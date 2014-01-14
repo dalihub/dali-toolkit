@@ -29,9 +29,7 @@ capi_devel_image_view_header_files = \
 capi_devel_popup_header_files = \
   $(capi_devel_src_dir)/controls/popup/popup.h
 
-capi_devel_scroll_component_header_files = \
-  $(capi_devel_src_dir)/controls/scroll-component/scroll-bar.h \
-  $(capi_devel_src_dir)/controls/scroll-component/scroll-component.h
+capi_devel_scroll_component_header_files =
 
 capi_devel_scrollable_header_files = \
   $(capi_devel_src_dir)/controls/scrollable/scrollable.h

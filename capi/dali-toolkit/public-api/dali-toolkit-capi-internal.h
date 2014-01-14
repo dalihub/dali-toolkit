@@ -28,8 +28,6 @@
 #include <dali-toolkit/public-api/controls/default-controls/push-button-factory.h>
 #include <dali-toolkit/public-api/controls/image-view/masked-image-view.h>
 #include <dali-toolkit/public-api/controls/popup/popup.h>
-#include <dali-toolkit/public-api/controls/scroll-component/scroll-bar.h>
-#include <dali-toolkit/public-api/controls/scroll-component/scroll-component.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/grid-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>

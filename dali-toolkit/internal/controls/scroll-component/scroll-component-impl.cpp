@@ -16,7 +16,7 @@
 
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/scroll-component/scroll-component-impl.h>
-#include <dali-toolkit/public-api/controls/scroll-component/scroll-bar.h>
+#include <dali-toolkit/internal/controls/scroll-component/scroll-bar.h>
 
 namespace Dali
 {

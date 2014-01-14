@@ -24,8 +24,6 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.cpp \
   $(public_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.cpp \
   $(public_api_src_dir)/controls/popup/popup.cpp \
-  $(public_api_src_dir)/controls/scroll-component/scroll-bar.cpp \
-  $(public_api_src_dir)/controls/scroll-component/scroll-component.cpp \
   $(public_api_src_dir)/controls/scrollable/item-view/item-factory.cpp \
   $(public_api_src_dir)/controls/scrollable/item-view/item-layout.cpp \
   $(public_api_src_dir)/controls/scrollable/item-view/item-view.cpp \

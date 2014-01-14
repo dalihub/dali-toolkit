@@ -17,11 +17,6 @@
 // limitations under the License.
 //
 
-/**
- * @addtogroup CAPI_DALI_FRAMEWORK
- * @{
- */
-
 // INTERNAL INCLUDES
 #include <dali/dali.h>
 #include <dali-toolkit/public-api/controls/control.h>
@@ -95,7 +90,4 @@ public: // Not intended for application developers
 
 } // namespace Dali
 
-/**
- * @}
- */
 #endif // __DALI_TOOLKIT_SCROLL_COMPONENT_H__

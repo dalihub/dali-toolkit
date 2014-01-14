@@ -17,13 +17,8 @@
 // limitations under the License.
 //
 
-/**
- * @addtogroup CAPI_DALI_FRAMEWORK
- * @{
- */
-
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/scroll-component/scroll-component.h>
+#include <dali-toolkit/internal/controls/scroll-component/scroll-component.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 
 namespace Dali DALI_IMPORT_API
@@ -119,7 +114,4 @@ public: // Not intended for application developers
 
 } // namespace Dali
 
-/**
- * @}
- */
 #endif // __DALI_TOOLKIT_SCROLL_BAR_H__

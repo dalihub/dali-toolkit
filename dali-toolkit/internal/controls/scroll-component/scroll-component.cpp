@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-#include <dali-toolkit/public-api/controls/scroll-component/scroll-component.h>
+#include <dali-toolkit/internal/controls/scroll-component/scroll-component.h>
 #include <dali-toolkit/internal/controls/scroll-component/scroll-component-impl.h>
 
 namespace Dali
