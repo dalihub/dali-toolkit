@@ -65,32 +65,24 @@ extern "C" {
   void (*tet_cleanup)() = Cleanup;
 }
 
-static void UtcDaliButtonNew();
-static void UtcDaliButtonSetProperty();
-static void UtcDaliButtonSetGetDimmed();
-static void UtcDaliButtonSize();
-static void UtcDaliButtonClicked();
-static void UtcDaliButtonConnectSignal();
-static void UtcDaliButtonSetGetAnimationTime();
-
 enum {
   POSITIVE_TC_IDX = 0x01,
   NEGATIVE_TC_IDX,
 };
 
-// Add test functionality for all APIs in the class (Positive and Negative)
+#define MAX_NUMBER_OF_TESTS 10000
 extern "C" {
-  struct tet_testlist tet_testlist[] = {
-    { UtcDaliButtonNew, POSITIVE_TC_IDX },
-    { UtcDaliButtonSetProperty, POSITIVE_TC_IDX },
-    { UtcDaliButtonSetGetDimmed, POSITIVE_TC_IDX },
-    { UtcDaliButtonSize, POSITIVE_TC_IDX },
-    { UtcDaliButtonClicked, POSITIVE_TC_IDX },
-    { UtcDaliButtonConnectSignal, POSITIVE_TC_IDX },
-    { UtcDaliButtonSetGetAnimationTime, POSITIVE_TC_IDX },
-    { NULL, 0 }
-  };
+  struct tet_testlist tet_testlist[MAX_NUMBER_OF_TESTS];
 }
+
+// Add test functionality for all APIs in the class (Positive and Negative)
+TEST_FUNCTION( UtcDaliButtonNew, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliButtonProperties, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliButtonSetGetDimmed, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliButtonSize, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliButtonClicked, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliButtonConnectSignal, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliButtonSetGetAnimationTime, POSITIVE_TC_IDX );
 
 // Called only once before first test is run.
 static void Startup()
@@ -162,7 +154,7 @@ static void UtcDaliButtonNew()
   DALI_TEST_CHECK( downCastCheckBoxButton2 );
 }
 
-static void UtcDaliButtonSetProperty()
+static void UtcDaliButtonProperties()
 {
   tet_infoline("UtcDaliButtonSetProperty: ");
   ToolkitTestApplication application;
@@ -171,15 +163,19 @@ static void UtcDaliButtonSetProperty()
   PushButton pushButton = PushButton::New();
 
   //Test various properties
-  checkBoxButton.SetProperty(checkBoxButton.GetPropertyIndex("dimmed"), false);
+  checkBoxButton.SetProperty( Button::PROPERTY_DIMMED, false );
   DALI_TEST_CHECK( false == checkBoxButton.IsDimmed() );
-  checkBoxButton.SetProperty(checkBoxButton.GetPropertyIndex("dimmed"), true);
+  DALI_TEST_CHECK( false == checkBoxButton.GetProperty< bool >( Button::PROPERTY_DIMMED ) );
+  checkBoxButton.SetProperty( Button::PROPERTY_DIMMED, true );
   DALI_TEST_CHECK( true == checkBoxButton.IsDimmed() );
+  DALI_TEST_CHECK( true == checkBoxButton.GetProperty< bool >( Button::PROPERTY_DIMMED ) );
 
-  pushButton.SetProperty(pushButton.GetPropertyIndex("dimmed"), false);
+  pushButton.SetProperty( Button::PROPERTY_DIMMED, false );
   DALI_TEST_CHECK( false == pushButton.IsDimmed() );
-  pushButton.SetProperty(pushButton.GetPropertyIndex("dimmed"), true);
+  DALI_TEST_CHECK( false == pushButton.GetProperty< bool >( Button::PROPERTY_DIMMED ) );
+  pushButton.SetProperty( Button::PROPERTY_DIMMED, true );
   DALI_TEST_CHECK( true == pushButton.IsDimmed() );
+  DALI_TEST_CHECK( true == pushButton.GetProperty< bool >( Button::PROPERTY_DIMMED ) );
 }
 
 static void UtcDaliButtonSetGetDimmed()

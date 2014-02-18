@@ -44,10 +44,10 @@ class Control : public CustomActor, public ConnectionTrackerInterface
 {
 public:
 
-  //Action Names
+  // Action Names
   static const char* const ACTION_CONTROL_ACTIVATED;
 
-  //Signal Names
+  // Signal Names
   static const char* const SIGNAL_KEY_EVENT;
 
   /**

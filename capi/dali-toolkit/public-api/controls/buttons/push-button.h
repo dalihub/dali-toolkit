@@ -83,13 +83,24 @@ class PushButton : public Button
 {
 public:
 
-  //Signal Names
+  // Signal Names
   static const char* const SIGNAL_TOGGLED;
   static const char* const SIGNAL_PRESSED;
   static const char* const SIGNAL_RELEASED;
 
-  //Action Names
+  // Action Names
   static const char* const ACTION_PUSH_BUTTON_CLICK;
+
+  // Properties
+  static const Property::Index PROPERTY_AUTO_REPEATING;               ///< name "auto-repeating",               @see SetAutoRepeating(),               type BOOLEAN
+  static const Property::Index PROPERTY_INITIAL_AUTO_REPEATING_DELAY; ///< name "initial-auto-repeating-delay", @see SetInitialAutoRepeatingDelay(),   type FLOAT
+  static const Property::Index PROPERTY_NEXT_AUTO_REPEATING_DELAY;    ///< name "next-auto-repeating-delay",    @see SetNextAutoRepeatingDelay(),      type FLOAT
+  static const Property::Index PROPERTY_TOGGLABLE;                    ///< name "togglable",                    @see SetToggleButton(),                type BOOLEAN
+  static const Property::Index PROPERTY_TOGGLE;                       ///< name "toggle",                       @see SetToggled(),                     type BOOLEAN
+  static const Property::Index PROPERTY_BUTTON_IMAGE;                 ///< name "button-image",                 @see SetButtonImage(Image),            type STRING
+  static const Property::Index PROPERTY_PRESSED_IMAGE;                ///< name "pressed-image",                @see SetPressedImage(Image),           type STRING
+  static const Property::Index PROPERTY_DIMMED_IMAGE;                 ///< name "dimmed-image",                 @see SetDimmedImage(Image),            type STRING
+  static const Property::Index PROPERTY_LABEL_TEXT;                   ///< name "label-text",                   @see SetLabelText(const std::string&), type STRING
 
 public:
 

@@ -29,13 +29,13 @@ namespace Dali
 namespace Toolkit
 {
 
-namespace Internal
-{
+const Property::Index Button::PROPERTY_DIMMED( Internal::Button::BUTTON_PROPERTY_START_INDEX );
 
 namespace Internal
 {
 
-using namespace Dali;
+namespace
+{
 
 BaseHandle Create()
 {
@@ -47,7 +47,9 @@ TypeRegistration typeRegistration( typeid(Toolkit::Button), typeid(Toolkit::Cont
 
 SignalConnectorType signalConnector1( typeRegistration, Toolkit::Button::SIGNAL_CLICKED, &Button::DoConnectSignal );
 
-}
+PropertyRegistration property1( typeRegistration, "dimmed", Toolkit::Button::PROPERTY_DIMMED, Property::BOOLEAN, &Button::SetProperty, &Button::GetProperty );
+
+} // unnamed namespace
 
 Button::Button()
 : ControlImpl( true ),
@@ -196,14 +198,13 @@ void Button::OnInitialize()
     mPainter->Initialize( handle );
   }
 
+  Actor self = Self();
+
   mTapDetector = TapGestureDetector::New();
-  mTapDetector.Attach(Self());
+  mTapDetector.Attach( self );
   mTapDetector.DetectedSignal().Connect(this, &Button::OnTap);
 
   OnButtonInitialize();
-
-  Actor self = Self();
-  mPropertyDimmed = self.RegisterProperty( PROPERTY_DIMMED, false, Property::READ_WRITE );
 
   self.SetKeyboardFocusable( true );
 }
@@ -214,14 +215,6 @@ void Button::OnControlSizeSet(const Vector3& targetSize)
   if( mPainter )
   {
     mPainter->SetSize( handle, targetSize );
-  }
-}
-
-void Button::OnPropertySet( Property::Index index, Property::Value propertyValue )
-{
-  if( index == mPropertyDimmed )
-  {
-    SetDimmed(propertyValue.Get<bool>());
   }
 }
 
@@ -237,6 +230,28 @@ void Button::OnStageDisconnection()
     OnTouchPointLeave(); // Notification for derived classes.
     mState = ButtonUp;
   }
+}
+
+void Button::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+{
+  Toolkit::Button button = Toolkit::Button::DownCast( Dali::BaseHandle( object ) );
+
+  if ( button && ( index == Toolkit::Button::PROPERTY_DIMMED ) )
+  {
+    GetImplementation( button ).SetDimmed( value.Get<bool>() );
+  }
+}
+
+Property::Value Button::GetProperty( BaseObject* object, Property::Index propertyIndex )
+{
+  Toolkit::Button button = Toolkit::Button::DownCast( Dali::BaseHandle( object ) );
+
+  if ( button && ( propertyIndex == Toolkit::Button::PROPERTY_DIMMED ) )
+  {
+    return Property::Value( GetImplementation( button ).mDimmed );
+  }
+
+  return Property::Value();
 }
 
 } // namespace Internal

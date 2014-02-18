@@ -385,6 +385,7 @@ TEST_FUNCTION( UtcDaliPushButtonReleased, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliPushButtonToggled, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliPushButtonInterruptEventWhenInsensitive, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliPushButtonInterruptEventWhenNonVisible, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPushButtonProperties, POSITIVE_TC_IDX );
 
 // Called only once before first test is run.
 static void Startup()
@@ -1260,4 +1261,75 @@ static void UtcDaliPushButtonInterruptEventWhenNonVisible()
   application.GetCore().SendEvent( event );
 
   DALI_TEST_CHECK( !gOnTouchPointInterrupted );
+}
+
+void UtcDaliPushButtonProperties()
+{
+  ToolkitTestApplication application;
+
+  PushButton button = PushButton::New();
+  Stage::GetCurrent().Add( button );
+
+  // PushButton::PROPERTY_AUTO_REPEATING
+  button.SetAutoRepeating( false );
+  DALI_TEST_CHECK( ! button.GetProperty< bool >( PushButton::PROPERTY_AUTO_REPEATING ) );
+  button.SetProperty( PushButton::PROPERTY_AUTO_REPEATING, true );
+  DALI_TEST_CHECK( button.IsAutoRepeating() ) ;
+  DALI_TEST_CHECK( button.GetProperty< bool >( PushButton::PROPERTY_AUTO_REPEATING ) );
+
+  // PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY
+  button.SetInitialAutoRepeatingDelay( 10.0f );
+  DALI_TEST_EQUALS( 10.0f, button.GetProperty< float >( PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY ), TEST_LOCATION );
+  button.SetProperty( PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY, 25.0f );
+  DALI_TEST_EQUALS( 25.0f, button.GetInitialAutoRepeatingDelay(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 25.0f, button.GetProperty< float >( PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY ), TEST_LOCATION );
+
+  //  PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY
+  button.SetNextAutoRepeatingDelay( 3.0f );
+  DALI_TEST_EQUALS( 3.0f, button.GetProperty< float >( PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY ), TEST_LOCATION );
+  button.SetProperty( PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY, 4.0f );
+  DALI_TEST_EQUALS( 4.0f, button.GetNextAutoRepeatingDelay(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 4.0f, button.GetProperty< float >( PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY ), TEST_LOCATION );
+
+  //  PushButton::PROPERTY_TOGGLABLE
+  button.SetToggleButton( false );
+  DALI_TEST_CHECK( ! button.GetProperty< bool >( PushButton::PROPERTY_TOGGLABLE ) );
+  button.SetProperty( PushButton::PROPERTY_TOGGLABLE, true );
+  DALI_TEST_CHECK( button.IsToggleButton() ) ;
+  DALI_TEST_CHECK( button.GetProperty< bool >( PushButton::PROPERTY_TOGGLABLE ) );
+
+  //  PushButton::PROPERTY_TOGGLE
+  button.SetToggled( false );
+  DALI_TEST_CHECK( ! button.GetProperty< bool >( PushButton::PROPERTY_TOGGLE ) );
+  button.SetProperty( PushButton::PROPERTY_TOGGLE, true );
+  DALI_TEST_CHECK( button.IsToggled() ) ;
+  DALI_TEST_CHECK( button.GetProperty< bool >( PushButton::PROPERTY_TOGGLE ) );
+
+  //  PushButton::PROPERTY_BUTTON_IMAGE
+  DALI_TEST_CHECK( button.GetProperty< std::string >( PushButton::PROPERTY_BUTTON_IMAGE ).empty() );
+  button.SetButtonImage( Image::New( "FunctionButtonImage") );
+  DALI_TEST_EQUALS( "FunctionButtonImage", button.GetProperty< std::string >( PushButton::PROPERTY_BUTTON_IMAGE ), TEST_LOCATION );
+  button.SetProperty( PushButton::PROPERTY_BUTTON_IMAGE, "PropertyButtonImage" );
+  DALI_TEST_EQUALS( "PropertyButtonImage", button.GetProperty< std::string >( PushButton::PROPERTY_BUTTON_IMAGE ), TEST_LOCATION );
+
+  //  PushButton::PROPERTY_PRESSED_IMAGE
+  DALI_TEST_CHECK( button.GetProperty< std::string >( PushButton::PROPERTY_PRESSED_IMAGE ).empty() );
+  button.SetPressedImage( Image::New( "FunctionPressedImage") );
+  DALI_TEST_EQUALS( "FunctionPressedImage", button.GetProperty< std::string >( PushButton::PROPERTY_PRESSED_IMAGE ), TEST_LOCATION );
+  button.SetProperty( PushButton::PROPERTY_PRESSED_IMAGE, "PropertyPressedImage" );
+  DALI_TEST_EQUALS( "PropertyPressedImage", button.GetProperty< std::string >( PushButton::PROPERTY_PRESSED_IMAGE ), TEST_LOCATION );
+
+  //  PushButton::PROPERTY_DIMMED_IMAGE
+  DALI_TEST_CHECK( button.GetProperty< std::string >( PushButton::PROPERTY_DIMMED_IMAGE ).empty() );
+  button.SetDimmedImage( Image::New( "FunctionDimmedImage") );
+  DALI_TEST_EQUALS( "FunctionDimmedImage", button.GetProperty< std::string >( PushButton::PROPERTY_DIMMED_IMAGE ), TEST_LOCATION );
+  button.SetProperty( PushButton::PROPERTY_DIMMED_IMAGE, "PropertyDimmedImage" );
+  DALI_TEST_EQUALS( "PropertyDimmedImage", button.GetProperty< std::string >( PushButton::PROPERTY_DIMMED_IMAGE ), TEST_LOCATION );
+
+  //  PushButton::PROPERTY_LABEL_TEXT
+  DALI_TEST_CHECK( button.GetProperty< std::string >( PushButton::PROPERTY_LABEL_TEXT ).empty() );
+  button.SetLabelText( "FunctionLabel" );
+  DALI_TEST_EQUALS( "FunctionLabel", button.GetProperty< std::string >( PushButton::PROPERTY_LABEL_TEXT ), TEST_LOCATION );
+  button.SetProperty( PushButton::PROPERTY_LABEL_TEXT, "PropertyLabel" );
+  DALI_TEST_EQUALS( "PropertyLabel", button.GetProperty< std::string >( PushButton::PROPERTY_LABEL_TEXT ), TEST_LOCATION );
 }

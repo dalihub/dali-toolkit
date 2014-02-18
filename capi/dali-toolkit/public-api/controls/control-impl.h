@@ -51,6 +51,13 @@ class ControlImpl : public CustomActorImpl, public ConnectionTrackerInterface
 {
 public:
 
+  // Properties
+  enum
+  {
+    CONTROL_PROPERTY_START_INDEX = PropertyRegistration::START_INDEX,
+    CONTROL_PROPERTY_END_INDEX = CONTROL_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
+  };
+
   // Creation
 
   /**

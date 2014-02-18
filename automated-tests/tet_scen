@@ -123,4 +123,7 @@ text-view-full
     :include:/dali-internal-test-suite/text-view/tslist
 
 ##### DEBUG #####
+debug
+    /dali-test-suite/buttons/utc-Dali-PushButton
+
 # EOF

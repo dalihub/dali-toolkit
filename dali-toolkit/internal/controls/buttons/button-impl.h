@@ -39,6 +39,14 @@ namespace Internal
  */
 class Button : public ControlImpl
 {
+public:
+
+  // Properties
+  enum
+  {
+    BUTTON_PROPERTY_START_INDEX = ControlImpl::CONTROL_PROPERTY_END_INDEX + 1,
+    BUTTON_PROPERTY_END_INDEX = BUTTON_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
+  };
 
 protected:
 
@@ -139,6 +147,24 @@ public:
    */
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
+  // Properties
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
+
 protected: // From CustomActorImpl
 
   /**
@@ -157,11 +183,6 @@ private: // From ControlImpl
    * @copydoc Toolkit::Control::OnControlSizeSet( const Vector3& targetSize )
    */
   virtual void OnControlSizeSet( const Vector3& targetSize );
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnPropertySet()
-   */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
 
 private:
 
@@ -208,8 +229,6 @@ protected: // Signals
   Toolkit::Button::ClickedSignalV2 mClickedSignalV2; ///< Signal emitted when the button is clicked.
 
   TapGestureDetector mTapDetector;
-
-  Property::Index  mPropertyDimmed;       ///< Property index for dimmed.
 };
 
 } // namespace Internal

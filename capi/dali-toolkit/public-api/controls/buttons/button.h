@@ -57,6 +57,9 @@ public:
   // Signal Names
   static const char* const SIGNAL_CLICKED;
 
+  // Properties
+  static const Property::Index PROPERTY_DIMMED; ///< name "dimmed", @see SetDimmed(), type BOOLEAN
+
 public:
 
   /**

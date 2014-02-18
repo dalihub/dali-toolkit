@@ -34,13 +34,21 @@ namespace Dali
 namespace Toolkit
 {
 
+const Property::Index PushButton::PROPERTY_AUTO_REPEATING               = Internal::Button::BUTTON_PROPERTY_END_INDEX + 1;
+const Property::Index PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY = Internal::Button::BUTTON_PROPERTY_END_INDEX + 2;
+const Property::Index PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY    = Internal::Button::BUTTON_PROPERTY_END_INDEX + 3;
+const Property::Index PushButton::PROPERTY_TOGGLABLE                    = Internal::Button::BUTTON_PROPERTY_END_INDEX + 4;
+const Property::Index PushButton::PROPERTY_TOGGLE                       = Internal::Button::BUTTON_PROPERTY_END_INDEX + 5;
+const Property::Index PushButton::PROPERTY_BUTTON_IMAGE                 = Internal::Button::BUTTON_PROPERTY_END_INDEX + 6;
+const Property::Index PushButton::PROPERTY_PRESSED_IMAGE                = Internal::Button::BUTTON_PROPERTY_END_INDEX + 8;
+const Property::Index PushButton::PROPERTY_DIMMED_IMAGE                 = Internal::Button::BUTTON_PROPERTY_END_INDEX + 9;
+const Property::Index PushButton::PROPERTY_LABEL_TEXT                   = Internal::Button::BUTTON_PROPERTY_END_INDEX + 11;
+
 namespace Internal
 {
 
 namespace
 {
-
-using namespace Dali;
 
 BaseHandle Create()
 {
@@ -55,20 +63,56 @@ SignalConnectorType signalConnector3( typeRegistration, Toolkit::PushButton::SIG
 
 TypeAction action1( typeRegistration, Toolkit::PushButton::ACTION_PUSH_BUTTON_CLICK, &PushButton::DoAction );
 
-}
+PropertyRegistration property1( typeRegistration, "auto-repeating",               Toolkit::PushButton::PROPERTY_AUTO_REPEATING,               Property::BOOLEAN, &PushButton::SetProperty, &PushButton::GetProperty );
+PropertyRegistration property2( typeRegistration, "initial-auto-repeating-delay", Toolkit::PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY, Property::FLOAT,   &PushButton::SetProperty, &PushButton::GetProperty );
+PropertyRegistration property3( typeRegistration, "next-auto-repeating-delay",    Toolkit::PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY,    Property::FLOAT,   &PushButton::SetProperty, &PushButton::GetProperty );
+PropertyRegistration property4( typeRegistration, "togglable",                    Toolkit::PushButton::PROPERTY_TOGGLABLE,                    Property::BOOLEAN, &PushButton::SetProperty, &PushButton::GetProperty );
+PropertyRegistration property5( typeRegistration, "toggle",                       Toolkit::PushButton::PROPERTY_TOGGLE,                       Property::BOOLEAN, &PushButton::SetProperty, &PushButton::GetProperty );
+PropertyRegistration property6( typeRegistration, "button-image",                 Toolkit::PushButton::PROPERTY_BUTTON_IMAGE,                 Property::STRING,  &PushButton::SetProperty, &PushButton::GetProperty );
+PropertyRegistration property7( typeRegistration, "pressed-image",                Toolkit::PushButton::PROPERTY_PRESSED_IMAGE,                Property::STRING,  &PushButton::SetProperty, &PushButton::GetProperty );
+PropertyRegistration property8( typeRegistration, "dimmed-image",                 Toolkit::PushButton::PROPERTY_DIMMED_IMAGE,                 Property::STRING,  &PushButton::SetProperty, &PushButton::GetProperty );
+PropertyRegistration property9( typeRegistration, "label-text",                   Toolkit::PushButton::PROPERTY_LABEL_TEXT,                   Property::STRING,  &PushButton::SetProperty, &PushButton::GetProperty );
 
+} // unnamed namespace
 
 namespace
 {
-  const unsigned int INITIAL_AUTOREPEATING_DELAY( 0.15f );
-  const unsigned int NEXT_AUTOREPEATING_DELAY( 0.05f );
 
-  // Helper function used to cast a ButtonPainter to PushButtonDefaultPainter
-  PushButtonDefaultPainterPtr GetPushButtonPainter( Dali::Toolkit::Internal::ButtonPainterPtr painter )
+const unsigned int INITIAL_AUTOREPEATING_DELAY( 0.15f );
+const unsigned int NEXT_AUTOREPEATING_DELAY( 0.05f );
+
+// Helper function used to cast a ButtonPainter to PushButtonDefaultPainter
+PushButtonDefaultPainterPtr GetPushButtonPainter( Dali::Toolkit::Internal::ButtonPainterPtr painter )
+{
+  return static_cast<PushButtonDefaultPainter*>( painter.Get() );
+}
+
+/**
+ * Helper function to checks if the specified actor is an ImageActor and if it has an Image with a path.
+ *
+ * @param[in]  actor  Actor handle to check.
+ * @param[out] path   The image path will be applied to this parameter, if available.
+ *                    If not available then this will be an empty string.
+ */
+void GetImageActorFilename( Actor& actor, std::string& path )
+{
+  path = ""; // Just return an empty string if not using ImageActor with an image
+
+  if ( actor )
   {
-    return static_cast<PushButtonDefaultPainter*>( painter.Get() );
+    ImageActor imageActor = ImageActor::DownCast( actor );
+    if ( imageActor )
+    {
+      Image image = imageActor.GetImage();
+      if ( image )
+      {
+        path = image.GetFilename();
+      }
+    }
   }
-} // namespace
+}
+
+} // unnamed namespace
 
 Dali::Toolkit::PushButton PushButton::New()
 {
@@ -352,6 +396,162 @@ bool PushButton::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   }
 
   return connected;
+}
+
+void PushButton::SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )
+{
+  Toolkit::PushButton pushButton = Toolkit::PushButton::DownCast( Dali::BaseHandle( object ) );
+
+  if ( pushButton )
+  {
+    PushButton& pushButtonImpl( GetImplementation( pushButton ) );
+
+    switch ( propertyIndex )
+    {
+      case Toolkit::PushButton::PROPERTY_AUTO_REPEATING:
+      {
+        pushButtonImpl.SetAutoRepeating( value.Get< bool >() );
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY:
+      {
+        pushButtonImpl.SetInitialAutoRepeatingDelay( value.Get< float >() );
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY:
+      {
+        pushButtonImpl.SetNextAutoRepeatingDelay( value.Get< float >() );
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_TOGGLABLE:
+      {
+        pushButtonImpl.SetToggleButton( value.Get< bool >() );
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_TOGGLE:
+      {
+        pushButtonImpl.SetToggled( value.Get< bool >() );
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_BUTTON_IMAGE:
+      {
+        Image image = Image::New( value.Get<std::string>() );
+        pushButtonImpl.SetButtonImage( image );
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_PRESSED_IMAGE:
+      {
+        Image image = Image::New( value.Get<std::string>() );
+        pushButtonImpl.SetPressedImage( image );
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_DIMMED_IMAGE:
+      {
+        Image image = Image::New( value.Get<std::string>() );
+        pushButtonImpl.SetDimmedImage( image );
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_LABEL_TEXT:
+      {
+        pushButtonImpl.SetLabelText( value.Get< std::string >() );
+        break;
+      }
+    }
+  }
+}
+
+Property::Value PushButton::GetProperty( BaseObject* object, Property::Index propertyIndex )
+{
+  Property::Value value;
+
+  Toolkit::PushButton pushButton = Toolkit::PushButton::DownCast( Dali::BaseHandle( object ) );
+
+  if ( pushButton )
+  {
+    PushButton& pushButtonImpl( GetImplementation( pushButton ) );
+
+    switch ( propertyIndex )
+    {
+      case Toolkit::PushButton::PROPERTY_AUTO_REPEATING:
+      {
+        value = pushButtonImpl.mAutoRepeating;
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY:
+      {
+        value = pushButtonImpl.mInitialAutoRepeatingDelay;
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY:
+      {
+        value = pushButtonImpl.mNextAutoRepeatingDelay;
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_TOGGLABLE:
+      {
+        value = pushButtonImpl.mToggleButton;
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_TOGGLE:
+      {
+        value = pushButtonImpl.mToggled;
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_BUTTON_IMAGE:
+      {
+        std::string path;
+        GetImageActorFilename( pushButtonImpl.mButtonImage, path );
+        value = path;
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_PRESSED_IMAGE:
+      {
+        std::string path;
+        GetImageActorFilename( pushButtonImpl.mPressedImage, path );
+        value = path;
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_DIMMED_IMAGE:
+      {
+        std::string path;
+        GetImageActorFilename( pushButtonImpl.mDimmedImage, path );
+        value = path;
+        break;
+      }
+
+      case Toolkit::PushButton::PROPERTY_LABEL_TEXT:
+      {
+        value = ""; // Just return an empty string if not using a TextView
+
+        if ( pushButtonImpl.mLabel )
+        {
+          Toolkit::TextView textView = Toolkit::TextView::DownCast( pushButtonImpl.mLabel );
+          if ( textView )
+          {
+            value = textView.GetText();
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  return value;
 }
 
 void PushButton::OnButtonInitialize()

@@ -236,7 +236,9 @@ public:
    */
   Actor& GetFadeOutButtonImage();
 
-public: // Signals
+public:
+
+  // Signals
 
   /**
    * @copydoc Dali::Toolkit::PushButton::ToggledSignal()
@@ -263,6 +265,18 @@ public: // Signals
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+
+  // Properties
+
+  /**
+   * @copydoc Button::SetProperty
+   */
+  static void SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value );
+
+  /**
+   * @copydoc Button::GetProperty
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
 
 protected: // From Button
 
