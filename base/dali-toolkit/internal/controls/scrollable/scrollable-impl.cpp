@@ -67,6 +67,8 @@ Scrollable::Scrollable()
   mPropertyPositionMin(Property::INVALID_INDEX),
   mPropertyPositionMax(Property::INVALID_INDEX),
   mPropertyScrollDirection(Property::INVALID_INDEX),
+  mPropertyCanScrollVertical(Property::INVALID_INDEX),
+  mPropertyCanScrollHorizontal(Property::INVALID_INDEX),
   mOvershootEnabled(false)
 {
 }

@@ -859,6 +859,14 @@ public:
   Vector3 GetCurrentScrollPosition() const;
 
   /**
+   * @brief Sets the current scroll position, overriding current scroll animations. If panning is currently taking place
+   *        SetScrollPosition will have no effect. Try to ensure panning has stopped before calling this function.
+   *
+   * @param[in] position The new scroll position to set.
+   */
+  void SetScrollPosition(const Vector3& position);
+
+  /**
    * @brief Retrieves current scroll scale.
    *
    * @returns The current scroll scale.

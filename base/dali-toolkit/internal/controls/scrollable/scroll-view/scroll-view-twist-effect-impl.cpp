@@ -179,8 +179,7 @@ struct ScrollDropoffTwistRotationConstraint
                         const PropertyInput& scrollablePositionProperty,
                         const PropertyInput& scrollOvershootXProperty,
                         const PropertyInput& scrollOvershootYProperty,
-                        const PropertyInput& pageSizeProperty,
-                        const PropertyInput& activateProperty)
+                        const PropertyInput& pageSizeProperty)
   {
     const Vector3& position = actorPositionProperty.GetVector3();
     const Vector3& parentPosition = scrollablePositionProperty.GetVector3();
@@ -188,13 +187,6 @@ struct ScrollDropoffTwistRotationConstraint
     const Vector2 overshoot(scrollOvershootXProperty.GetFloat(), scrollOvershootYProperty.GetFloat());
 
     if(fabsf(overshoot.x) < Math::MACHINE_EPSILON_0 && fabsf(overshoot.y) < Math::MACHINE_EPSILON_0)
-    {
-      return current;
-    }
-
-    const float& activate = activateProperty.GetFloat();
-
-    if(activate < Math::MACHINE_EPSILON_0)
     {
       return current;
     }
@@ -275,19 +267,11 @@ struct ScrollTwistRotationConstraint
    */
   Quaternion operator()(const Quaternion& current,
                         const PropertyInput& scrollOvershootXProperty,
-                        const PropertyInput& scrollOvershootYProperty,
-                        const PropertyInput& activateProperty)
+                        const PropertyInput& scrollOvershootYProperty)
   {
     const Vector2 overshoot(scrollOvershootXProperty.GetFloat(), scrollOvershootYProperty.GetFloat());
 
-    if(fabsf(overshoot.x) < Math::MACHINE_EPSILON_0 && fabsf(overshoot.y) < Math::MACHINE_EPSILON_0)
-    {
-      return current;
-    }
-
-    const float& activate = activateProperty.GetFloat();
-
-    if(activate < Math::MACHINE_EPSILON_0)
+    if( fabsf(overshoot.x) < Math::MACHINE_EPSILON_0 && fabsf(overshoot.y) < Math::MACHINE_EPSILON_0 )
     {
       return current;
     }
@@ -543,7 +527,6 @@ void ScrollViewTwistEffect::Apply(Actor child)
                                                 Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME ) ),
                                                 Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME ) ),
                                                 Source(scrollView, Actor::SIZE ),
-                                                Source(scrollView, scrollView.GetPropertyIndex( EFFECT_ACTIVATE) ),
                                                 ScrollDropoffTwistRotationConstraint(mMaxSwingAngle, mDropOff, mDropOffDistance, mDropOffFunction) );
     }
     else
@@ -551,7 +534,6 @@ void ScrollViewTwistEffect::Apply(Actor child)
       constraint = Constraint::New<Quaternion>( Actor::ROTATION,
                                                 Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME ) ),
                                                 Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME ) ),
-                                                Source(scrollView, scrollView.GetPropertyIndex( EFFECT_ACTIVATE) ),
                                                 ScrollTwistRotationConstraint(mMaxSwingAngle) );
     }
     constraint.SetRemoveAction( Constraint::Discard );
@@ -584,8 +566,10 @@ void ScrollViewTwistEffect::OnAttach(Toolkit::ScrollView& scrollView)
     mPropertyTime = SafeRegisterProperty( scrollView, EFFECT_TIME, 0.0f );
     mPropertyReference = SafeRegisterProperty( scrollView, EFFECT_REFERENCE, Vector3::ZERO );
     mPropertyDepth = SafeRegisterProperty( scrollView, EFFECT_DEPTH, 0.0f);
-    mPropertyActivate = SafeRegisterProperty(scrollView, EFFECT_ACTIVATE, 1.0f);
+    mPropertyActivate = SafeRegisterProperty(scrollView, EFFECT_ACTIVATE, 0.0f);
   }
+  // currently cant change overshoot snap back duration, use the constant one from ScrollView
+  mActivationTime = Toolkit::ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION;
 
   // Connect to the scroll view signals
   scrollView.ScrollStartedSignal().Connect(this, &ScrollViewTwistEffect::OnScrollStart);
@@ -677,7 +661,7 @@ void ScrollViewTwistEffect::OnScrollComplete( const Vector3& position )
   }
   Actor scrollView = GetScrollView();
   scrollView.SetProperty(mPropertyActivate, 1.0f);
-  mActivateAnimation = Animation::New(DELAY);
+  mActivateAnimation = Animation::New(mActivationTime);
   mActivateAnimation.AnimateTo( Property(scrollView, mPropertyActivate), 0.0f, AlphaFunctions::Linear);
   mActivateAnimation.FinishedSignal().Connect(this, &ScrollViewTwistEffect::OnActivateAnimationFinished);
   mActivateAnimation.Play();

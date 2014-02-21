@@ -280,7 +280,7 @@ const std::string ScrollView::SCROLL_START_PAGE_POSITION_PROPERTY_NAME( "scroll-
 
 const float ScrollView::DEFAULT_SLOW_SNAP_ANIMATION_DURATION(0.5f);
 const float ScrollView::DEFAULT_FAST_SNAP_ANIMATION_DURATION(0.25f);
-const float ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION(1.0f);
+const float ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION(0.5f);
 const float ScrollView::DEFAULT_MAX_OVERSHOOT(100.0f);  // 100 pixels
 
 const float ScrollView::DEFAULT_AXIS_AUTO_LOCK_GRADIENT(0.36f);
@@ -501,6 +501,11 @@ void ScrollView::SetMouseWheelScrollDistanceStep(Vector2 step)
 Vector3 ScrollView::GetCurrentScrollPosition() const
 {
   return GetImpl(*this).GetCurrentScrollPosition();
+}
+
+void ScrollView::SetScrollPosition(const Vector3& position)
+{
+  GetImpl(*this).SetScrollPosition(position);
 }
 
 Vector3 ScrollView::GetCurrentScrollScale() const

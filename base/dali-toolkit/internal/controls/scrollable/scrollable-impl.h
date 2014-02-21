@@ -213,7 +213,7 @@ private:
   typedef ComponentContainer::iterator ComponentIter;
 
   ComponentContainer mComponents;  ///< ScrollComponent (such as a scrollbar/page indicator/status)
-  bool mOvershootEnabled;
+  bool mOvershootEnabled:1;
 };
 
 } // namespace Internal

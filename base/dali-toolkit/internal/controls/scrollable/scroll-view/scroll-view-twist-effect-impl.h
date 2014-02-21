@@ -185,6 +185,7 @@ private:
 
   ushort mFlags;
   Animation mAnimation;                         ///< Animation Timer to drive the twist effect constraint.
+  float     mActivationTime;                    ///< Time taken for overshoot to reach zero, which is the time we need to allow effect to be active
   Animation mActivateAnimation;
   Property::Index mPropertyTime;                ///< Time property used by twist effect constraint to calculate timePassed.
   bool mEnableEffect;                           ///< flag that decide whether enable or disable the twist effect.

@@ -78,6 +78,19 @@ public:
     LockNone          ///< Locking is set to none (free panning).
   };
 
+  enum ScrollStateFlag
+  {
+    AnimatingInternalX = 0x01, ///< animating mPropertyX due to externally requested ScrollTo or internal snapping operation
+    AnimatingInternalY = 0x02, ///< animating mPropertyY due to externally requested ScrollTo or internal snapping operation
+    SnappingInternalX  = 0x04, ///< snapping mPropertyX back to mPropertyPreScroll x value to remove x overshoot over time
+    SnappingInternalY  = 0x08, ///< snapping mPropertyY back to mPropertyPreScroll y value to remove y overshoot over time
+  };
+
+  static const unsigned int SCROLL_X_STATE_MASK = AnimatingInternalX | SnappingInternalX;
+  static const unsigned int SCROLL_Y_STATE_MASK = AnimatingInternalY | SnappingInternalY;
+  static const unsigned int SCROLL_ANIMATION_FLAGS = AnimatingInternalX | AnimatingInternalY;
+  static const unsigned int SNAP_ANIMATION_FLAGS = SnappingInternalX | SnappingInternalY;
+
 public:
 
   /**
@@ -333,6 +346,11 @@ public:
   Vector3 GetCurrentScrollPosition() const;
 
   /**
+   * @copydoc Toolkit::ScrollView::SetScrollPosition
+   */
+  void SetScrollPosition(const Vector3& position);
+
+  /**
    * @copydoc Toolkit::ScrollView::GetCurrentScrollScale
    */
   Vector3 GetCurrentScrollScale() const;
@@ -439,6 +457,13 @@ public:
   void StopAnimation(void);
 
   /**
+   * Stops the input animation
+   *
+   * @param[in] the animation to stop
+   */
+  void StopAnimation(Animation& animation);
+
+  /**
    * Animates to position/scale/rotation transform.
    *
    * @param[in] position The position to animate to
@@ -513,6 +538,11 @@ private: // private overriden functions from CustomActorImpl and Controls
   virtual void OnChildRemove(Actor& child);
 
   /**
+   * @copydoc Dali::CustomActorImpl::OnPropertySet( Property::Index index, Property::Value propertyValue )
+   */
+  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
+
+  /**
    * From CustomActorImpl; called after a touch-signal is received by the owning actor.
    *
    * We don't listen to these events as content within the contain may consume events.
@@ -574,20 +604,70 @@ private:
   /**
    * Called whenever a snap animation has completed
    * @param[in] source the Animation instance that has completed.
+   * Resets all scrolling animations and states, leaving current scroll position at mPropertyPosition
    */
-  void OnSnapAnimationFinished( Animation& source );
+  void ResetScrolling();
+
+  /**
+   * Updates mScrollInternalPosition, mScrollPrePosition and mScrollPostPosition from their property counterparts
+   */
+  void UpdateLocalScrollProperties();
+
+  /**
+   * Makes sure scroll values are ready for animated scrolling
+   */
+  void PreAnimatedScrollSetup();
+
+  /**
+   * Finish an animated scroll, ensuring all scroll properties are updated
+   * and synchronised
+   */
+  void FinaliseAnimatedScroll();
+
+  /**
+   * Animates the internal x property to the given value
+   *
+   * @param[in] position The X position to animate to
+   * @param[in] duration The time in seconds for animation
+   * @param[in] alpha The alpha function to use for animating
+   */
+  void AnimateInternalXTo( float position, float duration, AlphaFunction alpha );
+
+  /**
+   * Animates the internal y property to the given value
+   *
+   * @param[in] position The Y position to animate to
+   * @param[in] duration The time in seconds for animation
+   * @param[in] alpha The alpha function to use for animating
+   */
+  void AnimateInternalYTo( float position, float duration, AlphaFunction alpha );
 
   /**
    * Called whenever a snap animation on the x-axis has completed
    * @param[in] source the Animation instance that has completed.
    */
-  void OnSnapXAnimationFinished( Animation& source );
+  void OnScrollAnimationFinished( Animation& source );
 
   /**
-   * Called whenever a snap animation on the y-axis has completed
+   * Called when either the X or Y internal scroll positions have finished snapping back to mPropertyPrePosition
+   *
    * @param[in] source the Animation instance that has completed.
    */
-  void OnSnapYAnimationFinished( Animation& source );
+  void OnSnapInternalPositionFinished( Animation& source );
+
+  /**
+   * Called whenever a snap animation on the x-axis has completed and we need to snap pre scroll
+   * position to our clamped position
+   * @param[in] position The x position to snap pre scroll property to
+   */
+  void SnapInternalXTo( float position );
+
+  /**
+   * Called whenever a snap animation on the y-axis has completed and we need to snap pre scroll
+   * position to our clamped position
+   * @param[in] position The y position to snap pre scroll property to
+   */
+  void SnapInternalYTo( float position );
 
   /**
    * This is called internally whenever the Scroll Rulers are
@@ -610,7 +690,7 @@ private:
    * @param[in] scaleDelta average scale delta from base scale (1)
    * @param[in] rotationDelta average rotation delta from base angle (0)
    */
-  void GestureContinuing(Vector2 panDelta, Vector2 scaleDelta, float rotationDelta);
+  void GestureContinuing(const Vector2& panDelta, const Vector2& scaleDelta, float rotationDelta);
 
   /**
    * Called upon pan gesture event.
@@ -645,22 +725,6 @@ private:
    * (occurs upon finishing gesture i.e. releasing)
    */
   void FinishTransform();
-
-  /**
-   * Sets Overshoot to origin / cancels animation
-   */
-  void SetOvershootToOrigin();
-
-  /**
-   * Animates Overshoot to origin
-   */
-  void AnimateOvershootToOrigin(float xDelay, float yDelay);
-
-  /**
-   * Called whenever a snap overshoot animation has completed.
-   * @param[in] source the Animation instance that has completed.
-   */
-  void OnSnapOvershootAnimationFinished( Animation& source );
 
   /**
    * Returns overshoot vector based on current position
@@ -818,12 +882,7 @@ private:
 
 private:
 
-  bool mInitialized;
-  bool mScrolling;                      ///< Flag indicating whether the scroll view is being scrolled (by user or animation)
-  bool mScrollInterrupted;              ///< Flag set for when a down event interrupts a scroll
   unsigned long mTouchDownTime;         ///< The touch down time
-
-  bool mSensitive;                      ///< Scroll Sensitivity Flag.
 
   int mGestureStackDepth;               ///< How many gestures are currently occuring.
   Vector2 mGestureReferencePosition;    ///< Point where scaling should occur from.
@@ -834,9 +893,11 @@ private:
   Vector3 mScaleDelta;                  ///< Amount currently scaled.
   float mRotationDelta;                 ///< Amount currently rotated.
 
+  unsigned int mScrollStateFlags;       ///< flags indicating current state of scrolling
   // Scroll delegate pre and post position/scale/rotation properties...
-  Vector3 mScrollPrePosition;           ///< Scroll delegate pre-position
-  Vector3 mScrollPostPosition;          ///< Scroll delegate post-position (affected by current touch)
+  Vector3 mScrollPrePosition;           ///< Wrapped scroll position, but not clamped
+  Vector3 mScrollPostPosition;          ///< Wrapped and clamped, this is the final scroll position used
+  Vector3 mScrollTargetPosition;        ///< Final target position for an animated scroll
   Vector3 mScrollPreScale;              ///< Scroll delegate pre-scale
   Vector3 mScrollPostScale;             ///< Scroll delegate post-scale (affected by current touch)
   float mScrollPreRotation;             ///< Scroll delegate pre-rotation
@@ -849,18 +910,13 @@ private:
   RulerPtr mRulerScaleX;
   RulerPtr mRulerScaleY;
   RulerPtr mRulerRotation;
-  bool mTouchDownTimeoutReached;
-  bool mActorAutoSnapEnabled;           ///< Whether to automatically snap to closest actor.
-  bool mAutoResizeContainerEnabled;     ///< Whether to automatically resize container (affects RulerDomain's on X/Y axes)
-  bool mWrapMode;                       ///< Whether to wrap contents based on container size.
-  bool mAxisAutoLock;                   ///< Whether to automatically lock axis when panning.
+
   unsigned int mMinTouchesForPanning;   ///< Minimum number of touches for panning to be used.
   unsigned int mMaxTouchesForPanning;   ///< Maximum number of touches for panning to be used.
 
-  Animation mSnapAnimation;
-  Animation mSnapXAnimation;             ///< Animates from current x-axis position to the snapped (or scrolled) x-axis position.
-  Animation mSnapYAnimation;             ///< Animates from current y-axis position to the snapped (or scrolled) y-axis position.
-  Animation mSnapOvershootAnimation;    ///< Animates scroll-overshoot from current position to 0,0 based on specified easing equation.
+  Animation mSnapAnimation;             ///< Used to animate rotation and scaling of scroll properties
+  Animation mInternalXAnimation;        ///< Animates mPropertyX to a snap position or application requested scroll position
+  Animation mInternalYAnimation;        ///< Animates mPropertyY to a snap position or application requested scroll position
 
 
   Vector2 mLastVelocity;                ///< Record the last velocity from PanGesture (Finish event doesn't have correct velocity)
@@ -871,14 +927,13 @@ private:
   Timer mRefreshTimer;                  ///< Refresh timer is used to provide the Application developer with updates as animations run.
   int mRefreshIntervalMilliseconds;     ///< Refresh timer interval.
 
-  bool mAlterChild;                     ///< Internal flag to control behavior of OnChildAdd/OnChildRemove when Adding internal Actors.
   Actor mInternalActor;                 ///< Internal actor (we keep internal actors in here e.g. scrollbars, so we can ignore it in searches)
 
   ScrollViewEffectContainer mEffects;   ///< Container keeping track of all the applied effects.
 
   float     mOvershootDelay;                    ///< Time to wait for input before reducing overshoot back to 0
   Vector2   mMaxOvershoot;                      ///< Number of scrollable pixels that will take overshoot from 0.0f to 1.0f
-  bool      mDefaultMaxOvershoot;               ///< Whether to use default max overshoot or application defined one
+  Vector2   mUserMaxOvershoot;                  ///< Set by user, allows overriding of default max overshoot for the scroll indicator
   float     mSnapOvershootDuration;             ///< Duration for overshoot snapping back to Vector3::ZERO
   AlphaFunction mSnapOvershootAlphaFunction;    ///< AlphaFunction to be used for this overshoot.
 
@@ -910,7 +965,20 @@ private:
 
   Toolkit::ScrollView::SnapStartedSignalV2 mSnapStartedSignalV2;
 
-  bool mInAccessibilityPan : 1; // With AccessibilityPan its easier to move between snap positions
+  bool mInAccessibilityPan : 1;           ///< With AccessibilityPan its easier to move between snap positions
+  bool mInitialized:1;
+  bool mScrolling:1;                      ///< Flag indicating whether the scroll view is being scrolled (by user or animation)
+  bool mScrollInterrupted:1;              ///< Flag set for when a down event interrupts a scroll
+  bool mPanning:1;                        ///< Whether scroll view is currently panning or not
+  bool mSensitive:1;                      ///< Scroll Sensitivity Flag.
+  bool mTouchDownTimeoutReached:1;        ///< Indicates when down event timeout occured without corresponding up event (touch still down)
+  bool mActorAutoSnapEnabled:1;           ///< Whether to automatically snap to closest actor.
+  bool mAutoResizeContainerEnabled:1;     ///< Whether to automatically resize container (affects RulerDomain's on X/Y axes)
+  bool mWrapMode:1;                       ///< Whether to wrap contents based on container size.
+  bool mAxisAutoLock:1;                   ///< Whether to automatically lock axis when panning.
+  bool mAlterChild:1;                     ///< Internal flag to control behavior of OnChildAdd/OnChildRemove when Adding internal Actors.
+  bool mDefaultMaxOvershoot:1;            ///< Whether to use default max overshoot or application defined one
+  bool mUserSetPosition:1;                ///< SetScrollPosition has been called, return this position until internals get control of scroll position again
 };
 
 } // namespace Internal
