@@ -261,7 +261,14 @@ void MaskedImageView::Resume()
 
 bool MaskedImageView::IsPaused() const
 {
-  return !mRenderTask; // RenderTask is discarded during Pause()
+  if( mRenderTask.GetRefreshRate() ) // REFRESH_ALWAYS
+  {
+    return false;
+  }
+  else // REFRESH_ONCE
+  {
+    return true;
+  }
 }
 
 void MaskedImageView::SetEditMode( Dali::Toolkit::MaskedImageView::EditMode editMode )
