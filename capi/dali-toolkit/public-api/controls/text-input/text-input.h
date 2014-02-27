@@ -271,36 +271,6 @@ public:
    bool IsGrabHandleEnabled();
 
   /**
-   * Toggle to enable flipping the selection handle, when it is reached the selection handle flip border.
-   * @param[in] toggle true to enable, false to disable flipping the selection handle. DEFAULT = true.
-   */
-  /* @deprecated, handles always flip. Use SetBoundingRectangle */
-  void EnableSelectionHandleFlip( bool toggle );
-
-  /**
-   * Method to check if the selection handle flip is enabled, if true then the selection cursor will be fliped when this exceed border.
-   * @return bool return true is that the selection handle flip enable.
-   */
-  /* @deprecated, handles always flip. Use SetBoundingRectangle */
-  bool IsSelectionHandleFlipEnabled();
-
-  /**
-   * Set the selection handle filp margin.
-   * The default value is Vector4(0, 0, 0, 0)
-   * ------------------------------------------
-   * |                  y                     |
-   * |   ----------------------------------   |
-   * |   |                                |   |
-   * | x |          Text Input            | z |
-   * |   |                                |   |
-   * |  ----------------------------------    |
-   * |                  w                     |
-   * ------------------------------------------
-   */
-   /* @deprecated, use SetBoundingRectangle instead. */
-  void SetSelectionHandleFlipMargin( const Vector4& margin );
-
-  /**
    * Set the bounding rectangle which handles, popup and similar decorations will not exceed
    * The default value is the width and height of the stage from the top left origin.
    * If a title bar for example is on the top of the screen then the y should be the title's height and
@@ -325,13 +295,6 @@ public:
    * @return Rect the bounding rectangle
    */
   const Rect<float> GetBoundingRectangle() const;
-
-  /**
-   * Retrieve the selection handle filp margin.
-   * @return Vector4 the selection handle flip margin.
-   */
-  /* @deprecated, use GetBoundingRectangle instead. */
-  const Vector4& GetSelectionHandleFlipMargin();
 
    /**
     * Sets the style for new text being typed.

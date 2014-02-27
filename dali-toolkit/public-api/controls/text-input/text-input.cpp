@@ -193,21 +193,6 @@ bool TextInput::IsGrabHandleEnabled()
   return GetImpl(*this).IsGrabHandleEnabled();
 }
 
-void TextInput::EnableSelectionHandleFlip( bool toggle )
-{
-  GetImpl(*this).EnableSelectionHandleFlip( toggle );
-}
-
-bool TextInput::IsSelectionHandleFlipEnabled()
-{
-  return GetImpl(*this).IsSelectionHandleFlipEnabled();
-}
-
-void TextInput::SetSelectionHandleFlipMargin( const Vector4& border )
-{
-  GetImpl(*this).SetSelectionHandleFlipMargin( border );
-}
-
 void TextInput::SetBoundingRectangle( const Rect<float>& boundingOriginAndSize )
 {
   GetImpl(*this).SetBoundingRectangle( boundingOriginAndSize );
@@ -216,11 +201,6 @@ void TextInput::SetBoundingRectangle( const Rect<float>& boundingOriginAndSize )
 const Rect<float> TextInput::GetBoundingRectangle() const
 {
   return GetImpl(*this).GetBoundingRectangle();
-}
-
-const Vector4& TextInput::GetSelectionHandleFlipMargin()
-{
-  return GetImpl(*this).GetSelectionHandleFlipMargin();
 }
 
 void TextInput::SetActiveStyle( const TextStyle& style, const TextStyle::Mask mask )
