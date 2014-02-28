@@ -185,7 +185,7 @@ static void UtcDaliPopoupSetProperty()
 
   //Test properties
   std::string testString = "Hello World";
-  popup.SetProperty(popup.GetPropertyIndex(Popup::PROPERTY_TITLE), testString);
+  popup.SetProperty(popup.GetPropertyIndex("title"), testString);
   DALI_TEST_EQUALS( testString, popup.GetTitle().GetText(), TEST_LOCATION );
 }
 

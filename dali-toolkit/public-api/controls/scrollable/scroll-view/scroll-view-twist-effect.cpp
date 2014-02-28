@@ -27,11 +27,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const std::string ScrollViewTwistEffect::EFFECT_TIME( "ScrollViewTwistEffect::EFFECT_TIME" );
-const std::string ScrollViewTwistEffect::EFFECT_REFERENCE( "ScrollViewTwistEffect::EFFECT_REFERENCE" );
-const std::string ScrollViewTwistEffect::EFFECT_DEPTH( "ScrollViewTwistEffect::EFFECT_DEPTH");
-const std::string ScrollViewTwistEffect::EFFECT_ACTIVATE( "ScrollViewTwistEffect::EFFECT_ACTIVATE");
-
 const float ScrollViewTwistEffect::DEFAULT_MINIMUM_DISTANCE_FOR_SHRINK( 0.0f );
 
 ScrollViewTwistEffect ScrollViewTwistEffect::New()

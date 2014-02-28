@@ -38,6 +38,19 @@ namespace Internal
 namespace
 {
 
+const char* const PROPERTY_TEXT = "text";
+const char* const PROPERTY_MULTILINE_POLICY = "multiline-policy";
+const char* const PROPERTY_WIDTH_EXCEED_POLICY = "width-exceed-policy";
+const char* const PROPERTY_HEIGHT_EXCEED_POLICY = "height-exceed-policy";
+const char* const PROPERTY_LINE_JUSTIFICATION = "line-justification";
+const char* const PROPERTY_FADE_BOUNDARY_LEFT = "fade-boundary-left";
+const char* const PROPERTY_FADE_BOUNDARY_RIGHT = "fade-boundary-right";
+const char* const PROPERTY_FADE_BOUNDARY_TOP = "fade-boundary-top";
+const char* const PROPERTY_FADE_BOUNDARY_BOTTOM = "fade-boundary-bottom";
+const char* const PROPERTY_LINE_HEIGHT_OFFSET = "line-height-offset";
+const char* const PROPERTY_HORIZONTAL_ALIGNMENT = "horizontal-alignment";
+const char* const PROPERTY_VERTICAL_ALIGNMENT = "vertical-alignment";
+
 // Currently on desktop machines 2k x 2k is the maximum frame buffer size, on target is 4k x 4k.
 const float MAX_OFFSCREEN_RENDERING_SIZE = 2048.f;
 
@@ -1144,29 +1157,29 @@ void TextView::OnInitialize()
 {
   Actor self = Self();
 
-  mPropertyText = self.RegisterProperty( Dali::Toolkit::TextView::PROPERTY_TEXT, "", Property::READ_WRITE );
+  mPropertyText = self.RegisterProperty( PROPERTY_TEXT, "", Property::READ_WRITE );
 
-  mPropertyMultilinePolicy = self.RegisterProperty( Dali::Toolkit::TextView::PROPERTY_MULTILINE_POLICY, "SplitByNewLineChar", Property::READ_WRITE );
+  mPropertyMultilinePolicy = self.RegisterProperty( PROPERTY_MULTILINE_POLICY, "SplitByNewLineChar", Property::READ_WRITE );
 
-  mPropertyWidthExceedPolicy = self.RegisterProperty( Dali::Toolkit::TextView::PROPERTY_WIDTH_EXCEED_POLICY, "Original", Property::READ_WRITE );
+  mPropertyWidthExceedPolicy = self.RegisterProperty( PROPERTY_WIDTH_EXCEED_POLICY, "Original", Property::READ_WRITE );
 
-  mPropertyHeightExceedPolicy = self.RegisterProperty( Dali::Toolkit::TextView::PROPERTY_HEIGHT_EXCEED_POLICY, "Original", Property::READ_WRITE );
+  mPropertyHeightExceedPolicy = self.RegisterProperty( PROPERTY_HEIGHT_EXCEED_POLICY, "Original", Property::READ_WRITE );
 
-  mPropertyLineJustification = self.RegisterProperty( Dali::Toolkit::TextView::PROPERTY_LINE_JUSTIFICATION, "Left", Property::READ_WRITE );
+  mPropertyLineJustification = self.RegisterProperty( PROPERTY_LINE_JUSTIFICATION, "Left", Property::READ_WRITE );
 
-  mPropertyFadeBoundaryLeft = self.RegisterProperty( Dali::Toolkit::TextView::PROPERTY_FADE_BOUNDARY_LEFT, static_cast< int >( 0 ), Property::READ_WRITE );
+  mPropertyFadeBoundaryLeft = self.RegisterProperty( PROPERTY_FADE_BOUNDARY_LEFT, static_cast< int >( 0 ), Property::READ_WRITE );
 
-  mPropertyFadeBoundaryRight = self.RegisterProperty( Dali::Toolkit::TextView::PROPERTY_FADE_BOUNDARY_RIGHT, static_cast< int >( 0 ), Property::READ_WRITE );
+  mPropertyFadeBoundaryRight = self.RegisterProperty( PROPERTY_FADE_BOUNDARY_RIGHT, static_cast< int >( 0 ), Property::READ_WRITE );
 
-  mPropertyFadeBoundaryTop = self.RegisterProperty( Dali::Toolkit::TextView::PROPERTY_FADE_BOUNDARY_TOP, static_cast< int >( 0 ), Property::READ_WRITE );
+  mPropertyFadeBoundaryTop = self.RegisterProperty( PROPERTY_FADE_BOUNDARY_TOP, static_cast< int >( 0 ), Property::READ_WRITE );
 
-  mPropertyFadeBoundaryBottom = self.RegisterProperty( Dali::Toolkit::TextView::PROPERTY_FADE_BOUNDARY_BOTTOM, static_cast< int >( 0 ), Property::READ_WRITE );
+  mPropertyFadeBoundaryBottom = self.RegisterProperty( PROPERTY_FADE_BOUNDARY_BOTTOM, static_cast< int >( 0 ), Property::READ_WRITE );
 
-  mPropertyLineHeightOffset = self.RegisterProperty( Dali::Toolkit::TextView::PROPERTY_LINE_HEIGHT_OFFSET, 0.0f, Property::READ_WRITE );
+  mPropertyLineHeightOffset = self.RegisterProperty( PROPERTY_LINE_HEIGHT_OFFSET, 0.0f, Property::READ_WRITE );
 
-  mPropertyHorizontalAlignment = self.RegisterProperty( Dali::Toolkit::TextView::PROPERTY_HORIZONTAL_ALIGNMENT, "HorizontalCenter", Property::READ_WRITE );
+  mPropertyHorizontalAlignment = self.RegisterProperty( PROPERTY_HORIZONTAL_ALIGNMENT, "HorizontalCenter", Property::READ_WRITE );
 
-  mPropertyVerticalAlignment = self.RegisterProperty( Dali::Toolkit::TextView::PROPERTY_VERTICAL_ALIGNMENT, "VerticalCenter", Property::READ_WRITE );
+  mPropertyVerticalAlignment = self.RegisterProperty( PROPERTY_VERTICAL_ALIGNMENT, "VerticalCenter", Property::READ_WRITE );
 
 }
 

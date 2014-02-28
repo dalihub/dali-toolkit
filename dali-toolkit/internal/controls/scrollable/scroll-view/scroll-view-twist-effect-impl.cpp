@@ -23,6 +23,11 @@ using namespace Dali;
 namespace // unnamed namespace
 {
 
+const char * const EFFECT_TIME( "ScrollViewTwistEffect::EFFECT_TIME" );
+const char * const EFFECT_REFERENCE( "ScrollViewTwistEffect::EFFECT_REFERENCE" );
+const char * const EFFECT_DEPTH( "ScrollViewTwistEffect::EFFECT_DEPTH");
+const char * const EFFECT_ACTIVATE( "ScrollViewTwistEffect::EFFECT_ACTIVATE");
+
 const float TWISTEFFECT_ANIMATION_MAX_TIME = 60.0f;         ///< Animation time (every time finishes, checks if it needs to go again)
 const float TWISTEFFECT_DEFAULT_DROPOFF = 0.7f;             ///< Default drop off amount
 const float TWISTEFFECT_DEFAULT_DROPOFF_DISTANCE_X = 720.0f;  ///< Default drop off distance
@@ -509,7 +514,7 @@ void ScrollViewTwistEffect::Apply(Actor child)
   if( mFlags & FlagScale )
   {
     constraint = Constraint::New<Vector3>( Actor::SCALE,
-                                           Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollViewTwistEffect::EFFECT_DEPTH ) ),
+                                           Source(scrollView, scrollView.GetPropertyIndex( EFFECT_DEPTH ) ),
                                            ScrollTwistScaleConstraint(mScaleFactor) );
     constraint.SetRemoveAction( Constraint::Discard );
     child.ApplyConstraint( constraint );
@@ -518,10 +523,10 @@ void ScrollViewTwistEffect::Apply(Actor child)
   constraint = Constraint::New<Vector3>( Actor::POSITION,
                                           ParentSource(Actor::POSITION),
                                           Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_PROPERTY_NAME ) ),
-                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollViewTwistEffect::EFFECT_REFERENCE ) ),
-                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollViewTwistEffect::EFFECT_TIME ) ),
+                                          Source(scrollView, scrollView.GetPropertyIndex( EFFECT_REFERENCE ) ),
+                                          Source(scrollView, scrollView.GetPropertyIndex( EFFECT_TIME ) ),
                                           Source(scrollView, Actor::SIZE),
-                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollViewTwistEffect::EFFECT_ACTIVATE) ),
+                                          Source(scrollView, scrollView.GetPropertyIndex( EFFECT_ACTIVATE) ),
                                          ScrollTwistPositionConstraint(mDelayMin, mDelayMax) );
   constraint.SetRemoveAction( Constraint::Discard );
   child.ApplyConstraint( constraint );
@@ -537,7 +542,7 @@ void ScrollViewTwistEffect::Apply(Actor child)
                                                 Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME ) ),
                                                 Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME ) ),
                                                 Source(scrollView, Actor::SIZE ),
-                                                Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollViewTwistEffect::EFFECT_ACTIVATE) ),
+                                                Source(scrollView, scrollView.GetPropertyIndex( EFFECT_ACTIVATE) ),
                                                 ScrollDropoffTwistRotationConstraint(mMaxSwingAngle, mDropOff, mDropOffDistance, mDropOffFunction) );
     }
     else
@@ -545,7 +550,7 @@ void ScrollViewTwistEffect::Apply(Actor child)
       constraint = Constraint::New<Quaternion>( Actor::ROTATION,
                                                 Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME ) ),
                                                 Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME ) ),
-                                                Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollViewTwistEffect::EFFECT_ACTIVATE) ),
+                                                Source(scrollView, scrollView.GetPropertyIndex( EFFECT_ACTIVATE) ),
                                                 ScrollTwistRotationConstraint(mMaxSwingAngle) );
     }
     constraint.SetRemoveAction( Constraint::Discard );
@@ -575,10 +580,10 @@ void ScrollViewTwistEffect::OnAttach(Toolkit::ScrollView& scrollView)
   // Create effect-time property if not already created.
   if(mPropertyTime == Property::INVALID_INDEX)
   {
-    mPropertyTime = SafeRegisterProperty( scrollView, Toolkit::ScrollViewTwistEffect::EFFECT_TIME, 0.0f );
-    mPropertyReference = SafeRegisterProperty( scrollView, Toolkit::ScrollViewTwistEffect::EFFECT_REFERENCE, Vector3::ZERO );
-    mPropertyDepth = SafeRegisterProperty( scrollView, Toolkit::ScrollViewTwistEffect::EFFECT_DEPTH, 0.0f);
-    mPropertyActivate = SafeRegisterProperty(scrollView,Toolkit::ScrollViewTwistEffect::EFFECT_ACTIVATE,1.0f);
+    mPropertyTime = SafeRegisterProperty( scrollView, EFFECT_TIME, 0.0f );
+    mPropertyReference = SafeRegisterProperty( scrollView, EFFECT_REFERENCE, Vector3::ZERO );
+    mPropertyDepth = SafeRegisterProperty( scrollView, EFFECT_DEPTH, 0.0f);
+    mPropertyActivate = SafeRegisterProperty(scrollView, EFFECT_ACTIVATE, 1.0f);
   }
 
   // Connect to the scroll view signals

@@ -394,7 +394,7 @@ static void UtcDaliFocusManagerSetAndGetCurrentFocusActor()
   application.Render();
 
   // Make the third actor not focusable
-  Property::Index propertyActorFocusable = third.GetPropertyIndex(Toolkit::FocusManager::ACTOR_FOCUSABLE);
+  Property::Index propertyActorFocusable = third.GetPropertyIndex("is-focus-group");
   third.SetProperty(propertyActorFocusable, false);
   // flush the queue and render once
   application.SendNotification();
@@ -622,7 +622,7 @@ static void UtcDaliFocusManagerMoveFocusForward()
   DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), FocusManager::ACCESSIBILITY_LABEL) == "first");
 
   // Make the second actor not focusable
-  Property::Index propertyActorFocusable = second.GetPropertyIndex(Toolkit::FocusManager::ACTOR_FOCUSABLE);
+  Property::Index propertyActorFocusable = second.GetPropertyIndex("focusable");
   second.SetProperty(propertyActorFocusable, false);
   // flush the queue and render once
   application.SendNotification();
@@ -734,7 +734,7 @@ static void UtcDaliFocusManagerMoveFocusBackward()
   DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), FocusManager::ACCESSIBILITY_LABEL) == "third");
 
   // Make the second actor not focusable
-  Property::Index propertyActorFocusable = second.GetPropertyIndex(Toolkit::FocusManager::ACTOR_FOCUSABLE);
+  Property::Index propertyActorFocusable = second.GetPropertyIndex("focusable");
   second.SetProperty(propertyActorFocusable, false);
   // flush the queue and render once
   application.SendNotification();

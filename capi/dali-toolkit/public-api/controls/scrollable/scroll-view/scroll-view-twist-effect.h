@@ -48,10 +48,6 @@ class ScrollViewTwistEffect : public ScrollViewEffect
 
 public:
 
-  static const std::string EFFECT_TIME;
-  static const std::string EFFECT_REFERENCE;
-  static const std::string EFFECT_DEPTH;
-  static const std::string EFFECT_ACTIVATE;
   static const float DEFAULT_MINIMUM_DISTANCE_FOR_SHRINK;
 
 public:

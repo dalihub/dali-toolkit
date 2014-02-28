@@ -30,18 +30,6 @@ namespace Toolkit
 
 
 const char* const TextView::SIGNAL_TEXT_SCROLLED = "scrolled";
-const char* const TextView::PROPERTY_TEXT = "text";
-const char* const TextView::PROPERTY_MULTILINE_POLICY = "multiline-policy";
-const char* const TextView::PROPERTY_WIDTH_EXCEED_POLICY = "width-exceed-policy";
-const char* const TextView::PROPERTY_HEIGHT_EXCEED_POLICY = "height-exceed-policy";
-const char* const TextView::PROPERTY_LINE_JUSTIFICATION = "line-justification";
-const char* const TextView::PROPERTY_FADE_BOUNDARY_LEFT = "fade-boundary-left";
-const char* const TextView::PROPERTY_FADE_BOUNDARY_RIGHT = "fade-boundary-right";
-const char* const TextView::PROPERTY_FADE_BOUNDARY_TOP = "fade-boundary-top";
-const char* const TextView::PROPERTY_FADE_BOUNDARY_BOTTOM = "fade-boundary-bottom";
-const char* const TextView::PROPERTY_LINE_HEIGHT_OFFSET = "line-height-offset";
-const char* const TextView::PROPERTY_HORIZONTAL_ALIGNMENT = "horizontal-alignment";
-const char* const TextView::PROPERTY_VERTICAL_ALIGNMENT = "vertical-alignment";
 
 TextView::CharacterLayoutInfo::CharacterLayoutInfo()
 : mSize(),

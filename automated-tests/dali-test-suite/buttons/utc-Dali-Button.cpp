@@ -171,14 +171,14 @@ static void UtcDaliButtonSetProperty()
   PushButton pushButton = PushButton::New();
 
   //Test various properties
-  checkBoxButton.SetProperty(checkBoxButton.GetPropertyIndex(Button::PROPERTY_DIMMED), false);
+  checkBoxButton.SetProperty(checkBoxButton.GetPropertyIndex("dimmed"), false);
   DALI_TEST_CHECK( false == checkBoxButton.IsDimmed() );
-  checkBoxButton.SetProperty(checkBoxButton.GetPropertyIndex(Button::PROPERTY_DIMMED), true);
+  checkBoxButton.SetProperty(checkBoxButton.GetPropertyIndex("dimmed"), true);
   DALI_TEST_CHECK( true == checkBoxButton.IsDimmed() );
 
-  pushButton.SetProperty(pushButton.GetPropertyIndex(Button::PROPERTY_DIMMED), false);
+  pushButton.SetProperty(pushButton.GetPropertyIndex("dimmed"), false);
   DALI_TEST_CHECK( false == pushButton.IsDimmed() );
-  pushButton.SetProperty(pushButton.GetPropertyIndex(Button::PROPERTY_DIMMED), true);
+  pushButton.SetProperty(pushButton.GetPropertyIndex("dimmed"), true);
   DALI_TEST_CHECK( true == pushButton.IsDimmed() );
 }
 

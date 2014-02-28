@@ -32,6 +32,19 @@ using namespace Toolkit;
 namespace
 {
 
+const char* const PROPERTY_TEXT = "text";
+const char* const PROPERTY_MULTILINE_POLICY = "multiline-policy";
+const char* const PROPERTY_WIDTH_EXCEED_POLICY = "width-exceed-policy";
+const char* const PROPERTY_HEIGHT_EXCEED_POLICY = "height-exceed-policy";
+const char* const PROPERTY_LINE_JUSTIFICATION = "line-justification";
+const char* const PROPERTY_FADE_BOUNDARY_LEFT = "fade-boundary-left";
+const char* const PROPERTY_FADE_BOUNDARY_RIGHT = "fade-boundary-right";
+const char* const PROPERTY_FADE_BOUNDARY_TOP = "fade-boundary-top";
+const char* const PROPERTY_FADE_BOUNDARY_BOTTOM = "fade-boundary-bottom";
+const char* const PROPERTY_LINE_HEIGHT_OFFSET = "line-height-offset";
+const char* const PROPERTY_HORIZONTAL_ALIGNMENT = "horizontal-alignment";
+const char* const PROPERTY_VERTICAL_ALIGNMENT = "vertical-alignment";
+
 bool TestEqual( float x, float y )
 {
   return !( fabsf( x - y ) > Math::MACHINE_EPSILON_1000 );
@@ -716,73 +729,73 @@ static void UtcDaliTextViewSetProperty()
   Stage::GetCurrent().Add( view );
 
   //Test multiline policy property
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_MULTILINE_POLICY), "SplitByNewLineChar");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_MULTILINE_POLICY), "SplitByNewLineChar");
   DALI_TEST_CHECK( Toolkit::TextView::SplitByNewLineChar == view.GetMultilinePolicy() );
 
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_MULTILINE_POLICY), "SplitByWord");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_MULTILINE_POLICY), "SplitByWord");
   DALI_TEST_CHECK( Toolkit::TextView::SplitByWord == view.GetMultilinePolicy() );
 
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_MULTILINE_POLICY), "SplitByChar");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_MULTILINE_POLICY), "SplitByChar");
   DALI_TEST_CHECK( Toolkit::TextView::SplitByChar == view.GetMultilinePolicy() );
 
   //Test width exceed policy property
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_WIDTH_EXCEED_POLICY), "Original");
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_HEIGHT_EXCEED_POLICY), "Original");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_WIDTH_EXCEED_POLICY), "Original");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_HEIGHT_EXCEED_POLICY), "Original");
   DALI_TEST_CHECK( Toolkit::TextView::Original == view.GetWidthExceedPolicy() );
   DALI_TEST_CHECK( Toolkit::TextView::Original == view.GetHeightExceedPolicy() );
 
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_WIDTH_EXCEED_POLICY), "Fade");
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_HEIGHT_EXCEED_POLICY), "Fade");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_WIDTH_EXCEED_POLICY), "Fade");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_HEIGHT_EXCEED_POLICY), "Fade");
   DALI_TEST_CHECK( Toolkit::TextView::Fade == view.GetWidthExceedPolicy() );
   DALI_TEST_CHECK( Toolkit::TextView::Fade == view.GetHeightExceedPolicy() );
 
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_WIDTH_EXCEED_POLICY), "ShrinkToFit");
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_HEIGHT_EXCEED_POLICY), "ShrinkToFit");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_WIDTH_EXCEED_POLICY), "ShrinkToFit");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_HEIGHT_EXCEED_POLICY), "ShrinkToFit");
   DALI_TEST_CHECK( Toolkit::TextView::ShrinkToFit == view.GetWidthExceedPolicy() );
   DALI_TEST_CHECK( Toolkit::TextView::ShrinkToFit == view.GetHeightExceedPolicy() );
 
   //Test line justification property
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_LINE_JUSTIFICATION), "Left");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_LINE_JUSTIFICATION), "Left");
   DALI_TEST_CHECK( Toolkit::TextView::Left == view.GetLineJustification() );
 
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_LINE_JUSTIFICATION), "Center");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_LINE_JUSTIFICATION), "Center");
   DALI_TEST_CHECK( Toolkit::TextView::Center == view.GetLineJustification() );
 
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_LINE_JUSTIFICATION), "Right");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_LINE_JUSTIFICATION), "Right");
   DALI_TEST_CHECK( Toolkit::TextView::Right == view.GetLineJustification() );
 
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_LINE_JUSTIFICATION), "Justified");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_LINE_JUSTIFICATION), "Justified");
   DALI_TEST_CHECK( Toolkit::TextView::Justified == view.GetLineJustification() );
 
   //Test fade boundary property
   unsigned int testValue = 23;
   PixelSize leftFadeBoundary(testValue);
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_FADE_BOUNDARY_LEFT), testValue);
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_FADE_BOUNDARY_LEFT), testValue);
   DALI_TEST_CHECK( leftFadeBoundary == view.GetFadeBoundary().mLeft );
 
   testValue = 26;
   PixelSize rightFadeBoundary(testValue);
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_FADE_BOUNDARY_RIGHT), testValue);
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_FADE_BOUNDARY_RIGHT), testValue);
   DALI_TEST_CHECK( rightFadeBoundary == view.GetFadeBoundary().mRight );
 
   testValue = 2;
   PixelSize topFadeBoundary(testValue);
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_FADE_BOUNDARY_TOP), testValue);
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_FADE_BOUNDARY_TOP), testValue);
   DALI_TEST_CHECK( topFadeBoundary == view.GetFadeBoundary().mTop );
 
   testValue = 11;
   PixelSize bottomFadeBoundary(testValue);
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_FADE_BOUNDARY_BOTTOM), testValue);
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_FADE_BOUNDARY_BOTTOM), testValue);
   DALI_TEST_CHECK( bottomFadeBoundary == view.GetFadeBoundary().mBottom );
 
   //Test Line height offset property
   float testOffsetValue = 14.04f;
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_LINE_HEIGHT_OFFSET), testOffsetValue);
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_LINE_HEIGHT_OFFSET), testOffsetValue);
   DALI_TEST_CHECK( PointSize(testOffsetValue) == view.GetLineHeightOffset() );
 
   //Test alignment property
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_HORIZONTAL_ALIGNMENT), "HorizontalLeft");
-  view.SetProperty(view.GetPropertyIndex(TextView::PROPERTY_VERTICAL_ALIGNMENT), "VerticalTop");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_HORIZONTAL_ALIGNMENT), "HorizontalLeft");
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_VERTICAL_ALIGNMENT), "VerticalTop");
   DALI_TEST_CHECK( (Toolkit::Alignment::HorizontalLeft | Toolkit::Alignment::VerticalTop) == view.GetTextAlignment() );
 }
 

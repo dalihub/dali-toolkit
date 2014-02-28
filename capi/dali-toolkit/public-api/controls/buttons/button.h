@@ -53,14 +53,9 @@ class Button;
 class Button : public Control
 {
 public:
-  //Signal Names
-  static const char* const SIGNAL_CLICKED;
 
-  /**
-   * The names of custom properties installed by this control.
-   */
-  // Property Names
-  static const char* const PROPERTY_DIMMED;      ///< name "dimmed", type bool.
+  // Signal Names
+  static const char* const SIGNAL_CLICKED;
 
 public:
 

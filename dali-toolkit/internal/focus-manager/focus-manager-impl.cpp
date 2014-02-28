@@ -38,6 +38,9 @@ namespace // unnamed namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_FOCUS_MANAGER");
 #endif
 
+const char * const ACTOR_FOCUSABLE("focusable");
+const char * const IS_FOCUS_GROUP("is-focus-group");
+
 const char* FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "B16-8_TTS_focus.png";
 const Vector4 FOCUS_BORDER_IMAGE_BORDER = Vector4(7.0f, 7.0f, 7.0f, 7.0f);
 
@@ -57,7 +60,7 @@ bool IsActorFocusableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType 
        && actor.GetCurrentWorldColor().a > 0.01f) // not FULLY_TRANSPARENT
       {
         // Check whether the actor is focusable
-        Property::Index propertyActorFocusable = actor.GetPropertyIndex(Toolkit::FocusManager::ACTOR_FOCUSABLE);
+        Property::Index propertyActorFocusable = actor.GetPropertyIndex(ACTOR_FOCUSABLE);
         if(propertyActorFocusable != Property::INVALID_INDEX)
         {
           hittable = actor.GetProperty<bool>(propertyActorFocusable);
@@ -162,10 +165,10 @@ void FocusManager::SetFocusOrder(Actor actor, const unsigned int order)
     mFocusIDContainer.erase(GetFocusOrder(actor));
 
     // Create actor focusable property if not already created.
-    Property::Index propertyActorFocusable = actor.GetPropertyIndex(Toolkit::FocusManager::ACTOR_FOCUSABLE);
+    Property::Index propertyActorFocusable = actor.GetPropertyIndex(ACTOR_FOCUSABLE);
     if(propertyActorFocusable == Property::INVALID_INDEX)
     {
-      propertyActorFocusable = actor.RegisterProperty(Toolkit::FocusManager::ACTOR_FOCUSABLE, true);
+      propertyActorFocusable = actor.RegisterProperty(ACTOR_FOCUSABLE, true);
     }
 
     if(order == 0)
@@ -293,7 +296,7 @@ bool FocusManager::DoSetCurrentFocusActor(const unsigned int actorID)
   {
     // Check whether the actor is focusable
     bool actorFocusable = false;
-    Property::Index propertyActorFocusable = actor.GetPropertyIndex(Toolkit::FocusManager::ACTOR_FOCUSABLE);
+    Property::Index propertyActorFocusable = actor.GetPropertyIndex(ACTOR_FOCUSABLE);
     if(propertyActorFocusable != Property::INVALID_INDEX)
     {
       actorFocusable = actor.GetProperty<bool>(propertyActorFocusable);
@@ -477,10 +480,10 @@ void FocusManager::SetFocusGroup(Actor actor, bool isFocusGroup)
   if(actor)
   {
     // Create focus group property if not already created.
-    Property::Index propertyIsFocusGroup = actor.GetPropertyIndex(Toolkit::FocusManager::IS_FOCUS_GROUP);
+    Property::Index propertyIsFocusGroup = actor.GetPropertyIndex(IS_FOCUS_GROUP);
     if(propertyIsFocusGroup == Property::INVALID_INDEX)
     {
-      propertyIsFocusGroup = actor.RegisterProperty(Toolkit::FocusManager::IS_FOCUS_GROUP, isFocusGroup);
+      propertyIsFocusGroup = actor.RegisterProperty(IS_FOCUS_GROUP, isFocusGroup);
     }
     else
     {
@@ -496,7 +499,7 @@ bool FocusManager::IsFocusGroup(Actor actor) const
 
   if(actor)
   {
-    Property::Index propertyIsFocusGroup = actor.GetPropertyIndex(Toolkit::FocusManager::IS_FOCUS_GROUP);
+    Property::Index propertyIsFocusGroup = actor.GetPropertyIndex(IS_FOCUS_GROUP);
     if(propertyIsFocusGroup != Property::INVALID_INDEX)
     {
       isFocusGroup = actor.GetProperty<bool>(propertyIsFocusGroup);
@@ -603,10 +606,10 @@ void FocusManager::SetFocusable(Actor actor, bool focusable)
   if(actor)
   {
     // Create actor focusable property if not already created.
-    Property::Index propertyActorFocusable = actor.GetPropertyIndex(Toolkit::FocusManager::ACTOR_FOCUSABLE);
+    Property::Index propertyActorFocusable = actor.GetPropertyIndex(ACTOR_FOCUSABLE);
     if(propertyActorFocusable == Property::INVALID_INDEX)
     {
-      propertyActorFocusable = actor.RegisterProperty(Toolkit::FocusManager::ACTOR_FOCUSABLE, focusable);
+      propertyActorFocusable = actor.RegisterProperty(ACTOR_FOCUSABLE, focusable);
     }
     else
     {

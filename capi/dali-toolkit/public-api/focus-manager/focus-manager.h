@@ -47,14 +47,10 @@ class FocusManager;
  class FocusManager : public BaseHandle
  {
  public:
-  //Signal Names
+  // Signal Names
   static const char* const SIGNAL_FOCUS_CHANGED;
   static const char* const SIGNAL_FOCUS_OVERSHOT;
   static const char* const SIGNAL_FOCUSED_ACTOR_ACTIVATED;
-
-  // Property Names
-  static const std::string ACTOR_FOCUSABLE;  ///< name "focusable", type bool
-  static const std::string IS_FOCUS_GROUP;  ///< name "is-focus-group", type bool
 
   /**
    * Accessibility needs four information which will be read by screen-reader.

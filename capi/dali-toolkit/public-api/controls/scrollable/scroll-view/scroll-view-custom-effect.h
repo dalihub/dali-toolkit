@@ -60,9 +60,6 @@ class ScrollViewCustomEffect;
  */
 class ScrollViewCustomEffect : public ScrollViewEffect
 {
-  static const std::string ANCHOR_POINT_PROPERTY_NAME;
-  static const std::string SCROLL_AMOUNT_PROPERTY_NAME;               ///< Property, name "scroll-amount",           type VECTOR3
-
 public:
   enum EFlag
   {

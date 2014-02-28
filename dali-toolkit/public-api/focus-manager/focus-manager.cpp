@@ -33,8 +33,6 @@ namespace Toolkit
 const char* const FocusManager::SIGNAL_FOCUS_CHANGED = "focus-changed";
 const char* const FocusManager::SIGNAL_FOCUS_OVERSHOT = "focus-overshot";
 const char* const FocusManager::SIGNAL_FOCUSED_ACTOR_ACTIVATED = "focused-actor-activated";
-const std::string FocusManager::ACTOR_FOCUSABLE("focusable");
-const std::string FocusManager::IS_FOCUS_GROUP("is-focus-group");
 
 FocusManager::FocusManager()
 {

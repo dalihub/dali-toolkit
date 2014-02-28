@@ -18,6 +18,11 @@
 
 #include "button-impl.h"
 
+namespace
+{
+const char* const PROPERTY_DIMMED = "dimmed";
+} // unnamed namespace
+
 namespace Dali
 {
 
@@ -198,7 +203,7 @@ void Button::OnInitialize()
   OnButtonInitialize();
 
   Actor self = Self();
-  mPropertyDimmed = self.RegisterProperty( Dali::Toolkit::Button::PROPERTY_DIMMED, false, Property::READ_WRITE );
+  mPropertyDimmed = self.RegisterProperty( PROPERTY_DIMMED, false, Property::READ_WRITE );
 
   self.SetKeyboardFocusable( true );
 }

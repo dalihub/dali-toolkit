@@ -43,6 +43,9 @@ const float POPUP_BUTTON_BG_HEIGHT = 96.f;                    ///< Height of But
 const Vector3 DEFAULT_DIALOG_SIZE = Vector3(POPUP_TITLE_WIDTH/POPUP_WIDTH, 0.5f, 0.0f);
 const Vector3 DEFAULT_BOTTOM_SIZE = Vector3(1.0f, 0.2f, 0.0f);
 
+const char* const PROPERTY_TITLE = "title";
+const char* const PROPERTY_STATE = "state";
+
 // Constraints ///////////////////////////////////////////////////////////////////////////
 
 /**
@@ -210,8 +213,8 @@ void Popup::OnInitialize()
   // Hide content by default.
   SetState( Toolkit::Popup::POPUP_HIDE, 0.0f );
 
-  mPropertyTitle = self.RegisterProperty( Dali::Toolkit::Popup::PROPERTY_TITLE, "", Property::READ_WRITE );
-  mPropertyState = self.RegisterProperty( Dali::Toolkit::Popup::PROPERTY_STATE, "POPUP_HIDE", Property::READ_WRITE );
+  mPropertyTitle = self.RegisterProperty( PROPERTY_TITLE, "", Property::READ_WRITE );
+  mPropertyState = self.RegisterProperty( PROPERTY_STATE, "POPUP_HIDE", Property::READ_WRITE );
 
   // Make self as keyboard focusable and focus group
   self.SetKeyboardFocusable(true);

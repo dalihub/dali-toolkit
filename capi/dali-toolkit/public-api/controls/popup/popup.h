@@ -80,13 +80,6 @@ public:
   static const char* const SIGNAL_HIDDEN;
 
   /**
-   * The names of custom properties installed by this control.
-   */
-  // Property Names
-  static const char* const PROPERTY_TITLE;     ///< name "title", type string.
-  static const char* const PROPERTY_STATE;     ///< name "state", type string.
-
-  /**
    * Current popup state
    */
   enum PopupState

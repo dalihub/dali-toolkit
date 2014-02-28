@@ -29,7 +29,6 @@ namespace Toolkit
 {
 
 const char* const Button::SIGNAL_CLICKED = "clicked";
-const char* const Button::PROPERTY_DIMMED = "dimmed";
 
 Button::Button()
 {}

@@ -99,25 +99,9 @@ class TextView;
 class TextView : public Control
 {
 public:
-  //Signal Names
-  static const char* const SIGNAL_TEXT_SCROLLED; ///< Signal emitted when the scroll position changes. @see SignalScrolled()
 
-  /**
-   * The names of custom properties installed by this control.
-   */
-  // Property Names
-  static const char* const PROPERTY_TEXT;                  ///< name "text", type std::string
-  static const char* const PROPERTY_MULTILINE_POLICY;      ///< name "multiline-policy", type std::string
-  static const char* const PROPERTY_WIDTH_EXCEED_POLICY;   ///< name "width-exceed-policy", type std::string
-  static const char* const PROPERTY_HEIGHT_EXCEED_POLICY;  ///< name "height-exceed-policy", type std::string
-  static const char* const PROPERTY_LINE_JUSTIFICATION;    ///< name "line-justification", type std::string
-  static const char* const PROPERTY_FADE_BOUNDARY_LEFT;    ///< name "fade-boundary-left", type int
-  static const char* const PROPERTY_FADE_BOUNDARY_RIGHT;   ///< name "fade-boundary-right", type int
-  static const char* const PROPERTY_FADE_BOUNDARY_TOP;     ///< name "fade-boundary-top", type int
-  static const char* const PROPERTY_FADE_BOUNDARY_BOTTOM;  ///< name "fade-boundary-bottom", type int
-  static const char* const PROPERTY_LINE_HEIGHT_OFFSET;    ///< name "line-height-offset", type float
-  static const char* const PROPERTY_HORIZONTAL_ALIGNMENT;  ///< name "horizontal-alignment", type std::string
-  static const char* const PROPERTY_VERTICAL_ALIGNMENT;    ///< name "vertical-alignment", type std::string
+  // Signal Names
+  static const char* const SIGNAL_TEXT_SCROLLED; ///< Signal emitted when the scroll position changes. @see SignalScrolled()
 
   /**
    * Structure used to retrieve Layout info per character.
