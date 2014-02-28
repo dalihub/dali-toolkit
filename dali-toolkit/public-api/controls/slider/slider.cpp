@@ -108,6 +108,11 @@ Slider::ValueChangedSignalType& Slider::ValueChangedSignal()
   return GetImpl( *this ).ValueChangedSignal();
 }
 
+Slider::ValueChangedSignalType& Slider::SlidingFinishedSignal()
+{
+  return GetImpl( *this ).SlidingFinishedSignal();
+}
+
 Slider::MarkSignalType& Slider::MarkSignal()
 {
   return GetImpl( *this ).MarkSignal();

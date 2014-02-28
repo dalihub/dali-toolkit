@@ -126,6 +126,11 @@ public:
   ValueChangedSignalType& ValueChangedSignal();
 
   /**
+   * Signal emitted when the sliding is finished
+   */
+  ValueChangedSignalType& SlidingFinishedSignal();
+
+  /**
    * Signal emitted when the slider handle reaches a mark
    */
   MarkSignalType& MarkSignal();

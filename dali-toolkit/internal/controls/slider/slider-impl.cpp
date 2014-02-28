@@ -211,6 +211,14 @@ bool Slider::OnTouchEvent(Actor actor, const TouchEvent& event)
       SetValue( value );
       DisplayPopup( value );
     }
+    else if( touchState == TouchPoint::Up)
+    {
+      if( mState == PRESSED )
+      {
+        mState = NORMAL;
+        mSlidingFinishedSignal.Emit( Toolkit::Slider::DownCast( Self() ), Self().GetProperty( mPropertyValue ).Get<float>());
+      }
+    }
   }
 
   return true;
@@ -235,11 +243,15 @@ void Slider::OnPan( Actor actor, PanGesture gesture )
       }
       case Gesture::Finished:
       {
-        if( mState == PRESSED && GetSnapToMarks() )
+        if( mState == PRESSED  )
         {
-          float value = MapBounds( SnapToMark( MapPercentage( gesture.position ) ), GetLowerBound(), GetUpperBound() );
-          SetValue( value );
-          DisplayPopup( value );
+          if( GetSnapToMarks() )
+          {
+            float value = MapBounds( SnapToMark( MapPercentage( gesture.position ) ), GetLowerBound(), GetUpperBound() );
+            SetValue( value );
+            DisplayPopup( value );
+          }
+          mSlidingFinishedSignal.Emit( Toolkit::Slider::DownCast( Self() ), Self().GetProperty( mPropertyValue ).Get<float>());
         }
 
         mState = NORMAL;
@@ -564,6 +576,11 @@ Actor Slider::CreateValueDisplay()
 Toolkit::Slider::ValueChangedSignalType& Slider::ValueChangedSignal()
 {
   return mValueChangedSignal;
+}
+
+Toolkit::Slider::ValueChangedSignalType& Slider::SlidingFinishedSignal()
+{
+  return mSlidingFinishedSignal;
 }
 
 Toolkit::Slider::MarkSignalType& Slider::MarkSignal()

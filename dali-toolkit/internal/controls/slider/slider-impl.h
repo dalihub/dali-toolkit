@@ -221,6 +221,11 @@ public:
   Toolkit::Slider::ValueChangedSignalType& ValueChangedSignal();
 
   /**
+   * copydoc Toolkit::Slider::SlidingFinishedSignal()
+   */
+  Toolkit::Slider::ValueChangedSignalType& SlidingFinishedSignal();
+
+  /**
    * @copydoc Toolkit::Slider::MarkSignal()
    */
   Toolkit::Slider::MarkSignalType& MarkSignal();
@@ -657,6 +662,7 @@ private:
   Timer mValueTimer;                        ///< Timer used to hide value view
 
   Toolkit::Slider::ValueChangedSignalType mValueChangedSignal;    ///< Signal emitted when the value is changed
+  Toolkit::Slider::ValueChangedSignalType mSlidingFinishedSignal;    ///< Signal emitted when a sliding is finished
   Toolkit::Slider::MarkSignalType mMarkSignal;                    ///< Signal emitted when a mark is reached
 
   SliderState mState;                 ///< The state of the slider
