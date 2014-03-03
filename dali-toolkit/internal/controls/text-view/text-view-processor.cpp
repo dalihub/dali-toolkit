@@ -1071,6 +1071,7 @@ void InitializeTextActorInfo( TextView::RelayoutData& relayoutData )
   std::size_t lineLayoutInfoIndex = 0;  // Index to the laid out line info.
   const std::size_t lineLayoutInfoSize = relayoutData.mLines.size(); // Number or laid out lines.
   bool lineLayoutEnd = false;           // Whether lineLayoutInfoIndex points at the last laid out line.
+  bool textActorCreatedForLine = false;
 
   TextActor currentTextActor;           // text-actor used when the edit mode is disabled.
   TextStyle currentStyle;               // style for the current text-actor.
@@ -1104,40 +1105,41 @@ void InitializeTextActorInfo( TextView::RelayoutData& relayoutData )
         {
           CharacterLayoutInfo& characterLayout( *characterIt );
 
+          // Check if there is a new line.
+          const bool newLine = !lineLayoutEnd && ( characterGlobalIndex == relayoutData.mLines[lineLayoutInfoIndex].mCharacterGlobalIndex );
+
+          if( newLine )
+          {
+            // Point to the next line.
+            ++lineLayoutInfoIndex;
+            if( lineLayoutInfoIndex >= lineLayoutInfoSize )
+            {
+              // Arrived at last line.
+              lineLayoutEnd = true; // Avoids access out of bounds in the relayoutData.mLines vector.
+            }
+            textActorCreatedForLine = false;
+          }
+
           if( !characterLayout.mStyledText.mText.IsEmpty() )
           {
             // Do not create a text-actor if there is no text.
-            const std::size_t length = characterLayout.mStyledText.mText.GetLength();
-            const Character character = characterLayout.mStyledText.mText[0];
+            const Character character = characterLayout.mStyledText.mText[0]; // there are only one character per character layout.
 
-            if( ( 1 < length ) ||
-                ( ( 1 == length ) && character.IsWhiteSpace() && characterLayout.mStyledText.mStyle.GetUnderline() ) ||
-                ( ( 1 == length ) && !character.IsNewLine() && !character.IsWhiteSpace() ) )
+            if( !character.IsWhiteSpace() || // A new line character is also a white space.
+                ( character.IsWhiteSpace() && characterLayout.mStyledText.mStyle.GetUnderline() ) )
             {
               // Do not create a text-actor if it's a white space (without underline) or a new line character.
 
               // Creates one text-actor per each counsecutive group of characters, with the same style, per line.
 
-              // Check if there is a new line.
-              const bool newLine = !lineLayoutEnd && ( characterGlobalIndex == relayoutData.mLines[lineLayoutInfoIndex].mCharacterGlobalIndex );
-
-              if( ( characterLayout.mStyledText.mStyle != currentStyle ) ||
+              if( !textActorCreatedForLine ||
+                  ( characterLayout.mStyledText.mStyle != currentStyle ) ||
                   ( characterLayout.mGradientColor != currentGradientColor ) ||
                   ( characterLayout.mStartPoint != currentStartPoint ) ||
-                  ( characterLayout.mEndPoint != currentEndPoint ) ||
-                  newLine )
+                  ( characterLayout.mEndPoint != currentEndPoint ) )
               {
                 // There is a new style or a new line.
-                if( newLine )
-                {
-                  // Point to the next line.
-                  ++lineLayoutInfoIndex;
-                  if( lineLayoutInfoIndex >= lineLayoutInfoSize )
-                  {
-                    // Arrived at last line.
-                    lineLayoutEnd = true;
-                  }
-                }
+                textActorCreatedForLine = true;
 
                 if( characterLayout.mTextActor )
                 {
