@@ -1,0 +1,3 @@
+TARGETS += \
+	Dali/utc-Dali-Builder \
+	Dali/utc-Dali-JsonParser \

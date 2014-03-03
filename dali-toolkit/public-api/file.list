@@ -1,0 +1,233 @@
+# Add local source files here
+
+public_api_src_files = \
+  $(public_api_src_dir)/enums.cpp \
+  $(public_api_src_dir)/controls/control.cpp \
+  $(public_api_src_dir)/controls/control-impl.cpp \
+  $(public_api_src_dir)/controls/alignment/alignment.cpp \
+  $(public_api_src_dir)/controls/bloom-view/bloom-view.cpp \
+  $(public_api_src_dir)/controls/buttons/button.cpp \
+  $(public_api_src_dir)/controls/buttons/check-box-button.cpp \
+  $(public_api_src_dir)/controls/buttons/push-button.cpp \
+  $(public_api_src_dir)/controls/cluster/cluster.cpp \
+  $(public_api_src_dir)/controls/cluster/cluster-style.cpp \
+  $(public_api_src_dir)/controls/default-controls/solid-color-actor.cpp \
+  $(public_api_src_dir)/controls/default-controls/check-button-factory.cpp \
+  $(public_api_src_dir)/controls/default-controls/push-button-factory.cpp \
+  $(public_api_src_dir)/controls/effects-view/effects-view.cpp \
+  $(public_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.cpp \
+  $(public_api_src_dir)/controls/image-view/image-view.cpp \
+  $(public_api_src_dir)/controls/image-view/masked-image-view.cpp \
+  $(public_api_src_dir)/controls/magnifier/magnifier.cpp \
+  $(public_api_src_dir)/controls/page-turn-view/page-turn-view.cpp \
+  $(public_api_src_dir)/controls/page-turn-view/page-factory.cpp \
+  $(public_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.cpp \
+  $(public_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.cpp \
+  $(public_api_src_dir)/controls/popup/popup.cpp \
+  $(public_api_src_dir)/controls/scroll-component/scroll-bar.cpp \
+  $(public_api_src_dir)/controls/scroll-component/scroll-component.cpp \
+  $(public_api_src_dir)/controls/scrollable/item-view/item-factory.cpp \
+  $(public_api_src_dir)/controls/scrollable/item-view/item-layout.cpp \
+  $(public_api_src_dir)/controls/scrollable/item-view/item-view.cpp \
+  $(public_api_src_dir)/controls/scrollable/item-view/depth-layout.cpp \
+  $(public_api_src_dir)/controls/scrollable/item-view/grid-layout.cpp \
+  $(public_api_src_dir)/controls/scrollable/item-view/navigation-layout.cpp \
+  $(public_api_src_dir)/controls/scrollable/item-view/roll-layout.cpp \
+  $(public_api_src_dir)/controls/scrollable/item-view/spiral-layout.cpp \
+  $(public_api_src_dir)/controls/scrollable/item-view/album-layout.cpp \
+  $(public_api_src_dir)/controls/scrollable/scrollable.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-constraints.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-effect.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-custom-effect.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-carousel-effect.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-cube-effect.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-depth-effect.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-page-cube-effect.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-page-carousel-effect.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-page-spiral-effect.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-slide-effect.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-twist-effect.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect.cpp \
+  $(public_api_src_dir)/controls/selectors/rotating-selector.cpp \
+  $(public_api_src_dir)/controls/shadow-view/shadow-view.cpp \
+  $(public_api_src_dir)/controls/slider/slider.cpp \
+  $(public_api_src_dir)/controls/super-blur-view/super-blur-view.cpp \
+  $(public_api_src_dir)/controls/table-view/table-view.cpp \
+  $(public_api_src_dir)/controls/text-input/text-input.cpp \
+  $(public_api_src_dir)/controls/text-view/text-view.cpp \
+  $(public_api_src_dir)/controls/tool-bar/tool-bar.cpp \
+  $(public_api_src_dir)/controls/view/view.cpp \
+  $(public_api_src_dir)/controls/navigation-frame/navigation-control.cpp \
+  $(public_api_src_dir)/controls/navigation-frame/page.cpp \
+  $(public_api_src_dir)/controls/bubble-effect/bubble-emitter.cpp \
+  $(public_api_src_dir)/factory/localized-control-factory.cpp \
+  $(public_api_src_dir)/focus-manager/focus-manager.cpp \
+  $(public_api_src_dir)/focus-manager/keyboard-focus-manager.cpp \
+  $(public_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
+  $(public_api_src_dir)/markup-processor/markup-processor.cpp \
+  $(public_api_src_dir)/shader-effects/alpha-discard-effect.cpp \
+  $(public_api_src_dir)/shader-effects/bendy-effect.cpp \
+  $(public_api_src_dir)/shader-effects/blind-effect.cpp \
+  $(public_api_src_dir)/shader-effects/carousel-effect.cpp \
+  $(public_api_src_dir)/shader-effects/displacement-effect.cpp \
+  $(public_api_src_dir)/shader-effects/dissolve-effect.cpp \
+  $(public_api_src_dir)/shader-effects/dissolve-local-effect.cpp \
+  $(public_api_src_dir)/shader-effects/distance-field-effect.cpp \
+  $(public_api_src_dir)/shader-effects/image-region-effect.cpp \
+  $(public_api_src_dir)/shader-effects/iris-effect.cpp \
+  $(public_api_src_dir)/shader-effects/mask-effect.cpp \
+  $(public_api_src_dir)/shader-effects/mirror-effect.cpp \
+  $(public_api_src_dir)/shader-effects/motion-blur-effect.cpp \
+  $(public_api_src_dir)/shader-effects/motion-stretch-effect.cpp \
+  $(public_api_src_dir)/shader-effects/nine-patch-mask-effect.cpp \
+  $(public_api_src_dir)/shader-effects/overlay-effect.cpp \
+  $(public_api_src_dir)/shader-effects/page-turn-effect.cpp \
+  $(public_api_src_dir)/shader-effects/page-turn-book-spine-effect.cpp \
+  $(public_api_src_dir)/shader-effects/ripple-effect.cpp \
+  $(public_api_src_dir)/shader-effects/ripple2d-effect.cpp \
+  $(public_api_src_dir)/shader-effects/shear-effect.cpp \
+  $(public_api_src_dir)/shader-effects/soft-button-effect.cpp \
+  $(public_api_src_dir)/shader-effects/spot-effect.cpp \
+  $(public_api_src_dir)/shader-effects/square-dissolve-effect.cpp \
+  $(public_api_src_dir)/shader-effects/swirl-effect.cpp \
+  $(public_api_src_dir)/shader-effects/water-effect.cpp \
+  $(public_api_src_dir)/shader-effects/bubble-effect/bubble-effect.cpp \
+  $(public_api_src_dir)/shader-effects/bubble-effect/color-adjuster.cpp \
+  $(public_api_src_dir)/builder/builder.cpp \
+  $(public_api_src_dir)/builder/json-parser.cpp \
+  $(public_api_src_dir)/builder/tree-node.cpp \
+  $(public_api_src_dir)/transition-effects/cube-transition-effect.cpp \
+  $(public_api_src_dir)/transition-effects/cube-transition-wave-effect.cpp \
+  $(public_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
+  $(public_api_src_dir)/transition-effects/cube-transition-fold-effect.cpp
+
+# Add public header files here
+
+public_api_header_files =
+
+public_api_controls_header_files =
+
+public_api_alignment_header_files =
+
+public_api_bloom_view_header_files = \
+  $(public_api_src_dir)/controls/bloom-view/bloom-view.h
+
+public_api_buttons_header_files = \
+  $(public_api_src_dir)/controls/buttons/check-box-button.h
+
+public_api_cluster_header_files = \
+  $(public_api_src_dir)/controls/cluster/cluster.h
+
+public_api_default_controls_header_files = \
+  $(public_api_src_dir)/controls/default-controls/check-button-factory.h
+
+public_api_effects_view_header_files = \
+  $(public_api_src_dir)/controls/effects-view/effects-view.h
+
+public_api_gaussian_blur_view_header_files = \
+  $(public_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.h
+
+public_api_image_view_header_files = \
+  $(public_api_src_dir)/controls/image-view/image-view.h
+
+public_api_item_view_header_files = \
+  $(public_api_src_dir)/controls/scrollable/item-view/depth-layout.h \
+  $(public_api_src_dir)/controls/scrollable/item-view/roll-layout.h \
+  $(public_api_src_dir)/controls/scrollable/item-view/spiral-layout.h \
+  $(public_api_src_dir)/controls/scrollable/item-view/navigation-layout.h \
+  $(public_api_src_dir)/controls/scrollable/item-view/album-layout.h
+
+public_api_magnifier_header_files = \
+  $(public_api_src_dir)/controls/magnifier/magnifier.h
+
+public_api_page_turn_view_header_files = \
+  $(public_api_src_dir)/controls/page-turn-view/page-turn-view.h \
+  $(public_api_src_dir)/controls/page-turn-view/page-factory.h \
+  $(public_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.h \
+  $(public_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.h
+
+public_api_popup_header_files =
+
+public_api_scroll_component_header_files =
+
+public_api_scrollable_header_files =
+
+public_api_scroll_view_header_files = \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-constraints.h \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-carousel-effect.h \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-depth-effect.h \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-page-cube-effect.h \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-page-carousel-effect.h \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect.h
+
+public_api_slider_header_files = \
+  $(public_api_src_dir)/controls/slider/slider.h
+
+public_api_selectors_header_files = \
+  $(public_api_src_dir)/controls/selectors/rotating-selector.h
+
+public_api_shadow_view_header_files = \
+  $(public_api_src_dir)/controls/shadow-view/shadow-view.h
+
+public_api_super_blur_view_header_files =
+
+public_api_table_view_header_files = \
+  $(public_api_src_dir)/controls/table-view/table-view.h
+
+public_api_text_input_header_files =
+
+public_api_text_view_header_files =
+
+public_api_tool_bar_header_files = \
+  $(public_api_src_dir)/controls/tool-bar/tool-bar.h
+
+public_api_view_header_files = \
+  $(public_api_src_dir)/controls/view/view.h
+
+public_api_navigation_frame_header_files = \
+  $(public_api_src_dir)/controls/navigation-frame/navigation-control.h \
+  $(public_api_src_dir)/controls/navigation-frame/page.h \
+  $(public_api_src_dir)/controls/navigation-frame/navigation-bar-style.h
+
+public_api_factory_header_files =
+
+public_api_focus_manager_header_files = \
+  $(public_api_src_dir)/focus-manager/keyinput-focus-manager.h
+
+public_api_markup_processor_header_files =
+
+public_api_shader_effects_header_files =               \
+  $(public_api_src_dir)/shader-effects/alpha-discard-effect.h \
+  $(public_api_src_dir)/shader-effects/bendy-effect.h \
+  $(public_api_src_dir)/shader-effects/blind-effect.h \
+  $(public_api_src_dir)/shader-effects/carousel-effect.h \
+  $(public_api_src_dir)/shader-effects/displacement-effect.h \
+  $(public_api_src_dir)/shader-effects/dissolve-local-effect.h \
+  $(public_api_src_dir)/shader-effects/distance-field-effect.h \
+  $(public_api_src_dir)/shader-effects/mirror-effect.h \
+  $(public_api_src_dir)/shader-effects/motion-blur-effect.h \
+  $(public_api_src_dir)/shader-effects/motion-stretch-effect.h \
+  $(public_api_src_dir)/shader-effects/overlay-effect.h \
+  $(public_api_src_dir)/shader-effects/shear-effect.h \
+  $(public_api_src_dir)/shader-effects/soft-button-effect.h \
+  $(public_api_src_dir)/shader-effects/spot-effect.h \
+  $(public_api_src_dir)/shader-effects/square-dissolve-effect.h \
+  $(public_api_src_dir)/shader-effects/water-effect.h
+
+public_api_bubble_effect_header_files =  \
+  $(public_api_src_dir)/shader-effects/bubble-effect/bubble-effect.h \
+  $(public_api_src_dir)/shader-effects/bubble-effect/color-adjuster.h
+
+public_api_bubble_emitter_header_files =
+
+public_api_builder_header_files = \
+  $(public_api_src_dir)/builder/builder.h \
+  $(public_api_src_dir)/builder/json-parser.h \
+  $(public_api_src_dir)/builder/tree-node.h
+
+public_api_transition_effects_header_files = \
+  $(public_api_src_dir)/transition-effects/cube-transition-effect.h \
+  $(public_api_src_dir)/transition-effects/cube-transition-wave-effect.h \
+  $(public_api_src_dir)/transition-effects/cube-transition-cross-effect.h \
+  $(public_api_src_dir)/transition-effects/cube-transition-fold-effect.h

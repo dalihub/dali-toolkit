@@ -1,0 +1,11 @@
+LDFLAGS = `pkg-config --libs $(PKGS)`
+LDFLAGS += $(TET_ROOT)/lib/tet3/tcm_s.o
+LDFLAGS += -L$(TET_ROOT)/lib/tet3 -ltcm_s
+LDFLAGS += -L$(TET_ROOT)/lib/tet3 -lapi_s
+
+CXXFLAGS = -I. -I../../.. `pkg-config --cflags $(PKGS)`
+CXXFLAGS += -I$(TET_ROOT)/inc/tet3
+CXXFLAGS += -Wall -g -O0 -Wno-write-strings
+CXXFLAGS += -DDALI_IMAGE_DIR=\"$(DALI_IMAGE_DIR)\"
+CXXFLAGS += -DDALI_STYLE_DIR=\"$(DALI_STYLE_DIR)\"
+CXXFLAGS += @DALI_TOOLKIT_CFLAGS@

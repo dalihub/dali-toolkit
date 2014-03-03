@@ -1,0 +1,6 @@
+TARGETS += \
+        utc-Dali-TextView \
+        utc-Dali-TextView-HelperAndDebug \
+        utc-Dali-TextView-Processor \
+        utc-Dali-TextView-Processor-Types \
+        utc-Dali-TextView-Relayout-Utilities \

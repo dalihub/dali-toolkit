@@ -1,0 +1,83 @@
+capi_devel_header_files = \
+  $(capi_devel_src_dir)/enums.h \
+  $(capi_devel_src_dir)/dali-toolkit-capi-internal.h
+
+capi_devel_controls_header_files = \
+  $(capi_devel_src_dir)/controls/control.h \
+  $(capi_devel_src_dir)/controls/control-impl.h
+
+capi_devel_alignment_header_files = \
+  $(capi_devel_src_dir)/controls/alignment/alignment.h
+
+capi_devel_bubble_emitter_header_files =  \
+  $(capi_devel_src_dir)/controls/bubble-effect/bubble-emitter.h
+
+capi_devel_buttons_header_files = \
+  $(capi_devel_src_dir)/controls/buttons/button.h \
+  $(capi_devel_src_dir)/controls/buttons/push-button.h
+
+capi_devel_cluster_header_files = \
+  $(capi_devel_src_dir)/controls/cluster/cluster-style.h
+
+capi_devel_default_controls_header_files = \
+  $(capi_devel_src_dir)/controls/default-controls/solid-color-actor.h \
+  $(capi_devel_src_dir)/controls/default-controls/push-button-factory.h
+
+capi_devel_image_view_header_files = \
+  $(capi_devel_src_dir)/controls/image-view/masked-image-view.h
+
+capi_devel_popup_header_files = \
+  $(capi_devel_src_dir)/controls/popup/popup.h
+
+capi_devel_scroll_component_header_files = \
+  $(capi_devel_src_dir)/controls/scroll-component/scroll-bar.h \
+  $(capi_devel_src_dir)/controls/scroll-component/scroll-component.h
+
+capi_devel_scrollable_header_files = \
+  $(capi_devel_src_dir)/controls/scrollable/scrollable.h
+
+capi_devel_item_view_header_files = \
+  $(capi_devel_src_dir)/controls/scrollable/item-view/grid-layout.h \
+  $(capi_devel_src_dir)/controls/scrollable/item-view/item-factory.h \
+  $(capi_devel_src_dir)/controls/scrollable/item-view/item-layout.h \
+  $(capi_devel_src_dir)/controls/scrollable/item-view/item-view.h
+
+capi_devel_scroll_view_header_files = \
+  $(capi_devel_src_dir)/controls/scrollable/scroll-view/scroll-view.h \
+  $(capi_devel_src_dir)/controls/scrollable/scroll-view/scroll-view-effect.h \
+  $(capi_devel_src_dir)/controls/scrollable/scroll-view/scroll-view-custom-effect.h \
+  $(capi_devel_src_dir)/controls/scrollable/scroll-view/scroll-view-cube-effect.h \
+  $(capi_devel_src_dir)/controls/scrollable/scroll-view/scroll-view-page-spiral-effect.h \
+  $(capi_devel_src_dir)/controls/scrollable/scroll-view/scroll-view-slide-effect.h \
+  $(capi_devel_src_dir)/controls/scrollable/scroll-view/scroll-view-twist-effect.h
+
+capi_devel_super_blur_view_header_files = \
+  $(capi_devel_src_dir)/controls/super-blur-view/super-blur-view.h
+
+capi_devel_text_input_header_files = \
+  $(capi_devel_src_dir)/controls/text-input/text-input.h
+
+capi_devel_text_view_header_files = \
+  $(capi_devel_src_dir)/controls/text-view/text-view.h
+
+capi_devel_factory_header_files = \
+  $(capi_devel_src_dir)/factory/localized-control-factory.h
+
+capi_devel_focus_manager_header_files = \
+  $(capi_devel_src_dir)/focus-manager/focus-manager.h \
+  $(capi_devel_src_dir)/focus-manager/keyboard-focus-manager.h
+
+capi_devel_markup_processor_header_files =               \
+  $(capi_devel_src_dir)/markup-processor/markup-processor.h
+
+capi_devel_shader_effects_header_files =               \
+  $(capi_devel_src_dir)/shader-effects/dissolve-effect.h \
+  $(capi_devel_src_dir)/shader-effects/image-region-effect.h \
+  $(capi_devel_src_dir)/shader-effects/iris-effect.h \
+  $(capi_devel_src_dir)/shader-effects/mask-effect.h \
+  $(capi_devel_src_dir)/shader-effects/nine-patch-mask-effect.h \
+  $(capi_devel_src_dir)/shader-effects/page-turn-book-spine-effect.h \
+  $(capi_devel_src_dir)/shader-effects/page-turn-effect.h \
+  $(capi_devel_src_dir)/shader-effects/ripple-effect.h \
+  $(capi_devel_src_dir)/shader-effects/ripple2d-effect.h \
+  $(capi_devel_src_dir)/shader-effects/swirl-effect.h

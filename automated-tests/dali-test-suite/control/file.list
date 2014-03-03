@@ -1,0 +1,3 @@
+TARGETS += \
+        utc-Dali-ControlImpl \
+        utc-Dali-Control \

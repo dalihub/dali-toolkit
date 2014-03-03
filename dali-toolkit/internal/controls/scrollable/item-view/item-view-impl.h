@@ -1,0 +1,595 @@
+#ifndef __DALI_TOOLKIT_INTERNAL_ITEM_VIEW_H__
+#define __DALI_TOOLKIT_INTERNAL_ITEM_VIEW_H__
+
+//
+// Copyright (c) 2014 Samsung Electronics Co., Ltd.
+//
+// Licensed under the Flora License, Version 1.0 (the License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://floralicense.org/license/
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an AS IS BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+// EXTERNAL INCLUDES
+#include <dali/dali.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
+#include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
+#include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
+#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
+
+namespace Dali
+{
+
+namespace Toolkit
+{
+
+namespace Internal
+{
+
+class ItemView;
+
+typedef IntrusivePtr<ItemView> ItemViewPtr;
+
+/**
+ * ItemPool is container of Actor/ID pairs stored by ItemView
+ */
+class ItemPool
+{
+public: // types
+
+  typedef std::pair<unsigned int, Actor>     IDKeyPair;
+  typedef std::map<unsigned int, Actor>      IDKeyContainer;
+  typedef IDKeyContainer::iterator           IDKeyIter;
+  typedef IDKeyContainer::const_iterator     IDKeyConstIter;
+
+  typedef std::pair<Actor, unsigned int>     ActorKeyPair;
+  typedef std::map<Actor, unsigned int>      ActorKeyContainer;
+  typedef ActorKeyContainer::iterator        ActorKeyIter;
+  typedef ActorKeyContainer::const_iterator  ActorKeyConstIter;
+
+public: // Construction & Destruction
+
+  /**
+   * Constructor
+   * @param[in] itemView A reference to the ItemView class that owns this.
+   */
+  ItemPool(ItemView& itemView)
+  : mItemView(itemView)
+  {
+  }
+
+public: // Methods
+
+  /**
+   * Returns a const reference to the IDKeyContainer whose key is based on the Item ID.
+   * @return Const reference to IDKeyContainer.
+   */
+  const IDKeyContainer& GetIDKeyContainer() const
+  {
+    return mIdKeyContainer;
+  }
+
+  /**
+   * Returns a const reference to the ActorKeyContainer whose key is based on the Actor.
+   * @return Const reference to IDKeyContainer.
+   */
+  const ActorKeyContainer& GetActorKeyContainer() const
+  {
+    return mActorKeyContainer;
+  }
+
+  /**
+   * Add a range of items to the ItemPool, if they are not already in the ItemPool.
+   * @param[in] scrollingTowardsLast Should be true if scrolling towards the last item in the range.
+   * @param[in] range The range of Item IDs to associate with the new actors.
+   * @param[in] targetSize The current size of the layout.
+   */
+  void AddItems(bool scrollingTowardsLast, ItemRange range, const Vector3& targetSize);
+
+  /**
+   * Remove items from the ItemPool that are outside the given range.
+   * @param[in] range The range of required items.
+   */
+  void RemoveItems(ItemRange range);
+
+  /**
+   * Remove an item from the ItemPool.
+   * @param[in] itemId The item to remove.
+   * @return Whether the item is found and removed or not.
+   */
+  bool RemoveItem(unsigned int itemId);
+
+private:
+
+  /**
+   * Adds an item, if not already in the ItemPool.
+   * @param[in] itemId The item to add.
+   * @param[in] targetSize The target size of the layout.
+   */
+  void AddItem(unsigned int itemId, const Vector3& targetSize);
+
+private:
+
+  IDKeyContainer mIdKeyContainer;
+  ActorKeyContainer mActorKeyContainer;
+  ItemView& mItemView;
+};
+
+/**
+ * ItemView is a scrollable layout container.
+ * Multiple ItemLayouts may be provided, to determine the logical position of each item a layout.
+ * Actor-ID pairs are provided from a shared ItemFactory, to display the currently visible items.
+ */
+class ItemView : public Scrollable
+{
+public:
+
+  /**
+   * Create a new ItemView.
+   * @param[in] factory The factory which provides ItemView with items.
+   * @return A public handle to the newly allocated ItemView.
+   */
+  static Dali::Toolkit::ItemView New(ItemFactory& factory);
+
+  /**
+   * @copydoc Toolkit::ItemView::GetLayoutCount
+   */
+  unsigned int GetLayoutCount() const;
+
+  /**
+   * @copydoc Toolkit::ItemView::AddLayout
+   */
+  void AddLayout(ItemLayout& layout);
+
+  /**
+   * @copydoc Toolkit::ItemView::RemoveLayout
+   */
+  void RemoveLayout(unsigned int layoutIndex);
+
+  /**
+   * @copydoc Toolkit::ItemView::GetLayout
+   */
+  ItemLayoutPtr GetLayout(unsigned int layoutIndex) const;
+
+  /**
+   * @copydoc Toolkit::ItemView::GetActiveLayout
+   */
+  ItemLayoutPtr GetActiveLayout() const;
+
+  /**
+   * @copydoc Toolkit::ItemView::GetCurrentLayoutPosition
+   */
+  float GetCurrentLayoutPosition(unsigned int itemId) const;
+
+  /**
+   * @copydoc Toolkit::ItemView::ActivateLayout
+   */
+  void ActivateLayout(unsigned int layoutIndex, const Vector3& targetSize, float durationSeconds);
+
+  /**
+   * @copydoc Toolkit::ItemView::DeactivateCurrentLayout
+   */
+  void DeactivateCurrentLayout();
+
+  /**
+   * @copydoc Toolkit::ItemView::SetMinimumSwipeSpeed
+   */
+  void SetMinimumSwipeSpeed(float speed);
+
+  /**
+   * @copydoc Toolkit::ItemView::GetMinimumSwipeSpeed
+   */
+  float GetMinimumSwipeSpeed() const;
+
+  /**
+   * @copydoc Toolkit::ItemView::SetMinimumSwipeDistance
+   */
+  void SetMinimumSwipeDistance(float distance);
+
+  /**
+   * @copydoc Toolkit::ItemView::GetMinimumSwipeDistance
+   */
+  float GetMinimumSwipeDistance() const;
+
+  /**
+   * @copydoc Toolkit::ItemView::SetMouseWheelScrollDistanceStep
+   */
+  void SetMouseWheelScrollDistanceStep(float step);
+
+  /**
+   * @copydoc Toolkit::ItemView::GetMouseWheelScrollDistanceStep
+   */
+  float GetMouseWheelScrollDistanceStep() const;
+
+  /**
+   * @copydoc Toolkit::ItemView::SetAnchoring
+   */
+  void SetAnchoring(bool enabled);
+
+  /**
+   * @copydoc Toolkit::ItemView::GetAnchoring
+   */
+  bool GetAnchoring() const;
+
+  /**
+   * @copydoc Toolkit::ItemView::SetAnchoringDuration
+   */
+  void SetAnchoringDuration(float durationSeconds);
+
+  /**
+   * @copydoc Toolkit::ItemView::GetAnchoringDuration
+   */
+  float GetAnchoringDuration() const;
+
+  /**
+   * @copydoc Toolkit::ItemView::ScrollToItem
+   */
+  void ScrollToItem(unsigned int itemId, float durationSeconds);
+
+  /**
+   * @copydoc Toolkit::ItemView::SetRefreshInterval
+   */
+  void SetRefreshInterval(unsigned int intervalMilliseconds);
+
+  /**
+   * @copydoc Toolkit::ItemView::GetRefreshInterval
+   */
+  unsigned int GetRefreshInterval() const;
+
+  /**
+   * @copydoc Toolkit::ItemView::GetItem
+   */
+  Actor GetItem(unsigned int itemId) const;
+
+  /**
+   * @copydoc Toolkit::ItemView::GetItemId
+   */
+  unsigned int GetItemId(Actor actor) const;
+
+  /**
+   * @copydoc Toolkit::ItemView::RemoveItem
+   */
+  void RemoveItem(unsigned int itemId, float durationSeconds);
+
+  /**
+   * @copydoc Toolkit::Scrollable::GetDomainSize
+   */
+  Vector3 GetDomainSize() const;
+
+  /**
+   * @copydoc Toolkit::Scrollable::GetCurrentScrollPosition
+   */
+  Vector3 GetCurrentScrollPosition() const;
+
+  /**
+   * @copydoc Toolkit::Scrollable::AddOverlay()
+   */
+  void AddOverlay(Actor actor);
+
+  /**
+   * @copydoc Toolkit::Scrollable::RemoveOverlay()
+   */
+  void RemoveOverlay(Actor actor);
+
+  /**
+   * @copydoc Toolkit::Scrollable::ScrollTo(const Vector3& position, float duration)
+   */
+  void ScrollTo(const Vector3& position, float duration);
+
+public: // Used By ItemPool
+
+  /**
+   * Called by the ItemPool when it wishes to create an actor from the ItemFactory with the
+   * specified ItemId.
+   * @param[in] itemId The Item ID of the actor to create.
+   */
+  Actor CreateActor(unsigned int itemId);
+
+  /**
+   * Called by the ItemPool when an actor is added to the ItemPool.
+   * @param[in] actor The actor that has been added.
+   * @param[in] itemId The associated Item ID.
+   * @param[in] targetSize The target size that was specified upon addition.
+   */
+  void ActorAddedToItemPool(Actor actor, unsigned int itemId, const Vector3& targetSize);
+
+  /**
+   * Called by the ItemPool when an actor with the specified itemId is about to be removed from the
+   * ItemPool.
+   * @param[in] actor The actor about to be removed.
+   * @param[in] itemId The associated Item ID.
+   */
+  void ActorRemovedFromItemPool(Actor actor, unsigned int itemId);
+
+private: // From CustomActorImpl
+
+  /**
+   * From CustomActorImpl; called after a touch-signal is received by the owning actor.
+   * @param[in] event The touch event.
+   * @return True if the event should be consumed.
+   */
+  virtual bool OnTouchEvent(const TouchEvent& event);
+
+  /**
+   * From CustomActorImpl; called after a mouse-wheel-event is received by the owning actor.
+   * @param[in] event The mouse wheel event.
+   * @return True if the event should be consumed.
+   */
+  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event);
+
+private: // From ControlImpl
+
+  /**
+   * @copydoc Toolkit::Control::OnInitialize()
+   */
+  virtual void OnInitialize();
+
+  /**
+   * @copydoc Toolkit::Control::OnAccessibilityPan()
+   */
+  virtual bool OnAccessibilityPan(PanGesture gesture);
+
+  /**
+   * @copydoc Toolkit::Control::GetNextKeyboardFocusableActor()
+   */
+  virtual Actor GetNextKeyboardFocusableActor(Actor actor, Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
+
+  /**
+   * @copydoc Toolkit::Control::OnKeyboardFocusChangeCommitted()
+   */
+  virtual void OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor);
+
+protected:
+
+  /**
+   * Construct a new ItemView.
+   * @param[in] factory The factory which provides ItemView with items.
+   */
+  ItemView(ItemFactory& factory);
+
+  /**
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~ItemView();
+
+private:
+
+  // Undefined
+  ItemView(const ItemView&);
+
+  // Undefined
+  ItemView& operator=(const ItemView& rhs);
+
+  /**
+   * Helper to apply constraints to an actor.
+   * @param[in] actor The actor to constrain.
+   * @param[in] layout The active layout.
+   * @param[in] itemId The ID of the item represented by the actor.
+   * @param[in] durationSeconds The time taken to fully constrain the actors.
+   */
+  void ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int itemId, float durationSeconds);
+
+  /**
+   * Helper to remove items outside a given range.
+   * @param[in] range The range of required items.
+   */
+  void RemoveItems(ItemRange range);
+
+  /**
+   * Helper to add a range of items, if not already in the ItemPool.
+   * @param[in] layout The layout used to position the new items.
+   * @param[in] layoutSize The current size of the layout.
+   * @param[in] range The range of required items.
+   */
+  void AddItems(ItemLayout& layout, const Vector3& layoutSize, ItemRange range);
+
+  /**
+   * Helper to find the range of items to populate with.
+   * @param[in] layout The current layout.
+   * @param[in] range The range of items.
+   * @param[in] reserveExtra True if reserve items should be included.
+   */
+  ItemRange GetItemRange(ItemLayout& layout, const Vector3& layoutSize, bool reserveExtra);
+
+  // Input Handling
+
+  /**
+   * Helper to handle pressed (Down) events.
+   * @param[in] x The X coordinate of the touch event.
+   * @param[in] y The Y coordinate of the touch event.
+   * @param[in] timeMs The time-stamp of the touch event.
+   */
+  void OnPressed(float x, float y, unsigned long timeMs);
+
+  /**
+   * Helper to clamp the first-item position when dragging/swiping.
+   * @param[in] targetPosition The target position of the drag etc.
+   * @param[in] targetSize The target ItemView & layout size.
+   * @param[in] layout The current layout.
+   * @return The clamped first-item position.
+   */
+  float ClampFirstItemPosition(float targetPosition, const Vector3& targetSize, ItemLayout& layout);
+
+  /**
+   * Called upon pan gesture event.
+   *
+   * @param[in] gesture The gesture event.
+   */
+  void OnPan(PanGesture pan);
+
+  /**
+   * Helper to handle anchoring animations.
+   * @return The animation, or an uninitialized handle if not necessary.
+   */
+  Animation DoAnchoring();
+
+  /**
+   * Callback from scroll animations
+   * @param[in] animation The scroll-animation which has finished.
+   */
+  void OnScrollFinished(Animation& animation);
+
+  /**
+   * Called by animation system when overshoot has finished animating to maximum (either -1.0f or 1.0f)
+   *
+   * @param[in] animation the animation that has finished
+   */
+  void OnOvershootOnFinished(Animation& animation);
+
+  /**
+   * Helper to start the refresh timer.
+   */
+  void StartRefreshTimer();
+
+  /**
+   * Helper to cancel the refresh timer.
+   */
+  void CancelRefreshTimer();
+
+  /**
+   * Refresh the ItemView; this is called after a timeout when scrolling.
+   * During a refresh, ItemFactory::NewItem() will be called to create newly visible items.
+   * @return True if the refresh timer should be kept running.
+   */
+  bool OnRefreshTick();
+
+  /**
+   * This is called after a timeout when no new mouse wheel event is received for a certain period of time.
+   * @return will return false; one-shot timer.
+   */
+  bool OnMouseWheelEventFinished();
+
+  /**
+   * Stops and removes animation if exists.
+   * @param[in,out] animation The animation handle to be removed.
+   */
+  void RemoveAnimation(Animation& animation);
+
+  /**
+   * Helper to apply constraints to the overshoot overlay actor.
+   */
+  void ApplyOvershootOverlayConstraints();
+
+  /**
+   * Helper to calculate the scroll overshoot according to the pan gesture displacement.
+   * @return The scroll overshoot.
+   */
+  float CalculateScrollOvershoot();
+
+  /**
+   * Helper to calculate the scroll overshoot according to the pan gesture displacement.
+   *
+   * @param[in] overshootAmount amount to animate to
+   * @param[in] animateBack whether to animate back to zero immediately after
+   * @return The scroll overshoot.
+   */
+  void AnimateScrollOvershoot(float overshootAmount, bool animateBack = false);
+
+  /**
+   * Gets the scroll position in pixels according to the logical layout position.
+   * @param[in] layoutSize The current size of the layout.
+   */
+  float GetScrollPosition(float layoutPosition, const Vector3& layoutSize) const;
+
+  /**
+   * Calculates the minimum and maximum positions for each axis to scroll to.
+   * @param[in] layoutSize The current size of the layout.
+   */
+  void CalculateDomainSize(const Vector3& layoutSize);
+
+
+  /**
+   * Calculates whether we want to allow current item view to scroll.
+   * @param[in] layoutSize The current size of the layout.
+   * @return    true if itemview is scrollable
+   */
+  bool IsLayoutScrollable(const Vector3& layoutSize);
+
+private:
+
+  ItemFactory& mItemFactory;
+
+  ItemPool mItemPool;
+
+  ItemLayoutContainer mLayouts;
+  ItemLayout* mActiveLayout;
+
+  Animation mResizeAnimation;
+  Animation mScrollAnimation;
+  Animation mScrollSpeedAnimation;
+  Animation mScrollOvershootAnimation;
+  bool      mAnimatingOvershootOn;          ///< whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
+  bool      mAnimateOvershootOff;         ///< whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
+
+  bool mAnchoringEnabled;
+  float mAnchoringDuration;
+
+  Timer mRefreshTimer;
+  int mRefreshIntervalMilliseconds;
+  bool mRefreshOrderHint; ///< True if scrolling towards the last item
+
+  // Input handling
+
+  float mMinimumSwipeSpeed;
+  float mMinimumSwipeDistance;
+  float mMouseWheelScrollDistanceStep; ///< The step of scroll distance in actor coordinates for each mouse wheel event received.
+
+  float mScrollDistance;
+  float mScrollSpeed;
+  Vector2 mTotalPanDisplacement;
+
+  float mScrollOvershoot;
+  bool mIsFlicking;
+
+  Timer mMouseWheelEventFinishedTimer; ///< The timer to determine whether there is no mouse wheel event received for a certain period of time.
+
+  Dali::Gesture::State mGestureState;
+
+  ImageActor mOvershootOverlay;           ///< The overlay actor for overshoot effect
+  OvershootRippleEffect mOvershootEffect; ///< The vertex/fragment shader used to display the overshoot ripple effect
+
+  Property::Index mPropertyLayoutPosition; ///< The logical position of the first item within the layout
+  Property::Index mPropertyPosition; ///< The physical position of the first item within the layout
+  Property::Index mPropertyMinimumLayoutPosition; ///< The minimum valid layout position in the layout.
+  Property::Index mPropertyScrollSpeed; ///< The current scroll speed of item view
+  Property::Index mPropertyOvershoot; ///< The scroll overshoot (difference of the layout position before and after clamping)
+};
+
+} // namespace Internal
+
+// Helpers for public-api forwarding methods
+
+inline Toolkit::Internal::ItemView& GetImpl(Toolkit::ItemView& itemView)
+{
+  DALI_ASSERT_ALWAYS(itemView);
+
+  Dali::RefObject& handle = itemView.GetImplementation();
+
+  return static_cast<Toolkit::Internal::ItemView&>(handle);
+}
+
+inline const Toolkit::Internal::ItemView& GetImpl(const Toolkit::ItemView& itemView)
+{
+  DALI_ASSERT_ALWAYS(itemView);
+
+  const Dali::RefObject& handle = itemView.GetImplementation();
+
+  return static_cast<const Toolkit::Internal::ItemView&>(handle);
+}
+
+} // namespace Toolkit
+
+} // namespace Dali
+
+#endif // __DALI_TOOLKIT_INTERNAL_ITEM_VIEW_H__
