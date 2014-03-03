@@ -394,7 +394,7 @@ static void UtcDaliFocusManagerSetAndGetCurrentFocusActor()
   application.Render();
 
   // Make the third actor not focusable
-  Property::Index propertyActorFocusable = third.GetPropertyIndex("is-focus-group");
+  Property::Index propertyActorFocusable = third.GetPropertyIndex("focusable");
   third.SetProperty(propertyActorFocusable, false);
   // flush the queue and render once
   application.SendNotification();
