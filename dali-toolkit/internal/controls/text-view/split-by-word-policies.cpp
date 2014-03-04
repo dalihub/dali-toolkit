@@ -249,6 +249,8 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
   const float parentWidth = relayoutData.mTextViewSize.width;
   TextViewProcessor::TextLayoutInfo& textLayoutInfo = relayoutData.mTextLayoutInfo;
 
+  relayoutData.mLineJustificationInfo.clear();
+
   // Reset the text height. This value is returned in order to shrink further or not the text.
   newTextHeight = 0.f;
 
@@ -324,23 +326,20 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
               ( isFirstCharOfWord && ( wordOffset + wordLayoutInfo.mSize.width * shrinkFactor > parentWidth ) ) )
           {
             isFirstChar = false;
-            const float minWidth = std::min( parentWidth, textLayoutInfo.mWholeTextSize.width );
 
             // Calculates the line length and the max character height for the current line.
             TextViewRelayout::SubLineLayoutInfo subLineInfo;
             subLineInfo.mLineLength = 0.f;
             subLineInfo.mMaxCharHeight = 0.f;
             subLineInfo.mMaxAscender = 0.f;
-            TextViewRelayout::CalculateSubLineLayout( minWidth,
+            TextViewRelayout::CalculateSubLineLayout( parentWidth,
                                                       indices,
                                                       lineLayoutInfo,
                                                       TextViewRelayout::WrapByWord,
                                                       shrinkFactor,
                                                       subLineInfo );
 
-            float justificationOffset =  TextViewRelayout::CalculateJustificationOffset( layoutParameters.mLineJustification, minWidth, subLineInfo.mLineLength );
-
-            characterLayoutInfo.mPosition = Vector3( justificationOffset, previousPositionY + subLineInfo.mMaxCharHeight + layoutParameters.mLineHeightOffset * shrinkFactor, 0.f );
+            characterLayoutInfo.mPosition = Vector3( 0.f, previousPositionY + subLineInfo.mMaxCharHeight + layoutParameters.mLineHeightOffset * shrinkFactor, 0.f );
 
             newTextHeight += subLineInfo.mMaxCharHeight + layoutParameters.mLineHeightOffset * shrinkFactor;
 
@@ -349,6 +348,15 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
             lineInfo.mSize = Size( subLineInfo.mLineLength, subLineInfo.mMaxCharHeight ); // Size of this piece of line.
             lineInfo.mAscender = subLineInfo.mMaxAscender;                                // Ascender of this piece of line.
             relayoutData.mLines.push_back( lineInfo );
+
+
+            // Stores some info to calculate the line justification in a post-process.
+            TextView::LineJustificationInfo justificationInfo;
+
+            justificationInfo.mIndices = indices;
+            justificationInfo.mLineLength = subLineInfo.mLineLength;
+
+            relayoutData.mLineJustificationInfo.push_back( justificationInfo );
           }
           else
           {

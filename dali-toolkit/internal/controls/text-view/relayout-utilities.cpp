@@ -277,6 +277,7 @@ void CalculateSubLineLayout( const float parentWidth,
     {
       const TextViewProcessor::WordLayoutInfo& wordLayoutInfo( *wordIt );
 
+      const float shrunkWordWidth = wordLayoutInfo.mSize.width * shrinkFactor;
       const bool isWhiteSpace = TextViewProcessor::WordSeparator == wordLayoutInfo.mType;
 
       bool splitByCharacter = false;
@@ -296,19 +297,19 @@ void CalculateSubLineLayout( const float parentWidth,
         }
         case WrapByWordAndSplit:
         {
-          splitByCharacter = ( wordLayoutInfo.mSize.width * shrinkFactor > parentWidth );
+          splitByCharacter = ( shrunkWordWidth > parentWidth );
           break;
         }
         case WrapByLineAndSplit:
         {
           if( ( 0 != characterIndex ) ||
-              ( ( 0 == characterIndex ) && ( lineOffset + wordLayoutInfo.mSize.width * shrinkFactor > parentWidth ) ) )
+              ( ( 0 == characterIndex ) && ( lineOffset + shrunkWordWidth > parentWidth ) ) )
           {
             splitByCharacter = true;
           }
           else
           {
-            lineOffset += wordLayoutInfo.mSize.width * shrinkFactor;
+            lineOffset += shrunkWordWidth;
             splitByCharacter = false;
           }
         }
@@ -339,7 +340,7 @@ void CalculateSubLineLayout( const float parentWidth,
       }
       else
       {
-        CalculateLineLength( isWhiteSpace, wordLayoutInfo.mSize.width * shrinkFactor, parentWidth, found, subLineInfo.mLineLength, endWhiteSpaceLength );
+        CalculateLineLength( isWhiteSpace, shrunkWordWidth, parentWidth, found, subLineInfo.mLineLength, endWhiteSpaceLength );
         if( !found || isFirstCharacter )
         {
           subLineInfo.mMaxCharHeight = std::max( subLineInfo.mMaxCharHeight, wordLayoutInfo.mSize.height );
