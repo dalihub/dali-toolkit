@@ -97,6 +97,15 @@ namespace
       'name':'text',                                           \
       'type':'basic-text',                                     \
       'text':'Hello'                                           \
+    },                                                         \
+    {                                                          \
+      'name':'text2',                                          \
+      'type':'basic-text',                                     \
+      'text':'Hello',                                          \
+      'signals':                                               \
+      [                                                        \
+        { 'name': 'on-stage', 'action':'set', 'actor':'text2', 'property':'text', 'value':'Jaylo' } \
+      ]                                                        \
     }                                                          \
   ],                                                           \
   'other':                                                     \
@@ -183,6 +192,7 @@ static void UtcDaliBuilderTextActorApplyFromStyle();
 static void UtcDaliBuilderStyles();
 static void UtcDaliBuilderAddActorsOther();
 static void UtcDaliBuilderAddActors();
+static void UtcDaliBuilderSetProperty();
 
 enum {
   POSITIVE_TC_IDX = 0x01,
@@ -198,6 +208,7 @@ extern "C" {
     { UtcDaliBuilderStyles, POSITIVE_TC_IDX },
     { UtcDaliBuilderAddActorsOther, POSITIVE_TC_IDX },
     { UtcDaliBuilderAddActors, POSITIVE_TC_IDX },
+    { UtcDaliBuilderSetProperty, POSITIVE_TC_IDX },
     { NULL, 0 }
   };
 }
@@ -389,5 +400,27 @@ static void UtcDaliBuilderStyles()
 
   v = textActor.GetProperty( textActor.GetPropertyIndex("smooth-edge") );
   DALI_TEST_CHECK( 0.8f == v.Get<float>() );
+
+}
+
+static void UtcDaliBuilderSetProperty()
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliBuilderSetProperty");
+
+  Builder builder = Builder::New();
+
+  builder.LoadFromString(ReplaceQuotes(JSON_TEXT_ACTOR));
+
+  builder.AddActors( Stage::GetCurrent().GetRootLayer() );
+
+  application.SendNotification();
+  application.Render();
+
+  TextActor actor = TextActor::DownCast( Stage::GetCurrent().GetRootLayer().FindChildByName("text2") );
+
+  DALI_TEST_CHECK( actor );
+  DALI_TEST_CHECK( actor.GetText() == "Jaylo" );
 
 }

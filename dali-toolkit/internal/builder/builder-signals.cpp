@@ -97,7 +97,18 @@ struct PropertySetAction
 
       if( idx != Property::INVALID_INDEX )
       {
-        actor.SetProperty( idx, value );
+        if( actor.GetPropertyType(idx) != value.GetType() )
+        {
+          DALI_SCRIPT_WARNING("Set property action has different type for property '%s'\n", propertyName.c_str());
+        }
+        else
+        {
+          actor.SetProperty( idx, value );
+        }
+      }
+      else
+      {
+        DALI_SCRIPT_WARNING("Set property action cannot find property '%s'\n", propertyName.c_str());
       }
     }
   };
@@ -225,7 +236,7 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
   OptionalString childActorName(IsString( IsChild(&child, "child-actor")) );
   OptionalString actorName(IsString( IsChild(&child, "actor")) );
   OptionalString propertyName(IsString( IsChild(&child, "property")) );
-  OptionalString valueChild(IsString( IsChild(&child, "value")) );
+  OptionalChild  valueChild( IsChild(&child, "value") );
 
   OptionalString actionName = IsString( IsChild(&child, "action") );
   DALI_ASSERT_ALWAYS(actionName && "Signal must have an action");
@@ -243,11 +254,16 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
   }
   else if(actorName)
   {
-    if(propertyName && valueChild)
+    if(propertyName && valueChild && ("set" == *actionName) )
     {
       PropertySetAction action;
       action.actorName       = *actorName;
       action.propertyName    = *propertyName;
+      // actor may not exist yet so we can't check the property type
+      if( !Dali::Toolkit::Internal::SetPropertyFromNode( *valueChild, action.value ) )
+      {
+        DALI_SCRIPT_WARNING("Cannot set property for set property action\n");
+      }
       callback = action;
     }
     else
