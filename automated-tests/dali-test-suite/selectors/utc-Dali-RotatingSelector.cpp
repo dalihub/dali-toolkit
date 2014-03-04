@@ -259,11 +259,11 @@ static void UtcDaliRotatingSelectorSignalSelected()
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   application.SendNotification();
   application.Render(1000);

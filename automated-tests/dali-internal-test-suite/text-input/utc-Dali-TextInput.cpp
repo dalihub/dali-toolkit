@@ -75,8 +75,6 @@ static void UtcDaliInternalTextInputTextSelection()
 
   ToolkitTestApplication application;
 
-  Dali::Integration::Core& core ( application.GetCore() );
-
   tet_infoline("Testing Text Selection with replace.");
 
   Toolkit::TextInput textInput = Toolkit::TextInput::New();
@@ -99,7 +97,7 @@ static void UtcDaliInternalTextInputTextSelection()
 
   Integration::KeyEvent event(testChar, testChar, 0, 0, 0, Integration::KeyEvent::Down );
 
-  core.SendEvent( event );
+  application.ProcessEvent( event );
 
   tet_printf("Simulate pressing of a key: %s\n", testChar );
 

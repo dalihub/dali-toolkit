@@ -664,19 +664,18 @@ static void UtcDaliKeyboardFocusManagerSignalFocusGroupChanged()
   FocusGroupChangedCallback focusGroupChangedCallback(focusGroupChangedSignalVerified);
   manager.FocusGroupChangedSignal().Connect( &focusGroupChangedCallback, &FocusGroupChangedCallback::Callback );
 
-  Dali::Integration::Core& core = application.GetCore();
   Integration::KeyEvent tabEvent("Tab", "", 0, 0, 0, Integration::KeyEvent::Down);
   Integration::KeyEvent shiftTabEvent("Tab", "", 1, 0, 0, Integration::KeyEvent::Down);
 
   // Send the tab event to change focus group in the forward direction
-  core.SendEvent(tabEvent);
+  application.ProcessEvent(tabEvent);
   DALI_TEST_CHECK(focusGroupChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusGroupChangedCallback.mCurrentFocusedActor == Actor());
   DALI_TEST_CHECK(focusGroupChangedCallback.mForward == true);
   focusGroupChangedCallback.Reset();
 
   // Send the shift tab event to change focus group in the backward direction
-  core.SendEvent(shiftTabEvent);
+  application.ProcessEvent(shiftTabEvent);
   DALI_TEST_CHECK(focusGroupChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusGroupChangedCallback.mCurrentFocusedActor == Actor());
   DALI_TEST_CHECK(focusGroupChangedCallback.mForward == false);
@@ -703,7 +702,6 @@ static void UtcDaliKeyboardFocusManagerSignalFocusedActorActivated()
   FocusedActorActivatedCallback focusedActorActivatedCallback(focusedActorActivatedSignalVerified);
   manager.FocusedActorActivatedSignal().Connect( &focusedActorActivatedCallback, &FocusedActorActivatedCallback::Callback );
 
-  Dali::Integration::Core& core = application.GetCore();
   Integration::KeyEvent returnEvent("Return", "", 0, 0, 0, Integration::KeyEvent::Up);
 
   // Create the first button and add it to the stage
@@ -721,7 +719,7 @@ static void UtcDaliKeyboardFocusManagerSignalFocusedActorActivated()
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == firstPushButton);
 
   // Send the return event to activate the first button
-  core.SendEvent(returnEvent);
+  application.ProcessEvent(returnEvent);
   DALI_TEST_CHECK(focusedActorActivatedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusedActorActivatedCallback.mActivatedActor == firstPushButton);
   focusedActorActivatedCallback.Reset();
@@ -731,7 +729,7 @@ static void UtcDaliKeyboardFocusManagerSignalFocusedActorActivated()
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == secondPushButton);
 
   // Send the return event again to activate the second button
-  core.SendEvent(returnEvent);
+  application.ProcessEvent(returnEvent);
   DALI_TEST_CHECK(focusedActorActivatedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusedActorActivatedCallback.mActivatedActor == secondPushButton);
   focusedActorActivatedCallback.Reset();

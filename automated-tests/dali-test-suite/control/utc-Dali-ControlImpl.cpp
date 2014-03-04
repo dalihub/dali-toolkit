@@ -282,7 +282,7 @@ static void UtcDaliControlImplOnGestureMethods()
     pinch.scale = 10.0f;
     pinch.speed = 50.0f;
     pinch.centerPoint = Vector2(20.0f, 20.0f);
-    application.GetCore().SendEvent(pinch);
+    application.ProcessEvent(pinch);
     DALI_TEST_CHECK( dummyImpl.pinchCalled == true );
 
     DALI_TEST_CHECK( dummyImpl.panCalled == false );
@@ -291,9 +291,9 @@ static void UtcDaliControlImplOnGestureMethods()
     pan.currentPosition = Vector2(20.0f, 20.0f);
     pan.timeDelta = 10;
     pan.numberOfTouches = 1u;
-    application.GetCore().SendEvent(pan);
+    application.ProcessEvent(pan);
     pan.state = Gesture::Started;
-    application.GetCore().SendEvent(pan);
+    application.ProcessEvent(pan);
     DALI_TEST_CHECK( dummyImpl.panCalled == true );
 
     DALI_TEST_CHECK( dummyImpl.tapCalled == false );
@@ -301,21 +301,21 @@ static void UtcDaliControlImplOnGestureMethods()
     tap.numberOfTaps = 1u;
     tap.numberOfTouches = 1u;
     tap.point = Vector2(50.0f, 50.0f);
-    application.GetCore().SendEvent(tap);
+    application.ProcessEvent(tap);
     tap.state = Gesture::Started;
-    application.GetCore().SendEvent(tap);
+    application.ProcessEvent(tap);
     DALI_TEST_CHECK( dummyImpl.tapCalled == true );
 
     DALI_TEST_CHECK( dummyImpl.longPressCalled == false );
     Integration::LongPressGestureEvent longPress(Gesture::Possible);
     longPress.numberOfTouches = 1u;
     longPress.point = Vector2(50.0f, 50.0f);
-    application.GetCore().SendEvent(longPress);
+    application.ProcessEvent(longPress);
     longPress.state = Gesture::Started;
-    application.GetCore().SendEvent(longPress);
+    application.ProcessEvent(longPress);
     DALI_TEST_CHECK( dummyImpl.longPressCalled == true );
     longPress.state = Gesture::Finished;
-    application.GetCore().SendEvent(longPress);
+    application.ProcessEvent(longPress);
 
     Stage::GetCurrent().Remove(dummy);
   }
@@ -342,7 +342,7 @@ static void UtcDaliControlImplOnGestureMethods()
     pinch.scale = 10.0f;
     pinch.speed = 50.0f;
     pinch.centerPoint = Vector2(20.0f, 20.0f);
-    application.GetCore().SendEvent(pinch);
+    application.ProcessEvent(pinch);
 
     // Render and notify a couple of times
     application.SendNotification();
@@ -356,26 +356,26 @@ static void UtcDaliControlImplOnGestureMethods()
     pan.currentPosition = Vector2(20.0f, 20.0f);
     pan.timeDelta = 10;
     pan.numberOfTouches = 1u;
-    application.GetCore().SendEvent(pan);
+    application.ProcessEvent(pan);
     pan.state = Gesture::Started;
-    application.GetCore().SendEvent(pan);
+    application.ProcessEvent(pan);
 
     Integration::TapGestureEvent tap(Gesture::Possible);
     tap.numberOfTaps = 1u;
     tap.numberOfTouches = 1u;
     tap.point = Vector2(50.0f, 50.0f);
-    application.GetCore().SendEvent(tap);
+    application.ProcessEvent(tap);
     tap.state = Gesture::Started;
-    application.GetCore().SendEvent(tap);
+    application.ProcessEvent(tap);
 
     Integration::LongPressGestureEvent longPress(Gesture::Possible);
     longPress.numberOfTouches = 1u;
     longPress.point = Vector2(50.0f, 50.0f);
-    application.GetCore().SendEvent(longPress);
+    application.ProcessEvent(longPress);
     longPress.state = Gesture::Started;
-    application.GetCore().SendEvent(longPress);
+    application.ProcessEvent(longPress);
     longPress.state = Gesture::Finished;
-    application.GetCore().SendEvent(longPress);
+    application.ProcessEvent(longPress);
 
     Stage::GetCurrent().Remove(dummy);
   }
@@ -597,7 +597,7 @@ static void UtcDaliControlImplTouchEvent()
     Integration::TouchEvent touchEvent(1);
     TouchPoint point(1, TouchPoint::Down, 20.0f, 20.0f);
     touchEvent.AddPoint(point);
-    application.GetCore().SendEvent(touchEvent);
+    application.ProcessEvent(touchEvent);
     DALI_TEST_EQUALS( dummyImpl.touchEventCalled, true, TEST_LOCATION );
 
     Stage::GetCurrent().Remove(dummy);
@@ -619,7 +619,7 @@ static void UtcDaliControlImplTouchEvent()
     Integration::TouchEvent touchEvent(1);
     TouchPoint point(1, TouchPoint::Down, 20.0f, 20.0f);
     touchEvent.AddPoint(point);
-    application.GetCore().SendEvent(touchEvent);
+    application.ProcessEvent(touchEvent);
 
     Stage::GetCurrent().Remove(dummy);
   }
@@ -656,7 +656,7 @@ static void UtcDaliControlImplMouseWheelEvent()
     // simulate a mouse wheel event
     Vector2 screenCoordinates( 10.0f, 10.0f );
     Integration::MouseWheelEvent event(0, 0u, screenCoordinates, 1, 1000u);
-    application.GetCore().SendEvent(event);
+    application.ProcessEvent(event);
     DALI_TEST_EQUALS( dummyImpl.mouseWheelEventCalled, true, TEST_LOCATION );
 
     Stage::GetCurrent().Remove(dummy);
@@ -680,7 +680,7 @@ static void UtcDaliControlImplMouseWheelEvent()
     // simulate a mouse wheel event
     Vector2 screenCoordinates( 20.0f, 20.0f );
     Integration::MouseWheelEvent event(0, 0u, screenCoordinates, 1, 1000u);
-    application.GetCore().SendEvent(event);
+    application.ProcessEvent(event);
 
     Stage::GetCurrent().Remove(dummy);
   }
@@ -706,7 +706,7 @@ static void UtcDaliControlImplKeyEvent()
 
     DALI_TEST_EQUALS( dummyImpl.keyEventCalled, false, TEST_LOCATION );
     Integration::KeyEvent keyEvent;
-    application.GetCore().SendEvent(keyEvent);
+    application.ProcessEvent(keyEvent);
     DALI_TEST_EQUALS( dummyImpl.keyEventCalled, true, TEST_LOCATION );
 
     Stage::GetCurrent().Remove(dummy);
@@ -725,7 +725,7 @@ static void UtcDaliControlImplKeyEvent()
     application.SendNotification();
 
     Integration::KeyEvent keyEvent;
-    application.GetCore().SendEvent(keyEvent);
+    application.ProcessEvent(keyEvent);
 
     Stage::GetCurrent().Remove(dummy);
   }

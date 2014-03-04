@@ -187,8 +187,6 @@ static void UtcDaliTextInputSetMaxCharacterLength()
   const int maxChars = 4;
   const char* testChar  = "v";
 
-  Dali::Integration::Core& core = application.GetCore();
-
   TextInput textInput = TextInput::New();  // create empty TextInput
 
   Stage::GetCurrent().Add(textInput);
@@ -202,19 +200,19 @@ static void UtcDaliTextInputSetMaxCharacterLength()
   // Send max number of characters
   for (int i=0; i < maxChars; i++)
     {
-      core.SendEvent(event);
+      application.ProcessEvent(event);
       testString.append(testChar);
     }
 
   DALI_TEST_EQUALS(testString,textInput.GetText(), TEST_LOCATION); // Get text which should be empty
 
-  core.SendEvent(event); // try to append additional character
+  application.ProcessEvent(event); // try to append additional character
 
   DALI_TEST_EQUALS(testString,textInput.GetText(), TEST_LOCATION); // Get text which should be empty
 
   textInput.SetMaxCharacterLength(maxChars+1); // increment max characters by 1
 
-  core.SendEvent(event); // append additional character
+  application.ProcessEvent(event); // append additional character
   testString.append(testChar);
 
   DALI_TEST_EQUALS(testString,textInput.GetText(), TEST_LOCATION); // Get text which should be empty
@@ -242,8 +240,6 @@ static void UtcDaliTextInputAddChars()
 
   tet_infoline("Testing Adding characters");
 
-  Dali::Integration::Core& core = application.GetCore();
-
   TextInput textInput = TextInput::New();  // create empty TextInput
 
   Stage::GetCurrent().Add(textInput);
@@ -251,12 +247,12 @@ static void UtcDaliTextInputAddChars()
   textInput.SetKeyInputFocus();
 
   Integration::KeyEvent event("a", "a", 0, 0, 0, Integration::KeyEvent::Down);
-  core.SendEvent(event);
+  application.ProcessEvent(event);
 
   DALI_TEST_EQUALS("a",textInput.GetText(), TEST_LOCATION); // Get text which should be "a"
 
   Integration::KeyEvent event2("v", "v", 0, 0, 0, Integration::KeyEvent::Down);
-  core.SendEvent(event2);
+  application.ProcessEvent(event2);
 
   DALI_TEST_EQUALS("av",textInput.GetText(), TEST_LOCATION); // Get text which should be "av"
 }
@@ -267,8 +263,6 @@ static void UtcDaliTextInputRemoveChars()
 
   tet_infoline("Testing Removal of end characters");
 
-  Dali::Integration::Core& core = application.GetCore();
-
   TextInput textInput = TextInput::New();  // create empty TextInput
 
   Stage::GetCurrent().Add(textInput);
@@ -276,21 +270,21 @@ static void UtcDaliTextInputRemoveChars()
   textInput.SetKeyInputFocus();
 
   Integration::KeyEvent event("a", "a", 0, 0, 0, Integration::KeyEvent::Down);
-  core.SendEvent(event);
+  application.ProcessEvent(event);
 
   DALI_TEST_EQUALS("a",textInput.GetText(), TEST_LOCATION); // Get text which should be "a"
 
   Integration::KeyEvent event2("BackSpace", "", 0, 0, 0, Integration::KeyEvent::Down);
-  core.SendEvent(event2);
+  application.ProcessEvent(event2);
 
   DALI_TEST_EQUALS("",textInput.GetText(), TEST_LOCATION); // Get text which should be ""
 
-  core.SendEvent(event);
-  core.SendEvent(event);
+  application.ProcessEvent(event);
+  application.ProcessEvent(event);
 
   DALI_TEST_EQUALS("aa",textInput.GetText(), TEST_LOCATION); // Get text which should be "aa"
 
-  core.SendEvent(event2);
+  application.ProcessEvent(event2);
 
   DALI_TEST_EQUALS("a",textInput.GetText(), TEST_LOCATION); // Get text which should be "a"
 }
@@ -386,8 +380,6 @@ static void UtcDaliTextInputExceedMaxCharacters()
 {
   ToolkitTestApplication application;
 
-  Dali::Integration::Core& core = application.GetCore();
-
   tet_infoline("Testing Max characters is obeyed when inputting key events ");
 
   TextInput textInput = TextInput::New();  // create empty TextInput
@@ -403,13 +395,13 @@ static void UtcDaliTextInputExceedMaxCharacters()
   Integration::KeyEvent eventA("a", "a", 0, 0, 0, Integration::KeyEvent::Down );
   Integration::KeyEvent eventB("b", "b", 0, 0, 0, Integration::KeyEvent::Down );
 
-  core.SendEvent(eventA);
-  core.SendEvent(eventB);
-  core.SendEvent(eventA);
-  core.SendEvent(eventB);
+  application.ProcessEvent(eventA);
+  application.ProcessEvent(eventB);
+  application.ProcessEvent(eventA);
+  application.ProcessEvent(eventB);
 
-  core.SendEvent(eventA);
-  core.SendEvent(eventB);
+  application.ProcessEvent(eventA);
+  application.ProcessEvent(eventB);
 
   tet_printf( "Get text result : %s\n", textInput.GetText().c_str());
 

@@ -313,10 +313,9 @@ static void UtcDaliKeyInputFocusManagerSignalUnhandledKeyEvent()
   KeyInputFocusManager manager = KeyInputFocusManager::Get();
   manager.UnhandledKeyEventSignal().Connect( &callback, &SignalUnhandledKeyEventCallback::Callback );
 
-  Dali::Integration::Core& core = application.GetCore();
 
   Integration::KeyEvent event("a", "a", 0, 0, 0, Integration::KeyEvent::Up);
-  core.SendEvent(event);
+  application.ProcessEvent(event);
 
   DALI_TEST_CHECK(data.functorCalled);
   DALI_TEST_CHECK(event.keyName == data.receivedKeyEvent.keyPressedName );
@@ -327,7 +326,7 @@ static void UtcDaliKeyInputFocusManagerSignalUnhandledKeyEvent()
   data.Reset();
 
   Integration::KeyEvent event2("v", "v", 0, 0, 0, Integration::KeyEvent::Up);
-  core.SendEvent(event2);
+  application.ProcessEvent(event2);
 
   DALI_TEST_CHECK(data.functorCalled);
   DALI_TEST_CHECK(event2.keyName == data.receivedKeyEvent.keyPressedName );

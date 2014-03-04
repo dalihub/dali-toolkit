@@ -189,7 +189,7 @@ static void UtcDaliSliderSignals()
   const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 50.0f, 10.0f );
   event.AddPoint( pointUp );
 
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   application.SendNotification();
   application.Render();

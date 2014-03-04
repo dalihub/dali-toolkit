@@ -268,11 +268,11 @@ static void UtcDaliButtonClicked()
   gButtonClicked = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gButtonClicked );
 
@@ -281,11 +281,11 @@ static void UtcDaliButtonClicked()
   gButtonClicked = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownOutside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpOutside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gButtonClicked );
 
@@ -294,15 +294,15 @@ static void UtcDaliButtonClicked()
   gButtonClicked = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointLeave );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpOutside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gButtonClicked );
 
@@ -311,15 +311,15 @@ static void UtcDaliButtonClicked()
   gButtonClicked = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownOutside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointEnter );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gButtonClicked );
 }
@@ -359,11 +359,11 @@ static void UtcDaliButtonConnectSignal()
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gClickedCallBackCalled == true );
 
@@ -371,7 +371,7 @@ static void UtcDaliButtonConnectSignal()
   pushButton.ClickedSignal().Disconnect(TestClickedCallback);
 
   // simulate another touch event
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gClickedCallBackCalled == false );
 }

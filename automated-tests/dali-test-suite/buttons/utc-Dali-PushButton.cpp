@@ -754,7 +754,7 @@ static void UtcDaliPushButtonPressed()
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  application.GetCore().SendEvent( eventDown );
+  application.ProcessEvent( eventDown );
 
   DALI_TEST_CHECK( gPushButtonPressed );
 }
@@ -785,11 +785,11 @@ static void UtcDaliPushButtonReleased()
   gPushButtonReleased = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gPushButtonReleased );
 
@@ -798,11 +798,11 @@ static void UtcDaliPushButtonReleased()
   gPushButtonReleased = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownOutside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpOutside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gPushButtonReleased );
 
@@ -811,15 +811,15 @@ static void UtcDaliPushButtonReleased()
   gPushButtonReleased = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointLeave );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpOutside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gPushButtonReleased );
 
@@ -828,15 +828,15 @@ static void UtcDaliPushButtonReleased()
   gPushButtonReleased = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownOutside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointEnter );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gPushButtonReleased );
 }
@@ -867,11 +867,11 @@ static void UtcDaliPushButtonToggled()
   gPushButtonToggleState = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gPushButtonToggleState );
 
@@ -882,21 +882,21 @@ static void UtcDaliPushButtonToggled()
   gPushButtonToggleState = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gPushButtonToggleState );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gPushButtonToggleState );
 
@@ -905,11 +905,11 @@ static void UtcDaliPushButtonToggled()
   gPushButtonToggleState = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownOutside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpOutside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gPushButtonToggleState );
 
@@ -918,15 +918,15 @@ static void UtcDaliPushButtonToggled()
   gPushButtonToggleState = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointLeave );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpOutside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gPushButtonToggleState );
 
@@ -935,15 +935,15 @@ static void UtcDaliPushButtonToggled()
   gPushButtonToggleState = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownOutside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointEnter );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpInside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gPushButtonToggleState );
 }
@@ -1008,7 +1008,7 @@ static void UtcDaliPushButtonInterruptEventWhenInsensitive()
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   // An up event is sent outside the button's boundary but inside the actor's one.
 
@@ -1018,7 +1018,7 @@ static void UtcDaliPushButtonInterruptEventWhenInsensitive()
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gOnTouchPointInterrupted );
 
@@ -1042,7 +1042,7 @@ static void UtcDaliPushButtonInterruptEventWhenInsensitive()
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   // A motion event is sent outside the button's boundary but inside the actor's one.
 
@@ -1052,7 +1052,7 @@ static void UtcDaliPushButtonInterruptEventWhenInsensitive()
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gOnTouchPointInterrupted );
 
@@ -1072,7 +1072,7 @@ static void UtcDaliPushButtonInterruptEventWhenInsensitive()
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   actor.SetSensitive( true );
   // An up event is sent inside the button's boundary.
@@ -1083,7 +1083,7 @@ static void UtcDaliPushButtonInterruptEventWhenInsensitive()
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gOnTouchPointInterrupted );
 }
@@ -1150,7 +1150,7 @@ static void UtcDaliPushButtonInterruptEventWhenNonVisible()
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   // More renders are needed in order to allow the node of the actor to become invisible.
   application.SendNotification();
@@ -1168,7 +1168,7 @@ static void UtcDaliPushButtonInterruptEventWhenNonVisible()
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gOnTouchPointInterrupted );
 
@@ -1195,7 +1195,7 @@ static void UtcDaliPushButtonInterruptEventWhenNonVisible()
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   // More renders are needed in order to allow the node of the actor to become invisible.
   application.SendNotification();
@@ -1213,7 +1213,7 @@ static void UtcDaliPushButtonInterruptEventWhenNonVisible()
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gOnTouchPointInterrupted );
 
@@ -1239,7 +1239,7 @@ static void UtcDaliPushButtonInterruptEventWhenNonVisible()
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   tetButton.SetVisible( true );
 
@@ -1258,7 +1258,7 @@ static void UtcDaliPushButtonInterruptEventWhenNonVisible()
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gOnTouchPointInterrupted );
 }

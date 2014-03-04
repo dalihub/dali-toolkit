@@ -109,7 +109,7 @@ static void SendPan(ToolkitTestApplication& application, Gesture::State state, c
     last.y = pos.y;
   }
 
-  application.GetCore().SendEvent(GeneratePan(state, last, pos, RENDER_FRAME_INTERVAL));
+  application.ProcessEvent(GeneratePan(state, last, pos, RENDER_FRAME_INTERVAL));
 
   last.x = pos.x;
   last.y = pos.y;

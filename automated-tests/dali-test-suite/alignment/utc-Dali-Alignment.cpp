@@ -1047,7 +1047,7 @@ static void UtcDaliAlignmentOnTouchEvent()
   Integration::TouchEvent touchEvent(1);
   TouchPoint point(1, TouchPoint::Down, 20.0f, 20.0f);
   touchEvent.AddPoint(point);
-  application.GetCore().SendEvent(touchEvent);
+  application.ProcessEvent(touchEvent);
 
   tet_result(TET_PASS); // For line coverage, as long as there are no exceptions, we assume passed.
 }
@@ -1067,7 +1067,7 @@ static void UtcDaliAlignmentOnKeyEvent()
   application.SendNotification();
 
   Integration::KeyEvent keyEvent;
-  application.GetCore().SendEvent(keyEvent);
+  application.ProcessEvent(keyEvent);
 
   tet_result(TET_PASS); // For line coverage, as long as there are no exceptions, we assume passed.
 }

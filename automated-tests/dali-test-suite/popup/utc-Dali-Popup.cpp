@@ -454,14 +454,14 @@ static void UtcDaliPopupOnTouchedOutside()
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownOutside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   application.SendNotification();
   application.Render();
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointUpOutside );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   application.SendNotification();
   application.Render();
