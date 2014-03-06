@@ -425,9 +425,12 @@ void TextInput::SetText(const std::string& initialText)
   mCursorPosition = mTextLayoutInfo.mCharacterLayoutInfoTable.size();
 
   ImfManager imfManager = ImfManager::Get();
-  imfManager.SetCursorPosition( mCursorPosition );
-  imfManager.SetSurroundingText( initialText );
-  imfManager.NotifyCursorPosition();
+  if ( imfManager )
+  {
+    imfManager.SetCursorPosition( mCursorPosition );
+    imfManager.SetSurroundingText( initialText );
+    imfManager.NotifyCursorPosition();
+  }
 
   if( IsScrollEnabled() )
   {
@@ -985,8 +988,6 @@ void TextInput::OnKeyInputFocusGained()
   // Updates the line height accordingly with the input style.
   UpdateLineHeight();
 
-  ImfManager imfManager = ImfManager::Get();
-
   // Connect the signals to use in text input.
   VirtualKeyboard::StatusChangedSignal().Connect( this, &TextInput::KeyboardStatusChanged );
   VirtualKeyboard::LanguageChangedSignal().Connect( this, &TextInput::SetTextDirection );
@@ -1003,16 +1004,21 @@ void TextInput::OnKeyInputFocusGained()
   Toolkit::TextInput handle( GetOwner() );
   mInputStartedSignalV2.Emit( handle );
 
-  imfManager.EventReceivedSignal().Connect(this, &TextInput::ImfEventReceived);
+  ImfManager imfManager = ImfManager::Get();
 
-  // Notify that the text editing start.
-  imfManager.Activate();
+  if ( imfManager )
+  {
+    imfManager.EventReceivedSignal().Connect(this, &TextInput::ImfEventReceived);
 
-  // When window gain lost focus, the imf manager is deactivated. Thus when window gain focus again, the imf manager must be activated.
-  imfManager.SetRestoreAferFocusLost( true );
+    // Notify that the text editing start.
+    imfManager.Activate();
 
-  imfManager.SetCursorPosition( mCursorPosition );
-  imfManager.NotifyCursorPosition();
+    // When window gain lost focus, the imf manager is deactivated. Thus when window gain focus again, the imf manager must be activated.
+    imfManager.SetRestoreAferFocusLost( true );
+
+    imfManager.SetCursorPosition( mCursorPosition );
+    imfManager.NotifyCursorPosition();
+  }
 
   mClipboard = Clipboard::Get(); // Store handle to clipboard
 
@@ -1041,15 +1047,16 @@ void TextInput::OnKeyInputFocusLost()
   }
 
   ImfManager imfManager = ImfManager::Get();
+  if ( imfManager )
+  {
+    // The text editing is finished. Therefore the imf manager don't have restore activation.
+    imfManager.SetRestoreAferFocusLost( false );
 
-  // The text editing is finished. Therefore the imf manager don't have restore activation.
-  imfManager.SetRestoreAferFocusLost( false );
+    // Notify that the text editing finish.
+    imfManager.Deactivate();
 
-  // Notify that the text editing finish.
-  imfManager.Deactivate();
-
-  imfManager.EventReceivedSignal().Disconnect(this, &TextInput::ImfEventReceived);
-
+    imfManager.EventReceivedSignal().Disconnect(this, &TextInput::ImfEventReceived);
+  }
   // Disconnect signal used the text input.
   VirtualKeyboard::LanguageChangedSignal().Disconnect( this, &TextInput::SetTextDirection );
 
@@ -1073,7 +1080,11 @@ void TextInput::OnKeyInputFocusLost()
       notifier.ContentSelectedSignal().Disconnect( this, &TextInput::OnClipboardTextSelected );
     }
     Clipboard clipboard = Clipboard::Get();
-    clipboard.HideClipboard();
+
+    if ( clipboard )
+    {
+      clipboard.HideClipboard();
+    }
   }
 }
 
@@ -1326,8 +1337,11 @@ void TextInput::OnDoubleTap(Dali::Actor actor, Dali::TapGesture tap)
      ReturnClosestIndex( tap.localPoint, mCursorPosition );
 
      ImfManager imfManager = ImfManager::Get();
-     imfManager.SetCursorPosition ( mCursorPosition );
-     imfManager.NotifyCursorPosition();
+     if ( imfManager )
+     {
+       imfManager.SetCursorPosition ( mCursorPosition );
+       imfManager.NotifyCursorPosition();
+     }
 
      std::size_t start = 0;
      std::size_t end = 0;
@@ -1433,9 +1447,11 @@ void TextInput::OnTextTap(Dali::Actor actor, Dali::TapGesture tap)
       // Notify keyboard so it can 're-capture' word for predictive text.
       // As we have done a reset, is this required, expect IMF keyboard to request this information.
       ImfManager imfManager = ImfManager::Get();
-      imfManager.SetCursorPosition ( mCursorPosition );
-      imfManager.NotifyCursorPosition();
-
+      if ( imfManager )
+      {
+        imfManager.SetCursorPosition ( mCursorPosition );
+        imfManager.NotifyCursorPosition();
+      }
       const TextStyle oldInputStyle( mInputStyle );
 
       mInputStyle = GetStyleAtCursor(); // Inherit style from cursor position
@@ -1511,9 +1527,11 @@ void TextInput::OnLongPress(Dali::Actor actor, Dali::LongPressGesture longPress)
       ReturnClosestIndex( longPress.localPoint, mCursorPosition );
 
       ImfManager imfManager = ImfManager::Get();
-      imfManager.SetCursorPosition ( mCursorPosition );
-      imfManager.NotifyCursorPosition();
-
+      if ( imfManager )
+      {
+        imfManager.SetCursorPosition ( mCursorPosition );
+        imfManager.NotifyCursorPosition();
+      }
       std::size_t start = 0;
       std::size_t end = 0;
       Dali::Toolkit::Internal::TextProcessor::FindNearestWord( mStyledText, mCursorPosition, start, end );
@@ -2479,18 +2497,25 @@ void TextInput::PreEditReset( bool preserveCursorPosition )
   mPreserveCursorPosition = preserveCursorPosition;
 
   // Reset incase we are in a pre-edit state.
-  ImfManager::Get().Reset(); // Will trigger a commit message
+  ImfManager imfManager = ImfManager::Get();
+  if ( imfManager )
+  {
+    imfManager.Reset(); // Will trigger a commit message
+  }
 }
 
 void TextInput::CursorUpdate()
 {
   DrawCursor();
 
-  std::string text( GetText() );
   ImfManager imfManager = ImfManager::Get();
-  imfManager.SetSurroundingText( text );  // Notifying IMF of a cursor change triggers a surrounding text request so updating it now.
-  imfManager.SetCursorPosition ( mCursorPosition );
-  imfManager.NotifyCursorPosition();
+  if ( imfManager )
+  {
+    std::string text( GetText() );
+    imfManager.SetSurroundingText( text );  // Notifying IMF of a cursor change triggers a surrounding text request so updating it now.
+    imfManager.SetCursorPosition ( mCursorPosition );
+    imfManager.NotifyCursorPosition();
+  }
 }
 
 /* Delete highlighted characters redisplay*/
@@ -2803,8 +2828,11 @@ void TextInput::AdvanceCursor(bool reverse, std::size_t places)
     }
 
     ImfManager imfManager = ImfManager::Get();
-    imfManager.SetCursorPosition ( mCursorPosition );
-    imfManager.NotifyCursorPosition();
+    if ( imfManager )
+    {
+      imfManager.SetCursorPosition ( mCursorPosition );
+      imfManager.NotifyCursorPosition();
+    }
   }
 }
 
@@ -4475,11 +4503,15 @@ void TextInput::SelectText(std::size_t start, std::size_t end)
     // When replacing highlighted text keyboard should ignore current word at cursor hence notify keyboard that the cursor is at the start of the highlight.
     mSelectingText = true;
 
-    ImfManager imfManager = ImfManager::Get();
     mCursorPosition = std::min( start, end ); // Set cursor position to start of highlighted text.
-    imfManager.SetCursorPosition ( mCursorPosition );
-    imfManager.SetSurroundingText( GetText() );
-    imfManager.NotifyCursorPosition();
+
+    ImfManager imfManager = ImfManager::Get();
+    if ( imfManager )
+    {
+      imfManager.SetCursorPosition ( mCursorPosition );
+      imfManager.SetSurroundingText( GetText() );
+      imfManager.NotifyCursorPosition();
+    }
     // As the imfManager has been notified of the new cursor position we do not need to reset the pre-edit as it will be updated instead.
 
     // Hide grab handle when selecting.
@@ -4667,8 +4699,11 @@ void TextInput::PasteText( const Text& text )
     mCursorPosition = std::min(mSelectionHandleOnePosition, mSelectionHandleTwoPosition);
 
     ImfManager imfManager = ImfManager::Get();
-    imfManager.SetCursorPosition( mCursorPosition );
-    imfManager.NotifyCursorPosition();
+    if ( imfManager )
+    {
+      imfManager.SetCursorPosition( mCursorPosition );
+      imfManager.NotifyCursorPosition();
+    }
     DeleteHighlightedText( true );
     update = true;
   }
@@ -4680,8 +4715,11 @@ void TextInput::PasteText( const Text& text )
 
   mCursorPosition += insertedStringLength;
   ImfManager imfManager = ImfManager::Get();
-  imfManager.SetCursorPosition ( mCursorPosition );
-  imfManager.NotifyCursorPosition();
+  if ( imfManager )
+  {
+    imfManager.SetCursorPosition ( mCursorPosition );
+    imfManager.NotifyCursorPosition();
+  }
 
   update = update || ( insertedStringLength > 0 );
   if( update )
