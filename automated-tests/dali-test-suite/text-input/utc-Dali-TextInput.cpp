@@ -79,15 +79,32 @@ extern "C" {
 TEST_FUNCTION( UtcDaliTextInputConstruction, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliTextInputDownCast, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliTextInputGetText, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputGetMarkupText, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliTextInputSetMaxCharacterLength, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputSetAndGetNumberOfLines, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputGetNumberOfCharacters, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputSetAndGetPlaceholderText, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliTextInputSetInitialText, POSITIVE_TC_IDX );
-TEST_FUNCTION( UtcDaliTextInputAddChars, POSITIVE_TC_IDX );
-TEST_FUNCTION( UtcDaliTextInputRemoveChars, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputSetEditableAndIsEditable, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputSetEditOnTouch, POSITIVE_TC_IDX );
+
+TEST_FUNCTION( UtcDaliTextInputSetTextSelectable, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputTextSelection, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputEnableGrabHandleAndIsGrabHandleEnabled, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputSetAndGetBoundingRectangle, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputSetActiveStyle, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputApplyStyleToSelectedText, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputApplyStyleToAll, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputGetStyleAtCursor, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputSetAndGetTextAlignment, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputSetAndGetMultilinePolicy, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputSetAndGetExceedEnabled, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputSetSortModifier, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliTextInputSetAndGetSnapshotModeEnabled, POSITIVE_TC_IDX );
+
 TEST_FUNCTION( UtcDaliTextInputEndSignalEmit, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliTextInputStartSignalEmit, POSITIVE_TC_IDX );
-TEST_FUNCTION( UtcDaliTextInputExceedMaxCharactersInitial, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliTextInputExceedMaxCharacters, POSITIVE_TC_IDX );
-TEST_FUNCTION( UtcDaliTextInputSetNumberOfLines, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliTextInputSetAndGetFadeBoundary, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliTextInputSetAndGetWidthExceedPolicy, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliTextInputSetAndGetHeightExceedPolicy, POSITIVE_TC_IDX );
@@ -177,6 +194,37 @@ static void UtcDaliTextInputGetText()
 
 }
 
+static void UtcDaliTextInputGetMarkupText()
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Testing retrieval of Markup text after style set");
+
+  const std::string markup = "<i>Text with italic style</i>" ;
+  const std::string teststring = "Text with italic style";
+
+  TextInput textInput = TextInput::New();
+
+  tet_infoline("Set initial text");
+
+  textInput.SetInitialText( teststring );
+
+  tet_infoline("Check initial text");
+  DALI_TEST_EQUALS( teststring,textInput.GetText(), TEST_LOCATION); // Get text which should be empty
+
+  TextStyle style;
+  style.SetItalics( true );
+
+  tet_infoline("Apply style to TextInput");
+  textInput.ApplyStyleToAll( style );
+
+  tet_infoline("Retreive Markup Text");
+  const std::string retreivedMarkupString = textInput.GetMarkupText();
+
+  tet_infoline("Test Retreived text and Markup text match");
+  DALI_TEST_EQUALS( retreivedMarkupString , retreivedMarkupString, TEST_LOCATION);
+}
+
 // Positive test case for a method
 static void UtcDaliTextInputSetMaxCharacterLength()
 {
@@ -191,31 +239,117 @@ static void UtcDaliTextInputSetMaxCharacterLength()
 
   Stage::GetCurrent().Add(textInput);
 
-  textInput.SetKeyInputFocus();
+  application.SendNotification();
+  application.Render();
+
   textInput.SetMaxCharacterLength(maxChars);
 
   Integration::KeyEvent event(testChar, testChar, 0, 0, 0, Integration::KeyEvent::Down );
 
   std::string testString = "";
+
+  tet_infoline("Starting editmode");
+  textInput.SetEditable( true );
+
+  tet_infoline("Sending Key Events");
   // Send max number of characters
   for (int i=0; i < maxChars; i++)
-    {
-      application.ProcessEvent(event);
-      testString.append(testChar);
-    }
+  {
+    application.ProcessEvent( event );
+    testString.append(testChar);
+  }
 
-  DALI_TEST_EQUALS(testString,textInput.GetText(), TEST_LOCATION); // Get text which should be empty
+  tet_printf( "Get text result : %s\n", textInput.GetText().c_str());
+
+  DALI_TEST_EQUALS(testString, textInput.GetText(), TEST_LOCATION);
+
+  tet_infoline("Sending Key Event which exceeds max characters");
 
   application.ProcessEvent(event); // try to append additional character
 
-  DALI_TEST_EQUALS(testString,textInput.GetText(), TEST_LOCATION); // Get text which should be empty
+  DALI_TEST_EQUALS(testString,textInput.GetText(), TEST_LOCATION);
+
+  tet_infoline("Increase max characters limit");
 
   textInput.SetMaxCharacterLength(maxChars+1); // increment max characters by 1
 
+  tet_infoline("Send character again which should now fit");
   application.ProcessEvent(event); // append additional character
   testString.append(testChar);
 
-  DALI_TEST_EQUALS(testString,textInput.GetText(), TEST_LOCATION); // Get text which should be empty
+  DALI_TEST_EQUALS(testString,textInput.GetText(), TEST_LOCATION);
+}
+
+
+static void UtcDaliTextInputSetAndGetNumberOfLines()
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Ensuring API for setting and getting max number of lines is correct");
+
+  TextInput textInput = TextInput::New();  // create empty TextInput
+
+  unsigned int numberOfLines = 1;
+
+  textInput.SetNumberOfLinesLimit( numberOfLines );
+
+  DALI_TEST_EQUALS(numberOfLines ,textInput.GetNumberOfLinesLimit(),  TEST_LOCATION);
+}
+
+static void UtcDaliTextInputGetNumberOfCharacters()
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Testing Getting number of characters");
+
+  const std::string initialString = "initial text";
+  const std::string newInitialString = "initial text new";
+
+  TextInput textInput = TextInput::New();  // create empty TextInput
+
+  textInput.SetInitialText( initialString );
+
+  tet_infoline("Testing TextInput contains correct number of characters ");
+
+  DALI_TEST_EQUALS( initialString.size() , textInput.GetNumberOfCharacters(), TEST_LOCATION);
+
+  tet_infoline("Testing TextInput contains correct number of characters second phase ");
+
+  textInput.SetInitialText( newInitialString );
+
+  DALI_TEST_EQUALS( newInitialString.size() , textInput.GetNumberOfCharacters(), TEST_LOCATION);
+}
+
+static void UtcDaliTextInputSetAndGetPlaceholderText()
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Testing Setting of PlaceholderText");
+
+  const std::string initialString = "initial text";
+  const std::string placeholderString = "placeholder";
+
+  TextInput textInput = TextInput::New();  // create empty TextInput
+
+  tet_infoline("Testing TextInput is empty at creation ");
+
+  DALI_TEST_EQUALS("",textInput.GetText(), TEST_LOCATION);
+
+  tet_infoline("Set placeholder text");
+
+  textInput.SetPlaceholderText( placeholderString );
+
+  tet_infoline("Testing TextInput contains placeholder text");
+
+  DALI_TEST_EQUALS( placeholderString , textInput.GetPlaceholderText(), TEST_LOCATION);
+
+  tet_infoline("Set initial text which should replace placeholder text");
+
+  textInput.SetInitialText( initialString );
+
+  tet_infoline("Testing TextInput contains initial text when placeholder text set");
+
+  DALI_TEST_EQUALS( initialString,textInput.GetText(), TEST_LOCATION);
 }
 
 // Positive test case for a method
@@ -229,64 +363,418 @@ static void UtcDaliTextInputSetInitialText()
 
   TextInput textInput = TextInput::New();  // create empty TextInput
 
+  tet_infoline("Testing TextInput is empty at creation ");
+
+  DALI_TEST_EQUALS("",textInput.GetText(), TEST_LOCATION);
+
+  tet_infoline("Set text to TextInput");
+
   textInput.SetInitialText(teststring);
 
-  DALI_TEST_EQUALS(teststring,textInput.GetText(), TEST_LOCATION); // Get text which should be empty
+  tet_infoline("Test TextInput contains set text");
+
+  DALI_TEST_EQUALS(teststring,textInput.GetText(), TEST_LOCATION);
 }
 
-static void UtcDaliTextInputAddChars()
+static void UtcDaliTextInputSetEditableAndIsEditable()
 {
   ToolkitTestApplication application;
 
-  tet_infoline("Testing Adding characters");
+  tet_infoline("Testing SetEditable And IsEditable");
+
+  const std::string initialString = "initial text";
 
   TextInput textInput = TextInput::New();  // create empty TextInput
 
   Stage::GetCurrent().Add(textInput);
 
-  textInput.SetKeyInputFocus();
+  textInput.SetInitialText( initialString );
 
-  Integration::KeyEvent event("a", "a", 0, 0, 0, Integration::KeyEvent::Down);
-  application.ProcessEvent(event);
+  application.SendNotification();
+  application.Render();
 
-  DALI_TEST_EQUALS("a",textInput.GetText(), TEST_LOCATION); // Get text which should be "a"
+  bool editableStateFalse ( false );
+  bool editableStateTrue ( true );
 
-  Integration::KeyEvent event2("v", "v", 0, 0, 0, Integration::KeyEvent::Down);
-  application.ProcessEvent(event2);
+  textInput.SetEditable ( editableStateFalse );
+  DALI_TEST_EQUALS( editableStateFalse, textInput.IsEditable() , TEST_LOCATION);
 
-  DALI_TEST_EQUALS("av",textInput.GetText(), TEST_LOCATION); // Get text which should be "av"
+  textInput.SetEditable ( editableStateTrue );
+  DALI_TEST_EQUALS( editableStateTrue, textInput.IsEditable() , TEST_LOCATION);
 }
 
-static void UtcDaliTextInputRemoveChars()
+static void UtcDaliTextInputSetEditOnTouch()
 {
   ToolkitTestApplication application;
 
-  tet_infoline("Testing Removal of end characters");
+  tet_infoline("Testing SetEditOnTouch And IsEditOnTouch");
+
+  TextInput textInput = TextInput::New();
+
+  bool editableOnTouchOn ( true );
+  bool editableOnTouchOff( false );
+
+  tet_infoline("Testing SetEditOnTouch disabled");
+  textInput.SetEditOnTouch ( editableOnTouchOff );
+  DALI_TEST_EQUALS( editableOnTouchOff, textInput.IsEditOnTouch() , TEST_LOCATION);
+
+  tet_infoline("Testing SetEditOnTouch enabled");
+  textInput.SetEditOnTouch ( editableOnTouchOn );
+  DALI_TEST_EQUALS( editableOnTouchOn, textInput.IsEditOnTouch() , TEST_LOCATION);
+}
+
+static void UtcDaliTextInputSetTextSelectable()
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Testing SetTextSelectable and IsTextSelectable");
+
+  const std::string initialString = "initial text";
+
+  TextInput textInput = TextInput::New();
+  textInput.SetInitialText( initialString );
+
+  tet_infoline("Testing SetTextSelectable");
+  textInput.SetTextSelectable();
+  DALI_TEST_EQUALS( true, textInput.IsTextSelectable() , TEST_LOCATION);
+  textInput.SetTextSelectable( false );
+  DALI_TEST_EQUALS( false, textInput.IsTextSelectable() , TEST_LOCATION);
+}
+
+static void UtcDaliTextInputTextSelection()
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Testing Text Selection");
+
+  const std::string initialString = "initial text";
+
+  TextInput textInput = TextInput::New();
+  textInput.SetInitialText( initialString );
+
+  Stage::GetCurrent().Add(textInput);
+
+  application.SendNotification();
+  application.Render();
+
+  textInput.SetEditable( true );
+
+  tet_infoline("Testing IsTextSelected negative");
+  DALI_TEST_EQUALS( false, textInput.IsTextSelected(), TEST_LOCATION);
+
+  textInput.SelectText(1,7);
+  DALI_TEST_EQUALS( true, textInput.IsTextSelected(), TEST_LOCATION);
+
+  textInput.DeSelectText();
+  DALI_TEST_EQUALS( false, textInput.IsTextSelected(), TEST_LOCATION);
+}
+
+
+static void UtcDaliTextInputEnableGrabHandleAndIsGrabHandleEnabled()
+{
+  ToolkitTestApplication application;
+
+  TextInput textInput = TextInput::New();
+
+  bool grabHandleState = false;
+
+  textInput.EnableGrabHandle( grabHandleState );
+
+  DALI_TEST_EQUALS( grabHandleState, textInput.IsGrabHandleEnabled(), TEST_LOCATION);
+
+  grabHandleState = true;
+  textInput.EnableGrabHandle( grabHandleState );
+
+  DALI_TEST_EQUALS( grabHandleState, textInput.IsGrabHandleEnabled(), TEST_LOCATION);
+
+}
+
+static void UtcDaliTextInputSetAndGetBoundingRectangle()
+{
+  ToolkitTestApplication application;
+
+  TextInput textInput = TextInput::New();
+
+  Stage::GetCurrent().Add(textInput);
+  Vector2 stageSize = Stage::GetCurrent().GetSize();
+
+  const Rect<float> boundingRectangle( 100.0f, 100.0f, stageSize.width, stageSize.height );
+
+  textInput.SetBoundingRectangle( boundingRectangle );
+
+  const Rect<float> retreievedBoundingRectangle = textInput.GetBoundingRectangle();
+
+  DALI_TEST_EQUALS( boundingRectangle.x, retreievedBoundingRectangle.x, TEST_LOCATION);
+  DALI_TEST_EQUALS( boundingRectangle.y, retreievedBoundingRectangle.y, TEST_LOCATION);
+  DALI_TEST_EQUALS( boundingRectangle.width, retreievedBoundingRectangle.width, TEST_LOCATION);
+  DALI_TEST_EQUALS( boundingRectangle.height, retreievedBoundingRectangle.height, TEST_LOCATION);
+}
+
+static void UtcDaliTextInputSetActiveStyle()
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Testing Setting of Style to newly added text");
 
   TextInput textInput = TextInput::New();  // create empty TextInput
 
   Stage::GetCurrent().Add(textInput);
 
-  textInput.SetKeyInputFocus();
+  const std::string styledString = "Test String<i>ab</i>" ;
+  const std::string plainString = "Test String";
+  textInput.SetInitialText( plainString );
 
-  Integration::KeyEvent event("a", "a", 0, 0, 0, Integration::KeyEvent::Down);
-  application.ProcessEvent(event);
+  application.SendNotification();
+  application.Render();
 
-  DALI_TEST_EQUALS("a",textInput.GetText(), TEST_LOCATION); // Get text which should be "a"
+  textInput.SetEditable(true);
 
-  Integration::KeyEvent event2("BackSpace", "", 0, 0, 0, Integration::KeyEvent::Down);
-  application.ProcessEvent(event2);
+  std::string retreivedMarkupString = textInput.GetMarkupText();
 
-  DALI_TEST_EQUALS("",textInput.GetText(), TEST_LOCATION); // Get text which should be ""
+  tet_infoline("Confirm markup text is a plain string ");
+  DALI_TEST_EQUALS( plainString,textInput.GetText(), TEST_LOCATION);
 
-  application.ProcessEvent(event);
-  application.ProcessEvent(event);
+  TextStyle style;
+  style.SetItalics( true );
 
-  DALI_TEST_EQUALS("aa",textInput.GetText(), TEST_LOCATION); // Get text which should be "aa"
+  tet_infoline("Apply style to TextInput");
+  textInput.SetActiveStyle( style );
 
-  application.ProcessEvent(event2);
+  Integration::KeyEvent eventA("a", "a", 0, 0, 0, Integration::KeyEvent::Down );
+  Integration::KeyEvent eventB("b", "b", 0, 0, 0, Integration::KeyEvent::Down );
 
-  DALI_TEST_EQUALS("a",textInput.GetText(), TEST_LOCATION); // Get text which should be "a"
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(eventA);
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent(eventB);
+  application.SendNotification();
+  application.Render();
+
+  retreivedMarkupString = textInput.GetMarkupText();
+
+  DALI_TEST_EQUALS( styledString, retreivedMarkupString, TEST_LOCATION);
+}
+
+static void UtcDaliTextInputApplyStyleToSelectedText()
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Testing application of style to selected text ");
+
+  TextInput textInput = TextInput::New();  // create empty TextInput
+
+  Stage::GetCurrent().Add(textInput);
+
+  const std::string styledString = "Test <i>String</i> to style";
+  const std::string plainString = "Test String to style";
+  textInput.SetInitialText( plainString );
+
+  application.SendNotification();
+  application.Render();
+
+  textInput.SetEditable(true);
+
+  std::string retreivedMarkupString = textInput.GetMarkupText();
+
+  tet_infoline("Confirm markup text is a plain string ");
+  DALI_TEST_EQUALS( plainString,textInput.GetText(), TEST_LOCATION);
+
+  TextStyle style;
+  style.SetItalics( true );
+
+  textInput.SelectText( 5, 11 );
+
+  tet_infoline("Apply style to selected text");
+  textInput.ApplyStyle( style );
+
+  application.Render();
+
+  retreivedMarkupString = textInput.GetMarkupText();
+
+  DALI_TEST_EQUALS( styledString, retreivedMarkupString, TEST_LOCATION);
+}
+
+static void UtcDaliTextInputApplyStyleToAll()
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Testing application of style to all text ");
+
+  TextInput textInput = TextInput::New();  // create empty TextInput
+
+  Stage::GetCurrent().Add(textInput);
+
+  const std::string styledString = "<i>Test String to style</i>";
+  const std::string plainString = "Test String to style";
+  textInput.SetInitialText( plainString );
+
+  application.SendNotification();
+  application.Render();
+
+  textInput.SetEditable(true);
+
+  std::string retreivedMarkupString = textInput.GetMarkupText();
+
+  tet_infoline("Confirm markup text is a plain string ");
+  DALI_TEST_EQUALS( plainString,textInput.GetText(), TEST_LOCATION);
+
+  TextStyle style;
+  style.SetItalics( true );
+
+  tet_infoline("Apply style to all text");
+  textInput.ApplyStyleToAll( style );
+
+  application.Render();
+
+  retreivedMarkupString = textInput.GetMarkupText();
+
+  DALI_TEST_EQUALS( styledString, retreivedMarkupString, TEST_LOCATION);
+}
+
+static void UtcDaliTextInputGetStyleAtCursor()
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Test getting style at cursor");
+
+  TextInput textInput = TextInput::New();  // create empty TextInput
+
+  Stage::GetCurrent().Add(textInput);
+
+  const std::string styledString = "Test Stringa<i>b</i>" ;
+  const std::string plainString = "Test String";
+  textInput.SetInitialText( plainString );
+
+  application.SendNotification();
+  application.Render();
+
+  textInput.SetEditable(true);
+
+  tet_infoline("Confirm style at cursor is default(plain)");
+  TextStyle style;
+  Integration::KeyEvent eventA("a", "a", 0, 0, 0, Integration::KeyEvent::Down );
+  application.ProcessEvent(eventA);
+  application.SendNotification();
+  application.Render();
+
+  TextStyle retreivedStyleAtCursor = textInput.GetStyleAtCursor();
+
+  DALI_TEST_CHECK( style == retreivedStyleAtCursor );
+  DALI_TEST_CHECK( !retreivedStyleAtCursor.GetItalics() );
+
+  tet_infoline("Set style before adding new character");
+  style.SetItalics( true );
+  textInput.SetActiveStyle( style );
+
+  Integration::KeyEvent eventB("b", "b", 0, 0, 0, Integration::KeyEvent::Down );
+  application.ProcessEvent(eventB);
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Confirm style at cursor is correct style");
+  retreivedStyleAtCursor = textInput.GetStyleAtCursor();
+
+  DALI_TEST_CHECK( retreivedStyleAtCursor.GetItalics() );
+
+  tet_infoline("Confirm style at cursor is not a style that was not set");
+  DALI_TEST_CHECK( !retreivedStyleAtCursor.GetUnderline() );
+
+  tet_infoline("Confirm markup text is correct");
+  DALI_TEST_EQUALS( styledString, textInput.GetMarkupText(), TEST_LOCATION);
+
+
+
+}
+
+static void UtcDaliTextInputSetAndGetTextAlignment()
+{
+  ToolkitTestApplication application;
+
+  TextInput textInput = TextInput::New();
+  textInput.SetTextAlignment(static_cast<Alignment::Type>( Alignment::HorizontalCenter) );
+
+  bool result = ( textInput.GetTextAlignment() & Alignment::HorizontalCenter ) ;
+
+  DALI_TEST_CHECK( result );
+
+  result = ( textInput.GetTextAlignment() & Alignment::HorizontalRight );
+
+  DALI_TEST_CHECK( !result );
+}
+
+static void UtcDaliTextInputSetAndGetMultilinePolicy()
+{
+  ToolkitTestApplication application;
+
+  const TextView::MultilinePolicy MULTILINE_POLICIES[] = { TextView::SplitByNewLineChar, TextView::SplitByWord, TextView::SplitByChar };
+  const unsigned int NUM_MULTILINE_POLICIES = sizeof( MULTILINE_POLICIES ) / sizeof( unsigned int );
+
+  TextInput textInput = TextInput::New();
+  Stage::GetCurrent().Add(textInput);
+  textInput.SetInitialText( "Hello world!" );
+
+  for( unsigned int epIndex = 0; epIndex < NUM_MULTILINE_POLICIES; ++epIndex )
+  {
+    textInput.SetMultilinePolicy( MULTILINE_POLICIES[epIndex] );
+
+    DALI_TEST_EQUALS( textInput.GetMultilinePolicy(), MULTILINE_POLICIES[epIndex], TEST_LOCATION );
+  }
+}
+
+static void UtcDaliTextInputSetAndGetExceedEnabled()
+{
+  ToolkitTestApplication application;
+
+  const TextView::ExceedPolicy EXCEED_POLICIES[] = { TextView::Original, TextView::Fade, TextView::Split, TextView::ShrinkToFit };
+  const unsigned int NUM_EXCEED_POLICIES = sizeof( EXCEED_POLICIES ) / sizeof( unsigned int );
+
+  TextInput textInput = TextInput::New();
+  Stage::GetCurrent().Add(textInput);
+  textInput.SetInitialText( "Hello world!" );
+
+  for( unsigned int epIndex = 0; epIndex < NUM_EXCEED_POLICIES; ++epIndex )
+  {
+    textInput.SetWidthExceedPolicy( EXCEED_POLICIES[epIndex] );
+
+    DALI_TEST_EQUALS( textInput.GetWidthExceedPolicy(), EXCEED_POLICIES[epIndex], TEST_LOCATION );
+  }
+}
+
+static void UtcDaliTextInputSetSortModifier()
+{
+  tet_infoline("Testing SetSortModifier does not cause TextInput failure");
+
+  ToolkitTestApplication application;
+
+  TextInput textInput = TextInput::New();
+
+  const float offsetToUse = 1.5f;
+
+  textInput.SetSortModifier( offsetToUse );
+
+  DALI_TEST_CHECK( textInput );
+}
+
+static void UtcDaliTextInputSetAndGetSnapshotModeEnabled()
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Testing SetSnapshotModeEnabled and IsSnapshotModeEnabled");
+
+  TextInput textInput = TextInput::New();  // create empty TextInput
+  bool snapshotMode( true );
+  textInput.SetSnapshotModeEnabled( snapshotMode );
+
+  DALI_TEST_EQUALS( snapshotMode, textInput.IsSnapshotModeEnabled(), TEST_LOCATION);
+
+  snapshotMode = false;
+  textInput.SetSnapshotModeEnabled( snapshotMode );
+
+  DALI_TEST_EQUALS( snapshotMode, textInput.IsSnapshotModeEnabled(), TEST_LOCATION);
 }
 
 // Callback test function
@@ -351,29 +839,11 @@ static void UtcDaliTextInputStartSignalEmit()
 
   gHasStartSignalBeenReceived = false;
 
-  textInput.SetEditable(true,Vector2(3.f,2.f));  // Set editable again
+  textInput.SetEditable(true);  // Set editable again
 
   DALI_TEST_EQUALS(true, gHasStartSignalBeenReceived, TEST_LOCATION);
 }
 
-static void UtcDaliTextInputExceedMaxCharactersInitial()
-{
-  ToolkitTestApplication application;
-
-  tet_infoline("Testing Setting Initial Text obeys Max Character Limit");
-
-  TextInput textInput = TextInput::New();  // create empty TextInput
-
-  Stage::GetCurrent().Add(textInput);
-
-  textInput.SetMaxCharacterLength(4);
-
-  textInput.SetInitialText("TooBig");
-
-  tet_printf( "Get text result : %s\n", textInput.GetText().c_str());
-
-  DALI_TEST_EQUALS("TooB",textInput.GetText(), TEST_LOCATION); // Get text which should be only 4 characters
-}
 
 
 static void UtcDaliTextInputExceedMaxCharacters()
@@ -395,6 +865,9 @@ static void UtcDaliTextInputExceedMaxCharacters()
   Integration::KeyEvent eventA("a", "a", 0, 0, 0, Integration::KeyEvent::Down );
   Integration::KeyEvent eventB("b", "b", 0, 0, 0, Integration::KeyEvent::Down );
 
+  application.SendNotification();
+  application.Render();
+
   application.ProcessEvent(eventA);
   application.ProcessEvent(eventB);
   application.ProcessEvent(eventA);
@@ -408,20 +881,7 @@ static void UtcDaliTextInputExceedMaxCharacters()
   DALI_TEST_EQUALS("abab",textInput.GetText(), TEST_LOCATION); // Get text which should be only 4 characters
 }
 
-static void UtcDaliTextInputSetNumberOfLines()
-{
-  ToolkitTestApplication application;
 
-  tet_infoline("Ensuring API for setting and getting max number of lines is correct");
-
-  TextInput textInput = TextInput::New();  // create empty TextInput
-
-  unsigned int numberOfLines = 1;
-
-  textInput.SetNumberOfLinesLimit( numberOfLines );
-
-  DALI_TEST_EQUALS(numberOfLines ,textInput.GetNumberOfLinesLimit(),  TEST_LOCATION);
-}
 
 static void UtcDaliTextInputSetAndGetFadeBoundary()
 {
