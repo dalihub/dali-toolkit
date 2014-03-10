@@ -350,7 +350,6 @@ void PageTurnView::SetupRenderTasks()
   mCameraActor.SetParentOrigin(ParentOrigin::CENTER);
   mCameraActor.SetPositionInheritanceMode( DONT_INHERIT_POSITION );
   mCameraActor.SetInheritScale( false );
-  mCameraActor.SetInvertYAxis(false);
   Self().Add(mCameraActor);
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();

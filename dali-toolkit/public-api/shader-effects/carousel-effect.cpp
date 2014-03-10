@@ -60,7 +60,7 @@ CarouselEffect CarouselEffect::New()
               "    vec2 d = (world.xy - uCenter) * uAnglePerUnit;\n"
               "    float a = length(d);\n"
               "    float cs = cos(radians(a));\n"
-              "    world.z += cs * uRadius;\n"
+              "    world.z -= cs * uRadius;\n"
               "    gl_Position = uProjection * world;\n"
               "    \n"
               "    vTexCoord = aTexCoord;\n"

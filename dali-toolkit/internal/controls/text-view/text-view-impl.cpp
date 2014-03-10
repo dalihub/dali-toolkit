@@ -702,6 +702,7 @@ void TextView::SetSnapshotModeEnabled( bool enable )
       Actor self = Self();
       self.Add( mOffscreenRootActor );
       self.Add( mOffscreenImageActor );
+      mOffscreenImageActor.SetScale(Vector3(1.f, -1.f, 1.f));
     }
     else
     {
@@ -1467,13 +1468,11 @@ void TextView::ProcessSnapshot( const Size& textViewSize )
           mOffscreenCameraActor = CameraActor::New();
           mOffscreenCameraActor.SetParentOrigin( ParentOrigin::CENTER );
           mOffscreenCameraActor.SetAnchorPoint( AnchorPoint::CENTER );
+          mOffscreenCameraActor.SetRotation(Degree(180.f), Vector3::YAXIS);
 
           mOffscreenCameraActor.SetType( Dali::Camera::FREE_LOOK ); // Inherits position from the offscreen root actor.
 
           mOffscreenRootActor.Add( mOffscreenCameraActor ); // camera to shoot the offscreen text
-
-          // Images are expected to be from top to bottom, but OpenGL buffers are bottom to top
-          mOffscreenCameraActor.SetInvertYAxis( false );
         }
 
         // Calculate camera parameters for current text size.

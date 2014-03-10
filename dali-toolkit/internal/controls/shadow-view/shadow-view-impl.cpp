@@ -237,12 +237,13 @@ void ShadowView::OnInitialize()
 
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   mCameraActor = CameraActor::New(stageSize);
+
   mCameraActor.SetParentOrigin( ParentOrigin::CENTER );
 
   // Target is constrained to point at the shadow plane origin
   mCameraActor.SetNearClippingPlane( 1.0f );
   mCameraActor.SetType( Dali::Camera::FREE_LOOK ); // Camera orientation constrained to point at shadow plane world position
-  mCameraActor.SetInvertYAxis(false);
+  mCameraActor.SetRotation(Radian(Degree(180)), Vector3::YAXIS);
   mCameraActor.SetPosition(DEFAULT_LIGHT_POSITION);
 
   mShadowRenderShader = ShaderEffect::New( RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE,

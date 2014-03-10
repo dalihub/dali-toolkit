@@ -59,9 +59,9 @@ struct CameraActorPositionConstraint
   {
     const Vector3& sourcePosition = sourcePositionProperty.GetVector3();
 
-    return Vector3(sourcePosition.x + mStageSize.x * 0.5f,
-                     -sourcePosition.y + mStageSize.y * 0.5f,
-                     sourcePosition.z + mDefaultCameraDistance);
+    return Vector3( sourcePosition.x + mStageSize.x * 0.5f,
+                    sourcePosition.y + mStageSize.y * 0.5f,
+                    sourcePosition.z + mDefaultCameraDistance);
   }
 
   Vector2 mStageSize;

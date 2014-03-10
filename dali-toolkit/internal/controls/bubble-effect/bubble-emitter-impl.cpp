@@ -127,7 +127,6 @@ void BubbleEmitter::OnInitialize()
   // Create a cameraActor for the off screen render task.
   mCameraActor = CameraActor::New(mMovementArea);
   mCameraActor.SetParentOrigin(ParentOrigin::CENTER);
-  mCameraActor.SetInvertYAxis(false);
   Stage::GetCurrent().Add(mCameraActor);
 }
 
