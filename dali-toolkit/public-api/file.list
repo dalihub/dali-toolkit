@@ -34,6 +34,7 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/scrollable/item-view/spiral-layout.cpp \
   $(public_api_src_dir)/controls/scrollable/item-view/album-layout.cpp \
   $(public_api_src_dir)/controls/scrollable/scrollable.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-connector.cpp \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view.cpp \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-constraints.cpp \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-effect.cpp \
@@ -149,7 +150,8 @@ public_api_popup_header_files =
 
 public_api_scroll_component_header_files =
 
-public_api_scrollable_header_files =
+public_api_scrollable_header_files = \
+  $(public_api_src_dir)/controls/scrollable/scroll-connector.h
 
 public_api_scroll_view_header_files = \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-constraints.h \

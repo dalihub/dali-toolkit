@@ -38,6 +38,7 @@ namespace Internal DALI_INTERNAL
 class ItemView;
 }
 
+class ScrollConnector;
 class ItemFactory;
 class ItemLayout;
 
@@ -88,6 +89,12 @@ public:
    * @return handle to a ItemView or an uninitialized handle
    */
   static ItemView DownCast( BaseHandle handle );
+
+  /**
+   * Retrieve a scroll-connector; this can be used to connect scroll components e.g. scroll bars.
+   * @return The connector.
+   */
+  ScrollConnector GetScrollConnector() const;
 
   /**
    * Query the number of layouts.
