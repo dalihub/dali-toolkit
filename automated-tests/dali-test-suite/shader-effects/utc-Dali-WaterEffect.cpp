@@ -162,8 +162,8 @@ static void UtcDaliWaterEffectDefaultValues()
   application.SendNotification();
   application.Render();
 
-  Vector2 leftCorner( Stage::GetCurrent().GetSize() * 0.5f );
-  leftCorner.x = -leftCorner.x;
+  Vector2 topLeft( Stage::GetCurrent().GetSize() * 0.5f );
+  topLeft.y = -topLeft.y;
 
   for ( unsigned int i = 0; i < effect.GetNumberOfWaves(); ++i )
   {
@@ -174,7 +174,7 @@ static void UtcDaliWaterEffectDefaultValues()
     DALI_TEST_CHECK(
         application.GetGlAbstraction().CheckUniformValue(
             effect.GetCenterPropertyName(i).c_str(),
-            leftCorner ) );
+            topLeft ) );
     DALI_TEST_CHECK(
         application.GetGlAbstraction().CheckUniformValue(
             effect.GetPropagationPropertyName(i).c_str(),
@@ -208,13 +208,13 @@ static void UtcDaliWaterEffectCustomValues()
           effect.GetAmplitudePropertyName(0).c_str(),
           0.5f ) );
 
-  Vector2 leftCorner( Stage::GetCurrent().GetSize() * 0.5f );
-  leftCorner.x = -leftCorner.x;
+  Vector2 centerPoint( Stage::GetCurrent().GetSize() * 0.5f );
+  centerPoint.y = -centerPoint.y;
 
   DALI_TEST_CHECK(
       application.GetGlAbstraction().CheckUniformValue(
           effect.GetCenterPropertyName(0).c_str(),
-          Vector2( leftCorner.x + 10.0f, leftCorner.y - 10.0f ) ) );
+          Vector2( centerPoint.x - 10.0f, centerPoint.y + 10.0f ) ) );
   DALI_TEST_CHECK(
       application.GetGlAbstraction().CheckUniformValue(
           effect.GetPropagationPropertyName(0).c_str(),

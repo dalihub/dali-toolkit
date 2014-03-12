@@ -128,9 +128,8 @@ static void UtcDaliShearEffectPropertyNames()
 Vector2 ToScreenPosition(Vector2 value)
 {
   Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
-  value.x = value.x - stageSize.x * 0.5f;
+  value.x = stageSize.x * 0.5f - value.x;
   value.y = value.y - stageSize.y * 0.5f;
-  value.y *= -1.0f;
 
   return value;
 }

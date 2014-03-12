@@ -130,14 +130,14 @@ static void UtcDaliBendyDefaultValuesEffect()
   application.SendNotification();
   application.Render();
 
-  Vector2 leftCorner( Stage::GetCurrent().GetSize() * 0.5f );
-  leftCorner.x = -leftCorner.x;
+  Vector2 topLeft( Stage::GetCurrent().GetSize() * 0.5f );
+  topLeft.y = -topLeft.y;
 
-  // Gets converted to opengl viewport coordinates
+  // Gets converted to opengl view space
   DALI_TEST_CHECK(
       application.GetGlAbstraction().CheckUniformValue(
           effect.GetCenterPropertyName().c_str(),
-          leftCorner ) );
+          topLeft ) );
 
   DALI_TEST_CHECK(
       application.GetGlAbstraction().CheckUniformValue(
@@ -173,14 +173,17 @@ static void UtcDaliBendyCustomValuesEffect()
   application.SendNotification();
   application.Render();
 
+  Vector2 bottomRight( Stage::GetCurrent().GetSize() * 0.5f );
+  bottomRight.x = -bottomRight.x;
+
   // Gets converted to opengl viewport coordinates
   DALI_TEST_CHECK(
       application.GetGlAbstraction().CheckUniformValue(
           effect.GetCenterPropertyName().c_str(),
-          Vector2(240.0f, -400.0f) ) );
+          bottomRight ) );
 
   direction.Normalize();
-  direction.y *= -1.0f;
+  direction.x *= -1.0f;
   DALI_TEST_CHECK(
       application.GetGlAbstraction().CheckUniformValue(
           effect.GetDirectionPropertyName().c_str(),
