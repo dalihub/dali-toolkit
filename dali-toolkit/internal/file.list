@@ -38,6 +38,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/scroll-component/scroll-component.cpp \
    $(toolkit_src_dir)/controls/scrollable/item-view/item-view-impl.cpp \
    $(toolkit_src_dir)/controls/scrollable/scrollable-impl.cpp \
+   $(toolkit_src_dir)/controls/scrollable/scroll-connector-impl.cpp \
    $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-base-impl.cpp \
    $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.cpp \
    $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-view-impl.cpp \

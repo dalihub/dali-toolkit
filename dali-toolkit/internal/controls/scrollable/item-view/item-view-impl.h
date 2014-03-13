@@ -24,6 +24,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-connector.h>
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
@@ -141,6 +142,11 @@ public:
    * @return A public handle to the newly allocated ItemView.
    */
   static Dali::Toolkit::ItemView New(ItemFactory& factory);
+
+  /**
+   * @copydoc Toolkit::ItemView::GetScrollConnector
+   */
+  Dali::Toolkit::ScrollConnector GetScrollConnector() const;
 
   /**
    * @copydoc Toolkit::ItemView::GetLayoutCount
@@ -559,7 +565,9 @@ private:
   ImageActor mOvershootOverlay;           ///< The overlay actor for overshoot effect
   OvershootRippleEffect mOvershootEffect; ///< The vertex/fragment shader used to display the overshoot ripple effect
 
-  Property::Index mPropertyLayoutPosition; ///< The logical position of the first item within the layout
+  Dali::Toolkit::ScrollConnector mScrollConnector; ///< Connects ItemView with scrollable components e.g. scroll bars
+  Constrainable   mScrollPositionObject;     ///< From mScrollConnector
+
   Property::Index mPropertyPosition; ///< The physical position of the first item within the layout
   Property::Index mPropertyMinimumLayoutPosition; ///< The minimum valid layout position in the layout.
   Property::Index mPropertyScrollSpeed; ///< The current scroll speed of item view

@@ -23,6 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/events/mouse-wheel-event.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
+#include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
 
 using namespace std;
 using namespace Dali;
@@ -516,7 +517,9 @@ void ItemView::OnInitialize()
   mOvershootOverlay.SetPixelArea(OVERSHOOT_BOUNCE_IMAGE_1_PIXEL_AREA);
   self.Add(mOvershootOverlay);
 
-  mPropertyLayoutPosition = self.RegisterProperty(LAYOUT_POSITION_PROPERTY_NAME, 0.0f);
+  mScrollConnector = Dali::Toolkit::ScrollConnector::New();
+  mScrollPositionObject = mScrollConnector.GetScrollPositionObject();
+
   mPropertyMinimumLayoutPosition = self.RegisterProperty(MINIMUM_LAYOUT_POSITION_PROPERTY_NAME, 0.0f);
   mPropertyPosition = self.RegisterProperty(POSITION_PROPERTY_NAME, 0.0f);
   mPropertyScrollSpeed = self.RegisterProperty(SCROLL_SPEED_PROPERTY_NAME, 0.0f);
@@ -543,6 +546,11 @@ void ItemView::OnInitialize()
 
 ItemView::~ItemView()
 {
+}
+
+Dali::Toolkit::ScrollConnector ItemView::GetScrollConnector() const
+{
+  return mScrollConnector;
 }
 
 unsigned int ItemView::GetLayoutCount() const
@@ -579,7 +587,7 @@ ItemLayoutPtr ItemView::GetActiveLayout() const
 
 float ItemView::GetCurrentLayoutPosition(unsigned int itemId) const
 {
-  return Self().GetProperty<float>(mPropertyLayoutPosition) + static_cast<float>(itemId);
+  return mScrollPositionObject.GetProperty<float>( ScrollConnector::SCROLL_POSITION ) + static_cast<float>( itemId );
 }
 
 void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSize, float durationSeconds)
@@ -657,7 +665,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
   bool scrollAnimationNeeded(false);
   float firstItemScrollPosition(0.0f);
 
-  float current = self.GetProperty<float>(mPropertyLayoutPosition);
+  float current = GetCurrentLayoutPosition(0);
   float minimum = ClampFirstItemPosition(current, targetSize, *mActiveLayout);
   self.SetProperty(mPropertyPosition, GetScrollPosition(current, targetSize));
 
@@ -676,7 +684,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
   {
     RemoveAnimation(mScrollAnimation);
     mScrollAnimation = Animation::New(mAnchoringDuration);
-    mScrollAnimation.AnimateTo( Property(self, mPropertyLayoutPosition), firstItemScrollPosition, AlphaFunctions::EaseOut );
+    mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunctions::EaseOut );
     mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, targetSize), AlphaFunctions::EaseOut );
     mScrollAnimation.Play();
   }
@@ -884,7 +892,7 @@ ItemRange ItemView::GetItemRange(ItemLayout& layout, const Vector3& layoutSize, 
 
   ItemRange available(0u, itemCount);
 
-  ItemRange range = layout.GetItemsWithinArea(Self().GetProperty<float>(mPropertyLayoutPosition), layoutSize);
+  ItemRange range = layout.GetItemsWithinArea( GetCurrentLayoutPosition(0), layoutSize );
 
   if (reserveExtra)
   {
@@ -932,9 +940,10 @@ bool ItemView::OnMouseWheelEvent(const MouseWheelEvent& event)
   {
     Actor self = Self();
     const Vector3 layoutSize = Self().GetCurrentSize();
-    float layoutPositionDelta = self.GetProperty<float>(mPropertyLayoutPosition) + (event.z * mMouseWheelScrollDistanceStep * mActiveLayout->GetScrollSpeedFactor());
+    float layoutPositionDelta = GetCurrentLayoutPosition(0) + (event.z * mMouseWheelScrollDistanceStep * mActiveLayout->GetScrollSpeedFactor());
     float firstItemScrollPosition = ClampFirstItemPosition(layoutPositionDelta, layoutSize, *mActiveLayout);
-    self.SetProperty(mPropertyLayoutPosition, firstItemScrollPosition);
+
+    mScrollPositionObject.SetProperty( ScrollConnector::SCROLL_POSITION, firstItemScrollPosition );
     self.SetProperty(mPropertyPosition, GetScrollPosition(firstItemScrollPosition, layoutSize));
     mScrollStartedSignalV2.Emit(GetCurrentScrollPosition());
     StartRefreshTimer();
@@ -985,7 +994,7 @@ void ItemView::ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int i
     WrappedVector3Constraint wrapped(positionConstraint, itemId);
 
     Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                      ParentSource( mPropertyLayoutPosition ),
+                                                      Source( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ),
                                                       ParentSource( mPropertyScrollSpeed ),
                                                       ParentSource( Actor::SIZE ),
                                                       wrapped );
@@ -1000,7 +1009,7 @@ void ItemView::ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int i
     WrappedQuaternionConstraint wrapped(rotationConstraint, itemId);
 
     Constraint constraint = Constraint::New<Quaternion>( Actor::ROTATION,
-                                                         ParentSource( mPropertyLayoutPosition ),
+                                                         Source( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ),
                                                          ParentSource( mPropertyScrollSpeed ),
                                                          ParentSource( Actor::SIZE ),
                                                          wrapped );
@@ -1015,7 +1024,7 @@ void ItemView::ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int i
     WrappedVector3Constraint wrapped(scaleConstraint, itemId);
 
     Constraint constraint = Constraint::New<Vector3>( Actor::SCALE,
-                                                      ParentSource( mPropertyLayoutPosition ),
+                                                      Source( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ),
                                                       ParentSource( mPropertyScrollSpeed ),
                                                       ParentSource( Actor::SIZE ),
                                                       wrapped );
@@ -1030,7 +1039,7 @@ void ItemView::ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int i
     WrappedVector4Constraint wrapped(colorConstraint, itemId);
 
     Constraint constraint = Constraint::New<Vector4>( Actor::COLOR,
-                                                      ParentSource( mPropertyLayoutPosition ),
+                                                      Source( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ),
                                                       ParentSource( mPropertyScrollSpeed ),
                                                       ParentSource( Actor::SIZE ),
                                                       wrapped );
@@ -1049,7 +1058,7 @@ void ItemView::ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int i
     WrappedBoolConstraint wrapped(visibilityConstraint, itemId);
 
     Constraint constraint = Constraint::New<bool>( Actor::VISIBLE,
-                                                   ParentSource( mPropertyLayoutPosition ),
+                                                   Source( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ),
                                                    ParentSource( mPropertyScrollSpeed ),
                                                    ParentSource( Actor::SIZE ),
                                                    wrapped );
@@ -1102,7 +1111,7 @@ void ItemView::OnPan(PanGesture gesture)
 
         mRefreshOrderHint = true;
 
-        float currentLayoutPosition = self.GetProperty<float>(mPropertyLayoutPosition);
+        float currentLayoutPosition = GetCurrentLayoutPosition(0);
         float firstItemScrollPosition = ClampFirstItemPosition(currentLayoutPosition + mScrollSpeed * direction,
                                                                layoutSize,
                                                                *mActiveLayout);
@@ -1116,7 +1125,7 @@ void ItemView::OnPan(PanGesture gesture)
 
         float flickAnimationDuration = mActiveLayout->GetItemFlickAnimationDuration() * max(1.0f, fabsf(firstItemScrollPosition - GetCurrentLayoutPosition(0)));
         mScrollAnimation = Animation::New(flickAnimationDuration);
-        mScrollAnimation.AnimateTo( Property(self, mPropertyLayoutPosition), firstItemScrollPosition, AlphaFunctions::EaseOut );
+        mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunctions::EaseOut );
         mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, layoutSize), AlphaFunctions::EaseOut );
         mScrollAnimation.AnimateTo( Property(self, mPropertyScrollSpeed), 0.0f, AlphaFunctions::EaseOut );
 
@@ -1162,11 +1171,11 @@ void ItemView::OnPan(PanGesture gesture)
       mScrollSpeedAnimation.AnimateTo( Property(self, mPropertyScrollSpeed), mScrollSpeed, AlphaFunctions::Linear );
       mScrollSpeedAnimation.Play();
 
-      float layoutPositionDelta = self.GetProperty<float>(mPropertyLayoutPosition) + (mScrollDistance * mActiveLayout->GetScrollSpeedFactor());
+      float layoutPositionDelta = GetCurrentLayoutPosition(0) + (mScrollDistance * mActiveLayout->GetScrollSpeedFactor());
 
       float firstItemScrollPosition = ClampFirstItemPosition(layoutPositionDelta, layoutSize, *mActiveLayout);
 
-      self.SetProperty(mPropertyLayoutPosition, firstItemScrollPosition);
+      mScrollPositionObject.SetProperty( ScrollConnector::SCROLL_POSITION, firstItemScrollPosition );
       self.SetProperty(mPropertyPosition, GetScrollPosition(firstItemScrollPosition, layoutSize));
       mScrollStartedSignalV2.Emit(GetCurrentScrollPosition());
 
@@ -1236,7 +1245,7 @@ Actor ItemView::GetNextKeyboardFocusableActor(Actor actor, Control::KeyboardFocu
         return nextFocusActor;
       }
     }
-    float layoutPosition = mActiveLayout->GetClosestAnchorPosition(Self().GetProperty<float>(mPropertyLayoutPosition));
+    float layoutPosition = mActiveLayout->GetClosestAnchorPosition( GetCurrentLayoutPosition(0) );
     Vector3 layoutSize = Self().GetCurrentSize();
     if(!nextFocusActor)
     {
@@ -1255,7 +1264,7 @@ void ItemView::OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
   if(commitedFocusableActor)
   {
     int nextItemID = GetItemId(commitedFocusableActor);
-    float layoutPosition = Self().GetProperty<float>(mPropertyLayoutPosition);
+    float layoutPosition = GetCurrentLayoutPosition(0);
     Vector3 layoutSize = Self().GetCurrentSize();
     Vector3 focusItemPosition = Vector3::ZERO;
     ItemLayout::Vector3Function itemPositionConstraint;
@@ -1276,10 +1285,10 @@ Animation ItemView::DoAnchoring()
 
   if (mActiveLayout && mAnchoringEnabled)
   {
-    float anchorPosition = mActiveLayout->GetClosestAnchorPosition(Self().GetProperty<float>(mPropertyLayoutPosition));
+    float anchorPosition = mActiveLayout->GetClosestAnchorPosition( GetCurrentLayoutPosition(0) );
 
     anchoringAnimation = Animation::New(mAnchoringDuration);
-    anchoringAnimation.AnimateTo( Property(self, mPropertyLayoutPosition), anchorPosition, AlphaFunctions::EaseOut );
+    anchoringAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), anchorPosition, AlphaFunctions::EaseOut );
     anchoringAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(anchorPosition, self.GetCurrentSize()), AlphaFunctions::EaseOut );
     anchoringAnimation.AnimateTo( Property(self, mPropertyScrollSpeed), 0.0f, AlphaFunctions::EaseOut );
     if(!mIsFlicking)
@@ -1358,14 +1367,14 @@ void ItemView::ScrollToItem(unsigned int itemId, float durationSeconds)
   {
     RemoveAnimation(mScrollAnimation);
     mScrollAnimation = Animation::New(durationSeconds);
-    mScrollAnimation.AnimateTo( Property(self, mPropertyLayoutPosition), firstItemScrollPosition, AlphaFunctions::EaseOut );
+    mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunctions::EaseOut );
     mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, layoutSize), AlphaFunctions::EaseOut );
     mScrollAnimation.FinishedSignal().Connect(this, &ItemView::OnScrollFinished);
     mScrollAnimation.Play();
   }
   else
   {
-    self.SetProperty(mPropertyLayoutPosition, firstItemScrollPosition);
+    mScrollPositionObject.SetProperty( ScrollConnector::SCROLL_POSITION, firstItemScrollPosition );
     AnimateScrollOvershoot(0.0f);
   }
 
@@ -1435,7 +1444,7 @@ bool ItemView::IsLayoutScrollable(const Vector3& layoutSize)
 {
   Actor self = Self();
 
-  float currentLayoutPosition = ClampFirstItemPosition(self.GetProperty<float>(mPropertyLayoutPosition), layoutSize, *mActiveLayout);
+  float currentLayoutPosition = ClampFirstItemPosition( GetCurrentLayoutPosition(0), layoutSize, *mActiveLayout );
   float forwardClampedPosition = ClampFirstItemPosition(currentLayoutPosition + 1.0, layoutSize, *mActiveLayout);
   float backwardClampedPosition = ClampFirstItemPosition(currentLayoutPosition - 1.0, layoutSize, *mActiveLayout);
 
@@ -1456,7 +1465,7 @@ float ItemView::GetScrollPosition(float layoutPosition, const Vector3& layoutSiz
 
 Vector3 ItemView::GetCurrentScrollPosition() const
 {
-  float currentLayoutPosition = Self().GetProperty<float>(mPropertyLayoutPosition);
+  float currentLayoutPosition = GetCurrentLayoutPosition(0);
   return Vector3(0.0f, GetScrollPosition(currentLayoutPosition, Self().GetCurrentSize()), 0.0f);
 }
 
@@ -1483,14 +1492,14 @@ void ItemView::ScrollTo(const Vector3& position, float duration)
   {
     RemoveAnimation(mScrollAnimation);
     mScrollAnimation = Animation::New(duration);
-    mScrollAnimation.AnimateTo( Property(self, mPropertyLayoutPosition), firstItemScrollPosition, AlphaFunctions::EaseOut );
+    mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunctions::EaseOut );
     mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, layoutSize), AlphaFunctions::EaseOut );
     mScrollAnimation.FinishedSignal().Connect(this, &ItemView::OnScrollFinished);
     mScrollAnimation.Play();
   }
   else
   {
-    self.SetProperty(mPropertyLayoutPosition, firstItemScrollPosition);
+    mScrollPositionObject.SetProperty( ScrollConnector::SCROLL_POSITION, firstItemScrollPosition );
     AnimateScrollOvershoot(0.0f);
   }
 
@@ -1543,7 +1552,7 @@ float ItemView::CalculateScrollOvershoot()
     // since the pan gesture starts.
     Actor self = Self();
     float scrollDistance = CalculateScrollDistance(mTotalPanDisplacement, *mActiveLayout) * mActiveLayout->GetScrollSpeedFactor();
-    float positionDelta = self.GetProperty<float>(mPropertyLayoutPosition) + scrollDistance;
+    float positionDelta = GetCurrentLayoutPosition(0) + scrollDistance;
     float minLayoutPosition = mActiveLayout->GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), Self().GetCurrentSize());
     self.SetProperty(mPropertyMinimumLayoutPosition, minLayoutPosition);
     float clamppedPosition = min(0.0f, max(minLayoutPosition, positionDelta));
