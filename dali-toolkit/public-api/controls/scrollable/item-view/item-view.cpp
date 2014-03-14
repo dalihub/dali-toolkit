@@ -187,9 +187,34 @@ unsigned int ItemView::GetItemId(Actor actor) const
   return GetImpl(*this).GetItemId(actor);
 }
 
+void ItemView::InsertItem(Item newItem, float durationSeconds)
+{
+  GetImpl(*this).InsertItem( newItem, durationSeconds );
+}
+
+void ItemView::InsertItems(const ItemContainer& newItems, float durationSeconds)
+{
+  GetImpl(*this).InsertItems( newItems, durationSeconds );
+}
+
 void ItemView::RemoveItem(unsigned int itemId, float durationSeconds)
 {
-  GetImpl(*this).RemoveItem(itemId, durationSeconds);
+  GetImpl(*this).RemoveItem( itemId, durationSeconds );
+}
+
+void ItemView::RemoveItems(const ItemIdContainer& itemIds, float durationSeconds)
+{
+  GetImpl(*this).RemoveItems( itemIds, durationSeconds );
+}
+
+void ItemView::ReplaceItem(Item replacementItem, float durationSeconds)
+{
+  GetImpl(*this).ReplaceItem( replacementItem, durationSeconds );
+}
+
+void ItemView::ReplaceItems(const ItemContainer& replacementItems, float durationSeconds)
+{
+  GetImpl(*this).ReplaceItems( replacementItems, durationSeconds );
 }
 
 } // namespace Toolkit

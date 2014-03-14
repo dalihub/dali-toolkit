@@ -38,7 +38,8 @@ capi_devel_item_view_header_files = \
   $(capi_devel_src_dir)/controls/scrollable/item-view/grid-layout.h \
   $(capi_devel_src_dir)/controls/scrollable/item-view/item-factory.h \
   $(capi_devel_src_dir)/controls/scrollable/item-view/item-layout.h \
-  $(capi_devel_src_dir)/controls/scrollable/item-view/item-view.h
+  $(capi_devel_src_dir)/controls/scrollable/item-view/item-view.h \
+  $(capi_devel_src_dir)/controls/scrollable/item-view/item-view-declarations.h
 
 capi_devel_scroll_view_header_files = \
   $(capi_devel_src_dir)/controls/scrollable/scroll-view/scroll-view.h \

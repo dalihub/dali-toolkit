@@ -22,10 +22,12 @@
  * @{
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/dali.h>
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/item-view-declarations.h>
 
 namespace Dali DALI_IMPORT_API
 {
@@ -133,7 +135,7 @@ public:
    * @param[in] itemId The item identifier.
    * @return The current layout-position.
    */
-  float GetCurrentLayoutPosition(unsigned int itemId) const;
+  float GetCurrentLayoutPosition(ItemId itemId) const;
 
   /**
    * Activate one of the layouts; this will resize the ItemView & relayout actors within the ItemView.
@@ -224,7 +226,7 @@ public:
    * @param[in] itemId The ID of an item in the layout.
    * @param[in] durationSeconds How long the scrolling takes in seconds.
    */
-  void ScrollToItem(unsigned int itemId, float durationSeconds);
+  void ScrollToItem(ItemId itemId, float durationSeconds);
 
   /**
    * Set the interval between refreshes, during which new items are requested from ItemFactory.
@@ -243,7 +245,7 @@ public:
    * @param[in] itemId The Item ID of the actor required.
    * @return The Actor corresponding to the Item ID.
    */
-  Actor GetItem(unsigned int itemId) const;
+  Actor GetItem(ItemId itemId) const;
 
   /**
    * Returns the Item ID of the specified actor.
@@ -251,16 +253,71 @@ public:
    * @return The Item ID of the item.
    * @pre The actor should be an item of ItemView.
    */
-  unsigned int GetItemId(Actor actor) const;
+  ItemId GetItemId(Actor actor) const;
+
+  /**
+   * Insert an item.
+   * A relayout will occur for the existing actors; for example if InsertItem(Item(2, ActorZ), 0) is called,
+   * the items with ID 2 or greater will be moved:
+   *   Initial actors:     After insert:
+   *     ID 1 - ActorA       ID 1 - ActorA
+   *     ID 2 - ActorB       ID 2 - ActorZ !
+   *     ID 3 - ActorC       ID 3 - ActorB
+   *                         ID 4 - ActorC
+   * @pre durationSeconds must be zero or greater; zero means the relayout occurs instantly.
+   * @param[in] newItem The item to insert.
+   * @param[in] durationSeconds How long the relayout takes in seconds.
+   */
+  void InsertItem(Item newItem, float durationSeconds);
+
+  /**
+   * Insert a set of items; this is more efficient than calling InsertItem() repeatedly.
+   * @pre durationSeconds must be zero or greater; zero means the relayout occurs instantly.
+   * @param[in] newItems The items to insert.
+   * @param[in] durationSeconds How long the relayout takes in seconds.
+   */
+  void InsertItems(const ItemContainer& newItems, float durationSeconds);
 
   /**
    * Removes an item with the given ID.
-   * @pre durationSeconds must be zero or greater; zero means when the item is deleted the remaining items
-   * will finish the relayout instantly.
+   * A relayout will occur for the remaining actors; for example if RemoveItem(Item(2, ActorZ), 0) is called,
+   * the items with ID 3 or greater will be moved:
+   *   Initial actors:     After remove:
+   *     ID 1 - ActorA       ID 1 - ActorA
+   *     ID 2 - ActorB       ID 2 - ActorC (previously ID 3)
+   *     ID 3 - ActorC       ID 3 - ActorB (previously ID 4)
+   *     ID 4 - ActorD
+   * @pre durationSeconds must be zero or greater; zero means the relayout occurs instantly.
    * @param[in] itemId The Item ID of the item to remove.
-   * @param[in] durationSeconds How long the realyout takes in seconds after the item is deleted.
+   * @param[in] durationSeconds How long the relayout takes in seconds.
    */
-  void RemoveItem(unsigned int itemId, float durationSeconds);
+  void RemoveItem(ItemId itemId, float durationSeconds);
+
+  /**
+   * Remove a set of items; this is more efficient than calling RemoveItem() repeatedly.
+   * @pre durationSeconds must be zero or greater; zero means the relayout occurs instantly.
+   * @param[in] itemIds The IDs of the items to remove.
+   * @param[in] durationSeconds How long the relayout takes in seconds.
+   */
+  void RemoveItems(const ItemIdContainer& itemIds, float durationSeconds);
+
+  /**
+   * Replace an item.
+   * A relayout will occur for the replacement item only.
+   * @pre durationSeconds must be zero or greater; zero means the relayout occurs instantly.
+   * @param[in] replacementItem The replacement for an existing item.
+   * @param[in] durationSeconds How long the relayout takes in seconds.
+   */
+  void ReplaceItem(Item replacementItem, float durationSeconds);
+
+  /**
+   * Replace a set of items.
+   * A relayout will occur for the replacement items only.
+   * @pre durationSeconds must be zero or greater; zero means the relayout occurs instantly.
+   * @param[in] replacementItems The replacements for a set of existing items.
+   * @param[in] durationSeconds How long the relayout takes in seconds.
+   */
+  void ReplaceItems(const ItemContainer& replacementItems, float durationSeconds);
 
 public: // Not intended for application developers
 

@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/dali.h>
+#include <map>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -41,91 +42,6 @@ namespace Internal
 class ItemView;
 
 typedef IntrusivePtr<ItemView> ItemViewPtr;
-
-/**
- * ItemPool is container of Actor/ID pairs stored by ItemView
- */
-class ItemPool
-{
-public: // types
-
-  typedef std::pair<unsigned int, Actor>     IDKeyPair;
-  typedef std::map<unsigned int, Actor>      IDKeyContainer;
-  typedef IDKeyContainer::iterator           IDKeyIter;
-  typedef IDKeyContainer::const_iterator     IDKeyConstIter;
-
-  typedef std::pair<Actor, unsigned int>     ActorKeyPair;
-  typedef std::map<Actor, unsigned int>      ActorKeyContainer;
-  typedef ActorKeyContainer::iterator        ActorKeyIter;
-  typedef ActorKeyContainer::const_iterator  ActorKeyConstIter;
-
-public: // Construction & Destruction
-
-  /**
-   * Constructor
-   * @param[in] itemView A reference to the ItemView class that owns this.
-   */
-  ItemPool(ItemView& itemView)
-  : mItemView(itemView)
-  {
-  }
-
-public: // Methods
-
-  /**
-   * Returns a const reference to the IDKeyContainer whose key is based on the Item ID.
-   * @return Const reference to IDKeyContainer.
-   */
-  const IDKeyContainer& GetIDKeyContainer() const
-  {
-    return mIdKeyContainer;
-  }
-
-  /**
-   * Returns a const reference to the ActorKeyContainer whose key is based on the Actor.
-   * @return Const reference to IDKeyContainer.
-   */
-  const ActorKeyContainer& GetActorKeyContainer() const
-  {
-    return mActorKeyContainer;
-  }
-
-  /**
-   * Add a range of items to the ItemPool, if they are not already in the ItemPool.
-   * @param[in] scrollingTowardsLast Should be true if scrolling towards the last item in the range.
-   * @param[in] range The range of Item IDs to associate with the new actors.
-   * @param[in] targetSize The current size of the layout.
-   */
-  void AddItems(bool scrollingTowardsLast, ItemRange range, const Vector3& targetSize);
-
-  /**
-   * Remove items from the ItemPool that are outside the given range.
-   * @param[in] range The range of required items.
-   */
-  void RemoveItems(ItemRange range);
-
-  /**
-   * Remove an item from the ItemPool.
-   * @param[in] itemId The item to remove.
-   * @return Whether the item is found and removed or not.
-   */
-  bool RemoveItem(unsigned int itemId);
-
-private:
-
-  /**
-   * Adds an item, if not already in the ItemPool.
-   * @param[in] itemId The item to add.
-   * @param[in] targetSize The target size of the layout.
-   */
-  void AddItem(unsigned int itemId, const Vector3& targetSize);
-
-private:
-
-  IDKeyContainer mIdKeyContainer;
-  ActorKeyContainer mActorKeyContainer;
-  ItemView& mItemView;
-};
 
 /**
  * ItemView is a scrollable layout container.
@@ -264,9 +180,34 @@ public:
   unsigned int GetItemId(Actor actor) const;
 
   /**
+   * @copydoc Toolkit::ItemView::InsertItem
+   */
+  void InsertItem(Item newItem, float durationSeconds);
+
+  /**
+   * @copydoc Toolkit::ItemView::InsertItem
+   */
+  void InsertItems(const ItemContainer& newItems, float durationSeconds);
+
+  /**
    * @copydoc Toolkit::ItemView::RemoveItem
    */
-  void RemoveItem(unsigned int itemId, float durationSeconds);
+  void RemoveItem(ItemId itemId, float durationSeconds);
+
+  /**
+   * @copydoc Toolkit::ItemView::InsertItem
+   */
+  void RemoveItems(const ItemIdContainer& itemIds, float durationSeconds);
+
+  /**
+   * @copydoc Toolkit::ItemView::InsertItem
+   */
+  void ReplaceItem(Item replacementItem, float durationSeconds);
+
+  /**
+   * @copydoc Toolkit::ItemView::InsertItem
+   */
+  void ReplaceItems(const ItemContainer& replacementItems, float durationSeconds);
 
   /**
    * @copydoc Toolkit::Scrollable::GetDomainSize
@@ -293,30 +234,40 @@ public:
    */
   void ScrollTo(const Vector3& position, float duration);
 
-public: // Used By ItemPool
+private:
 
   /**
-   * Called by the ItemPool when it wishes to create an actor from the ItemFactory with the
-   * specified ItemId.
-   * @param[in] itemId The Item ID of the actor to create.
+   * Remove an Actor if found in the ItemPool.
+   * @param[in] itemId The item to remove.
+   * @return True if an actor was removed.
    */
-  Actor CreateActor(unsigned int itemId);
+  bool RemoveActor( unsigned int itemId );
 
   /**
-   * Called by the ItemPool when an actor is added to the ItemPool.
-   * @param[in] actor The actor that has been added.
-   * @param[in] itemId The associated Item ID.
-   * @param[in] targetSize The target size that was specified upon addition.
+   * Remove any Actors outside a given range.
+   * @param[in] @param[in] range The range of required items.
    */
-  void ActorAddedToItemPool(Actor actor, unsigned int itemId, const Vector3& targetSize);
+  void RemoveActorsOutsideRange( ItemRange range );
 
   /**
-   * Called by the ItemPool when an actor with the specified itemId is about to be removed from the
-   * ItemPool.
-   * @param[in] actor The actor about to be removed.
-   * @param[in] itemId The associated Item ID.
+   * Add a range of Actors, if they are not already in the ItemPool.
+   * @param[in] layout The active layout.
+   * @param[in] range The range of Item IDs to associate with the new actors.
    */
-  void ActorRemovedFromItemPool(Actor actor, unsigned int itemId);
+  void AddActorsWithinRange( ItemRange range );
+
+  /**
+   * Add a new Actor, if not already in the ItemPool.
+   * @param[in] item The ID for the new item.
+   */
+  void AddNewActor( ItemId item );
+
+  /**
+   * Apply the constraints etc. that are required for ItemView children.
+   * @param[in] item The item to setup.
+   * @param[in] durationSeconds The time taken to fully constrain the actor.
+   */
+  void SetupActor( Item item, float durationSeconds );
 
 private: // From CustomActorImpl
 
@@ -385,6 +336,12 @@ private:
    * @param[in] durationSeconds The time taken to fully constrain the actors.
    */
   void ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int itemId, float durationSeconds);
+
+  /**
+   * Helper to re-apply all the constraints after items have been inserted, removed etc.
+   * @param[in] durationSeconds The time taken to fully constrain the actors.
+   */
+  void ReapplyAllConstraints( float durationSeconds );
 
   /**
    * Helper to remove items outside a given range.
@@ -514,7 +471,6 @@ private:
    */
   void CalculateDomainSize(const Vector3& layoutSize);
 
-
   /**
    * Calculates whether we want to allow current item view to scroll.
    * @param[in] layoutSize The current size of the layout.
@@ -526,10 +482,15 @@ private:
 
   ItemFactory& mItemFactory;
 
+  typedef std::map<unsigned int, Actor> ItemPool;
+  typedef ItemPool::iterator            ItemPoolIter;
+  typedef ItemPool::const_iterator      ConstItemPoolIter;
+
   ItemPool mItemPool;
 
   ItemLayoutContainer mLayouts;
   ItemLayout* mActiveLayout;
+  Vector3 mActiveLayoutTargetSize;
 
   Animation mResizeAnimation;
   Animation mScrollAnimation;
