@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SCROLL_VIEW_MODULE
  * @{
  */
 
@@ -43,47 +43,52 @@ class ScrollViewSlideEffect;
 }
 
 /**
- * ScrollView Twist-Effect.
+ * @brief ScrollView effect that uses slides for transitioning pages.
  */
 class ScrollViewSlideEffect : public ScrollViewEffect
 {
-
 public:
-
-  static const std::string EFFECT_TIME;
-  static const std::string EFFECT_REFERENCE;
-  static const std::string EFFECT_ACTIVE;
+  static const std::string EFFECT_TIME;        ///< Effect time property name
+  static const std::string EFFECT_REFERENCE;   ///< Effect reference property name
+  static const std::string EFFECT_ACTIVE;      ///< Effect active property name
 
 public:
 
   /**
-   * Create an initialized ScrollViewSlideEffect.
+   * @brief Create an initialized ScrollViewSlideEffect.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static ScrollViewSlideEffect New();
 
   /**
-   * Create an uninitialized ScrollViewSlideEffect; this can be initialized with ScrollViewSlideEffect::New()
+   * @brief Create an uninitialized ScrollViewSlideEffect; this can be initialized with ScrollViewSlideEffect::New().
+   *
    * Calling member functions with an uninitialized Toolkit::ScrollViewSlideEffect is not allowed.
    */
   ScrollViewSlideEffect();
 
   /**
-   * Downcast an Object handle to ScrollViewSlideEffect. If handle points to a ScrollViewSlideEffect the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to ScrollViewSlideEffect.
+   *
+   * If handle points to a ScrollViewSlideEffect the downcast produces
+   * valid handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle Handle to an object
    * @return handle to a ScrollViewSlideEffect or an uninitialized handle
    */
   static ScrollViewSlideEffect DownCast( BaseHandle handle );
 
   /**
-   * Gets the slide direction for this effect.
+   * @brief Gets the slide direction for this effect.
+   *
    * @return The slide direction (true = vertical, false = horizontal)
    */
   bool GetSlideDirection() const;
 
   /**
-   * Sets the slide direction for this effect.
+   * @brief Sets the slide direction for this effect.
+   *
    * If the direction has been set to horizontal (false), then
    * the user will see the Actors have a delay in horizontal movement
    * based on the vertical distance the actor is away from the initial drag point.
@@ -95,14 +100,16 @@ public:
   void SetSlideDirection(bool vertical);
 
   /**
-   * Gets the delay reference offset for this effect.
+   * @brief Gets the delay reference offset for this effect.
+   *
    * @return The delay reference offset (Vector3::ZERO - indicates no offset)
    */
   Vector3 GetDelayReferenceOffset() const;
 
   /**
-   * Sets an offset for where the central delay point on the scroll-view should be
+   * @brief Sets an offset for where the central delay point on the scroll-view should be
    * when dragging.
+   *
    * By default the offset is 0. Which means that the point where the user drags
    * the scroll-view content should have no delay, and the further away from this
    * point, the delay should increase. Adjusting this offset to for example
@@ -114,19 +121,22 @@ public:
   void SetDelayReferenceOffset(const Vector3& offset);
 
   /**
-   * Gets the maximum duration of the effect after scrolling completes
+   * @brief Gets the maximum duration of the effect after scrolling completes.
+   *
    * @return The duration in seconds
    */
   float GetMaxDelayDuration() const;
 
   /**
-   * Sets the maximum duration of the effect after scrolling completes
+   * @brief Sets the maximum duration of the effect after scrolling completes.
+   *
    * @param[in] duration The duration in seconds (>= 0.0f, default is 0.25 seconds)
    */
   void SetMaxDelayDuration(float duration);
 
   /**
-   * Manually apply effect to an Actor.
+   * @brief Manually apply effect to an Actor.
+   *
    * @param[in] child The child Actor to be affected by this effect.
    * @param[in] delayMin The minimum delay coefficient for Actors at the
    * scroll-view touch point. Set to 0 for instantaneous, and 1 for infinite delay.
@@ -142,7 +152,8 @@ public:
 protected:
 
   /**
-   * This constructor is used by Dali New() methods.
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
   ScrollViewSlideEffect(Internal::ScrollViewSlideEffect *impl);

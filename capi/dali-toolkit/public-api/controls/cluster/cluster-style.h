@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_CLUSTER_MODULE
  * @{
  */
 
@@ -43,26 +43,27 @@ class ClusterStyleRandom;
 
 class ClusterStyle;
 
-typedef IntrusivePtr<ClusterStyle> ClusterStylePtr;
+typedef IntrusivePtr<ClusterStyle> ClusterStylePtr; ///< Pointer to a Dali::Toolkit::ClusterStyle object
 
 /**
- * A ClusterStyle describes the constraints, which are imposed on the child actors in the cluster.
+ * @brief A ClusterStyle describes the constraints which are imposed on the child actors in the cluster.
  */
 class ClusterStyle : public Dali::BaseHandle
 {
 public:
 
-  static const unsigned int UNLIMITED_CHILDREN;
+  static const unsigned int UNLIMITED_CHILDREN; ///< Constant that represents an unlimited number of children.
 
 public:
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~ClusterStyle();
 
   /**
-   * Query the maximum number of children this Style can handle.
+   * @brief Query the maximum number of children this Style can handle.
+   *
    * If return value is UNLIMITED_CHILDREN, then this style has no
    * limit.
    * @return The maximum number of children.
@@ -70,7 +71,7 @@ public:
   unsigned int GetMaximumNumberOfChildren() const;
 
   /**
-   * Applies style (position) to child actor over a specified time duration.
+   * @brief Applies style (position) to child actor over a specified time duration.
    *
    * @param[in] child The child actor to apply
    * @param[in] index The style position index for the actor to transform to.
@@ -80,7 +81,8 @@ public:
   void ApplyStyle(Actor child, unsigned int index, AlphaFunction alpha, const TimePeriod& durationSeconds);
 
   /**
-   * Applies style to background actor over a specified time duration.
+   * @brief Applies style to background actor over a specified time duration.
+   *
    * @param[in] background The background actor to apply
    * @param[in] alpha The alpha function to use.
    * @param[in] durationSeconds The time period to apply this style.
@@ -88,7 +90,8 @@ public:
   void ApplyStyleToBackground(Actor background, AlphaFunction alpha, const TimePeriod& durationSeconds);
 
   /**
-   * Applies style to title actor over a specified time duration.
+   * @brief Applies style to title actor over a specified time duration.
+   *
    * @param[in] title The title actor to apply
    * @param[in] alpha The alpha function to use.
    * @param[in] durationSeconds The time period to apply this style.
@@ -98,67 +101,73 @@ public:
 protected:
 
   /**
-   * Create a new ClusterStyle; Only derived versions are instantiatable.
+   * @brief Create a new ClusterStyle; Only derived versions are instantiatable.
    */
   ClusterStyle();
 
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] internal A pointer to a newly allocated Dali resource
    */
   ClusterStyle(Internal::ClusterStyle* internal);
 };
 
 /**
- * A ClusterStyle describes the constraints, which are imposed on the child actors in the cluster.
+ * @brief A ClusterStyle describes the constraints, which are imposed on the child actors in the cluster.
  */
 class ClusterStyleStandard : public ClusterStyle
 {
 public:
 
+  /**
+   * @brief Cluster Style type.
+   */
   enum StyleType
   {
-    ClusterStyle1,
-    ClusterStyle2,
-    ClusterStyle3,
-    ClusterStyle4,
-    TotalClusterStyles
+    ClusterStyle1,     ///< Style number 1
+    ClusterStyle2,     ///< Style number 2
+    ClusterStyle3,     ///< Style number 3
+    ClusterStyle4,     ///< Style number 4
+    TotalClusterStyles ///< The number of styles
   };
 
 public:
 
   /**
-   * Create an initialized style
+   * @brief Create an initialized style.
    */
   static ClusterStyleStandard New(StyleType style);
 
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] internal A pointer to a newly allocated Dali resource
    */
   ClusterStyleStandard(Internal::ClusterStyle* internal);
 };
 
 /**
- * A ClusterStyle describes the constraints, which are imposed on the child actors in the cluster.
+ * @brief A ClusterStyle describes the constraints, which are imposed on the child actors in the cluster.
  */
 class ClusterStyleRandom : public ClusterStyle
 {
 public:
 
   /**
-   * Create an initialized style
+   * @brief Create an initialized style.
    */
   static ClusterStyleRandom New();
 
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] internal A pointer to a newly allocated Dali resource
    */
   ClusterStyleRandom(Internal::ClusterStyle* internal);

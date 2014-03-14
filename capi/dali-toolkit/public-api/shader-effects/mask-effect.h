@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SHADER_EFFECTS_MODULE
  * @{
  */
 
@@ -32,7 +32,8 @@ namespace Toolkit
 {
 
 /**
- * MaskEffect is used to control which parts of an image are visible, using the alpha channel of a separate mask image.
+ * @brief MaskEffect is used to control which parts of an image are visible, using the alpha channel of a separate mask image.
+ *
  * Typically mask images should be the same size as the main image being viewed, but this isn't essential.
  *
  * Usage example:
@@ -46,17 +47,19 @@ class DALI_IMPORT_API MaskEffect : public ShaderEffect
 public:
 
   /**
-   * Create an empty MaskEffect handle.
+   * @brief Create an empty MaskEffect handle.
    */
   MaskEffect();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~MaskEffect();
 
   /**
-   * Create a MaskEffect.
+   * @brief Create a MaskEffect.
+   *
+   * @param[in] maskImage The image to use as a mask
    * @return A handle to a newly allocated MaskEffect.
    */
   static MaskEffect New( Image maskImage );

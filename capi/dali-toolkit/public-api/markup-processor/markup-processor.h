@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_MARKUP_PROCESSOR_MODULE
  * @{
  */
 
@@ -34,23 +34,36 @@ namespace Dali DALI_IMPORT_API
 namespace Toolkit
 {
 
+/**
+ * @brief Markup Processor enumerations, structures and functions.
+ */
 namespace MarkupProcessor
 {
 
 /**
- * Holds text and its style.
+ * @brief A pair of Dali::Text and Dali::TextStyle.
  *
- * mText is a Dali::Text object which can store text in different languages. mStyle is a Dali::TextStyle object which can
- * store all text styling features provided by Dali::TextActor.
+ * mText is a Dali::Text object which can store text in different
+ * languages. mStyle is a Dali::TextStyle object which can store all
+ * text styling features provided by Dali::TextActor.
  */
 struct StyledText
 {
+  /**
+   * @brief Constructor
+   */
   StyledText()
   : mText(),
     mStyle()
   {
   }
 
+  /**
+   * @brief Constructor
+   *
+   * @param[in] text  A Text object
+   * @param[in] style A Style object
+   */
   StyledText( const Text& text, const TextStyle& style )
   : mText( text ),
     mStyle( style )
@@ -62,15 +75,20 @@ struct StyledText
 };
 
 /**
- * This type defines a vector of StyledText. It's used to store a whole text with its style
- * and set it to a Dali::Toolkit::TextView. It could be used in other UI Dali::Toolkit::Control classes
- * which need text with style.
+ * @brief This type defines a vector of StyledText.
+ *
+ * It's used to store a whole text with its style and set it to a
+ * Dali::Toolkit::TextView. It could be used in other UI
+ * Dali::Toolkit::Control classes which need text with style.
  */
 typedef std::vector<StyledText> StyledTextArray;
 
 /**
- * Creates a text array with its style from a markup string.
- * The syntax of a markup string is html-ish. It contains open, close and empty tags and some of them can contain parameters.
+ * @brief Creates a text array with its style from a markup string.
+ *
+ * The syntax of a markup string is html-ish. It contains open, close
+ * and empty tags and some of them can contain parameters.
+ *
  * <ul>
  *   <li>\e \<b\>\</b\> Bold text.
  *   <li>\e \<i\>\</i\> Italic text.
@@ -112,21 +130,24 @@ typedef std::vector<StyledText> StyledTextArray;
 void GetStyledTextArray( const std::string& markupString, StyledTextArray& styledTextArray );
 
 /**
- * Creates a plain string from a text array (thus stripping the style meta)
+ * @brief Creates a plain string from a text array (thus stripping the style meta).
+ *
  * @param [in] styledTextArray A text array split in characters, each one with its style.
  * @param [out] plainString A string without style.
  */
 void GetPlainString( const StyledTextArray& styledTextArray, std::string& plainString );
 
 /**
- * Creates a markup string from a text array with its style.
+ * @brief Creates a markup string from a text array with its style.
+ *
  * @param [in] styledTextArray A text array split in characters, each one with its style.
  * @param [out] markupString A string with style.
  */
 void GetMarkupString( const StyledTextArray& styledTextArray, std::string& markupString );
 
 /**
- * Sets a text style to the given text.
+ * @brief Sets a text style to the given text.
+ *
  * By default all style settings are applied but a bit mask could be used to modify only certain style settings.
  * @param[in,out] styledTextArray The given text
  * @param[in] style The given style
@@ -144,7 +165,8 @@ void SetTextStyle( StyledTextArray& styledTextArray, const TextStyle& style, con
 void SetTextStyle( const Text& text, StyledTextArray& styledTextArray, const TextStyle& style, const TextStyle::Mask mask = TextStyle::ALL );
 
 /**
- * Sets a text style to a range of characters of the given text.
+ * @brief Sets a text style to a range of characters of the given text.
+ *
  * By default all style settings are applied but a bit mask could be used to modify only certain style settings.
  * @param[in,out] styledTextArray The given text
  * @param[in] style The given style

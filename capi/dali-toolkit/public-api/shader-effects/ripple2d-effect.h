@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SHADER_EFFECTS_MODULE
  * @{
  */
 
@@ -32,49 +32,55 @@ namespace Toolkit
 {
 
 /**
- * Ripple2DEffect is a custom shader effect to achieve 2d ripple effects on Image actors
+ * @brief Ripple2DEffect is a custom shader effect to achieve 2d ripple effects on Image actors.
  */
 class Ripple2DEffect : public ShaderEffect
 {
 public:
 
   /**
-   * Create an uninitialized Ripple2DEffect; this can be initialized with Ripple2DEffect::New()
+   * @brief Create an uninitialized Ripple2DEffect; this can be initialized with Ripple2DEffect::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   Ripple2DEffect();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~Ripple2DEffect();
 
   /**
-   * Create an initialized Ripple2DEffect.
+   * @brief Create an initialized Ripple2DEffect.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static Ripple2DEffect New();
 
   /**
-   * Set the amplitude of the 2d ripple.
+   * @brief Set the amplitude of the 2d ripple.
+   *
    * @param[in] amplitude The amplitude in float.
    */
   void SetAmplitude(float amplitude);
 
   /**
-   * Set the time duration for the 2d ripple.
+   * @brief Set the time duration for the 2d ripple.
+   *
    * @param[in] time The time duration in float.
    */
   void SetTime(float time);
 
   /**
-   * Get the name for the amplitude property
+   * @brief Get the name for the amplitude property.
+   *
    * @return A std::string containing the property name
    */
   const std::string& GetAmplitudePropertyName() const;
 
   /**
-   * Get the name for the time property
+   * @brief Get the name for the time property.
+   *
    * which can be used in Animation API's
    * @return A std::string containing the property name
    */

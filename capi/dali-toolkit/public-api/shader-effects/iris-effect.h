@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SHADER_EFFECTS_MODULE
  * @{
  */
 
@@ -32,7 +32,7 @@ namespace Toolkit
 {
 
 /**
- * IrisEffect is a custom shader effect to achieve iris effects in Image actors
+ * @brief IrisEffect is a custom shader effect to achieve iris effects in Image actors
  */
 class IrisEffect : public ShaderEffect
 {
@@ -40,26 +40,28 @@ class IrisEffect : public ShaderEffect
 public:
 
   /**
-   * Create an uninitialized IrisEffect; this can be initialized with IrisEffect::New()
+   * @brief Create an uninitialized IrisEffect; this can be initialized with IrisEffect::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   IrisEffect();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~IrisEffect();
 
   /**
-   * Create an initialized IrisEffect
+   * @brief Create an initialized IrisEffect.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static IrisEffect New();
 
   /**
-   * Set the radius of the iris effect (in texture coordinate distance,
+   * @brief Set the radius of the iris effect in texture coordinate distance,
    * i.e. 0.0 (no circle) to 1.0 (complete circle), to > 1.0 (extending
-   * outside of texture)
+   * outside of texture).
    *
    * @note For Atlas Textures results may be unpredictable.
    *
@@ -68,7 +70,7 @@ public:
   void SetRadius(float radius);
 
   /**
-   * Set the blend factor of the iris effect.
+   * @brief Set the blend factor of the iris effect.
    *
    * The lower the value, the larger the blending portion
    * (between Opaque & Transparent)
@@ -81,27 +83,29 @@ public:
   void SetBlendFactor(float value);
 
   /**
-   * Sets the center point of the iris (in texture coordinates)
+   * @brief Sets the center point of the iris (in texture coordinates).
    *
    * @param[in] center The center point.
    */
   void SetCenter( const Vector2& center );
 
   /**
-   * Get the name for the radius property
-   * which can be used in Animation API's
+   * @brief Get the name for the radius property which can be used in Animation APIs.
+   *
    * @return A std::string containing the property name
    */
   const std::string& GetRadiusPropertyName() const;
 
   /**
-   * Get the name for the blend factor property
+   * @brief Get the name for the blend factor property.
+   *
    * @return A std::string containing the property name
    */
   const std::string& GetBlendFactorPropertyName() const;
 
   /**
-   * Get the name for the center property
+   * @brief Get the name for the center property.
+   *
    * @return A std::string containing the property name
    */
   const std::string& GetCenterPropertyName() const;

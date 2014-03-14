@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SHADER_EFFECTS_MODULE
  * @{
  */
 
@@ -32,32 +32,35 @@ namespace Toolkit
 {
 
 /**
- * DissolveEffect is a custom shader effect to achieve Dissolve effects in Image actors
+ * @brief DissolveEffect is a custom shader effect to achieve Dissolve effects in Image actors.
  */
 class DissolveEffect : public ShaderEffect
 {
 public:
 
   /**
-   * Create an uninitialized DissolveEffect; this can be initialized with DissolveEffect::New()
+   * @brief Create an uninitialized DissolveEffect; this can be initialized with DissolveEffect::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   DissolveEffect();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~DissolveEffect();
 
   /**
-   * Create an initialized DissolveEffect.
+   * @brief Create an initialized DissolveEffect.
+   *
    * @param[in] useHighPrecision True if using high precision in fragment shader for fully random noise, false otherwise
    * @return A handle to a newly allocated Dali resource.
    */
   static DissolveEffect New( bool useHighPrecision = true);
 
   /**
-   * Set the dissolve central line
+   * @brief Set the dissolve central line.
+   *
    * Use one point (position) and one direction ( displacement ) vector to define this line
    * As we use the texture coordinate as pixel position to calculate random offset,
    * the line should passing through rectangle {(0,0),(0,1),(1,0),(1,1)},
@@ -68,14 +71,16 @@ public:
   void SetCentralLine( const Vector2& position, const Vector2& displacement );
 
   /**
-   * Sets the distortion applied to the effect texture.
+   * @brief Sets the distortion applied to the effect texture.
+   *
    * This value is proportional to the distortion applied; a value of zero means no distortion.
    * @param [in] distortion The distortion value.
    */
   void SetDistortion( float distortion );
 
   /**
-   * Get the name for the distortion property
+   * @brief Get the name for the distortion property.
+   *
    * @return A std::string containing the property name
    */
   const std::string& GetDistortionPropertyName() const;

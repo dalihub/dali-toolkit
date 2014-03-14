@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_TEXT_VIEW_MODULE
  * @{
  */
 
@@ -41,7 +41,7 @@ class TextView;
 }
 
 /**
- * TextView is a layout container with alignment, multi-line wrapping and formatting support.
+ * @brief TextView is a layout container for text with alignment, multi-line wrapping and formatting support.
  *
  * Different multi-line and exceed policies could be chosen to represent the given text.
  * \see Toolkit::TextView::SetMultilinePolicy \see Toolkit::TextView::SetExceedPolicy
@@ -104,36 +104,36 @@ public:
   static const char* const SIGNAL_TEXT_SCROLLED; ///< Signal emitted when the scroll position changes. @see SignalScrolled()
 
   /**
-   * Structure used to retrieve Layout info per character.
+   * @brief Structure used to retrieve Layout info per character.
    */
   struct CharacterLayoutInfo
   {
     /**
-     * Default constructor.
+     * @brief Default constructor.
      *
      * Initializes all members to their default values.
      */
     CharacterLayoutInfo();
 
     /**
-     * Empty destructor.
+     * @brief Empty destructor.
      *
      * @note Added to increase coverage.
      */
     ~CharacterLayoutInfo();
 
     /**
-     * Copy constructor.
+     * @brief Copy constructor.
      */
     CharacterLayoutInfo( const CharacterLayoutInfo& characterLayoutInfo );
 
     /**
-     * Assignment operator.
+     * @brief Assignment operator.
      */
     CharacterLayoutInfo& operator=( const CharacterLayoutInfo& character );
 
     /**
-     * Constructor.
+     * @brief Constructor.
      *
      * @param[in] size of the character.
      * @param[in] position of the character.
@@ -157,10 +157,10 @@ public:
     float   mDescender;                ///< The character's descender which is the distance from the baseline to the bottom of the character
   };
 
-  typedef std::vector<CharacterLayoutInfo> CharacterLayoutInfoContainer;
+  typedef std::vector<CharacterLayoutInfo> CharacterLayoutInfoContainer; ///< Container of Character layouts
 
   /**
-   * Stores some info about a laid-out line.
+   * @brief Stores some info about a laid-out line.
    */
   struct LineLayoutInfo
   {
@@ -168,29 +168,33 @@ public:
     Size        mSize;                 ///< Size of the current laid-out line.
     float       mAscender;             ///< The max ascender of the current laid-out line.
   };
-  typedef std::vector<LineLayoutInfo> LineLayoutInfoContainer;
 
+  typedef std::vector<LineLayoutInfo> LineLayoutInfoContainer; ///< Container of line layouts
+
+  /**
+   * @brief How text is laid out.
+   */
   struct TextLayoutInfo
   {
     /**
-     * Default constructor.
+     * @brief Default constructor.
      */
     TextLayoutInfo();
 
     /**
-     * Empty destructor
+     * @brief Empty destructor.
      *
      * @note Added to increase coverage.
      */
     ~TextLayoutInfo();
 
     /**
-     * Copy constructor.
+     * @brief Copy constructor.
      */
     TextLayoutInfo( const TextLayoutInfo& textLayoutInfo );
 
     /**
-     * Assignment operator.
+     * @brief Assignment operator.
      */
     TextLayoutInfo& operator=( const TextLayoutInfo& textLayoutInfo );
 
@@ -203,20 +207,23 @@ public:
   };
 
   /**
-   * It represents a fade boundary.
+   * @brief This structure represents a fade boundary.
+   *
    * If Exceed policy is set to Fade all text which does not fit within the text-view fade boundary is faded out. Text which exceeds the text-view boundary becomes invisible.
    * The \e left, \e right, \e top and \e bottom values are positive, in pixels and set the distances between the text-view and fade boundaries.
    */
   struct FadeBoundary
   {
     /**
-     * Default constructor.
+     * @brief Default constructor.
+     *
      * Initializes all values to 0. It means no fade boundary.
      */
     FadeBoundary();
 
     /**
-     * Constructor.
+     * @brief Constructor.
+     *
      * Initializes the fade boundary with the given values.
      *
      * @param[in] left value in pixels.
@@ -226,14 +233,15 @@ public:
      */
     FadeBoundary( PixelSize left, PixelSize right, PixelSize top, PixelSize bottom );
 
-    PixelSize mLeft;
-    PixelSize mRight;
-    PixelSize mTop;
-    PixelSize mBottom;
+    PixelSize mLeft;   ///< The left fade boundary
+    PixelSize mRight;  ///< The right fade boundary
+    PixelSize mTop;    ///< The top fade boundary
+    PixelSize mBottom; ///< The bottom fade bounday
   };
 
   /**
-   * Define how to split the text in lines.
+   * @brief Define how to split the text in lines.
+   *
    * SplitByNewLineChar will split the text in lines when a '\\n' character is found.
    * SplitByWord has effect only when TextView size is assigned.
    * It will split the text in lines when a '\\n' character is found or if a line exceeds the TextView's boundary. This option won't split a word in two.
@@ -249,7 +257,8 @@ public:
   };
 
   /**
-   * Define how to display the text when it doesn't fit inside the TextView.
+   * @brief Define how to display the text when it doesn't fit inside the TextView.
+   *
    * The default value is ShrinkToFit.
    */
   enum ExceedPolicy
@@ -263,7 +272,8 @@ public:
   };
 
   /**
-   * Define how to justify lines inside the text area.
+   * @brief Define how to justify lines inside the text area.
+   *
    * The default value is Left.
    */
   enum LineJustification
@@ -276,29 +286,39 @@ public:
 
 public:
   /**
-   * Create an TextView handle; this can be initialised with TextView::New()
+   * @brief Create an TextView handle; this can be initialised with TextView::New().
+   *
    * Calling member functions with an uninitialised Dali::Object handle is not allowed.
    */
   TextView();
 
   /**
-   * Copy constructor. Creates another handle that points to the same real object
+   * @brief Copy constructor.
+   *
+   * Creates another handle that points to the same real object
+   * @param[in] handle The handle to copy from
    */
   TextView( const TextView& handle );
 
   /**
-   * Assignment operator. Changes this handle to point to another real object
+   * @brief Assignment operator.
+   *
+   * Changes this handle to point to another real object
+   * @param[in] handle The handle to copy from
+   * @return a reference to this
    */
   TextView& operator=( const TextView& handle );
 
   /**
-   * Create a TextView control with no text
+   * @brief Create a TextView control with no text.
+   *
    * @return A handle the TextView control.
    */
   static TextView New();
 
   /**
-   * Create a TextView control.
+   * @brief Create a TextView control.
+   *
    * @param[in] text to display.
    * @return A handle the TextView control.
    */
@@ -310,7 +330,9 @@ public:
   static TextView New( const MarkupProcessor::StyledTextArray& text );
 
   /**
-   * Downcast an Object handle to TextView. If handle points to a TextView the
+   * @brief Downcast an Object handle to TextView.
+   *
+   * If handle points to a TextView the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @param[in] handle Handle to an object
    * @return handle to a TextView or an uninitialized handle
@@ -318,25 +340,28 @@ public:
   static TextView DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~TextView();
 
   /**
-   * Replace the current text with a new text string.
+   * @brief Replace the current text with a new text string.
+   *
    * @param[in] text to display. The string may contain style tags.
    */
   void SetText( const std::string& text );
 
   /**
-   * Replace the current text with a new text string with style.
+   * @brief Replace the current text with a new text string with style.
+   *
    * @param[in] text with style to display.
    */
   void SetText( const MarkupProcessor::StyledTextArray& text );
 
   /**
-   * Inserts the given text in the specified position
+   * @brief Inserts the given text in the specified position.
    *
    * @param[in] position Where the given text is going to be added.
    * @param[in] text The text to be added.
@@ -349,7 +374,7 @@ public:
   void InsertTextAt( std::size_t position, const MarkupProcessor::StyledTextArray& text );
 
   /**
-   * Replaces part of the text.
+   * @brief Replaces part of the text.
    *
    * It removes the specified number of characters from the given position and inserts the given text in the same specified position.
    *
@@ -365,7 +390,7 @@ public:
   void ReplaceTextFromTo( std::size_t position, std::size_t numberOfCharacters, const MarkupProcessor::StyledTextArray& text );
 
   /**
-   * Removes the specified number of characters from the given position.
+   * @brief Removes the specified number of characters from the given position.
    *
    * @param[in] position of the first character to be removed.
    * @param[in] numberOfCharacters number of characters to be removed.
@@ -373,26 +398,30 @@ public:
   void RemoveTextFrom( std::size_t position, std::size_t numberOfCharacters );
 
   /**
-   * Get the currently displayed text.
+   * @brief Get the currently displayed text.
+   *
    * @return The currently displayed text.
    */
   std::string GetText() const;
 
   /**
-   * Sets a line height offset.
+   * @brief Sets a line height offset.
+   *
    * The line height offset will be added to the font line height.
    * @param [in] offset The height offset in PointSize units.
    */
   void SetLineHeightOffset( PointSize offset );
 
   /**
-   * Retrieves the line height offset.
+   * @brief Retrieves the line height offset.
+   *
    * @return The line height offset in PointSize units.
    */
   PointSize GetLineHeightOffset() const;
 
   /**
-   * Sets the given style to the current text.
+   * @brief Sets the given style to the current text.
+   *
    * By default all style settings are applied but a bit mask could be used to modify only certain style settings.
    * @note TextView doesn't store a copy of the given style, it applies the given style to the current text only.
    * Subsequent calls to SetText() will override any style set by this method.
@@ -402,69 +431,80 @@ public:
   void SetStyleToCurrentText( const TextStyle& style, TextStyle::Mask mask = TextStyle::ALL );
 
   /**
-   * Set the current text alignment.
+   * @brief Set the current text alignment.
+   *
    * Default alignment is (HorizontalCenter | VerticalCenter)
    * @param[in] align The new alignment option.
    */
   void SetTextAlignment( Alignment::Type align );
 
   /**
-   * Get the current text alignment combined into a single value.
+   * @brief Get the current text alignment combined into a single value.
+   *
    * The values can be tested by using the & operator
    * and the desired flag. e.g. if (GetTextAlignment() & HorizontalCentre) ...
+   * @return the combined alignment
    */
   Alignment::Type GetTextAlignment() const;
 
   /**
-   * Sets how to split the text in lines policy.
+   * @brief Sets how to split the text in lines policy.
+   *
    * @param policy The multi-line policy. SplitByNewLineChar is set by default.
    */
   void SetMultilinePolicy( MultilinePolicy policy );
 
   /**
-   * Gets the split in lines policy.
+   * @brief Gets the split in lines policy.
+   *
    * @return The multi-line policy.
    */
   MultilinePolicy GetMultilinePolicy() const;
 
   /**
-   * Sets how to display the text inside the TextView when it exceeds the text-view's width.
+   * @brief Sets how to display the text inside the TextView when it exceeds the text-view's width.
+   *
    * @param policy The exceed policy. Original is set by default.
    */
   void SetWidthExceedPolicy( ExceedPolicy policy );
 
   /**
-   * Gets the width exceed policy.
+   * @brief Gets the width exceed policy.
+   *
    * @return The exceed policy.
    */
   ExceedPolicy GetWidthExceedPolicy() const;
 
   /**
-   * Sets how to display the text inside the TextView when it exceeds the text-view's height.
+   * @brief Sets how to display the text inside the TextView when it exceeds the text-view's height.
+   *
    * @param policy The exceed policy. Original is set by default.
    */
   void SetHeightExceedPolicy( ExceedPolicy policy );
 
   /**
-   * Gets the height exceed policy.
+   * @brief Gets the height exceed policy.
+   *
    * @return The exceed policy.
    */
   ExceedPolicy GetHeightExceedPolicy() const;
 
   /**
-   * Sets how to justify lines inside the text area.
+   * @brief Sets how to justify lines inside the text area.
+   *
    * @param justification The line justification. Left is set by default.
    */
   void SetLineJustification( LineJustification justification );
 
   /**
-   * Gets the line justification.
+   * @brief Gets the line justification.
+   *
    * @return The line justification.
    */
   LineJustification GetLineJustification() const;
 
   /**
-   * Sets a fade boundary.
+   * @brief Sets a fade boundary.
    *
    * @see FadeBoundary.
    *
@@ -473,7 +513,7 @@ public:
   void SetFadeBoundary( const FadeBoundary& fadeBoundary );
 
   /**
-   * Retrieves the fade boundary.
+   * @brief Retrieves the fade boundary.
    *
    * @see FadeBoundary.
    *
@@ -482,28 +522,28 @@ public:
   const FadeBoundary& GetFadeBoundary() const;
 
   /**
-   * Sets the ellipsize text.
+   * @brief Sets the ellipsize text.
    *
    * @param[in] ellipsizeText The new text. The string may contain style tags. By default the ellipsize text is '...'
    */
   void SetEllipsizeText( const std::string& ellipsizeText );
 
   /**
-   * Sets the ellipsize text.
+   * @brief Sets the ellipsize text.
    *
    * @param[in] ellipsizeText The new text with its style.
    */
   void SetEllipsizeText( const MarkupProcessor::StyledTextArray& ellipsizeText );
 
   /**
-   * Retrieves the ellipsize text.
+   * @brief Retrieves the ellipsize text.
    *
    * @return The ellipsize text.
    */
   std::string GetEllipsizeText() const;
 
   /**
-   * A mechanism to retrieve layout information from the TextView.
+   * @brief A mechanism to retrieve layout information from the TextView.
    *
    * It produces a vector of CharcterLayoutInfo structures which describe the size and position of each character,
    * two vectors which maps the logical and visual positions of the characters in a bidirectional text, the size
@@ -516,7 +556,7 @@ public:
   void GetTextLayoutInfo( TextLayoutInfo& textLayoutInfo );
 
   /**
-   * Allows modification of text-actor's position in the depth sort algorithm.
+   * @brief Allows modification of text-actor's position in the depth sort algorithm.
    *
    * @see Dali::RenderableActor::SetSortModifier()
    * @param [in] depthOffset the offset to be given to the internal text-actors. Positive values pushing it further back.
@@ -524,7 +564,7 @@ public:
   void SetSortModifier( float depthOffset );
 
   /**
-   * Sets whether text-view renders text using a previously generated snapshot.
+   * @brief Sets whether text-view renders text using a previously generated snapshot.
    *
    * Rendering long text using a snapshot may increase performance. The default value is \e true (render using a snapshot).
    *
@@ -533,14 +573,14 @@ public:
   void SetSnapshotModeEnabled( bool enable );
 
   /**
-   * Retrieves whether text-view is using a snapshot to render text
+   * @brief Retrieves whether text-view is using a snapshot to render text.
    *
    * @return \e true if text-view is using a snapshot to render text, otherwhise it returns \e false.
    */
   bool IsSnapshotModeEnabled() const;
 
   /**
-   * Enables or disables the text scroll.
+   * @brief Enables or disables the text scroll.
    *
    * When scroll is enabled, snapshot mode will be enabled automatically. Equally, if scroll is disabled
    * the snapshot mode is restored to the previous value.
@@ -550,14 +590,14 @@ public:
   void SetScrollEnabled( bool enable );
 
   /**
-   * Retrieves whether the text scroll is enabled.
+   * @brief Retrieves whether the text scroll is enabled.
    *
    * @return \e true if the scroll is enabled.
    */
   bool IsScrollEnabled() const;
 
   /**
-   * Sets a new scroll position.
+   * @brief Sets a new scroll position.
    *
    * The new scroll position set could be trimmed if the text doesn't cover the whole text-view.
    * i.e. If a text-view is 100x100 and a text is 200x100 a scroll position beyond 50x0 will be trimmed to 50x0.
@@ -571,25 +611,25 @@ public:
   void SetScrollPosition( const Vector2& position );
 
   /**
-   * Recrieves current scroll position.
+   * @brief Recrieves current scroll position.
    *
    * @return The scroll position.
    */
   const Vector2& GetScrollPosition() const;
 
   /**
-   * Whether the last scroll position set was trimmed.
+   * @brief Whether the last scroll position set was trimmed.
    *
    * @return \e true if the last scroll position set was trimmed, otherwise \e false.
    */
   bool IsScrollPositionTrimmed() const;
 
 public:
-  // Signals
+  /// @brief Signal types
   typedef SignalV2< void ( TextView textView, Vector2 scrollDelta ) > ScrolledSignalV2;
 
   /**
-   * Signal emitted when the scroll position changes.
+   * @brief Signal emitted when the scroll position changes.
    *
    * A callback with the following prototype can be connected to this signal.
    *
@@ -597,19 +637,22 @@ public:
    *
    * \e textView is the handle of the text-view emitting the signal.
    * \e scrollDelta is the differente of the current scroll position with the previous one.
+   * @return The signal to connect to
    */
   ScrolledSignalV2& ScrolledSignal();
 
 public: // Not intended for application developers
 
   /**
-   * Creates a handle using the Toolkit::Internal implementation.
+   * @brief Creates a handle using the Toolkit::Internal implementation.
+   *
    * @param[in]  implementation  The Control implementation.
    */
   TextView( Internal::TextView& implementation );
 
   /**
-   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   TextView( Dali::Internal::CustomActor* internal );

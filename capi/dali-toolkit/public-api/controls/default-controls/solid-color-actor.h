@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_DEFAULT_CONTROLS_MODULE
  * @{
  */
 
@@ -33,7 +33,7 @@ namespace Toolkit
 {
 
 /**
- * Creates a Dali::ImageActor with a solid color, optionally it creates a border.
+ * @brief Creates a Dali::ImageActor with a solid color, optionally it creates a border.
  *
  * If the \e border parameter is set to \e true, the Dali::ImageActor's style is set to Dali::ImageActor::STYLE_NINE_PATCH.
  *
@@ -41,6 +41,7 @@ namespace Toolkit
  * @param[in] border If \e true, a border is created. By default, the value is set to \e false.
  * @param[in] borderColor The color for the ImageActor's border. By default, the value is set to Color::WHITE.
  * @param[in] borderSize The size for the ImageActor's border. By default, the value is set to 1 pixel. It supports under 10 pixel for clear result of gl blend
+ * @return a handle to the new ImageActor
  */
 ImageActor CreateSolidColorActor( const Vector4& color, bool border = false, const Vector4& borderColor = Color::WHITE, const unsigned int borderSize = 1 );
 

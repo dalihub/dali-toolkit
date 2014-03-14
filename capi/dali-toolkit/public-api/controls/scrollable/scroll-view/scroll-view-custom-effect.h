@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SCROLL_VIEW_MODULE
  * @{
  */
 
@@ -39,9 +39,8 @@ class ScrollViewCustomEffect;
 }
 
 /**
- * ScrollView Inner Cube-Effect.
+ * @brief This class has many transition effects for use when scrolling pages, e.g opacity, rotation, swing, translation.
  *
- * This effect cause each page in a scroll-view to rotate round an inner 3D cube.
  * It should be used on the following Actor hierarchy:
  *
  * ScrollView
@@ -61,6 +60,9 @@ class ScrollViewCustomEffect;
 class ScrollViewCustomEffect : public ScrollViewEffect
 {
 public:
+  /**
+   * @brief Bitflags for effect types.
+   */
   enum EFlag
   {
     FlagTranslate             = 0x0001,             ///< indicates that translation is wanted
@@ -109,96 +111,112 @@ public:
   };
 
   /**
-   * Create an initialized ScrollViewPageCubeEffect.
+   * @brief Create an initialized ScrollViewCustomEffect.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static ScrollViewCustomEffect New();
 
   /**
-   * Create an uninitialized ScrollViewPageCubeEffect; this can be initialized with ScrollViewPageCubeEffect::New()
-   * Calling member functions with an uninitialized Toolkit::ScrollViewPageCubeEffect is not allowed.
+   * @brief Create an uninitialized ScrollViewCustomEffect; this can be initialized with ScrollViewCustomEffect::New().
+   *
+   * Calling member functions with an uninitialized Toolkit::ScrollViewCustomEffect is not allowed.
    */
   ScrollViewCustomEffect();
 
   /**
-   * Downcast an Object handle to ScrollViewCustomEffect. If handle points to a ScrollViewCustomEffect the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to ScrollViewCustomEffect.
+   *
+   * If handle points to a ScrollViewCustomEffect the downcast
+   * produces valid handle. If not the returned handle is left
+   * uninitialized.
+   *
    * @param[in] handle Handle to an object
    * @return handle to a ScrollViewCustomEffect or an uninitialized handle
    */
   static ScrollViewCustomEffect DownCast( BaseHandle handle );
 
   /**
-   * @brief SetPageSpacing
+   * @brief SetPageSpacing.
+   *
    * @param spacing
    */
   void SetPageSpacing(const Vector2& spacing);
 
   /**
-   * @brief SetPageTranslation sets a simple translate on/off value
+   * @brief SetPageTranslation sets a simple translate on/off value.
+   *
    * @param translation
    */
   void SetPageTranslation(const Vector3& translation);
 
   /**
-   * @brief SetPageTranslation
+   * @brief SetPageTranslation.
+   *
    * @param translationIn
    * @param translationOut
    */
   void SetPageTranslation(const Vector3& translationIn, const Vector3& translationOut);
 
   /**
-   * @brief SetPageTranslationIn
+   * @brief SetPageTranslationIn.
    * @param translation
    */
   void SetPageTranslationIn(const Vector3& translation);
 
   /**
-   * @brief SetPageTranslationOut
+   * @brief SetPageTranslationOut.
+   *
    * @param translation
    */
   void SetPageTranslationOut(const Vector3& translation);
 
   /**
-   * @brief SetPageTranslateAlphaFunction
+   * @brief SetPageTranslateAlphaFunction.
+   *
    * @param func
    */
   void SetPageTranslateAlphaFunction(AlphaFunction func);
 
   /**
-   * @brief SetPageTranslateAlphaFunction
+   * @brief SetPageTranslateAlphaFunction.
+   *
    * @param funcIn
    * @param funcOut
    */
   void SetPageTranslateAlphaFunction(AlphaFunction funcIn, AlphaFunction funcOut);
 
   /**
-   * @brief SetPageTranslateAlphaFunctionIn
+   * @brief SetPageTranslateAlphaFunctionIn.
+   *
    * @param func
    */
   void SetPageTranslateAlphaFunctionIn(AlphaFunction func);
 
   /**
-   * @brief SetPageTranslateAlphaFunctionOut
+   * @brief SetPageTranslateAlphaFunctionOut.
    * @param func
    */
   void SetPageTranslateAlphaFunctionOut(AlphaFunction func);
 
   /**
-   * @brief SetGlobalPageRotation
+   * @brief SetGlobalPageRotation.
+   *
    * @param angle
    * @param axis
    */
   void SetGlobalPageRotation(float angle, const Vector3& axis);
 
   /**
-   * @brief SetAnglePageRotation uses the angle and page size passed in on creation to create a faked origin (inner cube needs this method)
+   * @brief SetAnglePageRotation uses the angle and page size passed in on creation to create a faked origin (inner cube needs this method).
+   *
    * @param angle
    */
   void SetAngledOriginPageRotation(const Vector3& angle);
 
   /**
-   * @brief SetGlobalPageRotation
+   * @brief SetGlobalPageRotation.
+   *
    * @param angleIn
    * @param axisIn
    * @param angleOut
@@ -207,54 +225,62 @@ public:
   void SetGlobalPageRotation(float angleIn, const Vector3& axisIn, float angleOut, const Vector3& axisOut);
 
   /**
-   * @brief SetGlobalPageRotationIn
+   * @brief SetGlobalPageRotationIn.
+   *
    * @param angle
    * @param axis
    */
   void SetGlobalPageRotationIn(float angle, const Vector3& axis);
 
   /**
-   * @brief SetGlobalPageRotationOut
+   * @brief SetGlobalPageRotationOut.
+   *
    * @param angle
    * @param axis
    */
   void SetGlobalPageRotationOut(float angle, const Vector3& axis);
 
   /**
-   * @brief SetPageRotationOrigin Set the origin to rotate all the pages around
+   * @brief SetPageRotationOrigin Set the origin to rotate all the pages around.
+   *
    *        - The default value is (0,0,0)
    * @param origin
    */
   void SetGlobalPageRotationOrigin(const Vector3& origin);
 
   /**
-   * @brief SetGlobalPageRotationOrigin
+   * @brief SetGlobalPageRotationOrigin.
+   *
    * @param originIn
    * @param originOut
    */
   void SetGlobalPageRotationOrigin(const Vector3& originIn, const Vector3& originOut);
 
   /**
-   * @brief SetGlobalPageRotationOriginIn
+   * @brief SetGlobalPageRotationOriginIn.
+   *
    * @param origin
    */
   void SetGlobalPageRotationOriginIn(const Vector3& origin);
 
   /**
-   * @brief SetGlobalPageRotationOriginOut
+   * @brief SetGlobalPageRotationOriginOut.
+   *
    * @param origin
    */
   void SetGlobalPageRotationOriginOut(const Vector3& origin);
 
   /**
-   * @brief SetSwingAngle
+   * @brief SetSwingAngle.
+   *
    * @param angle
    * @param axis
    */
   void SetSwingAngle(float angle, const Vector3& axis);
 
   /**
-   * @brief SetSwingAngle
+   * @brief SetSwingAngle.
+   *
    * @param angleIn
    * @param axisIn
    * @param angleOut
@@ -263,147 +289,169 @@ public:
   void SetSwingAngle(float angleIn, const Vector3& axisIn, float angleOut, const Vector3& axisOut);
 
   /**
-   * @brief SetSwingAngleIn
+   * @brief SetSwingAngleIn.
+   *
    * @param angle
    * @param axis
    */
   void SetSwingAngleIn(float angle, const Vector3& axis);
 
   /**
-   * @brief SetSwingAngleOut
+   * @brief SetSwingAngleOut.
+   *
    * @param angle
    * @param axis
    */
   void SetSwingAngleOut(float angle, const Vector3& axis);
 
   /**
-   * @brief SetSwingAngleAlphaFunction
+   * @brief SetSwingAngleAlphaFunction.
+   *
    * @param func
    */
   void SetSwingAngleAlphaFunction(AlphaFunction func);
 
   /**
-   * @brief SetSwingAngleAlphaFunction
+   * @brief SetSwingAngleAlphaFunction.
+   *
    * @param funcIn
    * @param funcOut
    */
   void SetSwingAngleAlphaFunction(AlphaFunction funcIn, AlphaFunction funcOut);
 
   /**
-   * @brief SetSwingAngleAlphaFunctionIn
+   * @brief SetSwingAngleAlphaFunctionIn.
+   *
    * @param func
    */
   void SetSwingAngleAlphaFunctionIn(AlphaFunction func);
 
   /**
-   * @brief SetSwingAngleAlphaFunctionOut
+   * @brief SetSwingAngleAlphaFunctionOut.
+   *
    * @param func
    */
   void SetSwingAngleAlphaFunctionOut(AlphaFunction func);
 
   /**
-   * @brief SetPageRotationOrigin Set the origin to rotate all the pages around
+   * @brief SetPageRotationOrigin Set the origin to rotate all the pages around.
+   *
    *        - The default value is (0,0,0)
    * @param anchor
    */
   void SetSwingAnchor(const Vector3& anchor);
 
   /**
-   * @brief SetSwingAnchor
+   * @brief SetSwingAnchor.
+   *
    * @param anchorIn
    * @param anchorOut
    */
   void SetSwingAnchor(const Vector3& anchorIn, const Vector3& anchorOut);
 
   /**
-   * @brief SetSwingAnchorIn
+   * @brief SetSwingAnchorIn.
+   *
    * @param anchor
    */
   void SetSwingAnchorIn(const Vector3& anchor);
 
   /**
-   * @brief SetSwingAnchorOut
+   * @brief SetSwingAnchorOut.
+   *
    * @param anchor
    */
   void SetSwingAnchorOut(const Vector3& anchor);
 
   /**
-   * @brief SetSwingAnchorAlphaFunction
+   * @brief SetSwingAnchorAlphaFunction.
+   *
    * @param func
    */
   void SetSwingAnchorAlphaFunction(AlphaFunction func);
 
   /**
-   * @brief SetSwingAnchorAlphaFunction
+   * @brief SetSwingAnchorAlphaFunction.
+   *
    * @param funcIn
    * @param funcOut
    */
   void SetSwingAnchorAlphaFunction(AlphaFunction funcIn, AlphaFunction funcOut);
 
   /**
-   * @brief SetSwingAnchorAlphaFunctionIn
+   * @brief SetSwingAnchorAlphaFunctionIn.
+   *
    * @param func
    */
   void SetSwingAnchorAlphaFunctionIn(AlphaFunction func);
 
   /**
-   * @brief SetSwingAnchorAlphaFunctionOut
+   * @brief SetSwingAnchorAlphaFunctionOut.
    * @param func
    */
   void SetSwingAnchorAlphaFunctionOut(AlphaFunction func);
 
   /**
-   * @brief SetOpacityThreshold
+   * @brief SetOpacityThreshold.
+   *
    * @param thresh
    */
   void SetOpacityThreshold(float thresh);
 
   /**
-   * @brief SetOpacityThreshold
+   * @brief SetOpacityThreshold.
+   *
    * @param threshIn
    * @param threshOut
    */
   void SetOpacityThreshold(float threshIn, float threshOut);
 
   /**
-   * @brief SetOpacityThresholdIn
+   * @brief SetOpacityThresholdIn.
+   *
    * @param thresh
    */
   void SetOpacityThresholdIn(float thresh);
 
   /**
-   * @brief SetOpacityThresholdOut
+   * @brief SetOpacityThresholdOut.
+   *
    * @param thresh
    */
   void SetOpacityThresholdOut(float thresh);
 
   /**
-   * @brief SetOpacityAlphaFunction
+   * @brief SetOpacityAlphaFunction.
+   *
    * @param func
    */
   void SetOpacityAlphaFunction(AlphaFunction func);
 
   /**
-   * @brief SetOpacityAlphaFunction
+   * @brief SetOpacityAlphaFunction.
+   *
    * @param funcIn
    * @param funcOut
    */
   void SetOpacityAlphaFunction(AlphaFunction funcIn, AlphaFunction funcOut);
 
   /**
-   * @brief SetOpacityAlphaFunctionIn
+   * @brief SetOpacityAlphaFunctionIn.
+   *
    * @param func
    */
   void SetOpacityAlphaFunctionIn(AlphaFunction func);
 
   /**
-   * @brief SetOpacityAlphaFunctionOut
+   * @brief SetOpacityAlphaFunctionOut.
+   *
    * @param func
    */
   void SetOpacityAlphaFunctionOut(AlphaFunction func);
 
   /**
-   * Applies the effect to a page
+   * @brief Applies the effect to a page.
+   *
    * @param page the page to apply this effect to
    * @param pageSize not needed, page size is determined by scroll view
 
@@ -413,7 +461,8 @@ public:
 protected:
 
   /**
-   * This constructor is used by Dali New() methods.
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
   ScrollViewCustomEffect( Internal::ScrollViewCustomEffect *impl );

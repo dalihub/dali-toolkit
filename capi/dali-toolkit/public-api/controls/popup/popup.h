@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_POPUP_MODULE
  * @{
  */
 
@@ -40,8 +40,7 @@ class Popup;
 class Button;
 
 /**
- * Popup contains content that can come into focus when
- * activated, and out of focus when deactivated.
+ * @brief Popup contains content that can come into focus when activated, and out of focus when deactivated.
  *
  * Content:
  *
@@ -65,10 +64,8 @@ class Button;
  *
  * Transition Effects:
  *
- * A popup can use various custom transition effects e.g.
- *
+ * A popup can use various custom transition effects, e.g.
  * Alpha fade, Scaling transition, position/rotation, shader effects.
- *
  */
 class Popup : public Control
 {
@@ -76,11 +73,11 @@ class Popup : public Control
 public:
 
   //Signal Names
-  static const char* const SIGNAL_TOUCHED_OUTSIDE;
-  static const char* const SIGNAL_HIDDEN;
+  static const char* const SIGNAL_TOUCHED_OUTSIDE; ///< name "touched-outside"
+  static const char* const SIGNAL_HIDDEN;          ///< name "hidden"
 
   /**
-   * Current popup state
+   * @brief Current popup state.
    */
   enum PopupState
   {
@@ -89,50 +86,61 @@ public:
     POPUP_SHOW,               ///< Shown (visible in default size)
   };
 
-  typedef SignalV2< void () > TouchedOutsideSignalV2;
-  typedef SignalV2< void () > HiddenSignalV2;
+  typedef SignalV2< void () > TouchedOutsideSignalV2; ///< Touched outside signal type.
+  typedef SignalV2< void () > HiddenSignalV2;         ///< Hidden signal type.
 
   /**
-   * Signal emitted when user has touched outside of the Dialog.
+   * @brief Signal emitted when user has touched outside of the Dialog.
    */
   TouchedOutsideSignalV2& OutsideTouchedSignal();
 
   /**
-   * Signal emitted when popup has been hidden.
+   * @brief Signal emitted when popup has been hidden.
    */
   HiddenSignalV2& HiddenSignal();
 
 public:
 
   /**
-   * Creates an empty Popup handle
+   * @brief Creates an empty Popup handle.
    */
   Popup();
 
   /**
-   * Copy constructor. Creates another handle that points to the same real object
+   * @brief Copy constructor.
+   *
+   * Creates another handle that points to the same real object
+   * @param[in] handle Handle to the copied object
    */
   Popup( const Popup& handle );
 
   /**
-   * Assignment operator. Changes this handle to point to another real object
+   * @brief Assignment operator.
+   *
+   * Changes this handle to point to another real object
+   * @param[in] handle Handle to the object
+   * @return A reference to this
    */
   Popup& operator=( const Popup& handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~Popup();
 
   /**
-   * Create the Poup control
+   * @brief Create the Poup control.
+   *
    * @return A handle to the Popup control.
    */
   static Popup New();
 
   /**
-   * Downcast an Object handle to Popup. If handle points to a Popup the
+   * @brief Downcast an Object handle to Popup.
+   *
+   * If handle points to a Popup the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @param[in] handle Handle to an object
    * @return handle to a Popup or an uninitialized handle
@@ -142,7 +150,7 @@ public:
 public:
 
   /**
-   * Sets the background image for this Popup.
+   * @brief Sets the background image for this Popup.
    *
    * The background is resized (stretched according to scale settings),
    * to the size of the Popup.
@@ -152,7 +160,7 @@ public:
   void SetBackgroundImage( Actor image );
 
   /**
-   * Sets a title for this Popup.
+   * @brief Sets a title for this Popup.
    *
    * By default a TextView is created with following settings: black color, split-by-word multi-line policy and split exceed policy.
    *
@@ -161,21 +169,21 @@ public:
   void SetTitle( const std::string& text );
 
   /**
-   * Sets a title for this Popup.
+   * @brief Sets a title for this Popup.
    *
    * @param[in] titleActor The TextView to appear as the heading for this Popup
    */
   void SetTitle( TextView titleActor );
 
   /**
-   * Gets the text (TextView) for this Popup.
+   * @brief Gets the text (TextView) for this Popup.
    *
    * @return The TextView representing this popup is returned.
    */
   TextView GetTitle() const;
 
   /**
-   * Adds a button to this Popup.
+   * @brief Adds a button to this Popup.
    *
    * Buttons are added to the bottom of the Popup and Centered.
    *
@@ -187,7 +195,7 @@ public:
   void AddButton( Button button );
 
   /**
-   * Sets state of Popup, such as HIDE, and SHOW.
+   * @brief Sets state of Popup, such as HIDE, and SHOW.
    *
    * The Popup will instantaneously jump to this state.
    *
@@ -196,7 +204,7 @@ public:
   void SetState( PopupState state );
 
   /**
-   * Sets state of Popup, such as HIDE, and SHOW.
+   * @brief Sets state of Popup, such as HIDE, and SHOW.
    *
    * The Popup will smoothly animate to this state.
    *
@@ -206,27 +214,28 @@ public:
   void SetState( PopupState state, float duration );
 
   /**
-   * Gets the state of the popup.
+   * @brief Gets the state of the popup.
+   *
    * @return The state of the popup.
    */
   PopupState GetState() const;
 
   /**
-   * Shows the popup.
+   * @brief Shows the popup.
    *
    * The Popup will animate to the SHOW state
    */
   void Show();
 
   /**
-   * Hides the popup.
+   * @brief Hides the popup.
    *
    * The Popup will animate to the HIDE state
    */
   void Hide();
 
   /**
-   * Shows the tail.
+   * @brief Shows the tail.
    *
    * The tail position is specified relative to it's Parent.
    * To display at top center for instace, pass:
@@ -241,20 +250,22 @@ public:
   void ShowTail(const Vector3& position);
 
   /**
-   * Hides the tail.
+   * @brief Hides the tail.
    */
   void HideTail();
 
 public: // Not intended for application developers
 
   /**
-   * Creates a handle using the Toolkit::Internal implementation.
+   * @brief Creates a handle using the Toolkit::Internal implementation.
+   *
    * @param[in]  implementation  The Control implementation.
    */
   Popup(Internal::Popup& implementation);
 
   /**
-   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   Popup( Dali::Internal::CustomActor* internal );

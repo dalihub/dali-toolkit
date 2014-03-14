@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SHADER_EFFECTS_MODULE
  * @{
  */
 
@@ -32,53 +32,58 @@ namespace Toolkit
 {
 
 /**
- * ImageRegionEffect is a custom shader effect to show only a region of an Image actor
+ * @brief ImageRegionEffect is a custom shader effect to show only a region of an Image actor.
  */
 class ImageRegionEffect : public ShaderEffect
 {
 public:
 
   /**
-   * Create an uninitialized ImageRegionEffect; this can be initialized with ImageRegionEffect::New()
+   * @brief Create an uninitialized ImageRegionEffect; this can be initialized with ImageRegionEffect::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   ImageRegionEffect();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~ImageRegionEffect();
 
   /**
-   * Create an initialized ~ImageRegionEffect.
+   * @brief Create an initialized ImageRegionEffect.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static ImageRegionEffect New();
 
   /**
-   * Set the top-left corner of the image region.
+   * @brief Set the top-left corner of the image region.
+   *
    * The coordinates are in percentage, (0,0) being the top-left and (1,1) the bottom right of the original image.
    * @param [in] point The top-left corner of the region.
    */
   void SetTopLeft(const Vector2& point);
 
   /**
-   * Set the bottom-right corner of the image region.
+   * @brief Set the bottom-right corner of the image region.
+   *
    * The coordinates are in percentage, (0,0) being the top-left and (1,1) the bottom right of the original image.
    * @param [in] point The bottom-right corner of the region.
    */
   void SetBottomRight(const Vector2& point);
 
   /**
-   * Get the name for the top-left point property
+   * @brief Get the name for the top-left point property.
+   *
    * which can be used in Animation API's
    * @return A std::string containing the property name
    */
   const std::string& GetTopLeftPropertyName() const;
 
   /**
-   * Get the name for the bottom-right point property
-   * which can be used in Animation API's
+   * @brief Get the name for the bottom-right point property which can be used in Animation APIs.
+   *
    * @return A std::string containing the property name
    */
   const std::string& GetBottomRightPropertyName() const;

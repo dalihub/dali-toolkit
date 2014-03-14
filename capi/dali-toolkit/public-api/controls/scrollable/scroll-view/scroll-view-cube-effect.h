@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SCROLL_VIEW_MODULE
  * @{
  */
 
@@ -41,9 +41,8 @@ class ScrollViewCubeEffect;
 }
 
 /**
- * ScrollView Cube-Effect.
+ * @brief This effect causes Actors to appear to rotate around a 3D cube.
  *
- * This effect causes Actors to appear to rotate around a 3D cube.
  * It should be used on the following Actor hierarchy:
  *
  * ScrollView
@@ -68,27 +67,33 @@ class ScrollViewCubeEffect : public ScrollViewEffect
 public:
 
   /**
-   * Create an initialized ScrollViewCubeEffect.
+   * @brief Create an initialized ScrollViewCubeEffect.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static ScrollViewCubeEffect New();
 
   /**
-   * Create an uninitialized ScrollViewCubeEffect; this can be initialized with ScrollViewCubeEffect::New()
+   * @brief Create an uninitialized ScrollViewCubeEffect; this can be initialized with ScrollViewCubeEffect::New().
+   *
    * Calling member functions with an uninitialized Toolkit::ScrollViewCubeEffect is not allowed.
    */
   ScrollViewCubeEffect();
 
   /**
-   * Downcast an Object handle to ScrollViewCubeEffect. If handle points to a ScrollViewCubeEffect the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to ScrollViewCubeEffect.
+   *
+   * If handle points to a ScrollViewCubeEffect the downcast produces
+   * valid handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle Handle to an object
    * @return handle to a ScrollViewCubeEffect or an uninitialized handle
    */
   static ScrollViewCubeEffect DownCast( BaseHandle handle );
 
   /**
-   * Manually apply effect to an Actor.
+   * @brief Manually apply effect to an Actor.
+   *
    * @param[in] child The child Actor to be affected by this effect.
    * @param[in] anchor The anchor point that the child actor should
    * rotate around when scrolling
@@ -103,7 +108,8 @@ public:
                     const Vector2& positionSwing);
 
   /**
-   * Manually apply effect to an Actor.
+   * @brief Manually apply effect to an Actor.
+   *
    * @param[in] child The child Actor to be affected by this effect.
    * @param[in] parentPage The parent page Actor to be used by this effect.
    * @param[in] anchor The anchor point that the child actor should
@@ -122,7 +128,8 @@ public:
 protected:
 
   /**
-   * This constructor is used by Dali New() methods.
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
   ScrollViewCubeEffect(Internal::ScrollViewCubeEffect *impl);

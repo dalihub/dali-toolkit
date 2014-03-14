@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SHADER_EFFECTS_MODULE
  * @{
  */
 
@@ -32,61 +32,70 @@ namespace Toolkit
 {
 
 /**
- * SwirlEffect is a custom shader effect to achieve swirl effects in Image actors
+ * @brief SwirlEffect is a custom shader effect to achieve swirl effects in Image actors.
  */
 class SwirlEffect : public ShaderEffect
 {
 public:
 
   /**
-   * Create an uninitialized SwirlEffect; this can be initialized with SwirlEffect::New()
+   * @brief Create an uninitialized SwirlEffect; this can be initialized with SwirlEffect::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   SwirlEffect();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~SwirlEffect();
 
   /**
-   * Create an initialized SwirlEffect.
+   * @brief Create an initialized SwirlEffect.
+   *
+   * @param[in] warp True if the effect should warp.
    * @return A handle to a newly allocated Dali resource.
    */
   static SwirlEffect New(bool warp);
 
   /**
-   * Set the angle of the swirl.
+   * @brief Set the angle of the swirl.
+   *
    * @param[in] angle The angle in float.
    */
   void SetAngle(float angle);
 
   /**
-   * Set the center of the swirl.
+   * @brief Set the center of the swirl.
+   *
    * @param[in] center The center in Vector2.
    */
   void SetCenter(const Vector2& center);
 
   /**
-   * Set the radius of the swirl.
+   * @brief Set the radius of the swirl.
+   *
    * @param[in] radius The radius in float.
    */
   void SetRadius(float radius);
 
   /**
-   * Get the name for the angle property
+   * @brief Get the name for the angle property.
+   *
    * @return A std::string containing the property name
    */
   const std::string& GetAnglePropertyName() const;
 
   /**
-   * Get the name for the center property
+   * @brief Get the name for the center property.
+   *
    * @return A std::string containing the property name
    */
   const std::string& GetCenterPropertyName() const;
 
   /**
-   * Get the name for the radius property
+   * @brief Get the name for the radius property.
+   *
    * @return A std::string containing the property name
    */
   const std::string& GetRadiusPropertyName() const;

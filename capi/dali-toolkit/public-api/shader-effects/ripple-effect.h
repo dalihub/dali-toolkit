@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SHADER_EFFECTS_MODULE
  * @{
  */
 
@@ -32,62 +32,70 @@ namespace Toolkit
 {
 
 /**
- * RippleEffect is a custom shader effect to achieve ripple effects on Image actors
+ * @brief RippleEffect is a custom shader effect to achieve ripple effects on Image actors.
  */
 class RippleEffect : public ShaderEffect
 {
 public:
 
   /**
-   * Create an uninitialized RippleEffect; this can be initialized with RippleEffect::New()
+   * @brief Create an uninitialized RippleEffect; this can be initialized with RippleEffect::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   RippleEffect();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~RippleEffect();
 
   /**
-   * Create an initialized RippleEffect.
+   * @brief Create an initialized RippleEffect.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static RippleEffect New();
 
   /**
-   * Set the amplitude of the effect.
+   * @brief Set the amplitude of the effect.
+   *
    * @param [in] amplitude The new amplitude.
    */
   void SetAmplitude(float amplitude);
 
   /**
-   * Set the center point of the effect as screen coordinates.
+   * @brief Set the center point of the effect as screen coordinates.
+   *
    * @param [in] center The new center point.
    */
   void SetCenter(const Vector2& center);
 
   /**
-   * Set the time duration for the ripple.
+   * @brief Set the time duration for the ripple.
+   *
    * @param[in] time The time duration in float.
    */
   void SetTime(float time);
 
   /**
-   * Get the name for the amplitude property
+   * @brief Get the name for the amplitude property.
+   *
    * @return A std::string containing the property name
    */
   const std::string& GetAmplitudePropertyName() const;
 
   /**
-   * Get the name for the center property
+   * @brief Get the name for the center property.
+   *
    * which can be used in Animation API's
    * @return A std::string containing the property name
    */
   const std::string& GetCenterPropertyName() const;
 
   /**
-   * Get the name for the time property
+   * @brief Get the name for the time property.
+   *
    * which can be used in Animation API's
    * @return A std::string containing the property name
    */

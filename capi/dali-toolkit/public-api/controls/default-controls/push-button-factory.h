@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_DEFAULT_CONTROLS_MODULE
  * @{
  */
 
@@ -33,7 +33,7 @@ namespace Toolkit
 {
 
 /**
- * Creates a push button with the given images.
+ * @brief Creates a push button with the given images.
  * Images will be shrunk to fit the button size keeping their aspect ratio.
  * @note Images won't be scaled to fill the whole button size.
  * @note If an image path is empty, this image is not set to the button.
@@ -43,12 +43,14 @@ namespace Toolkit
  * @param[in] backgroundImagePath        Image path to be shown as button background.
  * @param[in] dimmedReleasedImagePath    Image path to be shown when the button is released and dimmed.
  * @param[in] dimmedBackgroundImagePath  Image path to be shown as button background when the button is dimmed.
+ * @return A handle to the new push button
  */
 PushButton CreatePushButton( const std::string& releasedImagePath, const std::string& pressedImagePath, const std::string& backgroundImagePath,
                              const std::string& dimmedReleasedImagePath, const std::string& dimmedBackgroundImagePath );
 
 /**
- * Creates a push button with the given images.
+ * @brief Creates a push button with the given images.
+ *
  * Images will be shrunk to fit the button size keeping their aspect ratio.
  * @note Images won't be scaled to fill the whole button size.
  * @note If an image is an empty handle, this image is not set to the button.
@@ -58,25 +60,30 @@ PushButton CreatePushButton( const std::string& releasedImagePath, const std::st
  * @param[in] backgroundImageActor        Image to be shown as button background.
  * @param[in] dimmedReleasedImageActor    Image to be shown when the button is released and dimmed.
  * @param[in] dimmedBackgroundImageActor  Image to be shown as button background when the button is dimmed.
+ * @return A handle to the new pushbutton
  */
 PushButton CreatePushButton( Actor releasedImageActor, Actor pressedImageActor, Actor backgroundImageActor,
                              Actor dimmedReleasedImageActor, Actor dimmedBackgroundImageActor );
 
 /**
- * Creates a push button with the given background image.
+ * @brief Creates a push button with the given background image.
+ *
  * Background image will be shrunk to fit the button size keeping its aspect ratio.
  * @note Background image won't be scaled to fill the whole button size.
  *
  * @param[in] backgroundImagePath  Image path to be shown as button background.
+ * @return a handle to the new push button
  */
 PushButton CreatePushButton( const std::string& backgroundImagePath );
 
 /**
- * Creates a push button with the given background image.
+ * @brief Creates a push button with the given background image.
+ *
  * Background image will be shrunk to fit the button size keeping its aspect ratio.
  * @note Background image won't be scaled to fill the whole button size.
  *
  * @param[in] backgroundImageActor  Image to be shown as button background.
+ * @return a handle to the new push button
  */
 PushButton CreatePushButton( Actor backgroundImageActor );
 

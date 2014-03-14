@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SHADER_EFFECTS_MODULE
  * @{
  */
 
@@ -35,14 +35,14 @@ namespace Internal DALI_INTERNAL
 {
 
 /**
- * PageTurnEffect implementation class
+ * @brief PageTurnEffect implementation class.
  */
 class PageTurnEffect;
 
 } // namespace Internal
 
 /**
- * PageTurnEffect is a custom shader effect to achieve page turn effect for Image actors
+ * @brief PageTurnEffect is a custom shader effect to achieve page turn effect for Image actors.
  *
  * Usage example:-
  *
@@ -76,18 +76,20 @@ class PageTurnEffect : public ShaderEffect
 {
 public:
   /**
-   * Create an uninitialized PageTurnEffect; this can be initialized with PageTurnEffect::New()
+   * @brief Create an uninitialized PageTurnEffect; this can be initialized with PageTurnEffect::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   PageTurnEffect();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~PageTurnEffect();
 
   /**
-   * Create an initialized PageTurnEffect.
+   * @brief Create an initialized PageTurnEffect.
+   *
    * If fake shadow is used, need to apply the ShaderEffect::HINT_BLENDING
    * @param[in] enableBlending If true, apply HINT_BLENDING when creating the shader object; If false, disable the HINT_BLENDING
    * @return A handle to a newly allocated Dali resource.
@@ -95,37 +97,43 @@ public:
   static PageTurnEffect New( bool enableBlending = true );
 
   /**
-   * Set the page size of the PageTurnEffect.
+   * @brief Set the page size of the PageTurnEffect.
+   *
    * @param [in] pageSize The page size.
    */
   void SetPageSize(const Vector2& pageSize);
 
   /**
-   * Set the origin point of the PageTurnEffect, the position where the mouse/finger is pushed from.
+   * @brief Set the origin point of the PageTurnEffect, the position where the mouse/finger is pushed from.
+   *
    * @param [in] originalCenter The new origin point.
    */
   void SetOriginalCenter(const Vector2& originalCenter);
 
   /**
-   * Set the center point of the PageTurnEffect, the current position of touch motion.
+   * @brief Set the center point of the PageTurnEffect, the current position of touch motion.
+   *
    * @param [in] currentCenter The new center point.
    */
   void SetCurrentCenter(const Vector2& currentCenter);
 
   /**
-   * Set whether the current page is turning forward or backward
+   * @brief Set whether the current page is turning forward or backward.
+   *
    * @param [in] isTurningBack True for turning backward or False for turning forward
    */
   void SetIsTurningBack(bool isTurningBack);
 
   /**
-   * Set the width of shadow to be pageSize * shadowWidth
+   * @brief Set the width of shadow to be pageSize * shadowWidth.
+   *
    * @param [in] shadowWidth The width for the simulated shadow
    */
   void SetShadowWidth(float shadowWidth);
 
   /**
-   * Set the spine shadow parameter
+   * @brief Set the spine shadow parameter.
+   *
    * The two parameters are the major&minor radius (in pixels) to form an ellipse shape
    * The top-left quarter of this ellipse is used to calculate spine normal for simulating shadow
    * @param [in] spineShadowParameter The major&minor ellipse radius for the simulated spine shadow
@@ -133,19 +141,22 @@ public:
   void SetSpineShadowParameter(const Vector2& spineShadowParameter);
 
   /**
-   * Get the name for the page size property
+   * @brief Get the name for the page size property.
+   *
    * @return A std::string containing the property name
    */
   const std::string& GetPageSizePropertyName() const;
 
   /**
-  * Get the name for the origin center property
+  * @brief Get the name for the origin center property.
+  *
   * @return A std::string containing the property name
   */
   const std::string& GetOriginalCenterPropertyName() const;
 
   /**
-   * Get the name for the current center property
+   * @brief Get the name for the current center property.
+   *
    * which can be used in Animation API's
    * @return A std::string containing the property name
    */

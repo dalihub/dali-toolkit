@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SCROLL_VIEW_MODULE
  * @{
  */
 
@@ -45,17 +45,18 @@ class ScrollViewWobbleEffect;
 class ScrollView;
 class ScrollViewEffect;
 
-typedef std::vector<ScrollViewEffect> ScrollViewEffectContainer;
-typedef ScrollViewEffectContainer::iterator ScrollViewEffectIter;
-typedef ScrollViewEffectContainer::const_iterator ScrollViewEffectConstIter;
+typedef std::vector<ScrollViewEffect> ScrollViewEffectContainer; ///< Container of Dali::Toolkit::ScrollViewEffect%s
+typedef ScrollViewEffectContainer::iterator ScrollViewEffectIter; ///< Iterator for Dali::Toolkit::ScrollViewEffectContainer
+typedef ScrollViewEffectContainer::const_iterator ScrollViewEffectConstIter; ///< Const Iterator for Dali::Toolkit::ScrollViewEffectContainer
 
 /**
- * ScrollView Effect base class, used to apply custom
- * effects to a ScrollView instance. Such effects are
- * purely logical (i.e. physics), and may produce
- * properties that can be used with visual effects.
- * Such as creating constraints that are applied to ShaderEffects
- * or Actors using these properties as inputs.
+ * @brief ScrollView Effect base class, used to apply custom effects to a
+ * ScrollView instance.
+ *
+ * Such effects are purely logical (i.e. physics), and may produce
+ * properties that can be used with visual effects.  Such as creating
+ * constraints that are applied to ShaderEffects or Actors using these
+ * properties as inputs.
  */
 class ScrollViewEffect : public Dali::BaseHandle
 {
@@ -63,7 +64,8 @@ class ScrollViewEffect : public Dali::BaseHandle
 public:
 
   /**
-   * Create an uninitialized ScrollViewEffect; this can only be initialized with derived classes
+   * @brief Create an uninitialized ScrollViewEffect; this can only be initialized with derived classes.
+   *
    * Calling member functions with an uninitialized Toolkit::BaseObject is not allowed.
    */
   ScrollViewEffect();
@@ -71,7 +73,8 @@ public:
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods.
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
   ScrollViewEffect(Internal::ScrollViewEffect *impl);

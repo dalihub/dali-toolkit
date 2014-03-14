@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_IMAGE_VIEW_MODULE
  * @{
  */
 
@@ -37,8 +37,9 @@ class MaskedImageView;
 }
 
 /**
- * MaskedImageView displays the result of an image created from a masking operation, which is described below:
+ * @brief MaskedImageView displays the result of an image created from a masking operation.
  *
+ * Masking operations:
  *  - Firstly a target image size is chosen. The MaskedImageView handles the creation of this image internally. Initially the
  *    target image will be filled according to the BACKGROUND_COLOR property.
  *  - A source image is provided and positioned with the target image area. The position of the source image (in pixels), can
@@ -58,7 +59,7 @@ class MaskedImageView : public Control
 public:
 
   /**
-   * The custom properties installed by this control
+   * @brief The custom properties installed by this control.
    */
   enum CustomProperty
   {
@@ -71,13 +72,23 @@ public:
     CUSTOM_PROPERTY_COUNT
   };
 
+  /**
+   * @brief Edit mode for this control.
+   *
+   * @see SetEditMode()
+   */
   enum EditMode
   {
-    EDIT_DISABLED,
-    EDIT_SOURCE,
-    EDIT_MASK
+    EDIT_DISABLED, ///< Editting is disabled
+    EDIT_SOURCE,   ///< Editting affects the source image
+    EDIT_MASK      ///< Editting affects the mask
   };
 
+  /**
+   * @brief The rotation of the image.
+   *
+   * @see SetSourceRotation()
+   */
   enum ImageRotation
   {
     ROTATE_0,   ///< No rotation
@@ -89,29 +100,37 @@ public:
   static const float DEFAULT_MAXIMUM_SOURCE_SCALE; ///< Default SetMaximumSourceScale() value
 
   /**
-   * Creates an empty MaskedImageView handle
+   * @brief Creates an empty MaskedImageView handle.
    */
   MaskedImageView();
 
   /**
-   * Copy constructor. Creates another handle that points to the same real object
+   * @brief Copy constructor.
+   *
+   * Creates another handle that points to the same real object
    * @param handle to copy from
    */
   MaskedImageView( const MaskedImageView& handle );
 
   /**
-   * Assignment operator. Changes this handle to point to another real object
+   * @brief Assignment operator.
+   *
+   * Changes this handle to point to another real object
+   * @param[in] handle the handle of the object to re-assign this to
+   * @return a reference to this
    */
   MaskedImageView& operator=( const MaskedImageView& handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~MaskedImageView();
 
   /**
-   * Create the MaskedImageView control
+   * @brief Create the MaskedImageView control.
+   *
    * @param[in] targetWidth The width of the target image
    * @param[in] targetHeight The height of the target image
    * @param[in] sourceImage The source image
@@ -124,87 +143,103 @@ public:
                               Image maskImage );
 
   /**
-   * Downcast an Object handle to MaskedImageView. If handle points to an MaskedImageView the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to MaskedImageView.
+   *
+   * If handle points to an MaskedImageView the downcast produces
+   * valid handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle Handle to an object
    * @return handle to a MaskedImageView or an uninitialized handle
    */
   static MaskedImageView DownCast( BaseHandle handle );
 
   /**
-   * Set the image used as a source in the masking operation
+   * @brief Set the image used as a source in the masking operation.
+   *
    * @param[in] sourceImage The source image
    */
   void SetSourceImage( Image sourceImage );
 
   /**
-   * Retrieve the image used as a source in the masking operation
+   * @brief Retrieve the image used as a source in the masking operation.
+   *
    * @return sourceImage The source image
    */
   Image GetSourceImage();
 
   /**
-   * Set the image used as a mask in the masking operation
+   * @brief Set the image used as a mask in the masking operation.
+   *
    * @param[in] maskImage The mask image
    */
   void SetMaskImage( Image maskImage );
 
   /**
-   * Retrieve the image used as a mask in the masking operation
+   * @brief Retrieve the image used as a mask in the masking operation.
+   *
    * @return sourceImage The mask image
    */
   Image GetMaskImage();
 
   /**
-   * Get the property index for a custom MaskedImageView property.
+   * @brief Get the property index for a custom MaskedImageView property.
+   *
    * @param[in] customProperty A custom property enum defined in this class.
    * @return The property index e.g. for use with Animation::AnimateTo()
    */
   Property::Index GetPropertyIndex( CustomProperty customProperty ) const;
 
   /**
-   * Pause the masking operation to improve performance.
+   * @brief Pause the masking operation to improve performance.
+   *
    * Call this when the source & mask positions etc. are not being modified.
    */
   void Pause();
 
   /**
-   * Resume the masking operation.
+   * @brief Resume the masking operation.
+   *
    */
   void Resume();
 
   /**
-   * Query whether the masking operation has been paused.
+   * @brief Query whether the masking operation has been paused.
+   *
    * @return True if the masking operation has been paused.
    */
   bool IsPaused() const;
 
   /**
-   * Enable or disable an edit mode. The default is EDIT_DISABLED.
+   * @brief Enable or disable an edit mode.
+   *
+   * The default is EDIT_DISABLED.
    * @param[in] editMode The edit mode required.
    */
   void SetEditMode( EditMode editMode );
 
   /**
-   * Query which edit mode is enabled.
+   * @brief Query which edit mode is enabled.
    */
   EditMode GetEditMode() const;
 
   /**
-   * Set the aspect ratio to be preserved when editing the source image.
+   * @brief Set the aspect ratio to be preserved when editing the source image.
+   *
    * @param[in] widthOverHeight The aspect ratio i.e. width divided by height. If a value
    * of zero or less is set, then the aspect ratio of the source image will be ignored.
    */
   void SetSourceAspectRatio( float widthOverHeight );
 
   /**
-   * Query the aspect ratio preserved when editing the source image.
+   * @brief Query the aspect ratio preserved when editing the source image.
+   *
    * @return The aspect ratio (width divided by height) or zero if no aspect ratio is set.
    */
   float GetSourceAspectRatio() const;
 
   /**
-   * Set the maximum scale applied when editing the source image.
+   * @brief Set the maximum scale applied when editing the source image.
+   *
    * The minimum scale is implied by the target width/height i.e. the source image will
    * always fill that area when edit mode is enabled.
    * @param[in] scale The maximum scale.
@@ -212,49 +247,59 @@ public:
   void SetMaximumSourceScale( float scale );
 
   /**
-   * Query the maximum scale applied when editing the source image.
+   * @brief Query the maximum scale applied when editing the source image.
+   *
    * @return The maximum scale.
    */
   float GetMaximumSourceScale() const;
 
   /**
-   * Set the rotation applied to the source image.
+   * @brief Set the rotation applied to the source image.
+   *
    * @param[in] rotation The new rotation; by default the source image is not rotated (ROTATE_0).
    */
   void SetSourceRotation( ImageRotation rotation );
 
   /**
-   * Query the rotation applied to the source image.
+   * @brief Query the rotation applied to the source image.
+   *
    * @return The current rotation.
    */
   ImageRotation GetSourceRotation() const;
 
 public: /* Signals */
 
+  /// @brief Finished signal type.
   typedef SignalV2< void (MaskedImageView& source) > MaskedImageViewSignal;
 
   /**
-   * Signal emitted when the render task which targets the frame buffer of the masked image has finished.
+   * @brief Signal emitted when the render task which targets the
+   * frame buffer of the masked image has finished.
+   *
    * This signal carries information of the control handle to the callback function.
+   * @return the signal
    */
   MaskedImageViewSignal& MaskFinishedSignal();
 
   /**
    * @deprecated Use MaskFinishedSignal() instead.
    * Signal emitted when the render task which targets the frame buffer of the masked image has finished.
+   * @return the signal.
    */
   Dali::RenderTask::RenderTaskSignalV2& RenderFinishedSignal();
 
 public: // Not intended for application developers
 
   /**
-   * Creates a handle using the Toolkit::Internal implementation.
+   * @brief Creates a handle using the Toolkit::Internal implementation.
+   *
    * @param[in]  implementation  The Control implementation.
    */
   MaskedImageView(Internal::MaskedImageView& implementation);
 
   /**
-   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   MaskedImageView(Dali::Internal::CustomActor* internal);

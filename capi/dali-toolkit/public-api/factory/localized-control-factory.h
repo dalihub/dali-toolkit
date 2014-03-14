@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_FACTORY_MODULE
  * @{
  */
 
@@ -37,8 +37,8 @@ class LocalizedControlFactory;
 }
 
 /**
- * LocalizedControlFactory
- * This class provides functionality for creating controls which have localized text.
+ * @brief This class provides functionality for creating controls which have localized text.
+ *
  * This class keeps track of objects created using its factory methods, and updates them
  * when the system language changes.
  *
@@ -47,12 +47,12 @@ class LocalizedControlFactory;
  * localized text when language/locale changes.
  */
 
- class LocalizedControlFactory : public BaseHandle
- {
- public:
+class LocalizedControlFactory : public BaseHandle
+{
+public:
 
   /**
-   * Creates a localized TextView, which is automatically updated when the locale or language changes.
+   * @brief Creates a localized TextView, which is automatically updated when the locale or language changes.
    *
    * @pre The LocalizedControlFactory has been initialized.
    *
@@ -60,6 +60,7 @@ class LocalizedControlFactory;
    * @param textDomain The text domain for the localized text. Eg "sys_string"
    * @param textViewTheme A string containing style info about various properties of TextView for different
    *        locale/language.
+   * @return handle to a new localized TextView
    */
   static Dali::Toolkit::TextView CreateLocalizedTextView( const std::string& textID, const std::string& textDomain = "sys_string", const std::string& textViewTheme = "{}" );
 
@@ -67,24 +68,27 @@ class LocalizedControlFactory;
 private:
 
   /**
-   * Create a LocalizedControlFactory handle; this can be initialised with LocalizedControlFactory::New()
+   * @brief Create a LocalizedControlFactory handle; this can be initialised with LocalizedControlFactory::New().
+   *
    * Calling member functions with an uninitialised handle is not allowed.
    */
   LocalizedControlFactory();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~LocalizedControlFactory();
 
   /**
-   * Get the singleton of LocalizedControlFactory object.
+   * @brief Get the singleton of LocalizedControlFactory object.
+   *
    * @return A handle to the LocalizedControlFactory control.
    */
   static LocalizedControlFactory Get();
 
   /**
-   * Allows the creation of this Control from an Internal::LocalizedControlFactory pointer.
+   * @brief Allows the creation of this Control from an Internal::LocalizedControlFactory pointer.
+   *
    * @param[in]  impl  A pointer to the internal LocalizedControlFactory.
    */
   LocalizedControlFactory(Internal::LocalizedControlFactory *impl);

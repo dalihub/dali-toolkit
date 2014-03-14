@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_TEXT_INPUT_MODULE
  * @{
  */
 
@@ -37,7 +37,7 @@ class TextInput;
 }
 
 /**
- * TextInput Actor takes input one character at a time and displays it as a string within an input box.
+ * @brief TextInput Actor takes input one character at a time and displays it as a string within an input box.
  * Characters can be removed from the end of the string until it is empty. A maximum length of displayed string
  * can be set.
  */
@@ -47,93 +47,108 @@ class TextInput : public Control
 public:
 
   //Signal Names
-  static const char* const SIGNAL_START_INPUT;
-  static const char* const SIGNAL_END_INPUT;
-  static const char* const SIGNAL_STYLE_CHANGED;
-  static const char* const SIGNAL_MAX_INPUT_CHARACTERS_REACHED;
-  static const char* const SIGNAL_TOOLBAR_DISPLAYED;
-  static const char* const SIGNAL_TEXT_EXCEED_BOUNDARIES;
+  static const char* const SIGNAL_START_INPUT; ///< name "start-input"
+  static const char* const SIGNAL_END_INPUT; ///< name "end-input"
+  static const char* const SIGNAL_STYLE_CHANGED; ///< name "style-changed"
+  static const char* const SIGNAL_MAX_INPUT_CHARACTERS_REACHED; ///< name "max-input-characters-reached"
+  static const char* const SIGNAL_TOOLBAR_DISPLAYED; ///< name "toolbar-displayed"
+  static const char* const SIGNAL_TEXT_EXCEED_BOUNDARIES; ///< name "text-exceed-boundaries"
 
 public:
 
   /**
-   * Create an uninitialized TextInput; this can be initialized with TextView::New()
+   * @brief Create an uninitialized TextInput; this can be initialized with TextView::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   TextInput();
 
   /**
-   * Copy constructor.
+   * @brief Copy constructor.
+   *
    * @param handle to be copied
    */
   TextInput( const TextInput& handle );
 
   /**
-   * Assignment operator.
+   * @brief Assignment operator.
+   *
    * @param handle to object we want to point to
    * @return handle to the TextInput
    */
   TextInput& operator=( const TextInput& handle );
 
   /**
-   * Create an initialised TextInput.
+   * @brief Create an initialised TextInput.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static TextInput New();
 
   /**
-   * Downcast an Object handle to TextInput. If handle points to a TextInput the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to TextInput.
+   *
+   * If handle points to a TextInput the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle Handle to an object
    * @return handle to a TextInput or an uninitialized handle
    */
   static TextInput DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~TextInput();
 
   /**
-   * Get the inputed text currently being displayed.
+   * @brief Get the inputed text currently being displayed.
+   *
    * @return string, the currently displayed string.
    */
   std::string GetText() const;
 
   /**
-   * Get the inputed text currently being displayed together with mark-up tags.
+   * @brief Get the inputed text currently being displayed together with mark-up tags.
+   *
    * @return string, the currently displayed string with mark-up.
    */
   std::string GetMarkupText() const;
 
   /**
-   * Set the maximum number of characters for the Text Input
+   * @brief Set the maximum number of characters for the Text Input.
+   *
    * @param [in] maxChars the max number of characters
    */
   void SetMaxCharacterLength(std::size_t maxChars);
 
   /**
-   * Limits the number of lines of text Text Input will display
+   * @brief Limits the number of lines of text Text Input will display.
+   *
    * @param [in] maxLines the max number of lines to display, must be greater than 0.
    * Currently the only valid limit is 1. Which turns TextInput into Single line mode. Any number higher than 1 results in no limit.
    */
   void SetNumberOfLinesLimit(std::size_t maxLines);
 
   /**
-   * Returns the limit of lines Text Input is allowed to display.
+   * @brief Returns the limit of lines Text Input is allowed to display.
+   *
    * @return max line number limit
    */
   std::size_t GetNumberOfLinesLimit() const;
 
   /**
-   * Returns the number of characters TextInput is displaying.
+   * @brief Returns the number of characters TextInput is displaying.
+   *
    * @return number of characters
    */
   std::size_t GetNumberOfCharacters() const;
 
   /**
-   *  Sets a place holder text to be displayed when the text-input is empty.
+   *  @brief Sets a place holder text to be displayed when the text-input is empty.
+   *
    *  If not set or set to an empty string then no place holder will be shown.
    *  @param [in] placeHolderText text to be used as place holder.
    */
@@ -145,14 +160,16 @@ public:
   std::string GetPlaceholderText();
 
   /**
-   *  set initial text to be displayed in text-input
-   *  can be used to edit a pre-existing string
+   *  @brief set initial text to be displayed in text-input.
+   *
+   *  Can be used to edit a pre-existing string.
    *  @param [in] initialText text to be initially displayed
    */
   void SetInitialText(const std::string& initialText);
 
   /**
-   *  Manual method to set the focus on the TextInput so it starts or stops edit state
+   *  @brief Manual method to set the focus on the TextInput so it starts or stops edit state.
+   *
    *  @pre The text input actor has been initialised.
    *  @param[in] editMode true or false to indicate editMode on or off
    */
@@ -169,14 +186,16 @@ public:
    void SetEditable(bool editMode, const Vector2& touchPoint);
 
    /**
-    *  Check if TextInput is in edit state
+    *  @brief Check if TextInput is in edit state.
+    *
     *  @pre The text input actor has been initialised.
     *  @return  True or False to indicate editMode on or off
     */
    bool IsEditable() const;
 
    /**
-    * Method to enable or disable edit on touch/tap.
+    * @brief Method to enable or disable edit on touch/tap.
+    *
     * If not enabled (set to false) then SetEditable(true) will be used to start edit mode.
     * @pre The text input actor has been initialised.
     * @param[in] editOnTouch true or false to indicate if editing should start on touch
@@ -185,14 +204,16 @@ public:
    void SetEditOnTouch(bool editOnTouch = true);
 
    /**
-    *  Check if TextInput starts edit mode on touch
+    *  @brief Check if TextInput starts edit mode on touch.
+    *
     *  @pre The text input actor has been initialised.
     *  @return  True or False to indicate editOnTouch on or off
     */
    bool IsEditOnTouch() const;
 
    /**
-    *  Check if Text Selection is enabled so required text can be highlighted
+    *  @brief Check if Text Selection is enabled so required text can be highlighted.
+    *
     *  @pre The text input actor has been initialised.
     *  @param[in] textSelectable true or false to indicate if text can be selected or not
     *             default is for text to be select-able when in edit mode
@@ -200,21 +221,24 @@ public:
    void SetTextSelectable(bool textSelectable = true);
 
    /**
-    *  Check if Text can be selected
+    *  @brief Check if Text can be selected.
+    *
     *  @pre The text input actor has been initialised.
     *  @return  True or False to indicate if text can be selected or not
     */
    bool IsTextSelectable() const;
 
    /**
-    * Check if any text is currently selected, can be used to determine if ApplyStyle or SetActiveStyle should be used.
+    * @brief Check if any text is currently selected, can be used to determine if ApplyStyle or SetActiveStyle should be used.
+    *
     * @pre The text input actor has been initialised.
     * @return True if text selected else False
     */
    bool IsTextSelected() const;
 
    /**
-    * Selects text between the given positions
+    * @brief Selects text between the given positions.
+    *
     * @pre TextInput should be in edit mode.
     * @param start position to start selection
     * @param end position to end selection, inclusive of this character.
@@ -223,20 +247,23 @@ public:
    void SelectText(std::size_t start, std::size_t end);
 
    /**
-    * If any text is selected then de-select it and hide highlight.
+    * @brief If any text is selected then de-select it and hide highlight.
+    *
     * @pre The text input actor has been initialised.
     */
    void DeSelectText();
 
    /**
-    * Set the image to be used as the cursor grab hander
+    * @brief Set the image to be used as the cursor grab hander.
+    *
     * @pre The text input actor has been initialised.
     * @param[in] image The image to be used.
     */
    void SetGrabHandleImage( Image image );
 
    /**
-    * Set the image to be used for the regular left to right cursor
+    * @brief Set the image to be used for the regular left to right cursor.
+    *
     * @pre The text input actor has been initialised.
     * @param[in] image The image to be used.
     * @param[in] border The nine patch border for the image.
@@ -244,13 +271,16 @@ public:
    void SetCursorImage(Dali::Image image, const Vector4& border );
 
    /**
-    * Retrieve the selection handle size. Both handles have same size.
+    * @brief Retrieve the selection handle size.
+    *
+    * Both handles have same size.
     * @return Vector3 the selection handle size.
     */
    Vector3 GetSelectionHandleSize();
 
    /**
-    * Set the image to be used for the Right to Left cursor
+    * @brief Set the image to be used for the Right to Left cursor.
+    *
     * @pre The text input actor has been initialised.
     * @param[in] image The image to be used.
     * @param[in] border The nine patch border for the image.
@@ -258,20 +288,23 @@ public:
     void SetRTLCursorImage(Dali::Image image, const Vector4& border );
 
    /**
-    * Toggle to enable the grab handle, used to position cursor when magnifier not being used.
+    * @brief Toggle to enable the grab handle, used to position cursor when magnifier not being used.
+    *
     * Default behaviour is to use the magnifier to position the cursor, enabling this prevents the magnifier from being shown.
     * @param[in] toggle true to enable, false to disable grab handle
     */
    void EnableGrabHandle(bool toggle);
 
    /**
-    * Method to check if grab handle is enabled, if false then the magnifier will be used to position cursor.
+    * @brief Method to check if grab handle is enabled, if false then the magnifier will be used to position cursor.
+    *
     * @return bool returns true is grab handle enabled.
     */
    bool IsGrabHandleEnabled();
 
   /**
-   * Set the bounding rectangle which handles, popup and similar decorations will not exceed
+   * @brief Set the bounding rectangle which handles, popup and similar decorations will not exceed.
+   *
    * The default value is the width and height of the stage from the top left origin.
    * If a title bar for example is on the top of the screen then the y should be the title's height and
    * the boundary height the stage height minus the title's height.
@@ -290,14 +323,16 @@ public:
   void SetBoundingRectangle( const Rect<float>& boundingOriginAndSize );
 
   /**
-   * Retrieve the bounding box origin and dimensions
+   * @brief Retrieve the bounding box origin and dimensions.
+   *
    * default is set once control is added to stage, before this the return vector will be Vector4:ZERO
    * @return Rect the bounding rectangle
    */
   const Rect<float> GetBoundingRectangle() const;
 
    /**
-    * Sets the style for new text being typed.
+    * @brief Sets the style for new text being typed.
+    *
     * By default all style settings are applied but a bit mask could be used to modify only certain style settings.
     * @pre The text input actor has been initialised.
     * @param[in] style The style for the new text.
@@ -306,7 +341,8 @@ public:
    void SetActiveStyle( const TextStyle& style, const TextStyle::Mask mask = TextStyle::ALL );
 
    /**
-    * Applies the given style to the selected text.
+    * @brief Applies the given style to the selected text.
+    *
     * By default all style settings are applied but a bit mask could be used to modify only certain style settings.
     * Introduced text after this call uses the new style.
     * @param[in] style The given style.
@@ -315,7 +351,8 @@ public:
    void ApplyStyle( const TextStyle& style, const TextStyle::Mask mask = TextStyle::ALL );
 
    /**
-     * Applies the given style to all text, selected or not selected.
+     * @brief Applies the given style to all text, selected or not selected.
+     *
      * By default all style settings are applied but a bit mask could be used to modify only certain style settings.
      * @param[in] style The given style.
      * @param[in] mask The bit mask.
@@ -323,14 +360,15 @@ public:
    void ApplyStyleToAll( const TextStyle& style, const TextStyle::Mask mask = TextStyle::ALL );
 
    /**
-    * Get the style of the Text character before the cursor
+    * @brief Get the style of the Text character before the cursor.
+    *
     * If no character before then return the InputStyle.
     * @return TextStyle, the style of the character before the cursor
     */
    TextStyle GetStyleAtCursor() const;
 
   /**
-   * Set the current text alignment (overrides default setting)
+   * @brief Set the current text alignment (overrides default setting).
    *
    * The default alignment is dependent on the current text in the text field.
    * If the text begins using LTR characters (e.g. European text) then the
@@ -343,7 +381,8 @@ public:
   void SetTextAlignment( Toolkit::Alignment::Type align );
 
   /**
-   * Set the current line justification. (overrides default setting)
+   * @brief Set the current line justification. (overrides default setting).
+   *
    * The default justification is dependent on the current text in the text field.
    * If the text begins using LTR characters (e.g. European text) then the
    * justification is HorizontalLeft. If the text begins using RTL characters
@@ -355,7 +394,7 @@ public:
   void SetTextLineJustification( Toolkit::TextView::LineJustification justification );
 
   /**
-   * Sets a fade boundary.
+   * @brief Sets a fade boundary.
    *
    * @see TextView::FadeBoundary.
    *
@@ -364,7 +403,7 @@ public:
   void SetFadeBoundary( const Toolkit::TextView::FadeBoundary& fadeBoundary );
 
   /**
-   * Retrieves the fade boundary.
+   * @brief Retrieves the fade boundary.
    *
    * @see TextView::FadeBoundary.
    *
@@ -373,50 +412,58 @@ public:
   const Toolkit::TextView::FadeBoundary& GetFadeBoundary() const;
 
   /**
-   * Get the current text alignment combined into a single value.
+   * @brief Get the current text alignment combined into a single value.
+   *
    * The values can be tested by using the & operator
    * and the desired flag. e.g. if (GetTextAlignment() & HorizontalCentre) ...
+   * @return The combined text alignment
    */
   Toolkit::Alignment::Type GetTextAlignment() const;
 
   /**
-   * Sets how to split the text in lines policy.
+   * @brief Sets how to split the text in lines policy.
+   *
    * @param policy The multi-line policy.
    */
    void SetMultilinePolicy( Toolkit::TextView::MultilinePolicy policy );
 
   /**
-   * Gets the split in lines policy.
+   * @brief Gets the split in lines policy.
+   *
    * @return The multi-line policy.
    */
   Toolkit::TextView::MultilinePolicy GetMultilinePolicy() const;
 
   /**
-   * Sets how to display the text inside the TextView when it exceeds the text-view's width.
+   * @brief Sets how to display the text inside the TextView when it exceeds the text-view's width.
+   *
    * @param policy The exceed policy.
    */
   void SetWidthExceedPolicy( Toolkit::TextView::ExceedPolicy policy );
 
   /**
-   * Gets the width exceed policy.
+   * @brief Gets the width exceed policy.
+   *
    * @return The exceed policy.
    */
   TextView::ExceedPolicy GetWidthExceedPolicy() const;
 
   /**
-   * Sets how to display the text inside the TextView when it exceeds the text-view's height.
+   * @brief Sets how to display the text inside the TextView when it exceeds the text-view's height.
+   *
    * @param policy The exceed policy.
    */
   void SetHeightExceedPolicy( Toolkit::TextView::ExceedPolicy policy );
 
   /**
-   * Gets the height exceed policy.
+   * @brief Gets the height exceed policy.
+   *
    * @return The exceed policy.
    */
   TextView::ExceedPolicy GetHeightExceedPolicy() const;
 
   /**
-   * Sets if the inputed text can exceed the text-input boundary.
+   * @brief Sets if the inputed text can exceed the text-input boundary.
    *
    * By default is enabled.
    *
@@ -425,14 +472,14 @@ public:
   void SetExceedEnabled( bool enable );
 
   /**
-   * Retrieves whether inputed text can exceed the text-input boundary.
+   * @brief Retrieves whether inputed text can exceed the text-input boundary.
    *
    * @return \e true if text inputed can exceed the boundary, otherwise \e false.
    */
   bool GetExceedEnabled() const;
 
   /**
-   * Allows modification of text-actor's position in the depth sort algorithm.
+   * @brief Allows modification of text-actor's position in the depth sort algorithm.
    *
    * @see Dali::RenderableActor::SetSortModifier()
    * @param [in] depthOffset the offset to be given to the internal text-actors. Positive values pushing it further back.
@@ -440,7 +487,7 @@ public:
   void SetSortModifier( float depthOffset );
 
   /**
-   * Sets whether text-view renders text using a previously generated snapshot.
+   * @brief Sets whether text-view renders text using a previously generated snapshot.
    *
    * @see TextView::SetSnapshotModeEnabled()
    *
@@ -449,7 +496,7 @@ public:
   void SetSnapshotModeEnabled( bool enable );
 
   /**
-   * Retrieves whether text-view is using a snapshot to render text
+   * @brief Retrieves whether text-view is using a snapshot to render text.
    *
    * @see TextView::IsSnapshotModeEnabled()
    *
@@ -479,59 +526,71 @@ public:
 
 public: /* Signals */
 
-  // Input Signal
+  /// @brief Input Signal.
   typedef SignalV2< void ( TextInput textInput ) > InputSignalV2;
 
-  // Input style changed signal
+  /// @brief Input style changed signal.
   typedef SignalV2< void ( TextInput textInput, const TextStyle& style ) > StyleChangedSignalV2;
 
-  // Max input characters reached signal
+  /// @brief Max input characters reached signal.
   typedef SignalV2< void ( TextInput textInput ) > MaxInputCharactersReachedSignalV2;
 
-  // Input text exceeds boundaries signal
+  /// @brief Input text exceeds boundaries signal.
   typedef SignalV2< void ( TextInput textInput ) > InputTextExceedBoundariesSignalV2;
 
   /**
-   * Signal emitted when the Text-Input starts receiving input.
+   * @brief Signal emitted when the Text-Input starts receiving input.
    */
   InputSignalV2& InputStartedSignal();
 
   /**
-   * Signal emitted when the Text-Input is finished receiving input.
+   * @brief Signal emitted when the Text-Input is finished receiving input.
+   *
    * TextInput::GetText() can be called to get current text string.
+   * @return The signal to connect to
    */
   InputSignalV2& InputFinishedSignal();
 
   /**
-   * Signal emitted when the cut and paste toolbar is displayed.
+   * @brief Signal emitted when the cut and paste toolbar is displayed.
+   *
+   * @return The signal to connect to
    */
   InputSignalV2& CutAndPasteToolBarDisplayedSignal();
 
   /**
-   * Signal emitted when style changes.
+   * @brief Signal emitted when style changes.
+   *
+   * @return The signal to connect to
    */
   StyleChangedSignalV2& StyleChangedSignal();
 
   /**
-   * Signal emitted when max input characters are reached during text input.
+   * @brief Signal emitted when max input characters are reached during text input.
+   *
+   * @return The signal to connect to
    */
   MaxInputCharactersReachedSignalV2& MaxInputCharactersReachedSignal();
 
   /**
-   * Signal emitted when input text exceeds the boundaries of the text-input.
+   * @brief Signal emitted when input text exceeds the boundaries of the text-input.
+   *
+   * @return The signal to connect to
    */
   InputTextExceedBoundariesSignalV2& InputTextExceedBoundariesSignal();
 
 public: // Not intended for application developers
 
   /**
-   * Creates a handle using the Toolkit::Internal implementation.
+   * @brief Creates a handle using the Toolkit::Internal implementation.
+   *
    * @param[in]  implementation  The Control implementation.
    */
   TextInput(Internal::TextInput& implementation);
 
   /**
-   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   TextInput(Dali::Internal::CustomActor* internal );

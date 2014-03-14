@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SCROLL_VIEW_MODULE
  * @{
  */
 
@@ -36,33 +36,35 @@ namespace Internal DALI_INTERNAL
 class ScrollView;
 }
 
+/**
+ * @brief The snap type
+ */
 enum SnapType
 {
-  Snap,
-  Flick
+  Snap,  ///< Snap
+  Flick  ///< Flick
 };
 
 /**
- * DirectionBias types
+ * @brief DirectionBias types.
  */
 enum DirectionBias
 {
-  DirectionBiasLeft = -1,                                             ///< Bias scroll snap to Left
-  DirectionBiasNone = 0,                                              ///< Don't bias scroll snap
-  DirectionBiasRight = 1                                              ///< Bias scroll snap to Right
+  DirectionBiasLeft  = -1,  ///< Bias scroll snap to Left
+  DirectionBiasNone  =  0,  ///< Don't bias scroll snap
+  DirectionBiasRight =  1   ///< Bias scroll snap to Right
 };
 
 /**
- * RulerDomain class
- *
- * Used for specifying minimum/maximum extents of a ruler.
+ * @brief Used for specifying minimum/maximum extents of a ruler.
  */
 class RulerDomain
 {
 public:
 
   /**
-   * Creates Ruler domain allowing a point to traverse between min and max extents
+   * @brief Creates Ruler domain allowing a point to traverse between min and max extents.
+   *
    * @param[in] min Minimum extent (point cannot traverse less than this)
    * @param[in] max Maximum extent (point cannot traverse greater than this)
    * @param[in] enabled Whether domain has been enabled or not.
@@ -71,35 +73,39 @@ public:
 
 public:
 
-  float min;
-  float max;
-  bool enabled;
+  float min;    ///< Minimum extent (point cannot traverse less than this)
+  float max;    ///< Maximum extent (point cannot traverse greater than this)
+  bool enabled; ///< Whether domain has been enabled or not.
 
   /**
-   * Clamps value (x) from (min) to (max), an optional length parameter can be
-   * specifies to suggest that the subject is not a point but a line to that
-   * should be clamped.
+   * @brief Clamps value (x) from (min) to (max).
+   *
+   * An optional length parameter can be specified to suggest that the
+   * subject is not a point but a line to that should be clamped.
    *
    * @param[in] x X point to be clamped between (min) and (max) extents.
    * @param[in] length (optional) The Length of the line from (x) to (x + length) to be clamped.
    * @param[in] scale Scaling parameter which treats domain as scaled in calculations.
+   * @return The clamped value.
    */
   float Clamp(float x, float length = 0.0f, float scale = 1.0f) const;
 
   /**
-   * Clamps value (x) from (min) to (max), an optional length parameter can be
-   * specifies to suggest that the subject is not a point but a line to that
-   * should be clamped.
+   * @brief Clamps value (x) from (min) to (max).
+   *
+   * An optional length parameter can be specified to suggest that the
+   * subject is not a point but a line to that should be clamped.
    *
    * @param[in] x X point to be clamped between (min) and (max) extents.
    * @param[in] length (optional) The Length of the line from (x) to (x + length) to be clamped.
    * @param[in] scale Scaling parameter which treats domain as scaled in calculations.
    * @param[out] clamped Whether clamping occured and which size (None, Min or Max)
+   * @return The clamped value.
    */
   float Clamp(float x, float length, float scale, ClampState &clamped) const;
 
   /**
-   * Returns (max-min) size of ruler.
+   * @brief Returns (max-min) size of ruler.
    *
    * @return The size of the ruler from min to max.
    */
@@ -108,34 +114,34 @@ public:
 };
 
 /**
- * Ruler abstract class.
+ * @brief Abstract class to define scroll axes.
  *
- * Rulers are used to define axes, specifying whether they are traversable,
- * where their snap points are, and their domain.
+ * It can specify whether they are traversable, where their snap
+ * points are and their domain.
  */
 class Ruler : public RefObject
 {
 public:
-
+  /// @brief The type of the ruler
   enum RulerType {
-    Fixed,
-    Free
+    Fixed,  ///< A fixed ruler
+    Free    ///< A free ruler
   };
 
 public:
 
   /**
-   * Constructs ruler, defaulty enabled, with limitless domain.
+   * @brief Constructs ruler, default enabled, with limitless domain.
    */
   Ruler();
 
   /**
-   * Destructor - A reference counted object may only be deleted by calling Unreference()
+   * @brief Destructor - A reference counted object may only be deleted by calling Unreference().
    */
   virtual ~Ruler();
 
   /**
-   * Snaps (x) in accordance to the ruler settings.
+   * @brief Snaps (x) in accordance to the ruler settings.
    *
    * @param[in] x The input value on the ruler to be snapped.
    * @param[in] bias (optional) The biasing employed for snapping
@@ -147,7 +153,7 @@ public:
   virtual float Snap(float x, float bias = 0.5f) const = 0;
 
   /**
-   * Returns position from page, based on whatever the ruler
+   * @brief Returns position from page, based on whatever the ruler
    * defines as a page.
    *
    * If (wrap) is true, then will set volume to the number of
@@ -163,7 +169,7 @@ public:
   virtual float GetPositionFromPage(unsigned int page, unsigned int &volume, bool wrap) const = 0;
 
   /**
-   * Returns page from position, based on whatever the ruler
+   * @brief Returns page from position, based on whatever the ruler
    * defines as a page.
    *
    * If (wrap) is true, then will return a page wrapped within the domain.
@@ -175,7 +181,7 @@ public:
   virtual unsigned int GetPageFromPosition(float position, bool wrap) const = 0;
 
   /**
-   * Returns the total number of pages within this Ruler
+   * @brief Returns the total number of pages within this Ruler.
    *
    * @return The number of pages in the Ruler.
    */
@@ -183,84 +189,98 @@ public:
 
 public:
 
-  Ruler::RulerType GetType() const;
   /**
-   * Returns whether this axis has been enabled or not.
+   * @brief Gets the ruler type.
+   *
+   * @return The ruler type.
+   */
+  Ruler::RulerType GetType() const;
+
+  /**
+   * @brief Returns whether this axis has been enabled or not.
+   *
    * @return true if axis is enabled
    */
   bool IsEnabled() const;
 
   /**
-   * Enables ruler (ruler must be enabled in order to traverse along it)
+   * @brief Enables ruler (ruler must be enabled in order to traverse along it).
    */
   void Enable();
 
   /**
-   * Disables ruler
+   * @brief Disables ruler.
    */
   void Disable();
 
   /**
-   * Sets Domain
+   * @brief Sets Domain.
+   *
    * @param[in] domain Ruler domain object.
    */
   void SetDomain(RulerDomain domain);
 
   /**
-   * Gets Domain
+   * @brief Gets Domain.
+   *
    * @return The domain
    */
   const RulerDomain &GetDomain() const;
 
   /**
-   * Disables Domain (minimum/maximum extents for this axis)
+   * @brief Disables Domain (minimum/maximum extents for this axis).
    */
   void DisableDomain();
 
   /**
-   * Clamps value (x) from (min) to (max), an optional length parameter can be
-   * specifies to suggest that the subject is not a point but a line to that
-   * should be clamped.
+   * @brief Clamps value (x) from (min) to (max).
+   *
+   * An optional length parameter can be specified to suggest that the
+   * subject is not a point but a line that should be clamped.
    *
    * @param[in] x X point to be clamped between (min) and (max) extents.
    * @param[in] length (optional) The Length of the line from (x) to (x + length) to be clamped.
    * @param[in] scale Scaling parameter which treats domain as scaled in calculations.
+   * @return The clamped value.
    */
   float Clamp(float x, float length = 0.0f, float scale = 1.0f) const;
 
 
   /**
-   * Clamps value (x) from (min) to (max), an optional length parameter can be
-   * specifies to suggest that the subject is not a point but a line to that
-   * should be clamped.
+   * @brief Clamps value (x) from (min) to (max).
+   *
+   * An optional length parameter can be specified to suggest that the
+   * subject is not a point but a line to that should be clamped.
    *
    * @param[in] x X point to be clamped between (min) and (max) extents.
    * @param[in] length (optional) The Length of the line from (x) to (x + length) to be clamped.
    * @param[in] scale Scaling parameter which treats domain as scaled in calculations.
    * @param[out] clamped Whether clamping occured and which size (None, Min or Max)
+   * @return The clamped value.
    */
   float Clamp(float x, float length, float scale, ClampState &clamped) const;
 
   /**
-   * Snaps and Clamps (x) in accordance to ruler settings.
+   * @brief Snaps and Clamps (x) in accordance to ruler settings.
    *
    * @param[in] x value to be snapped in accordance to ruler snap value,
-   * and clamped in accordance to the ruler's domain (if set).
+   *            and clamped in accordance to the ruler's domain (if set).
    * @param[in] bias (optional) The biasing employed for snapping
-   * 0 floor input (floor x) "Used for Flick Left"
-   * 0.5 round input (floor x + 0.5) "Used for Release"
-   * 1 ceil input (floor x + 1.0) "Used for Flick Right"
+   *            0 floor input (floor x) "Used for Flick Left"
+   *            0.5 round input (floor x + 0.5) "Used for Release"
+   *            1 ceil input (floor x + 1.0) "Used for Flick Right"
    * @param[in] length (optional) The Length of the line from (x) to (x + length)
-   * to be clamped.
+   *            to be clamped.
    * @param[in] scale Scaling parameter which treats domain as scaled in calculations.
+   * @return the clamped value after snapping
    */
   float SnapAndClamp(float x, float bias = 0.5f, float length = 0.0f, float scale = 1.0f) const;
 
   /**
-   * Snaps and Clamps (x) in accordance to ruler settings.
+   * @brief Snaps and Clamps (x) in accordance to ruler settings.
    *
    * @param[in] x value to be snapped in accordance to ruler snap value,
-   * and clamped in accordance to the ruler's domain (if set).
+   *            and clamped in accordance to the ruler's domain (if set).
    * @param[in] bias (optional) The biasing employed for snapping
    * 0 floor input (floor x) "Used for Flick Left"
    * 0.5 round input (floor x + 0.5) "Used for Release"
@@ -269,27 +289,28 @@ public:
    * to be clamped.
    * @param[in] scale Scaling parameter which treats domain as scaled in calculations.
    * @param[out] clamped Whether clamping occured and which size (None, Min or Max)
+   * @return The clamped value after snapping
    */
   float SnapAndClamp(float x, float bias, float length, float scale, ClampState &clamped) const;
 
 protected:
 
-  RulerType mType;               ///< Type of Ruler (Fixed or Free)
-  bool mEnabled;
-  RulerDomain mDomain;
+  RulerType mType;               ///< Type of Ruler (Fixed or Free).
+  bool mEnabled;                 ///< If the ruler is enabled.
+  RulerDomain mDomain;           ///< The domain of the ruler.
 
 };
 
-typedef IntrusivePtr<Ruler> RulerPtr;
+typedef IntrusivePtr<Ruler> RulerPtr; ///< Pointer to Dali::Toolkit::Ruler object
 
 /**
- * DefaultRuler has no snapping, and has one single page.
+ * @brief Concrete implementation of Ruler that has no snapping and has one single page.
  */
 class DefaultRuler : public Ruler
 {
 public:
   /**
-   * DefaultRuler constructor
+   * @brief DefaultRuler constructor.
    */
   DefaultRuler();
 
@@ -315,13 +336,15 @@ public:
 };
 
 /**
- * FixedRuler has fixed snapping, and contains
+ * @brief Concrete implementation of Ruler that has fixed snapping.
  */
 class FixedRuler : public Ruler
 {
 public:
   /**
-   *@param[in] spacing The spacing between each interval on this ruler
+   * @brief Constructor
+   *
+   * @param[in] spacing The spacing between each interval on this ruler.
    */
   FixedRuler(float spacing = 1.0f);
 
@@ -346,29 +369,30 @@ public:
   virtual unsigned int GetTotalPages() const;
 
 private:
-  float mSpacing;
+  float mSpacing; ///< The spacing between each interval
 };
 
 class ScrollViewEffect;
 class ScrollView;
 
 /**
- * ScrollView contains actors that can be scrolled manually (via touch)
+ * @brief ScrollView contains actors that can be scrolled manually (via touch)
  * or automatically.
  */
 class ScrollView : public Scrollable
 {
 public:
+  /// Page effect types
   enum PageEffect
   {
-    PageEffectNone,                                             ///< No Effect (Standard ScrollView)
-    PageEffectOuterCube,                                         ///< 3D Rotating Cube Effect
-    PageEffectDepth,                                        ///< Depth Effect
-    PageEffectInnerCube,                                     ///< Page Cube Effect
-    PageEffectCarousel,                                     ///< Page Carousel Effect
-    PageEffectSpiral,                                       ///< Page Spiral Effect
+    PageEffectNone,      ///< No Effect (Standard ScrollView)
+    PageEffectOuterCube, ///< 3D Rotating Cube Effect
+    PageEffectDepth,     ///< Depth Effect
+    PageEffectInnerCube, ///< Page Cube Effect
+    PageEffectCarousel,  ///< Page Carousel Effect
+    PageEffectSpiral,    ///< Page Spiral Effect
 
-    Total
+    Total                ///< The total number of effect types
   };
 
   // Custom properties
@@ -402,8 +426,9 @@ public:
   static const float DEFAULT_MAX_FLICK_SPEED;                           ///< Default Maximum flick speed. (in stage diagonals per second)
 
   //Signal Names
-  static const char* const SIGNAL_SNAP_STARTED;
+  static const char* const SIGNAL_SNAP_STARTED; ///< Name "snap-started"
 
+  /// Direction of transitions
   enum EDirectionFlag
   {
     DirectionFlagLeft               = 0x01,
@@ -419,21 +444,21 @@ public:
 public:
 
   /**
-   * Snap signal event's data.
+   * @brief Snap signal event's data.
    */
   struct SnapEvent
   {
-    SnapType type;                                                      ///< Current snap commencing
-    Vector3 position;                                                   ///< Target snap position
-    Vector3 scale;                                                      ///< Target snap scale
-    float rotation;                                                     ///< Target snap rotation
-    float duration;                                                     ///< Duration of snap animation.
+    SnapType type;    ///< Current snap commencing
+    Vector3 position; ///< Target snap position
+    Vector3 scale;    ///< Target snap scale
+    float rotation;   ///< Target snap rotation
+    float duration;   ///< Duration of snap animation.
   };
 
-  typedef SignalV2< void ( const SnapEvent& ) > SnapStartedSignalV2;
+  typedef SignalV2< void ( const SnapEvent& ) > SnapStartedSignalV2; ///< SnapStarted signal type
 
   /**
-   * Signal emitted when the ScrollView has started to snap or flick (it tells the target
+   * @brief Signal emitted when the ScrollView has started to snap or flick (it tells the target
    * position, scale, rotation for the snap or flick)
    */
   SnapStartedSignalV2& SnapStartedSignal();
@@ -441,36 +466,48 @@ public:
 public:
 
   /**
-   * Creates an empty ScrollView handle
+   * @brief Creates an empty ScrollView handle.
    */
   ScrollView();
 
   /**
-   * Copy constructor. Creates another handle that points to the same real object
-   * @param handle to copy from
+   * @brief Copy constructor.
+   *
+   * Creates another handle that points to the same real object
+   *
+   * @param[in] handle to copy from
    */
   ScrollView( const ScrollView& handle );
 
   /**
-   * Assignment operator. Changes this handle to point to another real object
+   * @brief Assignment operator.
+   *
+   * Changes this handle to point to another real object
+   * @param[in] handle The handle to copy from
+   * @return A reference to this
    */
   ScrollView& operator=( const ScrollView& handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~ScrollView();
 
   /**
-   * Create an initialized ScrollView.
+   * @brief Create an initialized ScrollView.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static ScrollView New();
 
   /**
-   * Downcast an Object handle to ScrollView. If handle points to a ScrollView the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to ScrollView.
+   *
+   * If handle points to a ScrollView the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle Handle to an object
    * @return handle to a ScrollView or an uninitialized handle
    */
@@ -479,35 +516,36 @@ public:
 public:
 
   /**
-   * Get snap-animation's AlphaFunction
+   * @brief Get snap-animation's AlphaFunction.
    *
    * @return Current easing alpha function of the snap animation.
    */
   AlphaFunction GetScrollSnapAlphaFunction() const;
 
   /**
-   * Set snap-animation's AlphaFunction
+   * @brief Set snap-animation's AlphaFunction.
    *
    * @param[in] alpha Easing alpha function of the snap animation.
    */
   void SetScrollSnapAlphaFunction(AlphaFunction alpha);
 
   /**
-   * Get flick-animation's AlphaFunction
+   * @brief Get flick-animation's AlphaFunction.
    *
    * @return Current easing alpha function of the flick animation.
    */
   AlphaFunction GetScrollFlickAlphaFunction() const;
 
   /**
-   * Set flick-animation's AlphaFunction
+   * @brief Set flick-animation's AlphaFunction.
    *
    * @param[in] alpha Easing alpha function of the flick animation.
    */
   void SetScrollFlickAlphaFunction(AlphaFunction alpha);
 
   /**
-   * Gets the time for the scroll snap-animation
+   * @brief Gets the time for the scroll snap-animation.
+   *
    * This animation occurs when the user drags, and releases.
    *
    * @return The time in seconds for the animation to take.
@@ -515,7 +553,8 @@ public:
   float GetScrollSnapDuration() const;
 
   /**
-   * Sets the time for the scroll snap-animation
+   * @brief Sets the time for the scroll snap-animation.
+   *
    * This animation occurs when the user drags, and releases.
    *
    * @param[in] time The time in seconds for the animation to take.
@@ -523,7 +562,8 @@ public:
   void SetScrollSnapDuration(float time);
 
   /**
-   * Gets the time for the scroll flick-animation
+   * @brief Gets the time for the scroll flick-animation.
+   *
    * This animation occurs when the user flicks scroll view.
    *
    * @return The time in seconds for the animation to take.
@@ -531,7 +571,8 @@ public:
   float GetScrollFlickDuration() const;
 
   /**
-   * Sets the time for the scroll flick-animation
+   * @brief Sets the time for the scroll flick-animation.
+   *
    * This animation occurs when the user flicks scroll view.
    *
    * @param[in] time The time in seconds for the animation to take.
@@ -539,7 +580,9 @@ public:
   void SetScrollFlickDuration(float time);
 
   /**
-   * Set X axis ruler. Defines how scrolling horizontally is snapped, and
+   * @brief Set X axis ruler.
+   *
+   * Defines how scrolling horizontally is snapped, and
    * the boundary (domain) in which the ScrollView can pan.
    *
    * @param[in] ruler The ruler to be used for the X axis
@@ -547,31 +590,37 @@ public:
   void SetRulerX(RulerPtr ruler);
 
   /**
-   * Set Y axis ruler. Defines how scrolling vertically is snapped, and
-   * the boundary (domain) in which the ScrollView can pan.
+   * @brief Set Y axis ruler.
+   *
+   * Defines how scrolling vertically is snapped, and the boundary
+   * (domain) in which the ScrollView can pan.
    *
    * @param[in] ruler The ruler to be used for the Y axis
    */
   void SetRulerY(RulerPtr ruler);
 
   /**
-   * Set Scale-X axis ruler. Defines how scaling horizontally is snapped, and
-   * the extent (domain) to which scaling can be performed e.g. 10% to 200%
+   * @brief Set Scale-X axis ruler.
+   *
+   * Defines how scaling horizontally is snapped, and the extent
+   * (domain) to which scaling can be performed e.g. 10% to 200%
    *
    * @param[in] ruler The ruler to be used for the Scale-X axis
    */
   void SetRulerScaleX(RulerPtr ruler);
 
   /**
-   * Set Scale-Y axis ruler. Defines how scaling vertically is snapped, and
-   * the extent (domain) to which scaling can be performed e.g. 10% to 200%
+   * @brief Set Scale-Y axis ruler.
+   *
+   * Defines how scaling vertically is snapped, and the extent
+   * (domain) to which scaling can be performed e.g. 10% to 200%
    *
    * @param[in] ruler The ruler to be used for the Scale-Y axis
    */
   void SetRulerScaleY(RulerPtr ruler);
 
   /**
-   * Set Scroll's touch sensitivity.
+   * @brief Set Scroll's touch sensitivity.
    *
    * @note Unlike SetSensitive(), this determines whether this ScrollView
    * should react (e.g. pan), without disrupting the sensitivity of it's children.
@@ -581,9 +630,12 @@ public:
   void SetScrollSensitive(bool sensitive);
 
   /**
-   * Set maximum overshoot amount. The final overshoot value is within 0.0f to 1.0f,
-   * but the maximum overshoot is in pixels (e.g. if you scroll 75 pixels beyond the edge of a scrollable
-   * area and the maximum overshoot is 100 then the final overshoot value will be 0.75f)
+   * @brief Set maximum overshoot amount.
+   *
+   * The final overshoot value is within 0.0f to 1.0f, but the maximum
+   * overshoot is in pixels (e.g. if you scroll 75 pixels beyond the
+   * edge of a scrollable area and the maximum overshoot is 100 then
+   * the final overshoot value will be 0.75f)
    *
    * @param[in] overshootX the maximum number of horizontally scrolled pixels before overshoot X reaches 1.0f
    * @param[in] overshootY the maximum number of vertically scrolled pixels before overshoot Y reaches 1.0f
@@ -591,14 +643,14 @@ public:
   void SetMaxOvershoot(float overshootX, float overshootY);
 
   /**
-   * Set Snap Overshoot animation's AlphaFunction
+   * @brief Set Snap Overshoot animation's AlphaFunction.
    *
    * @param[in] alpha Easing alpha function of the overshoot snap animation.
    */
   void SetSnapOvershootAlphaFunction(AlphaFunction alpha);
 
   /**
-   * Set Snap Overshoot animation's Duration
+   * @brief Set Snap Overshoot animation's Duration.
    *
    * @note Set duration to 0 seconds, to disable Animation.
    *
@@ -607,7 +659,7 @@ public:
   void SetSnapOvershootDuration(float duration);
 
   /**
-   * Sets Touches required for pan gestures.
+   * @brief Sets Touches required for pan gestures.
    *
    * Panning requires number of touches to be within (minTouches) and
    * (maxTouches).
@@ -625,7 +677,7 @@ public:
   void SetTouchesRequiredForPanning(unsigned int minTouches = 1, unsigned int maxTouches = 1, bool endOutside = true);
 
   /**
-   * Enables or Disables Actor Auto-Snap mode.
+   * @brief Enables or Disables Actor Auto-Snap mode.
    *
    * When Actor Auto-Snap mode has been enabled, ScrollView will automatically
    * snap to the closest actor (The closest actor will appear in the center of
@@ -636,7 +688,7 @@ public:
   void SetActorAutoSnap(bool enable);
 
   /**
-   * Enables or Disables Wrap mode for ScrollView contents.
+   * @brief Enables or Disables Wrap mode for ScrollView contents.
    *
    * When enabled, the ScrollView contents are wrapped over the X/Y Domain.
    *
@@ -648,18 +700,18 @@ public:
   void SetWrapMode(bool enable);
 
   /**
-   * Gets the current refresh interval in milliseconds.
+   * @brief Gets the current refresh interval in milliseconds.
    *
    * @return Current refresh interval in milliseconds
    */
   int GetRefreshInterval() const;
 
   /**
-   * Sets the refresh interval in milliseconds.
+   * @brief Sets the refresh interval in milliseconds.
    *
    * The refresh interval is a notification signal
-   * (SignalScrollUpdate), that is periodically fired
-   * when scrolling animation is occuring.
+   * (SignalScrollUpdate), that is periodically fired when scrolling
+   * animation is occuring.
    *
    * When set to 0. No update signals are sent.
    *
@@ -668,14 +720,14 @@ public:
   void SetRefreshInterval(int milliseconds);
 
   /**
-   * Returns state of Axis Auto Lock mode.
+   * @brief Returns state of Axis Auto Lock mode.
    *
    * @return Whether Axis Auto Lock mode has been enabled or not.
    */
   bool GetAxisAutoLock() const;
 
   /**
-   * Enables or Disables Axis Auto Lock mode for panning within the ScrollView
+   * @brief Enables or Disables Axis Auto Lock mode for panning within the ScrollView.
    *
    * When enabled, any pan gesture that appears mostly horizontal or mostly
    * vertical, will be automatically restricted to horizontal only or vertical
@@ -686,16 +738,19 @@ public:
   void SetAxisAutoLock(bool enable);
 
   /**
-   * Gets the gradient threshold at which a panning gesture should be locked to the
-   * Horizontal or Vertical axis.
+   * @brief Gets the gradient threshold at which a panning gesture
+   * should be locked to the Horizontal or Vertical axis.
+   *
    * @return The gradient, a value between 0.0 and 1.0f.
    */
   float GetAxisAutoLockGradient() const;
 
   /**
-   * Sets the gradient threshold at which a panning gesture should be locked to the
-   * Horizontal or Vertical axis. by default this is 0.36 (0.36:1) which means angles
-   * less than 20 degrees to an axis will lock to that axis.
+   * @brief Sets the gradient threshold at which a panning gesture should be locked to the
+   * Horizontal or Vertical axis.
+   *
+   * By default this is 0.36 (0.36:1) which means angles less than 20
+   * degrees to an axis will lock to that axis.
    *
    * @note: Specifying a value of 1.0 (the maximum value accepted) indicates that
    * all panning gestures will auto-lock. Either to the horizontal or vertical axis.
@@ -705,8 +760,9 @@ public:
   void SetAxisAutoLockGradient(float gradient);
 
   /**
-   * Gets the friction coefficient setting for ScrollView when
+   * @brief Gets the friction coefficient setting for ScrollView when
    * flicking in free panning mode.
+   *
    * This is a value in stage-diagonals per second^2.
    * stage-diagonal = Length( stage.width, stage.height )
    * @return Friction coefficient is returned.
@@ -714,8 +770,9 @@ public:
   float GetFrictionCoefficient() const;
 
   /**
-   * Sets the friction coefficient for ScrollView when
-   * flicking in free panning mode.
+   * @brief Sets the friction coefficient for ScrollView when flicking
+   * in free panning mode.
+   *
    * This is a value in stage-diagonals per second^2.
    * stage-diagonal = Length( stage.width, stage.height ).
    * example:
@@ -727,8 +784,9 @@ public:
   void SetFrictionCoefficient(float friction);
 
   /**
-   * Gets the flick speed coefficient for ScrollView when
+   * @brief Gets the flick speed coefficient for ScrollView when
    * flicking in free panning mode.
+   *
    * This is a constant which multiplies the input touch
    * flick velocity to determine the actual velocity at
    * which to move the scrolling area.
@@ -737,8 +795,9 @@ public:
   float GetFlickSpeedCoefficient() const;
 
   /**
-   * Sets the flick speed coefficient for ScrollView when
+   * @brief Sets the flick speed coefficient for ScrollView when
    * flicking in free panning mode.
+   *
    * This is a constant which multiplies the input touch
    * flick velocity to determine the actual velocity at
    * which to move the scrolling area.
@@ -747,8 +806,9 @@ public:
   void SetFlickSpeedCoefficient(float speed);
 
   /**
-   * Gets the maximum flick speed setting for ScrollView when
+   * @brief Gets the maximum flick speed setting for ScrollView when
    * flicking in free panning mode.
+   *
    * This is a value in stage-diagonals per second.
    * stage-diagonal = Length( stage.width, stage.height )
    * @return Maximum flick speed is returned
@@ -756,8 +816,9 @@ public:
   float GetMaxFlickSpeed() const;
 
   /**
-   * Sets the maximum flick speed for the ScrollView when
+   * @brief Sets the maximum flick speed for the ScrollView when
    * flicking in free panning mode.
+   *
    * This is a value in stage-diagonals per second.
    * stage-diagonal = Length( stage.width, stage.height )
    * example:
@@ -769,15 +830,17 @@ public:
   void SetMaxFlickSpeed(float speed);
 
   /**
-   * Gets the step of scroll distance in actor coordinates for
+   * @brief Gets the step of scroll distance in actor coordinates for
    * each mouse wheel event received in free panning mode.
+   *
    * @return The step of scroll distance(pixel) in X and Y axes.
    */
   Vector2 GetMouseWheelScrollDistanceStep() const;
 
   /**
-   * Sets the step of scroll distance in actor coordinates for
+   * @brief Sets the step of scroll distance in actor coordinates for
    * each mouse wheel event received in free panning mode.
+   *
    * @param[in] step The step of scroll distance(pixel) in X and Y axes.
    *
    * @note: If snap points are defined in the rulers, it will always
@@ -788,23 +851,24 @@ public:
   void SetMouseWheelScrollDistanceStep(Vector2 step);
 
   /**
-   * Retrieves current scroll position.
+   * @brief Retrieves current scroll position.
    *
    * @returns The current scroll position.
    */
   Vector3 GetCurrentScrollPosition() const;
 
   /**
-   * Retrieves current scroll scale.
+   * @brief Retrieves current scroll scale.
    *
    * @returns The current scroll scale.
    */
   Vector3 GetCurrentScrollScale() const;
 
   /**
-   * Retrieves current scroll page based on ScrollView dimensions being
-   * the size of one page, and all pages laid out in a grid fashion,
-   * increasing from left to right until the end of the X-domain.
+   * @brief Retrieves current scroll page based on ScrollView
+   * dimensions being the size of one page, and all pages laid out in
+   * a grid fashion, increasing from left to right until the end of
+   * the X-domain.
    *
    * @note: Pages start from 0 as the first page, not 1.
    *
@@ -813,7 +877,7 @@ public:
   unsigned int GetCurrentPage() const;
 
   /**
-   * Transforms View to position, scale and rotation specified
+   * @brief Transforms View to position, scale and rotation specified.
    *
    * @param[in] position The position to transform to.
    * @param[in] scale The scale to transform to.
@@ -822,7 +886,7 @@ public:
   void TransformTo(const Vector3& position, const Vector3& scale, float rotation);
 
   /**
-   * Transforms View to position, scale and rotation specified
+   * @brief Transforms View to position, scale and rotation specified.
    *
    * @param[in] position The position to transform to.
    * @param[in] scale The scale to transform to.
@@ -832,7 +896,8 @@ public:
   void TransformTo(const Vector3& position, const Vector3& scale, float rotation, float duration);
 
   /**
-   * Scrolls View to position specified (contents will scroll to this position)
+   * @brief Scrolls View to position specified (contents will scroll to this position).
+   *
    * Position 0,0 is the origin. Increasing X scrolls contents left, while
    * increasing Y scrolls contents up.
    * - If Rulers have been applied to the axes, then the contents will scroll until
@@ -844,7 +909,8 @@ public:
   void ScrollTo(const Vector3 &position);
 
   /**
-   * Scrolls View to position specified (contents will scroll to this position)
+   * @brief Scrolls View to position specified (contents will scroll to this position).
+   *
    * Position 0,0 is the origin. Increasing X scrolls contents left, while
    * increasing Y scrolls contents up.
    * - If Rulers have been applied to the axes, then the contents will scroll until
@@ -857,7 +923,8 @@ public:
   void ScrollTo(const Vector3 &position, float duration);
 
   /**
-   * Scrolls View to position specified (contents will scroll to this position)
+   * @brief Scrolls View to position specified (contents will scroll to this position).
+   *
    * Position 0,0 is the origin. Increasing X scrolls contents left, while
    * increasing Y scrolls contents up.
    * - If Rulers have been applied to the axes, then the contents will scroll until
@@ -876,8 +943,9 @@ public:
                 DirectionBias horizontalBias, DirectionBias verticalBias);
 
   /**
-   * Scrolls View to page currently based on assumption that each page is
+   * @brief Scrolls View to page currently based on assumption that each page is
    * "(page) * ScrollViewSize.width, 0".
+   *
    * @note Should probably be upgraded so that page is an abstract class, that can be
    * a function of ScrollViewSize, ruler domain, ruler snap points etc. as pages may be
    * orchestrated in a 2D grid fashion, or variable width.
@@ -887,8 +955,9 @@ public:
   void ScrollTo(unsigned int page);
 
   /**
-   * Scrolls View to page currently based on assumption that each page is
+   * @brief Scrolls View to page currently based on assumption that each page is
    * "(page) * ScrollViewSize.width, 0".
+   *
    * @note Should probably be upgraded so that page is an abstract class, that can be
    * a function of ScrollViewSize, ruler domain, ruler snap points etc. as pages may be
    * orchestrated in a 2D grid fashion, or variable width.
@@ -899,8 +968,9 @@ public:
   void ScrollTo(unsigned int page, float duration);
 
   /**
-   * Scrolls View to page currently based on assumption that each page is
+   * @brief Scrolls View to page currently based on assumption that each page is
    * "(page) * ScrollViewSize.width, 0".
+   *
    * @note Should probably be upgraded so that page is an abstract class, that can be
    * a function of ScrollViewSize, ruler domain, ruler snap points etc. as pages may be
    * orchestrated in a 2D grid fashion, or variable width.
@@ -915,7 +985,7 @@ public:
   void ScrollTo(unsigned int page, float duration, DirectionBias bias);
 
   /**
-   * Scrolls View such that actor appears in the center of the ScrollView.
+   * @brief Scrolls View such that actor appears in the center of the ScrollView.
    *
    * @note Actor must be a direct child of ScrollView, otherwise will
    * cause an assertion failure.
@@ -924,7 +994,7 @@ public:
   void ScrollTo(Actor& actor);
 
   /**
-   * Scrolls View such that actor appears in the center of the ScrollView.
+   * @brief Scrolls View such that actor appears in the center of the ScrollView.
    *
    * @note Actor must be a direct child of ScrollView, otherwise will
    * cause an assertion failure.
@@ -934,7 +1004,7 @@ public:
   void ScrollTo(Actor& actor, float duration);
 
   /**
-   * Scrolls View to the nearest snap points as specified by the Rulers.
+   * @brief Scrolls View to the nearest snap points as specified by the Rulers.
    *
    * If already at snap points, then will return false, and not scroll.
    *
@@ -943,14 +1013,14 @@ public:
   bool ScrollToSnapPoint();
 
   /**
-   * Scales View to (scale)
+   * @brief Scales View to (scale).
    *
    * @param[in] scale The scale factor the animate to.
    */
   void ScaleTo(const Vector3& scale);
 
   /**
-   * Scales View to (scale)
+   * @brief Scales View to (scale).
    *
    * @param[in] scale The scale factor the animate to.
    * @param[in] duration The duration of the animation in seconds.
@@ -958,15 +1028,15 @@ public:
   void ScaleTo(const Vector3& scale, float duration);
 
   /**
-   * Applies a constraint that will affect the children of ScrollView
+   * @brief Applies a constraint that will affect the children of ScrollView.
    *
-   * @note this affects all existing, and future Actors that are added to
-   * scrollview.
+   * @note this affects all existing and future Actors that are added to scrollview.
+   * @param[in] constraint The constraint to apply
    */
   void ApplyConstraintToChildren(Constraint constraint);
 
   /**
-   * Removes all constraints that will affect the children of ScrollView
+   * @brief Removes all constraints that will affect the children of ScrollView.
    *
    * @note this removes all constraints from actors that have been added
    * to scrollview.
@@ -974,40 +1044,46 @@ public:
   void RemoveConstraintsFromChildren();
 
   /**
-   * Apply Effect to ScrollView
+   * @brief Apply Effect to ScrollView.
+   *
    * @param[in] effect The effect to apply to scroll view
    */
   void ApplyEffect(ScrollViewEffect effect);
 
   /**
-   * ApplyEffect Applies a predefined effect
+   * @brief ApplyEffect Applies a predefined effect.
+   *
    * @param[in] effect enum for the predefined effect
+   * @return The scrollview effect that was applied
    */
   ScrollViewEffect ApplyEffect(ScrollView::PageEffect effect);
 
   /**
-   * Remove Effect from ScrollView
+   * @brief Remove Effect from ScrollView.
+   *
    * @param[in] effect The effect to remove.
    */
   void RemoveEffect(ScrollViewEffect effect);
 
   /**
-   * Remove All Effects from ScrollView
+   * @brief Remove All Effects from ScrollView.
    */
   void RemoveAllEffects();
 
   /**
-   * Binds actor to this ScrollView, once an actor is bound to a ScrollView,
-   * it'll be subject to that ScrollView's properties.
+   * @brief Binds actor to this ScrollView.
+   *
+   * Once an actor is bound to a ScrollView, it will be subject to
+   * that ScrollView's properties.
    *
    * @param[in] child The actor to add to this ScrollView.
    */
   void BindActor(Actor child);
 
   /**
-   * Unbind Actor from this ScrollView
-   * Once Unbound, this ScrollView will not affect the actor.
+   * @brief Unbind Actor from this ScrollView.
    *
+   * Once Unbound, this ScrollView will not affect the actor.
    * @note this does not remove the child from the ScrollView container
    *
    * @param[in] child The actor to be unbound.
@@ -1015,7 +1091,8 @@ public:
   void UnbindActor(Actor child);
 
   /**
-   * Allows the user to constrain the scroll view in a particular direction.
+   * @brief Allows the user to constrain the scroll view in a particular direction.
+   *
    * @param[in] direction The axis to constrain the scroll-view to.
    *                      Usually set to PanGestureDetector::DIRECTION_VERTICAL or PanGestureDetector::DIRECTION_HORIZONTAL (but can be any other angle if desired).
    * @param[in] threshold The threshold to apply around the axis.
@@ -1024,7 +1101,8 @@ public:
   void SetScrollingDirection( Radian direction, Radian threshold = PanGestureDetector::DEFAULT_THRESHOLD );
 
   /**
-   * Remove a direction constraint from the scroll view.
+   * @brief Remove a direction constraint from the scroll view.
+   *
    * @param[in] direction The axis to stop constraining to.
    *                      Usually will be PanGestureDetector::DIRECTION_VERTICAL or PanGestureDetector::DIRECTION_HORIZONTAL (but can be any other angle if desired).
    */
@@ -1033,13 +1111,15 @@ public:
 public: // Not intended for application developers
 
   /**
-   * Creates a handle using the Toolkit::Internal implementation.
+   * @brief Creates a handle using the Toolkit::Internal implementation.
+   *
    * @param[in]  implementation  The Control implementation.
    */
   ScrollView(Internal::ScrollView& implementation);
 
   /**
-   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   ScrollView( Dali::Internal::CustomActor* internal );

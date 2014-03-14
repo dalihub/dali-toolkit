@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SCROLL_VIEW_MODULE
  * @{
  */
 
@@ -41,31 +41,35 @@ class ScrollViewTwistEffect;
 }
 
 /**
- * ScrollView Twist-Effect.
+ * @brief ScrollView effect that twists pages onto screen when transitioning.
  */
 class ScrollViewTwistEffect : public ScrollViewEffect
 {
 
 public:
 
-  static const float DEFAULT_MINIMUM_DISTANCE_FOR_SHRINK;
+  static const float DEFAULT_MINIMUM_DISTANCE_FOR_SHRINK; ///< The min distance for shrink
 
 public:
 
   /**
-   * Create an initialized ScrollViewTwistEffect.
+   * @brief Create an initialized ScrollViewTwistEffect.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static ScrollViewTwistEffect New();
 
   /**
-   * Create an uninitialized ScrollViewTwistEffect; this can be initialized with ScrollViewTwistEffect::New()
+   * @brief Create an uninitialized ScrollViewTwistEffect; this can be initialized with ScrollViewTwistEffect::New().
+   *
    * Calling member functions with an uninitialized Toolkit::ScrollViewTwistEffect is not allowed.
    */
   ScrollViewTwistEffect();
 
   /**
-   * Downcast an Object handle to ScrollViewTwistEffect. If handle points to a ScrollViewTwistEffect the
+   * @brief Downcast an Object handle to ScrollViewTwistEffect.
+   *
+   * If handle points to a ScrollViewTwistEffect the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @param[in] handle Handle to an object
    * @return handle to a ScrollViewTwistEffect or an uninitialized handle
@@ -73,28 +77,32 @@ public:
   static ScrollViewTwistEffect DownCast( BaseHandle handle );
 
   /**
-   * Gets the minimum animation distance for the shrink effect to
-   * occur
+   * @brief Gets the minimum animation distance for the shrink effect to
+   * occur.
+   *
    * @return The minimum distance in seconds is returned.
    */
   float GetMinimumDistanceForShrink() const;
 
   /**
-   * Sets the minimum animation distance for the shrink effect
+   * @brief Sets the minimum animation distance for the shrink effect
    * to occur.
+   *
    * @param[in] distance The minimum distance in pixels (default = 0.0)
    * i.e. any flick will result in shrinking.
    */
   void SetMinimumDistanceForShrink(float distance);
 
   /**
-   * Enable or disable this effect.
+   * @brief Enable or disable this effect.
+   *
    * @param[in] enableFlag Set to true if the effect should be enabled.
    */
   void EnableEffect(bool enableFlag);
 
   /**
-   * Manually apply effect to an Actor.
+   * @brief Manually apply effect to an Actor.
+   *
    * @param[in] child The child Actor to be affected by this effect.
    * @param[in] additionalEffects Whether just the basic effect (delay)
    * should be applied. Or all effects (delay, rotation, scaling).
@@ -119,16 +127,19 @@ public:
                      float delayMax = 0.9f );
 
   /**
-   * Set the maximum swing angle when at zero drop off
+   * @brief Set the maximum swing angle when at zero drop off.
    *
    * @param[in] maxSwingAngle maximum swing angle for x and y axes
    */
   void SetMaxSwingAngle(const Vector2& maxSwingAngle);
 
   /**
-   * Set the drop off values to affect the amount of swing angle applied to an actor the further it is from
-   * the scroll position. A drop off of 0.0f means no angle drop off while 1.0f will reduce the angle to zero
-   * over the distance supplied for that axis.
+   * @brief Set the drop off values to affect the amount of swing
+   * angle applied to an actor the further it is from the scroll
+   * position.
+   *
+   * A drop off of 0.0f means no angle drop off while 1.0f will reduce
+   * the angle to zero over the distance supplied for that axis.
    *
    * Example maxSwingAngle.x is Pi, dropOff.x is 0.5f and distance.x is 100.0f:
    *    The angle on the x axis will reduce to (0.5f * Pi) over 100 pixels
@@ -142,7 +153,8 @@ public:
 protected:
 
   /**
-   * This constructor is used by Dali New() methods.
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
   ScrollViewTwistEffect(Internal::ScrollViewTwistEffect *impl);

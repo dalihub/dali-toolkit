@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_ITEM_VIEW_MODULE
  * @{
  */
 
@@ -32,7 +32,7 @@ namespace Toolkit
 {
 
 /**
- * ItemFactory is an abstract interface for providing actors to ItemView.
+ * @brief ItemFactory is an abstract interface for providing actors to ItemView.
  * Each actor is identified by a unique ID, and has a linear order from 0 to GetNumberOfItems()-1.
  */
 class ItemFactory
@@ -40,18 +40,21 @@ class ItemFactory
 public:
 
   /**
-   * Virtual destructor
+   * @brief Virtual destructor.
    */
   virtual ~ItemFactory() = 0;
 
   /**
-   * Query the number of items available from the factory.
+   * @brief Query the number of items available from the factory.
+   *
    * The maximum available item has an ID of GetNumberOfItems() - 1.
+   * @return the number of items
    */
   virtual unsigned int GetNumberOfItems() = 0;
 
   /**
-   * Create an Actor to represent a visible item.
+   * @brief Create an Actor to represent a visible item.
+   *
    * @param[in] itemId The ID of the newly visible item.
    * @return An actor, or an uninitialized pointer if the ID is out of range.
    */

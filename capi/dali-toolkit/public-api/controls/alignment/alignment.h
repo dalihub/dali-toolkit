@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_ALIGNMENT_MODULE
  * @{
  */
 
@@ -37,7 +37,7 @@ class Alignment;
 }
 
 /**
- * Alignment is a container which provides an easy way to align other actors inside its boundary.
+ * @brief Alignment is a container which provides an easy way to align other actors inside its boundary.
  *
  * Additionaly it provides a scaling property to resize the contained actors @see Scaling.
  * @note The use of scaling property will override all constraints applied to actors.
@@ -49,7 +49,7 @@ class Alignment : public Control
 {
 public:
   /**
-   * Different types of alignment.
+   * @brief Different types of alignment.
    */
   enum Type
   {
@@ -62,7 +62,7 @@ public:
   };
 
   /**
-   * Scaling determines how actors are scaled, to match the alignment's boundary.
+   * @brief Scaling determines how actors are scaled, to match the alignment's boundary.
    */
   enum Scaling
   {
@@ -74,8 +74,14 @@ public:
     ShrinkToFitKeepAspect, ///< If added actors are larger than the alignment's boundary it will be shrunk down to fit. Aspect ratio is maintained
   };
 
+  /**
+   * @brief Structure describing the padding values.
+   */
   struct Padding
   {
+    /**
+     * @brief Constructor
+     */
     Padding()
     : left( 0.f ),
       right( 0.f ),
@@ -84,6 +90,14 @@ public:
     {
     }
 
+    /**
+     * @brief Constructor
+     *
+     * @param[in] l Left padding
+     * @param[in] r Right padding
+     * @param[in] t Top padding
+     * @param[in] b Bottom padding
+     */
     Padding( float l, float r, float t, float b )
     : left( l ),
       right( r ),
@@ -92,20 +106,22 @@ public:
     {
     }
 
-    float left;
-    float right;
-    float top;
-    float bottom;
+    float left;  ///< The left padding
+    float right; ///< The right padding
+    float top;   ///< The top padding
+    float bottom; ///< The bottom padding
   };
 
   /**
-   * Create an Alignment handle; this can be initialised with Alignment::New()
+   * @brief Create an Alignment handle; this can be initialised with Alignment::New().
+   *
    * Calling member functions with an uninitialised handle is not allowed.
    */
   Alignment();
 
   /**
-   * Creates an alignment control.
+   * @brief Creates an alignment control.
+   *
    * @param [in] horizontal Specifies how to align actors horizontally. Could be HorizontalLeft, HorizontalCenter or HorizontalRight. By default HorizontalCenter.
    * @param [in] vertical Specifies how to align actors vertically. Could be VerticalTop, VerticalCenter or VerticalBottom. By default VerticalCenter.
    * @return A handle to the Alignment control.
@@ -113,79 +129,103 @@ public:
   static Alignment New( Type horizontal = HorizontalCenter, Type vertical = VerticalCenter );
 
   /**
-   * Copy constructor. Creates another handle that points to the same real object.
+   * @brief Copy constructor. Creates another handle that points to the same real object.
+   *
+   * @param[in] alignment Object to copy.
    */
   Alignment(const Alignment& alignment);
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~Alignment();
 
   /**
-   * Downcast an Object handle to Alignment. If handle points to a Alignment the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to Alignment.
+   *
+   * If handle points to a Alignment the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle Handle to an object
    * @return handle to a Alignment or an uninitialized handle
    */
   static Alignment DownCast( BaseHandle handle );
 
   /**
-   * Sets the new alignment. By default ( HorizontalCenter | VerticalCenter ).
+   * @brief Sets the new alignment. By default ( HorizontalCenter | VerticalCenter ).
    * @param [in] type The new alignment option.
    */
   void SetAlignmentType( Type type );
 
   /**
-   * Get the current alignment combined into a single value.
-   * The values can be tested by using the & operator
-   * and the desired flag. e.g. if (GetAlignmentType() & HorizontalCentre) ...
+   * @brief Get the current alignment combined into a single value.
+   *
+   * The values can be tested by using the & operator and the desired
+   * flag. e.g.
+   * @code
+   *   if (GetAlignmentType() & HorizontalCentre)
+   *   {
+   *     ...
+   *   }
+   * @endcode
+   *
    * @return the alignment value.
    */
   Type GetAlignmentType() const;
 
   /**
-   * Sets how added actors scale to fit the alignment's boundary.
+   * @brief Sets how added actors scale to fit the alignment's boundary.
+   *
    * @see Scaling.
    * @param[in] scaling The scaling property.
    */
   void SetScaling( Scaling scaling );
 
   /**
-   * Retrieves the scaling property.
+   * @brief Retrieves the scaling property.
+   *
    * @see Scaling.
    * @return The scaling.
    */
   Scaling GetScaling() const;
 
   /**
-   * Set a padding value.
+   * @brief Set a padding value.
    *
    * @param [in] padding The left, right, top, bottom padding values.
    */
   void SetPadding( const Padding& padding );
 
   /**
+   * @brief Get the padding values.
+   *
    * @return The left, right, top, bottom padding values.
    */
   const Padding& GetPadding() const;
 
   /**
-   * Assignment operator. Changes this handle to point to another real object.
+   * @brief Assignment operator.
+   *
+   * Changes this handle to point to another real object.
+   * @param[in] alignment Object to copy
+   * @return A reference to this
    */
   Alignment& operator=(const Alignment& alignment);
 
 public: // Not intended for application developers
 
   /**
-   * Creates a handle using the Toolkit::Internal implementation.
+   * @brief Creates a handle using the Toolkit::Internal implementation.
+   *
    * @param[in]  implementation  The Control implementation.
    */
   Alignment( Internal::Alignment& implementation );
 
   /**
-   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   Alignment( Dali::Internal::CustomActor* internal );

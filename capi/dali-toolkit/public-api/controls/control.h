@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_CONTROLS_MODULE
  * @{
  */
 
@@ -36,7 +36,8 @@ namespace Toolkit
 class ControlImpl;
 
 /**
- * Control is the base class for all controls.
+ * @brief Control is the base class for all controls.
+ *
  * The implementation of the control must be supplied; see ControlImpl for more details.
  * @see ControlImpl
  */
@@ -45,13 +46,13 @@ class Control : public CustomActor, public ConnectionTrackerInterface
 public:
 
   // Action Names
-  static const char* const ACTION_CONTROL_ACTIVATED;
+  static const char* const ACTION_CONTROL_ACTIVATED; ///< name "control-activated"
 
   // Signal Names
-  static const char* const SIGNAL_KEY_EVENT;
+  static const char* const SIGNAL_KEY_EVENT;         ///< name "key-event"
 
   /**
-   * Describes how a control could be resized.
+   * @brief Describes how a control could be resized.
    */
   enum SizePolicy
   {
@@ -63,7 +64,7 @@ public:
   };
 
   /**
-   * Describes what a control should do when a contained actor/control exceeds the boundary of the control.
+   * @brief Describes what a control should do when a contained actor/control exceeds the boundary of the control.
    */
   enum ExceedPolicy
   {
@@ -73,7 +74,7 @@ public:
   };
 
   /**
-   * Describes the direction to move the keyboard focus towards
+   * @brief Describes the direction to move the keyboard focus towards.
    */
   enum KeyboardFocusNavigationDirection
   {
@@ -85,30 +86,37 @@ public:
 
   // Typedefs
 
-  // Key Event
+  /// @brief Key Event signal type;
   typedef SignalV2<bool ( Control, const KeyEvent& ) > KeyEventSignalV2;
 
 public: // Creation & Destruction
 
   /**
-   * Create a new instance of a Control.
+   * @brief Create a new instance of a Control.
+   *
    * @return A handle to a new Control.
    */
   static Control New();
 
   /**
-   * Create an uninitialized Control handle. Only derived versions can be instantiated.
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * @brief Create an uninitialized Control handle.
+   *
+   * Only derived versions can be instantiated.  Calling member
+   * functions with an uninitialized Dali::Object is not allowed.
    */
   Control();
 
   /**
-   * Copy constructor. Creates another handle that points to the same real object
+   * @brief Copy constructor.
+   *
+   * Creates another handle that points to the same real object
+   * @param[in] uiControl Handle to copy
    */
   Control(const Control& uiControl);
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes do not contain member data.
    */
   virtual ~Control();
@@ -116,34 +124,43 @@ public: // Creation & Destruction
 public: // operators
 
   /**
-   * Assignment operator. Changes this handle to point to another real object
+   * @brief Assignment operator.
+   *
+   * Changes this handle to point to another real object
+   * @param[in] handle Object to assign this to
+   * @return reference to this
    */
   Control& operator=( const Control& handle );
 
 public:
 
   /**
-   * Downcast an Object handle to Control. If handle points to a Control the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to Control.
+   *
+   * If handle points to a Control the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle Handle to an object
    * @return handle to a Control or an uninitialized handle
    */
   static Control DownCast( BaseHandle handle );
 
   /**
-   * Retrieve the Control implementation.
+   * @brief Retrieve the Control implementation.
+   *
    * @return The implementation.
    */
   ControlImpl& GetImplementation();
 
   /**
-   * Retrieve the Control implementation.
+   * @brief Retrieve the Control implementation.
+   *
    * @return The implementation.
    */
   const ControlImpl& GetImplementation() const;
 
   /**
-   * Sets the size policies for the width and height dimensions.
+   * @brief Sets the size policies for the width and height dimensions.
    *
    * @param[in] widthPolicy Size policy for the width dimension.
    * @param[in] heightPolicy Size policy for the height dimension.
@@ -151,7 +168,7 @@ public:
   void SetSizePolicy( SizePolicy widthPolicy, SizePolicy heightPolicy );
 
   /**
-   * Retrieves the size policies for the width and height dimensions.
+   * @brief Retrieves the size policies for the width and height dimensions.
    *
    * @param[out] widthPolicy Width's size policy.
    * @param[out] heightPolicy Height's size policy.
@@ -159,35 +176,35 @@ public:
   void GetSizePolicy( SizePolicy& widthPolicy, SizePolicy& heightPolicy ) const;
 
   /**
-   * Sets the minimum size for the control.
+   * @brief Sets the minimum size for the control.
    *
    * @param[in] size The minimum size.
    */
   void SetMinimumSize( const Vector3& size );
 
   /**
-   * Retrieves the minimum size.
+   * @brief Retrieves the minimum size.
    *
    * @return The minimum size.
    */
   const Vector3& GetMinimumSize() const;
 
   /**
-   * Sets the maximum size
+   * @brief Sets the maximum size.
    *
    * @param[in] size The maximum size.
    */
   void SetMaximumSize( const Vector3& size );
 
   /**
-   * Retrieves the maximum size.
+   * @brief Retrieves the maximum size.
    *
    * @return The maximum size.
    */
   const Vector3& GetMaximumSize() const;
 
   /**
-   * Works out the natural size.
+   * @brief Works out the natural size.
    *
    * Natural size is the control's size with any restriction.
    *
@@ -196,7 +213,7 @@ public:
   Vector3 GetNaturalSize();
 
   /**
-   * Works out the control's height for a given width.
+   * @brief Works out the control's height for a given width.
    *
    * @param[in] width The control's width.
    *
@@ -205,7 +222,7 @@ public:
   float GetHeightForWidth( float width );
 
   /**
-   * Works out the control's width for a given height.
+   * @brief Works out the control's width for a given height.
    *
    * @param[in] height The control's height.
    *
@@ -214,7 +231,9 @@ public:
   float GetWidthForHeight( float height );
 
   /**
-   * This sets the control to receive key events. The key event can originate from a virtual or physical keyboard.
+   * @brief This sets the control to receive key events.
+   *
+   * The key event can originate from a virtual or physical keyboard.
    * @pre The Control has been initialized.
    * @pre The Control should be on the stage before setting keyboard focus.
    * @return True if the control has foucs, False otherwise.
@@ -222,7 +241,8 @@ public:
   void SetKeyInputFocus();
 
   /**
-   * Quries whether the control has key input focus.
+   * @brief Quries whether the control has key input focus.
+   *
    * Note: The control can be set to have the focus and still not receive all the key events if another control has over ridden it.
    * As the key input focus mechanism works like a stack, the top most control receives all the key events, and passes on the
    * unhandled events to the controls below in the stack. A control in the stack will regain key input focus when there are no more
@@ -230,11 +250,13 @@ public:
    * To query for the conrol which is on top of the focus stack use Dali::Toolkit::KeyInputFocusManager::GetCurrentKeyboardFocusActor()
    * @pre The Control has been initialized.
    * @pre The Control should be on the stage before setting keyboard focus.
+   * @return true if this control has keyboard input focus
    */
   bool HasKeyInputFocus();
 
   /**
-   * Once an actor is Set to receive key input focus this function is called to stop it receiving key events.
+   * @brief Once an actor is Set to receive key input focus this function is called to stop it receiving key events.
+   *
    * A check is performed to ensure it was previously set, if this check fails then nothing is done.
    * @pre The Actor has been initialized.
    */
@@ -244,7 +266,8 @@ public:
 public:
 
   /**
-   * This signal is emitted when key event is received
+   * @brief This signal is emitted when key event is received.
+   *
    * A callback of the following type may be connected:
    * @code
    *   bool YourCallbackName(Control control, const KeyEvent& event);
@@ -276,15 +299,17 @@ protected:
 public: // Not intended for application developers
 
   /**
-   * Create an initialised Control.
+   * @brief Create an initialised Control.
+   *
    * @param[in] implementation The implementation for this control.
    * @return A handle to a newly allocated Dali resource.
    */
   Control(ControlImpl& implementation);
 
   /**
-   * This constructor is used by CustomActor within Dali core to create additional Control handles
+   * @brief This constructor is used by CustomActor within Dali core to create additional Control handles
    * using an Internal CustomActor pointer.
+   *
    * @param [in] internal A pointer to a newly allocated Dali resource
    */
   Control(Dali::Internal::CustomActor* internal);
@@ -292,7 +317,8 @@ public: // Not intended for application developers
 public: // Templates for Deriving Classes
 
   /**
-   * Template to allow deriving controls to DownCast handles to deriving handle classes.
+   * @brief Template to allow deriving controls to DownCast handles to deriving handle classes.
+   *
    * @tparam     T       The handle class
    * @tparam     I       The implementation class
    * @param[in]  handle  Handle to an object
@@ -321,8 +347,9 @@ public: // Templates for Deriving Classes
   }
 
   /**
-   * Template to allow deriving controls to verify whether the Internal::CustomActor* is actually an
+   * @brief Template to allow deriving controls to verify whether the Internal::CustomActor* is actually an
    * implementation of their class.
+   *
    * @tparam     I         The implementation class
    * @param[in]  internal  Pointer to the Internal::CustomActor
    */

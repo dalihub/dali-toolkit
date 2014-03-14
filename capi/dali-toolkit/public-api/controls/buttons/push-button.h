@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_BUTTONS_MODULE
  * @{
  */
 
@@ -41,7 +41,7 @@ class PushButton;
 }
 
 /**
- * PushButton provides a button functionality. A PushButton changes its appearance when is pressed and returns to its original when is released.
+ * @brief A PushButton changes its appearance when is pressed and returns to its original when is released.
  *
  * By default a PushButton emits a PushButton::PressedSignal() signal when the button is pressed, a Button::ClickedSignal() signal when it's clicked
  * and a PushButton::ReleasedSignal() signal when it's released or having pressed it, the touch point leaves the boundary of the button.
@@ -83,13 +83,13 @@ class PushButton : public Button
 {
 public:
 
-  // Signal Names
-  static const char* const SIGNAL_TOGGLED;
-  static const char* const SIGNAL_PRESSED;
-  static const char* const SIGNAL_RELEASED;
+  //Signal Names
+  static const char* const SIGNAL_TOGGLED; ///< name "toggled"
+  static const char* const SIGNAL_PRESSED; ///< name "pressed"
+  static const char* const SIGNAL_RELEASED; ///< name "released"
 
-  // Action Names
-  static const char* const ACTION_PUSH_BUTTON_CLICK;
+  //Action Names
+  static const char* const ACTION_PUSH_BUTTON_CLICK; ///< name "push-button-click"
 
   // Properties
   static const Property::Index PROPERTY_AUTO_REPEATING;               ///< name "auto-repeating",               @see SetAutoRepeating(),               type BOOLEAN
@@ -105,43 +105,49 @@ public:
 public:
 
   /**
-   * Create an uninitialized PushButton; this can be initialized with PushButton::New()
+   * @brief Create an uninitialized PushButton; this can be initialized with PushButton::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   PushButton();
 
   /**
-   * Copy constructor.
+   * @brief Copy constructor.
    */
   PushButton( const PushButton& pushButton );
 
   /**
-   * Assignment operator.
+   * @brief Assignment operator.
    */
   PushButton& operator=( const PushButton& pushButton );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~PushButton();
 
   /**
-   * Create an initialized PushButton.
+   * @brief Create an initialized PushButton.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static PushButton New();
 
   /**
-   * Downcast an Object handle to PushButton. If handle points to a PushButton the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to PushButton.
+   *
+   * If handle points to a PushButton the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle Handle to an object
    * @return handle to a PushButton or an uninitialized handle
    */
   static PushButton DownCast( BaseHandle handle );
 
   /**
-   * Sets the \e autorepeating property.
+   * @brief Sets the \e autorepeating property.
    *
    * If the \e autorepeating property is set to \e true, then the \e toggle property is set to false
    * but no signal is emitted.
@@ -156,7 +162,7 @@ public:
   bool IsAutoRepeating() const;
 
   /**
-   * Sets the initial autorepeating delay.
+   * @brief Sets the initial autorepeating delay.
    *
    * By default this value is set to 0.15 seconds.
    *
@@ -171,7 +177,7 @@ public:
   float GetInitialAutoRepeatingDelay() const;
 
   /**
-   * Sets the next autorepeating delay.
+   * @brief Sets the next autorepeating delay.
    *
    * By default this value is set to 0.05 seconds.
    *
@@ -186,7 +192,7 @@ public:
   float GetNextAutoRepeatingDelay() const;
 
   /**
-   * Sets the \e toggle property.
+   * @brief Sets the \e toggle property.
    *
    * If the \e toggle property is set to \e true, then the \e autorepeating property is set to false.
    *
@@ -200,7 +206,7 @@ public:
   bool IsToggleButton() const;
 
   /**
-   * Sets the button as toggled or not toggled.
+   * @brief Sets the button as toggled or not toggled.
    *
    * \e toggle property must be set to \e true.
    *
@@ -216,7 +222,7 @@ public:
   bool IsToggled() const;
 
   /**
-   * Sets the button image.
+   * @brief Sets the button image.
    *
    * @param[in] image The button image.
    */
@@ -228,13 +234,14 @@ public:
   void SetButtonImage( Actor image );
 
   /**
-   * Gets the button image.
+   * @brief Gets the button image.
+   *
    * @return An actor with the button image.
    */
   Actor GetButtonImage() const;
 
   /**
-   * Sets the background image.
+   * @brief Sets the background image.
    *
    * @param[in] image The background image.
    */
@@ -246,13 +253,14 @@ public:
   void SetBackgroundImage( Actor image );
 
   /**
-   * Gets the background image.
+   * @brief Gets the background image.
+   *
    * @return An actor with the background image.
    */
   Actor GetBackgroundImage() const;
 
   /**
-   * Sets the pressed image.
+   * @brief Sets the pressed image.
    *
    * @param[in] image The pressed image.
    */
@@ -264,13 +272,14 @@ public:
   void SetPressedImage( Actor image );
 
   /**
-   * Gets the pressed image.
+   * @brief Gets the pressed image.
+   *
    * @return An actor with the pressed image.
    */
   Actor GetPressedImage() const;
 
   /**
-   * Sets the dimmed background image.
+   * @brief Sets the dimmed background image.
    *
    * @param[in] image The dimmed background image.
    */
@@ -282,13 +291,14 @@ public:
   void SetDimmedBackgroundImage( Actor image );
 
   /**
-   * Gets the dimmed background image.
+   * @brief Gets the dimmed background image.
+   *
    * @return An actor with the dimmed background image.
    */
   Actor GetDimmedBackgroundImage() const;
 
   /**
-   * Sets the dimmed button image.
+   * @brief Sets the dimmed button image.
    *
    * @param[in] image The dimmed button image.
    */
@@ -300,13 +310,14 @@ public:
   void SetDimmedImage( Actor image );
 
   /**
-   * Gets the dimmed image.
+   * @brief Gets the dimmed image.
+   *
    * @return An actor with the dimmed image.
    */
   Actor GetDimmedImage() const;
 
   /**
-   * Sets the text label.
+   * @brief Sets the text label.
    *
    * @param[in] text Label text.
    */
@@ -318,50 +329,50 @@ public:
   void SetLabelText( Actor text );
 
   /**
-   * Gets the label text.
+   * @brief Gets the label text.
+   *
    * @return An actor with the label text.
    */
   Actor GetLabelText() const;
 
 public: //Signals
 
-  // PushButton Toggled
-
+  /// @brief PushButton Toggled signal type.
   typedef SignalV2< bool ( Button, bool ) > ToggledSignalV2;
 
-  // PushButton Pressed
-
+  /// @brief PushButton Pressed signal type.
   typedef SignalV2< bool ( Button ) > PressedSignalV2;
 
-  // PushButton Released
-
+  /// @brief PushButton Released signal type.
   typedef SignalV2< bool ( Button ) > ReleasedSignalV2;
 
   /**
-   * Signal emitted when the \e toggle property is set and the button is touched.
+   * @brief Signal emitted when the \e toggle property is set and the button is touched.
    */
   ToggledSignalV2& ToggledSignal();
 
   /**
-   * Signal emitted when the button is touched.
+   * @brief Signal emitted when the button is touched.
    */
   PressedSignalV2& PressedSignal();
 
   /**
-   * Signal emitted when the button is touched and the touch point leaves the boundary of the button.
+   * @brief Signal emitted when the button is touched and the touch point leaves the boundary of the button.
    */
   ReleasedSignalV2& ReleasedSignal();
 
 public: // Not intended for application developers
 
   /**
-   * Creates a handle using the Toolkit::Internal implementation.
+   * @brief Creates a handle using the Toolkit::Internal implementation.
+   *
    * @param[in]  implementation  The Control implementation.
    */
   PushButton( Internal::PushButton& implementation );
 
   /**
-   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   PushButton( Dali::Internal::CustomActor* internal );

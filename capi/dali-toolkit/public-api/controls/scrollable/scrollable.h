@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SCROLLABLE_MODULE
  * @{
  */
 
@@ -36,47 +36,57 @@ namespace Internal DALI_INTERNAL
 class Scrollable;
 }
 
+/**
+ * @brief How axes/rotation or scale are clamped
+ */
 enum ClampState
 {
-  NotClamped,
-  ClampedToMin,
-  ClampedToMax
-};
-
-struct ClampState2
-{
-  ClampState x;
-  ClampState y;
-};
-
-struct ClampState3
-{
-  ClampState x;
-  ClampState y;
-  ClampState z;
+  NotClamped,   ///< The quantity isn't clamped
+  ClampedToMin, ///< The quantity is clamped to the min value
+  ClampedToMax  ///< The quantity is clamped to the max value
 };
 
 /**
- * Base class for derived Scrollables that contains actors that can be scrolled manually
- * (via touch) or automatically. Scrollables such as ScrollView and ItemView can be derived
- * from this class.
+ * @brief A 2 dimensional clamp
+ */
+struct ClampState2
+{
+  ClampState x; ///< The clamp state of the x axis
+  ClampState y; ///< The clamp state of the y axis
+};
+
+/**
+ * @brief A 3 dimensional clamp
+ */
+struct ClampState3
+{
+  ClampState x; ///< The clamp state of the x axis
+  ClampState y; ///< The clamp state of the y axis
+  ClampState z; ///< The clamp state of the z axis
+};
+
+/**
+ * @brief Base class for derived Scrollables that contains actors that can be scrolled manually
+ * (via touch) or automatically.
+ *
+ * Scrollables such as ScrollView and ItemView can be derived from this class.
  */
 class Scrollable : public Control
 {
 public:
 
   /**
-   * Clamp signal event's data
+   * @brief Clamp signal event's data
    */
   struct ClampEvent
   {
-    ClampState3 scale;                                                  ///< Clamp information for scale axes
-    ClampState3 position;                                               ///< Clamp information for position axes
-    ClampState rotation;                                                ///< Clamp information for rotation
+    ClampState3 scale;       ///< Clamp information for scale axes
+    ClampState3 position;    ///< Clamp information for position axes
+    ClampState rotation;     ///< Clamp information for rotation
   };
 
   /**
-   * Scroll component types
+   * @brief Scroll component types
    */
   enum ScrollComponentType
   {
@@ -93,89 +103,102 @@ public:
   static const std::string SCROLL_DIRECTION_PROPERTY_NAME;              ///< Property, name "scroll-direction",         type VECTOR2
 
   //Signal Names
-  static const char* const SIGNAL_SCROLL_STARTED;
-  static const char* const SIGNAL_SCROLL_COMPLETED;
-  static const char* const SIGNAL_SCROLL_UPDATED;
-  static const char* const SIGNAL_SCROLL_CLAMPED;
+  static const char* const SIGNAL_SCROLL_STARTED;   ///< "scroll-started";
+  static const char* const SIGNAL_SCROLL_COMPLETED; ///< "scroll-completed";
+  static const char* const SIGNAL_SCROLL_UPDATED;   ///< "scroll-updated";
+  static const char* const SIGNAL_SCROLL_CLAMPED;   ///< "scroll-clamped";
 
 public:
 
-  typedef SignalV2< void ( const Vector3& ) > ScrollStartedSignalV2;
-
-  typedef SignalV2< void ( const Vector3& ) > ScrollUpdatedSignalV2;
-
-  typedef SignalV2< void ( const Vector3& ) > ScrollCompletedSignalV2;
-
-  typedef SignalV2< void ( const ClampEvent& ) > ScrollClampedSignalV2;
+  typedef SignalV2< void ( const Vector3& ) > ScrollStartedSignalV2;   ///< ScrollStarted signal type
+  typedef SignalV2< void ( const Vector3& ) > ScrollCompletedSignalV2; ///< ScrollCompleted signal type
+  typedef SignalV2< void ( const Vector3& ) > ScrollUpdatedSignalV2;   ///< Scroll updated signal type
+  typedef SignalV2< void ( const ClampEvent& ) > ScrollClampedSignalV2; ///< Scroll clamped signal type
 
   /**
-   * Signal emitted when the Scrollable has moved (whether by touch or animation)
+   * @brief Signal emitted when the Scrollable has moved (whether by touch or animation).
    */
   ScrollStartedSignalV2& ScrollStartedSignal();
 
   /**
-   * Signal emitted when the Scrollable has moved (whether by touch or animation)
+   * @brief Signal emitted when the Scrollable has moved (whether by touch or animation).
    */
   ScrollUpdatedSignalV2& ScrollUpdatedSignal();
 
   /**
-   * Signal emitted when the Scrollable has completed movement (whether by touch or animation)
+   * @brief Signal emitted when the Scrollable has completed movement (whether by touch or animation).
    */
   ScrollCompletedSignalV2& ScrollCompletedSignal();
 
   /**
-   * Signal emitted when the Scrollable is pushing against a domain boundary
-   * (in either position, scale, or rotation)
+   * @brief Signal emitted when the Scrollable is pushing against a domain boundary
+   * (in either position, scale, or rotation).
+   *
+   * @return The signal to connect to
    */
   ScrollClampedSignalV2& ScrollClampedSignal();
 
 public:
 
   /**
-   * Creates an uninitialized Scrollable handle
+   * @brief Creates an uninitialized Scrollable handle.
    */
   Scrollable();
 
   /**
-   * Copy constructor. Creates another handle that points to the same real object
+   * @brief Copy constructor.
+   *
+   * Creates another handle that points to the same real object
+   *
    * @param handle to copy from
    */
   Scrollable( const Scrollable& handle );
 
   /**
-   * Assignment operator. Changes this handle to point to another real object
+   * @brief Assignment operator.
+   *
+   * Changes this handle to point to another real object
+   * @param[in] handle to copy from
+   * @return A reference to this
    */
   Scrollable& operator=( const Scrollable& handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~Scrollable();
 
   /**
-   * Downcast an Object handle to Scrollable. If handle points to a Scrollable the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to Scrollable.
+   *
+   * If handle points to a Scrollable the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle Handle to an object
    * @return handle to a Scrollable or an uninitialized handle
    */
   static Scrollable DownCast( BaseHandle handle );
 
   /**
-   * Checks if a ScrollComponent has been enabled or not.
+   * @brief Checks if a ScrollComponent has been enabled or not.
+   *
    * @param[in] type The Scroll Component Type to check
    * @return True (if Enabled)
    */
   bool IsScrollComponentEnabled(Scrollable::ScrollComponentType type) const;
 
   /**
-   * Enables a ScrollComponent
+   * @brief Enables a ScrollComponent.
+   *
    * @param[in] type The Scroll Component Type to enable
    */
   void EnableScrollComponent(Scrollable::ScrollComponentType type);
 
   /**
-   * Disables a ScrollComponent
+   * @brief Disables a ScrollComponent.
+   *
    * @param[in] type The Scroll Component Type to disable
    */
   void DisableScrollComponent(Scrollable::ScrollComponentType type);
@@ -183,13 +206,15 @@ public:
 public: // Not intended for application developers
 
   /**
-   * Creates a handle using the Toolkit::Internal implementation.
+   * @brief Creates a handle using the Toolkit::Internal implementation.
+   *
    * @param[in]  implementation  The Control implementation.
    */
   Scrollable(Internal::Scrollable& implementation);
 
   /**
-   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   Scrollable( Dali::Internal::CustomActor* internal );

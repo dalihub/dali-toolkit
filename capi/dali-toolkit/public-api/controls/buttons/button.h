@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_BUTTONS_MODULE
  * @{
  */
 
@@ -42,7 +42,8 @@ class Button;
 }
 
 /**
- * Button is a base class for different kind of buttons.
+ * @brief Button is a base class for different kind of buttons.
+ *
  * This class provides the dimmed property and the clicked signal.
  *
  * A ClickedSignal() is emitted when the button is touched and the touch
@@ -55,7 +56,7 @@ class Button : public Control
 public:
 
   // Signal Names
-  static const char* const SIGNAL_CLICKED;
+  static const char* const SIGNAL_CLICKED; ///< name "clicked"
 
   // Properties
   static const Property::Index PROPERTY_DIMMED; ///< name "dimmed", @see SetDimmed(), type BOOLEAN
@@ -63,37 +64,43 @@ public:
 public:
 
   /**
-   * Create an uninitialized Button. Only derived versions can be instantiated.
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * @brief Create an uninitialized Button.
+   *
+   * Only derived versions can be instantiated.  Calling member
+   * functions with an uninitialized Dali::Object is not allowed.
    */
   Button();
 
   /**
-   * Copy constructor.
+   * @brief Copy constructor.
    */
   Button( const Button& button );
 
   /**
-   * Assignment operator.
+   * @brief Assignment operator.
    */
   Button& operator=( const Button& button );
 
   /**
-   * Downcast an Object handle to Button. If handle points to a Button the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to Button.
+   *
+   * If handle points to a Button the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle Handle to an object
    * @return handle to a Button or an uninitialized handle
    */
   static Button DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~Button();
 
   /**
-   * Sets the button as \e dimmed.
+   * @brief Sets the button as \e dimmed.
    *
    * No signals are emitted when the \e dimmed property is set.
    *
@@ -107,38 +114,43 @@ public:
   bool IsDimmed() const;
 
   /**
-   * Sets the animation time.
+   * @brief Sets the animation time.
+   *
    * @param [in] animationTime The animation time in seconds.
    */
   void SetAnimationTime( float animationTime );
 
   /**
-   * Retrieves button's animation time.
+   * @brief Retrieves button's animation time.
+   *
    * @return The animation time in seconds.
    */
   float GetAnimationTime() const;
 
 public: //Signals
 
-  // Button Clicked
-
+  /**
+   * @brief Button Clicked signal type
+   */
   typedef SignalV2< bool ( Button ) > ClickedSignalV2;
 
   /**
-   * Signal emitted when the button is touched and the touch point doesn't leave the boundary of the button.
+   * @brief Signal emitted when the button is touched and the touch point doesn't leave the boundary of the button.
    */
   ClickedSignalV2& ClickedSignal();
 
 public: // Not intended for application developers
 
   /**
-   * Creates a handle using the Toolkit::Internal implementation.
+   * @brief Creates a handle using the Toolkit::Internal implementation.
+   *
    * @param[in]  implementation  The Control implementation.
    */
   Button( Internal::Button& implementation );
 
   /**
-   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   Button( Dali::Internal::CustomActor* internal );

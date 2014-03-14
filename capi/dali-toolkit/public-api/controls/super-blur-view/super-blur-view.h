@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SUPER_BLUR_VIEW_MODULE
  * @{
  */
 
@@ -39,7 +39,7 @@ class SuperBlurView;
 }
 
 /**
- * SuperBlurView accepts an image as input, and displays/animates it with various blur strength.
+ * @brief SuperBlurView accepts an image as input, and displays/animates it with various blur strength.
  * Usage example:-
  *
  *  // initialise\n
@@ -60,39 +60,48 @@ class SuperBlurView : public Control
 {
 public:
   /**
-   * Signal type for notifications
+   * @brief Signal type for notifications.
    */
   typedef SignalV2< void (SuperBlurView source) > SuperBlurViewSignal;
 
   /**
-   * Creates an empty SuperBlurView handle
+   * @brief Creates an empty SuperBlurView handle.
    */
   SuperBlurView();
 
   /**
-   * Create an initialized SuperBlurView
+   * @brief Create an initialized SuperBlurView.
+   *
    * @param[in] blurLevels The final blur strength level. It decides how many filtering passes are used to create the group of blurred images.
    * @return A handle to a newly allocated Dali resource
    */
   static SuperBlurView New( unsigned int blurLevels );
 
   /**
-   * Copy constructor. Creates another handle that points to the same real object
+   * @brief Copy constructor.
+   *
+   * Creates another handle that points to the same real object.
+   * @param[in] handle the handle to copy from
    */
   SuperBlurView( const SuperBlurView& handle );
 
   /**
-   * Assignment operator. Changes this handle to point to another real object
+   * @brief Assignment operator.
+   *
+   * Changes this handle to point to another real object.
+   * @param[in] rhs the handle to copy from
+   * @return a reference to this
    */
   SuperBlurView& operator=( const SuperBlurView& rhs );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~SuperBlurView();
 
   /**
-   * Downcast an Object handle to SuperBlurView.
+   * @brief Downcast an Object handle to SuperBlurView.
+   *
    * If handle points to a SuperBlurView, the downcast produces valid handle.
    * If not, the returned handle is left uninitialized.
    * @param[in] handle Handle to an object
@@ -101,38 +110,46 @@ public:
   static SuperBlurView DownCast( BaseHandle handle );
 
   /**
-   * Sets a custom image to be blurred
+   * @brief Sets a custom image to be blurred.
+   *
    * @param[in] inputImage The image that the user wishes to blur
    */
   void SetImage(Image inputImage);
 
   /**
-   * Get the index of the property that can be used to fade the blur in / out. This is the overall strength of the blur.
+   * @brief Get the index of the property that can be used to fade the blur in / out.
+   *
+   * This is the overall strength of the blur.
    * User can use this to animate the blur. A value of 0.0 is zero blur and 1.0 is full blur. Default is 0.0.
    * @return Index of the property that can be used to fade the blur in / out
    */
   Property::Index GetBlurStrengthPropertyIndex() const;
 
   /**
-   * Set the blur strength to display the image
+   * @brief Set the blur strength to display the image.
+   *
    * @param[in] blurStrength The blur strength used to display the image.
    */
   void SetBlurStrength( float blurStrength );
 
   /**
-   * Get the current blur strength
+   * @brief Get the current blur strength.
+   *
    * @return The current blur strength
    */
   float GetCurrentBlurStrength() const;
 
   /**
-   * Connect to this signal to be notified when the all the blurs have completed.
+   * @brief Connect to this signal to be notified when the all the blurs have completed.
+   *
    * @return The BlurFinished signal
    */
   SuperBlurViewSignal& BlurFinishedSignal();
 
   /**
-   * Get the blurred image. Should wait for the BlurFinishedSignal before calling this method
+   * @brief Get the blurred image.
+   *
+   * Should wait for the BlurFinishedSignal before calling this method.
    * @param[in] level Indicate which blurred image to get, must be a value between 1 and  blurLevels
    * @return The level-th blurred image
    */
@@ -141,13 +158,15 @@ public:
 public: // Not intended for application developers
 
   /**
-   * Creates a handle using the Toolkit::Internal implementation.
+   * @brief Creates a handle using the Toolkit::Internal implementation.
+   *
    * @param[in]  implementation  The Control implementation.
    */
   DALI_INTERNAL SuperBlurView(Internal::SuperBlurView& implementation);
 
   /**
-   * Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   DALI_INTERNAL SuperBlurView(Dali::Internal::CustomActor* internal);

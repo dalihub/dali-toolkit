@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_MODULE
  * @{
  */
 
@@ -28,14 +28,20 @@
 namespace Dali DALI_IMPORT_API
 {
 
+/**
+ * @brief DALi Toolkit namespace.
+ */
 namespace Toolkit
 {
 
+/**
+ * @brief Control Orientation namespace.
+ */
 namespace ControlOrientation
 {
 
 /**
- * The internal orientation a control.
+ * @brief The internal orientation of a control.
  */
 enum Type
 {
@@ -48,14 +54,16 @@ enum Type
 } // namespace ControlOrientation
 
 /**
- * Query whether an orientation is vertical.
+ * @brief Query whether an orientation is vertical.
+ *
  * @param[in] orientation The orientation.
  * @return True if the orientation is vertical.
  */
 bool IsVertical(ControlOrientation::Type orientation);
 
 /**
- * Query whether an orientation is horizontal.
+ * @brief Query whether an orientation is horizontal.
+ *
  * @param[in] orientation The orientation.
  * @return True if the orientation is horizontal.
  */

@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_SCROLL_VIEW_MODULE
  * @{
  */
 
@@ -39,9 +39,8 @@ class ScrollViewPageSpiralEffect;
 }
 
 /**
- * ScrollView Page Spiral Effect.
+ * @brief This effect cause each page in a scroll-view to move along a spiral.
  *
- * This effect cause each page in a scroll-view to move along a spiral.
  * It should be used on the following Actor hierarchy:
  *
  * ScrollView
@@ -64,19 +63,23 @@ class ScrollViewPageSpiralEffect : public ScrollViewEffect
 public:
 
   /**
-   * Create an initialized ScrollViewPageSpiralEffect.
+   * @brief Create an initialized ScrollViewPageSpiralEffect.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static ScrollViewPageSpiralEffect New();
 
   /**
-   * Create an uninitialized ScrollViewPageSpiralEffect; this can be initialized with ScrollViewPageSpiralEffect::New()
+   * @brief Create an uninitialized ScrollViewPageSpiralEffect; this can be initialized with ScrollViewPageSpiralEffect::New().
+   *
    * Calling member functions with an uninitialized Toolkit::ScrollViewPageSpiralEffect is not allowed.
    */
   ScrollViewPageSpiralEffect();
 
   /**
-   * Downcast an Object handle to ScrollViewPageSpiralEffect. If handle points to a ScrollViewPageSpiralEffect the
+   * @brief Downcast an Object handle to ScrollViewPageSpiralEffect.
+   *
+   * If handle points to a ScrollViewPageSpiralEffect the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @param[in] handle Handle to an object
    * @return handle to a ScrollViewPageSpiralEffect or an uninitialized handle
@@ -84,7 +87,8 @@ public:
   static ScrollViewPageSpiralEffect DownCast( BaseHandle handle );
 
   /**
-   * Manually apply effect to a page in the scroll-view.
+   * @brief Manually apply effect to a page in the scroll-view.
+   *
    * @param[in] page The page to be affected by this effect.
    * @param[in] spiralAngle The spirald angle (in radians).
    *
@@ -96,7 +100,8 @@ public:
 protected:
 
   /**
-   * This constructor is used by Dali New() methods.
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
   ScrollViewPageSpiralEffect( Internal::ScrollViewPageSpiralEffect *impl );

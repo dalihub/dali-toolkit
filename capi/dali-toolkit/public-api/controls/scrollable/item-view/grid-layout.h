@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_ITEM_VIEW_MODULE
  * @{
  */
 
@@ -35,139 +35,165 @@ namespace Toolkit
 
 class GridLayout;
 
-typedef IntrusivePtr<GridLayout> GridLayoutPtr;
+typedef IntrusivePtr<GridLayout> GridLayoutPtr; ///< Pointer to a Dali::Toolkit::GridLayout object
 
 /**
- * An ItemView layout which arranges items in a grid.
+ * @brief An ItemView layout which arranges items in a grid.
  */
 class GridLayout : public ItemLayout
 {
 public:
 
+  /**
+   * @brief Function signature for a method to calculate the item size.
+   *
+   * @see SetItemSizeFunction()
+   */
   typedef boost::function<Vector3 (unsigned int numberOfColumns, float layoutWidth, float sideMargin, float columnSpacing)> ItemSizeFunction;
 
   /**
-   * Create a new grid layout
+   * @brief Create a new grid layout.
    */
   static GridLayoutPtr New();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~GridLayout();
 
   /**
-   * Set the number of columns in the layout.
+   * @brief Set the number of columns in the layout.
+   *
    * @param[in] columns The number of columns.
    */
   void SetNumberOfColumns(unsigned int columns);
 
   /**
-   * Get the number of columns in the layout.
+   * @brief Get the number of columns in the layout.
+   *
    * @return The number of columns.
    */
   unsigned int GetNumberOfColumns() const;
 
   /**
-   * Set the spacing between rows.
+   * @brief Set the spacing between rows.
+   *
    * @param[in] spacing The row spacing.
    */
   void SetRowSpacing(float spacing);
 
   /**
-   * Get the spacing between rows.
+   * @brief Get the spacing between rows.
+   *
    * @return The row spacing.
    */
   float GetRowSpacing() const;
 
   /**
-   * Set the spacing between columns.
+   * @brief Set the spacing between columns.
+   *
    * @param[in] spacing The row spacing.
    */
   void SetColumnSpacing(float spacing);
 
   /**
-   * Get the spacing between columns.
+   * @brief Get the spacing between columns.
+   *
    * @return The row spacing.
    */
   float GetColumnSpacing() const;
 
   /**
-   * Set the margin in the top of the layout
+   * @brief Set the margin in the top of the layout.
+   *
    * @param[in] margin The layout top margin.
    */
   void SetTopMargin(float margin);
 
   /**
-   * Get the margin in the top of the layout
+   * @brief Get the margin in the top of the layout.
+   *
    * @return The layout top margin.
    */
   float GetTopMargin() const;
 
   /**
-   * Set the margin in the bottom of the layout
+   * @brief Set the margin in the bottom of the layout.
+   *
    * @param[in] margin The layout bottom margin.
    */
   void SetBottomMargin(float margin);
 
   /**
-   * Get the margin in the bottom of the layout
+   * @brief Get the margin in the bottom of the layout.
+   *
    * @return The layout bottom margin.
    */
   float GetBottomMargin() const;
 
   /**
-   * Set the margin in the left and right of the layout
+   * @brief Set the margin in the left and right of the layout.
+   *
    * @param[in] margin The layout side margin.
    */
   void SetSideMargin(float margin);
 
   /**
-   * Get the margin in the left and right of the layout
+   * @brief Get the margin in the left and right of the layout.
+   *
    * @return The layout side margin.
    */
   float GetSideMargin() const;
 
   /**
-   * Set the gap of items in the Z axis in different columns.
+   * @brief Set the gap of items in the Z axis in different columns.
+   *
    * @param[in] gap The gap of items.
    */
   void SetZGap(float gap);
 
   /**
-   * Get the gap of items in the Z axis in different columns.
+   * @brief Get the gap of items in the Z axis in different columns.
+   *
    * @return The gap of items.
    */
   float GetZGap() const;
 
   /**
-   * Set the function used to calculate the item-size, for a given layout-size.
+   * @brief Set the function used to calculate the item-size, for a given layout-size.
+   *
    * @param[in] function The item-size function.
    */
   void SetItemSizeFunction(ItemSizeFunction function);
 
   /**
-   * Get the function used to calculate the item-size.
+   * @brief Get the function used to calculate the item-size.
+   *
    * @return The item-size function.
    */
   ItemSizeFunction GetItemSizeFunction() const;
 
   /**
-   * Set the factor used to customise the scroll speed while dragging and swiping the layout.
+   * @brief Set the factor used to customise the scroll speed while dragging and swiping the layout.
+   *
    * @param[in] scrollSpeed The scroll speed factor.
    */
   void SetScrollSpeedFactor(float scrollSpeed);
 
   /**
-   * Set the maximum swipe speed in pixels per second.
+   * @brief Set the maximum swipe speed in pixels per second.
+   *
    * @param[in] speed The maximum swipe speed.
    */
   void SetMaximumSwipeSpeed(float speed);
 
   /**
-   * Set the duration of the flick animation in second. This is the time taken to animate each
-   * item to its next layout position (e.g. from 1.0 to 2.0) when a flick animation is triggered
-   * by a swipe gesture.
+   * @brief Set the duration of the flick animation in seconds.
+   *
+   * This is the time taken to animate each item to its next layout
+   * position (e.g. from 1.0 to 2.0) when a flick animation is
+   * triggered by a swipe gesture.
+   *
    * @pre durationSeconds must be greater than zero.
    * @param[in] durationSeconds The duration of flick animation in seconds.
    */
@@ -268,7 +294,7 @@ private:
 protected:
 
   /**
-   * Protected constructor; see also GridLayout::New()
+   * @brief Protected constructor; see also GridLayout::New().
    */
   GridLayout();
 
