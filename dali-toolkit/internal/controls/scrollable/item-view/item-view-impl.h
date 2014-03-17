@@ -19,7 +19,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/dali.h>
-#include <map>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -98,6 +97,16 @@ public:
    * @copydoc Toolkit::ItemView::ActivateLayout
    */
   void ActivateLayout(unsigned int layoutIndex, const Vector3& targetSize, float durationSeconds);
+
+  /**
+   * @copydoc Toolkit::ItemView::SetDefaultAlphaFunction
+   */
+  void SetDefaultAlphaFunction(AlphaFunction func);
+
+  /**
+   * @copydoc Toolkit::ItemView::GetDefaultAlphaFunction
+   */
+  AlphaFunction GetDefaultAlphaFunction() const;
 
   /**
    * @copydoc Toolkit::ItemView::DeactivateCurrentLayout
@@ -491,6 +500,8 @@ private:
   ItemLayoutContainer mLayouts;
   ItemLayout* mActiveLayout;
   Vector3 mActiveLayoutTargetSize;
+
+  AlphaFunction mDefaultAlphaFunction;
 
   Animation mResizeAnimation;
   Animation mScrollAnimation;

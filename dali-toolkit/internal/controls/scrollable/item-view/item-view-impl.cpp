@@ -19,7 +19,6 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
-#include <set>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/mouse-wheel-event.h>
@@ -396,6 +395,7 @@ ItemView::ItemView(ItemFactory& factory)
 : Scrollable(),
   mItemFactory(factory),
   mActiveLayout(NULL),
+  mDefaultAlphaFunction(Dali::Constraint::DEFAULT_ALPHA_FUNCTION),
   mAnimatingOvershootOn(false),
   mAnimateOvershootOff(false),
   mAnchoringEnabled(true),
@@ -632,6 +632,16 @@ void ItemView::DeactivateCurrentLayout()
   }
 
   CancelRefreshTimer();
+}
+
+void ItemView::SetDefaultAlphaFunction(AlphaFunction func)
+{
+  mDefaultAlphaFunction = func;
+}
+
+AlphaFunction ItemView::GetDefaultAlphaFunction() const
+{
+  return mDefaultAlphaFunction;
 }
 
 bool ItemView::OnRefreshTick()
@@ -1115,6 +1125,7 @@ void ItemView::ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int i
                                                       ParentSource( Actor::SIZE ),
                                                       wrapped );
     constraint.SetApplyTime(duration);
+    constraint.SetAlphaFunction(mDefaultAlphaFunction);
 
     actor.ApplyConstraint(constraint);
   }
@@ -1130,6 +1141,7 @@ void ItemView::ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int i
                                                          ParentSource( Actor::SIZE ),
                                                          wrapped );
     constraint.SetApplyTime(duration);
+    constraint.SetAlphaFunction(mDefaultAlphaFunction);
 
     actor.ApplyConstraint(constraint);
   }
@@ -1145,6 +1157,7 @@ void ItemView::ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int i
                                                       ParentSource( Actor::SIZE ),
                                                       wrapped );
     constraint.SetApplyTime(duration);
+    constraint.SetAlphaFunction(mDefaultAlphaFunction);
 
     actor.ApplyConstraint(constraint);
   }
@@ -1160,6 +1173,7 @@ void ItemView::ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int i
                                                       ParentSource( Actor::SIZE ),
                                                       wrapped );
     constraint.SetApplyTime(duration);
+    constraint.SetAlphaFunction(mDefaultAlphaFunction);
 
     // Release color constraints slowly; this allows ItemView to co-exist with ImageActor fade-in
     constraint.SetRemoveTime(DEFAULT_COLOR_VISIBILITY_REMOVE_TIME);
@@ -1179,6 +1193,7 @@ void ItemView::ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int i
                                                    ParentSource( Actor::SIZE ),
                                                    wrapped );
     constraint.SetApplyTime(duration);
+    constraint.SetAlphaFunction(mDefaultAlphaFunction);
 
     // Release visibility constraints the same time as the color constraint
     constraint.SetRemoveTime(DEFAULT_COLOR_VISIBILITY_REMOVE_TIME);

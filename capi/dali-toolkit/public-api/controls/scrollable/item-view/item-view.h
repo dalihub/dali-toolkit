@@ -175,6 +175,20 @@ public:
   void DeactivateCurrentLayout();
 
   /**
+   * @brief Set default the alpha function used when applying constraints e.g. during ActivateLayout().
+   *
+   * @param[in] func The default alpha function to use.
+   */
+  void SetDefaultAlphaFunction(AlphaFunction func);
+
+  /**
+   * @brief Retrieve the default alpha function for an animation.
+   *
+   * @return The default alpha function.
+   */
+  AlphaFunction GetDefaultAlphaFunction() const;
+
+  /**
    * @brief Set the minimum swipe speed in pixels per second; A pan
    * gesture must exceed this to trigger a swipe.
    *

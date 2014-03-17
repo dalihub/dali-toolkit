@@ -112,6 +112,16 @@ void ItemView::DeactivateCurrentLayout()
   GetImpl(*this).DeactivateCurrentLayout();
 }
 
+void ItemView::SetDefaultAlphaFunction(AlphaFunction func)
+{
+  GetImpl(*this).SetDefaultAlphaFunction(func);
+}
+
+AlphaFunction ItemView::GetDefaultAlphaFunction() const
+{
+  return GetImpl(*this).GetDefaultAlphaFunction();
+}
+
 void ItemView::SetMinimumSwipeSpeed(float speed)
 {
   GetImpl(*this).SetMinimumSwipeSpeed(speed);
