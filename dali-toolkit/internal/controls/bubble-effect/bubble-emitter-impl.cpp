@@ -151,6 +151,7 @@ void BubbleEmitter::SetBackground( Image bgImage, const Vector3& hsvDelta )
   task.SetSourceActor( sourceActor );
   task.SetExclusive(true);
   task.SetCameraActor(mCameraActor);
+  task.GetCameraActor().SetInvertYAxis(true);
   task.SetTargetFrameBuffer( mEffectImage );
   task.FinishedSignal().Connect(this, &BubbleEmitter::OnRenderFinished);
 }
