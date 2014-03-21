@@ -1067,17 +1067,18 @@ void InitializeTextActorInfo( TextView::RelayoutData& relayoutData )
     return;
   }
 
-  std::size_t characterGlobalIndex = 0; // Index to the global character (within the whole text).
-  std::size_t lineLayoutInfoIndex = 0;  // Index to the laid out line info.
+  std::size_t characterGlobalIndex = 0;  // Index to the global character (within the whole text).
+  std::size_t lineLayoutInfoIndex = 0;   // Index to the laid out line info.
   const std::size_t lineLayoutInfoSize = relayoutData.mLines.size(); // Number or laid out lines.
-  bool lineLayoutEnd = false;           // Whether lineLayoutInfoIndex points at the last laid out line.
-  bool textActorCreatedForLine = false;
+  bool lineLayoutEnd = false;            // Whether lineLayoutInfoIndex points at the last laid out line.
+  bool glyphActorCreatedForLine = false; // Whether a renderable actor has been created for this line.
 
-  TextActor currentTextActor;           // text-actor used when the edit mode is disabled.
-  TextStyle currentStyle;               // style for the current text-actor.
-  Vector4 currentGradientColor;         // gradient color for the current text-actor.
-  Vector2 currentStartPoint;            // start point for the current text-actor.
-  Vector2 currentEndPoint;              // end point for the current text-actor.
+  RenderableActor currentGlyphActor;      // text-actor used when the edit mode is disabled.
+  TextStyle currentStyle;                // style for the current text-actor.
+  Vector4 currentGradientColor;          // gradient color for the current text-actor.
+  Vector2 currentStartPoint;             // start point for the current text-actor.
+  Vector2 currentEndPoint;               // end point for the current text-actor.
+  bool currentIsColorGlyph = false;      // Whether current glyph is an emoticon.
 
   std::vector<TextActor> textActorsToRemove; // Keep a vector of text-actors to be included into the cache.
 
@@ -1117,50 +1118,73 @@ void InitializeTextActorInfo( TextView::RelayoutData& relayoutData )
               // Arrived at last line.
               lineLayoutEnd = true; // Avoids access out of bounds in the relayoutData.mLines vector.
             }
-            textActorCreatedForLine = false;
+            glyphActorCreatedForLine = false;
           }
 
           if( !characterLayout.mStyledText.mText.IsEmpty() )
           {
-            // Do not create a text-actor if there is no text.
+            // Do not create a glyph-actor if there is no text.
             const Character character = characterLayout.mStyledText.mText[0]; // there are only one character per character layout.
 
-            if( !character.IsWhiteSpace() || // A new line character is also a white space.
+            if( characterLayout.mIsColorGlyph ||
+                !character.IsWhiteSpace() || // A new line character is also a white space.
                 ( character.IsWhiteSpace() && characterLayout.mStyledText.mStyle.GetUnderline() ) )
             {
-              // Do not create a text-actor if it's a white space (without underline) or a new line character.
+              // Do not create a glyph-actor if it's a white space (without underline) or a new line character.
 
-              // Creates one text-actor per each counsecutive group of characters, with the same style, per line.
+              // Creates one glyph-actor per each counsecutive group of characters, with the same style, per line, or if it's an emoticon.
 
-              if( !textActorCreatedForLine ||
+              if( !glyphActorCreatedForLine ||
+                  characterLayout.mIsColorGlyph ||
                   ( characterLayout.mStyledText.mStyle != currentStyle ) ||
                   ( characterLayout.mGradientColor != currentGradientColor ) ||
                   ( characterLayout.mStartPoint != currentStartPoint ) ||
-                  ( characterLayout.mEndPoint != currentEndPoint ) )
+                  ( characterLayout.mEndPoint != currentEndPoint ) ||
+                  ( characterLayout.mIsColorGlyph != currentIsColorGlyph ) )
               {
-                // There is a new style or a new line.
-                textActorCreatedForLine = true;
+                characterLayout.mSetText = false;
+                characterLayout.mSetStyle = false;
 
-                if( characterLayout.mTextActor )
+                // There is a new style or a new line.
+                glyphActorCreatedForLine = true;
+
+                if( characterLayout.mIsColorGlyph )
                 {
-                  // Try to reuse first the text-actor of this character.
-                  currentTextActor = characterLayout.mTextActor;
-                  currentTextActor.SetTextStyle( characterLayout.mStyledText.mStyle );
+                  ImageActor imageActor = ImageActor::DownCast( characterLayout.mGlyphActor );
+                  if( !imageActor )
+                  {
+                    characterLayout.mGlyphActor = ImageActor::New();
+                    characterLayout.mSetText = true;
+                  }
                 }
                 else
                 {
-                  // If there is no text-actor, try to retrieve one from the cache.
-                  currentTextActor = relayoutData.mTextActorCache.RetrieveTextActor();
+                  TextActor textActor = TextActor::DownCast( characterLayout.mGlyphActor );
 
-                  // If still there is no text-actor, create one.
-                  if( !currentTextActor )
+                  if( textActor )
                   {
-                    currentTextActor = TextActor::New( Text(), characterLayout.mStyledText.mStyle, false, true );
+                    // Try to reuse first the text-actor of this character.
+                    textActor.SetTextStyle( characterLayout.mStyledText.mStyle );
+                    currentGlyphActor = textActor;
                   }
                   else
                   {
-                    currentTextActor.SetTextStyle( characterLayout.mStyledText.mStyle );
+                    // If there is no text-actor, try to retrieve one from the cache.
+                    textActor = relayoutData.mTextActorCache.RetrieveTextActor();
+
+                    // If still there is no text-actor, create one.
+                    if( !textActor )
+                    {
+                      textActor = TextActor::New( Text(), characterLayout.mStyledText.mStyle, false, true );
+                    }
+                    else
+                    {
+                      textActor.SetTextStyle( characterLayout.mStyledText.mStyle );
+                    }
+
+                    currentGlyphActor = textActor;
                   }
+                  characterLayout.mGlyphActor = currentGlyphActor;
                 }
 
                 // Update style to be checked with next characters.
@@ -1168,24 +1192,28 @@ void InitializeTextActorInfo( TextView::RelayoutData& relayoutData )
                 currentGradientColor = characterLayout.mGradientColor;
                 currentStartPoint = characterLayout.mStartPoint;
                 currentEndPoint = characterLayout.mEndPoint;
+                currentIsColorGlyph = characterLayout.mIsColorGlyph;
 
-                characterLayout.mSetText = false;
-                characterLayout.mSetStyle = false;
-
-                characterLayout.mTextActor = currentTextActor;
-                characterLayout.mTextActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-                characterLayout.mTextActor.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
+                characterLayout.mGlyphActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+                characterLayout.mGlyphActor.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
               }
               else
               {
+                DALI_ASSERT_DEBUG( !characterLayout.mIsColorGlyph && "TextViewProcessor::InitializeTextActorInfo. An image-actor doesn't store more than one emoticon." );
+
                 // Same style than previous one.
-                if( characterLayout.mTextActor )
+                TextActor textActor = TextActor::DownCast( characterLayout.mGlyphActor );
+                if( textActor )
                 {
                   // There is a previously created text-actor for this character.
                   // If this character has another one put it into the cache.
-                  characterLayout.mTextActor.SetText( "" );
-                  textActorsToRemove.push_back( characterLayout.mTextActor );
-                  characterLayout.mTextActor.Reset();
+                  textActor.SetText( "" );
+                  textActorsToRemove.push_back( textActor );
+                }
+
+                if( characterLayout.mGlyphActor )
+                {
+                  characterLayout.mGlyphActor.Reset();
                 }
               }
             } // no white space / new line char

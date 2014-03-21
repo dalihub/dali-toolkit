@@ -462,13 +462,13 @@ void CalculateUnderlineInfo( TextView::RelayoutData& relayoutData );
 void SetUnderlineInfo( TextView::RelayoutData& relayoutData );
 
 /**
- * Remove text-actor from the text-view.
+ * Remove renderable-actor from the text-view.
  *
  * @param[in,out] textView The text-view.
- * @param[in] textActors text-actors to be removed from the text-view.
+ * @param[in] glyphActors renderable-actors to be removed from the text-view.
  */
-void RemoveTextActors( Actor textView,
-                       const std::vector<TextActor>& textActors );
+void RemoveGlyphActors( Actor textView,
+                        const std::vector<RenderableActor>& glyphActors );
 
 /**
  * Inserts the text-actors into the text-view and/or the text-actor's list.
@@ -482,13 +482,15 @@ void InsertToTextView( TextView::RelayoutOperationMask relayoutOperationMask,
                        TextView::RelayoutData& relayoutData );
 
 /**
- * Retrieves a new text-actor from the cache of text-actors or creating a new one if it's empty.
+ * Retrieves a new glyph-actor from the cache of text-actors or creating a new one if it's empty.
  *
  * @param[in] text The text-actor's text.
  * @param[in] style The text-actor's style.
  * @param[in] cache The cache of text-actors.
+ *
+ * @return a RenderableActor with the text's glyph.
  */
-TextActor CreateTextActor( const Text& text, const TextStyle& style, TextActorCache& cache );
+RenderableActor CreateGlyphActor( const Text& text, const TextStyle& style, TextActorCache& cache );
 
 } // namespace TextViewRelayout
 

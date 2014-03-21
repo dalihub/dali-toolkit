@@ -640,8 +640,8 @@ public:
     TextViewProcessor::TextLayoutInfo               mTextLayoutInfo;              ///< Stores metrics, layout info (size, direction, type of word) and text-actor info for the whole text.
     std::vector<int>                                mCharacterLogicalToVisualMap; ///< Reorder map that stores each character's visual (output) index according to its logical (input) index
     std::vector<int>                                mCharacterVisualToLogicalMap; ///< Reorder map that stores each character's logical (input) index according to its visual (output) index
-    std::vector<TextActor>                          mTextActors;                  ///< Stores handles of those text-actors which are currently added to the text-view.
-    std::vector<TextActor>                          mEllipsizedTextActors;        ///< Stores handles of those text-actors which are used to ellipsize the text.
+    std::vector<RenderableActor>                    mGlyphActors;                 ///< Stores handles of those text-actors which are currently added to the text-view.
+    std::vector<RenderableActor>                    mEllipsizedGlyphActors;       ///< Stores handles of those text-actors which are used to ellipsize the text.
     Toolkit::TextView::CharacterLayoutInfoContainer mCharacterLayoutInfoTable;    ///< Stores layout info per character sorted by the character's visual index.
     Toolkit::TextView::LineLayoutInfoContainer      mLines;                       ///< Stores an index to the first character of each line.
     Size                                            mTextSizeForRelayoutOption;   ///< Stores the text size after relayout.

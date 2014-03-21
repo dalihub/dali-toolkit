@@ -591,8 +591,8 @@ void TextView::GetTextLayoutInfo()
     if( ( textViewSize.width > Math::MACHINE_EPSILON_1000 ) &&
         ( textViewSize.height > Math::MACHINE_EPSILON_1000 ) )
     {
-      // Check if the text-view has text-actors.
-      const bool hasTextActors = !mRelayoutData.mTextActors.empty();
+      // Check if the text-view has glyph-actors.
+      const bool hasGlyphActors = !mRelayoutData.mGlyphActors.empty();
 
       RelayoutOperationMask mask = NO_RELAYOUT;
       if( relayoutSizeAndPositionNeeded )
@@ -608,18 +608,18 @@ void TextView::GetTextLayoutInfo()
         mask = static_cast<RelayoutOperationMask>( mask | RELAYOUT_VISIBILITY );
       }
 
-      if( hasTextActors )
+      if( hasGlyphActors )
       {
-        // Remove text-actors from the text-view as some text-operation like CreateTextInfo()
+        // Remove glyph-actors from the text-view as some text-operation like CreateTextInfo()
         // add them to the text-actor cache.
-        TextViewRelayout::RemoveTextActors( GetRootActor(), mRelayoutData.mTextActors );
-        mRelayoutData.mTextActors.clear();
+        TextViewRelayout::RemoveGlyphActors( GetRootActor(), mRelayoutData.mGlyphActors );
+        mRelayoutData.mGlyphActors.clear();
       }
 
-      // Relays-out but doesn't add text-actors to the text-view.
+      // Relays-out but doesn't add glyph-actors to the text-view.
       DoRelayOut( textViewSize.GetVectorXY(), mask );
 
-      if( hasTextActors )
+      if( hasGlyphActors )
       {
         mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations | RELAYOUT_INSERT_TO_TEXT_VIEW );
         mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations | RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST );
@@ -648,7 +648,7 @@ void TextView::SetSortModifier( float depthOffset )
 {
   mVisualParameters.mSortModifier = depthOffset;
 
-  for( std::vector<TextActor>::iterator it = mRelayoutData.mTextActors.begin(), endIt = mRelayoutData.mTextActors.end();
+  for( std::vector<RenderableActor>::iterator it = mRelayoutData.mGlyphActors.begin(), endIt = mRelayoutData.mGlyphActors.end();
        it != endIt;
        ++it )
   {
@@ -665,10 +665,10 @@ void TextView::SetSnapshotModeEnabled( bool enable )
 {
   if( enable != mVisualParameters.mSnapshotModeEnabled )
   {
-    // Remove first all text-actors
-    if( !mRelayoutData.mTextActors.empty() )
+    // Remove first all glyph-actors
+    if( !mRelayoutData.mGlyphActors.empty() )
     {
-      TextViewRelayout::RemoveTextActors( GetRootActor(), mRelayoutData.mTextActors );
+      TextViewRelayout::RemoveGlyphActors( GetRootActor(), mRelayoutData.mGlyphActors );
     }
 
     mVisualParameters.mSnapshotModeEnabled = enable;
@@ -945,7 +945,7 @@ TextView::RelayoutData::RelayoutData()
   mTextLayoutInfo(),
   mCharacterLogicalToVisualMap(),
   mCharacterVisualToLogicalMap(),
-  mTextActors(),
+  mGlyphActors(),
   mCharacterLayoutInfoTable(),
   mLines(),
   mTextSizeForRelayoutOption()
@@ -958,7 +958,7 @@ TextView::RelayoutData::RelayoutData( const TextView::RelayoutData& relayoutData
   mTextLayoutInfo( relayoutData.mTextLayoutInfo ),
   mCharacterLogicalToVisualMap( relayoutData.mCharacterLogicalToVisualMap ),
   mCharacterVisualToLogicalMap( relayoutData.mCharacterVisualToLogicalMap ),
-  mTextActors( relayoutData.mTextActors ),
+  mGlyphActors( relayoutData.mGlyphActors ),
   mCharacterLayoutInfoTable( relayoutData.mCharacterLayoutInfoTable ),
   mLines( relayoutData.mLines ),
   mTextSizeForRelayoutOption( relayoutData.mTextSizeForRelayoutOption )
@@ -972,7 +972,7 @@ TextView::RelayoutData& TextView::RelayoutData::operator=( const TextView::Relay
   mTextLayoutInfo = relayoutData.mTextLayoutInfo;
   mCharacterLogicalToVisualMap = relayoutData.mCharacterLogicalToVisualMap;
   mCharacterVisualToLogicalMap = relayoutData.mCharacterVisualToLogicalMap;
-  mTextActors = relayoutData.mTextActors;
+  mGlyphActors = relayoutData.mGlyphActors;
   mCharacterLayoutInfoTable = relayoutData.mCharacterLayoutInfoTable;
   mLines = relayoutData.mLines;
   mTextSizeForRelayoutOption = relayoutData.mTextSizeForRelayoutOption;
@@ -1026,12 +1026,12 @@ Vector3 TextView::GetNaturalSize()
   {
     // There are SetText, Inserts or Removes to do. It means the current layout info is not updated.
 
-    if( !mRelayoutData.mTextActors.empty() )
+    if( !mRelayoutData.mGlyphActors.empty() )
     {
-      // Remove text-actors from the text-view as some text-operation like CreateTextInfo()
+      // Remove glyph-actors from the text-view as some text-operation like CreateTextInfo()
       // add them to the text-actor cache.
-      TextViewRelayout::RemoveTextActors( GetRootActor(), mRelayoutData.mTextActors );
-      mRelayoutData.mTextActors.clear();
+      TextViewRelayout::RemoveGlyphActors( GetRootActor(), mRelayoutData.mGlyphActors );
+      mRelayoutData.mGlyphActors.clear();
 
       mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations | RELAYOUT_INSERT_TO_TEXT_VIEW );
       mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations | RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST );
@@ -1060,26 +1060,26 @@ float TextView::GetHeightForWidth( float width )
     // Check if the given width is different than the current one.
     const bool differentWidth = ( fabsf( width - mRelayoutData.mTextViewSize.width ) > Math::MACHINE_EPSILON_1000 );
 
-    // Check if the text-view has text-actors.
-    const bool hasTextActors = !mRelayoutData.mTextActors.empty();
+    // Check if the text-view has glyph-actors.
+    const bool hasGlyphActors = !mRelayoutData.mGlyphActors.empty();
 
     // Check which layout operations need to be done.
     const bool relayoutSizeAndPositionNeeded = ( mRelayoutOperations & RELAYOUT_SIZE_POSITION ) || differentWidth;
 
     if( relayoutSizeAndPositionNeeded )
     {
-      if( hasTextActors )
+      if( hasGlyphActors )
       {
-        // Remove text-actors from the text-view as some text-operation like CreateTextInfo()
+        // Remove glyph-actors from the text-view as some text-operation like CreateTextInfo()
         // add them to the text-actor cache.
-        TextViewRelayout::RemoveTextActors( GetRootActor(), mRelayoutData.mTextActors );
-        mRelayoutData.mTextActors.clear();
+        TextViewRelayout::RemoveGlyphActors( GetRootActor(), mRelayoutData.mGlyphActors );
+        mRelayoutData.mGlyphActors.clear();
       }
 
       // Use the given width.
       const Vector2 textViewSize( width, GetControlSize().height );
 
-      // Relays-out but doesn't add text-actors to the text-view.
+      // Relays-out but doesn't add glyph-actors to the text-view.
       DoRelayOut( textViewSize, RELAYOUT_SIZE_POSITION );
     }
 
@@ -1092,13 +1092,13 @@ float TextView::GetHeightForWidth( float width )
       mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations | RELAYOUT_SIZE_POSITION );
     }
 
-    if( hasTextActors )
+    if( hasGlyphActors )
     {
       mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations | RELAYOUT_INSERT_TO_TEXT_VIEW );
       mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations | RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST );
     }
 
-    if( differentWidth || hasTextActors )
+    if( differentWidth || hasGlyphActors )
     {
       RelayoutRequest();
     }
@@ -1216,7 +1216,7 @@ void TextView::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
 
   if( size != mRelayoutData.mTextViewSize )
   {
-    // if new size is different than the prevoius one, set positions and maybe sizes of all text-actor is needed.
+    // if new size is different than the prevoius one, set positions and maybe sizes of all glyph-actor is needed.
     if( RELAYOUT_ALL != mRelayoutOperations )
     {
       mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations |
@@ -1230,16 +1230,16 @@ void TextView::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
     }
   }
 
-  // Remove text-actors from text-view
-  if( !mRelayoutData.mTextActors.empty() && ( mRelayoutOperations & RELAYOUT_REMOVE_TEXT_ACTORS ) )
+  // Remove glyph-actors from text-view
+  if( !mRelayoutData.mGlyphActors.empty() && ( mRelayoutOperations & RELAYOUT_REMOVE_TEXT_ACTORS ) )
   {
-    TextViewRelayout::RemoveTextActors( GetRootActor(), mRelayoutData.mTextActors );
-    mRelayoutData.mTextActors.clear();
+    TextViewRelayout::RemoveGlyphActors( GetRootActor(), mRelayoutData.mGlyphActors );
+    mRelayoutData.mGlyphActors.clear();
   }
 
   if( NO_RELAYOUT != mRelayoutOperations )
   {
-    // Relays-out and add text-actors to the text-view.
+    // Relays-out and add glyph-actors to the text-view.
     DoRelayOut( size, mRelayoutOperations );
     ProcessSnapshot( size );
   }
@@ -1373,7 +1373,7 @@ void TextView::OptimizeTextViewProcessorOperations()
 
 void TextView::DoRelayOut( const Size& textViewSize, const RelayoutOperationMask relayoutOperationMask )
 {
-  // Traverse the relayout operation vector. It fills the natural size, layout and text-actor data structures.
+  // Traverse the relayout operation vector. It fills the natural size, layout and glyph-actor data structures.
   if( !mTextViewProcessorOperations.empty() )
   {
     PerformTextViewProcessorOperations();
@@ -1740,7 +1740,7 @@ void TextView::DoSetScrollPosition( const Vector2& position )
 
   if( mOffscreenRootActor )
   {
-    // If there is a render-task it needs to be refreshed. Therefore text-actors need to be
+    // If there is a render-task it needs to be refreshed. Therefore glyph-actors need to be
     // set to visible.
     mOffscreenRootActor.SetVisible( true );
   }

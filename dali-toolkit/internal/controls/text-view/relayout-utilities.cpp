@@ -15,13 +15,13 @@
 //
 
 // FILE HEADER
-
 #include "relayout-utilities.h"
 
 // EXTERNAL INCLUDES
 #include <cmath>
 
 // INTERNAL INCLUDES
+#include <dali/dali.h>
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>
 #include "text-view-line-processor.h"
 #include "text-view-word-processor.h"
@@ -447,7 +447,7 @@ float CalculateJustificationOffset( const Toolkit::TextView::LineJustification j
   return offset;
 }
 
-bool IsVisible( const Vector3& position, const Size& size, const Size& parentSize, VisibilityTestType type )
+bool IsVisible( const Vector3& position, const Size& size, const Size& parentSize, const VisibilityTestType type )
 {
   bool visible = false;
 
@@ -1045,6 +1045,8 @@ void CreateEllipsizeTextActor( const EllipsizeParameters& ellipsizeParameters,
   TextStyle ellipsizeStyle;
   // Stores the current size.
   Size ellipsizeSize;
+  //Whether current glyph is an emoticon.
+  bool isColorGlyph = false;
 
   float bearingOffset = 0.f;
 
@@ -1056,27 +1058,30 @@ void CreateEllipsizeTextActor( const EllipsizeParameters& ellipsizeParameters,
   {
     const TextViewProcessor::CharacterLayoutInfo& ellipsizeCharacterLayoutInfo( *ellipsizeCharacterLayoutIt );
 
-    if( ellipsizeStyle != ellipsizeCharacterLayoutInfo.mStyledText.mStyle )
+    if( isColorGlyph ||
+        ( isColorGlyph != ellipsizeCharacterLayoutInfo.mIsColorGlyph ) ||
+        ( ellipsizeStyle != ellipsizeCharacterLayoutInfo.mStyledText.mStyle ) )
     {
       // The style is different, so a new text-actor is needed.
       if( !ellipsizeText.IsEmpty() )
       {
         // It only creates a text-actor if there is any text.
-        TextActor ellipsizeTextActor = CreateTextActor( ellipsizeText, ellipsizeStyle, relayoutData.mTextActorCache );
-        ellipsizeTextActor.SetSize( ellipsizeSize );
-        ellipsizeTextActor.SetPosition( Vector3( ellipsizePosition.x, ellipsizePosition.y - bearingOffset, ellipsizePosition.z ) );
+        RenderableActor ellipsizeGlyphActor = CreateGlyphActor( ellipsizeText, ellipsizeStyle, relayoutData.mTextActorCache );
+        ellipsizeGlyphActor.SetSize( ellipsizeSize );
+        ellipsizeGlyphActor.SetPosition( Vector3( ellipsizePosition.x, ellipsizePosition.y - bearingOffset, ellipsizePosition.z ) );
 
         // Updates the position for the next text-actor.
         ellipsizePosition.x += ellipsizeSize.width;
 
         // Adds the text-actor to the list.
-        relayoutData.mEllipsizedTextActors.push_back( ellipsizeTextActor );
+        relayoutData.mEllipsizedGlyphActors.push_back( ellipsizeGlyphActor );
       }
 
       // Resets the current ellipsize info.
       ellipsizeText = ellipsizeCharacterLayoutInfo.mStyledText.mText;
       ellipsizeStyle = ellipsizeCharacterLayoutInfo.mStyledText.mStyle;
       ellipsizeSize = ellipsizeCharacterLayoutInfo.mSize;
+      isColorGlyph = ellipsizeCharacterLayoutInfo.mIsColorGlyph;
 
       bearingOffset = ( ellipsizeParameters.mLineDescender - ( ellipsizeCharacterLayoutInfo.mSize.height - ellipsizeCharacterLayoutInfo.mAscender ) ) * relayoutData.mShrinkFactor;
     }
@@ -1091,13 +1096,13 @@ void CreateEllipsizeTextActor( const EllipsizeParameters& ellipsizeParameters,
 
   if( !ellipsizeText.IsEmpty() )
   {
-    // Creates the last text-actor.
-    TextActor ellipsizeTextActor = CreateTextActor( ellipsizeText, ellipsizeStyle, relayoutData.mTextActorCache );
-    ellipsizeTextActor.SetSize( ellipsizeSize );
-    ellipsizeTextActor.SetPosition( Vector3( ellipsizePosition.x, ellipsizePosition.y - bearingOffset, ellipsizePosition.z ) );
+    // Creates the last glyph-actor.
+    RenderableActor ellipsizeGlyphActor = CreateGlyphActor( ellipsizeText, ellipsizeStyle, relayoutData.mTextActorCache );
+    ellipsizeGlyphActor.SetSize( ellipsizeSize );
+    ellipsizeGlyphActor.SetPosition( Vector3( ellipsizePosition.x, ellipsizePosition.y - bearingOffset, ellipsizePosition.z ) );
 
-    // Adds the text-actor to the list.
-    relayoutData.mEllipsizedTextActors.push_back( ellipsizeTextActor );
+    // Adds the glyph-actor to the list.
+    relayoutData.mEllipsizedGlyphActors.push_back( ellipsizeGlyphActor );
   }
 }
 
@@ -1546,48 +1551,75 @@ void UpdateTextActorInfo( const TextView::VisualParameters& visualParameters,
         {
           TextViewProcessor::CharacterLayoutInfo& characterLayoutInfo( *characterLayoutIt );
 
-          if( characterLayoutInfo.mTextActor )
+          if( characterLayoutInfo.mIsColorGlyph )
           {
-              // There is a new text-actor. Set text and everything to the previous one.
-            if( currentTextActorInfo.textActor )
-            {
-              currentTextActorInfo.textActor.SetText( currentTextActorInfo.text );
-              currentTextActorInfo.textActor.SetPosition( currentTextActorInfo.position );
-              currentTextActorInfo.textActor.SetSize( currentTextActorInfo.size );
+            ImageActor imageActor = ImageActor::DownCast( characterLayoutInfo.mGlyphActor );
 
-              SetVisualParameters( currentTextActorInfo,
-                                   visualParameters,
-                                   relayoutData,
-                                   lineLayoutInfo.mSize.height );
+            if( characterLayoutInfo.mSetText )
+            {
+              GlyphImage image = GlyphImage::New( characterLayoutInfo.mStyledText.mText[0] );
+
+              if( image )
+              {
+                imageActor.SetImage( image );
+              }
+              characterLayoutInfo.mSetText = false;
             }
 
-            currentTextActorInfo.text = characterLayoutInfo.mStyledText.mText;
-            currentTextActorInfo.position = Vector3( characterLayoutInfo.mPosition.x + characterLayoutInfo.mOffset.x,
-                                                     characterLayoutInfo.mPosition.y + characterLayoutInfo.mOffset.y,
-                                                     characterLayoutInfo.mPosition.z );
-            currentTextActorInfo.size = characterLayoutInfo.mSize * relayoutData.mShrinkFactor;
+            imageActor.SetPosition( Vector3( characterLayoutInfo.mPosition.x + characterLayoutInfo.mOffset.x,
+                                             characterLayoutInfo.mPosition.y + characterLayoutInfo.mOffset.y,
+                                             characterLayoutInfo.mPosition.z ) );
+            imageActor.SetSize( characterLayoutInfo.mSize );
 
-            currentTextActorInfo.color = characterLayoutInfo.mStyledText.mStyle.GetTextColor();
-            currentTextActorInfo.color.a = characterLayoutInfo.mColorAlpha;
-
-            currentTextActorInfo.gradientColor = characterLayoutInfo.mGradientColor;
-            currentTextActorInfo.startPoint = characterLayoutInfo.mStartPoint;
-            currentTextActorInfo.endPoint = characterLayoutInfo.mEndPoint;
-
-            // Update the current text-actor.
-            currentTextActorInfo.textActor = characterLayoutInfo.mTextActor;
+            // Sets the sort modifier value.
+            imageActor.SetSortModifier( visualParameters.mSortModifier );
           }
           else
           {
-            // If this character layout has no text-actor is because this character has the same style than previous one.
-            // Add the character to the current text-actor and update the size.
-            if( characterLayoutInfo.mIsVisible && ( TextViewProcessor::LineSeparator != wordLayoutInfo.mType ) )
+            TextActor textActor = TextActor::DownCast( characterLayoutInfo.mGlyphActor );
+            if( textActor )
             {
-              currentTextActorInfo.text.Append( characterLayoutInfo.mStyledText.mText );
+              // There is a new text-actor. Set text and everything to the previous one.
+              if( currentTextActorInfo.textActor )
+              {
+                currentTextActorInfo.textActor.SetText( currentTextActorInfo.text );
+                currentTextActorInfo.textActor.SetPosition( currentTextActorInfo.position );
+                currentTextActorInfo.textActor.SetSize( currentTextActorInfo.size );
 
-              currentTextActorInfo.position.y = std::min( currentTextActorInfo.position.y, ( characterLayoutInfo.mPosition.y + characterLayoutInfo.mOffset.y ) );
-              currentTextActorInfo.size.width += characterLayoutInfo.mSize.width * relayoutData.mShrinkFactor;
-              currentTextActorInfo.size.height = std::max( currentTextActorInfo.size.height, characterLayoutInfo.mSize.height * relayoutData.mShrinkFactor );
+                SetVisualParameters( currentTextActorInfo,
+                                     visualParameters,
+                                     relayoutData,
+                                     lineLayoutInfo.mSize.height );
+              }
+
+              currentTextActorInfo.text = characterLayoutInfo.mStyledText.mText;
+              currentTextActorInfo.position = Vector3( characterLayoutInfo.mPosition.x + characterLayoutInfo.mOffset.x,
+                                                       characterLayoutInfo.mPosition.y + characterLayoutInfo.mOffset.y,
+                                                       characterLayoutInfo.mPosition.z );
+              currentTextActorInfo.size = characterLayoutInfo.mSize * relayoutData.mShrinkFactor;
+
+              currentTextActorInfo.color = characterLayoutInfo.mStyledText.mStyle.GetTextColor();
+              currentTextActorInfo.color.a = characterLayoutInfo.mColorAlpha;
+
+              currentTextActorInfo.gradientColor = characterLayoutInfo.mGradientColor;
+              currentTextActorInfo.startPoint = characterLayoutInfo.mStartPoint;
+              currentTextActorInfo.endPoint = characterLayoutInfo.mEndPoint;
+
+              // Update the current text-actor.
+              currentTextActorInfo.textActor = textActor;
+            }
+            else
+            {
+              // If this character layout has no text-actor is because this character has the same style than previous one.
+              // Add the character to the current text-actor and update the size.
+              if( characterLayoutInfo.mIsVisible && ( TextViewProcessor::LineSeparator != wordLayoutInfo.mType ) )
+              {
+                currentTextActorInfo.text.Append( characterLayoutInfo.mStyledText.mText );
+
+                currentTextActorInfo.position.y = std::min( currentTextActorInfo.position.y, ( characterLayoutInfo.mPosition.y + characterLayoutInfo.mOffset.y ) );
+                currentTextActorInfo.size.width += characterLayoutInfo.mSize.width * relayoutData.mShrinkFactor;
+                currentTextActorInfo.size.height = std::max( currentTextActorInfo.size.height, characterLayoutInfo.mSize.height * relayoutData.mShrinkFactor );
+              }
             }
           }
         } // end characters
@@ -1610,21 +1642,21 @@ void UpdateTextActorInfo( const TextView::VisualParameters& visualParameters,
     } //end groups of words
   } // end lines
 
-  for( std::vector<TextActor>::iterator it = relayoutData.mEllipsizedTextActors.begin(),
-         endIt = relayoutData.mEllipsizedTextActors.end();
+  for( std::vector<RenderableActor>::iterator it = relayoutData.mEllipsizedGlyphActors.begin(),
+         endIt = relayoutData.mEllipsizedGlyphActors.end();
        it != endIt;
        ++it )
   {
-    TextActor textActor = ( *it );
+    RenderableActor glyphActor = ( *it );
 
-    textActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    textActor.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
+    glyphActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    glyphActor.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
 
     // Sets the sort modifier value.
-    textActor.SetSortModifier( visualParameters.mSortModifier );
+    glyphActor.SetSortModifier( visualParameters.mSortModifier );
 
     // Enables or disables the blending.
-    textActor.SetBlendMode( !visualParameters.mSnapshotModeEnabled ? BlendingMode::ON : BlendingMode::OFF );
+    glyphActor.SetBlendMode( !visualParameters.mSnapshotModeEnabled ? BlendingMode::ON : BlendingMode::OFF );
   }
 }
 
@@ -1842,16 +1874,16 @@ void SetUnderlineInfo( TextView::RelayoutData& relayoutData )
   } // end of lines.
 }
 
-void RemoveTextActors( Actor textView,
-                       const std::vector<TextActor>& textActors )
+void RemoveGlyphActors( Actor textView,
+                        const std::vector<RenderableActor>& glyphActors )
 {
-  // Removes previously inserted text-actors.
+  // Removes previously inserted renderable-actors.
   // The SplitByNewLineChar::Relayout(), SplitByWord::Relayout() and SplitByChar::Relayout() functions add
-  // text-actors to the text-view. A handle to these text-actors are stored and passed to this function
-  // in order to remove 'only' text-actors added by these functions.
+  // renderable-actors to the text-view. A handle to these renderable-actors are stored and passed to this function
+  // in order to remove 'only' renderable-actors added by these functions.
   // Any other actor added by a programmer or application won't be removed.
 
-  for( std::vector<TextActor>::const_reverse_iterator it = textActors.rbegin(), endIt = textActors.rend(); it != endIt; ++it )
+  for( std::vector<RenderableActor>::const_reverse_iterator it = glyphActors.rbegin(), endIt = glyphActors.rend(); it != endIt; ++it )
   {
     textView.Remove( *it );
   }
@@ -1894,16 +1926,16 @@ void InsertToTextView( const TextView::RelayoutOperationMask relayoutOperationMa
         {
           TextViewProcessor::CharacterLayoutInfo& characterLayoutInfo( *characterLayoutIt );
 
-          if( characterLayoutInfo.mIsVisible && characterLayoutInfo.mTextActor ) // White spaces and '\n' characters doesn't have a text-actor.
+          if( characterLayoutInfo.mIsVisible && characterLayoutInfo.mGlyphActor ) // White spaces and '\n' characters doesn't have a text-actor.
           {
             //Add to the text-view.
             if( insertToTextView )
             {
-              textView.Add( characterLayoutInfo.mTextActor );
+              textView.Add( characterLayoutInfo.mGlyphActor );
             }
             if( insertToTextActorList )
             {
-              relayoutData.mTextActors.push_back( characterLayoutInfo.mTextActor );
+              relayoutData.mGlyphActors.push_back( characterLayoutInfo.mGlyphActor );
             }
           }
         } // end group of character
@@ -1911,27 +1943,27 @@ void InsertToTextView( const TextView::RelayoutOperationMask relayoutOperationMa
     } // end group of words
   } // end lines
 
-  for( std::vector<TextActor>::iterator it = relayoutData.mEllipsizedTextActors.begin(),
-         endIt = relayoutData.mEllipsizedTextActors.end();
+  for( std::vector<RenderableActor>::iterator it = relayoutData.mEllipsizedGlyphActors.begin(),
+         endIt = relayoutData.mEllipsizedGlyphActors.end();
        it != endIt;
        ++it )
   {
-    TextActor textActor = ( *it );
+    RenderableActor glyphActor = ( *it );
 
     //Add to the text-view.
     if( insertToTextView )
     {
-      textView.Add( textActor );
+      textView.Add( glyphActor );
     }
     if( insertToTextActorList )
     {
-      relayoutData.mTextActors.push_back( textActor );
+      relayoutData.mGlyphActors.push_back( glyphActor );
     }
   }
-  relayoutData.mEllipsizedTextActors.clear();
+  relayoutData.mEllipsizedGlyphActors.clear();
 }
 
-TextActor CreateTextActor( const Text& text, const TextStyle& style, TextActorCache& cache )
+RenderableActor CreateGlyphActor( const Text& text, const TextStyle& style, TextActorCache& cache )
 {
   TextActor textActor = cache.RetrieveTextActor();
 

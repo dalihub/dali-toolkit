@@ -130,16 +130,17 @@ struct CharacterLayoutInfo
   float       mUnderlineThickness; ///< The underline's thickness.
   float       mUnderlinePosition;  ///< The underline's position.
 
-  TextActor                   mTextActor;     ///< Handle to a text-actor.
-  MarkupProcessor::StyledText mStyledText;    ///< Stores the text and its style.
-  float                       mColorAlpha;    ///< Alpha component for the initial text color when text is faded.
-  Vector4                     mGradientColor; ///< Gradient color.
-  Vector2                     mStartPoint;    ///< Gradient start point.
-  Vector2                     mEndPoint;      ///< Gradient end point.
+  RenderableActor             mGlyphActor;     ///< Handle to a text-actor.
+  MarkupProcessor::StyledText mStyledText;     ///< Stores the text and its style.
+  float                       mColorAlpha;     ///< Alpha component for the initial text color when text is faded.
+  Vector4                     mGradientColor;  ///< Gradient color.
+  Vector2                     mStartPoint;     ///< Gradient start point.
+  Vector2                     mEndPoint;       ///< Gradient end point.
 
-  bool                        mIsVisible:1;   ///< Whether the text-actor is visible.
-  bool                        mSetText:1;     ///< Whether a new text needs to be set in the text-actor.
-  bool                        mSetStyle:1;    ///< Whether a new style needs to be set in the text-actor.
+  bool                        mIsVisible:1;    ///< Whether the text-actor is visible.
+  bool                        mSetText:1;      ///< Whether a new text needs to be set in the text-actor.
+  bool                        mSetStyle:1;     ///< Whether a new style needs to be set in the text-actor.
+  bool                        mIsColorGlyph:1; ///< Whether this character is an emoticon.
 };
 typedef std::vector<CharacterLayoutInfo> CharacterLayoutInfoContainer;
 

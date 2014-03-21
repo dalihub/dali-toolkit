@@ -16,6 +16,7 @@
 
 // INTERNAL INCLUDES
 #include "text-view-processor-helper-functions.h"
+#include "text-view-processor-dbg.h"
 
 namespace Dali
 {
@@ -56,6 +57,9 @@ TextSeparatorType GetTextSeparatorType( const Character& character )
 
 void ChooseFontFamilyName( MarkupProcessor::StyledText& text )
 {
+  DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "-->TextViewProcessor::ChooseFontFamilyName\n" );
+  DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "   input font name: [%s]\n", text.mStyle.GetFontName().c_str() );
+
   bool userDefinedFontFamilyName = false;
 
   // First check if there is a font defined in the style and it supports the given text.
@@ -88,6 +92,8 @@ void ChooseFontFamilyName( MarkupProcessor::StyledText& text )
       text.mStyle.SetFontName( "" );
     }
   }
+  DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "  output font name: [%s]\n", text.mStyle.GetFontName().c_str() );
+  DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "<--TextViewProcessor::ChooseFontFamilyName\n" );
 }
 
 void GetIndicesFromGlobalCharacterIndex( const std::size_t index,

@@ -43,7 +43,7 @@ CharacterLayoutInfo::CharacterLayoutInfo()
   mAscender( 0.f ),
   mUnderlineThickness( 0.f ),
   mUnderlinePosition( 0.f ),
-  mTextActor(),
+  mGlyphActor(),
   mStyledText(),
   mColorAlpha( 1.f ),
   mGradientColor(),
@@ -51,7 +51,8 @@ CharacterLayoutInfo::CharacterLayoutInfo()
   mEndPoint(),
   mIsVisible( true ),
   mSetText( true ),
-  mSetStyle( true )
+  mSetStyle( true ),
+  mIsColorGlyph( false )
 {
 }
 
@@ -65,7 +66,7 @@ CharacterLayoutInfo::CharacterLayoutInfo( const CharacterLayoutInfo& character )
   mAscender( character.mAscender ),
   mUnderlineThickness( character.mUnderlineThickness ),
   mUnderlinePosition( character.mUnderlinePosition ),
-  mTextActor( character.mTextActor ),
+  mGlyphActor( character.mGlyphActor ),
   mStyledText( character.mStyledText ),
   mColorAlpha( character.mColorAlpha ),
   mGradientColor( character.mGradientColor ),
@@ -73,7 +74,8 @@ CharacterLayoutInfo::CharacterLayoutInfo( const CharacterLayoutInfo& character )
   mEndPoint( character.mEndPoint ),
   mIsVisible( character.mIsVisible ),
   mSetText( character.mSetText ),
-  mSetStyle( character.mSetStyle )
+  mSetStyle( character.mSetStyle ),
+  mIsColorGlyph( character.mIsColorGlyph )
 {
 }
 
@@ -98,8 +100,9 @@ CharacterLayoutInfo& CharacterLayoutInfo::operator=( const CharacterLayoutInfo& 
   mIsVisible = character.mIsVisible;
   mSetText = character.mSetText;
   mSetStyle = character.mSetStyle;
+  mIsColorGlyph = character.mIsColorGlyph;
 
-  mTextActor = character.mTextActor;
+  mGlyphActor = character.mGlyphActor;
 
   return *this;
 }

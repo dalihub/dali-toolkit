@@ -19,6 +19,7 @@
 
 // INTERNAL INCLUDES
 #include "text-view-processor-types.h"
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -31,6 +32,10 @@ namespace Internal
 
 namespace TextViewProcessor
 {
+
+#if defined(DEBUG_ENABLED)
+extern Debug::Filter* gTextViewProcessorLogFilter;
+#endif
 
 void dbgPrint( const WordLayoutInfo& word );
 void dbgPrint( const WordGroupLayoutInfo& group );

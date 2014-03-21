@@ -29,6 +29,10 @@ namespace Internal
 namespace TextViewProcessor
 {
 
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gTextViewProcessorLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TEXT_VIEW_PROCESSOR");
+#endif
+
 void dbgPrint( const WordLayoutInfo& word )
 {
   for( CharacterLayoutInfoContainer::const_iterator characterIt = word.mCharactersLayoutInfo.begin(), endCharacterIt = word.mCharactersLayoutInfo.end();
@@ -40,9 +44,14 @@ void dbgPrint( const WordLayoutInfo& word )
     std::cout << "[" << character.mSize << std::endl;
     std::cout << " ascender " << character.mAscender << std::endl;
 
-    if( character.mTextActor )
+    TextActor textActor = TextActor::DownCast( character.mGlyphActor );
+    if( textActor )
     {
-      std::cout << "[" << character.mTextActor.GetText() << "]";
+      std::cout << "[" << textActor.GetText() << "]";
+    }
+    else
+    {
+      std::cout << "[ImageActor]" << std::endl;
     }
     std::cout << "{" << character.mStyledText.mText.GetText() << "}";
   }

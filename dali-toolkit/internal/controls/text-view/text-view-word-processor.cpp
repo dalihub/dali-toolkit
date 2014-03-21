@@ -14,9 +14,13 @@
 // limitations under the License.
 //
 
-// INTERNAL INCLUDES
+// FILE HEADER
 #include "text-view-word-processor.h"
+
+// INTERNAL INCLUDES
+#include <dali/dali.h>
 #include "text-view-processor-helper-functions.h"
+#include "text-view-processor-dbg.h"
 
 namespace Dali
 {
@@ -95,6 +99,7 @@ WordLayoutInfo& WordLayoutInfo::operator=( const WordLayoutInfo& word )
 void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
                          TextViewProcessor::WordLayoutInfo& wordLayoutInfo )
 {
+  DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "-->TextViewProcessor::CreateWordTextInfo\n" );
   // Split in characters.
   for( MarkupProcessor::StyledTextArray::const_iterator charIt = word.begin(), charEndIt = word.end(); charIt != charEndIt; ++charIt )
   {
@@ -120,12 +125,15 @@ void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
       // Create layout character info.
       CharacterLayoutInfo characterLayoutInfo;
 
+      characterLayoutInfo.mIsColorGlyph = GlyphImage::IsColorGlyph( character );
+      DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "  Is color glyph: %s\n", ( characterLayoutInfo.mIsColorGlyph ? "True" : "False" ) );
+
       // Fill Natural size info for current character.
       characterLayoutInfo.mHeight = font.GetLineHeight();
       characterLayoutInfo.mAdvance = metrics.GetAdvance();
       characterLayoutInfo.mBearing = metrics.GetBearing();
 
-      if( character.IsNewLine() )
+      if( character.IsNewLine() && !characterLayoutInfo.mIsColorGlyph )
       {
         // A new line character doesn't have any width.
         characterLayoutInfo.mSize.width = 0.f;
@@ -155,6 +163,7 @@ void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
       wordLayoutInfo.mType = GetTextSeparatorType( character );
     } // end of each character in the group of characters.
   } // end of characters in the word.
+  DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "<--TextViewProcessor::CreateWordTextInfo\n" );
 }
 
 void RemoveCharactersFromWordInfo( TextView::RelayoutData& relayoutData,
@@ -377,9 +386,13 @@ void CollectTextActors( std::vector<TextActor>& textActors, const WordLayoutInfo
   {
     const CharacterLayoutInfo& characterLayout( *characterIt );
 
-    if( characterLayout.mTextActor )
+    if( !characterLayout.mIsColorGlyph )
     {
-      textActors.push_back( characterLayout.mTextActor );
+      TextActor textActor = TextActor::DownCast( characterLayout.mGlyphActor );
+      if( textActor )
+      {
+        textActors.push_back( textActor );
+      }
     }
   }
 }
@@ -398,9 +411,13 @@ void CollectTextActorsFromWords( std::vector<TextActor>& textActors, const WordG
     {
       const CharacterLayoutInfo& characterLayout( *characterIt );
 
-      if( characterLayout.mTextActor )
+      if( !characterLayout.mIsColorGlyph )
       {
-        textActors.push_back( characterLayout.mTextActor );
+        TextActor textActor = TextActor::DownCast( characterLayout.mGlyphActor );
+        if( textActor )
+        {
+          textActors.push_back( textActor );
+        }
       }
     }
   }
