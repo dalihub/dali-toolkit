@@ -25,10 +25,9 @@ namespace Dali
 namespace Toolkit
 {
 
-const char* const ScrollConnector::SCROLL_POSITION_PROPERTY_NAME = "scroll-position";
-const Property::Index SCROLL_POSITION = Internal::ScrollConnector::SCROLL_POSITION;
-
-const char* const ScrollConnector::LIMITS_CHANGED_SIGNAL_NAME = "limits-changed";
+const char* const     ScrollConnector::SCROLL_POSITION_PROPERTY_NAME = "scroll-position";
+const Property::Index ScrollConnector::SCROLL_POSITION               = Internal::ScrollConnector::SCROLL_POSITION;
+const char* const     ScrollConnector::LIMITS_CHANGED_SIGNAL_NAME    = "limits-changed";
 
 ScrollConnector ScrollConnector::New()
 {
