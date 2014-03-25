@@ -260,16 +260,17 @@ private:
 
   /**
    * Add a range of Actors, if they are not already in the ItemPool.
-   * @param[in] layout The active layout.
    * @param[in] range The range of Item IDs to associate with the new actors.
+   * @param[in] durationSeconds The time taken to fully constrain the newly added actor.
    */
-  void AddActorsWithinRange( ItemRange range );
+  void AddActorsWithinRange( ItemRange range, float durationSeconds );
 
   /**
    * Add a new Actor, if not already in the ItemPool.
    * @param[in] item The ID for the new item.
+   * @param[in] durationSeconds The time taken to fully constrain the new actor.
    */
-  void AddNewActor( ItemId item );
+  void AddNewActor( ItemId item, float durationSeconds );
 
   /**
    * Apply the constraints etc. that are required for ItemView children.

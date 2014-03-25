@@ -517,12 +517,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
   mActiveLayoutTargetSize = targetSize;
 
   // Switch to the new layout
-  ItemLayout* previousLayout = mActiveLayout;
   mActiveLayout = mLayouts[layoutIndex].Get();
-
-  // Calculate which items are within either layout
-  ItemRange oldRange = previousLayout ? GetItemRange(*previousLayout, targetSize, false/*don't reserve extra*/) : ItemRange(0u, 0u);
-  ItemRange newRange = GetItemRange(*mActiveLayout, targetSize, false/*don't reserve extra*/);
 
   // Move the items to the new layout positions...
 
@@ -533,18 +528,13 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
     unsigned int itemId = iter->first;
     Actor actor = iter->second;
 
-    // Immediately relayout items that aren't within either layout
-    bool immediate = !oldRange.Within(itemId) &&
-                     !newRange.Within(itemId);
-
     // Remove constraints from previous layout
     actor.RemoveConstraints();
 
     Vector3 size;
     if(mActiveLayout->GetItemSize(itemId, targetSize, size))
     {
-      if (!immediate &&
-          durationSeconds > 0.0f)
+      if( durationSeconds > 0.0f )
       {
         // Use a size animation
         if (!resizeAnimationNeeded)
@@ -564,7 +554,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
       }
     }
 
-    ApplyConstraints(actor, *mActiveLayout, itemId, immediate ? 0.0f : durationSeconds);
+    ApplyConstraints(actor, *mActiveLayout, itemId, durationSeconds);
   }
 
   if (resizeAnimationNeeded)
@@ -574,7 +564,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
 
   // Refresh the new layout
   ItemRange range = GetItemRange(*mActiveLayout, targetSize, true/*reserve extra*/);
-  AddActorsWithinRange( range );
+  AddActorsWithinRange( range, durationSeconds );
 
   // Scroll to an appropriate layout position
 
@@ -656,7 +646,7 @@ bool ItemView::OnRefreshTick()
 
   RemoveActorsOutsideRange( range );
 
-  AddActorsWithinRange( range );
+  AddActorsWithinRange( range, 0.0f/*immediate*/ );
 
   // Keep refreshing whilst the layout is moving
   return mScrollAnimation || (mGestureState == Gesture::Started || mGestureState == Gesture::Continuing);
@@ -956,7 +946,7 @@ void ItemView::RemoveActorsOutsideRange( ItemRange range )
   }
 }
 
-void ItemView::AddActorsWithinRange( ItemRange range )
+void ItemView::AddActorsWithinRange( ItemRange range, float durationSeconds )
 {
   range.end = min(mItemFactory.GetNumberOfItems(), range.end);
 
@@ -965,19 +955,19 @@ void ItemView::AddActorsWithinRange( ItemRange range )
   {
     for (unsigned int itemId = range.begin; itemId < range.end; ++itemId)
     {
-      AddNewActor( itemId );
+      AddNewActor( itemId, durationSeconds );
     }
   }
   else
   {
     for (unsigned int itemId = range.end; itemId > range.begin; --itemId)
     {
-      AddNewActor( itemId-1 );
+      AddNewActor( itemId-1, durationSeconds );
     }
   }
 }
 
-void ItemView::AddNewActor( unsigned int itemId )
+void ItemView::AddNewActor( unsigned int itemId, float durationSeconds )
 {
   if( mItemPool.end() == mItemPool.find( itemId ) )
   {
@@ -989,7 +979,7 @@ void ItemView::AddNewActor( unsigned int itemId )
 
       mItemPool.insert( newItem );
 
-      SetupActor( newItem, 0.0f/*immediate*/ );
+      SetupActor( newItem, durationSeconds );
       Self().Add( actor );
     }
   }
