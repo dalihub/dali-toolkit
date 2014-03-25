@@ -39,10 +39,10 @@ const Property::Index PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY = Intern
 const Property::Index PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY    = Internal::Button::BUTTON_PROPERTY_END_INDEX + 3;
 const Property::Index PushButton::PROPERTY_TOGGLABLE                    = Internal::Button::BUTTON_PROPERTY_END_INDEX + 4;
 const Property::Index PushButton::PROPERTY_TOGGLE                       = Internal::Button::BUTTON_PROPERTY_END_INDEX + 5;
-const Property::Index PushButton::PROPERTY_BUTTON_IMAGE                 = Internal::Button::BUTTON_PROPERTY_END_INDEX + 6;
-const Property::Index PushButton::PROPERTY_PRESSED_IMAGE                = Internal::Button::BUTTON_PROPERTY_END_INDEX + 8;
-const Property::Index PushButton::PROPERTY_DIMMED_IMAGE                 = Internal::Button::BUTTON_PROPERTY_END_INDEX + 9;
-const Property::Index PushButton::PROPERTY_LABEL_TEXT                   = Internal::Button::BUTTON_PROPERTY_END_INDEX + 11;
+const Property::Index PushButton::PROPERTY_NORMAL_STATE_ACTOR           = Internal::Button::BUTTON_PROPERTY_END_INDEX + 6;
+const Property::Index PushButton::PROPERTY_PRESSED_STATE_ACTOR          = Internal::Button::BUTTON_PROPERTY_END_INDEX + 7;
+const Property::Index PushButton::PROPERTY_DIMMED_STATE_ACTOR           = Internal::Button::BUTTON_PROPERTY_END_INDEX + 8;
+const Property::Index PushButton::PROPERTY_LABEL_ACTOR                  = Internal::Button::BUTTON_PROPERTY_END_INDEX + 9;
 
 namespace Internal
 {
@@ -68,10 +68,10 @@ PropertyRegistration property2( typeRegistration, "initial-auto-repeating-delay"
 PropertyRegistration property3( typeRegistration, "next-auto-repeating-delay",    Toolkit::PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY,    Property::FLOAT,   &PushButton::SetProperty, &PushButton::GetProperty );
 PropertyRegistration property4( typeRegistration, "togglable",                    Toolkit::PushButton::PROPERTY_TOGGLABLE,                    Property::BOOLEAN, &PushButton::SetProperty, &PushButton::GetProperty );
 PropertyRegistration property5( typeRegistration, "toggle",                       Toolkit::PushButton::PROPERTY_TOGGLE,                       Property::BOOLEAN, &PushButton::SetProperty, &PushButton::GetProperty );
-PropertyRegistration property6( typeRegistration, "button-image",                 Toolkit::PushButton::PROPERTY_BUTTON_IMAGE,                 Property::STRING,  &PushButton::SetProperty, &PushButton::GetProperty );
-PropertyRegistration property7( typeRegistration, "pressed-image",                Toolkit::PushButton::PROPERTY_PRESSED_IMAGE,                Property::STRING,  &PushButton::SetProperty, &PushButton::GetProperty );
-PropertyRegistration property8( typeRegistration, "dimmed-image",                 Toolkit::PushButton::PROPERTY_DIMMED_IMAGE,                 Property::STRING,  &PushButton::SetProperty, &PushButton::GetProperty );
-PropertyRegistration property9( typeRegistration, "label-text",                   Toolkit::PushButton::PROPERTY_LABEL_TEXT,                   Property::STRING,  &PushButton::SetProperty, &PushButton::GetProperty );
+PropertyRegistration property6( typeRegistration, "normal-state-actor",           Toolkit::PushButton::PROPERTY_NORMAL_STATE_ACTOR,           Property::MAP,     &PushButton::SetProperty, &PushButton::GetProperty );
+PropertyRegistration property7( typeRegistration, "pressed-state-actor",          Toolkit::PushButton::PROPERTY_PRESSED_STATE_ACTOR,          Property::MAP,     &PushButton::SetProperty, &PushButton::GetProperty );
+PropertyRegistration property8( typeRegistration, "dimmed-state-actor",           Toolkit::PushButton::PROPERTY_DIMMED_STATE_ACTOR,           Property::MAP,     &PushButton::SetProperty, &PushButton::GetProperty );
+PropertyRegistration property9( typeRegistration, "label-actor",                  Toolkit::PushButton::PROPERTY_LABEL_ACTOR,                  Property::MAP,     &PushButton::SetProperty, &PushButton::GetProperty );
 
 } // unnamed namespace
 
@@ -85,31 +85,6 @@ const unsigned int NEXT_AUTOREPEATING_DELAY( 0.05f );
 PushButtonDefaultPainterPtr GetPushButtonPainter( Dali::Toolkit::Internal::ButtonPainterPtr painter )
 {
   return static_cast<PushButtonDefaultPainter*>( painter.Get() );
-}
-
-/**
- * Helper function to checks if the specified actor is an ImageActor and if it has an Image with a path.
- *
- * @param[in]  actor  Actor handle to check.
- * @param[out] path   The image path will be applied to this parameter, if available.
- *                    If not available then this will be an empty string.
- */
-void GetImageActorFilename( Actor& actor, std::string& path )
-{
-  path = ""; // Just return an empty string if not using ImageActor with an image
-
-  if ( actor )
-  {
-    ImageActor imageActor = ImageActor::DownCast( actor );
-    if ( imageActor )
-    {
-      Image image = imageActor.GetImage();
-      if ( image )
-      {
-        path = image.GetFilename();
-      }
-    }
-  }
 }
 
 } // unnamed namespace
@@ -438,30 +413,27 @@ void PushButton::SetProperty( BaseObject* object, Property::Index propertyIndex,
         break;
       }
 
-      case Toolkit::PushButton::PROPERTY_BUTTON_IMAGE:
+      case Toolkit::PushButton::PROPERTY_NORMAL_STATE_ACTOR:
       {
-        Image image = Image::New( value.Get<std::string>() );
-        pushButtonImpl.SetButtonImage( image );
+        pushButtonImpl.SetButtonImage( Scripting::NewActor( value.Get< Property::Map >() ) );
         break;
       }
 
-      case Toolkit::PushButton::PROPERTY_PRESSED_IMAGE:
+      case Toolkit::PushButton::PROPERTY_PRESSED_STATE_ACTOR:
       {
-        Image image = Image::New( value.Get<std::string>() );
-        pushButtonImpl.SetPressedImage( image );
+        pushButtonImpl.SetPressedImage( Scripting::NewActor( value.Get< Property::Map >() ) );
         break;
       }
 
-      case Toolkit::PushButton::PROPERTY_DIMMED_IMAGE:
+      case Toolkit::PushButton::PROPERTY_DIMMED_STATE_ACTOR:
       {
-        Image image = Image::New( value.Get<std::string>() );
-        pushButtonImpl.SetDimmedImage( image );
+        pushButtonImpl.SetDimmedImage( Scripting::NewActor( value.Get< Property::Map >() ) );
         break;
       }
 
-      case Toolkit::PushButton::PROPERTY_LABEL_TEXT:
+      case Toolkit::PushButton::PROPERTY_LABEL_ACTOR:
       {
-        pushButtonImpl.SetLabelText( value.Get< std::string >() );
+        pushButtonImpl.SetLabelText( Scripting::NewActor( value.Get< Property::Map >() ) );
         break;
       }
     }
@@ -510,42 +482,35 @@ Property::Value PushButton::GetProperty( BaseObject* object, Property::Index pro
         break;
       }
 
-      case Toolkit::PushButton::PROPERTY_BUTTON_IMAGE:
+      case Toolkit::PushButton::PROPERTY_NORMAL_STATE_ACTOR:
       {
-        std::string path;
-        GetImageActorFilename( pushButtonImpl.mButtonImage, path );
-        value = path;
+        Property::Map map;
+        Scripting::CreatePropertyMap( pushButtonImpl.mButtonImage, map );
+        value = map;
         break;
       }
 
-      case Toolkit::PushButton::PROPERTY_PRESSED_IMAGE:
+      case Toolkit::PushButton::PROPERTY_PRESSED_STATE_ACTOR:
       {
-        std::string path;
-        GetImageActorFilename( pushButtonImpl.mPressedImage, path );
-        value = path;
+        Property::Map map;
+        Scripting::CreatePropertyMap( pushButtonImpl.mPressedImage, map );
+        value = map;
         break;
       }
 
-      case Toolkit::PushButton::PROPERTY_DIMMED_IMAGE:
+      case Toolkit::PushButton::PROPERTY_DIMMED_STATE_ACTOR:
       {
-        std::string path;
-        GetImageActorFilename( pushButtonImpl.mDimmedImage, path );
-        value = path;
+        Property::Map map;
+        Scripting::CreatePropertyMap( pushButtonImpl.mDimmedImage, map );
+        value = map;
         break;
       }
 
-      case Toolkit::PushButton::PROPERTY_LABEL_TEXT:
+      case Toolkit::PushButton::PROPERTY_LABEL_ACTOR:
       {
-        value = ""; // Just return an empty string if not using a TextView
-
-        if ( pushButtonImpl.mLabel )
-        {
-          Toolkit::TextView textView = Toolkit::TextView::DownCast( pushButtonImpl.mLabel );
-          if ( textView )
-          {
-            value = textView.GetText();
-          }
-        }
+        Property::Map map;
+        Scripting::CreatePropertyMap( pushButtonImpl.mLabel, map );
+        value = map;
         break;
       }
     }

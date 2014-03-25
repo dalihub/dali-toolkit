@@ -1305,31 +1305,51 @@ void UtcDaliPushButtonProperties()
   DALI_TEST_CHECK( button.IsToggled() ) ;
   DALI_TEST_CHECK( button.GetProperty< bool >( PushButton::PROPERTY_TOGGLE ) );
 
-  //  PushButton::PROPERTY_BUTTON_IMAGE
-  DALI_TEST_CHECK( button.GetProperty< std::string >( PushButton::PROPERTY_BUTTON_IMAGE ).empty() );
-  button.SetButtonImage( Image::New( "FunctionButtonImage") );
-  DALI_TEST_EQUALS( "FunctionButtonImage", button.GetProperty< std::string >( PushButton::PROPERTY_BUTTON_IMAGE ), TEST_LOCATION );
-  button.SetProperty( PushButton::PROPERTY_BUTTON_IMAGE, "PropertyButtonImage" );
-  DALI_TEST_EQUALS( "PropertyButtonImage", button.GetProperty< std::string >( PushButton::PROPERTY_BUTTON_IMAGE ), TEST_LOCATION );
+  //  PushButton::PROPERTY_NORMAL_STATE_ACTOR
+  {
+    button.SetButtonImage( Image::New( "IMAGE_PATH_1") );
+    DALI_TEST_EQUALS( "IMAGE_PATH_1", button.GetProperty( PushButton::PROPERTY_NORMAL_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
+
+    Property::Map map;
+    map.push_back( Property::StringValuePair( "type", "ImageActor" ) );
+
+    button.SetProperty( PushButton::PROPERTY_NORMAL_STATE_ACTOR, map );
+    DALI_TEST_EQUALS( "ImageActor", button.GetProperty( PushButton::PROPERTY_NORMAL_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+  }
 
   //  PushButton::PROPERTY_PRESSED_IMAGE
-  DALI_TEST_CHECK( button.GetProperty< std::string >( PushButton::PROPERTY_PRESSED_IMAGE ).empty() );
-  button.SetPressedImage( Image::New( "FunctionPressedImage") );
-  DALI_TEST_EQUALS( "FunctionPressedImage", button.GetProperty< std::string >( PushButton::PROPERTY_PRESSED_IMAGE ), TEST_LOCATION );
-  button.SetProperty( PushButton::PROPERTY_PRESSED_IMAGE, "PropertyPressedImage" );
-  DALI_TEST_EQUALS( "PropertyPressedImage", button.GetProperty< std::string >( PushButton::PROPERTY_PRESSED_IMAGE ), TEST_LOCATION );
+  {
+    button.SetPressedImage( Image::New( "IMAGE_PATH_2") );
+    DALI_TEST_EQUALS( "IMAGE_PATH_2", button.GetProperty( PushButton::PROPERTY_PRESSED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
-  //  PushButton::PROPERTY_DIMMED_IMAGE
-  DALI_TEST_CHECK( button.GetProperty< std::string >( PushButton::PROPERTY_DIMMED_IMAGE ).empty() );
-  button.SetDimmedImage( Image::New( "FunctionDimmedImage") );
-  DALI_TEST_EQUALS( "FunctionDimmedImage", button.GetProperty< std::string >( PushButton::PROPERTY_DIMMED_IMAGE ), TEST_LOCATION );
-  button.SetProperty( PushButton::PROPERTY_DIMMED_IMAGE, "PropertyDimmedImage" );
-  DALI_TEST_EQUALS( "PropertyDimmedImage", button.GetProperty< std::string >( PushButton::PROPERTY_DIMMED_IMAGE ), TEST_LOCATION );
+    Property::Map map;
+    map.push_back( Property::StringValuePair( "type", "TextActor" ) );
 
-  //  PushButton::PROPERTY_LABEL_TEXT
-  DALI_TEST_CHECK( button.GetProperty< std::string >( PushButton::PROPERTY_LABEL_TEXT ).empty() );
-  button.SetLabelText( "FunctionLabel" );
-  DALI_TEST_EQUALS( "FunctionLabel", button.GetProperty< std::string >( PushButton::PROPERTY_LABEL_TEXT ), TEST_LOCATION );
-  button.SetProperty( PushButton::PROPERTY_LABEL_TEXT, "PropertyLabel" );
-  DALI_TEST_EQUALS( "PropertyLabel", button.GetProperty< std::string >( PushButton::PROPERTY_LABEL_TEXT ), TEST_LOCATION );
+    button.SetProperty( PushButton::PROPERTY_PRESSED_STATE_ACTOR, map );
+    DALI_TEST_EQUALS( "TextActor", button.GetProperty( PushButton::PROPERTY_PRESSED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+  }
+
+  //  PushButton::PROPERTY_DIMMED_STATE_ACTOR
+  {
+    button.SetDimmedImage( Image::New( "IMAGE_PATH_3") );
+    DALI_TEST_EQUALS( "IMAGE_PATH_3", button.GetProperty( PushButton::PROPERTY_DIMMED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
+
+    Property::Map map;
+    map.push_back( Property::StringValuePair( "type", "Actor" ) );
+
+    button.SetProperty( PushButton::PROPERTY_DIMMED_STATE_ACTOR, map );
+    DALI_TEST_EQUALS( "Actor", button.GetProperty( PushButton::PROPERTY_DIMMED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+  }
+
+  //  PushButton::PROPERTY_LABEL_ACTOR
+  {
+    button.SetLabelText( "LABEL_TEXT_CUSTOM" );
+    DALI_TEST_EQUALS( "TextView", button.GetProperty( PushButton::PROPERTY_LABEL_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+
+    Property::Map map;
+    map.push_back( Property::StringValuePair( "type", "Actor" ) );
+
+    button.SetProperty( PushButton::PROPERTY_LABEL_ACTOR, map );
+    DALI_TEST_EQUALS( "Actor", button.GetProperty( PushButton::PROPERTY_LABEL_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+  }
 }

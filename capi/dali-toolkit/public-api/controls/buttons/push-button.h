@@ -92,15 +92,15 @@ public:
   static const char* const ACTION_PUSH_BUTTON_CLICK; ///< name "push-button-click"
 
   // Properties
-  static const Property::Index PROPERTY_AUTO_REPEATING;               ///< name "auto-repeating",               @see SetAutoRepeating(),               type BOOLEAN
-  static const Property::Index PROPERTY_INITIAL_AUTO_REPEATING_DELAY; ///< name "initial-auto-repeating-delay", @see SetInitialAutoRepeatingDelay(),   type FLOAT
-  static const Property::Index PROPERTY_NEXT_AUTO_REPEATING_DELAY;    ///< name "next-auto-repeating-delay",    @see SetNextAutoRepeatingDelay(),      type FLOAT
-  static const Property::Index PROPERTY_TOGGLABLE;                    ///< name "togglable",                    @see SetToggleButton(),                type BOOLEAN
-  static const Property::Index PROPERTY_TOGGLE;                       ///< name "toggle",                       @see SetToggled(),                     type BOOLEAN
-  static const Property::Index PROPERTY_BUTTON_IMAGE;                 ///< name "button-image",                 @see SetButtonImage(Image),            type STRING
-  static const Property::Index PROPERTY_PRESSED_IMAGE;                ///< name "pressed-image",                @see SetPressedImage(Image),           type STRING
-  static const Property::Index PROPERTY_DIMMED_IMAGE;                 ///< name "dimmed-image",                 @see SetDimmedImage(Image),            type STRING
-  static const Property::Index PROPERTY_LABEL_TEXT;                   ///< name "label-text",                   @see SetLabelText(const std::string&), type STRING
+  static const Property::Index PROPERTY_AUTO_REPEATING;               ///< name "auto-repeating",               @see SetAutoRepeating(),             type BOOLEAN
+  static const Property::Index PROPERTY_INITIAL_AUTO_REPEATING_DELAY; ///< name "initial-auto-repeating-delay", @see SetInitialAutoRepeatingDelay(), type FLOAT
+  static const Property::Index PROPERTY_NEXT_AUTO_REPEATING_DELAY;    ///< name "next-auto-repeating-delay",    @see SetNextAutoRepeatingDelay(),    type FLOAT
+  static const Property::Index PROPERTY_TOGGLABLE;                    ///< name "togglable",                    @see SetToggleButton(),              type BOOLEAN
+  static const Property::Index PROPERTY_TOGGLE;                       ///< name "toggle",                       @see SetToggled(),                   type BOOLEAN
+  static const Property::Index PROPERTY_NORMAL_STATE_ACTOR;           ///< name "button-state-actor",           @see SetButtonImage(),               type MAP
+  static const Property::Index PROPERTY_PRESSED_STATE_ACTOR;          ///< name "pressed-state-actor",          @see SetPressedImage(),              type MAP
+  static const Property::Index PROPERTY_DIMMED_STATE_ACTOR;           ///< name "dimmed-state-actor",           @see SetDimmedImage(),               type MAP
+  static const Property::Index PROPERTY_LABEL_ACTOR;                  ///< name "label-actor",                  @see SetLabelText(),                 type STRING
 
 public:
 
