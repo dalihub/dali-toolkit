@@ -39,8 +39,8 @@ typedef IntrusivePtr<ScrollComponent> ScrollComponentPtr;
 
 /**
  * Base class for derived ScrollComponents
- * ScrollComponents such as ScrollBar are derived from this class.
- * To instantiate these ScrollBars and other derived components.
+ * ScrollComponents such as ScrollBarInternal are derived from this class.
+ * To instantiate these ScrollBarInternals and other derived components.
  */
 class ScrollComponent : public ControlImpl
 {

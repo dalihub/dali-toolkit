@@ -32,9 +32,10 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-landscape-view-impl.cpp \
    $(toolkit_src_dir)/controls/popup/popup-impl.cpp \
    $(toolkit_src_dir)/controls/popup/popup-style-impl.cpp \
-   $(toolkit_src_dir)/controls/scroll-component/scroll-bar-impl.cpp \
+   $(toolkit_src_dir)/controls/scroll-bar/scroll-bar-impl.cpp \
+   $(toolkit_src_dir)/controls/scroll-component/scroll-bar-internal-impl.cpp \
    $(toolkit_src_dir)/controls/scroll-component/scroll-component-impl.cpp \
-   $(toolkit_src_dir)/controls/scroll-component/scroll-bar.cpp \
+   $(toolkit_src_dir)/controls/scroll-component/scroll-bar-internal.cpp \
    $(toolkit_src_dir)/controls/scroll-component/scroll-component.cpp \
    $(toolkit_src_dir)/controls/scrollable/item-view/item-view-impl.cpp \
    $(toolkit_src_dir)/controls/scrollable/scrollable-impl.cpp \

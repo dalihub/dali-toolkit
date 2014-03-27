@@ -16,7 +16,7 @@
 
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/scroll-component/scroll-component-impl.h>
-#include <dali-toolkit/internal/controls/scroll-component/scroll-bar.h>
+#include <dali-toolkit/internal/controls/scroll-component/scroll-bar-internal.h>
 
 namespace Dali
 {
@@ -57,12 +57,12 @@ Toolkit::ScrollComponent ScrollComponent::New(Toolkit::Scrollable& scrollable, T
   {
     case Toolkit::Scrollable::VerticalScrollBar:
     {
-      instance = static_cast<Toolkit::ScrollComponent>(Toolkit::ScrollBar::New(scrollable, true));
+      instance = static_cast<Toolkit::ScrollComponent>(Toolkit::ScrollBarInternal::New(scrollable, true));
       break;
     }
     case Toolkit::Scrollable::HorizontalScrollBar:
     {
-      instance = static_cast<Toolkit::ScrollComponent>(Toolkit::ScrollBar::New(scrollable, false));
+      instance = static_cast<Toolkit::ScrollComponent>(Toolkit::ScrollBarInternal::New(scrollable, false));
       break;
     }
     default:

@@ -23,6 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/events/mouse-wheel-event.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
+#include <dali-toolkit/internal/controls/scroll-bar/scroll-bar-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
 
 using namespace std;
@@ -38,7 +39,7 @@ const float DEFAULT_MINIMUM_SWIPE_SPEED = 1.0f;
 const float DEFAULT_MINIMUM_SWIPE_DISTANCE = 3.0f;
 const float DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION = 0.1f;
 
-const int DEFAULT_REFRESH_INTERVAL_MILLISECONDS = 50; // 20 updates per second
+const float DEFAULT_REFRESH_INTERVAL_LAYOUT_POSITIONS = 20.0f; // 1 updates per 20 items
 const int MOUSE_WHEEL_EVENT_FINISHED_TIME_OUT = 500;  // 0.5 second
 
 const float DEFAULT_ANCHORING_DURATION = 1.0f;  // 1 second
@@ -400,7 +401,7 @@ ItemView::ItemView(ItemFactory& factory)
   mAnimateOvershootOff(false),
   mAnchoringEnabled(true),
   mAnchoringDuration(DEFAULT_ANCHORING_DURATION),
-  mRefreshIntervalMilliseconds(DEFAULT_REFRESH_INTERVAL_MILLISECONDS),
+  mRefreshIntervalLayoutPositions(DEFAULT_REFRESH_INTERVAL_LAYOUT_POSITIONS),
   mRefreshOrderHint(true/*Refresh item 0 first*/),
   mMinimumSwipeSpeed(DEFAULT_MINIMUM_SWIPE_SPEED),
   mMinimumSwipeDistance(DEFAULT_MINIMUM_SWIPE_DISTANCE),
@@ -409,7 +410,8 @@ ItemView::ItemView(ItemFactory& factory)
   mTotalPanDisplacement(Vector2::ZERO),
   mScrollOvershoot(0.0f),
   mIsFlicking(false),
-  mGestureState(Gesture::Clear)
+  mGestureState(Gesture::Clear),
+  mAddingItems(false)
 {
   SetRequiresMouseWheelEvents(true);
   SetKeyboardNavigationSupport(true);
@@ -457,6 +459,8 @@ void ItemView::OnInitialize()
 
   mMouseWheelEventFinishedTimer = Timer::New( MOUSE_WHEEL_EVENT_FINISHED_TIME_OUT );
   mMouseWheelEventFinishedTimer.TickSignal().Connect( this, &ItemView::OnMouseWheelEventFinished );
+
+  SetRefreshInterval(mRefreshIntervalLayoutPositions);
 }
 
 ItemView::~ItemView()
@@ -619,8 +623,6 @@ void ItemView::DeactivateCurrentLayout()
 
     mActiveLayout = NULL;
   }
-
-  CancelRefreshTimer();
 }
 
 void ItemView::SetDefaultAlphaFunction(AlphaFunction func)
@@ -633,22 +635,17 @@ AlphaFunction ItemView::GetDefaultAlphaFunction() const
   return mDefaultAlphaFunction;
 }
 
-bool ItemView::OnRefreshTick()
+void ItemView::OnRefreshNotification(PropertyNotification& source)
 {
-  // Short-circuit if there is no active layout
-  if (!mActiveLayout)
+  if (mActiveLayout)
   {
-    return false;
+    ItemRange range = GetItemRange(*mActiveLayout, mActiveLayoutTargetSize, true/*reserve extra*/);
+    RemoveActorsOutsideRange( range );
+    AddActorsWithinRange( range, 0.0f/*immediate*/ );
+
+    Vector3 currentScrollPosition = GetCurrentScrollPosition();
+    mScrollUpdatedSignalV2.Emit( currentScrollPosition );
   }
-
-  ItemRange range = GetItemRange(*mActiveLayout, mActiveLayoutTargetSize, true/*reserve extra*/);
-
-  RemoveActorsOutsideRange( range );
-
-  AddActorsWithinRange( range, 0.0f/*immediate*/ );
-
-  // Keep refreshing whilst the layout is moving
-  return mScrollAnimation || (mGestureState == Gesture::Started || mGestureState == Gesture::Continuing);
 }
 
 void ItemView::SetMinimumSwipeSpeed(float speed)
@@ -701,14 +698,21 @@ float ItemView::GetAnchoringDuration() const
   return mAnchoringDuration;
 }
 
-void ItemView::SetRefreshInterval(unsigned int intervalMilliseconds)
+void ItemView::SetRefreshInterval(float intervalLayoutPositions)
 {
-  mRefreshIntervalMilliseconds = intervalMilliseconds;
+  mRefreshIntervalLayoutPositions = intervalLayoutPositions;
+
+  if(mRefreshNotification)
+  {
+    mScrollPositionObject.RemovePropertyNotification(mRefreshNotification);
+  }
+  mRefreshNotification = mScrollPositionObject.AddPropertyNotification( ScrollConnector::SCROLL_POSITION, StepCondition(mRefreshIntervalLayoutPositions, 0.0f) );
+  mRefreshNotification.NotifySignal().Connect( this, &ItemView::OnRefreshNotification );
 }
 
-unsigned int ItemView::GetRefreshInterval() const
+float ItemView::GetRefreshInterval() const
 {
-  return mRefreshIntervalMilliseconds;
+  return mRefreshIntervalLayoutPositions;
 }
 
 Actor ItemView::GetItem(unsigned int itemId) const
@@ -742,6 +746,8 @@ unsigned int ItemView::GetItemId( Actor actor ) const
 
 void ItemView::InsertItem( Item newItem, float durationSeconds )
 {
+  mAddingItems = true;
+
   SetupActor( newItem, durationSeconds );
   Self().Add( newItem.second );
 
@@ -774,10 +780,16 @@ void ItemView::InsertItem( Item newItem, float durationSeconds )
   {
     mItemPool.insert( newItem );
   }
+
+  CalculateDomainSize(Self().GetCurrentSize());
+
+  mAddingItems = false;
 }
 
 void ItemView::InsertItems( const ItemContainer& newItems, float durationSeconds )
 {
+  mAddingItems = true;
+
   // Insert from lowest id to highest
   set<Item> sortedItems;
   for( ConstItemIter iter = newItems.begin(); newItems.end() != iter; ++iter )
@@ -830,6 +842,10 @@ void ItemView::InsertItems( const ItemContainer& newItems, float durationSeconds
       ApplyConstraints( iter->second, *mActiveLayout, iter->first, durationSeconds );
     }
   }
+
+  CalculateDomainSize(Self().GetCurrentSize());
+
+  mAddingItems = false;
 }
 
 void ItemView::RemoveItem( unsigned int itemId, float durationSeconds )
@@ -902,6 +918,8 @@ bool ItemView::RemoveActor(unsigned int itemId)
 
 void ItemView::ReplaceItem( Item replacementItem, float durationSeconds )
 {
+  mAddingItems = true;
+
   SetupActor( replacementItem, durationSeconds );
   Self().Add( replacementItem.second );
 
@@ -915,6 +933,10 @@ void ItemView::ReplaceItem( Item replacementItem, float durationSeconds )
   {
     mItemPool.insert( replacementItem );
   }
+
+  CalculateDomainSize(Self().GetCurrentSize());
+
+  mAddingItems = false;
 }
 
 void ItemView::ReplaceItems( const ItemContainer& replacementItems, float durationSeconds )
@@ -964,10 +986,16 @@ void ItemView::AddActorsWithinRange( ItemRange range, float durationSeconds )
       AddNewActor( itemId-1, durationSeconds );
     }
   }
+
+  // Total number of items may change dynamically.
+  // Always recalculate the domain size to reflect that.
+  CalculateDomainSize(Self().GetCurrentSize());
 }
 
 void ItemView::AddNewActor( unsigned int itemId, float durationSeconds )
 {
+  mAddingItems = true;
+
   if( mItemPool.end() == mItemPool.find( itemId ) )
   {
     Actor actor = mItemFactory.NewItem( itemId );
@@ -982,6 +1010,8 @@ void ItemView::AddNewActor( unsigned int itemId, float durationSeconds )
       Self().Add( actor );
     }
   }
+
+  mAddingItems = false;
 }
 
 void ItemView::SetupActor( Item item, float durationSeconds )
@@ -1018,6 +1048,20 @@ ItemRange ItemView::GetItemRange(ItemLayout& layout, const Vector3& layoutSize, 
   }
 
   return range.Intersection(available);
+}
+
+void ItemView::OnChildAdd(Actor& child)
+{
+  if(!mAddingItems)
+  {
+    // We don't want to do this downcast check for any item added by ItemView itself.
+    Dali::Toolkit::ScrollBar scrollBar = Dali::Toolkit::ScrollBar::DownCast(child);
+    if(scrollBar)
+    {
+      // Set the scroll connector when scroll bar is being added
+      scrollBar.SetScrollConnector(mScrollConnector);
+    }
+  }
 }
 
 bool ItemView::OnTouchEvent(const TouchEvent& event)
@@ -1061,7 +1105,6 @@ bool ItemView::OnMouseWheelEvent(const MouseWheelEvent& event)
     mScrollPositionObject.SetProperty( ScrollConnector::SCROLL_POSITION, firstItemScrollPosition );
     self.SetProperty(mPropertyPosition, GetScrollPosition(firstItemScrollPosition, layoutSize));
     mScrollStartedSignalV2.Emit(GetCurrentScrollPosition());
-    StartRefreshTimer();
   }
 
   if (mMouseWheelEventFinishedTimer.IsRunning())
@@ -1084,8 +1127,6 @@ bool ItemView::OnMouseWheelEventFinished()
     mScrollAnimation = DoAnchoring();
     if (mScrollAnimation)
     {
-      StartRefreshTimer();
-
       mScrollAnimation.FinishedSignal().Connect(this, &ItemView::OnScrollFinished);
       mScrollAnimation.Play();
     }
@@ -1327,8 +1368,6 @@ void ItemView::OnPan(PanGesture gesture)
       {
         AnimateScrollOvershoot(0.0f);
       }
-
-      StartRefreshTimer();
     }
     break;
 
@@ -1344,8 +1383,6 @@ void ItemView::OnPan(PanGesture gesture)
 
   if (mScrollAnimation)
   {
-    StartRefreshTimer();
-
     mScrollAnimation.FinishedSignal().Connect(this, &ItemView::OnScrollFinished);
     mScrollAnimation.Play();
   }
@@ -1467,35 +1504,11 @@ void ItemView::OnOvershootOnFinished(Animation& animation)
   }
 }
 
-void ItemView::StartRefreshTimer()
-{
-  if (!mRefreshTimer)
-  {
-    mRefreshTimer = Timer::New( mRefreshIntervalMilliseconds );
-    mRefreshTimer.TickSignal().Connect( this, &ItemView::OnRefreshTick );
-  }
-
-  if (!mRefreshTimer.IsRunning())
-  {
-    mRefreshTimer.Start();
-  }
-}
-
-void ItemView::CancelRefreshTimer()
-{
-  if (mRefreshTimer)
-  {
-    mRefreshTimer.Stop();
-  }
-}
-
 void ItemView::ScrollToItem(unsigned int itemId, float durationSeconds)
 {
   Actor self = Self();
   const Vector3 layoutSize = Self().GetCurrentSize();
   float firstItemScrollPosition = ClampFirstItemPosition(mActiveLayout->GetItemScrollToPosition(itemId), layoutSize, *mActiveLayout);
-
-  StartRefreshTimer();
 
   if(durationSeconds > 0.0f)
   {
@@ -1541,22 +1554,30 @@ void ItemView::CalculateDomainSize(const Vector3& layoutSize)
     }
 
     float minLayoutPosition = mActiveLayout->GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), layoutSize);
+    self.SetProperty(mPropertyMinimumLayoutPosition, minLayoutPosition);
+
     ItemLayout::Vector3Function lastItemPositionConstraint;
     if (mActiveLayout->GetPositionConstraint(fabs(minLayoutPosition), lastItemPositionConstraint))
     {
       lastItemPosition = lastItemPositionConstraint(Vector3::ZERO, fabs(minLayoutPosition), 0.0f, layoutSize);
     }
 
+    float domainSize;
+
     if(IsHorizontal(mActiveLayout->GetOrientation()))
     {
       self.SetProperty(mPropertyPositionMin, Vector3(0.0f, firstItemPosition.x, 0.0f));
       self.SetProperty(mPropertyPositionMax, Vector3(0.0f, lastItemPosition.x, 0.0f));
+      domainSize = fabs(firstItemPosition.x - lastItemPosition.x);
     }
     else
     {
       self.SetProperty(mPropertyPositionMin, Vector3(0.0f, firstItemPosition.y, 0.0f));
       self.SetProperty(mPropertyPositionMax, Vector3(0.0f, lastItemPosition.y, 0.0f));
+      domainSize = fabs(firstItemPosition.y - lastItemPosition.y);
     }
+
+    mScrollConnector.SetScrollDomain(minLayoutPosition, 0.0f, domainSize);
 
     bool isLayoutScrollable = IsLayoutScrollable(layoutSize);
     self.SetProperty(mPropertyCanScrollVertical, isLayoutScrollable);
@@ -1619,8 +1640,6 @@ void ItemView::ScrollTo(const Vector3& position, float duration)
   const Vector3 layoutSize = Self().GetCurrentSize();
 
   float firstItemScrollPosition = ClampFirstItemPosition(position.y, layoutSize, *mActiveLayout);
-
-  StartRefreshTimer();
 
   if(duration > 0.0f)
   {

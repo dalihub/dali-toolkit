@@ -128,6 +128,26 @@ void Control::ClearKeyInputFocus()
   GetImplementation().ClearKeyInputFocus();
 }
 
+PinchGestureDetector Control::GetPinchGestureDetector() const
+{
+  return GetImplementation().GetPinchGestureDetector();
+}
+
+PanGestureDetector Control::GetPanGestureDetector() const
+{
+  return GetImplementation().GetPanGestureDetector();
+}
+
+TapGestureDetector Control::GetTapGestureDetector() const
+{
+  return GetImplementation().GetTapGestureDetector();
+}
+
+LongPressGestureDetector Control::GetLongPressGestureDetector() const
+{
+  return GetImplementation().GetLongPressGestureDetector();
+}
+
 Control::KeyEventSignalV2& Control::KeyEventSignal()
 {
   return GetImplementation().KeyEventSignal();

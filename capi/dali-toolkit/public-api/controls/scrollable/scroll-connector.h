@@ -38,9 +38,10 @@ class ScrollConnector;
  *   - A "scroll-position" property which controls which part of the scrollable content is visible
  *   - The minimum/maximum limits of the scroll position, which corresponds to the start & end points of the scollable list etc.
  *   - An "overshoot" property which shows any attempts to exceed the start & end points.
+ *   - The scrollable content size, which corresponds to the length of the scrollable content in the scrollable container in actor coordinates.
  *
- * The provider of the scrollable content is responsible for calling SetLimits(). Scroll-bar components are then expected to
- * receive these values via the LIMITS_CHANGED signal.
+ * The provider of the scrollable content is responsible for calling SetScrollDomain(). Scroll-bar components are then expected to
+ * receive these values via the DOMAIN_CHANGED signal.
  *
  * The scroll-position property is accessible via GetScrollPositionObject(). This is intended to be shared by multiple controls
  * e.g. a list control may be scrolled by panning the list content, or indirectly by dragging a connected scroll-bar control.
@@ -60,8 +61,8 @@ public:
   static const Property::Index OVERSHOOT;                 ///< The index of the "overshoot" property
 
   // Signals
-  static const char* const LIMITS_CHANGED_SIGNAL_NAME;    ///< "limits-changed" signal name
-  typedef SignalV2< void ( float min, float max ) > LimitsChangedSignalType;
+  static const char* const DOMAIN_CHANGED_SIGNAL_NAME;    ///< "domain-changed" signal name
+  typedef SignalV2< void ( float min, float max, float size ) > DomainChangedSignalType;
 
   /**
    * Create a ScrollConnector.
@@ -97,11 +98,12 @@ public:
   static ScrollConnector DownCast( BaseHandle handle );
 
   /**
-   * Set The min/max values, corresponding to the start & end position of the scrollable content.
-   * @param[in] min The minimum value.
-   * @param[in] max The maximum value.
+   * Set the scroll domain, corresponding to the start & end position, and size of the scrollable content in actor coordinates.
+   * @param[in] min The minimum scroll position limit.
+   * @param[in] max The maximum scroll position limit.
+   * @param[in] length The length of the scrollable content in actor coordinates.
    */
-  void SetLimits( float min, float max );
+  void SetScrollDomain( float min, float max, float length );
 
   /**
    * Retrieve the min limit.
@@ -116,9 +118,15 @@ public:
   float GetMaxLimit() const;
 
   /**
-   * Signal emitted after the SetLimits() method has been called.
+   * Retrieve the length of the scrollable content in actor coordinates.
+   * @return The length of the scrollable content.
    */
-  ScrollConnector::LimitsChangedSignalType& LimitsChangedSignal();
+  float GetContentLength() const;
+
+  /**
+   * Signal emitted after the SetScrollDomain() method has been called.
+   */
+  ScrollConnector::DomainChangedSignalType& DomainChangedSignal();
 
   /**
    * Retrieve the object which provides the "scroll-position" property.

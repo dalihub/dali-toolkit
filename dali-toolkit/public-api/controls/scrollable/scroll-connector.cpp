@@ -31,7 +31,7 @@ const char* const ScrollConnector::OVERSHOOT_PROPERTY_NAME       = "overshoot";
 const Property::Index ScrollConnector::SCROLL_POSITION = Internal::ScrollConnector::SCROLL_POSITION;
 const Property::Index ScrollConnector::OVERSHOOT       = Internal::ScrollConnector::OVERSHOOT;
 
-const char* const ScrollConnector::LIMITS_CHANGED_SIGNAL_NAME = "limits-changed";
+const char* const ScrollConnector::DOMAIN_CHANGED_SIGNAL_NAME    = "domain-changed";
 
 ScrollConnector ScrollConnector::New()
 {
@@ -56,9 +56,9 @@ ScrollConnector ScrollConnector::DownCast( BaseHandle handle )
   return ScrollConnector( dynamic_cast<Internal::ScrollConnector*>(handle.GetObjectPtr()) );
 }
 
-void ScrollConnector::SetLimits( float min, float max )
+void ScrollConnector::SetScrollDomain( float min, float max, float length )
 {
-  GetImpl(*this).SetLimits( min, max );
+  GetImpl(*this).SetScrollDomain( min, max, length );
 }
 
 float ScrollConnector::GetMinLimit() const
@@ -71,14 +71,19 @@ float ScrollConnector::GetMaxLimit() const
   return GetImpl(*this).GetMaxLimit();
 }
 
+float ScrollConnector::GetContentLength() const
+{
+  return GetImpl(*this).GetContentLength();
+}
+
 Constrainable ScrollConnector::GetScrollPositionObject() const
 {
   return GetImpl(*this).GetScrollPositionObject();
 }
 
-ScrollConnector::LimitsChangedSignalType& ScrollConnector::LimitsChangedSignal()
+ScrollConnector::DomainChangedSignalType& ScrollConnector::DomainChangedSignal()
 {
-  return GetImpl(*this).LimitsChangedSignal();
+  return GetImpl(*this).DomainChangedSignal();
 }
 
 ScrollConnector::ScrollConnector( Internal::ScrollConnector* impl )

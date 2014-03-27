@@ -262,6 +262,38 @@ public:
    */
   void ClearKeyInputFocus();
 
+  /**
+   * @brief Retrieves the pinch gesture detector of the control.
+   *
+   * @return The pinch gesture detector.
+   * @pre Pinch detection should have been enabled in the control.
+   */
+  PinchGestureDetector GetPinchGestureDetector() const;
+
+  /**
+   * @brief Retrieves the pan gesture detector of the control.
+   *
+   * @return The pan gesture detector.
+   * @pre Pan detection should have been enabled in the control.
+   */
+  PanGestureDetector GetPanGestureDetector() const;
+
+  /**
+   * @brief Retrieves the tap gesture detector of the control.
+   *
+   * @return The tap gesture detector.
+   * @pre Tap detection should have been enabled in the control.
+   */
+  TapGestureDetector GetTapGestureDetector() const;
+
+  /**
+   * @brief Retrieves the long press gesture detector of the control.
+   *
+   * @return The long press gesture detector.
+   * @pre Long press detection should have been enabled in the control.
+   */
+  LongPressGestureDetector GetLongPressGestureDetector() const;
+
 //signals
 public:
 

@@ -37,17 +37,19 @@ ScrollConnector* ScrollConnector::New()
   return new ScrollConnector();
 }
 
-void ScrollConnector::SetLimits( float min, float max )
+void ScrollConnector::SetScrollDomain( float min, float max, float length )
 {
   mMinLimit = min;
   mMaxLimit = max;
+  mContentLength = length;
 
-  mLimitsChangedSignal.Emit( mMinLimit, mMaxLimit );
+  mDomainChangedSignal.Emit( mMinLimit, mMaxLimit, mContentLength );
 }
 
 ScrollConnector::ScrollConnector()
 : mMinLimit( 0.0f ),
-  mMaxLimit( 0.0f )
+  mMaxLimit( 0.0f ),
+  mContentLength( 0.0f )
 {
   mScrollPositionObject = Constrainable::New();
 

@@ -171,12 +171,12 @@ public:
   /**
    * @copydoc Toolkit::ItemView::SetRefreshInterval
    */
-  void SetRefreshInterval(unsigned int intervalMilliseconds);
+  void SetRefreshInterval(float intervalLayoutPositions);
 
   /**
    * @copydoc Toolkit::ItemView::GetRefreshInterval
    */
-  unsigned int GetRefreshInterval() const;
+  float GetRefreshInterval() const;
 
   /**
    * @copydoc Toolkit::ItemView::GetItem
@@ -280,6 +280,12 @@ private:
   void SetupActor( Item item, float durationSeconds );
 
 private: // From CustomActorImpl
+
+  /**
+   * From CustomActorImpl; called after a child has been added to the owning actor.
+   * @param[in] child The child which has been added.
+   */
+  virtual void OnChildAdd(Actor& child);
 
   /**
    * From CustomActorImpl; called after a touch-signal is received by the owning actor.
@@ -421,23 +427,6 @@ private:
   void OnOvershootOnFinished(Animation& animation);
 
   /**
-   * Helper to start the refresh timer.
-   */
-  void StartRefreshTimer();
-
-  /**
-   * Helper to cancel the refresh timer.
-   */
-  void CancelRefreshTimer();
-
-  /**
-   * Refresh the ItemView; this is called after a timeout when scrolling.
-   * During a refresh, ItemFactory::NewItem() will be called to create newly visible items.
-   * @return True if the refresh timer should be kept running.
-   */
-  bool OnRefreshTick();
-
-  /**
    * This is called after a timeout when no new mouse wheel event is received for a certain period of time.
    * @return will return false; one-shot timer.
    */
@@ -488,6 +477,14 @@ private:
    */
   bool IsLayoutScrollable(const Vector3& layoutSize);
 
+  /**
+   * Callback when the current layout position of ItemView changes in both positive
+   * and negative directions by the specified amount. Refresh the ItemView to create
+   * newly visible items.
+   * @param[in] source the property notification that triggered this callback
+   */
+  void OnRefreshNotification(PropertyNotification& source);
+
 private:
 
   ItemFactory& mItemFactory;
@@ -514,8 +511,8 @@ private:
   bool mAnchoringEnabled;
   float mAnchoringDuration;
 
-  Timer mRefreshTimer;
-  int mRefreshIntervalMilliseconds;
+  float mRefreshIntervalLayoutPositions;  ///< Refresh item view when the layout position changes by this interval in both positive and negative directions.
+  PropertyNotification mRefreshNotification; // stores the property notification used for item view refresh
   bool mRefreshOrderHint; ///< True if scrolling towards the last item
 
   // Input handling
@@ -540,6 +537,8 @@ private:
 
   Dali::Toolkit::ScrollConnector mScrollConnector; ///< Connects ItemView with scrollable components e.g. scroll bars
   Constrainable   mScrollPositionObject;     ///< From mScrollConnector
+
+  bool mAddingItems;
 
   Property::Index mPropertyPosition; ///< The physical position of the first item within the layout
   Property::Index mPropertyMinimumLayoutPosition; ///< The minimum valid layout position in the layout.

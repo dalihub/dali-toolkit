@@ -16,7 +16,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
-#include <dali-toolkit/internal/controls/scroll-component/scroll-bar-impl.h>
+#include <dali-toolkit/internal/controls/scroll-component/scroll-bar-internal-impl.h>
 
 using namespace Dali;
 

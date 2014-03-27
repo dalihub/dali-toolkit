@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-#include <dali-toolkit/internal/controls/scroll-component/scroll-bar-impl.h>
+#include <dali-toolkit/internal/controls/scroll-component/scroll-bar-internal-impl.h>
 #include <dali-toolkit/public-api/enums.h>
 
 using namespace Dali;
@@ -44,10 +44,10 @@ const float BAR_HIDE_TIME(0.5f);
 const int SECOND_UNIT(1000);
 
 /**
- * ScrollBar Visibility Constraint
+ * ScrollBarInternal Visibility Constraint
  * Returns whether scroll bar is visible
  */
-bool ScrollBarVisibilityConstraint(const bool& current,
+bool ScrollBarInternalVisibilityConstraint(const bool& current,
     const PropertyInput& canScrollProperty)
 {
   bool canScroll = canScrollProperty.GetBoolean();
@@ -55,28 +55,28 @@ bool ScrollBarVisibilityConstraint(const bool& current,
 }
 
 /**
- * ScrollBar Size Constraint
- * Resize ScrollBar Size depends on both ScrollSize and DomainSize
+ * ScrollBarInternal Size Constraint
+ * Resize ScrollBarInternal Size depends on both ScrollSize and DomainSize
  */
-struct ScrollBarSizeConstraint
+struct ScrollBarInternalSizeConstraint
 {
   /**
    * @param[in] vertical Whether this constraint controls a vertical scrollbar (true)
    * or a horizontal one (false)
    */
-  ScrollBarSizeConstraint(bool vertical)
+  ScrollBarInternalSizeConstraint(bool vertical)
   : mVertical(vertical)
   {
   }
 
   /**
    * Constraint operator
-   * @param[in] current The current ScrollBar size
+   * @param[in] current The current ScrollBarInternal size
    * @param[in] scrollMinProperty The container's minimum position.
    * @param[in] scrollMaxProperty The container's maximum position.
    * @param[in] scrollDirectionProperty The container's scroll direction.
    * @param[in] scrollSizeProperty The container's size of viewport.
-   * @return The new ScrollBar position is returned.
+   * @return The new ScrollBarInternal position is returned.
    */
   Vector3 operator()(const Vector3& current,
                      const PropertyInput& scrollMinProperty,
@@ -107,25 +107,25 @@ struct ScrollBarSizeConstraint
 };
 
 /**
- * ScrollBar rotation Constraint
- * Rotate ScrollBar depends on the scroll direction
+ * ScrollBarInternal rotation Constraint
+ * Rotate ScrollBarInternal depends on the scroll direction
  */
-struct ScrollBarRotationConstraint
+struct ScrollBarInternalRotationConstraint
 {
   /**
    * @param[in] vertical Whether this constraint controls a vertical scrollbar (true)
    * or a horizontal one (false)
    */
-  ScrollBarRotationConstraint(bool vertical)
+  ScrollBarInternalRotationConstraint(bool vertical)
   : mVertical(vertical)
   {
   }
 
   /**
    * Constraint operator
-   * @param[in] current The current ScrollBar rotation
+   * @param[in] current The current ScrollBarInternal rotation
    * @param[in] scrollDirectionProperty The container's scroll direction.
-   * @return The new ScrollBar rotation is returned.
+   * @return The new ScrollBarInternal rotation is returned.
    */
   Quaternion operator()(const Quaternion& current,
                         const PropertyInput& scrollDirectionProperty)
@@ -147,18 +147,18 @@ struct ScrollBarRotationConstraint
 };
 
 /**
- * ScrollBar Position Constraint
+ * ScrollBarInternal Position Constraint
  * Positions the scroll bar to reflect the current scroll position
  * within the domain.
  */
-struct ScrollBarPositionConstraint
+struct ScrollBarInternalPositionConstraint
 {
   /**
    * @param[in] vertical Whether this constraint controls a vertical scrollbar (true)
    * or a horizontal one (false)
    * @param[in] wrap Whether to base scrollbar on original position or wrapped position
    */
-  ScrollBarPositionConstraint(bool vertical, bool wrap = false)
+  ScrollBarInternalPositionConstraint(bool vertical, bool wrap = false)
   : mVertical(vertical),
     mWrap(wrap)
   {
@@ -166,14 +166,14 @@ struct ScrollBarPositionConstraint
 
   /**
    * Constraint operator
-   * @param[in] current The current ScrollBar position
-   * @param[in] scrollBarSizeProperty ScrollBar size
+   * @param[in] current The current ScrollBarInternal position
+   * @param[in] scrollBarSizeProperty ScrollBarInternal size
    * @param[in] scrollRelativePositionProperty The container's relative position (from 0.0 -> 1.0 in each axis)
    * @param[in] scrollMinProperty The container's minimum position.
    * @param[in] scrollMaxProperty The container's maximum position.
    * @param[in] scrollDirectionProperty The container's scroll direction.
    * @param[in] scrollSizeProperty The container's size of viewport.
-   * @return The new ScrollBar position is returned.
+   * @return The new ScrollBarInternal position is returned.
    */
   Vector3 operator()(const Vector3&    current,
                      const PropertyInput& scrollBarSizeProperty,
@@ -276,17 +276,17 @@ struct ScrollBarPositionConstraint
 };
 
 /**
- * ScrollBar HitSize Constraint
+ * ScrollBarInternal HitSize Constraint
  * Resizes HitArea to size of the container.
  */
-struct ScrollBarHitSizeConstraint
+struct ScrollBarInternalHitSizeConstraint
 {
   /**
    * @param[in] vertical Whether this constraint controls a vertical scrollbar (true)
    * or a horizontal one (false)
    * @param[in] thickness The thickness of the scrollbar
    */
-  ScrollBarHitSizeConstraint(bool vertical,
+  ScrollBarInternalHitSizeConstraint(bool vertical,
                              float thickness)
   : mVertical(vertical),
     mThickness(thickness)
@@ -298,7 +298,7 @@ struct ScrollBarHitSizeConstraint
    * @param[in] current The current HitSize
    * @param[in] scrollDirectionProperty The container's scroll direction.
    * @param[in] scrollSizeProperty The container's size of viewport.
-   * @return The new ScrollBar Hit Area size is returned.
+   * @return The new ScrollBarInternal Hit Area size is returned.
    */
   Vector3 operator()(const Vector3&    current,
                      const PropertyInput& scrollDirectionProperty,
@@ -350,11 +350,11 @@ BaseHandle Create()
   return BaseHandle();
 }
 
-TypeRegistration mType( typeid(Toolkit::ScrollBar), typeid(Toolkit::ScrollComponent), Create );
+TypeRegistration mType( typeid(Toolkit::ScrollBarInternal), typeid(Toolkit::ScrollComponent), Create );
 
 }
 
-ScrollBar::ScrollBar(Toolkit::Scrollable& container, bool vertical)
+ScrollBarInternal::ScrollBarInternal(Toolkit::Scrollable& container, bool vertical)
 : mContainer(static_cast<Toolkit::Internal::Scrollable&>(container.GetImplementation())),
   mVertical(vertical),
   mAxisMask(vertical ? Vector3::YAXIS : Vector3::XAXIS),
@@ -381,7 +381,7 @@ ScrollBar::ScrollBar(Toolkit::Scrollable& container, bool vertical)
   Actor target = mContainer.Self();
   Constraint constraint = Constraint::New<bool>( Actor::VISIBLE,
                                       Source( target, vertical ? target.GetPropertyIndex(Scrollable::SCROLLABLE_CAN_SCROLL_VERTICAL) : target.GetPropertyIndex(Scrollable::SCROLLABLE_CAN_SCROLL_HORIZONTAL)),
-                                      ScrollBarVisibilityConstraint );
+                                      ScrollBarInternalVisibilityConstraint );
   mSlider.ApplyConstraint( constraint );
   mSliderWrap.ApplyConstraint( constraint );
 
@@ -390,13 +390,13 @@ ScrollBar::ScrollBar(Toolkit::Scrollable& container, bool vertical)
                                                    Source( target, target.GetPropertyIndex( Toolkit::Scrollable::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
                                                    Source( target, target.GetPropertyIndex( Toolkit::Scrollable::SCROLL_DIRECTION_PROPERTY_NAME ) ),
                                                    Source( target, Actor::SIZE ),
-                                                   ScrollBarSizeConstraint( vertical ) );
+                                                   ScrollBarInternalSizeConstraint( vertical ) );
   mSlider.ApplyConstraint( constraint );
   mSliderWrap.ApplyConstraint( constraint );
 
   constraint = Constraint::New<Quaternion>( Actor::ROTATION,
                                             Source( target, target.GetPropertyIndex( Toolkit::Scrollable::SCROLL_DIRECTION_PROPERTY_NAME ) ),
-                                            ScrollBarRotationConstraint( vertical ) );
+                                            ScrollBarInternalRotationConstraint( vertical ) );
   mSlider.ApplyConstraint( constraint );
   mSliderWrap.ApplyConstraint( constraint );
 
@@ -407,7 +407,7 @@ ScrollBar::ScrollBar(Toolkit::Scrollable& container, bool vertical)
                                          Source( target, target.GetPropertyIndex( Toolkit::Scrollable::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
                                          Source( target, target.GetPropertyIndex( Toolkit::Scrollable::SCROLL_DIRECTION_PROPERTY_NAME ) ),
                                          Source( target, Actor::SIZE ),
-                                         ScrollBarPositionConstraint(vertical) );
+                                         ScrollBarInternalPositionConstraint(vertical) );
 
   mSlider.ApplyConstraint( constraint );
 
@@ -418,15 +418,15 @@ ScrollBar::ScrollBar(Toolkit::Scrollable& container, bool vertical)
                                          Source( target, target.GetPropertyIndex( Toolkit::Scrollable::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
                                          Source( target, target.GetPropertyIndex( Toolkit::Scrollable::SCROLL_DIRECTION_PROPERTY_NAME ) ),
                                          Source( target, Actor::SIZE ),
-                                         ScrollBarPositionConstraint(vertical, true) );
+                                         ScrollBarInternalPositionConstraint(vertical, true) );
   mSliderWrap.ApplyConstraint( constraint );
 
   // Add Sliders to internal Actor, to avoid mixing up with regular
   // Actors added by user.
   mContainer.AddOverlay( mSlider );
   mContainer.AddOverlay( mSliderWrap );
-  mContainer.ScrollStartedSignal().Connect( this, &ScrollBar::OnStarted );
-  mContainer.ScrollCompletedSignal().Connect( this, &ScrollBar::OnCompleted );
+  mContainer.ScrollStartedSignal().Connect( this, &ScrollBarInternal::OnStarted );
+  mContainer.ScrollCompletedSignal().Connect( this, &ScrollBarInternal::OnCompleted );
 
   // Hit Area for dragging slider /////////////////////////////////////////////
   mHitArea = Actor::New();
@@ -436,7 +436,7 @@ ScrollBar::ScrollBar(Toolkit::Scrollable& container, bool vertical)
   constraint = Constraint::New<Vector3>( Actor::SIZE,
                                          Source( target, target.GetPropertyIndex( Toolkit::Scrollable::SCROLL_DIRECTION_PROPERTY_NAME ) ),
                                          Source( target, Actor::SIZE ),
-                                         ScrollBarHitSizeConstraint(vertical, BAR_TAB_SIZE.width) );
+                                         ScrollBarInternalHitSizeConstraint(vertical, BAR_TAB_SIZE.width) );
   mHitArea.ApplyConstraint( constraint );
 
   if(vertical)
@@ -453,24 +453,24 @@ ScrollBar::ScrollBar(Toolkit::Scrollable& container, bool vertical)
   WaitingContractDelay();
 }
 
-ScrollBar::~ScrollBar()
+ScrollBarInternal::~ScrollBarInternal()
 {
   DestructTimer();
 }
 
-void ScrollBar::OnInitialize()
+void ScrollBarInternal::OnInitialize()
 {
   EnableGestureDetection(Gesture::Type(Gesture::Pan));
 }
 
-void ScrollBar::OnDisconnect()
+void ScrollBarInternal::OnDisconnect()
 {
   // Disconnect all connected callback functions.
   mContainer.RemoveOverlay( mSlider );
   mContainer.RemoveOverlay( mSliderWrap );
 }
 
-void ScrollBar::OnPanGesture(Actor actor, PanGesture gesture)
+void ScrollBarInternal::OnPanGesture(Actor actor, PanGesture gesture)
 {
   switch(gesture.state)
   {
@@ -503,7 +503,7 @@ void ScrollBar::OnPanGesture(Actor actor, PanGesture gesture)
   }
 }
 
-void ScrollBar::OnStarted(const Vector3& position)
+void ScrollBarInternal::OnStarted(const Vector3& position)
 {
   // TODO: Need to disable this for the scrollbar which isn't being scrolled.
   if(!mDragMode)
@@ -513,7 +513,7 @@ void ScrollBar::OnStarted(const Vector3& position)
   }
 }
 
-void ScrollBar::OnCompleted(const Vector3& position)
+void ScrollBarInternal::OnCompleted(const Vector3& position)
 {
   if( mDragMode )
   {
@@ -523,7 +523,7 @@ void ScrollBar::OnCompleted(const Vector3& position)
   }
 }
 
-bool ScrollBar::OnContractDelayExpired()
+bool ScrollBarInternal::OnContractDelayExpired()
 {
   if ( !mDragMode )
   {
@@ -535,7 +535,7 @@ bool ScrollBar::OnContractDelayExpired()
   return true;
 }
 
-void ScrollBar::Show()
+void ScrollBarInternal::Show()
 {
   // Cancel any animation
   if(mAnimation)
@@ -552,7 +552,7 @@ void ScrollBar::Show()
   DestructTimer();
 }
 
-void ScrollBar::Hide()
+void ScrollBarInternal::Hide()
 {
   // Cancel any animation
   if(mAnimation)
@@ -567,39 +567,39 @@ void ScrollBar::Hide()
   mAnimation.Play();
 }
 
-void ScrollBar::CreateTimer()
+void ScrollBarInternal::CreateTimer()
 {
   if( !mTimer )
   {
     // Create timer for contract delay
     mTimer = Timer::New( BAR_CONTRACT_DELAY * SECOND_UNIT );
-    mTimer.TickSignal().Connect( this, &ScrollBar::OnContractDelayExpired );
+    mTimer.TickSignal().Connect( this, &ScrollBarInternal::OnContractDelayExpired );
   }
 }
 
-void ScrollBar::DestructTimer()
+void ScrollBarInternal::DestructTimer()
 {
   if( mTimer )
   {
     mTimer.Stop();
-    mTimer.TickSignal().Disconnect( this, &ScrollBar::OnContractDelayExpired );
+    mTimer.TickSignal().Disconnect( this, &ScrollBarInternal::OnContractDelayExpired );
     mTimer.Reset();
   }
 }
 
-void ScrollBar::WaitingContractDelay()
+void ScrollBarInternal::WaitingContractDelay()
 {
   CreateTimer();
   mTimer.Start();
 }
 
-Toolkit::ScrollBar ScrollBar::New(Toolkit::Scrollable& container, bool vertical)
+Toolkit::ScrollBarInternal ScrollBarInternal::New(Toolkit::Scrollable& container, bool vertical)
 {
   // Create the implementation, temporarily owned by this handle on stack
-  IntrusivePtr< ScrollBar > impl = new ScrollBar( container, vertical );
+  IntrusivePtr< ScrollBarInternal > impl = new ScrollBarInternal( container, vertical );
 
   // Pass ownership to CustomActor handle
-  Toolkit::ScrollBar handle( *impl );
+  Toolkit::ScrollBarInternal handle( *impl );
 
   // Second-phase init of the implementation
   // This can only be done after the CustomActor connection has been made...

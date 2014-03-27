@@ -36,7 +36,7 @@ class ScrollConnector : public Dali::BaseObject
 {
 public:
 
-  typedef Toolkit::ScrollConnector::LimitsChangedSignalType LimitsChangedSignalType;
+  typedef Toolkit::ScrollConnector::DomainChangedSignalType DomainChangedSignalType;
 
   static const Property::Index SCROLL_POSITION;
   static const Property::Index OVERSHOOT;
@@ -48,9 +48,9 @@ public:
   static ScrollConnector* New();
 
   /**
-   * @copydoc Toolkit::ScrollConnector::SetLimits()
+   * @copydoc Toolkit::ScrollConnector::SetScrollDomain()
    */
-  void SetLimits( float min, float max );
+  void SetScrollDomain( float min, float max, float length );
 
   /**
    * @copydoc Toolkit::ScrollConnector::GetMinLimit()
@@ -69,11 +69,19 @@ public:
   }
 
   /**
-   * Signal emitted after the SetLimits() method has been called.
+   * @copydoc Toolkit::ScrollConnector::GetContentLength()
    */
-  LimitsChangedSignalType& LimitsChangedSignal()
+  float GetContentLength() const
   {
-    return mLimitsChangedSignal;
+    return mContentLength;
+  }
+
+  /**
+   * Signal emitted after the SetScrollDomain() method has been called.
+   */
+  DomainChangedSignalType& DomainChangedSignal()
+  {
+    return mDomainChangedSignal;
   }
 
   /**
@@ -107,10 +115,11 @@ private:
 
   Constrainable mScrollPositionObject;
 
-  LimitsChangedSignalType mLimitsChangedSignal;
+  DomainChangedSignalType mDomainChangedSignal;
 
   float mMinLimit;
   float mMaxLimit;
+  float mContentLength;
 };
 
 } // namespace Internal

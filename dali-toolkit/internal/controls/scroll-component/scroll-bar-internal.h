@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_SCROLL_BAR_H__
-#define __DALI_TOOLKIT_SCROLL_BAR_H__
+#ifndef __DALI_TOOLKIT_SCROLL_BAR_INTERNAL_H__
+#define __DALI_TOOLKIT_SCROLL_BAR_INTERNAL_H__
 
 //
 // Copyright (c) 2014 Samsung Electronics Co., Ltd.
@@ -33,65 +33,65 @@ namespace Internal DALI_INTERNAL
 {
 // Forward declarations
 
-class ScrollBar;
+class ScrollBarInternal;
 }
 
 /**
- * ScrollBar is a UI component that can be added to the sides of the scrollable controls
+ * ScrollBarInternal is a UI component that can be added to the sides of the scrollable controls
  * indicating the current scroll position.
  */
-class ScrollBar : public ScrollComponent
+class ScrollBarInternal : public ScrollComponent
 {
 
 public:
 
   /**
-   * Create an uninitialized ScrollBar; this can be initialized with ScrollBar::New()
+   * Create an uninitialized ScrollBarInternal; this can be initialized with ScrollBarInternal::New()
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    * or horizontally (false)
    */
-  ScrollBar();
+  ScrollBarInternal();
 
   /**
    * Copy constructor.
    */
-  ScrollBar( const ScrollBar& scrollBar );
+  ScrollBarInternal( const ScrollBarInternal& scrollBar );
 
   /**
    * Assignment operator.
    */
-  ScrollBar& operator=( const ScrollBar& scrollBar );
+  ScrollBarInternal& operator=( const ScrollBarInternal& scrollBar );
 
   /**
    * Virtual destructor.
    * Dali::Object derived classes typically do not contain member data.
    */
-  virtual ~ScrollBar();
+  virtual ~ScrollBarInternal();
 
     /**
-   * Create an initialized ScrollBar
+   * Create an initialized ScrollBarInternal
    * @param[in] container Reference to the container of scroll bar
-   * @param[in] vertical Whether ScrollBar should be oriented vertically (true)
+   * @param[in] vertical Whether ScrollBarInternal should be oriented vertically (true)
    * or horizontally (false)
-   * @return A pointer to the created ScrollBar.
+   * @return A pointer to the created ScrollBarInternal.
    */
-  static ScrollBar New(Scrollable& container, bool vertical);
+  static ScrollBarInternal New(Scrollable& container, bool vertical);
 
   /**
-   * Downcast an Object handle to ScrollBar. If handle points to a ScrollBar the
+   * Downcast an Object handle to ScrollBarInternal. If handle points to a ScrollBarInternal the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @param[in] handle Handle to an object
-   * @return handle to a ScrollBar or an uninitialized handle
+   * @return handle to a ScrollBarInternal or an uninitialized handle
    */
-  static ScrollBar DownCast( BaseHandle handle );
+  static ScrollBarInternal DownCast( BaseHandle handle );
 
   /**
-   * Show ScrollBar
+   * Show ScrollBarInternal
    */
   void Show();
 
   /**
-   * Hide ScrollBar
+   * Hide ScrollBarInternal
    */
   void Hide();
 
@@ -101,17 +101,17 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  ScrollBar( Internal::ScrollBar& implementation );
+  ScrollBarInternal( Internal::ScrollBarInternal& implementation );
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  ScrollBar( Dali::Internal::CustomActor* internal );
+  ScrollBarInternal( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_SCROLL_BAR_H__
+#endif // __DALI_TOOLKIT_SCROLL_BAR_INTERNAL_H__

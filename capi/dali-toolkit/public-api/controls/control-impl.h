@@ -166,44 +166,6 @@ public:
    */
   static bool DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes);
 
-public:
-
-  /**
-   * @copydoc Dali::Toolkit::Control::KeyEventSignal()
-   */
-  Toolkit::Control::KeyEventSignalV2& KeyEventSignal();
-
-protected:
-
-  // Construction
-
-  /**
-   * @brief Second phase initialization.
-   */
-  void Initialize();
-
-  // Gesture Detection
-
-  /**
-   * @brief Allows deriving classes to enable any of the gesture detectors that are available.
-   *
-   * Gesture detection can be enabled one at a time or in bitwise format as shown:
-   * @code
-   * EnableGestureDetection(Gesture::Type(Gesture::Pinch | Gesture::Tap | Gesture::Pan));
-   * @endcode
-   * @param[in]  type  The gesture type(s) to enable.
-   */
-  void EnableGestureDetection(Gesture::Type type);
-
-  /**
-   * @brief Allows deriving classes to disable any of the gesture detectors.
-   *
-   * Like EnableGestureDetection, this can also be called using bitwise or.
-   * @param[in]  type  The gesture type(s) to disable.
-   * @see EnableGetureDetection
-   */
-  void DisableGestureDetection(Gesture::Type type);
-
   /**
    * @brief If deriving classes wish to fine tune pinch gesture
    * detection then they can access the gesture detector through this
@@ -247,6 +209,44 @@ protected:
    * @see EnableGestureDetection
    */
   LongPressGestureDetector GetLongPressGestureDetector() const;
+
+public:
+
+  /**
+   * @copydoc Dali::Toolkit::Control::KeyEventSignal()
+   */
+  Toolkit::Control::KeyEventSignalV2& KeyEventSignal();
+
+protected:
+
+  // Construction
+
+  /**
+   * @brief Second phase initialization.
+   */
+  void Initialize();
+
+  // Gesture Detection
+
+  /**
+   * @brief Allows deriving classes to enable any of the gesture detectors that are available.
+   *
+   * Gesture detection can be enabled one at a time or in bitwise format as shown:
+   * @code
+   * EnableGestureDetection(Gesture::Type(Gesture::Pinch | Gesture::Tap | Gesture::Pan));
+   * @endcode
+   * @param[in]  type  The gesture type(s) to enable.
+   */
+  void EnableGestureDetection(Gesture::Type type);
+
+  /**
+   * @brief Allows deriving classes to disable any of the gesture detectors.
+   *
+   * Like EnableGestureDetection, this can also be called using bitwise or.
+   * @param[in]  type  The gesture type(s) to disable.
+   * @see EnableGetureDetection
+   */
+  void DisableGestureDetection(Gesture::Type type);
 
 private: // For derived classes to override
 

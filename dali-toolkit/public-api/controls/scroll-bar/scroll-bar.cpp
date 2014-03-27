@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#include <dali-toolkit/internal/controls/scroll-component/scroll-bar.h>
-#include <dali-toolkit/internal/controls/scroll-component/scroll-bar-impl.h>
+#include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
+#include <dali-toolkit/internal/controls/scroll-bar/scroll-bar-impl.h>
 
 namespace Dali
 {
@@ -23,23 +23,25 @@ namespace Dali
 namespace Toolkit
 {
 
+const char* const ScrollBar::SCROLL_POSITION_NOTIFIED_SIGNAL_NAME = "scroll-position-notified";
+
 ScrollBar::ScrollBar()
 {
 }
 
 ScrollBar::ScrollBar(Internal::ScrollBar& implementation)
-: ScrollComponent(implementation)
+: Control( implementation )
 {
 }
 
 ScrollBar::ScrollBar( Dali::Internal::CustomActor* internal )
-: ScrollComponent( internal )
+: Control( internal )
 {
   VerifyCustomActorPointer<Internal::ScrollBar>(internal);
 }
 
 ScrollBar::ScrollBar( const ScrollBar& scrollBar )
-: ScrollComponent(scrollBar)
+: Control( scrollBar )
 {
 }
 
@@ -52,9 +54,9 @@ ScrollBar& ScrollBar::operator=( const ScrollBar& scrollBar )
   return *this;
 }
 
-ScrollBar ScrollBar::New(Scrollable& container, bool vertical)
+ScrollBar ScrollBar::New()
 {
-  return Internal::ScrollBar::New(container, vertical);
+  return Internal::ScrollBar::New();
 }
 
 ScrollBar ScrollBar::DownCast( BaseHandle handle )
@@ -66,6 +68,31 @@ ScrollBar::~ScrollBar()
 {
 }
 
+void ScrollBar::SetScrollConnector( ScrollConnector connector )
+{
+  GetImpl(*this).SetScrollConnector(connector);
+}
+
+void ScrollBar::SetBackgroundImage( Image image, const Vector4& border )
+{
+  GetImpl(*this).SetBackgroundImage(image, border);
+}
+
+void ScrollBar::SetIndicatorImage( Image image, const Vector4& border )
+{
+  GetImpl(*this).SetIndicatorImage(image, border);
+}
+
+Actor ScrollBar::GetScrollIndicator()
+{
+  return GetImpl(*this).GetScrollIndicator();
+}
+
+void ScrollBar::SetPositionNotifications( const std::vector<float>& positions )
+{
+  GetImpl(*this).SetPositionNotifications(positions);
+}
+
 void ScrollBar::Show()
 {
   GetImpl(*this).Show();
@@ -74,6 +101,11 @@ void ScrollBar::Show()
 void ScrollBar::Hide()
 {
   GetImpl(*this).Hide();
+}
+
+ScrollBar::ScrollPositionNotifiedSignalType& ScrollBar::ScrollPositionNotifiedSignal()
+{
+  return GetImpl(*this).ScrollPositionNotifiedSignal();
 }
 
 } // namespace Toolkit

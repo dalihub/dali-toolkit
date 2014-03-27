@@ -280,18 +280,19 @@ public:
   void ScrollToItem(ItemId itemId, float durationSeconds);
 
   /**
-   * @brief Set the interval between refreshes, during which new items are requested from ItemFactory.
+   * @brief Set the interval between refreshes. When the layout-position of items is changed by this interval,
+   * new items are requested from ItemFactory.
    *
-   * @param[in] intervalMilliseconds The refresh interval in milliseconds.
+   * @param[in] intervalLayoutPositions The refresh interval in layout position.
    */
-  void SetRefreshInterval(unsigned int intervalMilliseconds);
+  void SetRefreshInterval(float intervalLayoutPositions);
 
   /**
-   * @brief Get the interval between refreshes in milliseconds.
+   * @brief Get the interval between refreshes in layout position.
    *
    * @return  The refresh interval
    */
-  unsigned int GetRefreshInterval() const;
+  float GetRefreshInterval() const;
 
   /**
    * @brief Given the Item ID, this returns the accompanying actor.

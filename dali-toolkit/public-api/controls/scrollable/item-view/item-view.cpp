@@ -177,12 +177,12 @@ void ItemView::ScrollToItem(unsigned int itemId, float durationSeconds)
   GetImpl(*this).ScrollToItem(itemId, durationSeconds);
 }
 
-void ItemView::SetRefreshInterval(unsigned int intervalMilliseconds)
+void ItemView::SetRefreshInterval(float intervalLayoutPositions)
 {
-  GetImpl(*this).SetRefreshInterval(intervalMilliseconds);
+  GetImpl(*this).SetRefreshInterval(intervalLayoutPositions);
 }
 
-unsigned int ItemView::GetRefreshInterval() const
+float ItemView::GetRefreshInterval() const
 {
   return GetImpl(*this).GetRefreshInterval();
 }
