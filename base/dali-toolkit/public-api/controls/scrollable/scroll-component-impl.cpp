@@ -54,7 +54,7 @@ Toolkit::ScrollConnector ScrollComponentImpl::GetScrollConnector() const
 }
 
 ScrollComponentImpl::ScrollComponentImpl()
-: Control(true/*requires touch*/)
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_THEME_CHANGE_SIGNALS ) )
 {
 }
 

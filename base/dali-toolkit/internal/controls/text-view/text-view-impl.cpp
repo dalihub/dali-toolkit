@@ -1009,7 +1009,7 @@ TextView::RelayoutData& TextView::RelayoutData::operator=( const TextView::Relay
 }
 
 TextView::TextView()
-: Control( false ),  // doesn't require touch events
+: Control( REQUIRES_THEME_CHANGE_SIGNALS ),
   mCurrentStyledText(),
   mTextViewProcessorOperations(),
   mLayoutParameters( Toolkit::TextView::SplitByNewLineChar,

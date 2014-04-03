@@ -46,7 +46,7 @@ TypeAction a2(mType, Toolkit::NavigationControl::ACTION_POP, &NavigationControl:
 }
 
 NavigationControl::NavigationControl()
-: Control( true ),
+: Control( REQUIRES_TOUCH_EVENTS ),
   mToolBar(NULL),
   mTitleBar(NULL),
   mOrientationAngle( 0 ),

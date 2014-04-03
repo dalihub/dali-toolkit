@@ -994,13 +994,13 @@ void Builder::LoadConstants( const TreeNode& root, PropertyValueMap& intoMap )
 
 }
 
-void Builder::ApplyStyle( const std::string& styleName, Handle& handle )
+bool Builder::ApplyStyle( const std::string& styleName, Handle& handle )
 {
   Replacement replacer( mReplacementMap );
-  ApplyStyle( styleName, handle, replacer );
+  return ApplyStyle( styleName, handle, replacer );
 }
 
-void Builder::ApplyStyle( const std::string& styleName, Handle& handle, const Replacement& replacement )
+bool Builder::ApplyStyle( const std::string& styleName, Handle& handle, const Replacement& replacement )
 {
   DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
 
@@ -1010,12 +1010,13 @@ void Builder::ApplyStyle( const std::string& styleName, Handle& handle, const Re
   if( styles && style )
   {
     ApplyAllStyleProperties( *mParser.GetRoot(), *style, handle, replacement );
+    return true;
   }
   else
   {
     DALI_SCRIPT_WARNING("No styles section to create style '%s'\n", styleName.c_str());
+    return false;
   }
-
 }
 
 BaseHandle Builder::Create( const std::string& templateName, const PropertyValueMap& map )

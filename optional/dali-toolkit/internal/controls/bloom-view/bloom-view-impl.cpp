@@ -119,7 +119,7 @@ const char* const COMPOSITE_FRAGMENT_SOURCE =
 
 
 BloomView::BloomView()
-  : Control( false )  // doesn't require touch events
+  : Control( CONTROL_BEHAVIOUR_NONE )
   , mBlurNumSamples(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_NUM_SAMPLES)
   , mBlurBellCurveWidth(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_BELL_CURVE_WIDTH)
   , mPixelFormat(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_RENDER_TARGET_PIXEL_FORMAT)
@@ -141,7 +141,7 @@ BloomView::BloomView()
 
 BloomView::BloomView( const unsigned int blurNumSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
                                     const float downsampleWidthScale, const float downsampleHeightScale)
-  : Control( false )  // doesn't require touch events
+  : Control( CONTROL_BEHAVIOUR_NONE )
   , mBlurNumSamples(blurNumSamples)
   , mBlurBellCurveWidth(blurBellCurveWidth)
   , mPixelFormat(renderTargetPixelFormat)

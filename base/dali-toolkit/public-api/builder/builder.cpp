@@ -113,9 +113,9 @@ BaseHandle Builder::Create( const std::string& templateName, const PropertyValue
   return GetImpl(*this).Create( templateName, map );
 }
 
-void Builder::ApplyStyle( const std::string& styleName, Handle& handle )
+bool Builder::ApplyStyle( const std::string& styleName, Handle& handle )
 {
-  GetImpl(*this).ApplyStyle( styleName, handle );
+  return GetImpl(*this).ApplyStyle( styleName, handle );
 }
 
 void Builder::AddActors( Actor toActor )

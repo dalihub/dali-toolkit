@@ -60,5 +60,4 @@
 #include <dali-toolkit/public-api/shader-effects/ripple2d-effect.h>
 #include <dali-toolkit/public-api/shader-effects/swirl-effect.h>
 
-
 #endif // __DALI_TOOLKIT_CAPI_INTERNAL_H__

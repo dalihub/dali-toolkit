@@ -269,7 +269,7 @@ Dali::Toolkit::TextInput TextInput::New()
 }
 
 TextInput::TextInput()
-:Control( true ),
+:Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_THEME_CHANGE_SIGNALS ) ),
  mState( StateEdit ),
  mStyledText(),
  mInputStyle(),

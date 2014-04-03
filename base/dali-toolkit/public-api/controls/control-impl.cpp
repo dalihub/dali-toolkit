@@ -21,12 +21,14 @@
 
 #include <dali/integration-api/debug.h>
 
-#include "dali-toolkit/internal/controls/style-change-processor.h"
 #include "dali-toolkit/internal/controls/relayout-controller.h"
 #include "dali-toolkit/internal/controls/relayout-helper.h"
 #include "dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h"
 #include "dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h"
 #include <dali-toolkit/public-api/controls/control.h>
+
+#include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/internal/styling/style-manager-impl.h>
 
 namespace Dali
 {
@@ -253,7 +255,8 @@ public:
     mIsKeyboardNavigationSupported(false),
     mIsKeyboardFocusGroup(false),
     mKeyEventSignalV2(),
-    mBackground( NULL )
+    mBackground( NULL ),
+    mFlags( Control::CONTROL_BEHAVIOUR_NONE )
   {
   }
 
@@ -528,6 +531,8 @@ public:
   // Background
   Background* mBackground;           ///< Only create the background if we use it
 
+  ControlBehaviour mFlags;           ///< Flags passed in from constructor
+
   // Properties - these need to be members of Internal::Control::Impl as they need to functions within this class.
   static PropertyRegistration PROPERTY_1;
   static PropertyRegistration PROPERTY_2;
@@ -549,7 +554,7 @@ PropertyRegistration Control::Impl::PROPERTY_7( CONTROL_TYPE, "key-input-focus",
 Toolkit::Control Control::New()
 {
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr<Control> controlImpl = new Control( false );
+  IntrusivePtr<Control> controlImpl = new Control( CONTROL_BEHAVIOUR_NONE );
 
   // Pass ownership to handle
   Toolkit::Control handle( *controlImpl );
@@ -563,21 +568,25 @@ Toolkit::Control Control::New()
 
 Control::~Control()
 {
-  if( mImpl->mInitialized )
-  {
-    // Unregister only if control has been initialized.
-    Internal::StyleChangeProcessor::Unregister( this );
-  }
   delete mImpl;
 }
 
 void Control::Initialize()
 {
-  // Register with the style change processor so we are informed when the default style changes
-  Internal::StyleChangeProcessor::Register( this );
 
   // Calling deriving classes
   OnInitialize();
+
+  if( mImpl->mFlags & REQUIRES_THEME_CHANGE_SIGNALS )
+  {
+    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+
+    // Register for font/theme changes
+    styleManager.ThemeChangeSignal().Connect( this, &ControlImpl::OnThemeChange );
+
+    // Set theme
+    GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
+  }
 
   mImpl->mInitialized = true;
 }
@@ -1175,6 +1184,11 @@ void Control::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& containe
   Relayout( size, container );
 }
 
+void Control::OnThemeChange( Toolkit::StyleManager styleManager )
+{
+  GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
+}
+
 bool Control::EmitKeyEventSignal( const KeyEvent& event )
 {
   // Guard against destruction during signal emission
@@ -1216,6 +1230,13 @@ Control::Control( bool requiresTouchEvents )
 : CustomActorImpl( requiresTouchEvents ),
   mImpl(new Impl(*this))
 {
+}
+
+Control::Control( ControlBehaviour behaviourFlags )
+: CustomActorImpl( behaviourFlags & REQUIRES_TOUCH_EVENTS ),
+  mImpl(new Impl(*this))
+{
+  mImpl->mFlags = behaviourFlags;
 }
 
 } // namespace Internal
