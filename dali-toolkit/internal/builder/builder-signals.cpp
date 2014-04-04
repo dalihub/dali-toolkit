@@ -289,6 +289,7 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
       {
         DelayedAnimationPlay action;
         action.memento = Toolkit::JsonParser::New(*animNode);
+        // @todo; put constants into the map
         callback = action;
       }
       else

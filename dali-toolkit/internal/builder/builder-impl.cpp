@@ -29,6 +29,7 @@
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
 #include <dali-toolkit/internal/builder/builder-filesystem.h>
 #include <dali-toolkit/internal/builder/builder-declarations.h>
+#include <dali-toolkit/internal/builder/replacement.h>
 
 namespace Dali
 {
@@ -38,9 +39,13 @@ namespace Toolkit
 
 namespace Internal
 {
+class Replacement;
 
-extern Animation CreateAnimation(const TreeNode& child);
+extern Animation CreateAnimation(const TreeNode& child, const Replacement& replacements, const Dali::Actor searchRoot );
+extern bool SetPropertyFromNode( const TreeNode& node, Property::Value& value );
+extern bool SetPropertyFromNode( const TreeNode& node, Property::Value& value, const Replacement& replacements );
 extern bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value );
+extern bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value, const Replacement& replacements );
 extern Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor);
 extern Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor);
 extern Actor SetupActor( const TreeNode& node, Actor& actor );
@@ -55,10 +60,118 @@ namespace
 
 typedef std::vector<const TreeNode*> TreeNodeList;
 
+template <typename T>
+std::string ToString(const T& value)
+{
+  std::stringstream ss;
+  ss << value;
+  return ss.str();
+}
+
+template <>
+std::string ToString(const Rect<int>& value)
+{
+  std::stringstream ss;
+  ss << value.x << "," << value.y << "," << value.width << "," << value.height;
+  return ss.str();
+}
+
+
+std::string PropertyValueToString( const Property::Value& value )
+{
+  std::string ret;
+
+  switch( value.GetType() )
+  {
+    case Property::NONE:
+    {
+      ret = "NONE";
+      break;
+    }            ///< No type
+    case Property::BOOLEAN:
+    {
+      ret = value.Get<bool>() ? "True" : "False";
+      break;
+    }
+    case Property::FLOAT:
+    {
+
+      ret = ToString( value.Get<float>() );
+      break;
+    }
+    case Property::INTEGER:
+    {
+      ret = ToString( value.Get<int>() );
+      break;
+    }
+    case Property::UNSIGNED_INTEGER:
+    {
+      ret = ToString( value.Get<unsigned int>() );
+      break;
+    }
+    case Property::VECTOR2:
+    {
+      ret = ToString( value.Get<Vector2>() );
+      break;
+    }
+    case Property::VECTOR3:
+    {
+      ret = ToString( value.Get<Vector3>() );
+      break;
+    }
+    case Property::VECTOR4:
+    {
+      ret = ToString( value.Get<Vector4>() );
+      break;
+    }
+    case Property::MATRIX3:
+    {
+      ret = ToString( value.Get<Matrix3>() );
+      break;
+    }
+    case Property::MATRIX:
+    {
+      ret = ToString( value.Get<Matrix>() );
+      break;
+    }
+    case Property::RECTANGLE:
+    {
+      ret = ToString( value.Get< Rect<int> >() );
+      break;
+    }
+    case Property::ROTATION:
+    {
+      break;
+    }
+    case Property::STRING:
+    {
+      ret = value.Get<std::string>();
+      break;
+    }
+    case Property::ARRAY:
+    {
+      ret = std::string("Array Size=") + ToString( value.Get<Property::Array>().size() );
+      break;
+    }
+    case Property::MAP:
+    {
+      ret = std::string("Map Size=") + ToString( value.Get<Property::Map>().size() );
+      break;
+    }
+    case Property::TYPE_COUNT:
+    {
+      ret = "";
+      break;
+    }
+  }
+
+  return ret;
+}
+
 /*
  * Sets the handle properties found in the tree node
  */
-void SetProperties( const TreeNode& node, Handle& handle, Builder& builder )
+void SetProperties( const TreeNode& node, Handle& handle, Builder& builder, const Replacement& constant )
 {
   if( handle )
   {
@@ -83,9 +196,9 @@ void SetProperties( const TreeNode& node, Handle& handle, Builder& builder )
           ImageActor imageActor = ImageActor::DownCast(handle);
           if(imageActor)
           {
-            if( OptionalString s = IsString( keyChild.second ) )
+            if( OptionalString s = constant.IsString( keyChild.second ) )
             {
-              FrameBufferImage fb = builder.GetFrameBufferImage(*s);
+              FrameBufferImage fb = builder.GetFrameBufferImage(*s, constant);
               if(fb)
               {
                 imageActor.SetImage( fb );
@@ -99,10 +212,10 @@ void SetProperties( const TreeNode& node, Handle& handle, Builder& builder )
       if(key == "effect")
       {
         Actor actor = Actor::DownCast(handle);
-        OptionalString s = IsString( keyChild.second );
+        OptionalString s = constant.IsString( keyChild.second );
         if(actor && s)
         {
-          ShaderEffect e = builder.GetShaderEffect(*s);
+          ShaderEffect e = builder.GetShaderEffect(*s, constant);
           actor.SetShaderEffect(e);
         }
         else
@@ -120,7 +233,7 @@ void SetProperties( const TreeNode& node, Handle& handle, Builder& builder )
         Property::Type type = handle.GetPropertyType(index);
 
         Property::Value value;
-        if( !SetPropertyFromNode( keyChild.second, type, value ) )
+        if( !SetPropertyFromNode( keyChild.second, type, value, constant ) )
         {
           // verbose as this might not be a problem
           // eg parent-origin can be a string which is picked up later
@@ -128,7 +241,7 @@ void SetProperties( const TreeNode& node, Handle& handle, Builder& builder )
         }
         else
         {
-          DALI_SCRIPT_VERBOSE("SetProperty '%s' Index=:%d Value Type=%d\n", key.c_str(), index, value.GetType());
+          DALI_SCRIPT_VERBOSE("SetProperty '%s' Index=:%d Value Type=%d Value '%s'\n", key.c_str(), index, value.GetType(), PropertyValueToString(value).c_str() );
 
           handle.SetProperty( index, value );
         }
@@ -233,12 +346,15 @@ void CollectAllStyles( const OptionalChild& optionalStyles, const TreeNode& node
   }
 }
 
+} // namespace anon
+
 /*
  * Create a dali type from a node.
  * If parent given and an actor type was created then add it to the parent and
  * recursively add nodes children.
  */
-BaseHandle Create( ConnectionTracker* tracker, const OptionalChild& optionalStyles, const TreeNode& node, const TreeNode& root, Actor parent, Builder& builder )
+BaseHandle Builder::Create( const OptionalChild& optionalStyles, const TreeNode& node, const TreeNode& root, Actor parent,
+                            const Replacement& replacements )
 {
   BaseHandle baseHandle;
   TreeNodeList allStyles;
@@ -248,7 +364,7 @@ BaseHandle Create( ConnectionTracker* tracker, const OptionalChild& optionalStyl
 
   if(!typeInfo)
   {
-    DALI_SCRIPT_WARNING("Unable to create Dali type from node\n");
+    DALI_SCRIPT_WARNING("Cannot create Dali type from node '%s'\n", node.GetName());
   }
   else
   {
@@ -283,9 +399,47 @@ BaseHandle Create( ConnectionTracker* tracker, const OptionalChild& optionalStyl
 
       for(TreeNodeList::reverse_iterator iter = allStyles.rbegin(); iter != allStyles.rend(); ++iter)
       {
-        SetProperties( *(*iter), handle, builder );
+        if( (*iter)->GetType() == TreeNode::ARRAY )
+        {
+          // if its an array then its a list of styles to set to objects already in the hiearchy by name
+          if( actor )
+          {
+            const TreeNode& styleList = *(*iter);
+            for( TreeNode::ConstIterator iterSubStyle = styleList.CBegin(); iterSubStyle != styleList.CEnd(); ++iterSubStyle )
+            {
+              const TreeNode* nameNode = (*iterSubStyle).second.Find("name");
+              if( nameNode && nameNode->GetType() == TreeNode::STRING )
+              {
+                Dali::Actor found = actor.FindChildByName( nameNode->GetString() );
+                if( found )
+                {
+                  SetProperties( (*iterSubStyle).second, found, *this, replacements );
+                }
+                else
+                {
+                  DALI_SCRIPT_VERBOSE("Cannot find object '%s' in tree to style\n", nameNode->GetString());
+                }
+              }
+              else
+              {
+                DALI_SCRIPT_VERBOSE("Style name is not a string '%s' '%d'\n",
+                                    nameNode->GetString(), (*iterSubStyle).second.GetType());
+              }
+            }
+          }
+          else
+          {
+            DALI_SCRIPT_VERBOSE("Cannot apply style list to non actor\n");
+          }
+        }
+        else
+        {
+          DALI_ASSERT_DEBUG( (*iter)->GetType() == TreeNode::OBJECT );
+          // else it should be a map of properties
+          SetProperties( *(*iter), handle, *this, replacements  );
+        }
 
-        if( actor ) // if we created an actor
+        if( actor )
         {
           SetupActor( *(*iter), actor);
 
@@ -299,7 +453,7 @@ BaseHandle Create( ConnectionTracker* tracker, const OptionalChild& optionalStyl
           {
             for( TreeConstIter iter = (*actors).CBegin(); iter != (*actors).CEnd(); ++iter )
             {
-              Create( tracker, optionalStyles, (*iter).second, root, actor, builder );
+              Create( optionalStyles, (*iter).second, root, actor, replacements );
             }
           }
         }
@@ -308,8 +462,9 @@ BaseHandle Create( ConnectionTracker* tracker, const OptionalChild& optionalStyl
       if( actor )
       {
         // add signals first
-        SetupSignalAction( tracker, root, node, actor );
-        SetupPropertyNotification( tracker, root, node, actor );
+        SetupSignalAction( mSlotDelegate.GetConnectionTracker(), root, node, actor );
+
+        SetupPropertyNotification( mSlotDelegate.GetConnectionTracker(), root, node, actor );
 
         // then add to parent
         if( parent )
@@ -329,9 +484,6 @@ BaseHandle Create( ConnectionTracker* tracker, const OptionalChild& optionalStyl
 }
 
 
-} // namespace anon
-
-
 ActorContainer Builder::GetTopLevelActors() const
 {
   // deprecated function.
@@ -344,12 +496,12 @@ Animation Builder::GetAnimation( const std::string &name ) const
   return Animation();
 }
 
-void Builder::SetupTask( RenderTask& task, const TreeNode& node )
+void Builder::SetupTask( RenderTask& task, const TreeNode& node, const Replacement& constant )
 {
   const Stage& stage = Stage::GetCurrent();
   Layer root  = stage.GetRootLayer();
 
-  if( OptionalString s = IsString( IsChild(node, "source-actor") ) )
+  if( OptionalString s = constant.IsString( IsChild(node, "source-actor") ) )
   {
     Actor actor = root.FindChildByName(*s);
     if(actor)
@@ -362,7 +514,7 @@ void Builder::SetupTask( RenderTask& task, const TreeNode& node )
     }
   }
 
-  if( OptionalString s = IsString( IsChild(node, "camera-actor") ) )
+  if( OptionalString s = constant.IsString( IsChild(node, "camera-actor") ) )
   {
     CameraActor actor = CameraActor::DownCast( root.FindChildByName(*s) );
     if(actor)
@@ -375,9 +527,9 @@ void Builder::SetupTask( RenderTask& task, const TreeNode& node )
     }
   }
 
-  if( OptionalString s = IsString( IsChild(node, "target-frame-buffer") ) )
+  if( OptionalString s = constant.IsString( IsChild(node, "target-frame-buffer") ) )
   {
-    FrameBufferImage fb = GetFrameBufferImage( *s );
+    FrameBufferImage fb = GetFrameBufferImage( *s, constant );
     if(fb)
     {
       task.SetTargetFrameBuffer( fb );
@@ -388,7 +540,7 @@ void Builder::SetupTask( RenderTask& task, const TreeNode& node )
     }
   }
 
-  if( OptionalString s = IsString( IsChild(node, "screen-to-frame-buffer-function") ) )
+  if( OptionalString s = constant.IsString( IsChild(node, "screen-to-frame-buffer-function") ) )
   {
     if("DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION" == *s)
     {
@@ -405,12 +557,14 @@ void Builder::SetupTask( RenderTask& task, const TreeNode& node )
   }
 
   // other setup is via the property system
-  SetProperties( node, task, *this ); // @ todo, remove 'source-actor', 'camera-actor'?
+  SetProperties( node, task, *this, constant  ); // @ todo, remove 'source-actor', 'camera-actor'?
 
 }
 
 void Builder::CreateRenderTask( const std::string &name )
 {
+  Replacement constant(mReplacementMap);
+
   const Stage& stage = Stage::GetCurrent();
 
   OptionalChild tasks = IsChild(*mParser.GetRoot(), "render-tasks");
@@ -439,20 +593,26 @@ void Builder::CreateRenderTask( const std::string &name )
       TreeNode::ConstIterator iter = (*renderTask).CBegin();
       task = list.GetTask( start - 1 );
 
-      SetupTask( task, (*iter).second );
+      SetupTask( task, (*iter).second, constant  );
 
       ++iter;
 
       for(; iter != (*renderTask).CEnd(); ++iter )
       {
         task = list.CreateTask();
-        SetupTask( task, (*iter).second );
+        SetupTask( task, (*iter).second, constant );
       }
     }
   }
 }
 
-ShaderEffect Builder::GetShaderEffect( const std::string &name )
+ShaderEffect Builder::GetShaderEffect( const std::string &name)
+{
+  Replacement constant;
+  return GetShaderEffect( name, constant );
+}
+
+ShaderEffect Builder::GetShaderEffect( const std::string &name, const Replacement& constant )
 {
   ShaderEffect ret;
 
@@ -468,7 +628,7 @@ ShaderEffect Builder::GetShaderEffect( const std::string &name )
       if( OptionalChild effect = IsChild( *effects, name ) )
       {
         Dali::Property::Value propertyMap(Property::MAP);
-        if( SetPropertyFromNode( *effect, Property::MAP, propertyMap ) )
+        if( SetPropertyFromNode( *effect, Property::MAP, propertyMap, constant ) )
         {
           ret = Dali::Scripting::NewShaderEffect( propertyMap );
           mShaderEffectLut[ name ] = ret;
@@ -481,6 +641,12 @@ ShaderEffect Builder::GetShaderEffect( const std::string &name )
 }
 
 FrameBufferImage Builder::GetFrameBufferImage( const std::string &name )
+{
+  Replacement constant;
+  return GetFrameBufferImage(name, constant);
+}
+
+FrameBufferImage Builder::GetFrameBufferImage( const std::string &name, const Replacement& constant )
 {
   FrameBufferImage ret;
 
@@ -496,7 +662,7 @@ FrameBufferImage Builder::GetFrameBufferImage( const std::string &name )
       if( OptionalChild image = IsChild( *images, name ) )
       {
         Dali::Property::Value propertyMap(Property::MAP);
-        if( SetPropertyFromNode( *image, Property::MAP, propertyMap ) )
+        if( SetPropertyFromNode( *image, Property::MAP, propertyMap, constant ) )
         {
           propertyMap.SetValue("type", Property::Value(std::string("FrameBufferImage")));
           ret = Dali::Scripting::NewImage( propertyMap );
@@ -542,6 +708,9 @@ void Builder::AddActors( Actor toActor )
 
 void Builder::AddActors( const std::string &sectionName, Actor toActor )
 {
+  PropertyValueMap overrideMap;
+  Replacement replacements(overrideMap, mReplacementMap);
+
   OptionalChild addToStage = IsChild(*mParser.GetRoot(), sectionName);
 
   if( addToStage )
@@ -551,7 +720,7 @@ void Builder::AddActors( const std::string &sectionName, Actor toActor )
     for( TreeNode::ConstIterator iter = (*addToStage).CBegin(); iter != (*addToStage).CEnd(); ++iter )
     {
       // empty actor adds directly to the stage
-      BaseHandle baseHandle = Create( mSlotDelegate.GetConnectionTracker(), styles, (*iter).second, *mParser.GetRoot(), Actor(), *this);
+      BaseHandle baseHandle = Create( styles, (*iter).second, *mParser.GetRoot(), Actor(), replacements );
       Actor actor = Actor::DownCast(baseHandle);
       if(actor)
       {
@@ -571,11 +740,10 @@ void Builder::AddActors( const std::string &sectionName, Actor toActor )
         }
       }
     }
-
   }
 }
 
-Animation Builder::CreateAnimation( const std::string& animationName )
+Animation Builder::CreateAnimation( const std::string& animationName, const Replacement& replacement, Dali::Actor searchRoot )
 {
   Animation anim;
 
@@ -583,15 +751,44 @@ Animation Builder::CreateAnimation( const std::string& animationName )
   {
     if( OptionalChild animation = IsChild(*animations, animationName) )
     {
-      anim = Dali::Toolkit::Internal::CreateAnimation( *animation );
+      anim = Dali::Toolkit::Internal::CreateAnimation( *animation, replacement, Stage::GetCurrent().GetRootLayer() );
+    }
+    else
+    {
+      DALI_SCRIPT_WARNING( "Request for Animation called '%s' failed\n", animationName.c_str() );
     }
   }
   else
   {
-    DALI_SCRIPT_WARNING( "Request for Animation called '%s' failed\n", animationName.c_str() );
+    DALI_SCRIPT_WARNING( "Request for Animation called '%s' failed (no animation section)\n", animationName.c_str() );
   }
 
   return anim;
+}
+
+Animation Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor searchRoot )
+{
+  Replacement replacement(map, mReplacementMap);
+  return CreateAnimation( animationName, replacement, searchRoot);
+}
+
+Animation Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map )
+{
+  Replacement replacement(map, mReplacementMap);
+  return CreateAnimation( animationName, replacement, Stage::GetCurrent().GetRootLayer() );
+}
+
+Animation Builder::CreateAnimation( const std::string& animationName, Dali::Actor searchRoot )
+{
+  Replacement replacement( mReplacementMap );
+
+  return CreateAnimation( animationName, replacement, searchRoot );
+}
+
+Animation Builder::CreateAnimation( const std::string& animationName )
+{
+  Replacement replacement( mReplacementMap );
+  return CreateAnimation( animationName, replacement, Dali::Stage::GetCurrent().GetRootLayer() );
 }
 
 void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::UIFormat format )
@@ -610,9 +807,80 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
 
   DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Cannot parse JSON");
 
+  // load constant map (allows the user to override the constants in the json after loading)
+  LoadConstants();
+
+}
+
+void Builder::AddConstants( const PropertyValueMap& map )
+{
+  for(PropertyValueMap::const_iterator iter = map.begin(); iter != map.end(); ++iter)
+  {
+    mReplacementMap[ (*iter).first ] = (*iter).second;
+  }
+}
+
+void Builder::LoadConstants()
+{
+  Replacement replacer(mReplacementMap);
+
+  if( OptionalChild constants = IsChild(*mParser.GetRoot(), "constants") )
+  {
+    for(TreeNode::ConstIterator iter = (*constants).CBegin();
+        iter != (*constants).CEnd(); ++iter)
+    {
+      Dali::Property::Value property;
+      if( (*iter).second.GetName() )
+      {
+#if defined(DEBUG_ENABLED)
+        DALI_SCRIPT_VERBOSE("Constant set from json '%s'\n", (*iter).second.GetName());
+#endif
+        if( SetPropertyFromNode( (*iter).second, property, replacer ) )
+        {
+          mReplacementMap[ (*iter).second.GetName() ] = property;
+        }
+        else
+        {
+          DALI_SCRIPT_WARNING("Cannot convert property for constant %s\n",
+                              (*iter).second.GetName() == NULL ? "no name?" : (*iter).second.GetName());
+        }
+      }
+    }
+  }
+
+#if defined(DEBUG_ENABLED)
+  PropertyValueMap::const_iterator iter = mReplacementMap.find( "CONFIG_SCRIPT_LOG_LEVEL" );
+  if( iter != mReplacementMap.end() && (*iter).second.GetType() == Property::STRING )
+  {
+    std::string logLevel( (*iter).second.Get< std::string >() );
+    if( logLevel == "NoLogging" )
+    {
+      gFilterScript->SetLogLevel( Integration::Log::NoLogging );
+    }
+    else if( logLevel == "Concise" )
+    {
+      gFilterScript->SetLogLevel( Integration::Log::Concise );
+    }
+    else if( logLevel == "General" )
+    {
+      gFilterScript->SetLogLevel( Integration::Log::General );
+    }
+    else if( logLevel == "Verbose" )
+    {
+      gFilterScript->SetLogLevel( Integration::Log::Verbose );
+    }
+  }
+#endif
+
 }
 
 void Builder::ApplyStyle( const std::string& styleName, Handle& handle )
+{
+  Replacement replacer;
+  ApplyStyle( styleName, handle, replacer );
+}
+
+void Builder::ApplyStyle( const std::string& styleName, Handle& handle, const Replacement& replacement )
 {
   OptionalChild styles = IsChild(*mParser.GetRoot(), "styles");
 
@@ -627,7 +895,44 @@ void Builder::ApplyStyle( const std::string& styleName, Handle& handle )
 
       for(TreeNodeList::reverse_iterator iter = allStyles.rbegin(); iter != allStyles.rend(); ++iter)
       {
-        SetProperties( *style, handle, *this );
+        if( (*iter)->GetType() == TreeNode::ARRAY )
+        {
+          // if its an array then its a list of styles to set to objects already in the hiearchy by name
+          if( Dali::Actor actor = Dali::Actor::DownCast( handle ) )
+          {
+            const TreeNode& styleList = *(*iter);
+            for( TreeNode::ConstIterator iterSubStyle = styleList.CBegin(); iterSubStyle != styleList.CEnd(); ++iterSubStyle )
+            {
+              const TreeNode* nameNode = (*iterSubStyle).second.Find("name");
+              if( nameNode && nameNode->GetType() == TreeNode::STRING )
+              {
+                Dali::Actor found = actor.FindChildByName( nameNode->GetString() );
+                if( found )
+                {
+                  SetProperties( (*iterSubStyle).second, found, *this, replacement );
+                }
+                else
+                {
+                  DALI_SCRIPT_VERBOSE("Cannot find object '%s' in tree to style\n", nameNode->GetString());
+                }
+              }
+              else
+              {
+                DALI_SCRIPT_VERBOSE("Style name is not a string '%s' '%d'\n",
+                                    nameNode->GetString(), (*iterSubStyle).second.GetType());
+              }
+            }
+          }
+          else
+          {
+            DALI_SCRIPT_VERBOSE("Cannot apply style list to non actor\n");
+          }
+        }
+        else
+        {
+          DALI_ASSERT_DEBUG( (*iter)->GetType() == TreeNode::OBJECT );
+          SetProperties( *style, handle, *this, replacement );
+        }
       }
     }
     else
@@ -641,7 +946,13 @@ void Builder::ApplyStyle( const std::string& styleName, Handle& handle )
   }
 }
 
-BaseHandle Builder::CreateFromStyle( const std::string& styleName )
+BaseHandle Builder::CreateFromStyle( const std::string& styleName, const PropertyValueMap& map )
+{
+  Replacement replacement( map, mReplacementMap );
+  return CreateFromStyle( styleName, replacement );
+}
+
+BaseHandle Builder::CreateFromStyle( const std::string& styleName, const Replacement& constant )
 {
   BaseHandle baseHandle;
 
@@ -660,7 +971,7 @@ BaseHandle Builder::CreateFromStyle( const std::string& styleName )
     }
     else
     {
-      OptionalString type = IsString( IsChild(*style, "type") );
+      OptionalString type = constant.IsString( IsChild(*style, "type") );
 
       if(!type)
       {
@@ -668,12 +979,20 @@ BaseHandle Builder::CreateFromStyle( const std::string& styleName )
       }
       else
       {
-        baseHandle = Create( mSlotDelegate.GetConnectionTracker(), styles, *style, *mParser.GetRoot(), Actor(), *this );
+        baseHandle = Create( styles, *style, *mParser.GetRoot(), Actor(), constant );
       }
     }
   }
 
   return baseHandle;
+}
+
+
+BaseHandle Builder::CreateFromStyle( const std::string& styleName )
+{
+  PropertyValueMap overrideMap;
+  Replacement replacement( overrideMap, mReplacementMap );
+  return CreateFromStyle( styleName, replacement );
 }
 
 Builder::Builder()

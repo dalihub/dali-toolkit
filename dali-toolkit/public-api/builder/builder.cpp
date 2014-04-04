@@ -53,14 +53,29 @@ void Builder::LoadFromString( const std::string &data, UIFormat rep )
   GetImpl(*this).LoadFromString( data );
 }
 
+void Builder::AddConstants( const PropertyValueMap& map )
+{
+  GetImpl(*this).AddConstants( map );
+}
+
 Animation Builder::CreateAnimation( const std::string& animationName )
 {
   return GetImpl(*this).CreateAnimation( animationName );
 }
 
+Animation Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map )
+{
+  return GetImpl(*this).CreateAnimation( animationName, map );
+}
+
 BaseHandle Builder::CreateFromStyle( const std::string& styleName )
 {
   return GetImpl(*this).CreateFromStyle( styleName );
+}
+
+BaseHandle Builder::CreateFromStyle( const std::string& styleName, const PropertyValueMap& map )
+{
+  return GetImpl(*this).CreateFromStyle( styleName, map );
 }
 
 void Builder::ApplyStyle( const std::string& styleName, Handle& handle )

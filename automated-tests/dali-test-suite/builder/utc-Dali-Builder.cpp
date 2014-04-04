@@ -167,6 +167,47 @@ namespace
 }                                                                                         \
 ");
 
+  std::string JSON_CONSTANTS("\
+{                                                                                         \
+    'constants':                                                                          \
+    {                                                                                     \
+      'HELLO':'Hello World',                                                              \
+      'HELLO2':'Hello {WORLD}'                                                            \
+    },                                                                                    \
+    'styles':                                                                             \
+    {                                                                                     \
+        'basic-text': {                                                                   \
+                    'type':'TextActor',                                                   \
+                    'text':'{HELLO2}'                                                     \
+                   }                                                                      \
+    },                                                                                    \
+    'animations':                                                                         \
+    {                                                                                     \
+      'rotate':                                                                           \
+      {                                                                                   \
+        'duration': 10,                                                                   \
+        'properties':                                                                     \
+        [                                                                                 \
+          {                                                                               \
+            'actor':'{ACTOR}',                                                            \
+            'property':'rotation',                                                        \
+            'value':[0, 3, 0, 0],                                                         \
+            'alpha-function': 'EASE_IN_OUT',                                              \
+            'time-period': {'delay': 0, 'duration': 3 }                                   \
+          }                                                                               \
+        ]                                                                                 \
+      }                                                                                   \
+    },                                                                                    \
+    'stage':                                                                              \
+    [                                                                                     \
+        {'name':'txt1',                                                                   \
+         'type':'TextActor',                                                              \
+         'text':'{HELLO}'                                                                \
+        }                                                                                 \
+    ]                                                                                     \
+}                                                                                         \
+");
+
 
   std::string ReplaceQuotes(const std::string &in_s)
   {
@@ -186,6 +227,7 @@ extern "C" {
   void (*tet_cleanup)() = Cleanup;
 }
 
+static void UtcDaliBuilderConstants();
 static void UtcDaliBuilderTextActorCreateFromStyle();
 static void UtcDaliBuilderTextActorCreateAnimation();
 static void UtcDaliBuilderTextActorApplyFromStyle();
@@ -199,19 +241,19 @@ enum {
   NEGATIVE_TC_IDX,
 };
 
-// Add test functionality for all APIs in the class (Positive and Negative)
+#define MAX_NUMBER_OF_TESTS 10000
 extern "C" {
-  struct tet_testlist tet_testlist[] = {
-    { UtcDaliBuilderTextActorCreateFromStyle, POSITIVE_TC_IDX },
-    { UtcDaliBuilderTextActorCreateAnimation, POSITIVE_TC_IDX },
-    { UtcDaliBuilderTextActorApplyFromStyle, POSITIVE_TC_IDX },
-    { UtcDaliBuilderStyles, POSITIVE_TC_IDX },
-    { UtcDaliBuilderAddActorsOther, POSITIVE_TC_IDX },
-    { UtcDaliBuilderAddActors, POSITIVE_TC_IDX },
-    { UtcDaliBuilderSetProperty, POSITIVE_TC_IDX },
-    { NULL, 0 }
-  };
+  struct tet_testlist tet_testlist[MAX_NUMBER_OF_TESTS];
 }
+
+TEST_FUNCTION( UtcDaliBuilderConstants                     , POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliBuilderTextActorCreateFromStyle      , POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliBuilderTextActorCreateAnimation      , POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliBuilderTextActorApplyFromStyle       , POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliBuilderStyles                        , POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliBuilderAddActorsOther                , POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliBuilderAddActors                     , POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliBuilderSetProperty                   , POSITIVE_TC_IDX );
 
 // Called only once before first test is run.
 static void Startup()
@@ -221,6 +263,59 @@ static void Startup()
 // Called only once after last test is run
 static void Cleanup()
 {
+}
+
+static void UtcDaliBuilderConstants()
+{
+  ToolkitTestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  tet_infoline(" UtcDaliBuilderConstants");
+
+  Builder builder = Builder::New();
+
+  PropertyValueMap userMap;
+  userMap["WORLD"] = "World";
+  builder.AddConstants(userMap);
+
+  builder.LoadFromString( ReplaceQuotes(JSON_CONSTANTS) );
+
+  // constants in json
+  Layer layer = stage.GetRootLayer();
+  size_t count = layer.GetChildCount();
+
+  builder.AddActors( layer );
+  DALI_TEST_CHECK( layer.GetChildCount() == count + 1 );
+
+  TextActor actor = TextActor::DownCast( layer.GetChildAt( count ) );
+  DALI_TEST_CHECK( actor );
+  DALI_TEST_CHECK( actor.GetText() == std::string("Hello World") );
+
+  // global constants
+  PropertyValueMap map;
+  map["HELLO2"] = "Hi";
+
+  builder.AddConstants( map );
+
+  actor = TextActor::DownCast( builder.CreateFromStyle("basic-text") );
+  DALI_TEST_CHECK( actor );
+  DALI_TEST_CHECK( actor.GetText() == std::string("Hi") );
+
+  // user overriding
+  userMap["HELLO2"] = "Hello Dali";
+  actor = TextActor::DownCast( builder.CreateFromStyle("basic-text", userMap) );
+  DALI_TEST_CHECK( actor );
+  DALI_TEST_CHECK( actor.GetText() == std::string("Hello Dali") );
+
+  // animation constants
+  actor = TextActor::DownCast( layer.GetChildAt( count ) );
+  actor.SetName("rotate-me");
+  userMap["ACTOR"] = actor.GetName();
+
+  Animation anim = builder.CreateAnimation("rotate", userMap);
+  DALI_TEST_CHECK( anim );
+  DALI_TEST_CHECK( 10.0f == anim.GetDuration() );
+
 }
 
 static void UtcDaliBuilderTextActorCreateFromStyle()

@@ -28,6 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/builder/json-parser.h>
 #include <dali-toolkit/public-api/builder/builder.h>
+#include <dali-toolkit/internal/builder/builder-declarations.h>
 
 // Warning messages usually displayed
 #define DALI_SCRIPT_WARNING(format, args...) \
@@ -60,6 +61,7 @@ extern Dali::Integration::Log::Filter* gFilterScript;
 #endif
 
 class Builder;
+class Replacement;
 
 /**
  * @copydoc Toolkit::Builder
@@ -77,14 +79,39 @@ public:
                        Dali::Toolkit::Builder::UIFormat rep = Dali::Toolkit::Builder::JSON );
 
   /**
-   * @copydoc Toolkit::Builder::CreateAnimation
+   * @copydoc Toolkit::Builder::AddConstants
+   */
+  void AddConstants( const PropertyValueMap& map );
+
+  /**
+   * @copydoc Toolkit::Builder::CreateAnimation( const std::string& animationName );
    */
   Animation CreateAnimation( const std::string& animationName );
 
   /**
-   * @copydoc Toolkit::Builder::CreateFromStyle
+   * @copydoc Toolkit::Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map );
+   */
+  Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map );
+
+  /**
+   * @copydoc Toolkit::Builder::CreateAnimation( const std::string& animationName, Dali::Actor searchRoot );
+   */
+  Animation CreateAnimation( const std::string& animationName, Dali::Actor searchRoot );
+
+  /**
+   * @copydoc Toolkit::Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor searchRoot );
+   */
+  Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor searchRoot );
+
+  /**
+   * @copydoc Toolkit::Builder::CreateFromStyle( const std::string& styleName );
    */
   BaseHandle CreateFromStyle( const std::string& styleName );
+
+  /**
+   * @copydoc Toolkit::Builder::CreateFromStyle( const std::string& styleName, const PropertyValueMap& map );
+   */
+  BaseHandle CreateFromStyle( const std::string& styleName, const PropertyValueMap& map );
 
   /**
    * @copydoc Toolkit::Builder::GetFont
@@ -137,9 +164,19 @@ public:
   ShaderEffect GetShaderEffect( const std::string &name );
 
   /**
+   * @copydoc Toolkit::Builder::GetShaderEffect
+   */
+  ShaderEffect GetShaderEffect( const std::string &name, const Replacement& constant );
+
+  /**
    * @copydoc Toolkit::Builder::GetFrameBufferImage
    */
   FrameBufferImage GetFrameBufferImage( const std::string &name );
+
+  /**
+   * @copydoc Toolkit::Builder::GetFrameBufferImage
+   */
+  FrameBufferImage GetFrameBufferImage( const std::string &name, const Replacement& constant );
 
   /**
    * @copydoc Toolkit::Builder::GetTopLevelActors
@@ -155,7 +192,7 @@ private:
   Builder(const Builder&);
   Builder& operator=(const Builder& rhs);
 
-  void SetupTask( RenderTask& task, const Toolkit::TreeNode& node );
+  void SetupTask( RenderTask& task, const Toolkit::TreeNode& node, const Replacement& replacement );
 
 private:
   Toolkit::JsonParser mParser;
@@ -167,6 +204,19 @@ private:
   ShaderEffectLut mShaderEffectLut;
 
   SlotDelegate<Builder> mSlotDelegate;
+
+  PropertyValueMap mReplacementMap;
+
+  BaseHandle Create( const OptionalChild& optionalStyles, const TreeNode& node, const TreeNode& root, Actor parent,
+                     const Replacement& replacement );
+
+  void LoadConstants();
+
+  void ApplyStyle( const std::string& styleName, Handle& handle, const Replacement& replacement);
+
+  Animation CreateAnimation( const std::string& animationName, const Replacement& replacement, Dali::Actor searchRoot );
+
+  BaseHandle CreateFromStyle( const std::string& styleName, const Replacement& replacement );
 };
 
 } // namespace Internal

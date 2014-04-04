@@ -20,16 +20,17 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/builder/builder-impl.h>
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
+#include <dali-toolkit/internal/builder/replacement.h>
 
 namespace // unnamed namespace
 {
 
 using namespace Dali;
 
-TimePeriod GetTimePeriod( const TreeNode& child )
+TimePeriod GetTimePeriod( const TreeNode& child, const Toolkit::Internal::Replacement& constant )
 {
-  OptionalFloat delay      = IsFloat( IsChild(child, "delay" ) );
-  OptionalFloat duration   = IsFloat( IsChild(child, "duration" ) );
+  OptionalFloat delay      = constant.IsFloat( IsChild(child, "delay" ) );
+  OptionalFloat duration   = constant.IsFloat( IsChild(child, "duration" ) );
   DALI_ASSERT_ALWAYS( duration && "Time period must have at least a duration" );
 
   if( delay )
@@ -148,18 +149,32 @@ namespace Toolkit
 namespace Internal
 {
 
-Animation CreateAnimation( const TreeNode& child )
+Animation CreateAnimation( const TreeNode& child, const Replacement& constant, Dali::Actor searchRoot )
 {
   float durationSum = 0.f;
 
+  Dali::Actor searchActor = searchRoot ? searchRoot : Dali::Stage::GetCurrent().GetRootLayer();
+
   Animation animation( Animation::New( 0.f ) );
 
-  if( OptionalBoolean looping = IsBoolean(  IsChild(child, "loop" ) ) )
+  // duration needs to be set before AnimateTo calls for correct operation when AnimateTo has no "time-period".
+  OptionalFloat duration = constant.IsFloat( IsChild(child, "duration" ) );
+
+  if( duration )
+  {
+    animation.SetDuration( *duration );
+  }
+  else
+  {
+    animation.SetDuration( durationSum );
+  }
+
+  if( OptionalBoolean looping = constant.IsBoolean(  IsChild(child, "loop" ) ) )
   {
     animation.SetLooping( *looping );
   }
 
-  if( OptionalString endAction = IsString(  IsChild(child, "end-action" ) ) )
+  if( OptionalString endAction = constant.IsString(  IsChild(child, "end-action" ) ) )
   {
     if("BAKE" == *endAction)
     {
@@ -171,7 +186,7 @@ Animation CreateAnimation( const TreeNode& child )
     }
   }
 
-  if( OptionalString endAction = IsString(  IsChild(child, "destroy-action" ) ) )
+  if( OptionalString endAction = constant.IsString(  IsChild(child, "destroy-action" ) ) )
   {
     if("BAKE" == *endAction)
     {
@@ -191,12 +206,12 @@ Animation CreateAnimation( const TreeNode& child )
     {
       const TreeNode::KeyNodePair& pKeyChild = *iter;
 
-      OptionalString actorName( IsString( pKeyChild.second, "actor" ) );
-      OptionalString property(  IsString( pKeyChild.second, "property" ) );
+      OptionalString actorName( constant.IsString( IsChild(pKeyChild.second, "actor" ) ) );
+      OptionalString property(  constant.IsString( IsChild(pKeyChild.second, "property" ) ) );
       DALI_ASSERT_ALWAYS( actorName && "Animation must specify actor name" );
       DALI_ASSERT_ALWAYS( property  && "Animation must specify a property name" );
 
-      Actor targetActor = Stage::GetCurrent().GetRootLayer().FindChildByName( *actorName );
+      Actor targetActor = searchActor.FindChildByName( *actorName );
       DALI_ASSERT_ALWAYS( targetActor && "Actor must exist for property" );
 
       Property::Index idx( targetActor.GetPropertyIndex( *property ) );
@@ -239,14 +254,16 @@ Animation CreateAnimation( const TreeNode& child )
       AlphaFunction alphaFunction( AlphaFunctions::Default );
       TimePeriod timePeriod( 0.f );
 
-      if( OptionalChild timeChild = IsChild( pKeyChild.second, "time-period" ) )
+      OptionalChild timeChild = IsChild( pKeyChild.second, "time-period" );
+
+      if( timeChild )
       {
-        timePeriod = GetTimePeriod( *timeChild );
+        timePeriod = GetTimePeriod( *timeChild, constant );
       }
 
       durationSum = std::max( durationSum, timePeriod.delaySeconds + timePeriod.durationSeconds );
 
-      if( OptionalString alphaChild = IsString( pKeyChild.second, "alpha-function" ) )
+      if( OptionalString alphaChild = constant.IsString( IsChild(pKeyChild.second, "alpha-function" ) ) )
       {
         alphaFunction = GetAlphaFunction( *alphaChild );
       }
@@ -260,7 +277,7 @@ Animation CreateAnimation( const TreeNode& child )
         {
           const TreeNode::KeyNodePair& kfKeyChild = *iter;
 
-          OptionalFloat kfProgress = IsFloat( kfKeyChild.second, "progress" );
+          OptionalFloat kfProgress = constant.IsFloat( IsChild(kfKeyChild.second, "progress" ) );
           DALI_ASSERT_ALWAYS( kfProgress && "Key frame entry must have 'progress'" );
 
           OptionalChild kfValue = IsChild( kfKeyChild.second, "value" );
@@ -280,7 +297,7 @@ Animation CreateAnimation( const TreeNode& child )
           }
 
           AlphaFunction kfAlphaFunction( AlphaFunctions::Default );
-          if( OptionalString alphaFuncStr = IsString( pKeyChild.second, "alpha-function") )
+          if( OptionalString alphaFuncStr = constant.IsString( IsChild(pKeyChild.second, "alpha-function") ) )
           {
             kfAlphaFunction = GetAlphaFunction( *alphaFuncStr );
           }
@@ -288,7 +305,14 @@ Animation CreateAnimation( const TreeNode& child )
           keyframes.Add( *kfProgress, propValue, kfAlphaFunction );
         }
 
-        animation.AnimateBetween( prop, keyframes, alphaFunction, timePeriod );
+        if( timeChild )
+        {
+          animation.AnimateBetween( prop, keyframes, alphaFunction, timePeriod );
+        }
+        else
+        {
+          animation.AnimateBetween( prop, keyframes, alphaFunction );
+        }
       }
       else
       {
@@ -304,28 +328,39 @@ Animation CreateAnimation( const TreeNode& child )
           throw;
         }
 
-        if( OptionalBoolean relative = IsBoolean(pKeyChild.second, "relative") )
+        if( OptionalBoolean relative = constant.IsBoolean( IsChild(pKeyChild.second, "relative") ) )
         {
-          animation.AnimateBy( prop, propValue, alphaFunction, timePeriod );
+          if( timeChild )
+          {
+            animation.AnimateBy( prop, propValue, alphaFunction, timePeriod );
+          }
+          else
+          {
+            animation.AnimateBy( prop, propValue, alphaFunction );
+          }
         }
         else
         {
-          animation.AnimateTo( prop, propValue, alphaFunction, timePeriod );
+          if( timeChild )
+          {
+            animation.AnimateTo( prop, propValue, alphaFunction, timePeriod );
+          }
+          else
+          {
+            animation.AnimateTo( prop, propValue, alphaFunction );
+          }
         }
       }
     }
   }
 
-  if( OptionalFloat duration = IsFloat( child, "duration" ) )
-  {
-    animation.SetDuration( *duration );
-  }
-  else
-  {
-    animation.SetDuration( durationSum );
-  }
-
   return animation;
+}
+
+Animation CreateAnimation( const TreeNode& child )
+{
+  Replacement replacement;
+  return CreateAnimation( child, replacement, Stage::GetCurrent().GetRootLayer() );
 }
 
 } // namespace Internal

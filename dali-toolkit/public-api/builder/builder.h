@@ -31,6 +31,8 @@ namespace Internal DALI_INTERNAL
 class Builder;
 }
 
+typedef std::map<std::string, Property::Value> PropertyValueMap;
+
 /**
  * Builder
  * This class provides the ability to load an actor tree from a string representation.
@@ -122,6 +124,19 @@ class Builder;
   void LoadFromString( const std::string& data, UIFormat format = JSON );
 
   /**
+   * @brief Adds user defined constants to all future style template or animation expansions
+   *
+   * e.g.
+   *   PropertyValueMap map;
+   *   map["IMAGE_DIRECTORY"] = "/usr/share/images";
+   *   builder.AddConstants( map );
+   *
+   * @pre The Builder has been initialized.
+   * @param map The user defined constants used in template expansions.
+   */
+  void AddConstants( const PropertyValueMap& map );
+
+  /**
    * Creates an animation from the set of known animations
    * e.g.
    *   Animation a = builder.CreateAnimation( "wobble");
@@ -135,7 +150,26 @@ class Builder;
   Animation CreateAnimation( const std::string& animationName );
 
   /**
-   * Creates an object (e.g. an actor) from the set of known styles
+   * @brief Creates an animation from the set of known animations with user defined constants
+   *
+   * e.g.
+   *   PropertyValueMap map;
+   *   map["ACTOR"] = actor.GetName();       // replaces '{ACTOR} in the template
+   *   Animation a = builder.CreateAnimation( "wobble");
+   *
+   * @pre The Builder has been initialized.
+   * @pre Preconditions have been met for creating dali objects ie Images, Actors etc
+   * @pre The animationName exists in the animations section of the data representation
+   * @pre The map contains all the constant expansions in the style template
+   * @param animationName The animation name to create
+   * @param map The user defined constants used in style template expansion.
+   * @returns The base handle of the created object
+   */
+  Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map );
+
+  /**
+   * @brief Creates an object (e.g. an actor) from the set of known style templates
+   *
    * e.g.
    *   mActor.Add( Actor::DownCast(builder.CreateFromStyle( "default-text")) );
    *
@@ -147,6 +181,25 @@ class Builder;
    * @returns The base handle of the created object
    */
   BaseHandle CreateFromStyle( const std::string& styleName );
+
+  /**
+   * @brief Creates an object from the style templates with user defined constants
+   *
+   * e.g.
+   *   PropertyValueMap map;
+   *   map["IMAGE_DIR"] = "/usr/share/images"; // replaces '{IMAGE_DIR} in the template
+   *   mActor.Add( Actor::DownCast(builder.CreateFromStyle( "default-image", map) ) );
+   *
+   * @pre The Builder has been initialized.
+   * @pre Preconditions have been met for creating dali objects ie Images, Actors etc
+   * @pre The styleName has been loaded from the styles section of the data representation
+   *      and contains 'type' property used to create the object.
+   * @pre The map contains all the constant expansions in the style template
+   * @param styleName The set of styles/properties to set on the handle object.
+   * @param map The user defined constants used in style template expansion.
+   * @returns The base handle of the created object
+   */
+  BaseHandle CreateFromStyle( const std::string& styleName, const PropertyValueMap& map );
 
   /**
    * Apply a style (a collection of properties) to an actor.

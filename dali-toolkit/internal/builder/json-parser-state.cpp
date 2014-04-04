@@ -663,6 +663,8 @@ char* JsonParserState::EncodeString()
   mNumberOfParsedChars += last - first;
   mNumberOfParsedChars += 1 ; // null terminator
 
+  mCurrent.SetSubstitution( substitution > 1 );
+
   // return true;
   return &(*first);
 

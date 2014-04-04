@@ -17,6 +17,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/builder/builder-impl.h>
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
+#include <dali-toolkit/internal/builder/replacement.h>
 
 namespace Dali
 {
@@ -38,6 +39,16 @@ namespace Internal
 bool SetPropertyFromNode( const TreeNode& node, Property::Value& value );
 
 /*
+ * Set a property value from a tree node as SetPropertyFromNode() above
+ * @param node  The node string to convert from
+ * @param value The property value to set
+ * @param replacement The overriding replacement map (if any)
+ * @return true if the string could be converted.
+ */
+bool SetPropertyFromNode( const TreeNode& node, Property::Value& value,
+                          const Replacement& replacement );
+
+/*
  * Set a property value as the given type from a tree node.
  * @param node The node string to convert from
  * @param type The property type to convert to.
@@ -46,16 +57,39 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Value& value );
  */
 bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value );
 
+/*
+ * Set a property value as the given type from a tree node as SetPropertyFromNode() above
+ * @param node The node string to convert from
+ * @param type The property type to convert to.
+ * @param value The property value to set
+ * @param replacement The overriding replacement map (if any)
+ * @return true if the string could be converted to the correct type.
+ */
+bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value,
+                          const Replacement& replacement );
+
+
+namespace
+{
+
+
+
+} // anon namespace
+
+
 /**
  * A property value type can be forced when its unknown by a disambiguation convention in the json
  * ie  "myarray": [1,2,3,4] ; would be a vector but
  *     "myarray": {'type-cast':'array', 'value':[1,2,3,4]} would be an array
  * @param child The node whos string to search for a disambiguated type
  * @param value The value to set
+ * @param overrideMap The user overriding constant map
+ * @param defaultMap The default map.
  * @return True if child contained a disambiguated string that could be converted.
  */
 bool Disambiguated(const TreeNode& child, // ConstantLut& constantLut,
-                   Dali::Property::Value& value)
+                   Dali::Property::Value& value,
+                   const Replacement& replacement )
 {
   OptionalString childType = IsString( IsChild(child, "type-cast") );
   OptionalChild childValue = IsChild(child, "value");
@@ -67,43 +101,43 @@ bool Disambiguated(const TreeNode& child, // ConstantLut& constantLut,
     // type-cast and value keys. If they do then a work around is to add a bogus key to not run this case.
     if(*childType == "boolean")
     {
-      return SetPropertyFromNode( *childValue, Dali::Property::BOOLEAN, value);
+      return SetPropertyFromNode( *childValue, Dali::Property::BOOLEAN, value, replacement);
     }
     else if(*childType == "float")
     {
-      return SetPropertyFromNode( *childValue, Dali::Property::FLOAT, value);
+      return SetPropertyFromNode( *childValue, Dali::Property::FLOAT, value, replacement);
     }
     else if(*childType == "vector2")
     {
-      return SetPropertyFromNode( *childValue, Dali::Property::VECTOR2, value);
+      return SetPropertyFromNode( *childValue, Dali::Property::VECTOR2, value, replacement);
     }
     else if(*childType == "vector3")
     {
-      return SetPropertyFromNode( *childValue, Dali::Property::VECTOR3, value);
+      return SetPropertyFromNode( *childValue, Dali::Property::VECTOR3, value, replacement);
     }
     else if(*childType == "vector4")
     {
-      return SetPropertyFromNode( *childValue, Dali::Property::VECTOR4, value);
+      return SetPropertyFromNode( *childValue, Dali::Property::VECTOR4, value, replacement);
     }
     else if(*childType == "rotation")
     {
-      return SetPropertyFromNode( *childValue, Dali::Property::ROTATION, value);
+      return SetPropertyFromNode( *childValue, Dali::Property::ROTATION, value, replacement);
     }
     else if(*childType == "rect")
     {
-      return SetPropertyFromNode( *childValue, Dali::Property::RECTANGLE, value);
+      return SetPropertyFromNode( *childValue, Dali::Property::RECTANGLE, value, replacement);
     }
     else if(*childType == "string")
     {
-      return SetPropertyFromNode( *childValue, Dali::Property::STRING, value);
+      return SetPropertyFromNode( *childValue, Dali::Property::STRING, value, replacement);
     }
     else if(*childType == "map")
     {
-      return SetPropertyFromNode( *childValue, Dali::Property::MAP, value);
+      return SetPropertyFromNode( *childValue, Dali::Property::MAP, value, replacement);
     }
     else if(*childType == "array")
     {
-      return SetPropertyFromNode( *childValue, Dali::Property::ARRAY, value);
+      return SetPropertyFromNode( *childValue, Dali::Property::ARRAY, value, replacement);
     }
   }
 
@@ -111,7 +145,15 @@ bool Disambiguated(const TreeNode& child, // ConstantLut& constantLut,
   return false;
 }
 
-bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value )
+
+bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value)
+{
+  Replacement noReplacement;
+  return SetPropertyFromNode( node, type, value, noReplacement );
+}
+
+bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value,
+                          const Replacement& replacer )
 {
   bool done = false;
 
@@ -119,7 +161,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
   {
     case Property::BOOLEAN:
     {
-      if( OptionalBoolean v = IsBoolean(node) )
+      if( OptionalBoolean v = replacer.IsBoolean(node) )
       {
         value = *v;
         done = true;
@@ -128,7 +170,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     }
     case Property::FLOAT:
     {
-      if( OptionalFloat v = IsFloat(node) )
+      if( OptionalFloat v = replacer.IsFloat(node) )
       {
         value = *v;
         done = true;
@@ -137,7 +179,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     }
     case Property::INTEGER:
     {
-      if( OptionalInteger v = IsInteger(node) )
+      if( OptionalInteger v = replacer.IsInteger(node) )
       {
         value = *v;
         done = true;
@@ -146,7 +188,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     }
     case Property::UNSIGNED_INTEGER:
     {
-      if( OptionalInteger v = IsInteger(node) )
+      if( OptionalInteger v = replacer.IsInteger(node) )
       {
         if( *v >= 0 ) // with a loss of resolution....
         {
@@ -158,7 +200,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     }
     case Property::VECTOR2:
     {
-      if( OptionalVector2 v = IsVector2(node) )
+      if( OptionalVector2 v = replacer.IsVector2(node) )
       {
         value = *v;
         done = true;
@@ -167,7 +209,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     }
     case Property::VECTOR3:
     {
-      if( OptionalVector3 v = IsVector3(node) )
+      if( OptionalVector3 v = replacer.IsVector3(node) )
       {
         value = *v;
         done = true;
@@ -176,16 +218,16 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     }
     case Property::VECTOR4:
     {
-      if( OptionalVector4 v = IsVector4(node) )
+      if( OptionalVector4 v = replacer.IsVector4(node) )
       {
         value = *v;
         done = true;
-       }
+      }
       break;
     }
     case Property::MATRIX3:
     {
-      if( OptionalMatrix3 v = IsMatrix3(node) )
+      if( OptionalMatrix3 v = replacer.IsMatrix3(node) )
       {
         value = *v;
         done = true;
@@ -194,7 +236,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     }
     case Property::MATRIX:
     {
-      if( OptionalMatrix v = IsMatrix(node) )
+      if( OptionalMatrix v = replacer.IsMatrix(node) )
       {
         value = *v;
         done = true;
@@ -203,7 +245,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     }
     case Property::RECTANGLE:
     {
-      if( OptionalRect v = IsRect(node) )
+      if( OptionalRect v = replacer.IsRect(node) )
       {
         value = *v;
         done = true;
@@ -214,7 +256,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     {
       if(4 == node.Size())
       {
-        if( OptionalVector4 ov = IsVector4(node) )
+        if( OptionalVector4 ov = replacer.IsVector4(node) )
         {
           const Vector4& v = *ov;
           // angle, axis as per spec
@@ -226,7 +268,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
       else
       {
         // degrees Euler as per spec
-        if( OptionalVector3 v = IsVector3(node) )
+        if( OptionalVector3 v = replacer.IsVector3(node) )
         {
           value = Quaternion(Radian(Degree((*v).x)),
                              Radian(Degree((*v).y)),
@@ -238,7 +280,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     }
     case Property::STRING:
     {
-      if( OptionalString v = IsString(node) )
+      if( OptionalString v = replacer.IsString(node) )
       {
         value = *v;
         done = true;
@@ -247,7 +289,11 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     }
     case Property::ARRAY:
     {
-      if(node.Size())
+      if( replacer.IsArray( node, value ) )
+      {
+        done = true;
+      }
+      else if(node.Size())
       {
         value = Property::Value(Property::ARRAY);
         unsigned int i = 0;
@@ -255,7 +301,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
         for( ; i < node.Size(); ++i, ++iter)
         {
           Property::Value v;
-          if( SetPropertyFromNode( (*iter).second, v) )
+          if( SetPropertyFromNode( (*iter).second, v, replacer ) )
           {
             value.AppendItem(v);
           }
@@ -274,7 +320,11 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     }
     case Property::MAP:
     {
-      if(node.Size())
+      if( replacer.IsMap( node, value ) )
+      {
+        done = true;
+      }
+      else if(node.Size())
       {
         value = Property::Value(Property::MAP);
         unsigned int i = 0;
@@ -282,7 +332,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
         for( ; i < node.Size(); ++i, ++iter)
         {
           Property::Value v;
-          if( SetPropertyFromNode( (*iter).second, v) )
+          if( SetPropertyFromNode( (*iter).second, v, replacer ) )
           {
             value.SetValue( (*iter).first, v );
           }
@@ -304,20 +354,27 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     {
       break;
     }
-  }
+  } // switch type
 
   return done;
 }
 
-
 bool SetPropertyFromNode( const TreeNode& node, Property::Value& value )
+
+{
+  Replacement replacer;
+  return SetPropertyFromNode( node, value, replacer );
+}
+
+bool SetPropertyFromNode( const TreeNode& node, Property::Value& value,
+                          const Replacement& replacer )
 {
   bool done = false;
 
   // some values are ambiguous as we have no Property::Type but can be disambiguated in the json
 
   // Currently Rotations and Rectangle must always be disambiguated when a type isnt available
-  if( Disambiguated( node, value ) )
+  if( Disambiguated( node, value, replacer ) )
   {
     done = true;
   }
@@ -351,7 +408,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Value& value )
           value = *v;
           done = true;
         }
-        if( OptionalVector4 v = IsVector4(node) )
+        else if( OptionalVector4 v = IsVector4(node) )
         {
           value = *v;
           done = true;
@@ -381,7 +438,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Value& value )
 
           for(TreeConstIter iter = node.CBegin(); iter != node.CEnd(); ++iter)
           {
-            if( SetPropertyFromNode( (*iter).second, v) )
+            if( SetPropertyFromNode( (*iter).second, v, replacer ) )
             {
               value.AppendItem(v);
               done = true;
@@ -404,7 +461,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Value& value )
           Property::Value v;
           for(unsigned int i = 0; i < node.Size(); ++i, ++iter)
           {
-            if( SetPropertyFromNode( (*iter).second, v) )
+            if( SetPropertyFromNode( (*iter).second, v, replacer ) )
             {
               value.AppendItem(v);
               done = true;
@@ -417,7 +474,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Value& value )
           Property::Value v;
           for(unsigned int i = 0; i < node.Size(); ++i, ++iter)
           {
-            if( SetPropertyFromNode( (*iter).second, v) )
+            if( SetPropertyFromNode( (*iter).second, v, replacer ) )
             {
               value.SetValue((*iter).first, v);
               done = true;
@@ -429,10 +486,10 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Value& value )
     else // if( 0 == node.size() )
     {
       // no children so either one of bool, float, integer, string
-      OptionalBoolean aBool    = IsBoolean(node);
-      OptionalInteger anInt    = IsInteger(node);
-      OptionalFloat   aFloat   = IsFloat(node);
-      OptionalString  aString  = IsString(node);
+      OptionalBoolean aBool    = replacer.IsBoolean(node);
+      OptionalInteger anInt    = replacer.IsInteger(node);
+      OptionalFloat   aFloat   = replacer.IsFloat(node);
+      OptionalString  aString  = replacer.IsString(node);
 
       if(aBool)
       {
