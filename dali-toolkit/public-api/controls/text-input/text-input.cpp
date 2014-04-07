@@ -353,6 +353,17 @@ TextInput::InputTextExceedBoundariesSignalV2& TextInput::InputTextExceedBoundari
   return GetImpl(*this).InputTextExceedBoundariesSignal();
 }
 
+void TextInput::SetMarkupProcessingEnabled( bool enable )
+{
+  return GetImpl( *this ).SetMarkupProcessingEnabled( enable );
+}
+
+bool TextInput::IsMarkupProcessingEnabled() const
+{
+  return GetImpl( *this ).IsMarkupProcessingEnabled();
+}
+
+
 TextInput::TextInput( Dali::Internal::CustomActor* internal )
 : Control( internal )
 {

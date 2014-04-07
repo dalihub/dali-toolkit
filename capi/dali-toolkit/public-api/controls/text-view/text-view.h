@@ -580,6 +580,20 @@ public:
   bool IsSnapshotModeEnabled() const;
 
   /**
+   * @brief Sets whether markup processing should be carried out.
+   *
+   * @param[in] enable whether markup processing is carried out or not.
+   */
+  void SetMarkupProcessingEnabled( bool enable );
+
+  /**
+   * @brief Retrieves whether text-view is processing markup text
+   *
+   * @return \e true if text-view markup processing is enabled, otherwhise it returns \e false.
+   */
+  bool IsMarkupProcessingEnabled() const;
+
+  /**
    * @brief Enables or disables the text scroll.
    *
    * When scroll is enabled, snapshot mode will be enabled automatically. Equally, if scroll is disabled

@@ -48,7 +48,7 @@ bool TestBeginsRightToLeftCharacter( const std::string& description, const std::
 {
   // Creates a styled text with the markup or plain string.
   MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( input, styledText );
+  MarkupProcessor::GetStyledTextArray( input, styledText, true );
 
   const bool ret = ( result == TextProcessor::BeginsRightToLeftCharacter( styledText ) );
 
@@ -74,7 +74,7 @@ bool TestContainsRightToLeftCharacter( const std::string& description, const std
 {
   // Creates a styled text with the markup or plain string.
   MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( input, styledText );
+  MarkupProcessor::GetStyledTextArray( input, styledText, true );
 
   const bool ret = ( result == TextProcessor::ContainsRightToLeftCharacter( styledText ) );
 
@@ -102,7 +102,7 @@ bool TestFindNearestWord( const std::string& description, const std::string& inp
 {
   // Creates a styled text with the markup or plain string.
   MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( input, styledText );
+  MarkupProcessor::GetStyledTextArray( input, styledText, true );
 
   std::size_t start;
   std::size_t end;
@@ -132,7 +132,7 @@ bool TestSplitInLines( const SplitInLinesTest& test, const char* location )
 {
   // Creates a styled text with the markup or plain string.
   MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( test.inputText, styledText );
+  MarkupProcessor::GetStyledTextArray( test.inputText, styledText, true );
 
   std::vector<MarkupProcessor::StyledTextArray> lines;
 
@@ -163,7 +163,7 @@ bool TestSplitInWords( const SplitInWordsTest& test, const char* location )
 {
   // Creates a styled text with the markup or plain string.
   MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( test.inputText, styledText );
+  MarkupProcessor::GetStyledTextArray( test.inputText, styledText, true );
 
   std::vector<MarkupProcessor::StyledTextArray> words;
 

@@ -366,6 +366,16 @@ TextView::ScrolledSignalV2& TextView::ScrolledSignal()
   return GetImpl( *this ).ScrolledSignal();
 }
 
+void TextView::SetMarkupProcessingEnabled( bool enable )
+{
+  return GetImpl( *this ).SetMarkupProcessingEnabled( enable );
+}
+
+bool TextView::IsMarkupProcessingEnabled() const
+{
+  return GetImpl( *this ).IsMarkupProcessingEnabled();
+}
+
 TextView::TextView( Internal::TextView& implementation )
 : Control( implementation )
 {

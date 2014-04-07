@@ -165,7 +165,7 @@ static void UtcDaliTextViewNew()
   DALI_TEST_EQUALS( view1.GetText(), text, TEST_LOCATION );
 
   MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( text, styledText );
+  MarkupProcessor::GetStyledTextArray( text, styledText, true );
 
   TextView view2 = TextView::New( styledText );
 
@@ -264,7 +264,7 @@ static void UtcDaliTextViewSetAndGetText()
   DALI_TEST_EQUALS( view.GetText(), str, TEST_LOCATION );
 
   MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( str, styledText );
+  MarkupProcessor::GetStyledTextArray( str, styledText, true );
 
   view.SetText( styledText );
   DALI_TEST_EQUALS( view.GetText(), str, TEST_LOCATION );
@@ -369,7 +369,7 @@ static void UtcDaliTextViewSetAndGetEllipsizeText()
 
   Toolkit::MarkupProcessor::StyledTextArray styledTextArray;
 
-  GetStyledTextArray( std::string( "..." ), styledTextArray );
+  GetStyledTextArray( std::string( "..." ), styledTextArray, true );
 
   textView.SetEllipsizeText( styledTextArray );
 
@@ -603,7 +603,7 @@ static void UtcDaliTextViewInsertRemoveText()
   std::string text("Hello ");
 
   MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( text, styledText );
+  MarkupProcessor::GetStyledTextArray( text, styledText, true );
 
   TextView view = TextView::New( "world!" );
 

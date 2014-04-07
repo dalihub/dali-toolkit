@@ -1279,6 +1279,20 @@ public:  // Public to allow internal testing.
   Vector2 GetScrollPosition() const;
 
   /**
+   * @brief Sets whether markup processing should be carried out.
+   *
+   * @param[in] enable whether markup processing is carried out or not.
+   */
+  void SetMarkupProcessingEnabled( bool enable );
+
+  /**
+   * @brief Returns whether markup processing is enabled or not
+   *
+   * @return true is markup processing is enabled
+   */
+  bool IsMarkupProcessingEnabled() const;
+
+  /**
    * Insert or replaces the given text in the given position. It checks if the text exceeds the maximum allowed number of characters
    * and if it fits in the text-input's boundaries.
    *
@@ -1427,6 +1441,7 @@ private:
   bool mCommitByKeyInput:1;              ///< Set if a commit is done by key input rather than automatically (usually when a space bar or enter is pressed).
 
   bool mPlaceHolderSet:1;                ///< Whether the place holder text is set.
+  bool mMarkUpEnabled:1;                 ///< enable to scan for mark-up
 
   Toolkit::TextInput::InputSignalV2                      mInputStartedSignalV2;              ///< Signal emitted when input starts
   Toolkit::TextInput::InputSignalV2                      mInputFinishedSignalV2;             ///< Signal emitted when input ends

@@ -126,8 +126,9 @@ typedef std::vector<StyledText> StyledTextArray;
  * It transform any pair CR+LF new line characters into a single LF new line character.
  * @param [in] markupString A string with style.
  * @param [out] styledTextArray A text array split in characters, each one with its style.
+ * @param [in] scanForMarkup If true will check to see string contains markup, else assume not
  */
-void GetStyledTextArray( const std::string& markupString, StyledTextArray& styledTextArray );
+void GetStyledTextArray( const std::string& markupString, StyledTextArray& styledTextArray, bool scanForMarkup );
 
 /**
  * @brief Creates a plain string from a text array (thus stripping the style meta).

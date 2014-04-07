@@ -39,7 +39,7 @@ bool TestMarkupString( const std::string& input, const std::string& expectedResu
 {
   Toolkit::MarkupProcessor::StyledTextArray styledTextArray;
 
-  GetStyledTextArray( input, styledTextArray );
+  GetStyledTextArray( input, styledTextArray, true );
   GetMarkupString( styledTextArray, result );
 
   return expectedResult == result;
@@ -121,48 +121,48 @@ static void UtcDaliMarkupProcessor()
   std::string markupString;
   Toolkit::MarkupProcessor::StyledTextArray styledTextArray;
 
-  GetStyledTextArray( text1, styledTextArray );
+  GetStyledTextArray( text1, styledTextArray, true );
   GetMarkupString( styledTextArray, markupString );
   DALI_TEST_EQUALS( result1, markupString, TEST_LOCATION );
 
-  GetStyledTextArray( text2, styledTextArray );
+  GetStyledTextArray( text2, styledTextArray, true );
   GetMarkupString( styledTextArray, markupString );
   DALI_TEST_EQUALS( result2, markupString, TEST_LOCATION );
 
-  GetStyledTextArray( text3, styledTextArray );
+  GetStyledTextArray( text3, styledTextArray, true );
   GetMarkupString( styledTextArray, markupString );
   DALI_TEST_EQUALS( result3, markupString, TEST_LOCATION );
 
-  GetStyledTextArray( text4, styledTextArray );
+  GetStyledTextArray( text4, styledTextArray, true );
   GetMarkupString( styledTextArray, markupString );
   DALI_TEST_EQUALS( result4, markupString, TEST_LOCATION );
 
-  GetStyledTextArray( text5, styledTextArray );
+  GetStyledTextArray( text5, styledTextArray, true );
   GetMarkupString( styledTextArray, markupString );
   DALI_TEST_EQUALS( result5, markupString, TEST_LOCATION );
 
-  GetStyledTextArray( text6, styledTextArray );
+  GetStyledTextArray( text6, styledTextArray, true );
   GetMarkupString( styledTextArray, markupString );
   DALI_TEST_EQUALS( result6, markupString, TEST_LOCATION );
 
-  GetStyledTextArray( text7, styledTextArray );
+  GetStyledTextArray( text7, styledTextArray, true );
   GetMarkupString( styledTextArray, markupString );
   DALI_TEST_EQUALS( result7, markupString, TEST_LOCATION );
 
-  GetStyledTextArray( text8, styledTextArray );
+  GetStyledTextArray( text8, styledTextArray, true );
   GetMarkupString( styledTextArray, markupString );
   DALI_TEST_EQUALS( result8, markupString, TEST_LOCATION );
 
-  GetStyledTextArray( text9, styledTextArray );
+  GetStyledTextArray( text9, styledTextArray, true );
   GetMarkupString( styledTextArray, markupString );
   DALI_TEST_EQUALS( result9, markupString, TEST_LOCATION );
 
-  GetStyledTextArray( text10, styledTextArray );
+  GetStyledTextArray( text10, styledTextArray, true );
   GetMarkupString( styledTextArray, markupString );
 
   DALI_TEST_EQUALS( result10, markupString, TEST_LOCATION );
 
-  GetStyledTextArray( text11, styledTextArray );
+  GetStyledTextArray( text11, styledTextArray, true );
   GetMarkupString( styledTextArray, markupString );
 
   DALI_TEST_EQUALS( result11, markupString, TEST_LOCATION );
@@ -181,7 +181,7 @@ static void UtcDaliMarkupProcessorSetTextStyle01()
   std::string markupString;
   Toolkit::MarkupProcessor::StyledTextArray styledTextArray;
 
-  GetStyledTextArray( text1, styledTextArray );
+  GetStyledTextArray( text1, styledTextArray, true );
 
   TextStyle style;
   style.SetItalics( true );
@@ -198,13 +198,13 @@ static void UtcDaliMarkupProcessorSetTextStyle01()
 
   DALI_TEST_EQUALS( result1, markupString, TEST_LOCATION );
 
-  GetStyledTextArray( text1, styledTextArray );
+  GetStyledTextArray( text1, styledTextArray, true );
   SetTextStyleToRange( styledTextArray, style, TextStyle::ALL, 0, text1.size() - 1 );
   GetMarkupString( styledTextArray, markupString );
 
   DALI_TEST_EQUALS( result1, markupString, TEST_LOCATION );
 
-  GetStyledTextArray( text1, styledTextArray );
+  GetStyledTextArray( text1, styledTextArray, true );
   SetTextStyleToRange( styledTextArray, style, TextStyle::ALL, 10, 19 );
   GetMarkupString( styledTextArray, markupString );
 

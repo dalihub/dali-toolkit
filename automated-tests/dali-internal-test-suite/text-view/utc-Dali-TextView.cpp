@@ -535,7 +535,7 @@ bool TestSplitWord( const std::string& description, const std::string& input, co
   TextViewProcessor::TextLayoutInfo& inputLayout( relayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray inputStyledText;
-  MarkupProcessor::GetStyledTextArray( input, inputStyledText );
+  MarkupProcessor::GetStyledTextArray( input, inputStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -563,7 +563,7 @@ bool TestSplitWord( const std::string& description, const std::string& input, co
   TextViewProcessor::TextLayoutInfo& firstResultLayout( firstRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray firstResultStyledText;
-  MarkupProcessor::GetStyledTextArray( firstResult, firstResultStyledText );
+  MarkupProcessor::GetStyledTextArray( firstResult, firstResultStyledText, true );
 
   TextViewProcessor::CreateTextInfo( firstResultStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -591,7 +591,7 @@ bool TestSplitWord( const std::string& description, const std::string& input, co
   TextViewProcessor::TextLayoutInfo& lastResultLayout( lastRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray lastResultStyledText;
-  MarkupProcessor::GetStyledTextArray( lastResult, lastResultStyledText );
+  MarkupProcessor::GetStyledTextArray( lastResult, lastResultStyledText, true );
 
   TextViewProcessor::CreateTextInfo( lastResultStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -667,7 +667,7 @@ bool TestSplitWordGroup( const std::string& description,
   TextViewProcessor::TextLayoutInfo& inputLayout( relayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray inputStyledText;
-  MarkupProcessor::GetStyledTextArray( input, inputStyledText );
+  MarkupProcessor::GetStyledTextArray( input, inputStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -691,7 +691,7 @@ bool TestSplitWordGroup( const std::string& description,
   TextViewProcessor::TextLayoutInfo& firstResultLayout( firstRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray firstResultStyledText;
-  MarkupProcessor::GetStyledTextArray( firstResult, firstResultStyledText );
+  MarkupProcessor::GetStyledTextArray( firstResult, firstResultStyledText, true );
 
   TextViewProcessor::CreateTextInfo( firstResultStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -715,7 +715,7 @@ bool TestSplitWordGroup( const std::string& description,
   TextViewProcessor::TextLayoutInfo& lastResultLayout( lastRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray lastResultStyledText;
-  MarkupProcessor::GetStyledTextArray( lastResult, lastResultStyledText );
+  MarkupProcessor::GetStyledTextArray( lastResult, lastResultStyledText, true );
 
   TextViewProcessor::CreateTextInfo( lastResultStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -792,7 +792,7 @@ bool TestSplitLine( const std::string& description,
   TextViewProcessor::TextLayoutInfo& inputLayout( relayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray inputStyledText;
-  MarkupProcessor::GetStyledTextArray( input, inputStyledText );
+  MarkupProcessor::GetStyledTextArray( input, inputStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputStyledText,
                                      Toolkit::Internal::TextView::LayoutParameters( Toolkit::TextView::SplitByNewLineChar,
@@ -801,7 +801,8 @@ bool TestSplitLine( const std::string& description,
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ) ),
+                                                                                    std::string( "..." ),
+                                                                                    true ),
                                      relayoutData );
 
   // Get the input line
@@ -818,7 +819,7 @@ bool TestSplitLine( const std::string& description,
   TextViewProcessor::TextLayoutInfo& firstResultLayout( firstRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray firstResultStyledText;
-  MarkupProcessor::GetStyledTextArray( firstResult, firstResultStyledText );
+  MarkupProcessor::GetStyledTextArray( firstResult, firstResultStyledText, true );
 
   TextViewProcessor::CreateTextInfo( firstResultStyledText,
                                      Toolkit::Internal::TextView::LayoutParameters( Toolkit::TextView::SplitByNewLineChar,
@@ -827,7 +828,8 @@ bool TestSplitLine( const std::string& description,
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ) ),
+                                                                                    std::string( "..." ),
+                                                                                    true ),
                                      firstRelayoutData );
 
   // Get the first result line
@@ -844,7 +846,7 @@ bool TestSplitLine( const std::string& description,
   TextViewProcessor::TextLayoutInfo& lastResultLayout( lastRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray lastResultStyledText;
-  MarkupProcessor::GetStyledTextArray( lastResult, lastResultStyledText );
+  MarkupProcessor::GetStyledTextArray( lastResult, lastResultStyledText, true );
 
   TextViewProcessor::CreateTextInfo( lastResultStyledText,
                                      Toolkit::Internal::TextView::LayoutParameters( Toolkit::TextView::SplitByNewLineChar,
@@ -853,7 +855,8 @@ bool TestSplitLine( const std::string& description,
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ) ),
+                                                                                    std::string( "..."),
+                                                                                    true ),
                                      lastRelayoutData );
 
   // Get the last result line
@@ -912,7 +915,7 @@ bool TestMergeWords( const std::string& description, const std::string& inputFir
   TextViewProcessor::TextLayoutInfo& inputFirstLayout( firstRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray inputFirstStyledText;
-  MarkupProcessor::GetStyledTextArray( inputFirst, inputFirstStyledText );
+  MarkupProcessor::GetStyledTextArray( inputFirst, inputFirstStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputFirstStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -939,7 +942,7 @@ bool TestMergeWords( const std::string& description, const std::string& inputFir
   TextViewProcessor::TextLayoutInfo& inputLastLayout( lastRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray inputLastStyledText;
-  MarkupProcessor::GetStyledTextArray( inputLast, inputLastStyledText );
+  MarkupProcessor::GetStyledTextArray( inputLast, inputLastStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputLastStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -966,7 +969,7 @@ bool TestMergeWords( const std::string& description, const std::string& inputFir
   TextViewProcessor::TextLayoutInfo& resultLayout( resultRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray resultStyledText;
-  MarkupProcessor::GetStyledTextArray( result, resultStyledText );
+  MarkupProcessor::GetStyledTextArray( result, resultStyledText, true );
 
   TextViewProcessor::CreateTextInfo( resultStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -1022,7 +1025,7 @@ bool TestMergeGroupsOfWords( const std::string& description, const std::string& 
   TextViewProcessor::TextLayoutInfo& inputFirstLayout( firstRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray inputFirstStyledText;
-  MarkupProcessor::GetStyledTextArray( inputFirst, inputFirstStyledText );
+  MarkupProcessor::GetStyledTextArray( inputFirst, inputFirstStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputFirstStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -1045,7 +1048,7 @@ bool TestMergeGroupsOfWords( const std::string& description, const std::string& 
   TextViewProcessor::TextLayoutInfo& inputLastLayout( lastRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray inputLastStyledText;
-  MarkupProcessor::GetStyledTextArray( inputLast, inputLastStyledText );
+  MarkupProcessor::GetStyledTextArray( inputLast, inputLastStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputLastStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -1068,7 +1071,7 @@ bool TestMergeGroupsOfWords( const std::string& description, const std::string& 
   TextViewProcessor::TextLayoutInfo& resultLayout( resultRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray resultStyledText;
-  MarkupProcessor::GetStyledTextArray( result, resultStyledText );
+  MarkupProcessor::GetStyledTextArray( result, resultStyledText, true );
 
   TextViewProcessor::CreateTextInfo( resultStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -1121,7 +1124,7 @@ bool TestMergeLines( const std::string& description, const std::string& inputFir
   TextViewProcessor::TextLayoutInfo& inputFirstLayout( firstRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray inputFirstStyledText;
-  MarkupProcessor::GetStyledTextArray( inputFirst, inputFirstStyledText );
+  MarkupProcessor::GetStyledTextArray( inputFirst, inputFirstStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputFirstStyledText,
                                      Toolkit::Internal::TextView::LayoutParameters( Toolkit::TextView::SplitByNewLineChar,
@@ -1130,7 +1133,8 @@ bool TestMergeLines( const std::string& description, const std::string& inputFir
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ) ),
+                                                                                    std::string( "..." ),
+                                                                                    true ),
                                      firstRelayoutData );
 
   // Get the input word
@@ -1146,7 +1150,7 @@ bool TestMergeLines( const std::string& description, const std::string& inputFir
   TextViewProcessor::TextLayoutInfo& inputLastLayout( lastRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray inputLastStyledText;
-  MarkupProcessor::GetStyledTextArray( inputLast, inputLastStyledText );
+  MarkupProcessor::GetStyledTextArray( inputLast, inputLastStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputLastStyledText,
                                      Toolkit::Internal::TextView::LayoutParameters( Toolkit::TextView::SplitByNewLineChar,
@@ -1155,7 +1159,8 @@ bool TestMergeLines( const std::string& description, const std::string& inputFir
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ) ),
+                                                                                    std::string( "..." ),
+                                                                                    true ),
                                      lastRelayoutData );
 
   // Get the input word
@@ -1171,7 +1176,7 @@ bool TestMergeLines( const std::string& description, const std::string& inputFir
   TextViewProcessor::TextLayoutInfo& resultLayout( resultRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray resultStyledText;
-  MarkupProcessor::GetStyledTextArray( result, resultStyledText );
+  MarkupProcessor::GetStyledTextArray( result, resultStyledText, true );
 
   TextViewProcessor::CreateTextInfo( resultStyledText,
                                      Toolkit::Internal::TextView::LayoutParameters( Toolkit::TextView::SplitByNewLineChar,
@@ -1180,7 +1185,8 @@ bool TestMergeLines( const std::string& description, const std::string& inputFir
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ) ),
+                                                                                    std::string( "..." ),
+                                                                                    true ),
                                      resultRelayoutData );
 
   // Get the result word
@@ -1226,7 +1232,7 @@ bool TestRemoveCharactersFromWord( const std::string& description, const std::st
   TextViewProcessor::TextLayoutInfo& inputLayout( relayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray inputStyledText;
-  MarkupProcessor::GetStyledTextArray( input, inputStyledText );
+  MarkupProcessor::GetStyledTextArray( input, inputStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -1253,7 +1259,7 @@ bool TestRemoveCharactersFromWord( const std::string& description, const std::st
   TextViewProcessor::TextLayoutInfo& resultLayout( resultRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray resultStyledText;
-  MarkupProcessor::GetStyledTextArray( result, resultStyledText );
+  MarkupProcessor::GetStyledTextArray( result, resultStyledText, true );
 
   TextViewProcessor::CreateTextInfo( resultStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -1311,7 +1317,7 @@ bool TestRemoveWordsFromGroup( const std::string& description, const std::string
   TextViewProcessor::TextLayoutInfo& inputLayout( relayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray inputStyledText;
-  MarkupProcessor::GetStyledTextArray( input, inputStyledText );
+  MarkupProcessor::GetStyledTextArray( input, inputStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -1334,7 +1340,7 @@ bool TestRemoveWordsFromGroup( const std::string& description, const std::string
   TextViewProcessor::TextLayoutInfo& resultLayout( resultRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray resultStyledText;
-  MarkupProcessor::GetStyledTextArray( result, resultStyledText );
+  MarkupProcessor::GetStyledTextArray( result, resultStyledText, true );
 
   TextViewProcessor::CreateTextInfo( resultStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -1390,7 +1396,7 @@ bool TestRemoveGroupsFromLine( const std::string& description, const std::string
   TextViewProcessor::TextLayoutInfo& inputLayout( relayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray inputStyledText;
-  MarkupProcessor::GetStyledTextArray( input, inputStyledText );
+  MarkupProcessor::GetStyledTextArray( input, inputStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputStyledText,
                                      Toolkit::Internal::TextView::LayoutParameters( Toolkit::TextView::SplitByNewLineChar,
@@ -1399,7 +1405,8 @@ bool TestRemoveGroupsFromLine( const std::string& description, const std::string
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ) ),
+                                                                                    std::string( "..." ),
+                                                                                    true ),
                                      relayoutData );
 
   // Get the input line
@@ -1415,7 +1422,7 @@ bool TestRemoveGroupsFromLine( const std::string& description, const std::string
   TextViewProcessor::TextLayoutInfo& resultLayout( resultRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray resultStyledText;
-  MarkupProcessor::GetStyledTextArray( result, resultStyledText );
+  MarkupProcessor::GetStyledTextArray( result, resultStyledText, true );
 
   TextViewProcessor::CreateTextInfo( resultStyledText,
                                      Toolkit::Internal::TextView::LayoutParameters( Toolkit::TextView::SplitByNewLineChar,
@@ -1424,7 +1431,8 @@ bool TestRemoveGroupsFromLine( const std::string& description, const std::string
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ) ),
+                                                                                    std::string( "..." ),
+                                                                                    true ),
                                      resultRelayoutData );
 
   // Get the result line
@@ -1483,7 +1491,7 @@ bool TestUpdateTextInfo( const std::string& description,
   TextViewProcessor::TextLayoutInfo& inputLayout( relayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray inputStyledText;
-  MarkupProcessor::GetStyledTextArray( input, inputStyledText );
+  MarkupProcessor::GetStyledTextArray( input, inputStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputStyledText,
                                      Toolkit::Internal::TextView::LayoutParameters( Toolkit::TextView::SplitByNewLineChar,
@@ -1492,7 +1500,8 @@ bool TestUpdateTextInfo( const std::string& description,
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ) ),
+                                                                                    std::string( "..." ),
+                                                                                    true ),
                                      relayoutData );
 
   // Create layout info for the result.
@@ -1500,7 +1509,7 @@ bool TestUpdateTextInfo( const std::string& description,
   TextViewProcessor::TextLayoutInfo& resultLayout( resultRelayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray resultStyledText;
-  MarkupProcessor::GetStyledTextArray( result, resultStyledText );
+  MarkupProcessor::GetStyledTextArray( result, resultStyledText, true );
 
   TextViewProcessor::CreateTextInfo( resultStyledText,
                                      Toolkit::Internal::TextView::LayoutParameters( Toolkit::TextView::SplitByNewLineChar,
@@ -1509,7 +1518,8 @@ bool TestUpdateTextInfo( const std::string& description,
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ) ),
+                                                                                    std::string( "..." ),
+                                                                                    true ),
                                      resultRelayoutData );
 
   // Choose operation and call appropiate UpdateTextInfo() method.
@@ -1519,14 +1529,15 @@ bool TestUpdateTextInfo( const std::string& description,
                                                                         static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                         Toolkit::TextView::Center,
                                                                         PointSize( lineHeightOffset ),
-                                                                        std::string( "..." ) );
+                                                                        std::string( "..." ),
+                                                                        true );
 
   switch( operation )
   {
     case Insert:
     {
       MarkupProcessor::StyledTextArray inputStyledText;
-      MarkupProcessor::GetStyledTextArray( inputText, inputStyledText );
+      MarkupProcessor::GetStyledTextArray( inputText, inputStyledText, true );
 
       TextViewProcessor::UpdateTextInfo( position,
                                          inputStyledText,
@@ -1546,7 +1557,7 @@ bool TestUpdateTextInfo( const std::string& description,
     case Replace:
     {
       MarkupProcessor::StyledTextArray inputStyledText;
-      MarkupProcessor::GetStyledTextArray( inputText, inputStyledText );
+      MarkupProcessor::GetStyledTextArray( inputText, inputStyledText, true );
 
       TextViewProcessor::UpdateTextInfo( position,
                                          numberOfCharacters,
@@ -1667,7 +1678,7 @@ static void UtcDaliTextViewCreateTextInfo()
                     "\n" );
 
   MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( text, styledText );
+  MarkupProcessor::GetStyledTextArray( text, styledText, true );
 
   TextViewProcessor::CreateTextInfo( styledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -2341,9 +2352,9 @@ static void UtcDaliTextViewMergeWord02()
   MarkupProcessor::StyledTextArray styledText01;
   MarkupProcessor::StyledTextArray styledText02;
   MarkupProcessor::StyledTextArray styledText03;
-  MarkupProcessor::GetStyledTextArray( text01, styledText01 );
-  MarkupProcessor::GetStyledTextArray( text02, styledText02 );
-  MarkupProcessor::GetStyledTextArray( text03, styledText03 );
+  MarkupProcessor::GetStyledTextArray( text01, styledText01, true );
+  MarkupProcessor::GetStyledTextArray( text02, styledText02, true );
+  MarkupProcessor::GetStyledTextArray( text03, styledText03, true );
 
   TextViewProcessor::CreateTextInfo( styledText01,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -2521,9 +2532,9 @@ static void UtcDaliTextViewMergeGroup02()
   MarkupProcessor::StyledTextArray styledText01;
   MarkupProcessor::StyledTextArray styledText02;
   MarkupProcessor::StyledTextArray styledText03;
-  MarkupProcessor::GetStyledTextArray( text01, styledText01 );
-  MarkupProcessor::GetStyledTextArray( text02, styledText02 );
-  MarkupProcessor::GetStyledTextArray( text03, styledText03 );
+  MarkupProcessor::GetStyledTextArray( text01, styledText01, true );
+  MarkupProcessor::GetStyledTextArray( text02, styledText02, true );
+  MarkupProcessor::GetStyledTextArray( text03, styledText03, true );
 
   TextViewProcessor::CreateTextInfo( styledText01,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -2669,8 +2680,8 @@ static void UtcDaliTextViewMergeLine02()
   std::string text02( "hello world" );
   MarkupProcessor::StyledTextArray styledText01;
   MarkupProcessor::StyledTextArray styledText02;
-  MarkupProcessor::GetStyledTextArray( text01, styledText01 );
-  MarkupProcessor::GetStyledTextArray( text02, styledText02 );
+  MarkupProcessor::GetStyledTextArray( text01, styledText01, true );
+  MarkupProcessor::GetStyledTextArray( text02, styledText02, true );
 
   TextViewProcessor::CreateTextInfo( styledText01,
                                      DEFAULT_LAYOUT_PARAMETERS,

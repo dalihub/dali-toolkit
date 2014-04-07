@@ -326,7 +326,8 @@ TextInput::TextInput()
  mSelectTextOnCommit( false ),
  mUnderlinedPriorToPreEdit ( false ),
  mCommitByKeyInput( false ),
- mPlaceHolderSet( false )
+ mPlaceHolderSet( false ),
+ mMarkUpEnabled( false )
 {
   // Updates the line height accordingly with the input style.
   UpdateLineHeight();
@@ -364,7 +365,7 @@ std::string TextInput::GetMarkupText() const
 void TextInput::SetPlaceholderText( const std::string& placeHolderText )
 {
   // Get the placeholder styled text array from the markup string.
-  MarkupProcessor::GetStyledTextArray( placeHolderText, mStyledPlaceHolderText );
+  MarkupProcessor::GetStyledTextArray( placeHolderText, mStyledPlaceHolderText, IsMarkupProcessingEnabled() );
 
   if( mStyledText.empty() )
   {
@@ -406,7 +407,7 @@ void TextInput::SetText(const std::string& initialText)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "SetText string[%s]\n", initialText.c_str() );
 
-  GetStyledTextArray( initialText, mStyledText );
+  GetStyledTextArray( initialText, mStyledText, IsMarkupProcessingEnabled() );
 
   if( mStyledText.empty() )
   {
@@ -4857,6 +4858,16 @@ bool TextInput::IsSnapshotModeEnabled() const
   }
 
   return snapshotEnabled;
+}
+
+void TextInput::SetMarkupProcessingEnabled( bool enable )
+{
+  mMarkUpEnabled = enable;
+}
+
+bool TextInput::IsMarkupProcessingEnabled() const
+{
+  return mMarkUpEnabled;
 }
 
 void TextInput::SetScrollEnabled( bool enable )

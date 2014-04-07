@@ -524,6 +524,21 @@ public:
    */
   Vector2 GetScrollPosition() const;
 
+  /**
+   * @brief Sets whether markup processing should be carried out.
+   *
+   * @param[in] enable whether markup processing is carried out or not.
+   */
+  void SetMarkupProcessingEnabled( bool enable );
+
+  /**
+   * @brief Returns whether markup processing is enabled or not
+   *
+   * @return true is markup processing is enabled
+   */
+  bool IsMarkupProcessingEnabled() const;
+
+
 public: /* Signals */
 
   /// @brief Input Signal.

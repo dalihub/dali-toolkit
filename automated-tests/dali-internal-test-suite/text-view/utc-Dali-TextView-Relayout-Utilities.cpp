@@ -69,7 +69,7 @@ bool TestCalculateSubLineLayout( const CalculateSubLineLayoutTest& test,  const 
 
   // Create styled text.
   MarkupProcessor::StyledTextArray inputStyledText;
-  MarkupProcessor::GetStyledTextArray( test.inputLine, inputStyledText );
+  MarkupProcessor::GetStyledTextArray( test.inputLine, inputStyledText, true );
 
   // Create styled text layout info.
   Toolkit::Internal::TextView::RelayoutData relayoutData;

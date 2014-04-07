@@ -85,7 +85,7 @@ bool TestGetIndicesFromGlobalCharacterIndex( const std::string& description,
   TextViewProcessor::TextLayoutInfo& inputLayout( relayoutData.mTextLayoutInfo );
 
   MarkupProcessor::StyledTextArray inputStyledText;
-  MarkupProcessor::GetStyledTextArray( input, inputStyledText );
+  MarkupProcessor::GetStyledTextArray( input, inputStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -277,7 +277,7 @@ static void UtcDaliTextViewDebugCouts()
   Toolkit::Internal::TextView::RelayoutData relayoutData;
 
   MarkupProcessor::StyledTextArray inputStyledText;
-  MarkupProcessor::GetStyledTextArray( std::string( "Hello world\nhello world" ), inputStyledText );
+  MarkupProcessor::GetStyledTextArray( std::string( "Hello world\nhello world" ), inputStyledText, true );
 
   TextViewProcessor::CreateTextInfo( inputStyledText,
                                      DEFAULT_LAYOUT_PARAMETERS,

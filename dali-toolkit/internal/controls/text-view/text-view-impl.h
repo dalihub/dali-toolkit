@@ -278,6 +278,20 @@ public:
   bool IsSnapshotModeEnabled() const;
 
   /**
+   * @brief Sets whether markup processing should be carried out.
+   *
+   * @param[in] enable whether markup processing is carried out or not.
+   */
+  void SetMarkupProcessingEnabled( bool enable );
+
+  /**
+   * @brief Returns whether markup processing is enabled or not
+   *
+   * @return true is markup processing is enabled
+   */
+  bool IsMarkupProcessingEnabled() const;
+
+  /**
    * @copydoc SetScrollEnabled()
    */
   void SetScrollEnabled( bool enable );
@@ -555,7 +569,8 @@ public:
                       Toolkit::Alignment::Type               alignment,
                       Toolkit::TextView::LineJustification   lineJustification,
                       float                                  lineHeightOffset,
-                      const std::string&                     ellipsizeText );
+                      const std::string&                     ellipsizeText,
+                      const bool                             markUpEnabled );
 
     /**
      * Copy constructor
@@ -575,7 +590,8 @@ public:
     Toolkit::Alignment::Type             mVerticalAlignment;   ///< Stores the vertical alignment for the whole text.
     Toolkit::TextView::LineJustification mLineJustification;   ///< Stores the line justification.
     float                                mLineHeightOffset;    ///< Line height offset to be addded to the font line height (measured in PointSize).
-    MarkupProcessor::StyledTextArray     mEllipsizeText;       ///< Stores the ellipsize text.
+    MarkupProcessor::StyledTextArray     mEllipsizeText;       ///< Stores the ellipsize text
+    bool                                 mMarkUpEnabled:1;     ///< Is markup string scanning enabled
   };
 
   /**
@@ -689,6 +705,7 @@ private:
 
   bool                                            mLockPreviousSnapshotMode;      ///< Whether previous stored snapshot mode should be modified.
   bool                                            mPreviousSnapshotModeEnabled:1; ///< Stores the previous snapshot mode value.
+  bool                                            mMarkUpEnabled:1;               ///< enable to scan for mark-up
 
   Toolkit::TextView::ScrolledSignalV2             mScrolledSignalV2;              ///< Signal emitted when text is scrolled.
 

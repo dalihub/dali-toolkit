@@ -542,9 +542,51 @@ bool IsTag( std::string::const_iterator& it, const std::string::const_iterator& 
 
 } // namespace
 
-void GetStyledTextArray( const std::string& markupString, StyledTextArray& styledTextArray )
+static inline bool HasMarkup( const std::string& markupString )
+{
+  // Reset counters
+  unsigned int lessThanCount = 0;
+  unsigned int greaterThanCount = 0;
+
+  // Check to see if any markup command surrounds are of equal number and not zero
+  for ( std::string::const_iterator it = markupString.begin(); it != markupString.end(); ++it )
+  {
+    if ( *it == LESS_THAN )
+    {
+      lessThanCount++;
+    }
+    else
+    {
+      if ( *it == GREATER_THAN )
+      {
+        greaterThanCount++;
+      }
+      else
+      {
+        if ( *it == BACK_SLASH )
+        {
+          return true;
+        }
+      }
+    }
+  }
+  if ( !lessThanCount || !greaterThanCount || lessThanCount != greaterThanCount )
+  {
+    return false;
+  }
+  return true;
+}
+
+void GetStyledTextArray( const std::string& markupString, StyledTextArray& styledTextArray, bool scanForMarkup )
 {
   styledTextArray.clear();
+
+  // Scan markup ( if necessary ) to see if the string contains any change in style from default?
+  if ( !scanForMarkup || !HasMarkup( markupString ) )
+  {
+    styledTextArray.push_back( StyledText( Text( markupString ), TextStyle() ) );
+    return;
+  }
 
   TextStyle defaultStyle;
   std::stack<TextStyle> styleStack;

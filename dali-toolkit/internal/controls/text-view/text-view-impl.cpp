@@ -136,7 +136,7 @@ void TextView::SetText( const std::string& text )
 {
   // Creates a styled text with the markup or plain string.
   MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( text, styledText );
+  MarkupProcessor::GetStyledTextArray( text, styledText, IsMarkupProcessingEnabled() );
 
   // Calls SetText() with the styled text array.
   SetText( styledText );
@@ -172,7 +172,7 @@ void TextView::InsertTextAt( std::size_t position, const std::string& text )
 {
   // Creates a styled text with the markup or plain string.
   MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( text, styledText );
+  MarkupProcessor::GetStyledTextArray( text, styledText, IsMarkupProcessingEnabled() );
 
   // Calls InsertTextAt() with the styled text array.
   InsertTextAt( position, styledText );
@@ -203,7 +203,7 @@ void TextView::ReplaceTextFromTo( const std::size_t position, const std::size_t 
 {
   // Creates a styled text with the markup or plain string.
   MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( text, styledText );
+  MarkupProcessor::GetStyledTextArray( text, styledText, IsMarkupProcessingEnabled() );
 
   // Calls ReplaceTextFromTo() with the styled text array.
   ReplaceTextFromTo( position, numberOfCharacters, styledText );
@@ -536,7 +536,7 @@ void TextView::SetEllipsizeText( const std::string& ellipsizeText )
 {
   // Creates a styled text with the markup or plain string.
   MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( ellipsizeText, styledText );
+  MarkupProcessor::GetStyledTextArray( ellipsizeText, styledText, IsMarkupProcessingEnabled() );
 
   SetEllipsizeText( styledText );
 }
@@ -738,6 +738,16 @@ bool TextView::IsSnapshotModeEnabled() const
   return mVisualParameters.mSnapshotModeEnabled;
 }
 
+void TextView::SetMarkupProcessingEnabled( bool enable )
+{
+  mMarkUpEnabled = enable;
+}
+
+bool TextView::IsMarkupProcessingEnabled() const
+{
+  return mMarkUpEnabled;
+}
+
 void TextView::SetScrollEnabled( const bool enable )
 {
   if( enable != mVisualParameters.mScrollEnabled )
@@ -842,11 +852,12 @@ TextView::LayoutParameters::LayoutParameters()
   mVerticalAlignment( Toolkit::Alignment::VerticalCenter ),
   mLineJustification( Toolkit::TextView::Left ),
   mLineHeightOffset( 0.f ),
-  mEllipsizeText()
+  mEllipsizeText(),
+  mMarkUpEnabled( false )
 {
   // Sets ellipsize text
   MarkupProcessor::StyledTextArray styledEllipsize;
-  MarkupProcessor::GetStyledTextArray( std::string( "..." ), mEllipsizeText );
+  MarkupProcessor::GetStyledTextArray( std::string( "..." ), mEllipsizeText, false );
 }
 
 TextView::LayoutParameters::LayoutParameters( const Toolkit::TextView::MultilinePolicy   multilinePolicy,
@@ -855,7 +866,8 @@ TextView::LayoutParameters::LayoutParameters( const Toolkit::TextView::Multiline
                                               const Toolkit::Alignment::Type             alignmentType,
                                               const Toolkit::TextView::LineJustification lineJustification,
                                               const float                                lineHeightOffset,
-                                              const std::string&                         ellipsizeText )
+                                              const std::string&                         ellipsizeText,
+                                              const bool                                 markUpEnabled )
 : mMultilinePolicy( multilinePolicy ),
   mWidthExceedPolicy( widthExceedPolicy ),
   mHeightExceedPolicy( heightExceedPolicy ),
@@ -863,7 +875,8 @@ TextView::LayoutParameters::LayoutParameters( const Toolkit::TextView::Multiline
   mVerticalAlignment(),
   mLineJustification( lineJustification ),
   mLineHeightOffset( lineHeightOffset ),
-  mEllipsizeText()
+  mEllipsizeText(),
+  mMarkUpEnabled( markUpEnabled )
 {
   // Sets alignment
   Toolkit::Alignment::Type horizontalAlignment( ( alignmentType & Toolkit::Alignment::HorizontalLeft ? Toolkit::Alignment::HorizontalLeft :
@@ -878,7 +891,7 @@ TextView::LayoutParameters::LayoutParameters( const Toolkit::TextView::Multiline
 
   // Sets ellipsize text
   MarkupProcessor::StyledTextArray styledEllipsize;
-  MarkupProcessor::GetStyledTextArray( ellipsizeText, mEllipsizeText );
+  MarkupProcessor::GetStyledTextArray( ellipsizeText, mEllipsizeText, mMarkUpEnabled );
 }
 
 TextView::LayoutParameters::LayoutParameters( const TextView::LayoutParameters& layoutParameters )
@@ -889,7 +902,8 @@ TextView::LayoutParameters::LayoutParameters( const TextView::LayoutParameters& 
   mVerticalAlignment( layoutParameters.mVerticalAlignment ),
   mLineJustification( layoutParameters.mLineJustification ),
   mLineHeightOffset( layoutParameters.mLineHeightOffset ),
-  mEllipsizeText( layoutParameters.mEllipsizeText )
+  mEllipsizeText( layoutParameters.mEllipsizeText ),
+  mMarkUpEnabled( layoutParameters.mMarkUpEnabled )
 {
 }
 
@@ -903,6 +917,7 @@ TextView::LayoutParameters& TextView::LayoutParameters::operator=( const TextVie
   mLineJustification = layoutParameters.mLineJustification;
   mLineHeightOffset = layoutParameters.mLineHeightOffset;
   mEllipsizeText = layoutParameters.mEllipsizeText;
+  mMarkUpEnabled = layoutParameters.mMarkUpEnabled;
 
   return *this;
 }
@@ -990,7 +1005,8 @@ TextView::TextView()
                      static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                      Toolkit::TextView::Left,
                      PointSize( 0.f ),
-                     std::string( "..." ) ),
+                     std::string( "..." ),
+                     false ),
   mVisualParameters(),
   mRelayoutData(),
   mRelayoutOperations( NO_RELAYOUT ),
@@ -1002,7 +1018,8 @@ TextView::TextView()
   mRenderTask(),
   mPanGestureDetector(),
   mLockPreviousSnapshotMode( false ),
-  mPreviousSnapshotModeEnabled( false )
+  mPreviousSnapshotModeEnabled( false ),
+  mMarkUpEnabled( false )
 {
   TextViewProcessor::CreateWordTextInfo( mLayoutParameters.mEllipsizeText,
                                          mRelayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo );
