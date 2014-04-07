@@ -544,7 +544,6 @@ private:
   Property::Index mPropertyPosition; ///< The physical position of the first item within the layout
   Property::Index mPropertyMinimumLayoutPosition; ///< The minimum valid layout position in the layout.
   Property::Index mPropertyScrollSpeed; ///< The current scroll speed of item view
-  Property::Index mPropertyOvershoot; ///< The scroll overshoot (difference of the layout position before and after clamping)
 };
 
 } // namespace Internal

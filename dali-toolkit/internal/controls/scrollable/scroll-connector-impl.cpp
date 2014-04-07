@@ -29,7 +29,8 @@ namespace Toolkit
 namespace Internal
 {
 
-const Property::Index ScrollConnector::SCROLL_POSITION = 50000000; // TODO - expose CUSTOM_PROPERTY_START from Core
+const Property::Index ScrollConnector::SCROLL_POSITION = Dali::PROPERTY_CUSTOM_START_INDEX;
+const Property::Index ScrollConnector::OVERSHOOT       = Dali::PROPERTY_CUSTOM_START_INDEX + 1;
 
 ScrollConnector* ScrollConnector::New()
 {
@@ -51,6 +52,7 @@ ScrollConnector::ScrollConnector()
   mScrollPositionObject = Constrainable::New();
 
   mScrollPositionObject.RegisterProperty( Toolkit::ScrollConnector::SCROLL_POSITION_PROPERTY_NAME, 0.0f );
+  mScrollPositionObject.RegisterProperty( Toolkit::ScrollConnector::OVERSHOOT_PROPERTY_NAME, 0.0f );
 }
 
 ScrollConnector::~ScrollConnector()

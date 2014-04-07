@@ -39,6 +39,7 @@ public:
   typedef Toolkit::ScrollConnector::LimitsChangedSignalType LimitsChangedSignalType;
 
   static const Property::Index SCROLL_POSITION;
+  static const Property::Index OVERSHOOT;
 
   /**
    * Create a ScrollConnector.

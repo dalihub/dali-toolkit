@@ -37,19 +37,27 @@ class ScrollConnector;
  * This basically consists of:
  *   - A "scroll-position" property which controls which part of the scrollable content is visible
  *   - The minimum/maximum limits of the scroll position, which corresponds to the start & end points of the scollable list etc.
+ *   - An "overshoot" property which shows any attempts to exceed the start & end points.
  *
  * The provider of the scrollable content is responsible for calling SetLimits(). Scroll-bar components are then expected to
  * receive these values via the LIMITS_CHANGED signal.
  *
  * The scroll-position property is accessible via GetScrollPositionObject(). This is intended to be shared by multiple controls
  * e.g. a list control may be scrolled by panning the list content, or indirectly by dragging a connected scroll-bar control.
+ *
+ * The overshoot property is intended for implementing 'end of list' style indicators. This property is expected to be in the range
+ * -1 to 1, where -1 shows an attempt the scroll beyond the minimum limit, and 1 shows an attempt the scroll beyond the maximum limit.
+ * Zero indicates normal scrolling i.e. when overshoot indicators should be hidden.
  */
 class ScrollConnector : public BaseHandle
 {
 public:
 
   static const char* const SCROLL_POSITION_PROPERTY_NAME; ///< This float "scroll-position" property is available via GetScrollPositionObject()
+  static const char* const OVERSHOOT_PROPERTY_NAME;       ///< This float "overshoot" property is available via GetScrollPositionObject()
+
   static const Property::Index SCROLL_POSITION;           ///< The index of the "scroll-position" property
+  static const Property::Index OVERSHOOT;                 ///< The index of the "overshoot" property
 
   // Signals
   static const char* const LIMITS_CHANGED_SIGNAL_NAME;    ///< "limits-changed" signal name

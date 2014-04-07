@@ -439,7 +439,6 @@ void ItemView::OnInitialize()
   mPropertyMinimumLayoutPosition = self.RegisterProperty(MINIMUM_LAYOUT_POSITION_PROPERTY_NAME, 0.0f);
   mPropertyPosition = self.RegisterProperty(POSITION_PROPERTY_NAME, 0.0f);
   mPropertyScrollSpeed = self.RegisterProperty(SCROLL_SPEED_PROPERTY_NAME, 0.0f);
-  mPropertyOvershoot = self.RegisterProperty(OVERSHOOT_PROPERTY_NAME, 0.0f);
 
   ApplyOvershootOverlayConstraints();
 
@@ -1645,7 +1644,7 @@ void ItemView::ApplyOvershootOverlayConstraints()
 {
   Constraint constraint = Constraint::New<float>( Actor::SIZE_WIDTH,
                                                     ParentSource( mPropertyScrollDirection ),
-                                                    ParentSource( mPropertyOvershoot ),
+                                                    Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                                     ParentSource( Actor::SIZE ),
                                                     OvershootOverlaySizeConstraint() );
   mOvershootOverlay.ApplyConstraint(constraint);
@@ -1653,14 +1652,14 @@ void ItemView::ApplyOvershootOverlayConstraints()
 
   constraint = Constraint::New<Quaternion>( Actor::ROTATION,
                                             ParentSource( mPropertyScrollDirection ),
-                                            ParentSource( mPropertyOvershoot ),
+                                            Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                             OvershootOverlayRotationConstraint() );
   mOvershootOverlay.ApplyConstraint(constraint);
 
   constraint = Constraint::New<Vector3>( Actor::POSITION,
                                          ParentSource( Actor::SIZE ),
                                          ParentSource( mPropertyScrollDirection ),
-                                         ParentSource( mPropertyOvershoot ),
+                                         Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                          OvershootOverlayPositionConstraint() );
   mOvershootOverlay.ApplyConstraint(constraint);
 
@@ -1672,7 +1671,7 @@ void ItemView::ApplyOvershootOverlayConstraints()
   int effectOvershootPropertyIndex = mOvershootEffect.GetPropertyIndex(mOvershootEffect.GetOvershootPropertyName());
   Actor self = Self();
   constraint = Constraint::New<float>( effectOvershootPropertyIndex,
-                                       Source( self, mPropertyOvershoot ),
+                                       Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                        EqualToConstraint() );
   mOvershootEffect.ApplyConstraint(constraint);
 }
@@ -1711,13 +1710,13 @@ void ItemView::AnimateScrollOvershoot(float overshootAmount, bool animateBack)
   }
 
   Actor self = Self();
-  float currentOvershoot = self.GetProperty<float>(mPropertyOvershoot);
+  float currentOvershoot = mScrollPositionObject.GetProperty<float>(ScrollConnector::OVERSHOOT);
   float duration = DEFAULT_OVERSHOOT_ANIMATION_DURATION * (animatingOn ? (1.0f - fabsf(currentOvershoot)) : fabsf(currentOvershoot));
 
   RemoveAnimation(mScrollOvershootAnimation);
   mScrollOvershootAnimation = Animation::New(duration);
   mScrollOvershootAnimation.FinishedSignal().Connect(this, &ItemView::OnOvershootOnFinished);
-  mScrollOvershootAnimation.AnimateTo( Property(self, mPropertyOvershoot), overshootAmount, TimePeriod(0.0f, duration) );
+  mScrollOvershootAnimation.AnimateTo( Property(mScrollPositionObject, ScrollConnector::OVERSHOOT), overshootAmount, TimePeriod(0.0f, duration) );
   mScrollOvershootAnimation.Play();
 
   mAnimatingOvershootOn = animatingOn;
