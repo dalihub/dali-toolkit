@@ -18,10 +18,9 @@
 //
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/scroll-component/scroll-component-impl.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-component-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
 #include <dali-toolkit/internal/controls/scroll-component/scroll-bar-internal.h>
-#include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
 {
@@ -36,7 +35,7 @@ namespace Internal
  * ScrollBarInternal is a UI component that can be added to the sides of the ScrollView
  * indicating the current scroll position within the domain.
  */
-class ScrollBarInternal : public ScrollComponent
+class ScrollBarInternal : public ScrollComponentImpl
 {
 
 public:

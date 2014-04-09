@@ -30,18 +30,18 @@ ScrollBar::ScrollBar()
 }
 
 ScrollBar::ScrollBar(Internal::ScrollBar& implementation)
-: Control( implementation )
+: ScrollComponent( implementation )
 {
 }
 
 ScrollBar::ScrollBar( Dali::Internal::CustomActor* internal )
-: Control( internal )
+: ScrollComponent( internal )
 {
   VerifyCustomActorPointer<Internal::ScrollBar>(internal);
 }
 
 ScrollBar::ScrollBar( const ScrollBar& scrollBar )
-: Control( scrollBar )
+: ScrollComponent( scrollBar )
 {
 }
 
@@ -66,11 +66,6 @@ ScrollBar ScrollBar::DownCast( BaseHandle handle )
 
 ScrollBar::~ScrollBar()
 {
-}
-
-void ScrollBar::SetScrollConnector( ScrollConnector connector )
-{
-  GetImpl(*this).SetScrollConnector(connector);
 }
 
 void ScrollBar::SetBackgroundImage( Image image, const Vector4& border )

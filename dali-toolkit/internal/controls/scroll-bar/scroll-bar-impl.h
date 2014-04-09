@@ -18,7 +18,7 @@
 //
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-component-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-connector.h>
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 
@@ -39,7 +39,7 @@ typedef IntrusivePtr<ScrollBar> ScrollBarPtr;
  * ScrollBar is a UI component that can be added to the scrollable controls
  * indicating the current scroll position of the scrollable content.
  */
-class ScrollBar : public ControlImpl
+class ScrollBar : public ScrollComponentImpl
 {
 
 public:
@@ -64,9 +64,9 @@ public:
   static Toolkit::ScrollBar New();
 
   /**
-   * @copydoc Toolkit::ScrollBar::SetScrollConnector()
+   * @copydoc Toolkit::ScrollComponentImpl::OnScrollConnectorSet()
    */
-  void SetScrollConnector( Toolkit::ScrollConnector connector );
+  void OnScrollConnectorSet( Toolkit::ScrollConnector connector );
 
   /**
    * @copydoc Toolkit::ScrollBar::SetBackgroundImage()
@@ -143,7 +143,6 @@ private:
 
 private:
 
-  Toolkit::ScrollConnector mScrollConnector;              ///< Connects scroll bar with the scrollable container.
   Constrainable mScrollPositionObject;                    ///< From mScrollConnector
 
   ImageActor mBackground;                                 ///< Background image of scroll bar.

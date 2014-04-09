@@ -23,7 +23,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/events/mouse-wheel-event.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
-#include <dali-toolkit/internal/controls/scroll-bar/scroll-bar-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
 
 using namespace std;
@@ -1055,11 +1054,11 @@ void ItemView::OnChildAdd(Actor& child)
   if(!mAddingItems)
   {
     // We don't want to do this downcast check for any item added by ItemView itself.
-    Dali::Toolkit::ScrollBar scrollBar = Dali::Toolkit::ScrollBar::DownCast(child);
-    if(scrollBar)
+    Dali::Toolkit::ScrollComponent scrollComponent = Dali::Toolkit::ScrollComponent::DownCast(child);
+    if(scrollComponent)
     {
       // Set the scroll connector when scroll bar is being added
-      scrollBar.SetScrollConnector(mScrollConnector);
+      scrollComponent.SetScrollConnector(mScrollConnector);
     }
   }
 }

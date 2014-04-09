@@ -27,15 +27,12 @@ namespace Dali DALI_IMPORT_API
 namespace Toolkit
 {
 
-namespace Internal DALI_INTERNAL
-{
-class ScrollComponent;
-}
+class ScrollComponentImpl;
+class ScrollConnector;
 
 /**
- * Base class for derived ScrollComponents
- * ScrollComponents such as ScrollBarInternal are derived from this class.
- * To instantiate these ScrollBarInternals and other derived components
+ * Base class for scroll component handles.
+ * Scroll-components such as scroll bars, indicators etc. are connected to scrollable containers via ScrollConnector.
  */
 class ScrollComponent : public Control
 {
@@ -71,13 +68,27 @@ public:
    */
   static ScrollComponent DownCast( BaseHandle handle );
 
+  /**
+   * @brief Sets the scroll connector.
+   *
+   * @param[in] connector The scroll-connector used to connect with scrollable container.
+   */
+  void SetScrollConnector( ScrollConnector connector );
+
+  /**
+   * @brief Retrieve the scroll connector.
+   *
+   * @return The scroll-connector used to connect with a scrollable container.
+   */
+  ScrollConnector GetScrollConnector() const;
+
 public: // Not intended for application developers
 
   /**
-   * Creates a handle using the Toolkit::Internal implementation.
-   * @param[in]  implementation  The Control implementation.
+   * Creates a handle using the implementation.
+   * @param[in]  implementation The Control implementation.
    */
-  ScrollComponent( Internal::ScrollComponent& implementation );
+  ScrollComponent( ScrollComponentImpl& implementation );
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.

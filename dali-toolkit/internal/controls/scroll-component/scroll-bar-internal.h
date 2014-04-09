@@ -18,7 +18,7 @@
 //
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/scroll-component/scroll-component.h>
+#include <dali-toolkit/public-api/controls/scrollable//scroll-component.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 
 namespace Dali DALI_IMPORT_API

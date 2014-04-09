@@ -22,7 +22,7 @@
 
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
-#include <dali-toolkit/internal/controls/scroll-component/scroll-component-impl.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-component-impl.h>
 
 namespace Dali
 {
@@ -180,6 +180,14 @@ private:
 
   // Undefined
   Scrollable& operator=(const Scrollable& rhs);
+
+  /**
+   * Helper to create an initialized ScrollComponent
+   * @param[in] scrollable reference to ScrollView implementation
+   * @param[in] type the type of scroll component to create.
+   * @return A pointer to the created ScrollComponent.
+   */
+  Toolkit::ScrollComponent NewScrollComponent(Toolkit::Scrollable& scrollable, Toolkit::Scrollable::ScrollComponentType type);
 
 protected:
 

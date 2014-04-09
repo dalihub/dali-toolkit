@@ -109,8 +109,8 @@ void Scrollable::EnableScrollComponent(Toolkit::Scrollable::ScrollComponentType 
   {
     // Create ScrollComponent
     Toolkit::Scrollable scrollable = Toolkit::Scrollable::DownCast(Self());
-    Toolkit::ScrollComponent scrollComponent = ScrollComponent::New(scrollable, type);
-    Toolkit::Internal::ScrollComponent& component = static_cast<Toolkit::Internal::ScrollComponent&>(scrollComponent.GetImplementation());
+    Toolkit::ScrollComponent scrollComponent = NewScrollComponent(scrollable, type);
+    Toolkit::ScrollComponentImpl& component = static_cast<Toolkit::ScrollComponentImpl&>(scrollComponent.GetImplementation());
     ScrollComponentPtr componentPtr(&component);
 
     mComponents[type] = componentPtr;
@@ -130,9 +130,6 @@ void Scrollable::DisableScrollComponent(Toolkit::Scrollable::ScrollComponentType
   if( mComponents.end() != pair )
   {
     ScrollComponentPtr component = pair->second;
-
-    // Disconnect the scroll component first.
-    component->OnDisconnect();
 
     // Destroy ScrollComponent.
     mComponents.erase( type );
@@ -189,6 +186,31 @@ bool Scrollable::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   }
 
   return connected;
+}
+
+Toolkit::ScrollComponent Scrollable::NewScrollComponent(Toolkit::Scrollable& scrollable, Toolkit::Scrollable::ScrollComponentType type)
+{
+  Toolkit::ScrollComponent instance;
+
+  switch(type)
+  {
+    case Toolkit::Scrollable::VerticalScrollBar:
+    {
+      instance = static_cast<Toolkit::ScrollComponent>(Toolkit::ScrollBarInternal::New(scrollable, true));
+      break;
+    }
+    case Toolkit::Scrollable::HorizontalScrollBar:
+    {
+      instance = static_cast<Toolkit::ScrollComponent>(Toolkit::ScrollBarInternal::New(scrollable, false));
+      break;
+    }
+    default:
+    {
+      DALI_ASSERT_ALWAYS(true && "Unrecognized component type");
+    }
+  }
+
+  return instance;
 }
 
 } // namespace Internal

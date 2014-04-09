@@ -17,10 +17,10 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/events/mouse-wheel-event.h>
 
-#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-component-impl.h>
+#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
-#include <dali-toolkit/internal/controls/scroll-component/scroll-component-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
 
 // TODO: Change to two class system:

@@ -19,7 +19,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/dali.h>
-#include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-component.h>
 
 namespace Dali DALI_IMPORT_API
 {
@@ -41,7 +41,7 @@ class ScrollBar;
  * ScrollBar is a UI component that can be added to the scrollable controls
  * indicating the current scroll position of the scrollable content.
  */
-class ScrollBar : public Control
+class ScrollBar : public ScrollComponent
 {
 public:
 
@@ -87,15 +87,6 @@ public:
    * @return handle to a ScrollBar or an uninitialized handle
    */
   static ScrollBar DownCast( BaseHandle handle );
-
-  /**
-   * @brief Sets the scroll connector for the scroll bar.
-   *
-   * @pre The scroll bar actor has been initialised.
-   *
-   * @param[in] connector Scroll connector used to connect scrollable container with this ScrollBar
-   */
- void SetScrollConnector( ScrollConnector connector );
 
   /**
    * @brief Sets the image for the background of scroll indicator.

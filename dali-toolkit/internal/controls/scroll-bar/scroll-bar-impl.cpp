@@ -126,8 +126,7 @@ TypeRegistration mType( typeid(Toolkit::ScrollBar), typeid(Toolkit::Control), Cr
 }
 
 ScrollBar::ScrollBar()
-: ControlImpl(true/*requires touch*/),
-  mScrollStart(0.0f)
+: mScrollStart(0.0f)
 {
 }
 
@@ -153,18 +152,22 @@ void ScrollBar::OnInitialize()
   EnableGestureDetection(Gesture::Type(Gesture::Pan));
 }
 
-void ScrollBar::SetScrollConnector( Toolkit::ScrollConnector connector )
+void ScrollBar::OnScrollConnectorSet( Toolkit::ScrollConnector oldConnector )
 {
-  if(mScrollConnector)
+  if( oldConnector )
   {
-    mScrollConnector.DomainChangedSignal().Disconnect(this, &ScrollBar::OnScrollDomainChanged);
+    oldConnector.DomainChangedSignal().Disconnect(this, &ScrollBar::OnScrollDomainChanged);
+
+    mScrollPositionObject.Reset();
   }
 
-  mScrollConnector = connector;
-  mScrollPositionObject = mScrollConnector.GetScrollPositionObject();
+  if( mScrollConnector )
+  {
+    mScrollPositionObject = mScrollConnector.GetScrollPositionObject();
 
-  ApplyConstraints();
-  mScrollConnector.DomainChangedSignal().Connect(this, &ScrollBar::OnScrollDomainChanged);
+    ApplyConstraints();
+    mScrollConnector.DomainChangedSignal().Connect(this, &ScrollBar::OnScrollDomainChanged);
+  }
 }
 
 void ScrollBar::SetBackgroundImage( Image image, const Vector4& border )
