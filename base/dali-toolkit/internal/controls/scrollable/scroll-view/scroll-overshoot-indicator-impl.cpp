@@ -429,21 +429,19 @@ void ScrollOvershootEffectRipple::SetPropertyNotifications(Actor& scrollable)
   int overshootXPropertyIndex = scrollable.GetPropertyIndex(Toolkit::ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME);
   int overshootYPropertyIndex = scrollable.GetPropertyIndex(Toolkit::ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME);
   mCanScrollPropertyIndex = scrollable.GetPropertyIndex(IsVertical() ? Scrollable::SCROLLABLE_CAN_SCROLL_VERTICAL : Scrollable::SCROLLABLE_CAN_SCROLL_HORIZONTAL);
-  if(scrollable.OnStage())
-  {
-    if(!mOvershootNegativeNotification)
-    {
-      mOvershootNegativeNotification = scrollable.AddPropertyNotification(IsVertical() ? overshootYPropertyIndex : overshootXPropertyIndex, LessThanCondition(-Math::MACHINE_EPSILON_1));
-      mOvershootNegativeNotification.SetNotifyMode(PropertyNotification::NotifyOnChanged);
-      mOvershootNegativeNotification.NotifySignal().Connect(this, &ScrollOvershootEffectRipple::OnNegativeOvershootNotification);
-    }
 
-    if(!mOvershootPositiveNotification)
-    {
-      mOvershootPositiveNotification = scrollable.AddPropertyNotification(IsVertical() ? overshootYPropertyIndex : overshootXPropertyIndex, GreaterThanCondition(Math::MACHINE_EPSILON_1));
-      mOvershootPositiveNotification.SetNotifyMode(PropertyNotification::NotifyOnChanged);
-      mOvershootPositiveNotification.NotifySignal().Connect(this, &ScrollOvershootEffectRipple::OnPositiveOvershootNotification);
-    }
+  if(!mOvershootNegativeNotification)
+  {
+    mOvershootNegativeNotification = scrollable.AddPropertyNotification(IsVertical() ? overshootYPropertyIndex : overshootXPropertyIndex, LessThanCondition(-Math::MACHINE_EPSILON_1));
+    mOvershootNegativeNotification.SetNotifyMode(PropertyNotification::NotifyOnChanged);
+    mOvershootNegativeNotification.NotifySignal().Connect(this, &ScrollOvershootEffectRipple::OnNegativeOvershootNotification);
+  }
+
+  if(!mOvershootPositiveNotification)
+  {
+    mOvershootPositiveNotification = scrollable.AddPropertyNotification(IsVertical() ? overshootYPropertyIndex : overshootXPropertyIndex, GreaterThanCondition(Math::MACHINE_EPSILON_1));
+    mOvershootPositiveNotification.SetNotifyMode(PropertyNotification::NotifyOnChanged);
+    mOvershootPositiveNotification.NotifySignal().Connect(this, &ScrollOvershootEffectRipple::OnPositiveOvershootNotification);
   }
 }
 
