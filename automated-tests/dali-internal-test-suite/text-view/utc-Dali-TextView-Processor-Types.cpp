@@ -93,7 +93,7 @@ static void UtcDaliTextViewDefaultConstructorDestructor()
   DALI_TEST_EQUALS( characterLayoutInfo.mAscender, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo.mUnderlineThickness, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo.mUnderlinePosition, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_CHECK( !characterLayoutInfo.mTextActor );
+  DALI_TEST_CHECK( !characterLayoutInfo.mGlyphActor );
   DALI_TEST_CHECK( characterLayoutInfo.mStyledText.mText.IsEmpty() );
   DALI_TEST_EQUALS( characterLayoutInfo.mColorAlpha, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo.mGradientColor, Vector4::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
@@ -152,7 +152,7 @@ static void UtcDaliTextViewCopyConstructorOperator()
   characterLayoutInfo.mUnderlineThickness = 1.f;
   characterLayoutInfo.mUnderlinePosition = 1.f;
 
-  characterLayoutInfo.mTextActor = TextActor::New( "Hello" );
+  characterLayoutInfo.mGlyphActor = TextActor::New( "Hello" );
   characterLayoutInfo.mStyledText.mText = Text( "Hello" );
 
   characterLayoutInfo.mColorAlpha = 0.f;
@@ -175,7 +175,7 @@ static void UtcDaliTextViewCopyConstructorOperator()
   DALI_TEST_EQUALS( characterLayoutInfo1.mAscender, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo1.mUnderlineThickness, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo1.mUnderlinePosition, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_CHECK( characterLayoutInfo1.mTextActor );
+  DALI_TEST_CHECK( characterLayoutInfo1.mGlyphActor );
   DALI_TEST_EQUALS( characterLayoutInfo1.mStyledText.mText.GetLength(), 5u, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo1.mColorAlpha, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo1.mGradientColor, Vector4( 1.f, 1.f, 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
@@ -195,7 +195,7 @@ static void UtcDaliTextViewCopyConstructorOperator()
   DALI_TEST_EQUALS( characterLayoutInfo2.mAscender, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo2.mUnderlineThickness, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo2.mUnderlinePosition, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_CHECK( characterLayoutInfo2.mTextActor );
+  DALI_TEST_CHECK( characterLayoutInfo2.mGlyphActor );
   DALI_TEST_EQUALS( characterLayoutInfo2.mStyledText.mText.GetLength(), 5u, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo2.mColorAlpha, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo2.mGradientColor, Vector4( 1.f, 1.f, 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
@@ -206,9 +206,9 @@ static void UtcDaliTextViewCopyConstructorOperator()
   DALI_TEST_CHECK( !characterLayoutInfo2.mSetStyle );
 
   // Increases coverage.
-  characterLayoutInfo2.mTextActor.Reset();
+  characterLayoutInfo2.mGlyphActor.Reset();
   characterLayoutInfo1 = characterLayoutInfo2;
-  DALI_TEST_CHECK( !characterLayoutInfo1.mTextActor );
+  DALI_TEST_CHECK( !characterLayoutInfo1.mGlyphActor );
 
   TextViewProcessor::WordLayoutInfo wordLayoutInfo;
   wordLayoutInfo.mSize = Vector2( 1.f, 1.f );

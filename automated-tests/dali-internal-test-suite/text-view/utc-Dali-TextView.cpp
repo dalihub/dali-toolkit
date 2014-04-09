@@ -157,9 +157,10 @@ void Print( const TextViewProcessor::CharacterLayoutInfo& character )
   std::cout << "              mSize : " << character.mSize << std::endl;
   std::cout << "          mAscender : " << character.mAscender << std::endl;
 
-  if( character.mTextActor )
+  TextActor textActor = TextActor::DownCast( character.mGlyphActor );
+  if( textActor )
   {
-    std::cout << "[" << character.mTextActor.GetText() << "]";
+    std::cout << "[" << textActor.GetText() << "]";
   }
   else
   {
@@ -286,12 +287,12 @@ bool TestEqual( const TextViewProcessor::CharacterLayoutInfo& character1,
     return false;
   }
 
-  if( character1.mTextActor && !character2.mTextActor )
+  if( character1.mGlyphActor && !character2.mGlyphActor )
   {
     return false;
   }
 
-  if( !character1.mTextActor && character2.mTextActor )
+  if( !character1.mGlyphActor && character2.mGlyphActor )
   {
     return false;
   }
@@ -301,13 +302,15 @@ bool TestEqual( const TextViewProcessor::CharacterLayoutInfo& character1,
   TextStyle style1;
   TextStyle style2;
 
-  if( character1.mTextActor )
+  TextActor textActor1 = TextActor::DownCast( character1.mGlyphActor );
+  TextActor textActor2 = TextActor::DownCast( character2.mGlyphActor );
+  if( textActor1 )
   {
-    text1 = character1.mTextActor.GetText();
-    style1 = character1.mTextActor.GetTextStyle();
+    text1 = textActor1.GetText();
+    style1 = textActor1.GetTextStyle();
 
-    text2 = character2.mTextActor.GetText();
-    style2 = character2.mTextActor.GetTextStyle();
+    text2 = textActor2.GetText();
+    style2 = textActor2.GetTextStyle();
   }
 
   if( text1 != text2 )
