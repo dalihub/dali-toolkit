@@ -17,6 +17,11 @@
 // limitations under the License.
 //
 
+/**
+ * @addtogroup CAPI_DALI_TOOLKIT_SCROLL_CONNECTOR_MODULE
+ * @{
+ */
+
 // INTERNAL INCLUDES
 #include <dali/dali.h>
 
@@ -146,5 +151,9 @@ public: // Not intended for application developers
 } // namespace Toolkit
 
 } // namespace Dali
+
+/**
+ * @}
+ */
 
 #endif // __DALI_TOOLKIT_SCROLL_CONNECTOR_H__

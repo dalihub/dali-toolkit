@@ -154,6 +154,7 @@
  * (via touch) or automatically. </td></tr>
  * <tr><td>@ref CAPI_DALI_TOOLKIT_ITEM_VIEW_MODULE</td><td> Item view </td></tr>
  * <tr><td>@ref CAPI_DALI_TOOLKIT_SCROLL_VIEW_MODULE</td><td> Scroll view </td></tr>
+ * <tr><td>@ref CAPI_DALI_TOOLKIT_SCROLL_CONNECTOR_MODULE</td><td> Scroll Connector </td></tr>
  * <tr><td>@ref Dali::Toolkit::Scrollable </td><td>Base class for derived Scrollables that contains actors that can be scrolled manually
  * </table>
  */
@@ -171,6 +172,18 @@
  * <tr><td>@ref Dali::Toolkit::ItemRange </td><td>A support class for managing ranges of items.</td></tr>
  * <tr><td>@ref Dali::Toolkit::ItemLayout </td><td>An ItemLayout describes the constraints which are imposed on items in the layout.</td></tr>
  * <tr><td>@ref Dali::Toolkit::ItemView </td><td>ItemView is a scrollable layout container.</td></tr>
+ * </table>
+ */
+
+/**
+ * @ingroup CAPI_DALI_TOOLKIT_SCROLLABLE_MODULE
+ * @defgroup CAPI_DALI_TOOLKIT_SCROLL_CONNECTOR_MODULE   Scroll Connector
+ * @brief
+ * @section  CAPI_DALI_TOOLKIT_SCROLL_CONNECTOR_MODULE_HEADER Required Header
+ *  \#include <dali-toolkit/dali-toolkit.h>
+ * @section CAPI_DALI_TOOLKIT_SCROLL_CONNECTOR_MODULE_OVERVIEW Overview
+ * <table> <tr><th>API</th><th>Description</th></tr>
+ * <tr><td>@ref Dali::Toolkit::ScrollConnector </td><td>ScrollConnector is used to connect scrollable containers with components such as scroll bars, indicators etc.</td></tr>
  * </table>
  */
 
