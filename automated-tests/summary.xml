@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="./style/summary.xsl"?>
+<result_summary plan_name="Core">
+  <other xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" />
+  <summary test_plan_name="Empty test_plan_name">
+    <start_at>2014-03-21_18_52_41</start_at>
+    <end_at>2014-03-21_18_57_54</end_at>
+  </summary>
+  <suite name="tct-dali-toolkit-core-tests">
+    <total_case>231</total_case>
+    <pass_case>222</pass_case>
+    <pass_rate>96.10</pass_rate>
+    <fail_case>9</fail_case>
+    <fail_rate> 3.90</fail_rate>
+    <block_case>0</block_case>
+    <block_rate>0.00</block_rate>
+    <na_case>0</na_case>
+    <na_rate>0.00</na_rate>
+  </suite>
+  <suite name="tct-dali-toolkit-internal-core-tests">
+    <total_case>33</total_case>
+    <pass_case>31</pass_case>
+    <pass_rate>93.94</pass_rate>
+    <fail_case>2</fail_case>
+    <fail_rate> 6.06</fail_rate>
+    <block_case>0</block_case>
+    <block_rate>0.00</block_rate>
+    <na_case>0</na_case>
+    <na_rate>0.00</na_rate>
+  </suite>
+  <suite name="tct-dali-toolkit-unmanaged-core-tests">
+    <total_case>311</total_case>
+    <pass_case>290</pass_case>
+    <pass_rate>93.25</pass_rate>
+    <fail_case>21</fail_case>
+    <fail_rate> 6.75</fail_rate>
+    <block_case>0</block_case>
+    <block_rate>0.00</block_rate>
+    <na_case>0</na_case>
+    <na_rate>0.00</na_rate>
+  </suite>
+</result_summary>

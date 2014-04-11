@@ -2,16 +2,14 @@
 
 ( cd ../build/slp ; make cov_data )
 
-
-for i in `find . -name "*.dir"` ; do
+for i in `find . -name Makefile` ; do
     (
-        cd $i
+        cd $(dirname $i)
         echo `pwd`
         covs=( `ls *.gcda 2>/dev/null` )
         if [[ $? -eq 0 ]]
         then
-            lcov --directory . -c -o dali.info
-            lcov --remove dali.info "*boost*" "/usr/include/*" "*/automated-tests/*" -o dali.info
+            make coverage
         fi
     )
 done
@@ -20,3 +18,5 @@ done
     cd .. ;
     genhtml -o build/slp/doc/coverage `find . -name dali.info`
 )
+
+

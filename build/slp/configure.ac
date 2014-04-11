@@ -81,7 +81,6 @@ AC_CONFIG_FILES([
  Makefile
  dali-toolkit/Makefile
  dali-toolkit.pc
- ../../automated-tests/rules.mk
 ])
 
 AC_OUTPUT
