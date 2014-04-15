@@ -164,10 +164,6 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
   {
     animation.SetDuration( *duration );
   }
-  else
-  {
-    animation.SetDuration( durationSum );
-  }
 
   if( OptionalBoolean looping = constant.IsBoolean(  IsChild(child, "loop" ) ) )
   {
@@ -352,6 +348,11 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
         }
       }
     }
+  }
+
+  if( !duration )
+  {
+    animation.SetDuration( durationSum );
   }
 
   return animation;
