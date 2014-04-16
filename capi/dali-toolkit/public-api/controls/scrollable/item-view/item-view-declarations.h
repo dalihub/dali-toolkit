@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TOOLKIT_ITEM_VIEW_MODULE
  * @{
  */
 
@@ -32,7 +32,7 @@ namespace Dali DALI_IMPORT_API
 namespace Toolkit
 {
 
-typedef unsigned int ItemId;
+typedef unsigned int ItemId; ///< Unique identity for each item in the view.
 
 typedef std::vector<ItemId> ItemIdContainer;
 typedef ItemIdContainer::iterator ItemIdIter;
