@@ -327,7 +327,7 @@ TextInput::TextInput()
  mUnderlinedPriorToPreEdit ( false ),
  mCommitByKeyInput( false ),
  mPlaceHolderSet( false ),
- mMarkUpEnabled( false )
+ mMarkUpEnabled( true )
 {
   // Updates the line height accordingly with the input style.
   UpdateLineHeight();
@@ -846,7 +846,6 @@ TextStyle TextInput::GetStyleAtCursor() const
   if ( !mStyledText.empty() && ( mCursorPosition > 0 ) )
   {
     DALI_ASSERT_DEBUG( ( 0 <= mCursorPosition-1 ) && ( mCursorPosition-1 < mStyledText.size() ) );
-
     style = mStyledText.at( mCursorPosition-1 ).mStyle;
   }
   else // No text.
@@ -2029,6 +2028,7 @@ void TextInput::SetUpTouchEvents()
 void TextInput::CreateTextViewActor()
 {
   mDisplayedTextView = Toolkit::TextView::New();
+  mDisplayedTextView.SetMarkupProcessingEnabled( mMarkUpEnabled );
   mDisplayedTextView.SetParentOrigin(ParentOrigin::TOP_LEFT);
   mDisplayedTextView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
   mDisplayedTextView.SetMultilinePolicy(Toolkit::TextView::SplitByWord);
