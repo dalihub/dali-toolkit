@@ -99,7 +99,7 @@ bool Scrollable::IsScrollComponentEnabled(Toolkit::Scrollable::ScrollComponentTy
 
 void Scrollable::EnableScrollComponent(Toolkit::Scrollable::ScrollComponentType type)
 {
-  if(type == Toolkit::Scrollable::OvershootIndicator)
+  if(type == Toolkit::Scrollable::OvershootIndicator && !mOvershootEnabled)
   {
     SetOvershootEnabled(true);
     mOvershootEnabled = true;
@@ -119,7 +119,7 @@ void Scrollable::EnableScrollComponent(Toolkit::Scrollable::ScrollComponentType 
 
 void Scrollable::DisableScrollComponent(Toolkit::Scrollable::ScrollComponentType type)
 {
-  if(type == Toolkit::Scrollable::OvershootIndicator)
+  if(type == Toolkit::Scrollable::OvershootIndicator && mOvershootEnabled)
   {
     SetOvershootEnabled(false);
     mOvershootEnabled = false;

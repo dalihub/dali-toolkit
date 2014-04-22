@@ -425,16 +425,6 @@ void ItemView::OnInitialize()
 
   Actor self = Self();
 
-  mOvershootEffect = OvershootRippleEffect::New();
-  Image overshootImage = Image::New( OVERSHOOT_OVERLAY_RIPPLE_IMAGE_PATH );
-  mOvershootOverlay = ImageActor::New( overshootImage );
-  mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  mOvershootOverlay.SetDrawMode(DrawMode::OVERLAY);
-  mOvershootOverlay.SetShaderEffect(mOvershootEffect);
-  mOvershootOverlay.SetPixelArea(OVERSHOOT_BOUNCE_IMAGE_1_PIXEL_AREA);
-  self.Add(mOvershootOverlay);
-
   mScrollConnector = Dali::Toolkit::ScrollConnector::New();
   mScrollPositionObject = mScrollConnector.GetScrollPositionObject();
 
@@ -442,7 +432,7 @@ void ItemView::OnInitialize()
   mPropertyPosition = self.RegisterProperty(POSITION_PROPERTY_NAME, 0.0f);
   mPropertyScrollSpeed = self.RegisterProperty(SCROLL_SPEED_PROPERTY_NAME, 0.0f);
 
-  ApplyOvershootOverlayConstraints();
+  EnableScrollComponent(Toolkit::Scrollable::OvershootIndicator);
 
   Constraint constraint = Constraint::New<Vector3>(mPropertyRelativePosition,
                                                    LocalSource(mPropertyPosition),
@@ -1672,40 +1662,62 @@ void ItemView::ScrollTo(const Vector3& position, float duration)
   mScrollStartedSignalV2.Emit(GetCurrentScrollPosition());
 }
 
-void ItemView::ApplyOvershootOverlayConstraints()
+void ItemView::SetOvershootEnabled( bool enable )
 {
-  Constraint constraint = Constraint::New<float>( Actor::SIZE_WIDTH,
-                                                    ParentSource( mPropertyScrollDirection ),
-                                                    Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
-                                                    ParentSource( Actor::SIZE ),
-                                                    OvershootOverlaySizeConstraint() );
-  mOvershootOverlay.ApplyConstraint(constraint);
-  mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_IMAGE_1_PIXEL_AREA.width, OVERSHOOT_BOUNCE_IMAGE_1_PIXEL_AREA.height);
-
-  constraint = Constraint::New<Quaternion>( Actor::ROTATION,
-                                            ParentSource( mPropertyScrollDirection ),
-                                            Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
-                                            OvershootOverlayRotationConstraint() );
-  mOvershootOverlay.ApplyConstraint(constraint);
-
-  constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                         ParentSource( Actor::SIZE ),
-                                         ParentSource( mPropertyScrollDirection ),
-                                         Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
-                                         OvershootOverlayPositionConstraint() );
-  mOvershootOverlay.ApplyConstraint(constraint);
-
-  constraint = Constraint::New<bool>( Actor::VISIBLE,
-                                      ParentSource( mPropertyCanScrollVertical ),
-                                      OvershootOverlayVisibilityConstraint() );
-  mOvershootOverlay.ApplyConstraint(constraint);
-
-  int effectOvershootPropertyIndex = mOvershootEffect.GetPropertyIndex(mOvershootEffect.GetOvershootPropertyName());
   Actor self = Self();
-  constraint = Constraint::New<float>( effectOvershootPropertyIndex,
-                                       Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
-                                       EqualToConstraint() );
-  mOvershootEffect.ApplyConstraint(constraint);
+  if( enable )
+  {
+    mOvershootEffect = OvershootRippleEffect::New();
+    Image overshootImage = Image::New( OVERSHOOT_OVERLAY_RIPPLE_IMAGE_PATH );
+    mOvershootOverlay = ImageActor::New( overshootImage );
+    mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
+    mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    mOvershootOverlay.SetDrawMode(DrawMode::OVERLAY);
+    mOvershootOverlay.SetShaderEffect(mOvershootEffect);
+    mOvershootOverlay.SetPixelArea(OVERSHOOT_BOUNCE_IMAGE_1_PIXEL_AREA);
+    self.Add(mOvershootOverlay);
+    Constraint constraint = Constraint::New<float>( Actor::SIZE_WIDTH,
+                                                      ParentSource( mPropertyScrollDirection ),
+                                                      Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
+                                                      ParentSource( Actor::SIZE ),
+                                                      OvershootOverlaySizeConstraint() );
+    mOvershootOverlay.ApplyConstraint(constraint);
+    mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_IMAGE_1_PIXEL_AREA.width, OVERSHOOT_BOUNCE_IMAGE_1_PIXEL_AREA.height);
+
+    constraint = Constraint::New<Quaternion>( Actor::ROTATION,
+                                              ParentSource( mPropertyScrollDirection ),
+                                              Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
+                                              OvershootOverlayRotationConstraint() );
+    mOvershootOverlay.ApplyConstraint(constraint);
+
+    constraint = Constraint::New<Vector3>( Actor::POSITION,
+                                           ParentSource( Actor::SIZE ),
+                                           ParentSource( mPropertyScrollDirection ),
+                                           Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
+                                           OvershootOverlayPositionConstraint() );
+    mOvershootOverlay.ApplyConstraint(constraint);
+
+    constraint = Constraint::New<bool>( Actor::VISIBLE,
+                                        ParentSource( mPropertyCanScrollVertical ),
+                                        OvershootOverlayVisibilityConstraint() );
+    mOvershootOverlay.ApplyConstraint(constraint);
+
+    int effectOvershootPropertyIndex = mOvershootEffect.GetPropertyIndex(mOvershootEffect.GetOvershootPropertyName());
+    Actor self = Self();
+    constraint = Constraint::New<float>( effectOvershootPropertyIndex,
+                                         Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
+                                         EqualToConstraint() );
+    mOvershootEffect.ApplyConstraint(constraint);
+  }
+  else
+  {
+    if( mOvershootOverlay )
+    {
+      self.Remove(mOvershootOverlay);
+      mOvershootOverlay.Reset();
+    }
+    mOvershootEffect.Reset();
+  }
 }
 
 float ItemView::CalculateScrollOvershoot()

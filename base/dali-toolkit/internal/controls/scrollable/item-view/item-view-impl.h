@@ -458,9 +458,9 @@ private:
   void RemoveAnimation(Animation& animation);
 
   /**
-   * Helper to apply constraints to the overshoot overlay actor.
+   * @copydoc Toolkit::Internal::Scrollable::SetOvershootEnabled
    */
-  void ApplyOvershootOverlayConstraints();
+  virtual void SetOvershootEnabled( bool enable );
 
   /**
    * Helper to calculate the scroll overshoot according to the pan gesture displacement.
