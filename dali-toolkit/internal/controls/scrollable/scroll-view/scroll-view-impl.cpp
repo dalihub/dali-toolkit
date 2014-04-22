@@ -574,7 +574,7 @@ void ScrollView::OnInitialize()
 
   mGestureStackDepth = 0;
 
-  EnableGestureDetection( Gesture::Type( Gesture::Pan | Gesture::Pinch ) );
+  EnableGestureDetection( Gesture::Type( Gesture::Pan ) );
 
   // For pan, default to only 1 touch required, ignoring touches outside this range.
   SetTouchesRequiredForPanning(1, 1, false);
@@ -915,19 +915,16 @@ void ScrollView::SetScrollSensitive(bool sensitive)
 {
   Actor self = Self();
   PanGestureDetector panGesture( GetPanGestureDetector() );
-  PinchGestureDetector pinchGesture( GetPinchGestureDetector() );
 
   if((!mSensitive) && (sensitive))
   {
     mSensitive = sensitive;
     panGesture.Attach(self);
-    pinchGesture.Attach(self);
   }
   else if((mSensitive) && (!sensitive))
   {
     mSensitive = sensitive;
     panGesture.Detach(self);
-    pinchGesture.Detach(self);
 
     mGestureStackDepth = 0;
     self.SetProperty(mPropertyPanning, false);
@@ -2175,11 +2172,6 @@ void ScrollView::OnPan(PanGesture gesture)
   } // end switch(gesture.state)
 
   OnGestureEx(gesture.state);
-}
-
-void ScrollView::OnPinch(PinchGesture gesture)
-{
-  // TODO: Reintroduce the pinch functionality for scaling.
 }
 
 void ScrollView::OnGestureEx(Gesture::State state)

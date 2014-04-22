@@ -604,13 +604,6 @@ private:
   void OnPan(PanGesture pan);
 
   /**
-   * Called up pinch gesture event.
-   *
-   * @param[in] gesture The gesture event.
-   */
-  void OnPinch(PinchGesture gesture);
-
-  /**
    * Extension of the above gestures.
    *
    * @param[in] gesture The gesture event.
