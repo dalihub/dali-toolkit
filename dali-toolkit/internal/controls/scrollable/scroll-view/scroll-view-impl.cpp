@@ -923,15 +923,18 @@ void ScrollView::SetScrollSensitive(bool sensitive)
   }
   else if((mSensitive) && (!sensitive))
   {
-    mSensitive = sensitive;
+    // while the scroll view is panning, the state needs to be reset.
+    bool isPanning = self.GetProperty<bool>( mPropertyPanning );
+    if ( isPanning )
+    {
+      PanGesture cancelGesture( Gesture::Cancelled );
+      OnPan( cancelGesture );
+    }
+
     panGesture.Detach(self);
+    mSensitive = sensitive;
 
     mGestureStackDepth = 0;
-    self.SetProperty(mPropertyPanning, false);
-
-    // Remove X & Y position constraints as they are not required when we are not panning.
-    self.RemoveConstraint(mScrollMainInternalXConstraint);
-    self.RemoveConstraint(mScrollMainInternalYConstraint);
   }
 }
 
