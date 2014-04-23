@@ -41,6 +41,15 @@ class SuperBlurView : public ControlImpl
 {
 public:
 
+  // Properties
+  enum
+  {
+    SUPER_BLUR_VIEW_PROPERTY_START_INDEX = ControlImpl::CONTROL_PROPERTY_END_INDEX + 1,
+    SUPER_BLUR_VIEW_PROPERTY_END_INDEX = SUPER_BLUR_VIEW_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
+  };
+
+public:
+
   /**
    * @copydoc Dali::Toolkit::SuperBlurView::New
    */
@@ -75,6 +84,24 @@ public:
    * @copydoc Dali::Toolkit::SuperBlurView::GetBlurredImage
    */
   Image GetBlurredImage( unsigned int level );
+
+  // Properties
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value );
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
 
 protected:
 

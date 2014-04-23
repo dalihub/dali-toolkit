@@ -16,6 +16,7 @@
 
 //EXTERNAL INCLUDES
 #include <cmath>
+#include <integration-api/debug.h>
 
 // CLASS HEADER
 #include "super-blur-view-impl.h"
@@ -24,9 +25,6 @@ namespace //unnamed namespace
 {
 
 using namespace Dali;
-
-//Type registration
-TypeRegistration mType( typeid(Toolkit::SuperBlurView), typeid(Toolkit::Control), NULL );
 
 //Todo: make these properties instead of constants
 const unsigned int GAUSSIAN_BLUR_DEFAULT_NUM_SAMPLES = 11;
@@ -77,8 +75,26 @@ namespace Dali
 namespace Toolkit
 {
 
+const Property::Index SuperBlurView::PROPERTY_IMAGE( Internal::SuperBlurView::SUPER_BLUR_VIEW_PROPERTY_START_INDEX );
+
 namespace Internal
 {
+
+namespace
+{
+const unsigned int DEFAULT_BLUR_LEVEL(5u); ///< The default blur level when creating SuperBlurView from the type registry
+
+BaseHandle Create()
+{
+  return Toolkit::SuperBlurView::New( DEFAULT_BLUR_LEVEL );
+}
+
+// Type registration
+TypeRegistration typeRegistration( typeid(Toolkit::SuperBlurView), typeid(Toolkit::Control), Create );
+
+PropertyRegistration property1( typeRegistration, "image", Toolkit::SuperBlurView::PROPERTY_IMAGE,   Property::MAP, &SuperBlurView::SetProperty, &SuperBlurView::GetProperty );
+
+} // unnamed namespace
 
 SuperBlurView::SuperBlurView( unsigned int blurLevels )
 : ControlImpl( false ),
@@ -114,7 +130,7 @@ Toolkit::SuperBlurView SuperBlurView::New( unsigned int blurLevels )
 
 void SuperBlurView::OnInitialize()
 {
-  mBlurStrengthPropertyIndex = Self().RegisterProperty( "BLUR_STRENGTH",0.f );
+  mBlurStrengthPropertyIndex = Self().RegisterProperty( "blur-strength",0.f );
 
   DALI_ASSERT_ALWAYS( mImageActors.size() == mBlurLevels+1 && "must synchronize the ImageActor group if blur levels got changed " );
   for(unsigned int i=0; i<=mBlurLevels;i++)
@@ -249,6 +265,61 @@ void SuperBlurView::OnControlSizeSet( const Vector3& targetSize )
                                                 GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT, Dali::Image::Never );
     }
   }
+}
+
+void SuperBlurView::SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )
+{
+  Toolkit::SuperBlurView superBlurView = Toolkit::SuperBlurView::DownCast( Dali::BaseHandle( object ) );
+
+  if ( superBlurView )
+  {
+    SuperBlurView& superBlurViewImpl( GetImpl( superBlurView ) );
+
+    switch ( propertyIndex )
+    {
+      case Toolkit::SuperBlurView::PROPERTY_IMAGE:
+      {
+        Dali::Image image = Scripting::NewImage( value );
+        if ( image )
+        {
+          superBlurViewImpl.SetImage( image );
+        }
+        else
+        {
+          DALI_LOG_ERROR( "Cannot create image from property value\n" );
+        }
+        break;
+      }
+    }
+  }
+}
+
+Property::Value SuperBlurView::GetProperty( BaseObject* object, Property::Index propertyIndex )
+{
+  Property::Value value;
+
+  Toolkit::SuperBlurView pushButton = Toolkit::SuperBlurView::DownCast( Dali::BaseHandle( object ) );
+
+  if ( pushButton )
+  {
+    SuperBlurView& superBlurViewImpl( GetImpl( pushButton ) );
+
+    switch ( propertyIndex )
+    {
+      case Toolkit::SuperBlurView::PROPERTY_IMAGE:
+      {
+        Property::Map map;
+        if ( !superBlurViewImpl.mImageActors.empty() && superBlurViewImpl.mImageActors[0] )
+        {
+          Scripting::CreatePropertyMap( superBlurViewImpl.mImageActors[0], map );
+        }
+        value = Property::Value( map );
+        break;
+      }
+    }
+  }
+
+  return value;
 }
 
 } // namespace Internal

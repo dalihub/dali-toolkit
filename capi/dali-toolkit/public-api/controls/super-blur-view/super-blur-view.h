@@ -59,6 +59,10 @@ class SuperBlurView;
 class SuperBlurView : public Control
 {
 public:
+
+  // Properties
+  static const Property::Index PROPERTY_IMAGE;     ///< name "image",    @see SetImage,    type MAP
+
   /**
    * @brief Signal type for notifications.
    */
