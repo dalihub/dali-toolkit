@@ -55,6 +55,11 @@ public:
    */
   Toolkit::ScrollConnector GetScrollConnector() const;
 
+  /**
+   * Called when the scroll component is disconnected from a scrollable container.
+   */
+  virtual void OnDisconnect() {}
+
 protected:
 
   /**

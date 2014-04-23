@@ -131,6 +131,9 @@ void Scrollable::DisableScrollComponent(Toolkit::Scrollable::ScrollComponentType
   {
     ScrollComponentPtr component = pair->second;
 
+    // Disconnect the scroll component first.
+    component->OnDisconnect();
+
     // Destroy ScrollComponent.
     mComponents.erase( type );
   }
