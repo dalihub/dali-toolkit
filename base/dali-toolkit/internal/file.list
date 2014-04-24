@@ -35,6 +35,7 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/controls/scrollable/scroll-view/scroll-view-twist-effect-impl.cpp \
    $(toolkit_base_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect-impl.cpp \
    $(toolkit_base_src_dir)/controls/table-view/table-view-impl.cpp \
+   $(toolkit_base_src_dir)/controls/text-input/text-input-decorator-impl.cpp \
    $(toolkit_base_src_dir)/controls/text-input/text-input-impl.cpp \
    $(toolkit_base_src_dir)/controls/text-input/text-input-popup-impl.cpp \
    $(toolkit_base_src_dir)/controls/text-view/relayout-utilities.cpp   \
