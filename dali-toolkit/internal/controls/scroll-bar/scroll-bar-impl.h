@@ -141,6 +141,12 @@ private:
    */
   void OnScrollPositionNotified(PropertyNotification& source);
 
+  /**
+   * Process the pan gesture per predefined timeout until the gesture is finished.
+   * @return True if the timer should be kept running.
+   */
+  bool OnPanGestureProcessTick();
+
 private:
 
   Constrainable mScrollPositionObject;                    ///< From mScrollConnector
@@ -149,8 +155,13 @@ private:
   ImageActor mIndicator;                                  ///< Image of scroll indicator.
   Animation mAnimation;                                   ///< Scroll indicator Show/Hide Animation.
 
-  float mScrollStart;                                     ///< Scroll Start position (start of drag)
+  float mScrollStart;                                    ///< Scroll Start position (start of drag)
   Vector3 mGestureDisplacement;                           ///< Gesture Displacement.
+
+  bool mIsPanning;                                       ///< Whether the scroll bar is being panned.
+  float mCurrentScrollPosition;                          ///< The current scroll position updated by the pan gesture
+
+  Timer mTimer;                                           ///< The timer to process the pan gesture after the gesture is started.
 
   Property::Index mPropertyIndicatorPosition;             ///< Indicatore Position ("indicator-position")
 

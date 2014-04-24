@@ -410,7 +410,8 @@ ItemView::ItemView(ItemFactory& factory)
   mScrollOvershoot(0.0f),
   mIsFlicking(false),
   mGestureState(Gesture::Clear),
-  mAddingItems(false)
+  mAddingItems(false),
+  mRefreshEnabled(true)
 {
   SetRequiresMouseWheelEvents(true);
   SetKeyboardNavigationSupport(true);
@@ -565,7 +566,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
   }
 
   // Refresh the new layout
-  ItemRange range = GetItemRange(*mActiveLayout, targetSize, true/*reserve extra*/);
+  ItemRange range = GetItemRange(*mActiveLayout, targetSize, GetCurrentLayoutPosition(0), true/*reserve extra*/);
   AddActorsWithinRange( range, durationSeconds );
 
   // Scroll to an appropriate layout position
@@ -636,14 +637,22 @@ AlphaFunction ItemView::GetDefaultAlphaFunction() const
 
 void ItemView::OnRefreshNotification(PropertyNotification& source)
 {
+  if(mRefreshEnabled)
+  {
+    // Only refresh the cache during normal scrolling
+    DoRefresh(GetCurrentLayoutPosition(0), true);
+  }
+}
+
+void ItemView::DoRefresh(float currentLayoutPosition, bool cacheExtra)
+{
   if (mActiveLayout)
   {
-    ItemRange range = GetItemRange(*mActiveLayout, mActiveLayoutTargetSize, true/*reserve extra*/);
+    ItemRange range = GetItemRange(*mActiveLayout, mActiveLayoutTargetSize, currentLayoutPosition, cacheExtra/*reserve extra*/);
     RemoveActorsOutsideRange( range );
     AddActorsWithinRange( range, 0.0f/*immediate*/ );
 
-    Vector3 currentScrollPosition = GetCurrentScrollPosition();
-    mScrollUpdatedSignalV2.Emit( currentScrollPosition );
+    mScrollUpdatedSignalV2.Emit( Vector3(0.0f, currentLayoutPosition, 0.0f) );
   }
 }
 
@@ -712,6 +721,11 @@ void ItemView::SetRefreshInterval(float intervalLayoutPositions)
 float ItemView::GetRefreshInterval() const
 {
   return mRefreshIntervalLayoutPositions;
+}
+
+void ItemView::SetRefreshEnabled(bool enabled)
+{
+  mRefreshEnabled = enabled;
 }
 
 Actor ItemView::GetItem(unsigned int itemId) const
@@ -1030,13 +1044,13 @@ void ItemView::SetupActor( Item item, float durationSeconds )
   }
 }
 
-ItemRange ItemView::GetItemRange(ItemLayout& layout, const Vector3& layoutSize, bool reserveExtra)
+ItemRange ItemView::GetItemRange(ItemLayout& layout, const Vector3& layoutSize, float layoutPosition, bool reserveExtra)
 {
   unsigned int itemCount = mItemFactory.GetNumberOfItems();
 
   ItemRange available(0u, itemCount);
 
-  ItemRange range = layout.GetItemsWithinArea( GetCurrentLayoutPosition(0), layoutSize );
+  ItemRange range = layout.GetItemsWithinArea( layoutPosition, layoutSize );
 
   if (reserveExtra)
   {

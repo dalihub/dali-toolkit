@@ -500,7 +500,7 @@ ItemRange GridLayout::GetItemsWithinArea(float firstItemPosition, Vector3 layout
   int firstVisibleItem = -(static_cast<int>(firstItemPosition / mImpl->mNumberOfColumns)) * mImpl->mNumberOfColumns;
 
   int firstItemIndex = std::max(0, firstVisibleItem - static_cast<int>(mImpl->mNumberOfColumns));
-  int lastItemIndex  = std::max(0, firstVisibleItem + (itemsPerPage - 1));
+  int lastItemIndex  = std::max(0, firstVisibleItem + itemsPerPage);
 
   return ItemRange(firstItemIndex, lastItemIndex);
 }

@@ -243,6 +243,25 @@ public:
    */
   void ScrollTo(const Vector3& position, float duration);
 
+  /**
+   * @brief Set whether to enable automatic refresh or not. When refresh is disabled,
+   * ItemView will not automatically refresh the cache in the given interval when the
+   * layout position is changed. This is useful in some cases, for example, automatic
+   * refresh is not needed during fast scrolling, otherwise it will cache unneeded
+   * items when the layout position changes quickly.
+   *
+   * @param[in] enabled True to enable automatic refresh or false to disable it.
+   */
+  void SetRefreshEnabled(bool enabled);
+
+  /**
+   * @brief Helper to perform the refresh.
+   *
+   * @param[in] currentLayoutPosition The current layout position.
+   * @param[in] cacheExtra Whether to cache extra items during refresh.
+   */
+  void DoRefresh(float currentLayoutPosition, bool cacheExtra);
+
 private:
 
   /**
@@ -379,7 +398,7 @@ private:
    * @param[in] range The range of items.
    * @param[in] reserveExtra True if reserve items should be included.
    */
-  ItemRange GetItemRange(ItemLayout& layout, const Vector3& layoutSize, bool reserveExtra);
+  ItemRange GetItemRange(ItemLayout& layout, const Vector3& layoutSize, float layoutPosition, bool reserveExtra);
 
   // Input Handling
 
@@ -543,6 +562,8 @@ private:
   Property::Index mPropertyPosition; ///< The physical position of the first item within the layout
   Property::Index mPropertyMinimumLayoutPosition; ///< The minimum valid layout position in the layout.
   Property::Index mPropertyScrollSpeed; ///< The current scroll speed of item view
+
+  bool mRefreshEnabled; ///< Whether to refresh the cache automatically
 };
 
 } // namespace Internal

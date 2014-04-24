@@ -15,6 +15,7 @@
 //
 
 #include <dali-toolkit/internal/controls/scroll-bar/scroll-bar-impl.h>
+#include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
 
 using namespace Dali;
 
@@ -26,6 +27,7 @@ const Vector4 DEFAULT_INDICATOR_NINE_PATCH_BORDER(0.0f, 12.0f, 14.0f, 14.0f);
 const float DEFAULT_SLIDER_DEPTH(1.0f);
 const float INDICATOR_SHOW_TIME(0.5f);
 const float INDICATOR_HIDE_TIME(0.5f);
+const float DEFAULT_PAN_GESTURE_PROCESS_TIME(16.7f); // 16.7 milliseconds, i.e. one frame
 
 /**
  * Indicator size constraint
@@ -126,7 +128,9 @@ TypeRegistration mType( typeid(Toolkit::ScrollBar), typeid(Toolkit::Control), Cr
 }
 
 ScrollBar::ScrollBar()
-: mScrollStart(0.0f)
+: mScrollStart(0.0f),
+  mIsPanning(false),
+  mCurrentScrollPosition(0.0f)
 {
 }
 
@@ -274,6 +278,21 @@ void ScrollBar::Hide()
   mAnimation.Play();
 }
 
+bool ScrollBar::OnPanGestureProcessTick()
+{
+  // Update the scroll position property.
+  mScrollPositionObject.SetProperty( Toolkit::ScrollConnector::SCROLL_POSITION, mCurrentScrollPosition );
+
+  Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(Self().GetParent());
+  if(itemView)
+  {
+    // Refresh ItemView immediately when the scroll position is changed.
+    GetImpl(itemView).DoRefresh(mCurrentScrollPosition, false); // No need to cache extra items.
+  }
+
+  return true;
+}
+
 void ScrollBar::OnPan( PanGesture gesture )
 {
   if(mScrollPositionObject)
@@ -282,9 +301,19 @@ void ScrollBar::OnPan( PanGesture gesture )
     {
       case Gesture::Started:
       {
+        if( !mTimer )
+        {
+          // Make sure the pan gesture is only being processed once per frame.
+          mTimer = Timer::New( DEFAULT_PAN_GESTURE_PROCESS_TIME );
+          mTimer.TickSignal().Connect( this, &ScrollBar::OnPanGestureProcessTick );
+          mTimer.Start();
+        }
+
         Show();
         mScrollStart = mScrollPositionObject.GetProperty<float>( Toolkit::ScrollConnector::SCROLL_POSITION );
         mGestureDisplacement = Vector3::ZERO;
+        mIsPanning = true;
+
         break;
       }
       case Gesture::Continuing:
@@ -294,15 +323,32 @@ void ScrollBar::OnPan( PanGesture gesture )
 
         Vector3 span = Self().GetCurrentSize() - mIndicator.GetCurrentSize();
         const float domainSize = fabs(mScrollConnector.GetMaxLimit() - mScrollConnector.GetMinLimit());
-        float position = mScrollStart - mGestureDisplacement.y * domainSize / span.y;
-        position = std::min(mScrollConnector.GetMaxLimit(), std::max(position, mScrollConnector.GetMinLimit()));
-        mScrollPositionObject.SetProperty( Toolkit::ScrollConnector::SCROLL_POSITION, position );
+        mCurrentScrollPosition = mScrollStart - mGestureDisplacement.y * domainSize / span.y;
+        mCurrentScrollPosition = std::min(mScrollConnector.GetMaxLimit(), std::max(mCurrentScrollPosition, mScrollConnector.GetMinLimit()));
+
         break;
       }
       default:
       {
+        mIsPanning = false;
+
+        if( mTimer )
+        {
+          // Destroy the timer when pan gesture is finished.
+          mTimer.Stop();
+          mTimer.TickSignal().Disconnect( this, &ScrollBar::OnPanGestureProcessTick );
+          mTimer.Reset();
+        }
+
         break;
       }
+    }
+
+    Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(Self().GetParent());
+    if(itemView)
+    {
+      // Disable automatic refresh in ItemView during fast scrolling
+      GetImpl(itemView).SetRefreshEnabled(!mIsPanning);
     }
   }
 }
