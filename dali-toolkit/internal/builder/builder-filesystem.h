@@ -18,6 +18,9 @@
 //
 
 // EXTERNAL INCLUDES
+#include <string>
+#include <fstream>
+
 #include <wordexp.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -43,6 +46,12 @@ inline std::string ExePath(void)
   char buf[256];
   readlink("/proc/self/exe", buf, sizeof(buf));
   return std::string(buf);
+}
+
+inline std::string GetFileContents(const std::string &fn)
+{
+  std::ifstream t(fn.c_str());
+  return std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
 }
 
 #endif // __DALI_TOOLKIT_INTERNAL_BUILDER_FILESYSTEM_H__

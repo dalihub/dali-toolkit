@@ -25,6 +25,7 @@
 #include <dali/integration-api/debug.h>
 
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/public-api/builder/json-parser.h>
 
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
 #include <dali-toolkit/internal/builder/builder-filesystem.h>
@@ -57,6 +58,14 @@ Integration::Log::Filter* gFilterScript  = Integration::Log::Filter::New(Debug::
 
 namespace
 {
+
+const std::string KEYNAME_STYLES    = "styles";
+const std::string KEYNAME_TYPE      = "type";
+const std::string KEYNAME_ACTORS    = "actors";
+const std::string KEYNAME_SIGNALS   = "signals";
+const std::string KEYNAME_NAME      = "name";
+const std::string KEYNAME_TEMPLATES = "templates";
+const std::string KEYNAME_INCLUDES  = "includes";
 
 typedef std::vector<const TreeNode*> TreeNodeList;
 
@@ -169,9 +178,41 @@ std::string PropertyValueToString( const Property::Value& value )
 }
 
 /*
+ * Recursively collects all stylesin a node (An array of style names).
+ *
+ * stylesCollection The set of styles from the json file (a json object of named styles)
+ * style The style array to begin the collection from
+ * styleList The style list to add nodes to apply
+ */
+void CollectAllStyles( const TreeNode& stylesCollection, const TreeNode& style, TreeNodeList& styleList )
+{
+  // style is an array of style names
+  if( TreeNode::ARRAY == style.GetType() )
+  {
+    for(TreeNode::ConstIterator iter = style.CBegin(); iter != style.CEnd(); ++iter)
+    {
+      if( OptionalString styleName = IsString( (*iter).second ) )
+      {
+        if( OptionalChild node = IsChild( stylesCollection, *styleName) )
+        {
+          styleList.push_back( &(*node) );
+
+          if( OptionalChild subStyle = IsChild( *node, KEYNAME_STYLES ) )
+          {
+            CollectAllStyles( stylesCollection, *subStyle, styleList );
+          }
+        }
+      }
+    }
+  }
+}
+
+} // namespace anon
+
+/*
  * Sets the handle properties found in the tree node
  */
-void SetProperties( const TreeNode& node, Handle& handle, Builder& builder, const Replacement& constant )
+void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replacement& constant )
 {
   if( handle )
   {
@@ -182,7 +223,7 @@ void SetProperties( const TreeNode& node, Handle& handle, Builder& builder, cons
       std::string key( keyChild.first );
 
       // ignore special fields; type,actors,signals
-      if(key == "type" || key == "actors" || key == "signals")
+      if(key == KEYNAME_TYPE || key == KEYNAME_ACTORS || key == KEYNAME_SIGNALS || key == KEYNAME_STYLES)
       {
         continue;
       }
@@ -198,7 +239,7 @@ void SetProperties( const TreeNode& node, Handle& handle, Builder& builder, cons
           {
             if( OptionalString s = constant.IsString( keyChild.second ) )
             {
-              FrameBufferImage fb = builder.GetFrameBufferImage(*s, constant);
+              FrameBufferImage fb = GetFrameBufferImage(*s, constant);
               if(fb)
               {
                 imageActor.SetImage( fb );
@@ -215,7 +256,7 @@ void SetProperties( const TreeNode& node, Handle& handle, Builder& builder, cons
         OptionalString s = constant.IsString( keyChild.second );
         if(actor && s)
         {
-          ShaderEffect e = builder.GetShaderEffect(*s, constant);
+          ShaderEffect e = GetShaderEffect(*s, constant);
           actor.SetShaderEffect(e);
         }
         else
@@ -259,108 +300,150 @@ void SetProperties( const TreeNode& node, Handle& handle, Builder& builder, cons
   }
 }
 
-/*
- * Split a string by delimiter
- */
-std::vector<std::string> SplitString(const std::string &s, char delim, std::vector<std::string> &elems)
+// Set properties from node on handle.
+void Builder::ApplyProperties( const TreeNode& root, const TreeNode& node,
+                               Dali::Handle& handle, const Replacement& constant )
 {
-  std::stringstream ss(s);
-  std::string item;
-  while(std::getline(ss, item, delim))
+  if( Actor actor = Actor::DownCast(handle) )
   {
-    elems.push_back(item);
-  }
-  return elems;
-}
+    SetProperties( node, actor, constant );
 
-/*
- * Recursively collects all styles listed in a json node 'type' field. (Could be a comma separated list).
- * It also returns the first found base typeInfo from the TypeRegistry. This is the concrete object to instance.
- * i.e. the type field can name a json style section or a TypeRegistry base type.
- */
-void CollectAllStyles( const TreeNode& styles, const std::string& typeStyleString, TreeNodeList& additionalStyles, TypeInfo& typeInfo )
-{
-  typedef std::vector<std::string> StyleNames;
-  StyleNames styleNames;
-
-  SplitString(typeStyleString, ',', styleNames);
-
-  for(StyleNames::iterator iter = styleNames.begin(); iter != styleNames.end(); ++iter)
-  {
-    const std::string typeName(*iter);
-
-    OptionalChild style = IsChild(styles, typeName);
-    if(style)
+    if( actor )
     {
-      additionalStyles.push_back(&(*style));
+      SetupActor( node, actor );
 
-      OptionalString styleType = IsString( IsChild(*style, "type") );
-      if( styleType )
+      Control control  = Control::DownCast(actor);
+
+      if( control )
       {
-        CollectAllStyles(styles, *styleType, additionalStyles, typeInfo);
+        SetupControl( node, control );
       }
-      else
-      {
-        if(!typeInfo)
-        {
-          // if its not a style then check for a type but only the first found
-          typeInfo = TypeRegistry::Get().GetTypeInfo( typeName );
-        }
-      }
-    }
-    else
-    {
-      DALI_ASSERT_DEBUG(!typeInfo);
-      typeInfo = TypeRegistry::Get().GetTypeInfo( typeName );
-    }
-  }
-}
 
-/*
- * Recursively collects all styles listed in a json node 'type' field. (Could be a comma separated list).
- * Adds the given node to the end of the additional styles list.
- * It also returns the first found base typeInfo from the TypeRegistry. This is the concrete object to instance.
- * i.e. the type field can name a json style section or a TypeRegistry base type.
- */
-void CollectAllStyles( const OptionalChild& optionalStyles, const TreeNode& node, TreeNodeList& additionalStyles, TypeInfo& typeInfo )
-{
-  OptionalString type = IsString( IsChild(node, "type") );
+      // add signals
+      SetupSignalAction( mSlotDelegate.GetConnectionTracker(), root, node, actor );
 
-  if(!type)
-  {
-    DALI_SCRIPT_WARNING("Cannot create style as type section is missing\n");
+      SetupPropertyNotification( mSlotDelegate.GetConnectionTracker(), root, node, actor );
+   }
   }
   else
   {
-    additionalStyles.push_back(&node);
-
-    if( optionalStyles )
-    {
-      CollectAllStyles( *optionalStyles, *type, additionalStyles, typeInfo );
-    }
-    else
-    {
-      typeInfo = TypeRegistry::Get().GetTypeInfo( *type );
-    }
-
+    SetProperties( node, handle, constant );
   }
 }
 
-} // namespace anon
+// Appling by style helper
+// use FindChildByName() to apply properties referenced in KEYNAME_ACTORS in the node
+void Builder::ApplyStylesByActor(  const TreeNode& root, const TreeNode& node,
+                                   Dali::Handle& handle, const Replacement& constant )
+{
+  if( Dali::Actor actor = Dali::Actor::DownCast( handle ) )
+  {
+    if( const TreeNode* actors = node.GetChild( KEYNAME_ACTORS ) )
+    {
+      // in a style the actor subtree properties referenced by actor name
+      for( TreeConstIter iter = actors->CBegin(); iter != actors->CEnd(); ++iter )
+      {
+        Dali::Actor foundActor;
+
+        if( (*iter).first )
+        {
+          foundActor = actor.FindChildByName( (*iter).first );
+        }
+
+        if( !foundActor )
+        {
+          // debug log cannot find searched for actor
+#if defined(DEBUG_ENABLED)
+          DALI_SCRIPT_VERBOSE("Cannot find actor in style application '%s'\n", (*iter).first);
+#endif
+        }
+        else
+        {
+#if defined(DEBUG_ENABLED)
+          DALI_SCRIPT_VERBOSE("Styles applied to actor '%s'\n", (*iter).first);
+#endif
+          ApplyProperties( root, (*iter).second, foundActor, constant );
+        }
+      }
+    }
+  }
+}
+
+
+void Builder::ApplyAllStyleProperties( const TreeNode& root, const TreeNode& node,
+                                       Dali::Handle& handle, const Replacement& constant )
+{
+  OptionalChild styles = IsChild(root, KEYNAME_STYLES);
+  OptionalChild style  = IsChild(node, KEYNAME_STYLES);
+
+  if( styles && style )
+  {
+    TreeNodeList additionalStyles;
+
+    CollectAllStyles( *styles, *style, additionalStyles );
+
+#if defined(DEBUG_ENABLED)
+    for(TreeNode::ConstIterator iter = (*style).CBegin(); iter != (*style).CEnd(); ++iter)
+    {
+      if( OptionalString styleName = IsString( (*iter).second ) )
+      {
+        DALI_SCRIPT_VERBOSE("Style Applied '%s'\n", (*styleName).c_str());
+      }
+    }
+#endif
+
+    // a style may have other styles, which has other styles etc so we apply in reverse by convention.
+    for(TreeNodeList::reverse_iterator iter = additionalStyles.rbegin(); iter != additionalStyles.rend(); ++iter)
+    {
+      ApplyProperties( root, *(*iter), handle, constant );
+
+      ApplyStylesByActor( root, *(*iter), handle, constant );
+    }
+  }
+
+  // applying given node last
+  ApplyProperties( root, node, handle, constant );
+
+  ApplyStylesByActor( root, node, handle, constant );
+
+}
+
 
 /*
  * Create a dali type from a node.
  * If parent given and an actor type was created then add it to the parent and
  * recursively add nodes children.
  */
-BaseHandle Builder::Create( const OptionalChild& optionalStyles, const TreeNode& node, const TreeNode& root, Actor parent,
-                            const Replacement& replacements )
+BaseHandle Builder::DoCreate( const TreeNode& root, const TreeNode& node,
+                              Actor parent, const Replacement& replacements )
 {
   BaseHandle baseHandle;
-  TreeNodeList allStyles;
   TypeInfo typeInfo;
+  const TreeNode* templateNode = NULL;
 
-  CollectAllStyles( optionalStyles, node, allStyles, typeInfo );
+  if( OptionalString typeName = IsString(node, KEYNAME_TYPE) )
+  {
+    typeInfo = TypeRegistry::Get().GetTypeInfo( *typeName );
+
+    if( !typeInfo )
+    {
+      // a template name is also allowed inplace of the type name
+      OptionalChild templates = IsChild( root, KEYNAME_TEMPLATES);
+
+      if( templates )
+      {
+        if( OptionalChild isTemplate = IsChild( *templates, *typeName ) )
+        {
+          templateNode = &(*isTemplate);
+
+          if( OptionalString templateTypeName = IsString(*templateNode, KEYNAME_TYPE) )
+          {
+            typeInfo = TypeRegistry::Get().GetTypeInfo( *templateTypeName );
+          }
+        }
+      }
+    }
+  }
 
   if(!typeInfo)
   {
@@ -377,7 +460,6 @@ BaseHandle Builder::Create( const OptionalChild& optionalStyles, const TreeNode&
     {
 
       DALI_SCRIPT_VERBOSE("Create:%s\n", typeInfo.GetName().c_str());
-      DALI_SCRIPT_VERBOSE("  %d style sections\n", allStyles.size());
 
 #if defined(DEBUG_ENABLED)
       if(handle)
@@ -397,82 +479,42 @@ BaseHandle Builder::Create( const OptionalChild& optionalStyles, const TreeNode&
       }
 #endif // DEBUG_ENABLED
 
-      for(TreeNodeList::reverse_iterator iter = allStyles.rbegin(); iter != allStyles.rend(); ++iter)
+      if( templateNode )
       {
-        if( (*iter)->GetType() == TreeNode::ARRAY )
-        {
-          // if its an array then its a list of styles to set to objects already in the hiearchy by name
-          if( actor )
-          {
-            const TreeNode& styleList = *(*iter);
-            for( TreeNode::ConstIterator iterSubStyle = styleList.CBegin(); iterSubStyle != styleList.CEnd(); ++iterSubStyle )
-            {
-              const TreeNode* nameNode = (*iterSubStyle).second.Find("name");
-              if( nameNode && nameNode->GetType() == TreeNode::STRING )
-              {
-                Dali::Actor found = actor.FindChildByName( nameNode->GetString() );
-                if( found )
-                {
-                  SetProperties( (*iterSubStyle).second, found, *this, replacements );
-                }
-                else
-                {
-                  DALI_SCRIPT_VERBOSE("Cannot find object '%s' in tree to style\n", nameNode->GetString());
-                }
-              }
-              else
-              {
-                DALI_SCRIPT_VERBOSE("Style name is not a string '%s' '%d'\n",
-                                    nameNode->GetString(), (*iterSubStyle).second.GetType());
-              }
-            }
-          }
-          else
-          {
-            DALI_SCRIPT_VERBOSE("Cannot apply style list to non actor\n");
-          }
-        }
-        else
-        {
-          DALI_ASSERT_DEBUG( (*iter)->GetType() == TreeNode::OBJECT );
-          // else it should be a map of properties
-          SetProperties( *(*iter), handle, *this, replacements  );
-        }
+        ApplyProperties( root, *templateNode, handle, replacements );
 
-        if( actor )
+        if( OptionalChild actors = IsChild( *templateNode, KEYNAME_ACTORS ) )
         {
-          SetupActor( *(*iter), actor);
-
-          if( control )
+          for( TreeConstIter iter = (*actors).CBegin(); iter != (*actors).CEnd(); ++iter )
           {
-            SetupControl( *(*iter), control);
-          }
-
-          // add children of all the styles
-          if( OptionalChild actors = IsChild( *(*iter), "actors" ) )
-          {
-            for( TreeConstIter iter = (*actors).CBegin(); iter != (*actors).CEnd(); ++iter )
-            {
-              Create( optionalStyles, (*iter).second, root, actor, replacements );
-            }
+            DoCreate( root, (*iter).second, actor, replacements );
           }
         }
       }
 
-      if( actor )
-      {
-        // add signals first
-        SetupSignalAction( mSlotDelegate.GetConnectionTracker(), root, node, actor );
+      ApplyProperties( root, node, handle, replacements );
 
-        SetupPropertyNotification( mSlotDelegate.GetConnectionTracker(), root, node, actor );
+      if( actor)
+      {
+        // add children of all the styles
+        if( OptionalChild actors = IsChild( node, KEYNAME_ACTORS ) )
+        {
+          for( TreeConstIter iter = (*actors).CBegin(); iter != (*actors).CEnd(); ++iter )
+          {
+            DoCreate( root, (*iter).second, actor, replacements );
+          }
+        }
+
+        // apply style on top as they need the children to exist
+        ApplyAllStyleProperties( root, node, actor, replacements );
 
         // then add to parent
         if( parent )
         {
           parent.Add( actor );
         }
-
       }
+
     }
     else
     {
@@ -557,12 +599,14 @@ void Builder::SetupTask( RenderTask& task, const TreeNode& node, const Replaceme
   }
 
   // other setup is via the property system
-  SetProperties( node, task, *this, constant  ); // @ todo, remove 'source-actor', 'camera-actor'?
+  SetProperties( node, task, constant ); // @ todo, remove 'source-actor', 'camera-actor'?
 
 }
 
 void Builder::CreateRenderTask( const std::string &name )
 {
+  DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
+
   Replacement constant(mReplacementMap);
 
   const Stage& stage = Stage::GetCurrent();
@@ -608,12 +652,14 @@ void Builder::CreateRenderTask( const std::string &name )
 
 ShaderEffect Builder::GetShaderEffect( const std::string &name)
 {
-  Replacement constant;
+  Replacement constant( mReplacementMap );
   return GetShaderEffect( name, constant );
 }
 
 ShaderEffect Builder::GetShaderEffect( const std::string &name, const Replacement& constant )
 {
+  DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
+
   ShaderEffect ret;
 
   ShaderEffectLut::const_iterator iter( mShaderEffectLut.find( name ) );
@@ -642,12 +688,14 @@ ShaderEffect Builder::GetShaderEffect( const std::string &name, const Replacemen
 
 FrameBufferImage Builder::GetFrameBufferImage( const std::string &name )
 {
-  Replacement constant;
+  Replacement constant( mReplacementMap );
   return GetFrameBufferImage(name, constant);
 }
 
 FrameBufferImage Builder::GetFrameBufferImage( const std::string &name, const Replacement& constant )
 {
+  DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
+
   FrameBufferImage ret;
 
   ImageLut::const_iterator iter( mFrameBufferImageLut.find( name ) );
@@ -664,7 +712,7 @@ FrameBufferImage Builder::GetFrameBufferImage( const std::string &name, const Re
         Dali::Property::Value propertyMap(Property::MAP);
         if( SetPropertyFromNode( *image, Property::MAP, propertyMap, constant ) )
         {
-          propertyMap.SetValue("type", Property::Value(std::string("FrameBufferImage")));
+          propertyMap.SetValue(KEYNAME_TYPE, Property::Value(std::string("FrameBufferImage")));
           ret = Dali::Scripting::NewImage( propertyMap );
           mFrameBufferImageLut[ name ] = ret;
         }
@@ -708,19 +756,19 @@ void Builder::AddActors( Actor toActor )
 
 void Builder::AddActors( const std::string &sectionName, Actor toActor )
 {
+  DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
+
   PropertyValueMap overrideMap;
   Replacement replacements(overrideMap, mReplacementMap);
 
-  OptionalChild addToStage = IsChild(*mParser.GetRoot(), sectionName);
+  OptionalChild add = IsChild(*mParser.GetRoot(), sectionName);
 
-  if( addToStage )
+  if( add )
   {
-    OptionalChild styles = IsChild(*mParser.GetRoot(), "styles");
-
-    for( TreeNode::ConstIterator iter = (*addToStage).CBegin(); iter != (*addToStage).CEnd(); ++iter )
+    for( TreeNode::ConstIterator iter = (*add).CBegin(); iter != (*add).CEnd(); ++iter )
     {
       // empty actor adds directly to the stage
-      BaseHandle baseHandle = Create( styles, (*iter).second, *mParser.GetRoot(), Actor(), replacements );
+      BaseHandle baseHandle = DoCreate( *mParser.GetRoot(), (*iter).second, Actor(), replacements );
       Actor actor = Actor::DownCast(baseHandle);
       if(actor)
       {
@@ -745,6 +793,8 @@ void Builder::AddActors( const std::string &sectionName, Actor toActor )
 
 Animation Builder::CreateAnimation( const std::string& animationName, const Replacement& replacement, Dali::Actor sourceActor )
 {
+  DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
+
   Animation anim;
 
   if( OptionalChild animations = IsChild(*mParser.GetRoot(), "animations") )
@@ -796,20 +846,55 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
 {
   DALI_ASSERT_ALWAYS( format == Dali::Toolkit::Builder::JSON && "Currently only JSON is supported" );
 
-  if( !mParser.Parse(data) )
+  // parser to get constants and includes only
+  Dali::Toolkit::JsonParser parser = Dali::Toolkit::JsonParser::New();
+
+  if( !parser.Parse( data ) )
   {
     DALI_LOG_WARNING( "JSON Parse Error:%d:%d:'%s'\n",
-                      mParser.GetErrorLineNumber(),
-                      mParser.GetErrorColumn(),
-                      mParser.GetErrorDescription().c_str() );
+                      parser.GetErrorLineNumber(),
+                      parser.GetErrorColumn(),
+                      parser.GetErrorDescription().c_str() );
 
     DALI_ASSERT_ALWAYS(!"Cannot parse JSON");
+
+  }
+  else
+  {
+    // load constant map (allows the user to override the constants in the json after loading)
+    LoadConstants( *parser.GetRoot(), mReplacementMap );
+
+    // merge includes
+    if( OptionalChild includes = IsChild(*parser.GetRoot(), KEYNAME_INCLUDES) )
+    {
+      Replacement replacer( mReplacementMap );
+
+      for(TreeNode::ConstIterator iter = (*includes).CBegin(); iter != (*includes).CEnd(); ++iter)
+      {
+        OptionalString filename = replacer.IsString( (*iter).second );
+
+        if( filename )
+        {
+#if defined(DEBUG_ENABLED)
+          DALI_SCRIPT_VERBOSE("Loading Include '%s'\n", (*filename).c_str());
+#endif
+          LoadFromString( GetFileContents(*filename) );
+        }
+      }
+    }
+
+    if( !mParser.Parse( data ) )
+    {
+      DALI_LOG_WARNING( "JSON Parse Error:%d:%d:'%s'\n",
+                        mParser.GetErrorLineNumber(),
+                        mParser.GetErrorColumn(),
+                        mParser.GetErrorDescription().c_str() );
+
+      DALI_ASSERT_ALWAYS(!"Cannot parse JSON");
+    }
   }
 
   DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Cannot parse JSON");
-
-  // load constant map (allows the user to override the constants in the json after loading)
-  LoadConstants();
 
 }
 
@@ -845,11 +930,11 @@ const Property::Value& Builder::GetConstant( const std::string& key ) const
   }
 }
 
-void Builder::LoadConstants()
+void Builder::LoadConstants( const TreeNode& root, PropertyValueMap& intoMap )
 {
-  Replacement replacer(mReplacementMap);
+  Replacement replacer(intoMap);
 
-  if( OptionalChild constants = IsChild(*mParser.GetRoot(), "constants") )
+  if( OptionalChild constants = IsChild(root, "constants") )
   {
     for(TreeNode::ConstIterator iter = (*constants).CBegin();
         iter != (*constants).CEnd(); ++iter)
@@ -862,7 +947,7 @@ void Builder::LoadConstants()
 #endif
         if( SetPropertyFromNode( (*iter).second, property, replacer ) )
         {
-          mReplacementMap[ (*iter).second.GetName() ] = property;
+          intoMap[ (*iter).second.GetName() ] = property;
         }
         else
         {
@@ -874,8 +959,8 @@ void Builder::LoadConstants()
   }
 
 #if defined(DEBUG_ENABLED)
-  PropertyValueMap::const_iterator iter = mReplacementMap.find( "CONFIG_SCRIPT_LOG_LEVEL" );
-  if( iter != mReplacementMap.end() && (*iter).second.GetType() == Property::STRING )
+  PropertyValueMap::const_iterator iter = intoMap.find( "CONFIG_SCRIPT_LOG_LEVEL" );
+  if( iter != intoMap.end() && (*iter).second.GetType() == Property::STRING )
   {
     std::string logLevel( (*iter).second.Get< std::string >() );
     if( logLevel == "NoLogging" )
@@ -901,110 +986,64 @@ void Builder::LoadConstants()
 
 void Builder::ApplyStyle( const std::string& styleName, Handle& handle )
 {
-  Replacement replacer;
+  Replacement replacer( mReplacementMap );
   ApplyStyle( styleName, handle, replacer );
 }
 
 void Builder::ApplyStyle( const std::string& styleName, Handle& handle, const Replacement& replacement )
 {
-  OptionalChild styles = IsChild(*mParser.GetRoot(), "styles");
+  DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
 
-  if( styles )
+  OptionalChild styles = IsChild( *mParser.GetRoot(), KEYNAME_STYLES );
+  OptionalChild style  = IsChild( *styles, styleName );
+
+  if( styles && style )
   {
-    if( OptionalChild style = IsChild(*styles, styleName) )
-    {
-      TreeNodeList allStyles;
-      TypeInfo typeInfo;
-
-      CollectAllStyles( styles, *style, allStyles, typeInfo );
-
-      for(TreeNodeList::reverse_iterator iter = allStyles.rbegin(); iter != allStyles.rend(); ++iter)
-      {
-        if( (*iter)->GetType() == TreeNode::ARRAY )
-        {
-          // if its an array then its a list of styles to set to objects already in the hiearchy by name
-          if( Dali::Actor actor = Dali::Actor::DownCast( handle ) )
-          {
-            const TreeNode& styleList = *(*iter);
-            for( TreeNode::ConstIterator iterSubStyle = styleList.CBegin(); iterSubStyle != styleList.CEnd(); ++iterSubStyle )
-            {
-              const TreeNode* nameNode = (*iterSubStyle).second.Find("name");
-              if( nameNode && nameNode->GetType() == TreeNode::STRING )
-              {
-                Dali::Actor found = actor.FindChildByName( nameNode->GetString() );
-                if( found )
-                {
-                  SetProperties( (*iterSubStyle).second, found, *this, replacement );
-                }
-                else
-                {
-                  DALI_SCRIPT_VERBOSE("Cannot find object '%s' in tree to style\n", nameNode->GetString());
-                }
-              }
-              else
-              {
-                DALI_SCRIPT_VERBOSE("Style name is not a string '%s' '%d'\n",
-                                    nameNode->GetString(), (*iterSubStyle).second.GetType());
-              }
-            }
-          }
-          else
-          {
-            DALI_SCRIPT_VERBOSE("Cannot apply style list to non actor\n");
-          }
-        }
-        else
-        {
-          DALI_ASSERT_DEBUG( (*iter)->GetType() == TreeNode::OBJECT );
-          SetProperties( *style, handle, *this, replacement );
-        }
-      }
-    }
-    else
-    {
-      DALI_SCRIPT_WARNING("Could not find style:%s\n", styleName.c_str());
-    }
+    ApplyAllStyleProperties( *mParser.GetRoot(), *style, handle, replacement );
   }
   else
   {
-    DALI_SCRIPT_WARNING("No style section available for style:%s\n", styleName.c_str());
+    DALI_SCRIPT_WARNING("No styles section to create style '%s'\n", styleName.c_str());
   }
+
 }
 
-BaseHandle Builder::CreateFromStyle( const std::string& styleName, const PropertyValueMap& map )
+BaseHandle Builder::Create( const std::string& templateName, const PropertyValueMap& map )
 {
   Replacement replacement( map, mReplacementMap );
-  return CreateFromStyle( styleName, replacement );
+  return Create( templateName, replacement );
 }
 
-BaseHandle Builder::CreateFromStyle( const std::string& styleName, const Replacement& constant )
+BaseHandle Builder::Create( const std::string& templateName, const Replacement& constant )
 {
+  DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
+
   BaseHandle baseHandle;
 
-  OptionalChild styles = IsChild(*mParser.GetRoot(), "styles");
+  OptionalChild templates = IsChild(*mParser.GetRoot(), KEYNAME_TEMPLATES);
 
-  if( !styles )
+  if( !templates )
   {
-    DALI_SCRIPT_WARNING("No style section found to CreateFromStyle\n");
+    DALI_SCRIPT_WARNING("No template section found to CreateFromTemplate\n");
   }
   else
   {
-    OptionalChild style = IsChild(*styles, styleName);
-    if(!style)
+    OptionalChild childTemplate = IsChild(*templates, templateName);
+    if(!childTemplate)
     {
-      DALI_SCRIPT_WARNING("Style '%s' does not exist in style section\n", styleName.c_str());
+      DALI_SCRIPT_WARNING("Template '%s' does not exist in template section\n", templateName.c_str());
     }
     else
     {
-      OptionalString type = constant.IsString( IsChild(*style, "type") );
+      OptionalString type = constant.IsString( IsChild(*childTemplate, KEYNAME_TYPE) );
 
       if(!type)
       {
-        DALI_SCRIPT_WARNING("Cannot create style '%s' as style section is missing 'type'\n", styleName.c_str());
+        DALI_SCRIPT_WARNING("Cannot create template '%s' as template section is missing 'type'\n", templateName.c_str());
       }
       else
       {
-        baseHandle = Create( styles, *style, *mParser.GetRoot(), Actor(), constant );
+        baseHandle = DoCreate( *mParser.GetRoot(), *childTemplate, Actor(), constant );
       }
     }
   }
@@ -1013,11 +1052,10 @@ BaseHandle Builder::CreateFromStyle( const std::string& styleName, const Replace
 }
 
 
-BaseHandle Builder::CreateFromStyle( const std::string& styleName )
+BaseHandle Builder::Create( const std::string& templateName )
 {
-  PropertyValueMap overrideMap;
-  Replacement replacement( overrideMap, mReplacementMap );
-  return CreateFromStyle( styleName, replacement );
+  Replacement replacement( mReplacementMap );
+  return Create( templateName, replacement );
 }
 
 Builder::Builder()

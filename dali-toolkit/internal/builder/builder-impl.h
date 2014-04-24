@@ -119,16 +119,16 @@ public:
   Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor sourceActor );
 
   /**
-   * @copydoc Toolkit::Builder::CreateFromStyle( const std::string& styleName );
+   * @copydoc Toolkit::Builder::Create( const std::string& templateName );
    */
-  BaseHandle CreateFromStyle( const std::string& styleName );
+  BaseHandle Create( const std::string& templateName );
 
   /**
-   * @copydoc Toolkit::Builder::CreateFromStyle( const std::string& styleName, const PropertyValueMap& map );
+   * @copydoc Toolkit::Builder::Create( const std::string& templateName, const PropertyValueMap& map );
    */
-  BaseHandle CreateFromStyle( const std::string& styleName, const PropertyValueMap& map );
+  BaseHandle Create( const std::string& templateName, const PropertyValueMap& map );
 
-  /**
+ /**
    * @copydoc Toolkit::Builder::GetFont
    */
   Font GetFont(const std::string &name) const;
@@ -152,6 +152,8 @@ public:
    * @copydoc Toolkit::Builder::ApplyStyle
    */
   void ApplyStyle( const std::string& styleName, Handle& handle );
+
+  void AnimateTo( const std::string& styleName, Handle& handle );
 
   /**
    * @copydoc Toolkit::Builder::AddActors
@@ -222,16 +224,29 @@ private:
 
   PropertyValueMap mReplacementMap;
 
-  BaseHandle Create( const OptionalChild& optionalStyles, const TreeNode& node, const TreeNode& root, Actor parent,
-                     const Replacement& replacement );
+  BaseHandle Create( const std::string& templateName, const Replacement& constant );
 
-  void LoadConstants();
+  BaseHandle DoCreate( const TreeNode& root, const TreeNode& node, Actor parent, const Replacement& replacements );
+
+  void LoadConstants( const TreeNode& root, PropertyValueMap& intoMap );
+
+  void LoadIncludes( const std::string& data );
 
   void ApplyStyle( const std::string& styleName, Handle& handle, const Replacement& replacement);
 
   Animation CreateAnimation( const std::string& animationName, const Replacement& replacement, Dali::Actor sourceActor );
 
-  BaseHandle CreateFromStyle( const std::string& styleName, const Replacement& replacement );
+  void ApplyProperties( const TreeNode& root, const TreeNode& node,
+                        Dali::Handle& handle, const Replacement& constant );
+
+  void ApplyStylesByActor( const TreeNode& root, const TreeNode& node,
+                           Dali::Handle& handle, const Replacement& constant );
+
+  void ApplyAllStyleProperties( const TreeNode& root, const TreeNode& node,
+                                Dali::Handle& handle, const Replacement& constant );
+
+  void SetProperties( const TreeNode& node, Handle& handle, const Replacement& constant );
+
 };
 
 } // namespace Internal

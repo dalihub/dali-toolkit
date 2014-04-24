@@ -79,8 +79,8 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
  * // 1) load all actors in the "stage" section to the root layer
  * builder.AddActors( Stage::GetCurrent().GetRootLayer() );
  *
- * // or 2) create an actor from the library "styles" section
- * TextActor actor = TextActor::DownCast( builder.CreateFromStyle( "default-text" ) );
+ * // or 2) create an actor from the library "templates" section
+ * TextActor actor = TextActor::DownCast( builder.Create( "default-text" ) );
  *
  * @endcode
  */
@@ -210,7 +210,7 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
    *
    * The animation is applied to a specific actor.
    * e.g.
-   *   Actor myInstance = builder.CreateFromStyle( "template-actor-tree" )
+   *   Actor myInstance = builder.Create( "template-actor-tree" )
    *   Animation a = builder.CreateAnimation( "wobble", myInstance );
    *
    * @pre The Builder has been initialized.
@@ -229,7 +229,7 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
    * e.g.
    *   PropertyValueMap map;
    *   map["ACTOR"] = actor.GetName();       // replaces '{ACTOR} in the template
-   *   Actor myInstance = builder.CreateFromStyle( "template-actor-tree" )
+   *   Actor myInstance = builder.Create( "template-actor-tree" )
    *   Animation a = builder.CreateAnimation( "wobble", myInstance);
    *
    * @pre The Builder has been initialized.
@@ -244,19 +244,29 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
   Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor sourceActor );
 
   /**
+   * @deprecated Use Create()
+   */
+  BaseHandle CreateFromStyle( const std::string& styleName );
+
+  /**
+   * @deprecated Use Create()
+   */
+  BaseHandle CreateFromStyle( const std::string& styleName, const PropertyValueMap& map );
+
+  /**
    * @brief Creates an object (e.g. an actor) from the set of known style templates
    *
    * e.g.
-   *   mActor.Add( Actor::DownCast(builder.CreateFromStyle( "default-text")) );
+   *   mActor.Add( Actor::DownCast(builder.Create( "default-text")) );
    *
    * @pre The Builder has been initialized.
    * @pre Preconditions have been met for creating dali objects ie Images, Actors etc
-   * @pre The styleName has been loaded from the styles section of the data representation
+   * @pre The templateName exists in the templates section of the data representation
    *      and contains 'type' property used to create the object.
-   * @param styleName The set of styles/properties to set on the handle object.
+   * @param templateName The template to apply in creation.
    * @returns The base handle of the created object
    */
-  BaseHandle CreateFromStyle( const std::string& styleName );
+  BaseHandle Create( const std::string& templateName );
 
   /**
    * @brief Creates an object from the style templates with user defined constants
@@ -264,18 +274,17 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
    * e.g.
    *   PropertyValueMap map;
    *   map["IMAGE_DIR"] = "/usr/share/images"; // replaces '{IMAGE_DIR} in the template
-   *   mActor.Add( Actor::DownCast(builder.CreateFromStyle( "default-image", map) ) );
+   *   mActor.Add( Actor::DownCast(builder.Create( "default-image", map) ) );
    *
    * @pre The Builder has been initialized.
    * @pre Preconditions have been met for creating dali objects ie Images, Actors etc
-   * @pre The styleName has been loaded from the styles section of the data representation
+   * @pre The templateName exists in the templates section of the data representation
    *      and contains 'type' property used to create the object.
-   * @pre The map contains all the constant expansions in the style template
-   * @param styleName The set of styles/properties to set on the handle object.
-   * @param map The user defined constants used in style template expansion.
+   * @param templateName The template used to create the object.
+   * @param map The user defined constants used in template expansion.
    * @returns The base handle of the created object
    */
-  BaseHandle CreateFromStyle( const std::string& styleName, const PropertyValueMap& map );
+  BaseHandle Create( const std::string& templateName, const PropertyValueMap& map );
 
   /**
    * Apply a style (a collection of properties) to an actor.

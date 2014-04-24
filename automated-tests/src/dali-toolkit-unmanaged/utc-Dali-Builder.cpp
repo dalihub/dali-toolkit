@@ -28,40 +28,23 @@ namespace
 // Note: To avoid escaping double quotes single quotes are used and then replaced
 //       before parsing. JSON uses double quotes
 //
-  std::string JSON_TEXTSTYLE_ONLY("\
-{                                                                  \
-    'text-styles':                                                 \
-    {                                                              \
-        'title-text-style':{'font-name': 'Vera',                   \
-                            'font-style': 'Bold',                  \
-                            'point-size': 12.0,                    \
-                            'weight': 'light',                     \
-                            'text-color': [0.0,0.5,0.5,1],         \
-                            'italic': false,                       \
-                            'underline': false,                    \
-                            'shadow': true,                        \
-                            'glow': true,                          \
-                            'outline': true,                       \
-                            'shadow-color': [0.0,1.0,0.0,1.0],     \
-                            'shadow-offset': [3.0,2.0],            \
-                            'shadow-size': 2.0,                    \
-                            'glow-color': [0.9,0.6,0.3,1.0],       \
-                            'glow-intensity':0.1,                  \
-                            'smooth-edge': 0.45,                   \
-                            'outline-color': [1.0,0.5,0.0,1.0],    \
-                            'outline-thickness': [0.7,0.6]         \
-      }                                                            \
-    }                                                              \
-}                                                                  \
-");
 
   std::string JSON_TEXT_ACTOR("\
 {                                                              \
-  'styles':                                                    \
+  'templates':                                                 \
   {                                                            \
     'basic-text':                                              \
     {                                                          \
       'type':'TextActor',                                      \
+      'text':'Template Hello',                                 \
+      'size': [150,170,1],                                     \
+      'position':[-10,10,0]                                    \
+    }                                                          \
+  },                                                           \
+  'styles':                                                    \
+  {                                                            \
+    'basic-text':                                              \
+    {                                                          \
       'text':'Hello',                                          \
       'font':'',                                               \
       'parent-origin':[0.0,0.0,0],                             \
@@ -118,7 +101,7 @@ namespace
 
   std::string JSON_CORE_ACTOR_TREE("\
 {                                                                                         \
-    'styles':                                                                             \
+    'templates':                                                                          \
     {                                                                                     \
         'my-camera': {                                                                    \
                       'type':'CameraActor',                                               \
@@ -135,13 +118,16 @@ namespace
                     'smooth-edge':0.2,                                                    \
                     'position': [-10.0, 10.0, -1000.0],                                   \
                     'size': [300.0, 250.0, 0.0]                                           \
-                   },                                                                     \
-        'theme2-text': {                                                                  \
-                    'type':'TextActor',                                                   \
-                    'text':'Hello',                                                       \
-                    'font':'Freesans',                                                    \
-                    'smooth-edge':0.8                                                     \
                    }                                                                      \
+    },                                                                                    \
+    'styles':                                                                             \
+    {                                                                                     \
+       'theme2-text': {                                                                   \
+                   'type':'TextActor',                                                    \
+                   'text':'Hello',                                                        \
+                   'font':'Freesans',                                                     \
+                   'smooth-edge':0.8                                                      \
+                  }                                                                       \
     },                                                                                    \
     'stage':                                                                              \
     [                                                                                     \
@@ -186,18 +172,18 @@ void builder_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-int UtcDaliBuilderTextActorCreateFromStyle(void)
+int UtcDaliBuilderTextActorCreate(void)
 {
   ToolkitTestApplication application;
   Stage stage = Stage::GetCurrent();
 
-  tet_infoline(" UtcDaliBuilderTextActorCreateFromStyle");
+  tet_infoline(" UtcDaliBuilderTextActorCreate");
 
   Builder builder = Builder::New();
 
   builder.LoadFromString(ReplaceQuotes(JSON_TEXT_ACTOR));
 
-  TextActor actor( TextActor::DownCast( builder.CreateFromStyle("basic-text") ) );
+  TextActor actor( TextActor::DownCast( builder.Create("basic-text") ) );
 
   DALI_TEST_CHECK( actor );
 
@@ -218,9 +204,9 @@ int UtcDaliBuilderTextActorCreateFromStyle(void)
   DALI_TEST_CHECK(v.y == 170.0);
   DALI_TEST_CHECK(v.z == 1.0);
 
-  DALI_TEST_CHECK(actor.GetText() == "Hello");
+  DALI_TEST_CHECK(actor.GetText() == "Template Hello");
 
-  actor = TextActor::DownCast( builder.CreateFromStyle("*(&^") );
+  actor = TextActor::DownCast( builder.Create("*(&^") );
   DALI_TEST_CHECK(!actor);
 
   END_TEST;
@@ -343,7 +329,7 @@ int UtcDaliBuilderStyles(void)
 
   builder.LoadFromString(ReplaceQuotes(JSON_CORE_ACTOR_TREE));
 
-  BaseHandle handle = builder.CreateFromStyle("my-camera");
+  BaseHandle handle = builder.Create("my-camera");
   CameraActor camera = CameraActor::DownCast(handle);
 
   DALI_TEST_CHECK(camera);
@@ -356,7 +342,7 @@ int UtcDaliBuilderStyles(void)
   v = camera.GetProperty( camera.GetPropertyIndex("aspect-ratio") );
   DALI_TEST_CHECK( 5.0f == v.Get<float>() );
 
-  handle   = builder.CreateFromStyle("basic-text");
+  handle   = builder.Create("basic-text");
   TextActor textActor = TextActor::DownCast(handle);
 
   v = textActor.GetProperty( textActor.GetPropertyIndex("smooth-edge") );

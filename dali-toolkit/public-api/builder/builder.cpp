@@ -95,12 +95,22 @@ Animation Builder::CreateAnimation( const std::string& animationName, const Prop
 
 BaseHandle Builder::CreateFromStyle( const std::string& styleName )
 {
-  return GetImpl(*this).CreateFromStyle( styleName );
+  return BaseHandle();
 }
 
 BaseHandle Builder::CreateFromStyle( const std::string& styleName, const PropertyValueMap& map )
 {
-  return GetImpl(*this).CreateFromStyle( styleName, map );
+  return BaseHandle();
+}
+
+BaseHandle Builder::Create( const std::string& templateName )
+{
+  return GetImpl(*this).Create( templateName );
+}
+
+BaseHandle Builder::Create( const std::string& templateName, const PropertyValueMap& map )
+{
+  return GetImpl(*this).Create( templateName, map );
 }
 
 void Builder::ApplyStyle( const std::string& styleName, Handle& handle )
