@@ -2121,13 +2121,17 @@ void TextView::SetProperty( BaseObject* object, Property::Index index, const Pro
   {
     Internal::TextView& textViewImpl( GetImpl( textView ) );
     bool newValue( value.Get<bool>() );
-    textViewImpl.SetMarkupProcessingEnabled( newValue );
-    if( newValue )
+    if( newValue != textViewImpl.IsMarkupProcessingEnabled() )
     {
-      const std::string& currentText( textViewImpl.GetText() );
-      if( ! currentText.empty() )
+      textViewImpl.SetMarkupProcessingEnabled( newValue );
+      if( newValue )
       {
-        textViewImpl.SetText( currentText );
+        // If markup processing has been enabled, Ensure current text is reprocessed.
+        const std::string& currentText( textViewImpl.GetText() );
+        if( ! currentText.empty() )
+        {
+          textViewImpl.SetText( currentText );
+        }
       }
     }
   }
