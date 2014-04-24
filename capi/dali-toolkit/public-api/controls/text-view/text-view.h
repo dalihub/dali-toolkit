@@ -103,6 +103,9 @@ public:
   // Signal Names
   static const char* const SIGNAL_TEXT_SCROLLED; ///< Signal emitted when the scroll position changes. @see SignalScrolled()
 
+  // Properties
+  static const Property::Index PROPERTY_MARKUP_ENABLED; ///< name "markup-enabled", @see SetMarkupProcessingEnabled(), type BOOLEAN
+
   /**
    * @brief Structure used to retrieve Layout info per character.
    */

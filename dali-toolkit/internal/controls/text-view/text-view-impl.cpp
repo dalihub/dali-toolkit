@@ -32,6 +32,8 @@ namespace Dali
 namespace Toolkit
 {
 
+const Property::Index TextView::PROPERTY_MARKUP_ENABLED( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX );
+
 namespace Internal
 {
 
@@ -63,6 +65,8 @@ BaseHandle Create()
 TypeRegistration typeRegistration( typeid(Toolkit::TextView), typeid(Toolkit::Control), Create );
 
 SignalConnectorType signalConnector1( typeRegistration, Toolkit::TextView::SIGNAL_TEXT_SCROLLED , &TextView::DoConnectSignal );
+
+PropertyRegistration property1( typeRegistration, "markup-enabled", Toolkit::TextView::PROPERTY_MARKUP_ENABLED, Property::BOOLEAN, &TextView::SetProperty, &TextView::GetProperty );
 
 /**
  * Whether the text-view-processor operation sets, inserts, replaces, removes text.
@@ -2107,6 +2111,38 @@ void TextView::OnAlignmentPropertySet( Property::Index propertyIndex, Property::
       DALI_ASSERT_ALWAYS( !"TextView::OnAlignmentPropertySet(). Invalid Property value." );
     }
   }
+}
+
+void TextView::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+{
+  Toolkit::TextView textView = Toolkit::TextView::DownCast( Dali::BaseHandle( object ) );
+
+  if ( textView && ( index == Toolkit::TextView::PROPERTY_MARKUP_ENABLED ) )
+  {
+    Internal::TextView& textViewImpl( GetImpl( textView ) );
+    bool newValue( value.Get<bool>() );
+    textViewImpl.SetMarkupProcessingEnabled( newValue );
+    if( newValue )
+    {
+      const std::string& currentText( textViewImpl.GetText() );
+      if( ! currentText.empty() )
+      {
+        textViewImpl.SetText( currentText );
+      }
+    }
+  }
+}
+
+Property::Value TextView::GetProperty( BaseObject* object, Property::Index propertyIndex )
+{
+  Toolkit::TextView textView = Toolkit::TextView::DownCast( Dali::BaseHandle( object ) );
+
+  if ( textView && ( propertyIndex == Toolkit::TextView::PROPERTY_MARKUP_ENABLED ) )
+  {
+    return Property::Value( GetImpl( textView ).mMarkUpEnabled );
+  }
+
+  return Property::Value();
 }
 
 } // namespace Internal
