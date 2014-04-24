@@ -136,7 +136,7 @@ inline OptionalVector4 IsVector4(const OptionalChild& node)
 {
   OptionalVector4 ret;
 
-  if( node && (*node).Size() >= 4 )
+  if( node && (TreeNode::ARRAY == (*node).GetType()) && (*node).Size() >= 4 )
   {
     Dali::Vector4 v;
     if( CopyNumbers((*node).CBegin(), 4, v) )
@@ -152,7 +152,7 @@ inline OptionalVector3 IsVector3(const OptionalChild& node)
 {
   OptionalVector3 ret;
 
-  if( node && (*node).Size() >= 3 )
+  if( node && (TreeNode::ARRAY == (*node).GetType()) && (*node).Size() >= 3 )
   {
     Dali::Vector3 v;
     if( CopyNumbers((*node).CBegin(), 3, v) )
@@ -168,7 +168,7 @@ inline OptionalVector2 IsVector2(const OptionalChild& node)
 {
   OptionalVector2 ret;
 
-  if( node && (*node).Size() >= 2 )
+  if( node && (TreeNode::ARRAY == (*node).GetType()) && (*node).Size() >= 2 )
   {
     Dali::Vector2 v;
     if( CopyNumbers((*node).CBegin(), 2, v) )
@@ -184,7 +184,7 @@ inline OptionalMatrix IsMatrix(const OptionalChild &node)
 {
   OptionalMatrix ret;
 
-  if( node && (*node).Size() >= 16 )
+  if( node && (TreeNode::ARRAY == (*node).GetType()) && (*node).Size() >= 16 )
   {
     float v[16];
     if( CopyNumbers((*node).CBegin(), 16, v) )
@@ -200,7 +200,7 @@ inline OptionalMatrix3 IsMatrix3(const OptionalChild& node)
 {
   OptionalMatrix3 ret;
 
-  if( node && (*node).Size() >= 9 )
+  if( node && (TreeNode::ARRAY == (*node).GetType()) && (*node).Size() >= 9 )
   {
     float v[9];
     if( CopyNumbers((*node).CBegin(), 9, v) )

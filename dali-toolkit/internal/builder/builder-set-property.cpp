@@ -72,7 +72,21 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
 namespace
 {
 
-
+/**
+ * Converts a HTML style 'color' hex string ("#FF0000" for bright red) to a Vector4.
+ * The Vector4 alpha component will be set to 1.0f
+ * @param hexString The HTML style hex string
+ * @return a Vector4 containing the new color value
+ */
+Vector4 HexStringToVector4( const char* s )
+{
+  unsigned int value(0u);
+  std::istringstream( s ) >> std::hex >> value;
+  return Vector4( ((value >> 16 ) & 0xff ) / 255.0f,
+                  ((value >> 8 ) & 0xff ) / 255.0f,
+                  (value & 0xff ) / 255.0f,
+                  1.0f );
+}
 
 } // anon namespace
 
@@ -222,6 +236,36 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
       {
         value = *v;
         done = true;
+      }
+      else if( OptionalString s = replacer.IsString(node) )
+      {
+        if( (*s)[0] == '#' && 7 == (*s).size() )
+        {
+          value = HexStringToVector4( &(*s)[1] );
+          done = true;
+        }
+      }
+      else if( TreeNode::OBJECT == node.GetType() )
+      {
+        // check for "r", "g" and "b" child color component nodes
+        OptionalInteger r = replacer.IsInteger( IsChild(node, "r") );
+        OptionalInteger g = replacer.IsInteger( IsChild(node, "g") );
+        OptionalInteger b = replacer.IsInteger( IsChild(node, "b") );
+        if( r && g && b )
+        {
+          float red( (*r) * (1.0f/255.0f) );
+          float green( (*r) * (1.0f/255.0f) );
+          float blue( (*r) * (1.0f/255.0f) );
+          // check for optional "a" (alpha) node, default to fully opaque if it is not found.
+          float alpha( 1.0f );
+          OptionalInteger a = replacer.IsInteger( IsChild(node, "a") );
+          if( a )
+          {
+            alpha = (*a) * (1.0f/255.0f);
+          }
+          value = Vector4( red, green, blue, alpha );
+          done = true;
+        }
       }
       break;
     }
