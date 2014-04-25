@@ -137,6 +137,44 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
   void AddConstants( const PropertyValueMap& map );
 
   /**
+   * @brief Adds or modifies a user defined constant to all future style template or animation expansions
+   *
+   * e.g.
+   * @code builder.AddConstant( "IMAGE_DIRECTORY", "/usr/share/images" );
+   *
+   * @pre The Builder has been initialized.
+   * @param key The constant name to add or update
+   * @param value The new value for the constant.
+   */
+  void AddConstant( const std::string& key, const Property::Value& value );
+
+  /**
+   * @brief Gets all currently defined constants.
+   *
+   * e.g.
+   * @code PropertyValueMap map = builder.GetConstants(); // get copy of current constants
+   *       map["IMAGE_DIRECTORY"] = "/usr/share/images";  // make modification
+   *       builder.AddConstants( map );                   // write back changes
+   *
+   * @pre The Builder has been initialized.
+   * @return A reference to the currently defined constants.
+   */
+  const PropertyValueMap& GetConstants() const;
+
+  /**
+   * @brief Gets a currently defined constant, or returns Property::INVALID
+   *
+   * e.g.
+   * @code PropertyValueMap map = builder.GetConstants(); // get copy of current constants
+   *       map["IMAGE_DIRECTORY"] = "/usr/share/images";  // make modification
+   *       builder.AddConstants( map );                   // write back changes
+   *
+   * @pre The Builder has been initialized.
+   * @param key The constant name to search for.
+   */
+  const Property::Value& GetConstant( const std::string& key ) const;
+
+  /**
    * Creates an animation from the set of known animations
    * e.g.
    *   Animation a = builder.CreateAnimation( "wobble");

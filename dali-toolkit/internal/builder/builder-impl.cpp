@@ -820,6 +820,30 @@ void Builder::AddConstants( const PropertyValueMap& map )
   }
 }
 
+void Builder::AddConstant( const std::string& key, const Property::Value& value )
+{
+  mReplacementMap[key] = value;
+}
+
+const PropertyValueMap& Builder::GetConstants() const
+{
+  return mReplacementMap;
+}
+
+const Property::Value& Builder::GetConstant( const std::string& key ) const
+{
+  PropertyValueMap::const_iterator iter = mReplacementMap.find( key );
+  if( iter  != mReplacementMap.end() )
+  {
+    return (*iter).second;
+  }
+  else
+  {
+    static Property::Value invalid;
+    return invalid;
+  }
+}
+
 void Builder::LoadConstants()
 {
   Replacement replacer(mReplacementMap);

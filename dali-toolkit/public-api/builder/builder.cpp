@@ -58,6 +58,21 @@ void Builder::AddConstants( const PropertyValueMap& map )
   GetImpl(*this).AddConstants( map );
 }
 
+void Builder::AddConstant( const std::string& key, const Property::Value& value )
+{
+  GetImpl(*this).AddConstant( key, value );
+}
+
+const PropertyValueMap& Builder::GetConstants() const
+{
+  return GetImpl(*this).GetConstants();
+}
+
+const Property::Value& Builder::GetConstant( const std::string& key ) const
+{
+  return GetImpl(*this).GetConstant( key );
+}
+
 Animation Builder::CreateAnimation( const std::string& animationName )
 {
   return GetImpl(*this).CreateAnimation( animationName );

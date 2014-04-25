@@ -84,6 +84,21 @@ public:
   void AddConstants( const PropertyValueMap& map );
 
   /**
+   * @copydoc Toolkit::Builder::AddConstant
+   */
+  void AddConstant( const std::string& key, const Property::Value& value );
+
+  /**
+   * @copydoc Toolkit::Builder::GetConstants
+   */
+  const PropertyValueMap& GetConstants() const;
+
+  /**
+   * @copydoc Toolkit::Builder::GetConstant
+   */
+  const Property::Value& GetConstant( const std::string& key ) const;
+
+  /**
    * @copydoc Toolkit::Builder::CreateAnimation( const std::string& animationName );
    */
   Animation CreateAnimation( const std::string& animationName );
