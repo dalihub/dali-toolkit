@@ -254,8 +254,8 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
         if( r && g && b )
         {
           float red( (*r) * (1.0f/255.0f) );
-          float green( (*r) * (1.0f/255.0f) );
-          float blue( (*r) * (1.0f/255.0f) );
+          float green( (*g) * (1.0f/255.0f) );
+          float blue( (*b) * (1.0f/255.0f) );
           // check for optional "a" (alpha) node, default to fully opaque if it is not found.
           float alpha( 1.0f );
           OptionalInteger a = replacer.IsInteger( IsChild(node, "a") );
