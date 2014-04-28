@@ -25,7 +25,7 @@ struct OptionalTypes
   typedef const T& ReturnType;
   static ReturnType Get(const ValueType& v) { return v; }
   static ValueType Set(const ReturnType v) { return v; }
-  static bool Ok(const ValueType v) { return true; }
+  static bool Ok(const ValueType& v) { return true; }
 };
 
 template <typename T>
@@ -67,26 +67,24 @@ public:
     return mOk == true ? &OptionalValue::this_type_does_not_support_comparisons : 0;
   }
 
-  template <typename OT>
-  bool operator!=( const OT& rhs )
-  {
-    this->this_type_does_not_support_comparisons();
-    return false;
-  }
-
-  template <typename OT>
-  bool operator==( const OT& rhs )
-  {
-    this->this_type_does_not_support_comparisons();
-    return false;
-  }
-
 private:
   bool mOk;
   ValueType mValue;
   void this_type_does_not_support_comparisons() const {}
-  // todo operator=() ? use OptionalTypes<T>::Ok(mValue)
 };
 
+template <typename T, typename U>
+bool operator==( const OptionalValue<T>& lhs, const OptionalValue<U>& rhs )
+{
+  lhs.this_type_does_not_support_comparisons();
+  return false;
+}
+
+template <typename T, typename U>
+bool operator!=( const OptionalValue<T>& lhs, const OptionalValue<U>& rhs )
+{
+  lhs.this_type_does_not_support_comparisons();
+  return false;
+}
 
 #endif // header

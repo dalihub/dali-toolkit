@@ -722,6 +722,11 @@ bool JsonParserState::ParseJson(VectorChar& source)
       {
         if( '}' == currentChar )
         {
+          if(',' == lastCharacter)
+          {
+            return Error("Unexpected comma");
+          }
+
           if( !UpToParent() )
           {
             return false;
@@ -799,15 +804,22 @@ bool JsonParserState::ParseJson(VectorChar& source)
         }
         else if( '{' == currentChar )
         {
-          NewNode(name, TreeNode::OBJECT);
-          mState = STATE_OBJECT;
-          AdvanceSkipWhiteSpace(1);
+          if( '}' == lastCharacter )
+          {
+            return Error("Expected a comma");
+          }
+          else
+          {
+            NewNode(name, TreeNode::OBJECT);
+            mState = STATE_OBJECT;
+            AdvanceSkipWhiteSpace(1);
+          }
         }
         else if( '}' == currentChar )
         {
           if(',' == lastCharacter)
           {
-            return Error("Expected a value");
+            return Error("Expected another value");
           }
 
           if(mCurrent.GetType() != TreeNode::OBJECT)

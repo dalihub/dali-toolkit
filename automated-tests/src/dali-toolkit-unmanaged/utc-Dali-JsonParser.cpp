@@ -43,6 +43,56 @@ std::string ReplaceQuotes(const std::string &in_s)
   std::replace(s.begin(), s.end(), '\'', '"');
   return s;
 }
+
+void CompareTrees(const TreeNode& a, const TreeNode& b)
+{
+  DALI_TEST_CHECK( a.GetType() == b.GetType() );
+
+  DALI_TEST_CHECK( a.Size() == b.Size() );
+
+  if( a.GetName() )
+  {
+    DALI_TEST_CHECK( std::string( a.GetName() ) == std::string( b.GetName() ) );
+  }
+
+  DALI_TEST_CHECK( a.HasSubstitution() == b.HasSubstitution() );
+
+  switch( a.GetType() )
+  {
+    case TreeNode::OBJECT:
+    case TreeNode::ARRAY:
+    {
+      for( TreeNode::ConstIterator aiter = a.CBegin(), biter = b.CBegin();
+           aiter != a.CEnd() && biter != b.CEnd(); ++aiter, ++biter )
+      {
+        CompareTrees( (*aiter).second, (*biter).second );
+      }
+      break;
+    }
+    case TreeNode::STRING:
+    {
+      DALI_TEST_CHECK( std::string( a.GetString() ) == std::string( b.GetString() ) );
+      break;
+    }
+    case TreeNode::FLOAT:
+    {
+      DALI_TEST_CHECK( a.GetFloat() == b.GetFloat() );
+      break;
+    }
+    case TreeNode::INTEGER:
+    {
+      DALI_TEST_CHECK( a.GetInteger() == b.GetInteger());
+      break;
+    }
+    case TreeNode::BOOLEAN:
+    {
+      DALI_TEST_CHECK( a.GetBoolean() == b.GetBoolean() );
+      break;
+    }
+  }
+}
+
+
 }
 
 
@@ -61,7 +111,6 @@ int UtcDaliJsonParserMethod01(void)
   'nil':null, \
   'array':[1,2,3], \
   'object':{'key':'value'} \
-END_TEST; \
 }"));
 
   JsonParser parser = JsonParser::New();
@@ -468,7 +517,7 @@ int UtcDaliJsonParserMethod06(void)
 namespace
 {
 
-static const int NUMBER_FAIL_TESTS = 32;
+static const int NUMBER_FAIL_TESTS = 34;
 const char *TEST_FAIL[] = {
   "[' tab\t   character  \t in\t string   ']",
   "['Extra close']]",
@@ -502,6 +551,8 @@ const char *TEST_FAIL[] = {
   "[0e+-1]",
   "{'Numbers cannot be hex': 0x14}",
   "[   , '<-- missing value']",
+  "[{'no comma':1} {'b:2}]",
+  "{'extra comma':1,}",
 };
 }
 
@@ -612,7 +663,7 @@ int UtcDaliJsonParserMethod10(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline("JSON basic test");
+  tet_infoline("JSON empty data");
 
   std::string s1( "" );
 
@@ -621,6 +672,47 @@ int UtcDaliJsonParserMethod10(void)
   parser.Parse( s1 );
 
   DALI_TEST_CHECK(parser.ParseError());
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliJsonParserMethod11(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("JSON tree copy");
+
+  std::string s1( ReplaceQuotes("                                       \
+{                                                                       \
+  'animations':                                                         \
+  {                                                                     \
+    'bump':                                                             \
+    {                                                                   \
+      'properties':                                                     \
+      [                                                                 \
+        {                                                               \
+          'actor':'bump-image',                                         \
+          'property':'uLightPosition',                                  \
+          'value':[0.8, 0.0, -1.5],                                     \
+          'alpha-function': 'BOUNCE',                                   \
+          'time-period': { 'duration': 2.5 }                            \
+        }                                                               \
+      ]                                                                 \
+    }                                                                   \
+  }                                                                     \
+}                                                                       \
+"));
+
+  JsonParser parser = JsonParser::New();
+
+  parser.Parse( s1 );
+
+  JsonParser parser2 = JsonParser::New(*parser.GetRoot());
+
+  DALI_TEST_CHECK(parser.GetRoot());
+  DALI_TEST_CHECK(parser2.GetRoot());
+
+  CompareTrees( *parser.GetRoot(), *parser2.GetRoot() );
 
   tet_result(TET_PASS);
   END_TEST;

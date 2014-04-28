@@ -169,12 +169,12 @@ TreeNode* TreeNodeManipulator::Copy(const TreeNode& tree, int& numberNodes, int&
 
   if(tree.mName)
   {
-    numberChars += std::strlen(tree.mName);
+    numberChars += std::strlen(tree.mName) + 1;
   }
 
   if(TreeNode::STRING == tree.mType)
   {
-    numberChars += std::strlen(tree.mStringValue);
+    numberChars += std::strlen(tree.mStringValue) + 1;
   }
 
   ++numberNodes;
