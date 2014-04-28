@@ -109,14 +109,14 @@ public:
   Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map );
 
   /**
-   * @copydoc Toolkit::Builder::CreateAnimation( const std::string& animationName, Dali::Actor searchRoot );
+   * @copydoc Toolkit::Builder::CreateAnimation( const std::string&,Dali::Actor);
    */
-  Animation CreateAnimation( const std::string& animationName, Dali::Actor searchRoot );
+  Animation CreateAnimation( const std::string& animationName, Dali::Actor sourceActor );
 
   /**
-   * @copydoc Toolkit::Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor searchRoot );
+   * @copydoc Toolkit::Builder::CreateAnimation( const std::string&,const PropertyValueMap&,Dali::Actor);
    */
-  Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor searchRoot );
+  Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor sourceActor );
 
   /**
    * @copydoc Toolkit::Builder::CreateFromStyle( const std::string& styleName );
@@ -229,7 +229,7 @@ private:
 
   void ApplyStyle( const std::string& styleName, Handle& handle, const Replacement& replacement);
 
-  Animation CreateAnimation( const std::string& animationName, const Replacement& replacement, Dali::Actor searchRoot );
+  Animation CreateAnimation( const std::string& animationName, const Replacement& replacement, Dali::Actor sourceActor );
 
   BaseHandle CreateFromStyle( const std::string& styleName, const Replacement& replacement );
 };

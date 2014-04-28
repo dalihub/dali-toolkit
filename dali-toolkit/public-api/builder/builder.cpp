@@ -83,6 +83,16 @@ Animation Builder::CreateAnimation( const std::string& animationName, const Prop
   return GetImpl(*this).CreateAnimation( animationName, map );
 }
 
+Animation Builder::CreateAnimation( const std::string& animationName, Dali::Actor sourceActor )
+{
+  return GetImpl(*this).CreateAnimation( animationName, sourceActor );
+}
+
+Animation Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor sourceActor )
+{
+  return GetImpl(*this).CreateAnimation( animationName, map, sourceActor );
+}
+
 BaseHandle Builder::CreateFromStyle( const std::string& styleName )
 {
   return GetImpl(*this).CreateFromStyle( styleName );

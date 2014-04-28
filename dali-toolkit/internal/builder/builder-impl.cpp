@@ -743,7 +743,7 @@ void Builder::AddActors( const std::string &sectionName, Actor toActor )
   }
 }
 
-Animation Builder::CreateAnimation( const std::string& animationName, const Replacement& replacement, Dali::Actor searchRoot )
+Animation Builder::CreateAnimation( const std::string& animationName, const Replacement& replacement, Dali::Actor sourceActor )
 {
   Animation anim;
 
@@ -751,7 +751,7 @@ Animation Builder::CreateAnimation( const std::string& animationName, const Repl
   {
     if( OptionalChild animation = IsChild(*animations, animationName) )
     {
-      anim = Dali::Toolkit::Internal::CreateAnimation( *animation, replacement, Stage::GetCurrent().GetRootLayer() );
+      anim = Dali::Toolkit::Internal::CreateAnimation( *animation, replacement, sourceActor );
     }
     else
     {
@@ -766,10 +766,10 @@ Animation Builder::CreateAnimation( const std::string& animationName, const Repl
   return anim;
 }
 
-Animation Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor searchRoot )
+Animation Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor sourceActor )
 {
   Replacement replacement(map, mReplacementMap);
-  return CreateAnimation( animationName, replacement, searchRoot);
+  return CreateAnimation( animationName, replacement, sourceActor);
 }
 
 Animation Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map )
@@ -778,16 +778,17 @@ Animation Builder::CreateAnimation( const std::string& animationName, const Prop
   return CreateAnimation( animationName, replacement, Stage::GetCurrent().GetRootLayer() );
 }
 
-Animation Builder::CreateAnimation( const std::string& animationName, Dali::Actor searchRoot )
+Animation Builder::CreateAnimation( const std::string& animationName, Dali::Actor sourceActor )
 {
   Replacement replacement( mReplacementMap );
 
-  return CreateAnimation( animationName, replacement, searchRoot );
+  return CreateAnimation( animationName, replacement, sourceActor );
 }
 
 Animation Builder::CreateAnimation( const std::string& animationName )
 {
   Replacement replacement( mReplacementMap );
+
   return CreateAnimation( animationName, replacement, Dali::Stage::GetCurrent().GetRootLayer() );
 }
 

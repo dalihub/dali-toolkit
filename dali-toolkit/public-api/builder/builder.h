@@ -140,7 +140,7 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
    * @brief Adds or modifies a user defined constant to all future style template or animation expansions
    *
    * e.g.
-   * @code builder.AddConstant( "IMAGE_DIRECTORY", "/usr/share/images" );
+   *  builder.AddConstant( "IMAGE_DIRECTORY", "/usr/share/images" );
    *
    * @pre The Builder has been initialized.
    * @param key The constant name to add or update
@@ -152,9 +152,9 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
    * @brief Gets all currently defined constants.
    *
    * e.g.
-   * @code PropertyValueMap map = builder.GetConstants(); // get copy of current constants
-   *       map["IMAGE_DIRECTORY"] = "/usr/share/images";  // make modification
-   *       builder.AddConstants( map );                   // write back changes
+   *  PropertyValueMap map = builder.GetConstants(); // get copy of current constants
+   *  map["IMAGE_DIRECTORY"] = "/usr/share/images";  // make modification
+   *  builder.AddConstants( map );                   // write back changes
    *
    * @pre The Builder has been initialized.
    * @return A reference to the currently defined constants.
@@ -165,9 +165,9 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
    * @brief Gets a currently defined constant, or returns Property::INVALID
    *
    * e.g.
-   * @code PropertyValueMap map = builder.GetConstants(); // get copy of current constants
-   *       map["IMAGE_DIRECTORY"] = "/usr/share/images";  // make modification
-   *       builder.AddConstants( map );                   // write back changes
+   *  PropertyValueMap map = builder.GetConstants(); // get copy of current constants
+   *  map["IMAGE_DIRECTORY"] = "/usr/share/images";  // make modification
+   *  builder.AddConstants( map );                   // write back changes
    *
    * @pre The Builder has been initialized.
    * @param key The constant name to search for.
@@ -204,6 +204,44 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
    * @returns The base handle of the created object
    */
   Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map );
+
+  /**
+   * @brief Creates an animation from the set of known animations.
+   *
+   * The animation is applied to a specific actor.
+   * e.g.
+   *   Actor myInstance = builder.CreateFromStyle( "template-actor-tree" )
+   *   Animation a = builder.CreateAnimation( "wobble", myInstance );
+   *
+   * @pre The Builder has been initialized.
+   * @pre Preconditions have been met for creating dali objects ie Images, Actors etc
+   * @pre The animationName exists in the animations section of the data representation
+   * @param animationName The animation name to create
+   * @param sourceActor The starting point in an actor tree, from which to look for property owners
+   * @returns The base handle of the created object
+   */
+  Animation CreateAnimation( const std::string& animationName, Dali::Actor sourceActor );
+
+  /**
+   * @brief Creates an animation from the set of known animations with user defined constants
+   *
+   * The animation is applied to a specific actor.
+   * e.g.
+   *   PropertyValueMap map;
+   *   map["ACTOR"] = actor.GetName();       // replaces '{ACTOR} in the template
+   *   Actor myInstance = builder.CreateFromStyle( "template-actor-tree" )
+   *   Animation a = builder.CreateAnimation( "wobble", myInstance);
+   *
+   * @pre The Builder has been initialized.
+   * @pre Preconditions have been met for creating dali objects ie Images, Actors etc
+   * @pre The animationName exists in the animations section of the data representation
+   * @pre The map contains all the constant expansions in the style template
+   * @param animationName The animation name to create
+   * @param map The user defined constants used in style template expansion.
+   * @param sourceActor The starting point in an actor tree, from which to look for property owners
+   * @returns The base handle of the created object
+   */
+  Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor sourceActor );
 
   /**
    * @brief Creates an object (e.g. an actor) from the set of known style templates
