@@ -545,8 +545,11 @@ void Slider::CreateHandleValueDisplay()
 
 void Slider::DestroyHandleValueDisplay()
 {
-  mHandleValueTextView.Unparent();
-  mHandleValueTextView.Reset();
+  if(mHandleValueTextView)
+  {
+    mHandleValueTextView.Unparent();
+    mHandleValueTextView.Reset();
+  }
 }
 
 void Slider::UpdatePopupTextColor( const Vector4& color )
