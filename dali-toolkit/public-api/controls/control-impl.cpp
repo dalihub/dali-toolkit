@@ -34,6 +34,9 @@ namespace Dali
 namespace Toolkit
 {
 
+const Property::Index Control::PROPERTY_BACKGROUND_COLOR      = ControlImpl::CONTROL_PROPERTY_START_INDEX;
+const Property::Index Control::PROPERTY_BACKGROUND            = ControlImpl::CONTROL_PROPERTY_START_INDEX + 1;
+
 namespace
 {
 
@@ -42,6 +45,7 @@ Integration::Log::Filter* gLogFilter  = Integration::Log::Filter::New(Debug::NoL
 #endif
 
 const float MAX_FLOAT_VALUE( std::numeric_limits<float>::max() );
+const float BACKGROUND_ACTOR_Z_POSITION( -0.1f );
 
 BaseHandle Create()
 {
@@ -49,6 +53,8 @@ BaseHandle Create()
 }
 
 TypeRegistration CONTROL_TYPE( typeid(Control), typeid(CustomActor), Create );
+
+// Property Registration after ControlImpl::Impl definition below
 
 TypeAction ACTION_TYPE_1(CONTROL_TYPE, Toolkit::Control::ACTION_CONTROL_ACTIVATED, &ControlImpl::DoAction);
 
@@ -71,6 +77,24 @@ public:
 
 private:
   bool& mLock;
+};
+
+/**
+ * Structure which holds information about the background of a control
+ */
+struct Background
+{
+  Actor actor;   ///< Either a MeshActor or an ImageActor
+  Vector4 color; ///< The color of the actor.
+
+  /**
+   * Constructor
+   */
+  Background()
+  : actor(),
+    color( Color::WHITE )
+  {
+  }
 };
 
 /**
@@ -137,6 +161,56 @@ float Calculate( Control::SizePolicy policy, float minimum, float maximum, float
   return size;
 }
 
+/**
+ * Creates a white coloured Mesh.
+ */
+Mesh CreateMesh()
+{
+  Vector3 white( Color::WHITE );
+
+  MeshData meshData;
+
+  // Create vertices with a white color (actual color is set by actor color)
+  MeshData::VertexContainer vertices(4);
+  vertices[ 0 ] = MeshData::Vertex( Vector3( -0.5f, -0.5f, 0.0f ), Vector2::ZERO, white );
+  vertices[ 1 ] = MeshData::Vertex( Vector3(  0.5f, -0.5f, 0.0f ), Vector2::ZERO, white );
+  vertices[ 2 ] = MeshData::Vertex( Vector3( -0.5f,  0.5f, 0.0f ), Vector2::ZERO, white );
+  vertices[ 3 ] = MeshData::Vertex( Vector3(  0.5f,  0.5f, 0.0f ), Vector2::ZERO, white );
+
+  // Specify all the faces
+  MeshData::FaceIndices faces;
+  faces.reserve( 6 ); // 2 triangles in Quad
+  faces.push_back( 0 ); faces.push_back( 3 ); faces.push_back( 1 );
+  faces.push_back( 0 ); faces.push_back( 2 ); faces.push_back( 3 );
+
+  // Create the mesh data from the vertices and faces
+  meshData.SetMaterial( Material::New( "ControlMaterial" ) );
+  meshData.SetVertices( vertices );
+  meshData.SetFaceIndices( faces );
+  meshData.SetHasColor( true );
+
+  return Mesh::New( meshData );
+}
+
+/**
+ * Sets all the required properties for the background actor.
+ *
+ * @param[in]  actor              The actor to set the properties on.
+ * @param[in]  constrainingIndex  The property index to constrain the parent's size on.
+ * @param[in]  color              The required color of the actor.
+ */
+void SetupBackgroundActor( Actor actor, Property::Index constrainingIndex, const Vector4& color )
+{
+  actor.SetColor( color );
+  actor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
+  actor.SetZ( BACKGROUND_ACTOR_Z_POSITION );
+
+  Constraint constraint = Constraint::New<Vector3>( constrainingIndex,
+                                                    ParentSource( Actor::SIZE ),
+                                                    EqualToConstraint() );
+  actor.ApplyConstraint( constraint );
+}
+
 } // unnamed namespace
 
 class ControlImpl::Impl : public ConnectionTrackerInterface
@@ -160,13 +234,18 @@ public:
     mMaximumSize( MAX_FLOAT_VALUE, MAX_FLOAT_VALUE, MAX_FLOAT_VALUE ),
     mIsKeyboardNavigationSupported(false),
     mIsKeyboardFocusGroup(false),
-    mKeyEventSignalV2()
+    mKeyEventSignalV2(),
+    mBackground( NULL )
   {
   }
 
   ~Impl()
   {
     // All gesture detectors will be destroyed so no need to disconnect.
+    if ( mBackground )
+    {
+      delete mBackground;
+    }
   }
 
   // Gesture Detection Methods
@@ -215,6 +294,119 @@ public:
     return mConnectionTracker.GetConnectionCount();
   }
 
+  // Background Methods
+
+  /**
+   * Only creates an instance of the background if we actually use it.
+   * @return A reference to the Background structure.
+   */
+  Background& GetBackground()
+  {
+    if ( !mBackground )
+    {
+      mBackground = new Background;
+    }
+    return *mBackground;
+  }
+
+  // Properties
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+  {
+    Control control = Control::DownCast( BaseHandle( object ) );
+
+    if ( control )
+    {
+      ControlImpl& controlImpl( control.GetImplementation() );
+
+      switch ( index )
+      {
+        case Control::PROPERTY_BACKGROUND_COLOR:
+        {
+          controlImpl.SetBackgroundColor( value.Get< Vector4 >() );
+          break;
+        }
+
+        case Control::PROPERTY_BACKGROUND:
+        {
+          if ( value.HasKey( "image" ) )
+          {
+            Property::Map imageMap = value.GetValue( "image" ).Get< Property::Map >();
+            Image image = Scripting::NewImage( imageMap );
+
+            if ( image )
+            {
+              controlImpl.SetBackground( image );
+            }
+          }
+          else if ( value.Get< Property::Map >().empty() )
+          {
+            // An empty map means the background is no longer required
+            controlImpl.ClearBackground();
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index index )
+  {
+    Property::Value value;
+
+    Control control = Control::DownCast( BaseHandle( object ) );
+
+    if ( control )
+    {
+      ControlImpl& controlImpl( control.GetImplementation() );
+
+      switch ( index )
+      {
+        case Control::PROPERTY_BACKGROUND_COLOR:
+        {
+          value = controlImpl.GetBackgroundColor();
+          break;
+        }
+
+        case Control::PROPERTY_BACKGROUND:
+        {
+          Property::Map map;
+
+          Actor actor = controlImpl.GetBackgroundActor();
+          if ( actor )
+          {
+            ImageActor imageActor = ImageActor::DownCast( actor );
+            if ( imageActor )
+            {
+              Image image = imageActor.GetImage();
+              Property::Map imageMap;
+              Scripting::CreatePropertyMap( image, imageMap );
+              map.push_back( Property::StringValuePair( "image", imageMap ) );
+            }
+          }
+
+          value = map;
+          break;
+        }
+
+      }
+    }
+
+    return value;
+  }
+
   // Data
 
   ControlImpl& mControlImpl;
@@ -248,7 +440,17 @@ public:
   bool mIsKeyboardFocusGroup;        ///< Stores whether the control is a focus group.
 
   Toolkit::Control::KeyEventSignalV2 mKeyEventSignalV2;
+
+  // Background
+  Background* mBackground;           ///< Only create the background if we use it
+
+  // Properties - need to be part of this class as ControlImpl::Impl is private
+  static PropertyRegistration PROPERTY_1;
+  static PropertyRegistration PROPERTY_2;
 };
+
+PropertyRegistration ControlImpl::Impl::PROPERTY_1( CONTROL_TYPE, "background-color", Control::PROPERTY_BACKGROUND_COLOR, Property::VECTOR4, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
+PropertyRegistration ControlImpl::Impl::PROPERTY_2( CONTROL_TYPE, "background",       Control::PROPERTY_BACKGROUND,       Property::MAP,     &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
 
 Control ControlImpl::New()
 {
@@ -364,6 +566,81 @@ LongPressGestureDetector ControlImpl::GetLongPressGestureDetector() const
   return mImpl->mLongPressGestureDetector;
 }
 
+void ControlImpl::SetBackgroundColor( const Vector4& color )
+{
+  Background& background( mImpl->GetBackground() );
+
+  if ( background.actor )
+  {
+    // Just set the actor color
+    background.actor.SetColor( color );
+  }
+  else
+  {
+    // Create Mesh Actor
+    MeshActor meshActor = MeshActor::New( CreateMesh() );
+
+    meshActor.SetAffectedByLighting( false );
+    SetupBackgroundActor( meshActor, Actor::SCALE, color );
+
+    // Set the background actor before adding so that we do not inform deriving classes
+    background.actor = meshActor;
+    Self().Add( meshActor );
+  }
+
+  background.color = color;
+}
+
+Vector4 ControlImpl::GetBackgroundColor() const
+{
+  if ( mImpl->mBackground )
+  {
+    return mImpl->mBackground->color;
+  }
+  return Color::TRANSPARENT;
+}
+
+void ControlImpl::SetBackground( Image image )
+{
+  Background& background( mImpl->GetBackground() );
+
+  if ( background.actor )
+  {
+    // Remove Current actor, unset AFTER removal so that we do not inform deriving classes
+    Self().Remove( background.actor );
+    background.actor = NULL;
+  }
+
+  ImageActor imageActor = ImageActor::New( image );
+  SetupBackgroundActor( imageActor, Actor::SIZE, background.color );
+
+  // Set the background actor before adding so that we do not inform derived classes
+  background.actor = imageActor;
+  Self().Add( imageActor );
+}
+
+void ControlImpl::ClearBackground()
+{
+  if ( mImpl->mBackground )
+  {
+    Background& background( mImpl->GetBackground() );
+    Self().Remove( background.actor );
+
+    delete mImpl->mBackground;
+    mImpl->mBackground = NULL;
+  }
+}
+
+Actor ControlImpl::GetBackgroundActor() const
+{
+  if ( mImpl->mBackground )
+  {
+    return mImpl->mBackground->actor;
+  }
+
+  return Actor();
+}
+
 void ControlImpl::OnPinch(PinchGesture pinch)
 {
   if (pinch.state == Gesture::Started)
@@ -390,6 +667,12 @@ void ControlImpl::OnStageDisconnection()
 
 void ControlImpl::OnChildAdd(Actor& child)
 {
+  // If this is the background actor, then we do not want to relayout or inform deriving classes
+  if ( mImpl->mBackground && ( child == mImpl->mBackground->actor ) )
+  {
+    return;
+  }
+
   // Request for relayout.
   RelayoutRequest();
 
@@ -399,6 +682,12 @@ void ControlImpl::OnChildAdd(Actor& child)
 
 void ControlImpl::OnChildRemove(Actor& child)
 {
+  // If this is the background actor, then we do not want to relayout or inform deriving classes
+  if ( mImpl->mBackground && ( child == mImpl->mBackground->actor ) )
+  {
+    return;
+  }
+
   // Request for relayout.
   RelayoutRequest();
 

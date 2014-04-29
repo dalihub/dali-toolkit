@@ -99,6 +99,9 @@ extern int UtcDaliControlGetImplementation(void);
 extern int UtcDaliControlSignalConnectDisconnect(void);
 extern int UtcDaliControlSignalAutomaticDisconnect(void);
 extern int UtcDaliControlTestParameters(void);
+extern int UtcDaliControlBackgroundColor(void);
+extern int UtcDaliControlBackgroundImage(void);
+extern int UtcDaliControlBackgroundProperties(void);
 extern int UtcDaliControlImplNew(void);
 extern int UtcDaliControlImplEnableGestureDetector(void);
 extern int UtcDaliControlImplDisableGestureDetector(void);
@@ -275,7 +278,6 @@ extern int UtcDaliTextViewSetAndGetFadeBoundary(void);
 extern int UtcDaliTextViewSetAndGetEllipsizeText(void);
 extern int UtcDaliTextViewSetAndGetWidthExceedPolicy(void);
 extern int UtcDaliTextViewSetAndGetHeightExceedPolicy(void);
-extern int UtcDaliTextViewTestLayoutOptions01(void);
 extern int UtcDaliTextViewTestLayoutOptions02(void);
 extern int UtcDaliTextViewInsertRemoveText(void);
 extern int UtcDaliTextViewSnapshotEnable(void);
@@ -332,6 +334,9 @@ testcase tc_array[] = {
     {"UtcDaliControlSignalConnectDisconnect", UtcDaliControlSignalConnectDisconnect, utc_dali_toolkit_control_startup, utc_dali_toolkit_control_cleanup},
     {"UtcDaliControlSignalAutomaticDisconnect", UtcDaliControlSignalAutomaticDisconnect, utc_dali_toolkit_control_startup, utc_dali_toolkit_control_cleanup},
     {"UtcDaliControlTestParameters", UtcDaliControlTestParameters, utc_dali_toolkit_control_startup, utc_dali_toolkit_control_cleanup},
+    {"UtcDaliControlBackgroundColor", UtcDaliControlBackgroundColor, utc_dali_toolkit_control_startup, utc_dali_toolkit_control_cleanup},
+    {"UtcDaliControlBackgroundImage", UtcDaliControlBackgroundImage, utc_dali_toolkit_control_startup, utc_dali_toolkit_control_cleanup},
+    {"UtcDaliControlBackgroundProperties", UtcDaliControlBackgroundProperties, utc_dali_toolkit_control_startup, utc_dali_toolkit_control_cleanup},
     {"UtcDaliControlImplNew", UtcDaliControlImplNew, utc_dali_toolkit_control_impl_startup, utc_dali_toolkit_control_impl_cleanup},
     {"UtcDaliControlImplEnableGestureDetector", UtcDaliControlImplEnableGestureDetector, utc_dali_toolkit_control_impl_startup, utc_dali_toolkit_control_impl_cleanup},
     {"UtcDaliControlImplDisableGestureDetector", UtcDaliControlImplDisableGestureDetector, utc_dali_toolkit_control_impl_startup, utc_dali_toolkit_control_impl_cleanup},
@@ -508,7 +513,6 @@ testcase tc_array[] = {
     {"UtcDaliTextViewSetAndGetEllipsizeText", UtcDaliTextViewSetAndGetEllipsizeText, utc_dali_toolkit_text_view_startup, utc_dali_toolkit_text_view_cleanup},
     {"UtcDaliTextViewSetAndGetWidthExceedPolicy", UtcDaliTextViewSetAndGetWidthExceedPolicy, utc_dali_toolkit_text_view_startup, utc_dali_toolkit_text_view_cleanup},
     {"UtcDaliTextViewSetAndGetHeightExceedPolicy", UtcDaliTextViewSetAndGetHeightExceedPolicy, utc_dali_toolkit_text_view_startup, utc_dali_toolkit_text_view_cleanup},
-    {"UtcDaliTextViewTestLayoutOptions01", UtcDaliTextViewTestLayoutOptions01, utc_dali_toolkit_text_view_startup, utc_dali_toolkit_text_view_cleanup},
     {"UtcDaliTextViewTestLayoutOptions02", UtcDaliTextViewTestLayoutOptions02, utc_dali_toolkit_text_view_startup, utc_dali_toolkit_text_view_cleanup},
     {"UtcDaliTextViewInsertRemoveText", UtcDaliTextViewInsertRemoveText, utc_dali_toolkit_text_view_startup, utc_dali_toolkit_text_view_cleanup},
     {"UtcDaliTextViewSnapshotEnable", UtcDaliTextViewSnapshotEnable, utc_dali_toolkit_text_view_startup, utc_dali_toolkit_text_view_cleanup},

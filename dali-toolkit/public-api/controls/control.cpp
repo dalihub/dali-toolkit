@@ -28,7 +28,17 @@ const char* const Control::SIGNAL_KEY_EVENT = "key-event";
 
 Control Control::New()
 {
-  return ControlImpl::New();
+  // Use TypeRegistry to create instance of control so that the type-info matches Control rather than ControlImpl
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid(Control) );
+  DALI_ASSERT_ALWAYS( typeInfo && "TypeRegistry returning Invalid TypeInfo" );
+
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_ASSERT_ALWAYS( handle && "Unable to Create Control" );
+
+  Control control = DownCast( handle );
+  DALI_ASSERT_ALWAYS( handle && "TypeRegistry did not create a Control" );
+
+  return control;
 }
 
 Control::Control()
@@ -146,6 +156,31 @@ TapGestureDetector Control::GetTapGestureDetector() const
 LongPressGestureDetector Control::GetLongPressGestureDetector() const
 {
   return GetImplementation().GetLongPressGestureDetector();
+}
+
+void Control::SetBackgroundColor( const Vector4& color )
+{
+  GetImplementation().SetBackgroundColor( color );
+}
+
+Vector4 Control::GetBackgroundColor() const
+{
+  return GetImplementation().GetBackgroundColor();
+}
+
+void Control::SetBackground( Image image )
+{
+  GetImplementation().SetBackground( image );
+}
+
+void Control::ClearBackground()
+{
+  GetImplementation().ClearBackground();
+}
+
+Actor Control::GetBackgroundActor() const
+{
+  return GetImplementation().GetBackgroundActor();
 }
 
 Control::KeyEventSignalV2& Control::KeyEventSignal()

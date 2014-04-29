@@ -114,7 +114,7 @@ extern int UtcDaliBloomViewDownCast(void);
 extern int UtcDaliBloomViewPropertyNames(void);
 extern int UtcDaliBloomViewAddRemove(void);
 extern int UtcDaliBloomActivateDeactivate(void);
-extern int UtcDaliBuilderTextActorCreateFromStyle(void);
+extern int UtcDaliBuilderTextActorCreate(void);
 extern int UtcDaliBuilderTextActorCreateAnimation(void);
 extern int UtcDaliBuilderTextActorApplyFromStyle(void);
 extern int UtcDaliBuilderAddActors(void);
@@ -427,7 +427,7 @@ testcase tc_array[] = {
     {"UtcDaliBloomViewPropertyNames", UtcDaliBloomViewPropertyNames, bloom_view_startup, bloom_view_cleanup},
     {"UtcDaliBloomViewAddRemove", UtcDaliBloomViewAddRemove, bloom_view_startup, bloom_view_cleanup},
     {"UtcDaliBloomActivateDeactivate", UtcDaliBloomActivateDeactivate, bloom_view_startup, bloom_view_cleanup},
-    {"UtcDaliBuilderTextActorCreateFromStyle", UtcDaliBuilderTextActorCreateFromStyle, builder_startup, builder_cleanup},
+    {"UtcDaliBuilderTextActorCreate", UtcDaliBuilderTextActorCreate, builder_startup, builder_cleanup},
     {"UtcDaliBuilderTextActorCreateAnimation", UtcDaliBuilderTextActorCreateAnimation, builder_startup, builder_cleanup},
     {"UtcDaliBuilderTextActorApplyFromStyle", UtcDaliBuilderTextActorApplyFromStyle, builder_startup, builder_cleanup},
     {"UtcDaliBuilderAddActors", UtcDaliBuilderAddActors, builder_startup, builder_cleanup},

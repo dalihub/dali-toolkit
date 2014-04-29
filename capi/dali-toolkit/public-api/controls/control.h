@@ -45,11 +45,21 @@ class Control : public CustomActor, public ConnectionTrackerInterface
 {
 public:
 
-  // Action Names
-  static const char* const ACTION_CONTROL_ACTIVATED; ///< name "control-activated"
+  /// @name Properties
+  /** @{ */
+  static const Property::Index PROPERTY_BACKGROUND_COLOR;    ///< name "background-color",        @see SetBackgroundColor,        type VECTOR4
+  static const Property::Index PROPERTY_BACKGROUND;          ///< name "background",              @see SetBackground,             type MAP
+  /** @} */
 
-  // Signal Names
-  static const char* const SIGNAL_KEY_EVENT;         ///< name "key-event"
+  /// @name Signals
+  /** @{ */
+  static const char* const SIGNAL_KEY_EVENT;                 ///< name "key-event"
+  /** @} */
+
+  /// @name Actions
+  /** @{ */
+  static const char* const ACTION_CONTROL_ACTIVATED;         ///< name "control-activated"
+  /** @} */
 
   /**
    * @brief Describes how a control could be resized.
@@ -159,6 +169,8 @@ public:
    */
   const ControlImpl& GetImplementation() const;
 
+  // Size Negotiation
+
   /**
    * @brief Sets the size policies for the width and height dimensions.
    *
@@ -230,6 +242,8 @@ public:
    */
   float GetWidthForHeight( float height );
 
+  // Key Input
+
   /**
    * @brief This sets the control to receive key events.
    *
@@ -261,6 +275,8 @@ public:
    * @pre The Actor has been initialized.
    */
   void ClearKeyInputFocus();
+
+  // Gesture Detection
 
   /**
    * @brief Retrieves the pinch gesture detector of the control.
@@ -294,8 +310,44 @@ public:
    */
   LongPressGestureDetector GetLongPressGestureDetector() const;
 
-//signals
-public:
+  // Background
+
+  /**
+   * @brief Sets the background color of the control.
+   *
+   * @param[in] color The required background color of the control
+   */
+  void SetBackgroundColor( const Vector4& color );
+
+  /**
+   * @brief Retrieves the background color of the control.
+   *
+   * @return The background color of the control.
+   */
+  Vector4 GetBackgroundColor() const;
+
+  /**
+   * @brief Sets an image as the background of the control.
+   *
+   * The color of this image is blended with the background color @see SetBackgroundColor
+   *
+   * @param[in] image The image to set as the background.
+   */
+  void SetBackground( Image image );
+
+  /**
+   * @brief Clears the background.
+   */
+  void ClearBackground();
+
+  /**
+   * @brief Retrieves the actor used as the background for this control.
+   *
+   * @return The actor that used as the background for this control.
+   */
+  Actor GetBackgroundActor() const;
+
+  // Signals
 
   /**
    * @brief This signal is emitted when key event is received.

@@ -210,6 +210,33 @@ public:
    */
   LongPressGestureDetector GetLongPressGestureDetector() const;
 
+  // Background
+
+  /**
+   * @copydoc Dali::Toolkit::Control::SetBackgroundColor
+   */
+  void SetBackgroundColor( const Vector4& color );
+
+  /**
+   * @copydoc Dali::Toolkit::Control::GetBackgroundColor
+   */
+  Vector4 GetBackgroundColor() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Control::SetBackground
+   */
+  void SetBackground( Image image );
+
+  /**
+   * @copydoc Dali::Toolkit::Control::ClearBackground
+   */
+  void ClearBackground();
+
+  /**
+   * @copydoc Dali::Toolkit::Control::GetBackgroundActor
+   */
+  Actor GetBackgroundActor() const;
+
 public:
 
   /**
