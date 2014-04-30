@@ -267,11 +267,29 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
         continue;
       }
 
-      Property::Index index = handle.GetPropertyIndex(key);
+      Handle propertyObject( handle );
+
+      Property::Index index = propertyObject.GetPropertyIndex( key );
+
+      if( Property::INVALID_INDEX == index )
+      {
+        Actor actor = Actor::DownCast(propertyObject);
+        if( actor )
+        {
+          if( ShaderEffect effect = actor.GetShaderEffect() )
+          {
+            index = effect.GetPropertyIndex( key );
+            if(index != Property::INVALID_INDEX)
+            {
+              propertyObject = effect;
+            }
+          }
+        }
+      }
 
       if( Property::INVALID_INDEX != index )
       {
-        Property::Type type = handle.GetPropertyType(index);
+        Property::Type type = propertyObject.GetPropertyType(index);
 
         Property::Value value;
         if( !SetPropertyFromNode( keyChild.second, type, value, constant ) )
@@ -284,7 +302,7 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
         {
           DALI_SCRIPT_VERBOSE("SetProperty '%s' Index=:%d Value Type=%d Value '%s'\n", key.c_str(), index, value.GetType(), PropertyValueToString(value).c_str() );
 
-          handle.SetProperty( index, value );
+          propertyObject.SetProperty( index, value );
         }
       }
       else
