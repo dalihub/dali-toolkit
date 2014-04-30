@@ -14,34 +14,52 @@
 # limitations under the License.
 #
 
-# Build the Dali Toolkit library
+# Build the Dali Toolkit library (Combined Base and Optional)
 
-toolkit_images_dir = ../../../dali-toolkit/images
-toolkit_src_dir = ../../../dali-toolkit/internal
-public_api_src_dir = ../../../dali-toolkit/public-api
+# Base files
+toolkit_base_images_dir = ../../../base/dali-toolkit/images
+toolkit_base_src_dir    = ../../../base/dali-toolkit/internal
+public_api_base_src_dir = ../../../base/dali-toolkit/public-api
+
+include ../../../base/dali-toolkit/images/file.list
+include ../../../base/dali-toolkit/internal/file.list
+include ../../../base/dali-toolkit/public-api/file.list
+
+# Optional files
+toolkit_optional_images_dir = ../../../optional/dali-toolkit/images
+toolkit_optional_src_dir    = ../../../optional/dali-toolkit/internal
+public_api_optional_src_dir = ../../../optional/dali-toolkit/public-api
+
+include ../../../optional/dali-toolkit/images/file.list
+include ../../../optional/dali-toolkit/internal/file.list
+include ../../../optional/dali-toolkit/public-api/file.list
+
+# CAPI
 capi_devel_src_dir = ../../../capi/dali-toolkit/public-api
 
-include ../../../dali-toolkit/images/file.list
-include ../../../dali-toolkit/internal/file.list
-include ../../../dali-toolkit/public-api/file.list
 include ../../../capi/dali-toolkit/public-api/file.list
-
-lib_LTLIBRARIES = libdali-toolkit.la
-
-libdali_toolkit_la_SOURCES = \
-                     $(toolkit_src_files) \
-                     $(public_api_src_files)
 
 resources_dir = ../../../resources
 daliimagedir = ${dataReadOnlyDir}/toolkit/images/
-daliimage_DATA = ${dali_toolkit_image_files}
+daliimage_DATA = ${dali_toolkit_base_image_files} \
+                 ${dali_toolkit_optional_image_files}
+
+# The Combined library
+lib_LTLIBRARIES = libdali-toolkit.la
+
+libdali_toolkit_la_SOURCES = \
+                     $(toolkit_base_src_files) \
+                     $(public_api_base_src_files) \
+                     $(toolkit_optional_src_files) \
+                     $(public_api_optional_src_files)
 
 libdali_toolkit_la_DEPENDENCIES =
 
 libdali_toolkit_la_CXXFLAGS = -DDALI_COMPILATION \
                       -DDALI_IMAGE_DIR="\"${daliimagedir}\"" \
                       -Werror -Wall \
-                      -I../../.. \
+                      -I../../../base \
+                      -I../../../optional \
                       -I../../../capi \
                       $(DALI_TOOLKIT_CFLAGS) \
                       $(DALICORE_CFLAGS) \
@@ -57,88 +75,96 @@ libdali_toolkit_la_LIBADD = \
                       $(FRIBIDI_LIBS) \
                       $(HTMLCXX_LIBS)
 
-# Install headers
-topleveldir = $(devincludepath)/dali-toolkit
-toplevel_HEADERS = ../../../dali-toolkit/dali-toolkit.h
+# Install Base headers
 
-publicapidir = $(devincludepath)/dali-toolkit/public-api
-publicapicontrolsdir = $(publicapidir)/controls
-publicapialignmentdir = $(publicapidir)/controls/alignment
-publicapibloomviewdir = $(publicapidir)/controls/bloom-view
-publicapibuttonsdir = $(publicapidir)/controls/buttons
-publicapiclusterdir = $(publicapidir)/controls/cluster
-publicapidefaultcontrolsdir = $(publicapidir)/controls/default-controls
-publicapieffectsviewdir = $(publicapidir)/controls/effects-view
-publicapigaussianblurviewdir = $(publicapidir)/controls/gaussian-blur-view
-publicapiimageviewdir = $(publicapidir)/controls/image-view
-publicapiitemviewdir = $(publicapidir)/controls/scrollable/item-view
-publicapimagnifierdir = $(publicapidir)/controls/magnifier
-publicapipopupdir = $(publicapidir)/controls/popup
-publicapipageturnviewdir = $(publicapidir)/controls/page-turn-view
-publicapiscrollbardir = $(publicapidir)/controls/scroll-bar
-publicapiscrollcomponentdir = $(publicapidir)/controls/scroll-component
-publicapiscrollabledir = $(publicapidir)/controls/scrollable
-publicapiscrollviewdir = $(publicapidir)/controls/scrollable/scroll-view
-publicapisliderdir = $(publicapidir)/controls/slider
-publicapitableviewdir = $(publicapidir)/controls/table-view
-publicapitextviewdir = $(publicapidir)/controls/text-view
-publicapitextinputdir = $(publicapidir)/controls/text-input
-publicapitoolbardir = $(publicapidir)/controls/tool-bar
-publicapiselectorsdir = $(publicapidir)/controls/selectors
-publicapishadowviewdir = $(publicapidir)/controls/shadow-view
-publicapibubbleemitterdir = $(publicapidir)/controls/bubble-effect
-publicapisuperblurviewdir = $(publicapidir)/controls/super-blur-view
-publicapiviewdir = $(publicapidir)/controls/view
-publicapinavigationframedir = $(publicapidir)/controls/navigation-frame
-publicapifactorydir = $(publicapidir)/factory
-publicapifocusmanagerdir = $(publicapidir)/focus-manager
-publicapimarkupprocessordir = $(publicapidir)/markup-processor
-publicapishadereffectsdir = $(publicapidir)/shader-effects
-publicapibubbleeffectdir = $(publicapidir)/shader-effects/bubble-effect
-publicapistyledtextutilitiesdir = $(publicapidir)/styled-text-utilities
-publicapibuilderdir = $(publicapidir)/builder
-publicapiutilitiesdir = $(publicapidir)/utilities
-publicapitransitioneffectsdir = $(publicapidir)/transition-effects
+toplevelbasedir = $(devincludepath)/dali-toolkit
 
-publicapi_HEADERS = $(public_api_header_files)
-publicapicontrols_HEADERS = $(public_api_controls_header_files)
-publicapialignment_HEADERS = $(public_api_alignment_header_files)
-publicapibloomview_HEADERS = $(public_api_bloom_view_header_files)
-publicapibuttons_HEADERS = $(public_api_buttons_header_files)
-publicapicluster_HEADERS = $(public_api_cluster_header_files)
-publicapidefaultcontrols_HEADERS = $(public_api_default_controls_header_files)
-publicapieffectsview_HEADERS = $(public_api_effects_view_header_files)
-publicapigaussianblurview_HEADERS = $(public_api_gaussian_blur_view_header_files)
-publicapiimageview_HEADERS = $(public_api_image_view_header_files)
-publicapiitemview_HEADERS = $(public_api_item_view_header_files)
-publicapimagnifier_HEADERS = $(public_api_magnifier_header_files)
-publicapipopup_HEADERS = $(public_api_popup_header_files)
-publicapipageturnview_HEADERS = $(public_api_page_turn_view_header_files)
-publicapiscrollbar_HEADERS = $(public_api_scroll_bar_header_files)
-publicapiscrollcomponent_HEADERS = $(public_api_scroll_component_header_files)
-publicapiscrollable_HEADERS = $(public_api_scrollable_header_files)
-publicapiscrollview_HEADERS = $(public_api_scroll_view_header_files)
-publicapislider_HEADERS = $(public_api_slider_header_files)
-publicapitableview_HEADERS = $(public_api_table_view_header_files)
-publicapitextview_HEADERS = $(public_api_text_view_header_files)
-publicapitextinput_HEADERS = $(public_api_text_input_header_files)
-publicapitoolbar_HEADERS = $(public_api_tool_bar_header_files)
-publicapiselectors_HEADERS = $(public_api_selectors_header_files)
-publicapishadowview_HEADERS = $(public_api_shadow_view_header_files)
-publicapibubbleemitter_HEADERS = $(public_api_bubble_emitter_header_files)
-publicapisuperblurview_HEADERS = $(public_api_super_blur_view_header_files)
-publicapiview_HEADERS = $(public_api_view_header_files)
-publicapinavigationframe_HEADERS = $(public_api_navigation_frame_header_files)
-publicapifactory_HEADERS = $(public_api_factory_header_files)
-publicapifocusmanager_HEADERS = $(public_api_focus_manager_header_files)
-publicapimarkupprocessor_HEADERS = $(public_api_markup_processor_header_files)
-publicapishadereffects_HEADERS = $(public_api_shader_effects_header_files)
-publicapibubbleeffect_HEADERS = $(public_api_bubble_effect_header_files)
-publicapistyledtextutilities_HEADERS = $(public_api_styled_text_utilities_header_files)
-publicapibuilder_HEADERS = $(public_api_builder_header_files)
-publicapiutilities_HEADERS = $(public_api_utilities_header_files)
-publicapitransitioneffects_HEADERS = $(public_api_transition_effects_header_files)
+publicapibasedir = $(toplevelbasedir)/public-api
+publicapibasecontrolsdir = $(publicapibasedir)/controls
+publicapibasealignmentdir = $(publicapibasedir)/controls/alignment
+publicapibasebuttonsdir = $(publicapibasedir)/controls/buttons
+publicapibasedefaultcontrolsdir = $(publicapibasedir)/controls/default-controls
+publicapibaseitemviewdir = $(publicapibasedir)/controls/scrollable/item-view
+publicapibasepopupdir = $(publicapibasedir)/controls/popup
+publicapibasescrollbardir = $(publicapibasedir)/controls/scroll-bar
+publicapibasescrollcomponentdir = $(publicapibasedir)/controls/scroll-component
+publicapibasescrollabledir = $(publicapibasedir)/controls/scrollable
+publicapibasescrollviewdir = $(publicapibasedir)/controls/scrollable/scroll-view
+publicapibasetableviewdir = $(publicapibasedir)/controls/table-view
+publicapibasetextviewdir = $(publicapibasedir)/controls/text-view
+publicapibasetextinputdir = $(publicapibasedir)/controls/text-input
+publicapibasefactorydir = $(publicapibasedir)/factory
+publicapibasefocusmanagerdir = $(publicapibasedir)/focus-manager
+publicapibasemarkupprocessordir = $(publicapibasedir)/markup-processor
 
+publicapibase_HEADERS = $(public_api_base_header_files)
+publicapibasecontrols_HEADERS = $(public_api_base_controls_header_files)
+publicapibasealignment_HEADERS = $(public_api_base_alignment_header_files)
+publicapibasebuttons_HEADERS = $(public_api_base_buttons_header_files)
+publicapibasedefaultcontrols_HEADERS = $(public_api_base_default_controls_header_files)
+publicapibaseitemview_HEADERS = $(public_api_base_item_view_header_files)
+publicapibasepopup_HEADERS = $(public_api_base_popup_header_files)
+publicapibasescrollbar_HEADERS = $(public_api_base_scroll_bar_header_files)
+publicapibasescrollcomponent_HEADERS = $(public_api_base_scroll_component_header_files)
+publicapibasescrollable_HEADERS = $(public_api_base_scrollable_header_files)
+publicapibasescrollview_HEADERS = $(public_api_base_scroll_view_header_files)
+publicapibasetableview_HEADERS = $(public_api_base_table_view_header_files)
+publicapibasetextview_HEADERS = $(public_api_base_text_view_header_files)
+publicapibasetextinput_HEADERS = $(public_api_base_text_input_header_files)
+publicapibasefactory_HEADERS = $(public_api_base_factory_header_files)
+publicapibasefocusmanager_HEADERS = $(public_api_base_focus_manager_header_files)
+publicapibasemarkupprocessor_HEADERS = $(public_api_base_markup_processor_header_files)
+
+# Install Optional headers
+
+topleveloptionaldir = $(devincludepath)/dali-toolkit
+topleveloptional_HEADERS = ../../../optional/dali-toolkit/dali-toolkit.h
+
+publicapioptionaldir = $(topleveloptionaldir)/public-api
+publicapioptionalcontrolsdir = $(publicapioptionaldir)/controls
+publicapioptionalbloomviewdir = $(publicapioptionaldir)/controls/bloom-view
+publicapioptionalclusterdir = $(publicapioptionaldir)/controls/cluster
+publicapioptionaleffectsviewdir = $(publicapioptionaldir)/controls/effects-view
+publicapioptionalgaussianblurviewdir = $(publicapioptionaldir)/controls/gaussian-blur-view
+publicapioptionalimageviewdir = $(publicapioptionaldir)/controls/image-view
+publicapioptionalmagnifierdir = $(publicapioptionaldir)/controls/magnifier
+publicapioptionalpageturnviewdir = $(publicapioptionaldir)/controls/page-turn-view
+publicapioptionalsliderdir = $(publicapioptionaldir)/controls/slider
+publicapioptionaltoolbardir = $(publicapioptionaldir)/controls/tool-bar
+publicapioptionalselectorsdir = $(publicapioptionaldir)/controls/selectors
+publicapioptionalshadowviewdir = $(publicapioptionaldir)/controls/shadow-view
+publicapioptionalbubbleemitterdir = $(publicapioptionaldir)/controls/bubble-effect
+publicapioptionalsuperblurviewdir = $(publicapioptionaldir)/controls/super-blur-view
+publicapioptionalviewdir = $(publicapioptionaldir)/controls/view
+publicapioptionalnavigationframedir = $(publicapioptionaldir)/controls/navigation-frame
+publicapioptionalshadereffectsdir = $(publicapioptionaldir)/shader-effects
+publicapioptionalbubbleeffectdir = $(publicapioptionaldir)/shader-effects/bubble-effect
+publicapioptionalbuilderdir = $(publicapioptionaldir)/builder
+publicapioptionaltransitioneffectsdir = $(publicapioptionaldir)/transition-effects
+
+publicapioptional_HEADERS = $(public_api_optional_header_files)
+publicapioptionalcontrols_HEADERS = $(public_api_optional_controls_header_files)
+publicapioptionalbloomview_HEADERS = $(public_api_optional_bloom_view_header_files)
+publicapioptionalcluster_HEADERS = $(public_api_optional_cluster_header_files)
+publicapioptionaleffectsview_HEADERS = $(public_api_optional_effects_view_header_files)
+publicapioptionalgaussianblurview_HEADERS = $(public_api_optional_gaussian_blur_view_header_files)
+publicapioptionalimageview_HEADERS = $(public_api_optional_image_view_header_files)
+publicapioptionalmagnifier_HEADERS = $(public_api_optional_magnifier_header_files)
+publicapioptionalpageturnview_HEADERS = $(public_api_optional_page_turn_view_header_files)
+publicapioptionalslider_HEADERS = $(public_api_optional_slider_header_files)
+publicapioptionaltoolbar_HEADERS = $(public_api_optional_tool_bar_header_files)
+publicapioptionalselectors_HEADERS = $(public_api_optional_selectors_header_files)
+publicapioptionalshadowview_HEADERS = $(public_api_optional_shadow_view_header_files)
+publicapioptionalbubbleemitter_HEADERS = $(public_api_optional_bubble_emitter_header_files)
+publicapioptionalsuperblurview_HEADERS = $(public_api_optional_super_blur_view_header_files)
+publicapioptionalview_HEADERS = $(public_api_optional_view_header_files)
+publicapioptionalnavigationframe_HEADERS = $(public_api_optional_navigation_frame_header_files)
+publicapioptionalshadereffects_HEADERS = $(public_api_optional_shader_effects_header_files)
+publicapioptionalbubbleeffect_HEADERS = $(public_api_optional_bubble_effect_header_files)
+publicapioptionalbuilder_HEADERS = $(public_api_optional_builder_header_files)
+publicapioptionaltransitioneffects_HEADERS = $(public_api_optional_transition_effects_header_files)
+
+# Install CAPI headers
 
 capideveldir = $(devincludepath)/dali-toolkit/public-api
 capidevelcontrolsdir = $(capideveldir)/controls

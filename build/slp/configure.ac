@@ -80,6 +80,7 @@ AC_SUBST(devincludepath)
 AC_CONFIG_FILES([
  Makefile
  dali-toolkit/Makefile
+ dali-toolkit-base/Makefile
  dali-toolkit.pc
 ])
 

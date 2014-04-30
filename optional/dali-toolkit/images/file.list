@@ -1,0 +1,4 @@
+# Files to install here
+
+dali_toolkit_optional_image_files =\
+    $(toolkit_optional_images_dir)/*.png

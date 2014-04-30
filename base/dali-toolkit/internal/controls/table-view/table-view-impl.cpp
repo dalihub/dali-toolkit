@@ -15,7 +15,7 @@
 //
 
 // CLASS HEADER
-#include "dali-toolkit/internal/controls/table-view/table-view-impl.h"
+#include <dali-toolkit/internal/controls/table-view/table-view-impl.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 
 // EXTERNAL INCLUDES

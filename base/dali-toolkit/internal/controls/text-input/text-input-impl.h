@@ -21,7 +21,6 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-input/text-input.h>
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>
-#include <dali-toolkit/public-api/controls/tool-bar/tool-bar.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/internal/controls/text-input/text-input-popup-impl.h>
 

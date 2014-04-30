@@ -39,6 +39,16 @@ Requires:   boost-devel
 Application development package for the OpenGLES Canvas toolkit
 
 ##############################
+# Dali Base library
+##############################
+%package dali-toolkit-base
+Summary:    A library for Base Toolkit components, intended for lightweight applications
+Group:      Development/Libs
+
+%description dali-toolkit-base
+A library for Base Toolkit components, intended for lightweight applications
+
+##############################
 # Preparation
 ##############################
 %prep
@@ -109,3 +119,7 @@ exit 0
 %defattr(-,root,root,-)
 %{dev_include_path}/%{name}/*
 %{_libdir}/pkgconfig/*.pc
+
+%files dali-toolkit-base
+%defattr(-,root,root,-)
+%{_libdir}/libdali-toolkit-base.so*
