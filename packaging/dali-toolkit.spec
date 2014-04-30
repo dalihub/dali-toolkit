@@ -53,7 +53,7 @@ Application development package for the OpenGLES Canvas toolkit
 ##############################
 %build
 PREFIX="/usr"
-CXXFLAGS+=" -Wall -g -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
+CXXFLAGS+=" -Wall -g -Os -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
 LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections "
 
 %if 0%{?sec_build_binary_debug_enable}
