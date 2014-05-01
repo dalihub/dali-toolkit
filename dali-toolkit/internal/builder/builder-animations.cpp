@@ -180,6 +180,10 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
     {
       animation.SetEndAction( Animation::Discard );
     }
+    else if("BAKE_FINAL" == *endAction)
+    {
+      animation.SetEndAction( Animation::BakeFinal );
+    }
   }
 
   if( OptionalString endAction = constant.IsString(  IsChild(child, "destroy-action" ) ) )
@@ -191,6 +195,10 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
     else if("DISCARD" == *endAction)
     {
       animation.SetDestroyAction( Animation::Discard );
+    }
+    else if("BAKE_FINAL" == *endAction)
+    {
+      animation.SetDestroyAction( Animation::BakeFinal );
     }
   }
 
