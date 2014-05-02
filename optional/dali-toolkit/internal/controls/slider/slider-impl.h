@@ -112,7 +112,7 @@ public:
    *
    * @return The hit region
    */
-  Vector2 GetHitRegion() const;
+  const Vector2& GetHitRegion() const;
 
   /**
    * Set backing region
@@ -126,24 +126,17 @@ public:
    *
    * @return The backing region
    */
-  Vector2 GetBackingRegion() const;
+  const Vector2& GetBackingRegion() const;
 
   /**
-   * Get backing scale9 border
+   * @brief Set the disable color.
    *
-   * @return The backing scale9 border
+   * @param[in] color The disable color.
    */
-  Vector4 GetBackingScale9Border() const;
+  void SetDisableColor( const Vector4& color );
 
   /**
-   * Get popup scale9 border
-   *
-   * @return The popup scale9 border
-   */
-  Vector4 GetPopupScale9Border() const;
-
-  /**
-   * Get disable color
+   * @brief Get disable color
    *
    * @return The disable color
    */
@@ -157,6 +150,13 @@ public:
   Vector4 GetPopupTextColor() const;
 
   /**
+   * Set the value precision to be used for numbers in the slider
+   *
+   * @param[in] precision The number of decimal places to use for printing numbers
+   */
+  void SetValuePrecision( int precision );
+
+  /**
    * Get value precision
    *
    * @return The value precision
@@ -168,7 +168,7 @@ public:
    *
    * @param[in] showPopup The show popup flag
    */
-  void ShowPopup( bool showPopup );
+  void SetShowPopup( bool showPopup );
 
   /**
    * Get show value in popup
@@ -182,7 +182,7 @@ public:
    *
    * @param[in] showValue The show value flag
    */
-  void ShowValue( bool showValue );
+  void SetShowValue( bool showValue );
 
   /**
    * Get show value on handle
@@ -204,6 +204,16 @@ public:
    * @return If enabled
    */
   bool IsEnabled() const;
+
+  /**
+   * @brief Set the mark tolerance
+   *
+   * The tolerance is the percentage of the slider width for which snapping to
+   * marks occurs
+   *
+   * @param[in] tolerance The percentage of width for which to snap
+   */
+  void SetMarkTolerance( float tolerance );
 
   /**
    * Return the mark tolerance
@@ -241,6 +251,24 @@ public:
    */
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName,
                                FunctorDelegate* functor );
+
+  // Properties
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
 
 protected:
 
@@ -422,13 +450,6 @@ private:
   void CreateChildren();
 
   /**
-   * Resize the hit area
-   *
-   * @param[in] size The new size of the hit area
-   */
-  void ResizeHitRegion( const Vector2& size );
-
-  /**
    * Create value popup
    */
   void AddPopup();
@@ -490,42 +511,63 @@ private:
    *
    * @param[in] imageName The name of the image to load and set
    */
-  void CreateBackingImage( const std::string& imageName );
+  void SetBackingImageName( const std::string& imageName );
 
   /**
-   * Set the backing image to be a scale-9 image
+   * @brief Return the backing image file name.
    *
-   * @param[in] border The scale-9 border to use
+   * @return The backing image file name.
    */
-  void SetBackingScale9( const Vector4& border );
-
-  /**
-   * Resize the backing region
-   *
-   * @param[in] region The size of the region to set
-   */
-  void ResizeBackingRegion( const Vector2& region );
-
-  /**
-   * Size the backing region
-   *
-   * @param[in] region The size of the region to set
-   */
-  void SetBackingRegionSize( const Vector2& region );
+  std::string GetBackingImageName();
 
   /**
    * Create the image for the progress bar
    *
    * @param[in] imageName The name of the image to load and set
    */
-  void CreateProgressImage( const std::string& imageName );
+  void SetProgressImageName( const std::string& imageName );
 
   /**
-   * Create the image for the popup
+   * @brief Return the progress image name.
+   *
+   * @return The progress image name if it exists.
+   */
+  std::string GetProgressImageName();
+
+  /**
+   * @brief Create the image for the popup
    *
    * @param[in] imageName The name of the image to load and set
    */
   void CreatePopupImage( const std::string& imageName );
+
+  /**
+   * @brief Set the popup name
+   *
+   * @param[in] imageName The name of the image to set
+   */
+  void SetPopupImageName( const std::string& imageName );
+
+  /**
+   * @brief Return the popup image name.
+   *
+   * @return The name of the popup image if it exists.
+   */
+  std::string GetPopupImageName();
+
+  /**
+   * @brief Set the popup arrow image name
+   *
+   * @param[in] imageName The name of the image to set
+   */
+  void SetPopupArrowImageName( const std::string& imageName );
+
+  /**
+   * @brief Return the popup arrow image name.
+   *
+   * @return The name of the popup image if it exists.
+   */
+  std::string GetPopupArrowImageName();
 
   /**
    * Create the image for the popup arrow
@@ -533,20 +575,6 @@ private:
    * @param[in] imageName The name of the image to load and set
    */
   void CreatePopupArrowImage( const std::string& imageName );
-
-  /**
-   * Set the progress image to be a scale-9 image
-   *
-   * @param[in] border The scale-9 border to use
-   */
-  void SetProgressScale9( const Vector4& border );
-
-  /**
-   * Set the popup image to be a scale-9 image
-   *
-   * @param[in] border The scale-9 border to use
-   */
-  void SetPopupScale9( const Vector4& border );
 
   /**
    * Set the size of the progress bar region
@@ -560,7 +588,14 @@ private:
    *
    * @param[in] imageName The name of the image to load and set
    */
-  void CreateHandleImage( const std::string& imageName );
+  void SetHandleImageName( const std::string& imageName );
+
+  /**
+   * @brief Return the handle image name.
+   *
+   * @return The name of the image handle if it exists.
+   */
+  std::string GetHandleImageName();
 
   /**
    * Set the size of the handle region
@@ -584,28 +619,28 @@ private:
    *
    * @param[in] color The new color
    */
-  void UpdatePopupTextColor( const Vector4& color );
+  void SetPopupTextColor( const Vector4& color );
 
   /**
    * Set handle region
    *
    * @param[in] region The handle region
    */
-  void UpdateHandleRegion( const Vector2& region );
+  void SetHandleRegion( const Vector2& region );
 
   /**
    * Get handle region
    *
    * @return The handle region
    */
-  Vector2 GetHandleRegion() const;
+  const Vector2& GetHandleRegion() const;
 
   /**
    * Set the lower bound of the slider's value
    *
    * @param[in] bound The value to set for the lower bound
    */
-  void UpdateLowerBound( float bound );
+  void SetLowerBound( float bound );
 
   /**
    * Get the lower bound of the slider's value
@@ -619,7 +654,7 @@ private:
    *
    * @param[in] bound The value to set for the upper bound
    */
-  void UpdateUpperBound( float bound );
+  void SetUpperBound( float bound );
 
   /**
    * Get the upper bound of the slider's value
@@ -627,14 +662,6 @@ private:
    * @return The upper bound value
    */
   float GetUpperBound() const;
-
-private:
-  // From ControlImpl
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnPropertySet()
-   */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
 
 private:
 
@@ -671,38 +698,27 @@ private:
 
   MarkList mMarks;                    ///< List of discreet marks
 
-  // Properties
-  Property::Index mPropertyLowerBound;
-  Property::Index mPropertyUpperBound;
-  Property::Index mPropertyValue;
-  Property::Index mPropertyHitRegion;
-  Property::Index mPropertyBackingRegion;
-  Property::Index mPropertyHandleRegion;
+  std::string mPopupImageName;      ///< Image name for popup image
+  std::string mPopupArrowImageName; ///< Image name for popup arrow
 
-  Property::Index mPropertyBackingImageName;
-  Property::Index mPropertyHandleImageName;
-  Property::Index mPropertyProgressImageName;
-  Property::Index mPropertyPopupImageName;
-  Property::Index mPropertyPopupArrowImageName;
+  Vector4 mDisableColor;    ///< The color to tint the slider when disabled
+  Vector4 mPopupTextColor;  ///< The color of the popup text
 
-  Property::Index mPropertyBackingScale9Border;
-  Property::Index mPropertyProgressScale9Border;
-  Property::Index mPropertyPopupScale9Border;
+  Vector2 mHitRegion;     ///< Size of hit region
+  Vector2 mBackingRegion; ///< Size of backing region
+  Vector2 mHandleRegionSize;  ///< Size of the handle region
 
-  Property::Index mPropertyDisableColor;
-  Property::Index mPropertyPopupTextColor;
+  float mLowerBound;        ///< Lower bound on value
+  float mUpperBound;        ///< Upper bound on value
+  float mValue;             ///< Current value of slider
 
-  Property::Index mPropertyValuePrecision;
+  float mMarkTolerance;     ///< Tolerance in percentage of slider width for which to snap to marks
 
-  Property::Index mPropertyShowPopup;
-  Property::Index mPropertyShowValue;
+  int mValuePrecision;      ///< The precision to use for outputting the value
 
-  Property::Index mPropertyEnabled;
-
-  Property::Index mPropertyMarks;
-  Property::Index mPropertySnapToMarks;
-  Property::Index mPropertyMarkTolerance;
-
+  bool mShowPopup   : 1,      ///< Show the popup or not
+       mShowValue   : 1,      ///< Whether to display the value number or not on the handle
+       mSnapToMarks : 1;      ///< Turn on or off snapping to marks
 };
 
 } // namespace Internal

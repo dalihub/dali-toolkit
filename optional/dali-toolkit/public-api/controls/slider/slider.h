@@ -43,37 +43,33 @@ public:
   static const char* const SIGNAL_MARK;
 
   // Properties
-  static const std::string LOWER_BOUND_PROPERTY_NAME;           ///< Property, name "lower-bound",       type FLOAT
-  static const std::string UPPER_BOUND_PROPERTY_NAME;           ///< Property, name "upper-bound",       type FLOAT
-  static const std::string VALUE_PROPERTY_NAME;                 ///< Property, name "value",             type FLOAT
+  static const Property::Index LOWER_BOUND_PROPERTY;            ///< Property, name "lower-bound",       type FLOAT
+  static const Property::Index UPPER_BOUND_PROPERTY;            ///< Property, name "upper-bound",       type FLOAT
+  static const Property::Index VALUE_PROPERTY;                  ///< Property, name "value",             type FLOAT
 
-  static const std::string HIT_REGION_PROPERTY_NAME;            ///< Property, name "hit-region",        type VECTOR2
-  static const std::string BACKING_REGION_PROPERTY_NAME;        ///< Property, name "backing-region",    type VECTOR2
-  static const std::string HANDLE_REGION_PROPERTY_NAME;         ///< Property, name "handle-region",     type VECTOR2
+  static const Property::Index HIT_REGION_PROPERTY;             ///< Property, name "hit-region",        type VECTOR2
+  static const Property::Index BACKING_REGION_PROPERTY;         ///< Property, name "backing-region",    type VECTOR2
+  static const Property::Index HANDLE_REGION_PROPERTY;          ///< Property, name "handle-region",     type VECTOR2
 
-  static const std::string BACKING_IMAGE_NAME_PROPERTY_NAME;    ///< Property, name "backing-image-name",  type std::string
-  static const std::string HANDLE_IMAGE_NAME_PROPERTY_NAME;     ///< Property, name "handle-image-name",   type std::string
-  static const std::string PROGRESS_IMAGE_NAME_PROPERTY_NAME;   ///< Property, name "progress-image-name", type std::string
-  static const std::string POPUP_IMAGE_NAME_PROPERTY_NAME;      ///< Property, name "popup-image-name",    type std::string
-  static const std::string POPUP_ARROW_IMAGE_NAME_PROPERTY_NAME; ///< Property, name "popup-arrow-image-name", type std::string
+  static const Property::Index BACKING_IMAGE_NAME_PROPERTY;     ///< Property, name "backing-image-name",  type STRING
+  static const Property::Index HANDLE_IMAGE_NAME_PROPERTY;      ///< Property, name "handle-image-name",   type STRING
+  static const Property::Index PROGRESS_IMAGE_NAME_PROPERTY;    ///< Property, name "progress-image-name", type STRING
+  static const Property::Index POPUP_IMAGE_NAME_PROPERTY;       ///< Property, name "popup-image-name",    type STRING
+  static const Property::Index POPUP_ARROW_IMAGE_NAME_PROPERTY; ///< Property, name "popup-arrow-image-name", type STRING
 
-  static const std::string BACKING_SCALE9_BORDER_PROPERTY_NAME;  ///< Property, name "backing-scale9-border",  type VECTOR4
-  static const std::string PROGRESS_SCALE9_BORDER_PROPERTY_NAME; ///< Property, name "progress-scale9-border", type VECTOR4
-  static const std::string POPUP_SCALE9_BORDER_PROPERTY_NAME;    ///< Property, name "popup-scale9-border",    type VECTOR4
+  static const Property::Index DISABLE_COLOR_PROPERTY;          ///< Property, name "disable-color",    type VECTOR4
+  static const Property::Index POPUP_TEXT_COLOR_PROPERTY;       ///< Property, name "popup-text-color", type VECTOR4
 
-  static const std::string DISABLE_COLOR_PROPERTY_NAME;          ///< Property, name "disable-color",    type VECTOR4
-  static const std::string POPUP_TEXT_COLOR_PROPERTY_NAME;       ///< Property, name "popup-text-color", type VECTOR4
+  static const Property::Index VALUE_PRECISION_PROPERTY;        ///< Property, name "value-precision",  type INT
 
-  static const std::string VALUE_PRECISION_PROPERTY_NAME;        ///< Property, name "value-precision",  type INT
+  static const Property::Index SHOW_POPUP_PROPERTY;             ///< Property, name "show-popup",       type BOOLEAN
+  static const Property::Index SHOW_VALUE_PROPERTY;             ///< Property, name "show-value",       type BOOLEAN
 
-  static const std::string SHOW_POPUP_PROPERTY_NAME;             ///< Property, name "show-popup",       type BOOLEAN
-  static const std::string SHOW_VALUE_PROPERTY_NAME;             ///< Property, name "show-value",       type BOOLEAN
+  static const Property::Index ENABLED_PROPERTY;                ///< Property, name "enabled",          type BOOLEAN
 
-  static const std::string ENABLED_PROPERTY_NAME;                ///< Property, name "enabled",          type BOOLEAN
-
-  static const std::string MARKS_PROPERTY_NAME;                  ///< Property, name "marks",            type Property::Array<float>
-  static const std::string SNAP_TO_MARKS_PROPERTY_NAME;          ///< Property, name "snap-to-marks",    type BOOLEAN
-  static const std::string MARK_TOLERANCE_PROPERTY_NAME;         ///< Property, name "mark-tolerance",   type FLOAT
+  static const Property::Index MARKS_PROPERTY;                  ///< Property, name "marks",            type Property::Array<float>
+  static const Property::Index SNAP_TO_MARKS_PROPERTY;          ///< Property, name "snap-to-marks",    type BOOLEAN
+  static const Property::Index MARK_TOLERANCE_PROPERTY;         ///< Property, name "mark-tolerance",   type FLOAT
 
 public:
 
