@@ -21,6 +21,7 @@ BuildRequires:  dali-adaptor-devel
 BuildRequires:  fribidi-devel
 BuildRequires:  pkgconfig(utilX)
 BuildRequires:  sec-product-features
+ExclusiveArch:  armv7l
 
 %description
 The OpenGLES Canvas Core Library Toolkit
