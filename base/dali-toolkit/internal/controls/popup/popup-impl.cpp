@@ -732,16 +732,11 @@ void Popup::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
   // Relayout content
   if( mContent )
   {
-    Vector2 contentSize;
-    contentSize.width = popupSize.width;
-
-    Toolkit::Control control = Toolkit::Control::DownCast( mContent );
-    if( control )
+    // If the content width is greater than popup width then scale it down/wrap text as needed
+    Vector2 contentSize( RelayoutHelper::GetNaturalSize( mContent ) );
+    if( contentSize.width > popupSize.width )
     {
-      contentSize.height = control.GetHeightForWidth( contentSize.width );
-    }
-    else
-    {
+      contentSize.width = popupSize.width;
       contentSize.height = RelayoutHelper::GetHeightForWidth( mContent, contentSize.width );
     }
 
@@ -826,28 +821,38 @@ bool Popup::OnKeyEvent(const KeyEvent& event)
 
 Vector3 Popup::GetNaturalSize()
 {
-  Vector3 naturalSize;
+  float margin = 2.0f * ( POPUP_OUT_MARGIN_WIDTH + mPopupStyle->margin );
+  const float maxWidth = Stage::GetCurrent().GetSize().width - margin;
+
+  Vector3 naturalSize( 0.0f, 0.0f, 0.0f );
 
   if ( mTitle )
   {
-    naturalSize += mTitle.GetImplementation().GetNaturalSize();
+    Vector3 titleNaturalSize = mTitle.GetImplementation().GetNaturalSize();
+    // Buffer to avoid errors. The width of the popup could potentially be the width of the title text.
+    // It was observed in this case that text wrapping was then inconsistent when seen on device
+    const float titleBuffer = 0.5f;
+    titleNaturalSize.width += titleBuffer;
+
+    // As TextView GetNaturalSize does not take wrapping into account, limit the width
+    // to that of the stage
+    if( titleNaturalSize.width >= maxWidth)
+    {
+      naturalSize.width = maxWidth;
+      naturalSize.height = mTitle.GetImplementation().GetHeightForWidth( naturalSize.width );
+    }
+    else
+    {
+      naturalSize += titleNaturalSize;
+    }
+
     naturalSize.height += mPopupStyle->margin;
   }
 
   if( mContent )
   {
-    Vector3 contentSize;
-
-    Toolkit::Control control = Toolkit::Control::DownCast( mContent );
-    if( control )
-    {
-      contentSize = control.GetImplementation().GetNaturalSize();
-    }
-    else
-    {
-      contentSize = RelayoutHelper::GetNaturalSize( mContent );
-    }
-
+    Vector3 contentSize = RelayoutHelper::GetNaturalSize( mContent );
+    // Choose the biggest width
     naturalSize.width = std::max( naturalSize.width, contentSize.width );
     naturalSize.height += contentSize.height + mPopupStyle->margin;
   }
@@ -858,7 +863,6 @@ Vector3 Popup::GetNaturalSize()
   }
 
   // Add the margins
-  float margin( 2.0f * ( POPUP_OUT_MARGIN_WIDTH + mPopupStyle->margin ) );
   naturalSize.width += margin;
   naturalSize.height += margin;
 
@@ -878,19 +882,7 @@ float Popup::GetHeightForWidth( float width )
 
   if( mContent )
   {
-    float contentHeight;
-
-    Toolkit::Control control = Toolkit::Control::DownCast( mContent );
-    if( control )
-    {
-      contentHeight = control.GetImplementation().GetHeightForWidth( popupWidth );
-    }
-    else
-    {
-      contentHeight = RelayoutHelper::GetHeightForWidth( mContent, popupWidth );
-    }
-
-    height += contentHeight + mPopupStyle->margin;
+    height += RelayoutHelper::GetHeightForWidth( mContent, popupWidth ) + mPopupStyle->margin;
   }
 
   if( !mButtons.empty() )

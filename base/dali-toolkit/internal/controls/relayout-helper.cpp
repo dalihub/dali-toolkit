@@ -16,6 +16,9 @@
 
 #include "relayout-helper.h"
 
+#include <dali-toolkit/public-api/controls/control.h>
+
+
 namespace Dali
 {
 
@@ -30,29 +33,41 @@ namespace RelayoutHelper
 
 Vector3 GetNaturalSize( Actor actor )
 {
-  Vector3 size = actor.GetCurrentSize();
-  const float depth = size.depth;
+  Vector3 size( 0.0f, 0.0f, 0.0f );
 
-  // Get natural size for TextActor.
-  TextActor textActor = TextActor::DownCast( actor );
-  if( textActor )
+  Toolkit::Control control = Toolkit::Control::DownCast( actor );
+  if( control )
   {
-    Font font = textActor.GetFont();
-    if( !font )
-    {
-      font = Font::New();
-    }
-    size = font.MeasureText( textActor.GetText() );
-    size.depth = depth;
+    size = control.GetNaturalSize();
   }
-
-  // Get natural size for ImageActor.
-  // TODO: currently it doesn't work as expected.
-  ImageActor imageActor = ImageActor::DownCast( actor );
-  if( ( imageActor ) && ( imageActor.GetImage() ) )
+  else
   {
-    Image image = imageActor.GetImage();
-    size = Vector3( static_cast<float>( image.GetWidth() ), static_cast<float>( image.GetHeight() ), depth );
+    size = actor.GetCurrentSize();
+    const float depth = size.depth;
+
+    // Get natural size for ImageActor.
+    // TODO: currently it doesn't work as expected.
+    ImageActor imageActor = ImageActor::DownCast( actor );
+    if( ( imageActor ) && ( imageActor.GetImage() ) )
+    {
+      Image image = imageActor.GetImage();
+      size = Vector3( static_cast<float>( image.GetWidth() ), static_cast<float>( image.GetHeight() ), depth );
+    }
+    else
+    {
+      // Get natural size for TextActor.
+      TextActor textActor = TextActor::DownCast( actor );
+      if( textActor )
+      {
+        Font font = textActor.GetFont();
+        if( !font )
+        {
+          font = Font::New();
+        }
+        size = font.MeasureText( textActor.GetText() );
+        size.depth = depth;
+      }
+    }
   }
 
   return size;
@@ -60,28 +75,59 @@ Vector3 GetNaturalSize( Actor actor )
 
 float GetHeightForWidth( Actor actor, float width )
 {
-  Vector3 size = actor.GetCurrentSize();
-  float height = 0.f;
+  float height = 0.0f;
 
-  TextActor textActor = TextActor::DownCast( actor );
-  if( textActor )
+  Toolkit::Control control = Toolkit::Control::DownCast( actor );
+  if( control )
   {
-    Font font = textActor.GetFont();
-    if( !font )
+    height = control.GetHeightForWidth( width );
+  }
+  else
+  {
+    bool constrainSize = false;
+    Vector3 size( 0.0f, 0.0f, 0.0f );
+
+    ImageActor imageActor = ImageActor::DownCast( actor );
+    if( ( imageActor ) && ( imageActor.GetImage() ) )
     {
-      font = Font::New();
+      Image image = imageActor.GetImage();
+      size = Vector3( static_cast<float>( image.GetWidth() ), static_cast<float>( image.GetHeight() ), 0.0f );
+
+      constrainSize = true;
     }
-    size = font.MeasureText( textActor.GetText() );
-  }
+    else
+    {
+      TextActor textActor = TextActor::DownCast( actor );
+      if( textActor )
+      {
+        Font font = textActor.GetFont();
+        if( !font )
+        {
+          font = Font::New();
+        }
+        size = font.MeasureText( textActor.GetText() );
 
-  ImageActor imageActor = ImageActor::DownCast( actor );
-  if( ( imageActor ) && ( imageActor.GetImage() ) )
-  {
-    Image image = imageActor.GetImage();
-    size = Vector3( static_cast<float>( image.GetWidth() ), static_cast<float>( image.GetHeight() ), 0.f );
-  }
+        constrainSize = true;
+      }
+      else
+      {
+        size = actor.GetCurrentSize();
+      }
+    }
 
-  height = size.height / ( size.width / width );
+    // Scale the actor
+    float scaleRatio = width / size.width;
+    if( constrainSize )
+    {
+      // Allow the scale to decrease if greater than input width but not increase if less than input width
+      if( scaleRatio > 1.0f )
+      {
+        scaleRatio = 1.0f;
+      }
+    }
+
+    height = size.height * scaleRatio;
+  }
 
   return height;
 }
