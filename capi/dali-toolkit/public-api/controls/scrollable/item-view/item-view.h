@@ -381,6 +381,36 @@ public:
    */
   void ReplaceItems(const ItemContainer& replacementItems, float durationSeconds);
 
+  /**
+   * @brief Set the parent origin of the items
+   *
+   * A relayout will occur for all the items if the parent origin is different than the current one.
+   * @param[in] parentOrigin New parent origin position vector
+   */
+  void SetItemsParentOrigin( const Vector3& parentOrigin );
+
+  /**
+   * @brief Get the parent origin of the items
+   *
+   * @return The current parent origin of the items
+   */
+  Vector3 GetItemsParentOrigin() const;
+
+  /**
+   * @brief Set the anchor point of the items
+   *
+   * A relayout will occur for all the items if the anchor point is different than the current one.
+   * @param[in] anchorPoint New anchor point position vector
+   */
+  void SetItemsAnchorPoint( const Vector3& anchorPoint );
+
+  /**
+   * @brief Get the anchor point of the items
+   *
+   * @return The current anchor point of the items
+   */
+  Vector3 GetItemsAnchorPoint() const;
+
 public: // Not intended for application developers
 
   /**

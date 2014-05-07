@@ -227,6 +227,27 @@ void ItemView::ReplaceItems(const ItemContainer& replacementItems, float duratio
   GetImpl(*this).ReplaceItems( replacementItems, durationSeconds );
 }
 
+
+void ItemView::SetItemsParentOrigin( const Vector3& parentOrigin )
+{
+  GetImpl(*this).SetItemsParentOrigin( parentOrigin );
+}
+
+Vector3 ItemView::GetItemsParentOrigin() const
+{
+  return GetImpl(*this).GetItemsParentOrigin();
+}
+
+void ItemView::SetItemsAnchorPoint( const Vector3& anchorPoint )
+{
+  GetImpl(*this).SetItemsAnchorPoint(anchorPoint);
+}
+
+Vector3 ItemView::GetItemsAnchorPoint() const
+{
+  return GetImpl(*this).GetItemsAnchorPoint();
+}
+
 } // namespace Toolkit
 
 } // namespace Dali

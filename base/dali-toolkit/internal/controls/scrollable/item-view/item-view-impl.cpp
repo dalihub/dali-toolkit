@@ -411,7 +411,9 @@ ItemView::ItemView(ItemFactory& factory)
   mIsFlicking(false),
   mGestureState(Gesture::Clear),
   mAddingItems(false),
-  mRefreshEnabled(true)
+  mRefreshEnabled(true),
+  mItemsParentOrigin( ParentOrigin::CENTER),
+  mItemsAnchorPoint( AnchorPoint::CENTER)
 {
   SetRequiresMouseWheelEvents(true);
   SetKeyboardNavigationSupport(true);
@@ -1019,8 +1021,8 @@ void ItemView::AddNewActor( unsigned int itemId, float durationSeconds )
 
 void ItemView::SetupActor( Item item, float durationSeconds )
 {
-  item.second.SetParentOrigin( ParentOrigin::CENTER );
-  item.second.SetAnchorPoint( AnchorPoint::CENTER );
+  item.second.SetParentOrigin( mItemsParentOrigin );
+  item.second.SetAnchorPoint( mItemsAnchorPoint );
 
   if( mActiveLayout )
   {
@@ -1764,6 +1766,40 @@ void ItemView::AnimateScrollOvershoot(float overshootAmount, bool animateBack)
   mScrollOvershootAnimation.Play();
 
   mAnimatingOvershootOn = animatingOn;
+}
+
+void ItemView::SetItemsParentOrigin( const Vector3& parentOrigin )
+{
+  if( parentOrigin != mItemsParentOrigin )
+  {
+    mItemsParentOrigin = parentOrigin;
+    for (ItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+    {
+      iter->second.SetParentOrigin(parentOrigin);
+    }
+  }
+}
+
+Vector3 ItemView::GetItemsParentOrigin() const
+{
+  return mItemsParentOrigin;
+}
+
+void ItemView::SetItemsAnchorPoint( const Vector3& anchorPoint )
+{
+  if( anchorPoint != mItemsAnchorPoint )
+  {
+    mItemsAnchorPoint = anchorPoint;
+    for (ItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+    {
+      iter->second.SetAnchorPoint(anchorPoint);
+    }
+  }
+}
+
+Vector3 ItemView::GetItemsAnchorPoint() const
+{
+  return mItemsAnchorPoint;
 }
 
 } // namespace Internal

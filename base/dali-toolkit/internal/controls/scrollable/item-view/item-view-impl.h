@@ -262,6 +262,27 @@ public:
    */
   void DoRefresh(float currentLayoutPosition, bool cacheExtra);
 
+
+  /**
+   * @copydoc Toolkit::ItemView::SetItemsParentOrigin
+   */
+  void SetItemsParentOrigin( const Vector3& parentOrigin );
+
+  /**
+   * @copydoc Toolkit::ItemView::GetItemsParentOrigin
+   */
+  Vector3 GetItemsParentOrigin() const;
+
+  /**
+   * @copydoc Toolkit::ItemView::SetItemsAnchorPoint
+   */
+  void SetItemsAnchorPoint( const Vector3& anchorPoint );
+
+  /**
+   * @copydoc Toolkit::ItemView::GetItemsAnchorPoint
+   */
+  Vector3 GetItemsAnchorPoint() const;
+
 private:
 
   /**
@@ -564,6 +585,9 @@ private:
   Property::Index mPropertyScrollSpeed; ///< The current scroll speed of item view
 
   bool mRefreshEnabled; ///< Whether to refresh the cache automatically
+
+  Vector3 mItemsParentOrigin;
+  Vector3 mItemsAnchorPoint;
 };
 
 } // namespace Internal
