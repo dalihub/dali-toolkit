@@ -67,6 +67,7 @@
 #include <dali-toolkit/public-api/shader-effects/alpha-discard-effect.h>
 #include <dali-toolkit/public-api/shader-effects/bendy-effect.h>
 #include <dali-toolkit/public-api/shader-effects/blind-effect.h>
+#include <dali-toolkit/public-api/shader-effects/bouncing-effect.h>
 #include <dali-toolkit/public-api/shader-effects/carousel-effect.h>
 #include <dali-toolkit/public-api/shader-effects/displacement-effect.h>
 #include <dali-toolkit/public-api/shader-effects/dissolve-local-effect.h>

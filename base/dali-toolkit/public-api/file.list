@@ -47,7 +47,8 @@ public_api_base_src_files = \
   $(public_api_base_src_dir)/focus-manager/keyboard-focus-manager.cpp \
   $(public_api_base_src_dir)/focus-manager/keyinput-focus-manager.cpp \
   $(public_api_base_src_dir)/markup-processor/markup-processor.cpp \
-  $(public_api_base_src_dir)/shader-effects/image-region-effect.cpp
+  $(public_api_base_src_dir)/shader-effects/image-region-effect.cpp \
+  $(public_api_base_src_dir)/shader-effects/bouncing-effect.cpp
 
 # Add public header files here
 
@@ -100,4 +101,7 @@ public_api_base_focus_manager_header_files = \
   $(public_api_base_src_dir)/focus-manager/keyinput-focus-manager.h
 
 public_api_base_markup_processor_header_files =
+
+public_api_base_shader_effects_header_files = \
+  $(public_api_base_src_dir)/shader-effects/bouncing-effect.h
 

@@ -96,6 +96,7 @@ publicapibasetextinputdir = $(publicapibasedir)/controls/text-input
 publicapibasefactorydir = $(publicapibasedir)/factory
 publicapibasefocusmanagerdir = $(publicapibasedir)/focus-manager
 publicapibasemarkupprocessordir = $(publicapibasedir)/markup-processor
+publicapibaseshadereffectsdir = $(publicapibasedir)/shader-effects
 
 publicapibase_HEADERS = $(public_api_base_header_files)
 publicapibasecontrols_HEADERS = $(public_api_base_controls_header_files)
@@ -114,6 +115,7 @@ publicapibasetextinput_HEADERS = $(public_api_base_text_input_header_files)
 publicapibasefactory_HEADERS = $(public_api_base_factory_header_files)
 publicapibasefocusmanager_HEADERS = $(public_api_base_focus_manager_header_files)
 publicapibasemarkupprocessor_HEADERS = $(public_api_base_markup_processor_header_files)
+publicapibaseshadereffects_HEADERS = $(public_api_base_shader_effects_header_files)
 
 # Install Optional headers
 
