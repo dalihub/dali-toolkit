@@ -327,6 +327,11 @@ protected: // From ControlImpl
    */
   virtual void OnActivated();
 
+  /**
+   * @copydoc Control::GetNaturalSize()
+   */
+  virtual Vector3 GetNaturalSize();
+
 private:
 
   /**

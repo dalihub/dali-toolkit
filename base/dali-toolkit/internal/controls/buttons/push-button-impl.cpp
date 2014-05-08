@@ -27,6 +27,7 @@
 #include "push-button-default-painter-impl.h"
 
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>
+#include <dali-toolkit/internal/controls/relayout-helper.h>
 
 namespace Dali
 {
@@ -81,11 +82,35 @@ namespace
 const unsigned int INITIAL_AUTOREPEATING_DELAY( 0.15f );
 const unsigned int NEXT_AUTOREPEATING_DELAY( 0.05f );
 
+const float TEXT_PADDING = 12.0f;
+
 // Helper function used to cast a ButtonPainter to PushButtonDefaultPainter
 PushButtonDefaultPainterPtr GetPushButtonPainter( Dali::Toolkit::Internal::ButtonPainterPtr painter )
 {
   return static_cast<PushButtonDefaultPainter*>( painter.Get() );
 }
+
+/**
+ * Find the first image actor in the actor hierarchy
+ */
+ImageActor FindImageActor( Actor root )
+{
+  ImageActor imageActor = ImageActor::DownCast( root );
+  if( !imageActor && root )
+  {
+    for( unsigned int i = 0, numChildren = root.GetChildCount(); i < numChildren; ++i )
+    {
+      ImageActor childImageActor = FindImageActor( root.GetChildAt( i ) );
+      if( childImageActor )
+      {
+        return childImageActor;
+      }
+    }
+  }
+
+  return imageActor;
+}
+
 
 } // unnamed namespace
 
@@ -676,6 +701,69 @@ void PushButton::OnActivated()
   // When the button is activated, it performs the click action
   std::vector<Property::Value> attributes;
   DoClickAction(attributes);
+}
+
+Vector3 PushButton::GetNaturalSize()
+{
+  Vector3 size = ControlImpl::GetNaturalSize();
+
+  const bool widthIsZero = EqualsZero( size.width );
+  const bool heightIsZero = EqualsZero( size.height );
+
+  if( widthIsZero || heightIsZero )
+  {
+    // If background and background not scale9 try get size from that
+    ImageActor imageActor = FindImageActor( mButtonImage );
+    if( imageActor && imageActor.GetStyle() != ImageActor::STYLE_NINE_PATCH )
+    {
+      Vector3 imageSize = RelayoutHelper::GetNaturalSize( imageActor );
+
+      if( widthIsZero )
+      {
+        size.width = imageSize.width;
+      }
+
+      if( heightIsZero )
+      {
+        size.height = imageSize.height;
+      }
+    }
+
+    ImageActor backgroundImageActor = FindImageActor( mBackgroundImage );
+    if( backgroundImageActor && backgroundImageActor.GetStyle() != ImageActor::STYLE_NINE_PATCH )
+    {
+      Vector3 imageSize = RelayoutHelper::GetNaturalSize( backgroundImageActor );
+
+      if( widthIsZero )
+      {
+        size.width = std::max( size.width, imageSize.width );
+      }
+
+      if( heightIsZero )
+      {
+        size.height = std::max( size.height, imageSize.height );
+      }
+    }
+
+    // If label, test against it's size
+    Toolkit::TextView textView = Toolkit::TextView::DownCast( mLabel );
+    if( textView )
+    {
+      Vector3 textViewSize = textView.GetNaturalSize();
+
+      if( widthIsZero )
+      {
+        size.width = std::max( size.width, textViewSize.width + TEXT_PADDING * 2.0f );
+      }
+
+      if( heightIsZero )
+      {
+        size.height = std::max( size.height, textViewSize.height + TEXT_PADDING * 2.0f );
+      }
+    }
+  }
+
+  return size;
 }
 
 void PushButton::DoClickAction(const PropertyValueContainer& attributes)

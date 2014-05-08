@@ -43,7 +43,6 @@ Alignment CreateAlignedImage( Actor image )
 Alignment CreateAlignedImage( const std::string& imagePath )
 {
   Image image = Image::New( imagePath );
-
   return CreateAlignedImage( ImageActor::New( image ) );
 }
 
