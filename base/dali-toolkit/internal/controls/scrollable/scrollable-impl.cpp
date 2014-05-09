@@ -54,6 +54,7 @@ SignalConnectorType s4(mType, Toolkit::Scrollable::SIGNAL_SCROLL_CLAMPED,   &Scr
 
 const std::string Scrollable::SCROLLABLE_CAN_SCROLL_VERTICAL( "scrollable-can-scroll-vertical" );
 const std::string Scrollable::SCROLLABLE_CAN_SCROLL_HORIZONTAL( "scrollable-can-scroll-horizontal" );
+const Vector4     Scrollable::DEFAULT_OVERSHOOT_COLOUR(0.0f, 0.64f, 0.85f, 0.6f);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Scrollable

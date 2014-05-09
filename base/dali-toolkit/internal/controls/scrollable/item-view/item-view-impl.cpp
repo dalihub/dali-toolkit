@@ -24,6 +24,7 @@
 #include <dali/public-api/events/mouse-wheel-event.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
+#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 
 using namespace std;
 using namespace Dali;
@@ -46,7 +47,6 @@ const float DEFAULT_COLOR_VISIBILITY_REMOVE_TIME = 0.5f; // 0.5 second
 
 const float MILLISECONDS_PER_SECONDS = 1000.0f;
 
-const char* OVERSHOOT_OVERLAY_RIPPLE_IMAGE_PATH = DALI_IMAGE_DIR "overshoot_ripple.png";
 const Rect<int> OVERSHOOT_BOUNCE_IMAGE_1_PIXEL_AREA( 0, 0, 720, 58 );
 const Vector4 OVERSHOOT_OVERLAY_NINE_PATCH_BORDER(0.0f, 0.0f, 1.0f, 12.0f);
 const float MAXIMUM_OVERSHOOT_HEIGHT = 36.0f;  // 36 pixels
@@ -1669,14 +1669,12 @@ void ItemView::SetOvershootEnabled( bool enable )
   Actor self = Self();
   if( enable )
   {
-    mOvershootEffect = OvershootRippleEffect::New();
-    Image overshootImage = Image::New( OVERSHOOT_OVERLAY_RIPPLE_IMAGE_PATH );
-    mOvershootOverlay = ImageActor::New( overshootImage );
+    mOvershootEffect = BouncingEffect::New(Scrollable::DEFAULT_OVERSHOOT_COLOUR);
+    mOvershootOverlay = CreateSolidColorActor(Vector4::ONE);
     mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
     mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     mOvershootOverlay.SetDrawMode(DrawMode::OVERLAY);
     mOvershootOverlay.SetShaderEffect(mOvershootEffect);
-    mOvershootOverlay.SetPixelArea(OVERSHOOT_BOUNCE_IMAGE_1_PIXEL_AREA);
     self.Add(mOvershootOverlay);
     Constraint constraint = Constraint::New<float>( Actor::SIZE_WIDTH,
                                                       ParentSource( mPropertyScrollDirection ),
@@ -1704,7 +1702,7 @@ void ItemView::SetOvershootEnabled( bool enable )
                                         OvershootOverlayVisibilityConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
 
-    int effectOvershootPropertyIndex = mOvershootEffect.GetPropertyIndex(mOvershootEffect.GetOvershootPropertyName());
+    int effectOvershootPropertyIndex = mOvershootEffect.GetPropertyIndex(mOvershootEffect.GetProgressRatePropertyName());
     Actor self = Self();
     constraint = Constraint::New<float>( effectOvershootPropertyIndex,
                                          Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),

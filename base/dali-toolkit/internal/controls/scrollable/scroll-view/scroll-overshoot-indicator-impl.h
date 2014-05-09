@@ -18,6 +18,7 @@
 //
 
 #include <dali/dali.h>
+#include <dali-toolkit/public-api/shader-effects/bouncing-effect.h>
 
 namespace Dali
 {
@@ -140,148 +141,6 @@ private:
 };
 
 /**
- * OvershootRippleEffect is a custom shader effect for the overshoot indicator
- */
-class OvershootRippleEffect : public ShaderEffect
-{
-public:
-
-  /**
-   * Create an uninitialized OvershootRippleEffect; this can be initialized with OvershootRippleEffect::New()
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  OvershootRippleEffect();
-
-  /**
-   * Virtual destructor.
-   */
-  virtual ~OvershootRippleEffect();
-
-  /**
-   * Create an initialized OvershootRippleEffect.
-   *
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static OvershootRippleEffect New();
-
-  /**
-   * Set the current overshoot value
-   *
-   * @param[in] overshoot current overshoot value in the range [0.0f,1.0f]
-   */
-  void SetOvershoot(float overshoot);
-
-  /**
-   * Set the number of sub images in the overshoot bounce image
-   *
-   * @param[in] imageCount number of sub images in main ripple effect image
-   */
-  void SetOvershootImageCount(float imageCount);
-
-  /**
-   * Get the name for the overshoot property
-   * which can be used in Animation API's
-   *
-   * @return A std::string containing the property name
-   */
-  const std::string& GetOvershootPropertyName() const;
-
-  /**
-   * Get the name for the sub image count property
-   * which can be used in Animation API's
-   *
-   * @return A std::string containing the property name
-   */
-  const std::string& GetOvershootImageCountPropertyName() const;
-
-private: // Not intended for application developers
-  OvershootRippleEffect(ShaderEffect handle);
-};
-
-/**
- * ScrollOvershootEffectGradient creates a gradiented effect at the end of the scrollable area if the user
- * attempts to scroll past it
- */
-struct ScrollOvershootEffectGradient : public ScrollOvershootEffect
-{
-public:
-  /**
-   * Create a new gradient overshoot effect, passing in whether it is vertical or horizontal
-   *
-   * @param[in] vertical whether this effect is a vertical or horizontal one
-   */
-  ScrollOvershootEffectGradient(bool vertical);
-
-  /**
-   * @copydoc ScrollOvershootEffect::Apply
-   */
-  virtual void Apply(Scrollable& scrollable);
-
-  /**
-   * @copydoc ScrollOvershootEffect::Remove
-   */
-  virtual void Remove(Scrollable& scrollable);
-
-  /**
-   * @copydoc ScrollOvershootEffect::Reset
-   */
-  virtual void Reset() {}
-
-  /**
-   * Constrains the size of the gradient image
-   * @param[in] current current size of the image actor
-   * @param[in] overshootPropertyX current overshoot x amount
-   * @param[in] overshootPropertyY current overshoot y amount
-   * @param[in] parentSizeProperty size of the scrollable area so we can make sure the image stretches across it
-   * @return the new size of the image depending on the overshoot amount
-   */
-  Vector3 SizeConstraint(const Vector3& current, const PropertyInput& overshootPropertyX, const PropertyInput& overshootPropertyY, const PropertyInput& parentSizeProperty);
-
-  /**
-   * Constrains the size of the gradient image
-   * @param[in] current current rotation of the image actor
-   * @param[in] overshootPropertyX current overshoot x amount
-   * @param[in] overshootPropertyY current overshoot y amount
-   * @return new rotation os the gradient image actor
-   */
-  Quaternion RotationConstraint(const Quaternion& current, const PropertyInput& overshootPropertyX, const PropertyInput& overshootPropertyY);
-
-  /**
-   * Constrains the size of the gradient image
-   * @param[in] current current position of the image actor
-   * @param[in] parentSizeProperty size of the scrollable area so we can position image on the edge of it
-   * @param[in] overshootPropertyX current overshoot x amount
-   * @param[in] overshootPropertyY current overshoot y amount
-   * @return new position of the gradient image actor
-   */
-  Vector3 PositionConstraint(const Vector3& current, const PropertyInput& parentSizeProperty, const PropertyInput& overshootPropertyX, const PropertyInput& overshootPropertyY);
-
-  /**
-   * Constrains the size of the gradient image
-   * @param[in] current current visibility of the image actor
-   * @param[in] overshootPropertyX current overshoot x amount
-   * @param[in] overshootPropertyY current overshoot y amount
-   * @return new visibility property depending on overshoot values
-   */
-  bool VisibilityConstraint(const bool& current, const PropertyInput& canScrollProperty);
-
-  /**
-   * Creates a new ScrollOvershootEffectGradient objects and returns a pointer to it
-   * @param[in] vertical whether to create a vertical(true) or horizontal effect
-   * @return a pointer to the new effect
-   */
-  static ScrollOvershootEffectGradientPtr New( bool vertical );
-
-private:
-  float mMaxOvershootImageSize;            ///< maximum size of the image when overshoot value is 1.0f
-  ImageActor mOvershootImage;              ///< the overshoot image...
-  ActiveConstraint    mSizeConstraint;     ///< active constraint handle used to store the image width constraint
-  ActiveConstraint    mRotationConstraint; ///< active constraint handle used to store the image rotation constraint
-  ActiveConstraint    mPositionConstraint; ///< active constraint handle used to store the image position constraint
-  ActiveConstraint    mVisibilityConstraint; ///< active constraint handle used to store the image visibility constraint
-};
-
-/**
  * ScrollOvershootEffectRipple creates an animated bounce effect at the end of the scrollable area if the user
  * attempts to scroll past it
  */
@@ -372,7 +231,7 @@ private:
   bool      mAnimatingOvershootOn;         ///< whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
   bool      mAnimateOvershootOff;          ///< whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
   int       mCanScrollPropertyIndex;       ///< property index to a property that informs indicator if it is needed
-  OvershootRippleEffect mRippleEffect;                 // the ripple vertex/fragment shader effect
+  BouncingEffect mRippleEffect;                 // the ripple vertex/fragment shader effect
   PropertyNotification mOvershootPositiveNotification; // stores the property notification used for positive overshoot values
   PropertyNotification mOvershootNegativeNotification; // stores the property notification used for negative overshoot values
   ActiveConstraint    mSizeConstraint;                 // active constraint handle used to store the image width constraint

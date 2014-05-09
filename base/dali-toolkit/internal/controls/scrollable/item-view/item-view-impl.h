@@ -27,7 +27,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-connector.h>
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
-#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
+#include <dali-toolkit/public-api/shader-effects/bouncing-effect.h>
 
 namespace Dali
 {
@@ -573,7 +573,7 @@ private:
   Dali::Gesture::State mGestureState;
 
   ImageActor mOvershootOverlay;           ///< The overlay actor for overshoot effect
-  OvershootRippleEffect mOvershootEffect; ///< The vertex/fragment shader used to display the overshoot ripple effect
+  BouncingEffect mOvershootEffect; ///< The vertex/fragment shader used to display the overshoot ripple effect
 
   Dali::Toolkit::ScrollConnector mScrollConnector; ///< Connects ItemView with scrollable components e.g. scroll bars
   Constrainable   mScrollPositionObject;     ///< From mScrollConnector

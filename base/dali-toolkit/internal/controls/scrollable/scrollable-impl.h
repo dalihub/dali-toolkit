@@ -44,6 +44,7 @@ class Scrollable : public ControlImpl
 public:
   static const std::string SCROLLABLE_CAN_SCROLL_VERTICAL;
   static const std::string SCROLLABLE_CAN_SCROLL_HORIZONTAL;
+  static const Vector4     DEFAULT_OVERSHOOT_COLOUR;
 
   /**
    * Create a new Scrollable.
