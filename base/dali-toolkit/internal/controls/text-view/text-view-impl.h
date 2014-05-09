@@ -356,7 +356,7 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
+  static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
 
 private: // From ControlImpl
@@ -407,11 +407,6 @@ private: // From ControlImpl
    * @return The \e width for the given \e height.
    */
   virtual float GetWidthForHeight( float height );
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnPropertySet()
-   */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
 
 protected:
 
@@ -537,42 +532,59 @@ private:
   Actor GetRootActor() const;
 
   /**
+   * Handle SetProperty for markup processing.
+   * @param[in] propertyValue The new property value.
+   */
+  void OnMarkupEnabledPeopertySet( Property::Value propertyValue );
+
+  /**
    * Handles SetProperty for multiline policy.
    * @param[in] propertyValue The new property value.
-  */
+   */
   void OnMultilinePolicyPropertySet( Property::Value propertyValue );
 
   /**
    * Handles SetProperty for width exceed policy.
    * @param[in] propertyValue The new property value.
-  */
+   */
   void OnWidthExceedPolicyPropertySet( Property::Value propertyValue );
 
   /**
    * Handles SetProperty for height exceed policy.
    * @param[in] propertyValue The new property value.
-  */
+   */
   void OnHeightExceedPolicyPropertySet( Property::Value propertyValue );
 
   /**
    * Handles SetProperty for line justification.
    * @param[in] propertyValue The new property value.
-  */
+   */
   void OnLineJustificationPropertySet( Property::Value propertyValue );
 
   /**
    * Handles SetProperty for fade boundary.
-   * @param[in] propertyIndex The property index.
    * @param[in] propertyValue The new property value.
-  */
-  void OnFadeBoundaryPropertySet( Property::Index propertyIndex, Property::Value propertyValue );
+   */
+  void OnFadeBoundaryPropertySet( Property::Value propertyValue );
 
   /**
    * Handles SetProperty for alignment property.
    * @param[in] propertyIndex The property index.
    * @param[in] propertyValue The new property value.
-  */
+   */
   void OnAlignmentPropertySet( Property::Index propertyIndex, Property::Value propertyValue );
+
+  /**
+   * Handles GetProperty for horizontal alignment property.
+   * @return The property value of horizontal alignment.
+   */
+  std::string OnHorizontalAlignmentPropertyGet();
+
+  /**
+   * Handles GetProperty for vertical alignment property.
+   * @return The property value of vertical alignment.
+   */
+  std::string OnVerticalAlignmentPropertyGet();
 
 public:
 
@@ -734,19 +746,6 @@ private:
   bool                                            mMarkUpEnabled:1;               ///< enable to scan for mark-up
 
   Toolkit::TextView::ScrolledSignalV2             mScrolledSignalV2;              ///< Signal emitted when text is scrolled.
-
-  Property::Index                                 mPropertyText;                  ///< Property index for text.
-  Property::Index                                 mPropertyMultilinePolicy;       ///< Property index for multiline policy.
-  Property::Index                                 mPropertyWidthExceedPolicy;     ///< Property index for width exceed policy.
-  Property::Index                                 mPropertyHeightExceedPolicy;    ///< Property index for height exceed policy.
-  Property::Index                                 mPropertyLineJustification;     ///< Property index for line justification policy.
-  Property::Index                                 mPropertyFadeBoundaryLeft;      ///< Property index for Left fade boundary.
-  Property::Index                                 mPropertyFadeBoundaryRight;     ///< Property index for Right fade boundary.
-  Property::Index                                 mPropertyFadeBoundaryTop;       ///< Property index for Top fade boundary.
-  Property::Index                                 mPropertyFadeBoundaryBottom;    ///< Property index for Bottom fade boundary.
-  Property::Index                                 mPropertyLineHeightOffset;      ///< Property index for Line height offset.
-  Property::Index                                 mPropertyHorizontalAlignment;   ///< Property index for Horizontal alignment.
-  Property::Index                                 mPropertyVerticalAlignment;     ///< Property index for Vertical alignment.
 };
 
 } // namespace Internal

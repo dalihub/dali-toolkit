@@ -33,6 +33,15 @@ namespace Toolkit
 {
 
 const Property::Index TextView::PROPERTY_MARKUP_ENABLED( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX );
+const Property::Index TextView::PROPERTY_TEXT( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 1 );
+const Property::Index TextView::PROPERTY_MULTILINE_POLICY( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 2 );
+const Property::Index TextView::PROPERTY_WIDTH_EXCEED_POLICY( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 3 );
+const Property::Index TextView::PROPERTY_HEIGHT_EXCEED_POLICY( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 4 );
+const Property::Index TextView::PROPERTY_LINE_JUSTIFICATION( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 5 );
+const Property::Index TextView::PROPERTY_FADE_BOUNDARY( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 6 );
+const Property::Index TextView::PROPERTY_LINE_HEIGHT_OFFSET( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 7 );
+const Property::Index TextView::PROPERTY_HORIZONTAL_ALIGNMENT( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 8 );
+const Property::Index TextView::PROPERTY_VERTICAL_ALIGNMENT( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 9 );
 
 namespace Internal
 {
@@ -40,18 +49,10 @@ namespace Internal
 namespace
 {
 
-const char* const PROPERTY_TEXT = "text";
-const char* const PROPERTY_MULTILINE_POLICY = "multiline-policy";
-const char* const PROPERTY_WIDTH_EXCEED_POLICY = "width-exceed-policy";
-const char* const PROPERTY_HEIGHT_EXCEED_POLICY = "height-exceed-policy";
-const char* const PROPERTY_LINE_JUSTIFICATION = "line-justification";
-const char* const PROPERTY_FADE_BOUNDARY_LEFT = "fade-boundary-left";
-const char* const PROPERTY_FADE_BOUNDARY_RIGHT = "fade-boundary-right";
-const char* const PROPERTY_FADE_BOUNDARY_TOP = "fade-boundary-top";
-const char* const PROPERTY_FADE_BOUNDARY_BOTTOM = "fade-boundary-bottom";
-const char* const PROPERTY_LINE_HEIGHT_OFFSET = "line-height-offset";
-const char* const PROPERTY_HORIZONTAL_ALIGNMENT = "horizontal-alignment";
-const char* const PROPERTY_VERTICAL_ALIGNMENT = "vertical-alignment";
+
+const char* MULTILINE_POLICY_NAME[] = {"SplitByNewLineChar", "SplitByWord", "SplitByChar"};
+const char* EXCEED_POLICY_NAME[] = {"Original", "Truncate", "Fade", "Split","ShrinkToFit","EllipsizeEnd"};
+const char* LINE_JUSTIFICATION_NAME[] = {"Left","Center","Right","Justified"};
 
 // Currently on desktop machines 2k x 2k is the maximum frame buffer size, on target is 4k x 4k.
 const float MAX_OFFSCREEN_RENDERING_SIZE = 2048.f;
@@ -66,7 +67,16 @@ TypeRegistration typeRegistration( typeid(Toolkit::TextView), typeid(Toolkit::Co
 
 SignalConnectorType signalConnector1( typeRegistration, Toolkit::TextView::SIGNAL_TEXT_SCROLLED , &TextView::DoConnectSignal );
 
-PropertyRegistration property1( typeRegistration, "markup-enabled", Toolkit::TextView::PROPERTY_MARKUP_ENABLED, Property::BOOLEAN, &TextView::SetProperty, &TextView::GetProperty );
+PropertyRegistration property1( typeRegistration,  "markup-enabled",       Toolkit::TextView::PROPERTY_MARKUP_ENABLED,       Property::BOOLEAN, &TextView::SetProperty, &TextView::GetProperty );
+PropertyRegistration property2( typeRegistration,  "text",                 Toolkit::TextView::PROPERTY_TEXT,                 Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
+PropertyRegistration property3( typeRegistration,  "multiline-policy",     Toolkit::TextView::PROPERTY_MULTILINE_POLICY,     Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
+PropertyRegistration property4( typeRegistration,  "width-exceed-policy",  Toolkit::TextView::PROPERTY_WIDTH_EXCEED_POLICY,  Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
+PropertyRegistration property5( typeRegistration,  "height-exceed-policy", Toolkit::TextView::PROPERTY_HEIGHT_EXCEED_POLICY, Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
+PropertyRegistration property6( typeRegistration,  "line-justification",   Toolkit::TextView::PROPERTY_LINE_JUSTIFICATION,   Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
+PropertyRegistration property7( typeRegistration,  "fade-boundary",        Toolkit::TextView::PROPERTY_FADE_BOUNDARY,        Property::VECTOR4, &TextView::SetProperty, &TextView::GetProperty );
+PropertyRegistration property8( typeRegistration, "line-height-offset",    Toolkit::TextView::PROPERTY_LINE_HEIGHT_OFFSET,   Property::FLOAT,   &TextView::SetProperty, &TextView::GetProperty );
+PropertyRegistration property9( typeRegistration, "horizontal-alignment",  Toolkit::TextView::PROPERTY_HORIZONTAL_ALIGNMENT, Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
+PropertyRegistration property10( typeRegistration, "vertical-alignment",   Toolkit::TextView::PROPERTY_VERTICAL_ALIGNMENT,   Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
 
 /**
  * Whether the text-view-processor operation sets, inserts, replaces, removes text.
@@ -1134,75 +1144,9 @@ float TextView::GetWidthForHeight( float height )
   return GetNaturalSize().width;
 }
 
-void TextView::OnPropertySet( Property::Index index, Property::Value propertyValue )
-{
-  if( index == mPropertyText )
-  {
-    SetText(propertyValue.Get<std::string>());
-  }
-  else if( index == mPropertyMultilinePolicy )
-  {
-    OnMultilinePolicyPropertySet(propertyValue);
-  }
-  else if( index == mPropertyWidthExceedPolicy )
-  {
-    OnWidthExceedPolicyPropertySet(propertyValue);
-  }
-  else if( index == mPropertyHeightExceedPolicy )
-  {
-    OnHeightExceedPolicyPropertySet(propertyValue);
-  }
-  else if( index == mPropertyLineJustification )
-  {
-    OnLineJustificationPropertySet(propertyValue);
-  }
-  else if( ( index == mPropertyFadeBoundaryLeft )  ||
-           ( index == mPropertyFadeBoundaryRight ) ||
-           ( index == mPropertyFadeBoundaryTop )   ||
-           ( index == mPropertyFadeBoundaryBottom ) )
-  {
-    OnFadeBoundaryPropertySet( index, propertyValue );
-  }
-  else if( index == mPropertyLineHeightOffset )
-  {
-    Dali::PointSize pointSize( propertyValue.Get<float>() );
-    SetLineHeightOffset(pointSize);
-  }
-  else if ( ( index == mPropertyHorizontalAlignment ) ||
-            ( index == mPropertyVerticalAlignment ) )
-  {
-    OnAlignmentPropertySet( index, propertyValue );
-  }
-}
 
 void TextView::OnInitialize()
 {
-  Actor self = Self();
-
-  mPropertyText = self.RegisterProperty( PROPERTY_TEXT, "", Property::READ_WRITE );
-
-  mPropertyMultilinePolicy = self.RegisterProperty( PROPERTY_MULTILINE_POLICY, "SplitByNewLineChar", Property::READ_WRITE );
-
-  mPropertyWidthExceedPolicy = self.RegisterProperty( PROPERTY_WIDTH_EXCEED_POLICY, "Original", Property::READ_WRITE );
-
-  mPropertyHeightExceedPolicy = self.RegisterProperty( PROPERTY_HEIGHT_EXCEED_POLICY, "Original", Property::READ_WRITE );
-
-  mPropertyLineJustification = self.RegisterProperty( PROPERTY_LINE_JUSTIFICATION, "Left", Property::READ_WRITE );
-
-  mPropertyFadeBoundaryLeft = self.RegisterProperty( PROPERTY_FADE_BOUNDARY_LEFT, static_cast< int >( 0 ), Property::READ_WRITE );
-
-  mPropertyFadeBoundaryRight = self.RegisterProperty( PROPERTY_FADE_BOUNDARY_RIGHT, static_cast< int >( 0 ), Property::READ_WRITE );
-
-  mPropertyFadeBoundaryTop = self.RegisterProperty( PROPERTY_FADE_BOUNDARY_TOP, static_cast< int >( 0 ), Property::READ_WRITE );
-
-  mPropertyFadeBoundaryBottom = self.RegisterProperty( PROPERTY_FADE_BOUNDARY_BOTTOM, static_cast< int >( 0 ), Property::READ_WRITE );
-
-  mPropertyLineHeightOffset = self.RegisterProperty( PROPERTY_LINE_HEIGHT_OFFSET, 0.0f, Property::READ_WRITE );
-
-  mPropertyHorizontalAlignment = self.RegisterProperty( PROPERTY_HORIZONTAL_ALIGNMENT, "HorizontalCenter", Property::READ_WRITE );
-
-  mPropertyVerticalAlignment = self.RegisterProperty( PROPERTY_VERTICAL_ALIGNMENT, "VerticalCenter", Property::READ_WRITE );
-
 }
 
 
@@ -1935,6 +1879,24 @@ Actor TextView::GetRootActor() const
   return rootActor;
 }
 
+void TextView::OnMarkupEnabledPeopertySet( Property::Value propertyValue )
+{
+  bool newValue( propertyValue.Get<bool>() );
+  if( newValue != IsMarkupProcessingEnabled() )
+  {
+    SetMarkupProcessingEnabled( newValue );
+    if( newValue )
+    {
+      // If markup processing has been enabled, Ensure current text is reprocessed.
+      const std::string& currentText( GetText() );
+      if( ! currentText.empty() )
+      {
+        SetText( currentText );
+      }
+    }
+  }
+}
+
 void TextView::OnMultilinePolicyPropertySet( Property::Value propertyValue )
 {
   std::string policyName( propertyValue.Get<std::string>() );
@@ -2043,37 +2005,25 @@ void TextView::OnLineJustificationPropertySet( Property::Value propertyValue )
   }
 }
 
-void TextView::OnFadeBoundaryPropertySet( Property::Index propertyIndex, Property::Value propertyValue )
+void TextView::OnFadeBoundaryPropertySet( Property::Value propertyValue )
 {
-  PixelSize boundary( propertyValue.Get<unsigned int>() );
+  Vector4 value( propertyValue.Get<Vector4>() );
+  DALI_ASSERT_ALWAYS( value.x >= 0 && value.y >= 0 && value.z >= 0 && value.w >= 0
+                      && "TextView::OnFadeBoundaryPropertySet(). Negative value is invalid. "  );
 
-  if ( propertyIndex == mPropertyFadeBoundaryLeft )
-  {
-    mVisualParameters.mFadeBoundary.mLeft = boundary;
-  }
-  else if ( propertyIndex == mPropertyFadeBoundaryRight )
-  {
-    mVisualParameters.mFadeBoundary.mRight = boundary;
-  }
-  else if ( propertyIndex == mPropertyFadeBoundaryTop )
-  {
-    mVisualParameters.mFadeBoundary.mTop = boundary;
-  }
-  else if ( propertyIndex == mPropertyFadeBoundaryBottom )
-  {
-    mVisualParameters.mFadeBoundary.mBottom = boundary;
-  }
-  else
-  {
-    DALI_ASSERT_ALWAYS( !"TextView::OnFadeBoundaryPropertySet(). Invalid Property value." );
-  }
+  Toolkit::TextView::FadeBoundary fadeBoundary( PixelSize( static_cast<unsigned int>( value.x ) ),
+                                                PixelSize( static_cast<unsigned int>( value.y ) ),
+                                                PixelSize( static_cast<unsigned int>( value.z ) ),
+                                                PixelSize( static_cast<unsigned int>( value.w ) ) );
+
+  SetFadeBoundary( fadeBoundary );
 }
 
 void TextView::OnAlignmentPropertySet( Property::Index propertyIndex, Property::Value propertyValue )
 {
   std::string value( propertyValue.Get<std::string>() );
 
-  if( propertyIndex == mPropertyHorizontalAlignment )
+  if( propertyIndex == Toolkit::TextView::PROPERTY_HORIZONTAL_ALIGNMENT )
   {
     if(value == "HorizontalLeft")
     {
@@ -2092,7 +2042,7 @@ void TextView::OnAlignmentPropertySet( Property::Index propertyIndex, Property::
       DALI_ASSERT_ALWAYS( !"TextView::OnAlignmentPropertySet(). Invalid Property value." );
     }
   }
-  else if( propertyIndex == mPropertyVerticalAlignment )
+  else if( propertyIndex == Toolkit::TextView::PROPERTY_VERTICAL_ALIGNMENT )
   {
     if( value == "VerticalTop" )
     {
@@ -2111,42 +2061,187 @@ void TextView::OnAlignmentPropertySet( Property::Index propertyIndex, Property::
       DALI_ASSERT_ALWAYS( !"TextView::OnAlignmentPropertySet(). Invalid Property value." );
     }
   }
+
+  RelayoutRequest();
+
+  // If a GetTextLayoutInfo() or GetHeightForWidth() arrives, relayout the text synchronously is needed in order to retrieve the right values.
+  if( RELAYOUT_ALL != mRelayoutOperations )
+  {
+    mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations |
+                                                              RELAYOUT_TEXT_ACTOR_UPDATE |
+                                                              RELAYOUT_ALIGNMENT |
+                                                              RELAYOUT_VISIBILITY );
+  }
+}
+
+std::string TextView::OnHorizontalAlignmentPropertyGet()
+{
+  if( mLayoutParameters.mHorizontalAlignment == Toolkit::Alignment::HorizontalLeft )
+  {
+    return "HorizontalLeft";
+  }
+  else if( mLayoutParameters.mHorizontalAlignment == Toolkit::Alignment::HorizontalCenter )
+  {
+    return "HorizontalCenter";
+  }
+  else if( mLayoutParameters.mHorizontalAlignment == Toolkit::Alignment::HorizontalRight )
+  {
+    return "HorizontalRight";
+  }
+  else
+  {
+    DALI_ASSERT_ALWAYS( !"TextView::OnHorizontalAlignmentPropertyGet(). Invalid value." );
+  }
+}
+
+std::string TextView::OnVerticalAlignmentPropertyGet()
+{
+  if( mLayoutParameters.mVerticalAlignment == Toolkit::Alignment::VerticalTop )
+   {
+     return "VerticalTop";
+   }
+   else if( mLayoutParameters.mVerticalAlignment == Toolkit::Alignment::VerticalCenter )
+   {
+     return "VerticalCenter";
+   }
+   else if( mLayoutParameters.mVerticalAlignment == Toolkit::Alignment::VerticalBottom )
+   {
+     return "VerticalBottom";
+   }
+   else
+   {
+     DALI_ASSERT_ALWAYS( !"TextView::OnVerticalAlignmentPropertyGet(). Invalid value." );
+   }
 }
 
 void TextView::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
 {
   Toolkit::TextView textView = Toolkit::TextView::DownCast( Dali::BaseHandle( object ) );
 
-  if ( textView && ( index == Toolkit::TextView::PROPERTY_MARKUP_ENABLED ) )
+  if( textView )
   {
-    Internal::TextView& textViewImpl( GetImpl( textView ) );
-    bool newValue( value.Get<bool>() );
-    if( newValue != textViewImpl.IsMarkupProcessingEnabled() )
+    TextView& textViewImpl( GetImpl( textView ) );
+    switch( index )
     {
-      textViewImpl.SetMarkupProcessingEnabled( newValue );
-      if( newValue )
+      case Toolkit::TextView::PROPERTY_MARKUP_ENABLED:
       {
-        // If markup processing has been enabled, Ensure current text is reprocessed.
-        const std::string& currentText( textViewImpl.GetText() );
-        if( ! currentText.empty() )
-        {
-          textViewImpl.SetText( currentText );
-        }
+        textViewImpl.OnMarkupEnabledPeopertySet( value );
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_TEXT:
+      {
+        textViewImpl.SetText( value.Get<std::string>() );
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_MULTILINE_POLICY:
+      {
+        textViewImpl.OnMultilinePolicyPropertySet( value );
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_WIDTH_EXCEED_POLICY:
+      {
+        textViewImpl.OnWidthExceedPolicyPropertySet( value );
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_HEIGHT_EXCEED_POLICY:
+      {
+        textViewImpl.OnHeightExceedPolicyPropertySet( value );
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_LINE_JUSTIFICATION:
+      {
+        textViewImpl.OnLineJustificationPropertySet( value );
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_FADE_BOUNDARY:
+      {
+        textViewImpl.OnFadeBoundaryPropertySet( value );
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_LINE_HEIGHT_OFFSET:
+      {
+        Dali::PointSize pointSize( value.Get<float>() );
+        textViewImpl.SetLineHeightOffset(pointSize);
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_HORIZONTAL_ALIGNMENT:
+      case Toolkit::TextView::PROPERTY_VERTICAL_ALIGNMENT:
+      {
+        textViewImpl.OnAlignmentPropertySet( index, value );
+        break;
       }
     }
   }
 }
 
-Property::Value TextView::GetProperty( BaseObject* object, Property::Index propertyIndex )
+Property::Value TextView::GetProperty( BaseObject* object, Property::Index index )
 {
+  Property::Value value;
+
   Toolkit::TextView textView = Toolkit::TextView::DownCast( Dali::BaseHandle( object ) );
 
-  if ( textView && ( propertyIndex == Toolkit::TextView::PROPERTY_MARKUP_ENABLED ) )
+  if( textView )
   {
-    return Property::Value( GetImpl( textView ).mMarkUpEnabled );
+    TextView& textViewImpl( GetImpl( textView ) );
+    switch( index )
+    {
+      case Toolkit::TextView::PROPERTY_MARKUP_ENABLED:
+      {
+        value = textViewImpl.IsMarkupProcessingEnabled();
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_TEXT:
+      {
+        value = textViewImpl.GetText();
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_MULTILINE_POLICY:
+      {
+        value = MULTILINE_POLICY_NAME[ textViewImpl.GetMultilinePolicy() ];
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_WIDTH_EXCEED_POLICY:
+      {
+        value = EXCEED_POLICY_NAME[ textViewImpl.GetWidthExceedPolicy() ];
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_HEIGHT_EXCEED_POLICY:
+      {
+        value = EXCEED_POLICY_NAME[ textViewImpl.GetHeightExceedPolicy() ];
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_LINE_JUSTIFICATION:
+      {
+        value = LINE_JUSTIFICATION_NAME[ textViewImpl.GetLineJustification() ];
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_FADE_BOUNDARY:
+      {
+        Toolkit::TextView::FadeBoundary boundary = textViewImpl.GetFadeBoundary();
+        value = Vector4( static_cast<float>( boundary.mLeft.value ),
+                         static_cast<float>( boundary.mRight.value ),
+                         static_cast<float>( boundary.mTop.value ),
+                         static_cast<float>( boundary.mBottom.value ) );
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_LINE_HEIGHT_OFFSET:
+      {
+        value = textViewImpl.GetLineHeightOffset().value;
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_HORIZONTAL_ALIGNMENT:
+      {
+        value = textViewImpl.OnHorizontalAlignmentPropertyGet();
+        break;
+      }
+      case Toolkit::TextView::PROPERTY_VERTICAL_ALIGNMENT:
+      {
+        value = textViewImpl.OnVerticalAlignmentPropertyGet();
+        break;
+      }
+    }
   }
-
-  return Property::Value();
+  return value;
 }
 
 } // namespace Internal

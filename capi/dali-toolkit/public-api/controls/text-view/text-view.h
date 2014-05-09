@@ -104,7 +104,16 @@ public:
   static const char* const SIGNAL_TEXT_SCROLLED; ///< Signal emitted when the scroll position changes. @see SignalScrolled()
 
   // Properties
-  static const Property::Index PROPERTY_MARKUP_ENABLED; ///< name "markup-enabled", @see SetMarkupProcessingEnabled(), type BOOLEAN
+  static const Property::Index PROPERTY_MARKUP_ENABLED;         ///< name "markup-enabled", @see SetMarkupProcessingEnabled(), type BOOLEAN
+  static const Property::Index PROPERTY_TEXT;                   ///< name "text",                 type STRING
+  static const Property::Index PROPERTY_MULTILINE_POLICY;       ///< name "multiline-policy",     type STRING
+  static const Property::Index PROPERTY_WIDTH_EXCEED_POLICY;    ///< name "width-exceed-policy",  type STRING
+  static const Property::Index PROPERTY_HEIGHT_EXCEED_POLICY;   ///< name "height-exceed-policy", type STRING
+  static const Property::Index PROPERTY_LINE_JUSTIFICATION;     ///< name "line-justification",   type STRING
+  static const Property::Index PROPERTY_FADE_BOUNDARY;          ///< name "fade-boundary",        type VECTOR4
+  static const Property::Index PROPERTY_LINE_HEIGHT_OFFSET;     ///< name "line-height-offset",   type FLOAT
+  static const Property::Index PROPERTY_HORIZONTAL_ALIGNMENT;   ///< name "horizontal-alignment", type STRING
+  static const Property::Index PROPERTY_VERTICAL_ALIGNMENT;     ///< name "vertical-alignment",   type STRING
 
   /**
    * @brief Structure used to retrieve Layout info per character.
