@@ -99,10 +99,13 @@ bool Scrollable::IsScrollComponentEnabled(Toolkit::Scrollable::ScrollComponentTy
 
 void Scrollable::EnableScrollComponent(Toolkit::Scrollable::ScrollComponentType type)
 {
-  if(type == Toolkit::Scrollable::OvershootIndicator && !mOvershootEnabled)
+  if(type == Toolkit::Scrollable::OvershootIndicator)
   {
-    SetOvershootEnabled(true);
-    mOvershootEnabled = true;
+    if( !mOvershootEnabled )
+    {
+      SetOvershootEnabled(true);
+      mOvershootEnabled = true;
+    }
     return;
   }
   if( mComponents.find(type) == mComponents.end() )
@@ -119,10 +122,13 @@ void Scrollable::EnableScrollComponent(Toolkit::Scrollable::ScrollComponentType 
 
 void Scrollable::DisableScrollComponent(Toolkit::Scrollable::ScrollComponentType type)
 {
-  if(type == Toolkit::Scrollable::OvershootIndicator && mOvershootEnabled)
+  if(type == Toolkit::Scrollable::OvershootIndicator)
   {
-    SetOvershootEnabled(false);
-    mOvershootEnabled = false;
+    if( mOvershootEnabled )
+    {
+      SetOvershootEnabled(false);
+      mOvershootEnabled = false;
+    }
     return;
   }
   ComponentIter pair = mComponents.find( type );
