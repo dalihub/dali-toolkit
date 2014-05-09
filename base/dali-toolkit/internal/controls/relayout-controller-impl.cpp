@@ -85,7 +85,10 @@ void PrintChildren( Actor actor, int level )
  */
 void PrintHierarchy()
 {
-  PrintChildren( Stage().GetCurrent().GetRootLayer(), 0 );
+  if ( gLogFilter->IsEnabledFor( Debug::Verbose ) )
+  {
+    PrintChildren( Stage().GetCurrent().GetRootLayer(), 0 );
+  }
 }
 
 #define PRINT_HIERARCHY PrintHierarchy()

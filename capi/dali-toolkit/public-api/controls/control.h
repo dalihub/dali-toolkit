@@ -49,6 +49,11 @@ public:
   /** @{ */
   static const Property::Index PROPERTY_BACKGROUND_COLOR;    ///< name "background-color",        @see SetBackgroundColor,        type VECTOR4
   static const Property::Index PROPERTY_BACKGROUND;          ///< name "background",              @see SetBackground,             type MAP
+  static const Property::Index PROPERTY_WIDTH_POLICY;        ///< name "width-policy",            @see SetSizePolicy,             type STRING
+  static const Property::Index PROPERTY_HEIGHT_POLICY;       ///< name "height-policy",           @see SetSizePolicy,             type STRING
+  static const Property::Index PROPERTY_MINIMUM_SIZE;        ///< name "minimum-size",            @see SetMinimumSize,            type VECTOR3
+  static const Property::Index PROPERTY_MAXIMUM_SIZE;        ///< name "maximum-size",            @see SetMaximumSize,            type VECTOR3
+  static const Property::Index PROPERTY_KEY_INPUT_FOCUS;     ///< name "key-input-focus",         @see SetKeyInputFocus,          type BOOLEAN
   /** @} */
 
   /// @name Signals

@@ -36,9 +36,24 @@ namespace Toolkit
 
 const Property::Index Control::PROPERTY_BACKGROUND_COLOR      = ControlImpl::CONTROL_PROPERTY_START_INDEX;
 const Property::Index Control::PROPERTY_BACKGROUND            = ControlImpl::CONTROL_PROPERTY_START_INDEX + 1;
+const Property::Index Control::PROPERTY_WIDTH_POLICY          = ControlImpl::CONTROL_PROPERTY_START_INDEX + 2;
+const Property::Index Control::PROPERTY_HEIGHT_POLICY         = ControlImpl::CONTROL_PROPERTY_START_INDEX + 3;
+const Property::Index Control::PROPERTY_MINIMUM_SIZE          = ControlImpl::CONTROL_PROPERTY_START_INDEX + 4;
+const Property::Index Control::PROPERTY_MAXIMUM_SIZE          = ControlImpl::CONTROL_PROPERTY_START_INDEX + 5;
+const Property::Index Control::PROPERTY_KEY_INPUT_FOCUS       = ControlImpl::CONTROL_PROPERTY_START_INDEX + 6;
 
 namespace
 {
+
+const Scripting::StringEnum< Control::SizePolicy > SIZE_POLICY_STRING_TABLE[] =
+{
+  { "FIXED",      Control::Fixed      },
+  { "MINIMUM",    Control::Minimum    },
+  { "MAXIMUM",    Control::Maximum    },
+  { "RANGE",      Control::Range      },
+  { "FLEXIBLE",   Control::Flexible   },
+};
+const unsigned int SIZE_POLICY_STRING_TABLE_COUNT = sizeof( SIZE_POLICY_STRING_TABLE ) / sizeof( SIZE_POLICY_STRING_TABLE[0] );
 
 #if defined(DEBUG_ENABLED)
 Integration::Log::Filter* gLogFilter  = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_CONTROL");
@@ -352,6 +367,43 @@ public:
           }
           break;
         }
+
+        case Control::PROPERTY_WIDTH_POLICY:
+        {
+          controlImpl.mImpl->mWidthPolicy = Scripting::GetEnumeration< Control::SizePolicy >( value.Get< std::string >(), SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT );
+          break;
+        }
+
+        case Control::PROPERTY_HEIGHT_POLICY:
+        {
+          controlImpl.mImpl->mHeightPolicy = Scripting::GetEnumeration< Control::SizePolicy >( value.Get< std::string >(), SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT );
+          break;
+        }
+
+        case Control::PROPERTY_MINIMUM_SIZE:
+        {
+          controlImpl.SetMinimumSize( value.Get< Vector3 >() );
+          break;
+        }
+
+        case Control::PROPERTY_MAXIMUM_SIZE:
+        {
+          controlImpl.SetMaximumSize( value.Get< Vector3 >() );
+          break;
+        }
+
+        case Control::PROPERTY_KEY_INPUT_FOCUS:
+        {
+          if ( value.Get< bool >() )
+          {
+            controlImpl.SetKeyInputFocus();
+          }
+          else
+          {
+            controlImpl.ClearKeyInputFocus();
+          }
+          break;
+        }
       }
     }
   }
@@ -401,6 +453,35 @@ public:
           break;
         }
 
+        case Control::PROPERTY_WIDTH_POLICY:
+        {
+          value = std::string( Scripting::GetEnumerationName< Control::SizePolicy >( controlImpl.mImpl->mWidthPolicy, SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT ) );
+          break;
+        }
+
+        case Control::PROPERTY_HEIGHT_POLICY:
+        {
+          value = std::string( Scripting::GetEnumerationName< Control::SizePolicy >( controlImpl.mImpl->mHeightPolicy, SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT ) );
+          break;
+        }
+
+        case Control::PROPERTY_MINIMUM_SIZE:
+        {
+          value = controlImpl.mImpl->mMinimumSize;
+          break;
+        }
+
+        case Control::PROPERTY_MAXIMUM_SIZE:
+        {
+          value = controlImpl.mImpl->mMaximumSize;
+          break;
+        }
+
+        case Control::PROPERTY_KEY_INPUT_FOCUS:
+        {
+          value = controlImpl.HasKeyInputFocus();
+          break;
+        }
       }
     }
 
@@ -444,13 +525,23 @@ public:
   // Background
   Background* mBackground;           ///< Only create the background if we use it
 
-  // Properties - need to be part of this class as ControlImpl::Impl is private
+  // Properties - these need to be members of ControlImpl::Impl as they need to functions within this class.
   static PropertyRegistration PROPERTY_1;
   static PropertyRegistration PROPERTY_2;
+  static PropertyRegistration PROPERTY_3;
+  static PropertyRegistration PROPERTY_4;
+  static PropertyRegistration PROPERTY_5;
+  static PropertyRegistration PROPERTY_6;
+  static PropertyRegistration PROPERTY_7;
 };
 
 PropertyRegistration ControlImpl::Impl::PROPERTY_1( CONTROL_TYPE, "background-color", Control::PROPERTY_BACKGROUND_COLOR, Property::VECTOR4, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
 PropertyRegistration ControlImpl::Impl::PROPERTY_2( CONTROL_TYPE, "background",       Control::PROPERTY_BACKGROUND,       Property::MAP,     &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
+PropertyRegistration ControlImpl::Impl::PROPERTY_3( CONTROL_TYPE, "width-policy",     Control::PROPERTY_WIDTH_POLICY,     Property::STRING,  &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
+PropertyRegistration ControlImpl::Impl::PROPERTY_4( CONTROL_TYPE, "height-policy",    Control::PROPERTY_HEIGHT_POLICY,    Property::STRING,  &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
+PropertyRegistration ControlImpl::Impl::PROPERTY_5( CONTROL_TYPE, "minimum-size",     Control::PROPERTY_MINIMUM_SIZE,     Property::VECTOR3, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
+PropertyRegistration ControlImpl::Impl::PROPERTY_6( CONTROL_TYPE, "maximum-size",     Control::PROPERTY_MAXIMUM_SIZE,     Property::VECTOR3, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
+PropertyRegistration ControlImpl::Impl::PROPERTY_7( CONTROL_TYPE, "key-input-focus",  Control::PROPERTY_KEY_INPUT_FOCUS,  Property::BOOLEAN, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
 
 Control ControlImpl::New()
 {

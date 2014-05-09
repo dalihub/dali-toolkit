@@ -6,7 +6,6 @@ toolkit_optional_src_files = \
    $(toolkit_optional_src_dir)/builder/builder-set-property.cpp \
    $(toolkit_optional_src_dir)/builder/builder-signals.cpp \
    $(toolkit_optional_src_dir)/builder/builder-actor.cpp \
-   $(toolkit_optional_src_dir)/builder/builder-control.cpp \
    $(toolkit_optional_src_dir)/builder/json-parser-state.cpp \
    $(toolkit_optional_src_dir)/builder/json-parser-impl.cpp \
    $(toolkit_optional_src_dir)/builder/tree-node-manipulator.cpp \

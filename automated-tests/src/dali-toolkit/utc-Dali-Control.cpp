@@ -434,3 +434,74 @@ int UtcDaliControlBackgroundProperties(void)
 
   END_TEST;
 }
+
+int UtcDaliControlSizePolicyProperties(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+
+  Control::SizePolicy widthPolicy( Control::Fixed );
+  Control::SizePolicy heightPolicy( Control::Fixed );
+
+  control.GetSizePolicy( widthPolicy, heightPolicy );
+  DALI_TEST_EQUALS( "FIXED", control.GetProperty( Control::PROPERTY_WIDTH_POLICY ).Get< std::string >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( "FIXED", control.GetProperty( Control::PROPERTY_HEIGHT_POLICY ).Get< std::string >(), TEST_LOCATION );
+
+  control.SetSizePolicy( Control::Flexible, Control::Range );
+  DALI_TEST_EQUALS( "FLEXIBLE", control.GetProperty( Control::PROPERTY_WIDTH_POLICY ).Get< std::string >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( "RANGE", control.GetProperty( Control::PROPERTY_HEIGHT_POLICY ).Get< std::string >(), TEST_LOCATION );
+
+  control.SetProperty( Control::PROPERTY_WIDTH_POLICY, "MAXIMUM" );
+  control.SetProperty( Control::PROPERTY_HEIGHT_POLICY, "MINIMUM" );
+  control.GetSizePolicy( widthPolicy, heightPolicy );
+  DALI_TEST_EQUALS( Control::Maximum, widthPolicy, TEST_LOCATION );
+  DALI_TEST_EQUALS( Control::Minimum, heightPolicy, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlSizeProperties(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+
+  DALI_TEST_EQUALS( control.GetMinimumSize(), control.GetProperty( Control::PROPERTY_MINIMUM_SIZE ).Get< Vector3 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetMaximumSize(), control.GetProperty( Control::PROPERTY_MAXIMUM_SIZE ).Get< Vector3 >(), TEST_LOCATION );
+
+  control.SetMinimumSize( Vector3( 100.0f, 200.0f, 300.0f ) );
+  DALI_TEST_EQUALS( Vector3( 100.0f, 200.0f, 300.0f ), control.GetProperty( Control::PROPERTY_MINIMUM_SIZE ).Get< Vector3 >(), TEST_LOCATION );
+
+
+  control.SetMaximumSize( Vector3( 200.0f, 250.0f, 800.0f ) );
+  DALI_TEST_EQUALS( Vector3( 200.0f, 250.0f, 800.0f ), control.GetProperty( Control::PROPERTY_MAXIMUM_SIZE ).Get< Vector3 >(), TEST_LOCATION );
+
+  control.SetProperty( Control::PROPERTY_MINIMUM_SIZE, Vector3( 1.0f, 2.0f, 3.0f ) );
+  control.SetProperty( Control::PROPERTY_MAXIMUM_SIZE, Vector3( 10.0f, 20.0f, 30.0f ) );
+  DALI_TEST_EQUALS( control.GetMinimumSize(), Vector3( 1.0f, 2.0f, 3.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetMaximumSize(), Vector3( 10.0f, 20.0f, 30.0f ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlKeyProperties(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  Stage::GetCurrent().Add( control );
+
+  DALI_TEST_EQUALS( control.HasKeyInputFocus(), control.GetProperty( Control::PROPERTY_KEY_INPUT_FOCUS ).Get< bool >(), TEST_LOCATION );
+
+  control.SetKeyInputFocus();
+  DALI_TEST_EQUALS( true, control.GetProperty( Control::PROPERTY_KEY_INPUT_FOCUS ).Get< bool >(), TEST_LOCATION );
+
+  control.ClearKeyInputFocus();
+  DALI_TEST_EQUALS( false, control.GetProperty( Control::PROPERTY_KEY_INPUT_FOCUS ).Get< bool >(), TEST_LOCATION );
+
+  control.SetProperty( Control::PROPERTY_KEY_INPUT_FOCUS, true );
+  DALI_TEST_EQUALS( true, control.HasKeyInputFocus(), TEST_LOCATION );
+
+  END_TEST;
+}
