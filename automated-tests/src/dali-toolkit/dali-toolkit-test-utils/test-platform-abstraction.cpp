@@ -16,7 +16,7 @@
 
 #include "test-platform-abstraction.h"
 #include "dali-test-suite-utils.h"
-#include <dali/integration-api/image-data.h>
+#include <dali/integration-api/bitmap.h>
 
 namespace Dali
 {
@@ -187,21 +187,21 @@ const PixelSize TestPlatformAbstraction::GetFontLineHeightFromCapsHeight(const s
 
 Integration::GlyphSet* TestPlatformAbstraction::GetGlyphData ( const Integration::TextResourceType& textRequest,
                                                                const std::string& fontFamily,
-                                                               bool getImageData) const
+                                                               bool getBitmap) const
 {
-  if( getImageData )
+  if( getBitmap )
   {
-    mTrace.PushCall("GetGlyphData", "getImageData:true");
+    mTrace.PushCall("GetGlyphData", "getBitmap:true");
   }
   else
   {
-    mTrace.PushCall("GetGlyphData", "getImageData:false");
+    mTrace.PushCall("GetGlyphData", "getBitmap:false");
   }
 
   // It creates fake metrics for the received characters.
 
   Integration::GlyphSet* set = new Dali::Integration::GlyphSet();
-  Integration::ImageDataPtr bitmapData;
+  Integration::BitmapPtr bitmapData;
 
   std::set<uint32_t> characters;
 
@@ -212,9 +212,10 @@ Integration::GlyphSet* TestPlatformAbstraction::GetGlyphData ( const Integration
       characters.insert( it->character );
       Integration::GlyphMetrics character = {it->character, Integration::GlyphMetrics::LOW_QUALITY,  10.0f,  10.0f, 9.0f, 1.0f, 10.0f, it->xPosition, it->yPosition };
 
-      if( getImageData )
+      if( getBitmap )
       {
-        bitmapData = Dali::Integration::NewBitmapImageData( 64, 64, Pixel::A8 );
+        bitmapData = Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true);
+        bitmapData->GetPackedPixelsProfile()->ReserveBuffer(Pixel::A8, 64, 64);
         PixelBuffer* pixelBuffer = bitmapData->GetBuffer();
         memset( pixelBuffer, it->character, 64*64 );
       }
@@ -243,7 +244,7 @@ Integration::GlyphSet* TestPlatformAbstraction::GetCachedGlyphData( const Integr
 
   // It creates fake metrics and bitmap for received numeric characters '0' through '9'.
   Integration::GlyphSet* set = new Dali::Integration::GlyphSet();
-  Integration::ImageDataPtr bitmapData;
+  Integration::BitmapPtr bitmapData;
 
   std::set<uint32_t> characters;
 
@@ -254,7 +255,8 @@ Integration::GlyphSet* TestPlatformAbstraction::GetCachedGlyphData( const Integr
       characters.insert( it->character );
       Integration::GlyphMetrics character = {it->character, Integration::GlyphMetrics::HIGH_QUALITY,  10.0f,  10.0f, 9.0f, 1.0f, 10.0f, it->xPosition, it->yPosition };
 
-      bitmapData = Dali::Integration::NewBitmapImageData( 64, 64, Pixel::A8 );
+      bitmapData = Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true);
+      bitmapData->GetPackedPixelsProfile()->ReserveBuffer(Pixel::A8, 64, 64);
       PixelBuffer* pixelBuffer = bitmapData->GetBuffer();
       memset( pixelBuffer, it->character, 64*64 );
       set->AddCharacter(bitmapData, character);
@@ -440,10 +442,13 @@ void TestPlatformAbstraction::GetFileNamesFromDirectory( const std::string& dire
 }
 
 
-Integration::ImageDataPtr TestPlatformAbstraction::GetGlyphImage( const std::string& fontFamily, const std::string& fontStyle, float fontSize, uint32_t character ) const
+Integration::BitmapPtr TestPlatformAbstraction::GetGlyphImage( const std::string& fontFamily, const std::string& fontStyle, float fontSize, uint32_t character ) const
 {
-  Integration::ImageDataPtr image = Dali::Integration::NewBitmapImageData( 1, 1, Pixel::RGBA8888 );
+  Integration::BitmapPtr image = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
+  image->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 1, 1 );
+
   mTrace.PushCall("GetGlyphImage", "");
+
   return image;
 }
 
