@@ -4,7 +4,7 @@ Version:    0.9.14
 Release:    1
 Group:      System/Libraries
 License:    Flora
-URL:        TO_BE_FILLED
+URL:        https://review.tizen.org/git/?p=platform/core/uifw/dali-toolkit.git;a=summary
 Source0:    %{name}-%{version}.tar.gz
 
 Requires(post): /sbin/ldconfig
@@ -20,33 +20,34 @@ BuildRequires:  dali-devel
 BuildRequires:  dali-adaptor-devel
 BuildRequires:  fribidi-devel
 BuildRequires:  pkgconfig(utilX)
-BuildRequires:  sec-product-features
 ExclusiveArch:  armv7l
 
 %description
-The OpenGLES Canvas Core Library Toolkit
+The OpenGLES Canvas Core Library Toolkit - a set of controls that provide
+user interface functionality.
 
 ##############################
 # devel
 ##############################
 %package devel
 Summary:    Application development package for the OpenGLES Canvas toolkit
-Group:      Development/Libs
+Group:      Development/Building
 Requires:   %{name} = %{version}-%{release}
 Requires:   boost-devel
 
 %description devel
-Application development package for the OpenGLES Canvas toolkit
+Application development package for the OpenGLES Canvas toolkit - headers and package config
 
 ##############################
 # Dali Base library
 ##############################
 %package dali-toolkit-base
-Summary:    A library for Base Toolkit components, intended for lightweight applications
-Group:      Development/Libs
+Summary:    The basic OpenGLES Canvas Core Library Toolkit
+Group:      Development/Building
 
 %description dali-toolkit-base
-A library for Base Toolkit components, intended for lightweight applications
+A subset of the controls provided by the main package, intended for lightweight applications.
+all the controls provided by the main package.
 
 ##############################
 # Preparation
@@ -56,7 +57,6 @@ A library for Base Toolkit components, intended for lightweight applications
 %define dali_data_rw_dir            /opt/usr/share/dali/
 %define dali_data_ro_dir            /usr/share/dali/
 %define dali_toolkit_image_files    %{dali_data_ro_dir}/toolkit/images/
-#%define dev_include_path %{_includedir}/dali/internal
 %define dev_include_path %{_includedir}
 
 ##############################
@@ -98,10 +98,18 @@ cp -af %{_builddir}/%{name}-%{version}/LICENSE %{buildroot}/usr/share/license/%{
 /sbin/ldconfig
 exit 0
 
+%post dali-toolkit-base
+/sbin/ldconfig
+exit 0
+
 ##############################
 # Post Uninstall
 ##############################
 %postun
+/sbin/ldconfig
+exit 0
+
+%postun dali-toolkit-base
 /sbin/ldconfig
 exit 0
 

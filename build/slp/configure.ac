@@ -16,7 +16,7 @@
 
 m4_define([dali_version],[0.1.0])
 AC_INIT([dali], [dali_version])
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([-Wall foreign])
 
 AC_PROG_CXX
 AC_PROG_LIBTOOL
