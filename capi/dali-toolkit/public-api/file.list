@@ -33,7 +33,11 @@ capi_devel_scroll_component_header_files =
 
 capi_devel_scrollable_header_files = \
   $(capi_devel_src_dir)/controls/scrollable/scrollable.h \
-  $(capi_devel_src_dir)/controls/scrollable/scroll-connector.h
+  $(capi_devel_src_dir)/controls/scrollable/scroll-connector.h \
+  $(capi_devel_src_dir)/controls/scrollable/scroll-component.h
+
+capi_devel_scroll_bar_header_files = \
+  $(capi_devel_src_dir)/controls/scroll-bar/scroll-bar.h
 
 capi_devel_item_view_header_files = \
   $(capi_devel_src_dir)/controls/scrollable/item-view/grid-layout.h \
