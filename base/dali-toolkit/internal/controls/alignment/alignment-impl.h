@@ -36,7 +36,7 @@ namespace Internal
  * Alignment is a control to position and resize actors inside other container actors.
  * @see Dali::Toolkit::Alignment for more details.
  */
-class Alignment : public ControlImpl
+class Alignment : public Control
 {
 public:
 
@@ -81,7 +81,7 @@ public:
 private: // From Control
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnRelaidOut()
+   * @copydoc Control::OnRelaidOut()
    */
   virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
 

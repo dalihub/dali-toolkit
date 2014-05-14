@@ -54,7 +54,7 @@ int UtcDaliControlImplNew(void)
 
   DALI_TEST_CHECK( !Control::DownCast(control) );
 
-  control = ControlImpl::New();
+  control = Toolkit::Internal::Control::New();
 
   DALI_TEST_CHECK( Control::DownCast(control) );
   END_TEST;

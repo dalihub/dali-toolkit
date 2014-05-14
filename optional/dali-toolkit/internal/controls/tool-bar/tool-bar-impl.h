@@ -39,7 +39,7 @@ namespace Internal
  * ToolBar is a control to create a tool bar.
  * @see Dali::Toolkit::ToolBar for more details.
  */
-class ToolBar : public ControlImpl
+class ToolBar : public Control
 {
 public:
 
@@ -64,7 +64,7 @@ public:
    */
   void RemoveControl( Dali::Actor control );
 
-private: // From ControlImpl
+private: // From Control
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()
@@ -75,7 +75,7 @@ private: // From ControlImpl
    * Adds a control using some default values (the control uses 10% of the tool bar space and is placed on the left group).
    * @param child The control to be added.
    *
-   * @see Toolkit::ControlImpl::OnControlChildAdd()
+   * @see Control::OnControlChildAdd()
    */
   virtual void OnControlChildAdd(Actor& child);
 

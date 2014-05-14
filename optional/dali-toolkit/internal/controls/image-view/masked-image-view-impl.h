@@ -34,7 +34,7 @@ namespace Internal
 /**
  * @copydoc Dali::Toolkit::MaskedImageView
  */
-class MaskedImageView : public ControlImpl
+class MaskedImageView : public Control
 {
 public:
 

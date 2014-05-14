@@ -705,7 +705,7 @@ void PushButton::OnActivated()
 
 Vector3 PushButton::GetNaturalSize()
 {
-  Vector3 size = ControlImpl::GetNaturalSize();
+  Vector3 size = Control::GetNaturalSize();
 
   const bool widthIsZero = EqualsZero( size.width );
   const bool heightIsZero = EqualsZero( size.height );

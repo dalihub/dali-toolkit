@@ -86,7 +86,7 @@ Dali::Toolkit::ImageView ImageView::New()
 }
 
 ImageView::ImageView()
-: ControlImpl(true)
+: Control(true)
 {
 }
 

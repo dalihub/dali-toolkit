@@ -200,7 +200,7 @@ int UtcDaliControlGetImplementation(void)
   {
     try
     {
-      ControlImpl& controlImpl = control.GetImplementation();
+      Toolkit::Internal::Control& controlImpl = control.GetImplementation();
       (void)controlImpl; // Avoid unused warning
       tet_result(TET_FAIL);
     }
@@ -215,7 +215,7 @@ int UtcDaliControlGetImplementation(void)
     try
     {
       const DummyControl constControl(control);
-      const ControlImpl& controlImpl = constControl.GetImplementation();
+      const Toolkit::Internal::Control& controlImpl = constControl.GetImplementation();
       (void)controlImpl; // Avoid unused warning
       tet_result(TET_FAIL);
     }
@@ -231,7 +231,7 @@ int UtcDaliControlGetImplementation(void)
   {
     try
     {
-      ControlImpl& controlImpl = control.GetImplementation();
+      Toolkit::Internal::Control& controlImpl = control.GetImplementation();
       (void)controlImpl; // Avoid unused warning
       tet_result(TET_PASS);
     }
@@ -246,7 +246,7 @@ int UtcDaliControlGetImplementation(void)
     try
     {
       const DummyControl constControl(control);
-      const ControlImpl& controlImpl = constControl.GetImplementation();
+      const Toolkit::Internal::Control& controlImpl = constControl.GetImplementation();
       (void)controlImpl; // Avoid unused warning
       tet_result(TET_PASS);
     }

@@ -41,7 +41,7 @@ namespace Internal
 /**
  * BloomEffect implementation class
  */
-class BloomView : public ControlImpl
+class BloomView : public Control
 {
 public:
   /**

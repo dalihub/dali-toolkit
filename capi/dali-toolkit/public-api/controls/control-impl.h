@@ -38,8 +38,11 @@ class RelayoutControllerImpl;
 class KeyInputFocusManager;
 }
 
-typedef std::pair< Actor, Vector2 > ActorSizePair; ///< Pair of actor and size
+typedef std::pair< Actor, Vector2 > ActorSizePair;       ///< Pair of actor and size
 typedef std::vector< ActorSizePair > ActorSizeContainer; ///< Container of actors and their sizes
+
+namespace Internal
+{
 
 /**
  * @brief This is the internal base class for all controls.
@@ -48,7 +51,7 @@ typedef std::vector< ActorSizePair > ActorSizeContainer; ///< Container of actor
  * Implements ConnectionTrackerInterface so that signals (typically connected to member functions) will
  * be disconnected automatically when the control is destroyed.
  */
-class ControlImpl : public CustomActorImpl, public ConnectionTrackerInterface
+class DALI_IMPORT_API Control : public CustomActorImpl, public ConnectionTrackerInterface
 {
 public:
 
@@ -67,14 +70,14 @@ public:
    * If touch is required then the user can connect to this class' touch signal.
    * @return A handle to the ConntrolImpl instance.
    */
-  static Control New();
+  static Toolkit::Control New();
 
   // Destruction
 
   /**
    * @brief Virtual destructor.
    */
-  virtual ~ControlImpl();
+  virtual ~Control();
 
   // Actions
 
@@ -144,7 +147,7 @@ public:
    * @param[in] loopEnabled Whether the focus movement should be looped within the control.
    * @return the next keyboard focusable actor in this control or an empty handle if no actor can be focused.
    */
-  virtual Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
+  virtual Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
 
   /**
    * @brief Informs this control that its chosen focusable actor will be focused.
@@ -511,58 +514,58 @@ private:
 protected: // Construction
 
   /**
-   * @brief Create a ControlImpl.
+   * @brief Create a Control.
    *
    * @param[in] requiresTouchEvents True if the OnTouchEvent() callback is required.
    */
-  ControlImpl(bool requiresTouchEvents);
+  Control(bool requiresTouchEvents);
 
 public:
 
   // Size negotiation
 
   /**
-   * @copydoc Control::SetSizePolicy()
+   * @copydoc Toolkit::Control::SetSizePolicy()
    */
-  void SetSizePolicy( Control::SizePolicy widthPolicy, Control::SizePolicy heightPolicy );
+  void SetSizePolicy( Toolkit::Control::SizePolicy widthPolicy, Toolkit::Control::SizePolicy heightPolicy );
 
   /**
-   * @copydoc Control::GetSizePolicy()
+   * @copydoc Toolkit::Control::GetSizePolicy()
    */
-  void GetSizePolicy( Control::SizePolicy& widthPolicy, Control::SizePolicy& heightPolicy ) const;
+  void GetSizePolicy( Toolkit::Control::SizePolicy& widthPolicy, Toolkit::Control::SizePolicy& heightPolicy ) const;
 
   /**
-   * @copydoc Control::SetMinimumSize()
+   * @copydoc Toolkit::Control::SetMinimumSize()
    */
   void SetMinimumSize( const Vector3& size );
 
   /**
-   * @copydoc Control::GetMinimumSize()
+   * @copydoc Toolkit::Control::GetMinimumSize()
    */
   const Vector3& GetMinimumSize() const;
 
   /**
-   * @copydoc Control::SetMaximumSize()
+   * @copydoc Toolkit::Control::SetMaximumSize()
    */
   void SetMaximumSize( const Vector3& size );
 
   /**
-   * @copydoc Control::GetMaximumSize()
+   * @copydoc Toolkit::Control::GetMaximumSize()
    */
   const Vector3& GetMaximumSize() const;
 
   /**
-   * @copydoc Control::GetNaturalSize()
+   * @copydoc Toolkit::Control::GetNaturalSize()
    */
   virtual Vector3 GetNaturalSize();
 
   /**
-   * @copydoc Control::GetHeightForWidth()
+   * @copydoc Toolkit::Control::GetHeightForWidth()
    */
   virtual float GetHeightForWidth( float width );
 
   /**
-   * @copydoc Control::GetWidthForHeight()
+   * @copydoc Toolkit::Control::GetWidthForHeight()
    */
   virtual float GetWidthForHeight( float height );
 
@@ -583,17 +586,17 @@ public:
   //KeyInput
 
   /**
-   * @copydoc Control::SetKeyInputFocus()
+   * @copydoc Toolkit::Control::SetKeyInputFocus()
    */
   void SetKeyInputFocus();
 
   /**
-   * @copydoc Control::HasKeyInputFocus()
+   * @copydoc Toolkit::Control::HasKeyInputFocus()
    */
   bool HasKeyInputFocus();
 
   /**
-   * @copydoc Control::ClearKeyInputFocus()
+   * @copydoc Toolkit::Control::ClearKeyInputFocus()
    */
   void ClearKeyInputFocus();
 
@@ -686,8 +689,8 @@ private:
 private:
 
   // Undefined
-  ControlImpl(const ControlImpl&);
-  ControlImpl& operator=(const ControlImpl&);
+  Control(const Control&);
+  Control& operator=(const Control&);
 
   class Impl;
   Impl *mImpl;
@@ -696,6 +699,10 @@ private:
   friend class Internal::RelayoutControllerImpl;   ///< Relayout controller needs to call Relayout() which is private.
   friend class Internal::KeyInputFocusManager;     ///< KeyInputFocusManager needs to call which is private.
 };
+
+} // namespace Internal
+
+typedef Internal::Control ControlImpl; ///< @deprecated, Use Internal::Control
 
 } // namespace Toolkit
 

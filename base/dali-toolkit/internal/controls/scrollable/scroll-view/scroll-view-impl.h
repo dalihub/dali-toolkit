@@ -495,7 +495,7 @@ private: // private overriden functions from CustomActorImpl and Controls
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
 
   /**
-   * @copydoc Dali::ControlImpl::OnControlSizeSet(const Vector3&)
+   * @copydoc Dali::Control::OnControlSizeSet(const Vector3&)
    */
   virtual void OnControlSizeSet( const Vector3& size );
 

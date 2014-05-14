@@ -46,7 +46,7 @@ TypeAction a2(mType, Toolkit::NavigationControl::ACTION_POP, &NavigationControl:
 }
 
 NavigationControl::NavigationControl()
-: ControlImpl( true ),
+: Control( true ),
   mToolBar(NULL),
   mTitleBar(NULL),
   mOrientationAngle( 0 ),

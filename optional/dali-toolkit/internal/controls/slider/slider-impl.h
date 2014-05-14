@@ -41,9 +41,16 @@ typedef Dali::IntrusivePtr< Slider > SliderPtr;
 /**
  * @copydoc Toolkit::Slider
  */
-class Slider : public ControlImpl
+class Slider : public Control
 {
 public:
+
+  // Properties
+  enum
+  {
+    SLIDER_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    SLIDER_PROPERTY_END_INDEX = SLIDER_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
+  };
 
   typedef Property::Array MarkList;
 
@@ -283,7 +290,7 @@ protected:
   virtual ~Slider();
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnControlSizeSet( const Vector3& size )
+   * @copydoc Control::OnControlSizeSet( const Vector3& size )
    */
   virtual void OnControlSizeSet( const Vector3& size );
 

@@ -36,7 +36,7 @@ namespace Toolkit
 namespace Internal
 {
 
-class PageTurnView : public ControlImpl
+class PageTurnView : public Control
 {
 protected:
 
@@ -179,7 +179,7 @@ private:
    */
   void RenderPage( int pageIndex );
 
-private: // from ControlImpl
+private: // from Control
 
   /**
    * @copydoc Toolkit::Control::OnPan

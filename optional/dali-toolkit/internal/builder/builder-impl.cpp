@@ -464,7 +464,6 @@ BaseHandle Builder::DoCreate( const TreeNode& root, const TreeNode& node,
     baseHandle       = typeInfo.CreateInstance();
     Handle handle    = Handle::DownCast(baseHandle);
     Actor actor      = Actor::DownCast(handle);
-    Control control  = Control::DownCast(handle);
 
     if(handle)
     {
@@ -483,6 +482,7 @@ BaseHandle Builder::DoCreate( const TreeNode& root, const TreeNode& node,
         DALI_SCRIPT_VERBOSE("  Is Actor id=%d\n", actor.GetId());
       }
 
+      Toolkit::Control control  = Toolkit::Control::DownCast(handle);
       if(control)
       {
         DALI_SCRIPT_VERBOSE("  Is Control id=%d\n", actor.GetId());

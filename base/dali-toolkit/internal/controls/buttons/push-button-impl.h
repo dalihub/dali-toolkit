@@ -320,7 +320,7 @@ protected: // From Button
    */
   virtual float OnAnimationTimeRequested() const;
 
-protected: // From ControlImpl
+protected: // From Control
 
   /**
    * Respond the activate notification.

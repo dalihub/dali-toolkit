@@ -269,7 +269,7 @@ bool View::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* trac
 }
 
 View::View(bool fullscreen)
-: ControlImpl( false ),  // doesn't require touch events
+: Control( false ),  // doesn't require touch events
   mOrientation( -1 ),
   mFullScreen(fullscreen),
   mContentLayers(),

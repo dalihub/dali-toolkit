@@ -690,10 +690,11 @@ int UtcDaliPushButtonProperties(void)
     DALI_TEST_EQUALS( "IMAGE_PATH_2", button.GetProperty( PushButton::PROPERTY_PRESSED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;
-    map.push_back( Property::StringValuePair( "type", "TextActor" ) );
+    map.push_back( Property::StringValuePair( "type", "Actor" ) );
 
     button.SetProperty( PushButton::PROPERTY_PRESSED_STATE_ACTOR, map );
-    DALI_TEST_EQUALS( "TextActor", button.GetProperty( PushButton::PROPERTY_PRESSED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+    DALI_TEST_EQUALS( "Actor", button.GetProperty( PushButton::PROPERTY_PRESSED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+    DALI_TEST_CHECK( "ImageActor" != button.GetProperty( PushButton::PROPERTY_PRESSED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >() );
   }
 
   //  PushButton::PROPERTY_DIMMED_STATE_ACTOR

@@ -341,7 +341,7 @@ private: // From CustomActorImpl
    */
   virtual bool OnMouseWheelEvent(const MouseWheelEvent& event);
 
-private: // From ControlImpl
+private: // From Control
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()
@@ -356,7 +356,7 @@ private: // From ControlImpl
   /**
    * @copydoc Toolkit::Control::GetNextKeyboardFocusableActor()
    */
-  virtual Actor GetNextKeyboardFocusableActor(Actor actor, Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
+  virtual Actor GetNextKeyboardFocusableActor(Actor actor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
 
   /**
    * @copydoc Toolkit::Control::OnKeyboardFocusChangeCommitted()

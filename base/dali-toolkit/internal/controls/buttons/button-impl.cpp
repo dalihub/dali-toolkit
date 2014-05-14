@@ -52,7 +52,7 @@ PropertyRegistration property1( typeRegistration, "dimmed", Toolkit::Button::PRO
 } // unnamed namespace
 
 Button::Button()
-: ControlImpl( true ),
+: Control( true ),
   mState( ButtonUp ),
   mDimmed( false ),
   mPainter( NULL )

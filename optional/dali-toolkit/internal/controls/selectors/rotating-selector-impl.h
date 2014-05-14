@@ -38,7 +38,7 @@ class RotatingSelector;
 /**
  * RotatingSelector is a custom control for text aligning and multiline support
  */
-class RotatingSelector : public ControlImpl
+class RotatingSelector : public Control
 {
 public:
 
@@ -104,7 +104,7 @@ public:
    */
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
-private: // From ControlImpl
+private: // From Control
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()

@@ -42,7 +42,7 @@ class ImageFilter;
  * EffectsView implementation class
  * @copydoc Dali::Toolkit::EffectsView
  */
-class EffectsView : public ControlImpl
+class EffectsView : public Control
 {
 public:
   /// @copydoc Dali::Toolkit::EffectsView New()
@@ -121,7 +121,7 @@ private:
    */
   void SetupProperties();
 
-private: // From ControlImpl
+private: // From Control
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()

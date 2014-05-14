@@ -42,7 +42,7 @@ class TextView;
 
 typedef IntrusivePtr<TextInput> TextInputPtr;
 
-class TextInput : public ControlImpl
+class TextInput : public Control
 {
 public:
 
@@ -520,11 +520,11 @@ private:
   virtual void OnKeyInputFocusLost();
 
   /**
-   * From ControlImpl; called whenever the control is added to the stage.
+   * From Control; called whenever the control is added to the stage.
    */
   virtual void OnControlStageConnection();
 
-private: // From ControlImpl
+private: // From Control
 
   /**
    * Creation of the layer that is used by top level active parts of the TextInput like handles
@@ -532,17 +532,17 @@ private: // From ControlImpl
   void CreateActiveLayer();
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnInitialize()
+   * @copydoc Control::OnInitialize()
    */
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnControlSizeSet()
+   * @copydoc Control::OnControlSizeSet()
    */
   virtual void OnControlSizeSet(const Vector3& targetSize);
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnRelaidOut()
+   * @copydoc Control::OnRelaidOut()
    */
   virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
 

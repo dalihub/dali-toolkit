@@ -38,14 +38,14 @@ namespace Internal
 /**
  * TextView is a custom control for text aligning and multiline support
  */
-class TextView : public ControlImpl
+class TextView : public Control
 {
 public:
 
   // Properties
   enum
   {
-    TEXTVIEW_PROPERTY_START_INDEX = ControlImpl::CONTROL_PROPERTY_END_INDEX + 1,
+    TEXTVIEW_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
     TEXTVIEW_PROPERTY_END_INDEX = TEXTVIEW_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
   };
 
@@ -360,7 +360,7 @@ public:
   static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
 
-private: // From ControlImpl
+private: // From Control
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()

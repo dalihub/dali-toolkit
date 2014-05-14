@@ -34,13 +34,13 @@ namespace Dali
 namespace Toolkit
 {
 
-const Property::Index Control::PROPERTY_BACKGROUND_COLOR      = ControlImpl::CONTROL_PROPERTY_START_INDEX;
-const Property::Index Control::PROPERTY_BACKGROUND            = ControlImpl::CONTROL_PROPERTY_START_INDEX + 1;
-const Property::Index Control::PROPERTY_WIDTH_POLICY          = ControlImpl::CONTROL_PROPERTY_START_INDEX + 2;
-const Property::Index Control::PROPERTY_HEIGHT_POLICY         = ControlImpl::CONTROL_PROPERTY_START_INDEX + 3;
-const Property::Index Control::PROPERTY_MINIMUM_SIZE          = ControlImpl::CONTROL_PROPERTY_START_INDEX + 4;
-const Property::Index Control::PROPERTY_MAXIMUM_SIZE          = ControlImpl::CONTROL_PROPERTY_START_INDEX + 5;
-const Property::Index Control::PROPERTY_KEY_INPUT_FOCUS       = ControlImpl::CONTROL_PROPERTY_START_INDEX + 6;
+const Property::Index Control::PROPERTY_BACKGROUND_COLOR      = Internal::Control::CONTROL_PROPERTY_START_INDEX;
+const Property::Index Control::PROPERTY_BACKGROUND            = Internal::Control::CONTROL_PROPERTY_START_INDEX + 1;
+const Property::Index Control::PROPERTY_WIDTH_POLICY          = Internal::Control::CONTROL_PROPERTY_START_INDEX + 2;
+const Property::Index Control::PROPERTY_HEIGHT_POLICY         = Internal::Control::CONTROL_PROPERTY_START_INDEX + 3;
+const Property::Index Control::PROPERTY_MINIMUM_SIZE          = Internal::Control::CONTROL_PROPERTY_START_INDEX + 4;
+const Property::Index Control::PROPERTY_MAXIMUM_SIZE          = Internal::Control::CONTROL_PROPERTY_START_INDEX + 5;
+const Property::Index Control::PROPERTY_KEY_INPUT_FOCUS       = Internal::Control::CONTROL_PROPERTY_START_INDEX + 6;
 
 namespace
 {
@@ -64,14 +64,14 @@ const float BACKGROUND_ACTOR_Z_POSITION( -0.1f );
 
 BaseHandle Create()
 {
-  return ControlImpl::New();
+  return Internal::Control::New();
 }
 
 TypeRegistration CONTROL_TYPE( typeid(Control), typeid(CustomActor), Create );
 
-// Property Registration after ControlImpl::Impl definition below
+// Property Registration after Internal::Control::Impl definition below
 
-TypeAction ACTION_TYPE_1(CONTROL_TYPE, Toolkit::Control::ACTION_CONTROL_ACTIVATED, &ControlImpl::DoAction);
+TypeAction ACTION_TYPE_1(CONTROL_TYPE, Toolkit::Control::ACTION_CONTROL_ACTIVATED, &Internal::Control::DoAction);
 
 /**
  * Helper class used to set the Control's size through the Actor's API or through children added.
@@ -228,11 +228,14 @@ void SetupBackgroundActor( Actor actor, Property::Index constrainingIndex, const
 
 } // unnamed namespace
 
-class ControlImpl::Impl : public ConnectionTrackerInterface
+namespace Internal
+{
+
+class Control::Impl : public ConnectionTrackerInterface
 {
 public:
   // Construction & Destruction
-  Impl(ControlImpl& controlImpl)
+  Impl(Control& controlImpl)
   : mControlImpl(controlImpl),
     mInitialized( false ),
     mPinchGestureDetector(),
@@ -241,8 +244,8 @@ public:
     mLongPressGestureDetector(),
     mStartingPinchScale(),
     mLockSetSize( false ),
-    mWidthPolicy( Control::Fixed ),
-    mHeightPolicy( Control::Fixed ),
+    mWidthPolicy( Toolkit::Control::Fixed ),
+    mHeightPolicy( Toolkit::Control::Fixed ),
     mSize(),
     mSetSize(),
     mMinimumSize(),
@@ -334,21 +337,21 @@ public:
    */
   static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
   {
-    Control control = Control::DownCast( BaseHandle( object ) );
+    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
 
     if ( control )
     {
-      ControlImpl& controlImpl( control.GetImplementation() );
+      Control& controlImpl( control.GetImplementation() );
 
       switch ( index )
       {
-        case Control::PROPERTY_BACKGROUND_COLOR:
+        case Toolkit::Control::PROPERTY_BACKGROUND_COLOR:
         {
           controlImpl.SetBackgroundColor( value.Get< Vector4 >() );
           break;
         }
 
-        case Control::PROPERTY_BACKGROUND:
+        case Toolkit::Control::PROPERTY_BACKGROUND:
         {
           if ( value.HasKey( "image" ) )
           {
@@ -368,31 +371,31 @@ public:
           break;
         }
 
-        case Control::PROPERTY_WIDTH_POLICY:
+        case Toolkit::Control::PROPERTY_WIDTH_POLICY:
         {
-          controlImpl.mImpl->mWidthPolicy = Scripting::GetEnumeration< Control::SizePolicy >( value.Get< std::string >(), SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT );
+          controlImpl.mImpl->mWidthPolicy = Scripting::GetEnumeration< Toolkit::Control::SizePolicy >( value.Get< std::string >(), SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT );
           break;
         }
 
-        case Control::PROPERTY_HEIGHT_POLICY:
+        case Toolkit::Control::PROPERTY_HEIGHT_POLICY:
         {
-          controlImpl.mImpl->mHeightPolicy = Scripting::GetEnumeration< Control::SizePolicy >( value.Get< std::string >(), SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT );
+          controlImpl.mImpl->mHeightPolicy = Scripting::GetEnumeration< Toolkit::Control::SizePolicy >( value.Get< std::string >(), SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT );
           break;
         }
 
-        case Control::PROPERTY_MINIMUM_SIZE:
+        case Toolkit::Control::PROPERTY_MINIMUM_SIZE:
         {
           controlImpl.SetMinimumSize( value.Get< Vector3 >() );
           break;
         }
 
-        case Control::PROPERTY_MAXIMUM_SIZE:
+        case Toolkit::Control::PROPERTY_MAXIMUM_SIZE:
         {
           controlImpl.SetMaximumSize( value.Get< Vector3 >() );
           break;
         }
 
-        case Control::PROPERTY_KEY_INPUT_FOCUS:
+        case Toolkit::Control::PROPERTY_KEY_INPUT_FOCUS:
         {
           if ( value.Get< bool >() )
           {
@@ -418,21 +421,21 @@ public:
   {
     Property::Value value;
 
-    Control control = Control::DownCast( BaseHandle( object ) );
+    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
 
     if ( control )
     {
-      ControlImpl& controlImpl( control.GetImplementation() );
+      Control& controlImpl( control.GetImplementation() );
 
       switch ( index )
       {
-        case Control::PROPERTY_BACKGROUND_COLOR:
+        case Toolkit::Control::PROPERTY_BACKGROUND_COLOR:
         {
           value = controlImpl.GetBackgroundColor();
           break;
         }
 
-        case Control::PROPERTY_BACKGROUND:
+        case Toolkit::Control::PROPERTY_BACKGROUND:
         {
           Property::Map map;
 
@@ -453,31 +456,31 @@ public:
           break;
         }
 
-        case Control::PROPERTY_WIDTH_POLICY:
+        case Toolkit::Control::PROPERTY_WIDTH_POLICY:
         {
-          value = std::string( Scripting::GetEnumerationName< Control::SizePolicy >( controlImpl.mImpl->mWidthPolicy, SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT ) );
+          value = std::string( Scripting::GetEnumerationName< Toolkit::Control::SizePolicy >( controlImpl.mImpl->mWidthPolicy, SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT ) );
           break;
         }
 
-        case Control::PROPERTY_HEIGHT_POLICY:
+        case Toolkit::Control::PROPERTY_HEIGHT_POLICY:
         {
-          value = std::string( Scripting::GetEnumerationName< Control::SizePolicy >( controlImpl.mImpl->mHeightPolicy, SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT ) );
+          value = std::string( Scripting::GetEnumerationName< Toolkit::Control::SizePolicy >( controlImpl.mImpl->mHeightPolicy, SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT ) );
           break;
         }
 
-        case Control::PROPERTY_MINIMUM_SIZE:
+        case Toolkit::Control::PROPERTY_MINIMUM_SIZE:
         {
           value = controlImpl.mImpl->mMinimumSize;
           break;
         }
 
-        case Control::PROPERTY_MAXIMUM_SIZE:
+        case Toolkit::Control::PROPERTY_MAXIMUM_SIZE:
         {
           value = controlImpl.mImpl->mMaximumSize;
           break;
         }
 
-        case Control::PROPERTY_KEY_INPUT_FOCUS:
+        case Toolkit::Control::PROPERTY_KEY_INPUT_FOCUS:
         {
           value = controlImpl.HasKeyInputFocus();
           break;
@@ -490,7 +493,7 @@ public:
 
   // Data
 
-  ControlImpl& mControlImpl;
+  Control& mControlImpl;
 
   bool mInitialized:1;
 
@@ -509,8 +512,8 @@ public:
 
   bool mLockSetSize;                 ///< Used to avoid. Can't be a bitfield as a reference to this member is used in SetSizeLock helper class.
 
-  Control::SizePolicy mWidthPolicy;  ///< Stores the width policy.
-  Control::SizePolicy mHeightPolicy; ///< Stores the height policy.
+  Toolkit::Control::SizePolicy mWidthPolicy;  ///< Stores the width policy.
+  Toolkit::Control::SizePolicy mHeightPolicy; ///< Stores the height policy.
 
   Vector3 mSize;                     ///< Stores the current control's size.
   Vector3 mSetSize;                  ///< Always stores the size set through the Actor's API. Useful when reset to the initial size is needed.
@@ -525,7 +528,7 @@ public:
   // Background
   Background* mBackground;           ///< Only create the background if we use it
 
-  // Properties - these need to be members of ControlImpl::Impl as they need to functions within this class.
+  // Properties - these need to be members of Internal::Control::Impl as they need to functions within this class.
   static PropertyRegistration PROPERTY_1;
   static PropertyRegistration PROPERTY_2;
   static PropertyRegistration PROPERTY_3;
@@ -535,21 +538,21 @@ public:
   static PropertyRegistration PROPERTY_7;
 };
 
-PropertyRegistration ControlImpl::Impl::PROPERTY_1( CONTROL_TYPE, "background-color", Control::PROPERTY_BACKGROUND_COLOR, Property::VECTOR4, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
-PropertyRegistration ControlImpl::Impl::PROPERTY_2( CONTROL_TYPE, "background",       Control::PROPERTY_BACKGROUND,       Property::MAP,     &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
-PropertyRegistration ControlImpl::Impl::PROPERTY_3( CONTROL_TYPE, "width-policy",     Control::PROPERTY_WIDTH_POLICY,     Property::STRING,  &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
-PropertyRegistration ControlImpl::Impl::PROPERTY_4( CONTROL_TYPE, "height-policy",    Control::PROPERTY_HEIGHT_POLICY,    Property::STRING,  &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
-PropertyRegistration ControlImpl::Impl::PROPERTY_5( CONTROL_TYPE, "minimum-size",     Control::PROPERTY_MINIMUM_SIZE,     Property::VECTOR3, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
-PropertyRegistration ControlImpl::Impl::PROPERTY_6( CONTROL_TYPE, "maximum-size",     Control::PROPERTY_MAXIMUM_SIZE,     Property::VECTOR3, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
-PropertyRegistration ControlImpl::Impl::PROPERTY_7( CONTROL_TYPE, "key-input-focus",  Control::PROPERTY_KEY_INPUT_FOCUS,  Property::BOOLEAN, &ControlImpl::Impl::SetProperty, &ControlImpl::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_1( CONTROL_TYPE, "background-color", Toolkit::Control::PROPERTY_BACKGROUND_COLOR, Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_2( CONTROL_TYPE, "background",       Toolkit::Control::PROPERTY_BACKGROUND,       Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_3( CONTROL_TYPE, "width-policy",     Toolkit::Control::PROPERTY_WIDTH_POLICY,     Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_4( CONTROL_TYPE, "height-policy",    Toolkit::Control::PROPERTY_HEIGHT_POLICY,    Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_5( CONTROL_TYPE, "minimum-size",     Toolkit::Control::PROPERTY_MINIMUM_SIZE,     Property::VECTOR3, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_6( CONTROL_TYPE, "maximum-size",     Toolkit::Control::PROPERTY_MAXIMUM_SIZE,     Property::VECTOR3, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_7( CONTROL_TYPE, "key-input-focus",  Toolkit::Control::PROPERTY_KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
-Control ControlImpl::New()
+Toolkit::Control Control::New()
 {
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr<ControlImpl> controlImpl = new ControlImpl( false );
+  IntrusivePtr<Control> controlImpl = new Control( false );
 
   // Pass ownership to handle
-  Control handle( *controlImpl );
+  Toolkit::Control handle( *controlImpl );
 
   // Second-phase init of the implementation
   // This can only be done after the CustomActor connection has been made...
@@ -558,7 +561,7 @@ Control ControlImpl::New()
   return handle;
 }
 
-ControlImpl::~ControlImpl()
+Control::~Control()
 {
   if( mImpl->mInitialized )
   {
@@ -568,7 +571,7 @@ ControlImpl::~ControlImpl()
   delete mImpl;
 }
 
-void ControlImpl::Initialize()
+void Control::Initialize()
 {
   // Register with the style change processor so we are informed when the default style changes
   Internal::StyleChangeProcessor::Register( this );
@@ -579,7 +582,7 @@ void ControlImpl::Initialize()
   mImpl->mInitialized = true;
 }
 
-void ControlImpl::EnableGestureDetection(Gesture::Type type)
+void Control::EnableGestureDetection(Gesture::Type type)
 {
   if ( (type & Gesture::Pinch) && !mImpl->mPinchGestureDetector )
   {
@@ -610,7 +613,7 @@ void ControlImpl::EnableGestureDetection(Gesture::Type type)
   }
 }
 
-void ControlImpl::DisableGestureDetection(Gesture::Type type)
+void Control::DisableGestureDetection(Gesture::Type type)
 {
   if ( (type & Gesture::Pinch) && mImpl->mPinchGestureDetector )
   {
@@ -637,27 +640,27 @@ void ControlImpl::DisableGestureDetection(Gesture::Type type)
   }
 }
 
-PinchGestureDetector ControlImpl::GetPinchGestureDetector() const
+PinchGestureDetector Control::GetPinchGestureDetector() const
 {
   return mImpl->mPinchGestureDetector;
 }
 
-PanGestureDetector ControlImpl::GetPanGestureDetector() const
+PanGestureDetector Control::GetPanGestureDetector() const
 {
   return mImpl->mPanGestureDetector;
 }
 
-TapGestureDetector ControlImpl::GetTapGestureDetector() const
+TapGestureDetector Control::GetTapGestureDetector() const
 {
   return mImpl->mTapGestureDetector;
 }
 
-LongPressGestureDetector ControlImpl::GetLongPressGestureDetector() const
+LongPressGestureDetector Control::GetLongPressGestureDetector() const
 {
   return mImpl->mLongPressGestureDetector;
 }
 
-void ControlImpl::SetBackgroundColor( const Vector4& color )
+void Control::SetBackgroundColor( const Vector4& color )
 {
   Background& background( mImpl->GetBackground() );
 
@@ -682,7 +685,7 @@ void ControlImpl::SetBackgroundColor( const Vector4& color )
   background.color = color;
 }
 
-Vector4 ControlImpl::GetBackgroundColor() const
+Vector4 Control::GetBackgroundColor() const
 {
   if ( mImpl->mBackground )
   {
@@ -691,7 +694,7 @@ Vector4 ControlImpl::GetBackgroundColor() const
   return Color::TRANSPARENT;
 }
 
-void ControlImpl::SetBackground( Image image )
+void Control::SetBackground( Image image )
 {
   Background& background( mImpl->GetBackground() );
 
@@ -710,7 +713,7 @@ void ControlImpl::SetBackground( Image image )
   Self().Add( imageActor );
 }
 
-void ControlImpl::ClearBackground()
+void Control::ClearBackground()
 {
   if ( mImpl->mBackground )
   {
@@ -722,7 +725,7 @@ void ControlImpl::ClearBackground()
   }
 }
 
-Actor ControlImpl::GetBackgroundActor() const
+Actor Control::GetBackgroundActor() const
 {
   if ( mImpl->mBackground )
   {
@@ -732,7 +735,7 @@ Actor ControlImpl::GetBackgroundActor() const
   return Actor();
 }
 
-void ControlImpl::OnPinch(PinchGesture pinch)
+void Control::OnPinch(PinchGesture pinch)
 {
   if (pinch.state == Gesture::Started)
   {
@@ -742,7 +745,7 @@ void ControlImpl::OnPinch(PinchGesture pinch)
   Self().SetScale(mImpl->mStartingPinchScale * pinch.scale);
 }
 
-void ControlImpl::OnStageConnection()
+void Control::OnStageConnection()
 {
   RelayoutRequest();
 
@@ -750,13 +753,13 @@ void ControlImpl::OnStageConnection()
   OnControlStageConnection();
 }
 
-void ControlImpl::OnStageDisconnection()
+void Control::OnStageDisconnection()
 {
   // Notify derived classes
   OnControlStageDisconnection();
 }
 
-void ControlImpl::OnChildAdd(Actor& child)
+void Control::OnChildAdd(Actor& child)
 {
   // If this is the background actor, then we do not want to relayout or inform deriving classes
   if ( mImpl->mBackground && ( child == mImpl->mBackground->actor ) )
@@ -771,7 +774,7 @@ void ControlImpl::OnChildAdd(Actor& child)
   OnControlChildAdd( child );
 }
 
-void ControlImpl::OnChildRemove(Actor& child)
+void Control::OnChildRemove(Actor& child)
 {
   // If this is the background actor, then we do not want to relayout or inform deriving classes
   if ( mImpl->mBackground && ( child == mImpl->mBackground->actor ) )
@@ -786,7 +789,7 @@ void ControlImpl::OnChildRemove(Actor& child)
   OnControlChildRemove( child );
 }
 
-void ControlImpl::OnSizeSet(const Vector3& targetSize)
+void Control::OnSizeSet(const Vector3& targetSize)
 {
   if( ( !mImpl->mLockSetSize ) && ( targetSize != mImpl->mSetSize ) )
   {
@@ -804,98 +807,98 @@ void ControlImpl::OnSizeSet(const Vector3& targetSize)
   }
 }
 
-void ControlImpl::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
+void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
 {
   // Do Nothing
 }
 
-bool ControlImpl::OnTouchEvent(const TouchEvent& event)
+bool Control::OnTouchEvent(const TouchEvent& event)
 {
   return false; // Do not consume
 }
 
-bool ControlImpl::OnKeyEvent(const KeyEvent& event)
+bool Control::OnKeyEvent(const KeyEvent& event)
 {
   return false; // Do not consume
 }
 
-bool ControlImpl::OnMouseWheelEvent(const MouseWheelEvent& event)
+bool Control::OnMouseWheelEvent(const MouseWheelEvent& event)
 {
   return false; // Do not consume
 }
 
-void ControlImpl::OnKeyInputFocusGained()
+void Control::OnKeyInputFocusGained()
 {
   // Do Nothing
 }
 
-void ControlImpl::OnKeyInputFocusLost()
+void Control::OnKeyInputFocusLost()
 {
   // Do Nothing
 }
 
-Actor ControlImpl::GetChildByAlias(const std::string& actorAlias)
+Actor Control::GetChildByAlias(const std::string& actorAlias)
 {
   return Actor();
 }
 
-bool ControlImpl::OnAccessibilityPan(PanGesture gesture)
+bool Control::OnAccessibilityPan(PanGesture gesture)
 {
   return false; // Accessibility pan gesture is not handled by default
 }
 
-bool ControlImpl::OnAccessibilityValueChange(bool isIncrease)
+bool Control::OnAccessibilityValueChange(bool isIncrease)
 {
   return false; // Accessibility value change action is not handled by default
 }
 
 
-void ControlImpl::SetKeyboardNavigationSupport(bool isSupported)
+void Control::SetKeyboardNavigationSupport(bool isSupported)
 {
   mImpl->mIsKeyboardNavigationSupported = isSupported;
 }
 
-bool ControlImpl::IsKeyboardNavigationSupported()
+bool Control::IsKeyboardNavigationSupported()
 {
   return mImpl->mIsKeyboardNavigationSupported;
 }
 
-void ControlImpl::SetAsKeyboardFocusGroup(bool isFocusGroup)
+void Control::SetAsKeyboardFocusGroup(bool isFocusGroup)
 {
   mImpl->mIsKeyboardFocusGroup = isFocusGroup;
 
   // The following line will be removed when the deprecated API in KeyboardFocusManager is deleted
-  KeyboardFocusManager::Get().SetAsFocusGroup(Self(), isFocusGroup);
+  Toolkit::KeyboardFocusManager::Get().SetAsFocusGroup(Self(), isFocusGroup);
 }
 
-bool ControlImpl::IsKeyboardFocusGroup()
+bool Control::IsKeyboardFocusGroup()
 {
-  return KeyboardFocusManager::Get().IsFocusGroup(Self());
+  return Toolkit::KeyboardFocusManager::Get().IsFocusGroup(Self());
 }
 
-Actor ControlImpl::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
+Actor Control::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
 {
   return Actor();
 }
 
-bool ControlImpl::DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes)
+bool Control::DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes)
 {
   bool ret = false;
 
   return ret;
 }
 
-void ControlImpl::DoActivatedAction(const PropertyValueContainer& attributes)
+void Control::DoActivatedAction(const PropertyValueContainer& attributes)
 {
   OnActivated();
 }
 
-Toolkit::Control::KeyEventSignalV2& ControlImpl::KeyEventSignal()
+Toolkit::Control::KeyEventSignalV2& Control::KeyEventSignal()
 {
   return mImpl->mKeyEventSignalV2;
 }
 
-void ControlImpl::SetSizePolicy( Control::SizePolicy widthPolicy, Control::SizePolicy heightPolicy )
+void Control::SetSizePolicy( Toolkit::Control::SizePolicy widthPolicy, Toolkit::Control::SizePolicy heightPolicy )
 {
   bool relayoutRequest( false );
 
@@ -914,59 +917,59 @@ void ControlImpl::SetSizePolicy( Control::SizePolicy widthPolicy, Control::SizeP
   }
 }
 
-void ControlImpl::GetSizePolicy( Control::SizePolicy& widthPolicy, Control::SizePolicy& heightPolicy ) const
+void Control::GetSizePolicy( Toolkit::Control::SizePolicy& widthPolicy, Toolkit::Control::SizePolicy& heightPolicy ) const
 {
   widthPolicy = mImpl->mWidthPolicy;
   heightPolicy = mImpl->mHeightPolicy;
 }
 
-void ControlImpl::SetMinimumSize( const Vector3& size )
+void Control::SetMinimumSize( const Vector3& size )
 {
   if ( mImpl->mMinimumSize != size )
   {
     mImpl->mMinimumSize = size;
 
     // Only relayout if our control is using the minimum or range policy.
-    if ( ( mImpl->mHeightPolicy == Control::Minimum ) || ( mImpl->mWidthPolicy  == Control::Minimum ) ||
-         ( mImpl->mHeightPolicy == Control::Range   ) || ( mImpl->mWidthPolicy  == Control::Range   ) )
+    if ( ( mImpl->mHeightPolicy == Toolkit::Control::Minimum ) || ( mImpl->mWidthPolicy  == Toolkit::Control::Minimum ) ||
+         ( mImpl->mHeightPolicy == Toolkit::Control::Range   ) || ( mImpl->mWidthPolicy  == Toolkit::Control::Range   ) )
     {
       RelayoutRequest();
     }
   }
 }
 
-const Vector3& ControlImpl::GetMinimumSize() const
+const Vector3& Control::GetMinimumSize() const
 {
   return mImpl->mMinimumSize;
 }
 
-void ControlImpl::SetMaximumSize( const Vector3& size )
+void Control::SetMaximumSize( const Vector3& size )
 {
   if ( mImpl->mMaximumSize != size )
   {
     mImpl->mMaximumSize = size;
 
     // Only relayout if our control is using the maximum or range policy.
-    if ( ( mImpl->mHeightPolicy == Control::Maximum ) || ( mImpl->mWidthPolicy  == Control::Maximum ) ||
-         ( mImpl->mHeightPolicy == Control::Range   ) || ( mImpl->mWidthPolicy  == Control::Range   ) )
+    if ( ( mImpl->mHeightPolicy == Toolkit::Control::Maximum ) || ( mImpl->mWidthPolicy  == Toolkit::Control::Maximum ) ||
+         ( mImpl->mHeightPolicy == Toolkit::Control::Range   ) || ( mImpl->mWidthPolicy  == Toolkit::Control::Range   ) )
     {
       RelayoutRequest();
     }
   }
 }
 
-const Vector3& ControlImpl::GetMaximumSize() const
+const Vector3& Control::GetMaximumSize() const
 {
   return mImpl->mMaximumSize;
 }
 
-Vector3 ControlImpl::GetNaturalSize()
+Vector3 Control::GetNaturalSize()
 {
   // could be overridden in derived classes.
   return mImpl->mSetSize;
 }
 
-float ControlImpl::GetHeightForWidth( float width )
+float Control::GetHeightForWidth( float width )
 {
   // could be overridden in derived classes.
   float height( 0.0f );
@@ -977,7 +980,7 @@ float ControlImpl::GetHeightForWidth( float width )
   return height;
 }
 
-float ControlImpl::GetWidthForHeight( float height )
+float Control::GetWidthForHeight( float height )
 {
   // could be overridden in derived classes.
   float width( 0.0f );
@@ -988,48 +991,48 @@ float ControlImpl::GetWidthForHeight( float height )
   return width;
 }
 
-const Vector3& ControlImpl::GetControlSize() const
+const Vector3& Control::GetControlSize() const
 {
   return mImpl->mSize;
 }
 
-const Vector3& ControlImpl::GetSizeSet() const
+const Vector3& Control::GetSizeSet() const
 {
   return mImpl->mSetSize;
 }
 
-void ControlImpl::SetKeyInputFocus()
+void Control::SetKeyInputFocus()
 {
   if( Self().OnStage() )
   {
-    KeyInputFocusManager::Get().SetFocus(Control::DownCast(Self()));
+    Toolkit::KeyInputFocusManager::Get().SetFocus(Toolkit::Control::DownCast(Self()));
   }
 }
 
-bool ControlImpl::HasKeyInputFocus()
+bool Control::HasKeyInputFocus()
 {
   bool result = false;
   if( Self().OnStage() )
   {
-    result = KeyInputFocusManager::Get().IsKeyboardListener(Control::DownCast(Self()));
+    result = Toolkit::KeyInputFocusManager::Get().IsKeyboardListener(Toolkit::Control::DownCast(Self()));
   }
   return result;
 }
 
-void ControlImpl::ClearKeyInputFocus()
+void Control::ClearKeyInputFocus()
 {
   if( Self().OnStage() )
   {
-    KeyInputFocusManager::Get().RemoveFocus(Control::DownCast(Self()));
+    Toolkit::KeyInputFocusManager::Get().RemoveFocus(Toolkit::Control::DownCast(Self()));
   }
 }
 
-void ControlImpl::RelayoutRequest()
+void Control::RelayoutRequest()
 {
   Internal::RelayoutController::Get().Request();
 }
 
-void ControlImpl::Relayout( Vector2 size, ActorSizeContainer& container )
+void Control::Relayout( Vector2 size, ActorSizeContainer& container )
 {
   // Avoids relayout again when OnSizeSet callback arrives.
   {
@@ -1041,11 +1044,11 @@ void ControlImpl::Relayout( Vector2 size, ActorSizeContainer& container )
   OnRelaidOut( size, container );
 }
 
-void ControlImpl::Relayout( Actor actor, Vector2 size, ActorSizeContainer& container )
+void Control::Relayout( Actor actor, Vector2 size, ActorSizeContainer& container )
 {
   if ( actor )
   {
-    Control control( Control::DownCast( actor ) );
+    Toolkit::Control control( Toolkit::Control::DownCast( actor ) );
     if( control )
     {
       control.GetImplementation().NegotiateSize( size, container );
@@ -1057,7 +1060,7 @@ void ControlImpl::Relayout( Actor actor, Vector2 size, ActorSizeContainer& conta
   }
 }
 
-void ControlImpl::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+void Control::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
 {
   unsigned int numChildren = Self().GetChildCount();
 
@@ -1067,13 +1070,13 @@ void ControlImpl::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
   }
 }
 
-void ControlImpl::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& container )
+void Control::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& container )
 {
   Vector2 size;
 
-  if ( mImpl->mWidthPolicy == Control::Fixed )
+  if ( mImpl->mWidthPolicy == Toolkit::Control::Fixed )
   {
-    if ( mImpl->mHeightPolicy == Control::Fixed )
+    if ( mImpl->mHeightPolicy == Toolkit::Control::Fixed )
     {
       // If a control says it has a fixed size, then use the size set by the application / control.
       Vector2 setSize( mImpl->mSetSize );
@@ -1120,7 +1123,7 @@ void ControlImpl::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& cont
   }
   else
   {
-    if ( mImpl->mHeightPolicy == Control::Fixed )
+    if ( mImpl->mHeightPolicy == Toolkit::Control::Fixed )
     {
       // Height is fixed so if the application / control has set it, then use that.
       if ( !EqualsZero( mImpl->mSetSize.height ) )
@@ -1172,7 +1175,7 @@ void ControlImpl::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& cont
   Relayout( size, container );
 }
 
-bool ControlImpl::EmitKeyEventSignal( const KeyEvent& event )
+bool Control::EmitKeyEventSignal( const KeyEvent& event )
 {
   // Guard against destruction during signal emission
   Dali::Toolkit::Control handle( GetOwner() );
@@ -1194,26 +1197,28 @@ bool ControlImpl::EmitKeyEventSignal( const KeyEvent& event )
   return consumed;
 }
 
-void ControlImpl::SignalConnected( SlotObserver* slotObserver, CallbackBase* callback )
+void Control::SignalConnected( SlotObserver* slotObserver, CallbackBase* callback )
 {
   mImpl->SignalConnected( slotObserver, callback );
 }
 
-void ControlImpl::SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback )
+void Control::SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback )
 {
   mImpl->SignalDisconnected( slotObserver, callback );
 }
 
-std::size_t ControlImpl::GetConnectionCount() const
+std::size_t Control::GetConnectionCount() const
 {
   return mImpl->GetConnectionCount();
 }
 
-ControlImpl::ControlImpl( bool requiresTouchEvents )
+Control::Control( bool requiresTouchEvents )
 : CustomActorImpl( requiresTouchEvents ),
   mImpl(new Impl(*this))
 {
 }
+
+} // namespace Internal
 
 } // namespace Toolkit
 

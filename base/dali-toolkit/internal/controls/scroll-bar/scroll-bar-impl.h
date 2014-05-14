@@ -152,7 +152,7 @@ public:
   */
  static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
-private: // from ControlImpl
+private: // from Control
 
   /**
    * @copydoc Toolkit::Control::OnInitialize

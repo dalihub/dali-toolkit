@@ -41,7 +41,7 @@ typedef IntrusivePtr<ImageView>    ImageViewPtr;
 /**
  * @copydoc Toolkit::ImageView
  */
-class ImageView : public ControlImpl
+class ImageView : public Control
 {
 public:
 

@@ -28,17 +28,7 @@ const char* const Control::SIGNAL_KEY_EVENT = "key-event";
 
 Control Control::New()
 {
-  // Use TypeRegistry to create instance of control so that the type-info matches Control rather than ControlImpl
-  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid(Control) );
-  DALI_ASSERT_ALWAYS( typeInfo && "TypeRegistry returning Invalid TypeInfo" );
-
-  BaseHandle handle = typeInfo.CreateInstance();
-  DALI_ASSERT_ALWAYS( handle && "Unable to Create Control" );
-
-  Control control = DownCast( handle );
-  DALI_ASSERT_ALWAYS( handle && "TypeRegistry did not create a Control" );
-
-  return control;
+  return Internal::Control::New();
 }
 
 Control::Control()
@@ -46,7 +36,7 @@ Control::Control()
 }
 
 Control::Control(const Control& uiControl)
-: CustomActor( uiControl ? static_cast<const ControlImpl&>( uiControl.GetImplementation() ).GetOwner() : NULL)
+: CustomActor( uiControl ? static_cast< const Internal::Control& >( uiControl.GetImplementation() ).GetOwner() : NULL)
 {
 }
 
@@ -65,17 +55,17 @@ Control& Control::operator=( const Control& handle )
 
 Control Control::DownCast( BaseHandle handle )
 {
-  return DownCast<Control, ControlImpl>(handle);
+  return DownCast< Control, Internal::Control >(handle);
 }
 
-ControlImpl& Control::GetImplementation()
+Internal::Control& Control::GetImplementation()
 {
-  return static_cast<ControlImpl&>(CustomActor::GetImplementation());
+  return static_cast<Internal::Control&>(CustomActor::GetImplementation());
 }
 
-const ControlImpl& Control::GetImplementation() const
+const Internal::Control& Control::GetImplementation() const
 {
-  return static_cast<const ControlImpl&>(CustomActor::GetImplementation());
+  return static_cast<const Internal::Control&>(CustomActor::GetImplementation());
 }
 
 void Control::SetSizePolicy( SizePolicy widthPolicy, SizePolicy heightPolicy )
@@ -213,7 +203,7 @@ std::size_t Control::GetConnectionCount() const
 }
 
 
-Control::Control(ControlImpl& implementation)
+Control::Control(Internal::Control& implementation)
 : CustomActor(implementation)
 {
 }
@@ -221,7 +211,7 @@ Control::Control(ControlImpl& implementation)
 Control::Control(Dali::Internal::CustomActor* internal)
 : CustomActor(internal)
 {
-  VerifyCustomActorPointer<ControlImpl>(internal);
+  VerifyCustomActorPointer<Internal::Control>(internal);
 }
 
 } // namespace Toolkit

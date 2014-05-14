@@ -68,7 +68,7 @@ typedef ChildInfoContainer::const_iterator ChildInfoConstIter;
  * Multiple cluster styles may be provided, to determine the position, size, rotation, scale, color and visibility
  * of the child actors in the cluster.
  */
-class Cluster : public ControlImpl
+class Cluster : public Control
 {
 public:
 
@@ -230,9 +230,9 @@ private:
    */
   void DoTransformAction(const PropertyValueContainer& attributes);
 
-private: // From ControlImpl
+private: // From Control
   /**
-   * From Toolkit::ControlImpl; called shortly before a child is removed from the owning actor.
+   * From Control; called shortly before a child is removed from the owning actor.
    * @param[in] child The child being removed.Ptr
    */
   virtual void OnControlChildRemove(Actor& child);
@@ -248,7 +248,7 @@ public:
    */
   static bool DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes);
 
-private: // From ControlImpl
+private: // From Control
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()

@@ -269,7 +269,7 @@ Dali::Toolkit::TextInput TextInput::New()
 }
 
 TextInput::TextInput()
-:ControlImpl( true ),
+:Control( true ),
  mState( StateEdit ),
  mStyledText(),
  mInputStyle(),
@@ -2037,7 +2037,7 @@ void TextInput::CreateTextViewActor()
   mDisplayedTextView.SetLineJustification( Toolkit::TextView::Left );
   mDisplayedTextView.SetTextAlignment( static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalLeft | Toolkit::Alignment::VerticalTop ) );
   mDisplayedTextView.SetPosition( Vector3( 0.0f, 0.0f, DISPLAYED_TEXT_VIEW_Z_OFFSET ) );
-  mDisplayedTextView.SetSizePolicy( Control::Fixed, Control::Fixed );
+  mDisplayedTextView.SetSizePolicy( Toolkit::Control::Fixed, Toolkit::Control::Fixed );
 
   mDisplayedTextView.ScrolledSignal().Connect( this, &TextInput::OnTextViewScrolled );
 

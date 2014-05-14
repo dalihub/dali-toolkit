@@ -40,7 +40,7 @@ namespace // unnamed namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_KEYBOARD_FOCUS_MANAGER");
 #endif
 
-const std::string IS_FOCUS_GROUP_PROPERTY_NAME("is-keyboard-focus-group"); // This property will be replaced by a flag in ControlImpl.
+const std::string IS_FOCUS_GROUP_PROPERTY_NAME("is-keyboard-focus-group"); // This property will be replaced by a flag in Control.
 
 const char* FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "keyboard_focus.png";
 const Vector4 FOCUS_BORDER_IMAGE_BORDER = Vector4(7.0f, 7.0f, 7.0f, 7.0f);

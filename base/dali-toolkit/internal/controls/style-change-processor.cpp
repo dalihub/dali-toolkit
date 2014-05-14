@@ -39,7 +39,7 @@ StyleChangeProcessor::~StyleChangeProcessor()
 {
 }
 
-void StyleChangeProcessor::Register( ControlImpl* control )
+void StyleChangeProcessor::Register( Control* control )
 {
   // Only create a style change processor if we have not created one in the local thread storage.
   if (!gThreadLocalStyleChangeProcessor.get())
@@ -49,7 +49,7 @@ void StyleChangeProcessor::Register( ControlImpl* control )
 
   gThreadLocalStyleChangeProcessor->Reference();
 
-  std::vector<ControlImpl*>& controls( gThreadLocalStyleChangeProcessor->mControls );
+  std::vector<Control*>& controls( gThreadLocalStyleChangeProcessor->mControls );
 
   // Store the Control raw pointer to allow traverse all off stage controls.
   DALI_ASSERT_ALWAYS( ( std::find( controls.begin(), controls.end(), control ) == controls.end() ) && "StyleChangeProcessor::Register. The control has been registered twice." );
@@ -57,15 +57,15 @@ void StyleChangeProcessor::Register( ControlImpl* control )
   controls.push_back( control );
 }
 
-void StyleChangeProcessor::Unregister( ControlImpl* control )
+void StyleChangeProcessor::Unregister( Control* control )
 {
   if (gThreadLocalStyleChangeProcessor.get())
   {
-    std::vector<ControlImpl*>& controls( gThreadLocalStyleChangeProcessor->mControls );
+    std::vector<Control*>& controls( gThreadLocalStyleChangeProcessor->mControls );
 
     // Removes the control from the vector as is not needed to notify it about style changes.
-    std::vector<ControlImpl*>::iterator it = std::find( controls.begin(), controls.end(), control );
-    std::vector<ControlImpl*>::iterator endIt = controls.end();
+    std::vector<Control*>::iterator it = std::find( controls.begin(), controls.end(), control );
+    std::vector<Control*>::iterator endIt = controls.end();
     DALI_ASSERT_ALWAYS( ( it != endIt ) && "StyleChangeProcessor::UnRegister. The control has not been registered in the StyleChangeProcessor." );
 
     *it = *(endIt - 1);
@@ -101,12 +101,12 @@ StyleChangeProcessor::StyleChangeProcessor()
 void StyleChangeProcessor::StyleChanged(Dali::StyleMonitor styleMonitor, StyleChange styleChange)
 {
   // Traverse all registered controls.
-  std::vector<ControlImpl*>& controls( gThreadLocalStyleChangeProcessor->mControls );
+  std::vector<Control*>& controls( gThreadLocalStyleChangeProcessor->mControls );
 
-  for( std::vector<ControlImpl*>::iterator it = controls.begin(), endIt = controls.end(); it != endIt; ++it )
+  for( std::vector<Control*>::iterator it = controls.begin(), endIt = controls.end(); it != endIt; ++it )
   {
     // Create a valid handle.
-    IntrusivePtr<ControlImpl> implementation( *it );
+    IntrusivePtr<Control> implementation( *it );
 
     if (implementation)
     {

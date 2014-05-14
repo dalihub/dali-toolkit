@@ -169,7 +169,7 @@ Dali::Toolkit::Popup Popup::New()
 }
 
 Popup::Popup(PopupStyle& style)
-: ControlImpl(true),
+: Control(true),
   mShowing(false),
   mState(Toolkit::Popup::POPUP_NONE), // Initially, the popup state should not be set, it's set in OnInitialize
   mAlterAddedChild(false),
@@ -902,7 +902,7 @@ float Popup::GetWidthForHeight( float height )
   return GetNaturalSize().width;
 }
 
-Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
+Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
 {
   Actor nextFocusableActor( currentFocusedActor );
 
@@ -945,7 +945,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Control::K
       {
         switch ( direction )
         {
-          case Control::Left:
+          case Toolkit::Control::Left:
           {
             if ( iter == focusableActors.begin() )
             {
@@ -957,7 +957,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Control::K
             }
             break;
           }
-          case Control::Right:
+          case Toolkit::Control::Right:
           {
             if ( iter == focusableActors.end() - 1 )
             {
@@ -970,7 +970,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Control::K
             break;
           }
 
-          case Control::Up:
+          case Toolkit::Control::Up:
           {
             if ( *iter == mContent )
             {
@@ -997,7 +997,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Control::K
             break;
           }
 
-          case Control::Down:
+          case Toolkit::Control::Down:
           {
             if ( mContent && mContent.IsKeyboardFocusable() )
             {

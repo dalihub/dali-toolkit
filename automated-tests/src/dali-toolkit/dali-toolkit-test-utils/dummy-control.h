@@ -61,22 +61,22 @@ public: // Not intended for application developers
 };
 
 /**
- * Cannot create an instance of ControlImpl, so use this dummy class for the implementation.
- * This class does not override any of ControlImpl's behaviour.
+ * Cannot create an instance of Internal::Control, so use this dummy class for the implementation.
+ * This class does not override any of Internal::Control's behaviour.
  */
-class DummyControlImpl : public ControlImpl
+class DummyControlImpl : public Internal::Control
 {
 public:
 
   static DummyControl New();
 
 public:
-  inline void EnableGestureDetection(Gesture::Type type) { ControlImpl::EnableGestureDetection(type); }
-  inline void DisableGestureDetection(Gesture::Type type) { ControlImpl::DisableGestureDetection(type); }
-  inline PinchGestureDetector GetPinchGestureDetector() const { return ControlImpl::GetPinchGestureDetector(); }
-  inline PanGestureDetector GetPanGestureDetector() const { return ControlImpl::GetPanGestureDetector(); }
-  inline TapGestureDetector GetTapGestureDetector() const { return ControlImpl::GetTapGestureDetector(); }
-  inline LongPressGestureDetector GetLongPressGestureDetector() const { return ControlImpl::GetLongPressGestureDetector(); }
+  inline void EnableGestureDetection(Gesture::Type type) { Internal::Control::EnableGestureDetection(type); }
+  inline void DisableGestureDetection(Gesture::Type type) { Internal::Control::DisableGestureDetection(type); }
+  inline PinchGestureDetector GetPinchGestureDetector() const { return Internal::Control::GetPinchGestureDetector(); }
+  inline PanGestureDetector GetPanGestureDetector() const { return Internal::Control::GetPanGestureDetector(); }
+  inline TapGestureDetector GetTapGestureDetector() const { return Internal::Control::GetTapGestureDetector(); }
+  inline LongPressGestureDetector GetLongPressGestureDetector() const { return Internal::Control::GetLongPressGestureDetector(); }
 
 protected:
 
@@ -86,8 +86,8 @@ protected:
 };
 
 /**
- * Cannot create an instance of ControlImpl, so use this dummy class for the implementation.
- * This class DOES override ControlImpl's behaviour.
+ * Cannot create an instance of Internal::Control, so use this dummy class for the implementation.
+ * This class DOES override Internal::Control's behaviour.
  */
 class DummyControlImplOverride : public DummyControlImpl
 {
@@ -101,7 +101,7 @@ private:
 
   virtual ~DummyControlImplOverride();
 
-private: // From ControlImpl
+private: // From Internal::Control
 
   virtual void OnInitialize();
   virtual void OnStyleChange(StyleChange change);
