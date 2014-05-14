@@ -1261,6 +1261,7 @@ void SetTextVisible( TextView::RelayoutData& relayoutData )
           characterLayoutInfo.mGradientColor = Vector4::ZERO;
           characterLayoutInfo.mStartPoint = Vector2::ZERO;
           characterLayoutInfo.mEndPoint = Vector2::ZERO;
+          characterLayoutInfo.mColorAlpha = characterLayoutInfo.mStyledText.mStyle.GetTextColor().a;
         } // end characters
       } // end words
     } // end group of words
