@@ -341,7 +341,10 @@ void KeyboardFocusManager::ClearFocus()
   Actor actor = GetCurrentFocusActor();
   if(actor)
   {
-    actor.Remove(mFocusIndicatorActor);
+    if(mFocusIndicatorActor)
+    {
+      actor.Remove(mFocusIndicatorActor);
+    }
 
     // Send notification for the change of focus actor
     if( !mFocusChangedSignalV2.Empty() )
