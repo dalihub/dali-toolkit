@@ -327,7 +327,7 @@ TextInput::TextInput()
  mUnderlinedPriorToPreEdit ( false ),
  mCommitByKeyInput( false ),
  mPlaceHolderSet( false ),
- mMarkUpEnabled( true )
+ mMarkUpEnabled( false )
 {
   // Updates the line height accordingly with the input style.
   UpdateLineHeight();

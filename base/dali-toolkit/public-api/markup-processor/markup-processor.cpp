@@ -548,7 +548,18 @@ void GetStyledTextArray( const std::string& markupString, StyledTextArray& style
 
   if ( !scanForMarkup )
   {
-    styledTextArray.push_back( StyledText( Text( markupString ), TextStyle() ) );
+    const Text text( markupString );
+    const std::size_t size = text.GetLength();
+
+    styledTextArray.resize( size, StyledText( Text(), TextStyle() ) );
+
+    std::size_t index = 0;
+    for( StyledTextArray::iterator it = styledTextArray.begin(), endIt = styledTextArray.end(); it != endIt; ++it, ++index )
+    {
+      StyledText& styledText( *it );
+
+      styledText.mText.Append( text[index] );
+    }
     return;
   }
 
