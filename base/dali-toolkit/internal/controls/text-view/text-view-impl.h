@@ -60,6 +60,7 @@ public:
     SplitOriginal,        ///< Split if it exceeds the width but no action if it exceeds the height.
     SplitFade,            ///< Split if it exceeds the width and faded if it exceeds the height.
     SplitShrink,          ///< Split if it exceeds the width and shrunk if it exceeds the height.
+    SplitEllipsizeEnd,    ///< Split if it exceeds the width and ellipsize if it exceeds the height.
     Fade,                 ///< Faded if it exceeds any boundary.
     FadeOriginal,         ///< Faded if it exceeds the width but no action if it exceeds the height.
     ShrinkOriginal,       ///< Shrunk if it exceeds the width but no action if it exceeds the height.

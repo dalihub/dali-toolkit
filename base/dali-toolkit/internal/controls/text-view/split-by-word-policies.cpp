@@ -562,15 +562,8 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
               break;
             }
             case TextView::SplitOriginal:
-            {
-              characterLayoutInfo.mPosition = SplitWhenExceedPosition( relayoutParameters,
-                                                                       layoutParameters,
-                                                                       relayoutData );
-
-              relayoutParameters.mPositionOffset = characterLayoutInfo.mPosition + Vector3( characterLayoutInfo.mSize.width, 0.f, 0.f );
-              break;
-            }
             case TextView::SplitFade:
+            case TextView::SplitEllipsizeEnd:
             {
               characterLayoutInfo.mPosition = SplitWhenExceedPosition( relayoutParameters,
                                                                        layoutParameters,

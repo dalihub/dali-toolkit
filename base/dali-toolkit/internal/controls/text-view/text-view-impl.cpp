@@ -1779,6 +1779,11 @@ void TextView::CombineExceedPolicies()
           mLayoutParameters.mExceedPolicy = SplitShrink;
           break;
         }
+        case Toolkit::TextView::EllipsizeEnd:
+        {
+          mLayoutParameters.mExceedPolicy = SplitEllipsizeEnd;
+          break;
+        }
         default:
         {
           DALI_ASSERT_ALWAYS( !"TextView::CombineExceedPolicies() Invalid width and height exceed policies combination" );
