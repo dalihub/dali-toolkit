@@ -414,7 +414,25 @@ Actor KeyboardFocusManager::GetFocusGroup(Actor actor)
 
 void KeyboardFocusManager::SetFocusIndicatorActor(Actor indicator)
 {
-  mFocusIndicatorActor = indicator;
+  if(mFocusIndicatorActor != indicator)
+  {
+    Actor currentFocusActor = GetCurrentFocusActor();
+    if(currentFocusActor)
+    {
+      // The new focus indicator should be added to the current focused actor immediately
+      if(mFocusIndicatorActor)
+      {
+        currentFocusActor.Remove(mFocusIndicatorActor);
+      }
+
+      if(indicator)
+      {
+        currentFocusActor.Add(indicator);
+      }
+    }
+
+    mFocusIndicatorActor = indicator;
+  }
 }
 
 Actor KeyboardFocusManager::GetFocusIndicatorActor()
