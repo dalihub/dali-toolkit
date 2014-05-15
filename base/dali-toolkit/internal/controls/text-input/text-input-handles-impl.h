@@ -38,104 +38,97 @@ class TextInputHandles : public ConnectionTracker
 
 public:
 
-  typedef SignalV2< bool () > HandlesReleasedSignal;
-
-  /**
-   * Signal emitted when a handle is released
-   */
-  HandlesReleasedSignal& ReleasedSignal(){ return mReleasedSignal; };
-
   /**
    * Default constructor
    */
-  TextInputHandles() {}
+  TextInputHandles();
 
   /**
    * Destructor
    */
-  ~TextInputHandles() {};
+  ~TextInputHandles();
 
   /**
    * Create the selection handles
    */
-  void CreateSelectionHandles(){};
+  void CreateSelectionHandles();
 
   /**
    * Un-parents the Selection Handles and resets their Image Actors
    */
-  void DestorySelectionHandles(){};
+  void DestorySelectionHandles();
 
   /**
    * Set the Actor visibility on Selection Handle One
    * @param[in] visibility visibility flag
    */
-  void SetSelectionHandleOneVisibility( bool visibility ){};
+  void SetSelectionHandleOneVisibility( bool visibility );
 
   /**
    * Set the Actor visibility on Selection Handle Two
    * @param[in] visibility visibility flag
    */
-  void SetSelectionHandleTwoVisibility( bool visibility ){};
+  void SetSelectionHandleTwoVisibility( bool visibility );
 
   /**
    * Attach the two selection handles to the pan gesture detector
    * @param[in] panGestureDetector the PanGestureDetector to attach to
    */
-  void AttachSelectionHandlesToGivenPanGesture(PanGestureDetector& panGestureDetector ){};
+  void AttachSelectionHandlesToGivenPanGesture(PanGestureDetector& panGestureDetector );
 
   /**
    * Attach the two selection handles to the tap gesture detector
    * @param[in] tapGestureDetector the TapGestureDetector to attach to
    */
-  void AttachSelectionHandlesToGivenTapDetector(TapGestureDetector& tapGestureDetector ){};
+  void AttachSelectionHandlesToGivenTapDetector(TapGestureDetector& tapGestureDetector );
 
   /**
    * Attach the grab handle to the pan gesture detector
    * @param[in] panGestureDetector the PanGestureDetector to attach to
    */
-  void AttachGrabHandleToGivenPanGesture( PanGestureDetector& panGestureDetector ){};
+  void AttachGrabHandleToGivenPanGesture( PanGestureDetector& panGestureDetector );
 
   /**
    * Get Selection handle one
    * @return selection handle actor
    */
-  Actor GetSelectionHandleOne() { return Actor(); };
+  Actor GetSelectionHandleOne();
 
   /**
    * Get Selection handle two
    * @return selection handle actor
    */
-  Actor GetSelectionHandleTwo() { return Actor(); };
+  Actor GetSelectionHandleTwo();
 
   /**
    * Get the grab handle
    * @return grab handle Actor
    */
-  Actor GetGrabHandle()  { return Actor(); };
+  Actor GetGrabHandle();
 
   /**
    * Create the grab handle that positions the cursor
    * @param[in] image the image to be used.
    */
-  void CreateGrabHandle(){};
+  void CreateGrabHandle();
 
   /**
    * Removes and Resets GrabHandle
    */
-  void DestoryGrabHandle(){};
+  void DestoryGrabHandle();
 
   /**
    * Set the image to be used as the cursor grab hander
    * @pre The text input actor has been initialised.
    * @param[in] image The image to be used.
    */
-  void SetGrabHandleImage( Dali::Image image ){};
+  void SetGrabHandleImage( Dali::Image image );
 
   /**
    * Set the Actor visibility on the GrabHandle
    * @param[in] visibility visibility flag
    */
-  void SetGrabHandleVisibility( bool visibility ){};
+  void SetGrabHandleVisibility( bool visibility );
 
   /* Touch Event Callbacks */
 
@@ -145,7 +138,7 @@ public:
    * @param[in] actor touched
    * @param[in] touch touch event, used to determine if down or up event
    */
-  bool OnSelectionHandleTouched(Dali::Actor actor, const TouchEvent& touch){ return true; };
+  bool OnSelectionHandleTouched(Dali::Actor actor, const TouchEvent& touch);
 
 private:
 
@@ -185,8 +178,6 @@ private:
   Image mGrabHandleImage;                         // Image to be used for grab handle
   ImageActor mGrabHandle;                         // Handle used to move cursor for editing
   Actor mGrabHandleGrabArea;                      // invisible actor that receives pans events for the grab handle.
-
-  HandlesReleasedSignal mReleasedSignal;          // Signal emitted when a handle is released
 
   bool mIsSelectionHandleOneFlipped:1;            // Flag to know whether the handle one is flipped or not.
   bool mIsSelectionHandleTwoFlipped:1;            // Flag to know whether the handle two is flipped or not.

@@ -162,12 +162,6 @@ public:
   void SetSelectionHandlesVisibility( bool visible );
 
   /**
-   * @brief Callback for when a handle is released
-   * @return bool
-   */
-  bool OnHandleReleased();
-
-  /**
    * @brief Position Selection handles at given positions within the text string.
    *
    * @param[in] start where to place first handle
