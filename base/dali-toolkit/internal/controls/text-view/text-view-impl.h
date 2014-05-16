@@ -163,11 +163,6 @@ public:
   std::string GetText() const;
 
   /**
-   * @copydoc SetFont( const Font newFont )
-   */
-  void SetFont( const Font newFont );
-
-  /**
    * @copydoc SetLineHeightOffset()
    */
   void SetLineHeightOffset( PointSize offset );
@@ -609,7 +604,7 @@ public:
                       Toolkit::TextView::LineJustification   lineJustification,
                       float                                  lineHeightOffset,
                       const std::string&                     ellipsizeText,
-                      const bool                             markUpEnabled );
+                      bool                                   markUpEnabled );
 
     /**
      * Copy constructor

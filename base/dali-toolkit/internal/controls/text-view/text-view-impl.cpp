@@ -49,7 +49,6 @@ namespace Internal
 namespace
 {
 
-
 const char* MULTILINE_POLICY_NAME[] = {"SplitByNewLineChar", "SplitByWord", "SplitByChar"};
 const char* EXCEED_POLICY_NAME[] = {"Original", "Truncate", "Fade", "Split","ShrinkToFit","EllipsizeEnd"};
 const char* LINE_JUSTIFICATION_NAME[] = {"Left","Center","Right","Justified"};
@@ -140,8 +139,8 @@ Toolkit::TextView TextView::New()
   // This can only be done after the CustomActor connection has been made...
   textView->Initialize();
 
-  // Enables by default the offscreen rendering.
-  textView->SetSnapshotModeEnabled( false ); /// @note Temporary disabled due to some issues with text quality and glyph loading.
+  // Disables by default the offscreen rendering.
+  textView->SetSnapshotModeEnabled( false );
 
   return handle;
 }
@@ -192,7 +191,7 @@ void TextView::InsertTextAt( std::size_t position, const std::string& text )
   InsertTextAt( position, styledText );
 }
 
-void TextView::InsertTextAt( const std::size_t position, const MarkupProcessor::StyledTextArray& text )
+void TextView::InsertTextAt( std::size_t position, const MarkupProcessor::StyledTextArray& text )
 {
   // Creates metadata with the Insert operation.
   TextViewProcessorMetadata metadata;
@@ -213,7 +212,7 @@ void TextView::InsertTextAt( const std::size_t position, const MarkupProcessor::
   mRelayoutOperations = RELAYOUT_ALL;
 }
 
-void TextView::ReplaceTextFromTo( const std::size_t position, const std::size_t numberOfCharacters, const std::string& text )
+void TextView::ReplaceTextFromTo( std::size_t position, std::size_t numberOfCharacters, const std::string& text )
 {
   // Creates a styled text with the markup or plain string.
   MarkupProcessor::StyledTextArray styledText;
@@ -223,7 +222,7 @@ void TextView::ReplaceTextFromTo( const std::size_t position, const std::size_t 
   ReplaceTextFromTo( position, numberOfCharacters, styledText );
 }
 
-void TextView::ReplaceTextFromTo( const std::size_t position, const std::size_t numberOfCharacters, const MarkupProcessor::StyledTextArray& text )
+void TextView::ReplaceTextFromTo( std::size_t position, std::size_t numberOfCharacters, const MarkupProcessor::StyledTextArray& text )
 {
   // Creates metadata with the Insert operation.
   TextViewProcessorMetadata metadata;
@@ -248,7 +247,7 @@ void TextView::ReplaceTextFromTo( const std::size_t position, const std::size_t 
   mRelayoutOperations = RELAYOUT_ALL;
 }
 
-void TextView::RemoveTextFrom( const std::size_t position, const std::size_t numberOfCharacters )
+void TextView::RemoveTextFrom( std::size_t position, std::size_t numberOfCharacters )
 {
   // Creates metadata with the Remove operation.
   TextViewProcessorMetadata metadata;
@@ -284,7 +283,7 @@ std::string TextView::GetText() const
   return text;
 }
 
-void TextView::SetLineHeightOffset( const PointSize offset )
+void TextView::SetLineHeightOffset( PointSize offset )
 {
   if( fabsf( mLayoutParameters.mLineHeightOffset - offset ) > Math::MACHINE_EPSILON_1000 )
   {
@@ -323,7 +322,7 @@ PointSize TextView::GetLineHeightOffset() const
   return PointSize( mLayoutParameters.mLineHeightOffset );
 }
 
-void TextView::SetStyleToCurrentText( const TextStyle& style, const TextStyle::Mask mask )
+void TextView::SetStyleToCurrentText( const TextStyle& style, TextStyle::Mask mask )
 {
   if( !mCurrentStyledText.empty() )
   {
@@ -762,7 +761,7 @@ bool TextView::IsMarkupProcessingEnabled() const
   return mMarkUpEnabled;
 }
 
-void TextView::SetScrollEnabled( const bool enable )
+void TextView::SetScrollEnabled( bool enable )
 {
   if( enable != mVisualParameters.mScrollEnabled )
   {
@@ -874,14 +873,14 @@ TextView::LayoutParameters::LayoutParameters()
   MarkupProcessor::GetStyledTextArray( std::string( "..." ), mEllipsizeText, false );
 }
 
-TextView::LayoutParameters::LayoutParameters( const Toolkit::TextView::MultilinePolicy   multilinePolicy,
-                                              const Toolkit::TextView::ExceedPolicy      widthExceedPolicy,
-                                              const Toolkit::TextView::ExceedPolicy      heightExceedPolicy,
-                                              const Toolkit::Alignment::Type             alignmentType,
-                                              const Toolkit::TextView::LineJustification lineJustification,
-                                              const float                                lineHeightOffset,
-                                              const std::string&                         ellipsizeText,
-                                              const bool                                 markUpEnabled )
+TextView::LayoutParameters::LayoutParameters( Toolkit::TextView::MultilinePolicy   multilinePolicy,
+                                              Toolkit::TextView::ExceedPolicy      widthExceedPolicy,
+                                              Toolkit::TextView::ExceedPolicy      heightExceedPolicy,
+                                              Toolkit::Alignment::Type             alignmentType,
+                                              Toolkit::TextView::LineJustification lineJustification,
+                                              float                                lineHeightOffset,
+                                              const std::string&                   ellipsizeText,
+                                              bool                                 markUpEnabled )
 : mMultilinePolicy( multilinePolicy ),
   mWidthExceedPolicy( widthExceedPolicy ),
   mHeightExceedPolicy( heightExceedPolicy ),
@@ -1336,7 +1335,7 @@ void TextView::OptimizeTextViewProcessorOperations()
   mTextViewProcessorOperations = textViewProcessorOperations;
 }
 
-void TextView::DoRelayOut( const Size& textViewSize, const RelayoutOperationMask relayoutOperationMask )
+void TextView::DoRelayOut( const Size& textViewSize, RelayoutOperationMask relayoutOperationMask )
 {
   // Traverse the relayout operation vector. It fills the natural size, layout and glyph-actor data structures.
   if( !mTextViewProcessorOperations.empty() )

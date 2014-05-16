@@ -69,10 +69,10 @@ TextView::CharacterLayoutInfo& TextView::CharacterLayoutInfo::operator=( const T
 
 TextView::CharacterLayoutInfo::CharacterLayoutInfo( const Size& size,
                                                     const Vector3& position,
-                                                    const bool isNewLineChar,
-                                                    const bool isRightToLeftCharacter,
-                                                    const bool isVisible,
-                                                    const float descender )
+                                                    bool isNewLineChar,
+                                                    bool isRightToLeftCharacter,
+                                                    bool isVisible,
+                                                    float descender )
 : mSize( size ),
   mPosition( position ),
   mIsNewLineChar( isNewLineChar ),
@@ -126,7 +126,7 @@ TextView::FadeBoundary::FadeBoundary()
 {
 }
 
-TextView::FadeBoundary::FadeBoundary( const PixelSize left, const PixelSize right, const PixelSize top, const PixelSize bottom )
+TextView::FadeBoundary::FadeBoundary( PixelSize left, PixelSize right, PixelSize top, PixelSize bottom )
 : mLeft( left ),
   mRight( right ),
   mTop( top ),
@@ -196,27 +196,27 @@ void TextView::SetText( const MarkupProcessor::StyledTextArray& text )
   GetImpl( *this ).SetText( text );
 }
 
-void TextView::InsertTextAt( const std::size_t position, const std::string& text )
+void TextView::InsertTextAt( std::size_t position, const std::string& text )
 {
   GetImpl( *this ).InsertTextAt( position, text );
 }
 
-void TextView::InsertTextAt( const std::size_t position, const MarkupProcessor::StyledTextArray& text )
+void TextView::InsertTextAt( std::size_t position, const MarkupProcessor::StyledTextArray& text )
 {
   GetImpl( *this ).InsertTextAt( position, text );
 }
 
-void TextView::ReplaceTextFromTo( const std::size_t position, const std::size_t numberOfCharacters, const std::string& text )
+void TextView::ReplaceTextFromTo( std::size_t position, std::size_t numberOfCharacters, const std::string& text )
 {
   GetImpl( *this ).ReplaceTextFromTo( position, numberOfCharacters, text );
 }
 
-void TextView::ReplaceTextFromTo( const std::size_t position, const std::size_t numberOfCharacters, const MarkupProcessor::StyledTextArray& text )
+void TextView::ReplaceTextFromTo( std::size_t position, std::size_t numberOfCharacters, const MarkupProcessor::StyledTextArray& text )
 {
   GetImpl( *this ).ReplaceTextFromTo( position, numberOfCharacters, text );
 }
 
-void TextView::RemoveTextFrom( const std::size_t position, const std::size_t numberOfCharacters )
+void TextView::RemoveTextFrom( std::size_t position, std::size_t numberOfCharacters )
 {
   GetImpl( *this ).RemoveTextFrom( position, numberOfCharacters );
 }
@@ -226,7 +226,7 @@ std::string TextView::GetText() const
   return GetImpl( *this ).GetText();
 }
 
-void TextView::SetLineHeightOffset( const PointSize offset )
+void TextView::SetLineHeightOffset( PointSize offset )
 {
   GetImpl( *this ).SetLineHeightOffset( offset );
 }
@@ -236,7 +236,7 @@ PointSize TextView::GetLineHeightOffset() const
   return GetImpl( *this ).GetLineHeightOffset();
 }
 
-void TextView::SetStyleToCurrentText( const TextStyle& style, const TextStyle::Mask mask )
+void TextView::SetStyleToCurrentText( const TextStyle& style, TextStyle::Mask mask )
 {
   GetImpl( *this ).SetStyleToCurrentText( style, mask );
 }
