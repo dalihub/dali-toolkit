@@ -16,40 +16,194 @@
 
 #include "toolkit-timer.h"
 
-#include <Ecore.h>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
 
+namespace Dali
+{
 
-namespace
+namespace Internal
 {
-bool ecore_timer_running = false;
-Ecore_Task_Cb timer_callback_func=NULL;
-const void* timer_callback_data=NULL;
-int timerId = 0;
-}// anon namespace
 
-extern "C"
+namespace Adaptor
 {
-Ecore_Timer* ecore_timer_add(double in,
-                             Ecore_Task_Cb func,
-                             const void   *data)
+class Timer;
+
+typedef IntrusivePtr<Timer> TimerPtr;
+
+/**
+ * Implementation of the timer
+ */
+class Timer : public BaseObject
 {
-  ecore_timer_running = true;
-  timer_callback_func = func;
-  timer_callback_data = data;
-  timerId += sizeof(Ecore_Timer*);
-  return (Ecore_Timer*)timerId;
+public:
+  static TimerPtr New( unsigned int milliSec );
+  Timer( unsigned int milliSec );
+  virtual ~Timer();
+
+  void Start();
+  void Stop();
+  void SetInterval( unsigned int interval );
+  unsigned int GetInterval() const;
+  bool IsRunning() const;
+  bool Tick();
+
+public: // Signals
+
+  Dali::Timer::TimerSignalV2& TickSignal();
+
+private: // Implementation
+
+  // not implemented
+  Timer( const Timer& );
+  Timer& operator=( const Timer& );
+
+private: // Data
+
+  Dali::Timer::TimerSignalV2 mTickSignal;
+  unsigned int mInterval;
+};
+
+inline Timer& GetImplementation(Dali::Timer& timer)
+{
+  DALI_ASSERT_ALWAYS(timer && "Timer handle is empty");
+
+  BaseObject& handle = timer.GetBaseObject();
+
+  return static_cast<Internal::Adaptor::Timer&>(handle);
 }
 
-void* ecore_timer_del(Ecore_Timer *timer)
+inline const Timer& GetImplementation(const Dali::Timer& timer)
 {
-  ecore_timer_running = false;
-  timer_callback_func = NULL;
-  return NULL;
+  DALI_ASSERT_ALWAYS(timer && "Timer handle is empty");
+
+  const BaseObject& handle = timer.GetBaseObject();
+
+  return static_cast<const Internal::Adaptor::Timer&>(handle);
 }
 
+TimerPtr Timer::New( unsigned int milliSec )
+{
+  TimerPtr timerImpl = new Timer(10);
+  return timerImpl;
 }
+
+Timer::Timer( unsigned int milliSec )
+: mInterval( milliSec )
+{
+}
+
+Timer::~Timer()
+{
+}
+
+void Timer::Start()
+{
+}
+
+void Timer::Stop()
+{
+}
+
+void Timer::SetInterval( unsigned int interval )
+{
+  mInterval = interval;
+}
+
+unsigned int Timer::GetInterval() const
+{
+  return mInterval;
+}
+
+bool Timer::IsRunning() const
+{
+  return true;
+}
+
+bool Timer::Tick()
+{
+  return false;
+}
+
+Dali::Timer::TimerSignalV2& Timer::TickSignal()
+{
+  return mTickSignal;
+}
+
+} // namespace Adaptor
+
+} // namespace Internal
+
+/********************************************************************************/
+/*********************************  PUBLIC CLASS  *******************************/
+/********************************************************************************/
+
+Timer::Timer()
+{
+
+}
+
+Timer Timer::New( unsigned int milliSec )
+{
+  Internal::Adaptor::TimerPtr internal = Internal::Adaptor::Timer::New( milliSec );
+  return Timer(internal.Get());
+}
+
+Timer::Timer( const Timer& timer )
+:BaseHandle( timer )
+{
+}
+
+Timer& Timer::operator=( const Timer& timer )
+{
+  // check self assignment
+  if( *this != timer )
+  {
+    BaseHandle::operator=(timer);
+  }
+  return *this;
+}
+
+Timer::~Timer()
+{
+}
+
+void Timer::Start()
+{
+  Internal::Adaptor::GetImplementation( *this ).Start();
+}
+
+void Timer::Stop()
+{
+  Internal::Adaptor::GetImplementation( *this ).Stop();
+}
+
+void Timer::SetInterval( unsigned int milliSec )
+{
+  Internal::Adaptor::GetImplementation( *this ).SetInterval( milliSec );
+}
+
+unsigned int Timer::GetInterval() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetInterval();
+}
+
+bool Timer::IsRunning() const
+{
+  return true;
+}
+
+Timer::TimerSignalV2& Timer::TickSignal()
+{
+  return Internal::Adaptor::GetImplementation( *this ).TickSignal();
+}
+
+Timer::Timer(Internal::Adaptor::Timer* timer)
+: BaseHandle(timer)
+{
+}
+
+} // namespace Dali
+

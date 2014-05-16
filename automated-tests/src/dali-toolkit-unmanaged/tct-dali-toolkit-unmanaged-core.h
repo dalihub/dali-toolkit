@@ -193,6 +193,7 @@ extern int UtcDaliJsonParserMethod07(void);
 extern int UtcDaliJsonParserMethod08(void);
 extern int UtcDaliJsonParserMethod09(void);
 extern int UtcDaliJsonParserMethod10(void);
+extern int UtcDaliJsonParserMethod11(void);
 extern int UtcDaliKeyInputFocusManagerGet(void);
 extern int UtcDaliKeyInputFocusManagerSetFocus(void);
 extern int UtcDaliKeyInputFocusManagerGetCurrentFocusControl(void);
@@ -506,6 +507,7 @@ testcase tc_array[] = {
     {"UtcDaliJsonParserMethod08", UtcDaliJsonParserMethod08, utc_json_parser_startup, utc_json_parser_cleanup},
     {"UtcDaliJsonParserMethod09", UtcDaliJsonParserMethod09, utc_json_parser_startup, utc_json_parser_cleanup},
     {"UtcDaliJsonParserMethod10", UtcDaliJsonParserMethod10, utc_json_parser_startup, utc_json_parser_cleanup},
+    {"UtcDaliJsonParserMethod11", UtcDaliJsonParserMethod11, utc_json_parser_startup, utc_json_parser_cleanup},
     {"UtcDaliKeyInputFocusManagerGet", UtcDaliKeyInputFocusManagerGet, key_input_focus_manager_startup, key_input_focus_manager_cleanup},
     {"UtcDaliKeyInputFocusManagerSetFocus", UtcDaliKeyInputFocusManagerSetFocus, key_input_focus_manager_startup, key_input_focus_manager_cleanup},
     {"UtcDaliKeyInputFocusManagerGetCurrentFocusControl", UtcDaliKeyInputFocusManagerGetCurrentFocusControl, key_input_focus_manager_startup, key_input_focus_manager_cleanup},

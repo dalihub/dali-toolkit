@@ -28,12 +28,20 @@
 namespace Dali
 {
 
+namespace Internal
+{
+namespace Adaptor
+{
+class Timer;
+}
+}
+
 class Timer : public BaseHandle
 {
 public:
   typedef SignalV2< bool () > TimerSignalV2;
-  static Timer New( unsigned int milliSec );
   Timer();
+  static Timer New( unsigned int milliSec );
   Timer( const Timer& timer );
   Timer& operator=( const Timer& timer );
   virtual ~Timer();
@@ -46,9 +54,7 @@ public:
   bool IsRunning() const;
   TimerSignalV2& TickSignal();
 private:
-  Dali::Timer::TimerSignalV2 mTickSignal;
-  unsigned int mInterval;
-  bool mIsRunning;
+  Timer(Internal::Adaptor::Timer* timer);
 };
 
 } // namespace Dali
