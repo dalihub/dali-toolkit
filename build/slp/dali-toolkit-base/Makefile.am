@@ -18,16 +18,20 @@
 
 # Base files
 toolkit_base_images_dir = ../../../base/dali-toolkit/images
+toolkit_base_sounds_dir = ../../../base/dali-toolkit/sounds
 toolkit_base_src_dir    = ../../../base/dali-toolkit/internal
 public_api_base_src_dir = ../../../base/dali-toolkit/public-api
 
 include ../../../base/dali-toolkit/images/file.list
+include ../../../base/dali-toolkit/sounds/file.list
 include ../../../base/dali-toolkit/internal/file.list
 include ../../../base/dali-toolkit/public-api/file.list
 
 #resources_dir = ../../../resources
 #daliimagedir = ${dataReadOnlyDir}/toolkit/images/
 #daliimage_DATA = ${dali_toolkit_base_image_files}
+#dalisounddir = ${dataReadOnlyDir}/toolkit/sounds/
+#dalisound_DATA = ${dali_toolkit_base_sound_files}
 
 # The Base library
 lib_LTLIBRARIES = libdali-toolkit-base.la
@@ -40,6 +44,7 @@ libdali_toolkit_base_la_DEPENDENCIES =
 
 libdali_toolkit_base_la_CXXFLAGS = -DDALI_COMPILATION \
                       -DDALI_IMAGE_DIR="\"${daliimagedir}\"" \
+                      -DDALI_SOUND_DIR="\"${dalisounddir}\"" \
                       -Werror -Wall \
                       -I../../../base \
                       -I../../../capi \

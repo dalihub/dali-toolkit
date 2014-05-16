@@ -57,6 +57,7 @@ all the controls provided by the main package.
 %define dali_data_rw_dir            /opt/usr/share/dali/
 %define dali_data_ro_dir            /usr/share/dali/
 %define dali_toolkit_image_files    %{dali_data_ro_dir}/toolkit/images/
+%define dali_toolkit_sound_files    %{dali_data_ro_dir}/toolkit/sounds/
 %define dev_include_path %{_includedir}
 
 ##############################
@@ -121,6 +122,7 @@ exit 0
 %defattr(-,root,root,-)
 %{_libdir}/lib%{name}.so*
 %{dali_toolkit_image_files}/*
+%{dali_toolkit_sound_files}/*
 %{_datadir}/license/%{name}
 
 %files devel
