@@ -88,6 +88,26 @@ void ScrollBar::SetPositionNotifications( const std::vector<float>& positions )
   GetImpl(*this).SetPositionNotifications(positions);
 }
 
+void ScrollBar::SetIndicatorHeightPolicy( ScrollBar::IndicatorHeightPolicy policy )
+{
+  GetImpl(*this).SetIndicatorHeightPolicy(policy);
+}
+
+ScrollBar::IndicatorHeightPolicy ScrollBar::GetIndicatorHeightPolicy()
+{
+  return GetImpl(*this).GetIndicatorHeightPolicy();
+}
+
+void ScrollBar::SetIndicatorFixedHeight( float height )
+{
+  GetImpl(*this).SetIndicatorFixedHeight(height);
+}
+
+float ScrollBar::GetIndicatorFixedHeight()
+{
+  return GetImpl(*this).GetIndicatorFixedHeight();
+}
+
 void ScrollBar::Show()
 {
   GetImpl(*this).Show();

@@ -44,6 +44,14 @@ class ScrollBar : public ScrollComponentImpl
 
 public:
 
+  // Properties
+  enum
+  {
+    SCROLLBAR_PROPERTY_START_INDEX = ControlImpl::CONTROL_PROPERTY_END_INDEX + 1,
+    SCROLLBAR_PROPERTY_END_INDEX = SCROLLBAR_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
+  };
+
+  // Signals
   typedef Toolkit::ScrollBar::ScrollPositionNotifiedSignalType ScrollPositionNotifiedSignalType;
 
 public:
@@ -89,6 +97,26 @@ public:
   void SetPositionNotifications( const std::vector<float>& positions );
 
   /**
+   * @copydoc Toolkit::ScrollBar::SetIndicatorHeightPolicy()
+   */
+  void SetIndicatorHeightPolicy( Toolkit::ScrollBar::IndicatorHeightPolicy policy );
+
+  /**
+   * @copydoc Toolkit::ScrollBar::GetIndicatorHeightPolicy()
+   */
+  Toolkit::ScrollBar::IndicatorHeightPolicy GetIndicatorHeightPolicy();
+
+  /**
+   * @copydoc Toolkit::ScrollBar::SetIndicatorFixedHeight()
+   */
+  void SetIndicatorFixedHeight( float height );
+
+  /**
+   * @copydoc Toolkit::ScrollBar::GetIndicatorFixedHeight()
+   */
+  float GetIndicatorFixedHeight();
+
+  /**
    * @copydoc Toolkit::ScrollBar::Show()
    */
   void Show();
@@ -105,6 +133,24 @@ public:
  {
    return mScrollPositionNotifiedSignal;
  }
+
+ // Properties
+
+ /**
+  * Called when a property of an object of this type is set.
+  * @param[in] object The object whose property is set.
+  * @param[in] index The property index.
+  * @param[in] value The new property value.
+  */
+ static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+
+ /**
+  * Called to retrieve a property of an object of this type.
+  * @param[in] object The object whose property is to be retrieved.
+  * @param[in] index The property index.
+  * @return The current value of the property.
+  */
+ static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
 private: // from ControlImpl
 
@@ -147,27 +193,39 @@ private:
    */
   bool OnPanGestureProcessTick();
 
+  /**
+   * Handle SetProperty for scroll indicator height policy.
+   * @param[in] propertyValue The new property value.
+   */
+  void OnIndicatorHeightPolicyPropertySet(Property::Value propertyValue);
+
 private:
 
-  Constrainable mScrollPositionObject;                    ///< From mScrollConnector
+  Constrainable mScrollPositionObject;                               ///< From mScrollConnector
 
-  ImageActor mBackground;                                 ///< Background image of scroll bar.
-  ImageActor mIndicator;                                  ///< Image of scroll indicator.
-  Animation mAnimation;                                   ///< Scroll indicator Show/Hide Animation.
+  ImageActor mBackground;                                            ///< Background image of scroll bar.
+  ImageActor mIndicator;                                             ///< Image of scroll indicator.
+  Animation mAnimation;                                              ///< Scroll indicator Show/Hide Animation.
 
-  float mScrollStart;                                    ///< Scroll Start position (start of drag)
-  Vector3 mGestureDisplacement;                           ///< Gesture Displacement.
+  float mScrollStart;                                               ///< Scroll Start position (start of drag)
+  Vector3 mGestureDisplacement;                                      ///< Gesture Displacement.
 
-  bool mIsPanning;                                       ///< Whether the scroll bar is being panned.
-  float mCurrentScrollPosition;                          ///< The current scroll position updated by the pan gesture
+  bool mIsPanning;                                                  ///< Whether the scroll bar is being panned.
+  float mCurrentScrollPosition;                                     ///< The current scroll position updated by the pan gesture
 
-  Timer mTimer;                                           ///< The timer to process the pan gesture after the gesture is started.
+  Toolkit::ScrollBar::IndicatorHeightPolicy mIndicatorHeightPolicy;  ///< The height policy of scroll indicator (variable or fixed)
+  float mIndicatorFixedHeight;                                      ///< The fixed height of scroll indicator
 
-  Property::Index mPropertyIndicatorPosition;             ///< Indicatore Position ("indicator-position")
+  Timer mTimer;                                                      ///< The timer to process the pan gesture after the gesture is started.
 
-  PropertyNotification mPositionNotification;             ///< Stores the property notification used for scroll position changes
+  Property::Index mPropertyIndicatorPosition;                        ///< Indicatore Position ("indicator-position")
+
+  PropertyNotification mPositionNotification;                        ///< Stores the property notification used for scroll position changes
 
   ScrollPositionNotifiedSignalType mScrollPositionNotifiedSignal;
+
+  ActiveConstraint mIndicatorSizeConstraint;
+  ActiveConstraint mIndicatorPositionConstraint;
 };
 
 } // namespace Internal

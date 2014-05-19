@@ -23,11 +23,13 @@ namespace
 {
 
 const char* DEFAULT_INDICATOR_IMAGE_PATH = DALI_IMAGE_DIR "popup_scroll.png";
-const Vector4 DEFAULT_INDICATOR_NINE_PATCH_BORDER(0.0f, 12.0f, 14.0f, 14.0f);
+const Vector4 DEFAULT_INDICATOR_NINE_PATCH_BORDER(4.0f, 9.0f, 7.0f, 11.0f);
+const float MINIMUM_INDICATOR_HEIGHT(20.0f); // The minimum indicator height for the nine patch border
 const float DEFAULT_SLIDER_DEPTH(1.0f);
 const float INDICATOR_SHOW_TIME(0.5f);
 const float INDICATOR_HIDE_TIME(0.5f);
 const float DEFAULT_PAN_GESTURE_PROCESS_TIME(16.7f); // 16.7 milliseconds, i.e. one frame
+const float DEFAULT_INDICATOR_FIXED_HEIGHT(80.0f);
 
 /**
  * Indicator size constraint
@@ -54,7 +56,7 @@ struct IndicatorSizeConstraint
   {
     const Vector3& parentSize = parentSizeProperty.GetVector3();
     float height = mContentSize > parentSize.height ? parentSize.height * ( parentSize.height / mContentSize ) : parentSize.height * ( (parentSize.height - mContentSize * 0.5f) / parentSize.height);
-    return Vector3( parentSize.width, height, parentSize.depth );
+    return Vector3( parentSize.width, std::max(MINIMUM_INDICATOR_HEIGHT, height), parentSize.depth );
   }
 
   float mContentSize;  ///< The size of scrollable content
@@ -110,6 +112,9 @@ namespace Dali
 namespace Toolkit
 {
 
+const Property::Index ScrollBar::PROPERTY_INDICATOR_HEIGHT_POLICY( Internal::ScrollBar::SCROLLBAR_PROPERTY_START_INDEX );
+const Property::Index ScrollBar::PROPERTY_INDICATOR_FIXED_HEIGHT( Internal::ScrollBar::SCROLLBAR_PROPERTY_START_INDEX + 1 );
+
 namespace Internal
 {
 
@@ -118,19 +123,25 @@ namespace
 
 using namespace Dali;
 
+const char* INDICATOR_HEIGHT_POLICY_NAME[] = {"Variable", "Fixed"};
+
 BaseHandle Create()
 {
-  return BaseHandle();
+  return Toolkit::ScrollBar::New();
 }
 
-TypeRegistration mType( typeid(Toolkit::ScrollBar), typeid(Toolkit::Control), Create );
+TypeRegistration typeRegistration( typeid(Toolkit::ScrollBar), typeid(Toolkit::ScrollComponent), Create );
 
+PropertyRegistration property1( typeRegistration, "indicator-height-policy", Toolkit::ScrollBar::PROPERTY_INDICATOR_HEIGHT_POLICY, Property::STRING, &ScrollBar::SetProperty, &ScrollBar::GetProperty );
+PropertyRegistration property2( typeRegistration, "indicator-fixed-height",  Toolkit::ScrollBar::PROPERTY_INDICATOR_FIXED_HEIGHT,  Property::FLOAT,  &ScrollBar::SetProperty, &ScrollBar::GetProperty );
 }
 
 ScrollBar::ScrollBar()
 : mScrollStart(0.0f),
   mIsPanning(false),
-  mCurrentScrollPosition(0.0f)
+  mCurrentScrollPosition(0.0f),
+  mIndicatorHeightPolicy(Toolkit::ScrollBar::Variable),
+  mIndicatorFixedHeight(DEFAULT_INDICATOR_FIXED_HEIGHT)
 {
 }
 
@@ -206,28 +217,51 @@ Actor ScrollBar::GetScrollIndicator()
 
 void ScrollBar::ApplyConstraints()
 {
-  mIndicator.RemoveConstraints();
-
-  Constraint constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                                    ParentSource( Actor::SIZE ),
-                                                    IndicatorSizeConstraint( mScrollConnector.GetContentLength() ) );
-  mIndicator.ApplyConstraint( constraint );
-
-  constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                         LocalSource( Actor::SIZE ),
-                                         ParentSource( Actor::SIZE ),
-                                         Source( mScrollPositionObject, Toolkit::ScrollConnector::SCROLL_POSITION ),
-                                         IndicatorPositionConstraint( mScrollConnector.GetMinLimit(), mScrollConnector.GetMaxLimit() ) );
-  mIndicator.ApplyConstraint( constraint );
-
-  if( mBackground )
+  if( mScrollConnector )
   {
-    mBackground.RemoveConstraints();
+    Actor self = Self();
 
-    constraint = Constraint::New<Vector3>(Actor::SIZE,
-                                          ParentSource(Actor::SIZE),
-                                          EqualToConstraint());
-    mBackground.ApplyConstraint(constraint);
+    Constraint constraint;
+
+    if(mIndicatorSizeConstraint)
+    {
+      self.RemoveConstraint(mIndicatorSizeConstraint);
+    }
+
+    // Set indicator height according to the indicator's height policy
+    if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
+    {
+      mIndicator.SetSize(Self().GetCurrentSize().width, mIndicatorFixedHeight);
+    }
+    else
+    {
+      constraint = Constraint::New<Vector3>( Actor::SIZE,
+                                             ParentSource( Actor::SIZE ),
+                                             IndicatorSizeConstraint( mScrollConnector.GetContentLength() ) );
+      mIndicatorSizeConstraint = mIndicator.ApplyConstraint( constraint );
+    }
+
+    if(mIndicatorPositionConstraint)
+    {
+      self.RemoveConstraint(mIndicatorPositionConstraint);
+    }
+
+    constraint = Constraint::New<Vector3>( Actor::POSITION,
+                                           LocalSource( Actor::SIZE ),
+                                           ParentSource( Actor::SIZE ),
+                                           Source( mScrollPositionObject, Toolkit::ScrollConnector::SCROLL_POSITION ),
+                                           IndicatorPositionConstraint( mScrollConnector.GetMinLimit(), mScrollConnector.GetMaxLimit() ) );
+    mIndicatorPositionConstraint = mIndicator.ApplyConstraint( constraint );
+
+    if( mBackground )
+    {
+      mBackground.RemoveConstraints();
+
+      constraint = Constraint::New<Vector3>(Actor::SIZE,
+                                            ParentSource(Actor::SIZE),
+                                            EqualToConstraint());
+      mBackground.ApplyConstraint(constraint);
+    }
   }
 }
 
@@ -357,6 +391,94 @@ void ScrollBar::OnScrollDomainChanged(float minPosition, float maxPosition, floa
 {
   // Reapply constraints when the scroll domain is changed
   ApplyConstraints();
+}
+
+void ScrollBar::SetIndicatorHeightPolicy( Toolkit::ScrollBar::IndicatorHeightPolicy policy )
+{
+  mIndicatorHeightPolicy = policy;
+  ApplyConstraints();
+}
+
+Toolkit::ScrollBar::IndicatorHeightPolicy ScrollBar::GetIndicatorHeightPolicy()
+{
+  return mIndicatorHeightPolicy;
+}
+
+void ScrollBar::SetIndicatorFixedHeight( float height )
+{
+  mIndicatorFixedHeight = height;
+  ApplyConstraints();
+}
+
+float ScrollBar::GetIndicatorFixedHeight()
+{
+  return mIndicatorFixedHeight;
+}
+
+void ScrollBar::OnIndicatorHeightPolicyPropertySet( Property::Value propertyValue )
+{
+  std::string policyName( propertyValue.Get<std::string>() );
+  if(policyName == "Variable")
+  {
+    SetIndicatorHeightPolicy(Toolkit::ScrollBar::Variable);
+  }
+  else if(policyName == "Fixed")
+  {
+    SetIndicatorHeightPolicy(Toolkit::ScrollBar::Fixed);
+  }
+  else
+  {
+    DALI_ASSERT_ALWAYS( !"ScrollBar::OnIndicatorHeightPolicyPropertySet(). Invalid Property value." );
+  }
+}
+
+void ScrollBar::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+{
+  Toolkit::ScrollBar scrollBar = Toolkit::ScrollBar::DownCast( Dali::BaseHandle( object ) );
+
+  if( scrollBar )
+  {
+    ScrollBar& scrollBarImpl( GetImpl( scrollBar ) );
+    switch( index )
+    {
+      case Toolkit::ScrollBar::PROPERTY_INDICATOR_HEIGHT_POLICY:
+      {
+        scrollBarImpl.OnIndicatorHeightPolicyPropertySet( value );
+        break;
+      }
+      case Toolkit::ScrollBar::PROPERTY_INDICATOR_FIXED_HEIGHT:
+      {
+        scrollBarImpl.SetIndicatorFixedHeight(value.Get<float>());
+        break;
+      }
+    }
+  }
+}
+
+Property::Value ScrollBar::GetProperty( BaseObject* object, Property::Index index )
+{
+  Property::Value value;
+
+  Toolkit::ScrollBar scrollBar = Toolkit::ScrollBar::DownCast( Dali::BaseHandle( object ) );
+
+  if( scrollBar )
+  {
+    ScrollBar& scrollBarImpl( GetImpl( scrollBar ) );
+    switch( index )
+    {
+      case Toolkit::ScrollBar::PROPERTY_INDICATOR_HEIGHT_POLICY:
+      {
+        value = INDICATOR_HEIGHT_POLICY_NAME[ scrollBarImpl.GetIndicatorHeightPolicy() ];
+        break;
+      }
+      case Toolkit::ScrollBar::PROPERTY_INDICATOR_FIXED_HEIGHT:
+      {
+        value = scrollBarImpl.GetIndicatorFixedHeight();
+        break;
+      }
+    }
+  }
+  return value;
 }
 
 Toolkit::ScrollBar ScrollBar::New()
