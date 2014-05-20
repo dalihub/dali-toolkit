@@ -343,6 +343,11 @@ TextInput::StyleChangedSignalV2& TextInput::StyleChangedSignal()
   return GetImpl(*this).StyleChangedSignal();
 }
 
+TextInput::TextModifiedSignalType& TextInput::TextModifiedSignal()
+{
+  return GetImpl(*this).TextModifiedSignal();
+}
+
 TextInput::MaxInputCharactersReachedSignalV2& TextInput::MaxInputCharactersReachedSignal()
 {
   return GetImpl(*this).MaxInputCharactersReachedSignal();

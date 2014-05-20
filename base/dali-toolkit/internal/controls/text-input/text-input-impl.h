@@ -130,6 +130,11 @@ public:
   Toolkit::TextInput::StyleChangedSignalV2& StyleChangedSignal();
 
   /**
+   * @copydoc Toolkit::TextInput::TextModifiedSignal()
+   */
+  Toolkit::TextInput::TextModifiedSignalType& TextModifiedSignal();
+
+  /**
    * @copydoc Toolkit::TextInput::MaxInputCharactersReachedSignal()
    */
   Toolkit::TextInput::MaxInputCharactersReachedSignalV2& MaxInputCharactersReachedSignal();
@@ -1316,6 +1321,11 @@ public:  // Public to allow internal testing.
   void EmitStyleChangedSignal();
 
   /**
+   * Emit signal when text is modified.
+   */
+  void EmitTextModified();
+
+  /**
    * Emits max input characters reached signal.
    */
   void EmitMaxInputCharactersReachedSignal();
@@ -1445,6 +1455,7 @@ private:
   Toolkit::TextInput::InputSignalV2                      mInputStartedSignalV2;              ///< Signal emitted when input starts
   Toolkit::TextInput::InputSignalV2                      mInputFinishedSignalV2;             ///< Signal emitted when input ends
   Toolkit::TextInput::StyleChangedSignalV2               mStyleChangedSignalV2;              ///< Signal emitted when style changes.
+  Toolkit::TextInput::TextModifiedSignalType             mTextModifiedSignal;                ///< Signal emitted when text modified.
   Toolkit::TextInput::MaxInputCharactersReachedSignalV2  mMaxInputCharactersReachedSignalV2; ///< Signal emitted when max input characters is reached.
   Toolkit::TextInput::InputSignalV2                      mCutAndPasteToolBarDisplayedV2;     ///< Signal emitted when toolbar displayed
   Toolkit::TextInput::InputTextExceedBoundariesSignalV2  mInputTextExceedBoundariesSignalV2; ///< Signal emitted when input text exceeds the boundaries of the text-input.
