@@ -219,13 +219,11 @@ void ScrollBar::ApplyConstraints()
 {
   if( mScrollConnector )
   {
-    Actor self = Self();
-
     Constraint constraint;
 
     if(mIndicatorSizeConstraint)
     {
-      self.RemoveConstraint(mIndicatorSizeConstraint);
+      mIndicator.RemoveConstraint(mIndicatorSizeConstraint);
     }
 
     // Set indicator height according to the indicator's height policy
@@ -243,7 +241,7 @@ void ScrollBar::ApplyConstraints()
 
     if(mIndicatorPositionConstraint)
     {
-      self.RemoveConstraint(mIndicatorPositionConstraint);
+      mIndicator.RemoveConstraint(mIndicatorPositionConstraint);
     }
 
     constraint = Constraint::New<Vector3>( Actor::POSITION,
