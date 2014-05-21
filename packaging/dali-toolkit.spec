@@ -1,6 +1,6 @@
 Name:       dali-toolkit
 Summary:    The OpenGLES Canvas Core Library Toolkit
-Version:    0.9.16
+Version:    0.9.17
 Release:    1
 Group:      System/Libraries
 License:    Flora
