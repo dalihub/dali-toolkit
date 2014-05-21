@@ -1723,7 +1723,7 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
         mPreEditFlag = true;
         mIgnoreCommitFlag = false;
       }
-
+      EmitTextModified();
       update = true;
     }
     else
@@ -1748,7 +1748,7 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
     {
       mCommitByKeyInput = true;
     }
-
+    EmitTextModified();
     update = true;
   } // space
   else if (keyName == "BackSpace")
@@ -1767,6 +1767,7 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
         update = true;
       }
     }
+    EmitTextModified();
   } // BackSpace
   else if (keyName == "Right")
   {
