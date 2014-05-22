@@ -701,6 +701,7 @@ public:
   void SetWrapMode(bool enable);
 
   /**
+   * @deprecated
    * @brief Gets the current refresh interval in milliseconds.
    *
    * @return Current refresh interval in milliseconds
@@ -708,6 +709,7 @@ public:
   int GetRefreshInterval() const;
 
   /**
+   * @deprecated
    * @brief Sets the refresh interval in milliseconds.
    *
    * The refresh interval is a notification signal
@@ -719,6 +721,23 @@ public:
    * @param[in] milliseconds The frequency of the event in milliseconds
    */
   void SetRefreshInterval(int milliseconds);
+
+  /**
+   * @brief Gets the current distance needed to scroll for ScrollUpdatedSignal to be emitted
+   *
+   * @return Current scroll update distance
+   */
+  int GetScrollUpdateDistance() const;
+
+  /**
+   * @brief Sets the distance needed to scroll for ScrollUpdatedSignal to be emitted
+   *
+   * The scroll update distance tells ScrollView how far to move before ScrollUpdatedSignal the informs application.
+   * Each time the ScrollView crosses this distance the signal will be emitted
+   *
+   * @param[in] distance The distance for ScrollView to move before emitting update signal
+   */
+  void SetScrollUpdateDistance(int distance);
 
   /**
    * @brief Returns state of Axis Auto Lock mode.

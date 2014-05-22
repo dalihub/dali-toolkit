@@ -266,14 +266,26 @@ public:
   void SetWrapMode(bool enable);
 
   /**
+   * @deprecated
    * @copydoc Toolkit::ScrollView::GetRefreshInterval
    */
   int GetRefreshInterval() const;
 
   /**
+   * @deprecated
    * @copydoc Toolkit::ScrollView::SetRefreshInterval
    */
   void SetRefreshInterval(int milliseconds);
+
+  /**
+   * @copydoc Toolkit::ScrollView::GetScrollupdateDistance
+   */
+  int GetScrollUpdateDistance() const;
+
+  /**
+   * @copydoc Toolkit::ScrollView::SetScrollUpdateDistance
+   */
+  void SetScrollUpdateDistance(int distance);
 
   /**
    * @copydoc Toolkit::ScrollView::GetAxisAutoLock
@@ -857,20 +869,15 @@ private:
   void HandleSnapAnimationFinished();
 
   /**
-   * Helper to start the refresh timer.
+   * Checks if the property notifications are active and adds them if not
    */
-  void StartRefreshTimer();
-
-  /**
-   * Helper to cancel the refresh timer.
-   */
-  void CancelRefreshTimer();
+  void SetScrollUpdateNotification( bool enabled );
 
   /**
    * Refresh the ScrollView (used when animating to update application developer of changes)
    * @return True if the refresh timer should be kept running.
    */
-  bool OnRefreshTick();
+  void OnScrollUpdateNotification(Dali::PropertyNotification& source);
 
 private:
 
@@ -927,9 +934,10 @@ private:
   LockAxis mLockAxis;
 
   Timer mTouchDownTimer;                ///< Used to interrupt snap-animation. This cannot be done in OnTouchEvent without breaking fast flick behavior.
-  Timer mOvershootRefreshTimer;
-  Timer mRefreshTimer;                  ///< Refresh timer is used to provide the Application developer with updates as animations run.
-  int mRefreshIntervalMilliseconds;     ///< Refresh timer interval.
+
+  float mScrollUpdateDistance;          ///< Distance for scrolling to travel for the scroll update notifications
+  Dali::PropertyNotification mScrollXUpdateNotification; ///< scroll x position update notification
+  Dali::PropertyNotification mScrollYUpdateNotification; ///< scroll y position update notification
 
   Actor mInternalActor;                 ///< Internal actor (we keep internal actors in here e.g. scrollbars, so we can ignore it in searches)
 

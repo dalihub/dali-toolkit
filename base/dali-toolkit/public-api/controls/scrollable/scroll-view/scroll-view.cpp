@@ -438,6 +438,16 @@ void ScrollView::SetRefreshInterval(int milliseconds)
   GetImpl(*this).SetRefreshInterval(milliseconds);
 }
 
+int ScrollView::GetScrollUpdateDistance() const
+{
+  return GetImpl(*this).GetScrollUpdateDistance();
+}
+
+void ScrollView::SetScrollUpdateDistance(int distance)
+{
+  GetImpl(*this).SetScrollUpdateDistance(distance);
+}
+
 bool ScrollView::GetAxisAutoLock() const
 {
   return GetImpl(*this).GetAxisAutoLock();

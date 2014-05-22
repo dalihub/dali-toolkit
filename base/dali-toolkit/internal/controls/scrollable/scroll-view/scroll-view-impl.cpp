@@ -58,6 +58,7 @@ const unsigned long MINIMUM_TIME_BETWEEN_DOWN_AND_UP_FOR_RESET( 150u );
 const float DEFAULT_OVERSHOOT_ANIMATION_DURATION = 0.35f;  // time in seconds
 const Vector2 OVERSCROLL_CLAMP(1.0f, 1.0f);                // maximum overscroll allowed in pixels when overshoot indicator is being used
 const float TOUCH_DOWN_TIMER_INTERVAL = 100.0f;
+const float DEFAULT_SCROLL_UPDATE_DISTANCE( 30.0f );                               ///< Default distance to travel in pixels for scroll update signal
 
 // predefined effect values
 const Vector3 ANGLE_CAROUSEL_ROTATE(Math::PI * 0.5f, Math::PI * 0.5f, 0.0f);
@@ -596,7 +597,7 @@ ScrollView::ScrollView()
   mMinTouchesForPanning(1),
   mMaxTouchesForPanning(1),
   mLockAxis(LockPossible),
-  mRefreshIntervalMilliseconds(DEFAULT_REFRESH_INTERVAL_MILLISECONDS),
+  mScrollUpdateDistance(DEFAULT_SCROLL_UPDATE_DISTANCE),
   mOvershootDelay(1.0f),
   mMaxOvershoot(Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT, Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT),
   mUserMaxOvershoot(Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT, Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT),
@@ -1113,12 +1114,22 @@ void ScrollView::SetWrapMode(bool enable)
 
 int ScrollView::GetRefreshInterval() const
 {
-  return mRefreshIntervalMilliseconds;
+  return mScrollUpdateDistance;
 }
 
 void ScrollView::SetRefreshInterval(int milliseconds)
 {
-  mRefreshIntervalMilliseconds = milliseconds;
+  mScrollUpdateDistance = milliseconds;
+}
+
+int ScrollView::GetScrollUpdateDistance() const
+{
+  return mScrollUpdateDistance;
+}
+
+void ScrollView::SetScrollUpdateDistance(int distance)
+{
+  mScrollUpdateDistance = distance;
 }
 
 bool ScrollView::GetAxisAutoLock() const
@@ -1275,6 +1286,7 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
     Self().SetProperty(mPropertyScrolling, false);
     mScrolling = false;
     DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 2 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+    SetScrollUpdateNotification(false);
     mScrollCompletedSignalV2.Emit( currentScrollPosition );
   }
 }
@@ -1793,7 +1805,7 @@ bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDurat
       mScrollPreScale = mScrollPostScale = scale;
     }
   }
-  StartRefreshTimer();
+  SetScrollUpdateNotification(true);
 
   // Always send a snap event when AnimateTo is called.
   Toolkit::ScrollView::SnapEvent snapEvent;
@@ -1884,8 +1896,7 @@ Vector3 ScrollView::GetPropertyScale() const
 
 void ScrollView::HandleStoppedAnimation()
 {
-  // Animation has stopped, so stop sending the scroll-update signal.
-  CancelRefreshTimer();
+  SetScrollUpdateNotification(false);
 }
 
 void ScrollView::HandleSnapAnimationFinished()
@@ -1908,6 +1919,44 @@ void ScrollView::HandleSnapAnimationFinished()
   mDomainOffset += deltaPosition - mScrollPostPosition;
   self.SetProperty(mPropertyDomainOffset, mDomainOffset);
   HandleStoppedAnimation();
+}
+
+void ScrollView::SetScrollUpdateNotification( bool enabled )
+{
+  Actor self = Self();
+  if( mScrollXUpdateNotification )
+  {
+    // disconnect now to avoid a notification before removed from update thread
+    mScrollXUpdateNotification.NotifySignal().Disconnect(this, &ScrollView::OnScrollUpdateNotification);
+    self.RemovePropertyNotification(mScrollXUpdateNotification);
+    mScrollXUpdateNotification.Reset();
+  }
+  if( enabled )
+  {
+    mScrollXUpdateNotification = self.AddPropertyNotification(mPropertyPosition, 0, StepCondition(mScrollUpdateDistance, 0.0f));
+    mScrollXUpdateNotification.NotifySignal().Connect( this, &ScrollView::OnScrollUpdateNotification );
+  }
+  if( mScrollYUpdateNotification )
+  {
+    // disconnect now to avoid a notification before removed from update thread
+    mScrollYUpdateNotification.NotifySignal().Disconnect(this, &ScrollView::OnScrollUpdateNotification);
+    self.RemovePropertyNotification(mScrollYUpdateNotification);
+    mScrollYUpdateNotification.Reset();
+  }
+  if( enabled )
+  {
+    mScrollYUpdateNotification = self.AddPropertyNotification(mPropertyPosition, 1, StepCondition(mScrollUpdateDistance, 0.0f));
+    mScrollYUpdateNotification.NotifySignal().Connect( this, &ScrollView::OnScrollUpdateNotification );
+  }
+}
+
+void ScrollView::OnScrollUpdateNotification(Dali::PropertyNotification& source)
+{
+  // Guard against destruction during signal emission
+  Toolkit::ScrollView handle( GetOwner() );
+
+  Vector3 currentScrollPosition = GetCurrentScrollPosition();
+  mScrollUpdatedSignalV2.Emit( currentScrollPosition );
 }
 
 bool ScrollView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -2510,6 +2559,7 @@ void ScrollView::FinishTransform()
   if(!animating)
   {
     // if not animating, then this pan has completed right now.
+    SetScrollUpdateNotification(false);
     mScrolling = false;
     Self().SetProperty(mPropertyScrolling, false);
     Vector3 currentScrollPosition = GetCurrentScrollPosition();
@@ -2796,42 +2846,6 @@ void ScrollView::SetInternalConstraints()
                                                  WrapActorConstraint );
   constraint.SetRemoveAction(Constraint::Discard);
   ApplyConstraintToBoundActors(constraint);
-}
-
-void ScrollView::StartRefreshTimer()
-{
-  if(mRefreshIntervalMilliseconds > 0)
-  {
-    if (!mRefreshTimer)
-    {
-      mRefreshTimer = Timer::New( mRefreshIntervalMilliseconds );
-      mRefreshTimer.TickSignal().Connect( this, &ScrollView::OnRefreshTick );
-    }
-
-    if (!mRefreshTimer.IsRunning())
-    {
-      mRefreshTimer.Start();
-    }
-  }
-}
-
-void ScrollView::CancelRefreshTimer()
-{
-  if (mRefreshTimer)
-  {
-    mRefreshTimer.Stop();
-  }
-}
-
-bool ScrollView::OnRefreshTick()
-{
-  // Guard against destruction during signal emission
-  Toolkit::ScrollView handle( GetOwner() );
-
-  Vector3 currentScrollPosition = GetCurrentScrollPosition();
-  mScrollUpdatedSignalV2.Emit( currentScrollPosition );
-
-  return true;
 }
 
 } // namespace Internal
