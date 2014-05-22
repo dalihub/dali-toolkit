@@ -386,6 +386,8 @@ private:
 
   Actor mFocusIndicatorActor; ///< The focus indicator actor shared by all the focusable actors for highlight
 
+  Vector2 mPreviousPosition; ///< The previous pan position; useful for calculating velocity for Gesture::Finished events
+
   unsigned int mRecursiveFocusMoveCounter; ///< The counter to count the number of recursive focus movement attempted before the focus movement is successful.
 
   bool mIsAccessibilityTtsEnabled; ///< Whether accessibility feature(screen-reader) turned on/off

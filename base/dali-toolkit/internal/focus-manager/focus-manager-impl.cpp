@@ -877,13 +877,21 @@ bool FocusManager::HandlePanGesture(const Integration::PanGestureEvent& panEvent
     }
   }
 
+  // Gesture::Finished (Up) events are delivered with previous (Motion) event position
+  // Use the real previous position; otherwise we may incorrectly get a ZERO velocity
+  if ( Gesture::Finished != panEvent.state )
+  {
+    // Store the previous position for next Gesture::Finished iteration.
+    mPreviousPosition = panEvent.previousPosition;
+  }
+
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
 
   Dali::PanGesture pan(panEvent.state);
   pan.time = panEvent.time;
   pan.numberOfTouches = panEvent.numberOfTouches;
   pan.screenPosition = panEvent.currentPosition;
-  pan.screenDisplacement = panEvent.previousPosition - panEvent.currentPosition;
+  pan.screenDisplacement = mPreviousPosition - panEvent.currentPosition;
   pan.screenVelocity.x = pan.screenDisplacement.x / panEvent.timeDelta;
   pan.screenVelocity.y = pan.screenDisplacement.y / panEvent.timeDelta;
 
@@ -898,7 +906,7 @@ bool FocusManager::HandlePanGesture(const Integration::PanGestureEvent& panEvent
       pan.position = localCurrent;
 
       Vector2 localPrevious;
-      control.ScreenToLocal( localPrevious.x, localPrevious.y, panEvent.previousPosition.x, panEvent.previousPosition.y );
+      control.ScreenToLocal( localPrevious.x, localPrevious.y, mPreviousPosition.x, mPreviousPosition.y );
 
       pan.displacement = localCurrent - localPrevious;
       pan.velocity.x = pan.displacement.x / panEvent.timeDelta;
