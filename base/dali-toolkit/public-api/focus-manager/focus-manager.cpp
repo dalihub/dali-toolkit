@@ -170,16 +170,6 @@ bool FocusManager::GetWrapMode() const
   return GetImpl(*this).GetWrapMode();
 }
 
-void FocusManager::SetEndCapFeedbackEnabled(bool enabled)
-{
-  GetImpl(*this).SetEndCapFeedbackEnabled(enabled);
-}
-
-bool FocusManager::GetEndCapFeedbackEnabled() const
-{
-  return GetImpl(*this).GetEndCapFeedbackEnabled();
-}
-
 void FocusManager::SetFocusIndicatorActor(Actor indicator)
 {
   GetImpl(*this).SetFocusIndicatorActor(indicator);

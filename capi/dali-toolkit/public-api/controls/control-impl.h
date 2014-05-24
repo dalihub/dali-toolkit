@@ -99,6 +99,15 @@ public:
   virtual bool OnAccessibilityPan(PanGesture gesture);
 
   /**
+   * @brief This method should be overridden by deriving classes when they wish to respond the accessibility
+   * touch event.
+   *
+   * @param[in] touchEvent The touch event.
+   * @return true if the touch event has been consumed by this control
+   */
+  virtual bool OnAccessibilityTouch(const TouchEvent& touchEvent);
+
+  /**
    * @brief This method should be overridden by deriving classes when they wish to respond
    * the accessibility up and down action (i.e. value change of slider control).
    *

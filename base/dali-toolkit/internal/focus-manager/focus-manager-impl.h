@@ -170,16 +170,6 @@ public:
   bool GetWrapMode() const;
 
   /**
-   * @copydoc Toolkit::FocusManager::SetEndCapFeedbackEnabled
-   */
-  void SetEndCapFeedbackEnabled(bool enabled);
-
-  /**
-   * @copydoc Toolkit::FocusManager::GetEndCapFeedbackEnabled
-   */
-  bool GetEndCapFeedbackEnabled() const;
-
-  /**
    * @copydoc Toolkit::FocusManager::SetFocusIndicatorActor
    */
   void SetFocusIndicatorActor(Actor indicator);
@@ -303,27 +293,31 @@ private:
 
   /**
    * Perform the accessibility action to move focus to the previous focusable actor (by one finger flick up).
+   * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionPrevious();
+  virtual bool AccessibilityActionPrevious(bool allowEndFeedback);
 
   /**
    * Perform the accessibility action to move focus to the next focusable actor (by one finger flick down).
+   * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionNext();
+  virtual bool AccessibilityActionNext(bool allowEndFeedback);
 
   /**
    * Perform the accessibility action to move focus to the previous focusable actor (by one finger flick left).
+   * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionReadPrevious();
+  virtual bool AccessibilityActionReadPrevious(bool allowEndFeedback);
 
   /**
    * Perform the accessibility action to move focus to the next focusable actor (by one finger flick right).
+   * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionReadNext();
+  virtual bool AccessibilityActionReadNext(bool allowEndFeedback);
 
   /**
    * Perform the accessibility action to focus and read the actor (by one finger tap or move).
@@ -358,6 +352,13 @@ private:
    * @return whether the accessibility action is performed or not.
    */
   virtual bool AccessibilityActionBack();
+
+  /**
+   * Perform the accessibility action to mouse move (by one finger tap & hold and move).
+   * @param touchEvent touch event structure
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionTouch(const TouchEvent& touchEvent);
 
 private:
 
