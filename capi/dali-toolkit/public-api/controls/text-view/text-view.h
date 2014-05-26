@@ -557,6 +557,9 @@ public:
   /**
    * @brief Sets whether markup processing should be carried out.
    *
+   * To use markup, applications need to SetMarkupProcessingEnabled first, then SetText().
+   *
+   * @see SetText()
    * @param[in] enable whether markup processing is carried out or not.
    */
   void SetMarkupProcessingEnabled( bool enable );
