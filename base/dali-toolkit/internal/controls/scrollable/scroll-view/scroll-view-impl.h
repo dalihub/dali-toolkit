@@ -893,6 +893,8 @@ private:
   ScrollOvershootIndicatorPtr mOvershootIndicator;
 
   Toolkit::ScrollView::SnapStartedSignalV2 mSnapStartedSignalV2;
+
+  bool mInAccessibilityPan : 1; // With AccessibilityPan its easier to move between snap positions
 };
 
 } // namespace Internal

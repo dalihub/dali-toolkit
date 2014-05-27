@@ -540,7 +540,8 @@ ScrollView::ScrollView()
   mAxisAutoLockGradient(Toolkit::ScrollView::DEFAULT_AXIS_AUTO_LOCK_GRADIENT),
   mFrictionCoefficient(Toolkit::ScrollView::DEFAULT_FRICTION_COEFFICIENT),
   mFlickSpeedCoefficient(Toolkit::ScrollView::DEFAULT_FLICK_SPEED_COEFFICIENT),
-  mMaxFlickSpeed(Toolkit::ScrollView::DEFAULT_MAX_FLICK_SPEED)
+  mMaxFlickSpeed(Toolkit::ScrollView::DEFAULT_MAX_FLICK_SPEED),
+  mInAccessibilityPan(false)
 {
   SetRequiresMouseWheelEvents(true);
 }
@@ -1365,7 +1366,8 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
   {
     horizontal = All;
 
-    if(speed2 > flickSpeedThreshold2) // exceeds flick threshold
+    if( speed2 > flickSpeedThreshold2 || // exceeds flick threshold
+        mInAccessibilityPan ) // With AccessibilityPan its easier to move between snap positions
     {
       if((angle >= -orthoAngleRange) && (angle < orthoAngleRange)) // Swiping East
       {
@@ -1392,7 +1394,8 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
   {
     vertical = All;
 
-    if(speed2 > flickSpeedThreshold2) // exceeds flick threshold
+    if( speed2 > flickSpeedThreshold2 || // exceeds flick threshold
+        mInAccessibilityPan ) // With AccessibilityPan its easier to move between snap positions
     {
       if((angle >= M_PI_2-orthoAngleRange) && (angle < M_PI_2+orthoAngleRange)) // Swiping South
       {
@@ -2285,7 +2288,11 @@ Vector3 ScrollView::GetOvershoot(Vector3& position) const
 
 bool ScrollView::OnAccessibilityPan(PanGesture gesture)
 {
+  // Keep track of whether this is an AccessibilityPan
+  mInAccessibilityPan = true;
   OnPan(gesture);
+  mInAccessibilityPan = false;
+
   return true;
 }
 
