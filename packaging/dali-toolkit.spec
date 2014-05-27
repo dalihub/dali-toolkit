@@ -15,11 +15,10 @@ Requires:       dali
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  boost-devel
-BuildRequires:  dali-devel
-BuildRequires:  dali-adaptor-devel
+BuildRequires:  pkgconfig(dali)
+BuildRequires:  pkgconfig(dali-core)
 BuildRequires:  fribidi-devel
 BuildRequires:  pkgconfig(utilX)
-ExclusiveArch:  armv7l
 
 %description
 The OpenGLES Canvas Core Library Toolkit - a set of controls that provide
@@ -75,9 +74,11 @@ export FFLAGS="$FFLAGS -DTIZEN_DEBUG_ENABLE"
 %endif
 
 libtoolize --force
-cd %{_builddir}/dali-toolkit-%{version}/build/slp && autoreconf --install
-cd %{_builddir}/dali-toolkit-%{version}/build/slp && CXXFLAGS=$CXXFLAGS LDFLAGS=$LDFLAGS DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ./configure --prefix=$PREFIX
-
+cd %{_builddir}/dali-toolkit-%{version}/build/slp
+autoreconf --install
+DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
+DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
+%configure
 make %{?jobs:-j%jobs}
 
 ##############################
