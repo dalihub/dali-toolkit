@@ -17,9 +17,6 @@
 // limitations under the License.
 //
 
-// EXTERNAL INCLUDES
-#include <boost/function.hpp>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/navigation-frame/page.h>

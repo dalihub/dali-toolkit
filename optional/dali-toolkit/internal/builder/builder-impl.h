@@ -21,7 +21,6 @@
 #include <string>
 #include <list>
 #include <map>
-#include <boost/property_tree/ptree.hpp>
 #include <dali/dali.h>
 #include <dali/integration-api/debug.h>
 

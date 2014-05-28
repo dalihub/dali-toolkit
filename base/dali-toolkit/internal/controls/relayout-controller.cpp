@@ -21,7 +21,6 @@
 
 // EXTERNAL INCLUDES
 
-#include <boost/thread/tss.hpp>
 #include <stack>
 #include <sstream>
 #include <dali/integration-api/debug.h>

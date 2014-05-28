@@ -14,6 +14,9 @@
 // limitations under the License.
 //
 
+// EXTERNAL INCLUDES
+#include <sstream>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/builder/builder-impl.h>
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>

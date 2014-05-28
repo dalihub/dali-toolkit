@@ -16,7 +16,6 @@
 
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
-#include <boost/thread/tss.hpp>
 #include <stack>
 
 #include <dali/integration-api/debug.h>

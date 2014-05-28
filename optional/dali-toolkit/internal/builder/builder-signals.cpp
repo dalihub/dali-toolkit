@@ -16,6 +16,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <boost/function.hpp>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/builder/builder-impl.h>

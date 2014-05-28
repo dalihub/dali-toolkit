@@ -17,9 +17,6 @@
 // limitations under the License.
 //
 
-// EXTERNAL INCLUDES
-#include <boost/bind.hpp>
-
 // INTERNAL INCLUDES
 #include <dali/dali.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>

@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <sys/stat.h>
+#include <sstream>
 
 // INTERNAL INCLUDES
 #include <dali/dali.h>

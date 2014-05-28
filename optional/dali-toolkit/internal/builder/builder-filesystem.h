@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <fstream>
+#include <sstream>
 
 #include <wordexp.h>
 #include <stdio.h>
