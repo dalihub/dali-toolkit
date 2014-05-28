@@ -86,7 +86,7 @@ Dali::Toolkit::ImageView ImageView::New()
 }
 
 ImageView::ImageView()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_THEME_CHANGE_SIGNALS ) )
+: Control(true)
 {
 }
 

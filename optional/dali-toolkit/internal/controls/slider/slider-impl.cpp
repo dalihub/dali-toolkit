@@ -168,7 +168,7 @@ Dali::Toolkit::Slider Slider::New()
 }
 
 Slider::Slider()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_THEME_CHANGE_SIGNALS ) ),
+: Control( true ),
   mState( NORMAL ),
   mDisableColor( 0.0f, 0.0f, 0.0f, 0.0f ),
   mPopupTextColor( 0.0f, 0.0f, 0.0f, 0.0f ),

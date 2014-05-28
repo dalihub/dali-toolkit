@@ -101,7 +101,7 @@ void RotatingSelector::OnInitialize()
 }
 
 RotatingSelector::RotatingSelector()
-: Control( REQUIRES_TOUCH_EVENTS ),
+: Control(true/*requires touch*/),
   mSelected(false),
   mSelectable(true),
   mIsAnimating(false)

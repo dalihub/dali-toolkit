@@ -20,6 +20,8 @@
 #include <dali-toolkit/public-api/dali-toolkit-capi-internal.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/builder/builder.h>
+#include <dali-toolkit/public-api/builder/tree-node.h>
 
 #include <dali-toolkit/public-api/controls/bloom-view/bloom-view.h>
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
@@ -86,6 +88,5 @@
 #include <dali-toolkit/public-api/transition-effects/cube-transition-wave-effect.h>
 #include <dali-toolkit/public-api/transition-effects/cube-transition-cross-effect.h>
 #include <dali-toolkit/public-api/transition-effects/cube-transition-fold-effect.h>
-
 
 #endif // __DALI_TOOLKIT_EXT_H__

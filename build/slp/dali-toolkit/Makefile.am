@@ -19,13 +19,11 @@
 # Base files
 toolkit_base_images_dir = ../../../base/dali-toolkit/images
 toolkit_base_sounds_dir = ../../../base/dali-toolkit/sounds
-toolkit_base_styles_dir = ../../../base/dali-toolkit/styles
 toolkit_base_src_dir    = ../../../base/dali-toolkit/internal
 public_api_base_src_dir = ../../../base/dali-toolkit/public-api
 
 include ../../../base/dali-toolkit/images/file.list
 include ../../../base/dali-toolkit/sounds/file.list
-include ../../../base/dali-toolkit/styles/file.list
 include ../../../base/dali-toolkit/internal/file.list
 include ../../../base/dali-toolkit/public-api/file.list
 
@@ -60,16 +58,11 @@ libdali_toolkit_la_SOURCES = \
                      $(toolkit_optional_src_files) \
                      $(public_api_optional_src_files)
 
-dalistyledir = ${dataReadOnlyDir}/toolkit/styles/
-dalistyle_DATA = ${dali_toolkit_style_files}
-
 libdali_toolkit_la_DEPENDENCIES =
 
 libdali_toolkit_la_CXXFLAGS = -DDALI_COMPILATION \
                       -DDALI_IMAGE_DIR="\"${daliimagedir}\"" \
                       -DDALI_SOUND_DIR="\"${dalisounddir}\"" \
-                      -DDALI_STYLE_DIR="\"${dalistyledir}\"" \
-                      -DDALI_DATA_READ_ONLY_DIR="\"${dataReadOnlyDir}\"" \
                       -Werror -Wall \
                       -I../../../base \
                       -I../../../optional \
@@ -110,8 +103,6 @@ publicapibasefactorydir = $(publicapibasedir)/factory
 publicapibasefocusmanagerdir = $(publicapibasedir)/focus-manager
 publicapibasemarkupprocessordir = $(publicapibasedir)/markup-processor
 publicapibaseshadereffectsdir = $(publicapibasedir)/shader-effects
-publicapibasestylingdir = $(publicapibasedir)/styling
-publicapibasebuilderdir = $(publicapibasedir)/builder
 
 publicapibase_HEADERS = $(public_api_base_header_files)
 publicapibasecontrols_HEADERS = $(public_api_base_controls_header_files)
@@ -131,8 +122,6 @@ publicapibasefactory_HEADERS = $(public_api_base_factory_header_files)
 publicapibasefocusmanager_HEADERS = $(public_api_base_focus_manager_header_files)
 publicapibasemarkupprocessor_HEADERS = $(public_api_base_markup_processor_header_files)
 publicapibaseshadereffects_HEADERS = $(public_api_base_shader_effects_header_files)
-publicapibasestyling_HEADERS = $(public_api_base_styling_header_files)
-publicapibasebuilder_HEADERS = $(public_api_base_builder_header_files)
 
 # Install Optional headers
 
@@ -158,6 +147,7 @@ publicapioptionalviewdir = $(publicapioptionaldir)/controls/view
 publicapioptionalnavigationframedir = $(publicapioptionaldir)/controls/navigation-frame
 publicapioptionalshadereffectsdir = $(publicapioptionaldir)/shader-effects
 publicapioptionalbubbleeffectdir = $(publicapioptionaldir)/shader-effects/bubble-effect
+publicapioptionalbuilderdir = $(publicapioptionaldir)/builder
 publicapioptionaltransitioneffectsdir = $(publicapioptionaldir)/transition-effects
 
 publicapioptional_HEADERS = $(public_api_optional_header_files)
@@ -179,6 +169,7 @@ publicapioptionalview_HEADERS = $(public_api_optional_view_header_files)
 publicapioptionalnavigationframe_HEADERS = $(public_api_optional_navigation_frame_header_files)
 publicapioptionalshadereffects_HEADERS = $(public_api_optional_shader_effects_header_files)
 publicapioptionalbubbleeffect_HEADERS = $(public_api_optional_bubble_effect_header_files)
+publicapioptionalbuilder_HEADERS = $(public_api_optional_builder_header_files)
 publicapioptionaltransitioneffects_HEADERS = $(public_api_optional_transition_effects_header_files)
 
 # Install CAPI headers
@@ -221,7 +212,6 @@ capidevelstyledtextutilitiesdir = $(capideveldir)/styled-text-utilities
 capidevelbuilderdir = $(capideveldir)/builder
 capidevelutilitiesdir = $(capideveldir)/utilities
 capideveltransitioneffectsdir = $(capideveldir)/transition-effects
-capidevelstylingdir = $(capideveldir)/styling
 
 capidevel_HEADERS = $(capi_devel_header_files)
 capidevelcontrols_HEADERS = $(capi_devel_controls_header_files)
@@ -261,5 +251,3 @@ capidevelstyledtextutilities_HEADERS = $(capi_devel_styled_text_utilities_header
 capidevelbuilder_HEADERS = $(capi_devel_builder_header_files)
 capidevelutilities_HEADERS = $(capi_devel_utilities_header_files)
 capideveltransitioneffects_HEADERS = $(capi_devel_transition_effects_header_files)
-capidevelstyling_HEADERS = $(capi_devel_styling_header_files)
-

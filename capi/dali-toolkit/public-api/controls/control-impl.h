@@ -35,6 +35,7 @@ class StyleManager;
 
 namespace Internal DALI_INTERNAL
 {
+class StyleChangeProcessor;
 class RelayoutControllerImpl;
 class KeyInputFocusManager;
 }
@@ -290,9 +291,12 @@ private: // For derived classes to override
   virtual void OnInitialize() { }
 
   /**
-   * @brief Callback for when the theme changes.
+   * @brief This method should be overridden by deriving classes when
+   * they wish to be notified when the style changes.
+   *
+   * @param[in] change  Information denoting what has changed.
    */
-  virtual void OnThemeChange( Toolkit::StyleManager styleManager );
+  virtual void OnStyleChange(StyleChange change) { }
 
   /**
    * @brief Called whenever a pinch gesture is detected on this control.
@@ -511,28 +515,12 @@ private:
 
 protected: // Construction
 
-  // Flags for the constructor
-  enum ControlBehaviour
-  {
-    CONTROL_BEHAVIOUR_NONE        = 0x0,
-    REQUIRES_TOUCH_EVENTS         = 0x1,     ///< True if the OnTouchEvent() callback is required.
-    REQUIRES_THEME_CHANGE_SIGNALS = 0x2      ///< True if this control should listen to theme change signals
-  };
-
   /**
-   * @deprecated Use the constructor taking flags instead
    * @brief Create a Control.
    *
    * @param[in] requiresTouchEvents True if the OnTouchEvent() callback is required.
    */
   Control(bool requiresTouchEvents);
-
-  /**
-   * @brief Create a Control.
-   *
-   * @param[in] behaviourFlags Behavioural flags from ControlBehaviour enum
-   */
-  Control(ControlBehaviour behaviourFlags);
 
 public:
 
@@ -709,6 +697,7 @@ private:
   class Impl;
   Impl *mImpl;
 
+  friend class Internal::StyleChangeProcessor;
   friend class Internal::RelayoutControllerImpl;   ///< Relayout controller needs to call Relayout() which is private.
   friend class Internal::KeyInputFocusManager;     ///< KeyInputFocusManager needs to call which is private.
 };

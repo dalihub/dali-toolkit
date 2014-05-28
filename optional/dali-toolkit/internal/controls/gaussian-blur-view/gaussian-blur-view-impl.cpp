@@ -111,8 +111,9 @@ const char* const GAUSSIAN_BLUR_FRAGMENT_SOURCE =
 
 
 GaussianBlurView::GaussianBlurView()
-  : Control( CONTROL_BEHAVIOUR_NONE )
+  : Control( false )  // doesn't require touch events
   , mNumSamples(GAUSSIAN_BLUR_VIEW_DEFAULT_NUM_SAMPLES)
+
   , mPixelFormat(GAUSSIAN_BLUR_VIEW_DEFAULT_RENDER_TARGET_PIXEL_FORMAT)
   , mDownsampleWidthScale(GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_WIDTH_SCALE)
   , mDownsampleHeightScale(GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_HEIGHT_SCALE)
@@ -131,7 +132,7 @@ GaussianBlurView::GaussianBlurView()
 GaussianBlurView::GaussianBlurView( const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
                                     const float downsampleWidthScale, const float downsampleHeightScale,
                                     bool blurUserImage)
-  : Control( CONTROL_BEHAVIOUR_NONE )
+  : Control( false )  // doesn't require touch events
   , mNumSamples(numSamples)
   , mPixelFormat(renderTargetPixelFormat)
   , mDownsampleWidthScale(downsampleWidthScale)

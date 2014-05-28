@@ -161,7 +161,7 @@ Dali::Toolkit::Magnifier Magnifier::New()
 }
 
 Magnifier::Magnifier()
-: Control( REQUIRES_TOUCH_EVENTS ),
+: Control(true),
   mPropertySourcePosition(Property::INVALID_INDEX),
   mActorSize(Vector3::ZERO),
   mMagnificationFactor(1.0f)

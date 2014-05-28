@@ -61,7 +61,7 @@ const Vector4     Scrollable::DEFAULT_OVERSHOOT_COLOUR(0.0f, 0.64f, 0.85f, 0.6f)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 Scrollable::Scrollable()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_THEME_CHANGE_SIGNALS ) ),
+: Control(true/*requires touch*/),
   mPropertyRelativePosition(Property::INVALID_INDEX),
   mPropertyPositionMin(Property::INVALID_INDEX),
   mPropertyPositionMax(Property::INVALID_INDEX),

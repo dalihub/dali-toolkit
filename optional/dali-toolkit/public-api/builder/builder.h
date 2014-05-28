@@ -140,9 +140,7 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
    * @brief Adds or modifies a user defined constant to all future style template or animation expansions
    *
    * e.g.
-   * @code
-   * builder.AddConstant( "IMAGE_DIRECTORY", "/usr/share/images" );
-   * @endcode
+   *  builder.AddConstant( "IMAGE_DIRECTORY", "/usr/share/images" );
    *
    * @pre The Builder has been initialized.
    * @param key The constant name to add or update
@@ -154,11 +152,9 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
    * @brief Gets all currently defined constants.
    *
    * e.g.
-   * @code
-   * PropertyValueMap map = builder.GetConstants(); // get copy of current constants
-   * map["IMAGE_DIRECTORY"] = "/usr/share/images";  // make modification
-   * builder.AddConstants( map );                   // write back changes
-   * @endcode
+   *  PropertyValueMap map = builder.GetConstants(); // get copy of current constants
+   *  map["IMAGE_DIRECTORY"] = "/usr/share/images";  // make modification
+   *  builder.AddConstants( map );                   // write back changes
    *
    * @pre The Builder has been initialized.
    * @return A reference to the currently defined constants.
@@ -169,11 +165,9 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
    * @brief Gets a currently defined constant, or returns Property::INVALID
    *
    * e.g.
-   * @code
-   * PropertyValueMap map = builder.GetConstants(); // get copy of current constants
-   * map["IMAGE_DIRECTORY"] = "/usr/share/images";  // make modification
-   * builder.AddConstants( map );                   // write back changes
-   * @endcode
+   *  PropertyValueMap map = builder.GetConstants(); // get copy of current constants
+   *  map["IMAGE_DIRECTORY"] = "/usr/share/images";  // make modification
+   *  builder.AddConstants( map );                   // write back changes
    *
    * @pre The Builder has been initialized.
    * @param key The constant name to search for.
@@ -298,10 +292,8 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
    * @pre Preconditions have been met for creating dali objects ie Images, Actors etc
    * @param styleName The name of the set of style properties to set on the handle object.
    * @param handle Then handle of the object on which to set the properties.
-   *
-   * @return Return true if the style was found
    */
-  bool ApplyStyle( const std::string& styleName, Handle& handle );
+  void ApplyStyle( const std::string& styleName, Handle& handle );
 
   /**
    * Add the actor tree in the "stage" section to the actor toActor.

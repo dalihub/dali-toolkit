@@ -48,11 +48,7 @@ public_api_base_src_files = \
   $(public_api_base_src_dir)/focus-manager/keyinput-focus-manager.cpp \
   $(public_api_base_src_dir)/markup-processor/markup-processor.cpp \
   $(public_api_base_src_dir)/shader-effects/image-region-effect.cpp \
-  $(public_api_base_src_dir)/shader-effects/bouncing-effect.cpp \
-  $(public_api_base_src_dir)/styling/style-manager.cpp \
-  $(public_api_base_src_dir)/builder/builder.cpp \
-  $(public_api_base_src_dir)/builder/json-parser.cpp \
-  $(public_api_base_src_dir)/builder/tree-node.cpp
+  $(public_api_base_src_dir)/shader-effects/bouncing-effect.cpp
 
 # Add public header files here
 
@@ -104,13 +100,4 @@ public_api_base_markup_processor_header_files =
 
 public_api_base_shader_effects_header_files = \
   $(public_api_base_src_dir)/shader-effects/bouncing-effect.h
-
-public_api_base_styling_header_files = \
-  $(public_api_base_src_dir)/styling/style-manager.h
-
-public_api_base_builder_header_files = \
-  $(public_api_base_src_dir)/builder/builder.h \
-  $(public_api_base_src_dir)/builder/json-parser.h \
-  $(public_api_base_src_dir)/builder/tree-node.h
-
 

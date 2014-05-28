@@ -49,7 +49,6 @@ SET(TC_SOURCES
  utc-Dali-KeyboardFocusManager.cpp
  utc-Dali-ScrollViewEffect.cpp
  utc-Dali-TextInput.cpp
- utc-Dali-StyleManager.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)

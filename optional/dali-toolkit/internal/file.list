@@ -1,6 +1,15 @@
 # Add local source files here
 
 toolkit_optional_src_files = \
+   $(toolkit_optional_src_dir)/builder/builder-impl.cpp \
+   $(toolkit_optional_src_dir)/builder/builder-animations.cpp \
+   $(toolkit_optional_src_dir)/builder/builder-set-property.cpp \
+   $(toolkit_optional_src_dir)/builder/builder-signals.cpp \
+   $(toolkit_optional_src_dir)/builder/builder-actor.cpp \
+   $(toolkit_optional_src_dir)/builder/json-parser-state.cpp \
+   $(toolkit_optional_src_dir)/builder/json-parser-impl.cpp \
+   $(toolkit_optional_src_dir)/builder/tree-node-manipulator.cpp \
+   $(toolkit_optional_src_dir)/builder/replacement.cpp \
    $(toolkit_optional_src_dir)/controls/bloom-view/bloom-view-impl.cpp \
    $(toolkit_optional_src_dir)/controls/cluster/cluster-impl.cpp \
    $(toolkit_optional_src_dir)/controls/cluster/cluster-style-impl.cpp \
