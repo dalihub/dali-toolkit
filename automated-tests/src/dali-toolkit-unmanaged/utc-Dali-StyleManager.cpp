@@ -19,6 +19,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
 
 
 using namespace Dali;

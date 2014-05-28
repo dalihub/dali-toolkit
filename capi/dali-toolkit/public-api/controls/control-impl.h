@@ -24,13 +24,14 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
-#include <dali-toolkit/public-api/styling/style-manager.h>
 
 namespace Dali DALI_IMPORT_API
 {
 
 namespace Toolkit
 {
+
+class StyleManager;
 
 namespace Internal DALI_INTERNAL
 {
