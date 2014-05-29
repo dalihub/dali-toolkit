@@ -73,6 +73,11 @@ void ScrollBar::SetBackgroundImage( Image image, const Vector4& border )
   GetImpl(*this).SetBackgroundImage(image, border);
 }
 
+void ScrollBar::SetIndicatorImage( Image image )
+{
+  GetImpl(*this).SetIndicatorImage(image);
+}
+
 void ScrollBar::SetIndicatorImage( Image image, const Vector4& border )
 {
   GetImpl(*this).SetIndicatorImage(image, border);

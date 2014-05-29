@@ -198,9 +198,13 @@ void ScrollBar::SetBackgroundImage( Image image, const Vector4& border )
   {
     mBackground.SetImage(image);
   }
-
   mBackground.SetNinePatchBorder( border );
   mBackground.SetStyle( ImageActor::STYLE_NINE_PATCH );
+}
+
+void ScrollBar::SetIndicatorImage( Image image )
+{
+  mIndicator.SetImage(image);
 }
 
 void ScrollBar::SetIndicatorImage( Image image, const Vector4& border )

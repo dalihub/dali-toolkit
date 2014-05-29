@@ -84,6 +84,11 @@ public:
   /**
    * @copydoc Toolkit::ScrollBar::SetIndicatorImage()
    */
+  void SetIndicatorImage( Image image );
+
+  /**
+   * @copydoc Toolkit::ScrollBar::SetIndicatorImage()
+   */
   void SetIndicatorImage( Image image, const Vector4& border );
 
   /**
