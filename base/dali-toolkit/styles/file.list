@@ -1,0 +1,4 @@
+# Files to install here
+
+dali_toolkit_style_files =\
+    $(toolkit_base_styles_dir)/*.json

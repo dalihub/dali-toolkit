@@ -474,7 +474,7 @@ Dali::Toolkit::MaskedImageView::MaskedImageViewSignal& MaskedImageView::MaskFini
 }
 
 MaskedImageView::MaskedImageView()
-: Control(true),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_THEME_CHANGE_SIGNALS ) ),
   mEditMode( Dali::Toolkit::MaskedImageView::EDIT_DISABLED ),
   mSelfPropertySetting( false ),
   mSourceRotation( Dali::Toolkit::MaskedImageView::ROTATE_0 ),

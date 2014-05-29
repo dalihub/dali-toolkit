@@ -150,7 +150,7 @@ public:
   /**
    * @copydoc Toolkit::Builder::ApplyStyle
    */
-  void ApplyStyle( const std::string& styleName, Handle& handle );
+  bool ApplyStyle( const std::string& styleName, Handle& handle );
 
   void AnimateTo( const std::string& styleName, Handle& handle );
 
@@ -231,7 +231,7 @@ private:
 
   void LoadIncludes( const std::string& data );
 
-  void ApplyStyle( const std::string& styleName, Handle& handle, const Replacement& replacement);
+  bool ApplyStyle( const std::string& styleName, Handle& handle, const Replacement& replacement);
 
   Animation CreateAnimation( const std::string& animationName, const Replacement& replacement, Dali::Actor sourceActor );
 

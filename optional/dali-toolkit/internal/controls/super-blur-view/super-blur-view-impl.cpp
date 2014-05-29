@@ -97,7 +97,7 @@ PropertyRegistration property1( typeRegistration, "image", Toolkit::SuperBlurVie
 } // unnamed namespace
 
 SuperBlurView::SuperBlurView( unsigned int blurLevels )
-: Control( false ),
+: Control( CONTROL_BEHAVIOUR_NONE ),
   mBlurLevels( blurLevels ),
   mBlurStrengthPropertyIndex(Property::INVALID_INDEX),
   mResourcesCleared( true ),

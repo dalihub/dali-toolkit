@@ -4,7 +4,6 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/controls/relayout-controller.cpp \
    $(toolkit_base_src_dir)/controls/relayout-controller-impl.cpp \
    $(toolkit_base_src_dir)/controls/relayout-helper.cpp \
-   $(toolkit_base_src_dir)/controls/style-change-processor.cpp \
    $(toolkit_base_src_dir)/controls/alignment/alignment-impl.cpp \
    $(toolkit_base_src_dir)/controls/buttons/button-impl.cpp \
    $(toolkit_base_src_dir)/controls/buttons/check-box-button-default-painter-impl.cpp \
@@ -57,4 +56,14 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/factory/localized-control-factory-impl.cpp \
    $(toolkit_base_src_dir)/focus-manager/focus-manager-impl.cpp \
    $(toolkit_base_src_dir)/focus-manager/keyboard-focus-manager-impl.cpp \
-   $(toolkit_base_src_dir)/focus-manager/keyinput-focus-manager-impl.cpp
+   $(toolkit_base_src_dir)/focus-manager/keyinput-focus-manager-impl.cpp \
+   $(toolkit_base_src_dir)/styling/style-manager-impl.cpp \
+   $(toolkit_base_src_dir)/builder/builder-impl.cpp \
+   $(toolkit_base_src_dir)/builder/builder-animations.cpp \
+   $(toolkit_base_src_dir)/builder/builder-set-property.cpp \
+   $(toolkit_base_src_dir)/builder/builder-signals.cpp \
+   $(toolkit_base_src_dir)/builder/builder-actor.cpp \
+   $(toolkit_base_src_dir)/builder/json-parser-state.cpp \
+   $(toolkit_base_src_dir)/builder/json-parser-impl.cpp \
+   $(toolkit_base_src_dir)/builder/tree-node-manipulator.cpp \
+   $(toolkit_base_src_dir)/builder/replacement.cpp

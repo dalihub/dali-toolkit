@@ -81,6 +81,8 @@ extern void dali_keyboard_focus_manager_startup(void);
 extern void dali_keyboard_focus_manager_cleanup(void);
 extern void dali_scroll_view_effect_startup(void);
 extern void dali_scroll_view_effect_cleanup(void);
+extern void dali_style_manager_startup(void);
+extern void dali_style_manager_cleanup(void);
 
 extern int UtcDaliAlbumLayoutNew(void);
 extern int UtcDaliAlbumSetAndGetItemSizeFunction(void);
@@ -394,6 +396,10 @@ extern int UtcDaliTextInputGetStyleAtCursor(void);
 extern int UtcDaliTextInputSetAndGetTextAlignment(void);
 extern int UtcDaliTextInputSetAndGetMultilinePolicy(void);
 extern int UtcDaliTextInputSetAndGetExceedEnabled(void);
+extern int UtcDaliStyleManagerGet(void);
+extern int UtcDaliStyleManagerSetOrientationValue(void);
+extern int UtcDaliStyleManagerSetOrientation(void);
+extern int UtcDaliStyleManagerSetStyleConstant(void);
 
 testcase tc_array[] = {
     {"UtcDaliAlbumLayoutNew", UtcDaliAlbumLayoutNew, album_layout_startup, album_layout_cleanup},
@@ -708,6 +714,10 @@ testcase tc_array[] = {
     {"UtcDaliTextInputSetAndGetTextAlignment", UtcDaliTextInputSetAndGetTextAlignment, dali_scroll_view_effect_startup, dali_scroll_view_effect_cleanup},
     {"UtcDaliTextInputSetAndGetMultilinePolicy", UtcDaliTextInputSetAndGetMultilinePolicy, dali_scroll_view_effect_startup, dali_scroll_view_effect_cleanup},
     {"UtcDaliTextInputSetAndGetExceedEnabled", UtcDaliTextInputSetAndGetExceedEnabled, dali_scroll_view_effect_startup, dali_scroll_view_effect_cleanup},
+    {"UtcDaliStyleManagerGet", UtcDaliStyleManagerGet, dali_style_manager_startup, dali_style_manager_cleanup},
+    {"UtcDaliStyleManagerSetOrientationValue", UtcDaliStyleManagerSetOrientationValue, dali_style_manager_startup, dali_style_manager_cleanup},
+    {"UtcDaliStyleManagerSetOrientation", UtcDaliStyleManagerSetOrientation, dali_style_manager_startup, dali_style_manager_cleanup},
+    {"UtcDaliStyleManagerSetStyleConstant", UtcDaliStyleManagerSetStyleConstant, dali_style_manager_startup, dali_style_manager_cleanup},
     {NULL, NULL}
 };
 

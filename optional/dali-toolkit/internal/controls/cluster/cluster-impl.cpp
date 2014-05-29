@@ -80,7 +80,7 @@ Dali::Toolkit::Cluster Cluster::New(Toolkit::ClusterStyle& style)
 }
 
 Cluster::Cluster(Toolkit::ClusterStyle& style)
-: Control(true/*requires touch*/),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_THEME_CHANGE_SIGNALS ) ),
   mClusterStyle(style),
   mExpandedCount(0)
 {

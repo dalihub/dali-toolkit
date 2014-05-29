@@ -794,7 +794,7 @@ void TableView::OnControlChildRemove( Actor& child )
 }
 
 TableView::TableView( unsigned int initialRows, unsigned int initialColumns )
-: Control( true ),  // requires touch
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_THEME_CHANGE_SIGNALS ) ),
   mCellData( initialRows, initialColumns ),
   mLayoutingChild( false ),
   mConstraintDuration( DEFAULT_CONSTRAINT_DURATION )

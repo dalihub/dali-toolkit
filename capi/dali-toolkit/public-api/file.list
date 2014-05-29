@@ -85,3 +85,4 @@ capi_devel_shader_effects_header_files =               \
   $(capi_devel_src_dir)/shader-effects/ripple-effect.h \
   $(capi_devel_src_dir)/shader-effects/ripple2d-effect.h \
   $(capi_devel_src_dir)/shader-effects/swirl-effect.h
+

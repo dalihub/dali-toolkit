@@ -623,7 +623,7 @@ void Alignment::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
 }
 
 Alignment::Alignment( Toolkit::Alignment::Type horizontal, Toolkit::Alignment::Type vertical )
-: Control( false ),  // doesn't require touch events
+: Control( CONTROL_BEHAVIOUR_NONE ),
   mHorizontal( horizontal ),
   mVertical( vertical ),
   mScaling( Toolkit::Alignment::ScaleNone ),
