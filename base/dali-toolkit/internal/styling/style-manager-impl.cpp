@@ -110,6 +110,11 @@ StyleManager::StyleManager()
   mThemeBuilderConstants[ PACKAGE_PATH_KEY ] = DEFAULT_PACKAGE_PATH;
 
   RequestDefaultTheme();
+
+  if( Adaptor::IsAvailable() )
+  {
+    StyleMonitor::Get().StyleChangeSignal().Connect( this, &StyleManager::StyleMonitorChange );
+  }
 }
 
 StyleManager::~StyleManager()
@@ -330,17 +335,9 @@ bool StyleManager::LoadFile( const std::string& filename, std::string& stringOut
   return false;
 }
 
-Toolkit::StyleManager::ThemeChangeSignalType& StyleManager::ThemeChangeSignal()
+Toolkit::StyleManager::StyleChangeSignalType& StyleManager::StyleChangeSignal()
 {
-  return mThemeChangeSignal;
-}
-
-void StyleManager::EmitThemeChangeSignal()
-{
-  if( !mThemeChangeSignal.Empty() )
-  {
-    mThemeChangeSignal.Emit( Toolkit::StyleManager::Get() );
-  }
+  return mStyleChangeSignal;
 }
 
 void StyleManager::RequestThemeChange( const std::string& themeFile )
@@ -368,7 +365,9 @@ void StyleManager::SetTheme()
 
   mSetThemeConnection = false;
 
-  EmitThemeChangeSignal();
+  StyleChange change;
+  change.themeChange = true;
+  mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), change );
 }
 
 Toolkit::Builder StyleManager::FindCachedBuilder( const std::string& key )
@@ -385,6 +384,11 @@ Toolkit::Builder StyleManager::FindCachedBuilder( const std::string& key )
 void StyleManager::CacheBuilder( Toolkit::Builder builder, const std::string& key )
 {
   mBuilderCache[ key ] = builder;
+}
+
+void StyleManager::StyleMonitorChange( StyleMonitor styleMonitor, StyleChange styleChange )
+{
+  mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), styleChange );
 }
 
 } // namespace Internal

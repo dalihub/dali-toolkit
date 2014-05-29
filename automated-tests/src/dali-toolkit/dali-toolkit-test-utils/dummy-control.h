@@ -104,7 +104,8 @@ private:
 private: // From Internal::Control
 
   virtual void OnInitialize();
-  virtual void OnStyleChange(StyleChange change);
+  virtual void OnThemeChange( StyleManager styleManager );
+  virtual void OnFontChange(bool defaultFontChange, bool defaultFontSizeChange);
   virtual void OnPinch(PinchGesture pinch);
   virtual void OnPan(PanGesture pan);
   virtual void OnTap(TapGesture tap);
@@ -127,7 +128,8 @@ private: // From CustomActorImpl
 public:
 
   bool initializeCalled;
-  bool styleChangeCalled;
+  bool themeChangeCalled;
+  bool fontChangeCalled;
   bool pinchCalled;
   bool panCalled;
   bool tapCalled;

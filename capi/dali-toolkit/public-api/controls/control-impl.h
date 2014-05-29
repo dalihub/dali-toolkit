@@ -299,9 +299,32 @@ private: // For derived classes to override
   virtual void OnInitialize() { }
 
   /**
-   * @brief Callback for when the theme changes.
+   * @brief This method should be overridden by deriving classes when
+   * they wish to be notified when the style manager changes the theme.
+   *
+   * @param[in] styleManager  The StyleManager object.
    */
   virtual void OnThemeChange( Toolkit::StyleManager styleManager );
+
+  /**
+   * @brief This method should be overridden by deriving classes when
+   * they wish to be notified when the style changes the default font.
+   *
+   * @param[in] defaultFontChange  Information denoting whether the default font has changed.
+   * @param[in] defaultFontSizeChange Information denoting whether the default font size has changed.
+   */
+  virtual void OnFontChange( bool defaultFontChange, bool defaultFontSizeChange ){ }
+
+  /**
+   * @deprecated Use OnFontChange() instead.
+   * Before the using of StyleManager, the StyleChange only deals with font change.
+   *
+   * @brief This method should be overridden by deriving classes when
+   * they wish to be notified when the style changes.
+   *
+   * @param[in] change  Information denoting what has changed.
+   */
+  virtual void OnStyleChange( StyleChange change ) { }
 
   /**
    * @brief Called whenever a pinch gesture is detected on this control.
@@ -518,14 +541,22 @@ private:
    */
   void DoActivatedAction(const PropertyValueContainer& attributes);
 
+  /**
+   * @brief This method is the callback for the StyleChangeSignal from StyleManager
+   *
+   * @param[in] styleManager The StyleManager Object
+   * @param[in] change  Information denoting what has changed.
+   */
+  void DoStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
+
 protected: // Construction
 
   // Flags for the constructor
   enum ControlBehaviour
   {
-    CONTROL_BEHAVIOUR_NONE        = 0x0,
-    REQUIRES_TOUCH_EVENTS         = 0x1,     ///< True if the OnTouchEvent() callback is required.
-    REQUIRES_THEME_CHANGE_SIGNALS = 0x2      ///< True if this control should listen to theme change signals
+    CONTROL_BEHAVIOUR_NONE         = 0x0,
+    REQUIRES_TOUCH_EVENTS          = 0x1,     ///< True if the OnTouchEvent() callback is required.
+    REQUIRES_STYLE_CHANGE_SIGNALS  = 0x2      ///< True if needs to monitor style change signals such as theme/font change
   };
 
   /**

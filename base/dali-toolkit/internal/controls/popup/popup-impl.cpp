@@ -169,7 +169,7 @@ Dali::Toolkit::Popup Popup::New()
 }
 
 Popup::Popup(PopupStyle& style)
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_THEME_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mShowing(false),
   mState(Toolkit::Popup::POPUP_NONE), // Initially, the popup state should not be set, it's set in OnInitialize
   mAlterAddedChild(false),

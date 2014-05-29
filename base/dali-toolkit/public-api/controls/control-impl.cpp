@@ -576,15 +576,12 @@ void Control::Initialize()
   // Calling deriving classes
   OnInitialize();
 
-  if( mImpl->mFlags & REQUIRES_THEME_CHANGE_SIGNALS )
+  if( mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS )
   {
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
 
-    // Register for font/theme changes
-    styleManager.ThemeChangeSignal().Connect( this, &ControlImpl::OnThemeChange );
-
-    // Set theme
-    GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
+    // Register for style changes
+    styleManager.StyleChangeSignal().Connect( this, &ControlImpl::DoStyleChange );
   }
 
   mImpl->mInitialized = true;
@@ -741,6 +738,11 @@ Actor Control::GetBackgroundActor() const
   }
 
   return Actor();
+}
+
+void Control::OnThemeChange( Toolkit::StyleManager styleManager )
+{
+  GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
 }
 
 void Control::OnPinch(PinchGesture pinch)
@@ -904,6 +906,21 @@ bool Control::DoAction(BaseObject* object, const std::string& actionName, const 
 void Control::DoActivatedAction(const PropertyValueContainer& attributes)
 {
   OnActivated();
+}
+
+void Control::DoStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
+{
+  if( change.themeChange )
+  {
+    OnThemeChange( styleManager );
+  }
+  else if( change.defaultFontChange || change.defaultFontSizeChange )
+  {
+    // This OnStyleChange(StyleChange change ) is deprecated, use OnFontChange instead
+    OnStyleChange( change );
+
+    OnFontChange( change.defaultFontChange, change.defaultFontSizeChange );
+  }
 }
 
 Toolkit::Control::KeyEventSignalV2& Control::KeyEventSignal()
@@ -1186,11 +1203,6 @@ void Control::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& containe
                  size.x, size.y );
 
   Relayout( size, container );
-}
-
-void Control::OnThemeChange( Toolkit::StyleManager styleManager )
-{
-  GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
 }
 
 bool Control::EmitKeyEventSignal( const KeyEvent& event )

@@ -138,7 +138,8 @@ private:
   DummyControlImplOverride()
   : DummyControlImpl(),
     initializeCalled(false),
-    styleChangeCalled(false),
+    themeChangeCalled(false),
+    fontChangeCalled( false ),
     pinchCalled(false),
     panCalled(false),
     tapCalled(false),
@@ -162,7 +163,8 @@ private:
 private: // From ControlImpl
 
   virtual void OnInitialize() { initializeCalled = true; }
-  virtual void OnStyleChange(StyleChange change) { styleChangeCalled = true;}
+  virtual void OnThemeChange( StyleManager styleManager ) { themeChangeCalled = true }
+  virtual void OnFontChange( bool defaultFontChange, bool defaultFontSizeChange ) { fontChangeCalled = true;}
   virtual void OnPinch(PinchGesture pinch) { pinchCalled = true; }
   virtual void OnPan(PanGesture pan) { panCalled = true; }
   virtual void OnTap(TapGesture tap) { tapCalled = true; }
@@ -185,7 +187,8 @@ private: // From CustomActorImpl
 public:
 
   bool initializeCalled;
-  bool styleChangeCalled;
+  bool themeChangeCalled;
+  bool fontChangeCalled;
   bool pinchCalled;
   bool panCalled;
   bool tapCalled;

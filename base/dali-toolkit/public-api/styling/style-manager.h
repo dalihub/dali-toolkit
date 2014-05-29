@@ -63,7 +63,7 @@ class StyleManager : public BaseHandle
 public:
 
   // Signals
-  typedef SignalV2< void ( StyleManager ) > ThemeChangeSignalType;
+  typedef SignalV2< void ( StyleManager, StyleChange ) >  StyleChangeSignalType;
 
   /**
    * @brief Create a StyleManager handle; this can be initialised with StyleManager::Get()
@@ -162,14 +162,14 @@ public:
 public: // Signals
 
   /**
-   * @brief This signal is emitted whenever the theme is changed on device
+   * @brief This signal is emitted whenever the style (e.g. theme/font change) is changed on device
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName( StyleManager styleManager );
+   *   void YourCallbackName( StyleManager styleManager, StyleChange change );
    * @endcode
    * @return The signal to connect to.
    */
-  ThemeChangeSignalType& ThemeChangeSignal();
+  StyleChangeSignalType& StyleChangeSignal();
 
 public:
 

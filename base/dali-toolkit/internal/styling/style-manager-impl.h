@@ -116,9 +116,9 @@ public:
   // SIGNALS
 
   /**
-   * @copydoc Toolkit::StyleManager::ThemeChangeSignal
+   * @copydoc Toolkit::StyleManager::StyleChangeSignal
    */
-  Toolkit::StyleManager::ThemeChangeSignalType& ThemeChangeSignal();
+  Toolkit::StyleManager::StyleChangeSignalType& StyleChangeSignal();
 
 protected:
 
@@ -193,11 +193,6 @@ private:
   void ApplyStyle( Toolkit::Builder builder, Toolkit::Control control );
 
   /**
-   * @brief Emit theme changed signal
-   */
-  void EmitThemeChangeSignal();
-
-  /**
    * @brief Callback for orientation changes
    *
    * @param[in] orientation The orientation object
@@ -219,6 +214,14 @@ private:
    * @param[in] key The key to store the builder under
    */
   void CacheBuilder( Toolkit::Builder builder, const std::string& key );
+
+  /**
+   * Callback for when style monitor raises a signal
+   *
+   * @param[in] styleMonitor The style monitor object
+   * @param[in] styleChange The style change data
+   */
+  void StyleMonitorChange( StyleMonitor styleMonitor, StyleChange styleChange );
 
   // Undefined
   StyleManager(const StyleManager&);
@@ -245,7 +248,7 @@ private:
   bool mSetThemeConnection;           ///< Has the callback to set the theme been set
 
   // Signals
-  Toolkit::StyleManager::ThemeChangeSignalType       mThemeChangeSignal;         ///< Emitted when the theme changes
+  Toolkit::StyleManager::StyleChangeSignalType       mStyleChangeSignal;         ///< Emitted when the style( theme/font ) changes
 };
 
 } // namespace Internal

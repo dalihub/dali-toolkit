@@ -1009,7 +1009,7 @@ TextView::RelayoutData& TextView::RelayoutData::operator=( const TextView::Relay
 }
 
 TextView::TextView()
-: Control( REQUIRES_THEME_CHANGE_SIGNALS ),
+: Control( REQUIRES_STYLE_CHANGE_SIGNALS  ),
   mCurrentStyledText(),
   mTextViewProcessorOperations(),
   mLayoutParameters( Toolkit::TextView::SplitByNewLineChar,
@@ -1149,7 +1149,7 @@ void TextView::OnInitialize()
 }
 
 
-void TextView::OnStyleChange( StyleChange change )
+void TextView::OnFontChange( bool defaultFontChange, bool defaultFontSizeChange )
 {
   mRelayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo = TextViewProcessor::WordLayoutInfo();
   TextViewProcessor::CreateWordTextInfo( mLayoutParameters.mEllipsizeText,

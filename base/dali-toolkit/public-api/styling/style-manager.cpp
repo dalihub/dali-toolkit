@@ -83,9 +83,9 @@ StyleManager::StyleManager( Internal::StyleManager *impl )
 {
 }
 
-StyleManager::ThemeChangeSignalType& StyleManager::ThemeChangeSignal()
+StyleManager::StyleChangeSignalType& StyleManager::StyleChangeSignal()
 {
-  return GetImpl( *this ).ThemeChangeSignal();
+  return GetImpl( *this ).StyleChangeSignal();
 }
 
 void StyleManager::RequestThemeChange( const std::string& themeFile )

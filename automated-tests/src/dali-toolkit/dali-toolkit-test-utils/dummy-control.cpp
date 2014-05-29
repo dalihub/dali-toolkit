@@ -16,6 +16,8 @@
 
 #include "dummy-control.h"
 
+#include <dali-toolkit/public-api/styling/style-manager.h>
+
 namespace Dali
 {
 
@@ -65,7 +67,7 @@ DummyControl DummyControlImpl::New()
 }
 
 DummyControlImpl::DummyControlImpl()
-: Control(true)
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) )
 {
 }
 
@@ -85,7 +87,8 @@ DummyControl DummyControlImplOverride::New()
 DummyControlImplOverride::DummyControlImplOverride()
 : DummyControlImpl(),
   initializeCalled(false),
-  styleChangeCalled(false),
+  themeChangeCalled( false ),
+  fontChangeCalled( false ),
   pinchCalled(false),
   panCalled(false),
   tapCalled(false),
@@ -108,7 +111,8 @@ DummyControlImplOverride::~DummyControlImplOverride() { }
 
 
 void DummyControlImplOverride::OnInitialize() { initializeCalled = true; }
-void DummyControlImplOverride::OnStyleChange(StyleChange change) { styleChangeCalled = true;}
+void DummyControlImplOverride::OnThemeChange(StyleManager change) { themeChangeCalled = true;}
+void DummyControlImplOverride::OnFontChange(bool defaultFontChange, bool defaultFontSizeChange) { fontChangeCalled = true; }
 void DummyControlImplOverride::OnPinch(PinchGesture pinch) { pinchCalled = true; }
 void DummyControlImplOverride::OnPan(PanGesture pan) { panCalled = true; }
 void DummyControlImplOverride::OnTap(TapGesture tap) { tapCalled = true; }

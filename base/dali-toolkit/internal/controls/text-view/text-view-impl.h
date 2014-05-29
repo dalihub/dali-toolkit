@@ -363,9 +363,9 @@ private: // From Control
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::Control::OnStyleChange()
+   * @copydoc Toolkit::Control::OnFontChange( )
    */
-  virtual void OnStyleChange( StyleChange change );
+  virtual void OnFontChange( bool defaultFontChange, bool defaultFontSizeChange );
 
   /**
    * @copydoc Toolkit::Control::OnControlSizeSet()
