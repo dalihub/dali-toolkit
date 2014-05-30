@@ -47,13 +47,29 @@ class TextInput : public Control
 
 public:
 
-  //Signal Names
+  /// @name Properties
+  /** @{ */
+  static const Property::Index HIGHLIGHT_COLOR_PROPERTY;              // Property, name "highlight-color", type VECTOR4
+  static const Property::Index CUT_AND_PASTE_COLOR_PROPERTY;          // Property, name "cut-and-paste-bg-color", type VECTOR4
+  static const Property::Index CUT_AND_PASTE_PRESSED_COLOR_PROPERTY;  // Property, name "cut-and-paste-pressed-color", type VECTOR4
+
+  static const Property::Index CUT_BUTTON_POSITION_PRIORITY_PROPERTY; // Property, name "cut-button-position-priority", type unsigned int
+  static const Property::Index COPY_BUTTON_POSITION_PRIORITY_PROPERTY; // Property, name "copy-button-position-priority", type unsigned int
+  static const Property::Index PASTE_BUTTON_POSITION_PRIORITY_PROPERTY; // Property, name "paste-button-position-priority", type unsigned int
+  static const Property::Index SELECT_BUTTON_POSITION_PRIORITY_PROPERTY; // Property, name "select-button-position-priority", type unsigned int
+  static const Property::Index SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY; // Property, name "select-all-button-position-priority", type unsigned int
+  static const Property::Index CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY; // Property, name "clipboard-button-position-priority", type unsigned int
+  /** @} */
+
+  /// @name Signals
+  /** @{ */
   static const char* const SIGNAL_START_INPUT; ///< name "start-input"
   static const char* const SIGNAL_END_INPUT; ///< name "end-input"
   static const char* const SIGNAL_STYLE_CHANGED; ///< name "style-changed"
   static const char* const SIGNAL_MAX_INPUT_CHARACTERS_REACHED; ///< name "max-input-characters-reached"
   static const char* const SIGNAL_TOOLBAR_DISPLAYED; ///< name "toolbar-displayed"
   static const char* const SIGNAL_TEXT_EXCEED_BOUNDARIES; ///< name "text-exceed-boundaries"
+  /** @} */
 
 public:
 

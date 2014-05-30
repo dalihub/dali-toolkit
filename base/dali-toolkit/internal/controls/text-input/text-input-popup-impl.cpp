@@ -16,15 +16,25 @@
  */
 
 #include <dali-toolkit/internal/controls/text-input/text-input-popup-impl.h>
+
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
+#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
+
+#include <libintl.h>
 
 using namespace std;
 using namespace Dali;
 
+#define GET_LOCALE_TEXT(string) dgettext("sys_string", string)
+
 namespace {
 
-// Popup: Background
-const char* DEFAULT_PANEL_BACKGROUND = DALI_IMAGE_DIR "cutCopyPastePopup_bg.png";
+// Default Colors
+
+const Vector4 DEFAULT_POPUP_BACKGROUND( Vector4( 0.24f, 0.41f, 0.88f, 1.0f ) );
+const Vector4 DEFAULT_POPUP_BUTTON_PRESSED( Vector4( 0.18f, 0.56f, 1.0f, 1.0f ) );
+const Vector4 DEFAULT_BORDER_COLOR( Vector4( 0.2f, 0.2f, 0.2f, 1.0f ) );
+const Vector3 POPUP_BORDER( Vector3(1.0f, 1.0f, 0.0f) );
 
 // Popup: Divider
 const char* DEFAULT_PANEL_BUTTON_DIVIDER = DALI_IMAGE_DIR "copypanelLine.png";
@@ -34,18 +44,6 @@ const char* DEFAULT_PANEL_BUTTON_DIVIDER = DALI_IMAGE_DIR "copypanelLine.png";
  * the left image can be rounded on the left and straight on the right, the right image can be straight on the left and rounded on the right.
  */
 
-// Popup: Left Pressed Highlight
-const char* DEFAULT_BUTTON_HIGHLIGHT_LEFT( DALI_IMAGE_DIR "00_popup_button_pressed.png" );
-const Vector4 DEFAULT_BUTTON_HIGHLIGHT_LEFT_BORDER( 6.0f, 9.0f, 6.0f, 9.0f );
-
-// Popup: Center Pressed Highlight
-const char* DEFAULT_BUTTON_HIGHLIGHT_CENTER( DALI_IMAGE_DIR "00_popup_button_pressed.png" );
-const Vector4 DEFAULT_BUTTON_HIGHLIGHT_CENTER_BORDER( 6.0f, 9.0f, 6.0f, 9.0f );
-
-// Popup: Right Pressed Highlight
-const char* DEFAULT_BUTTON_HIGHLIGHT_RIGHT( DALI_IMAGE_DIR "00_popup_button_pressed.png" );
-const Vector4 DEFAULT_BUTTON_HIGHLIGHT_RIGHT_BORDER( 6.0f, 9.0f, 6.0f, 9.0f );
-
 // Popup: Tails
 const char* DEFAULT_POPUP_TAIL_BOTTOM( DALI_IMAGE_DIR "00_popup_bubble_tail_bottom.png" );
 
@@ -54,19 +52,17 @@ const char* DEFAULT_POPUP_TAIL_BOTTOM( DALI_IMAGE_DIR "00_popup_bubble_tail_bott
 // height of the indicator actor from Dali-Toolkit.
 const Vector2 DEFAULT_POPUP_INDICATOR_OFFSET(0.0f, 60.0f);
 
-const Vector4 BACKGROUND_IMAGE_BORDER( 22.0f, 20.0f, 29.0f, 27.0f );
-const Vector2 BACKGROUND_IMAGE_SIZE( 50.0f, 54.0f );
-const Vector3 POPUP_TEXT_OFFSET( 12.0f, 10.0f, 0.0f );
+const Vector3 POPUP_TEXT_OFFSET( 0.0f, 0.0f, 0.0f );
 const Vector3 POPUP_TEXT_ENLARGE( 12.0f, 28.0f, 0.0f );
 const Vector3 POPUP_MINIMUM_SIZE( 128.0f, 124.0f, 0.0f );
 
 const Vector3 BUTTON_TEXT_ENLARGE( 32.0f, 0.0f, 0.0f );
 const Vector3 BUTTON_TEXT_MINIMUM_SIZE( 128.0f, 126.0f, 0.0f );
-const Vector3 BUTTON_TEXT_MAXIMUM_SIZE( 196.0f, 126.0f, 0.0f );
+const Vector3 BUTTON_TEXT_MAXIMUM_SIZE( 190.0f, 126.0f, 0.0f );
 const Vector3 TEXT_LABEL_MAX_SIZE( 160.0f, 30.0f, 0.0f );
 
 const float DIVIDER_WIDTH(2.0f);                                            ///< Width of each button divider
-const float DIVIDER_MARGIN(10.0f);                                          ///< Top/Bottom Margin between divider and edge of popup.
+const float DIVIDER_MARGIN(0.0f);                                          ///< Top/Bottom Margin between divider and edge of popup.
 
 const float DEFAULT_UI_FONT_SIZE(7.0f);                                     ///< Standard font size for Text-Input's UI
 
@@ -76,6 +72,13 @@ const float SHOW_POPUP_ANIMATION_DURATION(0.2f);                            ///<
 const Vector2 DEFAULT_ICON_SIZE( 45.0f, 45.0f );                            ///< Default icon size for image in options
 const float TEXT_POSITION_OFFSET( -19.0f );                                  ///< Default offset for text label
 const float ICON_POSITION_OFFSET( 19.0f );                                  ///< Default offset for icon
+
+const char* DEFAULT_ICON_CLIPBOARD( DALI_IMAGE_DIR "copy_paste_icon_clipboard.png" );
+const char* DEFAULT_ICON_COPY( DALI_IMAGE_DIR "copy_paste_icon_copy.png" );
+const char* DEFAULT_ICON_CUT( DALI_IMAGE_DIR "copy_paste_icon_cut.png" );
+const char* DEFAULT_ICON_PASTE( DALI_IMAGE_DIR "copy_paste_icon_paste.png" );
+const char* DEFAULT_ICON_SELECT( DALI_IMAGE_DIR "copy_paste_icon_select.png" );
+const char* DEFAULT_ICON_SELECT_ALL( DALI_IMAGE_DIR "copy_paste_icon_select_all.png" );
 
 // TODO: This should be based on the content for example:
 // 1. For selection: should be above top of highlighted selection, or below bottom of highlighted selection + end handle.
@@ -183,9 +186,26 @@ const char* const TextInputPopup::SIGNAL_PRESSED = "pressed";
 const char* const TextInputPopup::SIGNAL_HIDE_FINISHED = "hide-finished";
 const char* const TextInputPopup::SIGNAL_SHOW_FINISHED = "show-finished";
 
+const char* const TextInputPopup::OPTION_SELECT_WORD = "select_word";                       // "Select Word" popup option.
+const char* const TextInputPopup::OPTION_SELECT_ALL("select_all");                          // "Select All" popup option.
+const char* const TextInputPopup::OPTION_CUT("cut");                                        // "Cut" popup option.
+const char* const TextInputPopup::OPTION_COPY("copy");                                      // "Copy" popup option.
+const char* const TextInputPopup::OPTION_PASTE("paste");                                    // "Paste" popup option.
+const char* const TextInputPopup::OPTION_CLIPBOARD("clipboard");                            // "Clipboard" popup option.
+
 TextInputPopup::TextInputPopup()
 : mState(StateHidden),
   mRootActor(Layer::New()),
+  mContentSize( Vector3::ZERO ),
+  mCutPasteButtonsColor( DEFAULT_POPUP_BACKGROUND ),
+  mCutPasteButtonsPressedColor( DEFAULT_POPUP_BUTTON_PRESSED ),
+  mBorderColor( DEFAULT_BORDER_COLOR ),
+  mSelectOptionPriority(1),
+  mSelectAllOptionPriority(2),
+  mCutOptionPriority(3),
+  mCopyOptionPriority(4),
+  mPasteOptionPriority(5),
+  mClipboardOptionPriority(6),
   mPressedSignal(),
   mHideFinishedSignal(),
   mShowFinishedSignal()
@@ -277,15 +297,7 @@ void TextInputPopup::CreatePopUpBackground()
   // Create background-panel if not already created (required if we have at least one option)
   if ( !mBackground )
   {
-    Image backgroundImage = Image::New( DEFAULT_PANEL_BACKGROUND );
-
-    mBackground = ImageActor::New( backgroundImage );
-    // Expand background from bottom-center of root actor.
-    mBackground.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
-    mBackground.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
-    mBackground.SetStyle( ImageActor::STYLE_NINE_PATCH );
-
-    mBackground.SetNinePatchBorder( Vector4(13.0f, 13.0f, 13.0f, 13.0f) );
+    mBackground = Toolkit::CreateSolidColorActor( GetCutPastePopUpColor(), true, mBorderColor );
 
     Self().Add( mBackground );
     mContentSize = POPUP_TEXT_OFFSET;
@@ -313,7 +325,7 @@ void TextInputPopup::CreateDivider()
     ImageActor divider = ImageActor::New( dividerImage );
     divider.SetParentOrigin( ParentOrigin::TOP_LEFT );
     divider.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-    divider.SetPosition( Vector3( mContentSize.width, POPUP_TEXT_OFFSET.y + 5.0f, 0.0f ) );
+    divider.SetPosition( Vector3( mContentSize.width, POPUP_TEXT_OFFSET.y, 0.0f ) );
     // Keep track of all the dividers. As their height's need to be updated to the max. of all
     // buttons currently added.
     mDividerContainer.push_back(divider);
@@ -323,37 +335,112 @@ void TextInputPopup::CreateDivider()
   }
 }
 
-ImageActor TextInputPopup::CreatePressedBackground( const Vector3 requiredSize, const bool finalFlag )
+ImageActor TextInputPopup::CreatePressedBackground( const Vector3 requiredSize )
 {
   std::string pressedImageFilename;
   Vector4 pressedImageBorder;
   Vector2 pressedImageSize;
 
-  if(mButtonContainer.size() == 0) // LEFT
-  {
-    pressedImageFilename = DEFAULT_BUTTON_HIGHLIGHT_LEFT;
-    pressedImageBorder = DEFAULT_BUTTON_HIGHLIGHT_LEFT_BORDER;
-  }
-  else if(!finalFlag) // CENTER
-  {
-    pressedImageFilename = DEFAULT_BUTTON_HIGHLIGHT_CENTER;
-    pressedImageBorder = DEFAULT_BUTTON_HIGHLIGHT_CENTER_BORDER;
-  }
-  else // RIGHT
-  {
-    pressedImageFilename = DEFAULT_BUTTON_HIGHLIGHT_RIGHT;
-    pressedImageBorder = DEFAULT_BUTTON_HIGHLIGHT_RIGHT_BORDER;
-  }
+  ImageActor pressedButtonBg = Toolkit::CreateSolidColorActor( GetCutPastePopUpPressedColor() );
 
-  Image pressedImage = Image::New( pressedImageFilename );
-  ImageActor pressedImageBg = ImageActor::New( pressedImage );
-  pressedImageBg.SetStyle( ImageActor::STYLE_NINE_PATCH );
-  pressedImageBg.SetNinePatchBorder( pressedImageBorder );
-  pressedImageBg.SetSize ( requiredSize );
-  pressedImageBg.SetParentOrigin( ParentOrigin::CENTER );
-  pressedImageBg.SetAnchorPoint( AnchorPoint::CENTER );
+  pressedButtonBg.SetSize ( requiredSize );
+  pressedButtonBg.SetParentOrigin( ParentOrigin::CENTER );
+  pressedButtonBg.SetAnchorPoint( AnchorPoint::CENTER );
 
-  return pressedImageBg;
+  return pressedButtonBg;
+}
+
+TextInputPopup::ButtonRequirement TextInputPopup::CreateRequiredButton( TextInputPopup::Buttons buttonId, std::size_t orderOfPriority,
+                                                                        const std::string& name, const std::string& caption, Image iconImage, bool enabled )
+{
+  TextInputPopup::ButtonRequirement currentButton;
+
+  currentButton.buttonId = buttonId;
+  currentButton.orderOfPriority = orderOfPriority;
+  currentButton.name = name;
+  currentButton.caption = caption;
+  currentButton.iconImage = iconImage;
+  currentButton.enabled = enabled;
+
+  return currentButton;
+}
+
+void TextInputPopup::CreateOrderedListOfOptions()
+{
+  mOrderListOfButtons.clear();
+
+  for ( std::size_t index= 0; index < ButtonsEnumEnd; index++ )
+  {
+    TextInputPopup::ButtonRequirement currentButton;
+
+    // Create button for each possible option using Option priority
+    switch ( index )
+    {
+      case ButtonsCut:
+      {
+        Image cutIcon = Image::New( DEFAULT_ICON_CUT );
+        currentButton = CreateRequiredButton( ButtonsCut, mCutOptionPriority, OPTION_CUT, GET_LOCALE_TEXT("IDS_COM_BODY_CUT"), cutIcon, false );
+        break;
+      }
+      case ButtonsCopy:
+      {
+        Image copyIcon = Image::New( DEFAULT_ICON_COPY );
+        currentButton = CreateRequiredButton( ButtonsCopy, mCopyOptionPriority, OPTION_COPY, GET_LOCALE_TEXT("IDS_COM_BODY_COPY"), copyIcon, false );
+        break;
+      }
+      case ButtonsPaste:
+      {
+        Image pasteIcon = Image::New( DEFAULT_ICON_PASTE );
+        currentButton = CreateRequiredButton( ButtonsPaste, mPasteOptionPriority, OPTION_PASTE, GET_LOCALE_TEXT("IDS_COM_BODY_PASTE"), pasteIcon, false );
+        break;
+      }
+      case ButtonsSelect:
+      {
+        Image selectIcon = Image::New( DEFAULT_ICON_SELECT );
+        currentButton = CreateRequiredButton( ButtonsSelect, mSelectOptionPriority, OPTION_SELECT_WORD, GET_LOCALE_TEXT("IDS_COM_SK_SELECT"), selectIcon, false );
+        break;
+      }
+      case ButtonsSelectAll:
+      {
+        Image selectAllIcon = Image::New( DEFAULT_ICON_SELECT_ALL );
+        currentButton = CreateRequiredButton( ButtonsSelectAll, mSelectAllOptionPriority, OPTION_SELECT_ALL, GET_LOCALE_TEXT("IDS_COM_BODY_SELECT_ALL"), selectAllIcon, false );
+        break;
+      }
+      case ButtonsClipboard:
+      {
+        Image clipboardIcon = Image::New( DEFAULT_ICON_CLIPBOARD );
+        currentButton = CreateRequiredButton( ButtonsClipboard, mClipboardOptionPriority, OPTION_CLIPBOARD, GET_LOCALE_TEXT("IDS_COM_BODY_CLIPBOARD"), clipboardIcon, false );
+        break;
+      }
+      case ButtonsEnumEnd:
+      {
+        DALI_ASSERT_DEBUG( "ButtonsEnumEnd used but an invalid choice");
+        currentButton.orderOfPriority = 0;
+        break;
+      }
+    }
+
+    bool match = false;
+
+    // Insert button in list of buttons in order of priority setting.
+    for( std::vector<ButtonRequirement>::iterator it = mOrderListOfButtons.begin(), endIt = mOrderListOfButtons.end(); ( it != endIt && !match ); ++it )
+    {
+      const ButtonRequirement& button( *it );
+      if ( currentButton.orderOfPriority < button.orderOfPriority )
+      {
+        if ( currentButton.orderOfPriority != 0 ) // If order priority 0 then do not add button as not required.
+        {
+          mOrderListOfButtons.insert( it, currentButton );
+        }
+        match = true;
+      }
+    }
+
+    if ( !match)
+    {
+      mOrderListOfButtons.push_back( currentButton );
+    }
+  }
 }
 
 void TextInputPopup::AddOption(const std::string& name, const std::string& caption, const Image iconImage,  bool finalOption)
@@ -393,7 +480,7 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
   button.SetParentOrigin( ParentOrigin::TOP_LEFT );
   button.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   button.SetSize( buttonSize );
-  button.SetPosition( Vector3( mContentSize.width, POPUP_TEXT_OFFSET.y, 0.0f ) );
+  button.SetPosition( Vector3( mContentSize.width, POPUP_BORDER.y, 0.0f ) );
 
   // 2. Add icon
   ImageActor icon = CreateOptionIcon( iconImage );
@@ -401,7 +488,7 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
   iconTextContainer.Add( icon );
 
   // 3. Add highlight - Pressed state in Pushbutton needs a new image which means creating the text and icon again but including a highlight this time.
-  ImageActor pressedImageBg = CreatePressedBackground( buttonSize, finalOption );
+  ImageActor pressedImageBg = CreatePressedBackground( buttonSize );
 
   Actor iconPressedTextContainer = Actor::New();
   iconPressedTextContainer.SetDrawMode( DrawMode::OVERLAY );
@@ -425,7 +512,7 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
 
   // Update content size (represents size of all content i.e. from top-left of first button, to bottom-right of last button)
   mContentSize.width += buttonSize.width;
-  mContentSize.height = std::max(mContentSize.height, buttonSize.height);
+  mContentSize.height = std::max(mContentSize.height + ( POPUP_BORDER.y ), buttonSize.height);
   mButtonContainer.push_back(button);
 
   // resize all dividers based on the height content (i.e. max of all button heights)
@@ -435,7 +522,7 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
     i->SetSize( DIVIDER_WIDTH, dividerHeight );
   }
 
-  Vector3 popupSize( Max(mContentSize + POPUP_TEXT_ENLARGE, POPUP_MINIMUM_SIZE) );
+  Vector3 popupSize( Max(mContentSize, POPUP_MINIMUM_SIZE) );
 
   mBackground.SetSize( popupSize );
   // Make Root Actor reflect the size of its content
@@ -518,6 +605,144 @@ Actor TextInputPopup::GetRootActor() const
 {
   return mRootActor;
 }
+
+// Styling
+
+void TextInputPopup::SetCutPastePopUpColor( const Vector4& color )
+{
+  mCutPasteButtonsColor = color;
+}
+
+const Vector4& TextInputPopup::GetCutPastePopUpColor() const
+{
+  return mCutPasteButtonsColor;
+}
+
+void TextInputPopup::SetCutPastePopUpPressedColor( const Vector4& color )
+{
+  mCutPasteButtonsPressedColor = color;
+}
+
+const Vector4& TextInputPopup::GetCutPastePopUpPressedColor() const
+{
+  return mCutPasteButtonsPressedColor;
+}
+
+void TextInputPopup::TogglePopUpButtonOnOff( TextInputPopup::Buttons requiredButton, bool enable )
+{
+  bool match ( false );
+  for( std::vector<ButtonRequirement>::iterator it = mOrderListOfButtons.begin(), endIt = mOrderListOfButtons.end(); ( it != endIt && !match ); ++it )
+   {
+     ButtonRequirement& button( *it );
+     if ( requiredButton == button.buttonId )
+     {
+       button.enabled = enable;
+       match = true;
+     }
+   }
+}
+
+void TextInputPopup::SetButtonPriorityPosition( TextInputPopup::Buttons button, unsigned int priority )
+{
+  switch ( button )
+  {
+    case ButtonsCut:
+    {
+      mCutOptionPriority = priority;
+      break;
+    }
+    case ButtonsCopy:
+    {
+      mCopyOptionPriority = priority;
+      break;
+    }
+    case ButtonsPaste:
+    {
+      mPasteOptionPriority = priority;
+      break;
+    }
+    case ButtonsSelect:
+    {
+      mSelectOptionPriority = priority;
+      break;
+    }
+    case ButtonsSelectAll:
+    {
+      mSelectAllOptionPriority = priority;
+      break;
+    }
+    case ButtonsClipboard:
+    {
+      mClipboardOptionPriority = priority;
+      break;
+    }
+    case ButtonsEnumEnd:
+    {
+      DALI_ASSERT_DEBUG( "ButtonsEnumEnd used but an invalid choice");
+      break;
+    }
+  }
+  CreateOrderedListOfOptions(); // Update list of options as priority changed.
+}
+
+unsigned int TextInputPopup::GetButtonPriorityPosition( TextInputPopup::Buttons button ) const
+{
+  unsigned int priority = 0;
+
+  switch ( button )
+  {
+    case ButtonsCut:
+    {
+      priority = mCutOptionPriority;
+      break;
+    }
+    case ButtonsCopy:
+    {
+      priority = mCopyOptionPriority;
+      break;
+    }
+    case ButtonsPaste:
+    {
+      priority = mPasteOptionPriority;
+      break;
+    }
+    case ButtonsSelect:
+    {
+      priority = mSelectOptionPriority;
+      break;
+    }
+    case ButtonsSelectAll:
+    {
+      priority = mSelectAllOptionPriority;
+      break;
+    }
+    case ButtonsClipboard:
+    {
+      priority = mClipboardOptionPriority;
+      break;
+    }
+    case ButtonsEnumEnd:
+    {
+      DALI_ASSERT_DEBUG( "ButtonsEnumEnd used but an invalid choice");
+      break;
+    }
+  }
+
+  return priority;
+}
+
+void TextInputPopup::AddPopupOptions()
+{
+  for( std::vector<ButtonRequirement>::const_iterator it = mOrderListOfButtons.begin(), endIt = mOrderListOfButtons.end(); ( it != endIt ); ++it )
+  {
+    const ButtonRequirement& button( *it );
+    if (  button.enabled )
+    {
+      AddOption( button.name, button.caption, button.iconImage, false );
+    }
+  }
+}
+
 
 bool TextInputPopup::OnButtonPressed( Toolkit::Button button )
 {

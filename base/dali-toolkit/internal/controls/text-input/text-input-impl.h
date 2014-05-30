@@ -47,6 +47,13 @@ class TextInput : public Control
 {
 public:
 
+  // Properties
+  enum
+  {
+    TEXTINPUT_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    TEXTINPUT_PROPERTY_END_INDEX = TEXTINPUT_PROPERTY_START_INDEX + 512 ///< Reserving property indices
+  };
+
   /**
    * Create a new TextInput
    * @return instrusive ptr to a TextInput
@@ -377,6 +384,22 @@ public:
    * @copydoc Toolkit::TextInput::GetNumberOfCharacters
    */
   std::size_t GetNumberOfCharacters() const;
+
+  /**
+   * Styling
+   */
+
+  /**
+   * Set the diffuse color for the highlight
+   * @param[in] color color to use
+   */
+  void SetMaterialDiffuseColor( const Vector4& color );
+
+  /**
+   * Get the diffuse color used by the highlight
+   * @return color
+   */
+  const Vector4& GetMaterialDiffuseColor() const;
 
 private:
 
@@ -1032,6 +1055,11 @@ public:  // Public to allow internal testing.
   void ClearPopup();
 
   /**
+   * Adds Popup options which have been enabled.
+   */
+  void AddPopupOptions();
+
+  /**
    * Adds a popup option.
    * @note Creates popup frame if not already created.
    * @param[in] name The unique name for this option.
@@ -1316,6 +1344,24 @@ public:  // Public to allow internal testing.
    */
   void GetTextLayoutInfo();
 
+  // Properties
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
+
   /**
    * Emits the style changed signal.
    */
@@ -1418,6 +1464,9 @@ private:
   Vector4 mBoundingRectangleWorldCoordinates;
 
   Clipboard mClipboard;                  ///< Handle to clipboard
+
+  // Styling
+  Vector4           mMaterialColor;      // Color of the highlight
 
   bool mOverrideAutomaticAlignment:1;    ///< Whether to override the alignment automatically set by the text content (e.g. european LTR or arabic RTL)
   bool mCursorRTLEnabled:1;              ///< Enable state of Alternate RTL Cursor (need to keep track of this as it's not always enabled)

@@ -47,6 +47,34 @@ public:
     StateShown
   };
 
+  enum Buttons
+  {
+    ButtonsCut,
+    ButtonsCopy,
+    ButtonsPaste,
+    ButtonsSelect,
+    ButtonsSelectAll,
+    ButtonsClipboard,
+    ButtonsEnumEnd
+  };
+
+  struct ButtonRequirement
+  {
+    TextInputPopup::Buttons buttonId;
+    std::size_t orderOfPriority;
+    std::string name;
+    std::string caption;
+    Image iconImage;
+    bool enabled;
+  };
+
+  static const char* const OPTION_SELECT_WORD;
+  static const char* const OPTION_SELECT_ALL;
+  static const char* const OPTION_CUT;
+  static const char* const OPTION_COPY;
+  static const char* const OPTION_PASTE;
+  static const char* const OPTION_CLIPBOARD;
+
   // Signal names
   static const char* const SIGNAL_PRESSED;
   static const char* const SIGNAL_HIDE_FINISHED;
@@ -123,10 +151,14 @@ public:
   /**
    * Create a background to be used when button pressed
    * @param[in] requiredSize size Image actor should be
-   * @param[in] finalFlag flag to be set if option is the final one.
    * @return Returns an Image Actor to be used a pressed background
    */
-  ImageActor CreatePressedBackground( const Vector3 requiredSize, const bool finalFlag );
+  ImageActor CreatePressedBackground( const Vector3 requiredSize );
+
+  /**
+   * Creates a ordered vector of button options
+   */
+  void CreateOrderedListOfOptions();
 
   /**
    * Adds a popup option.
@@ -171,10 +203,72 @@ public:
    */
   Actor GetRootActor() const;
 
+  /**
+   * Set the Cut and Paste buttons color when in normal state
+   * @param[in] color color to use
+   */
+  void SetCutPastePopUpColor( const Vector4& color );
+
+  /**
+   * Get the set color of the Copy and Paste PopUp buttons
+   * @return color
+   */
+  const Vector4& GetCutPastePopUpColor() const;
+
+  /**
+   * Set the Cut and Paste button color when pressed.
+   * @param[in] color color to use
+   */
+  void SetCutPastePopUpPressedColor( const Vector4& color );
+
+  /**
+   * Get the Cut and Paste pressed button color.
+   * @return color
+   */
+  const Vector4& GetCutPastePopUpPressedColor() const;
+
+  /**
+   * Toggle if a popup button should be enabled (shown) or not
+   * @param[in]  requiredButton Button Id to enable or disable
+   * @param[in]  enable toggle to enable (true) or disable (false)
+   */
+  void TogglePopUpButtonOnOff( TextInputPopup::Buttons requiredButton, bool enable );
+
+  /**
+   * Set the Button Priority Position
+   * @param[in] button Button id for priority to be set on
+   * @param[in] priority Priority level, 1 is highest so will appear first.  0 priority will not show the button.
+   */
+  void SetButtonPriorityPosition( TextInputPopup::Buttons button, unsigned int priority );
+
+  /**
+   * Get the Button Priority Position
+   * @param[in] button Button id to get priority of
+   * @return the button priority, 1 is highest, 0 is not shown.
+   */
+  unsigned int GetButtonPriorityPosition( TextInputPopup::Buttons button ) const;
+
+  /**
+   * Adds Popup options which have been enabled.
+   */
+  void AddPopupOptions();
+
 private:
 
   /**
-   * Adds popup to the stage (ideally on a separate top-most layer and as an overlay)
+   * Creates a Button with the required parameters.
+   * @param[in] buttonId enum representing the button
+   * @param[in] orderOfPriority Position in toolbar button should be position, 1 is first from left to right.
+   * @param[in] name Given name for Button actor
+   * @param[in] caption Text to display in button
+   * @param[in] iconImage Icon to display in button
+   * @param[in] enabled Toggle if button should be used or not, this is decided by the current state/conditions.
+   */
+  TextInputPopup::ButtonRequirement CreateRequiredButton( TextInputPopup::Buttons buttonId, std::size_t orderOfPriority,
+                                                                          const std::string& name, const std::string& caption, Image iconImage, bool enabled );
+
+  /**
+   * Adds Popup to the stage (ideally on a separate top-most layer and as an overlay)
    */
   void AddToStage();
 
@@ -184,12 +278,12 @@ private:
   void ApplyConfinementConstraint();
 
   /**
-   * Removes popup from the stage.
+   * Removes Popup from the stage.
    */
   void RemoveFromStage();
 
   /**
-   * Called when a button is pressed in the popup
+   * Called when a button is pressed in the Popup
    * @param[in] button The button pressed.
    */
   bool OnButtonPressed( Toolkit::Button button );
@@ -219,6 +313,20 @@ private:
   ActorContainer mButtonContainer;                    ///< List of buttons added to popup.
   ActorContainer mDividerContainer;                   ///< List of dividers added to popup.
   Animation mAnimation;                               ///< Popup Hide/Show animation.
+
+  std::vector<ButtonRequirement> mOrderListOfButtons;        // List of buttons in the order to be displayed and a flag to indicate if needed.
+
+  Vector4           mCutPasteButtonsColor;  // Color of the cut and paste popup
+  Vector4           mCutPasteButtonsPressedColor;  // Color of the cut and paste buttons when pressed.
+  Vector4           mBorderColor; // Color of the border around the Cut and Paste Popup
+
+  // Priority of Options/Buttons in the Cut and Paste pop-up, higher priority buttons are displayed first, left to right.
+  std::size_t mSelectOptionPriority;  // Position of Select Button
+  std::size_t mSelectAllOptionPriority; // Position of Select All button
+  std::size_t mCutOptionPriority; // Position of Cut button
+  std::size_t mCopyOptionPriority; // Position of Copy button
+  std::size_t mPasteOptionPriority;  // Position of Paste button
+  std::size_t mClipboardOptionPriority;  // Position of Clipboard button
 
   PressedSignalV2 mPressedSignal;              ///< Signal emitted when a button within the popup is pressed.
   HideFinishedSignalV2 mHideFinishedSignal;    ///< Signal emitted when popup is completely hidden
