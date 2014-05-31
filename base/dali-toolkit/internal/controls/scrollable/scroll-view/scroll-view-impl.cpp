@@ -2143,17 +2143,23 @@ void ScrollView::OnPan(PanGesture gesture)
       self.SetProperty( mPropertyScrollStartPagePosition, GetCurrentScrollPosition() );
 
       //  Update property: X & Y = Position (only when in panning mode - in snapping mode, X & Y are animated).
-      Constraint constraint = Constraint::New<float>( mPropertyX,
-                                           LocalSource( mPropertyPosition ),
-                                           Source( self, mPropertyPanning ),
-                                           InternalXConstraint );
-      mScrollMainInternalXConstraint = self.ApplyConstraint(constraint);
+      if( ! mScrollMainInternalXConstraint )
+      {
+        Constraint constraint = Constraint::New<float>( mPropertyX,
+                                                        LocalSource( mPropertyPosition ),
+                                                        Source( self, mPropertyPanning ),
+                                                        InternalXConstraint );
+        mScrollMainInternalXConstraint = self.ApplyConstraint( constraint );
+      }
+      if( ! mScrollMainInternalYConstraint )
+      {
+        Constraint constraint = Constraint::New<float>( mPropertyY,
+                                                        LocalSource( mPropertyPosition ),
+                                                        Source( self, mPropertyPanning ),
+                                                        InternalYConstraint );
+        mScrollMainInternalYConstraint = self.ApplyConstraint( constraint );
+      }
 
-      constraint = Constraint::New<float>( mPropertyY,
-                                           LocalSource( mPropertyPosition ),
-                                           Source( self, mPropertyPanning ),
-                                           InternalYConstraint );
-      mScrollMainInternalYConstraint = self.ApplyConstraint(constraint);
       // When panning we want to make sure overshoot values are affected by pre position and post position
       SetOvershootConstraintsEnabled(true);
       break;
@@ -2174,6 +2180,8 @@ void ScrollView::OnPan(PanGesture gesture)
       // Remove X & Y position constraints as they are not required when we are not panning.
       self.RemoveConstraint(mScrollMainInternalXConstraint);
       self.RemoveConstraint(mScrollMainInternalYConstraint);
+      mScrollMainInternalXConstraint.Reset();
+      mScrollMainInternalYConstraint.Reset();
       break;
     }
 
