@@ -556,6 +556,21 @@ private: // private overriden functions from CustomActorImpl and Controls
 private:
 
   /**
+   * Start a timer which calls OnTouchDownTimeout()
+   */
+  void StartTouchDownTimer();
+
+  /**
+   * Stop a timer which calls OnTouchDownTimeout()
+   */
+  void StopTouchDownTimer();
+
+  /**
+   * Helper to detect when touch-point has been down (outside of pan gesture)
+   */
+  bool OnTouchDownTimeout();
+
+  /**
    * Called whenever a snap animation has completed
    * @param[in] source the Animation instance that has completed.
    */
@@ -806,7 +821,6 @@ private:
   bool mScrolling;                      ///< Flag indicating whether the scroll view is being scrolled (by user or animation)
   bool mScrollInterrupted;              ///< Flag set for when a down event interrupts a scroll
   unsigned long mTouchDownTime;         ///< The touch down time
-  Vector2 mTouchDownPosition;           ///< The touch down position
 
   bool mSensitive;                      ///< Scroll Sensitivity Flag.
 
@@ -834,7 +848,7 @@ private:
   RulerPtr mRulerScaleX;
   RulerPtr mRulerScaleY;
   RulerPtr mRulerRotation;
-  bool mTouchDownReceived;
+  bool mTouchDownTimeoutReached;
   bool mActorAutoSnapEnabled;           ///< Whether to automatically snap to closest actor.
   bool mAutoResizeContainerEnabled;     ///< Whether to automatically resize container (affects RulerDomain's on X/Y axes)
   bool mWrapMode;                       ///< Whether to wrap contents based on container size.
@@ -851,6 +865,7 @@ private:
   Vector2 mLastVelocity;                ///< Record the last velocity from PanGesture (Finish event doesn't have correct velocity)
   LockAxis mLockAxis;
 
+  Timer mTouchDownTimer;                ///< Used to interrupt snap-animation. This cannot be done in OnTouchEvent without breaking fast flick behavior.
   Timer mOvershootRefreshTimer;
   Timer mRefreshTimer;                  ///< Refresh timer is used to provide the Application developer with updates as animations run.
   int mRefreshIntervalMilliseconds;     ///< Refresh timer interval.

@@ -44,7 +44,8 @@ const float AUTOLOCK_AXIS_MINIMUM_DISTANCE2 = 100.0f;                           
 const float FLICK_ORTHO_ANGLE_RANGE = 60.0f;                                              ///< degrees. (if >45, then supports diagonal flicking)
 const unsigned int MAXIMUM_NUMBER_OF_VALUES = 5;                                          ///< Number of values to use for weighted pan calculation.
 const Vector2 DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION = Vector2(0.17f, 0.1f); ///< The step of horizontal scroll distance in the proportion of stage size for each mouse wheel event received.
-const unsigned long MINIMUM_TIME_BETWEEN_DOWN_AND_UP_FOR_RESET( 150u );
+const unsigned long MINIMUM_TIME_BETWEEN_DOWN_AND_UP_FOR_RESET( 150u );                   ///< Determines whether velocity is reset after tap interrupts snap animation
+const float TOUCH_DOWN_TIMER_INTERVAL = 100.0f;                                           ///< After this time interval with touch-down, the snap animation will be interrupted (if no gesture has started).
 
 // predefined effect values
 const Vector3 ANGLE_CAROUSEL_ROTATE(Math::PI * 0.5f, Math::PI * 0.5f, 0.0f);
@@ -518,7 +519,7 @@ ScrollView::ScrollView()
   mRotationDelta(0.0f),
   mScrollPreRotation(0.0f),
   mScrollPostRotation(0.0f),
-  mTouchDownReceived(false),
+  mTouchDownTimeoutReached(false),
   mActorAutoSnapEnabled(false),
   mAutoResizeContainerEnabled(false),
   mWrapMode(false),
@@ -1878,6 +1879,49 @@ void ScrollView::OnChildRemove(Actor& child)
   UnbindActor(child);
 }
 
+void ScrollView::StartTouchDownTimer()
+{
+  if ( !mTouchDownTimer )
+  {
+    mTouchDownTimer = Timer::New( TOUCH_DOWN_TIMER_INTERVAL );
+    mTouchDownTimer.TickSignal().Connect( this, &ScrollView::OnTouchDownTimeout );
+  }
+
+  mTouchDownTimer.Start();
+}
+
+void ScrollView::StopTouchDownTimer()
+{
+  if ( mTouchDownTimer )
+  {
+    mTouchDownTimer.Stop();
+  }
+}
+
+bool ScrollView::OnTouchDownTimeout()
+{
+  mTouchDownTimeoutReached = true;
+
+  if( mSnapAnimation || mSnapXAnimation || mSnapYAnimation || mSnapOvershootAnimation )
+  {
+    mScrollInterrupted = true;
+    StopAnimation();
+  }
+
+  if(mScrolling) // are we interrupting a current scroll?
+  {
+    // reset domain offset as scrolling from original plane.
+    mDomainOffset = Vector3::ZERO;
+    Self().SetProperty(mPropertyDomainOffset, Vector3::ZERO);
+
+    mScrolling = false;
+    Vector3 currentScrollPosition = GetCurrentScrollPosition();
+    mScrollCompletedSignalV2.Emit( currentScrollPosition );
+  }
+
+  return false;
+}
+
 bool ScrollView::OnTouchEvent(const TouchEvent& event)
 {
   if(!mSensitive)
@@ -1894,44 +1938,29 @@ bool ScrollView::OnTouchEvent(const TouchEvent& event)
 
   if (event.GetPoint(0).state == TouchPoint::Down)
   {
-    mTouchDownTime = event.time;
-    mTouchDownReceived = true;
-    mTouchDownPosition = event.GetPoint(0).local;
-
-    if( mSnapAnimation || mSnapXAnimation || mSnapYAnimation || mSnapOvershootAnimation )
+    if(mGestureStackDepth==0)
     {
-      mScrollInterrupted = true;
-      StopAnimation();
-    }
+      mTouchDownTime = event.time;
 
-    if(mScrolling) // are we interrupting a current scroll?
-    {
-      // reset domain offset as scrolling from original plane.
-      mDomainOffset = Vector3::ZERO;
-      Self().SetProperty(mPropertyDomainOffset, Vector3::ZERO);
-
-      mScrolling = false;
-      Vector3 currentScrollPosition = GetCurrentScrollPosition();
-      mScrollCompletedSignalV2.Emit( currentScrollPosition );
+      // This allows time for a pan-gesture to start, to avoid breaking snap-animation behavior with fast flicks.
+      // If touch-down does not become a pan (after timeout interval), then snap-animation can be interrupted.
+      StartTouchDownTimer();
     }
   }
   else if(event.GetPoint(0).state == TouchPoint::Up)
   {
+    StopTouchDownTimer();
+
     // if the user touches and releases without enough movement to go
     // into a gesture state, then we should snap to nearest point.
     // otherwise our scroll could be stopped (interrupted) half way through an animation.
-    if(mGestureStackDepth==0 && mTouchDownReceived)
+    if(mGestureStackDepth==0 && mTouchDownTimeoutReached)
     {
       unsigned timeDelta( event.time - mTouchDownTime );
       if ( timeDelta >= MINIMUM_TIME_BETWEEN_DOWN_AND_UP_FOR_RESET )
       {
         // Reset the velocity only if down was received a while ago
         mLastVelocity = Vector2( 0.0f, 0.0f );
-      }
-      else
-      {
-        Vector2 positionDelta( mTouchDownPosition - event.GetPoint(0).local );
-        mLastVelocity = positionDelta / timeDelta;
       }
 
       // Only finish the transform if scrolling was interrupted on down or if we are scrolling
@@ -1940,7 +1969,7 @@ bool ScrollView::OnTouchEvent(const TouchEvent& event)
         FinishTransform();
       }
     }
-    mTouchDownReceived = false;
+    mTouchDownTimeoutReached = false;
     mScrollInterrupted = false;
   }
 
@@ -2058,6 +2087,7 @@ void ScrollView::GestureStarted()
   // we continue and combine the effects of the gesture instead of reseting.
   if(mGestureStackDepth++==0)
   {
+    StopTouchDownTimer();
     StopAnimation();
     mPanDelta = Vector3::ZERO;
     mScaleDelta = Vector3::ONE;
