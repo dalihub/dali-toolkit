@@ -1105,7 +1105,7 @@ bool ItemView::OnMouseWheelEvent(const MouseWheelEvent& event)
   {
     Actor self = Self();
     const Vector3 layoutSize = Self().GetCurrentSize();
-    float layoutPositionDelta = GetCurrentLayoutPosition(0) + (event.z * mMouseWheelScrollDistanceStep * mActiveLayout->GetScrollSpeedFactor());
+    float layoutPositionDelta = GetCurrentLayoutPosition(0) - (event.z * mMouseWheelScrollDistanceStep * mActiveLayout->GetScrollSpeedFactor());
     float firstItemScrollPosition = ClampFirstItemPosition(layoutPositionDelta, layoutSize, *mActiveLayout);
 
     mScrollPositionObject.SetProperty( ScrollConnector::SCROLL_POSITION, firstItemScrollPosition );

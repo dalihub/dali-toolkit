@@ -1993,14 +1993,14 @@ bool ScrollView::OnMouseWheelEvent(const MouseWheelEvent& event)
     if(mRulerX->GetType() == Ruler::Free)
     {
       // Free panning mode
-      targetScrollPosition.x -= event.z * mMouseWheelScrollDistanceStep.x;
+      targetScrollPosition.x += event.z * mMouseWheelScrollDistanceStep.x;
       ClampPosition(targetScrollPosition);
       ScrollTo(-targetScrollPosition);
     }
     else if(!mScrolling)
     {
       // Snap mode, only respond to the event when the previous snap animation is finished.
-      ScrollTo(GetCurrentPage() + event.z);
+      ScrollTo(GetCurrentPage() - event.z);
     }
   }
   else
@@ -2009,14 +2009,14 @@ bool ScrollView::OnMouseWheelEvent(const MouseWheelEvent& event)
     if(mRulerY->GetType() == Ruler::Free)
     {
       // Free panning mode
-      targetScrollPosition.y -= event.z * mMouseWheelScrollDistanceStep.y;
+      targetScrollPosition.y += event.z * mMouseWheelScrollDistanceStep.y;
       ClampPosition(targetScrollPosition);
       ScrollTo(-targetScrollPosition);
     }
     else if(!mScrolling)
     {
       // Snap mode, only respond to the event when the previous snap animation is finished.
-      ScrollTo(GetCurrentPage() + event.z * mRulerX->GetTotalPages());
+      ScrollTo(GetCurrentPage() - event.z * mRulerX->GetTotalPages());
     }
   }
 
