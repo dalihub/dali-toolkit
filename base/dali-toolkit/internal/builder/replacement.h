@@ -99,6 +99,13 @@ public:
    * @param node The TreeNode to check
    * @return Optional value
    */
+  OptionalUnsignedInt IsUnsignedInteger( const TreeNode & node ) const;
+
+  /* @brief Check node for a type
+   *
+   * @param node The TreeNode to check
+   * @return Optional value
+   */
   OptionalVector2 IsVector2( const TreeNode & node ) const;
 
   /* @brief Check node for a type

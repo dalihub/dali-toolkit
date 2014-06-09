@@ -206,7 +206,7 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     }
     case Property::UNSIGNED_INTEGER:
     {
-      if( OptionalInteger v = replacer.IsInteger(node) )
+      if( OptionalUnsignedInt v = replacer.IsUnsignedInteger( node) )
       {
         if( *v >= 0 ) // with a loss of resolution....
         {
