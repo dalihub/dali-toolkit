@@ -544,7 +544,6 @@ private:
 
   Animation mResizeAnimation;
   Animation mScrollAnimation;
-  Animation mScrollSpeedAnimation;
   Animation mScrollOvershootAnimation;
   bool      mAnimatingOvershootOn;          ///< whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
   bool      mAnimateOvershootOff;         ///< whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)

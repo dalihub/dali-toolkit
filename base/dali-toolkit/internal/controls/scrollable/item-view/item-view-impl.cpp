@@ -1347,11 +1347,6 @@ void ItemView::OnPan(PanGesture gesture)
       // Refresh order depends on the direction of the scroll; negative is towards the last item.
       mRefreshOrderHint = mScrollDistance < 0.0f;
 
-      RemoveAnimation(mScrollSpeedAnimation);
-      mScrollSpeedAnimation = Animation::New(0.3f);
-      mScrollSpeedAnimation.AnimateTo( Property(self, mPropertyScrollSpeed), mScrollSpeed, AlphaFunctions::Linear );
-      mScrollSpeedAnimation.Play();
-
       float layoutPositionDelta = GetCurrentLayoutPosition(0) + (mScrollDistance * mActiveLayout->GetScrollSpeedFactor());
 
       float firstItemScrollPosition = ClampFirstItemPosition(layoutPositionDelta, layoutSize, *mActiveLayout);
