@@ -850,7 +850,7 @@ private:
   unsigned long mTouchDownTime;         ///< The touch down time
 
   int mGestureStackDepth;               ///< How many gestures are currently occuring.
-
+  Vector2 mPanStartPosition;            ///< Where the pan gesture's touch down occured
   Vector3 mPanDelta;                    ///< Amount currently panned.
 
   unsigned int mScrollStateFlags;       ///< flags indicating current state of scrolling

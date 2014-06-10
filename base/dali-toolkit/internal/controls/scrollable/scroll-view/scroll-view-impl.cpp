@@ -276,13 +276,15 @@ ScrollView::LockAxis GetLockAxis(const Vector2& panDelta, ScrollView::LockAxis c
  */
 struct InternalPrePositionConstraint
 {
-  InternalPrePositionConstraint(const Vector2& initialPanMask,
+  InternalPrePositionConstraint(const Vector2& initialPanPosition,
+                                const Vector2& initialPanMask,
                                 bool axisAutoLock,
                                 float axisAutoLockGradient,
                                 ScrollView::LockAxis initialLockAxis,
                                 const Vector2& maxOvershoot,
                                 const RulerDomain& domainX, const RulerDomain& domainY)
-  : mInitialPanMask(initialPanMask),
+  : mLocalStart(initialPanPosition),
+    mInitialPanMask(initialPanMask),
     mDomainMin( -domainX.min, -domainY.min ),
     mDomainMax( -domainX.max, -domainY.max ),
     mMaxOvershoot(maxOvershoot),
@@ -297,7 +299,6 @@ struct InternalPrePositionConstraint
 
   Vector3 operator()(const Vector3&    current,
                      const PropertyInput& gesturePositionProperty,
-                     const PropertyInput& gestureDisplacementProperty,
                      const PropertyInput& sizeProperty)
   {
     Vector3 scrollPostPosition = current;
@@ -305,7 +306,6 @@ struct InternalPrePositionConstraint
 
     if(!mWasPanning)
     {
-      mLocalStart = gesturePositionProperty.GetVector2() - gestureDisplacementProperty.GetVector2();
       mPrePosition = current;
       mCurrentPanMask = mInitialPanMask;
       mWasPanning = true;
@@ -2508,6 +2508,7 @@ void ScrollView::OnPan(PanGesture gesture)
     case Gesture::Started:
     {
       DALI_LOG_SCROLL_STATE("[0x%X] Pan Started", this);
+      mPanStartPosition = gesture.position - gesture.displacement;
       UpdateLocalScrollProperties();
       GestureStarted();
       mPanning = true;
@@ -2769,9 +2770,8 @@ void ScrollView::UpdateMainInternalConstraint()
   {
     constraint = Constraint::New<Vector3>( mPropertyPrePosition,
                                                       Source( detector, PanGestureDetector::LOCAL_POSITION ),
-                                                      Source( detector, PanGestureDetector::LOCAL_DISPLACEMENT ),
                                                       Source( self, Actor::SIZE ),
-                                                      InternalPrePositionConstraint( initialPanMask, mAxisAutoLock, mAxisAutoLockGradient, mLockAxis, mMaxOvershoot, mRulerX->GetDomain(), mRulerY->GetDomain() ) );
+                                                      InternalPrePositionConstraint( mPanStartPosition, initialPanMask, mAxisAutoLock, mAxisAutoLockGradient, mLockAxis, mMaxOvershoot, mRulerX->GetDomain(), mRulerY->GetDomain() ) );
     mScrollMainInternalPrePositionConstraint = self.ApplyConstraint( constraint );
   }
 
