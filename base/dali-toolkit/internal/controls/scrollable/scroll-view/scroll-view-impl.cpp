@@ -2223,9 +2223,7 @@ void ScrollView::OnScrollAnimationFinished( Animation& source )
       scrollingFinished = true;
     }
     mInternalXAnimation.Reset();
-
-    // erase current state flags
-    mScrollStateFlags &= ~SCROLL_X_STATE_MASK;
+    SnapInternalXTo(mScrollPostPosition.x);
   }
 
   if( source == mInternalYAnimation )
@@ -2235,14 +2233,77 @@ void ScrollView::OnScrollAnimationFinished( Animation& source )
       scrollingFinished = true;
     }
     mInternalYAnimation.Reset();
-
-    // erase current state flags
-    mScrollStateFlags &= ~SCROLL_Y_STATE_MASK;
+    SnapInternalYTo(mScrollPostPosition.y);
   }
 
   if(scrollingFinished)
   {
     HandleSnapAnimationFinished();
+  }
+}
+
+void ScrollView::OnSnapInternalPositionFinished( Animation& source )
+{
+  Actor self = Self();
+  UpdateLocalScrollProperties();
+  if( source == mInternalXAnimation )
+  {
+    // clear internal x animation flags
+    mScrollStateFlags &= ~SCROLL_X_STATE_MASK;
+    mInternalXAnimation.Reset();
+    WrapPosition(mScrollPrePosition);
+  }
+  if( source == mInternalYAnimation )
+  {
+    mScrollStateFlags &= ~SCROLL_Y_STATE_MASK;
+    mInternalYAnimation.Reset();
+    WrapPosition(mScrollPrePosition);
+  }
+}
+
+void ScrollView::SnapInternalXTo(float position)
+{
+  Actor self = Self();
+
+  StopAnimation(mInternalXAnimation);
+
+  // erase current state flags
+  mScrollStateFlags &= ~SCROLL_X_STATE_MASK;
+
+  // if internal x not equal to inputed parameter, animate it
+  float duration = std::min(fabsf((position - mScrollPrePosition.x) / mMaxOvershoot.x) * mSnapOvershootDuration, mSnapOvershootDuration);
+  if( duration > Math::MACHINE_EPSILON_1 )
+  {
+    mInternalXAnimation = Animation::New(duration);
+    mInternalXAnimation.FinishedSignal().Connect(this, &ScrollView::OnSnapInternalPositionFinished);
+    mInternalXAnimation.AnimateTo(Property(self, mPropertyPrePosition, 0), position);
+    mInternalXAnimation.Play();
+
+    // add internal animation state flag
+    mScrollStateFlags |= SnappingInternalX;
+  }
+}
+
+void ScrollView::SnapInternalYTo(float position)
+{
+  Actor self = Self();
+
+  StopAnimation(mInternalYAnimation);
+
+  // erase current state flags
+  mScrollStateFlags &= ~SCROLL_Y_STATE_MASK;
+
+  // if internal y not equal to inputed parameter, animate it
+  float duration = std::min(fabsf((position - mScrollPrePosition.y) / mMaxOvershoot.y) * mSnapOvershootDuration, mSnapOvershootDuration);
+  if( duration > Math::MACHINE_EPSILON_1 )
+  {
+    mInternalYAnimation = Animation::New(duration);
+    mInternalYAnimation.FinishedSignal().Connect(this, &ScrollView::OnSnapInternalPositionFinished);
+    mInternalYAnimation.AnimateTo(Property(self, mPropertyPrePosition, 1), position);
+    mInternalYAnimation.Play();
+
+    // add internal animation state flag
+    mScrollStateFlags |= SnappingInternalY;
   }
 }
 
