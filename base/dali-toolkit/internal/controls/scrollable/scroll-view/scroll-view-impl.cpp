@@ -25,6 +25,14 @@
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
 #include <dali/integration-api/debug.h>
 
+#define ENABLED_SCROLL_STATE_LOGGING
+
+#ifdef ENABLED_SCROLL_STATE_LOGGING
+#define DALI_LOG_SCROLL_STATE(format, args...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, "%s:%d " format, __PRETTY_FUNCTION__, __LINE__, ## args)
+#else
+#define DALI_LOG_SCROLL_STATE(format, args...)
+#endif
+
 // TODO: Change to two class system:
 // 1. DraggableActor (is an actor which can be dragged anywhere/scaled/rotated, can be set to range using the ruler)
 // 2. ScrollView (contains a draggable actor that can a) be dragged in the negative X, and Y domain, b) has a hitArea for touches)
@@ -672,6 +680,8 @@ void ScrollView::OnInitialize()
 
 void ScrollView::OnControlStageConnection()
 {
+  DALI_LOG_SCROLL_STATE("[0x%X]", this);
+
   if ( mSensitive )
   {
     SetScrollSensitive( false );
@@ -686,11 +696,14 @@ void ScrollView::OnControlStageConnection()
 
 void ScrollView::OnControlStageDisconnection()
 {
+  DALI_LOG_SCROLL_STATE("[0x%X]", this);
+
   StopAnimation();
 }
 
 ScrollView::~ScrollView()
 {
+  DALI_LOG_SCROLL_STATE("[0x%X]", this);
 }
 
 AlphaFunction ScrollView::GetScrollSnapAlphaFunction() const
@@ -1014,6 +1027,8 @@ void ScrollView::SetScrollSensitive(bool sensitive)
   Actor self = Self();
   PanGestureDetector panGesture( GetPanGestureDetector() );
 
+  DALI_LOG_SCROLL_STATE("[0x%X] sensitive[%d]", this, int(sensitive));
+
   if((!mSensitive) && (sensitive))
   {
     mSensitive = sensitive;
@@ -1235,6 +1250,7 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
   {
     // set mScrolling to false, in case user has code that interrogates mScrolling Getter() in complete.
     mScrolling = false;
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 1 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
     mScrollCompletedSignalV2.Emit( currentScrollPosition );
   }
 
@@ -1258,6 +1274,7 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
     // if not animating, then this pan has completed right now.
     Self().SetProperty(mPropertyScrolling, false);
     mScrolling = false;
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 2 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
     mScrollCompletedSignalV2.Emit( currentScrollPosition );
   }
 }
@@ -1885,6 +1902,7 @@ void ScrollView::HandleSnapAnimationFinished()
   self.SetProperty(mPropertyPrePosition, mScrollPrePosition);
 
   Vector3 currentScrollPosition = GetCurrentScrollPosition();
+  DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 3 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
   mScrollCompletedSignalV2.Emit( currentScrollPosition );
 
   mDomainOffset += deltaPosition - mScrollPostPosition;
@@ -1969,6 +1987,7 @@ void ScrollView::OnPropertySet( Property::Index index, Property::Value propertyV
   }
   else if( index == mPropertyPrePosition )
   {
+    DALI_LOG_SCROLL_STATE("[0x%X]", this);
     propertyValue.Get(mScrollPrePosition);
   }
 }
@@ -2008,6 +2027,7 @@ bool ScrollView::OnTouchDownTimeout()
 
       UpdateLocalScrollProperties();
       Vector3 currentScrollPosition = GetCurrentScrollPosition();
+      DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 4 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
       mScrollCompletedSignalV2.Emit( currentScrollPosition );
     }
   }
@@ -2354,6 +2374,7 @@ void ScrollView::GestureStarted()
       mScrolling = false;
       // send negative scroll position since scroll internal scroll position works as an offset for actors,
       // give applications the position within the domain from the scroll view's anchor position
+      DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 5 [%.2f, %.2f]", this, -mScrollPostPosition.x, -mScrollPostPosition.y);
       mScrollCompletedSignalV2.Emit( -mScrollPostPosition );
     }
   }
@@ -2492,6 +2513,7 @@ void ScrollView::FinishTransform()
     mScrolling = false;
     Self().SetProperty(mPropertyScrolling, false);
     Vector3 currentScrollPosition = GetCurrentScrollPosition();
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 6 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
     mScrollCompletedSignalV2.Emit( currentScrollPosition );
   }
 }
