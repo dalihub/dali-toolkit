@@ -649,27 +649,6 @@ private:
   void OnScrollAnimationFinished( Animation& source );
 
   /**
-   * Called when either the X or Y internal scroll positions have finished snapping back to mPropertyPrePosition
-   *
-   * @param[in] source the Animation instance that has completed.
-   */
-  void OnSnapInternalPositionFinished( Animation& source );
-
-  /**
-   * Called whenever a snap animation on the x-axis has completed and we need to snap pre scroll
-   * position to our clamped position
-   * @param[in] position The x position to snap pre scroll property to
-   */
-  void SnapInternalXTo( float position );
-
-  /**
-   * Called whenever a snap animation on the y-axis has completed and we need to snap pre scroll
-   * position to our clamped position
-   * @param[in] position The y position to snap pre scroll property to
-   */
-  void SnapInternalYTo( float position );
-
-  /**
    * This is called internally whenever the Scroll Rulers are
    * modified. This will update the properties: 'scroll-position-min'
    * and 'scroll-position-max' to reflect the changes.
