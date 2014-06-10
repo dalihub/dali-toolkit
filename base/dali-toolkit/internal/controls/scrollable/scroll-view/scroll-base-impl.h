@@ -199,8 +199,6 @@ protected:
 
   ScrollBase *mParent;                              ///< Pointer to ScrollBase parent, if exists.
   Property::Index mPropertyTime;                    ///< Scroll Time (0 to animationDuration while animating, otherwise 0)
-  Property::Index mPropertyX;                       ///< Scroll Position X ("scroll-x")
-  Property::Index mPropertyY;                       ///< Scroll Position Y ("scroll-y")
   Property::Index mPropertyPrePosition;             ///< Scroll Position ("scroll-position") [function of scroll-x, scroll-y]
   Property::Index mPropertyPosition;                ///< Scroll Position ("scroll-position") [function of scroll-pre-position]
   Property::Index mPropertyScale;                   ///< Scroll Scale ("scroll-scale")

@@ -407,8 +407,6 @@ public:
   static const std::string SCROLL_OVERSHOOT_X_PROPERTY_NAME;            ///< Property, name "scroll-overshoot-x",         type float
   static const std::string SCROLL_OVERSHOOT_Y_PROPERTY_NAME;            ///< Property, name "scroll-overshoot-y",         type float
   static const std::string SCROLL_FINAL_PROPERTY_NAME;                  ///< Property, name "scroll-final",              type VECTOR3
-  static const std::string SCROLL_X_PROPERTY_NAME;                      ///< Property, name "scroll-x",                  type FLOAT
-  static const std::string SCROLL_Y_PROPERTY_NAME;                      ///< Property, name "scroll-y",                  type FLOAT
   static const std::string SCROLL_SCALE_PROPERTY_NAME;                  ///< Property, name "scroll-scale",              type VECTOR3
   static const std::string SCROLL_WRAP_PROPERTY_NAME;                   ///< Property, name "scroll-wrap",               type BOOLEAN
   static const std::string SCROLL_PANNING_PROPERTY_NAME;                ///< Property, name "scroll-panning",            type BOOLEAN

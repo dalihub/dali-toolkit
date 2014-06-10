@@ -279,8 +279,6 @@ const std::string ScrollView::SCROLL_PRE_POSITION_PROPERTY_NAME( "scroll-pre-pos
 const std::string ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME( "scroll-overshoot-x" );
 const std::string ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME( "scroll-overshoot-y" );
 const std::string ScrollView::SCROLL_FINAL_PROPERTY_NAME( "scroll-final" );
-const std::string ScrollView::SCROLL_X_PROPERTY_NAME( "scroll-x" );
-const std::string ScrollView::SCROLL_Y_PROPERTY_NAME( "scroll-y" );
 const std::string ScrollView::SCROLL_SCALE_PROPERTY_NAME( "scroll-scale" );
 const std::string ScrollView::SCROLL_WRAP_PROPERTY_NAME( "scroll-wrap" );
 const std::string ScrollView::SCROLL_PANNING_PROPERTY_NAME( "scroll-panning" );

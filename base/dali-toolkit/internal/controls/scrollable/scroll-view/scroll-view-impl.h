@@ -912,8 +912,6 @@ private:
   //ScrollInternalConstraintsPtr mScrollInternalConstraints;
   ActiveConstraint mScrollMainInternalPrePositionConstraint;
   ActiveConstraint mScrollMainInternalPositionConstraint;
-  ActiveConstraint mScrollMainInternalXConstraint;
-  ActiveConstraint mScrollMainInternalYConstraint;
   ActiveConstraint mScrollMainInternalOvershootXConstraint;
   ActiveConstraint mScrollMainInternalOvershootYConstraint;
   ActiveConstraint mScrollMainInternalDeltaConstraint;

@@ -487,26 +487,6 @@ struct OvershootYConstraint
 };
 
 /**
- * When panning, this constraint updates the X property, otherwise
- * it has no effect on the X property.
- */
-float InternalXConstraint(const float&    current,
-                          const PropertyInput& scrollPosition)
-{
-  return scrollPosition.GetVector3().x;
-}
-
-/**
- * When panning, this constraint updates the Y property, otherwise
- * it has no effect on the Y property.
- */
-float InternalYConstraint(const float&    current,
-                          const PropertyInput& scrollPosition)
-{
-  return scrollPosition.GetVector3().y;
-}
-
-/**
  * Internal Position-Delta Property Constraint.
  *
  * Generates position-delta property based on scroll-position + scroll-offset properties.
@@ -2013,21 +1993,7 @@ void ScrollView::OnChildRemove(Actor& child)
 void ScrollView::OnPropertySet( Property::Index index, Property::Value propertyValue )
 {
   Actor self = Self();
-  if( index == mPropertyX )
-  {
-    self.GetProperty(mPropertyPrePosition).Get(mScrollPrePosition);
-    propertyValue.Get(mScrollPrePosition.x);
-    DALI_LOG_SCROLL_STATE("[0x%X] Setting mPropertyPrePosition To[%.2f, %.2f]", this, mScrollPrePosition.x, mScrollPrePosition.y );
-    self.SetProperty(mPropertyPrePosition, mScrollPrePosition);
-  }
-  else if( index == mPropertyY )
-  {
-    self.GetProperty(mPropertyPrePosition).Get(mScrollPrePosition);
-    propertyValue.Get(mScrollPrePosition.y);
-    DALI_LOG_SCROLL_STATE("[0x%X] Setting mPropertyPrePosition To[%.2f, %.2f]", this, mScrollPrePosition.x, mScrollPrePosition.y );
-    self.SetProperty(mPropertyPrePosition, mScrollPrePosition);
-  }
-  else if( index == mPropertyPrePosition )
+  if( index == mPropertyPrePosition )
   {
     DALI_LOG_SCROLL_STATE("[0x%X]: mPropertyPrePosition[%.2f, %.2f]", this, propertyValue.Get<Vector3>().x, propertyValue.Get<Vector3>().y);
     propertyValue.Get(mScrollPrePosition);
@@ -2742,8 +2708,6 @@ void ScrollView::UpdateMainInternalConstraint()
     self.RemoveConstraint(mScrollMainInternalDeltaConstraint);
     self.RemoveConstraint(mScrollMainInternalFinalConstraint);
     self.RemoveConstraint(mScrollMainInternalRelativeConstraint);
-    self.RemoveConstraint(mScrollMainInternalXConstraint);
-    self.RemoveConstraint(mScrollMainInternalYConstraint);
   }
   if( mScrollMainInternalPrePositionConstraint )
   {
@@ -2806,16 +2770,6 @@ void ScrollView::UpdateMainInternalConstraint()
                                          LocalSource( Actor::SIZE ),
                                          InternalRelativePositionConstraint );
   mScrollMainInternalRelativeConstraint = self.ApplyConstraint( constraint );
-
-  constraint = Constraint::New<float>( mPropertyX,
-                                         LocalSource( mPropertyPrePosition ),
-                                         InternalXConstraint );
-  mScrollMainInternalXConstraint = self.ApplyConstraint( constraint );
-
-  constraint = Constraint::New<float>( mPropertyY,
-                                         LocalSource( mPropertyPrePosition ),
-                                         InternalYConstraint );
-  mScrollMainInternalYConstraint = self.ApplyConstraint( constraint );
 
   // When panning we want to make sure overshoot values are affected by pre position and post position
   SetOvershootConstraintsEnabled(!mWrapMode);
