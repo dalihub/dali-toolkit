@@ -911,6 +911,10 @@ private:
   RulerPtr mRulerScaleY;
   RulerPtr mRulerRotation;
 
+  // Last property values set to ScrollView
+  Vector3 mMinScroll;
+  Vector3 mMaxScroll;
+
   unsigned int mMinTouchesForPanning;   ///< Minimum number of touches for panning to be used.
   unsigned int mMaxTouchesForPanning;   ///< Maximum number of touches for panning to be used.
 

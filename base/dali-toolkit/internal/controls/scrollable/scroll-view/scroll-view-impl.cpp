@@ -914,8 +914,8 @@ void ScrollView::SetRulerY(RulerPtr ruler)
 void ScrollView::UpdatePropertyDomain(const Vector3& size)
 {
   Actor self = Self();
-  Vector3 min = self.GetProperty<Vector3>(mPropertyPositionMin);
-  Vector3 max = self.GetProperty<Vector3>(mPropertyPositionMax);
+  Vector3 min = mMinScroll;
+  Vector3 max = mMaxScroll;
   bool scrollPositionChanged = false;
   bool domainChanged = false;
 
@@ -984,6 +984,8 @@ void ScrollView::UpdatePropertyDomain(const Vector3& size)
   }
   if( domainChanged )
   {
+    mMinScroll = min;
+    mMaxScroll = max;
     self.SetProperty(mPropertyPositionMin, min );
     self.SetProperty(mPropertyPositionMax, max );
   }
