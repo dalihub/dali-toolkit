@@ -434,12 +434,17 @@ struct OvershootXConstraint
 
   float operator()(const float&    current,
       const PropertyInput& scrollPrePositionProperty,
-      const PropertyInput& scrollPostPositionProperty)
+      const PropertyInput& scrollPostPositionProperty,
+      const PropertyInput& canScrollProperty)
   {
-    const Vector3& scrollPrePosition = scrollPrePositionProperty.GetVector3();
-    const Vector3& scrollPostPosition = scrollPostPositionProperty.GetVector3();
-    float newOvershoot = scrollPrePosition.x - scrollPostPosition.x;
-    return (newOvershoot > 0.0f ? std::min(newOvershoot, mMaxOvershoot) : std::max(newOvershoot, -mMaxOvershoot)) / mMaxOvershoot;
+    if( canScrollProperty.GetBoolean() )
+    {
+      const Vector3& scrollPrePosition = scrollPrePositionProperty.GetVector3();
+      const Vector3& scrollPostPosition = scrollPostPositionProperty.GetVector3();
+      float newOvershoot = scrollPrePosition.x - scrollPostPosition.x;
+      return (newOvershoot > 0.0f ? std::min(newOvershoot, mMaxOvershoot) : std::max(newOvershoot, -mMaxOvershoot)) / mMaxOvershoot;
+    }
+    return 0.0f;
   }
 
   float mMaxOvershoot;
@@ -455,12 +460,17 @@ struct OvershootYConstraint
 
   float operator()(const float&    current,
       const PropertyInput& scrollPrePositionProperty,
-      const PropertyInput& scrollPostPositionProperty)
+      const PropertyInput& scrollPostPositionProperty,
+      const PropertyInput& canScrollProperty)
   {
-    const Vector3& scrollPrePosition = scrollPrePositionProperty.GetVector3();
-    const Vector3& scrollPostPosition = scrollPostPositionProperty.GetVector3();
-    float newOvershoot = scrollPrePosition.y - scrollPostPosition.y;
-    return (newOvershoot > 0.0f ? std::min(newOvershoot, mMaxOvershoot) : std::max(newOvershoot, -mMaxOvershoot)) / mMaxOvershoot;
+    if( canScrollProperty.GetBoolean() )
+    {
+      const Vector3& scrollPrePosition = scrollPrePositionProperty.GetVector3();
+      const Vector3& scrollPostPosition = scrollPostPositionProperty.GetVector3();
+      float newOvershoot = scrollPrePosition.y - scrollPostPosition.y;
+      return (newOvershoot > 0.0f ? std::min(newOvershoot, mMaxOvershoot) : std::max(newOvershoot, -mMaxOvershoot)) / mMaxOvershoot;
+    }
+    return 0.0f;
   }
 
   float mMaxOvershoot;
@@ -929,10 +939,10 @@ void ScrollView::UpdatePropertyDomain(const Vector3& size)
         scrollPositionChanged = true;
         mScrollPrePosition.x = Clamp(mScrollPrePosition.x, -(max.x - size.x), -min.x);
       }
-      if((fabsf(max.x - min.x) - size.x) > Math::MACHINE_EPSILON_10000)
-      {
-        canScrollHorizontal = true;
-      }
+    }
+    if( (fabsf(rulerDomain.max - rulerDomain.min) - size.x) > Math::MACHINE_EPSILON_10000 )
+    {
+      canScrollHorizontal = true;
     }
   }
 
@@ -953,10 +963,10 @@ void ScrollView::UpdatePropertyDomain(const Vector3& size)
         scrollPositionChanged = true;
         mScrollPrePosition.y = Clamp(mScrollPrePosition.y, -(max.y - size.y), -min.y);
       }
-      if((fabsf(max.y - min.y) - size.y) > Math::MACHINE_EPSILON_10000)
-      {
-        canScrollVertical = true;
-      }
+    }
+    if( (fabsf(rulerDomain.max - rulerDomain.min) - size.y) > Math::MACHINE_EPSILON_10000 )
+    {
+      canScrollVertical = true;
     }
   }
   // avoid setting properties if possible, otherwise this will cause an entire update as well as triggering constraints using each property we update
@@ -966,7 +976,7 @@ void ScrollView::UpdatePropertyDomain(const Vector3& size)
   }
   if( self.GetProperty<bool>(mPropertyCanScrollHorizontal) != canScrollHorizontal )
   {
-    self.SetProperty(mPropertyCanScrollHorizontal, canScrollVertical);
+    self.SetProperty(mPropertyCanScrollHorizontal, canScrollHorizontal);
   }
   if( scrollPositionChanged )
   {
@@ -2702,12 +2712,14 @@ void ScrollView::SetOvershootConstraintsEnabled(bool enabled)
     Constraint constraint = Constraint::New<float>( mPropertyOvershootX,
                                            LocalSource( mPropertyPrePosition ),
                                            LocalSource( mPropertyPosition ),
+                                           LocalSource( mPropertyCanScrollHorizontal ),
                                            OvershootXConstraint(mMaxOvershoot.x) );
     mScrollMainInternalOvershootXConstraint = self.ApplyConstraint( constraint );
 
     constraint = Constraint::New<float>( mPropertyOvershootY,
                                            LocalSource( mPropertyPrePosition ),
                                            LocalSource( mPropertyPosition ),
+                                           LocalSource( mPropertyCanScrollVertical ),
                                            OvershootYConstraint(mMaxOvershoot.y) );
     mScrollMainInternalOvershootYConstraint = self.ApplyConstraint( constraint );
   }
