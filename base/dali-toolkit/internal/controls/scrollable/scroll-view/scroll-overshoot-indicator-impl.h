@@ -19,7 +19,6 @@
  */
 
 #include <dali/dali.h>
-#include <dali-toolkit/public-api/shader-effects/bouncing-effect.h>
 
 namespace Dali
 {
@@ -71,11 +70,22 @@ public:
   void Reset();
 
   /**
+   * Clears the overshoot
+   */
+  void ClearOvershoot();
+
+  /**
    * Create an initialized ScrollOvershootIndicator
    *
    * @return A pointer to the created ScrollOvershootIndicator.
    */
   static ScrollOvershootIndicator* New();
+
+  /**
+   * Set the color of the overshoot effect.
+   * @parm[in] color The color of the overshoot effect
+   */
+  void SetOvershootEffectColor( const Vector4& color );
 
 private:
   ScrollOvershootEffectPtr mEffectX;                      ///< effect used for x-axis/horizontal display
@@ -132,6 +142,19 @@ public:
    */
   virtual void UpdatePropertyNotifications() {}
 
+  /**
+   * @copydoc ScrollOvershootIndicator::SetOvershootEffectColor()
+   */
+  virtual void SetOvershootEffectColor( const Vector4& color ) = 0;
+
+  /**
+   * Sets shader overshoot value, either immediately of by animating over time
+   *
+   * @param[in] amount The amount to set overshoot to [-1.0f,1.0f]
+   * @param[in] animate Whether to animate or set immediately
+   */
+  virtual void SetOvershoot(float amount, bool animate = true) = 0;
+
 private:
   bool mVertical;                      ///< whether this is a vertical/horizontal effect
 };
@@ -179,6 +202,11 @@ public:
   void UpdatePropertyNotifications();
 
   /**
+   * @copydoc ScrollOvershootEffect::SetOvershootEffectColor()
+   */
+  void SetOvershootEffectColor( const Vector4& color );
+
+  /**
    * Updates the vibility of the overshoot image as well as updating its size, position and rotation
    * This function is called when animation starts and finishes
    *
@@ -195,10 +223,7 @@ public:
   void OnOvershootNotification(PropertyNotification& source);
 
   /**
-   * Sets shader overshoot value, either immediately of by animating over time
-   *
-   * @param[in] amount The amount to set overshoot to [-1.0f,1.0f]
-   * @param[in] animate Whether to animate or set immediately
+   * @copydoc ScrollOvershootEffect::SetOvershoot()
    */
   void SetOvershoot(float amount, bool animate = true);
 
@@ -218,9 +243,8 @@ public:
   static ScrollOvershootEffectRipplePtr New( bool vertical, Scrollable& scrollable );
 
 private:
-  ImageActor            mOvershootImage;               ///< the overshoot image...
+  Actor                 mOvershootOverlay;             ///< the actor which displays the overshoot effect
   Scrollable&           mAttachedScrollView;           ///< the actor that this indicator has been attached to
-  BouncingEffect        mRippleEffect;                 ///< the ripple vertex/fragment shader effect
   Animation             mScrollOvershootAnimation;     ///< overshoot animation
   PropertyNotification  mOvershootIncreaseNotification;///< notification used to inform as overshoot increases
   PropertyNotification  mOvershootDecreaseNotification;///< notification used to inform as overshoot decreases

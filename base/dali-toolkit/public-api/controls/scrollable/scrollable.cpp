@@ -109,6 +109,16 @@ void Scrollable::DisableScrollComponent(Scrollable::ScrollComponentType indicato
   GetImpl(*this).DisableScrollComponent(indicator);
 }
 
+void Scrollable::SetOvershootEffectColor( const Vector4& color )
+{
+  GetImpl(*this).SetOvershootEffectColor(color);
+}
+
+Vector4 Scrollable::GetOvershootEffectColor() const
+{
+  return GetImpl(*this).GetOvershootEffectColor();
+}
+
 } // namespace Toolkit
 
 } // namespace Dali

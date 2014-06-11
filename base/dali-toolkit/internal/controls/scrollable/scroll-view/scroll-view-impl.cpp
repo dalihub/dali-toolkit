@@ -1905,6 +1905,15 @@ void ScrollView::RemoveOverlay(Actor actor)
   mInternalActor.Remove( actor );
 }
 
+void ScrollView::SetOvershootEffectColor( const Vector4& color )
+{
+  mOvershootEffectColor = color;
+  if( mOvershootIndicator )
+  {
+    mOvershootIndicator->SetOvershootEffectColor( color );
+  }
+}
+
 void ScrollView::SetScrollingDirection( Radian direction, Radian threshold )
 {
   PanGestureDetector panGesture( GetPanGestureDetector() );
@@ -2586,6 +2595,11 @@ void ScrollView::OnPan(PanGesture gesture)
         if( mScrollMainInternalPrePositionConstraint )
         {
           self.RemoveConstraint(mScrollMainInternalPrePositionConstraint);
+        }
+
+        if( mOvershootIndicator )
+        {
+          mOvershootIndicator->ClearOvershoot();
         }
       }
       else

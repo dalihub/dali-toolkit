@@ -103,11 +103,18 @@ public:
   static const std::string SCROLL_POSITION_MAX_PROPERTY_NAME;           ///< Property, name "scroll-position-max",      type VECTOR3
   static const std::string SCROLL_DIRECTION_PROPERTY_NAME;              ///< Property, name "scroll-direction",         type VECTOR2
 
-  //Signal Names
+  /// @name Properties
+  /** @{ */
+  static const Property::Index PROPERTY_OVERSHOOT_EFFECT_COLOR;         ///< Property, name "overshoot-effect-color",  @see SetOvershootEffectColor(),  type VECTOR4
+  /** @} */
+
+  /// @name Signals
+  /** @{ */
   static const char* const SIGNAL_SCROLL_STARTED;   ///< "scroll-started";
   static const char* const SIGNAL_SCROLL_COMPLETED; ///< "scroll-completed";
   static const char* const SIGNAL_SCROLL_UPDATED;   ///< "scroll-updated";
   static const char* const SIGNAL_SCROLL_CLAMPED;   ///< "scroll-clamped";
+  /** @} */
 
 public:
 
@@ -203,6 +210,19 @@ public:
    * @param[in] type The Scroll Component Type to disable
    */
   void DisableScrollComponent(Scrollable::ScrollComponentType type);
+
+  /**
+   * @brief Set the color of the overshoot effect.
+   *
+   * @param[in] color The color of the overshoot effect.
+   */
+  void SetOvershootEffectColor( const Vector4& color );
+
+  /**
+   * @brief Get the color of the overshoot effect.
+   * @return The color of the overshoot effect.
+   */
+  Vector4 GetOvershootEffectColor() const;
 
 public: // Not intended for application developers
 

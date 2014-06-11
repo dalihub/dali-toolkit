@@ -32,11 +32,14 @@ namespace Dali
 namespace Toolkit
 {
 
+const Property::Index Scrollable::PROPERTY_OVERSHOOT_EFFECT_COLOR( Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX + 1 );
+
 namespace Internal
 {
 
 namespace
 {
+const Vector4 DEFAULT_OVERSHOOT_COLOUR(0.0f, 0.64f, 0.85f, 0.25f);
 
 BaseHandle Create()
 {
@@ -51,11 +54,17 @@ SignalConnectorType s2(mType, Toolkit::Scrollable::SIGNAL_SCROLL_COMPLETED, &Scr
 SignalConnectorType s3(mType, Toolkit::Scrollable::SIGNAL_SCROLL_UPDATED,   &Scrollable::DoConnectSignal);
 SignalConnectorType s4(mType, Toolkit::Scrollable::SIGNAL_SCROLL_CLAMPED,   &Scrollable::DoConnectSignal);
 
+PropertyRegistration property1( mType,
+                                "overshoot-effect-color",
+                                Toolkit::Scrollable::PROPERTY_OVERSHOOT_EFFECT_COLOR,
+                                Property::VECTOR4,
+                                &Scrollable::SetProperty,
+                                &Scrollable::GetProperty );
+
 }
 
 const std::string Scrollable::SCROLLABLE_CAN_SCROLL_VERTICAL( "scrollable-can-scroll-vertical" );
 const std::string Scrollable::SCROLLABLE_CAN_SCROLL_HORIZONTAL( "scrollable-can-scroll-horizontal" );
-const Vector4     Scrollable::DEFAULT_OVERSHOOT_COLOUR(0.0f, 0.64f, 0.85f, 0.6f);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Scrollable
@@ -65,6 +74,7 @@ const Vector4     Scrollable::DEFAULT_OVERSHOOT_COLOUR(0.0f, 0.64f, 0.85f, 0.6f)
 // we dont want size negotiation while scrolling if we can avoid it
 Scrollable::Scrollable()
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | NO_SIZE_NEGOTIATION ) ),
+  mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
   mPropertyRelativePosition(Property::INVALID_INDEX),
   mPropertyPositionMin(Property::INVALID_INDEX),
   mPropertyPositionMax(Property::INVALID_INDEX),
@@ -151,6 +161,11 @@ void Scrollable::DisableScrollComponent(Toolkit::Scrollable::ScrollComponentType
   }
 }
 
+Vector4 Scrollable::GetOvershootEffectColor() const
+{
+  return mOvershootEffectColor;
+};
+
 Toolkit::Scrollable::ScrollStartedSignalV2& Scrollable::ScrollStartedSignal()
 {
   return mScrollStartedSignalV2;
@@ -201,6 +216,46 @@ bool Scrollable::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   }
 
   return connected;
+}
+
+void Scrollable::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+{
+  Toolkit::Scrollable scrollable = Toolkit::Scrollable::DownCast( Dali::BaseHandle( object ) );
+
+  if( scrollable )
+  {
+    Scrollable& scrollableImpl( GetImpl( scrollable ) );
+    switch( index )
+    {
+      case Toolkit::Scrollable::PROPERTY_OVERSHOOT_EFFECT_COLOR:
+      {
+        scrollableImpl.SetOvershootEffectColor( value.Get<Vector4>() );
+        break;
+      }
+    }
+  }
+}
+
+Property::Value Scrollable::GetProperty( BaseObject* object, Property::Index index )
+{
+  Property::Value value;
+
+  Toolkit::Scrollable scrollable = Toolkit::Scrollable::DownCast( Dali::BaseHandle( object ) );
+
+  if( scrollable )
+  {
+    Scrollable& scrollableImpl( GetImpl( scrollable ) );
+    switch( index )
+    {
+      case Toolkit::Scrollable::PROPERTY_OVERSHOOT_EFFECT_COLOR:
+      {
+        value = scrollableImpl.GetOvershootEffectColor();
+        break;
+      }
+    }
+  }
+
+  return value;
 }
 
 Toolkit::ScrollComponent Scrollable::NewScrollComponent(Toolkit::Scrollable& scrollable, Toolkit::Scrollable::ScrollComponentType type)

@@ -25,7 +25,7 @@
 #include <dali/public-api/events/mouse-wheel-event.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
-#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
+#include <dali-toolkit/internal/controls/scrollable/bouncing-effect-actor.h>
 
 using namespace std;
 using namespace Dali;
@@ -48,7 +48,8 @@ const float DEFAULT_COLOR_VISIBILITY_REMOVE_TIME = 0.5f; // 0.5 second
 
 const float MILLISECONDS_PER_SECONDS = 1000.0f;
 
-const Rect<int> OVERSHOOT_BOUNCE_IMAGE_1_PIXEL_AREA( 0, 0, 720, 58 );
+const Vector2 OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE( 720.0f, 42.0f );
+const float OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD = 180.0f;
 const Vector4 OVERSHOOT_OVERLAY_NINE_PATCH_BORDER(0.0f, 0.0f, 1.0f, 12.0f);
 const float MAXIMUM_OVERSHOOT_HEIGHT = 36.0f;  // 36 pixels
 const float DEFAULT_OVERSHOOT_ANIMATION_DURATION = 0.5f;  // 0.5 second
@@ -156,7 +157,7 @@ float CalculateScrollDistance(Vector2 panDistance, Toolkit::ItemLayout& layout)
 
 struct OvershootOverlaySizeConstraint
 {
-  float operator()(const float& current,
+  Vector3 operator()(const Vector3& current,
                      const PropertyInput& parentScrollDirectionProperty,
                      const PropertyInput& parentOvershootProperty,
                      const PropertyInput& parentSizeProperty)
@@ -176,7 +177,9 @@ struct OvershootOverlaySizeConstraint
       overlayWidth = fabsf(parentScrollDirection.x) > Math::MACHINE_EPSILON_1 ? parentSize.y : parentSize.x;
     }
 
-    return overlayWidth;
+    float overlayHeight = (overlayWidth > OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD) ? OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height : OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height*0.5f;
+
+    return Vector3( overlayWidth, overlayHeight, current.depth );
   }
 };
 
@@ -1667,25 +1670,35 @@ void ItemView::ScrollTo(const Vector3& position, float duration)
   mScrollStartedSignalV2.Emit(GetCurrentScrollPosition());
 }
 
+void ItemView::SetOvershootEffectColor( const Vector4& color )
+{
+  mOvershootEffectColor = color;
+  if( mOvershootOverlay )
+  {
+    mOvershootOverlay.SetColor( color );
+  }
+}
+
 void ItemView::SetOvershootEnabled( bool enable )
 {
   Actor self = Self();
   if( enable )
   {
-    mOvershootEffect = BouncingEffect::New(Scrollable::DEFAULT_OVERSHOOT_COLOUR);
-    mOvershootOverlay = CreateSolidColorActor(Vector4::ONE);
+    Property::Index effectOvershootPropertyIndex = Property::INVALID_INDEX;
+    mOvershootOverlay = CreateBouncingEffectActor( effectOvershootPropertyIndex );
+    mOvershootOverlay.SetColor(mOvershootEffectColor);
     mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
     mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     mOvershootOverlay.SetDrawMode(DrawMode::OVERLAY);
-    mOvershootOverlay.SetShaderEffect(mOvershootEffect);
     self.Add(mOvershootOverlay);
-    Constraint constraint = Constraint::New<float>( Actor::SIZE_WIDTH,
+
+    Constraint constraint = Constraint::New<Vector3>( Actor::SIZE,
                                                       ParentSource( mPropertyScrollDirection ),
                                                       Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                                       ParentSource( Actor::SIZE ),
                                                       OvershootOverlaySizeConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
-    mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_IMAGE_1_PIXEL_AREA.width, OVERSHOOT_BOUNCE_IMAGE_1_PIXEL_AREA.height);
+    mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.width, OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height);
 
     constraint = Constraint::New<Quaternion>( Actor::ROTATION,
                                               ParentSource( mPropertyScrollDirection ),
@@ -1705,12 +1718,11 @@ void ItemView::SetOvershootEnabled( bool enable )
                                         OvershootOverlayVisibilityConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
 
-    int effectOvershootPropertyIndex = mOvershootEffect.GetPropertyIndex(mOvershootEffect.GetProgressRatePropertyName());
     Actor self = Self();
     constraint = Constraint::New<float>( effectOvershootPropertyIndex,
                                          Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                          EqualToConstraint() );
-    mOvershootEffect.ApplyConstraint(constraint);
+    mOvershootOverlay.ApplyConstraint(constraint);
   }
   else
   {
@@ -1719,7 +1731,6 @@ void ItemView::SetOvershootEnabled( bool enable )
       self.Remove(mOvershootOverlay);
       mOvershootOverlay.Reset();
     }
-    mOvershootEffect.Reset();
   }
 }
 

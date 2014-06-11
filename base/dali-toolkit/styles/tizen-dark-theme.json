@@ -47,6 +47,10 @@ distributing this software or its derivatives.
       "select-button-position-priority":1,
       "select-all-button-position-priority":2,
       "clipboard-button-position-priority":6
+    },
+    "scrollview":
+    {
+      "overshoot-effect-color":"B018"
     }
   }
 }

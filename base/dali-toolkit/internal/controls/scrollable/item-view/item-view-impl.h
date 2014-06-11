@@ -28,7 +28,6 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-connector.h>
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
-#include <dali-toolkit/public-api/shader-effects/bouncing-effect.h>
 
 namespace Dali
 {
@@ -243,6 +242,11 @@ public:
    * @copydoc Toolkit::Scrollable::ScrollTo(const Vector3& position, float duration)
    */
   void ScrollTo(const Vector3& position, float duration);
+
+  /**
+   * @copydoc Toolkit::Internal::Scrollable::SetOvershootEffectColor
+   */
+  void SetOvershootEffectColor( const Vector4& color );
 
   /**
    * @brief Set whether to enable automatic refresh or not. When refresh is disabled,
@@ -584,8 +588,7 @@ private:
 
   Dali::Gesture::State mGestureState;
 
-  ImageActor mOvershootOverlay;           ///< The overlay actor for overshoot effect
-  BouncingEffect mOvershootEffect; ///< The vertex/fragment shader used to display the overshoot ripple effect
+  Actor mOvershootOverlay;           ///< The overlay actor for overshoot effect
 
   Dali::Toolkit::ScrollConnector mScrollConnector; ///< Connects ItemView with scrollable components e.g. scroll bars
   Constrainable   mScrollPositionObject;     ///< From mScrollConnector

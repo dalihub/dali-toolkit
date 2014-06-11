@@ -507,6 +507,11 @@ public:
    */
   void RemoveOverlay(Actor actor);
 
+  /**
+   * @copydoc Toolkit::Internal::Scrollable::SetOvershootEffectColor
+   */
+  void SetOvershootEffectColor( const Vector4& color );
+
 public: //Signals
 
   /**
