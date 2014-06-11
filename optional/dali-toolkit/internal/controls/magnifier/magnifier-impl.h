@@ -38,7 +38,7 @@ typedef IntrusivePtr<Magnifier>    MagnifierPtr;
 /**
  * @copydoc Toolkit::Magnifier
  */
-class Magnifier : public ControlImpl
+class Magnifier : public Control
 {
 public:
 

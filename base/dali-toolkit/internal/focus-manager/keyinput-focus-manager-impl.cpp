@@ -91,9 +91,9 @@ void KeyInputFocusManager::SetFocus(Toolkit::Control control)
   }
 }
 
-Control KeyInputFocusManager::GetCurrentFocusControl() const
+Toolkit::Control KeyInputFocusManager::GetCurrentFocusControl() const
 {
-  Control currentFocusControl;
+  Toolkit::Control currentFocusControl;
 
   if(!mFocusActorsQueue.empty())
   {

@@ -37,14 +37,14 @@ namespace Internal
 /**
  * Button is the base class implementation for all buttons.
  */
-class Button : public ControlImpl
+class Button : public Control
 {
 public:
 
   // Properties
   enum
   {
-    BUTTON_PROPERTY_START_INDEX = ControlImpl::CONTROL_PROPERTY_END_INDEX + 1,
+    BUTTON_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
     BUTTON_PROPERTY_END_INDEX = BUTTON_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
   };
 
@@ -172,7 +172,7 @@ protected: // From CustomActorImpl
    */
   virtual bool OnTouchEvent( const TouchEvent& event );
 
-private: // From ControlImpl
+private: // From Control
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()

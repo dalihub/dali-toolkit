@@ -44,6 +44,9 @@ const char * const IS_FOCUS_GROUP("is-focus-group");
 const char* FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "B16-8_TTS_focus.png";
 const Vector4 FOCUS_BORDER_IMAGE_BORDER = Vector4(7.0f, 7.0f, 7.0f, 7.0f);
 
+const char* FOCUS_SOUND_FILE = DALI_SOUND_DIR "Focus.ogg";
+const char* FOCUS_CHAIN_END_SOUND_FILE = DALI_SOUND_DIR "End_of_List.ogg";
+
 /**
  * The function to be used in the hit-test algorithm to check whether the actor is hittable.
  */
@@ -90,6 +93,8 @@ bool IsActorFocusableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType 
 FocusManager::FocusManager()
 : mIsWrapped(false),
   mIsFocusWithinGroup(false),
+  mIsEndcapFeedbackEnabled(true),
+  mIsEndcapFeedbackPlayed(false),
   mCurrentFocusActor(FocusIDPair(0, 0)),
   mFocusIndicatorActor(Actor()),
   mRecursiveFocusMoveCounter(0),
@@ -331,6 +336,9 @@ bool FocusManager::DoSetCurrentFocusActor(const unsigned int actorID)
 
       if(mIsAccessibilityTtsEnabled)
       {
+        Dali::SoundPlayer soundPlayer = Dali::SoundPlayer::Get();
+        soundPlayer.PlaySound(FOCUS_SOUND_FILE);
+
         // Play the accessibility attributes with the TTS player.
         Dali::TtsPlayer player = Dali::TtsPlayer::Get(Dali::TtsPlayer::SCREEN_READER);
 
@@ -540,6 +548,16 @@ bool FocusManager::GetWrapMode() const
   return mIsWrapped;
 }
 
+void FocusManager::SetEndCapFeedbackEnabled(bool enabled)
+{
+  mIsEndcapFeedbackEnabled = enabled;
+}
+
+bool FocusManager::GetEndCapFeedbackEnabled() const
+{
+  return mIsEndcapFeedbackEnabled;
+}
+
 void FocusManager::SetFocusIndicatorActor(Actor indicator)
 {
   mFocusIndicatorActor = indicator;
@@ -560,6 +578,20 @@ bool FocusManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapp
   {
     if(wrapped)
     {
+      if(mIsEndcapFeedbackEnabled)
+      {
+        if(mIsEndcapFeedbackPlayed == false)
+        {
+          // play sound & skip to move once
+          Dali::SoundPlayer soundPlayer = Dali::SoundPlayer::Get();
+          soundPlayer.PlaySound(FOCUS_CHAIN_END_SOUND_FILE);
+
+          mIsEndcapFeedbackPlayed = true;
+          return true;
+        }
+        mIsEndcapFeedbackPlayed = false;
+      }
+
       if(forward)
       {
         focusIDIter = mFocusIDContainer.begin();
@@ -572,6 +604,12 @@ bool FocusManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapp
     }
     else
     {
+      if(mIsEndcapFeedbackEnabled)
+      {
+        Dali::SoundPlayer soundPlayer = Dali::SoundPlayer::Get();
+        soundPlayer.PlaySound(FOCUS_CHAIN_END_SOUND_FILE);
+      }
+
       DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Overshot\n", __FUNCTION__, __LINE__);
       // Send notification for handling overshooted situation
       mFocusOvershotSignalV2.Emit(GetCurrentFocusActor(), forward ? Toolkit::FocusManager::OVERSHOT_NEXT : Toolkit::FocusManager::OVERSHOT_PREVIOUS);
@@ -824,21 +862,43 @@ bool FocusManager::HandlePanGesture(const Integration::PanGestureEvent& panEvent
 {
   bool handled = false;
 
-  Actor currentGesturedActor = GetCurrentFocusActor();
+  if( panEvent.state == Gesture::Started )
+  {
+    // Find the focusable actor at the event position
+    Dali::HitTestAlgorithm::Results results;
+    AccessibilityManager manager = AccessibilityManager::Get();
+
+    Dali::HitTestAlgorithm::HitTest( Stage::GetCurrent(), panEvent.currentPosition, results, IsActorFocusableFunction );
+    mCurrentGesturedActor = results.actor;
+
+    if(!mCurrentGesturedActor)
+    {
+      DALI_LOG_ERROR("Gesture detected, but no hit actor");
+    }
+  }
+
+  // Gesture::Finished (Up) events are delivered with previous (Motion) event position
+  // Use the real previous position; otherwise we may incorrectly get a ZERO velocity
+  if ( Gesture::Finished != panEvent.state )
+  {
+    // Store the previous position for next Gesture::Finished iteration.
+    mPreviousPosition = panEvent.previousPosition;
+  }
+
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
 
   Dali::PanGesture pan(panEvent.state);
   pan.time = panEvent.time;
   pan.numberOfTouches = panEvent.numberOfTouches;
   pan.screenPosition = panEvent.currentPosition;
-  pan.screenDisplacement = panEvent.previousPosition - panEvent.currentPosition;
+  pan.screenDisplacement = mPreviousPosition - panEvent.currentPosition;
   pan.screenVelocity.x = pan.screenDisplacement.x / panEvent.timeDelta;
   pan.screenVelocity.y = pan.screenDisplacement.y / panEvent.timeDelta;
 
   // Only handle the pan gesture when the current focused actor is scrollable or within a scrollable actor
-  while(currentGesturedActor && currentGesturedActor != rootActor && !handled)
+  while(mCurrentGesturedActor && mCurrentGesturedActor != rootActor && !handled)
   {
-    Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(currentGesturedActor);
+    Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(mCurrentGesturedActor);
     if(control)
     {
       Vector2 localCurrent;
@@ -846,7 +906,7 @@ bool FocusManager::HandlePanGesture(const Integration::PanGestureEvent& panEvent
       pan.position = localCurrent;
 
       Vector2 localPrevious;
-      control.ScreenToLocal( localPrevious.x, localPrevious.y, panEvent.previousPosition.x, panEvent.previousPosition.y );
+      control.ScreenToLocal( localPrevious.x, localPrevious.y, mPreviousPosition.x, mPreviousPosition.y );
 
       pan.displacement = localCurrent - localPrevious;
       pan.velocity.x = pan.displacement.x / panEvent.timeDelta;
@@ -858,7 +918,12 @@ bool FocusManager::HandlePanGesture(const Integration::PanGestureEvent& panEvent
     // If the gesture is not handled by the control, check its parent
     if(!handled)
     {
-      currentGesturedActor = currentGesturedActor.GetParent();
+      mCurrentGesturedActor = mCurrentGesturedActor.GetParent();
+
+      if(!mCurrentGesturedActor)
+      {
+        DALI_LOG_ERROR("no more gestured actor");
+      }
     }
     else
     {

@@ -474,7 +474,7 @@ Dali::Toolkit::MaskedImageView::MaskedImageViewSignal& MaskedImageView::MaskFini
 }
 
 MaskedImageView::MaskedImageView()
-: ControlImpl(true),
+: Control(true),
   mEditMode( Dali::Toolkit::MaskedImageView::EDIT_DISABLED ),
   mSelfPropertySetting( false ),
   mSourceRotation( Dali::Toolkit::MaskedImageView::ROTATE_0 ),

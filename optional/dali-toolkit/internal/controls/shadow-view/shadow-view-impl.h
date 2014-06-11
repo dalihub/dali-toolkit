@@ -41,7 +41,7 @@ namespace Internal
 /**
  * ShadowView implementation class
  */
-class ShadowView : public ControlImpl
+class ShadowView : public Control
 {
 public:
 

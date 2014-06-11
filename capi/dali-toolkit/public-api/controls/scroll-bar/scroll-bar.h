@@ -49,7 +49,20 @@ public:
   static const char* const SCROLL_POSITION_NOTIFIED_SIGNAL_NAME;        ///< "scroll-position-notified" signal name
   typedef SignalV2< void ( float ) > ScrollPositionNotifiedSignalType;
 
+  // Properties
+  static const Property::Index PROPERTY_INDICATOR_HEIGHT_POLICY;         ///< name "indicator-height-policy", type STRING
+  static const Property::Index PROPERTY_INDICATOR_FIXED_HEIGHT;          ///< name "indicator-fixed-height",  type FLOAT
+
 public:
+
+  /**
+   * @brief Indicator height policy.
+   */
+  enum IndicatorHeightPolicy
+  {
+    Variable = 0,  ///< Variable height changed dynamically according to the length of scroll content
+    Fixed          ///< Fixed height regardless of the length of scroll content
+  };
 
   /**
    * @brief Create an uninitialized ScrollBar; this can be initialized with ScrollBar::New()
@@ -120,7 +133,7 @@ public:
    *
    * @pre The scroll bar actor has been initialised.
    *
-   * The indicator indicates the current scroll position of the scrollable content.
+   * @return The indicator indicates the current scroll position of the scrollable content.
    */
   Actor GetScrollIndicator();
 
@@ -133,6 +146,40 @@ public:
    * @param[in] positions List of values to receive notifications for when the current scroll position crosses them
    */
   void SetPositionNotifications( const std::vector<float>& positions );
+
+  /**
+   * @brief Sets the height policy of scroll indicator to have either variable or fixed height.
+   *
+   * @pre The scroll bar actor has been initialised.
+   *
+   * @param[in] policy The height policy of scroll indicator
+   */
+  void SetIndicatorHeightPolicy( IndicatorHeightPolicy policy );
+
+  /**
+   * @brief Gets the height policy of scroll indicator.
+   *
+   * @return The height policy of scroll indicator
+   */
+  IndicatorHeightPolicy GetIndicatorHeightPolicy();
+
+  /**
+   * @brief Sets the fixed height of scroll indicator.
+   * Normally the height of scroll indicator is changed dynamically according to the length of scroll content.
+   * However, when the height policy of scroll indicator is set to be fixed, the height will keep fixed
+   * regardless of the length of scroll content.
+   *
+   * @pre The scroll bar actor has been initialised.
+   *
+   * @param[in] height The fixed height of the scroll indicator
+   */
+  void SetIndicatorFixedHeight( float height );
+
+  /**
+   * @brief Gets the fix height of scroll indicator.
+   * @return The fixed height of the scroll indicator
+   */
+  float GetIndicatorFixedHeight();
 
   /**
    * @brief Shows the scroll indicator

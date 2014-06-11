@@ -50,7 +50,6 @@ extern bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Prop
 extern Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor);
 extern Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor);
 extern Actor SetupActor( const TreeNode& node, Actor& actor );
-extern Control SetupControl( const TreeNode& node, Control& actor );
 
 #if defined(DEBUG_ENABLED)
 Integration::Log::Filter* gFilterScript  = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_SCRIPT");
@@ -330,13 +329,6 @@ void Builder::ApplyProperties( const TreeNode& root, const TreeNode& node,
     {
       SetupActor( node, actor );
 
-      Control control  = Control::DownCast(actor);
-
-      if( control )
-      {
-        SetupControl( node, control );
-      }
-
       // add signals
       SetupSignalAction( mSlotDelegate.GetConnectionTracker(), root, node, actor );
 
@@ -472,7 +464,6 @@ BaseHandle Builder::DoCreate( const TreeNode& root, const TreeNode& node,
     baseHandle       = typeInfo.CreateInstance();
     Handle handle    = Handle::DownCast(baseHandle);
     Actor actor      = Actor::DownCast(handle);
-    Control control  = Control::DownCast(handle);
 
     if(handle)
     {
@@ -491,6 +482,7 @@ BaseHandle Builder::DoCreate( const TreeNode& root, const TreeNode& node,
         DALI_SCRIPT_VERBOSE("  Is Actor id=%d\n", actor.GetId());
       }
 
+      Toolkit::Control control  = Toolkit::Control::DownCast(handle);
       if(control)
       {
         DALI_SCRIPT_VERBOSE("  Is Control id=%d\n", actor.GetId());

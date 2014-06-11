@@ -47,7 +47,7 @@ class NavigationBar;
  * NavigationControl implements a controller than manages the navigation of hierarchical contents.
  * @see Dali::Toolkit::NavigationControl for more details.
  */
-class NavigationControl : public ControlImpl
+class NavigationControl : public Control
 {
 public:
 
@@ -136,36 +136,36 @@ public:
    */
   Toolkit::NavigationControl::ItemPoppedSignalV2& ItemPoppedSignal();
 
-private: // override functions from ControlImpl
+private: // override functions from Control
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnInitialize()
+   * @copydoc Control::OnInitialize()
    */
   virtual void OnInitialize();
 
   /**
-   * From ControlImpl; called after a child has been added to the owning actor.
+   * From Control; called after a child has been added to the owning actor.
    * @param[in] child The child which has been added.
    */
   virtual void OnControlChildAdd( Actor& child );
 
   /**
-   * @copydoc Toolkit::ControlImple::OnStageConnection()
+   * @copydoc Control::OnStageConnection()
    */
   virtual void OnStageConnection();
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnRelaidOut()
+   * @copydoc Control::OnRelaidOut()
    */
   virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnControlSizeSet
+   * @copydoc Control::OnControlSizeSet
    */
   virtual void OnControlSizeSet( const Vector3& size );
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnKeyEvent()
+   * @copydoc Control::OnKeyEvent()
    */
   virtual bool OnKeyEvent( const KeyEvent& event );
 

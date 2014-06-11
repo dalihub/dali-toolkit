@@ -794,7 +794,7 @@ void TableView::OnControlChildRemove( Actor& child )
 }
 
 TableView::TableView( unsigned int initialRows, unsigned int initialColumns )
-: ControlImpl( true ),  // requires touch
+: Control( true ),  // requires touch
   mCellData( initialRows, initialColumns ),
   mLayoutingChild( false ),
   mConstraintDuration( DEFAULT_CONSTRAINT_DURATION )
@@ -1000,7 +1000,7 @@ TableView::~TableView()
   // nothing to do
 }
 
-Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
+Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
 {
   Actor nextFocusableActor;
 
@@ -1023,7 +1023,7 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Contro
 
       switch ( direction )
       {
-        case Control::Left:
+        case Toolkit::Control::Left:
         {
           if(--currentColumn < 0)
           {
@@ -1036,7 +1036,7 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Contro
           }
           break;
         }
-        case Control::Right:
+        case Toolkit::Control::Right:
         {
           if(++currentColumn > numberOfColumns - 1)
           {
@@ -1049,7 +1049,7 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Contro
           }
           break;
         }
-        case Control::Up:
+        case Toolkit::Control::Up:
         {
           if(--currentRow < 0)
           {
@@ -1058,7 +1058,7 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Contro
           }
           break;
         }
-        case Control::Down:
+        case Toolkit::Control::Down:
         {
           if(++currentRow > numberOfRows - 1)
           {

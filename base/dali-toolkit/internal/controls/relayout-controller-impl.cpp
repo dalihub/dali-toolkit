@@ -85,7 +85,10 @@ void PrintChildren( Actor actor, int level )
  */
 void PrintHierarchy()
 {
-  PrintChildren( Stage().GetCurrent().GetRootLayer(), 0 );
+  if ( gLogFilter->IsEnabledFor( Debug::Verbose ) )
+  {
+    PrintChildren( Stage().GetCurrent().GetRootLayer(), 0 );
+  }
 }
 
 #define PRINT_HIERARCHY PrintHierarchy()
@@ -126,7 +129,7 @@ void SetIfNotZero( Vector2& target, const Vector2& source )
  */
 void FindControls( Actor actor, ControlStack& controls, Vector2 size )
 {
-  Control control( Control::DownCast( actor ) );
+  Toolkit::Control control( Toolkit::Control::DownCast( actor ) );
   if( control )
   {
     // If the control size has been set by the application / control, then we should try and honour that.
@@ -192,7 +195,7 @@ void RelayoutControllerImpl::Relayout()
   while ( !controlStack.empty() )
   {
     ControlSizePair pair ( controlStack.top() );
-    Control control ( pair.first );
+    Toolkit::Control control ( pair.first );
     Vector2 size ( pair.second );
     controlStack.pop();
 

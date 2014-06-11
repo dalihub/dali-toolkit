@@ -37,7 +37,7 @@ typedef IntrusivePtr<ScrollComponentImpl> ScrollComponentPtr;
  * Base class for scroll component implementations.
  * Scroll-components such as scroll bars, indicators etc. are connected to scrollable containers via ScrollConnector.
  */
-class ScrollComponentImpl : public ControlImpl
+class ScrollComponentImpl : public Internal::Control
 {
 public:
 

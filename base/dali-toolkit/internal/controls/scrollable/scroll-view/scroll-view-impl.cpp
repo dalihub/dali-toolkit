@@ -1357,6 +1357,8 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
   const float orthoAngleRange = FLICK_ORTHO_ANGLE_RANGE * M_PI / 180.0f;
   const float flickSpeedThreshold2 = FLICK_SPEED_THRESHOLD*FLICK_SPEED_THRESHOLD;
 
+  Vector3 positionSnap = mScrollPostPosition;
+
   // Flick logic X Axis
 
   if(mRulerX->IsEnabled())
@@ -1368,10 +1370,18 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
       if((angle >= -orthoAngleRange) && (angle < orthoAngleRange)) // Swiping East
       {
         biasX = 0.0f, horizontal = Left;
+
+        // This guards against an error where no movement occurs, due to the flick finishing
+        // before the update-thread has advanced mScrollPostPosition past the the previous snap point.
+        positionSnap.x += 1.0f;
       }
       else if((angle >= M_PI-orthoAngleRange) || (angle < -M_PI+orthoAngleRange)) // Swiping West
       {
         biasX = 1.0f, horizontal = Right;
+
+        // This guards against an error where no movement occurs, due to the flick finishing
+        // before the update-thread has advanced mScrollPostPosition past the the previous snap point.
+        positionSnap.x -= 1.0f;
       }
     }
   }
@@ -1406,8 +1416,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
     alphaFunction = mFlickAlphaFunction;
   }
 
-  // Position Snap ////////////////////////////////////////////////////////////
-  Vector3 positionSnap = mScrollPostPosition;
+  // Calculate next positionSnap ////////////////////////////////////////////////////////////
 
   if(mActorAutoSnapEnabled)
   {

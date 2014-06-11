@@ -236,7 +236,8 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
               break;
             }
             case TextView::SplitOriginal:
-            case TextView::SplitFade: // Fall Through
+            case TextView::SplitFade:
+            case TextView::SplitEllipsizeEnd: // Fall Through
             {
               characterLayoutInfo.mPosition = SplitPosition( relayoutParameters,
                                                              layoutParameters,

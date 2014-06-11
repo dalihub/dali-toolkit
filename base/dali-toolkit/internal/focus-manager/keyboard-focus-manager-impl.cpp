@@ -40,7 +40,7 @@ namespace // unnamed namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_KEYBOARD_FOCUS_MANAGER");
 #endif
 
-const std::string IS_FOCUS_GROUP_PROPERTY_NAME("is-keyboard-focus-group"); // This property will be replaced by a flag in ControlImpl.
+const std::string IS_FOCUS_GROUP_PROPERTY_NAME("is-keyboard-focus-group"); // This property will be replaced by a flag in Control.
 
 const char* FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "keyboard_focus.png";
 const Vector4 FOCUS_BORDER_IMAGE_BORDER = Vector4(7.0f, 7.0f, 7.0f, 7.0f);
@@ -341,7 +341,10 @@ void KeyboardFocusManager::ClearFocus()
   Actor actor = GetCurrentFocusActor();
   if(actor)
   {
-    actor.Remove(mFocusIndicatorActor);
+    if(mFocusIndicatorActor)
+    {
+      actor.Remove(mFocusIndicatorActor);
+    }
 
     // Send notification for the change of focus actor
     if( !mFocusChangedSignalV2.Empty() )
@@ -411,7 +414,25 @@ Actor KeyboardFocusManager::GetFocusGroup(Actor actor)
 
 void KeyboardFocusManager::SetFocusIndicatorActor(Actor indicator)
 {
-  mFocusIndicatorActor = indicator;
+  if(mFocusIndicatorActor != indicator)
+  {
+    Actor currentFocusActor = GetCurrentFocusActor();
+    if(currentFocusActor)
+    {
+      // The new focus indicator should be added to the current focused actor immediately
+      if(mFocusIndicatorActor)
+      {
+        currentFocusActor.Remove(mFocusIndicatorActor);
+      }
+
+      if(indicator)
+      {
+        currentFocusActor.Add(indicator);
+      }
+    }
+
+    mFocusIndicatorActor = indicator;
+  }
 }
 
 Actor KeyboardFocusManager::GetFocusIndicatorActor()

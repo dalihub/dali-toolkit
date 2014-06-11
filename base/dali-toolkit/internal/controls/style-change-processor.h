@@ -26,10 +26,10 @@ namespace Dali
 namespace Toolkit
 {
 
-class ControlImpl;
-
 namespace Internal
 {
+
+class Control;
 
 /**
  * This observes and processes when any style changes occur.  When they do occur, it traverses through
@@ -54,13 +54,13 @@ public:
    * Registers a control with the StyleChangeProcessor.
    * @param[in] control The raw Control pointer.
    */
-  static void Register( ControlImpl* control );
+  static void Register( Control* control );
 
   /**
    * Unregisters a control from the StyleChangeProcessor.
    * @param[in] control The raw Control pointer.
    */
-  static void Unregister( ControlImpl* control );
+  static void Unregister( Control* control );
 
 public:
 
@@ -112,8 +112,8 @@ private:
 
 private:
 
-  unsigned int              mCount;        ///< The reference count
-  std::vector<ControlImpl*> mControls;     ///< Stores all registered controls.
+  unsigned int          mCount;        ///< The reference count
+  std::vector<Control*> mControls;     ///< Stores all registered controls.
 };
 
 } // namespace Internal

@@ -154,7 +154,7 @@ public:
    */
   Actor& GetFadeOutCheckedImage();
 
-protected: // From ControlImpl
+protected: // From Control
 
   /**
    * Respond the activate notification.

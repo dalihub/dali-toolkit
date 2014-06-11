@@ -39,7 +39,7 @@ typedef IntrusivePtr<Scrollable> ScrollablePtr;
 /**
  * @copydoc Toolkit::Scrollable
  */
-class Scrollable : public ControlImpl
+class Scrollable : public Control
 {
 public:
   static const std::string SCROLLABLE_CAN_SCROLL_VERTICAL;

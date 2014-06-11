@@ -37,6 +37,8 @@ namespace TextViewProcessor
 namespace
 {
 
+const std::string EMOJI_FONT_NAME( "SamsungEmoji" ); // Emoticons font family name.
+
 /**
  * Updates the word size and ascender.
  *
@@ -115,18 +117,25 @@ void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
       Character character = styledText.mText[index];
       styledCharacter.mText.Append( character );
 
-      //Choose the right font for the given character and style.
-      ChooseFontFamilyName( styledCharacter );
-
-      const Font font = Font::New( FontParameters( styledCharacter.mStyle.GetFontName(), styledCharacter.mStyle.GetFontStyle(), styledCharacter.mStyle.GetFontPointSize() ) );
-      const Font::Metrics metrics = font.GetMetrics( character );
-      const float ascender = font.GetAscender();
-
       // Create layout character info.
       CharacterLayoutInfo characterLayoutInfo;
 
       characterLayoutInfo.mIsColorGlyph = GlyphImage::IsColorGlyph( character );
       DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "  Is color glyph: %s\n", ( characterLayoutInfo.mIsColorGlyph ? "True" : "False" ) );
+
+      if( characterLayoutInfo.mIsColorGlyph )
+      {
+        styledCharacter.mStyle.SetFontName( EMOJI_FONT_NAME );
+      }
+      else
+      {
+        //Choose the right font for the given character and style.
+        ChooseFontFamilyName( styledCharacter );
+      }
+
+      const Font font = Font::New( FontParameters( styledCharacter.mStyle.GetFontName(), styledCharacter.mStyle.GetFontStyle(), styledCharacter.mStyle.GetFontPointSize() ) );
+      const Font::Metrics metrics = font.GetMetrics( character );
+      const float ascender = font.GetAscender();
 
       // Fill Natural size info for current character.
       characterLayoutInfo.mHeight = font.GetLineHeight();

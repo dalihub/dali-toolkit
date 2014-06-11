@@ -33,13 +33,16 @@ namespace Toolkit
 
 //Forward declarations.
 
-class ControlImpl;
+namespace Internal
+{
+class Control;
+}
 
 /**
  * @brief Control is the base class for all controls.
  *
- * The implementation of the control must be supplied; see ControlImpl for more details.
- * @see ControlImpl
+ * The implementation of the control must be supplied; see Internal::Control for more details.
+ * @see Internal::Control
  */
 class Control : public CustomActor, public ConnectionTrackerInterface
 {
@@ -49,6 +52,11 @@ public:
   /** @{ */
   static const Property::Index PROPERTY_BACKGROUND_COLOR;    ///< name "background-color",        @see SetBackgroundColor,        type VECTOR4
   static const Property::Index PROPERTY_BACKGROUND;          ///< name "background",              @see SetBackground,             type MAP
+  static const Property::Index PROPERTY_WIDTH_POLICY;        ///< name "width-policy",            @see SetSizePolicy,             type STRING
+  static const Property::Index PROPERTY_HEIGHT_POLICY;       ///< name "height-policy",           @see SetSizePolicy,             type STRING
+  static const Property::Index PROPERTY_MINIMUM_SIZE;        ///< name "minimum-size",            @see SetMinimumSize,            type VECTOR3
+  static const Property::Index PROPERTY_MAXIMUM_SIZE;        ///< name "maximum-size",            @see SetMaximumSize,            type VECTOR3
+  static const Property::Index PROPERTY_KEY_INPUT_FOCUS;     ///< name "key-input-focus",         @see SetKeyInputFocus,          type BOOLEAN
   /** @} */
 
   /// @name Signals
@@ -160,14 +168,14 @@ public:
    *
    * @return The implementation.
    */
-  ControlImpl& GetImplementation();
+  Internal::Control& GetImplementation();
 
   /**
    * @brief Retrieve the Control implementation.
    *
    * @return The implementation.
    */
-  const ControlImpl& GetImplementation() const;
+  const Internal::Control& GetImplementation() const;
 
   // Size Negotiation
 
@@ -388,7 +396,7 @@ public: // Not intended for application developers
    * @param[in] implementation The implementation for this control.
    * @return A handle to a newly allocated Dali resource.
    */
-  Control(ControlImpl& implementation);
+  Control(Internal::Control& implementation);
 
   /**
    * @brief This constructor is used by CustomActor within Dali core to create additional Control handles

@@ -37,7 +37,7 @@ namespace Internal
 /**
  * BubbleEmitter implementation class.
  */
-class BubbleEmitter : public ControlImpl
+class BubbleEmitter : public Control
 {
 public:
 

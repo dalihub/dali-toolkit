@@ -547,6 +547,9 @@ public: /* Signals */
   /// @brief Input style changed signal.
   typedef SignalV2< void ( TextInput textInput, const TextStyle& style ) > StyleChangedSignalV2;
 
+  /// @brief Text modified signal.
+  typedef SignalV2< void ( TextInput textInput  ) > TextModifiedSignalType;
+
   /// @brief Max input characters reached signal.
   typedef SignalV2< void ( TextInput textInput ) > MaxInputCharactersReachedSignalV2;
 
@@ -579,6 +582,13 @@ public: /* Signals */
    * @return The signal to connect to
    */
   StyleChangedSignalV2& StyleChangedSignal();
+
+  /**
+   * @brief Signal emitted when text changes.
+   *
+   * @return The signal to connect to.
+   */
+  TextModifiedSignalType& TextModifiedSignal();
 
   /**
    * @brief Signal emitted when max input characters are reached during text input.

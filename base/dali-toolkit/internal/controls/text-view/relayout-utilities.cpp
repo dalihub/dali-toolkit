@@ -517,8 +517,11 @@ void UpdateAlignment( const TextView::LayoutParameters& layoutParameters,
 
   // If the exceed policy is ellipsize at the end, negative offsets are not wanted.
   // In that case, it will align the line to the left and/or top, and ellipsize the end.
-  const bool ellipsizeAlignToLeft = ( layoutParameters.mExceedPolicy == TextView::EllipsizeEndOriginal ) || ( layoutParameters.mExceedPolicy == TextView::EllipsizeEnd );
-  const bool ellipsizeAlignToTop = ( layoutParameters.mExceedPolicy == TextView::EllipsizeEnd );
+  const bool ellipsizeAlignToLeft = ( layoutParameters.mExceedPolicy == TextView::EllipsizeEndOriginal ) ||
+                                    ( layoutParameters.mExceedPolicy == TextView::EllipsizeEnd ) ||
+                                    ( layoutParameters.mExceedPolicy == TextView::SplitEllipsizeEnd );
+  const bool ellipsizeAlignToTop = ( layoutParameters.mExceedPolicy == TextView::EllipsizeEnd ) ||
+                                   ( layoutParameters.mExceedPolicy == TextView::SplitEllipsizeEnd );
 
   RelayoutParameters relayoutParameters;
 
@@ -1009,6 +1012,7 @@ void CalculateVisibilityForEllipsize( const Internal::TextView::LayoutParameters
 
         break;
       }
+      case TextView::SplitEllipsizeEnd:
       case TextView::EllipsizeEnd:
       {
         // Ellipsizes the text if it doesn't fit in the width and fully fits in the text-view's height.
@@ -1205,7 +1209,8 @@ void EllipsizeLine( const TextView::LayoutParameters& layoutParameters,
           }
           else
           {
-            if( TextView::EllipsizeEnd == layoutParameters.mExceedPolicy )
+            if( ( TextView::EllipsizeEnd == layoutParameters.mExceedPolicy ) ||
+                ( TextView::SplitEllipsizeEnd == layoutParameters.mExceedPolicy ))
             {
               if( !ellipsizeParameters.mIsLineHeightFullyVisible )
               {
@@ -1256,6 +1261,7 @@ void SetTextVisible( TextView::RelayoutData& relayoutData )
           characterLayoutInfo.mGradientColor = Vector4::ZERO;
           characterLayoutInfo.mStartPoint = Vector2::ZERO;
           characterLayoutInfo.mEndPoint = Vector2::ZERO;
+          characterLayoutInfo.mColorAlpha = characterLayoutInfo.mStyledText.mStyle.GetTextColor().a;
         } // end characters
       } // end words
     } // end group of words
@@ -1429,7 +1435,8 @@ void UpdateVisibilityForEllipsize( const TextView::LayoutParameters& layoutParam
     // If the next line exceeds the text-view height then it's going to be invisible and current line needs to be ellipsized.
     ellipsizeParameters.mIsLineHeightFullyVisible = true;
     ellipsizeParameters.mIsNextLineFullyVisibleHeight = true;
-    if( TextView::EllipsizeEnd == layoutParameters.mExceedPolicy )
+    if( ( TextView::EllipsizeEnd == layoutParameters.mExceedPolicy ) ||
+        ( TextView::SplitEllipsizeEnd == layoutParameters.mExceedPolicy ) )
     {
       // Need to check if there is lines which doesn't fit in the height.
 
@@ -1499,6 +1506,7 @@ void UpdateVisibility( const TextView::LayoutParameters& layoutParameters,
       break;
     }
     case TextView::EllipsizeEndOriginal:
+    case TextView::SplitEllipsizeEnd:
     case TextView::EllipsizeEnd: // Fall through
     {
       // Set first all characters to visible as UpdateVisibilityForEllipsize() doesn't traverse all of them.

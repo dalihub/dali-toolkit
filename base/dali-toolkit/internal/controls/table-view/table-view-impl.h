@@ -35,7 +35,7 @@ namespace Internal
  * TableView is a custom control for laying out actors in a table layout
  * @see Dali::Toolkit:TableView for more details
  */
-class TableView : public ControlImpl
+class TableView : public Control
 {
 public:
 
@@ -186,32 +186,32 @@ public:
    */
   unsigned int GetColumns();
 
-private: // From ControlImpl
+private: // From Control
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnControlChildAdd(Actor& child)
+   * @copydoc Control::OnControlChildAdd(Actor& child)
    */
   virtual void OnControlChildAdd(Actor& child);
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnControlChildRemove(Actor& child)
+   * @copydoc Control::OnControlChildRemove(Actor& child)
    */
   virtual void OnControlChildRemove(Actor& child);
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnRelaidOut
+   * @copydoc Control::OnRelaidOut
    */
   virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnInitialize()
+   * @copydoc Control::OnInitialize()
    */
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::ControlImpl::GetNextKeyboardFocusableActor
+   * @copydoc Control::GetNextKeyboardFocusableActor
    */
-  virtual Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
+  virtual Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
 
 private: // Implementation
 

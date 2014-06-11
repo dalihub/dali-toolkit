@@ -39,7 +39,7 @@ namespace Internal
  * View is a control to add layers and a background.
  * @see Dali::Toolkit::View for more details.
  */
-class View : public ControlImpl
+class View : public Control
 {
 private:
   typedef std::map<unsigned int,Layer> LayerContainer;
@@ -127,7 +127,7 @@ public:
    */
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
-private: // From ControlImpl
+private: // From Control
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()

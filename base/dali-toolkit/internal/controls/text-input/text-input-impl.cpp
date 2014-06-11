@@ -269,7 +269,7 @@ Dali::Toolkit::TextInput TextInput::New()
 }
 
 TextInput::TextInput()
-:ControlImpl( true ),
+:Control( true ),
  mState( StateEdit ),
  mStyledText(),
  mInputStyle(),
@@ -327,7 +327,7 @@ TextInput::TextInput()
  mUnderlinedPriorToPreEdit ( false ),
  mCommitByKeyInput( false ),
  mPlaceHolderSet( false ),
- mMarkUpEnabled( true )
+ mMarkUpEnabled( false )
 {
   // Updates the line height accordingly with the input style.
   UpdateLineHeight();
@@ -443,6 +443,8 @@ void TextInput::SetText(const std::string& initialText)
   RemoveHighlight();
 
   DrawCursor();
+
+  EmitTextModified();
 }
 
 void TextInput::SetText( const MarkupProcessor::StyledTextArray& styleText )
@@ -488,6 +490,8 @@ void TextInput::SetText( const MarkupProcessor::StyledTextArray& styleText )
                                              Toolkit::Alignment::VerticalTop ) );
     mDisplayedTextView.SetLineJustification( leftToRight ? Toolkit::TextView::Left : Toolkit::TextView::Right);
   }
+
+  EmitTextModified();
 }
 
 void TextInput::SetMaxCharacterLength(std::size_t maxChars)
@@ -533,6 +537,11 @@ Toolkit::TextInput::InputSignalV2& TextInput::CutAndPasteToolBarDisplayedSignal(
 Toolkit::TextInput::StyleChangedSignalV2& TextInput::StyleChangedSignal()
 {
   return mStyleChangedSignalV2;
+}
+
+Toolkit::TextInput::TextModifiedSignalType& TextInput::TextModifiedSignal()
+{
+  return mTextModifiedSignal;
 }
 
 Toolkit::TextInput::MaxInputCharactersReachedSignalV2& TextInput::MaxInputCharactersReachedSignal()
@@ -1044,6 +1053,7 @@ void TextInput::OnKeyInputFocusLost()
     RemovePreEditStyle();
     const std::size_t numberOfCharactersDeleted = DeletePreEdit();
     InsertAt( mPreEditString, mPreEditStartPosition, numberOfCharactersDeleted );
+    EmitTextModified();
   }
 
   ImfManager imfManager = ImfManager::Get();
@@ -1622,7 +1632,6 @@ bool TextInput::OnPopupButtonPressed( Toolkit::Button button )
 
     ShowGrabHandleAndSetVisibility( false );
 
-
     HidePopup();
   }
   else if(name == OPTION_CLIPBOARD)
@@ -1714,7 +1723,7 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
         mPreEditFlag = true;
         mIgnoreCommitFlag = false;
       }
-
+      EmitTextModified();
       update = true;
     }
     else
@@ -1739,7 +1748,7 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
     {
       mCommitByKeyInput = true;
     }
-
+    EmitTextModified();
     update = true;
   } // space
   else if (keyName == "BackSpace")
@@ -1758,6 +1767,7 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
         update = true;
       }
     }
+    EmitTextModified();
   } // BackSpace
   else if (keyName == "Right")
   {
@@ -1784,6 +1794,7 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
       // Received key String
       mCursorPosition = mCursorPosition + InsertAt( Text( keyString ), mCursorPosition, 0 );
       update = true;
+      EmitTextModified();
     }
   }
 
@@ -2037,7 +2048,7 @@ void TextInput::CreateTextViewActor()
   mDisplayedTextView.SetLineJustification( Toolkit::TextView::Left );
   mDisplayedTextView.SetTextAlignment( static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalLeft | Toolkit::Alignment::VerticalTop ) );
   mDisplayedTextView.SetPosition( Vector3( 0.0f, 0.0f, DISPLAYED_TEXT_VIEW_Z_OFFSET ) );
-  mDisplayedTextView.SetSizePolicy( Control::Fixed, Control::Fixed );
+  mDisplayedTextView.SetSizePolicy( Toolkit::Control::Fixed, Toolkit::Control::Fixed );
 
   mDisplayedTextView.ScrolledSignal().Connect( this, &TextInput::OnTextViewScrolled );
 
@@ -2234,6 +2245,8 @@ ImfManager::ImfCallbackData TextInput::ImfEventReceived( Dali::ImfManager& imfMa
       mCursorPosition = toDelete;
       mNumberOfSurroundingCharactersDeleted = numberOfCharacters;
 
+      EmitTextModified();
+
       DALI_LOG_INFO( gLogFilter, Debug::General, "ImfEventReceived - deleteSurrounding post-delete range mCursorPosition[%u] \n", mCursorPosition);
       break;
     }
@@ -2325,6 +2338,7 @@ bool TextInput::PreEditReceived(const std::string& keyString, std::size_t cursor
           mDisplayedTextView.RemoveTextFrom( mPreEditStartPosition, numberOfCharactersToReplace );
         }
         GetTextLayoutInfo();
+        EmitTextModified();
       }
       else
       {
@@ -2334,6 +2348,7 @@ bool TextInput::PreEditReceived(const std::string& keyString, std::size_t cursor
         mCursorPosition = mPreEditStartPosition + std::min( cursorOffset, mPreEditLength );
         ApplyPreEditStyle( mPreEditStartPosition, mPreEditLength );
         DALI_LOG_INFO(gLogFilter, Debug::General, "PreEditReceived mCursorPosition[%u] \n", mCursorPosition);
+        EmitTextModified();
       }
       // cursor update to keyboard is not done here as the keyboard knows the cursor position and provides the 'cursorOffset'.
       DrawCursor();
@@ -2353,9 +2368,9 @@ bool TextInput::PreEditReceived(const std::string& keyString, std::size_t cursor
       mCursorPosition = mPreEditStartPosition + std::min( cursorOffset, mPreEditLength );
       ApplyPreEditStyle( mPreEditStartPosition, mPreEditLength );
       DALI_LOG_INFO(gLogFilter, Debug::General, "PreEditReceived mCursorPosition[%u] mPreEditStartPosition[%u]\n", mCursorPosition, mPreEditStartPosition);
-
       // cursor update to keyboard is not done here as the keyboard knows the cursor position and provides the 'cursorOffset'.
       DrawCursor();
+      EmitTextModified();
     }
     else
     {
@@ -2416,6 +2431,8 @@ bool TextInput::CommitReceived(const std::string& keyString )
         }
       }
 
+      EmitTextModified();
+
       if ( mSelectTextOnCommit )
       {
         SelectText(mRequestedSelection.mStartOfSelection, mRequestedSelection.mEndOfSelection );
@@ -2437,6 +2454,7 @@ bool TextInput::CommitReceived(const std::string& keyString )
         mCursorPosition = mCursorPosition + InsertAt( Text( keyString ), mCursorPosition, mNumberOfSurroundingCharactersDeleted );
         update = true;
         mNumberOfSurroundingCharactersDeleted = 0;
+        EmitTextModified();
       }
       else
       {
@@ -5092,10 +5110,17 @@ void TextInput::GetTextLayoutInfo()
 void TextInput::EmitStyleChangedSignal()
 {
   // emit signal if input style changes.
-
   Toolkit::TextInput handle( GetOwner() );
   mStyleChangedSignalV2.Emit( handle, mInputStyle );
 }
+
+void TextInput::EmitTextModified()
+{
+  // emit signal when text changes.
+  Toolkit::TextInput handle( GetOwner() );
+  mTextModifiedSignal.Emit( handle );
+}
+
 
 void TextInput::EmitMaxInputCharactersReachedSignal()
 {

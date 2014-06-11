@@ -38,14 +38,14 @@ namespace Internal
 /**
  * TextView is a custom control for text aligning and multiline support
  */
-class TextView : public ControlImpl
+class TextView : public Control
 {
 public:
 
   // Properties
   enum
   {
-    TEXTVIEW_PROPERTY_START_INDEX = ControlImpl::CONTROL_PROPERTY_END_INDEX + 1,
+    TEXTVIEW_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
     TEXTVIEW_PROPERTY_END_INDEX = TEXTVIEW_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
   };
 
@@ -60,6 +60,7 @@ public:
     SplitOriginal,        ///< Split if it exceeds the width but no action if it exceeds the height.
     SplitFade,            ///< Split if it exceeds the width and faded if it exceeds the height.
     SplitShrink,          ///< Split if it exceeds the width and shrunk if it exceeds the height.
+    SplitEllipsizeEnd,    ///< Split if it exceeds the width and ellipsize if it exceeds the height.
     Fade,                 ///< Faded if it exceeds any boundary.
     FadeOriginal,         ///< Faded if it exceeds the width but no action if it exceeds the height.
     ShrinkOriginal,       ///< Shrunk if it exceeds the width but no action if it exceeds the height.
@@ -160,11 +161,6 @@ public:
    * @copydoc GetText()
    */
   std::string GetText() const;
-
-  /**
-   * @copydoc SetFont( const Font newFont )
-   */
-  void SetFont( const Font newFont );
 
   /**
    * @copydoc SetLineHeightOffset()
@@ -359,7 +355,7 @@ public:
   static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
 
-private: // From ControlImpl
+private: // From Control
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()
@@ -608,7 +604,7 @@ public:
                       Toolkit::TextView::LineJustification   lineJustification,
                       float                                  lineHeightOffset,
                       const std::string&                     ellipsizeText,
-                      const bool                             markUpEnabled );
+                      bool                                   markUpEnabled );
 
     /**
      * Copy constructor

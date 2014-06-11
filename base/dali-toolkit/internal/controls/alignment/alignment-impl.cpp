@@ -560,7 +560,7 @@ void Alignment::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
     }
 
     Vector3 actorSize ( actor.GetCurrentSize() );
-    Control control( Control::DownCast( actor ) );
+    Toolkit::Control control( Toolkit::Control::DownCast( actor ) );
     if ( actorSize == Vector3::ZERO && control )
     {
       actorSize = control.GetNaturalSize();
@@ -623,7 +623,7 @@ void Alignment::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
 }
 
 Alignment::Alignment( Toolkit::Alignment::Type horizontal, Toolkit::Alignment::Type vertical )
-: ControlImpl( false ),  // doesn't require touch events
+: Control( false ),  // doesn't require touch events
   mHorizontal( horizontal ),
   mVertical( vertical ),
   mScaling( Toolkit::Alignment::ScaleNone ),

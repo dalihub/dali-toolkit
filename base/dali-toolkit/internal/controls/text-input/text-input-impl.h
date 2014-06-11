@@ -42,7 +42,7 @@ class TextView;
 
 typedef IntrusivePtr<TextInput> TextInputPtr;
 
-class TextInput : public ControlImpl
+class TextInput : public Control
 {
 public:
 
@@ -128,6 +128,11 @@ public:
    * @copydoc Toolkit::TextInput::StyleChangedSignal()
    */
   Toolkit::TextInput::StyleChangedSignalV2& StyleChangedSignal();
+
+  /**
+   * @copydoc Toolkit::TextInput::TextModifiedSignal()
+   */
+  Toolkit::TextInput::TextModifiedSignalType& TextModifiedSignal();
 
   /**
    * @copydoc Toolkit::TextInput::MaxInputCharactersReachedSignal()
@@ -520,11 +525,11 @@ private:
   virtual void OnKeyInputFocusLost();
 
   /**
-   * From ControlImpl; called whenever the control is added to the stage.
+   * From Control; called whenever the control is added to the stage.
    */
   virtual void OnControlStageConnection();
 
-private: // From ControlImpl
+private: // From Control
 
   /**
    * Creation of the layer that is used by top level active parts of the TextInput like handles
@@ -532,17 +537,17 @@ private: // From ControlImpl
   void CreateActiveLayer();
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnInitialize()
+   * @copydoc Control::OnInitialize()
    */
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnControlSizeSet()
+   * @copydoc Control::OnControlSizeSet()
    */
   virtual void OnControlSizeSet(const Vector3& targetSize);
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnRelaidOut()
+   * @copydoc Control::OnRelaidOut()
    */
   virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
 
@@ -1316,6 +1321,11 @@ public:  // Public to allow internal testing.
   void EmitStyleChangedSignal();
 
   /**
+   * Emit signal when text is modified.
+   */
+  void EmitTextModified();
+
+  /**
    * Emits max input characters reached signal.
    */
   void EmitMaxInputCharactersReachedSignal();
@@ -1445,6 +1455,7 @@ private:
   Toolkit::TextInput::InputSignalV2                      mInputStartedSignalV2;              ///< Signal emitted when input starts
   Toolkit::TextInput::InputSignalV2                      mInputFinishedSignalV2;             ///< Signal emitted when input ends
   Toolkit::TextInput::StyleChangedSignalV2               mStyleChangedSignalV2;              ///< Signal emitted when style changes.
+  Toolkit::TextInput::TextModifiedSignalType             mTextModifiedSignal;                ///< Signal emitted when text modified.
   Toolkit::TextInput::MaxInputCharactersReachedSignalV2  mMaxInputCharactersReachedSignalV2; ///< Signal emitted when max input characters is reached.
   Toolkit::TextInput::InputSignalV2                      mCutAndPasteToolBarDisplayedV2;     ///< Signal emitted when toolbar displayed
   Toolkit::TextInput::InputTextExceedBoundariesSignalV2  mInputTextExceedBoundariesSignalV2; ///< Signal emitted when input text exceeds the boundaries of the text-input.

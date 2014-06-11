@@ -41,79 +41,30 @@ class TextView;
 }
 
 /**
- * @brief TextView is a layout container for text with alignment, multi-line wrapping and formatting support.
+ * @brief The TextView class is a UI Dali::Toolkit::Control designed to extend the capabilities of the basic Dali::TextActor.
  *
- * Different multi-line and exceed policies could be chosen to represent the given text.
- * \see Toolkit::TextView::SetMultilinePolicy \see Toolkit::TextView::SetExceedPolicy
+ * It provides support for multi-line wrapping, multi-language font detection, text alignment, scrolling and styling.
  *
- * Multi-line policies:
- * <ul>
- *   <li>\e Split by new line character.
- *          Text will split when a '\\n' character is found.
- *
- *   <li>\e Split by word.
- *          Text will split when a '\\n' character is found or if the text doesn't fit in the text view width.
- *          In that case, some words will be moved to a new line.
- *
- *   <li>\e Split by character.
- *          Text will split when a '\\n' character is found or if the text doesn't fit in the text view width.
- *          In that case, words which doesn't fit will be split in two and the remaining text moved to a new line.
- * </ul>
- *
- * Exceed policies work in combination with multi-line policies:
- * <ul>
- *   <li>\e Original size.
- *          Text will be displayed with its original size.
- *
- *   <li>\e Truncate.
- *          Text will be truncated.
- *
- *   <li>\e Fade.
- *          Text will be faded out.
- *
- *   <li>\e Split.
- *          Text will be split and moved to a new line.
- *
- *   <li>\e Shrink to fit.
- *          Text will be shrink to fit in the text view's boundary.
- *
- *   <li>\e EllipsizeEnd.
- *          Text will be ellipsized at the end.
- *
- * </ul>
- *
- * Text alignment could be set to align the whole text block inside the text view's boundary. \see Toolkit::TextView::SetTextAlignment.
- *
- * Line justification could be set to align lines inside a text block. \see Toolkit::TextView::SetLineJustification.
- *
- * A default font could be set through the \see Toolkit::TextView::SetFont method. If any font is set, text view automatically detects a suitable font for every character.
- *
- * Font priority:
- * 1) Use the font specified in text decoration.
- * 2) Use automatic font detection.
- *
- * Integration with other classes (GetSizeAndPositionTable )
- *
- * Text decoration ( Color, Font, Size, italic and all features supported in TextActor )
+ * See the \link text-view Text View \endlink page of the Programming Guide for more details and examples.
  */
 class TextView : public Control
 {
 public:
 
   // Signal Names
-  static const char* const SIGNAL_TEXT_SCROLLED; ///< Signal emitted when the scroll position changes. @see SignalScrolled()
+  static const char* const SIGNAL_TEXT_SCROLLED; ///< Signal emitted when the scroll position changes. @see ScrolledSignal()
 
   // Properties
-  static const Property::Index PROPERTY_MARKUP_ENABLED;         ///< name "markup-enabled", @see SetMarkupProcessingEnabled(), type BOOLEAN
-  static const Property::Index PROPERTY_TEXT;                   ///< name "text",                 type STRING
-  static const Property::Index PROPERTY_MULTILINE_POLICY;       ///< name "multiline-policy",     type STRING
-  static const Property::Index PROPERTY_WIDTH_EXCEED_POLICY;    ///< name "width-exceed-policy",  type STRING
-  static const Property::Index PROPERTY_HEIGHT_EXCEED_POLICY;   ///< name "height-exceed-policy", type STRING
-  static const Property::Index PROPERTY_LINE_JUSTIFICATION;     ///< name "line-justification",   type STRING
-  static const Property::Index PROPERTY_FADE_BOUNDARY;          ///< name "fade-boundary",        type VECTOR4
-  static const Property::Index PROPERTY_LINE_HEIGHT_OFFSET;     ///< name "line-height-offset",   type FLOAT
-  static const Property::Index PROPERTY_HORIZONTAL_ALIGNMENT;   ///< name "horizontal-alignment", type STRING
-  static const Property::Index PROPERTY_VERTICAL_ALIGNMENT;     ///< name "vertical-alignment",   type STRING
+  static const Property::Index PROPERTY_MARKUP_ENABLED;         ///< name "markup-enabled",       @see SetMarkupProcessingEnabled(), type BOOLEAN
+  static const Property::Index PROPERTY_TEXT;                   ///< name "text",                 @see SetText(),                    type STRING
+  static const Property::Index PROPERTY_MULTILINE_POLICY;       ///< name "multiline-policy",     @see SetMultilinePolicy(),         type STRING
+  static const Property::Index PROPERTY_WIDTH_EXCEED_POLICY;    ///< name "width-exceed-policy",  @see SetWidthExceedPolicy(),       type STRING
+  static const Property::Index PROPERTY_HEIGHT_EXCEED_POLICY;   ///< name "height-exceed-policy", @see SetHeightExceedPolicy(),      type STRING
+  static const Property::Index PROPERTY_LINE_JUSTIFICATION;     ///< name "line-justification",   @see SetLineJustification(),       type STRING
+  static const Property::Index PROPERTY_FADE_BOUNDARY;          ///< name "fade-boundary",        @see SetFadeBoundary(),            type VECTOR4
+  static const Property::Index PROPERTY_LINE_HEIGHT_OFFSET;     ///< name "line-height-offset",   @see SetLineHeightOffset(),        type FLOAT
+  static const Property::Index PROPERTY_HORIZONTAL_ALIGNMENT;   ///< name "horizontal-alignment", @see SetTextAlignment(),           type STRING
+  static const Property::Index PROPERTY_VERTICAL_ALIGNMENT;     ///< name "vertical-alignment",   @see SetTextAlignment(),           type STRING
 
   /**
    * @brief Structure used to retrieve Layout info per character.
@@ -162,14 +113,14 @@ public:
                          float descender );
 
     Size    mSize;                     ///< Size of the group of characters.
-    Vector3 mPosition;                 ///< Position of the group of characters within the text view.
-    bool    mIsNewLineChar:1;          ///< Whether this group of characters represent a new line.
+    Vector3 mPosition;                 ///< Position of the character within the text view.
+    bool    mIsNewLineChar:1;          ///< Whether this character represent a new line.
     bool    mIsRightToLeftCharacter:1; ///< Whether it's a right-to-left character.
-    bool    mIsVisible:1;              ///< Whether this group of characters is visible or not.
+    bool    mIsVisible:1;              ///< Whether this character is visible or not.
     float   mDescender;                ///< The character's descender which is the distance from the baseline to the bottom of the character
   };
 
-  typedef std::vector<CharacterLayoutInfo> CharacterLayoutInfoContainer; ///< Container of Character layouts
+  typedef std::vector<CharacterLayoutInfo> CharacterLayoutInfoContainer; ///< Container of layout info per character.
 
   /**
    * @brief Stores some info about a laid-out line.
@@ -181,7 +132,7 @@ public:
     float       mAscender;             ///< The max ascender of the current laid-out line.
   };
 
-  typedef std::vector<LineLayoutInfo> LineLayoutInfoContainer; ///< Container of line layouts
+  typedef std::vector<LineLayoutInfo> LineLayoutInfoContainer; ///< Container of layout info per line.
 
   /**
    * @brief How text is laid out.
@@ -210,7 +161,7 @@ public:
      */
     TextLayoutInfo& operator=( const TextLayoutInfo& textLayoutInfo );
 
-    CharacterLayoutInfoContainer mCharacterLayoutInfoTable;    ///< The table of character positions and sizes sorted by the characters' visual index.
+    CharacterLayoutInfoContainer mCharacterLayoutInfoTable;    ///< The table of character's positions and sizes sorted by the character's visual index.
     LineLayoutInfoContainer      mLines;                       ///< For each laid-out line, it stores an index to the first character of the line.
     std::vector<int>             mCharacterLogicalToVisualMap; ///< The map to store the character's logical (input) index according to its visual (reordered) index.
     std::vector<int>             mCharacterVisualToLogicalMap; ///< The map to store the character's visual (reordered) index according to its logical (input) index.
@@ -221,7 +172,7 @@ public:
   /**
    * @brief This structure represents a fade boundary.
    *
-   * If Exceed policy is set to Fade all text which does not fit within the text-view fade boundary is faded out. Text which exceeds the text-view boundary becomes invisible.
+   * If the Exceed policy is set to Fade all text which does not fit within the text-view fade boundary is faded out. Text which exceeds the text-view boundary becomes invisible.
    * The \e left, \e right, \e top and \e bottom values are positive, in pixels and set the distances between the text-view and fade boundaries.
    */
   struct FadeBoundary
@@ -252,31 +203,31 @@ public:
   };
 
   /**
-   * @brief Define how to split the text in lines.
+   * @brief Define how to wrap the text in lines.
    *
-   * SplitByNewLineChar will split the text in lines when a '\\n' character is found.
-   * SplitByWord has effect only when TextView size is assigned.
-   * It will split the text in lines when a '\\n' character is found or if a line exceeds the TextView's boundary. This option won't split a word in two.
-   * SplitByChar has effect only when TextView size is assigned.
-   * It will split the text in lines when a '\\n' character is found or if a line exceeds the TextView's boundary. This option might split a word in two.
-   * The default value is SplitByNewLineChar.
+   * \e SplitByNewLineChar will wrap the text in lines when a '\\n' character or a \<br /\> is found.
+   * \e SplitByWord has effect only when TextView size is assigned.
+   * It will wrap the text in lines when a '\\n' character or a \<br /\> is found or if a line exceeds the TextView's boundary. This option won't split a word in two.
+   * \e SplitByChar has effect only when TextView size is assigned.
+   * It will wrap the text in lines when a '\\n' character or a \<br /\> is found or if a line exceeds the TextView's boundary. This option might split a word in two.
+   * The default value is \e SplitByNewLineChar.
    */
   enum MultilinePolicy
   {
-    SplitByNewLineChar, ///< Text lines will split when '\\n' character is found.
-    SplitByWord,        ///< Text lines will split by word or if '\\n' character is found. It has effect only when TextView size is assigned.
-    SplitByChar         ///< Text lines will split by char or if '\\n' character is found. It has effect only when TextView size is assigned.
+    SplitByNewLineChar, ///< Text lines will wrap when '\\n' character is found.
+    SplitByWord,        ///< Text lines will wrap by word or if '\\n' character is found. It has effect only when TextView size is assigned.
+    SplitByChar         ///< Text lines will wrap by char or if '\\n' character is found. It has effect only when TextView size is assigned.
   };
 
   /**
-   * @brief Define how to display the text when it doesn't fit inside the TextView.
+   * @brief Define how to display the text when it doesn't fit inside the TextView after the line wrap.
    *
-   * The default value is ShrinkToFit.
+   * The default value is \e Original.
    */
   enum ExceedPolicy
   {
     Original,         ///< Will display the text in its original size. If a line, a word or a character is bigger than the TextView size it may exceed its boundary.
-    Truncate,         ///< Will display the text in its original size. It won't display the text which exceeds the TextView boundary.
+    Truncate,         ///< @deprecated. Use Fade instead.
     Fade,             ///< Will display the text in its original size. It won't display the text which exceeds the TextView boundary. It fades the text out.
     Split,            ///< Will split the text in a new line.
     ShrinkToFit,      ///< Will shrink the text to fit the TextView boundary.
@@ -286,7 +237,7 @@ public:
   /**
    * @brief Define how to justify lines inside the text area.
    *
-   * The default value is Left.
+   * The default value is \e Left.
    */
   enum LineJustification
   {
@@ -298,7 +249,7 @@ public:
 
 public:
   /**
-   * @brief Create an TextView handle; this can be initialised with TextView::New().
+   * @brief Create a TextView handle; this can be initialised with TextView::New().
    *
    * Calling member functions with an uninitialised Dali::Object handle is not allowed.
    */
@@ -337,7 +288,10 @@ public:
   static TextView New( const std::string& text );
 
   /**
-   * @copydoc TextView New( const std::string& text )
+   * @brief Create a TextView control with styled text.
+   *
+   * @param[in] text The text with style to display.
+   * @return A handle the TextView control.
    */
   static TextView New( const MarkupProcessor::StyledTextArray& text );
 
@@ -368,7 +322,7 @@ public:
   /**
    * @brief Replace the current text with a new text string with style.
    *
-   * @param[in] text with style to display.
+   * @param[in] text The text with style to display.
    */
   void SetText( const MarkupProcessor::StyledTextArray& text );
 
@@ -381,7 +335,10 @@ public:
   void InsertTextAt( std::size_t position, const std::string& text );
 
   /**
-   * @copydoc InsertTextAt( std::size_t position, const std::string& text )
+   * @brief Inserts the given text with style in the specified position.
+   *
+   * @param[in] position Where the given text is going to be added.
+   * @param[in] text The text with style to be added.
    */
   void InsertTextAt( std::size_t position, const MarkupProcessor::StyledTextArray& text );
 
@@ -397,7 +354,13 @@ public:
   void ReplaceTextFromTo( std::size_t position, std::size_t numberOfCharacters, const std::string& text );
 
   /**
-   * @copydoc ReplaceTextFromTo( std::size_t position, std::size_t numberOfCharacters, const std::string& text )
+   * @brief Replaces part of the text.
+   *
+   * It removes the specified number of characters from the given position and inserts the given text with style in the same specified position.
+   *
+   * @param[in] position of the first character to be removed and Where the given text is going to be added.
+   * @param[in] numberOfCharacters number of characters to be removed.
+   * @param[in] text The text with style to be added.
    */
   void ReplaceTextFromTo( std::size_t position, std::size_t numberOfCharacters, const MarkupProcessor::StyledTextArray& text );
 
@@ -460,14 +423,14 @@ public:
   Alignment::Type GetTextAlignment() const;
 
   /**
-   * @brief Sets how to split the text in lines policy.
+   * @brief Sets how to wrap the text in lines policy.
    *
-   * @param policy The multi-line policy. SplitByNewLineChar is set by default.
+   * @param policy The multi-line policy. \e SplitByNewLineChar is set by default.
    */
   void SetMultilinePolicy( MultilinePolicy policy );
 
   /**
-   * @brief Gets the split in lines policy.
+   * @brief Gets the wrap in lines policy.
    *
    * @return The multi-line policy.
    */
@@ -541,7 +504,7 @@ public:
   void SetEllipsizeText( const std::string& ellipsizeText );
 
   /**
-   * @brief Sets the ellipsize text.
+   * @brief Sets the ellipsize text with style.
    *
    * @param[in] ellipsizeText The new text with its style.
    */
@@ -578,7 +541,7 @@ public:
   /**
    * @brief Sets whether text-view renders text using a previously generated snapshot.
    *
-   * Rendering long text using a snapshot may increase performance. The default value is \e true (render using a snapshot).
+   * Rendering long text using a snapshot may increase performance. The default value is \e false (render without using a snapshot).
    *
    * @param[in] enable Whether text-view is using a snapshot to render text.
    */
@@ -594,6 +557,9 @@ public:
   /**
    * @brief Sets whether markup processing should be carried out.
    *
+   * To use markup, applications need to SetMarkupProcessingEnabled first, then SetText().
+   *
+   * @see SetText()
    * @param[in] enable whether markup processing is carried out or not.
    */
   void SetMarkupProcessingEnabled( bool enable );
@@ -655,7 +621,7 @@ public:
   typedef SignalV2< void ( TextView textView, Vector2 scrollDelta ) > ScrolledSignalV2;
 
   /**
-   * @brief Signal emitted when the scroll position changes.
+   * @brief Signal emitted when the text is scrolled inside the text-view.
    *
    * A callback with the following prototype can be connected to this signal.
    *
@@ -671,6 +637,7 @@ public: // Not intended for application developers
 
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
+   * @note Not intended for application developers
    *
    * @param[in]  implementation  The Control implementation.
    */
@@ -678,6 +645,7 @@ public: // Not intended for application developers
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
+   * @note Not intended for application developers
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */

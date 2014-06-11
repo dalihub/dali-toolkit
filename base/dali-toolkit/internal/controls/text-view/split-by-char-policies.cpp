@@ -168,6 +168,7 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
             case TextView::OriginalShrink:
             case TextView::SplitOriginal:
             case TextView::SplitFade:
+            case TextView::SplitEllipsizeEnd:
             case TextView::SplitShrink:
             case TextView::ShrinkOriginal:
             case TextView::ShrinkFade:

@@ -287,7 +287,7 @@ void ToolBar::RemoveControl( Actor control )
 }
 
 ToolBar::ToolBar()
-: ControlImpl( false ),  // doesn't require touch events
+: Control( false ),  // doesn't require touch events
   mLayout(),
   mLeftOffset( 0 ),
   mCenterBase( 1 ),

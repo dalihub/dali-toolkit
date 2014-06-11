@@ -65,7 +65,7 @@ DummyControl DummyControlImpl::New()
 }
 
 DummyControlImpl::DummyControlImpl()
-: ControlImpl(true)
+: Control(true)
 {
 }
 

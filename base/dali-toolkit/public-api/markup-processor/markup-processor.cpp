@@ -548,7 +548,18 @@ void GetStyledTextArray( const std::string& markupString, StyledTextArray& style
 
   if ( !scanForMarkup )
   {
-    styledTextArray.push_back( StyledText( Text( markupString ), TextStyle() ) );
+    const Text text( markupString );
+    const std::size_t size = text.GetLength();
+
+    styledTextArray.resize( size, StyledText( Text(), TextStyle() ) );
+
+    std::size_t index = 0;
+    for( StyledTextArray::iterator it = styledTextArray.begin(), endIt = styledTextArray.end(); it != endIt; ++it, ++index )
+    {
+      StyledText& styledText( *it );
+
+      styledText.mText.Append( text[index] );
+    }
     return;
   }
 
@@ -1064,7 +1075,7 @@ void GetMarkupString( const StyledTextArray& styledTextArray, std::string& marku
   }
 }
 
-void SetTextStyle( StyledTextArray& styledTextArray, const TextStyle& style, const TextStyle::Mask mask )
+void SetTextStyle( StyledTextArray& styledTextArray, const TextStyle& style, TextStyle::Mask mask )
 {
   if( !styledTextArray.empty() )
   {
@@ -1073,7 +1084,7 @@ void SetTextStyle( StyledTextArray& styledTextArray, const TextStyle& style, con
   }
 }
 
-void SetTextStyle( const Text& text, StyledTextArray& styledTextArray, const TextStyle& style, const TextStyle::Mask mask )
+void SetTextStyle( const Text& text, StyledTextArray& styledTextArray, const TextStyle& style, TextStyle::Mask mask )
 {
   if( !text.IsEmpty() )
   {
@@ -1092,7 +1103,7 @@ void SetTextStyle( const Text& text, StyledTextArray& styledTextArray, const Tex
   }
 }
 
-void SetTextStyleToRange( StyledTextArray& styledTextArray, const TextStyle& style, const TextStyle::Mask mask, const std::size_t begin, const std::size_t end )
+void SetTextStyleToRange( StyledTextArray& styledTextArray, const TextStyle& style, TextStyle::Mask mask, std::size_t begin, std::size_t end )
 {
   const size_t size = styledTextArray.size();
   DALI_ASSERT_ALWAYS( begin < size );

@@ -43,7 +43,7 @@ typedef IntrusivePtr<PopupStyle> PopupStylePtr;
 /**
  * @copydoc Toolkit::Popup
  */
-class Popup : public ControlImpl
+class Popup : public Control
 {
 public:
 
@@ -240,18 +240,18 @@ private:
   virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
 
   /**
-   * From ControlImpl; called after a child has been added to the owning actor.
+   * From Control; called after a child has been added to the owning actor.
    * @param[in] child The child which has been added.
    */
   virtual void OnControlChildAdd( Actor& child );
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnRelaidOut()
+   * @copydoc Control::OnRelaidOut()
    */
   virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnKeyEvent()
+   * @copydoc Control::OnKeyEvent()
    */
   virtual bool OnKeyEvent(const KeyEvent& event);
 
@@ -273,7 +273,7 @@ private:
   /**
    * @copydoc Control::GetNextKeyboardFocusableActor()
    */
-  Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
+  Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
 
 private:
 

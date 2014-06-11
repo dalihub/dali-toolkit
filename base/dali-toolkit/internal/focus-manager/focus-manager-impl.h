@@ -170,6 +170,16 @@ public:
   bool GetWrapMode() const;
 
   /**
+   * @copydoc Toolkit::FocusManager::SetEndCapFeedbackEnabled
+   */
+  void SetEndCapFeedbackEnabled(bool enabled);
+
+  /**
+   * @copydoc Toolkit::FocusManager::GetEndCapFeedbackEnabled
+   */
+  bool GetEndCapFeedbackEnabled() const;
+
+  /**
    * @copydoc Toolkit::FocusManager::SetFocusIndicatorActor
    */
   void SetFocusIndicatorActor(Actor indicator);
@@ -365,12 +375,18 @@ private:
   bool mIsWrapped; ///< Whether the focus movement is wrapped around or not
   bool mIsFocusWithinGroup; ///< Whether the focus movement is limited to the current focus group or not
 
+  bool mIsEndcapFeedbackEnabled; ///< Whether the endcap feedback need to be played when the focus leaves the end or vice versa
+  bool mIsEndcapFeedbackPlayed; ///< Whether the endcap feedback was played or not
+
   FocusIDContainer mFocusIDContainer; ///< The container to look up actor ID by focus order
   IDAdditionalInfoContainer mIDAdditionalInfoContainer; ///< The container to look up additional information by actor ID
 
   FocusIDPair mCurrentFocusActor; ///< The focus order and actor ID of current focused actor
+  Actor mCurrentGesturedActor; ///< The actor that will handle the gesture
 
   Actor mFocusIndicatorActor; ///< The focus indicator actor shared by all the focusable actors for highlight
+
+  Vector2 mPreviousPosition; ///< The previous pan position; useful for calculating velocity for Gesture::Finished events
 
   unsigned int mRecursiveFocusMoveCounter; ///< The counter to count the number of recursive focus movement attempted before the focus movement is successful.
 

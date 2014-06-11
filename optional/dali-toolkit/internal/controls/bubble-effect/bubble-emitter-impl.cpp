@@ -36,7 +36,7 @@ BubbleEmitter::BubbleEmitter( const Vector2& movementArea,
                               Image shapeImage,
                               unsigned int maximumNumberOfBubble,
                               const Vector2& bubbleSizeRange )
-: ControlImpl( true ),
+: Control( true ),
   mMovementArea( movementArea ),
   mShapeImage( shapeImage ),
   mTotalNumOfBubble( maximumNumberOfBubble ),

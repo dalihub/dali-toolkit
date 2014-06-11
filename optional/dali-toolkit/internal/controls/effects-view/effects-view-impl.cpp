@@ -100,7 +100,7 @@ Toolkit::EffectsView EffectsView::New()
 }
 
 EffectsView::EffectsView()
-: ControlImpl( false ),
+: Control( false ),
   mEffectType( Toolkit::EffectsView::INVALID_TYPE ),
   mPixelFormat( EFFECTS_VIEW_DEFAULT_PIXEL_FORMAT ),
   mSpread(0.0f),
@@ -273,7 +273,7 @@ Vector4 EffectsView::GetBackgroundColor() const
   return mBackgroundColor;
 }
 
-// From ControlImpl
+// From Control
 void EffectsView::OnInitialize()
 {
   //////////////////////////////////////////////////////

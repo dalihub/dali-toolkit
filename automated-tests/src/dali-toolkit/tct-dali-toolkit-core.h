@@ -102,6 +102,9 @@ extern int UtcDaliControlTestParameters(void);
 extern int UtcDaliControlBackgroundColor(void);
 extern int UtcDaliControlBackgroundImage(void);
 extern int UtcDaliControlBackgroundProperties(void);
+extern int UtcDaliControlSizePolicyProperties(void);
+extern int UtcDaliControlSizeProperties(void);
+extern int UtcDaliControlKeyProperties(void);
 extern int UtcDaliControlImplNew(void);
 extern int UtcDaliControlImplEnableGestureDetector(void);
 extern int UtcDaliControlImplDisableGestureDetector(void);
@@ -337,6 +340,9 @@ testcase tc_array[] = {
     {"UtcDaliControlBackgroundColor", UtcDaliControlBackgroundColor, utc_dali_toolkit_control_startup, utc_dali_toolkit_control_cleanup},
     {"UtcDaliControlBackgroundImage", UtcDaliControlBackgroundImage, utc_dali_toolkit_control_startup, utc_dali_toolkit_control_cleanup},
     {"UtcDaliControlBackgroundProperties", UtcDaliControlBackgroundProperties, utc_dali_toolkit_control_startup, utc_dali_toolkit_control_cleanup},
+    {"UtcDaliControlSizePolicyProperties", UtcDaliControlSizePolicyProperties, utc_dali_toolkit_control_startup, utc_dali_toolkit_control_cleanup},
+    {"UtcDaliControlSizeProperties", UtcDaliControlSizeProperties, utc_dali_toolkit_control_startup, utc_dali_toolkit_control_cleanup},
+    {"UtcDaliControlKeyProperties", UtcDaliControlKeyProperties, utc_dali_toolkit_control_startup, utc_dali_toolkit_control_cleanup},
     {"UtcDaliControlImplNew", UtcDaliControlImplNew, utc_dali_toolkit_control_impl_startup, utc_dali_toolkit_control_impl_cleanup},
     {"UtcDaliControlImplEnableGestureDetector", UtcDaliControlImplEnableGestureDetector, utc_dali_toolkit_control_impl_startup, utc_dali_toolkit_control_impl_cleanup},
     {"UtcDaliControlImplDisableGestureDetector", UtcDaliControlImplDisableGestureDetector, utc_dali_toolkit_control_impl_startup, utc_dali_toolkit_control_impl_cleanup},

@@ -40,7 +40,7 @@ namespace Internal
  * @see Dali::Toolkit::Page for more details
  */
 
-class Page : public ControlImpl
+class Page : public Control
 {
 
 public:
@@ -116,7 +116,7 @@ public:
    */
   Toolkit::Popup GetPopupMenu() const;
 
-private: // From ControlImpl
+private: // From Control
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()

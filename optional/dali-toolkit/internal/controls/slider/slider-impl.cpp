@@ -29,33 +29,33 @@ namespace Toolkit
 {
 
 // Properties
-const Property::Index Slider::LOWER_BOUND_PROPERTY             = ControlImpl::CONTROL_PROPERTY_END_INDEX + 1;
-const Property::Index Slider::UPPER_BOUND_PROPERTY             = ControlImpl::CONTROL_PROPERTY_END_INDEX + 2;
+const Property::Index Slider::LOWER_BOUND_PROPERTY             = Internal::Slider::SLIDER_PROPERTY_START_INDEX;
+const Property::Index Slider::UPPER_BOUND_PROPERTY             = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 1;
 
-const Property::Index Slider::VALUE_PROPERTY                   = ControlImpl::CONTROL_PROPERTY_END_INDEX + 3;
-const Property::Index Slider::HIT_REGION_PROPERTY              = ControlImpl::CONTROL_PROPERTY_END_INDEX + 4;
-const Property::Index Slider::BACKING_REGION_PROPERTY          = ControlImpl::CONTROL_PROPERTY_END_INDEX + 5;
-const Property::Index Slider::HANDLE_REGION_PROPERTY           = ControlImpl::CONTROL_PROPERTY_END_INDEX + 6;
+const Property::Index Slider::VALUE_PROPERTY                   = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 2;
+const Property::Index Slider::HIT_REGION_PROPERTY              = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 3;
+const Property::Index Slider::BACKING_REGION_PROPERTY          = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 4;
+const Property::Index Slider::HANDLE_REGION_PROPERTY           = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 5;
 
-const Property::Index Slider::BACKING_IMAGE_NAME_PROPERTY      = ControlImpl::CONTROL_PROPERTY_END_INDEX + 7;
-const Property::Index Slider::HANDLE_IMAGE_NAME_PROPERTY       = ControlImpl::CONTROL_PROPERTY_END_INDEX + 8;
-const Property::Index Slider::PROGRESS_IMAGE_NAME_PROPERTY     = ControlImpl::CONTROL_PROPERTY_END_INDEX + 9;
-const Property::Index Slider::POPUP_IMAGE_NAME_PROPERTY        = ControlImpl::CONTROL_PROPERTY_END_INDEX + 10;
-const Property::Index Slider::POPUP_ARROW_IMAGE_NAME_PROPERTY  = ControlImpl::CONTROL_PROPERTY_END_INDEX + 11;
+const Property::Index Slider::BACKING_IMAGE_NAME_PROPERTY      = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 6;
+const Property::Index Slider::HANDLE_IMAGE_NAME_PROPERTY       = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 7;
+const Property::Index Slider::PROGRESS_IMAGE_NAME_PROPERTY     = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 8;
+const Property::Index Slider::POPUP_IMAGE_NAME_PROPERTY        = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 9;
+const Property::Index Slider::POPUP_ARROW_IMAGE_NAME_PROPERTY  = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 10;
 
-const Property::Index Slider::DISABLE_COLOR_PROPERTY           = ControlImpl::CONTROL_PROPERTY_END_INDEX + 12;
-const Property::Index Slider::POPUP_TEXT_COLOR_PROPERTY        = ControlImpl::CONTROL_PROPERTY_END_INDEX + 13;
+const Property::Index Slider::DISABLE_COLOR_PROPERTY           = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 11;
+const Property::Index Slider::POPUP_TEXT_COLOR_PROPERTY        = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 12;
 
-const Property::Index Slider::VALUE_PRECISION_PROPERTY         = ControlImpl::CONTROL_PROPERTY_END_INDEX + 14;
+const Property::Index Slider::VALUE_PRECISION_PROPERTY         = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 13;
 
-const Property::Index Slider::SHOW_POPUP_PROPERTY              = ControlImpl::CONTROL_PROPERTY_END_INDEX + 15;
-const Property::Index Slider::SHOW_VALUE_PROPERTY              = ControlImpl::CONTROL_PROPERTY_END_INDEX + 16;
+const Property::Index Slider::SHOW_POPUP_PROPERTY              = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 14;
+const Property::Index Slider::SHOW_VALUE_PROPERTY              = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 15;
 
-const Property::Index Slider::ENABLED_PROPERTY                 = ControlImpl::CONTROL_PROPERTY_END_INDEX + 17;
+const Property::Index Slider::ENABLED_PROPERTY                 = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 16;
 
-const Property::Index Slider::MARKS_PROPERTY                   = ControlImpl::CONTROL_PROPERTY_END_INDEX + 18;
-const Property::Index Slider::SNAP_TO_MARKS_PROPERTY           = ControlImpl::CONTROL_PROPERTY_END_INDEX + 19;
-const Property::Index Slider::MARK_TOLERANCE_PROPERTY          = ControlImpl::CONTROL_PROPERTY_END_INDEX + 20;
+const Property::Index Slider::MARKS_PROPERTY                   = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 17;
+const Property::Index Slider::SNAP_TO_MARKS_PROPERTY           = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 18;
+const Property::Index Slider::MARK_TOLERANCE_PROPERTY          = Internal::Slider::SLIDER_PROPERTY_START_INDEX + 19;
 
 namespace Internal
 {
@@ -168,7 +168,7 @@ Dali::Toolkit::Slider Slider::New()
 }
 
 Slider::Slider()
-: ControlImpl( true ),
+: Control( true ),
   mState( NORMAL ),
   mDisableColor( 0.0f, 0.0f, 0.0f, 0.0f ),
   mPopupTextColor( 0.0f, 0.0f, 0.0f, 0.0f ),
@@ -547,7 +547,7 @@ Toolkit::TextView Slider::CreatePopupText()
   Toolkit::TextView textView = Toolkit::TextView::New();
   textView.SetParentOrigin( ParentOrigin::CENTER );
   textView.SetAnchorPoint( AnchorPoint::CENTER );
-  textView.SetSizePolicy( Control::Flexible, Control::Flexible );
+  textView.SetSizePolicy( Toolkit::Control::Flexible, Toolkit::Control::Flexible );
   textView.SetZ( VALUE_DISPLAY_TEXT_Z );
   return textView;
 }

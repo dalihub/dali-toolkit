@@ -336,6 +336,25 @@ public:
   bool GetWrapMode() const;
 
   /**
+   * @brief Set whether focus manager will play a feedback when the focus leaves the end or vice versa.
+   *
+   * If wrap mode is enabled, the feedback will be played once. In next time, focus will move continueously.
+   * Otherwise, feedback will be played with overshot signal
+   *
+   * @pre The FocusManager has been initialized.
+   * @param enabled Whether the endcap feedback is enabled or not
+   */
+  void SetEndCapFeedbackEnabled(bool enabled);
+
+  /**
+   * @brief Get whether the endcap feedback is enabled or not.
+   *
+   * @pre The FocusManager has been initialized.
+   * @return Whether the endcap feedback is enabled or not.
+   */
+  bool GetEndCapFeedbackEnabled() const;
+
+  /**
    * @brief Set the focus indicator actor.
    *
    * This will replace the default focus indicator actor in

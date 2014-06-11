@@ -29,38 +29,39 @@ namespace
   Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TEXT_INPUT_DECORATOR");
 #endif
 
-  const Vector3 DEFAULT_SELECTION_HANDLE_SIZE( 51.0f, 79.0f, 0.0f );
-  const float TOP_HANDLE_TOP_OFFSET(-1.5f);                                   // Offset between top handle and cutCopyPaste pop-up
-  const float BOTTOM_HANDLE_BOTTOM_OFFSET(1.5f);                              // Offset between bottom handle and cutCopyPaste pop-up
-  const float UI_Z_OFFSET( 0.2f );                                            // Text Selection Handles/Cursor z-offset.
-  const Vector3 UI_OFFSET(0.0f, 0.0f, UI_Z_OFFSET);                           // Text Selection Handles/Cursor offset.
-  const char* DEFAULT_CURSOR( DALI_IMAGE_DIR "cursor.png" );
-  const Vector4 DEFAULT_CURSOR_IMAGE_9_BORDER( 2.0f, 2.0f, 2.0f, 2.0f );
-  const std::size_t CURSOR_BLINK_INTERVAL = 500;                              // Cursor blink interval
-  const float CURSOR_THICKNESS(6.0f);
-  const Degree CURSOR_ANGLE_OFFSET(2.0f);                                     // Offset from the angle
+const Vector3 DEFAULT_SELECTION_HANDLE_SIZE( 51.0f, 79.0f, 0.0f );
+const float TOP_HANDLE_TOP_OFFSET(-1.5f);                                   // Offset between top handle and cutCopyPaste pop-up
+const float BOTTOM_HANDLE_BOTTOM_OFFSET(1.5f);                              // Offset between bottom handle and cutCopyPaste pop-up
+const float UI_Z_OFFSET( 0.2f );                                            // Text Selection Handles/Cursor z-offset.
+const Vector3 UI_OFFSET(0.0f, 0.0f, UI_Z_OFFSET);                           // Text Selection Handles/Cursor offset.
+const char* DEFAULT_CURSOR( DALI_IMAGE_DIR "cursor.png" );
+const Vector4 DEFAULT_CURSOR_IMAGE_9_BORDER( 2.0f, 2.0f, 2.0f, 2.0f );
+const std::size_t CURSOR_BLINK_INTERVAL = 500;                              // Cursor blink interval
+const float CURSOR_THICKNESS(6.0f);
+const Degree CURSOR_ANGLE_OFFSET(2.0f);                                     // Offset from the angle
 
-  const unsigned int SCROLL_TICK_INTERVAL = 50u;
-  const float SCROLL_THRESHOLD = 10.f;
-  const float SCROLL_SPEED = 15.f;
+const unsigned int SCROLL_TICK_INTERVAL = 50u;
+const float SCROLL_THRESHOLD = 10.f;
+const float SCROLL_SPEED = 15.f;
 
-  /**
-   * Whether the given position plus the cursor size offset is inside the given boundary.
-   *
-   * @param[in] position The given position.
-   * @param[in] cursorSize The cursor size.
-   * @param[in] controlSize The given boundary.
-   * @param[in] threshold imaginary indent around boundary that will trigger the position to be outside of control.
-   *
-   * @return whether the given position is inside the given boundary.
-   */
-  bool IsPositionWithinControl( const Vector3& position, const Size& cursorSize, const Vector3& controlSize, const Vector2 threshold = Vector2::ZERO )
-  {
-    return ( position.x >= -Math::MACHINE_EPSILON_1000 + threshold.x ) &&
-           ( position.x <= controlSize.width - threshold.x + Math::MACHINE_EPSILON_1000 ) &&
-           ( position.y - cursorSize.height >= -Math::MACHINE_EPSILON_1000 + threshold.y ) &&
-           ( position.y <= controlSize.height + Math::MACHINE_EPSILON_1000 - threshold.y);
-  }
+/**
+ * Whether the given position plus the cursor size offset is inside the given boundary.
+ *
+ * @param[in] position The given position.
+ * @param[in] cursorSize The cursor size.
+ * @param[in] controlSize The given boundary.
+ * @param[in] threshold imaginary indent around boundary that will trigger the position to be outside of control.
+ *
+ * @return whether the given position is inside the given boundary.
+ */
+bool IsPositionWithinControl( const Vector3& position, const Size& cursorSize, const Vector3& controlSize, const Vector2 threshold = Vector2::ZERO )
+{
+  return ( position.x >= -Math::MACHINE_EPSILON_1000 + threshold.x ) &&
+         ( position.x <= controlSize.width - threshold.x + Math::MACHINE_EPSILON_1000 ) &&
+         ( position.y - cursorSize.height >= -Math::MACHINE_EPSILON_1000 + threshold.y ) &&
+         ( position.y <= controlSize.height + Math::MACHINE_EPSILON_1000 - threshold.y);
+}
+
 }
 
 namespace Dali
@@ -150,22 +151,19 @@ void Decorator::OnHandlePan(Actor actor, PanGesture gesture)
       // Revert back to non-pressed selection handle images
       if ( actor.GetParent() == mTextInputHandles.GetSelectionHandleOne() )
       {
-        mSelectionHandleOneActualPosition = MoveSelectionHandle( selectionHandleOne, mSelectionHandleOneActualPosition, mSelectionHandleOnePosition, gesture.displacement );
+         mSelectionHandleOneActualPosition = MoveSelectionHandle( selectionHandleOne, mSelectionHandleOneActualPosition, mSelectionHandleOnePosition, gesture.displacement );
         ShowPopupCutCopyPaste();
-        ShowPopUp();
       }
       else if ( actor.GetParent() == mTextInputHandles.GetSelectionHandleTwo() )
       {
         mSelectionHandleTwoActualPosition = MoveSelectionHandle( selectionHandleTwo, mSelectionHandleTwoActualPosition, mSelectionHandleTwoPosition, gesture.displacement );
         ShowPopupCutCopyPaste();
-        ShowPopUp();
       }
       else if ( actor.GetParent() == mTextInputHandles.GetGrabHandle() )
       {
         MoveGrabHandle( gesture.displacement );
         SetCursorVisibility( true );
         ShowPopupCutCopyPaste();
-        ShowPopUp();
       }
     }
     break;
@@ -253,12 +251,6 @@ void Decorator::SetSelectionHandlesVisibility(bool visible )
   mTextInputHandles.SetSelectionHandleTwoVisibility( visible );
 }
 
-bool Decorator::OnHandleReleased()
-{
-  ShowPopUp();
-  return false;
-}
-
 void Decorator::PositionSelectionHandles( std::size_t start, std::size_t end )
 {
   mSelectionHandleOnePosition = start;
@@ -268,8 +260,6 @@ void Decorator::PositionSelectionHandles( std::size_t start, std::size_t end )
 
   mSelectionHandleOneActualPosition = PositionSelectionHandle( mTextInputHandles.GetSelectionHandleOne(), mSelectionHandleOnePosition );
   mSelectionHandleTwoActualPosition = PositionSelectionHandle( mTextInputHandles.GetSelectionHandleTwo(), mSelectionHandleTwoPosition );
-
-  mTextInputHandles.ReleasedSignal().Connect( this, &Decorator::OnHandleReleased );
 }
 
 Vector3 Decorator::MoveSelectionHandle( Actor selectionHandle,
@@ -837,7 +827,7 @@ Vector3 Decorator::PositionOfPopUpRelativeToSelectionHandles()
   // When text is selected, show popup above top handle (and text), or below bottom handle.
 
   // topHandle: referring to the top most point of the handle or the top line of selection.
-  if ( mSelectionHandleTwoActualPosition.y > mSelectionHandleOneActualPosition.y )
+  if ( mSelectionHandleTwoActualPosition.y > mSelectionHandleOneActualPosition.y ) // Handle may switch positions so calculate which is top.
   {
     topHandle = mSelectionHandleOneActualPosition;
     rowSize= mTextViewCharacterPositioning.GetRowRectFromCharacterPosition( mSelectionHandleOnePosition, min, max );

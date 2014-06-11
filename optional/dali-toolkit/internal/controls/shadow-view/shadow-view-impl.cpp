@@ -116,7 +116,7 @@ struct EqualToConstraintMatrix
 } // namespace
 
 ShadowView::ShadowView( float downsampleWidthScale, float downsampleHeightScale )
-: ControlImpl( false ),  // doesn't require touch events
+: Control( false ),  // doesn't require touch events
   mChildrenRoot(Actor::New()),
   mCachedShadowColor(DEFAULT_SHADOW_COLOR),
   mCachedBackgroundColor(DEFAULT_SHADOW_COLOR.r, DEFAULT_SHADOW_COLOR.g, DEFAULT_SHADOW_COLOR.b, 0.0f),

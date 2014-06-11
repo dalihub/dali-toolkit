@@ -37,14 +37,14 @@ namespace Internal
 /**
  * SuperBlurView implementation class
  */
-class SuperBlurView : public ControlImpl
+class SuperBlurView : public Control
 {
 public:
 
   // Properties
   enum
   {
-    SUPER_BLUR_VIEW_PROPERTY_START_INDEX = ControlImpl::CONTROL_PROPERTY_END_INDEX + 1,
+    SUPER_BLUR_VIEW_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
     SUPER_BLUR_VIEW_PROPERTY_END_INDEX = SUPER_BLUR_VIEW_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
   };
 
@@ -115,7 +115,7 @@ protected:
    */
   virtual ~SuperBlurView();
 
-private: // from ControlImpl
+private: // from Control
 
   /**
    * @copydoc Toolkit::Control::OnInitialize
@@ -128,7 +128,7 @@ private: // from ControlImpl
   virtual void OnControlSizeSet(const Vector3& targetSize);
 
   /**
-   * @copydoc Toolkit::ControlImpl::OnRelaidOut()
+   * @copydoc Control::OnRelaidOut()
    */
   virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
 

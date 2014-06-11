@@ -44,7 +44,7 @@ TypeRegistration mType( typeid(Toolkit::Page), typeid(CustomActor), Create );
 } // unnamed namespace
 
 Page::Page()
-: ControlImpl(false),
+: Control(false),
   mTitle(""),
   mSubTitle("")
 {

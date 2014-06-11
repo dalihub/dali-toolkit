@@ -36,6 +36,8 @@ namespace Toolkit
 
 /**
  * @brief Markup Processor enumerations, structures and functions.
+ *
+ * See the \link markup-processor Markup Processor \endlink page in the Programming Guide.
  */
 namespace MarkupProcessor
 {
@@ -86,44 +88,9 @@ typedef std::vector<StyledText> StyledTextArray;
 /**
  * @brief Creates a text array with its style from a markup string.
  *
- * The syntax of a markup string is html-ish. It contains open, close
- * and empty tags and some of them can contain parameters.
+ * Refer to the \link markup-processor Markup Processor \endlink page in the Programming Guide
+ * to see the html-ish sintax and some examples.
  *
- * <ul>
- *   <li>\e \<b\>\</b\> Bold text.
- *   <li>\e \<i\>\</i\> Italic text.
- *   <li>\e \<u\>\</u\> Underlined text.
- *   <li>\e \<br /\> New line.
- *   <li>\e \<font\>\</font\> Specifies font properties:
- *     <ul>
- *       <li> \e face Font face.
- *       <li> \e size Font size.
- *       <li> \e color Font color.
- *     </ul>
- *   <li>\e \<shadow\>\</shadow\> Specifies shadow properties @see Dali::TextActor::SetShadow().
- *     <ul>
- *       <li> \e paramx X offset.
- *       <li> \e paramy Y offset.
- *       <li> \e color Shadow color.
- *     </ul>
- *   <li>\e \<glow\>\</glow\> Specifies glow properties @see Dali::TextActor::SetGlow().
- *     <ul>
- *       <li> \e param Glow around the text.
- *       <li> \e color Glow color.
- *     </ul>
- *   <li>\e \<outline\>\</outline\> Specifies outline properties @see Dali::TextActor::SetOutline().
- *     <ul>
- *       <li> \e paramx X thickness.
- *       <li> \e paramy Y thickness.
- *       <li> \e color Outline color.
- *     </ul>
- *   <li>\e \<smooth\>\</smooth\> Specify the smooth edge @see Dali::TextActor::SetSmoothEdge().
- *     <ul>
- *       <li> \e paramx Distance field.
- *     </ul>
- * </ul>
- *
- * It transform any pair CR+LF new line characters into a single LF new line character.
  * @param [in] markupString A string with style.
  * @param [out] styledTextArray A text array split in characters, each one with its style.
  * @param [in] scanForMarkup If true will check to see string contains markup, else assume not
@@ -154,16 +121,19 @@ void GetMarkupString( const StyledTextArray& styledTextArray, std::string& marku
  * @param[in] style The given style
  * @param[in] mask The bit mask.
  */
-void SetTextStyle( StyledTextArray& styledTextArray, const TextStyle& style, const TextStyle::Mask mask = TextStyle::ALL );
+void SetTextStyle( StyledTextArray& styledTextArray, const TextStyle& style, TextStyle::Mask mask = TextStyle::ALL );
 
 /**
- * @see SetTextStyle( StyledTextArray& styledTextArray, const TextStyle& style, StyleMask mask )
+ * @brief Sets a text style to the given text.
+ *
+ * @see SetTextStyle( StyledTextArray& styledTextArray, const TextStyle& style, TextStyle::Mask mask )
+ *
  * @param[in] text The input text.
  * @param[out] styledTextArray The input text with the given style.
  * @param[in] style The given style.
  * @param[in] mask The bit mask.
  */
-void SetTextStyle( const Text& text, StyledTextArray& styledTextArray, const TextStyle& style, const TextStyle::Mask mask = TextStyle::ALL );
+void SetTextStyle( const Text& text, StyledTextArray& styledTextArray, const TextStyle& style, TextStyle::Mask mask = TextStyle::ALL );
 
 /**
  * @brief Sets a text style to a range of characters of the given text.
@@ -176,7 +146,7 @@ void SetTextStyle( const Text& text, StyledTextArray& styledTextArray, const Tex
  * @param[in] end The last character of the range.
  * @note It will assert if begin or end are out of range, or if begin > end.
  */
-void SetTextStyleToRange( StyledTextArray& styledTextArray, const TextStyle& style, const TextStyle::Mask mask, const std::size_t begin, const std::size_t end );
+void SetTextStyleToRange( StyledTextArray& styledTextArray, const TextStyle& style, TextStyle::Mask mask, std::size_t begin, std::size_t end );
 
 } // namespace MarkupProcessor
 
