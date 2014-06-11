@@ -22,6 +22,7 @@
 #include <dali/dali.h>
 
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 
 namespace Dali
 {
@@ -253,6 +254,12 @@ public:
    */
   void AddPopupOptions();
 
+  /**
+   * Set Boundary that PopUp should stay within
+   * @param[in] boundingRectangle coordinates of bounding box from Top Left
+   */
+  void SetPopupBoundary( const Rect<float>& boundingRectangle );
+
 private:
 
   /**
@@ -276,6 +283,37 @@ private:
    * Applies constraint to keep Popup in view within the desired area.
    */
   void ApplyConfinementConstraint();
+
+  /**
+   * Create a layer to hold the stencil
+   * @param[in] size Size to of layer
+   */
+  void CreateLayer(  const Vector2& size );
+
+  /**
+   * Create a stencil to clip the scroll view content
+   * @param[in] size Size to of stencil
+   */
+  void CreateStencil( const Vector2& size );
+
+  /**
+   * Popup has started to scroll
+   * @param[in] position current scroll view position
+   */
+  void OnScrollStarted( const Vector3& position );
+
+  /**
+   * Popup has stopped scrolling
+   * @param[in] position current scroll view position
+   */
+  void OnScrollCompleted( const Vector3& position );
+
+  /**
+   * Create a scroll view to hold the popup buttons and allow scrolling if too many buttons to fit within the visible boundary
+   * @param[in] scrollViewSize size of content of the scroll view which can exceed its visible size
+   * @param[in] visibleSize size of the visible scroll view
+   */
+  void CreateScrollView( const Vector2& scrollViewSize, const Vector2& visibleSize );
 
   /**
    * Removes Popup from the stage.
@@ -314,11 +352,17 @@ private:
   ActorContainer mDividerContainer;                   ///< List of dividers added to popup.
   Animation mAnimation;                               ///< Popup Hide/Show animation.
 
+  Actor mStencil;                                     ///< Stencil to clip scrollview
+  Toolkit::ScrollView mScrollView;                    ///< Scrollview to house the popup
+  Layer mLayer;                                       ///< Layer to house the scroll view and stencil
+
   std::vector<ButtonRequirement> mOrderListOfButtons;        // List of buttons in the order to be displayed and a flag to indicate if needed.
 
   Vector4           mCutPasteButtonsColor;  // Color of the cut and paste popup
   Vector4           mCutPasteButtonsPressedColor;  // Color of the cut and paste buttons when pressed.
   Vector4           mBorderColor; // Color of the border around the Cut and Paste Popup
+
+  Rect<float> mBoundingRect; // Boundary that Popup must stay within.
 
   // Priority of Options/Buttons in the Cut and Paste pop-up, higher priority buttons are displayed first, left to right.
   std::size_t mSelectOptionPriority;  // Position of Select Button

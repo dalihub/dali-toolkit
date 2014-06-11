@@ -44,7 +44,7 @@ const std::size_t DEFAULT_NUMBER_OF_LINES_LIMIT( std::numeric_limits<std::size_t
 const Vector3 DEFAULT_SELECTION_HANDLE_SIZE( 51.0f, 79.0f, 0.0f );  // Selection cursor image size
 const Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE( 1.5f, 2.0f, 1.0f );
 const Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.5f, 1.5f, 1.0f );
-const Vector4 LIGHTBLUE( 10.0f/255.0f, 140.0f/255.0f, 210.0f/255.0f, 1.0f );    // Used for Selection highlight
+const Vector4 LIGHTBLUE( 0.07f, 0.41f, 0.59f, 1.0f );    // Used for Selection highlight
 
 const char* DEFAULT_GRAB_HANDLE( DALI_IMAGE_DIR "insertpoint-icon.png" );
 const char* DEFAULT_SELECTION_HANDLE_ONE( DALI_IMAGE_DIR "text-input-selection-handle-left.png" );
@@ -782,6 +782,9 @@ void TextInput::SetBoundingRectangle( const Rect<float>& boundingRectangle )
                           originY + boundingRectangle.height );
 
   mBoundingRectangleWorldCoordinates = boundary;
+
+  // Set Boundary for Popup so it keeps the Pop-up within the area also.
+  mPopUpPanel.SetPopupBoundary( boundingRectangle );
 }
 
 const Rect<float> TextInput::GetBoundingRectangle() const
@@ -1386,7 +1389,7 @@ void TextInput::OnDoubleTap(Dali::Actor actor, Dali::TapGesture tap)
      SelectText( start, end );
    }
    // if no text but clipboard has content then show paste option
-   if ( mClipboard.NumberOfItems() || !mStyledText.empty() )
+   if ( ( mClipboard && mClipboard.NumberOfItems() ) || !mStyledText.empty() )
    {
      ShowPopupCutCopyPaste();
    }
@@ -1576,7 +1579,7 @@ void TextInput::OnLongPress(Dali::Actor actor, Dali::LongPressGesture longPress)
     }
 
     // if no text but clipboard has content then show paste option, if no text and clipboard empty then do nothing
-    if ( mClipboard.NumberOfItems() || !mStyledText.empty() )
+    if ( ( mClipboard && mClipboard.NumberOfItems() ) || !mStyledText.empty() )
     {
       ShowPopupCutCopyPaste();
     }
@@ -3697,11 +3700,6 @@ void TextInput::AddPopupOptions()
   mPopUpPanel.AddPopupOptions();
 }
 
-void TextInput::AddPopupOption(const std::string& name, const std::string& caption, const Image icon, bool finalOption)
-{
-  mPopUpPanel.AddOption(name, caption, icon, finalOption);
-}
-
 void TextInput::SetPopupPosition(const Vector3& position)
 {
   mPopUpPanel.Self().SetPosition( position );
@@ -3747,7 +3745,7 @@ void TextInput::ShowPopup(bool animate)
     Vector3 bottomHandle;
     bottomHandle.y = std::max ( mSelectionHandleTwoActualPosition.y , mSelectionHandleOneActualPosition.y );
     bottomHandle.y += GetSelectionHandleSize().y + BOTTOM_HANDLE_BOTTOM_OFFSET;
-    mPopUpPanel.SetAlternativeOffset(Vector2(0.0f, bottomHandle.y - topHandle.y));
+    mPopUpPanel.SetAlternativeOffset(Vector2( mBoundingRectangleWorldCoordinates.x, bottomHandle.y - topHandle.y));
   }
   else
   {
@@ -3756,11 +3754,11 @@ void TextInput::ShowPopup(bool animate)
     const Size rowSize = GetRowRectFromCharacterPosition( mCursorPosition );
     position.y -= rowSize.height;
     // if can't be positioned above, then position below row.
-    Vector2 alternativePopUpPosition( 0.0f, position.y ); // default if no grab handle
+    Vector2 alternativePopUpPosition( mBoundingRectangleWorldCoordinates.x, position.y ); // default if no grab handle
     if ( mGrabHandle )
     {
-      alternativePopUpPosition.y = rowSize.height + ( mGrabHandle.GetCurrentSize().height * DEFAULT_GRAB_HANDLE_RELATIVE_SIZE.y ) ;
       // If grab handle enabled then position pop-up below the grab handle.
+      alternativePopUpPosition.y = rowSize.height + mGrabHandle.GetCurrentSize().height + BOTTOM_HANDLE_BOTTOM_OFFSET ;
     }
     mPopUpPanel.SetAlternativeOffset( alternativePopUpPosition );
   }
@@ -3768,7 +3766,7 @@ void TextInput::ShowPopup(bool animate)
   // reposition popup above the desired cursor posiiton.
   Vector3 textViewSize = mDisplayedTextView.GetCurrentSize();
   textViewSize.z = 0.0f;
-  // World position = world position of ParentOrigin of cursor (i.e. top-left corner of TextView) + cursor position;
+  // World position = world position of local position i.e. top-left corner of TextView
   Vector3 worldPosition = mDisplayedTextView.GetCurrentWorldPosition() - (textViewSize * 0.5f) + position;
 
   SetPopupPosition( worldPosition );
@@ -3798,7 +3796,7 @@ void TextInput::ShowPopupCutCopyPaste()
     mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsCut, true );
   }
 
-  if( mClipboard.NumberOfItems() )
+  if( mClipboard && mClipboard.NumberOfItems() )
   {
     mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsPaste, true );
     mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsClipboard, true );
@@ -3822,7 +3820,7 @@ void TextInput::SetUpPopUpSelection()
     mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsCut, true );
   }
   // if clipboard has valid contents then offer paste option
-  if( mClipboard.NumberOfItems() )
+  if( mClipboard && mClipboard.NumberOfItems() )
   {
     mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsPaste, true );
     mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsClipboard, true );

@@ -1060,17 +1060,6 @@ public:  // Public to allow internal testing.
   void AddPopupOptions();
 
   /**
-   * Adds a popup option.
-   * @note Creates popup frame if not already created.
-   * @param[in] name The unique name for this option.
-   * @param[in] caption The caption (label) for this option
-   * @param[in] icon the image icon to be displayed for this option
-   * @param[in] finalOption Flag to indicate that this is the final option.
-   * (set to true on the last option you add)
-   */
-  void AddPopupOption(const std::string& name, const std::string& caption, const Image icon, bool finalOption = false);
-
-  /**
    * Sets popup position
    * @param[in] position The actual position for this popup.
    */

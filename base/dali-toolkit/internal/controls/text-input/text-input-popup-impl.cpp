@@ -31,13 +31,10 @@ namespace {
 
 // Default Colors
 
-const Vector4 DEFAULT_POPUP_BACKGROUND( Vector4( 0.24f, 0.41f, 0.88f, 1.0f ) );
-const Vector4 DEFAULT_POPUP_BUTTON_PRESSED( Vector4( 0.18f, 0.56f, 1.0f, 1.0f ) );
-const Vector4 DEFAULT_BORDER_COLOR( Vector4( 0.2f, 0.2f, 0.2f, 1.0f ) );
+const Vector4 DEFAULT_POPUP_BACKGROUND( Vector4( .20f, 0.29f, 0.44f, 1.0f ) );
+const Vector4 DEFAULT_POPUP_BUTTON_PRESSED( Vector4( 0.07f, 0.10f, 0.17f, 1.0f ) );
+const Vector4 DEFAULT_BORDER_COLOR( Vector4( 0.36f, 0.45f, 0.59f, 1.0f ) );
 const Vector3 POPUP_BORDER( Vector3(1.0f, 1.0f, 0.0f) );
-
-// Popup: Divider
-const char* DEFAULT_PANEL_BUTTON_DIVIDER = DALI_IMAGE_DIR "copypanelLine.png";
 
 /* Functionality in place to have the end buttons using different images to inner button.
  * Supply a centre image and then a left and right image, the centre image can have straight ends while
@@ -50,7 +47,9 @@ const char* DEFAULT_POPUP_TAIL_BOTTOM( DALI_IMAGE_DIR "00_popup_bubble_tail_bott
 // Popup: Vertical Constraint
 // TODO: Remove - this should come from application - it is not possible to get the
 // height of the indicator actor from Dali-Toolkit.
-const Vector2 DEFAULT_POPUP_INDICATOR_OFFSET(0.0f, 60.0f);
+
+const float POP_UP_SCREEN_EDGE_MARGIN( 4.0f );
+const Vector2 DEFAULT_POPUP_INDICATOR_OFFSET(POP_UP_SCREEN_EDGE_MARGIN, 60.0f);
 
 const Vector3 POPUP_TEXT_OFFSET( 0.0f, 0.0f, 0.0f );
 const Vector3 POPUP_TEXT_ENLARGE( 12.0f, 28.0f, 0.0f );
@@ -62,7 +61,7 @@ const Vector3 BUTTON_TEXT_MAXIMUM_SIZE( 190.0f, 126.0f, 0.0f );
 const Vector3 TEXT_LABEL_MAX_SIZE( 160.0f, 30.0f, 0.0f );
 
 const float DIVIDER_WIDTH(2.0f);                                            ///< Width of each button divider
-const float DIVIDER_MARGIN(0.0f);                                          ///< Top/Bottom Margin between divider and edge of popup.
+const float DIVIDER_MARGIN(0.0f);                                           ///< Top/Bottom Margin between divider and edge of popup.
 
 const float DEFAULT_UI_FONT_SIZE(7.0f);                                     ///< Standard font size for Text-Input's UI
 
@@ -97,14 +96,17 @@ struct ConfinementConstraint
    * Confinement constraint constructor.
    * @param[in] topLeftMargin (optional) Top-Left margins (defaults to 0.0f, 0.0f)
    * @param[in] bottomRightMargin (optional) Bottom-Right margins (defaults to 0.0f, 0.0f)
-   * @param[in] flipVertical (optional) whether to flip Actor to the other side if near edge, and by
-   * how much (defaults to 0.0f i.e. no flip)
+   * @paran[in[ flipHorizontal (optional) whether to flip Actor to other side if near edge
+   * @param[in] flipVertical (optional) whether to flip Actor to the other side if near edge
+   * @param[in] boundingRect Rectangle to bound Popup to.
+   *
    */
-  ConfinementConstraint(Vector2 topLeftMargin = Vector2::ZERO, Vector2 bottomRightMargin = Vector2::ZERO, bool flipHorizontal = false, bool flipVertical = false)
+  ConfinementConstraint(Vector2 topLeftMargin = Vector2::ZERO, Vector2 bottomRightMargin = Vector2::ZERO, bool flipHorizontal = false, bool flipVertical = false, Rect<float> boundingRect = Rect<float>(0.0f, 0.0f, 0.0f, 0.0f) )
   : mMinIndent(topLeftMargin),
     mMaxIndent(bottomRightMargin),
     mFlipHorizontal(flipHorizontal),
-    mFlipVertical(flipVertical)
+    mFlipVertical(flipVertical),
+    mBoundingRect( boundingRect )
   {
   }
 
@@ -127,12 +129,25 @@ struct ConfinementConstraint
     Vector3 position(constPosition + origin * referenceSize);
 
     // if top-left corner is outside of Top-Left bounds, then push back in screen.
+
     Vector3 corner(position - size * anchor - mMinIndent);
 
-    if(mFlipHorizontal && corner.x < 0.0f)
+    newPosition.x -= std::max(corner.x, 0.0f);
+
+    if ( mFlipHorizontal )
     {
-      corner.x = 0.0f;
-      newPosition.x += size.width + alternativeOffset.width;
+      if( corner.x < mBoundingRect.x + POP_UP_SCREEN_EDGE_MARGIN )
+      {
+        // Snap PopUp to left hand boundary so stays visible
+        corner.x = mBoundingRect.x + POP_UP_SCREEN_EDGE_MARGIN ;
+      }
+      else if ( ( corner.x + size.x ) > ( ( mBoundingRect.x + mBoundingRect.width ) - POP_UP_SCREEN_EDGE_MARGIN ))
+      {
+        // Calculate offset from left boundary PopUp must be placed at so it does not exceed right side boundary.
+        float requiredOffSetFromLeftBoundaryToFit = mBoundingRect.width - POP_UP_SCREEN_EDGE_MARGIN - size.x;
+        corner.x = mBoundingRect.x + requiredOffSetFromLeftBoundaryToFit - ( origin.x * referenceSize.x ) + ( size.x * anchor.x );
+       }
+      newPosition.x = corner.x;
     }
 
     if(mFlipVertical && corner.y < 0.0f)
@@ -141,26 +156,16 @@ struct ConfinementConstraint
       newPosition.y += size.height + alternativeOffset.height;
     }
 
-    newPosition.x -= std::min(corner.x, 0.0f);
     newPosition.y -= std::min(corner.y, 0.0f);
 
     // if bottom-right corner is outside of Bottom-Right bounds, then push back in screen.
     corner += size - referenceSize + mMinIndent + mMaxIndent;
-
-    if(mFlipHorizontal && corner.x > 0.0f)
-    {
-      corner.x = 0.0f;
-      newPosition.x -= size.width + alternativeOffset.width;
-    }
 
     if(mFlipVertical && corner.y > 0.0f)
     {
       corner.y = 0.0f;
       newPosition.y -= size.height + alternativeOffset.height;
     }
-
-    newPosition.x -= std::max(corner.x, 0.0f);
-    newPosition.y -= std::max(corner.y, 0.0f);
 
     return newPosition;
   }
@@ -169,6 +174,7 @@ struct ConfinementConstraint
   Vector3 mMaxIndent;                                   ///< Bottom-Right Margin.
   bool mFlipHorizontal;                                 ///< Whether to flip actor's position if exceeds horizontal screen bounds
   bool mFlipVertical;                                   ///< Whether to flip actor's position if exceeds vertical screen bounds
+  Rect<float> mBoundingRect;                            ///< Bounding Rect Popup must stay within
 };
 
 } // unnamed namespace
@@ -186,12 +192,12 @@ const char* const TextInputPopup::SIGNAL_PRESSED = "pressed";
 const char* const TextInputPopup::SIGNAL_HIDE_FINISHED = "hide-finished";
 const char* const TextInputPopup::SIGNAL_SHOW_FINISHED = "show-finished";
 
-const char* const TextInputPopup::OPTION_SELECT_WORD = "select_word";                       // "Select Word" popup option.
-const char* const TextInputPopup::OPTION_SELECT_ALL("select_all");                          // "Select All" popup option.
-const char* const TextInputPopup::OPTION_CUT("cut");                                        // "Cut" popup option.
-const char* const TextInputPopup::OPTION_COPY("copy");                                      // "Copy" popup option.
-const char* const TextInputPopup::OPTION_PASTE("paste");                                    // "Paste" popup option.
-const char* const TextInputPopup::OPTION_CLIPBOARD("clipboard");                            // "Clipboard" popup option.
+const char* const TextInputPopup::OPTION_SELECT_WORD = "option-select_word";                       // "Select Word" popup option.
+const char* const TextInputPopup::OPTION_SELECT_ALL("option-select_all");                          // "Select All" popup option.
+const char* const TextInputPopup::OPTION_CUT("option-cut");                                        // "Cut" popup option.
+const char* const TextInputPopup::OPTION_COPY("option-copy");                                      // "Copy" popup option.
+const char* const TextInputPopup::OPTION_PASTE("option-paste");                                    // "Paste" popup option.
+const char* const TextInputPopup::OPTION_CLIPBOARD("option-clipboard");                            // "Clipboard" popup option.
 
 TextInputPopup::TextInputPopup()
 : mState(StateHidden),
@@ -241,9 +247,59 @@ void TextInputPopup::ApplyConfinementConstraint()
                                                     LocalSource( mAlternativeOffsetProperty ),
                                                     ConfinementConstraint( DEFAULT_POPUP_INDICATOR_OFFSET,
                                                                            Vector2::ZERO,
-                                                                           false,
-                                                                           true) );
+                                                                           true,
+                                                                           true, mBoundingRect ) );
   mRootActor.ApplyConstraint(constraint);
+}
+
+void TextInputPopup::CreateLayer( const Vector2& size )
+{
+  mLayer = Layer::New();
+  mLayer.SetParentOrigin(ParentOrigin::CENTER);
+  mLayer.SetAnchorPoint(AnchorPoint::CENTER);
+  mLayer.SetSize( size ); // matches stencil size
+  mLayer.SetName("popup-mLayer");
+}
+
+void TextInputPopup::CreateStencil( const Vector2& size )
+{
+  mStencil = CreateSolidColorActor( Color::BLUE );
+  mStencil.SetParentOrigin( Vector3( ParentOrigin::CENTER ) );
+  mStencil.SetAnchorPoint( AnchorPoint::CENTER );
+  mStencil.SetDrawMode( DrawMode::STENCIL );
+  mStencil.SetSize( size  ); // slightly smaller than layer and stencil so over shoot always inside.
+  mStencil.SetVisible( true );
+  mStencil.SetName("popup-stencil");
+}
+
+void TextInputPopup::OnScrollStarted( const Vector3& position )
+{
+  mBackground.SetSensitive( false );
+}
+
+void TextInputPopup::OnScrollCompleted( const Vector3& position )
+{
+  mBackground.SetSensitive( true );
+}
+
+void TextInputPopup::CreateScrollView( const Vector2& domainSize, const Vector2& visibleSize )
+{
+  mScrollView = Toolkit::ScrollView::New();
+  mScrollView.SetName("popup-scroll-view");
+  mScrollView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  mScrollView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  mScrollView.SetSize( visibleSize.x, visibleSize.y  );
+  mScrollView.SetScrollingDirection( PanGestureDetector::DIRECTION_HORIZONTAL, Degree( 40.0f ) );
+  mScrollView.SetAxisAutoLock( true );
+  mScrollView.ScrollStartedSignal().Connect( this, &TextInputPopup::OnScrollStarted );
+  mScrollView.ScrollCompletedSignal().Connect( this, &TextInputPopup::OnScrollCompleted );
+
+  RulerPtr rulerX = new DefaultRuler();  // IntrusivePtr which is unreferenced when ScrollView is destroyed.
+  RulerPtr rulerY = new DefaultRuler();  // IntrusivePtr which is unreferenced when ScrollView is destroyed.
+  rulerY->Disable();
+  rulerX->SetDomain( RulerDomain( 0, domainSize.width, true ) );
+  mScrollView.SetRulerX(rulerX);
+  mScrollView.SetRulerY(rulerY);
 }
 
 void TextInputPopup::RemoveFromStage()
@@ -256,8 +312,10 @@ void TextInputPopup::Clear()
 {
   if ( mBackground )
   {
-    mRootActor.Remove( mBackground );
-    mBackground.Reset();
+    UnparentAndReset( mStencil );
+    UnparentAndReset( mBackground );
+    UnparentAndReset( mScrollView );
+    UnparentAndReset( mLayer );
     mButtonContainer.clear();
     mDividerContainer.clear();
 
@@ -298,10 +356,10 @@ void TextInputPopup::CreatePopUpBackground()
   if ( !mBackground )
   {
     mBackground = Toolkit::CreateSolidColorActor( GetCutPastePopUpColor(), true, mBorderColor );
-
-    Self().Add( mBackground );
+    mBackground.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+    mBackground.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    mBackground.SetName("pop-up-background");
     mContentSize = POPUP_TEXT_OFFSET;
-
     Hide(false);
     AddToStage();
 
@@ -321,15 +379,13 @@ void TextInputPopup::CreateDivider()
 {
   if(mButtonContainer.size() > 0)
   {
-    Image dividerImage = Image::New( DEFAULT_PANEL_BUTTON_DIVIDER );
-    ImageActor divider = ImageActor::New( dividerImage );
+    ImageActor divider = Toolkit::CreateSolidColorActor( mBorderColor );
     divider.SetParentOrigin( ParentOrigin::TOP_LEFT );
     divider.SetAnchorPoint( AnchorPoint::TOP_LEFT );
     divider.SetPosition( Vector3( mContentSize.width, POPUP_TEXT_OFFSET.y, 0.0f ) );
     // Keep track of all the dividers. As their height's need to be updated to the max. of all
     // buttons currently added.
     mDividerContainer.push_back(divider);
-
     mBackground.Add( divider );
     mContentSize.width += DIVIDER_WIDTH;
   }
@@ -475,7 +531,7 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
   const Vector3 constrainedTextSize = Min( textSize, TEXT_LABEL_MAX_SIZE );
   Vector3 buttonSize( Max(constrainedTextSize + BUTTON_TEXT_ENLARGE, BUTTON_TEXT_MINIMUM_SIZE) );
   buttonSize = ( Min(buttonSize, BUTTON_TEXT_MAXIMUM_SIZE) );
-  label.SetSize( Min( buttonSize + BUTTON_TEXT_ENLARGE, constrainedTextSize ) );
+  label.SetSize( Min( buttonSize, constrainedTextSize ) );
 
   button.SetParentOrigin( ParentOrigin::TOP_LEFT );
   button.SetAnchorPoint( AnchorPoint::TOP_LEFT );
@@ -522,11 +578,6 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
     i->SetSize( DIVIDER_WIDTH, dividerHeight );
   }
 
-  Vector3 popupSize( Max(mContentSize, POPUP_MINIMUM_SIZE) );
-
-  mBackground.SetSize( popupSize );
-  // Make Root Actor reflect the size of its content
-  mRootActor.SetSize( popupSize );
   mTail.SetPosition(Vector3(0.0f, -20.0f, 0.0f));
 
   button.ClickedSignal().Connect( this, &TextInputPopup::OnButtonPressed );
@@ -565,6 +616,8 @@ void TextInputPopup::Show(bool animate)
 {
   if(mBackground)
   {
+    mBackground.SetSensitive( true );
+
     if(mAnimation)
     {
       mAnimation.Clear();
@@ -741,8 +794,31 @@ void TextInputPopup::AddPopupOptions()
       AddOption( button.name, button.caption, button.iconImage, false );
     }
   }
+
+  float visiblePopUpWidth = std::min( mContentSize.width - POP_UP_SCREEN_EDGE_MARGIN*2 , mBoundingRect.width - POP_UP_SCREEN_EDGE_MARGIN *2);
+  float visbilePopUpHeight = std::max( mContentSize.height, POPUP_MINIMUM_SIZE.height );
+  Vector2 visiblePopUpSize  = Vector2( visiblePopUpWidth, visbilePopUpHeight );
+
+  visiblePopUpWidth = std::max( visiblePopUpWidth,  POPUP_MINIMUM_SIZE.width );
+
+  mBackground.SetSize( mContentSize.width, mContentSize.height );
+  mRootActor.SetSize( visiblePopUpWidth, visbilePopUpHeight );   // Make Root Actor reflect the size of its content
+
+  CreateLayer( visiblePopUpSize );
+  CreateStencil( visiblePopUpSize );
+  CreateScrollView( Vector2( mContentSize.width, mContentSize.height ), visiblePopUpSize );
+
+  mLayer.Add( mStencil );
+  mLayer.Add( mScrollView );
+  mScrollView.Add( mBackground );
+
+  Self().Add(mLayer);
 }
 
+void TextInputPopup::SetPopupBoundary( const Rect<float>& boundingRectangle )
+{
+  mBoundingRect =  boundingRectangle;
+}
 
 bool TextInputPopup::OnButtonPressed( Toolkit::Button button )
 {
