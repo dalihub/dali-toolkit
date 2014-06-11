@@ -623,7 +623,9 @@ ScrollView::ScrollView()
   mWrapMode(false),
   mAxisAutoLock(false),
   mAlterChild(false),
-  mDefaultMaxOvershoot(true)
+  mDefaultMaxOvershoot(true),
+  mCanScrollHorizontal(true),
+  mCanScrollVertical(true)
 {
   SetRequiresMouseWheelEvents(true);
 }
@@ -939,8 +941,8 @@ void ScrollView::UpdatePropertyDomain(const Vector3& size)
   if(mRulerX->IsEnabled())
   {
     const Toolkit::RulerDomain& rulerDomain = mRulerX->GetDomain();
-    if( fabsf(min.x - rulerDomain.min) > Math::MACHINE_EPSILON_10000
-        || fabsf(max.x - rulerDomain.max) > Math::MACHINE_EPSILON_10000 )
+    if( fabsf(min.x - rulerDomain.min) > Math::MACHINE_EPSILON_100
+        || fabsf(max.x - rulerDomain.max) > Math::MACHINE_EPSILON_100 )
     {
       domainChanged = true;
       min.x = rulerDomain.min;
@@ -954,17 +956,26 @@ void ScrollView::UpdatePropertyDomain(const Vector3& size)
         mScrollPrePosition.x = Clamp(mScrollPrePosition.x, -(max.x - size.x), -min.x);
       }
     }
-    if( (fabsf(rulerDomain.max - rulerDomain.min) - size.x) > Math::MACHINE_EPSILON_10000 )
+    if( (fabsf(rulerDomain.max - rulerDomain.min) - size.x) > Math::MACHINE_EPSILON_100 )
     {
       canScrollHorizontal = true;
     }
+  }
+  else if( fabs(min.x) > Math::MACHINE_EPSILON_100
+           || fabs(max.x) > Math::MACHINE_EPSILON_100 )
+  {
+    // need to reset to 0
+    domainChanged = true;
+    min.x = 0.0f;
+    max.x = 0.0f;
+    canScrollHorizontal = false;
   }
 
   if(mRulerY->IsEnabled())
   {
     const Toolkit::RulerDomain& rulerDomain = mRulerY->GetDomain();
-    if( fabsf(min.y - rulerDomain.min) > Math::MACHINE_EPSILON_10000
-        || fabsf(max.y - rulerDomain.max) > Math::MACHINE_EPSILON_10000 )
+    if( fabsf(min.y - rulerDomain.min) > Math::MACHINE_EPSILON_100
+        || fabsf(max.y - rulerDomain.max) > Math::MACHINE_EPSILON_100 )
     {
       domainChanged = true;
       min.y = rulerDomain.min;
@@ -978,18 +989,30 @@ void ScrollView::UpdatePropertyDomain(const Vector3& size)
         mScrollPrePosition.y = Clamp(mScrollPrePosition.y, -(max.y - size.y), -min.y);
       }
     }
-    if( (fabsf(rulerDomain.max - rulerDomain.min) - size.y) > Math::MACHINE_EPSILON_10000 )
+    if( (fabsf(rulerDomain.max - rulerDomain.min) - size.y) > Math::MACHINE_EPSILON_100 )
     {
       canScrollVertical = true;
     }
   }
-  // avoid setting properties if possible, otherwise this will cause an entire update as well as triggering constraints using each property we update
-  if( self.GetProperty<bool>(mPropertyCanScrollVertical) != canScrollVertical )
+  else if( fabs(min.y) > Math::MACHINE_EPSILON_100
+           || fabs(max.y) > Math::MACHINE_EPSILON_100 )
   {
+    // need to reset to 0
+    domainChanged = true;
+    min.y = 0.0f;
+    max.y = 0.0f;
+    canScrollHorizontal = false;
+  }
+
+  // avoid setting properties if possible, otherwise this will cause an entire update as well as triggering constraints using each property we update
+  if( mCanScrollVertical != canScrollVertical )
+  {
+    mCanScrollVertical = canScrollVertical;
     self.SetProperty(mPropertyCanScrollVertical, canScrollVertical);
   }
-  if( self.GetProperty<bool>(mPropertyCanScrollHorizontal) != canScrollHorizontal )
+  if( mCanScrollHorizontal != canScrollHorizontal )
   {
+    mCanScrollHorizontal = canScrollHorizontal;
     self.SetProperty(mPropertyCanScrollHorizontal, canScrollHorizontal);
   }
   if( scrollPositionChanged )
@@ -1000,8 +1023,8 @@ void ScrollView::UpdatePropertyDomain(const Vector3& size)
   {
     mMinScroll = min;
     mMaxScroll = max;
-    self.SetProperty(mPropertyPositionMin, min );
-    self.SetProperty(mPropertyPositionMax, max );
+    self.SetProperty(mPropertyPositionMin, mMinScroll );
+    self.SetProperty(mPropertyPositionMax, mMaxScroll );
   }
 }
 
