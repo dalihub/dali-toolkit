@@ -536,13 +536,6 @@ private: // From CustomActorImpl, derived classes can override these.
 private:
 
   /**
-   * @brief Perform the activated action.
-   *
-   * @param[in] attributes The attributes to perfrom this action.
-   */
-  void DoActivatedAction(const PropertyValueContainer& attributes);
-
-  /**
    * @brief This method is the callback for the StyleChangeSignal from StyleManager
    *
    * @param[in] styleManager The StyleManager Object

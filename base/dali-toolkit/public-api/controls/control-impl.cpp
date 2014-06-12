@@ -901,12 +901,17 @@ bool Control::DoAction(BaseObject* object, const std::string& actionName, const 
 {
   bool ret = false;
 
-  return ret;
-}
+  if( object && (actionName == Toolkit::Control::ACTION_CONTROL_ACTIVATED) )
+  {
+    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
+    if( control )
+    {
+      // if cast succeeds there is an implementation so no need to check
+      control.GetImplementation().OnActivated();
+    }
+  }
 
-void Control::DoActivatedAction(const PropertyValueContainer& attributes)
-{
-  OnActivated();
+  return ret;
 }
 
 void Control::DoStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
