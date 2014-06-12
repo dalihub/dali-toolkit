@@ -1129,7 +1129,7 @@ void InitializeTextActorInfo( TextView::RelayoutData& relayoutData )
 
             if( characterLayout.mIsColorGlyph ||
                 !character.IsWhiteSpace() || // A new line character is also a white space.
-                ( character.IsWhiteSpace() && characterLayout.mStyledText.mStyle.GetUnderline() ) )
+                ( character.IsWhiteSpace() && characterLayout.mStyledText.mStyle.IsUnderlineEnabled() ) )
             {
               // Do not create a glyph-actor if it's a white space (without underline) or a new line character.
 

@@ -156,7 +156,7 @@ void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
       characterLayoutInfo.mSize.height = characterLayoutInfo.mHeight;
       characterLayoutInfo.mAscender = ascender;
 
-      if( styledCharacter.mStyle.GetUnderline() )
+      if( styledCharacter.mStyle.IsUnderlineEnabled() )
       {
         characterLayoutInfo.mUnderlineThickness = font.GetUnderlineThickness(); // Both thickness and position includes the
         characterLayoutInfo.mUnderlinePosition = font.GetUnderlinePosition();   // vertical pad adjust used in effects like glow or shadow.

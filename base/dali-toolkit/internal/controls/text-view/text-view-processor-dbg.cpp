@@ -123,24 +123,28 @@ void dbgPrint( const TextLayoutInfo& textInfo )
 
 void dbgPrint( const TextStyle& style )
 {
-  std::cout << "         font name : " << style.GetFontName() << std::endl;
-  std::cout << "        font style : " << style.GetFontStyle() << std::endl;
-  std::cout << "   font point size : " << style.GetFontPointSize() << std::endl;
-  std::cout << "            weight : " << style.GetWeight() << std::endl;
-  std::cout << "        text color : " << style.GetTextColor() << std::endl;
-  std::cout << "           italics : " << style.GetItalics() << std::endl;
-  std::cout << "         underline : " << style.GetUnderline() << std::endl;
-  std::cout << "            shadow : " << style.GetShadow() << std::endl;
-  std::cout << "      shadow color : " << style.GetShadowColor() << std::endl;
-  std::cout << "     shadow offset : " << style.GetShadowOffset() << std::endl;
-  std::cout << "              glow : " << style.GetGlow() << std::endl;
-  std::cout << "     italics angle : " << style.GetItalicsAngle() << std::endl;
-  std::cout << "        glow color : " << style.GetGlowColor() << std::endl;
-  std::cout << "    glow intensity : " << style.GetGlowIntensity() << std::endl;
-  std::cout << "       smooth edge : " << style.GetSmoothEdge() << std::endl;
-  std::cout << "           outline : " << style.GetOutline() << std::endl;
-  std::cout << "     outline color : " << style.GetOutlineColor() << std::endl;
-  std::cout << " outline thickness : " << style.GetOutlineThickness() << std::endl;
+  std::cout << "             font name : " << style.GetFontName() << std::endl;
+  std::cout << "            font style : " << style.GetFontStyle() << std::endl;
+  std::cout << "       font point size : " << style.GetFontPointSize() << std::endl;
+  std::cout << "                weight : " << style.GetWeight() << std::endl;
+  std::cout << "            text color : " << style.GetTextColor() << std::endl;
+  std::cout << "               italics : " << style.IsItalicsEnabled() << std::endl;
+  std::cout << "             underline : " << style.IsUnderlineEnabled() << std::endl;
+  std::cout << "                shadow : " << style.IsShadowEnabled() << std::endl;
+  std::cout << "          shadow color : " << style.GetShadowColor() << std::endl;
+  std::cout << "         shadow offset : " << style.GetShadowOffset() << std::endl;
+  std::cout << "                  glow : " << style.IsGlowEnabled() << std::endl;
+  std::cout << "         italics angle : " << style.GetItalicsAngle() << std::endl;
+  std::cout << "            glow color : " << style.GetGlowColor() << std::endl;
+  std::cout << "        glow intensity : " << style.GetGlowIntensity() << std::endl;
+  std::cout << "           smooth edge : " << style.GetSmoothEdge() << std::endl;
+  std::cout << "               outline : " << style.IsOutlineEnabled() << std::endl;
+  std::cout << "         outline color : " << style.GetOutlineColor() << std::endl;
+  std::cout << "     outline thickness : " << style.GetOutlineThickness() << std::endl;
+  std::cout << "              gradient : " << style.IsGradientEnabled() << std::endl;
+  std::cout << "        gradient color : " << style.GetGradientColor() << std::endl;
+  std::cout << "  gradient start point : " << style.GetGradientStartPoint() << std::endl;
+  std::cout << "    gradient end point : " << style.GetGradientEndPoint() << std::endl;
 }
 
 void dbgPrint( const TextInfoIndices& indices )

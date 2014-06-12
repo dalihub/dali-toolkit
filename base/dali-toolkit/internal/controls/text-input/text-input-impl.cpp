@@ -2136,7 +2136,7 @@ void TextInput::ApplyPreEditStyle( std::size_t preEditStartPosition, std::size_t
 {
   if ( mPreEditFlag && ( preEditStringLength > 0 ) )
   {
-    mUnderlinedPriorToPreEdit = mInputStyle.GetUnderline();
+    mUnderlinedPriorToPreEdit = mInputStyle.IsUnderlineEnabled();
     TextStyle style;
     style.SetUnderline( true );
     ApplyStyleToRange( style, TextStyle::UNDERLINE , preEditStartPosition, preEditStartPosition + preEditStringLength -1 );
@@ -2898,7 +2898,7 @@ void TextInput::DrawCursor(const std::size_t nthChar)
   mCursor.SetSize(size);
 
   // If the character is italic then the cursor also tilts.
-  mCursor.SetRotation( mInputStyle.GetItalics() ? Degree( mInputStyle.GetItalicsAngle() - CURSOR_ANGLE_OFFSET ) : Degree( 0.f ), Vector3::ZAXIS );
+  mCursor.SetRotation( mInputStyle.IsItalicsEnabled() ? Degree( mInputStyle.GetItalicsAngle() - CURSOR_ANGLE_OFFSET ) : Degree( 0.f ), Vector3::ZAXIS );
 
   DALI_ASSERT_DEBUG( mCursorPosition <= mTextLayoutInfo.mCharacterLayoutInfoTable.size() );
 
