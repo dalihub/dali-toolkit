@@ -614,13 +614,6 @@ private:
   bool OnTouchDownTimeout();
 
   /**
-   * Called whenever a snap animation has completed
-   * @param[in] source the Animation instance that has completed.
-   * Resets all scrolling animations and states, leaving current scroll position at mPropertyPosition
-   */
-  void ResetScrolling();
-
-  /**
    * Updates mScrollInternalPosition, mScrollPrePosition and mScrollPostPosition from their property counterparts
    */
   void UpdateLocalScrollProperties();
@@ -705,18 +698,25 @@ private:
   void GestureContinuing(const Vector2& panDelta, const Vector2& scaleDelta, float rotationDelta);
 
   /**
+   * Called when either pan starts or animated scroll starts
+   *
+   * @param[in] scroll position where scrolling started in positive scroll coordinates (scroll properties are negative)
+   */
+  void ScrollingStarted( const Vector3& position );
+
+  /**
+   * Called when scrolling stops, either due to interruption from pan or when scroll animation finishes
+   *
+   * @param[in] scroll position where scrolling stopped in positive scroll coordinates (scroll properties are negative)
+   */
+  void ScrollingStopped( const Vector3& position );
+
+  /**
    * Called upon pan gesture event.
    *
    * @param[in] gesture The gesture event.
    */
   void OnPan(PanGesture pan);
-
-  /**
-   * Extension of the above gestures.
-   *
-   * @param[in] gesture The gesture event.
-   */
-  void OnGestureEx(Gesture::State state);
 
   /**
    * Performs snapping while taking into account Velocity of gesture
@@ -929,7 +929,6 @@ private:
   Animation mInternalXAnimation;        ///< Animates mPropertyX to a snap position or application requested scroll position
   Animation mInternalYAnimation;        ///< Animates mPropertyY to a snap position or application requested scroll position
 
-
   Vector2 mLastVelocity;                ///< Record the last velocity from PanGesture (Finish event doesn't have correct velocity)
   LockAxis mLockAxis;
 
@@ -977,7 +976,8 @@ private:
 
   Toolkit::ScrollView::SnapStartedSignalV2 mSnapStartedSignalV2;
 
-  bool mInAccessibilityPan : 1;           ///< With AccessibilityPan its easier to move between snap positions
+  bool mPropertiesUpdated:1;              ///< Flag telling us when we can return local values to application or if we have to return the property
+  bool mInAccessibilityPan:1;             ///< With AccessibilityPan its easier to move between snap positions
   bool mInitialized:1;
   bool mScrolling:1;                      ///< Flag indicating whether the scroll view is being scrolled (by user or animation)
   bool mScrollInterrupted:1;              ///< Flag set for when a down event interrupts a scroll
