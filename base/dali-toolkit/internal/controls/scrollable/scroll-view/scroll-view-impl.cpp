@@ -25,10 +25,10 @@
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
 #include <dali/integration-api/debug.h>
 
-#define ENABLED_SCROLL_STATE_LOGGING
+//#define ENABLED_SCROLL_STATE_LOGGING
 
 #ifdef ENABLED_SCROLL_STATE_LOGGING
-#define DALI_LOG_SCROLL_STATE(format, args...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, "%s:%d " format, __PRETTY_FUNCTION__, __LINE__, ## args)
+#define DALI_LOG_SCROLL_STATE(format, args...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, "%s:%d " format "\n", __PRETTY_FUNCTION__, __LINE__, ## args)
 #else
 #define DALI_LOG_SCROLL_STATE(format, args...)
 #endif
