@@ -1280,7 +1280,7 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
   Vector3 currentScrollPosition = GetCurrentScrollPosition();
   Self().SetProperty( mPropertyScrollStartPagePosition, currentScrollPosition );
 
-  if(mScrolling) // are we interrupting a current scroll?
+  if( mScrolling ) // are we interrupting a current scroll?
   {
     // set mScrolling to false, in case user has code that interrogates mScrolling Getter() in complete.
     mScrolling = false;
@@ -1786,14 +1786,14 @@ bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDurat
 
       if(mRulerX->IsEnabled())
       {
-        float dir = VectorInDomain(-mScrollPostPosition.x, -mScrollTargetPosition.x, rulerDomainX.min, rulerDomainX.max, horizontalBias);
-        mScrollTargetPosition.x = mScrollPostPosition.x + -dir;
+        float dir = VectorInDomain(-mScrollPrePosition.x, -mScrollTargetPosition.x, rulerDomainX.min, rulerDomainX.max, horizontalBias);
+        mScrollTargetPosition.x = mScrollPrePosition.x + -dir;
       }
 
       if(mRulerY->IsEnabled())
       {
-        float dir = VectorInDomain(-mScrollPostPosition.y, -mScrollTargetPosition.y, rulerDomainY.min, rulerDomainY.max, verticalBias);
-        mScrollTargetPosition.y = mScrollPostPosition.y + -dir;
+        float dir = VectorInDomain(-mScrollPrePosition.y, -mScrollTargetPosition.y, rulerDomainY.min, rulerDomainY.max, verticalBias);
+        mScrollTargetPosition.y = mScrollPrePosition.y + -dir;
       }
     }
 
@@ -1806,6 +1806,8 @@ bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDurat
     {
       self.SetProperty(mPropertyPrePosition, mScrollTargetPosition);
       mScrollPrePosition = mScrollTargetPosition;
+      mScrollPostPosition = mScrollTargetPosition;
+      WrapPosition(mScrollPostPosition);
     }
   }
 
@@ -2330,6 +2332,13 @@ void ScrollView::OnScrollAnimationFinished( Animation& source )
       scrollingFinished = true;
     }
     mInternalXAnimation.Reset();
+    // wrap pre scroll x position and set it
+    if( mWrapMode )
+    {
+      const RulerDomain rulerDomain = mRulerX->GetDomain();
+      mScrollPrePosition.x = -WrapInDomain(-mScrollPrePosition.x, rulerDomain.min, rulerDomain.max);
+      handle.SetProperty(mPropertyPrePosition, mScrollPrePosition);
+    }
     SnapInternalXTo(mScrollPostPosition.x);
   }
 
@@ -2340,6 +2349,13 @@ void ScrollView::OnScrollAnimationFinished( Animation& source )
       scrollingFinished = true;
     }
     mInternalYAnimation.Reset();
+    if( mWrapMode )
+    {
+      // wrap pre scroll y position and set it
+      const RulerDomain rulerDomain = mRulerY->GetDomain();
+      mScrollPrePosition.y = -WrapInDomain(-mScrollPrePosition.y, rulerDomain.min, rulerDomain.max);
+      handle.SetProperty(mPropertyPrePosition, mScrollPrePosition);
+    }
     SnapInternalYTo(mScrollPostPosition.y);
   }
 
@@ -2589,6 +2605,15 @@ void ScrollView::FinishTransform()
     SetScrollUpdateNotification(false);
     mScrolling = false;
     Self().SetProperty(mPropertyScrolling, false);
+
+    if( fabs(mScrollPrePosition.x - mScrollTargetPosition.x) > Math::MACHINE_EPSILON_10 )
+    {
+      SnapInternalXTo(mScrollTargetPosition.x);
+    }
+    if( fabs(mScrollPrePosition.y - mScrollTargetPosition.y) > Math::MACHINE_EPSILON_10 )
+    {
+      SnapInternalYTo(mScrollTargetPosition.y);
+    }
     Vector3 currentScrollPosition = GetCurrentScrollPosition();
     DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 6 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
     mScrollCompletedSignalV2.Emit( currentScrollPosition );
