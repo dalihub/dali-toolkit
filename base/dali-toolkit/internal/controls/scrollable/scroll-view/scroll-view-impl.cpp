@@ -1267,6 +1267,8 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
 
   Self().SetProperty(mPropertyScrolling, true);
   mScrolling = true;
+
+  DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignalV2 1 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
   mScrollStartedSignalV2.Emit( currentScrollPosition );
   bool animating = AnimateTo(-position,
                              Vector3::ONE * duration,
@@ -1815,6 +1817,7 @@ bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDurat
   snapEvent.rotation = rotation;
   snapEvent.duration = totalDuration;
 
+  DALI_LOG_SCROLL_STATE("[0x%X] mSnapStartedSignalV2 [%.2f, %.2f]", this, snapEvent.position.x, snapEvent.position.y);
   mSnapStartedSignalV2.Emit( snapEvent );
 
   return (mScrollStateFlags & SCROLL_ANIMATION_FLAGS) != 0;
@@ -2525,6 +2528,7 @@ void ScrollView::OnGestureEx(Gesture::State state)
     Vector3 currentScrollPosition = GetCurrentScrollPosition();
     Self().SetProperty(mPropertyScrolling, true);
     mScrolling = true;
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignalV2 2 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
     mScrollStartedSignalV2.Emit( currentScrollPosition );
   }
   else if( (state == Gesture::Finished) ||
