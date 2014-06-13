@@ -572,6 +572,9 @@ void Control::Initialize()
 
     // Register for style changes
     styleManager.StyleChangeSignal().Connect( this, &ControlImpl::DoStyleChange );
+
+    // SetTheme
+    GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
   }
 
   mImpl->mInitialized = true;

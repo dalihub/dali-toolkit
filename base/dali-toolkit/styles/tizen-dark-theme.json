@@ -31,5 +31,17 @@ distributing this software or its derivatives.
 {
   "styles":
   {
+    "textinput":
+    {
+      "highlight-color":"F060",
+      "cut-and-paste-bg-color":"B061L41",
+      "cut-and-paste-pressed-color":"B061L41P",
+      "cut-button-position-priority":4,
+      "copy-button-position-priority":3,
+      "paste-button-position-priority":5,
+      "select-button-position-priority":1,
+      "select-all-button-position-priority":2,
+      "clipboard-button-position-priority":6
+    }
   }
 }

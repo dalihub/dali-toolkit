@@ -18,10 +18,13 @@
 // EXTERNAL INCLUDES
 #include <sstream>
 
+#include <dali/public-api/adaptor-framework/common/color-controller.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/builder/builder-impl.h>
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
 #include <dali-toolkit/internal/builder/replacement.h>
+
 
 namespace Dali
 {
@@ -247,6 +250,12 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
         {
           value = HexStringToVector4( &(*s)[1] );
           done = true;
+        }
+        else if( Dali::ColorController::Get() )
+        {
+          Vector4 color;
+          done = Dali::ColorController::Get().RetrieveColor( *s, color );
+          value = color;
         }
       }
       else if( TreeNode::OBJECT == node.GetType() )
