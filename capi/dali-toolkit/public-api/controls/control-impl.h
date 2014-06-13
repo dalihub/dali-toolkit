@@ -23,6 +23,9 @@
  * @{
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
@@ -548,9 +551,10 @@ protected: // Construction
   // Flags for the constructor
   enum ControlBehaviour
   {
-    CONTROL_BEHAVIOUR_NONE         = 0x0,
-    REQUIRES_TOUCH_EVENTS          = 0x1,     ///< True if the OnTouchEvent() callback is required.
-    REQUIRES_STYLE_CHANGE_SIGNALS  = 0x2      ///< True if needs to monitor style change signals such as theme/font change
+    CONTROL_BEHAVIOUR_NONE        = 0,
+    REQUIRES_TOUCH_EVENTS         = 1<<1,     ///< True if the OnTouchEvent() callback is required.
+    REQUIRES_STYLE_CHANGE_SIGNALS = 1<<2,     ///< True if needs to monitor style change signals such as theme/font change
+    NO_SIZE_NEGOTIATION           = 1<<3      ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm
   };
 
   /**
@@ -732,8 +736,6 @@ private:
    */
   bool EmitKeyEventSignal(const KeyEvent& event);
 
-
-
 private:
 
   // Undefined
@@ -741,7 +743,7 @@ private:
   Control& operator=(const Control&);
 
   class Impl;
-  Impl *mImpl;
+  Impl* mImpl;
 
   friend class Internal::RelayoutControllerImpl;   ///< Relayout controller needs to call Relayout() which is private.
   friend class Internal::KeyInputFocusManager;     ///< KeyInputFocusManager needs to call which is private.

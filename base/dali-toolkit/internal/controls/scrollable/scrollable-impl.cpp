@@ -61,8 +61,10 @@ const Vector4     Scrollable::DEFAULT_OVERSHOOT_COLOUR(0.0f, 0.64f, 0.85f, 0.6f)
 // Scrollable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Scrollable controls are not layout containers so they dont need size negotiation..
+// we dont want size negotiation while scrolling if we can avoid it
 Scrollable::Scrollable()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | NO_SIZE_NEGOTIATION ) ),
   mPropertyRelativePosition(Property::INVALID_INDEX),
   mPropertyPositionMin(Property::INVALID_INDEX),
   mPropertyPositionMax(Property::INVALID_INDEX),

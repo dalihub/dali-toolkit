@@ -41,6 +41,14 @@ namespace Toolkit
 namespace Internal
 {
 
+namespace
+{
+// Flag to avoid doing more than one request per frame
+// getting the singleton handle can be expensive as it requires calling to adaptor, dynamic cast etc
+// and it can get called 100 times per frame easily in startup and new view initialization
+  bool gRelayoutRequestPending = false;
+}
+
 RelayoutController::RelayoutController()
 {
 
@@ -51,40 +59,39 @@ RelayoutController::~RelayoutController()
 
 }
 
-RelayoutController RelayoutController::Get()
+void RelayoutController::Request()
 {
-  RelayoutController controller;
-
-  // Check whether the RelayoutController is already created
-  Dali::Adaptor& adaptor = Dali::Adaptor::Get();
-  Dali::BaseHandle handle = adaptor.GetSingleton(typeid(RelayoutController));
-
-  if(handle)
+  // are we already going to do it this frame
+  if( !gRelayoutRequestPending )
   {
-    // If so, downcast the handle of singleton to RelayoutController
-    controller = RelayoutController(dynamic_cast<Internal::RelayoutControllerImpl*>(handle.GetObjectPtr()));
-  }
+    RelayoutController controller;
 
-  if(!controller)
-  {
-    // If not, create the RelayoutController and register it as a singleton
-    controller = RelayoutController(new Internal::RelayoutControllerImpl());
-    adaptor.RegisterSingleton(typeid(controller), controller);
-  }
+    // Check whether the RelayoutController is already created
+    Dali::Adaptor& adaptor = Dali::Adaptor::Get();
+    Dali::BaseHandle handle = adaptor.GetSingleton(typeid(RelayoutController));
 
-  return controller;
+    if(handle)
+    {
+      // If so, downcast the handle of singleton to RelayoutController
+      controller = RelayoutController(dynamic_cast<Internal::RelayoutControllerImpl*>(handle.GetObjectPtr()));
+    }
+
+    if(!controller)
+    {
+      // If not, create the RelayoutController and register it as a singleton
+      controller = RelayoutController( new Internal::RelayoutControllerImpl(gRelayoutRequestPending) );
+      adaptor.RegisterSingleton( typeid(controller), controller );
+    }
+
+    GetImpl(controller).Request();
+    gRelayoutRequestPending = true;
+  }
 }
 
 RelayoutController::RelayoutController(Internal::RelayoutControllerImpl *impl)
   : BaseHandle(impl)
 {
 }
-
-void RelayoutController::Request()
-{
-  GetImpl(*this).Request();
-}
-
 
 } // namespace Internal
 

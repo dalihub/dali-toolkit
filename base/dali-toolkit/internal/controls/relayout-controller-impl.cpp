@@ -20,25 +20,19 @@
 #include "relayout-controller-impl.h"
 
 // EXTERNAL INCLUDES
-
-#include <stack>
-#include <sstream>
 #include <dali/integration-api/debug.h>
+#if defined(DEBUG_ENABLED)
+#include <sstream>
+#endif // defined(DEBUG_ENABLED)
 
 // INTERNAL INCLUDES
-
-#include "dali-toolkit/public-api/controls/control.h"
-#include "dali-toolkit/public-api/controls/control-impl.h"
-#include "dali-toolkit/public-api/controls/text-view/text-view.h"
+#include <dali-toolkit/public-api/controls/text-view/text-view.h>
 
 namespace Dali
 {
 
 namespace Toolkit
 {
-
-typedef std::pair< Control, Vector2 > ControlSizePair;
-typedef std::stack< ControlSizePair > ControlStack;
 
 namespace Internal
 {
@@ -139,7 +133,7 @@ void FindControls( Actor actor, ControlStack& controls, Vector2 size )
     // Only set the width and height if they are non zero.
     SetIfNotZero( size, controlSetSize );
 
-    controls.push( ControlSizePair( control, size ) );
+    controls.push_back( ControlSizePair( control, size ) );
   }
   else
   {
@@ -167,6 +161,15 @@ void PushToStack( ControlStack& controlStack, const ActorSizeContainer& containe
 
 } // unnamed namespace
 
+RelayoutControllerImpl::RelayoutControllerImpl( bool& relayoutFlag )
+: mRelayoutFlag( relayoutFlag ),
+  mRelayoutConnection( false )
+{
+  // make space for 32 controls to avoid having to copy construct a lot in the beginning
+  mControlStack.reserve( 32 );
+  mSizecontainer.reserve( 32 );
+}
+
 RelayoutControllerImpl::~RelayoutControllerImpl()
 {
 }
@@ -185,49 +188,40 @@ void RelayoutControllerImpl::Request()
 
 void RelayoutControllerImpl::Relayout()
 {
-  PRINT_HIERARCHY;
-
-  // 1. Finds all top-level controls from the root actor and allocate them the size of the stage
-  //    These controls are paired with the stage size and added to the stack.
-  ControlStack controlStack;
-  FindControls( Stage().GetCurrent().GetRootLayer(), controlStack, Stage::GetCurrent().GetSize() );
-
-  // 2. Iterate through the stack until it's empty.
-  while ( !controlStack.empty() )
+  // only do something when requested
+  if( mRelayoutFlag )
   {
-    ControlSizePair pair ( controlStack.top() );
-    Toolkit::Control control ( pair.first );
-    Vector2 size ( pair.second );
-    controlStack.pop();
+    // clear the flag as we're now doing the relayout
+    mRelayoutFlag = false;
+    PRINT_HIERARCHY;
 
-    DALI_LOG_INFO( gLogFilter, Debug::General, "Allocating %p (%.2f, %.2f)\n", control.GetObjectPtr(), size.width, size.height );
+    mControlStack.clear(); // we do not release memory, just empty the container
 
-    // 3. Negotiate the size with the current control. Pass it an empty container which the control
-    //    has to fill with all the actors it has not done any size negotiation for.
-    ActorSizeContainer container;
-    control.GetImplementation().NegotiateSize( size, container );
+    // 1. Finds all top-level controls from the root actor and allocate them the size of the stage
+    //    These controls are paired with the stage size and added to the stack.
+    FindControls( Stage().GetCurrent().GetRootLayer(), mControlStack, Stage::GetCurrent().GetSize() );
 
-    // 4. Push the controls from the actors in the container to the stack.
-    PushToStack( controlStack, container );
+    // 2. Iterate through the stack until it's empty.
+    while ( !mControlStack.empty() )
+    {
+      ControlSizePair pair ( mControlStack.back() );
+      Toolkit::Control control ( pair.first );
+      Vector2 size ( pair.second );
+      mControlStack.pop_back();
+
+      DALI_LOG_INFO( gLogFilter, Debug::General, "Allocating %p (%.2f, %.2f)\n", control.GetObjectPtr(), size.width, size.height );
+
+      mSizecontainer.clear();
+      // 3. Negotiate the size with the current control. Pass it an empty container which the control
+      //    has to fill with all the actors it has not done any size negotiation for.
+      control.GetImplementation().NegotiateSize( size, mSizecontainer );
+
+      // 4. Push the controls from the actors in the container to the stack.
+      PushToStack( mControlStack, mSizecontainer );
+    }
   }
-
-  //Disconnect so that we relayout only when requested to do so.
-  Disconnect();
-}
-
-void RelayoutControllerImpl::Disconnect()
-{
-  if( mRelayoutConnection )
-  {
-    Stage stage = Stage::GetCurrent();
-    stage.EventProcessingFinishedSignal().Disconnect( this, &RelayoutControllerImpl::Relayout );
-    mRelayoutConnection = false;
-  }
-}
-
-RelayoutControllerImpl::RelayoutControllerImpl()
-: mRelayoutConnection( false )
-{
+  // should not disconnect the signal as that causes some control size negotiations to not work correctly
+  // this algorithm needs more optimization as well
 }
 
 } // namespace Internal

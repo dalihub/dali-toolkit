@@ -51,19 +51,14 @@ public:
   virtual ~RelayoutController();
 
   /**
-   * Get the singleton of RelayoutController object.
-   * @return A handle to the RelayoutController.
-   */
-  static RelayoutController Get();
-
-  /**
    * Request to relayout.
    */
-  void Request();
+  static void Request();
 
 private:
 
-  RelayoutController(Internal::RelayoutControllerImpl *impl);
+  RelayoutController(Internal::RelayoutControllerImpl* impl);
+
 };
 
 } // namespace Internal

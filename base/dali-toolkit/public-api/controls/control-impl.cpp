@@ -778,7 +778,7 @@ void Control::OnChildAdd(Actor& child)
     return;
   }
 
-  // Request for relayout.
+  // Request for relayout as we may need to position the new child and old ones
   RelayoutRequest();
 
   // Notify derived classes.
@@ -793,7 +793,7 @@ void Control::OnChildRemove(Actor& child)
     return;
   }
 
-  // Request for relayout.
+  // Request for relayout as we may need to re-position the old child
   RelayoutRequest();
 
   // Notify derived classes.
@@ -1065,7 +1065,12 @@ void Control::ClearKeyInputFocus()
 
 void Control::RelayoutRequest()
 {
-  Internal::RelayoutController::Get().Request();
+  // unfortunate double negative but thats to guarantee new controls get size negotiation
+  // by default and have to "opt-out" if they dont want it
+  if( !(mImpl->mFlags & NO_SIZE_NEGOTIATION) )
+  {
+    Internal::RelayoutController::Request();
+  }
 }
 
 void Control::Relayout( Vector2 size, ActorSizeContainer& container )
