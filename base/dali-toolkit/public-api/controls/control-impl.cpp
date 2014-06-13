@@ -239,24 +239,24 @@ public:
   // Construction & Destruction
   Impl(Control& controlImpl)
   : mControlImpl(controlImpl),
-    mInitialized( false ),
+    mBackground( NULL ),
+    mKeyEventSignalV2(),
     mPinchGestureDetector(),
     mPanGestureDetector(),
     mTapGestureDetector(),
     mLongPressGestureDetector(),
     mStartingPinchScale(),
-    mLockSetSize( false ),
-    mWidthPolicy( Toolkit::Control::Fixed ),
-    mHeightPolicy( Toolkit::Control::Fixed ),
     mSize(),
     mSetSize(),
     mMinimumSize(),
     mMaximumSize( MAX_FLOAT_VALUE, MAX_FLOAT_VALUE, MAX_FLOAT_VALUE ),
+    mLockSetSize( false ),
+    mWidthPolicy( Toolkit::Control::Fixed ),
+    mHeightPolicy( Toolkit::Control::Fixed ),
+    mFlags( Control::CONTROL_BEHAVIOUR_NONE ),
     mIsKeyboardNavigationSupported(false),
     mIsKeyboardFocusGroup(false),
-    mKeyEventSignalV2(),
-    mBackground( NULL ),
-    mFlags( Control::CONTROL_BEHAVIOUR_NONE )
+    mInitialized( false )
   {
   }
 
@@ -497,41 +497,30 @@ public:
   // Data
 
   Control& mControlImpl;
-
-  bool mInitialized:1;
-
+  Background* mBackground;           ///< Only create the background if we use it
   ConnectionTracker mConnectionTracker; // signal connection tracker
+  Toolkit::Control::KeyEventSignalV2 mKeyEventSignalV2;
 
   // Gesture Detection
-
   PinchGestureDetector     mPinchGestureDetector;
   PanGestureDetector       mPanGestureDetector;
   TapGestureDetector       mTapGestureDetector;
   LongPressGestureDetector mLongPressGestureDetector;
-
   Vector3 mStartingPinchScale;       ///< The scale when a pinch gesture starts
-
-  // Relayout and size negotiation
-
-  bool mLockSetSize;                 ///< Used to avoid. Can't be a bitfield as a reference to this member is used in SetSizeLock helper class.
-
-  Toolkit::Control::SizePolicy mWidthPolicy;  ///< Stores the width policy.
-  Toolkit::Control::SizePolicy mHeightPolicy; ///< Stores the height policy.
 
   Vector3 mSize;                     ///< Stores the current control's size.
   Vector3 mSetSize;                  ///< Always stores the size set through the Actor's API. Useful when reset to the initial size is needed.
   Vector3 mMinimumSize;              ///< Stores the control's minimum size.
   Vector3 mMaximumSize;              ///< Stores the control's maximum size.
 
-  bool mIsKeyboardNavigationSupported;  ///< Stores whether keyboard navigation is supported by the control.
-  bool mIsKeyboardFocusGroup;        ///< Stores whether the control is a focus group.
+  bool mLockSetSize;                 ///< Used to avoid. Can't be a bitfield as a reference to this member is used in SetSizeLock helper class.
 
-  Toolkit::Control::KeyEventSignalV2 mKeyEventSignalV2;
-
-  // Background
-  Background* mBackground;           ///< Only create the background if we use it
-
-  ControlBehaviour mFlags;           ///< Flags passed in from constructor
+  Toolkit::Control::SizePolicy mWidthPolicy:3;  ///< Stores the width policy. 3 bits covers 8 values
+  Toolkit::Control::SizePolicy mHeightPolicy:3; ///< Stores the height policy. 3 bits covers 8 values
+  ControlBehaviour mFlags:4;           ///< Flags passed in from constructor. Need to increase this size when new enums are added
+  bool mIsKeyboardNavigationSupported:1;  ///< Stores whether keyboard navigation is supported by the control.
+  bool mIsKeyboardFocusGroup:1;        ///< Stores whether the control is a focus group.
+  bool mInitialized:1;
 
   // Properties - these need to be members of Internal::Control::Impl as they need to functions within this class.
   static PropertyRegistration PROPERTY_1;
