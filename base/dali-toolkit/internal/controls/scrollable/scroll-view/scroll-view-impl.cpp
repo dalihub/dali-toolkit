@@ -611,7 +611,6 @@ ScrollView::ScrollView()
   mFrictionCoefficient(Toolkit::ScrollView::DEFAULT_FRICTION_COEFFICIENT),
   mFlickSpeedCoefficient(Toolkit::ScrollView::DEFAULT_FLICK_SPEED_COEFFICIENT),
   mMaxFlickSpeed(Toolkit::ScrollView::DEFAULT_MAX_FLICK_SPEED),
-  mPropertiesUpdated(false),
   mInAccessibilityPan(false),
   mInitialized(false),
   mScrolling(false),
@@ -1223,7 +1222,7 @@ Vector2 ScrollView::GetMouseWheelScrollDistanceStep() const
 unsigned int ScrollView::GetCurrentPage() const
 {
   // in case animation is currently taking place.
-  Vector3 position = GetCurrentScrollPosition();
+  Vector3 position = GetPropertyPosition();
 
   Actor self = Self();
   unsigned int page = 0;
@@ -1231,8 +1230,8 @@ unsigned int ScrollView::GetCurrentPage() const
   unsigned int volume = 0;
 
   // if rulerX is enabled, then get page count (columns)
-  page = mRulerX->GetPageFromPosition(position.x, mWrapMode);
-  volume = mRulerY->GetPageFromPosition(position.y, mWrapMode);
+  page = mRulerX->GetPageFromPosition(-position.x, mWrapMode);
+  volume = mRulerY->GetPageFromPosition(-position.y, mWrapMode);
   pagesPerVolume = mRulerX->GetTotalPages();
 
   return volume * pagesPerVolume + page;
@@ -1240,10 +1239,6 @@ unsigned int ScrollView::GetCurrentPage() const
 
 Vector3 ScrollView::GetCurrentScrollPosition() const
 {
-  if( mPropertiesUpdated )
-  {
-    return -mScrollPostPosition;
-  }
   return -GetPropertyPosition();
 }
 
@@ -1285,10 +1280,19 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
   Vector3 currentScrollPosition = GetCurrentScrollPosition();
   Self().SetProperty( mPropertyScrollStartPagePosition, currentScrollPosition );
 
-  PreAnimatedScrollSetup();
+  if( mScrolling ) // are we interrupting a current scroll?
+  {
+    // set mScrolling to false, in case user has code that interrogates mScrolling Getter() in complete.
+    mScrolling = false;
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 1 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+    mScrollCompletedSignalV2.Emit( currentScrollPosition );
+  }
 
-  Vector3 scrollStartPosition = GetCurrentScrollPosition();
+  Self().SetProperty(mPropertyScrolling, true);
+  mScrolling = true;
 
+  DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignalV2 1 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+  mScrollStartedSignalV2.Emit( currentScrollPosition );
   bool animating = AnimateTo(-position,
                              Vector3::ONE * duration,
                              scale,
@@ -1301,16 +1305,14 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
                              verticalBias,
                              Snap);
 
-  if( !mScrolling )
-  {
-    DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignalV2 1 [%.2f, %.2f]", this, scrollStartPosition.x, scrollStartPosition.y);
-    ScrollingStarted(scrollStartPosition);
-  }
-
   if(!animating)
   {
-    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 1 [%.2f, %.2f]", this, -mScrollPostPosition.x, -mScrollPostPosition.y);
-    ScrollingStopped(-mScrollPostPosition);
+    // if not animating, then this pan has completed right now.
+    Self().SetProperty(mPropertyScrolling, false);
+    mScrolling = false;
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 2 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+    SetScrollUpdateNotification(false);
+    mScrollCompletedSignalV2.Emit( currentScrollPosition );
   }
 }
 
@@ -1718,10 +1720,7 @@ void ScrollView::StopAnimation(void)
   StopAnimation(mSnapAnimation);
   StopAnimation(mInternalXAnimation);
   StopAnimation(mInternalYAnimation);
-
-  // clear scrolling flags
   mScrollStateFlags = 0;
-
   // remove scroll animation flags
   HandleStoppedAnimation();
 }
@@ -1756,6 +1755,12 @@ bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDurat
   {
     totalDuration = std::max(totalDuration, positionDuration.x);
     totalDuration = std::max(totalDuration, positionDuration.y);
+  }
+  else
+  {
+    // try to animate for a frame, on some occasions update will be changing scroll value while event side thinks it hasnt changed
+    totalDuration = 0.01f;
+    positionChanged = true;
   }
 
   if(scaleChanged)
@@ -1796,14 +1801,14 @@ bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDurat
     // a horizonal/vertical wall.delay
     AnimateInternalXTo(mScrollTargetPosition.x, positionDuration.x, alpha);
     AnimateInternalYTo(mScrollTargetPosition.y, positionDuration.y, alpha);
-  }
 
-  if( !(mScrollStateFlags & SCROLL_ANIMATION_FLAGS) )
-  {
-    mScrollTargetPosition = position;
-    WrapPosition(mScrollTargetPosition);
-    self.SetProperty(mPropertyPrePosition, mScrollTargetPosition);
-    mScrollPrePosition = mScrollPostPosition = mScrollTargetPosition;
+    if( !(mScrollStateFlags & SCROLL_ANIMATION_FLAGS) )
+    {
+      self.SetProperty(mPropertyPrePosition, mScrollTargetPosition);
+      mScrollPrePosition = mScrollTargetPosition;
+      mScrollPostPosition = mScrollTargetPosition;
+      WrapPosition(mScrollPostPosition);
+    }
   }
 
   // Scale Delta ///////////////////////////////////////////////////////
@@ -1899,12 +1904,17 @@ void ScrollView::FindAndUnbindActor(Actor child)
 
 Vector3 ScrollView::GetPropertyPrePosition() const
 {
-  return Self().GetProperty<Vector3>(mPropertyPrePosition);
+  Vector3 position = Self().GetProperty<Vector3>(mPropertyPrePosition);
+  WrapPosition(position);
+  return position;
 }
 
 Vector3 ScrollView::GetPropertyPosition() const
 {
-  return Self().GetProperty<Vector3>(mPropertyPosition);
+  Vector3 position = Self().GetProperty<Vector3>(mPropertyPosition);
+  WrapPosition(position);
+
+  return position;
 }
 
 Vector3 ScrollView::GetPropertyScale() const
@@ -1920,20 +1930,23 @@ void ScrollView::HandleStoppedAnimation()
 void ScrollView::HandleSnapAnimationFinished()
 {
   // Emit Signal that scrolling has completed.
+  mScrolling = false;
   Actor self = Self();
   self.SetProperty(mPropertyScrolling, false);
 
   Vector3 deltaPosition(mScrollPrePosition);
 
+  UpdateLocalScrollProperties();
   WrapPosition(mScrollPrePosition);
   self.SetProperty(mPropertyPrePosition, mScrollPrePosition);
+
+  Vector3 currentScrollPosition = GetCurrentScrollPosition();
+  DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 3 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+  mScrollCompletedSignalV2.Emit( currentScrollPosition );
 
   mDomainOffset += deltaPosition - mScrollPostPosition;
   self.SetProperty(mPropertyDomainOffset, mDomainOffset);
   HandleStoppedAnimation();
-
-  DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 2 [%.2f, %.2f]", this, GetCurrentScrollPosition().x, GetCurrentScrollPosition().y);
-  ScrollingStopped(GetCurrentScrollPosition());
 }
 
 void ScrollView::SetScrollUpdateNotification( bool enabled )
@@ -1970,12 +1983,8 @@ void ScrollView::OnScrollUpdateNotification(Dali::PropertyNotification& source)
   // Guard against destruction during signal emission
   Toolkit::ScrollView handle( GetOwner() );
 
-  // sometimes notification isnt removed quickly enough, dont emit signal if not scrolling
-  if( mScrolling )
-  {
-    Vector3 currentScrollPosition = GetCurrentScrollPosition();
-    mScrollUpdatedSignalV2.Emit( currentScrollPosition );
-  }
+  Vector3 currentScrollPosition = GetCurrentScrollPosition();
+  mScrollUpdatedSignalV2.Emit( currentScrollPosition );
 }
 
 bool ScrollView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -2094,12 +2103,9 @@ bool ScrollView::OnTouchDownTimeout()
       Self().SetProperty(mPropertyDomainOffset, Vector3::ZERO);
 
       UpdateLocalScrollProperties();
-      mPropertiesUpdated = true;
-      DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 3 [%.2f, %.2f]", this, GetCurrentScrollPosition().x, GetCurrentScrollPosition().y);
-      ScrollingStopped(GetCurrentScrollPosition());
-
-      // make sure scroll view returns actual property value and not locally stored value once we return from this function
-      mPropertiesUpdated = false;
+      Vector3 currentScrollPosition = GetCurrentScrollPosition();
+      DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 4 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+      mScrollCompletedSignalV2.Emit( currentScrollPosition );
     }
   }
 
@@ -2119,9 +2125,6 @@ bool ScrollView::OnTouchEvent(const TouchEvent& event)
   {
     return false;
   }
-
-  UpdateLocalScrollProperties();
-  mPropertiesUpdated = true;
 
   if( event.GetPoint(0).state == TouchPoint::Down )
   {
@@ -2150,6 +2153,7 @@ bool ScrollView::OnTouchEvent(const TouchEvent& event)
         mLastVelocity = Vector2( 0.0f, 0.0f );
       }
 
+      UpdateLocalScrollProperties();
       // Only finish the transform if scrolling was interrupted on down or if we are scrolling
       if ( mScrollInterrupted || mScrolling )
       {
@@ -2159,9 +2163,6 @@ bool ScrollView::OnTouchEvent(const TouchEvent& event)
     mTouchDownTimeoutReached = false;
     mScrollInterrupted = false;
   }
-
-  // no longer guarantee local properties are up to date
-  mPropertiesUpdated = false;
 
   return true;
 }
@@ -2212,15 +2213,19 @@ bool ScrollView::OnMouseWheelEvent(const MouseWheelEvent& event)
   return true;
 }
 
+void ScrollView::ResetScrolling()
+{
+  Actor self = Self();
+  self.GetProperty(mPropertyPosition).Get(mScrollPostPosition);
+  mScrollPrePosition = mScrollPostPosition;
+  self.SetProperty(mPropertyPrePosition, mScrollPostPosition);
+}
+
 void ScrollView::UpdateLocalScrollProperties()
 {
-  if( !mPropertiesUpdated )
-  {
-    // only update local properties if we are not currently handler an event originating from this scroll view
-    Actor self = Self();
-    self.GetProperty(mPropertyPrePosition).Get(mScrollPrePosition);
-    self.GetProperty(mPropertyPosition).Get(mScrollPostPosition);
-  }
+  Actor self = Self();
+  self.GetProperty(mPropertyPrePosition).Get(mScrollPrePosition);
+  self.GetProperty(mPropertyPosition).Get(mScrollPostPosition);
 }
 
 // private functions
@@ -2232,10 +2237,24 @@ void ScrollView::PreAnimatedScrollSetup()
 
   Actor self = Self();
 
-  Vector3 deltaPosition(mScrollPrePosition);
+  Vector3 deltaPosition(mScrollPostPosition);
+  WrapPosition(mScrollPostPosition);
   mDomainOffset += deltaPosition - mScrollPostPosition;
   Self().SetProperty(mPropertyDomainOffset, mDomainOffset);
-  StopAnimation();
+
+  if( mScrollStateFlags & SCROLL_X_STATE_MASK )
+  {
+    // already performing animation on internal x position
+    StopAnimation(mInternalXAnimation);
+  }
+
+  if( mScrollStateFlags & SCROLL_Y_STATE_MASK )
+  {
+    // already performing animation on internal y position
+    StopAnimation(mInternalYAnimation);
+  }
+
+  mScrollStateFlags = 0;
 
   mScrollPostScale = GetPropertyScale();
 
@@ -2244,9 +2263,6 @@ void ScrollView::PreAnimatedScrollSetup()
 
   mScrollPreScale = mScrollPostScale;
   mScrollPreRotation = mScrollPostRotation;
-
-  // animated scroll needs update notification
-  SetScrollUpdateNotification(true);
 }
 
 void ScrollView::FinaliseAnimatedScroll()
@@ -2302,7 +2318,6 @@ void ScrollView::OnScrollAnimationFinished( Animation& source )
 
   // update our local scroll positions
   UpdateLocalScrollProperties();
-  mPropertiesUpdated = true;
 
   if( source == mSnapAnimation )
   {
@@ -2348,7 +2363,6 @@ void ScrollView::OnScrollAnimationFinished( Animation& source )
   {
     HandleSnapAnimationFinished();
   }
-  mPropertiesUpdated = false;
 }
 
 void ScrollView::OnSnapInternalPositionFinished( Animation& source )
@@ -2430,15 +2444,30 @@ void ScrollView::GestureStarted()
     mScaleDelta = Vector3::ONE;
     mRotationDelta = 0.0f;
     mLastVelocity = Vector2(0.0f, 0.0f);
-
-    // inform application that animated scroll has been interrupted
-    if( mScrolling )
+    if( !mScrolling )
     {
-      DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 4 [%.2f, %.2f]", this, GetCurrentScrollPosition().x, GetCurrentScrollPosition().y);
-      ScrollingStopped(GetCurrentScrollPosition());
+      mLockAxis = LockPossible;
     }
-    DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignalV2 2 [%.2f, %.2f]", this, GetCurrentScrollPosition().x, GetCurrentScrollPosition().y);
-    ScrollingStarted(GetCurrentScrollPosition());
+
+    if( mScrollStateFlags & SCROLL_X_STATE_MASK )
+    {
+      StopAnimation(mInternalXAnimation);
+    }
+    if( mScrollStateFlags & SCROLL_Y_STATE_MASK )
+    {
+      StopAnimation(mInternalYAnimation);
+    }
+    mScrollStateFlags = 0;
+
+    if(mScrolling) // are we interrupting a current scroll?
+    {
+      // set mScrolling to false, in case user has code that interrogates mScrolling Getter() in complete.
+      mScrolling = false;
+      // send negative scroll position since scroll internal scroll position works as an offset for actors,
+      // give applications the position within the domain from the scroll view's anchor position
+      DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 5 [%.2f, %.2f]", this, -mScrollPostPosition.x, -mScrollPostPosition.y);
+      mScrollCompletedSignalV2.Emit( -mScrollPostPosition );
+    }
   }
 }
 
@@ -2463,24 +2492,6 @@ void ScrollView::GestureContinuing(const Vector2& panDelta, const Vector2& scale
   } // end if mAxisAutoLock
 }
 
-void ScrollView::ScrollingStarted( const Vector3& position )
-{
-  Self().SetProperty(mPropertyScrolling, true);
-  mScrolling = true;
-  mLockAxis = LockPossible;
-
-  mScrollStartedSignalV2.Emit( position );
-}
-
-void ScrollView::ScrollingStopped( const Vector3& position )
-{
-  Self().SetProperty(mPropertyScrolling, false);
-  mScrolling = false;
-  SetScrollUpdateNotification(false);
-
-  mScrollCompletedSignalV2.Emit( position );
-}
-
 // TODO: Upgrade to use a more powerful gesture detector (one that supports multiple touches on pan - so works as pan and flick gesture)
 // TODO: Reimplement Scaling (pinching 2+ points)
 // TODO: Reimplment Rotation (pinching 2+ points)
@@ -2498,14 +2509,13 @@ void ScrollView::OnPan(PanGesture gesture)
     // this callback will still be called, so we must suppress it.
     return;
   }
-  UpdateLocalScrollProperties();
-  mPropertiesUpdated = true;
 
   // translate Gesture input to get useful data...
   switch(gesture.state)
   {
     case Gesture::Started:
     {
+      UpdateLocalScrollProperties();
       GestureStarted();
       mPanning = true;
       self.SetProperty( mPropertyPanning, true );
@@ -2524,6 +2534,7 @@ void ScrollView::OnPan(PanGesture gesture)
     case Gesture::Finished:
     case Gesture::Cancelled:
     {
+      UpdateLocalScrollProperties();
       mLastVelocity = gesture.velocity;
       mPanning = false;
       self.SetProperty( mPropertyPanning, false );
@@ -2531,11 +2542,6 @@ void ScrollView::OnPan(PanGesture gesture)
       if( mScrollMainInternalPrePositionConstraint )
       {
         self.RemoveConstraint(mScrollMainInternalPrePositionConstraint);
-      }
-      mGestureStackDepth--;
-      if(mGestureStackDepth==0)
-      {
-        FinishTransform();
       }
       break;
     }
@@ -2546,10 +2552,37 @@ void ScrollView::OnPan(PanGesture gesture)
       // Nothing to do, not needed.
       break;
     }
+
   } // end switch(gesture.state)
 
-  // can no longer guarantee local properties are latest
-  mPropertiesUpdated = false;
+  OnGestureEx(gesture.state);
+}
+
+void ScrollView::OnGestureEx(Gesture::State state)
+{
+  // call necessary signals for application developer
+
+  if(state == Gesture::Started)
+  {
+    Vector3 currentScrollPosition = GetCurrentScrollPosition();
+    Self().SetProperty(mPropertyScrolling, true);
+    mScrolling = true;
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignalV2 2 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+    mScrollStartedSignalV2.Emit( currentScrollPosition );
+  }
+  else if( (state == Gesture::Finished) ||
+           (state == Gesture::Cancelled) ) // Finished/default
+  {
+    // when all the gestures have finished, we finish the transform.
+    // so if a user decides to pan (1 gesture), and then pan+zoom (2 gestures)
+    // then stop panning (back to 1 gesture), and then stop zooming (0 gestures).
+    // this is the point we end, and perform necessary snapping.
+    mGestureStackDepth--;
+    if(mGestureStackDepth==0)
+    {
+      FinishTransform();
+    }
+  }
 }
 
 void ScrollView::UpdateTransform()
@@ -2581,15 +2614,9 @@ void ScrollView::FinishTransform()
     {
       SnapInternalYTo(mScrollTargetPosition.y);
     }
-    if( !(mScrollStateFlags & SNAP_ANIMATION_FLAGS) )
-    {
-      // set final position
-      WrapPosition(mScrollTargetPosition);
-      mScrollPrePosition = mScrollTargetPosition;
-      self.SetProperty(mPropertyPrePosition, mScrollPrePosition);
-    }
-    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 5 [%.2f, %.2f]", this, GetCurrentScrollPosition().x, GetCurrentScrollPosition().y);
-    ScrollingStopped(GetCurrentScrollPosition());
+    Vector3 currentScrollPosition = GetCurrentScrollPosition();
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 6 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+    mScrollCompletedSignalV2.Emit( currentScrollPosition );
   }
 }
 

@@ -233,10 +233,6 @@ unsigned int FixedRuler::GetPageFromPosition(float position, bool wrap) const
   // spacing must be present.
   if(mEnabled && fabsf(mSpacing) > Math::MACHINE_EPSILON_1)
   {
-    if( wrap )
-    {
-      position = WrapInDomain(position, mDomain.min, mDomain.max);
-    }
     page = floor((position - mDomain.min) / mSpacing + 0.5f);
 
     if(wrap)
