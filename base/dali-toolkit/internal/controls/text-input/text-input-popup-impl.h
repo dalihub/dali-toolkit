@@ -260,6 +260,12 @@ public:
    */
   void SetPopupBoundary( const Rect<float>& boundingRectangle );
 
+  /**
+   * Sets the positon of the PopUp tail relative to TextInput
+   * @param position Position to set
+   */
+  void SetTailPosition( const Vector3& position );
+
 private:
 
   /**
@@ -283,6 +289,11 @@ private:
    * Applies constraint to keep Popup in view within the desired area.
    */
   void ApplyConfinementConstraint();
+
+  /**
+   * Applies constraint to keep the Tail attached to Popup
+   */
+  void ApplyTailConstraint();
 
   /**
    * Create a layer to hold the stencil
@@ -347,6 +358,10 @@ private:
   Property::Index mAlternativeOffsetProperty;         ///< Property [Vector3] how much to offset the popup if it goes out of the screen
   ImageActor mBackground;                             ///< The background popup panel
   ImageActor mTail;                                   ///< The tail for the popup
+  ImageActor mTailOutline;                            ///< The border/outline around the tail
+
+  float mPopupTailXPosition;                          ///< X position of PopUp tail.
+
   Vector3 mContentSize;                               ///< Size of Content (i.e. Buttons)
   ActorContainer mButtonContainer;                    ///< List of buttons added to popup.
   ActorContainer mDividerContainer;                   ///< List of dividers added to popup.

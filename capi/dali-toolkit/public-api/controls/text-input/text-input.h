@@ -59,6 +59,9 @@ public:
   static const Property::Index SELECT_BUTTON_POSITION_PRIORITY_PROPERTY; // Property, name "select-button-position-priority", type unsigned int
   static const Property::Index SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY; // Property, name "select-all-button-position-priority", type unsigned int
   static const Property::Index CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY; // Property, name "clipboard-button-position-priority", type unsigned int
+
+  static const Property::Index POP_UP_OFFSET_FROM_TEXT_PROPERTY;       // Property, name "popup-offset-from-text", type VECTOR4
+
   /** @} */
 
   /// @name Signals

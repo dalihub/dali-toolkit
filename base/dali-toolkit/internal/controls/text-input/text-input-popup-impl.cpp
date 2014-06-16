@@ -42,7 +42,8 @@ const Vector3 POPUP_BORDER( Vector3(1.0f, 1.0f, 0.0f) );
  */
 
 // Popup: Tails
-const char* DEFAULT_POPUP_TAIL_BOTTOM( DALI_IMAGE_DIR "00_popup_bubble_tail_bottom.png" );
+const char* DEFAULT_POPUP_TAIL_BOTTOM( DALI_IMAGE_DIR "popup_bubble_tail_bottom.png" );
+const char* DEFAULT_POPUP_TAIL_BOTTOM_OUTLINE( DALI_IMAGE_DIR "popup_bubble_tail_bottom_line.png" );
 
 // Popup: Vertical Constraint
 // TODO: Remove - this should come from application - it is not possible to get the
@@ -69,7 +70,7 @@ const float HIDE_POPUP_ANIMATION_DURATION(0.2f);                            ///<
 const float SHOW_POPUP_ANIMATION_DURATION(0.2f);                            ///< Duration of popup show animation in seconds.
 
 const Vector2 DEFAULT_ICON_SIZE( 45.0f, 45.0f );                            ///< Default icon size for image in options
-const float TEXT_POSITION_OFFSET( -19.0f );                                  ///< Default offset for text label
+const float TEXT_POSITION_OFFSET( -19.0f );                                 ///< Default offset for text label
 const float ICON_POSITION_OFFSET( 19.0f );                                  ///< Default offset for icon
 
 const char* DEFAULT_ICON_CLIPBOARD( DALI_IMAGE_DIR "copy_paste_icon_clipboard.png" );
@@ -177,6 +178,35 @@ struct ConfinementConstraint
   Rect<float> mBoundingRect;                            ///< Bounding Rect Popup must stay within
 };
 
+/**
+ * Confine actor to the x axis boundaries of reference actor (e.g. Parent)
+ */
+struct ParentXAxisConstraint
+{
+  /**
+   * Confinement constraint constructor.
+   */
+  ParentXAxisConstraint( float handlesMidPoint = 0.0f )
+  : mHandlesMidPoint( handlesMidPoint )
+  {
+  }
+
+  float operator()(  const float          constXPosition,
+                     const PropertyInput& localWidthProperty,
+                     const PropertyInput& anchorPointXProperty )
+  {
+    const float size = localWidthProperty.GetFloat();
+    const float anchor = anchorPointXProperty.GetFloat();
+
+    float newPosition = Clamp( mHandlesMidPoint, constXPosition - size * anchor , constXPosition + size * anchor);
+
+    return newPosition;
+  }
+
+  float mHandlesMidPoint;
+};
+
+
 } // unnamed namespace
 
 namespace Dali
@@ -202,6 +232,7 @@ const char* const TextInputPopup::OPTION_CLIPBOARD("option-clipboard");         
 TextInputPopup::TextInputPopup()
 : mState(StateHidden),
   mRootActor(Layer::New()),
+  mPopupTailXPosition( 0.0f ),
   mContentSize( Vector3::ZERO ),
   mCutPasteButtonsColor( DEFAULT_POPUP_BACKGROUND ),
   mCutPasteButtonsPressedColor( DEFAULT_POPUP_BUTTON_PRESSED ),
@@ -250,6 +281,15 @@ void TextInputPopup::ApplyConfinementConstraint()
                                                                            true,
                                                                            true, mBoundingRect ) );
   mRootActor.ApplyConstraint(constraint);
+}
+
+void TextInputPopup::ApplyTailConstraint()
+{
+  mTail.RemoveConstraints();
+  Constraint constraint = Constraint::New<float>( Actor::POSITION_X,
+                                                  LocalSource( Actor::SIZE_WIDTH ),
+                                                  LocalSource( Actor::ANCHOR_POINT_X ),
+                                                  ParentXAxisConstraint());
 }
 
 void TextInputPopup::CreateLayer( const Vector2& size )
@@ -312,6 +352,7 @@ void TextInputPopup::Clear()
 {
   if ( mBackground )
   {
+    UnparentAndReset( mTail );
     UnparentAndReset( mStencil );
     UnparentAndReset( mBackground );
     UnparentAndReset( mScrollView );
@@ -365,13 +406,21 @@ void TextInputPopup::CreatePopUpBackground()
 
     // Add Tail too.
     Image tailImage = Image::New( DEFAULT_POPUP_TAIL_BOTTOM );
+    Image tailImageOutline = Image::New( DEFAULT_POPUP_TAIL_BOTTOM_OUTLINE );
+
+    mTailOutline = ImageActor::New ( tailImageOutline );
+    mTailOutline.SetParentOrigin( ParentOrigin::CENTER );
+    mTailOutline.SetAnchorPoint( AnchorPoint::CENTER );
+    mTailOutline.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
 
     mTail = ImageActor::New( tailImage );
     mTail.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
     mTail.SetAnchorPoint( AnchorPoint::TOP_CENTER );
-    mBackground.Add( mTail );
     // TODO: Make tail visible, and positioned in relation to original intended position of popup (i.e. before constrained effects)
-    mTail.SetVisible(false);
+    mTail.SetVisible(true);
+    mTail.SetColor( mCutPasteButtonsColor );
+    mTailOutline.SetColor( mBorderColor );
+    mTail.Add( mTailOutline);
   }
 }
 
@@ -577,15 +626,12 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
   {
     i->SetSize( DIVIDER_WIDTH, dividerHeight );
   }
-
-  mTail.SetPosition(Vector3(0.0f, -20.0f, 0.0f));
-
   button.ClickedSignal().Connect( this, &TextInputPopup::OnButtonPressed );
 }
 
 void TextInputPopup::Hide(bool animate)
 {
-  if(mBackground)
+  if( mRootActor )
   {
     if(mAnimation)
     {
@@ -596,8 +642,8 @@ void TextInputPopup::Hide(bool animate)
     if(animate)
     {
       mAnimation = Animation::New( HIDE_POPUP_ANIMATION_DURATION );
-      mAnimation.AnimateTo( Property(mBackground, Actor::SCALE), Vector3::ZERO, AlphaFunctions::EaseOut );
-      mAnimation.AnimateTo( Property(mBackground, Actor::COLOR_ALPHA), 0.0f, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRootActor, Actor::SCALE), Vector3::ZERO, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRootActor, Actor::COLOR_ALPHA), 0.0f, AlphaFunctions::EaseOut );
       mAnimation.Play();
 
       mAnimation.FinishedSignal().Connect( this, &TextInputPopup::OnHideFinished );
@@ -605,8 +651,8 @@ void TextInputPopup::Hide(bool animate)
     }
     else
     {
-      mBackground.SetProperty(Actor::SCALE, Vector3::ZERO);
-      mBackground.SetProperty(Actor::COLOR_ALPHA, 0.0f);
+      mRootActor.SetProperty(Actor::SCALE, Vector3::ZERO);
+      mRootActor.SetProperty(Actor::COLOR_ALPHA, 0.0f);
       mState = StateHidden;
     }
   }
@@ -614,9 +660,11 @@ void TextInputPopup::Hide(bool animate)
 
 void TextInputPopup::Show(bool animate)
 {
-  if(mBackground)
+  if( mRootActor )
   {
-    mBackground.SetSensitive( true );
+    mRootActor.SetSensitive( true );
+
+    mTail.SetPosition(Vector3( mPopupTailXPosition, 0.0f, 0.0f));
 
     if(mAnimation)
     {
@@ -627,8 +675,8 @@ void TextInputPopup::Show(bool animate)
     if(animate)
     {
       mAnimation = Animation::New( SHOW_POPUP_ANIMATION_DURATION );
-      mAnimation.AnimateTo( Property(mBackground, Actor::SCALE), Vector3::ONE, AlphaFunctions::EaseOut );
-      mAnimation.AnimateTo( Property(mBackground, Actor::COLOR_ALPHA), 1.0f, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRootActor, Actor::SCALE), Vector3::ONE, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRootActor, Actor::COLOR_ALPHA), 1.0f, AlphaFunctions::EaseOut );
       mAnimation.Play();
 
       mAnimation.FinishedSignal().Connect( this, &TextInputPopup::OnShowFinished );
@@ -636,8 +684,8 @@ void TextInputPopup::Show(bool animate)
     }
     else
     {
-      mBackground.SetProperty(Actor::SCALE, Vector3::ONE);
-      mBackground.SetProperty(Actor::COLOR_ALPHA, 1.0f);
+      mRootActor.SetProperty(Actor::SCALE, Vector3::ONE);
+      mRootActor.SetProperty(Actor::COLOR_ALPHA, 1.0f);
       mState = StateShown;
     }
   }
@@ -811,6 +859,7 @@ void TextInputPopup::AddPopupOptions()
   mLayer.Add( mStencil );
   mLayer.Add( mScrollView );
   mScrollView.Add( mBackground );
+  mRootActor.Add( mTail );
 
   Self().Add(mLayer);
 }
@@ -818,6 +867,12 @@ void TextInputPopup::AddPopupOptions()
 void TextInputPopup::SetPopupBoundary( const Rect<float>& boundingRectangle )
 {
   mBoundingRect =  boundingRectangle;
+}
+
+void TextInputPopup::SetTailPosition( const Vector3& position )
+{
+  mPopupTailXPosition = position.x;
+  ApplyTailConstraint();
 }
 
 bool TextInputPopup::OnButtonPressed( Toolkit::Button button )
@@ -861,3 +916,4 @@ TextInputPopup::ShowFinishedSignalV2& TextInputPopup::ShowFinishedSignal()
 } // namespace Toolkit
 
 } // namespace Dali
+

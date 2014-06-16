@@ -1333,6 +1333,18 @@ public:  // Public to allow internal testing.
    */
   void GetTextLayoutInfo();
 
+  /**
+   * Set the offset for positioning Popup from the TextInput
+   * @param[in] offset in the order, left, top, right, bottom
+   */
+  void SetOffsetFromText( const Vector4& offset );
+
+  /**
+   * Get the offset of the Popup from the TextInput
+   * @return Vector4 with the offset in the order, left, top, right, bottom
+   */
+  const Vector4& GetOffsetFromText() const;
+
   // Properties
 
   /**
@@ -1452,10 +1464,11 @@ private:
   Vector4 mSelectionHandleFlipMargin;
   Vector4 mBoundingRectangleWorldCoordinates;
 
-  Clipboard mClipboard;                  ///< Handle to clipboard
+  Clipboard mClipboard;                   ///< Handle to clipboard
 
   // Styling
-  Vector4           mMaterialColor;      // Color of the highlight
+  Vector4           mMaterialColor;       // Color of the highlight
+  Vector4           mPopupOffsetFromText; // Offset of Popup from the TextInput.
 
   bool mOverrideAutomaticAlignment:1;    ///< Whether to override the alignment automatically set by the text content (e.g. european LTR or arabic RTL)
   bool mCursorRTLEnabled:1;              ///< Enable state of Alternate RTL Cursor (need to keep track of this as it's not always enabled)

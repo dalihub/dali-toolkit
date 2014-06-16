@@ -57,15 +57,15 @@ const Vector4 DEFAULT_CURSOR_IMAGE_9_BORDER( 2.0f, 2.0f, 2.0f, 2.0f );
 
 const std::size_t CURSOR_BLINK_INTERVAL = 500;                              ///< Cursor blink interval
 const float CHARACTER_THRESHOLD( 2.5f );                                    ///< the threshold of a line.
-const float DISPLAYED_HIGHLIGHT_Z_OFFSET( 0.0f );                           ///< 1. Highlight rendered (z-offset).
-const float DISPLAYED_TEXT_VIEW_Z_OFFSET( 0.1f );                           ///< 2. Text rendered (z-offset).
+const float DISPLAYED_HIGHLIGHT_Z_OFFSET( 0.1f );                           ///< 1. Highlight rendered (z-offset).
+const float DISPLAYED_TEXT_VIEW_Z_OFFSET( 0.2f );                           ///< 2. Text rendered (z-offset).
 const float UI_Z_OFFSET( 0.2f );                                            ///< 3. Text Selection Handles/Cursor z-offset.
 
 const Vector3 UI_OFFSET(0.0f, 0.0f, UI_Z_OFFSET);                           ///< Text Selection Handles/Cursor offset.
 const Vector3 DEFAULT_HANDLE_ONE_OFFSET(0.0f, -5.0f, 0.0f);                 ///< Handle One's Offset
 const Vector3 DEFAULT_HANDLE_TWO_OFFSET(0.0f, -5.0f, 0.0f);                 ///< Handle Two's Offset
-const float TOP_HANDLE_TOP_OFFSET(-1.5f);                                   ///< Offset between top handle and cutCopyPaste pop-up
-const float BOTTOM_HANDLE_BOTTOM_OFFSET(1.5f);                              ///< Offset between bottom handle and cutCopyPaste pop-up
+const float TOP_HANDLE_TOP_OFFSET( 34.0f);                                   ///< Offset between top handle and cutCopyPaste pop-up
+const float BOTTOM_HANDLE_BOTTOM_OFFSET(34.0f);                              ///< Offset between bottom handle and cutCopyPaste pop-up
 const float CURSOR_THICKNESS(6.0f);
 const Degree CURSOR_ANGLE_OFFSET(2.0f);                                     ///< Offset from the angle of italic angle.
 
@@ -208,6 +208,8 @@ const Property::Index TextInput::SELECT_BUTTON_POSITION_PRIORITY_PROPERTY     = 
 const Property::Index TextInput::SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+7;
 const Property::Index TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY  = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+8;
 
+const Property::Index TextInput::POP_UP_OFFSET_FROM_TEXT_PROPERTY             = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+9;
+
 namespace Internal
 {
 
@@ -312,6 +314,7 @@ TextInput::TextInput()
  mBoundingRectangleWorldCoordinates( 0.0f, 0.0f, 0.0f, 0.0f ),
  mClipboard(),
  mMaterialColor( LIGHTBLUE ),
+ mPopupOffsetFromText ( Vector4( 0.0f, TOP_HANDLE_TOP_OFFSET, 0.0f, BOTTOM_HANDLE_BOTTOM_OFFSET ) ),
  mOverrideAutomaticAlignment( false ),
  mCursorRTLEnabled( false ),
  mClosestCursorPositionEOL ( false ),
@@ -3703,6 +3706,7 @@ void TextInput::AddPopupOptions()
 void TextInput::SetPopupPosition(const Vector3& position)
 {
   mPopUpPanel.Self().SetPosition( position );
+  mPopUpPanel.SetTailPosition( position );
 }
 
 void TextInput::HidePopup(bool animate, bool signalFinished )
@@ -3738,27 +3742,31 @@ void TextInput::ShowPopup(bool animate)
       topHandle = mSelectionHandleTwoActualPosition;
       rowSize = GetRowRectFromCharacterPosition( mSelectionHandleTwoPosition );
     }
-    topHandle.y += TOP_HANDLE_TOP_OFFSET - rowSize.height;
+    topHandle.y += -mPopupOffsetFromText.y - rowSize.height;
     position = Vector3(topHandle.x, topHandle.y, 0.0f);
 
     // bottomHandle: referring to the bottom most point of the handle or the bottom line of selection.
     Vector3 bottomHandle;
     bottomHandle.y = std::max ( mSelectionHandleTwoActualPosition.y , mSelectionHandleOneActualPosition.y );
-    bottomHandle.y += GetSelectionHandleSize().y + BOTTOM_HANDLE_BOTTOM_OFFSET;
+    bottomHandle.y += GetSelectionHandleSize().y + mPopupOffsetFromText.w;
     mPopUpPanel.SetAlternativeOffset(Vector2( mBoundingRectangleWorldCoordinates.x, bottomHandle.y - topHandle.y));
+
+    float xPosition = ( fabsf( topHandle.x - bottomHandle.x ) )*0.5f + std::min( topHandle.x , bottomHandle.x );
+
+    position.x = xPosition;
   }
   else
   {
     // When no text is selected, show popup at world position of grab handle or cursor
     position = GetActualPositionFromCharacterPosition( mCursorPosition );
     const Size rowSize = GetRowRectFromCharacterPosition( mCursorPosition );
-    position.y -= rowSize.height;
+    position.y -= ( mPopupOffsetFromText.y + rowSize.height );
     // if can't be positioned above, then position below row.
     Vector2 alternativePopUpPosition( mBoundingRectangleWorldCoordinates.x, position.y ); // default if no grab handle
     if ( mGrabHandle )
     {
       // If grab handle enabled then position pop-up below the grab handle.
-      alternativePopUpPosition.y = rowSize.height + mGrabHandle.GetCurrentSize().height + BOTTOM_HANDLE_BOTTOM_OFFSET ;
+      alternativePopUpPosition.y = rowSize.height + mGrabHandle.GetCurrentSize().height + mPopupOffsetFromText.w +50.0f;
     }
     mPopUpPanel.SetAlternativeOffset( alternativePopUpPosition );
   }
@@ -3767,7 +3775,7 @@ void TextInput::ShowPopup(bool animate)
   Vector3 textViewSize = mDisplayedTextView.GetCurrentSize();
   textViewSize.z = 0.0f;
   // World position = world position of local position i.e. top-left corner of TextView
-  Vector3 worldPosition = mDisplayedTextView.GetCurrentWorldPosition() - (textViewSize * 0.5f) + position;
+  Vector3 worldPosition = mDisplayedTextView.GetCurrentWorldPosition() - ( textViewSize * 0.5f ) + position;
 
   SetPopupPosition( worldPosition );
 
@@ -5135,6 +5143,16 @@ void TextInput::GetTextLayoutInfo()
   }
 }
 
+void TextInput::SetOffsetFromText( const Vector4& offset )
+{
+  mPopupOffsetFromText = offset;
+}
+
+const Vector4& TextInput::GetOffsetFromText() const
+{
+  return mPopupOffsetFromText;
+}
+
 void TextInput::SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )
 {
   Toolkit::TextInput textInput = Toolkit::TextInput::DownCast( Dali::BaseHandle( object ) );
@@ -5188,6 +5206,11 @@ void TextInput::SetProperty( BaseObject* object, Property::Index propertyIndex, 
       case Toolkit::TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
         textInputImpl.mPopUpPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsClipboard, value.Get<unsigned int>() );
+        break;
+      }
+      case Toolkit::TextInput::POP_UP_OFFSET_FROM_TEXT_PROPERTY:
+      {
+        textInputImpl.SetOffsetFromText( value.Get< Vector4 >() );
         break;
       }
     }
@@ -5249,6 +5272,11 @@ Property::Value TextInput::GetProperty( BaseObject* object, Property::Index prop
       case Toolkit::TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
         value = textInputImpl.mPopUpPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsClipboard );
+        break;
+      }
+      case Toolkit::TextInput::POP_UP_OFFSET_FROM_TEXT_PROPERTY:
+      {
+        value = textInputImpl.GetOffsetFromText();
         break;
       }
     }
