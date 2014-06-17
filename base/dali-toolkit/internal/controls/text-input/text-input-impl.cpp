@@ -3712,10 +3712,10 @@ void TextInput::AddPopupOptions()
   mPopUpPanel.AddPopupOptions();
 }
 
-void TextInput::SetPopupPosition(const Vector3& position)
+void TextInput::SetPopupPosition( const Vector3& position )
 {
-  mPopUpPanel.Self().SetPosition( position );
   mPopUpPanel.SetTailPosition( position );
+  mPopUpPanel.Self().SetPosition( position );
 }
 
 void TextInput::HidePopup(bool animate, bool signalFinished )
@@ -3738,25 +3738,25 @@ void TextInput::ShowPopup(bool animate)
   if(mHighlightMeshActor && mState == StateEdit)
   {
     Vector3 topHandle;
+    Vector3 bottomHandle; // referring to the bottom most point of the handle or the bottom line of selection.
     Size rowSize;
     // When text is selected, show popup above top handle (and text), or below bottom handle.
     // topHandle: referring to the top most point of the handle or the top line of selection.
     if ( mSelectionHandleTwoActualPosition.y > mSelectionHandleOneActualPosition.y )
     {
       topHandle = mSelectionHandleOneActualPosition;
+      bottomHandle = mSelectionHandleTwoActualPosition;
       rowSize= GetRowRectFromCharacterPosition( mSelectionHandleOnePosition );
     }
     else
     {
       topHandle = mSelectionHandleTwoActualPosition;
+      bottomHandle = mSelectionHandleOneActualPosition;
       rowSize = GetRowRectFromCharacterPosition( mSelectionHandleTwoPosition );
     }
     topHandle.y += -mPopupOffsetFromText.y - rowSize.height;
     position = Vector3(topHandle.x, topHandle.y, 0.0f);
 
-    // bottomHandle: referring to the bottom most point of the handle or the bottom line of selection.
-    Vector3 bottomHandle;
-    bottomHandle.y = std::max ( mSelectionHandleTwoActualPosition.y , mSelectionHandleOneActualPosition.y );
     bottomHandle.y += GetSelectionHandleSize().y + mPopupOffsetFromText.w;
     mPopUpPanel.SetAlternativeOffset(Vector2( mBoundingRectangleWorldCoordinates.x, bottomHandle.y - topHandle.y));
 

@@ -416,6 +416,7 @@ private:
   State mState;                                       ///< Popup State.
   Actor mRootActor;                                   ///< The actor which all popup content is added to (i.e. panel and buttons)
   Property::Index mAlternativeOffsetProperty;         ///< Property [Vector3] how much to offset the popup if it goes out of the screen
+  Property::Index mRequestionPositionProperty;        ///< Prperty [Vector3] Requested position to place popup
   ImageActor mBackground;                             ///< The background popup panel
   ImageActor mTail;                                   ///< The tail for the popup
   ImageActor mTailOutline;                            ///< The border/outline around the tail
