@@ -1277,6 +1277,9 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
   // Note that Emit() methods are called indirectly e.g. from within ScrollView::AnimateTo()
   Toolkit::ScrollView handle( GetOwner() );
 
+  DALI_LOG_SCROLL_STATE("pos[%.2f,%.2f], scale[%.2f,%.2f], rot[%.2f], duration[%.2f] bias[%d, %d]",
+    position.x, position.y, scale.x, scale.y, rotation, duration, int(horizontalBias), int(verticalBias));
+
   Vector3 currentScrollPosition = GetCurrentScrollPosition();
   Self().SetProperty( mPropertyScrollStartPagePosition, currentScrollPosition );
 
@@ -1329,6 +1332,9 @@ void ScrollView::ScrollTo(const Vector3& position, float duration)
 void ScrollView::ScrollTo(const Vector3& position, float duration,
                           DirectionBias horizontalBias, DirectionBias verticalBias)
 {
+  DALI_LOG_SCROLL_STATE("position[%.2f, %.2f] duration[%.2f]",
+    position.x, position.y, duration, int(horizontalBias), int(verticalBias));
+
   TransformTo(position, mScrollPostScale, mScrollPostRotation, duration, horizontalBias, verticalBias);
 }
 
