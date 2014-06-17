@@ -137,7 +137,7 @@ public:
    * @param[in] iconImage the image to be used
    * @return the newly created Image actor to be used as the icon
    */
-  ImageActor CreateOptionIcon( Image iconImage );
+  ImageActor CreateOptionIcon( Image iconImage, const Vector4& color );
 
   /**
    * Creates and sets up the popup background
@@ -229,6 +229,18 @@ public:
   const Vector4& GetCutPastePopUpPressedColor() const;
 
   /**
+   * Set the border color of the popup
+   * @param[in] color required color
+   */
+  void SetCutPastePopUpBorderColor( const Vector4& color );
+
+  /**
+   * Get the border color
+   * @return Vector4 the color of the border
+   */
+  const Vector4& GetCutPastePopUpBorderColor() const;
+
+  /**
    * Toggle if a popup button should be enabled (shown) or not
    * @param[in]  requiredButton Button Id to enable or disable
    * @param[in]  enable toggle to enable (true) or disable (false)
@@ -241,6 +253,54 @@ public:
    * @param[in] priority Priority level, 1 is highest so will appear first.  0 priority will not show the button.
    */
   void SetButtonPriorityPosition( TextInputPopup::Buttons button, unsigned int priority );
+
+  /**
+   * Set the icon color of the popup
+   * @param[in] color required color
+   */
+  void SetCutPastePopUpIconColor( const Vector4& color );
+
+  /**
+   * Get the popup icon color
+   * @return Vector4 the color of the popup icon
+   */
+  const Vector4& GetCutPastePopUpIconColor() const;
+
+  /**
+   * Set the pressed icon color of the popup
+   * @param[in] color required color
+   */
+  void SetCutPastePopUpIconPressedColor( const Vector4& color );
+
+  /**
+   * Get the popup pressed icon color
+   * @return Vector4 the color of the popup pressed icon
+   */
+  const Vector4& GetCutPastePopUpIconPressedColor();
+
+  /**
+   * Set the text color of the popup
+   * @param[in] color required color
+   */
+  void SetCutPastePopUpTextColor( const Vector4& color );
+
+  /**
+   * Get the popup text color
+   * @return Vector4 the color of the popup text
+   */
+  const Vector4& GetCutPastePopUpTextColor();
+
+  /**
+   * Set the pressed text color of the popup
+   * @param[in] color required color
+   */
+  void SetCutPastePopUpTextPressedColor( const Vector4& color );
+
+  /**
+   * Get the popup pressed text color
+   * @return Vector4 the color of the popup pressed text
+   */
+  const Vector4& GetCutPastePopUpTextPressedColor();
 
   /**
    * Get the Button Priority Position
@@ -373,9 +433,13 @@ private:
 
   std::vector<ButtonRequirement> mOrderListOfButtons;        // List of buttons in the order to be displayed and a flag to indicate if needed.
 
-  Vector4           mCutPasteButtonsColor;  // Color of the cut and paste popup
-  Vector4           mCutPasteButtonsPressedColor;  // Color of the cut and paste buttons when pressed.
-  Vector4           mBorderColor; // Color of the border around the Cut and Paste Popup
+  Vector4           mCutPasteButtonsColor;        // Color of the cut and paste popup.
+  Vector4           mCutPasteButtonsPressedColor; // Color of the cut and paste buttons when pressed.
+  Vector4           mBorderColor;                 // Color of the border around the Cut and Paste Popup.
+  Vector4           mCutPasteIconsColor;          // Color of the popup icon.
+  Vector4           mCutPasteIconsPressedColor;   // Color of the popup icon when pressed.
+  Vector4           mCutPasteTextsColor;          // Color of the popup text.
+  Vector4           mCutPasteTextsPressedColor;   // Color of the popup text when pressed.
 
   Rect<float> mBoundingRect; // Boundary that Popup must stay within.
 

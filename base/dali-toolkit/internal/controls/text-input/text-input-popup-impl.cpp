@@ -34,7 +34,11 @@ namespace {
 const Vector4 DEFAULT_POPUP_BACKGROUND( Vector4( .20f, 0.29f, 0.44f, 1.0f ) );
 const Vector4 DEFAULT_POPUP_BUTTON_PRESSED( Vector4( 0.07f, 0.10f, 0.17f, 1.0f ) );
 const Vector4 DEFAULT_BORDER_COLOR( Vector4( 0.36f, 0.45f, 0.59f, 1.0f ) );
-const Vector3 POPUP_BORDER( Vector3(1.0f, 1.0f, 0.0f) );
+const Vector4 DEFAULT_POPUP_ICON( Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
+const Vector4 DEFAULT_POPUP_ICON_PRESSED( Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
+const Vector4 DEFAULT_POPUP_TEXT( Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
+const Vector4 DEFAULT_POPUP_TEXT_PRESSED( Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
+const Vector3 POPUP_BORDER( Vector3( 1.0f, 1.0f, 0.0f ) );
 
 /* Functionality in place to have the end buttons using different images to inner button.
  * Supply a centre image and then a left and right image, the centre image can have straight ends while
@@ -44,6 +48,7 @@ const Vector3 POPUP_BORDER( Vector3(1.0f, 1.0f, 0.0f) );
 // Popup: Tails
 const char* DEFAULT_POPUP_TAIL_BOTTOM( DALI_IMAGE_DIR "popup_bubble_tail_bottom.png" );
 const char* DEFAULT_POPUP_TAIL_BOTTOM_OUTLINE( DALI_IMAGE_DIR "popup_bubble_tail_bottom_line.png" );
+const float TAIL_Y_POSITION( -1.5f );
 
 // Popup: Vertical Constraint
 // TODO: Remove - this should come from application - it is not possible to get the
@@ -237,6 +242,10 @@ TextInputPopup::TextInputPopup()
   mCutPasteButtonsColor( DEFAULT_POPUP_BACKGROUND ),
   mCutPasteButtonsPressedColor( DEFAULT_POPUP_BUTTON_PRESSED ),
   mBorderColor( DEFAULT_BORDER_COLOR ),
+  mCutPasteIconsColor( DEFAULT_POPUP_ICON ),
+  mCutPasteIconsPressedColor( DEFAULT_POPUP_ICON_PRESSED ),
+  mCutPasteTextsColor( DEFAULT_POPUP_TEXT ),
+  mCutPasteTextsPressedColor( DEFAULT_POPUP_TEXT_PRESSED ),
   mSelectOptionPriority(1),
   mSelectAllOptionPriority(2),
   mCutOptionPriority(3),
@@ -379,7 +388,7 @@ Toolkit::TextView TextInputPopup::CreateOptionText( const MarkupProcessor::Style
   return label;
 }
 
-ImageActor TextInputPopup::CreateOptionIcon( Image iconImage )
+ImageActor TextInputPopup::CreateOptionIcon( Image iconImage, const Vector4& color )
 {
   ImageActor icon = ImageActor::New( iconImage );
 
@@ -387,6 +396,7 @@ ImageActor TextInputPopup::CreateOptionIcon( Image iconImage )
   icon.SetParentOrigin( ParentOrigin::TOP_CENTER );
   icon.SetAnchorPoint( AnchorPoint::TOP_CENTER );
   icon.SetPosition( 0.0f, ICON_POSITION_OFFSET );
+  icon.SetColor( color );
 
   return icon;
 }
@@ -432,6 +442,7 @@ void TextInputPopup::CreateDivider()
     divider.SetParentOrigin( ParentOrigin::TOP_LEFT );
     divider.SetAnchorPoint( AnchorPoint::TOP_LEFT );
     divider.SetPosition( Vector3( mContentSize.width, POPUP_TEXT_OFFSET.y, 0.0f ) );
+    divider.SetColor( mBorderColor );
     // Keep track of all the dividers. As their height's need to be updated to the max. of all
     // buttons currently added.
     mDividerContainer.push_back(divider);
@@ -568,6 +579,7 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
   // 1. Add text.
   TextStyle style;
   style.SetFontPointSize( PointSize( DEFAULT_UI_FONT_SIZE ) );
+  style.SetTextColor( mCutPasteTextsColor );
   MarkupProcessor::StyledTextArray styledCaption;
   styledCaption.push_back( MarkupProcessor::StyledText( Text( caption ), style ) );
   Toolkit::TextView label = CreateOptionText( styledCaption );
@@ -588,7 +600,7 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
   button.SetPosition( Vector3( mContentSize.width, POPUP_BORDER.y, 0.0f ) );
 
   // 2. Add icon
-  ImageActor icon = CreateOptionIcon( iconImage );
+  ImageActor icon = CreateOptionIcon( iconImage, mCutPasteIconsColor );
 
   iconTextContainer.Add( icon );
 
@@ -598,9 +610,12 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
   Actor iconPressedTextContainer = Actor::New();
   iconPressedTextContainer.SetDrawMode( DrawMode::OVERLAY );
 
+  style.SetTextColor( mCutPasteTextsPressedColor );
+  styledCaption.clear();
+  styledCaption.push_back( MarkupProcessor::StyledText( Text( caption ), style ) );
   Toolkit::TextView pressedLabel = CreateOptionText( styledCaption );
   pressedLabel.SetSize( Min( buttonSize, TEXT_LABEL_MAX_SIZE ) );
-  ImageActor pressedIcon = CreateOptionIcon( iconImage );
+  ImageActor pressedIcon = CreateOptionIcon( iconImage, mCutPasteIconsPressedColor );
 
   iconPressedTextContainer.Add( pressedImageBg );
   iconPressedTextContainer.Add( pressedLabel );
@@ -664,7 +679,7 @@ void TextInputPopup::Show(bool animate)
   {
     mRootActor.SetSensitive( true );
 
-    mTail.SetPosition(Vector3( mPopupTailXPosition, 0.0f, 0.0f));
+    mTail.SetPosition(Vector3( mPopupTailXPosition, TAIL_Y_POSITION, 0.0f));
 
     if(mAnimation)
     {
@@ -727,6 +742,56 @@ void TextInputPopup::SetCutPastePopUpPressedColor( const Vector4& color )
 const Vector4& TextInputPopup::GetCutPastePopUpPressedColor() const
 {
   return mCutPasteButtonsPressedColor;
+}
+
+void TextInputPopup::SetCutPastePopUpBorderColor( const Vector4& color )
+{
+  mBorderColor = color;
+}
+
+const Vector4& TextInputPopup::GetCutPastePopUpBorderColor() const
+{
+  return mBorderColor;
+}
+
+void TextInputPopup::SetCutPastePopUpIconColor( const Vector4& color )
+{
+  mCutPasteIconsColor = color;
+}
+
+const Vector4& TextInputPopup::GetCutPastePopUpIconColor() const
+{
+  return mCutPasteIconsColor;
+}
+
+void TextInputPopup::SetCutPastePopUpIconPressedColor( const Vector4& color )
+{
+  mCutPasteIconsPressedColor = color;
+}
+
+const Vector4& TextInputPopup::GetCutPastePopUpIconPressedColor()
+{
+  return mCutPasteIconsPressedColor;
+}
+
+void TextInputPopup::SetCutPastePopUpTextColor( const Vector4& color )
+{
+  mCutPasteTextsColor = color;
+}
+
+const Vector4& TextInputPopup::GetCutPastePopUpTextColor()
+{
+  return mCutPasteTextsColor;
+}
+
+void TextInputPopup::SetCutPastePopUpTextPressedColor( const Vector4& color )
+{
+  mCutPasteTextsPressedColor = color;
+}
+
+const Vector4& TextInputPopup::GetCutPastePopUpTextPressedColor()
+{
+  return mCutPasteTextsPressedColor;
 }
 
 void TextInputPopup::TogglePopUpButtonOnOff( TextInputPopup::Buttons requiredButton, bool enable )
@@ -862,6 +927,8 @@ void TextInputPopup::AddPopupOptions()
   mRootActor.Add( mTail );
 
   Self().Add(mLayer);
+
+  mLayer.Lower();
 }
 
 void TextInputPopup::SetPopupBoundary( const Rect<float>& boundingRectangle )

@@ -200,15 +200,19 @@ namespace Toolkit
 const Property::Index TextInput::HIGHLIGHT_COLOR_PROPERTY                     = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX;
 const Property::Index TextInput::CUT_AND_PASTE_COLOR_PROPERTY                 = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+1;
 const Property::Index TextInput::CUT_AND_PASTE_PRESSED_COLOR_PROPERTY         = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+2;
+const Property::Index TextInput::CUT_AND_PASTE_BORDER_COLOR_PROPERTY          = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+3;
+const Property::Index TextInput::CUT_AND_PASTE_ICON_COLOR_PROPERTY            = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+4;
+const Property::Index TextInput::CUT_AND_PASTE_ICON_PRESSED_COLOR_PROPERTY    = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+5;
+const Property::Index TextInput::CUT_AND_PASTE_TEXT_COLOR_PROPERTY            = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+6;
+const Property::Index TextInput::CUT_AND_PASTE_TEXT_PRESSED_COLOR_PROPERTY    = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+7;
+const Property::Index TextInput::CUT_BUTTON_POSITION_PRIORITY_PROPERTY        = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+8;
+const Property::Index TextInput::COPY_BUTTON_POSITION_PRIORITY_PROPERTY       = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+9;
+const Property::Index TextInput::PASTE_BUTTON_POSITION_PRIORITY_PROPERTY      = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+10;
+const Property::Index TextInput::SELECT_BUTTON_POSITION_PRIORITY_PROPERTY     = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+11;
+const Property::Index TextInput::SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+12;
+const Property::Index TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY  = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+13;
 
-const Property::Index TextInput::CUT_BUTTON_POSITION_PRIORITY_PROPERTY        = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+3;
-const Property::Index TextInput::COPY_BUTTON_POSITION_PRIORITY_PROPERTY       = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+4;
-const Property::Index TextInput::PASTE_BUTTON_POSITION_PRIORITY_PROPERTY      = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+5;
-const Property::Index TextInput::SELECT_BUTTON_POSITION_PRIORITY_PROPERTY     = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+6;
-const Property::Index TextInput::SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+7;
-const Property::Index TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY  = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+8;
-
-const Property::Index TextInput::POP_UP_OFFSET_FROM_TEXT_PROPERTY             = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+9;
+const Property::Index TextInput::POP_UP_OFFSET_FROM_TEXT_PROPERTY             = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+14;
 
 namespace Internal
 {
@@ -235,13 +239,18 @@ SignalConnectorType signalConnector6( typeRegistration, Toolkit::TextInput::SIGN
 PropertyRegistration property1( typeRegistration, "highlight-color",  Toolkit::TextInput::HIGHLIGHT_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
 PropertyRegistration property2( typeRegistration, "cut-and-paste-bg-color",  Toolkit::TextInput::CUT_AND_PASTE_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
 PropertyRegistration property3( typeRegistration, "cut-and-paste-pressed-color",  Toolkit::TextInput::CUT_AND_PASTE_PRESSED_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
-PropertyRegistration property4( typeRegistration, "cut-button-position-priority",  Toolkit::TextInput::CUT_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
-PropertyRegistration property5( typeRegistration, "copy-button-position-priority",  Toolkit::TextInput::COPY_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
-PropertyRegistration property6( typeRegistration, "paste-button-position-priority",  Toolkit::TextInput::PASTE_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
-PropertyRegistration property7( typeRegistration, "select-button-position-priority",  Toolkit::TextInput::SELECT_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
-PropertyRegistration property8( typeRegistration, "select-all-button-position-priority",  Toolkit::TextInput::SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
-PropertyRegistration property9( typeRegistration, "clipboard-button-position-priority",  Toolkit::TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
-
+PropertyRegistration property4( typeRegistration, "cut-and-paste-icon-color",  Toolkit::TextInput::CUT_AND_PASTE_ICON_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property5( typeRegistration, "cut-and-paste-icon-pressed-color",  Toolkit::TextInput::CUT_AND_PASTE_ICON_PRESSED_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property6( typeRegistration, "cut-and-paste-text-color",  Toolkit::TextInput::CUT_AND_PASTE_TEXT_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property7( typeRegistration, "cut-and-paste-text-pressed-color",  Toolkit::TextInput::CUT_AND_PASTE_TEXT_PRESSED_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property8( typeRegistration, "cut-and-paste-border-color",  Toolkit::TextInput::CUT_AND_PASTE_BORDER_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property9( typeRegistration, "cut-button-position-priority",  Toolkit::TextInput::CUT_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property10( typeRegistration, "copy-button-position-priority",  Toolkit::TextInput::COPY_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property11( typeRegistration, "paste-button-position-priority",  Toolkit::TextInput::PASTE_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property12( typeRegistration, "select-button-position-priority",  Toolkit::TextInput::SELECT_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property13( typeRegistration, "select-all-button-position-priority",  Toolkit::TextInput::SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property14( typeRegistration, "clipboard-button-position-priority",  Toolkit::TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property15( typeRegistration, "popup-offset-from-text", Toolkit::TextInput::POP_UP_OFFSET_FROM_TEXT_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
 
 // [TextInput::HighlightInfo] /////////////////////////////////////////////////
 
@@ -5178,6 +5187,31 @@ void TextInput::SetProperty( BaseObject* object, Property::Index propertyIndex, 
         textInputImpl.mPopUpPanel.SetCutPastePopUpPressedColor( value.Get< Vector4 >() );
         break;
       }
+      case Toolkit::TextInput::CUT_AND_PASTE_BORDER_COLOR_PROPERTY:
+      {
+        textInputImpl.mPopUpPanel.SetCutPastePopUpBorderColor( value.Get< Vector4 >() );
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_ICON_COLOR_PROPERTY:
+      {
+        textInputImpl.mPopUpPanel.SetCutPastePopUpIconColor( value.Get< Vector4 >() );
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_ICON_PRESSED_COLOR_PROPERTY:
+      {
+        textInputImpl.mPopUpPanel.SetCutPastePopUpIconPressedColor( value.Get< Vector4 >() );
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_TEXT_COLOR_PROPERTY:
+      {
+        textInputImpl.mPopUpPanel.SetCutPastePopUpTextColor( value.Get< Vector4 >() );
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_TEXT_PRESSED_COLOR_PROPERTY:
+      {
+        textInputImpl.mPopUpPanel.SetCutPastePopUpTextPressedColor( value.Get< Vector4 >() );
+        break;
+      }
       case Toolkit::TextInput::CUT_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
         textInputImpl.mPopUpPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsCut, value.Get<unsigned int>() );
@@ -5242,6 +5276,31 @@ Property::Value TextInput::GetProperty( BaseObject* object, Property::Index prop
       case Toolkit::TextInput::CUT_AND_PASTE_PRESSED_COLOR_PROPERTY:
       {
         value = textInputImpl.mPopUpPanel.GetCutPastePopUpPressedColor();
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_BORDER_COLOR_PROPERTY :
+      {
+        value = textInputImpl.mPopUpPanel.GetCutPastePopUpBorderColor();
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_ICON_COLOR_PROPERTY:
+      {
+        value = textInputImpl.mPopUpPanel.GetCutPastePopUpIconColor();
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_ICON_PRESSED_COLOR_PROPERTY:
+      {
+        value = textInputImpl.mPopUpPanel.GetCutPastePopUpIconPressedColor();
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_TEXT_COLOR_PROPERTY:
+      {
+        value = textInputImpl.mPopUpPanel.GetCutPastePopUpTextColor();
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_TEXT_PRESSED_COLOR_PROPERTY:
+      {
+        value = textInputImpl.mPopUpPanel.GetCutPastePopUpTextPressedColor();
         break;
       }
       case Toolkit::TextInput::CUT_BUTTON_POSITION_PRIORITY_PROPERTY:
