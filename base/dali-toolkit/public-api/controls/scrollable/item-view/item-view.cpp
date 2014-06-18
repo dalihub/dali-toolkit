@@ -249,6 +249,11 @@ Vector3 ItemView::GetItemsAnchorPoint() const
   return GetImpl(*this).GetItemsAnchorPoint();
 }
 
+void ItemView::GetItemsRange(ItemRange& range)
+{
+  GetImpl(*this).GetItemsRange(range);
+}
+
 } // namespace Toolkit
 
 } // namespace Dali

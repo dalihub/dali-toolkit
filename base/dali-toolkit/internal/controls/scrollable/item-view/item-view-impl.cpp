@@ -1796,6 +1796,12 @@ Vector3 ItemView::GetItemsAnchorPoint() const
   return mItemsAnchorPoint;
 }
 
+void ItemView::GetItemsRange(ItemRange& range)
+{
+  range.begin = mItemPool.begin()->first;
+  range.end = mItemPool.rbegin()->first + 1;
+}
+
 } // namespace Internal
 
 } // namespace Toolkit

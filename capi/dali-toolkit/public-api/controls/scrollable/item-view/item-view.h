@@ -44,6 +44,7 @@ class ItemView;
 class ScrollConnector;
 class ItemFactory;
 class ItemLayout;
+struct ItemRange;
 
 typedef IntrusivePtr<ItemLayout> ItemLayoutPtr;
 
@@ -411,6 +412,13 @@ public:
    * @return The current anchor point of the items
    */
   Vector3 GetItemsAnchorPoint() const;
+
+  /**
+   * @brief Get the range of items that are currently in ItemView.
+   *
+   * @param[out] range The range of items.
+   */
+  void GetItemsRange(ItemRange& range);
 
 public: // Not intended for application developers
 

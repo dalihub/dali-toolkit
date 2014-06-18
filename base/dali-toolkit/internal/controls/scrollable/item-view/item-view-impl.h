@@ -284,6 +284,11 @@ public:
    */
   Vector3 GetItemsAnchorPoint() const;
 
+  /**
+   * @copydoc Toolkit::ItemView::GetItemsRange
+   */
+  void GetItemsRange(ItemRange& range);
+
 private:
 
   /**
