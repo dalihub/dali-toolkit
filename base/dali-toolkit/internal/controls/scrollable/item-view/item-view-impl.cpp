@@ -585,7 +585,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
   if (scrollAnimationNeeded)
   {
     RemoveAnimation(mScrollAnimation);
-    mScrollAnimation = Animation::New(mAnchoringDuration);
+    mScrollAnimation = Animation::New(durationSeconds);
     mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunctions::EaseOut );
     mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, targetSize), AlphaFunctions::EaseOut );
     mScrollAnimation.Play();
@@ -896,7 +896,8 @@ bool ItemView::RemoveActor(unsigned int itemId)
 
   if( removeIter != mItemPool.end() )
   {
-    Self().Remove( removeIter->second );
+    ReleaseActor(itemId, removeIter->second);
+
     removed = true;
 
     // Adjust the remaining item IDs, for example if item 2 is removed:
@@ -932,7 +933,7 @@ void ItemView::ReplaceItem( Item replacementItem, float durationSeconds )
   const ItemPoolIter iter = mItemPool.find( replacementItem.first );
   if( mItemPool.end() != iter )
   {
-    Self().Remove( iter->second );
+    ReleaseActor(iter->first, iter->second);
     iter->second = replacementItem.second;
   }
   else
@@ -962,7 +963,7 @@ void ItemView::RemoveActorsOutsideRange( ItemRange range )
 
     if( ! range.Within( current ) )
     {
-      Self().Remove( iter->second );
+      ReleaseActor(iter->first, iter->second);
 
       mItemPool.erase( iter++ ); // erase invalidates the return value of post-increment; iter remains valid
     }
@@ -1035,6 +1036,12 @@ void ItemView::SetupActor( Item item, float durationSeconds )
 
     ApplyConstraints( item.second, *mActiveLayout, item.first, durationSeconds );
   }
+}
+
+void ItemView::ReleaseActor( ItemId item, Actor actor )
+{
+  Self().Remove( actor );
+  mItemFactory.ItemReleased(item, actor);
 }
 
 ItemRange ItemView::GetItemRange(ItemLayout& layout, const Vector3& layoutSize, float layoutPosition, bool reserveExtra)

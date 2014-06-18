@@ -325,6 +325,13 @@ private:
    */
   void SetupActor( Item item, float durationSeconds );
 
+  /**
+   * Remove the Actor from the ItemPool and notify the ItemFactory the actor has been released by ItemView.
+   * @param[in] item The ID for the item to be released.
+   * @param[in] actor The actor to be removed from ItemView.
+   */
+  void ReleaseActor( ItemId item, Actor actor );
+
 private: // From CustomActorImpl
 
   /**

@@ -33,7 +33,7 @@ namespace Toolkit
 {
 
 /**
- * @brief ItemFactory is an abstract interface for providing actors to ItemView.
+ * @brief ItemFactory is for providing actors to ItemView.
  * Each actor is identified by a unique ID, and has a linear order from 0 to GetNumberOfItems()-1.
  */
 class ItemFactory
@@ -60,6 +60,14 @@ public:
    * @return An actor, or an uninitialized pointer if the ID is out of range.
    */
   virtual Actor NewItem(unsigned int itemId) = 0;
+
+  /**
+   * @brief Notify the factory the actor representing the item is removed from ItemView.
+   *
+   * @param[in] itemId The ID of the released item.
+   * @param[in] actor The actor that represents the released item.
+   */
+  virtual void ItemReleased(unsigned int itemId, Actor actor) {};
 };
 
 } // namespace Toolkit
