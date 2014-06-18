@@ -1313,9 +1313,18 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
     // if not animating, then this pan has completed right now.
     Self().SetProperty(mPropertyScrolling, false);
     mScrolling = false;
-    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 2 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+
+    // If we have no duration, then in the next update frame, we will be at the position specified as we just set.
+    // In this scenario, we cannot return the currentScrollPosition as this is out-of-date and should instead return the requested final position
+    Vector3 completedPosition( currentScrollPosition );
+    if( duration <= Math::MACHINE_EPSILON_10 )
+    {
+      completedPosition = position;
+    }
+
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 2 [%.2f, %.2f]", this, completedPosition.x, completedPosition.y);
     SetScrollUpdateNotification(false);
-    mScrollCompletedSignalV2.Emit( currentScrollPosition );
+    mScrollCompletedSignalV2.Emit( completedPosition );
   }
 }
 
