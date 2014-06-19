@@ -350,6 +350,11 @@ bool JsonParserState::ParseWhiteSpace()
   bool c_comment   = false;
   bool cpp_comment = false;
 
+  if( mIter == mEnd )
+  {
+    return true;
+  }
+
   // skip white space
   char nextChar = 0;
   while(1)
