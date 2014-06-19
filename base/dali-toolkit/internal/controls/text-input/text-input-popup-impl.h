@@ -116,45 +116,45 @@ public:
   TextInputPopup();
 
   /**
-   * @return The root actor of for this popup is returned.
-   */
-  Actor Self();
-
-  /**
    * Clears popup options (popup no longer exists)
    */
   void Clear();
 
   /**
    * Create the label
-   * @param[in] styledCaption The text to be displayed
-   * @return the newly created label
-   */
-  Toolkit::TextView CreateOptionText( const MarkupProcessor::StyledTextArray& styledCaption );
-
-  /**
-   * Create the label
-   * @param[in] iconImage the image to be used
    * @return the newly created Image actor to be used as the icon
    */
   ImageActor CreateOptionIcon( Image iconImage, const Vector4& color );
 
   /**
-   * Creates and sets up the popup background
+   * Create the caption
+   * @param[in] styledCaption The text to be displayed
+   * @return the newly created label
    */
-  void CreatePopUpBackground();
+  Toolkit::TextView CreateOptionCaption( const std::string& caption, const Vector4& color );
+
+  /**
+   * Creates and sets up the background
+   */
+  void CreateBackground();
+
+  /**
+   * Create and set up the tail
+   */
+  void CreateTail();
 
   /**
    * Create divider if multiple options
+   * @return Return a divider image actor
    */
-  void CreateDivider();
+  ImageActor CreateDivider();
 
   /**
-   * Create a background to be used when button pressed
+   * Create a background to be used when option pressed
    * @param[in] requiredSize size Image actor should be
    * @return Returns an Image Actor to be used a pressed background
    */
-  ImageActor CreatePressedBackground( const Vector3 requiredSize );
+  ImageActor CreatePressedBackground( const Vector2& requiredSize );
 
   /**
    * Creates a ordered vector of button options
@@ -208,44 +208,44 @@ public:
    * Set the Cut and Paste buttons color when in normal state
    * @param[in] color color to use
    */
-  void SetCutPastePopUpColor( const Vector4& color );
+  void SetCutPastePopupColor( const Vector4& color );
 
   /**
-   * Get the set color of the Copy and Paste PopUp buttons
+   * Get the set color of the Copy and Paste Popup buttons
    * @return color
    */
-  const Vector4& GetCutPastePopUpColor() const;
+  const Vector4& GetCutPastePopupColor() const;
 
   /**
    * Set the Cut and Paste button color when pressed.
    * @param[in] color color to use
    */
-  void SetCutPastePopUpPressedColor( const Vector4& color );
+  void SetCutPastePopupPressedColor( const Vector4& color );
 
   /**
    * Get the Cut and Paste pressed button color.
    * @return color
    */
-  const Vector4& GetCutPastePopUpPressedColor() const;
+  const Vector4& GetCutPastePopupPressedColor() const;
 
   /**
    * Set the border color of the popup
    * @param[in] color required color
    */
-  void SetCutPastePopUpBorderColor( const Vector4& color );
+  void SetCutPastePopupBorderColor( const Vector4& color );
 
   /**
    * Get the border color
    * @return Vector4 the color of the border
    */
-  const Vector4& GetCutPastePopUpBorderColor() const;
+  const Vector4& GetCutPastePopupBorderColor() const;
 
   /**
    * Toggle if a popup button should be enabled (shown) or not
    * @param[in]  requiredButton Button Id to enable or disable
    * @param[in]  enable toggle to enable (true) or disable (false)
    */
-  void TogglePopUpButtonOnOff( TextInputPopup::Buttons requiredButton, bool enable );
+  void TogglePopupButtonOnOff( TextInputPopup::Buttons requiredButton, bool enable );
 
   /**
    * Set the Button Priority Position
@@ -258,49 +258,49 @@ public:
    * Set the icon color of the popup
    * @param[in] color required color
    */
-  void SetCutPastePopUpIconColor( const Vector4& color );
+  void SetCutPastePopupIconColor( const Vector4& color );
 
   /**
    * Get the popup icon color
    * @return Vector4 the color of the popup icon
    */
-  const Vector4& GetCutPastePopUpIconColor() const;
+  const Vector4& GetCutPastePopupIconColor() const;
 
   /**
    * Set the pressed icon color of the popup
    * @param[in] color required color
    */
-  void SetCutPastePopUpIconPressedColor( const Vector4& color );
+  void SetCutPastePopupIconPressedColor( const Vector4& color );
 
   /**
    * Get the popup pressed icon color
    * @return Vector4 the color of the popup pressed icon
    */
-  const Vector4& GetCutPastePopUpIconPressedColor();
+  const Vector4& GetCutPastePopupIconPressedColor();
 
   /**
    * Set the text color of the popup
    * @param[in] color required color
    */
-  void SetCutPastePopUpTextColor( const Vector4& color );
+  void SetCutPastePopupTextColor( const Vector4& color );
 
   /**
    * Get the popup text color
    * @return Vector4 the color of the popup text
    */
-  const Vector4& GetCutPastePopUpTextColor();
+  const Vector4& GetCutPastePopupTextColor();
 
   /**
    * Set the pressed text color of the popup
    * @param[in] color required color
    */
-  void SetCutPastePopUpTextPressedColor( const Vector4& color );
+  void SetCutPastePopupTextPressedColor( const Vector4& color );
 
   /**
    * Get the popup pressed text color
    * @return Vector4 the color of the popup pressed text
    */
-  const Vector4& GetCutPastePopUpTextPressedColor();
+  const Vector4& GetCutPastePopupTextPressedColor();
 
   /**
    * Get the Button Priority Position
@@ -315,13 +315,13 @@ public:
   void AddPopupOptions();
 
   /**
-   * Set Boundary that PopUp should stay within
+   * Set Boundary that Popup should stay within
    * @param[in] boundingRectangle coordinates of bounding box from Top Left
    */
   void SetPopupBoundary( const Rect<float>& boundingRectangle );
 
   /**
-   * Sets the positon of the PopUp tail relative to TextInput
+   * Sets the positon of the Popup tail relative to TextInput
    * @param position Position to set
    */
   void SetTailPosition( const Vector3& position );
@@ -356,14 +356,8 @@ private:
   void ApplyTailConstraint();
 
   /**
-   * Create a layer to hold the stencil
-   * @param[in] size Size to of layer
-   */
-  void CreateLayer(  const Vector2& size );
-
-  /**
    * Create a stencil to clip the scroll view content
-   * @param[in] size Size to of stencil
+   * @param[in] size of the stencil.
    */
   void CreateStencil( const Vector2& size );
 
@@ -381,10 +375,14 @@ private:
 
   /**
    * Create a scroll view to hold the popup buttons and allow scrolling if too many buttons to fit within the visible boundary
-   * @param[in] scrollViewSize size of content of the scroll view which can exceed its visible size
+   */
+  void CreateScrollView();
+
+  /**
+   * Set the scroll view size and ruler.
    * @param[in] visibleSize size of the visible scroll view
    */
-  void CreateScrollView( const Vector2& scrollViewSize, const Vector2& visibleSize );
+  void UpdateScrollViewProperty( const Vector2& visibleSize );
 
   /**
    * Removes Popup from the stage.
@@ -414,33 +412,35 @@ private:
 private:
 
   State mState;                                       ///< Popup State.
-  Actor mRootActor;                                   ///< The actor which all popup content is added to (i.e. panel and buttons)
+  Layer mRoot;                                       ///< The actor which all popup content is added to (i.e. panel and buttons)
   Property::Index mAlternativeOffsetProperty;         ///< Property [Vector3] how much to offset the popup if it goes out of the screen
   Property::Index mRequestionPositionProperty;        ///< Prperty [Vector3] Requested position to place popup
   ImageActor mBackground;                             ///< The background popup panel
+  ImageActor mBackgroundEffect;                       ///< The background effect
+  ImageActor mBackgroundLine;                         ///< The background line
   ImageActor mTail;                                   ///< The tail for the popup
-  ImageActor mTailOutline;                            ///< The border/outline around the tail
+  ImageActor mTailEffect;                             ///< the tail effect
+  ImageActor mTailLine;                               ///< The border/outline around the tail
 
-  float mPopupTailXPosition;                          ///< X position of PopUp tail.
+  float mPopupTailXPosition;                          ///< X position of Popup tail.
 
-  Vector3 mContentSize;                               ///< Size of Content (i.e. Buttons)
+  Vector2 mContentSize;                               ///< Size of Content (i.e. Buttons)
   ActorContainer mButtonContainer;                    ///< List of buttons added to popup.
   ActorContainer mDividerContainer;                   ///< List of dividers added to popup.
   Animation mAnimation;                               ///< Popup Hide/Show animation.
 
   Actor mStencil;                                     ///< Stencil to clip scrollview
   Toolkit::ScrollView mScrollView;                    ///< Scrollview to house the popup
-  Layer mLayer;                                       ///< Layer to house the scroll view and stencil
 
   std::vector<ButtonRequirement> mOrderListOfButtons;        // List of buttons in the order to be displayed and a flag to indicate if needed.
 
-  Vector4           mCutPasteButtonsColor;        // Color of the cut and paste popup.
-  Vector4           mCutPasteButtonsPressedColor; // Color of the cut and paste buttons when pressed.
-  Vector4           mBorderColor;                 // Color of the border around the Cut and Paste Popup.
-  Vector4           mCutPasteIconsColor;          // Color of the popup icon.
-  Vector4           mCutPasteIconsPressedColor;   // Color of the popup icon when pressed.
-  Vector4           mCutPasteTextsColor;          // Color of the popup text.
-  Vector4           mCutPasteTextsPressedColor;   // Color of the popup text when pressed.
+  Vector4 mBackgroundColor;              // Color of the background of the text input popup
+  Vector4 mBackgroundPressedColor;       // Color of the option background.
+  Vector4 mLineColor;                    // Color of the line around the text input popup
+  Vector4 mIconColor;                    // Color of the popup icon.
+  Vector4 mIconPressedColor;             // Color of the popup icon when pressed.
+  Vector4 mTextColor;                    // Color of the popup text.
+  Vector4 mTextPressedColor;             // Color of the popup text when pressed.
 
   Rect<float> mBoundingRect; // Boundary that Popup must stay within.
 

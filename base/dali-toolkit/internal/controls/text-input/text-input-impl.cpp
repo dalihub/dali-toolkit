@@ -312,7 +312,7 @@ TextInput::TextInput()
  mTouchStartTime( 0 ),
  mTextLayoutInfo(),
  mCurrentCopySelecton(),
- mPopUpPanel(),
+ mPopupPanel(),
  mScrollTimer(),
  mScrollDisplacement(),
  mCurrentHandlePosition(),
@@ -796,7 +796,7 @@ void TextInput::SetBoundingRectangle( const Rect<float>& boundingRectangle )
   mBoundingRectangleWorldCoordinates = boundary;
 
   // Set Boundary for Popup so it keeps the Pop-up within the area also.
-  mPopUpPanel.SetPopupBoundary( boundingRectangle );
+  mPopupPanel.SetPopupBoundary( boundingRectangle );
 }
 
 const Rect<float> TextInput::GetBoundingRectangle() const
@@ -1279,7 +1279,7 @@ void TextInput::OnHandlePan(Actor actor, PanGesture gesture)
       {
         mActualGrabHandlePosition = MoveGrabHandle( gesture.displacement );
         SetCursorVisibility( true );
-        SetUpPopUpSelection();
+        SetUpPopupSelection();
         ShowPopup();
       }
       if (actor == mHandleOneGrabArea)
@@ -1423,9 +1423,9 @@ void TextInput::OnTextTap(Dali::Actor actor, Dali::TapGesture tap)
 
   if( mGrabArea == actor )
   {
-    if( mPopUpPanel.GetState() == TextInputPopup::StateHidden || mPopUpPanel.GetState() == TextInputPopup::StateHiding )
+    if( mPopupPanel.GetState() == TextInputPopup::StateHidden || mPopupPanel.GetState() == TextInputPopup::StateHiding )
     {
-      SetUpPopUpSelection();
+      SetUpPopupSelection();
       ShowPopup();
     }
 
@@ -1614,7 +1614,7 @@ void TextInput::OnClipboardTextSelected( ClipboardEventNotifier& notifier )
 
 bool TextInput::OnPopupButtonPressed( Toolkit::Button button )
 {
-  mPopUpPanel.PressedSignal().Disconnect( this, &TextInput::OnPopupButtonPressed );
+  mPopupPanel.PressedSignal().Disconnect( this, &TextInput::OnPopupButtonPressed );
 
   const std::string& name = button.GetName();
 
@@ -3704,29 +3704,29 @@ void TextInput::UpdateHighlight()
 
 void TextInput::ClearPopup()
 {
-  mPopUpPanel.Clear();
+  mPopupPanel.Clear();
 }
 
 void TextInput::AddPopupOptions()
 {
-  mPopUpPanel.AddPopupOptions();
+  mPopupPanel.AddPopupOptions();
 }
 
 void TextInput::SetPopupPosition( const Vector3& position )
 {
-  mPopUpPanel.SetTailPosition( position );
-  mPopUpPanel.Self().SetPosition( position );
+  mPopupPanel.SetTailPosition( position );
+  mPopupPanel.GetRootActor().SetPosition( position );
 }
 
 void TextInput::HidePopup(bool animate, bool signalFinished )
 {
-  if ( ( mPopUpPanel.GetState() == TextInputPopup::StateShowing ) || ( mPopUpPanel.GetState() == TextInputPopup::StateShown )  )
+  if ( ( mPopupPanel.GetState() == TextInputPopup::StateShowing ) || ( mPopupPanel.GetState() == TextInputPopup::StateShown )  )
   {
-    mPopUpPanel.Hide( animate );
+    mPopupPanel.Hide( animate );
 
     if( animate && signalFinished )
     {
-      mPopUpPanel.HideFinishedSignal().Connect( this, &TextInput::OnPopupHideFinished );
+      mPopupPanel.HideFinishedSignal().Connect( this, &TextInput::OnPopupHideFinished );
     }
   }
 }
@@ -3758,7 +3758,7 @@ void TextInput::ShowPopup(bool animate)
     position = Vector3(topHandle.x, topHandle.y, 0.0f);
 
     bottomHandle.y += GetSelectionHandleSize().y + mPopupOffsetFromText.w;
-    mPopUpPanel.SetAlternativeOffset(Vector2( mBoundingRectangleWorldCoordinates.x, bottomHandle.y - topHandle.y));
+    mPopupPanel.SetAlternativeOffset(Vector2( mBoundingRectangleWorldCoordinates.x, bottomHandle.y - topHandle.y));
 
     float xPosition = ( fabsf( topHandle.x - bottomHandle.x ) )*0.5f + std::min( topHandle.x , bottomHandle.x );
 
@@ -3771,13 +3771,13 @@ void TextInput::ShowPopup(bool animate)
     const Size rowSize = GetRowRectFromCharacterPosition( mCursorPosition );
     position.y -= ( mPopupOffsetFromText.y + rowSize.height );
     // if can't be positioned above, then position below row.
-    Vector2 alternativePopUpPosition( mBoundingRectangleWorldCoordinates.x, position.y ); // default if no grab handle
+    Vector2 alternativePopupPosition( mBoundingRectangleWorldCoordinates.x, position.y ); // default if no grab handle
     if ( mGrabHandle )
     {
       // If grab handle enabled then position pop-up below the grab handle.
-      alternativePopUpPosition.y = rowSize.height + mGrabHandle.GetCurrentSize().height + mPopupOffsetFromText.w +50.0f;
+      alternativePopupPosition.y = rowSize.height + mGrabHandle.GetCurrentSize().height + mPopupOffsetFromText.w +50.0f;
     }
-    mPopUpPanel.SetAlternativeOffset( alternativePopUpPosition );
+    mPopupPanel.SetAlternativeOffset( alternativePopupPosition );
   }
 
   // reposition popup above the desired cursor posiiton.
@@ -3789,63 +3789,62 @@ void TextInput::ShowPopup(bool animate)
   SetPopupPosition( worldPosition );
 
   // Show popup
-  mPopUpPanel.Show(animate);
+  mPopupPanel.Show(animate);
   StartMonitoringStageForTouch();
 
-  mPopUpPanel.PressedSignal().Connect( this, &TextInput::OnPopupButtonPressed );
+  mPopupPanel.PressedSignal().Connect( this, &TextInput::OnPopupButtonPressed );
 }
 
 void TextInput::ShowPopupCutCopyPaste()
 {
   ClearPopup();
 
-  mPopUpPanel.CreateOrderedListOfOptions(); // todo Move this so only run when order has changed
+  mPopupPanel.CreateOrderedListOfOptions(); // todo Move this so only run when order has changed
   // Check the selected text is whole text or not.
   if( IsTextSelected() && ( mStyledText.size() != GetSelectedText().size() ) )
   {
-    mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsSelectAll, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelectAll, true );
   }
 
   if ( !mStyledText.empty() )
   {
-
-    mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsCopy, true );
-    mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsCut, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCopy, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, true );
   }
 
   if( mClipboard && mClipboard.NumberOfItems() )
   {
-    mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsPaste, true );
-    mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsClipboard, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsPaste, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsClipboard, true );
   }
 
   AddPopupOptions();
 
-  mPopUpPanel.Hide(false);
+  mPopupPanel.Hide(false);
   ShowPopup();
 }
 
-void TextInput::SetUpPopUpSelection()
+void TextInput::SetUpPopupSelection()
 {
   ClearPopup();
-  mPopUpPanel.CreateOrderedListOfOptions(); // todo Move this so only run when order has changed
+  mPopupPanel.CreateOrderedListOfOptions(); // todo Move this so only run when order has changed
   // If no text exists then don't offer to select
   if ( !mStyledText.empty() )
   {
-    mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsSelectAll, true );
-    mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsSelect, true );
-    mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsCut, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelectAll, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelect, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, true );
   }
   // if clipboard has valid contents then offer paste option
   if( mClipboard && mClipboard.NumberOfItems() )
   {
-    mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsPaste, true );
-    mPopUpPanel.TogglePopUpButtonOnOff( TextInputPopup::ButtonsClipboard, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsPaste, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsClipboard, true );
   }
 
   AddPopupOptions();
 
-  mPopUpPanel.Hide(false);
+  mPopupPanel.Hide(false);
 }
 
 bool TextInput::ReturnClosestIndex(const Vector2& source, std::size_t& closestIndex )
@@ -4489,7 +4488,7 @@ Size TextInput::GetRowRectFromCharacterPosition(std::size_t characterPosition, V
 
 bool TextInput::WasTouchedCheck( const Actor& touchedActor ) const
 {
-  Actor popUpPanel = mPopUpPanel.GetRootActor();
+  Actor popUpPanel = mPopupPanel.GetRootActor();
 
   if ( ( touchedActor == Self() ) || ( touchedActor == popUpPanel ) )
   {
@@ -4530,7 +4529,7 @@ void TextInput::OnStageTouched(const TouchEvent& event)
 
       bool popUpShown( false );
 
-      if ( ( mPopUpPanel.GetState() == TextInputPopup::StateShowing ) || ( mPopUpPanel.GetState() == TextInputPopup::StateShown ) )
+      if ( ( mPopupPanel.GetState() == TextInputPopup::StateShowing ) || ( mPopupPanel.GetState() == TextInputPopup::StateShown ) )
       {
         popUpShown = true;
       }
@@ -4665,7 +4664,7 @@ void TextInput::KeyboardStatusChanged(bool keyboardShown)
     ShowGrabHandleAndSetVisibility( false );
 
     // If the keyboard is not now being shown, then hide the popup panel
-    mPopUpPanel.Hide( true );
+    mPopupPanel.Hide( true );
   }
 }
 
@@ -5179,67 +5178,67 @@ void TextInput::SetProperty( BaseObject* object, Property::Index propertyIndex, 
       }
       case Toolkit::TextInput::CUT_AND_PASTE_COLOR_PROPERTY:
       {
-        textInputImpl.mPopUpPanel.SetCutPastePopUpColor( value.Get< Vector4 >() );
+        textInputImpl.mPopupPanel.SetCutPastePopupColor( value.Get< Vector4 >() );
         break;
       }
       case Toolkit::TextInput::CUT_AND_PASTE_PRESSED_COLOR_PROPERTY:
       {
-        textInputImpl.mPopUpPanel.SetCutPastePopUpPressedColor( value.Get< Vector4 >() );
+        textInputImpl.mPopupPanel.SetCutPastePopupPressedColor( value.Get< Vector4 >() );
         break;
       }
       case Toolkit::TextInput::CUT_AND_PASTE_BORDER_COLOR_PROPERTY:
       {
-        textInputImpl.mPopUpPanel.SetCutPastePopUpBorderColor( value.Get< Vector4 >() );
+        textInputImpl.mPopupPanel.SetCutPastePopupBorderColor( value.Get< Vector4 >() );
         break;
       }
       case Toolkit::TextInput::CUT_AND_PASTE_ICON_COLOR_PROPERTY:
       {
-        textInputImpl.mPopUpPanel.SetCutPastePopUpIconColor( value.Get< Vector4 >() );
+        textInputImpl.mPopupPanel.SetCutPastePopupIconColor( value.Get< Vector4 >() );
         break;
       }
       case Toolkit::TextInput::CUT_AND_PASTE_ICON_PRESSED_COLOR_PROPERTY:
       {
-        textInputImpl.mPopUpPanel.SetCutPastePopUpIconPressedColor( value.Get< Vector4 >() );
+        textInputImpl.mPopupPanel.SetCutPastePopupIconPressedColor( value.Get< Vector4 >() );
         break;
       }
       case Toolkit::TextInput::CUT_AND_PASTE_TEXT_COLOR_PROPERTY:
       {
-        textInputImpl.mPopUpPanel.SetCutPastePopUpTextColor( value.Get< Vector4 >() );
+        textInputImpl.mPopupPanel.SetCutPastePopupTextColor( value.Get< Vector4 >() );
         break;
       }
       case Toolkit::TextInput::CUT_AND_PASTE_TEXT_PRESSED_COLOR_PROPERTY:
       {
-        textInputImpl.mPopUpPanel.SetCutPastePopUpTextPressedColor( value.Get< Vector4 >() );
+        textInputImpl.mPopupPanel.SetCutPastePopupTextPressedColor( value.Get< Vector4 >() );
         break;
       }
       case Toolkit::TextInput::CUT_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
-        textInputImpl.mPopUpPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsCut, value.Get<unsigned int>() );
+        textInputImpl.mPopupPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsCut, value.Get<unsigned int>() );
         break;
       }
       case Toolkit::TextInput::COPY_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
-        textInputImpl.mPopUpPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsCopy, value.Get<unsigned int>() );
+        textInputImpl.mPopupPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsCopy, value.Get<unsigned int>() );
         break;
       }
       case Toolkit::TextInput::PASTE_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
-        textInputImpl.mPopUpPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsPaste, value.Get<unsigned int>() );
+        textInputImpl.mPopupPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsPaste, value.Get<unsigned int>() );
         break;
       }
       case Toolkit::TextInput::SELECT_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
-        textInputImpl.mPopUpPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsSelect, value.Get<unsigned int>() );
+        textInputImpl.mPopupPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsSelect, value.Get<unsigned int>() );
         break;
       }
       case Toolkit::TextInput::SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
-        textInputImpl.mPopUpPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsSelectAll, value.Get<unsigned int>() );
+        textInputImpl.mPopupPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsSelectAll, value.Get<unsigned int>() );
         break;
       }
       case Toolkit::TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
-        textInputImpl.mPopUpPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsClipboard, value.Get<unsigned int>() );
+        textInputImpl.mPopupPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsClipboard, value.Get<unsigned int>() );
         break;
       }
       case Toolkit::TextInput::POP_UP_OFFSET_FROM_TEXT_PROPERTY:
@@ -5270,67 +5269,67 @@ Property::Value TextInput::GetProperty( BaseObject* object, Property::Index prop
       }
       case Toolkit::TextInput::CUT_AND_PASTE_COLOR_PROPERTY:
       {
-        value = textInputImpl.mPopUpPanel.GetCutPastePopUpColor();
+        value = textInputImpl.mPopupPanel.GetCutPastePopupColor();
         break;
       }
       case Toolkit::TextInput::CUT_AND_PASTE_PRESSED_COLOR_PROPERTY:
       {
-        value = textInputImpl.mPopUpPanel.GetCutPastePopUpPressedColor();
+        value = textInputImpl.mPopupPanel.GetCutPastePopupPressedColor();
         break;
       }
       case Toolkit::TextInput::CUT_AND_PASTE_BORDER_COLOR_PROPERTY :
       {
-        value = textInputImpl.mPopUpPanel.GetCutPastePopUpBorderColor();
+        value = textInputImpl.mPopupPanel.GetCutPastePopupBorderColor();
         break;
       }
       case Toolkit::TextInput::CUT_AND_PASTE_ICON_COLOR_PROPERTY:
       {
-        value = textInputImpl.mPopUpPanel.GetCutPastePopUpIconColor();
+        value = textInputImpl.mPopupPanel.GetCutPastePopupIconColor();
         break;
       }
       case Toolkit::TextInput::CUT_AND_PASTE_ICON_PRESSED_COLOR_PROPERTY:
       {
-        value = textInputImpl.mPopUpPanel.GetCutPastePopUpIconPressedColor();
+        value = textInputImpl.mPopupPanel.GetCutPastePopupIconPressedColor();
         break;
       }
       case Toolkit::TextInput::CUT_AND_PASTE_TEXT_COLOR_PROPERTY:
       {
-        value = textInputImpl.mPopUpPanel.GetCutPastePopUpTextColor();
+        value = textInputImpl.mPopupPanel.GetCutPastePopupTextColor();
         break;
       }
       case Toolkit::TextInput::CUT_AND_PASTE_TEXT_PRESSED_COLOR_PROPERTY:
       {
-        value = textInputImpl.mPopUpPanel.GetCutPastePopUpTextPressedColor();
+        value = textInputImpl.mPopupPanel.GetCutPastePopupTextPressedColor();
         break;
       }
       case Toolkit::TextInput::CUT_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
-        value = textInputImpl.mPopUpPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsCut );
+        value = textInputImpl.mPopupPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsCut );
         break;
       }
       case Toolkit::TextInput::COPY_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
-        value =  textInputImpl.mPopUpPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsCopy );
+        value =  textInputImpl.mPopupPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsCopy );
         break;
       }
       case Toolkit::TextInput::PASTE_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
-        value = textInputImpl.mPopUpPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsPaste );
+        value = textInputImpl.mPopupPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsPaste );
         break;
       }
       case Toolkit::TextInput::SELECT_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
-        value = textInputImpl.mPopUpPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsSelect );
+        value = textInputImpl.mPopupPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsSelect );
         break;
       }
       case Toolkit::TextInput::SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
-        value = textInputImpl.mPopUpPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsSelectAll );
+        value = textInputImpl.mPopupPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsSelectAll );
         break;
       }
       case Toolkit::TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY:
       {
-        value = textInputImpl.mPopUpPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsClipboard );
+        value = textInputImpl.mPopupPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsClipboard );
         break;
       }
       case Toolkit::TextInput::POP_UP_OFFSET_FROM_TEXT_PROPERTY:

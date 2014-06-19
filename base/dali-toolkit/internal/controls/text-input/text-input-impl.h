@@ -1086,7 +1086,7 @@ public:  // Public to allow internal testing.
   /**
    * Setup the selection popup and clipboard if relevant so the correct options are shown when ShowPopup is called.
    */
-  void SetUpPopUpSelection();
+  void SetUpPopupSelection();
 
   /**
    * Return the logical index containing the character position closest to the source.
@@ -1453,7 +1453,7 @@ private:
                                                                                      ///< the text size after layout and the scroll offset.
 
   MarkupProcessor::StyledTextArray mCurrentCopySelecton;                                              ///< Array to store copied text.
-  TextInputPopup mPopUpPanel;                                                                         ///< Panel to house cut and paste, select all buttons.
+  TextInputPopup mPopupPanel;                                                                         ///< Panel to house cut and paste, select all buttons.
 
   Timer mScrollTimer;
   Vector2 mScrollDisplacement;
