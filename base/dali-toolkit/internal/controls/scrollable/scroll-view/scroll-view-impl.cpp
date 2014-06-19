@@ -1051,7 +1051,7 @@ void ScrollView::SetScrollSensitive(bool sensitive)
   Actor self = Self();
   PanGestureDetector panGesture( GetPanGestureDetector() );
 
-  DALI_LOG_SCROLL_STATE("[0x%X] sensitive[%d]", this, int(sensitive));
+  DALI_LOG_SCROLL_STATE("[0x%X] sensitive: before:[%d] setting[%d]", this, int(mSensitive), int(sensitive));
 
   if((!mSensitive) && (sensitive))
   {
@@ -1061,8 +1061,7 @@ void ScrollView::SetScrollSensitive(bool sensitive)
   else if((mSensitive) && (!sensitive))
   {
     // while the scroll view is panning, the state needs to be reset.
-    bool isPanning = self.GetProperty<bool>( mPropertyPanning );
-    if ( isPanning )
+    if ( mPanning )
     {
       PanGesture cancelGesture( Gesture::Cancelled );
       OnPan( cancelGesture );
@@ -1273,15 +1272,17 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
 void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, float rotation, float duration,
                              DirectionBias horizontalBias, DirectionBias verticalBias)
 {
+  Actor self( Self() );
+
   // Guard against destruction during signal emission
   // Note that Emit() methods are called indirectly e.g. from within ScrollView::AnimateTo()
   Toolkit::ScrollView handle( GetOwner() );
 
-  DALI_LOG_SCROLL_STATE("pos[%.2f,%.2f], scale[%.2f,%.2f], rot[%.2f], duration[%.2f] bias[%d, %d]",
-    position.x, position.y, scale.x, scale.y, rotation, duration, int(horizontalBias), int(verticalBias));
+  DALI_LOG_SCROLL_STATE("[0x%X] pos[%.2f,%.2f], scale[%.2f,%.2f], rot[%.2f], duration[%.2f] bias[%d, %d]",
+    this, position.x, position.y, scale.x, scale.y, rotation, duration, int(horizontalBias), int(verticalBias));
 
   Vector3 currentScrollPosition = GetCurrentScrollPosition();
-  Self().SetProperty( mPropertyScrollStartPagePosition, currentScrollPosition );
+  self.SetProperty( mPropertyScrollStartPagePosition, currentScrollPosition );
 
   if( mScrolling ) // are we interrupting a current scroll?
   {
@@ -1291,7 +1292,19 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
     mScrollCompletedSignalV2.Emit( currentScrollPosition );
   }
 
-  Self().SetProperty(mPropertyScrolling, true);
+  if( mPanning ) // are we interrupting a current pan?
+  {
+    DALI_LOG_SCROLL_STATE("[0x%X] Interrupting Pan, set to false", this );
+    mPanning = false;
+    self.SetProperty( mPropertyPanning, false );
+
+    if( mScrollMainInternalPrePositionConstraint )
+    {
+      self.RemoveConstraint(mScrollMainInternalPrePositionConstraint);
+    }
+  }
+
+  self.SetProperty(mPropertyScrolling, true);
   mScrolling = true;
 
   DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignalV2 1 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
@@ -1311,7 +1324,7 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
   if(!animating)
   {
     // if not animating, then this pan has completed right now.
-    Self().SetProperty(mPropertyScrolling, false);
+    self.SetProperty(mPropertyScrolling, false);
     mScrolling = false;
 
     // If we have no duration, then in the next update frame, we will be at the position specified as we just set.
@@ -1341,8 +1354,8 @@ void ScrollView::ScrollTo(const Vector3& position, float duration)
 void ScrollView::ScrollTo(const Vector3& position, float duration,
                           DirectionBias horizontalBias, DirectionBias verticalBias)
 {
-  DALI_LOG_SCROLL_STATE("position[%.2f, %.2f] duration[%.2f]",
-    position.x, position.y, duration, int(horizontalBias), int(verticalBias));
+  DALI_LOG_SCROLL_STATE("[0x%X] position[%.2f, %.2f] duration[%.2f]",
+    this, position.x, position.y, duration, int(horizontalBias), int(verticalBias));
 
   TransformTo(position, mScrollPostScale, mScrollPostRotation, duration, horizontalBias, verticalBias);
 }
@@ -2520,6 +2533,8 @@ void ScrollView::OnPan(PanGesture gesture)
 
   if(!mSensitive)
   {
+    DALI_LOG_SCROLL_STATE("[0x%X] Pan Ignored, Insensitive", this);
+
     // If another callback on the same original signal disables sensitivity,
     // this callback will still be called, so we must suppress it.
     return;
@@ -2530,6 +2545,7 @@ void ScrollView::OnPan(PanGesture gesture)
   {
     case Gesture::Started:
     {
+      DALI_LOG_SCROLL_STATE("[0x%X] Pan Started", this);
       UpdateLocalScrollProperties();
       GestureStarted();
       mPanning = true;
@@ -2542,21 +2558,40 @@ void ScrollView::OnPan(PanGesture gesture)
 
     case Gesture::Continuing:
     {
-      GestureContinuing(gesture.screenDisplacement, Vector2::ZERO, 0.0f);
+      if ( mPanning )
+      {
+        DALI_LOG_SCROLL_STATE("[0x%X] Pan Continuing", this);
+        GestureContinuing(gesture.screenDisplacement, Vector2::ZERO, 0.0f);
+      }
+      else
+      {
+        // If we do not think we are panning, then we should not do anything here
+        return;
+      }
       break;
     }
 
     case Gesture::Finished:
     case Gesture::Cancelled:
     {
-      UpdateLocalScrollProperties();
-      mLastVelocity = gesture.velocity;
-      mPanning = false;
-      self.SetProperty( mPropertyPanning, false );
-
-      if( mScrollMainInternalPrePositionConstraint )
+      if ( mPanning )
       {
-        self.RemoveConstraint(mScrollMainInternalPrePositionConstraint);
+        DALI_LOG_SCROLL_STATE("[0x%X] Pan %s", this, ( ( gesture.state == Gesture::Finished ) ? "Finished" : "Cancelled" ) );
+
+        UpdateLocalScrollProperties();
+        mLastVelocity = gesture.velocity;
+        mPanning = false;
+        self.SetProperty( mPropertyPanning, false );
+
+        if( mScrollMainInternalPrePositionConstraint )
+        {
+          self.RemoveConstraint(mScrollMainInternalPrePositionConstraint);
+        }
+      }
+      else
+      {
+        // If we do not think we are panning, then we should not do anything here
+        return;
       }
       break;
     }
