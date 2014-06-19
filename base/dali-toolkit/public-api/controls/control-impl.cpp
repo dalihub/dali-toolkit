@@ -62,6 +62,7 @@ Integration::Log::Filter* gLogFilter  = Integration::Log::Filter::New(Debug::NoL
 #endif
 
 const float MAX_FLOAT_VALUE( std::numeric_limits<float>::max() );
+const Vector3 MAX_SIZE( MAX_FLOAT_VALUE, MAX_FLOAT_VALUE, MAX_FLOAT_VALUE );
 const float BACKGROUND_ACTOR_Z_POSITION( -0.1f );
 
 BaseHandle Create()
@@ -73,28 +74,7 @@ TypeRegistration CONTROL_TYPE( typeid(Control), typeid(CustomActor), Create );
 
 // Property Registration after Internal::Control::Impl definition below
 
-TypeAction ACTION_TYPE_1(CONTROL_TYPE, Toolkit::Control::ACTION_CONTROL_ACTIVATED, &Internal::Control::DoAction);
-
-/**
- * Helper class used to set the Control's size through the Actor's API or through children added.
- */
-class SetSizeLock
-{
-public:
-  SetSizeLock( bool& lock )
-  : mLock( lock )
-  {
-    mLock = true;
-  }
-
-  ~SetSizeLock()
-  {
-    mLock = false;
-  }
-
-private:
-  bool& mLock;
-};
+TypeAction ACTION_TYPE_1( CONTROL_TYPE, Toolkit::Control::ACTION_CONTROL_ACTIVATED, &Internal::Control::DoAction );
 
 /**
  * Structure which holds information about the background of a control
@@ -233,29 +213,38 @@ void SetupBackgroundActor( Actor actor, Property::Index constrainingIndex, const
 namespace Internal
 {
 
-class Control::Impl : public ConnectionTrackerInterface
+class Control::Impl : public ConnectionTracker
 {
+public:
+
+  /**
+   * Size indices for mMinMaxSize array
+   */
+  enum
+  {
+    MIN_SIZE_INDEX = 0,
+    MAX_SIZE_INDEX = 1
+  };
+
 public:
   // Construction & Destruction
   Impl(Control& controlImpl)
-  : mControlImpl(controlImpl),
+  : mControlImpl( controlImpl ),
     mBackground( NULL ),
+    mStartingPinchScale( NULL ),
     mKeyEventSignalV2(),
     mPinchGestureDetector(),
     mPanGestureDetector(),
     mTapGestureDetector(),
     mLongPressGestureDetector(),
-    mStartingPinchScale(),
-    mSize(),
-    mSetSize(),
-    mMinimumSize(),
-    mMaximumSize( MAX_FLOAT_VALUE, MAX_FLOAT_VALUE, MAX_FLOAT_VALUE ),
-    mLockSetSize( false ),
+    mCurrentSize(),
+    mNaturalSize(),
     mWidthPolicy( Toolkit::Control::Fixed ),
     mHeightPolicy( Toolkit::Control::Fixed ),
     mFlags( Control::CONTROL_BEHAVIOUR_NONE ),
-    mIsKeyboardNavigationSupported(false),
-    mIsKeyboardFocusGroup(false),
+    mInsideRelayout( false ),
+    mIsKeyboardNavigationSupported( false ),
+    mIsKeyboardFocusGroup( false ),
     mInitialized( false )
   {
   }
@@ -263,10 +252,8 @@ public:
   ~Impl()
   {
     // All gesture detectors will be destroyed so no need to disconnect.
-    if ( mBackground )
-    {
-      delete mBackground;
-    }
+    delete mBackground;
+    delete mStartingPinchScale;
   }
 
   // Gesture Detection Methods
@@ -289,30 +276,6 @@ public:
   void LongPressDetected(Actor actor, LongPressGesture longPress)
   {
     mControlImpl.OnLongPress(longPress);
-  }
-
-  /**
-   * @copydoc ConnectionTrackerInterface::SignalConnected
-   */
-  virtual void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback )
-  {
-    mConnectionTracker.SignalConnected( slotObserver, callback );
-  }
-
-  /**
-   * @copydoc ConnectionTrackerInterface::SignalDisconnected
-   */
-  virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback )
-  {
-    mConnectionTracker.SignalDisconnected( slotObserver, callback );
-  }
-
-  /**
-   * @copydoc ConnectionTrackerInterface::GetConnectionCount
-   */
-  virtual std::size_t GetConnectionCount() const
-  {
-    return mConnectionTracker.GetConnectionCount();
   }
 
   // Background Methods
@@ -473,13 +436,13 @@ public:
 
         case Toolkit::Control::PROPERTY_MINIMUM_SIZE:
         {
-          value = controlImpl.mImpl->mMinimumSize;
+          value = controlImpl.mImpl->GetMinimumSize();
           break;
         }
 
         case Toolkit::Control::PROPERTY_MAXIMUM_SIZE:
         {
-          value = controlImpl.mImpl->mMaximumSize;
+          value = controlImpl.mImpl->GetMaximumSize();
           break;
         }
 
@@ -494,32 +457,102 @@ public:
     return value;
   }
 
+  /**
+   * Helper to get minimum size
+   * @return minimum size
+   */
+  inline const Vector3& GetMinimumSize()
+  {
+    if( mMinMaxSize.Count() > MIN_SIZE_INDEX )
+    {
+      return mMinMaxSize[ MIN_SIZE_INDEX ];
+    }
+    else
+    {
+      // its not been allocated so its ZERO
+      return Vector3::ZERO;
+    }
+  }
+  /**
+   * Helper to Set minimum size
+   * @param size to set
+   */
+  inline void SetMinimumSize( const Vector3& size )
+  {
+    if( mMinMaxSize.Count() > MIN_SIZE_INDEX )
+    {
+      mMinMaxSize[ MIN_SIZE_INDEX ] = size;
+    }
+    else
+    {
+      // its not been allocated so push the new value there
+      mMinMaxSize.PushBack( size );
+    }
+  }
+
+  /**
+   * Helper to get maximum size
+   * @return maximum size
+   */
+  inline const Vector3& GetMaximumSize()
+  {
+    if( mMinMaxSize.Count() > MAX_SIZE_INDEX )
+    {
+      return mMinMaxSize[ MAX_SIZE_INDEX ];
+    }
+    else
+    {
+      // its not been allocated so its MAX_SIZE
+      return MAX_SIZE;
+    }
+  }
+
+  /**
+   * Helper to Set minimum size
+   * @param size to set
+   */
+  inline void SetMaximumSize( const Vector3& size )
+  {
+    if( mMinMaxSize.Count() > MAX_SIZE_INDEX )
+    {
+      mMinMaxSize[ MAX_SIZE_INDEX ] = size;
+    }
+    else if( mMinMaxSize.Count() > MIN_SIZE_INDEX )
+    {
+      // max has not been allocated, but min has
+      mMinMaxSize.PushBack( size );
+    }
+    else
+    {
+      // min and max both unallocated so allocate both
+      mMinMaxSize.Resize( 2u ); // this will reserve and default construct two Vector3s
+      mMinMaxSize[ MAX_SIZE_INDEX ] = size;
+    }
+  }
+
   // Data
 
   Control& mControlImpl;
   Background* mBackground;           ///< Only create the background if we use it
-  ConnectionTracker mConnectionTracker; // signal connection tracker
+  Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
   Toolkit::Control::KeyEventSignalV2 mKeyEventSignalV2;
 
   // Gesture Detection
-  PinchGestureDetector     mPinchGestureDetector;
-  PanGestureDetector       mPanGestureDetector;
-  TapGestureDetector       mTapGestureDetector;
+  PinchGestureDetector mPinchGestureDetector;
+  PanGestureDetector mPanGestureDetector;
+  TapGestureDetector mTapGestureDetector;
   LongPressGestureDetector mLongPressGestureDetector;
-  Vector3 mStartingPinchScale;       ///< The scale when a pinch gesture starts
+  // @todo change all these to Vector2 when we have a chance to sanitize the public API as well
+  Vector3 mCurrentSize; ///< Stores the current control's size, this is the negotiated size
+  Vector3 mNaturalSize; ///< Stores the size set through the Actor's API. This is size the actor wants to be. Useful when reset to the initial size is needed.
+  Dali::Vector< Vector3 > mMinMaxSize; ///< Stores the minimum and maximum size if they are set
 
-  Vector3 mSize;                     ///< Stores the current control's size.
-  Vector3 mSetSize;                  ///< Always stores the size set through the Actor's API. Useful when reset to the initial size is needed.
-  Vector3 mMinimumSize;              ///< Stores the control's minimum size.
-  Vector3 mMaximumSize;              ///< Stores the control's maximum size.
-
-  bool mLockSetSize;                 ///< Used to avoid. Can't be a bitfield as a reference to this member is used in SetSizeLock helper class.
-
-  Toolkit::Control::SizePolicy mWidthPolicy:3;  ///< Stores the width policy. 3 bits covers 8 values
-  Toolkit::Control::SizePolicy mHeightPolicy:3; ///< Stores the height policy. 3 bits covers 8 values
-  ControlBehaviour mFlags:4;           ///< Flags passed in from constructor. Need to increase this size when new enums are added
+  Toolkit::Control::SizePolicy mWidthPolicy :3;  ///< Stores the width policy. 3 bits covers 8 values
+  Toolkit::Control::SizePolicy mHeightPolicy :3; ///< Stores the height policy. 3 bits covers 8 values
+  ControlBehaviour mFlags :4;             ///< Flags passed in from constructor. Need to increase this size when new enums are added
+  bool mInsideRelayout:1;                 ///< Detect when were in Relayout
   bool mIsKeyboardNavigationSupported:1;  ///< Stores whether keyboard navigation is supported by the control.
-  bool mIsKeyboardFocusGroup:1;        ///< Stores whether the control is a focus group.
+  bool mIsKeyboardFocusGroup:1;           ///< Stores whether the control is a focus group.
   bool mInitialized:1;
 
   // Properties - these need to be members of Internal::Control::Impl as they need to functions within this class.
@@ -740,12 +773,18 @@ void Control::OnThemeChange( Toolkit::StyleManager styleManager )
 
 void Control::OnPinch(PinchGesture pinch)
 {
-  if (pinch.state == Gesture::Started)
+  if( !( mImpl->mStartingPinchScale ) )
   {
-    mImpl->mStartingPinchScale = Self().GetCurrentScale();
+    // lazy allocate
+    mImpl->mStartingPinchScale = new Vector3;
   }
 
-  Self().SetScale(mImpl->mStartingPinchScale * pinch.scale);
+  if( pinch.state == Gesture::Started )
+  {
+    *( mImpl->mStartingPinchScale ) = Self().GetCurrentScale();
+  }
+
+  Self().SetScale( *( mImpl->mStartingPinchScale ) * pinch.scale );
 }
 
 void Control::OnStageConnection()
@@ -794,16 +833,16 @@ void Control::OnChildRemove(Actor& child)
 
 void Control::OnSizeSet(const Vector3& targetSize)
 {
-  if( ( !mImpl->mLockSetSize ) && ( targetSize != mImpl->mSetSize ) )
+  if( ( !mImpl->mInsideRelayout ) && ( targetSize != mImpl->mNaturalSize ) )
   {
     // Only updates size if set through Actor's API
-    mImpl->mSetSize = targetSize;
+    mImpl->mNaturalSize = targetSize;
   }
 
-  if( targetSize != mImpl->mSize )
+  if( targetSize != mImpl->mCurrentSize )
   {
     // Update control size.
-    mImpl->mSize = targetSize;
+    mImpl->mCurrentSize = targetSize;
 
     // Notify derived classes.
     OnControlSizeSet( targetSize );
@@ -812,7 +851,7 @@ void Control::OnSizeSet(const Vector3& targetSize)
 
 void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
 {
-  // Do Nothing
+  // @todo consider animating negotiated child sizes to target size
 }
 
 bool Control::OnTouchEvent(const TouchEvent& event)
@@ -953,9 +992,11 @@ void Control::GetSizePolicy( Toolkit::Control::SizePolicy& widthPolicy, Toolkit:
 
 void Control::SetMinimumSize( const Vector3& size )
 {
-  if ( mImpl->mMinimumSize != size )
+  const Vector3& minSize = mImpl->GetMinimumSize();
+  if ( fabsf( minSize.width - size.width ) > Math::MACHINE_EPSILON_1000 ||
+       fabsf( minSize.height - size.height ) > Math::MACHINE_EPSILON_1000 )
   {
-    mImpl->mMinimumSize = size;
+    mImpl->SetMinimumSize( size );
 
     // Only relayout if our control is using the minimum or range policy.
     if ( ( mImpl->mHeightPolicy == Toolkit::Control::Minimum ) || ( mImpl->mWidthPolicy  == Toolkit::Control::Minimum ) ||
@@ -968,14 +1009,16 @@ void Control::SetMinimumSize( const Vector3& size )
 
 const Vector3& Control::GetMinimumSize() const
 {
-  return mImpl->mMinimumSize;
+  return mImpl->GetMinimumSize();
 }
 
 void Control::SetMaximumSize( const Vector3& size )
 {
-  if ( mImpl->mMaximumSize != size )
+  const Vector3& maxSize = mImpl->GetMaximumSize();
+  if ( fabsf( maxSize.width - size.width ) > Math::MACHINE_EPSILON_1000 ||
+       fabsf( maxSize.height - size.height ) > Math::MACHINE_EPSILON_1000 )
   {
-    mImpl->mMaximumSize = size;
+    mImpl->SetMaximumSize( size );
 
     // Only relayout if our control is using the maximum or range policy.
     if ( ( mImpl->mHeightPolicy == Toolkit::Control::Maximum ) || ( mImpl->mWidthPolicy  == Toolkit::Control::Maximum ) ||
@@ -988,22 +1031,22 @@ void Control::SetMaximumSize( const Vector3& size )
 
 const Vector3& Control::GetMaximumSize() const
 {
-  return mImpl->mMaximumSize;
+  return mImpl->GetMaximumSize();
 }
 
 Vector3 Control::GetNaturalSize()
 {
   // could be overridden in derived classes.
-  return mImpl->mSetSize;
+  return mImpl->mNaturalSize;
 }
 
 float Control::GetHeightForWidth( float width )
 {
   // could be overridden in derived classes.
   float height( 0.0f );
-  if ( mImpl->mSetSize.width > 0.0f )
+  if ( mImpl->mNaturalSize.width > 0.0f )
   {
-    height = mImpl->mSetSize.height * width / mImpl->mSetSize.width;
+    height = mImpl->mNaturalSize.height * width / mImpl->mNaturalSize.width;
   }
   return height;
 }
@@ -1012,21 +1055,21 @@ float Control::GetWidthForHeight( float height )
 {
   // could be overridden in derived classes.
   float width( 0.0f );
-  if ( mImpl->mSetSize.height > 0.0f )
+  if ( mImpl->mNaturalSize.height > 0.0f )
   {
-    width = mImpl->mSetSize.width * height / mImpl->mSetSize.height;
+    width = mImpl->mNaturalSize.width * height / mImpl->mNaturalSize.height;
   }
   return width;
 }
 
 const Vector3& Control::GetControlSize() const
 {
-  return mImpl->mSize;
+  return mImpl->mCurrentSize;
 }
 
 const Vector3& Control::GetSizeSet() const
 {
-  return mImpl->mSetSize;
+  return mImpl->mNaturalSize;
 }
 
 void Control::SetKeyInputFocus()
@@ -1065,13 +1108,13 @@ void Control::RelayoutRequest()
   }
 }
 
-void Control::Relayout( Vector2 size, ActorSizeContainer& container )
+void Control::Relayout(Vector2 size, ActorSizeContainer& container)
 {
   // Avoids relayout again when OnSizeSet callback arrives.
-  {
-    SetSizeLock lock( mImpl->mLockSetSize );
-    Self().SetSize( size );
-  }
+  mImpl->mInsideRelayout = true;
+  Self().SetSize( size );
+  // @todo this really needs to be at the end of method but not sure why the scope used to be only the SetSize, needs to be cleaned up in size negotiation rework
+  mImpl->mInsideRelayout = false;
 
   // Only relayout controls which requested to be relaid out.
   OnRelaidOut( size, container );
@@ -1112,7 +1155,7 @@ void Control::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& containe
     if ( mImpl->mHeightPolicy == Toolkit::Control::Fixed )
     {
       // If a control says it has a fixed size, then use the size set by the application / control.
-      Vector2 setSize( mImpl->mSetSize );
+      Vector2 setSize( mImpl->mNaturalSize );
       if ( setSize != Vector2::ZERO )
       {
         size = setSize;
@@ -1137,9 +1180,9 @@ void Control::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& containe
     else
     {
       // Width is fixed so if the application / control has set it, then use that.
-      if ( !EqualsZero( mImpl->mSetSize.width ) )
+      if ( !EqualsZero( mImpl->mNaturalSize.width ) )
       {
-        size.width = mImpl->mSetSize.width;
+        size.width = mImpl->mNaturalSize.width;
       }
       else
       {
@@ -1151,7 +1194,7 @@ void Control::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& containe
       size.height = GetHeightForWidth( size.width );
 
       // Ensure height is within our policy rules
-      size.height = Calculate( mImpl->mHeightPolicy, mImpl->mMinimumSize.height, mImpl->mMaximumSize.height, size.height );
+      size.height = Calculate( mImpl->mHeightPolicy, GetMinimumSize().height, GetMaximumSize().height, size.height );
     }
   }
   else
@@ -1159,9 +1202,9 @@ void Control::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& containe
     if ( mImpl->mHeightPolicy == Toolkit::Control::Fixed )
     {
       // Height is fixed so if the application / control has set it, then use that.
-      if ( !EqualsZero( mImpl->mSetSize.height ) )
+      if ( !EqualsZero( mImpl->mNaturalSize.height ) )
       {
-        size.height = mImpl->mSetSize.height;
+        size.height = mImpl->mNaturalSize.height;
       }
       else
       {
@@ -1173,14 +1216,14 @@ void Control::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& containe
       size.width = GetWidthForHeight( size.height );
 
       // Ensure width is within our policy rules
-      size.width = Calculate( mImpl->mWidthPolicy, mImpl->mMinimumSize.width, mImpl->mMaximumSize.width, size.width );
+      size.width = Calculate( mImpl->mWidthPolicy, mImpl->GetMinimumSize().width, mImpl->GetMaximumSize().width, size.width );
     }
     else
     {
       // Width and height are BOTH flexible.
       // Calculate the width and height using the policy rules.
-      size.width = Calculate( mImpl->mWidthPolicy, mImpl->mMinimumSize.width, mImpl->mMaximumSize.width, allocatedSize.width );
-      size.height = Calculate( mImpl->mHeightPolicy, mImpl->mMinimumSize.height, mImpl->mMaximumSize.height, allocatedSize.height );
+      size.width = Calculate( mImpl->mWidthPolicy, mImpl->GetMinimumSize().width, mImpl->GetMaximumSize().width, allocatedSize.width );
+      size.height = Calculate( mImpl->mHeightPolicy, mImpl->GetMinimumSize().height, mImpl->GetMaximumSize().height, allocatedSize.height );
     }
   }
 
