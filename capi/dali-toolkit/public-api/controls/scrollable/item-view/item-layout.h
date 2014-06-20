@@ -345,9 +345,9 @@ public:
   virtual void GetYAxisScrollHint(Vector2& scrollHint) const;
 
   /**
-   * @brief Query the scroll speed factor of the layout.
+   * @brief Query the scroll speed factor of the layout while dragging.
    *
-   * This factor is used by the layout to customise its scroll speed while dragging and swiping.
+   * This factor is used by the layout to customise its scroll speed while dragging.
    * The factor will be multiplied with the scroll distance of how many pixels in actor coordinate,
    * and the layout position of the actors in ItemView will be moved by this result.
    * For example, when the speed factor is 0.01, if the scroll distance is 100 pixels, the layout
@@ -386,6 +386,20 @@ public:
    * @return The next item ID.
    */
   virtual int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
+
+  /**
+   * @brief Query the flick speed factor of the layout while swipping.
+   *
+   * This factor is used by the layout to customise its scroll speed while swiping.
+   * The factor will be multiplied with the scroll distance of how many pixels in actor coordinate,
+   * and the layout position of the actors in ItemView will be moved by this result.
+   * For example, when the speed factor is 0.01, if the scroll distance is 100 pixels, the layout
+   * position of actors will be moved by 1.
+   * Therefore, the bigger the factor is, the faster the flick speed will be.
+   *
+   * @return The scroll speed factor of the layout.
+   */
+  virtual float GetFlickSpeedFactor() const;
 
 protected:
 

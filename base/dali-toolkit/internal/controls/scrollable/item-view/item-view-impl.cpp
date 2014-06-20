@@ -1349,7 +1349,7 @@ void ItemView::OnPan(PanGesture gesture)
     case Gesture::Continuing:
     {
       mScrollDistance = CalculateScrollDistance(gesture.displacement, *mActiveLayout);
-      mScrollSpeed = Clamp((gesture.GetSpeed() * mActiveLayout->GetScrollSpeedFactor() * MILLISECONDS_PER_SECONDS), 0.0f, mActiveLayout->GetMaximumSwipeSpeed());
+      mScrollSpeed = Clamp((gesture.GetSpeed() * mActiveLayout->GetFlickSpeedFactor() * MILLISECONDS_PER_SECONDS), 0.0f, mActiveLayout->GetMaximumSwipeSpeed());
 
       // Refresh order depends on the direction of the scroll; negative is towards the last item.
       mRefreshOrderHint = mScrollDistance < 0.0f;

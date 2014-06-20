@@ -237,6 +237,12 @@ int ItemLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Cont
   return itemID;
 }
 
+float ItemLayout::GetFlickSpeedFactor() const
+{
+  // By default, the speed factor while dragging and swiping is the same.
+  return GetScrollSpeedFactor();
+}
+
 } // namespace Toolkit
 
 } // namespace Dali
