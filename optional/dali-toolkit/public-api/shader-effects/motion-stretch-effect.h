@@ -56,9 +56,11 @@ public:
   MotionStretchEffect();
 
   /**
-   * Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~MotionStretchEffect();
+  ~MotionStretchEffect();
 
   /**
    * Create an initialized MotionStretchEffect

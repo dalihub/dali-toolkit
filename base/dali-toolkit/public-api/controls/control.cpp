@@ -179,31 +179,6 @@ Control::KeyEventSignalV2& Control::KeyEventSignal()
   return GetImplementation().KeyEventSignal();
 }
 
-/**
- * @copydoc ConnectionTrackerInterface::SignalConnected
- */
-void Control::SignalConnected( SlotObserver* slotObserver, CallbackBase* callback )
-{
-  GetImplementation().SignalConnected(slotObserver, callback );
-}
-
-/**
- * @copydoc ConnectionTrackerInterface::SignalDisconnected
- */
-void Control::SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback )
-{
-  GetImplementation().SignalDisconnected(slotObserver, callback );
-}
-
-/**
- * @copydoc ConnectionTrackerInterface::GetConnectionCount
- */
-std::size_t Control::GetConnectionCount() const
-{
-  return GetImplementation().GetConnectionCount( );
-}
-
-
 Control::Control(Internal::Control& implementation)
 : CustomActor(implementation)
 {

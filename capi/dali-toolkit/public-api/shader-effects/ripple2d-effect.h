@@ -47,9 +47,11 @@ public:
   Ripple2DEffect();
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~Ripple2DEffect();
+  ~Ripple2DEffect();
 
   /**
    * @brief Create an initialized Ripple2DEffect.

@@ -47,9 +47,11 @@ public:
   SwirlEffect();
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~SwirlEffect();
+  ~SwirlEffect();
 
   /**
    * @brief Create an initialized SwirlEffect.

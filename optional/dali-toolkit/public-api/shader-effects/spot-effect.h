@@ -41,9 +41,11 @@ public:
   SpotEffect();
 
   /**
-   * Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~SpotEffect();
+  ~SpotEffect();
 
   /**
    * Create an initialized SpotEffect.

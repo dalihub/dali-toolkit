@@ -93,9 +93,11 @@ public:
   using Dali::BaseHandle::operator=;
 
   /**
-   * Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~ScrollConnector();
+  ~ScrollConnector();
 
   /**
    * Downcast a BaseHandle to ScrollConnector handle.

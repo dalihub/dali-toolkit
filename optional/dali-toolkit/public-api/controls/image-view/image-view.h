@@ -88,10 +88,11 @@ public:
   ImageView& operator=( const ImageView& handle );
 
   /**
-   * Virtual destructor.
-   * Dali::Object derived classes typically do not contain member data.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~ImageView();
+  ~ImageView();
 
   /**
    * Create the Poup control

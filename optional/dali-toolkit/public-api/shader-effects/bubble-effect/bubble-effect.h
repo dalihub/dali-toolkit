@@ -41,9 +41,11 @@ public:
   BubbleEffect();
 
   /**
-   * Virtual destructor
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~BubbleEffect();
+  ~BubbleEffect();
 
   /**
    * Create an initialized BubbleEffect

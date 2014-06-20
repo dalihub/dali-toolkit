@@ -76,11 +76,11 @@ public:
   ItemView& operator=( const ItemView& itemView );
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
    *
-   * Dali::Object derived classes typically do not contain member data.
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~ItemView();
+  ~ItemView();
 
   /**
    * @brief Create an initialized ItemView.

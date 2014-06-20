@@ -101,9 +101,11 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
   static Builder New();
 
   /**
-   * Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~Builder();
+  ~Builder();
 
   /**
    * UI string data format

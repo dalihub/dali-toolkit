@@ -96,10 +96,11 @@ public:
   Slider& operator=( const Slider& handle );
 
   /**
-   * Virtual destructor.
-   * Dali::Object derived classes typically do not contain member data.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~Slider();
+  ~Slider();
 
   /**
    * Downcast an Object handle to Slider. If handle points to a Slider the

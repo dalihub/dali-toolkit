@@ -56,10 +56,11 @@ public:
   PageTurnPortraitView& operator=( const PageTurnPortraitView& pageTurnPortraitView );
 
   /**
-   * Virtual destructor.
-   * Dali::Object derived classes typically do not contain member data.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~PageTurnPortraitView();
+  ~PageTurnPortraitView();
 
   /**
    * Create an initialized  PageTurnPortraitView control

@@ -41,9 +41,11 @@ public:
   DissolveLocalEffect();
 
   /**
-   * Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~DissolveLocalEffect();
+  ~DissolveLocalEffect();
 
   /**
    * Create an initialized DissolveLocalEffect.

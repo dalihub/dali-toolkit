@@ -69,10 +69,11 @@ public:
   Cluster& operator=( const Cluster& cluster );
 
   /**
-   * Virtual destructor.
-   * Dali::Object derived classes typically do not contain member data.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~Cluster();
+  ~Cluster();
 
   /**
    * Create the Cluster control with the given style.

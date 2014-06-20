@@ -68,9 +68,11 @@ public:
   ToolBar& operator=( const ToolBar& handle );
 
   /**
-   * virtual Destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~ToolBar();
+  ~ToolBar();
 
   /**
    * Create an initialized ToolBar.

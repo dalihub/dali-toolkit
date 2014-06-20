@@ -84,9 +84,11 @@ public:
   PageTurnEffect();
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~PageTurnEffect();
+  ~PageTurnEffect();
 
   /**
    * @brief Create an initialized PageTurnEffect.

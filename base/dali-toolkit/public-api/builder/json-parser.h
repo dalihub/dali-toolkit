@@ -63,10 +63,12 @@ public:
    */
   JsonParser();
 
-  /*
-   * virtual Destructor
+  /**
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~JsonParser();
+  ~JsonParser();
 
   /**
    * Downcast an Object handle to JsonParser if it is a JsonParser.

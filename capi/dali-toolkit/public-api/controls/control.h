@@ -45,7 +45,7 @@ class Control;
  * The implementation of the control must be supplied; see Internal::Control for more details.
  * @see Internal::Control
  */
-class Control : public CustomActor, public ConnectionTrackerInterface
+class Control : public CustomActor
 {
 public:
 
@@ -134,11 +134,11 @@ public: // Creation & Destruction
   Control(const Control& uiControl);
 
   /**
-   * @brief Virtual destructor.
+   * @brief Dali::Control is intended as a base class
    *
-   * Dali::Object derived classes do not contain member data.
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~Control();
+  ~Control();
 
 public: // operators
 
@@ -371,23 +371,6 @@ public:
    * @return The signal to connect to.
    */
   KeyEventSignalV2& KeyEventSignal();
-
-protected:
-
-  /**
-   * @copydoc ConnectionTrackerInterface::SignalConnected
-   */
-  virtual void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback );
-
-  /**
-   * @copydoc ConnectionTrackerInterface::SignalDisconnected
-   */
-  virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback );
-
-  /**
-   * @copydoc ConnectionTrackerInterface::GetConnectionCount
-   */
-  virtual std::size_t GetConnectionCount() const;
 
 public: // Not intended for application developers
 

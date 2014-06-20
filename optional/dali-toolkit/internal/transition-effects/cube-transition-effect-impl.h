@@ -51,9 +51,11 @@ public:
   FullAreaImageCreator(){}
 
   /**
-   * virtual destructor
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~FullAreaImageCreator(){}
+  ~FullAreaImageCreator(){}
 
   /**
    * Create an initialized FullAreaImageCreator.

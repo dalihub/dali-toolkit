@@ -122,9 +122,11 @@ public:
   ShadowView& operator=(const ShadowView& view);
 
   /**
-   * Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~ShadowView();
+  ~ShadowView();
 
   /**
    * Downcast an Object handle to ShadowView. If handle points to a ShadowView the

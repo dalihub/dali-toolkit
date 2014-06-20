@@ -74,9 +74,11 @@ public:
   PageTurnView& operator=( const PageTurnView& handle );
 
   /**
-   * Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~PageTurnView();
+  ~PageTurnView();
 
   /**
    * Downcast an Object handle to PageTurnView.

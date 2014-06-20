@@ -102,9 +102,11 @@ public:
   NavigationControl& operator=( const NavigationControl& handle );
 
   /**
-   * virtual Destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~NavigationControl();
+  ~NavigationControl();
 
   /**
    * Create an initialized NavigationControl.

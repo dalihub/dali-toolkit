@@ -47,9 +47,11 @@ public:
   AlphaDiscardEffect();
 
   /**
-   * Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~AlphaDiscardEffect();
+  ~AlphaDiscardEffect();
 
   /**
    * Create a AlphaDiscardEffect.

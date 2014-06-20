@@ -68,10 +68,11 @@ public:
   Magnifier& operator=( const Magnifier& handle );
 
   /**
-   * Virtual destructor.
-   * Dali::Object derived classes typically do not contain member data.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~Magnifier();
+  ~Magnifier();
 
   /**
    * Create the Poup control

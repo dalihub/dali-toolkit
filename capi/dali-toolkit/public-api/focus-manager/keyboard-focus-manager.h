@@ -78,9 +78,11 @@ public:
   KeyboardFocusManager();
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~KeyboardFocusManager();
+  ~KeyboardFocusManager();
 
   /**
    * @brief Get the singleton of KeyboardFocusManager object.

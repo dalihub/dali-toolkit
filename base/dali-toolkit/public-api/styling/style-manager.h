@@ -72,9 +72,11 @@ public:
   StyleManager();
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~StyleManager();
+  ~StyleManager();
 
   /**
    * @brief Get the singleton of StyleManager object.

@@ -40,9 +40,11 @@ public:
   ColorAdjuster();
 
   /**
-   * Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~ColorAdjuster();
+  ~ColorAdjuster();
 
   /**
    * Create an initialized ColorAdjuster.

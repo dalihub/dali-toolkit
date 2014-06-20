@@ -137,11 +137,6 @@ public:
   Ruler();
 
   /**
-   * @brief Destructor - A reference counted object may only be deleted by calling Unreference().
-   */
-  virtual ~Ruler();
-
-  /**
    * @brief Snaps (x) in accordance to the ruler settings.
    *
    * @param[in] x The input value on the ruler to be snapped.
@@ -293,6 +288,13 @@ public:
    * @return The clamped value after snapping
    */
   float SnapAndClamp(float x, float bias, float length, float scale, ClampState &clamped) const;
+
+protected:
+
+  /**
+   * @brief Destructor - A reference counted object may only be deleted by calling Unreference().
+   */
+  virtual ~Ruler();
 
 protected:
 
@@ -490,11 +492,11 @@ public:
   ScrollView& operator=( const ScrollView& handle );
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
    *
-   * Dali::Object derived classes typically do not contain member data.
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~ScrollView();
+  ~ScrollView();
 
   /**
    * @brief Create an initialized ScrollView.

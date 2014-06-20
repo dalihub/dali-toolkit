@@ -123,11 +123,11 @@ public:
   PushButton& operator=( const PushButton& pushButton );
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
    *
-   * Dali::Object derived classes typically do not contain member data.
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~PushButton();
+  ~PushButton();
 
   /**
    * @brief Create an initialized PushButton.

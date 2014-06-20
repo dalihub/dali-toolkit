@@ -51,9 +51,11 @@ public:
   CarouselEffect();
 
   /**
-   * Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~CarouselEffect();
+  ~CarouselEffect();
 
   /**
    * Create an initialized CarouselEffect.

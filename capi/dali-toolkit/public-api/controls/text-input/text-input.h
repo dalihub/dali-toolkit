@@ -122,11 +122,11 @@ public:
   static TextInput DownCast( BaseHandle handle );
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
    *
-   * Dali::Object derived classes typically do not contain member data.
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~TextInput();
+  ~TextInput();
 
   /**
    * @brief Get the inputed text currently being displayed.

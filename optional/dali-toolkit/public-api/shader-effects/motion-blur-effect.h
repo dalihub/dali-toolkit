@@ -57,9 +57,11 @@ public:
   MotionBlurEffect();
 
   /**
-   * Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~MotionBlurEffect();
+  ~MotionBlurEffect();
 
   /**
    * Create an initialized MotionBlurEffect

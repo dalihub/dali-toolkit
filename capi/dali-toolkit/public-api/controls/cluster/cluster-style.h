@@ -58,9 +58,11 @@ public:
 public:
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~ClusterStyle();
+  ~ClusterStyle();
 
   /**
    * @brief Query the maximum number of children this Style can handle.

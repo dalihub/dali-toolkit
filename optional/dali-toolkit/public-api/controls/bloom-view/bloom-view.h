@@ -109,9 +109,11 @@ public:
   BloomView& operator=(const BloomView& ZoomView);
 
   /**
-   * Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~BloomView();
+  ~BloomView();
 
   /**
    * Downcast an Object handle to BloomView. If handle points to a BloomView the

@@ -113,9 +113,11 @@ public:
   GaussianBlurView& operator=(const GaussianBlurView& ZoomView);
 
   /**
-   * Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~GaussianBlurView();
+  ~GaussianBlurView();
 
   /**
    * Downcast an Object handle to GaussianBlurView. If handle points to a GaussianBlurView the
