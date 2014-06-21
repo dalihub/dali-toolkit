@@ -619,6 +619,7 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
   option.SetSize( constrainedOptionSize );
   option.SetX( mContentSize.x );
   option.SetName( name );
+  option.SetAnimationTime( 0.0f );
   option.ClickedSignal().Connect( this, &TextInputPopup::OnButtonPressed );
   mScrollView.Add( option );
 
