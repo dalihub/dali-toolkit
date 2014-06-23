@@ -32,12 +32,8 @@ namespace
 {
 const Vector2 DEFAULT_POPUP_INDICATOR_OFFSET(0.0f, 60.0f);
 
-
-// TODO: This should be based on the content for example:
 // 1. For selection: should be above top of highlighted selection, or below bottom of highlighted selection + end handle.
 // 2. For cursor: should be above top of cursor, or below bottom of cursor + grab handle.
-const std::string POPUP_ALTERNATIVE_OFFSET("popup-alternative-offset");       ///< Alternative offset property for confinenment constraint.
-const std::string POPUP_REQUESTED_POSITION("popup-requested-position");       ///< Position the Popup was requested to be, for confinenment constraint.
 
 /**
  * Image resource paths
@@ -45,9 +41,14 @@ const std::string POPUP_REQUESTED_POSITION("popup-requested-position");       //
 const std::string POPUP_BACKGROUND( DALI_IMAGE_DIR "popup_bubble_bg.#.png" );
 const std::string POPUP_BACKGROUND_EFFECT( DALI_IMAGE_DIR "popup_bubble_bg_ef.#.png" );
 const std::string POPUP_BACKGROUND_LINE( DALI_IMAGE_DIR "popup_bubble_bg_line.#.png" );
+
 const std::string POPUP_TAIL_BOTTOM( DALI_IMAGE_DIR "popup_bubble_tail_bottom.png" );
 const std::string POPUP_TAIL_BOTTOM_EFFECT( DALI_IMAGE_DIR "popup_bubble_tail_bottom_ef.png" );
 const std::string POPUP_TAIL_BOTTOM_LINE( DALI_IMAGE_DIR "popup_bubble_tail_bottom_line.png" );
+const std::string POPUP_TAIL_TOP( DALI_IMAGE_DIR "popup_bubble_tail_top.png" );
+const std::string POPUP_TAIL_TOP_EFFECT( DALI_IMAGE_DIR "popup_bubble_tail_top_ef.png" );
+const std::string POPUP_TAIL_TOP_LINE( DALI_IMAGE_DIR "popup_bubble_tail_top_line.png" );
+
 const std::string OPTION_ICON_CLIPBOARD( DALI_IMAGE_DIR "copy_paste_icon_clipboard.png" );
 const std::string OPTION_ICON_COPY( DALI_IMAGE_DIR "copy_paste_icon_copy.png" );
 const std::string OPTION_ICON_CUT( DALI_IMAGE_DIR "copy_paste_icon_cut.png" );
@@ -86,130 +87,6 @@ const Vector4 DEFAULT_OPTION_ICON_PRESSED( Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
 const Vector4 DEFAULT_OPTION_TEXT( Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
 const Vector4 DEFAULT_OPTION_TEXT_PRESSED( Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
-
-/**
- * Confine Actor to boundaries of reference actor (e.g. Parent)
- * Actor bounds (top-left position + size) are confined to reference Actor's
- * bounds.
- */
-struct ConfinementConstraint
-{
-  /**
-   * Confinement constraint constructor.
-   * @param[in] topLeftMargin (optional) Top-Left margins (defaults to 0.0f, 0.0f)
-   * @param[in] bottomRightMargin (optional) Bottom-Right margins (defaults to 0.0f, 0.0f)
-   * @paran[in[ flipHorizontal (optional) whether to flip Actor to other side if near edge
-   * @param[in] flipVertical (optional) whether to flip Actor to the other side if near edge
-   * @param[in] boundingRect Rectangle to bound Popup to.
-   *
-   */
-  ConfinementConstraint(Vector2 topLeftMargin = Vector2::ZERO, Vector2 bottomRightMargin = Vector2::ZERO, bool flipHorizontal = false, bool flipVertical = false, Rect<float> boundingRect = Rect<float>(0.0f, 0.0f, 0.0f, 0.0f) )
-  : mMinIndent(topLeftMargin),
-    mMaxIndent(bottomRightMargin),
-    mFlipHorizontal(flipHorizontal),
-    mFlipVertical(flipVertical),
-    mBoundingRect( boundingRect )
-  {
-  }
-
-  Vector3 operator()(const Vector3&    constPosition,
-                     const PropertyInput& sizeProperty,
-                     const PropertyInput& parentOriginProperty,
-                     const PropertyInput& anchorPointProperty,
-                     const PropertyInput& referenceSizeProperty,
-                     const PropertyInput& alternativeOffsetProperty,
-                     const PropertyInput& requestedPositionProperty )
-  {
-    const Vector3& size = sizeProperty.GetVector3();
-    const Vector3& origin = parentOriginProperty.GetVector3();
-    const Vector3& anchor = anchorPointProperty.GetVector3();
-    const Vector3& referenceSize = referenceSizeProperty.GetVector3();
-    const Vector2& alternativeOffset = alternativeOffsetProperty.GetVector2();
-    const Vector3& requestedPosition = requestedPositionProperty.GetVector3();
-
-    Vector3 newPosition( requestedPosition );
-
-    // Get actual position of Actor relative to parent's Top-Left.
-    Vector3 position(constPosition + origin * referenceSize);
-
-    // if top-left corner is outside of Top-Left bounds, then push back in screen.
-
-    Vector3 corner(position - size * anchor - mMinIndent);
-
-    if ( mFlipHorizontal )
-    {
-      if( corner.x < mBoundingRect.x )
-      {
-        // Snap Popup to left hand boundary so stays visible
-        corner.x = mBoundingRect.x - ( origin.x * referenceSize.x ) + ( size.x * anchor.x );
-        newPosition.x = corner.x;
-      }
-      else if ( ( corner.x + size.x ) > ( mBoundingRect.x + mBoundingRect.width ))
-      {
-        // Calculate offset from left boundary Popup must be placed at so it does not exceed right side boundary.
-        float requiredOffSetFromLeftBoundaryToFit = mBoundingRect.width - size.x;
-        corner.x = mBoundingRect.x + requiredOffSetFromLeftBoundaryToFit - ( origin.x * referenceSize.x ) + ( size.x * anchor.x );
-        newPosition.x = corner.x;
-       }
-    }
-
-    if(mFlipVertical && corner.y < 0.0f)
-    {
-      corner.y = 0.0f;
-      newPosition.y += size.height + alternativeOffset.height;
-    }
-
-    newPosition.y -= std::min(corner.y, 0.0f);
-
-    // if bottom-right corner is outside of Bottom-Right bounds, then push back in screen.
-    corner += size - referenceSize + mMinIndent + mMaxIndent;
-
-    if(mFlipVertical && corner.y > 0.0f)
-    {
-      corner.y = 0.0f;
-      newPosition.y -= size.height + alternativeOffset.height;
-    }
-
-    return newPosition;
-  }
-
-  Vector3 mMinIndent;                                   ///< Top-Left Margin
-  Vector3 mMaxIndent;                                   ///< Bottom-Right Margin.
-  bool mFlipHorizontal;                                 ///< Whether to flip actor's position if exceeds horizontal screen bounds
-  bool mFlipVertical;                                   ///< Whether to flip actor's position if exceeds vertical screen bounds
-  Rect<float> mBoundingRect;                            ///< Bounding Rect Popup must stay within
-};
-
-/**
- * Confine actor to the x axis boundaries of reference actor (e.g. Parent)
- */
-struct ParentXAxisConstraint
-{
-  /**
-   * Confinement constraint constructor.
-   */
-  ParentXAxisConstraint( float handlesMidPoint = 0.0f )
-  : mHandlesMidPoint( handlesMidPoint )
-  {
-  }
-
-  float operator()(  const float          constXPosition,
-                     const PropertyInput& localSizeWidthProperty,
-                     const PropertyInput& parentWidthProperty,
-                     const PropertyInput& anchorPointXProperty )
-  {
-    const float localSizeProperty = localSizeWidthProperty.GetFloat();
-    const float size = parentWidthProperty.GetFloat();
-
-    float newPosition = std::max( mHandlesMidPoint, -size/2 + localSizeProperty );
-    newPosition = std::min( newPosition, size/2 - localSizeProperty );
-    return newPosition;
-  }
-
-  float mHandlesMidPoint;
-};
-
-
 } // unnamed namespace
 
 namespace Dali
@@ -235,6 +112,7 @@ const char* const TextInputPopup::OPTION_CLIPBOARD("option-clipboard");         
 TextInputPopup::TextInputPopup()
 : mState(StateHidden),
   mRoot(Layer::New()),
+  mVisiblePopUpSize(),
   mPopupTailXPosition( 0.0f ),
   mContentSize( POPUP_MIN_SIZE ),
   mBackgroundColor( DEFAULT_POPUP_BACKGROUND ),
@@ -254,51 +132,31 @@ TextInputPopup::TextInputPopup()
   mHideFinishedSignal(),
   mShowFinishedSignal()
 {
-  mAlternativeOffsetProperty = mRoot.RegisterProperty( POPUP_ALTERNATIVE_OFFSET, Vector2::ZERO );
-  mRequestionPositionProperty = mRoot.RegisterProperty( POPUP_REQUESTED_POSITION, Vector3::ZERO );
-  mRoot.SetParentOrigin( ParentOrigin::CENTER );
+  mRoot.SetParentOrigin( ParentOrigin::TOP_LEFT );
   mRoot.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
-  // constrain popup to size of parent.
 }
 
-void TextInputPopup::AddToStage()
+void TextInputPopup::AddToParent( Actor parent )
 {
-  // TODO: Confinement constraint borders should be defined by the application.
-  // It should also not use the stage directly, instead it should add to parent container.
-  Stage::GetCurrent().Add(mRoot);
+  Actor existingParent = mRoot.GetParent();
 
-  ApplyConfinementConstraint();
+  if ( !existingParent )
+  {
+    parent.Add( mRoot );
+  }
 }
 
-void TextInputPopup::ApplyConfinementConstraint()
+void TextInputPopup::RemoveFromParent()
 {
-  mRoot.RemoveConstraints();
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                    LocalSource( Actor::SIZE ),
-                                                    LocalSource( Actor::PARENT_ORIGIN ),
-                                                    LocalSource( Actor::ANCHOR_POINT ),
-                                                    ParentSource( Actor::SIZE ),
-                                                    LocalSource( mAlternativeOffsetProperty ),
-                                                    LocalSource( mRequestionPositionProperty),
-                                                    ConfinementConstraint( DEFAULT_POPUP_INDICATOR_OFFSET,
-                                                                           Vector2::ZERO,
-                                                                           true,
-                                                                           true, mBoundingRect ) );
-  mRoot.ApplyConstraint(constraint);
+  Actor parent = mRoot.GetParent();
+
+  if ( parent )
+  {
+    parent.Remove( mRoot );
+  }
 }
 
-void TextInputPopup::ApplyTailConstraint()
-{
-  mTail.RemoveConstraints();
-  Constraint constraint = Constraint::New<float>( Actor::POSITION_X,
-                                                  LocalSource( Actor::SIZE_WIDTH ),
-                                                  ParentSource( Actor::SIZE_WIDTH ),
-                                                  LocalSource( Actor::PARENT_ORIGIN_X ),
-                                                  ParentXAxisConstraint( mPopupTailXPosition ));
-  mTail.ApplyConstraint( constraint );
-}
-
-void TextInputPopup::CreateStencil( const Vector2& size)
+void TextInputPopup::CreateStencil( const Vector2& size )
 {
   mStencil = CreateSolidColorActor( Color::BLUE );
   mStencil.SetParentOrigin( ParentOrigin::CENTER );
@@ -332,7 +190,7 @@ void TextInputPopup::CreateScrollView()
   mScrollView.ScrollCompletedSignal().Connect( this, &TextInputPopup::OnScrollCompleted );
 }
 
-void TextInputPopup::UpdateScrollViewProperty( const Vector2& visibleSize )
+void TextInputPopup::UpdateScrollViewRulerAndSize( const Vector2& visibleSize )
 {
   mScrollView.SetSize( visibleSize.x, visibleSize.y );
 
@@ -344,10 +202,6 @@ void TextInputPopup::UpdateScrollViewProperty( const Vector2& visibleSize )
   mScrollView.SetRulerY(rulerY);
 }
 
-void TextInputPopup::RemoveFromStage()
-{
-  Stage::GetCurrent().Remove( mRoot );
-}
 
 void TextInputPopup::Clear()
 {
@@ -359,10 +213,8 @@ void TextInputPopup::Clear()
     UnparentAndReset( mScrollView );
     mButtonContainer.clear();
     mDividerContainer.clear();
-
-    RemoveFromStage();
     mRoot.RemoveConstraints();
-
+    RemoveFromParent();
     mState = StateHidden;
   }
 }
@@ -436,7 +288,7 @@ void TextInputPopup::CreateBackground()
     mBackgroundEffect.Add( mBackgroundLine );
 
     Hide(false);
-    AddToStage();
+    GetRootActor().Add( mBackground );
   }
 }
 
@@ -475,17 +327,17 @@ void TextInputPopup::CreateTail()
 
 ImageActor TextInputPopup::CreateDivider()
 {
-    ImageActor divider = Toolkit::CreateSolidColorActor( mLineColor );
-    divider.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    divider.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-    divider.SetSize( POPUP_DIVIDER_SIZE );
-    divider.SetPosition( mContentSize.width - POPUP_DIVIDER_SIZE.width, 0.0f );
+  ImageActor divider = Toolkit::CreateSolidColorActor( mLineColor );
+  divider.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  divider.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  divider.SetSize( POPUP_DIVIDER_SIZE );
+  divider.SetPosition( mContentSize.width - POPUP_DIVIDER_SIZE.width, 0.0f );
 
-    // Keep track of all the dividers. As their height's need to be updated to the max. of all
-    // buttons currently added.
-    mDividerContainer.push_back( divider );
+  // Keep track of all the dividers. As their height's need to be updated to the max of all
+  // buttons currently added.
+  mDividerContainer.push_back( divider );
 
-    return divider;
+  return divider;
 }
 
 ImageActor TextInputPopup::CreatePressedBackground( const Vector2& requiredSize )
@@ -685,7 +537,7 @@ void TextInputPopup::Hide(bool animate)
   }
 }
 
-void TextInputPopup::Show(bool animate)
+void TextInputPopup::Show( Actor target, bool animate )
 {
   if( mRoot )
   {
@@ -695,6 +547,11 @@ void TextInputPopup::Show(bool animate)
     {
       mAnimation.Clear();
       mAnimation.Reset();
+    }
+
+    if ( target )
+    {
+      AddToParent( target );
     }
 
     if(animate)
@@ -714,12 +571,6 @@ void TextInputPopup::Show(bool animate)
       mState = StateShown;
     }
   }
-}
-
-void TextInputPopup::SetAlternativeOffset(Vector2 offset)
-{
-  mRoot.SetProperty( mAlternativeOffsetProperty, offset );
-  ApplyConfinementConstraint();
 }
 
 TextInputPopup::State TextInputPopup::GetState(void) const
@@ -933,22 +784,22 @@ void TextInputPopup::AddPopupOptions()
     }
   }
 
-  // 5. Calcurate a lot of size to make the layout.
+  // 5. Calculate size of content and of popup including borders
   const Vector2 visibleContentSize  = Vector2( std::min( mContentSize.x, POPUP_MAX_SIZE.x - POPUP_BORDER.x - POPUP_BORDER.y ), mContentSize.y );
   const Vector2 popupSize = Vector2( POPUP_BORDER.x + visibleContentSize.x + POPUP_BORDER.y,
                                      POPUP_BORDER.z + visibleContentSize.y + POPUP_BORDER.w );
+  mVisiblePopUpSize = Vector3( popupSize.x,  popupSize.y, 1.0f);
 
-  // 6. Set the scroll view ruller.
-  UpdateScrollViewProperty( visibleContentSize );
+  // 6. Set the scroll view ruler.
+  UpdateScrollViewRulerAndSize( visibleContentSize );
 
-  // 8. Create stencil
+  // 7. Create stencil
   const Vector2 stencilSize = Vector2( popupSize.x, popupSize.y + POPUP_TAIL_SIZE.x + POPUP_TAIL_Y_OFFSET );
   CreateStencil( stencilSize );
   mRoot.Add( mStencil );
 
-  // 7. Set the root size.
+  // 8. Set the root size.
   mRoot.SetSize( popupSize );   // Make Root Actor reflect the size of its content
-
 }
 
 void TextInputPopup::SetPopupBoundary( const Rect<float>& boundingRectangle )
@@ -956,12 +807,30 @@ void TextInputPopup::SetPopupBoundary( const Rect<float>& boundingRectangle )
   mBoundingRect =  boundingRectangle;
 }
 
-void TextInputPopup::SetTailPosition( const Vector3& position )
+const Vector3& TextInputPopup::GetVisibileSize() const
 {
-  mRoot.SetProperty( mRequestionPositionProperty, position );
+  return mVisiblePopUpSize;
+}
+
+
+void TextInputPopup::SetTailPosition( const Vector3& position, bool yAxisFlip )
+{
   mPopupTailXPosition = position.x;
-  ApplyConfinementConstraint();
-  ApplyTailConstraint();
+  mTail.SetX( position.x );
+
+  if ( yAxisFlip )
+  {
+    Image tail = Image::New( POPUP_TAIL_TOP );
+    mTail.SetImage( tail );
+    mTail.SetParentOrigin( ParentOrigin::TOP_CENTER );
+    mTail.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
+    mTail.SetY( POPUP_BORDER.y - POPUP_TAIL_Y_OFFSET );
+    Image tailEffect = Image::New( POPUP_TAIL_TOP_EFFECT );
+    mTailEffect.SetImage( tailEffect );
+
+    Image tailLine = Image::New( POPUP_TAIL_TOP_LINE );
+    mTailLine.SetImage( tailLine );
+  }
 }
 
 bool TextInputPopup::OnButtonPressed( Toolkit::Button button )

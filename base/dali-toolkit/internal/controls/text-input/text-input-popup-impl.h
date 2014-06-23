@@ -181,8 +181,9 @@ public:
   /**
    * Shows the popup
    * @param[in] animate (optional) whether to animate popup to show state over time (i.e. tween).
+   * @param[in] target Actor to parent popup.
    */
-  void Show(bool animate = true);
+  void Show( Actor target, bool animate = true );
 
   /**
    * Sets Alternative offset property.
@@ -321,10 +322,17 @@ public:
   void SetPopupBoundary( const Rect<float>& boundingRectangle );
 
   /**
-   * Sets the positon of the Popup tail relative to TextInput
-   * @param position Position to set
+   * Get Visible size of the Popup, excludes content that needs scrolling
+   * @return Vector3 size of Popup
    */
-  void SetTailPosition( const Vector3& position );
+  const Vector3& GetVisibileSize() const;
+
+  /**
+   * Sets the positon of the PopUp tail relative to TextInput
+   * @param[in] position Position to set
+   * @param[in] yAxisFlip If tail should be flipped in y axis
+   */
+  void SetTailPosition( const Vector3& position, const bool yAxisFlip );
 
 private:
 
@@ -341,9 +349,15 @@ private:
                                                                           const std::string& name, const std::string& caption, Image iconImage, bool enabled );
 
   /**
-   * Adds Popup to the stage (ideally on a separate top-most layer and as an overlay)
+   * @brief Adds popup to the given parent
+   * @paran[in] parent target to add Popup to
    */
-  void AddToStage();
+  void AddToParent( Actor parent );
+
+  /**
+   * @brief Removes Popup from Parent
+   */
+  void RemoveFromParent();
 
   /**
    * Applies constraint to keep Popup in view within the desired area.
@@ -382,12 +396,7 @@ private:
    * Set the scroll view size and ruler.
    * @param[in] visibleSize size of the visible scroll view
    */
-  void UpdateScrollViewProperty( const Vector2& visibleSize );
-
-  /**
-   * Removes Popup from the stage.
-   */
-  void RemoveFromStage();
+  void UpdateScrollViewRulerAndSize( const Vector2& visibleSize );
 
   /**
    * Called when a button is pressed in the Popup
@@ -413,8 +422,6 @@ private:
 
   State mState;                                       ///< Popup State.
   Layer mRoot;                                       ///< The actor which all popup content is added to (i.e. panel and buttons)
-  Property::Index mAlternativeOffsetProperty;         ///< Property [Vector3] how much to offset the popup if it goes out of the screen
-  Property::Index mRequestionPositionProperty;        ///< Prperty [Vector3] Requested position to place popup
   ImageActor mBackground;                             ///< The background popup panel
   ImageActor mBackgroundEffect;                       ///< The background effect
   ImageActor mBackgroundLine;                         ///< The background line
@@ -422,7 +429,8 @@ private:
   ImageActor mTailEffect;                             ///< the tail effect
   ImageActor mTailLine;                               ///< The border/outline around the tail
 
-  float mPopupTailXPosition;                          ///< X position of Popup tail.
+  Vector3 mVisiblePopUpSize;                          ///< Visible Size of Popup excluding content that needs scrolling.
+  float mPopupTailXPosition;                          ///< X position of PopUp tail.
 
   Vector2 mContentSize;                               ///< Size of Content (i.e. Buttons)
   ActorContainer mButtonContainer;                    ///< List of buttons added to popup.

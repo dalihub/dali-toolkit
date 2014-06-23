@@ -1197,6 +1197,8 @@ void TextInput::OnControlSizeSet(const Vector3& targetSize)
 void TextInput::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
 {
   Relayout( mDisplayedTextView, size, container );
+  Relayout( mPopupPanel.GetRootActor(), size, container );
+
   GetTextLayoutInfo();
 
   DrawCursor();
@@ -3712,10 +3714,45 @@ void TextInput::AddPopupOptions()
   mPopupPanel.AddPopupOptions();
 }
 
-void TextInput::SetPopupPosition( const Vector3& position )
+void TextInput::SetPopupPosition( const Vector3& position, const Vector2& alternativePosition )
 {
-  mPopupPanel.SetTailPosition( position );
-  mPopupPanel.GetRootActor().SetPosition( position );
+  const Vector3& visiblePopUpSize = mPopupPanel.GetVisibileSize();
+
+  Vector3 clampedPosition ( position );
+  Vector3 tailOffsetPosition ( position );
+
+  float xOffSet( 0.0f );
+
+  Actor self = Self();
+  const Vector3 textViewTopLeftWorldPosition = self.GetCurrentWorldPosition() - self.GetCurrentSize()*0.5f;
+
+  const float popUpLeft = textViewTopLeftWorldPosition.x + position.x - visiblePopUpSize.width*0.5f;
+  const float popUpTop = textViewTopLeftWorldPosition.y + position.y - visiblePopUpSize.height;
+
+  // Clamp to left or right or of boundary
+  if( popUpLeft < mBoundingRectangleWorldCoordinates.x )
+  {
+    xOffSet = mBoundingRectangleWorldCoordinates.x - popUpLeft ;
+  }
+  else if ( popUpLeft + visiblePopUpSize.width > mBoundingRectangleWorldCoordinates.z )
+  {
+    xOffSet = mBoundingRectangleWorldCoordinates.z - ( popUpLeft + visiblePopUpSize.width );
+  }
+
+  clampedPosition.x = position.x + xOffSet;
+  tailOffsetPosition.x = -xOffSet;
+
+  // Check if top left of PopUp outside of top bounding rectangle, if so then flip to lower position.
+  bool flipTail( false );
+
+  if ( popUpTop < mBoundingRectangleWorldCoordinates.y )
+  {
+    clampedPosition.y = alternativePosition.y + visiblePopUpSize.height;
+    flipTail = true;
+  }
+
+  mPopupPanel.GetRootActor().SetPosition( clampedPosition );
+  mPopupPanel.SetTailPosition( tailOffsetPosition, flipTail );
 }
 
 void TextInput::HidePopup(bool animate, bool signalFinished )
@@ -3731,9 +3768,10 @@ void TextInput::HidePopup(bool animate, bool signalFinished )
   }
 }
 
-void TextInput::ShowPopup(bool animate)
+void TextInput::ShowPopup( bool animate )
 {
   Vector3 position;
+  Vector2 alternativePopupPosition;
 
   if(mHighlightMeshActor && mState == StateEdit)
   {
@@ -3757,12 +3795,13 @@ void TextInput::ShowPopup(bool animate)
     topHandle.y += -mPopupOffsetFromText.y - rowSize.height;
     position = Vector3(topHandle.x, topHandle.y, 0.0f);
 
-    bottomHandle.y += GetSelectionHandleSize().y + mPopupOffsetFromText.w;
-    mPopupPanel.SetAlternativeOffset(Vector2( mBoundingRectangleWorldCoordinates.x, bottomHandle.y - topHandle.y));
-
-    float xPosition = ( fabsf( topHandle.x - bottomHandle.x ) )*0.5f + std::min( topHandle.x , bottomHandle.x );
+    float xPosition = ( fabsf( topHandle.x - bottomHandle.x ) )*0.5f + std::min( mSelectionHandleOneActualPosition.x , mSelectionHandleTwoActualPosition.x );
 
     position.x = xPosition;
+
+    // Alternative position if no upper space
+    bottomHandle.y += GetSelectionHandleSize().y + mPopupOffsetFromText.w;
+    alternativePopupPosition = Vector2 ( position.x, bottomHandle.y );
   }
   else
   {
@@ -3771,25 +3810,18 @@ void TextInput::ShowPopup(bool animate)
     const Size rowSize = GetRowRectFromCharacterPosition( mCursorPosition );
     position.y -= ( mPopupOffsetFromText.y + rowSize.height );
     // if can't be positioned above, then position below row.
-    Vector2 alternativePopupPosition( mBoundingRectangleWorldCoordinates.x, position.y ); // default if no grab handle
+    alternativePopupPosition = Vector2( position.x, position.y ); // default if no grab handle
     if ( mGrabHandle )
     {
       // If grab handle enabled then position pop-up below the grab handle.
       alternativePopupPosition.y = rowSize.height + mGrabHandle.GetCurrentSize().height + mPopupOffsetFromText.w +50.0f;
     }
-    mPopupPanel.SetAlternativeOffset( alternativePopupPosition );
   }
 
-  // reposition popup above the desired cursor posiiton.
-  Vector3 textViewSize = mDisplayedTextView.GetCurrentSize();
-  textViewSize.z = 0.0f;
-  // World position = world position of local position i.e. top-left corner of TextView
-  Vector3 worldPosition = mDisplayedTextView.GetCurrentWorldPosition() - ( textViewSize * 0.5f ) + position;
-
-  SetPopupPosition( worldPosition );
+  SetPopupPosition( position, alternativePopupPosition );
 
   // Show popup
-  mPopupPanel.Show(animate);
+  mPopupPanel.Show( Self(), animate );
   StartMonitoringStageForTouch();
 
   mPopupPanel.PressedSignal().Connect( this, &TextInput::OnPopupButtonPressed );

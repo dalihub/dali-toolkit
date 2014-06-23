@@ -1062,8 +1062,9 @@ public:  // Public to allow internal testing.
   /**
    * Sets popup position
    * @param[in] position The actual position for this popup.
+   * @param[in] alternativePosition Alternative popup position if no space in upper area.
    */
-  void SetPopupPosition(const Vector3& position);
+  void SetPopupPosition(const Vector3& position, const Vector2& alternativePosition );
 
   /**
    * Hides the popup
