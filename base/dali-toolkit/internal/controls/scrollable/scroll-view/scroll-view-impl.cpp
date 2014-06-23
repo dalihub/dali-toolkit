@@ -1296,6 +1296,7 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
   {
     DALI_LOG_SCROLL_STATE("[0x%X] Interrupting Pan, set to false", this );
     mPanning = false;
+    mGestureStackDepth = 0;
     self.SetProperty( mPropertyPanning, false );
 
     if( mScrollMainInternalPrePositionConstraint )
@@ -2645,6 +2646,10 @@ void ScrollView::OnGestureEx(Gesture::State state)
     if(mGestureStackDepth==0)
     {
       FinishTransform();
+    }
+    else
+    {
+      DALI_LOG_SCROLL_STATE("[0x%X] mGestureStackDepth[%d]", this, mGestureStackDepth);
     }
   }
 }
