@@ -59,15 +59,16 @@ const std::string OPTION_ICON_SELECT_ALL( DALI_IMAGE_DIR "copy_paste_icon_select
 /**
  * Constant values for building the GUI
  */
-const Vector4 POPUP_BORDER( 14.0f, 14.0f, 14.0f, 14.0f );  ///< The margin of the popup.
+const Vector4 POPUP_MARGIN( 14.0f, 14.0f, 14.0f, 14.0f );  ///< Margin around the popup visible background Image.
+const Vector4 POPUP_BORDER( 2.0f, 2.0f, 2.0f, 2.0f );  ///< The Border of the popup.
 const Vector2 POPUP_MIN_SIZE( 0.0f, 126.0f );  ///< The minimum size of the popup.
 const Vector2 POPUP_MAX_SIZE( 720.0f, 126.0f );  ///< The maximum size of the popup.
 const float POPUP_TAIL_Y_OFFSET( -2.25f );  ///< The y offset of the tail.
 const Vector2 POPUP_TAIL_SIZE( 36.0f, 36.0f );  ///< The size of the tail.
 const Vector2 POPUP_DIVIDER_SIZE( 1.0f, 126.0f );  ///< The size of the divider.
 
-const Vector4 OPTION_MARGIN( 0.0f, 0.0f, 24.0f, 19.0f );  ///< The margin of the icon. the order is left, right, top and bottom
-const Vector2 OPTION_MAX_SIZE( 360.0f, 126.0f );  ///< The maximum size of the option.
+const Vector4 OPTION_PADDING( 16.0f, 16.0f, 24.0f, 19.0f );  ///< The padding within the option to position icon and text away from the border. The order is left, right, top and bottom
+const Vector2 OPTION_MAX_SIZE( 220.0f, 126.0f );  ///< The maximum size of the option.
 const Vector2 OPTION_MIN_SIZE( 128.0f, 126.0f );  ///< The minimum size of the option.
 const Vector2 OPTION_ICON_SIZE( 45.0f, 45.0f );  ///< The size of the icon.
 const Vector2 OPTION_TEXT_MIN_SIZE( 128.0f, 30.0f );  ///< The minimum size of the text.
@@ -111,10 +112,11 @@ const char* const TextInputPopup::OPTION_CLIPBOARD("option-clipboard");         
 
 TextInputPopup::TextInputPopup()
 : mState(StateHidden),
-  mRoot(Layer::New()),
+  mRoot( Layer::New() ),
+  mButtons(),
   mVisiblePopUpSize(),
   mPopupTailXPosition( 0.0f ),
-  mContentSize( POPUP_MIN_SIZE ),
+  mContentSize(),
   mBackgroundColor( DEFAULT_POPUP_BACKGROUND ),
   mBackgroundPressedColor( DEFAULT_POPUP_BACKGROUND_PRESSED ),
   mLineColor( DEFAULT_POPUP_LINE_COLOR ),
@@ -156,6 +158,15 @@ void TextInputPopup::RemoveFromParent()
   }
 }
 
+void TextInputPopup::CreateLayer( const Vector2& size )
+{
+  mLayer = Layer::New();
+  mLayer.SetParentOrigin(ParentOrigin::CENTER);
+  mLayer.SetAnchorPoint(AnchorPoint::CENTER);
+  mLayer.SetSize( size ); // matches stencil size
+  mLayer.SetName("popup-mLayer");
+}
+
 void TextInputPopup::CreateStencil( const Vector2& size )
 {
   mStencil = CreateSolidColorActor( Color::BLUE );
@@ -169,21 +180,20 @@ void TextInputPopup::CreateStencil( const Vector2& size )
 
 void TextInputPopup::OnScrollStarted( const Vector3& position )
 {
-  mBackground.SetSensitive( false );
+  mButtons.SetSensitive( false );
 }
 
 void TextInputPopup::OnScrollCompleted( const Vector3& position )
 {
-  mBackground.SetSensitive( true );
+  mButtons.SetSensitive( true );
 }
 
 void TextInputPopup::CreateScrollView()
 {
   mScrollView = Toolkit::ScrollView::New();
   mScrollView.SetName("popup-scroll-view");
-  mScrollView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  mScrollView.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  mScrollView.SetPosition( POPUP_BORDER.x, POPUP_BORDER.y );
+  mScrollView.SetAnchorPoint( AnchorPoint::CENTER );
+  mScrollView.SetParentOrigin( ParentOrigin::CENTER );
   mScrollView.SetScrollingDirection( PanGestureDetector::DIRECTION_HORIZONTAL, Degree( 40.0f ) );
   mScrollView.SetAxisAutoLock( true );
   mScrollView.ScrollStartedSignal().Connect( this, &TextInputPopup::OnScrollStarted );
@@ -210,10 +220,9 @@ void TextInputPopup::Clear()
     UnparentAndReset( mTail );
     UnparentAndReset( mStencil );
     UnparentAndReset( mBackground );
+    UnparentAndReset( mButtons );
     UnparentAndReset( mScrollView );
-    mButtonContainer.clear();
     mDividerContainer.clear();
-    mRoot.RemoveConstraints();
     RemoveFromParent();
     mState = StateHidden;
   }
@@ -226,7 +235,7 @@ ImageActor TextInputPopup::CreateOptionIcon( Image iconImage, const Vector4& col
   icon.SetParentOrigin( ParentOrigin::TOP_CENTER );
   icon.SetAnchorPoint( AnchorPoint::TOP_CENTER );
   icon.SetColor( color );
-  icon.SetY( OPTION_MARGIN.z );
+  icon.SetY( OPTION_PADDING.z - POPUP_BORDER.y );
   return icon;
 }
 
@@ -243,11 +252,15 @@ Toolkit::TextView TextInputPopup::CreateOptionCaption( const std::string& captio
 
   Toolkit::TextView textView = Toolkit::TextView::New( styledCaption );
   textView.SetSizePolicy( Toolkit::Control::Fixed, Toolkit::Control::Fixed );
-  textView.SetWidthExceedPolicy( Toolkit::TextView::ShrinkToFit );
-  textView.SetHeightExceedPolicy( Toolkit::TextView::ShrinkToFit );
+  textView.SetWidthExceedPolicy( Toolkit::TextView::EllipsizeEnd );
+  textView.SetHeightExceedPolicy( Toolkit::TextView::EllipsizeEnd );
   textView.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
   textView.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
-  textView.SetY( -OPTION_MARGIN.w );
+  textView.SetY( -OPTION_PADDING.w + POPUP_BORDER.w );
+
+  MarkupProcessor::StyledTextArray styledCaptionEllipsize;
+  MarkupProcessor::SetTextStyle( Text("..."), styledCaptionEllipsize, style );
+  textView.SetEllipsizeText( styledCaptionEllipsize );
 
   const float textWidth = textView.GetWidthForHeight( OPTION_TEXT_MIN_SIZE.y );
   textView.SetSize( textWidth, OPTION_TEXT_MIN_SIZE.y );
@@ -265,7 +278,6 @@ void TextInputPopup::CreateBackground()
     mBackground.SetAnchorPoint( AnchorPoint::CENTER );
     mBackground.SetParentOrigin( ParentOrigin::CENTER );
     mBackground.SetName( "text-input-popup-background" );
-    mBackground.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
     mBackground.SetColor( mBackgroundColor );
 
     Image bgEffectImg = Image::New( POPUP_BACKGROUND_EFFECT );
@@ -288,7 +300,6 @@ void TextInputPopup::CreateBackground()
     mBackgroundEffect.Add( mBackgroundLine );
 
     Hide(false);
-    GetRootActor().Add( mBackground );
   }
 }
 
@@ -330,7 +341,7 @@ ImageActor TextInputPopup::CreateDivider()
   ImageActor divider = Toolkit::CreateSolidColorActor( mLineColor );
   divider.SetParentOrigin( ParentOrigin::TOP_LEFT );
   divider.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  divider.SetSize( POPUP_DIVIDER_SIZE );
+  divider.SetSize( POPUP_DIVIDER_SIZE.width , mContentSize.height );
   divider.SetPosition( mContentSize.width - POPUP_DIVIDER_SIZE.width, 0.0f );
 
   // Keep track of all the dividers. As their height's need to be updated to the max of all
@@ -435,11 +446,16 @@ void TextInputPopup::CreateOrderedListOfOptions()
       }
     }
 
-    if ( !match)
+    if ( !match )
     {
       mOrderListOfButtons.push_back( currentButton );
     }
   }
+}
+
+Vector2 TextInputPopup::GetConstrainedTextSize( const Vector2& textSize )
+{
+  return  Vector2( std::min( textSize.width, OPTION_MAX_SIZE.width - OPTION_PADDING.x - OPTION_PADDING.y ), textSize.height );
 }
 
 void TextInputPopup::AddOption(const std::string& name, const std::string& caption, const Image iconImage, bool finalOption)
@@ -459,9 +475,16 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
 
   // 4. Calculate the size of option.
   const Vector2 textSize = Vector2( captionTextView.GetNaturalSize() );
-  const Vector2 optionSize( std::max( textSize.x, OPTION_ICON_SIZE.x ),
-                            OPTION_MARGIN.z + OPTION_ICON_SIZE.y + OPTION_GAP_ICON_TEXT + textSize.y + OPTION_MARGIN.w );
-  const Vector2 constrainedOptionSize = Min( Max( optionSize, OPTION_MIN_SIZE ), OPTION_MAX_SIZE );
+  captionTextView.SetSize( GetConstrainedTextSize( textSize ) );
+
+
+  const Vector2 optionSize( std::max( textSize.x, OPTION_ICON_SIZE.x ) +  OPTION_PADDING.x + OPTION_PADDING.z,
+                            OPTION_PADDING.z + OPTION_ICON_SIZE.y + OPTION_GAP_ICON_TEXT + textSize.y + OPTION_MAX_SIZE.y );
+
+
+  Vector2 constrainedOptionSize = Min( Max( optionSize, OPTION_MIN_SIZE ), OPTION_MAX_SIZE );
+
+  constrainedOptionSize.height = constrainedOptionSize.height - POPUP_BORDER.y - POPUP_BORDER.z;
 
   // 5. Create a option.
   Toolkit::PushButton option = Toolkit::PushButton::New();
@@ -473,24 +496,26 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
   option.SetName( name );
   option.SetAnimationTime( 0.0f );
   option.ClickedSignal().Connect( this, &TextInputPopup::OnButtonPressed );
-  mScrollView.Add( option );
+  mButtons.Add( option );
 
   // 6. Set the normal option image.
   option.SetButtonImage( optionContainer );
 
   // 7. Update the content size.
   mContentSize.x += constrainedOptionSize.x;
+  mContentSize.y = std::max ( constrainedOptionSize.y, mContentSize.y );
 
   // 8. Create the pressed container.
   Actor optionPressedContainer = Actor::New();
 
   // 9. Add option pressed background.
-  Vector2 optionPressedBackgroundSize( constrainedOptionSize.x - 1.0f, constrainedOptionSize.y - 2.0f );
+  Vector2 optionPressedBackgroundSize( constrainedOptionSize.x - POPUP_BORDER.x, mContentSize.y - POPUP_BORDER.y - POPUP_BORDER.w );
   ImageActor optionPressedBackground = CreatePressedBackground( optionPressedBackgroundSize );
   optionPressedContainer.Add( optionPressedBackground );
 
   // 10. Add pressed text
   Toolkit::TextView pressedCaptionTextView = CreateOptionCaption( caption, mTextPressedColor );
+  pressedCaptionTextView.SetSize( GetConstrainedTextSize( Vector2( pressedCaptionTextView.GetNaturalSize() ) ) );
   optionPressedBackground.Add( pressedCaptionTextView );
 
   // 11. Add pressed icon
@@ -504,7 +529,7 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
   if ( !finalOption )
   {
     ImageActor divider = CreateDivider();
-    mScrollView.Add( divider );
+    mButtons.Add( divider );
   }
 }
 
@@ -760,19 +785,26 @@ unsigned int TextInputPopup::GetButtonPriorityPosition( TextInputPopup::Buttons 
 
 void TextInputPopup::AddPopupOptions()
 {
-  mContentSize = POPUP_MIN_SIZE;
+  mContentSize = Vector2( POPUP_MIN_SIZE.width, ( POPUP_BORDER.y + POPUP_BORDER.z ) );
 
   // 1. Create the background.
   CreateBackground();
-  mRoot.Add(mBackground);
 
   // 2. Create the tail.
   CreateTail();
-  mBackground.Add( mTail );
 
-  // 3. Create the scroll view.
+  // 3. Create the scroll view and Actor to hold buttons.
   CreateScrollView();
-  mBackground.Add( mScrollView );
+
+  // Clear previous buttons
+  if ( mButtons )
+  {
+    UnparentAndReset( mButtons );
+  }
+
+  mButtons = Actor::New();
+  mButtons.SetParentOrigin( ParentOrigin::CENTER );
+  mButtons.SetAnchorPoint( AnchorPoint::CENTER );
 
   // 4. Create the options and add into the scroll view.
   for( std::vector<ButtonRequirement>::const_iterator it = mOrderListOfButtons.begin(), endIt = mOrderListOfButtons.end(); ( it != endIt ); ++it )
@@ -785,26 +817,31 @@ void TextInputPopup::AddPopupOptions()
   }
 
   // 5. Calculate size of content and of popup including borders
-  const Vector2 visibleContentSize  = Vector2( std::min( mContentSize.x, POPUP_MAX_SIZE.x - POPUP_BORDER.x - POPUP_BORDER.y ), mContentSize.y );
-  const Vector2 popupSize = Vector2( POPUP_BORDER.x + visibleContentSize.x + POPUP_BORDER.y,
-                                     POPUP_BORDER.z + visibleContentSize.y + POPUP_BORDER.w );
-  mVisiblePopUpSize = Vector3( popupSize.x,  popupSize.y, 1.0f);
+  const Vector2 popupSize = Vector2( std::min ( ( POPUP_BORDER.x + mContentSize.width + POPUP_BORDER.z ), POPUP_MAX_SIZE.width ) ,  POPUP_BORDER.y + mContentSize.height + POPUP_BORDER.w );
+
+  mVisiblePopUpSize = Vector3( popupSize.width - POPUP_BORDER.x - POPUP_BORDER.z , mContentSize.height, 1.0f);
+
+  mBackground.SetSize( popupSize.x + 28 - POPUP_BORDER.x - POPUP_BORDER.z, popupSize.y + 28 - POPUP_BORDER.y - POPUP_BORDER.w );
+  mButtons.SetSize( mVisiblePopUpSize.GetVectorXY() );
 
   // 6. Set the scroll view ruler.
-  UpdateScrollViewRulerAndSize( visibleContentSize );
+  UpdateScrollViewRulerAndSize( mVisiblePopUpSize.GetVectorXY() );
 
   // 7. Create stencil
-  const Vector2 stencilSize = Vector2( popupSize.x, popupSize.y + POPUP_TAIL_SIZE.x + POPUP_TAIL_Y_OFFSET );
+  const Vector2 stencilSize = Vector2( mVisiblePopUpSize.GetVectorXY() );
+
+  CreateLayer( stencilSize );
   CreateStencil( stencilSize );
-  mRoot.Add( mStencil );
+
+  mScrollView.Add ( mButtons );
+  mLayer.Add( mScrollView);
+  mLayer.Add( mStencil);
+  mRoot.Add( mTail );
+  mRoot.Add( mBackground );
+  mRoot.Add( mLayer );
 
   // 8. Set the root size.
   mRoot.SetSize( popupSize );   // Make Root Actor reflect the size of its content
-}
-
-void TextInputPopup::SetPopupBoundary( const Rect<float>& boundingRectangle )
-{
-  mBoundingRect =  boundingRectangle;
 }
 
 const Vector3& TextInputPopup::GetVisibileSize() const
@@ -812,24 +849,27 @@ const Vector3& TextInputPopup::GetVisibileSize() const
   return mVisiblePopUpSize;
 }
 
-
 void TextInputPopup::SetTailPosition( const Vector3& position, bool yAxisFlip )
 {
-  mPopupTailXPosition = position.x;
-  mTail.SetX( position.x );
+  mPopupTailXPosition = std::max(  position.x, POPUP_TAIL_SIZE.width*0.5f - mVisiblePopUpSize.width*0.5f + POPUP_BORDER.x );
+
+  std::min( mPopupTailXPosition, mVisiblePopUpSize.width*0.5f - POPUP_BORDER.x - POPUP_TAIL_SIZE.width*0.5f );
+
+  mTail.SetX( mPopupTailXPosition );
 
   if ( yAxisFlip )
   {
     Image tail = Image::New( POPUP_TAIL_TOP );
+    Image tailEffect = Image::New( POPUP_TAIL_TOP_EFFECT );
+    Image tailLine = Image::New( POPUP_TAIL_TOP_LINE );
+
     mTail.SetImage( tail );
+    mTailEffect.SetImage( tailEffect );
+    mTailLine.SetImage( tailLine );
+
     mTail.SetParentOrigin( ParentOrigin::TOP_CENTER );
     mTail.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
     mTail.SetY( POPUP_BORDER.y - POPUP_TAIL_Y_OFFSET );
-    Image tailEffect = Image::New( POPUP_TAIL_TOP_EFFECT );
-    mTailEffect.SetImage( tailEffect );
-
-    Image tailLine = Image::New( POPUP_TAIL_TOP_LINE );
-    mTailLine.SetImage( tailLine );
   }
 }
 

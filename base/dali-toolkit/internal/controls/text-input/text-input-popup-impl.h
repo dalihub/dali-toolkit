@@ -162,6 +162,14 @@ public:
   void CreateOrderedListOfOptions();
 
   /**
+   * Get the TextSize after constrained by the Popup margins.
+   * @param[in] textSize Natural size of text
+   * @return Vector2 constrained text size.
+   *
+   */
+  Vector2 GetConstrainedTextSize( const Vector2& textSize );
+
+  /**
    * Adds a popup option.
    * @note Creates popup frame if not already created.
    * @param[in] name The unique name for this option.
@@ -184,14 +192,6 @@ public:
    * @param[in] target Actor to parent popup.
    */
   void Show( Actor target, bool animate = true );
-
-  /**
-   * Sets Alternative offset property.
-   * The alternative offset property is how much to move in the horizontal and vertical
-   * axes when the popup goes out of the screen on the left/right sides or top/bottom sides.
-   * @param[in] offset Vector holding the left/right offset (x) and top/bottom offset (y)
-   */
-  void SetAlternativeOffset(Vector2 offset);
 
   /**
    * Returns the current state of the popup.
@@ -316,12 +316,6 @@ public:
   void AddPopupOptions();
 
   /**
-   * Set Boundary that Popup should stay within
-   * @param[in] boundingRectangle coordinates of bounding box from Top Left
-   */
-  void SetPopupBoundary( const Rect<float>& boundingRectangle );
-
-  /**
    * Get Visible size of the Popup, excludes content that needs scrolling
    * @return Vector3 size of Popup
    */
@@ -368,6 +362,12 @@ private:
    * Applies constraint to keep the Tail attached to Popup
    */
   void ApplyTailConstraint();
+
+  /**
+   * Create Layer to be used with stencil to allow scrolling of buttons which do not fit in visible popup
+   * @param[in] size of the layer.
+   */
+  void CreateLayer( const Vector2& size );
 
   /**
    * Create a stencil to clip the scroll view content
@@ -421,7 +421,8 @@ private:
 private:
 
   State mState;                                       ///< Popup State.
-  Layer mRoot;                                       ///< The actor which all popup content is added to (i.e. panel and buttons)
+  Layer mRoot;                                        ///< The actor which all popup content is added to (i.e. panel and buttons)
+  Actor mButtons;                                     ///< Actor which holds all the buttons, sensitivity can be set on all buttons via this actor
   ImageActor mBackground;                             ///< The background popup panel
   ImageActor mBackgroundEffect;                       ///< The background effect
   ImageActor mBackgroundLine;                         ///< The background line
@@ -433,10 +434,10 @@ private:
   float mPopupTailXPosition;                          ///< X position of PopUp tail.
 
   Vector2 mContentSize;                               ///< Size of Content (i.e. Buttons)
-  ActorContainer mButtonContainer;                    ///< List of buttons added to popup.
   ActorContainer mDividerContainer;                   ///< List of dividers added to popup.
   Animation mAnimation;                               ///< Popup Hide/Show animation.
 
+  Layer mLayer;                                       ///< Layer to be used with Stencil
   Actor mStencil;                                     ///< Stencil to clip scrollview
   Toolkit::ScrollView mScrollView;                    ///< Scrollview to house the popup
 
@@ -449,8 +450,6 @@ private:
   Vector4 mIconPressedColor;             // Color of the popup icon when pressed.
   Vector4 mTextColor;                    // Color of the popup text.
   Vector4 mTextPressedColor;             // Color of the popup text when pressed.
-
-  Rect<float> mBoundingRect; // Boundary that Popup must stay within.
 
   // Priority of Options/Buttons in the Cut and Paste pop-up, higher priority buttons are displayed first, left to right.
   std::size_t mSelectOptionPriority;  // Position of Select Button

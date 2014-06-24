@@ -794,9 +794,6 @@ void TextInput::SetBoundingRectangle( const Rect<float>& boundingRectangle )
                           originY + boundingRectangle.height );
 
   mBoundingRectangleWorldCoordinates = boundary;
-
-  // Set Boundary for Popup so it keeps the Pop-up within the area also.
-  mPopupPanel.SetPopupBoundary( boundingRectangle );
 }
 
 const Rect<float> TextInput::GetBoundingRectangle() const
