@@ -105,9 +105,9 @@ SuperBlurView::SuperBlurView( unsigned int blurLevels )
   mTargetSize( Vector2::ZERO )
 {
   DALI_ASSERT_ALWAYS( mBlurLevels > 0 && " Minimal blur level is one, otherwise no blur is needed" );
-  mGaussianBlurView.resize( blurLevels );
-  mBlurredImage.resize( blurLevels );
-  mImageActors.resize( blurLevels + 1 );
+  mGaussianBlurView.assign( blurLevels, NULL );
+  mBlurredImage.assign( blurLevels, FrameBufferImage() );
+  mImageActors.assign( blurLevels + 1, ImageActor() );
 }
 
 SuperBlurView::~SuperBlurView()
