@@ -477,6 +477,12 @@ private:
   void OnScrollFinished(Animation& animation);
 
   /**
+   * Callback from layout activation scroll animations
+   * @param[in] animation The scroll-animation which has finished.
+   */
+  void OnLayoutActivationScrollFinished(Animation& animation);
+
+  /**
    * Called by animation system when overshoot has finished animating to maximum (either -1.0f or 1.0f)
    *
    * @param[in] animation the animation that has finished

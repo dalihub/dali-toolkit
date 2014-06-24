@@ -404,7 +404,7 @@ ItemView::ItemView(ItemFactory& factory)
   mAnimateOvershootOff(false),
   mAnchoringEnabled(true),
   mAnchoringDuration(DEFAULT_ANCHORING_DURATION),
-  mRefreshIntervalLayoutPositions(DEFAULT_REFRESH_INTERVAL_LAYOUT_POSITIONS),
+  mRefreshIntervalLayoutPositions(0.0f),
   mRefreshOrderHint(true/*Refresh item 0 first*/),
   mMinimumSwipeSpeed(DEFAULT_MINIMUM_SWIPE_SPEED),
   mMinimumSwipeDistance(DEFAULT_MINIMUM_SWIPE_DISTANCE),
@@ -456,7 +456,7 @@ void ItemView::OnInitialize()
   mMouseWheelEventFinishedTimer = Timer::New( MOUSE_WHEEL_EVENT_FINISHED_TIME_OUT );
   mMouseWheelEventFinishedTimer.TickSignal().Connect( this, &ItemView::OnMouseWheelEventFinished );
 
-  SetRefreshInterval(mRefreshIntervalLayoutPositions);
+  SetRefreshInterval(DEFAULT_REFRESH_INTERVAL_LAYOUT_POSITIONS);
 }
 
 ItemView::~ItemView()
@@ -508,6 +508,8 @@ float ItemView::GetCurrentLayoutPosition(unsigned int itemId) const
 void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSize, float durationSeconds)
 {
   DALI_ASSERT_ALWAYS(layoutIndex < mLayouts.size());
+
+  mRefreshEnabled = false;
 
   Actor self = Self();
 
@@ -562,7 +564,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
   }
 
   // Refresh the new layout
-  ItemRange range = GetItemRange(*mActiveLayout, targetSize, GetCurrentLayoutPosition(0), true/*reserve extra*/);
+  ItemRange range = GetItemRange(*mActiveLayout, targetSize, GetCurrentLayoutPosition(0), false/* don't reserve extra*/);
   AddActorsWithinRange( range, durationSeconds );
 
   // Scroll to an appropriate layout position
@@ -591,6 +593,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
     mScrollAnimation = Animation::New(durationSeconds);
     mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunctions::EaseOut );
     mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, targetSize), AlphaFunctions::EaseOut );
+    mScrollAnimation.FinishedSignal().Connect(this, &ItemView::OnLayoutActivationScrollFinished);
     mScrollAnimation.Play();
   }
 
@@ -704,14 +707,17 @@ float ItemView::GetAnchoringDuration() const
 
 void ItemView::SetRefreshInterval(float intervalLayoutPositions)
 {
-  mRefreshIntervalLayoutPositions = intervalLayoutPositions;
-
-  if(mRefreshNotification)
+  if(mRefreshIntervalLayoutPositions != intervalLayoutPositions)
   {
-    mScrollPositionObject.RemovePropertyNotification(mRefreshNotification);
+    mRefreshIntervalLayoutPositions = intervalLayoutPositions;
+
+    if(mRefreshNotification)
+    {
+      mScrollPositionObject.RemovePropertyNotification(mRefreshNotification);
+    }
+    mRefreshNotification = mScrollPositionObject.AddPropertyNotification( ScrollConnector::SCROLL_POSITION, StepCondition(mRefreshIntervalLayoutPositions, 0.0f) );
+    mRefreshNotification.NotifySignal().Connect( this, &ItemView::OnRefreshNotification );
   }
-  mRefreshNotification = mScrollPositionObject.AddPropertyNotification( ScrollConnector::SCROLL_POSITION, StepCondition(mRefreshIntervalLayoutPositions, 0.0f) );
-  mRefreshNotification.NotifySignal().Connect( this, &ItemView::OnRefreshNotification );
 }
 
 float ItemView::GetRefreshInterval() const
@@ -1121,6 +1127,7 @@ bool ItemView::OnMouseWheelEvent(const MouseWheelEvent& event)
     mScrollPositionObject.SetProperty( ScrollConnector::SCROLL_POSITION, firstItemScrollPosition );
     self.SetProperty(mPropertyPosition, GetScrollPosition(firstItemScrollPosition, layoutSize));
     mScrollStartedSignalV2.Emit(GetCurrentScrollPosition());
+    mRefreshEnabled = true;
   }
 
   if (mMouseWheelEventFinishedTimer.IsRunning())
@@ -1347,6 +1354,8 @@ void ItemView::OnPan(PanGesture gesture)
     case Gesture::Started: // Fall through
     {
       mTotalPanDisplacement = Vector2::ZERO;
+      mScrollStartedSignalV2.Emit(GetCurrentScrollPosition());
+      mRefreshEnabled = true;
     }
 
     case Gesture::Continuing:
@@ -1363,7 +1372,6 @@ void ItemView::OnPan(PanGesture gesture)
 
       mScrollPositionObject.SetProperty( ScrollConnector::SCROLL_POSITION, firstItemScrollPosition );
       self.SetProperty(mPropertyPosition, GetScrollPosition(firstItemScrollPosition, layoutSize));
-      mScrollStartedSignalV2.Emit(GetCurrentScrollPosition());
 
       mTotalPanDisplacement += gesture.displacement;
       mScrollOvershoot = layoutPositionDelta - firstItemScrollPosition;
@@ -1504,6 +1512,12 @@ void ItemView::OnScrollFinished(Animation& source)
   mScrollOvershoot = 0.0f;
 }
 
+void ItemView::OnLayoutActivationScrollFinished(Animation& source)
+{
+  mRefreshEnabled = true;
+  DoRefresh(GetCurrentLayoutPosition(0), true);
+}
+
 void ItemView::OnOvershootOnFinished(Animation& animation)
 {
   mAnimatingOvershootOn = false;
@@ -1537,6 +1551,7 @@ void ItemView::ScrollToItem(unsigned int itemId, float durationSeconds)
   }
 
   mScrollStartedSignalV2.Emit(GetCurrentScrollPosition());
+  mRefreshEnabled = true;
 }
 
 void ItemView::RemoveAnimation(Animation& animation)
@@ -1668,6 +1683,7 @@ void ItemView::ScrollTo(const Vector3& position, float duration)
   }
 
   mScrollStartedSignalV2.Emit(GetCurrentScrollPosition());
+  mRefreshEnabled = true;
 }
 
 void ItemView::SetOvershootEffectColor( const Vector4& color )
