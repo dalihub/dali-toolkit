@@ -26,7 +26,6 @@
 #include <dali-toolkit/internal/controls/text-input/text-input-popup-impl.h>
 
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/adaptor-framework/common/imf-manager.h>
 #include <dali/public-api/geometry/mesh.h>
 
 namespace Dali
