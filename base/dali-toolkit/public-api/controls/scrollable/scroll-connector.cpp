@@ -33,6 +33,7 @@ const Property::Index ScrollConnector::SCROLL_POSITION = Internal::ScrollConnect
 const Property::Index ScrollConnector::OVERSHOOT       = Internal::ScrollConnector::OVERSHOOT;
 
 const char* const ScrollConnector::DOMAIN_CHANGED_SIGNAL_NAME    = "domain-changed";
+const char* const ScrollConnector::SCROLL_POSITION_CHANGED_SIGNAL_NAME    = "scroll-position-changed";
 
 ScrollConnector ScrollConnector::New()
 {
@@ -80,6 +81,21 @@ float ScrollConnector::GetContentLength() const
 Constrainable ScrollConnector::GetScrollPositionObject() const
 {
   return GetImpl(*this).GetScrollPositionObject();
+}
+
+void ScrollConnector::SetScrollPosition( float position )
+{
+  GetImpl(*this).SetScrollPosition( position );
+}
+
+float ScrollConnector::GetScrollPosition() const
+{
+  return GetImpl(*this).GetScrollPosition();
+}
+
+ScrollConnector::ScrollPositionChangedSignalType& ScrollConnector::ScrollPositionChangedSignal()
+{
+  return GetImpl(*this).ScrollPositionChangedSignal();
 }
 
 ScrollConnector::DomainChangedSignalType& ScrollConnector::DomainChangedSignal()

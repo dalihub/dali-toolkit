@@ -433,6 +433,7 @@ void ItemView::OnInitialize()
 
   mScrollConnector = Dali::Toolkit::ScrollConnector::New();
   mScrollPositionObject = mScrollConnector.GetScrollPositionObject();
+  mScrollConnector.ScrollPositionChangedSignal().Connect( this, &ItemView::OnScrollPositionChanged );
 
   mPropertyMinimumLayoutPosition = self.RegisterProperty(MINIMUM_LAYOUT_POSITION_PROPERTY_NAME, 0.0f);
   mPropertyPosition = self.RegisterProperty(POSITION_PROPERTY_NAME, 0.0f);
@@ -502,7 +503,7 @@ ItemLayoutPtr ItemView::GetActiveLayout() const
 
 float ItemView::GetCurrentLayoutPosition(unsigned int itemId) const
 {
-  return mScrollPositionObject.GetProperty<float>( ScrollConnector::SCROLL_POSITION ) + static_cast<float>( itemId );
+  return mScrollConnector.GetScrollPosition() + static_cast<float>( itemId );
 }
 
 void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSize, float durationSeconds)
@@ -1834,6 +1835,15 @@ void ItemView::GetItemsRange(ItemRange& range)
 {
   range.begin = mItemPool.begin()->first;
   range.end = mItemPool.rbegin()->first + 1;
+}
+
+void ItemView::OnScrollPositionChanged( float position )
+{
+  // Cancel scroll animation to prevent any fighting of setting the scroll position property.
+  RemoveAnimation(mScrollAnimation);
+
+  // Refresh the cache immediately when the scroll position is changed.
+  DoRefresh(position, false); // No need to cache extra items.
 }
 
 } // namespace Internal

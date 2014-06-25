@@ -548,6 +548,12 @@ private:
    */
   void OnRefreshNotification(PropertyNotification& source);
 
+  /**
+   * This is called when scroll position has been changed by ScrollConnector::SetScrollPosition.
+   * @param[in] position The new scroll position
+   */
+  void OnScrollPositionChanged( float position );
+
 private:
 
   ItemFactory& mItemFactory;

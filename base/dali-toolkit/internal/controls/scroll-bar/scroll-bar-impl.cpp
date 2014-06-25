@@ -284,7 +284,7 @@ void ScrollBar::SetPositionNotifications( const std::vector<float>& positions )
 void ScrollBar::OnScrollPositionNotified(PropertyNotification& source)
 {
   // Emit the signal to notify the scroll position crossing
-  mScrollPositionNotifiedSignal.Emit(mScrollPositionObject.GetProperty<float>( Toolkit::ScrollConnector::SCROLL_POSITION ));
+  mScrollPositionNotifiedSignal.Emit(mScrollConnector.GetScrollPosition());
 }
 
 void ScrollBar::Show()
@@ -318,13 +318,9 @@ void ScrollBar::Hide()
 bool ScrollBar::OnPanGestureProcessTick()
 {
   // Update the scroll position property.
-  mScrollPositionObject.SetProperty( Toolkit::ScrollConnector::SCROLL_POSITION, mCurrentScrollPosition );
-
-  Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(Self().GetParent());
-  if(itemView)
+  if( mScrollConnector )
   {
-    // Refresh ItemView immediately when the scroll position is changed.
-    GetImpl(itemView).DoRefresh(mCurrentScrollPosition, false); // No need to cache extra items.
+    mScrollConnector.SetScrollPosition(mCurrentScrollPosition);
   }
 
   return true;
@@ -332,8 +328,10 @@ bool ScrollBar::OnPanGestureProcessTick()
 
 void ScrollBar::OnPan( PanGesture gesture )
 {
-  if(mScrollPositionObject)
+  if(mScrollConnector)
   {
+    Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(Self().GetParent());
+
     switch(gesture.state)
     {
       case Gesture::Started:
@@ -347,7 +345,7 @@ void ScrollBar::OnPan( PanGesture gesture )
         }
 
         Show();
-        mScrollStart = mScrollPositionObject.GetProperty<float>( Toolkit::ScrollConnector::SCROLL_POSITION );
+        mScrollStart = mScrollConnector.GetScrollPosition();
         mGestureDisplacement = Vector3::ZERO;
         mIsPanning = true;
 
@@ -377,11 +375,16 @@ void ScrollBar::OnPan( PanGesture gesture )
           mTimer.Reset();
         }
 
+        if(itemView)
+        {
+          // Refresh the ItemView cache with extra items
+          GetImpl(itemView).DoRefresh(mCurrentScrollPosition, true);
+        }
+
         break;
       }
     }
 
-    Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(Self().GetParent());
     if(itemView)
     {
       // Disable automatic refresh in ItemView during fast scrolling

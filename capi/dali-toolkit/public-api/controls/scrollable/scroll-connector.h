@@ -70,6 +70,9 @@ public:
   static const char* const DOMAIN_CHANGED_SIGNAL_NAME;    ///< "domain-changed" signal name
   typedef SignalV2< void ( float min, float max, float size ) > DomainChangedSignalType;
 
+  static const char* const SCROLL_POSITION_CHANGED_SIGNAL_NAME;    ///< "scroll-position-changed" signal name
+  typedef SignalV2< void ( float position ) > ScrollPositionChangedSignalType;
+
   /**
    * Create a ScrollConnector.
    * @return A handle to a newly allocated ScrollConnector.
@@ -100,13 +103,13 @@ public:
   ~ScrollConnector();
 
   /**
-   * Downcast a BaseHandle to ScrollConnector handle.
+   * @brief Downcast a BaseHandle to ScrollConnector handle.
    * @return A handle to a ScrollConnector or an empty handle.
    */
   static ScrollConnector DownCast( BaseHandle handle );
 
   /**
-   * Set the scroll domain, corresponding to the start & end position, and size of the scrollable content in actor coordinates.
+   * @brief Set the scroll domain, corresponding to the start & end position, and size of the scrollable content in actor coordinates.
    * @param[in] min The minimum scroll position limit.
    * @param[in] max The maximum scroll position limit.
    * @param[in] length The length of the scrollable content in actor coordinates.
@@ -114,30 +117,50 @@ public:
   void SetScrollDomain( float min, float max, float length );
 
   /**
-   * Retrieve the min limit.
+   * @brief Retrieve the min limit.
    * @return The minimum value.
    */
   float GetMinLimit() const;
 
   /**
-   * Retrieve the max limit.
+   * @brief Retrieve the max limit.
    * @return The maximum value.
    */
   float GetMaxLimit() const;
 
   /**
-   * Retrieve the length of the scrollable content in actor coordinates.
+   * @brief Retrieve the length of the scrollable content in actor coordinates.
    * @return The length of the scrollable content.
    */
   float GetContentLength() const;
 
   /**
-   * Signal emitted after the SetScrollDomain() method has been called.
+   * @brief Set the scroll position.
+   *
+   * This will set the "scroll-position" property and emit the ScrollPositionChanged signal.
+   *
+   * @param[in] position The scroll position.
+   */
+  void SetScrollPosition( float position );
+
+  /**
+   * @brief Retrieve the scroll position.
+   * @return The scroll position.
+   */
+  float GetScrollPosition() const;
+
+  /**
+   * @brief Signal emitted after the SetScrollPosition() method has been called.
+   */
+  ScrollConnector::ScrollPositionChangedSignalType& ScrollPositionChangedSignal();
+
+  /**
+   * @brief Signal emitted after the SetScrollDomain() method has been called.
    */
   ScrollConnector::DomainChangedSignalType& DomainChangedSignal();
 
   /**
-   * Retrieve the object which provides the "scroll-position" property.
+   * @brief Retrieve the object which provides the "scroll-position" property.
    * @return The scroll-position object.
    */
   Constrainable GetScrollPositionObject() const;

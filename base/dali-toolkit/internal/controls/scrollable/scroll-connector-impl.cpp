@@ -47,6 +47,12 @@ void ScrollConnector::SetScrollDomain( float min, float max, float length )
   mDomainChangedSignal.Emit( mMinLimit, mMaxLimit, mContentLength );
 }
 
+void ScrollConnector::SetScrollPosition( float position )
+{
+  mScrollPositionObject.SetProperty( Toolkit::ScrollConnector::SCROLL_POSITION, position );
+  mScrollPositionChangedSignal.Emit( position );
+}
+
 ScrollConnector::ScrollConnector()
 : mMinLimit( 0.0f ),
   mMaxLimit( 0.0f ),
