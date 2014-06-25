@@ -488,6 +488,26 @@ void ScrollView::SetFlickSpeedCoefficient(float speed)
   GetImpl(*this).SetFlickSpeedCoefficient(speed);
 }
 
+Vector2 ScrollView::GetMinimumDistanceForFlick() const
+{
+  return GetImpl(*this).GetMinimumDistanceForFlick();
+}
+
+void ScrollView::SetMinimumDistanceForFlick( const Vector2& distance )
+{
+  GetImpl(*this).SetMinimumDistanceForFlick(distance);
+}
+
+float ScrollView::GetMinimumSpeedForFlick() const
+{
+  return GetImpl(*this).GetMinimumSpeedForFlick();
+}
+
+void ScrollView::SetMinimumSpeedForFlick( float speed )
+{
+  GetImpl(*this).SetMinimumSpeedForFlick(speed);
+}
+
 float ScrollView::GetMaxFlickSpeed() const
 {
   return GetImpl(*this).GetMaxFlickSpeed();

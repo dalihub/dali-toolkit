@@ -48,7 +48,8 @@ namespace
 {
 
 const int DEFAULT_REFRESH_INTERVAL_MILLISECONDS = 50;                                     ///< Refresh rate TODO: Animation should have an update signal (and see item-view-impl)
-const float FLICK_SPEED_THRESHOLD = 500.0f;                                               ///< Flick threshold in pixels/ms
+const Vector2 DEFAULT_MIN_FLICK_DISTANCE(30.0f, 30.0f);                                   ///< minimum distance for pan before flick allowed
+const float DEFAULT_MIN_FLICK_SPEED_THRESHOLD(500.0f);                          ///< Minimum pan speed required for flick in pixels/s
 const float FREE_FLICK_SPEED_THRESHOLD = 200.0f;                                          ///< Free-Flick threshold in pixels/ms
 const float AUTOLOCK_AXIS_MINIMUM_DISTANCE2 = 100.0f;                                     ///< Auto-lock axis after minimum distance squared.
 const float FLICK_ORTHO_ANGLE_RANGE = 75.0f;                                              ///< degrees. (if >45, then supports diagonal flicking)
@@ -605,6 +606,8 @@ ScrollView::ScrollView()
   mSnapOvershootAlphaFunction(AlphaFunctions::EaseOut),
   mSnapDuration(Toolkit::ScrollView::DEFAULT_SLOW_SNAP_ANIMATION_DURATION),
   mSnapAlphaFunction(AlphaFunctions::EaseOut),
+  mMinFlickDistance(DEFAULT_MIN_FLICK_DISTANCE),
+  mFlickSpeedThreshold(DEFAULT_MIN_FLICK_SPEED_THRESHOLD),
   mFlickDuration(Toolkit::ScrollView::DEFAULT_FAST_SNAP_ANIMATION_DURATION),
   mFlickAlphaFunction(AlphaFunctions::EaseOut),
   mAxisAutoLockGradient(Toolkit::ScrollView::DEFAULT_AXIS_AUTO_LOCK_GRADIENT),
@@ -1202,6 +1205,26 @@ void ScrollView::SetFlickSpeedCoefficient(float speed)
   mFlickSpeedCoefficient = speed;
 }
 
+Vector2 ScrollView::GetMinimumDistanceForFlick() const
+{
+  return mMinFlickDistance;
+}
+
+void ScrollView::SetMinimumDistanceForFlick( const Vector2& distance )
+{
+  mMinFlickDistance = distance;
+}
+
+float ScrollView::GetMinimumSpeedForFlick() const
+{
+  return mFlickSpeedThreshold;
+}
+
+void ScrollView::SetMinimumSpeedForFlick( float speed )
+{
+  mFlickSpeedThreshold = speed;
+}
+
 float ScrollView::GetMaxFlickSpeed() const
 {
   return mMaxFlickSpeed;
@@ -1546,7 +1569,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
   // that will be accepted as a general N,E,S,W flick direction.
 
   const float orthoAngleRange = FLICK_ORTHO_ANGLE_RANGE * M_PI / 180.0f;
-  const float flickSpeedThreshold2 = FLICK_SPEED_THRESHOLD*FLICK_SPEED_THRESHOLD;
+  const float flickSpeedThreshold2 = mFlickSpeedThreshold * mFlickSpeedThreshold;
 
   Vector3 positionSnap = mScrollPrePosition;
 
@@ -2703,6 +2726,13 @@ void ScrollView::OnGestureEx(Gesture::State state)
     mGestureStackDepth--;
     if(mGestureStackDepth==0)
     {
+      // no flick if we have not exceeded min flick distance
+      if( (fabsf(mPanDelta.x) < mMinFlickDistance.x)
+          && (fabsf(mPanDelta.y) < mMinFlickDistance.y) )
+      {
+        // reset flick velocity
+        mLastVelocity = Vector2::ZERO;
+      }
       FinishTransform();
     }
     else
@@ -2724,6 +2754,7 @@ void ScrollView::FinishTransform()
 
   PreAnimatedScrollSetup();
 
+  // convert pixels/millisecond to pixels per second
   bool animating = SnapWithVelocity(mLastVelocity * 1000.0f);
 
   if(!animating)

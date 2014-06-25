@@ -328,6 +328,26 @@ public:
   void SetFlickSpeedCoefficient(float speed);
 
   /**
+   * @copydoc Toolkit::ScrollView::GetMinimumDistanceForFlick
+   */
+  Vector2 GetMinimumDistanceForFlick() const;
+
+  /**
+   * @copydoc Toolkit::ScrollView::SetMinimumDistanceForFlick
+   */
+  void SetMinimumDistanceForFlick( const Vector2& distance );
+
+  /**
+   * @copydoc Toolkit::ScrollView::GetMinimumSpeedForFlick
+   */
+  float GetMinimumSpeedForFlick() const;
+
+  /**
+   * @copydoc Toolkit::ScrollView::SetMinimumSpeedForFlick
+   */
+  void SetMinimumSpeedForFlick( float speed );
+
+  /**
    * @copydoc Toolkit::ScrollView::GetMaxFlickSpeed
    */
   float GetMaxFlickSpeed() const;
@@ -954,6 +974,8 @@ private:
   float mSnapDuration;                          ///< Time for the snap animation to take (in seconds).
   AlphaFunction mSnapAlphaFunction;             ///< AlphaFunction to be used for the Snap Animation.
 
+  Vector2 mMinFlickDistance;                      ///< Minimum pan distance required for a flick
+  float mFlickSpeedThreshold;                   ///< Minimum pan speed required for a flick in pixels/ms
   float mFlickDuration;                         ///< Time for the flick animation to take (in seconds).
   AlphaFunction mFlickAlphaFunction;            ///< AlphaFunction to be used for the Flick Animation.
 

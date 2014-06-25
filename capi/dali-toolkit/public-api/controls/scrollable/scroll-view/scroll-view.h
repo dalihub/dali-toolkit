@@ -828,6 +828,36 @@ public:
   void SetFlickSpeedCoefficient(float speed);
 
   /**
+   * @brief Returns the minimum pan distance required for a flick gesture in pixels
+   *
+   * @return Minimum pan distance vector with separate x and y distance
+   */
+  Vector2 GetMinimumDistanceForFlick() const;
+
+  /**
+   * @brief Sets the minimum pan distance required for a flick in pixels
+   *
+   * Takes a Vector2 containing separate x and y values. As long as the pan distance exceeds one of these axes a flick will be allowed
+   *
+   * @param[in] distance The minimum pan distance for a flick
+   */
+  void SetMinimumDistanceForFlick( const Vector2& distance );
+
+  /**
+   * @brief Returns the minimum pan speed required for a flick gesture in pixels per second
+   *
+   * @return Minimum pan speed
+   */
+  float GetMinimumSpeedForFlick() const;
+
+  /**
+   * @brief Sets the minimum pan speed required for a flick in pixels per second
+   *
+   * @param[in] speed The minimum pan speed for a flick
+   */
+  void SetMinimumSpeedForFlick( float speed );
+
+  /**
    * @brief Gets the maximum flick speed setting for ScrollView when
    * flicking in free panning mode.
    *
