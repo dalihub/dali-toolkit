@@ -51,7 +51,7 @@ const int DEFAULT_REFRESH_INTERVAL_MILLISECONDS = 50;                           
 const float FLICK_SPEED_THRESHOLD = 500.0f;                                               ///< Flick threshold in pixels/ms
 const float FREE_FLICK_SPEED_THRESHOLD = 200.0f;                                          ///< Free-Flick threshold in pixels/ms
 const float AUTOLOCK_AXIS_MINIMUM_DISTANCE2 = 100.0f;                                     ///< Auto-lock axis after minimum distance squared.
-const float FLICK_ORTHO_ANGLE_RANGE = 60.0f;                                              ///< degrees. (if >45, then supports diagonal flicking)
+const float FLICK_ORTHO_ANGLE_RANGE = 75.0f;                                              ///< degrees. (if >45, then supports diagonal flicking)
 const unsigned int MAXIMUM_NUMBER_OF_VALUES = 5;                                          ///< Number of values to use for weighted pan calculation.
 const Vector2 DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION = Vector2(0.17f, 0.1f); ///< The step of horizontal scroll distance in the proportion of stage size for each mouse wheel event received.
 const unsigned long MINIMUM_TIME_BETWEEN_DOWN_AND_UP_FOR_RESET( 150u );
