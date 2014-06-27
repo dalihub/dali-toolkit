@@ -2187,7 +2187,8 @@ bool ScrollView::OnTouchEvent(const TouchEvent& event)
     return false;
   }
 
-  if( event.GetPoint(0).state == TouchPoint::Down )
+  const TouchPoint::State pointState = event.GetPoint(0).state;
+  if( pointState == TouchPoint::Down )
   {
     DALI_LOG_SCROLL_STATE("[0x%X] Down", this);
 
@@ -2202,9 +2203,10 @@ bool ScrollView::OnTouchEvent(const TouchEvent& event)
       StartTouchDownTimer();
     }
   }
-  else if( event.GetPoint(0).state == TouchPoint::Up )
+  else if( ( pointState == TouchPoint::Up ) ||
+           ( ( pointState == TouchPoint::Interrupted ) && ( event.GetPoint(0).hitActor == Self() ) ) )
   {
-    DALI_LOG_SCROLL_STATE("[0x%X] Up", this);
+    DALI_LOG_SCROLL_STATE("[0x%X] %s", this, ( ( pointState == TouchPoint::Up ) ? "Up" : "Interrupted" ) );
 
     StopTouchDownTimer();
 
@@ -2213,8 +2215,8 @@ bool ScrollView::OnTouchEvent(const TouchEvent& event)
     // otherwise our scroll could be stopped (interrupted) half way through an animation.
     if(mGestureStackDepth==0 && mTouchDownTimeoutReached)
     {
-      unsigned timeDelta( event.time - mTouchDownTime );
-      if ( timeDelta >= MINIMUM_TIME_BETWEEN_DOWN_AND_UP_FOR_RESET )
+      if( ( event.GetPoint(0).state == TouchPoint::Interrupted ) ||
+          ( ( event.time - mTouchDownTime ) >= MINIMUM_TIME_BETWEEN_DOWN_AND_UP_FOR_RESET ) )
       {
         // Reset the velocity only if down was received a while ago
         mLastVelocity = Vector2( 0.0f, 0.0f );
