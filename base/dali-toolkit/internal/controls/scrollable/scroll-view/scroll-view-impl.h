@@ -897,9 +897,6 @@ private:
   unsigned long mTouchDownTime;         ///< The touch down time
 
   int mGestureStackDepth;               ///< How many gestures are currently occuring.
-  Vector2 mGestureReferencePosition;    ///< Point where scaling should occur from.
-  Vector2 mPinchGestureLastPosition;
-  Vector2 mPinchGestureLastScale;
 
   Vector3 mPanDelta;                    ///< Amount currently panned.
   Vector3 mScaleDelta;                  ///< Amount currently scaled.
@@ -995,9 +992,8 @@ private:
   bool mAxisAutoLock:1;                   ///< Whether to automatically lock axis when panning.
   bool mAlterChild:1;                     ///< Internal flag to control behavior of OnChildAdd/OnChildRemove when Adding internal Actors.
   bool mDefaultMaxOvershoot:1;            ///< Whether to use default max overshoot or application defined one
-  bool mUserSetPosition:1;                ///< SetScrollPosition has been called, return this position until internals get control of scroll position again
-  bool mCanScrollHorizontal:1;              ///< Local value of our property to check against
-  bool mCanScrollVertical:1;                ///< Local value of our property to check against
+  bool mCanScrollHorizontal:1;            ///< Local value of our property to check against
+  bool mCanScrollVertical:1;              ///< Local value of our property to check against
 };
 
 } // namespace Internal
