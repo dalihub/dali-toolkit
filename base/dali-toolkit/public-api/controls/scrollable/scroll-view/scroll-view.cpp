@@ -15,8 +15,14 @@
  *
  */
 
-#include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
+// CLASS HEADER
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
+
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl.h>
 
 using namespace Dali;
@@ -385,12 +391,12 @@ void ScrollView::SetRulerY(RulerPtr ruler)
 
 void ScrollView::SetRulerScaleX(RulerPtr ruler)
 {
-  GetImpl(*this).SetRulerScaleX(ruler);
+  DALI_LOG_ERROR( "Deprecated" );
 }
 
 void ScrollView::SetRulerScaleY(RulerPtr ruler)
 {
-  GetImpl(*this).SetRulerScaleY(ruler);
+  DALI_LOG_ERROR( "Deprecated" );
 }
 
 void ScrollView::SetScrollSensitive(bool sensitive)
@@ -540,7 +546,8 @@ void ScrollView::SetScrollPosition(const Vector3& position)
 
 Vector3 ScrollView::GetCurrentScrollScale() const
 {
-  return GetImpl(*this).GetCurrentScrollScale();
+  DALI_LOG_ERROR( "Deprecated" );
+  return Vector3::ONE;
 }
 
 unsigned int ScrollView::GetCurrentPage() const
@@ -550,12 +557,16 @@ unsigned int ScrollView::GetCurrentPage() const
 
 void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, float rotation)
 {
-  GetImpl(*this).TransformTo(position, scale, rotation);
+  DALI_LOG_ERROR( "Deprecated" );
+
+  GetImpl(*this).TransformTo(position);
 }
 
 void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, float rotation, float duration)
 {
-  GetImpl(*this).TransformTo(position, scale, rotation, duration);
+  DALI_LOG_ERROR( "Deprecated" );
+
+  GetImpl(*this).TransformTo(position, duration);
 }
 
 void ScrollView::ScrollTo(const Vector3 &position)
@@ -606,12 +617,12 @@ bool ScrollView::ScrollToSnapPoint()
 
 void ScrollView::ScaleTo(const Vector3 &scale)
 {
-  GetImpl(*this).ScaleTo(scale);
+  DALI_LOG_ERROR( "Deprecated" );
 }
 
 void ScrollView::ScaleTo(const Vector3 &scale, float duration)
 {
-  GetImpl(*this).ScaleTo(scale, duration);
+  DALI_LOG_ERROR( "Deprecated" );
 }
 
 void ScrollView::ApplyConstraintToChildren(Constraint constraint)

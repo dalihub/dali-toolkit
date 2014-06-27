@@ -193,22 +193,6 @@ public:
   void SetRulerY(RulerPtr ruler);
 
   /**
-   * @copydoc Toolkit::ScrollView::SetRulerScaleX
-   */
-  void SetRulerScaleX(RulerPtr ruler);
-
-  /**
-   * @copydoc Toolkit::ScrollView::SetRulerScaleY
-   */
-  void SetRulerScaleY(RulerPtr ruler);
-
-  /**
-   * Set Rotation axis ruler (defines how rotating is snapped in radians)
-   * @param[in] ruler The ruler to be used for the Rotation axis
-   */
-  void SetRulerRotation(RulerPtr ruler);
-
-  /**
    * @copydoc Toolkit::ScrollView::SetScrollSensitive
    */
   void SetScrollSensitive(bool sensitive);
@@ -383,25 +367,20 @@ public:
   void SetScrollPosition(const Vector3& position);
 
   /**
-   * @copydoc Toolkit::ScrollView::GetCurrentScrollScale
-   */
-  Vector3 GetCurrentScrollScale() const;
-
-  /**
    * @copydoc Toolkit::Scrollable::GetDomainSize
    */
   Vector3 GetDomainSize() const;
 
   /**
-   * @copydoc Toolkit::ScrollView::TransformTo(const Vector3& position, const Vector3& scale, float rotation)
+   * @copydoc ScrollTo(const Vector3&)
    */
-  void TransformTo(const Vector3& position, const Vector3& scale, float rotation,
+  void TransformTo(const Vector3& position,
                    DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone);
 
   /**
-   * @copydoc Toolkit::ScrollView::TransformTo(const Vector3& position, const Vector3& scale, float rotation, float duration)
+   * @copydoc ScrollTo(const Vector3&, float, DirectionBias, DirectionBias)
    */
-  void TransformTo(const Vector3& position, const Vector3& scale, float rotation, float duration,
+  void TransformTo(const Vector3& position, float duration,
                    DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone);
 
   /**
@@ -474,16 +453,6 @@ public:
   bool ScrollToSnapPoint();
 
   /**
-   * @copydoc Toolkit::ScrollView::ScaleTo(const Vector3& scale)
-   */
-  void ScaleTo(const Vector3& scale);
-
-  /**
-   * @copydoc Toolkit::ScrollView::ScaleTo(const Vector3& scale, float duration)
-   */
-  void ScaleTo(const Vector3& scale, float duration);
-
-  /**
    * Stops animation
    */
   void StopAnimation(void);
@@ -496,14 +465,10 @@ public:
   void StopAnimation(Animation& animation);
 
   /**
-   * Animates to position/scale/rotation transform.
+   * Animates to position transform.
    *
    * @param[in] position The position to animate to
    * @param[in] positionDuration The number of seconds this animation should run for in each axis.
-   * @param[in] scale The scale to animate to
-   * @param[in] scaleDuration The number of seconds this animation should run for in each axis.
-   * @param[in] rotation The angle to animate to
-   * @param[in] rotationDuration The number of seconds this animation should run for in each axis.
    * @param[in] alpha The easing alpha function to use.
    * @param[in] findShortcuts (optional) Whether to find the shortest route (in Wrap mode)
    * @param[in] horizontalBias (optional) Whether to bias animation to left or right (or no biasing)
@@ -511,8 +476,6 @@ public:
    * @return True if animation necessary and taking place to reach desired transform.
    */
   bool AnimateTo(const Vector3& position, const Vector3& positionDuration,
-                             const Vector3& scale, const Vector3& scaleDuration,
-                             float rotation, float rotationDuration,
                              AlphaFunction alpha, bool findShortcuts = true,
                              DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone,
                              SnapType snapType = Snap);
@@ -724,10 +687,8 @@ private:
    * Amalgamated Gesture Continuing event
    *
    * @param[in] panDelta average panning delta from base position (0)
-   * @param[in] scaleDelta average scale delta from base scale (1)
-   * @param[in] rotationDelta average rotation delta from base angle (0)
    */
-  void GestureContinuing(const Vector2& panDelta, const Vector2& scaleDelta, float rotationDelta);
+  void GestureContinuing(const Vector2& panDelta);
 
   /**
    * Called upon pan gesture event.
@@ -750,12 +711,6 @@ private:
    * @param[in] velocity velocity in pixels/sec
    */
   bool SnapWithVelocity(Vector2 velocity);
-
-  /**
-   * Updates Container Transform based on Pan, Scale, and Rotation props.
-   * (occurs when continuing gesture i.e. dragging/pinching.)
-   */
-  void UpdateTransform();
 
   /**
    * Finishes Container Transform
@@ -801,21 +756,6 @@ private:
    * @param[in,out] position The position you wish to wrap
    */
   void WrapPosition(Vector3& position) const;
-
-  /**
-   * Clamps scale within the domain set up by Scale-X/Scale-Y Rulers
-   *
-   * @param[in,out] scale The scale you wish to clamp
-   */
-  void ClampScale(Vector3& scale) const;
-
-  /**
-   * Clamps scale within the domain set up by Scale-X/Scale-Y Rulers
-   *
-   * @param[in,out] scale The scale you wish to clamp
-   * @param[out] clamped The results of the clamping.
-   */
-  void ClampScale(Vector3& scale, ClampState3 &clamped) const;
 
   /**
    * Updates the main internal scroll constraints with new ruler and domain
@@ -874,22 +814,15 @@ private:
   Vector3 GetPropertyPosition() const;
 
   /**
-   * Gets scale property.
-   *
-   * @return The current scale
-   */
-  Vector3 GetPropertyScale() const;
-
-  /**
-   * Handles a Stopped animation. Its position/scale/rotation properties need to be
-   * saved, and the animation flag switched off.
+   * Handles a Stopped animation. Its position properties need to be saved, and the animation flag
+   * switched off.
    */
   void HandleStoppedAnimation();
 
   /**
    * Handles a Stopped animation (whether the animation completed, or was
-   * manually stopped). Its position/scale/rotation properties need to be
-   * saved, and the animation flag switched off.
+   * manually stopped). Its position properties need to be saved, and the
+   * animation flag switched off.
    */
   void HandleSnapAnimationFinished();
 
@@ -919,26 +852,17 @@ private:
   int mGestureStackDepth;               ///< How many gestures are currently occuring.
 
   Vector3 mPanDelta;                    ///< Amount currently panned.
-  Vector3 mScaleDelta;                  ///< Amount currently scaled.
-  float mRotationDelta;                 ///< Amount currently rotated.
 
   unsigned int mScrollStateFlags;       ///< flags indicating current state of scrolling
-  // Scroll delegate pre and post position/scale/rotation properties...
+  // Scroll delegate pre and post position properties...
   Vector3 mScrollPrePosition;           ///< Wrapped scroll position, but not clamped
   Vector3 mScrollPostPosition;          ///< Wrapped and clamped, this is the final scroll position used
   Vector3 mScrollTargetPosition;        ///< Final target position for an animated scroll
-  Vector3 mScrollPreScale;              ///< Scroll delegate pre-scale
-  Vector3 mScrollPostScale;             ///< Scroll delegate post-scale (affected by current touch)
-  float mScrollPreRotation;             ///< Scroll delegate pre-rotation
-  float mScrollPostRotation;            ///< Scroll delegate post-rotation (affected by current touch)
   Vector3 mDomainOffset;                ///< Domain offset (this keeps track of the domain boundaries that scroll positions traverses)
 
   // Rulers for each axes...
   RulerPtr mRulerX;
   RulerPtr mRulerY;
-  RulerPtr mRulerScaleX;
-  RulerPtr mRulerScaleY;
-  RulerPtr mRulerRotation;
 
   // Last property values set to ScrollView
   Vector3 mMinScroll;
@@ -947,7 +871,6 @@ private:
   unsigned int mMinTouchesForPanning;   ///< Minimum number of touches for panning to be used.
   unsigned int mMaxTouchesForPanning;   ///< Maximum number of touches for panning to be used.
 
-  Animation mSnapAnimation;             ///< Used to animate rotation and scaling of scroll properties
   Animation mInternalXAnimation;        ///< Animates mPropertyX to a snap position or application requested scroll position
   Animation mInternalYAnimation;        ///< Animates mPropertyY to a snap position or application requested scroll position
 

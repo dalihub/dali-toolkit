@@ -453,8 +453,6 @@ public:
   {
     SnapType type;    ///< Current snap commencing
     Vector3 position; ///< Target snap position
-    Vector3 scale;    ///< Target snap scale
-    float rotation;   ///< Target snap rotation
     float duration;   ///< Duration of snap animation.
   };
 
@@ -609,6 +607,8 @@ public:
    * (domain) to which scaling can be performed e.g. 10% to 200%
    *
    * @param[in] ruler The ruler to be used for the Scale-X axis
+   *
+   * @deprecated Scaling not supported
    */
   void SetRulerScaleX(RulerPtr ruler);
 
@@ -619,6 +619,8 @@ public:
    * (domain) to which scaling can be performed e.g. 10% to 200%
    *
    * @param[in] ruler The ruler to be used for the Scale-Y axis
+   *
+   * @deprecated Scaling not supported
    */
   void SetRulerScaleY(RulerPtr ruler);
 
@@ -921,6 +923,8 @@ public:
    * @brief Retrieves current scroll scale.
    *
    * @returns The current scroll scale.
+   *
+   * @deprecated Scaling not supported
    */
   Vector3 GetCurrentScrollScale() const;
 
@@ -942,16 +946,20 @@ public:
    * @param[in] position The position to transform to.
    * @param[in] scale The scale to transform to.
    * @param[in] rotation The rotation to transform to.
+   *
+   * @deprecated Scaling or rotation not supported, use ScrollTo(const Vector3&)
    */
   void TransformTo(const Vector3& position, const Vector3& scale, float rotation);
 
   /**
-   * @brief Transforms View to position, scale and rotation specified.
+   * @brief Transforms View to position, scale and rotation specified in the duration specified.
    *
    * @param[in] position The position to transform to.
    * @param[in] scale The scale to transform to.
    * @param[in] rotation The rotation to transform to.
    * @param[in] duration The duration for this animation in seconds.
+   *
+   * @deprecated Scaling or rotation not supported, use ScrollTo(const Vector3&, float)
    */
   void TransformTo(const Vector3& position, const Vector3& scale, float rotation, float duration);
 
@@ -1076,6 +1084,8 @@ public:
    * @brief Scales View to (scale).
    *
    * @param[in] scale The scale factor the animate to.
+   *
+   * @deprecated Scaling not supported
    */
   void ScaleTo(const Vector3& scale);
 
@@ -1084,6 +1094,8 @@ public:
    *
    * @param[in] scale The scale factor the animate to.
    * @param[in] duration The duration of the animation in seconds.
+   *
+   * @deprecated Scaling not supported
    */
   void ScaleTo(const Vector3& scale, float duration);
 

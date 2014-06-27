@@ -15,15 +15,18 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/public-api/events/mouse-wheel-event.h>
+// CLASS HEADER
+#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/events/mouse-wheel-event.h>
+#include <dali/integration-api/debug.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-component-impl.h>
-#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
-#include <dali/integration-api/debug.h>
 
 //#define ENABLED_SCROLL_STATE_LOGGING
 
@@ -34,10 +37,8 @@
 #endif
 
 // TODO: Change to two class system:
-// 1. DraggableActor (is an actor which can be dragged anywhere/scaled/rotated, can be set to range using the ruler)
+// 1. DraggableActor (is an actor which can be dragged anywhere, can be set to range using the ruler)
 // 2. ScrollView (contains a draggable actor that can a) be dragged in the negative X, and Y domain, b) has a hitArea for touches)
-// TODO: Rotation
-// TODO: Asymetrical scaling
 // TODO: external components (page and status overlays).
 // TODO: Orientation.
 // TODO: upgrade Vector2/3 to support returning Unit vectors, normals, & cross product (dot product is already provided)
@@ -272,7 +273,6 @@ ScrollView::LockAxis GetLockAxis(const Vector2& panDelta, ScrollView::LockAxis c
  * Generates position property based on current position + gesture displacement.
  * Or generates position property based on positionX/Y.
  * Note: This is the position prior to any clamping at scroll boundaries.
- * TODO: Scale & Rotation Transforms.
  */
 struct InternalPrePositionConstraint
 {
@@ -591,10 +591,7 @@ ScrollView::ScrollView()
 : ScrollBase(),
   mTouchDownTime(0u),
   mGestureStackDepth(0),
-  mRotationDelta(0.0f),
   mScrollStateFlags(0),
-  mScrollPreRotation(0.0f),
-  mScrollPostRotation(0.0f),
   mMinTouchesForPanning(1),
   mMaxTouchesForPanning(1),
   mLockAxis(LockPossible),
@@ -652,8 +649,6 @@ void ScrollView::OnInitialize()
   RegisterProperties();
 
   mScrollPostPosition = mScrollPrePosition = Vector3::ZERO;
-  mScrollPostScale = mScrollPreScale = Vector3::ONE;
-  mScrollPostRotation = mScrollPreRotation = 0.0f;
 
   mMouseWheelScrollDistanceStep = Stage::GetCurrent().GetSize() * DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
 
@@ -669,13 +664,8 @@ void ScrollView::OnInitialize()
   // By default we'll allow the user to freely drag the scroll view,
   // while disabling the other rulers.
   RulerPtr ruler = new DefaultRuler();
-  RulerPtr rulerDisabled = new DefaultRuler();
-  rulerDisabled->Disable();
   mRulerX = ruler;
   mRulerY = ruler;
-  mRulerScaleX = rulerDisabled;
-  mRulerScaleY = rulerDisabled;
-  mRulerRotation = rulerDisabled;
 
   EnableScrollComponent(Toolkit::Scrollable::OvershootIndicator);
 
@@ -1032,24 +1022,6 @@ void ScrollView::UpdatePropertyDomain(const Vector3& size)
   }
 }
 
-void ScrollView::SetRulerScaleX(RulerPtr ruler)
-{
-  mRulerScaleX = ruler;
-  UpdateMainInternalConstraint();
-}
-
-void ScrollView::SetRulerScaleY(RulerPtr ruler)
-{
-  mRulerScaleY = ruler;
-  UpdateMainInternalConstraint();
-}
-
-void ScrollView::SetRulerRotation(RulerPtr ruler)
-{
-  mRulerRotation = ruler;
-  UpdateMainInternalConstraint();
-}
-
 void ScrollView::SetScrollSensitive(bool sensitive)
 {
   Actor self = Self();
@@ -1273,12 +1245,6 @@ void ScrollView::SetScrollPosition(const Vector3& position)
   mScrollPrePosition = position;
 }
 
-Vector3 ScrollView::GetCurrentScrollScale() const
-{
-  // in case animation is currently taking place.
-  return GetPropertyScale();
-}
-
 Vector3 ScrollView::GetDomainSize() const
 {
   Vector3 size = Self().GetCurrentSize();
@@ -1290,13 +1256,13 @@ Vector3 ScrollView::GetDomainSize() const
   return domainSize;
 }
 
-void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, float rotation,
+void ScrollView::TransformTo(const Vector3& position,
                              DirectionBias horizontalBias, DirectionBias verticalBias)
 {
-  TransformTo(position, scale, rotation, mSnapDuration, horizontalBias, verticalBias);
+  TransformTo(position, mSnapDuration, horizontalBias, verticalBias);
 }
 
-void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, float rotation, float duration,
+void ScrollView::TransformTo(const Vector3& position, float duration,
                              DirectionBias horizontalBias, DirectionBias verticalBias)
 {
   Actor self( Self() );
@@ -1305,8 +1271,8 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
   // Note that Emit() methods are called indirectly e.g. from within ScrollView::AnimateTo()
   Toolkit::ScrollView handle( GetOwner() );
 
-  DALI_LOG_SCROLL_STATE("[0x%X] pos[%.2f,%.2f], scale[%.2f,%.2f], rot[%.2f], duration[%.2f] bias[%d, %d]",
-    this, position.x, position.y, scale.x, scale.y, rotation, duration, int(horizontalBias), int(verticalBias));
+  DALI_LOG_SCROLL_STATE("[0x%X] pos[%.2f,%.2f], duration[%.2f] bias[%d, %d]",
+    this, position.x, position.y, duration, int(horizontalBias), int(verticalBias));
 
   Vector3 currentScrollPosition = GetCurrentScrollPosition();
   self.SetProperty( mPropertyScrollStartPagePosition, currentScrollPosition );
@@ -1339,10 +1305,6 @@ void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, floa
   mScrollStartedSignalV2.Emit( currentScrollPosition );
   bool animating = AnimateTo(-position,
                              Vector3::ONE * duration,
-                             scale,
-                             Vector3::ONE * duration,
-                             rotation,
-                             duration,
                              mSnapAlphaFunction,
                              true,
                              horizontalBias,
@@ -1385,7 +1347,7 @@ void ScrollView::ScrollTo(const Vector3& position, float duration,
   DALI_LOG_SCROLL_STATE("[0x%X] position[%.2f, %.2f] duration[%.2f]",
     this, position.x, position.y, duration, int(horizontalBias), int(verticalBias));
 
-  TransformTo(position, mScrollPostScale, mScrollPostRotation, duration, horizontalBias, verticalBias);
+  TransformTo(position, duration, horizontalBias, verticalBias);
 }
 
 void ScrollView::ScrollTo(unsigned int page)
@@ -1531,17 +1493,6 @@ bool ScrollView::ScrollToSnapPoint()
   return SnapWithVelocity( stationaryVelocity );
 }
 
-void ScrollView::ScaleTo(const Vector3& scale)
-{
-  ScaleTo(scale, mSnapDuration);
-}
-
-void ScrollView::ScaleTo(const Vector3& scale, float duration)
-{
-  TransformTo(mScrollPostPosition, scale, mScrollPostRotation, duration);
-}
-
-
 // TODO: In situations where axes are different (X snap, Y free)
 // Each axis should really have their own independent animation (time and equation)
 // Consider, X axis snapping to nearest grid point (EaseOut over fixed time)
@@ -1558,8 +1509,6 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
   float speed2 = velocity.LengthSquared();
   AlphaFunction alphaFunction = mSnapAlphaFunction;
   Vector3 positionDuration = Vector3::ONE * mSnapDuration;
-  Vector3 scaleDuration = Vector3::ONE * mSnapDuration;
-  float rotationDuration = mSnapDuration;
   float biasX = 0.5f;
   float biasY = 0.5f;
   FindDirection horizontal = None;
@@ -1749,21 +1698,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
   }
   positionSnap += clampDelta;
 
-  // Scale Snap ///////////////////////////////////////////////////////////////
-  Vector3 scaleSnap = mScrollPostScale;
-
-  scaleSnap.x = mRulerScaleX->Snap(scaleSnap.x);
-  scaleSnap.y = mRulerScaleY->Snap(scaleSnap.y);
-
-  ClampScale(scaleSnap);
-
-  // Rotation Snap ////////////////////////////////////////////////////////////
-  float rotationSnap = mScrollPostRotation;
-  // TODO: implement rotation snap
-
   bool animating = AnimateTo(positionSnap, positionDuration,
-                             scaleSnap, scaleDuration,
-                             rotationSnap, rotationDuration,
                              alphaFunction, false,
                              DirectionBiasNone, DirectionBiasNone,
                              isFlick || isFreeFlick ? Flick : Snap);
@@ -1774,7 +1709,6 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
 void ScrollView::StopAnimation(void)
 {
   // Clear Snap animation if exists.
-  StopAnimation(mSnapAnimation);
   StopAnimation(mInternalXAnimation);
   StopAnimation(mInternalYAnimation);
   mScrollStateFlags = 0;
@@ -1792,8 +1726,6 @@ void ScrollView::StopAnimation(Animation& animation)
 }
 
 bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDuration,
-                           const Vector3& scale, const Vector3& scaleDuration,
-                           float rotation, float rotationDuration,
                            AlphaFunction alpha, bool findShortcuts,
                            DirectionBias horizontalBias, DirectionBias verticalBias,
                            SnapType snapType)
@@ -1805,8 +1737,6 @@ bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDurat
   float totalDuration = 0.0f;
 
   bool positionChanged = (mScrollTargetPosition != mScrollPostPosition);
-  bool scaleChanged = (scale != mScrollPostScale);
-  bool rotationChanged = fabsf(rotation - mScrollPostRotation) > Math::MACHINE_EPSILON_0;
 
   if(positionChanged)
   {
@@ -1820,16 +1750,6 @@ bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDurat
     positionChanged = true;
   }
 
-  if(scaleChanged)
-  {
-    totalDuration = std::max(totalDuration, scaleDuration.x);
-    totalDuration = std::max(totalDuration, scaleDuration.y);
-  }
-
-  if(rotationChanged)
-  {
-    totalDuration = std::max(totalDuration, rotationDuration);
-  }
   StopAnimation();
 
   // Position Delta ///////////////////////////////////////////////////////
@@ -1872,35 +1792,12 @@ bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDurat
     DALI_LOG_SCROLL_STATE("[0x%X] mPropertyPrePosition[%.2f, %.2f], mPropertyPosition[%.2f, %.2f]", this, self.GetProperty( mPropertyPrePosition ).Get<Vector3>().x, self.GetProperty( mPropertyPrePosition ).Get<Vector3>().y, self.GetProperty( mPropertyPosition ).Get<Vector3>().x, self.GetProperty( mPropertyPosition ).Get<Vector3>().y );
   }
 
-  // Scale Delta ///////////////////////////////////////////////////////
-  if(scaleChanged)
-  {
-    if(totalDuration > Math::MACHINE_EPSILON_1)
-    {
-      mSnapAnimation = Animation::New(totalDuration);
-      mSnapAnimation.FinishedSignal().Connect(this, &ScrollView::OnScrollAnimationFinished);
-      // TODO: for non-uniform scaling to different bounds e.g. scaling a square to a 4:3 aspect ratio screen with a velocity
-      // the height will hit first, and then the width, so that would require two different animation times just like position.
-      mSnapAnimation.AnimateTo( Property(self, mPropertyScale), scale, alpha, TimePeriod(0.0f, scaleDuration.x));
-
-      mSnapAnimation.AnimateTo( Property(self, mPropertyTime), totalDuration, AlphaFunctions::Linear );
-      mSnapAnimation.Play();
-    }
-    else
-    {
-      self.SetProperty(mPropertyScale, scale);
-
-      mScrollPreScale = mScrollPostScale = scale;
-    }
-  }
   SetScrollUpdateNotification(true);
 
   // Always send a snap event when AnimateTo is called.
   Toolkit::ScrollView::SnapEvent snapEvent;
   snapEvent.type = snapType;
   snapEvent.position = -mScrollTargetPosition;
-  snapEvent.scale = scale;
-  snapEvent.rotation = rotation;
   snapEvent.duration = totalDuration;
 
   DALI_LOG_SCROLL_STATE("[0x%X] mSnapStartedSignalV2 [%.2f, %.2f]", this, snapEvent.position.x, snapEvent.position.y);
@@ -1985,11 +1882,6 @@ Vector3 ScrollView::GetPropertyPosition() const
   WrapPosition(position);
 
   return position;
-}
-
-Vector3 ScrollView::GetPropertyScale() const
-{
-  return Self().GetProperty<Vector3>(mPropertyScale);
 }
 
 void ScrollView::HandleStoppedAnimation()
@@ -2351,13 +2243,7 @@ void ScrollView::PreAnimatedScrollSetup()
 
   mScrollStateFlags = 0;
 
-  mScrollPostScale = GetPropertyScale();
-
   // Update Actor position with this wrapped value.
-  // TODO Rotation
-
-  mScrollPreScale = mScrollPostScale;
-  mScrollPreRotation = mScrollPostRotation;
 }
 
 void ScrollView::FinaliseAnimatedScroll()
@@ -2417,14 +2303,6 @@ void ScrollView::OnScrollAnimationFinished( Animation& source )
 
   // update our local scroll positions
   UpdateLocalScrollProperties();
-
-  if( source == mSnapAnimation )
-  {
-    DALI_LOG_SCROLL_STATE("[0x%X] mSnapAnimation[0x%X]", this, mSnapAnimation.GetObjectPtr() );
-
-    // generic snap animation used for scaling and rotation
-    mSnapAnimation.Reset();
-  }
 
   if( source == mInternalXAnimation )
   {
@@ -2560,8 +2438,6 @@ void ScrollView::GestureStarted()
     StopTouchDownTimer();
     StopAnimation();
     mPanDelta = Vector3::ZERO;
-    mScaleDelta = Vector3::ONE;
-    mRotationDelta = 0.0f;
     mLastVelocity = Vector2(0.0f, 0.0f);
     if( !mScrolling )
     {
@@ -2590,13 +2466,10 @@ void ScrollView::GestureStarted()
   }
 }
 
-void ScrollView::GestureContinuing(const Vector2& panDelta, const Vector2& scaleDelta, float rotationDelta)
+void ScrollView::GestureContinuing(const Vector2& panDelta)
 {
   mPanDelta.x+= panDelta.x;
   mPanDelta.y+= panDelta.y;
-  mScaleDelta.x*= scaleDelta.x;
-  mScaleDelta.y*= scaleDelta.y;
-  mRotationDelta+= rotationDelta;
 
   // Save the velocity, there is a bug in PanGesture
   // Whereby the Gesture::Finished's velocity is either:
@@ -2612,8 +2485,6 @@ void ScrollView::GestureContinuing(const Vector2& panDelta, const Vector2& scale
 }
 
 // TODO: Upgrade to use a more powerful gesture detector (one that supports multiple touches on pan - so works as pan and flick gesture)
-// TODO: Reimplement Scaling (pinching 2+ points)
-// TODO: Reimplment Rotation (pinching 2+ points)
 // BUG: Gesture::Finished doesn't always return velocity on release (due to
 // timeDelta between last two events being 0 sometimes, or posiiton being the same)
 void ScrollView::OnPan(PanGesture gesture)
@@ -2652,7 +2523,7 @@ void ScrollView::OnPan(PanGesture gesture)
       if ( mPanning )
       {
         DALI_LOG_SCROLL_STATE("[0x%X] Pan Continuing", this);
-        GestureContinuing(gesture.screenDisplacement, Vector2::ZERO, 0.0f);
+        GestureContinuing(gesture.screenDisplacement);
       }
       else
       {
@@ -2740,11 +2611,6 @@ void ScrollView::OnGestureEx(Gesture::State state)
       DALI_LOG_SCROLL_STATE("[0x%X] mGestureStackDepth[%d]", this, mGestureStackDepth);
     }
   }
-}
-
-void ScrollView::UpdateTransform()
-{
-// TODO: notify clamps using property notifications (or see if we need this, can deprecate it)
 }
 
 void ScrollView::FinishTransform()
@@ -2837,18 +2703,6 @@ void ScrollView::ClampPosition(Vector3& position, ClampState3 &clamped) const
 {
   Vector3 size = Self().GetCurrentSize();
 
-  // determine size of viewport relative to current scaled size.
-  // e.g. if you're zoomed in 200%, then each pixel on screen is only 0.5 pixels on subject.
-  if(fabsf(mScrollPostScale.x) > Math::MACHINE_EPSILON_0)
-  {
-    size.x /= mScrollPostScale.x;
-  }
-
-  if(fabsf(mScrollPostScale.y) > Math::MACHINE_EPSILON_0)
-  {
-    size.y /= mScrollPostScale.y;
-  }
-
   position.x = -mRulerX->Clamp(-position.x, size.width, 1.0f, clamped.x);    // NOTE: X & Y rulers think in -ve coordinate system.
   position.y = -mRulerY->Clamp(-position.y, size.height, 1.0f, clamped.y);   // That is scrolling RIGHT (e.g. 100.0, 0.0) means moving LEFT.
 
@@ -2872,19 +2726,6 @@ void ScrollView::WrapPosition(Vector3& position) const
       position.y = -WrapInDomain(-position.y, rulerDomainY.min, rulerDomainY.max);
     }
   }
-}
-
-void ScrollView::ClampScale(Vector3& scale) const
-{
-  ClampState3 clamped;
-  ClampScale(scale, clamped);
-}
-
-void ScrollView::ClampScale(Vector3& scale, ClampState3 &clamped) const
-{
-  scale.x = mRulerScaleX->Clamp(scale.x, 0.0f, 1.0f, clamped.x);
-  scale.y = mRulerScaleY->Clamp(scale.y, 0.0f, 1.0f, clamped.y);
-  clamped.z = NotClamped;
 }
 
 void ScrollView::UpdateMainInternalConstraint()
@@ -3026,7 +2867,8 @@ void ScrollView::SetInternalConstraints()
   // self - The ScrollView
 
   // Apply some default constraints to ScrollView.
-  // Movement + Scaling + Wrap function
+  // Movement + Wrap function
+  // TODO: Look into removing some of these constraints
 
   Constraint constraint;
 
