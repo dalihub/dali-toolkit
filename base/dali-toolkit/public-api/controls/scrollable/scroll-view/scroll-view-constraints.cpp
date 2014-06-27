@@ -36,19 +36,6 @@ Vector3 MoveActorConstraint(const Vector3&    current,
   return current + scrollPositionProperty.GetVector3();
 }
 
-Vector3 MoveScaledActorConstraint(const Vector3&    current,
-                                  const PropertyInput& scrollPositionProperty,
-                                  const PropertyInput& scrollScaleProperty)
-{
-  return scrollScaleProperty.GetVector3() * (current + scrollPositionProperty.GetVector3());
-}
-
-Vector3 ScaleActorConstraint(const Vector3&    current,
-                             const PropertyInput& scrollScaleProperty)
-{
- return current * scrollScaleProperty.GetVector3();
-}
-
 Vector3 WrapActorConstraint(const Vector3&    current,
                             const PropertyInput& actorScaleProperty,
                             const PropertyInput& actorAnchorPointProperty,

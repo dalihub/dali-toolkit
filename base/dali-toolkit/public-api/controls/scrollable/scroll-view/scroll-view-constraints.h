@@ -48,23 +48,6 @@ Vector3 MoveActorConstraint(const Vector3&    current,
                             const PropertyInput& scrollPositionProperty);
 
 /**
- * Move-Scaled Actor constraint.
- *
- * Moves an Actor in accordance to scroll position (and scroll scale).
- */
-Vector3 MoveScaledActorConstraint(const Vector3&    current,
-                                  const PropertyInput& scrollPositionProperty,
-                                  const PropertyInput& scrollScaleProperty);
-
-/**
- * Scale Actor constraint.
- *
- * Scales an Actor in accordance to scroll scale.
- */
-Vector3 ScaleActorConstraint(const Vector3&    current,
-                             const PropertyInput& scrollScaleProperty);
-
-/**
  * Wrap Actor constraint.
  *
  * Wraps an Actors position in accordance to min/max bounds of domain.

@@ -2863,27 +2863,15 @@ void ScrollView::SetInternalConstraints()
   // User definable constraints to apply to all child actors //////////////////
   Actor self = Self();
 
-  // LocalSource - The Actors to be moved.
-  // self - The ScrollView
-
-  // Apply some default constraints to ScrollView.
+  // Apply some default constraints to ScrollView & its bound actors
   // Movement + Wrap function
-  // TODO: Look into removing some of these constraints
 
   Constraint constraint;
 
-  // MoveScaledActor (scrolling/zooming)
+  // MoveActor (scrolling)
   constraint = Constraint::New<Vector3>( Actor::POSITION,
                                          Source( self, mPropertyPosition ),
-                                         Source( self, mPropertyScale ),
-                                         MoveScaledActorConstraint );
-  constraint.SetRemoveAction(Constraint::Discard);
-  ApplyConstraintToBoundActors(constraint);
-
-  // ScaleActor (scrolling/zooming)
-  constraint = Constraint::New<Vector3>( Actor::SCALE,
-                                         Source( self, mPropertyScale ),
-                                         ScaleActorConstraint );
+                                         MoveActorConstraint );
   constraint.SetRemoveAction(Constraint::Discard);
   ApplyConstraintToBoundActors(constraint);
 
