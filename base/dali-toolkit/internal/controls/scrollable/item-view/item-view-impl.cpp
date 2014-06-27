@@ -637,7 +637,7 @@ AlphaFunction ItemView::GetDefaultAlphaFunction() const
 
 void ItemView::OnRefreshNotification(PropertyNotification& source)
 {
-  if(mRefreshEnabled)
+  if(mRefreshEnabled || mScrollAnimation)
   {
     // Only refresh the cache during normal scrolling
     DoRefresh(GetCurrentLayoutPosition(0), true);
