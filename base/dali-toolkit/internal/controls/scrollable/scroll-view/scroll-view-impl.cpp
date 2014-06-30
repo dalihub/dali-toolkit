@@ -974,7 +974,7 @@ void ScrollView::UpdatePropertyDomain(const Vector3& size)
     domainChanged = true;
     min.y = 0.0f;
     max.y = 0.0f;
-    canScrollHorizontal = false;
+    canScrollVertical = false;
   }
 
   // avoid setting properties if possible, otherwise this will cause an entire update as well as triggering constraints using each property we update
