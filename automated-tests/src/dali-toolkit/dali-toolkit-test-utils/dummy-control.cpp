@@ -26,14 +26,11 @@ namespace Toolkit
 {
 
 DummyControl::DummyControl()
-: mCustomSlot1Called(false)
 {
 }
 
 DummyControl::DummyControl(const DummyControl& control)
-: Control( control ),
-  mCustomSlot1Called(false),
-  mCustomSlot1Value(Vector3::ZERO)
+: Control( control )
 {
 }
 
@@ -53,7 +50,7 @@ DummyControl& DummyControl::operator=(const DummyControl& control)
 }
 
 // Used to test signal connections
-void DummyControl::CustomSlot1( Actor actor, const Vector3& value )
+void DummyControlImpl::CustomSlot1( Actor actor, const Vector3& value )
 {
   mCustomSlot1Called = true;
   mCustomSlot1Value = value;
@@ -68,9 +65,12 @@ DummyControl DummyControlImpl::New()
 }
 
 DummyControlImpl::DummyControlImpl()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) )
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+  mCustomSlot1Called(false),
+  mCustomSlot1Value(Vector3::ZERO)
 {
 }
+
 
 DummyControlImpl::~DummyControlImpl()
 {
@@ -147,16 +147,12 @@ DummyControl DummyControl::New( bool override )
 }
 
 DummyControl::DummyControl( DummyControlImpl& implementation )
-: Control( implementation ),
-  mCustomSlot1Called(false),
-  mCustomSlot1Value(Vector3::ZERO)
+: Control( implementation )
 {
 }
 
 DummyControl::DummyControl( Dali::Internal::CustomActor* internal )
-: Control( internal ),
-  mCustomSlot1Called(false),
-  mCustomSlot1Value(Vector3::ZERO)
+: Control( internal )
 {
   VerifyCustomActorPointer<DummyControlImpl>(internal);
 }

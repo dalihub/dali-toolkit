@@ -38,7 +38,7 @@ public:
 
   DummyControl();
   DummyControl(const DummyControl& control);
-  virtual ~DummyControl();
+  ~DummyControl();
 
   static DummyControl New( bool override = false );
 
@@ -46,14 +46,6 @@ public:
 
 
   DummyControl& operator=(const DummyControl& control);
-
-  // Used to test signal connections
-  void CustomSlot1( Actor actor, const Vector3& value );
-
-public:
-
-  bool mCustomSlot1Called;
-  Vector3 mCustomSlot1Value;
 
 public: // Not intended for application developers
 
@@ -78,6 +70,12 @@ public:
   inline PanGestureDetector GetPanGestureDetector() const { return Internal::Control::GetPanGestureDetector(); }
   inline TapGestureDetector GetTapGestureDetector() const { return Internal::Control::GetTapGestureDetector(); }
   inline LongPressGestureDetector GetLongPressGestureDetector() const { return Internal::Control::GetLongPressGestureDetector(); }
+
+  // Used to test signal connections
+  void CustomSlot1( Actor actor, const Vector3& value );
+
+  bool mCustomSlot1Called;
+  Vector3 mCustomSlot1Value;
 
 protected:
 
