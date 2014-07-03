@@ -712,11 +712,13 @@ void TextView::SetSnapshotModeEnabled( bool enable )
 
       mOffscreenImageActor.SetAnchorPoint( ParentOrigin::CENTER );
       mOffscreenImageActor.SetParentOrigin( ParentOrigin::CENTER );
+      mOffscreenImageActor.SetBlendFunc( BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA,
+                                         BlendingFactor::ONE, BlendingFactor::ONE );
 
       Actor self = Self();
       self.Add( mOffscreenRootActor );
       self.Add( mOffscreenImageActor );
-      mOffscreenImageActor.SetScale(Vector3(1.f, -1.f, 1.f));
+      mOffscreenImageActor.SetScale( Vector3( 1.f, -1.f, 1.f ) );
     }
     else
     {
