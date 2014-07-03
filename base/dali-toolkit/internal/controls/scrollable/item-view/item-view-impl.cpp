@@ -40,6 +40,10 @@ const float DEFAULT_MINIMUM_SWIPE_SPEED = 1.0f;
 const float DEFAULT_MINIMUM_SWIPE_DISTANCE = 3.0f;
 const float DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION = 0.1f;
 
+const float DEFAULT_MINIMUM_SWIPE_DURATION = 0.45f;
+const float DEFAULT_MAXIMUM_SWIPE_DURATION = 2.6f;
+
+
 const float DEFAULT_REFRESH_INTERVAL_LAYOUT_POSITIONS = 20.0f; // 1 updates per 20 items
 const int MOUSE_WHEEL_EVENT_FINISHED_TIME_OUT = 500;  // 0.5 second
 
@@ -1322,7 +1326,9 @@ void ItemView::OnPan(PanGesture gesture)
 
         RemoveAnimation(mScrollAnimation);
 
-        float flickAnimationDuration = mActiveLayout->GetItemFlickAnimationDuration() * max(1.0f, fabsf(firstItemScrollPosition - GetCurrentLayoutPosition(0)));
+        float flickAnimationDuration = Clamp( mActiveLayout->GetItemFlickAnimationDuration() * max(1.0f, fabsf(firstItemScrollPosition - GetCurrentLayoutPosition(0)))
+                                       , DEFAULT_MINIMUM_SWIPE_DURATION, DEFAULT_MAXIMUM_SWIPE_DURATION);
+
         mScrollAnimation = Animation::New(flickAnimationDuration);
         mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunctions::EaseOut );
         mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, layoutSize), AlphaFunctions::EaseOut );
@@ -1362,7 +1368,7 @@ void ItemView::OnPan(PanGesture gesture)
     case Gesture::Continuing:
     {
       mScrollDistance = CalculateScrollDistance(gesture.displacement, *mActiveLayout);
-      mScrollSpeed = Clamp((gesture.GetSpeed() * mActiveLayout->GetFlickSpeedFactor() * MILLISECONDS_PER_SECONDS), 0.0f, mActiveLayout->GetMaximumSwipeSpeed());
+      mScrollSpeed = Clamp((gesture.GetSpeed() * gesture.GetSpeed() * mActiveLayout->GetFlickSpeedFactor() * MILLISECONDS_PER_SECONDS), 0.0f, mActiveLayout->GetMaximumSwipeSpeed());
 
       // Refresh order depends on the direction of the scroll; negative is towards the last item.
       mRefreshOrderHint = mScrollDistance < 0.0f;
