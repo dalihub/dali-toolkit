@@ -267,7 +267,6 @@ public:
    */
   void DoRefresh(float currentLayoutPosition, bool cacheExtra);
 
-
   /**
    * @copydoc Toolkit::ItemView::SetItemsParentOrigin
    */
@@ -400,15 +399,6 @@ private:
 
   // Undefined
   ItemView& operator=(const ItemView& rhs);
-
-  /**
-   * Helper to apply constraints to an actor.
-   * @param[in] actor The actor to constrain.
-   * @param[in] layout The active layout.
-   * @param[in] itemId The ID of the item represented by the actor.
-   * @param[in] durationSeconds The time taken to fully constrain the actors.
-   */
-  void ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int itemId, float durationSeconds);
 
   /**
    * Helper to re-apply all the constraints after items have been inserted, removed etc.

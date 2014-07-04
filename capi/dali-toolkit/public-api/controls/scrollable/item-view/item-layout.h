@@ -401,6 +401,41 @@ public:
    */
   virtual float GetFlickSpeedFactor() const;
 
+  /*
+   * @brief Applies constraints defined by the layout to an actor.
+   *
+   * @param[in] actor The actor to constrain.
+   * @param[in] itemId The ID of the item represented by the actor.
+   * @param[in] durationSeconds The time taken to fully constrain the actors.
+   * @param[in] scrollPositionObject The object which provides the layout position property.
+   * @param[in] itemViewActor The item view instance which requests the application of constraints.
+   */
+  virtual void ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, Constrainable scrollPositionObject, const Actor& itemViewActor );
+
+  /**
+   * @brief Gets the position of a given item
+   *
+   * @param[in] itemID id of the item we want to get its position
+   * @param[in] currentLayoutPosition the current layout position of the item view instance
+   * @param[in] layoutSize the current size of the item view instance
+   * @return The item position (x,y,z)
+   */
+  virtual Vector3 GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const;
+
+  /**
+   * @brief Set the alpha function used when applying constraints
+   *
+   * @param[in] func The alpha function to use.
+   */
+  void SetAlphaFunction(AlphaFunction func);
+
+  /**
+   * @brief Retrieve the alpha function used when applying constraints
+   *
+   * @return The alpha function.
+   */
+  AlphaFunction GetAlphaFunction() const;
+
 protected:
 
   /**
@@ -410,7 +445,8 @@ protected:
 
 protected:
 
-  ControlOrientation::Type mOrientation; ///< the orientation of the layout.
+  ControlOrientation::Type mOrientation;   ///< the orientation of the layout.
+  AlphaFunction            mAlphaFunction; ///<Alpha function to be applied when removing/adding constraints
 };
 
 } // namespace Toolkit

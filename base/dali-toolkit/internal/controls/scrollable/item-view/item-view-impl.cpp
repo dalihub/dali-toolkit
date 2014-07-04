@@ -43,12 +43,10 @@ const float DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION = 0.1f;
 const float DEFAULT_MINIMUM_SWIPE_DURATION = 0.45f;
 const float DEFAULT_MAXIMUM_SWIPE_DURATION = 2.6f;
 
-
 const float DEFAULT_REFRESH_INTERVAL_LAYOUT_POSITIONS = 20.0f; // 1 updates per 20 items
 const int MOUSE_WHEEL_EVENT_FINISHED_TIME_OUT = 500;  // 0.5 second
 
 const float DEFAULT_ANCHORING_DURATION = 1.0f;  // 1 second
-const float DEFAULT_COLOR_VISIBILITY_REMOVE_TIME = 0.5f; // 0.5 second
 
 const float MILLISECONDS_PER_SECONDS = 1000.0f;
 
@@ -65,84 +63,6 @@ const string MINIMUM_LAYOUT_POSITION_PROPERTY_NAME( "item-view-minimum-layout-po
 const string SCROLL_SPEED_PROPERTY_NAME( "item-view-scroll-speed" );
 const string SCROLL_DIRECTION_PROPERTY_NAME( "item-view-scroll-direction" );
 const string OVERSHOOT_PROPERTY_NAME( "item-view-overshoot" );
-
-// Functors which wrap constraint functions with stored item IDs
-
-struct WrappedVector3Constraint
-{
-  WrappedVector3Constraint(Toolkit::ItemLayout::Vector3Function wrapMe, unsigned int itemId)
-  : mWrapMe(wrapMe),
-    mItemId(itemId)
-  {
-  }
-
-  Vector3 operator()(const Vector3& current, const PropertyInput& layoutPosition, const PropertyInput& scrollSpeed, const PropertyInput& layoutSize)
-  {
-    float offsetLayoutPosition = layoutPosition.GetFloat() + static_cast<float>(mItemId);
-
-    return mWrapMe(current, offsetLayoutPosition, scrollSpeed.GetFloat(), layoutSize.GetVector3());
-  }
-
-  Toolkit::ItemLayout::Vector3Function mWrapMe;
-  unsigned int mItemId;
-};
-
-struct WrappedQuaternionConstraint
-{
-  WrappedQuaternionConstraint(Toolkit::ItemLayout::QuaternionFunction wrapMe, unsigned int itemId)
-  : mWrapMe(wrapMe),
-    mItemId(itemId)
-  {
-  }
-
-  Quaternion operator()(const Quaternion& current, const PropertyInput& layoutPosition, const PropertyInput& scrollSpeed, const PropertyInput& layoutSize)
-  {
-    float offsetLayoutPosition = layoutPosition.GetFloat() + static_cast<float>(mItemId);
-
-    return mWrapMe(current, offsetLayoutPosition, scrollSpeed.GetFloat(), layoutSize.GetVector3());
-  }
-
-  Toolkit::ItemLayout::QuaternionFunction mWrapMe;
-  unsigned int mItemId;
-};
-
-struct WrappedVector4Constraint
-{
-  WrappedVector4Constraint(Toolkit::ItemLayout::Vector4Function wrapMe, unsigned int itemId)
-  : mWrapMe(wrapMe),
-    mItemId(itemId)
-  {
-  }
-
-  Vector4 operator()(const Vector4& current, const PropertyInput& layoutPosition, const PropertyInput& scrollSpeed, const PropertyInput& layoutSize)
-  {
-    float offsetLayoutPosition = layoutPosition.GetFloat() + static_cast<float>(mItemId);
-
-    return mWrapMe(current, offsetLayoutPosition, scrollSpeed.GetFloat(), layoutSize.GetVector3());
-  }
-
-  Toolkit::ItemLayout::Vector4Function mWrapMe;
-  unsigned int mItemId;
-};
-
-struct WrappedBoolConstraint
-{
-  WrappedBoolConstraint(Toolkit::ItemLayout::BoolFunction wrapMe, unsigned int itemId)
-  : mWrapMe(wrapMe),
-    mItemId(itemId)
-  {
-  }
-
-  bool operator()(const bool& current, const PropertyInput& layoutPosition, const PropertyInput& scrollSpeed, const PropertyInput& layoutSize)
-  {
-    float offsetLayoutPosition = layoutPosition.GetFloat() + static_cast<float>(mItemId);
-
-    return mWrapMe(current, offsetLayoutPosition, scrollSpeed.GetFloat(), layoutSize.GetVector3());
-  }
-
-  Toolkit::ItemLayout::BoolFunction mWrapMe;
-  unsigned int mItemId;
-};
 
 /**
  * Local helper to convert pan distance (in actor coordinates) to the layout-specific scrolling direction
@@ -528,7 +448,6 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
   // Move the items to the new layout positions...
 
   bool resizeAnimationNeeded(false);
-
   for (ConstItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
   {
     unsigned int itemId = iter->first;
@@ -560,7 +479,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
       }
     }
 
-    ApplyConstraints(actor, *mActiveLayout, itemId, durationSeconds);
+    mActiveLayout->ApplyConstraints(actor, itemId, durationSeconds, mScrollPositionObject, Self() );
   }
 
   if (resizeAnimationNeeded)
@@ -785,7 +704,7 @@ void ItemView::InsertItem( Item newItem, float durationSeconds )
       moveMe = temp;
 
       iter->second.RemoveConstraints();
-      ApplyConstraints( iter->second, *mActiveLayout, iter->first, durationSeconds );
+      mActiveLayout->ApplyConstraints(iter->second, iter->first, durationSeconds, mScrollPositionObject, Self() );
     }
 
     // Create last item
@@ -794,7 +713,7 @@ void ItemView::InsertItem( Item newItem, float durationSeconds )
     mItemPool.insert( lastItem );
 
     lastItem.second.RemoveConstraints();
-    ApplyConstraints( lastItem.second, *mActiveLayout, lastItem.first, durationSeconds );
+    mActiveLayout->ApplyConstraints(lastItem.second, lastItem.first, durationSeconds, mScrollPositionObject, Self() );
   }
   else
   {
@@ -859,7 +778,7 @@ void ItemView::InsertItems( const ItemContainer& newItems, float durationSeconds
     else
     {
       iter->second.RemoveConstraints();
-      ApplyConstraints( iter->second, *mActiveLayout, iter->first, durationSeconds );
+      mActiveLayout->ApplyConstraints( iter->second, iter->first, durationSeconds, mScrollPositionObject, Self() );
     }
   }
 
@@ -1048,7 +967,7 @@ void ItemView::SetupActor( Item item, float durationSeconds )
       item.second.SetSize( size );
     }
 
-    ApplyConstraints( item.second, *mActiveLayout, item.first, durationSeconds );
+    mActiveLayout->ApplyConstraints( item.second, item.first, durationSeconds, mScrollPositionObject, Self() );
   }
 }
 
@@ -1173,97 +1092,6 @@ bool ItemView::OnMouseWheelEventFinished()
   return false;
 }
 
-void ItemView::ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int itemId, float duration)
-{
-  ItemLayout::Vector3Function positionConstraint;
-  if (layout.GetPositionConstraint(itemId, positionConstraint))
-  {
-    WrappedVector3Constraint wrapped(positionConstraint, itemId);
-
-    Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                      Source( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ),
-                                                      ParentSource( mPropertyScrollSpeed ),
-                                                      ParentSource( Actor::SIZE ),
-                                                      wrapped );
-    constraint.SetApplyTime(duration);
-    constraint.SetAlphaFunction(mDefaultAlphaFunction);
-
-    actor.ApplyConstraint(constraint);
-  }
-
-  ItemLayout::QuaternionFunction rotationConstraint;
-  if (layout.GetRotationConstraint(itemId, rotationConstraint))
-  {
-    WrappedQuaternionConstraint wrapped(rotationConstraint, itemId);
-
-    Constraint constraint = Constraint::New<Quaternion>( Actor::ROTATION,
-                                                         Source( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ),
-                                                         ParentSource( mPropertyScrollSpeed ),
-                                                         ParentSource( Actor::SIZE ),
-                                                         wrapped );
-    constraint.SetApplyTime(duration);
-    constraint.SetAlphaFunction(mDefaultAlphaFunction);
-
-    actor.ApplyConstraint(constraint);
-  }
-
-  ItemLayout::Vector3Function scaleConstraint;
-  if (layout.GetScaleConstraint(itemId, scaleConstraint))
-  {
-    WrappedVector3Constraint wrapped(scaleConstraint, itemId);
-
-    Constraint constraint = Constraint::New<Vector3>( Actor::SCALE,
-                                                      Source( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ),
-                                                      ParentSource( mPropertyScrollSpeed ),
-                                                      ParentSource( Actor::SIZE ),
-                                                      wrapped );
-    constraint.SetApplyTime(duration);
-    constraint.SetAlphaFunction(mDefaultAlphaFunction);
-
-    actor.ApplyConstraint(constraint);
-  }
-
-  ItemLayout::Vector4Function colorConstraint;
-  if (layout.GetColorConstraint(itemId, colorConstraint))
-  {
-    WrappedVector4Constraint wrapped(colorConstraint, itemId);
-
-    Constraint constraint = Constraint::New<Vector4>( Actor::COLOR,
-                                                      Source( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ),
-                                                      ParentSource( mPropertyScrollSpeed ),
-                                                      ParentSource( Actor::SIZE ),
-                                                      wrapped );
-    constraint.SetApplyTime(duration);
-    constraint.SetAlphaFunction(mDefaultAlphaFunction);
-
-    // Release color constraints slowly; this allows ItemView to co-exist with ImageActor fade-in
-    constraint.SetRemoveTime(DEFAULT_COLOR_VISIBILITY_REMOVE_TIME);
-    constraint.SetRemoveAction(Dali::Constraint::Discard);
-
-    actor.ApplyConstraint(constraint);
-  }
-
-  ItemLayout::BoolFunction visibilityConstraint;
-  if (layout.GetVisibilityConstraint(itemId, visibilityConstraint))
-  {
-    WrappedBoolConstraint wrapped(visibilityConstraint, itemId);
-
-    Constraint constraint = Constraint::New<bool>( Actor::VISIBLE,
-                                                   Source( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ),
-                                                   ParentSource( mPropertyScrollSpeed ),
-                                                   ParentSource( Actor::SIZE ),
-                                                   wrapped );
-    constraint.SetApplyTime(duration);
-    constraint.SetAlphaFunction(mDefaultAlphaFunction);
-
-    // Release visibility constraints the same time as the color constraint
-    constraint.SetRemoveTime(DEFAULT_COLOR_VISIBILITY_REMOVE_TIME);
-    constraint.SetRemoveAction(Dali::Constraint::Discard);
-
-    actor.ApplyConstraint(constraint);
-  }
-}
-
 void ItemView::ReapplyAllConstraints( float durationSeconds )
 {
   for (ConstItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
@@ -1272,7 +1100,7 @@ void ItemView::ReapplyAllConstraints( float durationSeconds )
     Actor actor = iter->second;
 
     actor.RemoveConstraints();
-    ApplyConstraints(actor, *mActiveLayout, id, durationSeconds);
+    mActiveLayout->ApplyConstraints(actor, id, durationSeconds, mScrollPositionObject, Self());
   }
 
   CalculateDomainSize(Self().GetCurrentSize());
@@ -1466,12 +1294,6 @@ void ItemView::OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
     int nextItemID = GetItemId(commitedFocusableActor);
     float layoutPosition = GetCurrentLayoutPosition(0);
     Vector3 layoutSize = Self().GetCurrentSize();
-    Vector3 focusItemPosition = Vector3::ZERO;
-    ItemLayout::Vector3Function itemPositionConstraint;
-    if (mActiveLayout->GetPositionConstraint(nextItemID, itemPositionConstraint))
-    {
-      focusItemPosition = itemPositionConstraint(Vector3::ZERO, layoutPosition + nextItemID, 0.0f, layoutSize);
-    }
 
     float scrollTo = mActiveLayout->GetClosestOnScreenLayoutPosition(nextItemID, layoutPosition, layoutSize);
     ScrollTo(Vector3(0.0f, scrollTo, 0.0f), DEFAULT_KEYBOARD_FOCUS_SCROLL_DURATION);
@@ -1584,20 +1406,11 @@ void ItemView::CalculateDomainSize(const Vector3& layoutSize)
 
   if(mActiveLayout)
   {
-    ItemLayout::Vector3Function firstItemPositionConstraint;
-    if (mActiveLayout->GetPositionConstraint(0, firstItemPositionConstraint))
-    {
-      firstItemPosition = firstItemPositionConstraint(Vector3::ZERO, 0, 0.0f, layoutSize);
-    }
+    firstItemPosition = mActiveLayout->GetItemPosition( 0,0,layoutSize );
 
     float minLayoutPosition = mActiveLayout->GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), layoutSize);
     self.SetProperty(mPropertyMinimumLayoutPosition, minLayoutPosition);
-
-    ItemLayout::Vector3Function lastItemPositionConstraint;
-    if (mActiveLayout->GetPositionConstraint(fabs(minLayoutPosition), lastItemPositionConstraint))
-    {
-      lastItemPosition = lastItemPositionConstraint(Vector3::ZERO, fabs(minLayoutPosition), 0.0f, layoutSize);
-    }
+    lastItemPosition = mActiveLayout->GetItemPosition( fabs(minLayoutPosition),fabs(minLayoutPosition),layoutSize );
 
     float domainSize;
 
@@ -1645,13 +1458,7 @@ bool ItemView::IsLayoutScrollable(const Vector3& layoutSize)
 
 float ItemView::GetScrollPosition(float layoutPosition, const Vector3& layoutSize) const
 {
-  Vector3 firstItemPosition(Vector3::ZERO);
-  ItemLayout::Vector3Function firstItemPositionConstraint;
-  if (mActiveLayout->GetPositionConstraint(0, firstItemPositionConstraint))
-  {
-    firstItemPosition = firstItemPositionConstraint(Vector3::ZERO, layoutPosition, 0.0f, layoutSize);
-  }
-
+  Vector3 firstItemPosition( mActiveLayout->GetItemPosition(0, layoutPosition, layoutSize ) );
   return IsHorizontal(mActiveLayout->GetOrientation()) ? firstItemPosition.x: firstItemPosition.y;
 }
 

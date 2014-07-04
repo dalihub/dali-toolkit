@@ -228,7 +228,6 @@ void ItemView::ReplaceItems(const ItemContainer& replacementItems, float duratio
   GetImpl(*this).ReplaceItems( replacementItems, durationSeconds );
 }
 
-
 void ItemView::SetItemsParentOrigin( const Vector3& parentOrigin )
 {
   GetImpl(*this).SetItemsParentOrigin( parentOrigin );

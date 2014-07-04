@@ -179,13 +179,15 @@ public:
   /**
    * @brief Set default the alpha function used when applying constraints e.g. during ActivateLayout().
    *
+   * @deprecated Use SetAlphaFunction() in the layout
    * @param[in] func The default alpha function to use.
    */
   void SetDefaultAlphaFunction(AlphaFunction func);
 
   /**
-   * @brief Retrieve the default alpha function for an animation.
+   * @brief Retrieve the default alpha function used when applying constraints
    *
+   * @deprecated Use GetAlphaFunction() in the layout
    * @return The default alpha function.
    */
   AlphaFunction GetDefaultAlphaFunction() const;
