@@ -46,7 +46,8 @@ distributing this software or its derivatives.
       "paste-button-position-priority":5,
       "select-button-position-priority":1,
       "select-all-button-position-priority":2,
-      "clipboard-button-position-priority":6
+      "clipboard-button-position-priority":6,
+      "cursor-color":"F052"
     },
     "scrollview":
     {

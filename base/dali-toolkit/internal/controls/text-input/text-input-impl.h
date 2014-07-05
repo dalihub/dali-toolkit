@@ -866,12 +866,11 @@ public:  // Public to allow internal testing.
   std::size_t InsertAt( const Text& newText, const std::size_t insertionPosition, const std::size_t numberOfCharactersToReplace );
 
   /**
-   * Creates a cursor from the supplied image
-   * @param[in] cursorImage the image to be used for the cursor.
-   * @param[in] border the nine patch border corresponding to the supplied image.
-   * @return the image actor to be used as the cursor.
-   */
-  ImageActor CreateCursor( Image cursorImage, const Vector4& border );
+  * Creates a cursor.
+  * @param[in] color the cursor color.
+  * @return the image actor to be used as the cursor.
+  */
+  ImageActor CreateCursor( const Vector4 &color );
 
   /**
    * Moves cursor to the right

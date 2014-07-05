@@ -57,15 +57,14 @@ public:
   static const Property::Index CUT_AND_PASTE_ICON_PRESSED_COLOR_PROPERTY;    // Property, name "cut-and-paste-icon-pressed-color", type VECTOR4
   static const Property::Index CUT_AND_PASTE_TEXT_COLOR_PROPERTY;            // Property, name "cut-and-paste-text-color", type VECTOR4
   static const Property::Index CUT_AND_PASTE_TEXT_PRESSED_COLOR_PROPERTY;    // Property, name "cut-and-paste-text-pressed-color", type VECTOR4
-
   static const Property::Index CUT_BUTTON_POSITION_PRIORITY_PROPERTY;        // Property, name "cut-button-position-priority", type unsigned int
   static const Property::Index COPY_BUTTON_POSITION_PRIORITY_PROPERTY;       // Property, name "copy-button-position-priority", type unsigned int
   static const Property::Index PASTE_BUTTON_POSITION_PRIORITY_PROPERTY;      // Property, name "paste-button-position-priority", type unsigned int
   static const Property::Index SELECT_BUTTON_POSITION_PRIORITY_PROPERTY;     // Property, name "select-button-position-priority", type unsigned int
   static const Property::Index SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY; // Property, name "select-all-button-position-priority", type unsigned int
   static const Property::Index CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY;  // Property, name "clipboard-button-position-priority", type unsigned int
-
   static const Property::Index POP_UP_OFFSET_FROM_TEXT_PROPERTY;             // Property, name "popup-offset-from-text", type VECTOR4
+  static const Property::Index CURSOR_COLOR_PROPERTY;                        // Property, name "cursor-color", type VECTOR4
 
   /** @} */
 
@@ -287,6 +286,7 @@ public:
    void SetGrabHandleImage( Image image );
 
    /**
+    * Depreciated API.
     * @brief Set the image to be used for the regular left to right cursor.
     *
     * @pre The text input actor has been initialised.

@@ -21,6 +21,7 @@
 #include <dali-toolkit/internal/controls/text-view/text-processor.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
+#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 
 #include <dali/integration-api/debug.h>
 
@@ -51,9 +52,6 @@ const char* DEFAULT_SELECTION_HANDLE_ONE( DALI_IMAGE_DIR "text-input-selection-h
 const char* DEFAULT_SELECTION_HANDLE_TWO( DALI_IMAGE_DIR "text-input-selection-handle-right.png" );
 const char* DEFAULT_SELECTION_HANDLE_ONE_PRESSED( DALI_IMAGE_DIR "text-input-selection-handle-left-press.png" );
 const char* DEFAULT_SELECTION_HANDLE_TWO_PRESSED( DALI_IMAGE_DIR "text-input-selection-handle-right-press.png" );
-const char* DEFAULT_CURSOR( DALI_IMAGE_DIR "cursor.png" );
-
-const Vector4 DEFAULT_CURSOR_IMAGE_9_BORDER( 2.0f, 2.0f, 2.0f, 2.0f );
 
 const std::size_t CURSOR_BLINK_INTERVAL = 500;                              ///< Cursor blink interval
 const float CHARACTER_THRESHOLD( 2.5f );                                    ///< the threshold of a line.
@@ -66,8 +64,9 @@ const Vector3 DEFAULT_HANDLE_ONE_OFFSET(0.0f, -5.0f, 0.0f);                 ///<
 const Vector3 DEFAULT_HANDLE_TWO_OFFSET(0.0f, -5.0f, 0.0f);                 ///< Handle Two's Offset
 const float TOP_HANDLE_TOP_OFFSET( 34.0f);                                   ///< Offset between top handle and cutCopyPaste pop-up
 const float BOTTOM_HANDLE_BOTTOM_OFFSET(34.0f);                              ///< Offset between bottom handle and cutCopyPaste pop-up
-const float CURSOR_THICKNESS(6.0f);
+const float CURSOR_THICKNESS(4.0f);
 const Degree CURSOR_ANGLE_OFFSET(2.0f);                                     ///< Offset from the angle of italic angle.
+const Vector4 DEFAULT_CURSOR_COLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 const std::string NEWLINE( "\n" );
 
@@ -211,8 +210,9 @@ const Property::Index TextInput::PASTE_BUTTON_POSITION_PRIORITY_PROPERTY      = 
 const Property::Index TextInput::SELECT_BUTTON_POSITION_PRIORITY_PROPERTY     = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+11;
 const Property::Index TextInput::SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+12;
 const Property::Index TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY  = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+13;
-
 const Property::Index TextInput::POP_UP_OFFSET_FROM_TEXT_PROPERTY             = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+14;
+const Property::Index TextInput::CURSOR_COLOR_PROPERTY                        = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+15;
+
 
 namespace Internal
 {
@@ -251,6 +251,8 @@ PropertyRegistration property12( typeRegistration, "select-button-position-prior
 PropertyRegistration property13( typeRegistration, "select-all-button-position-priority",  Toolkit::TextInput::SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
 PropertyRegistration property14( typeRegistration, "clipboard-button-position-priority",  Toolkit::TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
 PropertyRegistration property15( typeRegistration, "popup-offset-from-text", Toolkit::TextInput::POP_UP_OFFSET_FROM_TEXT_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property16( typeRegistration, "cursor-color", Toolkit::TextInput::CURSOR_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+
 
 // [TextInput::HighlightInfo] /////////////////////////////////////////////////
 
@@ -1167,9 +1169,8 @@ void TextInput::OnInitialize()
 
   // Create 2 cursors (standard LTR and RTL cursor for when text can be added at
   // different positions depending on language)
-  Image mCursorImage = Image::New( DEFAULT_CURSOR );
-  mCursor = CreateCursor( mCursorImage, DEFAULT_CURSOR_IMAGE_9_BORDER );
-  mCursorRTL = CreateCursor( mCursorImage, DEFAULT_CURSOR_IMAGE_9_BORDER );
+  mCursor = CreateCursor(DEFAULT_CURSOR_COLOR);
+  mCursorRTL = CreateCursor(DEFAULT_CURSOR_COLOR);
 
   Actor self = Self();
   self.Add( mCursor );
@@ -2823,21 +2824,10 @@ std::size_t TextInput::InsertAt( const Text& newText, const std::size_t insertio
   return insertedStringLength;
 }
 
-ImageActor TextInput::CreateCursor( Image cursorImage, const Vector4& border )
+ImageActor TextInput::CreateCursor( const Vector4& color)
 {
   ImageActor cursor;
-
-  if ( cursorImage )
-  {
-    cursor = ImageActor::New( cursorImage );
-  }
-  else
-  {
-    cursor = ImageActor::New( Image::New( DEFAULT_CURSOR ) );
-  }
-
-  cursor.SetStyle(ImageActor::STYLE_NINE_PATCH);
-  cursor.SetNinePatchBorder( border );
+  cursor = CreateSolidColorActor(color);
 
   cursor.SetParentOrigin(ParentOrigin::TOP_LEFT);
   cursor.SetAnchorPoint(AnchorPoint::BOTTOM_CENTER);
@@ -5275,6 +5265,10 @@ void TextInput::SetProperty( BaseObject* object, Property::Index propertyIndex, 
         textInputImpl.SetOffsetFromText( value.Get< Vector4 >() );
         break;
       }
+      case Toolkit::TextInput::CURSOR_COLOR_PROPERTY:
+      {
+        textInputImpl.mCursor.SetColor( value.Get< Vector4 >() );
+      }
     }
   }
 }
@@ -5365,6 +5359,10 @@ Property::Value TextInput::GetProperty( BaseObject* object, Property::Index prop
       {
         value = textInputImpl.GetOffsetFromText();
         break;
+      }
+      case Toolkit::TextInput::CURSOR_COLOR_PROPERTY:
+      {
+        value = textInputImpl.mCursor.GetCurrentColor();
       }
     }
   }
