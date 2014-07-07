@@ -1111,7 +1111,10 @@ bool ItemView::OnTouchEvent(const TouchEvent& event)
     mScrollOvershoot = 0.0f;
     AnimateScrollOvershoot(0.0f);
 
-    mScrollCompletedSignalV2.Emit(GetCurrentScrollPosition());
+    if(mScrollAnimation)
+    {
+      mScrollCompletedSignalV2.Emit(GetCurrentScrollPosition());
+    }
 
     RemoveAnimation(mScrollAnimation);
   }
@@ -1521,6 +1524,7 @@ void ItemView::OnScrollFinished(Animation& source)
 
 void ItemView::OnLayoutActivationScrollFinished(Animation& source)
 {
+  RemoveAnimation(mScrollAnimation);
   mRefreshEnabled = true;
   DoRefresh(GetCurrentLayoutPosition(0), true);
 }
