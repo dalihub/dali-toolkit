@@ -55,6 +55,16 @@ if test "x$enable_debug" = "xno" -a "x$enable_exportall" = "xno"; then
   DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -fvisibility=hidden -DHIDE_DALI_INTERNALS"
 fi
 
+# Tizen Profile options
+AC_ARG_ENABLE([profile],
+              [AC_HELP_STRING([--enable-profile=COMMON,MOBILE,LITE,WEARABLE,TV],
+                            [Select the variant of tizen])],
+              [dali_profile=$enableval],
+              [dali_profile=COMMON])
+
+# Different platforms use either the full Toolkit or the basic version
+# The basic version excludes components under dali-toolkit/optional
+AM_CONDITIONAL([TOOLKIT_BASIC_VERSION], [test x$dali_profile = xLITE])
 
 if test x$DALI_DATA_RW_DIR != x; then
   dataReadWriteDir=${DALI_DATA_RW_DIR}/
@@ -80,7 +90,6 @@ AC_SUBST(devincludepath)
 AC_CONFIG_FILES([
  Makefile
  dali-toolkit/Makefile
- dali-toolkit-base/Makefile
  dali-toolkit.pc
 ])
 
@@ -91,6 +100,7 @@ Configuration
 -------------
   Prefix:                           $prefix
   Debug Build:                      $enable_debug
+  Profile:                          $dali_profile
   Data Dir (Read/Write):            $dataReadWriteDir
   Data Dir (Read Only):             $dataReadOnlyDir
 "

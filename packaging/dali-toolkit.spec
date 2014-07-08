@@ -36,17 +36,6 @@ Requires:   boost-devel
 Application development package for the OpenGLES Canvas toolkit - headers and package config
 
 ##############################
-# Dali Base library
-##############################
-%package dali-toolkit-base
-Summary:    The basic OpenGLES Canvas Core Library Toolkit
-Group:      Development/Building
-
-%description dali-toolkit-base
-A subset of the controls provided by the main package, intended for lightweight applications.
-all the controls provided by the main package.
-
-##############################
 # Preparation
 ##############################
 %prep
@@ -99,18 +88,10 @@ cp -af %{_builddir}/%{name}-%{version}/LICENSE %{buildroot}/usr/share/license/%{
 /sbin/ldconfig
 exit 0
 
-%post dali-toolkit-base
-/sbin/ldconfig
-exit 0
-
 ##############################
 # Post Uninstall
 ##############################
 %postun
-/sbin/ldconfig
-exit 0
-
-%postun dali-toolkit-base
 /sbin/ldconfig
 exit 0
 
@@ -131,6 +112,3 @@ exit 0
 %{dev_include_path}/%{name}/*
 %{_libdir}/pkgconfig/*.pc
 
-%files dali-toolkit-base
-%defattr(-,root,root,-)
-%{_libdir}/libdali-toolkit-base.so*

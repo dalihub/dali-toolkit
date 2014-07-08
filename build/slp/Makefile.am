@@ -14,8 +14,7 @@
 # limitations under the License.
 #
 
-SUBDIRS = dali-toolkit-base \
-          dali-toolkit
+SUBDIRS = dali-toolkit
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = dali-toolkit.pc
