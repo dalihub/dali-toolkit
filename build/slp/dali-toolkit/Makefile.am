@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-# Build the Dali Toolkit library (Combined Base and Optional)
+# Build the Dali Toolkit library
 
 # Base files
 toolkit_base_images_dir = ../../../base/dali-toolkit/images
@@ -38,32 +38,49 @@ include ../../../optional/dali-toolkit/images/file.list
 include ../../../optional/dali-toolkit/internal/file.list
 include ../../../optional/dali-toolkit/public-api/file.list
 
-# CAPI
+# CAPI headers
 capi_devel_src_dir = ../../../capi/dali-toolkit/public-api
 
 include ../../../capi/dali-toolkit/public-api/file.list
 
 resources_dir = ../../../resources
 daliimagedir = ${dataReadOnlyDir}/toolkit/images/
+if TOOLKIT_BASIC_VERSION
+daliimage_DATA = ${dali_toolkit_base_image_files}
+else
 daliimage_DATA = ${dali_toolkit_base_image_files} \
                  ${dali_toolkit_optional_image_files}
+endif # TOOLKIT_BASIC_VERSION
 
 dalisounddir = ${dataReadOnlyDir}/toolkit/sounds/
 dalisound_DATA = ${dali_toolkit_base_sound_files}
 
-# The Combined library
+# The library
 lib_LTLIBRARIES = libdali-toolkit.la
 
+if TOOLKIT_BASIC_VERSION
+libdali_toolkit_la_SOURCES = \
+                     $(toolkit_base_src_files) \
+                     $(public_api_base_src_files)
+else
 libdali_toolkit_la_SOURCES = \
                      $(toolkit_base_src_files) \
                      $(public_api_base_src_files) \
                      $(toolkit_optional_src_files) \
                      $(public_api_optional_src_files)
+endif # TOOLKIT_BASIC_VERSION
 
 dalistyledir = ${dataReadOnlyDir}/toolkit/styles/
 dalistyle_DATA = ${dali_toolkit_style_files}
 
 libdali_toolkit_la_DEPENDENCIES =
+
+toolkit_basic_includes = -I../../../base \
+                         -I../../../capi
+
+if ! TOOLKIT_BASIC_VERSION
+toolkit_optional_includes = -I../../../optional
+endif
 
 libdali_toolkit_la_CXXFLAGS = -DDALI_COMPILATION \
                       -DDALI_IMAGE_DIR="\"${daliimagedir}\"" \
@@ -71,9 +88,8 @@ libdali_toolkit_la_CXXFLAGS = -DDALI_COMPILATION \
                       -DDALI_STYLE_DIR="\"${dalistyledir}\"" \
                       -DDALI_DATA_READ_ONLY_DIR="\"${dataReadOnlyDir}\"" \
                       -Werror -Wall \
-                      -I../../../base \
-                      -I../../../optional \
-                      -I../../../capi \
+                      $(toolkit_basic_includes) \
+                      $(toolkit_optional_includes) \
                       $(DALI_TOOLKIT_CFLAGS) \
                       $(DALICORE_CFLAGS) \
                       $(DALI_CFLAGS) \
