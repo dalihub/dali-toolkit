@@ -49,7 +49,7 @@ public: // Typedefs
 
 public: // Construction & Destruction
   AccessibilityManager();
-  virtual ~AccessibilityManager();
+  ~AccessibilityManager();
 
 public: // Getters
   static AccessibilityManager Get();

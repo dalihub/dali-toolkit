@@ -211,9 +211,9 @@ public:
   ImfManager();
 
   /**
-   * Virtual destructor.
+   * Non virtual destructor.
    */
-  virtual ~ImfManager();
+  ~ImfManager();
 
   /**
    * This constructor is used by ImfManager::Get().

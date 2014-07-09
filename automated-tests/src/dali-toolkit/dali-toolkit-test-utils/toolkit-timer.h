@@ -45,7 +45,7 @@ public:
   static Timer New( unsigned int milliSec );
   Timer( const Timer& timer );
   Timer& operator=( const Timer& timer );
-  virtual ~Timer();
+  ~Timer();
   static Timer DownCast( BaseHandle handle );
   using BaseHandle::operator=;
   void Start();

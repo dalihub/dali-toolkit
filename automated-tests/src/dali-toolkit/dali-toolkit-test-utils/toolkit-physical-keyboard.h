@@ -38,7 +38,7 @@ class PhysicalKeyboard : public BaseHandle
 public:
   typedef SignalV2< void (PhysicalKeyboard) > Signal;
   PhysicalKeyboard();
-  virtual ~PhysicalKeyboard();
+  ~PhysicalKeyboard();
   static PhysicalKeyboard Get();
   bool IsAttached() const;
   Signal& StatusChangedSignal();

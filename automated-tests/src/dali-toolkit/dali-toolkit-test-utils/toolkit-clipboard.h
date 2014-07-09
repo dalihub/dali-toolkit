@@ -50,9 +50,9 @@ public:
   Clipboard();
 
   /**
-   * Virtual destructor.
+   * Non virtual destructor.
    */
-  virtual ~Clipboard();
+  ~Clipboard();
 
   /**
    * This constructor is used by Adaptor::GetClipboard().

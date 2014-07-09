@@ -49,7 +49,7 @@ public: // Creation & Destruction
   StyleMonitor();
   StyleMonitor(const StyleMonitor& monitor);
   static StyleMonitor Get();
-  virtual ~StyleMonitor();
+  ~StyleMonitor();
   static StyleMonitor DownCast( BaseHandle handle );
   using BaseHandle::operator=;
 
