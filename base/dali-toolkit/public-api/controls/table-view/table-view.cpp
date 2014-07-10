@@ -29,6 +29,10 @@ namespace Dali
 namespace Toolkit
 {
 
+const std::string TableView::CELL_INDICES_PROPERTY_NAME("cell-indices");
+const std::string TableView::ROW_SPAN_PROPERTY_NAME("row-span");
+const std::string TableView::COLUMN_SPAN_PROPERTY_NAME("column-span");
+
 TableView::TableView()
 {
 }

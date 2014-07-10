@@ -43,6 +43,57 @@ class TableView : public Control
 {
 public:
 
+  /// @name Properties
+  /** @{ */
+  static const Property::Index PROPERTY_ROWS;                       ///< name "rows",                      type UNSIGNED_INTEGER
+  static const Property::Index PROPERTY_COLUMNS;                    ///< name "columns",                   type UNSIGNED_INTEGER
+  static const Property::Index PROPERTY_CELL_PADDING;               ///< name "cell-padding",              type VECTOR2
+  static const Property::Index PROPERTY_LAYOUT_ANIMATION_DURATION;  ///< name "layout-animation-duration", type FLOAT
+
+  /*
+   * PROPERTY_LAYOUT_ROWS set the height of the rows
+   * It has the format as follows in script:
+   * @code
+   * "layout-rows":
+      {
+        "0": { "policy": "fixed", "value": 40 },       //@see SetFixedHight
+        "2": { "policy": "relative", "value": 0.33 }   //@see SetRelativeHeight
+      }
+   * @endcode
+   */
+  static const Property::Index PROPERTY_LAYOUT_ROWS;                ///< name "layout-rows",               type MAP
+
+  /*
+   * PROPERTY_LAYOUT_COLUMNS set the height of the rows
+   * It has the format as follows in script:
+   * @code
+   * "layout-columns":
+      {
+        "0": { "policy": "fixed", "value": 40 },       //@see SetFixedWidth
+        "2": { "policy": "relative", "value": 0.33 }   //@see SetRelativeWidth
+      }
+   * @endcode
+   */
+  static const Property::Index PROPERTY_LAYOUT_COLUMNS;             ///< name "layout-columns",            type MAP
+  /** @} */
+
+
+  // Custom properties for where to put the actor, these properties should be registered to the child which would be added to the table
+  static const std::string CELL_INDICES_PROPERTY_NAME;           ///< Property, name "cell-indices", type VECTOR2
+  static const std::string ROW_SPAN_PROPERTY_NAME;               ///< Property, name "row-span",     type FLOAT (Currently builder unable to differentiate integer and float from Json string)
+  static const std::string COLUMN_SPAN_PROPERTY_NAME;            ///< Property, name "column-span",  type FLOAT (Currently builder unable to differentiate integer and float from Json string)
+
+
+  /**
+   * @brief Describes how the size of a row / column been set
+   */
+  enum LayoutPolicy
+  {
+    Fixed,      ///< Fixed with the given value.
+    Relative,   ///< Calculated as percentage of the remainder after subtracting Padding and Fixed height/width
+    Fill        ///< Get the remainder of the 100% (after subtracting Padding, Fixed and Relative height/ width) divided evenly between 'fill' rows/columns
+  };
+
   /**
    * Structure to specify layout position for child actor
    */
