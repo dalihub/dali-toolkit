@@ -20,3 +20,5 @@ done
     cd .. ;
     genhtml -o build/slp/doc/coverage `find . -name dali.info`
 )
+
+echo "Coverage output: ../build/slp/doc/coverage/index.html"
