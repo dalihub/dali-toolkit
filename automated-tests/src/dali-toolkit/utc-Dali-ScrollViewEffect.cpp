@@ -174,9 +174,7 @@ ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
   scrollView.SetAnchorPoint(AnchorPoint::CENTER);
   scrollView.SetParentOrigin(ParentOrigin::CENTER);
   scrollView.ApplyConstraint( Constraint::New<Dali::Vector3>( Dali::Actor::SIZE, Dali::ParentSource( Dali::Actor::SIZE ), Dali::EqualToConstraint() ) );
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
   scrollView.SetWrapMode(false);
-  scrollView.SetRefreshInterval(0);
   scrollView.ScrollStartedSignal().Connect( &OnScrollStart );
   scrollView.ScrollUpdatedSignal().Connect( &OnScrollUpdate );
   scrollView.ScrollCompletedSignal().Connect( &OnScrollComplete );

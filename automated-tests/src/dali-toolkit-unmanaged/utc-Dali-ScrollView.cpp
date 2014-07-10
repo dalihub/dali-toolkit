@@ -67,7 +67,6 @@ const float TEST_RATIO_TOLERANCE = 0.05;                        ///< +/-5% toler
 
 const int MAX_FRAMES_TO_TEST_OVERSHOOT = 600;                         ///< 10 seconds (at 60 frames per second).
 const Vector3 OVERSHOOT_START_SCROLL_POSITION(100.0f, 100.0f, 0.0f);  ///< Scroll start position for the Overshoot tests.
-const float TEST_DEFAULT_SNAP_OVERSHOOT_DURATION = 0.25f;             ///< 0.25 seconds should be default snap overshoot duration
 const float TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION = 0.05f;             ///< a Test duration
 const float TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION = 1.5f;              ///< another Test duration
 const float TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION = TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION * 0.5f; // Same as above, but different alpha function.
@@ -340,8 +339,6 @@ int UtcDaliScrollViewScrollToPosition(void)
 
   // Create the ScrollView actor
   ScrollView scrollView = ScrollView::New();
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
   Stage::GetCurrent().Add( scrollView );
 
   const Vector3 target = Vector3(100.0f, 200.0f, 0.0f);
@@ -364,8 +361,6 @@ int UtcDaliScrollViewScrollToPage(void)
   tet_infoline(" UtcDaliScrollViewScrollToPage");
 
   ScrollView scrollView = ScrollView::New();
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
   Stage::GetCurrent().Add( scrollView );
   RulerPtr rulerX = new FixedRuler( 100.0f );
   rulerX->SetDomain( RulerDomain(0.0f, 800.0f, true) );
@@ -427,8 +422,6 @@ int UtcDaliScrollViewScrollToActor(void)
   tet_infoline(" UtcDaliScrollViewScrollToActor");
 
   ScrollView scrollView = ScrollView::New();
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
   Stage::GetCurrent().Add( scrollView );
 
   Actor actorA = Actor::New();
@@ -468,8 +461,6 @@ int UtcDaliScrollViewScrollToSnapPoint(void)
   tet_infoline(" UtcDaliScrollViewScrollToSnapPoint");
 
   ScrollView scrollView = ScrollView::New();
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
   Stage::GetCurrent().Add( scrollView );
   RulerPtr rulerX = new FixedRuler( 100.0f );
   rulerX->SetDomain( RulerDomain(0.0f, 800.0f, true) );
@@ -490,107 +481,19 @@ int UtcDaliScrollViewScrollToSnapPoint(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewRulerScale(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewRulerScale");
-
-  ScrollView scrollView = ScrollView::New();
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
-  Stage::GetCurrent().Add( scrollView );
-
-  RulerPtr rulerScaleX = new FixedRuler(0.25f);
-  RulerPtr rulerScaleY = new DefaultRuler();
-  rulerScaleX->SetDomain( RulerDomain(0.1f, 0.9f, true) );
-  rulerScaleY->SetDomain( RulerDomain(0.1f, 2.0f, true) );
-  scrollView.SetRulerScaleX(rulerScaleX);
-  scrollView.SetRulerScaleY(rulerScaleY);
-
-  scrollView.Add(Actor::New());
-
-  // Scroll to a position, and then snap.
-  scrollView.ScaleTo(Vector3(1.95f, 1.4f, 1.0f), 0.0f);
-  scrollView.ScrollToSnapPoint();
-  Wait(application, RENDER_DELAY_SCROLL);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollScale(), Vector3(0.9f, 1.4f, 1.0f), TEST_LOCATION );
-
-  // Scroll SLOWLY to another position, and then snap.
-  scrollView.ScaleTo(Vector3(0.45f, -1.0f, 1.0f));
-  Wait(application, RENDER_DELAY_SCROLL);
-  scrollView.ScrollToSnapPoint();
-  Wait(application, RENDER_DELAY_SCROLL);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollScale(), Vector3(0.5f, 0.1f, 1.0f), TEST_LOCATION );
-
-  // Scroll to another position, and then snap.
-  scrollView.ScaleTo(Vector3(0.71f, 0.71f, 1.0f), 0.0f);
-  scrollView.ScrollToSnapPoint();
-  Wait(application, RENDER_DELAY_SCROLL);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollScale(), Vector3(0.75f, 0.71f, 1.0f), TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliScrollViewTransformTo(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewTransformTo");
-
-  ScrollView scrollView = ScrollView::New();
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
-  Stage::GetCurrent().Add( scrollView );
-
-  // Position rulers.
-  RulerPtr rulerX = new FixedRuler(50.0f);
-  RulerPtr rulerY = new FixedRuler(50.0f);
-  rulerX->SetDomain( RulerDomain(0.0f, 200.0f, true) );
-  rulerY->SetDomain( RulerDomain(0.0f, 200.0f, true) );
-  scrollView.SetRulerX(rulerX);
-  scrollView.SetRulerY(rulerY);
-
-  // Scale rulers.
-  RulerPtr rulerScaleX = new FixedRuler(0.1f);
-  RulerPtr rulerScaleY = new FixedRuler(0.1f);
-  rulerScaleX->SetDomain( RulerDomain(0.0f, 1.0f, true) );
-  rulerScaleY->SetDomain( RulerDomain(0.0f, 1.0f, true) );
-  scrollView.SetRulerScaleX(rulerScaleX);
-  scrollView.SetRulerScaleY(rulerScaleY);
-
-  // transform to a random position/scale
-  Vector3 targetPosition = Vector3(100.0f, 200.0f, 0.0f);
-  Vector3 targetScale = Vector3(0.44f, 0.58f, 1.0f);
-  float targetRotation = 0.0f;
-  scrollView.TransformTo(targetPosition, targetScale, targetRotation, 0.0f);
-  Wait(application);
-
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), targetPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollScale(), targetScale, TEST_LOCATION );
-
-  // transform to another random position/scale (SLOWLY)
-  targetPosition = Vector3(60.0f, 40.0f, 0.0f);
-  targetScale = Vector3(0.4f, 0.6f, 1.0f);
-  targetRotation = 0.0f;
-  scrollView.TransformTo(targetPosition, targetScale, targetRotation);
-  Wait(application, RENDER_DELAY_SCROLL);
-
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), targetPosition, TEST_LOCATION );
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollScale(), targetScale, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliScrollViewRefreshInterval(void)
+int UtcDaliScrollViewSetScrollUpdateDistance(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliScrollViewRefreshInterval");
 
   ScrollView scrollView = ScrollView::New();
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
-  DALI_TEST_EQUALS( scrollView.GetRefreshInterval(), 0, TEST_LOCATION);
-  scrollView.SetRefreshInterval(10);
-  DALI_TEST_EQUALS( scrollView.GetRefreshInterval(), 10, TEST_LOCATION);
-  scrollView.SetRefreshInterval(1000);
-  DALI_TEST_EQUALS( scrollView.GetRefreshInterval(), 1000, TEST_LOCATION);
+
+  scrollView.SetScrollUpdateDistance(0);
+  DALI_TEST_EQUALS( scrollView.GetScrollUpdateDistance(), 0, TEST_LOCATION);
+  scrollView.SetScrollUpdateDistance(10);
+  DALI_TEST_EQUALS( scrollView.GetScrollUpdateDistance(), 10, TEST_LOCATION);
+  scrollView.SetScrollUpdateDistance(1000);
+  DALI_TEST_EQUALS( scrollView.GetScrollUpdateDistance(), 1000, TEST_LOCATION);
   END_TEST;
 }
 
@@ -626,8 +529,6 @@ int UtcDaliScrollViewActorAutoSnap(void)
 
   ScrollView scrollView = ScrollView::New();
   Stage::GetCurrent().Add( scrollView );
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -679,8 +580,6 @@ int UtcDaliScrollViewSignalsStartComplete(void)
 
   ScrollView scrollView = ScrollView::New();
   Stage::GetCurrent().Add( scrollView );
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -692,7 +591,7 @@ int UtcDaliScrollViewSignalsStartComplete(void)
   scrollView.ScrollStartedSignal().Connect( &OnScrollStart );
   scrollView.ScrollUpdatedSignal().Connect( &OnScrollUpdate );
   scrollView.ScrollCompletedSignal().Connect( &OnScrollComplete );
-  scrollView.ScrollTo( 100.0f, 100.0f );
+  scrollView.ScrollTo( Vector3(100.0f, 100.0f, 0.0f) );
   Wait(application, RENDER_DELAY_SCROLL);
 
   DALI_TEST_CHECK(gOnScrollStartCalled);
@@ -713,8 +612,6 @@ int UtcDaliScrollViewSignalsUpdate(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
   scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
   scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
 
@@ -762,86 +659,6 @@ int UtcDaliScrollViewSignalsUpdate(void)
   END_TEST;
 }
 
-// Creates a scroll domain slightly bigger than the stage size.
-// ScrollView is scrolled to center, slightly to the left.
-// Then a pan gesture is carried out causing the scrollview
-// to pan South-West direction. Resulting in ClampEvents
-// to fire (first Western boundary, then both Western and
-// Southern boundary).
-int UtcDaliScrollViewSignalsClamped(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewSignalsClamped");
-
-  gOnScrollUpdateCalled = false;
-  gOnScrollCompleteCalled = false;
-
-  // Set up a scrollView...
-  ScrollView scrollView = ScrollView::New();
-  Stage::GetCurrent().Add( scrollView );
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
-  scrollView.SetSize(stageSize);
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-
-  // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
-  rulerX->SetDomain( RulerDomain(0.0f, stageSize.width + CLAMP_EXCESS_WIDTH, true) );
-  rulerY->SetDomain( RulerDomain(0.0f, stageSize.height + CLAMP_EXCESS_HEIGHT, true) );
-  scrollView.SetRulerX(rulerX);
-  scrollView.SetRulerY(rulerY);
-  scrollView.ScrollUpdatedSignal().Connect( &OnScrollUpdate );
-  scrollView.ScrollClampedSignal().Connect( &OnScrollClamped );
-
-  scrollView.ScrollTo(CLAMP_START_SCROLL_POSITION, 0.0f); // move in a little.
-  Wait(application);
-
-  // Now do a pan starting from 100,100 and heading South-West
-  Vector2 pos(CLAMP_TOUCH_START);
-  SendPan(application, Gesture::Possible, pos);
-  SendPan(application, Gesture::Started, pos);
-  pos += CLAMP_TOUCH_MOVEMENT; // Move South-West a little
-  Wait(application);
-
-  int step = CLAMP_STEP_0_CHECK_NOTCLAMPED;
-  // Move 500,500 pixels South-West
-  // should be initially not clamped (0)
-  // then it should clamp against West boundary (X Min) (1)
-  // then it should clamp against South-West boundary (X Min, Y Max) (2)
-  gLastClampPosition.x = Toolkit::NotClamped;
-  gLastClampPosition.y = Toolkit::NotClamped;
-
-  for(int i = 0;i<CLAMP_GESTURE_FRAMES;i++)
-  {
-    SendPan(application, Gesture::Continuing, pos);
-    pos += CLAMP_TOUCH_MOVEMENT; // Move South-West a little
-    Wait(application);
-
-    if((gLastClampPosition.x == Toolkit::NotClamped) && (gLastClampPosition.y == Toolkit::NotClamped) && (step==CLAMP_STEP_0_CHECK_NOTCLAMPED))
-    {
-      step = CLAMP_STEP_1_CHECK_CLAMPED_WEST;
-    }
-    else if((gLastClampPosition.x == Toolkit::ClampedToMin) && (gLastClampPosition.y == Toolkit::NotClamped) && (step==CLAMP_STEP_1_CHECK_CLAMPED_WEST))
-    {
-      step = CLAMP_STEP_2_CHECK_CLAMPED_SOUTH_WEST;
-    }
-    else if((gLastClampPosition.x == Toolkit::ClampedToMin) && (gLastClampPosition.y == Toolkit::ClampedToMax) && (step==CLAMP_STEP_2_CHECK_CLAMPED_SOUTH_WEST))
-    {
-      step = CLAMP_STEP_3_SUCCESS;
-    }
-  }
-
-  SendPan(application, Gesture::Finished, pos);
-  Wait(application);
-
-  DALI_TEST_CHECK( gOnScrollClampedCalled );
-  DALI_TEST_EQUALS( step, CLAMP_STEP_3_SUCCESS, TEST_LOCATION );
-  END_TEST;
-}
-
 static Vector2 PerformGestureDiagonalSwipe(ToolkitTestApplication& application, Vector2 start, Vector2 direction, int frames, bool finish = true)
 {
   gOnScrollStartCalled = false;
@@ -882,8 +699,6 @@ int UtcDaliScrollViewScrollSensitive(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
   scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
   scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
 
@@ -907,7 +722,6 @@ int UtcDaliScrollViewScrollSensitive(void)
   PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, CLAMP_TOUCH_MOVEMENT, CLAMP_GESTURE_FRAMES, true);
 
   DALI_TEST_CHECK( !gOnScrollStartCalled );
-  DALI_TEST_CHECK( !gOnScrollUpdateCalled );
   DALI_TEST_CHECK( !gOnScrollCompleteCalled );
   DALI_TEST_CHECK( !gOnSnapStartCalled );
 
@@ -916,7 +730,6 @@ int UtcDaliScrollViewScrollSensitive(void)
   PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, CLAMP_TOUCH_MOVEMENT, CLAMP_GESTURE_FRAMES, true);
 
   DALI_TEST_CHECK( gOnScrollStartCalled );
-  DALI_TEST_CHECK( gOnScrollUpdateCalled );
   DALI_TEST_CHECK( gOnScrollCompleteCalled );
   DALI_TEST_CHECK( gOnSnapStartCalled );
   END_TEST;
@@ -932,8 +745,6 @@ int UtcDaliScrollViewTouchesRequired(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
   scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
   scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
 
@@ -961,9 +772,12 @@ int UtcDaliScrollViewTouchesRequired(void)
   DALI_TEST_CHECK( !gOnScrollCompleteCalled );
   DALI_TEST_CHECK( !gOnSnapStartCalled );
 
+  scrollView.ScrollTo(CLAMP_START_SCROLL_POSITION, 0.0f); // move in a little.
+  Wait(application);
+
   // Second try touches required being a minimum and maximum of 1.
   scrollView.SetTouchesRequiredForPanning(1, 1, true);
-  PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, CLAMP_TOUCH_MOVEMENT, CLAMP_GESTURE_FRAMES, true);
+  PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, CLAMP_TOUCH_MOVEMENT * 0.1f, CLAMP_GESTURE_FRAMES * 0.1f, true);
 
   DALI_TEST_CHECK( gOnScrollStartCalled );
   DALI_TEST_CHECK( gOnScrollUpdateCalled );
@@ -982,8 +796,6 @@ int UtcDaliScrollViewAxisAutoLock(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
   scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
   scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
 
@@ -1050,8 +862,6 @@ int UtcDaliScrollViewConstraints(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
   scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
   scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
 
@@ -1099,8 +909,6 @@ int UtcDaliScrollViewBind(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
   scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
   scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
 
@@ -1281,8 +1089,6 @@ int UtcDaliScrollViewOvershoot(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
   scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
   scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
 
@@ -1309,8 +1115,8 @@ int UtcDaliScrollViewOvershoot(void)
   float overshootXValue = scrollView.GetProperty<float>(overshootXProperty);
   float overshootYValue = scrollView.GetProperty<float>(overshootYProperty);
   Vector3 positionValue = scrollView.GetProperty<Vector3>(scrollPositionProperty);
-  DALI_TEST_EQUALS(overshootXValue, -1.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(overshootYValue, -1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(overshootXValue, 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(overshootYValue, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(positionValue, Vector3::ZERO, TEST_LOCATION);
 
   float timeToReachOrigin;
@@ -1319,8 +1125,8 @@ int UtcDaliScrollViewOvershoot(void)
   SendPan(application, Gesture::Finished, currentPos);
   timeToReachOrigin = TestOvershootSnapDuration(application, scrollView);
 
-  DALI_TEST_CHECK( (timeToReachOrigin > TEST_DEFAULT_SNAP_OVERSHOOT_DURATION - TIME_TOLERANCE) &&
-                   (timeToReachOrigin < TEST_DEFAULT_SNAP_OVERSHOOT_DURATION + TIME_TOLERANCE) );
+  DALI_TEST_CHECK( (timeToReachOrigin > Toolkit::ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION - TIME_TOLERANCE) &&
+                   (timeToReachOrigin < Toolkit::ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION + TIME_TOLERANCE) );
 
   // 2. Repeat Scroll, but this time change overshoot snap duration to shorter time
   scrollView.SetSnapOvershootDuration(TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION);
@@ -1345,6 +1151,7 @@ int UtcDaliScrollViewOvershoot(void)
                    (timeToReachOrigin < TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION + TIME_TOLERANCE) );
 
   // 4. Repeat Scroll, but this time change overshoot function.
+  scrollView.SetSnapOvershootDuration(TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION);
   scrollView.SetSnapOvershootAlphaFunction(TestAlphaFunction);
 
   currentPos = PerformGestureDiagonalSwipe(application, Vector2(100.0f, 100.0f), Vector2(5.0f, 5.0f), 100, false);
@@ -1405,8 +1212,6 @@ int UtcDaliScrollViewSignalsSnapStart(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetRefreshInterval(0);
   scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
   scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
 
@@ -1421,8 +1226,6 @@ int UtcDaliScrollViewSignalsSnapStart(void)
 
   scrollView.ScrollTo(CLAMP_START_SCROLL_POSITION, 0.0f); // move in a little.
   Wait(application);
-
-  DALI_TEST_CHECK( !gOnSnapStartCalled );
 
   // First try a snap.
   PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, Vector2(0.5f, 0.0f), 60, true);

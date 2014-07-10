@@ -270,14 +270,11 @@ extern int UtcDaliScrollViewScrollToPosition(void);
 extern int UtcDaliScrollViewScrollToPage(void);
 extern int UtcDaliScrollViewScrollToActor(void);
 extern int UtcDaliScrollViewScrollToSnapPoint(void);
-extern int UtcDaliScrollViewRulerScale(void);
-extern int UtcDaliScrollViewTransformTo(void);
-extern int UtcDaliScrollViewRefreshInterval(void);
+extern int UtcDaliScrollViewSetScrollUpdateDistance(void);
 extern int UtcDaliScrollViewWrapMode(void);
 extern int UtcDaliScrollViewActorAutoSnap(void);
 extern int UtcDaliScrollViewSignalsStartComplete(void);
 extern int UtcDaliScrollViewSignalsUpdate(void);
-extern int UtcDaliScrollViewSignalsClamped(void);
 extern int UtcDaliScrollViewScrollSensitive(void);
 extern int UtcDaliScrollViewTouchesRequired(void);
 extern int UtcDaliScrollViewAxisAutoLock(void);
@@ -588,14 +585,11 @@ testcase tc_array[] = {
     {"UtcDaliScrollViewScrollToPage", UtcDaliScrollViewScrollToPage, scroll_view_startup, scroll_view_cleanup},
     {"UtcDaliScrollViewScrollToActor", UtcDaliScrollViewScrollToActor, scroll_view_startup, scroll_view_cleanup},
     {"UtcDaliScrollViewScrollToSnapPoint", UtcDaliScrollViewScrollToSnapPoint, scroll_view_startup, scroll_view_cleanup},
-    {"UtcDaliScrollViewRulerScale", UtcDaliScrollViewRulerScale, scroll_view_startup, scroll_view_cleanup},
-    {"UtcDaliScrollViewTransformTo", UtcDaliScrollViewTransformTo, scroll_view_startup, scroll_view_cleanup},
-    {"UtcDaliScrollViewRefreshInterval", UtcDaliScrollViewRefreshInterval, scroll_view_startup, scroll_view_cleanup},
+    {"UtcDaliScrollViewSetScrollUpdateDistance", UtcDaliScrollViewSetScrollUpdateDistance, scroll_view_startup, scroll_view_cleanup},
     {"UtcDaliScrollViewWrapMode", UtcDaliScrollViewWrapMode, scroll_view_startup, scroll_view_cleanup},
     {"UtcDaliScrollViewActorAutoSnap", UtcDaliScrollViewActorAutoSnap, scroll_view_startup, scroll_view_cleanup},
     {"UtcDaliScrollViewSignalsStartComplete", UtcDaliScrollViewSignalsStartComplete, scroll_view_startup, scroll_view_cleanup},
     {"UtcDaliScrollViewSignalsUpdate", UtcDaliScrollViewSignalsUpdate, scroll_view_startup, scroll_view_cleanup},
-    {"UtcDaliScrollViewSignalsClamped", UtcDaliScrollViewSignalsClamped, scroll_view_startup, scroll_view_cleanup},
     {"UtcDaliScrollViewScrollSensitive", UtcDaliScrollViewScrollSensitive, scroll_view_startup, scroll_view_cleanup},
     {"UtcDaliScrollViewTouchesRequired", UtcDaliScrollViewTouchesRequired, scroll_view_startup, scroll_view_cleanup},
     {"UtcDaliScrollViewAxisAutoLock", UtcDaliScrollViewAxisAutoLock, scroll_view_startup, scroll_view_cleanup},
