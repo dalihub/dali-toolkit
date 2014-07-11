@@ -18,8 +18,6 @@
 // EXTERNAL INCLUDES
 #include <sstream>
 
-#include <dali/public-api/adaptor-framework/common/color-controller.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/builder/builder-impl.h>
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
