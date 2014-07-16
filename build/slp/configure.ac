@@ -87,10 +87,18 @@ AC_SUBST(DALI_TOOLKIT_CFLAGS)
 devincludepath=${includedir}
 AC_SUBST(devincludepath)
 
+# Doxygen paths
+DOXYGEN_DOCS_DIR=../../../docs
+DOXYGEN_ROOT_DIR=../../..
+AC_SUBST(DOXYGEN_DOCS_DIR)
+AC_SUBST(DOXYGEN_ROOT_DIR)
+
 AC_CONFIG_FILES([
  Makefile
  dali-toolkit/Makefile
  dali-toolkit.pc
+ docs/Makefile
+ docs/dali.doxy
 ])
 
 AC_OUTPUT

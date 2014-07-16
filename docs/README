@@ -1,0 +1,9 @@
+To build the documentation from a Desktop build environment
+
+On the desktop:
+- cd dali-toolkit/build/slp/docs
+- doxygen dali.doxy
+  or
+  make
+
+To view the output: firefox docs/generated/html/index.html

@@ -4,6 +4,7 @@
 .directory
 Makefile.in
 Makefile
+dali.doxy
 *~
 *.o
 *.o.d
