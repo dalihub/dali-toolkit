@@ -22,7 +22,7 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/adaptor-framework/common/orientation.h>
+#include <dali/public-api/orientation.h>
 
 namespace Dali
 {
