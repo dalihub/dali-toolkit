@@ -99,7 +99,11 @@ exit 0
 # Files in Binary Packages
 ##############################
 %files
+%if 0%{?enable_dali_smack_rules}
+%manifest dali-toolkit.manifest-smack
+%else
 %manifest dali-toolkit.manifest
+%endif
 %defattr(-,root,root,-)
 %{_libdir}/lib%{name}.so*
 %{dali_toolkit_image_files}/*
