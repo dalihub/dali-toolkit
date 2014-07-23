@@ -9,7 +9,6 @@ Source0:    %{name}-%{version}.tar.gz
 
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-Requires:       dali-adaptor-dali-feedback-plugin
 Requires:       dali
 # Do NOT put an adaptor here - it is an application choice which adaptor to use
 BuildRequires:  pkgconfig
