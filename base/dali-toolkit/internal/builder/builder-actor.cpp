@@ -21,7 +21,8 @@
 #include <dali/public-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/builder/builder-get-is.inl.h>
+#include <dali-toolkit/internal/builder/replacement.h>
+#include <dali-toolkit/internal/builder/builder-impl.h>
 
 namespace Dali
 {
@@ -33,12 +34,13 @@ namespace Internal
 {
 
 using namespace Dali::Scripting;
+extern bool SetPropertyFromNode( const TreeNode& node, Property::Value& value, const Replacement& constant );
 
 /*
  * Handles special case actor configuration (anything thats not already a property)
  *
  */
-Actor SetupActor( const TreeNode& child, Actor& actor )
+Actor SetupActor( const TreeNode& child, Actor& actor, const Replacement& constant )
 {
   DALI_ASSERT_ALWAYS( actor && "Empty actor handle" );
 
@@ -66,6 +68,32 @@ Actor SetupActor( const TreeNode& child, Actor& actor )
     else if( OptionalString anchor = IsString(child, "anchor-point") )
     {
       actor.SetAnchorPoint( GetAnchorConstant(*anchor) );
+    }
+  }
+
+  // Add custom properties
+  if( OptionalChild customPropertiesChild = IsChild(child,  "custom-properties") )
+  {
+    const TreeNode& customPropertiesNode = *customPropertiesChild;
+    const TreeConstIter endIter = customPropertiesNode.CEnd();
+    for( TreeConstIter iter = customPropertiesNode.CBegin(); endIter != iter; ++iter )
+    {
+      const TreeNode::KeyNodePair& keyChild = *iter;
+      std::string key( keyChild.first );
+
+      Property::Index index = actor.GetPropertyIndex( key );
+      Property::Value value;
+      if( SetPropertyFromNode( keyChild.second, value, constant ))
+      {
+        if( Property::INVALID_INDEX == index )
+        {
+          index = actor.RegisterProperty( key, value );
+        }
+        else
+        {
+          actor.SetProperty( index, value );
+        }
+      }
     }
   }
 

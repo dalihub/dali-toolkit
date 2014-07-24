@@ -35,6 +35,15 @@ void dali_tableview_cleanup(void)
 
 namespace
 {
+
+const char* const PROPERTY_NAME_ROWS = "rows";
+const char* const PROPERTY_NAME_COLUMNS = "columns";
+const char* const PROPERTY_NAME_CELL_PADDING = "cell-padding";
+const char* const PROPERTY_NAME_LAYOUT_ANIMATION_DURATION = "layout-animation-duration";
+const char* const PROPERTY_NAME_LAYOUT_ROWS = "layout-rows";
+const char* const PROPERTY_NAME_LAYOUT_COLUMNS = "layout-columns";
+
+
 static bool gObjectCreatedCallBackCalled;
 
 static void TestCallback(BaseHandle handle)
@@ -539,5 +548,148 @@ int UtcDaliTableViewMetricsAssert(void)
     tet_printf("8. Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
     DALI_TEST_EQUALS(e.mCondition, "columnIndex < mRelativeWidths.size()", TEST_LOCATION);
   }
+  END_TEST;
+}
+
+int UtcDaliTableViewSetGetProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTableViewSetGetProperty");
+
+  // Create a 1x1 table-view
+  TableView tableView = TableView::New(1,1);
+  tableView.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, Constraint100() ) );
+  DALI_TEST_CHECK( tableView );
+
+  // Test "rows" property
+  DALI_TEST_CHECK( tableView.GetPropertyIndex( PROPERTY_NAME_ROWS ) == TableView::PROPERTY_ROWS );
+
+  tableView.SetProperty( TableView::PROPERTY_ROWS, 4u );
+
+  DALI_TEST_CHECK( tableView.GetRows() == 4u );
+  DALI_TEST_CHECK( tableView.GetProperty(TableView::PROPERTY_ROWS).Get<unsigned int>() == 4u );
+
+  // Test "columns" property
+  DALI_TEST_CHECK( tableView.GetPropertyIndex( PROPERTY_NAME_COLUMNS ) == TableView::PROPERTY_COLUMNS );
+
+  tableView.SetProperty( TableView::PROPERTY_COLUMNS, 5u );
+
+  DALI_TEST_CHECK( tableView.GetColumns() == 5u );
+  DALI_TEST_CHECK( tableView.GetProperty(TableView::PROPERTY_COLUMNS).Get<unsigned int>() == 5u );
+
+  // Test "cell-padding" property
+  DALI_TEST_CHECK( tableView.GetPropertyIndex( PROPERTY_NAME_CELL_PADDING ) == TableView::PROPERTY_CELL_PADDING );
+
+  tableView.SetProperty( TableView::PROPERTY_CELL_PADDING, Size( 6.f, 8.f ) );
+
+  DALI_TEST_EQUALS( tableView.GetCellPadding(), Size(6.f, 8.f), TEST_LOCATION );
+  DALI_TEST_EQUALS( tableView.GetProperty(TableView::PROPERTY_CELL_PADDING).Get<Vector2>(), Vector2(6.f,8.f), TEST_LOCATION );
+
+  // Test "layout-animation-duration" property
+  DALI_TEST_CHECK( tableView.GetPropertyIndex(PROPERTY_NAME_LAYOUT_ANIMATION_DURATION) == TableView::PROPERTY_LAYOUT_ANIMATION_DURATION );
+
+  tableView.SetProperty( TableView::PROPERTY_LAYOUT_ANIMATION_DURATION, 1.5f );
+
+  DALI_TEST_EQUALS( tableView.GetLayoutAnimationDuration(), 1.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( tableView.GetProperty(TableView::PROPERTY_LAYOUT_ANIMATION_DURATION).Get<float>(), 1.5f, TEST_LOCATION );
+
+  //{ "policy": "fixed", "value": 30.0 },
+  Property::Map item1;
+  item1.push_back( Property::StringValuePair( "policy", "fixed" ) );
+  item1.push_back( Property::StringValuePair( "value", 30.f) );
+  //{ "policy": "relative", "value": 0.2 },
+  Property::Map item2;
+  item2.push_back( Property::StringValuePair( "policy", "relative" ) );
+  item2.push_back( Property::StringValuePair( "value", 0.2f ) );
+
+  // Test "layout-rows" property
+  DALI_TEST_CHECK( tableView.GetPropertyIndex(PROPERTY_NAME_LAYOUT_ROWS) == TableView::PROPERTY_LAYOUT_ROWS );
+
+  /*
+   * "layout-rows":
+   *  {
+   *    "1": { "policy": "fixed", "value": 30 },
+   *    "3": { "policy": "relative", "value": 0.2 }
+   *   }
+   */
+  Property::Map layoutRows;
+  layoutRows.push_back( Property::StringValuePair("1", item1) );
+  layoutRows.push_back( Property::StringValuePair("3", item2) );
+  tableView.SetProperty( TableView::PROPERTY_LAYOUT_ROWS, layoutRows );
+
+  DALI_TEST_EQUALS( tableView.GetFixedHeight( 1u ), 30.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( tableView.GetRelativeHeight( 3u ), 0.2f, TEST_LOCATION );
+
+  Property::Map layoutRowsGet = tableView.GetProperty(TableView::PROPERTY_LAYOUT_ROWS).Get<Property::Map>();
+  DALI_TEST_CHECK( layoutRowsGet[0].first.compare(layoutRows[0].first) == 0 );
+  DALI_TEST_CHECK( layoutRowsGet[0].second.GetValue( "policy" ).Get<std::string>().compare(layoutRows[0].second.GetValue( "policy" ).Get<std::string>()) == 0 );
+  DALI_TEST_EQUALS( layoutRowsGet[0].second.GetValue( "value" ).Get<float>(),layoutRows[0].second.GetValue( "value" ).Get<float>(), TEST_LOCATION );
+  DALI_TEST_CHECK( layoutRowsGet[1].first.compare(layoutRows[1].first) == 0 );
+  DALI_TEST_CHECK( layoutRowsGet[1].second.GetValue( "policy" ).Get<std::string>().compare(layoutRows[1].second.GetValue( "policy" ).Get<std::string>()) == 0 );
+  DALI_TEST_EQUALS( layoutRowsGet[1].second.GetValue( "value" ).Get<float>(),layoutRows[1].second.GetValue( "value" ).Get<float>(), TEST_LOCATION );
+
+  // Test "layout-columns" property
+  DALI_TEST_CHECK( tableView.GetPropertyIndex( PROPERTY_NAME_LAYOUT_COLUMNS ) == TableView::PROPERTY_LAYOUT_COLUMNS );
+
+  /*
+   * "layout-columns":
+   *  {
+   *    "2": { "policy": "relative", "value": 0.2 },
+   *    "3": { "policy": "fixed", "value": 30 }
+   *   }
+   */
+  Property::Map layoutColumns;
+  layoutColumns.push_back( Property::StringValuePair("2", item2) );
+  layoutColumns.push_back( Property::StringValuePair("3", item1) );
+  tableView.SetProperty( TableView::PROPERTY_LAYOUT_COLUMNS, layoutColumns );
+
+  DALI_TEST_EQUALS( tableView.GetRelativeWidth( 2u ), 0.2f, TEST_LOCATION );
+  DALI_TEST_EQUALS( tableView.GetFixedWidth( 3u ), 30.f, TEST_LOCATION );
+
+  Property::Map layoutColumnsGet = tableView.GetProperty(TableView::PROPERTY_LAYOUT_COLUMNS).Get<Property::Map>();
+  DALI_TEST_CHECK( layoutColumnsGet[0].first.compare(layoutColumns[0].first) == 0 );
+  DALI_TEST_CHECK( layoutColumnsGet[0].second.GetValue( "policy" ).Get<std::string>().compare(layoutColumns[0].second.GetValue( "policy" ).Get<std::string>()) == 0 );
+  DALI_TEST_EQUALS( layoutColumnsGet[0].second.GetValue( "value" ).Get<float>(),layoutColumns[0].second.GetValue( "value" ).Get<float>(), TEST_LOCATION );
+  DALI_TEST_CHECK( layoutColumnsGet[1].first.compare(layoutColumns[1].first) == 0 );
+  DALI_TEST_CHECK( layoutColumnsGet[1].second.GetValue( "policy" ).Get<std::string>().compare(layoutColumns[1].second.GetValue( "policy" ).Get<std::string>()) == 0 );
+  DALI_TEST_EQUALS( layoutColumnsGet[1].second.GetValue( "value" ).Get<float>(),layoutColumns[1].second.GetValue( "value" ).Get<float>(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTableViewCustomProperties(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTableViewCustomProperties");
+
+  // Create a 10x10 table-view
+  TableView tableView = TableView::New(10,10);
+  tableView.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, Constraint100() ) );
+  DALI_TEST_CHECK( tableView );
+
+  // Create a child actor with the custom properties
+  Actor child1 = Actor::New();
+  child1.RegisterProperty( TableView::CELL_INDICES_PROPERTY_NAME, Vector2( 3, 4 ) );
+  tableView.Add( child1 );
+  // Check for actors at actual positions.
+  DALI_TEST_CHECK( tableView.GetChildAt(TableView::CellPosition(3,4)) == child1);
+
+  // Create a second child actor with the custom properties
+  Actor child2 = Actor::New();
+  float rowSpan = 3.f;
+  float columnSpan = 2.f;
+  child2.RegisterProperty( TableView::CELL_INDICES_PROPERTY_NAME, Vector2( 6, 1 ) );
+  child2.RegisterProperty( TableView::ROW_SPAN_PROPERTY_NAME, rowSpan );
+  child2.RegisterProperty( TableView::COLUMN_SPAN_PROPERTY_NAME, columnSpan );
+  tableView.Add( child2 );
+  // Check for actors at actual positions.
+  for( int i=0; i<rowSpan; i++ )
+  {
+    for(int j=0; j<columnSpan; j++)
+    {
+      DALI_TEST_CHECK( tableView.GetChildAt(TableView::CellPosition(6+i,1+j)) == child2);
+    }
+  }
+
   END_TEST;
 }

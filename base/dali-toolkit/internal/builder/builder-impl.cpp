@@ -51,7 +51,7 @@ extern bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Prop
 extern bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value, const Replacement& replacements );
 extern Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor);
 extern Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor);
-extern Actor SetupActor( const TreeNode& node, Actor& actor );
+extern Actor SetupActor( const TreeNode& node, Actor& actor, const Replacement& constant );
 
 #if defined(DEBUG_ENABLED)
 Integration::Log::Filter* gFilterScript  = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_SCRIPT");
@@ -223,7 +223,7 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
 
       std::string key( keyChild.first );
 
-      // ignore special fields; type,actors,signals
+      // ignore special fields; type,actors,signals,styles
       if(key == KEYNAME_TYPE || key == KEYNAME_ACTORS || key == KEYNAME_SIGNALS || key == KEYNAME_STYLES)
       {
         continue;
@@ -329,7 +329,7 @@ void Builder::ApplyProperties( const TreeNode& root, const TreeNode& node,
 
     if( actor )
     {
-      SetupActor( node, actor );
+      SetupActor( node, actor, constant );
 
       // add signals
       SetupSignalAction( mSlotDelegate.GetConnectionTracker(), root, node, actor );
