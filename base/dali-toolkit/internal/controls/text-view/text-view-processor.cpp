@@ -1176,7 +1176,8 @@ void InitializeTextActorInfo( TextView::RelayoutData& relayoutData )
                     // If still there is no text-actor, create one.
                     if( !textActor )
                     {
-                      textActor = TextActor::New( Text(), characterLayout.mStyledText.mStyle, false, true );
+                      TextActorParameters parameters( characterLayout.mStyledText.mStyle, TextActorParameters::FONT_DETECTION_OFF );
+                      textActor = TextActor::New( NULL, parameters );
                     }
                     else
                     {
