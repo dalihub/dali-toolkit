@@ -1,26 +1,30 @@
 #ifndef __DALI_TOOLKIT_CONTROL_IMPL_H__
 #define __DALI_TOOLKIT_CONTROL_IMPL_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 /**
  * @addtogroup CAPI_DALI_TOOLKIT_CONTROLS_MODULE
  * @{
  */
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -31,9 +35,10 @@ namespace Dali DALI_IMPORT_API
 namespace Toolkit
 {
 
+class StyleManager;
+
 namespace Internal DALI_INTERNAL
 {
-class StyleChangeProcessor;
 class RelayoutControllerImpl;
 class KeyInputFocusManager;
 }
@@ -95,6 +100,15 @@ public:
    * @return true if the pan gesture has been consumed by this control
    */
   virtual bool OnAccessibilityPan(PanGesture gesture);
+
+  /**
+   * @brief This method should be overridden by deriving classes when they wish to respond the accessibility
+   * touch event.
+   *
+   * @param[in] touchEvent The touch event.
+   * @return true if the touch event has been consumed by this control
+   */
+  virtual bool OnAccessibilityTouch(const TouchEvent& touchEvent);
 
   /**
    * @brief This method should be overridden by deriving classes when they wish to respond
@@ -290,11 +304,31 @@ private: // For derived classes to override
 
   /**
    * @brief This method should be overridden by deriving classes when
+   * they wish to be notified when the style manager changes the theme.
+   *
+   * @param[in] styleManager  The StyleManager object.
+   */
+  virtual void OnThemeChange( Toolkit::StyleManager styleManager );
+
+  /**
+   * @brief This method should be overridden by deriving classes when
+   * they wish to be notified when the style changes the default font.
+   *
+   * @param[in] defaultFontChange  Information denoting whether the default font has changed.
+   * @param[in] defaultFontSizeChange Information denoting whether the default font size has changed.
+   */
+  virtual void OnFontChange( bool defaultFontChange, bool defaultFontSizeChange ){ }
+
+  /**
+   * @deprecated Use OnFontChange() instead.
+   * Before the using of StyleManager, the StyleChange only deals with font change.
+   *
+   * @brief This method should be overridden by deriving classes when
    * they wish to be notified when the style changes.
    *
    * @param[in] change  Information denoting what has changed.
    */
-  virtual void OnStyleChange(StyleChange change) { }
+  virtual void OnStyleChange( StyleChange change ) { }
 
   /**
    * @brief Called whenever a pinch gesture is detected on this control.
@@ -505,20 +539,38 @@ private: // From CustomActorImpl, derived classes can override these.
 private:
 
   /**
-   * @brief Perform the activated action.
+   * @brief This method is the callback for the StyleChangeSignal from StyleManager
    *
-   * @param[in] attributes The attributes to perfrom this action.
+   * @param[in] styleManager The StyleManager Object
+   * @param[in] change  Information denoting what has changed.
    */
-  void DoActivatedAction(const PropertyValueContainer& attributes);
+  void DoStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
 
 protected: // Construction
 
+  // Flags for the constructor
+  enum ControlBehaviour
+  {
+    CONTROL_BEHAVIOUR_NONE        = 0,
+    REQUIRES_TOUCH_EVENTS         = 1<<1,     ///< True if the OnTouchEvent() callback is required.
+    REQUIRES_STYLE_CHANGE_SIGNALS = 1<<2,     ///< True if needs to monitor style change signals such as theme/font change
+    NO_SIZE_NEGOTIATION           = 1<<3      ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm
+  };
+
   /**
+   * @deprecated Use the constructor taking flags instead
    * @brief Create a Control.
    *
    * @param[in] requiresTouchEvents True if the OnTouchEvent() callback is required.
    */
   Control(bool requiresTouchEvents);
+
+  /**
+   * @brief Create a Control.
+   *
+   * @param[in] behaviourFlags Behavioural flags from ControlBehaviour enum
+   */
+  Control(ControlBehaviour behaviourFlags);
 
 public:
 
@@ -684,8 +736,6 @@ private:
    */
   bool EmitKeyEventSignal(const KeyEvent& event);
 
-
-
 private:
 
   // Undefined
@@ -693,9 +743,8 @@ private:
   Control& operator=(const Control&);
 
   class Impl;
-  Impl *mImpl;
+  Impl* mImpl;
 
-  friend class Internal::StyleChangeProcessor;
   friend class Internal::RelayoutControllerImpl;   ///< Relayout controller needs to call Relayout() which is private.
   friend class Internal::KeyInputFocusManager;     ///< KeyInputFocusManager needs to call which is private.
 };

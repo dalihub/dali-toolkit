@@ -1,21 +1,22 @@
 #ifndef __DALI_TOOLKIT_INTERNAL_FOCUS_MANAGER_H__
 #define __DALI_TOOLKIT_INTERNAL_FOCUS_MANAGER_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // EXTERNAL INCLUDES
 #include <string>
@@ -170,16 +171,6 @@ public:
   bool GetWrapMode() const;
 
   /**
-   * @copydoc Toolkit::FocusManager::SetEndCapFeedbackEnabled
-   */
-  void SetEndCapFeedbackEnabled(bool enabled);
-
-  /**
-   * @copydoc Toolkit::FocusManager::GetEndCapFeedbackEnabled
-   */
-  bool GetEndCapFeedbackEnabled() const;
-
-  /**
    * @copydoc Toolkit::FocusManager::SetFocusIndicatorActor
    */
   void SetFocusIndicatorActor(Actor indicator);
@@ -303,27 +294,31 @@ private:
 
   /**
    * Perform the accessibility action to move focus to the previous focusable actor (by one finger flick up).
+   * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionPrevious();
+  virtual bool AccessibilityActionPrevious(bool allowEndFeedback);
 
   /**
    * Perform the accessibility action to move focus to the next focusable actor (by one finger flick down).
+   * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionNext();
+  virtual bool AccessibilityActionNext(bool allowEndFeedback);
 
   /**
    * Perform the accessibility action to move focus to the previous focusable actor (by one finger flick left).
+   * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionReadPrevious();
+  virtual bool AccessibilityActionReadPrevious(bool allowEndFeedback);
 
   /**
    * Perform the accessibility action to move focus to the next focusable actor (by one finger flick right).
+   * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
    * @return whether the accessibility action is performed or not.
    */
-  virtual bool AccessibilityActionReadNext();
+  virtual bool AccessibilityActionReadNext(bool allowEndFeedback);
 
   /**
    * Perform the accessibility action to focus and read the actor (by one finger tap or move).
@@ -358,6 +353,13 @@ private:
    * @return whether the accessibility action is performed or not.
    */
   virtual bool AccessibilityActionBack();
+
+  /**
+   * Perform the accessibility action to mouse move (by one finger tap & hold and move).
+   * @param touchEvent touch event structure
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionTouch(const TouchEvent& touchEvent);
 
 private:
 

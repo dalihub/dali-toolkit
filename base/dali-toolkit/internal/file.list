@@ -4,7 +4,6 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/controls/relayout-controller.cpp \
    $(toolkit_base_src_dir)/controls/relayout-controller-impl.cpp \
    $(toolkit_base_src_dir)/controls/relayout-helper.cpp \
-   $(toolkit_base_src_dir)/controls/style-change-processor.cpp \
    $(toolkit_base_src_dir)/controls/alignment/alignment-impl.cpp \
    $(toolkit_base_src_dir)/controls/buttons/button-impl.cpp \
    $(toolkit_base_src_dir)/controls/buttons/check-box-button-default-painter-impl.cpp \
@@ -17,6 +16,7 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/controls/scroll-component/scroll-bar-internal-impl.cpp \
    $(toolkit_base_src_dir)/controls/scroll-component/scroll-bar-internal.cpp \
    $(toolkit_base_src_dir)/controls/scrollable/item-view/item-view-impl.cpp \
+   $(toolkit_base_src_dir)/controls/scrollable/bouncing-effect-actor.cpp \
    $(toolkit_base_src_dir)/controls/scrollable/scrollable-impl.cpp \
    $(toolkit_base_src_dir)/controls/scrollable/scroll-connector-impl.cpp \
    $(toolkit_base_src_dir)/controls/scrollable/scroll-view/scroll-base-impl.cpp \
@@ -37,6 +37,7 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/controls/table-view/table-view-impl.cpp \
    $(toolkit_base_src_dir)/controls/text-input/text-input-decorator-impl.cpp \
    $(toolkit_base_src_dir)/controls/text-input/text-input-handles-impl.cpp \
+   $(toolkit_base_src_dir)/controls/text-input/text-input-text-highlight-impl.cpp \
    $(toolkit_base_src_dir)/controls/text-input/text-input-impl.cpp \
    $(toolkit_base_src_dir)/controls/text-input/text-input-popup-impl.cpp \
    $(toolkit_base_src_dir)/controls/text-view/relayout-utilities.cpp   \
@@ -56,4 +57,14 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/factory/localized-control-factory-impl.cpp \
    $(toolkit_base_src_dir)/focus-manager/focus-manager-impl.cpp \
    $(toolkit_base_src_dir)/focus-manager/keyboard-focus-manager-impl.cpp \
-   $(toolkit_base_src_dir)/focus-manager/keyinput-focus-manager-impl.cpp
+   $(toolkit_base_src_dir)/focus-manager/keyinput-focus-manager-impl.cpp \
+   $(toolkit_base_src_dir)/styling/style-manager-impl.cpp \
+   $(toolkit_base_src_dir)/builder/builder-impl.cpp \
+   $(toolkit_base_src_dir)/builder/builder-animations.cpp \
+   $(toolkit_base_src_dir)/builder/builder-set-property.cpp \
+   $(toolkit_base_src_dir)/builder/builder-signals.cpp \
+   $(toolkit_base_src_dir)/builder/builder-actor.cpp \
+   $(toolkit_base_src_dir)/builder/json-parser-state.cpp \
+   $(toolkit_base_src_dir)/builder/json-parser-impl.cpp \
+   $(toolkit_base_src_dir)/builder/tree-node-manipulator.cpp \
+   $(toolkit_base_src_dir)/builder/replacement.cpp

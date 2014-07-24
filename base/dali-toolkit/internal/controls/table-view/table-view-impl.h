@@ -1,21 +1,22 @@
 #ifndef __DALI_TOOLKIT_INTERNAL_TABLE_VIEW_H__
 #define __DALI_TOOLKIT_INTERNAL_TABLE_VIEW_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -38,6 +39,13 @@ namespace Internal
 class TableView : public Control
 {
 public:
+
+  // Properties
+  enum
+  {
+    TABLEVIEW_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    TABLEVIEW_PROPERTY_END_INDEX = TABLEVIEW_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
+  };
 
   /**
    * Structure for the layout data
@@ -186,6 +194,24 @@ public:
    */
   unsigned int GetColumns();
 
+  // Properties
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index index );
+
 private: // From Control
 
   /**
@@ -264,6 +290,41 @@ private: // Implementation
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~TableView();
+
+private: // scripting support
+
+  /**
+   * Called to set the heights/widths property.
+   * @param[in] tableViewImpl The object whose property is set.
+   * @param[in] funcFixed The set function to call, it can be SetFixedHeight or SetFixedWidths.
+   * @param[in] funcRelative The set function to call, it can be SetRelativeHeight or SetRelativeWidths.
+   * @param[in] value The new property value.
+   */
+  static void SetHeightOrWidthProperty( TableView& tableViewImpl,
+                                        void(TableView::*funcFixed)(unsigned int, float),
+                                        void(TableView::*funcRelative)(unsigned int, float),
+                                        const Property::Value& map );
+
+  /**
+   * Called to retrieve the property value of row heights.
+   * @return The property value of row heights.
+   */
+  Property::Value GetRowHeightsPropertyValue();
+
+  /**
+   * Called to retrieve the property value of column widths.
+   * @return The fixed-widths property value.
+   */
+  Property::Value GetColumnWidthsPropertyValue();
+
+  /**
+   * Generate the map type property value from the size vectors.
+   * @param[in] fixedSize The vector of fixed heights or widths.
+   * @param[in] relativeSize The vector of relative heights or widths.
+   * @param[out] map The property value.
+   */
+  void GetMapPropertyValue( const std::vector<float>& fixedSize, const std::vector<float>& relativeSize, Property::Map& map );
+
 
   /**
    * Helper class to prevent child adds and removes from causing relayout

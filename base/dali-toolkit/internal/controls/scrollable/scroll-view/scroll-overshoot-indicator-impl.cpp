@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
 
@@ -20,10 +21,29 @@
 #include <boost/bind.hpp>
 
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
+#include <dali-toolkit/internal/controls/scrollable/bouncing-effect-actor.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
-#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 
 using namespace Dali;
+
+namespace
+{
+const float DEFAULT_MAX_OVERSHOOT_HEIGHT = 36.0f;  // 36 pixels
+const Vector2 OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE( 720.0f, 42.0f );
+const float OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD = 180.0f;
+
+// local helper function to resize the height of the bounce actor
+float GetBounceActorHeight( float width )
+{
+  return (width > OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD) ? OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height : OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height * 0.5f;
+}
+
+const float DEFAULT_OVERSHOOT_ANIMATION_DURATION = 0.35f;  // time in seconds
+const float MAX_OVERSHOOT_NOTIFY_AMOUNT = 0.9f;                     // maximum amount to set notification for increased overshoot, beyond this we just wait for it to reduce again
+const float MIN_OVERSHOOT_NOTIFY_AMOUNT = Math::MACHINE_EPSILON_1;  // minimum amount to set notification for reduced overshoot, beyond this we just wait for it to increase again
+const float OVERSHOOT_NOTIFY_STEP = 0.1f;                           // amount to set notifications beyond current overshoot value
+
+}
 
 namespace Dali
 {
@@ -34,12 +54,7 @@ namespace Toolkit
 namespace Internal
 {
 
-const float DEFAULT_MAX_OVERSHOOT_HEIGHT = 36.0f;  // 36 pixels
-const Rect<int> OVERSHOOT_RIPPLE_IMAGE_1_PIXEL_AREA( 0, 0, 720, 58 );
-const float DEFAULT_OVERSHOOT_ANIMATION_DURATION = 0.35f;  // time in seconds
-
-ScrollOvershootIndicator::ScrollOvershootIndicator(Scrollable& scrollable) :
-  mScrollable(scrollable),
+ScrollOvershootIndicator::ScrollOvershootIndicator() :
   mEffectX(NULL),
   mEffectY(NULL)
 {
@@ -50,39 +65,35 @@ ScrollOvershootIndicator::~ScrollOvershootIndicator()
 
 }
 
-ScrollOvershootIndicator* ScrollOvershootIndicator::New(Scrollable& scrollable)
+ScrollOvershootIndicator* ScrollOvershootIndicator::New()
 {
-  ScrollOvershootIndicator* scrollOvershootPtr = new ScrollOvershootIndicator(scrollable);
+  ScrollOvershootIndicator* scrollOvershootPtr = new ScrollOvershootIndicator();
   return scrollOvershootPtr;
 }
 
-void ScrollOvershootIndicator::Enable(bool enable)
+void ScrollOvershootIndicator::AttachToScrollable(Scrollable& scrollable)
 {
-  if(enable)
+  if(!mEffectX)
   {
-    Actor scrollableActor = mScrollable.Self();
-    if(!mEffectX)
-    {
-      mEffectX = ScrollOvershootEffectRipple::New(false);
-    }
-    mEffectX->Apply(mScrollable);
-    if(!mEffectY)
-    {
-      mEffectY = ScrollOvershootEffectRipple::New(true);
-    }
-    mEffectY->Apply(mScrollable);
-    mEffectY->SetPropertyNotifications(scrollableActor);
+    mEffectX = ScrollOvershootEffectRipple::New(false, scrollable);
   }
-  else
+  mEffectX->Apply();
+  if(!mEffectY)
   {
-    if(mEffectX)
-    {
-      mEffectX->Remove(mScrollable);
-    }
-    if(mEffectY)
-    {
-      mEffectY->Remove(mScrollable);
-    }
+    mEffectY = ScrollOvershootEffectRipple::New(true, scrollable);
+  }
+  mEffectY->Apply();
+}
+
+void ScrollOvershootIndicator::DetachFromScrollable(Scrollable& scrollable)
+{
+  if(mEffectX)
+  {
+    mEffectX->Remove(scrollable);
+  }
+  if(mEffectY)
+  {
+    mEffectY->Remove(scrollable);
   }
 }
 
@@ -92,287 +103,304 @@ void ScrollOvershootIndicator::Reset()
   mEffectY->Reset();
 }
 
-ScrollOvershootEffect::ScrollOvershootEffect(bool vertical) :
+void ScrollOvershootIndicator::SetOvershootEffectColor( const Vector4& color )
+{
+  if(mEffectX)
+  {
+    mEffectX->SetOvershootEffectColor(color);
+  }
+  if(mEffectY)
+  {
+    mEffectY->SetOvershootEffectColor(color);
+  }
+}
+
+void ScrollOvershootIndicator::ClearOvershoot()
+{
+  if(mEffectX)
+  {
+    mEffectX->SetOvershoot(0.0f);
+  }
+  if(mEffectY)
+  {
+    mEffectY->SetOvershoot(0.0f);
+  }
+}
+
+ScrollOvershootEffect::ScrollOvershootEffect( bool vertical ) :
     mVertical(vertical)
 {
 
 }
 
-ScrollOvershootEffectRipple::ScrollOvershootEffectRipple(bool vertical) :
-    ScrollOvershootEffect(vertical),
-    mMaxOvershootImageSize(DEFAULT_MAX_OVERSHOOT_HEIGHT)
+bool ScrollOvershootEffect::IsVertical() const
 {
-  mRippleEffect = BouncingEffect::New(Scrollable::DEFAULT_OVERSHOOT_COLOUR);
-  mOvershootImage = CreateSolidColorActor(Vector4::ONE);
-  mOvershootImage.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  mOvershootImage.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  mOvershootImage.SetDrawMode(DrawMode::OVERLAY);
-  mOvershootImage.SetShaderEffect(mRippleEffect);
-  mOvershootImage.SetVisible(false);
-  mAnimatingOvershootOn = false;
-  mAnimateOvershootOff = false;
+  return mVertical;
 }
 
-void ScrollOvershootEffectRipple::Apply(Scrollable& scrollable)
+ScrollOvershootEffectRipple::ScrollOvershootEffectRipple( bool vertical, Scrollable& scrollable ) :
+    ScrollOvershootEffect( vertical ),
+    mAttachedScrollView(scrollable),
+    mCanScrollPropertyIndex(Property::INVALID_INDEX),
+    mOvershootProperty(Property::INVALID_INDEX),
+    mEffectOvershootProperty(Property::INVALID_INDEX),
+    mMaxOvershootImageSize(DEFAULT_MAX_OVERSHOOT_HEIGHT),
+    mOvershootAnimationDuration(DEFAULT_OVERSHOOT_ANIMATION_DURATION),
+    mOvershoot(0.0f),
+    mAnimationStateFlags(0)
 {
-  Actor scrollableActor = scrollable.Self();
+  mOvershootOverlay = CreateBouncingEffectActor(mEffectOvershootProperty);
+  mOvershootOverlay.SetColor(mAttachedScrollView.GetOvershootEffectColor());
+  mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
+  mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  mOvershootOverlay.SetDrawMode(DrawMode::OVERLAY);
+  mOvershootOverlay.SetVisible(false);
+
+}
+
+void ScrollOvershootEffectRipple::Apply()
+{
+  Actor self = mAttachedScrollView.Self();
+  mOvershootProperty = self.GetPropertyIndex(IsVertical() ? Toolkit::ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME : Toolkit::ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME);
+  mCanScrollPropertyIndex = self.GetPropertyIndex(IsVertical() ? Scrollable::SCROLLABLE_CAN_SCROLL_VERTICAL : Scrollable::SCROLLABLE_CAN_SCROLL_HORIZONTAL);
 
   // make sure height is set, since we only create a constraint for image width
-  mOvershootImage.SetSize(OVERSHOOT_RIPPLE_IMAGE_1_PIXEL_AREA.width, OVERSHOOT_RIPPLE_IMAGE_1_PIXEL_AREA.height);
+  mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.width, OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height);
 
-  UpdateConstraints(scrollableActor);
-  scrollable.AddOverlay(mOvershootImage);
+  mAttachedScrollView.AddOverlay(mOvershootOverlay);
 
-  SetPropertyNotifications(scrollableActor);
+  UpdatePropertyNotifications();
 }
 
-void ScrollOvershootEffectRipple::Remove(Scrollable& scrollable)
+void ScrollOvershootEffectRipple::Remove( Scrollable& scrollable )
 {
-  if(mOvershootImage)
+  if(mOvershootOverlay)
   {
-    if(mSizeConstraint)
+    if(mOvershootIncreaseNotification)
     {
-      mOvershootImage.RemoveConstraint(mSizeConstraint);
-      mSizeConstraint = NULL;
+      scrollable.Self().RemovePropertyNotification(mOvershootIncreaseNotification);
+      mOvershootIncreaseNotification.Reset();
     }
-    if(mPositionConstraint)
+    if(mOvershootDecreaseNotification)
     {
-      mOvershootImage.RemoveConstraint(mPositionConstraint);
-      mPositionConstraint = NULL;
+      scrollable.Self().RemovePropertyNotification(mOvershootDecreaseNotification);
+      mOvershootDecreaseNotification.Reset();
     }
-    scrollable.RemoveOverlay(mOvershootImage);
+    scrollable.RemoveOverlay(mOvershootOverlay);
   }
 }
 
 void ScrollOvershootEffectRipple::Reset()
 {
-  mAnimatingOvershootOn = false;
-  mAnimateOvershootOff = false;
-  mOvershootImage.SetVisible(false);
-  mRippleEffect.SetProgressRate(0.0f);
-  if(mScrollOvershootAnimation)
-  {
-    mScrollOvershootAnimation.Clear();
-    mScrollOvershootAnimation.Reset();
-  }
+  mOvershootOverlay.SetVisible(false);
+  mOvershootOverlay.SetProperty( mEffectOvershootProperty, 0.f);
 }
 
-void ScrollOvershootEffectRipple::UpdateConstraints(Actor& scrollable)
+void ScrollOvershootEffectRipple::UpdatePropertyNotifications()
 {
-  int overshootPropertyIndex = mRippleEffect.GetPropertyIndex(mRippleEffect.GetProgressRatePropertyName());
-  Constraint constraint;
-  if(!mSizeConstraint)
+  float absOvershoot = fabsf(mOvershoot);
+
+  Actor self = mAttachedScrollView.Self();
+  // update overshoot increase notify
+  if( mOvershootIncreaseNotification )
   {
-    constraint = Constraint::New<float>( Actor::SIZE_WIDTH,
-                                                      Source( scrollable, IsVertical() ? Actor::SIZE_WIDTH : Actor::SIZE_HEIGHT),
-                                                      EqualToConstraint() );
-    mSizeConstraint = mOvershootImage.ApplyConstraint(constraint);
+    self.RemovePropertyNotification( mOvershootIncreaseNotification );
+    mOvershootIncreaseNotification.Reset();
   }
-
-  if(!mPositionConstraint)
+  if( absOvershoot < MAX_OVERSHOOT_NOTIFY_AMOUNT )
   {
-    constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                           Source( scrollable, Actor::SIZE ),
-                                           Source( mRippleEffect, overshootPropertyIndex ),
-                                           boost::bind( &ScrollOvershootEffectRipple::PositionConstraint, this, _1, _2, _3) );
-    mPositionConstraint = mOvershootImage.ApplyConstraint(constraint);
-  }
-}
-
-void ScrollOvershootEffectRipple::SetPropertyNotifications(Actor& scrollable)
-{
-  int overshootXPropertyIndex = scrollable.GetPropertyIndex(Toolkit::ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME);
-  int overshootYPropertyIndex = scrollable.GetPropertyIndex(Toolkit::ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME);
-  mCanScrollPropertyIndex = scrollable.GetPropertyIndex(IsVertical() ? Scrollable::SCROLLABLE_CAN_SCROLL_VERTICAL : Scrollable::SCROLLABLE_CAN_SCROLL_HORIZONTAL);
-
-  if(!mOvershootNegativeNotification)
-  {
-    mOvershootNegativeNotification = scrollable.AddPropertyNotification(IsVertical() ? overshootYPropertyIndex : overshootXPropertyIndex, LessThanCondition(-Math::MACHINE_EPSILON_1));
-    mOvershootNegativeNotification.SetNotifyMode(PropertyNotification::NotifyOnChanged);
-    mOvershootNegativeNotification.NotifySignal().Connect(this, &ScrollOvershootEffectRipple::OnNegativeOvershootNotification);
-  }
-
-  if(!mOvershootPositiveNotification)
-  {
-    mOvershootPositiveNotification = scrollable.AddPropertyNotification(IsVertical() ? overshootYPropertyIndex : overshootXPropertyIndex, GreaterThanCondition(Math::MACHINE_EPSILON_1));
-    mOvershootPositiveNotification.SetNotifyMode(PropertyNotification::NotifyOnChanged);
-    mOvershootPositiveNotification.NotifySignal().Connect(this, &ScrollOvershootEffectRipple::OnPositiveOvershootNotification);
-  }
-}
-
-Vector3 ScrollOvershootEffectRipple::PositionConstraint(const Vector3& current,
-    const PropertyInput& parentSizeProperty, const PropertyInput& overshootProperty)
-{
-  float overshoot = overshootProperty.GetFloat();
-  const Vector3 parentSize = parentSizeProperty.GetVector3();
-
-  Vector3 relativeOffset = Vector3::ZERO;
-
-  if(IsVertical())
-  {
-    if(overshoot > Math::MACHINE_EPSILON_0)
+    float increaseStep = absOvershoot + OVERSHOOT_NOTIFY_STEP;
+    if( increaseStep > MAX_OVERSHOOT_NOTIFY_AMOUNT )
     {
-      relativeOffset = Vector3(0.0f, 0.0f, 0.0f);
+      increaseStep = MAX_OVERSHOOT_NOTIFY_AMOUNT;
     }
-    else if (overshoot < -Math::MACHINE_EPSILON_0)
+    mOvershootIncreaseNotification = self.AddPropertyNotification( mOvershootProperty, OutsideCondition(-increaseStep, increaseStep) );
+    mOvershootIncreaseNotification.SetNotifyMode(PropertyNotification::NotifyOnTrue);
+    mOvershootIncreaseNotification.NotifySignal().Connect(this, &ScrollOvershootEffectRipple::OnOvershootNotification);
+  }
+
+  // update overshoot decrease notify
+  if( mOvershootDecreaseNotification )
+  {
+    self.RemovePropertyNotification( mOvershootDecreaseNotification );
+    mOvershootDecreaseNotification.Reset();
+  }
+  if( absOvershoot > MIN_OVERSHOOT_NOTIFY_AMOUNT )
+  {
+    float reduceStep = absOvershoot - OVERSHOOT_NOTIFY_STEP;
+    if( reduceStep < MIN_OVERSHOOT_NOTIFY_AMOUNT )
     {
-      relativeOffset = Vector3(1.0f, 1.0f, 0.0f);
+      reduceStep = MIN_OVERSHOOT_NOTIFY_AMOUNT;
+    }
+    mOvershootDecreaseNotification = self.AddPropertyNotification( mOvershootProperty, InsideCondition(-reduceStep, reduceStep) );
+    mOvershootDecreaseNotification.SetNotifyMode(PropertyNotification::NotifyOnTrue);
+    mOvershootDecreaseNotification.NotifySignal().Connect(this, &ScrollOvershootEffectRipple::OnOvershootNotification);
+  }
+}
+
+void ScrollOvershootEffectRipple::SetOvershootEffectColor( const Vector4& color )
+{
+  if(mOvershootOverlay)
+  {
+    mOvershootOverlay.SetColor(color);
+  }
+}
+
+void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
+{
+  mOvershootOverlay.SetVisible(visible);
+  // make sure overshoot image is correctly placed
+  if( visible )
+  {
+    Actor self = mAttachedScrollView.Self();
+    if(mOvershoot > 0.0f)
+    {
+      // positive overshoot
+      const Vector3 size = mOvershootOverlay.GetCurrentSize();
+      Vector3 relativeOffset;
+      const Vector3 parentSize = self.GetCurrentSize();
+      if(IsVertical())
+      {
+        mOvershootOverlay.SetRotation(Quaternion(0.0f, Vector3::ZAXIS));
+        mOvershootOverlay.SetSize(parentSize.width, GetBounceActorHeight(parentSize.width), size.depth);
+      }
+      else
+      {
+        mOvershootOverlay.SetRotation(Quaternion(1.5f * Math::PI, Vector3::ZAXIS));
+        mOvershootOverlay.SetSize(parentSize.height, GetBounceActorHeight(parentSize.height), size.depth);
+        relativeOffset = Vector3(0.0f, 1.0f, 0.0f);
+      }
+      mOvershootOverlay.SetPosition(relativeOffset * parentSize);
+    }
+    else
+    {
+      // negative overshoot
+      const Vector3 size = mOvershootOverlay.GetCurrentSize();
+      Vector3 relativeOffset;
+      const Vector3 parentSize = self.GetCurrentSize();
+      if(IsVertical())
+      {
+        mOvershootOverlay.SetRotation(Quaternion(Math::PI, Vector3::ZAXIS));
+        mOvershootOverlay.SetSize(parentSize.width, GetBounceActorHeight(parentSize.width), size.depth);
+        relativeOffset = Vector3(1.0f, 1.0f, 0.0f);
+      }
+      else
+      {
+        mOvershootOverlay.SetRotation(Quaternion(0.5f * Math::PI, Vector3::ZAXIS));
+        mOvershootOverlay.SetSize(parentSize.height, GetBounceActorHeight(parentSize.height), size.depth);
+        relativeOffset = Vector3(1.0f, 0.0f, 0.0f);
+      }
+      mOvershootOverlay.SetPosition(relativeOffset * parentSize);
+    }
+  }
+}
+
+void ScrollOvershootEffectRipple::OnOvershootNotification(PropertyNotification& source)
+{
+  Actor self = mAttachedScrollView.Self();
+  mOvershoot = self.GetProperty<float>(mOvershootProperty);
+  if( source == mOvershootIncreaseNotification )
+  {
+    if( mOvershoot > Math::MACHINE_EPSILON_0 )
+    {
+      SetOvershoot(1.0f);
+    }
+    else if ( mOvershoot < -Math::MACHINE_EPSILON_0 )
+    {
+      SetOvershoot(-1.0f);
+    }
+  }
+  else if( source == mOvershootDecreaseNotification )
+  {
+    SetOvershoot(0.0f);
+    // overshoot reducing
+  }
+  UpdatePropertyNotifications();
+}
+
+void ScrollOvershootEffectRipple::SetOvershoot(float amount, bool animate)
+{
+  float absAmount = fabsf(amount);
+  bool animatingOn = absAmount > Math::MACHINE_EPSILON_0;
+  if( (animatingOn && (mAnimationStateFlags & AnimatingIn)) )
+  {
+    // trying to do what we are already doing
+    if( mAnimationStateFlags & AnimateBack )
+    {
+      mAnimationStateFlags &= ~AnimateBack;
+    }
+    return;
+  }
+  if( (!animatingOn && (mAnimationStateFlags & AnimatingOut)) )
+  {
+    // trying to do what we are already doing
+    return;
+  }
+  if( !animatingOn && (mAnimationStateFlags & AnimatingIn) )
+  {
+    // dont interrupt while animating on
+    mAnimationStateFlags |= AnimateBack;
+    return;
+  }
+  // When we need to animate overshoot to 0
+  if( mOvershootAnimationDuration > Math::MACHINE_EPSILON_1 )
+  {
+    // setup the new overshoot to 0 animation
+    float currentOvershoot = fabsf( mOvershootOverlay.GetProperty( mEffectOvershootProperty ).Get<float>() );
+    float duration = mOvershootAnimationDuration * (animatingOn ? (1.0f - currentOvershoot) : currentOvershoot);
+
+    if( duration > Math::MACHINE_EPSILON_0 )
+    {
+      if(mScrollOvershootAnimation)
+      {
+        mScrollOvershootAnimation.FinishedSignal().Disconnect( this, &ScrollOvershootEffectRipple::OnOvershootAnimFinished );
+        mScrollOvershootAnimation.Stop();
+        mScrollOvershootAnimation.Clear();
+        mScrollOvershootAnimation = NULL;
+      }
+      mScrollOvershootAnimation = Animation::New(duration);
+      mScrollOvershootAnimation.FinishedSignal().Connect( this, &ScrollOvershootEffectRipple::OnOvershootAnimFinished );
+      mScrollOvershootAnimation.AnimateTo( Property(mOvershootOverlay, mEffectOvershootProperty), amount, TimePeriod(duration) );
+      mScrollOvershootAnimation.Play();
+      mAnimationStateFlags = animatingOn ? AnimatingIn : AnimatingOut;
     }
   }
   else
   {
-    if(overshoot > Math::MACHINE_EPSILON_0)
-    {
-      relativeOffset = Vector3(0.0f, 1.0f, 0.0f);
-    }
-    else if (overshoot < -Math::MACHINE_EPSILON_0)
-    {
-      relativeOffset = Vector3(1.0f, 0.0f, 0.0f);
-    }
+    mOvershootOverlay.SetProperty( mEffectOvershootProperty, amount);
   }
-
-  return relativeOffset * parentSize;
-}
-
-void ScrollOvershootEffectRipple::OnPositiveOvershootNotification(PropertyNotification& source)
-{
-  Actor delegate = Actor::DownCast(source.GetTarget());
-  float overshoot = delegate.GetProperty<float>(source.GetTargetProperty());
-  bool canScroll = delegate.GetProperty<bool>(mCanScrollPropertyIndex);
-  if(!canScroll)
+  if( absAmount > Math::MACHINE_EPSILON_1 )
   {
-    mOvershootImage.SetVisible(false);
-    return;
+    UpdateVisibility(true);
   }
-  mOvershootImage.SetVisible(true);
-
-  if (fabsf(overshoot) < Math::MACHINE_EPSILON_1)
-  {
-    AnimateScrollOvershoot(0.0f);
-    return;
-  }
-  if(overshoot > 0.0f)
-  {
-    const Vector3 imageSize = mOvershootImage.GetCurrentSize();
-    Vector3 relativeOffset = Vector3::ZERO;
-    const Vector3 parentSize = delegate.GetCurrentSize();
-    AnimateScrollOvershoot(1.0f);
-    if(IsVertical())
-    {
-      mOvershootImage.SetRotation(Quaternion(0.0f, Vector3::ZAXIS));
-      mOvershootImage.SetSize(parentSize.width, imageSize.height, imageSize.depth);
-      relativeOffset = Vector3(0.0f, 0.0f, 0.0f);
-    }
-    else
-    {
-      mOvershootImage.SetRotation(Quaternion(1.5f * Math::PI, Vector3::ZAXIS));
-      mOvershootImage.SetSize(parentSize.height, imageSize.height, imageSize.depth);
-      relativeOffset = Vector3(0.0f, 1.0f, 0.0f);
-    }
-    mOvershootImage.SetPosition(relativeOffset * parentSize);
-  }
-}
-
-void ScrollOvershootEffectRipple::OnNegativeOvershootNotification(PropertyNotification& source)
-{
-  Actor delegate = Actor::DownCast(source.GetTarget());
-  float overshoot = delegate.GetProperty<float>(source.GetTargetProperty());
-  bool canScroll = delegate.GetProperty<bool>(mCanScrollPropertyIndex);
-  if(!canScroll)
-  {
-    mOvershootImage.SetVisible(false);
-    return;
-  }
-  mOvershootImage.SetVisible(true);
-
-  if (fabsf(overshoot) < Math::MACHINE_EPSILON_1)
-  {
-    AnimateScrollOvershoot(0.0f);
-    return;
-  }
-
-  if(overshoot < 0.0f)
-  {
-    const Vector3 imageSize = mOvershootImage.GetCurrentSize();
-    Vector3 relativeOffset = Vector3::ZERO;
-    const Vector3 parentSize = delegate.GetCurrentSize();
-    AnimateScrollOvershoot(-1.0f);
-    if(IsVertical())
-    {
-      mOvershootImage.SetRotation(Quaternion(Math::PI, Vector3::ZAXIS));
-      mOvershootImage.SetSize(parentSize.width, imageSize.height, imageSize.depth);
-      relativeOffset = Vector3(1.0f, 1.0f, 0.0f);
-    }
-    else
-    {
-      mOvershootImage.SetRotation(Quaternion(0.5f * Math::PI, Vector3::ZAXIS));
-      mOvershootImage.SetSize(parentSize.height, imageSize.height, imageSize.depth);
-      relativeOffset = Vector3(1.0f, 0.0f, 0.0f);
-    }
-    mOvershootImage.SetPosition(relativeOffset * parentSize);
-  }
-}
-
-void ScrollOvershootEffectRipple::AnimateScrollOvershoot(float overshootAmount)
-{
-  bool animatingOn = fabsf(overshootAmount) > Math::MACHINE_EPSILON_1;
-
-  // make sure we animate back if needed
-  mAnimateOvershootOff = (!animatingOn && mAnimatingOvershootOn);
-
-  int overShootProperty = mRippleEffect.GetPropertyIndex(mRippleEffect.GetProgressRatePropertyName());
-  float currentOvershoot = mRippleEffect.GetProperty<float>(overShootProperty);
-  if(((currentOvershoot < 0.0f && overshootAmount > 0.0f)
-      || (currentOvershoot > 0.0f && overshootAmount < 0.0f)))
-  {
-    // cancel current animation
-    mAnimatingOvershootOn = false;
-    // reset currentOvershoot to 0.0f
-    mRippleEffect.SetProperty(overShootProperty, 0.0f);
-    currentOvershoot = 0.0f;
-  }
-  if( mAnimatingOvershootOn )
-  {
-    // animating on in same direction, do not allow animate off
-    return;
-  }
-  float duration = DEFAULT_OVERSHOOT_ANIMATION_DURATION * (animatingOn ? (1.0f - fabsf(currentOvershoot)) : fabsf(currentOvershoot));
-
-  if(mScrollOvershootAnimation)
-  {
-    mScrollOvershootAnimation.Clear();
-    mScrollOvershootAnimation.Reset();
-  }
-  mScrollOvershootAnimation = Animation::New(duration);
-  mScrollOvershootAnimation.FinishedSignal().Connect(this, &ScrollOvershootEffectRipple::OnOvershootAnimFinished);
-  mScrollOvershootAnimation.AnimateTo( Property(mRippleEffect, overShootProperty), overshootAmount, TimePeriod(0.0f, duration) );
-  mScrollOvershootAnimation.Play();
-
-  mOvershootImage.SetVisible(true);
-
-  mAnimatingOvershootOn = animatingOn;
 }
 
 void ScrollOvershootEffectRipple::OnOvershootAnimFinished(Animation& animation)
 {
-  if(!mAnimatingOvershootOn && !mAnimateOvershootOff)
+  bool animateOff = false;
+  if( mAnimationStateFlags & AnimatingOut )
   {
-    // just finished animating overshoot to 0
-    mOvershootImage.SetVisible(false);
+    // should now be offscreen
+    mOvershootOverlay.SetVisible(false);
   }
-  mAnimatingOvershootOn = false;
-  mScrollOvershootAnimation.FinishedSignal().Disconnect(this, &ScrollOvershootEffectRipple::OnOvershootAnimFinished);
-  mScrollOvershootAnimation.Clear();
-  mScrollOvershootAnimation.Reset();
-  if(mAnimateOvershootOff)
+  if( (mAnimationStateFlags & AnimateBack) )
   {
-    AnimateScrollOvershoot(0.0f);
+    animateOff = true;
+  }
+  mScrollOvershootAnimation.FinishedSignal().Disconnect( this, &ScrollOvershootEffectRipple::OnOvershootAnimFinished );
+  mScrollOvershootAnimation.Stop();
+  mScrollOvershootAnimation.Clear();
+  mScrollOvershootAnimation = NULL;
+  mAnimationStateFlags = 0;
+  if( animateOff )
+  {
+    SetOvershoot(0.0f, true);
   }
 }
 
-ScrollOvershootEffectRipplePtr ScrollOvershootEffectRipple::New(bool vertical)
+ScrollOvershootEffectRipplePtr ScrollOvershootEffectRipple::New( bool vertical, Scrollable& scrollable )
 {
-  return new ScrollOvershootEffectRipple(vertical);
+  return new ScrollOvershootEffectRipple(vertical, scrollable);
 }
 
 } // namespace Internal

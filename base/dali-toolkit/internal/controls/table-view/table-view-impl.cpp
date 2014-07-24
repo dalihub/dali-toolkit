@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/table-view/table-view-impl.h>
@@ -21,19 +22,13 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dlog.h>
+#include <sstream>
 
 using namespace Dali;
 using namespace std;
 
 namespace
 {
-// Type registration
-BaseHandle Create()
-{
-  return Toolkit::TableView::New(0, 0);
-}
-TypeRegistration mType( typeid(Toolkit::TableView), typeid(Toolkit::Control), Create );
-
 const float DEFAULT_CONSTRAINT_DURATION = 0.0f;
 
 /**
@@ -137,8 +132,43 @@ namespace Dali
 namespace Toolkit
 {
 
+const Property::Index TableView::PROPERTY_ROWS( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX );
+const Property::Index TableView::PROPERTY_COLUMNS( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 1 );
+const Property::Index TableView::PROPERTY_CELL_PADDING( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 2 );
+const Property::Index TableView::PROPERTY_LAYOUT_ANIMATION_DURATION( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 3 );
+const Property::Index TableView::PROPERTY_LAYOUT_ROWS( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 4 );
+const Property::Index TableView::PROPERTY_LAYOUT_COLUMNS( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 5 );
+
 namespace Internal
 {
+
+namespace
+{
+
+const Scripting::StringEnum< Toolkit::TableView::LayoutPolicy > LAYOUT_POLICY_STRING_TABLE[] =
+{
+ { "fixed",    Toolkit::TableView::Fixed    },
+ { "relative", Toolkit::TableView::Relative },
+ { "fill",     Toolkit::TableView::Fill }
+};
+
+const unsigned int LAYOUT_POLICY_STRING_TABLE_COUNT = sizeof(LAYOUT_POLICY_STRING_TABLE) / sizeof( LAYOUT_POLICY_STRING_TABLE[0] );
+
+// Type registration
+BaseHandle Create()
+{
+  return Toolkit::TableView::New(0, 0);
+}
+TypeRegistration mType( typeid(Toolkit::TableView), typeid(Toolkit::Control), Create );
+
+PropertyRegistration property1( mType, "rows", Toolkit::TableView::PROPERTY_ROWS, Property::UNSIGNED_INTEGER, &TableView::SetProperty, &TableView::GetProperty );
+PropertyRegistration property2( mType, "columns", Toolkit::TableView::PROPERTY_COLUMNS, Property::UNSIGNED_INTEGER, &TableView::SetProperty, &TableView::GetProperty );
+PropertyRegistration property3( mType, "cell-padding", Toolkit::TableView::PROPERTY_CELL_PADDING, Property::VECTOR2, &TableView::SetProperty, &TableView::GetProperty );
+PropertyRegistration property4( mType, "layout-animation-duration", Toolkit::TableView::PROPERTY_LAYOUT_ANIMATION_DURATION, Property::FLOAT, &TableView::SetProperty, &TableView::GetProperty );
+PropertyRegistration property5( mType, "layout-rows", Toolkit::TableView::PROPERTY_LAYOUT_ROWS, Property::MAP, &TableView::SetProperty, &TableView::GetProperty );
+PropertyRegistration property6( mType, "layout-columns", Toolkit::TableView::PROPERTY_LAYOUT_COLUMNS, Property::MAP, &TableView::SetProperty, &TableView::GetProperty );
+
+} // namespace
 
 Toolkit::TableView TableView::New( unsigned int initialRows, unsigned int initialColumns )
 {
@@ -516,6 +546,8 @@ void TableView::SetFixedHeight( unsigned int rowIndex, float height )
   DALI_ASSERT_ALWAYS( rowIndex < mFixedHeights.size() );
   // add the fixed height to the array of fixed heights
   mFixedHeights[ rowIndex ] = height;
+  // remove the relative height of the same row
+  mRelativeHeights[ rowIndex ] = 0.f;
   // relayout all cells, no lock needed as nothing added or removed
   RelayoutRequest();
 }
@@ -532,6 +564,8 @@ void TableView::SetRelativeHeight( unsigned int rowIndex, float heightPercentage
   DALI_ASSERT_ALWAYS( rowIndex < mRelativeHeights.size() );
   // add the relative height to the array of relative heights
   mRelativeHeights[ rowIndex ] = heightPercentage;
+  // remove the fixed height of the same row
+  mFixedHeights[ rowIndex ] = 0.f;
   // relayout all cells, no lock needed as nothing added or removed
   RelayoutRequest();
 }
@@ -548,6 +582,8 @@ void TableView::SetFixedWidth( unsigned int columnIndex, float width )
   DALI_ASSERT_ALWAYS( columnIndex < mFixedWidths.size() );
   // add the fixed width to the array of fixed column widths
   mFixedWidths[ columnIndex ] = width;
+  // remove the relative width of the same column
+  mRelativeWidths[ columnIndex ] = 0.f;
   // relayout all cells, no lock needed as nothing added or removed
   RelayoutRequest();
 }
@@ -564,6 +600,8 @@ void TableView::SetRelativeWidth( unsigned int columnIndex, float widthPercentag
   DALI_ASSERT_ALWAYS( columnIndex < mRelativeWidths.size() );
   // add the relative widths to the array of relative widths
   mRelativeWidths[ columnIndex ] = widthPercentage;
+  // remove the fixed width of the same column
+  mFixedWidths[ columnIndex ] = 0.f;
   // relayout all cells, no lock needed as nothing added or removed
   RelayoutRequest();
 }
@@ -737,6 +775,102 @@ unsigned int TableView::GetColumns()
   return mCellData.GetColumns();
 }
 
+void TableView::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
+{
+  Toolkit::TableView tableView = Toolkit::TableView::DownCast( Dali::BaseHandle( object ) );
+
+  if( tableView )
+  {
+    TableView& tableViewImpl( GetImpl( tableView ) );
+    switch( index )
+    {
+      case Toolkit::TableView::PROPERTY_ROWS:
+      {
+        if( value.Get<unsigned int>() != tableViewImpl.GetRows() )
+        {
+          tableViewImpl.Resize( value.Get<unsigned int>(), tableViewImpl.GetColumns() );
+        }
+        break;
+      }
+      case Toolkit::TableView::PROPERTY_COLUMNS:
+      {
+        if( value.Get<unsigned int>() != tableViewImpl.GetColumns() )
+        {
+          tableViewImpl.Resize( tableViewImpl.GetRows(), value.Get<unsigned int>() );
+        }
+        break;
+      }
+      case Toolkit::TableView::PROPERTY_CELL_PADDING:
+      {
+        tableViewImpl.SetCellPadding( value.Get<Vector2>() );
+        break;
+      }
+      case Toolkit::TableView::PROPERTY_LAYOUT_ANIMATION_DURATION:
+      {
+        tableViewImpl.SetLayoutAnimationDuration( value.Get<float>() );
+        break;
+      }
+      case Toolkit::TableView::PROPERTY_LAYOUT_ROWS:
+      {
+        SetHeightOrWidthProperty( tableViewImpl, &TableView::SetFixedHeight, &TableView::SetRelativeHeight, value );
+        break;
+      }
+      case Toolkit::TableView::PROPERTY_LAYOUT_COLUMNS:
+      {
+        SetHeightOrWidthProperty( tableViewImpl, &TableView::SetFixedWidth, &TableView::SetRelativeWidth, value );
+        break;
+      }
+    }
+  }
+}
+
+Property::Value TableView::GetProperty( BaseObject* object, Property::Index index )
+{
+  Property::Value value;
+
+  Toolkit::TableView tableView = Toolkit::TableView::DownCast( Dali::BaseHandle( object ) );
+
+  if( tableView )
+  {
+    TableView& tableViewImpl( GetImpl( tableView ) );
+    switch( index )
+    {
+      case Toolkit::TableView::PROPERTY_ROWS:
+      {
+        value = tableViewImpl.GetRows();
+        break;
+      }
+      case Toolkit::TableView::PROPERTY_COLUMNS:
+      {
+        value = tableViewImpl.GetColumns();
+        break;
+      }
+      case Toolkit::TableView::PROPERTY_CELL_PADDING:
+      {
+        value = tableViewImpl.GetCellPadding();
+        break;
+      }
+      case Toolkit::TableView::PROPERTY_LAYOUT_ANIMATION_DURATION:
+      {
+        value = tableViewImpl.GetLayoutAnimationDuration();
+        break;
+      }
+      case Toolkit::TableView::PROPERTY_LAYOUT_ROWS:
+      {
+        value = tableViewImpl.GetRowHeightsPropertyValue();
+        break;
+      }
+      case Toolkit::TableView::PROPERTY_LAYOUT_COLUMNS:
+      {
+        value = tableViewImpl.GetColumnWidthsPropertyValue();
+        break;
+      }
+    }
+  }
+
+  return value;
+}
+
 void TableView::OnControlChildAdd( Actor& child )
 {
   if( mLayoutingChild )
@@ -744,6 +878,27 @@ void TableView::OnControlChildAdd( Actor& child )
     // we're in the middle of laying out children so no point doing anything here
     return;
   }
+
+  Toolkit::TableView::CellPosition cellPosition;
+  if( child.GetPropertyIndex(Toolkit::TableView::ROW_SPAN_PROPERTY_NAME) != Property::INVALID_INDEX )
+  {
+    cellPosition.rowSpan = static_cast<unsigned int>( child.GetProperty( child.GetPropertyIndex(Toolkit::TableView::ROW_SPAN_PROPERTY_NAME) ).Get<float>() );
+  }
+  if( child.GetPropertyIndex(Toolkit::TableView::COLUMN_SPAN_PROPERTY_NAME) != Property::INVALID_INDEX )
+  {
+    cellPosition.columnSpan = static_cast<unsigned int>( child.GetProperty( child.GetPropertyIndex(Toolkit::TableView::COLUMN_SPAN_PROPERTY_NAME) ).Get<float>() );
+  }
+  if( child.GetPropertyIndex(Toolkit::TableView::CELL_INDICES_PROPERTY_NAME) != Property::INVALID_INDEX )
+  {
+    Vector2 indices = child.GetProperty( child.GetPropertyIndex(Toolkit::TableView::CELL_INDICES_PROPERTY_NAME) ).Get<Vector2 >();
+    cellPosition.rowIndex = static_cast<unsigned int>( indices.x );
+    cellPosition.columnIndex = static_cast<unsigned int>( indices.y );
+
+    AddChild( child, cellPosition );
+    // donot continue
+    return;
+  }
+
   // check if we're already laying out this child somewhere on the table
   // walk through the layout data
   const unsigned int rowCount = mCellData.GetRows();
@@ -794,7 +949,7 @@ void TableView::OnControlChildRemove( Actor& child )
 }
 
 TableView::TableView( unsigned int initialRows, unsigned int initialColumns )
-: Control( true ),  // requires touch
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mCellData( initialRows, initialColumns ),
   mLayoutingChild( false ),
   mConstraintDuration( DEFAULT_CONSTRAINT_DURATION )
@@ -991,6 +1146,83 @@ void TableView::UpdateRelativeSizes( float& fixedHeightsTotal, float& fixedWidth
       }
       // store the value
       mRelativeSizes[ row ][ column ] = Size( relativeWidth, relativeHeight );
+    }
+  }
+}
+
+void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
+                                         void(TableView::*funcFixed)(unsigned int, float),
+                                         void(TableView::*funcRelative)(unsigned int, float),
+                                         const Property::Value& value )
+{
+  if( Property::MAP == value.GetType() )
+  {
+    Property::Map map = value.Get<Property::Map>();
+    unsigned int rowIndex;
+    for( Property::Map::const_iterator iter = map.begin(); iter != map.end(); iter++)
+    {
+      if( istringstream(iter->first) >> rowIndex  // the key is a number
+          && Property::MAP == (iter->second).GetType())
+      {
+        Property::Value item = iter->second;
+        if( item.HasKey( "policy" ) && item.HasKey( "value" ) )
+        {
+          Toolkit::TableView::LayoutPolicy policy = Scripting::GetEnumeration< Toolkit::TableView::LayoutPolicy >( item.GetValue("policy").Get<string>(), LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT );
+          if( policy == Toolkit::TableView::Fixed )
+          {
+            (tableViewImpl.*funcFixed)( rowIndex, item.GetValue("value").Get<float>() );
+          }
+          else if( policy == Toolkit::TableView::Relative )
+          {
+            (tableViewImpl.*funcRelative)( rowIndex, item.GetValue("value").Get<float>() );
+          }
+        }
+      }
+    }
+  }
+}
+
+Property::Value TableView::GetRowHeightsPropertyValue()
+{
+  Property::Map map;
+  GetMapPropertyValue( mFixedHeights, mRelativeHeights, map);
+  return Property::Value(map);
+}
+
+Property::Value TableView::GetColumnWidthsPropertyValue()
+{
+  Property::Map map;
+  GetMapPropertyValue( mFixedWidths, mRelativeWidths, map);
+  return Property::Value(map);
+}
+
+void TableView::GetMapPropertyValue( const std::vector<float>& fixedSize, const std::vector<float>& relativeSize, Property::Map& map )
+{
+  string fixedPolicy( Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::Fixed, LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT ) );
+  string relativePolicy( Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::Relative, LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT ) );
+  Property::StringValuePair fixedPolicyPair( "policy", fixedPolicy );
+  Property::StringValuePair relativePolicyPair( "policy", relativePolicy );
+
+  size_t count = fixedSize.size();
+  for( size_t index = 0; index < count; index++ )
+  {
+    if( ! EqualsZero( fixedSize[index] ) )
+    {
+      Property::StringValuePair valuePair( "value", fixedSize[index] );
+      Property::Map item;
+      item.push_back( fixedPolicyPair );
+      item.push_back( valuePair );
+
+      map.push_back(  Property::StringValuePair( static_cast<std::ostringstream*>( &(std::ostringstream() << index ) )->str(), item ) );
+    }
+    else if( ! EqualsZero( relativeSize[index] ) )
+    {
+      Property::StringValuePair valuePair( "value", relativeSize[index] );
+      Property::Map item;
+      item.push_back( relativePolicyPair );
+      item.push_back( valuePair );
+
+      map.push_back(  Property::StringValuePair( static_cast<std::ostringstream*>( &(std::ostringstream() << index ) )->str(), item ) );
     }
   }
 }

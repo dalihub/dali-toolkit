@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include "focus-manager-impl.h"
@@ -548,16 +549,6 @@ bool FocusManager::GetWrapMode() const
   return mIsWrapped;
 }
 
-void FocusManager::SetEndCapFeedbackEnabled(bool enabled)
-{
-  mIsEndcapFeedbackEnabled = enabled;
-}
-
-bool FocusManager::GetEndCapFeedbackEnabled() const
-{
-  return mIsEndcapFeedbackEnabled;
-}
-
 void FocusManager::SetFocusIndicatorActor(Actor indicator)
 {
   mFocusIndicatorActor = indicator;
@@ -576,22 +567,22 @@ bool FocusManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapp
   if( (forward && ++focusIDIter == mFocusIDContainer.end())
     || (!forward && focusIDIter-- == mFocusIDContainer.begin()) )
   {
+    if(mIsEndcapFeedbackEnabled)
+    {
+      if(mIsEndcapFeedbackPlayed == false)
+      {
+        // play sound & skip moving once
+        Dali::SoundPlayer soundPlayer = Dali::SoundPlayer::Get();
+        soundPlayer.PlaySound(FOCUS_CHAIN_END_SOUND_FILE);
+
+        mIsEndcapFeedbackPlayed = true;
+        return true;
+      }
+      mIsEndcapFeedbackPlayed = false;
+    }
+
     if(wrapped)
     {
-      if(mIsEndcapFeedbackEnabled)
-      {
-        if(mIsEndcapFeedbackPlayed == false)
-        {
-          // play sound & skip to move once
-          Dali::SoundPlayer soundPlayer = Dali::SoundPlayer::Get();
-          soundPlayer.PlaySound(FOCUS_CHAIN_END_SOUND_FILE);
-
-          mIsEndcapFeedbackPlayed = true;
-          return true;
-        }
-        mIsEndcapFeedbackPlayed = false;
-      }
-
       if(forward)
       {
         focusIDIter = mFocusIDContainer.begin();
@@ -604,12 +595,6 @@ bool FocusManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapp
     }
     else
     {
-      if(mIsEndcapFeedbackEnabled)
-      {
-        Dali::SoundPlayer soundPlayer = Dali::SoundPlayer::Get();
-        soundPlayer.PlaySound(FOCUS_CHAIN_END_SOUND_FILE);
-      }
-
       DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Overshot\n", __FUNCTION__, __LINE__);
       // Send notification for handling overshooted situation
       mFocusOvershotSignalV2.Emit(GetCurrentFocusActor(), forward ? Toolkit::FocusManager::OVERSHOT_NEXT : Toolkit::FocusManager::OVERSHOT_PREVIOUS);
@@ -708,10 +693,11 @@ bool FocusManager::ChangeAccessibilityStatus()
   return true;
 }
 
-bool FocusManager::AccessibilityActionNext()
+bool FocusManager::AccessibilityActionNext(bool allowEndFeedback)
 {
   if(mIsAccessibilityTtsEnabled)
   {
+    mIsEndcapFeedbackEnabled = allowEndFeedback;
     return MoveFocusForward();
   }
   else
@@ -720,10 +706,11 @@ bool FocusManager::AccessibilityActionNext()
   }
 }
 
-bool FocusManager::AccessibilityActionPrevious()
+bool FocusManager::AccessibilityActionPrevious(bool allowEndFeedback)
 {
   if(mIsAccessibilityTtsEnabled)
   {
+    mIsEndcapFeedbackEnabled = allowEndFeedback;
     return MoveFocusBackward();
   }
   else
@@ -772,7 +759,7 @@ bool FocusManager::AccessibilityActionRead(bool allowReadAgain)
   return ret;
 }
 
-bool FocusManager::AccessibilityActionReadNext()
+bool FocusManager::AccessibilityActionReadNext(bool allowEndFeedback)
 {
   if(mIsAccessibilityTtsEnabled)
   {
@@ -784,7 +771,7 @@ bool FocusManager::AccessibilityActionReadNext()
   }
 }
 
-bool FocusManager::AccessibilityActionReadPrevious()
+bool FocusManager::AccessibilityActionReadPrevious(bool allowEndFeedback)
 {
   if(mIsAccessibilityTtsEnabled)
   {
@@ -856,6 +843,21 @@ bool FocusManager::AccessibilityActionBack()
   // TODO: Back to previous view
 
   return mIsAccessibilityTtsEnabled;
+}
+
+bool FocusManager::AccessibilityActionTouch(const TouchEvent& touchEvent)
+{
+  bool handled = false;
+
+  // TODO: Need to convert the touchevent for the focused actor?
+
+  Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(GetCurrentFocusActor());
+  if(control)
+  {
+    handled = control.GetImplementation().OnAccessibilityTouch(touchEvent);
+  }
+
+  return handled;
 }
 
 bool FocusManager::HandlePanGesture(const Integration::PanGestureEvent& panEvent)

@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <dali-toolkit/public-api/controls/scrollable/scroll-connector.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
@@ -32,6 +33,7 @@ const Property::Index ScrollConnector::SCROLL_POSITION = Internal::ScrollConnect
 const Property::Index ScrollConnector::OVERSHOOT       = Internal::ScrollConnector::OVERSHOOT;
 
 const char* const ScrollConnector::DOMAIN_CHANGED_SIGNAL_NAME    = "domain-changed";
+const char* const ScrollConnector::SCROLL_POSITION_CHANGED_SIGNAL_NAME    = "scroll-position-changed";
 
 ScrollConnector ScrollConnector::New()
 {
@@ -79,6 +81,21 @@ float ScrollConnector::GetContentLength() const
 Constrainable ScrollConnector::GetScrollPositionObject() const
 {
   return GetImpl(*this).GetScrollPositionObject();
+}
+
+void ScrollConnector::SetScrollPosition( float position )
+{
+  GetImpl(*this).SetScrollPosition( position );
+}
+
+float ScrollConnector::GetScrollPosition() const
+{
+  return GetImpl(*this).GetScrollPosition();
+}
+
+ScrollConnector::ScrollPositionChangedSignalType& ScrollConnector::ScrollPositionChangedSignal()
+{
+  return GetImpl(*this).ScrollPositionChangedSignal();
 }
 
 ScrollConnector::DomainChangedSignalType& ScrollConnector::DomainChangedSignal()

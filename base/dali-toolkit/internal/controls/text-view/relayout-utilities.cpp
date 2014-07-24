@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // FILE HEADER
 #include "relayout-utilities.h"
@@ -1707,7 +1708,7 @@ void CalculateUnderlineInfo( TextView::RelayoutData& relayoutData, TextViewRelay
             ++textUnderlineStatus.mLineGlobalIndex; // If it's a new line, point to the next one.
           }
 
-          if( characterGroup.mStyledText.mStyle.GetUnderline() )
+          if( characterGroup.mStyledText.mStyle.IsUnderlineEnabled() )
           {
             if( !textUnderlineStatus.mCurrentUnderlineStatus || // Current character is underlined but previous one it wasn't.
                 isNewLine )                                     // Current character is underlined and is the first of current laid-out line.
@@ -1824,7 +1825,7 @@ void SetUnderlineInfo( TextView::RelayoutData& relayoutData )
             }
           }
 
-          if( characterGroup.mStyledText.mStyle.GetUnderline() )
+          if( characterGroup.mStyledText.mStyle.IsUnderlineEnabled() )
           {
             if( textUnderlineStatus.mCurrentUnderlineStatus )
             {
@@ -1844,15 +1845,12 @@ void SetUnderlineInfo( TextView::RelayoutData& relayoutData )
 
             textUnderlineStatus.mCurrentUnderlineStatus = true;
 
-            // Sets the underline's thickness.
-            characterGroup.mStyledText.mStyle.SetUnderlineThickness( underlineInfo.mMaxThickness );
-
             // Before setting the position it needs to be adjusted to match the base line.
             const float bearingOffset = ( currentLineHeight - currentLineAscender ) - ( characterGroup.mSize.height - characterGroup.mAscender );
             const float positionOffset = ( underlineInfo.mMaxHeight - characterGroup.mSize.height ) - bearingOffset;
 
-            // Sets the underline's position.
-            characterGroup.mStyledText.mStyle.SetUnderlinePosition( underlineInfo.mPosition - positionOffset );
+            // Sets the underline's parameters.
+            characterGroup.mStyledText.mStyle.SetUnderline( true, underlineInfo.mMaxThickness, underlineInfo.mPosition - positionOffset );
 
             // Mark the group of characters to be set the new style into the text-actor.
             characterGroup.mSetStyle = true;

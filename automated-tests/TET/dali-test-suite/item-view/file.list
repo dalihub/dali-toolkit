@@ -1,9 +1,0 @@
-TARGETS += \
-	utc-Dali-ItemView \
-	utc-Dali-ItemLayout \
-	utc-Dali-GridLayout \
-	utc-Dali-DepthLayout \
-	utc-Dali-SpiralLayout \
-	utc-Dali-NavigationLayout \
-	utc-Dali-AlbumLayout \
-        utc-Dali-RollLayout \

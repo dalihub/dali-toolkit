@@ -1,21 +1,22 @@
 #ifndef __DALI_TOOLKIT_TEXT_INPUT_H__
 #define __DALI_TOOLKIT_TEXT_INPUT_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 /**
  * @addtogroup CAPI_DALI_TOOLKIT_TEXT_INPUT_MODULE
@@ -46,13 +47,36 @@ class TextInput : public Control
 
 public:
 
-  //Signal Names
+  /// @name Properties
+  /** @{ */
+  static const Property::Index HIGHLIGHT_COLOR_PROPERTY;                     // Property, name "highlight-color", type VECTOR4
+  static const Property::Index CUT_AND_PASTE_COLOR_PROPERTY;                 // Property, name "cut-and-paste-bg-color", type VECTOR4
+  static const Property::Index CUT_AND_PASTE_PRESSED_COLOR_PROPERTY;         // Property, name "cut-and-paste-pressed-color", type VECTOR4
+  static const Property::Index CUT_AND_PASTE_BORDER_COLOR_PROPERTY;          // Property, name "cut-and-paste-border-color", type VECTOR4
+  static const Property::Index CUT_AND_PASTE_ICON_COLOR_PROPERTY;            // Property, name "cut-and-paste-icon-color", type VECTOR4
+  static const Property::Index CUT_AND_PASTE_ICON_PRESSED_COLOR_PROPERTY;    // Property, name "cut-and-paste-icon-pressed-color", type VECTOR4
+  static const Property::Index CUT_AND_PASTE_TEXT_COLOR_PROPERTY;            // Property, name "cut-and-paste-text-color", type VECTOR4
+  static const Property::Index CUT_AND_PASTE_TEXT_PRESSED_COLOR_PROPERTY;    // Property, name "cut-and-paste-text-pressed-color", type VECTOR4
+  static const Property::Index CUT_BUTTON_POSITION_PRIORITY_PROPERTY;        // Property, name "cut-button-position-priority", type unsigned int
+  static const Property::Index COPY_BUTTON_POSITION_PRIORITY_PROPERTY;       // Property, name "copy-button-position-priority", type unsigned int
+  static const Property::Index PASTE_BUTTON_POSITION_PRIORITY_PROPERTY;      // Property, name "paste-button-position-priority", type unsigned int
+  static const Property::Index SELECT_BUTTON_POSITION_PRIORITY_PROPERTY;     // Property, name "select-button-position-priority", type unsigned int
+  static const Property::Index SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY; // Property, name "select-all-button-position-priority", type unsigned int
+  static const Property::Index CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY;  // Property, name "clipboard-button-position-priority", type unsigned int
+  static const Property::Index POP_UP_OFFSET_FROM_TEXT_PROPERTY;             // Property, name "popup-offset-from-text", type VECTOR4
+  static const Property::Index CURSOR_COLOR_PROPERTY;                        // Property, name "cursor-color", type VECTOR4
+
+  /** @} */
+
+  /// @name Signals
+  /** @{ */
   static const char* const SIGNAL_START_INPUT; ///< name "start-input"
   static const char* const SIGNAL_END_INPUT; ///< name "end-input"
   static const char* const SIGNAL_STYLE_CHANGED; ///< name "style-changed"
   static const char* const SIGNAL_MAX_INPUT_CHARACTERS_REACHED; ///< name "max-input-characters-reached"
   static const char* const SIGNAL_TOOLBAR_DISPLAYED; ///< name "toolbar-displayed"
   static const char* const SIGNAL_TEXT_EXCEED_BOUNDARIES; ///< name "text-exceed-boundaries"
+  /** @} */
 
 public:
 
@@ -97,11 +121,11 @@ public:
   static TextInput DownCast( BaseHandle handle );
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
    *
-   * Dali::Object derived classes typically do not contain member data.
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~TextInput();
+  ~TextInput();
 
   /**
    * @brief Get the inputed text currently being displayed.
@@ -262,6 +286,7 @@ public:
    void SetGrabHandleImage( Image image );
 
    /**
+    * Depreciated API.
     * @brief Set the image to be used for the regular left to right cursor.
     *
     * @pre The text input actor has been initialised.

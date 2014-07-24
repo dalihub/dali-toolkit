@@ -1,0 +1,57 @@
+/*
+Copyright (c) 2000-2014 Samsung Electronics Co., Ltd All Rights Reserved
+
+This file is part of Dali Toolkit
+
+PROPRIETARY/CONFIDENTIAL
+
+This software is the confidential and proprietary information of
+SAMSUNG ELECTRONICS ("Confidential Information"). You shall not
+disclose such Confidential Information and shall use it only in
+accordance with the terms of the license agreement you entered
+into with SAMSUNG ELECTRONICS.
+
+SAMSUNG make no representations or warranties about the suitability
+of the software, either express or implied, including but not limited
+to the implied warranties of merchantability, fitness for a particular
+purpose, or non-infringement. SAMSUNG shall not be liable for any
+damages suffered by licensee as a result of using, modifying or
+distributing this software or its derivatives.
+*/
+
+
+
+//******************************************************************************
+//
+// Default style theme for Tizen dark theme, The values should come from
+// UX design document.
+//
+//******************************************************************************
+
+{
+  "styles":
+  {
+    "textinput":
+    {
+      "highlight-color":"F060",
+      "cut-and-paste-bg-color":"B061L41",
+      "cut-and-paste-pressed-color":"B061L41P",
+      "cut-and-paste-border-color":"B061L42",
+      "cut-and-paste-icon-color":"T126",
+      "cut-and-paste-icon-pressed-color":"T126P",
+      "cut-and-paste-text-color":"T1221",
+      "cut-and-paste-text-pressed-color":"T1221P",
+      "cut-button-position-priority":4,
+      "copy-button-position-priority":3,
+      "paste-button-position-priority":5,
+      "select-button-position-priority":1,
+      "select-all-button-position-priority":2,
+      "clipboard-button-position-priority":6,
+      "cursor-color":"F052"
+    },
+    "scrollview":
+    {
+      "overshoot-effect-color":"B018"
+    }
+  }
+}

@@ -1,21 +1,22 @@
 #ifndef __DALI_TOOLKIT_INTERNAL_SCROLLABLE_H__
 #define __DALI_TOOLKIT_INTERNAL_SCROLLABLE_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/dali.h>
@@ -44,7 +45,6 @@ class Scrollable : public Control
 public:
   static const std::string SCROLLABLE_CAN_SCROLL_VERTICAL;
   static const std::string SCROLLABLE_CAN_SCROLL_HORIZONTAL;
-  static const Vector4     DEFAULT_OVERSHOOT_COLOUR;
 
   /**
    * Create a new Scrollable.
@@ -106,6 +106,18 @@ public:
    */
   virtual void ScrollTo(const Vector3 &position, float duration) = 0;
 
+  /**
+   * Set the color of the overshoot effect.
+   * @parm[in] color The color of the overshoot effect
+   */
+  virtual void SetOvershootEffectColor( const Vector4& color ) = 0;
+
+  /**
+   * Retrieve the color of the overshoot effect.
+   * @return The color of the overshoot effect.
+   */
+  Vector4 GetOvershootEffectColor() const;
+
 private:
 
   /**
@@ -147,6 +159,24 @@ public: //Signals
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+
+  //properties
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
 protected:
 
@@ -192,6 +222,8 @@ private:
 
 protected:
 
+  Vector4         mOvershootEffectColor;    ///<The color of the overshoot bouncing effect
+
   Property::Index mPropertyRelativePosition;///< Scroll Relative Position ("scroll-relative-position") [range from 0.0f - 1.0f in each axes]
   Property::Index mPropertyPositionMin;     ///< Scroll Domain Minimum ("position-min")
   Property::Index mPropertyPositionMax;     ///< Scroll Domain Maximum ("position-max")
@@ -212,7 +244,7 @@ private:
   typedef ComponentContainer::iterator ComponentIter;
 
   ComponentContainer mComponents;  ///< ScrollComponent (such as a scrollbar/page indicator/status)
-  bool mOvershootEnabled;
+  bool mOvershootEnabled:1;
 };
 
 } // namespace Internal

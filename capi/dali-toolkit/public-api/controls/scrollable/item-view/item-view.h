@@ -1,21 +1,22 @@
 #ifndef __DALI_TOOLKIT_ITEM_VIEW_H__
 #define __DALI_TOOLKIT_ITEM_VIEW_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 /**
  * @addtogroup CAPI_DALI_TOOLKIT_ITEM_VIEW_MODULE
@@ -43,6 +44,7 @@ class ItemView;
 class ScrollConnector;
 class ItemFactory;
 class ItemLayout;
+struct ItemRange;
 
 typedef IntrusivePtr<ItemLayout> ItemLayoutPtr;
 
@@ -74,11 +76,11 @@ public:
   ItemView& operator=( const ItemView& itemView );
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
    *
-   * Dali::Object derived classes typically do not contain member data.
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~ItemView();
+  ~ItemView();
 
   /**
    * @brief Create an initialized ItemView.
@@ -177,13 +179,15 @@ public:
   /**
    * @brief Set default the alpha function used when applying constraints e.g. during ActivateLayout().
    *
+   * @deprecated Use SetAlphaFunction() in the layout
    * @param[in] func The default alpha function to use.
    */
   void SetDefaultAlphaFunction(AlphaFunction func);
 
   /**
-   * @brief Retrieve the default alpha function for an animation.
+   * @brief Retrieve the default alpha function used when applying constraints
    *
+   * @deprecated Use GetAlphaFunction() in the layout
    * @return The default alpha function.
    */
   AlphaFunction GetDefaultAlphaFunction() const;
@@ -410,6 +414,13 @@ public:
    * @return The current anchor point of the items
    */
   Vector3 GetItemsAnchorPoint() const;
+
+  /**
+   * @brief Get the range of items that are currently in ItemView.
+   *
+   * @param[out] range The range of items.
+   */
+  void GetItemsRange(ItemRange& range);
 
 public: // Not intended for application developers
 

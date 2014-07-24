@@ -1,24 +1,24 @@
 #ifndef __DALI_TOOLKIT_INTERNAL_SCROLL_OVERSHOOT_INDICATOR_H__
 #define __DALI_TOOLKIT_INTERNAL_SCROLL_OVERSHOOT_INDICATOR_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <dali/dali.h>
-#include <dali-toolkit/public-api/shader-effects/bouncing-effect.h>
 
 namespace Dali
 {
@@ -42,10 +42,8 @@ public:
 
   /**
    * ScrollOvershootIndicator constructor.
-   * @param[in] scrollView reference to ScrollView implementation
-   * or horizontally (false)
    */
-  ScrollOvershootIndicator( Scrollable& scrollable);
+  ScrollOvershootIndicator();
 
   /**
    * Virtual destructor
@@ -53,10 +51,18 @@ public:
   virtual ~ScrollOvershootIndicator();
 
   /**
-   * Enables and disables the indicator
-   * &param[in] enable true to enable, false to disable
+   * Attaches the scroll indicator to a scrollable actor
+   *
+   * &param[in] scrollable The scrollable actor to attach to
    */
-  void Enable(bool enable);
+  void AttachToScrollable(Scrollable& scrollable);
+
+  /**
+   * Detaches the scroll indicator from a scrollable actor
+   *
+   * &param[in] scrollable The scrollable actor to detach from
+   */
+  void DetachFromScrollable(Scrollable& scrollable);
 
   /**
    * Resets the indicator
@@ -64,15 +70,24 @@ public:
   void Reset();
 
   /**
+   * Clears the overshoot
+   */
+  void ClearOvershoot();
+
+  /**
    * Create an initialized ScrollOvershootIndicator
-   * @param[in] scrollView reference to ScrollView implementation
-   * or horizontally (false)
+   *
    * @return A pointer to the created ScrollOvershootIndicator.
    */
-  static ScrollOvershootIndicator* New( Scrollable& scrollable);
+  static ScrollOvershootIndicator* New();
+
+  /**
+   * Set the color of the overshoot effect.
+   * @parm[in] color The color of the overshoot effect
+   */
+  void SetOvershootEffectColor( const Vector4& color );
 
 private:
-  Scrollable& mScrollable;                                ///< Internal::Scrollable object
   ScrollOvershootEffectPtr mEffectX;                      ///< effect used for x-axis/horizontal display
   ScrollOvershootEffectPtr mEffectY;                      ///< effect used for y-axis/vertical display
 };
@@ -89,7 +104,7 @@ public:
    *
    * @param[in] vertical whether this effect is a vertical or horizontal one
    */
-  ScrollOvershootEffect(bool vertical);
+  ScrollOvershootEffect( bool vertical );
 
   /**
    * Virtual destructor
@@ -101,21 +116,21 @@ public:
    *
    * @return true or false
    */
-  inline bool IsVertical() { return mVertical; }
+  bool IsVertical() const;
 
   /**
    * Applies the indicator effect, all derived effects must implement this function
    *
    * @param[in] scrollable the scrollable object to apply this effect to
    */
-  virtual void Apply(Scrollable& scrollable) = 0;
+  virtual void Apply() = 0;
 
   /**
    * Removes the indicator effect, all derived effects must implement this function
    *
    * @param[in] scrollable the scrollable object to remove this effect from
    */
-  virtual void Remove(Scrollable& scrollable) = 0;
+  virtual void Remove( Scrollable& scrollable ) = 0;
 
   /**
    * Resets this overshoot effect
@@ -123,18 +138,22 @@ public:
   virtual void Reset() = 0;
 
   /**
-   * Updates the constraints used for the overshoot effect
-   *
-   * @param[in] scrollable the container for the overshoot effect
+   * Sets up property notifications for overshoot values
    */
-  virtual void UpdateConstraints(Actor& scrollable) {}
+  virtual void UpdatePropertyNotifications() {}
 
   /**
-   * Sets up property notifications for overshoot values
-   *
-   * @param[in] scrollable the container for the overshoot effect
+   * @copydoc ScrollOvershootIndicator::SetOvershootEffectColor()
    */
-  virtual void SetPropertyNotifications(Actor& scrollable) {}
+  virtual void SetOvershootEffectColor( const Vector4& color ) = 0;
+
+  /**
+   * Sets shader overshoot value, either immediately of by animating over time
+   *
+   * @param[in] amount The amount to set overshoot to [-1.0f,1.0f]
+   * @param[in] animate Whether to animate or set immediately
+   */
+  virtual void SetOvershoot(float amount, bool animate = true) = 0;
 
 private:
   bool mVertical;                      ///< whether this is a vertical/horizontal effect
@@ -146,21 +165,31 @@ private:
  */
 struct ScrollOvershootEffectRipple : public ScrollOvershootEffect, public ConnectionTracker
 {
+  enum AnimationState
+  {
+    AnimatingIn  = 0x01,  ///< animating overshoot to 0
+    AnimatingOut = 0x02,  ///< animating overshoot to negative (overshoot image displays in +ve area of screen)
+    AnimateBack  = 0x04,  ///< indicates that we need to animate overshoot back to zero immediately after it has finished animating in
+  };
+
 public:
+
   /**
    * Create a new gradient overshoot effect, passing in whether it is vertical or horizontal
+   *
+   * @param[in] vertical Whether this indicator is vertical or horizontal
    */
-  ScrollOvershootEffectRipple(bool vertical);
+  ScrollOvershootEffectRipple( bool vertical, Scrollable& scrollable );
 
   /**
    * @copydoc ScrollOvershootEffect::Apply
    */
-  virtual void Apply(Scrollable& scrollable);
+  virtual void Apply();
 
   /**
    * @copydoc ScrollOvershootEffect::Remove
    */
-  virtual void Remove(Scrollable& scrollable);
+  virtual void Remove( Scrollable& scrollable );
 
   /**
    * @copydoc ScrollOvershootEffect::Reset
@@ -168,23 +197,22 @@ public:
   virtual void Reset();
 
   /**
-   * @copydoc ScrollOvershootEffect::UpdateConstraints(Actor& scrollable)
+   * @copydoc ScrollOvershootEffect::UpdatePropertyNotifications
    */
-  virtual void UpdateConstraints(Actor& scrollable);
+  void UpdatePropertyNotifications();
 
   /**
-   * @copydoc ScrollOvershootEffect::SetPropertyNotification
+   * @copydoc ScrollOvershootEffect::SetOvershootEffectColor()
    */
-  virtual void SetPropertyNotifications(Actor& scrollable);
+  void SetOvershootEffectColor( const Vector4& color );
 
   /**
-   * Constrains the size of the gradient image
-   * @param[in] current current position of the image actor
-   * @param[in] parentSizeProperty size of the scrollable area so we can position image on the edge of it
-   * @param[in] overshootProperty current overshoot amount for this indicator's axis
-   * @return new position of the gradient image actor
+   * Updates the vibility of the overshoot image as well as updating its size, position and rotation
+   * This function is called when animation starts and finishes
+   *
+   * @param[in] visible Whether to set the image visible or not
    */
-  Vector3 PositionConstraint(const Vector3& current, const PropertyInput& parentSizeProperty, const PropertyInput& overshootProperty);
+  void UpdateVisibility( bool visible );
 
   /**
    * Informs overshoot effect to update image position and to animate effect overshoot value for a
@@ -192,22 +220,12 @@ public:
    *
    * @param[in] source the property notification that triggered this callback
    */
-  void OnPositiveOvershootNotification(PropertyNotification& source);
+  void OnOvershootNotification(PropertyNotification& source);
 
   /**
-   * Informs overshoot effect to update image position and to animate effect overshoot value for a
-   * negative overshoot value from scrollview
-   *
-   * @param[in] source the property notification that triggered this callback
+   * @copydoc ScrollOvershootEffect::SetOvershoot()
    */
-  void OnNegativeOvershootNotification(PropertyNotification& source);
-
-  /**
-   * Function to animate effect overshoot value either to -1.0f/1.0f or 0.0f
-   *
-   * @param[in] overshootAmount the amount to animate overshoot to [-1.0f,0.0f,1.0f]
-   */
-  void AnimateScrollOvershoot(float overshootAmount);
+  void SetOvershoot(float amount, bool animate = true);
 
   /**
    * Connects to the animation finished signal of our overshoot animation
@@ -218,24 +236,25 @@ public:
 
   /**
    * Creates a new ScrollOvershootEffectGradient objects and returns a pointer to it
+   *
    * @param[in] vertical whether to create a vertical(true) or horizontal effect
    * @return a pointer to the new effect
    */
-  static ScrollOvershootEffectRipplePtr New( bool vertical );
+  static ScrollOvershootEffectRipplePtr New( bool vertical, Scrollable& scrollable );
 
 private:
-
-  float mMaxOvershootImageSize;            ///< maximum size of the image when overshoot value is 1.0f
-  ImageActor mOvershootImage;              ///< the overshoot image...
-  Animation mScrollOvershootAnimation;     ///< animation
-  bool      mAnimatingOvershootOn;         ///< whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
-  bool      mAnimateOvershootOff;          ///< whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
-  int       mCanScrollPropertyIndex;       ///< property index to a property that informs indicator if it is needed
-  BouncingEffect mRippleEffect;                 // the ripple vertex/fragment shader effect
-  PropertyNotification mOvershootPositiveNotification; // stores the property notification used for positive overshoot values
-  PropertyNotification mOvershootNegativeNotification; // stores the property notification used for negative overshoot values
-  ActiveConstraint    mSizeConstraint;                 // active constraint handle used to store the image width constraint
-  ActiveConstraint    mPositionConstraint;             // active constraint handle used to store the image position constraint
+  Actor                 mOvershootOverlay;             ///< the actor which displays the overshoot effect
+  Scrollable&           mAttachedScrollView;           ///< the actor that this indicator has been attached to
+  Animation             mScrollOvershootAnimation;     ///< overshoot animation
+  PropertyNotification  mOvershootIncreaseNotification;///< notification used to inform as overshoot increases
+  PropertyNotification  mOvershootDecreaseNotification;///< notification used to inform as overshoot decreases
+  Property::Index       mCanScrollPropertyIndex;       ///< property index to a property that informs indicator if it is needed
+  Property::Index       mOvershootProperty;            ///< index of the overshoot property in the scrollable actor
+  Property::Index       mEffectOvershootProperty;      ///< index of the effect's overshoot property
+  float                 mMaxOvershootImageSize;        ///< maximum height of the image when overshoot value is 1.0f
+  float                 mOvershootAnimationDuration;   ///< time taken for overshoot to go from fully offscreen to fully onscreen and vice versa
+  float                 mOvershoot;                    ///< last overshoot value as detected by notifications
+  unsigned short        mAnimationStateFlags;          ///< contains flags indicating the current state of the overshoot animation
 };
 
 } // namespace Internal

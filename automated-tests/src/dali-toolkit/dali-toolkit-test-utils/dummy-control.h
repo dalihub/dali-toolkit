@@ -1,21 +1,22 @@
 #ifndef __DALI_TOOLKIT_TEST_DUMMY_CONTROL_H__
 #define __DALI_TOOLKIT_TEST_DUMMY_CONTROL_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/dali-toolkit.h>
@@ -37,7 +38,7 @@ public:
 
   DummyControl();
   DummyControl(const DummyControl& control);
-  virtual ~DummyControl();
+  ~DummyControl();
 
   static DummyControl New( bool override = false );
 
@@ -45,14 +46,6 @@ public:
 
 
   DummyControl& operator=(const DummyControl& control);
-
-  // Used to test signal connections
-  void CustomSlot1( Actor actor, const Vector3& value );
-
-public:
-
-  bool mCustomSlot1Called;
-  Vector3 mCustomSlot1Value;
 
 public: // Not intended for application developers
 
@@ -77,6 +70,12 @@ public:
   inline PanGestureDetector GetPanGestureDetector() const { return Internal::Control::GetPanGestureDetector(); }
   inline TapGestureDetector GetTapGestureDetector() const { return Internal::Control::GetTapGestureDetector(); }
   inline LongPressGestureDetector GetLongPressGestureDetector() const { return Internal::Control::GetLongPressGestureDetector(); }
+
+  // Used to test signal connections
+  void CustomSlot1( Actor actor, const Vector3& value );
+
+  bool mCustomSlot1Called;
+  Vector3 mCustomSlot1Value;
 
 protected:
 
@@ -104,7 +103,8 @@ private:
 private: // From Internal::Control
 
   virtual void OnInitialize();
-  virtual void OnStyleChange(StyleChange change);
+  virtual void OnThemeChange( StyleManager styleManager );
+  virtual void OnFontChange(bool defaultFontChange, bool defaultFontSizeChange);
   virtual void OnPinch(PinchGesture pinch);
   virtual void OnPan(PanGesture pan);
   virtual void OnTap(TapGesture tap);
@@ -127,7 +127,8 @@ private: // From CustomActorImpl
 public:
 
   bool initializeCalled;
-  bool styleChangeCalled;
+  bool themeChangeCalled;
+  bool fontChangeCalled;
   bool pinchCalled;
   bool panCalled;
   bool tapCalled;

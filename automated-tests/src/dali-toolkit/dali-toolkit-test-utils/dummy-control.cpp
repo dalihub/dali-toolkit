@@ -1,20 +1,23 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include "dummy-control.h"
+
+#include <dali-toolkit/public-api/styling/style-manager.h>
 
 namespace Dali
 {
@@ -23,14 +26,11 @@ namespace Toolkit
 {
 
 DummyControl::DummyControl()
-: mCustomSlot1Called(false)
 {
 }
 
 DummyControl::DummyControl(const DummyControl& control)
-: Control( control ),
-  mCustomSlot1Called(false),
-  mCustomSlot1Value(Vector3::ZERO)
+: Control( control )
 {
 }
 
@@ -50,7 +50,7 @@ DummyControl& DummyControl::operator=(const DummyControl& control)
 }
 
 // Used to test signal connections
-void DummyControl::CustomSlot1( Actor actor, const Vector3& value )
+void DummyControlImpl::CustomSlot1( Actor actor, const Vector3& value )
 {
   mCustomSlot1Called = true;
   mCustomSlot1Value = value;
@@ -65,9 +65,12 @@ DummyControl DummyControlImpl::New()
 }
 
 DummyControlImpl::DummyControlImpl()
-: Control(true)
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+  mCustomSlot1Called(false),
+  mCustomSlot1Value(Vector3::ZERO)
 {
 }
+
 
 DummyControlImpl::~DummyControlImpl()
 {
@@ -85,7 +88,8 @@ DummyControl DummyControlImplOverride::New()
 DummyControlImplOverride::DummyControlImplOverride()
 : DummyControlImpl(),
   initializeCalled(false),
-  styleChangeCalled(false),
+  themeChangeCalled( false ),
+  fontChangeCalled( false ),
   pinchCalled(false),
   panCalled(false),
   tapCalled(false),
@@ -108,7 +112,8 @@ DummyControlImplOverride::~DummyControlImplOverride() { }
 
 
 void DummyControlImplOverride::OnInitialize() { initializeCalled = true; }
-void DummyControlImplOverride::OnStyleChange(StyleChange change) { styleChangeCalled = true;}
+void DummyControlImplOverride::OnThemeChange(StyleManager change) { themeChangeCalled = true;}
+void DummyControlImplOverride::OnFontChange(bool defaultFontChange, bool defaultFontSizeChange) { fontChangeCalled = true; }
 void DummyControlImplOverride::OnPinch(PinchGesture pinch) { pinchCalled = true; }
 void DummyControlImplOverride::OnPan(PanGesture pan) { panCalled = true; }
 void DummyControlImplOverride::OnTap(TapGesture tap) { tapCalled = true; }
@@ -142,16 +147,12 @@ DummyControl DummyControl::New( bool override )
 }
 
 DummyControl::DummyControl( DummyControlImpl& implementation )
-: Control( implementation ),
-  mCustomSlot1Called(false),
-  mCustomSlot1Value(Vector3::ZERO)
+: Control( implementation )
 {
 }
 
 DummyControl::DummyControl( Dali::Internal::CustomActor* internal )
-: Control( internal ),
-  mCustomSlot1Called(false),
-  mCustomSlot1Value(Vector3::ZERO)
+: Control( internal )
 {
   VerifyCustomActorPointer<DummyControlImpl>(internal);
 }

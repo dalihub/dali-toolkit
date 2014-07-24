@@ -1,21 +1,22 @@
 #ifndef __DALI_TOOLKIT_SCROLLABLE_H__
 #define __DALI_TOOLKIT_SCROLLABLE_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 /**
  * @addtogroup CAPI_DALI_TOOLKIT_SCROLLABLE_MODULE
@@ -102,11 +103,18 @@ public:
   static const std::string SCROLL_POSITION_MAX_PROPERTY_NAME;           ///< Property, name "scroll-position-max",      type VECTOR3
   static const std::string SCROLL_DIRECTION_PROPERTY_NAME;              ///< Property, name "scroll-direction",         type VECTOR2
 
-  //Signal Names
+  /// @name Properties
+  /** @{ */
+  static const Property::Index PROPERTY_OVERSHOOT_EFFECT_COLOR;         ///< Property, name "overshoot-effect-color",  @see SetOvershootEffectColor(),  type VECTOR4
+  /** @} */
+
+  /// @name Signals
+  /** @{ */
   static const char* const SIGNAL_SCROLL_STARTED;   ///< "scroll-started";
   static const char* const SIGNAL_SCROLL_COMPLETED; ///< "scroll-completed";
   static const char* const SIGNAL_SCROLL_UPDATED;   ///< "scroll-updated";
   static const char* const SIGNAL_SCROLL_CLAMPED;   ///< "scroll-clamped";
+  /** @} */
 
 public:
 
@@ -164,11 +172,11 @@ public:
   Scrollable& operator=( const Scrollable& handle );
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
    *
-   * Dali::Object derived classes typically do not contain member data.
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~Scrollable();
+  ~Scrollable();
 
   /**
    * @brief Downcast an Object handle to Scrollable.
@@ -202,6 +210,19 @@ public:
    * @param[in] type The Scroll Component Type to disable
    */
   void DisableScrollComponent(Scrollable::ScrollComponentType type);
+
+  /**
+   * @brief Set the color of the overshoot effect.
+   *
+   * @param[in] color The color of the overshoot effect.
+   */
+  void SetOvershootEffectColor( const Vector4& color );
+
+  /**
+   * @brief Get the color of the overshoot effect.
+   * @return The color of the overshoot effect.
+   */
+  Vector4 GetOvershootEffectColor() const;
 
 public: // Not intended for application developers
 

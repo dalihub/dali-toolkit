@@ -1,21 +1,22 @@
 #ifndef __DALI_TOOLKIT_INTERNAL_SCROLL_VIEW_H__
 #define __DALI_TOOLKIT_INTERNAL_SCROLL_VIEW_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // EXTERNAL INCLUDES
 #include <dali/dali.h>
@@ -76,6 +77,19 @@ public:
     LockVertical,     ///< Locking is set to vertical. (can pan horizontally)
     LockNone          ///< Locking is set to none (free panning).
   };
+
+  enum ScrollStateFlag
+  {
+    AnimatingInternalX = 0x01, ///< animating mPropertyX due to externally requested ScrollTo or internal snapping operation
+    AnimatingInternalY = 0x02, ///< animating mPropertyY due to externally requested ScrollTo or internal snapping operation
+    SnappingInternalX  = 0x04, ///< snapping mPropertyX back to mPropertyPreScroll x value to remove x overshoot over time
+    SnappingInternalY  = 0x08, ///< snapping mPropertyY back to mPropertyPreScroll y value to remove y overshoot over time
+  };
+
+  static const unsigned int SCROLL_X_STATE_MASK = AnimatingInternalX | SnappingInternalX;
+  static const unsigned int SCROLL_Y_STATE_MASK = AnimatingInternalY | SnappingInternalY;
+  static const unsigned int SCROLL_ANIMATION_FLAGS = AnimatingInternalX | AnimatingInternalY;
+  static const unsigned int SNAP_ANIMATION_FLAGS = SnappingInternalX | SnappingInternalY;
 
 public:
 
@@ -179,22 +193,6 @@ public:
   void SetRulerY(RulerPtr ruler);
 
   /**
-   * @copydoc Toolkit::ScrollView::SetRulerScaleX
-   */
-  void SetRulerScaleX(RulerPtr ruler);
-
-  /**
-   * @copydoc Toolkit::ScrollView::SetRulerScaleY
-   */
-  void SetRulerScaleY(RulerPtr ruler);
-
-  /**
-   * Set Rotation axis ruler (defines how rotating is snapped in radians)
-   * @param[in] ruler The ruler to be used for the Rotation axis
-   */
-  void SetRulerRotation(RulerPtr ruler);
-
-  /**
    * @copydoc Toolkit::ScrollView::SetScrollSensitive
    */
   void SetScrollSensitive(bool sensitive);
@@ -252,14 +250,26 @@ public:
   void SetWrapMode(bool enable);
 
   /**
+   * @deprecated
    * @copydoc Toolkit::ScrollView::GetRefreshInterval
    */
   int GetRefreshInterval() const;
 
   /**
+   * @deprecated
    * @copydoc Toolkit::ScrollView::SetRefreshInterval
    */
   void SetRefreshInterval(int milliseconds);
+
+  /**
+   * @copydoc Toolkit::ScrollView::GetScrollupdateDistance
+   */
+  int GetScrollUpdateDistance() const;
+
+  /**
+   * @copydoc Toolkit::ScrollView::SetScrollUpdateDistance
+   */
+  void SetScrollUpdateDistance(int distance);
 
   /**
    * @copydoc Toolkit::ScrollView::GetAxisAutoLock
@@ -302,6 +312,26 @@ public:
   void SetFlickSpeedCoefficient(float speed);
 
   /**
+   * @copydoc Toolkit::ScrollView::GetMinimumDistanceForFlick
+   */
+  Vector2 GetMinimumDistanceForFlick() const;
+
+  /**
+   * @copydoc Toolkit::ScrollView::SetMinimumDistanceForFlick
+   */
+  void SetMinimumDistanceForFlick( const Vector2& distance );
+
+  /**
+   * @copydoc Toolkit::ScrollView::GetMinimumSpeedForFlick
+   */
+  float GetMinimumSpeedForFlick() const;
+
+  /**
+   * @copydoc Toolkit::ScrollView::SetMinimumSpeedForFlick
+   */
+  void SetMinimumSpeedForFlick( float speed );
+
+  /**
    * @copydoc Toolkit::ScrollView::GetMaxFlickSpeed
    */
   float GetMaxFlickSpeed() const;
@@ -332,9 +362,9 @@ public:
   Vector3 GetCurrentScrollPosition() const;
 
   /**
-   * @copydoc Toolkit::ScrollView::GetCurrentScrollScale
+   * @copydoc Toolkit::ScrollView::SetScrollPosition
    */
-  Vector3 GetCurrentScrollScale() const;
+  void SetScrollPosition(const Vector3& position);
 
   /**
    * @copydoc Toolkit::Scrollable::GetDomainSize
@@ -342,15 +372,15 @@ public:
   Vector3 GetDomainSize() const;
 
   /**
-   * @copydoc Toolkit::ScrollView::TransformTo(const Vector3& position, const Vector3& scale, float rotation)
+   * @copydoc ScrollTo(const Vector3&)
    */
-  void TransformTo(const Vector3& position, const Vector3& scale, float rotation,
+  void TransformTo(const Vector3& position,
                    DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone);
 
   /**
-   * @copydoc Toolkit::ScrollView::TransformTo(const Vector3& position, const Vector3& scale, float rotation, float duration)
+   * @copydoc ScrollTo(const Vector3&, float, DirectionBias, DirectionBias)
    */
-  void TransformTo(const Vector3& position, const Vector3& scale, float rotation, float duration,
+  void TransformTo(const Vector3& position, float duration,
                    DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone);
 
   /**
@@ -423,29 +453,22 @@ public:
   bool ScrollToSnapPoint();
 
   /**
-   * @copydoc Toolkit::ScrollView::ScaleTo(const Vector3& scale)
-   */
-  void ScaleTo(const Vector3& scale);
-
-  /**
-   * @copydoc Toolkit::ScrollView::ScaleTo(const Vector3& scale, float duration)
-   */
-  void ScaleTo(const Vector3& scale, float duration);
-
-  /**
    * Stops animation
    */
   void StopAnimation(void);
 
   /**
-   * Animates to position/scale/rotation transform.
+   * Stops the input animation
+   *
+   * @param[in] the animation to stop
+   */
+  void StopAnimation(Animation& animation);
+
+  /**
+   * Animates to position transform.
    *
    * @param[in] position The position to animate to
    * @param[in] positionDuration The number of seconds this animation should run for in each axis.
-   * @param[in] scale The scale to animate to
-   * @param[in] scaleDuration The number of seconds this animation should run for in each axis.
-   * @param[in] rotation The angle to animate to
-   * @param[in] rotationDuration The number of seconds this animation should run for in each axis.
    * @param[in] alpha The easing alpha function to use.
    * @param[in] findShortcuts (optional) Whether to find the shortest route (in Wrap mode)
    * @param[in] horizontalBias (optional) Whether to bias animation to left or right (or no biasing)
@@ -453,8 +476,6 @@ public:
    * @return True if animation necessary and taking place to reach desired transform.
    */
   bool AnimateTo(const Vector3& position, const Vector3& positionDuration,
-                             const Vector3& scale, const Vector3& scaleDuration,
-                             float rotation, float rotationDuration,
                              AlphaFunction alpha, bool findShortcuts = true,
                              DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone,
                              SnapType snapType = Snap);
@@ -468,6 +489,11 @@ public:
    * @copydoc Toolkit::Scrollable::RemoveOverlay()
    */
   void RemoveOverlay(Actor actor);
+
+  /**
+   * @copydoc Toolkit::Internal::Scrollable::SetOvershootEffectColor
+   */
+  void SetOvershootEffectColor( const Vector4& color );
 
 public: //Signals
 
@@ -510,6 +536,11 @@ private: // private overriden functions from CustomActorImpl and Controls
    * @param[in] child The child being removed.
    */
   virtual void OnChildRemove(Actor& child);
+
+  /**
+   * @copydoc Dali::CustomActorImpl::OnPropertySet( Property::Index index, Property::Value propertyValue )
+   */
+  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
 
   /**
    * From CustomActorImpl; called after a touch-signal is received by the owning actor.
@@ -556,22 +587,87 @@ private: // private overriden functions from CustomActorImpl and Controls
 private:
 
   /**
+   * Start a timer which calls OnTouchDownTimeout()
+   */
+  void StartTouchDownTimer();
+
+  /**
+   * Stop a timer which calls OnTouchDownTimeout()
+   */
+  void StopTouchDownTimer();
+
+  /**
+   * Helper to detect when touch-point has been down (outside of pan gesture)
+   */
+  bool OnTouchDownTimeout();
+
+  /**
    * Called whenever a snap animation has completed
    * @param[in] source the Animation instance that has completed.
+   * Resets all scrolling animations and states, leaving current scroll position at mPropertyPosition
    */
-  void OnSnapAnimationFinished( Animation& source );
+  void ResetScrolling();
+
+  /**
+   * Updates mScrollInternalPosition, mScrollPrePosition and mScrollPostPosition from their property counterparts
+   */
+  void UpdateLocalScrollProperties();
+
+  /**
+   * Makes sure scroll values are ready for animated scrolling
+   */
+  void PreAnimatedScrollSetup();
+
+  /**
+   * Finish an animated scroll, ensuring all scroll properties are updated
+   * and synchronised
+   */
+  void FinaliseAnimatedScroll();
+
+  /**
+   * Animates the internal x property to the given value
+   *
+   * @param[in] position The X position to animate to
+   * @param[in] duration The time in seconds for animation
+   * @param[in] alpha The alpha function to use for animating
+   */
+  void AnimateInternalXTo( float position, float duration, AlphaFunction alpha );
+
+  /**
+   * Animates the internal y property to the given value
+   *
+   * @param[in] position The Y position to animate to
+   * @param[in] duration The time in seconds for animation
+   * @param[in] alpha The alpha function to use for animating
+   */
+  void AnimateInternalYTo( float position, float duration, AlphaFunction alpha );
 
   /**
    * Called whenever a snap animation on the x-axis has completed
    * @param[in] source the Animation instance that has completed.
    */
-  void OnSnapXAnimationFinished( Animation& source );
+  void OnScrollAnimationFinished( Animation& source );
 
   /**
-   * Called whenever a snap animation on the y-axis has completed
+   * Called when either the X or Y internal scroll positions have finished snapping back to mPropertyPrePosition
+   *
    * @param[in] source the Animation instance that has completed.
    */
-  void OnSnapYAnimationFinished( Animation& source );
+  void OnSnapInternalPositionFinished( Animation& source );
+
+  /**
+   * Called whenever a snap animation on the x-axis has completed and we need to snap pre scroll
+   * position to our clamped position
+   * @param[in] position The x position to snap pre scroll property to
+   */
+  void SnapInternalXTo( float position );
+
+  /**
+   * Called whenever a snap animation on the y-axis has completed and we need to snap pre scroll
+   * position to our clamped position
+   * @param[in] position The y position to snap pre scroll property to
+   */
+  void SnapInternalYTo( float position );
 
   /**
    * This is called internally whenever the Scroll Rulers are
@@ -591,10 +687,8 @@ private:
    * Amalgamated Gesture Continuing event
    *
    * @param[in] panDelta average panning delta from base position (0)
-   * @param[in] scaleDelta average scale delta from base scale (1)
-   * @param[in] rotationDelta average rotation delta from base angle (0)
    */
-  void GestureContinuing(Vector2 panDelta, Vector2 scaleDelta, float rotationDelta);
+  void GestureContinuing(const Vector2& panDelta);
 
   /**
    * Called upon pan gesture event.
@@ -619,32 +713,10 @@ private:
   bool SnapWithVelocity(Vector2 velocity);
 
   /**
-   * Updates Container Transform based on Pan, Scale, and Rotation props.
-   * (occurs when continuing gesture i.e. dragging/pinching.)
-   */
-  void UpdateTransform();
-
-  /**
    * Finishes Container Transform
    * (occurs upon finishing gesture i.e. releasing)
    */
   void FinishTransform();
-
-  /**
-   * Sets Overshoot to origin / cancels animation
-   */
-  void SetOvershootToOrigin();
-
-  /**
-   * Animates Overshoot to origin
-   */
-  void AnimateOvershootToOrigin(float xDelay, float yDelay);
-
-  /**
-   * Called whenever a snap overshoot animation has completed.
-   * @param[in] source the Animation instance that has completed.
-   */
-  void OnSnapOvershootAnimationFinished( Animation& source );
 
   /**
    * Returns overshoot vector based on current position
@@ -684,21 +756,6 @@ private:
    * @param[in,out] position The position you wish to wrap
    */
   void WrapPosition(Vector3& position) const;
-
-  /**
-   * Clamps scale within the domain set up by Scale-X/Scale-Y Rulers
-   *
-   * @param[in,out] scale The scale you wish to clamp
-   */
-  void ClampScale(Vector3& scale) const;
-
-  /**
-   * Clamps scale within the domain set up by Scale-X/Scale-Y Rulers
-   *
-   * @param[in,out] scale The scale you wish to clamp
-   * @param[out] clamped The results of the clamping.
-   */
-  void ClampScale(Vector3& scale, ClampState3 &clamped) const;
 
   /**
    * Updates the main internal scroll constraints with new ruler and domain
@@ -757,40 +814,28 @@ private:
   Vector3 GetPropertyPosition() const;
 
   /**
-   * Gets scale property.
-   *
-   * @return The current scale
-   */
-  Vector3 GetPropertyScale() const;
-
-  /**
-   * Handles a Stopped animation. Its position/scale/rotation properties need to be
-   * saved, and the animation flag switched off.
+   * Handles a Stopped animation. Its position properties need to be saved, and the animation flag
+   * switched off.
    */
   void HandleStoppedAnimation();
 
   /**
    * Handles a Stopped animation (whether the animation completed, or was
-   * manually stopped). Its position/scale/rotation properties need to be
-   * saved, and the animation flag switched off.
+   * manually stopped). Its position properties need to be saved, and the
+   * animation flag switched off.
    */
   void HandleSnapAnimationFinished();
 
   /**
-   * Helper to start the refresh timer.
+   * Checks if the property notifications are active and adds them if not
    */
-  void StartRefreshTimer();
-
-  /**
-   * Helper to cancel the refresh timer.
-   */
-  void CancelRefreshTimer();
+  void SetScrollUpdateNotification( bool enabled );
 
   /**
    * Refresh the ScrollView (used when animating to update application developer of changes)
    * @return True if the refresh timer should be kept running.
    */
-  bool OnRefreshTick();
+  void OnScrollUpdateNotification(Dali::PropertyNotification& source);
 
 private:
 
@@ -802,73 +847,58 @@ private:
 
 private:
 
-  bool mInitialized;
-  bool mScrolling;                      ///< Flag indicating whether the scroll view is being scrolled (by user or animation)
-  bool mScrollInterrupted;              ///< Flag set for when a down event interrupts a scroll
   unsigned long mTouchDownTime;         ///< The touch down time
-  Vector2 mTouchDownPosition;           ///< The touch down position
-
-  bool mSensitive;                      ///< Scroll Sensitivity Flag.
 
   int mGestureStackDepth;               ///< How many gestures are currently occuring.
-  Vector2 mGestureReferencePosition;    ///< Point where scaling should occur from.
-  Vector2 mPinchGestureLastPosition;
-  Vector2 mPinchGestureLastScale;
-
+  Vector2 mPanStartPosition;            ///< Where the pan gesture's touch down occured
   Vector3 mPanDelta;                    ///< Amount currently panned.
-  Vector3 mScaleDelta;                  ///< Amount currently scaled.
-  float mRotationDelta;                 ///< Amount currently rotated.
 
-  // Scroll delegate pre and post position/scale/rotation properties...
-  Vector3 mScrollPrePosition;           ///< Scroll delegate pre-position
-  Vector3 mScrollPostPosition;          ///< Scroll delegate post-position (affected by current touch)
-  Vector3 mScrollPreScale;              ///< Scroll delegate pre-scale
-  Vector3 mScrollPostScale;             ///< Scroll delegate post-scale (affected by current touch)
-  float mScrollPreRotation;             ///< Scroll delegate pre-rotation
-  float mScrollPostRotation;            ///< Scroll delegate post-rotation (affected by current touch)
+  unsigned int mScrollStateFlags;       ///< flags indicating current state of scrolling
+  // Scroll delegate pre and post position properties...
+  Vector3 mScrollPrePosition;           ///< Wrapped scroll position, but not clamped
+  Vector3 mScrollPostPosition;          ///< Wrapped and clamped, this is the final scroll position used
+  Vector3 mScrollTargetPosition;        ///< Final target position for an animated scroll
   Vector3 mDomainOffset;                ///< Domain offset (this keeps track of the domain boundaries that scroll positions traverses)
 
   // Rulers for each axes...
   RulerPtr mRulerX;
   RulerPtr mRulerY;
-  RulerPtr mRulerScaleX;
-  RulerPtr mRulerScaleY;
-  RulerPtr mRulerRotation;
-  bool mTouchDownReceived;
-  bool mActorAutoSnapEnabled;           ///< Whether to automatically snap to closest actor.
-  bool mAutoResizeContainerEnabled;     ///< Whether to automatically resize container (affects RulerDomain's on X/Y axes)
-  bool mWrapMode;                       ///< Whether to wrap contents based on container size.
-  bool mAxisAutoLock;                   ///< Whether to automatically lock axis when panning.
+
+  // Last property values set to ScrollView
+  Vector3 mMinScroll;
+  Vector3 mMaxScroll;
+
   unsigned int mMinTouchesForPanning;   ///< Minimum number of touches for panning to be used.
   unsigned int mMaxTouchesForPanning;   ///< Maximum number of touches for panning to be used.
 
-  Animation mSnapAnimation;
-  Animation mSnapXAnimation;             ///< Animates from current x-axis position to the snapped (or scrolled) x-axis position.
-  Animation mSnapYAnimation;             ///< Animates from current y-axis position to the snapped (or scrolled) y-axis position.
-  Animation mSnapOvershootAnimation;    ///< Animates scroll-overshoot from current position to 0,0 based on specified easing equation.
+  Animation mInternalXAnimation;        ///< Animates mPropertyX to a snap position or application requested scroll position
+  Animation mInternalYAnimation;        ///< Animates mPropertyY to a snap position or application requested scroll position
 
 
   Vector2 mLastVelocity;                ///< Record the last velocity from PanGesture (Finish event doesn't have correct velocity)
   LockAxis mLockAxis;
 
-  Timer mOvershootRefreshTimer;
-  Timer mRefreshTimer;                  ///< Refresh timer is used to provide the Application developer with updates as animations run.
-  int mRefreshIntervalMilliseconds;     ///< Refresh timer interval.
+  Timer mTouchDownTimer;                ///< Used to interrupt snap-animation. This cannot be done in OnTouchEvent without breaking fast flick behavior.
 
-  bool mAlterChild;                     ///< Internal flag to control behavior of OnChildAdd/OnChildRemove when Adding internal Actors.
+  float mScrollUpdateDistance;          ///< Distance for scrolling to travel for the scroll update notifications
+  Dali::PropertyNotification mScrollXUpdateNotification; ///< scroll x position update notification
+  Dali::PropertyNotification mScrollYUpdateNotification; ///< scroll y position update notification
+
   Actor mInternalActor;                 ///< Internal actor (we keep internal actors in here e.g. scrollbars, so we can ignore it in searches)
 
   ScrollViewEffectContainer mEffects;   ///< Container keeping track of all the applied effects.
 
   float     mOvershootDelay;                    ///< Time to wait for input before reducing overshoot back to 0
   Vector2   mMaxOvershoot;                      ///< Number of scrollable pixels that will take overshoot from 0.0f to 1.0f
-  bool      mDefaultMaxOvershoot;               ///< Whether to use default max overshoot or application defined one
+  Vector2   mUserMaxOvershoot;                  ///< Set by user, allows overriding of default max overshoot for the scroll indicator
   float     mSnapOvershootDuration;             ///< Duration for overshoot snapping back to Vector3::ZERO
   AlphaFunction mSnapOvershootAlphaFunction;    ///< AlphaFunction to be used for this overshoot.
 
   float mSnapDuration;                          ///< Time for the snap animation to take (in seconds).
   AlphaFunction mSnapAlphaFunction;             ///< AlphaFunction to be used for the Snap Animation.
 
+  Vector2 mMinFlickDistance;                      ///< Minimum pan distance required for a flick
+  float mFlickSpeedThreshold;                   ///< Minimum pan speed required for a flick in pixels/ms
   float mFlickDuration;                         ///< Time for the flick animation to take (in seconds).
   AlphaFunction mFlickAlphaFunction;            ///< AlphaFunction to be used for the Flick Animation.
 
@@ -882,8 +912,6 @@ private:
   //ScrollInternalConstraintsPtr mScrollInternalConstraints;
   ActiveConstraint mScrollMainInternalPrePositionConstraint;
   ActiveConstraint mScrollMainInternalPositionConstraint;
-  ActiveConstraint mScrollMainInternalXConstraint;
-  ActiveConstraint mScrollMainInternalYConstraint;
   ActiveConstraint mScrollMainInternalOvershootXConstraint;
   ActiveConstraint mScrollMainInternalOvershootYConstraint;
   ActiveConstraint mScrollMainInternalDeltaConstraint;
@@ -893,6 +921,22 @@ private:
   ScrollOvershootIndicatorPtr mOvershootIndicator;
 
   Toolkit::ScrollView::SnapStartedSignalV2 mSnapStartedSignalV2;
+
+  bool mInAccessibilityPan : 1;           ///< With AccessibilityPan its easier to move between snap positions
+  bool mInitialized:1;
+  bool mScrolling:1;                      ///< Flag indicating whether the scroll view is being scrolled (by user or animation)
+  bool mScrollInterrupted:1;              ///< Flag set for when a down event interrupts a scroll
+  bool mPanning:1;                        ///< Whether scroll view is currently panning or not
+  bool mSensitive:1;                      ///< Scroll Sensitivity Flag.
+  bool mTouchDownTimeoutReached:1;        ///< Indicates when down event timeout occured without corresponding up event (touch still down)
+  bool mActorAutoSnapEnabled:1;           ///< Whether to automatically snap to closest actor.
+  bool mAutoResizeContainerEnabled:1;     ///< Whether to automatically resize container (affects RulerDomain's on X/Y axes)
+  bool mWrapMode:1;                       ///< Whether to wrap contents based on container size.
+  bool mAxisAutoLock:1;                   ///< Whether to automatically lock axis when panning.
+  bool mAlterChild:1;                     ///< Internal flag to control behavior of OnChildAdd/OnChildRemove when Adding internal Actors.
+  bool mDefaultMaxOvershoot:1;            ///< Whether to use default max overshoot or application defined one
+  bool mCanScrollHorizontal:1;            ///< Local value of our property to check against
+  bool mCanScrollVertical:1;              ///< Local value of our property to check against
 };
 
 } // namespace Internal

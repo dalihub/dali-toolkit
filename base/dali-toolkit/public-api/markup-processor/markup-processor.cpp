@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // HEADER INCLUDE
 #include <dali-toolkit/public-api/markup-processor/markup-processor.h>
@@ -891,9 +892,9 @@ void GetMarkupString( const StyledTextArray& styledTextArray, std::string& marku
   {
     const StyledText& styledText( *it );
 
-    bool isItalics = styledText.mStyle.GetItalics();
+    bool isItalics = styledText.mStyle.IsItalicsEnabled();
     bool isBold = defaultStyle.GetWeight() != styledText.mStyle.GetWeight();
-    bool isUnderline = styledText.mStyle.GetUnderline();
+    bool isUnderline = styledText.mStyle.IsUnderlineEnabled();
     bool hasFontFace = defaultStyle.GetFontName() != styledText.mStyle.GetFontName();
     bool hasFontStyle = defaultStyle.GetFontStyle() != styledText.mStyle.GetFontStyle();
     bool hasFontSize = fabsf( defaultStyle.GetFontPointSize() - styledText.mStyle.GetFontPointSize() ) > GetRangedEpsilon( defaultStyle.GetFontPointSize(), styledText.mStyle.GetFontPointSize() );
@@ -960,7 +961,7 @@ void GetMarkupString( const StyledTextArray& styledTextArray, std::string& marku
     }
 
     // Write shadow.
-    if( styledText.mStyle.GetShadow() )
+    if( styledText.mStyle.IsShadowEnabled() )
     {
       markupString += LESS_THAN + XHTML_SHADOW_TAG;
 
@@ -979,7 +980,7 @@ void GetMarkupString( const StyledTextArray& styledTextArray, std::string& marku
     }
 
     // Write glow.
-    if( styledText.mStyle.GetGlow() )
+    if( styledText.mStyle.IsGlowEnabled() )
     {
       markupString += LESS_THAN + XHTML_GLOW_TAG;
 
@@ -997,7 +998,7 @@ void GetMarkupString( const StyledTextArray& styledTextArray, std::string& marku
     } // <glow>
 
     // Write outline.
-    if( styledText.mStyle.GetOutline() )
+    if( styledText.mStyle.IsOutlineEnabled() )
     {
       markupString += LESS_THAN + XHTML_OUTLINE_TAG;
 
@@ -1026,19 +1027,19 @@ void GetMarkupString( const StyledTextArray& styledTextArray, std::string& marku
     }
 
     // Write outline close tag.
-    if( styledText.mStyle.GetOutline() )
+    if( styledText.mStyle.IsOutlineEnabled() )
     {
       markupString += LESS_THAN + ( SLASH + XHTML_OUTLINE_TAG + GREATER_THAN ); // </outline>
     }
 
     // Write glow close tag.
-    if( styledText.mStyle.GetGlow() )
+    if( styledText.mStyle.IsGlowEnabled() )
     {
       markupString += LESS_THAN + ( SLASH + XHTML_GLOW_TAG + GREATER_THAN ); // </glow>
     }
 
     // Write shadow close tag.
-    if( styledText.mStyle.GetShadow() )
+    if( styledText.mStyle.IsShadowEnabled() )
     {
       markupString += LESS_THAN + ( SLASH + XHTML_SHADOW_TAG + GREATER_THAN ); // </shadow>
     }

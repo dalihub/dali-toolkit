@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include "text-view-impl.h"
@@ -711,11 +712,13 @@ void TextView::SetSnapshotModeEnabled( bool enable )
 
       mOffscreenImageActor.SetAnchorPoint( ParentOrigin::CENTER );
       mOffscreenImageActor.SetParentOrigin( ParentOrigin::CENTER );
+      mOffscreenImageActor.SetBlendFunc( BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA,
+                                         BlendingFactor::ONE, BlendingFactor::ONE );
 
       Actor self = Self();
       self.Add( mOffscreenRootActor );
       self.Add( mOffscreenImageActor );
-      mOffscreenImageActor.SetScale(Vector3(1.f, -1.f, 1.f));
+      mOffscreenImageActor.SetScale( Vector3( 1.f, -1.f, 1.f ) );
     }
     else
     {
@@ -1009,7 +1012,7 @@ TextView::RelayoutData& TextView::RelayoutData::operator=( const TextView::Relay
 }
 
 TextView::TextView()
-: Control( false ),  // doesn't require touch events
+: Control( REQUIRES_STYLE_CHANGE_SIGNALS  ),
   mCurrentStyledText(),
   mTextViewProcessorOperations(),
   mLayoutParameters( Toolkit::TextView::SplitByNewLineChar,
@@ -1149,7 +1152,7 @@ void TextView::OnInitialize()
 }
 
 
-void TextView::OnStyleChange( StyleChange change )
+void TextView::OnFontChange( bool defaultFontChange, bool defaultFontSizeChange )
 {
   mRelayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo = TextViewProcessor::WordLayoutInfo();
   TextViewProcessor::CreateWordTextInfo( mLayoutParameters.mEllipsizeText,

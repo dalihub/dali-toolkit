@@ -1,8 +1,5 @@
 <manifest>
-	<assign>
-		<filesystem path="/usr/lib/*" label="_" />
-	</assign>
 	<request>
-		<domain name="dali"/>
+		<domain name="_"/>
 	</request>
 </manifest>

@@ -1,14 +1,14 @@
 #
 # Copyright (c) 2014 Samsung Electronics Co., Ltd.
 #
-# Licensed under the Flora License, Version 1.0 (the License);
+# Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://floralicense.org/license/
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an AS IS BASIS,
+# distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -55,6 +55,16 @@ if test "x$enable_debug" = "xno" -a "x$enable_exportall" = "xno"; then
   DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -fvisibility=hidden -DHIDE_DALI_INTERNALS"
 fi
 
+# Tizen Profile options
+AC_ARG_ENABLE([profile],
+              [AC_HELP_STRING([--enable-profile=COMMON,MOBILE,LITE,WEARABLE,TV],
+                            [Select the variant of tizen])],
+              [dali_profile=$enableval],
+              [dali_profile=COMMON])
+
+# Different platforms use either the full Toolkit or the basic version
+# The basic version excludes components under dali-toolkit/optional
+AM_CONDITIONAL([TOOLKIT_BASIC_VERSION], [test x$dali_profile = xLITE])
 
 if test x$DALI_DATA_RW_DIR != x; then
   dataReadWriteDir=${DALI_DATA_RW_DIR}/
@@ -77,11 +87,18 @@ AC_SUBST(DALI_TOOLKIT_CFLAGS)
 devincludepath=${includedir}
 AC_SUBST(devincludepath)
 
+# Doxygen paths
+DOXYGEN_DOCS_DIR=../../../docs
+DOXYGEN_ROOT_DIR=../../..
+AC_SUBST(DOXYGEN_DOCS_DIR)
+AC_SUBST(DOXYGEN_ROOT_DIR)
+
 AC_CONFIG_FILES([
  Makefile
  dali-toolkit/Makefile
- dali-toolkit-base/Makefile
  dali-toolkit.pc
+ docs/Makefile
+ docs/dali.doxy
 ])
 
 AC_OUTPUT
@@ -91,6 +108,7 @@ Configuration
 -------------
   Prefix:                           $prefix
   Debug Build:                      $enable_debug
+  Profile:                          $dali_profile
   Data Dir (Read/Write):            $dataReadWriteDir
   Data Dir (Read Only):             $dataReadOnlyDir
 "

@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <dali-toolkit/internal/controls/scroll-bar/scroll-bar-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
@@ -198,9 +199,13 @@ void ScrollBar::SetBackgroundImage( Image image, const Vector4& border )
   {
     mBackground.SetImage(image);
   }
-
   mBackground.SetNinePatchBorder( border );
   mBackground.SetStyle( ImageActor::STYLE_NINE_PATCH );
+}
+
+void ScrollBar::SetIndicatorImage( Image image )
+{
+  mIndicator.SetImage(image);
 }
 
 void ScrollBar::SetIndicatorImage( Image image, const Vector4& border )
@@ -279,7 +284,7 @@ void ScrollBar::SetPositionNotifications( const std::vector<float>& positions )
 void ScrollBar::OnScrollPositionNotified(PropertyNotification& source)
 {
   // Emit the signal to notify the scroll position crossing
-  mScrollPositionNotifiedSignal.Emit(mScrollPositionObject.GetProperty<float>( Toolkit::ScrollConnector::SCROLL_POSITION ));
+  mScrollPositionNotifiedSignal.Emit(mScrollConnector.GetScrollPosition());
 }
 
 void ScrollBar::Show()
@@ -313,13 +318,9 @@ void ScrollBar::Hide()
 bool ScrollBar::OnPanGestureProcessTick()
 {
   // Update the scroll position property.
-  mScrollPositionObject.SetProperty( Toolkit::ScrollConnector::SCROLL_POSITION, mCurrentScrollPosition );
-
-  Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(Self().GetParent());
-  if(itemView)
+  if( mScrollConnector )
   {
-    // Refresh ItemView immediately when the scroll position is changed.
-    GetImpl(itemView).DoRefresh(mCurrentScrollPosition, false); // No need to cache extra items.
+    mScrollConnector.SetScrollPosition(mCurrentScrollPosition);
   }
 
   return true;
@@ -327,8 +328,10 @@ bool ScrollBar::OnPanGestureProcessTick()
 
 void ScrollBar::OnPan( PanGesture gesture )
 {
-  if(mScrollPositionObject)
+  if(mScrollConnector)
   {
+    Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(Self().GetParent());
+
     switch(gesture.state)
     {
       case Gesture::Started:
@@ -342,7 +345,7 @@ void ScrollBar::OnPan( PanGesture gesture )
         }
 
         Show();
-        mScrollStart = mScrollPositionObject.GetProperty<float>( Toolkit::ScrollConnector::SCROLL_POSITION );
+        mScrollStart = mScrollConnector.GetScrollPosition();
         mGestureDisplacement = Vector3::ZERO;
         mIsPanning = true;
 
@@ -372,11 +375,16 @@ void ScrollBar::OnPan( PanGesture gesture )
           mTimer.Reset();
         }
 
+        if(itemView)
+        {
+          // Refresh the ItemView cache with extra items
+          GetImpl(itemView).DoRefresh(mCurrentScrollPosition, true);
+        }
+
         break;
       }
     }
 
-    Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(Self().GetParent());
     if(itemView)
     {
       // Disable automatic refresh in ItemView during fast scrolling

@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include "gaussian-blur-view-impl.h"
@@ -111,15 +112,16 @@ const char* const GAUSSIAN_BLUR_FRAGMENT_SOURCE =
 
 
 GaussianBlurView::GaussianBlurView()
-  : Control( false )  // doesn't require touch events
+  : Control( CONTROL_BEHAVIOUR_NONE )
   , mNumSamples(GAUSSIAN_BLUR_VIEW_DEFAULT_NUM_SAMPLES)
-
+  , mBlurBellCurveWidth( 0.001f )
   , mPixelFormat(GAUSSIAN_BLUR_VIEW_DEFAULT_RENDER_TARGET_PIXEL_FORMAT)
   , mDownsampleWidthScale(GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_WIDTH_SCALE)
   , mDownsampleHeightScale(GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_HEIGHT_SCALE)
   , mDownsampledWidth( 0.0f )
   , mDownsampledHeight( 0.0f )
   , mBlurUserImage( false )
+  , mRenderOnce( false )
   , mBackgroundColor( Color::BLACK )
   , mTargetSize(Vector2::ZERO)
   , mLastSize(Vector2::ZERO)
@@ -132,14 +134,16 @@ GaussianBlurView::GaussianBlurView()
 GaussianBlurView::GaussianBlurView( const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
                                     const float downsampleWidthScale, const float downsampleHeightScale,
                                     bool blurUserImage)
-  : Control( false )  // doesn't require touch events
+  : Control( CONTROL_BEHAVIOUR_NONE )
   , mNumSamples(numSamples)
+  , mBlurBellCurveWidth( 0.001f )
   , mPixelFormat(renderTargetPixelFormat)
   , mDownsampleWidthScale(downsampleWidthScale)
   , mDownsampleHeightScale(downsampleHeightScale)
   , mDownsampledWidth( 0.0f )
   , mDownsampledHeight( 0.0f )
   , mBlurUserImage( blurUserImage )
+  , mRenderOnce( false )
   , mBackgroundColor( Color::BLACK )
   , mTargetSize(Vector2::ZERO)
   , mLastSize(Vector2::ZERO)

@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <dali/dali.h>
 
@@ -20,15 +21,13 @@
 #include <dali-toolkit/internal/controls/text-view/text-processor.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
+#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 
 #include <dali/integration-api/debug.h>
 
 #include <math.h>
 #include <sstream>
 #include <algorithm>
-#include <libintl.h>
-
-#define GET_LOCALE_TEXT(string) dgettext("sys_string", string)
 
 using namespace std;
 using namespace Dali;
@@ -46,44 +45,28 @@ const std::size_t DEFAULT_NUMBER_OF_LINES_LIMIT( std::numeric_limits<std::size_t
 const Vector3 DEFAULT_SELECTION_HANDLE_SIZE( 51.0f, 79.0f, 0.0f );  // Selection cursor image size
 const Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE( 1.5f, 2.0f, 1.0f );
 const Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.5f, 1.5f, 1.0f );
-const Vector4 LIGHTBLUE( 10.0f/255.0f, 140.0f/255.0f, 210.0f/255.0f, 1.0f );    // Used for Selection highlight
+const Vector4 LIGHTBLUE( 0.07f, 0.41f, 0.59f, 1.0f );    // Used for Selection highlight
 
 const char* DEFAULT_GRAB_HANDLE( DALI_IMAGE_DIR "insertpoint-icon.png" );
 const char* DEFAULT_SELECTION_HANDLE_ONE( DALI_IMAGE_DIR "text-input-selection-handle-left.png" );
 const char* DEFAULT_SELECTION_HANDLE_TWO( DALI_IMAGE_DIR "text-input-selection-handle-right.png" );
 const char* DEFAULT_SELECTION_HANDLE_ONE_PRESSED( DALI_IMAGE_DIR "text-input-selection-handle-left-press.png" );
 const char* DEFAULT_SELECTION_HANDLE_TWO_PRESSED( DALI_IMAGE_DIR "text-input-selection-handle-right-press.png" );
-const char* DEFAULT_CURSOR( DALI_IMAGE_DIR "cursor.png" );
-
-const char* DEFAULT_ICON_CLIPBOARD( DALI_IMAGE_DIR "copy_paste_icon_clipboard.png" );
-const char* DEFAULT_ICON_COPY( DALI_IMAGE_DIR "copy_paste_icon_copy.png" );
-const char* DEFAULT_ICON_CUT( DALI_IMAGE_DIR "copy_paste_icon_cut.png" );
-const char* DEFAULT_ICON_PASTE( DALI_IMAGE_DIR "copy_paste_icon_paste.png" );
-const char* DEFAULT_ICON_SELECT( DALI_IMAGE_DIR "copy_paste_icon_select.png" );
-const char* DEFAULT_ICON_SELECT_ALL( DALI_IMAGE_DIR "copy_paste_icon_select_all.png" );
-
-const Vector4 DEFAULT_CURSOR_IMAGE_9_BORDER( 2.0f, 2.0f, 2.0f, 2.0f );
-
-const std::string OPTION_SELECT_WORD("select_word");                        ///< "Select Word" popup option.
-const std::string OPTION_SELECT_ALL("select_all");                          ///< "Select All" popup option.
-const std::string OPTION_CUT("cut");                                        ///< "Cut" popup option.
-const std::string OPTION_COPY("copy");                                      ///< "Copy" popup option.
-const std::string OPTION_PASTE("paste");                                    ///< "Paste" popup option.
-const std::string OPTION_CLIPBOARD("clipboard");                            ///< "Clipboard" popup option.
 
 const std::size_t CURSOR_BLINK_INTERVAL = 500;                              ///< Cursor blink interval
 const float CHARACTER_THRESHOLD( 2.5f );                                    ///< the threshold of a line.
-const float DISPLAYED_HIGHLIGHT_Z_OFFSET( 0.0f );                           ///< 1. Highlight rendered (z-offset).
-const float DISPLAYED_TEXT_VIEW_Z_OFFSET( 0.1f );                           ///< 2. Text rendered (z-offset).
+const float DISPLAYED_HIGHLIGHT_Z_OFFSET( 0.1f );                           ///< 1. Highlight rendered (z-offset).
+const float DISPLAYED_TEXT_VIEW_Z_OFFSET( 0.2f );                           ///< 2. Text rendered (z-offset).
 const float UI_Z_OFFSET( 0.2f );                                            ///< 3. Text Selection Handles/Cursor z-offset.
 
 const Vector3 UI_OFFSET(0.0f, 0.0f, UI_Z_OFFSET);                           ///< Text Selection Handles/Cursor offset.
 const Vector3 DEFAULT_HANDLE_ONE_OFFSET(0.0f, -5.0f, 0.0f);                 ///< Handle One's Offset
 const Vector3 DEFAULT_HANDLE_TWO_OFFSET(0.0f, -5.0f, 0.0f);                 ///< Handle Two's Offset
-const float TOP_HANDLE_TOP_OFFSET(-1.5f);                                   ///< Offset between top handle and cutCopyPaste pop-up
-const float BOTTOM_HANDLE_BOTTOM_OFFSET(1.5f);                              ///< Offset between bottom handle and cutCopyPaste pop-up
-const float CURSOR_THICKNESS(6.0f);
+const float TOP_HANDLE_TOP_OFFSET( 34.0f);                                   ///< Offset between top handle and cutCopyPaste pop-up
+const float BOTTOM_HANDLE_BOTTOM_OFFSET(34.0f);                              ///< Offset between bottom handle and cutCopyPaste pop-up
+const float CURSOR_THICKNESS(4.0f);
 const Degree CURSOR_ANGLE_OFFSET(2.0f);                                     ///< Offset from the angle of italic angle.
+const Vector4 DEFAULT_CURSOR_COLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 const std::string NEWLINE( "\n" );
 
@@ -92,6 +75,16 @@ const TextStyle DEFAULT_TEXT_STYLE;
 const unsigned int SCROLL_TICK_INTERVAL = 50u;
 const float SCROLL_THRESHOLD = 10.f;
 const float SCROLL_SPEED = 15.f;
+
+/**
+ * Selection state enumeration (FSM)
+ */
+enum SelectionState
+{
+  SelectionNone,                            ///< Currently not encountered selected section.
+  SelectionStarted,                         ///< Encountered selected section
+  SelectionFinished                         ///< Finished selected section
+};
 
 /**
  * Whether the given style is the default style or not.
@@ -122,16 +115,6 @@ bool IsTextDefaultStyle( const Toolkit::MarkupProcessor::StyledTextArray& textAr
 
   return true;
 }
-
-/**
- * Selection state enumeration (FSM)
- */
-enum SelectionState
-{
-  SelectionNone,                            ///< Currently not encountered selected section.
-  SelectionStarted,                         ///< Encountered selected section
-  SelectionFinished                         ///< Finished selected section
-};
 
 std::size_t FindVisibleCharacterLeft( std::size_t cursorPosition, const Toolkit::TextView::CharacterLayoutInfoContainer& characterLayoutInfoTable )
 {
@@ -212,6 +195,24 @@ namespace Dali
 
 namespace Toolkit
 {
+// Properties
+const Property::Index TextInput::HIGHLIGHT_COLOR_PROPERTY                     = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX;
+const Property::Index TextInput::CUT_AND_PASTE_COLOR_PROPERTY                 = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+1;
+const Property::Index TextInput::CUT_AND_PASTE_PRESSED_COLOR_PROPERTY         = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+2;
+const Property::Index TextInput::CUT_AND_PASTE_BORDER_COLOR_PROPERTY          = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+3;
+const Property::Index TextInput::CUT_AND_PASTE_ICON_COLOR_PROPERTY            = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+4;
+const Property::Index TextInput::CUT_AND_PASTE_ICON_PRESSED_COLOR_PROPERTY    = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+5;
+const Property::Index TextInput::CUT_AND_PASTE_TEXT_COLOR_PROPERTY            = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+6;
+const Property::Index TextInput::CUT_AND_PASTE_TEXT_PRESSED_COLOR_PROPERTY    = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+7;
+const Property::Index TextInput::CUT_BUTTON_POSITION_PRIORITY_PROPERTY        = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+8;
+const Property::Index TextInput::COPY_BUTTON_POSITION_PRIORITY_PROPERTY       = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+9;
+const Property::Index TextInput::PASTE_BUTTON_POSITION_PRIORITY_PROPERTY      = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+10;
+const Property::Index TextInput::SELECT_BUTTON_POSITION_PRIORITY_PROPERTY     = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+11;
+const Property::Index TextInput::SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+12;
+const Property::Index TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY  = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+13;
+const Property::Index TextInput::POP_UP_OFFSET_FROM_TEXT_PROPERTY             = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+14;
+const Property::Index TextInput::CURSOR_COLOR_PROPERTY                        = Internal::TextInput::TEXTINPUT_PROPERTY_START_INDEX+15;
+
 
 namespace Internal
 {
@@ -234,6 +235,24 @@ SignalConnectorType signalConnector5( typeRegistration, Toolkit::TextInput::SIGN
 SignalConnectorType signalConnector6( typeRegistration, Toolkit::TextInput::SIGNAL_TEXT_EXCEED_BOUNDARIES,       &TextInput::DoConnectSignal );
 
 }
+
+PropertyRegistration property1( typeRegistration, "highlight-color",  Toolkit::TextInput::HIGHLIGHT_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property2( typeRegistration, "cut-and-paste-bg-color",  Toolkit::TextInput::CUT_AND_PASTE_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property3( typeRegistration, "cut-and-paste-pressed-color",  Toolkit::TextInput::CUT_AND_PASTE_PRESSED_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property4( typeRegistration, "cut-and-paste-icon-color",  Toolkit::TextInput::CUT_AND_PASTE_ICON_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property5( typeRegistration, "cut-and-paste-icon-pressed-color",  Toolkit::TextInput::CUT_AND_PASTE_ICON_PRESSED_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property6( typeRegistration, "cut-and-paste-text-color",  Toolkit::TextInput::CUT_AND_PASTE_TEXT_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property7( typeRegistration, "cut-and-paste-text-pressed-color",  Toolkit::TextInput::CUT_AND_PASTE_TEXT_PRESSED_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property8( typeRegistration, "cut-and-paste-border-color",  Toolkit::TextInput::CUT_AND_PASTE_BORDER_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property9( typeRegistration, "cut-button-position-priority",  Toolkit::TextInput::CUT_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property10( typeRegistration, "copy-button-position-priority",  Toolkit::TextInput::COPY_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property11( typeRegistration, "paste-button-position-priority",  Toolkit::TextInput::PASTE_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property12( typeRegistration, "select-button-position-priority",  Toolkit::TextInput::SELECT_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property13( typeRegistration, "select-all-button-position-priority",  Toolkit::TextInput::SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property14( typeRegistration, "clipboard-button-position-priority",  Toolkit::TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY, Property::UNSIGNED_INTEGER, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property15( typeRegistration, "popup-offset-from-text", Toolkit::TextInput::POP_UP_OFFSET_FROM_TEXT_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+PropertyRegistration property16( typeRegistration, "cursor-color", Toolkit::TextInput::CURSOR_COLOR_PROPERTY, Property::VECTOR4, &TextInput::SetProperty, &TextInput::GetProperty );
+
 
 // [TextInput::HighlightInfo] /////////////////////////////////////////////////
 
@@ -269,7 +288,7 @@ Dali::Toolkit::TextInput TextInput::New()
 }
 
 TextInput::TextInput()
-:Control( true ),
+:Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
  mState( StateEdit ),
  mStyledText(),
  mInputStyle(),
@@ -295,6 +314,7 @@ TextInput::TextInput()
  mTouchStartTime( 0 ),
  mTextLayoutInfo(),
  mCurrentCopySelecton(),
+ mPopupPanel(),
  mScrollTimer(),
  mScrollDisplacement(),
  mCurrentHandlePosition(),
@@ -304,6 +324,8 @@ TextInput::TextInput()
  mSelectionHandleFlipMargin( 0.0f, 0.0f, 0.0f, 0.0f ),
  mBoundingRectangleWorldCoordinates( 0.0f, 0.0f, 0.0f, 0.0f ),
  mClipboard(),
+ mMaterialColor( LIGHTBLUE ),
+ mPopupOffsetFromText ( Vector4( 0.0f, TOP_HANDLE_TOP_OFFSET, 0.0f, BOTTOM_HANDLE_BOTTOM_OFFSET ) ),
  mOverrideAutomaticAlignment( false ),
  mCursorRTLEnabled( false ),
  mClosestCursorPositionEOL ( false ),
@@ -518,6 +540,24 @@ std::size_t TextInput::GetNumberOfCharacters() const
 {
   return mStyledText.size();
 }
+
+// Styling
+void TextInput::SetMaterialDiffuseColor( const Vector4& color )
+{
+  mMaterialColor = color;
+  if ( mCustomMaterial )
+  {
+    mCustomMaterial.SetDiffuseColor( mMaterialColor );
+    mMeshData.SetMaterial( mCustomMaterial );
+  }
+}
+
+const Vector4& TextInput::GetMaterialDiffuseColor() const
+{
+  return mMaterialColor;
+}
+
+// Signals
 
 Toolkit::TextInput::InputSignalV2& TextInput::InputStartedSignal()
 {
@@ -1129,9 +1169,8 @@ void TextInput::OnInitialize()
 
   // Create 2 cursors (standard LTR and RTL cursor for when text can be added at
   // different positions depending on language)
-  Image mCursorImage = Image::New( DEFAULT_CURSOR );
-  mCursor = CreateCursor( mCursorImage, DEFAULT_CURSOR_IMAGE_9_BORDER );
-  mCursorRTL = CreateCursor( mCursorImage, DEFAULT_CURSOR_IMAGE_9_BORDER );
+  mCursor = CreateCursor(DEFAULT_CURSOR_COLOR);
+  mCursorRTL = CreateCursor(DEFAULT_CURSOR_COLOR);
 
   Actor self = Self();
   self.Add( mCursor );
@@ -1156,6 +1195,8 @@ void TextInput::OnControlSizeSet(const Vector3& targetSize)
 void TextInput::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
 {
   Relayout( mDisplayedTextView, size, container );
+  Relayout( mPopupPanel.GetRootActor(), size, container );
+
   GetTextLayoutInfo();
 
   DrawCursor();
@@ -1238,7 +1279,7 @@ void TextInput::OnHandlePan(Actor actor, PanGesture gesture)
       {
         mActualGrabHandlePosition = MoveGrabHandle( gesture.displacement );
         SetCursorVisibility( true );
-        SetUpPopUpSelection();
+        SetUpPopupSelection();
         ShowPopup();
       }
       if (actor == mHandleOneGrabArea)
@@ -1360,7 +1401,7 @@ void TextInput::OnDoubleTap(Dali::Actor actor, Dali::TapGesture tap)
      SelectText( start, end );
    }
    // if no text but clipboard has content then show paste option
-   if ( mClipboard.NumberOfItems() || !mStyledText.empty() )
+   if ( ( mClipboard && mClipboard.NumberOfItems() ) || !mStyledText.empty() )
    {
      ShowPopupCutCopyPaste();
    }
@@ -1382,9 +1423,9 @@ void TextInput::OnTextTap(Dali::Actor actor, Dali::TapGesture tap)
 
   if( mGrabArea == actor )
   {
-    if( mPopUpPanel.GetState() == TextInputPopup::StateHidden || mPopUpPanel.GetState() == TextInputPopup::StateHiding )
+    if( mPopupPanel.GetState() == TextInputPopup::StateHidden || mPopupPanel.GetState() == TextInputPopup::StateHiding )
     {
-      SetUpPopUpSelection();
+      SetUpPopupSelection();
       ShowPopup();
     }
 
@@ -1550,7 +1591,7 @@ void TextInput::OnLongPress(Dali::Actor actor, Dali::LongPressGesture longPress)
     }
 
     // if no text but clipboard has content then show paste option, if no text and clipboard empty then do nothing
-    if ( mClipboard.NumberOfItems() || !mStyledText.empty() )
+    if ( ( mClipboard && mClipboard.NumberOfItems() ) || !mStyledText.empty() )
     {
       ShowPopupCutCopyPaste();
     }
@@ -1573,11 +1614,11 @@ void TextInput::OnClipboardTextSelected( ClipboardEventNotifier& notifier )
 
 bool TextInput::OnPopupButtonPressed( Toolkit::Button button )
 {
-  mPopUpPanel.PressedSignal().Disconnect( this, &TextInput::OnPopupButtonPressed );
+  mPopupPanel.PressedSignal().Disconnect( this, &TextInput::OnPopupButtonPressed );
 
   const std::string& name = button.GetName();
 
-  if(name == OPTION_SELECT_WORD)
+  if(name == TextInputPopup::OPTION_SELECT_WORD)
   {
     std::size_t start = 0;
     std::size_t end = 0;
@@ -1585,7 +1626,7 @@ bool TextInput::OnPopupButtonPressed( Toolkit::Button button )
 
     SelectText( start, end );
   }
-  else if(name == OPTION_SELECT_ALL)
+  else if(name == TextInputPopup::OPTION_SELECT_ALL)
   {
     SetCursorVisibility(false);
     StopCursorBlinkTimer();
@@ -1595,7 +1636,7 @@ bool TextInput::OnPopupButtonPressed( Toolkit::Button button )
 
     SelectText( start, end );
   }
-  else if(name == OPTION_CUT)
+  else if(name == TextInputPopup::OPTION_CUT)
   {
     bool ret = CopySelectedTextToClipboard();
 
@@ -1610,7 +1651,7 @@ bool TextInput::OnPopupButtonPressed( Toolkit::Button button )
 
     HidePopup();
   }
-  else if(name == OPTION_COPY)
+  else if(name == TextInputPopup::OPTION_COPY)
   {
     CopySelectedTextToClipboard();
 
@@ -1621,7 +1662,7 @@ bool TextInput::OnPopupButtonPressed( Toolkit::Button button )
 
     HidePopup();
   }
-  else if(name == OPTION_PASTE)
+  else if(name == TextInputPopup::OPTION_PASTE)
   {
     const Text retrievedString( mClipboard.GetItem( 0 ) );  // currently can only get first item in clip board, index 0;
 
@@ -1634,7 +1675,7 @@ bool TextInput::OnPopupButtonPressed( Toolkit::Button button )
 
     HidePopup();
   }
-  else if(name == OPTION_CLIPBOARD)
+  else if(name == TextInputPopup::OPTION_CLIPBOARD)
   {
     // In the case of clipboard being shown we do not want to show updated pop-up after hide animation completes
     // Hence pass the false parameter for signalFinished.
@@ -2110,7 +2151,7 @@ void TextInput::ApplyPreEditStyle( std::size_t preEditStartPosition, std::size_t
 {
   if ( mPreEditFlag && ( preEditStringLength > 0 ) )
   {
-    mUnderlinedPriorToPreEdit = mInputStyle.GetUnderline();
+    mUnderlinedPriorToPreEdit = mInputStyle.IsUnderlineEnabled();
     TextStyle style;
     style.SetUnderline( true );
     ApplyStyleToRange( style, TextStyle::UNDERLINE , preEditStartPosition, preEditStartPosition + preEditStringLength -1 );
@@ -2783,21 +2824,10 @@ std::size_t TextInput::InsertAt( const Text& newText, const std::size_t insertio
   return insertedStringLength;
 }
 
-ImageActor TextInput::CreateCursor( Image cursorImage, const Vector4& border )
+ImageActor TextInput::CreateCursor( const Vector4& color)
 {
   ImageActor cursor;
-
-  if ( cursorImage )
-  {
-    cursor = ImageActor::New( cursorImage );
-  }
-  else
-  {
-    cursor = ImageActor::New( Image::New( DEFAULT_CURSOR ) );
-  }
-
-  cursor.SetStyle(ImageActor::STYLE_NINE_PATCH);
-  cursor.SetNinePatchBorder( border );
+  cursor = CreateSolidColorActor(color);
 
   cursor.SetParentOrigin(ParentOrigin::TOP_LEFT);
   cursor.SetAnchorPoint(AnchorPoint::BOTTOM_CENTER);
@@ -2872,7 +2902,7 @@ void TextInput::DrawCursor(const std::size_t nthChar)
   mCursor.SetSize(size);
 
   // If the character is italic then the cursor also tilts.
-  mCursor.SetRotation( mInputStyle.GetItalics() ? Degree( mInputStyle.GetItalicsAngle() - CURSOR_ANGLE_OFFSET ) : Degree( 0.f ), Vector3::ZAXIS );
+  mCursor.SetRotation( mInputStyle.IsItalicsEnabled() ? Degree( mInputStyle.GetItalicsAngle() - CURSOR_ANGLE_OFFSET ) : Degree( 0.f ), Vector3::ZAXIS );
 
   DALI_ASSERT_DEBUG( mCursorPosition <= mTextLayoutInfo.mCharacterLayoutInfoTable.size() );
 
@@ -3663,144 +3693,177 @@ void TextInput::UpdateHighlight()
 
 void TextInput::ClearPopup()
 {
-  mPopUpPanel.Clear();
+  mPopupPanel.Clear();
 }
 
-void TextInput::AddPopupOption(const std::string& name, const std::string& caption, const Image icon, bool finalOption)
+void TextInput::AddPopupOptions()
 {
-  mPopUpPanel.AddOption(name, caption, icon, finalOption);
+  mPopupPanel.AddPopupOptions();
 }
 
-void TextInput::SetPopupPosition(const Vector3& position)
+void TextInput::SetPopupPosition( const Vector3& position, const Vector2& alternativePosition )
 {
-  mPopUpPanel.Self().SetPosition( position );
+  const Vector3& visiblePopUpSize = mPopupPanel.GetVisibileSize();
+
+  Vector3 clampedPosition ( position );
+  Vector3 tailOffsetPosition ( position );
+
+  float xOffSet( 0.0f );
+
+  Actor self = Self();
+  const Vector3 textViewTopLeftWorldPosition = self.GetCurrentWorldPosition() - self.GetCurrentSize()*0.5f;
+
+  const float popUpLeft = textViewTopLeftWorldPosition.x + position.x - visiblePopUpSize.width*0.5f;
+  const float popUpTop = textViewTopLeftWorldPosition.y + position.y - visiblePopUpSize.height;
+
+  // Clamp to left or right or of boundary
+  if( popUpLeft < mBoundingRectangleWorldCoordinates.x )
+  {
+    xOffSet = mBoundingRectangleWorldCoordinates.x - popUpLeft ;
+  }
+  else if ( popUpLeft + visiblePopUpSize.width > mBoundingRectangleWorldCoordinates.z )
+  {
+    xOffSet = mBoundingRectangleWorldCoordinates.z - ( popUpLeft + visiblePopUpSize.width );
+  }
+
+  clampedPosition.x = position.x + xOffSet;
+  tailOffsetPosition.x = -xOffSet;
+
+  // Check if top left of PopUp outside of top bounding rectangle, if so then flip to lower position.
+  bool flipTail( false );
+
+  if ( popUpTop < mBoundingRectangleWorldCoordinates.y )
+  {
+    clampedPosition.y = alternativePosition.y + visiblePopUpSize.height;
+    flipTail = true;
+  }
+
+  mPopupPanel.GetRootActor().SetPosition( clampedPosition );
+  mPopupPanel.SetTailPosition( tailOffsetPosition, flipTail );
 }
 
 void TextInput::HidePopup(bool animate, bool signalFinished )
 {
-  if ( ( mPopUpPanel.GetState() == TextInputPopup::StateShowing ) || ( mPopUpPanel.GetState() == TextInputPopup::StateShown )  )
+  if ( ( mPopupPanel.GetState() == TextInputPopup::StateShowing ) || ( mPopupPanel.GetState() == TextInputPopup::StateShown )  )
   {
-    mPopUpPanel.Hide( animate );
+    mPopupPanel.Hide( animate );
 
     if( animate && signalFinished )
     {
-      mPopUpPanel.HideFinishedSignal().Connect( this, &TextInput::OnPopupHideFinished );
+      mPopupPanel.HideFinishedSignal().Connect( this, &TextInput::OnPopupHideFinished );
     }
   }
 }
 
-void TextInput::ShowPopup(bool animate)
+void TextInput::ShowPopup( bool animate )
 {
   Vector3 position;
+  Vector2 alternativePopupPosition;
 
   if(mHighlightMeshActor && mState == StateEdit)
   {
     Vector3 topHandle;
+    Vector3 bottomHandle; // referring to the bottom most point of the handle or the bottom line of selection.
     Size rowSize;
     // When text is selected, show popup above top handle (and text), or below bottom handle.
     // topHandle: referring to the top most point of the handle or the top line of selection.
     if ( mSelectionHandleTwoActualPosition.y > mSelectionHandleOneActualPosition.y )
     {
       topHandle = mSelectionHandleOneActualPosition;
+      bottomHandle = mSelectionHandleTwoActualPosition;
       rowSize= GetRowRectFromCharacterPosition( mSelectionHandleOnePosition );
     }
     else
     {
       topHandle = mSelectionHandleTwoActualPosition;
+      bottomHandle = mSelectionHandleOneActualPosition;
       rowSize = GetRowRectFromCharacterPosition( mSelectionHandleTwoPosition );
     }
-    topHandle.y += TOP_HANDLE_TOP_OFFSET - rowSize.height;
+    topHandle.y += -mPopupOffsetFromText.y - rowSize.height;
     position = Vector3(topHandle.x, topHandle.y, 0.0f);
 
-    // bottomHandle: referring to the bottom most point of the handle or the bottom line of selection.
-    Vector3 bottomHandle;
-    bottomHandle.y = std::max ( mSelectionHandleTwoActualPosition.y , mSelectionHandleOneActualPosition.y );
-    bottomHandle.y += GetSelectionHandleSize().y + BOTTOM_HANDLE_BOTTOM_OFFSET;
-    mPopUpPanel.SetAlternativeOffset(Vector2(0.0f, bottomHandle.y - topHandle.y));
+    float xPosition = ( fabsf( topHandle.x - bottomHandle.x ) )*0.5f + std::min( mSelectionHandleOneActualPosition.x , mSelectionHandleTwoActualPosition.x );
+
+    position.x = xPosition;
+
+    // Alternative position if no upper space
+    bottomHandle.y += GetSelectionHandleSize().y + mPopupOffsetFromText.w;
+    alternativePopupPosition = Vector2 ( position.x, bottomHandle.y );
   }
   else
   {
     // When no text is selected, show popup at world position of grab handle or cursor
     position = GetActualPositionFromCharacterPosition( mCursorPosition );
     const Size rowSize = GetRowRectFromCharacterPosition( mCursorPosition );
-    position.y -= rowSize.height;
+    position.y -= ( mPopupOffsetFromText.y + rowSize.height );
     // if can't be positioned above, then position below row.
-    Vector2 alternativePopUpPosition( 0.0f, position.y ); // default if no grab handle
+    alternativePopupPosition = Vector2( position.x, position.y ); // default if no grab handle
     if ( mGrabHandle )
     {
-      alternativePopUpPosition.y = rowSize.height + ( mGrabHandle.GetCurrentSize().height * DEFAULT_GRAB_HANDLE_RELATIVE_SIZE.y ) ;
       // If grab handle enabled then position pop-up below the grab handle.
+      alternativePopupPosition.y = rowSize.height + mGrabHandle.GetCurrentSize().height + mPopupOffsetFromText.w +50.0f;
     }
-    mPopUpPanel.SetAlternativeOffset( alternativePopUpPosition );
   }
 
-  // reposition popup above the desired cursor posiiton.
-  Vector3 textViewSize = mDisplayedTextView.GetCurrentSize();
-  textViewSize.z = 0.0f;
-  // World position = world position of ParentOrigin of cursor (i.e. top-left corner of TextView) + cursor position;
-  Vector3 worldPosition = mDisplayedTextView.GetCurrentWorldPosition() - (textViewSize * 0.5f) + position;
-
-  SetPopupPosition( worldPosition );
+  SetPopupPosition( position, alternativePopupPosition );
 
   // Show popup
-  mPopUpPanel.Show(animate);
+  mPopupPanel.Show( Self(), animate );
   StartMonitoringStageForTouch();
 
-  mPopUpPanel.PressedSignal().Connect( this, &TextInput::OnPopupButtonPressed );
+  mPopupPanel.PressedSignal().Connect( this, &TextInput::OnPopupButtonPressed );
 }
 
 void TextInput::ShowPopupCutCopyPaste()
 {
   ClearPopup();
+
+  mPopupPanel.CreateOrderedListOfOptions(); // todo Move this so only run when order has changed
   // Check the selected text is whole text or not.
   if( IsTextSelected() && ( mStyledText.size() != GetSelectedText().size() ) )
   {
-    Image selectAllIcon = Image::New( DEFAULT_ICON_SELECT_ALL );
-    AddPopupOption( OPTION_SELECT_ALL, GET_LOCALE_TEXT("IDS_COM_BODY_SELECT_ALL"), selectAllIcon );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelectAll, true );
   }
 
   if ( !mStyledText.empty() )
   {
-    Image cutIcon = Image::New( DEFAULT_ICON_CUT );
-    Image copyIcon = Image::New( DEFAULT_ICON_COPY );
-    AddPopupOption( OPTION_CUT, GET_LOCALE_TEXT("IDS_COM_BODY_CUT"), cutIcon );
-    AddPopupOption( OPTION_COPY, GET_LOCALE_TEXT("IDS_COM_BODY_COPY"), copyIcon, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCopy, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, true );
   }
 
-  if(mClipboard.NumberOfItems())
+  if( mClipboard && mClipboard.NumberOfItems() )
   {
-    Image pasteIcon = Image::New( DEFAULT_ICON_PASTE );
-    Image clipboardIcon = Image::New( DEFAULT_ICON_CLIPBOARD );
-    AddPopupOption( OPTION_PASTE, GET_LOCALE_TEXT("IDS_COM_BODY_PASTE"), pasteIcon );
-    AddPopupOption( OPTION_CLIPBOARD, GET_LOCALE_TEXT("IDS_COM_BODY_CLIPBOARD"), clipboardIcon, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsPaste, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsClipboard, true );
   }
 
-  mPopUpPanel.Hide(false);
+  AddPopupOptions();
+
+  mPopupPanel.Hide(false);
   ShowPopup();
 }
 
-void TextInput::SetUpPopUpSelection()
+void TextInput::SetUpPopupSelection()
 {
   ClearPopup();
-
+  mPopupPanel.CreateOrderedListOfOptions(); // todo Move this so only run when order has changed
   // If no text exists then don't offer to select
   if ( !mStyledText.empty() )
   {
-    Image selectIcon = Image::New( DEFAULT_ICON_SELECT );
-    Image selectAllIcon = Image::New( DEFAULT_ICON_SELECT_ALL );
-    AddPopupOption( OPTION_SELECT_WORD, GET_LOCALE_TEXT("IDS_COM_SK_SELECT"), selectIcon );
-    AddPopupOption( OPTION_SELECT_ALL, GET_LOCALE_TEXT("IDS_COM_BODY_SELECT_ALL"), selectAllIcon );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelectAll, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelect, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, true );
   }
   // if clipboard has valid contents then offer paste option
-  if( mClipboard.NumberOfItems() )
+  if( mClipboard && mClipboard.NumberOfItems() )
   {
-    Image pasteIcon = Image::New( DEFAULT_ICON_PASTE );
-    Image clipboardIcon = Image::New( DEFAULT_ICON_CLIPBOARD );
-    AddPopupOption( OPTION_PASTE, GET_LOCALE_TEXT("IDS_COM_BODY_PASTE"), pasteIcon, true );
-    AddPopupOption( OPTION_CLIPBOARD, GET_LOCALE_TEXT("IDS_COM_BODY_CLIPBOARD"), clipboardIcon, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsPaste, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsClipboard, true );
   }
 
-  mPopUpPanel.Hide(false);
+  AddPopupOptions();
+
+  mPopupPanel.Hide(false);
 }
 
 bool TextInput::ReturnClosestIndex(const Vector2& source, std::size_t& closestIndex )
@@ -4444,7 +4507,7 @@ Size TextInput::GetRowRectFromCharacterPosition(std::size_t characterPosition, V
 
 bool TextInput::WasTouchedCheck( const Actor& touchedActor ) const
 {
-  Actor popUpPanel = mPopUpPanel.GetRootActor();
+  Actor popUpPanel = mPopupPanel.GetRootActor();
 
   if ( ( touchedActor == Self() ) || ( touchedActor == popUpPanel ) )
   {
@@ -4485,7 +4548,7 @@ void TextInput::OnStageTouched(const TouchEvent& event)
 
       bool popUpShown( false );
 
-      if ( ( mPopUpPanel.GetState() == TextInputPopup::StateShowing ) || ( mPopUpPanel.GetState() == TextInputPopup::StateShown ) )
+      if ( ( mPopupPanel.GetState() == TextInputPopup::StateShowing ) || ( mPopupPanel.GetState() == TextInputPopup::StateShown ) )
       {
         popUpShown = true;
       }
@@ -4620,7 +4683,7 @@ void TextInput::KeyboardStatusChanged(bool keyboardShown)
     ShowGrabHandleAndSetVisibility( false );
 
     // If the keyboard is not now being shown, then hide the popup panel
-    mPopUpPanel.Hide( true );
+    mPopupPanel.Hide( true );
   }
 }
 
@@ -4670,7 +4733,7 @@ void TextInput::CreateHighlight()
     mMeshData.SetHasNormals( true );
 
     mCustomMaterial = Material::New("CustomMaterial");
-    mCustomMaterial.SetDiffuseColor( LIGHTBLUE );
+    mCustomMaterial.SetDiffuseColor( mMaterialColor );
 
     mMeshData.SetMaterial( mCustomMaterial );
 
@@ -5105,6 +5168,205 @@ void TextInput::GetTextLayoutInfo()
       mTextLayoutInfo = Toolkit::TextView::TextLayoutInfo();
     }
   }
+}
+
+void TextInput::SetOffsetFromText( const Vector4& offset )
+{
+  mPopupOffsetFromText = offset;
+}
+
+const Vector4& TextInput::GetOffsetFromText() const
+{
+  return mPopupOffsetFromText;
+}
+
+void TextInput::SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )
+{
+  Toolkit::TextInput textInput = Toolkit::TextInput::DownCast( Dali::BaseHandle( object ) );
+
+  if ( textInput )
+  {
+    TextInput& textInputImpl( GetImpl( textInput ) );
+
+    switch ( propertyIndex )
+    {
+      case Toolkit::TextInput::HIGHLIGHT_COLOR_PROPERTY:
+      {
+        textInputImpl.SetMaterialDiffuseColor( value.Get< Vector4 >() );
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_COLOR_PROPERTY:
+      {
+        textInputImpl.mPopupPanel.SetCutPastePopupColor( value.Get< Vector4 >() );
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_PRESSED_COLOR_PROPERTY:
+      {
+        textInputImpl.mPopupPanel.SetCutPastePopupPressedColor( value.Get< Vector4 >() );
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_BORDER_COLOR_PROPERTY:
+      {
+        textInputImpl.mPopupPanel.SetCutPastePopupBorderColor( value.Get< Vector4 >() );
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_ICON_COLOR_PROPERTY:
+      {
+        textInputImpl.mPopupPanel.SetCutPastePopupIconColor( value.Get< Vector4 >() );
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_ICON_PRESSED_COLOR_PROPERTY:
+      {
+        textInputImpl.mPopupPanel.SetCutPastePopupIconPressedColor( value.Get< Vector4 >() );
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_TEXT_COLOR_PROPERTY:
+      {
+        textInputImpl.mPopupPanel.SetCutPastePopupTextColor( value.Get< Vector4 >() );
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_TEXT_PRESSED_COLOR_PROPERTY:
+      {
+        textInputImpl.mPopupPanel.SetCutPastePopupTextPressedColor( value.Get< Vector4 >() );
+        break;
+      }
+      case Toolkit::TextInput::CUT_BUTTON_POSITION_PRIORITY_PROPERTY:
+      {
+        textInputImpl.mPopupPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsCut, value.Get<unsigned int>() );
+        break;
+      }
+      case Toolkit::TextInput::COPY_BUTTON_POSITION_PRIORITY_PROPERTY:
+      {
+        textInputImpl.mPopupPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsCopy, value.Get<unsigned int>() );
+        break;
+      }
+      case Toolkit::TextInput::PASTE_BUTTON_POSITION_PRIORITY_PROPERTY:
+      {
+        textInputImpl.mPopupPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsPaste, value.Get<unsigned int>() );
+        break;
+      }
+      case Toolkit::TextInput::SELECT_BUTTON_POSITION_PRIORITY_PROPERTY:
+      {
+        textInputImpl.mPopupPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsSelect, value.Get<unsigned int>() );
+        break;
+      }
+      case Toolkit::TextInput::SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY:
+      {
+        textInputImpl.mPopupPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsSelectAll, value.Get<unsigned int>() );
+        break;
+      }
+      case Toolkit::TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY:
+      {
+        textInputImpl.mPopupPanel.SetButtonPriorityPosition( TextInputPopup::ButtonsClipboard, value.Get<unsigned int>() );
+        break;
+      }
+      case Toolkit::TextInput::POP_UP_OFFSET_FROM_TEXT_PROPERTY:
+      {
+        textInputImpl.SetOffsetFromText( value.Get< Vector4 >() );
+        break;
+      }
+      case Toolkit::TextInput::CURSOR_COLOR_PROPERTY:
+      {
+        textInputImpl.mCursor.SetColor( value.Get< Vector4 >() );
+      }
+    }
+  }
+}
+
+Property::Value TextInput::GetProperty( BaseObject* object, Property::Index propertyIndex )
+{
+  Property::Value value;
+
+  Toolkit::TextInput textInput = Toolkit::TextInput::DownCast( Dali::BaseHandle( object ) );
+
+  if ( textInput )
+  {
+    TextInput& textInputImpl( GetImpl( textInput ) );
+
+    switch ( propertyIndex )
+    {
+      case Toolkit::TextInput::HIGHLIGHT_COLOR_PROPERTY:
+      {
+        value = textInputImpl.GetMaterialDiffuseColor();
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_COLOR_PROPERTY:
+      {
+        value = textInputImpl.mPopupPanel.GetCutPastePopupColor();
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_PRESSED_COLOR_PROPERTY:
+      {
+        value = textInputImpl.mPopupPanel.GetCutPastePopupPressedColor();
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_BORDER_COLOR_PROPERTY :
+      {
+        value = textInputImpl.mPopupPanel.GetCutPastePopupBorderColor();
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_ICON_COLOR_PROPERTY:
+      {
+        value = textInputImpl.mPopupPanel.GetCutPastePopupIconColor();
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_ICON_PRESSED_COLOR_PROPERTY:
+      {
+        value = textInputImpl.mPopupPanel.GetCutPastePopupIconPressedColor();
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_TEXT_COLOR_PROPERTY:
+      {
+        value = textInputImpl.mPopupPanel.GetCutPastePopupTextColor();
+        break;
+      }
+      case Toolkit::TextInput::CUT_AND_PASTE_TEXT_PRESSED_COLOR_PROPERTY:
+      {
+        value = textInputImpl.mPopupPanel.GetCutPastePopupTextPressedColor();
+        break;
+      }
+      case Toolkit::TextInput::CUT_BUTTON_POSITION_PRIORITY_PROPERTY:
+      {
+        value = textInputImpl.mPopupPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsCut );
+        break;
+      }
+      case Toolkit::TextInput::COPY_BUTTON_POSITION_PRIORITY_PROPERTY:
+      {
+        value =  textInputImpl.mPopupPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsCopy );
+        break;
+      }
+      case Toolkit::TextInput::PASTE_BUTTON_POSITION_PRIORITY_PROPERTY:
+      {
+        value = textInputImpl.mPopupPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsPaste );
+        break;
+      }
+      case Toolkit::TextInput::SELECT_BUTTON_POSITION_PRIORITY_PROPERTY:
+      {
+        value = textInputImpl.mPopupPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsSelect );
+        break;
+      }
+      case Toolkit::TextInput::SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY:
+      {
+        value = textInputImpl.mPopupPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsSelectAll );
+        break;
+      }
+      case Toolkit::TextInput::CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY:
+      {
+        value = textInputImpl.mPopupPanel.GetButtonPriorityPosition( TextInputPopup::ButtonsClipboard );
+        break;
+      }
+      case Toolkit::TextInput::POP_UP_OFFSET_FROM_TEXT_PROPERTY:
+      {
+        value = textInputImpl.GetOffsetFromText();
+        break;
+      }
+      case Toolkit::TextInput::CURSOR_COLOR_PROPERTY:
+      {
+        value = textInputImpl.mCursor.GetCurrentColor();
+      }
+    }
+  }
+  return value;
 }
 
 void TextInput::EmitStyleChangedSignal()

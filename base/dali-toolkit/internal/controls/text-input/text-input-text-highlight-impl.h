@@ -1,21 +1,22 @@
 #ifndef __DALI_TOOLKIT_INTERNAL_TEXT_HIGHLIGHT_H__
 #define __DALI_TOOLKIT_INTERNAL_TEXT_HIGHLIGHT_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/dali.h>
@@ -85,12 +86,12 @@ public:
      * @param[in] x2 right co-ordinate
      * @param[in] y2 bottom co-ordinate
      */
-    void AddQuad( float x1, float y1, float x2, float y2 ){};
+    void AddQuad( float x1, float y1, float x2, float y2 );
 
     /**
      * Clamps all quads to fit within a min -> max 2D boundary.
      */
-    void Clamp2D(const Vector2& min, const Vector2& max){};
+    void Clamp2D(const Vector2& min, const Vector2& max);
 
     QuadContainer mQuadList;                                 ///< List of quads (sub-selections that form to create complete selection)
   };
@@ -99,12 +100,12 @@ public:
    * Constructor
    * @param[in] textViewCharacterPositioning TextViewCharacterPositioning to be used for positioning information.
    */
-  TextHighlight( TextViewCharacterPositioning& textViewCharacterPositioning ):mTextViewCharacterPositioning( textViewCharacterPositioning ){};
+  TextHighlight( TextViewCharacterPositioning& textViewCharacterPositioning );
 
   /**
    * Destructor
    */
-  ~TextHighlight(){};
+  ~TextHighlight();
 
   /**
    * Gets the table of the visual text positions which has a flag
@@ -119,7 +120,7 @@ public:
    * @param[in] textLayoutInfo TextView character layout information
    */
   void GetVisualTextSelection(std::vector<bool>& selectedVisualText, std::size_t startSelection, std::size_t endSelection,
-                              Toolkit::TextView::TextLayoutInfo& textLayoutInfo){};
+                              Toolkit::TextView::TextLayoutInfo& textLayoutInfo);
 
   /**
    * Iterates between selection handles and computes the info required to build the highlight mesh
@@ -127,19 +128,18 @@ public:
    * @param[in] handlePositionEnd ending handle position
    * @return textHighlight target TextHighlight
    */
-  TextHighlight::HighlightInfo CalculateHighlightInfo( std::size_t handlePositionStart, std::size_t handlePositionEnd, Toolkit::TextView::TextLayoutInfo& textLayoutInfo )
-  { return HighlightInfo();};
+  TextHighlight::HighlightInfo CalculateHighlightInfo( std::size_t handlePositionStart, std::size_t handlePositionEnd, Toolkit::TextView::TextLayoutInfo& textLayoutInfo );
 
   /**
    * Calculates new Mesh data so highlight moves with selection handles.
    * @param[in] newHighlightInfo HighlightInfo calculated by CalculateHighlightInfo
    */
-  void UpdateHighlight( TextHighlight::HighlightInfo& newHighlightInfo ){};
+  void UpdateHighlight( TextHighlight::HighlightInfo& newHighlightInfo );
 
   /**
    * Creates the Mesh data needed by the Mesh Actor
    */
-  Mesh CreateHighLightMesh(){return Mesh();};
+  Mesh CreateHighLightMesh();
 
 private:
 

@@ -1,21 +1,22 @@
 #ifndef __DALI_TOOLKIT_ITEM_LAYOUT_H__
 #define __DALI_TOOLKIT_ITEM_LAYOUT_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 /**
  * @addtogroup CAPI_DALI_TOOLKIT_ITEM_VIEW_MODULE
@@ -344,9 +345,9 @@ public:
   virtual void GetYAxisScrollHint(Vector2& scrollHint) const;
 
   /**
-   * @brief Query the scroll speed factor of the layout.
+   * @brief Query the scroll speed factor of the layout while dragging.
    *
-   * This factor is used by the layout to customise its scroll speed while dragging and swiping.
+   * This factor is used by the layout to customise its scroll speed while dragging.
    * The factor will be multiplied with the scroll distance of how many pixels in actor coordinate,
    * and the layout position of the actors in ItemView will be moved by this result.
    * For example, when the speed factor is 0.01, if the scroll distance is 100 pixels, the layout
@@ -386,6 +387,55 @@ public:
    */
   virtual int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
 
+  /**
+   * @brief Query the flick speed factor of the layout while swipping.
+   *
+   * This factor is used by the layout to customise its scroll speed while swiping.
+   * The factor will be multiplied with the scroll distance of how many pixels in actor coordinate,
+   * and the layout position of the actors in ItemView will be moved by this result.
+   * For example, when the speed factor is 0.01, if the scroll distance is 100 pixels, the layout
+   * position of actors will be moved by 1.
+   * Therefore, the bigger the factor is, the faster the flick speed will be.
+   *
+   * @return The scroll speed factor of the layout.
+   */
+  virtual float GetFlickSpeedFactor() const;
+
+  /*
+   * @brief Applies constraints defined by the layout to an actor.
+   *
+   * @param[in] actor The actor to constrain.
+   * @param[in] itemId The ID of the item represented by the actor.
+   * @param[in] durationSeconds The time taken to fully constrain the actors.
+   * @param[in] scrollPositionObject The object which provides the layout position property.
+   * @param[in] itemViewActor The item view instance which requests the application of constraints.
+   */
+  virtual void ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, Constrainable scrollPositionObject, const Actor& itemViewActor );
+
+  /**
+   * @brief Gets the position of a given item
+   *
+   * @param[in] itemID id of the item we want to get its position
+   * @param[in] currentLayoutPosition the current layout position of the item view instance
+   * @param[in] layoutSize the current size of the item view instance
+   * @return The item position (x,y,z)
+   */
+  virtual Vector3 GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const;
+
+  /**
+   * @brief Set the alpha function used when applying constraints
+   *
+   * @param[in] func The alpha function to use.
+   */
+  void SetAlphaFunction(AlphaFunction func);
+
+  /**
+   * @brief Retrieve the alpha function used when applying constraints
+   *
+   * @return The alpha function.
+   */
+  AlphaFunction GetAlphaFunction() const;
+
 protected:
 
   /**
@@ -395,7 +445,8 @@ protected:
 
 protected:
 
-  ControlOrientation::Type mOrientation; ///< the orientation of the layout.
+  ControlOrientation::Type mOrientation;   ///< the orientation of the layout.
+  AlphaFunction            mAlphaFunction; ///<Alpha function to be applied when removing/adding constraints
 };
 
 } // namespace Toolkit

@@ -1,21 +1,22 @@
 #ifndef __DALI_TOOLKIT_INTERNAL_ITEM_VIEW_H__
 #define __DALI_TOOLKIT_INTERNAL_ITEM_VIEW_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // EXTERNAL INCLUDES
 #include <dali/dali.h>
@@ -27,7 +28,6 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-connector.h>
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
-#include <dali-toolkit/public-api/shader-effects/bouncing-effect.h>
 
 namespace Dali
 {
@@ -244,6 +244,11 @@ public:
   void ScrollTo(const Vector3& position, float duration);
 
   /**
+   * @copydoc Toolkit::Internal::Scrollable::SetOvershootEffectColor
+   */
+  void SetOvershootEffectColor( const Vector4& color );
+
+  /**
    * @brief Set whether to enable automatic refresh or not. When refresh is disabled,
    * ItemView will not automatically refresh the cache in the given interval when the
    * layout position is changed. This is useful in some cases, for example, automatic
@@ -261,7 +266,6 @@ public:
    * @param[in] cacheExtra Whether to cache extra items during refresh.
    */
   void DoRefresh(float currentLayoutPosition, bool cacheExtra);
-
 
   /**
    * @copydoc Toolkit::ItemView::SetItemsParentOrigin
@@ -282,6 +286,11 @@ public:
    * @copydoc Toolkit::ItemView::GetItemsAnchorPoint
    */
   Vector3 GetItemsAnchorPoint() const;
+
+  /**
+   * @copydoc Toolkit::ItemView::GetItemsRange
+   */
+  void GetItemsRange(ItemRange& range);
 
 private:
 
@@ -318,6 +327,13 @@ private:
    * @param[in] durationSeconds The time taken to fully constrain the actor.
    */
   void SetupActor( Item item, float durationSeconds );
+
+  /**
+   * Remove the Actor from the ItemPool and notify the ItemFactory the actor has been released by ItemView.
+   * @param[in] item The ID for the item to be released.
+   * @param[in] actor The actor to be removed from ItemView.
+   */
+  void ReleaseActor( ItemId item, Actor actor );
 
 private: // From CustomActorImpl
 
@@ -383,15 +399,6 @@ private:
 
   // Undefined
   ItemView& operator=(const ItemView& rhs);
-
-  /**
-   * Helper to apply constraints to an actor.
-   * @param[in] actor The actor to constrain.
-   * @param[in] layout The active layout.
-   * @param[in] itemId The ID of the item represented by the actor.
-   * @param[in] durationSeconds The time taken to fully constrain the actors.
-   */
-  void ApplyConstraints(Actor& actor, ItemLayout& layout, unsigned int itemId, float durationSeconds);
 
   /**
    * Helper to re-apply all the constraints after items have been inserted, removed etc.
@@ -460,6 +467,12 @@ private:
   void OnScrollFinished(Animation& animation);
 
   /**
+   * Callback from layout activation scroll animations
+   * @param[in] animation The scroll-animation which has finished.
+   */
+  void OnLayoutActivationScrollFinished(Animation& animation);
+
+  /**
    * Called by animation system when overshoot has finished animating to maximum (either -1.0f or 1.0f)
    *
    * @param[in] animation the animation that has finished
@@ -525,6 +538,12 @@ private:
    */
   void OnRefreshNotification(PropertyNotification& source);
 
+  /**
+   * This is called when scroll position has been changed by ScrollConnector::SetScrollPosition.
+   * @param[in] position The new scroll position
+   */
+  void OnScrollPositionChanged( float position );
+
 private:
 
   ItemFactory& mItemFactory;
@@ -543,7 +562,6 @@ private:
 
   Animation mResizeAnimation;
   Animation mScrollAnimation;
-  Animation mScrollSpeedAnimation;
   Animation mScrollOvershootAnimation;
   bool      mAnimatingOvershootOn;          ///< whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
   bool      mAnimateOvershootOff;         ///< whether we are currently animating overshoot to 1.0f/-1.0f (on) or to 0.0f (off)
@@ -572,8 +590,7 @@ private:
 
   Dali::Gesture::State mGestureState;
 
-  ImageActor mOvershootOverlay;           ///< The overlay actor for overshoot effect
-  BouncingEffect mOvershootEffect; ///< The vertex/fragment shader used to display the overshoot ripple effect
+  Actor mOvershootOverlay;           ///< The overlay actor for overshoot effect
 
   Dali::Toolkit::ScrollConnector mScrollConnector; ///< Connects ItemView with scrollable components e.g. scroll bars
   Constrainable   mScrollPositionObject;     ///< From mScrollConnector

@@ -1,29 +1,31 @@
 #
 # Copyright (c) 2014 Samsung Electronics Co., Ltd.
 #
-# Licensed under the Flora License, Version 1.0 (the License);
+# Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://floralicense.org/license/
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an AS IS BASIS,
+# distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
 
-# Build the Dali Toolkit library (Combined Base and Optional)
+# Build the Dali Toolkit library
 
 # Base files
 toolkit_base_images_dir = ../../../base/dali-toolkit/images
 toolkit_base_sounds_dir = ../../../base/dali-toolkit/sounds
+toolkit_base_styles_dir = ../../../base/dali-toolkit/styles
 toolkit_base_src_dir    = ../../../base/dali-toolkit/internal
 public_api_base_src_dir = ../../../base/dali-toolkit/public-api
 
 include ../../../base/dali-toolkit/images/file.list
 include ../../../base/dali-toolkit/sounds/file.list
+include ../../../base/dali-toolkit/styles/file.list
 include ../../../base/dali-toolkit/internal/file.list
 include ../../../base/dali-toolkit/public-api/file.list
 
@@ -36,37 +38,58 @@ include ../../../optional/dali-toolkit/images/file.list
 include ../../../optional/dali-toolkit/internal/file.list
 include ../../../optional/dali-toolkit/public-api/file.list
 
-# CAPI
+# CAPI headers
 capi_devel_src_dir = ../../../capi/dali-toolkit/public-api
 
 include ../../../capi/dali-toolkit/public-api/file.list
 
 resources_dir = ../../../resources
 daliimagedir = ${dataReadOnlyDir}/toolkit/images/
+if TOOLKIT_BASIC_VERSION
+daliimage_DATA = ${dali_toolkit_base_image_files}
+else
 daliimage_DATA = ${dali_toolkit_base_image_files} \
                  ${dali_toolkit_optional_image_files}
+endif # TOOLKIT_BASIC_VERSION
 
 dalisounddir = ${dataReadOnlyDir}/toolkit/sounds/
 dalisound_DATA = ${dali_toolkit_base_sound_files}
 
-# The Combined library
+# The library
 lib_LTLIBRARIES = libdali-toolkit.la
 
+if TOOLKIT_BASIC_VERSION
+libdali_toolkit_la_SOURCES = \
+                     $(toolkit_base_src_files) \
+                     $(public_api_base_src_files)
+else
 libdali_toolkit_la_SOURCES = \
                      $(toolkit_base_src_files) \
                      $(public_api_base_src_files) \
                      $(toolkit_optional_src_files) \
                      $(public_api_optional_src_files)
+endif # TOOLKIT_BASIC_VERSION
+
+dalistyledir = ${dataReadOnlyDir}/toolkit/styles/
+dalistyle_DATA = ${dali_toolkit_style_files}
 
 libdali_toolkit_la_DEPENDENCIES =
+
+toolkit_basic_includes = -I../../../base \
+                         -I../../../capi
+
+if ! TOOLKIT_BASIC_VERSION
+toolkit_optional_includes = -I../../../optional
+endif
 
 libdali_toolkit_la_CXXFLAGS = -DDALI_COMPILATION \
                       -DDALI_IMAGE_DIR="\"${daliimagedir}\"" \
                       -DDALI_SOUND_DIR="\"${dalisounddir}\"" \
+                      -DDALI_STYLE_DIR="\"${dalistyledir}\"" \
+                      -DDALI_DATA_READ_ONLY_DIR="\"${dataReadOnlyDir}\"" \
                       -Werror -Wall \
-                      -I../../../base \
-                      -I../../../optional \
-                      -I../../../capi \
+                      $(toolkit_basic_includes) \
+                      $(toolkit_optional_includes) \
                       $(DALI_TOOLKIT_CFLAGS) \
                       $(DALICORE_CFLAGS) \
                       $(DALI_CFLAGS) \
@@ -103,6 +126,8 @@ publicapibasefactorydir = $(publicapibasedir)/factory
 publicapibasefocusmanagerdir = $(publicapibasedir)/focus-manager
 publicapibasemarkupprocessordir = $(publicapibasedir)/markup-processor
 publicapibaseshadereffectsdir = $(publicapibasedir)/shader-effects
+publicapibasestylingdir = $(publicapibasedir)/styling
+publicapibasebuilderdir = $(publicapibasedir)/builder
 
 publicapibase_HEADERS = $(public_api_base_header_files)
 publicapibasecontrols_HEADERS = $(public_api_base_controls_header_files)
@@ -122,6 +147,8 @@ publicapibasefactory_HEADERS = $(public_api_base_factory_header_files)
 publicapibasefocusmanager_HEADERS = $(public_api_base_focus_manager_header_files)
 publicapibasemarkupprocessor_HEADERS = $(public_api_base_markup_processor_header_files)
 publicapibaseshadereffects_HEADERS = $(public_api_base_shader_effects_header_files)
+publicapibasestyling_HEADERS = $(public_api_base_styling_header_files)
+publicapibasebuilder_HEADERS = $(public_api_base_builder_header_files)
 
 # Install Optional headers
 
@@ -147,7 +174,6 @@ publicapioptionalviewdir = $(publicapioptionaldir)/controls/view
 publicapioptionalnavigationframedir = $(publicapioptionaldir)/controls/navigation-frame
 publicapioptionalshadereffectsdir = $(publicapioptionaldir)/shader-effects
 publicapioptionalbubbleeffectdir = $(publicapioptionaldir)/shader-effects/bubble-effect
-publicapioptionalbuilderdir = $(publicapioptionaldir)/builder
 publicapioptionaltransitioneffectsdir = $(publicapioptionaldir)/transition-effects
 
 publicapioptional_HEADERS = $(public_api_optional_header_files)
@@ -169,7 +195,6 @@ publicapioptionalview_HEADERS = $(public_api_optional_view_header_files)
 publicapioptionalnavigationframe_HEADERS = $(public_api_optional_navigation_frame_header_files)
 publicapioptionalshadereffects_HEADERS = $(public_api_optional_shader_effects_header_files)
 publicapioptionalbubbleeffect_HEADERS = $(public_api_optional_bubble_effect_header_files)
-publicapioptionalbuilder_HEADERS = $(public_api_optional_builder_header_files)
 publicapioptionaltransitioneffects_HEADERS = $(public_api_optional_transition_effects_header_files)
 
 # Install CAPI headers
@@ -212,6 +237,7 @@ capidevelstyledtextutilitiesdir = $(capideveldir)/styled-text-utilities
 capidevelbuilderdir = $(capideveldir)/builder
 capidevelutilitiesdir = $(capideveldir)/utilities
 capideveltransitioneffectsdir = $(capideveldir)/transition-effects
+capidevelstylingdir = $(capideveldir)/styling
 
 capidevel_HEADERS = $(capi_devel_header_files)
 capidevelcontrols_HEADERS = $(capi_devel_controls_header_files)
@@ -251,3 +277,5 @@ capidevelstyledtextutilities_HEADERS = $(capi_devel_styled_text_utilities_header
 capidevelbuilder_HEADERS = $(capi_devel_builder_header_files)
 capidevelutilities_HEADERS = $(capi_devel_utilities_header_files)
 capideveltransitioneffects_HEADERS = $(capi_devel_transition_effects_header_files)
+capidevelstyling_HEADERS = $(capi_devel_styling_header_files)
+

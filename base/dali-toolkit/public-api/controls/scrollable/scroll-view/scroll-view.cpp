@@ -1,21 +1,28 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
-#include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
+// CLASS HEADER
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
+
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl.h>
 
 using namespace Dali;
@@ -232,6 +239,10 @@ unsigned int FixedRuler::GetPageFromPosition(float position, bool wrap) const
   // spacing must be present.
   if(mEnabled && fabsf(mSpacing) > Math::MACHINE_EPSILON_1)
   {
+    if( wrap )
+    {
+      position = WrapInDomain(position, mDomain.min, mDomain.max);
+    }
     page = floor((position - mDomain.min) / mSpacing + 0.5f);
 
     if(wrap)
@@ -268,8 +279,6 @@ const std::string ScrollView::SCROLL_PRE_POSITION_PROPERTY_NAME( "scroll-pre-pos
 const std::string ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME( "scroll-overshoot-x" );
 const std::string ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME( "scroll-overshoot-y" );
 const std::string ScrollView::SCROLL_FINAL_PROPERTY_NAME( "scroll-final" );
-const std::string ScrollView::SCROLL_X_PROPERTY_NAME( "scroll-x" );
-const std::string ScrollView::SCROLL_Y_PROPERTY_NAME( "scroll-y" );
 const std::string ScrollView::SCROLL_SCALE_PROPERTY_NAME( "scroll-scale" );
 const std::string ScrollView::SCROLL_WRAP_PROPERTY_NAME( "scroll-wrap" );
 const std::string ScrollView::SCROLL_PANNING_PROPERTY_NAME( "scroll-panning" );
@@ -279,7 +288,7 @@ const std::string ScrollView::SCROLL_START_PAGE_POSITION_PROPERTY_NAME( "scroll-
 
 const float ScrollView::DEFAULT_SLOW_SNAP_ANIMATION_DURATION(0.5f);
 const float ScrollView::DEFAULT_FAST_SNAP_ANIMATION_DURATION(0.25f);
-const float ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION(1.0f);
+const float ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION(0.5f);
 const float ScrollView::DEFAULT_MAX_OVERSHOOT(100.0f);  // 100 pixels
 
 const float ScrollView::DEFAULT_AXIS_AUTO_LOCK_GRADIENT(0.36f);
@@ -384,12 +393,12 @@ void ScrollView::SetRulerY(RulerPtr ruler)
 
 void ScrollView::SetRulerScaleX(RulerPtr ruler)
 {
-  GetImpl(*this).SetRulerScaleX(ruler);
+  DALI_LOG_ERROR( "Deprecated" );
 }
 
 void ScrollView::SetRulerScaleY(RulerPtr ruler)
 {
-  GetImpl(*this).SetRulerScaleY(ruler);
+  DALI_LOG_ERROR( "Deprecated" );
 }
 
 void ScrollView::SetScrollSensitive(bool sensitive)
@@ -437,6 +446,16 @@ void ScrollView::SetRefreshInterval(int milliseconds)
   GetImpl(*this).SetRefreshInterval(milliseconds);
 }
 
+int ScrollView::GetScrollUpdateDistance() const
+{
+  return GetImpl(*this).GetScrollUpdateDistance();
+}
+
+void ScrollView::SetScrollUpdateDistance(int distance)
+{
+  GetImpl(*this).SetScrollUpdateDistance(distance);
+}
+
 bool ScrollView::GetAxisAutoLock() const
 {
   return GetImpl(*this).GetAxisAutoLock();
@@ -477,6 +496,26 @@ void ScrollView::SetFlickSpeedCoefficient(float speed)
   GetImpl(*this).SetFlickSpeedCoefficient(speed);
 }
 
+Vector2 ScrollView::GetMinimumDistanceForFlick() const
+{
+  return GetImpl(*this).GetMinimumDistanceForFlick();
+}
+
+void ScrollView::SetMinimumDistanceForFlick( const Vector2& distance )
+{
+  GetImpl(*this).SetMinimumDistanceForFlick(distance);
+}
+
+float ScrollView::GetMinimumSpeedForFlick() const
+{
+  return GetImpl(*this).GetMinimumSpeedForFlick();
+}
+
+void ScrollView::SetMinimumSpeedForFlick( float speed )
+{
+  GetImpl(*this).SetMinimumSpeedForFlick(speed);
+}
+
 float ScrollView::GetMaxFlickSpeed() const
 {
   return GetImpl(*this).GetMaxFlickSpeed();
@@ -502,9 +541,15 @@ Vector3 ScrollView::GetCurrentScrollPosition() const
   return GetImpl(*this).GetCurrentScrollPosition();
 }
 
+void ScrollView::SetScrollPosition(const Vector3& position)
+{
+  GetImpl(*this).SetScrollPosition(position);
+}
+
 Vector3 ScrollView::GetCurrentScrollScale() const
 {
-  return GetImpl(*this).GetCurrentScrollScale();
+  DALI_LOG_ERROR( "Deprecated" );
+  return Vector3::ONE;
 }
 
 unsigned int ScrollView::GetCurrentPage() const
@@ -514,12 +559,16 @@ unsigned int ScrollView::GetCurrentPage() const
 
 void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, float rotation)
 {
-  GetImpl(*this).TransformTo(position, scale, rotation);
+  DALI_LOG_ERROR( "Deprecated" );
+
+  GetImpl(*this).TransformTo(position);
 }
 
 void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, float rotation, float duration)
 {
-  GetImpl(*this).TransformTo(position, scale, rotation, duration);
+  DALI_LOG_ERROR( "Deprecated" );
+
+  GetImpl(*this).TransformTo(position, duration);
 }
 
 void ScrollView::ScrollTo(const Vector3 &position)
@@ -570,12 +619,12 @@ bool ScrollView::ScrollToSnapPoint()
 
 void ScrollView::ScaleTo(const Vector3 &scale)
 {
-  GetImpl(*this).ScaleTo(scale);
+  DALI_LOG_ERROR( "Deprecated" );
 }
 
 void ScrollView::ScaleTo(const Vector3 &scale, float duration)
 {
-  GetImpl(*this).ScaleTo(scale, duration);
+  DALI_LOG_ERROR( "Deprecated" );
 }
 
 void ScrollView::ApplyConstraintToChildren(Constraint constraint)

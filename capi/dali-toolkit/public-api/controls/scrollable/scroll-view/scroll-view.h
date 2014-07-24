@@ -1,21 +1,22 @@
 #ifndef __DALI_TOOLKIT_SCROLL_VIEW_H__
 #define __DALI_TOOLKIT_SCROLL_VIEW_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 /**
  * @addtogroup CAPI_DALI_TOOLKIT_SCROLL_VIEW_MODULE
@@ -134,11 +135,6 @@ public:
    * @brief Constructs ruler, default enabled, with limitless domain.
    */
   Ruler();
-
-  /**
-   * @brief Destructor - A reference counted object may only be deleted by calling Unreference().
-   */
-  virtual ~Ruler();
 
   /**
    * @brief Snaps (x) in accordance to the ruler settings.
@@ -295,6 +291,13 @@ public:
 
 protected:
 
+  /**
+   * @brief Destructor - A reference counted object may only be deleted by calling Unreference().
+   */
+  virtual ~Ruler();
+
+protected:
+
   RulerType mType;               ///< Type of Ruler (Fixed or Free).
   bool mEnabled;                 ///< If the ruler is enabled.
   RulerDomain mDomain;           ///< The domain of the ruler.
@@ -404,8 +407,6 @@ public:
   static const std::string SCROLL_OVERSHOOT_X_PROPERTY_NAME;            ///< Property, name "scroll-overshoot-x",         type float
   static const std::string SCROLL_OVERSHOOT_Y_PROPERTY_NAME;            ///< Property, name "scroll-overshoot-y",         type float
   static const std::string SCROLL_FINAL_PROPERTY_NAME;                  ///< Property, name "scroll-final",              type VECTOR3
-  static const std::string SCROLL_X_PROPERTY_NAME;                      ///< Property, name "scroll-x",                  type FLOAT
-  static const std::string SCROLL_Y_PROPERTY_NAME;                      ///< Property, name "scroll-y",                  type FLOAT
   static const std::string SCROLL_SCALE_PROPERTY_NAME;                  ///< Property, name "scroll-scale",              type VECTOR3
   static const std::string SCROLL_WRAP_PROPERTY_NAME;                   ///< Property, name "scroll-wrap",               type BOOLEAN
   static const std::string SCROLL_PANNING_PROPERTY_NAME;                ///< Property, name "scroll-panning",            type BOOLEAN
@@ -450,8 +451,6 @@ public:
   {
     SnapType type;    ///< Current snap commencing
     Vector3 position; ///< Target snap position
-    Vector3 scale;    ///< Target snap scale
-    float rotation;   ///< Target snap rotation
     float duration;   ///< Duration of snap animation.
   };
 
@@ -489,11 +488,11 @@ public:
   ScrollView& operator=( const ScrollView& handle );
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
    *
-   * Dali::Object derived classes typically do not contain member data.
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~ScrollView();
+  ~ScrollView();
 
   /**
    * @brief Create an initialized ScrollView.
@@ -606,6 +605,8 @@ public:
    * (domain) to which scaling can be performed e.g. 10% to 200%
    *
    * @param[in] ruler The ruler to be used for the Scale-X axis
+   *
+   * @deprecated Scaling not supported
    */
   void SetRulerScaleX(RulerPtr ruler);
 
@@ -616,6 +617,8 @@ public:
    * (domain) to which scaling can be performed e.g. 10% to 200%
    *
    * @param[in] ruler The ruler to be used for the Scale-Y axis
+   *
+   * @deprecated Scaling not supported
    */
   void SetRulerScaleY(RulerPtr ruler);
 
@@ -700,6 +703,7 @@ public:
   void SetWrapMode(bool enable);
 
   /**
+   * @deprecated
    * @brief Gets the current refresh interval in milliseconds.
    *
    * @return Current refresh interval in milliseconds
@@ -707,6 +711,7 @@ public:
   int GetRefreshInterval() const;
 
   /**
+   * @deprecated
    * @brief Sets the refresh interval in milliseconds.
    *
    * The refresh interval is a notification signal
@@ -718,6 +723,23 @@ public:
    * @param[in] milliseconds The frequency of the event in milliseconds
    */
   void SetRefreshInterval(int milliseconds);
+
+  /**
+   * @brief Gets the current distance needed to scroll for ScrollUpdatedSignal to be emitted
+   *
+   * @return Current scroll update distance
+   */
+  int GetScrollUpdateDistance() const;
+
+  /**
+   * @brief Sets the distance needed to scroll for ScrollUpdatedSignal to be emitted
+   *
+   * The scroll update distance tells ScrollView how far to move before ScrollUpdatedSignal the informs application.
+   * Each time the ScrollView crosses this distance the signal will be emitted
+   *
+   * @param[in] distance The distance for ScrollView to move before emitting update signal
+   */
+  void SetScrollUpdateDistance(int distance);
 
   /**
    * @brief Returns state of Axis Auto Lock mode.
@@ -806,6 +828,36 @@ public:
   void SetFlickSpeedCoefficient(float speed);
 
   /**
+   * @brief Returns the minimum pan distance required for a flick gesture in pixels
+   *
+   * @return Minimum pan distance vector with separate x and y distance
+   */
+  Vector2 GetMinimumDistanceForFlick() const;
+
+  /**
+   * @brief Sets the minimum pan distance required for a flick in pixels
+   *
+   * Takes a Vector2 containing separate x and y values. As long as the pan distance exceeds one of these axes a flick will be allowed
+   *
+   * @param[in] distance The minimum pan distance for a flick
+   */
+  void SetMinimumDistanceForFlick( const Vector2& distance );
+
+  /**
+   * @brief Returns the minimum pan speed required for a flick gesture in pixels per second
+   *
+   * @return Minimum pan speed
+   */
+  float GetMinimumSpeedForFlick() const;
+
+  /**
+   * @brief Sets the minimum pan speed required for a flick in pixels per second
+   *
+   * @param[in] speed The minimum pan speed for a flick
+   */
+  void SetMinimumSpeedForFlick( float speed );
+
+  /**
    * @brief Gets the maximum flick speed setting for ScrollView when
    * flicking in free panning mode.
    *
@@ -858,9 +910,19 @@ public:
   Vector3 GetCurrentScrollPosition() const;
 
   /**
+   * @brief Sets the current scroll position, overriding current scroll animations. If panning is currently taking place
+   *        SetScrollPosition will have no effect. Try to ensure panning has stopped before calling this function.
+   *
+   * @param[in] position The new scroll position to set.
+   */
+  void SetScrollPosition(const Vector3& position);
+
+  /**
    * @brief Retrieves current scroll scale.
    *
    * @returns The current scroll scale.
+   *
+   * @deprecated Scaling not supported
    */
   Vector3 GetCurrentScrollScale() const;
 
@@ -882,16 +944,20 @@ public:
    * @param[in] position The position to transform to.
    * @param[in] scale The scale to transform to.
    * @param[in] rotation The rotation to transform to.
+   *
+   * @deprecated Scaling or rotation not supported, use ScrollTo(const Vector3&)
    */
   void TransformTo(const Vector3& position, const Vector3& scale, float rotation);
 
   /**
-   * @brief Transforms View to position, scale and rotation specified.
+   * @brief Transforms View to position, scale and rotation specified in the duration specified.
    *
    * @param[in] position The position to transform to.
    * @param[in] scale The scale to transform to.
    * @param[in] rotation The rotation to transform to.
    * @param[in] duration The duration for this animation in seconds.
+   *
+   * @deprecated Scaling or rotation not supported, use ScrollTo(const Vector3&, float)
    */
   void TransformTo(const Vector3& position, const Vector3& scale, float rotation, float duration);
 
@@ -1016,6 +1082,8 @@ public:
    * @brief Scales View to (scale).
    *
    * @param[in] scale The scale factor the animate to.
+   *
+   * @deprecated Scaling not supported
    */
   void ScaleTo(const Vector3& scale);
 
@@ -1024,6 +1092,8 @@ public:
    *
    * @param[in] scale The scale factor the animate to.
    * @param[in] duration The duration of the animation in seconds.
+   *
+   * @deprecated Scaling not supported
    */
   void ScaleTo(const Vector3& scale, float duration);
 

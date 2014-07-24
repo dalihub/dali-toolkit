@@ -1,26 +1,22 @@
 Name:       dali-toolkit
 Summary:    The OpenGLES Canvas Core Library Toolkit
-Version:    0.9.18
+Version:    1.0.1
 Release:    1
 Group:      System/Libraries
-License:    Flora
+License:    Apache-2.0
 URL:        https://review.tizen.org/git/?p=platform/core/uifw/dali-toolkit.git;a=summary
 Source0:    %{name}-%{version}.tar.gz
 
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-Requires:       boost
-Requires:       dali-adaptor-dali-feedback-plugin
 Requires:       dali
 # Do NOT put an adaptor here - it is an application choice which adaptor to use
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  boost-devel
-BuildRequires:  dali-devel
-BuildRequires:  dali-adaptor-devel
+BuildRequires:  pkgconfig(dali)
+BuildRequires:  pkgconfig(dali-core)
 BuildRequires:  fribidi-devel
-BuildRequires:  pkgconfig(utilX)
-ExclusiveArch:  armv7l
 
 %description
 The OpenGLES Canvas Core Library Toolkit - a set of controls that provide
@@ -39,17 +35,6 @@ Requires:   boost-devel
 Application development package for the OpenGLES Canvas toolkit - headers and package config
 
 ##############################
-# Dali Base library
-##############################
-%package dali-toolkit-base
-Summary:    The basic OpenGLES Canvas Core Library Toolkit
-Group:      Development/Building
-
-%description dali-toolkit-base
-A subset of the controls provided by the main package, intended for lightweight applications.
-all the controls provided by the main package.
-
-##############################
 # Preparation
 ##############################
 %prep
@@ -58,6 +43,7 @@ all the controls provided by the main package.
 %define dali_data_ro_dir            /usr/share/dali/
 %define dali_toolkit_image_files    %{dali_data_ro_dir}/toolkit/images/
 %define dali_toolkit_sound_files    %{dali_data_ro_dir}/toolkit/sounds/
+%define dali_toolkit_style_files    %{dali_data_ro_dir}/toolkit/styles/
 %define dev_include_path %{_includedir}
 
 ##############################
@@ -75,9 +61,11 @@ export FFLAGS="$FFLAGS -DTIZEN_DEBUG_ENABLE"
 %endif
 
 libtoolize --force
-cd %{_builddir}/dali-toolkit-%{version}/build/slp && autoreconf --install
-cd %{_builddir}/dali-toolkit-%{version}/build/slp && CXXFLAGS=$CXXFLAGS LDFLAGS=$LDFLAGS DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ./configure --prefix=$PREFIX
-
+cd %{_builddir}/dali-toolkit-%{version}/build/slp
+autoreconf --install
+DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
+DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
+%configure
 make %{?jobs:-j%jobs}
 
 ##############################
@@ -99,10 +87,6 @@ cp -af %{_builddir}/%{name}-%{version}/LICENSE %{buildroot}/usr/share/license/%{
 /sbin/ldconfig
 exit 0
 
-%post dali-toolkit-base
-/sbin/ldconfig
-exit 0
-
 ##############################
 # Post Uninstall
 ##############################
@@ -110,19 +94,20 @@ exit 0
 /sbin/ldconfig
 exit 0
 
-%postun dali-toolkit-base
-/sbin/ldconfig
-exit 0
-
 ##############################
 # Files in Binary Packages
 ##############################
 %files
+%if 0%{?enable_dali_smack_rules}
+%manifest dali-toolkit.manifest-smack
+%else
 %manifest dali-toolkit.manifest
+%endif
 %defattr(-,root,root,-)
 %{_libdir}/lib%{name}.so*
 %{dali_toolkit_image_files}/*
 %{dali_toolkit_sound_files}/*
+%{dali_toolkit_style_files}/*
 %{_datadir}/license/%{name}
 
 %files devel
@@ -130,6 +115,3 @@ exit 0
 %{dev_include_path}/%{name}/*
 %{_libdir}/pkgconfig/*.pc
 
-%files dali-toolkit-base
-%defattr(-,root,root,-)
-%{_libdir}/libdali-toolkit-base.so*

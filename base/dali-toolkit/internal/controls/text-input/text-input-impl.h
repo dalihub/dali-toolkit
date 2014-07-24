@@ -1,21 +1,22 @@
 #ifndef __DALI_TOOLKIT_INTERNAL_TEXT_INPUT_H__
 #define __DALI_TOOLKIT_INTERNAL_TEXT_INPUT_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -25,7 +26,6 @@
 #include <dali-toolkit/internal/controls/text-input/text-input-popup-impl.h>
 
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/adaptor-framework/common/imf-manager.h>
 #include <dali/public-api/geometry/mesh.h>
 
 namespace Dali
@@ -45,6 +45,13 @@ typedef IntrusivePtr<TextInput> TextInputPtr;
 class TextInput : public Control
 {
 public:
+
+  // Properties
+  enum
+  {
+    TEXTINPUT_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    TEXTINPUT_PROPERTY_END_INDEX = TEXTINPUT_PROPERTY_START_INDEX + 512 ///< Reserving property indices
+  };
 
   /**
    * Create a new TextInput
@@ -376,6 +383,22 @@ public:
    * @copydoc Toolkit::TextInput::GetNumberOfCharacters
    */
   std::size_t GetNumberOfCharacters() const;
+
+  /**
+   * Styling
+   */
+
+  /**
+   * Set the diffuse color for the highlight
+   * @param[in] color color to use
+   */
+  void SetMaterialDiffuseColor( const Vector4& color );
+
+  /**
+   * Get the diffuse color used by the highlight
+   * @return color
+   */
+  const Vector4& GetMaterialDiffuseColor() const;
 
 private:
 
@@ -842,12 +865,11 @@ public:  // Public to allow internal testing.
   std::size_t InsertAt( const Text& newText, const std::size_t insertionPosition, const std::size_t numberOfCharactersToReplace );
 
   /**
-   * Creates a cursor from the supplied image
-   * @param[in] cursorImage the image to be used for the cursor.
-   * @param[in] border the nine patch border corresponding to the supplied image.
-   * @return the image actor to be used as the cursor.
-   */
-  ImageActor CreateCursor( Image cursorImage, const Vector4& border );
+  * Creates a cursor.
+  * @param[in] color the cursor color.
+  * @return the image actor to be used as the cursor.
+  */
+  ImageActor CreateCursor( const Vector4 &color );
 
   /**
    * Moves cursor to the right
@@ -1031,21 +1053,16 @@ public:  // Public to allow internal testing.
   void ClearPopup();
 
   /**
-   * Adds a popup option.
-   * @note Creates popup frame if not already created.
-   * @param[in] name The unique name for this option.
-   * @param[in] caption The caption (label) for this option
-   * @param[in] icon the image icon to be displayed for this option
-   * @param[in] finalOption Flag to indicate that this is the final option.
-   * (set to true on the last option you add)
+   * Adds Popup options which have been enabled.
    */
-  void AddPopupOption(const std::string& name, const std::string& caption, const Image icon, bool finalOption = false);
+  void AddPopupOptions();
 
   /**
    * Sets popup position
    * @param[in] position The actual position for this popup.
+   * @param[in] alternativePosition Alternative popup position if no space in upper area.
    */
-  void SetPopupPosition(const Vector3& position);
+  void SetPopupPosition(const Vector3& position, const Vector2& alternativePosition );
 
   /**
    * Hides the popup
@@ -1068,7 +1085,7 @@ public:  // Public to allow internal testing.
   /**
    * Setup the selection popup and clipboard if relevant so the correct options are shown when ShowPopup is called.
    */
-  void SetUpPopUpSelection();
+  void SetUpPopupSelection();
 
   /**
    * Return the logical index containing the character position closest to the source.
@@ -1316,6 +1333,36 @@ public:  // Public to allow internal testing.
   void GetTextLayoutInfo();
 
   /**
+   * Set the offset for positioning Popup from the TextInput
+   * @param[in] offset in the order, left, top, right, bottom
+   */
+  void SetOffsetFromText( const Vector4& offset );
+
+  /**
+   * Get the offset of the Popup from the TextInput
+   * @return Vector4 with the offset in the order, left, top, right, bottom
+   */
+  const Vector4& GetOffsetFromText() const;
+
+  // Properties
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
+
+  /**
    * Emits the style changed signal.
    */
   void EmitStyleChangedSignal();
@@ -1405,7 +1452,7 @@ private:
                                                                                      ///< the text size after layout and the scroll offset.
 
   MarkupProcessor::StyledTextArray mCurrentCopySelecton;                                              ///< Array to store copied text.
-  TextInputPopup mPopUpPanel;                                                                         ///< Panel to house cut and paste, select all buttons.
+  TextInputPopup mPopupPanel;                                                                         ///< Panel to house cut and paste, select all buttons.
 
   Timer mScrollTimer;
   Vector2 mScrollDisplacement;
@@ -1416,7 +1463,11 @@ private:
   Vector4 mSelectionHandleFlipMargin;
   Vector4 mBoundingRectangleWorldCoordinates;
 
-  Clipboard mClipboard;                  ///< Handle to clipboard
+  Clipboard mClipboard;                   ///< Handle to clipboard
+
+  // Styling
+  Vector4           mMaterialColor;       // Color of the highlight
+  Vector4           mPopupOffsetFromText; // Offset of Popup from the TextInput.
 
   bool mOverrideAutomaticAlignment:1;    ///< Whether to override the alignment automatically set by the text content (e.g. european LTR or arabic RTL)
   bool mCursorRTLEnabled:1;              ///< Enable state of Alternate RTL Cursor (need to keep track of this as it's not always enabled)

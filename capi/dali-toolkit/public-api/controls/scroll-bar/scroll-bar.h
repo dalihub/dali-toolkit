@@ -1,21 +1,22 @@
 #ifndef __DALI_TOOLKIT_SCROLL_BAR_H__
 #define __DALI_TOOLKIT_SCROLL_BAR_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/dali.h>
@@ -82,10 +83,11 @@ public:
   ScrollBar& operator=( const ScrollBar& scrollBar );
 
   /**
-   * @brief Virtual destructor.
-   * Dali::Object derived classes typically do not contain member data.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~ScrollBar();
+  ~ScrollBar();
 
   /**
    * @brief Create an initialized ScrollBar
@@ -111,8 +113,23 @@ public:
    *
    * @param[in] image The image to cover background
    * @param[in] border The nine patch border for the image.
+   *
+   * @deprecated Use Control::SetBackground()
    */
- void SetBackgroundImage( Image image, const Vector4& border );
+  void SetBackgroundImage( Image image, const Vector4& border );
+
+  /**
+   * @brief Sets the image for the indicator of scroll bar.
+   *
+   * @pre The scroll bar actor has been initialised.
+   *
+   * The indicator image is resized (stretched according to scale settings),
+   * to reflect the size of the scroll indicator and minimum/maximum limits
+   * of the scroll position.
+   *
+   * @param[in] image The image of indicator that moves to indicate the current scroll position.
+   */
+  void SetIndicatorImage( Image image );
 
   /**
    * @brief Sets the image for the indicator of scroll bar.
@@ -125,6 +142,8 @@ public:
    *
    * @param[in] image The image of indicator that moves to indicate the current scroll position.
    * @param[in] border The nine patch border for the image.
+   *
+   * @deprecated Use the new 9-patch API
    */
   void SetIndicatorImage( Image image, const Vector4& border );
 

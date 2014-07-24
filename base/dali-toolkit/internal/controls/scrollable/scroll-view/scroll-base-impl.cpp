@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-base-impl.h>
 
@@ -37,8 +38,6 @@ ScrollBase::ScrollBase()
 : Scrollable(),
   mParent(NULL),
   mPropertyTime(Property::INVALID_INDEX),
-  mPropertyX(Property::INVALID_INDEX),
-  mPropertyY(Property::INVALID_INDEX),
   mPropertyPrePosition(Property::INVALID_INDEX),
   mPropertyPosition(Property::INVALID_INDEX),
   mPropertyScale(Property::INVALID_INDEX),
@@ -74,8 +73,6 @@ void ScrollBase::RegisterProperties()
   mPropertyOvershootX = self.RegisterProperty(Toolkit::ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME, 0.0f);
   mPropertyOvershootY = self.RegisterProperty(Toolkit::ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME, 0.0f);
   mPropertyFinal = self.RegisterProperty(Toolkit::ScrollView::SCROLL_FINAL_PROPERTY_NAME, Vector3::ZERO);
-  mPropertyX = self.RegisterProperty(Toolkit::ScrollView::SCROLL_X_PROPERTY_NAME, 0.0f);
-  mPropertyY = self.RegisterProperty(Toolkit::ScrollView::SCROLL_Y_PROPERTY_NAME, 0.0f);
   mPropertyScale = self.RegisterProperty(Toolkit::ScrollView::SCROLL_SCALE_PROPERTY_NAME, Vector3::ONE);
   mPropertyWrap = self.RegisterProperty(Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME, false);
   mPropertyPanning = self.RegisterProperty(Toolkit::ScrollView::SCROLL_PANNING_PROPERTY_NAME, false);
