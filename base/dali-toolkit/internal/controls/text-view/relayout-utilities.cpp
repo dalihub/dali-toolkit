@@ -1982,7 +1982,8 @@ RenderableActor CreateGlyphActor( const Text& text, const TextStyle& style, Text
   else
   {
     // The text-actor cache is empty. Create a new one.
-    textActor = TextActor::New( text, style, false, true );
+    TextActorParameters parameters( style, TextActorParameters::FONT_DETECTION_OFF );
+    textActor = TextActor::New( text, parameters );
   }
 
   return textActor;
