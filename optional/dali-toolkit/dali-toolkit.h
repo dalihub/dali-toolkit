@@ -18,11 +18,52 @@
  *
  */
 
-#include <dali-toolkit/public-api/dali-toolkit-capi-internal.h>
+#include <dali-toolkit/public-api/controls/alignment/alignment.h>
+#include <dali-toolkit/public-api/controls/buttons/button.h>
+#include <dali-toolkit/public-api/controls/buttons/push-button.h>
+#include <dali-toolkit/public-api/controls/cluster/cluster-style.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
+#include <dali-toolkit/public-api/controls/default-controls/push-button-factory.h>
+#include <dali-toolkit/public-api/controls/image-view/masked-image-view.h>
+#include <dali-toolkit/public-api/controls/popup/popup.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-connector.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/grid-layout.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-cube-effect.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-custom-effect.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-spiral-effect.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-slide-effect.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-twist-effect.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
+#include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
+#include <dali-toolkit/public-api/controls/super-blur-view/super-blur-view.h>
+#include <dali-toolkit/public-api/controls/text-input/text-input.h>
+#include <dali-toolkit/public-api/controls/text-view/text-view.h>
+#include <dali-toolkit/public-api/enums.h>
+#include <dali-toolkit/public-api/factory/localized-control-factory.h>
+#include <dali-toolkit/public-api/focus-manager/focus-manager.h>
+#include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
+#include <dali-toolkit/public-api/markup-processor/markup-processor.h>
+#include <dali-toolkit/public-api/shader-effects/dissolve-effect.h>
+#include <dali-toolkit/public-api/shader-effects/image-region-effect.h>
+#include <dali-toolkit/public-api/shader-effects/iris-effect.h>
+#include <dali-toolkit/public-api/shader-effects/mask-effect.h>
+#include <dali-toolkit/public-api/shader-effects/nine-patch-mask-effect.h>
+#include <dali-toolkit/public-api/shader-effects/page-turn-book-spine-effect.h>
+#include <dali-toolkit/public-api/shader-effects/page-turn-effect.h>
+#include <dali-toolkit/public-api/shader-effects/ripple-effect.h>
+#include <dali-toolkit/public-api/shader-effects/ripple2d-effect.h>
+#include <dali-toolkit/public-api/shader-effects/swirl-effect.h>
 
 // INTERNAL INCLUDES
 
 #include <dali-toolkit/public-api/controls/bloom-view/bloom-view.h>
+#include <dali-toolkit/public-api/controls/bubble-effect/bubble-emitter.h>
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
 #include <dali-toolkit/public-api/controls/cluster/cluster.h>
 

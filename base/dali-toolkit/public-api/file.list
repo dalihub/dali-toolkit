@@ -56,29 +56,49 @@ public_api_base_src_files = \
 
 # Add public header files here
 
-public_api_base_header_files =
+public_api_base_header_files = \
+  $(public_api_base_src_dir)/enums.h
 
-public_api_base_controls_header_files =
+public_api_base_controls_header_files = \
+  $(public_api_base_src_dir)/controls/control.h \
+  $(public_api_base_src_dir)/controls/control-impl.h
 
-public_api_base_alignment_header_files =
+public_api_base_alignment_header_files = \
+  $(public_api_base_src_dir)/controls/alignment/alignment.h
 
 public_api_base_buttons_header_files = \
-  $(public_api_base_src_dir)/controls/buttons/check-box-button.h
+  $(public_api_base_src_dir)/controls/buttons/check-box-button.h \
+  $(public_api_base_src_dir)/controls/buttons/button.h \
+  $(public_api_base_src_dir)/controls/buttons/push-button.h
 
 public_api_base_default_controls_header_files = \
-  $(public_api_base_src_dir)/controls/default-controls/check-button-factory.h
+  $(public_api_base_src_dir)/controls/default-controls/check-button-factory.h \
+  $(public_api_base_src_dir)/controls/default-controls/solid-color-actor.h \
+  $(public_api_base_src_dir)/controls/default-controls/push-button-factory.h
 
 public_api_base_item_view_header_files = \
   $(public_api_base_src_dir)/controls/scrollable/item-view/depth-layout.h \
   $(public_api_base_src_dir)/controls/scrollable/item-view/roll-layout.h \
   $(public_api_base_src_dir)/controls/scrollable/item-view/spiral-layout.h \
   $(public_api_base_src_dir)/controls/scrollable/item-view/navigation-layout.h \
-  $(public_api_base_src_dir)/controls/scrollable/item-view/album-layout.h
+  $(public_api_base_src_dir)/controls/scrollable/item-view/album-layout.h \
+  $(public_api_base_src_dir)/controls/scrollable/item-view/grid-layout.h \
+  $(public_api_base_src_dir)/controls/scrollable/item-view/item-factory.h \
+  $(public_api_base_src_dir)/controls/scrollable/item-view/item-layout.h \
+  $(public_api_base_src_dir)/controls/scrollable/item-view/item-view.h \
+  $(public_api_base_src_dir)/controls/scrollable/item-view/item-view-declarations.h 
 
-public_api_base_popup_header_files =
+public_api_base_popup_header_files = \
+  $(public_api_base_src_dir)/controls/popup/popup.h
 
 public_api_base_scrollable_header_files = \
-  $(public_api_base_src_dir)/controls/scrollable/scroll-component-impl.h
+  $(public_api_base_src_dir)/controls/scrollable/scroll-component-impl.h \
+  $(public_api_base_src_dir)/controls/scrollable/scrollable.h \
+  $(public_api_base_src_dir)/controls/scrollable/scroll-connector.h \
+  $(public_api_base_src_dir)/controls/scrollable/scroll-component.h
+
+public_api_base_scroll_bar_header_files = \
+  $(public_api_base_src_dir)/controls/scroll-bar/scroll-bar.h
 
 public_api_base_scroll_view_header_files = \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-constraints.h \
@@ -86,24 +106,47 @@ public_api_base_scroll_view_header_files = \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-depth-effect.h \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-page-cube-effect.h \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-page-carousel-effect.h \
-  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect.h
+  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect.h \
+  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view.h \
+  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-effect.h \
+  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-custom-effect.h \
+  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-cube-effect.h \
+  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-page-spiral-effect.h \
+  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-slide-effect.h \
+  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-twist-effect.h
 
 public_api_base_table_view_header_files = \
   $(public_api_base_src_dir)/controls/table-view/table-view.h
 
-public_api_base_text_input_header_files =
+public_api_base_text_input_header_files = \
+  $(public_api_base_src_dir)/controls/text-input/text-input.h
 
-public_api_base_text_view_header_files =
+public_api_base_text_view_header_files = \
+  $(public_api_base_src_dir)/controls/text-view/text-view.h
 
-public_api_base_factory_header_files =
+public_api_base_factory_header_files = \
+  $(public_api_base_src_dir)/factory/localized-control-factory.h
 
 public_api_base_focus_manager_header_files = \
-  $(public_api_base_src_dir)/focus-manager/keyinput-focus-manager.h
+  $(public_api_base_src_dir)/focus-manager/keyinput-focus-manager.h \
+  $(public_api_base_src_dir)/focus-manager/focus-manager.h \
+  $(public_api_base_src_dir)/focus-manager/keyboard-focus-manager.h
 
-public_api_base_markup_processor_header_files =
+public_api_base_markup_processor_header_files = \
+  $(public_api_base_src_dir)/markup-processor/markup-processor.h
 
 public_api_base_shader_effects_header_files = \
-  $(public_api_base_src_dir)/shader-effects/bouncing-effect.h
+  $(public_api_base_src_dir)/shader-effects/bouncing-effect.h \
+  $(public_api_base_src_dir)/shader-effects/dissolve-effect.h \
+  $(public_api_base_src_dir)/shader-effects/image-region-effect.h \
+  $(public_api_base_src_dir)/shader-effects/iris-effect.h \
+  $(public_api_base_src_dir)/shader-effects/mask-effect.h \
+  $(public_api_base_src_dir)/shader-effects/nine-patch-mask-effect.h \
+  $(public_api_base_src_dir)/shader-effects/page-turn-book-spine-effect.h \
+  $(public_api_base_src_dir)/shader-effects/page-turn-effect.h \
+  $(public_api_base_src_dir)/shader-effects/ripple-effect.h \
+  $(public_api_base_src_dir)/shader-effects/ripple2d-effect.h \
+  $(public_api_base_src_dir)/shader-effects/swirl-effect.h
 
 public_api_base_styling_header_files = \
   $(public_api_base_src_dir)/styling/style-manager.h
@@ -112,5 +155,4 @@ public_api_base_builder_header_files = \
   $(public_api_base_src_dir)/builder/builder.h \
   $(public_api_base_src_dir)/builder/json-parser.h \
   $(public_api_base_src_dir)/builder/tree-node.h
-
 

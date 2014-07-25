@@ -1,4 +1,4 @@
-/*.xml
-/build
-/build.log
+*.xml
+build
+build.log
 tct*core.h
