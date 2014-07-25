@@ -236,16 +236,16 @@ void Print( const TextStyle& style )
   std::cout << " : " << style.GetFontPointSize() << std::endl;
   std::cout << " : " << style.GetWeight() << std::endl;
   std::cout << " : " << style.GetTextColor() << std::endl;
-  std::cout << " : " << style.GetItalics() << std::endl;
-  std::cout << " : " << style.GetUnderline() << std::endl;
-  std::cout << " : " << style.GetShadow() << std::endl;
+  std::cout << " : " << style.IsItalicsEnabled() << std::endl;
+  std::cout << " : " << style.IsUnderlineEnabled() << std::endl;
+  std::cout << " : " << style.IsShadowEnabled() << std::endl;
   std::cout << " : " << style.GetShadowColor() << std::endl;
   std::cout << " : " << style.GetShadowOffset() << std::endl;
-  std::cout << " : " << style.GetGlow() << std::endl;
+  std::cout << " : " << style.IsGlowEnabled() << std::endl;
   std::cout << " : " << style.GetGlowColor() << std::endl;
   std::cout << " : " << style.GetGlowIntensity() << std::endl;
   std::cout << " : " << style.GetSmoothEdge() << std::endl;
-  std::cout << " : " << style.GetOutline() << std::endl;
+  std::cout << " : " << style.IsOutlineEnabled() << std::endl;
   std::cout << " : " << style.GetOutlineThickness() << std::endl;
 }
 

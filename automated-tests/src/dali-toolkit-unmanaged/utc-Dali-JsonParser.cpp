@@ -90,6 +90,10 @@ void CompareTrees(const TreeNode& a, const TreeNode& b)
       DALI_TEST_CHECK( a.GetBoolean() == b.GetBoolean() );
       break;
     }
+    default:
+    {
+      break;
+    }
   }
 }
 
