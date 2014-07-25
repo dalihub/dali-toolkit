@@ -73,9 +73,6 @@ const Dali::TouchPoint pointMotionOut( 0, TouchPoint::Motion, 10, 10 );
 const Dali::TouchPoint pointDownOutside( 0, TouchPoint::Down, 10, 10 );
 const Dali::TouchPoint pointUpOutside( 0, TouchPoint::Up, 10, 10 );
 
-static bool gOnTouchPointInterrupted = false;
-
-
 Image CreateSolidColorImage( const Vector4& color, unsigned int width, unsigned int height )
 {
   BitmapImage imageData = BitmapImage::New( width, height, Pixel::RGBA8888 );
