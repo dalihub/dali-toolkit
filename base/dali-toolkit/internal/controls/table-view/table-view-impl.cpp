@@ -17,12 +17,14 @@
 
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/table-view/table-view-impl.h>
-#include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/ref-object.h>
-#include <dlog.h>
 #include <sstream>
+#include <dali/public-api/object/ref-object.h>
+#include <dali/integration-api/debug.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 
 using namespace Dali;
 using namespace std;
@@ -70,8 +72,8 @@ struct RelativeToWidthOrHeight
 // debugging support, very useful when new features are added or bugs are hunted down
 // currently not called from code so compiler will optimize these away, kept here for future debugging
 
-#define TABLEVIEW_TAG "DALI Toolkit::TableView"
-#define TV_LOG(fmt, args...) LOG(LOG_INFO, TABLEVIEW_TAG, fmt, ## args)
+#define TABLEVIEW_TAG "DALI Toolkit::TableView "
+#define TV_LOG(fmt, args...) Debug::LogMessage(Debug::DebugInfo, TABLEVIEW_TAG fmt, ## args)
 
 void PrintArray( Array2d<Dali::Toolkit::Internal::TableView::CellData>& array )
 {

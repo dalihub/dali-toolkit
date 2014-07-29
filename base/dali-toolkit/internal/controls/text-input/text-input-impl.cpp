@@ -2267,7 +2267,7 @@ ImfManager::ImfCallbackData TextInput::ImfEventReceived( Dali::ImfManager& imfMa
       }
       else
       {
-        if( std::abs( imfEvent.cursorOffset ) < mCursorPosition )
+        if( static_cast<std::size_t>(std::abs( imfEvent.cursorOffset )) < mCursorPosition )
         {
           toDelete = mCursorPosition + imfEvent.cursorOffset;
         }
