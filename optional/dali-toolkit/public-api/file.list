@@ -52,11 +52,13 @@ public_api_optional_src_files = \
   $(public_api_optional_src_dir)/transition-effects/cube-transition-effect.cpp \
   $(public_api_optional_src_dir)/transition-effects/cube-transition-wave-effect.cpp \
   $(public_api_optional_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
-  $(public_api_optional_src_dir)/transition-effects/cube-transition-fold-effect.cpp
-  
+  $(public_api_optional_src_dir)/transition-effects/cube-transition-fold-effect.cpp \
+  $(public_api_optional_src_dir)/dali-toolkit-version.cpp
+
 # Add public header files here
 
-public_api_optional_header_files =
+public_api_optional_header_files = \
+  $(public_api_optional_src_dir)/dali-toolkit-version.h
 
 public_api_optional_controls_header_files =
 

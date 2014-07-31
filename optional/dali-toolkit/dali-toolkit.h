@@ -129,5 +129,6 @@
 #include <dali-toolkit/public-api/transition-effects/cube-transition-cross-effect.h>
 #include <dali-toolkit/public-api/transition-effects/cube-transition-fold-effect.h>
 
+#include <dali-toolkit/public-api/dali-toolkit-version.h>
 
 #endif // __DALI_TOOLKIT_EXT_H__
