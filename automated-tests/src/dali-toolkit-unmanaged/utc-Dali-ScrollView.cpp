@@ -143,9 +143,7 @@ int Wait(ToolkitTestApplication& application, int duration = 0)
 static bool gOnScrollStartCalled;                       ///< Whether the OnScrollStart signal was invoked.
 static bool gOnScrollUpdateCalled;                      ///< Whether the OnScrollUpdate signal was invoked.
 static bool gOnScrollCompleteCalled;                    ///< Whether the OnScrollComplete signal was invoked.
-static bool gOnScrollClampedCalled;                     ///< Whether the OnScrollClamped signal was invoked.
 static bool gOnSnapStartCalled;                         ///< Whether the OnSnapStart signal was invoked.
-static ClampState3 gLastClampPosition;                  ///< Clamping information from OnScrollClampedEvent.
 static SnapType gLastSnapType;                          ///< Snaping information from SnapEvent.
 static Vector3 gConstraintResult;                       ///< Result from constraint.
 
@@ -177,17 +175,6 @@ static void OnScrollUpdate( const Vector3& position )
 static void OnScrollComplete( const Vector3& position )
 {
   gOnScrollCompleteCalled = true;
-}
-
-/**
- * Invoked when scrolling clamped.
- *
- * @param[in] event The position/scale/rotation axes that were clamped.
- */
-static void OnScrollClamped( const ScrollView::ClampEvent& event )
-{
-  gOnScrollClampedCalled = true;
-  gLastClampPosition = event.position;
 }
 
 /**

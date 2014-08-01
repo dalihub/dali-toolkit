@@ -1,6 +1,6 @@
 Name:       dali-toolkit
 Summary:    The OpenGLES Canvas Core Library Toolkit
-Version:    1.0.1
+Version:    1.0.2
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0
@@ -61,7 +61,7 @@ export FFLAGS="$FFLAGS -DTIZEN_DEBUG_ENABLE"
 %endif
 
 libtoolize --force
-cd %{_builddir}/dali-toolkit-%{version}/build/slp
+cd %{_builddir}/dali-toolkit-%{version}/build/tizen
 autoreconf --install
 DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
 DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
@@ -73,7 +73,7 @@ make %{?jobs:-j%jobs}
 ##############################
 %install
 rm -rf %{buildroot}
-cd build/slp
+cd build/tizen
 %make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
 
 # LICENSE

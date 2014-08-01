@@ -52,19 +52,25 @@ public_api_optional_src_files = \
   $(public_api_optional_src_dir)/transition-effects/cube-transition-effect.cpp \
   $(public_api_optional_src_dir)/transition-effects/cube-transition-wave-effect.cpp \
   $(public_api_optional_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
-  $(public_api_optional_src_dir)/transition-effects/cube-transition-fold-effect.cpp
-  
+  $(public_api_optional_src_dir)/transition-effects/cube-transition-fold-effect.cpp \
+  $(public_api_optional_src_dir)/dali-toolkit-version.cpp
+
 # Add public header files here
 
-public_api_optional_header_files =
+public_api_optional_header_files = \
+  $(public_api_optional_src_dir)/dali-toolkit-version.h
 
 public_api_optional_controls_header_files =
+
+public_api_optional_bubble_emitter_header_files = \
+  $(public_api_optional_src_dir)/controls/bubble-effect/bubble-emitter.h
 
 public_api_optional_bloom_view_header_files = \
   $(public_api_optional_src_dir)/controls/bloom-view/bloom-view.h
 
 public_api_optional_cluster_header_files = \
-  $(public_api_optional_src_dir)/controls/cluster/cluster.h
+  $(public_api_optional_src_dir)/controls/cluster/cluster.h \
+  $(public_api_optional_src_dir)/controls/cluster/cluster-style.h
 
 public_api_optional_effects_view_header_files = \
   $(public_api_optional_src_dir)/controls/effects-view/effects-view.h
@@ -73,7 +79,8 @@ public_api_optional_gaussian_blur_view_header_files = \
   $(public_api_optional_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.h
 
 public_api_optional_image_view_header_files = \
-  $(public_api_optional_src_dir)/controls/image-view/image-view.h
+  $(public_api_optional_src_dir)/controls/image-view/image-view.h \
+  $(public_api_optional_src_dir)/controls/image-view/masked-image-view.h
 
 public_api_optional_magnifier_header_files = \
   $(public_api_optional_src_dir)/controls/magnifier/magnifier.h
@@ -93,7 +100,8 @@ public_api_optional_selectors_header_files = \
 public_api_optional_shadow_view_header_files = \
   $(public_api_optional_src_dir)/controls/shadow-view/shadow-view.h
 
-public_api_optional_super_blur_view_header_files =
+public_api_optional_super_blur_view_header_files = \
+  $(public_api_optional_src_dir)/controls/super-blur-view/super-blur-view.h
 
 public_api_optional_tool_bar_header_files = \
   $(public_api_optional_src_dir)/controls/tool-bar/tool-bar.h
@@ -129,8 +137,6 @@ public_api_optional_shader_effects_header_files =               \
 public_api_optional_bubble_effect_header_files =  \
   $(public_api_optional_src_dir)/shader-effects/bubble-effect/bubble-effect.h \
   $(public_api_optional_src_dir)/shader-effects/bubble-effect/color-adjuster.h
-
-public_api_optional_bubble_emitter_header_files =
 
 public_api_optional_transition_effects_header_files = \
   $(public_api_optional_src_dir)/transition-effects/cube-transition-effect.h \

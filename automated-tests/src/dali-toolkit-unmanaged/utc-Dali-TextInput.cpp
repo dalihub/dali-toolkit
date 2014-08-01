@@ -182,7 +182,7 @@ int UtcDaliTextInputGetStyleAtCursor(void)
   TextStyle retreivedStyleAtCursor = textInput.GetStyleAtCursor();
 
   DALI_TEST_CHECK( style == retreivedStyleAtCursor );
-  DALI_TEST_CHECK( !retreivedStyleAtCursor.GetItalics() );
+  DALI_TEST_CHECK( !retreivedStyleAtCursor.IsItalicsEnabled() );
 
   tet_infoline("Set style before adding new character");
   style.SetItalics( true );
@@ -196,10 +196,10 @@ int UtcDaliTextInputGetStyleAtCursor(void)
   tet_infoline("Confirm style at cursor is correct style");
   retreivedStyleAtCursor = textInput.GetStyleAtCursor();
 
-  DALI_TEST_CHECK( retreivedStyleAtCursor.GetItalics() );
+  DALI_TEST_CHECK( retreivedStyleAtCursor.IsItalicsEnabled() );
 
   tet_infoline("Confirm style at cursor is not a style that was not set");
-  DALI_TEST_CHECK( !retreivedStyleAtCursor.GetUnderline() );
+  DALI_TEST_CHECK( !retreivedStyleAtCursor.IsUnderlineEnabled() );
 
   tet_infoline("Confirm markup text is correct");
   DALI_TEST_EQUALS( styledString, textInput.GetMarkupText(), TEST_LOCATION);

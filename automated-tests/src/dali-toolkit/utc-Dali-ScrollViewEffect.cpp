@@ -42,12 +42,6 @@ void utc_dali_toolkit_scroll_view_effect_cleanup(void)
 
 namespace
 {
-static bool gObjectCreatedCallBackCalled;
-
-static void TestCallback(BaseHandle handle)
-{
-  gObjectCreatedCallBackCalled = true;
-}
 
 const int MILLISECONDS_PER_SECOND = 1000;
 const int RENDER_FRAME_INTERVAL = 16;                           ///< Duration of each frame in ms. (at approx 60FPS)
@@ -100,10 +94,6 @@ RulerPtr CreateRuler(float gridSize = 0.0f)
 static bool gOnScrollStartCalled;                       ///< Whether the OnScrollStart signal was invoked.
 static bool gOnScrollUpdateCalled;                      ///< Whether the OnScrollUpdate signal was invoked.
 static bool gOnScrollCompleteCalled;                    ///< Whether the OnScrollComplete signal was invoked.
-static bool gOnScrollClampedCalled;                     ///< Whether the OnScrollClamped signal was invoked.
-static bool gOnSnapStartCalled;                         ///< Whether the OnSnapStart signal was invoked.
-static ClampState3 gLastClampPosition;                  ///< Clamping information from OnScrollClampedEvent.
-static SnapType gLastSnapType;                          ///< Snaping information from SnapEvent.
 static Vector3 gConstraintResult;                       ///< Result from constraint.
 
 static ActorContainer gPages;                                ///< Keeps track of all the pages for applying effects.
@@ -143,28 +133,6 @@ static void OnScrollUpdate( const Vector3& position )
 static void OnScrollComplete( const Vector3& position )
 {
   gOnScrollCompleteCalled = true;
-}
-
-/**
- * Invoked when scrolling clamped.
- *
- * @param[in] event The position/scale/rotation axes that were clamped.
- */
-static void OnScrollClamped( const ScrollView::ClampEvent& event )
-{
-  gOnScrollClampedCalled = true;
-  gLastClampPosition = event.position;
-}
-
-/**
- * Invoked when a snap or flick started.
- *
- * @param[in] event The type of snap and the target position/scale/rotation.
- */
-static void OnSnapStart( const ScrollView::SnapEvent& event )
-{
-  gOnSnapStartCalled = true;
-  gLastSnapType = event.type;
 }
 
 ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)

@@ -296,7 +296,7 @@ int UtcDaliKeyInputFocusManagerSignalUnhandledKeyEvent(void)
   DALI_TEST_CHECK(event.keyName == data.receivedKeyEvent.keyPressedName );
   DALI_TEST_CHECK(event.keyCode == data.receivedKeyEvent.keyCode);
   DALI_TEST_CHECK(event.keyString == data.receivedKeyEvent.keyPressed );
-  DALI_TEST_CHECK(event.state == data.receivedKeyEvent.state );
+  DALI_TEST_CHECK(static_cast<int>( event.state ) == static_cast<int>( data.receivedKeyEvent.state ) );
 
   data.Reset();
 
