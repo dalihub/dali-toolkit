@@ -1,7 +1,7 @@
 To build the documentation from a Desktop build environment
 
 On the desktop:
-- cd dali-toolkit/build/slp/docs
+- cd dali-toolkit/build/tizen/docs
 - doxygen dali.doxy
   or
   make
