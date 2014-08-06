@@ -134,7 +134,7 @@ protected:
    * @param[in] actor The actor which the shader effect would be applied onto
    * @param[in] shaderEffect The shader effect to be set to the actor
    */
-  void SetShaderEffect( Actor actor, ShaderEffect shaderEffect );
+  void SetShaderEffect( ImageActor actor, ShaderEffect shaderEffect );
 
 private:
 
@@ -253,7 +253,7 @@ private: // implemented differently by PageTurnLandscapeView and PageTurnPortrai
    * @param[in] actor The current page actor
    * @param[in] isLeftSide Which side the current page is located
    */
-  virtual void SetSpineEffect(Actor actor, bool isLeftSide) = 0;
+  virtual void SetSpineEffect(ImageActor actor, bool isLeftSide) = 0;
 
   /**
    * This method is called when pan finished to detect outwards flick
@@ -327,8 +327,8 @@ protected:
 
   std::vector<ImageActor>        mPageActors;              ///< The vector of pages on stage
   int                            mCurrentPageIndex;        ///< The index of the current page, between 0 ~ mTotalPageCount-1
-  std::map<Actor,bool>           mIsTurnBack;              ///< The map to keep track the page actor's turning direction
-  std::map<Animation, Actor>     mAnimationActorPair;      ///< The map to keep track which page actor is the animation act on
+  std::map<ImageActor,bool>      mIsTurnBack;              ///< The map to keep track the page actor's turning direction
+  std::map<Animation,ImageActor> mAnimationActorPair;      ///< The map to keep track which page actor is the animation act on
   std::map<Animation, int>       mAnimationIndexPair;      ///< The map to keep track which PageTurnEffect, PanDisplacementProperty, CurrentCenterProperty is used for the animation
   int                            mIndex;                   ///< The index to keep track which PageTurnEffect, PanDisplacementProperty, CurrentCenterProperty is used for the current panning page
   std::vector<bool>              mIsAnimating;             ///< The boolean vector to keep track which PageTurnEffect, PanDisplacementProperty, CurrentCenterProperty is available for using

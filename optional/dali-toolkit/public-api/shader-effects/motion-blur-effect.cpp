@@ -74,15 +74,15 @@ MotionBlurEffect::~MotionBlurEffect()
 {
 }
 
-MotionBlurEffect MotionBlurEffect::Apply( Actor handle )
+MotionBlurEffect MotionBlurEffect::Apply( RenderableActor renderable )
 {
   MotionBlurEffect newEffect = New( MOTION_BLUR_NUM_SAMPLES );
-  handle.SetShaderEffect( newEffect );
+  renderable.SetShaderEffect( newEffect );
 
   Property::Index uModelProperty = newEffect.GetPropertyIndex( MOTION_BLUR_MODEL_LASTFRAME );
 
   Constraint constraint = Constraint::New<Matrix>( uModelProperty,
-                                                   Source( handle, Actor::WORLD_MATRIX ),
+                                                   Source( renderable, Actor::WORLD_MATRIX ),
                                                    EqualToConstraint() );
 
   // and set up constraint.
@@ -95,7 +95,7 @@ MotionBlurEffect MotionBlurEffect::New()
   return New( MOTION_BLUR_NUM_SAMPLES );
 }
 
-MotionBlurEffect MotionBlurEffect::New( const unsigned int numBlurSamples )
+MotionBlurEffect MotionBlurEffect::New( unsigned int numBlurSamples )
 {
   // Dali vertexSource prefix for reference:
   // precision highp float;

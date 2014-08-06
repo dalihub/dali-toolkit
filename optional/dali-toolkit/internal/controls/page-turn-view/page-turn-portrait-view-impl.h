@@ -82,7 +82,7 @@ protected: // From PageTurnView
   /**
    * @copydoc PageTurnView::SetSpineEffect
    */
-  virtual void SetSpineEffect(Actor actor, bool isLeftSide);
+  virtual void SetSpineEffect(ImageActor actor, bool isLeftSide);
 
   /**
    * @copydoc PageTurnView::OnPossibleOutwardsFlick

@@ -70,9 +70,10 @@ public:
 
   /**
    * Create a  MotionStretchEffect and attach it to the specified actor
+   * @param renderable actor to apply the effect to
    * @return A handle to a newly allocated Dali resource.
    */
-  static MotionStretchEffect Apply( Actor handle );
+  static MotionStretchEffect Apply( RenderableActor renderable );
 
   /**
    * Set geometry stretch factor property. This scales the amount the geometry

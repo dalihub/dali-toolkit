@@ -123,7 +123,7 @@ void PageTurnLandscapeView::SetPanActor( const Vector2& panPosition )
   }
 }
 
-void PageTurnLandscapeView::SetSpineEffect(Actor actor, bool isLeftSide)
+void PageTurnLandscapeView::SetSpineEffect(ImageActor actor, bool isLeftSide)
 {
   if(isLeftSide)
   {

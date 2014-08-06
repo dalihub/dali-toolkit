@@ -176,7 +176,7 @@ void ImageView::SetImageDistanceField(const std::string& filename)
   mImageActor.SetImage( image );
 
   DistanceFieldEffect effect = DistanceFieldEffect::New();
-  Self().SetShaderEffect( effect );
+  mImageActor.SetShaderEffect( effect );
 }
 
 void ImageView::SetImage(Image image)
