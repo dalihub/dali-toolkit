@@ -19,12 +19,45 @@
  * Dali::ImageActor myImageActor = ImageActor::New(image);
  * @endcode
  *
+ * <h3 class="pg">Resizing at Load Time</h3>
+ * An application loading images from an external source will often want to
+ * display those images at a lower resolution than their native ones.
+ * To support this, %Dali can resize an image at load time so that its in-memory
+ * copy uses less space and its visual quality benefits from being prefiltered.
+ * There are four algorithms which can be used to fit an image to a desired
+ * rectangle, a desired width or a desired height
+ * (see Dali::ImageAttributes::ScalingMode).
+ *
+ * Here is an example doing rescaling:
+ *
+ * @code
+ * Dali::ImageAttributes attributes;
+ * attributes.SetSize( 256, 192 );
+ * attributes.SetScalingMode( Dali::ImageAttributes::ScaleToFill );
+ * Dali::Image image = Dali::Image::New( filename, attributes );
+ * @endcode
+ *
+ * This example sets the size and scaling mode appropriately for a large thumbnail
+ * on an Dali::ImageAttributes instance and passes that to Dali::Image construction.
+ * In general, to enable scaling on load, set-up a Dali::ImageAttributes object with
+ * a non-zero width or height and one of the four scaling modes, and pass it into a
+ * Dali::Image creator function as shown above.
+ *
+ * The scaling modes and a suggested use-case for each are as follows:
+ * <ol>
+ *   <li> Dali::ImageAttributes::ShrinkToFit Full-screen image display: Limit loaded image resolution to device resolution.
+ *   <li> Dali::ImageAttributes::ScaleToFill Thumbnail gallery grid: Limit loaded image resolution to screen tile.
+ *   <li> Dali::ImageAttributes::FitWidth Image columns: Limit loaded image resolution to column.
+ *   <li> Dali::ImageAttributes::FitHeight Image rows: Limit loaded image resolution to row height.
+ * </ol>
+ *
+ * The dali-demo project contains a full example under <code>examples/image</code>.
  *
  * <h2 class="pg">Style</h2>
  * The Actor can render an image in two different ways.<br>
- * -# STYLE_QUAD: A simple flat quad style for redering image.<br>
+ * -# STYLE_QUAD: A simple flat quad style for rendering images.<br>
  * -# STYLE_NINE_PATCH: This style gives the flexibility to stretch images by dividing it into 9 sections.
- * The four corners are unscaled; the four edges are scaled in one axis, and the middle is scaled in both axes.<br>
+ * The four corners are not scaled; the four edges are scaled in one axis, and the middle is scaled in both axes.<br>
  *
  * @code
  * // default : ImageActor::STYLE_QUAD
