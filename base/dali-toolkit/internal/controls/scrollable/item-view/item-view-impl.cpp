@@ -323,7 +323,6 @@ ItemView::ItemView(ItemFactory& factory)
 : Scrollable(),
   mItemFactory(factory),
   mActiveLayout(NULL),
-  mDefaultAlphaFunction(Dali::Constraint::DEFAULT_ALPHA_FUNCTION),
   mAnimatingOvershootOn(false),
   mAnimateOvershootOff(false),
   mAnchoringEnabled(true),
@@ -546,16 +545,6 @@ void ItemView::DeactivateCurrentLayout()
 
     mActiveLayout = NULL;
   }
-}
-
-void ItemView::SetDefaultAlphaFunction(AlphaFunction func)
-{
-  mDefaultAlphaFunction = func;
-}
-
-AlphaFunction ItemView::GetDefaultAlphaFunction() const
-{
-  return mDefaultAlphaFunction;
 }
 
 void ItemView::OnRefreshNotification(PropertyNotification& source)

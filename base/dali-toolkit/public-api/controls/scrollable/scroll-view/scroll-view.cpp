@@ -391,16 +391,6 @@ void ScrollView::SetRulerY(RulerPtr ruler)
   GetImpl(*this).SetRulerY(ruler);
 }
 
-void ScrollView::SetRulerScaleX(RulerPtr ruler)
-{
-  DALI_LOG_ERROR( "Deprecated" );
-}
-
-void ScrollView::SetRulerScaleY(RulerPtr ruler)
-{
-  DALI_LOG_ERROR( "Deprecated" );
-}
-
 void ScrollView::SetScrollSensitive(bool sensitive)
 {
   GetImpl(*this).SetScrollSensitive(sensitive);
@@ -434,16 +424,6 @@ void ScrollView::SetActorAutoSnap(bool enable)
 void ScrollView::SetWrapMode(bool enable)
 {
   GetImpl(*this).SetWrapMode(enable);
-}
-
-int ScrollView::GetRefreshInterval() const
-{
-  return GetImpl(*this).GetRefreshInterval();
-}
-
-void ScrollView::SetRefreshInterval(int milliseconds)
-{
-  GetImpl(*this).SetRefreshInterval(milliseconds);
 }
 
 int ScrollView::GetScrollUpdateDistance() const
@@ -546,29 +526,9 @@ void ScrollView::SetScrollPosition(const Vector3& position)
   GetImpl(*this).SetScrollPosition(position);
 }
 
-Vector3 ScrollView::GetCurrentScrollScale() const
-{
-  DALI_LOG_ERROR( "Deprecated" );
-  return Vector3::ONE;
-}
-
 unsigned int ScrollView::GetCurrentPage() const
 {
   return GetImpl(*this).GetCurrentPage();
-}
-
-void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, float rotation)
-{
-  DALI_LOG_ERROR( "Deprecated" );
-
-  GetImpl(*this).TransformTo(position);
-}
-
-void ScrollView::TransformTo(const Vector3& position, const Vector3& scale, float rotation, float duration)
-{
-  DALI_LOG_ERROR( "Deprecated" );
-
-  GetImpl(*this).TransformTo(position, duration);
 }
 
 void ScrollView::ScrollTo(const Vector3 &position)
@@ -615,16 +575,6 @@ void ScrollView::ScrollTo(Actor &actor, float duration)
 bool ScrollView::ScrollToSnapPoint()
 {
   return GetImpl(*this).ScrollToSnapPoint();
-}
-
-void ScrollView::ScaleTo(const Vector3 &scale)
-{
-  DALI_LOG_ERROR( "Deprecated" );
-}
-
-void ScrollView::ScaleTo(const Vector3 &scale, float duration)
-{
-  DALI_LOG_ERROR( "Deprecated" );
 }
 
 void ScrollView::ApplyConstraintToChildren(Constraint constraint)

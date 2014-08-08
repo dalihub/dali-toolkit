@@ -223,7 +223,6 @@ public:
   enum ExceedPolicy
   {
     Original,         ///< Will display the text in its original size. If a line, a word or a character is bigger than the TextView size it may exceed its boundary.
-    Truncate,         ///< @deprecated. Use Fade instead.
     Fade,             ///< Will display the text in its original size. It won't display the text which exceeds the TextView boundary. It fades the text out.
     Split,            ///< Will split the text in a new line.
     ShrinkToFit,      ///< Will shrink the text to fit the TextView boundary.

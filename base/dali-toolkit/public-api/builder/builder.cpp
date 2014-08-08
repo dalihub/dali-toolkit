@@ -94,16 +94,6 @@ Animation Builder::CreateAnimation( const std::string& animationName, const Prop
   return GetImpl(*this).CreateAnimation( animationName, map, sourceActor );
 }
 
-BaseHandle Builder::CreateFromStyle( const std::string& styleName )
-{
-  return BaseHandle();
-}
-
-BaseHandle Builder::CreateFromStyle( const std::string& styleName, const PropertyValueMap& map )
-{
-  return BaseHandle();
-}
-
 BaseHandle Builder::Create( const std::string& templateName )
 {
   return GetImpl(*this).Create( templateName );
@@ -129,31 +119,6 @@ void Builder::AddActors( const std::string &sectionName, Actor toActor )
   GetImpl(*this).AddActors( sectionName, toActor );
 }
 
-Font Builder::GetFont( const std::string &name ) const
-{
-  return GetImpl(*this).GetFont( name );
-}
-
-TextStyle Builder::GetTextStyle( const std::string &name ) const
-{
-  return GetImpl(*this).GetTextStyle( name );
-}
-
-Image Builder::GetImage( const std::string &name ) const
-{
-  return GetImpl(*this).GetImage( name );
-}
-
-Actor Builder::GetActor( const std::string &name ) const
-{
-  return GetImpl(*this).GetActor( name );
-}
-
-Animation Builder::GetAnimation( const std::string &name ) const
-{
-  return GetImpl(*this).GetAnimation( name );
-}
-
 void Builder::CreateRenderTask( const std::string &name )
 {
   GetImpl(*this).CreateRenderTask( name );
@@ -167,11 +132,6 @@ ShaderEffect Builder::GetShaderEffect( const std::string &name )
 FrameBufferImage Builder::GetFrameBufferImage( const std::string &name )
 {
   return GetImpl(*this).GetFrameBufferImage( name );
-}
-
-ActorContainer Builder::GetTopLevelActors( void ) const
-{
-  return GetImpl(*this).GetTopLevelActors();
 }
 
 } // namespace Toolkit

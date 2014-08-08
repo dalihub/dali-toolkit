@@ -348,8 +348,6 @@ struct NavigationLayout::Impl
   ItemLayout::QuaternionFunction mRotationConstraint[4];
 
   ItemLayout::Vector4Function mColorConstraint;
-
-  NavigationLayout::NavigationSignalV2 mSignalPanV2;/*the signal to notify the application the selected item*/
 };
 
 NavigationLayoutPtr NavigationLayout::New()
@@ -468,7 +466,6 @@ ItemRange NavigationLayout::GetItemsWithinArea(float firstItemPosition, Vector3 
   int firstItemIndex = std::max(0.0f, -firstItemPosition -1.0f  );
   int lastItemIndex = std::max(0.0f, -(firstItemPosition) + itemsPerPage );
 
-  mImpl->mSignalPanV2.Emit(lastItemIndex - mImpl->mNumberOfColumns);
   return ItemRange(firstItemIndex , lastItemIndex );
 }
 
@@ -540,11 +537,6 @@ bool NavigationLayout::GetVisibilityConstraint(unsigned int itemId, ItemLayout::
   unsigned int columnIndex = itemId % mImpl->mNumberOfColumns;
   constraint = NavigationVisibilityConstraint(columnIndex, mImpl->mNumberOfColumns, mImpl->mColumnSpacing);
   return true;
-}
-
-NavigationLayout::NavigationSignalV2& NavigationLayout::PanSignal()
-{
-  return mImpl->mSignalPanV2;
 }
 
 Degree NavigationLayout::GetScrollDirection() const

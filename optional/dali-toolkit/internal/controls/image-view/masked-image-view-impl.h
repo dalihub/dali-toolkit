@@ -131,14 +131,6 @@ public:
   ImageRotation GetSourceRotation() const;
 
   /**
-   * @copydoc Dali::Toolkit::MaskedImageView::RenderFinishedSignal
-   */
-  Dali::RenderTask::RenderTaskSignalV2& RenderFinishedSignal()
-  {
-    return mRenderTask.FinishedSignal();
-  }
-
-  /**
    * @copydoc Dali::Toolkit::MaskedImageView::MaskFinishedSignal
    */
   Dali::Toolkit::MaskedImageView::MaskedImageViewSignal& MaskFinishedSignal();

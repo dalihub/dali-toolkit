@@ -604,7 +604,7 @@ void Control::Initialize()
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
 
     // Register for style changes
-    styleManager.StyleChangeSignal().Connect( this, &ControlImpl::DoStyleChange );
+    styleManager.StyleChangeSignal().Connect( this, &Control::DoStyleChange );
 
     // SetTheme
     GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
@@ -953,9 +953,6 @@ void Control::DoStyleChange( Toolkit::StyleManager styleManager, StyleChange cha
   }
   else if( change.defaultFontChange || change.defaultFontSizeChange )
   {
-    // This OnStyleChange(StyleChange change ) is deprecated, use OnFontChange instead
-    OnStyleChange( change );
-
     OnFontChange( change.defaultFontChange, change.defaultFontSizeChange );
   }
 }
@@ -1286,12 +1283,6 @@ void Control::SignalDisconnected( SlotObserver* slotObserver, CallbackBase* call
 std::size_t Control::GetConnectionCount() const
 {
   return mImpl->GetConnectionCount();
-}
-
-Control::Control( bool requiresTouchEvents )
-: CustomActorImpl( requiresTouchEvents ),
-  mImpl(new Impl(*this))
-{
 }
 
 Control::Control( ControlBehaviour behaviourFlags )

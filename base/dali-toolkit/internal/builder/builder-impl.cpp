@@ -537,19 +537,6 @@ BaseHandle Builder::DoCreate( const TreeNode& root, const TreeNode& node,
   return baseHandle;
 }
 
-
-ActorContainer Builder::GetTopLevelActors() const
-{
-  // deprecated function.
-  return ActorContainer();
-}
-
-Animation Builder::GetAnimation( const std::string &name ) const
-{
-  // deprecated
-  return Animation();
-}
-
 void Builder::SetupTask( RenderTask& task, const TreeNode& node, const Replacement& constant )
 {
   const Stage& stage = Stage::GetCurrent();
@@ -733,31 +720,6 @@ FrameBufferImage Builder::GetFrameBufferImage( const std::string &name, const Re
   }
 
   return ret;
-}
-
-Font Builder::GetFont( const std::string& name ) const
-{
-  // deprecated function.
-  Font font;
-  return font;
-}
-
-TextStyle Builder::GetTextStyle( const std::string& name ) const
-{
-  // deprecated
-  return TextStyle();
-}
-
-Image Builder::GetImage( const std::string& name) const
-{
-  // deprecated function.
-  return Image();
-}
-
-Actor Builder::GetActor( const std::string &name ) const
-{
-  // deprecated function.
-  return Actor();
 }
 
 void Builder::AddActors( Actor toActor )

@@ -250,18 +250,6 @@ public:
   void SetWrapMode(bool enable);
 
   /**
-   * @deprecated
-   * @copydoc Toolkit::ScrollView::GetRefreshInterval
-   */
-  int GetRefreshInterval() const;
-
-  /**
-   * @deprecated
-   * @copydoc Toolkit::ScrollView::SetRefreshInterval
-   */
-  void SetRefreshInterval(int milliseconds);
-
-  /**
    * @copydoc Toolkit::ScrollView::GetScrollupdateDistance
    */
   int GetScrollUpdateDistance() const;

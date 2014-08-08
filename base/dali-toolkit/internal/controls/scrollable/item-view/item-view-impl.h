@@ -99,16 +99,6 @@ public:
   void ActivateLayout(unsigned int layoutIndex, const Vector3& targetSize, float durationSeconds);
 
   /**
-   * @copydoc Toolkit::ItemView::SetDefaultAlphaFunction
-   */
-  void SetDefaultAlphaFunction(AlphaFunction func);
-
-  /**
-   * @copydoc Toolkit::ItemView::GetDefaultAlphaFunction
-   */
-  AlphaFunction GetDefaultAlphaFunction() const;
-
-  /**
    * @copydoc Toolkit::ItemView::DeactivateCurrentLayout
    */
   void DeactivateCurrentLayout();
@@ -557,8 +547,6 @@ private:
   ItemLayoutContainer mLayouts;
   ItemLayout* mActiveLayout;
   Vector3 mActiveLayoutTargetSize;
-
-  AlphaFunction mDefaultAlphaFunction;
 
   Animation mResizeAnimation;
   Animation mScrollAnimation;
