@@ -68,7 +68,7 @@ Actor CreateGrabArea( const std::string& name, const Vector3& relativeScale )
   return handleGrabArea;
 }
 
-Actor CreateHandle( const Vector3& anchorPoint, const Image& handleImage, const std::string& name )
+ImageActor CreateHandle( const Vector3& anchorPoint, const Image& handleImage, const std::string& name )
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextInputHandles: CreateSelectionHandle\n" );
 
