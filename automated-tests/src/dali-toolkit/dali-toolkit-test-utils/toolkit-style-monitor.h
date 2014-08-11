@@ -51,7 +51,6 @@ public: // Creation & Destruction
   static StyleMonitor Get();
   ~StyleMonitor();
   static StyleMonitor DownCast( BaseHandle handle );
-  using BaseHandle::operator=;
 
 public: // Style Information
   std::string GetDefaultFontFamily() const;
