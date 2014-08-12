@@ -216,27 +216,33 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
       DALI_ASSERT_ALWAYS( actorName && "Animation must specify actor name" );
       DALI_ASSERT_ALWAYS( property  && "Animation must specify a property name" );
 
-      Actor targetActor = searchActor.FindChildByName( *actorName );
-      DALI_ASSERT_ALWAYS( targetActor && "Actor must exist for property" );
+      Handle targetHandle = searchActor.FindChildByName( *actorName );
+      DALI_ASSERT_ALWAYS( targetHandle && "Actor must exist for property" );
 
-      Property::Index idx( targetActor.GetPropertyIndex( *property ) );
+      Property::Index idx( targetHandle.GetPropertyIndex( *property ) );
 
-      // A limitation here is that its possible that between binding to the signal and
-      // the signal call that the ShaderEffect of the targetActor has been changed.
-      // However this is a unlikely use case especially when using scripts.
+      // if the property is not found from the (actor) handle, try to downcast it to renderable actor
+      // to allow animating shader uniforms
       if( idx == Property::INVALID_INDEX )
       {
-        if( ShaderEffect effect = targetActor.GetShaderEffect() )
+        RenderableActor renderable = RenderableActor::DownCast( targetHandle );
+        if( renderable )
         {
-          idx = effect.GetPropertyIndex( *property );
-          if(idx != Property::INVALID_INDEX)
+          // A limitation here is that its possible that between creation of animation
+          // and running it the ShaderEffect of the actor has been changed.
+          // However this is a unlikely use case especially when using scripts.
+          if( ShaderEffect effect = renderable.GetShaderEffect() )
           {
-            targetActor = effect;
-          }
-          else
-          {
-            DALI_SCRIPT_WARNING( "Cannot find property on object or ShaderEffect\n" );
-            continue;
+            idx = effect.GetPropertyIndex( *property );
+            if(idx != Property::INVALID_INDEX)
+            {
+              targetHandle = effect;
+            }
+            else
+            {
+              DALI_SCRIPT_WARNING( "Cannot find property on object or ShaderEffect\n" );
+              continue;
+            }
           }
         }
         else
@@ -252,7 +258,7 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
         continue;
       }
 
-      Property prop( Property( targetActor, idx ) );
+      Property prop( Property( targetHandle, idx ) );
       Property::Value propValue;
 
       // these are the defaults

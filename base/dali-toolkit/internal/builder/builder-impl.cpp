@@ -712,7 +712,7 @@ FrameBufferImage Builder::GetFrameBufferImage( const std::string &name, const Re
         if( SetPropertyFromNode( *image, Property::MAP, propertyMap, constant ) )
         {
           propertyMap.SetValue(KEYNAME_TYPE, Property::Value(std::string("FrameBufferImage")));
-          ret = Dali::Scripting::NewImage( propertyMap );
+          ret = FrameBufferImage::DownCast( Dali::Scripting::NewImage( propertyMap ) );
           mFrameBufferImageLut[ name ] = ret;
         }
       }
