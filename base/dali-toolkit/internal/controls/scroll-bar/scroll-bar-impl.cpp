@@ -186,33 +186,9 @@ void ScrollBar::OnScrollConnectorSet( Toolkit::ScrollConnector oldConnector )
   }
 }
 
-void ScrollBar::SetBackgroundImage( Image image, const Vector4& border )
-{
-  if (!mBackground )
-  {
-    mBackground = ImageActor::New( image );
-    mBackground.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    mBackground.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-    Self().Add(mBackground);
-  }
-  else
-  {
-    mBackground.SetImage(image);
-  }
-  mBackground.SetNinePatchBorder( border );
-  mBackground.SetStyle( ImageActor::STYLE_NINE_PATCH );
-}
-
 void ScrollBar::SetIndicatorImage( Image image )
 {
   mIndicator.SetImage(image);
-}
-
-void ScrollBar::SetIndicatorImage( Image image, const Vector4& border )
-{
-  mIndicator.SetImage(image);
-  mIndicator.SetNinePatchBorder( border );
-  mIndicator.SetStyle( ImageActor::STYLE_NINE_PATCH );
 }
 
 Actor ScrollBar::GetScrollIndicator()

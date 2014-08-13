@@ -128,32 +128,10 @@ public:
    */
   BaseHandle Create( const std::string& templateName, const PropertyValueMap& map );
 
- /**
-   * @copydoc Toolkit::Builder::GetFont
-   */
-  Font GetFont(const std::string &name) const;
-
-  /**
-   * @copydoc Toolkit::Builder::GetTextStyle
-   */
-  TextStyle GetTextStyle(const std::string &name) const;
-
-  /**
-   * @copydoc Toolkit::Builder::GetImage
-   */
-  Image GetImage(const std::string &name) const;
-
-  /**
-   * @copydoc Toolkit::Builder::GetActor
-   */
-  Actor GetActor( const std::string &name ) const;
-
   /**
    * @copydoc Toolkit::Builder::ApplyStyle
    */
   bool ApplyStyle( const std::string& styleName, Handle& handle );
-
-  void AnimateTo( const std::string& styleName, Handle& handle );
 
   /**
    * @copydoc Toolkit::Builder::AddActors
@@ -164,11 +142,6 @@ public:
    * @copydoc Toolkit::Builder::AddActors
    */
   void AddActors( const std::string &sectionName, Actor toActor );
-
-  /**
-   * @copydoc Toolkit::Builder::GetAnimation
-   */
-  Animation GetAnimation( const std::string &name ) const;
 
   /**
    * @copydoc Toolkit::Builder::CreateRenderTask
@@ -194,11 +167,6 @@ public:
    * @copydoc Toolkit::Builder::GetFrameBufferImage
    */
   FrameBufferImage GetFrameBufferImage( const std::string &name, const Replacement& constant );
-
-  /**
-   * @copydoc Toolkit::Builder::GetTopLevelActors
-   */
-  ActorContainer GetTopLevelActors( void ) const;
 
 protected:
 

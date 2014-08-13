@@ -30,8 +30,8 @@ A type can be registered using Dali::TypeRegistration. This is normally done in 
 within the source file of the deriving control as shown in the code below.
 
 <b>Please note:</b> This snippet assumes knowledge of the \link Dali::Toolkit::Control Control
-\endlink / \link Dali::Toolkit::ControlImpl ControlImpl \endlink creation process where
-<i><b>MyControl</b></i> derives from a Control and <i><b>MyControlImpl</b></i> derives from ControlImpl.
+\endlink / \link Dali::Toolkit::Internal::Control Internal::Control \endlink creation process where
+<i><b>MyControl</b></i> derives from a Control and <i><b>MyControlImpl</b></i> derives from Internal::Control.
 
 @code
 namespace
@@ -193,10 +193,10 @@ Dali::PROPERTY_REGISTRATION_MAX_INDEX.
 
 Furthermore, if deriving from \link Dali::Toolkit::Control Control\endlink, the control writer
 needs to be aware of their parent class's property range. Control reserves a property range between
-\link Dali::Toolkit::ControlImpl::CONTROL_PROPERTY_START_INDEX ControlImpl::CONTROL_PROPERTY_START_INDEX\endlink
-and \link Dali::Toolkit::ControlImpl::CONTROL_PROPERTY_END_INDEX ControlImpl::CONTROL_PROPERTY_END_INDEX\endlink.
+\link Dali::Toolkit::Internal::Control::CONTROL_PROPERTY_START_INDEX ControlImpl::CONTROL_PROPERTY_START_INDEX\endlink
+and \link Dali::Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX Internal::Control::CONTROL_PROPERTY_END_INDEX\endlink.
 Any deriving control should start their property indices from
-\link Dali::Toolkit::ControlImpl::CONTROL_PROPERTY_END_INDEX ControlImpl::CONTROL_PROPERTY_END_INDEX\endlink + 1.
+\link Dali::Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX Internal::Control::CONTROL_PROPERTY_END_INDEX\endlink + 1.
 
 Please have a look at \ref property-indices for more information.
 
@@ -204,9 +204,9 @@ The following code shows how a property can be added to a type.
 
 @code
 // Define the indices we will use for the properties
-static const int PROPERTY_ONE( Dali::Toolkit::ControlImpl::CONTROL_PROPERTY_END_INDEX + 1 );
-static const int PROPERTY_TWO( Dali::Toolkit::ControlImpl::CONTROL_PROPERTY_END_INDEX + 2 );
-static const int PROPERTY_THREE( Dali::Toolkit::ControlImpl::CONTROL_PROPERTY_END_INDEX + 3 );
+static const int PROPERTY_ONE( Dali::Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX + 1 );
+static const int PROPERTY_TWO( Dali::Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX + 2 );
+static const int PROPERTY_THREE( Dali::Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX + 3 );
 
 Dali::PropertyRegistration property1(
     type,                    // Reference to type registration object (see above)

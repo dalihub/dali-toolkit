@@ -104,21 +104,6 @@ public:
   static ScrollBar DownCast( BaseHandle handle );
 
   /**
-   * @brief Sets the image for the background of scroll indicator.
-   *
-   * @pre The scroll bar actor has been initialised.
-   *
-   * The background image is resized (stretched according to scale settings),
-   * to the size of the ScrollBar.
-   *
-   * @param[in] image The image to cover background
-   * @param[in] border The nine patch border for the image.
-   *
-   * @deprecated Use Control::SetBackground()
-   */
-  void SetBackgroundImage( Image image, const Vector4& border );
-
-  /**
    * @brief Sets the image for the indicator of scroll bar.
    *
    * @pre The scroll bar actor has been initialised.
@@ -130,22 +115,6 @@ public:
    * @param[in] image The image of indicator that moves to indicate the current scroll position.
    */
   void SetIndicatorImage( Image image );
-
-  /**
-   * @brief Sets the image for the indicator of scroll bar.
-   *
-   * @pre The scroll bar actor has been initialised.
-   *
-   * The indicator image is resized (stretched according to scale settings),
-   * to reflect the size of the scroll indicator and minimum/maximum limits
-   * of the scroll position.
-   *
-   * @param[in] image The image of indicator that moves to indicate the current scroll position.
-   * @param[in] border The nine patch border for the image.
-   *
-   * @deprecated Use the new 9-patch API
-   */
-  void SetIndicatorImage( Image image, const Vector4& border );
 
   /**
    * @brief Gets the indicator of scroll bar.

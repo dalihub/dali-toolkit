@@ -253,16 +253,6 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
   Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor sourceActor );
 
   /**
-   * @deprecated Use Create()
-   */
-  BaseHandle CreateFromStyle( const std::string& styleName );
-
-  /**
-   * @deprecated Use Create()
-   */
-  BaseHandle CreateFromStyle( const std::string& styleName, const PropertyValueMap& map );
-
-  /**
    * @brief Creates an object (e.g. an actor) from the set of known style templates
    *
    * e.g.
@@ -328,54 +318,6 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
   void AddActors( const std::string &sectionName, Actor toActor );
 
   /**
-   * @deprecated Font as a separate asset is no longer supported
-   * Get's a Font asset previously created at load time
-   * An empty handle is returned otherwise.
-   * @pre The Builder has been initialized.
-   * @param name The name given to a Font in the loaded representation
-   * @return A handle to a Font if found, otherwise empty.
-   */
-  Font GetFont( const std::string &name ) const;
-
-  /**
-   * Get's a TextStyle asset previously created at load time
-   * @pre The Builder has been initialized.
-   * @param name The name given to a TextStyle in the loaded representation
-   * @return a Created TextStyle if found, otherwise return a TextStyle created by Default constructor
-   */
-  TextStyle GetTextStyle( const std::string &name ) const;
-
-  /**
-   * @deprecated Images as a separate asset is no longer supported
-   * Get's an Image asset previously created at load time
-   * An empty handle is returned otherwise.
-   * @pre The Builder has been initialized.
-   * @param name The name given to an Image in the loaded representation
-   * @return A handle to an Image if found, otherwise empty
-   */
-  Image GetImage( const std::string &name ) const;
-
-  /**
-   * @deprecated Actors no longer held by builder
-   * Get's an Actor previously created at load time
-   * An empty handle is returned otherwise.
-   * @pre The Builder has been initialized.
-   * @param name The name given to an Actor in the loaded representation
-   * @return A handle to an Actor if found, otherwise empty
-   */
-  Actor GetActor( const std::string &name ) const;
-
-  /**
-   * @deprecated Animations no longer held by builder
-   * Get's an Animation previously created at load time
-   * An empty handle is returned otherwise.
-   * @pre The Builder has been initialized.
-   * @param name The name given to an Animation in the loaded representation
-   * @return A handle to an Animation if found, otherwise empty
-   */
-  Animation GetAnimation( const std::string &name ) const;
-
-  /**
    * Create a render task set.
    * @pre The Builder has been initialized.
    * @param name The library name of the render task set.
@@ -399,13 +341,6 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
    * @return A handle to a FrameBufferImage if found, otherwise empty
    */
   FrameBufferImage GetFrameBufferImage( const std::string &name );
-
-  /**
-   * @deprecated. Builder no longer holds actor handles/references
-   * Provides a list of the top level actors previously created at load time
-   * @return A container of Actors found at the top level of the loaded representation
-   */
-  ActorContainer GetTopLevelActors( void ) const;
 
 private:
   Builder(Internal::Builder *impl);

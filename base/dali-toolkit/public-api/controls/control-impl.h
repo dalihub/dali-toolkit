@@ -315,17 +315,6 @@ private: // For derived classes to override
   virtual void OnFontChange( bool defaultFontChange, bool defaultFontSizeChange ){ }
 
   /**
-   * @deprecated Use OnFontChange() instead.
-   * Before the using of StyleManager, the StyleChange only deals with font change.
-   *
-   * @brief This method should be overridden by deriving classes when
-   * they wish to be notified when the style changes.
-   *
-   * @param[in] change  Information denoting what has changed.
-   */
-  virtual void OnStyleChange( StyleChange change ) { }
-
-  /**
    * @brief Called whenever a pinch gesture is detected on this control.
    *
    * This can be overridden by deriving classes when pinch detection
@@ -553,14 +542,6 @@ protected: // Construction
   };
 
   /**
-   * @deprecated Use the constructor taking flags instead
-   * @brief Create a Control.
-   *
-   * @param[in] requiresTouchEvents True if the OnTouchEvent() callback is required.
-   */
-  Control(bool requiresTouchEvents);
-
-  /**
    * @brief Create a Control.
    *
    * @param[in] behaviourFlags Behavioural flags from ControlBehaviour enum
@@ -745,8 +726,6 @@ private:
 };
 
 } // namespace Internal
-
-typedef Internal::Control ControlImpl; ///< @deprecated, Use Internal::Control
 
 } // namespace Toolkit
 

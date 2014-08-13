@@ -1093,16 +1093,6 @@ void ScrollView::SetWrapMode(bool enable)
   Self().SetProperty(mPropertyWrap, enable);
 }
 
-int ScrollView::GetRefreshInterval() const
-{
-  return mScrollUpdateDistance;
-}
-
-void ScrollView::SetRefreshInterval(int milliseconds)
-{
-  mScrollUpdateDistance = milliseconds;
-}
-
 int ScrollView::GetScrollUpdateDistance() const
 {
   return mScrollUpdateDistance;

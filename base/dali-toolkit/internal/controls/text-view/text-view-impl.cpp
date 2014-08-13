@@ -1932,10 +1932,6 @@ void TextView::OnWidthExceedPolicyPropertySet( Property::Value propertyValue )
   {
     SetWidthExceedPolicy(Toolkit::TextView::Original);
   }
-  else if(policyName == "Truncate")
-  {
-    SetWidthExceedPolicy(Toolkit::TextView::Truncate);
-  }
   else if(policyName == "Fade")
   {
     SetWidthExceedPolicy(Toolkit::TextView::Fade);
@@ -1964,10 +1960,6 @@ void TextView::OnHeightExceedPolicyPropertySet( Property::Value propertyValue )
   if(policyName == "Original")
   {
     SetHeightExceedPolicy(Toolkit::TextView::Original);
-  }
-  else if(policyName == "Truncate")
-  {
-    SetHeightExceedPolicy(Toolkit::TextView::Truncate);
   }
   else if(policyName == "Fade")
   {

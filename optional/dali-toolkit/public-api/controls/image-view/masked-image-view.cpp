@@ -142,11 +142,6 @@ MaskedImageView::ImageRotation MaskedImageView::GetSourceRotation() const
   return GetImpl(*this).GetSourceRotation();
 }
 
-Dali::RenderTask::RenderTaskSignalV2& MaskedImageView::RenderFinishedSignal()
-{
-  return GetImpl(*this).RenderFinishedSignal();
-}
-
 MaskedImageView::MaskedImageViewSignal& MaskedImageView::MaskFinishedSignal()
 {
   return GetImpl(*this).MaskFinishedSignal();

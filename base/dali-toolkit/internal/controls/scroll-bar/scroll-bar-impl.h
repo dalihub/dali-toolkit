@@ -48,7 +48,7 @@ public:
   // Properties
   enum
   {
-    SCROLLBAR_PROPERTY_START_INDEX = ControlImpl::CONTROL_PROPERTY_END_INDEX + 1,
+    SCROLLBAR_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
     SCROLLBAR_PROPERTY_END_INDEX = SCROLLBAR_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
   };
 
@@ -78,19 +78,9 @@ public:
   void OnScrollConnectorSet( Toolkit::ScrollConnector connector );
 
   /**
-   * @copydoc Toolkit::ScrollBar::SetBackgroundImage()
-   */
-  void SetBackgroundImage( Image image, const Vector4& border );
-
-  /**
    * @copydoc Toolkit::ScrollBar::SetIndicatorImage()
    */
   void SetIndicatorImage( Image image );
-
-  /**
-   * @copydoc Toolkit::ScrollBar::SetIndicatorImage()
-   */
-  void SetIndicatorImage( Image image, const Vector4& border );
 
   /**
    * @copydoc Toolkit::ScrollBar::GetScrollIndicator()

@@ -277,13 +277,6 @@ public: /* Signals */
    */
   MaskedImageViewSignal& MaskFinishedSignal();
 
-  /**
-   * @deprecated Use MaskFinishedSignal() instead.
-   * Signal emitted when the render task which targets the frame buffer of the masked image has finished.
-   * @return the signal.
-   */
-  Dali::RenderTask::RenderTaskSignalV2& RenderFinishedSignal();
-
 public: // Not intended for application developers
 
   /**

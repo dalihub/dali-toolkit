@@ -594,30 +594,6 @@ public:
   void SetRulerY(RulerPtr ruler);
 
   /**
-   * @brief Set Scale-X axis ruler.
-   *
-   * Defines how scaling horizontally is snapped, and the extent
-   * (domain) to which scaling can be performed e.g. 10% to 200%
-   *
-   * @param[in] ruler The ruler to be used for the Scale-X axis
-   *
-   * @deprecated Scaling not supported
-   */
-  void SetRulerScaleX(RulerPtr ruler);
-
-  /**
-   * @brief Set Scale-Y axis ruler.
-   *
-   * Defines how scaling vertically is snapped, and the extent
-   * (domain) to which scaling can be performed e.g. 10% to 200%
-   *
-   * @param[in] ruler The ruler to be used for the Scale-Y axis
-   *
-   * @deprecated Scaling not supported
-   */
-  void SetRulerScaleY(RulerPtr ruler);
-
-  /**
    * @brief Set Scroll's touch sensitivity.
    *
    * @note Unlike SetSensitive(), this determines whether this ScrollView
@@ -696,28 +672,6 @@ public:
    * @param[in] enable Enables (true), or disables (false) Wrap Mode.
    */
   void SetWrapMode(bool enable);
-
-  /**
-   * @deprecated
-   * @brief Gets the current refresh interval in milliseconds.
-   *
-   * @return Current refresh interval in milliseconds
-   */
-  int GetRefreshInterval() const;
-
-  /**
-   * @deprecated
-   * @brief Sets the refresh interval in milliseconds.
-   *
-   * The refresh interval is a notification signal
-   * (SignalScrollUpdate), that is periodically fired when scrolling
-   * animation is occuring.
-   *
-   * When set to 0. No update signals are sent.
-   *
-   * @param[in] milliseconds The frequency of the event in milliseconds
-   */
-  void SetRefreshInterval(int milliseconds);
 
   /**
    * @brief Gets the current distance needed to scroll for ScrollUpdatedSignal to be emitted
@@ -913,15 +867,6 @@ public:
   void SetScrollPosition(const Vector3& position);
 
   /**
-   * @brief Retrieves current scroll scale.
-   *
-   * @returns The current scroll scale.
-   *
-   * @deprecated Scaling not supported
-   */
-  Vector3 GetCurrentScrollScale() const;
-
-  /**
    * @brief Retrieves current scroll page based on ScrollView
    * dimensions being the size of one page, and all pages laid out in
    * a grid fashion, increasing from left to right until the end of
@@ -932,29 +877,6 @@ public:
    * @returns The Current page.
    */
   unsigned int GetCurrentPage() const;
-
-  /**
-   * @brief Transforms View to position, scale and rotation specified.
-   *
-   * @param[in] position The position to transform to.
-   * @param[in] scale The scale to transform to.
-   * @param[in] rotation The rotation to transform to.
-   *
-   * @deprecated Scaling or rotation not supported, use ScrollTo(const Vector3&)
-   */
-  void TransformTo(const Vector3& position, const Vector3& scale, float rotation);
-
-  /**
-   * @brief Transforms View to position, scale and rotation specified in the duration specified.
-   *
-   * @param[in] position The position to transform to.
-   * @param[in] scale The scale to transform to.
-   * @param[in] rotation The rotation to transform to.
-   * @param[in] duration The duration for this animation in seconds.
-   *
-   * @deprecated Scaling or rotation not supported, use ScrollTo(const Vector3&, float)
-   */
-  void TransformTo(const Vector3& position, const Vector3& scale, float rotation, float duration);
 
   /**
    * @brief Scrolls View to position specified (contents will scroll to this position).
@@ -1072,25 +994,6 @@ public:
    * @return True if Snapping necessary.
    */
   bool ScrollToSnapPoint();
-
-  /**
-   * @brief Scales View to (scale).
-   *
-   * @param[in] scale The scale factor the animate to.
-   *
-   * @deprecated Scaling not supported
-   */
-  void ScaleTo(const Vector3& scale);
-
-  /**
-   * @brief Scales View to (scale).
-   *
-   * @param[in] scale The scale factor the animate to.
-   * @param[in] duration The duration of the animation in seconds.
-   *
-   * @deprecated Scaling not supported
-   */
-  void ScaleTo(const Vector3& scale, float duration);
 
   /**
    * @brief Applies a constraint that will affect the children of ScrollView.

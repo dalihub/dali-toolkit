@@ -27,6 +27,7 @@
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/gl-abstraction.h>
+#include <dali/integration-api/gl-defines.h>
 #include "test-trace-call-stack.h"
 
 namespace Dali
@@ -132,6 +133,10 @@ public:
         mActiveTextures[ mActiveTextureUnit ].mBoundTextures.push_back( texture );
       }
     }
+
+    std::stringstream out;
+    out << target << ", " << texture;
+    mTextureTrace.PushCall("BindTexture", out.str());
   }
 
   inline void BlendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
@@ -474,6 +479,17 @@ public:
         *(textures+i) = ++mLastAutoTextureIdUsed;
       }
     }
+
+    std::stringstream out;
+    for(int i=0; i<n; i++)
+    {
+      out << textures[i];
+      if(i<n-1)
+      {
+        out << ", ";
+      }
+    }
+    mTextureTrace.PushCall("GenTexture", out.str());
   }
 
   inline void GetActiveAttrib(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name)
@@ -746,6 +762,11 @@ public:
     }
   }
 
+  inline std::string GetShaderSource(GLuint shader)
+  {
+    return mShaderSources[shader];
+  }
+
   inline void StencilFunc(GLenum func, GLint ref, GLuint mask)
   {
   }
@@ -779,18 +800,30 @@ public:
 
   inline void TexParameterf(GLenum target, GLenum pname, GLfloat param)
   {
+    std::stringstream out;
+    out << target << ", " << pname << ", " << param;
+    mTexParamaterTrace.PushCall("TexParameterf", out.str());
   }
 
   inline void TexParameterfv(GLenum target, GLenum pname, const GLfloat* params)
   {
+    std::stringstream out;
+    out << target << ", " << pname << ", " << params[0];
+    mTexParamaterTrace.PushCall("TexParameterfv", out.str());
   }
 
   inline void TexParameteri(GLenum target, GLenum pname, GLint param)
   {
+    std::stringstream out;
+    out << target << ", " << pname << ", " << param;
+    mTexParamaterTrace.PushCall("TexParameteri", out.str());
   }
 
   inline void TexParameteriv(GLenum target, GLenum pname, const GLint* params)
   {
+    std::stringstream out;
+    out << target << ", " << pname << ", " << params[0];
+    mTexParamaterTrace.PushCall("TexParameteriv", out.str());
   }
 
   inline void TexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels)
@@ -1498,6 +1531,11 @@ public: // TEST FUNCTIONS
   inline void ResetTextureCallStack() { mTextureTrace.Reset(); }
   inline TraceCallStack& GetTextureTrace() { return mTextureTrace; }
 
+  //Methods for Texture verification
+  inline void EnableTexParameterCallTrace(bool enable) { mTexParamaterTrace.Enable(enable); }
+  inline void ResetTexParameterCallStack() { mTexParamaterTrace.Reset(); }
+  inline TraceCallStack& GetTexParameterTrace() { return mTexParamaterTrace; }
+
   //Methods for Draw verification
   inline void EnableDrawCallTrace(bool enable) { mDrawTrace.Enable(enable); }
   inline void ResetDrawCallStack() { mDrawTrace.Reset(); }
@@ -1655,6 +1693,7 @@ private:
   TraceCallStack mCullFaceTrace;
   TraceCallStack mShaderTrace;
   TraceCallStack mTextureTrace;
+  TraceCallStack mTexParamaterTrace;
   TraceCallStack mDrawTrace;
 
   // Shaders & Uniforms

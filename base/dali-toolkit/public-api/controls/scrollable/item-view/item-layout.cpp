@@ -330,12 +330,6 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
   Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast( itemViewActor );
   if(itemView && scrollPositionObject)
   {
-    ///!ToDo: Remove this once AlphaFunction in itemview is removed
-    if( itemView.GetDefaultAlphaFunction() != Constraint::DEFAULT_ALPHA_FUNCTION )
-    {
-      mAlphaFunction = itemView.GetDefaultAlphaFunction();
-    }
-
     Property::Index scrollSpeedProperty = itemView.GetPropertyIndex("item-view-scroll-speed");
     Property::Index scrollPositionProperty = scrollPositionObject.GetPropertyIndex("scroll-position");
 

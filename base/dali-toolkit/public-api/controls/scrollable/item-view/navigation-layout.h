@@ -44,11 +44,6 @@ public:
                                    const float sideMargin)>  ResizeFunction;
 
   /**
-   * @deprecated This should not have been added to an ItemLayout
-   */
-  typedef SignalV2< void (int) > NavigationSignalV2;
-
-  /**
    * Create a new navigation layout
    */
   static NavigationLayoutPtr New();
@@ -57,11 +52,6 @@ public:
    * Virtual destructor.
    */
   virtual ~NavigationLayout();
-
-  /**
-   * Get the pan signal
-   */
-  NavigationSignalV2& PanSignal();
 
   /**
    * Set the number of columns in the layout.

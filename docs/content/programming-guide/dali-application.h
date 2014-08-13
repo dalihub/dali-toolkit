@@ -122,7 +122,7 @@ Dali provides a Window class to manage drawing to a default surface. It is also 
 @code
 void CreateProgram(Application& app)
 {
-  app.GetWindow().ShowIndicator(true);
+  app.GetWindow().ShowIndicator(Dali::Window::VISIBLE);
 }
 
 int main (int argc, char **argv)
