@@ -1029,6 +1029,44 @@ BaseHandle Builder::Create( const std::string& templateName, const Replacement& 
   return baseHandle;
 }
 
+BaseHandle Builder::CreateFromJson( const std::string& json )
+{
+  BaseHandle ret;
+
+  // merge in new template, hoping no one else has one named '@temp@'
+  std::string newTemplate =
+    std::string("{\"templates\":{\"@temp@\":") +                      \
+    json +                                                            \
+    std::string("}}");
+
+  if( mParser.Parse(newTemplate) )
+  {
+    Replacement replacement( mReplacementMap );
+    ret = Create( "@temp@", replacement );
+  }
+
+  return ret;
+}
+
+bool Builder::ApplyFromJson(  Handle& handle, const std::string& json )
+{
+  bool ret = false;
+
+  // merge new style, hoping no one else has one named '@temp@'
+  std::string newStyle =
+    std::string("{\"styles\":{\"@temp@\":") +                           \
+    json +                                                              \
+    std::string("}}");
+
+  if( mParser.Parse(newStyle) )
+  {
+    Replacement replacement( mReplacementMap );
+    ret = ApplyStyle( "@temp@", handle, replacement );
+  }
+
+  return ret;
+}
+
 
 BaseHandle Builder::Create( const std::string& templateName )
 {
