@@ -99,12 +99,22 @@ public:
   /**
    * @copydoc Toolkit::ScrollViewEffect::SetMaxSwingAngle
    */
-  void SetMaxSwingAngle(const Vector2& maxSwingAngle) { mMaxSwingAngle = maxSwingAngle; }
+  void SetMaxSwingAngle(const Vector2& maxSwingAngle);
+
+  /**
+   * @copydoc Toolkit::ScrollViewEffect::GetMaxSwingAngle
+   */
+  Vector2 GetMaxSwingAngle() const;
 
   /**
    * @copydoc Toolkit::ScrollViewEffect::SetSwingDropOff
    */
   void SetSwingDropOff(const Vector2& dropOff, const Vector2& distance, AlphaFunction function = NULL);
+
+  /**
+   * @copydoc Toolkit::ScrollViewEffect::GetSwingDropOff
+   */
+  void GetSwingDropOff( Vector2& dropOff, Vector2& distance, AlphaFunction& function ) const;
 
 public:
 
