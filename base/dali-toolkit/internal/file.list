@@ -10,6 +10,7 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/controls/buttons/check-box-button-impl.cpp \
    $(toolkit_base_src_dir)/controls/buttons/push-button-default-painter-impl.cpp \
    $(toolkit_base_src_dir)/controls/buttons/push-button-impl.cpp \
+   $(toolkit_base_src_dir)/controls/buttons/radio-button-impl.cpp \
    $(toolkit_base_src_dir)/controls/popup/popup-impl.cpp \
    $(toolkit_base_src_dir)/controls/popup/popup-style-impl.cpp \
    $(toolkit_base_src_dir)/controls/scroll-bar/scroll-bar-impl.cpp \
