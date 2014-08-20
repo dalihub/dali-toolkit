@@ -93,7 +93,7 @@ void PageTurnPortraitView::SetPanActor( const Vector2& panPosition )
   }
 }
 
-void PageTurnPortraitView::SetSpineEffect(Actor actor, bool isLeftSide)
+void PageTurnPortraitView::SetSpineEffect(ImageActor actor, bool isLeftSide)
 {
   if(isLeftSide)
   {
@@ -111,7 +111,7 @@ void PageTurnPortraitView::OnPossibleOutwardsFlick( const Vector2& panPosition, 
   // There is previous page and an outwards flick is detected
   if( mCurrentPageIndex > 0 && gestureSpeed > GESTURE_SPEED_THRESHOLD && offset.x > fabs( offset.y ))
   {
-    Actor actor = mPageActors[ (mCurrentPageIndex-1) % NUMBER_OF_CACHED_PAGES ];
+    ImageActor actor = mPageActors[ (mCurrentPageIndex-1) % NUMBER_OF_CACHED_PAGES ];
     if(actor.GetParent() != mRootOnScreen)
     {
       return;

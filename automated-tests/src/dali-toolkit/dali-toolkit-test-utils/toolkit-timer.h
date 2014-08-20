@@ -47,7 +47,6 @@ public:
   Timer& operator=( const Timer& timer );
   ~Timer();
   static Timer DownCast( BaseHandle handle );
-  using BaseHandle::operator=;
   void Start();
   void Stop();
   void SetInterval( unsigned int milliSec );

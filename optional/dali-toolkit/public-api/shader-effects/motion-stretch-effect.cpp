@@ -88,15 +88,15 @@ MotionStretchEffect::~MotionStretchEffect()
 {
 }
 
-MotionStretchEffect MotionStretchEffect::Apply( Actor handle )
+MotionStretchEffect MotionStretchEffect::Apply( RenderableActor renderable )
 {
   MotionStretchEffect newEffect = New();
-  handle.SetShaderEffect( newEffect );
+  renderable.SetShaderEffect( newEffect );
 
   Property::Index uModelProperty = newEffect.GetPropertyIndex( MOTION_STRETCH_MODELVIEW_LASTFRAME );
 
   Constraint constraint = Constraint::New<Matrix>( uModelProperty,
-                                                   Source( handle, Actor::WORLD_MATRIX ),
+                                                   Source( renderable, Actor::WORLD_MATRIX ),
                                                    EqualToConstraint() );
 
   // and set up constraint.

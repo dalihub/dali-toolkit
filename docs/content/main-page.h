@@ -57,6 +57,9 @@
  * - \link boost-library Boost Library \endlink
  * - \link boost-function Boost function usage \endlink
  *
+ * \section Rendering
+ * - \link viewing-modes Viewing modes \endlink
+ *
  * \section Profiling
  * - \link resource-tracking Resource Tracking \endlink
  * - \link performance-profiling Performance Profiling \endlink

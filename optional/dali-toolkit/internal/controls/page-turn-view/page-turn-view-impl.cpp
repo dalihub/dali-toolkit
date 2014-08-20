@@ -917,7 +917,7 @@ void PageTurnView::PanFinished( const Vector2& gesturePosition, float gestureSpe
 
   mPagePanFinishedSignal.Emit( handle );
 
-  Actor actor = mPanActor;
+  ImageActor actor = mPanActor;
   if(mPress)
   {
     if(!mConstraints) // if with constraints, the pan finished position is near spine, set up an animation to turn the page over
@@ -977,7 +977,7 @@ void PageTurnView::PanFinished( const Vector2& gesturePosition, float gestureSpe
 
 void PageTurnView::TurnedOver( Animation& animation )
 {
-  Actor actor = mAnimationActorPair[animation];
+  ImageActor actor = mAnimationActorPair[animation];
   mIsTurnBack[actor] = !mIsTurnBack[actor];
   actor.RemoveConstraints();
   mRootOnScreen.Add(actor);
@@ -996,7 +996,7 @@ void PageTurnView::TurnedOver( Animation& animation )
 
 void PageTurnView::SliddenBack( Animation& animation )
 {
-  Actor actor = mAnimationActorPair[animation];
+  ImageActor actor = mAnimationActorPair[animation];
   mRootOnScreen.Add(actor);
   int index = mAnimationIndexPair[animation];
   mIsSliding[index] = false;
@@ -1026,14 +1026,9 @@ void PageTurnView::OrganizePageDepth()
   }
 }
 
-void PageTurnView::SetShaderEffect( Actor actor, ShaderEffect shaderEffect )
+void PageTurnView::SetShaderEffect( ImageActor actor, ShaderEffect shaderEffect )
 {
-  actor.SetShaderEffect( shaderEffect );
-
-  if( actor.GetChildCount() > 0 )
-  {
-    actor.GetChildAt( 0 ).SetShaderEffect(shaderEffect);
-  }
+  SetShaderEffectRecursively( actor, shaderEffect );
 }
 
 Toolkit::PageTurnView::PageTurnSignal& PageTurnView::PageTurnStartedSignal()

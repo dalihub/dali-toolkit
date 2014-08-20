@@ -4741,7 +4741,6 @@ void TextInput::CreateHighlight()
 
     mHighlightMeshActor = MeshActor::New( mHighlightMesh );
     mHighlightMeshActor.SetName( "HighlightMeshActor" );
-    mHighlightMeshActor.SetInheritShaderEffect( false );
     mHighlightMeshActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
     mHighlightMeshActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
     mHighlightMeshActor.SetPosition( 0.0f, 0.0f, DISPLAYED_HIGHLIGHT_Z_OFFSET );

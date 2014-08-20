@@ -75,18 +75,20 @@ public:
    * Create a  MotionBlurEffect and attach it to the specified actor
    * The number of texture samples taken along the motion velocity vector of the
    * actor, producing the blur, is set to a default of 8.
+   * @param renderable actor to apply the effect to
    * @return A handle to a newly allocated Dali resource.
    */
-  static MotionBlurEffect Apply( Actor handle );
+  static MotionBlurEffect Apply( RenderableActor renderable );
 
   /**
    * Create an initialized MotionBlurEffect
    * @param numBlurSamples The number of texture samples taken along the motion
    * velocity vector of the actor, producing the blur. A higher number gives a
    * smoother blur but costs more in terms of performance.
+   * @param numBlurSamples to have
    * @return A handle to a newly allocated Dali resource.
    */
-  static MotionBlurEffect New( const unsigned int numBlurSamples );
+  static MotionBlurEffect New( unsigned int numBlurSamples );
 
   /**
    * Set texcoord scale property. This scales the offset for texture samples

@@ -691,7 +691,6 @@ void Decorator::CreateHighlight( Actor parent )
   {
     mHighlightMeshActor = MeshActor::New( mTextHighlight.CreateHighLightMesh() );
     mHighlightMeshActor.SetName( "HighlightMeshActor" );
-    mHighlightMeshActor.SetInheritShaderEffect( false );
     mHighlightMeshActor.SetAffectedByLighting(false);
     parent.Add( mHighlightMeshActor );
   }

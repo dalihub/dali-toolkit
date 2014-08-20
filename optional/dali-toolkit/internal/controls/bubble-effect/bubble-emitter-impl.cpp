@@ -203,10 +203,16 @@ void BubbleEmitter::SetBubbleDensity( unsigned int density )
 // clear the resources created for the off screen rendering
 void BubbleEmitter::OnRenderFinished(RenderTask& source)
 {
-  Actor sourceActor =  source.GetSourceActor();
-  sourceActor.RemoveShaderEffect();
+  Actor sourceActor = source.GetSourceActor();
+  if( sourceActor )
+  {
+    RenderableActor renderable = RenderableActor::DownCast( sourceActor );
+    if( renderable )
+    {
+      renderable.RemoveShaderEffect();
+    }
+  }
   Stage::GetCurrent().Remove(sourceActor);
-  sourceActor.Reset();
   Stage::GetCurrent().GetRenderTaskList().RemoveTask(source);
 }
 
