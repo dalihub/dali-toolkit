@@ -19,7 +19,7 @@
 #define __DALI_ACCESSIBILITY_MANAGER_H__
 #define __DALI_TIMER_H__
 #define __DALI_CLIPBOARD_H__
-#define IMFMANAGER_H
+#define __DALI_IMF_MANAGER_H__
 
 #include "toolkit-adaptor.h"
 #include <map>

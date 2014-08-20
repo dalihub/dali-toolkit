@@ -1,5 +1,5 @@
-#ifndef _DALI_ADAPTOR_IMF_MANAGER_H_
-#define _DALI_ADAPTOR_IMF_MANAGER_H_
+#ifndef __DALI_TOOLKIT_TOOLKIT_IMF_MANAGER_H__
+#define __DALI_TOOLKIT_TOOLKIT_IMF_MANAGER_H__
 
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#define IMFMANAGER_H
+#define __DALI_IMF_MANAGER_H__
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
 
@@ -224,4 +224,4 @@ public:
 
 } // namespace Dali
 
-#endif // _DALI_ADAPTOR_IMF_MANAGER_H_
+#endif // __DALI_TOOLKIT_TOOLKIT_IMF_MANAGER_H__
