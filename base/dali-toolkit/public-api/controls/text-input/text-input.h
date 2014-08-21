@@ -330,15 +330,17 @@ public:
    * the boundary height the stage height minus the title's height.
    * Restrictions - The boundary box should be set up with a fixed z position for the text-input and the default camera.
    * @param[in] boundingOriginAndSize Rect( x coordinate, y coordinate, width, height )
-   * ------------------------------------------
-   * |(x,y)                                   |
-   * |o---------------------------------------|
-   * ||                                      ||
-   * ||            Bounding Box              || boundary height
-   * ||                                      ||
-   * |----------------------------------------|
-   * ------------------------------------------
-   *               boundary width
+   *                                  @code
+   *                                  +----------------------------------------+
+   *                                  |(x,y)                                   |
+   *                                  |+--------------------------------------+|
+   *                                  ||                                      ||
+   *                                  ||            Bounding Box              || boundary height
+   *                                  ||                                      ||
+   *                                  |+--------------------------------------+|
+   *                                  +----------------------------------------+
+   *                                                boundary width
+   *                                  @endcode
    */
   void SetBoundingRectangle( const Rect<float>& boundingOriginAndSize );
 
