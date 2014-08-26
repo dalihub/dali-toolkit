@@ -27,8 +27,8 @@ const char* DEFAULT_INDICATOR_IMAGE_PATH = DALI_IMAGE_DIR "popup_scroll.png";
 const Vector4 DEFAULT_INDICATOR_NINE_PATCH_BORDER(4.0f, 9.0f, 7.0f, 11.0f);
 const float MINIMUM_INDICATOR_HEIGHT(20.0f); // The minimum indicator height for the nine patch border
 const float DEFAULT_SLIDER_DEPTH(1.0f);
-const float INDICATOR_SHOW_TIME(0.5f);
-const float INDICATOR_HIDE_TIME(0.5f);
+const float DEFAULT_INDICATOR_SHOW_DURATION(0.5f);
+const float DEFAULT_INDICATOR_HIDE_DURATION(0.5f);
 const float DEFAULT_PAN_GESTURE_PROCESS_TIME(16.7f); // 16.7 milliseconds, i.e. one frame
 const float DEFAULT_INDICATOR_FIXED_HEIGHT(80.0f);
 
@@ -115,6 +115,8 @@ namespace Toolkit
 
 const Property::Index ScrollBar::PROPERTY_INDICATOR_HEIGHT_POLICY( Internal::ScrollBar::SCROLLBAR_PROPERTY_START_INDEX );
 const Property::Index ScrollBar::PROPERTY_INDICATOR_FIXED_HEIGHT( Internal::ScrollBar::SCROLLBAR_PROPERTY_START_INDEX + 1 );
+const Property::Index ScrollBar::PROPERTY_INDICATOR_SHOW_DURATION( Internal::ScrollBar::SCROLLBAR_PROPERTY_START_INDEX + 2 );
+const Property::Index ScrollBar::PROPERTY_INDICATOR_HIDE_DURATION( Internal::ScrollBar::SCROLLBAR_PROPERTY_START_INDEX + 3 );
 
 namespace Internal
 {
@@ -135,10 +137,14 @@ TypeRegistration typeRegistration( typeid(Toolkit::ScrollBar), typeid(Toolkit::S
 
 PropertyRegistration property1( typeRegistration, "indicator-height-policy", Toolkit::ScrollBar::PROPERTY_INDICATOR_HEIGHT_POLICY, Property::STRING, &ScrollBar::SetProperty, &ScrollBar::GetProperty );
 PropertyRegistration property2( typeRegistration, "indicator-fixed-height",  Toolkit::ScrollBar::PROPERTY_INDICATOR_FIXED_HEIGHT,  Property::FLOAT,  &ScrollBar::SetProperty, &ScrollBar::GetProperty );
+PropertyRegistration property3( typeRegistration, "indicator-show-duration",  Toolkit::ScrollBar::PROPERTY_INDICATOR_SHOW_DURATION,  Property::FLOAT,  &ScrollBar::SetProperty, &ScrollBar::GetProperty );
+PropertyRegistration property4( typeRegistration, "indicator-hide-duration",  Toolkit::ScrollBar::PROPERTY_INDICATOR_HIDE_DURATION,  Property::FLOAT,  &ScrollBar::SetProperty, &ScrollBar::GetProperty );
 }
 
 ScrollBar::ScrollBar()
-: mScrollStart(0.0f),
+: mIndicatorShowDuration(DEFAULT_INDICATOR_SHOW_DURATION),
+  mIndicatorHideDuration(DEFAULT_INDICATOR_HIDE_DURATION),
+  mScrollStart(0.0f),
   mIsPanning(false),
   mCurrentScrollPosition(0.0f),
   mIndicatorHeightPolicy(Toolkit::ScrollBar::Variable),
@@ -272,9 +278,16 @@ void ScrollBar::Show()
     mAnimation.Reset();
   }
 
-  mAnimation = Animation::New( INDICATOR_SHOW_TIME );
-  mAnimation.OpacityTo( Self(), 1.0f, AlphaFunctions::EaseIn );
-  mAnimation.Play();
+  if(mIndicatorShowDuration > 0.0f)
+  {
+    mAnimation = Animation::New( mIndicatorShowDuration );
+    mAnimation.OpacityTo( Self(), 1.0f, AlphaFunctions::EaseIn );
+    mAnimation.Play();
+  }
+  else
+  {
+    Self().SetOpacity(1.0f);
+  }
 }
 
 void ScrollBar::Hide()
@@ -286,9 +299,16 @@ void ScrollBar::Hide()
     mAnimation.Reset();
   }
 
-  mAnimation = Animation::New( INDICATOR_HIDE_TIME );
-  mAnimation.OpacityTo( Self(), 0.0f, AlphaFunctions::EaseIn );
-  mAnimation.Play();
+  if(mIndicatorHideDuration > 0.0f)
+  {
+    mAnimation = Animation::New( mIndicatorHideDuration );
+    mAnimation.OpacityTo( Self(), 0.0f, AlphaFunctions::EaseIn );
+    mAnimation.Play();
+  }
+  else
+  {
+    Self().SetOpacity(0.0f);
+  }
 }
 
 bool ScrollBar::OnPanGestureProcessTick()
@@ -397,6 +417,26 @@ float ScrollBar::GetIndicatorFixedHeight()
   return mIndicatorFixedHeight;
 }
 
+void ScrollBar::SetIndicatorShowDuration( float durationSeconds )
+{
+  mIndicatorShowDuration = durationSeconds;
+}
+
+float ScrollBar::GetIndicatorShowDuration()
+{
+  return mIndicatorShowDuration;
+}
+
+void ScrollBar::SetIndicatorHideDuration( float durationSeconds )
+{
+  mIndicatorHideDuration = durationSeconds;
+}
+
+float ScrollBar::GetIndicatorHideDuration()
+{
+  return mIndicatorHideDuration;
+}
+
 void ScrollBar::OnIndicatorHeightPolicyPropertySet( Property::Value propertyValue )
 {
   std::string policyName( propertyValue.Get<std::string>() );
@@ -433,6 +473,16 @@ void ScrollBar::SetProperty( BaseObject* object, Property::Index index, const Pr
         scrollBarImpl.SetIndicatorFixedHeight(value.Get<float>());
         break;
       }
+      case Toolkit::ScrollBar::PROPERTY_INDICATOR_SHOW_DURATION:
+      {
+        scrollBarImpl.SetIndicatorShowDuration(value.Get<float>());
+        break;
+      }
+      case Toolkit::ScrollBar::PROPERTY_INDICATOR_HIDE_DURATION:
+      {
+        scrollBarImpl.SetIndicatorHideDuration(value.Get<float>());
+        break;
+      }
     }
   }
 }
@@ -456,6 +506,16 @@ Property::Value ScrollBar::GetProperty( BaseObject* object, Property::Index inde
       case Toolkit::ScrollBar::PROPERTY_INDICATOR_FIXED_HEIGHT:
       {
         value = scrollBarImpl.GetIndicatorFixedHeight();
+        break;
+      }
+      case Toolkit::ScrollBar::PROPERTY_INDICATOR_SHOW_DURATION:
+      {
+        value = scrollBarImpl.GetIndicatorShowDuration();
+        break;
+      }
+      case Toolkit::ScrollBar::PROPERTY_INDICATOR_HIDE_DURATION:
+      {
+        value = scrollBarImpl.GetIndicatorHideDuration();
         break;
       }
     }

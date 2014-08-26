@@ -51,8 +51,10 @@ public:
   typedef SignalV2< void ( float ) > ScrollPositionNotifiedSignalType;
 
   // Properties
-  static const Property::Index PROPERTY_INDICATOR_HEIGHT_POLICY;         ///< name "indicator-height-policy", type STRING
-  static const Property::Index PROPERTY_INDICATOR_FIXED_HEIGHT;          ///< name "indicator-fixed-height",  type FLOAT
+  static const Property::Index PROPERTY_INDICATOR_HEIGHT_POLICY;         ///< name "indicator-height-policy", @see SetIndicatorHeightPolicy(), type STRING
+  static const Property::Index PROPERTY_INDICATOR_FIXED_HEIGHT;          ///< name "indicator-fixed-height",  @see SetIndicatorFixedHeight(),  type FLOAT
+  static const Property::Index PROPERTY_INDICATOR_SHOW_DURATION;         ///< name "indicator-show-duration", @see SetIndicatorShowDuration(), type FLOAT
+  static const Property::Index PROPERTY_INDICATOR_HIDE_DURATION;         ///< name "indicator-hide-duration", @see SetIndicatorHideDuration(), type FLOAT
 
 public:
 
@@ -168,6 +170,36 @@ public:
    * @return The fixed height of the scroll indicator
    */
   float GetIndicatorFixedHeight();
+
+  /**
+   * @brief Sets the duration in second for the scroll indicator to become fully visible
+   *
+   * @pre The scroll bar actor has been initialised.
+   *
+   * @param[in] durationSeconds The duration for the scroll indicator to become fully visible
+   */
+  void SetIndicatorShowDuration( float durationSeconds );
+
+  /**
+   * @brief Gets the duration in second for the scroll indicator to become fully visible
+   * @return The duration for the scroll indicator to become fully visible
+   */
+  float GetIndicatorShowDuration();
+
+  /**
+   * @brief Sets the duration in second for the scroll indicator to become fully invisible
+   *
+   * @pre The scroll bar actor has been initialised.
+   *
+   * @param[in] durationSeconds The duration for the scroll indicator to become fully invisible
+   */
+  void SetIndicatorHideDuration( float durationSeconds );
+
+  /**
+   * @brief Gets the duration in second for the scroll indicator to become fully invisible
+   * @return The duration for the scroll indicator to become fully invisible
+   */
+  float GetIndicatorHideDuration();
 
   /**
    * @brief Shows the scroll indicator
