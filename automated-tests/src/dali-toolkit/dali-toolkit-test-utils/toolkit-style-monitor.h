@@ -25,7 +25,7 @@
 #define __DALI_STYLE_MONITOR_H__
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
-#include <dali/public-api/style-change.h>
+#include <dali/public-api/adaptor-framework/style-change.h>
 
 namespace Dali
 {

@@ -20,9 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
-
-// INTERNAL INCLUDES
-#include <dali/public-api/orientation.h>
+#include <dali/public-api/adaptor-framework/orientation.h>
 
 namespace Dali
 {

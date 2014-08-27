@@ -22,7 +22,7 @@
 #include <string>
 
 // PUBLIC INCLUDES
-#include <dali/public-api/clipboard-event-notifier.h>
+#include <dali/public-api/adaptor-framework/clipboard-event-notifier.h>
 
 namespace Dali
 {
