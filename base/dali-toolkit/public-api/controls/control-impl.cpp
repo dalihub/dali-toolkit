@@ -1280,11 +1280,6 @@ void Control::SignalDisconnected( SlotObserver* slotObserver, CallbackBase* call
   mImpl->SignalDisconnected( slotObserver, callback );
 }
 
-std::size_t Control::GetConnectionCount() const
-{
-  return mImpl->GetConnectionCount();
-}
-
 Control::Control( ControlBehaviour behaviourFlags )
 : CustomActorImpl( behaviourFlags & REQUIRES_TOUCH_EVENTS ),
   mImpl(new Impl(*this))
