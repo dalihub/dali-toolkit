@@ -507,9 +507,7 @@ BaseHandle Builder::DoCreate( const TreeNode& root, const TreeNode& node,
         }
       }
 
-      ApplyProperties( root, node, handle, replacements );
-
-      if( actor)
+      if( actor )
       {
         // add children of all the styles
         if( OptionalChild actors = IsChild( node, KEYNAME_ACTORS ) )
@@ -529,7 +527,10 @@ BaseHandle Builder::DoCreate( const TreeNode& root, const TreeNode& node,
           parent.Add( actor );
         }
       }
-
+      else
+      {
+        ApplyProperties( root, node, handle, replacements );
+      }
     }
     else
     {
