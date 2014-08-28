@@ -649,11 +649,6 @@ public:
    */
   virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback );
 
-  /**
-   * @copydoc ConnectionTrackerInterface::GetConnectionCount
-   */
-  virtual std::size_t GetConnectionCount() const;
-
 protected:
 
   /**
