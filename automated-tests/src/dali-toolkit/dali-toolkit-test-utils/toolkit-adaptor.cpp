@@ -55,10 +55,6 @@ public:
 
   typedef SignalV2< void ( Adaptor& ) > AdaptorSignalV2;
 
-  typedef std::pair<std::string, Dali::BaseHandle> SingletonPair;
-  typedef std::map<std::string, Dali::BaseHandle>  SingletonContainer;
-  typedef SingletonContainer::const_iterator       SingletonConstIter;
-
 public:
 
   Adaptor(ToolkitAdaptor& toolkitAdaptor);
@@ -77,9 +73,6 @@ public:
   void ReplaceSurface(RenderSurface& surface);
   void RenderSync();
   RenderSurface& GetSurface();
-
-  void RegisterSingleton(const std::type_info& info, Dali::BaseHandle singleton);
-  Dali::BaseHandle GetSingleton(const std::type_info& info) const;
 
 public: // static methods
   static Adaptor& Get();
@@ -103,8 +96,6 @@ private:
   AdaptorSignalV2 mResizeSignal;
   TestRenderSurface mRenderSurface;
   ToolkitAdaptor& mToolkitAdaptor;
-
-  SingletonContainer mSingletonContainer;
 };
 
 namespace
@@ -204,31 +195,6 @@ bool Adaptor::IsAvailable()
   }
 
   return available;
-}
-
-void Adaptor::RegisterSingleton(const std::type_info& info, Dali::BaseHandle singleton)
-{
-  mToolkitAdaptor.mFunctionsCalled.RegisterSingleton = true;
-
-  if(singleton)
-  {
-    mSingletonContainer.insert(SingletonPair(info.name(), singleton));
-  }
-}
-
-Dali::BaseHandle Adaptor::GetSingleton(const std::type_info& info) const
-{
-  mToolkitAdaptor.mFunctionsCalled.GetSingleton = true;
-
-  Dali::BaseHandle object = Dali::BaseHandle();
-
-  SingletonConstIter iter = mSingletonContainer.find(info.name());
-  if(iter != mSingletonContainer.end())
-  {
-    object = (*iter).second;
-  }
-
-  return object;
 }
 
 Adaptor::AdaptorSignalV2& Adaptor::SignalResize()

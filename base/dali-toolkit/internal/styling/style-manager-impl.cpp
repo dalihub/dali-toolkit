@@ -59,11 +59,15 @@ BaseHandle Create()
 {
   BaseHandle handle = StyleManager::Get();
 
-  if ( !handle && Adaptor::IsAvailable() )
+  if ( !handle )
   {
-    Toolkit::StyleManager manager = Toolkit::StyleManager( new Internal::StyleManager() );
-    Adaptor::Get().RegisterSingleton( typeid( manager ), manager );
-    handle = manager;
+    SingletonService singletonService( SingletonService::Get() );
+    if ( singletonService )
+    {
+      Toolkit::StyleManager manager = Toolkit::StyleManager( new Internal::StyleManager() );
+      singletonService.Register( typeid( manager ), manager );
+      handle = manager;
+    }
   }
 
   return handle;
@@ -88,10 +92,11 @@ Toolkit::StyleManager StyleManager::Get()
 {
   Toolkit::StyleManager manager;
 
-  if ( Adaptor::IsAvailable() )
+  SingletonService singletonService( SingletonService::Get() );
+  if ( singletonService )
   {
     // Check whether the style manager is already created
-    Dali::BaseHandle handle = Dali::Adaptor::Get().GetSingleton( typeid( Toolkit::StyleManager ) );
+    Dali::BaseHandle handle = singletonService.GetSingleton( typeid( Toolkit::StyleManager ) );
     if( handle )
     {
       // If so, downcast the handle of singleton

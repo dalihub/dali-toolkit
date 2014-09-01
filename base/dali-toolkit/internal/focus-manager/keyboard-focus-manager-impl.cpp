@@ -50,11 +50,15 @@ BaseHandle Create()
 {
   BaseHandle handle = KeyboardFocusManager::Get();
 
-  if ( !handle && Adaptor::IsAvailable() )
+  if ( !handle )
   {
-    Toolkit::KeyboardFocusManager manager = Toolkit::KeyboardFocusManager( new Internal::KeyboardFocusManager() );
-    Adaptor::Get().RegisterSingleton( typeid( manager ), manager );
-    handle = manager;
+    SingletonService singletonService( SingletonService::Get() );
+    if ( singletonService )
+    {
+      Toolkit::KeyboardFocusManager manager = Toolkit::KeyboardFocusManager( new Internal::KeyboardFocusManager() );
+      singletonService.Register( typeid( manager ), manager );
+      handle = manager;
+    }
   }
 
   return handle;
@@ -67,10 +71,11 @@ Toolkit::KeyboardFocusManager KeyboardFocusManager::Get()
 {
   Toolkit::KeyboardFocusManager manager;
 
-  if ( Adaptor::IsAvailable() )
+  SingletonService singletonService( SingletonService::Get() );
+  if ( singletonService )
   {
     // Check whether the keyboard focus manager is already created
-    Dali::BaseHandle handle = Dali::Adaptor::Get().GetSingleton( typeid( Toolkit::KeyboardFocusManager ) );
+    Dali::BaseHandle handle = singletonService.GetSingleton( typeid( Toolkit::KeyboardFocusManager ) );
     if(handle)
     {
       // If so, downcast the handle of singleton to keyboard focus manager

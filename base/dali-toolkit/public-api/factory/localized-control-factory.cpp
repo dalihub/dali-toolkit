@@ -50,19 +50,22 @@ LocalizedControlFactory LocalizedControlFactory::Get()
   LocalizedControlFactory factory;
 
   // Check whether the focus factory is already created
-  Dali::Adaptor& adaptor = Dali::Adaptor::Get();
-  Dali::BaseHandle handle = adaptor.GetSingleton(typeid(LocalizedControlFactory));
-  if(handle)
+  SingletonService singletonService( SingletonService::Get() );
+  if ( singletonService )
   {
-    // If so, downcast the handle of singleton to focus factory
-    factory = LocalizedControlFactory(dynamic_cast<Internal::LocalizedControlFactory*>(handle.GetObjectPtr()));
-  }
+    Dali::BaseHandle handle = singletonService.GetSingleton(typeid(LocalizedControlFactory));
+    if(handle)
+    {
+      // If so, downcast the handle of singleton to focus factory
+      factory = LocalizedControlFactory(dynamic_cast<Internal::LocalizedControlFactory*>(handle.GetObjectPtr()));
+    }
 
-  if(!factory)
-  {
-    // If not, create the focus factory and register it as a singleton
-    factory = LocalizedControlFactory(new Internal::LocalizedControlFactory());
-    adaptor.RegisterSingleton(typeid(factory), factory);
+    if(!factory)
+    {
+      // If not, create the focus factory and register it as a singleton
+      factory = LocalizedControlFactory(new Internal::LocalizedControlFactory());
+      singletonService.Register(typeid(factory), factory);
+    }
   }
 
   return factory;

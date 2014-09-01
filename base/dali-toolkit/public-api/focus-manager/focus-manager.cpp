@@ -48,19 +48,22 @@ FocusManager FocusManager::Get()
   FocusManager manager;
 
   // Check whether the focus manager is already created
-  Dali::Adaptor& adaptor = Dali::Adaptor::Get();
-  Dali::BaseHandle handle = adaptor.GetSingleton(typeid(FocusManager));
-  if(handle)
+  SingletonService singletonService( SingletonService::Get() );
+  if ( singletonService )
   {
-    // If so, downcast the handle of singleton to focus manager
-    manager = FocusManager(dynamic_cast<Internal::FocusManager*>(handle.GetObjectPtr()));
-  }
+    Dali::BaseHandle handle = singletonService.GetSingleton(typeid(FocusManager));
+    if(handle)
+    {
+      // If so, downcast the handle of singleton to focus manager
+      manager = FocusManager(dynamic_cast<Internal::FocusManager*>(handle.GetObjectPtr()));
+    }
 
-  if(!manager)
-  {
-    // If not, create the focus manager and register it as a singleton
-    manager = FocusManager(new Internal::FocusManager());
-    adaptor.RegisterSingleton(typeid(manager), manager);
+    if(!manager)
+    {
+      // If not, create the focus manager and register it as a singleton
+      manager = FocusManager(new Internal::FocusManager());
+      singletonService.Register(typeid(manager), manager);
+    }
   }
 
   return manager;

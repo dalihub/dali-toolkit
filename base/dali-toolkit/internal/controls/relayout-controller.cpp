@@ -67,24 +67,27 @@ void RelayoutController::Request()
     RelayoutController controller;
 
     // Check whether the RelayoutController is already created
-    Dali::Adaptor& adaptor = Dali::Adaptor::Get();
-    Dali::BaseHandle handle = adaptor.GetSingleton(typeid(RelayoutController));
-
-    if(handle)
+    SingletonService singletonService( SingletonService::Get() );
+    if ( singletonService )
     {
-      // If so, downcast the handle of singleton to RelayoutController
-      controller = RelayoutController(dynamic_cast<Internal::RelayoutControllerImpl*>(handle.GetObjectPtr()));
-    }
+      Dali::BaseHandle handle = singletonService.GetSingleton(typeid(RelayoutController));
 
-    if(!controller)
-    {
-      // If not, create the RelayoutController and register it as a singleton
-      controller = RelayoutController( new Internal::RelayoutControllerImpl(gRelayoutRequestPending) );
-      adaptor.RegisterSingleton( typeid(controller), controller );
-    }
+      if(handle)
+      {
+        // If so, downcast the handle of singleton to RelayoutController
+        controller = RelayoutController(dynamic_cast<Internal::RelayoutControllerImpl*>(handle.GetObjectPtr()));
+      }
 
-    GetImpl(controller).Request();
-    gRelayoutRequestPending = true;
+      if(!controller)
+      {
+        // If not, create the RelayoutController and register it as a singleton
+        controller = RelayoutController( new Internal::RelayoutControllerImpl(gRelayoutRequestPending) );
+        singletonService.Register( typeid(controller), controller );
+      }
+
+      GetImpl(controller).Request();
+      gRelayoutRequestPending = true;
+    }
   }
 }
 

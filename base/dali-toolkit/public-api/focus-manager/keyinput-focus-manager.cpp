@@ -47,19 +47,22 @@ KeyInputFocusManager KeyInputFocusManager::Get()
   KeyInputFocusManager manager;
 
   // Check whether the focus manager is already created
-  Dali::Adaptor& adaptor = Dali::Adaptor::Get();
-  Dali::BaseHandle handle = adaptor.GetSingleton(typeid(KeyInputFocusManager));
-  if(handle)
+  SingletonService singletonService( SingletonService::Get() );
+  if ( singletonService )
   {
-    // If so, downcast the handle of singleton to focus manager
-    manager = KeyInputFocusManager(dynamic_cast<Internal::KeyInputFocusManager*>(handle.GetObjectPtr()));
-  }
+    Dali::BaseHandle handle = singletonService.GetSingleton(typeid(KeyInputFocusManager));
+    if(handle)
+    {
+      // If so, downcast the handle of singleton to focus manager
+      manager = KeyInputFocusManager(dynamic_cast<Internal::KeyInputFocusManager*>(handle.GetObjectPtr()));
+    }
 
-  if(!manager)
-  {
-    // If not, create the focus manager and register it as a singleton
-    manager = KeyInputFocusManager(new Internal::KeyInputFocusManager());
-    adaptor.RegisterSingleton(typeid(manager), manager);
+    if(!manager)
+    {
+      // If not, create the focus manager and register it as a singleton
+      manager = KeyInputFocusManager(new Internal::KeyInputFocusManager());
+      singletonService.Register(typeid(manager), manager);
+    }
   }
 
   return manager;
