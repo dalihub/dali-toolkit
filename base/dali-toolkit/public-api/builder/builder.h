@@ -35,15 +35,14 @@ class Builder;
 typedef std::map<std::string, Property::Value> PropertyValueMap;
 
 /**
- * Builder
- * This class provides the ability to load an actor tree from a string representation.
+ * This class provides the ability to load and style an actor tree from a string representation.
  *
- * The following example is hello world in JSON.
+ * The following is an example in JSON.
  *
  * @code
  *
  *  {
- *    "styles":
+ *    "templates": // are named instantiable actor trees
  *    {
  *      "default-text":
  *      {
@@ -52,6 +51,24 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
  *        "parent-origin":[0.5,0.5,0],
  *        "scale": [50,50,1]
  *      }
+ *    },
+ *    "styles": // are named property sets applied to actor trees
+ *    {
+ *     "my-style":
+ *      {
+ *        "size": [10,10,1] // root properties applied to a given root actor
+ *        "actors":         // properties applied to actors found by name from root
+ *        {
+ *          "ok":           // properties for an actor named "ok"
+ *          {
+ *            "scale":[5,5,1],
+ *          },
+ *          "cancel":
+ *          {
+ *            "scale":[50,50,1],
+ *          }
+ *       },
+ *      },
  *    },
  *    "stage":
  *    [
@@ -63,29 +80,43 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
  *    ]
  *  }
  *
- *
- *
  * @endcode
  *
- * The following is how to load the json data.
- *
+ * The following shows a method to load the json file.
  * @code
- *
  * Builder builder = Builder::New();
- *
  * std::string json_data(ReadFile("layout.json"));
- *
  * builder.LoadFromString(json_data);
- *
- * // 1) load all actors in the "stage" section to the root layer
- * builder.AddActors( Stage::GetCurrent().GetRootLayer() );
- *
- * // or 2) create an actor from the library "templates" section
- * TextActor actor = TextActor::DownCast( builder.Create( "default-text" ) );
- *
  * @endcode
+ * Examples
+ * - Load all actors in the "stage" section to the root layer
+ * @code
+ * builder.AddActors( Stage::GetCurrent().GetRootLayer() );
+ * @endcode
+ *
+ * - Create an actor tree from the "templates" section
+ * @code
+ * TextActor actor = TextActor::DownCast( builder.Create( "default-text" ) );
+ * @endcode
+ *
+ * - Style an actor tree from the "styles" section
+ * @code
+ * builder.ApplyStyle( "my-style", actor );
+ * @endcode
+ *
+ * - Create an actor tree from json
+ * @code
+ * TextActor actor = TextActor::DownCast( builder.CreateFromJson("{\"type\":\"TextActor\",\"font\":\"\",\"scale\":[50,50,1]}") );
+ * @endcode
+ *
+ * - Apply a style to an actor tree from json
+ * @code
+ * builder.ApplyFromJson( textActor, ("{\"scale\":[5,5,1]}") );
+ * @endcode
+ *
  */
- class Builder : public BaseHandle
+
+class Builder : public BaseHandle
  {
  public:
    /**
@@ -286,6 +317,19 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
   BaseHandle Create( const std::string& templateName, const PropertyValueMap& map );
 
   /**
+   * @brief Creates an object (e.g. an actor) from given json snippet
+   *
+   * e.g.
+   *   Actor a = Actor::DownCast(builder.CreateFromJson( "{\"type\":\"TextActor\"}"));
+   *
+   * @pre The Builder has been initialized.
+   * @pre Preconditions have been met for creating dali objects ie Images, Actors etc
+   * @param json The json snippet used to create the object.
+   * @returns The base handle of the created object if any
+   */
+  BaseHandle CreateFromJson( const std::string& json );
+
+  /**
    * Apply a style (a collection of properties) to an actor.
    * @pre The Builder has been initialized.
    * @pre Preconditions have been met for creating dali objects ie Images, Actors etc
@@ -295,6 +339,18 @@ typedef std::map<std::string, Property::Value> PropertyValueMap;
    * @return Return true if the style was found
    */
   bool ApplyStyle( const std::string& styleName, Handle& handle );
+
+  /**
+   * Apply a style (a collection of properties) to an actor from the given json snippet
+   * @pre The Builder has been initialized.
+   * @pre Preconditions have been met for creating dali objects ie Images, Actors etc
+   * @param handle Then handle of the object on which to set the properties.
+   * @param json The json snippet used to create the object.
+   *
+   * @return Return true if the json snippet was parsed
+   */
+  bool ApplyFromJson(  Handle& handle, const std::string& json );
+
 
   /**
    * Add the actor tree in the "stage" section to the actor toActor.
