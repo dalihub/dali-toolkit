@@ -1951,11 +1951,7 @@ void TextInput::ScrollTextViewToMakeCursorVisible( const Vector3& cursorPosition
     scrollOffset.x += cursorPosition.x;
   }
 
-  if( cursorPosition.y - cursorSize.height < 0.f )
-  {
-    scrollOffset.y += ( cursorPosition.y - cursorSize.height );
-  }
-  else if( cursorPosition.y > controlSize.height )
+  if( cursorPosition.y - cursorSize.height < 0.f || cursorPosition.y > controlSize.height )
   {
     scrollOffset.y += cursorPosition.y;
   }

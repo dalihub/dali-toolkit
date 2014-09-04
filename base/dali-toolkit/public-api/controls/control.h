@@ -58,6 +58,10 @@ public:
   /// @name Signals
   /** @{ */
   static const char* const SIGNAL_KEY_EVENT;                 ///< name "key-event"
+  static const char* const SIGNAL_TAPPED;                    ///< name "tapped"
+  static const char* const SIGNAL_PANNED;                    ///< name "panned"
+  static const char* const SIGNAL_PINCHED;                   ///< name "pinched"
+  static const char* const SIGNAL_LONG_PRESSED;              ///< name "long-pressed"
   /** @} */
 
   /// @name Actions

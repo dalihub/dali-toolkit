@@ -44,11 +44,15 @@ void utc_dali_toolkit_control_cleanup(void)
 namespace
 {
 
-static bool gObjectCreatedCallBackCalled;
+bool gObjectCreatedCallBackCalled;
 
-static void TestCallback(BaseHandle handle)
+void TestCallback(BaseHandle handle)
 {
   gObjectCreatedCallBackCalled = true;
+}
+
+void TestVoidCallback()
+{
 }
 
 } // namespace
@@ -508,6 +512,32 @@ int UtcDaliControlKeyProperties(void)
 
   control.SetProperty( Control::PROPERTY_KEY_INPUT_FOCUS, true );
   DALI_TEST_EQUALS( true, control.HasKeyInputFocus(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlGestureSignals(void)
+{
+  ToolkitTestApplication application;
+  ConnectionTracker connectionTracker;
+  Control control = Control::New();
+
+  // Each gesture detector gets created when connecting to the gesture signals
+  DALI_TEST_CHECK( !control.GetTapGestureDetector() );
+  control.ConnectSignal( &connectionTracker, Control::SIGNAL_TAPPED, &TestVoidCallback );
+  DALI_TEST_CHECK( control.GetTapGestureDetector() );
+
+  DALI_TEST_CHECK( !control.GetPanGestureDetector() );
+  control.ConnectSignal( &connectionTracker, Control::SIGNAL_PANNED, &TestVoidCallback );
+  DALI_TEST_CHECK( control.GetPanGestureDetector() );
+
+  DALI_TEST_CHECK( !control.GetPinchGestureDetector() );
+  control.ConnectSignal( &connectionTracker, Control::SIGNAL_PINCHED, &TestVoidCallback );
+  DALI_TEST_CHECK( control.GetPinchGestureDetector() );
+
+  DALI_TEST_CHECK( !control.GetLongPressGestureDetector() );
+  control.ConnectSignal( &connectionTracker, Control::SIGNAL_LONG_PRESSED, &TestVoidCallback );
+  DALI_TEST_CHECK( control.GetLongPressGestureDetector() );
 
   END_TEST;
 }

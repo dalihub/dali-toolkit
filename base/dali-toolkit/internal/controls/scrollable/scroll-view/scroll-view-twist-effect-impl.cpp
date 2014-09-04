@@ -541,9 +541,19 @@ void ScrollViewTwistEffect::Apply(Actor child)
   }
 }
 
+void ScrollViewTwistEffect::SetMaxSwingAngle(const Vector2& maxSwingAngle)
+{
+  mMaxSwingAngle = maxSwingAngle;
+}
+
+Vector2 ScrollViewTwistEffect::GetMaxSwingAngle() const
+{
+  return mMaxSwingAngle;
+}
+
 void ScrollViewTwistEffect::SetSwingDropOff(const Vector2& dropOff, const Vector2& distance, AlphaFunction function)
 {
-  if( mDropOffDistance.LengthSquared() > Math::MACHINE_EPSILON_1 && mDropOff.LengthSquared() > Math::MACHINE_EPSILON_1 )
+  if( distance.LengthSquared() > Math::MACHINE_EPSILON_1 && dropOff.LengthSquared() > Math::MACHINE_EPSILON_1 )
   {
     mFlags |= FlagDropOff;
     mDropOff = dropOff;
@@ -556,6 +566,13 @@ void ScrollViewTwistEffect::SetSwingDropOff(const Vector2& dropOff, const Vector
   }
   // can no longer use default dop off
   mFlags = mFlags & ~FlagDefaultDropOff;
+}
+
+void ScrollViewTwistEffect::GetSwingDropOff( Vector2& dropOff, Vector2& distance, AlphaFunction& function ) const
+{
+  dropOff = mDropOff;
+  distance = mDropOffDistance;
+  function = mDropOffFunction;
 }
 
 void ScrollViewTwistEffect::OnAttach(Toolkit::ScrollView& scrollView)

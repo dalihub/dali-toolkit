@@ -338,7 +338,10 @@ bool FocusManager::DoSetCurrentFocusActor(const unsigned int actorID)
       if(mIsAccessibilityTtsEnabled)
       {
         Dali::SoundPlayer soundPlayer = Dali::SoundPlayer::Get();
-        soundPlayer.PlaySound(FOCUS_SOUND_FILE);
+        if(soundPlayer)
+        {
+          soundPlayer.PlaySound(FOCUS_SOUND_FILE);
+        }
 
         // Play the accessibility attributes with the TTS player.
         Dali::TtsPlayer player = Dali::TtsPlayer::Get(Dali::TtsPlayer::SCREEN_READER);
@@ -573,7 +576,10 @@ bool FocusManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapp
       {
         // play sound & skip moving once
         Dali::SoundPlayer soundPlayer = Dali::SoundPlayer::Get();
-        soundPlayer.PlaySound(FOCUS_CHAIN_END_SOUND_FILE);
+        if(soundPlayer)
+        {
+          soundPlayer.PlaySound(FOCUS_CHAIN_END_SOUND_FILE);
+        }
 
         mIsEndcapFeedbackPlayed = true;
         return true;

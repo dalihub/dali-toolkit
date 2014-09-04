@@ -114,6 +114,8 @@ int JsonParser::Parse(const std::string& source)
   }
   else
   {
+    mRoot = NULL;
+
     mErrorDescription   = parserState.GetErrorDescription();
     if(NULL == mErrorDescription)
     {

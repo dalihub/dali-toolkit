@@ -104,9 +104,19 @@ BaseHandle Builder::Create( const std::string& templateName, const PropertyValue
   return GetImpl(*this).Create( templateName, map );
 }
 
+BaseHandle Builder::CreateFromJson( const std::string& json )
+{
+  return GetImpl(*this).CreateFromJson( json );
+}
+
 bool Builder::ApplyStyle( const std::string& styleName, Handle& handle )
 {
   return GetImpl(*this).ApplyStyle( styleName, handle );
+}
+
+bool Builder::ApplyFromJson( Handle& handle, const std::string& json )
+{
+  return GetImpl(*this).ApplyFromJson( handle, json );
 }
 
 void Builder::AddActors( Actor toActor )

@@ -85,9 +85,19 @@ void ScrollViewTwistEffect::SetMaxSwingAngle(const Vector2& maxSwingAngle)
   GetImpl(*this).SetMaxSwingAngle(maxSwingAngle);
 }
 
+Vector2 ScrollViewTwistEffect::GetMaxSwingAngle() const
+{
+  return GetImpl( *this ).GetMaxSwingAngle();
+}
+
 void ScrollViewTwistEffect::SetSwingDropOff(const Vector2& dropOff, const Vector2& distance, AlphaFunction function)
 {
   GetImpl(*this).SetSwingDropOff(dropOff, distance, function);
+}
+
+void ScrollViewTwistEffect::GetSwingDropOff( Vector2& dropOff, Vector2& distance, AlphaFunction& function ) const
+{
+  GetImpl(*this).GetSwingDropOff(dropOff, distance, function);
 }
 
 } // namespace Toolkit

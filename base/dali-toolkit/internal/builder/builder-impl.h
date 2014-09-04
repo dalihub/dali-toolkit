@@ -129,6 +129,16 @@ public:
   BaseHandle Create( const std::string& templateName, const PropertyValueMap& map );
 
   /**
+   * @copydoc Toolkit::Builder::CreateFromJson( const std::string& json );
+   */
+  BaseHandle CreateFromJson( const std::string& json );
+
+  /**
+   * @copydoc Toolkit::Builder::ApplyFromJson( Handle& handle, const std::string& json );
+   */
+  bool ApplyFromJson(  Handle& handle, const std::string& json );
+
+  /**
    * @copydoc Toolkit::Builder::ApplyStyle
    */
   bool ApplyStyle( const std::string& styleName, Handle& handle );

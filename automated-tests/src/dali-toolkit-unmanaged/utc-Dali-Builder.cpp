@@ -381,3 +381,51 @@ int UtcDaliBuilderSetProperty(void)
 
   END_TEST;
 }
+
+int UtcDaliBuilderCreateFromJson(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliBuilderCreateFromJson");
+
+  Builder builder = Builder::New();
+
+  TextActor actor = TextActor::DownCast( builder.CreateFromJson("foobar") );
+
+  DALI_TEST_CHECK( !actor );
+
+  actor = TextActor::DownCast(
+    builder.CreateFromJson(
+      ReplaceQuotes("{'type':'TextActor','text':'Hi'}") ) );
+
+  DALI_TEST_CHECK( actor );
+
+  DALI_TEST_CHECK( actor.GetText() == "Hi" );
+
+  END_TEST;
+}
+
+int UtcDaliBuilderApplyFromJson(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliBuilderApplyFromJson");
+
+  Builder builder = Builder::New();
+
+  TextActor actor = TextActor::DownCast(
+    builder.CreateFromJson(
+      ReplaceQuotes("{'type':'TextActor','text':'Hi'}") ) );
+
+  DALI_TEST_CHECK( actor );
+
+  DALI_TEST_CHECK( actor.GetText() == "Hi" );
+
+  DALI_TEST_CHECK( !builder.ApplyFromJson(actor, ReplaceQuotes("foobar") ) );
+
+  builder.ApplyFromJson(actor, ReplaceQuotes("{'text':'low'}") );
+
+  DALI_TEST_CHECK( actor.GetText() == "low" );
+
+  END_TEST;
+}

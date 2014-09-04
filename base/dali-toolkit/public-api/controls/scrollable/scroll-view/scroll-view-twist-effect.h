@@ -130,6 +130,13 @@ public:
   void SetMaxSwingAngle(const Vector2& maxSwingAngle);
 
   /**
+   * @brief Retrieve the maximum swing angle when at zero drop off.
+   *
+   * @return The maximum swing angle for x and y axes
+   */
+  Vector2 GetMaxSwingAngle() const;
+
+  /**
    * @brief Set the drop off values to affect the amount of swing
    * angle applied to an actor the further it is from the scroll
    * position.
@@ -145,6 +152,15 @@ public:
    * @param[in] function Alpha Function to affect how drop off is applied over distance, NULL for linear application
    */
   void SetSwingDropOff(const Vector2& dropOff, const Vector2& distance, AlphaFunction function = NULL);
+
+  /**
+   * @brief Get the drop off values that affect the amount of swing angle that is applied to an actor.
+   *
+   * @param[out]  dropOff   The current drop-off amount.
+   * @param[out]  distance  The current distance to apply drop-off in pixels.
+   * @param[out]  function  The current alpha function used to affect how the drop iff is applied over the distance.
+   */
+  void GetSwingDropOff( Vector2& dropOff, Vector2& distance, AlphaFunction& function ) const;
 
 protected:
 

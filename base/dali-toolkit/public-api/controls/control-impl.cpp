@@ -76,6 +76,12 @@ TypeRegistration CONTROL_TYPE( typeid(Control), typeid(CustomActor), Create );
 
 TypeAction ACTION_TYPE_1( CONTROL_TYPE, Toolkit::Control::ACTION_CONTROL_ACTIVATED, &Internal::Control::DoAction );
 
+SignalConnectorType SIGNAL_CONNECTOR_1( CONTROL_TYPE, Toolkit::Control::SIGNAL_KEY_EVENT,     &Internal::Control::DoConnectSignal );
+SignalConnectorType SIGNAL_CONNECTOR_2( CONTROL_TYPE, Toolkit::Control::SIGNAL_TAPPED,        &Internal::Control::DoConnectSignal );
+SignalConnectorType SIGNAL_CONNECTOR_3( CONTROL_TYPE, Toolkit::Control::SIGNAL_PANNED,        &Internal::Control::DoConnectSignal );
+SignalConnectorType SIGNAL_CONNECTOR_4( CONTROL_TYPE, Toolkit::Control::SIGNAL_PINCHED,       &Internal::Control::DoConnectSignal );
+SignalConnectorType SIGNAL_CONNECTOR_5( CONTROL_TYPE, Toolkit::Control::SIGNAL_LONG_PRESSED,  &Internal::Control::DoConnectSignal );
+
 /**
  * Structure which holds information about the background of a control
  */
@@ -945,6 +951,50 @@ bool Control::DoAction(BaseObject* object, const std::string& actionName, const 
   return ret;
 }
 
+bool Control::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+{
+  Dali::BaseHandle handle( object );
+
+  bool connected( false );
+  Toolkit::Control control = Toolkit::Control::DownCast(handle);
+  if ( control )
+  {
+    Control& controlImpl( control.GetImplementation() );
+    connected = true;
+
+    if ( Toolkit::Control::SIGNAL_KEY_EVENT == signalName )
+    {
+      controlImpl.KeyEventSignal().Connect( tracker, functor );
+    }
+    else if( Toolkit::Control::SIGNAL_TAPPED == signalName )
+    {
+      controlImpl.EnableGestureDetection( Gesture::Tap );
+      controlImpl.GetTapGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else if( Toolkit::Control::SIGNAL_PANNED == signalName )
+    {
+      controlImpl.EnableGestureDetection( Gesture::Pan );
+      controlImpl.GetPanGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else if( Toolkit::Control::SIGNAL_PINCHED == signalName )
+    {
+      controlImpl.EnableGestureDetection( Gesture::Pinch );
+      controlImpl.GetPinchGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else if( Toolkit::Control::SIGNAL_LONG_PRESSED == signalName )
+    {
+      controlImpl.EnableGestureDetection( Gesture::LongPress );
+      controlImpl.GetLongPressGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else
+    {
+      // signalName does not match any signal
+      connected = false;
+    }
+  }
+  return connected;
+}
+
 void Control::DoStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
 {
   if( change.themeChange )
@@ -1278,11 +1328,6 @@ void Control::SignalConnected( SlotObserver* slotObserver, CallbackBase* callbac
 void Control::SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback )
 {
   mImpl->SignalDisconnected( slotObserver, callback );
-}
-
-std::size_t Control::GetConnectionCount() const
-{
-  return mImpl->GetConnectionCount();
 }
 
 Control::Control( ControlBehaviour behaviourFlags )
