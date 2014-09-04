@@ -245,8 +245,6 @@ private:
 
   BuilderMap mBuilderCache;           ///< Cache of builders keyed by JSON file name
 
-  bool mSetThemeConnection;           ///< Has the callback to set the theme been set
-
   // Signals
   Toolkit::StyleManager::StyleChangeSignalType       mStyleChangeSignal;         ///< Emitted when the style( theme/font ) changes
 };
