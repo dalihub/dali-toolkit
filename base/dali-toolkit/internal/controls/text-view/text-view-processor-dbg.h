@@ -19,8 +19,9 @@
  */
 
 // INTERNAL INCLUDES
-#include "text-view-processor-types.h"
 #include <dali/integration-api/debug.h>
+#include <dali-toolkit/public-api/markup-processor/markup-processor.h>
+#include <dali-toolkit/internal/controls/text-view/text-view-processor-types.h>
 
 namespace Dali
 {

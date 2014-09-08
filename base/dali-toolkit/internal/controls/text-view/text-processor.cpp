@@ -15,12 +15,11 @@
  *
  */
 
+// FILE HEADER
+#include <dali-toolkit/internal/controls/text-view/text-processor.h>
+
 // EXTERNAL INCLUDES
 #include <fribidi/fribidi.h>
-
-// INTERNAL INCLUDES
-
-#include <dali-toolkit/public-api/markup-processor/markup-processor.h>
 
 namespace Dali
 {

@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
+#include <dali/public-api/actors/renderable-actor.h>
 #include <dali-toolkit/public-api/markup-processor/markup-processor.h>
 
 namespace Dali

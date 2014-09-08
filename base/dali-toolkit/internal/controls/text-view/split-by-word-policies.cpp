@@ -16,16 +16,12 @@
  */
 
 // FILE HEADER
-
-#include "split-by-word-policies.h"
-
-// EXTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/text-view/split-by-word-policies.h>
 
 // INTERNAL INCLUDES
-
-#include "relayout-utilities.h"
-#include "text-view-processor.h"
 #include <dali/integration-api/debug.h>
+#include <dali-toolkit/internal/controls/text-view/relayout-utilities.h>
+#include <dali-toolkit/internal/controls/text-view/text-view-processor.h>
 
 namespace Dali
 {

@@ -16,16 +16,15 @@
  */
 
 // CLASS HEADER
-#include "text-view-impl.h"
+#include <dali-toolkit/internal/controls/text-view/text-view-impl.h>
 
 // INTERNAL INCLUDES
-#include "split-by-new-line-char-policies.h"
-#include "split-by-word-policies.h"
-#include "split-by-char-policies.h"
-#include "text-view-processor.h"
-#include "text-view-word-processor.h"
-#include "relayout-utilities.h"
-#include "text-view-processor-dbg.h"
+#include <dali-toolkit/internal/controls/text-view/split-by-new-line-char-policies.h>
+#include <dali-toolkit/internal/controls/text-view/split-by-word-policies.h>
+#include <dali-toolkit/internal/controls/text-view/split-by-char-policies.h>
+#include <dali-toolkit/internal/controls/text-view/text-view-processor.h>
+#include <dali-toolkit/internal/controls/text-view/text-view-word-processor.h>
+#include <dali-toolkit/internal/controls/text-view/relayout-utilities.h>
 
 namespace Dali
 {
