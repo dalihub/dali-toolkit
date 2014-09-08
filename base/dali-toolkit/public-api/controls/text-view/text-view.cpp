@@ -16,11 +16,9 @@
  */
 
 // CLASS HEADER
-
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>
 
 // INTERNAL INCLUDES
-
 #include <dali-toolkit/internal/controls/text-view/text-view-impl.h>
 
 namespace Dali

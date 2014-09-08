@@ -16,12 +16,11 @@
  */
 
 // FILE HEADER
-#include "text-view-word-processor.h"
+#include <dali-toolkit/internal/controls/text-view/text-view-word-processor.h>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
-#include "text-view-processor-helper-functions.h"
-#include "text-view-processor-dbg.h"
+#include <dali-toolkit/internal/controls/text-view/text-view-processor-helper-functions.h>
+#include <dali-toolkit/internal/controls/text-view/text-view-processor-dbg.h>
 
 namespace Dali
 {

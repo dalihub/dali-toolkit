@@ -15,8 +15,11 @@
  *
  */
 
+// FILE HEADER
+#include <dali-toolkit/internal/controls/text-view/text-view-processor-dbg.h>
+
 // INTERNAL INCLUDES
-#include "text-view-processor-dbg.h"
+#include <dali/public-api/actors/text-actor.h>
 
 namespace Dali
 {

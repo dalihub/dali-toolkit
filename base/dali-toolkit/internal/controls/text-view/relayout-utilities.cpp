@@ -16,18 +16,13 @@
  */
 
 // FILE HEADER
-#include "relayout-utilities.h"
+#include <dali-toolkit/internal/controls/text-view/relayout-utilities.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/text-view/text-view-processor-helper-functions.h>
 
 // EXTERNAL INCLUDES
 #include <cmath>
-
-// INTERNAL INCLUDES
-#include <dali/dali.h>
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
-#include "text-view-line-processor.h"
-#include "text-view-word-processor.h"
-#include "text-view-processor-helper-functions.h"
-#include "text-view-processor-dbg.h"
 
 namespace Dali
 {

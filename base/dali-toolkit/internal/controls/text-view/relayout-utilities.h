@@ -19,11 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/alignment/alignment.h>
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
-
-#include "text-view-impl.h"
-#include "text-view-processor-types.h"
+#include <dali-toolkit/internal/controls/text-view/text-view-impl.h>
+#include <dali-toolkit/internal/controls/text-view/text-view-processor-types.h>
 
 namespace Dali
 {
