@@ -40,8 +40,6 @@ public:
   virtual Dali::Any GetSurface() { return Dali::Any(); }
   virtual Dali::Any GetDisplay() { return Dali::Any(); }
   virtual PositionSize GetPositionSize() const { return PositionSize(0, 0, 640, 480);}
-  virtual void SetRenderMode(RenderMode mode){}
-  virtual RenderMode GetRenderMode() const { return RenderSurface::RENDER_60FPS; }
 };
 
 typedef Dali::Rect<int> PositionSize;
