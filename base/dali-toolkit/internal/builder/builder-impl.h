@@ -178,6 +178,16 @@ public:
    */
   FrameBufferImage GetFrameBufferImage( const std::string &name, const Replacement& constant );
 
+  /**
+   * @copydoc Toolkit::Builder::QuitSignal
+   */
+  Toolkit::Builder::Signal& QuitSignal();
+
+  /**
+   * Emits the quit signal
+   */
+  void EmitQuitSignal();
+
 protected:
 
   virtual ~Builder();
@@ -225,6 +235,7 @@ private:
 
   void SetProperties( const TreeNode& node, Handle& handle, const Replacement& constant );
 
+  Toolkit::Builder::Signal mQuitSignal;
 };
 
 } // namespace Internal
