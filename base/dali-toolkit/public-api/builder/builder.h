@@ -398,6 +398,18 @@ class Builder : public BaseHandle
    */
   FrameBufferImage GetFrameBufferImage( const std::string &name );
 
+  // Signals
+
+  /**
+   * @brief Builder signal type
+   */
+  typedef SignalV2< void () > Signal;
+
+  /**
+   * @brief Signal emitted when a quit action is requested by the builder.
+   */
+  Signal& QuitSignal();
+
 private:
   Builder(Internal::Builder *impl);
 

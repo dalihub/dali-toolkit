@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <sys/stat.h>
+#include <boost/function.hpp>
 #include <sstream>
 
 // INTERNAL INCLUDES
@@ -49,8 +50,8 @@ extern bool SetPropertyFromNode( const TreeNode& node, Property::Value& value );
 extern bool SetPropertyFromNode( const TreeNode& node, Property::Value& value, const Replacement& replacements );
 extern bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value );
 extern bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value, const Replacement& replacements );
-extern Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor);
-extern Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor);
+extern Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction);
+extern Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction);
 extern Actor SetupActor( const TreeNode& node, Actor& actor, const Replacement& constant );
 
 #if defined(DEBUG_ENABLED)
@@ -208,6 +209,23 @@ void CollectAllStyles( const TreeNode& stylesCollection, const TreeNode& style, 
   }
 }
 
+struct QuitAction
+{
+public:
+  QuitAction( Builder& builder )
+  : mBuilder( builder )
+  {
+  }
+
+  void operator()(void)
+  {
+    mBuilder.EmitQuitSignal();
+  }
+
+private:
+  Builder& mBuilder;
+};
+
 } // namespace anon
 
 /*
@@ -335,9 +353,9 @@ void Builder::ApplyProperties( const TreeNode& root, const TreeNode& node,
       SetupActor( node, actor, constant );
 
       // add signals
-      SetupSignalAction( mSlotDelegate.GetConnectionTracker(), root, node, actor );
-
-      SetupPropertyNotification( mSlotDelegate.GetConnectionTracker(), root, node, actor );
+      QuitAction quitAction( *this );
+      SetupSignalAction( mSlotDelegate.GetConnectionTracker(), root, node, actor, quitAction );
+      SetupPropertyNotification( mSlotDelegate.GetConnectionTracker(), root, node, actor, quitAction );
    }
   }
   else
@@ -724,6 +742,16 @@ FrameBufferImage Builder::GetFrameBufferImage( const std::string &name, const Re
   }
 
   return ret;
+}
+
+Toolkit::Builder::Signal& Builder::QuitSignal()
+{
+  return mQuitSignal;
+}
+
+void Builder::EmitQuitSignal()
+{
+  mQuitSignal.Emit();
 }
 
 void Builder::AddActors( Actor toActor )
