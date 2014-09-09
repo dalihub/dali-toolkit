@@ -104,6 +104,26 @@ float ScrollBar::GetIndicatorFixedHeight()
   return GetImpl(*this).GetIndicatorFixedHeight();
 }
 
+void ScrollBar::SetIndicatorShowDuration( float durationSeconds )
+{
+  GetImpl(*this).SetIndicatorShowDuration(durationSeconds);
+}
+
+float ScrollBar::GetIndicatorShowDuration()
+{
+  return GetImpl(*this).GetIndicatorShowDuration();
+}
+
+void ScrollBar::SetIndicatorHideDuration( float durationSeconds )
+{
+  GetImpl(*this).SetIndicatorHideDuration(durationSeconds);
+}
+
+float ScrollBar::GetIndicatorHideDuration()
+{
+  return GetImpl(*this).GetIndicatorHideDuration();
+}
+
 void ScrollBar::Show()
 {
   GetImpl(*this).Show();
