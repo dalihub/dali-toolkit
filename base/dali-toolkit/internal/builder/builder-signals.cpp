@@ -43,17 +43,6 @@ using namespace Dali;
 // Signal Actions
 //
 
-// Action quit; connected to signals
-// TODO: MOVE TO BUILDER TEMPLATE
-struct ActionQuit
-{
-  ActionQuit(void) {};
-
-  void operator()(void) {
-    // Dali::Application::Get().Quit();
-  };
-};
-
 // Action on child actor. The child is found by alias so can be 'previous' etc.
 struct ChildActorAction
 {
@@ -233,7 +222,7 @@ void DoNothing(void) {};
 /**
  * Get an action as boost function callback
  */
-boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &child, Actor actor)
+boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction)
 {
   OptionalString childActorName(IsString( IsChild(&child, "child-actor")) );
   OptionalString actorName(IsString( IsChild(&child, "actor")) );
@@ -279,7 +268,7 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
   }
   else if("quit" == *actionName)
   {
-    callback = ActionQuit();
+    callback = quitAction;
   }
   else if("play" == *actionName)
   {
@@ -383,7 +372,7 @@ Actor SetupPropertyNotification(const TreeNode &child, Actor actor);
 /**
  * Setup signals and actions on an actor
  */
-Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor)
+Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction)
 {
   DALI_ASSERT_ALWAYS(actor);
 
@@ -400,7 +389,7 @@ Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const 
       OptionalString name( IsString( IsChild( key_child.second, "name")) );
       DALI_ASSERT_ALWAYS(name && "Signal must have a name");
 
-      boost::function<void (void)> callback = GetAction(root, key_child.second, actor);
+      boost::function<void (void)> callback = GetAction(root, key_child.second, actor, quitAction);
 
       actor.ConnectSignal(tracker, *name, callback);
     }
@@ -412,7 +401,7 @@ Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const 
 /**
  * Setup Property notifications for an actor
  */
-Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor)
+Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction)
 {
   DALI_ASSERT_ALWAYS(actor);
 
@@ -426,7 +415,7 @@ Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root
 
       // Actor actions reference by pointer because of circular reference actor->signal
       // So this callback should only go onto the actor maintained list.
-      boost::function<void (void)> callback = GetAction(root, key_child.second, actor);
+      boost::function<void (void)> callback = GetAction(root, key_child.second, actor, quitAction);
 
       OptionalString prop(IsString( IsChild(key_child.second, "property")) );
       DALI_ASSERT_ALWAYS(prop && "Notification signal must specify a property");

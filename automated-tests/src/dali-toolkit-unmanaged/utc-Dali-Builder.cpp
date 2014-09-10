@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/public-api/builder/builder.h>
+#include <dali/integration-api/events/touch-event-integ.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -158,6 +159,21 @@ std::string ReplaceQuotes(const std::string &in_s)
   std::replace(s.begin(), s.end(), '\'', '"');
   return s;
 }
+
+struct BuilderFunctor
+{
+  BuilderFunctor( bool& called ) : mCalled( called )
+  {
+    mCalled = false;
+  }
+
+  void operator()()
+  {
+    mCalled = true;
+  }
+
+  bool& mCalled;
+};
 
 } // namespace
 
@@ -426,6 +442,47 @@ int UtcDaliBuilderApplyFromJson(void)
   builder.ApplyFromJson(actor, ReplaceQuotes("{'text':'low'}") );
 
   DALI_TEST_CHECK( actor.GetText() == "low" );
+
+  END_TEST;
+}
+
+int UtcDaliBuilderQuitSignal(void)
+{
+  ToolkitTestApplication application;
+
+  // JSON with a quit event when the actor is touched
+  std::string json(
+      "{"
+         "\"stage\":"
+         "[{"
+           "\"type\": \"Actor\","
+           "\"size\": [100,100,1],"
+           "\"parent-origin\": \"TOP_LEFT\","
+           "\"anchor-point\": \"TOP_LEFT\","
+           "\"signals\": [{"
+             "\"name\": \"touched\","
+             "\"action\": \"quit\""
+           "}]"
+         "}]"
+      "}"
+  );
+  Builder builder = Builder::New();
+  builder.LoadFromString( json );
+  builder.AddActors ( Stage::GetCurrent().GetRootLayer() );
+
+  // Connect to builder's quit signal
+  bool functorCalled( false );
+  builder.QuitSignal().Connect( &application, BuilderFunctor( functorCalled ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit touch event and check that our quit method is called
+  Integration::TouchEvent touchEvent;
+  touchEvent.points.push_back( TouchPoint ( 0, TouchPoint::Down, 10.0f, 10.0f ) );
+  application.ProcessEvent( touchEvent );
+  DALI_TEST_CHECK( functorCalled );
 
   END_TEST;
 }

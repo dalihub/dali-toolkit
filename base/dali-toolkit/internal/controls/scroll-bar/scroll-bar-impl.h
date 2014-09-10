@@ -113,6 +113,26 @@ public:
   float GetIndicatorFixedHeight();
 
   /**
+   * @copydoc Toolkit::ScrollBar::SetIndicatorShowDuration()
+   */
+  void SetIndicatorShowDuration( float durationSeconds );
+
+  /**
+   * @copydoc Toolkit::ScrollBar::GetIndicatorShowDuration()
+   */
+  float GetIndicatorShowDuration();
+
+  /**
+   * @copydoc Toolkit::ScrollBar::SetIndicatorHideDuration()
+   */
+  void SetIndicatorHideDuration( float durationSeconds );
+
+  /**
+   * @copydoc Toolkit::ScrollBar::GetIndicatorHideDuration()
+   */
+  float GetIndicatorHideDuration();
+
+  /**
    * @copydoc Toolkit::ScrollBar::Show()
    */
   void Show();
@@ -202,6 +222,9 @@ private:
   ImageActor mBackground;                                            ///< Background image of scroll bar.
   ImageActor mIndicator;                                             ///< Image of scroll indicator.
   Animation mAnimation;                                              ///< Scroll indicator Show/Hide Animation.
+
+  float mIndicatorShowDuration;                                     ///< The duration of scroll indicator show animation
+  float mIndicatorHideDuration;                                     ///< The duration of scroll indicator hide animation
 
   float mScrollStart;                                               ///< Scroll Start position (start of drag)
   Vector3 mGestureDisplacement;                                      ///< Gesture Displacement.

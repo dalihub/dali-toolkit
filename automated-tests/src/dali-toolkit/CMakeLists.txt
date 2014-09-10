@@ -43,6 +43,7 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-imf-manager.cpp
    dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
    dali-toolkit-test-utils/toolkit-style-monitor.cpp
+   dali-toolkit-test-utils/toolkit-singleton-service.cpp
    dali-toolkit-test-utils/toolkit-timer.cpp
    dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
    dali-toolkit-test-utils/dummy-control.cpp

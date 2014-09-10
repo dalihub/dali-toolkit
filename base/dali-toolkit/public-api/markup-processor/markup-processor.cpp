@@ -18,10 +18,6 @@
 // HEADER INCLUDE
 #include <dali-toolkit/public-api/markup-processor/markup-processor.h>
 
-// INTERNAL INCLUDES
-#include <dali/public-api/text/text.h>
-
-
 // EXTERNAL INCLUDES
 #include <stack>
 #include <sstream>

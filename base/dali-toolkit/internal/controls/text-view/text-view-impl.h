@@ -19,13 +19,10 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-vector.h>
-
-#include <dali/public-api/actors/text-actor.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>
-#include "text-actor-cache.h"
-#include "text-view-processor-types.h"
+#include <dali-toolkit/internal/controls/text-view/text-actor-cache.h>
+#include <dali-toolkit/internal/controls/text-view/text-view-processor-types.h>
 
 namespace Dali
 {

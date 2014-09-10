@@ -19,8 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include "text-view-impl.h"
-#include "text-view-processor-types.h"
+#include <dali-toolkit/internal/controls/text-view/text-view-impl.h>
 
 namespace Dali
 {
