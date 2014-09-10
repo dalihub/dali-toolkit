@@ -2635,6 +2635,8 @@ void TextInput::DeleteHighlightedText( bool inheritStyle )
 
     RemoveHighlight();
 
+    EmitTextModified();
+
     if( inheritStyle )
     {
       const TextStyle oldInputStyle( mInputStyle );
@@ -4802,6 +4804,7 @@ void TextInput::PasteText( const Text& text )
   if( update )
   {
     CursorUpdate();
+    EmitTextModified();
   }
 
   if( insertedStringLength < text.GetLength() )
