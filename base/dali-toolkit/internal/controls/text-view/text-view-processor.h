@@ -97,7 +97,7 @@ void UpdateTextInfo( std::size_t position,
  * Updates the layout data structure by modifying the space between lines.
  *
  * @param[in] lineHeightOffset The new space between lines.
- * @param[in,out] textLayoutInfo Layout info for all groups of characters, words, groups of words, lines and the whole text.
+ * @param[in,out] textLayoutInfo Layout info for all characters, words, lines and the whole text.
  */
 void UpdateTextInfo( float lineHeightOffset,
                      TextLayoutInfo& textLayoutInfo );

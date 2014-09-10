@@ -39,7 +39,7 @@ namespace TextViewProcessor
  * @param[in,out] lineLayoutInfo The line layout info.
  * @param[in] lineHeightOffset The line height offset.
  */
-void UpdateLineLayoutInfo( TextViewProcessor::LineLayoutInfo& lineLayoutInfo, float lineHeightOffset );
+void UpdateLineLayoutInfo( LineLayoutInfo& lineLayoutInfo, float lineHeightOffset );
 
 /**
  * Creates a data structure with info to layout the line, and data structures with useful info to modify the layout data structure if characters are added or removed.
@@ -50,32 +50,57 @@ void UpdateLineLayoutInfo( TextViewProcessor::LineLayoutInfo& lineLayoutInfo, fl
  */
 void CreateLineInfo( const MarkupProcessor::StyledTextArray& line,
                      TextView::RelayoutData& relayoutData,
-                     TextViewProcessor::LineLayoutInfo& lineLayoutInfo );
+                     LineLayoutInfo& lineLayoutInfo );
 
 /**
- * Removes a given number of groups of words from the given line.
+ * Removes a given number of words from the given line.
  *
- * @pre \e groupIndex and \e groupIndex + \e numberOfGroups can't exceed the bounds of the line.
+ * @pre \e wordIndex and \e wordIndex + \e numberOfWords can't exceed the bounds of the line.
  *
- * @param[in] groupIndex Index to the group of words within the line with the starting position to be deleted.
- * @param[in] numberOfGroups The number of group of words to be deleted.
+ * @param[in] wordIndex Index to the word within the line with the starting position to be deleted.
+ * @param[in] numberOfWords The number of words to be deleted.
  * @param[in] lineHeightOffset Additional space between lines. Needed to update layout info.
- * @param[in,out] lineLayout The input is the layout info of the line. The output is the layout info of the line without the removed group of words.
+ * @param[in,out] lineLayout The input is the layout info of the line. The output is the layout info of the line without the removed words.
  */
-void RemoveWordGroupsFromLine( std::size_t groupIndex,
-                               std::size_t numberOfGroups,
-                               const PointSize& lineHeightOffset,
-                               LineLayoutInfo& lineLayout );
+void RemoveWordsFromLine( std::size_t wordIndex,
+                          std::size_t numberOfWords,
+                          float lineHeightOffset,
+                          LineLayoutInfo& lineLayout );
+
+/**
+ * @param[in,out] relayoutData Natural size (metrics), layout, text-actor info.
+ * @param[in] numberOfCharacters The number of characters to be deleted.
+ * @param[out] mergeWords Whether words need to be merged after removing characters.
+ * @param[out] mergeLines Whether current line need to be merged with the next one.
+ * @param[in,out] textInfoIndicesBegin Indices to the line, word and characters from where to delete characters. It returns from where words need to be removed.
+ * @param[out] textInfoIndicesEnd If lines or words need to be merged it returns info to delete them (If a word is merged, it has to be removed. Equal for lines).
+ * @param[out] textInfoMergeIndicesBegin The indices to the first part of the line and word to be merged.
+ * @param[out] textInfoMergeIndicesEnd The indices to the last part of the line and word to be merged.
+ * @param[in,out] lineLayout Layout info of the line where the word is located.
+ * @param[out] removedTextActorsFromFirstWord Stores removed text-actors of the word pointed by the 'begin' index.
+ * @param[out] removedTextActorsFromLastWord Stores removed text-actors of the word pointed by the 'end' index.
+ */
+void RemoveCharactersFromLineInfo( TextView::RelayoutData& relayoutData,
+                                   std::size_t numberOfCharacters,
+                                   bool& mergeWords,
+                                   bool& mergeLines,
+                                   TextInfoIndices& textInfoIndicesBegin,
+                                   TextInfoIndices& textInfoIndicesEnd,
+                                   TextInfoIndices& textInfoMergeIndicesBegin,
+                                   TextInfoIndices& textInfoMergeIndicesEnd,
+                                   LineLayoutInfo& lineLayout,
+                                   std::vector<TextActor>& removedTextActorsFromFirstWord,
+                                   std::vector<TextActor>& removedTextActorsFromLastWord );
 
 /**
  * Splits a given line in two.
  *
  * @note It deletes whatever there is in the last part of the line.
  *
- * @param[in] indices Index to the group of words within the line, index to the word and index to the character within the word to split the line.
+ * @param[in] indices Index to the word within the line and index to the character within the word to split the line.
  * @param[in] lineHeightOffset Additional space between lines. Needed to update layout info.
- * @param[in,out] firstLineLayoutInfo The input is the layout info of the given line. The output is the first part of the input line (from the group of words \e 0 to the group of words \e groupPosition).
- * @param[in,out] lastLineLayoutInfo Layout info of the last part of the given line ( from the group of words \e groupPosition + \e 1 to the end of the line).
+ * @param[in,out] firstLineLayoutInfo The input is the layout info of the given line. The output is the first part of the input line.
+ * @param[in,out] lastLineLayoutInfo Layout info of the last part of the given line.
  */
 void SplitLine( const TextInfoIndices& indices,
                 const PointSize& lineHeightOffset,
@@ -83,11 +108,11 @@ void SplitLine( const TextInfoIndices& indices,
                 LineLayoutInfo& lastLineLayoutInfo );
 
 /**
- * Merges the two given lines by adding groups of words of the last line to the firs one.
+ * Merges the two given lines by adding words of the last line to the firs one.
  *
  * @note Does nothing if last part of the line is empty.
  * @note If the first part of the line is empty it just copy the last part to it.
- * @note it asserts if the last word of the first group is a line separator (new line character)
+ * @note it asserts if the last word of the first line is a line separator (new line character)
  *
  * @param[in,out] firstLineLineLayoutInfo The input is the layout info of the first line. The output is the layout info of the merged line.
  * @param[in] lastLineLayoutInfo Layout info of the last line.

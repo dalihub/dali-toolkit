@@ -35,15 +35,6 @@ namespace TextViewProcessor
 {
 
 /**
- * Whether the direction is Right To Left or Left To Right.
- */
-enum Direction
-{
-  LTR, ///< Left To Right direction.
-  RTL  ///< Right To Left direction.
-};
-
-/**
  * Whether the text is a new line character, a white space or normal text.
  */
 enum TextSeparatorType
@@ -77,7 +68,6 @@ struct TextInfoIndices
    * Constructor.
    */
   TextInfoIndices( std::size_t lineIndex,
-                   std::size_t groupIndex,
                    std::size_t wordIndex,
                    std::size_t characterIndex );
 
@@ -90,7 +80,6 @@ struct TextInfoIndices
   bool operator==( const TextInfoIndices& indices ) const;
 
   std::size_t mLineIndex;
-  std::size_t mGroupIndex;
   std::size_t mWordIndex;
   std::size_t mCharacterIndex;
 };
@@ -175,36 +164,6 @@ struct WordLayoutInfo
 typedef std::vector<WordLayoutInfo> WordLayoutInfoContainer;
 
 /**
- * Layout information for a group of words.
- */
-struct WordGroupLayoutInfo
-{
-  /**
-   * Default constructor.
-   *
-   * Initializes all members to their default values.
-   */
-  WordGroupLayoutInfo();
-
-  /**
-   * Copy constructor.
-   */
-  WordGroupLayoutInfo( const WordGroupLayoutInfo& group );
-
-  /**
-   * Assignment operator.
-   */
-  WordGroupLayoutInfo& operator=( const WordGroupLayoutInfo& group );
-
-  Size                    mSize;               ///< Size of the group of words.
-  float                   mAscender;           ///< Max of all ascenders of all words.
-  Direction               mDirection;          ///< Whether this group of words is Right To Left or Left To Right.
-  WordLayoutInfoContainer mWordsLayoutInfo;    ///< Layout info for all words.
-  std::size_t             mNumberOfCharacters; ///< Stores the number of characters.
-};
-typedef std::vector<WordGroupLayoutInfo> WordGroupLayoutInfoContainer;
-
-/**
  * Layout information for a line.
  */
 struct LineLayoutInfo
@@ -226,11 +185,11 @@ struct LineLayoutInfo
    */
   LineLayoutInfo& operator=( const LineLayoutInfo& line );
 
-  Size                         mSize;                 ///< Size of the line.
-  float                        mAscender;             ///< Max of all ascenders of all groups of words.
-  float                        mLineHeightOffset;     ///< Line height offset.
-  WordGroupLayoutInfoContainer mWordGroupsLayoutInfo; ///< Layout info for all groups of words.
-  std::size_t                  mNumberOfCharacters;   ///< Stores the number of characters.
+  Size                    mSize;               ///< Size of the line.
+  float                   mAscender;           ///< Max of all ascenders of all words.
+  float                   mLineHeightOffset;   ///< Line height offset.
+  WordLayoutInfoContainer mWordsLayoutInfo;    ///< Layout info for all words.
+  std::size_t             mNumberOfCharacters; ///< Stores the number of characters.
 };
 typedef std::vector<LineLayoutInfo> LineLayoutInfoContainer;
 

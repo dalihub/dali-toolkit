@@ -423,8 +423,7 @@ private:
   TextView& operator=( const TextView& rhs );
 
   /**
-   * Executes synchronously relayout operations such as set, insert, remove or replace text, or
-   * split groups of characters, etc.
+   * Executes synchronously relayout operations such as set, insert, remove or replace text, etc.
    */
   void PerformTextViewProcessorOperations();
 

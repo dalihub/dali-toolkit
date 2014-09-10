@@ -108,7 +108,7 @@ public:
                          bool visible,
                          float descender );
 
-    Size    mSize;                     ///< Size of the group of characters.
+    Size    mSize;                     ///< Size of the character.
     Vector3 mPosition;                 ///< Position of the character within the text view.
     bool    mIsNewLineChar:1;          ///< Whether this character represent a new line.
     bool    mIsRightToLeftCharacter:1; ///< Whether it's a right-to-left character.

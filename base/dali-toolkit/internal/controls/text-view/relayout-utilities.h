@@ -87,7 +87,7 @@ struct RelayoutParameters
   Size                               mLineSize;                 ///< Current line's size.
   Size                               mWordSize;                 ///< Current word's size.
   Size                               mCharacterSize;            ///< Current character's size.
-  TextViewProcessor::TextInfoIndices mIndices;                  ///< Current indices to line, group of words, word and character.
+  TextViewProcessor::TextInfoIndices mIndices;                  ///< Current indices to line, word and character.
   std::size_t                        mCharacterGlobalIndex;     ///< Index to a single character within the whole text.
   bool                               mIsFirstCharacter:1;       ///< Whether is the first character of the whole text.
   bool                               mIsFirstCharacterOfWord:1; ///< Whether is the first character of the word.
@@ -251,7 +251,7 @@ struct SubLineLayoutInfo
  * Calculates the layout info of the portion of the line which fits on the text-view width.
  *
  * @param[in] parentWidth Text-view width
- * @param[in] indices Indices to the word group, word and character.
+ * @param[in] indices Indices to the word and character.
  * @param[in] lineLayoutInfo Layout info for the line.
  * @param[in] splitPolicy Whether a line is wraped by word, by character or by word and character.
  * @param[in] shrinkFactor Shrink factor used.
@@ -342,13 +342,14 @@ void CalculateBearing( TextViewProcessor::CharacterLayoutInfo& characterLayoutIn
  * This table is used to pass the size, the position and other layout info to other controls/actors.
  *
  * @param[in,out] minMaxXY The boundary box of the whole text.
+ * @param[in,out] wordLayoutInfo Word layout info.
  * @param[in,out] characterLayoutInfo Character layout info.
+ * @param[in,out] relayoutParameters Temporary layout parameters.
  * @param[in,out] relayoutData The text-view's data structures.
  */
 void UpdateLayoutInfoTable( Vector4& minMaxXY,
-                            TextViewProcessor::WordGroupLayoutInfo& wordGroupLayoutInfo,
                             TextViewProcessor::WordLayoutInfo& wordLayoutInfo,
-                            TextViewProcessor::CharacterLayoutInfo& characterGroupLayoutInfo,
+                            TextViewProcessor::CharacterLayoutInfo& characterLayoutInfo,
                             RelayoutParameters& relayoutParameters,
                             TextView::RelayoutData& relayoutData );
 

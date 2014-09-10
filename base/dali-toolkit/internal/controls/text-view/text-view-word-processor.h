@@ -40,7 +40,7 @@ namespace TextViewProcessor
  * @param[out] wordLayoutInfo Layout info for all characters of the word.
  */
 void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
-                         TextViewProcessor::WordLayoutInfo& wordLayoutInfo );
+                         WordLayoutInfo& wordLayoutInfo );
 
 /**
  * Removes a given number of characters from the given word.
@@ -56,20 +56,20 @@ void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
  * @param[out] mergeLines Whether current line need to be merged with the next one.
  * @param[in,out] textInfoIndicesBegin Indices to the line, word and characters from where to delete characters. It returns from where words need to be removed.
  * @param[out] textInfoIndicesEnd If lines or words need to be merged it returns info to delete them (If a word is merged, it has to be removed. Equal for lines).
- * @param[out] textInfoMergeIndicesBegin The indices to the first part of the line, group and word to be merged.
- * @param[out] textInfoMergeIndicesEnd The indices to the last part of the line, group and word to be merged.
- * @param[in,out] groupLayout Layout info of the group of words where the word is located.
+ * @param[out] textInfoMergeIndicesBegin The indices to the first part of the line and word to be merged.
+ * @param[out] textInfoMergeIndicesEnd The indices to the last part of the line and word to be merged.
+ * @param[in,out] lineLayout Layout info of the line where the word is located.
  * @param[out] removedTextActors Stores handles of temoved text-actors.
  */
 void RemoveCharactersFromWordInfo( TextView::RelayoutData& relayoutData,
                                    std::size_t numberOfCharacters,
                                    bool& mergeWords,
                                    bool& mergeLines,
-                                   TextViewProcessor::TextInfoIndices& textInfoIndicesBegin,
-                                   TextViewProcessor::TextInfoIndices& textInfoIndicesEnd,
-                                   TextViewProcessor::TextInfoIndices& textInfoMergeIndicesBegin,
-                                   TextViewProcessor::TextInfoIndices& textInfoMergeIndicesEnd,
-                                   TextViewProcessor::WordGroupLayoutInfo& groupLayout,
+                                   TextInfoIndices& textInfoIndicesBegin,
+                                   TextInfoIndices& textInfoIndicesEnd,
+                                   TextInfoIndices& textInfoMergeIndicesBegin,
+                                   TextInfoIndices& textInfoMergeIndicesEnd,
+                                   LineLayoutInfo& lineLayout,
                                    std::vector<TextActor>& removedTextActors );
 /**
  * Removes a given number of characters from the given word.
@@ -142,14 +142,14 @@ CharacterLayoutInfo GetLastCharacterLayoutInfo( const WordLayoutInfo& wordLayout
 void CollectTextActors( std::vector<TextActor>& textActors, const WordLayoutInfo& word, std::size_t characterIndexBegin, std::size_t characterIndexEnd );
 
 /**
- * Collects text-actors from the given group of words, within the given indices, and stores them into the text-actor vector.
+ * Collects text-actors from the given line, within the given indices, and stores them into the text-actor vector.
  *
- * @param[out] textActors Stores the text-actors of the given group of words.
- * @param[in] group The group of words.
+ * @param[out] textActors Stores the text-actors of the given line.
+ * @param[in] line The line with the words.
  * @param[in] wordIndexBegin Index to the first word.
  * @param[in] wordIndexEnd Index to the last word.
  */
-void CollectTextActorsFromWords( std::vector<TextActor>& textActors, const WordGroupLayoutInfo& group, std::size_t wordIndexBegin, std::size_t wordIndexEnd );
+void CollectTextActorsFromWords( std::vector<TextActor>& textActors, const LineLayoutInfo& line, std::size_t wordIndexBegin, std::size_t wordIndexEnd );
 
 } //namespace TextViewProcessor
 

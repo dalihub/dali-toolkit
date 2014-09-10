@@ -59,9 +59,9 @@ struct CalculateSubLineLayoutTest
   std::string description;
   std::string inputLine;
   float parentWidth;
-  std::size_t groupIndex;
   std::size_t wordIndex;
   std::size_t characterIndex;
+  std::size_t characterLineIndex;
   TextViewRelayout::HorizontalWrapType splitPolicy;
   float shrinkFactor;
 
@@ -87,7 +87,7 @@ bool TestCalculateSubLineLayout( const CalculateSubLineLayoutTest& test,  const 
   // Prepare input parameters and the result structure and call the function to be tested.
 
   // Creaqte indices.
-  TextViewProcessor::TextInfoIndices indices( 0, test.groupIndex, test.wordIndex, test.characterIndex );
+  TextViewProcessor::TextInfoIndices indices( 0u, test.wordIndex, test.characterIndex );
 
   // Get the input line.
   TextViewProcessor::LineLayoutInfo inputLineLayout;
@@ -239,7 +239,6 @@ int UtcDaliTextViewDefaultConstructorDestructor_RU(void)
   DALI_TEST_EQUALS( relayoutParameters.mWordSize, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( relayoutParameters.mCharacterSize, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( relayoutParameters.mIndices.mLineIndex, 0u, TEST_LOCATION );
-  DALI_TEST_EQUALS( relayoutParameters.mIndices.mGroupIndex, 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( relayoutParameters.mIndices.mWordIndex, 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( relayoutParameters.mIndices.mCharacterIndex, 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( relayoutParameters.mCharacterGlobalIndex, 0u, TEST_LOCATION );
@@ -329,8 +328,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line is wraped by character. All characters have the same size.",
       "Hello world", // input line
       100.f,         // parent width
+      0,             // indices
       0,
-      0,              // indices
       0,
       TextViewRelayout::WrapByCharacter, // split policy
       1.f,
@@ -343,8 +342,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line is wraped by character. There are characters with different sizes.",
       "Hello <font size='14'>world</font>", // input line
       100.f,         // parent width
-      0,
       0,              // indices
+      0,
       0,
       TextViewRelayout::WrapByCharacter, // split policy
       1.f,
@@ -357,9 +356,9 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line is wraped by character. There are characters with different sizes. It calculates the layout for the second line.",
       "Hello <font size='14'>wo</font>rld hell<font size='14'>o world</font>", // input line
       100.f,         // parent width
-      0,
       2,              // indices. The third character of the third word starts in a new line.
       2,
+      8,
       TextViewRelayout::WrapByCharacter, // split policy
       1.f,
       // results
@@ -371,9 +370,9 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line is wraped by character. There are characters with different sizes. It calculates the layout for the third line.",
       "Hello <font size='14'>wo</font>rld hell<font size='14'>o world</font>", // input line
       100.f,         // parent width
-      0,
       4,              // indices. The fifth character of the fifth word starts in a new line.
       4,
+      16,
       TextViewRelayout::WrapByCharacter, // split policy
       1.f,
       // results
@@ -387,8 +386,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line is wraped by word. All characters have the same size.",
       "Hello world", // input line
       100.f,         // parent width
-      0,
       0,              // indices. It shouldn't use the index character so 9999999 shouldn't make it crash.
+      9999999,
       9999999,
       TextViewRelayout::WrapByWord, // split policy
       1.f,
@@ -401,8 +400,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line is wraped by word. There are characters with different sizes.",
       "Hell<font size='14'>o</font> world", // input line
       100.f,         // parent width
-      0,
       0,              // indices.
+      0,
       0,
       TextViewRelayout::WrapByWord, // split policy
       1.f,
@@ -415,9 +414,9 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line is wraped by word. There are characters with different sizes. It calculates the layout for the second line.",
       "Hello <font size='14'>wo</font>rld <font size='16'>hello world</font>", // input line
       100.f,         // parent width
-      0,
       2,              // indices. The third word starts in a new line.
       0,
+      6,
       TextViewRelayout::WrapByWord, // split policy
       1.f,
       // results
@@ -429,8 +428,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line is wraped by word. The word doen't fit.",
       "Hello world", // input line
       40.f,          // parent width
-      0,
       0,              // indices. The third word starts in a new line.
+      0,
       0,
       TextViewRelayout::WrapByWord, // split policy
       1.f,
@@ -445,8 +444,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line is wraped by word and by character. All characters have the same size. There is not a long word.",
       "Hello world hello world", // input line
       100.f,         // parent width
-      0,
       0,              // indices.
+      0,
       0,
       TextViewRelayout::WrapByWordAndSplit, // split policy
       1.f,
@@ -459,8 +458,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line is wraped by word and by character. All characters have the same size. There is a long word.",
       "Helloooooooo world", // input line
       100.f,         // parent width
-      0,
       0,              // indices.
+      0,
       0,
       TextViewRelayout::WrapByWordAndSplit, // split policy
       1.f,
@@ -473,8 +472,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line is wraped by word and by character. There are characters with different sizes. There is a long word. It calculates the layout for the second line.",
       "Helloooooooo <font size='14'>world</font>", // input line
       100.f,         // parent width
-      0,
       0,              // indices.
+      8,
       8,
       TextViewRelayout::WrapByWordAndSplit, // split policy
       1.f,
@@ -487,8 +486,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line is wraped by word and by character. There are characters with different sizes. There is a shrink factor.",
       "Helloooooooo<font size='14'> world</font>", // input line
       100.f,         // parent width
-      0,
       0,              // indices.
+      8,
       8,
       TextViewRelayout::WrapByWordAndSplit, // split policy
       0.7f,
@@ -503,8 +502,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line is wraped by end of line and by character. All characters have the same size.",
       "Hello world", // input line
       100.f,         // parent width
-      0,
       0,              // indices
+      0,
       0,
       TextViewRelayout::WrapByLineAndSplit, // split policy
       1.f,
@@ -517,8 +516,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line fits in the width.",
       "Hello", // input line
       100.f,         // parent width
-      0,
       0,             // indices
+      0,
       0,
       TextViewRelayout::WrapByLineAndSplit, // split policy
       1.f,
@@ -531,9 +530,9 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       "The line is wraped by end of line and by character. All characters have the same size. It calculates the layout for the second line.",
       "Hello world, hello world", // input line
       100.f,         // parent width
-      0,
       2,             // indices
       2,
+      8,
       TextViewRelayout::WrapByLineAndSplit, // split policy
       1.f,
       // results

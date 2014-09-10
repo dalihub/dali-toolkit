@@ -55,7 +55,6 @@ int UtcDaliTextViewDefaultConstructorDestructor_PT(void)
 
   TextViewProcessor::TextInfoIndices indices;
   DALI_TEST_EQUALS( indices.mLineIndex, 0u, TEST_LOCATION );
-  DALI_TEST_EQUALS( indices.mGroupIndex, 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( indices.mWordIndex, 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( indices.mCharacterIndex, 0u, TEST_LOCATION );
 
@@ -85,18 +84,11 @@ int UtcDaliTextViewDefaultConstructorDestructor_PT(void)
   DALI_TEST_EQUALS( wordLayoutInfo.mType, TextViewProcessor::NoSeparator, TEST_LOCATION );
   DALI_TEST_EQUALS( wordLayoutInfo.mCharactersLayoutInfo.size(), 0u, TEST_LOCATION );
 
-  TextViewProcessor::WordGroupLayoutInfo wordGroupLayoutInfo;
-  DALI_TEST_EQUALS( wordGroupLayoutInfo.mSize, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( wordGroupLayoutInfo.mAscender, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( wordGroupLayoutInfo.mDirection, TextViewProcessor::LTR, TEST_LOCATION );
-  DALI_TEST_EQUALS( wordGroupLayoutInfo.mWordsLayoutInfo.size(), 0u, TEST_LOCATION );
-  DALI_TEST_EQUALS( wordGroupLayoutInfo.mNumberOfCharacters, 0u, TEST_LOCATION );
-
   TextViewProcessor::LineLayoutInfo lineLayoutInfo;
   DALI_TEST_EQUALS( lineLayoutInfo.mSize, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( lineLayoutInfo.mAscender, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( lineLayoutInfo.mLineHeightOffset, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( lineLayoutInfo.mWordGroupsLayoutInfo.size(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( lineLayoutInfo.mWordsLayoutInfo.size(), 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( lineLayoutInfo.mNumberOfCharacters, 0u, TEST_LOCATION );
 
   TextViewProcessor::TextLayoutInfo textLayoutInfo;
@@ -205,29 +197,6 @@ int UtcDaliTextViewCopyConstructorOperator(void)
   DALI_TEST_EQUALS( wordLayoutInfo2.mAscender, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( wordLayoutInfo2.mType, TextViewProcessor::LineSeparator, TEST_LOCATION );
 
-
-  TextViewProcessor::WordGroupLayoutInfo wordGroupLayoutInfo;
-  wordGroupLayoutInfo.mSize = Vector2( 1.f, 1.f );
-  wordGroupLayoutInfo.mAscender = 1.f;
-  wordGroupLayoutInfo.mDirection = TextViewProcessor::RTL;
-  wordGroupLayoutInfo.mNumberOfCharacters = 1u;
-
-  TextViewProcessor::WordGroupLayoutInfo wordGroupLayoutInfo1;
-  wordGroupLayoutInfo1 = wordGroupLayoutInfo;
-
-  DALI_TEST_EQUALS( wordGroupLayoutInfo.mSize, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( wordGroupLayoutInfo.mAscender, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( wordGroupLayoutInfo.mDirection, TextViewProcessor::RTL, TEST_LOCATION );
-  DALI_TEST_EQUALS( wordGroupLayoutInfo.mNumberOfCharacters, 1u, TEST_LOCATION );
-
-  TextViewProcessor::WordGroupLayoutInfo wordGroupLayoutInfo2( wordGroupLayoutInfo );
-
-  DALI_TEST_EQUALS( wordGroupLayoutInfo.mSize, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( wordGroupLayoutInfo.mAscender, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( wordGroupLayoutInfo.mDirection, TextViewProcessor::RTL, TEST_LOCATION );
-  DALI_TEST_EQUALS( wordGroupLayoutInfo.mNumberOfCharacters, 1u, TEST_LOCATION );
-
-
   TextViewProcessor::LineLayoutInfo lineLayoutInfo;
   lineLayoutInfo.mSize = Vector2( 1.f, 1.f );
   lineLayoutInfo.mAscender = 1.f;
@@ -279,7 +248,7 @@ int UtcDaliTextViewEqualityOperator(void)
   tet_infoline("UtcDaliTextViewEqualityOperator : ");
 
   TextViewProcessor::TextInfoIndices indices;
-  TextViewProcessor::TextInfoIndices indices1( 1u, 1u, 1u, 1u );
+  TextViewProcessor::TextInfoIndices indices1( 1u, 1u, 1u );
 
   DALI_TEST_CHECK( !( indices == indices1 ) );
 

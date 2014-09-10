@@ -85,12 +85,12 @@ bool ContainsRightToLeftCharacter( const MarkupProcessor::StyledTextArray& text 
  * Convert the text as specified by the Unicode Bidirectional Algorithm.
  * The text is converted only if it is bidirectional.
  * @param[in] line The line of text to be converted.
- * @param[out] convertedText The text converted. Text is grouped in chunks which only have one direction.
+ * @param[out] convertedText The text converted.
  * @param[out] logicalToVisualMap The character position map from the logical input text to the visual output text.
  * @param[out] visualToLogicalMap The character position map from the visual output text to the logical input text.
  */
  void ConvertBidirectionalText( const MarkupProcessor::StyledTextArray& line,
-                                std::vector<MarkupProcessor::StyledTextArray>& convertedText,
+                                MarkupProcessor::StyledTextArray& convertedText,
                                 std::vector<int>& logicalToVisualMap,
                                 std::vector<int>& visualToLogicalMap );
 

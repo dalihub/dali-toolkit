@@ -23,8 +23,8 @@
 
 // Internal headers are allowed here
 #include <dali-toolkit/internal/controls/text-view/text-view-processor.h>
+#include <dali-toolkit/internal/controls/text-view/text-view-processor-dbg.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-line-processor.h>
-#include <dali-toolkit/internal/controls/text-view/text-view-word-group-processor.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-word-processor.h>
 #include <dali-toolkit/internal/controls/text-view/relayout-utilities.h>
 
@@ -60,37 +60,18 @@ struct SplitWordTest
   std::string lastResult;
 };
 
-struct SplitWordGroupTest
-{
-  std::string description;
-  std::string input;
-  std::size_t wordPosition;
-  std::size_t position;
-  std::string firstResult;
-  std::string lastResult;
-};
-
 struct SplitLineTest
 {
   std::string description;
   std::string input;
-  std::size_t groupPosition;
-  std::size_t wordPosition;
-  std::size_t position;
+  std::size_t wordIndex;
+  std::size_t characterIndex;
   float       lineHeightOffset;
   std::string firstResult;
   std::string lastResult;
 };
 
 struct MergeWordsTest
-{
-  std::string description;
-  std::string inputFirst;
-  std::string inputLast;
-  std::string result;
-};
-
-struct MergeWordGroupsTest
 {
   std::string description;
   std::string inputFirst;
@@ -116,21 +97,12 @@ struct RemoveCharactersFromWordTest
   std::string result;
 };
 
-struct RemoveWordsFromGroupTest
+struct RemoveWordsFromLineTest
 {
   std::string description;
   std::string input;
   std::size_t wordIndex;
   std::size_t numberOfWords;
-  std::string result;
-};
-
-struct RemoveGroupsFromLineTest
-{
-  std::string description;
-  std::string input;
-  std::size_t groupIndex;
-  std::size_t numberOfGroups;
   float       lineHeightOffset;
   std::string result;
 };
@@ -192,27 +164,13 @@ void Print( const TextViewProcessor::WordLayoutInfo& word )
   std::cout << "]"; std::cout << std::endl;
 }
 
-void Print( const TextViewProcessor::WordGroupLayoutInfo& wordGroup )
-{
-  std::cout << "(";
-  std::cout << "              mSize : " << wordGroup.mSize << std::endl;
-  std::cout << "          mAscender : " << wordGroup.mAscender << std::endl;
-  std::cout << "         mDirection : " << wordGroup.mDirection << std::endl;
-  std::cout << "mNumberOfCharacters : " << wordGroup.mNumberOfCharacters << std::endl;
-  for( TextViewProcessor::WordLayoutInfoContainer::const_iterator it = wordGroup.mWordsLayoutInfo.begin(), endIt = wordGroup.mWordsLayoutInfo.end(); it != endIt; ++it )
-  {
-    Print( *it );
-  }
-  std::cout << ")"; std::cout << std::endl;
-}
-
 void Print( const TextViewProcessor::LineLayoutInfo& line )
 {
   std::cout << "<";
   std::cout << "              mSize : " << line.mSize << std::endl;
   std::cout << "          mAscender : " << line.mAscender << std::endl;
   std::cout << "mNumberOfCharacters : " << line.mNumberOfCharacters << std::endl;
-  for( TextViewProcessor::WordGroupLayoutInfoContainer::const_iterator it = line.mWordGroupsLayoutInfo.begin(), endIt = line.mWordGroupsLayoutInfo.end(); it != endIt; ++it )
+  for( TextViewProcessor::WordLayoutInfoContainer::const_iterator it = line.mWordsLayoutInfo.begin(), endIt = line.mWordsLayoutInfo.end(); it != endIt; ++it )
   {
     Print( *it );
   }
@@ -229,31 +187,40 @@ void Print( const TextViewProcessor::TextLayoutInfo& text )
   std::cout << "||" << std::endl;
 }
 
-void Print( const TextStyle& style )
+std::string GetText( const TextViewProcessor::CharacterLayoutInfo& character )
 {
-  std::cout << " font name : " << style.GetFontName() << std::endl;
-  std::cout << " : " << style.GetFontStyle() << std::endl;
-  std::cout << " : " << style.GetFontPointSize() << std::endl;
-  std::cout << " : " << style.GetWeight() << std::endl;
-  std::cout << " : " << style.GetTextColor() << std::endl;
-  std::cout << " : " << style.IsItalicsEnabled() << std::endl;
-  std::cout << " : " << style.IsUnderlineEnabled() << std::endl;
-  std::cout << " : " << style.IsShadowEnabled() << std::endl;
-  std::cout << " : " << style.GetShadowColor() << std::endl;
-  std::cout << " : " << style.GetShadowOffset() << std::endl;
-  std::cout << " : " << style.IsGlowEnabled() << std::endl;
-  std::cout << " : " << style.GetGlowColor() << std::endl;
-  std::cout << " : " << style.GetGlowIntensity() << std::endl;
-  std::cout << " : " << style.GetSmoothEdge() << std::endl;
-  std::cout << " : " << style.IsOutlineEnabled() << std::endl;
-  std::cout << " : " << style.GetOutlineThickness() << std::endl;
+  return character.mStyledText.mText.GetText();
+}
+
+std::string GetText( const TextViewProcessor::WordLayoutInfo& word )
+{
+  std::string text;
+
+  for( TextViewProcessor::CharacterLayoutInfoContainer::const_iterator it = word.mCharactersLayoutInfo.begin(), endIt = word.mCharactersLayoutInfo.end(); it != endIt; ++it )
+  {
+    text += GetText( *it );
+  }
+
+  return text;
+}
+
+std::string GetText( const TextViewProcessor::LineLayoutInfo& line )
+{
+  std::string text;
+
+  for( TextViewProcessor::WordLayoutInfoContainer::const_iterator it = line.mWordsLayoutInfo.begin(), endIt = line.mWordsLayoutInfo.end(); it != endIt; ++it )
+  {
+    text += GetText( *it );
+  }
+
+  return text;
 }
 
 // Test functions used to check if two data structures are equal.
 
 bool TestEqual( float x, float y )
 {
-  return ( fabsf( x - y ) < Math::MACHINE_EPSILON_1000 );
+  return ( fabsf( x - y ) < 0.001f );
 }
 
 bool TestEqual( const TextViewProcessor::CharacterLayoutInfo& character1,
@@ -344,6 +311,11 @@ bool TestEqual( const TextViewProcessor::CharacterLayoutInfo& character1,
 
   if( style1 != style2 )
   {
+    std::cout << "  style1 : " << std::endl;
+    TextViewProcessor::dbgPrint( style1 );
+
+    std::cout << "  style2 : " << std::endl;
+    TextViewProcessor::dbgPrint( style2 );
     return false;
   }
 
@@ -391,53 +363,6 @@ bool TestEqual( const TextViewProcessor::WordLayoutInfo& word1,
   return true;
 }
 
-bool TestEqual( const TextViewProcessor::WordGroupLayoutInfo& group1,
-                const TextViewProcessor::WordGroupLayoutInfo& group2 )
-{
-
-  if( group1.mNumberOfCharacters != group2.mNumberOfCharacters )
-  {
-    return false;
-  }
-
-  if( group1.mWordsLayoutInfo.size() != group2.mWordsLayoutInfo.size() )
-  {
-    return false;
-  }
-
-  if( !TestEqual( group1.mSize.x, group2.mSize.x ) )
-  {
-    return false;
-  }
-  if( !TestEqual( group1.mSize.y, group2.mSize.y ) )
-  {
-    return false;
-  }
-
-  if( !TestEqual( group1.mAscender, group2.mAscender ) )
-  {
-    return false;
-  }
-
-  if( group1.mDirection != group2.mDirection )
-  {
-    return false;
-  }
-
-  for( TextViewProcessor::WordLayoutInfoContainer::const_iterator it1 = group1.mWordsLayoutInfo.begin(), endIt1 = group1.mWordsLayoutInfo.end(),
-         it2 = group2.mWordsLayoutInfo.begin(), endIt2 = group2.mWordsLayoutInfo.end();
-       ( it1 != endIt1 ) && ( it2 != endIt2 );
-       ++it1, ++it2 )
-  {
-    if( !TestEqual( *it1, *it2 ) )
-    {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 bool TestEqual( const TextViewProcessor::LineLayoutInfo& line1,
                 const TextViewProcessor::LineLayoutInfo& line2 )
 {
@@ -460,13 +385,13 @@ bool TestEqual( const TextViewProcessor::LineLayoutInfo& line1,
     return false;
   }
 
-  if( line1.mWordGroupsLayoutInfo.size() != line2.mWordGroupsLayoutInfo.size() )
+  if( line1.mWordsLayoutInfo.size() != line2.mWordsLayoutInfo.size() )
   {
     return false;
   }
 
-  for( TextViewProcessor::WordGroupLayoutInfoContainer::const_iterator it1 = line1.mWordGroupsLayoutInfo.begin(), endIt1 = line1.mWordGroupsLayoutInfo.end(),
-         it2 = line2.mWordGroupsLayoutInfo.begin(), endIt2 = line2.mWordGroupsLayoutInfo.end();
+  for( TextViewProcessor::WordLayoutInfoContainer::const_iterator it1 = line1.mWordsLayoutInfo.begin(), endIt1 = line1.mWordsLayoutInfo.end(),
+         it2 = line2.mWordsLayoutInfo.begin(), endIt2 = line2.mWordsLayoutInfo.end();
        ( it1 != endIt1 ) && ( it2 != endIt2 );
        ++it1, ++it2 )
   {
@@ -536,7 +461,7 @@ bool TestEqual( const TextViewProcessor::TextLayoutInfo& text1,
  */
 bool TestSplitWord( const std::string& description, const std::string& input, const size_t position, const std::string& firstResult, const std::string& lastResult, const char* location )
 {
-  tet_printf( "%s", description.c_str() );
+  tet_printf( "%s\n", description.c_str() );
 
   // Create layout info for the input word.
   Toolkit::Internal::TextView::RelayoutData relayoutData;
@@ -555,13 +480,9 @@ bool TestSplitWord( const std::string& description, const std::string& input, co
   if( !inputLayout.mLinesLayoutInfo.empty() )
   {
     const TextViewProcessor::LineLayoutInfo& line( *inputLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
+    if( !line.mWordsLayoutInfo.empty() )
     {
-      const TextViewProcessor::WordGroupLayoutInfo& group( *line.mWordGroupsLayoutInfo.begin() );
-      if( !group.mWordsLayoutInfo.empty() )
-      {
-        inputWordLayout = *( *( *inputLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin() ).mWordsLayoutInfo.begin();
-      }
+      inputWordLayout = *( *inputLayout.mLinesLayoutInfo.begin() ).mWordsLayoutInfo.begin();
     }
   }
 
@@ -583,13 +504,9 @@ bool TestSplitWord( const std::string& description, const std::string& input, co
   if( !firstResultLayout.mLinesLayoutInfo.empty() )
   {
     const TextViewProcessor::LineLayoutInfo& line( *firstResultLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
+    if( !line.mWordsLayoutInfo.empty() )
     {
-      const TextViewProcessor::WordGroupLayoutInfo& group( *line.mWordGroupsLayoutInfo.begin() );
-      if( !group.mWordsLayoutInfo.empty() )
-      {
-        firstResultWordLayout = *( *( *firstResultLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin() ).mWordsLayoutInfo.begin();
-      }
+      firstResultWordLayout = *( *firstResultLayout.mLinesLayoutInfo.begin() ).mWordsLayoutInfo.begin();
     }
   }
 
@@ -611,13 +528,9 @@ bool TestSplitWord( const std::string& description, const std::string& input, co
   if( !lastResultLayout.mLinesLayoutInfo.empty() )
   {
     const TextViewProcessor::LineLayoutInfo& line( *lastResultLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
+    if( !line.mWordsLayoutInfo.empty() )
     {
-      const TextViewProcessor::WordGroupLayoutInfo& group( *line.mWordGroupsLayoutInfo.begin() );
-      if( !group.mWordsLayoutInfo.empty() )
-      {
-        lastResultWordLayout = *( *( *lastResultLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin() ).mWordsLayoutInfo.begin();
-      }
+      lastResultWordLayout = *( *lastResultLayout.mLinesLayoutInfo.begin() ).mWordsLayoutInfo.begin();
     }
   }
 
@@ -632,13 +545,13 @@ bool TestSplitWord( const std::string& description, const std::string& input, co
   // Test results
   if( !TestEqual( inputWordLayout, firstResultWordLayout ) )
   {
-    tet_printf( "Fail. different layout info. %s", location );
+    tet_printf( "Fail. different layout info. %s\n", location );
     return false;
   }
 
   if( !TestEqual( lastWordLayoutInfo, lastResultWordLayout ) )
   {
-    tet_printf( "Fail. different layout info. %s", location );
+    tet_printf( "Fail. different layout info. %s\n", location );
     return false;
   }
 
@@ -646,136 +559,14 @@ bool TestSplitWord( const std::string& description, const std::string& input, co
 }
 
 /**
- * Splits the \e input group of words in two by the given \e wordPosition and \e position and checks the results with \e firstResult and \e lastResult.
+ * Splits the \e input line in two by the given \e wordIndex and \e characterIndex and checks the results with \e firstResult and \e lastResult.
  *
  * If the test fails it prints a short description and the line where this function was called.
  *
- * @param description Short description of the experiment. i.e. "Split the group of words from the beginning. (wordPosition 0 and position 0)".
+ * @param description Short description of the experiment. i.e. "Split the line from the beginning. (wordIndex 0 and characterIndex 0)".
  * @param input The input word.
- * @param wordPosition Index to the word within the group where to split the group.
- * @param position Where to split the word.
- * @param firstResult First part of the split group of words.
- * @param lastResult Last part of the split group of words.
- * @param location Where this function has been called.
- *
- * @return \e true if the experiment is successful. Otherwise returns \e false.
- */
-bool TestSplitWordGroup( const std::string& description,
-                         const std::string& input,
-                         const size_t wordPosition,
-                         const size_t position,
-                         const std::string& firstResult,
-                         const std::string& lastResult,
-                         const char* location )
-{
-  tet_printf( "%s", description.c_str() );
-
-  // Create layout info for the input group of words.
-  Toolkit::Internal::TextView::RelayoutData relayoutData;
-  TextViewProcessor::TextLayoutInfo& inputLayout( relayoutData.mTextLayoutInfo );
-
-  MarkupProcessor::StyledTextArray inputStyledText;
-  MarkupProcessor::GetStyledTextArray( input, inputStyledText, true );
-
-  TextViewProcessor::CreateTextInfo( inputStyledText,
-                                     DEFAULT_LAYOUT_PARAMETERS,
-                                     relayoutData );
-
-  // Get the input group of words
-  TextViewProcessor::WordGroupLayoutInfo inputWordGroupLayout;
-
-  if( !inputLayout.mLinesLayoutInfo.empty() )
-  {
-    const TextViewProcessor::LineLayoutInfo& line( *inputLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
-    {
-      inputWordGroupLayout = *( *inputLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin();
-    }
-  }
-
-  // Create layout info for the first part of the result (after split the group of words)
-
-  Toolkit::Internal::TextView::RelayoutData firstRelayoutData;
-  TextViewProcessor::TextLayoutInfo& firstResultLayout( firstRelayoutData.mTextLayoutInfo );
-
-  MarkupProcessor::StyledTextArray firstResultStyledText;
-  MarkupProcessor::GetStyledTextArray( firstResult, firstResultStyledText, true );
-
-  TextViewProcessor::CreateTextInfo( firstResultStyledText,
-                                     DEFAULT_LAYOUT_PARAMETERS,
-                                     firstRelayoutData );
-
-  // Get the first result group of words
-  TextViewProcessor::WordGroupLayoutInfo firstResultWordGroupLayout;
-
-  if( !firstResultLayout.mLinesLayoutInfo.empty() )
-  {
-    const TextViewProcessor::LineLayoutInfo& line( *firstResultLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
-    {
-      firstResultWordGroupLayout = *( *firstResultLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin();
-    }
-  }
-
-  // Create layout info for the last part of the result (after split the group of words)
-
-  Toolkit::Internal::TextView::RelayoutData lastRelayoutData;
-  TextViewProcessor::TextLayoutInfo& lastResultLayout( lastRelayoutData.mTextLayoutInfo );
-
-  MarkupProcessor::StyledTextArray lastResultStyledText;
-  MarkupProcessor::GetStyledTextArray( lastResult, lastResultStyledText, true );
-
-  TextViewProcessor::CreateTextInfo( lastResultStyledText,
-                                     DEFAULT_LAYOUT_PARAMETERS,
-                                     lastRelayoutData );
-
-  // Get the last result group of words
-  TextViewProcessor::WordGroupLayoutInfo lastResultWordGroupLayout;
-
-  if( !lastResultLayout.mLinesLayoutInfo.empty() )
-  {
-    const TextViewProcessor::LineLayoutInfo& line( *lastResultLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
-    {
-      lastResultWordGroupLayout = *( *lastResultLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin();
-    }
-  }
-
-  // Split the group of words.
-
-  TextViewProcessor::WordGroupLayoutInfo lastWordGroupLayoutInfo;
-
-  TextViewProcessor::TextInfoIndices indices( 0, 0, wordPosition, position );
-  SplitWordGroup( indices,
-                  inputWordGroupLayout,
-                  lastWordGroupLayoutInfo );
-
-  // Test results
-  if( !TestEqual( inputWordGroupLayout, firstResultWordGroupLayout ) )
-  {
-    tet_printf( "Fail. different layout info. %s", location );
-    return false;
-  }
-
-  if( !TestEqual( lastWordGroupLayoutInfo, lastResultWordGroupLayout ) )
-  {
-    tet_printf( "Fail. different layout info. %s", location );
-    return false;
-  }
-
-  return true;
-}
-
-/**
- * Splits the \e input line in two by the given \e groupPosition, \e wordPosition and \e position and checks the results with \e firstResult and \e lastResult.
- *
- * If the test fails it prints a short description and the line where this function was called.
- *
- * @param description Short description of the experiment. i.e. "Split the line from the beginning. (groupPosition 0, wordPosition 0 and position 0)".
- * @param input The input word.
- * @param groupPosition Index to the group of words within the line where to split the line.
- * @param wordPosition Index to the word within the group where to split the group.
- * @param position Where to split the word.
+ * @param wordIndex Index to the word within the line where to split it.
+ * @param characterIndex Where to split the word.
  * @param lineHeightOffset Offset between lines.
  * @param firstResult First part of the split line.
  * @param lastResult Last part of the split line.
@@ -785,15 +576,14 @@ bool TestSplitWordGroup( const std::string& description,
  */
 bool TestSplitLine( const std::string& description,
                     const std::string& input,
-                    const size_t groupPosition,
-                    const size_t wordPosition,
-                    const size_t position,
+                    const size_t wordIndex,
+                    const size_t characterIndex,
                     const float lineHeightOffset,
                     const std::string& firstResult,
                     const std::string& lastResult,
                     const char* location )
 {
-  tet_printf( "%s", description.c_str() );
+  tet_printf( "%s\n", description.c_str() );
 
   // Create layout info for the input line.
   Toolkit::Internal::TextView::RelayoutData relayoutData;
@@ -879,7 +669,8 @@ bool TestSplitLine( const std::string& description,
 
   TextViewProcessor::LineLayoutInfo lastLineLayoutInfo;
 
-  TextViewProcessor::TextInfoIndices indices( 0, groupPosition, wordPosition, position );
+  TextViewProcessor::TextInfoIndices indices( 0, wordIndex, characterIndex );
+
   SplitLine( indices,
              PointSize( lineHeightOffset ),
              inputLineLayout,
@@ -888,13 +679,13 @@ bool TestSplitLine( const std::string& description,
   // Test results
   if( !TestEqual( inputLineLayout, firstResultLineLayout ) )
   {
-    tet_printf( "Fail. different layout info. %s", location );
+    tet_printf( "Fail. different first layout info. %s\n", location );
     return false;
   }
 
   if( !TestEqual( lastLineLayoutInfo, lastResultLineLayout ) )
   {
-    tet_printf( "Fail. different layout info. %s", location );
+    tet_printf( "Fail. different last layout info. %s\n", location );
     return false;
   }
 
@@ -916,7 +707,7 @@ bool TestSplitLine( const std::string& description,
  */
 bool TestMergeWords( const std::string& description, const std::string& inputFirst, const std::string& inputLast, const std::string& result, const char* location )
 {
-  tet_printf( "%s", description.c_str() );
+  tet_printf( "%s\n", description.c_str() );
 
   // Create layout info for the inputFirst word.
   Toolkit::Internal::TextView::RelayoutData firstRelayoutData;
@@ -935,13 +726,9 @@ bool TestMergeWords( const std::string& description, const std::string& inputFir
   if( !inputFirstLayout.mLinesLayoutInfo.empty() )
   {
     const TextViewProcessor::LineLayoutInfo& line( *inputFirstLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
+    if( !line.mWordsLayoutInfo.empty() )
     {
-      const TextViewProcessor::WordGroupLayoutInfo& group( *line.mWordGroupsLayoutInfo.begin() );
-      if( !group.mWordsLayoutInfo.empty() )
-      {
-        inputFirstWordLayout = *( *( *inputFirstLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin() ).mWordsLayoutInfo.begin();
-      }
+      inputFirstWordLayout = *( *inputFirstLayout.mLinesLayoutInfo.begin() ).mWordsLayoutInfo.begin();
     }
   }
 
@@ -962,13 +749,9 @@ bool TestMergeWords( const std::string& description, const std::string& inputFir
   if( !inputLastLayout.mLinesLayoutInfo.empty() )
   {
     const TextViewProcessor::LineLayoutInfo& line( *inputLastLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
+    if( !line.mWordsLayoutInfo.empty() )
     {
-      const TextViewProcessor::WordGroupLayoutInfo& group( *line.mWordGroupsLayoutInfo.begin() );
-      if( !group.mWordsLayoutInfo.empty() )
-      {
-        inputLastWordLayout = *( *( *inputLastLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin() ).mWordsLayoutInfo.begin();
-      }
+      inputLastWordLayout = *( *inputLastLayout.mLinesLayoutInfo.begin() ).mWordsLayoutInfo.begin();
     }
   }
 
@@ -989,13 +772,9 @@ bool TestMergeWords( const std::string& description, const std::string& inputFir
   if( !resultLayout.mLinesLayoutInfo.empty() )
   {
     const TextViewProcessor::LineLayoutInfo& line( *resultLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
+    if( !line.mWordsLayoutInfo.empty() )
     {
-      const TextViewProcessor::WordGroupLayoutInfo& group( *line.mWordGroupsLayoutInfo.begin() );
-      if( !group.mWordsLayoutInfo.empty() )
-      {
-        resultWordLayout = *( *( *resultLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin() ).mWordsLayoutInfo.begin();
-      }
+      resultWordLayout = *( *resultLayout.mLinesLayoutInfo.begin() ).mWordsLayoutInfo.begin();
     }
   }
 
@@ -1004,105 +783,7 @@ bool TestMergeWords( const std::string& description, const std::string& inputFir
 
   if( !TestEqual( inputFirstWordLayout, resultWordLayout ) )
   {
-    tet_printf( "Fail. different layout info. %s", location );
-    return false;
-  }
-
-  return true;
-}
-
-/**
- * Merges the \e inputFirst group of words and the \e inputLast group of words, and checks the results with \e result.
- *
- * If the test fails it prints a short description and the line where this function was called.
- *
- * @param description Short description of the experiment.
- * @param inputFirst The first part of the group of words.
- * @param inputLast The last part of the group of words.
- * @param result The merged group of word.
- * @param location Where this function has been called.
- *
- * @return \e true if the experiment is successful. Otherwise returns \e false.
- */
-bool TestMergeGroupsOfWords( const std::string& description, const std::string& inputFirst, const std::string& inputLast, const std::string& result, const char* location )
-{
-  tet_printf( "%s", description.c_str() );
-
-  // Create layout info for the inputFirst group of word.
-  Toolkit::Internal::TextView::RelayoutData firstRelayoutData;
-  TextViewProcessor::TextLayoutInfo& inputFirstLayout( firstRelayoutData.mTextLayoutInfo );
-
-  MarkupProcessor::StyledTextArray inputFirstStyledText;
-  MarkupProcessor::GetStyledTextArray( inputFirst, inputFirstStyledText, true );
-
-  TextViewProcessor::CreateTextInfo( inputFirstStyledText,
-                                     DEFAULT_LAYOUT_PARAMETERS,
-                                     firstRelayoutData );
-
-  // Get the input group of words.
-  TextViewProcessor::WordGroupLayoutInfo inputFirstWordGroupLayout;
-
-  if( !inputFirstLayout.mLinesLayoutInfo.empty() )
-  {
-    const TextViewProcessor::LineLayoutInfo& line( *inputFirstLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
-    {
-      inputFirstWordGroupLayout = *( *inputFirstLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin();
-    }
-  }
-
-  // Create layout info for the inputLast group of words.
-  Toolkit::Internal::TextView::RelayoutData lastRelayoutData;
-  TextViewProcessor::TextLayoutInfo& inputLastLayout( lastRelayoutData.mTextLayoutInfo );
-
-  MarkupProcessor::StyledTextArray inputLastStyledText;
-  MarkupProcessor::GetStyledTextArray( inputLast, inputLastStyledText, true );
-
-  TextViewProcessor::CreateTextInfo( inputLastStyledText,
-                                     DEFAULT_LAYOUT_PARAMETERS,
-                                     lastRelayoutData );
-
-  // Get the input group of words
-  TextViewProcessor::WordGroupLayoutInfo inputLastWordGroupLayout;
-
-  if( !inputLastLayout.mLinesLayoutInfo.empty() )
-  {
-    const TextViewProcessor::LineLayoutInfo& line( *inputLastLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
-    {
-      inputLastWordGroupLayout = *( *inputLastLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin();
-    }
-  }
-
-  // Create layout info for the result group of words.
-  Toolkit::Internal::TextView::RelayoutData resultRelayoutData;
-  TextViewProcessor::TextLayoutInfo& resultLayout( resultRelayoutData.mTextLayoutInfo );
-
-  MarkupProcessor::StyledTextArray resultStyledText;
-  MarkupProcessor::GetStyledTextArray( result, resultStyledText, true );
-
-  TextViewProcessor::CreateTextInfo( resultStyledText,
-                                     DEFAULT_LAYOUT_PARAMETERS,
-                                     resultRelayoutData );
-
-  // Get the result word
-  TextViewProcessor::WordGroupLayoutInfo resultWordGroupLayout;
-
-  if( !resultLayout.mLinesLayoutInfo.empty() )
-  {
-    const TextViewProcessor::LineLayoutInfo& line( *resultLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
-    {
-      resultWordGroupLayout = *( *resultLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin();
-    }
-  }
-
-  MergeWordGroup( inputFirstWordGroupLayout,
-                  inputLastWordGroupLayout );
-
-  if( !TestEqual( inputFirstWordGroupLayout, resultWordGroupLayout ) )
-  {
-    tet_printf( "Fail. different layout info. %s", location );
+    tet_printf( "Fail. different layout info. %s\n", location );
     return false;
   }
 
@@ -1125,7 +806,7 @@ bool TestMergeGroupsOfWords( const std::string& description, const std::string& 
  */
 bool TestMergeLines( const std::string& description, const std::string& inputFirst, const std::string& inputLast, const float lineHeightOffset, const std::string& result, const char* location )
 {
-  tet_printf( "%s", description.c_str() );
+  tet_printf( "%s\n", description.c_str() );
 
   // Create layout info for the inputFirst line.
   Toolkit::Internal::TextView::RelayoutData firstRelayoutData;
@@ -1210,7 +891,7 @@ bool TestMergeLines( const std::string& description, const std::string& inputFir
 
   if( !TestEqual( inputFirstLineLayout, resultLineLayout ) )
   {
-    tet_printf( "Fail. different layout info. %s", location );
+    tet_printf( "Fail. different layout info. %s\n", location );
     return false;
   }
 
@@ -1222,7 +903,7 @@ bool TestMergeLines( const std::string& description, const std::string& inputFir
  *
  * If the test fails it prints a short description and the line where this function was called.
  *
- * @param description Short description of the experiment. i.e. "Remove a whole group of characters. Merge".
+ * @param description Short description of the experiment. i.e. "Remove a whole word. Merge".
  * @param input The input word.
  * @param position Where to start to remove characters
  * @param numberOfCharacters The number of characters to remove.
@@ -1233,7 +914,7 @@ bool TestMergeLines( const std::string& description, const std::string& inputFir
  */
 bool TestRemoveCharactersFromWord( const std::string& description, const std::string& input, const std::size_t position, const std::size_t numberOfCharacters, const std::string& result, const char* location )
 {
-  tet_printf( "%s", description.c_str() );
+  tet_printf( "%s\n", description.c_str() );
 
   // Create layout info for the input word.
   Toolkit::Internal::TextView::RelayoutData relayoutData;
@@ -1252,13 +933,9 @@ bool TestRemoveCharactersFromWord( const std::string& description, const std::st
   if( !inputLayout.mLinesLayoutInfo.empty() )
   {
     const TextViewProcessor::LineLayoutInfo& line( *inputLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
+    if( !line.mWordsLayoutInfo.empty() )
     {
-      const TextViewProcessor::WordGroupLayoutInfo& group( *line.mWordGroupsLayoutInfo.begin() );
-      if( !group.mWordsLayoutInfo.empty() )
-      {
-        inputWordLayout = *( *( *inputLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin() ).mWordsLayoutInfo.begin();
-      }
+      inputWordLayout = *( *inputLayout.mLinesLayoutInfo.begin() ).mWordsLayoutInfo.begin();
     }
   }
 
@@ -1279,13 +956,9 @@ bool TestRemoveCharactersFromWord( const std::string& description, const std::st
   if( !resultLayout.mLinesLayoutInfo.empty() )
   {
     const TextViewProcessor::LineLayoutInfo& line( *resultLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
+    if( !line.mWordsLayoutInfo.empty() )
     {
-      const TextViewProcessor::WordGroupLayoutInfo& group( *line.mWordGroupsLayoutInfo.begin() );
-      if( !group.mWordsLayoutInfo.empty() )
-      {
-        resultWordLayout = *( *( *resultLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin() ).mWordsLayoutInfo.begin();
-      }
+      resultWordLayout = *( *resultLayout.mLinesLayoutInfo.begin() ).mWordsLayoutInfo.begin();
     }
   }
 
@@ -1295,7 +968,7 @@ bool TestRemoveCharactersFromWord( const std::string& description, const std::st
 
   if( !TestEqual( inputWordLayout, resultWordLayout ) )
   {
-    tet_printf( "Fail. different layout info. %s", location );
+    tet_printf( "Fail. different layout info. %s\n", location );
     return false;
   }
 
@@ -1303,101 +976,23 @@ bool TestRemoveCharactersFromWord( const std::string& description, const std::st
 }
 
 /**
- * Removes from the \e input group of words the \e numberOfWords words starting from the given \e wordIndex and checks the results with \e result.
- *
- * If the test fails it prints a short description and the line where this function was called.
- *
- * @param description Short description of the experiment.
- * @param input The input group of words.
- * @param wordIndex Where to start to remove words.
- * @param numberOfWords The number of words to remove.
- * @param result The group of words without the removed words.
- * @param location Where this function has been called.
- *
- * @return \e true if the experiment is successful. Otherwise returns \e false.
- */
-bool TestRemoveWordsFromGroup( const std::string& description, const std::string& input, const std::size_t wordIndex, const std::size_t numberOfWords, const std::string& result, const char* location )
-{
-  tet_printf( "%s", description.c_str() );
-
-  // Create layout info for the input group of words.
-  Toolkit::Internal::TextView::RelayoutData relayoutData;
-  TextViewProcessor::TextLayoutInfo& inputLayout( relayoutData.mTextLayoutInfo );
-
-  MarkupProcessor::StyledTextArray inputStyledText;
-  MarkupProcessor::GetStyledTextArray( input, inputStyledText, true );
-
-  TextViewProcessor::CreateTextInfo( inputStyledText,
-                                     DEFAULT_LAYOUT_PARAMETERS,
-                                     relayoutData );
-
-  // Get the input group of words
-  TextViewProcessor::WordGroupLayoutInfo inputWordGroupLayout;
-
-  if( !inputLayout.mLinesLayoutInfo.empty() )
-  {
-    const TextViewProcessor::LineLayoutInfo& line( *inputLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
-    {
-      inputWordGroupLayout = *( *inputLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin();
-    }
-  }
-
-  // Create layout info for the result group of words.
-  Toolkit::Internal::TextView::RelayoutData resultRelayoutData;
-  TextViewProcessor::TextLayoutInfo& resultLayout( resultRelayoutData.mTextLayoutInfo );
-
-  MarkupProcessor::StyledTextArray resultStyledText;
-  MarkupProcessor::GetStyledTextArray( result, resultStyledText, true );
-
-  TextViewProcessor::CreateTextInfo( resultStyledText,
-                                     DEFAULT_LAYOUT_PARAMETERS,
-                                     resultRelayoutData );
-
-  // Get the result group of words.
-  TextViewProcessor::WordGroupLayoutInfo resultWordGroupLayout;
-
-  if( !resultLayout.mLinesLayoutInfo.empty() )
-  {
-    const TextViewProcessor::LineLayoutInfo& line( *resultLayout.mLinesLayoutInfo.begin() );
-    if( !line.mWordGroupsLayoutInfo.empty() )
-    {
-      resultWordGroupLayout = *( *resultLayout.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin();
-    }
-  }
-
-  RemoveWordsFromWordGroup( wordIndex,
-                            numberOfWords,
-                            inputWordGroupLayout );
-
-  if( !TestEqual( inputWordGroupLayout, resultWordGroupLayout ) )
-  {
-    tet_printf( "Fail. different layout info. %s", location );
-    return false;
-  }
-
-  return true;
-}
-
-
-/**
- * Removes from the \e input line the \e numberOfGroups groups of words starting from the given \e groupIndex and checks the results with \e result.
+ * Removes from the \e input line the \e numberOfWords words starting from the given \e wordIndex and checks the results with \e result.
  *
  * If the test fails it prints a short description and the line where this function was called.
  *
  * @param description Short description of the experiment.
  * @param input The input line.
- * @param groupIndex Where to start to remove groups of words
- * @param numberOfGroups The number of groups of words to remove.
+ * @param wordIndex Index within the line where to start to remove words.
+ * @param numberOfWords The number of words to remove.
  * @param lineHeightOffset Offset between lines.
- * @param result The line without the removed groups of words.
+ * @param result The line without the removed words.
  * @param location Where this function has been called.
  *
  * @return \e true if the experiment is successful. Otherwise returns \e false.
  */
-bool TestRemoveGroupsFromLine( const std::string& description, const std::string& input, const std::size_t groupIndex, const std::size_t numberOfGroups, const float lineHeightOffset, const std::string& result, const char* location )
+bool TestRemoveWordsFromLine( const std::string& description, const std::string& input, const std::size_t wordIndex, const std::size_t numberOfWords, const float lineHeightOffset, const std::string& result, const char* location )
 {
-  tet_printf( "%s", description.c_str() );
+  tet_printf( "%s\n", description.c_str() );
 
   // Create layout info for the input line.
   Toolkit::Internal::TextView::RelayoutData relayoutData;
@@ -1451,14 +1046,20 @@ bool TestRemoveGroupsFromLine( const std::string& description, const std::string
     resultLineLayout = *resultLayout.mLinesLayoutInfo.begin();
   }
 
-  RemoveWordGroupsFromLine( groupIndex,
-                            numberOfGroups,
-                            PointSize( lineHeightOffset ),
-                            inputLineLayout );
+  RemoveWordsFromLine( wordIndex,
+                       numberOfWords,
+                       lineHeightOffset,
+                       inputLineLayout );
 
   if( !TestEqual( inputLineLayout, resultLineLayout ) )
   {
-    tet_printf( "Fail. different layout info. %s", location );
+    tet_printf( "Fail. different layout info. %s\n", location );
+    tet_printf( "            input : [%s]\n", input.c_str() );
+    tet_printf( "           result : [%s]\n", GetText( resultLineLayout ).c_str() );
+    tet_printf( "  expected result : [%s]\n\n", result.c_str() );
+
+    Print(inputLineLayout); std::cout << std::endl << std::endl;
+    Print(resultLineLayout); std::cout << std::endl;
     return false;
   }
 
@@ -1492,7 +1093,7 @@ bool TestUpdateTextInfo( const std::string& description,
                          const std::string& result,
                          const char* location )
 {
-  tet_printf( "%s", description.c_str() );
+  tet_printf( "%s\n", description.c_str() );
 
   // Create layout info for the input.
   Toolkit::Internal::TextView::RelayoutData relayoutData;
@@ -1576,17 +1177,17 @@ bool TestUpdateTextInfo( const std::string& description,
     }
     default:
     {
-      tet_printf( "TestUpdateTextInfo: unknown update operation. %s", location );
+      tet_printf( "TestUpdateTextInfo: unknown update operation. %s\n", location );
       return false;
     }
   }
 
   if( !TestEqual( inputLayout, resultLayout ) )
   {
-    tet_printf( "Fail. different layout info. %s", location );
+    tet_printf( "Fail. different layout info. %s\n", location );
 
-    std::cout << "          result : "; Print( inputLayout );
-    std::cout << " expected result : "; Print( resultLayout );
+    // std::cout << "          result : "; Print( inputLayout );
+    // std::cout << " expected result : "; Print( resultLayout );
     return false;
   }
 
@@ -1668,9 +1269,10 @@ int UtcDaliTextViewCreateTextInfo(void)
   layoutInfo12.mAscender = ASCENDER_12;
 
   TextStyle style10;
+  style10.SetFontName( "" );
   style10.SetFontPointSize( PointSize( 10.f ) );
   TextStyle style12;
-  style12.SetFontPointSize( PointSize( 0.f ) ); // point size is set to zero because is a default point size.
+  style12.SetFontName( "" );
 
   layoutInfo12.mStyledText.mStyle = style12;
   layoutInfo10.mStyledText.mStyle = style10;
@@ -1727,25 +1329,6 @@ int UtcDaliTextViewCreateTextInfo(void)
   layoutInfo12.mSize.width = 0.f;
   wordLayout4.mCharactersLayoutInfo.push_back( layoutInfo12 ); // (new line char)
 
-  // Groups
-
-  TextViewProcessor::WordGroupLayoutInfo groupLayout1, groupLayout2;
-
-  groupLayout1.mSize = Size( 5.f * WIDTH_10 + 7.f * WIDTH_12, HEIGHT_12 );
-  groupLayout1.mAscender = ASCENDER_12;
-  groupLayout1.mDirection = TextViewProcessor::LTR;
-  groupLayout1.mNumberOfCharacters = 13;
-  groupLayout1.mWordsLayoutInfo.push_back( wordLayout1 );
-  groupLayout1.mWordsLayoutInfo.push_back( wordLayout2 );
-  groupLayout1.mWordsLayoutInfo.push_back( wordLayout3 );
-  groupLayout1.mWordsLayoutInfo.push_back( wordLayout4 );
-
-  groupLayout2.mSize = Size( 0.f, HEIGHT_12 );
-  groupLayout2.mAscender = ASCENDER_12;
-  groupLayout2.mDirection = TextViewProcessor::LTR;
-  groupLayout2.mNumberOfCharacters = 1;
-  groupLayout2.mWordsLayoutInfo.push_back( wordLayout4 );
-
   // Lines
 
   TextViewProcessor::LineLayoutInfo lineLayout1, lineLayout2, lineLayout3;
@@ -1753,12 +1336,15 @@ int UtcDaliTextViewCreateTextInfo(void)
   lineLayout1.mSize = Size( 5.f * WIDTH_10 + 7.f * WIDTH_12, HEIGHT_12 );
   lineLayout1.mAscender = ASCENDER_12;
   lineLayout1.mNumberOfCharacters = 13;
-  lineLayout1.mWordGroupsLayoutInfo.push_back( groupLayout1 );
+  lineLayout1.mWordsLayoutInfo.push_back( wordLayout1 );
+  lineLayout1.mWordsLayoutInfo.push_back( wordLayout2 );
+  lineLayout1.mWordsLayoutInfo.push_back( wordLayout3 );
+  lineLayout1.mWordsLayoutInfo.push_back( wordLayout4 );
 
   lineLayout2.mSize = Size( 0.f, HEIGHT_12 );
   lineLayout2.mAscender = ASCENDER_12;
   lineLayout2.mNumberOfCharacters = 1;
-  lineLayout2.mWordGroupsLayoutInfo.push_back( groupLayout2 );
+  lineLayout2.mWordsLayoutInfo.push_back( wordLayout4 );
 
   lineLayout3.mSize = Size( 0.f, HEIGHT_12 );
 
@@ -1894,9 +1480,9 @@ int UtcDaliTextViewUpdateTextInfo(void)
       std::string("hello world."),
     },
     // Remove within the same word:
-    // * within the same group of characters.
+    // * within the same group of characters with same style.
     {
-      std::string( "Remove within the same word, within the same group of characters" ),
+      std::string( "Remove within the same word, within the same group of characters with same style" ),
       Remove,
       std::string("Hello <font size='30'>world\nhello</font> world"),
       7,
@@ -1960,10 +1546,10 @@ int UtcDaliTextViewUpdateTextInfo(void)
       0.f,
       std::string( "Hello <font size='30'>w</font>orl<font size='10'>dhello</font> world" )
     },
-    // * Remove whole group of words
+    // * Remove RTL text within LTR
     /* TODO check this when RTL text is working
     {
-      std::string( "Remove within the same line, whole group of words (merge groups)" ),
+      std::string( "Remove within the same line, RTL text within LTR." ),
       Remove,
       std::string("Hello world, שלום עולם, hello world"),
       10,
@@ -2112,79 +1698,6 @@ int UtcDaliTextViewUpdateTextInfo(void)
   END_TEST;
 }
 
-int UtcDaliTextViewSplitWordGroup(void)
-{
-  ToolkitTestApplication application;
-
-  tet_infoline("UtcDaliTextViewSplitWordGroup : ");
-
-  struct SplitWordGroupTest splitWordGroupTests[] =
-  {
-    {
-      std::string( "Split word group, wordPosition 0, position 0." ),
-      std::string( "<u><font size='10'>He<font size='12'>ll</font>oooo wooorld</font></u>" ),
-      0,
-      0,
-      std::string( "" ),
-      std::string( "<u><font size='10'>He<font size='12'>ll</font>oooo wooorld</font></u>" ),
-    },
-    {
-      std::string( "Split word group, wordPosition 2, position 8." ),
-      std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font>" ),
-      2,
-      7,
-      std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font>" ),
-      std::string( "" ),
-    },
-    {
-      std::string( "Split word group, wordPosition 0, position 2." ),
-      std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font>" ),
-      0,
-      2,
-      std::string( "<font size='10'>He</font>" ),
-      std::string( "<font size='12'>ll</font><font size='10'>oooo wooorld</font>" ),
-    },
-    {
-      std::string( "Split word group, wordPosition 0, position 3." ),
-      std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font>" ),
-      0,
-      3,
-      std::string( "<font size='10'>He</font><font size='12'>l</font>" ),
-      std::string( "<font size='12'>l</font><font size='10'>oooo wooorld</font>" ),
-    },
-    {
-      std::string( "Split word group, wordPosition 0, position 4." ),
-      std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font>" ),
-      0,
-      4,
-      std::string( "<font size='10'>He</font><font size='12'>ll</font>" ),
-      std::string( "<font size='10'>oooo wooorld</font>" ),
-    },
-    {
-      std::string( "Split word group, wordPosition 1, position 0." ),
-      std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font>" ),
-      1,
-      0,
-      std::string( "<font size='10'>He<font size='12'>ll</font>oooo</font>" ),
-      std::string( "<font size='10'> wooorld</font>" ),
-    },
-  };
-  const std::size_t numberOfTests( 6 );
-
-  for( std::size_t index = 0; index < numberOfTests; ++index )
-  {
-    const SplitWordGroupTest& test = splitWordGroupTests[index];
-
-    if( !TestSplitWordGroup( test.description, test.input, test.wordPosition, test.position, test.firstResult, test.lastResult, TEST_LOCATION ) )
-    {
-      tet_result( TET_FAIL );
-    }
-  }
-
-  tet_result( TET_PASS );
-  END_TEST;
-}
-
 int UtcDaliTextViewSplitLine(void)
 {
   ToolkitTestApplication application;
@@ -2194,9 +1707,8 @@ int UtcDaliTextViewSplitLine(void)
   struct SplitLineTest splitLineTests[] =
   {
     {
-      std::string( "Split line, groupPosition 0, wordPosition 0, position 0." ),
+      std::string( "Split line, wordPosition 0, position 0." ),
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
-      0,
       0,
       0,
       3.f,
@@ -2204,47 +1716,52 @@ int UtcDaliTextViewSplitLine(void)
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
     },
     {
-      std::string( "Split line, groupPosition 2, wordPosition 2, position 4." ),
+      std::string( "Split line, wordPosition 10, position 4." ),
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
-      2,
-      2,
+      10,
       4,
       0.f,
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
       std::string( "" ),
     },
-    /* TODO check when RTL is working.
     {
-      std::string( "Split line, groupPosition 1, wordPosition 2, position 0." ),
-      std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
-      1,
+      std::string( "Split line, wordPosition 2, position 4." ),
+      std::string("<font size='10'>Hello </font>wor<font size='12'>ld, hello wo</font>rld"),
       2,
+      4,
+      0.f,
+      std::string("<font size='10'>Hello </font>wor<font size='12'>l</font>"),
+      std::string("<font size='12'>d, hello wo</font>rld")
+    }
+    /* TODO RTL
+    {
+      std::string( "Split line, wordPosition 6, position 0." ),
+      std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
+      6,
       0,
       0.f,
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום" ),
       std::string( " עולם text text" ),
     },
     {
-      std::string( "Split line, groupPosition 1, wordPosition 0, position 0." ),
+      std::string( "Split line, wordPosition 4, position 0." ),
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
-      1,
-      0,
+      4,
       0,
       0.f,
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> " ),
       std::string( "שלום עולם text text" ),
     },
-    */
     {
-      std::string( "Split line, groupPosition 2, wordPosition 0, position 0." ),
+      std::string( "Split line2, wordPosition 8, position 0." ),
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
-      2,
-      0,
+      8,
       0,
       6.f,
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם " ),
       std::string( "text text" ),
     },
+    */
   };
   const std::size_t numberOfTests( 3 );
 
@@ -2252,7 +1769,14 @@ int UtcDaliTextViewSplitLine(void)
   {
     const SplitLineTest& test = splitLineTests[index];
 
-    if( !TestSplitLine( test.description, test.input, test.groupPosition, test.wordPosition, test.position, test.lineHeightOffset, test.firstResult, test.lastResult, TEST_LOCATION ) )
+    if( !TestSplitLine( test.description,
+                        test.input,
+                        test.wordIndex,
+                        test.characterIndex,
+                        test.lineHeightOffset,
+                        test.firstResult,
+                        test.lastResult,
+                        TEST_LOCATION ) )
     {
       tet_result( TET_FAIL );
     }
@@ -2333,7 +1857,7 @@ int UtcDaliTextViewMergeWord02(void)
 
   TextViewProcessor::WordLayoutInfo wordLayoutInfo01;
 
-  wordLayoutInfo01 = *( *( *textLayoutInfo01.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin() ).mWordsLayoutInfo.begin();
+  wordLayoutInfo01 = *( *textLayoutInfo01.mLinesLayoutInfo.begin() ).mWordsLayoutInfo.begin();
 
   TextViewProcessor::CreateTextInfo( styledText02,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -2341,7 +1865,7 @@ int UtcDaliTextViewMergeWord02(void)
 
   TextViewProcessor::WordLayoutInfo wordLayoutInfo02;
 
-  wordLayoutInfo02 = *( *( *textLayoutInfo02.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin() ).mWordsLayoutInfo.begin();
+  wordLayoutInfo02 = *( *textLayoutInfo02.mLinesLayoutInfo.begin() ).mWordsLayoutInfo.begin();
 
   TextViewProcessor::CreateTextInfo( styledText03,
                                      DEFAULT_LAYOUT_PARAMETERS,
@@ -2349,7 +1873,7 @@ int UtcDaliTextViewMergeWord02(void)
 
   TextViewProcessor::WordLayoutInfo wordLayoutInfo03;
 
-  wordLayoutInfo03 = *( *( *textLayoutInfo03.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin() ).mWordsLayoutInfo.begin();
+  wordLayoutInfo03 = *( *textLayoutInfo03.mLinesLayoutInfo.begin() ).mWordsLayoutInfo.begin();
 
   // Test MergeWord() asserts if white spaces or new line chars are merged.
   bool assert1 = false;
@@ -2437,140 +1961,6 @@ int UtcDaliTextViewMergeWord02(void)
   END_TEST;
 }
 
-int UtcDaliTextViewMergeGroup01(void)
-{
-  ToolkitTestApplication application;
-
-  tet_infoline("UtcDaliTextViewMergeGroup01 : ");
-
-  struct MergeWordGroupsTest mergeWordGroupssTests[] =
-  {
-    {
-      std::string( "Merge a void first group." ),
-      std::string( "" ),
-      std::string( "Hello world" ),
-      std::string( "Hello world" ),
-    },
-    {
-      std::string( "Merge a void last group." ),
-      std::string( "Hello world" ),
-      std::string( "" ),
-      std::string( "Hello world" ),
-    },
-    {
-      std::string( "Merge groups and merge last and first words." ),
-      std::string( "Hello wor" ),
-      std::string( "ld, hello world" ),
-      std::string( "Hello world, hello world" ),
-    },
-    {
-      std::string( "Merge groups and don't merge last and first words." ),
-      std::string( "Hello world, " ),
-      std::string( "hello world" ),
-      std::string( "Hello world, hello world" )
-    },
-  };
-  const std::size_t numberOfTests( 4 );
-
-  for( std::size_t index = 0; index < numberOfTests; ++index )
-  {
-    const MergeWordGroupsTest& test = mergeWordGroupssTests[index];
-
-    if( !TestMergeGroupsOfWords( test.description, test.inputFirst, test.inputLast, test.result, TEST_LOCATION ) )
-    {
-      tet_result( TET_FAIL );
-    }
-  }
-
-  tet_result(TET_PASS);
-  END_TEST;
-}
-
-int UtcDaliTextViewMergeGroup02(void)
-{
-  ToolkitTestApplication application;
-
-  tet_infoline("UtcDaliTextViewMergeGroup02 : ");
-
-  Toolkit::Internal::TextView::RelayoutData relayoutData01;
-  Toolkit::Internal::TextView::RelayoutData relayoutData02;
-  Toolkit::Internal::TextView::RelayoutData relayoutData03;
-  TextViewProcessor::TextLayoutInfo& textLayoutInfo01( relayoutData01.mTextLayoutInfo );
-  TextViewProcessor::TextLayoutInfo& textLayoutInfo02( relayoutData02.mTextLayoutInfo );
-  TextViewProcessor::TextLayoutInfo& textLayoutInfo03( relayoutData03.mTextLayoutInfo );
-
-  std::string text01( "Hello \n" );
-  std::string text02( "world" );
-  std::string text03( "السلام عليكم" );
-  MarkupProcessor::StyledTextArray styledText01;
-  MarkupProcessor::StyledTextArray styledText02;
-  MarkupProcessor::StyledTextArray styledText03;
-  MarkupProcessor::GetStyledTextArray( text01, styledText01, true );
-  MarkupProcessor::GetStyledTextArray( text02, styledText02, true );
-  MarkupProcessor::GetStyledTextArray( text03, styledText03, true );
-
-  TextViewProcessor::CreateTextInfo( styledText01,
-                                     DEFAULT_LAYOUT_PARAMETERS,
-                                     relayoutData01 );
-
-  TextViewProcessor::WordGroupLayoutInfo wordGroupLayoutInfo01;
-
-  wordGroupLayoutInfo01 = *( *textLayoutInfo01.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin();
-
-  TextViewProcessor::CreateTextInfo( styledText02,
-                                     DEFAULT_LAYOUT_PARAMETERS,
-                                     relayoutData02 );
-
-  TextViewProcessor::WordGroupLayoutInfo wordGroupLayoutInfo02;
-
-  wordGroupLayoutInfo02 = *( *textLayoutInfo02.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin();
-
-  TextViewProcessor::CreateTextInfo( styledText03,
-                                     DEFAULT_LAYOUT_PARAMETERS,
-                                     relayoutData03 );
-
-  TextViewProcessor::WordGroupLayoutInfo wordGroupLayoutInfo03;
-
-  wordGroupLayoutInfo03 = *( *textLayoutInfo03.mLinesLayoutInfo.begin() ).mWordGroupsLayoutInfo.begin();
-
-  bool assert1 = false;
-  bool assert2 = false;
-
-  try
-  {
-    MergeWordGroup( wordGroupLayoutInfo01,
-                    wordGroupLayoutInfo02 );
-  }
-  catch( Dali::DaliException& e )
-  {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "!\"TextViewProcessor::MergeWordGroup(). ERROR: A group of words can't be merged to another group which finishes with a new line character.\"", TEST_LOCATION );
-    assert1 = true;
-  }
-
-  try
-  {
-    MergeWordGroup( wordGroupLayoutInfo03,
-                    wordGroupLayoutInfo02 );
-  }
-  catch( Dali::DaliException& e )
-  {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "!\"TextViewProcessor::MergeWordGroup(). ERROR: groups with different direction can't be merged.\"", TEST_LOCATION );
-    assert2 = true;
-  }
-
-  if( assert1 && assert2 )
-  {
-    tet_result( TET_PASS );
-  }
-  else
-  {
-    tet_result( TET_FAIL );
-  }
-  END_TEST;
-}
-
 int UtcDaliTextViewMergeLine01(void)
 {
   ToolkitTestApplication application;
@@ -2593,9 +1983,9 @@ int UtcDaliTextViewMergeLine01(void)
       0.f,
       std::string( "Hello world, this is a whole line" )
     },
-    /* TODO: check when RTL text is working.
+    /* TODO RTL
     {
-      std::string( "Merge lines and merge last and first groups" ),
+      std::string( "Merge lines: last starting with RTL text and first ending with RTL" ),
       std::string( "Hello world, שלום" ),
       std::string( " עולם, hello world." ),
       6.f,
@@ -2801,77 +2191,20 @@ int UtcDaliTextViewRemoveCharactersFromWord(void)
   END_TEST;
 }
 
-int UtcDaliTextViewRemoveWordsFromGroup(void)
+int UtcDaliTextViewRemoveWordsFromLine(void)
 {
-  // Note: Currently RemoveWordsFromWordGroup() function is only used to remove a number of words from the beginning, or
-  //       from a given index to the end. RemoveWordsFromWordGroup() doesn't merge words (if a white space is removed) so
-  //       tehere isn't any TET case to cover these cases. To be done if needed.
+  // Note: Currently RemoveWordsFromLine() function is only used to remove a number of words from the beginning, or
+  //       from a given index to the end.
 
   ToolkitTestApplication application;
 
-  tet_infoline("UtcDaliTextViewRemoveWordsFromGroup : ");
-  struct RemoveWordsFromGroupTest removeWordsFromGroupTests[] =
+  tet_infoline("UtcDaliTextViewRemoveWordsFromLine : ");
+  struct RemoveWordsFromLineTest removeWordsFromLineTest[] =
   {
     {
       std::string( "Delete 0 words." ),
-      std::string( "Hello world, hello world" ),
-      3,
-      0,
-      std::string( "Hello world, hello world" ),
-    },
-    {
-      std::string( "Delete some words in the middle. Don't merge words" ),
-      std::string( "<font size='10'>Hel</font><font size='20'>lo wo</font><font size='30'>rld, hello world</font>" ),
-      1,
-      4,
-      std::string( "<font size='10'>Hel</font><font size='20'>lo</font><font size='30'> world</font>" ),
-    },
-    {
-      std::string( "Delete words up to the end" ),
-      std::string( "<font size='10'>Hel</font><font size='20'>lo wo</font><font size='30'>rld, hello world</font>" ),
-      5,
-      2,
-      std::string( "<font size='10'>Hel</font><font size='20'>lo wo</font><font size='30'>rld, hello</font>" ),
-    },
-    {
-      std::string( "Delete words from the beginning." ),
-      std::string( "Hello world, hello world" ),
-      0,
-      3,
-      std::string( " hello world" ),
-    },
-  };
-  const std::size_t numberOfTests( 4 );
-
-  for( std::size_t index = 0; index < numberOfTests; ++index )
-  {
-    const RemoveWordsFromGroupTest& test = removeWordsFromGroupTests[index];
-
-    if( !TestRemoveWordsFromGroup( test.description, test.input, test.wordIndex, test.numberOfWords, test.result, TEST_LOCATION ) )
-    {
-      tet_result( TET_FAIL );
-    }
-  }
-
-  tet_result( TET_PASS );
-  END_TEST;
-}
-
-int UtcDaliTextViewRemoveGroupsFromLine(void)
-{
-  // Note: Currently RemoveWordGroupsFromLine() function is only used to remove a number of group of words from the beginning, or
-  //       from a given index to the end. RemoveWordGroupsFromLine() doesn't merge groups of words (if a whole group of words is removed) so
-  //       tehere isn't any TET case to cover these cases. To be done if needed.
-
-  ToolkitTestApplication application;
-
-  tet_infoline("UtcDaliTextViewRemoveGroupsFromLine : ");
-  struct RemoveGroupsFromLineTest removeGroupsFromLineTests[] =
-  {
-    {
-      std::string( "Delete 0 groups of words." ),
       std::string( "Hello hello, שלום עולם hello hello" ),
-      1,
+      0,
       0,
       2.f,
       std::string( "Hello hello, שלום עולם hello hello" ),
@@ -2879,8 +2212,8 @@ int UtcDaliTextViewRemoveGroupsFromLine(void)
     {
       std::string( "Delete from the middle to the end." ),
       std::string( "Hello hello, שלום עולם hello hello" ),
-      1,
-      2,
+      4,
+      7,
       0.f,
       std::string( "Hello hello, " ),
     },
@@ -2888,7 +2221,7 @@ int UtcDaliTextViewRemoveGroupsFromLine(void)
       std::string( "Delete from the beginning to the middle." ),
       std::string( "Hello hello, שלום עולם hello hello" ),
       0,
-      2,
+      8,
       6.f,
       std::string( "hello hello" ),
     },
@@ -2897,9 +2230,9 @@ int UtcDaliTextViewRemoveGroupsFromLine(void)
 
   for( std::size_t index = 0; index < numberOfTests; ++index )
   {
-    const RemoveGroupsFromLineTest& test = removeGroupsFromLineTests[index];
+    const RemoveWordsFromLineTest& test = removeWordsFromLineTest[index];
 
-    if( !TestRemoveGroupsFromLine( test.description, test.input, test.groupIndex, test.numberOfGroups, test.lineHeightOffset, test.result, TEST_LOCATION ) )
+    if( !TestRemoveWordsFromLine( test.description, test.input, test.wordIndex, test.numberOfWords, test.lineHeightOffset, test.result, TEST_LOCATION ) )
     {
       tet_result( TET_FAIL );
     }

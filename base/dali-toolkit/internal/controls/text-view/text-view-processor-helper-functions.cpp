@@ -103,8 +103,6 @@ void GetIndicesFromGlobalCharacterIndex( const std::size_t index,
                                          const TextLayoutInfo& textLayoutInfo,
                                          TextInfoIndices& indices )
 {
-  // TODO : Check for mixed LTR and RTL.
-
   // clear all indices
   indices = TextInfoIndices();
 
@@ -115,9 +113,9 @@ void GetIndicesFromGlobalCharacterIndex( const std::size_t index,
     return;
   }
 
-  std::size_t currentIndex = 0; // stores how many characters have been traversed.
+  std::size_t currentIndex = 0; // stores how many characters have been traversed (within the whole text).
 
-  // Traverse all lines, groups of words and words until global index is found.
+  // Traverse all lines and words until global index is found.
   bool found = false;
   for( LineLayoutInfoContainer::const_iterator lineIt = textLayoutInfo.mLinesLayoutInfo.begin(),
          lineEndIt = textLayoutInfo.mLinesLayoutInfo.end();
@@ -129,49 +127,28 @@ void GetIndicesFromGlobalCharacterIndex( const std::size_t index,
     if( currentIndex + lineLayoutInfo.mNumberOfCharacters > index )
     {
       // The character is in this line
-      for( WordGroupLayoutInfoContainer::const_iterator groupIt = lineLayoutInfo.mWordGroupsLayoutInfo.begin(),
-             groupEndIt = lineLayoutInfo.mWordGroupsLayoutInfo.end();
-           ( !found ) && ( groupIt != groupEndIt );
-           ++groupIt, ++indices.mGroupIndex )
+      for( WordLayoutInfoContainer::const_iterator wordIt = lineLayoutInfo.mWordsLayoutInfo.begin(),
+             wordEndIt = lineLayoutInfo.mWordsLayoutInfo.end();
+           ( !found ) && ( wordIt != wordEndIt );
+           ++wordIt, ++indices.mWordIndex )
       {
-        const WordGroupLayoutInfo& wordGroupLayoutInfo( *groupIt );
+        const WordLayoutInfo& wordLayoutInfo( *wordIt );
 
-        if( currentIndex + wordGroupLayoutInfo.mNumberOfCharacters > index )
+        if( currentIndex + wordLayoutInfo.mCharactersLayoutInfo.size() > index )
         {
-          // The character is in this group of words.
-          for( WordLayoutInfoContainer::const_iterator wordIt = wordGroupLayoutInfo.mWordsLayoutInfo.begin(),
-                 wordEndIt = wordGroupLayoutInfo.mWordsLayoutInfo.end();
-               ( !found ) && ( wordIt != wordEndIt );
-               ++wordIt, ++indices.mWordIndex )
-          {
-            const WordLayoutInfo& wordLayoutInfo( *wordIt );
-
-            if( currentIndex + wordLayoutInfo.mCharactersLayoutInfo.size() > index )
-            {
-              // The character is in this word
-              indices.mCharacterIndex = index - currentIndex;
-              found = true;
-            }
-            else
-            {
-              // check in the next word.
-              currentIndex += wordLayoutInfo.mCharactersLayoutInfo.size();
-            }
-          } // end words.
-          if( !wordGroupLayoutInfo.mWordsLayoutInfo.empty() )
-          {
-            --indices.mWordIndex;
-          }
+          // The character is in this word
+          indices.mCharacterIndex = index - currentIndex;
+          found = true;
         }
         else
         {
-          // check in the next group of words
-          currentIndex += wordGroupLayoutInfo.mNumberOfCharacters;
+          // check in the next word.
+          currentIndex += wordLayoutInfo.mCharactersLayoutInfo.size();
         }
-      } // end groups of words.
-      if( !lineLayoutInfo.mWordGroupsLayoutInfo.empty() )
+      } // end words.
+      if( !lineLayoutInfo.mWordsLayoutInfo.empty() )
       {
-        --indices.mGroupIndex;
+        --indices.mWordIndex;
       }
     }
     else

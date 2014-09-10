@@ -182,7 +182,7 @@ bool ContainsRightToLeftCharacter( const Dali::Text& text )
 }
 
 void ConvertBidirectionalText( const MarkupProcessor::StyledTextArray& line,
-                               std::vector<MarkupProcessor::StyledTextArray>& convertedText,
+                               MarkupProcessor::StyledTextArray& convertedText,
                                std::vector<int>& logicalToVisualMap,
                                std::vector<int>& visualToLogicalMap )
 {
@@ -247,44 +247,18 @@ void ConvertBidirectionalText( const MarkupProcessor::StyledTextArray& line,
     // To assign the original style is needed to use the characterLogicalToVisualMap table.
     Text text( &bidiTextConverted[0] );
 
-    // Split the line in groups of words.
-    // Words are grouped if they can be displayed left to right or right to left.
+    // Split the line in words.
     // Add the correct styles for the characters after they are reordered.
 
-    MarkupProcessor::StyledTextArray groupOfWords;
-
-    Character::CharacterDirection previousDirection = ( BeginsRightToLeftCharacter( line ) ? Character::RightToLeft : Character::LeftToRight );
     for( size_t i = 0; i < length; ++i )
     {
       const Character character( text[i] );
-
-      Character::CharacterDirection currentDirection = character.GetCharacterDirection();
-      if( Character::Neutral == currentDirection )
-      {
-        currentDirection = previousDirection;
-      }
 
       MarkupProcessor::StyledText styledText;
       styledText.mText.Append( character );
       styledText.mStyle = line[visualToLogicalMap[i]].mStyle;
 
-      if( currentDirection != previousDirection )
-      {
-        if( !groupOfWords.empty() )
-        {
-          convertedText.push_back( groupOfWords );
-          groupOfWords.clear();
-        }
-      }
-
-      groupOfWords.push_back( styledText );
-
-      previousDirection = currentDirection;
-    }
-
-    if( !groupOfWords.empty() )
-    {
-      convertedText.push_back( groupOfWords );
+      convertedText.push_back( styledText );
     }
   }
 }

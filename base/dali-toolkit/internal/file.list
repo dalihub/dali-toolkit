@@ -54,7 +54,6 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/controls/text-view/text-view-processor-dbg.cpp  \
    $(toolkit_base_src_dir)/controls/text-view/text-view-processor-helper-functions.cpp  \
    $(toolkit_base_src_dir)/controls/text-view/text-view-word-processor.cpp  \
-   $(toolkit_base_src_dir)/controls/text-view/text-view-word-group-processor.cpp  \
    $(toolkit_base_src_dir)/factory/localized-control-factory-impl.cpp \
    $(toolkit_base_src_dir)/focus-manager/focus-manager-impl.cpp \
    $(toolkit_base_src_dir)/focus-manager/keyboard-focus-manager-impl.cpp \

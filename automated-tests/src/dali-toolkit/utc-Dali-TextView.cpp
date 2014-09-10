@@ -236,12 +236,14 @@ int UtcDaliTextViewSetAndGetText(void)
   ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
   DALI_TEST_CHECK( registry );
 
-  gNumberObjectCreated = 0;
+  gNumberObjectCreated = 0u;
   registry.ObjectCreatedSignal().Connect(&TestCallback);
 
   // Following string should create three text-actors ([Hel], [lo wo] and [rld]).
   std::string text( "Hel<font size='10'>lo wo</font>rld!\n"
                     "\n" );
+
+  view.SetMarkupProcessingEnabled( true ); // Enables markup processing.
 
   Stage::GetCurrent().Add( view );
   view.SetText( text );
@@ -487,6 +489,7 @@ int UtcDaliTextViewTestLayoutOptions02(void)
 
   TextView textView = TextView::New();
   textView.SetSnapshotModeEnabled( false ); // Disables offscreen rendering.
+  textView.SetMarkupProcessingEnabled( true ); // Enables markup processing.
 
   Stage::GetCurrent().Add( textView );
 
@@ -626,7 +629,9 @@ int UtcDaliTextViewSnapshotEnable(void)
   // Avoids the frame buffer texture to throw an exception.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
 
-  TextView view = TextView::New( "Hel<font color='green'>lo world!</font> This <font color='green'>is</font> a sna<font color='green'>psho</font>t test." );
+  TextView view = TextView::New();
+  view.SetMarkupProcessingEnabled( true ); // Enables markup processing.
+  view.SetText( "Hel<font color='green'>lo world!</font> This <font color='green'>is</font> a sna<font color='green'>psho</font>t test." );
 
   Stage::GetCurrent().Add( view );
 
@@ -801,8 +806,10 @@ int UtcDaliTextViewUnderlineText(void)
   tet_infoline("UtcDaliTextViewUnderlineText: ");
   ToolkitTestApplication application;
 
-  TextView textView = TextView::New( "<u><font size='10'>gg<font size='14'>gg<font size='18'>gg<font size='22'>gg</font>gg</font>gg</font>gg</font></u>" );
+  TextView textView = TextView::New();
   textView.SetSnapshotModeEnabled( false );
+  textView.SetMarkupProcessingEnabled( true );
+  textView.SetText( "<u><font size='10'>gg<font size='14'>gg<font size='18'>gg<font size='22'>gg</font>gg</font>gg</font>gg</font></u>" );
 
   textView.SetSize( 150.f, 100.f );
 

@@ -99,7 +99,7 @@ WordLayoutInfo& WordLayoutInfo::operator=( const WordLayoutInfo& word )
 }
 
 void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
-                         TextViewProcessor::WordLayoutInfo& wordLayoutInfo )
+                         WordLayoutInfo& wordLayoutInfo )
 {
   DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "-->TextViewProcessor::CreateWordTextInfo\n" );
   // Split in characters.
@@ -179,19 +179,19 @@ void RemoveCharactersFromWordInfo( TextView::RelayoutData& relayoutData,
                                    const std::size_t numberOfCharacters,
                                    bool& mergeWords,
                                    bool& mergeLines,
-                                   TextViewProcessor::TextInfoIndices& textInfoIndicesBegin,
-                                   TextViewProcessor::TextInfoIndices& textInfoIndicesEnd,
-                                   TextViewProcessor::TextInfoIndices& textInfoMergeIndicesBegin,
-                                   TextViewProcessor::TextInfoIndices& textInfoMergeIndicesEnd,
-                                   TextViewProcessor::WordGroupLayoutInfo& groupLayout,
+                                   TextInfoIndices& textInfoIndicesBegin,
+                                   TextInfoIndices& textInfoIndicesEnd,
+                                   TextInfoIndices& textInfoMergeIndicesBegin,
+                                   TextInfoIndices& textInfoMergeIndicesEnd,
+                                   LineLayoutInfo& lineLayout,
                                    std::vector<TextActor>& removedTextActors )
 {
-  const TextViewProcessor::TextLayoutInfo& textLayoutInfo = relayoutData.mTextLayoutInfo;
+  const TextLayoutInfo& textLayoutInfo = relayoutData.mTextLayoutInfo;
 
   // Get the word.
-  WordLayoutInfo& wordLayout( *( groupLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex ) );
+  WordLayoutInfo& wordLayout( *( lineLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex ) );
 
-  if( TextViewProcessor::LineSeparator == wordLayout.mType )
+  if( LineSeparator == wordLayout.mType )
   {
     // If the word is a line separator and there is more lines, then current line and the line after need to be merged.
     if( textInfoIndicesBegin.mLineIndex + 1 < textLayoutInfo.mLinesLayoutInfo.size() )
@@ -214,14 +214,14 @@ void RemoveCharactersFromWordInfo( TextView::RelayoutData& relayoutData,
   {
     // If the word is a word separator. Check if the word before and the word after can be merged.
 
-    if( ( 0 < textInfoIndicesBegin.mWordIndex ) && ( groupLayout.mWordsLayoutInfo.size() > textInfoIndicesBegin.mWordIndex + 1 ) )
+    if( ( 0 < textInfoIndicesBegin.mWordIndex ) && ( lineLayout.mWordsLayoutInfo.size() > textInfoIndicesBegin.mWordIndex + 1 ) )
     {
-      const WordLayoutInfo& wordLayoutBefore( *( groupLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex - 1 ) );
-      const WordLayoutInfo& wordLayoutAfter( *( groupLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex + 1 ) );
+      const WordLayoutInfo& wordLayoutBefore( *( lineLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex - 1 ) );
+      const WordLayoutInfo& wordLayoutAfter( *( lineLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex + 1 ) );
 
       if( ( NoSeparator == wordLayoutBefore.mType ) && ( NoSeparator == wordLayoutAfter.mType ) )
       {
-        // This word is a word separator (white space) and is not the first word of the group nor the last one.
+        // This word is a word separator (white space) and is not the first word of the line nor the last one.
         mergeWords = true;
 
         // Set indices to merge the words.
@@ -406,9 +406,9 @@ void CollectTextActors( std::vector<TextActor>& textActors, const WordLayoutInfo
   }
 }
 
-void CollectTextActorsFromWords( std::vector<TextActor>& textActors, const WordGroupLayoutInfo& group, const std::size_t wordIndexBegin, const std::size_t wordIndexEnd )
+void CollectTextActorsFromWords( std::vector<TextActor>& textActors, const LineLayoutInfo& line, const std::size_t wordIndexBegin, const std::size_t wordIndexEnd )
 {
-  for( WordLayoutInfoContainer::const_iterator wordIt = group.mWordsLayoutInfo.begin() + wordIndexBegin, wordEndIt = group.mWordsLayoutInfo.begin() + wordIndexEnd;
+  for( WordLayoutInfoContainer::const_iterator wordIt = line.mWordsLayoutInfo.begin() + wordIndexBegin, wordEndIt = line.mWordsLayoutInfo.begin() + wordIndexEnd;
        wordIt != wordEndIt;
        ++wordIt )
   {

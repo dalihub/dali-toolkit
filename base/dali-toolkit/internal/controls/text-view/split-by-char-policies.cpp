@@ -127,90 +127,79 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
 
     relayoutParameters.mIsNewLine = true;
     relayoutParameters.mLineSize = lineLayoutInfo.mSize;
-    relayoutParameters.mIndices.mGroupIndex = 0;
+    relayoutParameters.mIndices.mWordIndex = 0;
 
-    for( TextViewProcessor::WordGroupLayoutInfoContainer::iterator groupLayoutIt = lineLayoutInfo.mWordGroupsLayoutInfo.begin(),
-           endGroupLayoutIt = lineLayoutInfo.mWordGroupsLayoutInfo.end();
-         groupLayoutIt != endGroupLayoutIt;
-         ++groupLayoutIt, ++relayoutParameters.mIndices.mGroupIndex )
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.begin(),
+           endWordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.end();
+         wordLayoutIt != endWordLayoutIt;
+         ++wordLayoutIt, ++relayoutParameters.mIndices.mWordIndex )
     {
-      TextViewProcessor::WordGroupLayoutInfo& wordGroupLayoutInfo( *groupLayoutIt );
+      TextViewProcessor::WordLayoutInfo& wordLayoutInfo( *wordLayoutIt );
+      relayoutParameters.mIsWhiteSpace = TextViewProcessor::WordSeparator == wordLayoutInfo.mType;
+      relayoutParameters.mIsNewLineCharacter = TextViewProcessor::LineSeparator == wordLayoutInfo.mType;
 
-      relayoutParameters.mIndices.mWordIndex = 0;
+      relayoutParameters.mIsFirstCharacterOfWord = true;
+      relayoutParameters.mWordSize = wordLayoutInfo.mSize;
+      relayoutParameters.mIndices.mCharacterIndex = 0;
 
-      for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = wordGroupLayoutInfo.mWordsLayoutInfo.begin(),
-             endWordLayoutIt = wordGroupLayoutInfo.mWordsLayoutInfo.end();
-           wordLayoutIt != endWordLayoutIt;
-           ++wordLayoutIt, ++relayoutParameters.mIndices.mWordIndex )
+      for( TextViewProcessor::CharacterLayoutInfoContainer::iterator characterLayoutIt = wordLayoutInfo.mCharactersLayoutInfo.begin(),
+             endCharacterLayoutIt = wordLayoutInfo.mCharactersLayoutInfo.end();
+           characterLayoutIt != endCharacterLayoutIt;
+           ++characterLayoutIt, ++relayoutParameters.mIndices.mCharacterIndex )
       {
-        TextViewProcessor::WordLayoutInfo& wordLayoutInfo( *wordLayoutIt );
-        relayoutParameters.mIsWhiteSpace = TextViewProcessor::WordSeparator == wordLayoutInfo.mType;
-        relayoutParameters.mIsNewLineCharacter = TextViewProcessor::LineSeparator == wordLayoutInfo.mType;
+        TextViewProcessor::CharacterLayoutInfo& characterLayoutInfo( *characterLayoutIt );
 
-        relayoutParameters.mIsFirstCharacterOfWord = true;
-        relayoutParameters.mWordSize = wordLayoutInfo.mSize;
-        relayoutParameters.mIndices.mCharacterIndex = 0;
+        relayoutParameters.mCharacterSize = characterLayoutInfo.mSize;
 
-        for( TextViewProcessor::CharacterLayoutInfoContainer::iterator characterLayoutIt = wordLayoutInfo.mCharactersLayoutInfo.begin(),
-               endCharacterLayoutIt = wordLayoutInfo.mCharactersLayoutInfo.end();
-             characterLayoutIt != endCharacterLayoutIt;
-             ++characterLayoutIt, ++relayoutParameters.mIndices.mCharacterIndex )
+        switch( layoutParameters.mExceedPolicy )
         {
-          TextViewProcessor::CharacterLayoutInfo& characterLayoutInfo( *characterLayoutIt );
-
-          relayoutParameters.mCharacterSize = characterLayoutInfo.mSize;
-
-          switch( layoutParameters.mExceedPolicy )
+          case TextView::OriginalShrink:
+          case TextView::SplitOriginal:
+          case TextView::SplitFade:
+          case TextView::SplitEllipsizeEnd:
+          case TextView::SplitShrink:
+          case TextView::ShrinkOriginal:
+          case TextView::ShrinkFade:
+          case TextView::Shrink:
+          case TextView::EllipsizeEndOriginal:
+          case TextView::EllipsizeEnd: // Fall Through
           {
-            case TextView::OriginalShrink:
-            case TextView::SplitOriginal:
-            case TextView::SplitFade:
-            case TextView::SplitEllipsizeEnd:
-            case TextView::SplitShrink:
-            case TextView::ShrinkOriginal:
-            case TextView::ShrinkFade:
-            case TextView::Shrink:
-            case TextView::EllipsizeEndOriginal:
-            case TextView::EllipsizeEnd: // Fall Through
-            {
-              DALI_LOG_WARNING( "SplitByChar::CalculateSizeAndPosition() policy not implemented.\n" );
-              break;
-            }
-            case TextView::OriginalFade:
-            case TextView::FadeOriginal:
-            case TextView::Original:
-            case TextView::Fade: // Fall Through
-            {
-              characterLayoutInfo.mPosition = NoShrinkWhenExceedPosition( relayoutParameters,
-                                                                          layoutParameters,
-                                                                          relayoutData );
-
-              relayoutParameters.mPositionOffset = characterLayoutInfo.mPosition + Vector3( characterLayoutInfo.mSize.width, 0.f, 0.f );
-              break;
-            }
-            default:
-            {
-              DALI_LOG_WARNING( "SplitByChar::CalculateSizeAndPosition() policy combination not possible.\n" );
-            }
+            DALI_LOG_WARNING( "SplitByChar::CalculateSizeAndPosition() policy not implemented.\n" );
+            break;
           }
+          case TextView::OriginalFade:
+          case TextView::FadeOriginal:
+          case TextView::Original:
+          case TextView::Fade: // Fall Through
+          {
+            characterLayoutInfo.mPosition = NoShrinkWhenExceedPosition( relayoutParameters,
+                                                                        layoutParameters,
+                                                                        relayoutData );
 
-          // Get last line info and calculate the bearing (used to align glyphs with the baseline).
-          TextViewRelayout::CalculateBearing( characterLayoutInfo, relayoutData );
+            relayoutParameters.mPositionOffset = characterLayoutInfo.mPosition + Vector3( characterLayoutInfo.mSize.width, 0.f, 0.f );
+            break;
+          }
+          default:
+          {
+            DALI_LOG_WARNING( "SplitByChar::CalculateSizeAndPosition() policy combination not possible.\n" );
+          }
+        }
 
-          // updates min and max position to calculate the text size for split by char.
-          TextViewRelayout::UpdateLayoutInfoTable( minMaxXY,
-                                                   wordGroupLayoutInfo,
-                                                   wordLayoutInfo,
-                                                   characterLayoutInfo,
-                                                   relayoutParameters,
-                                                   relayoutData );
+        // Get last line info and calculate the bearing (used to align glyphs with the baseline).
+        TextViewRelayout::CalculateBearing( characterLayoutInfo, relayoutData );
 
-          ++relayoutParameters.mCharacterGlobalIndex;
-          relayoutParameters.mIsFirstCharacter = false;
-          relayoutParameters.mIsNewLine = false;
-        } // end characters
-      } // end words
-    } // end group of words
+        // updates min and max position to calculate the text size for split by char.
+        TextViewRelayout::UpdateLayoutInfoTable( minMaxXY,
+                                                 wordLayoutInfo,
+                                                 characterLayoutInfo,
+                                                 relayoutParameters,
+                                                 relayoutData );
+
+        ++relayoutParameters.mCharacterGlobalIndex;
+        relayoutParameters.mIsFirstCharacter = false;
+        relayoutParameters.mIsNewLine = false;
+      } // end characters
+    } // end words
   } // end lines
 
   if( relayoutData.mCharacterLayoutInfoTable.empty() )
@@ -228,7 +217,7 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
   {
     const TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end() - 1 ) );
 
-    if( lineLayoutInfo.mWordGroupsLayoutInfo.empty() ) // if it's empty, it means the last character is a new line character.
+    if( lineLayoutInfo.mWordsLayoutInfo.empty() ) // if it's empty, it means the last character is a new line character.
     {
       relayoutData.mTextSizeForRelayoutOption.height += lineLayoutInfo.mSize.height;
     }
