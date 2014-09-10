@@ -19,12 +19,14 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/debug.h>
 #include <dali-toolkit/public-api/markup-processor/markup-processor.h>
-#include <dali-toolkit/internal/controls/text-view/text-view-processor-types.h>
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
+
+//Forward declarations.
+class TextStyle;
 
 namespace Toolkit
 {
@@ -34,6 +36,12 @@ namespace Internal
 
 namespace TextViewProcessor
 {
+
+//Forward declarations.
+struct WordLayoutInfo;
+struct ParagraphLayoutInfo;
+struct TextLayoutInfo;
+struct TextInfoIndices;
 
 #if defined(DEBUG_ENABLED)
 extern Debug::Filter* gTextViewProcessorLogFilter;
@@ -45,8 +53,6 @@ void dbgPrint( const TextLayoutInfo& textInfo );
 void dbgPrint( const TextStyle& style );
 void dbgPrint( const TextInfoIndices& indices );
 void dbgPrint( const MarkupProcessor::StyledTextArray& text );
-
-void dbgPrintText( const WordLayoutInfo& word );
 
 } // namespace TextViewProcessor
 

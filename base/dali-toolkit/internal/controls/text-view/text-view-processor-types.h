@@ -20,16 +20,25 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/renderable-actor.h>
-#include <dali-toolkit/public-api/markup-processor/markup-processor.h>
+#include <dali/public-api/text/text.h>
 
 namespace Dali
 {
+
+class TextStyle;
 
 namespace Toolkit
 {
 
 namespace Internal
 {
+
+namespace TextProcessor
+{
+// Forward declarations.
+struct BidirectionalParagraphInfo;
+struct BidirectionalLineInfo;
+} // namespace TextProcessor
 
 namespace TextViewProcessor
 {
@@ -84,6 +93,7 @@ struct TextInfoIndices
   std::size_t mParagraphIndex;          ///< The paragraph index within the text.
   std::size_t mWordIndex;               ///< The word index within the paragraph.
   std::size_t mCharacterIndex;          ///< The character index within the word.
+  std::size_t mCharacterParagraphIndex; ///< The character index within the paragraph.
 };
 
 /**
@@ -161,10 +171,9 @@ struct CharacterLayoutInfo
   Vector3     mPosition;           ///< Position within the text-view
   Vector2     mOffset;             ///< Alignment and justification offset.
 
-  RenderableActor             mGlyphActor;   ///< Handle to a text-actor.
-  MarkupProcessor::StyledText mStyledText;   ///< Stores the text and its style.
-  float                       mColorAlpha;   ///< Alpha component for the initial text color when text is faded.
-  GradientInfo*               mGradientInfo; ///< Stores gradient info.
+  RenderableActor mGlyphActor;     ///< Handle to a text-actor.
+  float           mColorAlpha;     ///< Alpha component for the initial text color when text is faded.
+  GradientInfo*   mGradientInfo;   ///< Stores gradient info.
 
   bool            mIsVisible:1;    ///< Whether the text-actor is visible.
   bool            mSetText:1;      ///< Whether a new text needs to be set in the text-actor.
@@ -205,9 +214,34 @@ struct WordLayoutInfo
   Size                              mSize;                      ///< Size of the word.
   float                             mAscender;                  ///< Max of all ascenders of all characters.
   TextSeparatorType                 mType;                      ///< Whether this word is a word separator, a line separator or is not a separator.
+  std::size_t                       mFirstCharacter;            ///< Index to the first character of the word within the paragraph.
   CharacterLayoutInfoContainer      mCharactersLayoutInfo;      ///< Layout info for all characters.
 };
 typedef std::vector<WordLayoutInfo> WordLayoutInfoContainer;
+
+/**
+ * Stores the reordered layout for right to left text.
+ */
+struct RightToLeftParagraphLayout
+{
+  RightToLeftParagraphLayout()
+  : mWordsLayoutInfo(),
+    mText(),
+    mTextStyles(),
+    mPreviousLayoutCleared( false )
+  {
+  }
+
+  WordLayoutInfoContainer mWordsLayoutInfo;         ///< Layout info for all words.
+  Text                    mText;                    ///< Stores the text.
+  Vector<TextStyle*>      mTextStyles;              ///< Stores the style per each character.
+  bool                    mPreviousLayoutCleared:1; ///< Whether the previous right to left layout has been cleared.
+
+  /**
+   * Clears the word layout vector, the text and the vector of styles.
+   */
+  void Clear();
+};
 
 /**
  * Layout information for a paragraph.
@@ -224,7 +258,7 @@ struct ParagraphLayoutInfo
   /**
    * Default destructor.
    *
-   * Clears all words.
+   * Clears all words, deletes all text styles, the paragraph bidirectional info and all bidirectional infor for each line.
    */
   ~ParagraphLayoutInfo();
 
@@ -238,11 +272,30 @@ struct ParagraphLayoutInfo
    */
   ParagraphLayoutInfo& operator=( const ParagraphLayoutInfo& paragraph );
 
+  /**
+   * Deletes the bidirectional info for each line.
+   */
+  void ClearBidirectionalInfo();
+
+private:
+
+  /**
+   * Deletes all text styles.
+   */
+  void ClearStyles();
+
+public:
   Size                                          mSize;                       ///< Size of the paragraph.
   float                                         mAscender;                   ///< Max of all ascenders of all words.
   float                                         mLineHeightOffset;           ///< Line height offset.
+  std::size_t                                   mFirstCharacter;             ///< Index to the first character of the paragraph.
   std::size_t                                   mNumberOfCharacters;         ///< Stores the number of characters.
   WordLayoutInfoContainer                       mWordsLayoutInfo;            ///< Layout info for all words.
+  Text                                          mText;                       ///< Stores the text.
+  Vector<TextStyle*>                            mTextStyles;                 ///< Stores the style per each character.
+  RightToLeftParagraphLayout*                   mRightToLeftLayout;          ///< Stores the reordered layout for the paragraph.
+  TextProcessor::BidirectionalParagraphInfo*    mBidirectionalParagraphInfo; ///< Contains bidirectional info for the whole paragraph. Set to NULL if the paragraph has left to right characters only.
+  Vector<TextProcessor::BidirectionalLineInfo*> mBidirectionalLinesInfo;     ///< Contains bidirectional info for each laid-out line.
 };
 typedef std::vector<ParagraphLayoutInfo> ParagraphLayoutInfoContainer;
 
@@ -259,6 +312,13 @@ struct TextLayoutInfo
   TextLayoutInfo();
 
   /**
+   * Defualt destructor.
+   *
+   * Clears the paragraph vector, the ellipsis text and deletes all ellipsis styles.
+   */
+  ~TextLayoutInfo();
+
+  /**
    * Copy constructor.
    */
   TextLayoutInfo( const TextLayoutInfo& text );
@@ -268,12 +328,21 @@ struct TextLayoutInfo
    */
   TextLayoutInfo& operator=( const TextLayoutInfo& text );
 
+private:
+  /**
+   * Deletes all the ellipsis text styles.
+   */
+  void ClearStyles();
+
+public:
   Size                         mWholeTextSize;        ///< width and height of the whole text.
   float                        mMaxWordWidth;         ///< maximum width between all words.
   float                        mMaxItalicsOffset;     ///< When rendering text-view in offscreen an extra width offset is needed to prevent italic characters to be cut if they are in the right edge.
   std::size_t                  mNumberOfCharacters;   ///< Stores the number of characters.
   ParagraphLayoutInfoContainer mParagraphsLayoutInfo; ///< Layout information for all paragraphs.
   WordLayoutInfo               mEllipsizeLayoutInfo;  ///< Layout information for the ellipsize text.
+  Dali::Text                   mEllipsisText;         ///< The ellipsis text.
+  Vector<TextStyle*>           mEllipsisTextStyles;   ///< Stores the style per each character of the ellipsis text.
 };
 
 } // namespace TextViewProcessor

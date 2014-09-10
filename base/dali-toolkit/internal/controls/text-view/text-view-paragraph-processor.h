@@ -36,12 +36,10 @@ namespace TextViewProcessor
 /**
  * Creates a data structure with info to layout the paragraph, and data structures with useful info to modify the layout data structure if characters are added or removed.
  *
- * @param[in] paragraph The styled paragraph.
  * @param[in,out] relayoutData Natural size (metrics), layout, text-actor info and conversion from visual to logical order and vice versa (for RTL text).
  * @param[out] paragraphLayoutInfo Layout info for the whole paragraph.
  */
-void CreateParagraphInfo( const MarkupProcessor::StyledTextArray& line,
-                          TextView::RelayoutData& relayoutData,
+void CreateParagraphInfo( TextView::RelayoutData& relayoutData,
                           ParagraphLayoutInfo& paragraphLayoutInfo );
 
 /**

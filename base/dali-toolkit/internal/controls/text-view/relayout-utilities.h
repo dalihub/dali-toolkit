@@ -19,8 +19,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/alignment/alignment.h>
+#include <dali-toolkit/public-api/controls/text-view/text-view.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-impl.h>
-#include <dali-toolkit/internal/controls/text-view/text-view-processor-types.h>
 
 namespace Dali
 {
@@ -265,6 +266,13 @@ void CalculateLineLayout( float parentWidth,
                           LineLayoutInfo& layoutInfo );
 
 /**
+ * Reorders the text layout of each line of each paragraph of the text.
+ *
+ * @param[in,out] relayoutData The text-view's data structures.
+ */
+void ReorderRightToLeftLayout( TextView::RelayoutData& relayoutData );
+
+/**
  * Calculates the \e x offset position for the whole text.
  *
  * @param[in] horizontalTextAlignment The horizontal alignment type.
@@ -358,12 +366,14 @@ void UpdateLayoutInfoTable( Vector4& minMaxXY,
  *
  * @param[in] layoutParameters The layout parameters.
  * @param[in] characterLayoutInfo Character layout info.
+ * @param[in] style The style of the character. Used to get the color (and alpha) of the character.
  * @param[in,out] relayoutParameters Temporary layout parameters.
  * @param[in,out] fadeParameters Temporary fade parameters.
  * @param[in,out] relayoutData The text-view's data structures.
  */
 void CalculateVisibilityForFade( const Internal::TextView::LayoutParameters& layoutParameters,
                                  TextViewProcessor::CharacterLayoutInfo& characterLayoutInfo,
+                                 const TextStyle& style,
                                  RelayoutParameters& relayoutParameters,
                                  FadeParameters& fadeParameters,
                                  TextView::RelayoutData& relayoutData );
@@ -391,7 +401,11 @@ void CreateEllipsizeTextActor( const EllipsizeParameters& ellipsizeParameters,
                                TextView::RelayoutData& relayoutData );
 
 /**
+ * Replace the text which exceeds the boundary by the ellipsis text.
  *
+ * @param[in] layoutParameters The layout parameters.
+ * @param[in,out] ellipsisParameters Temporary ellipsis parameters.
+ * @param[in,out] relayoutData The text-view's data structures.
  */
 void EllipsizeLine( const TextView::LayoutParameters& layoutParameters,
                     EllipsizeParameters& ellipsizeParameters,

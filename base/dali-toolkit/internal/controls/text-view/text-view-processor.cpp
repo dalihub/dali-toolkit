@@ -19,10 +19,12 @@
 #include <dali-toolkit/internal/controls/text-view/text-view-processor.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-word-processor.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-paragraph-processor.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-processor-helper-functions.h>
 #include <dali-toolkit/internal/controls/text-view/text-processor.h>
+#include <dali-toolkit/internal/controls/text-view/text-processor-bidirectional-info.h>
 
 namespace Dali
 {
@@ -84,7 +86,8 @@ void UpdateLayoutInfo( TextLayoutInfo& textLayoutInfo )
 TextInfoIndices::TextInfoIndices()
 : mParagraphIndex( 0u ),
   mWordIndex( 0u ),
-  mCharacterIndex( 0u )
+  mCharacterIndex( 0u ),
+  mCharacterParagraphIndex( 0u )
 {
 }
 
@@ -93,7 +96,8 @@ TextInfoIndices::TextInfoIndices( const std::size_t paragraphIndex,
                                   const std::size_t characterIndex )
 : mParagraphIndex( paragraphIndex ),
   mWordIndex( wordIndex ),
-  mCharacterIndex( characterIndex )
+  mCharacterIndex( characterIndex ),
+  mCharacterParagraphIndex( 0u )
 {
 }
 
@@ -101,7 +105,8 @@ bool TextInfoIndices::operator==( const TextInfoIndices& indices ) const
 {
   return ( ( mParagraphIndex == indices.mParagraphIndex ) &&
            ( mWordIndex == indices.mWordIndex ) &&
-           ( mCharacterIndex == indices.mCharacterIndex ) );
+           ( mCharacterIndex == indices.mCharacterIndex ) &&
+           ( mCharacterParagraphIndex == indices.mCharacterParagraphIndex ) );
 }
 
 /////////////////////
@@ -114,8 +119,19 @@ TextLayoutInfo::TextLayoutInfo()
   mMaxItalicsOffset( 0.f ),
   mNumberOfCharacters( 0u ),
   mParagraphsLayoutInfo(),
-  mEllipsizeLayoutInfo()
+  mEllipsizeLayoutInfo(),
+  mEllipsisText( "..." ),
+  mEllipsisTextStyles()
 {
+  // Sets default styles for the default ellipsis text.
+  mEllipsisTextStyles.PushBack( new TextStyle() );
+  mEllipsisTextStyles.PushBack( new TextStyle() );
+  mEllipsisTextStyles.PushBack( new TextStyle() );
+}
+
+TextLayoutInfo::~TextLayoutInfo()
+{
+  ClearStyles();
 }
 
 TextLayoutInfo::TextLayoutInfo( const TextLayoutInfo& text )
@@ -124,8 +140,14 @@ TextLayoutInfo::TextLayoutInfo( const TextLayoutInfo& text )
   mMaxItalicsOffset( text.mMaxItalicsOffset ),
   mNumberOfCharacters( text.mNumberOfCharacters ),
   mParagraphsLayoutInfo( text.mParagraphsLayoutInfo ),
-  mEllipsizeLayoutInfo( text.mEllipsizeLayoutInfo )
+  mEllipsizeLayoutInfo( text.mEllipsizeLayoutInfo ),
+  mEllipsisText( text.mEllipsisText ),
+  mEllipsisTextStyles()
 {
+  for( Vector<TextStyle*>::ConstIterator it = text.mEllipsisTextStyles.Begin(), endIt = text.mEllipsisTextStyles.End(); it != endIt; ++it )
+  {
+    mEllipsisTextStyles.PushBack( new TextStyle( *(*it) ) );
+  }
 }
 
 TextLayoutInfo& TextLayoutInfo::operator=( const TextLayoutInfo& text )
@@ -138,9 +160,25 @@ TextLayoutInfo& TextLayoutInfo::operator=( const TextLayoutInfo& text )
     mNumberOfCharacters = text.mNumberOfCharacters;
     mParagraphsLayoutInfo = text.mParagraphsLayoutInfo;
     mEllipsizeLayoutInfo = text.mEllipsizeLayoutInfo;
-  }
+    mEllipsisText = text.mEllipsisText;
 
+    ClearStyles();
+
+    for( Vector<TextStyle*>::ConstIterator it = text.mEllipsisTextStyles.Begin(), endIt = text.mEllipsisTextStyles.End(); it != endIt; ++it )
+    {
+      mEllipsisTextStyles.PushBack( new TextStyle( *(*it) ) );
+    }
+  }
   return *this;
+}
+
+void TextLayoutInfo::ClearStyles()
+{
+  for( Vector<TextStyle*>::Iterator it = mEllipsisTextStyles.Begin(), endIt = mEllipsisTextStyles.End(); it != endIt; ++it )
+  {
+    delete *it;
+  }
+  mEllipsisTextStyles.Clear();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,9 +190,11 @@ void CreateTextInfo( const MarkupProcessor::StyledTextArray& text,
   // * Traverse the given text spliting it in paragraphs and each paragraph in words.
   // * White spaces and new paragraph characters are alone in one word.
   // * Bidirectional text is processed in each paragraph.
+  //     It creates the conversion tables
+  //     It does the ligatures if there is arabic glyphs.
+  //     It doesn't reorder the text as it must be done for each line not for the paragraph.
   // * Generates a layout data structure to store layout information (size, position, ascender, text direction, etc) and metrics of all characters.
-  // * Generates a text-actor data structure to store text, style and text-actors.
-  // TODO: finish and test the bidirectional implementation.
+  // * Store text for each paragraph and the style for each character.
 
   // Collect previously created text-actors.
   std::vector<TextActor> textActors;
@@ -168,49 +208,77 @@ void CreateTextInfo( const MarkupProcessor::StyledTextArray& text,
   }
 
   // Store the ellipsize layout info before clearing the previous created info.
+  // TODO: fix this. Don't clear the ellipsis layout, store it somewhere else ...
   const WordLayoutInfo ellipsizeInfo = relayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo;
+  Dali::Text           ellipsisText = relayoutData.mTextLayoutInfo.mEllipsisText;
+  Vector<TextStyle*>   ellipsisTextStyles = relayoutData.mTextLayoutInfo.mEllipsisTextStyles;
+  relayoutData.mTextLayoutInfo.mEllipsisTextStyles.Clear();
 
-  // clear previous created info.
+  // clear previously created info.
   relayoutData.mTextLayoutInfo = TextLayoutInfo();
   relayoutData.mCharacterLogicalToVisualMap.clear();
   relayoutData.mCharacterVisualToLogicalMap.clear();
 
   // Sets the ellipsize layout info.
   relayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo = ellipsizeInfo;
+  relayoutData.mTextLayoutInfo.mEllipsisText = ellipsisText;
+  relayoutData.mTextLayoutInfo.mEllipsisTextStyles = ellipsisTextStyles;
 
   // Split the whole text in paragraphs.
-  std::vector<MarkupProcessor::StyledTextArray> paragraphs;
+  // It returns a vector of Text with all the paragraphs.
+  // and for each paragraph a vector of styles per character. TODO: don't create a style per character.
+  std::vector<Text> paragraphs;
+  std::vector< Vector<TextStyle*> > styles;
   TextProcessor::SplitInParagraphs( text,
-                                    paragraphs );
+                                    paragraphs,
+                                    styles );
+
+  // Reserve space for the current number of paragraphs.
+  relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.resize( paragraphs.size(), ParagraphLayoutInfo() );
 
   // Traverse all paragraphs
-  for( std::vector<MarkupProcessor::StyledTextArray>::const_iterator paragraphIt = paragraphs.begin(), paragraphEndIt = paragraphs.end(); paragraphIt != paragraphEndIt; ++paragraphIt )
+  std::size_t paragraphIndex = 0u;
+  std::vector<Text>::iterator paragraphIt, paragraphEndIt;
+  std::vector< Vector<TextStyle*> >::const_iterator styleIt, styleEndIt;
+  for( paragraphIt = paragraphs.begin(), paragraphEndIt = paragraphs.end(),
+         styleIt = styles.begin(), styleEndIt = styles.end();
+       ( paragraphIt != paragraphEndIt ) && ( styleIt != styleEndIt );
+       ++paragraphIndex,
+         ++paragraphIt,
+         ++styleIt )
   {
-    const MarkupProcessor::StyledTextArray& paragraph( *paragraphIt );
+    // Gets the paragraph and the styles for each character.
+    Text& paragraph( *paragraphIt );
+    const Vector<TextStyle*>& textStyles( *styleIt );
 
-    // Data structures for the new paragraph
-    ParagraphLayoutInfo paragraphLayoutInfo;
+    // Retrieve the data structure for the current paragraph.
+    ParagraphLayoutInfo& paragraphLayoutInfo = *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + paragraphIndex );
 
-    // Fills the paragraph data structures with the layout info.
-    CreateParagraphInfo( paragraph,
-                         relayoutData,
-                         paragraphLayoutInfo );
+    // Sets text and styles.
+    paragraphLayoutInfo.mText = paragraph;
+    paragraphLayoutInfo.mTextStyles = textStyles;
 
-    if( 0u < paragraphLayoutInfo.mNumberOfCharacters )
+    // Fills the paragraph data structure with the layout info.
+
+    if( !paragraph.IsEmpty() )
     {
+      CreateParagraphInfo( relayoutData,
+                           paragraphLayoutInfo );
+
       // do not add the line offset if the paragraph has no characters.
       paragraphLayoutInfo.mSize.height += layoutParameters.mLineHeightOffset;
       paragraphLayoutInfo.mLineHeightOffset = layoutParameters.mLineHeightOffset;
     }
     else
     {
-      // line height needs to be added for the last paragraph.
+      // This paragraph has no text. i.e. the previous paragraph ends with '\n'.
+      // Even though, line height needs to be set in order to align the whole text correctly.
 
       float lineHeight = 0.f;
       // Get the last character of the last paragraph.
-      if( !relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.empty() )
+      if( 0u < paragraphIndex )
       {
-        const ParagraphLayoutInfo& paragraphInfo( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end() - 1u ) );
+        const ParagraphLayoutInfo& paragraphInfo( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + ( paragraphIndex - 1u ) ) );
 
         const CharacterLayoutInfo characterInfo = GetLastCharacterLayoutInfo( paragraphInfo );
 
@@ -220,16 +288,21 @@ void CreateTextInfo( const MarkupProcessor::StyledTextArray& text,
       paragraphLayoutInfo.mSize.height = lineHeight;
     }
 
+    // Fills the conversion tables used to get the logical or visual position of a character is case there is right to left text.
+    // If there is right to left text, it needs to be updated every time the text is relaid-out.
+    for( std::size_t index = 0u; index < paragraphLayoutInfo.mNumberOfCharacters; ++index )
+    {
+      relayoutData.mCharacterLogicalToVisualMap.push_back( relayoutData.mTextLayoutInfo.mNumberOfCharacters + index );
+      relayoutData.mCharacterVisualToLogicalMap.push_back( relayoutData.mTextLayoutInfo.mNumberOfCharacters + index );
+    }
+
     // Update layout info for the whole text.
     UpdateSize( relayoutData.mTextLayoutInfo.mWholeTextSize, paragraphLayoutInfo.mSize, GrowHeight );
     relayoutData.mTextLayoutInfo.mNumberOfCharacters += paragraphLayoutInfo.mNumberOfCharacters;
-
-    // Add the paragraph to the current text.
-    relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.push_back( paragraphLayoutInfo );
   } // end of paragraphs
 }
 
-void UpdateTextInfo( const std::size_t position,
+void UpdateTextInfo( std::size_t position,
                      const MarkupProcessor::StyledTextArray& text,
                      const TextView::LayoutParameters& layoutParameters,
                      TextView::RelayoutData& relayoutData )
@@ -242,7 +315,7 @@ void UpdateTextInfo( const std::size_t position,
   // * Merge the last paragraph of the new text to the last part or the split paragraph.
   // * Add paragraphs between first and last of the new text.
   // * Merge the first part of the split paragraph with the first paragraph of the new text.
-  // * Update layout info and create new text actors if needed.
+  // * Update the layout info for the whole text.
 
   // Early returns:
 
@@ -269,6 +342,15 @@ void UpdateTextInfo( const std::size_t position,
     DALI_ASSERT_ALWAYS( !"TextViewProcessor::UpdateTextInfo (insert). Trying to insert text out of bounds." );
   }
 
+
+  // TODO
+  // If in the insertion is involved right to left text,
+  // check the neighbour characters is needed.
+  //   i.e. Arabic characters may have four different glyphs (isolated, end, middle, begin).
+  //        So check the neighbours on each side is needed in order to render
+  //        the correct ligatures.
+
+
   TextView::RelayoutData relayoutDataForNewText;
 
   // Creates layout info for the given text.
@@ -277,8 +359,8 @@ void UpdateTextInfo( const std::size_t position,
                   layoutParameters,
                   relayoutDataForNewText );
 
-  // Update logical-to-visual and visual-to-logical tables.
-  // TODO: check that for mixed RTL/LTR text.
+  // Fills the conversion tables used to get the logical or visual position of a character is case there is right to left text.
+  // If there is right to left text, it needs to be updated every time the text is relaid-out.
   std::size_t index = 0u;
   for( std::size_t i = 0u; i < relayoutDataForNewText.mTextLayoutInfo.mNumberOfCharacters; ++i )
   {
@@ -335,6 +417,13 @@ void UpdateTextInfo( const std::size_t position,
 
         const WordLayoutInfo& wordLayoutInfo( *( paragraphLayoutInfo.mWordsLayoutInfo.end() - 1u ) );
         textInfoIndices.mCharacterIndex = wordLayoutInfo.mCharactersLayoutInfo.size();
+
+        // Sets the character index within the paragraph.
+        textInfoIndices.mCharacterParagraphIndex = 0u;
+        for( WordLayoutInfoContainer::const_iterator it = paragraphLayoutInfo.mWordsLayoutInfo.begin(), endIt = paragraphLayoutInfo.mWordsLayoutInfo.end(); it != endIt; ++it )
+        {
+          textInfoIndices.mCharacterParagraphIndex += wordLayoutInfo.mCharactersLayoutInfo.size();
+        }
       }
     }
   }
@@ -382,8 +471,8 @@ void UpdateTextInfo( const std::size_t position,
   UpdateLayoutInfo( relayoutData.mTextLayoutInfo );
 }
 
-void UpdateTextInfo( const std::size_t position,
-                     const std::size_t numberOfCharacters,
+void UpdateTextInfo( std::size_t position,
+                     std::size_t numberOfCharacters,
                      const TextView::LayoutParameters& layoutParameters,
                      TextView::RelayoutData& relayoutData,
                      const TextOperationOnRemove clearText )
@@ -414,7 +503,8 @@ void UpdateTextInfo( const std::size_t position,
   // Asserts if trying to delete text out of bounds.
   DALI_ASSERT_ALWAYS( position + numberOfCharacters <= relayoutData.mTextLayoutInfo.mNumberOfCharacters && "TextViewProcessor::UpdateTextInfo. ERROR: trying to delete characters out of boundary" );
 
-  // Remove characters from character to visual map and vs //TODO: check this for RTL text!!
+  // Remove characters from character to visual map and vs.
+  // If there is right to left text, it needs to be updated every time the text is relaid-out.
   relayoutData.mCharacterLogicalToVisualMap.erase( relayoutData.mCharacterLogicalToVisualMap.end() - numberOfCharacters, relayoutData.mCharacterLogicalToVisualMap.end() );
   relayoutData.mCharacterVisualToLogicalMap.erase( relayoutData.mCharacterVisualToLogicalMap.end() - numberOfCharacters, relayoutData.mCharacterVisualToLogicalMap.end() );
 
@@ -521,6 +611,19 @@ void UpdateTextInfo( const std::size_t position,
       // As paragraphIndexBegin has been increased just to not to remove the paragraph, decrease now is needed to access it.
       ParagraphLayoutInfo& paragraphLayout( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + textInfoIndicesBegin.mParagraphIndex - 1u ) );
 
+      // Remove the characters from the text and the styles.
+      paragraphLayout.mText.Remove( textInfoIndicesBegin.mCharacterParagraphIndex, paragraphLayout.mNumberOfCharacters - textInfoIndicesBegin.mCharacterParagraphIndex );
+
+      for( Vector<TextStyle*>::Iterator it = paragraphLayout.mTextStyles.Begin() + textInfoIndicesBegin.mCharacterParagraphIndex,
+             endIt = paragraphLayout.mTextStyles.End();
+           it != endIt;
+           ++it )
+      {
+        delete *it;
+      }
+      paragraphLayout.mTextStyles.Erase( paragraphLayout.mTextStyles.Begin() + textInfoIndicesBegin.mCharacterParagraphIndex,
+                                         paragraphLayout.mTextStyles.End() );
+
       if( ( textInfoIndicesBegin.mWordIndex + 1u < paragraphLayout.mWordsLayoutInfo.size() ) || ( 0u == textInfoIndicesBegin.mCharacterIndex ) )
       {
         // Remove extra words within current paragraph. (and current word if whole characters are removed)
@@ -576,6 +679,21 @@ void UpdateTextInfo( const std::size_t position,
 
       // Get the last paragraph.
       ParagraphLayoutInfo& paragraphLayout( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + paragraphIndex ) );
+
+      // Remove the characters from the text and the styles.
+      const std::size_t lastCharacterIndex = textInfoIndicesEnd.mCharacterParagraphIndex + 1u;
+
+      paragraphLayout.mText.Remove( 0u, lastCharacterIndex );
+
+      for( Vector<TextStyle*>::Iterator it = paragraphLayout.mTextStyles.Begin(),
+             endIt = paragraphLayout.mTextStyles.Begin() + lastCharacterIndex;
+           it != endIt;
+           ++it )
+      {
+        delete *it;
+      }
+      paragraphLayout.mTextStyles.Erase( paragraphLayout.mTextStyles.Begin(),
+                                         paragraphLayout.mTextStyles.Begin() + lastCharacterIndex );
 
       // Check if is needed remove the whole word. (If the character index is pointing just after the end of the word)
       const WordLayoutInfo& wordLayout( *( paragraphLayout.mWordsLayoutInfo.begin() + textInfoIndicesEnd.mWordIndex ) );
@@ -633,6 +751,22 @@ void UpdateTextInfo( const std::size_t position,
 
     // Paragraph which contains the characters to be deleted.
     ParagraphLayoutInfo& paragraphLayout( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + textInfoIndicesBegin.mParagraphIndex ) );
+
+    // Remove the characters from the text and the styles.
+    const std::size_t firstCharacterIndex = textInfoIndicesBegin.mCharacterParagraphIndex;
+    const std::size_t lastCharacterIndex = textInfoIndicesEnd.mCharacterParagraphIndex + 1u;
+
+    paragraphLayout.mText.Remove( firstCharacterIndex, lastCharacterIndex - firstCharacterIndex );
+
+    for( Vector<TextStyle*>::Iterator it = paragraphLayout.mTextStyles.Begin() + firstCharacterIndex,
+           endIt = paragraphLayout.mTextStyles.Begin() + lastCharacterIndex;
+         it != endIt;
+         ++it )
+    {
+      delete *it;
+    }
+    paragraphLayout.mTextStyles.Erase( paragraphLayout.mTextStyles.Begin() + firstCharacterIndex,
+                                       paragraphLayout.mTextStyles.Begin() + lastCharacterIndex );
 
     // Remove the characters from the paragraph layout info. It returns whether the current paragraph can be merged with the next one.
     RemoveCharactersFromParagraphInfo( relayoutData,
@@ -730,8 +864,8 @@ void UpdateTextInfo( const std::size_t position,
   relayoutData.mTextActorCache.InsertTextActors( removedTextActorsFromBegin );
 }
 
-void UpdateTextInfo( const std::size_t position,
-                     const std::size_t numberOfCharacters,
+void UpdateTextInfo( std::size_t position,
+                     std::size_t numberOfCharacters,
                      const MarkupProcessor::StyledTextArray& text,
                      const TextView::LayoutParameters& layoutParameters,
                      TextView::RelayoutData& relayoutData )
@@ -788,6 +922,17 @@ void UpdateTextInfo( const TextStyle& style,
   {
     ParagraphLayoutInfo& paragraph( *paragraphIt );
 
+    std::size_t index = 0u;
+    for( Vector<TextStyle*>::Iterator it = paragraph.mTextStyles.Begin(), endIt = paragraph.mTextStyles.End(); it != endIt; ++it )
+    {
+      (*it)->Copy( style, mask );
+
+      // Checks if the font family supports all glyphs. If not, chooses a most suitable one.
+      ChooseFontFamilyName( paragraph.mText[index], *(*it) );
+
+      ++index;
+    }
+
     for( WordLayoutInfoContainer::iterator wordIt = paragraph.mWordsLayoutInfo.begin(), wordEndIt = paragraph.mWordsLayoutInfo.end();
          wordIt != wordEndIt;
          ++wordIt )
@@ -799,11 +944,6 @@ void UpdateTextInfo( const TextStyle& style,
            ++characterIt )
       {
         CharacterLayoutInfo& characterLayout( *characterIt );
-
-        characterLayout.mStyledText.mStyle.Copy( style, mask );
-
-        // Checks if the font family supports all glyphs. If not, chooses a most suitable one.
-        ChooseFontFamilyName( characterLayout.mStyledText );
 
         // Mark the character to be set the new style into the text-actor.
         characterLayout.mSetStyle = true;

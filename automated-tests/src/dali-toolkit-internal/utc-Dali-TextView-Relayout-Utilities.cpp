@@ -88,6 +88,7 @@ bool TestCalculateLineLayout( const CalculateLineLayoutTest& test,  const char* 
 
   // Creaqte indices.
   TextViewProcessor::TextInfoIndices indices( 0u, test.wordIndex, test.characterIndex );
+  indices.mCharacterParagraphIndex = test.characterParagraphIndex;
 
   // Get the input paragraph.
   TextViewProcessor::ParagraphLayoutInfo inputParagraphLayout;

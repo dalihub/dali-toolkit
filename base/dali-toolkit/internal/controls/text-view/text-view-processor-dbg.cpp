@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/controls/text-view/text-view-processor-dbg.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/text-actor.h>
+#include <dali-toolkit/internal/controls/text-view/text-view-processor-types.h>
 
 namespace Dali
 {
@@ -39,30 +39,9 @@ Debug::Filter* gTextViewProcessorLogFilter = Debug::Filter::New(Debug::NoLogging
 
 void dbgPrint( const WordLayoutInfo& word )
 {
-  for( CharacterLayoutInfoContainer::const_iterator characterIt = word.mCharactersLayoutInfo.begin(), endCharacterIt = word.mCharactersLayoutInfo.end();
-       characterIt != endCharacterIt;
-       ++characterIt )
-  {
-    const CharacterLayoutInfo& character( *characterIt );
-
-    std::cout << "[" << character.mSize << std::endl;
-    std::cout << " ascender " << character.mAscender << std::endl;
-
-    TextActor textActor = TextActor::DownCast( character.mGlyphActor );
-    if( textActor )
-    {
-      std::cout << "[" << textActor.GetText() << "]";
-    }
-    else
-    {
-      std::cout << "[ImageActor]" << std::endl;
-    }
-    std::cout << "{" << character.mStyledText.mText.GetText() << "}";
-  }
-  std::cout << "     size " << word.mSize << std::endl;
-  std::cout << " ascender " << word.mAscender << std::endl;
-  std::cout << " num char " << word.mCharactersLayoutInfo.size() << std::endl;
-  std::cout << "     type ";
+  std::cout << "       size " << word.mSize << std::endl;
+  std::cout << "   ascender " << word.mAscender << std::endl;
+  std::cout << "       type ";
   switch( word.mType )
   {
     case NoSeparator:
@@ -81,11 +60,24 @@ void dbgPrint( const WordLayoutInfo& word )
       break;
     }
   }
+  std::cout << " first char " << word.mFirstCharacter << std::endl;
+  std::cout << "   num char " << word.mCharactersLayoutInfo.size() << std::endl;
+  for( CharacterLayoutInfoContainer::const_iterator characterIt = word.mCharactersLayoutInfo.begin(), endCharacterIt = word.mCharactersLayoutInfo.end();
+       characterIt != endCharacterIt;
+       ++characterIt )
+  {
+    const CharacterLayoutInfo& character( *characterIt );
+
+    std::cout << "[" << character.mSize << std::endl;
+    std::cout << " ascender " << character.mAscender << std::endl;
+  }
 }
 
 void dbgPrint( const ParagraphLayoutInfo& paragraph )
 {
   std::cout << "< ";
+  std::cout << "  text : [" << paragraph.mText.GetText() << "]" << std::endl;
+  std::cout << "  number of styles : " << paragraph.mTextStyles.Count() << std::endl;
   std::cout << paragraph.mSize;
   for( WordLayoutInfoContainer::const_iterator wordIt = paragraph.mWordsLayoutInfo.begin(), endWordIt = paragraph.mWordsLayoutInfo.end();
        wordIt != endWordIt;
@@ -157,6 +149,7 @@ void dbgPrint( const TextInfoIndices& indices )
   std::cout << "          paragraph : " << indices.mParagraphIndex << std::endl;
   std::cout << "               word : " << indices.mWordIndex << std::endl;
   std::cout << "               char : " << indices.mCharacterIndex << std::endl;
+  std::cout << "  char in paragraph : " << indices.mCharacterParagraphIndex << std::endl;
 }
 
 void dbgPrint( const MarkupProcessor::StyledTextArray& textArray )
@@ -166,18 +159,6 @@ void dbgPrint( const MarkupProcessor::StyledTextArray& textArray )
     const MarkupProcessor::StyledText& text( *it );
 
     std::cout << text.mText.GetText();
-  }
-}
-
-void dbgPrintText( const WordLayoutInfo& word )
-{
-  for( CharacterLayoutInfoContainer::const_iterator characterIt = word.mCharactersLayoutInfo.begin(), endCharacterIt = word.mCharactersLayoutInfo.end();
-       characterIt != endCharacterIt;
-       ++characterIt )
-  {
-    const CharacterLayoutInfo& character( *characterIt );
-
-    std::cout << character.mStyledText.mText.GetText();
   }
 }
 

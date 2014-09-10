@@ -47,6 +47,7 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/controls/text-view/split-by-char-policies.cpp   \
    $(toolkit_base_src_dir)/controls/text-view/text-actor-cache.cpp   \
    $(toolkit_base_src_dir)/controls/text-view/text-processor.cpp   \
+   $(toolkit_base_src_dir)/controls/text-view/text-processor-bidirectional-info.cpp  \
    $(toolkit_base_src_dir)/controls/text-view/text-view-impl.cpp   \
    $(toolkit_base_src_dir)/controls/text-view/text-view-character-processor.cpp  \
    $(toolkit_base_src_dir)/controls/text-view/text-view-paragraph-processor.cpp  \

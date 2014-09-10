@@ -58,20 +58,20 @@ TextSeparatorType GetTextSeparatorType( const Character& character )
   return ( character.IsNewLine() ? ParagraphSeparator : ( character.IsWhiteSpace() ? WordSeparator : NoSeparator ) );
 }
 
-void ChooseFontFamilyName( MarkupProcessor::StyledText& text )
+void ChooseFontFamilyName( const Character& character, TextStyle& style )
 {
   DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "-->TextViewProcessor::ChooseFontFamilyName\n" );
-  DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "   input font name: [%s]\n", text.mStyle.GetFontName().c_str() );
+  DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "   input font name: [%s]\n", style.GetFontName().c_str() );
 
   bool userDefinedFontFamilyName = false;
 
   // First check if there is a font defined in the style and it supports the given text.
-  if( !text.mStyle.GetFontName().empty() )
+  if( !style.GetFontName().empty() )
   {
-    const FontParameters fontParams( text.mStyle.GetFontName(), text.mStyle.GetFontStyle() , text.mStyle.GetFontPointSize() );
+    const FontParameters fontParams( style.GetFontName(), style.GetFontStyle() , style.GetFontPointSize() );
     const Font font = Font::New( fontParams );
 
-    if( !font.IsDefaultSystemFont() && font.AllGlyphsSupported( text.mText ) )
+    if( !font.IsDefaultSystemFont() && font.AllGlyphsSupported( character ) )
     {
       userDefinedFontFamilyName = true;
     }
@@ -82,20 +82,20 @@ void ChooseFontFamilyName( MarkupProcessor::StyledText& text )
     const Font defaultSystemFont = Font::New();
 
     // At this point no font is set or doesn't support the given text.
-    if( !defaultSystemFont.AllGlyphsSupported( text.mText ) )
+    if( !defaultSystemFont.AllGlyphsSupported( character ) )
     {
       // If the default system font doesn't support the given text,
       // an appropiate font is selected.
-      text.mStyle.SetFontName( Font::GetFamilyForText( text.mText ) );
+      style.SetFontName( Font::GetFamilyForText( character ) );
       // @TODO Font::GetFamilyForText() should return font family and font style.
     }
     else
     {
       // All characters are supported with default font, so use it
-      text.mStyle.SetFontName( "" );
+      style.SetFontName( "" );
     }
   }
-  DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "  output font name: [%s]\n", text.mStyle.GetFontName().c_str() );
+  DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "  output font name: [%s]\n", style.GetFontName().c_str() );
   DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "<--TextViewProcessor::ChooseFontFamilyName\n" );
 }
 
@@ -123,6 +123,7 @@ void GetIndicesFromGlobalCharacterIndex( const std::size_t index,
        ++paragraphIt, ++indices.mParagraphIndex )
   {
     const ParagraphLayoutInfo& paragraphLayoutInfo( *paragraphIt );
+    std::size_t currentCharactersTraversed = currentIndex; // stores how many characters have been traversed until this paragraph.
 
     if( currentIndex + paragraphLayoutInfo.mNumberOfCharacters > index )
     {
@@ -138,6 +139,7 @@ void GetIndicesFromGlobalCharacterIndex( const std::size_t index,
         {
           // The character is in this word
           indices.mCharacterIndex = index - currentIndex;
+          indices.mCharacterParagraphIndex = index - currentCharactersTraversed;
           found = true;
         }
         else

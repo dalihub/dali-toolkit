@@ -22,6 +22,7 @@
 
 // Internal headers are allowed here
 #include <dali-toolkit/internal/controls/text-view/text-processor.h>
+#include <dali-toolkit/internal/controls/text-view/text-processor-bidirectional-info.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -53,11 +54,10 @@ struct BeginsRightToLeftCharacterTest
 
 bool TestBeginsRightToLeftCharacter( const std::string& description, const std::string& input, const bool result, const char* location )
 {
-  // Creates a styled text with the markup or plain string.
-  MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( input, styledText, true );
+  // Creates a text with the string.
+  Text text( input );
 
-  const bool ret = ( result == TextProcessor::BeginsRightToLeftCharacter( styledText ) );
+  const bool ret = ( result == TextProcessor::BeginsRightToLeftCharacter( text ) );
 
   if( !ret )
   {
@@ -79,11 +79,10 @@ struct ContainsRightToLeftCharacterTest
 
 bool TestContainsRightToLeftCharacter( const std::string& description, const std::string& input, const bool result, const char* location )
 {
-  // Creates a styled text with the markup or plain string.
-  MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( input, styledText, true );
+  // Creates a text with the string.
+  Text text( input );
 
-  const bool ret = ( result == TextProcessor::ContainsRightToLeftCharacter( styledText ) );
+  const bool ret = ( result == TextProcessor::ContainsRightToLeftCharacter( text ) );
 
   if( !ret )
   {
@@ -141,10 +140,12 @@ bool TestSplitInParagraphs( const SplitInParagraphsTest& test, const char* locat
   MarkupProcessor::StyledTextArray styledText;
   MarkupProcessor::GetStyledTextArray( test.inputText, styledText, true );
 
-  std::vector<MarkupProcessor::StyledTextArray> paragraphs;
+  std::vector<Text> paragraphs;
+  std::vector< Vector<TextStyle*> > styles;
 
   TextProcessor::SplitInParagraphs( styledText,
-                                    paragraphs );
+                                    paragraphs,
+                                    styles );
 
   if( paragraphs.size() != test.resultNumberOfParagraphs )
   {
@@ -163,24 +164,23 @@ struct SplitInWordsTest
 {
   std::string inputText;
 
-  std::size_t resultNumberOfWords;
+  std::size_t resultNumberOfSeparators;
 };
 
 bool TestSplitInWords( const SplitInWordsTest& test, const char* location )
 {
-  // Creates a styled text with the markup or plain string.
-  MarkupProcessor::StyledTextArray styledText;
-  MarkupProcessor::GetStyledTextArray( test.inputText, styledText, true );
+  // Creates a text with the string.
+  Text text( test.inputText );
 
-  std::vector<MarkupProcessor::StyledTextArray> words;
+  Vector<std::size_t> positions;
 
-  TextProcessor::SplitInWords( styledText,
-                               words );
+  TextProcessor::SplitInWords( text,
+                               positions );
 
-  if( words.size() != test.resultNumberOfWords )
+  if( positions.Count() != test.resultNumberOfSeparators )
   {
     tet_printf( "Fail. %s", location );
-    tet_printf( "Different number of words, result %d, expected result %d", words.size(), test.resultNumberOfWords );
+    tet_printf( "Different number of separators, result %d, expected result %d", positions.Count(), test.resultNumberOfSeparators );
 
     return false;
   }
@@ -236,10 +236,14 @@ int UtcDaliTextViewSplitInWords(void)
   {
     {
       std::string( "Hello world, hello word!" ),
-      7
+      3u
     },
+    {
+      std::string( "Hello world\n" ),
+      2u
+    }
   };
-  const std::size_t numberOfTests( 1 );
+  const std::size_t numberOfTests( 2u );
 
   for( std::size_t index = 0; index < numberOfTests; ++index )
   {

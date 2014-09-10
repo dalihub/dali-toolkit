@@ -22,6 +22,7 @@
 #include <dali-toolkit/internal/controls/text-view/split-by-new-line-char-policies.h>
 #include <dali-toolkit/internal/controls/text-view/split-by-word-policies.h>
 #include <dali-toolkit/internal/controls/text-view/split-by-char-policies.h>
+#include <dali-toolkit/internal/controls/text-view/text-processor-bidirectional-info.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-processor.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-word-processor.h>
 #include <dali-toolkit/internal/controls/text-view/relayout-utilities.h>
@@ -193,23 +194,38 @@ void TextView::InsertTextAt( std::size_t position, const std::string& text )
 
 void TextView::InsertTextAt( std::size_t position, const MarkupProcessor::StyledTextArray& text )
 {
-  // Creates metadata with the Insert operation.
-  TextViewProcessorMetadata metadata;
-  metadata.mType = TextView::TextInserted;
-  metadata.mPosition = position;
-  metadata.mText = text;
+  std::string textStr;
+  MarkupProcessor::GetPlainString( text, textStr );
 
-  // Store metadata.
-  mTextViewProcessorOperations.push_back( metadata );
+  if( TextProcessor::ContainsRightToLeftCharacter( Text( textStr ) ) ||
+      TextProcessor::ContainsRightToLeftCharacter( Text( GetText() ) ) )
+  {
+    // Temporary fix. Creates the whole layout if there is rtl text.
 
-  // Updates current styled text.
-  mCurrentStyledText.insert( mCurrentStyledText.begin() + position, text.begin(), text.end() );
+    MarkupProcessor::StyledTextArray textToSet = mCurrentStyledText;
+    textToSet.insert( textToSet.begin() + position, text.begin(), text.end() );
+    SetText( textToSet );
+  }
+  else
+  {
+    // Creates metadata with the Insert operation.
+    TextViewProcessorMetadata metadata;
+    metadata.mType = TextView::TextInserted;
+    metadata.mPosition = position;
+    metadata.mText = text;
 
-  // Request to be relaid out
-  RelayoutRequest();
+    // Store metadata.
+    mTextViewProcessorOperations.push_back( metadata );
 
-  // If a GetTextLayoutInfo() or GetHeightForWidth() arrives, relayout the text synchronously is needed on order to retrieve the right values.
-  mRelayoutOperations = RELAYOUT_ALL;
+    // Updates current styled text.
+    mCurrentStyledText.insert( mCurrentStyledText.begin() + position, text.begin(), text.end() );
+
+    // Request to be relaid out
+    RelayoutRequest();
+
+    // If a GetTextLayoutInfo() or GetHeightForWidth() arrives, relayout the text synchronously is needed on order to retrieve the right values.
+    mRelayoutOperations = RELAYOUT_ALL;
+  }
 }
 
 void TextView::ReplaceTextFromTo( std::size_t position, std::size_t numberOfCharacters, const std::string& text )
@@ -377,14 +393,18 @@ void TextView::SetStyleToCurrentText( const TextStyle& style, TextStyle::Mask ma
   }
 
   // Sets the new style to the ellipsize text
-  if( !mLayoutParameters.mEllipsizeText.empty() )
+  // TODO: fix this as a call to SetEllipsizeText will trigger the creation of new text actors.
+  if( 0u < mRelayoutData.mTextLayoutInfo.mEllipsisTextStyles.Count() )
   {
-    for( MarkupProcessor::StyledTextArray::iterator it = mLayoutParameters.mEllipsizeText.begin(), endIt = mLayoutParameters.mEllipsizeText.end(); it != endIt; ++it )
+    for( Vector<TextStyle*>::Iterator it = mRelayoutData.mTextLayoutInfo.mEllipsisTextStyles.Begin(),
+           endIt = mRelayoutData.mTextLayoutInfo.mEllipsisTextStyles.End();
+         it != endIt;
+         ++it )
     {
-      (*it).mStyle.Copy( style, mask );
+      (*it)->Copy( style, mask );
     }
 
-    SetEllipsizeText( mLayoutParameters.mEllipsizeText );
+    SetEllipsizeText( mRelayoutData.mTextLayoutInfo.mEllipsisText, mRelayoutData.mTextLayoutInfo.mEllipsisTextStyles );
   }
 }
 
@@ -547,17 +567,35 @@ void TextView::SetEllipsizeText( const std::string& ellipsizeText )
   MarkupProcessor::StyledTextArray styledText;
   MarkupProcessor::GetStyledTextArray( ellipsizeText, styledText, IsMarkupProcessingEnabled() );
 
+  // Creates the ellipsis layout info and sets the text and styles.
   SetEllipsizeText( styledText );
 }
 
 void TextView::SetEllipsizeText( const MarkupProcessor::StyledTextArray& ellipsizeText )
 {
-  mLayoutParameters.mEllipsizeText = ellipsizeText;
+  // Converts the styled text array into a Text and a vector of TextStyles.
+  Text text;
+  Vector<TextStyle*> styles;
+  for( MarkupProcessor::StyledTextArray::const_iterator it = ellipsizeText.begin(), endIt = ellipsizeText.end(); it != endIt; ++it )
+  {
+    const MarkupProcessor::StyledText& styledText( *it );
 
-  mRelayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo = TextViewProcessor::WordLayoutInfo();
+    text.Append( styledText.mText );
+    styles.PushBack( new TextStyle( styledText.mStyle ) );
+  }
 
-  TextViewProcessor::CreateWordTextInfo( mLayoutParameters.mEllipsizeText,
-                                         mRelayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo );
+  // Creates the ellipsis layout info and sets the text and styles.
+  SetEllipsizeText( text, styles );
+}
+
+void TextView::SetEllipsizeText( const Text& ellipsizeText, const Vector<TextStyle*>& ellipsizeStyles )
+{
+  // Sets the text and styles for the ellipsis text.
+  mRelayoutData.mTextLayoutInfo.mEllipsisText = ellipsizeText;
+  mRelayoutData.mTextLayoutInfo.mEllipsisTextStyles = ellipsizeStyles;
+
+  // Creates the ellipsis layout info.
+  CreateEllipsizeLayout();
 
   // Request to be relaid out
   RelayoutRequest();
@@ -567,13 +605,7 @@ void TextView::SetEllipsizeText( const MarkupProcessor::StyledTextArray& ellipsi
 
 std::string TextView::GetEllipsizeText() const
 {
-  std::string text;
-  for( MarkupProcessor::StyledTextArray::const_iterator it = mLayoutParameters.mEllipsizeText.begin(), endIt = mLayoutParameters.mEllipsizeText.end(); it != endIt; ++it )
-  {
-    text.append( (*it).mText.GetText() );
-  }
-
-  return text;
+  return mRelayoutData.mTextLayoutInfo.mEllipsisText.GetText();
 }
 
 void TextView::GetTextLayoutInfo()
@@ -632,7 +664,6 @@ void TextView::GetTextLayoutInfo()
       {
         mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations | RELAYOUT_INSERT_TO_TEXT_VIEW );
       }
-
     }
   }
 }
@@ -861,12 +892,8 @@ TextView::LayoutParameters::LayoutParameters()
   mVerticalAlignment( Toolkit::Alignment::VerticalCenter ),
   mLineJustification( Toolkit::TextView::Left ),
   mLineHeightOffset( 0.f ),
-  mEllipsizeText(),
   mMarkUpEnabled( false )
 {
-  // Sets ellipsize text
-  MarkupProcessor::StyledTextArray styledEllipsize;
-  MarkupProcessor::GetStyledTextArray( std::string( "..." ), mEllipsizeText, false );
 }
 
 TextView::LayoutParameters::~LayoutParameters()
@@ -879,7 +906,6 @@ TextView::LayoutParameters::LayoutParameters( Toolkit::TextView::MultilinePolicy
                                               Toolkit::Alignment::Type             alignmentType,
                                               Toolkit::TextView::LineJustification lineJustification,
                                               float                                lineHeightOffset,
-                                              const std::string&                   ellipsizeText,
                                               bool                                 markUpEnabled )
 : mMultilinePolicy( multilinePolicy ),
   mWidthExceedPolicy( widthExceedPolicy ),
@@ -888,7 +914,6 @@ TextView::LayoutParameters::LayoutParameters( Toolkit::TextView::MultilinePolicy
   mVerticalAlignment(),
   mLineJustification( lineJustification ),
   mLineHeightOffset( lineHeightOffset ),
-  mEllipsizeText(),
   mMarkUpEnabled( markUpEnabled )
 {
   // Sets alignment
@@ -901,10 +926,6 @@ TextView::LayoutParameters::LayoutParameters( Toolkit::TextView::MultilinePolicy
 
   mHorizontalAlignment = horizontalAlignment;
   mVerticalAlignment = verticalAlignment;
-
-  // Sets ellipsize text
-  MarkupProcessor::StyledTextArray styledEllipsize;
-  MarkupProcessor::GetStyledTextArray( ellipsizeText, mEllipsizeText, mMarkUpEnabled );
 }
 
 TextView::LayoutParameters::LayoutParameters( const TextView::LayoutParameters& layoutParameters )
@@ -915,7 +936,6 @@ TextView::LayoutParameters::LayoutParameters( const TextView::LayoutParameters& 
   mVerticalAlignment( layoutParameters.mVerticalAlignment ),
   mLineJustification( layoutParameters.mLineJustification ),
   mLineHeightOffset( layoutParameters.mLineHeightOffset ),
-  mEllipsizeText( layoutParameters.mEllipsizeText ),
   mMarkUpEnabled( layoutParameters.mMarkUpEnabled )
 {
 }
@@ -929,7 +949,6 @@ TextView::LayoutParameters& TextView::LayoutParameters::operator=( const TextVie
   mVerticalAlignment = layoutParameters.mVerticalAlignment;
   mLineJustification = layoutParameters.mLineJustification;
   mLineHeightOffset = layoutParameters.mLineHeightOffset;
-  mEllipsizeText = layoutParameters.mEllipsizeText;
   mMarkUpEnabled = layoutParameters.mMarkUpEnabled;
 
   return *this;
@@ -1018,7 +1037,6 @@ TextView::TextView()
                      static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                      Toolkit::TextView::Left,
                      PointSize( 0.f ),
-                     std::string( "..." ),
                      false ),
   mVisualParameters(),
   mRelayoutData(),
@@ -1034,8 +1052,8 @@ TextView::TextView()
   mPreviousSnapshotModeEnabled( false ),
   mMarkUpEnabled( false )
 {
-  TextViewProcessor::CreateWordTextInfo( mLayoutParameters.mEllipsizeText,
-                                         mRelayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo );
+  // Creates the ellipsis layout info.
+  CreateEllipsizeLayout();
 }
 
 TextView::~TextView()
@@ -1149,9 +1167,8 @@ void TextView::OnInitialize()
 
 void TextView::OnFontChange( bool defaultFontChange, bool defaultFontSizeChange )
 {
-  mRelayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo = TextViewProcessor::WordLayoutInfo();
-  TextViewProcessor::CreateWordTextInfo( mLayoutParameters.mEllipsizeText,
-                                         mRelayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo );
+  // Creates the ellipsis layout info.
+  CreateEllipsizeLayout();
 
   SetText( mCurrentStyledText );
 }
@@ -1188,6 +1205,17 @@ void TextView::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
                                                                 RELAYOUT_VISIBILITY |
                                                                 RELAYOUT_TEXT_ACTOR_UPDATE |
                                                                 RELAYOUT_INSERT_TO_TEXT_VIEW );
+    }
+  }
+
+  if( ( Toolkit::TextView::Fade == mLayoutParameters.mWidthExceedPolicy ) ||
+      ( Toolkit::TextView::Fade == mLayoutParameters.mHeightExceedPolicy ) )
+  {
+    if( mRelayoutOperations & RELAYOUT_ALIGNMENT )
+    {
+      // If the text of the alignment changes and a fade exceed policy is set,
+      // some characters may need new TextActor.
+      mRelayoutOperations = RELAYOUT_ALL;
     }
   }
 
@@ -1878,6 +1906,16 @@ Actor TextView::GetRootActor() const
   }
 
   return rootActor;
+}
+
+void TextView::CreateEllipsizeLayout()
+{
+  // Creates the ellipsis layout info for the ellipsis text and styles.
+  mRelayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo = TextViewProcessor::WordLayoutInfo();
+  mRelayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo.mCharactersLayoutInfo.resize( mRelayoutData.mTextLayoutInfo.mEllipsisText.GetLength(), TextViewProcessor::CharacterLayoutInfo() );
+  TextViewProcessor::CreateWordTextInfo( mRelayoutData.mTextLayoutInfo.mEllipsisText,
+                                         mRelayoutData.mTextLayoutInfo.mEllipsisTextStyles,
+                                         mRelayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo );
 }
 
 void TextView::OnMarkupEnabledPeopertySet( Property::Value propertyValue )

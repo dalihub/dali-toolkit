@@ -71,14 +71,6 @@ Vector3 SplitPosition( const TextViewRelayout::RelayoutParameters& relayoutParam
                                              1.f, // Shrink factor
                                              subLineInfo );
 
-      // Stores some info to calculate the line justification in a post-process.
-      TextView::LineJustificationInfo justificationInfo;
-
-      justificationInfo.mIndices = relayoutParameters.mIndices;
-      justificationInfo.mLineLength = subLineInfo.mLineLength;
-
-      relayoutData.mLineJustificationInfo.push_back( justificationInfo );
-
       Toolkit::TextView::LineLayoutInfo lineInfo;
       lineInfo.mCharacterGlobalIndex = relayoutParameters.mCharacterGlobalIndex;    // Index to the first character of the next line.
       lineInfo.mSize = Size( subLineInfo.mLineLength, subLineInfo.mMaxCharHeight ); // Size of this piece of paragraph.
@@ -157,22 +149,6 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
       relayoutParameters.mIsFirstCharacterOfWord = true;
       relayoutParameters.mWordSize = wordLayoutInfo.mSize;
       relayoutParameters.mIndices.mCharacterIndex = 0u;
-
-      if( relayoutParameters.mIsNewLine )
-      {
-        // Stores some info to calculate the line justification in a post-process.
-        const bool isSplitOriginal = layoutParameters.mExceedPolicy == TextView::SplitOriginal;
-
-        if( !isSplitOriginal )
-        {
-          TextView::LineJustificationInfo justificationInfo;
-
-          justificationInfo.mIndices = relayoutParameters.mIndices;
-          justificationInfo.mLineLength = relayoutParameters.mParagraphSize.width;
-
-          relayoutData.mLineJustificationInfo.push_back( justificationInfo );
-        }
-      }
 
       for( TextViewProcessor::CharacterLayoutInfoContainer::iterator characterLayoutIt = wordLayoutInfo.mCharactersLayoutInfo.begin(),
              endCharacterLayoutIt = wordLayoutInfo.mCharactersLayoutInfo.end();
@@ -290,9 +266,10 @@ void Relayout( Actor textView,
 {
   if( relayoutOperationMask & TextView::RELAYOUT_SIZE_POSITION )
   {
-    relayoutData.mLineJustificationInfo.clear();
     CalculateSizeAndPosition( layoutParameters,
                               relayoutData );
+
+    TextViewRelayout::ReorderRightToLeftLayout( relayoutData );
 
     TextViewRelayout::SetUnderlineInfo( relayoutData );
   }

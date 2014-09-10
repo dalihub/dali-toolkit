@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/license/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,11 @@
 #include <dali-toolkit/internal/controls/text-view/relayout-utilities.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/text-view/text-processor.h>
+#include <dali-toolkit/internal/controls/text-view/text-processor-bidirectional-info.h>
+#include <dali-toolkit/internal/controls/text-view/text-view-word-processor.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-processor-helper-functions.h>
+#include <dali-toolkit/internal/controls/text-view/text-view-processor-dbg.h>
 
 // EXTERNAL INCLUDES
 #include <cmath>
@@ -213,7 +217,7 @@ struct CurrentTextActorInfo
   Vector3 position;
   Size size;
   Vector4 color;
-  TextViewProcessor::GradientInfo* gradientInfo;
+  TextViewProcessor::CharacterLayoutInfo* characterLayout;
 };
 
 void SetVisualParameters( CurrentTextActorInfo& currentTextActorInfo,
@@ -222,11 +226,12 @@ void SetVisualParameters( CurrentTextActorInfo& currentTextActorInfo,
                           const float lineHeight )
 {
   currentTextActorInfo.textActor.SetTextColor( currentTextActorInfo.color );
-  if( NULL != currentTextActorInfo.gradientInfo )
+  if( ( NULL != currentTextActorInfo.characterLayout ) &&
+      ( NULL != currentTextActorInfo.characterLayout->mGradientInfo ) )
   {
-    currentTextActorInfo.textActor.SetGradientColor( currentTextActorInfo.gradientInfo->mGradientColor );
-    currentTextActorInfo.textActor.SetGradientStartPoint( currentTextActorInfo.gradientInfo->mStartPoint );
-    currentTextActorInfo.textActor.SetGradientEndPoint( currentTextActorInfo.gradientInfo->mEndPoint );
+    currentTextActorInfo.textActor.SetGradientColor( currentTextActorInfo.characterLayout->mGradientInfo->mGradientColor );
+    currentTextActorInfo.textActor.SetGradientStartPoint( currentTextActorInfo.characterLayout->mGradientInfo->mStartPoint );
+    currentTextActorInfo.textActor.SetGradientEndPoint( currentTextActorInfo.characterLayout->mGradientInfo->mEndPoint );
   }
 
   // The italics offset is used in the offscreen rendering. When text is in italics, it may exceed the text-view's boundary
@@ -341,6 +346,278 @@ void CalculateLineLayout( float parentWidth,
 
   subLineInfo.mMaxCharHeight *= shrinkFactor;
   subLineInfo.mMaxAscender *= shrinkFactor;
+}
+
+
+/**
+ * Sets a character of a line of a bidirectional paragraph in the new position.
+ *
+ * @param[in] wordsLayoutInfo Layout info of all the words of the paragraph.
+ * @param[in] index Index within the paragraph to the character to be set in the new position.
+ * @param[in,out] character Reference to the character in the new position.
+ */
+void SetCharacter( const TextViewProcessor::WordLayoutInfoContainer& wordsLayoutInfo,
+                   std::size_t index,
+                   TextViewProcessor::CharacterLayoutInfo& character )
+{
+  // Traverse all the characters of the paragraph till the one pointed by index is found.
+  std::size_t traversedCharacters = 0u;
+  for( TextViewProcessor::WordLayoutInfoContainer::const_iterator wordIt = wordsLayoutInfo.begin(),
+         wordEndIt = wordsLayoutInfo.end();
+       wordIt != wordEndIt;
+       ++wordIt )
+  {
+    const TextViewProcessor::WordLayoutInfo& word( *wordIt );
+
+    const std::size_t numberOfCharacters = word.mCharactersLayoutInfo.size();
+    if( index < traversedCharacters + numberOfCharacters  )
+    {
+      character = *( word.mCharactersLayoutInfo.begin() + ( index - traversedCharacters ) );
+      return;
+    }
+    traversedCharacters += numberOfCharacters;
+  }
+}
+
+/**
+ * Reorders the layout info of each line of the paragraph.
+ *
+ * Uses the visual to logical conversion table to order the text, styles and character's layout (metrics).
+ *
+ * @param[in,out] rtlParagraph Layout info for the paragraph with rtl text.
+ */
+void ReorderLayout( TextViewProcessor::ParagraphLayoutInfo& paragraph )
+{
+  // Clear any previous right to left layout.
+  if( NULL != paragraph.mRightToLeftLayout )
+  {
+    paragraph.mRightToLeftLayout->Clear();
+    paragraph.mRightToLeftLayout->mPreviousLayoutCleared = true;
+  }
+  else
+  {
+    // Create a new right to left layout if there isn't any.
+    paragraph.mRightToLeftLayout = new TextViewProcessor::RightToLeftParagraphLayout();
+  }
+
+  // Reorder Text and Styles.
+
+  // Reserve space for the styles.
+  paragraph.mRightToLeftLayout->mTextStyles.Reserve( paragraph.mTextStyles.Count() );
+
+  // Traverses all the bidirectional info per line.
+  for( Vector<TextProcessor::BidirectionalLineInfo*>::ConstIterator it = paragraph.mBidirectionalLinesInfo.Begin(), endIt = paragraph.mBidirectionalLinesInfo.End(); it != endIt; ++it )
+  {
+    TextProcessor::BidirectionalLineInfo* info( *it );
+
+    const std::size_t characterParagraphIndex = info->mCharacterParagraphIndex;
+    const Vector<int>& visualToLogicalMap = info->mVisualToLogicalMap;
+
+    // The text can be appended as it's already reordered.
+    paragraph.mRightToLeftLayout->mText.Append( info->mText );
+
+    // The visual to logical map needs to be used to reorder the styles.
+    for( std::size_t index = 0u, size = visualToLogicalMap.Count(); index < size; ++index )
+    {
+      paragraph.mRightToLeftLayout->mTextStyles.PushBack( *( paragraph.mTextStyles.Begin() + ( characterParagraphIndex + *( visualToLogicalMap.Begin() + index ) ) ) );
+    }
+  }
+
+  // Reorder Layout Info.
+
+  // Reserve space for the new word layout.
+  paragraph.mRightToLeftLayout->mWordsLayoutInfo.reserve( paragraph.mWordsLayoutInfo.size() );
+
+  // Traverses all the bidirectional info per line.
+  for( Vector<TextProcessor::BidirectionalLineInfo*>::ConstIterator it = paragraph.mBidirectionalLinesInfo.Begin(), endIt = paragraph.mBidirectionalLinesInfo.End(); it != endIt; ++it )
+  {
+    TextProcessor::BidirectionalLineInfo* info( *it );
+
+    // Reserve space for all characters.
+    TextViewProcessor::CharacterLayoutInfoContainer characters;
+    characters.resize( info->mNumberOfCharacters );
+
+    // Uses the visual to logical map to set every character in its new position.
+    for( std::size_t index = 0u; index < info->mNumberOfCharacters; ++index )
+    {
+      SetCharacter( paragraph.mWordsLayoutInfo,
+                    info->mCharacterParagraphIndex + info->mVisualToLogicalMap[index],
+                    *( characters.begin() + index ) );
+    }
+
+    // Sets the new 'x' position for each character.
+    float xPosition = 0.f;
+    for( TextViewProcessor::CharacterLayoutInfoContainer::iterator it = characters.begin(), endIt = characters.end(); it != endIt; ++it )
+    {
+      TextViewProcessor::CharacterLayoutInfo& character( *it );
+
+      character.mPosition.x = xPosition;
+      xPosition += character.mSize.width;
+    }
+
+    // Split the reordered text in words.
+    std::size_t previousPosition = 0u;
+    Vector<std::size_t> positions;
+    TextProcessor::SplitInWords( info->mText, positions );
+
+    // Sets the characters into the words they belong to.
+    for( Vector<size_t>::ConstIterator it = positions.Begin(), endIt = positions.End(); it != endIt; ++it )
+    {
+      const std::size_t position = *it;
+
+      TextViewProcessor::WordLayoutInfo word;
+      word.mCharactersLayoutInfo.insert( word.mCharactersLayoutInfo.end(),
+                                         characters.begin() + previousPosition,
+                                         characters.begin() + position );
+
+      if( !word.mCharactersLayoutInfo.empty() )
+      {
+        // Updates the layout of the word.
+        TextViewProcessor::UpdateLayoutInfo( word );
+
+        paragraph.mRightToLeftLayout->mWordsLayoutInfo.push_back( word );
+      }
+
+      // white space or new paragraph.
+      TextViewProcessor::WordLayoutInfo space;
+      space.mCharactersLayoutInfo.insert( space.mCharactersLayoutInfo.end(),
+                                          characters.begin() + position,
+                                          characters.begin() + position + 1u );
+
+      TextViewProcessor::UpdateLayoutInfo( space );
+
+      paragraph.mRightToLeftLayout->mWordsLayoutInfo.push_back( space );
+
+      previousPosition = position + 1u;
+    }
+
+    // The last word.
+    if( previousPosition < paragraph.mRightToLeftLayout->mText.GetLength() )
+    {
+      TextViewProcessor::WordLayoutInfo word;
+      word.mCharactersLayoutInfo.insert( word.mCharactersLayoutInfo.end(),
+                                         characters.begin() + previousPosition,
+                                         characters.end() );
+
+      TextViewProcessor::UpdateLayoutInfo( word );
+
+      paragraph.mRightToLeftLayout->mWordsLayoutInfo.push_back( word );
+    }
+  }
+}
+
+/**
+ * Creates the bidirectional info needed to reorder each line of the paragraph.
+ *
+ * @param[in,out] relayoutData Natural size (metrics), layout, text-actor info.
+ * @param[in,out] paragraph Layout info for the paragraph.
+ * @param[in] characterGlobalIndex Index to the character within the whole text.
+ * @param[in] lineLayoutInfoIndex Index to the table of lines.
+ */
+void CreateBidirectionalInfoForLines( TextView::RelayoutData& relayoutData,
+                                      TextViewProcessor::ParagraphLayoutInfo& paragraph,
+                                      std::size_t& characterGlobalIndex,
+                                      std::size_t& lineLayoutInfoIndex )
+{
+  const std::size_t lineLayoutInfoSize = relayoutData.mLines.size(); // Number or laid out lines.
+  bool lineLayoutEnd = false;            // Whether lineLayoutInfoIndex points at the last laid out line.
+
+  // Clear previously created bidirectional info.
+  paragraph.ClearBidirectionalInfo();
+
+  std::size_t characterParagraphIndex = 0u;   // Index to the character (within the paragraph).
+  for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = paragraph.mWordsLayoutInfo.begin(), wordEndIt = paragraph.mWordsLayoutInfo.end();
+       wordIt != wordEndIt;
+       ++wordIt )
+  {
+    TextViewProcessor::WordLayoutInfo& word( *wordIt );
+
+    for( TextViewProcessor::CharacterLayoutInfoContainer::iterator characterIt = word.mCharactersLayoutInfo.begin(), characterEndIt = word.mCharactersLayoutInfo.end();
+         characterIt != characterEndIt;
+         ++characterIt )
+    {
+      TextProcessor::BidirectionalLineInfo* bidirectionalLineInfo = NULL;
+
+      // Check if there is a new line.
+      const bool newLine = !lineLayoutEnd && ( characterGlobalIndex == relayoutData.mLines[lineLayoutInfoIndex].mCharacterGlobalIndex );
+
+      if( newLine )
+      {
+        // Point to the next line.
+        ++lineLayoutInfoIndex;
+        if( lineLayoutInfoIndex >= lineLayoutInfoSize )
+        {
+          // Arrived at last line.
+          lineLayoutEnd = true; // Avoids access out of bounds in the relayoutData.mLines vector.
+        }
+
+        // Number of characters of the line.
+        const size_t numberOfCharacters = ( lineLayoutEnd ? relayoutData.mTextLayoutInfo.mNumberOfCharacters : relayoutData.mLines[lineLayoutInfoIndex].mCharacterGlobalIndex ) - characterGlobalIndex;
+
+        // There is right to left characters in this line. It needs to be reordered.
+        bidirectionalLineInfo = new TextProcessor::BidirectionalLineInfo();
+        bidirectionalLineInfo->mCharacterParagraphIndex = characterParagraphIndex;
+        bidirectionalLineInfo->mNumberOfCharacters = numberOfCharacters;
+
+        // Set all the Text's characters in the visual order and creates the mapping tables.
+        TextProcessor::ReorderLine( paragraph.mBidirectionalParagraphInfo,
+                                    bidirectionalLineInfo );
+
+        paragraph.mBidirectionalLinesInfo.PushBack( bidirectionalLineInfo );
+
+        for( std::size_t index = 0u; index < numberOfCharacters; ++index )
+        {
+          relayoutData.mCharacterLogicalToVisualMap.push_back( characterGlobalIndex + bidirectionalLineInfo->mLogicalToVisualMap[index] );
+          relayoutData.mCharacterVisualToLogicalMap.push_back( characterGlobalIndex + bidirectionalLineInfo->mVisualToLogicalMap[index] );
+        }
+      }
+
+      ++characterGlobalIndex;
+      ++characterParagraphIndex;
+    } // characters
+  } // words
+}
+
+void ReorderRightToLeftLayout( TextView::RelayoutData& relayoutData )
+{
+  // Reset conversion tables shared through public-api
+  relayoutData.mCharacterLogicalToVisualMap.clear();
+  relayoutData.mCharacterVisualToLogicalMap.clear();
+
+  std::size_t characterGlobalIndex = 0u; // Index to the global character (within the whole text).
+  std::size_t lineLayoutInfoIndex = 0u;  // Index to the line info.
+
+  for( TextViewProcessor::ParagraphLayoutInfoContainer::iterator paragraphIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin(), paragraphEndIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end();
+       paragraphIt != paragraphEndIt;
+       ++paragraphIt )
+  {
+    TextViewProcessor::ParagraphLayoutInfo& paragraph( *paragraphIt );
+
+    if( NULL != paragraph.mBidirectionalParagraphInfo )
+    {
+      // There is right to left text in this paragraph.
+
+      // Creates the bidirectional info needed to reorder each line of the paragraph.
+      CreateBidirectionalInfoForLines( relayoutData,
+                                       paragraph,
+                                       characterGlobalIndex,
+                                       lineLayoutInfoIndex );
+
+      // Reorder each line of the paragraph
+      ReorderLayout( paragraph );
+    }
+    else
+    {
+      // Identity in case the paragraph has no right to left text.
+      for( std::size_t index = 0u; index < paragraph.mNumberOfCharacters; ++index )
+      {
+        const std::size_t globalIndex = characterGlobalIndex + index;
+        relayoutData.mCharacterLogicalToVisualMap.push_back( globalIndex );
+        relayoutData.mCharacterVisualToLogicalMap.push_back( globalIndex );
+      }
+      characterGlobalIndex += paragraph.mNumberOfCharacters;
+    }
+  } // paragraphs
 }
 
 float CalculateXoffset( Toolkit::Alignment::Type horizontalTextAlignment, float parentWidth, float wholeTextWidth )
@@ -513,8 +790,11 @@ void UpdateAlignment( const TextView::LayoutParameters& layoutParameters,
   const float textHorizontalOffset = CalculateXoffset( layoutParameters.mHorizontalAlignment, relayoutData.mTextViewSize.width, relayoutData.mTextSizeForRelayoutOption.width );
   const float textVerticalOffset = CalculateYoffset( layoutParameters.mVerticalAlignment, relayoutData.mTextViewSize.height, relayoutData.mTextSizeForRelayoutOption.height );
 
-  std::size_t lineJustificationIndex = 0u; // Index to the first position of the vector which stores all line justification info.
-  std::size_t infoTableCharacterIndex = 0u;
+  // Index to the global character (within the whole text).
+  std::size_t characterGlobalIndex = 0u;
+
+  // Index to the line info.
+  std::size_t lineLayoutInfoIndex = 0u;
 
   relayoutParameters.mIndices.mParagraphIndex = 0u;
 
@@ -527,10 +807,16 @@ void UpdateAlignment( const TextView::LayoutParameters& layoutParameters,
 
     float justificationOffset = 0.f;
 
+    const std::size_t lineLayoutInfoSize = relayoutData.mLines.size(); // Number of lines.
+    bool lineLayoutEnd = false;            // Whether lineLayoutInfoIndex points at the last line.
+
     relayoutParameters.mIndices.mWordIndex = 0u;
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.begin(),
-           endWordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.end();
+    const bool isRightToLeftLayout = NULL != paragraphLayoutInfo.mRightToLeftLayout;
+    TextViewProcessor::WordLayoutInfoContainer& wordsLayoutInfo = isRightToLeftLayout ? paragraphLayoutInfo.mRightToLeftLayout->mWordsLayoutInfo : paragraphLayoutInfo.mWordsLayoutInfo;
+
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = wordsLayoutInfo.begin(),
+           endWordLayoutIt = wordsLayoutInfo.end();
          wordLayoutIt != endWordLayoutIt;
          ++wordLayoutIt, ++relayoutParameters.mIndices.mWordIndex )
     {
@@ -541,19 +827,24 @@ void UpdateAlignment( const TextView::LayoutParameters& layoutParameters,
       for( TextViewProcessor::CharacterLayoutInfoContainer::iterator characterLayoutIt = wordLayoutInfo.mCharactersLayoutInfo.begin(),
              endCharacterLayoutIt = wordLayoutInfo.mCharactersLayoutInfo.end();
            characterLayoutIt != endCharacterLayoutIt;
-           ++characterLayoutIt, ++relayoutParameters.mIndices.mCharacterIndex, ++infoTableCharacterIndex )
+           ++characterLayoutIt, ++relayoutParameters.mIndices.mCharacterIndex, ++characterGlobalIndex )
       {
         TextViewProcessor::CharacterLayoutInfo& characterLayoutInfo( *characterLayoutIt );
 
-        // Calculate line justification offset.
-        if( lineJustificationIndex < relayoutData.mLineJustificationInfo.size() )
-        {
-          const TextView::LineJustificationInfo lineJustificationInfo( *( relayoutData.mLineJustificationInfo.begin() + lineJustificationIndex ) );
+        // Check if there is a new line.
+        const bool newLine = !lineLayoutEnd && ( characterGlobalIndex == relayoutData.mLines[lineLayoutInfoIndex].mCharacterGlobalIndex );
 
-          if( relayoutParameters.mIndices == lineJustificationInfo.mIndices )
+        if( newLine )
+        {
+          // Calculate line justification offset.
+          justificationOffset = CalculateJustificationOffset( layoutParameters.mLineJustification, relayoutData.mTextSizeForRelayoutOption.width, relayoutData.mLines[lineLayoutInfoIndex].mSize.width );
+
+          // Point to the next line.
+          ++lineLayoutInfoIndex;
+          if( lineLayoutInfoIndex >= lineLayoutInfoSize )
           {
-            justificationOffset = CalculateJustificationOffset( layoutParameters.mLineJustification, relayoutData.mTextSizeForRelayoutOption.width, lineJustificationInfo.mLineLength );
-            ++lineJustificationIndex; // increase the index to point the next position in the vector.
+            // Arrived at last line.
+            lineLayoutEnd = true; // Avoids access out of bounds in the relayoutData.mLines vector.
           }
         }
 
@@ -565,7 +856,7 @@ void UpdateAlignment( const TextView::LayoutParameters& layoutParameters,
         // Updates the size and position table for text-input with the alignment offset.
         Vector3 positionOffset( characterLayoutInfo.mPosition );
 
-        std::vector<Toolkit::TextView::CharacterLayoutInfo>::iterator infoTableIt = relayoutData.mCharacterLayoutInfoTable.begin() + infoTableCharacterIndex;
+        std::vector<Toolkit::TextView::CharacterLayoutInfo>::iterator infoTableIt = relayoutData.mCharacterLayoutInfoTable.begin() + characterGlobalIndex;
         Toolkit::TextView::CharacterLayoutInfo& characterTableInfo( *infoTableIt );
 
         characterTableInfo.mPosition.x = positionOffset.x + characterLayoutInfo.mOffset.x;
@@ -646,7 +937,7 @@ void UpdateLayoutInfoTable( Vector4& minMaxXY,
                                                                                characterLayoutInfo.mSize.height * relayoutData.mShrinkFactor ),
                                                                          positionOffset,
                                                                          ( TextViewProcessor::ParagraphSeparator == wordLayoutInfo.mType ),
-                                                                         false, // VCC set the correct direction if needed.
+                                                                         false,
                                                                          true,
                                                                          descender );
 
@@ -657,6 +948,7 @@ void UpdateLayoutInfoTable( Vector4& minMaxXY,
 
 void CalculateVisibilityForFade( const Internal::TextView::LayoutParameters& layoutParameters,
                                  TextViewProcessor::CharacterLayoutInfo& characterLayoutInfo,
+                                 const TextStyle& style,
                                  RelayoutParameters& relayoutParameters,
                                  FadeParameters& fadeParameters,
                                  TextView::RelayoutData& relayoutData )
@@ -813,35 +1105,40 @@ void CalculateVisibilityForFade( const Internal::TextView::LayoutParameters& lay
     Vector2 startPoint = Vector2::ZERO;
     Vector2 endPoint = Vector2::ZERO;
 
-    if( NULL == characterLayoutInfo.mGradientInfo )
-    {
-      characterLayoutInfo.mGradientInfo = new TextViewProcessor::GradientInfo();
-    }
-
     if( !( rightFadeOut && leftFadeOut ) )
     {
       // Current implementation can't set gradient parameters for a text-actor exceeding at the same time the left and the right boundaries.
       if( rightFadeOut )
       {
-        gradientColor = characterLayoutInfo.mStyledText.mStyle.GetTextColor();
+        gradientColor = style.GetTextColor();
 
         // Calculates gradient coeficients.
         characterLayoutInfo.mColorAlpha = gradientColor.a * std::min( 1.f, fadeParameters.mRightAlphaCoeficients.x * position.x + fadeParameters.mRightAlphaCoeficients.y );
         gradientColor.a *= std::max( 0.f, fadeParameters.mRightAlphaCoeficients.x * characterPositionPlusWidth + fadeParameters.mRightAlphaCoeficients.y );
 
-        startPoint = Vector2( std::max( 0.f, ( fadeParameters.mRightFadeThresholdOffset - position.x ) / size.width ), 0.5f );
-        endPoint = Vector2( std::min( 1.f, ( relayoutData.mTextViewSize.width - position.x ) / size.width ), 0.5f );
+        startPoint = Vector2( std::max( 0.f, std::min( 1.f, ( fadeParameters.mRightFadeThresholdOffset - position.x ) / size.width ) ), 0.5f );
+        endPoint = Vector2( std::min( 1.f, std::max( 0.f, ( relayoutData.mTextViewSize.width - position.x ) / size.width ) ), 0.5f );
+
+        if( NULL == characterLayoutInfo.mGradientInfo )
+        {
+          characterLayoutInfo.mGradientInfo = new TextViewProcessor::GradientInfo();
+        }
       }
       else if( leftFadeOut )
       {
-        gradientColor = characterLayoutInfo.mStyledText.mStyle.GetTextColor();
+        gradientColor = style.GetTextColor();
 
         // Calculates gradient coeficients.
         characterLayoutInfo.mColorAlpha = std::min( 1.f, fadeParameters.mLeftAlphaCoeficients.x * characterPositionPlusWidth + fadeParameters.mLeftAlphaCoeficients.y );
         gradientColor.a *= gradientColor.a * std::max( 0.f, fadeParameters.mLeftAlphaCoeficients.x * position.x + fadeParameters.mLeftAlphaCoeficients.y );
 
-        startPoint = Vector2( std::max( 0.f, ( fadeParameters.mLeftFadeThresholdOffset - position.x ) / size.width ), 0.5f );
-        endPoint = Vector2( std::min( 1.f, -position.x / size.width ), 0.5f );
+        startPoint = Vector2( std::max( 0.f, std::min( 1.f, ( fadeParameters.mLeftFadeThresholdOffset - position.x ) / size.width ) ), 0.5f );
+        endPoint = Vector2( std::min( 1.f, std::max( 0.f, -position.x / size.width ) ), 0.5f );
+
+        if( NULL == characterLayoutInfo.mGradientInfo )
+        {
+          characterLayoutInfo.mGradientInfo = new TextViewProcessor::GradientInfo();
+        }
       }
     }
 
@@ -850,31 +1147,44 @@ void CalculateVisibilityForFade( const Internal::TextView::LayoutParameters& lay
       // Current implementation can't set gradient parameters for a text-actor exceeding at the same time the top and the bottom boundaries.
       if( bottomFadeOut )
       {
-        gradientColor = characterLayoutInfo.mStyledText.mStyle.GetTextColor();
+        gradientColor = style.GetTextColor();
 
         // Calculates gradient coeficients.
         characterLayoutInfo.mColorAlpha = gradientColor.a * std::min( 1.f, fadeParameters.mBottomAlphaCoeficients.x * characterPositionMinusHeight + fadeParameters.mBottomAlphaCoeficients.y );
         gradientColor.a *= std::max( 0.f, fadeParameters.mBottomAlphaCoeficients.x * position.y + fadeParameters.mBottomAlphaCoeficients.y );
 
-        startPoint = Vector2( 0.5f, std::max( 0.f, ( fadeParameters.mBottomFadeThresholdOffset - characterPositionMinusHeight ) / size.height ) );
-        endPoint = Vector2( 0.5f, std::min( 1.f, ( relayoutData.mTextViewSize.height - characterPositionMinusHeight ) / size.height ) );
+        startPoint = Vector2( 0.5f, std::max( 0.f, std::min( 1.f, ( fadeParameters.mBottomFadeThresholdOffset - characterPositionMinusHeight ) / size.height ) ) );
+        endPoint = Vector2( 0.5f, std::min( 1.f, std::max( 0.f, ( relayoutData.mTextViewSize.height - characterPositionMinusHeight ) / size.height ) ) );
+
+        if( NULL == characterLayoutInfo.mGradientInfo )
+        {
+          characterLayoutInfo.mGradientInfo = new TextViewProcessor::GradientInfo();
+        }
       }
       else if( topFadeOut )
       {
-        gradientColor = characterLayoutInfo.mStyledText.mStyle.GetTextColor();
+        gradientColor = style.GetTextColor();
 
         // Calculates gradient coeficients.
         characterLayoutInfo.mColorAlpha *= gradientColor.a * std::min( 1.f, fadeParameters.mTopAlphaCoeficients.x * position.y + fadeParameters.mTopAlphaCoeficients.y );
         gradientColor.a *= std::max( 0.f, fadeParameters.mTopAlphaCoeficients.x * characterPositionMinusHeight + fadeParameters.mTopAlphaCoeficients.y );
 
-        startPoint = Vector2( 0.5f, std::max( 0.f, ( fadeParameters.mTopFadeThresholdOffset - characterPositionMinusHeight ) / size.height ) );
-        endPoint = Vector2( 0.5f, std::min( 1.f,  -characterPositionMinusHeight / size.height ) );
+        startPoint = Vector2( 0.5f, std::max( 0.f, std::min( 1.f, ( fadeParameters.mTopFadeThresholdOffset - characterPositionMinusHeight ) / size.height ) ) );
+        endPoint = Vector2( 0.5f, std::min( 1.f,  std::max( 0.f, -characterPositionMinusHeight / size.height ) ) );
+
+        if( NULL == characterLayoutInfo.mGradientInfo )
+        {
+          characterLayoutInfo.mGradientInfo = new TextViewProcessor::GradientInfo();
+        }
       }
     }
 
-    characterLayoutInfo.mGradientInfo->mGradientColor = gradientColor;
-    characterLayoutInfo.mGradientInfo->mStartPoint = startPoint;
-    characterLayoutInfo.mGradientInfo->mEndPoint = endPoint;
+    if( NULL != characterLayoutInfo.mGradientInfo )
+    {
+      characterLayoutInfo.mGradientInfo->mGradientColor = gradientColor;
+      characterLayoutInfo.mGradientInfo->mStartPoint = startPoint;
+      characterLayoutInfo.mGradientInfo->mEndPoint = endPoint;
+    }
   }
   else
   {
@@ -1034,16 +1344,18 @@ void CreateEllipsizeTextActor( const EllipsizeParameters& ellipsizeParameters,
   float bearingOffset = 0.f;
 
   // Create ellipsize text-actor.
+  std::size_t characterIndex = 0u;
   for( TextViewProcessor::CharacterLayoutInfoContainer::const_iterator ellipsizeCharacterLayoutIt = relayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo.mCharactersLayoutInfo.begin(),
          endEllipsizeCharacterLayoutIt = relayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo.mCharactersLayoutInfo.end();
        ellipsizeCharacterLayoutIt != endEllipsizeCharacterLayoutIt;
-       ++ellipsizeCharacterLayoutIt )
+       ++ellipsizeCharacterLayoutIt, ++characterIndex )
   {
     const TextViewProcessor::CharacterLayoutInfo& ellipsizeCharacterLayoutInfo( *ellipsizeCharacterLayoutIt );
+    const TextStyle& style = *( *( relayoutData.mTextLayoutInfo.mEllipsisTextStyles.Begin() + characterIndex ) );
 
     if( isColorGlyph ||
         ( isColorGlyph != ellipsizeCharacterLayoutInfo.mIsColorGlyph ) ||
-        ( ellipsizeStyle != ellipsizeCharacterLayoutInfo.mStyledText.mStyle ) )
+        ( ellipsizeStyle != style ) )
     {
       // The style is different, so a new text-actor is needed.
       if( !ellipsizeText.IsEmpty() )
@@ -1061,8 +1373,8 @@ void CreateEllipsizeTextActor( const EllipsizeParameters& ellipsizeParameters,
       }
 
       // Resets the current ellipsize info.
-      ellipsizeText = ellipsizeCharacterLayoutInfo.mStyledText.mText;
-      ellipsizeStyle = ellipsizeCharacterLayoutInfo.mStyledText.mStyle;
+      ellipsizeText = Text( relayoutData.mTextLayoutInfo.mEllipsisText[characterIndex] );
+      ellipsizeStyle = style;
       ellipsizeSize = ellipsizeCharacterLayoutInfo.mSize;
       isColorGlyph = ellipsizeCharacterLayoutInfo.mIsColorGlyph;
 
@@ -1071,7 +1383,7 @@ void CreateEllipsizeTextActor( const EllipsizeParameters& ellipsizeParameters,
     else
     {
       // Updates text and size with the new character.
-      ellipsizeText.Append( ellipsizeCharacterLayoutInfo.mStyledText.mText );
+      ellipsizeText.Append( relayoutData.mTextLayoutInfo.mEllipsisText[characterIndex] );
       TextViewProcessor::UpdateSize( ellipsizeSize, ellipsizeCharacterLayoutInfo.mSize );
     }
   }
@@ -1131,8 +1443,11 @@ void EllipsizeLine( const TextView::LayoutParameters& layoutParameters,
 
     std::size_t wordCount = 0u;
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.begin() + firstIndices.mWordIndex,
-           endWordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.begin() + lastIndices.mWordIndex + 1u;
+    const bool isRightToLeftLayout = NULL != paragraphLayoutInfo.mRightToLeftLayout;
+    TextViewProcessor::WordLayoutInfoContainer& wordsLayoutInfo = isRightToLeftLayout ? paragraphLayoutInfo.mRightToLeftLayout->mWordsLayoutInfo : paragraphLayoutInfo.mWordsLayoutInfo;
+
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = wordsLayoutInfo.begin() + firstIndices.mWordIndex,
+           endWordLayoutIt = wordsLayoutInfo.begin() + lastIndices.mWordIndex + 1u;
          wordLayoutIt != endWordLayoutIt;
          ++wordLayoutIt, ++wordCount )
     {
@@ -1193,9 +1508,13 @@ void SetTextVisible( TextView::RelayoutData& relayoutData )
        ++paragraphLayoutIt )
   {
     TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo( *paragraphLayoutIt );
+    std::size_t characterIndex = 0u;
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.begin(),
-           endWordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.end();
+    const bool isRightToLeftLayout = NULL != paragraphLayoutInfo.mRightToLeftLayout;
+    TextViewProcessor::WordLayoutInfoContainer& wordsLayoutInfo = isRightToLeftLayout ? paragraphLayoutInfo.mRightToLeftLayout->mWordsLayoutInfo : paragraphLayoutInfo.mWordsLayoutInfo;
+
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = wordsLayoutInfo.begin(),
+           endWordLayoutIt = wordsLayoutInfo.end();
          wordLayoutIt != endWordLayoutIt;
          ++wordLayoutIt )
     {
@@ -1204,14 +1523,14 @@ void SetTextVisible( TextView::RelayoutData& relayoutData )
       for( TextViewProcessor::CharacterLayoutInfoContainer::iterator characterLayoutIt = wordLayoutInfo.mCharactersLayoutInfo.begin(),
              endCharacterLayoutIt = wordLayoutInfo.mCharactersLayoutInfo.end();
            characterLayoutIt != endCharacterLayoutIt;
-           ++characterLayoutIt )
+           ++characterLayoutIt, ++characterIndex )
       {
         TextViewProcessor::CharacterLayoutInfo& characterLayoutInfo( *characterLayoutIt );
 
         characterLayoutInfo.mIsVisible = true;
         delete characterLayoutInfo.mGradientInfo;
         characterLayoutInfo.mGradientInfo = NULL;
-        characterLayoutInfo.mColorAlpha = characterLayoutInfo.mStyledText.mStyle.GetTextColor().a;
+        characterLayoutInfo.mColorAlpha = ( *( paragraphLayoutInfo.mTextStyles.Begin() + characterIndex ) )->GetTextColor().a;
       } // end characters
     } // end words
   } // end paragraphs
@@ -1272,10 +1591,14 @@ void UpdateVisibilityForFade( const TextView::LayoutParameters& layoutParameters
   {
     TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo( *paragraphLayoutIt );
 
+    std::size_t characterIndex = 0u;
     relayoutParameters.mIndices.mWordIndex = 0u;
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.begin(),
-           endWordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.end();
+    const bool isRightToLeftLayout = NULL != paragraphLayoutInfo.mRightToLeftLayout;
+    TextViewProcessor::WordLayoutInfoContainer& wordsLayoutInfo = isRightToLeftLayout ? paragraphLayoutInfo.mRightToLeftLayout->mWordsLayoutInfo : paragraphLayoutInfo.mWordsLayoutInfo;
+
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = wordsLayoutInfo.begin(),
+           endWordLayoutIt = wordsLayoutInfo.end();
          wordLayoutIt != endWordLayoutIt;
          ++wordLayoutIt, ++relayoutParameters.mIndices.mWordIndex )
     {
@@ -1288,7 +1611,7 @@ void UpdateVisibilityForFade( const TextView::LayoutParameters& layoutParameters
       for( TextViewProcessor::CharacterLayoutInfoContainer::iterator characterLayoutIt = wordLayoutInfo.mCharactersLayoutInfo.begin(),
              endCharacterLayoutIt = wordLayoutInfo.mCharactersLayoutInfo.end();
            characterLayoutIt != endCharacterLayoutIt;
-           ++characterLayoutIt, ++relayoutParameters.mIndices.mCharacterIndex, ++infoTableCharacterIndex )
+           ++characterLayoutIt, ++relayoutParameters.mIndices.mCharacterIndex, ++infoTableCharacterIndex, ++characterIndex )
       {
         TextViewProcessor::CharacterLayoutInfo& characterLayoutInfo( *characterLayoutIt );
 
@@ -1298,6 +1621,7 @@ void UpdateVisibilityForFade( const TextView::LayoutParameters& layoutParameters
         // Calculates the visibility for the current character.
         CalculateVisibilityForFade( layoutParameters,
                                     characterLayoutInfo,
+                                    *( *( paragraphLayoutInfo.mTextStyles.Begin() + characterIndex ) ),
                                     relayoutParameters,
                                     fadeParameters,
                                     relayoutData );
@@ -1524,7 +1848,12 @@ void CreateTextActor( const TextView::VisualParameters& visualParameters,
   // Set the text-actor for the current traversed text.
   if( currentTextActorInfo.textActor )
   {
-    currentTextActorInfo.textActor.SetText( currentTextActorInfo.text );
+    if( ( NULL != currentTextActorInfo.characterLayout ) &&
+        currentTextActorInfo.characterLayout->mSetText )
+    {
+      currentTextActorInfo.textActor.SetText( currentTextActorInfo.text );
+      currentTextActorInfo.characterLayout->mSetText = false;
+    }
     currentTextActorInfo.textActor.SetPosition( currentTextActorInfo.position );
     currentTextActorInfo.textActor.SetSize( currentTextActorInfo.size );
 
@@ -1534,16 +1863,24 @@ void CreateTextActor( const TextView::VisualParameters& visualParameters,
                          paragraph.mSize.height );
   }
 
+  float rightToLeftOffset = 0.f;
+  if( character.IsWhiteSpace() )
+  {
+    // In left to right text, a word never starts with a white space but
+    // it may happen in right to left text as the text is reversed.
+    // The text alignment and justification offset is calculated without this white space.
+    // It causes a missalignment which can be corrected by removing the size of the white space.
+    rightToLeftOffset = characterLayout.mSize.width * relayoutData.mShrinkFactor;
+  }
+
   currentTextActorInfo.text = Text( character );
-  currentTextActorInfo.position = Vector3( characterLayout.mPosition.x + characterLayout.mOffset.x,
+  currentTextActorInfo.position = Vector3( characterLayout.mPosition.x + characterLayout.mOffset.x - rightToLeftOffset,
                                            characterLayout.mPosition.y + characterLayout.mOffset.y,
                                            characterLayout.mPosition.z );
   currentTextActorInfo.size = characterLayout.mSize * relayoutData.mShrinkFactor;
 
   currentTextActorInfo.color = style.GetTextColor();
   currentTextActorInfo.color.a = characterLayout.mColorAlpha;
-
-  currentTextActorInfo.gradientInfo = characterLayout.mGradientInfo;
 
   TextActor textActor = TextActor::DownCast( characterLayout.mGlyphActor );
 
@@ -1570,6 +1907,9 @@ void CreateTextActor( const TextView::VisualParameters& visualParameters,
         textActor.SetTextStyle( style );
       }
     }
+    characterLayout.mSetText = true;
+    currentTextActorInfo.characterLayout = &characterLayout;
+
     characterLayout.mGlyphActor = textActor;
   }
 
@@ -1589,12 +1929,13 @@ void CreateTextActor( const TextView::VisualParameters& visualParameters,
  */
 void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualParameters,
                                       TextView::RelayoutData& relayoutData,
-                                      TextViewProcessor::ParagraphLayoutInfo& paragraph,
+                                      TextViewProcessor::ParagraphLayoutInfo& paragraphLayout,
                                       std::size_t& characterGlobalIndex,
                                       std::size_t& lineLayoutInfoIndex,
                                       bool createGlyphActors )
 {
   CurrentTextActorInfo currentTextActorInfo;
+  currentTextActorInfo.characterLayout = NULL;
 
   const std::size_t lineLayoutInfoSize = relayoutData.mLines.size(); // Number of lines.
   bool lineLayoutEnd = false;            // Whether lineLayoutInfoIndex points at the last line.
@@ -1610,14 +1951,24 @@ void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualPa
 
   std::vector<TextActor> textActorsToRemove; // Keep a vector of text-actors to be included into the cache.
 
+  // Retrieve the layout info to traverse. If there is right to left text it retrieves the right to left layout.
+  const bool isRightToLeftLayout = NULL != paragraphLayout.mRightToLeftLayout;
+
+  TextViewProcessor::WordLayoutInfoContainer& wordsLayoutInfo = isRightToLeftLayout ? paragraphLayout.mRightToLeftLayout->mWordsLayoutInfo : paragraphLayout.mWordsLayoutInfo;
+  Text& text = isRightToLeftLayout ? paragraphLayout.mRightToLeftLayout->mText : paragraphLayout.mText;
+  Vector<TextStyle*>& textStyles = isRightToLeftLayout ? paragraphLayout.mRightToLeftLayout->mTextStyles : paragraphLayout.mTextStyles;
+
+  // In case the previous right to left layout has been cleared, all text-actors have been removed as well. If this bool is set to true, text-actors will be created again.
+  const bool previousRightToLeftLayoutCleared = isRightToLeftLayout ? paragraphLayout.mRightToLeftLayout->mPreviousLayoutCleared : false;
+
   std::size_t characterParagraphIndex = 0u;   // Index to the character (within the paragraph).
-  for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = paragraph.mWordsLayoutInfo.begin(), wordEndIt = paragraph.mWordsLayoutInfo.end();
+  for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = wordsLayoutInfo.begin(), wordEndIt = wordsLayoutInfo.end();
        wordIt != wordEndIt;
        ++wordIt )
   {
-    TextViewProcessor::WordLayoutInfo& word( *wordIt );
+    TextViewProcessor::WordLayoutInfo& wordLayout( *wordIt );
 
-    for( TextViewProcessor::CharacterLayoutInfoContainer::iterator characterIt = word.mCharactersLayoutInfo.begin(), characterEndIt = word.mCharactersLayoutInfo.end();
+    for( TextViewProcessor::CharacterLayoutInfoContainer::iterator characterIt = wordLayout.mCharactersLayoutInfo.begin(), characterEndIt = wordLayout.mCharactersLayoutInfo.end();
          characterIt != characterEndIt;
          ++characterIt )
     {
@@ -1639,14 +1990,14 @@ void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualPa
       }
 
       // Do not create a glyph-actor if there is no text.
-      const Character character = characterLayout.mStyledText.mText[0u]; // there are only one character per character layout.
-      const TextStyle& style = characterLayout.mStyledText.mStyle;
+      const Character character = text[characterParagraphIndex];
+      const TextStyle& style = *( *( textStyles.Begin() + characterParagraphIndex ) );
 
       bool appendCharacter = false;
 
       if( characterLayout.mIsColorGlyph ||
-          !character.IsWhiteSpace() || // A new paragraph character is also a white space.
-          ( character.IsWhiteSpace() && style.IsUnderlineEnabled() ) )
+          ( TextViewProcessor::NoSeparator == wordLayout.mType ) ||
+          ( ( TextViewProcessor::WordSeparator == wordLayout.mType ) && style.IsUnderlineEnabled() ) )
       {
         // Do not create a glyph-actor if it's a white space (without underline) or a new paragraph character.
 
@@ -1673,9 +2024,6 @@ void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualPa
           characterLayout.mSetText = false;
           characterLayout.mSetStyle = false;
 
-          // There is a new style or a new line.
-          glyphActorCreatedForLine = true;
-
           if( characterLayout.mIsColorGlyph )
           {
             CreateEmoticon( visualParameters,
@@ -1686,13 +2034,16 @@ void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualPa
           {
             CreateTextActor( visualParameters,
                              relayoutData,
-                             paragraph,
+                             paragraphLayout,
                              characterLayout,
                              character,
                              style,
                              currentTextActorInfo,
-                             createGlyphActors );
+                             createGlyphActors || previousRightToLeftLayoutCleared );
           }
+
+          // There is a new style or a new line.
+          glyphActorCreatedForLine = true;
 
           // Update style to be checked with next characters.
           currentStyle = style;
@@ -1734,7 +2085,7 @@ void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualPa
       if( appendCharacter )
       {
         // Add the character to the current text-actor and update the size.
-        if( characterLayout.mIsVisible && ( TextViewProcessor::ParagraphSeparator != word.mType ) )
+        if( characterLayout.mIsVisible && ( TextViewProcessor::ParagraphSeparator != wordLayout.mType ) )
         {
           currentTextActorInfo.text.Append( character );
 
@@ -1753,14 +2104,19 @@ void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualPa
   {
     if( currentTextActorInfo.textActor )
     {
-      currentTextActorInfo.textActor.SetText( currentTextActorInfo.text );
+      if( ( NULL != currentTextActorInfo.characterLayout ) &&
+          currentTextActorInfo.characterLayout->mSetText )
+      {
+        currentTextActorInfo.textActor.SetText( currentTextActorInfo.text );
+        currentTextActorInfo.characterLayout->mSetText = false;
+      }
       currentTextActorInfo.textActor.SetPosition( currentTextActorInfo.position );
       currentTextActorInfo.textActor.SetSize( currentTextActorInfo.size );
 
       SetVisualParameters( currentTextActorInfo,
                            visualParameters,
                            relayoutData,
-                           paragraph.mSize.height );
+                           paragraphLayout.mSize.height );
     }
   }
 
@@ -1827,7 +2183,12 @@ void CalculateUnderlineInfo( TextView::RelayoutData& relayoutData, TextViewRelay
   {
     TextViewProcessor::ParagraphLayoutInfo& paragraph( *paragraphIt );
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = paragraph.mWordsLayoutInfo.begin(), wordEndIt = paragraph.mWordsLayoutInfo.end();
+    std::size_t characterIndex = 0u;
+
+    const bool isRightToLeftLayout = NULL != paragraph.mRightToLeftLayout;
+    TextViewProcessor::WordLayoutInfoContainer& wordsLayoutInfo = isRightToLeftLayout ? paragraph.mRightToLeftLayout->mWordsLayoutInfo : paragraph.mWordsLayoutInfo;
+
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = wordsLayoutInfo.begin(), wordEndIt = wordsLayoutInfo.end();
          wordIt != wordEndIt;
          ++wordIt )
     {
@@ -1835,9 +2196,10 @@ void CalculateUnderlineInfo( TextView::RelayoutData& relayoutData, TextViewRelay
 
       for( TextViewProcessor::CharacterLayoutInfoContainer::iterator characterIt = word.mCharactersLayoutInfo.begin(), characterEndIt = word.mCharactersLayoutInfo.end();
            characterIt != characterEndIt;
-           ++characterIt )
+           ++characterIt, ++characterIndex )
       {
         TextViewProcessor::CharacterLayoutInfo& character( *characterIt );
+        const TextStyle& style = *( *( paragraph.mTextStyles.Begin() + characterIndex ) );
 
         // Check if current character is the first of a new line
         const bool isNewLine = ( textUnderlineStatus.mLineGlobalIndex < relayoutData.mLines.size() ) &&
@@ -1847,7 +2209,7 @@ void CalculateUnderlineInfo( TextView::RelayoutData& relayoutData, TextViewRelay
           ++textUnderlineStatus.mLineGlobalIndex; // If it's a new line, point to the next one.
         }
 
-        if( character.mStyledText.mStyle.IsUnderlineEnabled() )
+        if( style.IsUnderlineEnabled() )
         {
           if( !textUnderlineStatus.mCurrentUnderlineStatus || // Current character is underlined but previous one it wasn't.
               isNewLine )                                     // Current character is underlined and is the first of current line.
@@ -1927,8 +2289,12 @@ void SetUnderlineInfo( TextView::RelayoutData& relayoutData )
        ++paragraphIt )
   {
     TextViewProcessor::ParagraphLayoutInfo& paragraph( *paragraphIt );
+    std::size_t characterIndex = 0u;
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = paragraph.mWordsLayoutInfo.begin(), wordEndIt = paragraph.mWordsLayoutInfo.end();
+    const bool isRightToLeftLayout = NULL != paragraph.mRightToLeftLayout;
+    TextViewProcessor::WordLayoutInfoContainer& wordsLayoutInfo = isRightToLeftLayout ? paragraph.mRightToLeftLayout->mWordsLayoutInfo : paragraph.mWordsLayoutInfo;
+
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = wordsLayoutInfo.begin(), wordEndIt = wordsLayoutInfo.end();
          wordIt != wordEndIt;
          ++wordIt )
     {
@@ -1936,9 +2302,10 @@ void SetUnderlineInfo( TextView::RelayoutData& relayoutData )
 
       for( TextViewProcessor::CharacterLayoutInfoContainer::iterator characterIt = word.mCharactersLayoutInfo.begin(), characterEndIt = word.mCharactersLayoutInfo.end();
            characterIt != characterEndIt;
-           ++characterIt )
+           ++characterIt, ++characterIndex )
       {
         TextViewProcessor::CharacterLayoutInfo& character( *characterIt );
+        TextStyle& style = *( *( paragraph.mTextStyles.Begin() + characterIndex ) );
 
         // Check if current character is the first of a new line
 
@@ -1957,7 +2324,7 @@ void SetUnderlineInfo( TextView::RelayoutData& relayoutData )
           }
         }
 
-        if( character.mStyledText.mStyle.IsUnderlineEnabled() )
+        if( style.IsUnderlineEnabled() )
         {
           if( textUnderlineStatus.mCurrentUnderlineStatus )
           {
@@ -1982,7 +2349,7 @@ void SetUnderlineInfo( TextView::RelayoutData& relayoutData )
           const float positionOffset = ( underlineInfo.mMaxHeight - character.mSize.height ) - bearingOffset;
 
           // Sets the underline's parameters.
-          character.mStyledText.mStyle.SetUnderline( true, underlineInfo.mMaxThickness, underlineInfo.mPosition - positionOffset );
+          style.SetUnderline( true, underlineInfo.mMaxThickness, underlineInfo.mPosition - positionOffset );
 
           // Mark the character to be set the new style into the text-actor.
           character.mSetStyle = true;
@@ -2038,8 +2405,12 @@ void InsertToTextView( Actor textView,
   {
     TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo( *paragraphLayoutIt );
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.begin(),
-           endWordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.end();
+    // Retrieve the layout info to traverse. If there is right to left text it retrieves the right to left layout.
+    const bool isRightToLeftLayout = NULL != paragraphLayoutInfo.mRightToLeftLayout;
+    TextViewProcessor::WordLayoutInfoContainer& wordsLayoutInfo = isRightToLeftLayout ? paragraphLayoutInfo.mRightToLeftLayout->mWordsLayoutInfo : paragraphLayoutInfo.mWordsLayoutInfo;
+
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = wordsLayoutInfo.begin(),
+           endWordLayoutIt = wordsLayoutInfo.end();
          wordLayoutIt != endWordLayoutIt;
          ++wordLayoutIt )
     {

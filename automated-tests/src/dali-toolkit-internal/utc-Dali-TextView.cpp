@@ -66,6 +66,7 @@ struct SplitParagraphTest
   std::string input;
   std::size_t wordIndex;
   std::size_t characterIndex;
+  std::size_t characterParagraphIndex;
   float       lineHeightOffset;
   std::string firstResult;
   std::string lastResult;
@@ -141,10 +142,6 @@ void Print( const TextViewProcessor::CharacterLayoutInfo& character )
   {
     std::cout << "[" << textActor.GetText() << "]";
   }
-  else
-  {
-    std::cout << "{" << character.mStyledText.mText.GetText() << "}";
-  }
 }
 
 void Print( const TextViewProcessor::WordLayoutInfo& word )
@@ -186,21 +183,13 @@ void Print( const TextViewProcessor::TextLayoutInfo& text )
   std::cout << "||" << std::endl;
 }
 
-std::string GetText( const TextViewProcessor::CharacterLayoutInfo& character )
+std::string GetText( const TextViewProcessor::WordLayoutInfo& word, const Text& paragraphText )
 {
-  return character.mStyledText.mText.GetText();
-}
+  Text text;
 
-std::string GetText( const TextViewProcessor::WordLayoutInfo& word )
-{
-  std::string text;
+  paragraphText.GetSubText( word.mFirstCharacter, word.mFirstCharacter + word.mCharactersLayoutInfo.size() - 1u, text );
 
-  for( TextViewProcessor::CharacterLayoutInfoContainer::const_iterator it = word.mCharactersLayoutInfo.begin(), endIt = word.mCharactersLayoutInfo.end(); it != endIt; ++it )
-  {
-    text += GetText( *it );
-  }
-
-  return text;
+  return text.GetText();
 }
 
 std::string GetText( const TextViewProcessor::ParagraphLayoutInfo& paragraph )
@@ -209,7 +198,7 @@ std::string GetText( const TextViewProcessor::ParagraphLayoutInfo& paragraph )
 
   for( TextViewProcessor::WordLayoutInfoContainer::const_iterator it = paragraph.mWordsLayoutInfo.begin(), endIt = paragraph.mWordsLayoutInfo.end(); it != endIt; ++it )
   {
-    text += GetText( *it );
+    text += GetText( *it, paragraph.mText );
   }
 
   return text;
@@ -285,27 +274,6 @@ bool TestEqual( const TextViewProcessor::CharacterLayoutInfo& character1,
 
   if( style1 != style2 )
   {
-    return false;
-  }
-
-  text1 = character1.mStyledText.mText.GetText();
-  style1 = character1.mStyledText.mStyle;
-
-  text2 = character2.mStyledText.mText.GetText();
-  style2 = character2.mStyledText.mStyle;
-
-  if( text1 != text2 )
-  {
-    return false;
-  }
-
-  if( style1 != style2 )
-  {
-    std::cout << "  style1 : " << std::endl;
-    TextViewProcessor::dbgPrint( style1 );
-
-    std::cout << "  style2 : " << std::endl;
-    TextViewProcessor::dbgPrint( style2 );
     return false;
   }
 
@@ -557,6 +525,7 @@ bool TestSplitWord( const std::string& description, const std::string& input, co
  * @param input The input word.
  * @param wordIndex Index to the word within the paragraph where to split it.
  * @param characterIndex Where to split the word.
+ * @param characterIndex Character index within the paragraph.
  * @param lineHeightOffset Offset between lines.
  * @param firstResult First part of the split paragraph.
  * @param lastResult Last part of the split paragraph.
@@ -568,6 +537,7 @@ bool TestSplitParagraph( const std::string& description,
                          const std::string& input,
                          size_t wordIndex,
                          size_t characterIndex,
+                         size_t characterParagraphIndex,
                          float lineHeightOffset,
                          const std::string& firstResult,
                          const std::string& lastResult,
@@ -589,7 +559,6 @@ bool TestSplitParagraph( const std::string& description,
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ),
                                                                                     true ),
                                      relayoutData );
 
@@ -616,7 +585,6 @@ bool TestSplitParagraph( const std::string& description,
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ),
                                                                                     true ),
                                      firstRelayoutData );
 
@@ -643,7 +611,6 @@ bool TestSplitParagraph( const std::string& description,
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..."),
                                                                                     true ),
                                      lastRelayoutData );
 
@@ -660,6 +627,7 @@ bool TestSplitParagraph( const std::string& description,
   TextViewProcessor::ParagraphLayoutInfo lastParagraphLayoutInfo;
 
   TextViewProcessor::TextInfoIndices indices( 0, wordIndex, characterIndex );
+  indices.mCharacterParagraphIndex = characterParagraphIndex;
 
   SplitParagraph( indices,
                   PointSize( lineHeightOffset ),
@@ -812,7 +780,6 @@ bool TestMergeParagraphs( const std::string& description, const std::string& inp
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ),
                                                                                     true ),
                                      firstRelayoutData );
 
@@ -838,7 +805,6 @@ bool TestMergeParagraphs( const std::string& description, const std::string& inp
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ),
                                                                                     true ),
                                      lastRelayoutData );
 
@@ -864,7 +830,6 @@ bool TestMergeParagraphs( const std::string& description, const std::string& inp
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ),
                                                                                     true ),
                                      resultRelayoutData );
 
@@ -998,7 +963,6 @@ bool TestRemoveWordsFromParagraph( const std::string& description, const std::st
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ),
                                                                                     true ),
                                      relayoutData );
 
@@ -1024,7 +988,6 @@ bool TestRemoveWordsFromParagraph( const std::string& description, const std::st
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ),
                                                                                     true ),
                                      resultRelayoutData );
 
@@ -1099,7 +1062,6 @@ bool TestUpdateTextInfo( const std::string& description,
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ),
                                                                                     true ),
                                      relayoutData );
 
@@ -1117,7 +1079,6 @@ bool TestUpdateTextInfo( const std::string& description,
                                                                                     static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                                     Toolkit::TextView::Center,
                                                                                     PointSize( lineHeightOffset ),
-                                                                                    std::string( "..." ),
                                                                                     true ),
                                      resultRelayoutData );
 
@@ -1128,7 +1089,6 @@ bool TestUpdateTextInfo( const std::string& description,
                                                                         static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalCenter | Toolkit::Alignment::VerticalCenter ),
                                                                         Toolkit::TextView::Center,
                                                                         PointSize( lineHeightOffset ),
-                                                                        std::string( "..." ),
                                                                         true );
 
   switch( operation )
@@ -1254,15 +1214,6 @@ int UtcDaliTextViewCreateTextInfo(void)
   layoutInfo12.mBearing = BEARING_12;
   layoutInfo12.mAscender = ASCENDER_12;
 
-  TextStyle style10;
-  style10.SetFontName( "" );
-  style10.SetFontPointSize( PointSize( 10.f ) );
-  TextStyle style12;
-  style12.SetFontName( "" );
-
-  layoutInfo12.mStyledText.mStyle = style12;
-  layoutInfo10.mStyledText.mStyle = style10;
-
   // Words
 
   TextViewProcessor::WordLayoutInfo wordLayout1, wordLayout2, wordLayout3, wordLayout4;
@@ -1272,46 +1223,33 @@ int UtcDaliTextViewCreateTextInfo(void)
   wordLayout1.mAscender = ASCENDER_12;
   wordLayout1.mType = TextViewProcessor::NoSeparator;
 
-  layoutInfo12.mStyledText.mText = Text( "H" );
   wordLayout1.mCharactersLayoutInfo.push_back( layoutInfo12 ); // H
-  layoutInfo12.mStyledText.mText = Text( "e" );
   wordLayout1.mCharactersLayoutInfo.push_back( layoutInfo12 ); // e
-  layoutInfo12.mStyledText.mText = Text( "l" );
   wordLayout1.mCharactersLayoutInfo.push_back( layoutInfo12 ); // l
-  layoutInfo10.mStyledText.mText = Text( "l" );
   wordLayout1.mCharactersLayoutInfo.push_back( layoutInfo10 ); // l
-  layoutInfo10.mStyledText.mText = Text( "o" );
   wordLayout1.mCharactersLayoutInfo.push_back( layoutInfo10 ); // o
 
   // (white space)
   wordLayout2.mSize = Size( ADVANCE_10, HEIGHT_10 );
   wordLayout2.mAscender = ASCENDER_10;
   wordLayout2.mType = TextViewProcessor::WordSeparator;
-  layoutInfo10.mStyledText.mText = Text( " " );
   wordLayout2.mCharactersLayoutInfo.push_back( layoutInfo10 ); // (white space)
 
   // world!
   wordLayout3.mSize = Size( 2.f * ADVANCE_10 + 4.f * ADVANCE_12, HEIGHT_12 );
   wordLayout3.mAscender = ASCENDER_12;
   wordLayout3.mType = TextViewProcessor::NoSeparator;
-  layoutInfo10.mStyledText.mText = Text( "w" );
   wordLayout3.mCharactersLayoutInfo.push_back( layoutInfo10 ); // w
-  layoutInfo10.mStyledText.mText = Text( "o" );
   wordLayout3.mCharactersLayoutInfo.push_back( layoutInfo10 ); // o
-  layoutInfo12.mStyledText.mText = Text( "r" );
   wordLayout3.mCharactersLayoutInfo.push_back( layoutInfo12 ); // r
-  layoutInfo12.mStyledText.mText = Text( "l" );
   wordLayout3.mCharactersLayoutInfo.push_back( layoutInfo12 ); // l
-  layoutInfo12.mStyledText.mText = Text( "d" );
   wordLayout3.mCharactersLayoutInfo.push_back( layoutInfo12 ); // d
-  layoutInfo12.mStyledText.mText = Text( "!" );
   wordLayout3.mCharactersLayoutInfo.push_back( layoutInfo12 ); // !
 
   // (new paragraph character)
   wordLayout4.mSize = Size( 0.f, HEIGHT_12 );
   wordLayout4.mAscender = ASCENDER_12;
   wordLayout4.mType = TextViewProcessor::ParagraphSeparator;
-  layoutInfo12.mStyledText.mText = Text( "\n" );
   layoutInfo12.mSize.width = 0.f;
   wordLayout4.mCharactersLayoutInfo.push_back( layoutInfo12 ); // (new paragraph char)
 
@@ -1533,7 +1471,6 @@ int UtcDaliTextViewUpdateTextInfo(void)
       std::string( "Hello <font size='30'>w</font>orl<font size='10'>dhello</font> world" )
     },
     // * Remove RTL text within LTR
-    /* TODO check this when RTL text is working
     {
       std::string( "Remove within the same paragraph, RTL text within LTR." ),
       Remove,
@@ -1544,7 +1481,6 @@ int UtcDaliTextViewUpdateTextInfo(void)
       0.f,
       std::string( "Hello worlello world" )
     },
-    */
     // * Remove whole paragraph
     {
       std::string( "Remove whole paragraph" ),
@@ -1668,7 +1604,7 @@ int UtcDaliTextViewUpdateTextInfo(void)
       std::string( "Touch <b>me\nhello\n</b>world" )
     },
   };
-  const std::size_t numberOfTests( 21u );
+  const std::size_t numberOfTests( 22u );
 
   for( std::size_t index = 0u; index < numberOfTests; ++index )
   {
@@ -1697,6 +1633,7 @@ int UtcDaliTextViewSplitParagraph(void)
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
       0,
       0,
+      0,
       3.f,
       std::string( "" ),
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
@@ -1706,6 +1643,7 @@ int UtcDaliTextViewSplitParagraph(void)
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
       10,
       4,
+      36,
       0.f,
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
       std::string( "" ),
@@ -1715,16 +1653,17 @@ int UtcDaliTextViewSplitParagraph(void)
       std::string("<font size='10'>Hello </font>wor<font size='12'>ld, hello wo</font>rld"),
       2,
       4,
+      10,
       0.f,
       std::string("<font size='10'>Hello </font>wor<font size='12'>l</font>"),
       std::string("<font size='12'>d, hello wo</font>rld")
-    }
-    /* TODO RTL
+    },
     {
       std::string( "Split paragraph, wordPosition 6, position 0." ),
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
       6,
       0,
+      21,
       0.f,
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום " ),
       std::string( "עולם text text" ),
@@ -1734,6 +1673,7 @@ int UtcDaliTextViewSplitParagraph(void)
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
       4,
       0,
+      17,
       0.f,
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> " ),
       std::string( "שלום עולם text text" ),
@@ -1743,13 +1683,13 @@ int UtcDaliTextViewSplitParagraph(void)
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם text text" ),
       8,
       0,
+      27,
       6.f,
       std::string( "<font size='10'>He<font size='12'>ll</font>oooo wooorld</font> שלום עולם " ),
       std::string( "text text" ),
     },
-    */
   };
-  const std::size_t numberOfTests( 3u );
+  const std::size_t numberOfTests( 6u );
 
   for( std::size_t index = 0u; index < numberOfTests; ++index )
   {
@@ -1759,6 +1699,7 @@ int UtcDaliTextViewSplitParagraph(void)
                              test.input,
                              test.wordIndex,
                              test.characterIndex,
+                             test.characterParagraphIndex,
                              test.lineHeightOffset,
                              test.firstResult,
                              test.lastResult,
@@ -1969,7 +1910,6 @@ int UtcDaliTextViewMergeParagraph01(void)
       0.f,
       std::string( "Hello world, this is a whole paragraph" )
     },
-    /* TODO RTL
     {
       std::string( "Merge paragraphs: last starting with RTL text and first ending with RTL" ),
       std::string( "Hello world, שלום" ),
@@ -1984,7 +1924,6 @@ int UtcDaliTextViewMergeParagraph01(void)
       3.f,
       std::string( "Hello world, שלום עולם, hello world." )
     },
-    */
     {
       std::string( "Merge paragraphs. Don't merge words" ),
       std::string( "Hello world," ),
@@ -2000,7 +1939,7 @@ int UtcDaliTextViewMergeParagraph01(void)
       std::string( "Hello world, this is a whole paragraph" )
     },
   };
-  const std::size_t numberOfTests( 4u );
+  const std::size_t numberOfTests( 6u );
 
   for( std::size_t index = 0u; index < numberOfTests; ++index )
   {
