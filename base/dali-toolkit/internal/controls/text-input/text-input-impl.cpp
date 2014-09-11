@@ -281,9 +281,9 @@ Dali::Toolkit::TextInput TextInput::New()
   TextInputPtr textInput(new TextInput());
   // Pass ownership to CustomActor via derived handle
   Dali::Toolkit::TextInput handle(*textInput);
+  handle.SetName( "TextInput");
 
   textInput->Initialize();
-
   return handle;
 }
 
@@ -1152,6 +1152,7 @@ void TextInput::CreateActiveLayer()
 {
   Actor self = Self();
   mActiveLayer = Layer::New();
+  mActiveLayer.SetName ( "ActiveLayerActor" );
 
   mActiveLayer.SetAnchorPoint( AnchorPoint::CENTER);
   mActiveLayer.SetParentOrigin( ParentOrigin::CENTER);
@@ -1540,6 +1541,12 @@ void TextInput::OnTextTap(Dali::Actor actor, Dali::TapGesture tap)
 void TextInput::OnLongPress(Dali::Actor actor, Dali::LongPressGesture longPress)
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "OnLongPress\n" );
+
+  // Ignore longpress if in selection mode already
+  if( mHighlightMeshActor )
+  {
+    return;
+  }
 
   if(longPress.state == Dali::Gesture::Started)
   {
@@ -2076,6 +2083,7 @@ void TextInput::SetUpTouchEvents()
 void TextInput::CreateTextViewActor()
 {
   mDisplayedTextView = Toolkit::TextView::New();
+  mDisplayedTextView.SetName( "TextView ");
   mDisplayedTextView.SetMarkupProcessingEnabled( mMarkUpEnabled );
   mDisplayedTextView.SetParentOrigin(ParentOrigin::TOP_LEFT);
   mDisplayedTextView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
