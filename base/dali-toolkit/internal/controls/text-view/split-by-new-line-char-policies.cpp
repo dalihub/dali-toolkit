@@ -129,9 +129,9 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
   }
 
   relayoutParameters.mIsFirstCharacter = true;
-  relayoutParameters.mIndices.mLineIndex = 0;
+  relayoutParameters.mIndices.mLineIndex = 0u;
   relayoutParameters.mPositionOffset = Vector3::ZERO;
-  relayoutParameters.mCharacterGlobalIndex = 0;
+  relayoutParameters.mCharacterGlobalIndex = 0u;
 
   for( TextViewProcessor::LineLayoutInfoContainer::iterator lineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin(),
        endLineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end();
@@ -143,7 +143,7 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
     relayoutParameters.mLineSize = lineLayoutInfo.mSize * relayoutData.mShrinkFactor;
 
     relayoutParameters.mIsNewLine = true;
-    relayoutParameters.mIndices.mWordIndex = 0;
+    relayoutParameters.mIndices.mWordIndex = 0u;
 
     for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.begin(),
            endWordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.end();
@@ -156,7 +156,7 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
 
       relayoutParameters.mIsFirstCharacterOfWord = true;
       relayoutParameters.mWordSize = wordLayoutInfo.mSize;
-      relayoutParameters.mIndices.mCharacterIndex = 0;
+      relayoutParameters.mIndices.mCharacterIndex = 0u;
 
       if( relayoutParameters.mIsNewLine )
       {
@@ -271,7 +271,7 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
   // Check if the last character is a new line character. In that case the height should be added.
   if( !relayoutData.mTextLayoutInfo.mLinesLayoutInfo.empty() )
   {
-    const TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end() - 1 ) );
+    const TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end() - 1u ) );
 
     if( lineLayoutInfo.mWordsLayoutInfo.empty() ) // if it's empty, it means the last character is a new line character.
     {
@@ -310,22 +310,18 @@ void Relayout( Actor textView,
                                         relayoutData );
   }
 
-  if( relayoutOperationMask & TextView::RELAYOUT_INITIALIZE_TEXT_ACTORS )
-  {
-    TextViewProcessor::InitializeTextActorInfo( relayoutData );
-  }
-
-  if( relayoutOperationMask & TextView::RELAYOUT_TEXT_ACTOR_UPDATE )
+  const bool initializeTextActors = relayoutOperationMask & TextView::RELAYOUT_INITIALIZE_TEXT_ACTORS;
+  const bool updateTextActors = relayoutOperationMask & TextView::RELAYOUT_TEXT_ACTOR_UPDATE;
+  if( initializeTextActors || updateTextActors )
   {
     TextViewRelayout::UpdateTextActorInfo( visualParameters,
-                                           relayoutData );
+                                           relayoutData,
+                                           initializeTextActors );
   }
 
-  if( ( relayoutOperationMask & TextView::RELAYOUT_INSERT_TO_TEXT_VIEW ) ||
-      ( relayoutOperationMask & TextView::RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST ) )
+  if( relayoutOperationMask & TextView::RELAYOUT_INSERT_TO_TEXT_VIEW )
   {
-    TextViewRelayout::InsertToTextView( relayoutOperationMask,
-                                        textView,
+    TextViewRelayout::InsertToTextView( textView,
                                         relayoutData );
   }
 }

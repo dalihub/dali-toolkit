@@ -49,7 +49,7 @@ const std::string EMOJI_FONT_NAME( "SamsungEmoji" ); // Emoticons font family na
 void UpdateLayoutInfo( WordLayoutInfo& wordLayout )
 {
   // Initialize layout info for the whole word.
-  wordLayout.mSize = Size();
+  wordLayout.mSize = Size::ZERO;
   wordLayout.mAscender = 0.f;
 
   // Traverse the character layout info to update the word layout.
@@ -110,7 +110,7 @@ void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
     const std::size_t length = styledText.mText.GetLength();
 
     // It could be a group of characters.
-    for( std::size_t index = 0; index < length; ++index )
+    for( std::size_t index = 0u; index < length; ++index )
     {
       MarkupProcessor::StyledText styledCharacter;
       styledCharacter.mStyle = styledText.mStyle;
@@ -194,18 +194,18 @@ void RemoveCharactersFromWordInfo( TextView::RelayoutData& relayoutData,
   if( LineSeparator == wordLayout.mType )
   {
     // If the word is a line separator and there is more lines, then current line and the line after need to be merged.
-    if( textInfoIndicesBegin.mLineIndex + 1 < textLayoutInfo.mLinesLayoutInfo.size() )
+    if( textInfoIndicesBegin.mLineIndex + 1u < textLayoutInfo.mLinesLayoutInfo.size() )
     {
       // current line is not the last one.
 
       // Update indices to merge lines.
       textInfoMergeIndicesBegin.mLineIndex = textInfoIndicesBegin.mLineIndex;
-      textInfoMergeIndicesEnd.mLineIndex = textInfoIndicesBegin.mLineIndex + 1;
+      textInfoMergeIndicesEnd.mLineIndex = textInfoIndicesBegin.mLineIndex + 1u;
 
       mergeLines = true;
 
-      ++textInfoIndicesBegin.mLineIndex; // increase both indices,
-      textInfoIndicesEnd.mLineIndex +=2; // will delete last line.
+      ++textInfoIndicesBegin.mLineIndex;   // increase both indices,
+      textInfoIndicesEnd.mLineIndex += 2u; // will delete last line.
     }
 
     ++textInfoIndicesEnd.mWordIndex; //will delete the line separator;
@@ -214,10 +214,10 @@ void RemoveCharactersFromWordInfo( TextView::RelayoutData& relayoutData,
   {
     // If the word is a word separator. Check if the word before and the word after can be merged.
 
-    if( ( 0 < textInfoIndicesBegin.mWordIndex ) && ( lineLayout.mWordsLayoutInfo.size() > textInfoIndicesBegin.mWordIndex + 1 ) )
+    if( ( 0u < textInfoIndicesBegin.mWordIndex ) && ( lineLayout.mWordsLayoutInfo.size() > textInfoIndicesBegin.mWordIndex + 1u ) )
     {
-      const WordLayoutInfo& wordLayoutBefore( *( lineLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex - 1 ) );
-      const WordLayoutInfo& wordLayoutAfter( *( lineLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex + 1 ) );
+      const WordLayoutInfo& wordLayoutBefore( *( lineLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex - 1u ) );
+      const WordLayoutInfo& wordLayoutAfter( *( lineLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex + 1u ) );
 
       if( ( NoSeparator == wordLayoutBefore.mType ) && ( NoSeparator == wordLayoutAfter.mType ) )
       {
@@ -225,10 +225,10 @@ void RemoveCharactersFromWordInfo( TextView::RelayoutData& relayoutData,
         mergeWords = true;
 
         // Set indices to merge the words.
-        textInfoMergeIndicesBegin.mWordIndex = textInfoIndicesBegin.mWordIndex - 1; // word before word separator.
-        textInfoMergeIndicesEnd.mWordIndex = textInfoIndicesBegin.mWordIndex + 1; // word after word separator.
+        textInfoMergeIndicesBegin.mWordIndex = textInfoIndicesBegin.mWordIndex - 1u; // word before word separator.
+        textInfoMergeIndicesEnd.mWordIndex = textInfoIndicesBegin.mWordIndex + 1u; // word after word separator.
 
-        textInfoIndicesEnd.mWordIndex += 2; // will delete the word separator and the merged word.
+        textInfoIndicesEnd.mWordIndex += 2u; // will delete the word separator and the merged word.
       }
       else
       {
@@ -264,7 +264,7 @@ void RemoveCharactersFromWord( const std::size_t position,
   // Removes a given number of characters from the given word starting from the 'position' index.
 
   // Early return.
-  if( 0 == numberOfCharacters )
+  if( 0u == numberOfCharacters )
   {
     // nothing to do if the number of characters is zero.
 
@@ -286,7 +286,7 @@ void SplitWord( const std::size_t position,
   // It moves characters from the first part of the word to the last one.
 
   // early returns
-  if( 0 == position )
+  if( 0u == position )
   {
     // the whole word goes to the last part of the word.
     lastWordLayoutInfo = firstWordLayoutInfo;
@@ -380,7 +380,7 @@ CharacterLayoutInfo GetLastCharacterLayoutInfo( const WordLayoutInfo& wordLayout
 
   if( !wordLayoutInfo.mCharactersLayoutInfo.empty() )
   {
-    layoutInfo = *( wordLayoutInfo.mCharactersLayoutInfo.end() - 1 );
+    layoutInfo = *( wordLayoutInfo.mCharactersLayoutInfo.end() - 1u );
   }
 
   return layoutInfo;

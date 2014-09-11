@@ -115,13 +115,6 @@ void UpdateTextInfo( const TextStyle& style,
                      TextStyle::Mask mask,
                      TextView::RelayoutData& relayoutData );
 
-/**
- * Traverse all text initializing all non initialized text-actor handles.
- *
- * @param[in,out] relayoutData Natural size (metrics), layout, text-actor info.
- */
-void InitializeTextActorInfo( TextView::RelayoutData& relayoutData );
-
 } // namespace TextViewProcessor
 
 } // namespace Internal

@@ -47,10 +47,7 @@ const char* const PROPERTY_MULTILINE_POLICY = "multiline-policy";
 const char* const PROPERTY_WIDTH_EXCEED_POLICY = "width-exceed-policy";
 const char* const PROPERTY_HEIGHT_EXCEED_POLICY = "height-exceed-policy";
 const char* const PROPERTY_LINE_JUSTIFICATION = "line-justification";
-const char* const PROPERTY_FADE_BOUNDARY_LEFT = "fade-boundary-left";
-const char* const PROPERTY_FADE_BOUNDARY_RIGHT = "fade-boundary-right";
-const char* const PROPERTY_FADE_BOUNDARY_TOP = "fade-boundary-top";
-const char* const PROPERTY_FADE_BOUNDARY_BOTTOM = "fade-boundary-bottom";
+const char* const PROPERTY_FADE_BOUNDARY = "fade-boundary";
 const char* const PROPERTY_LINE_HEIGHT_OFFSET = "line-height-offset";
 const char* const PROPERTY_HORIZONTAL_ALIGNMENT = "horizontal-alignment";
 const char* const PROPERTY_VERTICAL_ALIGNMENT = "vertical-alignment";
@@ -751,25 +748,13 @@ int UtcDaliTextViewSetProperty(void)
   DALI_TEST_CHECK( Toolkit::TextView::Justified == view.GetLineJustification() );
 
   //Test fade boundary property
-  unsigned int testValue = 23;
-  PixelSize leftFadeBoundary(testValue);
-  view.SetProperty(view.GetPropertyIndex(PROPERTY_FADE_BOUNDARY_LEFT), testValue);
-  DALI_TEST_CHECK( leftFadeBoundary == view.GetFadeBoundary().mLeft );
+  const Vector4 testValue( 23.f, 26.f, 2.f, 11.f );
 
-  testValue = 26;
-  PixelSize rightFadeBoundary(testValue);
-  view.SetProperty(view.GetPropertyIndex(PROPERTY_FADE_BOUNDARY_RIGHT), testValue);
-  DALI_TEST_CHECK( rightFadeBoundary == view.GetFadeBoundary().mRight );
-
-  testValue = 2;
-  PixelSize topFadeBoundary(testValue);
-  view.SetProperty(view.GetPropertyIndex(PROPERTY_FADE_BOUNDARY_TOP), testValue);
-  DALI_TEST_CHECK( topFadeBoundary == view.GetFadeBoundary().mTop );
-
-  testValue = 11;
-  PixelSize bottomFadeBoundary(testValue);
-  view.SetProperty(view.GetPropertyIndex(PROPERTY_FADE_BOUNDARY_BOTTOM), testValue);
-  DALI_TEST_CHECK( bottomFadeBoundary == view.GetFadeBoundary().mBottom );
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_FADE_BOUNDARY), testValue);
+  DALI_TEST_CHECK( testValue.x == view.GetFadeBoundary().mLeft );
+  DALI_TEST_CHECK( testValue.y == view.GetFadeBoundary().mRight );
+  DALI_TEST_CHECK( testValue.z == view.GetFadeBoundary().mTop );
+  DALI_TEST_CHECK( testValue.w == view.GetFadeBoundary().mBottom );
 
   //Test Line height offset property
   float testOffsetValue = 14.04f;

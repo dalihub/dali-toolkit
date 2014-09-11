@@ -34,14 +34,6 @@ namespace TextViewProcessor
 {
 
 /**
- * Updates the line layout size info.
- *
- * @param[in,out] lineLayoutInfo The line layout info.
- * @param[in] lineHeightOffset The line height offset.
- */
-void UpdateLineLayoutInfo( LineLayoutInfo& lineLayoutInfo, float lineHeightOffset );
-
-/**
  * Creates a data structure with info to layout the line, and data structures with useful info to modify the layout data structure if characters are added or removed.
  *
  * @param[in] line The styled line.
@@ -51,6 +43,14 @@ void UpdateLineLayoutInfo( LineLayoutInfo& lineLayoutInfo, float lineHeightOffse
 void CreateLineInfo( const MarkupProcessor::StyledTextArray& line,
                      TextView::RelayoutData& relayoutData,
                      LineLayoutInfo& lineLayoutInfo );
+
+/**
+ * Updates the line layout size info.
+ *
+ * @param[in,out] lineLayoutInfo The line layout info.
+ * @param[in] lineHeightOffset The line height offset.
+ */
+void UpdateLayoutInfo( LineLayoutInfo& lineLayoutInfo, float lineHeightOffset );
 
 /**
  * Removes a given number of words from the given line.

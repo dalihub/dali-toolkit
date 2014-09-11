@@ -45,12 +45,12 @@ namespace
  *
  * @param[in,out] textLayoutInfo
  */
-void UpdateTextLayoutInfo( TextLayoutInfo& textLayoutInfo )
+void UpdateLayoutInfo( TextLayoutInfo& textLayoutInfo )
 {
   // Initialize members to be updated.
-  textLayoutInfo.mWholeTextSize = Size();
+  textLayoutInfo.mWholeTextSize = Size::ZERO;
   textLayoutInfo.mMaxWordWidth = 0.f;
-  textLayoutInfo.mNumberOfCharacters = 0;
+  textLayoutInfo.mNumberOfCharacters = 0u;
 
   // Traverse all text updating values.
   for( LineLayoutInfoContainer::const_iterator lineIt = textLayoutInfo.mLinesLayoutInfo.begin(), lineEndIt = textLayoutInfo.mLinesLayoutInfo.end();
@@ -81,9 +81,9 @@ void UpdateTextLayoutInfo( TextLayoutInfo& textLayoutInfo )
 // Constructors and assignment operators
 
 TextInfoIndices::TextInfoIndices()
-: mLineIndex( 0 ),
-  mWordIndex( 0 ),
-  mCharacterIndex( 0 )
+: mLineIndex( 0u ),
+  mWordIndex( 0u ),
+  mCharacterIndex( 0u )
 {
 }
 
@@ -111,7 +111,7 @@ TextLayoutInfo::TextLayoutInfo()
 : mWholeTextSize(),
   mMaxWordWidth( 0.f ),
   mLinesLayoutInfo(),
-  mNumberOfCharacters( 0 ),
+  mNumberOfCharacters( 0u ),
   mMaxItalicsOffset( 0.f ),
   mEllipsizeLayoutInfo()
 {
@@ -154,7 +154,7 @@ void CreateTextInfo( const MarkupProcessor::StyledTextArray& text,
 
   // Collect previously created text-actors.
   std::vector<TextActor> textActors;
-  CollectTextActorsFromLines( textActors, relayoutData.mTextLayoutInfo, 0, relayoutData.mTextLayoutInfo.mLinesLayoutInfo.size() );
+  CollectTextActorsFromLines( textActors, relayoutData.mTextLayoutInfo, 0u, relayoutData.mTextLayoutInfo.mLinesLayoutInfo.size() );
 
   if( !textActors.empty() )
   {
@@ -192,7 +192,7 @@ void CreateTextInfo( const MarkupProcessor::StyledTextArray& text,
                     relayoutData,
                     lineLayoutInfo );
 
-    if( 0 < lineLayoutInfo.mNumberOfCharacters )
+    if( 0u < lineLayoutInfo.mNumberOfCharacters )
     {
       // do not add the line offset if the line has no characters.
       lineLayoutInfo.mSize.height += layoutParameters.mLineHeightOffset;
@@ -206,7 +206,7 @@ void CreateTextInfo( const MarkupProcessor::StyledTextArray& text,
       // Get the last character of the last line.
       if( !relayoutData.mTextLayoutInfo.mLinesLayoutInfo.empty() )
       {
-        const LineLayoutInfo& lineInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end() - 1 ) );
+        const LineLayoutInfo& lineInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end() - 1u ) );
 
         const CharacterLayoutInfo characterInfo = GetLastCharacterLayoutInfo( lineInfo );
 
@@ -248,7 +248,7 @@ void UpdateTextInfo( const std::size_t position,
     return;
   }
 
-  if( 0 == relayoutData.mTextLayoutInfo.mNumberOfCharacters )
+  if( 0u == relayoutData.mTextLayoutInfo.mNumberOfCharacters )
   {
     // Current text is empty. There is no need to update current data structure,
     // just create a new one with the new input text.
@@ -275,8 +275,8 @@ void UpdateTextInfo( const std::size_t position,
 
   // Update logical-to-visual and visual-to-logical tables.
   // TODO: check that for mixed RTL/LTR text.
-  std::size_t index = 0;
-  for( std::size_t i = 0; i < relayoutDataForNewText.mTextLayoutInfo.mNumberOfCharacters; ++i )
+  std::size_t index = 0u;
+  for( std::size_t i = 0u; i < relayoutDataForNewText.mTextLayoutInfo.mNumberOfCharacters; ++i )
   {
     relayoutData.mCharacterLogicalToVisualMap.push_back( relayoutData.mTextLayoutInfo.mNumberOfCharacters + index );
     relayoutData.mCharacterVisualToLogicalMap.push_back( relayoutData.mTextLayoutInfo.mNumberOfCharacters + index );
@@ -322,14 +322,14 @@ void UpdateTextInfo( const std::size_t position,
     // Calculates indices for that position.
     if( !relayoutData.mTextLayoutInfo.mLinesLayoutInfo.empty() )
     {
-      textInfoIndices.mLineIndex = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.size() - 1;
-      const LineLayoutInfo& lineLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end() - 1 ) );
+      textInfoIndices.mLineIndex = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.size() - 1u;
+      const LineLayoutInfo& lineLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end() - 1u ) );
 
       if( !lineLayoutInfo.mWordsLayoutInfo.empty() )
       {
-        textInfoIndices.mWordIndex = lineLayoutInfo.mWordsLayoutInfo.size() - 1;
+        textInfoIndices.mWordIndex = lineLayoutInfo.mWordsLayoutInfo.size() - 1u;
 
-        const WordLayoutInfo& wordLayoutInfo( *( lineLayoutInfo.mWordsLayoutInfo.end() - 1 ) );
+        const WordLayoutInfo& wordLayoutInfo( *( lineLayoutInfo.mWordsLayoutInfo.end() - 1u ) );
         textInfoIndices.mCharacterIndex = wordLayoutInfo.mCharactersLayoutInfo.size();
       }
     }
@@ -337,23 +337,23 @@ void UpdateTextInfo( const std::size_t position,
 
   // 2) If the new text has more than 1 line, merge the last line of the input text with the last part of the split line.
   //TODO check this cases ( num lines ==1, >1, >2 ) if it could be simplified.
-  if( relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.size() > 1 )
+  if( relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.size() > 1u )
   {
-    LineLayoutInfo& lastInputLineLayoutInfo( *( relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.end() - 1 ) );
+    LineLayoutInfo& lastInputLineLayoutInfo( *( relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.end() - 1u ) );
 
     MergeLine( lastInputLineLayoutInfo,
                lastLineLayoutInfo );
 
-    if( relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.size() > 2 )
+    if( relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.size() > 2u )
     {
       // Insert all lines except first and last in the text.
-      relayoutData.mTextLayoutInfo.mLinesLayoutInfo.insert( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndices.mLineIndex + 1,
-                                                            relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.begin() + 1,
-                                                            relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.end() - 1 );
+      relayoutData.mTextLayoutInfo.mLinesLayoutInfo.insert( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndices.mLineIndex + 1u,
+                                                            relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.begin() + 1u,
+                                                            relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.end() - 1u );
     }
 
     // Insert the last line to the text
-    relayoutData.mTextLayoutInfo.mLinesLayoutInfo.insert( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndices.mLineIndex + relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.size() - 1,
+    relayoutData.mTextLayoutInfo.mLinesLayoutInfo.insert( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndices.mLineIndex + relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.size() - 1u,
                                                           lastInputLineLayoutInfo );
   }
   else
@@ -375,7 +375,7 @@ void UpdateTextInfo( const std::size_t position,
   // 4) Update text info.
 
   // Updates the whole text size, maximum word size, etc.
-  UpdateTextLayoutInfo( relayoutData.mTextLayoutInfo );
+  UpdateLayoutInfo( relayoutData.mTextLayoutInfo );
 }
 
 void UpdateTextInfo( const std::size_t position,
@@ -549,7 +549,7 @@ void UpdateTextInfo( const std::size_t position,
         const std::size_t removedNumberOfCharacters = ( wordNumberCharacters - wordLayout.mCharactersLayoutInfo.size() );
         lineLayout.mNumberOfCharacters -= removedNumberOfCharacters;
       }
-      UpdateLineLayoutInfo( lineLayout, layoutParameters.mLineHeightOffset );
+      UpdateLayoutInfo( lineLayout, layoutParameters.mLineHeightOffset );
 
       // Insert the text-actors in order.
       removedTextActorsFromBegin.insert( removedTextActorsFromBegin.end(), removedTextActorsFromFirstWord.begin(), removedTextActorsFromFirstWord.end() );
@@ -611,7 +611,7 @@ void UpdateTextInfo( const std::size_t position,
         const std::size_t removedNumberOfCharacters = ( wordNumberCharacters - wordLayout.mCharactersLayoutInfo.size() );
         lineLayout.mNumberOfCharacters -= removedNumberOfCharacters;
       }
-      UpdateLineLayoutInfo( lineLayout, layoutParameters.mLineHeightOffset );
+      UpdateLayoutInfo( lineLayout, layoutParameters.mLineHeightOffset );
 
       // Insert the text-actors in order.
       removedTextActorsFromEnd.insert( removedTextActorsFromEnd.end(), removedTextActorsFromFirstWord.begin(), removedTextActorsFromFirstWord.end() );
@@ -664,7 +664,7 @@ void UpdateTextInfo( const std::size_t position,
     lineLayout.mWordsLayoutInfo.erase( lineLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex, lineLayout.mWordsLayoutInfo.begin() + textInfoIndicesEnd.mWordIndex );
 
     // Update line info.
-    UpdateLineLayoutInfo( lineLayout, layoutParameters.mLineHeightOffset );
+    UpdateLayoutInfo( lineLayout, layoutParameters.mLineHeightOffset );
   }// end delete text from same line.
 
   if( mergeLines )
@@ -691,7 +691,7 @@ void UpdateTextInfo( const std::size_t position,
                                                        relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndicesEnd.mLineIndex );
 
   // Update text info.
-  UpdateTextLayoutInfo( relayoutData.mTextLayoutInfo );
+  UpdateLayoutInfo( relayoutData.mTextLayoutInfo );
 
   // If the last character of the last line is a new line character, an empty line need to be added.
   if( !relayoutData.mTextLayoutInfo.mLinesLayoutInfo.empty() )
@@ -806,171 +806,6 @@ void UpdateTextInfo( const TextStyle& style,
       } // end characters
     } // end words
   } // end lines
-}
-
-void InitializeTextActorInfo( TextView::RelayoutData& relayoutData )
-{
-  TextLayoutInfo& textLayoutInfo = relayoutData.mTextLayoutInfo;
-  if( textLayoutInfo.mLinesLayoutInfo.empty() )
-  {
-    // nothing to do if there is no lines.
-    return;
-  }
-
-  std::size_t characterGlobalIndex = 0;  // Index to the global character (within the whole text).
-  std::size_t lineLayoutInfoIndex = 0;   // Index to the laid out line info.
-  const std::size_t lineLayoutInfoSize = relayoutData.mLines.size(); // Number or laid out lines.
-  bool lineLayoutEnd = false;            // Whether lineLayoutInfoIndex points at the last laid out line.
-  bool glyphActorCreatedForLine = false; // Whether a renderable actor has been created for this line.
-
-  RenderableActor currentGlyphActor;      // text-actor used when the edit mode is disabled.
-  TextStyle currentStyle;                // style for the current text-actor.
-  Vector4 currentGradientColor;          // gradient color for the current text-actor.
-  Vector2 currentStartPoint;             // start point for the current text-actor.
-  Vector2 currentEndPoint;               // end point for the current text-actor.
-  bool currentIsColorGlyph = false;      // Whether current glyph is an emoticon.
-
-  std::vector<TextActor> textActorsToRemove; // Keep a vector of text-actors to be included into the cache.
-
-  for( LineLayoutInfoContainer::iterator lineIt = textLayoutInfo.mLinesLayoutInfo.begin(), lineEndIt = textLayoutInfo.mLinesLayoutInfo.end();
-       lineIt != lineEndIt;
-       ++lineIt )
-  {
-    LineLayoutInfo& line( *lineIt );
-
-    for( WordLayoutInfoContainer::iterator wordIt = line.mWordsLayoutInfo.begin(), wordEndIt = line.mWordsLayoutInfo.end();
-         wordIt != wordEndIt;
-         ++wordIt )
-    {
-      WordLayoutInfo& word( *wordIt );
-
-      for( CharacterLayoutInfoContainer::iterator characterIt = word.mCharactersLayoutInfo.begin(), characterEndIt = word.mCharactersLayoutInfo.end();
-           characterIt != characterEndIt;
-           ++characterIt )
-      {
-        CharacterLayoutInfo& characterLayout( *characterIt );
-
-        // Check if there is a new line.
-        const bool newLine = !lineLayoutEnd && ( characterGlobalIndex == relayoutData.mLines[lineLayoutInfoIndex].mCharacterGlobalIndex );
-
-        if( newLine )
-        {
-          // Point to the next line.
-          ++lineLayoutInfoIndex;
-          if( lineLayoutInfoIndex >= lineLayoutInfoSize )
-          {
-            // Arrived at last line.
-            lineLayoutEnd = true; // Avoids access out of bounds in the relayoutData.mLines vector.
-          }
-          glyphActorCreatedForLine = false;
-        }
-
-        if( !characterLayout.mStyledText.mText.IsEmpty() )
-        {
-          // Do not create a glyph-actor if there is no text.
-          const Character character = characterLayout.mStyledText.mText[0]; // there are only one character per character layout.
-
-          if( characterLayout.mIsColorGlyph ||
-              !character.IsWhiteSpace() || // A new line character is also a white space.
-              ( character.IsWhiteSpace() && characterLayout.mStyledText.mStyle.IsUnderlineEnabled() ) )
-          {
-            // Do not create a glyph-actor if it's a white space (without underline) or a new line character.
-
-            // Creates one glyph-actor per each counsecutive group of characters, with the same style, per line, or if it's an emoticon.
-
-            if( !glyphActorCreatedForLine ||
-                characterLayout.mIsColorGlyph ||
-                ( characterLayout.mStyledText.mStyle != currentStyle ) ||
-                ( characterLayout.mGradientColor != currentGradientColor ) ||
-                ( characterLayout.mStartPoint != currentStartPoint ) ||
-                ( characterLayout.mEndPoint != currentEndPoint ) ||
-                ( characterLayout.mIsColorGlyph != currentIsColorGlyph ) )
-            {
-              characterLayout.mSetText = false;
-              characterLayout.mSetStyle = false;
-
-              // There is a new style or a new line.
-              glyphActorCreatedForLine = true;
-
-              if( characterLayout.mIsColorGlyph )
-              {
-                ImageActor imageActor = ImageActor::DownCast( characterLayout.mGlyphActor );
-                if( !imageActor )
-                {
-                  characterLayout.mGlyphActor = ImageActor::New();
-                  characterLayout.mSetText = true;
-                }
-              }
-              else
-              {
-                TextActor textActor = TextActor::DownCast( characterLayout.mGlyphActor );
-
-                if( textActor )
-                {
-                  // Try to reuse first the text-actor of this character.
-                  textActor.SetTextStyle( characterLayout.mStyledText.mStyle );
-                  currentGlyphActor = textActor;
-                }
-                else
-                {
-                  // If there is no text-actor, try to retrieve one from the cache.
-                  textActor = relayoutData.mTextActorCache.RetrieveTextActor();
-
-                  // If still there is no text-actor, create one.
-                  if( !textActor )
-                  {
-                    TextActorParameters parameters( characterLayout.mStyledText.mStyle, TextActorParameters::FONT_DETECTION_OFF );
-                    textActor = TextActor::New( NULL, parameters );
-                  }
-                  else
-                  {
-                    textActor.SetTextStyle( characterLayout.mStyledText.mStyle );
-                  }
-
-                  currentGlyphActor = textActor;
-                }
-                characterLayout.mGlyphActor = currentGlyphActor;
-              }
-
-              // Update style to be checked with next characters.
-              currentStyle = characterLayout.mStyledText.mStyle;
-              currentGradientColor = characterLayout.mGradientColor;
-              currentStartPoint = characterLayout.mStartPoint;
-              currentEndPoint = characterLayout.mEndPoint;
-              currentIsColorGlyph = characterLayout.mIsColorGlyph;
-
-              characterLayout.mGlyphActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-              characterLayout.mGlyphActor.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
-            }
-            else
-            {
-              DALI_ASSERT_DEBUG( !characterLayout.mIsColorGlyph && "TextViewProcessor::InitializeTextActorInfo. An image-actor doesn't store more than one emoticon." );
-
-              // Same style than previous one.
-              TextActor textActor = TextActor::DownCast( characterLayout.mGlyphActor );
-              if( textActor )
-              {
-                // There is a previously created text-actor for this character.
-                // If this character has another one put it into the cache.
-                textActor.SetText( "" );
-                textActorsToRemove.push_back( textActor );
-              }
-
-              if( characterLayout.mGlyphActor )
-              {
-                characterLayout.mGlyphActor.Reset();
-              }
-            }
-          } // no white space / new line char
-        } // text not empty
-
-        ++characterGlobalIndex;
-      } // characters
-    } // words
-  } // lines
-
-  // Insert the spare text-actors into the cache.
-  relayoutData.mTextActorCache.InsertTextActors( textActorsToRemove );
 }
 
 } // namespace TextViewProcessor

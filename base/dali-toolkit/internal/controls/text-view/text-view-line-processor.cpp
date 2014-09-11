@@ -44,7 +44,7 @@ LineLayoutInfo::LineLayoutInfo()
   mAscender( 0.f ),
   mLineHeightOffset( 0.f ),
   mWordsLayoutInfo(),
-  mNumberOfCharacters( 0 )
+  mNumberOfCharacters( 0u )
 {
 }
 
@@ -66,27 +66,6 @@ LineLayoutInfo& LineLayoutInfo::operator=( const LineLayoutInfo& line )
   mNumberOfCharacters = line.mNumberOfCharacters;
 
   return *this;
-}
-
-void UpdateLineLayoutInfo( LineLayoutInfo& lineLayoutInfo, const float lineHeightOffset )
-{
-  // Update layout info.
-  lineLayoutInfo.mSize = Size::ZERO;
-  lineLayoutInfo.mAscender = 0.f;
-  lineLayoutInfo.mNumberOfCharacters = 0u;
-  for( WordLayoutInfoContainer::iterator it = lineLayoutInfo.mWordsLayoutInfo.begin(), endIt = lineLayoutInfo.mWordsLayoutInfo.end();
-       it != endIt;
-       ++it )
-  {
-    WordLayoutInfo& word( *it );
-
-    UpdateSize( lineLayoutInfo.mSize, word.mSize );
-    lineLayoutInfo.mAscender = std::max( lineLayoutInfo.mAscender, word.mAscender );
-    lineLayoutInfo.mNumberOfCharacters += word.mCharactersLayoutInfo.size();
-  }
-
-  lineLayoutInfo.mSize.height += lineHeightOffset;
-  lineLayoutInfo.mLineHeightOffset = lineHeightOffset;
 }
 
 void CreateLineInfo( const MarkupProcessor::StyledTextArray& line,
@@ -113,12 +92,12 @@ void CreateLineInfo( const MarkupProcessor::StyledTextArray& line,
     convertedLine = line;
 
     // Create trivial bidirectional map tables.
-    std::size_t index = 0;
+    std::size_t index = 0u;
     for( MarkupProcessor::StyledTextArray::const_iterator it = convertedLine.begin(), endIt = convertedLine.end(); it != endIt; ++it )
     {
       const MarkupProcessor::StyledText& styledText( *it );
 
-      for( std::size_t i = 0, length = styledText.mText.GetLength(); i < length; ++i )
+      for( std::size_t i = 0u, length = styledText.mText.GetLength(); i < length; ++i )
       {
         relayoutData.mCharacterLogicalToVisualMap.push_back( relayoutData.mTextLayoutInfo.mNumberOfCharacters + index );
         relayoutData.mCharacterVisualToLogicalMap.push_back( relayoutData.mTextLayoutInfo.mNumberOfCharacters + index );
@@ -193,7 +172,7 @@ void CreateLineInfo( const MarkupProcessor::StyledTextArray& line,
       // kepps the font of the last character.
       if( !wordLayoutInfo.mCharactersLayoutInfo.empty() )
       {
-        lastCharacterFont = ( *( wordLayoutInfo.mCharactersLayoutInfo.end() - 1 ) ).mStyledText.mStyle.GetFontName();
+        lastCharacterFont = ( *( wordLayoutInfo.mCharactersLayoutInfo.end() - 1u ) ).mStyledText.mStyle.GetFontName();
       }
     }
 
@@ -210,6 +189,27 @@ void CreateLineInfo( const MarkupProcessor::StyledTextArray& line,
   } // end of words
 }
 
+void UpdateLayoutInfo( LineLayoutInfo& lineLayoutInfo, const float lineHeightOffset )
+{
+  // Update layout info.
+  lineLayoutInfo.mSize = Size::ZERO;
+  lineLayoutInfo.mAscender = 0.f;
+  lineLayoutInfo.mNumberOfCharacters = 0u;
+  for( WordLayoutInfoContainer::iterator it = lineLayoutInfo.mWordsLayoutInfo.begin(), endIt = lineLayoutInfo.mWordsLayoutInfo.end();
+       it != endIt;
+       ++it )
+  {
+    WordLayoutInfo& word( *it );
+
+    UpdateSize( lineLayoutInfo.mSize, word.mSize );
+    lineLayoutInfo.mAscender = std::max( lineLayoutInfo.mAscender, word.mAscender );
+    lineLayoutInfo.mNumberOfCharacters += word.mCharactersLayoutInfo.size();
+  }
+
+  lineLayoutInfo.mSize.height += lineHeightOffset;
+  lineLayoutInfo.mLineHeightOffset = lineHeightOffset;
+}
+
 void RemoveWordsFromLine( std::size_t wordIndex,
                           std::size_t numberOfWords,
                           float lineHeightOffset,
@@ -223,7 +223,7 @@ void RemoveWordsFromLine( std::size_t wordIndex,
   lineLayout.mWordsLayoutInfo.erase( lineLayout.mWordsLayoutInfo.begin() + wordIndex,
                                      lineLayout.mWordsLayoutInfo.begin() + ( wordIndex + numberOfWords ) );
 
-  UpdateLineLayoutInfo( lineLayout, lineHeightOffset );
+  UpdateLayoutInfo( lineLayout, lineHeightOffset );
 }
 
 void RemoveCharactersFromLineInfo( TextView::RelayoutData& relayoutData,
@@ -400,7 +400,7 @@ void SplitLine( const TextInfoIndices& indices,
   // * Remove words added to the last part of the line from the first line.
 
   // early returns!!
-  if( ( 0 == indices.mWordIndex ) && ( 0 == indices.mCharacterIndex ) )
+  if( ( 0u == indices.mWordIndex ) && ( 0u == indices.mCharacterIndex ) )
   {
     // the whole line goes to the last part.
     lastLineLayoutInfo = firstLineLayoutInfo;
@@ -471,7 +471,7 @@ void SplitLine( const TextInfoIndices& indices,
   firstLineLayoutInfo.mWordsLayoutInfo.erase( firstLineLayoutInfo.mWordsLayoutInfo.begin() + index, firstLineLayoutInfo.mWordsLayoutInfo.end() );
 
   // 6) update layout info of the first line.
-  UpdateLineLayoutInfo( firstLineLayoutInfo, lineHeightOffset );
+  UpdateLayoutInfo( firstLineLayoutInfo, lineHeightOffset );
 }
 
 void MergeLine( LineLayoutInfo& firstLineLineLayoutInfo,

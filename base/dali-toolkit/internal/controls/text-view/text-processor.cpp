@@ -41,7 +41,7 @@ void SplitInLines( const MarkupProcessor::StyledTextArray& text,
   {
     const MarkupProcessor::StyledText& styledText( *it );
 
-    for( size_t i = 0, length = styledText.mText.GetLength(); i < length; ++i )
+    for( size_t i = 0u, length = styledText.mText.GetLength(); i < length; ++i )
     {
       const Dali::Character character = styledText.mText[i];
 
@@ -75,7 +75,7 @@ void SplitInWords( const MarkupProcessor::StyledTextArray& line,
   for( MarkupProcessor::StyledTextArray::const_iterator it = line.begin(), endIt = line.end(); it != endIt; ++it )
   {
     const MarkupProcessor::StyledText& styledText( *it );
-    const Dali::Character character = styledText.mText[0];
+    const Dali::Character character = styledText.mText[0u];
 
     if( character.IsWhiteSpace() )
     {
@@ -121,7 +121,7 @@ bool BeginsRightToLeftCharacter( const MarkupProcessor::StyledTextArray& styledT
   {
     const Text& text( (*it).mText );
 
-    for( size_t i = 0, length = text.GetLength(); i < length; ++i )
+    for( size_t i = 0u, length = text.GetLength(); i < length; ++i )
     {
       Character::CharacterDirection direction = text[i].GetCharacterDirection();
       if( direction != Character::Neutral )
@@ -136,7 +136,7 @@ bool BeginsRightToLeftCharacter( const MarkupProcessor::StyledTextArray& styledT
 
 bool BeginsRightToLeftCharacter( const Text& text )
 {
-  for( size_t i = 0, length = text.GetLength(); i < length; ++i )
+  for( size_t i = 0u, length = text.GetLength(); i < length; ++i )
   {
     Character::CharacterDirection direction = text[i].GetCharacterDirection();
     if( direction != Character::Neutral )
@@ -154,7 +154,7 @@ bool ContainsRightToLeftCharacter( const MarkupProcessor::StyledTextArray& style
   {
     const Text& text( (*it).mText );
 
-    for( size_t i = 0, length = text.GetLength(); i < length; ++i )
+    for( size_t i = 0u, length = text.GetLength(); i < length; ++i )
     {
       Character::CharacterDirection direction = text[i].GetCharacterDirection();
       if( ( Character::RightToLeft == direction ) || ( Character::RightToLeftWeak == direction ) )
@@ -169,7 +169,7 @@ bool ContainsRightToLeftCharacter( const MarkupProcessor::StyledTextArray& style
 
 bool ContainsRightToLeftCharacter( const Dali::Text& text )
 {
-  for( size_t i = 0, length = text.GetLength(); i < length; ++i )
+  for( size_t i = 0u, length = text.GetLength(); i < length; ++i )
   {
     Character::CharacterDirection direction = ( text[i] ).GetCharacterDirection();
     if( ( Character::RightToLeft == direction ) || ( Character::RightToLeftWeak == direction ) )
@@ -209,15 +209,15 @@ void ConvertBidirectionalText( const MarkupProcessor::StyledTextArray& line,
   // pad these buffers with 0's, as it's unclear what fribidi_log2vis does w.r.t.
   // the length of it's output content (appears the same as input content, and does
   // not seem to generate bidi marks i.e. FRIBIDI_CHAR_LRM/FRIBIDI_CHAR_RLM)
-  logicalStrBuffer.resize( stringSize+1, 0 );
-  visualStrBuffer.resize( stringSize+1, 0 );
-  FriBidiChar *logicalStr( &logicalStrBuffer[0] );
-  FriBidiChar *visualStr( &visualStrBuffer[0] );
+  logicalStrBuffer.resize( stringSize+1u, 0u );
+  visualStrBuffer.resize( stringSize+1u, 0u );
+  FriBidiChar *logicalStr( &logicalStrBuffer[0u] );
+  FriBidiChar *visualStr( &visualStrBuffer[0u] );
 
   // Convert UTF-8 string to unicode string
   const std::size_t length = fribidi_charset_to_unicode( FRIBIDI_CHAR_SET_UTF8, textToBeConverted.c_str(), stringSize, logicalStr );
 
-  if( 0 == length )
+  if( 0u == length )
   {
     DALI_ASSERT_DEBUG( !"TextProcessor::ConvertBidirectionalText. Error when calling at fribidi_charset_to_unicode" );
 
@@ -229,28 +229,28 @@ void ConvertBidirectionalText( const MarkupProcessor::StyledTextArray& line,
 
   // Convert and reorder the string as specified by the Unicode Bidirectional Algorithm
   FriBidiCharType baseDirection = FRIBIDI_TYPE_ON;
-  fribidi_boolean log2vis = fribidi_log2vis( logicalStr, length, &baseDirection, visualStr, &logicalToVisualMap[0], &visualToLogicalMap[0], NULL );
+  fribidi_boolean log2vis = fribidi_log2vis( logicalStr, length, &baseDirection, visualStr, &logicalToVisualMap[0u], &visualToLogicalMap[0u], NULL );
 
   if(log2vis)
   {
     // Convert the unicode string back to the UTF-8 string
     std::vector<char> bidiTextConverted;
 
-    bidiTextConverted.resize( length * 4 + 1 ); // Maximum bytes to represent one UTF-8 character is 6.
+    bidiTextConverted.resize( length * 4u + 1u ); // Maximum bytes to represent one UTF-8 character is 6.
                                                 // Currently Dali doesn't support this UTF-8 extension. Dali only supports 'regular' UTF-8 which has a maximum of 4 bytes per character.
 
-    fribidi_unicode_to_charset( FRIBIDI_CHAR_SET_UTF8, visualStr, length, &bidiTextConverted[0] );
+    fribidi_unicode_to_charset( FRIBIDI_CHAR_SET_UTF8, visualStr, length, &bidiTextConverted[0u] );
 
-    textToBeConverted = &bidiTextConverted[0];
+    textToBeConverted = &bidiTextConverted[0u];
 
     // After reorder the text, rebuild the text with the original styles is needed.
     // To assign the original style is needed to use the characterLogicalToVisualMap table.
-    Text text( &bidiTextConverted[0] );
+    Text text( &bidiTextConverted[0u] );
 
     // Split the line in words.
     // Add the correct styles for the characters after they are reordered.
 
-    for( size_t i = 0; i < length; ++i )
+    for( size_t i = 0u; i < length; ++i )
     {
       const Character character( text[i] );
 
@@ -268,13 +268,13 @@ bool IsWhiteSpace( const MarkupProcessor::StyledTextArray& text, size_t offset )
   DALI_ASSERT_DEBUG( offset < text.size() );
 
   // assume 1 Character per StyledText
-  return text[offset].mText[0].IsWhiteSpace();
+  return text[offset].mText[0u].IsWhiteSpace();
 }
 
 void FindNearestWord( const MarkupProcessor::StyledTextArray& text, size_t offset, size_t& start, size_t& end)
 {
   const size_t size(text.size());
-  offset = std::min(offset, size-1);
+  offset = std::min(offset, size-1u);
 
   size_t i(offset);
   size_t j(offset);
@@ -283,7 +283,7 @@ void FindNearestWord( const MarkupProcessor::StyledTextArray& text, size_t offse
   if(IsWhiteSpace(text, offset))
   {
     // scan left until non-white space / beginning of string.
-    while(i > 0 && IsWhiteSpace(text, i))
+    while(i > 0u && IsWhiteSpace(text, i))
     {
       i--;
     }
@@ -309,7 +309,7 @@ void FindNearestWord( const MarkupProcessor::StyledTextArray& text, size_t offse
   }
 
   // expand left and right markers to encompase entire word
-  while(i > 0 && !IsWhiteSpace(text, i-1))
+  while(i > 0u && !IsWhiteSpace(text, i-1u))
   {
     i--;
   }

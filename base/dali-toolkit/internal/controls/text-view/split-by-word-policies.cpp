@@ -268,7 +268,7 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
   float lastCharHeight = 0.f;
 
   relayoutData.mLines.clear();
-  std::size_t characterGlobalIndex = 0;
+  std::size_t characterGlobalIndex = 0u;
 
   for( TextViewProcessor::LineLayoutInfoContainer::iterator lineIt = textLayoutInfo.mLinesLayoutInfo.begin(), lineEndIt = textLayoutInfo.mLinesLayoutInfo.end();
        lineIt != lineEndIt;
@@ -279,9 +279,8 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
     // The next character is in a new line.
     bool isNewLine = true;
 
-
     // Reset the index of words.
-    indices.mWordIndex = 0;
+    indices.mWordIndex = 0u;
 
     for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = lineLayoutInfo.mWordsLayoutInfo.begin(), wordEndIt = lineLayoutInfo.mWordsLayoutInfo.end();
          wordIt != wordEndIt;
@@ -290,7 +289,7 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
       TextViewProcessor::WordLayoutInfo& wordLayoutInfo( *wordIt );
 
       // Reset the index of the character.
-      indices.mCharacterIndex = 0;
+      indices.mCharacterIndex = 0u;
 
       // Whether current character is the first of the word.
       bool isFirstCharOfWord = true;
@@ -334,7 +333,6 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
           lineInfo.mAscender = subLineInfo.mMaxAscender;                                // Ascender of this piece of line.
           relayoutData.mLines.push_back( lineInfo );
 
-
           // Stores some info to calculate the line justification in a post-process.
           TextView::LineJustificationInfo justificationInfo;
 
@@ -349,7 +347,7 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
         }
 
         // Get last line info and calculate the bearing.
-        const Toolkit::TextView::LineLayoutInfo& lineInfo( *( relayoutData.mLines.end() - 1 ) );
+        const Toolkit::TextView::LineLayoutInfo& lineInfo( *( relayoutData.mLines.end() - 1u ) );
         const float bearingOffset = ( ( lineInfo.mSize.height - lineInfo.mAscender ) - ( characterLayoutInfo.mSize.height - characterLayoutInfo.mAscender ) ) * shrinkFactor;
 
         previousSize = characterLayoutInfo.mSize * shrinkFactor;
@@ -397,14 +395,14 @@ float RelayoutForShrinkToFit( TextView::RelayoutData& relayoutData,
 
     const float MIN_RATIO( 0.90f );         // The algorithm finishes if the ratio
     const float MAX_RATIO( 1.00f );         // new_text_height / text_view_height is between this two values
-    const unsigned int MAX_ITERATIONS( 8 ); // or max_iteration is reached.
+    const unsigned int MAX_ITERATIONS( 8u ); // or max_iteration is reached.
 
     float ratio = newTextHeight / textViewSize.height;
 
     float maxScaleFactor = shrinkFactor;                        // bigger scale factors than maxScaleFactor will produce a too big text.
     float minScaleFactor = shrinkFactor * ( textViewSize.height / newTextHeight ); // smaller scale factors than minScaleFactor will produce a too small text.
 
-    for( unsigned int iterations = 0; ( ( MIN_RATIO > ratio ) || ( ratio > MAX_RATIO )  ) && ( iterations < MAX_ITERATIONS ); ++iterations )
+    for( unsigned int iterations = 0u; ( ( MIN_RATIO > ratio ) || ( ratio > MAX_RATIO )  ) && ( iterations < MAX_ITERATIONS ); ++iterations )
     {
       // Calculates the new scale factor.
       // The new scale factor is always between the min and max scale factors.
@@ -465,7 +463,7 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
 
   relayoutData.mShrinkFactor = 1.f; // Shrink factor used when the exceed policy contains ShrinkToFit
 
-  if( TextView::Shrink== layoutParameters.mExceedPolicy )
+  if( TextView::Shrink == layoutParameters.mExceedPolicy )
   {
     // Relays-out the text for the shrink to fit policy.
     relayoutData.mShrinkFactor = RelayoutForShrinkToFit( relayoutData, layoutParameters );
@@ -477,8 +475,8 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
 
   relayoutParameters.mPositionOffset = Vector3::ZERO;
   relayoutParameters.mIsFirstCharacter = true;
-  relayoutParameters.mIndices.mLineIndex = 0;
-  relayoutParameters.mCharacterGlobalIndex = 0;
+  relayoutParameters.mIndices.mLineIndex = 0u;
+  relayoutParameters.mCharacterGlobalIndex = 0u;
 
   for( TextViewProcessor::LineLayoutInfoContainer::iterator lineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin(),
        endLineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end();
@@ -489,7 +487,7 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
 
     relayoutParameters.mIsNewLine = true;
     relayoutParameters.mLineSize = lineLayoutInfo.mSize;
-    relayoutParameters.mIndices.mWordIndex = 0;
+    relayoutParameters.mIndices.mWordIndex = 0u;
 
     for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.begin(),
            endWordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.end();
@@ -502,7 +500,7 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
 
       relayoutParameters.mIsFirstCharacterOfWord = true;
       relayoutParameters.mWordSize = wordLayoutInfo.mSize;
-      relayoutParameters.mIndices.mCharacterIndex = 0;
+      relayoutParameters.mIndices.mCharacterIndex = 0u;
 
       for( TextViewProcessor::CharacterLayoutInfoContainer::iterator characterLayoutIt = wordLayoutInfo.mCharactersLayoutInfo.begin(),
              endCharacterLayoutIt = wordLayoutInfo.mCharactersLayoutInfo.end();
@@ -601,7 +599,7 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
   // Check if the last character is a new line character. In that case the height should be added.
   if( !relayoutData.mTextLayoutInfo.mLinesLayoutInfo.empty() )
   {
-    const TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end() - 1 ) );
+    const TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end() - 1u ) );
 
     if( lineLayoutInfo.mWordsLayoutInfo.empty() ) // if it's empty, it means the last character is a new line character.
     {
@@ -639,23 +637,18 @@ void Relayout( Actor textView,
                                         visualParameters,
                                         relayoutData );
   }
-
-  if( relayoutOperationMask & TextView::RELAYOUT_INITIALIZE_TEXT_ACTORS )
-  {
-    TextViewProcessor::InitializeTextActorInfo( relayoutData );
-  }
-
-  if( relayoutOperationMask & TextView::RELAYOUT_TEXT_ACTOR_UPDATE )
+  const bool initializeTextActors = relayoutOperationMask & TextView::RELAYOUT_INITIALIZE_TEXT_ACTORS;
+  const bool updateTextActors = relayoutOperationMask & TextView::RELAYOUT_TEXT_ACTOR_UPDATE;
+  if( initializeTextActors || updateTextActors )
   {
     TextViewRelayout::UpdateTextActorInfo( visualParameters,
-                                           relayoutData );
+                                           relayoutData,
+                                           initializeTextActors );
   }
 
-  if( ( relayoutOperationMask & TextView::RELAYOUT_INSERT_TO_TEXT_VIEW ) ||
-      ( relayoutOperationMask & TextView::RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST ) )
+  if( relayoutOperationMask & TextView::RELAYOUT_INSERT_TO_TEXT_VIEW )
   {
-    TextViewRelayout::InsertToTextView( relayoutOperationMask,
-                                        textView,
+    TextViewRelayout::InsertToTextView( textView,
                                         relayoutData );
   }
 }

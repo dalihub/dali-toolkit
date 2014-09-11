@@ -113,7 +113,7 @@ void GetIndicesFromGlobalCharacterIndex( const std::size_t index,
     return;
   }
 
-  std::size_t currentIndex = 0; // stores how many characters have been traversed (within the whole text).
+  std::size_t currentIndex = 0u; // stores how many characters have been traversed (within the whole text).
 
   // Traverse all lines and words until global index is found.
   bool found = false;

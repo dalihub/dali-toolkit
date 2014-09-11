@@ -436,13 +436,16 @@ void UpdateVisibility( const TextView::LayoutParameters& layoutParameters,
                        TextView::RelayoutData& relayoutData );
 
 /**
- * Traverse all text updating text-actor handles with new size, position, ...
+ * Traverse all text initializing all non initialized text-actor handles
+ * and updating text-actor handles with new size, position, ...
  *
  * @param[in] visualParameters Some visual parameters (fade, sort modifier and blending).
  * @param[in,out] relayoutData Natural size (metrics), layout, text-actor info.
+ * @param[in] createGlyphActors Whether to create RenderableActor for text-actors or emojis.
  */
 void UpdateTextActorInfo( const TextView::VisualParameters& visualParameters,
-                          TextView::RelayoutData& relayoutData );
+                          TextView::RelayoutData& relayoutData,
+                          bool createGlyphActors );
 
 /**
  * Traverses the whole text and for each piece of underlined text,
@@ -470,14 +473,12 @@ void RemoveGlyphActors( Actor textView,
                         const std::vector<RenderableActor>& glyphActors );
 
 /**
- * Inserts the text-actors into the text-view and/or the text-actor's list.
+ * Inserts the text-actors into the text-view and the text-actor's list.
  *
- * @param[in] relayoutOperationMask Whether the text-actors should be added into the text-view, the list of text-actors or in both.
  * @param[in,out] textView The text-view.
  * @param[in,out] relayoutData The text-view's data structures.
  */
-void InsertToTextView( TextView::RelayoutOperationMask relayoutOperationMask,
-                       Actor textView,
+void InsertToTextView( Actor textView,
                        TextView::RelayoutData& relayoutData );
 
 /**

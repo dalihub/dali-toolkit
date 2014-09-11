@@ -108,7 +108,6 @@ public:
     RELAYOUT_INITIALIZE_TEXT_ACTORS = 0x10,    ///< Initialize text-actors (create handles).
     RELAYOUT_TEXT_ACTOR_UPDATE = 0x20,         ///< Updates text-actors (set size, position, style, ...)
     RELAYOUT_INSERT_TO_TEXT_VIEW = 0x40,       ///< Adds the text-actors to the text-view.
-    RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST = 0x80, ///< Inserts the text-actors to the text-actor list.
     RELAYOUT_ALL = 0xFF                        ///< Does all operations.
   };
 
