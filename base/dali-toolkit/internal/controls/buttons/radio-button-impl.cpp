@@ -40,18 +40,15 @@ BaseHandle Create()
   return Toolkit::RadioButton::New();
 }
 
-TypeRegistration typeRegistration(typeid (Toolkit::RadioButton ), typeid (Toolkit::Button ), Create);
+TypeRegistration typeRegistration( typeid( Toolkit::RadioButton ), typeid( Toolkit::Button ), Create);
 
 PropertyRegistration property1(typeRegistration, "active", Toolkit::RadioButton::PROPERTY_ACTIVE, Property::BOOLEAN, &RadioButton::SetProperty, &RadioButton::GetProperty);
 PropertyRegistration property2(typeRegistration, "label-actor", Toolkit::RadioButton::PROPERTY_LABEL_ACTOR, Property::MAP, &RadioButton::SetProperty, &RadioButton::GetProperty);
-}
 
-namespace
-{
 const char* const INACTIVE_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-inactive.png";
 const char* const ACTIVE_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-active.png";
-const Vector3 IMAGE_WIDTH(16.f, 0.f, 0.f);
-const Vector3 DISTANCE_BETWEEN_IMAGE_AND_LABEL(5.f, 0.f, 0.f);
+
+const Vector3 DISTANCE_BETWEEN_IMAGE_AND_LABEL(5.0f, 0.0f, 0.0f);
 }
 
 Dali::Toolkit::RadioButton RadioButton::New()
@@ -70,14 +67,12 @@ Dali::Toolkit::RadioButton RadioButton::New()
 }
 
 RadioButton::RadioButton()
-  : Button(),
-  mActive(false)
+  : mActive(false)
 {
-  mInactiveImage = Dali::Image::New(INACTIVE_BUTTON_IMAGE_DIR);
-  mActiveImage = Dali::Image::New(ACTIVE_BUTTON_IMAGE_DIR);
+  mInactiveImage = Dali::Image::New( INACTIVE_BUTTON_IMAGE_DIR );
+  mActiveImage = Dali::Image::New( ACTIVE_BUTTON_IMAGE_DIR );
 
-  mImageActor = Dali::ImageActor::New(mInactiveImage);
-  mLabel = Actor::New();
+  mRadioIcon = Dali::ImageActor::New( mInactiveImage );
 }
 
 RadioButton::~RadioButton()
@@ -86,23 +81,40 @@ RadioButton::~RadioButton()
 
 void RadioButton::SetLabel(const std::string& label)
 {
-  mLabel.Reset();
-  mLabel = Actor::New();
+  TextActor textActor = TextActor::DownCast( mLabel );
+  if( textActor )
+  {
+    textActor.SetText( label );
+  }
+  else
+  {
+    Toolkit::TextView newTextView = Toolkit::TextView::New( label );
+    SetLabel( newTextView );
+  }
 
-  Toolkit::TextView textView = Toolkit::TextView::New(label);
-  textView.SetWidthExceedPolicy(Toolkit::TextView::ShrinkToFit); // Make sure our text always fits inside the button
-  textView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-
-  mLabel.Add(textView);
+  RelayoutRequest();
 }
 
 void RadioButton::SetLabel(Actor label)
 {
   if( mLabel != label )
   {
-    Self().Remove(mLabel);
+    if( mLabel )
+    {
+      mRadioIcon.Remove( mLabel );
+    }
+
+    if( label )
+    {
+      label.SetParentOrigin( ParentOrigin::CENTER_RIGHT );
+      label.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+      label.MoveBy( DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+      mRadioIcon.Add( label );
+    }
+
     mLabel = label;
-    Self().Add(mLabel);
+
+    RelayoutRequest();
   }
 }
 
@@ -118,7 +130,6 @@ void RadioButton::SetActive(bool active)
     if( active )
     {
       Actor parent = Self().GetParent();
-
       if( parent )
       {
         for( unsigned int i = 0; i < parent.GetChildCount(); ++i )
@@ -131,14 +142,21 @@ void RadioButton::SetActive(bool active)
           }
         }
       }
+
       mActive = true;
-      mImageActor.SetImage(mActiveImage);
+      mRadioIcon.SetImage(mActiveImage);
     }
     else
     {
       mActive = false;
-      mImageActor.SetImage(mInactiveImage);
+      mRadioIcon.SetImage(mInactiveImage);
     }
+
+    // Raise toggled signal
+    Toolkit::RadioButton handle( GetOwner() );
+    mToggledSignalV2.Emit( handle, mActive );
+
+    RelayoutRequest();
   }
 }
 
@@ -152,39 +170,63 @@ void RadioButton::ToggleState()
   SetActive(!mActive);
 }
 
+void RadioButton::OnRelaidOut( Vector2 /*size*/, ActorSizeContainer& container )
+{
+  Vector3 newSize( mRadioIcon.GetNaturalSize() );
+
+  if( mLabel )
+  {
+    // Offset the label from the radio button image
+    newSize.width += DISTANCE_BETWEEN_IMAGE_AND_LABEL.width;
+
+    // Find the size of the control using size negotiation
+    Vector3 actorNaturalSize( mLabel.GetNaturalSize() );
+    Control::Relayout( mLabel, Vector2( actorNaturalSize.width, actorNaturalSize.height ), container );
+
+    Vector3 actorSize( mLabel.GetSize() );
+    newSize.width += actorSize.width;
+    newSize.height = std::max( newSize.height, actorSize.height );
+  }
+
+  Self().SetSize( newSize );
+}
+
 void RadioButton::OnInitialize()
 {
-  mImageActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  Self().Add(mImageActor);
+  mRadioIcon.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  mRadioIcon.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+  Self().Add( mRadioIcon );
 
-  mLabel.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  mLabel.MoveBy(IMAGE_WIDTH + DISTANCE_BETWEEN_IMAGE_AND_LABEL);
-  Self().Add(mLabel);
+  RelayoutRequest();
 }
 
 void RadioButton::OnButtonUp()
 {
-  ToggleState();
+  // Don't allow selection on an already active radio button
+  if( !mActive )
+  {
+    ToggleState();
+  }
 }
 
 void RadioButton::SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value)
 {
-  Toolkit::RadioButton radioButton = Toolkit::RadioButton::DownCast(Dali::BaseHandle(object));
+  Toolkit::RadioButton radioButton = Toolkit::RadioButton::DownCast( Dali::BaseHandle( object ) );
 
   if( radioButton )
   {
-    RadioButton & radioButtonImpl(GetImplementation(radioButton));
+    RadioButton& radioButtonImpl( GetImplementation( radioButton ) );
 
     switch ( propertyIndex )
     {
       case Toolkit::RadioButton::PROPERTY_ACTIVE:
       {
-        radioButtonImpl.SetActive(value.Get< bool >( ));
+        radioButtonImpl.SetActive( value.Get< bool >( ) );
         break;
       }
       case Toolkit::RadioButton::PROPERTY_LABEL_ACTOR:
       {
-        radioButtonImpl.SetLabel(Scripting::NewActor(value.Get< Property::Map >( )));
+        radioButtonImpl.SetLabel( Scripting::NewActor( value.Get< Property::Map >( ) ) );
         break;
       }
     }
@@ -195,11 +237,11 @@ Property::Value RadioButton::GetProperty(BaseObject* object, Property::Index pro
 {
   Property::Value value;
 
-  Toolkit::RadioButton radioButton = Toolkit::RadioButton::DownCast(Dali::BaseHandle(object));
+  Toolkit::RadioButton radioButton = Toolkit::RadioButton::DownCast( Dali::BaseHandle(object) );
 
   if( radioButton )
   {
-    RadioButton & radioButtonImpl(GetImplementation(radioButton));
+    RadioButton& radioButtonImpl( GetImplementation( radioButton ) );
 
     switch ( propertyIndex )
     {
@@ -211,7 +253,7 @@ Property::Value RadioButton::GetProperty(BaseObject* object, Property::Index pro
       case Toolkit::RadioButton::PROPERTY_LABEL_ACTOR:
       {
         Property::Map map;
-        Scripting::CreatePropertyMap(radioButtonImpl.mLabel, map);
+        Scripting::CreatePropertyMap( radioButtonImpl.mLabel, map );
         value = map;
         break;
       }

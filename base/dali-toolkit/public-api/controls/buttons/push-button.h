@@ -80,7 +80,6 @@ class PushButton : public Button
 public:
 
   //Signal Names
-  static const char* const SIGNAL_TOGGLED; ///< name "toggled"
   static const char* const SIGNAL_PRESSED; ///< name "pressed"
   static const char* const SIGNAL_RELEASED; ///< name "released"
 
@@ -333,19 +332,11 @@ public:
 
 public: //Signals
 
-  /// @brief PushButton Toggled signal type.
-  typedef SignalV2< bool ( Button, bool ) > ToggledSignalV2;
-
   /// @brief PushButton Pressed signal type.
   typedef SignalV2< bool ( Button ) > PressedSignalV2;
 
   /// @brief PushButton Released signal type.
   typedef SignalV2< bool ( Button ) > ReleasedSignalV2;
-
-  /**
-   * @brief Signal emitted when the \e toggle property is set and the button is touched.
-   */
-  ToggledSignalV2& ToggledSignal();
 
   /**
    * @brief Signal emitted when the button is touched.

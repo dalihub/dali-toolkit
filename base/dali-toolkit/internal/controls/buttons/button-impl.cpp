@@ -47,6 +47,7 @@ BaseHandle Create()
 TypeRegistration typeRegistration( typeid(Toolkit::Button), typeid(Toolkit::Control), Create );
 
 SignalConnectorType signalConnector1( typeRegistration, Toolkit::Button::SIGNAL_CLICKED, &Button::DoConnectSignal );
+SignalConnectorType signalConnector2( typeRegistration, Toolkit::Button::SIGNAL_TOGGLED, &Button::DoConnectSignal );
 
 PropertyRegistration property1( typeRegistration, "dimmed", Toolkit::Button::PROPERTY_DIMMED, Property::BOOLEAN, &Button::SetProperty, &Button::GetProperty );
 
@@ -106,6 +107,11 @@ Toolkit::Button::ClickedSignalV2& Button::ClickedSignal()
   return mClickedSignalV2;
 }
 
+Toolkit::Button::ToggledSignalV2& Button::ToggledSignal()
+{
+  return mToggledSignalV2;
+}
+
 bool Button::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::BaseHandle handle( object );
@@ -116,6 +122,10 @@ bool Button::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tr
   if( Dali::Toolkit::Button::SIGNAL_CLICKED == signalName )
   {
     button.ClickedSignal().Connect( tracker, functor );
+  }
+  else if( Dali::Toolkit::Button::SIGNAL_TOGGLED == signalName )
+  {
+    button.ToggledSignal().Connect( tracker, functor );
   }
   else
   {

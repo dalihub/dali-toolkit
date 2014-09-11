@@ -86,8 +86,8 @@ void CheckBoxButton::SetChecked( bool checked )
     // Notifies the painter the checkbox has been checked.
     GetCheckBoxButtonPainter( mPainter )->Checked( handle );
 
-    // Emit signal.
-    mClickedSignalV2.Emit( handle );
+    // Raise toggled signal
+    mToggledSignalV2.Emit( handle, mChecked );
   }
 }
 

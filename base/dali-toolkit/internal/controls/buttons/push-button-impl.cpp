@@ -59,9 +59,8 @@ BaseHandle Create()
 
 TypeRegistration typeRegistration( typeid(Toolkit::PushButton), typeid(Toolkit::Button), Create );
 
-SignalConnectorType signalConnector1( typeRegistration, Toolkit::PushButton::SIGNAL_TOGGLED , &PushButton::DoConnectSignal );
-SignalConnectorType signalConnector2( typeRegistration, Toolkit::PushButton::SIGNAL_PRESSED , &PushButton::DoConnectSignal );
-SignalConnectorType signalConnector3( typeRegistration, Toolkit::PushButton::SIGNAL_RELEASED, &PushButton::DoConnectSignal );
+SignalConnectorType signalConnector1( typeRegistration, Toolkit::PushButton::SIGNAL_PRESSED , &PushButton::DoConnectSignal );
+SignalConnectorType signalConnector2( typeRegistration, Toolkit::PushButton::SIGNAL_RELEASED, &PushButton::DoConnectSignal );
 
 TypeAction action1( typeRegistration, Toolkit::PushButton::ACTION_PUSH_BUTTON_CLICK, &PushButton::DoAction );
 
@@ -356,11 +355,6 @@ Actor& PushButton::GetFadeOutButtonImage()
   return mFadeOutButtonImage;
 }
 
-Toolkit::PushButton::ToggledSignalV2& PushButton::ToggledSignal()
-{
-  return mToggledSignalV2;
-}
-
 Toolkit::PushButton::PressedSignalV2& PushButton::PressedSignal()
 {
   return mPressedSignalV2;
@@ -584,7 +578,7 @@ void PushButton::OnButtonUp()
       // Notifies the painter the button has been toggled.
       GetPushButtonPainter( mPainter )->Toggled( handle );
 
-      //Emit signal.
+      // Emit signal.
       mToggledSignalV2.Emit( handle, mToggled );
     }
     else

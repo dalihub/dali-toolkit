@@ -29,7 +29,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const char* const PushButton::SIGNAL_TOGGLED = "toggled";
 const char* const PushButton::SIGNAL_PRESSED = "pressed";
 const char* const PushButton::SIGNAL_RELEASED = "released";
 
@@ -217,11 +216,6 @@ void PushButton::SetLabelText( Actor text )
 Actor PushButton::GetLabelText() const
 {
   return Dali::Toolkit::GetImplementation( *this ).GetLabelText();
-}
-
-PushButton::ToggledSignalV2& PushButton::ToggledSignal()
-{
-  return Dali::Toolkit::GetImplementation( *this ).ToggledSignal();
 }
 
 PushButton::PressedSignalV2& PushButton::PressedSignal()

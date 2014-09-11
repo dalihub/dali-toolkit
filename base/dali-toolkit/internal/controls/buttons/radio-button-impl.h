@@ -102,6 +102,11 @@ class RadioButton: public Button
    */
   void ToggleState();
 
+  /**
+   * @copydoc Dali::Toolkit::Control::OnRelaidOut(Vector2 size, ActorSizeContainer& container)
+   */
+  virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
+
  public:
   // Properties
 
@@ -138,7 +143,7 @@ class RadioButton: public Button
 
   Image mInactiveImage;     ///< Stores the inactive image
   Image mActiveImage;       ///< Stores the active image
-  ImageActor mImageActor;   ///< Stores the current image
+  ImageActor mRadioIcon;   ///< Stores the current image
   Actor mLabel;             ///< Stores the button label
   bool mActive;             ///< Stores the active state
 } ;

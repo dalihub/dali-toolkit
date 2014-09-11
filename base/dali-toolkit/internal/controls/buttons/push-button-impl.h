@@ -242,11 +242,6 @@ public:
   // Signals
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::ToggledSignal()
-   */
-  Toolkit::PushButton::ToggledSignalV2& ToggledSignal();
-
-  /**
    * @copydoc Dali::Toolkit::PushButton::PressedSignal()
    */
   Toolkit::PushButton::PressedSignalV2& PressedSignal();
@@ -394,7 +389,6 @@ private:
   bool  mToggled;                   ///< Stores the toggle state.
 
   // Signals
-  Toolkit::PushButton::ToggledSignalV2 mToggledSignalV2;   ///< Signal emitted when the button is toggled.
   Toolkit::PushButton::PressedSignalV2 mPressedSignalV2;   ///< Signal emitted when the button is pressed.
   Toolkit::PushButton::ReleasedSignalV2 mReleasedSignalV2; ///< Signal emitted when the button is released.
 
