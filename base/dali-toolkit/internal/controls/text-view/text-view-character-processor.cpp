@@ -57,6 +57,10 @@ CharacterLayoutInfo::CharacterLayoutInfo()
 {
 }
 
+CharacterLayoutInfo::~CharacterLayoutInfo()
+{
+}
+
 CharacterLayoutInfo::CharacterLayoutInfo( const CharacterLayoutInfo& character )
 : mHeight( character.mHeight ),
   mAdvance( character.mAdvance ),

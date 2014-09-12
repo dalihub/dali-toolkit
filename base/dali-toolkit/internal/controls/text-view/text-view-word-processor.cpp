@@ -80,6 +80,10 @@ WordLayoutInfo::WordLayoutInfo()
 {
 }
 
+WordLayoutInfo::~WordLayoutInfo()
+{
+}
+
 WordLayoutInfo::WordLayoutInfo( const WordLayoutInfo& word )
 : mSize( word.mSize ),
   mAscender( word.mAscender ),
@@ -144,7 +148,7 @@ void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
 
       if( character.IsNewLine() && !characterLayoutInfo.mIsColorGlyph )
       {
-        // A new line character doesn't have any width.
+        // A new paragraph character doesn't have any width.
         characterLayoutInfo.mSize.width = 0.f;
       }
       else
@@ -178,50 +182,50 @@ void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
 void RemoveCharactersFromWordInfo( TextView::RelayoutData& relayoutData,
                                    const std::size_t numberOfCharacters,
                                    bool& mergeWords,
-                                   bool& mergeLines,
+                                   bool& mergeParagraphs,
                                    TextInfoIndices& textInfoIndicesBegin,
                                    TextInfoIndices& textInfoIndicesEnd,
                                    TextInfoIndices& textInfoMergeIndicesBegin,
                                    TextInfoIndices& textInfoMergeIndicesEnd,
-                                   LineLayoutInfo& lineLayout,
+                                   ParagraphLayoutInfo& paragraphLayout,
                                    std::vector<TextActor>& removedTextActors )
 {
   const TextLayoutInfo& textLayoutInfo = relayoutData.mTextLayoutInfo;
 
   // Get the word.
-  WordLayoutInfo& wordLayout( *( lineLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex ) );
+  WordLayoutInfo& wordLayout( *( paragraphLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex ) );
 
-  if( LineSeparator == wordLayout.mType )
+  if( ParagraphSeparator == wordLayout.mType )
   {
-    // If the word is a line separator and there is more lines, then current line and the line after need to be merged.
-    if( textInfoIndicesBegin.mLineIndex + 1u < textLayoutInfo.mLinesLayoutInfo.size() )
+    // If the word is a paragraph separator and there is more paragraphs, then current paragraph and the paragraph after need to be merged.
+    if( textInfoIndicesBegin.mParagraphIndex + 1u < textLayoutInfo.mParagraphsLayoutInfo.size() )
     {
-      // current line is not the last one.
+      // current paragraph is not the last one.
 
-      // Update indices to merge lines.
-      textInfoMergeIndicesBegin.mLineIndex = textInfoIndicesBegin.mLineIndex;
-      textInfoMergeIndicesEnd.mLineIndex = textInfoIndicesBegin.mLineIndex + 1u;
+      // Update indices to merge paragraphs.
+      textInfoMergeIndicesBegin.mParagraphIndex = textInfoIndicesBegin.mParagraphIndex;
+      textInfoMergeIndicesEnd.mParagraphIndex = textInfoIndicesBegin.mParagraphIndex + 1u;
 
-      mergeLines = true;
+      mergeParagraphs = true;
 
-      ++textInfoIndicesBegin.mLineIndex;   // increase both indices,
-      textInfoIndicesEnd.mLineIndex += 2u; // will delete last line.
+      ++textInfoIndicesBegin.mParagraphIndex; // increase both indices,
+      textInfoIndicesEnd.mParagraphIndex += 2u; // will delete last paragraph.
     }
 
-    ++textInfoIndicesEnd.mWordIndex; //will delete the line separator;
+    ++textInfoIndicesEnd.mWordIndex; //will delete the paragraph separator;
   }
   else if( WordSeparator == wordLayout.mType )
   {
     // If the word is a word separator. Check if the word before and the word after can be merged.
 
-    if( ( 0u < textInfoIndicesBegin.mWordIndex ) && ( lineLayout.mWordsLayoutInfo.size() > textInfoIndicesBegin.mWordIndex + 1u ) )
+    if( ( 0u < textInfoIndicesBegin.mWordIndex ) && ( paragraphLayout.mWordsLayoutInfo.size() > textInfoIndicesBegin.mWordIndex + 1u ) )
     {
-      const WordLayoutInfo& wordLayoutBefore( *( lineLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex - 1u ) );
-      const WordLayoutInfo& wordLayoutAfter( *( lineLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex + 1u ) );
+      const WordLayoutInfo& wordLayoutBefore( *( paragraphLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex - 1u ) );
+      const WordLayoutInfo& wordLayoutAfter( *( paragraphLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex + 1u ) );
 
       if( ( NoSeparator == wordLayoutBefore.mType ) && ( NoSeparator == wordLayoutAfter.mType ) )
       {
-        // This word is a word separator (white space) and is not the first word of the line nor the last one.
+        // This word is a word separator (white space) and is not the first word of the paragraph nor the last one.
         mergeWords = true;
 
         // Set indices to merge the words.
@@ -348,8 +352,8 @@ void MergeWord( WordLayoutInfo& firstWordLayoutInfo,
 
   if( ( NoSeparator != firstWordLayoutInfo.mType ) || ( NoSeparator != lastWordLayoutInfo.mType ) )
   {
-    // Do not merge white spaces or new line characters.
-    DALI_ASSERT_ALWAYS( !"TextViewProcessor::MergeWord(). ERROR: White spaces or new line characters can't be merged with other words." );
+    // Do not merge white spaces or new paragraph characters.
+    DALI_ASSERT_ALWAYS( !"TextViewProcessor::MergeWord(). ERROR: White spaces or new paragraph characters can't be merged with other words." );
   }
 
   // Merge layout info
@@ -406,9 +410,9 @@ void CollectTextActors( std::vector<TextActor>& textActors, const WordLayoutInfo
   }
 }
 
-void CollectTextActorsFromWords( std::vector<TextActor>& textActors, const LineLayoutInfo& line, const std::size_t wordIndexBegin, const std::size_t wordIndexEnd )
+void CollectTextActorsFromWords( std::vector<TextActor>& textActors, const ParagraphLayoutInfo& paragraph, const std::size_t wordIndexBegin, const std::size_t wordIndexEnd )
 {
-  for( WordLayoutInfoContainer::const_iterator wordIt = line.mWordsLayoutInfo.begin() + wordIndexBegin, wordEndIt = line.mWordsLayoutInfo.begin() + wordIndexEnd;
+  for( WordLayoutInfoContainer::const_iterator wordIt = paragraph.mWordsLayoutInfo.begin() + wordIndexBegin, wordEndIt = paragraph.mWordsLayoutInfo.begin() + wordIndexEnd;
        wordIt != wordEndIt;
        ++wordIt )
   {

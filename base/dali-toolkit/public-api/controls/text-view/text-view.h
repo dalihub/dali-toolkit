@@ -96,21 +96,22 @@ public:
      *
      * @param[in] size of the character.
      * @param[in] position of the character.
-     * @param[in] isNewLineChar Whether the character is a new line character.
+     * @param[in] isNewParagraphChar Whether the character is a new paragraph character.
      * @param[in] isRightToLeftCharacter Whether is a right to left character.
      * @param[in] visible Whether is visible.
      * @param[in] descender of the character (distance from the base line to the bottom of the character.)
      */
     CharacterLayoutInfo( const Size& size,
                          const Vector3& position,
-                         bool isNewLineChar,
+                         bool isNewParagraphChar,
                          bool isRightToLeftCharacter,
                          bool visible,
                          float descender );
 
     Size    mSize;                     ///< Size of the character.
     Vector3 mPosition;                 ///< Position of the character within the text view.
-    bool    mIsNewLineChar:1;          ///< Whether this character represent a new line.
+    bool    mIsNewLineChar:1;          ///< @deprecated. Use mIsNewParagraphChar instead.
+    bool    mIsNewParagraphChar:1;     ///< Whether this character represent a new paragraph.
     bool    mIsRightToLeftCharacter:1; ///< Whether it's a right-to-left character.
     bool    mIsVisible:1;              ///< Whether this character is visible or not.
     float   mDescender;                ///< The character's descender which is the distance from the baseline to the bottom of the character
@@ -119,13 +120,13 @@ public:
   typedef std::vector<CharacterLayoutInfo> CharacterLayoutInfoContainer; ///< Container of layout info per character.
 
   /**
-   * @brief Stores some info about a laid-out line.
+   * @brief Stores some info about a line.
    */
   struct LineLayoutInfo
   {
-    std::size_t mCharacterGlobalIndex; ///< Global index within the whole text of the first character of current laid-out line.
-    Size        mSize;                 ///< Size of the current laid-out line.
-    float       mAscender;             ///< The max ascender of the current laid-out line.
+    std::size_t mCharacterGlobalIndex; ///< Global index within the whole text of the first character of current line.
+    Size        mSize;                 ///< Size of the current line.
+    float       mAscender;             ///< The max ascender of the current line.
   };
 
   typedef std::vector<LineLayoutInfo> LineLayoutInfoContainer; ///< Container of layout info per line.
@@ -158,7 +159,7 @@ public:
     TextLayoutInfo& operator=( const TextLayoutInfo& textLayoutInfo );
 
     CharacterLayoutInfoContainer mCharacterLayoutInfoTable;    ///< The table of character's positions and sizes sorted by the character's visual index.
-    LineLayoutInfoContainer      mLines;                       ///< For each laid-out line, it stores an index to the first character of the line.
+    LineLayoutInfoContainer      mLines;                       ///< For each line, it stores an index to the first character of the line.
     std::vector<int>             mCharacterLogicalToVisualMap; ///< The map to store the character's logical (input) index according to its visual (reordered) index.
     std::vector<int>             mCharacterVisualToLogicalMap; ///< The map to store the character's visual (reordered) index according to its logical (input) index.
     Size                         mTextSize;                    ///< Text size after relayout.
@@ -199,38 +200,38 @@ public:
   };
 
   /**
-   * @brief Define how to wrap the text in lines.
+   * @brief Define how to wrap the text's paragraphs in lines.
    *
-   * \e SplitByNewLineChar will wrap the text in lines when a '\\n' character or a \<br /\> is found.
+   * \e SplitByNewLineChar will wrap the text's paragraphs in lines when a '\\n' character or a \<br /\> is found.
    * \e SplitByWord has effect only when TextView size is assigned.
-   * It will wrap the text in lines when a '\\n' character or a \<br /\> is found or if a line exceeds the TextView's boundary. This option won't split a word in two.
+   * It will wrap the text's paragraphs in lines when a '\\n' character or a \<br /\> is found or if a paragraph exceeds the TextView's boundary. This option won't split a word in two.
    * \e SplitByChar has effect only when TextView size is assigned.
-   * It will wrap the text in lines when a '\\n' character or a \<br /\> is found or if a line exceeds the TextView's boundary. This option might split a word in two.
+   * It will wrap the text's paragraphs in lines when a '\\n' character or a \<br /\> is found or if a paragraph exceeds the TextView's boundary. This option might split a word in two.
    * The default value is \e SplitByNewLineChar.
    */
   enum MultilinePolicy
   {
-    SplitByNewLineChar, ///< Text lines will wrap when '\\n' character is found.
-    SplitByWord,        ///< Text lines will wrap by word or if '\\n' character is found. It has effect only when TextView size is assigned.
-    SplitByChar         ///< Text lines will wrap by char or if '\\n' character is found. It has effect only when TextView size is assigned.
+    SplitByNewLineChar, ///< Text's paragraphs will wrap in lines when '\\n' character is found.
+    SplitByWord,        ///< Text's paragraphs will wrap in lines by word or if '\\n' character is found. It has effect only when TextView size is assigned.
+    SplitByChar         ///< Text's paragraphs will wrap in lines by char or if '\\n' character is found. It has effect only when TextView size is assigned.
   };
 
   /**
-   * @brief Define how to display the text when it doesn't fit inside the TextView after the line wrap.
+   * @brief Define how to display the lines when they doesn't fit inside the TextView after the text's paragraphs are wrapped in lines.
    *
    * The default value is \e Original.
    */
   enum ExceedPolicy
   {
-    Original,         ///< Will display the text in its original size. If a line, a word or a character is bigger than the TextView size it may exceed its boundary.
-    Fade,             ///< Will display the text in its original size. It won't display the text which exceeds the TextView boundary. It fades the text out.
-    Split,            ///< Will split the text in a new line.
-    ShrinkToFit,      ///< Will shrink the text to fit the TextView boundary.
-    EllipsizeEnd      ///< Will ellipsize the text by the end.
+    Original,         ///< Will display the lines in their original size. If a line, a word or a character is bigger than the TextView size it may exceed its boundary.
+    Fade,             ///< Will display the lines in their original size. It won't display the part of the line which exceeds the TextView boundary. It fades the text out.
+    Split,            ///< Will split the lines in a new line(s).
+    ShrinkToFit,      ///< Will shrink the lines to fit the TextView boundary.
+    EllipsizeEnd      ///< Will ellipsize the lines by the end.
   };
 
   /**
-   * @brief Define how to justify lines inside the text area.
+   * @brief Define how to justify lines inside the text's boundary.
    *
    * The default value is \e Left.
    */
@@ -418,7 +419,7 @@ public:
   Alignment::Type GetTextAlignment() const;
 
   /**
-   * @brief Sets how to wrap the text in lines policy.
+   * @brief Sets how to split the paragraphs into lines.
    *
    * @param policy The multi-line policy. \e SplitByNewLineChar is set by default.
    */
@@ -460,7 +461,7 @@ public:
   ExceedPolicy GetHeightExceedPolicy() const;
 
   /**
-   * @brief Sets how to justify lines inside the text area.
+   * @brief Sets how to justify lines inside the text's boundary.
    *
    * @param justification The line justification. Left is set by default.
    */

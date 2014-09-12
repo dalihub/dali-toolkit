@@ -3495,7 +3495,7 @@ TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
           // TODO: TextView should have a table of visual rows, and each character a reference to the row
           // that it resides on. That way this enumeration is not necessary.
           Vector2 min, max;
-          if(lastIt->mIsNewLineChar)
+          if(lastIt->mIsNewParagraphChar)
           {
             // If the last character is a new line, then to get the row rect, we need to scan from the character before the new line.
             lastIt = std::max( mTextLayoutInfo.mCharacterLayoutInfoTable.begin(), lastIt - 1 );
@@ -3542,7 +3542,7 @@ TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
       {
         // finished selection.
         Vector2 min, max;
-        if(lastIt->mIsNewLineChar)
+        if(lastIt->mIsNewParagraphChar)
         {
           lastIt = std::max( mTextLayoutInfo.mCharacterLayoutInfoTable.begin(), lastIt - 1 );
         }
@@ -3908,7 +3908,7 @@ bool TextInput::ReturnClosestIndex(const Vector2& source, std::size_t& closestIn
         if( fabsf( closestYdifference - currentYdifference )  < CHARACTER_THRESHOLD )
         {
           // ignore new line character.
-          if( !info.mIsNewLineChar )
+          if( !info.mIsNewParagraphChar )
           {
             matchedCharacters.push_back( info );
             numberOfMatchedCharacters++;
@@ -3922,7 +3922,7 @@ bool TextInput::ReturnClosestIndex(const Vector2& source, std::size_t& closestIn
     // and check if user is touching below previous line.
     const Toolkit::TextView::CharacterLayoutInfo& lastInfo( mTextLayoutInfo.mCharacterLayoutInfoTable[mTextLayoutInfo.mCharacterLayoutInfoTable.size() - 1] );
 
-    if( ( lastInfo.mIsVisible ) && ( lastInfo.mIsNewLineChar ) && ( sourceScrollOffset.y > lastInfo.mPosition.y ) )
+    if( ( lastInfo.mIsVisible ) && ( lastInfo.mIsNewParagraphChar ) && ( sourceScrollOffset.y > lastInfo.mPosition.y ) )
     {
       closestIndex = mTextLayoutInfo.mCharacterLayoutInfoTable.size();
     }
@@ -4180,7 +4180,7 @@ Vector3 TextInput::GetActualPositionFromCharacterPosition(std::size_t characterP
       }
 
       Toolkit::TextView::CharacterLayoutInfo info = mTextLayoutInfo.mCharacterLayoutInfoTable[ visualCharacterPosition ];
-      if( ( visualCharacterPosition > 0 ) && info.mIsNewLineChar && !IsScrollEnabled() )
+      if( ( visualCharacterPosition > 0 ) && info.mIsNewParagraphChar && !IsScrollEnabled() )
       {
         // Prevents the cursor to exceed the boundary if the last visible character is a 'new line character' and the scroll is not enabled.
         const Vector3& size = GetControlSize();
@@ -4192,7 +4192,7 @@ Vector3 TextInput::GetActualPositionFromCharacterPosition(std::size_t characterP
         info = mTextLayoutInfo.mCharacterLayoutInfoTable[ visualCharacterPosition ];
       }
 
-      if(!info.mIsNewLineChar)
+      if(!info.mIsNewParagraphChar)
       {
         cursorPosition = PositionCursorAfterWordWrap( characterPosition ); // Get position of cursor/handles taking in account auto word wrap.
       }
@@ -4392,7 +4392,7 @@ std::size_t TextInput::GetRowStartFromCharacterPosition(std::size_t logicalPosit
   {
     logicalPosition--;
     std::size_t visualPosition = GetVisualPosition(logicalPosition);
-    if(mTextLayoutInfo.mCharacterLayoutInfoTable[visualPosition].mIsNewLineChar)
+    if(mTextLayoutInfo.mCharacterLayoutInfoTable[visualPosition].mIsNewParagraphChar)
     {
       logicalPosition++;
       break;
@@ -4462,7 +4462,7 @@ Size TextInput::GetRowRectFromCharacterPosition(std::size_t characterPosition, V
     --it;
 
     if( (it->mPosition.y < referenceLine) ||
-        (it->mIsNewLineChar) ||
+        (it->mIsNewParagraphChar) ||
         (!it->mIsVisible) )
     {
       break;
@@ -4479,7 +4479,7 @@ Size TextInput::GetRowRectFromCharacterPosition(std::size_t characterPosition, V
   while(it != end)
   {
     if( (it->mPosition.y > referenceLine) ||
-        (it->mIsNewLineChar) ||
+        (it->mIsNewParagraphChar) ||
         (!it->mIsVisible) )
     {
       break;

@@ -33,10 +33,10 @@ namespace Internal
 namespace TextProcessor
 {
 
-void SplitInLines( const MarkupProcessor::StyledTextArray& text,
-                   std::vector<MarkupProcessor::StyledTextArray>& lines )
+void SplitInParagraphs( const MarkupProcessor::StyledTextArray& text,
+                   std::vector<MarkupProcessor::StyledTextArray>& paragraphs )
 {
-  MarkupProcessor::StyledTextArray line;
+  MarkupProcessor::StyledTextArray paragraph;
   for( MarkupProcessor::StyledTextArray::const_iterator it = text.begin(), endIt = text.end(); it != endIt; ++it )
   {
     const MarkupProcessor::StyledText& styledText( *it );
@@ -49,30 +49,30 @@ void SplitInLines( const MarkupProcessor::StyledTextArray& text,
       {
         Text newText( character );
         MarkupProcessor::StyledText newStyledText( newText, styledText.mStyle );
-        line.push_back( newStyledText );
+        paragraph.push_back( newStyledText );
 
-        lines.push_back( line );
-        line.clear();
+        paragraphs.push_back( paragraph );
+        paragraph.clear();
       }
       else
       {
         Text newText( character );
         MarkupProcessor::StyledText newStyledText( newText, styledText.mStyle );
-        line.push_back( newStyledText );
+        paragraph.push_back( newStyledText );
       }
     }
   }
 
-  // This line could be empty if the last character of the previous line is a 'new line' character
+  // This paragraph could be empty if the last character of the previous paragraph is a 'new paragraph' character
   // and is the last of the text.
-  lines.push_back( line );
+  paragraphs.push_back( paragraph );
 }
 
-void SplitInWords( const MarkupProcessor::StyledTextArray& line,
+void SplitInWords( const MarkupProcessor::StyledTextArray& paragraph,
                    std::vector<MarkupProcessor::StyledTextArray>& words )
 {
   MarkupProcessor::StyledTextArray word;
-  for( MarkupProcessor::StyledTextArray::const_iterator it = line.begin(), endIt = line.end(); it != endIt; ++it )
+  for( MarkupProcessor::StyledTextArray::const_iterator it = paragraph.begin(), endIt = paragraph.end(); it != endIt; ++it )
   {
     const MarkupProcessor::StyledText& styledText( *it );
     const Dali::Character character = styledText.mText[0u];
@@ -263,6 +263,14 @@ void ConvertBidirectionalText( const MarkupProcessor::StyledTextArray& line,
   }
 }
 
+/**
+ * Wheather the character of the text pointed by the given offset is a white space.
+ *
+ * @param[in] text The text.
+ * @param[in] offset Offset pointing the character.
+ *
+ * @return \e true if the character pointed by the offset is a white space.
+ */
 bool IsWhiteSpace( const MarkupProcessor::StyledTextArray& text, size_t offset )
 {
   DALI_ASSERT_DEBUG( offset < text.size() );

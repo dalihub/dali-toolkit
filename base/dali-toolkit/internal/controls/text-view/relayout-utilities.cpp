@@ -40,7 +40,7 @@ const float MINIMUM_FADE_BOUNDARY = 0.05f; // When the fade boundary is the same
 
 RelayoutParameters::RelayoutParameters()
 : mPositionOffset(),
-  mLineSize(),
+  mParagraphSize(),
   mWordSize(),
   mCharacterSize(),
   mIndices(),
@@ -48,7 +48,7 @@ RelayoutParameters::RelayoutParameters()
   mIsFirstCharacter( false ),
   mIsFirstCharacterOfWord( false ),
   mIsNewLine( false ),
-  mIsNewLineCharacter( false ),
+  mIsNewParagraphCharacter( false ),
   mIsWhiteSpace( false ),
   mIsVisible( false )
 {
@@ -131,14 +131,14 @@ TextUnderlineStatus::~TextUnderlineStatus()
 {
 }
 
-SubLineLayoutInfo::SubLineLayoutInfo()
+LineLayoutInfo::LineLayoutInfo()
 : mLineLength( 0.f ),
   mMaxCharHeight( 0.f ),
   mMaxAscender( 0.f )
 {
 }
 
-SubLineLayoutInfo::~SubLineLayoutInfo()
+LineLayoutInfo::~LineLayoutInfo()
 {
 }
 
@@ -184,7 +184,7 @@ bool IsExceedingHeight( const Vector3& position, const Size& size, const Size& p
  * @param[out] lineLength The length of the portion of line which doesn't exceed the parant's width
  * @param[out] endWhiteSpaceLength The length of white spaces which are at the end of the line.
  */
-void CalculateLineLength( const bool isWhiteSpace, const float width, const float parentWidth, bool& found, float& lineLength, float& endWhiteSpaceLength )
+void CalculateLineLength( bool isWhiteSpace, float width, float parentWidth, bool& found, float& lineLength, float& endWhiteSpaceLength )
 {
   if( lineLength + width > parentWidth )
   {
@@ -241,12 +241,12 @@ void SetVisualParameters( CurrentTextActorInfo& currentTextActorInfo,
   currentTextActorInfo.textActor.SetBlendMode( !visualParameters.mSnapshotModeEnabled ? BlendingMode::ON : BlendingMode::OFF );
 }
 
-void CalculateSubLineLayout( const float parentWidth,
-                             const TextViewProcessor::TextInfoIndices& indices,
-                             const TextViewProcessor::LineLayoutInfo& lineLayoutInfo,
-                             const HorizontalWrapType splitPolicy,
-                             const float shrinkFactor,
-                             SubLineLayoutInfo& subLineInfo )
+void CalculateLineLayout( float parentWidth,
+                          const TextViewProcessor::TextInfoIndices& indices,
+                          const TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo,
+                          HorizontalWrapType splitPolicy,
+                          float shrinkFactor,
+                          LineLayoutInfo& subLineInfo )
 {
   subLineInfo.mLineLength = 0.f;
   subLineInfo.mMaxCharHeight = 0.f;
@@ -258,8 +258,8 @@ void CalculateSubLineLayout( const float parentWidth,
   float lineOffset = 0.f;
   bool found = false;
   bool isFirstCharacter = true;
-  for( TextViewProcessor::WordLayoutInfoContainer::const_iterator wordIt = lineLayoutInfo.mWordsLayoutInfo.begin() + indices.mWordIndex,
-         wordEndIt = lineLayoutInfo.mWordsLayoutInfo.end();
+  for( TextViewProcessor::WordLayoutInfoContainer::const_iterator wordIt = paragraphLayoutInfo.mWordsLayoutInfo.begin() + indices.mWordIndex,
+         wordEndIt = paragraphLayoutInfo.mWordsLayoutInfo.end();
        ( wordIt != wordEndIt ) && !found;
        ++wordIt )
   {
@@ -278,7 +278,7 @@ void CalculateSubLineLayout( const float parentWidth,
         break;
       }
       case WrapByWord:
-      case WrapByLine: // Fall through
+      case WrapByParagraphCharacter: // Fall through
       {
         splitByCharacter = false;
         break;
@@ -288,7 +288,7 @@ void CalculateSubLineLayout( const float parentWidth,
         splitByCharacter = ( shrunkWordWidth > parentWidth );
         break;
       }
-      case WrapByLineAndSplit:
+      case WrapByParagraphCharacterAndSplit:
       {
         if( ( 0u != characterIndex ) ||
             ( ( 0u == characterIndex ) && ( lineOffset + shrunkWordWidth > parentWidth ) ) )
@@ -342,7 +342,7 @@ void CalculateSubLineLayout( const float parentWidth,
   subLineInfo.mMaxAscender *= shrinkFactor;
 }
 
-float CalculateXoffset( const Toolkit::Alignment::Type horizontalTextAlignment, const float parentWidth, const float wholeTextWidth )
+float CalculateXoffset( Toolkit::Alignment::Type horizontalTextAlignment, float parentWidth, float wholeTextWidth )
 {
   float xOffset( 0.f );
   switch( horizontalTextAlignment )
@@ -371,7 +371,7 @@ float CalculateXoffset( const Toolkit::Alignment::Type horizontalTextAlignment, 
   return xOffset;
 }
 
-float CalculateYoffset( const Toolkit::Alignment::Type verticalTextAlignment, const float parentHeight, const float wholeTextHeight )
+float CalculateYoffset( Toolkit::Alignment::Type verticalTextAlignment, float parentHeight, float wholeTextHeight )
 {
   float yOffset( 0.f );
   switch( verticalTextAlignment )
@@ -400,7 +400,7 @@ float CalculateYoffset( const Toolkit::Alignment::Type verticalTextAlignment, co
   return yOffset;
 }
 
-float CalculateJustificationOffset( const Toolkit::TextView::LineJustification justification, const float wholeTextWidth, const float lineLength )
+float CalculateJustificationOffset( Toolkit::TextView::LineJustification justification, float wholeTextWidth, float lineLength )
 {
   float offset = 0.f;
   switch( justification )
@@ -430,7 +430,7 @@ float CalculateJustificationOffset( const Toolkit::TextView::LineJustification j
   return offset;
 }
 
-bool IsVisible( const Vector3& position, const Size& size, const Size& parentSize, const VisibilityTestType type )
+bool IsVisible( const Vector3& position, const Size& size, const Size& parentSize, VisibilityTestType type )
 {
   bool visible = false;
 
@@ -515,21 +515,21 @@ void UpdateAlignment( const TextView::LayoutParameters& layoutParameters,
   std::size_t lineJustificationIndex = 0u; // Index to the first position of the vector which stores all line justification info.
   std::size_t infoTableCharacterIndex = 0u;
 
-  relayoutParameters.mIndices.mLineIndex = 0u;
+  relayoutParameters.mIndices.mParagraphIndex = 0u;
 
-  for( TextViewProcessor::LineLayoutInfoContainer::iterator lineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin(),
-         endLineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end();
-       lineLayoutIt != endLineLayoutIt;
-       ++lineLayoutIt, ++relayoutParameters.mIndices.mLineIndex )
+  for( TextViewProcessor::ParagraphLayoutInfoContainer::iterator paragraphLayoutIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin(),
+         endParagraphLayoutIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end();
+       paragraphLayoutIt != endParagraphLayoutIt;
+       ++paragraphLayoutIt, ++relayoutParameters.mIndices.mParagraphIndex )
   {
-    TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *lineLayoutIt );
+    TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo( *paragraphLayoutIt );
 
     float justificationOffset = 0.f;
 
     relayoutParameters.mIndices.mWordIndex = 0u;
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.begin(),
-           endWordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.end();
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.begin(),
+           endWordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.end();
          wordLayoutIt != endWordLayoutIt;
          ++wordLayoutIt, ++relayoutParameters.mIndices.mWordIndex )
     {
@@ -573,7 +573,7 @@ void UpdateAlignment( const TextView::LayoutParameters& layoutParameters,
         positionOffset.x += characterLayoutInfo.mAdvance * relayoutData.mShrinkFactor;
       } // end characters
     } // end words
-  } // end lines
+  } // end paragraphs
 }
 
 void CalculateBearing( TextViewProcessor::CharacterLayoutInfo& characterLayoutInfo,
@@ -644,7 +644,7 @@ void UpdateLayoutInfoTable( Vector4& minMaxXY,
   const Toolkit::TextView::CharacterLayoutInfo characterLayoutTableInfo( Size( characterLayoutInfo.mAdvance * relayoutData.mShrinkFactor,
                                                                                characterLayoutInfo.mHeight * relayoutData.mShrinkFactor ),
                                                                          positionOffset,
-                                                                         ( TextViewProcessor::LineSeparator == wordLayoutInfo.mType ),
+                                                                         ( TextViewProcessor::ParagraphSeparator == wordLayoutInfo.mType ),
                                                                          false, // VCC set the correct direction if needed.
                                                                          true,
                                                                          descender );
@@ -1086,16 +1086,16 @@ void EllipsizeLine( const TextView::LayoutParameters& layoutParameters,
                     EllipsizeParameters& ellipsizeParameters,
                     TextView::RelayoutData& relayoutData )
 {
-  // Traverses the text layout info from the first character of the laid out line
+  // Traverses the text layout info from the first character of the line
   // to the last one setting to each character its visibility. If needed, it adds the ellipsize text (...).
 
-  // Indices to the first character of the laid out line.
+  // Indices to the first character of the line.
   TextViewProcessor::TextInfoIndices firstIndices;
   TextViewProcessor::GetIndicesFromGlobalCharacterIndex( ellipsizeParameters.mFirstIndex,
                                                          relayoutData.mTextLayoutInfo,
                                                          firstIndices );
 
-  // Indices to the last character of the laid out line.
+  // Indices to the last character of the line.
   TextViewProcessor::TextInfoIndices lastIndices;
   TextViewProcessor::GetIndicesFromGlobalCharacterIndex( ellipsizeParameters.mLastIndex,
                                                          relayoutData.mTextLayoutInfo,
@@ -1106,12 +1106,12 @@ void EllipsizeLine( const TextView::LayoutParameters& layoutParameters,
   ellipsizeParameters.mEllipsizeBoundary = relayoutData.mTextViewSize;
   ellipsizeParameters.mEllipsizeBoundary.width -= relayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo.mSize.width;
 
-  for( TextViewProcessor::LineLayoutInfoContainer::iterator lineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + firstIndices.mLineIndex,
-         endLineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + lastIndices.mLineIndex + 1u;
-       lineLayoutIt != endLineLayoutIt;
-       ++lineLayoutIt )
+  for( TextViewProcessor::ParagraphLayoutInfoContainer::iterator paragraphLayoutIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + firstIndices.mParagraphIndex,
+         endParagraphLayoutIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + lastIndices.mParagraphIndex + 1u;
+       paragraphLayoutIt != endParagraphLayoutIt;
+       ++paragraphLayoutIt )
   {
-    TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *lineLayoutIt );
+    TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo( *paragraphLayoutIt );
 
     ellipsizeParameters.mLineFits = ellipsizeParameters.mIsLineWidthFullyVisible && ellipsizeParameters.mIsLineHeightFullyVisible && ellipsizeParameters.mIsNextLineFullyVisibleHeight;
 
@@ -1125,8 +1125,8 @@ void EllipsizeLine( const TextView::LayoutParameters& layoutParameters,
 
     std::size_t wordCount = 0u;
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.begin() + firstIndices.mWordIndex,
-           endWordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.begin() + lastIndices.mWordIndex + 1u;
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.begin() + firstIndices.mWordIndex,
+           endWordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.begin() + lastIndices.mWordIndex + 1u;
          wordLayoutIt != endWordLayoutIt;
          ++wordLayoutIt, ++wordCount )
     {
@@ -1176,20 +1176,20 @@ void EllipsizeLine( const TextView::LayoutParameters& layoutParameters,
       } // end characters
       firstWord = false;
     } // end words
-  } // end lines
+  } // end paragraphs
 }
 
 void SetTextVisible( TextView::RelayoutData& relayoutData )
 {
-  for( TextViewProcessor::LineLayoutInfoContainer::iterator lineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin(),
-         endLineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end();
-       lineLayoutIt != endLineLayoutIt;
-       ++lineLayoutIt )
+  for( TextViewProcessor::ParagraphLayoutInfoContainer::iterator paragraphLayoutIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin(),
+         endParagraphLayoutIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end();
+       paragraphLayoutIt != endParagraphLayoutIt;
+       ++paragraphLayoutIt )
   {
-    TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *lineLayoutIt );
+    TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo( *paragraphLayoutIt );
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.begin(),
-           endWordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.end();
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.begin(),
+           endWordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.end();
          wordLayoutIt != endWordLayoutIt;
          ++wordLayoutIt )
     {
@@ -1209,7 +1209,7 @@ void SetTextVisible( TextView::RelayoutData& relayoutData )
         characterLayoutInfo.mColorAlpha = characterLayoutInfo.mStyledText.mStyle.GetTextColor().a;
       } // end characters
     } // end words
-  } // end lines
+  } // end paragraphs
 
   // Updates the visibility for text-input..
   for( std::vector<Toolkit::TextView::CharacterLayoutInfo>::iterator it = relayoutData.mCharacterLayoutInfoTable.begin(),
@@ -1258,19 +1258,19 @@ void UpdateVisibilityForFade( const TextView::LayoutParameters& layoutParameters
 
   std::size_t infoTableCharacterIndex = 0u;
 
-  relayoutParameters.mIndices.mLineIndex = 0u;
+  relayoutParameters.mIndices.mParagraphIndex = 0u;
 
-  for( TextViewProcessor::LineLayoutInfoContainer::iterator lineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin(),
-         endLineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end();
-       lineLayoutIt != endLineLayoutIt;
-       ++lineLayoutIt, ++relayoutParameters.mIndices.mLineIndex )
+  for( TextViewProcessor::ParagraphLayoutInfoContainer::iterator paragraphLayoutIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin(),
+         endParagraphLayoutIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end();
+       paragraphLayoutIt != endParagraphLayoutIt;
+       ++paragraphLayoutIt, ++relayoutParameters.mIndices.mParagraphIndex )
   {
-    TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *lineLayoutIt );
+    TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo( *paragraphLayoutIt );
 
     relayoutParameters.mIndices.mWordIndex = 0u;
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.begin(),
-           endWordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.end();
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.begin(),
+           endWordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.end();
          wordLayoutIt != endWordLayoutIt;
          ++wordLayoutIt, ++relayoutParameters.mIndices.mWordIndex )
     {
@@ -1307,23 +1307,23 @@ void UpdateVisibilityForFade( const TextView::LayoutParameters& layoutParameters
         relayoutParameters.mIsFirstCharacterOfWord = false;
       } // end character
     } // end words
-  } // end lines
+  } // end paragraphs
 }
 
 void UpdateVisibilityForEllipsize( const TextView::LayoutParameters& layoutParameters,
                                    const TextView::VisualParameters& visualParameters,
                                    TextView::RelayoutData& relayoutData )
 {
-  // Traverses the laid-out lines and checks which ones doesn't fit in the text-view's boundary.
+  // Traverses the lines and checks which ones doesn't fit in the text-view's boundary.
   for( Toolkit::TextView::LineLayoutInfoContainer::const_iterator lineInfoIt = relayoutData.mLines.begin(), endLineInfoIt = relayoutData.mLines.end();
        lineInfoIt != endLineInfoIt;
        ++lineInfoIt )
   {
     const Toolkit::TextView::LineLayoutInfo& lineInfo( *lineInfoIt );
 
-    // To check if a laid-out line fits in the text-view's boundary,
+    // To check if a line fits in the text-view's boundary,
     // get the position of the first character is needed and do the test
-    // with the laid-out line size.
+    // with the line size.
 
     // An bearing offset may have been applied to the first character so it's needed to
     // get the start position of the line.
@@ -1500,7 +1500,7 @@ void CreateEmoticon( const TextView::VisualParameters& visualParameters,
  *
  * @param[in] visualParameters Some visual parameters (fade, sort modifier and blending).
  * @param[in,out] relayoutData Natural size (metrics), layout, text-actor info.
- * @param[in,out] line Layout info for the line.
+ * @param[in,out] paragraph Layout info for the paragraph.
  * @param[in,out] characterLayout Layout info for the character.
  * @param[in] character The character.
  * @param[in] style The character's style.
@@ -1509,7 +1509,7 @@ void CreateEmoticon( const TextView::VisualParameters& visualParameters,
  */
 void CreateTextActor( const TextView::VisualParameters& visualParameters,
                       TextView::RelayoutData& relayoutData,
-                      const TextViewProcessor::LineLayoutInfo& line,
+                      const TextViewProcessor::ParagraphLayoutInfo& paragraph,
                       TextViewProcessor::CharacterLayoutInfo& characterLayout,
                       const Character& character,
                       const TextStyle& style,
@@ -1526,7 +1526,7 @@ void CreateTextActor( const TextView::VisualParameters& visualParameters,
     SetVisualParameters( currentTextActorInfo,
                          visualParameters,
                          relayoutData,
-                         line.mSize.height );
+                         paragraph.mSize.height );
   }
 
   currentTextActorInfo.text = Text( character );
@@ -1575,26 +1575,26 @@ void CreateTextActor( const TextView::VisualParameters& visualParameters,
 }
 
 /**
- * Traverses the whole line initializating renderable-actor handles and updating them with the new size and position.
+ * Traverses the whole paragraph initializating renderable-actor handles and updating them with the new size and position.
  *
  * @param[in] visualParameters Some visual parameters (fade, sort modifier and blending).
  * @param[in,out] relayoutData Natural size (metrics), layout, text-actor info.
- * @param[in,out] line Layout info for the line.
+ * @param[in,out] paragraph Layout info for the paragraph.
  * @param[in,out] characterGlobalIndex Index to the character within the whole text.
- * @param[in,out] lineLayoutInfoIndex Index to the table of laid out lines.
+ * @param[in,out] lineLayoutInfoIndex Index to the table of lines.
  * @param[in,out] createGlyphActors Whether to initialize renderable-actor handles.
  */
-void UpdateTextActorInfoForLine( const TextView::VisualParameters& visualParameters,
-                                 TextView::RelayoutData& relayoutData,
-                                 TextViewProcessor::LineLayoutInfo& line,
-                                 std::size_t& characterGlobalIndex,
-                                 std::size_t& lineLayoutInfoIndex,
-                                 bool createGlyphActors )
+void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualParameters,
+                                      TextView::RelayoutData& relayoutData,
+                                      TextViewProcessor::ParagraphLayoutInfo& paragraph,
+                                      std::size_t& characterGlobalIndex,
+                                      std::size_t& lineLayoutInfoIndex,
+                                      bool createGlyphActors )
 {
   CurrentTextActorInfo currentTextActorInfo;
 
-  const std::size_t lineLayoutInfoSize = relayoutData.mLines.size(); // Number of laid out lines.
-  bool lineLayoutEnd = false;            // Whether lineLayoutInfoIndex points at the last laid out line.
+  const std::size_t lineLayoutInfoSize = relayoutData.mLines.size(); // Number of lines.
+  bool lineLayoutEnd = false;            // Whether lineLayoutInfoIndex points at the last line.
   bool glyphActorCreatedForLine = false; // Whether a renderable actor has been created for this line.
 
   TextStyle currentStyle;                // style for the current text-actor.
@@ -1607,8 +1607,8 @@ void UpdateTextActorInfoForLine( const TextView::VisualParameters& visualParamet
 
   std::vector<TextActor> textActorsToRemove; // Keep a vector of text-actors to be included into the cache.
 
-  std::size_t characterLineIndex = 0u;   // Index to the character (within the line).
-  for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = line.mWordsLayoutInfo.begin(), wordEndIt = line.mWordsLayoutInfo.end();
+  std::size_t characterParagraphIndex = 0u;   // Index to the character (within the paragraph).
+  for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = paragraph.mWordsLayoutInfo.begin(), wordEndIt = paragraph.mWordsLayoutInfo.end();
        wordIt != wordEndIt;
        ++wordIt )
   {
@@ -1642,10 +1642,10 @@ void UpdateTextActorInfoForLine( const TextView::VisualParameters& visualParamet
       bool appendCharacter = false;
 
       if( characterLayout.mIsColorGlyph ||
-          !character.IsWhiteSpace() || // A new line character is also a white space.
+          !character.IsWhiteSpace() || // A new paragraph character is also a white space.
           ( character.IsWhiteSpace() && style.IsUnderlineEnabled() ) )
       {
-        // Do not create a glyph-actor if it's a white space (without underline) or a new line character.
+        // Do not create a glyph-actor if it's a white space (without underline) or a new paragraph character.
 
         // Creates one glyph-actor for each counsecutive group of characters, with the same style, per line, or if it's an emoticon.
 
@@ -1673,7 +1673,7 @@ void UpdateTextActorInfoForLine( const TextView::VisualParameters& visualParamet
           {
             CreateTextActor( visualParameters,
                              relayoutData,
-                             line,
+                             paragraph,
                              characterLayout,
                              character,
                              style,
@@ -1714,7 +1714,7 @@ void UpdateTextActorInfoForLine( const TextView::VisualParameters& visualParamet
             characterLayout.mGlyphActor.Reset();
           }
         }
-      } // no white space / new line char
+      } // no white space / new paragraph char
       else
       {
         appendCharacter = true;
@@ -1723,7 +1723,7 @@ void UpdateTextActorInfoForLine( const TextView::VisualParameters& visualParamet
       if( appendCharacter )
       {
         // Add the character to the current text-actor and update the size.
-        if( characterLayout.mIsVisible && ( TextViewProcessor::LineSeparator != word.mType ) )
+        if( characterLayout.mIsVisible && ( TextViewProcessor::ParagraphSeparator != word.mType ) )
         {
           currentTextActorInfo.text.Append( character );
 
@@ -1734,7 +1734,7 @@ void UpdateTextActorInfoForLine( const TextView::VisualParameters& visualParamet
       }
 
       ++characterGlobalIndex;
-      ++characterLineIndex;
+      ++characterParagraphIndex;
     } // characters
   } // words
 
@@ -1749,7 +1749,7 @@ void UpdateTextActorInfoForLine( const TextView::VisualParameters& visualParamet
       SetVisualParameters( currentTextActorInfo,
                            visualParameters,
                            relayoutData,
-                           line.mSize.height );
+                           paragraph.mSize.height );
     }
   }
 
@@ -1761,28 +1761,28 @@ void UpdateTextActorInfo( const TextView::VisualParameters& visualParameters,
                           TextView::RelayoutData& relayoutData,
                           bool createGlyphActors )
 {
-  if( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.empty() )
+  if( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.empty() )
   {
-    // nothing to do if there is no lines.
+    // nothing to do if there is no paragraphs.
     return;
   }
 
   std::size_t characterGlobalIndex = 0u; // Index to the global character (within the whole text).
-  std::size_t lineLayoutInfoIndex = 0u;  // Index to the laid out line info.
+  std::size_t lineLayoutInfoIndex = 0u;  // Index to the line info.
 
-  for( TextViewProcessor::LineLayoutInfoContainer::iterator lineIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin(), lineEndIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end();
-       lineIt != lineEndIt;
-       ++lineIt )
+  for( TextViewProcessor::ParagraphLayoutInfoContainer::iterator paragraphIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin(), paragraphEndIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end();
+       paragraphIt != paragraphEndIt;
+       ++paragraphIt )
   {
-    TextViewProcessor::LineLayoutInfo& line( *lineIt );
+    TextViewProcessor::ParagraphLayoutInfo& paragraph( *paragraphIt );
 
-    UpdateTextActorInfoForLine( visualParameters,
-                                relayoutData,
-                                line,
-                                characterGlobalIndex,
-                                lineLayoutInfoIndex,
-                                createGlyphActors );
-  } // lines
+    UpdateTextActorInfoForParagraph( visualParameters,
+                                     relayoutData,
+                                     paragraph,
+                                     characterGlobalIndex,
+                                     lineLayoutInfoIndex,
+                                     createGlyphActors );
+  } // paragraphs
 
   for( std::vector<RenderableActor>::iterator it = relayoutData.mEllipsizedGlyphActors.begin(),
          endIt = relayoutData.mEllipsizedGlyphActors.end();
@@ -1804,18 +1804,18 @@ void UpdateTextActorInfo( const TextView::VisualParameters& visualParameters,
 
 void CalculateUnderlineInfo( TextView::RelayoutData& relayoutData, TextViewRelayout::TextUnderlineStatus& textUnderlineStatus )
 {
-  // Traverse the whole text to find all groups of consecutive underlined characters in the same laid-out line.
+  // Traverse the whole text to find all groups of consecutive underlined characters in the same line.
   //
-  // Note that relayoutData.mTextLayoutInfo contains layout info per line but these lines are the result of split the whole text every time a '\n' is found.
-  // According with the layout option, one of this lines could be laid-out in more than one.
+  // Note that relayoutData.mTextLayoutInfo contains layout info per paragraph but these paragraphs are the result of split the whole text every time a '\n' is found.
+  // According with the layout option, one of this paragraphs could be laid-out in more than one line.
 
-  for( TextViewProcessor::LineLayoutInfoContainer::iterator lineIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin(), lineEndIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end();
-       lineIt != lineEndIt;
-       ++lineIt )
+  for( TextViewProcessor::ParagraphLayoutInfoContainer::iterator paragraphIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin(), paragraphEndIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end();
+       paragraphIt != paragraphEndIt;
+       ++paragraphIt )
   {
-    TextViewProcessor::LineLayoutInfo& line( *lineIt );
+    TextViewProcessor::ParagraphLayoutInfo& paragraph( *paragraphIt );
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = line.mWordsLayoutInfo.begin(), wordEndIt = line.mWordsLayoutInfo.end();
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = paragraph.mWordsLayoutInfo.begin(), wordEndIt = paragraph.mWordsLayoutInfo.end();
          wordIt != wordEndIt;
          ++wordIt )
     {
@@ -1827,7 +1827,7 @@ void CalculateUnderlineInfo( TextView::RelayoutData& relayoutData, TextViewRelay
       {
         TextViewProcessor::CharacterLayoutInfo& character( *characterIt );
 
-        // Check if current character is the first of a new laid-out line
+        // Check if current character is the first of a new line
         const bool isNewLine = ( textUnderlineStatus.mLineGlobalIndex < relayoutData.mLines.size() ) &&
           ( textUnderlineStatus.mCharacterGlobalIndex == ( *( relayoutData.mLines.begin() + textUnderlineStatus.mLineGlobalIndex ) ).mCharacterGlobalIndex );
         if( isNewLine )
@@ -1838,7 +1838,7 @@ void CalculateUnderlineInfo( TextView::RelayoutData& relayoutData, TextViewRelay
         if( character.mStyledText.mStyle.IsUnderlineEnabled() )
         {
           if( !textUnderlineStatus.mCurrentUnderlineStatus || // Current character is underlined but previous one it wasn't.
-              isNewLine )                                     // Current character is underlined and is the first of current laid-out line.
+              isNewLine )                                     // Current character is underlined and is the first of current line.
           {
             // Create a new underline info for the current underlined characters.
             UnderlineInfo underlineInfo;
@@ -1872,15 +1872,15 @@ void CalculateUnderlineInfo( TextView::RelayoutData& relayoutData, TextViewRelay
         ++textUnderlineStatus.mCharacterGlobalIndex;
       } // end characters.
     } // end words.
-  } // end lines.
+  } // end paragraphs.
 }
 
 void SetUnderlineInfo( TextView::RelayoutData& relayoutData )
 {
-  // Stores for each group of consecutive underlined characters in each laid-out line its maximum thicknes, its position of that thickness and the maximum character's height.
+  // Stores for each group of consecutive underlined characters in each line its maximum thicknes, its position of that thickness and the maximum character's height.
   TextViewRelayout::TextUnderlineStatus textUnderlineStatus;
 
-  // Traverse the whole text to find all groups of consecutive underlined characters in the same laid-out line.
+  // Traverse the whole text to find all groups of consecutive underlined characters in the same line.
   CalculateUnderlineInfo( relayoutData, textUnderlineStatus );
 
   if( textUnderlineStatus.mUnderlineInfo.empty() )
@@ -1910,13 +1910,13 @@ void SetUnderlineInfo( TextView::RelayoutData& relayoutData )
   float currentLineHeight = 0.f;
   float currentLineAscender = 0.f;
 
-  for( TextViewProcessor::LineLayoutInfoContainer::iterator lineIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin(), lineEndIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end();
-       lineIt != lineEndIt;
-       ++lineIt )
+  for( TextViewProcessor::ParagraphLayoutInfoContainer::iterator paragraphIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin(), paragraphEndIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end();
+       paragraphIt != paragraphEndIt;
+       ++paragraphIt )
   {
-    TextViewProcessor::LineLayoutInfo& line( *lineIt );
+    TextViewProcessor::ParagraphLayoutInfo& paragraph( *paragraphIt );
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = line.mWordsLayoutInfo.begin(), wordEndIt = line.mWordsLayoutInfo.end();
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = paragraph.mWordsLayoutInfo.begin(), wordEndIt = paragraph.mWordsLayoutInfo.end();
          wordIt != wordEndIt;
          ++wordIt )
     {
@@ -1928,7 +1928,7 @@ void SetUnderlineInfo( TextView::RelayoutData& relayoutData )
       {
         TextViewProcessor::CharacterLayoutInfo& character( *characterIt );
 
-        // Check if current character is the first of a new laid-out line
+        // Check if current character is the first of a new line
 
         bool isNewLine = false;
 
@@ -1996,7 +1996,7 @@ void SetUnderlineInfo( TextView::RelayoutData& relayoutData )
         ++textUnderlineStatus.mCharacterGlobalIndex;
       } // end of characters.
     } // end of word.
-  } // end of lines.
+  } // end of paragraphs.
 }
 
 void RemoveGlyphActors( Actor textView,
@@ -2019,15 +2019,15 @@ void InsertToTextView( Actor textView,
 {
   // Add text-actors to the text-view.
 
-  for( TextViewProcessor::LineLayoutInfoContainer::iterator lineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin(),
-         endLineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end();
-       lineLayoutIt != endLineLayoutIt;
-       ++lineLayoutIt )
+  for( TextViewProcessor::ParagraphLayoutInfoContainer::iterator paragraphLayoutIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin(),
+         endParagraphLayoutIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end();
+       paragraphLayoutIt != endParagraphLayoutIt;
+       ++paragraphLayoutIt )
   {
-    TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *lineLayoutIt );
+    TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo( *paragraphLayoutIt );
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.begin(),
-           endWordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.end();
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.begin(),
+           endWordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.end();
          wordLayoutIt != endWordLayoutIt;
          ++wordLayoutIt )
     {
@@ -2048,7 +2048,7 @@ void InsertToTextView( Actor textView,
         }
       } // end character
     } // end words
-  } // end lines
+  } // end paragraphs
 
   for( std::vector<RenderableActor>::iterator it = relayoutData.mEllipsizedGlyphActors.begin(),
          endIt = relayoutData.mEllipsizedGlyphActors.end();

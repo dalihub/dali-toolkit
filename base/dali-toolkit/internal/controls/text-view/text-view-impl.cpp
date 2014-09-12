@@ -869,6 +869,10 @@ TextView::LayoutParameters::LayoutParameters()
   MarkupProcessor::GetStyledTextArray( std::string( "..." ), mEllipsizeText, false );
 }
 
+TextView::LayoutParameters::~LayoutParameters()
+{
+}
+
 TextView::LayoutParameters::LayoutParameters( Toolkit::TextView::MultilinePolicy   multilinePolicy,
                                               Toolkit::TextView::ExceedPolicy      widthExceedPolicy,
                                               Toolkit::TextView::ExceedPolicy      heightExceedPolicy,

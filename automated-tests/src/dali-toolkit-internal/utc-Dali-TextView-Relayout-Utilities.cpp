@@ -54,14 +54,14 @@ bool TestEqual( float x, float y )
 
 //////////////////////////////////////////////////////////////////
 
-struct CalculateSubLineLayoutTest
+struct CalculateLineLayoutTest
 {
   std::string description;
-  std::string inputLine;
+  std::string inputParagraph;
   float parentWidth;
   std::size_t wordIndex;
   std::size_t characterIndex;
-  std::size_t characterLineIndex;
+  std::size_t characterParagraphIndex;
   TextViewRelayout::HorizontalWrapType splitPolicy;
   float shrinkFactor;
 
@@ -70,13 +70,13 @@ struct CalculateSubLineLayoutTest
   float resultMaxAscender;
 };
 
-bool TestCalculateSubLineLayout( const CalculateSubLineLayoutTest& test,  const char* location )
+bool TestCalculateLineLayout( const CalculateLineLayoutTest& test,  const char* location )
 {
   tet_printf( "%s", test.description.c_str() );
 
   // Create styled text.
   MarkupProcessor::StyledTextArray inputStyledText;
-  MarkupProcessor::GetStyledTextArray( test.inputLine, inputStyledText, true );
+  MarkupProcessor::GetStyledTextArray( test.inputParagraph, inputStyledText, true );
 
   // Create styled text layout info.
   Toolkit::Internal::TextView::RelayoutData relayoutData;
@@ -89,23 +89,23 @@ bool TestCalculateSubLineLayout( const CalculateSubLineLayoutTest& test,  const 
   // Creaqte indices.
   TextViewProcessor::TextInfoIndices indices( 0u, test.wordIndex, test.characterIndex );
 
-  // Get the input line.
-  TextViewProcessor::LineLayoutInfo inputLineLayout;
+  // Get the input paragraph.
+  TextViewProcessor::ParagraphLayoutInfo inputParagraphLayout;
 
-  if( !relayoutData.mTextLayoutInfo.mLinesLayoutInfo.empty() )
+  if( !relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.empty() )
   {
-    inputLineLayout = *relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin();
+    inputParagraphLayout = *relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin();
   }
 
   // Result struct.
-  TextViewRelayout::SubLineLayoutInfo resultLayoutInfo;
+  TextViewRelayout::LineLayoutInfo resultLayoutInfo;
 
-  CalculateSubLineLayout( test.parentWidth,
-                          indices,
-                          inputLineLayout,
-                          test.splitPolicy,
-                          test.shrinkFactor,
-                          resultLayoutInfo  );
+  CalculateLineLayout( test.parentWidth,
+                       indices,
+                       inputParagraphLayout,
+                       test.splitPolicy,
+                       test.shrinkFactor,
+                       resultLayoutInfo  );
 
   // Check results.
   if( !TestEqual( test.resultLineLength, resultLayoutInfo.mLineLength ) )
@@ -235,17 +235,17 @@ int UtcDaliTextViewDefaultConstructorDestructor_RU(void)
   TextViewRelayout::RelayoutParameters relayoutParameters;
 
   DALI_TEST_EQUALS( relayoutParameters.mPositionOffset, Vector3::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( relayoutParameters.mLineSize, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( relayoutParameters.mParagraphSize, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( relayoutParameters.mWordSize, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( relayoutParameters.mCharacterSize, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( relayoutParameters.mIndices.mLineIndex, 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( relayoutParameters.mIndices.mParagraphIndex, 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( relayoutParameters.mIndices.mWordIndex, 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( relayoutParameters.mIndices.mCharacterIndex, 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( relayoutParameters.mCharacterGlobalIndex, 0u, TEST_LOCATION );
   DALI_TEST_CHECK( !relayoutParameters.mIsFirstCharacter );
   DALI_TEST_CHECK( !relayoutParameters.mIsFirstCharacterOfWord );
   DALI_TEST_CHECK( !relayoutParameters.mIsNewLine );
-  DALI_TEST_CHECK( !relayoutParameters.mIsNewLineCharacter );
+  DALI_TEST_CHECK( !relayoutParameters.mIsNewParagraphCharacter );
   DALI_TEST_CHECK( !relayoutParameters.mIsWhiteSpace );
   DALI_TEST_CHECK( !relayoutParameters.mIsVisible );
 
@@ -306,27 +306,27 @@ int UtcDaliTextViewDefaultConstructorDestructor_RU(void)
   DALI_TEST_EQUALS( textUnderlineStatus.mLineGlobalIndex, 0u, TEST_LOCATION );
   DALI_TEST_CHECK( !textUnderlineStatus.mCurrentUnderlineStatus );
 
-  // Test SubLineLayoutInfo defaults
-  TextViewRelayout::SubLineLayoutInfo subLineLayoutInfo;
+  // Test LineLayoutInfo defaults
+  TextViewRelayout::LineLayoutInfo lineLayoutInfo;
 
-  DALI_TEST_EQUALS( subLineLayoutInfo.mLineLength, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( subLineLayoutInfo.mMaxCharHeight, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( subLineLayoutInfo.mMaxAscender, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( lineLayoutInfo.mLineLength, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( lineLayoutInfo.mMaxCharHeight, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( lineLayoutInfo.mMaxAscender, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliTextViewCalculateSubLineLayout(void)
+int UtcDaliTextViewCalculateLineLayout(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline("UtcDaliTextViewCalculateSubLineLayout : ");
+  tet_infoline("UtcDaliTextViewCalculateLineLayout : ");
 
-  struct CalculateSubLineLayoutTest calculateSubLineLayoutTest[] =
+  struct CalculateLineLayoutTest calculateLineLayoutTest[] =
   {
     //WrapByCharacter
     {
-      "The line is wraped by character. All characters have the same size.",
-      "Hello world", // input line
+      "The paragraph is wraped by character. All characters have the same size.",
+      "Hello world", // input paragraph
       100.f,         // parent width
       0,             // indices
       0,
@@ -339,8 +339,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       10.242188f  // max ascender
     },
     {
-      "The line is wraped by character. There are characters with different sizes.",
-      "Hello <font size='14'>world</font>", // input line
+      "The paragraph is wraped by character. There are characters with different sizes.",
+      "Hello <font size='14'>world</font>", // input paragraph
       100.f,         // parent width
       0,              // indices
       0,
@@ -353,8 +353,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       11.949220f  // max ascender
     },
     {
-      "The line is wraped by character. There are characters with different sizes. It calculates the layout for the second line.",
-      "Hello <font size='14'>wo</font>rld hell<font size='14'>o world</font>", // input line
+      "The paragraph is wraped by character. There are characters with different sizes. It calculates the layout for the second line.",
+      "Hello <font size='14'>wo</font>rld hell<font size='14'>o world</font>", // input paragraph
       100.f,         // parent width
       2,              // indices. The third character of the third word starts in a new line.
       2,
@@ -367,8 +367,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       10.242188f  // max ascender
     },
     {
-      "The line is wraped by character. There are characters with different sizes. It calculates the layout for the third line.",
-      "Hello <font size='14'>wo</font>rld hell<font size='14'>o world</font>", // input line
+      "The paragraph is wraped by character. There are characters with different sizes. It calculates the layout for the third line.",
+      "Hello <font size='14'>wo</font>rld hell<font size='14'>o world</font>", // input paragraph
       100.f,         // parent width
       4,              // indices. The fifth character of the fifth word starts in a new line.
       4,
@@ -383,8 +383,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
 
     //WrapByWord
     {
-      "The line is wraped by word. All characters have the same size.",
-      "Hello world", // input line
+      "The paragraph is wraped by word. All characters have the same size.",
+      "Hello world", // input paragraph
       100.f,         // parent width
       0,              // indices. It shouldn't use the index character so 9999999 shouldn't make it crash.
       9999999,
@@ -397,8 +397,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       10.242188f  // max ascender
     },
     {
-      "The line is wraped by word. There are characters with different sizes.",
-      "Hell<font size='14'>o</font> world", // input line
+      "The paragraph is wraped by word. There are characters with different sizes.",
+      "Hell<font size='14'>o</font> world", // input paragraph
       100.f,         // parent width
       0,              // indices.
       0,
@@ -411,8 +411,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       11.949220f  // max ascender
     },
     {
-      "The line is wraped by word. There are characters with different sizes. It calculates the layout for the second line.",
-      "Hello <font size='14'>wo</font>rld <font size='16'>hello world</font>", // input line
+      "The paragraph is wraped by word. There are characters with different sizes. It calculates the layout for the second line.",
+      "Hello <font size='14'>wo</font>rld <font size='16'>hello world</font>", // input paragraph
       100.f,         // parent width
       2,              // indices. The third word starts in a new line.
       0,
@@ -425,8 +425,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       11.949220f  // max ascender
     },
     {
-      "The line is wraped by word. The word doen't fit.",
-      "Hello world", // input line
+      "The paragraph is wraped by word. The word doen't fit.",
+      "Hello world", // input paragraph
       40.f,          // parent width
       0,              // indices. The third word starts in a new line.
       0,
@@ -441,8 +441,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
 
     //WrapByWordAndSplit
     {
-      "The line is wraped by word and by character. All characters have the same size. There is not a long word.",
-      "Hello world hello world", // input line
+      "The paragraph is wraped by word and by character. All characters have the same size. There is not a long word.",
+      "Hello world hello world", // input paragraph
       100.f,         // parent width
       0,              // indices.
       0,
@@ -455,8 +455,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       10.242188f  // max ascender
     },
     {
-      "The line is wraped by word and by character. All characters have the same size. There is a long word.",
-      "Helloooooooo world", // input line
+      "The paragraph is wraped by word and by character. All characters have the same size. There is a long word.",
+      "Helloooooooo world", // input paragraph
       100.f,         // parent width
       0,              // indices.
       0,
@@ -469,8 +469,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       10.242188f  // max ascender
     },
     {
-      "The line is wraped by word and by character. There are characters with different sizes. There is a long word. It calculates the layout for the second line.",
-      "Helloooooooo <font size='14'>world</font>", // input line
+      "The paragraph is wraped by word and by character. There are characters with different sizes. There is a long word. It calculates the layout for the second line.",
+      "Helloooooooo <font size='14'>world</font>", // input paragraph
       100.f,         // parent width
       0,              // indices.
       8,
@@ -483,8 +483,8 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       10.242188f  // max ascender
     },
     {
-      "The line is wraped by word and by character. There are characters with different sizes. There is a shrink factor.",
-      "Helloooooooo<font size='14'> world</font>", // input line
+      "The paragraph is wraped by word and by character. There are characters with different sizes. There is a shrink factor.",
+      "Helloooooooo<font size='14'> world</font>", // input paragraph
       100.f,         // parent width
       0,              // indices.
       8,
@@ -497,15 +497,15 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       7.169531f  // max ascender
     },
 
-    //WrapByLineAndSplit
+    //WrapByParagraphCharacterAndSplit
     {
-      "The line is wraped by end of line and by character. All characters have the same size.",
-      "Hello world", // input line
+      "The paragraph is wraped by end of paragraph and by character. All characters have the same size.",
+      "Hello world", // input paragraph
       100.f,         // parent width
       0,              // indices
       0,
       0,
-      TextViewRelayout::WrapByLineAndSplit, // split policy
+      TextViewRelayout::WrapByParagraphCharacterAndSplit, // split policy
       1.f,
       // results
       91.041672f, // line length. (only fits 8 characters 8x11.38)
@@ -513,13 +513,13 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       10.242188f  // max ascender
     },
     {
-      "The line fits in the width.",
-      "Hello", // input line
+      "The paragraph fits in the width.",
+      "Hello", // input paragraph
       100.f,         // parent width
       0,             // indices
       0,
       0,
-      TextViewRelayout::WrapByLineAndSplit, // split policy
+      TextViewRelayout::WrapByParagraphCharacterAndSplit, // split policy
       1.f,
       // results
       56.901047f, // line length. (only fits 5 characters 5x11.38)
@@ -527,13 +527,13 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
       10.242188f  // max ascender
     },
     {
-      "The line is wraped by end of line and by character. All characters have the same size. It calculates the layout for the second line.",
-      "Hello world, hello world", // input line
+      "The paragraph is wraped by end of paragraph and by character. All characters have the same size. It calculates the layout for the second line.",
+      "Hello world, hello world", // input paragraph
       100.f,         // parent width
       2,             // indices
       2,
       8,
-      TextViewRelayout::WrapByLineAndSplit, // split policy
+      TextViewRelayout::WrapByParagraphCharacterAndSplit, // split policy
       1.f,
       // results
       91.041672f, // line length. (only fits 8 characters 8x11.38)
@@ -545,9 +545,9 @@ int UtcDaliTextViewCalculateSubLineLayout(void)
 
   for( std::size_t index = 0; index < numberOfTests; ++index )
   {
-    const CalculateSubLineLayoutTest& test = calculateSubLineLayoutTest[index];
+    const CalculateLineLayoutTest& test = calculateLineLayoutTest[index];
 
-    if( !TestCalculateSubLineLayout( test, TEST_LOCATION ) )
+    if( !TestCalculateLineLayout( test, TEST_LOCATION ) )
     {
       tet_result( TET_FAIL );
     }

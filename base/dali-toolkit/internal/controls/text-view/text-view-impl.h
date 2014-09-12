@@ -591,6 +591,11 @@ public:
     LayoutParameters();
 
     /**
+     * Default destructor.
+     */
+    ~LayoutParameters();
+
+    /**
      * Constructor
      */
     LayoutParameters( Toolkit::TextView::MultilinePolicy     multilinePolicy,

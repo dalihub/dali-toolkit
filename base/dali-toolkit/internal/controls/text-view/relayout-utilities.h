@@ -40,15 +40,15 @@ namespace TextViewRelayout
 extern const float MINIMUM_FADE_BOUNDARY; // When the fade boundary is the same as the text-view boundary, this constant reduces it in order to avoid a zero division.
 
 /**
- * Define the type of line wrap.
+ * Define how to wrap a paragraph in lines.
  */
 enum HorizontalWrapType
 {
-  WrapByCharacter,    ///< Wrap a line per character (It may split a word in two).
-  WrapByWord,         ///< Wrap a line by word.
-  WrapByWordAndSplit, ///< Wrap the line by word and split a word if it doesn't fit.
-  WrapByLine,         ///< Wrap the line when a \n is found.
-  WrapByLineAndSplit  ///< Wrap the line when a \n is found and split if it doesn't fit.
+  WrapByCharacter,                  ///< Wrap the paragraph per character (It may split a word in two).
+  WrapByWord,                       ///< Wrap the paragraph by word.
+  WrapByWordAndSplit,               ///< Wrap the paragraph by word and split a word if it doesn't fit.
+  WrapByParagraphCharacter,         ///< Wrap the paragraph when a '\n' is found.
+  WrapByParagraphCharacterAndSplit  ///< Wrap the paragraph when a '\n' is found and split if it doesn't fit.
 };
 
 /**
@@ -83,18 +83,18 @@ struct RelayoutParameters
    */
   ~RelayoutParameters();
 
-  Vector3                            mPositionOffset;           ///< Offset (position.x + size.width, position.y, position.z) of the previous text-actor.
-  Size                               mLineSize;                 ///< Current line's size.
-  Size                               mWordSize;                 ///< Current word's size.
-  Size                               mCharacterSize;            ///< Current character's size.
-  TextViewProcessor::TextInfoIndices mIndices;                  ///< Current indices to line, word and character.
-  std::size_t                        mCharacterGlobalIndex;     ///< Index to a single character within the whole text.
-  bool                               mIsFirstCharacter:1;       ///< Whether is the first character of the whole text.
-  bool                               mIsFirstCharacterOfWord:1; ///< Whether is the first character of the word.
-  bool                               mIsNewLine:1;              ///< Whether the current character is the first character of a new line.
-  bool                               mIsNewLineCharacter:1;     ///< Whether the current character is a new line character.
-  bool                               mIsWhiteSpace:1;           ///< Whether the current character is a white space.
-  bool                               mIsVisible:1;              ///< Whether the current character is visible.
+  Vector3                            mPositionOffset;            ///< Offset (position.x + size.width, position.y, position.z) of the previous text-actor.
+  Size                               mParagraphSize;             ///< Current paragraphs's size.
+  Size                               mWordSize;                  ///< Current word's size.
+  Size                               mCharacterSize;             ///< Current character's size.
+  TextViewProcessor::TextInfoIndices mIndices;                   ///< Current indices to paragraph, word and character.
+  std::size_t                        mCharacterGlobalIndex;      ///< Index to a single character within the whole text.
+  bool                               mIsFirstCharacter:1;        ///< Whether is the first character of the whole text.
+  bool                               mIsFirstCharacterOfWord:1;  ///< Whether is the first character of the word.
+  bool                               mIsNewLine:1;               ///< Whether the current character is the first character of a new line.
+  bool                               mIsNewParagraphCharacter:1; ///< Whether the current character is a new paragraph character.
+  bool                               mIsWhiteSpace:1;            ///< Whether the current character is a white space.
+  bool                               mIsVisible:1;               ///< Whether the current character is visible.
 };
 
 /**
@@ -160,10 +160,10 @@ struct EllipsizeParameters
 
   Vector3     mPosition;                       ///< Position of the first character of the ellipsize text.
   float       mLineDescender;                  ///< Distance from the base line to the bottom.
-  float       mLineWidth;                      ///< Current laid out line's width.
+  float       mLineWidth;                      ///< Current line's width.
   Size        mEllipsizeBoundary;              ///< Where to start to ellipsize a line.
-  std::size_t mFirstIndex;                     ///< Global index within the whole text of the first character of the laid out line.
-  std::size_t mLastIndex;                      ///< Global index within the whole text of the last character of the laid out line.
+  std::size_t mFirstIndex;                     ///< Global index within the whole text of the first character of the line.
+  std::size_t mLastIndex;                      ///< Global index within the whole text of the last character of the line.
   bool        mEllipsizeLine:1;                ///< Whether current line must be ellipsized.
   bool        mIsLineWidthFullyVisible:1;      ///< Whether current line fits in text-view's width.
   bool        mIsLineHeightFullyVisible:1;     ///< Whether current line fits in text-view's height.
@@ -174,7 +174,7 @@ struct EllipsizeParameters
 };
 
 /**
- * Stores underline info for a group of consecutive characters in the same laid out line.
+ * Stores underline info for a group of consecutive characters in the same line.
  */
 struct UnderlineInfo
 {
@@ -219,50 +219,50 @@ struct TextUnderlineStatus
 
   std::vector<UnderlineInfo> mUnderlineInfo;            ///< Underline info for each group of consecutive underlined characters.
   std::size_t                mCharacterGlobalIndex;     ///< Global index (within the whole text) to current character.
-  std::size_t                mLineGlobalIndex;          ///< Index to current laid out line. It takes into account the current layout configuration (is not the number of \n)
+  std::size_t                mLineGlobalIndex;          ///< Index to current line. It takes into account the current layout configuration (is not the number of \n)
   bool                       mCurrentUnderlineStatus:1; ///< Whether current character is underlined.
 };
 
 /**
- * Stores layout information of the piece of a line.
+ * Stores layout information of a line.
  */
-struct SubLineLayoutInfo
+struct LineLayoutInfo
 {
   /**
    * Default constructor.
    *
    * Initializes each member to its default.
    */
-  SubLineLayoutInfo();
+  LineLayoutInfo();
 
   /**
    * Empty destructor.
    *
    * @note Added to increase coverage.
    */
-  ~SubLineLayoutInfo();
+  ~LineLayoutInfo();
 
-  float mLineLength;    ///< The length of the portion of the line which fits on the text-view width.
-  float mMaxCharHeight; ///< The maximum height of all characters of the portion of line which fits on the text-view width.
-  float mMaxAscender;   ///< The maximum ascender of all characters of the portion of line which fits on the text-view width.
+  float mLineLength;    ///< The length of the portion of the paragraph which fits on the text-view width.
+  float mMaxCharHeight; ///< The maximum height of all characters of the portion of the paragraph which fits on the text-view width.
+  float mMaxAscender;   ///< The maximum ascender of all characters of the portion of the paragraph which fits on the text-view width.
 };
 
 /**
- * Calculates the layout info of the portion of the line which fits on the text-view width.
+ * Calculates the layout info of the portion of the paragraph which fits on the text-view width.
  *
  * @param[in] parentWidth Text-view width
  * @param[in] indices Indices to the word and character.
- * @param[in] lineLayoutInfo Layout info for the line.
- * @param[in] splitPolicy Whether a line is wraped by word, by character or by word and character.
+ * @param[in] paragraphLayoutInfo Layout info for the paragraph.
+ * @param[in] splitPolicy Whether a paragraph is wraped by word, by character or by word and character.
  * @param[in] shrinkFactor Shrink factor used.
- * @param[out] layoutInfo Layout information of the part of the line which fits in the text-view width.
+ * @param[out] layoutInfo Layout information of the part of the paragraph which fits in the text-view width.
  */
-void CalculateSubLineLayout( float parentWidth,
-                             const TextViewProcessor::TextInfoIndices& indices,
-                             const TextViewProcessor::LineLayoutInfo& lineLayoutInfo,
-                             HorizontalWrapType splitPolicy,
-                             float shrinkFactor,
-                             SubLineLayoutInfo& layoutInfo );
+void CalculateLineLayout( float parentWidth,
+                          const TextViewProcessor::TextInfoIndices& indices,
+                          const TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo,
+                          HorizontalWrapType splitPolicy,
+                          float shrinkFactor,
+                          LineLayoutInfo& layoutInfo );
 
 /**
  * Calculates the \e x offset position for the whole text.

@@ -49,7 +49,7 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/controls/text-view/text-processor.cpp   \
    $(toolkit_base_src_dir)/controls/text-view/text-view-impl.cpp   \
    $(toolkit_base_src_dir)/controls/text-view/text-view-character-processor.cpp  \
-   $(toolkit_base_src_dir)/controls/text-view/text-view-line-processor.cpp  \
+   $(toolkit_base_src_dir)/controls/text-view/text-view-paragraph-processor.cpp  \
    $(toolkit_base_src_dir)/controls/text-view/text-view-processor.cpp  \
    $(toolkit_base_src_dir)/controls/text-view/text-view-processor-dbg.cpp  \
    $(toolkit_base_src_dir)/controls/text-view/text-view-processor-helper-functions.cpp  \

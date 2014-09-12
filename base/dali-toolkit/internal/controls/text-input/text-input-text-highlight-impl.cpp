@@ -159,7 +159,7 @@ TextHighlight::HighlightInfo TextHighlight::CalculateHighlightInfo( std::size_t 
           // TODO: TextView should have a table of visual rows, and each character a reference to the row
           // that it resides on. That way this enumeration is not necessary.
           Vector2 min, max;
-          if(lastIt->mIsNewLineChar)
+          if(lastIt->mIsNewParagraphChar)
           {
             // If the last character is a new line, then to get the row rect, we need to scan from the character before the new line.
             lastIt = std::max( textLayoutInfo.mCharacterLayoutInfoTable.begin(), lastIt - 1 );
@@ -206,7 +206,7 @@ TextHighlight::HighlightInfo TextHighlight::CalculateHighlightInfo( std::size_t 
       {
         // finished selection.
         Vector2 min, max;
-        if(lastIt->mIsNewLineChar)
+        if(lastIt->mIsNewParagraphChar)
         {
           lastIt = std::max( textLayoutInfo.mCharacterLayoutInfoTable.begin(), lastIt - 1 );
         }

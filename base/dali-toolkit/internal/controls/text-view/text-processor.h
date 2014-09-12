@@ -34,27 +34,27 @@ namespace TextProcessor
 {
 
 /**
- * Splits the given text in lines.
+ * Splits the given text in paragraphs.
  *
  * @note Assumes the StyledTextArray has 1 Character per Text element. (which is the case for text in TextInput, but
  * not necessarily the case for text in TextView)
  *
  * @param [in] text The given text.
- * @param [out] lines The text split in lines.
+ * @param [out] paragraphs The text split in paragraphs.
  */
-void SplitInLines( const MarkupProcessor::StyledTextArray& text,
-                   std::vector<MarkupProcessor::StyledTextArray>& lines );
+void SplitInParagraphs( const MarkupProcessor::StyledTextArray& text,
+                        std::vector<MarkupProcessor::StyledTextArray>& paragraphs );
 
 /**
- * Splits the given line in words.
+ * Splits the given paragraph in words.
  *
  * @note Assumes the StyledTextArray has 1 Character per Text element. (which is the case for text in TextInput, but
  * not necessarily the case for text in TextView)
  *
- * @param [in] line The given line.
- * @param [out] words The line split in words.
+ * @param [in] paragraph The given paragraph.
+ * @param [out] words The paragraph split in words.
  */
-void SplitInWords( const MarkupProcessor::StyledTextArray& line,
+void SplitInWords( const MarkupProcessor::StyledTextArray& paragraph,
                    std::vector<MarkupProcessor::StyledTextArray>& words );
 
 /**

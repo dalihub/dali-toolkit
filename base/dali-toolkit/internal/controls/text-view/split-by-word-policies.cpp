@@ -50,7 +50,7 @@ Vector3 OriginalPosition( const TextViewRelayout::RelayoutParameters& relayoutPa
       ( relayoutParameters.mIsFirstCharacterOfWord && ( wordOffset + relayoutParameters.mWordSize.width > relayoutData.mTextViewSize.width ) ) )
   {
     if( !relayoutParameters.mIsNewLine &&
-        ( relayoutParameters.mIsWhiteSpace || relayoutParameters.mIsNewLineCharacter ) )
+        ( relayoutParameters.mIsWhiteSpace || relayoutParameters.mIsNewParagraphCharacter ) )
     {
       // Current character is a white space. Don't want to move a white space to the next line.
       // These white spaces are placed just in the edge.
@@ -58,27 +58,27 @@ Vector3 OriginalPosition( const TextViewRelayout::RelayoutParameters& relayoutPa
     }
     else
     {
-      // Calculates the length of the portion of the line which doesn't exceed the text-view's width and the max character height for the current line.
-      TextViewRelayout::SubLineLayoutInfo subLineInfo;
+      // Calculates the length of the portion of the paragraph which doesn't exceed the text-view's width and the max character height for the current line.
+      TextViewRelayout::LineLayoutInfo subLineInfo;
       subLineInfo.mLineLength = 0.f;
       subLineInfo.mMaxCharHeight = 0.f;
       subLineInfo.mMaxAscender = 0.f;
-      const TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + relayoutParameters.mIndices.mLineIndex ) );
+      const TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + relayoutParameters.mIndices.mParagraphIndex ) );
 
-      TextViewRelayout::CalculateSubLineLayout( relayoutData.mTextViewSize.width,
-                                                relayoutParameters.mIndices,
-                                                lineLayoutInfo,
-                                                TextViewRelayout::WrapByWord,
-                                                1.f, // Shrink factor
-                                                subLineInfo );
+      TextViewRelayout::CalculateLineLayout( relayoutData.mTextViewSize.width,
+                                             relayoutParameters.mIndices,
+                                             paragraphLayoutInfo,
+                                             TextViewRelayout::WrapByWord,
+                                             1.f, // Shrink factor
+                                             subLineInfo );
 
       if( subLineInfo.mLineLength < Math::MACHINE_EPSILON_1000 )
       {
         // It may mean there is a word which is actually longer than the width of the text-view.
         // In that case the length of this word is needed.
-        if( !lineLayoutInfo.mWordsLayoutInfo.empty() )
+        if( !paragraphLayoutInfo.mWordsLayoutInfo.empty() )
         {
-          const TextViewProcessor::WordLayoutInfo& wordLayoutInfo( *( lineLayoutInfo.mWordsLayoutInfo.begin() + relayoutParameters.mIndices.mWordIndex ) );
+          const TextViewProcessor::WordLayoutInfo& wordLayoutInfo( *( paragraphLayoutInfo.mWordsLayoutInfo.begin() + relayoutParameters.mIndices.mWordIndex ) );
           subLineInfo.mLineLength = wordLayoutInfo.mSize.width;
         }
       }
@@ -93,8 +93,8 @@ Vector3 OriginalPosition( const TextViewRelayout::RelayoutParameters& relayoutPa
 
       Toolkit::TextView::LineLayoutInfo lineInfo;
       lineInfo.mCharacterGlobalIndex = relayoutParameters.mCharacterGlobalIndex;    // Index to the first character of the next line.
-      lineInfo.mSize = Size( subLineInfo.mLineLength, subLineInfo.mMaxCharHeight ); // Size of this piece of line.
-      lineInfo.mAscender = subLineInfo.mMaxAscender;                                // Ascender of this piece of line.
+      lineInfo.mSize = Size( subLineInfo.mLineLength, subLineInfo.mMaxCharHeight ); // Size of this piece of paragraph.
+      lineInfo.mAscender = subLineInfo.mMaxAscender;                                // Ascender of this piece of paragraph.
       relayoutData.mLines.push_back( lineInfo );
 
       return Vector3( 0.f, previousPositionY + subLineInfo.mMaxCharHeight + layoutParameters.mLineHeightOffset, 0.f );
@@ -125,7 +125,7 @@ Vector3 SplitWhenExceedPosition( const TextViewRelayout::RelayoutParameters& rel
       ( wordOffset + relayoutParameters.mCharacterSize.width > relayoutData.mTextViewSize.width ) )
   {
     if( !relayoutParameters.mIsNewLine &&
-        ( relayoutParameters.mIsWhiteSpace || relayoutParameters.mIsNewLineCharacter ) )
+        ( relayoutParameters.mIsWhiteSpace || relayoutParameters.mIsNewParagraphCharacter ) )
     {
       // Current character is a white space. Don't want to move a white space to the next line.
       // These white spaces are placed just in the edge.
@@ -134,18 +134,18 @@ Vector3 SplitWhenExceedPosition( const TextViewRelayout::RelayoutParameters& rel
     else
     {
       // Calculates the line length and the max character height for the current line.
-      TextViewRelayout::SubLineLayoutInfo subLineInfo;
+      TextViewRelayout::LineLayoutInfo subLineInfo;
       subLineInfo.mLineLength = 0.f;
       subLineInfo.mMaxCharHeight = 0.f;
       subLineInfo.mMaxAscender = 0.f;
-      const TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + relayoutParameters.mIndices.mLineIndex ) );
+      const TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + relayoutParameters.mIndices.mParagraphIndex ) );
 
-      TextViewRelayout::CalculateSubLineLayout( relayoutData.mTextViewSize.width,
-                                                relayoutParameters.mIndices,
-                                                lineLayoutInfo,
-                                                TextViewRelayout::WrapByWordAndSplit,
-                                                1.f, // Shrink factor.
-                                                subLineInfo );
+      TextViewRelayout::CalculateLineLayout( relayoutData.mTextViewSize.width,
+                                             relayoutParameters.mIndices,
+                                             paragraphLayoutInfo,
+                                             TextViewRelayout::WrapByWordAndSplit,
+                                             1.f, // Shrink factor.
+                                             subLineInfo );
 
       // Stores some info to calculate the line justification in a post-process.
       TextView::LineJustificationInfo justificationInfo;
@@ -157,8 +157,8 @@ Vector3 SplitWhenExceedPosition( const TextViewRelayout::RelayoutParameters& rel
 
       Toolkit::TextView::LineLayoutInfo lineInfo;
       lineInfo.mCharacterGlobalIndex = relayoutParameters.mCharacterGlobalIndex;    // Index to the first character of the next line.
-      lineInfo.mSize = Size( subLineInfo.mLineLength, subLineInfo.mMaxCharHeight ); // Size of this piece of line.
-      lineInfo.mAscender = subLineInfo.mMaxAscender;                                // Ascender of this piece of line.
+      lineInfo.mSize = Size( subLineInfo.mLineLength, subLineInfo.mMaxCharHeight ); // Size of this piece of paragraph.
+      lineInfo.mAscender = subLineInfo.mMaxAscender;                                // Ascender of this piece of paragraph.
       relayoutData.mLines.push_back( lineInfo );
 
       return Vector3( 0.f, previousPositionY + subLineInfo.mMaxCharHeight + layoutParameters.mLineHeightOffset, 0.f );
@@ -189,7 +189,7 @@ Vector3 ShrinkWidthWhenExceedPosition( const TextViewRelayout::RelayoutParameter
       ( relayoutParameters.mIsFirstCharacterOfWord && ( wordOffset + wordSize.width > relayoutData.mTextViewSize.width ) ) ) // The word doesn't fit in the parent width.
   {
     if( !relayoutParameters.mIsNewLine &&
-        ( relayoutParameters.mIsWhiteSpace || relayoutParameters.mIsNewLineCharacter ) )
+        ( relayoutParameters.mIsWhiteSpace || relayoutParameters.mIsNewParagraphCharacter ) )
     {
       // Current character is a white space. Don't want to move a white space to the next line.
       // These white spaces are placed just in the edge.
@@ -198,18 +198,18 @@ Vector3 ShrinkWidthWhenExceedPosition( const TextViewRelayout::RelayoutParameter
     else
     {
       // Calculates the line length and the max character height for the current line.
-      TextViewRelayout::SubLineLayoutInfo subLineInfo;
+      TextViewRelayout::LineLayoutInfo subLineInfo;
       subLineInfo.mLineLength = 0.f;
       subLineInfo.mMaxCharHeight = 0.f;
       subLineInfo.mMaxAscender = 0.f;
-      const TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + relayoutParameters.mIndices.mLineIndex ) );
+      const TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + relayoutParameters.mIndices.mParagraphIndex ) );
 
-      TextViewRelayout::CalculateSubLineLayout( relayoutData.mTextViewSize.width,
-                                                relayoutParameters.mIndices,
-                                                lineLayoutInfo,
-                                                TextViewRelayout::WrapByWord,
-                                                relayoutData.mShrinkFactor,
-                                                subLineInfo );
+      TextViewRelayout::CalculateLineLayout( relayoutData.mTextViewSize.width,
+                                             relayoutParameters.mIndices,
+                                             paragraphLayoutInfo,
+                                             TextViewRelayout::WrapByWord,
+                                             relayoutData.mShrinkFactor,
+                                             subLineInfo );
 
       // Stores some info to calculate the line justification in a post-process.
       TextView::LineJustificationInfo justificationInfo;
@@ -221,8 +221,8 @@ Vector3 ShrinkWidthWhenExceedPosition( const TextViewRelayout::RelayoutParameter
 
       Toolkit::TextView::LineLayoutInfo lineInfo;
       lineInfo.mCharacterGlobalIndex = relayoutParameters.mCharacterGlobalIndex;    // Index to the first character of the next line.
-      lineInfo.mSize = Size( subLineInfo.mLineLength, subLineInfo.mMaxCharHeight ); // Size of this piece of line.
-      lineInfo.mAscender = subLineInfo.mMaxAscender;                                // Ascender of this piece of line.
+      lineInfo.mSize = Size( subLineInfo.mLineLength, subLineInfo.mMaxCharHeight ); // Size of this piece of paragraph.
+      lineInfo.mAscender = subLineInfo.mMaxAscender;                                // Ascender of this piece of paragraph.
       relayoutData.mLines.push_back( lineInfo );
 
       return Vector3( 0.f, previousPositionY + subLineInfo.mMaxCharHeight + layoutParameters.mLineHeightOffset * relayoutData.mShrinkFactor, 0.f );
@@ -255,26 +255,26 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
   // Stores the position of the previous character.
   Vector3 previousPosition;
 
-  // Reset the index of lines.
+  // Reset the index of paragraphs.
   TextViewProcessor::TextInfoIndices indices;
 
-  // Whether the last character of the whole text is a new line char.
+  // Whether the last character of the whole text is a new paragraph char.
   // This information is used to increase or not the height of the whole text by one line.
   // Increase the whole text's height by one line is useful i.e. in TextInput to place the cursor
-  // after pressing 'Enter' in the last line.
-  bool isLastCharacterNewLineChar = false;
+  // after pressing 'Enter' in the last paragraph.
+  bool isLastCharacterNewParagraphChar = false;
   // Stores the height of the last character. This height used to be added to the whole text height if
-  // isLastCharacterNewLineChar is true.
+  // isLastCharacterNewParagraphChar is true.
   float lastCharHeight = 0.f;
 
   relayoutData.mLines.clear();
   std::size_t characterGlobalIndex = 0u;
 
-  for( TextViewProcessor::LineLayoutInfoContainer::iterator lineIt = textLayoutInfo.mLinesLayoutInfo.begin(), lineEndIt = textLayoutInfo.mLinesLayoutInfo.end();
-       lineIt != lineEndIt;
-       ++lineIt, ++indices.mLineIndex )
+  for( TextViewProcessor::ParagraphLayoutInfoContainer::iterator paragraphIt = textLayoutInfo.mParagraphsLayoutInfo.begin(), paragraphEndIt = textLayoutInfo.mParagraphsLayoutInfo.end();
+       paragraphIt != paragraphEndIt;
+       ++paragraphIt, ++indices.mParagraphIndex )
   {
-    TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *lineIt );
+    TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo( *paragraphIt );
 
     // The next character is in a new line.
     bool isNewLine = true;
@@ -282,7 +282,7 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
     // Reset the index of words.
     indices.mWordIndex = 0u;
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = lineLayoutInfo.mWordsLayoutInfo.begin(), wordEndIt = lineLayoutInfo.mWordsLayoutInfo.end();
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = paragraphLayoutInfo.mWordsLayoutInfo.begin(), wordEndIt = paragraphLayoutInfo.mWordsLayoutInfo.end();
          wordIt != wordEndIt;
          ++wordIt, ++indices.mWordIndex )
     {
@@ -295,7 +295,7 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
       bool isFirstCharOfWord = true;
       const float wordOffset = previousPosition.x + previousSize.width;
 
-      isLastCharacterNewLineChar = ( TextViewProcessor::LineSeparator == wordLayoutInfo.mType );
+      isLastCharacterNewParagraphChar = ( TextViewProcessor::ParagraphSeparator == wordLayoutInfo.mType );
 
       for( TextViewProcessor::CharacterLayoutInfoContainer::iterator charIt = wordLayoutInfo.mCharactersLayoutInfo.begin(), charEndIt = wordLayoutInfo.mCharactersLayoutInfo.end();
            charIt != charEndIt;
@@ -312,16 +312,16 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
           isFirstChar = false;
 
           // Calculates the line length and the max character height for the current line.
-          TextViewRelayout::SubLineLayoutInfo subLineInfo;
+          TextViewRelayout::LineLayoutInfo subLineInfo;
           subLineInfo.mLineLength = 0.f;
           subLineInfo.mMaxCharHeight = 0.f;
           subLineInfo.mMaxAscender = 0.f;
-          TextViewRelayout::CalculateSubLineLayout( parentWidth,
-                                                    indices,
-                                                    lineLayoutInfo,
-                                                    TextViewRelayout::WrapByWord,
-                                                    shrinkFactor,
-                                                    subLineInfo );
+          TextViewRelayout::CalculateLineLayout( parentWidth,
+                                                 indices,
+                                                 paragraphLayoutInfo,
+                                                 TextViewRelayout::WrapByWord,
+                                                 shrinkFactor,
+                                                 subLineInfo );
 
           characterLayoutInfo.mPosition = Vector3( 0.f, previousPositionY + subLineInfo.mMaxCharHeight + layoutParameters.mLineHeightOffset * shrinkFactor, 0.f );
 
@@ -329,8 +329,8 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
 
           Toolkit::TextView::LineLayoutInfo lineInfo;
           lineInfo.mCharacterGlobalIndex = characterGlobalIndex;                        // Index to the first character of the next line.
-          lineInfo.mSize = Size( subLineInfo.mLineLength, subLineInfo.mMaxCharHeight ); // Size of this piece of line.
-          lineInfo.mAscender = subLineInfo.mMaxAscender;                                // Ascender of this piece of line.
+          lineInfo.mSize = Size( subLineInfo.mLineLength, subLineInfo.mMaxCharHeight ); // Size of this piece of paragraph.
+          lineInfo.mAscender = subLineInfo.mMaxAscender;                                // Ascender of this piece of paragraph.
           relayoutData.mLines.push_back( lineInfo );
 
           // Stores some info to calculate the line justification in a post-process.
@@ -361,7 +361,7 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
     }
   }
 
-  if( isLastCharacterNewLineChar )
+  if( isLastCharacterNewParagraphChar )
   {
     newTextHeight += lastCharHeight + layoutParameters.mLineHeightOffset * shrinkFactor;
   }
@@ -475,28 +475,28 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
 
   relayoutParameters.mPositionOffset = Vector3::ZERO;
   relayoutParameters.mIsFirstCharacter = true;
-  relayoutParameters.mIndices.mLineIndex = 0u;
+  relayoutParameters.mIndices.mParagraphIndex = 0u;
   relayoutParameters.mCharacterGlobalIndex = 0u;
 
-  for( TextViewProcessor::LineLayoutInfoContainer::iterator lineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin(),
-       endLineLayoutIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end();
-       lineLayoutIt != endLineLayoutIt;
-       ++lineLayoutIt, ++relayoutParameters.mIndices.mLineIndex )
+  for( TextViewProcessor::ParagraphLayoutInfoContainer::iterator paragraphLayoutIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin(),
+       endParagraphLayoutIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end();
+       paragraphLayoutIt != endParagraphLayoutIt;
+       ++paragraphLayoutIt, ++relayoutParameters.mIndices.mParagraphIndex )
   {
-    TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *lineLayoutIt );
+    TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo( *paragraphLayoutIt );
 
     relayoutParameters.mIsNewLine = true;
-    relayoutParameters.mLineSize = lineLayoutInfo.mSize;
+    relayoutParameters.mParagraphSize = paragraphLayoutInfo.mSize;
     relayoutParameters.mIndices.mWordIndex = 0u;
 
-    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.begin(),
-           endWordLayoutIt = lineLayoutInfo.mWordsLayoutInfo.end();
+    for( TextViewProcessor::WordLayoutInfoContainer::iterator wordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.begin(),
+           endWordLayoutIt = paragraphLayoutInfo.mWordsLayoutInfo.end();
          wordLayoutIt != endWordLayoutIt;
          ++wordLayoutIt, ++relayoutParameters.mIndices.mWordIndex )
     {
       TextViewProcessor::WordLayoutInfo& wordLayoutInfo( *wordLayoutIt );
       relayoutParameters.mIsWhiteSpace = TextViewProcessor::WordSeparator == wordLayoutInfo.mType;
-      relayoutParameters.mIsNewLineCharacter = TextViewProcessor::LineSeparator == wordLayoutInfo.mType;
+      relayoutParameters.mIsNewParagraphCharacter = TextViewProcessor::ParagraphSeparator == wordLayoutInfo.mType;
 
       relayoutParameters.mIsFirstCharacterOfWord = true;
       relayoutParameters.mWordSize = wordLayoutInfo.mSize;
@@ -584,7 +584,7 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
         relayoutParameters.mIsNewLine = false;
       } // end characters
     } // end words
-  } // end lines
+  } // end paragraphs
 
   if( relayoutData.mCharacterLayoutInfoTable.empty() )
   {
@@ -596,14 +596,14 @@ void CalculateSizeAndPosition( const TextView::LayoutParameters& layoutParameter
     relayoutData.mTextSizeForRelayoutOption.height = minMaxXY.w - minMaxXY.y;
   }
 
-  // Check if the last character is a new line character. In that case the height should be added.
-  if( !relayoutData.mTextLayoutInfo.mLinesLayoutInfo.empty() )
+  // Check if the last character is a new paragraph character. In that case the height should be added.
+  if( !relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.empty() )
   {
-    const TextViewProcessor::LineLayoutInfo& lineLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end() - 1u ) );
+    const TextViewProcessor::ParagraphLayoutInfo& paragraphLayoutInfo( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end() - 1u ) );
 
-    if( lineLayoutInfo.mWordsLayoutInfo.empty() ) // if it's empty, it means the last character is a new line character.
+    if( paragraphLayoutInfo.mWordsLayoutInfo.empty() ) // if it's empty, it means the last character is a new paragraph character.
     {
-      relayoutData.mTextSizeForRelayoutOption.height += lineLayoutInfo.mSize.height * relayoutData.mShrinkFactor;
+      relayoutData.mTextSizeForRelayoutOption.height += paragraphLayoutInfo.mSize.height * relayoutData.mShrinkFactor;
     }
   }
 }

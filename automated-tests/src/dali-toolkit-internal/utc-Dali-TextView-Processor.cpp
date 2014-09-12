@@ -128,28 +128,28 @@ bool TestFindNearestWord( const std::string& description, const std::string& inp
 
 //////////////////////////////////////////////////////////////////
 
-struct SplitInLinesTest
+struct SplitInParagraphsTest
 {
   std::string inputText;
 
-  std::size_t resultNumberOfLines;
+  std::size_t resultNumberOfParagraphs;
 };
 
-bool TestSplitInLines( const SplitInLinesTest& test, const char* location )
+bool TestSplitInParagraphs( const SplitInParagraphsTest& test, const char* location )
 {
   // Creates a styled text with the markup or plain string.
   MarkupProcessor::StyledTextArray styledText;
   MarkupProcessor::GetStyledTextArray( test.inputText, styledText, true );
 
-  std::vector<MarkupProcessor::StyledTextArray> lines;
+  std::vector<MarkupProcessor::StyledTextArray> paragraphs;
 
-  TextProcessor::SplitInLines( styledText,
-                               lines );
+  TextProcessor::SplitInParagraphs( styledText,
+                                    paragraphs );
 
-  if( lines.size() != test.resultNumberOfLines )
+  if( paragraphs.size() != test.resultNumberOfParagraphs )
   {
     tet_printf( "Fail. %s", location );
-    tet_printf( "Different number of lines, result %d, expected result %d", lines.size(), test.resultNumberOfLines );
+    tet_printf( "Different number of paragraphs, result %d, expected result %d", paragraphs.size(), test.resultNumberOfParagraphs );
 
     return false;
   }
@@ -193,13 +193,13 @@ bool TestSplitInWords( const SplitInWordsTest& test, const char* location )
 } // namespace
 
 
-int UtcDaliTextViewSplitInLines(void)
+int UtcDaliTextViewSplitInParagraphs(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline("UtcDaliTextViewSplitInLines : ");
+  tet_infoline("UtcDaliTextViewSplitInParagraphs : ");
 
-  struct SplitInLinesTest splitInLinesTest[] =
+  struct SplitInParagraphsTest splitInParagraphsTest[] =
   {
     {
       std::string( "Hello world\nhello world." ),
@@ -214,9 +214,9 @@ int UtcDaliTextViewSplitInLines(void)
 
   for( std::size_t index = 0; index < numberOfTests; ++index )
   {
-    const SplitInLinesTest& test = splitInLinesTest[index];
+    const SplitInParagraphsTest& test = splitInParagraphsTest[index];
 
-    if( !TestSplitInLines( test, TEST_LOCATION ) )
+    if( !TestSplitInParagraphs( test, TEST_LOCATION ) )
     {
       tet_result( TET_FAIL );
     }

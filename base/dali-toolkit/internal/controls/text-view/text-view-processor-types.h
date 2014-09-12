@@ -35,11 +35,11 @@ namespace TextViewProcessor
 {
 
 /**
- * Whether the text is a new line character, a white space or normal text.
+ * Whether the text is a new paragraph character '\n', a white space or normal text.
  */
 enum TextSeparatorType
 {
-  LineSeparator,
+  ParagraphSeparator,
   WordSeparator,
   NoSeparator
 };
@@ -61,13 +61,15 @@ struct TextInfoIndices
 {
   /**
    * Default constructor.
+   *
+   * Initializes all members to their default values.
    */
   TextInfoIndices();
 
   /**
    * Constructor.
    */
-  TextInfoIndices( std::size_t lineIndex,
+  TextInfoIndices( std::size_t paragraphIndex,
                    std::size_t wordIndex,
                    std::size_t characterIndex );
 
@@ -79,9 +81,9 @@ struct TextInfoIndices
    */
   bool operator==( const TextInfoIndices& indices ) const;
 
-  std::size_t mLineIndex;
-  std::size_t mWordIndex;
-  std::size_t mCharacterIndex;
+  std::size_t mParagraphIndex;          ///< The paragraph index within the text.
+  std::size_t mWordIndex;               ///< The word index within the paragraph.
+  std::size_t mCharacterIndex;          ///< The character index within the word.
 };
 
 /**
@@ -96,6 +98,13 @@ struct CharacterLayoutInfo
    * Initializes all members to their default values.
    */
   CharacterLayoutInfo();
+
+  /**
+   * Default destructor.
+   *
+   * Deletes the gradient info.
+   */
+  ~CharacterLayoutInfo();
 
   /**
    * Copy constructor.
@@ -147,6 +156,13 @@ struct WordLayoutInfo
   WordLayoutInfo();
 
   /**
+   * Default destructor.
+   *
+   * Clears all characters.
+   */
+  ~WordLayoutInfo();
+
+  /**
    * Copy constructor.
    */
   WordLayoutInfo( const WordLayoutInfo& word );
@@ -164,34 +180,41 @@ struct WordLayoutInfo
 typedef std::vector<WordLayoutInfo> WordLayoutInfoContainer;
 
 /**
- * Layout information for a line.
+ * Layout information for a paragraph.
  */
-struct LineLayoutInfo
+struct ParagraphLayoutInfo
 {
   /**
    * Default constructor.
    *
    * Initializes all members to their default values.
    */
-  LineLayoutInfo();
+  ParagraphLayoutInfo();
+
+  /**
+   * Default destructor.
+   *
+   * Clears all words and deletes all text styles.
+   */
+  ~ParagraphLayoutInfo();
 
   /**
    * Copy constructor.
    */
-  LineLayoutInfo( const LineLayoutInfo& line );
+  ParagraphLayoutInfo( const ParagraphLayoutInfo& paragraph );
 
   /**
    * Assignment operator.
    */
-  LineLayoutInfo& operator=( const LineLayoutInfo& line );
+  ParagraphLayoutInfo& operator=( const ParagraphLayoutInfo& paragraph );
 
-  Size                    mSize;               ///< Size of the line.
-  float                   mAscender;           ///< Max of all ascenders of all words.
-  float                   mLineHeightOffset;   ///< Line height offset.
-  WordLayoutInfoContainer mWordsLayoutInfo;    ///< Layout info for all words.
-  std::size_t             mNumberOfCharacters; ///< Stores the number of characters.
+  Size                                          mSize;                       ///< Size of the paragraph.
+  float                                         mAscender;                   ///< Max of all ascenders of all words.
+  float                                         mLineHeightOffset;           ///< Line height offset.
+  std::size_t                                   mNumberOfCharacters;         ///< Stores the number of characters.
+  WordLayoutInfoContainer                       mWordsLayoutInfo;            ///< Layout info for all words.
 };
-typedef std::vector<LineLayoutInfo> LineLayoutInfoContainer;
+typedef std::vector<ParagraphLayoutInfo> ParagraphLayoutInfoContainer;
 
 /**
  * Layout information for the whole text.
@@ -215,12 +238,12 @@ struct TextLayoutInfo
    */
   TextLayoutInfo& operator=( const TextLayoutInfo& text );
 
-  Size                    mWholeTextSize;                 ///< width and height of the whole text.
-  float                   mMaxWordWidth;                  ///< maximum width between all words.
-  LineLayoutInfoContainer mLinesLayoutInfo;               ///< Layout information for all lines.
-  std::size_t             mNumberOfCharacters;            ///< Stores the number of characters.
-  float                   mMaxItalicsOffset;              ///< When rendering text-view in offscreen an extra width offset is needed to prevent italic characters to be cut if they are in the right edge.
-  WordLayoutInfo          mEllipsizeLayoutInfo;           ///< Layout information for the ellipsize text.
+  Size                         mWholeTextSize;        ///< width and height of the whole text.
+  float                        mMaxWordWidth;         ///< maximum width between all words.
+  float                        mMaxItalicsOffset;     ///< When rendering text-view in offscreen an extra width offset is needed to prevent italic characters to be cut if they are in the right edge.
+  std::size_t                  mNumberOfCharacters;   ///< Stores the number of characters.
+  ParagraphLayoutInfoContainer mParagraphsLayoutInfo; ///< Layout information for all paragraphs.
+  WordLayoutInfo               mEllipsizeLayoutInfo;  ///< Layout information for the ellipsize text.
 };
 
 } // namespace TextViewProcessor

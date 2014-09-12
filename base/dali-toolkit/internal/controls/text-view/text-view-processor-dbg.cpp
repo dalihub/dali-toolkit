@@ -70,9 +70,9 @@ void dbgPrint( const WordLayoutInfo& word )
       std::cout << "NoSeparator" << std::endl;
       break;
     }
-    case LineSeparator:
+    case ParagraphSeparator:
     {
-      std::cout << "LineSeparator" << std::endl;
+      std::cout << "ParagraphSeparator" << std::endl;
       break;
     }
     case WordSeparator:
@@ -83,11 +83,11 @@ void dbgPrint( const WordLayoutInfo& word )
   }
 }
 
-void dbgPrint( const LineLayoutInfo& line )
+void dbgPrint( const ParagraphLayoutInfo& paragraph )
 {
   std::cout << "< ";
-  std::cout << line.mSize;
-  for( WordLayoutInfoContainer::const_iterator wordIt = line.mWordsLayoutInfo.begin(), endWordIt = line.mWordsLayoutInfo.end();
+  std::cout << paragraph.mSize;
+  for( WordLayoutInfoContainer::const_iterator wordIt = paragraph.mWordsLayoutInfo.begin(), endWordIt = paragraph.mWordsLayoutInfo.end();
        wordIt != endWordIt;
        ++wordIt )
   {
@@ -101,7 +101,8 @@ void dbgPrint( const TextLayoutInfo& textInfo )
 {
   std::cout << "||" << std::endl;
   std::cout << textInfo.mWholeTextSize;
-  for( LineLayoutInfoContainer::const_iterator it = textInfo.mLinesLayoutInfo.begin(), endIt = textInfo.mLinesLayoutInfo.end();
+  std::cout << textInfo.mNumberOfCharacters;
+  for( ParagraphLayoutInfoContainer::const_iterator it = textInfo.mParagraphsLayoutInfo.begin(), endIt = textInfo.mParagraphsLayoutInfo.end();
        it != endIt;
        ++it )
   {
@@ -153,9 +154,9 @@ void dbgPrint( const TextStyle& style )
 
 void dbgPrint( const TextInfoIndices& indices )
 {
-  std::cout << "   line : " << indices.mLineIndex << std::endl;
-  std::cout << "   word : " << indices.mWordIndex << std::endl;
-  std::cout << "   char : " << indices.mCharacterIndex << std::endl;
+  std::cout << "          paragraph : " << indices.mParagraphIndex << std::endl;
+  std::cout << "               word : " << indices.mWordIndex << std::endl;
+  std::cout << "               char : " << indices.mCharacterIndex << std::endl;
 }
 
 void dbgPrint( const MarkupProcessor::StyledTextArray& textArray )

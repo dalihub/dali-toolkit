@@ -54,7 +54,7 @@ int UtcDaliTextViewDefaultConstructorDestructor_PT(void)
   tet_infoline("UtcDaliTextViewDefaultConstructorDestructor : ");
 
   TextViewProcessor::TextInfoIndices indices;
-  DALI_TEST_EQUALS( indices.mLineIndex, 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( indices.mParagraphIndex, 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( indices.mWordIndex, 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( indices.mCharacterIndex, 0u, TEST_LOCATION );
 
@@ -84,17 +84,17 @@ int UtcDaliTextViewDefaultConstructorDestructor_PT(void)
   DALI_TEST_EQUALS( wordLayoutInfo.mType, TextViewProcessor::NoSeparator, TEST_LOCATION );
   DALI_TEST_EQUALS( wordLayoutInfo.mCharactersLayoutInfo.size(), 0u, TEST_LOCATION );
 
-  TextViewProcessor::LineLayoutInfo lineLayoutInfo;
-  DALI_TEST_EQUALS( lineLayoutInfo.mSize, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( lineLayoutInfo.mAscender, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( lineLayoutInfo.mLineHeightOffset, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( lineLayoutInfo.mWordsLayoutInfo.size(), 0u, TEST_LOCATION );
-  DALI_TEST_EQUALS( lineLayoutInfo.mNumberOfCharacters, 0u, TEST_LOCATION );
+  TextViewProcessor::ParagraphLayoutInfo paragraphLayoutInfo;
+  DALI_TEST_EQUALS( paragraphLayoutInfo.mSize, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( paragraphLayoutInfo.mAscender, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( paragraphLayoutInfo.mLineHeightOffset, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( paragraphLayoutInfo.mWordsLayoutInfo.size(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( paragraphLayoutInfo.mNumberOfCharacters, 0u, TEST_LOCATION );
 
   TextViewProcessor::TextLayoutInfo textLayoutInfo;
   DALI_TEST_EQUALS( textLayoutInfo.mWholeTextSize, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( textLayoutInfo.mMaxWordWidth, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( textLayoutInfo.mLinesLayoutInfo.size(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLayoutInfo.mParagraphsLayoutInfo.size(), 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( textLayoutInfo.mNumberOfCharacters, 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( textLayoutInfo.mMaxItalicsOffset, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( textLayoutInfo.mEllipsizeLayoutInfo.mSize, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
@@ -182,41 +182,41 @@ int UtcDaliTextViewCopyConstructorOperator(void)
   TextViewProcessor::WordLayoutInfo wordLayoutInfo;
   wordLayoutInfo.mSize = Vector2( 1.f, 1.f );
   wordLayoutInfo.mAscender = 1.f;
-  wordLayoutInfo.mType = TextViewProcessor::LineSeparator;
+  wordLayoutInfo.mType = TextViewProcessor::ParagraphSeparator;
 
   TextViewProcessor::WordLayoutInfo wordLayoutInfo1;
   wordLayoutInfo1 = wordLayoutInfo;
 
   DALI_TEST_EQUALS( wordLayoutInfo1.mSize, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( wordLayoutInfo1.mAscender, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( wordLayoutInfo1.mType, TextViewProcessor::LineSeparator, TEST_LOCATION );
+  DALI_TEST_EQUALS( wordLayoutInfo1.mType, TextViewProcessor::ParagraphSeparator, TEST_LOCATION );
 
   TextViewProcessor::WordLayoutInfo wordLayoutInfo2( wordLayoutInfo );
 
   DALI_TEST_EQUALS( wordLayoutInfo2.mSize, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( wordLayoutInfo2.mAscender, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( wordLayoutInfo2.mType, TextViewProcessor::LineSeparator, TEST_LOCATION );
+  DALI_TEST_EQUALS( wordLayoutInfo2.mType, TextViewProcessor::ParagraphSeparator, TEST_LOCATION );
 
-  TextViewProcessor::LineLayoutInfo lineLayoutInfo;
-  lineLayoutInfo.mSize = Vector2( 1.f, 1.f );
-  lineLayoutInfo.mAscender = 1.f;
-  lineLayoutInfo.mLineHeightOffset = 1.f;
-  lineLayoutInfo.mNumberOfCharacters = 1u;
+  TextViewProcessor::ParagraphLayoutInfo paragraphLayoutInfo;
+  paragraphLayoutInfo.mSize = Vector2( 1.f, 1.f );
+  paragraphLayoutInfo.mAscender = 1.f;
+  paragraphLayoutInfo.mLineHeightOffset = 1.f;
+  paragraphLayoutInfo.mNumberOfCharacters = 1u;
 
-  TextViewProcessor::LineLayoutInfo lineLayoutInfo1;
-  lineLayoutInfo1 = lineLayoutInfo;
+  TextViewProcessor::ParagraphLayoutInfo paragraphLayoutInfo1;
+  paragraphLayoutInfo1 = paragraphLayoutInfo;
 
-  DALI_TEST_EQUALS( lineLayoutInfo1.mSize, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( lineLayoutInfo1.mAscender, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( lineLayoutInfo1.mLineHeightOffset, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( lineLayoutInfo1.mNumberOfCharacters, 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( paragraphLayoutInfo1.mSize, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( paragraphLayoutInfo1.mAscender, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( paragraphLayoutInfo1.mLineHeightOffset, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( paragraphLayoutInfo1.mNumberOfCharacters, 1u, TEST_LOCATION );
 
-  TextViewProcessor::LineLayoutInfo lineLayoutInfo2( lineLayoutInfo );
+  TextViewProcessor::ParagraphLayoutInfo paragraphLayoutInfo2( paragraphLayoutInfo );
 
-  DALI_TEST_EQUALS( lineLayoutInfo2.mSize, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( lineLayoutInfo2.mAscender, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( lineLayoutInfo2.mLineHeightOffset, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( lineLayoutInfo2.mNumberOfCharacters, 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( paragraphLayoutInfo2.mSize, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( paragraphLayoutInfo2.mAscender, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( paragraphLayoutInfo2.mLineHeightOffset, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( paragraphLayoutInfo2.mNumberOfCharacters, 1u, TEST_LOCATION );
 
   TextViewProcessor::TextLayoutInfo textLayoutInfo;
   textLayoutInfo.mWholeTextSize = Vector2( 1.f, 1.f );

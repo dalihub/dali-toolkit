@@ -54,8 +54,8 @@ void UpdateSize( Size& size1, const Size& size2, const SizeGrowType type )
 
 TextSeparatorType GetTextSeparatorType( const Character& character )
 {
-  // returns if the given character is a line separator '\n', a word separator ' ' or if is not a separator (any other character).
-  return ( character.IsNewLine() ? LineSeparator : ( character.IsWhiteSpace() ? WordSeparator : NoSeparator ) );
+  // returns if the given character is a paragraph separator '\n', a word separator ' ' or if is not a separator (any other character).
+  return ( character.IsNewLine() ? ParagraphSeparator : ( character.IsWhiteSpace() ? WordSeparator : NoSeparator ) );
 }
 
 void ChooseFontFamilyName( MarkupProcessor::StyledText& text )
@@ -107,7 +107,7 @@ void GetIndicesFromGlobalCharacterIndex( const std::size_t index,
   indices = TextInfoIndices();
 
   // Early return.
-  if( textLayoutInfo.mLinesLayoutInfo.empty() )
+  if( textLayoutInfo.mParagraphsLayoutInfo.empty() )
   {
     // Text is empty. All indices are 0.
     return;
@@ -115,20 +115,20 @@ void GetIndicesFromGlobalCharacterIndex( const std::size_t index,
 
   std::size_t currentIndex = 0u; // stores how many characters have been traversed (within the whole text).
 
-  // Traverse all lines and words until global index is found.
+  // Traverse all paragraphs and words until global index is found.
   bool found = false;
-  for( LineLayoutInfoContainer::const_iterator lineIt = textLayoutInfo.mLinesLayoutInfo.begin(),
-         lineEndIt = textLayoutInfo.mLinesLayoutInfo.end();
-       ( !found ) && ( lineIt != lineEndIt );
-       ++lineIt, ++indices.mLineIndex )
+  for( ParagraphLayoutInfoContainer::const_iterator paragraphIt = textLayoutInfo.mParagraphsLayoutInfo.begin(),
+         paragraphEndIt = textLayoutInfo.mParagraphsLayoutInfo.end();
+       ( !found ) && ( paragraphIt != paragraphEndIt );
+       ++paragraphIt, ++indices.mParagraphIndex )
   {
-    const LineLayoutInfo& lineLayoutInfo( *lineIt );
+    const ParagraphLayoutInfo& paragraphLayoutInfo( *paragraphIt );
 
-    if( currentIndex + lineLayoutInfo.mNumberOfCharacters > index )
+    if( currentIndex + paragraphLayoutInfo.mNumberOfCharacters > index )
     {
-      // The character is in this line
-      for( WordLayoutInfoContainer::const_iterator wordIt = lineLayoutInfo.mWordsLayoutInfo.begin(),
-             wordEndIt = lineLayoutInfo.mWordsLayoutInfo.end();
+      // The character is in this paragraph
+      for( WordLayoutInfoContainer::const_iterator wordIt = paragraphLayoutInfo.mWordsLayoutInfo.begin(),
+             wordEndIt = paragraphLayoutInfo.mWordsLayoutInfo.end();
            ( !found ) && ( wordIt != wordEndIt );
            ++wordIt, ++indices.mWordIndex )
       {
@@ -146,22 +146,22 @@ void GetIndicesFromGlobalCharacterIndex( const std::size_t index,
           currentIndex += wordLayoutInfo.mCharactersLayoutInfo.size();
         }
       } // end words.
-      if( !lineLayoutInfo.mWordsLayoutInfo.empty() )
+      if( !paragraphLayoutInfo.mWordsLayoutInfo.empty() )
       {
         --indices.mWordIndex;
       }
     }
     else
     {
-      // check in the next line
-      currentIndex += lineLayoutInfo.mNumberOfCharacters;
+      // check in the next paragraph
+      currentIndex += paragraphLayoutInfo.mNumberOfCharacters;
     }
-  } // end lines.
+  } // end paragraphs.
 
   // Need to decrease indices as they have been increased in the last loop.
-  if( !textLayoutInfo.mLinesLayoutInfo.empty() )
+  if( !textLayoutInfo.mParagraphsLayoutInfo.empty() )
   {
-    --indices.mLineIndex;
+    --indices.mParagraphIndex;
   }
 }
 
