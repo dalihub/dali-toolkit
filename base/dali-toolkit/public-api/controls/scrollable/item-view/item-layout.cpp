@@ -20,7 +20,6 @@
 
 namespace
 {
-  const float DEFAULT_COLOR_VISIBILITY_REMOVE_TIME = 0.5f; // 0.5 second
 
   // Functors which wrap constraint functions with stored item IDs
   struct WrappedQuaternionConstraint
@@ -392,9 +391,6 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
 
       constraint.SetApplyTime(durationSeconds);
       constraint.SetAlphaFunction(mAlphaFunction);
-
-      // Release color constraints slowly; this allows ItemView to co-exist with ImageActor fade-in
-      constraint.SetRemoveTime(DEFAULT_COLOR_VISIBILITY_REMOVE_TIME);
       constraint.SetRemoveAction(Dali::Constraint::Discard);
 
       actor.ApplyConstraint(constraint);
@@ -415,7 +411,6 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
       constraint.SetAlphaFunction(mAlphaFunction);
 
       // Release visibility constraints the same time as the color constraint
-      constraint.SetRemoveTime(DEFAULT_COLOR_VISIBILITY_REMOVE_TIME);
       constraint.SetRemoveAction(Dali::Constraint::Discard);
 
       actor.ApplyConstraint(constraint);
