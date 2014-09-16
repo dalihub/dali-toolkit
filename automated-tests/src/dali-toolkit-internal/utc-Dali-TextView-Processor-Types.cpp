@@ -59,21 +59,17 @@ int UtcDaliTextViewDefaultConstructorDestructor_PT(void)
   DALI_TEST_EQUALS( indices.mCharacterIndex, 0u, TEST_LOCATION );
 
   TextViewProcessor::CharacterLayoutInfo characterLayoutInfo;
-  DALI_TEST_EQUALS( characterLayoutInfo.mHeight, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( characterLayoutInfo.mAdvance, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( characterLayoutInfo.mSize, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo.mBearing, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo.mPosition, Vector3::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo.mOffset, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( characterLayoutInfo.mSize, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo.mAscender, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo.mUnderlineThickness, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo.mUnderlinePosition, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_CHECK( !characterLayoutInfo.mGlyphActor );
   DALI_TEST_CHECK( characterLayoutInfo.mStyledText.mText.IsEmpty() );
   DALI_TEST_EQUALS( characterLayoutInfo.mColorAlpha, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( characterLayoutInfo.mGradientColor, Vector4::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( characterLayoutInfo.mStartPoint, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( characterLayoutInfo.mEndPoint, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_CHECK( NULL == characterLayoutInfo.mGradientInfo );
   DALI_TEST_CHECK( characterLayoutInfo.mIsVisible );
   DALI_TEST_CHECK( characterLayoutInfo.mSetText );
   DALI_TEST_CHECK( characterLayoutInfo.mSetStyle );
@@ -111,12 +107,10 @@ int UtcDaliTextViewCopyConstructorOperator(void)
   tet_infoline("UtcDaliTextViewCopyConstructorOperator : ");
 
   TextViewProcessor::CharacterLayoutInfo characterLayoutInfo;
-  characterLayoutInfo.mHeight = 1.f;
-  characterLayoutInfo.mAdvance = 1.f;
+  characterLayoutInfo.mSize = Vector2( 1.f, 1.f );
   characterLayoutInfo.mBearing = 1.f;
   characterLayoutInfo.mPosition = Vector3( 1.f, 1.f, 1.f );
   characterLayoutInfo.mOffset = Vector2( 1.f, 1.f );
-  characterLayoutInfo.mSize = Vector2( 1.f, 1.f );
   characterLayoutInfo.mAscender = 1.f;
   characterLayoutInfo.mUnderlineThickness = 1.f;
   characterLayoutInfo.mUnderlinePosition = 1.f;
@@ -124,10 +118,14 @@ int UtcDaliTextViewCopyConstructorOperator(void)
   characterLayoutInfo.mGlyphActor = TextActor::New( "Hello" );
   characterLayoutInfo.mStyledText.mText = Text( "Hello" );
 
+  TextViewProcessor::GradientInfo* info = new TextViewProcessor::GradientInfo();
+  info->mGradientColor = Vector4( 1.f, 1.f, 1.f, 1.f );
+  info->mStartPoint = Vector2( 1.f, 1.f );
+  info->mEndPoint = Vector2( 1.f, 1.f );
+
   characterLayoutInfo.mColorAlpha = 0.f;
-  characterLayoutInfo.mGradientColor = Vector4( 1.f, 1.f, 1.f, 1.f );
-  characterLayoutInfo.mStartPoint = Vector2( 1.f, 1.f );
-  characterLayoutInfo.mEndPoint = Vector2( 1.f, 1.f );
+  characterLayoutInfo.mGradientInfo = info;
+
   characterLayoutInfo.mIsVisible = false;
   characterLayoutInfo.mSetText = false;
   characterLayoutInfo.mSetStyle = false;
@@ -135,8 +133,6 @@ int UtcDaliTextViewCopyConstructorOperator(void)
   TextViewProcessor::CharacterLayoutInfo characterLayoutInfo1;
   characterLayoutInfo1 = characterLayoutInfo;
 
-  DALI_TEST_EQUALS( characterLayoutInfo1.mHeight, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( characterLayoutInfo1.mAdvance, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo1.mBearing, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo1.mPosition, Vector3( 1.f, 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo1.mOffset, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
@@ -147,16 +143,14 @@ int UtcDaliTextViewCopyConstructorOperator(void)
   DALI_TEST_CHECK( characterLayoutInfo1.mGlyphActor );
   DALI_TEST_EQUALS( characterLayoutInfo1.mStyledText.mText.GetLength(), 5u, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo1.mColorAlpha, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( characterLayoutInfo1.mGradientColor, Vector4( 1.f, 1.f, 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( characterLayoutInfo1.mStartPoint, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( characterLayoutInfo1.mEndPoint, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( characterLayoutInfo1.mGradientInfo->mGradientColor, Vector4( 1.f, 1.f, 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( characterLayoutInfo1.mGradientInfo->mStartPoint, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( characterLayoutInfo1.mGradientInfo->mEndPoint, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_CHECK( !characterLayoutInfo1.mIsVisible );
   DALI_TEST_CHECK( !characterLayoutInfo1.mSetText );
   DALI_TEST_CHECK( !characterLayoutInfo1.mSetStyle );
 
   TextViewProcessor::CharacterLayoutInfo characterLayoutInfo2( characterLayoutInfo );
-  DALI_TEST_EQUALS( characterLayoutInfo2.mHeight, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( characterLayoutInfo2.mAdvance, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo2.mBearing, 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo2.mPosition, Vector3( 1.f, 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo2.mOffset, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
@@ -167,9 +161,9 @@ int UtcDaliTextViewCopyConstructorOperator(void)
   DALI_TEST_CHECK( characterLayoutInfo2.mGlyphActor );
   DALI_TEST_EQUALS( characterLayoutInfo2.mStyledText.mText.GetLength(), 5u, TEST_LOCATION );
   DALI_TEST_EQUALS( characterLayoutInfo2.mColorAlpha, 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( characterLayoutInfo2.mGradientColor, Vector4( 1.f, 1.f, 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( characterLayoutInfo2.mStartPoint, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( characterLayoutInfo2.mEndPoint, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( characterLayoutInfo2.mGradientInfo->mGradientColor, Vector4( 1.f, 1.f, 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( characterLayoutInfo2.mGradientInfo->mStartPoint, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( characterLayoutInfo2.mGradientInfo->mEndPoint, Vector2( 1.f, 1.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_CHECK( !characterLayoutInfo2.mIsVisible );
   DALI_TEST_CHECK( !characterLayoutInfo2.mSetText );
   DALI_TEST_CHECK( !characterLayoutInfo2.mSetStyle );

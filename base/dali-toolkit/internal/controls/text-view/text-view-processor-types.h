@@ -87,6 +87,40 @@ struct TextInfoIndices
 };
 
 /**
+ * Stores gradient info.
+ *
+ * Used to fade in/out text-actors.
+ */
+struct GradientInfo
+{
+  /**
+   * Default constructor.
+   *
+   * Initializes all members to their default values.
+   */
+  GradientInfo();
+
+  /**
+   * Default destructor.
+   */
+  ~GradientInfo();
+
+  /**
+   * Copy constructor
+   */
+  GradientInfo( const GradientInfo& info );
+
+  /**
+   * Assignment operator.
+   */
+  GradientInfo& operator=( const GradientInfo& info );
+
+  Vector4                     mGradientColor;  ///< Gradient color.
+  Vector2                     mStartPoint;     ///< Gradient start point.
+  Vector2                     mEndPoint;       ///< Gradient end point.
+};
+
+/**
  * Layout information for a character.
  * It stores the position, size and ascender of its respective text-actor.
  */
@@ -116,30 +150,26 @@ struct CharacterLayoutInfo
    */
   CharacterLayoutInfo& operator=( const CharacterLayoutInfo& character );
 
-  // Natural size (metrics) of the glyph.
-  float       mHeight;             ///< Natural height of the character.
-  float       mAdvance;            ///< Natural horizontal distance from origin of current character and the next one.
-  float       mBearing;            ///< Natural vertical distance from the baseline to the top of the glyph's bbox.
-
-  // Size of the text-actor (may be modified by a scale factor).
-  Vector3     mPosition;           ///< Position within the text-view
-  Vector2     mOffset;             ///< Alignment and justification offset.
-  Size        mSize;               ///< Size of this character.
+  // Metrics of the glyph.
+  Size        mSize;               ///< Height of the font and advance (the horizontal distance from the origin of the current character and the next one).
+  float       mBearing;            ///< Vertical distance from the baseline to the top of the glyph's boundary box.
   float       mAscender;           ///< Distance from the base line to the top of the line.
   float       mUnderlineThickness; ///< The underline's thickness.
   float       mUnderlinePosition;  ///< The underline's position.
 
-  RenderableActor             mGlyphActor;     ///< Handle to a text-actor.
-  MarkupProcessor::StyledText mStyledText;     ///< Stores the text and its style.
-  float                       mColorAlpha;     ///< Alpha component for the initial text color when text is faded.
-  Vector4                     mGradientColor;  ///< Gradient color.
-  Vector2                     mStartPoint;     ///< Gradient start point.
-  Vector2                     mEndPoint;       ///< Gradient end point.
+  // Position and alignment offset. It depends on the lay-out.
+  Vector3     mPosition;           ///< Position within the text-view
+  Vector2     mOffset;             ///< Alignment and justification offset.
 
-  bool                        mIsVisible:1;    ///< Whether the text-actor is visible.
-  bool                        mSetText:1;      ///< Whether a new text needs to be set in the text-actor.
-  bool                        mSetStyle:1;     ///< Whether a new style needs to be set in the text-actor.
-  bool                        mIsColorGlyph:1; ///< Whether this character is an emoticon.
+  RenderableActor             mGlyphActor;   ///< Handle to a text-actor.
+  MarkupProcessor::StyledText mStyledText;   ///< Stores the text and its style.
+  float                       mColorAlpha;   ///< Alpha component for the initial text color when text is faded.
+  GradientInfo*               mGradientInfo; ///< Stores gradient info.
+
+  bool            mIsVisible:1;    ///< Whether the text-actor is visible.
+  bool            mSetText:1;      ///< Whether a new text needs to be set in the text-actor.
+  bool            mSetStyle:1;     ///< Whether a new style needs to be set in the text-actor.
+  bool            mIsColorGlyph:1; ///< Whether this character is an emoticon.
 };
 typedef std::vector<CharacterLayoutInfo> CharacterLayoutInfoContainer;
 
@@ -194,7 +224,7 @@ struct ParagraphLayoutInfo
   /**
    * Default destructor.
    *
-   * Clears all words and deletes all text styles.
+   * Clears all words.
    */
   ~ParagraphLayoutInfo();
 

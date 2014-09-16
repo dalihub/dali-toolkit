@@ -213,9 +213,7 @@ struct CurrentTextActorInfo
   Vector3 position;
   Size size;
   Vector4 color;
-  Vector4 gradientColor;
-  Vector2 startPoint;
-  Vector2 endPoint;
+  TextViewProcessor::GradientInfo* gradientInfo;
 };
 
 void SetVisualParameters( CurrentTextActorInfo& currentTextActorInfo,
@@ -224,9 +222,12 @@ void SetVisualParameters( CurrentTextActorInfo& currentTextActorInfo,
                           const float lineHeight )
 {
   currentTextActorInfo.textActor.SetTextColor( currentTextActorInfo.color );
-  currentTextActorInfo.textActor.SetGradientColor( currentTextActorInfo.gradientColor );
-  currentTextActorInfo.textActor.SetGradientStartPoint( currentTextActorInfo.startPoint );
-  currentTextActorInfo.textActor.SetGradientEndPoint( currentTextActorInfo.endPoint );
+  if( NULL != currentTextActorInfo.gradientInfo )
+  {
+    currentTextActorInfo.textActor.SetGradientColor( currentTextActorInfo.gradientInfo->mGradientColor );
+    currentTextActorInfo.textActor.SetGradientStartPoint( currentTextActorInfo.gradientInfo->mStartPoint );
+    currentTextActorInfo.textActor.SetGradientEndPoint( currentTextActorInfo.gradientInfo->mEndPoint );
+  }
 
   // The italics offset is used in the offscreen rendering. When text is in italics, it may exceed the text-view's boundary
   // due to the trick used to implement it.
@@ -570,7 +571,7 @@ void UpdateAlignment( const TextView::LayoutParameters& layoutParameters,
         characterTableInfo.mPosition.x = positionOffset.x + characterLayoutInfo.mOffset.x;
         characterTableInfo.mPosition.y = positionOffset.y + characterLayoutInfo.mOffset.y;
 
-        positionOffset.x += characterLayoutInfo.mAdvance * relayoutData.mShrinkFactor;
+        positionOffset.x += characterLayoutInfo.mSize.width * relayoutData.mShrinkFactor;
       } // end characters
     } // end words
   } // end paragraphs
@@ -641,8 +642,8 @@ void UpdateLayoutInfoTable( Vector4& minMaxXY,
 
   const float descender = characterLayoutInfo.mSize.height - characterLayoutInfo.mAscender;
 
-  const Toolkit::TextView::CharacterLayoutInfo characterLayoutTableInfo( Size( characterLayoutInfo.mAdvance * relayoutData.mShrinkFactor,
-                                                                               characterLayoutInfo.mHeight * relayoutData.mShrinkFactor ),
+  const Toolkit::TextView::CharacterLayoutInfo characterLayoutTableInfo( Size( characterLayoutInfo.mSize.width * relayoutData.mShrinkFactor,
+                                                                               characterLayoutInfo.mSize.height * relayoutData.mShrinkFactor ),
                                                                          positionOffset,
                                                                          ( TextViewProcessor::ParagraphSeparator == wordLayoutInfo.mType ),
                                                                          false, // VCC set the correct direction if needed.
@@ -651,7 +652,7 @@ void UpdateLayoutInfoTable( Vector4& minMaxXY,
 
   relayoutData.mCharacterLayoutInfoTable.push_back( characterLayoutTableInfo );
 
-  positionOffset.x += characterLayoutInfo.mAdvance * relayoutData.mShrinkFactor;
+  positionOffset.x += characterLayoutInfo.mSize.width * relayoutData.mShrinkFactor;
 }
 
 void CalculateVisibilityForFade( const Internal::TextView::LayoutParameters& layoutParameters,
@@ -812,6 +813,11 @@ void CalculateVisibilityForFade( const Internal::TextView::LayoutParameters& lay
     Vector2 startPoint = Vector2::ZERO;
     Vector2 endPoint = Vector2::ZERO;
 
+    if( NULL == characterLayoutInfo.mGradientInfo )
+    {
+      characterLayoutInfo.mGradientInfo = new TextViewProcessor::GradientInfo();
+    }
+
     if( !( rightFadeOut && leftFadeOut ) )
     {
       // Current implementation can't set gradient parameters for a text-actor exceeding at the same time the left and the right boundaries.
@@ -866,9 +872,9 @@ void CalculateVisibilityForFade( const Internal::TextView::LayoutParameters& lay
       }
     }
 
-    characterLayoutInfo.mGradientColor = gradientColor;
-    characterLayoutInfo.mStartPoint = startPoint;
-    characterLayoutInfo.mEndPoint = endPoint;
+    characterLayoutInfo.mGradientInfo->mGradientColor = gradientColor;
+    characterLayoutInfo.mGradientInfo->mStartPoint = startPoint;
+    characterLayoutInfo.mGradientInfo->mEndPoint = endPoint;
   }
   else
   {
@@ -1203,9 +1209,8 @@ void SetTextVisible( TextView::RelayoutData& relayoutData )
         TextViewProcessor::CharacterLayoutInfo& characterLayoutInfo( *characterLayoutIt );
 
         characterLayoutInfo.mIsVisible = true;
-        characterLayoutInfo.mGradientColor = Vector4::ZERO;
-        characterLayoutInfo.mStartPoint = Vector2::ZERO;
-        characterLayoutInfo.mEndPoint = Vector2::ZERO;
+        delete characterLayoutInfo.mGradientInfo;
+        characterLayoutInfo.mGradientInfo = NULL;
         characterLayoutInfo.mColorAlpha = characterLayoutInfo.mStyledText.mStyle.GetTextColor().a;
       } // end characters
     } // end words
@@ -1538,9 +1543,7 @@ void CreateTextActor( const TextView::VisualParameters& visualParameters,
   currentTextActorInfo.color = style.GetTextColor();
   currentTextActorInfo.color.a = characterLayout.mColorAlpha;
 
-  currentTextActorInfo.gradientColor = characterLayout.mGradientColor;
-  currentTextActorInfo.startPoint = characterLayout.mStartPoint;
-  currentTextActorInfo.endPoint = characterLayout.mEndPoint;
+  currentTextActorInfo.gradientInfo = characterLayout.mGradientInfo;
 
   TextActor textActor = TextActor::DownCast( characterLayout.mGlyphActor );
 
@@ -1599,9 +1602,9 @@ void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualPa
 
   TextStyle currentStyle;                // style for the current text-actor.
 
-  Vector4 currentGradientColor;          // gradient color for the current text-actor.
-  Vector2 currentStartPoint;             // start point for the current text-actor.
-  Vector2 currentEndPoint;               // end point for the current text-actor.
+  TextViewProcessor::GradientInfo* currentGradientInfo = NULL; // gradient color for the current text-actor.
+                                                               // start point for the current text-actor.
+                                                               // end point for the current text-actor.
 
   bool currentIsColorGlyph = false;      // Whether current glyph is an emoticon.
 
@@ -1647,15 +1650,25 @@ void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualPa
       {
         // Do not create a glyph-actor if it's a white space (without underline) or a new paragraph character.
 
-        // Creates one glyph-actor for each counsecutive group of characters, with the same style, per line, or if it's an emoticon.
+        // Check if the character has the same gradient info than the current one.
+        bool differentGradientInfo = false;
+        if( characterLayout.mGradientInfo && currentGradientInfo )
+        {
+          differentGradientInfo = ( characterLayout.mGradientInfo->mGradientColor != currentGradientInfo->mGradientColor ) ||
+            ( characterLayout.mGradientInfo->mStartPoint != currentGradientInfo->mStartPoint ) ||
+            ( characterLayout.mGradientInfo->mEndPoint != currentGradientInfo->mEndPoint );
+        }
+        else if( ( NULL != currentGradientInfo ) || ( NULL != characterLayout.mGradientInfo ) )
+        {
+          differentGradientInfo = true;
+        }
 
+        // Creates one glyph-actor for each counsecutive group of characters, with the same style, per line, or if it's an emoticon.
         if( !glyphActorCreatedForLine ||
             characterLayout.mIsColorGlyph ||
+            differentGradientInfo ||
             ( characterLayout.mIsColorGlyph != currentIsColorGlyph ) ||
-            ( style != currentStyle ) ||
-            ( characterLayout.mGradientColor != currentGradientColor ) ||
-            ( characterLayout.mStartPoint != currentStartPoint ) ||
-            ( characterLayout.mEndPoint != currentEndPoint ) )
+            ( style != currentStyle ) )
         {
           characterLayout.mSetText = false;
           characterLayout.mSetStyle = false;
@@ -1683,9 +1696,7 @@ void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualPa
 
           // Update style to be checked with next characters.
           currentStyle = style;
-          currentGradientColor = characterLayout.mGradientColor;
-          currentStartPoint = characterLayout.mStartPoint;
-          currentEndPoint = characterLayout.mEndPoint;
+          currentGradientInfo = characterLayout.mGradientInfo;
           currentIsColorGlyph = characterLayout.mIsColorGlyph;
 
           characterLayout.mGlyphActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
@@ -1784,6 +1795,7 @@ void UpdateTextActorInfo( const TextView::VisualParameters& visualParameters,
                                      createGlyphActors );
   } // paragraphs
 
+  // Set visual parameters for ellipsis renderable actors.
   for( std::vector<RenderableActor>::iterator it = relayoutData.mEllipsizedGlyphActors.begin(),
          endIt = relayoutData.mEllipsizedGlyphActors.end();
        it != endIt;

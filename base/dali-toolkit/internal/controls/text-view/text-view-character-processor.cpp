@@ -34,22 +34,48 @@ namespace TextViewProcessor
 // Layout info.
 /////////////////////
 
+GradientInfo::GradientInfo()
+: mGradientColor(),
+  mStartPoint(),
+  mEndPoint()
+{
+}
+
+GradientInfo::~GradientInfo()
+{
+}
+
+GradientInfo::GradientInfo( const GradientInfo& info )
+: mGradientColor( info.mGradientColor ),
+  mStartPoint( info.mStartPoint ),
+  mEndPoint( info.mEndPoint )
+{
+}
+
+GradientInfo& GradientInfo::operator=( const GradientInfo& info )
+{
+  if( this != &info )
+  {
+    mGradientColor = info.mGradientColor;
+    mStartPoint = info.mStartPoint;
+    mEndPoint = info.mEndPoint;
+  }
+
+  return *this;
+}
+
 CharacterLayoutInfo::CharacterLayoutInfo()
-: mHeight( 0.f ),
-  mAdvance( 0.f ),
+: mSize(),
   mBearing( 0.f ),
-  mPosition(),
-  mOffset(),
-  mSize(),
   mAscender( 0.f ),
   mUnderlineThickness( 0.f ),
   mUnderlinePosition( 0.f ),
+  mPosition(),
+  mOffset(),
   mGlyphActor(),
   mStyledText(),
   mColorAlpha( 1.f ),
-  mGradientColor(),
-  mStartPoint(),
-  mEndPoint(),
+  mGradientInfo( NULL ),
   mIsVisible( true ),
   mSetText( true ),
   mSetStyle( true ),
@@ -59,24 +85,22 @@ CharacterLayoutInfo::CharacterLayoutInfo()
 
 CharacterLayoutInfo::~CharacterLayoutInfo()
 {
+  // Deletes the gradient info.
+  delete mGradientInfo;
 }
 
 CharacterLayoutInfo::CharacterLayoutInfo( const CharacterLayoutInfo& character )
-: mHeight( character.mHeight ),
-  mAdvance( character.mAdvance ),
+: mSize( character.mSize ),
   mBearing( character.mBearing ),
-  mPosition( character.mPosition ),
-  mOffset( character.mOffset ),
-  mSize( character.mSize ),
   mAscender( character.mAscender ),
   mUnderlineThickness( character.mUnderlineThickness ),
   mUnderlinePosition( character.mUnderlinePosition ),
+  mPosition( character.mPosition ),
+  mOffset( character.mOffset ),
   mGlyphActor( character.mGlyphActor ),
   mStyledText( character.mStyledText ),
   mColorAlpha( character.mColorAlpha ),
-  mGradientColor( character.mGradientColor ),
-  mStartPoint( character.mStartPoint ),
-  mEndPoint( character.mEndPoint ),
+  mGradientInfo( ( NULL == character.mGradientInfo ) ? NULL : new GradientInfo( *character.mGradientInfo ) ), // Copies the gradient info.
   mIsVisible( character.mIsVisible ),
   mSetText( character.mSetText ),
   mSetStyle( character.mSetStyle ),
@@ -86,28 +110,46 @@ CharacterLayoutInfo::CharacterLayoutInfo( const CharacterLayoutInfo& character )
 
 CharacterLayoutInfo& CharacterLayoutInfo::operator=( const CharacterLayoutInfo& character )
 {
-  mHeight = character.mHeight;
-  mAdvance = character.mAdvance;
-  mBearing = character.mBearing;
-
-  mPosition = character.mPosition;
-  mOffset = character.mOffset;
   mSize = character.mSize;
   mAscender = character.mAscender;
+  mBearing = character.mBearing;
   mUnderlineThickness = character.mUnderlineThickness;
   mUnderlinePosition = character.mUnderlinePosition;
 
+  mPosition = character.mPosition;
+  mOffset = character.mOffset;
+
+  mGlyphActor = character.mGlyphActor;
   mStyledText = character.mStyledText;
+
   mColorAlpha = character.mColorAlpha;
-  mGradientColor = character.mGradientColor;
-  mStartPoint = character.mStartPoint;
-  mEndPoint = character.mEndPoint;
+
+  // Copies the gradient info.
+  if( NULL == character.mGradientInfo )
+  {
+    // The source doesn't have. Deletes the current one.
+    delete mGradientInfo;
+    mGradientInfo = NULL;
+  }
+  else
+  {
+    // The source has gradient info.
+    if( NULL != mGradientInfo )
+    {
+      // It it has, copy to it.
+      *mGradientInfo = *character.mGradientInfo;
+    }
+    else
+    {
+      // If it doesn't have, create a new one.
+      mGradientInfo = new GradientInfo( *character.mGradientInfo );
+    }
+  }
+
   mIsVisible = character.mIsVisible;
   mSetText = character.mSetText;
   mSetStyle = character.mSetStyle;
   mIsColorGlyph = character.mIsColorGlyph;
-
-  mGlyphActor = character.mGlyphActor;
 
   return *this;
 }

@@ -130,12 +130,11 @@ struct UpdateTextInfoTest
 
 void Print( const TextViewProcessor::CharacterLayoutInfo& character )
 {
-  std::cout << "             height : " << character.mHeight << std::endl;
-  std::cout << "            advance : " << character.mAdvance << std::endl;
+  std::cout << "             height : " << character.mSize.height << std::endl;
+  std::cout << "            advance : " << character.mSize.width << std::endl;
   std::cout << "            bearing : " << character.mBearing << std::endl;
-  std::cout << "          mPosition : " << character.mPosition << std::endl;
-  std::cout << "              mSize : " << character.mSize << std::endl;
-  std::cout << "          mAscender : " << character.mAscender << std::endl;
+  std::cout << "           ascender : " << character.mAscender << std::endl;
+  std::cout << "           position : " << character.mPosition << std::endl;
 
   TextActor textActor = TextActor::DownCast( character.mGlyphActor );
   if( textActor )
@@ -226,11 +225,11 @@ bool TestEqual( float x, float y )
 bool TestEqual( const TextViewProcessor::CharacterLayoutInfo& character1,
                 const TextViewProcessor::CharacterLayoutInfo& character2 )
 {
-  if( !TestEqual( character1.mHeight, character2.mHeight ) )
+  if( !TestEqual( character1.mSize.height, character2.mSize.height ) )
   {
     return false;
   }
-  if( !TestEqual( character1.mAdvance, character2.mAdvance ) )
+  if( !TestEqual( character1.mSize.width, character2.mSize.width ) )
   {
     return false;
   }
@@ -244,15 +243,6 @@ bool TestEqual( const TextViewProcessor::CharacterLayoutInfo& character1,
     return false;
   }
   if( !TestEqual( character1.mPosition.y, character2.mPosition.y ) )
-  {
-    return false;
-  }
-
-  if( !TestEqual( character1.mSize.x, character2.mSize.x ) )
-  {
-    return false;
-  }
-  if( !TestEqual( character1.mSize.y, character2.mSize.y ) )
   {
     return false;
   }
@@ -1223,13 +1213,11 @@ int UtcDaliTextViewCreateTextInfo(void)
   //  bearing : 11.9492
   // ascender : 11.9492
 
-  const float WIDTH_10( 9.48351f );
   const float HEIGHT_10( 9.48351f );
   const float ADVANCE_10( 9.48351f );
   const float BEARING_10( 8.53516f );
   const float ASCENDER_10( 8.53516f );
 
-  const float WIDTH_12( 11.3802f );
   const float HEIGHT_12( 11.3802f );
   const float ADVANCE_12( 11.3802f );
   const float BEARING_12( 10.2422f );
@@ -1256,16 +1244,14 @@ int UtcDaliTextViewCreateTextInfo(void)
   // Characters
 
   TextViewProcessor::CharacterLayoutInfo layoutInfo10; // ( [lo wo])
-  layoutInfo10.mHeight = HEIGHT_10;
-  layoutInfo10.mAdvance = ADVANCE_10;
+  layoutInfo10.mSize.height = HEIGHT_10;
+  layoutInfo10.mSize.width = ADVANCE_10;
   layoutInfo10.mBearing = BEARING_10;
-  layoutInfo10.mSize = Size( WIDTH_10, HEIGHT_10 );
   layoutInfo10.mAscender = ASCENDER_10;
   TextViewProcessor::CharacterLayoutInfo layoutInfo12; // ( [Hel], [rld!] and [CR])
-  layoutInfo12.mHeight = HEIGHT_12;
-  layoutInfo12.mAdvance = ADVANCE_12;
+  layoutInfo12.mSize.height = HEIGHT_12;
+  layoutInfo12.mSize.width = ADVANCE_12;
   layoutInfo12.mBearing = BEARING_12;
-  layoutInfo12.mSize = Size( WIDTH_12, HEIGHT_12 );
   layoutInfo12.mAscender = ASCENDER_12;
 
   TextStyle style10;
@@ -1282,7 +1268,7 @@ int UtcDaliTextViewCreateTextInfo(void)
   TextViewProcessor::WordLayoutInfo wordLayout1, wordLayout2, wordLayout3, wordLayout4;
 
   // Hello
-  wordLayout1.mSize = Size( 3.f * WIDTH_12 + 2.f * WIDTH_10, HEIGHT_12 );
+  wordLayout1.mSize = Size( 3.f * ADVANCE_12 + 2.f * ADVANCE_10, HEIGHT_12 );
   wordLayout1.mAscender = ASCENDER_12;
   wordLayout1.mType = TextViewProcessor::NoSeparator;
 
@@ -1298,14 +1284,14 @@ int UtcDaliTextViewCreateTextInfo(void)
   wordLayout1.mCharactersLayoutInfo.push_back( layoutInfo10 ); // o
 
   // (white space)
-  wordLayout2.mSize = Size( WIDTH_10, HEIGHT_10 );
+  wordLayout2.mSize = Size( ADVANCE_10, HEIGHT_10 );
   wordLayout2.mAscender = ASCENDER_10;
   wordLayout2.mType = TextViewProcessor::WordSeparator;
   layoutInfo10.mStyledText.mText = Text( " " );
   wordLayout2.mCharactersLayoutInfo.push_back( layoutInfo10 ); // (white space)
 
   // world!
-  wordLayout3.mSize = Size( 2.f * WIDTH_10 + 4.f * WIDTH_12, HEIGHT_12 );
+  wordLayout3.mSize = Size( 2.f * ADVANCE_10 + 4.f * ADVANCE_12, HEIGHT_12 );
   wordLayout3.mAscender = ASCENDER_12;
   wordLayout3.mType = TextViewProcessor::NoSeparator;
   layoutInfo10.mStyledText.mText = Text( "w" );
@@ -1333,7 +1319,7 @@ int UtcDaliTextViewCreateTextInfo(void)
 
   TextViewProcessor::ParagraphLayoutInfo paragraphLayout1, paragraphLayout2, paragraphLayout3;
 
-  paragraphLayout1.mSize = Size( 5.f * WIDTH_10 + 7.f * WIDTH_12, HEIGHT_12 );
+  paragraphLayout1.mSize = Size( 5.f * ADVANCE_10 + 7.f * ADVANCE_12, HEIGHT_12 );
   paragraphLayout1.mAscender = ASCENDER_12;
   paragraphLayout1.mNumberOfCharacters = 13;
   paragraphLayout1.mWordsLayoutInfo.push_back( wordLayout1 );
@@ -1351,8 +1337,8 @@ int UtcDaliTextViewCreateTextInfo(void)
   // Text (layout)
   TextViewProcessor::TextLayoutInfo textLayout;
 
-  textLayout.mWholeTextSize = Size( 5.f * WIDTH_10 + 7.f * WIDTH_12, 3.f * HEIGHT_12 );
-  textLayout.mMaxWordWidth = 2.f * WIDTH_10 + 4.f * WIDTH_12;
+  textLayout.mWholeTextSize = Size( 5.f * ADVANCE_10 + 7.f * ADVANCE_12, 3.f * HEIGHT_12 );
+  textLayout.mMaxWordWidth = 2.f * ADVANCE_10 + 4.f * ADVANCE_12;
   textLayout.mNumberOfCharacters = 14;
   textLayout.mParagraphsLayoutInfo.push_back( paragraphLayout1 );
   textLayout.mParagraphsLayoutInfo.push_back( paragraphLayout2 );

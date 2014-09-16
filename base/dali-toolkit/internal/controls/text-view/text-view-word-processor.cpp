@@ -137,13 +137,19 @@ void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
         ChooseFontFamilyName( styledCharacter );
       }
 
+      // Gets the metrics of the font.
       const Font font = Font::New( FontParameters( styledCharacter.mStyle.GetFontName(), styledCharacter.mStyle.GetFontStyle(), styledCharacter.mStyle.GetFontPointSize() ) );
       const Font::Metrics metrics = font.GetMetrics( character );
       const float ascender = font.GetAscender();
 
-      // Fill Natural size info for current character.
-      characterLayoutInfo.mHeight = font.GetLineHeight();
-      characterLayoutInfo.mAdvance = metrics.GetAdvance();
+      // The font line's height is used as character's height.
+      characterLayoutInfo.mSize.height = font.GetLineHeight();
+
+      // The character's advance is used as charcter's width.
+      characterLayoutInfo.mSize.width = metrics.GetAdvance();
+
+      // The ascender and bearing are used to position correctly glyphs of different font sizes.
+      characterLayoutInfo.mAscender = ascender;
       characterLayoutInfo.mBearing = metrics.GetBearing();
 
       if( character.IsNewLine() && !characterLayoutInfo.mIsColorGlyph )
@@ -151,18 +157,13 @@ void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
         // A new paragraph character doesn't have any width.
         characterLayoutInfo.mSize.width = 0.f;
       }
-      else
-      {
-        // Uses advance as width.
-        characterLayoutInfo.mSize.width = characterLayoutInfo.mAdvance;
-      }
-      characterLayoutInfo.mSize.height = characterLayoutInfo.mHeight;
-      characterLayoutInfo.mAscender = ascender;
 
+      // Set's the underline thickness and position.
+      // Both thickness and position includes the vertical pad adjust used in effects like glow or shadow.
       if( styledCharacter.mStyle.IsUnderlineEnabled() )
       {
-        characterLayoutInfo.mUnderlineThickness = font.GetUnderlineThickness(); // Both thickness and position includes the
-        characterLayoutInfo.mUnderlinePosition = font.GetUnderlinePosition();   // vertical pad adjust used in effects like glow or shadow.
+        characterLayoutInfo.mUnderlineThickness = font.GetUnderlineThickness();
+        characterLayoutInfo.mUnderlinePosition = font.GetUnderlinePosition();
       }
 
       // stores the styled text.
