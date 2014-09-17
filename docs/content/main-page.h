@@ -64,7 +64,12 @@
  * - \link resource-tracking Resource Tracking \endlink
  * - \link performance-profiling Performance Profiling \endlink
  *
-*/
+ * \section Performance
+ * - \link performance-tips Performance Tips \endlink
+ * - \link texture-atlases Texture Atlases  \endlink
+ * - \link Texture_Compression Compressing Textures \endlink
+ *
+ */
 
 /*! \page scene-graph
  *

@@ -1,0 +1,45 @@
+<exporter version="1.0">
+  <!-- identifier of the exporter -->
+  <name>dali_exporter</name>
+
+  <!-- display name of the exporter for the combo box -->
+  <displayName>DALi 3D</displayName>
+
+  <!-- description of the exporter -->
+  <description>DALi 3D exporter for TexturePacker</description>
+
+  <!-- exporter version -->
+  <version>1.0</version>
+
+  <!-- currently only one file allowed - more to come soon -->
+  <files>
+      <file>
+          <!-- name of this file variable -->
+          <name>maintext</name>
+
+          <!-- human readable name (for GUI) -->
+          <displayName>.cpp file</displayName>
+
+          <!-- file extension for the file -->
+          <fileExtension>cpp</fileExtension>
+
+          <!-- name of the template file -->
+          <template>dali3d_exporter.cpp</template>
+      </file>
+  </files>
+
+  <!-- target framework supports trimming -->
+  <supportsTrimming>no</supportsTrimming>
+
+  <!-- target framework supports rotated sprites -->
+  <supportsRotation>no</supportsRotation>
+
+  <!-- supports npot sizes -->
+  <supportsNPOT>yes</supportsNPOT>
+
+  <!-- supports file name stripping (remove .png etc.) -->
+  <supportsTrimSpriteNames>yes</supportsTrimSpriteNames>
+
+  <!-- supports texture subpath -->
+  <supportsTextureSubPath>yes</supportsTextureSubPath>
+</exporter>
