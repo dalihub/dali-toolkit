@@ -1388,16 +1388,18 @@ void TextInput::OnDoubleTap(Dali::Actor actor, Dali::TapGesture tap)
      mTextLayoutInfo.mScrollOffset = mDisplayedTextView.GetScrollPosition();
      ReturnClosestIndex( tap.localPoint, mCursorPosition );
 
+     std::size_t start = 0;
+     std::size_t end = 0;
+     Dali::Toolkit::Internal::TextProcessor::FindNearestWord( mStyledText, mCursorPosition, start, end );
+
+     mCursorPosition = end; // Ensure cursor is positioned at end of selected word
+
      ImfManager imfManager = ImfManager::Get();
      if ( imfManager )
      {
        imfManager.SetCursorPosition ( mCursorPosition );
        imfManager.NotifyCursorPosition();
      }
-
-     std::size_t start = 0;
-     std::size_t end = 0;
-     Dali::Toolkit::Internal::TextProcessor::FindNearestWord( mStyledText, mCursorPosition, start, end );
 
      SelectText( start, end );
    }
@@ -1584,15 +1586,18 @@ void TextInput::OnLongPress(Dali::Actor actor, Dali::LongPressGesture longPress)
       mTextLayoutInfo.mScrollOffset = mDisplayedTextView.GetScrollPosition();
       ReturnClosestIndex( longPress.localPoint, mCursorPosition );
 
+      std::size_t start = 0;
+      std::size_t end = 0;
+      Dali::Toolkit::Internal::TextProcessor::FindNearestWord( mStyledText, mCursorPosition, start, end );
+
+      mCursorPosition  = end; // Ensure cursor is positioned at end of selected word
+
       ImfManager imfManager = ImfManager::Get();
       if ( imfManager )
       {
         imfManager.SetCursorPosition ( mCursorPosition );
         imfManager.NotifyCursorPosition();
       }
-      std::size_t start = 0;
-      std::size_t end = 0;
-      Dali::Toolkit::Internal::TextProcessor::FindNearestWord( mStyledText, mCursorPosition, start, end );
 
       SelectText( start, end );
     }
@@ -1751,11 +1756,9 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
     {
       bool preEditFlagPreviouslySet( mPreEditFlag );
 
-      if (mHighlightMeshActor)
-      {
-        // replaces highlighted text with new line
-        DeleteHighlightedText( false );
-      }
+      // replaces highlighted text with new line
+      DeleteHighlightedText( false );
+
       mCursorPosition = mCursorPosition + InsertAt( Text( NEWLINE ), mCursorPosition, 0 );
 
       // If we are in pre-edit mode then pressing enter will cause a commit.  But the commit string does not include the
@@ -1832,12 +1835,8 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
     // Some text may be selected, hiding keyboard causes an empty keystring to be sent, we don't want to delete highlight in this case
     if ( !keyString.empty() )
     {
-      if ( mHighlightMeshActor )
-      {
-        // replaces highlighted text with new character
-        DeleteHighlightedText( false );
-      }
-
+      // replaces highlighted text with new character
+      DeleteHighlightedText( false );
 
       // Received key String
       mCursorPosition = mCursorPosition + InsertAt( Text( keyString ), mCursorPosition, 0 );
@@ -2083,7 +2082,7 @@ void TextInput::SetUpTouchEvents()
 void TextInput::CreateTextViewActor()
 {
   mDisplayedTextView = Toolkit::TextView::New();
-  mDisplayedTextView.SetName( "TextView ");
+  mDisplayedTextView.SetName( "DisplayedTextView ");
   mDisplayedTextView.SetMarkupProcessingEnabled( mMarkUpEnabled );
   mDisplayedTextView.SetParentOrigin(ParentOrigin::TOP_LEFT);
   mDisplayedTextView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
@@ -2587,7 +2586,7 @@ void TextInput::DeleteHighlightedText( bool inheritStyle )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "DeleteHighlightedText handlePosOne[%u] handlePosTwo[%u]\n", mSelectionHandleOnePosition, mSelectionHandleTwoPosition);
 
-  if(mHighlightMeshActor)
+  if( mHighlightMeshActor )
   {
     mCursorPosition = std::min( mSelectionHandleOnePosition, mSelectionHandleTwoPosition );
 
@@ -2834,6 +2833,7 @@ ImageActor TextInput::CreateCursor( const Vector4& color)
 {
   ImageActor cursor;
   cursor = CreateSolidColorActor(color);
+  cursor.SetName( "Cursor" );
 
   cursor.SetParentOrigin(ParentOrigin::TOP_LEFT);
   cursor.SetAnchorPoint(AnchorPoint::BOTTOM_CENTER);
@@ -2989,11 +2989,13 @@ void TextInput::CreateGrabHandle( Dali::Image image )
 void TextInput::CreateGrabArea( Actor& parent )
 {
   mGrabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
+  mGrabArea.SetName( "GrabArea" );
   mGrabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
   mGrabArea.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), RelativeToConstraint( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE ) ) );  // grab area to be larger than text actor
   mGrabArea.TouchedSignal().Connect(this,&TextInput::OnPressDown);
   mTapDetector.Attach( mGrabArea );
   mPanGestureDetector.Attach( mGrabArea );
+  mLongPressDetector.Attach( mGrabArea );
 
   parent.Add(mGrabArea);
 }
@@ -4591,16 +4593,7 @@ void TextInput::SelectText(std::size_t start, std::size_t end)
     // When replacing highlighted text keyboard should ignore current word at cursor hence notify keyboard that the cursor is at the start of the highlight.
     mSelectingText = true;
 
-    mCursorPosition = std::min( start, end ); // Set cursor position to start of highlighted text.
-
-    ImfManager imfManager = ImfManager::Get();
-    if ( imfManager )
-    {
-      imfManager.SetCursorPosition ( mCursorPosition );
-      imfManager.SetSurroundingText( GetText() );
-      imfManager.NotifyCursorPosition();
-    }
-    // As the imfManager has been notified of the new cursor position we do not need to reset the pre-edit as it will be updated instead.
+    std::size_t selectionStartPosition = std::min( start, end );
 
     // Hide grab handle when selecting.
     ShowGrabHandleAndSetVisibility( false );
@@ -4614,7 +4607,7 @@ void TextInput::SelectText(std::size_t start, std::size_t end)
       UpdateHighlight();
 
       const TextStyle oldInputStyle( mInputStyle );
-      mInputStyle = GetStyleAt( mCursorPosition ); // Inherit style from selected position.
+      mInputStyle = GetStyleAt( selectionStartPosition ); // Inherit style from selected position.
 
       if( oldInputStyle != mInputStyle )
       {
