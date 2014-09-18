@@ -1010,7 +1010,6 @@ bool Builder::ApplyStyle( const std::string& styleName, Handle& handle, const Re
   }
   else
   {
-    DALI_SCRIPT_WARNING("No styles section to create style '%s'\n", styleName.c_str());
     return false;
   }
 }

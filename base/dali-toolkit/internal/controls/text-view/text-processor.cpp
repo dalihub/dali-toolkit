@@ -327,6 +327,15 @@ void FindNearestWord( const MarkupProcessor::StyledTextArray& text, size_t offse
     j++;
   }
 
+  // If both markers at same position and is whitespace then word is a whitespace word
+  if ( i == j )
+  {
+    while(j < size && IsWhiteSpace(text, j))
+    {
+      j++;
+    }
+  }
+
   start = i;
   end = j;
 }
