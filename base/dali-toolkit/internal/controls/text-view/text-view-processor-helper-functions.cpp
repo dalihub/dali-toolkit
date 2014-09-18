@@ -54,8 +54,8 @@ void UpdateSize( Size& size1, const Size& size2, const SizeGrowType type )
 
 TextSeparatorType GetTextSeparatorType( const Character& character )
 {
-  // returns if the given character is a line separator '\n', a word separator ' ' or if is not a separator (any other character).
-  return ( character.IsNewLine() ? LineSeparator : ( character.IsWhiteSpace() ? WordSeparator : NoSeparator ) );
+  // returns if the given character is a paragraph separator '\n', a word separator ' ' or if is not a separator (any other character).
+  return ( character.IsNewLine() ? ParagraphSeparator : ( character.IsWhiteSpace() ? WordSeparator : NoSeparator ) );
 }
 
 void ChooseFontFamilyName( MarkupProcessor::StyledText& text )
@@ -103,88 +103,65 @@ void GetIndicesFromGlobalCharacterIndex( const std::size_t index,
                                          const TextLayoutInfo& textLayoutInfo,
                                          TextInfoIndices& indices )
 {
-  // TODO : Check for mixed LTR and RTL.
-
   // clear all indices
   indices = TextInfoIndices();
 
   // Early return.
-  if( textLayoutInfo.mLinesLayoutInfo.empty() )
+  if( textLayoutInfo.mParagraphsLayoutInfo.empty() )
   {
     // Text is empty. All indices are 0.
     return;
   }
 
-  std::size_t currentIndex = 0; // stores how many characters have been traversed.
+  std::size_t currentIndex = 0u; // stores how many characters have been traversed (within the whole text).
 
-  // Traverse all lines, groups of words and words until global index is found.
+  // Traverse all paragraphs and words until global index is found.
   bool found = false;
-  for( LineLayoutInfoContainer::const_iterator lineIt = textLayoutInfo.mLinesLayoutInfo.begin(),
-         lineEndIt = textLayoutInfo.mLinesLayoutInfo.end();
-       ( !found ) && ( lineIt != lineEndIt );
-       ++lineIt, ++indices.mLineIndex )
+  for( ParagraphLayoutInfoContainer::const_iterator paragraphIt = textLayoutInfo.mParagraphsLayoutInfo.begin(),
+         paragraphEndIt = textLayoutInfo.mParagraphsLayoutInfo.end();
+       ( !found ) && ( paragraphIt != paragraphEndIt );
+       ++paragraphIt, ++indices.mParagraphIndex )
   {
-    const LineLayoutInfo& lineLayoutInfo( *lineIt );
+    const ParagraphLayoutInfo& paragraphLayoutInfo( *paragraphIt );
 
-    if( currentIndex + lineLayoutInfo.mNumberOfCharacters > index )
+    if( currentIndex + paragraphLayoutInfo.mNumberOfCharacters > index )
     {
-      // The character is in this line
-      for( WordGroupLayoutInfoContainer::const_iterator groupIt = lineLayoutInfo.mWordGroupsLayoutInfo.begin(),
-             groupEndIt = lineLayoutInfo.mWordGroupsLayoutInfo.end();
-           ( !found ) && ( groupIt != groupEndIt );
-           ++groupIt, ++indices.mGroupIndex )
+      // The character is in this paragraph
+      for( WordLayoutInfoContainer::const_iterator wordIt = paragraphLayoutInfo.mWordsLayoutInfo.begin(),
+             wordEndIt = paragraphLayoutInfo.mWordsLayoutInfo.end();
+           ( !found ) && ( wordIt != wordEndIt );
+           ++wordIt, ++indices.mWordIndex )
       {
-        const WordGroupLayoutInfo& wordGroupLayoutInfo( *groupIt );
+        const WordLayoutInfo& wordLayoutInfo( *wordIt );
 
-        if( currentIndex + wordGroupLayoutInfo.mNumberOfCharacters > index )
+        if( currentIndex + wordLayoutInfo.mCharactersLayoutInfo.size() > index )
         {
-          // The character is in this group of words.
-          for( WordLayoutInfoContainer::const_iterator wordIt = wordGroupLayoutInfo.mWordsLayoutInfo.begin(),
-                 wordEndIt = wordGroupLayoutInfo.mWordsLayoutInfo.end();
-               ( !found ) && ( wordIt != wordEndIt );
-               ++wordIt, ++indices.mWordIndex )
-          {
-            const WordLayoutInfo& wordLayoutInfo( *wordIt );
-
-            if( currentIndex + wordLayoutInfo.mCharactersLayoutInfo.size() > index )
-            {
-              // The character is in this word
-              indices.mCharacterIndex = index - currentIndex;
-              found = true;
-            }
-            else
-            {
-              // check in the next word.
-              currentIndex += wordLayoutInfo.mCharactersLayoutInfo.size();
-            }
-          } // end words.
-          if( !wordGroupLayoutInfo.mWordsLayoutInfo.empty() )
-          {
-            --indices.mWordIndex;
-          }
+          // The character is in this word
+          indices.mCharacterIndex = index - currentIndex;
+          found = true;
         }
         else
         {
-          // check in the next group of words
-          currentIndex += wordGroupLayoutInfo.mNumberOfCharacters;
+          // check in the next word.
+          currentIndex += wordLayoutInfo.mCharactersLayoutInfo.size();
         }
-      } // end groups of words.
-      if( !lineLayoutInfo.mWordGroupsLayoutInfo.empty() )
+      } // end words.
+      if( !paragraphLayoutInfo.mWordsLayoutInfo.empty() )
       {
-        --indices.mGroupIndex;
+        --indices.mWordIndex;
       }
     }
     else
     {
-      // check in the next line
-      currentIndex += lineLayoutInfo.mNumberOfCharacters;
+      // check in the next paragraph
+      currentIndex += paragraphLayoutInfo.mNumberOfCharacters;
     }
-  } // end lines.
+  } // end paragraphs.
 
   // Need to decrease indices as they have been increased in the last loop.
-  if( !textLayoutInfo.mLinesLayoutInfo.empty() )
+  if( !textLayoutInfo.mParagraphsLayoutInfo.empty() )
   {
-    --indices.mLineIndex;
+    --indices.mParagraphIndex;
   }
 }
 

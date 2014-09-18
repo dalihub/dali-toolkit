@@ -72,27 +72,6 @@ const Vector2 ANGLE_OUTER_CUBE_SWING(Math::PI * 0.5f, Math::PI * 0.5f);  ///< ou
 
 // Helpers ////////////////////////////////////////////////////////////////////////////////////////
 
-// TODO: GetAngle for Vector2 can be moved.
-// GetAngle for Vector3 needs to be measured against a normal/plane.
-
-/**
- * @param[in] vector The 3D vector to be measured
- * @return angle in radians from 0 to 2PI
- */
-float GetAngle(const Vector3& vector)
-{
-  return atan2(vector.y, vector.x) + Math::PI;
-}
-
-/**
- * @param[in] vector The 2D vector to be measured
- * @return angle in radians from 0 to 2PI
- */
-float GetAngle(const Vector2& vector)
-{
-  return atan2(vector.y, vector.x) + Math::PI;
-}
-
 /**
  * Find the vector (distance) from (a) to (b)
  * in domain (start) to (end)

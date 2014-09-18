@@ -40,8 +40,7 @@ extern Debug::Filter* gTextViewProcessorLogFilter;
 #endif
 
 void dbgPrint( const WordLayoutInfo& word );
-void dbgPrint( const WordGroupLayoutInfo& group );
-void dbgPrint( const LineLayoutInfo& line );
+void dbgPrint( const ParagraphLayoutInfo& paragraph );
 void dbgPrint( const TextLayoutInfo& textInfo );
 void dbgPrint( const TextStyle& style );
 void dbgPrint( const TextInfoIndices& indices );

@@ -47,10 +47,7 @@ const char* const PROPERTY_MULTILINE_POLICY = "multiline-policy";
 const char* const PROPERTY_WIDTH_EXCEED_POLICY = "width-exceed-policy";
 const char* const PROPERTY_HEIGHT_EXCEED_POLICY = "height-exceed-policy";
 const char* const PROPERTY_LINE_JUSTIFICATION = "line-justification";
-const char* const PROPERTY_FADE_BOUNDARY_LEFT = "fade-boundary-left";
-const char* const PROPERTY_FADE_BOUNDARY_RIGHT = "fade-boundary-right";
-const char* const PROPERTY_FADE_BOUNDARY_TOP = "fade-boundary-top";
-const char* const PROPERTY_FADE_BOUNDARY_BOTTOM = "fade-boundary-bottom";
+const char* const PROPERTY_FADE_BOUNDARY = "fade-boundary";
 const char* const PROPERTY_LINE_HEIGHT_OFFSET = "line-height-offset";
 const char* const PROPERTY_HORIZONTAL_ALIGNMENT = "horizontal-alignment";
 const char* const PROPERTY_VERTICAL_ALIGNMENT = "vertical-alignment";
@@ -236,12 +233,14 @@ int UtcDaliTextViewSetAndGetText(void)
   ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
   DALI_TEST_CHECK( registry );
 
-  gNumberObjectCreated = 0;
+  gNumberObjectCreated = 0u;
   registry.ObjectCreatedSignal().Connect(&TestCallback);
 
   // Following string should create three text-actors ([Hel], [lo wo] and [rld]).
   std::string text( "Hel<font size='10'>lo wo</font>rld!\n"
                     "\n" );
+
+  view.SetMarkupProcessingEnabled( true ); // Enables markup processing.
 
   Stage::GetCurrent().Add( view );
   view.SetText( text );
@@ -487,6 +486,7 @@ int UtcDaliTextViewTestLayoutOptions02(void)
 
   TextView textView = TextView::New();
   textView.SetSnapshotModeEnabled( false ); // Disables offscreen rendering.
+  textView.SetMarkupProcessingEnabled( true ); // Enables markup processing.
 
   Stage::GetCurrent().Add( textView );
 
@@ -626,7 +626,9 @@ int UtcDaliTextViewSnapshotEnable(void)
   // Avoids the frame buffer texture to throw an exception.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
 
-  TextView view = TextView::New( "Hel<font color='green'>lo world!</font> This <font color='green'>is</font> a sna<font color='green'>psho</font>t test." );
+  TextView view = TextView::New();
+  view.SetMarkupProcessingEnabled( true ); // Enables markup processing.
+  view.SetText( "Hel<font color='green'>lo world!</font> This <font color='green'>is</font> a sna<font color='green'>psho</font>t test." );
 
   Stage::GetCurrent().Add( view );
 
@@ -746,25 +748,13 @@ int UtcDaliTextViewSetProperty(void)
   DALI_TEST_CHECK( Toolkit::TextView::Justified == view.GetLineJustification() );
 
   //Test fade boundary property
-  unsigned int testValue = 23;
-  PixelSize leftFadeBoundary(testValue);
-  view.SetProperty(view.GetPropertyIndex(PROPERTY_FADE_BOUNDARY_LEFT), testValue);
-  DALI_TEST_CHECK( leftFadeBoundary == view.GetFadeBoundary().mLeft );
+  const Vector4 testValue( 23.f, 26.f, 2.f, 11.f );
 
-  testValue = 26;
-  PixelSize rightFadeBoundary(testValue);
-  view.SetProperty(view.GetPropertyIndex(PROPERTY_FADE_BOUNDARY_RIGHT), testValue);
-  DALI_TEST_CHECK( rightFadeBoundary == view.GetFadeBoundary().mRight );
-
-  testValue = 2;
-  PixelSize topFadeBoundary(testValue);
-  view.SetProperty(view.GetPropertyIndex(PROPERTY_FADE_BOUNDARY_TOP), testValue);
-  DALI_TEST_CHECK( topFadeBoundary == view.GetFadeBoundary().mTop );
-
-  testValue = 11;
-  PixelSize bottomFadeBoundary(testValue);
-  view.SetProperty(view.GetPropertyIndex(PROPERTY_FADE_BOUNDARY_BOTTOM), testValue);
-  DALI_TEST_CHECK( bottomFadeBoundary == view.GetFadeBoundary().mBottom );
+  view.SetProperty(view.GetPropertyIndex(PROPERTY_FADE_BOUNDARY), testValue);
+  DALI_TEST_CHECK( testValue.x == view.GetFadeBoundary().mLeft );
+  DALI_TEST_CHECK( testValue.y == view.GetFadeBoundary().mRight );
+  DALI_TEST_CHECK( testValue.z == view.GetFadeBoundary().mTop );
+  DALI_TEST_CHECK( testValue.w == view.GetFadeBoundary().mBottom );
 
   //Test Line height offset property
   float testOffsetValue = 14.04f;
@@ -801,8 +791,10 @@ int UtcDaliTextViewUnderlineText(void)
   tet_infoline("UtcDaliTextViewUnderlineText: ");
   ToolkitTestApplication application;
 
-  TextView textView = TextView::New( "<u><font size='10'>gg<font size='14'>gg<font size='18'>gg<font size='22'>gg</font>gg</font>gg</font>gg</font></u>" );
+  TextView textView = TextView::New();
   textView.SetSnapshotModeEnabled( false );
+  textView.SetMarkupProcessingEnabled( true );
+  textView.SetText( "<u><font size='10'>gg<font size='14'>gg<font size='18'>gg<font size='22'>gg</font>gg</font>gg</font>gg</font></u>" );
 
   textView.SetSize( 150.f, 100.f );
 

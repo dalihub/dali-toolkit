@@ -34,6 +34,7 @@ TextView::CharacterLayoutInfo::CharacterLayoutInfo()
 : mSize(),
   mPosition(),
   mIsNewLineChar( false ),
+  mIsNewParagraphChar( false ),
   mIsRightToLeftCharacter( false ),
   mIsVisible( true ),
   mDescender()
@@ -47,7 +48,8 @@ TextView::CharacterLayoutInfo::~CharacterLayoutInfo()
 TextView::CharacterLayoutInfo::CharacterLayoutInfo( const TextView::CharacterLayoutInfo& characterLayoutInfo )
 : mSize( characterLayoutInfo.mSize ),
   mPosition( characterLayoutInfo.mPosition ),
-  mIsNewLineChar( characterLayoutInfo.mIsNewLineChar ),
+  mIsNewLineChar( characterLayoutInfo.mIsNewParagraphChar ),
+  mIsNewParagraphChar( characterLayoutInfo.mIsNewParagraphChar ),
   mIsRightToLeftCharacter( characterLayoutInfo.mIsRightToLeftCharacter ),
   mIsVisible( characterLayoutInfo.mIsVisible ),
   mDescender( characterLayoutInfo.mDescender )
@@ -58,7 +60,8 @@ TextView::CharacterLayoutInfo& TextView::CharacterLayoutInfo::operator=( const T
 {
   mSize = characterLayoutInfo.mSize;
   mPosition = characterLayoutInfo.mPosition;
-  mIsNewLineChar = characterLayoutInfo.mIsNewLineChar;
+  mIsNewLineChar = characterLayoutInfo.mIsNewParagraphChar;
+  mIsNewParagraphChar = characterLayoutInfo.mIsNewParagraphChar;
   mIsRightToLeftCharacter = characterLayoutInfo.mIsRightToLeftCharacter;
   mIsVisible = characterLayoutInfo.mIsVisible;
   mDescender = characterLayoutInfo.mDescender;
@@ -68,13 +71,14 @@ TextView::CharacterLayoutInfo& TextView::CharacterLayoutInfo::operator=( const T
 
 TextView::CharacterLayoutInfo::CharacterLayoutInfo( const Size& size,
                                                     const Vector3& position,
-                                                    bool isNewLineChar,
+                                                    bool isNewParagraphChar,
                                                     bool isRightToLeftCharacter,
                                                     bool isVisible,
                                                     float descender )
 : mSize( size ),
   mPosition( position ),
-  mIsNewLineChar( isNewLineChar ),
+  mIsNewLineChar( isNewParagraphChar ),
+  mIsNewParagraphChar( isNewParagraphChar ),
   mIsRightToLeftCharacter( isRightToLeftCharacter ),
   mIsVisible( isVisible ),
   mDescender( descender )

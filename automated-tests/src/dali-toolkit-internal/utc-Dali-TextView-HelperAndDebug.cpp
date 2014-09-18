@@ -55,23 +55,21 @@ struct GetIndicesFromGlobalCharacterIndexTest
   std::string description;
   std::string input;
   std::size_t position;
-  std::size_t lineIndex;
-  std::size_t groupIndex;
+  std::size_t paragraphIndex;
   std::size_t wordIndex;
   std::size_t characterIndex;
 };
 
 /**
- * Gets the line, group, word, and character indices for a given text and a given position and checks the results with the given indices.
+ * Gets the paragraph, word, and character indices for a given text and a given position and checks the results with the given indices.
  *
  * If the test fails it prints a short description and the line where this function was called.
  *
  * @param description Short description of the experiment.
  * @param input The input text.
  * @param position Global position of the character. i.e in a text with with 1000 characters, position could be any value from 0 to 1000.
- * @param resultLineIndex Index to the line where the character is located.
- * @param resultGroupIndex Index to the group within the line where the character is located.
- * @param resultWordIndex Index to the word within the group where the character is located.
+ * @param resultParagraphIndex Index to the paragraph where the character is located.
+ * @param resultWordIndex Index to the word within the paragraph where the character is located.
  * @param resultCharacterIndex Index to the character within the word where the character is located.
  * @param location Where this function has been called.
  *
@@ -80,8 +78,7 @@ struct GetIndicesFromGlobalCharacterIndexTest
 bool TestGetIndicesFromGlobalCharacterIndex( const std::string& description,
                                              const std::string& input,
                                              const std::size_t position,
-                                             const std::size_t resultLineIndex,
-                                             const std::size_t resultGroupIndex,
+                                             const std::size_t resultParagraphIndex,
                                              const std::size_t resultWordIndex,
                                              const std::size_t resultCharacterIndex,
                                              const char* location )
@@ -104,14 +101,9 @@ bool TestGetIndicesFromGlobalCharacterIndex( const std::string& description,
                                                          inputLayout,
                                                          indices );
 
-  if( indices.mLineIndex != resultLineIndex )
+  if( indices.mParagraphIndex != resultParagraphIndex )
   {
-    tet_printf( "Fail. different line index. %s", location );
-    return false;
-  }
-  if( indices.mGroupIndex != resultGroupIndex )
-  {
-    tet_printf( "Fail. different group index. %s", location );
+    tet_printf( "Fail. different paragraph index. %s", location );
     return false;
   }
   if( indices.mWordIndex != resultWordIndex )
@@ -148,7 +140,6 @@ int UtcDaliTextViewGetIndicesFromGlobalCharacterIndex(void)
       0,
       0,
       0,
-      0,
       0
     },
     {
@@ -159,7 +150,6 @@ int UtcDaliTextViewGetIndicesFromGlobalCharacterIndex(void)
                    "\n" ),
       76,
       4,
-      0,
       0,
       0
     },
@@ -172,7 +162,6 @@ int UtcDaliTextViewGetIndicesFromGlobalCharacterIndex(void)
       75,
       3,
       0,
-      0,
       0
     },
     {
@@ -183,8 +172,7 @@ int UtcDaliTextViewGetIndicesFromGlobalCharacterIndex(void)
                    "\n" ),
       35,
       1,
-      1,
-      0,
+      4,
       0
     },
     {
@@ -196,19 +184,16 @@ int UtcDaliTextViewGetIndicesFromGlobalCharacterIndex(void)
       3,
       0,
       0,
-      0,
       3
     },
-    /* TODO Check for mixed RTL and LTR text.
     {
-      std::string( "Test position 33. (end of the second word of the second line)" ),
+      std::string( "Test position 33. (end of the second word of the second paragraph)" ),
       std::string( "text te<font size='30'>xt text text text\n</font>"
                    "text text טק<font size='30'>סט טקסט </font>text\n"
                    "text te<font size='30'>xt text text</font> text\n"
                    "\n" ),
       33,
       1,
-      0,
       2,
       3
     },
@@ -220,19 +205,17 @@ int UtcDaliTextViewGetIndicesFromGlobalCharacterIndex(void)
                    "\n" ),
       43,
       1,
-      1,
-      3,
+      6,
       3
     },
-    */
   };
-  const std::size_t numberOfTests( 5 );
+  const std::size_t numberOfTests( 7 );
 
   for( std::size_t index = 0; index < numberOfTests; ++index )
   {
     const GetIndicesFromGlobalCharacterIndexTest& test = getIndicesFromGlobalCharacterIndexTests[index];
 
-    if( !TestGetIndicesFromGlobalCharacterIndex( test.description, test.input, test.position, test.lineIndex, test.groupIndex, test.wordIndex, test.characterIndex, TEST_LOCATION ) )
+    if( !TestGetIndicesFromGlobalCharacterIndex( test.description, test.input, test.position, test.paragraphIndex, test.wordIndex, test.characterIndex, TEST_LOCATION ) )
     {
       tet_result( TET_FAIL );
     }

@@ -109,20 +109,34 @@ AlphaFunction GetAlphaFunction( const std::string& alphaFunction )
   if( 0 == alphaFunctionLut.size() )
   {
     // coding convention is uppercase enums
-    alphaFunctionLut["DEFAULT"]         = Dali::AlphaFunctions::Default;
-    alphaFunctionLut["LINEAR"]          = Dali::AlphaFunctions::Linear;
-    alphaFunctionLut["REVERSE"]         = Dali::AlphaFunctions::Reverse;
-    alphaFunctionLut["EASE_IN"]         = Dali::AlphaFunctions::EaseIn;
-    alphaFunctionLut["EASE_OUT"]        = Dali::AlphaFunctions::EaseOut;
-    alphaFunctionLut["EASE_IN_OUT"]     = Dali::AlphaFunctions::EaseInOut;
-    alphaFunctionLut["EASE_IN_SINE"]    = Dali::AlphaFunctions::EaseInSine;
-    alphaFunctionLut["EASE_OUT_SINE"]   = Dali::AlphaFunctions::EaseOutSine;
-    alphaFunctionLut["EASE_IN_OUT_SINE"]= Dali::AlphaFunctions::EaseInOutSine;
-    alphaFunctionLut["BOUNCE"]          = Dali::AlphaFunctions::Bounce;
-    alphaFunctionLut["BOUNCE_BACK"]     = Dali::AlphaFunctions::BounceBack;
-    alphaFunctionLut["EASE_OUT_BACK"]   = Dali::AlphaFunctions::EaseOutBack;
-    alphaFunctionLut["SIN"]             = Dali::AlphaFunctions::Sin;
-    alphaFunctionLut["SIN2X"]           = Dali::AlphaFunctions::Sin;
+    alphaFunctionLut["DEFAULT"]                    = AlphaFunctions::Default;
+    alphaFunctionLut["LINEAR"]                     = AlphaFunctions::Linear;
+    alphaFunctionLut["SQUARE"]                     = AlphaFunctions::Square;
+    alphaFunctionLut["REVERSE"]                    = AlphaFunctions::Reverse;
+    alphaFunctionLut["EASE_IN"]                    = AlphaFunctions::EaseIn;
+    alphaFunctionLut["EASE_OUT"]                   = AlphaFunctions::EaseOut;
+    alphaFunctionLut["EASE_IN_OUT"]                = AlphaFunctions::EaseInOut;
+    alphaFunctionLut["EASE_IN_SINE"]               = AlphaFunctions::EaseInSine;
+    alphaFunctionLut["EASE_OUT_SINE"]              = AlphaFunctions::EaseOutSine;
+    alphaFunctionLut["EASE_IN_OUT_SINE"]           = AlphaFunctions::EaseInOutSine;
+    alphaFunctionLut["EASE_IN_SINE_33"]            = AlphaFunctions::EaseInSine33;
+    alphaFunctionLut["EASE_OUT_SINE_33"]           = AlphaFunctions::EaseOutSine33;
+    alphaFunctionLut["EASE_IN_OUT_SINE_33"]        = AlphaFunctions::EaseInOutSine33;
+    alphaFunctionLut["EASE_IN_OUT_SINE_50"]        = AlphaFunctions::EaseInOutSine50;
+    alphaFunctionLut["EASE_IN_OUT_SINE_60"]        = AlphaFunctions::EaseInOutSine60;
+    alphaFunctionLut["EASE_IN_OUT_SINE_70"]        = AlphaFunctions::EaseInOutSine70;
+    alphaFunctionLut["EASE_IN_OUT_SINE_80"]        = AlphaFunctions::EaseInOutSine80;
+    alphaFunctionLut["EASE_IN_OUT_SINE_90"]        = AlphaFunctions::EaseInOutSine90;
+    alphaFunctionLut["DOUBLE_EASE_IN_OUT_SINE_60"] = AlphaFunctions::DoubleEaseInOutSine60;
+    alphaFunctionLut["EASE_OUT_QUINT_50"]          = AlphaFunctions::EaseOutQuint50;
+    alphaFunctionLut["EASE_OUT_QUINT_80"]          = AlphaFunctions::EaseOutQuint80;
+    alphaFunctionLut["BOUNCE"]                     = AlphaFunctions::Bounce;
+    alphaFunctionLut["BOUNCE_BACK"]                = AlphaFunctions::BounceBack;
+    alphaFunctionLut["EASE_IN_BACK"]               = AlphaFunctions::EaseInBack;
+    alphaFunctionLut["EASE_OUT_BACK"]              = AlphaFunctions::EaseOutBack;
+    alphaFunctionLut["EASE_IN_OUT_BACK"]           = AlphaFunctions::EaseInOutBack;
+    alphaFunctionLut["SIN"]                        = AlphaFunctions::Sin;
+    alphaFunctionLut["SIN2X"]                      = AlphaFunctions::Sin2x;
   }
 
   const AlphaFunctionLut::const_iterator iter( alphaFunctionLut.find( alphaFunction ) );

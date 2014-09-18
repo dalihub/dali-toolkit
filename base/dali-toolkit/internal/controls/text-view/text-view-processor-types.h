@@ -35,20 +35,11 @@ namespace TextViewProcessor
 {
 
 /**
- * Whether the direction is Right To Left or Left To Right.
- */
-enum Direction
-{
-  LTR, ///< Left To Right direction.
-  RTL  ///< Right To Left direction.
-};
-
-/**
- * Whether the text is a new line character, a white space or normal text.
+ * Whether the text is a new paragraph character '\n', a white space or normal text.
  */
 enum TextSeparatorType
 {
-  LineSeparator,
+  ParagraphSeparator,
   WordSeparator,
   NoSeparator
 };
@@ -70,14 +61,15 @@ struct TextInfoIndices
 {
   /**
    * Default constructor.
+   *
+   * Initializes all members to their default values.
    */
   TextInfoIndices();
 
   /**
    * Constructor.
    */
-  TextInfoIndices( std::size_t lineIndex,
-                   std::size_t groupIndex,
+  TextInfoIndices( std::size_t paragraphIndex,
                    std::size_t wordIndex,
                    std::size_t characterIndex );
 
@@ -89,10 +81,43 @@ struct TextInfoIndices
    */
   bool operator==( const TextInfoIndices& indices ) const;
 
-  std::size_t mLineIndex;
-  std::size_t mGroupIndex;
-  std::size_t mWordIndex;
-  std::size_t mCharacterIndex;
+  std::size_t mParagraphIndex;          ///< The paragraph index within the text.
+  std::size_t mWordIndex;               ///< The word index within the paragraph.
+  std::size_t mCharacterIndex;          ///< The character index within the word.
+};
+
+/**
+ * Stores gradient info.
+ *
+ * Used to fade in/out text-actors.
+ */
+struct GradientInfo
+{
+  /**
+   * Default constructor.
+   *
+   * Initializes all members to their default values.
+   */
+  GradientInfo();
+
+  /**
+   * Default destructor.
+   */
+  ~GradientInfo();
+
+  /**
+   * Copy constructor
+   */
+  GradientInfo( const GradientInfo& info );
+
+  /**
+   * Assignment operator.
+   */
+  GradientInfo& operator=( const GradientInfo& info );
+
+  Vector4                     mGradientColor;  ///< Gradient color.
+  Vector2                     mStartPoint;     ///< Gradient start point.
+  Vector2                     mEndPoint;       ///< Gradient end point.
 };
 
 /**
@@ -109,6 +134,13 @@ struct CharacterLayoutInfo
   CharacterLayoutInfo();
 
   /**
+   * Default destructor.
+   *
+   * Deletes the gradient info.
+   */
+  ~CharacterLayoutInfo();
+
+  /**
    * Copy constructor.
    */
   CharacterLayoutInfo( const CharacterLayoutInfo& character );
@@ -118,30 +150,26 @@ struct CharacterLayoutInfo
    */
   CharacterLayoutInfo& operator=( const CharacterLayoutInfo& character );
 
-  // Natural size (metrics) of the glyph.
-  float       mHeight;             ///< Natural height of the character.
-  float       mAdvance;            ///< Natural horizontal distance from origin of current character and the next one.
-  float       mBearing;            ///< Natural vertical distance from the baseline to the top of the glyph's bbox.
-
-  // Size of the text-actor (may be modified by a scale factor).
-  Vector3     mPosition;           ///< Position within the text-view
-  Vector2     mOffset;             ///< Alignment and justification offset.
-  Size        mSize;               ///< Size of this character.
+  // Metrics of the glyph.
+  Size        mSize;               ///< Height of the font and advance (the horizontal distance from the origin of the current character and the next one).
+  float       mBearing;            ///< Vertical distance from the baseline to the top of the glyph's boundary box.
   float       mAscender;           ///< Distance from the base line to the top of the line.
   float       mUnderlineThickness; ///< The underline's thickness.
   float       mUnderlinePosition;  ///< The underline's position.
 
-  RenderableActor             mGlyphActor;     ///< Handle to a text-actor.
-  MarkupProcessor::StyledText mStyledText;     ///< Stores the text and its style.
-  float                       mColorAlpha;     ///< Alpha component for the initial text color when text is faded.
-  Vector4                     mGradientColor;  ///< Gradient color.
-  Vector2                     mStartPoint;     ///< Gradient start point.
-  Vector2                     mEndPoint;       ///< Gradient end point.
+  // Position and alignment offset. It depends on the lay-out.
+  Vector3     mPosition;           ///< Position within the text-view
+  Vector2     mOffset;             ///< Alignment and justification offset.
 
-  bool                        mIsVisible:1;    ///< Whether the text-actor is visible.
-  bool                        mSetText:1;      ///< Whether a new text needs to be set in the text-actor.
-  bool                        mSetStyle:1;     ///< Whether a new style needs to be set in the text-actor.
-  bool                        mIsColorGlyph:1; ///< Whether this character is an emoticon.
+  RenderableActor             mGlyphActor;   ///< Handle to a text-actor.
+  MarkupProcessor::StyledText mStyledText;   ///< Stores the text and its style.
+  float                       mColorAlpha;   ///< Alpha component for the initial text color when text is faded.
+  GradientInfo*               mGradientInfo; ///< Stores gradient info.
+
+  bool            mIsVisible:1;    ///< Whether the text-actor is visible.
+  bool            mSetText:1;      ///< Whether a new text needs to be set in the text-actor.
+  bool            mSetStyle:1;     ///< Whether a new style needs to be set in the text-actor.
+  bool            mIsColorGlyph:1; ///< Whether this character is an emoticon.
 };
 typedef std::vector<CharacterLayoutInfo> CharacterLayoutInfoContainer;
 
@@ -156,6 +184,13 @@ struct WordLayoutInfo
    * Initializes all members to their default values.
    */
   WordLayoutInfo();
+
+  /**
+   * Default destructor.
+   *
+   * Clears all characters.
+   */
+  ~WordLayoutInfo();
 
   /**
    * Copy constructor.
@@ -175,64 +210,41 @@ struct WordLayoutInfo
 typedef std::vector<WordLayoutInfo> WordLayoutInfoContainer;
 
 /**
- * Layout information for a group of words.
+ * Layout information for a paragraph.
  */
-struct WordGroupLayoutInfo
+struct ParagraphLayoutInfo
 {
   /**
    * Default constructor.
    *
    * Initializes all members to their default values.
    */
-  WordGroupLayoutInfo();
+  ParagraphLayoutInfo();
 
   /**
-   * Copy constructor.
-   */
-  WordGroupLayoutInfo( const WordGroupLayoutInfo& group );
-
-  /**
-   * Assignment operator.
-   */
-  WordGroupLayoutInfo& operator=( const WordGroupLayoutInfo& group );
-
-  Size                    mSize;               ///< Size of the group of words.
-  float                   mAscender;           ///< Max of all ascenders of all words.
-  Direction               mDirection;          ///< Whether this group of words is Right To Left or Left To Right.
-  WordLayoutInfoContainer mWordsLayoutInfo;    ///< Layout info for all words.
-  std::size_t             mNumberOfCharacters; ///< Stores the number of characters.
-};
-typedef std::vector<WordGroupLayoutInfo> WordGroupLayoutInfoContainer;
-
-/**
- * Layout information for a line.
- */
-struct LineLayoutInfo
-{
-  /**
-   * Default constructor.
+   * Default destructor.
    *
-   * Initializes all members to their default values.
+   * Clears all words.
    */
-  LineLayoutInfo();
+  ~ParagraphLayoutInfo();
 
   /**
    * Copy constructor.
    */
-  LineLayoutInfo( const LineLayoutInfo& line );
+  ParagraphLayoutInfo( const ParagraphLayoutInfo& paragraph );
 
   /**
    * Assignment operator.
    */
-  LineLayoutInfo& operator=( const LineLayoutInfo& line );
+  ParagraphLayoutInfo& operator=( const ParagraphLayoutInfo& paragraph );
 
-  Size                         mSize;                 ///< Size of the line.
-  float                        mAscender;             ///< Max of all ascenders of all groups of words.
-  float                        mLineHeightOffset;     ///< Line height offset.
-  WordGroupLayoutInfoContainer mWordGroupsLayoutInfo; ///< Layout info for all groups of words.
-  std::size_t                  mNumberOfCharacters;   ///< Stores the number of characters.
+  Size                                          mSize;                       ///< Size of the paragraph.
+  float                                         mAscender;                   ///< Max of all ascenders of all words.
+  float                                         mLineHeightOffset;           ///< Line height offset.
+  std::size_t                                   mNumberOfCharacters;         ///< Stores the number of characters.
+  WordLayoutInfoContainer                       mWordsLayoutInfo;            ///< Layout info for all words.
 };
-typedef std::vector<LineLayoutInfo> LineLayoutInfoContainer;
+typedef std::vector<ParagraphLayoutInfo> ParagraphLayoutInfoContainer;
 
 /**
  * Layout information for the whole text.
@@ -256,12 +268,12 @@ struct TextLayoutInfo
    */
   TextLayoutInfo& operator=( const TextLayoutInfo& text );
 
-  Size                    mWholeTextSize;                 ///< width and height of the whole text.
-  float                   mMaxWordWidth;                  ///< maximum width between all words.
-  LineLayoutInfoContainer mLinesLayoutInfo;               ///< Layout information for all lines.
-  std::size_t             mNumberOfCharacters;            ///< Stores the number of characters.
-  float                   mMaxItalicsOffset;              ///< When rendering text-view in offscreen an extra width offset is needed to prevent italic characters to be cut if they are in the right edge.
-  WordLayoutInfo          mEllipsizeLayoutInfo;           ///< Layout information for the ellipsize text.
+  Size                         mWholeTextSize;        ///< width and height of the whole text.
+  float                        mMaxWordWidth;         ///< maximum width between all words.
+  float                        mMaxItalicsOffset;     ///< When rendering text-view in offscreen an extra width offset is needed to prevent italic characters to be cut if they are in the right edge.
+  std::size_t                  mNumberOfCharacters;   ///< Stores the number of characters.
+  ParagraphLayoutInfoContainer mParagraphsLayoutInfo; ///< Layout information for all paragraphs.
+  WordLayoutInfo               mEllipsizeLayoutInfo;  ///< Layout information for the ellipsize text.
 };
 
 } // namespace TextViewProcessor

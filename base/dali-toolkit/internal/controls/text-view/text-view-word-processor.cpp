@@ -49,7 +49,7 @@ const std::string EMOJI_FONT_NAME( "SamsungEmoji" ); // Emoticons font family na
 void UpdateLayoutInfo( WordLayoutInfo& wordLayout )
 {
   // Initialize layout info for the whole word.
-  wordLayout.mSize = Size();
+  wordLayout.mSize = Size::ZERO;
   wordLayout.mAscender = 0.f;
 
   // Traverse the character layout info to update the word layout.
@@ -80,6 +80,10 @@ WordLayoutInfo::WordLayoutInfo()
 {
 }
 
+WordLayoutInfo::~WordLayoutInfo()
+{
+}
+
 WordLayoutInfo::WordLayoutInfo( const WordLayoutInfo& word )
 : mSize( word.mSize ),
   mAscender( word.mAscender ),
@@ -99,7 +103,7 @@ WordLayoutInfo& WordLayoutInfo::operator=( const WordLayoutInfo& word )
 }
 
 void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
-                         TextViewProcessor::WordLayoutInfo& wordLayoutInfo )
+                         WordLayoutInfo& wordLayoutInfo )
 {
   DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "-->TextViewProcessor::CreateWordTextInfo\n" );
   // Split in characters.
@@ -110,7 +114,7 @@ void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
     const std::size_t length = styledText.mText.GetLength();
 
     // It could be a group of characters.
-    for( std::size_t index = 0; index < length; ++index )
+    for( std::size_t index = 0u; index < length; ++index )
     {
       MarkupProcessor::StyledText styledCharacter;
       styledCharacter.mStyle = styledText.mStyle;
@@ -133,32 +137,33 @@ void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
         ChooseFontFamilyName( styledCharacter );
       }
 
+      // Gets the metrics of the font.
       const Font font = Font::New( FontParameters( styledCharacter.mStyle.GetFontName(), styledCharacter.mStyle.GetFontStyle(), styledCharacter.mStyle.GetFontPointSize() ) );
       const Font::Metrics metrics = font.GetMetrics( character );
       const float ascender = font.GetAscender();
 
-      // Fill Natural size info for current character.
-      characterLayoutInfo.mHeight = font.GetLineHeight();
-      characterLayoutInfo.mAdvance = metrics.GetAdvance();
+      // The font line's height is used as character's height.
+      characterLayoutInfo.mSize.height = font.GetLineHeight();
+
+      // The character's advance is used as charcter's width.
+      characterLayoutInfo.mSize.width = metrics.GetAdvance();
+
+      // The ascender and bearing are used to position correctly glyphs of different font sizes.
+      characterLayoutInfo.mAscender = ascender;
       characterLayoutInfo.mBearing = metrics.GetBearing();
 
       if( character.IsNewLine() && !characterLayoutInfo.mIsColorGlyph )
       {
-        // A new line character doesn't have any width.
+        // A new paragraph character doesn't have any width.
         characterLayoutInfo.mSize.width = 0.f;
       }
-      else
-      {
-        // Uses advance as width.
-        characterLayoutInfo.mSize.width = characterLayoutInfo.mAdvance;
-      }
-      characterLayoutInfo.mSize.height = characterLayoutInfo.mHeight;
-      characterLayoutInfo.mAscender = ascender;
 
+      // Set's the underline thickness and position.
+      // Both thickness and position includes the vertical pad adjust used in effects like glow or shadow.
       if( styledCharacter.mStyle.IsUnderlineEnabled() )
       {
-        characterLayoutInfo.mUnderlineThickness = font.GetUnderlineThickness(); // Both thickness and position includes the
-        characterLayoutInfo.mUnderlinePosition = font.GetUnderlinePosition();   // vertical pad adjust used in effects like glow or shadow.
+        characterLayoutInfo.mUnderlineThickness = font.GetUnderlineThickness();
+        characterLayoutInfo.mUnderlinePosition = font.GetUnderlinePosition();
       }
 
       // stores the styled text.
@@ -178,57 +183,57 @@ void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
 void RemoveCharactersFromWordInfo( TextView::RelayoutData& relayoutData,
                                    const std::size_t numberOfCharacters,
                                    bool& mergeWords,
-                                   bool& mergeLines,
-                                   TextViewProcessor::TextInfoIndices& textInfoIndicesBegin,
-                                   TextViewProcessor::TextInfoIndices& textInfoIndicesEnd,
-                                   TextViewProcessor::TextInfoIndices& textInfoMergeIndicesBegin,
-                                   TextViewProcessor::TextInfoIndices& textInfoMergeIndicesEnd,
-                                   TextViewProcessor::WordGroupLayoutInfo& groupLayout,
+                                   bool& mergeParagraphs,
+                                   TextInfoIndices& textInfoIndicesBegin,
+                                   TextInfoIndices& textInfoIndicesEnd,
+                                   TextInfoIndices& textInfoMergeIndicesBegin,
+                                   TextInfoIndices& textInfoMergeIndicesEnd,
+                                   ParagraphLayoutInfo& paragraphLayout,
                                    std::vector<TextActor>& removedTextActors )
 {
-  const TextViewProcessor::TextLayoutInfo& textLayoutInfo = relayoutData.mTextLayoutInfo;
+  const TextLayoutInfo& textLayoutInfo = relayoutData.mTextLayoutInfo;
 
   // Get the word.
-  WordLayoutInfo& wordLayout( *( groupLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex ) );
+  WordLayoutInfo& wordLayout( *( paragraphLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex ) );
 
-  if( TextViewProcessor::LineSeparator == wordLayout.mType )
+  if( ParagraphSeparator == wordLayout.mType )
   {
-    // If the word is a line separator and there is more lines, then current line and the line after need to be merged.
-    if( textInfoIndicesBegin.mLineIndex + 1 < textLayoutInfo.mLinesLayoutInfo.size() )
+    // If the word is a paragraph separator and there is more paragraphs, then current paragraph and the paragraph after need to be merged.
+    if( textInfoIndicesBegin.mParagraphIndex + 1u < textLayoutInfo.mParagraphsLayoutInfo.size() )
     {
-      // current line is not the last one.
+      // current paragraph is not the last one.
 
-      // Update indices to merge lines.
-      textInfoMergeIndicesBegin.mLineIndex = textInfoIndicesBegin.mLineIndex;
-      textInfoMergeIndicesEnd.mLineIndex = textInfoIndicesBegin.mLineIndex + 1;
+      // Update indices to merge paragraphs.
+      textInfoMergeIndicesBegin.mParagraphIndex = textInfoIndicesBegin.mParagraphIndex;
+      textInfoMergeIndicesEnd.mParagraphIndex = textInfoIndicesBegin.mParagraphIndex + 1u;
 
-      mergeLines = true;
+      mergeParagraphs = true;
 
-      ++textInfoIndicesBegin.mLineIndex; // increase both indices,
-      textInfoIndicesEnd.mLineIndex +=2; // will delete last line.
+      ++textInfoIndicesBegin.mParagraphIndex; // increase both indices,
+      textInfoIndicesEnd.mParagraphIndex += 2u; // will delete last paragraph.
     }
 
-    ++textInfoIndicesEnd.mWordIndex; //will delete the line separator;
+    ++textInfoIndicesEnd.mWordIndex; //will delete the paragraph separator;
   }
   else if( WordSeparator == wordLayout.mType )
   {
     // If the word is a word separator. Check if the word before and the word after can be merged.
 
-    if( ( 0 < textInfoIndicesBegin.mWordIndex ) && ( groupLayout.mWordsLayoutInfo.size() > textInfoIndicesBegin.mWordIndex + 1 ) )
+    if( ( 0u < textInfoIndicesBegin.mWordIndex ) && ( paragraphLayout.mWordsLayoutInfo.size() > textInfoIndicesBegin.mWordIndex + 1u ) )
     {
-      const WordLayoutInfo& wordLayoutBefore( *( groupLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex - 1 ) );
-      const WordLayoutInfo& wordLayoutAfter( *( groupLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex + 1 ) );
+      const WordLayoutInfo& wordLayoutBefore( *( paragraphLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex - 1u ) );
+      const WordLayoutInfo& wordLayoutAfter( *( paragraphLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex + 1u ) );
 
       if( ( NoSeparator == wordLayoutBefore.mType ) && ( NoSeparator == wordLayoutAfter.mType ) )
       {
-        // This word is a word separator (white space) and is not the first word of the group nor the last one.
+        // This word is a word separator (white space) and is not the first word of the paragraph nor the last one.
         mergeWords = true;
 
         // Set indices to merge the words.
-        textInfoMergeIndicesBegin.mWordIndex = textInfoIndicesBegin.mWordIndex - 1; // word before word separator.
-        textInfoMergeIndicesEnd.mWordIndex = textInfoIndicesBegin.mWordIndex + 1; // word after word separator.
+        textInfoMergeIndicesBegin.mWordIndex = textInfoIndicesBegin.mWordIndex - 1u; // word before word separator.
+        textInfoMergeIndicesEnd.mWordIndex = textInfoIndicesBegin.mWordIndex + 1u; // word after word separator.
 
-        textInfoIndicesEnd.mWordIndex += 2; // will delete the word separator and the merged word.
+        textInfoIndicesEnd.mWordIndex += 2u; // will delete the word separator and the merged word.
       }
       else
       {
@@ -264,7 +269,7 @@ void RemoveCharactersFromWord( const std::size_t position,
   // Removes a given number of characters from the given word starting from the 'position' index.
 
   // Early return.
-  if( 0 == numberOfCharacters )
+  if( 0u == numberOfCharacters )
   {
     // nothing to do if the number of characters is zero.
 
@@ -286,7 +291,7 @@ void SplitWord( const std::size_t position,
   // It moves characters from the first part of the word to the last one.
 
   // early returns
-  if( 0 == position )
+  if( 0u == position )
   {
     // the whole word goes to the last part of the word.
     lastWordLayoutInfo = firstWordLayoutInfo;
@@ -348,8 +353,8 @@ void MergeWord( WordLayoutInfo& firstWordLayoutInfo,
 
   if( ( NoSeparator != firstWordLayoutInfo.mType ) || ( NoSeparator != lastWordLayoutInfo.mType ) )
   {
-    // Do not merge white spaces or new line characters.
-    DALI_ASSERT_ALWAYS( !"TextViewProcessor::MergeWord(). ERROR: White spaces or new line characters can't be merged with other words." );
+    // Do not merge white spaces or new paragraph characters.
+    DALI_ASSERT_ALWAYS( !"TextViewProcessor::MergeWord(). ERROR: White spaces or new paragraph characters can't be merged with other words." );
   }
 
   // Merge layout info
@@ -380,7 +385,7 @@ CharacterLayoutInfo GetLastCharacterLayoutInfo( const WordLayoutInfo& wordLayout
 
   if( !wordLayoutInfo.mCharactersLayoutInfo.empty() )
   {
-    layoutInfo = *( wordLayoutInfo.mCharactersLayoutInfo.end() - 1 );
+    layoutInfo = *( wordLayoutInfo.mCharactersLayoutInfo.end() - 1u );
   }
 
   return layoutInfo;
@@ -406,9 +411,9 @@ void CollectTextActors( std::vector<TextActor>& textActors, const WordLayoutInfo
   }
 }
 
-void CollectTextActorsFromWords( std::vector<TextActor>& textActors, const WordGroupLayoutInfo& group, const std::size_t wordIndexBegin, const std::size_t wordIndexEnd )
+void CollectTextActorsFromWords( std::vector<TextActor>& textActors, const ParagraphLayoutInfo& paragraph, const std::size_t wordIndexBegin, const std::size_t wordIndexEnd )
 {
-  for( WordLayoutInfoContainer::const_iterator wordIt = group.mWordsLayoutInfo.begin() + wordIndexBegin, wordEndIt = group.mWordsLayoutInfo.begin() + wordIndexEnd;
+  for( WordLayoutInfoContainer::const_iterator wordIt = paragraph.mWordsLayoutInfo.begin() + wordIndexBegin, wordEndIt = paragraph.mWordsLayoutInfo.begin() + wordIndexEnd;
        wordIt != wordEndIt;
        ++wordIt )
   {

@@ -70,9 +70,9 @@ void dbgPrint( const WordLayoutInfo& word )
       std::cout << "NoSeparator" << std::endl;
       break;
     }
-    case LineSeparator:
+    case ParagraphSeparator:
     {
-      std::cout << "LineSeparator" << std::endl;
+      std::cout << "ParagraphSeparator" << std::endl;
       break;
     }
     case WordSeparator:
@@ -83,29 +83,15 @@ void dbgPrint( const WordLayoutInfo& word )
   }
 }
 
-void dbgPrint( const WordGroupLayoutInfo& group )
+void dbgPrint( const ParagraphLayoutInfo& paragraph )
 {
-  std::cout << "( ";
-  std::cout << group.mSize;
-  std::cout << group.mNumberOfCharacters;
-  for( WordLayoutInfoContainer::const_iterator wordIt = group.mWordsLayoutInfo.begin(), endWordIt = group.mWordsLayoutInfo.end();
+  std::cout << "< ";
+  std::cout << paragraph.mSize;
+  for( WordLayoutInfoContainer::const_iterator wordIt = paragraph.mWordsLayoutInfo.begin(), endWordIt = paragraph.mWordsLayoutInfo.end();
        wordIt != endWordIt;
        ++wordIt )
   {
     dbgPrint( *wordIt );
-  }
-  std::cout << " )";
-}
-
-void dbgPrint( const LineLayoutInfo& line )
-{
-  std::cout << "< ";
-  std::cout << line.mSize;
-  for( WordGroupLayoutInfoContainer::const_iterator groupIt = line.mWordGroupsLayoutInfo.begin(), endGroupIt = line.mWordGroupsLayoutInfo.end();
-       groupIt != endGroupIt;
-       ++groupIt )
-  {
-    dbgPrint( *groupIt );
   }
   std::cout << " >";
   std::cout << std::endl;
@@ -115,7 +101,8 @@ void dbgPrint( const TextLayoutInfo& textInfo )
 {
   std::cout << "||" << std::endl;
   std::cout << textInfo.mWholeTextSize;
-  for( LineLayoutInfoContainer::const_iterator it = textInfo.mLinesLayoutInfo.begin(), endIt = textInfo.mLinesLayoutInfo.end();
+  std::cout << textInfo.mNumberOfCharacters;
+  for( ParagraphLayoutInfoContainer::const_iterator it = textInfo.mParagraphsLayoutInfo.begin(), endIt = textInfo.mParagraphsLayoutInfo.end();
        it != endIt;
        ++it )
   {
@@ -126,36 +113,50 @@ void dbgPrint( const TextLayoutInfo& textInfo )
 
 void dbgPrint( const TextStyle& style )
 {
-  std::cout << "             font name : " << style.GetFontName() << std::endl;
-  std::cout << "            font style : " << style.GetFontStyle() << std::endl;
-  std::cout << "       font point size : " << style.GetFontPointSize() << std::endl;
-  std::cout << "                weight : " << style.GetWeight() << std::endl;
-  std::cout << "            text color : " << style.GetTextColor() << std::endl;
-  std::cout << "               italics : " << style.IsItalicsEnabled() << std::endl;
-  std::cout << "             underline : " << style.IsUnderlineEnabled() << std::endl;
-  std::cout << "                shadow : " << style.IsShadowEnabled() << std::endl;
-  std::cout << "          shadow color : " << style.GetShadowColor() << std::endl;
-  std::cout << "         shadow offset : " << style.GetShadowOffset() << std::endl;
-  std::cout << "                  glow : " << style.IsGlowEnabled() << std::endl;
-  std::cout << "         italics angle : " << style.GetItalicsAngle() << std::endl;
-  std::cout << "            glow color : " << style.GetGlowColor() << std::endl;
-  std::cout << "        glow intensity : " << style.GetGlowIntensity() << std::endl;
-  std::cout << "           smooth edge : " << style.GetSmoothEdge() << std::endl;
-  std::cout << "               outline : " << style.IsOutlineEnabled() << std::endl;
-  std::cout << "         outline color : " << style.GetOutlineColor() << std::endl;
-  std::cout << "     outline thickness : " << style.GetOutlineThickness() << std::endl;
-  std::cout << "              gradient : " << style.IsGradientEnabled() << std::endl;
-  std::cout << "        gradient color : " << style.GetGradientColor() << std::endl;
-  std::cout << "  gradient start point : " << style.GetGradientStartPoint() << std::endl;
-  std::cout << "    gradient end point : " << style.GetGradientEndPoint() << std::endl;
+  std::cout << "               font name : " << style.GetFontName() << std::endl;
+  std::cout << "              font style : " << style.GetFontStyle() << std::endl;
+  std::cout << "         font point size : " << style.GetFontPointSize() << std::endl;
+  std::cout << "                  weight : " << style.GetWeight() << std::endl;
+  std::cout << "              text color : " << style.GetTextColor() << std::endl;
+  std::cout << "                 italics : " << style.IsItalicsEnabled() << std::endl;
+  std::cout << "           italics angle : " << style.GetItalicsAngle() << std::endl;
+  std::cout << "               underline : " << style.IsUnderlineEnabled() << std::endl;
+  std::cout << "     underline thickness : " << style.GetUnderlineThickness() << std::endl;
+  std::cout << "      underline position : " << style.GetUnderlinePosition() << std::endl;
+  std::cout << "                  shadow : " << style.IsShadowEnabled() << std::endl;
+  std::cout << "            shadow color : " << style.GetShadowColor() << std::endl;
+  std::cout << "           shadow offset : " << style.GetShadowOffset() << std::endl;
+  std::cout << "             shadow size : " << style.GetShadowSize() << std::endl;
+  std::cout << "                    glow : " << style.IsGlowEnabled() << std::endl;
+  std::cout << "              glow color : " << style.GetGlowColor() << std::endl;
+  std::cout << "          glow intensity : " << style.GetGlowIntensity() << std::endl;
+  std::cout << "             smooth edge : " << style.GetSmoothEdge() << std::endl;
+  std::cout << "                 outline : " << style.IsOutlineEnabled() << std::endl;
+  std::cout << "           outline color : " << style.GetOutlineColor() << std::endl;
+  std::cout << "       outline thickness : " << style.GetOutlineThickness() << std::endl;
+  std::cout << "                gradient : " << style.IsGradientEnabled() << std::endl;
+  std::cout << "          gradient color : " << style.GetGradientColor() << std::endl;
+  std::cout << "    gradient start point : " << style.GetGradientStartPoint() << std::endl;
+  std::cout << "      gradient end point : " << style.GetGradientEndPoint() << std::endl;
+  std::cout << "    is font name default : " << style.IsFontNameDefault() << std::endl;
+  std::cout << "   is font style default : " << style.IsFontStyleDefault() << std::endl;
+  std::cout << "    is font size default : " << style.IsFontSizeDefault() << std::endl;
+  std::cout << "   is text color default : " << style.IsTextColorDefault() << std::endl;
+  std::cout << "  is font weight default : " << style.IsFontWeightDefault() << std::endl;
+  std::cout << "  is smooth edge default : " << style.IsSmoothEdgeDefault() << std::endl;
+  std::cout << "      is italics default : " << style.IsItalicsDefault() << std::endl;
+  std::cout << "    is underline default : " << style.IsUnderlineDefault() << std::endl;
+  std::cout << "       is shadow default : " << style.IsShadowDefault() << std::endl;
+  std::cout << "         is glow default : " << style.IsGlowDefault() << std::endl;
+  std::cout << "      is outline default : " << style.IsOutlineDefault() << std::endl;
+  std::cout << "     is gradient default : " << style.IsGradientDefault() << std::endl;
 }
 
 void dbgPrint( const TextInfoIndices& indices )
 {
-  std::cout << "   line : " << indices.mLineIndex << std::endl;
-  std::cout << "  group : " << indices.mGroupIndex << std::endl;
-  std::cout << "   word : " << indices.mWordIndex << std::endl;
-  std::cout << "   char : " << indices.mCharacterIndex << std::endl;
+  std::cout << "          paragraph : " << indices.mParagraphIndex << std::endl;
+  std::cout << "               word : " << indices.mWordIndex << std::endl;
+  std::cout << "               char : " << indices.mCharacterIndex << std::endl;
 }
 
 void dbgPrint( const MarkupProcessor::StyledTextArray& textArray )

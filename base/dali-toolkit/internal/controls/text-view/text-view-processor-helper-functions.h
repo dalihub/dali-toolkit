@@ -46,9 +46,9 @@ enum SizeGrowType
 };
 
 /**
- * Updates the size of a group of characters, word, group of words, line or the whole text with a given size.
+ * Updates the size of a character, word, line or the whole text with a given size.
  *
- * For group of characters, words, groups of words and lines the new height will be the maximum of both sizes
+ * For characters, words, and lines the new height will be the maximum of both sizes
  * and the new width will be the sum of both.
  *
  * For the whole text, the new height will be the sum of both and the new width the max of both.
@@ -56,7 +56,7 @@ enum SizeGrowType
  * The \e type parameter speficies which type of update is required.
  *
  * @param[in,out] size1 The current size to be updated.
- * @param[in] size2 The size of a group of characters, word, group of words or a line.
+ * @param[in] size2 The size of a character, word, or a line.
  * @param[in] type Type of update.
  */
 void UpdateSize( Size& size1, const Size& size2, SizeGrowType type = GrowWidth );
@@ -80,7 +80,7 @@ TextSeparatorType GetTextSeparatorType( const Character& character );
 void ChooseFontFamilyName( MarkupProcessor::StyledText& text );
 
 /**
- * Retrieves the line, word group, word and character indices for the given global character's index.
+ * Retrieves the line, word and character indices for the given global character's index.
  *
  * i.e. The retrieved indices for the character 18 (j) for the following text would be: 2, 0, 2, 0
  *
@@ -90,8 +90,8 @@ void ChooseFontFamilyName( MarkupProcessor::StyledText& text );
  *  m n o p
  *
  * @param[in] index The global character index.
- * @param[in] textLayoutInfo Contains info about the number of characters per word, group and line.
- * @param[out] indices Index to the line, group of words, word and character within the word where the given character is located.
+ * @param[in] textLayoutInfo Contains info about the number of characters per word, and line.
+ * @param[out] indices Index to the line, word and character within the word where the given character is located.
  */
 void GetIndicesFromGlobalCharacterIndex( std::size_t index,
                                          const TextLayoutInfo& textLayoutInfo,

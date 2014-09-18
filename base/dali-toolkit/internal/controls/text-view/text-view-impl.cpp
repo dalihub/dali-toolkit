@@ -121,8 +121,8 @@ bool IsTextViewProcessorNewStyleOperation( const TextView::TextViewProcessorMeta
 
 TextView::TextViewProcessorMetadata::TextViewProcessorMetadata()
 : mType( TextView::TextSet ),
-  mPosition( 0 ),
-  mNumberOfCharacters( 0 ),
+  mPosition( 0u ),
+  mNumberOfCharacters( 0u ),
   mText()
 {
 }
@@ -311,8 +311,7 @@ void TextView::SetLineHeightOffset( PointSize offset )
                                                                 RELAYOUT_ALIGNMENT |
                                                                 RELAYOUT_VISIBILITY |
                                                                 RELAYOUT_TEXT_ACTOR_UPDATE |
-                                                                RELAYOUT_INSERT_TO_TEXT_VIEW |
-                                                                RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST );
+                                                                RELAYOUT_INSERT_TO_TEXT_VIEW );
     }
   }
 }
@@ -477,8 +476,7 @@ void TextView::SetHeightExceedPolicy( Toolkit::TextView::ExceedPolicy policy )
                                                                 RELAYOUT_ALIGNMENT |
                                                                 RELAYOUT_VISIBILITY |
                                                                 RELAYOUT_TEXT_ACTOR_UPDATE |
-                                                                RELAYOUT_INSERT_TO_TEXT_VIEW |
-                                                                RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST );
+                                                                RELAYOUT_INSERT_TO_TEXT_VIEW );
     }
   }
 }
@@ -505,8 +503,7 @@ void TextView::SetLineJustification( Toolkit::TextView::LineJustification justif
                                                                 RELAYOUT_ALIGNMENT |
                                                                 RELAYOUT_VISIBILITY |
                                                                 RELAYOUT_TEXT_ACTOR_UPDATE |
-                                                                RELAYOUT_INSERT_TO_TEXT_VIEW |
-                                                                RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST );
+                                                                RELAYOUT_INSERT_TO_TEXT_VIEW );
     }
   }
 }
@@ -534,8 +531,7 @@ void TextView::SetFadeBoundary( const Toolkit::TextView::FadeBoundary& fadeBound
                                                                 RELAYOUT_REMOVE_TEXT_ACTORS |
                                                                 RELAYOUT_VISIBILITY |
                                                                 RELAYOUT_TEXT_ACTOR_UPDATE |
-                                                                RELAYOUT_INSERT_TO_TEXT_VIEW |
-                                                                RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST );
+                                                                RELAYOUT_INSERT_TO_TEXT_VIEW );
     }
   }
 }
@@ -635,7 +631,6 @@ void TextView::GetTextLayoutInfo()
       if( hasGlyphActors )
       {
         mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations | RELAYOUT_INSERT_TO_TEXT_VIEW );
-        mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations | RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST );
       }
 
     }
@@ -741,8 +736,7 @@ void TextView::SetSnapshotModeEnabled( bool enable )
       mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations |
                                                                 RELAYOUT_REMOVE_TEXT_ACTORS |
                                                                 RELAYOUT_TEXT_ACTOR_UPDATE |
-                                                                RELAYOUT_INSERT_TO_TEXT_VIEW |
-                                                                RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST );
+                                                                RELAYOUT_INSERT_TO_TEXT_VIEW );
     }
     RelayoutRequest();
   }
@@ -873,6 +867,10 @@ TextView::LayoutParameters::LayoutParameters()
   // Sets ellipsize text
   MarkupProcessor::StyledTextArray styledEllipsize;
   MarkupProcessor::GetStyledTextArray( std::string( "..." ), mEllipsizeText, false );
+}
+
+TextView::LayoutParameters::~LayoutParameters()
+{
 }
 
 TextView::LayoutParameters::LayoutParameters( Toolkit::TextView::MultilinePolicy   multilinePolicy,
@@ -1066,7 +1064,6 @@ Vector3 TextView::GetNaturalSize()
       mRelayoutData.mGlyphActors.clear();
 
       mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations | RELAYOUT_INSERT_TO_TEXT_VIEW );
-      mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations | RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST );
     }
 
     PerformTextViewProcessorOperations();
@@ -1127,7 +1124,6 @@ float TextView::GetHeightForWidth( float width )
     if( hasGlyphActors )
     {
       mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations | RELAYOUT_INSERT_TO_TEXT_VIEW );
-      mRelayoutOperations = static_cast<RelayoutOperationMask>( mRelayoutOperations | RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST );
     }
 
     if( differentWidth || hasGlyphActors )
@@ -1191,8 +1187,7 @@ void TextView::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
                                                                 RELAYOUT_ALIGNMENT |
                                                                 RELAYOUT_VISIBILITY |
                                                                 RELAYOUT_TEXT_ACTOR_UPDATE |
-                                                                RELAYOUT_INSERT_TO_TEXT_VIEW |
-                                                                RELAYOUT_INSERT_TO_TEXT_ACTOR_LIST );
+                                                                RELAYOUT_INSERT_TO_TEXT_VIEW );
     }
   }
 
@@ -1300,9 +1295,9 @@ void TextView::OptimizeTextViewProcessorOperations()
       {
         bool optimizationDone = false;
 
-        if( it + 1 != endIt )
+        if( it + 1u != endIt )
         {
-          const TextViewProcessorMetadata& nextRelayoutMetadata( *( it + 1 ) );
+          const TextViewProcessorMetadata& nextRelayoutMetadata( *( it + 1u ) );
           if( TextView::TextInserted == nextRelayoutMetadata.mType )
           {
             if( relayoutMetadata.mPosition == nextRelayoutMetadata.mPosition )
@@ -2006,7 +2001,7 @@ void TextView::OnLineJustificationPropertySet( Property::Value propertyValue )
 void TextView::OnFadeBoundaryPropertySet( Property::Value propertyValue )
 {
   Vector4 value( propertyValue.Get<Vector4>() );
-  DALI_ASSERT_ALWAYS( value.x >= 0 && value.y >= 0 && value.z >= 0 && value.w >= 0
+  DALI_ASSERT_ALWAYS( ( value.x >= 0.f ) && ( value.y >= 0.f ) && ( value.z >= 0.f ) && ( value.w >= 0.f )
                       && "TextView::OnFadeBoundaryPropertySet(). Negative value is invalid. "  );
 
   Toolkit::TextView::FadeBoundary fadeBoundary( PixelSize( static_cast<unsigned int>( value.x ) ),

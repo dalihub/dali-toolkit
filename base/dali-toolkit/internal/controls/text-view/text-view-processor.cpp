@@ -20,8 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-view/text-view-word-processor.h>
-#include <dali-toolkit/internal/controls/text-view/text-view-word-group-processor.h>
-#include <dali-toolkit/internal/controls/text-view/text-view-line-processor.h>
+#include <dali-toolkit/internal/controls/text-view/text-view-paragraph-processor.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-processor-helper-functions.h>
 #include <dali-toolkit/internal/controls/text-view/text-processor.h>
 
@@ -46,40 +45,34 @@ namespace
  *
  * @param[in,out] textLayoutInfo
  */
-void UpdateTextLayoutInfo( TextLayoutInfo& textLayoutInfo )
+void UpdateLayoutInfo( TextLayoutInfo& textLayoutInfo )
 {
   // Initialize members to be updated.
-  textLayoutInfo.mWholeTextSize = Size();
+  textLayoutInfo.mWholeTextSize = Size::ZERO;
   textLayoutInfo.mMaxWordWidth = 0.f;
-  textLayoutInfo.mNumberOfCharacters = 0;
+  textLayoutInfo.mNumberOfCharacters = 0u;
 
   // Traverse all text updating values.
-  for( LineLayoutInfoContainer::const_iterator lineIt = textLayoutInfo.mLinesLayoutInfo.begin(), lineEndIt = textLayoutInfo.mLinesLayoutInfo.end();
-       lineIt != lineEndIt;
-       ++lineIt )
+  for( ParagraphLayoutInfoContainer::const_iterator paragraphIt = textLayoutInfo.mParagraphsLayoutInfo.begin(), paragraphEndIt = textLayoutInfo.mParagraphsLayoutInfo.end();
+       paragraphIt != paragraphEndIt;
+       ++paragraphIt )
   {
-    const LineLayoutInfo& line( *lineIt );
+    const ParagraphLayoutInfo& paragraph( *paragraphIt );
 
-    // Updates text size with the size of all lines.
-    UpdateSize( textLayoutInfo.mWholeTextSize, line.mSize, GrowHeight );
+    // Updates text size with the size of all paragraphs.
+    UpdateSize( textLayoutInfo.mWholeTextSize, paragraph.mSize, GrowHeight );
 
     // Updates number of characters.
-    textLayoutInfo.mNumberOfCharacters += line.mNumberOfCharacters;
+    textLayoutInfo.mNumberOfCharacters += paragraph.mNumberOfCharacters;
 
     // Updates the max word's width.
-    for( WordGroupLayoutInfoContainer::const_iterator groupIt = line.mWordGroupsLayoutInfo.begin(), groupEndIt = line.mWordGroupsLayoutInfo.end();
-         groupIt != groupEndIt;
-         ++groupIt )
+    for( WordLayoutInfoContainer::const_iterator wordIt = paragraph.mWordsLayoutInfo.begin(), wordEndIt = paragraph.mWordsLayoutInfo.end();
+         wordIt != wordEndIt;
+         ++wordIt )
     {
-      const WordGroupLayoutInfo& group( *groupIt );
-      for( WordLayoutInfoContainer::const_iterator wordIt = group.mWordsLayoutInfo.begin(), wordEndIt = group.mWordsLayoutInfo.end();
-           wordIt != wordEndIt;
-           ++wordIt )
-      {
-        const WordLayoutInfo& word( *wordIt );
+      const WordLayoutInfo& word( *wordIt );
 
-        textLayoutInfo.mMaxWordWidth = std::max( textLayoutInfo.mMaxWordWidth, word.mSize.width );
-      }
+      textLayoutInfo.mMaxWordWidth = std::max( textLayoutInfo.mMaxWordWidth, word.mSize.width );
     }
   }
 }
@@ -89,19 +82,16 @@ void UpdateTextLayoutInfo( TextLayoutInfo& textLayoutInfo )
 // Constructors and assignment operators
 
 TextInfoIndices::TextInfoIndices()
-: mLineIndex( 0 ),
-  mGroupIndex( 0 ),
-  mWordIndex( 0 ),
-  mCharacterIndex( 0 )
+: mParagraphIndex( 0u ),
+  mWordIndex( 0u ),
+  mCharacterIndex( 0u )
 {
 }
 
-TextInfoIndices::TextInfoIndices( const std::size_t lineIndex,
-                                  const std::size_t groupIndex,
+TextInfoIndices::TextInfoIndices( const std::size_t paragraphIndex,
                                   const std::size_t wordIndex,
                                   const std::size_t characterIndex )
-: mLineIndex( lineIndex ),
-  mGroupIndex( groupIndex ),
+: mParagraphIndex( paragraphIndex ),
   mWordIndex( wordIndex ),
   mCharacterIndex( characterIndex )
 {
@@ -109,8 +99,7 @@ TextInfoIndices::TextInfoIndices( const std::size_t lineIndex,
 
 bool TextInfoIndices::operator==( const TextInfoIndices& indices ) const
 {
-  return ( ( mLineIndex == indices.mLineIndex ) &&
-           ( mGroupIndex == indices.mGroupIndex ) &&
+  return ( ( mParagraphIndex == indices.mParagraphIndex ) &&
            ( mWordIndex == indices.mWordIndex ) &&
            ( mCharacterIndex == indices.mCharacterIndex ) );
 }
@@ -122,9 +111,9 @@ bool TextInfoIndices::operator==( const TextInfoIndices& indices ) const
 TextLayoutInfo::TextLayoutInfo()
 : mWholeTextSize(),
   mMaxWordWidth( 0.f ),
-  mLinesLayoutInfo(),
-  mNumberOfCharacters( 0 ),
   mMaxItalicsOffset( 0.f ),
+  mNumberOfCharacters( 0u ),
+  mParagraphsLayoutInfo(),
   mEllipsizeLayoutInfo()
 {
 }
@@ -132,21 +121,24 @@ TextLayoutInfo::TextLayoutInfo()
 TextLayoutInfo::TextLayoutInfo( const TextLayoutInfo& text )
 : mWholeTextSize( text.mWholeTextSize ),
   mMaxWordWidth( text.mMaxWordWidth ),
-  mLinesLayoutInfo( text.mLinesLayoutInfo ),
-  mNumberOfCharacters( text.mNumberOfCharacters ),
   mMaxItalicsOffset( text.mMaxItalicsOffset ),
+  mNumberOfCharacters( text.mNumberOfCharacters ),
+  mParagraphsLayoutInfo( text.mParagraphsLayoutInfo ),
   mEllipsizeLayoutInfo( text.mEllipsizeLayoutInfo )
 {
 }
 
 TextLayoutInfo& TextLayoutInfo::operator=( const TextLayoutInfo& text )
 {
-  mWholeTextSize = text.mWholeTextSize;
-  mMaxWordWidth = text.mMaxWordWidth;
-  mLinesLayoutInfo = text.mLinesLayoutInfo;
-  mNumberOfCharacters = text.mNumberOfCharacters;
-  mMaxItalicsOffset = text.mMaxItalicsOffset;
-  mEllipsizeLayoutInfo = text.mEllipsizeLayoutInfo;
+  if( this != &text )
+  {
+    mWholeTextSize = text.mWholeTextSize;
+    mMaxWordWidth = text.mMaxWordWidth;
+    mMaxItalicsOffset = text.mMaxItalicsOffset;
+    mNumberOfCharacters = text.mNumberOfCharacters;
+    mParagraphsLayoutInfo = text.mParagraphsLayoutInfo;
+    mEllipsizeLayoutInfo = text.mEllipsizeLayoutInfo;
+  }
 
   return *this;
 }
@@ -157,18 +149,16 @@ void CreateTextInfo( const MarkupProcessor::StyledTextArray& text,
                      const TextView::LayoutParameters& layoutParameters,
                      TextView::RelayoutData& relayoutData )
 {
-  // * Traverse the given text spliting it in lines, each line in groups of words and each group of words in words.
-  // * If possible, it joins characters with same style in one text-actor.
-  // * White spaces and new line characters are alone in one word.
-  // * Bidirectional text is processed in each line.
-  // * A group of words contains text in only one direction (Left to Right or Right to Left but not a mix of both).
+  // * Traverse the given text spliting it in paragraphs and each paragraph in words.
+  // * White spaces and new paragraph characters are alone in one word.
+  // * Bidirectional text is processed in each paragraph.
   // * Generates a layout data structure to store layout information (size, position, ascender, text direction, etc) and metrics of all characters.
   // * Generates a text-actor data structure to store text, style and text-actors.
   // TODO: finish and test the bidirectional implementation.
 
   // Collect previously created text-actors.
   std::vector<TextActor> textActors;
-  CollectTextActorsFromLines( textActors, relayoutData.mTextLayoutInfo, 0, relayoutData.mTextLayoutInfo.mLinesLayoutInfo.size() );
+  CollectTextActorsFromParagraphs( textActors, relayoutData.mTextLayoutInfo, 0u, relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.size() );
 
   if( !textActors.empty() )
   {
@@ -188,55 +178,55 @@ void CreateTextInfo( const MarkupProcessor::StyledTextArray& text,
   // Sets the ellipsize layout info.
   relayoutData.mTextLayoutInfo.mEllipsizeLayoutInfo = ellipsizeInfo;
 
-  // Split the whole text in lines.
-  std::vector<MarkupProcessor::StyledTextArray> lines;
-  TextProcessor::SplitInLines( text,
-                               lines );
+  // Split the whole text in paragraphs.
+  std::vector<MarkupProcessor::StyledTextArray> paragraphs;
+  TextProcessor::SplitInParagraphs( text,
+                                    paragraphs );
 
-  // Traverse all lines
-  for( std::vector<MarkupProcessor::StyledTextArray>::const_iterator lineIt = lines.begin(), lineEndIt = lines.end(); lineIt != lineEndIt; ++lineIt )
+  // Traverse all paragraphs
+  for( std::vector<MarkupProcessor::StyledTextArray>::const_iterator paragraphIt = paragraphs.begin(), paragraphEndIt = paragraphs.end(); paragraphIt != paragraphEndIt; ++paragraphIt )
   {
-    const MarkupProcessor::StyledTextArray& line( *lineIt );
+    const MarkupProcessor::StyledTextArray& paragraph( *paragraphIt );
 
-    // Data structures for the new line
-    LineLayoutInfo lineLayoutInfo;
+    // Data structures for the new paragraph
+    ParagraphLayoutInfo paragraphLayoutInfo;
 
-    // Fills the line data structures with the layout info.
-    CreateLineInfo( line,
-                    relayoutData,
-                    lineLayoutInfo );
+    // Fills the paragraph data structures with the layout info.
+    CreateParagraphInfo( paragraph,
+                         relayoutData,
+                         paragraphLayoutInfo );
 
-    if( 0 < lineLayoutInfo.mNumberOfCharacters )
+    if( 0u < paragraphLayoutInfo.mNumberOfCharacters )
     {
-      // do not add the line offset if the line has no characters.
-      lineLayoutInfo.mSize.height += layoutParameters.mLineHeightOffset;
-      lineLayoutInfo.mLineHeightOffset = layoutParameters.mLineHeightOffset;
+      // do not add the line offset if the paragraph has no characters.
+      paragraphLayoutInfo.mSize.height += layoutParameters.mLineHeightOffset;
+      paragraphLayoutInfo.mLineHeightOffset = layoutParameters.mLineHeightOffset;
     }
     else
     {
-      // line height needs to be added for the last line.
+      // line height needs to be added for the last paragraph.
 
       float lineHeight = 0.f;
-      // Get the last character of the last line.
-      if( !relayoutData.mTextLayoutInfo.mLinesLayoutInfo.empty() )
+      // Get the last character of the last paragraph.
+      if( !relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.empty() )
       {
-        const LineLayoutInfo& lineInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end() - 1 ) );
+        const ParagraphLayoutInfo& paragraphInfo( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end() - 1u ) );
 
-        const CharacterLayoutInfo characterInfo = GetLastCharacterLayoutInfo( lineInfo );
+        const CharacterLayoutInfo characterInfo = GetLastCharacterLayoutInfo( paragraphInfo );
 
         lineHeight = characterInfo.mSize.height;
       }
 
-      lineLayoutInfo.mSize.height = lineHeight;
+      paragraphLayoutInfo.mSize.height = lineHeight;
     }
 
     // Update layout info for the whole text.
-    UpdateSize( relayoutData.mTextLayoutInfo.mWholeTextSize, lineLayoutInfo.mSize, GrowHeight );
-    relayoutData.mTextLayoutInfo.mNumberOfCharacters += lineLayoutInfo.mNumberOfCharacters;
+    UpdateSize( relayoutData.mTextLayoutInfo.mWholeTextSize, paragraphLayoutInfo.mSize, GrowHeight );
+    relayoutData.mTextLayoutInfo.mNumberOfCharacters += paragraphLayoutInfo.mNumberOfCharacters;
 
-    // Add the line to the current text.
-    relayoutData.mTextLayoutInfo.mLinesLayoutInfo.push_back( lineLayoutInfo );
-  } // end of lines
+    // Add the paragraph to the current text.
+    relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.push_back( paragraphLayoutInfo );
+  } // end of paragraphs
 }
 
 void UpdateTextInfo( const std::size_t position,
@@ -248,10 +238,10 @@ void UpdateTextInfo( const std::size_t position,
 
   // * Creates layout info for the given text.
   // * With the given position, find where to add the text.
-  // * If the new text is not added at the end of current text, a line need to be split.
-  // * Merge the last line of the new text to the last part or the split line.
-  // * Add lines between first and last of the new text.
-  // * Merge the first part of the split line with the first line of the new text.
+  // * If the new text is not added at the end of current text, a paragraph need to be split.
+  // * Merge the last paragraph of the new text to the last part or the split paragraph.
+  // * Add paragraphs between first and last of the new text.
+  // * Merge the first part of the split paragraph with the first paragraph of the new text.
   // * Update layout info and create new text actors if needed.
 
   // Early returns:
@@ -262,7 +252,7 @@ void UpdateTextInfo( const std::size_t position,
     return;
   }
 
-  if( 0 == relayoutData.mTextLayoutInfo.mNumberOfCharacters )
+  if( 0u == relayoutData.mTextLayoutInfo.mNumberOfCharacters )
   {
     // Current text is empty. There is no need to update current data structure,
     // just create a new one with the new input text.
@@ -289,113 +279,107 @@ void UpdateTextInfo( const std::size_t position,
 
   // Update logical-to-visual and visual-to-logical tables.
   // TODO: check that for mixed RTL/LTR text.
-  std::size_t index = 0;
-  for( std::size_t i = 0; i < relayoutDataForNewText.mTextLayoutInfo.mNumberOfCharacters; ++i )
+  std::size_t index = 0u;
+  for( std::size_t i = 0u; i < relayoutDataForNewText.mTextLayoutInfo.mNumberOfCharacters; ++i )
   {
     relayoutData.mCharacterLogicalToVisualMap.push_back( relayoutData.mTextLayoutInfo.mNumberOfCharacters + index );
     relayoutData.mCharacterVisualToLogicalMap.push_back( relayoutData.mTextLayoutInfo.mNumberOfCharacters + index );
     ++index;
   }
 
-  // If a line is split, it stores the last part of the line.
-  LineLayoutInfo lastLineLayoutInfo;
+  // If a paragraph is split, it stores the last part of the paragraph.
+  ParagraphLayoutInfo lastParagraphLayoutInfo;
 
-  // Stores indices to the line, group of words, word and character of the given position.
+  // Stores indices to the paragraph, word and character of the given position.
   TextInfoIndices textInfoIndices;
 
   if( position < relayoutData.mTextLayoutInfo.mNumberOfCharacters )
   {
-    // Get line, group, word and character indices for given position.
+    // Get paragraph, word and character indices for given position.
     GetIndicesFromGlobalCharacterIndex( position,
                                         relayoutData.mTextLayoutInfo,
                                         textInfoIndices );
 
-    // 1) Split the line
+    // 1) Split the paragraph
 
-    // Split a line in two is needed, then merge the first part of the split line
-    // with the first line of the new text, add subsequent lines and merge the last line
-    // of the new text with the last part of the split line.
+    // Split a paragraph in two is needed, then merge the first part of the split paragraph
+    // with the first paragraph of the new text, add subsequent paragraphs and merge the last paragraph
+    // of the new text with the last part of the split paragraph.
 
     // Implementation notes!
     //
-    // These references to the first line are declared in this scope because if new lines are inserted in step 2,
+    // These references to the first paragraph are declared in this scope because if new paragraphs are inserted in step 2,
     // they become invalid, making the algorithm to crash if used again.
-    // In the step 3, references to the first line are needed and declared again.
+    // In the step 3, references to the first paragraph are needed and declared again.
 
-    // Stores the first part of the split line.
-    LineLayoutInfo& firstLineLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndices.mLineIndex ) );
+    // Stores the first part of the split paragraph.
+    ParagraphLayoutInfo& firstParagraphLayoutInfo( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + textInfoIndices.mParagraphIndex ) );
 
-    SplitLine( textInfoIndices,
-               PointSize( layoutParameters.mLineHeightOffset ),
-               firstLineLayoutInfo,
-               lastLineLayoutInfo );
+    SplitParagraph( textInfoIndices,
+                    PointSize( layoutParameters.mLineHeightOffset ),
+                    firstParagraphLayoutInfo,
+                    lastParagraphLayoutInfo );
   }
   else
   {
     // Position is just after the last character.
     // Calculates indices for that position.
-    if( !relayoutData.mTextLayoutInfo.mLinesLayoutInfo.empty() )
+    if( !relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.empty() )
     {
-      textInfoIndices.mLineIndex = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.size() - 1;
-      const LineLayoutInfo& lineLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end() - 1 ) );
+      textInfoIndices.mParagraphIndex = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.size() - 1u;
+      const ParagraphLayoutInfo& paragraphLayoutInfo( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end() - 1u ) );
 
-      if( !lineLayoutInfo.mWordGroupsLayoutInfo.empty() )
+      if( !paragraphLayoutInfo.mWordsLayoutInfo.empty() )
       {
-        textInfoIndices.mGroupIndex = lineLayoutInfo.mWordGroupsLayoutInfo.size() - 1;
-        const WordGroupLayoutInfo& groupLayoutInfo( *( lineLayoutInfo.mWordGroupsLayoutInfo.end() - 1 ) );
+        textInfoIndices.mWordIndex = paragraphLayoutInfo.mWordsLayoutInfo.size() - 1u;
 
-        if( !groupLayoutInfo.mWordsLayoutInfo.empty() )
-        {
-          textInfoIndices.mWordIndex = groupLayoutInfo.mWordsLayoutInfo.size() - 1;
-
-          const WordLayoutInfo& wordLayoutInfo( *( groupLayoutInfo.mWordsLayoutInfo.end() - 1 ) );
-          textInfoIndices.mCharacterIndex = wordLayoutInfo.mCharactersLayoutInfo.size();
-        }
+        const WordLayoutInfo& wordLayoutInfo( *( paragraphLayoutInfo.mWordsLayoutInfo.end() - 1u ) );
+        textInfoIndices.mCharacterIndex = wordLayoutInfo.mCharactersLayoutInfo.size();
       }
     }
   }
 
-  // 2) If the new text has more than 1 line, merge the last line of the input text with the last part of the split line.
-  //TODO check this cases ( num lines ==1, >1, >2 ) if it could be simplified.
-  if( relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.size() > 1 )
+  // 2) If the new text has more than 1 paragraph, merge the last paragraph of the input text with the last part of the split paragraph.
+  //TODO check this cases ( num paragraphs ==1, >1, >2 ) if it could be simplified.
+  if( relayoutDataForNewText.mTextLayoutInfo.mParagraphsLayoutInfo.size() > 1u )
   {
-    LineLayoutInfo& lastInputLineLayoutInfo( *( relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.end() - 1 ) );
+    ParagraphLayoutInfo& lastInputParagraphLayoutInfo( *( relayoutDataForNewText.mTextLayoutInfo.mParagraphsLayoutInfo.end() - 1u ) );
 
-    MergeLine( lastInputLineLayoutInfo,
-               lastLineLayoutInfo );
+    MergeParagraph( lastInputParagraphLayoutInfo,
+                    lastParagraphLayoutInfo );
 
-    if( relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.size() > 2 )
+    if( relayoutDataForNewText.mTextLayoutInfo.mParagraphsLayoutInfo.size() > 2u )
     {
-      // Insert all lines except first and last in the text.
-      relayoutData.mTextLayoutInfo.mLinesLayoutInfo.insert( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndices.mLineIndex + 1,
-                                                            relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.begin() + 1,
-                                                            relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.end() - 1 );
+      // Insert all paragraphs except first and last in the text.
+      relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.insert( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + textInfoIndices.mParagraphIndex + 1u,
+                                                            relayoutDataForNewText.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + 1u,
+                                                            relayoutDataForNewText.mTextLayoutInfo.mParagraphsLayoutInfo.end() - 1u );
     }
 
-    // Insert the last line to the text
-    relayoutData.mTextLayoutInfo.mLinesLayoutInfo.insert( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndices.mLineIndex + relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.size() - 1,
-                                                          lastInputLineLayoutInfo );
+    // Insert the last paragraph to the text
+    relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.insert( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + textInfoIndices.mParagraphIndex + relayoutDataForNewText.mTextLayoutInfo.mParagraphsLayoutInfo.size() - 1u,
+                                                          lastInputParagraphLayoutInfo );
   }
   else
   {
-    // Merge the new line to the last part of the split line.
-    LineLayoutInfo& inputLineLayoutInfo( *relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.begin() );
+    // Merge the new paragraph to the last part of the split paragraph.
+    ParagraphLayoutInfo& inputParagraphLayoutInfo( *relayoutDataForNewText.mTextLayoutInfo.mParagraphsLayoutInfo.begin() );
 
-    MergeLine( inputLineLayoutInfo,
-               lastLineLayoutInfo );
+    MergeParagraph( inputParagraphLayoutInfo,
+                    lastParagraphLayoutInfo );
   }
 
-  // 3) Merge the first line of the split text with the first line of the input text.
-  LineLayoutInfo& firstLineLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndices.mLineIndex ) );
-  LineLayoutInfo& firstInputLineLayoutInfo( *relayoutDataForNewText.mTextLayoutInfo.mLinesLayoutInfo.begin() );
+  // 3) Merge the first paragraph of the split text with the first paragraph of the input text.
+  ParagraphLayoutInfo& firstParagraphLayoutInfo( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + textInfoIndices.mParagraphIndex ) );
+  ParagraphLayoutInfo& firstInputParagraphLayoutInfo( *relayoutDataForNewText.mTextLayoutInfo.mParagraphsLayoutInfo.begin() );
 
-  MergeLine( firstLineLayoutInfo,
-             firstInputLineLayoutInfo );
+  MergeParagraph( firstParagraphLayoutInfo,
+                  firstInputParagraphLayoutInfo );
 
   // 4) Update text info.
 
   // Updates the whole text size, maximum word size, etc.
-  UpdateTextLayoutInfo( relayoutData.mTextLayoutInfo );
+  UpdateLayoutInfo( relayoutData.mTextLayoutInfo );
 }
 
 void UpdateTextInfo( const std::size_t position,
@@ -406,25 +390,22 @@ void UpdateTextInfo( const std::size_t position,
 {
   // Removes 'numberOfCharacters' starting from 'position'.
 
-  // * It checks if text to be deleted is in the same line or not:
-  // *   If it is not, check which lines need to be split/merged or deleted.
-  // *   If it is but all characters of the line are going to be deleted, just delete the line (nothing needs to be split/merged)
-  // *   If only some characters of the same line are going to be deleted, proceed similarly: check if text to be deleted is in the same group of words.
-  // *     If it is not, check which groups of words need to be split/merged or deleted. Two groups of words can't be merged if they contain text with different direction (Left to Right / Right to Left)
-  // *     If it is but all characters of the group are going to be deleted, delete the group. TODO: Check if previous and following group need to be merged.
-  // *     If only some characters of the same group of words need to be deleted, proceed similarly: check if text to be deleted is in the same word.
-  // *       If it is not, split/merge words.
-  // *       Check if the whole word needs to be deleted.
-  // *       Check if only some characters of the word need to be deleted.
+  // * It checks if text to be deleted is in the same paragraph or not:
+  // *   If it is not, check which paragraphs need to be split/merged or deleted.
+  // *   If it is but all characters of the paragraph are going to be deleted, just delete the paragraph (nothing needs to be split/merged)
+  // *   If only some characters of the same paragraph are going to be deleted, proceed similarly: check if text to be deleted is in the same word.
+  // *     If it is not, split/merge words.
+  // *     Check if the whole word needs to be deleted.
+  // *     Check if only some characters of the word need to be deleted.
   // * Updates layout info.
 
-  // * The algorithm checks if a word separator is deleted (in that case, different words need to be merged) and if a new line separator is deleted (two lines need to be merged).
+  // * The algorithm checks if a word separator is deleted (in that case, different words need to be merged) and if a new paragraph separator is deleted (two paragraphs need to be merged).
 
   // Early return
 
-  if( 0 == numberOfCharacters )
+  if( 0u == numberOfCharacters )
   {
-    DALI_ASSERT_DEBUG( !"TextViewProcessor::UpdateTextInfo. WARNING: trying to delete 0 characters!" )
+    DALI_ASSERT_DEBUG( !"TextViewProcessor::UpdateTextInfo. WARNING: trying to delete 0 characters!" );
 
     // nothing to do if no characters are deleted.
     return;
@@ -437,15 +418,15 @@ void UpdateTextInfo( const std::size_t position,
   relayoutData.mCharacterLogicalToVisualMap.erase( relayoutData.mCharacterLogicalToVisualMap.end() - numberOfCharacters, relayoutData.mCharacterLogicalToVisualMap.end() );
   relayoutData.mCharacterVisualToLogicalMap.erase( relayoutData.mCharacterVisualToLogicalMap.end() - numberOfCharacters, relayoutData.mCharacterVisualToLogicalMap.end() );
 
-  // Get line, group of words, word and character indices for the given start position.
+  // Get paragraph, word and character indices for the given start position.
   TextInfoIndices textInfoIndicesBegin;
   GetIndicesFromGlobalCharacterIndex( position,
                                       relayoutData.mTextLayoutInfo,
                                       textInfoIndicesBegin );
 
-  // Get line, group of words, word and character indices for the given end position (start position + number of characters to be deleted).
+  // Get paragraph, word and character indices for the given end position (start position + number of characters to be deleted).
   TextInfoIndices textInfoIndicesEnd;
-  GetIndicesFromGlobalCharacterIndex( position + numberOfCharacters - 1,
+  GetIndicesFromGlobalCharacterIndex( position + numberOfCharacters - 1u,
                                       relayoutData.mTextLayoutInfo,
                                       textInfoIndicesEnd );
 
@@ -456,133 +437,109 @@ void UpdateTextInfo( const std::size_t position,
   std::vector<TextActor> removedTextActorsFromMid;
   std::vector<TextActor> removedTextActorsFromEnd;
 
-  // Whether lines, group of words and words need to be merged.
-  bool mergeLines = false;
-  bool mergeGroups = false;
+  // Whether paragraphs and words need to be merged.
+  bool mergeParagraphs = false;
   bool mergeWords = false;
 
-  // Indices of the lines, group of words and words to be merged.
+  // Indices of the paragraphs and words to be merged.
   TextInfoIndices textInfoMergeIndicesBegin;
   TextInfoIndices textInfoMergeIndicesEnd;
 
-  const LineLayoutInfo& lineLayout( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndicesBegin.mLineIndex ) ); // used to check the number of characters of the line
-                                                                                                                                    // if all characters to be deleted are in the same line.
-  if( textInfoIndicesBegin.mLineIndex < textInfoIndicesEnd.mLineIndex )
+  const ParagraphLayoutInfo& paragraphLayout( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + textInfoIndicesBegin.mParagraphIndex ) ); // used to check the number of characters of the paragraph
+                                                                                                                                    // if all characters to be deleted are in the same paragraph.
+  if( textInfoIndicesBegin.mParagraphIndex < textInfoIndicesEnd.mParagraphIndex )
   {
-    // Deleted text is from different lines. It may need to split two lines, and merge first part of the first one with last part of the last one.
+    // Deleted text is from different paragraphs. It may need to split two paragraphs, and merge first part of the first one with last part of the last one.
 
-    // whether first or last line need to be split and merged with the last part.
-    bool mergeFirstLine = false;
-    bool mergeLastLine = true;
+    // whether first or last paragraph need to be split and merged with the last part.
+    bool mergeFirstParagraph = false;
+    bool mergeLastParagraph = true;
 
-    textInfoMergeIndicesBegin.mLineIndex = textInfoIndicesBegin.mLineIndex;
-    textInfoMergeIndicesEnd.mLineIndex = textInfoIndicesEnd.mLineIndex;
+    textInfoMergeIndicesBegin.mParagraphIndex = textInfoIndicesBegin.mParagraphIndex;
+    textInfoMergeIndicesEnd.mParagraphIndex = textInfoIndicesEnd.mParagraphIndex;
 
-    if( ( textInfoIndicesBegin.mGroupIndex > 0 ) || ( textInfoIndicesBegin.mWordIndex > 0 ) || ( textInfoIndicesBegin.mCharacterIndex > 0 ) )
+    if( ( textInfoIndicesBegin.mWordIndex > 0u ) || ( textInfoIndicesBegin.mCharacterIndex > 0u ) )
     {
-      // first character to be deleted is not the first one of the current line.
-      ++textInfoIndicesBegin.mLineIndex; // won't delete current line
+      // first character to be deleted is not the first one of the current paragraph.
+      ++textInfoIndicesBegin.mParagraphIndex; // won't delete current paragraph
 
-      // As some characters remain, this line could be merged with the last one.
-      mergeFirstLine = true;
+      // As some characters remain, this paragraph could be merged with the last one.
+      mergeFirstParagraph = true;
     }
 
-    // Check if all characters of the last line are going to be deleted.
-    bool wholeLinedeleted = false;
-    const LineLayoutInfo& lastLineLayout( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndicesEnd.mLineIndex ) );
-    if( textInfoIndicesEnd.mGroupIndex + 1 == lastLineLayout.mWordGroupsLayoutInfo.size() )
+    // Check if all characters of the last paragraph are going to be deleted.
+    bool wholeParagraphDeleted = false;
+    const ParagraphLayoutInfo& lastParagraphLayout( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + textInfoIndicesEnd.mParagraphIndex ) );
+    if( textInfoIndicesEnd.mWordIndex + 1u == lastParagraphLayout.mWordsLayoutInfo.size() )
     {
-      const WordGroupLayoutInfo& lastGroupLayout( *( lastLineLayout.mWordGroupsLayoutInfo.begin() + textInfoIndicesEnd.mGroupIndex ) );
-      if( textInfoIndicesEnd.mWordIndex + 1 == lastGroupLayout.mWordsLayoutInfo.size() )
+      const WordLayoutInfo& lastWordLayout( *( lastParagraphLayout.mWordsLayoutInfo.begin() + textInfoIndicesEnd.mWordIndex ) );
+      if( textInfoIndicesEnd.mCharacterIndex + 1u == lastWordLayout.mCharactersLayoutInfo.size() )
       {
-        const WordLayoutInfo& lastWordLayout( *( lastGroupLayout.mWordsLayoutInfo.begin() + textInfoIndicesEnd.mWordIndex ) );
-        if( textInfoIndicesEnd.mCharacterIndex + 1 == lastWordLayout.mCharactersLayoutInfo.size() )
-        {
-          // All characters of the last line are going to be deleted.
-          ++textInfoIndicesEnd.mLineIndex; // will delete the last line.
+        // All characters of the last paragraph are going to be deleted.
+        ++textInfoIndicesEnd.mParagraphIndex; // will delete the last paragraph.
 
-          // the whole last line is deleted. Need to check if the next line could be merged.
-          mergeLastLine = false;
-          wholeLinedeleted = true;
-        }
+        // the whole last paragraph is deleted. Need to check if the next paragraph could be merged.
+        mergeLastParagraph = false;
+        wholeParagraphDeleted = true;
       }
     }
 
-    if( wholeLinedeleted )
+    if( wholeParagraphDeleted )
     {
-      // It means the whole last line is deleted completely.
-      // It's needed to check if there is another line after that could be merged.
-      if( textInfoIndicesEnd.mLineIndex < relayoutData.mTextLayoutInfo.mLinesLayoutInfo.size() )
+      // It means the whole last paragraph is deleted completely.
+      // It's needed to check if there is another paragraph after that could be merged.
+      if( textInfoIndicesEnd.mParagraphIndex < relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.size() )
       {
-          mergeLastLine = true;
+        mergeLastParagraph = true;
 
-          // Point the first characters of the next line.
-          textInfoIndicesEnd.mGroupIndex = 0;
-          textInfoIndicesEnd.mWordIndex = 0;
-          textInfoIndicesEnd.mCharacterIndex = 0;
-          textInfoMergeIndicesEnd.mLineIndex = textInfoIndicesEnd.mLineIndex;
+        // Point the first characters of the next paragraph.
+        textInfoIndicesEnd.mWordIndex = 0u;
+        textInfoIndicesEnd.mCharacterIndex = 0u;
+        textInfoMergeIndicesEnd.mParagraphIndex = textInfoIndicesEnd.mParagraphIndex;
       }
     }
 
-    // If some characters remain in the first and last line, they need to be merged.
-    mergeLines = mergeFirstLine && mergeLastLine;
+    // If some characters remain in the first and last paragraph, they need to be merged.
+    mergeParagraphs = mergeFirstParagraph && mergeLastParagraph;
 
-    if( mergeLines )
+    if( mergeParagraphs )
     {
-      // last line is going to be merged with the first one, so is not needed.
-      ++textInfoIndicesEnd.mLineIndex; // will delete the last line.
+      // last paragraph is going to be merged with the first one, so is not needed.
+      ++textInfoIndicesEnd.mParagraphIndex; // will delete the last paragraph.
     }
 
-    if( mergeFirstLine )
+    if( mergeFirstParagraph )
     {
-      // Remove characters from the first line.
+      // Remove characters from the first paragraph.
 
-      // Vectors used to temporary store text-actors removed from the line.
+      // Vectors used to temporary store text-actors removed from the paragraph.
       // Three vectors are needed because text-actors are not removed in order
       // but insert them in order is required to reuse them later.
       std::vector<TextActor> removedTextActorsFromFirstWord;
-      std::vector<TextActor> removedTextActorsFromFirstGroup;
-      std::vector<TextActor> removedTextActorsFromGroups;
+      std::vector<TextActor> removedTextActorsFromFirstParagraph;
 
-      // As lineIndexBegin has been increased just to not to remove the line, decrease now is needed to access it.
-      LineLayoutInfo& lineLayout( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndicesBegin.mLineIndex - 1 ) );
+      // As paragraphIndexBegin has been increased just to not to remove the paragraph, decrease now is needed to access it.
+      ParagraphLayoutInfo& paragraphLayout( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + textInfoIndicesBegin.mParagraphIndex - 1u ) );
 
-      if( textInfoIndicesBegin.mGroupIndex + 1 < lineLayout.mWordGroupsLayoutInfo.size() )
+      if( ( textInfoIndicesBegin.mWordIndex + 1u < paragraphLayout.mWordsLayoutInfo.size() ) || ( 0u == textInfoIndicesBegin.mCharacterIndex ) )
       {
-        // Store text-actors before removing them.
-        CollectTextActorsFromGroups( removedTextActorsFromGroups, lineLayout, textInfoIndicesBegin.mGroupIndex + 1, lineLayout.mWordGroupsLayoutInfo.size() );
-
-        // Remove extra groups. If a line has left to right and right to left text, groups after current one could be removed.
-        RemoveWordGroupsFromLine( textInfoIndicesBegin.mGroupIndex + 1,
-                                  lineLayout.mWordGroupsLayoutInfo.size() - ( textInfoIndicesBegin.mGroupIndex + 1 ),
-                                  PointSize( layoutParameters.mLineHeightOffset ),
-                                  lineLayout );
-      }
-
-      WordGroupLayoutInfo& groupLayout( *( lineLayout.mWordGroupsLayoutInfo.begin() + textInfoIndicesBegin.mGroupIndex ) );
-
-      if( ( textInfoIndicesBegin.mWordIndex + 1 < groupLayout.mWordsLayoutInfo.size() ) || ( 0 == textInfoIndicesBegin.mCharacterIndex ) )
-      {
-        // Remove extra words within current group of words. (and current word if whole characters are removed)
+        // Remove extra words within current paragraph. (and current word if whole characters are removed)
         // 0 == characterIndexBegin means the whole word is deleted.
-        const std::size_t wordIndex = ( ( 0 == textInfoIndicesBegin.mCharacterIndex ) ? textInfoIndicesBegin.mWordIndex : textInfoIndicesBegin.mWordIndex + 1 );
+        const std::size_t wordIndex = ( ( 0u == textInfoIndicesBegin.mCharacterIndex ) ? textInfoIndicesBegin.mWordIndex : textInfoIndicesBegin.mWordIndex + 1u );
 
         // Store text-actors before removing them.
-        CollectTextActorsFromWords( removedTextActorsFromFirstGroup, groupLayout, wordIndex, groupLayout.mWordsLayoutInfo.size() );
+        CollectTextActorsFromWords( removedTextActorsFromFirstParagraph, paragraphLayout, wordIndex, paragraphLayout.mWordsLayoutInfo.size() );
 
-        const std::size_t groupNumberCharacters = groupLayout.mNumberOfCharacters;
-        RemoveWordsFromWordGroup( wordIndex,
-                                  groupLayout.mWordsLayoutInfo.size() - wordIndex,
-                                  groupLayout );
-
-        // discount the removed number of characters.
-        lineLayout.mNumberOfCharacters -= ( groupNumberCharacters - groupLayout.mNumberOfCharacters );
+        RemoveWordsFromParagraph( wordIndex,
+                                  paragraphLayout.mWordsLayoutInfo.size() - wordIndex,
+                                  layoutParameters.mLineHeightOffset,
+                                  paragraphLayout );
       }
 
-      if( ( textInfoIndicesBegin.mWordIndex < groupLayout.mWordsLayoutInfo.size() ) && ( textInfoIndicesBegin.mCharacterIndex > 0 ) )
+      if( ( textInfoIndicesBegin.mWordIndex < paragraphLayout.mWordsLayoutInfo.size() ) && ( textInfoIndicesBegin.mCharacterIndex > 0u ) )
       {
         // Only some characters of the word need to be removed.
-        WordLayoutInfo& wordLayout( *( groupLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex ) );
+        WordLayoutInfo& wordLayout( *( paragraphLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex ) );
 
         // Store text-actors before removing them.
         CollectTextActors( removedTextActorsFromFirstWord, wordLayout, textInfoIndicesBegin.mCharacterIndex, wordLayout.mCharactersLayoutInfo.size() );
@@ -594,67 +551,49 @@ void UpdateTextInfo( const std::size_t position,
 
         // discount the removed number of characters.
         const std::size_t removedNumberOfCharacters = ( wordNumberCharacters - wordLayout.mCharactersLayoutInfo.size() );
-        groupLayout.mNumberOfCharacters -= removedNumberOfCharacters;
-        lineLayout.mNumberOfCharacters -= removedNumberOfCharacters;
+        paragraphLayout.mNumberOfCharacters -= removedNumberOfCharacters;
       }
-      UpdateLineLayoutInfo( lineLayout, layoutParameters.mLineHeightOffset );
+      UpdateLayoutInfo( paragraphLayout, layoutParameters.mLineHeightOffset );
 
       // Insert the text-actors in order.
       removedTextActorsFromBegin.insert( removedTextActorsFromBegin.end(), removedTextActorsFromFirstWord.begin(), removedTextActorsFromFirstWord.end() );
-      removedTextActorsFromBegin.insert( removedTextActorsFromBegin.end(), removedTextActorsFromFirstGroup.begin(), removedTextActorsFromFirstGroup.end() );
-      removedTextActorsFromBegin.insert( removedTextActorsFromBegin.end(), removedTextActorsFromGroups.begin(), removedTextActorsFromGroups.end() );
+      removedTextActorsFromBegin.insert( removedTextActorsFromBegin.end(), removedTextActorsFromFirstParagraph.begin(), removedTextActorsFromFirstParagraph.end() );
     }
 
-    if( mergeLastLine && !wholeLinedeleted )
+    if( mergeLastParagraph && !wholeParagraphDeleted )
     {
-      // Some characters from the last line need to be removed.
+      // Some characters from the last paragraph need to be removed.
 
-      // Vectors used to temporary store text-actors removed from the group.
+      // Vectors used to temporary store text-actors removed from the paragraph.
       // Three vectors are needed because text-actors are not removed in order
       // but insert them in order is required to reuse them later.
       std::vector<TextActor> removedTextActorsFromFirstWord;
-      std::vector<TextActor> removedTextActorsFromFirstGroup;
-      std::vector<TextActor> removedTextActorsFromGroups;
+      std::vector<TextActor> removedTextActorsFromFirstParagraph;
 
-      // lineIndexEnd was increased to delete the last line if lines need to be merged.
-      // To access now the last line we need to decrease the index.
-      const std::size_t lineIndex = ( mergeLines ? textInfoIndicesEnd.mLineIndex - 1 : textInfoIndicesEnd.mLineIndex );
+      // paragraphIndexEnd was increased to delete the last paragraph if paragraphs need to be merged.
+      // To access now the last paragraph we need to decrease the index.
+      const std::size_t paragraphIndex = ( mergeParagraphs ? textInfoIndicesEnd.mParagraphIndex - 1u : textInfoIndicesEnd.mParagraphIndex );
 
-      // Get the last line.
-      LineLayoutInfo& lineLayout( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + lineIndex ) );
-
-      if( textInfoIndicesEnd.mGroupIndex > 0 )
-      {
-        // Store text-actors before removing them.
-        CollectTextActorsFromGroups( removedTextActorsFromGroups, lineLayout, 0, textInfoIndicesEnd.mGroupIndex );
-
-        // Remove extra groups from the beginning of the line to the current group of words.
-        RemoveWordGroupsFromLine( 0,
-                                  textInfoIndicesEnd.mGroupIndex,
-                                  PointSize( layoutParameters.mLineHeightOffset ),
-                                  lineLayout );
-      }
-
-      // The group of characters which contains the characters to be removed is now the first one.
-      WordGroupLayoutInfo& groupLayout( *lineLayout.mWordGroupsLayoutInfo.begin() );
+      // Get the last paragraph.
+      ParagraphLayoutInfo& paragraphLayout( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + paragraphIndex ) );
 
       // Check if is needed remove the whole word. (If the character index is pointing just after the end of the word)
-      const WordLayoutInfo& wordLayout( *( groupLayout.mWordsLayoutInfo.begin() + textInfoIndicesEnd.mWordIndex ) );
-      bool removeWholeWord = wordLayout.mCharactersLayoutInfo.size() == textInfoIndicesEnd.mCharacterIndex + 1;
+      const WordLayoutInfo& wordLayout( *( paragraphLayout.mWordsLayoutInfo.begin() + textInfoIndicesEnd.mWordIndex ) );
+      bool removeWholeWord = wordLayout.mCharactersLayoutInfo.size() == textInfoIndicesEnd.mCharacterIndex + 1u;
 
-      if( ( textInfoIndicesEnd.mWordIndex > 0 ) || ( removeWholeWord ) )
+      if( ( textInfoIndicesEnd.mWordIndex > 0u ) || ( removeWholeWord ) )
       {
         // Store text-actors before removing them.
-        CollectTextActorsFromWords( removedTextActorsFromFirstGroup, groupLayout, 0, ( removeWholeWord ) ? textInfoIndicesEnd.mWordIndex + 1 : textInfoIndicesEnd.mWordIndex );
+        CollectTextActorsFromWords( removedTextActorsFromFirstParagraph,
+                                    paragraphLayout,
+                                    0u,
+                                    ( removeWholeWord ) ? textInfoIndicesEnd.mWordIndex + 1u : textInfoIndicesEnd.mWordIndex );
 
         // Remove extra words. (and current word if whole characters are removed)
-        const std::size_t groupNumberCharacters = groupLayout.mNumberOfCharacters;
-        RemoveWordsFromWordGroup( 0,
-                                  ( removeWholeWord ) ? textInfoIndicesEnd.mWordIndex + 1 : textInfoIndicesEnd.mWordIndex,
-                                  groupLayout );
-
-        // discount the removed number of characters.
-        lineLayout.mNumberOfCharacters -= ( groupNumberCharacters - groupLayout.mNumberOfCharacters );
+        RemoveWordsFromParagraph( 0u,
+                                  ( removeWholeWord ) ? textInfoIndicesEnd.mWordIndex + 1u : textInfoIndicesEnd.mWordIndex,
+                                  layoutParameters.mLineHeightOffset,
+                                  paragraphLayout );
       }
 
       if( !removeWholeWord )
@@ -662,294 +601,115 @@ void UpdateTextInfo( const std::size_t position,
         // Only some characters of the word need to be deleted.
 
         // After removing all extra words. The word with the characters to be removed is the first one.
-        WordLayoutInfo& wordLayout( *groupLayout.mWordsLayoutInfo.begin() );
+        WordLayoutInfo& wordLayout( *paragraphLayout.mWordsLayoutInfo.begin() );
 
         // Store text-actors before removing them.
-        CollectTextActors( removedTextActorsFromFirstWord, wordLayout, 0, textInfoIndicesEnd.mCharacterIndex + 1 );
+        CollectTextActors( removedTextActorsFromFirstWord, wordLayout, 0u, textInfoIndicesEnd.mCharacterIndex + 1u );
 
         const std::size_t wordNumberCharacters = wordLayout.mCharactersLayoutInfo.size();
-        RemoveCharactersFromWord( 0,
-                                  textInfoIndicesEnd.mCharacterIndex + 1,
+        RemoveCharactersFromWord( 0u,
+                                  textInfoIndicesEnd.mCharacterIndex + 1u,
                                   wordLayout );
 
         // discount the removed number of characters.
         const std::size_t removedNumberOfCharacters = ( wordNumberCharacters - wordLayout.mCharactersLayoutInfo.size() );
-        groupLayout.mNumberOfCharacters -= removedNumberOfCharacters;
-        lineLayout.mNumberOfCharacters -= removedNumberOfCharacters;
-        UpdateGroupLayoutInfo( groupLayout );
+        paragraphLayout.mNumberOfCharacters -= removedNumberOfCharacters;
       }
-      UpdateLineLayoutInfo( lineLayout, layoutParameters.mLineHeightOffset );
+      UpdateLayoutInfo( paragraphLayout, layoutParameters.mLineHeightOffset );
 
       // Insert the text-actors in order.
       removedTextActorsFromEnd.insert( removedTextActorsFromEnd.end(), removedTextActorsFromFirstWord.begin(), removedTextActorsFromFirstWord.end() );
-      removedTextActorsFromEnd.insert( removedTextActorsFromEnd.end(), removedTextActorsFromFirstGroup.begin(), removedTextActorsFromFirstGroup.end() );
-      removedTextActorsFromEnd.insert( removedTextActorsFromEnd.end(), removedTextActorsFromGroups.begin(), removedTextActorsFromGroups.end() );
+      removedTextActorsFromEnd.insert( removedTextActorsFromEnd.end(), removedTextActorsFromFirstParagraph.begin(), removedTextActorsFromFirstParagraph.end() );
     }
-  } // end delete text from different lines
-  else if( ( textInfoIndicesBegin.mLineIndex == textInfoIndicesEnd.mLineIndex ) && ( lineLayout.mNumberOfCharacters == numberOfCharacters ) )
+  } // end delete text from different paragraphs
+  else if( ( textInfoIndicesBegin.mParagraphIndex == textInfoIndicesEnd.mParagraphIndex ) && ( paragraphLayout.mNumberOfCharacters == numberOfCharacters ) )
   {
-    // the whole line needs to be deleted.
-    ++textInfoIndicesEnd.mLineIndex; // will delete current line.
+    // the whole paragraph needs to be deleted.
+    ++textInfoIndicesEnd.mParagraphIndex; // will delete current paragraph.
   }
   else
   {
-    // deleted text is within the same line. (merge lines could be needed if the line separator character is deleted)
+    // deleted text is within the same paragraph. (merge paragraphs could be needed if the paragraph separator character is deleted)
 
-    // Line which contains the characters to be deleted.
-    LineLayoutInfo& lineLayout( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndicesBegin.mLineIndex ) );
+    // Paragraph which contains the characters to be deleted.
+    ParagraphLayoutInfo& paragraphLayout( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + textInfoIndicesBegin.mParagraphIndex ) );
 
-    const WordGroupLayoutInfo& groupLayout( *( lineLayout.mWordGroupsLayoutInfo.begin() + textInfoIndicesBegin.mGroupIndex ) ); // used to check the number of characters of the group of words
-                                                                                                                                // if all characters to be deleted are in the same group of words.
-    if( textInfoIndicesBegin.mGroupIndex < textInfoIndicesEnd.mGroupIndex )
+    // Remove the characters from the paragraph layout info. It returns whether the current paragraph can be merged with the next one.
+    RemoveCharactersFromParagraphInfo( relayoutData,
+                                       numberOfCharacters,
+                                       mergeWords,
+                                       mergeParagraphs,
+                                       textInfoIndicesBegin,
+                                       textInfoIndicesEnd,
+                                       textInfoMergeIndicesBegin,
+                                       textInfoMergeIndicesEnd,
+                                       paragraphLayout,
+                                       removedTextActorsFromBegin,
+                                       removedTextActorsFromEnd );
+
+    if( mergeWords )
     {
-      // Deleted text is from different group of words. The two different group of words may be merged if they have text with same direction.
+      // Merges words pointed by textInfoMergeIndicesBegin.mWordIndex and textInfoMergeIndicesEnd.mWordIndex calculated previously.
+      DALI_ASSERT_DEBUG( ( textInfoMergeIndicesBegin.mWordIndex < paragraphLayout.mWordsLayoutInfo.size() ) && "TextViewProcessor::UpdateTextInfo (delete). Word index (begin) out of bounds." );
+      DALI_ASSERT_DEBUG( ( textInfoMergeIndicesEnd.mWordIndex < paragraphLayout.mWordsLayoutInfo.size() ) && "TextViewProcessor::UpdateTextInfo (delete). Word index (end) out of bounds." );
 
-      // whether first or last group of words need to be split and merged with the last part.
-      bool splitFirstGroup = false;
-      bool splitLastGroup = true;
+      WordLayoutInfo& firstWordLayout( *( paragraphLayout.mWordsLayoutInfo.begin() + textInfoMergeIndicesBegin.mWordIndex ) );
+      WordLayoutInfo& lastWordLayout( *( paragraphLayout.mWordsLayoutInfo.begin() + textInfoMergeIndicesEnd.mWordIndex ) );
 
-      textInfoMergeIndicesBegin.mGroupIndex = textInfoIndicesBegin.mGroupIndex;
-      textInfoMergeIndicesEnd.mGroupIndex = textInfoIndicesEnd.mGroupIndex;
-
-      if( ( textInfoIndicesBegin.mWordIndex > 0 ) || ( textInfoIndicesBegin.mCharacterIndex > 0 ) )
-      {
-        // first character to be deleted is not the first one of the current group.
-        ++textInfoIndicesBegin.mGroupIndex; // won't delete current group
-
-        // As some characters remain, this group needs to be split and could be merged with the last one.
-        splitFirstGroup = true;
-      }
-
-      // Check if all characters of the last group are going to be deleted.
-      const WordGroupLayoutInfo& lastGroupLayout( *( lineLayout.mWordGroupsLayoutInfo.begin() + textInfoIndicesEnd.mGroupIndex ) );
-      if( textInfoIndicesEnd.mWordIndex + 1 == lastGroupLayout.mWordsLayoutInfo.size() )
-      {
-        const WordLayoutInfo& lastWordLayout( *( lastGroupLayout.mWordsLayoutInfo.begin() + textInfoIndicesEnd.mWordIndex ) );
-        if( textInfoIndicesEnd.mCharacterIndex + 1 == lastWordLayout.mCharactersLayoutInfo.size() )
-        {
-          // All characters of the last group are going to be deleted.
-          ++textInfoIndicesEnd.mGroupIndex; // will delete the last group.
-
-          // The whole last group is deleted. No need to merge groups.
-          splitLastGroup = false;
-        }
-      }
-
-      // Only merge two groups if they are not deleted completely and they have same direction.
-      mergeGroups = ( splitFirstGroup && splitLastGroup ) && ( groupLayout.mDirection == lastGroupLayout.mDirection );
-
-      if( mergeGroups )
-      {
-        // last group is going to be merged.
-        ++textInfoIndicesEnd.mGroupIndex; // will delete the last group.
-      }
-
-      if( splitFirstGroup )
-      {
-        // Remove characters from the first group.
-
-        // As wordGroupIndexBegin has been increased just to not to remove the group of words, decrease now is needed to access it.
-        WordGroupLayoutInfo& groupLayout( *( lineLayout.mWordGroupsLayoutInfo.begin() + textInfoIndicesBegin.mGroupIndex - 1 ) );
-
-        if( ( textInfoIndicesBegin.mWordIndex + 1 < groupLayout.mWordsLayoutInfo.size() ) || ( 0 == textInfoIndicesBegin.mCharacterIndex ) )
-        {
-          // Remove extra words within current group of words. (and current word if whole characters are removed)
-          // 0 == characterIndexBegin means the whole word is deleted.
-          const std::size_t wordIndex = ( ( 0 == textInfoIndicesBegin.mCharacterIndex ) ? textInfoIndicesBegin.mWordIndex : textInfoIndicesBegin.mWordIndex + 1 );
-
-          // Store text-actors before removing them.
-          CollectTextActorsFromWords( removedTextActorsFromBegin, groupLayout, wordIndex, groupLayout.mWordsLayoutInfo.size() );
-
-          RemoveWordsFromWordGroup( wordIndex,
-                                    groupLayout.mWordsLayoutInfo.size() - wordIndex,
-                                    groupLayout );
-        }
-
-        if( ( textInfoIndicesBegin.mWordIndex < groupLayout.mWordsLayoutInfo.size() ) && ( textInfoIndicesBegin.mCharacterIndex > 0 ) )
-        {
-          // Only some characters of the word need to be removed.
-          WordLayoutInfo& wordLayout( *( groupLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex ) );
-
-          // Store text-actors before removing them.
-          CollectTextActors( removedTextActorsFromBegin, wordLayout, textInfoIndicesBegin.mCharacterIndex, wordLayout.mCharactersLayoutInfo.size() );
-
-          RemoveCharactersFromWord( textInfoIndicesBegin.mCharacterIndex,
-                                    wordLayout.mCharactersLayoutInfo.size() - textInfoIndicesBegin.mCharacterIndex,
-                                    wordLayout );
-        }
-      }
-
-      if( splitLastGroup )
-      {
-        // Some characters from the last group of words need to be removed.
-
-        // textInfoIndicesEnd.mGroupIndex was increased to delete the last group of words if groups need to be merged.
-        // To access now the last group of words we need to decrease the index.
-        std::size_t index = mergeGroups ? textInfoIndicesEnd.mGroupIndex - 1 : textInfoIndicesEnd.mGroupIndex;
-
-        // Get the last group of words.
-        WordGroupLayoutInfo& groupLayout( *( lineLayout.mWordGroupsLayoutInfo.begin() + index ) );
-
-        // Check if is needed remove the whole word. (If the character index is pointing just after the end of the word)
-        const WordLayoutInfo& wordLayout( *( groupLayout.mWordsLayoutInfo.begin() + textInfoIndicesEnd.mWordIndex ) );
-        bool removeWholeWord = wordLayout.mCharactersLayoutInfo.size() == textInfoIndicesEnd.mCharacterIndex + 1;
-
-        if( ( textInfoIndicesEnd.mWordIndex > 0 ) || ( removeWholeWord ) )
-        {
-          // Store text-actors before removing them.
-          CollectTextActorsFromWords( removedTextActorsFromBegin, groupLayout, 0, ( removeWholeWord ) ? textInfoIndicesEnd.mWordIndex + 1 : textInfoIndicesEnd.mWordIndex );
-
-          // Remove extra words. (and current word if whole characters are removed)
-          RemoveWordsFromWordGroup( 0,
-                                    ( removeWholeWord ) ? textInfoIndicesEnd.mWordIndex + 1 : textInfoIndicesEnd.mWordIndex,
-                                    groupLayout );
-        }
-
-        if( !removeWholeWord )
-        {
-          // Only some characters of the word need to be deleted.
-
-          // After removing all extra words. The word with the characters to be removed is the first one.
-          WordLayoutInfo& wordLayout( *groupLayout.mWordsLayoutInfo.begin() );
-
-          // Store text-actors before removing them.
-          CollectTextActors( removedTextActorsFromBegin, wordLayout, 0, textInfoIndicesEnd.mCharacterIndex + 1 );
-
-          RemoveCharactersFromWord( 0,
-                                    textInfoIndicesEnd.mCharacterIndex + 1,
-                                    wordLayout );
-        }
-      }
-    } // end of remove from different groups
-    else if( ( textInfoIndicesBegin.mGroupIndex == textInfoIndicesEnd.mGroupIndex ) && ( groupLayout.mNumberOfCharacters == numberOfCharacters ) )
-    {
-      // The whole group is deleted.
-      ++textInfoIndicesEnd.mGroupIndex; // will delete current group.
-      // TODO group before and group after need to be merged!!!
-    }
-    else
-    {
-      // characters to be deleted are on the same group of words. (words may need to be merged)
-
-      // Group of words which contains the characters to be deleted.
-      WordGroupLayoutInfo& groupLayout( *( lineLayout.mWordGroupsLayoutInfo.begin() + textInfoIndicesBegin.mGroupIndex ) );
-
-      RemoveCharactersFromWordGroupInfo( relayoutData,
-                                         numberOfCharacters,
-                                         mergeWords,
-                                         mergeLines,
-                                         textInfoIndicesBegin,
-                                         textInfoIndicesEnd,
-                                         textInfoMergeIndicesBegin,
-                                         textInfoMergeIndicesEnd,
-                                         groupLayout,
-                                         removedTextActorsFromBegin,
-                                         removedTextActorsFromEnd );
-
-      if( mergeWords )
-      {
-        // Merges words pointed by textInfoMergeIndicesBegin.mWordIndex and textInfoMergeIndicesEnd.mWordIndex calculated previously.
-        DALI_ASSERT_DEBUG( ( textInfoMergeIndicesBegin.mWordIndex < groupLayout.mWordsLayoutInfo.size() ) && "TextViewProcessor::UpdateTextInfo (delete). Word index (begin) out of bounds." );
-        DALI_ASSERT_DEBUG( ( textInfoMergeIndicesEnd.mWordIndex < groupLayout.mWordsLayoutInfo.size() ) && "TextViewProcessor::UpdateTextInfo (delete). Word index (end) out of bounds." );
-
-        WordLayoutInfo& firstWordLayout( *( groupLayout.mWordsLayoutInfo.begin() + textInfoMergeIndicesBegin.mWordIndex ) );
-        WordLayoutInfo& lastWordLayout( *( groupLayout.mWordsLayoutInfo.begin() + textInfoMergeIndicesEnd.mWordIndex ) );
-
-        MergeWord( firstWordLayout,
-                   lastWordLayout );
-      }
-
-      // Store text-actors before removing them.
-      const std::size_t endIndex = ( mergeWords && ( textInfoIndicesEnd.mWordIndex > 0 ) ) ? textInfoIndicesEnd.mWordIndex - 1 : textInfoIndicesEnd.mWordIndex; // text-actors from the last word may have been added in the merge above.
-      CollectTextActorsFromWords( removedTextActorsFromMid, groupLayout, textInfoIndicesBegin.mWordIndex, endIndex );
-
-      // Remove unwanted words using previously calculated indices. (including the last part of the merged word)
-      groupLayout.mWordsLayoutInfo.erase( groupLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex, groupLayout.mWordsLayoutInfo.begin() + textInfoIndicesEnd.mWordIndex );
-
-      // Update group of words info
-      groupLayout.mNumberOfCharacters -= numberOfCharacters;
-      groupLayout.mSize = Size();
-      groupLayout.mAscender = 0;
-      for( WordLayoutInfoContainer::const_iterator it = groupLayout.mWordsLayoutInfo.begin(), endIt = groupLayout.mWordsLayoutInfo.end();
-           it != endIt;
-           ++it )
-      {
-        const WordLayoutInfo& layoutInfo( *it );
-        UpdateSize( groupLayout.mSize, layoutInfo.mSize );
-        groupLayout.mAscender = std::max( groupLayout.mAscender, layoutInfo.mAscender );
-      }
-    } // end of remove from same group
-
-    if( mergeGroups )
-    {
-      // Merges group of words pointed by textInfoMergeIndicesBegin.mGroupIndex and textInfoMergeIndicesEnd.mGroupIndex calculated previously.
-
-      WordGroupLayoutInfo& firstGroupLayout( *( lineLayout.mWordGroupsLayoutInfo.begin() + textInfoMergeIndicesBegin.mGroupIndex ) );
-
-      const WordGroupLayoutInfo& lastGroupLayout( *( lineLayout.mWordGroupsLayoutInfo.begin() + textInfoMergeIndicesEnd.mGroupIndex ) );
-
-      MergeWordGroup( firstGroupLayout,
-                      lastGroupLayout );
+      MergeWord( firstWordLayout,
+                 lastWordLayout );
     }
 
-    // Remove unwanted groups of words using previously calculated indices. (including the last part of the merged group of words)
-    lineLayout.mWordGroupsLayoutInfo.erase( lineLayout.mWordGroupsLayoutInfo.begin() + textInfoIndicesBegin.mGroupIndex, lineLayout.mWordGroupsLayoutInfo.begin() + textInfoIndicesEnd.mGroupIndex );
+    // Store text-actors before removing them.
+    const std::size_t endIndex = ( mergeWords && ( textInfoIndicesEnd.mWordIndex > 0u ) ) ? textInfoIndicesEnd.mWordIndex - 1u : textInfoIndicesEnd.mWordIndex; // text-actors from the last word may have been added in the merge above.
+    CollectTextActorsFromWords( removedTextActorsFromMid, paragraphLayout, textInfoIndicesBegin.mWordIndex, endIndex );
 
-    // Update line info.
-    lineLayout.mNumberOfCharacters -= numberOfCharacters;
-    lineLayout.mSize = Size();
-    lineLayout.mAscender = 0;
-    for( WordGroupLayoutInfoContainer::const_iterator it = lineLayout.mWordGroupsLayoutInfo.begin(), endIt = lineLayout.mWordGroupsLayoutInfo.end();
-         it != endIt;
-         ++it )
-    {
-      const WordGroupLayoutInfo& layoutInfo( *it );
-      UpdateSize( lineLayout.mSize, layoutInfo.mSize );
-      lineLayout.mAscender = std::max( lineLayout.mAscender, layoutInfo.mAscender );
-    }
-    lineLayout.mSize.height += layoutParameters.mLineHeightOffset;
-    lineLayout.mLineHeightOffset = layoutParameters.mLineHeightOffset;
-  }// end delete text from same line.
+    // Remove unwanted words using previously calculated indices. (including the last part of the merged word)
+    paragraphLayout.mWordsLayoutInfo.erase( paragraphLayout.mWordsLayoutInfo.begin() + textInfoIndicesBegin.mWordIndex, paragraphLayout.mWordsLayoutInfo.begin() + textInfoIndicesEnd.mWordIndex );
 
-  if( mergeLines )
+    // Update paragraph info.
+    UpdateLayoutInfo( paragraphLayout, layoutParameters.mLineHeightOffset );
+  }// end delete text from same paragraph.
+
+  if( mergeParagraphs )
   {
-    // Merges lines pointed by textInfoMergeIndicesBegin.mLineIndex and textInfoMergeIndicesEnd.mLineIndex calculated previously.
+    // Merges paragraphs pointed by textInfoMergeIndicesBegin.mParagraphIndex and textInfoMergeIndicesEnd.mParagraphIndex calculated previously.
 
-    LineLayoutInfo& firstLineLayout( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoMergeIndicesBegin.mLineIndex ) );
+    ParagraphLayoutInfo& firstParagraphLayout( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + textInfoMergeIndicesBegin.mParagraphIndex ) );
 
-    const LineLayoutInfo& lastLineLayout( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoMergeIndicesEnd.mLineIndex ) );
+    const ParagraphLayoutInfo& lastParagraphLayout( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + textInfoMergeIndicesEnd.mParagraphIndex ) );
 
-    MergeLine( firstLineLayout,
-               lastLineLayout );
+    MergeParagraph( firstParagraphLayout,
+               lastParagraphLayout );
   }
 
   // Store text-actors before removing them.
-  const std::size_t endIndex = ( mergeLines && ( textInfoIndicesEnd.mLineIndex > 0 ) ) ? textInfoIndicesEnd.mLineIndex - 1 : textInfoIndicesEnd.mLineIndex; // text-actors from the last line may have been added in the merge above.
-  CollectTextActorsFromLines( removedTextActorsFromMid,
+  const std::size_t endIndex = ( mergeParagraphs && ( textInfoIndicesEnd.mParagraphIndex > 0u ) ) ? textInfoIndicesEnd.mParagraphIndex - 1u : textInfoIndicesEnd.mParagraphIndex; // text-actors from the last paragraph may have been added in the merge above.
+  CollectTextActorsFromParagraphs( removedTextActorsFromMid,
                               relayoutData.mTextLayoutInfo,
-                              textInfoIndicesBegin.mLineIndex,
+                              textInfoIndicesBegin.mParagraphIndex,
                               endIndex );
 
-  // Remove unwanted lines using previously calculated indices. (including the last part of the merged line)
-  relayoutData.mTextLayoutInfo.mLinesLayoutInfo.erase( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndicesBegin.mLineIndex,
-                                                       relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin() + textInfoIndicesEnd.mLineIndex );
+  // Remove unwanted paragraphs using previously calculated indices. (including the last part of the merged paragraph)
+  relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.erase( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + textInfoIndicesBegin.mParagraphIndex,
+                                                       relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin() + textInfoIndicesEnd.mParagraphIndex );
 
   // Update text info.
-  UpdateTextLayoutInfo( relayoutData.mTextLayoutInfo );
+  UpdateLayoutInfo( relayoutData.mTextLayoutInfo );
 
-  // If the last character of the last line is a new line character, an empty line need to be added.
-  if( !relayoutData.mTextLayoutInfo.mLinesLayoutInfo.empty() )
+  // If the last character of the last paragraph is a new paragraph character, an empty paragraph need to be added.
+  if( !relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.empty() )
   {
-    const WordLayoutInfo lastWordLayout = GetLastWordLayoutInfo( *( relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end() - 1 ) );
+    const WordLayoutInfo lastWordLayout = GetLastWordLayoutInfo( *( relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end() - 1u ) );
 
-    if( LineSeparator == lastWordLayout.mType )
+    if( ParagraphSeparator == lastWordLayout.mType )
     {
-      LineLayoutInfo lastLineLayout;
+      ParagraphLayoutInfo lastParagraphLayout;
 
       const CharacterLayoutInfo layoutInfo = GetLastCharacterLayoutInfo( lastWordLayout );
-      lastLineLayout.mSize.height = layoutInfo.mSize.height;
+      lastParagraphLayout.mSize.height = layoutInfo.mSize.height;
 
-      relayoutData.mTextLayoutInfo.mLinesLayoutInfo.push_back( lastLineLayout );
+      relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.push_back( lastParagraphLayout );
 
       relayoutData.mTextLayoutInfo.mWholeTextSize.height += layoutInfo.mSize.height;
     }
@@ -994,23 +754,23 @@ void UpdateTextInfo( const std::size_t position,
                   relayoutData );
 }
 
-void UpdateTextInfo( const float lineHeightOffset,
+void UpdateTextInfo( float lineHeightOffset,
                      TextLayoutInfo& textLayoutInfo )
 {
   // Updates the space between lines with the new offset value.
 
   float newTextHeight = 0.f;
 
-  for( LineLayoutInfoContainer::iterator lineIt = textLayoutInfo.mLinesLayoutInfo.begin(), lineEndIt = textLayoutInfo.mLinesLayoutInfo.end();
-       lineIt != lineEndIt;
-       ++lineIt )
+  for( ParagraphLayoutInfoContainer::iterator paragraphIt = textLayoutInfo.mParagraphsLayoutInfo.begin(), paragraphEndIt = textLayoutInfo.mParagraphsLayoutInfo.end();
+       paragraphIt != paragraphEndIt;
+       ++paragraphIt )
   {
-    LineLayoutInfo& lineLayoutInfo( *lineIt );
+    ParagraphLayoutInfo& paragraphLayoutInfo( *paragraphIt );
 
-    lineLayoutInfo.mSize.height += ( lineHeightOffset - lineLayoutInfo.mLineHeightOffset );
-    newTextHeight += lineLayoutInfo.mSize.height;
+    paragraphLayoutInfo.mSize.height += ( lineHeightOffset - paragraphLayoutInfo.mLineHeightOffset );
+    newTextHeight += paragraphLayoutInfo.mSize.height;
 
-    lineLayoutInfo.mLineHeightOffset = lineHeightOffset;
+    paragraphLayoutInfo.mLineHeightOffset = lineHeightOffset;
   }
 
   textLayoutInfo.mWholeTextSize.height = newTextHeight;
@@ -1022,213 +782,34 @@ void UpdateTextInfo( const TextStyle& style,
 {
   // Change text style for all text-actors.
 
-  for( LineLayoutInfoContainer::iterator lineIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.begin(), lineEndIt = relayoutData.mTextLayoutInfo.mLinesLayoutInfo.end();
-       lineIt != lineEndIt;
-       ++lineIt )
+  for( ParagraphLayoutInfoContainer::iterator paragraphIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.begin(), paragraphEndIt = relayoutData.mTextLayoutInfo.mParagraphsLayoutInfo.end();
+       paragraphIt != paragraphEndIt;
+       ++paragraphIt )
   {
-    LineLayoutInfo& line( *lineIt );
+    ParagraphLayoutInfo& paragraph( *paragraphIt );
 
-    for( WordGroupLayoutInfoContainer::iterator groupIt = line.mWordGroupsLayoutInfo.begin(), groupEndIt = line.mWordGroupsLayoutInfo.end();
-         groupIt != groupEndIt;
-         ++groupIt )
+    for( WordLayoutInfoContainer::iterator wordIt = paragraph.mWordsLayoutInfo.begin(), wordEndIt = paragraph.mWordsLayoutInfo.end();
+         wordIt != wordEndIt;
+         ++wordIt )
     {
-      WordGroupLayoutInfo& group( *groupIt );
+      WordLayoutInfo& word( *wordIt );
 
-      for( WordLayoutInfoContainer::iterator wordIt = group.mWordsLayoutInfo.begin(), wordEndIt = group.mWordsLayoutInfo.end();
-           wordIt != wordEndIt;
-           ++wordIt )
+      for( CharacterLayoutInfoContainer::iterator characterIt = word.mCharactersLayoutInfo.begin(), characterEndIt = word.mCharactersLayoutInfo.end();
+           characterIt != characterEndIt;
+           ++characterIt )
       {
-        WordLayoutInfo& word( *wordIt );
+        CharacterLayoutInfo& characterLayout( *characterIt );
 
-        for( CharacterLayoutInfoContainer::iterator characterIt = word.mCharactersLayoutInfo.begin(), characterEndIt = word.mCharactersLayoutInfo.end();
-             characterIt != characterEndIt;
-             ++characterIt )
-        {
-          CharacterLayoutInfo& characterLayout( *characterIt );
+        characterLayout.mStyledText.mStyle.Copy( style, mask );
 
-          characterLayout.mStyledText.mStyle.Copy( style, mask );
+        // Checks if the font family supports all glyphs. If not, chooses a most suitable one.
+        ChooseFontFamilyName( characterLayout.mStyledText );
 
-          // Checks if the font family supports all glyphs. If not, chooses a most suitable one.
-          ChooseFontFamilyName( characterLayout.mStyledText );
-
-          // Mark the character to be set the new style into the text-actor.
-          characterLayout.mSetStyle = true;
-        } // end characters
-      } // end words
-    } // end group of words
-  } // end lines
-}
-
-void InitializeTextActorInfo( TextView::RelayoutData& relayoutData )
-{
-  TextLayoutInfo& textLayoutInfo = relayoutData.mTextLayoutInfo;
-  if( textLayoutInfo.mLinesLayoutInfo.empty() )
-  {
-    // nothing to do if there is no lines.
-    return;
-  }
-
-  std::size_t characterGlobalIndex = 0;  // Index to the global character (within the whole text).
-  std::size_t lineLayoutInfoIndex = 0;   // Index to the laid out line info.
-  const std::size_t lineLayoutInfoSize = relayoutData.mLines.size(); // Number or laid out lines.
-  bool lineLayoutEnd = false;            // Whether lineLayoutInfoIndex points at the last laid out line.
-  bool glyphActorCreatedForLine = false; // Whether a renderable actor has been created for this line.
-
-  RenderableActor currentGlyphActor;      // text-actor used when the edit mode is disabled.
-  TextStyle currentStyle;                // style for the current text-actor.
-  Vector4 currentGradientColor;          // gradient color for the current text-actor.
-  Vector2 currentStartPoint;             // start point for the current text-actor.
-  Vector2 currentEndPoint;               // end point for the current text-actor.
-  bool currentIsColorGlyph = false;      // Whether current glyph is an emoticon.
-
-  std::vector<TextActor> textActorsToRemove; // Keep a vector of text-actors to be included into the cache.
-
-  for( LineLayoutInfoContainer::iterator lineIt = textLayoutInfo.mLinesLayoutInfo.begin(), lineEndIt = textLayoutInfo.mLinesLayoutInfo.end();
-       lineIt != lineEndIt;
-       ++lineIt )
-  {
-    LineLayoutInfo& line( *lineIt );
-
-    for( WordGroupLayoutInfoContainer::iterator groupIt = line.mWordGroupsLayoutInfo.begin(), groupEndIt = line.mWordGroupsLayoutInfo.end();
-         groupIt != groupEndIt;
-         ++groupIt )
-    {
-      WordGroupLayoutInfo& group( *groupIt );
-
-      for( WordLayoutInfoContainer::iterator wordIt = group.mWordsLayoutInfo.begin(), wordEndIt = group.mWordsLayoutInfo.end();
-           wordIt != wordEndIt;
-           ++wordIt )
-      {
-        WordLayoutInfo& word( *wordIt );
-
-        for( CharacterLayoutInfoContainer::iterator characterIt = word.mCharactersLayoutInfo.begin(), characterEndIt = word.mCharactersLayoutInfo.end();
-             characterIt != characterEndIt;
-             ++characterIt )
-        {
-          CharacterLayoutInfo& characterLayout( *characterIt );
-
-          // Check if there is a new line.
-          const bool newLine = !lineLayoutEnd && ( characterGlobalIndex == relayoutData.mLines[lineLayoutInfoIndex].mCharacterGlobalIndex );
-
-          if( newLine )
-          {
-            // Point to the next line.
-            ++lineLayoutInfoIndex;
-            if( lineLayoutInfoIndex >= lineLayoutInfoSize )
-            {
-              // Arrived at last line.
-              lineLayoutEnd = true; // Avoids access out of bounds in the relayoutData.mLines vector.
-            }
-            glyphActorCreatedForLine = false;
-          }
-
-          if( !characterLayout.mStyledText.mText.IsEmpty() )
-          {
-            // Do not create a glyph-actor if there is no text.
-            const Character character = characterLayout.mStyledText.mText[0]; // there are only one character per character layout.
-
-            if( characterLayout.mIsColorGlyph ||
-                !character.IsWhiteSpace() || // A new line character is also a white space.
-                ( character.IsWhiteSpace() && characterLayout.mStyledText.mStyle.IsUnderlineEnabled() ) )
-            {
-              // Do not create a glyph-actor if it's a white space (without underline) or a new line character.
-
-              // Creates one glyph-actor per each counsecutive group of characters, with the same style, per line, or if it's an emoticon.
-
-              if( !glyphActorCreatedForLine ||
-                  characterLayout.mIsColorGlyph ||
-                  ( characterLayout.mStyledText.mStyle != currentStyle ) ||
-                  ( characterLayout.mGradientColor != currentGradientColor ) ||
-                  ( characterLayout.mStartPoint != currentStartPoint ) ||
-                  ( characterLayout.mEndPoint != currentEndPoint ) ||
-                  ( characterLayout.mIsColorGlyph != currentIsColorGlyph ) )
-              {
-                characterLayout.mSetText = false;
-                characterLayout.mSetStyle = false;
-
-                // There is a new style or a new line.
-                glyphActorCreatedForLine = true;
-
-                if( characterLayout.mIsColorGlyph )
-                {
-                  ImageActor imageActor = ImageActor::DownCast( characterLayout.mGlyphActor );
-                  if( !imageActor )
-                  {
-                    characterLayout.mGlyphActor = ImageActor::New();
-                    characterLayout.mSetText = true;
-                  }
-                }
-                else
-                {
-                  TextActor textActor = TextActor::DownCast( characterLayout.mGlyphActor );
-
-                  if( textActor )
-                  {
-                    // Try to reuse first the text-actor of this character.
-                    textActor.SetTextStyle( characterLayout.mStyledText.mStyle );
-                    currentGlyphActor = textActor;
-                  }
-                  else
-                  {
-                    // If there is no text-actor, try to retrieve one from the cache.
-                    textActor = relayoutData.mTextActorCache.RetrieveTextActor();
-
-                    // If still there is no text-actor, create one.
-                    if( !textActor )
-                    {
-                      TextActorParameters parameters( characterLayout.mStyledText.mStyle, TextActorParameters::FONT_DETECTION_OFF );
-                      textActor = TextActor::New( NULL, parameters );
-                    }
-                    else
-                    {
-                      textActor.SetTextStyle( characterLayout.mStyledText.mStyle );
-                    }
-
-                    currentGlyphActor = textActor;
-                  }
-                  characterLayout.mGlyphActor = currentGlyphActor;
-                }
-
-                // Update style to be checked with next characters.
-                currentStyle = characterLayout.mStyledText.mStyle;
-                currentGradientColor = characterLayout.mGradientColor;
-                currentStartPoint = characterLayout.mStartPoint;
-                currentEndPoint = characterLayout.mEndPoint;
-                currentIsColorGlyph = characterLayout.mIsColorGlyph;
-
-                characterLayout.mGlyphActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-                characterLayout.mGlyphActor.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
-              }
-              else
-              {
-                DALI_ASSERT_DEBUG( !characterLayout.mIsColorGlyph && "TextViewProcessor::InitializeTextActorInfo. An image-actor doesn't store more than one emoticon." );
-
-                // Same style than previous one.
-                TextActor textActor = TextActor::DownCast( characterLayout.mGlyphActor );
-                if( textActor )
-                {
-                  // There is a previously created text-actor for this character.
-                  // If this character has another one put it into the cache.
-                  textActor.SetText( "" );
-                  textActorsToRemove.push_back( textActor );
-                }
-
-                if( characterLayout.mGlyphActor )
-                {
-                  characterLayout.mGlyphActor.Reset();
-                }
-              }
-            } // no white space / new line char
-          } // text not empty
-
-          ++characterGlobalIndex;
-        } // characters
-      } // words
-    } // groups
-  } // lines
-
-  // Insert the spare text-actors into the cache.
-  relayoutData.mTextActorCache.InsertTextActors( textActorsToRemove );
+        // Mark the character to be set the new style into the text-actor.
+        characterLayout.mSetStyle = true;
+      } // end characters
+    } // end words
+  } // end paragraphs
 }
 
 } // namespace TextViewProcessor
