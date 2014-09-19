@@ -175,6 +175,11 @@ void FindNearestWord( const MarkupProcessor::StyledTextArray& text, size_t offse
     {
       j++;
     }
+
+    while(i > 0 && IsWhiteSpace(text, i-1))
+    {
+      i--;
+    }
   }
 
   start = i;

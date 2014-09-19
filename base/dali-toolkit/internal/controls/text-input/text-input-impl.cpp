@@ -1401,10 +1401,20 @@ void TextInput::OnDoubleTap(Dali::Actor actor, Dali::TapGesture tap)
        imfManager.NotifyCursorPosition();
      }
 
-     SelectText( start, end );
+     if ( !mStyledText.at(end-1).mText[0].IsWhiteSpace() )
+     {
+       SelectText( start, end );
+       ShowPopupCutCopyPaste();
+     }
+     else
+     {
+       RemoveHighlight( false ); // Remove highlight but do not auto hide popup
+       HidePopup( false ); // Hide popup with setting to do auto show.
+       SetUpPopupSelection( false ); // Set to false so if nearest word is whitespace it will not show cut button.
+       ShowPopup();
+     }
    }
-   // if no text but clipboard has content then show paste option
-   if ( ( mClipboard && mClipboard.NumberOfItems() ) || !mStyledText.empty() )
+   else if ( mClipboard && mClipboard.NumberOfItems() )
    {
      ShowPopupCutCopyPaste();
    }
@@ -3851,7 +3861,7 @@ void TextInput::ShowPopupCutCopyPaste()
   ShowPopup();
 }
 
-void TextInput::SetUpPopupSelection()
+void TextInput::SetUpPopupSelection( bool treatWhiteSpaceAsAnyOtherCharacter )
 {
   ClearPopup();
   mPopupPanel.CreateOrderedListOfOptions(); // todo Move this so only run when order has changed
@@ -3860,7 +3870,7 @@ void TextInput::SetUpPopupSelection()
   {
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelectAll, true );
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelect, true );
-    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, treatWhiteSpaceAsAnyOtherCharacter );
   }
   // if clipboard has valid contents then offer paste option
   if( mClipboard && mClipboard.NumberOfItems() )
@@ -4687,7 +4697,7 @@ void TextInput::KeyboardStatusChanged(bool keyboardShown)
 }
 
 // Removes highlight and resumes edit mode state
-void TextInput::RemoveHighlight()
+void TextInput::RemoveHighlight( bool hidePopup )
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "RemoveHighlight\n");
 
@@ -4717,7 +4727,10 @@ void TextInput::RemoveHighlight()
     // NOTE: We cannot dereference mHighlightMesh, due
     // to a bug in how the scene-graph MeshRenderer uses the Mesh data incorrectly.
 
-    HidePopup();
+    if ( hidePopup )
+    {
+      HidePopup();
+    }
   }
 
   mSelectionHandleOnePosition = 0;
