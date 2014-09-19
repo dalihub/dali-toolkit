@@ -2836,7 +2836,7 @@ ImageActor TextInput::CreateCursor( const Vector4& color)
   cursor.SetName( "Cursor" );
 
   cursor.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  cursor.SetAnchorPoint(AnchorPoint::BOTTOM_CENTER);
+  cursor.SetAnchorPoint(AnchorPoint::BOTTOM_LEFT);
   cursor.SetVisible(false);
 
   return cursor;
