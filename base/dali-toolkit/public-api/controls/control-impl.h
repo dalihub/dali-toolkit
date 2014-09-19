@@ -507,6 +507,11 @@ private: // From CustomActorImpl, derived classes can override these.
   virtual bool OnTouchEvent(const TouchEvent& event);
 
   /**
+   * @copydoc Dali::CustomActorImpl::OnHoverEvent(const HoverEvent&)
+   */
+  virtual bool OnHoverEvent(const HoverEvent& event);
+
+  /**
    * @copydoc Dali::CustomActorImpl::OnKeyEvent(const KeyEvent&)
    */
   virtual bool OnKeyEvent(const KeyEvent& event);
@@ -549,7 +554,9 @@ protected: // Construction
     CONTROL_BEHAVIOUR_NONE        = 0,
     REQUIRES_TOUCH_EVENTS         = 1<<1,     ///< True if the OnTouchEvent() callback is required.
     REQUIRES_STYLE_CHANGE_SIGNALS = 1<<2,     ///< True if needs to monitor style change signals such as theme/font change
-    NO_SIZE_NEGOTIATION           = 1<<3      ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm
+    NO_SIZE_NEGOTIATION           = 1<<3,     ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm
+    REQUIRES_HOVER_EVENTS         = 1<<4,     ///< True if the OnHoverEvent() callback is required.
+    REQUIRES_MOUSE_WHEEL_EVENTS   = 1<<5      ///< True if the OnMouseWheelEvent() callback is required.
   };
 
   /**
