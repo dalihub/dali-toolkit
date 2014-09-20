@@ -1839,7 +1839,7 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
       DeleteHighlightedText( false );
 
       // Received key String
-      mCursorPosition = mCursorPosition + InsertAt( Text( keyString ), mCursorPosition, 0 );
+      mCursorPosition += InsertAt( Text( keyString ), mCursorPosition, 0 );
       update = true;
       EmitTextModified();
     }
@@ -2895,7 +2895,7 @@ void TextInput::DrawCursor(const std::size_t nthChar)
 {
   // Get height of cursor and set its size
   Size size( CURSOR_THICKNESS, 0.0f );
-  if (!mTextLayoutInfo.mCharacterLayoutInfoTable.empty())
+  if( !mTextLayoutInfo.mCharacterLayoutInfoTable.empty() )
   {
     size.height = GetRowRectFromCharacterPosition( GetVisualPosition( mCursorPosition ) ).height;
   }
@@ -4250,7 +4250,7 @@ Vector3 TextInput::GetActualPositionFromCharacterPosition(std::size_t characterP
       // between RTL and LTR text...
       if(characterPosition != mTextLayoutInfo.mCharacterLogicalToVisualMap.size())
       {
-        std::size_t visualCharacterAltPosition = mTextLayoutInfo.mCharacterLogicalToVisualMap[characterPosition] - 1;
+        std::size_t visualCharacterAltPosition = mTextLayoutInfo.mCharacterLogicalToVisualMap[characterPosition]; // VCC TODO: find why in the previous patch it was a -1 here.
 
         DALI_ASSERT_ALWAYS(visualCharacterAltPosition < mTextLayoutInfo.mCharacterLayoutInfoTable.size());
         const Toolkit::TextView::CharacterLayoutInfo& infoAlt = mTextLayoutInfo.mCharacterLayoutInfoTable[ visualCharacterAltPosition ];

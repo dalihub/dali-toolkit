@@ -240,49 +240,84 @@ void TextView::ReplaceTextFromTo( std::size_t position, std::size_t numberOfChar
 
 void TextView::ReplaceTextFromTo( std::size_t position, std::size_t numberOfCharacters, const MarkupProcessor::StyledTextArray& text )
 {
-  // Creates metadata with the Insert operation.
-  TextViewProcessorMetadata metadata;
-  metadata.mType = TextView::TextReplaced;
-  metadata.mPosition = position;
-  metadata.mNumberOfCharacters = numberOfCharacters;
-  metadata.mText = text;
+  std::string textStr;
+  MarkupProcessor::GetPlainString( text, textStr );
 
-  // Store metadata.
-  mTextViewProcessorOperations.push_back( metadata );
+  if( TextProcessor::ContainsRightToLeftCharacter( Text( textStr ) ) ||
+      TextProcessor::ContainsRightToLeftCharacter( Text( GetText() ) ) )
+  {
+    // Temporary fix. Creates the whole layout if there is rtl text.
 
-  // Updates current styled text.
-  MarkupProcessor::StyledTextArray::iterator it = mCurrentStyledText.begin() + position;
-  mCurrentStyledText.erase( it, it + numberOfCharacters );
-  it = mCurrentStyledText.begin() + position;
-  mCurrentStyledText.insert( it, text.begin(), text.end() );
+    // Updates current styled text.
+    MarkupProcessor::StyledTextArray textToSet = mCurrentStyledText;
 
-  // Request to be relaid out
-  RelayoutRequest();
+    MarkupProcessor::StyledTextArray::iterator it = textToSet.begin() + position;
+    textToSet.erase( it, it + numberOfCharacters );
+    it = textToSet.begin() + position;
+    textToSet.insert( it, text.begin(), text.end() );
 
-  // If a GetTextLayoutInfo() or GetHeightForWidth() arrives, relayout the text synchronously is needed on order to retrieve the right values.
-  mRelayoutOperations = RELAYOUT_ALL;
+    SetText( textToSet );
+  }
+  else
+  {
+    // Creates metadata with the Insert operation.
+    TextViewProcessorMetadata metadata;
+    metadata.mType = TextView::TextReplaced;
+    metadata.mPosition = position;
+    metadata.mNumberOfCharacters = numberOfCharacters;
+    metadata.mText = text;
+
+    // Store metadata.
+    mTextViewProcessorOperations.push_back( metadata );
+
+    // Updates current styled text.
+    MarkupProcessor::StyledTextArray::iterator it = mCurrentStyledText.begin() + position;
+    mCurrentStyledText.erase( it, it + numberOfCharacters );
+    it = mCurrentStyledText.begin() + position;
+    mCurrentStyledText.insert( it, text.begin(), text.end() );
+
+    // Request to be relaid out
+    RelayoutRequest();
+
+    // If a GetTextLayoutInfo() or GetHeightForWidth() arrives, relayout the text synchronously is needed on order to retrieve the right values.
+    mRelayoutOperations = RELAYOUT_ALL;
+  }
 }
 
 void TextView::RemoveTextFrom( std::size_t position, std::size_t numberOfCharacters )
 {
-  // Creates metadata with the Remove operation.
-  TextViewProcessorMetadata metadata;
-  metadata.mType = TextView::TextRemoved;
-  metadata.mPosition = position;
-  metadata.mNumberOfCharacters = numberOfCharacters;
+  if( TextProcessor::ContainsRightToLeftCharacter( Text( GetText() ) ) )
+  {
+    // Temporary fix. Creates the whole layout if there is rtl text.
 
-  // Store metadata.
-  mTextViewProcessorOperations.push_back( metadata );
+    // Updates current styled text.
+    MarkupProcessor::StyledTextArray textToSet = mCurrentStyledText;
+    MarkupProcessor::StyledTextArray::iterator it = textToSet.begin() + position;
+    textToSet.erase( it, it + numberOfCharacters );
 
-  // Updates current styled text.
-  MarkupProcessor::StyledTextArray::iterator it = mCurrentStyledText.begin() + position;
-  mCurrentStyledText.erase( it, it + numberOfCharacters );
+    SetText( textToSet );
+  }
+  else
+  {
+    // Creates metadata with the Remove operation.
+    TextViewProcessorMetadata metadata;
+    metadata.mType = TextView::TextRemoved;
+    metadata.mPosition = position;
+    metadata.mNumberOfCharacters = numberOfCharacters;
 
-  // Request to be relaid out
-  RelayoutRequest();
+    // Store metadata.
+    mTextViewProcessorOperations.push_back( metadata );
 
-  // If a GetTextLayoutInfo() or GetHeightForWidth() arrives, relayout the text synchronously is needed on order to retrieve the right values.
-  mRelayoutOperations = RELAYOUT_ALL;
+    // Updates current styled text.
+    MarkupProcessor::StyledTextArray::iterator it = mCurrentStyledText.begin() + position;
+    mCurrentStyledText.erase( it, it + numberOfCharacters );
+
+    // Request to be relaid out
+    RelayoutRequest();
+
+    // If a GetTextLayoutInfo() or GetHeightForWidth() arrives, relayout the text synchronously is needed on order to retrieve the right values.
+    mRelayoutOperations = RELAYOUT_ALL;
+  }
 }
 
 std::string TextView::GetText() const

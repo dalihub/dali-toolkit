@@ -937,8 +937,8 @@ void UpdateLayoutInfoTable( Vector4& minMaxXY,
                                                                                characterLayoutInfo.mSize.height * relayoutData.mShrinkFactor ),
                                                                          positionOffset,
                                                                          ( TextViewProcessor::ParagraphSeparator == wordLayoutInfo.mType ),
-                                                                         false,
-                                                                         true,
+                                                                         characterLayoutInfo.mIsRightToLeft, // whether the character is right to left.
+                                                                         true,  // whether the character is visible.
                                                                          descender );
 
   relayoutData.mCharacterLayoutInfoTable.push_back( characterLayoutTableInfo );

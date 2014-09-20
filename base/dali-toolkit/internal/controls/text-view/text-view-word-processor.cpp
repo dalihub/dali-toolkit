@@ -113,6 +113,11 @@ void CreateWordTextInfo( const Text& paragraph,
       ChooseFontFamilyName( character, *textStyle );
     }
 
+    // Checks whether the charcter is right to left.
+    const Character::CharacterDirection direction = character.GetCharacterDirection();
+    characterLayoutInfo.mIsRightToLeft = ( ( direction == Character::RightToLeft ) ||
+                                           ( direction == Character::RightToLeftWeak ) );
+
     // Gets the metrics of the font.
     const Font font = Font::New( FontParameters( textStyle->GetFontName(), textStyle->GetFontStyle(), textStyle->GetFontPointSize() ) );
     const Font::Metrics metrics = font.GetMetrics( character );

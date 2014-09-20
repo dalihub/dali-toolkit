@@ -78,7 +78,8 @@ CharacterLayoutInfo::CharacterLayoutInfo()
   mIsVisible( true ),
   mSetText( false ),
   mSetStyle( false ),
-  mIsColorGlyph( false )
+  mIsColorGlyph( false ),
+  mIsRightToLeft( false )
 {
 }
 
@@ -102,7 +103,8 @@ CharacterLayoutInfo::CharacterLayoutInfo( const CharacterLayoutInfo& character )
   mIsVisible( character.mIsVisible ),
   mSetText( character.mSetText ),
   mSetStyle( character.mSetStyle ),
-  mIsColorGlyph( character.mIsColorGlyph )
+  mIsColorGlyph( character.mIsColorGlyph ),
+  mIsRightToLeft( character.mIsRightToLeft )
 {
 }
 
@@ -147,6 +149,7 @@ CharacterLayoutInfo& CharacterLayoutInfo::operator=( const CharacterLayoutInfo& 
   mSetText = character.mSetText;
   mSetStyle = character.mSetStyle;
   mIsColorGlyph = character.mIsColorGlyph;
+  mIsRightToLeft = character.mIsRightToLeft;
 
   return *this;
 }
