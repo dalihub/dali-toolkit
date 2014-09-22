@@ -1463,26 +1463,6 @@ void TextInput::OnTextTap(Dali::Actor actor, Dali::TapGesture tap)
     {
       // Set the initial cursor position in the tap point.
       ReturnClosestIndex(tap.localPoint, mCursorPosition );
-
-      // Create the grab handle.
-      // TODO Make this a re-usable function.
-      if ( IsGrabHandleEnabled() )
-      {
-        const Vector3 cursorPosition = GetActualPositionFromCharacterPosition(mCursorPosition);
-
-        CreateGrabHandle();
-
-        mActualGrabHandlePosition.x = cursorPosition.x; // Set grab handle to be at the cursor position
-        mActualGrabHandlePosition.y = cursorPosition.y; // Set grab handle to be at the cursor position
-        mGrabHandle.SetPosition( mActualGrabHandlePosition + UI_OFFSET );
-        ShowGrabHandleAndSetVisibility( mIsGrabHandleInScrollArea );
-
-      }
-
-      // Edit mode started after grab handle created to ensure the signal InputStarted is sent last.
-      // This is used to ensure if selecting text hides the grab handle then this code is run after grab handle is created,
-      // otherwise the Grab handle will be shown when selecting.
-
       StartEditMode();
     }
   }
@@ -1536,6 +1516,9 @@ void TextInput::OnTextTap(Dali::Actor actor, Dali::TapGesture tap)
     }
   }
 
+  // Edit mode started after grab handle created to ensure the signal InputStarted is sent last.
+  // This is used to ensure if selecting text hides the grab handle then this code is run after grab handle is created,
+  // otherwise the Grab handle will be shown when selecting.
   if ( createGrabHandle && IsGrabHandleEnabled() )
   {
     const Vector3 cursorPosition = GetActualPositionFromCharacterPosition(mCursorPosition);
@@ -3861,7 +3844,7 @@ void TextInput::ShowPopupCutCopyPaste()
   ShowPopup();
 }
 
-void TextInput::SetUpPopupSelection( bool treatWhiteSpaceAsAnyOtherCharacter )
+void TextInput::SetUpPopupSelection( bool showCutButton )
 {
   ClearPopup();
   mPopupPanel.CreateOrderedListOfOptions(); // todo Move this so only run when order has changed
@@ -3870,7 +3853,7 @@ void TextInput::SetUpPopupSelection( bool treatWhiteSpaceAsAnyOtherCharacter )
   {
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelectAll, true );
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelect, true );
-    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, treatWhiteSpaceAsAnyOtherCharacter );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, showCutButton );
   }
   // if clipboard has valid contents then offer paste option
   if( mClipboard && mClipboard.NumberOfItems() )

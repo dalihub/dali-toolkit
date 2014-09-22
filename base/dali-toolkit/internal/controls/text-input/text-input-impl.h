@@ -1084,10 +1084,10 @@ public:  // Public to allow internal testing.
 
   /**
    * Setup the selection popup and clipboard if relevant so the correct options are shown when ShowPopup is called.
-   * @param[in] treatWhiteSpaceAsAnyOtherCharacter If whitespace should not be selected in the same manner as other characters set
-   *  this to false. default is true.
+   * @param[in] showCutButton Flag to show or hide cut button, in some cases like whitespace we do not want to cut just select.
+   * default is true.
    */
-  void SetUpPopupSelection( bool treatWhiteSpaceAsAnyOtherCharacter = true );
+  void SetUpPopupSelection( bool showCutButton = true );
 
   /**
    * Return the logical index containing the character position closest to the source.
