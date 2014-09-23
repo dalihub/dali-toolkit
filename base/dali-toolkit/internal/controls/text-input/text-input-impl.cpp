@@ -3793,7 +3793,7 @@ void TextInput::ShowPopupCutCopyPaste()
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelectAll, true );
   }
 
-  if ( !mStyledText.empty() )
+  if ( !mStyledText.empty() && IsTextSelected() )
   {
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCopy, true );
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, true );
@@ -3820,7 +3820,7 @@ void TextInput::SetUpPopupSelection( bool showCutButton )
   {
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelectAll, true );
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelect, true );
-    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, showCutButton );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, ( showCutButton && IsTextSelected() ) );
   }
   // if clipboard has valid contents then offer paste option
   if( mClipboard && mClipboard.NumberOfItems() )
