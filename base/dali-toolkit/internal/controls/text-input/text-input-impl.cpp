@@ -86,36 +86,6 @@ enum SelectionState
   SelectionFinished                         ///< Finished selected section
 };
 
-/**
- * Whether the given style is the default style or not.
- * @param[in] style The given style.
- * @return \e true if the given style is the default. Otherwise it returns \e false.
- */
-bool IsDefaultStyle( const TextStyle& style )
-{
-  return DEFAULT_TEXT_STYLE == style;
-}
-
-/**
- * Whether the given styled text is using the default style or not.
- * @param[in] textArray The given text.
- * @return \e true if the given styled text is using the default style. Otherwise it returns \e false.
- */
-bool IsTextDefaultStyle( const Toolkit::MarkupProcessor::StyledTextArray& textArray )
-{
-  for( Toolkit::MarkupProcessor::StyledTextArray::const_iterator it = textArray.begin(), endIt = textArray.end(); it != endIt; ++it )
-  {
-    const TextStyle& style( (*it).mStyle );
-
-    if( !IsDefaultStyle( style ) )
-    {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 std::size_t FindVisibleCharacterLeft( std::size_t cursorPosition, const Toolkit::TextView::CharacterLayoutInfoContainer& characterLayoutInfoTable )
 {
   for( Toolkit::TextView::CharacterLayoutInfoContainer::const_reverse_iterator it = characterLayoutInfoTable.rbegin() + characterLayoutInfoTable.size() - cursorPosition, endIt = characterLayoutInfoTable.rend();
