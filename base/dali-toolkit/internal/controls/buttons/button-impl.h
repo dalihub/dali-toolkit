@@ -130,6 +130,12 @@ private:
    */
   virtual float OnAnimationTimeRequested() const;
 
+  /**
+   * This method is called when the button is removed from the stage.
+   * Could be reimplemented in subclasses to provide specific behaviour.
+   */
+  virtual void OnButtonStageDisconnection() { }
+
 public:
 
   /**
@@ -185,6 +191,12 @@ private: // From Control
    */
   virtual void OnControlSizeSet( const Vector3& targetSize );
 
+  /**
+   * Callback received when the button is disconnected from the stage.
+   * It resets the button status.
+   */
+  void OnControlStageDisconnection();
+
 private:
 
   /**
@@ -196,14 +208,6 @@ private:
    * @param[in]  tap    The tap gesture.
    */
   void OnTap(Actor actor, TapGesture tap);
-
-private:
-
-  /**
-   * Callback received when the button is disconected from the stage.
-   * It resets the button status.
-   */
-  void OnStageDisconnection();
 
 private:
 

@@ -224,13 +224,10 @@ void Button::OnTap(Actor actor, TapGesture tap)
   // Do nothing.
 }
 
-void Button::OnStageDisconnection()
+void Button::OnControlStageDisconnection()
 {
-  if( ButtonUp != mState )
-  {
-    OnTouchPointLeave(); // Notification for derived classes.
-    mState = ButtonUp;
-  }
+  OnButtonStageDisconnection(); // Notification for derived classes.
+  mState = ButtonUp;
 }
 
 void Button::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
