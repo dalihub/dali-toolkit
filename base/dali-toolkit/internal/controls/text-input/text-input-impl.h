@@ -880,9 +880,8 @@ public:  // Public to allow internal testing.
 
   /**
    * Draw a cursor / caret at position where new text should appear
-   * @param[in] nthChar the position along the text string in which new text should appear.
    */
-  void DrawCursor(const std::size_t nthChar = 0);
+  void DrawCursor();
 
   /**
    * Sets cursor visibility
@@ -1017,15 +1016,6 @@ public:  // Public to allow internal testing.
   void SetSelectionHandlePosition(SelectionHandleId handleId);
 
   /**
-   * Gets the visual position of a logical position.
-   * @note This is preferred over directly accessing the Map, as it resolves visual
-   * positions outside of the character map range.
-   * @param[in] logicalPosition The logical position
-   * @return Visual position is returned.
-   */
-  std::size_t GetVisualPosition(std::size_t logicalPosition) const;
-
-  /**
    * Gets a table of the visual text positions which has a flag
    * for each Character. The flag is either true (character selected)
    * or false (character deselected)
@@ -1152,6 +1142,15 @@ public:  // Public to allow internal testing.
    * @return logical character position of start of row.
    */
   std::size_t GetRowStartFromCharacterPosition(std::size_t logicalPosition) const;
+
+  /**
+   * Retrieves the first character of a group of characters with the same direction.
+   *
+   * @param[in] logicalPosition Index to a character.
+   *
+   * @return Index to the character.
+   */
+  std::size_t GetFirstCharacterWithSameDirection( std::size_t logicalPosition ) const;
 
   /**
    * Retrieve the dimensions of this row of text that the character resides on.

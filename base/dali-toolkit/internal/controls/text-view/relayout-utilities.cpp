@@ -384,9 +384,13 @@ void SetCharacter( const TextViewProcessor::WordLayoutInfoContainer& wordsLayout
  *
  * Uses the visual to logical conversion table to order the text, styles and character's layout (metrics).
  *
+ * @param[in] characterGlobalIndex Index within the whole text of the first character of the paragraph.
  * @param[in,out] rtlParagraph Layout info for the paragraph with rtl text.
+ * @param[in,out] relayoutData The text-view's data structures.
  */
-void ReorderLayout( TextViewProcessor::ParagraphLayoutInfo& paragraph )
+void ReorderLayout( std::size_t characterGlobalIndex,
+                    TextViewProcessor::ParagraphLayoutInfo& paragraph,
+                    TextView::RelayoutData& relayoutData )
 {
   // Clear any previous right to left layout.
   if( NULL != paragraph.mRightToLeftLayout )
@@ -446,12 +450,20 @@ void ReorderLayout( TextViewProcessor::ParagraphLayoutInfo& paragraph )
     }
 
     // Sets the new 'x' position for each character.
+    // Updates the text-view's layout info table with the new position of the character.
     float xPosition = 0.f;
-    for( TextViewProcessor::CharacterLayoutInfoContainer::iterator it = characters.begin(), endIt = characters.end(); it != endIt; ++it )
+    std::size_t index = 0u;
+    for( TextViewProcessor::CharacterLayoutInfoContainer::iterator it = characters.begin(), endIt = characters.end(); it != endIt; ++it, ++index )
     {
       TextViewProcessor::CharacterLayoutInfo& character( *it );
 
+      // Set the 'x' position.
       character.mPosition.x = xPosition;
+
+      // Update layout info table.
+      relayoutData.mCharacterLayoutInfoTable[characterGlobalIndex + info->mVisualToLogicalMap[index]].mPosition = character.mPosition;
+
+      // Update the position for the next character.
       xPosition += character.mSize.width;
     }
 
@@ -461,7 +473,7 @@ void ReorderLayout( TextViewProcessor::ParagraphLayoutInfo& paragraph )
     TextProcessor::SplitInWords( info->mText, positions );
 
     // Sets the characters into the words they belong to.
-    for( Vector<size_t>::ConstIterator it = positions.Begin(), endIt = positions.End(); it != endIt; ++it )
+    for( Vector<std::size_t>::ConstIterator it = positions.Begin(), endIt = positions.End(); it != endIt; ++it )
     {
       const std::size_t position = *it;
 
@@ -524,6 +536,47 @@ void CreateBidirectionalInfoForLines( TextView::RelayoutData& relayoutData,
 
   // Clear previously created bidirectional info.
   paragraph.ClearBidirectionalInfo();
+
+  // For each character, it sets the character's direction.
+
+  // Initialize the paragraph direction. Used to set the direction of weak characters.
+  const bool isParagraphRightToLeft = paragraph.mBidirectionalParagraphInfo->IsRightToLeftParagraph();
+  bool isPreviousRightToLeft = isParagraphRightToLeft;
+
+  for( std::size_t index = 0u; index < paragraph.mNumberOfCharacters; ++index )
+  {
+    // Get the character's layout information (the one is shared with text-input)
+    Toolkit::TextView::CharacterLayoutInfo& info = *( relayoutData.mCharacterLayoutInfoTable.begin() + ( characterGlobalIndex + index ) );
+
+    // Gets the character's direction.
+    const Character::CharacterDirection direction = paragraph.mText[index].GetCharacterDirection();
+    if( Character::RightToLeft == direction )
+    {
+      info.mIsRightToLeftCharacter = true;
+    }
+    else if( Character::Neutral == direction )
+    {
+      // For neutral characters it check's the next and previous directions.
+      // If they are equals set that direction. If they are not, sets the paragraph direction.
+      // If there is no next, sets the previous direction.
+
+      // Check next character's direction.
+      bool isNextRightToLeft = isPreviousRightToLeft;
+      if( index < paragraph.mNumberOfCharacters - 1u )
+      {
+        const Character::CharacterDirection nextDirection = paragraph.mText[index + 1u].GetCharacterDirection();
+        isNextRightToLeft = Character::RightToLeft == nextDirection;
+      }
+
+      info.mIsRightToLeftCharacter = isPreviousRightToLeft == isNextRightToLeft ? isPreviousRightToLeft : isParagraphRightToLeft;
+    }
+    else
+    {
+      info.mIsRightToLeftCharacter = false;
+    }
+
+    isPreviousRightToLeft = info.mIsRightToLeftCharacter;
+  }
 
   std::size_t characterParagraphIndex = 0u;   // Index to the character (within the paragraph).
   for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = paragraph.mWordsLayoutInfo.begin(), wordEndIt = paragraph.mWordsLayoutInfo.end();
@@ -597,6 +650,9 @@ void ReorderRightToLeftLayout( TextView::RelayoutData& relayoutData )
     {
       // There is right to left text in this paragraph.
 
+      // Stores the current global character index as is needed in both functions.
+      const std::size_t currentGlobalIndex = characterGlobalIndex;
+
       // Creates the bidirectional info needed to reorder each line of the paragraph.
       CreateBidirectionalInfoForLines( relayoutData,
                                        paragraph,
@@ -604,7 +660,7 @@ void ReorderRightToLeftLayout( TextView::RelayoutData& relayoutData )
                                        lineLayoutInfoIndex );
 
       // Reorder each line of the paragraph
-      ReorderLayout( paragraph );
+      ReorderLayout( currentGlobalIndex, paragraph, relayoutData );
     }
     else
     {
@@ -856,7 +912,8 @@ void UpdateAlignment( const TextView::LayoutParameters& layoutParameters,
         // Updates the size and position table for text-input with the alignment offset.
         Vector3 positionOffset( characterLayoutInfo.mPosition );
 
-        std::vector<Toolkit::TextView::CharacterLayoutInfo>::iterator infoTableIt = relayoutData.mCharacterLayoutInfoTable.begin() + characterGlobalIndex;
+        // Update layout info table.
+        std::vector<Toolkit::TextView::CharacterLayoutInfo>::iterator infoTableIt = relayoutData.mCharacterLayoutInfoTable.begin() + relayoutData.mCharacterVisualToLogicalMap[characterGlobalIndex];
         Toolkit::TextView::CharacterLayoutInfo& characterTableInfo( *infoTableIt );
 
         characterTableInfo.mPosition.x = positionOffset.x + characterLayoutInfo.mOffset.x;
@@ -937,7 +994,7 @@ void UpdateLayoutInfoTable( Vector4& minMaxXY,
                                                                                characterLayoutInfo.mSize.height * relayoutData.mShrinkFactor ),
                                                                          positionOffset,
                                                                          ( TextViewProcessor::ParagraphSeparator == wordLayoutInfo.mType ),
-                                                                         characterLayoutInfo.mIsRightToLeft, // whether the character is right to left.
+                                                                         false, // whether the character is right to left. The value is set in a next step in the CreateBidirectionalInfoForLines function
                                                                          true,  // whether the character is visible.
                                                                          descender );
 
@@ -1627,7 +1684,7 @@ void UpdateVisibilityForFade( const TextView::LayoutParameters& layoutParameters
                                     relayoutData );
 
         // Updates the visibility for text-input..
-        std::vector<Toolkit::TextView::CharacterLayoutInfo>::iterator it = relayoutData.mCharacterLayoutInfoTable.begin() + infoTableCharacterIndex;
+        std::vector<Toolkit::TextView::CharacterLayoutInfo>::iterator it = relayoutData.mCharacterLayoutInfoTable.begin() + relayoutData.mCharacterVisualToLogicalMap[infoTableCharacterIndex];
 
         Toolkit::TextView::CharacterLayoutInfo& characterLayoutTableInfo( *it );
 
@@ -1643,6 +1700,8 @@ void UpdateVisibilityForEllipsize( const TextView::LayoutParameters& layoutParam
                                    const TextView::VisualParameters& visualParameters,
                                    TextView::RelayoutData& relayoutData )
 {
+  // TODO check ellipsis with rtl text.
+
   // Traverses the lines and checks which ones doesn't fit in the text-view's boundary.
   for( Toolkit::TextView::LineLayoutInfoContainer::const_iterator lineInfoIt = relayoutData.mLines.begin(), endLineInfoIt = relayoutData.mLines.end();
        lineInfoIt != endLineInfoIt;
@@ -1934,6 +1993,8 @@ void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualPa
                                       std::size_t& lineLayoutInfoIndex,
                                       bool createGlyphActors )
 {
+  // TODO: Check if there is text-actor created only with white spaces. Check first in RTL text.
+
   CurrentTextActorInfo currentTextActorInfo;
   currentTextActorInfo.characterLayout = NULL;
 

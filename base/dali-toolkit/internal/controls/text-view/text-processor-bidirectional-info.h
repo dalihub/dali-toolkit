@@ -64,6 +64,12 @@ struct BidirectionalParagraphInfo
    */
   BidirectionalParagraphInfo& operator=( const BidirectionalParagraphInfo& info );
 
+
+  /**
+   * @return Whether the paragraph is right to left.
+   */
+  bool IsRightToLeftParagraph() const;
+
   FriBidiParType               mDirection;            ///< The paragraph direction.
   std::vector<FriBidiCharType> mCharactersTypeBuffer; ///< Character type buffer.
   std::vector<FriBidiLevel>    mLevelsBuffer;         ///< Levels buffer.

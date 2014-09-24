@@ -63,6 +63,30 @@ BidirectionalParagraphInfo& BidirectionalParagraphInfo::operator=( const Bidirec
   return *this;
 }
 
+bool BidirectionalParagraphInfo::IsRightToLeftParagraph() const
+{
+  bool isRightToLeft = false;
+
+  switch( mDirection )
+  {
+    case FRIBIDI_PAR_LTR:  // Left-To-Right paragraph.
+    case FRIBIDI_PAR_ON:   // DirectiOn-Neutral paragraph.
+    case FRIBIDI_PAR_WLTR: // Weak Left To Right paragraph.
+    {
+      isRightToLeft = false;
+      break;
+    }
+    case FRIBIDI_PAR_RTL:  // Right-To-Left paragraph.
+    case FRIBIDI_PAR_WRTL: // Weak Right To Left paragraph.
+    {
+      isRightToLeft = true;
+      break;
+    }
+  }
+
+  return isRightToLeft;
+}
+
 BidirectionalLineInfo::BidirectionalLineInfo()
 : mCharacterParagraphIndex(),
   mNumberOfCharacters(),
