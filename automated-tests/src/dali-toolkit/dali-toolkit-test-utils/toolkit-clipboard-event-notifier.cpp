@@ -24,56 +24,116 @@
 namespace Dali
 {
 
-namespace
-{
-ToolkitClipboardEventNotifier* gToolkitClipboardEventNotifier(NULL);
-} // unnamed namespace
-
 namespace Internal
 {
 
 namespace Adaptor
 {
 
-/**
- * Stub for the ClipboardEventNotifier
- */
-class ClipboardEventNotifier : public BaseObject
+class ClipboardEventNotifier : public Dali::BaseObject
 {
-public: // Creation & Destruction
+public:
 
+  typedef Dali::ClipboardEventNotifier::ClipboardEventSignalV2 ClipboardEventSignalV2;
+
+  // Creation
+  static Dali::ClipboardEventNotifier New();
   static Dali::ClipboardEventNotifier Get();
 
-  ClipboardEventNotifier();
-  ClipboardEventNotifier(ToolkitClipboardEventNotifier *clipboardEventNotifier);
-  ~ClipboardEventNotifier();
+  // Public API
+  const std::string& GetContent() const;
+  void SetContent( const std::string& content );
+  void ClearContent();
+  void EmitContentSelectedSignal();
 
-public: // Signals
-
-  Dali::ClipboardEventNotifier::ClipboardEventSignalV2& SignalContentSelected()
+  // Signals
+  ClipboardEventSignalV2& ContentSelectedSignal()
   {
-    return mClipboardSignal;
+    return mContentSelectedSignalV2;
   }
 
 private:
+  // Construction & Destruction
+  ClipboardEventNotifier();
+  virtual ~ClipboardEventNotifier();
 
-  ToolkitClipboardEventNotifier* mToolkitClipboardEventNotifier;
-  Dali::ClipboardEventNotifier::ClipboardEventSignalV2 mClipboardSignal;
+  // Undefined
+  ClipboardEventNotifier( const ClipboardEventNotifier& );
+  ClipboardEventNotifier& operator=( ClipboardEventNotifier& );
+
+private:
+
+  std::string mContent;    ///< The current selected content.
+  ClipboardEventSignalV2 mContentSelectedSignalV2;
+
+  static Dali::ClipboardEventNotifier mToolkitClipboardEventNotifier;
+
+public:
+
+  // Helpers for public-api forwarding methods
+
+  inline static Internal::Adaptor::ClipboardEventNotifier& GetImplementation(Dali::ClipboardEventNotifier& detector)
+  {
+    DALI_ASSERT_ALWAYS( detector && "ClipboardEventNotifier handle is empty" );
+
+    BaseObject& handle = detector.GetBaseObject();
+
+    return static_cast<Internal::Adaptor::ClipboardEventNotifier&>(handle);
+  }
+
+  inline static const Internal::Adaptor::ClipboardEventNotifier& GetImplementation(const Dali::ClipboardEventNotifier& detector)
+  {
+    DALI_ASSERT_ALWAYS( detector && "ClipboardEventNotifier handle is empty" );
+
+    const BaseObject& handle = detector.GetBaseObject();
+
+    return static_cast<const Internal::Adaptor::ClipboardEventNotifier&>(handle);
+  }
 
 };
 
+Dali::ClipboardEventNotifier ClipboardEventNotifier::mToolkitClipboardEventNotifier;
+
+Dali::ClipboardEventNotifier ClipboardEventNotifier::New()
+{
+  return Get();
+}
+
 Dali::ClipboardEventNotifier ClipboardEventNotifier::Get()
 {
-  return gToolkitClipboardEventNotifier->GetClipboardEventNotifier();
+  if ( !mToolkitClipboardEventNotifier )
+  {
+    mToolkitClipboardEventNotifier = Dali::ClipboardEventNotifier( new ClipboardEventNotifier );
+  }
+  return mToolkitClipboardEventNotifier;
+}
+
+const std::string& ClipboardEventNotifier::GetContent() const
+{
+  return mContent;
+}
+
+void ClipboardEventNotifier::SetContent( const std::string& content )
+{
+  mContent = content;
+}
+
+void ClipboardEventNotifier::ClearContent()
+{
+  mContent.clear();
+}
+
+void ClipboardEventNotifier::EmitContentSelectedSignal()
+{
+  if ( !mContentSelectedSignalV2.Empty() )
+  {
+    Dali::ClipboardEventNotifier handle( this );
+    mContentSelectedSignalV2.Emit( handle );
+  }
 }
 
 ClipboardEventNotifier::ClipboardEventNotifier()
-: mToolkitClipboardEventNotifier(NULL)
-{
-}
-
-ClipboardEventNotifier::ClipboardEventNotifier(ToolkitClipboardEventNotifier *clipboardEventNotifier)
-: mToolkitClipboardEventNotifier(clipboardEventNotifier)
+: mContent()
 {
 }
 
@@ -82,26 +142,53 @@ ClipboardEventNotifier::~ClipboardEventNotifier()
 }
 
 } // namespace Adaptor
-
 } // namespace Internal
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ToolkitClipboardEventNotifier::ToolkitClipboardEventNotifier()
-: mClipboardEventNotifierStub(new Internal::Adaptor::ClipboardEventNotifier(this)),
-  mClipboardEventNotifier( mClipboardEventNotifierStub )
+const char* const ClipboardEventNotifier::SIGNAL_CONTENT_SELECTED( "content-selected" );
+
+ClipboardEventNotifier::ClipboardEventNotifier()
 {
-  gToolkitClipboardEventNotifier = this;
 }
 
-ToolkitClipboardEventNotifier::~ToolkitClipboardEventNotifier()
+ClipboardEventNotifier ClipboardEventNotifier::Get()
 {
-  gToolkitClipboardEventNotifier = NULL;
+  return Internal::Adaptor::ClipboardEventNotifier::Get();
 }
 
-ClipboardEventNotifier ToolkitClipboardEventNotifier::GetClipboardEventNotifier()
+ClipboardEventNotifier::~ClipboardEventNotifier()
 {
-  return mClipboardEventNotifier;
+}
+
+const std::string& ClipboardEventNotifier::GetContent() const
+{
+  return Internal::Adaptor::ClipboardEventNotifier::GetImplementation(*this).GetContent();
+}
+
+void ClipboardEventNotifier::SetContent( const std::string& content )
+{
+  Internal::Adaptor::ClipboardEventNotifier::GetImplementation(*this).SetContent(content);
+}
+
+void ClipboardEventNotifier::ClearContent()
+{
+  Internal::Adaptor::ClipboardEventNotifier::GetImplementation(*this).ClearContent();
+}
+
+void ClipboardEventNotifier::EmitContentSelectedSignal()
+{
+  Internal::Adaptor::ClipboardEventNotifier::GetImplementation(*this).EmitContentSelectedSignal();
+}
+
+ClipboardEventNotifier::ClipboardEventSignalV2& ClipboardEventNotifier::ContentSelectedSignal()
+{
+  return Internal::Adaptor::ClipboardEventNotifier::GetImplementation(*this).ContentSelectedSignal();
+}
+
+ClipboardEventNotifier::ClipboardEventNotifier( Internal::Adaptor::ClipboardEventNotifier* notifier )
+: BaseHandle( notifier )
+{
 }
 
 } // namespace Dali

@@ -1072,13 +1072,10 @@ void TextInput::OnKeyInputFocusGained()
   mClipboard = Clipboard::Get(); // Store handle to clipboard
 
   // Now in edit mode we can accept string to paste from clipboard
-  if( Adaptor::IsAvailable() )
+  ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
+  if ( notifier )
   {
-    ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
-    if ( notifier )
-    {
-      notifier.ContentSelectedSignal().Connect( this, &TextInput::OnClipboardTextSelected );
-    }
+    notifier.ContentSelectedSignal().Connect( this, &TextInput::OnClipboardTextSelected );
   }
 }
 
@@ -1122,19 +1119,16 @@ void TextInput::OnKeyInputFocusLost()
 
   mClipboard.Reset();
   // No longer in edit mode so do not want to receive string from clipboard
-  if( Adaptor::IsAvailable() )
+  ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
+  if ( notifier )
   {
-    ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
-    if ( notifier )
-    {
-      notifier.ContentSelectedSignal().Disconnect( this, &TextInput::OnClipboardTextSelected );
-    }
-    Clipboard clipboard = Clipboard::Get();
+    notifier.ContentSelectedSignal().Disconnect( this, &TextInput::OnClipboardTextSelected );
+  }
 
-    if ( clipboard )
-    {
-      clipboard.HideClipboard();
-    }
+  Clipboard clipboard = Clipboard::Get();
+  if ( clipboard )
+  {
+    clipboard.HideClipboard();
   }
 }
 
