@@ -42,6 +42,7 @@ BubbleEmitter::BubbleEmitter( const Vector2& movementArea,
   mMovementArea( movementArea ),
   mShapeImage( shapeImage ),
   mTotalNumOfBubble( maximumNumberOfBubble ),
+  mRenderTaskRunning(false),
   mBubbleSizeRange( bubbleSizeRange ),
   mCurrentUniform( 0 ),
   mDensity( 5 )
@@ -129,7 +130,11 @@ void BubbleEmitter::OnInitialize()
   // Create a cameraActor for the off screen render task.
   mCameraActor = CameraActor::New(mMovementArea);
   mCameraActor.SetParentOrigin(ParentOrigin::CENTER);
-  Stage::GetCurrent().Add(mCameraActor);
+
+  Stage stage = Stage::GetCurrent();
+
+  stage.Add(mCameraActor);
+  stage.ContextRegainedSignal().Connect(this, &BubbleEmitter::OnContextRegained);
 }
 
 Actor BubbleEmitter::GetRootActor()
@@ -139,6 +144,9 @@ Actor BubbleEmitter::GetRootActor()
 
 void BubbleEmitter::SetBackground( Image bgImage, const Vector3& hsvDelta )
 {
+  mBackgroundImage = bgImage;
+  mHSVDelta = hsvDelta;
+
   ImageActor sourceActor = ImageActor::New( bgImage );
   sourceActor.SetSize( mMovementArea );
   sourceActor.SetParentOrigin(ParentOrigin::CENTER);
@@ -156,6 +164,7 @@ void BubbleEmitter::SetBackground( Image bgImage, const Vector3& hsvDelta )
   task.GetCameraActor().SetInvertYAxis(true);
   task.SetTargetFrameBuffer( mEffectImage );
   task.FinishedSignal().Connect(this, &BubbleEmitter::OnRenderFinished);
+  mRenderTaskRunning = true;
 }
 
 void BubbleEmitter::SetShapeImage( Image shapeImage )
@@ -204,6 +213,7 @@ void BubbleEmitter::SetBubbleDensity( unsigned int density )
 // clear the resources created for the off screen rendering
 void BubbleEmitter::OnRenderFinished(RenderTask& source)
 {
+  mRenderTaskRunning = false;
   Actor sourceActor = source.GetSourceActor();
   if( sourceActor )
   {
@@ -213,8 +223,20 @@ void BubbleEmitter::OnRenderFinished(RenderTask& source)
       renderable.RemoveShaderEffect();
     }
   }
-  Stage::GetCurrent().Remove(sourceActor);
-  Stage::GetCurrent().GetRenderTaskList().RemoveTask(source);
+
+  Stage stage = Stage::GetCurrent();
+  stage.Remove(sourceActor);
+  stage.GetRenderTaskList().RemoveTask(source);
+}
+
+void BubbleEmitter::OnContextRegained()
+{
+  // Context was lost, so the framebuffer has been destroyed. Re-create render task
+  // and trigger re-draw if not already running
+  if( ! mRenderTaskRunning )
+  {
+    SetBackground( mBackgroundImage, mHSVDelta );
+  }
 }
 
 void BubbleEmitter::SetBlendMode( bool enable )

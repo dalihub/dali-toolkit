@@ -50,13 +50,17 @@ public:
   TestApplication( size_t surfaceWidth  = DEFAULT_SURFACE_WIDTH,
                    size_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
                    float  horizontalDpi = DEFAULT_HORIZONTAL_DPI,
-                   float  verticalDpi   = DEFAULT_VERTICAL_DPI );
+                   float  verticalDpi   = DEFAULT_VERTICAL_DPI,
+                   ResourcePolicy::DataRetention resourcePolicy = ResourcePolicy::DALI_DISCARDS_ALL_DATA );
+
+
 
   TestApplication( bool   initialize,
                    size_t surfaceWidth  = DEFAULT_SURFACE_WIDTH,
                    size_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
                    float  horizontalDpi = DEFAULT_HORIZONTAL_DPI,
-                   float  verticalDpi   = DEFAULT_VERTICAL_DPI );
+                   float  verticalDpi   = DEFAULT_VERTICAL_DPI,
+                   ResourcePolicy::DataRetention resourcePolicy = ResourcePolicy::DALI_DISCARDS_ALL_DATA );
 
   void Initialize();
   virtual ~TestApplication();
@@ -97,6 +101,7 @@ protected:
 
   Vector2 mDpi;
   unsigned int mLastVSyncTime;
+  ResourcePolicy::DataRetention mDataRetentionPolicy;
 };
 
 } // Dali
