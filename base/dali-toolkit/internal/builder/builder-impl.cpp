@@ -87,6 +87,100 @@ std::string ToString(const Rect<int>& value)
   return ss.str();
 }
 
+#if defined(DEBUG_ENABLED)
+
+std::string PropertyValueToString( const Property::Value& value )
+{
+  std::string ret;
+
+  switch( value.GetType() )
+  {
+    case Property::NONE:
+    {
+      ret = "NONE";
+      break;
+    }            ///< No type
+    case Property::BOOLEAN:
+    {
+      ret = value.Get<bool>() ? "True" : "False";
+      break;
+    }
+    case Property::FLOAT:
+    {
+
+      ret = ToString( value.Get<float>() );
+      break;
+    }
+    case Property::INTEGER:
+    {
+      ret = ToString( value.Get<int>() );
+      break;
+    }
+    case Property::UNSIGNED_INTEGER:
+    {
+      ret = ToString( value.Get<unsigned int>() );
+      break;
+    }
+    case Property::VECTOR2:
+    {
+      ret = ToString( value.Get<Vector2>() );
+      break;
+    }
+    case Property::VECTOR3:
+    {
+      ret = ToString( value.Get<Vector3>() );
+      break;
+    }
+    case Property::VECTOR4:
+    {
+      ret = ToString( value.Get<Vector4>() );
+      break;
+    }
+    case Property::MATRIX3:
+    {
+      ret = ToString( value.Get<Matrix3>() );
+      break;
+    }
+    case Property::MATRIX:
+    {
+      ret = ToString( value.Get<Matrix>() );
+      break;
+    }
+    case Property::RECTANGLE:
+    {
+      ret = ToString( value.Get< Rect<int> >() );
+      break;
+    }
+    case Property::ROTATION:
+    {
+      break;
+    }
+    case Property::STRING:
+    {
+      ret = value.Get<std::string>();
+      break;
+    }
+    case Property::ARRAY:
+    {
+      ret = std::string("Array Size=") + ToString( value.Get<Property::Array>().size() );
+      break;
+    }
+    case Property::MAP:
+    {
+      ret = std::string("Map Size=") + ToString( value.Get<Property::Map>().size() );
+      break;
+    }
+    case Property::TYPE_COUNT:
+    {
+      ret = "";
+      break;
+    }
+  }
+
+  return ret;
+}
+#endif // DEBUG_ENABLED
+
 /*
  * Recursively collects all stylesin a node (An array of style names).
  *
