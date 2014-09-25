@@ -30,6 +30,7 @@ namespace Toolkit
 {
 
 const char* const Button::SIGNAL_CLICKED = "clicked";
+const char* const Button::SIGNAL_TOGGLED = "toggled";
 
 Button::Button()
 {}
@@ -80,6 +81,11 @@ float Button::GetAnimationTime() const
 Button::ClickedSignalV2& Button::ClickedSignal()
 {
   return Dali::Toolkit::GetImplementation( *this ).ClickedSignal();
+}
+
+Button::ToggledSignalV2& Button::ToggledSignal()
+{
+  return Dali::Toolkit::GetImplementation( *this ).ToggledSignal();
 }
 
 Button::Button( Internal::Button& implementation )
