@@ -39,13 +39,123 @@ namespace
 
 const std::string EMOJI_FONT_NAME( "SamsungEmoji" ); // Emoticons font family name.
 
-/**
- * Updates the word size and ascender.
- *
- * It's called after deleting some characters.
- *
- * @param[in] wordLayout The word layout info.
- */
+} // namespace
+
+/////////////////////
+// Layout info.
+/////////////////////
+
+WordLayoutInfo::WordLayoutInfo()
+: mSize(),
+  mAscender( 0.f ),
+  mType( NoSeparator ),
+  mFirstCharacter( 0u ),
+  mCharactersLayoutInfo()
+{
+}
+
+WordLayoutInfo::~WordLayoutInfo()
+{
+}
+
+WordLayoutInfo::WordLayoutInfo( const WordLayoutInfo& word )
+: mSize( word.mSize ),
+  mAscender( word.mAscender ),
+  mType( word.mType ),
+  mFirstCharacter( word.mFirstCharacter ),
+  mCharactersLayoutInfo( word.mCharactersLayoutInfo )
+{
+}
+
+WordLayoutInfo& WordLayoutInfo::operator=( const WordLayoutInfo& word )
+{
+  mSize = word.mSize;
+  mAscender = word.mAscender;
+  mType = word.mType;
+  mFirstCharacter = word.mFirstCharacter;
+  mCharactersLayoutInfo = word.mCharactersLayoutInfo;
+
+  return *this;
+}
+
+void CreateWordTextInfo( const Text& paragraph,
+                         Vector<TextStyle*>& textStyles,
+                         WordLayoutInfo& wordLayoutInfo )
+{
+  DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "-->TextViewProcessor::CreateWordTextInfo\n" );
+  // Split in characters.
+  std::size_t characterIndex = wordLayoutInfo.mFirstCharacter;
+  for( CharacterLayoutInfoContainer::iterator it = wordLayoutInfo.mCharactersLayoutInfo.begin(),
+         endIt =  wordLayoutInfo.mCharactersLayoutInfo.end();
+       it != endIt;
+       ++it, ++characterIndex )
+  {
+    // Gets a reference of the character's layout info.
+    CharacterLayoutInfo& characterLayoutInfo( *it );
+
+    // Gets the character and the style for that character from the paragraph.
+    Character character = paragraph[characterIndex];
+    TextStyle* textStyle = *( textStyles.Begin() + characterIndex );
+
+    // Checks whether the character is an emoticon.
+    characterLayoutInfo.mIsColorGlyph = GlyphImage::IsColorGlyph( character );
+    DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "  Is color glyph: %s\n", ( characterLayoutInfo.mIsColorGlyph ? "True" : "False" ) );
+
+    if( characterLayoutInfo.mIsColorGlyph )
+    {
+      // If the character is an emoticon a predefined font is set.
+      textStyle->SetFontName( EMOJI_FONT_NAME );
+    }
+    else
+    {
+      // Checks if the font family and the font style set in the text style supports the character.
+      // If not, it chooses the right font for the given character and style.
+      ChooseFontFamilyName( character, *textStyle );
+    }
+
+    // Checks whether the charcter is right to left.
+    const Character::CharacterDirection direction = character.GetCharacterDirection();
+    characterLayoutInfo.mIsRightToLeft = ( ( direction == Character::RightToLeft ) ||
+                                           ( direction == Character::RightToLeftWeak ) );
+
+    // Gets the metrics of the font.
+    const Font font = Font::New( FontParameters( textStyle->GetFontName(), textStyle->GetFontStyle(), textStyle->GetFontPointSize() ) );
+    const Font::Metrics metrics = font.GetMetrics( character );
+    const float ascender = font.GetAscender();
+
+    // Fill Natural size info for current character.
+
+    // The font line's height is used as character's height.
+    characterLayoutInfo.mSize.height = font.GetLineHeight();
+
+    // The character's advance is used as charcter's width.
+    characterLayoutInfo.mSize.width = metrics.GetAdvance();
+
+    // The ascender and bearing are used to position correctly glyphs of different font sizes.
+    characterLayoutInfo.mAscender = ascender;
+    characterLayoutInfo.mBearing = metrics.GetBearing();
+
+    if( character.IsNewLine() && !characterLayoutInfo.mIsColorGlyph )
+    {
+      // A new paragraph character '\n'  doesn't have any width.
+      characterLayoutInfo.mSize.width = 0.f;
+    }
+
+    // Set's the underline thickness and position.
+    // Both thickness and position includes the vertical pad adjust used in effects like glow or shadow.
+    if( textStyle->IsUnderlineEnabled() )
+    {
+      characterLayoutInfo.mUnderlineThickness = font.GetUnderlineThickness();
+      characterLayoutInfo.mUnderlinePosition = font.GetUnderlinePosition();
+    }
+
+    // Updates the word size and ascender.
+    UpdateSize( wordLayoutInfo.mSize, characterLayoutInfo.mSize );
+    wordLayoutInfo.mAscender = std::max( wordLayoutInfo.mAscender, characterLayoutInfo.mAscender );
+  } // end of characters in the word.
+  DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "<--TextViewProcessor::CreateWordTextInfo\n" );
+}
+
 void UpdateLayoutInfo( WordLayoutInfo& wordLayout )
 {
   // Initialize layout info for the whole word.
@@ -64,120 +174,6 @@ void UpdateLayoutInfo( WordLayoutInfo& wordLayout )
     UpdateSize( wordLayout.mSize, layoutInfo.mSize );
     wordLayout.mAscender = std::max( wordLayout.mAscender, layoutInfo.mAscender );
   }
-}
-
-} // namespace
-
-/////////////////////
-// Layout info.
-/////////////////////
-
-WordLayoutInfo::WordLayoutInfo()
-: mSize(),
-  mAscender( 0.f ),
-  mType( NoSeparator ),
-  mCharactersLayoutInfo()
-{
-}
-
-WordLayoutInfo::~WordLayoutInfo()
-{
-}
-
-WordLayoutInfo::WordLayoutInfo( const WordLayoutInfo& word )
-: mSize( word.mSize ),
-  mAscender( word.mAscender ),
-  mType( word.mType ),
-  mCharactersLayoutInfo( word.mCharactersLayoutInfo )
-{
-}
-
-WordLayoutInfo& WordLayoutInfo::operator=( const WordLayoutInfo& word )
-{
-  mSize = word.mSize;
-  mAscender = word.mAscender;
-  mType = word.mType;
-  mCharactersLayoutInfo = word.mCharactersLayoutInfo;
-
-  return *this;
-}
-
-void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
-                         WordLayoutInfo& wordLayoutInfo )
-{
-  DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "-->TextViewProcessor::CreateWordTextInfo\n" );
-  // Split in characters.
-  for( MarkupProcessor::StyledTextArray::const_iterator charIt = word.begin(), charEndIt = word.end(); charIt != charEndIt; ++charIt )
-  {
-    const MarkupProcessor::StyledText& styledText( *charIt );
-
-    const std::size_t length = styledText.mText.GetLength();
-
-    // It could be a group of characters.
-    for( std::size_t index = 0u; index < length; ++index )
-    {
-      MarkupProcessor::StyledText styledCharacter;
-      styledCharacter.mStyle = styledText.mStyle;
-      Character character = styledText.mText[index];
-      styledCharacter.mText.Append( character );
-
-      // Create layout character info.
-      CharacterLayoutInfo characterLayoutInfo;
-
-      characterLayoutInfo.mIsColorGlyph = GlyphImage::IsColorGlyph( character );
-      DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "  Is color glyph: %s\n", ( characterLayoutInfo.mIsColorGlyph ? "True" : "False" ) );
-
-      if( characterLayoutInfo.mIsColorGlyph )
-      {
-        styledCharacter.mStyle.SetFontName( EMOJI_FONT_NAME );
-      }
-      else
-      {
-        //Choose the right font for the given character and style.
-        ChooseFontFamilyName( styledCharacter );
-      }
-
-      // Gets the metrics of the font.
-      const Font font = Font::New( FontParameters( styledCharacter.mStyle.GetFontName(), styledCharacter.mStyle.GetFontStyle(), styledCharacter.mStyle.GetFontPointSize() ) );
-      const Font::Metrics metrics = font.GetMetrics( character );
-      const float ascender = font.GetAscender();
-
-      // The font line's height is used as character's height.
-      characterLayoutInfo.mSize.height = font.GetLineHeight();
-
-      // The character's advance is used as charcter's width.
-      characterLayoutInfo.mSize.width = metrics.GetAdvance();
-
-      // The ascender and bearing are used to position correctly glyphs of different font sizes.
-      characterLayoutInfo.mAscender = ascender;
-      characterLayoutInfo.mBearing = metrics.GetBearing();
-
-      if( character.IsNewLine() && !characterLayoutInfo.mIsColorGlyph )
-      {
-        // A new paragraph character doesn't have any width.
-        characterLayoutInfo.mSize.width = 0.f;
-      }
-
-      // Set's the underline thickness and position.
-      // Both thickness and position includes the vertical pad adjust used in effects like glow or shadow.
-      if( styledCharacter.mStyle.IsUnderlineEnabled() )
-      {
-        characterLayoutInfo.mUnderlineThickness = font.GetUnderlineThickness();
-        characterLayoutInfo.mUnderlinePosition = font.GetUnderlinePosition();
-      }
-
-      // stores the styled text.
-      characterLayoutInfo.mStyledText.mText = styledCharacter.mText;
-      characterLayoutInfo.mStyledText.mStyle = styledCharacter.mStyle;
-
-      // Add character layout info to the word layout info and update it.
-      wordLayoutInfo.mCharactersLayoutInfo.push_back( characterLayoutInfo );
-      UpdateSize( wordLayoutInfo.mSize, characterLayoutInfo.mSize );
-      wordLayoutInfo.mAscender = std::max( wordLayoutInfo.mAscender, characterLayoutInfo.mAscender );
-      wordLayoutInfo.mType = GetTextSeparatorType( character );
-    } // end of each character in the group of characters.
-  } // end of characters in the word.
-  DALI_LOG_INFO( gTextViewProcessorLogFilter, Debug::General, "<--TextViewProcessor::CreateWordTextInfo\n" );
 }
 
 void RemoveCharactersFromWordInfo( TextView::RelayoutData& relayoutData,

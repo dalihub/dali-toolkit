@@ -21,6 +21,7 @@
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
+#include "toolkit-style-monitor.h"
 
 #include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
@@ -656,7 +657,7 @@ int UtcDaliControlImplStyleChange(void)
   DALI_TEST_EQUALS( dummyImpl.fontChangeCalled, false, TEST_LOCATION );
   StyleChange styleChange;
   styleChange.defaultFontChange = true;
-  Dali::StyleMonitor styleMonitor = application.GetAdaptor().GetToolkitStyleMonitor();
+  Dali::StyleMonitor styleMonitor = StyleMonitor::Get();
   styleMonitor.EmitStyleChangeSignal(styleChange);
 
   DALI_TEST_EQUALS( dummyImpl.fontChangeCalled, true, TEST_LOCATION );

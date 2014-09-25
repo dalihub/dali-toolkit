@@ -115,22 +115,6 @@ struct RenderTaskViewportSizeConstraint
   }
 };
 
-/**
- * Returns relative border (0.0f...1.0f x 0.0f...1.0f)
- * from an absolute pixel specified border.
- * @param[in] absolute A border using absolute pixel coordinates
- * @param[in] width The width of the texture
- * @param[in] height The height of the texture.
- * @return A border relative to the size of the Image texture dimensions.
- */
-Vector4 GetRelativeBorder(Vector4 absolute, float width, float height)
-{
-  return Vector4( absolute.x / width,
-                  absolute.y / height,
-                  absolute.z / width,
-                  absolute.w / height);
-}
-
 }
 
 namespace Dali

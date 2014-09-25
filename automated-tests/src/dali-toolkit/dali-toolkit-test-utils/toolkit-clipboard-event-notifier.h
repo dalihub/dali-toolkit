@@ -22,7 +22,10 @@
 #include <string>
 
 // PUBLIC INCLUDES
-#include <dali/public-api/adaptor-framework/clipboard-event-notifier.h>
+#define __DALI_CLIPBOARD_EVENT_NOTIFIER_H__
+#include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/signals/dali-signal-v2.h>
+
 
 namespace Dali
 {
@@ -35,33 +38,24 @@ class ClipboardEventNotifier;
 }
 }
 
-/**
- * This creates a stubbed ClipboardEventNotifier so that internal Toolkit Adaptor calls work.
- */
-class ToolkitClipboardEventNotifier
+class ClipboardEventNotifier : public BaseHandle
 {
-public: // Constants
+public:
+  typedef SignalV2< void ( ClipboardEventNotifier& ) > ClipboardEventSignalV2;
+  static const char* const SIGNAL_CONTENT_SELECTED; ///< name "content-selected"
 
-public: // Construction & Destruction
+  ClipboardEventNotifier();
+  static ClipboardEventNotifier Get();
+  ~ClipboardEventNotifier();
 
-  ToolkitClipboardEventNotifier();
-  ~ToolkitClipboardEventNotifier();
+  const std::string& GetContent() const;
+  void SetContent( const std::string& content );
+  void ClearContent();
 
-public: // Getters
+  void EmitContentSelectedSignal();
+  ClipboardEventSignalV2& ContentSelectedSignal();
 
-  ClipboardEventNotifier GetClipboardEventNotifier();
-
-public: // Signal Emissions
-
-  ClipboardEventNotifier::ClipboardEventSignalV2& SignalContentSelected();
-
-public: // TEST FUNCTIONS
-
-private:
-
-  Internal::Adaptor::ClipboardEventNotifier* mClipboardEventNotifierStub;
-  friend class Internal::Adaptor::ClipboardEventNotifier;
-  ClipboardEventNotifier mClipboardEventNotifier; // Hold a handle ourselves.
+  ClipboardEventNotifier( Internal::Adaptor::ClipboardEventNotifier* notifier );
 };
 
 } // namespace Dali

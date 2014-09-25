@@ -292,11 +292,6 @@ unsigned int genRandom(unsigned int& seed, unsigned int offset)
   return seed;
 }
 
-float genRandomFloat(unsigned int& seed, unsigned int offset)
-{
-  return static_cast<float>(genRandom(seed, offset)) / 0xffffffff;
-}
-
 float genRandomFloat(unsigned int& seed, unsigned int offset, float min, float max)
 {
   const float f = static_cast<float>(genRandom(seed, offset)) / 0xffffffff;

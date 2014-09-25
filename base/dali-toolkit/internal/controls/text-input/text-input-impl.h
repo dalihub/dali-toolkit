@@ -1084,8 +1084,10 @@ public:  // Public to allow internal testing.
 
   /**
    * Setup the selection popup and clipboard if relevant so the correct options are shown when ShowPopup is called.
+   * @param[in] showCutButton Flag to show or hide cut button, in some cases like whitespace we do not want to cut just select.
+   * default is true.
    */
-  void SetUpPopupSelection();
+  void SetUpPopupSelection( bool showCutButton = true );
 
   /**
    * Return the logical index containing the character position closest to the source.
@@ -1218,8 +1220,9 @@ public:  // Public to allow internal testing.
 
   /**
    * Hide highlight shown between selection handles.
+   * @param[in] hidePopup flag to hide the popup too, default is to hide popup.
    */
-  void RemoveHighlight();
+  void RemoveHighlight( bool hidePopup = true );
 
   /**
    * Highlights text that has been selected

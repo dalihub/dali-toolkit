@@ -71,13 +71,14 @@ void UpdateSize( Size& size1, const Size& size2, SizeGrowType type = GrowWidth )
 TextSeparatorType GetTextSeparatorType( const Character& character );
 
 /**
- * Choose a suitable font family name for the given styled text.
+ * Choose a suitable font family name for the given character.
  *
- * It may modify the text-style of the given text by setting a suitable font-family.
+ * It may modify the text-style of the given character by setting a suitable font-family.
  *
- * @param[in,out] text Text with style.
+ * @param[in] character The character.
+ * @param[in,out] style The style of the character.
  */
-void ChooseFontFamilyName( MarkupProcessor::StyledText& text );
+void ChooseFontFamilyName( const Character& character, TextStyle& style );
 
 /**
  * Retrieves the line, word and character indices for the given global character's index.

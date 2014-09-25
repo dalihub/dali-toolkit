@@ -36,11 +36,23 @@ namespace TextViewProcessor
 /**
  * Creates a data structure with info to layout the word, and data structures with useful info to modify the layout data structure if characters are added or removed.
  *
- * @param[in] word The styled word.
+ * @param[in] paragraphText The paragraph's text.
+ * @param[in] textStyles The styles for each character of the paragraph.
  * @param[out] wordLayoutInfo Layout info for all characters of the word.
  */
-void CreateWordTextInfo( const MarkupProcessor::StyledTextArray& word,
+void CreateWordTextInfo( const Text& paragraphText,
+                         Vector<TextStyle*>& textStyles,
                          WordLayoutInfo& wordLayoutInfo );
+
+/**
+ * Updates the word size and ascender.
+ *
+ * It's called after deleting some characters, split a word in two,
+ * or when a new word is created when right to left text is reordered.
+ *
+ * @param[in] wordLayout The word layout info.
+ */
+void UpdateLayoutInfo( WordLayoutInfo& wordLayout );
 
 /**
  * Removes a given number of characters from the given word.

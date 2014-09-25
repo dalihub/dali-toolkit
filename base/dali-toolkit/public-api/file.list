@@ -43,7 +43,6 @@ public_api_base_src_files = \
   $(public_api_base_src_dir)/controls/table-view/table-view.cpp \
   $(public_api_base_src_dir)/controls/text-input/text-input.cpp \
   $(public_api_base_src_dir)/controls/text-view/text-view.cpp \
-  $(public_api_base_src_dir)/factory/localized-control-factory.cpp \
   $(public_api_base_src_dir)/focus-manager/focus-manager.cpp \
   $(public_api_base_src_dir)/focus-manager/keyboard-focus-manager.cpp \
   $(public_api_base_src_dir)/focus-manager/keyinput-focus-manager.cpp \
@@ -125,9 +124,6 @@ public_api_base_text_input_header_files = \
 
 public_api_base_text_view_header_files = \
   $(public_api_base_src_dir)/controls/text-view/text-view.h
-
-public_api_base_factory_header_files = \
-  $(public_api_base_src_dir)/factory/localized-control-factory.h
 
 public_api_base_focus_manager_header_files = \
   $(public_api_base_src_dir)/focus-manager/keyinput-focus-manager.h \

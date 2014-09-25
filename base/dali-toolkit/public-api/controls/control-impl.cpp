@@ -206,6 +206,7 @@ void SetupBackgroundActor( Actor actor, Property::Index constrainingIndex, const
 {
   actor.SetColor( color );
   actor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
+  actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
   actor.SetZ( BACKGROUND_ACTOR_Z_POSITION );
 
   Constraint constraint = Constraint::New<Vector3>( constrainingIndex,

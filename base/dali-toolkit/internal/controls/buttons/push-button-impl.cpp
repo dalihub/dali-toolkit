@@ -644,6 +644,25 @@ float PushButton::OnAnimationTimeRequested() const
   return GetPushButtonPainter( mPainter )->GetAnimationTime();
 }
 
+void PushButton::OnButtonStageDisconnection()
+{
+  if( ButtonDown == mState )
+  {
+    if( !mToggleButton )
+    {
+      Toolkit::PushButton handle( GetOwner() );
+
+      // Notifies the painter the button has been released.
+      GetPushButtonPainter( mPainter )->Released( handle );
+
+      if( mAutoRepeating )
+      {
+        mAutoRepeatingTimer.Reset();
+      }
+    }
+  }
+}
+
 PushButton::PushButton()
 : Button(),
   mAutoRepeating( false ),

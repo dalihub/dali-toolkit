@@ -18,9 +18,6 @@
 // FILE HEADER
 #include <dali-toolkit/internal/controls/text-view/text-processor.h>
 
-// EXTERNAL INCLUDES
-#include <fribidi/fribidi.h>
-
 namespace Dali
 {
 
@@ -33,32 +30,55 @@ namespace Internal
 namespace TextProcessor
 {
 
-void SplitInParagraphs( const MarkupProcessor::StyledTextArray& text,
-                   std::vector<MarkupProcessor::StyledTextArray>& paragraphs )
+void SplitInParagraphs( const MarkupProcessor::StyledTextArray& styledTextArray,
+                        std::vector<Text>& paragraphs,
+                        std::vector< Vector<TextStyle*> >& styles )
 {
-  MarkupProcessor::StyledTextArray paragraph;
-  for( MarkupProcessor::StyledTextArray::const_iterator it = text.begin(), endIt = text.end(); it != endIt; ++it )
+  // Stores the text for a paragraph.
+  Text paragraph;
+
+  // Stores the styles for each character of the paragraph.
+  Vector<TextStyle*> stylesForParagraph;
+
+  // Traverses all styled texts of the array.
+  for( MarkupProcessor::StyledTextArray::const_iterator it = styledTextArray.begin(), endIt = styledTextArray.end(); it != endIt; ++it )
   {
     const MarkupProcessor::StyledText& styledText( *it );
 
+    // Traverses all the characters of the styled text (It may have more than one).
     for( size_t i = 0u, length = styledText.mText.GetLength(); i < length; ++i )
     {
       const Dali::Character character = styledText.mText[i];
 
       if( character.IsNewLine() ) // LF
       {
-        Text newText( character );
-        MarkupProcessor::StyledText newStyledText( newText, styledText.mStyle );
-        paragraph.push_back( newStyledText );
+        // The character is a new paragraph character.
 
+        // Append the new paragraph character.
+        paragraph.Append( character );
+
+        // Creates a new text style for the character and insert it to the vector of styles for that paragraph.
+        TextStyle* style = new TextStyle( styledText.mStyle );
+        stylesForParagraph.PushBack( style );
+
+        // Inserts the paragraph and the styles to the vector of paragraphs and the vector of styles.
         paragraphs.push_back( paragraph );
-        paragraph.clear();
+        styles.push_back( stylesForParagraph );
+
+        // Clears the text and the vector of styles for the next paragraph.
+        paragraph = Text();
+        stylesForParagraph.Clear();
       }
       else
       {
-        Text newText( character );
-        MarkupProcessor::StyledText newStyledText( newText, styledText.mStyle );
-        paragraph.push_back( newStyledText );
+        // The character is not a new paragraph character.
+
+        // Append it to the paragraph's text
+        paragraph.Append( character );
+
+        // Add the style to the vector of styles for that paragraph.
+        TextStyle* style = new TextStyle( styledText.mStyle );
+        stylesForParagraph.PushBack( style );
       }
     }
   }
@@ -66,201 +86,22 @@ void SplitInParagraphs( const MarkupProcessor::StyledTextArray& text,
   // This paragraph could be empty if the last character of the previous paragraph is a 'new paragraph' character
   // and is the last of the text.
   paragraphs.push_back( paragraph );
+  styles.push_back( stylesForParagraph );
 }
 
-void SplitInWords( const MarkupProcessor::StyledTextArray& paragraph,
-                   std::vector<MarkupProcessor::StyledTextArray>& words )
+void SplitInWords( const Dali::Text& paragraph,
+                   Vector<std::size_t>& positions )
 {
-  MarkupProcessor::StyledTextArray word;
-  for( MarkupProcessor::StyledTextArray::const_iterator it = paragraph.begin(), endIt = paragraph.end(); it != endIt; ++it )
-  {
-    const MarkupProcessor::StyledText& styledText( *it );
-    const Dali::Character character = styledText.mText[0u];
+  const std::size_t length = paragraph.GetLength();
 
-    if( character.IsWhiteSpace() )
-    {
-      // When a separator is found, the previous word is added to the list,
-      // then a new word is initialized and the separator is also added as a word.
-      if( !word.empty() )
-      {
-        words.push_back( word );
-        word.clear(); // initializes a new word.
-      }
+  // Magic number: Let's soupose there is ~6 characters per word. Used to do less memory reallocation inside Vector.
+  const size_t magicNumberOfWords = ( length / 6u ) + 1u;
 
-      // Separator added as a word.
-      MarkupProcessor::StyledText separatorChar;
-      separatorChar.mText.Append( character );
-      separatorChar.mStyle = styledText.mStyle;
+  // Find the positions of the new paragraph characters.
+  positions.Reserve( magicNumberOfWords );
 
-      MarkupProcessor::StyledTextArray separatorWord;
-      separatorWord.push_back( separatorChar );
-
-      words.push_back( separatorWord );
-    }
-    else
-    {
-      MarkupProcessor::StyledText styledChar;
-      styledChar.mStyle = styledText.mStyle;
-      styledChar.mText.Append( character );
-
-      // Add the character to the current word.
-      word.push_back( styledChar );
-    }
-  }
-
-  //Finally the last word need to be added.
-  if( !word.empty() )
-  {
-    words.push_back( word );
-  }
-}
-
-bool BeginsRightToLeftCharacter( const MarkupProcessor::StyledTextArray& styledText )
-{
-  for( MarkupProcessor::StyledTextArray::const_iterator it = styledText.begin(), endIt = styledText.end(); it != endIt; ++it )
-  {
-    const Text& text( (*it).mText );
-
-    for( size_t i = 0u, length = text.GetLength(); i < length; ++i )
-    {
-      Character::CharacterDirection direction = text[i].GetCharacterDirection();
-      if( direction != Character::Neutral )
-      {
-        return ( direction == Character::RightToLeft || direction == Character::RightToLeftWeak );
-      }
-    }
-  }
-
-  return false;
-}
-
-bool BeginsRightToLeftCharacter( const Text& text )
-{
-  for( size_t i = 0u, length = text.GetLength(); i < length; ++i )
-  {
-    Character::CharacterDirection direction = text[i].GetCharacterDirection();
-    if( direction != Character::Neutral )
-    {
-      return ( direction == Character::RightToLeft || direction == Character::RightToLeftWeak );
-    }
-  }
-
-  return false;
-}
-
-bool ContainsRightToLeftCharacter( const MarkupProcessor::StyledTextArray& styledText )
-{
-  for( MarkupProcessor::StyledTextArray::const_iterator it = styledText.begin(), endIt = styledText.end(); it != endIt; ++it )
-  {
-    const Text& text( (*it).mText );
-
-    for( size_t i = 0u, length = text.GetLength(); i < length; ++i )
-    {
-      Character::CharacterDirection direction = text[i].GetCharacterDirection();
-      if( ( Character::RightToLeft == direction ) || ( Character::RightToLeftWeak == direction ) )
-      {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-bool ContainsRightToLeftCharacter( const Dali::Text& text )
-{
-  for( size_t i = 0u, length = text.GetLength(); i < length; ++i )
-  {
-    Character::CharacterDirection direction = ( text[i] ).GetCharacterDirection();
-    if( ( Character::RightToLeft == direction ) || ( Character::RightToLeftWeak == direction ) )
-    {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-void ConvertBidirectionalText( const MarkupProcessor::StyledTextArray& line,
-                               MarkupProcessor::StyledTextArray& convertedText,
-                               std::vector<int>& logicalToVisualMap,
-                               std::vector<int>& visualToLogicalMap )
-{
-  // Clean vectors first. This function doesn't use any previous value.
-  logicalToVisualMap.clear();
-  visualToLogicalMap.clear();
-  convertedText.clear();
-
-  if( line.empty() )
-  {
-    // nothing to do if the line is empty.
-    return;
-  }
-
-  // Get the plain text from the line to be reordered by the BiDirectional algorithm.
-  std::string textToBeConverted;
-  GetPlainString( line, textToBeConverted );
-
-  const std::size_t stringSize = textToBeConverted.size();
-
-  std::vector<FriBidiChar> logicalStrBuffer;
-  std::vector<FriBidiChar> visualStrBuffer;
-  // unicode length <= UTF-8 length in bytes (reserve one extra for terminator)
-  // pad these buffers with 0's, as it's unclear what fribidi_log2vis does w.r.t.
-  // the length of it's output content (appears the same as input content, and does
-  // not seem to generate bidi marks i.e. FRIBIDI_CHAR_LRM/FRIBIDI_CHAR_RLM)
-  logicalStrBuffer.resize( stringSize+1u, 0u );
-  visualStrBuffer.resize( stringSize+1u, 0u );
-  FriBidiChar *logicalStr( &logicalStrBuffer[0u] );
-  FriBidiChar *visualStr( &visualStrBuffer[0u] );
-
-  // Convert UTF-8 string to unicode string
-  const std::size_t length = fribidi_charset_to_unicode( FRIBIDI_CHAR_SET_UTF8, textToBeConverted.c_str(), stringSize, logicalStr );
-
-  if( 0u == length )
-  {
-    DALI_ASSERT_DEBUG( !"TextProcessor::ConvertBidirectionalText. Error when calling at fribidi_charset_to_unicode" );
-
-    return;
-  }
-
-  logicalToVisualMap.resize( length );
-  visualToLogicalMap.resize( length );
-
-  // Convert and reorder the string as specified by the Unicode Bidirectional Algorithm
-  FriBidiCharType baseDirection = FRIBIDI_TYPE_ON;
-  fribidi_boolean log2vis = fribidi_log2vis( logicalStr, length, &baseDirection, visualStr, &logicalToVisualMap[0u], &visualToLogicalMap[0u], NULL );
-
-  if(log2vis)
-  {
-    // Convert the unicode string back to the UTF-8 string
-    std::vector<char> bidiTextConverted;
-
-    bidiTextConverted.resize( length * 4u + 1u ); // Maximum bytes to represent one UTF-8 character is 6.
-                                                // Currently Dali doesn't support this UTF-8 extension. Dali only supports 'regular' UTF-8 which has a maximum of 4 bytes per character.
-
-    fribidi_unicode_to_charset( FRIBIDI_CHAR_SET_UTF8, visualStr, length, &bidiTextConverted[0u] );
-
-    textToBeConverted = &bidiTextConverted[0u];
-
-    // After reorder the text, rebuild the text with the original styles is needed.
-    // To assign the original style is needed to use the characterLogicalToVisualMap table.
-    Text text( &bidiTextConverted[0u] );
-
-    // Split the line in words.
-    // Add the correct styles for the characters after they are reordered.
-
-    for( size_t i = 0u; i < length; ++i )
-    {
-      const Character character( text[i] );
-
-      MarkupProcessor::StyledText styledText;
-      styledText.mText.Append( character );
-      styledText.mStyle = line[visualToLogicalMap[i]].mStyle;
-
-      convertedText.push_back( styledText );
-    }
-  }
+  // Find the position of all white spaces. A new paragraph character is also considered a white space but it doesn't matter at this point.
+  paragraph.Find( Text::WHITE_SPACE, 0u, length - 1u, positions );
 }
 
 /**
@@ -276,7 +117,7 @@ bool IsWhiteSpace( const MarkupProcessor::StyledTextArray& text, size_t offset )
   DALI_ASSERT_DEBUG( offset < text.size() );
 
   // assume 1 Character per StyledText
-  return text[offset].mText[0u].IsWhiteSpace();
+  return ( *( text.begin() + offset ) ).mText[0u].IsWhiteSpace();
 }
 
 void FindNearestWord( const MarkupProcessor::StyledTextArray& text, size_t offset, size_t& start, size_t& end)
@@ -325,6 +166,20 @@ void FindNearestWord( const MarkupProcessor::StyledTextArray& text, size_t offse
   while(j < size && !IsWhiteSpace(text, j))
   {
     j++;
+  }
+
+  // If both markers at same position and is whitespace then word is a whitespace word
+  if ( i == j )
+  {
+    while(j < size && IsWhiteSpace(text, j))
+    {
+      j++;
+    }
+
+    while(i > 0 && IsWhiteSpace(text, i-1))
+    {
+      i--;
+    }
   }
 
   start = i;

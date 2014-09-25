@@ -72,14 +72,6 @@ Vector3 NoShrinkWhenExceedPosition( const TextViewRelayout::RelayoutParameters& 
                                              1.f, // Shrink factor
                                              subLineInfo );
 
-      // Stores some info to calculate the line justification in a post-process.
-      TextView::LineJustificationInfo justificationInfo;
-
-      justificationInfo.mIndices = relayoutParameters.mIndices;
-      justificationInfo.mLineLength = subLineInfo.mLineLength;
-
-      relayoutData.mLineJustificationInfo.push_back( justificationInfo );
-
       Toolkit::TextView::LineLayoutInfo lineInfo;
       lineInfo.mCharacterGlobalIndex = relayoutParameters.mCharacterGlobalIndex;    // Index to the first character of the next line.
       lineInfo.mSize = Size( subLineInfo.mLineLength, subLineInfo.mMaxCharHeight ); // Size of this piece of paragraph.
@@ -234,9 +226,10 @@ void Relayout( Actor textView,
 {
   if( relayoutOperationMask & TextView::RELAYOUT_SIZE_POSITION )
   {
-    relayoutData.mLineJustificationInfo.clear();
     CalculateSizeAndPosition( layoutParameters,
                               relayoutData );
+
+    TextViewRelayout::ReorderRightToLeftLayout( relayoutData );
 
     TextViewRelayout::SetUnderlineInfo( relayoutData );
   }

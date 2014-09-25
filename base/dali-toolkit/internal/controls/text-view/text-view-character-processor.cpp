@@ -73,13 +73,13 @@ CharacterLayoutInfo::CharacterLayoutInfo()
   mPosition(),
   mOffset(),
   mGlyphActor(),
-  mStyledText(),
   mColorAlpha( 1.f ),
   mGradientInfo( NULL ),
   mIsVisible( true ),
-  mSetText( true ),
-  mSetStyle( true ),
-  mIsColorGlyph( false )
+  mSetText( false ),
+  mSetStyle( false ),
+  mIsColorGlyph( false ),
+  mIsRightToLeft( false )
 {
 }
 
@@ -98,13 +98,13 @@ CharacterLayoutInfo::CharacterLayoutInfo( const CharacterLayoutInfo& character )
   mPosition( character.mPosition ),
   mOffset( character.mOffset ),
   mGlyphActor( character.mGlyphActor ),
-  mStyledText( character.mStyledText ),
   mColorAlpha( character.mColorAlpha ),
   mGradientInfo( ( NULL == character.mGradientInfo ) ? NULL : new GradientInfo( *character.mGradientInfo ) ), // Copies the gradient info.
   mIsVisible( character.mIsVisible ),
   mSetText( character.mSetText ),
   mSetStyle( character.mSetStyle ),
-  mIsColorGlyph( character.mIsColorGlyph )
+  mIsColorGlyph( character.mIsColorGlyph ),
+  mIsRightToLeft( character.mIsRightToLeft )
 {
 }
 
@@ -120,7 +120,6 @@ CharacterLayoutInfo& CharacterLayoutInfo::operator=( const CharacterLayoutInfo& 
   mOffset = character.mOffset;
 
   mGlyphActor = character.mGlyphActor;
-  mStyledText = character.mStyledText;
 
   mColorAlpha = character.mColorAlpha;
 
@@ -150,6 +149,7 @@ CharacterLayoutInfo& CharacterLayoutInfo::operator=( const CharacterLayoutInfo& 
   mSetText = character.mSetText;
   mSetStyle = character.mSetStyle;
   mIsColorGlyph = character.mIsColorGlyph;
+  mIsRightToLeft = character.mIsRightToLeft;
 
   return *this;
 }

@@ -321,6 +321,11 @@ protected: // From Button
    */
   virtual float OnAnimationTimeRequested() const;
 
+  /**
+   * This method is called when the button is removed from the stage.
+   */
+  virtual void OnButtonStageDisconnection();
+
 protected: // From Control
 
   /**

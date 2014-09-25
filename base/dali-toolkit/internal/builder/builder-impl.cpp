@@ -87,6 +87,7 @@ std::string ToString(const Rect<int>& value)
   return ss.str();
 }
 
+#if defined(DEBUG_ENABLED)
 
 std::string PropertyValueToString( const Property::Value& value )
 {
@@ -178,6 +179,7 @@ std::string PropertyValueToString( const Property::Value& value )
 
   return ret;
 }
+#endif // DEBUG_ENABLED
 
 /*
  * Recursively collects all stylesin a node (An array of style names).
@@ -1010,7 +1012,6 @@ bool Builder::ApplyStyle( const std::string& styleName, Handle& handle, const Re
   }
   else
   {
-    DALI_SCRIPT_WARNING("No styles section to create style '%s'\n", styleName.c_str());
     return false;
   }
 }

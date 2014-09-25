@@ -83,14 +83,6 @@ Vector3 OriginalPosition( const TextViewRelayout::RelayoutParameters& relayoutPa
         }
       }
 
-      // Stores some info to calculate the line justification in a post-process.
-      TextView::LineJustificationInfo justificationInfo;
-
-      justificationInfo.mIndices = relayoutParameters.mIndices;
-      justificationInfo.mLineLength = subLineInfo.mLineLength;
-
-      relayoutData.mLineJustificationInfo.push_back( justificationInfo );
-
       Toolkit::TextView::LineLayoutInfo lineInfo;
       lineInfo.mCharacterGlobalIndex = relayoutParameters.mCharacterGlobalIndex;    // Index to the first character of the next line.
       lineInfo.mSize = Size( subLineInfo.mLineLength, subLineInfo.mMaxCharHeight ); // Size of this piece of paragraph.
@@ -146,14 +138,6 @@ Vector3 SplitWhenExceedPosition( const TextViewRelayout::RelayoutParameters& rel
                                              TextViewRelayout::WrapByWordAndSplit,
                                              1.f, // Shrink factor.
                                              subLineInfo );
-
-      // Stores some info to calculate the line justification in a post-process.
-      TextView::LineJustificationInfo justificationInfo;
-
-      justificationInfo.mIndices = relayoutParameters.mIndices;
-      justificationInfo.mLineLength = subLineInfo.mLineLength;
-
-      relayoutData.mLineJustificationInfo.push_back( justificationInfo );
 
       Toolkit::TextView::LineLayoutInfo lineInfo;
       lineInfo.mCharacterGlobalIndex = relayoutParameters.mCharacterGlobalIndex;    // Index to the first character of the next line.
@@ -211,14 +195,6 @@ Vector3 ShrinkWidthWhenExceedPosition( const TextViewRelayout::RelayoutParameter
                                              relayoutData.mShrinkFactor,
                                              subLineInfo );
 
-      // Stores some info to calculate the line justification in a post-process.
-      TextView::LineJustificationInfo justificationInfo;
-
-      justificationInfo.mIndices = relayoutParameters.mIndices;
-      justificationInfo.mLineLength = subLineInfo.mLineLength;
-
-      relayoutData.mLineJustificationInfo.push_back( justificationInfo );
-
       Toolkit::TextView::LineLayoutInfo lineInfo;
       lineInfo.mCharacterGlobalIndex = relayoutParameters.mCharacterGlobalIndex;    // Index to the first character of the next line.
       lineInfo.mSize = Size( subLineInfo.mLineLength, subLineInfo.mMaxCharHeight ); // Size of this piece of paragraph.
@@ -241,8 +217,6 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
 {
   const float parentWidth = relayoutData.mTextViewSize.width;
   TextViewProcessor::TextLayoutInfo& textLayoutInfo = relayoutData.mTextLayoutInfo;
-
-  relayoutData.mLineJustificationInfo.clear();
 
   // Reset the text height. This value is returned in order to shrink further or not the text.
   newTextHeight = 0.f;
@@ -332,14 +306,6 @@ void CalculatePositionsForShrinkWhenExceed( TextView::RelayoutData& relayoutData
           lineInfo.mSize = Size( subLineInfo.mLineLength, subLineInfo.mMaxCharHeight ); // Size of this piece of paragraph.
           lineInfo.mAscender = subLineInfo.mMaxAscender;                                // Ascender of this piece of paragraph.
           relayoutData.mLines.push_back( lineInfo );
-
-          // Stores some info to calculate the line justification in a post-process.
-          TextView::LineJustificationInfo justificationInfo;
-
-          justificationInfo.mIndices = indices;
-          justificationInfo.mLineLength = subLineInfo.mLineLength;
-
-          relayoutData.mLineJustificationInfo.push_back( justificationInfo );
         }
         else
         {
@@ -618,9 +584,10 @@ void Relayout( Actor textView,
 {
   if( relayoutOperationMask & TextView::RELAYOUT_SIZE_POSITION )
   {
-    relayoutData.mLineJustificationInfo.clear();
     CalculateSizeAndPosition( layoutParameters,
                               relayoutData );
+
+    TextViewRelayout::ReorderRightToLeftLayout( relayoutData );
 
     TextViewRelayout::SetUnderlineInfo( relayoutData );
   }

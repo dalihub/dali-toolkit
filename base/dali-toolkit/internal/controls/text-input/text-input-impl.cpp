@@ -86,36 +86,6 @@ enum SelectionState
   SelectionFinished                         ///< Finished selected section
 };
 
-/**
- * Whether the given style is the default style or not.
- * @param[in] style The given style.
- * @return \e true if the given style is the default. Otherwise it returns \e false.
- */
-bool IsDefaultStyle( const TextStyle& style )
-{
-  return DEFAULT_TEXT_STYLE == style;
-}
-
-/**
- * Whether the given styled text is using the default style or not.
- * @param[in] textArray The given text.
- * @return \e true if the given styled text is using the default style. Otherwise it returns \e false.
- */
-bool IsTextDefaultStyle( const Toolkit::MarkupProcessor::StyledTextArray& textArray )
-{
-  for( Toolkit::MarkupProcessor::StyledTextArray::const_iterator it = textArray.begin(), endIt = textArray.end(); it != endIt; ++it )
-  {
-    const TextStyle& style( (*it).mStyle );
-
-    if( !IsDefaultStyle( style ) )
-    {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 std::size_t FindVisibleCharacterLeft( std::size_t cursorPosition, const Toolkit::TextView::CharacterLayoutInfoContainer& characterLayoutInfoTable )
 {
   for( Toolkit::TextView::CharacterLayoutInfoContainer::const_reverse_iterator it = characterLayoutInfoTable.rbegin() + characterLayoutInfoTable.size() - cursorPosition, endIt = characterLayoutInfoTable.rend();
@@ -281,9 +251,9 @@ Dali::Toolkit::TextInput TextInput::New()
   TextInputPtr textInput(new TextInput());
   // Pass ownership to CustomActor via derived handle
   Dali::Toolkit::TextInput handle(*textInput);
+  handle.SetName( "TextInput");
 
   textInput->Initialize();
-
   return handle;
 }
 
@@ -1072,13 +1042,10 @@ void TextInput::OnKeyInputFocusGained()
   mClipboard = Clipboard::Get(); // Store handle to clipboard
 
   // Now in edit mode we can accept string to paste from clipboard
-  if( Adaptor::IsAvailable() )
+  ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
+  if ( notifier )
   {
-    ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
-    if ( notifier )
-    {
-      notifier.ContentSelectedSignal().Connect( this, &TextInput::OnClipboardTextSelected );
-    }
+    notifier.ContentSelectedSignal().Connect( this, &TextInput::OnClipboardTextSelected );
   }
 }
 
@@ -1122,19 +1089,16 @@ void TextInput::OnKeyInputFocusLost()
 
   mClipboard.Reset();
   // No longer in edit mode so do not want to receive string from clipboard
-  if( Adaptor::IsAvailable() )
+  ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
+  if ( notifier )
   {
-    ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
-    if ( notifier )
-    {
-      notifier.ContentSelectedSignal().Disconnect( this, &TextInput::OnClipboardTextSelected );
-    }
-    Clipboard clipboard = Clipboard::Get();
+    notifier.ContentSelectedSignal().Disconnect( this, &TextInput::OnClipboardTextSelected );
+  }
 
-    if ( clipboard )
-    {
-      clipboard.HideClipboard();
-    }
+  Clipboard clipboard = Clipboard::Get();
+  if ( clipboard )
+  {
+    clipboard.HideClipboard();
   }
 }
 
@@ -1152,6 +1116,7 @@ void TextInput::CreateActiveLayer()
 {
   Actor self = Self();
   mActiveLayer = Layer::New();
+  mActiveLayer.SetName ( "ActiveLayerActor" );
 
   mActiveLayer.SetAnchorPoint( AnchorPoint::CENTER);
   mActiveLayer.SetParentOrigin( ParentOrigin::CENTER);
@@ -1387,6 +1352,12 @@ void TextInput::OnDoubleTap(Dali::Actor actor, Dali::TapGesture tap)
      mTextLayoutInfo.mScrollOffset = mDisplayedTextView.GetScrollPosition();
      ReturnClosestIndex( tap.localPoint, mCursorPosition );
 
+     std::size_t start = 0;
+     std::size_t end = 0;
+     Dali::Toolkit::Internal::TextProcessor::FindNearestWord( mStyledText, mCursorPosition, start, end );
+
+     mCursorPosition = end; // Ensure cursor is positioned at end of selected word
+
      ImfManager imfManager = ImfManager::Get();
      if ( imfManager )
      {
@@ -1394,14 +1365,20 @@ void TextInput::OnDoubleTap(Dali::Actor actor, Dali::TapGesture tap)
        imfManager.NotifyCursorPosition();
      }
 
-     std::size_t start = 0;
-     std::size_t end = 0;
-     Dali::Toolkit::Internal::TextProcessor::FindNearestWord( mStyledText, mCursorPosition, start, end );
-
-     SelectText( start, end );
+     if ( !mStyledText.at(end-1).mText[0].IsWhiteSpace() )
+     {
+       SelectText( start, end );
+       ShowPopupCutCopyPaste();
+     }
+     else
+     {
+       RemoveHighlight( false ); // Remove highlight but do not auto hide popup
+       HidePopup( false ); // Hide popup with setting to do auto show.
+       SetUpPopupSelection( false ); // Set to false so if nearest word is whitespace it will not show cut button.
+       ShowPopup();
+     }
    }
-   // if no text but clipboard has content then show paste option
-   if ( ( mClipboard && mClipboard.NumberOfItems() ) || !mStyledText.empty() )
+   else if ( mClipboard && mClipboard.NumberOfItems() )
    {
      ShowPopupCutCopyPaste();
    }
@@ -1450,26 +1427,6 @@ void TextInput::OnTextTap(Dali::Actor actor, Dali::TapGesture tap)
     {
       // Set the initial cursor position in the tap point.
       ReturnClosestIndex(tap.localPoint, mCursorPosition );
-
-      // Create the grab handle.
-      // TODO Make this a re-usable function.
-      if ( IsGrabHandleEnabled() )
-      {
-        const Vector3 cursorPosition = GetActualPositionFromCharacterPosition(mCursorPosition);
-
-        CreateGrabHandle();
-
-        mActualGrabHandlePosition.x = cursorPosition.x; // Set grab handle to be at the cursor position
-        mActualGrabHandlePosition.y = cursorPosition.y; // Set grab handle to be at the cursor position
-        mGrabHandle.SetPosition( mActualGrabHandlePosition + UI_OFFSET );
-        ShowGrabHandleAndSetVisibility( mIsGrabHandleInScrollArea );
-
-      }
-
-      // Edit mode started after grab handle created to ensure the signal InputStarted is sent last.
-      // This is used to ensure if selecting text hides the grab handle then this code is run after grab handle is created,
-      // otherwise the Grab handle will be shown when selecting.
-
       StartEditMode();
     }
   }
@@ -1523,6 +1480,9 @@ void TextInput::OnTextTap(Dali::Actor actor, Dali::TapGesture tap)
     }
   }
 
+  // Edit mode started after grab handle created to ensure the signal InputStarted is sent last.
+  // This is used to ensure if selecting text hides the grab handle then this code is run after grab handle is created,
+  // otherwise the Grab handle will be shown when selecting.
   if ( createGrabHandle && IsGrabHandleEnabled() )
   {
     const Vector3 cursorPosition = GetActualPositionFromCharacterPosition(mCursorPosition);
@@ -1540,6 +1500,12 @@ void TextInput::OnTextTap(Dali::Actor actor, Dali::TapGesture tap)
 void TextInput::OnLongPress(Dali::Actor actor, Dali::LongPressGesture longPress)
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "OnLongPress\n" );
+
+  // Ignore longpress if in selection mode already
+  if( mHighlightMeshActor )
+  {
+    return;
+  }
 
   if(longPress.state == Dali::Gesture::Started)
   {
@@ -1577,15 +1543,18 @@ void TextInput::OnLongPress(Dali::Actor actor, Dali::LongPressGesture longPress)
       mTextLayoutInfo.mScrollOffset = mDisplayedTextView.GetScrollPosition();
       ReturnClosestIndex( longPress.localPoint, mCursorPosition );
 
+      std::size_t start = 0;
+      std::size_t end = 0;
+      Dali::Toolkit::Internal::TextProcessor::FindNearestWord( mStyledText, mCursorPosition, start, end );
+
+      mCursorPosition  = end; // Ensure cursor is positioned at end of selected word
+
       ImfManager imfManager = ImfManager::Get();
       if ( imfManager )
       {
         imfManager.SetCursorPosition ( mCursorPosition );
         imfManager.NotifyCursorPosition();
       }
-      std::size_t start = 0;
-      std::size_t end = 0;
-      Dali::Toolkit::Internal::TextProcessor::FindNearestWord( mStyledText, mCursorPosition, start, end );
 
       SelectText( start, end );
     }
@@ -1744,11 +1713,9 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
     {
       bool preEditFlagPreviouslySet( mPreEditFlag );
 
-      if (mHighlightMeshActor)
-      {
-        // replaces highlighted text with new line
-        DeleteHighlightedText( false );
-      }
+      // replaces highlighted text with new line
+      DeleteHighlightedText( false );
+
       mCursorPosition = mCursorPosition + InsertAt( Text( NEWLINE ), mCursorPosition, 0 );
 
       // If we are in pre-edit mode then pressing enter will cause a commit.  But the commit string does not include the
@@ -1825,15 +1792,11 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
     // Some text may be selected, hiding keyboard causes an empty keystring to be sent, we don't want to delete highlight in this case
     if ( !keyString.empty() )
     {
-      if ( mHighlightMeshActor )
-      {
-        // replaces highlighted text with new character
-        DeleteHighlightedText( false );
-      }
-
+      // replaces highlighted text with new character
+      DeleteHighlightedText( false );
 
       // Received key String
-      mCursorPosition = mCursorPosition + InsertAt( Text( keyString ), mCursorPosition, 0 );
+      mCursorPosition += InsertAt( Text( keyString ), mCursorPosition, 0 );
       update = true;
       EmitTextModified();
     }
@@ -2076,6 +2039,7 @@ void TextInput::SetUpTouchEvents()
 void TextInput::CreateTextViewActor()
 {
   mDisplayedTextView = Toolkit::TextView::New();
+  mDisplayedTextView.SetName( "DisplayedTextView ");
   mDisplayedTextView.SetMarkupProcessingEnabled( mMarkUpEnabled );
   mDisplayedTextView.SetParentOrigin(ParentOrigin::TOP_LEFT);
   mDisplayedTextView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
@@ -2579,7 +2543,7 @@ void TextInput::DeleteHighlightedText( bool inheritStyle )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "DeleteHighlightedText handlePosOne[%u] handlePosTwo[%u]\n", mSelectionHandleOnePosition, mSelectionHandleTwoPosition);
 
-  if(mHighlightMeshActor)
+  if( mHighlightMeshActor )
   {
     mCursorPosition = std::min( mSelectionHandleOnePosition, mSelectionHandleTwoPosition );
 
@@ -2826,9 +2790,10 @@ ImageActor TextInput::CreateCursor( const Vector4& color)
 {
   ImageActor cursor;
   cursor = CreateSolidColorActor(color);
+  cursor.SetName( "Cursor" );
 
   cursor.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  cursor.SetAnchorPoint(AnchorPoint::BOTTOM_CENTER);
+  cursor.SetAnchorPoint(AnchorPoint::BOTTOM_LEFT);
   cursor.SetVisible(false);
 
   return cursor;
@@ -2887,7 +2852,7 @@ void TextInput::DrawCursor(const std::size_t nthChar)
 {
   // Get height of cursor and set its size
   Size size( CURSOR_THICKNESS, 0.0f );
-  if (!mTextLayoutInfo.mCharacterLayoutInfoTable.empty())
+  if( !mTextLayoutInfo.mCharacterLayoutInfoTable.empty() )
   {
     size.height = GetRowRectFromCharacterPosition( GetVisualPosition( mCursorPosition ) ).height;
   }
@@ -2981,11 +2946,13 @@ void TextInput::CreateGrabHandle( Dali::Image image )
 void TextInput::CreateGrabArea( Actor& parent )
 {
   mGrabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
+  mGrabArea.SetName( "GrabArea" );
   mGrabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
   mGrabArea.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), RelativeToConstraint( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE ) ) );  // grab area to be larger than text actor
   mGrabArea.TouchedSignal().Connect(this,&TextInput::OnPressDown);
   mTapDetector.Attach( mGrabArea );
   mPanGestureDetector.Attach( mGrabArea );
+  mLongPressDetector.Attach( mGrabArea );
 
   parent.Add(mGrabArea);
 }
@@ -3841,7 +3808,7 @@ void TextInput::ShowPopupCutCopyPaste()
   ShowPopup();
 }
 
-void TextInput::SetUpPopupSelection()
+void TextInput::SetUpPopupSelection( bool showCutButton )
 {
   ClearPopup();
   mPopupPanel.CreateOrderedListOfOptions(); // todo Move this so only run when order has changed
@@ -3850,7 +3817,7 @@ void TextInput::SetUpPopupSelection()
   {
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelectAll, true );
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelect, true );
-    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, true );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, showCutButton );
   }
   // if clipboard has valid contents then offer paste option
   if( mClipboard && mClipboard.NumberOfItems() )
@@ -4240,7 +4207,7 @@ Vector3 TextInput::GetActualPositionFromCharacterPosition(std::size_t characterP
       // between RTL and LTR text...
       if(characterPosition != mTextLayoutInfo.mCharacterLogicalToVisualMap.size())
       {
-        std::size_t visualCharacterAltPosition = mTextLayoutInfo.mCharacterLogicalToVisualMap[characterPosition] - 1;
+        std::size_t visualCharacterAltPosition = mTextLayoutInfo.mCharacterLogicalToVisualMap[characterPosition]; // VCC TODO: find why in the previous patch it was a -1 here.
 
         DALI_ASSERT_ALWAYS(visualCharacterAltPosition < mTextLayoutInfo.mCharacterLayoutInfoTable.size());
         const Toolkit::TextView::CharacterLayoutInfo& infoAlt = mTextLayoutInfo.mCharacterLayoutInfoTable[ visualCharacterAltPosition ];
@@ -4583,16 +4550,7 @@ void TextInput::SelectText(std::size_t start, std::size_t end)
     // When replacing highlighted text keyboard should ignore current word at cursor hence notify keyboard that the cursor is at the start of the highlight.
     mSelectingText = true;
 
-    mCursorPosition = std::min( start, end ); // Set cursor position to start of highlighted text.
-
-    ImfManager imfManager = ImfManager::Get();
-    if ( imfManager )
-    {
-      imfManager.SetCursorPosition ( mCursorPosition );
-      imfManager.SetSurroundingText( GetText() );
-      imfManager.NotifyCursorPosition();
-    }
-    // As the imfManager has been notified of the new cursor position we do not need to reset the pre-edit as it will be updated instead.
+    std::size_t selectionStartPosition = std::min( start, end );
 
     // Hide grab handle when selecting.
     ShowGrabHandleAndSetVisibility( false );
@@ -4606,7 +4564,7 @@ void TextInput::SelectText(std::size_t start, std::size_t end)
       UpdateHighlight();
 
       const TextStyle oldInputStyle( mInputStyle );
-      mInputStyle = GetStyleAt( mCursorPosition ); // Inherit style from selected position.
+      mInputStyle = GetStyleAt( selectionStartPosition ); // Inherit style from selected position.
 
       if( oldInputStyle != mInputStyle )
       {
@@ -4686,7 +4644,7 @@ void TextInput::KeyboardStatusChanged(bool keyboardShown)
 }
 
 // Removes highlight and resumes edit mode state
-void TextInput::RemoveHighlight()
+void TextInput::RemoveHighlight( bool hidePopup )
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "RemoveHighlight\n");
 
@@ -4716,7 +4674,10 @@ void TextInput::RemoveHighlight()
     // NOTE: We cannot dereference mHighlightMesh, due
     // to a bug in how the scene-graph MeshRenderer uses the Mesh data incorrectly.
 
-    HidePopup();
+    if ( hidePopup )
+    {
+      HidePopup();
+    }
   }
 
   mSelectionHandleOnePosition = 0;

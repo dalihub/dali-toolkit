@@ -90,7 +90,7 @@ public:
 
     TextViewProcessorMetadataType    mType;               ///< Stores the type of operation.
     std::size_t                      mPosition;           ///< Character position within the text.
-    std::size_t                      mNumberOfCharacters; ///< Number of characters to be removed/ replaced.
+    std::size_t                      mNumberOfCharacters; ///< Number of characters to be removed/replaced.
     MarkupProcessor::StyledTextArray mText;               ///< The new text.
     TextStyle::Mask                  mStyleMask;          ///< The style mask.
   };
@@ -243,6 +243,11 @@ public:
    * @copydoc SetEllipsizeText()
    */
   void SetEllipsizeText( const MarkupProcessor::StyledTextArray& ellipsizeText );
+
+  /**
+   * @copydoc SetEllipsizeText()
+   */
+  void SetEllipsizeText( const Text& ellipsizeText, const Vector<TextStyle*>& ellipsizeStyles );
 
   /**
    * @copydoc GetEllipsizeText()
@@ -524,6 +529,11 @@ private:
   Actor GetRootActor() const;
 
   /**
+   * Creates the ellipsize text layout.
+   */
+  void CreateEllipsizeLayout();
+
+  /**
    * Handle SetProperty for markup processing.
    * @param[in] propertyValue The new property value.
    */
@@ -604,7 +614,6 @@ public:
                       Toolkit::Alignment::Type               alignment,
                       Toolkit::TextView::LineJustification   lineJustification,
                       float                                  lineHeightOffset,
-                      const std::string&                     ellipsizeText,
                       bool                                   markUpEnabled );
 
     /**
@@ -618,15 +627,14 @@ public:
     LayoutParameters& operator=( const LayoutParameters& layoutParameters );
 
     Toolkit::TextView::MultilinePolicy   mMultilinePolicy;     ///< Stores the multiline policy.
-    TextView::ExceedPolicy               mExceedPolicy;        ///< Stores a combination of both policies;
+    TextView::ExceedPolicy               mExceedPolicy;        ///< Stores a combination of both policies.
     Toolkit::TextView::ExceedPolicy      mWidthExceedPolicy;   ///< Stores the text width exceed policy.
     Toolkit::TextView::ExceedPolicy      mHeightExceedPolicy;  ///< Stores the text height exceed policy.
     Toolkit::Alignment::Type             mHorizontalAlignment; ///< Stores the horizontal alignment for the whole text.
     Toolkit::Alignment::Type             mVerticalAlignment;   ///< Stores the vertical alignment for the whole text.
     Toolkit::TextView::LineJustification mLineJustification;   ///< Stores the line justification.
     float                                mLineHeightOffset;    ///< Line height offset to be addded to the font line height (measured in PointSize).
-    MarkupProcessor::StyledTextArray     mEllipsizeText;       ///< Stores the ellipsize text
-    bool                                 mMarkUpEnabled:1;     ///< Is markup string scanning enabled
+    bool                                 mMarkUpEnabled:1;     ///< Is markup string scanning enabled.
   };
 
   /**
@@ -655,15 +663,6 @@ public:
     bool                            mSnapshotModeEnabled:1;   ///< Whether text-view is rendered offscreen.
     bool                            mScrollEnabled:1;         ///< Whether the text scroll is enabled.
     bool                            mScrollPositionTrimmed:1; ///< Whether the last scroll position set was trimmed.
-  };
-
-  /**
-   * Temporary data used to calculate line justification.
-   */
-  struct LineJustificationInfo
-  {
-    TextViewProcessor::TextInfoIndices mIndices;    ///< Indices to the first character of the new line.
-    float                              mLineLength; ///< Length of the line (or portion of line).
   };
 
   /**
@@ -696,7 +695,6 @@ public:
     Toolkit::TextView::CharacterLayoutInfoContainer mCharacterLayoutInfoTable;    ///< Stores layout info per character sorted by the character's visual index.
     Toolkit::TextView::LineLayoutInfoContainer      mLines;                       ///< Stores an index to the first character of each line.
     Size                                            mTextSizeForRelayoutOption;   ///< Stores the text size after relayout.
-    std::vector<LineJustificationInfo>              mLineJustificationInfo;       ///< Stores justification info per line.
     TextActorCache                                  mTextActorCache;              ///< Stores previously created text-actors to be reused.
   };
 

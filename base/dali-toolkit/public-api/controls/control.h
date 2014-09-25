@@ -324,6 +324,8 @@ public:
    * @brief Sets the background color of the control.
    *
    * @param[in] color The required background color of the control
+   *
+   * @note The background color fully blends with the actor color.
    */
   void SetBackgroundColor( const Vector4& color );
 

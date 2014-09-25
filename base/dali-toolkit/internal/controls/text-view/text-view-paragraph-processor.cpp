@@ -22,6 +22,7 @@
 #include <dali-toolkit/internal/controls/text-view/text-view-word-processor.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-processor-helper-functions.h>
 #include <dali-toolkit/internal/controls/text-view/text-processor.h>
+#include <dali-toolkit/internal/controls/text-view/text-processor-bidirectional-info.h>
 
 namespace Dali
 {
@@ -39,26 +40,74 @@ namespace TextViewProcessor
 // Layout info.
 /////////////////////
 
+void RightToLeftParagraphLayout::Clear()
+{
+  mWordsLayoutInfo.clear();
+  mText = Text();
+  mTextStyles.Clear();
+}
+
 ParagraphLayoutInfo::ParagraphLayoutInfo()
 : mSize(),
   mAscender( 0.f ),
   mLineHeightOffset( 0.f ),
+  mFirstCharacter( 0u ),
   mNumberOfCharacters( 0u ),
-  mWordsLayoutInfo()
+  mWordsLayoutInfo(),
+  mText(),
+  mTextStyles(),
+  mRightToLeftLayout( NULL ),
+  mBidirectionalParagraphInfo( NULL ),
+  mBidirectionalLinesInfo()
 {
 }
 
 ParagraphLayoutInfo::~ParagraphLayoutInfo()
 {
+  if( NULL != mRightToLeftLayout )
+  {
+    // TextStyle pointers are the same than the ones stored at ParagraphLayoutInfo::mTextStyles.
+    // Do not delete them, just clear the vector.
+    mRightToLeftLayout->mTextStyles.Clear();
+
+    delete mRightToLeftLayout;
+  }
+
+  // Clears text styles. It destroys TextStyle objects.
+  ClearStyles();
+
+  // Deletes the bidirectional info for the whole paragraph.
+  delete mBidirectionalParagraphInfo;
+
+  // Clears the bidirectional info for all lines. Destroys the BidirectionalLineInfo objects.
+  ClearBidirectionalInfo();
 }
 
 ParagraphLayoutInfo::ParagraphLayoutInfo( const ParagraphLayoutInfo& paragraph )
 : mSize( paragraph.mSize ),
   mAscender( paragraph.mAscender ),
   mLineHeightOffset( paragraph.mLineHeightOffset ),
+  mFirstCharacter( paragraph.mFirstCharacter ),
   mNumberOfCharacters( paragraph.mNumberOfCharacters ),
-  mWordsLayoutInfo( paragraph.mWordsLayoutInfo )
+  mWordsLayoutInfo( paragraph.mWordsLayoutInfo ),
+  mText( paragraph.mText ),
+  mTextStyles(),
+  mRightToLeftLayout( NULL ),
+  // Copies bidirectional info for the whole paragraph.
+  mBidirectionalParagraphInfo( ( NULL == paragraph.mBidirectionalParagraphInfo ) ? NULL : new TextProcessor::BidirectionalParagraphInfo( *paragraph.mBidirectionalParagraphInfo ) ),
+  mBidirectionalLinesInfo()
 {
+  // Copies styles.
+  for( Vector<TextStyle*>::ConstIterator it = paragraph.mTextStyles.Begin(), endIt = paragraph.mTextStyles.End(); it != endIt; ++it )
+  {
+    mTextStyles.PushBack( new TextStyle( *(*it) ) );
+  }
+
+  // Copies bidirectional info for each line.
+  for( Vector<TextProcessor::BidirectionalLineInfo*>::ConstIterator it = mBidirectionalLinesInfo.Begin(), endIt = mBidirectionalLinesInfo.End(); it != endIt; ++it )
+  {
+    mBidirectionalLinesInfo.PushBack( new TextProcessor::BidirectionalLineInfo( *( *it ) ) );
+  }
 }
 
 ParagraphLayoutInfo& ParagraphLayoutInfo::operator=( const ParagraphLayoutInfo& paragraph )
@@ -66,150 +115,207 @@ ParagraphLayoutInfo& ParagraphLayoutInfo::operator=( const ParagraphLayoutInfo& 
   mSize = paragraph.mSize;
   mAscender = paragraph.mAscender;
   mLineHeightOffset = paragraph.mLineHeightOffset;
+  mFirstCharacter = paragraph.mFirstCharacter;
   mNumberOfCharacters = paragraph.mNumberOfCharacters;
   mWordsLayoutInfo = paragraph.mWordsLayoutInfo;
+  mText = paragraph.mText;
+
+  // If it has styles, destroy them.
+  ClearStyles();
+
+  // Copies styles.
+  for( Vector<TextStyle*>::ConstIterator it = paragraph.mTextStyles.Begin(), endIt = paragraph.mTextStyles.End(); it != endIt; ++it )
+  {
+    mTextStyles.PushBack( new TextStyle( *(*it) ) );
+  }
+
+  // Copies the paragraph's bidirectiona info.
+  if( NULL == paragraph.mBidirectionalParagraphInfo )
+  {
+    // The source doesn't have bidirectiona info. Deletes the current one.
+    delete mBidirectionalParagraphInfo;
+    mBidirectionalParagraphInfo = NULL;
+  }
+  else
+  {
+    // The source has bidirectional info.
+    if( NULL != mBidirectionalParagraphInfo )
+    {
+      // It it has, copy to it.
+      *mBidirectionalParagraphInfo = *paragraph.mBidirectionalParagraphInfo;
+    }
+    else
+    {
+      // If it doesn't have, create a new one.
+      mBidirectionalParagraphInfo = new TextProcessor::BidirectionalParagraphInfo( *paragraph.mBidirectionalParagraphInfo );
+    }
+  }
+
+  // If it has bidirectiona info per line, destroy them.
+  ClearBidirectionalInfo();
+
+  // Copies bidirectional info per line.
+  for( Vector<TextProcessor::BidirectionalLineInfo*>::ConstIterator it = mBidirectionalLinesInfo.Begin(), endIt = mBidirectionalLinesInfo.End(); it != endIt; ++it )
+  {
+    mBidirectionalLinesInfo.PushBack( new TextProcessor::BidirectionalLineInfo( *( *it ) ) );
+  }
 
   return *this;
 }
 
-void CreateParagraphInfo( const MarkupProcessor::StyledTextArray& paragraph,
-                          TextView::RelayoutData& relayoutData,
+void ParagraphLayoutInfo::ClearBidirectionalInfo()
+{
+  // Destroys the bidirectional infor per line.
+  for( Vector<TextProcessor::BidirectionalLineInfo*>::Iterator it = mBidirectionalLinesInfo.Begin(), endIt = mBidirectionalLinesInfo.End(); it != endIt; ++it )
+  {
+    delete *it;
+  }
+  mBidirectionalLinesInfo.Clear();
+}
+
+void ParagraphLayoutInfo::ClearStyles()
+{
+  // Destroys the styles.
+  for( Vector<TextStyle*>::Iterator it = mTextStyles.Begin(), endIt = mTextStyles.End(); it != endIt; ++it )
+  {
+    delete *it;
+  }
+  mTextStyles.Clear();
+}
+
+void CreateParagraphInfo( TextView::RelayoutData& relayoutData,
                           ParagraphLayoutInfo& paragraphLayoutInfo )
 {
-  // Split the paragraph in words.
-  // TODO: Proper RTL support.
-  MarkupProcessor::StyledTextArray convertedParagraph;
-  if( TextProcessor::ContainsRightToLeftCharacter( paragraph ) )
+  if( TextProcessor::ContainsRightToLeftCharacter( paragraphLayoutInfo.mText ) )
   {
     // If the text is bidirectional, the characters will be converted and reordered
     // as specified by the Unicode Bidirectional Algorithm.
 
-    // Reorders the paragraph and converts arabic glyphs (if any).
-    TextProcessor::ConvertBidirectionalText( paragraph,
-                                             convertedParagraph,
-                                             relayoutData.mCharacterLogicalToVisualMap,
-                                             relayoutData.mCharacterVisualToLogicalMap);
+    paragraphLayoutInfo.mBidirectionalParagraphInfo = new TextProcessor::BidirectionalParagraphInfo();
+
+    TextProcessor::ProcessBidirectionalText( paragraphLayoutInfo.mText, paragraphLayoutInfo.mBidirectionalParagraphInfo );
   }
-  else
+
+  // Split the paragraph in words. It retrieves the positions of white spaces and the last '\n' if there is one.
+  Vector<std::size_t> positions;
+  TextProcessor::SplitInWords( paragraphLayoutInfo.mText, positions );
+
+  const std::size_t lastCharacterIndex = paragraphLayoutInfo.mText.GetLength() - 1u;
+  const bool isLastCharacterParagraphSeparator = paragraphLayoutInfo.mText.IsNewLine( lastCharacterIndex );
+
+  // The number of words is ~the number of white spaces found + 1u.
+  // White spaces are also words.
+  // New line characters are also white spaces. If the last character is a white space the +1 is not needed.
+  const std::size_t numberOfWords = 2u * positions.Count() + ( isLastCharacterParagraphSeparator ? 0u : 1u );
+
+  // Reserve space for all the words.
+  paragraphLayoutInfo.mWordsLayoutInfo.resize( numberOfWords, WordLayoutInfo() );
+
+  // Traverses all positions creating and setting all character layout info objects to every word.
+  std::size_t wordIndex = 0u;
+  Vector<std::size_t>::ConstIterator positionIt = positions.Begin();
+  Vector<std::size_t>::ConstIterator positionEndIt = positions.End();
+  std::size_t from = 0u;
+  for( std::size_t positionIndex = 0u, size = positions.Count() + 1u; positionIndex < size; ++positionIndex )
   {
-    // No bidirectional text to process.
-    convertedParagraph = paragraph;
+    const bool isEndPosition = positionIt == positionEndIt;
+    const std::size_t to = isEndPosition ? lastCharacterIndex + 1u : *positionIt;
 
-    // Create trivial bidirectional map tables.
-    std::size_t index = 0u;
-    for( MarkupProcessor::StyledTextArray::const_iterator it = convertedParagraph.begin(), endIt = convertedParagraph.end(); it != endIt; ++it )
+    if( from < to )
     {
-      const MarkupProcessor::StyledText& styledText( *it );
-
-      for( std::size_t i = 0u, length = styledText.mText.GetLength(); i < length; ++i )
-      {
-        relayoutData.mCharacterLogicalToVisualMap.push_back( relayoutData.mTextLayoutInfo.mNumberOfCharacters + index );
-        relayoutData.mCharacterVisualToLogicalMap.push_back( relayoutData.mTextLayoutInfo.mNumberOfCharacters + index );
-        ++index;
-      }
+      // The word is not a white space.
+      WordLayoutInfo& wordLayoutInfo = *( paragraphLayoutInfo.mWordsLayoutInfo.begin() + wordIndex );
+      ++wordIndex;
+      // Sets the index within the paragraph to the first character of the word.
+      wordLayoutInfo.mFirstCharacter = from;
+      // Creates character layout info objects.
+      wordLayoutInfo.mCharactersLayoutInfo.resize( ( to - from ), CharacterLayoutInfo() );
     }
-  }
 
-  // Split the paragraph in words
-  std::vector<MarkupProcessor::StyledTextArray> words;
-  TextProcessor::SplitInWords( convertedParagraph, words );
-
-  // if last word has a new paragraph separator, create a new word.
-  if( !words.empty() )
-  {
-    MarkupProcessor::StyledTextArray& word( *( words.end() - 1u ) );
-    if( word.size() > 1u )
+    if( !isEndPosition )
     {
-      // do nothing if the word has only one character.
-      MarkupProcessor::StyledText& styledText( *( word.end() - 1u ) );
-      if( !styledText.mText.IsEmpty() )
-      {
-        const std::size_t length = styledText.mText.GetLength();
-        if( styledText.mText[length-1u].IsNewLine() )
-        {
-          // Last character of this word is a new paragraph character.
+      // Create a word for the white space.
+      WordLayoutInfo& wordLayoutInfo = *( paragraphLayoutInfo.mWordsLayoutInfo.begin() + wordIndex );
+      ++wordIndex;
+      // Sets the index within the paragraph to the white space.
+      wordLayoutInfo.mFirstCharacter = to;
+      wordLayoutInfo.mType = WordSeparator;
 
-          // Remove paragraph separator character from current word.
-          styledText.mText.Remove( length - 1u, 1u );
-
-          // Create a new word with the paragraph separator character.
-          MarkupProcessor::StyledText newParagraphText( Text( styledText.mText[length-1u] ), styledText.mStyle );
-
-          MarkupProcessor::StyledTextArray newParagraphWord;
-          newParagraphWord.push_back( newParagraphText );
-
-          words.push_back( newParagraphWord );
-        }
-      }
+      CharacterLayoutInfo characterLayoutInfo;
+      wordLayoutInfo.mCharactersLayoutInfo.push_back( characterLayoutInfo );
     }
-  }
 
-  std::string lastCharacterFont; // Keeps the font used by the last character. It's used to set the font to a word separator.
+    from = to + 1u;
 
-  // Traverse all words.
-  for( std::vector<MarkupProcessor::StyledTextArray>::const_iterator wordIt = words.begin(), wordEndIt = words.end(); wordIt != wordEndIt; ++wordIt )
-  {
-    const MarkupProcessor::StyledTextArray& word( *wordIt );
-
-    // Data structures for the new word.
-    WordLayoutInfo wordLayoutInfo;
-
-    CreateWordTextInfo( word,
-                        wordLayoutInfo );
-
-    // White space's size could be different depending on the type of font. It's important to use the same font than the previous character to
-    // avoid 'jumps' of characters when there is a switch between one text-actor per character and one text-actor per line and/or style.
-    if( WordSeparator == wordLayoutInfo.mType )
+    if( !isEndPosition )
     {
-      // If current word is a word separator (white space) then the font of the last character is set.
-      for( CharacterLayoutInfoContainer::iterator characterIt = wordLayoutInfo.mCharactersLayoutInfo.begin(), characterEndIt = wordLayoutInfo.mCharactersLayoutInfo.end();
-           characterIt != characterEndIt;
-           ++characterIt )
-      {
-        CharacterLayoutInfo& characterLayout( *characterIt );
-
-        characterLayout.mStyledText.mStyle.SetFontName( lastCharacterFont );
-      }
+      // next white space position.
+      ++positionIt;
     }
     else
     {
-      // kepps the font of the last character.
-      if( !wordLayoutInfo.mCharactersLayoutInfo.empty() )
+      // All white space positiona have been traversed.
+      // It may be some extra words. i.e if the text is \n.
+      // Erase them.
+      paragraphLayoutInfo.mWordsLayoutInfo.erase( paragraphLayoutInfo.mWordsLayoutInfo.begin() + wordIndex, paragraphLayoutInfo.mWordsLayoutInfo.end() );
+
+      // Check if the last character is a new paragraph character.
+      if( isLastCharacterParagraphSeparator )
       {
-        lastCharacterFont = ( *( wordLayoutInfo.mCharactersLayoutInfo.end() - 1u ) ).mStyledText.mStyle.GetFontName();
+        ( *( paragraphLayoutInfo.mWordsLayoutInfo.end() - 1u ) ).mType = ParagraphSeparator;
       }
     }
+  }
+
+  // Traverse all words and fill the layout info.
+  for( WordLayoutInfoContainer::iterator it = paragraphLayoutInfo.mWordsLayoutInfo.begin(), endIt = paragraphLayoutInfo.mWordsLayoutInfo.end(); it != endIt; ++it )
+  {
+    WordLayoutInfo& wordLayoutInfo( *it );
+
+    CreateWordTextInfo( paragraphLayoutInfo.mText,
+                        paragraphLayoutInfo.mTextStyles,
+                        wordLayoutInfo );
+
+    // Update layout info for the current paragraph.
+    UpdateSize( paragraphLayoutInfo.mSize, wordLayoutInfo.mSize );
+    paragraphLayoutInfo.mAscender = std::max( paragraphLayoutInfo.mAscender, wordLayoutInfo.mAscender );
+    paragraphLayoutInfo.mNumberOfCharacters += wordLayoutInfo.mCharactersLayoutInfo.size();
 
     // Update the max word width figure.
     relayoutData.mTextLayoutInfo.mMaxWordWidth = std::max( relayoutData.mTextLayoutInfo.mMaxWordWidth, wordLayoutInfo.mSize.width );
-
-    // Update layout info for the current paragraph.
-    paragraphLayoutInfo.mAscender = std::max( paragraphLayoutInfo.mAscender, wordLayoutInfo.mAscender );
-    paragraphLayoutInfo.mNumberOfCharacters += wordLayoutInfo.mCharactersLayoutInfo.size();
-    UpdateSize( paragraphLayoutInfo.mSize, wordLayoutInfo.mSize );
-
-    // Add the word to the current paragraph.
-    paragraphLayoutInfo.mWordsLayoutInfo.push_back( wordLayoutInfo );
   } // end of words
 }
 
 void UpdateLayoutInfo( ParagraphLayoutInfo& paragraphLayoutInfo, float lineHeightOffset )
 {
   // Update layout info.
+
+  // Initialize members to be updated.
   paragraphLayoutInfo.mSize = Size::ZERO;
   paragraphLayoutInfo.mAscender = 0.f;
   paragraphLayoutInfo.mNumberOfCharacters = 0u;
+
+  // Traverses all words.
   for( WordLayoutInfoContainer::iterator it = paragraphLayoutInfo.mWordsLayoutInfo.begin(), endIt = paragraphLayoutInfo.mWordsLayoutInfo.end();
        it != endIt;
        ++it )
   {
     WordLayoutInfo& word( *it );
 
+    // Sets the index within the paragraph to the first character of the word.
+    word.mFirstCharacter = paragraphLayoutInfo.mNumberOfCharacters;
+
+    // Updates the paragraph's size.
     UpdateSize( paragraphLayoutInfo.mSize, word.mSize );
+
+    // Updates the paragraph's max asender.
     paragraphLayoutInfo.mAscender = std::max( paragraphLayoutInfo.mAscender, word.mAscender );
+
+    // Updates the paragraph's number of characters.
     paragraphLayoutInfo.mNumberOfCharacters += word.mCharactersLayoutInfo.size();
   }
 
+  // Sets the line height offset.
   paragraphLayoutInfo.mSize.height += lineHeightOffset;
   paragraphLayoutInfo.mLineHeightOffset = lineHeightOffset;
 }
@@ -476,6 +582,26 @@ void SplitParagraph( const TextInfoIndices& indices,
 
   // 6) update layout info of the first paragraph.
   UpdateLayoutInfo( firstParagraphLayoutInfo, lineHeightOffset );
+
+  // 7) Split text and styles.
+
+  // Copies the whole text to the last part of the paragraph.
+  lastParagraphLayoutInfo.mText = firstParagraphLayoutInfo.mText;
+
+  // Removes from the first part of the paragraph the text that goes to the last part.
+  firstParagraphLayoutInfo.mText.Remove( indices.mCharacterParagraphIndex, firstParagraphLayoutInfo.mText.GetLength() - indices.mCharacterParagraphIndex );
+
+  // Removes from the last part of the paragraph the text that remains in the first part.
+  lastParagraphLayoutInfo.mText.Remove( 0u, indices.mCharacterParagraphIndex );
+
+  // Sets the character's styles for the last part of the paragraph.
+  lastParagraphLayoutInfo.mTextStyles.Insert( lastParagraphLayoutInfo.mTextStyles.End(),
+                                         firstParagraphLayoutInfo.mTextStyles.Begin() + indices.mCharacterParagraphIndex,
+                                         firstParagraphLayoutInfo.mTextStyles.End() );
+
+  // Removes the character's styles that go to the last part of the paragraph.
+  firstParagraphLayoutInfo.mTextStyles.Erase( firstParagraphLayoutInfo.mTextStyles.Begin() + indices.mCharacterParagraphIndex,
+                                         firstParagraphLayoutInfo.mTextStyles.End() );
 }
 
 void MergeParagraph( ParagraphLayoutInfo& firstParagraphLayoutInfo,
@@ -528,14 +654,29 @@ void MergeParagraph( ParagraphLayoutInfo& firstParagraphLayoutInfo,
   // Merge layout info
 
   // Insert the layout of the words.
+  const std::size_t numberOfWords = firstParagraphLayoutInfo.mWordsLayoutInfo.size();
   firstParagraphLayoutInfo.mWordsLayoutInfo.insert( firstParagraphLayoutInfo.mWordsLayoutInfo.end(),
                                                    lastParagraphLayoutInfo.mWordsLayoutInfo.begin() + index, lastParagraphLayoutInfo.mWordsLayoutInfo.end() );
+
+  // Increase the index of the first character of each inserted word.
+  for( WordLayoutInfoContainer::iterator it = firstParagraphLayoutInfo.mWordsLayoutInfo.begin() + numberOfWords, endIt = firstParagraphLayoutInfo.mWordsLayoutInfo.end(); it != endIt; ++it )
+  {
+    WordLayoutInfo& word( *it );
+    word.mFirstCharacter += firstParagraphLayoutInfo.mNumberOfCharacters;
+  }
 
   // Update the size and other layout parameters.
   UpdateSize( firstParagraphLayoutInfo.mSize, lastParagraphLayoutInfo.mSize );
   firstParagraphLayoutInfo.mAscender = std::max( firstParagraphLayoutInfo.mAscender, lastParagraphLayoutInfo.mAscender );
   firstParagraphLayoutInfo.mLineHeightOffset = std::max( firstParagraphLayoutInfo.mLineHeightOffset, lastParagraphLayoutInfo.mLineHeightOffset );
   firstParagraphLayoutInfo.mNumberOfCharacters += lastParagraphLayoutInfo.mNumberOfCharacters;
+
+  // Merge text and styles.
+  firstParagraphLayoutInfo.mText.Append( lastParagraphLayoutInfo.mText );
+  for( Vector<TextStyle*>::ConstIterator it = lastParagraphLayoutInfo.mTextStyles.Begin(), endIt = lastParagraphLayoutInfo.mTextStyles.End(); it != endIt; ++it )
+  {
+    firstParagraphLayoutInfo.mTextStyles.PushBack( new TextStyle( *(*it) ) );
+  }
 }
 
 WordLayoutInfo GetLastWordLayoutInfo( const ParagraphLayoutInfo& paragraphLayoutInfo )

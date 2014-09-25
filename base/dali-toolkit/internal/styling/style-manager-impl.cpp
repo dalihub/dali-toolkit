@@ -116,9 +116,10 @@ StyleManager::StyleManager()
 
   RequestDefaultTheme();
 
-  if( Adaptor::IsAvailable() )
+  StyleMonitor styleMonitor( StyleMonitor::Get() );
+  if( styleMonitor )
   {
-    StyleMonitor::Get().StyleChangeSignal().Connect( this, &StyleManager::StyleMonitorChange );
+    styleMonitor.StyleChangeSignal().Connect( this, &StyleManager::StyleMonitorChange );
   }
 }
 

@@ -32,6 +32,8 @@ namespace Internal
 
 namespace TextProcessor
 {
+// Forward declarations.
+struct BidirectionalParagraphInfo;
 
 /**
  * Splits the given text in paragraphs.
@@ -39,60 +41,22 @@ namespace TextProcessor
  * @note Assumes the StyledTextArray has 1 Character per Text element. (which is the case for text in TextInput, but
  * not necessarily the case for text in TextView)
  *
- * @param [in] text The given text.
+ * @param [in] styledTextArray The given text.
  * @param [out] paragraphs The text split in paragraphs.
+ * @param [out] styles The styles of each character of each paragraph.
  */
-void SplitInParagraphs( const MarkupProcessor::StyledTextArray& text,
-                        std::vector<MarkupProcessor::StyledTextArray>& paragraphs );
+void SplitInParagraphs( const MarkupProcessor::StyledTextArray& styledTextArray,
+                        std::vector<Text>& paragraphs,
+                        std::vector< Vector<TextStyle*> >& styles );
 
 /**
- * Splits the given paragraph in words.
- *
- * @note Assumes the StyledTextArray has 1 Character per Text element. (which is the case for text in TextInput, but
- * not necessarily the case for text in TextView)
+ * Finds the position of all word separators (currently white spaces and new paragraph characters '\n') in the given text.
  *
  * @param [in] paragraph The given paragraph.
- * @param [out] words The paragraph split in words.
+ * @param [out] positions Positions within the paragraph of all word sepatators.
  */
-void SplitInWords( const MarkupProcessor::StyledTextArray& paragraph,
-                   std::vector<MarkupProcessor::StyledTextArray>& words );
-
-/**
- * Whether the text begins with right-to-left (bidirectional) character.
- * @param [in] text The given text.
- * @return \e true if the text begins right-to-left character.
- */
-bool BeginsRightToLeftCharacter( const Text& text );
-
-/**
- * @copydoc BeginsRightToLeftCharacter( const Text& text )
- */
-bool BeginsRightToLeftCharacter( const MarkupProcessor::StyledTextArray& text );
-
-/**
- * Whether the text contains any right-to-left (bidirectional) character.
- * @param [in] text The given text.
- * @return \e true if the text contains right-to-left character.
- */
-bool ContainsRightToLeftCharacter( const Text& text );
-
-/**
- * @copydoc ContainsRightToLeftCharacter( const Text& text )
- */
-bool ContainsRightToLeftCharacter( const MarkupProcessor::StyledTextArray& text );
-
-/**
- * Convert the text as specified by the Unicode Bidirectional Algorithm.
- * The text is converted only if it is bidirectional.
- * @param[in] line The line of text to be converted.
- * @param[out] convertedText The text converted.
- * @param[out] logicalToVisualMap The character position map from the logical input text to the visual output text.
- * @param[out] visualToLogicalMap The character position map from the visual output text to the logical input text.
- */
- void ConvertBidirectionalText( const MarkupProcessor::StyledTextArray& line,
-                                MarkupProcessor::StyledTextArray& convertedText,
-                                std::vector<int>& logicalToVisualMap,
-                                std::vector<int>& visualToLogicalMap );
+void SplitInWords( const Text& paragraph,
+                   Vector<std::size_t>& positions );
 
 /**
  * Finds the nearest word in a string to a specified

@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
 
-#include "toolkit-adaptor.h"
 #include "toolkit-orientation.h"
 
 namespace Dali
@@ -50,18 +49,12 @@ public:
     mCore = NULL;
   }
 
-  inline ToolkitAdaptor& GetAdaptor()
-  {
-    return mAdaptor;
-  }
-
   //ToolkitOrientation& GetOrientation()
   //{
   //return mOrientation;
   //}
 
 private:
-  ToolkitAdaptor mAdaptor;
   //ToolkitOrientation mOrientation;
 };
 

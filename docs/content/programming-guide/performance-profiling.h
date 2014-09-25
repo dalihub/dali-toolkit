@@ -18,26 +18,24 @@
  * <h2 class="pg">Background</h2>
  * The Dali rendering pipeline has 2 stages.
  * Each stage is typically run once per frame.
+ * <h3> 1. Update </h3>
+ * <ul>
+ * <li> Run animations</li>
+ * <li> Run constraints</li>
+ * <li> Run physics</li>
+ * <li> Update the scene-graph</li>
+ * </ul>
+ * <h3> 2. Render </h3>
+ * <ul>
+ * <li> Upload 3D data using OpenGL ( textures, vertex buffers etc).</li>
+ * <li> Draw the scene using OpenGL</li>
+ * </ul>
  *
- * <ul>
- * <li> 1. Update
- * <ul>
- * <li> Run animations
- * <li> Run constraints
- * <li> Run physics
- * <li> Update the scene-graph
- * </ul>
- * <li> 2. Render
- * <ul>
- * <li> Upload 3D data using OpenGL ( textures, vertex buffers etc).
- * <li> Draw the scene using OpenGL
- * </ul>
- * </ul>
  *
  * To run at 60 FPS (16 milliseconds per frame), it is recommended to stay below the following times:
  * <ul>
- * <li> Update: 4 milliseconds
- * <li> Render: 4 milliseconds
+ * <li> Update: 4 milliseconds</li>
+ * <li> Render: 4 milliseconds</li>
  * </ul>
  *
  * This will leave enough time for the output to be composited (if the system uses a compositor) and to avoid using
@@ -60,36 +58,6 @@
  * If nothing is animating Dali will enter a paused state to save power. At this
  * point nothing will be logged.
  *
- * <h2 class="pg">Performance advice </h2>
- *
- *
- * <h3> Tips to reduce update times: </h3>
- * <ul>
- * <li> Keep the actor count as small as possible.
- * <ul>
- * <li> Less actors == less processing
- * <li> Try to keep invisible or un-used actors off the stage. Don't have hidden views on the stage.
- * </ul>
- * <li> Ensure constraints are kept as simple as possible
- * </ul>
- *
- * <h3> Tips to reduce render times: </h3>
- *
- * <ul>
- * <li> Keep the visible actor count as small as possible == less draw calls
- * <li> If using a fixed set of images, try pre-generating a texture-atlas.
- * <ul>
- * <li> For each image within the Atlas, use ImageActor.SetPixelArea()  to use it.
- * <li> This reduces texture state changes when rendering.
- * </ul>
- * <li> Try to use 9-patch when you need to stretch an image while maintaining the border size.
- * <ul>
- * <li> See ImageActor::STYLE_NINE_PATCH
- * </ul>
- * <li> When using layers try to disable the depth test to avoid the depth buffer being cleared.
- * <li> If writing custom shaders, try to keep them as simple as possible.
- * <li> Try to keep texture sizes as small as possible.
- * </ul>
  *
  *  <h2 class="pg">Application profiling</h2>
  *
@@ -136,7 +104,7 @@
  * <li> DALI_RENDER_END. Dali render task has finished
  * </ul>
  *
- * <h3> Checking ftrace is working on Tizen</h3>
+ * <h3> Checking ftrace is working on Linux</h3>
  *
  * Documentation for ftrace:
  * Follow these instructions to ensure the debugfs has been mounted, and the kernel you are using
