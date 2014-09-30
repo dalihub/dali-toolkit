@@ -201,19 +201,19 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
     }
   }
 
-  if( OptionalString endAction = constant.IsString(  IsChild(child, "destroy-action" ) ) )
+  if( OptionalString endAction = constant.IsString(  IsChild(child, "disconnect-action" ) ) )
   {
     if("BAKE" == *endAction)
     {
-      animation.SetDestroyAction( Animation::Bake );
+      animation.SetDisconnectAction( Animation::Bake );
     }
     else if("DISCARD" == *endAction)
     {
-      animation.SetDestroyAction( Animation::Discard );
+      animation.SetDisconnectAction( Animation::Discard );
     }
     else if("BAKE_FINAL" == *endAction)
     {
-      animation.SetDestroyAction( Animation::BakeFinal );
+      animation.SetDisconnectAction( Animation::BakeFinal );
     }
   }
 
