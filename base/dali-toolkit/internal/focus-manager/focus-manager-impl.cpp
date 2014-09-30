@@ -94,7 +94,7 @@ bool IsActorFocusableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType 
 FocusManager::FocusManager()
 : mIsWrapped(false),
   mIsFocusWithinGroup(false),
-  mIsEndcapFeedbackEnabled(true),
+  mIsEndcapFeedbackEnabled(false),
   mIsEndcapFeedbackPlayed(false),
   mCurrentFocusActor(FocusIDPair(0, 0)),
   mFocusIndicatorActor(Actor()),
