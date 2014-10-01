@@ -253,7 +253,6 @@ void NavigationControl::OrientationChanged( int angle )
     }
 
     Animation animation = Animation::New( mOrientationAnimationDuration );
-    animation.SetDestroyAction( Animation::Bake );
     animation.RotateTo( Self(), Degree( -angle ), Vector3::ZAXIS, mOrientationAnimationAlphaFunc );
     animation.Play();
 
