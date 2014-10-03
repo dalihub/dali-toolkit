@@ -231,8 +231,6 @@ void View::OrientationChanged( Dali::Orientation orientation )
     }
   }
 
-  mRotateAnimation.SetDestroyAction( Animation::Bake );
-
   Toolkit::View handle( GetOwner() );
   mOrientationAnimationStartedSignalV2.Emit( handle, mRotateAnimation, orientation );
 

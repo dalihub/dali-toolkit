@@ -53,6 +53,7 @@ public:
 
   // Signal Names
   static const char* const SIGNAL_CLICKED; ///< name "clicked"
+  static const char* const SIGNAL_TOGGLED; ///< name "toggled"
 
   // Properties
   static const Property::Index PROPERTY_DIMMED; ///< name "dimmed", @see SetDimmed(), type BOOLEAN
@@ -131,9 +132,19 @@ public: //Signals
   typedef SignalV2< bool ( Button ) > ClickedSignalV2;
 
   /**
+   * @brief Button toggled signal type
+   */
+  typedef SignalV2< bool ( Button, bool ) > ToggledSignalV2;
+
+  /**
    * @brief Signal emitted when the button is touched and the touch point doesn't leave the boundary of the button.
    */
   ClickedSignalV2& ClickedSignal();
+
+  /**
+   * @brief Signal emitted when the button's state is toggled.
+   */
+  ToggledSignalV2& ToggledSignal();
 
 public: // Not intended for application developers
 

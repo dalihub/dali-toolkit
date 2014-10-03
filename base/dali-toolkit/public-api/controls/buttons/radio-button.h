@@ -41,7 +41,7 @@ class RadioButton;
  *
  * Radio buttons are designed to select one of many option at the same time.
  *
- * Every button have its own \e label and \e state, which can be modified by RadioButton::SetLabel and RadioBUtton::SetActive.
+ * Every button have its own \e label and \e state, which can be modified by RadioButton::SetLabel and RadioButton::SetActive.
  *
  * RadioButton can change its current state using RadioButton::ToggleState.
  *
@@ -177,7 +177,8 @@ class RadioButton: public Button
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
   RadioButton(Dali::Internal::CustomActor* internal);
-} ;
+
+};
 
 } // namespace Toolkit
 

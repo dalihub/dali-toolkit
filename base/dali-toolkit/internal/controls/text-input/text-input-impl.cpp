@@ -100,7 +100,7 @@ std::size_t FindVisibleCharacterLeft( std::size_t cursorPosition, const Toolkit:
     --cursorPosition;
   }
 
-  return 0;
+  return 0u;
 }
 
 std::size_t FindVisibleCharacterRight( std::size_t cursorPosition, const Toolkit::TextView::CharacterLayoutInfoContainer& characterLayoutInfoTable  )
@@ -1851,7 +1851,7 @@ void TextInput::OnTextViewScrolled( Toolkit::TextView textView, Vector2 scrollPo
   // Updates the cursor and grab handle position and visibility.
   if( mGrabHandle || mCursor )
   {
-    cursorSize.height = GetRowRectFromCharacterPosition( GetVisualPosition( mCursorPosition ) ).height;
+    cursorSize.height = GetRowRectFromCharacterPosition( mCursorPosition ).height;
     const Vector3 cursorPosition = GetActualPositionFromCharacterPosition(mCursorPosition);
 
     mIsCursorInScrollArea = mIsGrabHandleInScrollArea = IsPositionInsideBoundaries( cursorPosition, cursorSize, controlSize );
@@ -1901,7 +1901,7 @@ void TextInput::ScrollTextViewToMakeCursorVisible( const Vector3& cursorPosition
 {
   // Scroll the text to make the cursor visible.
   const Size cursorSize( CURSOR_THICKNESS,
-                         GetRowRectFromCharacterPosition( GetVisualPosition( mCursorPosition ) ).height );
+                         GetRowRectFromCharacterPosition( mCursorPosition ).height );
 
   // Need to scroll the text to make the cursor visible and to cover the whole text-input area.
 
@@ -2848,13 +2848,15 @@ void TextInput::AdvanceCursor(bool reverse, std::size_t places)
   }
 }
 
-void TextInput::DrawCursor(const std::size_t nthChar)
+void TextInput::DrawCursor()
 {
+  const Size rowRect = GetRowRectFromCharacterPosition( mCursorPosition );
+
   // Get height of cursor and set its size
   Size size( CURSOR_THICKNESS, 0.0f );
   if( !mTextLayoutInfo.mCharacterLayoutInfoTable.empty() )
   {
-    size.height = GetRowRectFromCharacterPosition( GetVisualPosition( mCursorPosition ) ).height;
+    size.height = rowRect.height;
   }
   else
   {
@@ -2869,7 +2871,7 @@ void TextInput::DrawCursor(const std::size_t nthChar)
 
   DALI_ASSERT_DEBUG( mCursorPosition <= mTextLayoutInfo.mCharacterLayoutInfoTable.size() );
 
-  if ( ( mCursorPosition <= mTextLayoutInfo.mCharacterLayoutInfoTable.size() ) )
+  if( ( mCursorPosition <= mTextLayoutInfo.mCharacterLayoutInfoTable.size() ) )
   {
     Vector3 altPosition;    // Alternate (i.e. opposite direction) cursor position.
     bool altPositionValid;  // Alternate cursor validity flag.
@@ -2878,7 +2880,7 @@ void TextInput::DrawCursor(const std::size_t nthChar)
 
     SetAltCursorEnabled( altPositionValid );
 
-    if(!altPositionValid)
+    if( !altPositionValid )
     {
       mCursor.SetPosition( position + UI_OFFSET );
     }
@@ -2886,13 +2888,12 @@ void TextInput::DrawCursor(const std::size_t nthChar)
     {
       size.height *= 0.5f;
       mCursor.SetSize(size);
-      mCursor.SetPosition( position + UI_OFFSET - Vector3(0.0f, directionRTL ? 0.0f : size.height, 0.0f) );
+      mCursor.SetPosition( position + UI_OFFSET - Vector3( 0.0f, directionRTL ? 0.0f : size.height, 0.0f ) );
 
       // TODO: change this cursor pos, to be the one where the cursor is sourced from.
-      Size rowSize = GetRowRectFromCharacterPosition( GetVisualPosition( mCursorPosition ) );
-      size.height = rowSize.height * 0.5f;
+      size.height = rowRect.height * 0.5f;
       mCursorRTL.SetSize(size);
-      mCursorRTL.SetPosition( altPosition + UI_OFFSET - Vector3(0.0f, directionRTL ? size.height : 0.0f, 0.0f) );
+      mCursorRTL.SetPosition( altPosition + UI_OFFSET - Vector3( 0.0f, directionRTL ? size.height : 0.0f, 0.0f ) );
     }
 
     if( IsScrollEnabled() )
@@ -2970,14 +2971,26 @@ Vector3 TextInput::MoveGrabHandle( const Vector2& displacement )
     std::size_t newCursorPosition = 0;
     ReturnClosestIndex( mActualGrabHandlePosition.GetVectorXY(), newCursorPosition );
 
-    actualHandlePosition = GetActualPositionFromCharacterPosition( newCursorPosition );
+    Vector3 altPosition;    // Alternate (i.e. opposite direction) cursor position.
+    bool altPositionValid;  // Alternate cursor validity flag.
+    bool directionRTL;      // Need to know direction of primary cursor (in case we have 2 cursors and need to show them differently)
+    actualHandlePosition = GetActualPositionFromCharacterPosition( newCursorPosition, directionRTL, altPosition, altPositionValid );
+
+    if( altPositionValid )
+    {
+      // Check which of the positions is the closest.
+      if( fabsf( altPosition.x - mActualGrabHandlePosition.x ) < fabsf( actualHandlePosition.x - mActualGrabHandlePosition.x ) )
+      {
+        actualHandlePosition = altPosition;
+      }
+    }
 
     bool handleVisible = true;
 
     if( IsScrollEnabled() )
     {
       const Vector3 controlSize = GetControlSize();
-      const Size cursorSize = GetRowRectFromCharacterPosition( GetVisualPosition( newCursorPosition ) );
+      const Size cursorSize = GetRowRectFromCharacterPosition( newCursorPosition );
       // Scrolls the text if the handle is not in a visible position
       handleVisible = IsPositionInsideBoundaries( actualHandlePosition,
                                                   cursorSize,
@@ -3270,7 +3283,7 @@ Vector3 TextInput::MoveSelectionHandle( SelectionHandleId handleId, const Vector
     {
       mCurrentSelectionId = handleId;
 
-      cursorSize.height = GetRowRectFromCharacterPosition( GetVisualPosition( newHandlePosition ) ).height;
+      cursorSize.height = GetRowRectFromCharacterPosition( newHandlePosition ).height;
       // Restricts the movement of the grab handle inside the boundaries of the text-input.
       handleVisible = IsPositionInsideBoundaries( actualHandlePosition,
                                                   cursorSize,
@@ -3341,7 +3354,6 @@ Vector3 TextInput::MoveSelectionHandle( SelectionHandleId handleId, const Vector
 
 void TextInput::SetSelectionHandlePosition(SelectionHandleId handleId)
 {
-
   const std::size_t selectionHandlePosition = ( handleId == HandleOne ) ? mSelectionHandleOnePosition : mSelectionHandleTwoPosition;
   ImageActor selectionHandleActor = ( handleId == HandleOne ) ? mSelectionHandleOne : mSelectionHandleTwo;
 
@@ -3354,21 +3366,12 @@ void TextInput::SetSelectionHandlePosition(SelectionHandleId handleId)
     if( IsScrollEnabled() )
     {
       const Size cursorSize( CURSOR_THICKNESS,
-                             GetRowRectFromCharacterPosition( GetVisualPosition( selectionHandlePosition ) ).height );
+                             GetRowRectFromCharacterPosition( selectionHandlePosition ).height );
       selectionHandleActor.SetVisible( IsPositionInsideBoundaries( actualHandlePosition,
                                                                    cursorSize,
                                                                    GetControlSize() ) );
     }
   }
-}
-
-std::size_t TextInput::GetVisualPosition(std::size_t logicalPosition) const
-{
-  // Note: we're allowing caller to request a logical position of size (i.e. end of string)
-  // For now the visual position of end of logical string will be end of visual string.
-  DALI_ASSERT_DEBUG( logicalPosition <= mTextLayoutInfo.mCharacterLogicalToVisualMap.size() );
-
-  return logicalPosition != mTextLayoutInfo.mCharacterLogicalToVisualMap.size() ? mTextLayoutInfo.mCharacterLogicalToVisualMap[logicalPosition] : mTextLayoutInfo.mCharacterLogicalToVisualMap.size();
 }
 
 void TextInput::GetVisualTextSelection(std::vector<bool>& selectedVisualText, std::size_t startSelection, std::size_t endSelection)
@@ -3790,7 +3793,7 @@ void TextInput::ShowPopupCutCopyPaste()
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelectAll, true );
   }
 
-  if ( !mStyledText.empty() )
+  if ( !mStyledText.empty() && IsTextSelected() )
   {
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCopy, true );
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, true );
@@ -3817,7 +3820,7 @@ void TextInput::SetUpPopupSelection( bool showCutButton )
   {
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelectAll, true );
     mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsSelect, true );
-    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, showCutButton );
+    mPopupPanel.TogglePopupButtonOnOff( TextInputPopup::ButtonsCut, ( showCutButton && IsTextSelected() ) );
   }
   // if clipboard has valid contents then offer paste option
   if( mClipboard && mClipboard.NumberOfItems() )
@@ -3895,15 +3898,16 @@ bool TextInput::ReturnClosestIndex(const Vector2& source, std::size_t& closestIn
     }
     else
     {
-      std::vector<Toolkit::TextView::CharacterLayoutInfo>::const_iterator it = matchedCharacters.begin();
-      std::vector<Toolkit::TextView::CharacterLayoutInfo>::const_iterator endIt = matchedCharacters.end();
+      // 2 Iterate through matching list of y positions and find closest matching X position.
 
       bool matched( false );
 
-      // 2 Iterate through matching list of y positions and find closest matching X position.
-      for( ; it != endIt; ++it )
+      // Traverse the characters in the visual order. VCC TODO: check for more than one line.
+      std::size_t visualIndex = 0u;
+      const std::size_t matchedCharactersSize = matchedCharacters.size();
+      for( ; visualIndex < matchedCharactersSize; ++visualIndex )
       {
-        const Toolkit::TextView::CharacterLayoutInfo& info( *it );
+        const Toolkit::TextView::CharacterLayoutInfo& info( *( matchedCharacters.begin() + mTextLayoutInfo.mCharacterVisualToLogicalMap[visualIndex] ) );
 
         if( info.mIsVisible )
         {
@@ -3924,16 +3928,15 @@ bool TextInput::ReturnClosestIndex(const Vector2& source, std::size_t& closestIn
         }
       }
 
-      if( it == endIt )
+      if( visualIndex == matchedCharactersSize )
       {
         rightToLeftChar = lastRightToLeftChar;
       }
 
-      std::size_t matchCharacterIndex = it - matchedCharacters.begin();
-      closestIndex = lineOffset + matchCharacterIndex;
+      closestIndex = lineOffset + visualIndex;
 
       mClosestCursorPositionEOL = false; // reset
-      if ( it == endIt && !matched )
+      if( ( visualIndex == matchedCharactersSize ) && !matched )
       {
         mClosestCursorPositionEOL = true; // Reached end of matched characters in closest line but no match so cursor should be after last character.
       }
@@ -4072,104 +4075,132 @@ Vector3 TextInput::PositionCursorAfterWordWrap( std::size_t characterPosition ) 
   /* Word wrap occurs automatically in TextView when the exceed policy moves a word to the next line when not enough space on current.
      A newline character is not inserted in this case */
 
-  DALI_ASSERT_DEBUG( !(characterPosition <= 0 ));
-
   Vector3 cursorPosition;
 
-  Toolkit::TextView::CharacterLayoutInfo currentCharInfo;
+  Toolkit::TextView::CharacterLayoutInfo currentCharInfo = mTextLayoutInfo.mCharacterLayoutInfoTable[ characterPosition ];
 
-  if ( characterPosition == mTextLayoutInfo.mCharacterLayoutInfoTable.size() )
-  {
-    // end character so use
-    currentCharInfo = mTextLayoutInfo.mCharacterLayoutInfoTable[ characterPosition - 1 ];
-    cursorPosition = Vector3(currentCharInfo.mPosition.x + currentCharInfo.mSize.width, currentCharInfo.mPosition.y, currentCharInfo.mPosition.z) ;
-  }
-  else
-  {
-    currentCharInfo = mTextLayoutInfo.mCharacterLayoutInfoTable[ characterPosition ];
-  }
+  bool noWrap = true;
 
-  Toolkit::TextView::CharacterLayoutInfo previousCharInfo = mTextLayoutInfo.mCharacterLayoutInfoTable[ characterPosition - 1];
-
-  // If previous character on a different line then use current characters position
-  if ( fabsf( (currentCharInfo.mPosition.y - currentCharInfo.mDescender )  - ( previousCharInfo.mPosition.y - previousCharInfo.mDescender) ) > Math::MACHINE_EPSILON_1000 )
+  if( characterPosition > 0u )
   {
-    if ( mClosestCursorPositionEOL )
+    Toolkit::TextView::CharacterLayoutInfo previousCharInfo = mTextLayoutInfo.mCharacterLayoutInfoTable[ characterPosition - 1u ];
+
+    // If previous character on a different line then use current characters position
+    if( fabsf( (currentCharInfo.mPosition.y - currentCharInfo.mDescender )  - ( previousCharInfo.mPosition.y - previousCharInfo.mDescender) ) > Math::MACHINE_EPSILON_1000 )
     {
-      cursorPosition = Vector3(previousCharInfo.mPosition.x + previousCharInfo.mSize.width, previousCharInfo.mPosition.y, previousCharInfo.mPosition.z) ;
-    }
-    else
-    {
-      cursorPosition = Vector3(currentCharInfo.mPosition);
+      // VCC TODO: PositionCursorAfterWordWrap currently doesn't work for multiline. Need to check this branch.
+      if ( mClosestCursorPositionEOL )
+      {
+        cursorPosition = Vector3( previousCharInfo.mPosition.x + previousCharInfo.mSize.width, previousCharInfo.mPosition.y, previousCharInfo.mPosition.z ) ;
+      }
+      else
+      {
+        cursorPosition = Vector3( currentCharInfo.mPosition );
+      }
+
+      noWrap = false;
     }
   }
-  else
+
+  if( noWrap )
   {
-    // Previous character is on same line so use position of previous character plus it's width.
-    cursorPosition = Vector3(previousCharInfo.mPosition.x + previousCharInfo.mSize.width, previousCharInfo.mPosition.y, previousCharInfo.mPosition.z) ;
+    // If the character is left to right, the position is the character's position plus its width.
+    const float ltrOffset = !currentCharInfo.mIsRightToLeftCharacter ? currentCharInfo.mSize.width : 0.f;
+
+    cursorPosition.x = currentCharInfo.mPosition.x  + ltrOffset;
+    cursorPosition.y = currentCharInfo.mPosition.y;
   }
 
   return cursorPosition;
 }
 
-Vector3 TextInput::GetActualPositionFromCharacterPosition(std::size_t characterPosition) const
+Vector3 TextInput::GetActualPositionFromCharacterPosition( std::size_t characterPosition ) const
 {
-  bool direction(false);
+  bool direction = false;
   Vector3 alternatePosition;
-  bool alternatePositionValid(false);
+  bool alternatePositionValid = false;
 
   return GetActualPositionFromCharacterPosition( characterPosition, direction, alternatePosition, alternatePositionValid );
 }
 
-Vector3 TextInput::GetActualPositionFromCharacterPosition(std::size_t characterPosition, bool& directionRTL, Vector3& alternatePosition, bool& alternatePositionValid ) const
+Vector3 TextInput::GetActualPositionFromCharacterPosition( std::size_t characterPosition, bool& directionRTL, Vector3& alternatePosition, bool& alternatePositionValid ) const
 {
+  DALI_ASSERT_DEBUG( ( mTextLayoutInfo.mCharacterLayoutInfoTable.size() == mTextLayoutInfo.mCharacterLogicalToVisualMap.size() ) &&
+                     ( mTextLayoutInfo.mCharacterLayoutInfoTable.size() == mTextLayoutInfo.mCharacterVisualToLogicalMap.size() ) &&
+                     "TextInput::GetActualPositionFromCharacterPosition. All layout tables must have the same size." );
+
   Vector3 cursorPosition( 0.f, 0.f, 0.f );
 
   alternatePositionValid = false;
   directionRTL = false;
 
-  if( !mTextLayoutInfo.mCharacterLayoutInfoTable.empty() && !mTextLayoutInfo.mCharacterLogicalToVisualMap.empty() )
+  if( !mTextLayoutInfo.mCharacterLayoutInfoTable.empty() )
   {
-    std::size_t visualCharacterPosition;
-
-    // When cursor is not at beginning, consider possibility of
-    // showing 2 cursors. (whereas at beginning we only ever show one cursor)
-    if(characterPosition > 0)
+    if( characterPosition == 0u )
     {
+      // When the cursor position is at the beginning, it should be at the start of the current character.
+      // If the current character is LTR, then the start is on the right side of the glyph.
+      // If the current character is RTL, then the start is on the left side of the glyph.
+
+      if( !( *( mTextLayoutInfo.mCharacterLayoutInfoTable.begin() ) ).mIsVisible )
+      {
+         characterPosition = FindVisibleCharacter( Right, 0u );
+      }
+
+      const Toolkit::TextView::CharacterLayoutInfo& info = mTextLayoutInfo.mCharacterLayoutInfoTable[ characterPosition ];
+      const float rtlOffset = info.mIsRightToLeftCharacter ? info.mSize.width : 0.0f;
+
+      cursorPosition.x = info.mPosition.x + rtlOffset;
+      cursorPosition.y = info.mPosition.y;
+      directionRTL = info.mIsRightToLeftCharacter;
+    }
+    else if( characterPosition > 0u )
+    {
+      // Get the direction of the paragraph.
+      const std::size_t startCharacterPosition = GetRowStartFromCharacterPosition( characterPosition );
+      const bool isParagraphRightToLeft = ( *( mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + startCharacterPosition ) ).mIsRightToLeftCharacter;
+
+      // When cursor is not at beginning, consider possibility of
+      // showing 2 cursors. (whereas at beginning we only ever show one cursor)
+
       // Cursor position should be the end of the last character.
       // If the last character is LTR, then the end is on the right side of the glyph.
       // If the last character is RTL, then the end is on the left side of the glyph.
-      visualCharacterPosition = mTextLayoutInfo.mCharacterLogicalToVisualMap[ characterPosition - 1 ];
 
-      if( !( *( mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + visualCharacterPosition ) ).mIsVisible )
+      --characterPosition;
+
+      if( !( *( mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + characterPosition ) ).mIsVisible )
       {
-        visualCharacterPosition = FindVisibleCharacter( Left, visualCharacterPosition );
+        characterPosition = FindVisibleCharacter( Left, characterPosition );
       }
 
-      Toolkit::TextView::CharacterLayoutInfo info = mTextLayoutInfo.mCharacterLayoutInfoTable[ visualCharacterPosition ];
-      if( ( visualCharacterPosition > 0 ) && info.mIsNewParagraphChar && !IsScrollEnabled() )
+      Toolkit::TextView::CharacterLayoutInfo info = mTextLayoutInfo.mCharacterLayoutInfoTable[ characterPosition ];
+      if( ( characterPosition > 0u ) && info.mIsNewParagraphChar && !IsScrollEnabled() )
       {
+        // VCC TODO : check for a new paragraph character.
+
         // Prevents the cursor to exceed the boundary if the last visible character is a 'new line character' and the scroll is not enabled.
         const Vector3& size = GetControlSize();
 
         if( info.mPosition.y + info.mSize.height - mDisplayedTextView.GetLineHeightOffset() > size.height )
         {
-          --visualCharacterPosition;
+          --characterPosition;
         }
-        info = mTextLayoutInfo.mCharacterLayoutInfoTable[ visualCharacterPosition ];
+        info = mTextLayoutInfo.mCharacterLayoutInfoTable[ characterPosition ];
       }
 
-      if(!info.mIsNewParagraphChar)
+      if( !info.mIsNewParagraphChar )
       {
         cursorPosition = PositionCursorAfterWordWrap( characterPosition ); // Get position of cursor/handles taking in account auto word wrap.
       }
       else
       {
+        // VCC TODO : check for a new paragraph character.
+
         // When cursor points to first character on new line, position cursor at the start of this glyph.
-        if(characterPosition < mTextLayoutInfo.mCharacterLogicalToVisualMap.size())
+        if( characterPosition < mTextLayoutInfo.mCharacterLayoutInfoTable.size() )
         {
-          std::size_t visualCharacterNextPosition = mTextLayoutInfo.mCharacterLogicalToVisualMap[ characterPosition ];
-          const Toolkit::TextView::CharacterLayoutInfo& infoNext = mTextLayoutInfo.mCharacterLayoutInfoTable[ visualCharacterNextPosition ];
+          const Toolkit::TextView::CharacterLayoutInfo& infoNext = mTextLayoutInfo.mCharacterLayoutInfoTable[ characterPosition ];
           const float start( infoNext.mIsRightToLeftCharacter ? infoNext.mSize.width : 0.0f );
 
           cursorPosition.x = infoNext.mPosition.x + start;
@@ -4181,12 +4212,12 @@ Vector3 TextInput::GetActualPositionFromCharacterPosition(std::size_t characterP
           // cursor where the new line starts based on the line-justification position.
           cursorPosition.x = GetLineJustificationPosition();
 
-          if(characterPosition == mTextLayoutInfo.mCharacterLogicalToVisualMap.size())
+          if( characterPosition == mTextLayoutInfo.mCharacterLogicalToVisualMap.size() )
           {
             // If this is after the last character, then we can assume that the new cursor
             // should be exactly one row below the current row.
 
-            const Size rowRect(GetRowRectFromCharacterPosition(characterPosition - 1));
+            const Size rowRect = GetRowRectFromCharacterPosition( characterPosition - 1u );
             cursorPosition.y = info.mPosition.y + rowRect.height;
           }
           else
@@ -4194,7 +4225,7 @@ Vector3 TextInput::GetActualPositionFromCharacterPosition(std::size_t characterP
             // If this is not after last character, then we can use this row's height.
             // should be exactly one row below the current row.
 
-            const Size rowRect(GetRowRectFromCharacterPosition(characterPosition));
+            const Size rowRect = GetRowRectFromCharacterPosition( characterPosition );
             cursorPosition.y = info.mPosition.y + rowRect.height;
           }
         }
@@ -4202,104 +4233,87 @@ Vector3 TextInput::GetActualPositionFromCharacterPosition(std::size_t characterP
 
       directionRTL = info.mIsRightToLeftCharacter;
 
-      // 1. When the cursor is neither at the beginning or the end,
-      // we can show multiple cursors under situations when the cursor is
-      // between RTL and LTR text...
-      if(characterPosition != mTextLayoutInfo.mCharacterLogicalToVisualMap.size())
+      if( 1u < mTextLayoutInfo.mCharacterLayoutInfoTable.size() )
       {
-        std::size_t visualCharacterAltPosition = mTextLayoutInfo.mCharacterLogicalToVisualMap[characterPosition]; // VCC TODO: find why in the previous patch it was a -1 here.
-
-        DALI_ASSERT_ALWAYS(visualCharacterAltPosition < mTextLayoutInfo.mCharacterLayoutInfoTable.size());
-        const Toolkit::TextView::CharacterLayoutInfo& infoAlt = mTextLayoutInfo.mCharacterLayoutInfoTable[ visualCharacterAltPosition ];
-
-        if(!info.mIsRightToLeftCharacter && infoAlt.mIsRightToLeftCharacter)
+        // 1. When the cursor is neither at the beginning or the end,
+        // we can show multiple cursors under situations when the cursor is
+        // between RTL and LTR text...
+        if( characterPosition + 1u < mTextLayoutInfo.mCharacterLayoutInfoTable.size() )
         {
-          // Stuation occurs when cursor is at the end of English text (LTR) and beginning of Arabic (RTL)
-          // Text:     [...LTR...]|[...RTL...]
-          // Cursor pos:          ^
-          // Alternate cursor pos:            ^
-          // In which case we need to display an alternate cursor for the RTL text.
+          std::size_t characterAltPosition = characterPosition + 1u;
 
-          alternatePosition.x = infoAlt.mPosition.x + infoAlt.mSize.width;
-          alternatePosition.y = infoAlt.mPosition.y;
-          alternatePositionValid = true;
+          const Toolkit::TextView::CharacterLayoutInfo& infoAlt = mTextLayoutInfo.mCharacterLayoutInfoTable[ characterAltPosition ];
+
+          if(!info.mIsRightToLeftCharacter && infoAlt.mIsRightToLeftCharacter)
+          {
+            // Stuation occurs when cursor is at the end of English text (LTR) and beginning of Arabic (RTL)
+            // Text:     [...LTR...]|[...RTL...]
+            // Cursor pos:          ^
+            // Alternate cursor pos:            ^
+            // In which case we need to display an alternate cursor for the RTL text.
+
+            alternatePosition.x = infoAlt.mPosition.x + infoAlt.mSize.width;
+            alternatePosition.y = infoAlt.mPosition.y;
+            alternatePositionValid = true;
+          }
+          else if(info.mIsRightToLeftCharacter && !infoAlt.mIsRightToLeftCharacter)
+          {
+            // Situation occurs when cursor is at end of the Arabic text (LTR) and beginning of English (RTL)
+            // Text:           |[...RTL...] [...LTR....]
+            // Cursor pos:     ^
+            // Alternate cursor pos:       ^
+            // In which case we need to display an alternate cursor for the RTL text.
+
+            alternatePosition.x = infoAlt.mPosition.x;
+            alternatePosition.y = infoAlt.mPosition.y;
+            alternatePositionValid = true;
+          }
         }
-        else if(info.mIsRightToLeftCharacter && !infoAlt.mIsRightToLeftCharacter)
+        else
         {
-          // Situation occurs when cursor is at end of the Arabic text (LTR) and beginning of English (RTL)
-          // Text:           |[...RTL...] [...LTR....]
-          // Cursor pos:     ^
-          // Alternate cursor pos:       ^
-          // In which case we need to display an alternate cursor for the RTL text.
+          // 2. When the cursor is at the end of the text,
+          // and we have multi-directional text,
+          // we can also consider showing mulitple cursors.
+          // The rule here is:
+          // If first and last characters on row are different
+          // Directions, then two cursors need to be displayed.
 
-          alternatePosition.x = infoAlt.mPosition.x;
-          alternatePosition.y = infoAlt.mPosition.y;
-          alternatePositionValid = true;
-        }
-      }
-      else
-      {
-        // 2. When the cursor is at the end of the text,
-        // and we have multi-directional text,
-        // we can also consider showing mulitple cursors.
-        // The rule here is:
-        // If first and last characters on row are different
-        // Directions, then two cursors need to be displayed.
+          if( info.mIsRightToLeftCharacter != isParagraphRightToLeft )
+          {
+            // The last character's direction is differernt than the first one of current paragraph.
 
-        // Get first logical glyph on row
-        std::size_t startCharacterPosition = GetRowStartFromCharacterPosition( characterPosition - 1 );
+            // Get first
+            const Toolkit::TextView::CharacterLayoutInfo& infoStart= mTextLayoutInfo.mCharacterLayoutInfoTable[ GetFirstCharacterWithSameDirection( characterPosition ) ];
 
-        std::size_t visualCharacterStartPosition = mTextLayoutInfo.mCharacterLogicalToVisualMap[ startCharacterPosition ];
-        const Toolkit::TextView::CharacterLayoutInfo& infoStart= mTextLayoutInfo.mCharacterLayoutInfoTable[ visualCharacterStartPosition ];
+            if(info.mIsRightToLeftCharacter)
+            {
+              // For text Starting as LTR and ending as RTL. End cursor position is as follows:
+              // Text:     [...LTR...]|[...RTL...]
+              // Cursor pos:          ^
+              // Alternate cursor pos:            ^
+              // In which case we need to display an alternate cursor for the RTL text, this cursor
+              // should be at the end of the given line.
 
-        if(info.mIsRightToLeftCharacter && !infoStart.mIsRightToLeftCharacter)
-        {
-          // For text Starting as LTR and ending as RTL. End cursor position is as follows:
-          // Text:     [...LTR...]|[...RTL...]
-          // Cursor pos:          ^
-          // Alternate cursor pos:            ^
-          // In which case we need to display an alternate cursor for the RTL text, this cursor
-          // should be at the end of the given line.
+              alternatePosition.x = infoStart.mPosition.x + infoStart.mSize.width;
+              alternatePosition.y = infoStart.mPosition.y;
+              alternatePositionValid = true;
+            }
+            else if(!info.mIsRightToLeftCharacter) // starting RTL
+            {
+              // For text Starting as RTL and ending as LTR. End cursor position is as follows:
+              // Text:           |[...RTL...] [...LTR....]
+              // Cursor pos:     ^
+              // Alternate cursor pos:       ^
+              // In which case we need to display an alternate cursor for the RTL text.
 
-          const Toolkit::TextView::CharacterLayoutInfo& infoAlt = mTextLayoutInfo.mCharacterLayoutInfoTable[ mTextLayoutInfo.mCharacterLayoutInfoTable.size() - 1 ];
-          alternatePosition.x = infoAlt.mPosition.x + infoAlt.mSize.width;
-          alternatePosition.y = infoAlt.mPosition.y;
-          alternatePositionValid = true;
-        }
-        else if(!info.mIsRightToLeftCharacter && infoStart.mIsRightToLeftCharacter) // starting RTL
-        {
-          // For text Starting as RTL and ending as LTR. End cursor position is as follows:
-          // Text:           |[...RTL...] [...LTR....]
-          // Cursor pos:     ^
-          // Alternate cursor pos:       ^
-          // In which case we need to display an alternate cursor for the RTL text.
-
-          const Toolkit::TextView::CharacterLayoutInfo& infoAlt = mTextLayoutInfo.mCharacterLayoutInfoTable[ startCharacterPosition ];
-          alternatePosition.x = infoAlt.mPosition.x;
-          alternatePosition.y = infoAlt.mPosition.y;
-          alternatePositionValid = true;
+              alternatePosition.x = infoStart.mPosition.x;
+              alternatePosition.y = infoStart.mPosition.y;
+              alternatePositionValid = true;
+            }
+          }
         }
       }
     } // characterPosition > 0
-    else if(characterPosition == 0)
-    {
-      // When the cursor position is at the beginning, it should be at the start of the current character.
-      // If the current character is LTR, then the start is on the right side of the glyph.
-      // If the current character is RTL, then the start is on the left side of the glyph.
-      visualCharacterPosition = mTextLayoutInfo.mCharacterLogicalToVisualMap[ characterPosition ];
-
-      if( !( *( mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + visualCharacterPosition ) ).mIsVisible )
-      {
-         visualCharacterPosition = FindVisibleCharacter( Right, visualCharacterPosition );
-      }
-
-      const Toolkit::TextView::CharacterLayoutInfo& info = mTextLayoutInfo.mCharacterLayoutInfoTable[ visualCharacterPosition ];
-      const float start(info.mIsRightToLeftCharacter ? info.mSize.width : 0.0f);
-
-      cursorPosition.x = info.mPosition.x + start;
-      cursorPosition.y = info.mPosition.y;
-      directionRTL = info.mIsRightToLeftCharacter;
-    }
   }
   else
   {
@@ -4352,14 +4366,30 @@ Vector3 TextInput::GetActualPositionFromCharacterPosition(std::size_t characterP
   return cursorPosition;
 }
 
-std::size_t TextInput::GetRowStartFromCharacterPosition(std::size_t logicalPosition) const
+std::size_t TextInput::GetRowStartFromCharacterPosition( std::size_t logicalPosition ) const
 {
   // scan string from current position to beginning of current line to note direction of line
-  while(logicalPosition)
+  while( logicalPosition )
   {
     logicalPosition--;
-    std::size_t visualPosition = GetVisualPosition(logicalPosition);
-    if(mTextLayoutInfo.mCharacterLayoutInfoTable[visualPosition].mIsNewParagraphChar)
+    if( mTextLayoutInfo.mCharacterLayoutInfoTable[logicalPosition].mIsNewParagraphChar )
+    {
+      logicalPosition++;
+      break;
+    }
+  }
+
+  return logicalPosition;
+}
+
+std::size_t TextInput::GetFirstCharacterWithSameDirection( std::size_t logicalPosition ) const
+{
+  const bool isRightToLeft = mTextLayoutInfo.mCharacterLayoutInfoTable[logicalPosition].mIsRightToLeftCharacter;
+
+  while( logicalPosition )
+  {
+    logicalPosition--;
+    if( isRightToLeft != mTextLayoutInfo.mCharacterLayoutInfoTable[logicalPosition].mIsRightToLeftCharacter )
     {
       logicalPosition++;
       break;
@@ -4376,7 +4406,7 @@ Size TextInput::GetRowRectFromCharacterPosition(std::size_t characterPosition) c
   return GetRowRectFromCharacterPosition( characterPosition, min, max );
 }
 
-Size TextInput::GetRowRectFromCharacterPosition(std::size_t characterPosition, Vector2& min, Vector2& max) const
+Size TextInput::GetRowRectFromCharacterPosition( std::size_t characterPosition, Vector2& min, Vector2& max ) const
 {
   // if we have no text content, then return position 0,0 with width 0, and height the same as cursor height.
   if( mTextLayoutInfo.mCharacterLayoutInfoTable.empty() )
@@ -4386,85 +4416,55 @@ Size TextInput::GetRowRectFromCharacterPosition(std::size_t characterPosition, V
     return max;
   }
 
-  // TODO: This info should be readily available from text-view, we should not have to search hard for it.
-  Toolkit::TextView::CharacterLayoutInfoContainer::const_iterator begin = mTextLayoutInfo.mCharacterLayoutInfoTable.begin();
-  Toolkit::TextView::CharacterLayoutInfoContainer::const_iterator end = mTextLayoutInfo.mCharacterLayoutInfoTable.end();
+  DALI_ASSERT_DEBUG( characterPosition <= mTextLayoutInfo.mCharacterLayoutInfoTable.size() );
 
-  // If cursor is pointing to end of line, then start from last character.
-  characterPosition = std::min( characterPosition, static_cast<std::size_t>(mTextLayoutInfo.mCharacterLayoutInfoTable.size() - 1) );
+  // Initializes the min and max position.
+  const std::size_t initialPosition = ( characterPosition == mTextLayoutInfo.mCharacterLayoutInfoTable.size() ) ? characterPosition - 1u : characterPosition;
+  min = ( *( mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + initialPosition ) ).mPosition.GetVectorXY();
+  max = min;
 
-  Toolkit::TextView::CharacterLayoutInfoContainer::const_iterator it = mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + characterPosition;
-
-  // 0. Find first a visible character. Draw a cursor beyound text-input bounds is not wanted.
-  if( !it->mIsVisible )
+  bool found = false;
+  // 1) Find the line where the character is laid-out.
+  for( Toolkit::TextView::LineLayoutInfoContainer::const_iterator lineIt = mTextLayoutInfo.mLines.begin(), lineEndIt = mTextLayoutInfo.mLines.end();
+         !found && ( lineIt != mTextLayoutInfo.mLines.end() );
+       ++lineIt )
   {
-    characterPosition = FindVisibleCharacter( Left, characterPosition );
-    it = mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + characterPosition;
-  }
+    const Toolkit::TextView::LineLayoutInfo& lineInfo( *lineIt );
 
-  // Scan characters left and right of cursor, stopping when end of line/string reached or
-  // y position greater than threshold of reference line.
+    // Index within the whole text to the last character of the current line.
+    std::size_t lastCharacterOfLine = 0u;
 
-  // 1. scan left until we reach the beginning or a different line.
-  Toolkit::TextView::CharacterLayoutInfoContainer::const_iterator validCharIt = it;
-  float referenceLine = it->mPosition.y - CHARACTER_THRESHOLD;
-  // min-x position is the left-most char's left (x)
-  // max-x position is the right-most char's right (x)
-  // min-y position is the minimum of all character's top (y)
-  // max-y position is the maximum of all character's bottom (y+height)
-  min.y = validCharIt->mPosition.y;
-  max.y = validCharIt->mPosition.y + validCharIt->mSize.y;
-
-  while(true)
-  {
-    validCharIt = it;
-    min.y = std::min(min.y, validCharIt->mPosition.y);
-    max.y = std::max(max.y, validCharIt->mPosition.y + validCharIt->mSize.y);
-
-    if(it == begin)
+    Toolkit::TextView::LineLayoutInfoContainer::const_iterator lineNextIt = lineIt + 1u;
+    if( lineNextIt != lineEndIt )
     {
-      break;
+      lastCharacterOfLine = (*lineNextIt).mCharacterGlobalIndex - 1u;
+    }
+    else
+    {
+      lastCharacterOfLine = mTextLayoutInfo.mCharacterLayoutInfoTable.size() - 1u;
     }
 
-    --it;
-
-    if( (it->mPosition.y < referenceLine) ||
-        (it->mIsNewParagraphChar) ||
-        (!it->mIsVisible) )
+    // Check if the given chracter position is within the line.
+    if( ( lineInfo.mCharacterGlobalIndex <= initialPosition ) && ( initialPosition <= lastCharacterOfLine ) )
     {
-      break;
+      // 2) Get the row rect of all laid-out characters on the line.
+
+      // Need to scan all characters of the line because they are in the logical position.
+      for( Toolkit::TextView::CharacterLayoutInfoContainer::const_iterator it = mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + lineInfo.mCharacterGlobalIndex,
+             endIt = mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + lastCharacterOfLine + 1u;
+           it != endIt;
+           ++it )
+      {
+        const Toolkit::TextView::CharacterLayoutInfo& characterInfo( *it );
+
+        min.x = std::min( min.x, characterInfo.mPosition.x );
+        min.y = std::min( min.y, characterInfo.mPosition.y );
+        max.x = std::max( max.x, characterInfo.mPosition.x + characterInfo.mSize.width );
+        max.y = std::max( max.y, characterInfo.mPosition.y + characterInfo.mSize.height );
+      }
+
+      found = true;
     }
-  }
-
-  // info refers to the first character on this line.
-  min.x = validCharIt->mPosition.x;
-
-  // 2. scan right until we reach end or a different line
-  it = mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + characterPosition;
-  referenceLine = it->mPosition.y + CHARACTER_THRESHOLD;
-
-  while(it != end)
-  {
-    if( (it->mPosition.y > referenceLine) ||
-        (it->mIsNewParagraphChar) ||
-        (!it->mIsVisible) )
-    {
-      break;
-    }
-
-    validCharIt = it;
-    min.y = std::min(min.y, validCharIt->mPosition.y);
-    max.y = std::max(max.y, validCharIt->mPosition.y + validCharIt->mSize.y);
-
-    ++it;
-  }
-
-  DALI_ASSERT_DEBUG ( validCharIt != end  && "validCharIt invalid")
-
-  if ( validCharIt != end )
-  {
-    // info refers to the last character on this line.
-    max.x = validCharIt->mPosition.x + validCharIt->mSize.x;
   }
 
   return Size( max.x - min.x, max.y - min.y );
@@ -4831,9 +4831,10 @@ void TextInput::UpdateLineHeight()
   }
 }
 
-std::size_t TextInput::FindVisibleCharacter( const FindVisibleCharacterDirection direction , const std::size_t cursorPosition ) const
+std::size_t TextInput::FindVisibleCharacter( FindVisibleCharacterDirection direction , std::size_t cursorPosition ) const
 {
-  std::size_t position = 0;
+  // VCC check if we need do this in the visual order ...
+  std::size_t position = 0u;
 
   const std::size_t tableSize = mTextLayoutInfo.mCharacterLayoutInfoTable.size();
 
@@ -4843,7 +4844,7 @@ std::size_t TextInput::FindVisibleCharacter( const FindVisibleCharacterDirection
     {
       position = FindVisibleCharacterLeft( cursorPosition, mTextLayoutInfo.mCharacterLayoutInfoTable );
 
-      if( !( *( mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + ( tableSize == position ? position - 1 : position ) ) ).mIsVisible )
+      if( !( *( mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + ( tableSize == position ? position - 1u : position ) ) ).mIsVisible )
       {
         position = FindVisibleCharacterRight( cursorPosition, mTextLayoutInfo.mCharacterLayoutInfoTable );
       }
@@ -4852,7 +4853,7 @@ std::size_t TextInput::FindVisibleCharacter( const FindVisibleCharacterDirection
     case Right:
     {
       position = FindVisibleCharacterRight( cursorPosition, mTextLayoutInfo.mCharacterLayoutInfoTable );
-      if( !( *( mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + ( tableSize == position ? position - 1 : position ) ) ).mIsVisible )
+      if( !( *( mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + ( tableSize == position ? position - 1u : position ) ) ).mIsVisible )
       {
         position = FindVisibleCharacterLeft( cursorPosition, mTextLayoutInfo.mCharacterLayoutInfoTable );
       }
@@ -4860,7 +4861,7 @@ std::size_t TextInput::FindVisibleCharacter( const FindVisibleCharacterDirection
     }
     case ByEnd:
     {
-      position = FindVisibleCharacterLeft( 0, mTextLayoutInfo.mCharacterLayoutInfoTable );
+      position = FindVisibleCharacterLeft( 0u, mTextLayoutInfo.mCharacterLayoutInfoTable );
       break;
     }
     default:

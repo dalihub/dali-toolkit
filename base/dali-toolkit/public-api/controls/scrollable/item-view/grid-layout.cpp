@@ -623,7 +623,6 @@ void GridLayout::GetResizeAnimation(Animation& animation, Actor actor, Vector3 s
     // so that we can avoid the actors overlapping during orientation change.
     animation.Resize( actor, shrink, AlphaFunctions::EaseOut, 0.0f, durationSeconds * 0.5f );
     animation.Resize( actor, size, AlphaFunctions::EaseIn, 0.0f, durationSeconds );
-    animation.SetDestroyAction( Animation::Bake );
   }
 }
 

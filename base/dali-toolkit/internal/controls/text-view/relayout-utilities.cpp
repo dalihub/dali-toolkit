@@ -384,9 +384,13 @@ void SetCharacter( const TextViewProcessor::WordLayoutInfoContainer& wordsLayout
  *
  * Uses the visual to logical conversion table to order the text, styles and character's layout (metrics).
  *
+ * @param[in] characterGlobalIndex Index within the whole text of the first character of the paragraph.
  * @param[in,out] rtlParagraph Layout info for the paragraph with rtl text.
+ * @param[in,out] relayoutData The text-view's data structures.
  */
-void ReorderLayout( TextViewProcessor::ParagraphLayoutInfo& paragraph )
+void ReorderLayout( std::size_t characterGlobalIndex,
+                    TextViewProcessor::ParagraphLayoutInfo& paragraph,
+                    TextView::RelayoutData& relayoutData )
 {
   // Clear any previous right to left layout.
   if( NULL != paragraph.mRightToLeftLayout )
@@ -446,12 +450,20 @@ void ReorderLayout( TextViewProcessor::ParagraphLayoutInfo& paragraph )
     }
 
     // Sets the new 'x' position for each character.
+    // Updates the text-view's layout info table with the new position of the character.
     float xPosition = 0.f;
-    for( TextViewProcessor::CharacterLayoutInfoContainer::iterator it = characters.begin(), endIt = characters.end(); it != endIt; ++it )
+    std::size_t index = 0u;
+    for( TextViewProcessor::CharacterLayoutInfoContainer::iterator it = characters.begin(), endIt = characters.end(); it != endIt; ++it, ++index )
     {
       TextViewProcessor::CharacterLayoutInfo& character( *it );
 
+      // Set the 'x' position.
       character.mPosition.x = xPosition;
+
+      // Update layout info table.
+      relayoutData.mCharacterLayoutInfoTable[characterGlobalIndex + info->mVisualToLogicalMap[index]].mPosition = character.mPosition;
+
+      // Update the position for the next character.
       xPosition += character.mSize.width;
     }
 
@@ -460,8 +472,13 @@ void ReorderLayout( TextViewProcessor::ParagraphLayoutInfo& paragraph )
     Vector<std::size_t> positions;
     TextProcessor::SplitInWords( info->mText, positions );
 
+    // Whether last character is a word or a paragraph separator.
+    const std::size_t lastCharacterIndex = info->mText.GetLength() - 1u;
+    const bool isLastCharacterParagraphSeparator = info->mText.IsNewLine( lastCharacterIndex );
+    const bool isLastCharacterWordSeparator = info->mText.IsWhiteSpace( lastCharacterIndex );
+
     // Sets the characters into the words they belong to.
-    for( Vector<size_t>::ConstIterator it = positions.Begin(), endIt = positions.End(); it != endIt; ++it )
+    for( Vector<std::size_t>::ConstIterator it = positions.Begin(), endIt = positions.End(); it != endIt; ++it )
     {
       const std::size_t position = *it;
 
@@ -480,9 +497,12 @@ void ReorderLayout( TextViewProcessor::ParagraphLayoutInfo& paragraph )
 
       // white space or new paragraph.
       TextViewProcessor::WordLayoutInfo space;
+
       space.mCharactersLayoutInfo.insert( space.mCharactersLayoutInfo.end(),
                                           characters.begin() + position,
                                           characters.begin() + position + 1u );
+
+      space.mType = TextViewProcessor::WordSeparator;
 
       TextViewProcessor::UpdateLayoutInfo( space );
 
@@ -499,6 +519,14 @@ void ReorderLayout( TextViewProcessor::ParagraphLayoutInfo& paragraph )
                                          characters.begin() + previousPosition,
                                          characters.end() );
 
+      if( isLastCharacterParagraphSeparator )
+      {
+        word.mType = TextViewProcessor::ParagraphSeparator;
+      }
+      else if( isLastCharacterWordSeparator )
+      {
+        word.mType = TextViewProcessor::WordSeparator;
+      }
       TextViewProcessor::UpdateLayoutInfo( word );
 
       paragraph.mRightToLeftLayout->mWordsLayoutInfo.push_back( word );
@@ -524,6 +552,47 @@ void CreateBidirectionalInfoForLines( TextView::RelayoutData& relayoutData,
 
   // Clear previously created bidirectional info.
   paragraph.ClearBidirectionalInfo();
+
+  // For each character, it sets the character's direction.
+
+  // Initialize the paragraph direction. Used to set the direction of weak characters.
+  const bool isParagraphRightToLeft = paragraph.mBidirectionalParagraphInfo->IsRightToLeftParagraph();
+  bool isPreviousRightToLeft = isParagraphRightToLeft;
+
+  for( std::size_t index = 0u; index < paragraph.mNumberOfCharacters; ++index )
+  {
+    // Get the character's layout information (the one is shared with text-input)
+    Toolkit::TextView::CharacterLayoutInfo& info = *( relayoutData.mCharacterLayoutInfoTable.begin() + ( characterGlobalIndex + index ) );
+
+    // Gets the character's direction.
+    const Character::CharacterDirection direction = paragraph.mText[index].GetCharacterDirection();
+    if( Character::RightToLeft == direction )
+    {
+      info.mIsRightToLeftCharacter = true;
+    }
+    else if( Character::Neutral == direction )
+    {
+      // For neutral characters it check's the next and previous directions.
+      // If they are equals set that direction. If they are not, sets the paragraph direction.
+      // If there is no next, sets the previous direction.
+
+      // Check next character's direction.
+      bool isNextRightToLeft = isPreviousRightToLeft;
+      if( index < paragraph.mNumberOfCharacters - 1u )
+      {
+        const Character::CharacterDirection nextDirection = paragraph.mText[index + 1u].GetCharacterDirection();
+        isNextRightToLeft = Character::RightToLeft == nextDirection;
+      }
+
+      info.mIsRightToLeftCharacter = isPreviousRightToLeft == isNextRightToLeft ? isPreviousRightToLeft : isParagraphRightToLeft;
+    }
+    else
+    {
+      info.mIsRightToLeftCharacter = false;
+    }
+
+    isPreviousRightToLeft = info.mIsRightToLeftCharacter;
+  }
 
   std::size_t characterParagraphIndex = 0u;   // Index to the character (within the paragraph).
   for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = paragraph.mWordsLayoutInfo.begin(), wordEndIt = paragraph.mWordsLayoutInfo.end();
@@ -597,6 +666,9 @@ void ReorderRightToLeftLayout( TextView::RelayoutData& relayoutData )
     {
       // There is right to left text in this paragraph.
 
+      // Stores the current global character index as is needed in both functions.
+      const std::size_t currentGlobalIndex = characterGlobalIndex;
+
       // Creates the bidirectional info needed to reorder each line of the paragraph.
       CreateBidirectionalInfoForLines( relayoutData,
                                        paragraph,
@@ -604,7 +676,7 @@ void ReorderRightToLeftLayout( TextView::RelayoutData& relayoutData )
                                        lineLayoutInfoIndex );
 
       // Reorder each line of the paragraph
-      ReorderLayout( paragraph );
+      ReorderLayout( currentGlobalIndex, paragraph, relayoutData );
     }
     else
     {
@@ -856,7 +928,8 @@ void UpdateAlignment( const TextView::LayoutParameters& layoutParameters,
         // Updates the size and position table for text-input with the alignment offset.
         Vector3 positionOffset( characterLayoutInfo.mPosition );
 
-        std::vector<Toolkit::TextView::CharacterLayoutInfo>::iterator infoTableIt = relayoutData.mCharacterLayoutInfoTable.begin() + characterGlobalIndex;
+        // Update layout info table.
+        std::vector<Toolkit::TextView::CharacterLayoutInfo>::iterator infoTableIt = relayoutData.mCharacterLayoutInfoTable.begin() + relayoutData.mCharacterVisualToLogicalMap[characterGlobalIndex];
         Toolkit::TextView::CharacterLayoutInfo& characterTableInfo( *infoTableIt );
 
         characterTableInfo.mPosition.x = positionOffset.x + characterLayoutInfo.mOffset.x;
@@ -937,7 +1010,7 @@ void UpdateLayoutInfoTable( Vector4& minMaxXY,
                                                                                characterLayoutInfo.mSize.height * relayoutData.mShrinkFactor ),
                                                                          positionOffset,
                                                                          ( TextViewProcessor::ParagraphSeparator == wordLayoutInfo.mType ),
-                                                                         characterLayoutInfo.mIsRightToLeft, // whether the character is right to left.
+                                                                         false, // whether the character is right to left. The value is set in a next step in the CreateBidirectionalInfoForLines function
                                                                          true,  // whether the character is visible.
                                                                          descender );
 
@@ -1627,7 +1700,7 @@ void UpdateVisibilityForFade( const TextView::LayoutParameters& layoutParameters
                                     relayoutData );
 
         // Updates the visibility for text-input..
-        std::vector<Toolkit::TextView::CharacterLayoutInfo>::iterator it = relayoutData.mCharacterLayoutInfoTable.begin() + infoTableCharacterIndex;
+        std::vector<Toolkit::TextView::CharacterLayoutInfo>::iterator it = relayoutData.mCharacterLayoutInfoTable.begin() + relayoutData.mCharacterVisualToLogicalMap[infoTableCharacterIndex];
 
         Toolkit::TextView::CharacterLayoutInfo& characterLayoutTableInfo( *it );
 
@@ -1643,6 +1716,8 @@ void UpdateVisibilityForEllipsize( const TextView::LayoutParameters& layoutParam
                                    const TextView::VisualParameters& visualParameters,
                                    TextView::RelayoutData& relayoutData )
 {
+  // TODO check ellipsis with rtl text.
+
   // Traverses the lines and checks which ones doesn't fit in the text-view's boundary.
   for( Toolkit::TextView::LineLayoutInfoContainer::const_iterator lineInfoIt = relayoutData.mLines.begin(), endLineInfoIt = relayoutData.mLines.end();
        lineInfoIt != endLineInfoIt;
@@ -1830,21 +1905,27 @@ void CreateEmoticon( const TextView::VisualParameters& visualParameters,
  * @param[in] visualParameters Some visual parameters (fade, sort modifier and blending).
  * @param[in,out] relayoutData Natural size (metrics), layout, text-actor info.
  * @param[in,out] paragraph Layout info for the paragraph.
+ * @param[in,out] wordLayout Layout info for the word.
  * @param[in,out] characterLayout Layout info for the character.
  * @param[in] character The character.
  * @param[in] style The character's style.
  * @param[in,out] currentTextActorInfo Temporary stores the text-actor's info to be set.
  * @param[in,out] createGlyphActors Whether to initialize renderable-actor handles.
+ * @param[in,out] textActorCreated Whether a text-actor
  */
 void CreateTextActor( const TextView::VisualParameters& visualParameters,
                       TextView::RelayoutData& relayoutData,
                       const TextViewProcessor::ParagraphLayoutInfo& paragraph,
+                      TextViewProcessor::WordLayoutInfo& wordLayout,
                       TextViewProcessor::CharacterLayoutInfo& characterLayout,
                       const Character& character,
                       const TextStyle& style,
                       CurrentTextActorInfo& currentTextActorInfo,
-                      bool createGlyphActors )
+                      bool createGlyphActors,
+                      bool& textActorCreated )
 {
+  textActorCreated = false;
+
   // Set the text-actor for the current traversed text.
   if( currentTextActorInfo.textActor )
   {
@@ -1873,7 +1954,18 @@ void CreateTextActor( const TextView::VisualParameters& visualParameters,
     rightToLeftOffset = characterLayout.mSize.width * relayoutData.mShrinkFactor;
   }
 
-  currentTextActorInfo.text = Text( character );
+  // Whether this word is not a white space or if it is, it is underlined.
+  // Don't want to create text-actors for white spaces unless they are underlined.
+  bool isNotWhiteSpace = ( TextViewProcessor::NoSeparator == wordLayout.mType ) || ( ( TextViewProcessor::WordSeparator == wordLayout.mType ) && style.IsUnderlineEnabled() );
+
+  if( isNotWhiteSpace )
+  {
+    currentTextActorInfo.text = Text( character );
+  }
+  else
+  {
+    currentTextActorInfo.text = Text();
+  }
   currentTextActorInfo.position = Vector3( characterLayout.mPosition.x + characterLayout.mOffset.x - rightToLeftOffset,
                                            characterLayout.mPosition.y + characterLayout.mOffset.y,
                                            characterLayout.mPosition.z );
@@ -1884,8 +1976,9 @@ void CreateTextActor( const TextView::VisualParameters& visualParameters,
 
   TextActor textActor = TextActor::DownCast( characterLayout.mGlyphActor );
 
-  if( createGlyphActors )
+  if( createGlyphActors &&  isNotWhiteSpace )
   {
+    textActorCreated = true;
     if( textActor )
     {
       // Try to reuse first the text-actor of this character.
@@ -1938,10 +2031,10 @@ void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualPa
   currentTextActorInfo.characterLayout = NULL;
 
   const std::size_t lineLayoutInfoSize = relayoutData.mLines.size(); // Number of lines.
-  bool lineLayoutEnd = false;            // Whether lineLayoutInfoIndex points at the last line.
-  bool glyphActorCreatedForLine = false; // Whether a renderable actor has been created for this line.
+  bool lineLayoutEnd = false;    // Whether lineLayoutInfoIndex points at the last line.
+  bool textActorCreated = false; // Whether a text actor has been created for this the current group of characters traversed.
 
-  TextStyle currentStyle;                // style for the current text-actor.
+  TextStyle currentStyle;        // style for the current text-actor.
 
   TextViewProcessor::GradientInfo* currentGradientInfo = NULL; // gradient color for the current text-actor.
                                                                // start point for the current text-actor.
@@ -1959,7 +2052,7 @@ void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualPa
   Vector<TextStyle*>& textStyles = isRightToLeftLayout ? paragraphLayout.mRightToLeftLayout->mTextStyles : paragraphLayout.mTextStyles;
 
   // In case the previous right to left layout has been cleared, all text-actors have been removed as well. If this bool is set to true, text-actors will be created again.
-  const bool previousRightToLeftLayoutCleared = isRightToLeftLayout ? paragraphLayout.mRightToLeftLayout->mPreviousLayoutCleared : false;
+  createGlyphActors = createGlyphActors || ( ( isRightToLeftLayout ) ? paragraphLayout.mRightToLeftLayout->mPreviousLayoutCleared : false );
 
   std::size_t characterParagraphIndex = 0u;   // Index to the character (within the paragraph).
   for( TextViewProcessor::WordLayoutInfoContainer::iterator wordIt = wordsLayoutInfo.begin(), wordEndIt = wordsLayoutInfo.end();
@@ -1986,104 +2079,77 @@ void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualPa
           // Arrived at last line.
           lineLayoutEnd = true; // Avoids access out of bounds in the relayoutData.mLines vector.
         }
-        glyphActorCreatedForLine = false;
+        textActorCreated = false;
       }
 
       // Do not create a glyph-actor if there is no text.
       const Character character = text[characterParagraphIndex];
       const TextStyle& style = *( *( textStyles.Begin() + characterParagraphIndex ) );
 
-      bool appendCharacter = false;
-
-      if( characterLayout.mIsColorGlyph ||
-          ( TextViewProcessor::NoSeparator == wordLayout.mType ) ||
-          ( ( TextViewProcessor::WordSeparator == wordLayout.mType ) && style.IsUnderlineEnabled() ) )
+      // Check if the character has the same gradient info than the current one.
+      bool differentGradientInfo = false;
+      if( characterLayout.mGradientInfo && currentGradientInfo )
       {
-        // Do not create a glyph-actor if it's a white space (without underline) or a new paragraph character.
+              differentGradientInfo = ( characterLayout.mGradientInfo->mGradientColor != currentGradientInfo->mGradientColor ) ||
+                ( characterLayout.mGradientInfo->mStartPoint != currentGradientInfo->mStartPoint ) ||
+                ( characterLayout.mGradientInfo->mEndPoint != currentGradientInfo->mEndPoint );
+      }
+      else if( ( NULL != currentGradientInfo ) || ( NULL != characterLayout.mGradientInfo ) )
+      {
+              differentGradientInfo = true;
+      }
 
-        // Check if the character has the same gradient info than the current one.
-        bool differentGradientInfo = false;
-        if( characterLayout.mGradientInfo && currentGradientInfo )
+      if( ( createGlyphActors && !textActorCreated ) ||
+          characterLayout.mIsColorGlyph ||
+          differentGradientInfo ||
+          ( characterLayout.mIsColorGlyph != currentIsColorGlyph ) ||
+          ( style != currentStyle ) )
+      {
+        characterLayout.mSetText = false;
+        characterLayout.mSetStyle = false;
+
+        if( characterLayout.mIsColorGlyph )
         {
-          differentGradientInfo = ( characterLayout.mGradientInfo->mGradientColor != currentGradientInfo->mGradientColor ) ||
-            ( characterLayout.mGradientInfo->mStartPoint != currentGradientInfo->mStartPoint ) ||
-            ( characterLayout.mGradientInfo->mEndPoint != currentGradientInfo->mEndPoint );
-        }
-        else if( ( NULL != currentGradientInfo ) || ( NULL != characterLayout.mGradientInfo ) )
-        {
-          differentGradientInfo = true;
-        }
-
-        // Creates one glyph-actor for each counsecutive group of characters, with the same style, per line, or if it's an emoticon.
-        if( !glyphActorCreatedForLine ||
-            characterLayout.mIsColorGlyph ||
-            differentGradientInfo ||
-            ( characterLayout.mIsColorGlyph != currentIsColorGlyph ) ||
-            ( style != currentStyle ) )
-        {
-          characterLayout.mSetText = false;
-          characterLayout.mSetStyle = false;
-
-          if( characterLayout.mIsColorGlyph )
-          {
-            CreateEmoticon( visualParameters,
-                            characterLayout,
-                            character );
-          }
-          else
-          {
-            CreateTextActor( visualParameters,
-                             relayoutData,
-                             paragraphLayout,
-                             characterLayout,
-                             character,
-                             style,
-                             currentTextActorInfo,
-                             createGlyphActors || previousRightToLeftLayoutCleared );
-          }
-
-          // There is a new style or a new line.
-          glyphActorCreatedForLine = true;
-
-          // Update style to be checked with next characters.
-          currentStyle = style;
-          currentGradientInfo = characterLayout.mGradientInfo;
-          currentIsColorGlyph = characterLayout.mIsColorGlyph;
+          CreateEmoticon( visualParameters,
+                          characterLayout,
+                          character );
 
           characterLayout.mGlyphActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
           characterLayout.mGlyphActor.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
         }
         else
         {
-          DALI_ASSERT_DEBUG( !characterLayout.mIsColorGlyph && "TextViewProcessor::InitializeTextActorInfo. An image-actor doesn't store more than one emoticon." );
+          // There is a new style or a new line.
 
-          // Same style than previous one.
+          CreateTextActor( visualParameters,
+                           relayoutData,
+                           paragraphLayout,
+                           wordLayout,
+                           characterLayout,
+                           character,
+                           style,
+                           currentTextActorInfo,
+                           createGlyphActors,
+                           textActorCreated );
 
-          // Add the character to the current text-actor and update the size.
-          appendCharacter = true;
-
-          TextActor textActor = TextActor::DownCast( characterLayout.mGlyphActor );
-          if( textActor )
+          if( textActorCreated )
           {
-            // There is a previously created text-actor for this character.
-            // If this character has another one put it into the cache.
-            textActor.SetText( "" );
-            textActorsToRemove.push_back( textActor );
-          }
-
-          if( characterLayout.mGlyphActor )
-          {
-            characterLayout.mGlyphActor.Reset();
+            characterLayout.mGlyphActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+            characterLayout.mGlyphActor.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
           }
         }
-      } // no white space / new paragraph char
+
+        // Update style to be checked with next characters.
+        currentStyle = style;
+        currentGradientInfo = characterLayout.mGradientInfo;
+        currentIsColorGlyph = characterLayout.mIsColorGlyph;
+      }
       else
       {
-        appendCharacter = true;
-      }
+        DALI_ASSERT_DEBUG( !characterLayout.mIsColorGlyph && "TextViewProcessor::InitializeTextActorInfo. An image-actor doesn't store more than one emoticon." );
 
-      if( appendCharacter )
-      {
+        // Same style than previous one.
+
         // Add the character to the current text-actor and update the size.
         if( characterLayout.mIsVisible && ( TextViewProcessor::ParagraphSeparator != wordLayout.mType ) )
         {
@@ -2095,6 +2161,24 @@ void UpdateTextActorInfoForParagraph( const TextView::VisualParameters& visualPa
         }
       }
 
+      if( ( createGlyphActors ) &&
+          !characterLayout.mIsColorGlyph &&
+          !textActorCreated )
+      {
+        TextActor textActor = TextActor::DownCast( characterLayout.mGlyphActor );
+        if( textActor )
+        {
+          // There is a previously created text-actor for this character.
+          // If this character has another one put it into the cache.
+          textActor.SetText( "" );
+          textActorsToRemove.push_back( textActor );
+        }
+
+        if( characterLayout.mGlyphActor )
+        {
+          characterLayout.mGlyphActor.Reset();
+        }
+      }
       ++characterGlobalIndex;
       ++characterParagraphIndex;
     } // characters

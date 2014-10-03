@@ -144,6 +144,11 @@ public:
   Toolkit::Button::ClickedSignalV2& ClickedSignal();
 
   /**
+   * @copydoc Dali::Toolkit::Button::ToggledSignal()
+   */
+  Toolkit::Button::ToggledSignalV2& ToggledSignal();
+
+  /**
    * Connects a callback function with the object's signals.
    * @param[in] object The object providing the signal.
    * @param[in] tracker Used to disconnect the signal.
@@ -232,6 +237,7 @@ protected: // Signals
   ButtonPainterPtr mPainter;              ///< Pointer to a ButtonPainter base class.
 
   Toolkit::Button::ClickedSignalV2 mClickedSignalV2; ///< Signal emitted when the button is clicked.
+  Toolkit::Button::ToggledSignalV2 mToggledSignalV2; ///< Signal emitted when the button is toggled.
 
   TapGestureDetector mTapDetector;
 };

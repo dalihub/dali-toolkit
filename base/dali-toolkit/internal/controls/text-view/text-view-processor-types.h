@@ -161,25 +161,24 @@ struct CharacterLayoutInfo
   CharacterLayoutInfo& operator=( const CharacterLayoutInfo& character );
 
   // Metrics of the glyph.
-  Size        mSize;                ///< Height of the font and advance (the horizontal distance from the origin of the current character and the next one).
-  float       mBearing;             ///< Vertical distance from the baseline to the top of the glyph's boundary box.
-  float       mAscender;            ///< Distance from the base line to the top of the line.
-  float       mUnderlineThickness;  ///< The underline's thickness.
-  float       mUnderlinePosition;   ///< The underline's position.
+  Size        mSize;               ///< Height of the font and advance (the horizontal distance from the origin of the current character and the next one).
+  float       mBearing;            ///< Vertical distance from the baseline to the top of the glyph's boundary box.
+  float       mAscender;           ///< Distance from the base line to the top of the line.
+  float       mUnderlineThickness; ///< The underline's thickness.
+  float       mUnderlinePosition;  ///< The underline's position.
 
   // Position and alignment offset. It depends on the lay-out.
-  Vector3     mPosition;            ///< Position within the text-view
-  Vector2     mOffset;              ///< Alignment and justification offset.
+  Vector3     mPosition;           ///< Position within the text-view
+  Vector2     mOffset;             ///< Alignment and justification offset.
 
-  RenderableActor mGlyphActor;      ///< Handle to a text-actor.
-  float           mColorAlpha;      ///< Alpha component for the initial text color when text is faded.
-  GradientInfo*   mGradientInfo;    ///< Stores gradient info.
+  RenderableActor mGlyphActor;     ///< Handle to a text-actor.
+  float           mColorAlpha;     ///< Alpha component for the initial text color when text is faded.
+  GradientInfo*   mGradientInfo;   ///< Stores gradient info.
 
-  bool            mIsVisible:1;     ///< Whether the text-actor is visible.
-  bool            mSetText:1;       ///< Whether a new text needs to be set in the text-actor.
-  bool            mSetStyle:1;      ///< Whether a new style needs to be set in the text-actor.
-  bool            mIsColorGlyph:1;  ///< Whether this character is an emoticon.
-  bool            mIsRightToLeft:1; ///< Whether this character is right to left.
+  bool            mIsVisible:1;    ///< Whether the text-actor is visible.
+  bool            mSetText:1;      ///< Whether a new text needs to be set in the text-actor.
+  bool            mSetStyle:1;     ///< Whether a new style needs to be set in the text-actor.
+  bool            mIsColorGlyph:1; ///< Whether this character is an emoticon.
 };
 typedef std::vector<CharacterLayoutInfo> CharacterLayoutInfoContainer;
 
