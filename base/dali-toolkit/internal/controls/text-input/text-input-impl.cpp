@@ -354,16 +354,20 @@ std::string TextInput::GetMarkupText() const
   return markupString;
 }
 
+void TextInput::ShowPlaceholderText( const MarkupProcessor::StyledTextArray& stylePlaceHolderText )
+{
+  mDisplayedTextView.SetText( stylePlaceHolderText );
+  mPlaceHolderSet = true;
+  mDisplayedTextView.SetScrollPosition( Vector2( 0.0f,0.0f ) );
+}
+
 void TextInput::SetPlaceholderText( const std::string& placeHolderText )
 {
   // Get the placeholder styled text array from the markup string.
   MarkupProcessor::GetStyledTextArray( placeHolderText, mStyledPlaceHolderText, IsMarkupProcessingEnabled() );
-
   if( mStyledText.empty() )
   {
-    // Set the placeholder text only if the styled text is empty.
-    mDisplayedTextView.SetText( mStyledPlaceHolderText );
-    mPlaceHolderSet = true;
+    ShowPlaceholderText( mStyledPlaceHolderText );
   }
 }
 
@@ -403,9 +407,7 @@ void TextInput::SetText(const std::string& initialText)
 
   if( mStyledText.empty() )
   {
-    // If the initial text is empty, set the placeholder text.
-    mDisplayedTextView.SetText( mStyledPlaceHolderText );
-    mPlaceHolderSet = true;
+    ShowPlaceholderText( mStyledPlaceHolderText );
   }
   else
   {
@@ -2271,9 +2273,7 @@ ImfManager::ImfCallbackData TextInput::ImfEventReceived( Dali::ImfManager& imfMa
 
         if( mStyledText.empty() )
         {
-          // Styled text is empty, so set the placeholder text.
-          mDisplayedTextView.SetText( mStyledPlaceHolderText );
-          mPlaceHolderSet = true;
+          ShowPlaceholderText( mStyledPlaceHolderText );
         }
       }
       break;
@@ -2330,14 +2330,13 @@ bool TextInput::PreEditReceived(const std::string& keyString, std::size_t cursor
 
         if( mStyledText.empty() )
         {
-          // Styled text is empty, so set the placeholder text.
-          mDisplayedTextView.SetText( mStyledPlaceHolderText );
-          mPlaceHolderSet = true;
+          ShowPlaceholderText( mStyledPlaceHolderText );
         }
         else
         {
           mDisplayedTextView.RemoveTextFrom( mPreEditStartPosition, numberOfCharactersToReplace );
         }
+
         GetTextLayoutInfo();
         EmitTextModified();
       }
@@ -2558,13 +2557,12 @@ void TextInput::DeleteHighlightedText( bool inheritStyle )
 
     mStyledText.erase( start, end ); // erase range of characters
 
-    // Remove text from TextView.
+    // Remove text from TextView and update place holder text if required
 
+    // Set the placeholder text only if the styled text is empty.
     if( mStyledText.empty() )
     {
-      // Styled text is empty, so set the placeholder text.
-      mDisplayedTextView.SetText( mStyledPlaceHolderText );
-      mPlaceHolderSet = true;
+      ShowPlaceholderText( mStyledPlaceHolderText );
     }
     else
     {
@@ -2691,9 +2689,7 @@ void TextInput::DeleteCharacter( std::size_t positionToDelete )
 
     if( mStyledText.empty() )
     {
-      // Styled text is empty, so set the placeholder text.
-      mDisplayedTextView.SetText( mStyledPlaceHolderText );
-      mPlaceHolderSet = true;
+      ShowPlaceholderText( mStyledPlaceHolderText );
     }
     else
     {
@@ -5095,9 +5091,8 @@ std::size_t TextInput::DoInsertAt( const Text& text, const std::size_t position,
   if( textToInsert.empty() && emptyTextView )
   {
     // No character has been added and the text-view was empty.
-    // Set the placeholder text.
-    mDisplayedTextView.SetText( mStyledPlaceHolderText );
-    mPlaceHolderSet = true;
+    // Show the placeholder text.
+    ShowPlaceholderText( mStyledPlaceHolderText );
   }
   else
   {

@@ -556,7 +556,7 @@ public:
 
   Toolkit::Control::SizePolicy mWidthPolicy :3;  ///< Stores the width policy. 3 bits covers 8 values
   Toolkit::Control::SizePolicy mHeightPolicy :3; ///< Stores the height policy. 3 bits covers 8 values
-  ControlBehaviour mFlags :4;             ///< Flags passed in from constructor. Need to increase this size when new enums are added
+  ControlBehaviour mFlags :6;             ///< Flags passed in from constructor. Need to increase this size when new enums are added
   bool mInsideRelayout:1;                 ///< Detect when were in Relayout
   bool mIsKeyboardNavigationSupported:1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup:1;           ///< Stores whether the control is a focus group.
@@ -616,6 +616,9 @@ void Control::Initialize()
     // SetTheme
     GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
   }
+
+  SetRequiresHoverEvents(mImpl->mFlags & REQUIRES_HOVER_EVENTS);
+  SetRequiresMouseWheelEvents(mImpl->mFlags & REQUIRES_MOUSE_WHEEL_EVENTS);
 
   mImpl->mInitialized = true;
 }
@@ -862,6 +865,11 @@ void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
 }
 
 bool Control::OnTouchEvent(const TouchEvent& event)
+{
+  return false; // Do not consume
+}
+
+bool Control::OnHoverEvent(const HoverEvent& event)
 {
   return false; // Do not consume
 }

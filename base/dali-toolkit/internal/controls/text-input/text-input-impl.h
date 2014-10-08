@@ -1346,6 +1346,12 @@ public:  // Public to allow internal testing.
    */
   const Vector4& GetOffsetFromText() const;
 
+  /**
+   * Show the Placeholder text with an already created StyleTextArray
+   * @param[in] stylePlaceHolderText Required placeholder text to be used
+   */
+  void ShowPlaceholderText( const MarkupProcessor::StyledTextArray& stylePlaceHolderText );
+
   // Properties
 
   /**
