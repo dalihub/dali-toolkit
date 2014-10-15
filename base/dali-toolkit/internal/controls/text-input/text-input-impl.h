@@ -702,6 +702,22 @@ private:
    bool OnKeyUpEvent(const KeyEvent& event);
 
    /**
+    * Chooses from all handle position and alternative handle positions where to set the position of the two selection handles.
+    *
+    * @param[in] cursorPositionOne The initial position of the first selection handle.
+    * @param[in] cursorPositionTwo The initial position of the second selection handle.
+    * @param[in] altPositionValidOne Whether there is an alternative position for the first selection handle.
+    * @param[in] altPositionValidTwo Whether there is an alternative position for the second selection handle.
+    * @param[in] altPositionOne The alternative position of the first selection handle.
+    * @param[in] altPositionTwo The alternative position of the second selection handle.
+    */
+   void ChooseRtlSelectionHandlePosition( const Vector3& cursorPositionOne,
+                                          const Vector3& cursorPositionTwo,
+                                          bool altPositionValidOne,
+                                          bool altPositionValidTwo,
+                                          const Vector3& altPositionOne,
+                                          const Vector3& altPositionTwo );
+   /**
     * Callback called when the text-view is scrolled.
     *
     * Updates the selection and grab handles, and the highlighted text.
@@ -1031,6 +1047,11 @@ public:  // Public to allow internal testing.
    *  Iterates between selection handles and computes the info required to build the highlight mesh
    */
   HighlightInfo CalculateHighlightInfo();
+
+  /**
+   * This method was added to fix a PLM. it creates one quad per character so the mesh can show different selection boxes when a mix of right to left and left to right text is selected.
+   */
+  HighlightInfo CalculateHighlightInfoRtl();
 
   /**
    * Calculates new Mesh data so highlight moves with selection handles.

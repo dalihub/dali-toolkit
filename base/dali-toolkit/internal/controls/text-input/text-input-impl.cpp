@@ -1487,7 +1487,19 @@ void TextInput::OnTextTap(Dali::Actor actor, Dali::TapGesture tap)
   // otherwise the Grab handle will be shown when selecting.
   if ( createGrabHandle && IsGrabHandleEnabled() )
   {
-    const Vector3 cursorPosition = GetActualPositionFromCharacterPosition(mCursorPosition);
+    Vector3 altPosition;    // Alternate (i.e. opposite direction) cursor position.
+    bool altPositionValid;  // Alternate cursor validity flag.
+    bool directionRTL;      // Need to know direction of primary cursor (in case we have 2 cursors and need to show them differently)
+    Vector3 cursorPosition = GetActualPositionFromCharacterPosition( mCursorPosition, directionRTL, altPosition, altPositionValid );
+
+    if( altPositionValid )
+    {
+      // Check which of the positions is the closest.
+      if( fabsf( altPosition.x - tap.localPoint.x ) < fabsf( cursorPosition.x - tap.localPoint.x ) )
+      {
+        cursorPosition = altPosition;
+      }
+    }
 
     CreateGrabHandle();
 
@@ -1842,6 +1854,64 @@ bool TextInput::OnKeyUpEvent(const KeyEvent& event)
   return false;
 }
 
+void TextInput::ChooseRtlSelectionHandlePosition( const Vector3& cursorPositionOne,
+                                                  const Vector3& cursorPositionTwo,
+                                                  bool altPositionValidOne,
+                                                  bool altPositionValidTwo,
+                                                  const Vector3& altPositionOne,
+                                                  const Vector3& altPositionTwo )
+{
+  // TODO VCC Valid for one line.
+  // Try to place the selection handles. TODO think in something better. Probably need to know the direction of the paragraph.
+  if( cursorPositionOne != cursorPositionTwo )
+  {
+    if( cursorPositionOne.x < cursorPositionTwo.x )
+    {
+      mSelectionHandleOneActualPosition = cursorPositionOne;
+      mSelectionHandleTwoActualPosition = cursorPositionTwo;
+    }
+    else
+    {
+      mSelectionHandleOneActualPosition = cursorPositionTwo;
+      mSelectionHandleTwoActualPosition = cursorPositionOne;
+    }
+  }
+  else
+  {
+    mSelectionHandleOneActualPosition = cursorPositionOne;
+    if( altPositionValidOne )
+    {
+      if( altPositionOne.x < mSelectionHandleOneActualPosition.x )
+      {
+        mSelectionHandleOneActualPosition = altPositionOne;
+      }
+    }
+    if( altPositionValidTwo )
+    {
+      if(  altPositionTwo.x < mSelectionHandleOneActualPosition.x )
+      {
+        mSelectionHandleOneActualPosition = altPositionTwo;
+      }
+    }
+
+    mSelectionHandleTwoActualPosition = cursorPositionTwo;
+    if( altPositionValidTwo )
+    {
+      if(  altPositionTwo.x > mSelectionHandleTwoActualPosition.x )
+      {
+        mSelectionHandleTwoActualPosition = altPositionTwo;
+      }
+    }
+    if( altPositionValidOne )
+    {
+      if( altPositionOne.x > mSelectionHandleTwoActualPosition.x )
+      {
+        mSelectionHandleTwoActualPosition = altPositionOne;
+      }
+    }
+  }
+}
+
 void TextInput::OnTextViewScrolled( Toolkit::TextView textView, Vector2 scrollPosition )
 {
   // Updates the stored scroll position.
@@ -1854,7 +1924,20 @@ void TextInput::OnTextViewScrolled( Toolkit::TextView textView, Vector2 scrollPo
   if( mGrabHandle || mCursor )
   {
     cursorSize.height = GetRowRectFromCharacterPosition( mCursorPosition ).height;
-    const Vector3 cursorPosition = GetActualPositionFromCharacterPosition(mCursorPosition);
+
+    Vector3 altPosition;    // Alternate (i.e. opposite direction) cursor position.
+    bool altPositionValid;  // Alternate cursor validity flag.
+    bool directionRTL;      // Need to know direction of primary cursor (in case we have 2 cursors and need to show them differently)
+    Vector3 cursorPosition = GetActualPositionFromCharacterPosition( mCursorPosition, directionRTL, altPosition, altPositionValid );
+
+    if( altPositionValid )
+    {
+      // Check which of the positions is the closest.
+      if( fabsf( altPosition.x - mActualGrabHandlePosition.x ) < fabsf( cursorPosition.x - mActualGrabHandlePosition.x ) )
+      {
+        cursorPosition = altPosition;
+      }
+    }
 
     mIsCursorInScrollArea = mIsGrabHandleInScrollArea = IsPositionInsideBoundaries( cursorPosition, cursorSize, controlSize );
 
@@ -1876,15 +1959,28 @@ void TextInput::OnTextViewScrolled( Toolkit::TextView textView, Vector2 scrollPo
   // Updates the selection handles and highlighted text position and visibility.
   if( mSelectionHandleOne && mSelectionHandleTwo )
   {
-    const Vector3 cursorPositionOne = GetActualPositionFromCharacterPosition(mSelectionHandleOnePosition);
-    const Vector3 cursorPositionTwo = GetActualPositionFromCharacterPosition(mSelectionHandleTwoPosition);
+    Vector3 altPositionOne;    // Alternate (i.e. opposite direction) cursor position.
+    bool altPositionValidOne;  // Alternate cursor validity flag.
+    bool directionRTLOne;      // Need to know direction of primary cursor (in case we have 2 cursors and need to show them differently)
+    Vector3 cursorPositionOne = GetActualPositionFromCharacterPosition( mSelectionHandleOnePosition, directionRTLOne, altPositionOne, altPositionValidOne );
+
+    Vector3 altPositionTwo;    // Alternate (i.e. opposite direction) cursor position.
+    bool altPositionValidTwo;  // Alternate cursor validity flag.
+    bool directionRTLTwo;      // Need to know direction of primary cursor (in case we have 2 cursors and need to show them differently)
+    Vector3 cursorPositionTwo = GetActualPositionFromCharacterPosition( mSelectionHandleTwoPosition, directionRTLTwo, altPositionTwo, altPositionValidTwo );
+
+    // VCC TODO: This method is a hack for one line.
+    ChooseRtlSelectionHandlePosition( cursorPositionOne,
+                                      cursorPositionTwo,
+                                      altPositionValidOne,
+                                      altPositionValidTwo,
+                                      altPositionOne,
+                                      altPositionTwo );
+
     cursorSize.height = ( *( mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + mSelectionHandleOnePosition ) ).mSize.height;
     const bool isSelectionHandleOneVisible = IsPositionInsideBoundaries( cursorPositionOne, cursorSize, controlSize );
     cursorSize.height = ( *( mTextLayoutInfo.mCharacterLayoutInfoTable.begin() + mSelectionHandleTwoPosition ) ).mSize.height;
     const bool isSelectionHandleTwoVisible = IsPositionInsideBoundaries( cursorPositionTwo, cursorSize, controlSize );
-
-    mSelectionHandleOneActualPosition = cursorPositionOne.GetVectorXY();
-    mSelectionHandleTwoActualPosition = cursorPositionTwo.GetVectorXY();
 
     mSelectionHandleOne.SetVisible( isSelectionHandleOneVisible );
     mSelectionHandleTwo.SetVisible( isSelectionHandleTwoVisible );
@@ -3226,8 +3322,23 @@ void TextInput::CreateSelectionHandles( std::size_t start, std::size_t end, Dali
   // update table as text may have changed.
   GetTextLayoutInfo();
 
-  mSelectionHandleOneActualPosition = GetActualPositionFromCharacterPosition( mSelectionHandleOnePosition );
-  mSelectionHandleTwoActualPosition = GetActualPositionFromCharacterPosition( mSelectionHandleTwoPosition );
+  Vector3 altPositionOne;    // Alternate (i.e. opposite direction) cursor position.
+  bool altPositionValidOne;  // Alternate cursor validity flag.
+  bool directionRTLOne;      // Need to know direction of primary cursor (in case we have 2 cursors and need to show them differently)
+  Vector3 cursorPositionOne = GetActualPositionFromCharacterPosition( mSelectionHandleOnePosition, directionRTLOne, altPositionOne, altPositionValidOne );
+
+  Vector3 altPositionTwo;    // Alternate (i.e. opposite direction) cursor position.
+  bool altPositionValidTwo;  // Alternate cursor validity flag.
+  bool directionRTLTwo;      // Need to know direction of primary cursor (in case we have 2 cursors and need to show them differently)
+  Vector3 cursorPositionTwo = GetActualPositionFromCharacterPosition( mSelectionHandleTwoPosition, directionRTLTwo, altPositionTwo, altPositionValidTwo );
+
+  // VCC TODO: This method is a hack for one line.
+  ChooseRtlSelectionHandlePosition( cursorPositionOne,
+                                    cursorPositionTwo,
+                                    altPositionValidOne,
+                                    altPositionValidTwo,
+                                    altPositionOne,
+                                    altPositionTwo );
 
   mSelectionHandleOne.SetPosition( mSelectionHandleOneActualPosition + UI_OFFSET + mSelectionHandleOneOffset );
   mSelectionHandleTwo.SetPosition( mSelectionHandleTwoActualPosition + UI_OFFSET + mSelectionHandleTwoOffset );
@@ -3271,7 +3382,18 @@ Vector3 TextInput::MoveSelectionHandle( SelectionHandleId handleId, const Vector
     std::size_t newHandlePosition = 0;
     ReturnClosestIndex( actualSelectionHandlePosition.GetVectorXY(), newHandlePosition );
 
-    actualHandlePosition = GetActualPositionFromCharacterPosition( newHandlePosition );
+    Vector3 altPosition;    // Alternate (i.e. opposite direction) cursor position.
+    bool altPositionValid;  // Alternate cursor validity flag.
+    bool directionRTL;      // Need to know direction of primary cursor (in case we have 2 cursors and need to show them differently)
+    actualHandlePosition = GetActualPositionFromCharacterPosition( newHandlePosition, directionRTL, altPosition, altPositionValid );
+    if( altPositionValid )
+    {
+      // Check which of the positions is the closest.
+      if( fabsf( altPosition.x - actualSelectionHandlePosition.x ) < fabsf( actualHandlePosition.x - actualSelectionHandlePosition.x ) )
+      {
+        actualHandlePosition = altPosition;
+      }
+    }
 
     bool handleVisible = true;
 
@@ -3370,34 +3492,28 @@ void TextInput::SetSelectionHandlePosition(SelectionHandleId handleId)
   }
 }
 
-void TextInput::GetVisualTextSelection(std::vector<bool>& selectedVisualText, std::size_t startSelection, std::size_t endSelection)
+void TextInput::GetVisualTextSelection( std::vector<bool>& selectedVisualText, std::size_t startSelection, std::size_t endSelection )
 {
-  std::vector<int>::iterator it = mTextLayoutInfo.mCharacterLogicalToVisualMap.begin();
-  std::vector<int>::iterator startSelectionIt = mTextLayoutInfo.mCharacterLogicalToVisualMap.begin() + std::min(startSelection, endSelection);
-  std::vector<int>::iterator endSelectionIt = mTextLayoutInfo.mCharacterLogicalToVisualMap.begin() + std::max(startSelection, endSelection);
-  std::vector<int>::iterator end = mTextLayoutInfo.mCharacterLogicalToVisualMap.end();
-
-  selectedVisualText.resize( mTextLayoutInfo.mCharacterLogicalToVisualMap.size() );
-
-  // Deselect text prior to startSelectionIt
-  for(;it!=startSelectionIt;++it)
-  {
-    selectedVisualText[*it] = false;
-  }
-
-  // Select text from startSelectionIt -> endSelectionIt
-  for(;it!=endSelectionIt;++it)
-  {
-    selectedVisualText[*it] = true;
-  }
-
-  // Deselect text after endSelection
-  for(;it!=end;++it)
-  {
-    selectedVisualText[*it] = false;
-  }
-
   selectedVisualText.resize( mTextLayoutInfo.mCharacterLogicalToVisualMap.size(), false );
+
+  // VCC Set true/false in logical order. TODO : It needs to be checked.
+
+  if( startSelection > endSelection )
+  {
+    std::swap( startSelection, endSelection );
+  }
+  std::size_t index = 0u;
+  for( std::vector<bool>::iterator it = selectedVisualText.begin(), endIt = selectedVisualText.end(); it != endIt; ++it, ++index )
+  {
+    if( ( index < startSelection ) || ( endSelection <= index ) )
+    {
+      *it = false;
+    }
+    else
+    {
+      *it = true;
+    }
+  }
 }
 
 // Calculate the dimensions of the quads they will make the highlight mesh
@@ -3415,9 +3531,9 @@ TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
 
     // Get vector of flags representing characters that are selected (true) vs unselected (false).
     std::vector<bool> selectedVisualText;
-    GetVisualTextSelection(selectedVisualText, mSelectionHandleOnePosition, mSelectionHandleTwoPosition);
-    std::vector<bool>::iterator selectedIt(selectedVisualText.begin());
-    std::vector<bool>::iterator selectedEndIt(selectedVisualText.end());
+    GetVisualTextSelection( selectedVisualText, mSelectionHandleOnePosition, mSelectionHandleTwoPosition );
+    std::vector<bool>::iterator selectedIt = selectedVisualText.begin();
+    std::vector<bool>::iterator selectedEndIt = selectedVisualText.end();
 
     SelectionState selectionState = SelectionNone;          ///< Current selection status of cursor over entire text.
     float rowLeft = 0.0f;
@@ -3434,28 +3550,28 @@ TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
       // selectionState: None when not in selection, Started when in selection, and Ended when reached end of selection.
 
       Toolkit::TextView::CharacterLayoutInfo& charInfo(*it);
-      bool charSelected( false );
+      bool charSelected = false;
       if( selectedIt != selectedEndIt )
       {
         charSelected = *selectedIt++;
       }
 
-      if(selectionState == SelectionNone)
+      if( selectionState == SelectionNone )
       {
-        if(charSelected)
+        if( charSelected )
         {
           selectionState = SelectionStarted;
           rowLeft = charInfo.mPosition.x - mTextLayoutInfo.mScrollOffset.x;
           rowRight = rowLeft + charInfo.mSize.width;
         }
       }
-      else if(selectionState == SelectionStarted)
+      else if( selectionState == SelectionStarted )
       {
         // break selection on:
         // 1. new line causing selection break. (\n or wordwrap)
         // 2. character not selected.
-        if(charInfo.mPosition.y - lastIt->mPosition.y > CHARACTER_THRESHOLD ||
-           !charSelected)
+        if( !charSelected ||
+            ( charInfo.mPosition.y - lastIt->mPosition.y > CHARACTER_THRESHOLD ) )
         {
           // finished selection.
           // TODO: TextView should have a table of visual rows, and each character a reference to the row
@@ -3558,6 +3674,66 @@ TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
   return mNewHighlightInfo;
 }
 
+// VCC TODO: two methods are not needed. this one is a quick hack to fix PLMs. Should implement one which support both directions.
+// This method creates one quad per character so different selection boxes for a mix of LTR and RTL languages are created.
+TextInput::HighlightInfo TextInput::CalculateHighlightInfoRtl()
+{
+  // At the moment there is no public API to modify the block alignment option.
+
+  mNewHighlightInfo.mQuadList.clear(); // clear last quad information.
+
+  if ( !mTextLayoutInfo.mCharacterLayoutInfoTable.empty() && !mTextLayoutInfo.mCharacterLogicalToVisualMap.empty() )
+  {
+    Toolkit::TextView::CharacterLayoutInfoContainer::iterator it = mTextLayoutInfo.mCharacterLayoutInfoTable.begin();
+    Toolkit::TextView::CharacterLayoutInfoContainer::iterator end = mTextLayoutInfo.mCharacterLayoutInfoTable.end();
+
+    // Get vector of flags representing characters that are selected (true) vs unselected (false).
+    std::vector<bool> selectedVisualText;
+    GetVisualTextSelection( selectedVisualText, mSelectionHandleOnePosition, mSelectionHandleTwoPosition );
+    std::vector<bool>::iterator selectedIt = selectedVisualText.begin();
+    std::vector<bool>::iterator selectedEndIt = selectedVisualText.end();
+
+    // SelectionState selectionState = SelectionNone;          ///< Current selection status of cursor over entire text.
+    float rowLeft = 0.0f;
+    float rowRight = 0.0f;
+
+    // VCC TODO this is valid for one line.
+    Vector2 min, max;
+    const Size rowSize = GetRowRectFromCharacterPosition( 0, min, max );
+
+    // Scan through entire text.
+    while(it != end)
+    {
+      // selectionState: None when not in selection, Started when in selection, and Ended when reached end of selection.
+
+      Toolkit::TextView::CharacterLayoutInfo& charInfo(*it);
+      bool charSelected = false;
+      if( selectedIt != selectedEndIt )
+      {
+        charSelected = *selectedIt++;
+      }
+
+      if( charSelected )
+      {
+        rowLeft = charInfo.mPosition.x - mTextLayoutInfo.mScrollOffset.x;
+        rowRight = rowLeft + charInfo.mSize.width;
+
+        float rowBottom = charInfo.mPosition.y - mTextLayoutInfo.mScrollOffset.y;
+        float rowTop = rowBottom - rowSize.height;
+        mNewHighlightInfo.AddQuad( rowLeft, rowTop, rowRight, rowBottom );
+      }
+
+      ++it;
+    }
+
+    // Finally clamp quads again so they don't exceed the boundry of the control.
+    const Vector3& controlSize = GetControlSize();
+    mNewHighlightInfo.Clamp2D( Vector2::ZERO, Vector2(controlSize.x, controlSize.y) );
+  } // end if
+
+  return mNewHighlightInfo;
+}
+
 void TextInput::UpdateHighlight()
 {
 //  Construct a Mesh with a texture to be used as the highlight 'box' for selected text
@@ -3588,7 +3764,7 @@ void TextInput::UpdateHighlight()
   if ( mHighlightMeshActor )
   {
     // vertex and triangle buffers should always be present if MeshActor is alive.
-    HighlightInfo newHighlightInfo = CalculateHighlightInfo();
+    HighlightInfo newHighlightInfo = CalculateHighlightInfoRtl();
     MeshData::VertexContainer vertices;
     Dali::MeshData::FaceIndices faceIndices;
 
@@ -4353,6 +4529,7 @@ Vector3 TextInput::GetActualPositionFromCharacterPosition( std::size_t character
 
   cursorPosition.x -= mTextLayoutInfo.mScrollOffset.x;
   cursorPosition.y -= mTextLayoutInfo.mScrollOffset.y;
+
   if( alternatePositionValid )
   {
     alternatePosition.x -= mTextLayoutInfo.mScrollOffset.x;
@@ -4719,6 +4896,7 @@ bool TextInput::CopySelectedTextToClipboard()
    */
   MarkupProcessor::StyledTextArray selectedText(mCurrentCopySelecton.begin(),mCurrentCopySelecton.end());
   MarkupProcessor::GetPlainString( selectedText, stringToStore );
+
   bool success = mClipboard.SetItem( stringToStore );
   return success;
 }
