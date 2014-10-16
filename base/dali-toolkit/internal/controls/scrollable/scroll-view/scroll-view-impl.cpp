@@ -1208,10 +1208,10 @@ Vector3 ScrollView::GetDomainSize() const
 void ScrollView::TransformTo(const Vector3& position,
                              DirectionBias horizontalBias, DirectionBias verticalBias)
 {
-  TransformTo(position, mSnapDuration, horizontalBias, verticalBias);
+  TransformTo(position, mSnapDuration, mSnapAlphaFunction, horizontalBias, verticalBias);
 }
 
-void ScrollView::TransformTo(const Vector3& position, float duration,
+void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunction alpha,
                              DirectionBias horizontalBias, DirectionBias verticalBias)
 {
   Actor self( Self() );
@@ -1254,7 +1254,7 @@ void ScrollView::TransformTo(const Vector3& position, float duration,
   mScrollStartedSignalV2.Emit( currentScrollPosition );
   bool animating = AnimateTo(-position,
                              Vector3::ONE * duration,
-                             mSnapAlphaFunction,
+                             alpha,
                              true,
                              horizontalBias,
                              verticalBias,
@@ -1290,13 +1290,22 @@ void ScrollView::ScrollTo(const Vector3& position, float duration)
   ScrollTo(position, duration, DirectionBiasNone, DirectionBiasNone);
 }
 
+void ScrollView::ScrollTo(const Vector3& position, float duration, AlphaFunction alpha)
+{
+  ScrollTo(position, duration, alpha, DirectionBiasNone, DirectionBiasNone);
+}
+
 void ScrollView::ScrollTo(const Vector3& position, float duration,
                           DirectionBias horizontalBias, DirectionBias verticalBias)
 {
-  DALI_LOG_SCROLL_STATE("[0x%X] position[%.2f, %.2f] duration[%.2f]",
-    this, position.x, position.y, duration, int(horizontalBias), int(verticalBias));
+  ScrollTo(position, duration, mSnapAlphaFunction, horizontalBias, verticalBias);
+}
 
-  TransformTo(position, duration, horizontalBias, verticalBias);
+void ScrollView::ScrollTo(const Vector3& position, float duration, AlphaFunction alpha,
+                DirectionBias horizontalBias, DirectionBias verticalBias)
+{
+  DALI_LOG_SCROLL_STATE("[0x%X] position[%.2f, %.2f] duration[%.2f]", this, position.x, position.y, duration, int(horizontalBias), int(verticalBias));
+  TransformTo(position, duration, alpha, horizontalBias, verticalBias);
 }
 
 void ScrollView::ScrollTo(unsigned int page)
