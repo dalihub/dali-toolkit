@@ -18,8 +18,11 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/dali.h>
+#include <dali/public-api/common/map-wrapper.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
 #include <dali-toolkit/internal/shader-effects/page-turn-effect-impl.h>

@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/dali.h>
+#include <dali/public-api/common/map-wrapper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
