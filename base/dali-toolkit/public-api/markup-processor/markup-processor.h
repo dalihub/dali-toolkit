@@ -18,9 +18,8 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
-
 #include <dali/public-api/text/text.h>
 #include <dali/public-api/text/text-style.h>
 

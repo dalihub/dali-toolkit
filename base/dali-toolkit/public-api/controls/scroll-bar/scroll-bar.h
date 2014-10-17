@@ -18,8 +18,11 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/dali.h>
+#include <dali/public-api/common/vector-wrapper.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scroll-component.h>
 
 namespace Dali DALI_IMPORT_API

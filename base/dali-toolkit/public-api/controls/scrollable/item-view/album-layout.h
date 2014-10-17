@@ -26,9 +26,9 @@ Note:This layout is customized for music player application, so there are some l
 
 // EXTERNAL INCLUDES
 #include <boost/function.hpp>
+#include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 
 namespace Dali DALI_IMPORT_API

@@ -18,8 +18,9 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/dali.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali DALI_IMPORT_API
 {

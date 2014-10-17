@@ -336,7 +336,7 @@ public:
               controlImpl.SetBackground( image );
             }
           }
-          else if ( value.Get< Property::Map >().empty() )
+          else if ( ! value.Get< Property::Map >().Count() )
           {
             // An empty map means the background is no longer required
             controlImpl.ClearBackground();
@@ -421,7 +421,7 @@ public:
               Image image = imageActor.GetImage();
               Property::Map imageMap;
               Scripting::CreatePropertyMap( image, imageMap );
-              map.push_back( Property::StringValuePair( "image", imageMap ) );
+              map[ "image" ] = imageMap;
             }
           }
 
