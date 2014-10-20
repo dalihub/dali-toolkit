@@ -414,7 +414,7 @@ int UtcDaliControlBackgroundProperties(void)
   DALI_TEST_CHECK( !control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
   DALI_TEST_EQUALS( control.GetProperty( Control::PROPERTY_BACKGROUND_COLOR ).Get< Vector4 >(), Color::TRANSPARENT, TEST_LOCATION );
-  DALI_TEST_CHECK( !control.GetProperty( Control::PROPERTY_BACKGROUND ).Get< Property::Map >().Count() );
+  DALI_TEST_CHECK( control.GetProperty( Control::PROPERTY_BACKGROUND ).Get< Property::Map >().Empty() );
 
   control.SetProperty( Control::PROPERTY_BACKGROUND_COLOR, Color::RED );
   DALI_TEST_CHECK( control.GetBackgroundActor() );
@@ -440,7 +440,7 @@ int UtcDaliControlBackgroundProperties(void)
   DALI_TEST_CHECK( !control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
   DALI_TEST_EQUALS( control.GetProperty( Control::PROPERTY_BACKGROUND_COLOR ).Get< Vector4 >(), Color::TRANSPARENT, TEST_LOCATION );
-  DALI_TEST_CHECK( !control.GetProperty( Control::PROPERTY_BACKGROUND ).Get< Property::Map >().Count() );
+  DALI_TEST_CHECK( control.GetProperty( Control::PROPERTY_BACKGROUND ).Get< Property::Map >().Empty() );
 
   END_TEST;
 }

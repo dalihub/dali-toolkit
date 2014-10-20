@@ -73,18 +73,6 @@ BaseHandle Create()
 }
 TypeRegistration STYLE_MANAGER_TYPE( typeid(Dali::Toolkit::StyleManager), typeid(Dali::BaseHandle), Create, true /* Create instance at startup */ );
 
-/**
- * Merge two maps into one
- */
-void MergeMaps( const PropertyValueMap& a, const PropertyValueMap& b, PropertyValueMap& out )
-{
-  out = a;
-  for( PropertyValueMap::const_iterator it = b.begin(), itEnd = b.end(); it != itEnd; ++it )
-  {
-    out[ it->first ] = it->second;
-  }
-}
-
 } // namespace
 
 Toolkit::StyleManager StyleManager::Get()
@@ -168,10 +156,10 @@ void StyleManager::SetStyleConstant( const std::string& key, const Property::Val
 
 bool StyleManager::GetStyleConstant( const std::string& key, Property::Value& valueOut )
 {
-  Toolkit::PropertyValueMap::iterator valueIt = mStyleBuilderConstants.find( key );
-  if( valueIt != mStyleBuilderConstants.end() )
+  Property::Value* value = mStyleBuilderConstants.Find( key );
+  if( value )
   {
-    valueOut = valueIt->second;
+    valueOut = *value;
     return true;
   }
 
@@ -186,7 +174,7 @@ void StyleManager::OnOrientationChanged( Orientation orientation )
   SetTheme();
 }
 
-Toolkit::Builder StyleManager::CreateBuilder( const PropertyValueMap& constants )
+Toolkit::Builder StyleManager::CreateBuilder( const Property::Map& constants )
 {
   Toolkit::Builder builder = Toolkit::Builder::New();
   builder.AddConstants( constants );
@@ -297,8 +285,8 @@ void StyleManager::ApplyStyle( Toolkit::Control control, const std::string& json
   else
   {
     // Merge theme and style constants
-    PropertyValueMap constants;
-    MergeMaps( mThemeBuilderConstants, mStyleBuilderConstants, constants );
+    Property::Map constants( mThemeBuilderConstants );
+    constants.Merge( mStyleBuilderConstants );
 
     // Create it
     builder = CreateBuilder( constants );

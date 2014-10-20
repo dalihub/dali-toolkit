@@ -336,7 +336,7 @@ public:
               controlImpl.SetBackground( image );
             }
           }
-          else if ( ! value.Get< Property::Map >().Count() )
+          else if ( value.Get< Property::Map >().Empty() )
           {
             // An empty map means the background is no longer required
             controlImpl.ClearBackground();
