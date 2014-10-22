@@ -20,14 +20,16 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
+#include <dali/public-api/events/mouse-wheel-event.h>
+#include <dali/public-api/common/set-wrapper.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/events/mouse-wheel-event.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/bouncing-effect-actor.h>
 
-using namespace std;
+using std::string;
+using std::set;
 using namespace Dali;
 
 namespace // unnamed namespace
@@ -719,17 +721,15 @@ void ItemView::InsertItems( const ItemContainer& newItems, float durationSeconds
   mAddingItems = true;
 
   // Insert from lowest id to highest
-  set<Item> sortedItems;
+  std::set<Item> sortedItems;
   for( ConstItemIter iter = newItems.begin(); newItems.end() != iter; ++iter )
   {
     sortedItems.insert( *iter );
   }
 
-  for( set<Item>::iterator iter = sortedItems.begin(); sortedItems.end() != iter; ++iter )
+  for( std::set<Item>::iterator iter = sortedItems.begin(); sortedItems.end() != iter; ++iter )
   {
     Self().Add( iter->second );
-
-    cout << "inserting item: " << iter->first << endl;
 
     ItemPoolIter foundIter = mItemPool.find( iter->first );
     if( mItemPool.end() != foundIter )
@@ -898,7 +898,7 @@ void ItemView::RemoveActorsOutsideRange( ItemRange range )
 
 void ItemView::AddActorsWithinRange( ItemRange range, float durationSeconds )
 {
-  range.end = min(mItemFactory.GetNumberOfItems(), range.end);
+  range.end = std::min(mItemFactory.GetNumberOfItems(), range.end);
 
   // The order of addition depends on the scroll direction.
   if (mRefreshOrderHint)
@@ -1099,7 +1099,7 @@ float ItemView::ClampFirstItemPosition(float targetPosition, const Vector3& targ
 {
   Actor self = Self();
   float minLayoutPosition = layout.GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), targetSize);
-  float clamppedPosition = min(0.0f, max(minLayoutPosition, targetPosition));
+  float clamppedPosition = std::min(0.0f, std::max(minLayoutPosition, targetPosition));
   mScrollOvershoot = targetPosition - clamppedPosition;
   self.SetProperty(mPropertyMinimumLayoutPosition, minLayoutPosition);
 
@@ -1146,7 +1146,7 @@ void ItemView::OnPan(PanGesture gesture)
 
         RemoveAnimation(mScrollAnimation);
 
-        float flickAnimationDuration = Clamp( mActiveLayout->GetItemFlickAnimationDuration() * max(1.0f, fabsf(firstItemScrollPosition - GetCurrentLayoutPosition(0)))
+        float flickAnimationDuration = Clamp( mActiveLayout->GetItemFlickAnimationDuration() * std::max(1.0f, fabsf(firstItemScrollPosition - GetCurrentLayoutPosition(0)))
                                        , DEFAULT_MINIMUM_SWIPE_DURATION, DEFAULT_MAXIMUM_SWIPE_DURATION);
 
         mScrollAnimation = Animation::New(flickAnimationDuration);
@@ -1570,7 +1570,7 @@ float ItemView::CalculateScrollOvershoot()
     float positionDelta = GetCurrentLayoutPosition(0) + scrollDistance;
     float minLayoutPosition = mActiveLayout->GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), Self().GetCurrentSize());
     self.SetProperty(mPropertyMinimumLayoutPosition, minLayoutPosition);
-    float clamppedPosition = min(0.0f, max(minLayoutPosition, positionDelta));
+    float clamppedPosition = std::min(0.0f, std::max(minLayoutPosition, positionDelta));
     overshoot = positionDelta - clamppedPosition;
   }
 

@@ -21,7 +21,6 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
-#include <dali-toolkit/internal/styling/util.h>
 #include <dali/integration-api/debug.h>
 
 // EXTERNAL INCLUDES
@@ -74,18 +73,6 @@ BaseHandle Create()
 }
 TypeRegistration STYLE_MANAGER_TYPE( typeid(Dali::Toolkit::StyleManager), typeid(Dali::BaseHandle), Create, true /* Create instance at startup */ );
 
-/**
- * Merge two maps into one
- */
-void MergeMaps( const PropertyValueMap& a, const PropertyValueMap& b, PropertyValueMap& out )
-{
-  out = a;
-  for( PropertyValueMap::const_iterator it = b.begin(), itEnd = b.end(); it != itEnd; ++it )
-  {
-    out[ it->first ] = it->second;
-  }
-}
-
 } // namespace
 
 Toolkit::StyleManager StyleManager::Get()
@@ -108,8 +95,7 @@ Toolkit::StyleManager StyleManager::Get()
 }
 
 StyleManager::StyleManager()
-  : mOrientationDegrees( 0 ),  // Portrait
-    mSetThemeConnection( false )
+  : mOrientationDegrees( 0 )  // Portrait
 {
   // Add theme builder constants
   mThemeBuilderConstants[ PACKAGE_PATH_KEY ] = DEFAULT_PACKAGE_PATH;
@@ -125,16 +111,17 @@ StyleManager::StyleManager()
 
 StyleManager::~StyleManager()
 {
-  // Disconnect from signal
-  SetOrientation( Orientation() );
 }
 
 void StyleManager::SetOrientationValue( int orientation )
 {
-  mOrientationDegrees = orientation;
-
-  Util::ConnectEventProcessingFinishedSignal();
-  mSetThemeConnection = true;
+  if( orientation !=  mOrientationDegrees )
+  {
+    mOrientationDegrees = orientation;
+    // TODO: if orientation changed, apply the new style to all controls
+    // dont want to really do the whole load from file again if the bundle contains both portrait & landscape
+    SetTheme();
+  }
 }
 
 int StyleManager::GetOrientationValue()
@@ -169,10 +156,10 @@ void StyleManager::SetStyleConstant( const std::string& key, const Property::Val
 
 bool StyleManager::GetStyleConstant( const std::string& key, Property::Value& valueOut )
 {
-  Toolkit::PropertyValueMap::iterator valueIt = mStyleBuilderConstants.find( key );
-  if( valueIt != mStyleBuilderConstants.end() )
+  Property::Value* value = mStyleBuilderConstants.Find( key );
+  if( value )
   {
-    valueOut = valueIt->second;
+    valueOut = *value;
     return true;
   }
 
@@ -182,15 +169,12 @@ bool StyleManager::GetStyleConstant( const std::string& key, Property::Value& va
 void StyleManager::OnOrientationChanged( Orientation orientation )
 {
   mOrientation = orientation;
-
-  if( mOrientation )
-  {
-    Util::ConnectEventProcessingFinishedSignal();
-    mSetThemeConnection = true;
-  }
+  // TODO: if orientation changed, apply the new style to all controls
+  // dont want to really do the whole load from file again if the bundle contains both portrait & landscape
+  SetTheme();
 }
 
-Toolkit::Builder StyleManager::CreateBuilder( const PropertyValueMap& constants )
+Toolkit::Builder StyleManager::CreateBuilder( const Property::Map& constants )
 {
   Toolkit::Builder builder = Toolkit::Builder::New();
   builder.AddConstants( constants );
@@ -301,8 +285,8 @@ void StyleManager::ApplyStyle( Toolkit::Control control, const std::string& json
   else
   {
     // Merge theme and style constants
-    PropertyValueMap constants;
-    MergeMaps( mThemeBuilderConstants, mStyleBuilderConstants, constants );
+    Property::Map constants( mThemeBuilderConstants );
+    constants.Merge( mStyleBuilderConstants );
 
     // Create it
     builder = CreateBuilder( constants );
@@ -350,8 +334,8 @@ void StyleManager::RequestThemeChange( const std::string& themeFile )
 {
   mThemeFile = themeFile;
 
-  Util::ConnectEventProcessingFinishedSignal();
-  mSetThemeConnection = true;
+  // need to do style change synchronously as app might create a UI control on the next line
+  SetTheme();
 }
 
 void StyleManager::RequestDefaultTheme()
@@ -359,17 +343,10 @@ void StyleManager::RequestDefaultTheme()
   RequestThemeChange( DEFAULT_THEME );
 }
 
-bool StyleManager::IsThemeRequestPending()
-{
-  return mSetThemeConnection;
-}
-
 void StyleManager::SetTheme()
 {
   mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
   LoadJSON( mThemeBuilder, mThemeFile );
-
-  mSetThemeConnection = false;
 
   StyleChange change;
   change.themeChange = true;

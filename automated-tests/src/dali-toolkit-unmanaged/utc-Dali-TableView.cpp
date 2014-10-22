@@ -595,12 +595,12 @@ int UtcDaliTableViewSetGetProperty(void)
 
   //{ "policy": "fixed", "value": 30.0 },
   Property::Map item1;
-  item1.push_back( Property::StringValuePair( "policy", "fixed" ) );
-  item1.push_back( Property::StringValuePair( "value", 30.f) );
+  item1[ "policy" ] = "fixed";
+  item1[ "value" ] = 30.f;
   //{ "policy": "relative", "value": 0.2 },
   Property::Map item2;
-  item2.push_back( Property::StringValuePair( "policy", "relative" ) );
-  item2.push_back( Property::StringValuePair( "value", 0.2f ) );
+  item2[ "policy" ] = "relative";
+  item2[ "value" ] = 0.2f;
 
   // Test "layout-rows" property
   DALI_TEST_CHECK( tableView.GetPropertyIndex(PROPERTY_NAME_LAYOUT_ROWS) == TableView::PROPERTY_LAYOUT_ROWS );
@@ -613,20 +613,20 @@ int UtcDaliTableViewSetGetProperty(void)
    *   }
    */
   Property::Map layoutRows;
-  layoutRows.push_back( Property::StringValuePair("1", item1) );
-  layoutRows.push_back( Property::StringValuePair("3", item2) );
+  layoutRows[ "1" ] = item1;
+  layoutRows[ "3" ] = item2;
   tableView.SetProperty( TableView::PROPERTY_LAYOUT_ROWS, layoutRows );
 
   DALI_TEST_EQUALS( tableView.GetFixedHeight( 1u ), 30.f, TEST_LOCATION );
   DALI_TEST_EQUALS( tableView.GetRelativeHeight( 3u ), 0.2f, TEST_LOCATION );
 
   Property::Map layoutRowsGet = tableView.GetProperty(TableView::PROPERTY_LAYOUT_ROWS).Get<Property::Map>();
-  DALI_TEST_CHECK( layoutRowsGet[0].first.compare(layoutRows[0].first) == 0 );
-  DALI_TEST_CHECK( layoutRowsGet[0].second.GetValue( "policy" ).Get<std::string>().compare(layoutRows[0].second.GetValue( "policy" ).Get<std::string>()) == 0 );
-  DALI_TEST_EQUALS( layoutRowsGet[0].second.GetValue( "value" ).Get<float>(),layoutRows[0].second.GetValue( "value" ).Get<float>(), TEST_LOCATION );
-  DALI_TEST_CHECK( layoutRowsGet[1].first.compare(layoutRows[1].first) == 0 );
-  DALI_TEST_CHECK( layoutRowsGet[1].second.GetValue( "policy" ).Get<std::string>().compare(layoutRows[1].second.GetValue( "policy" ).Get<std::string>()) == 0 );
-  DALI_TEST_EQUALS( layoutRowsGet[1].second.GetValue( "value" ).Get<float>(),layoutRows[1].second.GetValue( "value" ).Get<float>(), TEST_LOCATION );
+  DALI_TEST_CHECK( layoutRowsGet.GetKey(0).compare(layoutRows.GetKey(0)) == 0 );
+  DALI_TEST_CHECK( layoutRowsGet.GetValue(0).GetValue( "policy" ).Get<std::string>().compare(layoutRows.GetValue(0).GetValue( "policy" ).Get<std::string>()) == 0 );
+  DALI_TEST_EQUALS( layoutRowsGet.GetValue(0).GetValue( "value" ).Get<float>(),layoutRows.GetValue(0).GetValue( "value" ).Get<float>(), TEST_LOCATION );
+  DALI_TEST_CHECK( layoutRowsGet.GetKey(1).compare(layoutRows.GetKey(1)) == 0 );
+  DALI_TEST_CHECK( layoutRowsGet.GetValue(1).GetValue( "policy" ).Get<std::string>().compare(layoutRows.GetValue(1).GetValue( "policy" ).Get<std::string>()) == 0 );
+  DALI_TEST_EQUALS( layoutRowsGet.GetValue(1).GetValue( "value" ).Get<float>(),layoutRows.GetValue(1).GetValue( "value" ).Get<float>(), TEST_LOCATION );
 
   // Test "layout-columns" property
   DALI_TEST_CHECK( tableView.GetPropertyIndex( PROPERTY_NAME_LAYOUT_COLUMNS ) == TableView::PROPERTY_LAYOUT_COLUMNS );
@@ -639,20 +639,20 @@ int UtcDaliTableViewSetGetProperty(void)
    *   }
    */
   Property::Map layoutColumns;
-  layoutColumns.push_back( Property::StringValuePair("2", item2) );
-  layoutColumns.push_back( Property::StringValuePair("3", item1) );
+  layoutColumns[ "2" ] = item2;
+  layoutColumns[ "3" ] = item1;
   tableView.SetProperty( TableView::PROPERTY_LAYOUT_COLUMNS, layoutColumns );
 
   DALI_TEST_EQUALS( tableView.GetRelativeWidth( 2u ), 0.2f, TEST_LOCATION );
   DALI_TEST_EQUALS( tableView.GetFixedWidth( 3u ), 30.f, TEST_LOCATION );
 
   Property::Map layoutColumnsGet = tableView.GetProperty(TableView::PROPERTY_LAYOUT_COLUMNS).Get<Property::Map>();
-  DALI_TEST_CHECK( layoutColumnsGet[0].first.compare(layoutColumns[0].first) == 0 );
-  DALI_TEST_CHECK( layoutColumnsGet[0].second.GetValue( "policy" ).Get<std::string>().compare(layoutColumns[0].second.GetValue( "policy" ).Get<std::string>()) == 0 );
-  DALI_TEST_EQUALS( layoutColumnsGet[0].second.GetValue( "value" ).Get<float>(),layoutColumns[0].second.GetValue( "value" ).Get<float>(), TEST_LOCATION );
-  DALI_TEST_CHECK( layoutColumnsGet[1].first.compare(layoutColumns[1].first) == 0 );
-  DALI_TEST_CHECK( layoutColumnsGet[1].second.GetValue( "policy" ).Get<std::string>().compare(layoutColumns[1].second.GetValue( "policy" ).Get<std::string>()) == 0 );
-  DALI_TEST_EQUALS( layoutColumnsGet[1].second.GetValue( "value" ).Get<float>(),layoutColumns[1].second.GetValue( "value" ).Get<float>(), TEST_LOCATION );
+  DALI_TEST_CHECK( layoutColumnsGet.GetKey(0).compare(layoutColumns.GetKey(0)) == 0 );
+  DALI_TEST_CHECK( layoutColumnsGet.GetValue(0).GetValue( "policy" ).Get<std::string>().compare(layoutColumns.GetValue(0).GetValue( "policy" ).Get<std::string>()) == 0 );
+  DALI_TEST_EQUALS( layoutColumnsGet.GetValue(0).GetValue( "value" ).Get<float>(),layoutColumns.GetValue(0).GetValue( "value" ).Get<float>(), TEST_LOCATION );
+  DALI_TEST_CHECK( layoutColumnsGet.GetKey(1).compare(layoutColumns.GetKey(1)) == 0 );
+  DALI_TEST_CHECK( layoutColumnsGet.GetValue(1).GetValue( "policy" ).Get<std::string>().compare(layoutColumns.GetValue(1).GetValue( "policy" ).Get<std::string>()) == 0 );
+  DALI_TEST_EQUALS( layoutColumnsGet.GetValue(1).GetValue( "value" ).Get<float>(),layoutColumns.GetValue(1).GetValue( "value" ).Get<float>(), TEST_LOCATION );
 
   END_TEST;
 }

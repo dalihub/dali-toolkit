@@ -906,6 +906,21 @@ public:
   void ScrollTo(const Vector3 &position, float duration);
 
   /**
+   * @brief Scrolls View to position specified (contents will scroll to this position)
+   *
+   * Position 0,0 is the origin. Increasing X scrolls contents left, while
+   * increasing Y scrolls contents up.
+   * - If Rulers have been applied to the axes, then the contents will scroll until
+   * reaching the domain boundary.
+   * @note Contents will not snap to ruler snap points.
+   *
+   * @param[in] position The position to scroll to.
+   * @param[in] duration The duration of the animation in seconds
+   * @param[in] alpha The alpha function to use
+   */
+  void ScrollTo(const Vector3 &position, float duration, AlphaFunction alpha);
+
+  /**
    * @brief Scrolls View to position specified (contents will scroll to this position).
    *
    * Position 0,0 is the origin. Increasing X scrolls contents left, while
@@ -923,6 +938,27 @@ public:
    * @param[in] verticalBias Whether to bias scrolling to top or bottom.
    */
   void ScrollTo(const Vector3 &position, float duration,
+                DirectionBias horizontalBias, DirectionBias verticalBias);
+
+  /**
+   * @brief Scrolls View to position specified (contents will scroll to this position)
+   *
+   * Position 0,0 is the origin. Increasing X scrolls contents left, while
+   * increasing Y scrolls contents up.
+   * - If Rulers have been applied to the axes, then the contents will scroll until
+   * reaching the domain boundary.
+   * @note Contents will not snap to ruler snap points.
+   * Biasing parameters are provided such that in scenarios with 2 or 2x2 pages in
+   * wrap mode, the application developer can decide whether to scroll left or right
+   * to get to the target page
+   *
+   * @param[in] position The position to scroll to.
+   * @param[in] duration The duration of the animation in seconds
+   * @param[in] horizontalBias Whether to bias scrolling to left or right.
+   * @param[in] verticalBias Whether to bias scrolling to top or bottom.
+   * @param[in] alpha Alpha function to use
+   */
+  void ScrollTo(const Vector3 &position, float duration, AlphaFunction alpha,
                 DirectionBias horizontalBias, DirectionBias verticalBias);
 
   /**

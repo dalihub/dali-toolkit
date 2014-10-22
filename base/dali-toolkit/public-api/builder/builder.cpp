@@ -54,7 +54,7 @@ void Builder::LoadFromString( const std::string &data, UIFormat rep )
   GetImpl(*this).LoadFromString( data );
 }
 
-void Builder::AddConstants( const PropertyValueMap& map )
+void Builder::AddConstants( const Property::Map& map )
 {
   GetImpl(*this).AddConstants( map );
 }
@@ -64,7 +64,7 @@ void Builder::AddConstant( const std::string& key, const Property::Value& value 
   GetImpl(*this).AddConstant( key, value );
 }
 
-const PropertyValueMap& Builder::GetConstants() const
+const Property::Map& Builder::GetConstants() const
 {
   return GetImpl(*this).GetConstants();
 }
@@ -79,7 +79,7 @@ Animation Builder::CreateAnimation( const std::string& animationName )
   return GetImpl(*this).CreateAnimation( animationName );
 }
 
-Animation Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map )
+Animation Builder::CreateAnimation( const std::string& animationName, const Property::Map& map )
 {
   return GetImpl(*this).CreateAnimation( animationName, map );
 }
@@ -89,7 +89,7 @@ Animation Builder::CreateAnimation( const std::string& animationName, Dali::Acto
   return GetImpl(*this).CreateAnimation( animationName, sourceActor );
 }
 
-Animation Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor sourceActor )
+Animation Builder::CreateAnimation( const std::string& animationName, const Property::Map& map, Dali::Actor sourceActor )
 {
   return GetImpl(*this).CreateAnimation( animationName, map, sourceActor );
 }
@@ -99,7 +99,7 @@ BaseHandle Builder::Create( const std::string& templateName )
   return GetImpl(*this).Create( templateName );
 }
 
-BaseHandle Builder::Create( const std::string& templateName, const PropertyValueMap& map )
+BaseHandle Builder::Create( const std::string& templateName, const Property::Map& map )
 {
   return GetImpl(*this).Create( templateName, map );
 }

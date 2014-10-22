@@ -20,9 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <dali/dali.h>
+#include <dali/public-api/common/map-wrapper.h>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 
 namespace Dali

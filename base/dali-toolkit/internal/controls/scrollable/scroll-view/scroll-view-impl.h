@@ -366,9 +366,9 @@ public:
                    DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone);
 
   /**
-   * @copydoc ScrollTo(const Vector3&, float, DirectionBias, DirectionBias)
+   * @copydoc ScrollTo(const Vector3&, float, AlhpaFunction, DirectionBias, DirectionBias)
    */
-  void TransformTo(const Vector3& position, float duration,
+  void TransformTo(const Vector3& position, float duration, AlphaFunction alpha,
                    DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone);
 
   /**
@@ -382,9 +382,20 @@ public:
   void ScrollTo(const Vector3& position, float duration);
 
   /**
+   * @copydoc Toolkit::Scrollable::ScrollTo(const Vector3& position, float duration, AlphaFunction alpha)
+   */
+  void ScrollTo(const Vector3& position, float duration, AlphaFunction alpha);
+
+  /**
    * @copydoc Toolkit::ScrollView::ScrollTo(const Vector3 &position, float duration, DirectionBias horizontalBias, DirectionBias verticalBias)
    */
   void ScrollTo(const Vector3& position, float duration,
+                DirectionBias horizontalBias, DirectionBias verticalBias);
+
+  /**
+   * @copydoc Toolkit::ScrollView::ScrollTo(const Vector3 &position, float duration, AlphaFunction alpha, DirectionBias horizontalBias, DirectionBias verticalBias)
+   */
+  void ScrollTo(const Vector3& position, float duration, AlphaFunction alpha,
                 DirectionBias horizontalBias, DirectionBias verticalBias);
 
   /**

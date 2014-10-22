@@ -20,9 +20,9 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <list>
+#include <dali/public-api/common/map-wrapper.h>
 
 // INTERNAL INCLUDES
-
 #include <dali/dali.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/public-api/builder/builder.h>
@@ -155,7 +155,7 @@ private:
    *
    * @return Return the newly created builder
    */
-  Toolkit::Builder CreateBuilder( const PropertyValueMap& constants );
+  Toolkit::Builder CreateBuilder( const Property::Map& constants );
 
   /**
    * @brief Load a JSON file into given builder
@@ -240,12 +240,10 @@ private:
 
   std::string mThemeFile;             ///< The full path of the current theme file
 
-  Toolkit::PropertyValueMap mThemeBuilderConstants;   ///< Contants to give the theme builder
-  Toolkit::PropertyValueMap mStyleBuilderConstants;   ///< Constants specific to building styles
+  Property::Map mThemeBuilderConstants;   ///< Contants to give the theme builder
+  Property::Map mStyleBuilderConstants;   ///< Constants specific to building styles
 
   BuilderMap mBuilderCache;           ///< Cache of builders keyed by JSON file name
-
-  bool mSetThemeConnection;           ///< Has the callback to set the theme been set
 
   // Signals
   Toolkit::StyleManager::StyleChangeSignalType       mStyleChangeSignal;         ///< Emitted when the style( theme/font ) changes

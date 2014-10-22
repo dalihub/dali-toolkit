@@ -56,7 +56,7 @@ public:
    * @param overrideMap The user overriding map
    * @param defaultMap The default map to use
    */
-  Replacement( const PropertyValueMap& overrideMap, const PropertyValueMap& defaultMap );
+  Replacement( const Property::Map& overrideMap, const Property::Map& defaultMap );
 
   /*
    * Constructor with default map
@@ -64,7 +64,7 @@ public:
    * Make a deep copy of the tree.
    * @param overrideMap The user overriding map
    */
-  Replacement( const PropertyValueMap& defaultMap );
+  Replacement( const Property::Map& defaultMap );
 
   /* @brief Check node for a type
    *
@@ -229,10 +229,10 @@ public:
 
 private:
   // Overriding map (overrides the default map). The map is not owned.
-  const PropertyValueMap* const mOverrideMap;
+  const Property::Map* const mOverrideMap;
 
-  // Defautl map. The map is not owned.
-  const PropertyValueMap* const mDefaultMap;
+  // Default map. The map is not owned.
+  const Property::Map* const mDefaultMap;
 
   // compiler
   // Replacement & operation=( Replacement& replacement );

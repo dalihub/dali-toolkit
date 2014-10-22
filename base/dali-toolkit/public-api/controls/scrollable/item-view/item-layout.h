@@ -18,8 +18,11 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/dali.h>
+#include <dali/public-api/common/vector-wrapper.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/enums.h>
 #include <dali-toolkit/public-api/controls/control.h>
 

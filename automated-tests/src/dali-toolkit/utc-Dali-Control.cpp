@@ -414,7 +414,7 @@ int UtcDaliControlBackgroundProperties(void)
   DALI_TEST_CHECK( !control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
   DALI_TEST_EQUALS( control.GetProperty( Control::PROPERTY_BACKGROUND_COLOR ).Get< Vector4 >(), Color::TRANSPARENT, TEST_LOCATION );
-  DALI_TEST_CHECK( control.GetProperty( Control::PROPERTY_BACKGROUND ).Get< Property::Map >().empty() );
+  DALI_TEST_CHECK( control.GetProperty( Control::PROPERTY_BACKGROUND ).Get< Property::Map >().Empty() );
 
   control.SetProperty( Control::PROPERTY_BACKGROUND_COLOR, Color::RED );
   DALI_TEST_CHECK( control.GetBackgroundActor() );
@@ -422,9 +422,9 @@ int UtcDaliControlBackgroundProperties(void)
   DALI_TEST_EQUALS( control.GetProperty( Control::PROPERTY_BACKGROUND_COLOR ).Get< Vector4 >(), Color::RED, TEST_LOCATION );
 
   Property::Map imageMap;
-  imageMap.push_back( Property::StringValuePair( "filename", "TestImage" ) );
+  imageMap[ "filename" ] = "TestImage";
   Property::Map map;
-  map.push_back( Property::StringValuePair( "image", imageMap ) );
+  map[ "image" ] = imageMap;
   control.SetProperty( Control::PROPERTY_BACKGROUND, map );
   DALI_TEST_CHECK( control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::RED, TEST_LOCATION );
@@ -440,7 +440,7 @@ int UtcDaliControlBackgroundProperties(void)
   DALI_TEST_CHECK( !control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
   DALI_TEST_EQUALS( control.GetProperty( Control::PROPERTY_BACKGROUND_COLOR ).Get< Vector4 >(), Color::TRANSPARENT, TEST_LOCATION );
-  DALI_TEST_CHECK( control.GetProperty( Control::PROPERTY_BACKGROUND ).Get< Property::Map >().empty() );
+  DALI_TEST_CHECK( control.GetProperty( Control::PROPERTY_BACKGROUND ).Get< Property::Map >().Empty() );
 
   END_TEST;
 }

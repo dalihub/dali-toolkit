@@ -32,31 +32,16 @@ namespace Internal
 namespace  // anon
 {
 
-PropertyValueMap::const_iterator FindReplacement( const std::string &str,
-                                                const PropertyValueMap& overrideMap, const PropertyValueMap& defaultMap )
+Property::Value* FindReplacement( const std::string &str, const Property::Map& overrideMap, const Property::Map& defaultMap )
 {
-  PropertyValueMap::const_iterator ret  = defaultMap.end();
+  Property::Value* ret  = overrideMap.Find( str );
 
-  PropertyValueMap::const_iterator iter = overrideMap.find( str );
-
-  if( iter != overrideMap.end() )
+  if ( !ret )
   {
-    ret = iter;
-  }
-  else
-  {
-    PropertyValueMap::const_iterator iter = defaultMap.find( str );
+    ret = defaultMap.Find( str );
 
-    if( iter != defaultMap.end() )
-    {
-      ret = iter;
-    }
-    else
-    {
-      // @ todo
-      // try localized text ie dgettext. Look for colon  {DOMAIN:TEXT} {LC_MESSAGE:ID_XXXX}
-
-    }
+    // @ todo
+    // try localized text ie dgettext. Look for colon  {DOMAIN:TEXT} {LC_MESSAGE:ID_XXXX}
   }
 
   return ret;
@@ -114,7 +99,7 @@ bool GetSubstitutionPosition( const std::string &initialValue, std::size_t &star
 }
 
 bool ResolvePartialReplacement( const std::string &initialValue, Property::Value &out,
-                                const PropertyValueMap& overrideMap, const PropertyValueMap& defaultMap )
+                                const Property::Map& overrideMap, const Property::Map& defaultMap )
 {
 
   if( initialValue.size() >= 2 )
@@ -135,15 +120,15 @@ bool ResolvePartialReplacement( const std::string &initialValue, Property::Value
     {
       const std::string str( initialValue.substr( startPos, size ) );
 
-      PropertyValueMap::const_iterator iter = FindReplacement( str, overrideMap, defaultMap );
+      Property::Value* value = FindReplacement( str, overrideMap, defaultMap );
 
-      if( iter == defaultMap.end() )
+      if( !value )
       {
         DALI_SCRIPT_WARNING( "Cannot find replacement for '%s'\n", str.c_str() );
       }
       else
       {
-        if( Property::STRING != (*iter).second.GetType() )
+        if( Property::STRING != value->GetType() )
         {
           DALI_SCRIPT_WARNING( "Cannot replace substring in non string property type='%s'. Initial value '%s'\n",
                                PropertyTypes::GetName( out.GetType() ), initialValue.c_str() );
@@ -152,7 +137,7 @@ bool ResolvePartialReplacement( const std::string &initialValue, Property::Value
         {
           std::string newString = \
             initialValue.substr(0, startPos - 1) +
-            (*iter).second.Get<std::string>() +
+            value->Get< std::string >() +
             initialValue.substr( startPos + size + 1 );
 
           return ResolvePartialReplacement( newString, out, overrideMap,  defaultMap );
@@ -168,7 +153,7 @@ bool ResolvePartialReplacement( const std::string &initialValue, Property::Value
 } // namespace anon
 
 
-Replacement::Replacement( const PropertyValueMap& overrideMap, const PropertyValueMap& defaultMap )
+Replacement::Replacement( const Property::Map& overrideMap, const Property::Map& defaultMap )
   : mOverrideMap( &overrideMap ), mDefaultMap( &defaultMap )
 {
 
@@ -176,10 +161,10 @@ Replacement::Replacement( const PropertyValueMap& overrideMap, const PropertyVal
 
 namespace
 {
-PropertyValueMap noMap;
+Property::Map noMap;
 }
 
-Replacement::Replacement( const PropertyValueMap& defaultMap )
+Replacement::Replacement( const Property::Map& defaultMap )
   : mOverrideMap( &noMap ), mDefaultMap( &defaultMap )
 {
 
@@ -195,7 +180,7 @@ OptionalString Replacement::HasFullReplacement( const TreeNode & node ) const
 {
   OptionalString ret;
 
-  if( node.HasSubstitution() && ((*mOverrideMap).size() || (*mDefaultMap).size()) )
+  if( node.HasSubstitution() && ((*mOverrideMap).Count() || (*mDefaultMap).Count()) )
   {
     OptionalString v = ::IsString( node );
     if( v )
@@ -216,15 +201,15 @@ Property::Value Replacement::GetFullReplacement( const std::string& replacementS
   DALI_ASSERT_DEBUG( mOverrideMap && "missing map");
   DALI_ASSERT_DEBUG( mDefaultMap && "missing map");
 
-  PropertyValueMap::const_iterator iter = FindReplacement( replacementString, *mOverrideMap, *mDefaultMap );
+  Property::Value* value = FindReplacement( replacementString, *mOverrideMap, *mDefaultMap );
 
-  if( iter == (*mDefaultMap).end() )
+  if( !value )
   {
     DALI_SCRIPT_WARNING("Cannot find replacement for '%s'\n", replacementString.c_str());
   }
   else
   {
-    out = (*iter).second;
+    out = *value;
 #if defined(DEBUG_ENABLED)
     DALI_SCRIPT_VERBOSE("  Full replacement for '%s' => to Type '%s'\n",
                         replacementString.c_str(),
@@ -265,45 +250,6 @@ OptionalBoolean Replacement::IsBoolean( OptionalChild child ) const
   }
 }
 
-// template <typename T, OptionalValue<T> (*ISTYPE)( const TreeNode& node ), Property::Type TYPE>
-// OptionalValue<T> IsOfType( const TreeNode& node, const PropertyValueMap& overrideMap, const PropertyValueMap& defaultMap )
-// {
-//   OptionalValue<T> ret;
-//   if( OptionalString replace = HasFullReplacement( node, overrideMap, defaultMap ) )
-//   {
-//     Property::Value value = GetFullReplacement( *replace, overrideMap, defaultMap );
-//     if( TYPE == value.GetType() )
-//     {
-//       ret = value.Get<T>();
-//     }
-//   }
-//   else
-//   {
-//     ret = ISTYPE( node );
-//   }
-//   return ret;
-
-// }
-
-// OptionalFloat Replacement::IsFloat( const TreeNode & node ) const
-// {
-//   return IsOfType<float, ::IsFloat, Property::FLOAT>( node, *mOverrideMap, *mDefaultMap );
-//   /* OptionalFloat ret; */
-//   /* if( OptionalString replace = HasFullReplacement( node ) ) */
-//   /* { */
-//   /*   Property::Value value = GetFullReplacement( replace ); */
-//   /*   if( Property::FLOAT == value.GetType() ) */
-//   /*   { */
-//   /*     ret = value.Get<float>(); */
-//   /*   } */
-//   /* } */
-//   /* else */
-//   /* { */
-//   /*   ret = IsFloat( node ); */
-//   /* } */
-//   /* return ret; */
-// }
-
 OptionalFloat Replacement::IsFloat( const TreeNode & node ) const
 {
   OptionalFloat ret;
@@ -329,7 +275,7 @@ OptionalString Replacement::IsString( const TreeNode& node ) const
   DALI_ASSERT_DEBUG( mOverrideMap && "missing map");
   DALI_ASSERT_DEBUG( mDefaultMap && "missing map");
 
-  if( node.HasSubstitution() && ((*mOverrideMap).size() || (*mDefaultMap).size()) )
+  if( node.HasSubstitution() && ((*mOverrideMap).Count() || (*mDefaultMap).Count()) )
   {
     if( OptionalString v = ::IsString( node ) )
     {

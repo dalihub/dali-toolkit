@@ -18,7 +18,7 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/dali.h>
 
 namespace Dali DALI_IMPORT_API
@@ -31,8 +31,6 @@ namespace Internal DALI_INTERNAL
 {
 class Builder;
 }
-
-typedef std::map<std::string, Property::Value> PropertyValueMap;
 
 /**
  * This class provides the ability to load and style an actor tree from a string representation.
@@ -161,14 +159,14 @@ class Builder : public BaseHandle
    * @brief Adds user defined constants to all future style template or animation expansions
    *
    * e.g.
-   *   PropertyValueMap map;
+   *   Property::Map map;
    *   map["IMAGE_DIRECTORY"] = "/usr/share/images";
    *   builder.AddConstants( map );
    *
    * @pre The Builder has been initialized.
    * @param map The user defined constants used in template expansions.
    */
-  void AddConstants( const PropertyValueMap& map );
+  void AddConstants( const Property::Map& map );
 
   /**
    * @brief Adds or modifies a user defined constant to all future style template or animation expansions
@@ -189,7 +187,7 @@ class Builder : public BaseHandle
    *
    * e.g.
    * @code
-   * PropertyValueMap map = builder.GetConstants(); // get copy of current constants
+   * Property::Map map = builder.GetConstants(); // get copy of current constants
    * map["IMAGE_DIRECTORY"] = "/usr/share/images";  // make modification
    * builder.AddConstants( map );                   // write back changes
    * @endcode
@@ -197,14 +195,14 @@ class Builder : public BaseHandle
    * @pre The Builder has been initialized.
    * @return A reference to the currently defined constants.
    */
-  const PropertyValueMap& GetConstants() const;
+  const Property::Map& GetConstants() const;
 
   /**
    * @brief Gets a currently defined constant, or returns Property::INVALID
    *
    * e.g.
    * @code
-   * PropertyValueMap map = builder.GetConstants(); // get copy of current constants
+   * Property::Map map = builder.GetConstants(); // get copy of current constants
    * map["IMAGE_DIRECTORY"] = "/usr/share/images";  // make modification
    * builder.AddConstants( map );                   // write back changes
    * @endcode
@@ -231,7 +229,7 @@ class Builder : public BaseHandle
    * @brief Creates an animation from the set of known animations with user defined constants
    *
    * e.g.
-   *   PropertyValueMap map;
+   *   Property::Map map;
    *   map["ACTOR"] = actor.GetName();       // replaces '{ACTOR} in the template
    *   Animation a = builder.CreateAnimation( "wobble");
    *
@@ -243,7 +241,7 @@ class Builder : public BaseHandle
    * @param map The user defined constants used in style template expansion.
    * @returns The base handle of the created object
    */
-  Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map );
+  Animation CreateAnimation( const std::string& animationName, const Property::Map& map );
 
   /**
    * @brief Creates an animation from the set of known animations.
@@ -267,7 +265,7 @@ class Builder : public BaseHandle
    *
    * The animation is applied to a specific actor.
    * e.g.
-   *   PropertyValueMap map;
+   *   Property::Map map;
    *   map["ACTOR"] = actor.GetName();       // replaces '{ACTOR} in the template
    *   Actor myInstance = builder.Create( "template-actor-tree" )
    *   Animation a = builder.CreateAnimation( "wobble", myInstance);
@@ -281,7 +279,7 @@ class Builder : public BaseHandle
    * @param sourceActor The starting point in an actor tree, from which to look for property owners
    * @returns The base handle of the created object
    */
-  Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor sourceActor );
+  Animation CreateAnimation( const std::string& animationName, const Property::Map& map, Dali::Actor sourceActor );
 
   /**
    * @brief Creates an object (e.g. an actor) from the set of known style templates
@@ -302,7 +300,7 @@ class Builder : public BaseHandle
    * @brief Creates an object from the style templates with user defined constants
    *
    * e.g.
-   *   PropertyValueMap map;
+   *   Property::Map map;
    *   map["IMAGE_DIR"] = "/usr/share/images"; // replaces '{IMAGE_DIR} in the template
    *   mActor.Add( Actor::DownCast(builder.Create( "default-image", map) ) );
    *
@@ -314,7 +312,7 @@ class Builder : public BaseHandle
    * @param map The user defined constants used in template expansion.
    * @returns The base handle of the created object
    */
-  BaseHandle Create( const std::string& templateName, const PropertyValueMap& map );
+  BaseHandle Create( const std::string& templateName, const Property::Map& map );
 
   /**
    * @brief Creates an object (e.g. an actor) from given json snippet

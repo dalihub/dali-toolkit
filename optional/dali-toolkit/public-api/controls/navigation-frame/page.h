@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>

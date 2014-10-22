@@ -81,7 +81,7 @@ public:
   /**
    * @copydoc Toolkit::Builder::AddConstants
    */
-  void AddConstants( const PropertyValueMap& map );
+  void AddConstants( const Property::Map& map );
 
   /**
    * @copydoc Toolkit::Builder::AddConstant
@@ -91,7 +91,7 @@ public:
   /**
    * @copydoc Toolkit::Builder::GetConstants
    */
-  const PropertyValueMap& GetConstants() const;
+  const Property::Map& GetConstants() const;
 
   /**
    * @copydoc Toolkit::Builder::GetConstant
@@ -104,9 +104,9 @@ public:
   Animation CreateAnimation( const std::string& animationName );
 
   /**
-   * @copydoc Toolkit::Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map );
+   * @copydoc Toolkit::Builder::CreateAnimation( const std::string& animationName, const Property::Map& map );
    */
-  Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map );
+  Animation CreateAnimation( const std::string& animationName, const Property::Map& map );
 
   /**
    * @copydoc Toolkit::Builder::CreateAnimation( const std::string&,Dali::Actor);
@@ -114,9 +114,9 @@ public:
   Animation CreateAnimation( const std::string& animationName, Dali::Actor sourceActor );
 
   /**
-   * @copydoc Toolkit::Builder::CreateAnimation( const std::string&,const PropertyValueMap&,Dali::Actor);
+   * @copydoc Toolkit::Builder::CreateAnimation( const std::string&,const Property::Map&, Dali::Actor);
    */
-  Animation CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor sourceActor );
+  Animation CreateAnimation( const std::string& animationName, const Property::Map& map, Dali::Actor sourceActor );
 
   /**
    * @copydoc Toolkit::Builder::Create( const std::string& templateName );
@@ -124,9 +124,9 @@ public:
   BaseHandle Create( const std::string& templateName );
 
   /**
-   * @copydoc Toolkit::Builder::Create( const std::string& templateName, const PropertyValueMap& map );
+   * @copydoc Toolkit::Builder::Create( const std::string& templateName, const Property::Map& map );
    */
-  BaseHandle Create( const std::string& templateName, const PropertyValueMap& map );
+  BaseHandle Create( const std::string& templateName, const Property::Map& map );
 
   /**
    * @copydoc Toolkit::Builder::CreateFromJson( const std::string& json );
@@ -210,13 +210,13 @@ private:
 
   SlotDelegate<Builder> mSlotDelegate;
 
-  PropertyValueMap mReplacementMap;
+  Property::Map mReplacementMap;
 
   BaseHandle Create( const std::string& templateName, const Replacement& constant );
 
   BaseHandle DoCreate( const TreeNode& root, const TreeNode& node, Actor parent, const Replacement& replacements );
 
-  void LoadConstants( const TreeNode& root, PropertyValueMap& intoMap );
+  void LoadConstants( const TreeNode& root, Property::Map& intoMap );
 
   void LoadIncludes( const std::string& data );
 

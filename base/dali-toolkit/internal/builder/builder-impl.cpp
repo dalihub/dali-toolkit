@@ -167,7 +167,7 @@ std::string PropertyValueToString( const Property::Value& value )
     }
     case Property::MAP:
     {
-      ret = std::string("Map Size=") + ToString( value.Get<Property::Map>().size() );
+      ret = std::string("Map Size=") + ToString( value.Get<Property::Map>().Count() );
       break;
     }
     case Property::TYPE_COUNT:
@@ -766,7 +766,7 @@ void Builder::AddActors( const std::string &sectionName, Actor toActor )
 {
   DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
 
-  PropertyValueMap overrideMap;
+  Property::Map overrideMap;
   Replacement replacements(overrideMap, mReplacementMap);
 
   OptionalChild add = IsChild(*mParser.GetRoot(), sectionName);
@@ -824,13 +824,13 @@ Animation Builder::CreateAnimation( const std::string& animationName, const Repl
   return anim;
 }
 
-Animation Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map, Dali::Actor sourceActor )
+Animation Builder::CreateAnimation( const std::string& animationName, const Property::Map& map, Dali::Actor sourceActor )
 {
   Replacement replacement(map, mReplacementMap);
   return CreateAnimation( animationName, replacement, sourceActor);
 }
 
-Animation Builder::CreateAnimation( const std::string& animationName, const PropertyValueMap& map )
+Animation Builder::CreateAnimation( const std::string& animationName, const Property::Map& map )
 {
   Replacement replacement(map, mReplacementMap);
   return CreateAnimation( animationName, replacement, Stage::GetCurrent().GetRootLayer() );
@@ -906,12 +906,9 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
 
 }
 
-void Builder::AddConstants( const PropertyValueMap& map )
+void Builder::AddConstants( const Property::Map& map )
 {
-  for(PropertyValueMap::const_iterator iter = map.begin(); iter != map.end(); ++iter)
-  {
-    mReplacementMap[ (*iter).first ] = (*iter).second;
-  }
+  mReplacementMap.Merge( map );
 }
 
 void Builder::AddConstant( const std::string& key, const Property::Value& value )
@@ -919,17 +916,17 @@ void Builder::AddConstant( const std::string& key, const Property::Value& value 
   mReplacementMap[key] = value;
 }
 
-const PropertyValueMap& Builder::GetConstants() const
+const Property::Map& Builder::GetConstants() const
 {
   return mReplacementMap;
 }
 
 const Property::Value& Builder::GetConstant( const std::string& key ) const
 {
-  PropertyValueMap::const_iterator iter = mReplacementMap.find( key );
-  if( iter  != mReplacementMap.end() )
+  Property::Value* match = mReplacementMap.Find( key );
+  if( match )
   {
-    return (*iter).second;
+    return (*match);
   }
   else
   {
@@ -938,7 +935,7 @@ const Property::Value& Builder::GetConstant( const std::string& key ) const
   }
 }
 
-void Builder::LoadConstants( const TreeNode& root, PropertyValueMap& intoMap )
+void Builder::LoadConstants( const TreeNode& root, Property::Map& intoMap )
 {
   Replacement replacer(intoMap);
 
@@ -967,10 +964,10 @@ void Builder::LoadConstants( const TreeNode& root, PropertyValueMap& intoMap )
   }
 
 #if defined(DEBUG_ENABLED)
-  PropertyValueMap::const_iterator iter = intoMap.find( "CONFIG_SCRIPT_LOG_LEVEL" );
-  if( iter != intoMap.end() && (*iter).second.GetType() == Property::STRING )
+  Property::Value* iter = intoMap.Find( "CONFIG_SCRIPT_LOG_LEVEL" );
+  if( iter && iter->GetType() == Property::STRING )
   {
-    std::string logLevel( (*iter).second.Get< std::string >() );
+    std::string logLevel( iter->Get< std::string >() );
     if( logLevel == "NoLogging" )
     {
       gFilterScript->SetLogLevel( Integration::Log::NoLogging );
@@ -1016,7 +1013,7 @@ bool Builder::ApplyStyle( const std::string& styleName, Handle& handle, const Re
   }
 }
 
-BaseHandle Builder::Create( const std::string& templateName, const PropertyValueMap& map )
+BaseHandle Builder::Create( const std::string& templateName, const Property::Map& map )
 {
   Replacement replacement( map, mReplacementMap );
   return Create( templateName, replacement );

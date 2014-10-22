@@ -541,10 +541,21 @@ void ScrollView::ScrollTo(const Vector3 &position, float duration)
   GetImpl(*this).ScrollTo(position, duration);
 }
 
+void ScrollView::ScrollTo(const Vector3 &position, float duration, AlphaFunction alpha)
+{
+  GetImpl(*this).ScrollTo(position, duration, alpha);
+}
+
 void ScrollView::ScrollTo(const Vector3 &position, float duration,
                           DirectionBias horizontalBias, DirectionBias verticalBias)
 {
   GetImpl(*this).ScrollTo(position, duration, horizontalBias, verticalBias);
+}
+
+void ScrollView::ScrollTo(const Vector3 &position, float duration, AlphaFunction alpha,
+                          DirectionBias horizontalBias, DirectionBias verticalBias)
+{
+  GetImpl(*this).ScrollTo(position, duration, alpha, horizontalBias, verticalBias);
 }
 
 void ScrollView::ScrollTo(unsigned int page)

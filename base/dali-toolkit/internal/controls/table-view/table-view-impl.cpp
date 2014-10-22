@@ -1160,13 +1160,14 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
   if( Property::MAP == value.GetType() )
   {
     Property::Map map = value.Get<Property::Map>();
-    unsigned int rowIndex;
-    for( Property::Map::const_iterator iter = map.begin(); iter != map.end(); iter++)
+    unsigned int rowIndex(0);
+    for ( unsigned int i = 0, count = map.Count(); i < count; ++i )
     {
-      if( istringstream(iter->first) >> rowIndex  // the key is a number
-          && Property::MAP == (iter->second).GetType())
+      Property::Value& item = map.GetValue(i);
+
+      if( istringstream(map.GetKey(i)) >> rowIndex  // the key is a number
+          && Property::MAP == item.GetType())
       {
-        Property::Value item = iter->second;
         if( item.HasKey( "policy" ) && item.HasKey( "value" ) )
         {
           Toolkit::TableView::LayoutPolicy policy = Scripting::GetEnumeration< Toolkit::TableView::LayoutPolicy >( item.GetValue("policy").Get<string>(), LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT );
@@ -1212,19 +1213,19 @@ void TableView::GetMapPropertyValue( const std::vector<float>& fixedSize, const 
     {
       Property::StringValuePair valuePair( "value", fixedSize[index] );
       Property::Map item;
-      item.push_back( fixedPolicyPair );
-      item.push_back( valuePair );
+      item[ fixedPolicyPair.first ] = fixedPolicyPair.second;
+      item[ valuePair.first ] = valuePair.second;
 
-      map.push_back(  Property::StringValuePair( static_cast<std::ostringstream*>( &(std::ostringstream() << index ) )->str(), item ) );
+      map[ static_cast<std::ostringstream*>( &(std::ostringstream() << index ) )->str() ] = item;
     }
     else if( ! EqualsZero( relativeSize[index] ) )
     {
       Property::StringValuePair valuePair( "value", relativeSize[index] );
       Property::Map item;
-      item.push_back( relativePolicyPair );
-      item.push_back( valuePair );
+      item[ relativePolicyPair.first ] = relativePolicyPair.second;
+      item[ valuePair.first ] = valuePair.second;
 
-      map.push_back(  Property::StringValuePair( static_cast<std::ostringstream*>( &(std::ostringstream() << index ) )->str(), item ) );
+      map[ static_cast<std::ostringstream*>( &(std::ostringstream() << index ) )->str() ] = item;
     }
   }
 }

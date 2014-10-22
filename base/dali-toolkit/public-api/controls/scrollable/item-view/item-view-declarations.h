@@ -20,7 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <utility> // std::pair
-#include <dali/dali.h>
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali DALI_IMPORT_API
 {
