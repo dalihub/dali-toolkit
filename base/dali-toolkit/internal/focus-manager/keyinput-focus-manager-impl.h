@@ -20,8 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <string>
-#include <deque>
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/object-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>
@@ -41,13 +41,11 @@ class KeyInputFocusManager;
 /**
  * @copydoc Toolkit::KeyInputFocusManager
  */
-class KeyInputFocusManager : public Dali::BaseObject
+class KeyInputFocusManager : public Dali::BaseObject, public Dali::ConnectionTracker
 {
 public:
-
-  typedef std::deque< unsigned int > ActorQueue;
-  typedef std::deque< unsigned int >::iterator ActorQueueIterator;
-  typedef std::deque< unsigned int >::const_iterator ActorQueueConstIterator;
+  typedef Dali::Vector< Dali::BaseObject* > FocusStack;
+  typedef FocusStack::Iterator FocusStackIterator;
 
   /**
    * Construct a new KeyInputFocusManager.
@@ -60,14 +58,14 @@ public:
   void SetFocus(Toolkit::Control control);
 
   /**
-   * @copydoc Toolkit::GetCurrentFocusControl
-   */
-  Toolkit::Control GetCurrentFocusControl() const;
-
-  /**
    * @copydoc Toolkit::RemoveFocus
    */
   void RemoveFocus(Toolkit::Control control);
+
+  /**
+   * @copydoc Toolkit::GetCurrentFocusControl
+   */
+  Toolkit::Control GetCurrentFocusControl() const;
 
   /**
    * @copydoc Toolkit::IsKeyboardListener
@@ -107,16 +105,29 @@ protected:
 private:
 
   /**
+   * Search for a control in the focus stack.
+   * @param[in] control The control for which to search
+   * @return An iterator to the control. If not found, this will equate to the
+   * mFocusStack.End() iterator.
+   */
+  FocusStackIterator FindFocusControlInStack( Toolkit::Control control ) const;
+
+  /**
    * Callback for the key event when no actor in the stage has gained the key input focus
    * @param[in] event The KeyEvent event.
    */
   void OnKeyEvent(const KeyEvent& event);
 
   /**
-   * Signal handler called when a focused Actor is removed from Stage.
-   * @param[in]  actor  The actor removed from stage.
+   * Signal handler called when a focused Control is removed from Stage.
+   * @param[in]  control  The control removed from stage.
    */
-  void OnFocusActorStageDisconnection( Dali::Actor actor );
+  void OnFocusControlStageDisconnection( Dali::Actor control );
+
+  /**
+   * Signal handler called when an actor is destroyed.
+   */
+  void OnObjectDestroyed(const Dali::RefObject* object);
 
 private:
 
@@ -134,9 +145,9 @@ private:
   Toolkit::KeyInputFocusManager::UnhandledKeyEventSignalV2 mUnhandledKeyEventSignalV2;
 
   // Keyboard events are sent to the current focus actor, which will be the actor on the top of the focus actors stack.
-  ActorQueue mFocusActorsQueue;
-
+  FocusStack mFocusStack;
   SlotDelegate< KeyInputFocusManager > mSlotDelegate;
+  ObjectRegistry mObjectRegistry;
 };
 
 } // namespace Internal
