@@ -18,7 +18,12 @@
 // CLASS HEADER
 #include "navigation-control-impl.h"
 
-//INTERNAL INCLUDES
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/animation.h>
+#include <dali/public-api/events/key-event.h>
+#include <dali/public-api/object/type-registry.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/navigation-frame/navigation-tool-bar.h>
 #include <dali-toolkit/internal/controls/navigation-frame/navigation-title-bar.h>
 #include <dali-toolkit/internal/controls/relayout-controller.h>

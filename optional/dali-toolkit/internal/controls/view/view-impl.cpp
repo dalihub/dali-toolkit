@@ -16,10 +16,12 @@
  */
 
 // CLASS HEADER
-
 #include "view-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 

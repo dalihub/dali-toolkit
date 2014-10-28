@@ -18,10 +18,16 @@
  *
  */
 
-#include <dali/dali.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/actors/mesh-actor.h>
+#include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/public-api/animation/animation.h>
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/geometry/mesh.h>
+#include <dali/public-api/signals/connection-tracker.h>
 
 // INTERNAL INCLUDES
-
 #include <dali-toolkit/internal/controls/text-input/textview-character-positions-impl.h>
 #include <dali-toolkit/internal/controls/text-input/text-input-handles-impl.h>
 #include <dali-toolkit/internal/controls/text-input/text-input-text-highlight-impl.h>
@@ -626,5 +632,3 @@ private:
 } // namespace Dali
 
 #endif // __DALI_TOOLKIT_INTERNAL_TEXT_INPUT_DECORATOR_H__
-
-

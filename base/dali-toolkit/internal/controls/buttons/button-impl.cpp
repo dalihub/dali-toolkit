@@ -16,8 +16,11 @@
  */
 
 // CLASS HEADER
-
 #include "button-impl.h"
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/object/type-registry.h>
 
 namespace
 {

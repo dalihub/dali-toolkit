@@ -16,15 +16,14 @@
  */
 
 // CLASS HEADER
-
 #include "check-box-button-impl.h"
 
 // EXTERNAL INCLUDES
-
 #include <algorithm>
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
-
 #include "check-box-button-default-painter-impl.h"
 
 namespace Dali

@@ -18,12 +18,11 @@
  *
  */
 
-//EXTERNAL INCLUDES
-
+// EXTERNAL INCLUDES
 #include <list>
+#include <dali/public-api/actors/layer.h>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/navigation-frame/navigation-control.h>
 #include <dali-toolkit/public-api/controls/navigation-frame/page.h>

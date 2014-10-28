@@ -15,12 +15,14 @@
  *
  */
 
-#include <dali-toolkit/public-api/controls/alignment/alignment.h>
+// HEADER
 #include <dali-toolkit/public-api/controls/default-controls/push-button-factory.h>
 
 // EXTERNAL INCLUDES
-// INTERNAL INCLUDES
+#include <dali/public-api/actors/image-actor.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/alignment/alignment.h>
 
 namespace Dali
 {

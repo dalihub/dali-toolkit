@@ -18,8 +18,8 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/dali.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/object/constrainable.h>
 
 namespace Dali DALI_IMPORT_API
 {

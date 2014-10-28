@@ -15,6 +15,7 @@
  *
  */
 
+// CLASS HEADER
 #include "color-adjuster.h"
 
 namespace Dali
@@ -22,10 +23,12 @@ namespace Dali
 
 namespace Toolkit
 {
+
 namespace
 {
-  const std::string HSVDELTA_PROPERTY_NAME("uHSVDelta");
+const std::string HSVDELTA_PROPERTY_NAME("uHSVDelta");
 }
+
 ColorAdjuster::ColorAdjuster()
 {
 }

@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali-toolkit/public-api/controls/scrollable/scroll-component-impl.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/object/type-registry.h>
+
 namespace Dali
 {
 

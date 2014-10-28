@@ -20,8 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <boost/bind.hpp>
-
-#include <dali/dali.h>
+#include <dali/public-api/object/base-object.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/key-event-integ.h>
 

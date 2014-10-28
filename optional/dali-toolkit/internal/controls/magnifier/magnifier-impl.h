@@ -18,8 +18,12 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/camera-actor.h>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/render-tasks/render-task.h>
+
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/magnifier/magnifier.h>
 

@@ -19,10 +19,13 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/actors/camera-actor.h>
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/render-tasks/render-task.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
-#include <dali/public-api/common/dali-vector.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/effects-view/effects-view.h>
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>

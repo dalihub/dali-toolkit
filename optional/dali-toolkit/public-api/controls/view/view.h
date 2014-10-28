@@ -18,17 +18,15 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/adaptor-framework/orientation.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali DALI_IMPORT_API
 {
-
-namespace Internal DALI_INTERNAL
-{
-// Forward declarations
-class CustomActor;
-}
 
 namespace Toolkit
 {

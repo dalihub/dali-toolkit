@@ -21,9 +21,9 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <deque>
+#include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
 

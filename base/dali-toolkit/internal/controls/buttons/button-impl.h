@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/controls/buttons/button.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include "button-painter-impl.h"

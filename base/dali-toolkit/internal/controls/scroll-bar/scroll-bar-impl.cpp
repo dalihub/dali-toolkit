@@ -15,7 +15,14 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/internal/controls/scroll-bar/scroll-bar-impl.h>
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/object/type-registry.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
 
 using namespace Dali;

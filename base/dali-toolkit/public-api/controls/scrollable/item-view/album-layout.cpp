@@ -15,8 +15,13 @@
  *
  */
 
-#include <algorithm>
+// CLASS HEADER
 #include <dali-toolkit/public-api/controls/scrollable/item-view/album-layout.h>
+
+// EXTERNAL INCLUDES
+#include <algorithm>
+#include <dali/public-api/animation/animation.h>
+#include <dali/public-api/math/random.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;

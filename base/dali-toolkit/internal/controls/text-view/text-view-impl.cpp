@@ -18,6 +18,11 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/text-view/text-view-impl.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-view/split-by-new-line-char-policies.h>
 #include <dali-toolkit/internal/controls/text-view/split-by-word-policies.h>

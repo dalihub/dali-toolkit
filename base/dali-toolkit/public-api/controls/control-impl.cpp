@@ -15,18 +15,24 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
+// EXTERNAL INCLUDES
 #include <stack>
-
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/actors/mesh-actor.h>
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/geometry/mesh.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
-#include "dali-toolkit/internal/controls/relayout-controller.h"
-#include "dali-toolkit/internal/controls/relayout-helper.h"
-#include "dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h"
-#include "dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h"
+#include <dali-toolkit/internal/controls/relayout-controller.h>
+#include <dali-toolkit/internal/controls/relayout-helper.h>
+#include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>
+#include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
-
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 

@@ -15,7 +15,14 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/internal/controls/image-view/image-view-impl.h>
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/object/type-registry.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/shader-effects/distance-field-effect.h>
 
 using namespace Dali;

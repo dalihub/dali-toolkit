@@ -20,8 +20,12 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
-#include <dali/public-api/events/mouse-wheel-event.h>
+#include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/set-wrapper.h>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/events/mouse-wheel-event.h>
+#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>

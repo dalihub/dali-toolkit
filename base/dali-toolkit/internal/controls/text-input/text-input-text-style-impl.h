@@ -18,10 +18,11 @@
  *
  */
 
-#include <dali/dali.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/text/text-style.h>
 
 // INTERNAL INCLUDES
-
 #include <dali-toolkit/internal/controls/text-input/textview-character-positions-impl.h>
 
 namespace Dali

@@ -15,7 +15,11 @@
  *
  */
 
+// HEADER
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-helper-functions.h>
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/math/math-utils.h>
 
 namespace Dali
 {

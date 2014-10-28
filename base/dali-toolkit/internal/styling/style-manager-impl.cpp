@@ -17,17 +17,18 @@
 // CLASS HEADER
 #include "style-manager-impl.h"
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control.h>
-#include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/styling/style-manager.h>
-#include <dali/integration-api/debug.h>
-
 // EXTERNAL INCLUDES
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <dali/public-api/adaptor-framework/singleton-service.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/integration-api/debug.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
 
 namespace
 {

@@ -23,7 +23,6 @@
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
 
-#include <dali/dali.h>
 #include <dali-toolkit/dali-toolkit.h>
 
 using namespace Dali;

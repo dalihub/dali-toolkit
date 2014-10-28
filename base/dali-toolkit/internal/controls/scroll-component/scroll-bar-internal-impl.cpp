@@ -15,7 +15,13 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/internal/controls/scroll-component/scroll-bar-internal-impl.h>
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/object/type-registry.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/enums.h>
 
 using namespace Dali;

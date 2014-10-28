@@ -15,23 +15,23 @@
  *
  */
 
-// INTERNAL INCLUDES
+// CLASS HEADER
 #include <dali-toolkit/internal/controls/text-input/text-input-handles-impl.h>
+
+// EXTERNAL INCLUDES
+#include <math.h>
+#include <sstream>
+#include <algorithm>
+#include <dali/public-api/animation/constraints.h>
+#include <dali/integration-api/debug.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-input/textview-character-positions-impl.h>
-
-#include <dali/dali.h>
-
 #include <dali-toolkit/internal/controls/text-input/text-input-impl.h>
 #include <dali-toolkit/internal/controls/text-view/text-processor.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-impl.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
-
-#include <dali/integration-api/debug.h>
-
-#include <math.h>
-#include <sstream>
-#include <algorithm>
 
 using namespace Dali;
 using namespace std;

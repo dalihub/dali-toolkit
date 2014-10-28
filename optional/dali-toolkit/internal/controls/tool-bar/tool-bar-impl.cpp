@@ -18,6 +18,11 @@
 // CLASS HEADER
 #include "tool-bar-impl.h"
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/renderable-actor.h>
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/object/type-registry.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>

@@ -15,11 +15,17 @@
  *
  */
 
+// CLASS HEADER
+#include <dali-toolkit/internal/controls/text-input/text-input-decorator-impl.h>
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/clipboard.h>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/events/pan-gesture.h>
+#include <dali/public-api/object/property-notification.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/text-input/text-input-decorator-impl.h>
-
 #include <dali-toolkit/internal/controls/text-input/text-input-handles-impl.h>
 
 using namespace Dali;

@@ -23,7 +23,6 @@
 #include <list>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>

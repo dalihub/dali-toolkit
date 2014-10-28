@@ -21,11 +21,14 @@
 // EXTERNAL INCLUDES
 #include <sstream>
 #include <iomanip>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/shadow-view/shadow-view-impl.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
-#include <dali/integration-api/debug.h>
 
 // TODO:
 // pixel format / size - set from JSON

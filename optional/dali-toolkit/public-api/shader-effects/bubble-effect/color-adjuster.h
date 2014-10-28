@@ -18,8 +18,9 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/dali.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/math/vector3.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
 
 namespace Dali DALI_IMPORT_API
 {

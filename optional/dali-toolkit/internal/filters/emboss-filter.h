@@ -19,9 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/actors/camera-actor.h>
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/render-tasks/render-task.h>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include "image-filter.h"
 
 namespace Dali

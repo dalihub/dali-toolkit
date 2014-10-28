@@ -19,7 +19,13 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/style-change.h>
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/events/long-press-gesture.h>
+#include <dali/public-api/events/pan-gesture.h>
+#include <dali/public-api/events/pinch-gesture.h>
+#include <dali/public-api/events/tap-gesture.h>
+#include <dali/public-api/object/property-index.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>

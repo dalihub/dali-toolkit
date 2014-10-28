@@ -15,17 +15,17 @@
  *
  */
 
-// INTERNAL INCLUDES
+// CLASS HEADER
 #include <dali-toolkit/internal/controls/text-input/text-input-text-highlight-impl.h>
 
-#include <dali/dali.h>
-
-#include <dali/integration-api/debug.h>
-
+// EXTERNAL INCLUDES
 #include <math.h>
 #include <sstream>
 #include <algorithm>
 #include <libintl.h>
+#include <dali/integration-api/debug.h>
+
+// INTERNAL INCLUDES
 
 using namespace Dali;
 using namespace std;

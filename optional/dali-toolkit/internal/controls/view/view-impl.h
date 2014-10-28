@@ -19,7 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/dali.h>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/map-wrapper.h>
 
 // INTERNAL INCLUDES

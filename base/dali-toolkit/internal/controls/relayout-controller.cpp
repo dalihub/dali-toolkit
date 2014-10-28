@@ -21,9 +21,9 @@
 #include "relayout-controller-impl.h"
 
 // EXTERNAL INCLUDES
-
 #include <stack>
 #include <sstream>
+#include <dali/public-api/adaptor-framework/singleton-service.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES

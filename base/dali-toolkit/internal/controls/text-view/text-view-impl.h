@@ -18,6 +18,13 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/camera-actor.h>
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/images/glyph-image.h>
+#include <dali/public-api/render-tasks/render-task.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>

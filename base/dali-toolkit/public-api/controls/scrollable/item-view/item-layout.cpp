@@ -15,7 +15,14 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/animation/time-period.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 
 namespace

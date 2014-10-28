@@ -18,8 +18,12 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/render-tasks/render-task.h>
+#include <dali/public-api/images/frame-buffer-image.h>
+
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/masked-image-view.h>
 

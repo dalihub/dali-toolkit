@@ -15,11 +15,13 @@
  *
  */
 
-// EXTERNAL HEADERS
-#include <sstream>
-
 // CLASS HEADER
 #include "bubble-effect.h"
+
+// EXTERNAL HEADERS
+#include <sstream>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/images/image.h>
 
 namespace Dali
 {

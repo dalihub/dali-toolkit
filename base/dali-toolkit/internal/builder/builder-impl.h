@@ -22,7 +22,8 @@
 #include <string>
 #include <list>
 #include <map>
-#include <dali/dali.h>
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/object/base-object.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES

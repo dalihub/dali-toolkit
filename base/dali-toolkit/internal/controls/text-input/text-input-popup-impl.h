@@ -18,9 +18,12 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/dali.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/animation/animation.h>
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 

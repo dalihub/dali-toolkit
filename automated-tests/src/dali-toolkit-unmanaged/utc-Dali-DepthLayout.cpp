@@ -19,7 +19,6 @@
 #include <float.h>       // for FLT_MAX
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
-#include <dali/dali.h>
 #include <dali-toolkit/dali-toolkit.h>
 
 using namespace Dali;

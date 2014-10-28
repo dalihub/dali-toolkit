@@ -18,8 +18,13 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/dali.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/events/pan-gesture-detector.h>
+#include <dali/public-api/events/tap-gesture-detector.h>
+#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/images/image.h>
+#include <dali/public-api/signals/connection-tracker.h>
 
 namespace Dali
 {

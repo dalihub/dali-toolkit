@@ -21,9 +21,9 @@
 // EXTERNAL INCLUDES
 #include <sstream>
 #include <cmath>
+#include <dali/public-api/shader-effects/shader-effect.h>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/shader-effects/water-effect.h>
 
 namespace Dali

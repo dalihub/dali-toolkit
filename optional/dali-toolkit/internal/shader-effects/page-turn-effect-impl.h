@@ -18,7 +18,6 @@
  *
  */
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/shader-effects/page-turn-effect.h>
 
 namespace Dali

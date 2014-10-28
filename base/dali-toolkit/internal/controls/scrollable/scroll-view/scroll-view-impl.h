@@ -19,7 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/dali.h>
+#include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/public-api/animation/animation.h>
+#include <dali/public-api/object/property-notification.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>

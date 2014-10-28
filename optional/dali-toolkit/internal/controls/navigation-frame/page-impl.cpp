@@ -20,6 +20,7 @@
 #include "page-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 

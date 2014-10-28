@@ -22,7 +22,6 @@
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
 
-#include <dali/dali.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/key-event-integ.h>
 

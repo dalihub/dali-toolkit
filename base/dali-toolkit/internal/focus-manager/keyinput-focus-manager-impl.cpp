@@ -18,6 +18,10 @@
 // CLASS HEADER
 #include "keyinput-focus-manager-impl.h"
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/common/stage.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/integration-api/debug.h>
