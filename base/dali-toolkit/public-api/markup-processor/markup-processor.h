@@ -23,7 +23,7 @@
 #include <dali/public-api/text/text.h>
 #include <dali/public-api/text/text-style.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -90,7 +90,7 @@ typedef std::vector<StyledText> StyledTextArray;
  * @param [out] styledTextArray A text array split in characters, each one with its style.
  * @param [in] scanForMarkup If true will check to see string contains markup, else assume not
  */
-void GetStyledTextArray( const std::string& markupString, StyledTextArray& styledTextArray, bool scanForMarkup );
+DALI_IMPORT_API void GetStyledTextArray( const std::string& markupString, StyledTextArray& styledTextArray, bool scanForMarkup );
 
 /**
  * @brief Creates a plain string from a text array (thus stripping the style meta).
@@ -98,7 +98,7 @@ void GetStyledTextArray( const std::string& markupString, StyledTextArray& style
  * @param [in] styledTextArray A text array split in characters, each one with its style.
  * @param [out] plainString A string without style.
  */
-void GetPlainString( const StyledTextArray& styledTextArray, std::string& plainString );
+DALI_IMPORT_API void GetPlainString( const StyledTextArray& styledTextArray, std::string& plainString );
 
 /**
  * @brief Creates a markup string from a text array with its style.
@@ -106,7 +106,7 @@ void GetPlainString( const StyledTextArray& styledTextArray, std::string& plainS
  * @param [in] styledTextArray A text array split in characters, each one with its style.
  * @param [out] markupString A string with style.
  */
-void GetMarkupString( const StyledTextArray& styledTextArray, std::string& markupString );
+DALI_IMPORT_API void GetMarkupString( const StyledTextArray& styledTextArray, std::string& markupString );
 
 /**
  * @brief Sets a text style to the given text.
@@ -116,7 +116,7 @@ void GetMarkupString( const StyledTextArray& styledTextArray, std::string& marku
  * @param[in] style The given style
  * @param[in] mask The bit mask.
  */
-void SetTextStyle( StyledTextArray& styledTextArray, const TextStyle& style, TextStyle::Mask mask = TextStyle::ALL );
+DALI_IMPORT_API void SetTextStyle( StyledTextArray& styledTextArray, const TextStyle& style, TextStyle::Mask mask = TextStyle::ALL );
 
 /**
  * @brief Sets a text style to the given text.
@@ -128,7 +128,7 @@ void SetTextStyle( StyledTextArray& styledTextArray, const TextStyle& style, Tex
  * @param[in] style The given style.
  * @param[in] mask The bit mask.
  */
-void SetTextStyle( const Text& text, StyledTextArray& styledTextArray, const TextStyle& style, TextStyle::Mask mask = TextStyle::ALL );
+DALI_IMPORT_API void SetTextStyle( const Text& text, StyledTextArray& styledTextArray, const TextStyle& style, TextStyle::Mask mask = TextStyle::ALL );
 
 /**
  * @brief Sets a text style to a range of characters of the given text.
@@ -141,7 +141,7 @@ void SetTextStyle( const Text& text, StyledTextArray& styledTextArray, const Tex
  * @param[in] end The last character of the range.
  * @note It will assert if begin or end are out of range, or if begin > end.
  */
-void SetTextStyleToRange( StyledTextArray& styledTextArray, const TextStyle& style, TextStyle::Mask mask, std::size_t begin, std::size_t end );
+DALI_IMPORT_API void SetTextStyleToRange( StyledTextArray& styledTextArray, const TextStyle& style, TextStyle::Mask mask, std::size_t begin, std::size_t end );
 
 } // namespace MarkupProcessor
 

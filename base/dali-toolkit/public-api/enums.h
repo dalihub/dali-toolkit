@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -55,7 +55,7 @@ enum Type
  * @param[in] orientation The orientation.
  * @return True if the orientation is vertical.
  */
-bool IsVertical(ControlOrientation::Type orientation);
+DALI_IMPORT_API bool IsVertical(ControlOrientation::Type orientation);
 
 /**
  * @brief Query whether an orientation is horizontal.
@@ -63,7 +63,7 @@ bool IsVertical(ControlOrientation::Type orientation);
  * @param[in] orientation The orientation.
  * @return True if the orientation is horizontal.
  */
-bool IsHorizontal(ControlOrientation::Type orientation);
+DALI_IMPORT_API bool IsHorizontal(ControlOrientation::Type orientation);
 
 } // namespace Toolkit
 

@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/constrainable.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -51,7 +51,7 @@ class ScrollConnector;
  * -1 to 1, where -1 shows an attempt the scroll beyond the minimum limit, and 1 shows an attempt the scroll beyond the maximum limit.
  * Zero indicates normal scrolling i.e. when overshoot indicators should be hidden.
  */
-class ScrollConnector : public BaseHandle
+class DALI_IMPORT_API ScrollConnector : public BaseHandle
 {
 public:
 
@@ -166,7 +166,7 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in] impl The Control implementation.
    */
-  ScrollConnector( Internal::ScrollConnector* impl );
+  explicit DALI_INTERNAL ScrollConnector( Internal::ScrollConnector* impl );
 };
 
 } // namespace Toolkit

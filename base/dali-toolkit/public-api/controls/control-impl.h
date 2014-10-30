@@ -30,7 +30,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -550,7 +550,7 @@ private:
    * @param[in] styleManager The StyleManager Object
    * @param[in] change  Information denoting what has changed.
    */
-  void DoStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
+  DALI_INTERNAL void DoStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
 
 protected: // Construction
 
@@ -708,7 +708,7 @@ private: // Used by the RelayoutController
    * @param[in,out]  container  The container that holds actors that are fed back into the
    *                            RelayoutController algorithm.
    */
-  void NegotiateSize( Vector2 size, ActorSizeContainer& container );
+  DALI_INTERNAL void NegotiateSize( Vector2 size, ActorSizeContainer& container );
 
 private:
 
@@ -721,7 +721,7 @@ private:
    * @param[in,out]  container  The control should add actors to this container that it is not able
    *                            to allocate a size for.
    */
-  void Relayout( Vector2 size, ActorSizeContainer& container );
+  DALI_INTERNAL void Relayout( Vector2 size, ActorSizeContainer& container );
 
   /**
    * @brief Used by the KeyInputFocusManager to emit key event signals.
@@ -729,13 +729,13 @@ private:
    * @param[in] event The key event.
    * @return True if the event was consumed.
    */
-  bool EmitKeyEventSignal(const KeyEvent& event);
+  DALI_INTERNAL bool EmitKeyEventSignal(const KeyEvent& event);
 
 private:
 
   // Undefined
-  Control(const Control&);
-  Control& operator=(const Control&);
+  DALI_INTERNAL Control(const Control&);
+  DALI_INTERNAL Control& operator=(const Control&);
 
   class Impl;
   Impl* mImpl;

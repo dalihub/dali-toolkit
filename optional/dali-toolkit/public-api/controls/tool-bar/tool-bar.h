@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -43,7 +43,7 @@ class ToolBar;
  * is not forbidden, it adds controls on the left group with a size of 10% of the total tool bar size.
  * Dali::Actor::Remove() method does nothing.
  */
-class ToolBar : public Control
+class DALI_IMPORT_API ToolBar : public Control
 {
 public:
   static const Toolkit::Alignment::Padding DEFAULT_PADDING; ///< Default padding space between controls. By default all values are set to 0.
@@ -117,13 +117,13 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  ToolBar( Internal::ToolBar& implementation );
+  DALI_INTERNAL ToolBar( Internal::ToolBar& implementation );
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  ToolBar( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL ToolBar( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

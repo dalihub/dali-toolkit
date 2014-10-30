@@ -26,7 +26,7 @@
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 #include <dali-toolkit/public-api/controls/popup/popup.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -43,7 +43,7 @@ class Page;
  * It serves as the root of a navigation view.
  * It also carries the title/subtitle/buttons/icons information which would be shown on the navigation bars when the item is on the top of the stack.
  */
-class Page : public Control
+class DALI_IMPORT_API Page : public Control
 {
 
 public:
@@ -197,13 +197,13 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in] impl The Page implementation.
    */
-  Page(Internal::Page& impl);
+  DALI_INTERNAL Page(Internal::Page& impl);
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  Page( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL Page( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -41,7 +41,7 @@ class Alignment;
  * All actors added to an alignment are going to be set with the same anchor point and parent origin. And, if the scaling property is set to a value
  * different than ScaleNone, constraints as well.
  */
-class Alignment : public Control
+class DALI_IMPORT_API Alignment : public Control
 {
 public:
   /**
@@ -217,14 +217,14 @@ public: // Not intended for application developers
    *
    * @param[in]  implementation  The Control implementation.
    */
-  Alignment( Internal::Alignment& implementation );
+  DALI_INTERNAL Alignment( Internal::Alignment& implementation );
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  Alignment( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL Alignment( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

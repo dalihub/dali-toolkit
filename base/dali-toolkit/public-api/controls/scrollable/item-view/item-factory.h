@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -38,7 +38,7 @@ public:
   /**
    * @brief Virtual destructor.
    */
-  virtual ~ItemFactory() = 0;
+  DALI_EXPORT_API virtual ~ItemFactory() = 0;
 
   /**
    * @brief Query the number of items available from the factory.

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -41,7 +41,7 @@ class KeyboardFocusManager;
  * highlight for the focused actor and emits a signal when the focus
  * is changed.
  */
-class KeyboardFocusManager : public BaseHandle
+class DALI_IMPORT_API KeyboardFocusManager : public BaseHandle
 {
 public:
   //Signal Names

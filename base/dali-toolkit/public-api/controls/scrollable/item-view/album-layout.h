@@ -31,7 +31,7 @@ Note:This layout is customized for music player application, so there are some l
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -44,7 +44,7 @@ typedef IntrusivePtr<AlbumLayout> AlbumLayoutPtr;
 /**
  * An ItemView layout which arranges items in a album.
  */
-class AlbumLayout : public ItemLayout
+class DALI_IMPORT_API AlbumLayout : public ItemLayout
 {
 public:
 

@@ -22,7 +22,7 @@
 
 // INTERNAL INCLUDES
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 struct Vector2;
@@ -44,21 +44,21 @@ namespace Toolkit
  *
  * Moves an Actor in accordance to scroll position.
  */
-Vector3 MoveActorConstraint(const Vector3&    current,
-                            const PropertyInput& scrollPositionProperty);
+DALI_IMPORT_API Vector3 MoveActorConstraint(const Vector3&    current,
+                                           const PropertyInput& scrollPositionProperty);
 
 /**
  * Wrap Actor constraint.
  *
  * Wraps an Actors position in accordance to min/max bounds of domain.
  */
-Vector3 WrapActorConstraint(const Vector3&    current,
-                            const PropertyInput& actorScaleProperty,
-                            const PropertyInput& actorAnchorPointProperty,
-                            const PropertyInput& actorSizeProperty,
-                            const PropertyInput& scrollPositionMin,
-                            const PropertyInput& scrollPositionMax,
-                            const PropertyInput& scrollWrap);
+DALI_IMPORT_API Vector3 WrapActorConstraint(const Vector3&    current,
+                                            const PropertyInput& actorScaleProperty,
+                                            const PropertyInput& actorAnchorPointProperty,
+                                            const PropertyInput& actorSizeProperty,
+                                            const PropertyInput& scrollPositionMin,
+                                            const PropertyInput& scrollPositionMax,
+                                            const PropertyInput& scrollWrap);
 
 } // namespace Toolkit
 

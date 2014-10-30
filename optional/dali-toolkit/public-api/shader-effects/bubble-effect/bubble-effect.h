@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -31,7 +31,7 @@ namespace Toolkit
  * BubbleEffect is a custom shader to achieve similar effect of particle system by applying on a specially created MeshActor
  * Each bubble is rendered on a patch with two triangles; and each mesh can contain multiple such patches.
  */
-class BubbleEffect : public ShaderEffect
+class DALI_IMPORT_API BubbleEffect : public ShaderEffect
 {
 public:
 
@@ -128,7 +128,7 @@ public:
 
 private:// Not intended for application developers
 
-  BubbleEffect( ShaderEffect handle );
+  DALI_INTERNAL BubbleEffect( ShaderEffect handle );
 
 private:
 

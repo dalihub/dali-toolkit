@@ -21,13 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
-
-namespace Internal DALI_INTERNAL
-{
-class CustomActor;
-}
 
 namespace Toolkit
 {
@@ -47,7 +42,7 @@ class Button;
  *
  * When the \e dimmed property is set to \e true, no signal is emitted.
  */
-class Button : public Control
+class DALI_IMPORT_API Button : public Control
 {
 public:
 
@@ -153,14 +148,14 @@ public: // Not intended for application developers
    *
    * @param[in]  implementation  The Control implementation.
    */
-  Button( Internal::Button& implementation );
+  DALI_INTERNAL Button( Internal::Button& implementation );
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  Button( Dali::Internal::CustomActor* internal );
+  DALI_INTERNAL Button( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

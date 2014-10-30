@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -54,7 +54,7 @@ enum DirectionBias
 /**
  * @brief Used for specifying minimum/maximum extents of a ruler.
  */
-class RulerDomain
+class DALI_IMPORT_API RulerDomain
 {
 public:
 
@@ -115,7 +115,7 @@ public:
  * It can specify whether they are traversable, where their snap
  * points are and their domain.
  */
-class Ruler : public RefObject
+class DALI_IMPORT_API Ruler : public RefObject
 {
 public:
   /// @brief The type of the ruler
@@ -304,7 +304,7 @@ typedef IntrusivePtr<Ruler> RulerPtr; ///< Pointer to Dali::Toolkit::Ruler objec
 /**
  * @brief Concrete implementation of Ruler that has no snapping and has one single page.
  */
-class DefaultRuler : public Ruler
+class DALI_IMPORT_API DefaultRuler : public Ruler
 {
 public:
   /**
@@ -336,7 +336,7 @@ public:
 /**
  * @brief Concrete implementation of Ruler that has fixed snapping.
  */
-class FixedRuler : public Ruler
+class DALI_IMPORT_API FixedRuler : public Ruler
 {
 public:
   /**
@@ -377,7 +377,7 @@ class ScrollView;
  * @brief ScrollView contains actors that can be scrolled manually (via touch)
  * or automatically.
  */
-class ScrollView : public Scrollable
+class DALI_IMPORT_API ScrollView : public Scrollable
 {
 public:
   /// Page effect types
@@ -1119,14 +1119,14 @@ public: // Not intended for application developers
    *
    * @param[in]  implementation  The Control implementation.
    */
-  ScrollView(Internal::ScrollView& implementation);
+  DALI_INTERNAL ScrollView(Internal::ScrollView& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  ScrollView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL ScrollView( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

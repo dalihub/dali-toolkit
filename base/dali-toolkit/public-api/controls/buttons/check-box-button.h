@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/button.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -50,7 +50,7 @@ class CheckBoxButton;
  * CheckBoxButton doesn't have a text. However, a Dali::Toolkit::TableView with a Dali::TextActor or a Dali::Toolkit::TextView
  * and a CheckBoxButton could be used instead.
  */
-class CheckBoxButton : public Button
+class DALI_IMPORT_API CheckBoxButton : public Button
 {
 public:
   //Action Names
@@ -192,13 +192,13 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  CheckBoxButton( Internal::CheckBoxButton& implementation );
+  DALI_INTERNAL CheckBoxButton( Internal::CheckBoxButton& implementation );
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  CheckBoxButton( Dali::Internal::CustomActor* internal );
+  DALI_INTERNAL CheckBoxButton( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

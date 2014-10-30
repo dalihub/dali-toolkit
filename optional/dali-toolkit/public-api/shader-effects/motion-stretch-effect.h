@@ -22,7 +22,7 @@
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -43,7 +43,7 @@ namespace Toolkit
  * Actor.SetShaderEffect( MotionStretchEffect );
  *
  */
-class MotionStretchEffect : public ShaderEffect
+class DALI_IMPORT_API MotionStretchEffect : public ShaderEffect
 {
 
 public:
@@ -157,7 +157,7 @@ public:
 
 private:
   // Not intended for application developers
-  MotionStretchEffect( ShaderEffect handle );
+  DALI_INTERNAL MotionStretchEffect( ShaderEffect handle );
 };
 
 }

@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -30,7 +30,7 @@ namespace Toolkit
 /**
  * ShearEffect is a custom shader effect to achieve shear effects in Image actors
  */
-class ShearEffect : public ShaderEffect
+class DALI_IMPORT_API ShearEffect : public ShaderEffect
 {
 public:
 
@@ -91,7 +91,7 @@ public:
 
 
 private: // Not intended for application developers
-  ShearEffect(ShaderEffect handle);
+  DALI_INTERNAL ShearEffect(ShaderEffect handle);
 };
 
 } // namespace Toolkit

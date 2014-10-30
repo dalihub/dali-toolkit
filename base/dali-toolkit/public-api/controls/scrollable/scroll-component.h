@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -34,7 +34,7 @@ class ScrollConnector;
  * Base class for scroll component handles.
  * Scroll-components such as scroll bars, indicators etc. are connected to scrollable containers via ScrollConnector.
  */
-class ScrollComponent : public Control
+class DALI_IMPORT_API ScrollComponent : public Control
 {
 
 public:
@@ -89,13 +89,13 @@ public: // Not intended for application developers
    * Creates a handle using the implementation.
    * @param[in]  implementation The Control implementation.
    */
-  ScrollComponent( ScrollComponentImpl& implementation );
+  DALI_INTERNAL ScrollComponent( ScrollComponentImpl& implementation );
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  ScrollComponent( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL ScrollComponent( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

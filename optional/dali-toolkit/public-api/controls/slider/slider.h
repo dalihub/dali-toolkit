@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -33,9 +33,9 @@ class Slider;
 }
 
 /**
- * Slider is a control to enable sliding an indicator between two values
+ * @brief Slider is a control to enable sliding an indicator between two values
  */
-class Slider : public Control
+class DALI_IMPORT_API Slider : public Control
 {
 public:
 
@@ -139,13 +139,13 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  Slider(Internal::Slider& implementation);
+  DALI_INTERNAL Slider(Internal::Slider& implementation);
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  Slider( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL Slider( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

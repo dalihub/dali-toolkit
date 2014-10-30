@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -30,7 +30,7 @@ namespace Toolkit
 /**
  * @brief RippleEffect is a custom shader effect to achieve ripple effects on Image actors.
  */
-class RippleEffect : public ShaderEffect
+class DALI_IMPORT_API RippleEffect : public ShaderEffect
 {
 public:
 
@@ -100,7 +100,7 @@ public:
   const std::string& GetTimePropertyName() const;
 
 private:
-  RippleEffect(ShaderEffect handle);
+  DALI_INTERNAL RippleEffect(ShaderEffect handle);
 
 };
 

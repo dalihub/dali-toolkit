@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -30,7 +30,7 @@ namespace Toolkit
 /**
  * DistanceFieldEffect is a custom shader effect to achieve distance field on Image actors
  */
-class DistanceFieldEffect : public ShaderEffect
+class DALI_IMPORT_API DistanceFieldEffect : public ShaderEffect
 {
 public:
 
@@ -188,7 +188,7 @@ public:
   const std::string& GetGlowBoundaryPropertyName() const;
 
 private:
-  DistanceFieldEffect(ShaderEffect handle);
+  DALI_INTERNAL DistanceFieldEffect(ShaderEffect handle);
 
 };
 

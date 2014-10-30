@@ -28,7 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/enums.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Actor;
@@ -49,7 +49,7 @@ typedef IntrusivePtr<ClusterStyle> ClusterStylePtr; ///< Pointer to a Dali::Tool
 /**
  * @brief A ClusterStyle describes the constraints which are imposed on the child actors in the cluster.
  */
-class ClusterStyle : public Dali::BaseHandle
+class DALI_IMPORT_API ClusterStyle : public Dali::BaseHandle
 {
 public:
 
@@ -115,13 +115,13 @@ public: // Not intended for application developers
    *
    * @param [in] internal A pointer to a newly allocated Dali resource
    */
-  ClusterStyle(Internal::ClusterStyle* internal);
+  explicit DALI_INTERNAL ClusterStyle(Internal::ClusterStyle* internal);
 };
 
 /**
  * @brief A ClusterStyle describes the constraints, which are imposed on the child actors in the cluster.
  */
-class ClusterStyleStandard : public ClusterStyle
+class DALI_IMPORT_API ClusterStyleStandard : public ClusterStyle
 {
 public:
 
@@ -151,13 +151,13 @@ public: // Not intended for application developers
    *
    * @param [in] internal A pointer to a newly allocated Dali resource
    */
-  ClusterStyleStandard(Internal::ClusterStyle* internal);
+  explicit DALI_INTERNAL ClusterStyleStandard(Internal::ClusterStyle* internal);
 };
 
 /**
  * @brief A ClusterStyle describes the constraints, which are imposed on the child actors in the cluster.
  */
-class ClusterStyleRandom : public ClusterStyle
+class DALI_IMPORT_API ClusterStyleRandom : public ClusterStyle
 {
 public:
 
@@ -173,7 +173,7 @@ public: // Not intended for application developers
    *
    * @param [in] internal A pointer to a newly allocated Dali resource
    */
-  ClusterStyleRandom(Internal::ClusterStyle* internal);
+  explicit DALI_INTERNAL ClusterStyleRandom(Internal::ClusterStyle* internal);
 };
 
 } // namespace Toolkit

@@ -22,7 +22,7 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -88,7 +88,7 @@ class BloomView;
  *  Stage::GetCurrent().Remove(bloomView);\n
  *  bloomView.Deactivate();\n
  */
-class BloomView : public Control
+class DALI_IMPORT_API BloomView : public Control
 {
 public:
 
@@ -237,15 +237,13 @@ public:
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The UI Control implementation.
    */
-  BloomView( Internal::BloomView& implementation );
+  DALI_INTERNAL BloomView( Internal::BloomView& implementation );
 
   /**
    * Allows the creation of this UI Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  BloomView( Dali::Internal::CustomActor* internal );
-
-private:
+  explicit DALI_INTERNAL BloomView( Dali::Internal::CustomActor* internal );
 
 };
 

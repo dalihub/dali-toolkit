@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -35,7 +35,7 @@ namespace Toolkit
  * display the pages visually consistent with its turning state,
  * please set the uniforms with the same values as the PageTurnEffect.
  **/
-class PageTurnBookSpineEffect : public ShaderEffect
+class DALI_IMPORT_API PageTurnBookSpineEffect : public ShaderEffect
 {
 public:
   /**
@@ -93,7 +93,7 @@ public:
 
 
 private:// Helper for New()
-  PageTurnBookSpineEffect( ShaderEffect handle );
+  DALI_INTERNAL PageTurnBookSpineEffect( ShaderEffect handle );
 
 }; // End of PageTurnBookSpineEffect class
 

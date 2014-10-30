@@ -24,13 +24,13 @@
 
 #include <dali-toolkit/internal/builder/tree-node-manipulator.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
 {
 
-namespace Internal DALI_INTERNAL
+namespace Internal
 {
 
 /*

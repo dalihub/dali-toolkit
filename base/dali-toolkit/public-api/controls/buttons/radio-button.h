@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include "button.h"
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -53,7 +53,7 @@ class RadioButton;
  *
  * A Button::ClickedSignal() is emitted when the RadioButton change its state to \e active or \e inactive.
  */
-class RadioButton: public Button
+class DALI_IMPORT_API RadioButton: public Button
 {
  public:
 
@@ -169,14 +169,14 @@ class RadioButton: public Button
    *
    * @param[in]  implementation  The Control implementation.
    */
-  RadioButton(Internal::RadioButton& implementation);
+  DALI_INTERNAL RadioButton(Internal::RadioButton& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  RadioButton(Dali::Internal::CustomActor* internal);
+  DALI_INTERNAL RadioButton(Dali::Internal::CustomActor* internal);
 
 };
 

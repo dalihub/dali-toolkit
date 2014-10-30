@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -30,7 +30,7 @@ namespace Toolkit
 /**
  * SquareDissolveEffect is a custom shader effect to achieve square effects in Image actors
  */
-class SquareDissolveEffect : public ShaderEffect
+class DALI_IMPORT_API SquareDissolveEffect : public ShaderEffect
 {
 public:
 
@@ -106,7 +106,7 @@ public:
   const std::string& GetTexSizePropertyName() const;
 
 private: // Not intended for application developers
-  SquareDissolveEffect(ShaderEffect handle);
+  DALI_INTERNAL SquareDissolveEffect(ShaderEffect handle);
 };
 
 } // namespace Toolkit

@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -30,7 +30,7 @@ namespace Toolkit
 /**
  * @brief DissolveEffect is a custom shader effect to achieve Dissolve effects in Image actors.
  */
-class DissolveEffect : public ShaderEffect
+class DALI_IMPORT_API DissolveEffect : public ShaderEffect
 {
 public:
 
@@ -84,7 +84,7 @@ public:
   const std::string& GetDistortionPropertyName() const;
 
 private: // Not intended for application developers
-  DissolveEffect(ShaderEffect handle);
+  DALI_INTERNAL DissolveEffect(ShaderEffect handle);
 };
 
 } // namespace Toolkit

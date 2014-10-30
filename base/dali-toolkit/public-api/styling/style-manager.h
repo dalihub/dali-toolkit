@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -59,7 +59,7 @@ class StyleManager;
  * Internal::Control can be configured to register for the signals that are required from StyleManager,
  * such as theme change.
  */
-class StyleManager : public BaseHandle
+class DALI_IMPORT_API StyleManager : public BaseHandle
 {
 public:
 

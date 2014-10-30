@@ -28,7 +28,7 @@
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/images/image.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -47,7 +47,7 @@ class Control;
  * The implementation of the control must be supplied; see Internal::Control for more details.
  * @see Internal::Control
  */
-class Control : public CustomActor
+class DALI_IMPORT_API Control : public CustomActor
 {
 public:
 
@@ -380,7 +380,7 @@ public:
    */
   KeyEventSignalV2& KeyEventSignal();
 
-public: // Not intended for application developers
+public: // Intended for control developers (used implicitly)
 
   /**
    * @brief Create an initialised Control.
@@ -410,7 +410,7 @@ public: // Templates for Deriving Classes
    * @see DownCast(BaseHandle)
    */
   template<typename T, typename I>
-  static T DownCast( BaseHandle handle )
+  DALI_INTERNAL static T DownCast( BaseHandle handle )
   {
     T result;
 
@@ -438,7 +438,7 @@ public: // Templates for Deriving Classes
    * @param[in]  internal  Pointer to the Internal::CustomActor
    */
   template<typename I>
-  void VerifyCustomActorPointer(Dali::Internal::CustomActor* internal)
+  DALI_INTERNAL void VerifyCustomActorPointer(Dali::Internal::CustomActor* internal)
   {
     // Can have a NULL pointer so we only need to check if the internal implementation is our class
     // when there is a value.

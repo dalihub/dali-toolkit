@@ -22,7 +22,7 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/image-actor.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -45,7 +45,7 @@ class FocusManager;
  * focused actor and emits a signal when the focus is changed.
  */
 
-class FocusManager : public BaseHandle
+class DALI_IMPORT_API FocusManager : public BaseHandle
 {
 public:
   // Signal Names
@@ -403,7 +403,7 @@ public:
 
 private:
 
-  FocusManager(Internal::FocusManager *impl);
+  explicit DALI_INTERNAL FocusManager(Internal::FocusManager *impl);
 
 }; // class FocusManager
 

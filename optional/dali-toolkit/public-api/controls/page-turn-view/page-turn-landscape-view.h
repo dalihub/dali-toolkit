@@ -21,7 +21,7 @@
 //INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -36,7 +36,7 @@ class PageTurnLandscapeView;
 /**
  * PageTurnLandscapeView provides a page turn view in landscape mode
  */
-class PageTurnLandscapeView : public PageTurnView
+class DALI_IMPORT_API PageTurnLandscapeView : public PageTurnView
 {
 public:
   /**
@@ -84,15 +84,13 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  PageTurnLandscapeView( Internal::PageTurnLandscapeView& implementation );
+  DALI_INTERNAL PageTurnLandscapeView( Internal::PageTurnLandscapeView& implementation );
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  PageTurnLandscapeView( Dali::Internal::CustomActor* internal );
-
-
+  explicit DALI_INTERNAL PageTurnLandscapeView( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

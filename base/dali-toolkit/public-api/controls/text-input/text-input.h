@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -37,7 +37,7 @@ class TextInput;
  * Characters can be removed from the end of the string until it is empty. A maximum length of displayed string
  * can be set.
  */
-class TextInput : public Control
+class DALI_IMPORT_API TextInput : public Control
 {
 
 public:
@@ -633,14 +633,14 @@ public: // Not intended for application developers
    *
    * @param[in]  implementation  The Control implementation.
    */
-  TextInput(Internal::TextInput& implementation);
+  DALI_INTERNAL TextInput(Internal::TextInput& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  TextInput(Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL TextInput(Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

@@ -22,7 +22,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 struct Vector2;
@@ -55,7 +55,7 @@ typedef ScrollViewEffectContainer::const_iterator ScrollViewEffectConstIter; ///
  * constraints that are applied to ShaderEffects or Actors using these
  * properties as inputs.
  */
-class ScrollViewEffect : public Dali::BaseHandle
+class DALI_IMPORT_API ScrollViewEffect : public Dali::BaseHandle
 {
 
 public:
@@ -74,7 +74,7 @@ public: // Not intended for application developers
    *
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
-  ScrollViewEffect(Internal::ScrollViewEffect *impl);
+  explicit DALI_INTERNAL ScrollViewEffect(Internal::ScrollViewEffect *impl);
 
 };
 

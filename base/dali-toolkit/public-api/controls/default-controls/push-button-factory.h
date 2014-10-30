@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -40,7 +40,7 @@ namespace Toolkit
  * @param[in] dimmedBackgroundImagePath  Image path to be shown as button background when the button is dimmed.
  * @return A handle to the new push button
  */
-PushButton CreatePushButton( const std::string& releasedImagePath, const std::string& pressedImagePath, const std::string& backgroundImagePath,
+DALI_IMPORT_API PushButton CreatePushButton( const std::string& releasedImagePath, const std::string& pressedImagePath, const std::string& backgroundImagePath,
                              const std::string& dimmedReleasedImagePath, const std::string& dimmedBackgroundImagePath );
 
 /**
@@ -57,7 +57,7 @@ PushButton CreatePushButton( const std::string& releasedImagePath, const std::st
  * @param[in] dimmedBackgroundImageActor  Image to be shown as button background when the button is dimmed.
  * @return A handle to the new pushbutton
  */
-PushButton CreatePushButton( Actor releasedImageActor, Actor pressedImageActor, Actor backgroundImageActor,
+DALI_IMPORT_API PushButton CreatePushButton( Actor releasedImageActor, Actor pressedImageActor, Actor backgroundImageActor,
                              Actor dimmedReleasedImageActor, Actor dimmedBackgroundImageActor );
 
 /**
@@ -69,7 +69,7 @@ PushButton CreatePushButton( Actor releasedImageActor, Actor pressedImageActor, 
  * @param[in] backgroundImagePath  Image path to be shown as button background.
  * @return a handle to the new push button
  */
-PushButton CreatePushButton( const std::string& backgroundImagePath );
+DALI_IMPORT_API PushButton CreatePushButton( const std::string& backgroundImagePath );
 
 /**
  * @brief Creates a push button with the given background image.
@@ -80,7 +80,7 @@ PushButton CreatePushButton( const std::string& backgroundImagePath );
  * @param[in] backgroundImageActor  Image to be shown as button background.
  * @return a handle to the new push button
  */
-PushButton CreatePushButton( Actor backgroundImageActor );
+DALI_IMPORT_API PushButton CreatePushButton( Actor backgroundImageActor );
 
 } // namespace Toolkit
 

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -40,11 +40,10 @@ class KeyInputFocusManager;
  * the next control in the stack. If none of the controls in the stack consume the key event then
  * UnhandledKeyEventSignal() is emitted.
  */
-
- class KeyInputFocusManager : public BaseHandle
- {
- public:
-  //Signal Names
+class DALI_IMPORT_API KeyInputFocusManager : public BaseHandle
+{
+public:
+  // Signal Names
   static const char* const SIGNAL_KEY_INPUT_FOCUS_CHANGED;
   static const char* const SIGNAL_UNHANDLED_KEY_EVENT;
 
@@ -54,7 +53,7 @@ class KeyInputFocusManager;
   // Unhandled Key Event
   typedef SignalV2< void (const KeyEvent&) > UnhandledKeyEventSignalV2;
 
- public:
+public:
 
   /**
    * Create a KeyInputFocusManager handle; this can be initialised with KeyInputFocusManager::Get()
@@ -108,7 +107,7 @@ class KeyInputFocusManager;
    */
   bool IsKeyboardListener(Control control);
 
- public: // Signals
+public: // Signals
 
   /**
    * This signal is emitted when the key input focus control changes.
@@ -134,7 +133,7 @@ class KeyInputFocusManager;
 
 private:
 
-  KeyInputFocusManager(Internal::KeyInputFocusManager *impl);
+  explicit DALI_INTERNAL KeyInputFocusManager(Internal::KeyInputFocusManager *impl);
 
 }; // class KeyInputFocusManager
 

@@ -22,7 +22,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-component.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -30,7 +30,7 @@ namespace Toolkit
 
 // Forward declarations
 
-namespace Internal DALI_INTERNAL
+namespace Internal
 {
 // Forward declarations
 

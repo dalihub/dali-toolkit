@@ -38,7 +38,7 @@ typedef IntrusivePtr<ScrollComponentImpl> ScrollComponentPtr;
  * Base class for scroll component implementations.
  * Scroll-components such as scroll bars, indicators etc. are connected to scrollable containers via ScrollConnector.
  */
-class ScrollComponentImpl : public Internal::Control
+class DALI_IMPORT_API ScrollComponentImpl : public Internal::Control
 {
 public:
 
@@ -83,10 +83,10 @@ protected:
 private:
 
   // Undefined
-  ScrollComponentImpl(const ScrollComponentImpl&);
+  DALI_INTERNAL ScrollComponentImpl(const ScrollComponentImpl&);
 
   // Undefined
-  ScrollComponentImpl& operator=(const ScrollComponentImpl& rhs);
+  DALI_INTERNAL ScrollComponentImpl& operator=(const ScrollComponentImpl& rhs);
 
 protected:
 

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -36,7 +36,7 @@ class RotatingSelector;
  * RotatingSelector is a simple control to switch between two states (selected/unselected). A signal is emitted when the selector switches between
  * the two states. The control has two faces one behind the other, The control is rotated while switching between the two states
  */
-class RotatingSelector : public Control
+class DALI_IMPORT_API RotatingSelector : public Control
 {
 public:
   //Signal Names
@@ -145,13 +145,13 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  RotatingSelector( Internal::RotatingSelector& implementation );
+  DALI_INTERNAL RotatingSelector( Internal::RotatingSelector& implementation );
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  RotatingSelector( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL RotatingSelector( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

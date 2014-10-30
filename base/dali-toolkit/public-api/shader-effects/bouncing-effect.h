@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -46,7 +46,7 @@ namespace Toolkit
  *                        1.f, AlphaFunctions::Bounce );
  *   animation.Play();
  */
-class BouncingEffect : public ShaderEffect
+class DALI_IMPORT_API BouncingEffect : public ShaderEffect
 {
 public:
 
@@ -88,7 +88,7 @@ public:
 
 
 private: // Not intended for application developers
-  BouncingEffect( ShaderEffect handle );
+  DALI_INTERNAL BouncingEffect( ShaderEffect handle );
 
 };
 

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include "button.h"
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -75,7 +75,7 @@ class PushButton;
  *
  * Is not mandatory set all images. A button could be defined only by setting its \e background image or by setting its \e background and \e pressed images.
  */
-class PushButton : public Button
+class DALI_IMPORT_API PushButton : public Button
 {
 public:
 
@@ -355,14 +355,14 @@ public: // Not intended for application developers
    *
    * @param[in]  implementation  The Control implementation.
    */
-  PushButton( Internal::PushButton& implementation );
+  DALI_INTERNAL PushButton( Internal::PushButton& implementation );
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  PushButton( Dali::Internal::CustomActor* internal );
+  DALI_INTERNAL PushButton( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

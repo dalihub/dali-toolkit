@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Actor;
@@ -54,7 +54,7 @@ class ScrollViewPageCubeEffect;
  * Automatic operation:
  * not implemented.
  */
-class ScrollViewPageCubeEffect : public ScrollViewEffect
+class DALI_IMPORT_API ScrollViewPageCubeEffect : public ScrollViewEffect
 {
 
 public:
@@ -93,7 +93,7 @@ protected:
    * This constructor is used by Dali New() methods.
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
-  ScrollViewPageCubeEffect( Internal::ScrollViewPageCubeEffect *impl );
+  explicit DALI_INTERNAL ScrollViewPageCubeEffect( Internal::ScrollViewPageCubeEffect *impl );
 
 };
 

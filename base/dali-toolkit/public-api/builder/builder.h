@@ -24,7 +24,7 @@
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -117,7 +117,7 @@ class Builder;
  *
  */
 
-class Builder : public BaseHandle
+class DALI_IMPORT_API Builder : public BaseHandle
  {
  public:
    /**
@@ -412,7 +412,7 @@ class Builder : public BaseHandle
   Signal& QuitSignal();
 
 private:
-  Builder(Internal::Builder *impl);
+  explicit DALI_INTERNAL Builder(Internal::Builder *impl);
 
 }; // class Builder
 

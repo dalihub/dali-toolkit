@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -30,7 +30,7 @@ namespace Toolkit
 /**
  * MirrorEffect is a custom shader effect to achieve square effects in Image actors
  */
-class MirrorEffect : public ShaderEffect
+class DALI_IMPORT_API MirrorEffect : public ShaderEffect
 {
 public:
 
@@ -80,7 +80,7 @@ public:
   const std::string& GetAlphaPropertyName() const;
 
 private: // Not intended for application developers
-  MirrorEffect(ShaderEffect handle);
+  DALI_INTERNAL MirrorEffect(ShaderEffect handle);
 };
 
 } // namespace Toolkit

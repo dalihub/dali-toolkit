@@ -25,7 +25,7 @@
 #include <dali-toolkit/public-api/enums.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -146,21 +146,21 @@ public:
   /**
    * @brief Virtual destructor.
    */
-  virtual ~ItemLayout();
+  DALI_IMPORT_API virtual ~ItemLayout();
 
   /**
    * @brief Set the orientation of the layout.
    *
    * @param[in] orientation The orientation of the layout.
    */
-  void SetOrientation(ControlOrientation::Type orientation);
+  DALI_IMPORT_API void SetOrientation(ControlOrientation::Type orientation);
 
   /**
    * @brief Query the orientation of the layout.
    *
    * @return the orientation of the layout.
    */
-  ControlOrientation::Type GetOrientation() const;
+  DALI_IMPORT_API ControlOrientation::Type GetOrientation() const;
 
   /**
    * @brief Query the minimum valid layout position; this is a negative value.
@@ -216,7 +216,7 @@ public:
    * @param[in] layoutSize the current size of the item view instance
    * @return The layout position
    */
-  virtual float GetClosestOnScreenLayoutPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize);
+  DALI_IMPORT_API virtual float GetClosestOnScreenLayoutPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize);
 
   /**
    * @brief Query the number of items that should be reserved, for scrolling purposes.
@@ -323,7 +323,7 @@ public:
    *
    * @param[out] scrollHint Vector2 describing how x and y scroll values should be used for x-axis scrolling
    */
-  virtual void GetXAxisScrollHint(Vector2& scrollHint) const;
+  DALI_IMPORT_API virtual void GetXAxisScrollHint(Vector2& scrollHint) const;
 
   /**
    * @brief Tells scroll components how to interpolate our logical scroll position as a screen x/y direction.
@@ -339,7 +339,7 @@ public:
    *
    * @param[out] scrollHint Vector2 describing how x and y scroll values should be used for y-axis scrolling
    */
-  virtual void GetYAxisScrollHint(Vector2& scrollHint) const;
+  DALI_IMPORT_API virtual void GetYAxisScrollHint(Vector2& scrollHint) const;
 
   /**
    * @brief Query the scroll speed factor of the layout while dragging.
@@ -382,7 +382,7 @@ public:
    * @param[in] loopEnabled Whether the KeyboardFocusManager is set to wrap around between first and last item
    * @return The next item ID.
    */
-  virtual int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
+  DALI_IMPORT_API virtual int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
 
   /**
    * @brief Query the flick speed factor of the layout while swipping.
@@ -396,7 +396,7 @@ public:
    *
    * @return The scroll speed factor of the layout.
    */
-  virtual float GetFlickSpeedFactor() const;
+  DALI_IMPORT_API virtual float GetFlickSpeedFactor() const;
 
   /*
    * @brief Applies constraints defined by the layout to an actor.
@@ -407,7 +407,7 @@ public:
    * @param[in] scrollPositionObject The object which provides the layout position property.
    * @param[in] itemViewActor The item view instance which requests the application of constraints.
    */
-  virtual void ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, Constrainable scrollPositionObject, const Actor& itemViewActor );
+  DALI_IMPORT_API virtual void ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, Constrainable scrollPositionObject, const Actor& itemViewActor );
 
   /**
    * @brief Gets the position of a given item
@@ -417,28 +417,28 @@ public:
    * @param[in] layoutSize the current size of the item view instance
    * @return The item position (x,y,z)
    */
-  virtual Vector3 GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const;
+  DALI_IMPORT_API virtual Vector3 GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const;
 
   /**
    * @brief Set the alpha function used when applying constraints
    *
    * @param[in] func The alpha function to use.
    */
-  void SetAlphaFunction(AlphaFunction func);
+  DALI_IMPORT_API void SetAlphaFunction(AlphaFunction func);
 
   /**
    * @brief Retrieve the alpha function used when applying constraints
    *
    * @return The alpha function.
    */
-  AlphaFunction GetAlphaFunction() const;
+  DALI_IMPORT_API AlphaFunction GetAlphaFunction() const;
 
 protected:
 
   /**
    * @brief Create a new ItemLayout; Only derived versions are instantiatable.
    */
-  ItemLayout();
+  DALI_IMPORT_API ItemLayout();
 
 protected:
 
