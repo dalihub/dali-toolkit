@@ -18,6 +18,11 @@
 // CLASS HEADER
 #include "cube-transition-effect-impl.h"
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/images/image-attributes.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
+
 namespace Dali
 {
 

@@ -19,9 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-
-// INTERNAL INCLUDES
-#include <dali/dali.h>
+#include <dali/public-api/actors/renderable-actor.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
 
 namespace Dali DALI_IMPORT_API
 {

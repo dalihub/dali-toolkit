@@ -18,14 +18,19 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/animation/alpha-functions.h>
+#include <dali/public-api/animation/time-period.h>
+#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/object/base-handle.h>
+
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/enums.h>
 
 namespace Dali DALI_IMPORT_API
 {
 
-struct TimePeriod;
 class Actor;
 
 namespace Toolkit

@@ -18,9 +18,10 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/public-api/object/ref-object.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/animation.h>
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/selectors/rotating-selector.h>
 

@@ -20,9 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <dali/public-api/adaptor-framework/physical-keyboard.h>
+#include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 
 namespace Dali

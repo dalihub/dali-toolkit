@@ -18,14 +18,17 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/alpha-functions.h>
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/object/ref-object.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-slide-effect.h>
+#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
 
 namespace Dali
 {
@@ -39,8 +42,6 @@ class ScrollView;
 
 namespace Internal
 {
-
-class ScrollViewEffect;
 
 class ScrollSlideInfo;
 

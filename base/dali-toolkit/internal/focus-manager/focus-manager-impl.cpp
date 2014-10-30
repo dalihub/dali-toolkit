@@ -18,6 +18,14 @@
 // CLASS HEADER
 #include "focus-manager-impl.h"
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/adaptor-framework/accessibility-manager.h>
+#include <dali/public-api/adaptor-framework/sound-player.h>
+#include <dali/public-api/adaptor-framework/tts-player.h>
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/events/hit-test-algorithm.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>

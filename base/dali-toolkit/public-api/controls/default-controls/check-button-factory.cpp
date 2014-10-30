@@ -18,10 +18,10 @@
 #include "check-button-factory.h"
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/actors/image-actor.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
-#include <dali/dali.h>
 
 namespace Dali
 {

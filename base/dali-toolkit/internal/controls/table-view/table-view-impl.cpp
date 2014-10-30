@@ -20,7 +20,12 @@
 
 // EXTERNAL INCLUDES
 #include <sstream>
+#include <dali/public-api/adaptor-framework/physical-keyboard.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES

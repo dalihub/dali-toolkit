@@ -15,7 +15,11 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/public-api/shader-effects/page-turn-book-spine-effect.h>
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/stage.h>
 
 namespace Dali
 {

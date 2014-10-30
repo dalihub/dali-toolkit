@@ -20,7 +20,7 @@
 
 // EXTERNAL HEADERS
 #include <sstream>
-
+#include <dali/public-api/common/stage.h>
 
 namespace Dali
 {

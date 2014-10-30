@@ -24,7 +24,6 @@
 #include <sstream>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali/integration-api/debug.h>
 
 #include <dali-toolkit/public-api/controls/control.h>

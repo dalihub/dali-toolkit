@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 

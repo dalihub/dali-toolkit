@@ -16,15 +16,15 @@
  */
 
 // CLASS HEADER
-
 #include "push-button-impl.h"
 
 // EXTERNAL INCLUDES
-
 #include <algorithm>
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
-
 #include "push-button-default-painter-impl.h"
 
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>

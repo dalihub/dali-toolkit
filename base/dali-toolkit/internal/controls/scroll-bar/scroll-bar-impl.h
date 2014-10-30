@@ -18,6 +18,12 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/animation/animation.h>
+#include <dali/public-api/object/property-notification.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scroll-component-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-connector.h>

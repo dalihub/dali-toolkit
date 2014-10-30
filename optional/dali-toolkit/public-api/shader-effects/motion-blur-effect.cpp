@@ -15,7 +15,12 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/public-api/shader-effects/motion-blur-effect.h>
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/constraints.h>
+
 namespace Dali
 {
 

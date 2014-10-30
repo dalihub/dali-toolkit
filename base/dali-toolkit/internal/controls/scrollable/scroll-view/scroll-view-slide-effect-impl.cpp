@@ -16,8 +16,14 @@
  *
  */
 
-#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
+// CLASS HEADER
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-slide-effect-impl.h>
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/common/stage.h>
+
+// INTERNAL INCLUDES
 
 using namespace Dali;
 

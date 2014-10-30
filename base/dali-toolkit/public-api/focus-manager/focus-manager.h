@@ -18,8 +18,9 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/dali.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/actors/image-actor.h>
 
 namespace Dali DALI_IMPORT_API
 {

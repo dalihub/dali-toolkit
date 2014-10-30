@@ -18,7 +18,13 @@
  *
  */
 
-#include <dali/dali.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/animation/animation.h>
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/math/vector4.h>
+#include <dali/public-api/object/property-notification.h>
+#include <dali/public-api/object/ref-object.h>
 
 namespace Dali
 {

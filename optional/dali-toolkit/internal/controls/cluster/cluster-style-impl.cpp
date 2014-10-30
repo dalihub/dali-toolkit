@@ -15,9 +15,12 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/dali.h>
+// CLASS HEADER
 #include <dali-toolkit/internal/controls/cluster/cluster-style-impl.h>
+
+// EXTERNAL INCLUDES
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/cluster/cluster.h>
 
 namespace Dali

@@ -22,7 +22,6 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 
 namespace Dali DALI_IMPORT_API

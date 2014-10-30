@@ -18,9 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/orientation.h>
+#include <dali/public-api/adaptor-framework/style-change.h>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali DALI_IMPORT_API

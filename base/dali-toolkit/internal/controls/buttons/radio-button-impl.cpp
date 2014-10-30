@@ -17,8 +17,12 @@
 
 
 // CLASS HEADER
-
 #include "radio-button-impl.h"
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/text-actor.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/scripting/scripting.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit::Internal;

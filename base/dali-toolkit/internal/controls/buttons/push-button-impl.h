@@ -18,11 +18,12 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/common/dali-vector.h>
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
-
 #include "button-impl.h"
 
 namespace Dali

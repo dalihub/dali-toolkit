@@ -18,6 +18,12 @@
 // CLASS HEADER
 #include "effects-view-impl.h"
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
+
 // INTERNAL INCLUDES
 #include "../../filters/blur-two-pass-filter.h"
 #include "../../filters/emboss-filter.h"

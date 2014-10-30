@@ -19,8 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/dali.h>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/common/map-wrapper.h>
+#include <dali/public-api/images/frame-buffer-image.h>
+#include <dali/public-api/render-tasks/render-task.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>

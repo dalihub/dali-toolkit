@@ -15,15 +15,16 @@
  *
  */
 
-//CLASS HEADER
+// CLASS HEADER
 #include "bubble-emitter-impl.h"
 
-//EXTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <cmath>
+#include <dali/public-api/animation/animation.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
 
-//INTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/shader-effects/bubble-effect/color-adjuster.h>
-
 
 namespace Dali
 {

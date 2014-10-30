@@ -15,19 +15,27 @@
  *
  */
 
-#include <dali/dali.h>
-
+// CLASS HEADER
 #include <dali-toolkit/internal/controls/text-input/text-input-impl.h>
+
+// EXTERNAL INCLUDES
+#include <math.h>
+#include <sstream>
+#include <algorithm>
+#include <dali/public-api/adaptor-framework/virtual-keyboard.h>
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/events/key-event.h>
+#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/property-notification.h>
+#include <dali/integration-api/debug.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-view/text-processor.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
-
-#include <dali/integration-api/debug.h>
-
-#include <math.h>
-#include <sstream>
-#include <algorithm>
 
 using namespace std;
 using namespace Dali;

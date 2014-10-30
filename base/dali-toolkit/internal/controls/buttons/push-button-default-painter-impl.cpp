@@ -16,19 +16,18 @@
  */
 
 // CLASS HEADER
-
 #include "push-button-default-painter-impl.h"
 
-// INTERNAL INCLUDES
-
+// EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
-#include <dali-toolkit/public-api/controls/buttons/push-button.h>
+#include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/ref-object.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/buttons/push-button.h>
+#include <dali-toolkit/public-api/controls/text-view/text-view.h>
 #include "push-button-impl.h"
-
-// EXTERNAL INCLUDES
 
 namespace Dali
 {

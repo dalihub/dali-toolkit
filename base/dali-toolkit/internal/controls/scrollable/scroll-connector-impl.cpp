@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/object/property-index.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali

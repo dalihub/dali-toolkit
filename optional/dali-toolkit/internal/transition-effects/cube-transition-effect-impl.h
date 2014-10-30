@@ -19,9 +19,14 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/animation.h>
+#include <dali/public-api/images/bitmap-image.h>
+#include <dali/public-api/images/frame-buffer-image.h>
+#include <dali/public-api/object/base-object.h>
+#include <dali/public-api/render-tasks/render-task.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/transition-effects/cube-transition-effect.h>
 
 namespace Dali

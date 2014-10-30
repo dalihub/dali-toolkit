@@ -20,10 +20,13 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <list>
+#include <dali/public-api/adaptor-framework/style-monitor.h>
 #include <dali/public-api/common/map-wrapper.h>
+#include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/property-map.h>
+#include <dali/public-api/signals/connection-tracker.h>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/public-api/builder/builder.h>
 

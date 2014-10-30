@@ -20,6 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <sstream>
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
 
 // INTERNAL INCLUDES
 

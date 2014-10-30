@@ -15,9 +15,12 @@
  *
  */
 
-#include <algorithm>
-
+// CLASS HEADER
 #include <dali-toolkit/public-api/controls/scrollable/item-view/roll-layout.h>
+
+// EXTERNAL INCLUDES
+#include <algorithm>
+#include <dali/public-api/animation/animation.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;

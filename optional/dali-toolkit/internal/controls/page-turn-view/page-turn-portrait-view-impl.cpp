@@ -15,8 +15,12 @@
  *
  */
 
-//CLASS HEADER
+// CLASS HEADER
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-portrait-view-impl.h>
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/animation.h>
+#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {

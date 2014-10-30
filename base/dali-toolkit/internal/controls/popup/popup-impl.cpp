@@ -15,17 +15,26 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/internal/controls/popup/popup-impl.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/key.h>
+#include <dali/public-api/adaptor-framework/physical-keyboard.h>
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/events/key-event.h>
+#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/integration-api/debug.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/button.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-
 #include <dali-toolkit/internal/controls/relayout-helper.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
-
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
-#include <dali/integration-api/debug.h>
 
 using namespace Dali;
 using namespace std;

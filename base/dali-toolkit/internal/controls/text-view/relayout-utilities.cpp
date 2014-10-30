@@ -18,15 +18,16 @@
 // FILE HEADER
 #include <dali-toolkit/internal/controls/text-view/relayout-utilities.h>
 
+// EXTERNAL INCLUDES
+#include <cmath>
+#include <dali/public-api/text/text-actor-parameters.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-view/text-processor.h>
 #include <dali-toolkit/internal/controls/text-view/text-processor-bidirectional-info.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-word-processor.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-processor-helper-functions.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-processor-dbg.h>
-
-// EXTERNAL INCLUDES
-#include <cmath>
 
 namespace Dali
 {

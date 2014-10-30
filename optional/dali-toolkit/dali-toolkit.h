@@ -18,6 +18,10 @@
  *
  */
 
+#include <dali/dali.h>
+
+// Toolkit
+
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 #include <dali-toolkit/public-api/controls/buttons/button.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>

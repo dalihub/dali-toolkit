@@ -15,6 +15,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/object/type-registry.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
 #include <dali-toolkit/internal/controls/scroll-component/scroll-bar-internal-impl.h>

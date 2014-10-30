@@ -15,8 +15,14 @@
  *
  */
 
+// CLASS HEADER
 #include "relayout-helper.h"
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/actors/text-actor.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
 

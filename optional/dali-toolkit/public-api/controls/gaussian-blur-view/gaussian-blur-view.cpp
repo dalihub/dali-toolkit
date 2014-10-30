@@ -18,6 +18,8 @@
 // CLASS HEADER
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
 
+// EXTERNAL INCLUDES
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/gaussian-blur-view/gaussian-blur-view-impl.h>
 

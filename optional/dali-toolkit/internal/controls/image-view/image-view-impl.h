@@ -19,8 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/dali.h>
+#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/common/map-wrapper.h>
+#include <dali/public-api/images/image-attributes.h>
+#include <dali/public-api/object/property-notification.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>

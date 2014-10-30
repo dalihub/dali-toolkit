@@ -15,10 +15,17 @@
  *
  */
 
-#include <algorithm>
+// CLASS HEADER
 #include <dali-toolkit/internal/controls/selectors/rotating-selector-impl.h>
 
-#include "dali-toolkit/public-api/controls/selectors/rotating-selector.h"
+// EXTERNAL INCLUDES
+#include <algorithm>
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/object/type-registry.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/selectors/rotating-selector.h>
 
 using namespace std;
 

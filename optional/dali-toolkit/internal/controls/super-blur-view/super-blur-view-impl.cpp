@@ -15,9 +15,12 @@
  *
  */
 
-//EXTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <cmath>
-#include <integration-api/debug.h>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/scripting/scripting.h>
+#include <dali/integration-api/debug.h>
 
 // CLASS HEADER
 #include "super-blur-view-impl.h"

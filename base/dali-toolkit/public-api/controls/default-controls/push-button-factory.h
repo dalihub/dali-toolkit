@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 
 namespace Dali DALI_IMPORT_API

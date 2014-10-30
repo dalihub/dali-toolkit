@@ -20,8 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <string>
-#include <dali/dali.h>
+#include <dali/public-api/adaptor-framework/accessibility-action-handler.h>
+#include <dali/public-api/adaptor-framework/accessibility-gesture-handler.h>
 #include <dali/public-api/common/map-wrapper.h>
+#include <dali/public-api/object/base-object.h>
+#include <dali/integration-api/events/pan-gesture-event.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>

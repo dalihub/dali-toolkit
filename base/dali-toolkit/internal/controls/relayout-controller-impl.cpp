@@ -20,7 +20,10 @@
 #include "relayout-controller-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/common/stage.h>
 #include <dali/integration-api/debug.h>
+
 #if defined(DEBUG_ENABLED)
 #include <sstream>
 #endif // defined(DEBUG_ENABLED)

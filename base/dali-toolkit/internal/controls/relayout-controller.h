@@ -18,7 +18,8 @@
  *
  */
 
-#include <dali/dali.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/object/base-handle.h>
 
 namespace Dali
 {

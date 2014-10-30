@@ -18,10 +18,12 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/dali.h>
-#include <dali-toolkit/internal/controls/text-input/textview-character-positions-impl.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/geometry/mesh.h>
+#include <dali/public-api/modeling/material.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/text-input/textview-character-positions-impl.h>
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>
 
 namespace Dali

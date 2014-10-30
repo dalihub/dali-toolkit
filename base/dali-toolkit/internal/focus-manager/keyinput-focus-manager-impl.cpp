@@ -18,6 +18,10 @@
 // CLASS HEADER
 #include "keyinput-focus-manager-impl.h"
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/common/stage.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/integration-api/debug.h>
@@ -35,52 +39,48 @@ KeyInputFocusManager::KeyInputFocusManager()
 : mSlotDelegate( this )
 {
   Stage::GetCurrent().KeyEventSignal().Connect(mSlotDelegate, &KeyInputFocusManager::OnKeyEvent);
+  mObjectRegistry = Dali::Stage::GetCurrent().GetObjectRegistry();
+  mObjectRegistry.ObjectDestroyedSignal().Connect( this, &KeyInputFocusManager::OnObjectDestroyed );
 }
 
 KeyInputFocusManager::~KeyInputFocusManager()
 {
 }
 
-void KeyInputFocusManager::SetFocus(Toolkit::Control control)
+void KeyInputFocusManager::SetFocus( Toolkit::Control control )
 {
-  if(!control)
+  if( !control )
   {
-   //No-op
+    // No-op
     return;
   }
 
-  unsigned int actorID = control.GetId();
+  FocusStackIterator pos = FindFocusControlInStack( control );
 
-  ActorQueueIterator pos = std::find( mFocusActorsQueue.begin(), mFocusActorsQueue.end(), actorID);
-
-  if((!mFocusActorsQueue.empty()) && (pos == mFocusActorsQueue.begin()))
+  if( ( mFocusStack.Count() != 0 ) && ( pos == mFocusStack.End()-1 ) )
   {
-    //Actor allready in front, so No-op
+    // Control already in front, so No-op
     return;
   }
 
-  if(pos != mFocusActorsQueue.end())
+  if( pos != mFocusStack.End() )
   {
-    //A previously focused actor wants to regain focus
-    mFocusActorsQueue.erase(pos);
+    // A previously focused control wants to regain focus
+    mFocusStack.Erase( pos );
   }
   else
   {
-    control.OffStageSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnFocusActorStageDisconnection );
+    control.OffStageSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnFocusControlStageDisconnection );
   }
 
-  Dali::Toolkit::Control previousFocusControl;
-  if(!mFocusActorsQueue.empty())
+  Dali::Toolkit::Control previousFocusControl = GetCurrentFocusControl();
+  if( previousFocusControl )
   {
-    previousFocusControl = Dali::Toolkit::Control::DownCast(Stage::GetCurrent().GetRootLayer().FindChildById(mFocusActorsQueue.front()));
-    if(previousFocusControl)
-    {
-      // Notify the control that it has lost key input focus
-      previousFocusControl.GetImplementation().OnKeyInputFocusLost();
-    }
+    // Notify the control that it has lost key input focus
+    previousFocusControl.GetImplementation().OnKeyInputFocusLost();
   }
 
-  mFocusActorsQueue.push_front(actorID);
+  mFocusStack.PushBack( &control.GetBaseObject() );
 
   // Tell the new actor that it has gained focus.
   control.GetImplementation().OnKeyInputFocusGained();
@@ -92,72 +92,60 @@ void KeyInputFocusManager::SetFocus(Toolkit::Control control)
   }
 }
 
-Toolkit::Control KeyInputFocusManager::GetCurrentFocusControl() const
+void KeyInputFocusManager::RemoveFocus( Toolkit::Control control )
 {
-  Toolkit::Control currentFocusControl;
-
-  if(!mFocusActorsQueue.empty())
+  if( control )
   {
-    currentFocusControl = Dali::Toolkit::Control::DownCast(Stage::GetCurrent().GetRootLayer().FindChildById(mFocusActorsQueue.front()));
-  }
-
-  return currentFocusControl;
-}
-
-void KeyInputFocusManager::RemoveFocus(Toolkit::Control control)
-{
-  if(control)
-  {
-    unsigned int actorId = control.GetId();
-    ActorQueueIterator pos = std::find( mFocusActorsQueue.begin(), mFocusActorsQueue.end(), actorId);
-
-    if(pos != mFocusActorsQueue.end())
+    FocusStackIterator pos = FindFocusControlInStack( control );
+    if( pos != mFocusStack.End() )
     {
-      control.OffStageSignal().Disconnect( mSlotDelegate, &KeyInputFocusManager::OnFocusActorStageDisconnection );
+      control.OffStageSignal().Disconnect( mSlotDelegate, &KeyInputFocusManager::OnFocusControlStageDisconnection );
 
       // Notify the control that it has lost key input focus
       control.GetImplementation().OnKeyInputFocusLost();
 
-      if(pos == mFocusActorsQueue.begin())
+      // If this is the top-most actor, pop it and change focus to the previous control
+      if( pos == mFocusStack.End() - 1 )
       {
-        Actor previousFocusActor;
+        mFocusStack.Erase( pos );
 
-        mFocusActorsQueue.erase(pos);
-        if(!mFocusActorsQueue.empty())
+        Toolkit::Control previouslyFocusedControl = GetCurrentFocusControl();
+        if( previouslyFocusedControl )
         {
-          previousFocusActor = Stage::GetCurrent().GetRootLayer().FindChildById(mFocusActorsQueue.front());
-        }
-
-        Dali::Toolkit::Control previouscontrol = Dali::Toolkit::Control::DownCast(previousFocusActor);
-        if(previouscontrol)
-        {
-          // Tell the new actor that it has gained focus.
-          previouscontrol.GetImplementation().OnKeyInputFocusGained();
+          // Tell the control that it has gained focus.
+          previouslyFocusedControl.GetImplementation().OnKeyInputFocusGained();
         }
       }
       else
       {
-        //If the removed actor is not currently focused, then no need to emit signal.
-        mFocusActorsQueue.erase(pos);
+        // If the removed control is not currently focused, then no need to emit signal.
+        mFocusStack.Erase( pos );
       }
-
     }
   }
 }
 
-bool KeyInputFocusManager::IsKeyboardListener(Toolkit::Control control) const
+Toolkit::Control KeyInputFocusManager::GetCurrentFocusControl() const
+{
+  Toolkit::Control currentControl;
+
+  FocusStack::SizeType count = mFocusStack.Count();
+  if( count != 0 )
+  {
+    BaseObject* object = mFocusStack[ count - 1 ];
+    BaseHandle handle( object );
+    currentControl = Dali::Toolkit::Control::DownCast( handle );
+  }
+  return currentControl;
+}
+
+bool KeyInputFocusManager::IsKeyboardListener( Toolkit::Control control ) const
 {
   bool result = false;
 
-  if(!mFocusActorsQueue.empty())
+  if( FindFocusControlInStack( control ) != mFocusStack.End() )
   {
-    unsigned int actorId = control.GetId();
-    ActorQueueConstIterator pos = std::find(mFocusActorsQueue.begin(), mFocusActorsQueue.end(), actorId);
-
-    if(pos != mFocusActorsQueue.end())
-    {
-      result = true;
-    }
+    result = true;
   }
 
   return result;
@@ -173,27 +161,34 @@ Toolkit::KeyInputFocusManager::UnhandledKeyEventSignalV2& KeyInputFocusManager::
   return mUnhandledKeyEventSignalV2;
 }
 
-void KeyInputFocusManager::OnKeyEvent(const KeyEvent& event)
+KeyInputFocusManager::FocusStackIterator KeyInputFocusManager::FindFocusControlInStack( Toolkit::Control control ) const
+{
+  BaseObject* controlObject = &control.GetBaseObject();
+  return std::find( mFocusStack.Begin(), mFocusStack.End(), controlObject );
+}
+
+void KeyInputFocusManager::OnKeyEvent( const KeyEvent& event )
 {
   bool consumed = false;
 
-  ActorQueueIterator iter = mFocusActorsQueue.begin();
-
-  Layer rootLayer = Stage::GetCurrent().GetRootLayer();
-
-  while(!mFocusActorsQueue.empty() && !consumed && (iter != mFocusActorsQueue.end()))
+  if( mFocusStack.Count() > 0 )
   {
-    Actor actor = rootLayer.FindChildById(*iter);
-    Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
-    if(control)
+    FocusStack::SizeType index = mFocusStack.Count();
+    while( mFocusStack.Count() != 0 && !consumed && index > 0 )
     {
-      // Notify the control about the key event
-      consumed = control.GetImplementation().EmitKeyEventSignal(event);
+      --index;
+      BaseObject* object = mFocusStack[ index ];
+      BaseHandle handle( object );
+      Toolkit::Control control = Toolkit::Control::DownCast( object );
+      if( control )
+      {
+        // Notify the control about the key event
+        consumed = control.GetImplementation().EmitKeyEventSignal( event );
+      }
     }
-    iter++;
   }
 
-  if(!consumed)
+  if( !consumed )
   {
     // Emit signal to inform that a key event is not consumed.
     if( !mUnhandledKeyEventSignalV2.Empty() )
@@ -203,9 +198,21 @@ void KeyInputFocusManager::OnKeyEvent(const KeyEvent& event)
   }
 }
 
-void KeyInputFocusManager::OnFocusActorStageDisconnection( Dali::Actor actor )
+void KeyInputFocusManager::OnFocusControlStageDisconnection( Dali::Actor actor )
 {
-  RemoveFocus(Dali::Toolkit::Control::DownCast(actor));
+  RemoveFocus( Dali::Toolkit::Control::DownCast( actor ) );
+}
+
+void KeyInputFocusManager::OnObjectDestroyed( const Dali::RefObject* object )
+{
+  // The object is already destroyed. Don't create handles to it, or try sending
+  // signals to it. Remove it's pointer from the stack.
+  const BaseObject* baseObject = static_cast<const BaseObject*>( object );
+  FocusStackIterator pos = std::find( mFocusStack.Begin(), mFocusStack.End(), baseObject );
+  if( pos != mFocusStack.End() )
+  {
+    mFocusStack.Erase( pos );
+  }
 }
 
 bool KeyInputFocusManager::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )

@@ -17,6 +17,8 @@
 
 #include "toolkit-accessibility-manager.h"
 
+#include <dali/public-api/object/base-object.h>
+
 namespace Dali
 {
 

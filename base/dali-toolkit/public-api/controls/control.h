@@ -18,8 +18,15 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/dali.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/custom-actor.h>
+#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/events/long-press-gesture-detector.h>
+#include <dali/public-api/events/pan-gesture-detector.h>
+#include <dali/public-api/events/pinch-gesture-detector.h>
+#include <dali/public-api/events/tap-gesture-detector.h>
+#include <dali/public-api/events/tap-gesture-detector.h>
+#include <dali/public-api/images/image.h>
 
 namespace Dali DALI_IMPORT_API
 {

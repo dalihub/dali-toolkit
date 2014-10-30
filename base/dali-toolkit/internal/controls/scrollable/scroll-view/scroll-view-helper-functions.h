@@ -18,8 +18,8 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/dali.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/math/vector3.h>
 
 namespace Dali
 {

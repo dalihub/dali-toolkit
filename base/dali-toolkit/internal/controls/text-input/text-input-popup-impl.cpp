@@ -15,13 +15,15 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <libintl.h>
+#include <dali/public-api/animation/constraints.h>
 #include <dali/integration-api/debug.h>
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-input/text-input-popup-impl.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
-
-#include <libintl.h>
 
 using namespace std;
 using namespace Dali;

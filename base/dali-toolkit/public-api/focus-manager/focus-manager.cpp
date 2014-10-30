@@ -16,13 +16,12 @@
  */
 
 // CLASS HEADER
-
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/singleton-service.h>
 
 // INTERNAL INCLUDES
-
 #include <dali-toolkit/internal/focus-manager/focus-manager-impl.h>
 
 namespace Dali

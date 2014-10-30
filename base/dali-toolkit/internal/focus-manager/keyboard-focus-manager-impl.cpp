@@ -18,6 +18,15 @@
 // CLASS HEADER
 #include "keyboard-focus-manager-impl.h"
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/adaptor-framework/accessibility-manager.h>
+#include <dali/public-api/adaptor-framework/singleton-service.h>
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/events/key-event.h>
+#include <dali/public-api/object/type-registry.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>

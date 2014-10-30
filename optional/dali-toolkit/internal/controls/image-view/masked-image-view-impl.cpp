@@ -15,11 +15,15 @@
  *
  */
 
+// CLASS HEADER
+#include <dali-toolkit/internal/controls/image-view/masked-image-view-impl.h>
+
 // EXTERNAL INCLUDES
 #include <sstream>
-
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/image-view/masked-image-view-impl.h>
+#include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
 
 namespace Dali
 {

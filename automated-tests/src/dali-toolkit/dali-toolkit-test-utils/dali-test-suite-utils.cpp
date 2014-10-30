@@ -16,7 +16,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 #include <stdarg.h>
 
 #include "dali-test-suite-utils.h"
@@ -344,7 +344,6 @@ void ConstraintAppliedCheck::CheckSignalNotReceived()
     tet_result( TET_PASS );
   }
 }
-
 
 BitmapImage CreateBitmapImage(int width, int height, const Vector4& color)
 {

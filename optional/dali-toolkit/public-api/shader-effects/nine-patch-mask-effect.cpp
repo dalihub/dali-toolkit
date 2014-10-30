@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali-toolkit/public-api/shader-effects/nine-patch-mask-effect.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/shader-effects/shader-effect.h>
+
 namespace Dali
 {
 
