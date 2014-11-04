@@ -277,9 +277,10 @@ Toolkit::ScrollComponent Scrollable::NewScrollComponent(Toolkit::Scrollable& scr
       instance = static_cast<Toolkit::ScrollComponent>(Toolkit::ScrollBarInternal::New(scrollable, false));
       break;
     }
-    default:
+    case Toolkit::Scrollable::OvershootIndicator:
     {
-      DALI_ASSERT_ALWAYS(true && "Unrecognized component type");
+      DALI_ASSERT_ALWAYS(!"Unrecognized component type");
+      break;
     }
   }
 

@@ -7,7 +7,6 @@ SET(CAPI_LIB "dali-toolkit-unmanaged")
 
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
- utc-Dali-AlbumLayout.cpp
  utc-Dali-BendyEffect.cpp
  utc-Dali-BlindEffect.cpp
  utc-Dali-BloomView.cpp

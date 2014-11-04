@@ -84,7 +84,6 @@
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-component.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-component-impl.h>
-#include <dali-toolkit/public-api/controls/scrollable/item-view/album-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/depth-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/navigation-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/roll-layout.h>

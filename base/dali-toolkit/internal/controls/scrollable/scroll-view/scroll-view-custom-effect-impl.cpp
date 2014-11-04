@@ -88,16 +88,23 @@ public:
     mSwingAnchorAlphaFunctionIn(swingAnchorAlphaFunctionIn), mSwingAnchorAlphaFunctionOut(swingAnchorAlphaFunctionOut),
     mTranslateAlphaFunctionIn(translateAlphaFunctionIn), mTranslateAlphaFunctionOut(translateAlphaFunctionOut),
     mOpacityAlphaFunctionIn(opacityAlphaFunctionIn), mOpacityAlphaFunctionOut(opacityAlphaFunctionOut),
+    mWrap(false),
     mPanning(false),
     mScrolling(false),
     mWasOutsideView(true),
+    mIsStraightOnView(false),
+    mWasStraightOnView(false),
     mWrapped(false),
     mWasWrapped(false),
+    mCanChangeDirection(false),
     mSkipConstraints(false),
     mPassedCentreThisFrame(false),
     mForceDirectionUpdate(true),
+    mDirectionChanged(false),
     mDirectionFlags(0),
     mLastDirectionFlags(0),
+    mCurrentSwingAngle(0.f),
+    mCurrentOpacity(0.f),
     mCurrentOpacityAlphaFunction(NULL)
   {
   }

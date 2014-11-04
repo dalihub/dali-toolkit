@@ -155,7 +155,8 @@ ScrollBar::ScrollBar()
   mIsPanning(false),
   mCurrentScrollPosition(0.0f),
   mIndicatorHeightPolicy(Toolkit::ScrollBar::Variable),
-  mIndicatorFixedHeight(DEFAULT_INDICATOR_FIXED_HEIGHT)
+  mIndicatorFixedHeight(DEFAULT_INDICATOR_FIXED_HEIGHT),
+  mPropertyIndicatorPosition(Property::INVALID_INDEX)
 {
 }
 

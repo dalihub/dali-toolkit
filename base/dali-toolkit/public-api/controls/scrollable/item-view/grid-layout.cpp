@@ -311,6 +311,7 @@ struct GridLayout::Impl
     mTopMargin(DEFAULT_TOP_MARGIN),
     mBottomMargin(DEFAULT_BOTTOM_MARGIN),
     mSideMargin(DEFAULT_SIDE_MARGIN),
+    mZGap(0.f),
     mScrollSpeedFactor(DEFAULT_SCROLL_SPEED_FACTOR),
     mMaximumSwipeSpeed(DEFAULT_MAXIMUM_SWIPE_SPEED),
     mItemFlickAnimationDuration(DEFAULT_ITEM_FLICK_ANIMATION_DURATION),
