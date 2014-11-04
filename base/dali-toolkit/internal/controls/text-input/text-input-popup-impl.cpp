@@ -424,12 +424,6 @@ void TextInputPopup::CreateOrderedListOfOptions()
         currentButton = CreateRequiredButton( ButtonsClipboard, mClipboardOptionPriority, OPTION_CLIPBOARD, GET_LOCALE_TEXT("IDS_COM_BODY_CLIPBOARD"), clipboardIcon, false );
         break;
       }
-      case ButtonsEnumEnd:
-      {
-        DALI_ASSERT_DEBUG( "ButtonsEnumEnd used but an invalid choice");
-        currentButton.orderOfPriority = 0;
-        break;
-      }
     }
 
     bool match = false;

@@ -83,10 +83,16 @@ namespace Internal
 Decorator::Decorator( TextViewCharacterPositioning& textViewManager, TextInputTextStyle& textStyle ):
   mTextViewCharacterPositioning( textViewManager ),
   mTextStyle( textStyle ),
+  mSelectionHandleOnePosition(0),
+  mSelectionHandleTwoPosition(0),
+  mGrabHandlePosition(0),
   mCursorPosition( 0 ),
   mTextHighlight( textViewManager ),
   mCursorBlinkStatus( true ),
   mCursorVisibility( true ),
+  mCursorRTLEnabled( false ),
+  mIsGrabHandleInScrollArea( false ),
+  mIsCursorInScrollArea( false ),
   mGrabHandleEnabled( true )
 {
 }
@@ -238,17 +244,6 @@ Vector3 Decorator::PositionSelectionHandle( Actor selectionHandle, Vector3& actu
 
   selectionHandle.SetPosition( actualPosition += DEFAULT_HANDLE_OFFSET );
 
-  if( mTextViewCharacterPositioning.IsScrollEnabled() )
-  {
-    const Vector3 controlSize = mTextViewCharacterPositioning.GetTextView().GetCurrentSize();
-    const Size cursorSize( GetCursorSizeAt( position ) );
-    bool handleVisible = IsPositionWithinControl( actualPosition, Vector2(DEFAULT_HANDLE_OFFSET.width, DEFAULT_HANDLE_OFFSET.height), controlSize );
-
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextInputDecorationLayouter::PositionSelectionHandle controlSize[%f,%f] cursorSize[%f,%f] actualPos[%f,%f] visible[%s] \n",
-              controlSize.x, controlSize.y, cursorSize.x, cursorSize.y, actualPosition.x, actualPosition.y, ( handleVisible )?"true":"false" );
-
-    selectionHandle.SetVisible( handleVisible );
-  }
   return actualPosition;
 }
 
@@ -276,7 +271,7 @@ Vector3 Decorator::MoveSelectionHandle( Actor selectionHandle,
 {
   Vector3 actualHandlePosition;
   actualSelectionHandlePosition.x += displacement.x * selectionHandle.GetCurrentScale().x;
-  actualSelectionHandlePosition.y += displacement.y * selectionHandle.GetCurrentScale().y;;
+  actualSelectionHandlePosition.y += displacement.y * selectionHandle.GetCurrentScale().y;
 
   // Selection handles should jump to the nearest character
   std::size_t newHandlePosition = 0;
@@ -288,47 +283,6 @@ Vector3 Decorator::MoveSelectionHandle( Actor selectionHandle,
   actualHandlePosition = mTextViewCharacterPositioning.GetActualPositionFromCharacterPosition( newHandlePosition,direction, alternatePosition, alternatePositionValid  );
 
   bool handleVisible = true;
-
-  Vector2 min, max;
-  if( mTextViewCharacterPositioning.IsScrollEnabled() )
-  {
-    const Vector3 controlSize = mTextViewCharacterPositioning.GetTextView().GetCurrentSize();
-    const Size cursorSize( GetCursorSizeAt( newHandlePosition ) );
-
-    handleVisible = IsPositionWithinControl( actualHandlePosition,
-                                             cursorSize,
-                                             controlSize );
-
-    if( handleVisible )
-    {
-      StopScrollTimer();
-      mCurrentHandlePosition = actualHandlePosition;
-      mScrollDisplacement = Vector2::ZERO;
-    }
-    else
-    {
-
-      if( ( actualHandlePosition.x < SCROLL_THRESHOLD ) && ( displacement.x <= 0.f ) )
-      {
-        mScrollDisplacement.x = -SCROLL_SPEED;
-      }
-      else if( ( actualHandlePosition.x > controlSize.width - SCROLL_THRESHOLD ) && ( displacement.x >= 0.f ) )
-      {
-        mScrollDisplacement.x = SCROLL_SPEED;
-      }
-      if( ( actualHandlePosition.y < SCROLL_THRESHOLD ) && ( displacement.y <= 0.f ) )
-      {
-        mScrollDisplacement.y = -SCROLL_SPEED;
-      }
-      else if( ( actualHandlePosition.y > controlSize.height - SCROLL_THRESHOLD ) && ( displacement.y >= 0.f ) )
-      {
-        mScrollDisplacement.y = SCROLL_SPEED;
-      }
-      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextInputDecorationLayouter::MoveSelectionHandle Handle not visible scroll displacement [%f]\n", mScrollDisplacement.x);
-
-      StartScrollTimer();
-   }
-  }
 
   if ( handleVisible &&                                          // Ensure the handle is visible.
      ( newHandlePosition != currentSelectionHandlePosition ) &&  // Ensure the handle has moved.
@@ -381,46 +335,7 @@ void Decorator::MoveGrabHandle( const Vector2& displacement /*, std::size_t curr
 
   bool handleVisible = true;
 
-  if( mTextViewCharacterPositioning.IsScrollEnabled() )
-  {
-    const Vector3 controlSize = mTextViewCharacterPositioning.GetTextView().GetCurrentSize();
-    const Size cursorSize( GetCursorSizeAt( newHandlePosition ) );
-    // Scrolls the text if the handle is not in a visible position
-    handleVisible = IsPositionWithinControl( actualHandlePosition,
-                                                cursorSize,
-                                                controlSize );
-
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextInputDecorationLayouter::MoveGrabHandle handleVisible[%s]\n", ( handleVisible )?"true":"false");
-
-    if( handleVisible )
-    {
-      StopScrollTimer();
-      mCurrentHandlePosition = actualHandlePosition;
-      mScrollDisplacement = Vector2::ZERO;
-    }
-    else
-    {
-      if( ( actualHandlePosition.x < SCROLL_THRESHOLD ) && ( displacement.x <= 0.f ) )
-      {
-        mScrollDisplacement.x = -SCROLL_SPEED;
-      }
-      else if( ( actualHandlePosition.x > controlSize.width - SCROLL_THRESHOLD ) && ( displacement.x >= 0.f ) )
-      {
-        mScrollDisplacement.x = SCROLL_SPEED;
-      }
-      if( ( actualHandlePosition.y < SCROLL_THRESHOLD ) && ( displacement.y <= 0.f ) )
-      {
-        mScrollDisplacement.y = -SCROLL_SPEED;
-      }
-      else if( ( actualHandlePosition.y > controlSize.height - SCROLL_THRESHOLD ) && ( displacement.y >= 0.f ) )
-      {
-        mScrollDisplacement.y = SCROLL_SPEED;
-      }
-      StartScrollTimer();
-    }
-  }
-
-    if( ( newHandlePosition != mGrabHandlePosition ) &&                           // Only redraw cursor and do updates if position changed
+  if( ( newHandlePosition != mGrabHandlePosition ) &&                           // Only redraw cursor and do updates if position changed
         ( handleVisible ) )// and the new position is visible (if scroll is not enabled, it's always true).
     {
       mActualGrabHandlePosition = actualHandlePosition;
@@ -440,8 +355,6 @@ void Decorator::MoveGrabHandle( const Vector2& displacement /*, std::size_t curr
       if ( !mTextViewCharacterPositioning.IsStyledTextEmpty()  && ( cursorPosition > 0 ) )
       {
         DALI_ASSERT_DEBUG( ( 0 <= cursorPosition-1 ) && ( cursorPosition-1 < mTextViewCharacterPositioning.StyledTextSize() ) );
-        const TextStyle inputStyle = mTextViewCharacterPositioning.GetStyleAt( cursorPosition-1 );
-        mTextStyle.SetInputStyle( inputStyle );
       }
     }
 }
@@ -513,16 +426,9 @@ void Decorator::DrawCursor(const std::size_t nthChar)
 
   // Get height of cursor and set its size
   Size size( CURSOR_THICKNESS, 0.0f );
-  if ( !mTextViewCharacterPositioning.IsTextEmpty() )
-  {
-    Vector2 min, max; // out parameters for GetRowRectFromCharacterPosition
-    size.height = mTextViewCharacterPositioning.GetRowRectFromCharacterPosition( mTextViewCharacterPositioning.GetVisualPosition( cursorPosition ), min, max  ).height;
-  }
-  else
-  {
-    // Measure Font so know how big text will be if no initial text to measure.
-    size.height = mTextViewCharacterPositioning.GetLineHeight( nthChar );
-  }
+
+  Vector2 min, max; // out parameters for GetRowRectFromCharacterPosition
+  size.height = mTextViewCharacterPositioning.GetRowRectFromCharacterPosition( mTextViewCharacterPositioning.GetVisualPosition( cursorPosition ), min, max  ).height;
 
   mCursor.SetSize(size);
 
@@ -544,28 +450,7 @@ void Decorator::DrawCursor(const std::size_t nthChar)
 
     SetAltCursorEnabled( altPositionValid );
 
-    if(!altPositionValid)
-    {
-      mCursor.SetPosition( position + UI_OFFSET );
-    }
-    else
-    {
-      size.height *= 0.5f;
-      mCursor.SetSize(size);
-      mCursor.SetPosition( position + UI_OFFSET - Vector3(0.0f, directionRTL ? 0.0f : size.height, 0.0f) );
-      Vector2 min, max; // out parameters for GetRowRectFromCharacterPosition
-      Size rowSize = mTextViewCharacterPositioning.GetRowRectFromCharacterPosition( mTextViewCharacterPositioning.GetVisualPosition( cursorPosition ), min, max );
-      size.height = rowSize.height * 0.5f;
-      mCursorRTL.SetSize(size);
-      mCursorRTL.SetPosition( altPosition + UI_OFFSET - Vector3(0.0f, directionRTL ? size.height : 0.0f, 0.0f) );
-    }
-
-    if( mTextViewCharacterPositioning.IsScrollEnabled() )
-    {
-      // Whether cursor and grab handle are inside the boundaries of the text-input when text scroll is enabled.
-      const Vector3& controlSize = mTextViewCharacterPositioning.GetTextView().GetCurrentSize();
-      mIsCursorInScrollArea = mIsGrabHandleInScrollArea = IsPositionWithinControl( position, size, controlSize );
-    }
+    mCursor.SetPosition( position + UI_OFFSET );
   }
 }
 
@@ -943,10 +828,6 @@ void Decorator::ShowPopupCutCopyPaste()
 
 void Decorator::HidePopUp( bool animate, bool signalFinished )
 {
-  if ( ( mPopUpPanel.GetState() == TextInputPopupNew::StateShowing ) || ( mPopUpPanel.GetState() == TextInputPopupNew::StateShown )  )
-  {
-    mPopUpPanel.Hide( animate );
-  }
 }
 
 void Decorator::AddPopupOption(const std::string& name, const std::string& caption, const Image icon, bool finalOption)
@@ -1114,12 +995,6 @@ bool Decorator::OnScrollTimerTick()
       scrollPosition += scrollDelta;
       mTextViewCharacterPositioning.SetScrollPosition( scrollPosition );
 
-      // If scroll position goes too far TextView will trim it to fit.
-      if ( mTextViewCharacterPositioning.IsScrollPositionTrimmed() )
-      {
-        StopScrollTimer();
-      }
-
       mActualGrabHandlePosition = mTextViewCharacterPositioning.GetActualPositionFromCharacterPosition( newGrabHandlePosition ).GetVectorXY();
     }
   }
@@ -1143,11 +1018,6 @@ bool Decorator::OnScrollTimerTick()
       scrollPosition += scrollDelta;
       mTextViewCharacterPositioning.SetScrollPosition( scrollPosition );
 
-      if( mTextViewCharacterPositioning.IsScrollPositionTrimmed() )
-      {
-        StopScrollTimer();
-      }
-
       mSelectionHandleOnePosition = newHandleOnePosition;
       mSelectionHandleOneActualPosition = mTextViewCharacterPositioning.GetActualPositionFromCharacterPosition( mSelectionHandleOnePosition ).GetVectorXY();
     }
@@ -1168,11 +1038,6 @@ bool Decorator::OnScrollTimerTick()
       Vector2 scrollPosition = mTextViewCharacterPositioning.GetScrollPosition();
       scrollPosition += scrollDelta;
       mTextViewCharacterPositioning.SetScrollPosition( scrollPosition );
-
-      if( mTextViewCharacterPositioning.IsScrollPositionTrimmed() )
-      {
-        StopScrollTimer();
-      }
 
       mSelectionHandleTwoPosition = newHandleTwoPosition;
       mCurrentHandlePosition = mTextViewCharacterPositioning.GetActualPositionFromCharacterPosition( mSelectionHandleTwoPosition ).GetVectorXY();
