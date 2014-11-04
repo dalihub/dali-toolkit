@@ -322,15 +322,10 @@ float GetConditionArg0(const TreeNode &child)
   {
     f = IsFloat( IsChild(child, "min") );
   }
+
   DALI_ASSERT_ALWAYS(f && "Notification condition for arg0 not specified");
-  if(f)
-  {
-    return *f;
-  }
-  else
-  {
-    return 0.f;
-  }
+
+  return *f;
 }
 
 /**
@@ -344,15 +339,10 @@ float GetConditionArg1(const TreeNode &child)
   {
     f = IsFloat( IsChild(child, "max") );
   }
+
   DALI_ASSERT_ALWAYS(f && "Notification condition for arg1 not specified");
-  if(f)
-  {
-    return *f;
-  }
-  else
-  {
-    return 0.f;
-  }
+
+  return *f;
 }
 
 

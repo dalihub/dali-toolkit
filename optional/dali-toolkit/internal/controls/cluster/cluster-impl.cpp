@@ -141,7 +141,7 @@ void Cluster::AddChildInfoAt( ChildInfo childInfo, unsigned int index )
     Property::Index depthProperty = child.GetPropertyIndex(Toolkit::Cluster::CLUSTER_ACTOR_DEPTH);
     if(depthProperty == Property::INVALID_INDEX)
     {
-      depthProperty = child.RegisterProperty(Toolkit::Cluster::CLUSTER_ACTOR_DEPTH, depth);
+      child.RegisterProperty(Toolkit::Cluster::CLUSTER_ACTOR_DEPTH, depth);
     }
 
     // not added prior

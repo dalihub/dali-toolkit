@@ -155,6 +155,7 @@ Dali::Toolkit::Magnifier Magnifier::New()
 Magnifier::Magnifier()
 : Control( REQUIRES_TOUCH_EVENTS ),
   mPropertySourcePosition(Property::INVALID_INDEX),
+  mDefaultCameraDistance(1000.f),
   mActorSize(Vector3::ZERO),
   mMagnificationFactor(1.0f)
 {
