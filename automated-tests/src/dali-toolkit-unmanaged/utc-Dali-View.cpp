@@ -73,9 +73,9 @@ int UtcDaliViewNew(void)
   View view3 = view2;
   DALI_TEST_CHECK( view3 );
 
-  view1 = NULL;
-  view2 = NULL;
-  view3 = NULL;
+  view1.Reset();
+  view2.Reset();
+  view3.Reset();
 
   //Additional check to ensure object is created by checking if it's registered
   ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();

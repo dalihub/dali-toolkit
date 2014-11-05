@@ -76,7 +76,7 @@ int UtcDaliButtonNew(void)
 
   DALI_TEST_CHECK( pushButton2 );
 
-   pushButton2 = NULL;
+  pushButton2.Reset();
 
   // Test down cast
   Handle handleButton;
