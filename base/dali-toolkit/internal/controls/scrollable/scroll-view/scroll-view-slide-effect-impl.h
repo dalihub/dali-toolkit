@@ -186,9 +186,9 @@ private:
 
   ScrollSlideInfoPtr mScrollSlideInfo;                  ///< Info structure to keep track of common properties amongst many constraints.
   ActiveConstraint mInfoUpdateConstraint;               ///< Constraint applied to scroll-view to update Info structure.
-  Animation mAnimation;                                 ///< Animation Timer to drive the twist effect constraint.
+  Animation mAnimation;                                 ///< Animation Timer to drive the slide effect constraint.
   Animation mAnimationSnap;                             ///< Animation Snap (this animates from from 1.0 to 0.0 when contents snap)
-  Property::Index mPropertyTime;                        ///< Time property used by twist effect constraint to calculate timePassed.
+  Property::Index mPropertyTime;                        ///< Time property used by slide effect constraint to calculate timePassed.
   Property::Index mPropertyReference;                   ///< Reference point in scroll-contents, this point has no delay.
                                                         ///< The further out from this point, the further the delay.
   Property::Index mPropertyActive;                      ///< Property indicates the progress of the scrolling from 1.0f (scrolling) to 0.0f (fully snapped)

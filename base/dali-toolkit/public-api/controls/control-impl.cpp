@@ -749,7 +749,7 @@ void Control::SetBackground( Image image )
   {
     // Remove Current actor, unset AFTER removal so that we do not inform deriving classes
     Self().Remove( background.actor );
-    background.actor = NULL;
+    background.actor.Reset();
   }
 
   ImageActor imageActor = ImageActor::New( image );

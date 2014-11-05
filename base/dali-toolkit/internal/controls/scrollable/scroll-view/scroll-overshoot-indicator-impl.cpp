@@ -357,8 +357,7 @@ void ScrollOvershootEffectRipple::SetOvershoot(float amount, bool animate)
       {
         mScrollOvershootAnimation.FinishedSignal().Disconnect( this, &ScrollOvershootEffectRipple::OnOvershootAnimFinished );
         mScrollOvershootAnimation.Stop();
-        mScrollOvershootAnimation.Clear();
-        mScrollOvershootAnimation = NULL;
+        mScrollOvershootAnimation.Reset();
       }
       mScrollOvershootAnimation = Animation::New(duration);
       mScrollOvershootAnimation.FinishedSignal().Connect( this, &ScrollOvershootEffectRipple::OnOvershootAnimFinished );
@@ -391,8 +390,7 @@ void ScrollOvershootEffectRipple::OnOvershootAnimFinished(Animation& animation)
   }
   mScrollOvershootAnimation.FinishedSignal().Disconnect( this, &ScrollOvershootEffectRipple::OnOvershootAnimFinished );
   mScrollOvershootAnimation.Stop();
-  mScrollOvershootAnimation.Clear();
-  mScrollOvershootAnimation = NULL;
+  mScrollOvershootAnimation.Reset();
   mAnimationStateFlags = 0;
   if( animateOff )
   {
