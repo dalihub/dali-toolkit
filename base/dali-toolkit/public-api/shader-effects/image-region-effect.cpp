@@ -49,11 +49,11 @@ ImageRegionEffect::~ImageRegionEffect()
 ImageRegionEffect ImageRegionEffect::New()
 {
   std::string vertexShader(
-    "uniform vec2 uTopLeft;\n"
-    "uniform vec2 uBottomRight;\n"
+    "uniform mediump vec2 uTopLeft;\n"
+    "uniform mediump vec2 uBottomRight;\n"
     "void main()\n"
     "{\n"
-    "  vec4 position = vec4(aPosition,1.0);\n"
+    "  mediump vec4 position = vec4(aPosition,1.0);\n"
     "  gl_Position = uMvpMatrix * position;\n"
     // The line below is doing the same as the following commented lines:
     //"  vec2 imageSize = sTextureRect.zw - sTextureRect.xy;\n"
@@ -98,4 +98,3 @@ const std::string& ImageRegionEffect::GetBottomRightPropertyName() const
 } // namespace Toolkit
 
 } // namespace Dali
-

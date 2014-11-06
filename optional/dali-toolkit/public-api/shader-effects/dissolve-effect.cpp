@@ -90,13 +90,13 @@ DissolveEffect DissolveEffect::New( bool useHighPrecision )
   Dali::ShaderEffect shaderEffectCustom;
   if( useHighPrecision )
   {
-    shaderEffectCustom =  Dali::ShaderEffect::New( vertexShader, prefixHighPrecision + fragmentShader,
+    shaderEffectCustom =  Dali::ShaderEffect::New( prefixHighPrecision+vertexShader, prefixHighPrecision + fragmentShader,
                                                GeometryType( GEOMETRY_TYPE_IMAGE),
                                                ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_BLENDING ) );
   }
   else
   {
-    shaderEffectCustom =  Dali::ShaderEffect::New( vertexShader, prefixMediumPrecision + fragmentShader,
+    shaderEffectCustom =  Dali::ShaderEffect::New( prefixMediumPrecision+vertexShader, prefixMediumPrecision + fragmentShader,
                                                GeometryType( GEOMETRY_TYPE_IMAGE),
                                                ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_BLENDING ) );
   }

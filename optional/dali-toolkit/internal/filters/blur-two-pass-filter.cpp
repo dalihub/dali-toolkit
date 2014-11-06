@@ -60,6 +60,7 @@ const float ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 
 const char* BLUR_TWO_PASS_FRAGMENT_SOURCE =
 {
+ "precision highp float;\n"
  "uniform vec2 uSampleOffsets[NUM_SAMPLES];\n"
  "uniform float uSampleWeights[NUM_SAMPLES];\n"
  "void main()\n"

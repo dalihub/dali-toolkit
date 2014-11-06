@@ -42,6 +42,7 @@ const float ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 
 const char* const SPREAD_FRAGMENT_SOURCE =
 {
+ "precision highp float;\n"
  "uniform float uSpread;\n"
  "uniform vec2 uTexScale;\n"
  "void main()\n"

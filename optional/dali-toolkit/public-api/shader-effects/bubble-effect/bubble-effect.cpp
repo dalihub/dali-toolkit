@@ -57,6 +57,7 @@ BubbleEffect BubbleEffect::New( unsigned int numberOfBubble, const std::string& 
   std::ostringstream vertexShaderStringStream;
   vertexShaderStringStream << "#define NUMBER_OF_BUBBLE "<< numberOfBubble << "\n";
   std::string vertexShader(
+    "  precision mediump float;\n"
     // the gravity applied to the y direction
     "  uniform float uGravity; \n"
     // Width of the texture in pixels
@@ -127,6 +128,7 @@ BubbleEffect BubbleEffect::New( unsigned int numberOfBubble, const std::string& 
   vertexShaderStringStream << vertexShader;
 
   std::string fragmentShader(
+    "  precision mediump float;\n"
     "  varying float vPercentage;\n"
     "  varying vec2  vEffectTexCoord;\n"
     "\n"
@@ -140,14 +142,16 @@ BubbleEffect BubbleEffect::New( unsigned int numberOfBubble, const std::string& 
     "    gl_FragColor = fragColor;\n"
     "  }\n");
 
-  ShaderEffect shaderEffect = ShaderEffect::New( vertexShaderStringStream.str(), fragmentShader,
-                                                 GeometryType( GEOMETRY_TYPE_TEXTURED_MESH),
-                                                 ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ) );
+  ShaderEffect shaderEffect = ShaderEffect::New(
+    vertexShaderStringStream.str(),
+    fragmentShader,
+    GeometryType( GEOMETRY_TYPE_TEXTURED_MESH),
+    ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ) );
+
   BubbleEffect handle( shaderEffect );
 
   handle.mNumberOfBubbles = numberOfBubble;
   handle.SetMovementArea( Stage::GetCurrent().GetSize() );
-
 
   handle.SetUniform( "uGravity", 50.f );
   handle.SetUniform( "uMagnification", 1.f );

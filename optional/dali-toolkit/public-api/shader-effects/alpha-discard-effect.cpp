@@ -37,7 +37,7 @@ AlphaDiscardEffect AlphaDiscardEffect::New()
   const char* ALPHA_DISCARD_FRAGMENT_SHADER_SOURCE =
       "void main()                                                    \n"
       "{                                                              \n"
-      "  vec4 color = texture2D( sTexture, vTexCoord );               \n"
+      "  mediump vec4 color = texture2D( sTexture, vTexCoord );       \n"
       "  if(color.a <= 0.0001)                                        \n"
       "  {                                                            \n"
       "    discard;                                                   \n"
