@@ -28,7 +28,10 @@ namespace Internal
 {
 
 CubeTransitionWaveEffect::CubeTransitionWaveEffect( unsigned int numRows, unsigned int numColumns, Size viewAreaSize )
-: CubeTransitionEffect( numRows, numColumns, viewAreaSize)
+: CubeTransitionEffect( numRows, numColumns, viewAreaSize),
+  mSaddleAA( 1.f ),
+  mSaddleBB( 1.f ),
+  mSaddleB( 1.f )
 {
 }
 

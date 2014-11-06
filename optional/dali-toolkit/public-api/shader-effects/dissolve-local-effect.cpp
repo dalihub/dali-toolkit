@@ -36,12 +36,14 @@ namespace
 }
 
 DissolveLocalEffect::DissolveLocalEffect()
+: mNumberOfDimples( 1 )
 {
 }
 
 //Call the Parent copy constructor to add reference to the implementation for this object
 DissolveLocalEffect::DissolveLocalEffect( ShaderEffect handle )
-: ShaderEffect( handle )
+: ShaderEffect( handle ),
+  mNumberOfDimples( 1 )
 {
 }
 

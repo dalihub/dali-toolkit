@@ -253,7 +253,9 @@ bool CheckBoxButton::DoAction(BaseObject* object, const std::string& actionName,
 CheckBoxButton::CheckBoxButton()
 : Button(),
   mChecked( false ),
-  mClickActionPerforming(false)
+  mClickActionPerforming(false),
+  mUseFadeAnimationProperty(Property::INVALID_INDEX),
+  mUseCheckAnimationProperty(Property::INVALID_INDEX)
 {
   // Creates specific painter.
   mPainter = new CheckBoxButtonDefaultPainter();

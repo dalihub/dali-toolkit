@@ -129,6 +129,8 @@ struct CommonParametersConstraint
 }//namespace
 
 PageTurnEffect::PageTurnEffect()
+: mOriginalCenterPropertyIndex(Property::INVALID_INDEX),
+  mCurrentCenterPropertyIndex(Property::INVALID_INDEX)
 {
 }
 

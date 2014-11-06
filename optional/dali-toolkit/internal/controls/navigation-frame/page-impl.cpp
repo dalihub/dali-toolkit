@@ -48,7 +48,9 @@ TypeRegistration mType( typeid(Toolkit::Page), typeid(CustomActor), Create );
 Page::Page()
 : Control( CONTROL_BEHAVIOUR_NONE ),
   mTitle(""),
-  mSubTitle("")
+  mSubTitle(""),
+  mPropertyTitle(Property::INVALID_INDEX),
+  mPropertySubTitle(Property::INVALID_INDEX)
 {
 }
 

@@ -112,6 +112,7 @@ RotatingSelector::RotatingSelector()
 : Control( REQUIRES_TOUCH_EVENTS ),
   mSelected(false),
   mSelectable(true),
+  mPressed(false),
   mIsAnimating(false)
 {
 }

@@ -503,7 +503,7 @@ void FocusManager::SetFocusGroup(Actor actor, bool isFocusGroup)
     Property::Index propertyIsFocusGroup = actor.GetPropertyIndex(IS_FOCUS_GROUP);
     if(propertyIsFocusGroup == Property::INVALID_INDEX)
     {
-      propertyIsFocusGroup = actor.RegisterProperty(IS_FOCUS_GROUP, isFocusGroup);
+      actor.RegisterProperty(IS_FOCUS_GROUP, isFocusGroup);
     }
     else
     {
@@ -646,7 +646,7 @@ void FocusManager::SetFocusable(Actor actor, bool focusable)
     Property::Index propertyActorFocusable = actor.GetPropertyIndex(ACTOR_FOCUSABLE);
     if(propertyActorFocusable == Property::INVALID_INDEX)
     {
-      propertyActorFocusable = actor.RegisterProperty(ACTOR_FOCUSABLE, focusable);
+      actor.RegisterProperty(ACTOR_FOCUSABLE, focusable);
     }
     else
     {
