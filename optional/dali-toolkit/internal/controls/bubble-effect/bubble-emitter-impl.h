@@ -135,6 +135,11 @@ private:
   void OnRenderFinished(RenderTask& source);
 
   /**
+   * Callback function from Stage to tell us if the context has been regained.
+   */
+  void OnContextRegained();
+
+  /**
    * Generate the material object which is attached to the meshActor to describe its color, texture, texture mapping mode etc.
    */
   void GenMaterial();
@@ -207,6 +212,8 @@ private:
   unsigned int                mNumBubblePerShader;  ///< How many bubbles for each BubbleEffect shader.
   unsigned int                mNumShader;           ///< How many BubbleEffect shaders are used.
   unsigned int                mTotalNumOfBubble;    ///< mNumBubblePerShader*mNumShader.
+  bool                        mRenderTaskRunning;   ///< If the background render task is currently running
+
   Vector2                     mBubbleSizeRange;     ///< The bubble size range.
 
   std::vector<Mesh>           mMesh;                ///< The mesh vector, each mesh is used to create a meshActor which applies a BubbleEffect.
@@ -219,6 +226,8 @@ private:
 
   unsigned int                mCurrentUniform;      ///< Keep track of the uniform index for the newly emitted bubble
 
+  Vector3                     mHSVDelta;            ///< The HSV difference used to adjust the background image color.
+  Image                       mBackgroundImage;     ///< The original background image
   FrameBufferImage            mEffectImage;         ///< The image stores the adjusted color of the background image.The bubbles pick color from this image.
   CameraActor                 mCameraActor;         ///< The render task views the scene from the perspective of this actor.
 

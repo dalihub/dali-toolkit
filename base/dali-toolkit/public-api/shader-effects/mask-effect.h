@@ -22,7 +22,7 @@
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit

@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -67,7 +67,7 @@ class EffectsView;
  * // start effect processing
  * effectsView.Enable();
  */
-class EffectsView : public Control
+class DALI_IMPORT_API EffectsView : public Control
 {
 public:
 
@@ -213,13 +213,13 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  EffectsView( Internal::EffectsView& implementation );
+  DALI_INTERNAL EffectsView( Internal::EffectsView& implementation );
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  EffectsView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL EffectsView( Dali::Internal::CustomActor* internal );
 
 }; // class EffectsView
 

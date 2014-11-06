@@ -22,7 +22,7 @@
 
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -35,7 +35,7 @@ typedef IntrusivePtr<SpiralLayout> SpiralLayoutPtr;
 /**
  * An ItemView layout which arranges items in a spiral.
  */
-class SpiralLayout : public ItemLayout
+class DALI_IMPORT_API SpiralLayout : public ItemLayout
 {
 public:
 

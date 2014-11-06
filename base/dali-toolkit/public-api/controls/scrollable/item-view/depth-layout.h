@@ -22,7 +22,7 @@
 
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -35,7 +35,7 @@ typedef IntrusivePtr<DepthLayout> DepthLayoutPtr;
 /**
  * This layout arranges items in a grid, which scrolls along the Z-Axis.
  */
-class DepthLayout : public ItemLayout
+class DALI_IMPORT_API DepthLayout : public ItemLayout
 {
 public:
 

@@ -20,7 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/transition-effects/cube-transition-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -39,7 +39,7 @@ namespace Internal DALI_INTERNAL
  * SubClass of CubeTransitionEffect
  * Rotate the neighboring cubes in opposite directions to transite from one image to another
  */
-class CubeTransitionFoldEffect : public CubeTransitionEffect
+class DALI_IMPORT_API CubeTransitionFoldEffect : public CubeTransitionEffect
 {
 
 public:
@@ -60,7 +60,7 @@ public: // Not intended for developer use
    * This constructor is used by Dali New() methods.
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
-  CubeTransitionFoldEffect( Internal::CubeTransitionFoldEffect* impl );
+  explicit DALI_INTERNAL CubeTransitionFoldEffect( Internal::CubeTransitionFoldEffect* impl );
 
 }; // class CubeTransitionFoldEffect
 

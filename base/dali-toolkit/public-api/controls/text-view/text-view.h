@@ -25,7 +25,7 @@
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 #include <dali-toolkit/public-api/markup-processor/markup-processor.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -43,7 +43,7 @@ class TextView;
  *
  * See the \link text-view Text View \endlink page of the Programming Guide for more details and examples.
  */
-class TextView : public Control
+class DALI_IMPORT_API TextView : public Control
 {
 public:
 
@@ -637,7 +637,7 @@ public: // Not intended for application developers
    *
    * @param[in]  implementation  The Control implementation.
    */
-  TextView( Internal::TextView& implementation );
+  DALI_INTERNAL TextView( Internal::TextView& implementation );
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
@@ -645,7 +645,7 @@ public: // Not intended for application developers
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  TextView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL TextView( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

@@ -22,7 +22,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -31,7 +31,7 @@ namespace Toolkit
 /**
  * ColorAdjuster is a custom shader effect to adjust the image color in HSV space.
  */
-class ColorAdjuster : public ShaderEffect
+class DALI_IMPORT_API ColorAdjuster : public ShaderEffect
 {
 public:
 
@@ -62,8 +62,7 @@ public:
 
 private: // Not intended for application developers
 
-ColorAdjuster( ShaderEffect handle );
-
+  DALI_INTERNAL ColorAdjuster( ShaderEffect handle );
 };
 
 } // namespace Toolkit

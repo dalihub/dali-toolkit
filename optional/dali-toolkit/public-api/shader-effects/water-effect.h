@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -54,7 +54,7 @@ class WaterEffect;
  *   std::string propertyName = waterEffect.GetPropagationPropertyName( 1 );
  *   animation.AnimateTo( Property(waterEffect, propertyName), FINAL_RADIUS );
  */
-class WaterEffect : public ShaderEffect
+class DALI_IMPORT_API WaterEffect : public ShaderEffect
 {
 public:
 
@@ -158,7 +158,7 @@ public:
 
 public: // Not intended for developer use
 
-  WaterEffect( ShaderEffect handle, Internal::WaterEffect* shaderExtension );
+  DALI_INTERNAL WaterEffect( ShaderEffect handle, Internal::WaterEffect* shaderExtension );
 };
 
 } // namespace Toolkit

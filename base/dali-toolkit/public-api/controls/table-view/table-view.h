@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -41,7 +41,7 @@ class TableView;
  * z position and depth are left intact so that 3D model actors can also be laid out
  * in a grid without loosing their depth scaling.
  */
-class TableView : public Control
+class DALI_IMPORT_API TableView : public Control
 {
 public:
 
@@ -361,13 +361,13 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  TableView(Internal::TableView& implementation);
+  DALI_INTERNAL TableView(Internal::TableView& implementation);
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  TableView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL TableView( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

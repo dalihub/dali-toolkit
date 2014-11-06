@@ -29,13 +29,13 @@
 
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
 {
 
-namespace Internal DALI_INTERNAL
+namespace Internal
 {
 
 /*

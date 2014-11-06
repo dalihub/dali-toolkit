@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -57,7 +57,7 @@ class Button;
  * based on the distance imageView is from mCamera an appropriate, different
  * image will be loaded and dispayed.
  */
-class ImageView : public Control
+class DALI_IMPORT_API ImageView : public Control
 {
 public:
 
@@ -185,13 +185,13 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  ImageView(Internal::ImageView& implementation);
+  DALI_INTERNAL ImageView(Internal::ImageView& implementation);
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  ImageView(Dali::Internal::CustomActor* internal);
+  explicit DALI_INTERNAL ImageView(Dali::Internal::CustomActor* internal);
 };
 
 } // namespace Toolkit

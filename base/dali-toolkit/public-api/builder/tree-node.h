@@ -25,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -44,7 +44,7 @@ class TreeNodeManipulator;
  * TreeNode does not own its string data which is held by a container eg JsonParser
  * Modification operations should be done through a container.
  */
-class TreeNode
+class DALI_IMPORT_API TreeNode
 {
 public:
   /*
@@ -208,11 +208,11 @@ private:
   /*
    * Constructor
    */
-  TreeNode();
+  DALI_INTERNAL TreeNode();
 
   // non copyable or assignable
-  TreeNode(TreeNode &);
-  TreeNode& operator=(const TreeNode&);
+  DALI_INTERNAL TreeNode(TreeNode &);
+  DALI_INTERNAL TreeNode& operator=(const TreeNode&);
 
   const char* mName;                   ///< The nodes name (if any)
 

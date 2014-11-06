@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 namespace Toolkit
 {
@@ -32,7 +32,7 @@ typedef IntrusivePtr<NavigationLayout> NavigationLayoutPtr;
 /**
  * An ItemView layout which arranges items in navigation mode.
  */
-class NavigationLayout: public ItemLayout
+class DALI_IMPORT_API NavigationLayout: public ItemLayout
 {
 public:
 

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -40,7 +40,7 @@ class ScrollViewWobbleEffect;
  * Using this effect, a %wobble% property is produced which swings
  * towards the origin in accordance to how the user pans the ScrollView.
  */
-class ScrollViewWobbleEffect : public ScrollViewEffect
+class DALI_IMPORT_API ScrollViewWobbleEffect : public ScrollViewEffect
 {
 public:
 
@@ -67,7 +67,7 @@ protected:
    * This constructor is used by Dali New() methods.
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
-  ScrollViewWobbleEffect(Internal::ScrollViewWobbleEffect *impl);
+  explicit DALI_INTERNAL ScrollViewWobbleEffect(Internal::ScrollViewWobbleEffect *impl);
 
 };
 

@@ -25,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -73,7 +73,7 @@ class View;
  * view.AddContentLayer( contentLayer );
  * \endcode
  */
-class View : public Control
+class DALI_IMPORT_API View : public Control
 {
 public:
   //Signal Names
@@ -200,15 +200,14 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  View( Internal::View& implementation );
+  DALI_INTERNAL View( Internal::View& implementation );
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  View( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL View( Dali::Internal::CustomActor* internal );
 };
-
 
 } // namespace Toolkit
 

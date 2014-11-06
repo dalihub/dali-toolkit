@@ -23,7 +23,7 @@
 #include <dali-toolkit/public-api/controls/navigation-frame/page.h>
 #include <dali-toolkit/public-api/controls/navigation-frame/navigation-bar-style.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -75,7 +75,7 @@ class NavigationControl;
  *                 +----------------------------------------+
  */
 
-class NavigationControl : public Control
+class DALI_IMPORT_API NavigationControl : public Control
 {
 
 public:
@@ -229,13 +229,13 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  NavigationControl( Internal::NavigationControl& implementation );
+  DALI_INTERNAL NavigationControl( Internal::NavigationControl& implementation );
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  NavigationControl( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL NavigationControl( Dali::Internal::CustomActor* internal );
 
 }; // class NavigationControl
 

@@ -23,7 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -52,7 +52,7 @@ class SuperBlurView;
  *  blurAnimation.AnimateTo( Property( blurView, blurView.GetBlurStrengthPropertyIndex() ), ... );\n
  *  blurAnimation.Play();\n
  */
-class SuperBlurView : public Control
+class DALI_IMPORT_API SuperBlurView : public Control
 {
 public:
 
@@ -171,8 +171,7 @@ public: // Not intended for application developers
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  DALI_INTERNAL SuperBlurView(Dali::Internal::CustomActor* internal);
-
+  explicit DALI_INTERNAL SuperBlurView(Dali::Internal::CustomActor* internal);
 };
 
 } // namespace Toolkit

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -38,7 +38,7 @@ namespace Toolkit
  * @param[in] dimmedBackgroundImagePath Image path to be shown as button dimmed background.
  * @param[in] dimmedCheckedImagePath Image path to be shown as dimmed checked button.
  */
-CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& checkedImagePath, const std::string& dimmedBackgroundImagePath, const std::string& dimmedCheckedImagePath );
+DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& checkedImagePath, const std::string& dimmedBackgroundImagePath, const std::string& dimmedCheckedImagePath );
 
 /**
  * Creates a check box button with the given images.
@@ -51,7 +51,7 @@ CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, con
  * @param[in] dimmedBackgroundImageActor Image to be shown as button dimmed background.
  * @param[in] dimmedCheckedImagActor Image to be shown as dimmed checked button.
  */
-CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedImageActor, Actor dimmedBackgroundImageActor, Actor dimmedCheckedImagActor );
+DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedImageActor, Actor dimmedBackgroundImageActor, Actor dimmedCheckedImagActor );
 
 /**
  * Creates a check box button with the given background and checked images.
@@ -61,7 +61,7 @@ CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedIm
  * @param[in] backgroundImagePath  Image path to be shown as button background.
  * @param[in] checkedImagePath  Image path to be shown as checked button.
  */
-CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& checkedImagePath );
+DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& checkedImagePath );
 
 /**
  * Creates a check box button with the given background and checked images.
@@ -71,7 +71,8 @@ CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, con
  * @param[in] backgroundImageActor  Image to be shown as button background.
  * @param[in] checkedImageActor  Image to be shown as checked button.
  */
-CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedImageActor );
+DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedImageActor );
+
 } // namespace Toolkit
 
 } // namespace Dali

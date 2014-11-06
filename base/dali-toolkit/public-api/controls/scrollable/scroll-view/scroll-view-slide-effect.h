@@ -23,7 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Actor;
@@ -41,7 +41,7 @@ class ScrollViewSlideEffect;
 /**
  * @brief ScrollView effect that uses slides for transitioning pages.
  */
-class ScrollViewSlideEffect : public ScrollViewEffect
+class DALI_IMPORT_API ScrollViewSlideEffect : public ScrollViewEffect
 {
 public:
   static const std::string EFFECT_TIME;        ///< Effect time property name
@@ -152,7 +152,7 @@ protected:
    *
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
-  ScrollViewSlideEffect(Internal::ScrollViewSlideEffect *impl);
+  explicit DALI_INTERNAL ScrollViewSlideEffect(Internal::ScrollViewSlideEffect *impl);
 
 };
 

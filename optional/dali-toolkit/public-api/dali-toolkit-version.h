@@ -18,14 +18,17 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-common.h>
+
 namespace Dali
 {
 namespace Toolkit
 {
-extern const unsigned int TOOLKIT_MAJOR_VERSION; ///< The major version number of the Toolkit.
-extern const unsigned int TOOLKIT_MINOR_VERSION; ///< The minor version number of the Toolkit.
-extern const unsigned int TOOLKIT_MICRO_VERSION; ///< The micro version number of the Toolkit.
-extern const char * const TOOLKIT_BUILD_DATE;    ///< The date/time the Toolkit library was built.
+DALI_IMPORT_API extern const unsigned int TOOLKIT_MAJOR_VERSION; ///< The major version number of the Toolkit.
+DALI_IMPORT_API extern const unsigned int TOOLKIT_MINOR_VERSION; ///< The minor version number of the Toolkit.
+DALI_IMPORT_API extern const unsigned int TOOLKIT_MICRO_VERSION; ///< The micro version number of the Toolkit.
+DALI_IMPORT_API extern const char * const TOOLKIT_BUILD_DATE;    ///< The date/time the Toolkit library was built.
 } // namespace Toolkit
 } // namespace Dali
 

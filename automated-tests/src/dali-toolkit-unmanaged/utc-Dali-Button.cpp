@@ -66,7 +66,7 @@ int UtcDaliButtonNew(void)
 
   CheckBoxButton checkBoxButton2( checkBoxButton );
   DALI_TEST_CHECK( checkBoxButton2 );
-  checkBoxButton2 = NULL;
+  checkBoxButton2.Reset();
 
 
   //Additional check to ensure object is created by checking if it's registered

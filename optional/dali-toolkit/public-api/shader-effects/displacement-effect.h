@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -70,7 +70,7 @@ namespace Toolkit
  * animation.Play();\n
  *
  */
-class DisplacementEffect : public ShaderEffect
+class DALI_IMPORT_API DisplacementEffect : public ShaderEffect
 {
 
 public:
@@ -213,7 +213,7 @@ public:
 
 private:
   // Not intended for application developers
-  DisplacementEffect(ShaderEffect handle);
+  DALI_INTERNAL DisplacementEffect(ShaderEffect handle);
 };
 
 }

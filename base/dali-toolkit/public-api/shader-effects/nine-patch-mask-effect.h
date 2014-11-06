@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -52,7 +52,7 @@ namespace NinePatchMaskEffect
  * @param [in] actor The actor which needs the effect. To remove the effect call actor.RemoveShaderEffect().
  * @param [in] maskImage The path to a file containing the mask. The center pixels of the mask will be stretched.
  */
-void Apply( ImageActor actor, const std::string& maskImage );
+DALI_IMPORT_API void Apply( ImageActor actor, const std::string& maskImage );
 
 /**
  * @brief Apply the mask effect to an ImageActor.
@@ -62,7 +62,7 @@ void Apply( ImageActor actor, const std::string& maskImage );
  * @param [in] maskImage The path to a file containing the mask.
  * @param [in] maskBorder Specifies the part of the mask image that will be stretched (left, top, right, bottom).
  */
-void Apply( ImageActor actor, const std::string& maskImage, const Vector4& maskBorder );
+DALI_IMPORT_API void Apply( ImageActor actor, const std::string& maskImage, const Vector4& maskBorder );
 
 } // namespace NinePatchMaskEffect
 

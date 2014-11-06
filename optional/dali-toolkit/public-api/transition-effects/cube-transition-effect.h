@@ -22,7 +22,7 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/image-actor.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -74,7 +74,7 @@ class CubeTransitionEffect;
  *
  * @endcode
  */
-class CubeTransitionEffect : public BaseHandle
+class DALI_IMPORT_API CubeTransitionEffect : public BaseHandle
 {
 public:
 
@@ -192,7 +192,7 @@ public: //Signal
 
 public: // Not intended for developer use
 
-  CubeTransitionEffect( Internal::CubeTransitionEffect* impl );
+  explicit DALI_INTERNAL CubeTransitionEffect( Internal::CubeTransitionEffect* impl );
 
 }; //class CubeTransitionEffect
 

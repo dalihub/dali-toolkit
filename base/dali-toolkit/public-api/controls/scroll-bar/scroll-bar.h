@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scroll-component.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -44,7 +44,7 @@ class ScrollBar;
  * ScrollBar is a UI component that can be added to the scrollable controls
  * indicating the current scroll position of the scrollable content.
  */
-class ScrollBar : public ScrollComponent
+class DALI_IMPORT_API ScrollBar : public ScrollComponent
 {
 public:
 
@@ -232,13 +232,13 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  ScrollBar( Internal::ScrollBar& implementation );
+  DALI_INTERNAL ScrollBar( Internal::ScrollBar& implementation );
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  ScrollBar( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL ScrollBar( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

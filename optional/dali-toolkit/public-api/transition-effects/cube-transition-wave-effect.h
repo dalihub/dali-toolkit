@@ -20,7 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/transition-effects/cube-transition-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -39,7 +39,7 @@ namespace Internal DALI_INTERNAL
  * SubClass of CubeTransitionEffect
  * Rotate the cubes successively according to the finger movement to achieve wave-like transition effect
  */
-class CubeTransitionWaveEffect : public CubeTransitionEffect
+class DALI_IMPORT_API CubeTransitionWaveEffect : public CubeTransitionEffect
 {
 
 public:
@@ -60,7 +60,7 @@ public: // Not intended for developer use
    * This constructor is used by Dali New() methods.
    * @param[in] impl A pointer to a newly allocated Dali resource
    */
-  CubeTransitionWaveEffect( Internal::CubeTransitionWaveEffect* impl );
+  explicit DALI_INTERNAL CubeTransitionWaveEffect( Internal::CubeTransitionWaveEffect* impl );
 
 }; // class CubeTransitionWaveEffect
 

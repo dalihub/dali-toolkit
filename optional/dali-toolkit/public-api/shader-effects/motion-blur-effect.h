@@ -22,7 +22,7 @@
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -44,7 +44,7 @@ namespace Toolkit
  * Actor.SetShaderEffect( MotionBlurEffect );
  *
  */
-class MotionBlurEffect : public ShaderEffect
+class DALI_IMPORT_API MotionBlurEffect : public ShaderEffect
 {
 
 public:
@@ -206,7 +206,7 @@ public:
 
 private:
   // Not intended for application developers
-  MotionBlurEffect( ShaderEffect handle );
+  DALI_INTERNAL MotionBlurEffect( ShaderEffect handle );
 };
 
 }

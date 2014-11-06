@@ -22,7 +22,7 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -63,7 +63,7 @@ class Button;
  * A popup can use various custom transition effects, e.g.
  * Alpha fade, Scaling transition, position/rotation, shader effects.
  */
-class Popup : public Control
+class DALI_IMPORT_API Popup : public Control
 {
 
 public:
@@ -257,14 +257,14 @@ public: // Not intended for application developers
    *
    * @param[in]  implementation  The Control implementation.
    */
-  Popup(Internal::Popup& implementation);
+  DALI_INTERNAL Popup(Internal::Popup& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  Popup( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL Popup( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

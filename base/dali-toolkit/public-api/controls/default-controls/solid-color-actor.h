@@ -22,7 +22,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/actors/image-actor.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -39,8 +39,7 @@ namespace Toolkit
  * @param[in] borderSize The size for the ImageActor's border. By default, the value is set to 1 pixel. It supports under 10 pixel for clear result of gl blend
  * @return a handle to the new ImageActor
  */
-ImageActor CreateSolidColorActor( const Vector4& color, bool border = false, const Vector4& borderColor = Color::WHITE, const unsigned int borderSize = 1 );
-
+DALI_IMPORT_API ImageActor CreateSolidColorActor( const Vector4& color, bool border = false, const Vector4& borderColor = Color::WHITE, const unsigned int borderSize = 1 );
 
 } // namespace Toolkit
 

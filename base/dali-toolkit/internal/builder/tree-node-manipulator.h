@@ -27,13 +27,13 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali-toolkit/public-api/builder/tree-node.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
 {
 
-namespace Internal DALI_INTERNAL
+namespace Internal
 {
 typedef std::vector<char> VectorChar;
 typedef VectorChar::iterator VectorCharIter;

@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Actor;
@@ -42,7 +42,7 @@ class ScrollViewTwistEffect;
 /**
  * @brief ScrollView effect that twists pages onto screen when transitioning.
  */
-class ScrollViewTwistEffect : public ScrollViewEffect
+class DALI_IMPORT_API ScrollViewTwistEffect : public ScrollViewEffect
 {
 
 public:
@@ -172,7 +172,7 @@ protected:
    *
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
-  ScrollViewTwistEffect(Internal::ScrollViewTwistEffect *impl);
+  explicit DALI_INTERNAL ScrollViewTwistEffect(Internal::ScrollViewTwistEffect *impl);
 
 };
 

@@ -24,7 +24,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view-declarations.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -48,7 +48,7 @@ typedef IntrusivePtr<ItemLayout> ItemLayoutPtr;
  * Multiple ItemLayouts may be provided, to determine the logical position of each item a layout.
  * Actors are provided from an external ItemFactory, to display the currently visible items.
  */
-class ItemView : public Scrollable
+class DALI_IMPORT_API ItemView : public Scrollable
 {
 public:
 
@@ -407,14 +407,14 @@ public: // Not intended for application developers
    *
    * @param[in]  implementation  The Control implementation.
    */
-  ItemView(Internal::ItemView& implementation);
+  DALI_INTERNAL ItemView(Internal::ItemView& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  ItemView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL ItemView( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

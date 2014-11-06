@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -30,7 +30,7 @@ namespace Toolkit
 /**
  * @brief SwirlEffect is a custom shader effect to achieve swirl effects in Image actors.
  */
-class SwirlEffect : public ShaderEffect
+class DALI_IMPORT_API SwirlEffect : public ShaderEffect
 {
 public:
 
@@ -99,7 +99,7 @@ public:
   const std::string& GetRadiusPropertyName() const;
 
 private: // Not intended for application developers
-  SwirlEffect(ShaderEffect handle);
+  DALI_INTERNAL SwirlEffect(ShaderEffect handle);
 };
 
 } // namespace Toolkit

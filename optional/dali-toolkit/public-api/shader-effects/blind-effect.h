@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -30,7 +30,7 @@ namespace Toolkit
 /**
  * BlindEffect is a custom shader effect to achieve blind effects in Image actors
  */
-class BlindEffect : public ShaderEffect
+class DALI_IMPORT_API BlindEffect : public ShaderEffect
 {
 public:
 
@@ -68,7 +68,7 @@ public:
   const std::string& GetStepPropertyName() const;
 
 private: // Not intended for application developers
-  BlindEffect(ShaderEffect handle);
+  DALI_INTERNAL BlindEffect(ShaderEffect handle);
 };
 
 } // namespace Toolkit

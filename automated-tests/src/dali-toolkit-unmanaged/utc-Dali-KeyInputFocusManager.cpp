@@ -618,14 +618,16 @@ int UtcDaliKeyInputFocusManagerSignalKeyInputFocusChanged(void)
   DALI_TEST_CHECK( gainActor == pushButton1 );
   DALI_TEST_CHECK( lostActor == Control() );
 
-  gainActor = lostActor = NULL;
+  gainActor.Reset();
+  lostActor.Reset();
 
   manager.SetFocus(pushButton2);
 
   DALI_TEST_CHECK( gainActor == pushButton2 );
   DALI_TEST_CHECK( lostActor == pushButton1 );
 
-  gainActor = lostActor = NULL;
+  gainActor.Reset();
+  lostActor.Reset();
 
   // Removing the focus actor from the stage would also result in signal emission.
   stage.Remove( pushButton1 );

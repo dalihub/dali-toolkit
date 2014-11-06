@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -50,7 +50,7 @@ class MaskedImageView;
  * avoided by calling Pause() e.g. when the source & mask positions are not being modified. The Resume() method can then be called
  * to continue the masking operation when required.
  */
-class MaskedImageView : public Control
+class DALI_IMPORT_API MaskedImageView : public Control
 {
 public:
 
@@ -284,14 +284,14 @@ public: // Not intended for application developers
    *
    * @param[in]  implementation  The Control implementation.
    */
-  MaskedImageView(Internal::MaskedImageView& implementation);
+  DALI_INTERNAL MaskedImageView(Internal::MaskedImageView& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  MaskedImageView(Dali::Internal::CustomActor* internal);
+  explicit DALI_INTERNAL MaskedImageView(Dali::Internal::CustomActor* internal);
 };
 
 } // namespace Toolkit

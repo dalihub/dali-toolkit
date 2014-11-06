@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -49,7 +49,7 @@ namespace Toolkit
  * animation.Play();\n
  *
  */
-class SoftButtonEffect : public ShaderEffect
+class DALI_IMPORT_API SoftButtonEffect : public ShaderEffect
 {
 
 public:
@@ -167,7 +167,7 @@ public:
 
 private:
   // Not intended for application developers
-  SoftButtonEffect(ShaderEffect handle);
+  DALI_INTERNAL SoftButtonEffect(ShaderEffect handle);
 };
 
 }

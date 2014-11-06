@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -102,7 +102,7 @@ class ShadowView;
  *  shadowView.Deactivate();
  *  @endcode
  */
-class ShadowView : public Control
+class DALI_IMPORT_API ShadowView : public Control
 {
 public:
 
@@ -246,13 +246,13 @@ public:
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The UI Control implementation.
    */
-  ShadowView( Internal::ShadowView& implementation );
+  DALI_INTERNAL ShadowView( Internal::ShadowView& implementation );
 
   /**
    * Allows the creation of this UI Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  ShadowView( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL ShadowView( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -30,7 +30,7 @@ namespace Toolkit
 /**
  * @brief IrisEffect is a custom shader effect to achieve iris effects in Image actors
  */
-class IrisEffect : public ShaderEffect
+class DALI_IMPORT_API IrisEffect : public ShaderEffect
 {
 
 public:
@@ -110,7 +110,7 @@ public:
 
 
 private: // Not intended for application developers
-  IrisEffect(ShaderEffect handle);
+  DALI_INTERNAL IrisEffect(ShaderEffect handle);
 };
 
 }

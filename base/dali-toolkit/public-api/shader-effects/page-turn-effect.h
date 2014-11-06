@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -68,7 +68,7 @@ class PageTurnEffect;
  * animation[mAnimationIndex].Play(); \n
  */
 
-class PageTurnEffect : public ShaderEffect
+class DALI_IMPORT_API PageTurnEffect : public ShaderEffect
 {
 public:
   /**
@@ -162,7 +162,7 @@ public:
 
 public: // Not intended for application developers
 
-  PageTurnEffect( ShaderEffect handle, Internal::PageTurnEffect* shaderExtension );
+  DALI_INTERNAL PageTurnEffect( ShaderEffect handle, Internal::PageTurnEffect* shaderExtension );
 
 };  //end of PageTurnEffect class
 

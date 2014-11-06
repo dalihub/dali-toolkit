@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -30,7 +30,7 @@ namespace Toolkit
 /**
  * SpotEffect2D is a custom shader effect to achieve spot effects on Image actors
  */
-class SpotEffect : public ShaderEffect
+class DALI_IMPORT_API SpotEffect : public ShaderEffect
 {
 public:
 
@@ -78,8 +78,7 @@ public:
   const std::string& GetRadiusPropertyName() const;
 
 private:
-  SpotEffect(ShaderEffect handle);
-
+  DALI_INTERNAL SpotEffect(ShaderEffect handle);
 };
 
 } // namespace Toolkit

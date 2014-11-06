@@ -27,7 +27,7 @@
 #include <dali-toolkit/public-api/builder/tree-node.h>
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -41,7 +41,7 @@ class JsonParser;
 /*
  * Parses JSON
  */
-class JsonParser : public BaseHandle
+class DALI_IMPORT_API JsonParser : public BaseHandle
 {
 public:
 

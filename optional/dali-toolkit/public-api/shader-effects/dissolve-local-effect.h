@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -30,7 +30,7 @@ namespace Toolkit
 /**
  * DissolveLocalEffect is a custom shader effect to achieve Dissolve effects in multiple small areas of Image actors
  */
-class DissolveLocalEffect : public ShaderEffect
+class DALI_IMPORT_API DissolveLocalEffect : public ShaderEffect
 {
 public:
 
@@ -117,7 +117,7 @@ public:
 
 private: // Not intended for application developers
 
-  DissolveLocalEffect( ShaderEffect handle );
+  DALI_INTERNAL DissolveLocalEffect( ShaderEffect handle );
 
 private:
 

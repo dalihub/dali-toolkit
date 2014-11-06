@@ -22,7 +22,7 @@
 
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -35,7 +35,7 @@ typedef IntrusivePtr<RollLayout> RollLayoutPtr;
 /**
  * An ItemView layout which arranges items in a roll.
  */
-class RollLayout : public ItemLayout
+class DALI_IMPORT_API RollLayout : public ItemLayout
 {
 public:
 

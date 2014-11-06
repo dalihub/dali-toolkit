@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -67,7 +67,7 @@ struct ClampState3
  *
  * Scrollables such as ScrollView and ItemView can be derived from this class.
  */
-class Scrollable : public Control
+class DALI_IMPORT_API Scrollable : public Control
 {
 public:
 
@@ -226,14 +226,14 @@ public: // Not intended for application developers
    *
    * @param[in]  implementation  The Control implementation.
    */
-  Scrollable(Internal::Scrollable& implementation);
+  DALI_INTERNAL Scrollable(Internal::Scrollable& implementation);
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  Scrollable( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL Scrollable( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

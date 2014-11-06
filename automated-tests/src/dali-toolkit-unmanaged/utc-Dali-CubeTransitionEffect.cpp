@@ -121,7 +121,7 @@ int UtcDaliCubeTransitionWaveEffectNew(void)
 
   DALI_TEST_CHECK( waveEffect );
 
-  waveEffect = NULL;
+  waveEffect.Reset();
 
   //Additional check to ensure object is created by checking if it's registered
   ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
@@ -149,7 +149,7 @@ int UtcDaliCubeTransitionCrossEffectNew(void)
 
   DALI_TEST_CHECK( crossEffect );
 
-  crossEffect = NULL;
+  crossEffect.Reset();
 
   //Additional check to ensure object is created by checking if it's registered
   ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
@@ -177,7 +177,7 @@ int UtcDaliCubeTransitionFoldEffectNew(void)
 
   DALI_TEST_CHECK( foldEffect );
 
-  foldEffect = NULL;
+  foldEffect.Reset();
 
   //Additional check to ensure object is created by checking if it is registered
   ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();

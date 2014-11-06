@@ -23,7 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -41,7 +41,7 @@ class Magnifier;
  * to the stage as a separate overlay. In addition to the contents, an optional frame
  * is displayed around the magnified contents.
  */
-class Magnifier : public Control
+class DALI_IMPORT_API Magnifier : public Control
 {
 public:
 
@@ -143,7 +143,7 @@ public: // Not intended for application developers
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  DALI_INTERNAL Magnifier(Dali::Internal::CustomActor* internal);
+  explicit DALI_INTERNAL Magnifier(Dali::Internal::CustomActor* internal);
 };
 
 } // namespace Toolkit

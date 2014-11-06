@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -30,7 +30,7 @@ namespace Toolkit
 /**
  * BendyEffect is a custom shader effect to achieve bendy effects in Image actors
  */
-class BendyEffect : public ShaderEffect
+class DALI_IMPORT_API BendyEffect : public ShaderEffect
 {
 public:
 
@@ -93,7 +93,7 @@ public:
 
 
 private: // Not intended for application developers
-  BendyEffect(ShaderEffect handle);
+  DALI_INTERNAL BendyEffect(ShaderEffect handle);
 };
 
 } // namespace Toolkit

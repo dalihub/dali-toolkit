@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Actor;
@@ -61,7 +61,7 @@ class ScrollViewCarouselEffect;
  * Notes:
  * * Assumes Actor's AnchorPoint = AnchorPoint::CENTER
  */
-class ScrollViewCarouselEffect : public ScrollViewEffect
+class DALI_IMPORT_API ScrollViewCarouselEffect : public ScrollViewEffect
 {
 
 public:
@@ -104,7 +104,7 @@ protected:
    * This constructor is used by Dali New() methods.
    * @param [in] impl A pointer to a newly allocated Dali resource
    */
-  ScrollViewCarouselEffect(Internal::ScrollViewCarouselEffect *impl);
+  explicit DALI_INTERNAL ScrollViewCarouselEffect(Internal::ScrollViewCarouselEffect *impl);
 
 };
 

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -52,7 +52,7 @@ class PageTurnView;
  * Pan with no animation will occur when the user touches the page in an area that does not start the
  * page turning.
  */
-class PageTurnView : public Control
+class DALI_IMPORT_API PageTurnView : public Control
 {
 public:
 
@@ -208,7 +208,7 @@ public: // Not intended for application developers
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  DALI_INTERNAL PageTurnView(Dali::Internal::CustomActor* internal);
+  explicit DALI_INTERNAL PageTurnView(Dali::Internal::CustomActor* internal);
 };
 
 } // namespace Toolkit

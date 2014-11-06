@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -37,7 +37,7 @@ class ClusterStyle;
 /**
  * Cluster is a container of grouped actors positioned in different cluster styles.
  */
-class Cluster : public Control
+class DALI_IMPORT_API Cluster : public Control
 {
 public:
 
@@ -242,13 +242,13 @@ public: // Not intended for application developers
    * Creates a handle using the Toolkit::Internal implementation.
    * @param[in]  implementation  The Control implementation.
    */
-  Cluster( Internal::Cluster& implementation );
+  DALI_INTERNAL Cluster( Internal::Cluster& implementation );
 
   /**
    * Allows the creation of this Control from an Internal::CustomActor pointer.
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  Cluster( Dali::Internal::CustomActor* internal );
+  explicit DALI_INTERNAL Cluster( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

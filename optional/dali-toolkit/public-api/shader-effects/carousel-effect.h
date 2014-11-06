@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -40,7 +40,7 @@ namespace Toolkit
  * Finally, the carousel's center position can be specified as a Screen coordinate (top-left being
  * the origin).
  */
-class CarouselEffect : public ShaderEffect
+class DALI_IMPORT_API CarouselEffect : public ShaderEffect
 {
 public:
 
@@ -111,7 +111,7 @@ public:
 
 
 private: // Not intended for application developers
-  CarouselEffect(ShaderEffect handle);
+  DALI_INTERNAL CarouselEffect(ShaderEffect handle);
 };
 
 } // namespace Toolkit

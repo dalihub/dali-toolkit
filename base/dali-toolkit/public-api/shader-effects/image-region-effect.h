@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Toolkit
@@ -30,7 +30,7 @@ namespace Toolkit
 /**
  * @brief ImageRegionEffect is a custom shader effect to show only a region of an Image actor.
  */
-class ImageRegionEffect : public ShaderEffect
+class DALI_IMPORT_API ImageRegionEffect : public ShaderEffect
 {
 public:
 
@@ -87,7 +87,7 @@ public:
   const std::string& GetBottomRightPropertyName() const;
 
 private: // Not intended for application developers
-  ImageRegionEffect(ShaderEffect handle);
+  DALI_INTERNAL ImageRegionEffect(ShaderEffect handle);
 };
 
 } // namespace Toolkit
