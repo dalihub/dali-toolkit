@@ -37,7 +37,6 @@
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 
 using namespace Dali;
-using namespace std;
 
 namespace
 {

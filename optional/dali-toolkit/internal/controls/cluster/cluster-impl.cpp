@@ -27,7 +27,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/cluster/cluster-style.h>
 
-using namespace std;
 using namespace Dali;
 
 namespace // unnamed namespace

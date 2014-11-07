@@ -25,7 +25,6 @@
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 
-using namespace std;
 using namespace Dali;
 
 #define GET_LOCALE_TEXT(string) dgettext("sys_string", string)

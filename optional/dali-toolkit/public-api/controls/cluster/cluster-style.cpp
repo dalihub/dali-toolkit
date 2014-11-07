@@ -20,7 +20,6 @@
 
 using namespace Dali;
 using namespace Dali::Toolkit;
-using namespace std;
 
 namespace Dali
 {

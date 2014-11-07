@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <sstream>
-#include <dali/public-api/adaptor-framework/physical-keyboard.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/object/ref-object.h>
@@ -28,11 +27,7 @@
 #include <dali/public-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
-
 using namespace Dali;
-using namespace std;
 
 namespace
 {
@@ -119,7 +114,7 @@ void PrintArray( Array2d<Size>& array )
 }
 // debugging support, very useful when new features are added or bugs are hunted down
 // currently not called from code so compiler will optimize these away, kept here for future debugging
-void PrintVector( vector<float>& array )
+void PrintVector( std::vector<float>& array )
 {
   TV_LOG( "vector, size [%d]\n", array.size() );
   // print values
@@ -364,14 +359,14 @@ void TableView::InsertRow( unsigned int rowIndex )
 
 void TableView::DeleteRow( unsigned int rowIndex )
 {
-  vector< Actor > ignored;
+  std::vector< Actor > ignored;
   DeleteRow( rowIndex, ignored );
 }
 
-void TableView::DeleteRow( unsigned int rowIndex, vector<Actor>& removed )
+void TableView::DeleteRow( unsigned int rowIndex, std::vector<Actor>& removed )
 {
   RelayoutingLock lock( *this );
-  vector< CellData > lost;
+  std::vector< CellData > lost;
   mCellData.DeleteRow( rowIndex, lost );
   // need to update the cellinfos for the items that moved
   const unsigned int rowCount = mCellData.GetRows();
@@ -451,14 +446,14 @@ void TableView::InsertColumn( unsigned int columnIndex )
 
 void TableView::DeleteColumn( unsigned int columnIndex )
 {
-  vector< Actor > ignored;
+  std::vector< Actor > ignored;
   DeleteColumn( columnIndex, ignored );
 }
 
-void TableView::DeleteColumn( unsigned int columnIndex, vector<Actor>& removed )
+void TableView::DeleteColumn( unsigned int columnIndex, std::vector<Actor>& removed )
 {
   RelayoutingLock lock( *this );
-  vector< CellData > lost;
+  std::vector< CellData > lost;
   mCellData.DeleteColumn( columnIndex, lost );
   // need to update the cellinfos for the items that moved
   const unsigned int rowCount = mCellData.GetRows();
@@ -502,17 +497,17 @@ void TableView::DeleteColumn( unsigned int columnIndex, vector<Actor>& removed )
 
 void TableView::Resize( unsigned int rows, unsigned int columns )
 {
-  vector< Actor > ignored;
+  std::vector< Actor > ignored;
   Resize( rows, columns, ignored );
 }
 
-void TableView::Resize( unsigned int rows, unsigned int columns, vector<Actor>& removed )
+void TableView::Resize( unsigned int rows, unsigned int columns, std::vector<Actor>& removed )
 {
   RelayoutingLock lock( *this );
   unsigned int oldRows = GetRows();
   unsigned int oldColumns = GetColumns();
   // resize data array
-  vector< CellData > lost;
+  std::vector< CellData > lost;
   ResizeContainers( rows, columns, lost );
   // calculate if we lost rows or columns
   unsigned int rowsRemoved = 0;
@@ -975,11 +970,11 @@ void TableView::OnInitialize()
 
 void TableView::ResizeContainers( unsigned int rows, unsigned int columns )
 {
-  vector<CellData> ignored;
+  std::vector<CellData> ignored;
   ResizeContainers( rows, columns, ignored );
 }
 
-void TableView::ResizeContainers( unsigned int rows, unsigned int columns, vector<CellData>& removed )
+void TableView::ResizeContainers( unsigned int rows, unsigned int columns, std::vector<CellData>& removed )
 {
   mCellData.Resize( rows, columns, removed );
   // we dont care if these go smaller, data will be regenerated or is not needed anymore
@@ -990,11 +985,11 @@ void TableView::ResizeContainers( unsigned int rows, unsigned int columns, vecto
   mRelativeWidths.resize( columns );
 }
 
-void TableView::RemoveAndGetLostActors( const vector<CellData>& lost, vector<Actor>& removed,
+void TableView::RemoveAndGetLostActors( const std::vector<CellData>& lost, std::vector<Actor>& removed,
                                         unsigned int rowsRemoved, unsigned int columnsRemoved )
 {
   // iterate through all lost cells
-  vector< CellData >::const_iterator iter = lost.begin();
+  std::vector< CellData >::const_iterator iter = lost.begin();
   for( ; iter != lost.end(); ++iter )
   {
     // if it is a valid actor
@@ -1170,12 +1165,12 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
     {
       Property::Value& item = map.GetValue(i);
 
-      if( istringstream(map.GetKey(i)) >> rowIndex  // the key is a number
+      if( std::istringstream(map.GetKey(i)) >> rowIndex  // the key is a number
           && Property::MAP == item.GetType())
       {
         if( item.HasKey( "policy" ) && item.HasKey( "value" ) )
         {
-          Toolkit::TableView::LayoutPolicy policy = Scripting::GetEnumeration< Toolkit::TableView::LayoutPolicy >( item.GetValue("policy").Get<string>(), LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT );
+          Toolkit::TableView::LayoutPolicy policy = Scripting::GetEnumeration< Toolkit::TableView::LayoutPolicy >( item.GetValue("policy").Get<std::string>(), LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT );
           if( policy == Toolkit::TableView::Fixed )
           {
             (tableViewImpl.*funcFixed)( rowIndex, item.GetValue("value").Get<float>() );
@@ -1206,29 +1201,25 @@ Property::Value TableView::GetColumnWidthsPropertyValue()
 
 void TableView::GetMapPropertyValue( const std::vector<float>& fixedSize, const std::vector<float>& relativeSize, Property::Map& map )
 {
-  string fixedPolicy( Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::Fixed, LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT ) );
-  string relativePolicy( Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::Relative, LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT ) );
-  Property::StringValuePair fixedPolicyPair( "policy", fixedPolicy );
-  Property::StringValuePair relativePolicyPair( "policy", relativePolicy );
+  std::string fixedPolicy( Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::Fixed, LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT ) );
+  std::string relativePolicy( Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::Relative, LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT ) );
 
   size_t count = fixedSize.size();
   for( size_t index = 0; index < count; index++ )
   {
     if( ! EqualsZero( fixedSize[index] ) )
     {
-      Property::StringValuePair valuePair( "value", fixedSize[index] );
       Property::Map item;
-      item[ fixedPolicyPair.first ] = fixedPolicyPair.second;
-      item[ valuePair.first ] = valuePair.second;
+      item[ "policy" ] = fixedPolicy;
+      item[ "value" ] = fixedSize[index];
 
       map[ static_cast<std::ostringstream*>( &(std::ostringstream() << index ) )->str() ] = item;
     }
     else if( ! EqualsZero( relativeSize[index] ) )
     {
-      Property::StringValuePair valuePair( "value", relativeSize[index] );
       Property::Map item;
-      item[ relativePolicyPair.first ] = relativePolicyPair.second;
-      item[ valuePair.first ] = valuePair.second;
+      item[ "policy" ] = relativePolicy;
+      item[ "value" ] = relativeSize[index];
 
       map[ static_cast<std::ostringstream*>( &(std::ostringstream() << index ) )->str() ] = item;
     }

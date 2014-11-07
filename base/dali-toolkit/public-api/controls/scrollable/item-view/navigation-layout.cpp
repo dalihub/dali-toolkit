@@ -20,7 +20,6 @@
 #include <dali-toolkit/public-api/controls/scrollable/item-view/navigation-layout.h>
 using namespace Dali;
 using namespace Dali::Toolkit;
-using namespace std;
 
 namespace // unnamed namespace
 {

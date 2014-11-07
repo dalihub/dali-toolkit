@@ -28,7 +28,6 @@
 #include <sstream>
 
 using namespace Dali;
-using namespace std;
 
 namespace Dali
 {
@@ -384,7 +383,7 @@ void Slider::DisplayValue( float value, bool raiseSignals )
   {
     std::stringstream ss;
     ss.precision( GetValuePrecision() );
-    ss << fixed << clampledValue;
+    ss << std::fixed << clampledValue;
     mHandleValueTextView.SetText( ss.str() );
   }
 }
@@ -1052,7 +1051,7 @@ void Slider::DisplayPopup( float value )
   {
     std::stringstream ss;
     ss.precision( GetValuePrecision() );
-    ss << fixed << value;
+    ss << std::fixed << value;
     mValueTextView.SetText( ss.str() );
     TextStyle style;
     style.SetTextColor( GetPopupTextColor() );

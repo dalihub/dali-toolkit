@@ -24,7 +24,6 @@
 
 using namespace Dali;
 using namespace Dali::Toolkit;
-using namespace std;
 
 namespace // unnamed namespace
 {
@@ -60,7 +59,7 @@ struct GetColumnPositionDefaultFunction
                    float layoutWidth)
   {
     // Share the available space between margins & column spacings
-    float availableSpace = max(0.0f, (layoutWidth - itemSize.width*numberOfColumns));
+    float availableSpace = std::max(0.0f, (layoutWidth - itemSize.width*numberOfColumns));
 
     float leftMargin = availableSpace/numberOfColumns * 0.5f;
 
@@ -312,7 +311,7 @@ struct DepthColorConstraint
 
     if (row < 0.0f)
     {
-      darkness = alpha = max(0.0f, 1.0f + row);
+      darkness = alpha = std::max(0.0f, 1.0f + row);
     }
     else
     {
@@ -327,7 +326,7 @@ struct DepthColorConstraint
 
       if (row > (mNumberOfRows-1.0f))
       {
-        alpha = max(0.0f, 1.0f - (row-(mNumberOfRows-1.0f)));
+        alpha = std::max(0.0f, 1.0f - (row-(mNumberOfRows-1.0f)));
       }
     }
 
@@ -551,8 +550,8 @@ ItemRange DepthLayout::GetItemsWithinArea(float firstItemPosition, Vector3 layou
   float firstRow = -(firstItemPosition/mImpl->mNumberOfColumns);
   float lastRow = firstRow + mImpl->mNumberOfRows * 0.5f;
 
-  unsigned int firstItem = static_cast<unsigned int>(max(0.0f, firstRow * mImpl->mNumberOfColumns));
-  unsigned int lastItem  = static_cast<unsigned int>(max(0.0f, lastRow  * mImpl->mNumberOfColumns));
+  unsigned int firstItem = static_cast<unsigned int>(std::max(0.0f, firstRow * mImpl->mNumberOfColumns));
+  unsigned int lastItem  = static_cast<unsigned int>(std::max(0.0f, lastRow  * mImpl->mNumberOfColumns));
 
   return ItemRange(firstItem, lastItem+1);
 }

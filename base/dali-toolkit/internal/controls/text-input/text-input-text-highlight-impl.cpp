@@ -28,7 +28,6 @@
 // INTERNAL INCLUDES
 
 using namespace Dali;
-using namespace std;
 
 namespace
 {

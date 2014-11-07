@@ -37,7 +37,6 @@
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 
-using namespace std;
 using namespace Dali;
 
 // Local Data
@@ -4177,7 +4176,7 @@ bool TextInput::ReturnClosestIndex(const Vector2& source, std::size_t& closestIn
         ++closestIndex;
       }
     }
-    else if( closestIndex == numeric_limits<std::size_t>::max() ) // -1 RTL (after last arabic character on line)
+    else if( closestIndex == std::numeric_limits<std::size_t>::max() ) // -1 RTL (after last arabic character on line)
     {
       closestIndex = mTextLayoutInfo.mCharacterVisualToLogicalMap.size();
     }

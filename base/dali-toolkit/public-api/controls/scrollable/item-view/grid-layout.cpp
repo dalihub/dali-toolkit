@@ -24,7 +24,6 @@
 
 using namespace Dali;
 using namespace Dali::Toolkit;
-using namespace std;
 
 namespace // unnamed namespace
 {
@@ -620,8 +619,8 @@ void GridLayout::GetResizeAnimation(Animation& animation, Actor actor, Vector3 s
     Vector3 currentSize( actor.GetCurrentSize() );
     Vector3 shrink( currentSize );
 
-    shrink.width = min(size.width, currentSize.width);
-    shrink.height = min(size.height, currentSize.height);
+    shrink.width = std::min(size.width, currentSize.width);
+    shrink.height = std::min(size.height, currentSize.height);
 
     // Do a nonlinear size animation to shrink the actor first when the actor size changes,
     // so that we can avoid the actors overlapping during orientation change.

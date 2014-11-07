@@ -24,7 +24,6 @@
 
 using namespace Dali;
 using namespace Dali::Toolkit;
-using namespace std;
 
 namespace // unnamed namespace
 {
@@ -372,7 +371,7 @@ void SpiralLayout::SetItemSpacing(Radian itemSpacing)
 {
   mImpl->mItemSpacingRadians = itemSpacing;
 
-  float itemsPerSpiral = max(1.0f, (2.0f*(float)Math::PI) / mImpl->mItemSpacingRadians);
+  float itemsPerSpiral = std::max(1.0f, (2.0f*(float)Math::PI) / mImpl->mItemSpacingRadians);
   mImpl->mItemDescent = mImpl->mRevolutionDistance / itemsPerSpiral;
 }
 
@@ -385,7 +384,7 @@ void SpiralLayout::SetRevolutionDistance(float distance)
 {
   mImpl->mRevolutionDistance = distance;
 
-  float itemsPerSpiral = max(1.0f, (2.0f*(float)Math::PI) / mImpl->mItemSpacingRadians);
+  float itemsPerSpiral = std::max(1.0f, (2.0f*(float)Math::PI) / mImpl->mItemSpacingRadians);
   mImpl->mItemDescent = mImpl->mRevolutionDistance / itemsPerSpiral;
 }
 
@@ -464,10 +463,10 @@ ItemRange SpiralLayout::GetItemsWithinArea(float firstItemPosition, Vector3 layo
   float layoutHeight = IsHorizontal(mOrientation) ? layoutSize.width : layoutSize.height;
   float itemsPerSpiral = layoutHeight / mImpl->mItemDescent;
   float itemsCachedBeforeTopItem = layoutHeight * (mImpl->mTopItemAlignment + 0.5f) / mImpl->mItemDescent;
-  float itemsViewable = min(itemsPerSpiral, itemsPerSpiral - itemsCachedBeforeTopItem - firstItemPosition + 1.0f);
+  float itemsViewable = std::min(itemsPerSpiral, itemsPerSpiral - itemsCachedBeforeTopItem - firstItemPosition + 1.0f);
 
-  unsigned int firstItem = static_cast<unsigned int>(max(0.0f, -firstItemPosition - itemsCachedBeforeTopItem - 1.0f));
-  unsigned int lastItem  = static_cast<unsigned int>(max(0.0f, firstItem + itemsViewable));
+  unsigned int firstItem = static_cast<unsigned int>(std::max(0.0f, -firstItemPosition - itemsCachedBeforeTopItem - 1.0f));
+  unsigned int lastItem  = static_cast<unsigned int>(std::max(0.0f, firstItem + itemsViewable));
 
   return ItemRange(firstItem, lastItem+1);
 }
