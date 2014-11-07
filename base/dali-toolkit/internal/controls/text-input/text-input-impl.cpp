@@ -1767,7 +1767,6 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
     {
       // Some text is selected so erase it before adding space.
       DeleteHighlightedText( true );
-      update = true;
     }
 
     mCursorPosition = mCursorPosition + InsertAt(Text(keyString), mCursorPosition, 0);
@@ -3528,7 +3527,6 @@ void TextInput::GetVisualTextSelection( std::vector<bool>& selectedVisualText, s
 TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
 {
   // At the moment there is no public API to modify the block alignment option.
-  const bool blockAlignEnabled = true;
 
   mNewHighlightInfo.mQuadList.clear(); // clear last quad information.
 
@@ -3597,7 +3595,7 @@ TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
           float rowTop = rowBottom - rowSize.height;
 
           // Still selected, and block-align mode then set rowRight to max, so it can be clamped afterwards
-          if(charSelected && blockAlignEnabled)
+          if(charSelected)
           {
             rowRight = std::numeric_limits<float>::max();
           }
@@ -3609,7 +3607,7 @@ TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
           if( charSelected )
           {
             // if block-align mode then set rowLeft to min, so it can be clamped afterwards
-            rowLeft = blockAlignEnabled ? 0.0f : charInfo.mPosition.x - mTextLayoutInfo.mScrollOffset.x;
+            rowLeft = 0.0f;
             rowRight = ( charInfo.mPosition.x - mTextLayoutInfo.mScrollOffset.x ) + charInfo.mSize.width;
             selectionState = SelectionStarted;
           }
@@ -3654,8 +3652,6 @@ TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
     mNewHighlightInfo.Clamp2D( topLeft, bottomRight );
 
     // For block-align align Further Clamp quads to max left and right extents
-    if(blockAlignEnabled)
-    {
       // BlockAlign: Will adjust highlight to block:
       // i.e.
       //   H[ello] (top row right = max of all rows right)
@@ -3670,9 +3666,7 @@ TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
       // [is some]
       // [text]
       // (common in regular text editors/web browser selection)
-
       mNewHighlightInfo.Clamp2D( Vector2(maxRowLeft, topLeft.y), Vector2(maxRowRight, bottomRight.y ) );
-    }
 
     // Finally clamp quads again so they don't exceed the boundry of the control.
     const Vector3& controlSize = GetControlSize();

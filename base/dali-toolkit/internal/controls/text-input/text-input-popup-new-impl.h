@@ -89,7 +89,9 @@ public:
    * Default constructor
    * Creates an empty popup base actor (no content i.e. invisible)
    */
-  TextInputPopupNew(){};
+  TextInputPopupNew()
+  : mState(StateHidden)
+  { };
 
   /**
    * Destructor
