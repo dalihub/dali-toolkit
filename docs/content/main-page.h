@@ -69,6 +69,8 @@
  * - \link texture-atlases Texture Atlases  \endlink
  * - \link Texture_Compression Compressing Textures \endlink
  *
+ * \section Testing
+ * See [Automated Tests](@ref auto_testing) for instructions.
  */
 
 /*! \page scene-graph
