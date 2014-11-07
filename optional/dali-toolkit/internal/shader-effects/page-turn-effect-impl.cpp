@@ -158,6 +158,7 @@ Toolkit::PageTurnEffect PageTurnEffect::CreateShaderEffect( bool enableBlending 
      * ([3][2]) float curveHeight: The height of the interpolated hermite curve.
      * ([3][3]) float currentLength: The length from the current center to the curveEnd.
      */
+    precision mediump float;\n
     uniform mat4 uCommonParameters;\n
     \n
     uniform vec2 uPageSize;\n
@@ -321,6 +322,7 @@ Toolkit::PageTurnEffect PageTurnEffect::CreateShaderEffect( bool enableBlending 
   std::string vertexShaderEnd("}");
 
   std::string fragmentShaderPartOne = MAKE_STRING(
+    precision mediump float;\n
     uniform vec2 uPageSize;\n
     uniform vec2 uSpineShadowParameter;\n
     varying vec3 vNormal;\n

@@ -97,8 +97,8 @@ const float GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_HEIGHT_SCALE = 0.5f;
 const float ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 
 const char* const GAUSSIAN_BLUR_FRAGMENT_SOURCE =
-    "uniform vec2 uSampleOffsets[NUM_SAMPLES];\n"
-    "uniform float uSampleWeights[NUM_SAMPLES];\n"
+    "uniform mediump vec2 uSampleOffsets[NUM_SAMPLES];\n"
+    "uniform mediump float uSampleWeights[NUM_SAMPLES];\n"
 
     "void main()\n"
     "{\n"

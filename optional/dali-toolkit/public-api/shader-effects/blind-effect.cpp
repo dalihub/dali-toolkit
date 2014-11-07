@@ -48,14 +48,14 @@ BlindEffect::~BlindEffect()
 BlindEffect BlindEffect::New()
 {
   std::string fragmentShader(
-    "uniform float uStep;                                                                \n"
+    "uniform mediump float uStep;                                                        \n"
     "void main()                                                                         \n"
     "{                                                                                   \n"
-    "    vec4 alphaColor;                                                                \n"
-    "    vec4 baseColor;                                                                 \n"
+    "    mediump vec4 alphaColor;                                                        \n"
+    "    mediump vec4 baseColor;                                                         \n"
     "    baseColor = texture2D( sTexture, vTexCoord);                                    \n"
     "    alphaColor = vec4(0.1,0.1,0.1,1.0);                                             \n"
-    "    float index = 0.0;                                                              \n"
+    "    lowp float index = 0.0;                                                         \n"
     "    index = floor(vTexCoord.y/0.1);                                                 \n"
     "    if((vTexCoord.y < (index * 0.1 + uStep * 0.005)) && (vTexCoord.y > index * 0.1))\n"
     "    {                                                                               \n"

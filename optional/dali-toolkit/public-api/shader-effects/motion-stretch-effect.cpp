@@ -123,6 +123,7 @@ MotionStretchEffect MotionStretchEffect::New()
   // varying   vec2  vTexCoord;
   std::string vertexSource;
   vertexSource =
+    "precision mediump float;\n"
     "uniform mat4  uModelLastFrame;\n"
     "uniform float uTimeDelta;\n"
 
@@ -223,10 +224,9 @@ MotionStretchEffect MotionStretchEffect::New()
     "}";
 
   // NOTE: we must turn on alpha blending for the actor (HINT_BLENDING)
-  ShaderEffect shader = ShaderEffect::New( vertexSource,
-                                           fragmentSource,
-                                           GeometryType( GEOMETRY_TYPE_IMAGE ),
-                                           ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID ) );
+  ShaderEffect shader = ShaderEffect::New(
+    vertexSource, fragmentSource, GeometryType( GEOMETRY_TYPE_IMAGE ),
+    ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID ) );
 
 
 
@@ -302,4 +302,3 @@ const std::string& MotionStretchEffect::GetAlphaScalePropertyName() const
 }
 
 }
-

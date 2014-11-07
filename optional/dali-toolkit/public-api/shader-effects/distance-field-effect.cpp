@@ -112,7 +112,7 @@ DistanceFieldEffect DistanceFieldEffect::New()
       "\n"
       "  else // (uDoShadow > 0.0)\n"
       "  {\n"
-      "    float shadowDistance = texture2D(sTexture, vTexCoord - uShadowOffset).a;\n"
+      "    mediump float shadowDistance = texture2D(sTexture, vTexCoord - uShadowOffset).a;\n"
       "    mediump float inText = alphaFactor;\n"
       "    mediump float inShadow = smoothstep(uSmoothing - smoothWidth, uSmoothing + smoothWidth, shadowDistance);\n"
       "\n"

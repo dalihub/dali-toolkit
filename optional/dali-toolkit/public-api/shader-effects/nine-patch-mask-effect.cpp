@@ -42,6 +42,7 @@ struct NinePatchMaskEffectSizeConstraint
 static void DoApply( ImageActor actor, const std::string& maskImage, const Vector2& maskSize, Vector4 maskBorder )
 {
   const char* ALPHA_MASK_VERTEX_SHADER_SOURCE =
+  "precision mediump float;\n"
   "uniform vec2 uImageSize;                                                       \n"
   "uniform vec2 uMaskSize;                                                        \n"
   "varying vec2 vMaskTexCoord;                                                    \n"
@@ -68,7 +69,7 @@ static void DoApply( ImageActor actor, const std::string& maskImage, const Vecto
   "}                                                                              \n";
 
   const char* ALPHA_MASK_FRAGMENT_SHADER_SOURCE =
-  "varying vec2 vMaskTexCoord;                                                    \n"
+  "varying mediump vec2 vMaskTexCoord;                                            \n"
   "                                                                               \n"
   "void main()                                                                    \n"
   "{                                                                              \n"
@@ -76,10 +77,11 @@ static void DoApply( ImageActor actor, const std::string& maskImage, const Vecto
   "  gl_FragColor = texture2D(sTexture, vTexCoord) * uColor * vec4(1,1,1,mask.a); \n"
   "}                                                                              \n";
 
-  ShaderEffect maskEffect = ShaderEffect::New( ALPHA_MASK_VERTEX_SHADER_SOURCE,
-                                               ALPHA_MASK_FRAGMENT_SHADER_SOURCE,
-                                               GeometryType( GEOMETRY_TYPE_IMAGE ),
-                                               ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ) );
+  ShaderEffect maskEffect = ShaderEffect::New(
+    ALPHA_MASK_VERTEX_SHADER_SOURCE,
+    ALPHA_MASK_FRAGMENT_SHADER_SOURCE,
+    GeometryType( GEOMETRY_TYPE_IMAGE ),
+    ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ) );
 
   maskEffect.SetEffectImage( Image::New( maskImage ) );
 

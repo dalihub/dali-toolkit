@@ -60,6 +60,7 @@ PageTurnBookSpineEffect::~PageTurnBookSpineEffect()
 PageTurnBookSpineEffect PageTurnBookSpineEffect::New()
 {
   std::string vertexSource(
+  "precision mediump float;\n"
   "uniform float uShadowWidth;\n"
   "  void main()\n"
   "  {\n"
@@ -70,6 +71,7 @@ PageTurnBookSpineEffect PageTurnBookSpineEffect::New()
 
   // the simplified version of the fragment shader of page turn effect
   std::string fragmentSource(
+  "precision mediump float;\n"
   "uniform float uIsBackImageVisible;\n"
   "uniform float uPageWidth;\n"
   "uniform vec2 uSpineShadowParameter;\n"
@@ -99,7 +101,7 @@ PageTurnBookSpineEffect PageTurnBookSpineEffect::New()
   "  }" );
 
   ShaderEffect shader;
-  shader = ShaderEffect::New( vertexSource,fragmentSource );
+  shader = ShaderEffect::New( vertexSource, fragmentSource );
   PageTurnBookSpineEffect handle( shader );
   handle.SetUniform( IS_BACK_IMAGE_VISIBLE_PROPERTY_NAME, -1.f );
   handle.SetUniform( SHADOW_WIDTH_PROPERTY_NAME, DEFAULT_SHADOW_WIDTH );

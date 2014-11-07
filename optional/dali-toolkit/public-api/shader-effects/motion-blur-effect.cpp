@@ -114,6 +114,7 @@ MotionBlurEffect MotionBlurEffect::New( unsigned int numBlurSamples )
   // varying   vec2  vTexCoord;
   std::string vertexSource;
   vertexSource =
+    "precision mediump float;\n"
     "uniform mat4 uModelLastFrame;\n"
     "uniform float uTimeDelta;\n"
 
@@ -186,7 +187,6 @@ MotionBlurEffect MotionBlurEffect::New( unsigned int numBlurSamples )
   std::string fragmentSource;
   fragmentSource =
     "precision mediump float;\n"
-
     "uniform vec2 uObjectFadeStart;\n"
     "uniform vec2 uObjectFadeEnd;\n"
     "uniform float uAlphaScale;\n"
@@ -227,8 +227,7 @@ MotionBlurEffect MotionBlurEffect::New( unsigned int numBlurSamples )
     "}\n";
 
   // NOTE: we must turn on alpha blending for the actor (HINT_BLENDING)
-  ShaderEffect shader = ShaderEffect::New( vertexSource,
-                                           fragmentSource,
+  ShaderEffect shader = ShaderEffect::New( vertexSource, fragmentSource,
                                            GEOMETRY_TYPE_IMAGE,
                                            ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID) );
 
@@ -331,4 +330,3 @@ const std::string& MotionBlurEffect::GetAlphaScalePropertyName() const
 }
 
 }
-

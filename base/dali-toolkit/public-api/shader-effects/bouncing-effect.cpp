@@ -48,6 +48,7 @@ BouncingEffect::~BouncingEffect()
 BouncingEffect BouncingEffect::New( const Vector4& color )
 {
   std::string fragmentShader = MAKE_STRING(
+      precision mediump float;\n
       uniform float uProgressRate;\n
       uniform vec4 uAssignedColor;\n
       void main()\n
@@ -81,7 +82,8 @@ BouncingEffect BouncingEffect::New( const Vector4& color )
   );
 
   ShaderEffect shaderEffect;
-  shaderEffect = ShaderEffect::New( "", fragmentShader, GeometryType( GEOMETRY_TYPE_IMAGE),
+  shaderEffect = ShaderEffect::New( "", fragmentShader,
+                                    GeometryType( GEOMETRY_TYPE_IMAGE),
                                     ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ) );
   BouncingEffect handle( shaderEffect );
 

@@ -52,6 +52,7 @@ Ripple2DEffect Ripple2DEffect::New()
 {
     // append the default version
     std::string fragmentShader(
+        "precision mediump float;\n"
         "uniform float uAmplitude;\n"
         "uniform float uTime;\n"
         "void main()\n"
@@ -65,10 +66,9 @@ Ripple2DEffect Ripple2DEffect::New()
 
   // Create the implementation, temporarily owned on stack
   Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
-      "",
-      fragmentShader,
-      Dali::GeometryType( GEOMETRY_TYPE_IMAGE ),
-      ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID ));
+    "", fragmentShader,
+    Dali::GeometryType( GEOMETRY_TYPE_IMAGE ),
+    ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID ));
 
   /* Pass ownership to Ripple2DEffect through overloaded constructor, So that it now has access to the
      Dali::ShaderEffect implementation */
