@@ -273,7 +273,7 @@ bool Slider::OnTouchEvent(Actor actor, const TouchEvent& event)
   return true;
 }
 
-void Slider::OnPan( Actor actor, PanGesture gesture )
+void Slider::OnPan( Actor actor, const PanGesture& gesture )
 {
   // gesture.position is in local actor coordinates
   if( mState != DISABLED )

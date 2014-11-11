@@ -355,7 +355,7 @@ void MaskedImageView::OnPropertySet( Property::Index index, Property::Value prop
   }
 }
 
-void MaskedImageView::OnPan(Actor source, PanGesture gesture)
+void MaskedImageView::OnPan(Actor source, const PanGesture& gesture)
 {
   // Used to flag whether edit mode is setting properties
   mSelfPropertySetting = true;
@@ -380,7 +380,7 @@ void MaskedImageView::OnPan(Actor source, PanGesture gesture)
   mSelfPropertySetting = false;
 }
 
-void MaskedImageView::OnPinch(Actor actor, PinchGesture pinch)
+void MaskedImageView::OnPinch(Actor actor, const PinchGesture& pinch)
 {
   // Used to flag whether edit mode is setting properties
   mSelfPropertySetting = true;

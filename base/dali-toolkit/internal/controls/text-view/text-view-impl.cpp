@@ -1675,7 +1675,7 @@ void TextView::DestroyOffscreenRenderingResources()
   }
 }
 
-void TextView::OnTextPan( Actor actor, PanGesture gesture )
+void TextView::OnTextPan( Actor actor, const PanGesture& gesture )
 {
   if( 1u == gesture.numberOfTouches )
   {

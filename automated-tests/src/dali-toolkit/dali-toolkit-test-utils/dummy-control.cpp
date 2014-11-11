@@ -114,10 +114,10 @@ DummyControlImplOverride::~DummyControlImplOverride() { }
 void DummyControlImplOverride::OnInitialize() { initializeCalled = true; }
 void DummyControlImplOverride::OnThemeChange(StyleManager change) { themeChangeCalled = true;}
 void DummyControlImplOverride::OnFontChange(bool defaultFontChange, bool defaultFontSizeChange) { fontChangeCalled = true; }
-void DummyControlImplOverride::OnPinch(PinchGesture pinch) { pinchCalled = true; }
-void DummyControlImplOverride::OnPan(PanGesture pan) { panCalled = true; }
-void DummyControlImplOverride::OnTap(TapGesture tap) { tapCalled = true; }
-void DummyControlImplOverride::OnLongPress(LongPressGesture longPress) { longPressCalled = true; }
+void DummyControlImplOverride::OnPinch(const PinchGesture& pinch) { pinchCalled = true; }
+void DummyControlImplOverride::OnPan(const PanGesture& pan) { panCalled = true; }
+void DummyControlImplOverride::OnTap(const TapGesture& tap) { tapCalled = true; }
+void DummyControlImplOverride::OnLongPress(const LongPressGesture& longPress) { longPressCalled = true; }
 void DummyControlImplOverride::OnStageConnection() { stageConnectionCalled = true; }
 void DummyControlImplOverride::OnStageDisconnection() { stageDisconnectionCalled = true; }
 void DummyControlImplOverride::OnChildAdd(Actor& child) { childAddCalled = true; }

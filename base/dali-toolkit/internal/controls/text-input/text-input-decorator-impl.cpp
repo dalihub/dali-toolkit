@@ -128,7 +128,7 @@ Vector4 Decorator::GetBoundingBox() const
 /**
  * Selection Handles
  */
-void Decorator::OnHandlePan(Actor actor, PanGesture gesture)
+void Decorator::OnHandlePan(Actor actor, const PanGesture& gesture)
 {
   Actor selectionHandleOne = mTextInputHandles.GetSelectionHandleOne();
   Actor selectionHandleTwo = mTextInputHandles.GetSelectionHandleTwo();

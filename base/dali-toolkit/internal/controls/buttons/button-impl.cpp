@@ -232,7 +232,7 @@ void Button::OnControlSizeSet(const Vector3& targetSize)
   }
 }
 
-void Button::OnTap(Actor actor, TapGesture tap)
+void Button::OnTap(Actor actor, const TapGesture& tap)
 {
   // Do nothing.
 }

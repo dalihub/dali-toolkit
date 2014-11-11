@@ -1207,7 +1207,7 @@ float TextInput::GetHeightForWidth( float width )
 
 // Private Internal methods
 
-void TextInput::OnHandlePan(Actor actor, PanGesture gesture)
+void TextInput::OnHandlePan(Actor actor, const PanGesture& gesture)
 {
   switch (gesture.state)
   {
@@ -1332,7 +1332,7 @@ bool TextInput::OnHandleTwoTouched(Dali::Actor actor, const TouchEvent& touch)
   return false;
 }
 
-void TextInput::OnDoubleTap(Dali::Actor actor, Dali::TapGesture tap)
+void TextInput::OnDoubleTap(Dali::Actor actor, const Dali::TapGesture& tap)
 {
    // If text exists then select nearest word.
    if ( !mStyledText.empty())
@@ -1397,7 +1397,7 @@ void TextInput::OnDoubleTap(Dali::Actor actor, Dali::TapGesture tap)
 }
 
 // TODO: Change the function name to be more general.
-void TextInput::OnTextTap(Dali::Actor actor, Dali::TapGesture tap)
+void TextInput::OnTextTap(Dali::Actor actor, const Dali::TapGesture& tap)
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "OnTap mPreEditFlag[%s] mEditOnTouch[%s] mEditModeActive[%s] ", (mPreEditFlag)?"true":"false"
                                                                                                            , (mEditOnTouch)?"true":"false"
@@ -1519,7 +1519,7 @@ void TextInput::OnTextTap(Dali::Actor actor, Dali::TapGesture tap)
   }
 }
 
-void TextInput::OnLongPress(Dali::Actor actor, Dali::LongPressGesture longPress)
+void TextInput::OnLongPress(Dali::Actor actor, const Dali::LongPressGesture& longPress)
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "OnLongPress\n" );
 

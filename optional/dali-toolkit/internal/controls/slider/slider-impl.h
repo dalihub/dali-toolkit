@@ -350,7 +350,7 @@ private:
    * @param[in] actor The actor the event is raised for
    * @param[in] gesture The pan event info
    */
-  void OnPan( Actor actor, PanGesture gestur );
+  void OnPan( Actor actor, const PanGesture& gesture );
 
   /**
    * Map a position onto a domain and return the result as a percentage

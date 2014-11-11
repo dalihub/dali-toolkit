@@ -343,7 +343,7 @@ private: // For derived classes to override
    * @param[in]  pinch  The pinch gesture.
    * @see EnableGestureDetection
    */
-  virtual void OnPinch(PinchGesture pinch);
+  virtual void OnPinch(const PinchGesture& pinch);
 
   /**
    * @brief Called whenever a pan gesture is detected on this control.
@@ -356,7 +356,7 @@ private: // For derived classes to override
    * @param[in]  pan  The pan gesture.
    * @see EnableGestureDetection
    */
-  virtual void OnPan(PanGesture pan) { }
+  virtual void OnPan( const PanGesture& pan );
 
   /**
    * @brief Called whenever a tap gesture is detected on this control.
@@ -369,7 +369,7 @@ private: // For derived classes to override
    * @param[in]  tap  The tap gesture.
    * @see EnableGestureDetection
    */
-  virtual void OnTap(TapGesture tap) { }
+  virtual void OnTap( const TapGesture& tap );
 
   /**
    * @brief Called whenever a long press gesture is detected on this control.
@@ -382,7 +382,7 @@ private: // For derived classes to override
    * @param[in]  longPress  The long press gesture.
    * @see EnableGestureDetection
    */
-  virtual void OnLongPress(LongPressGesture longPress) { }
+  virtual void OnLongPress( const LongPressGesture& longPress );
 
   /**
    * @brief Called whenever the control is added to the stage.

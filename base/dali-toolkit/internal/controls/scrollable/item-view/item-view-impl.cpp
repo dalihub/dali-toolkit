@@ -1114,7 +1114,7 @@ float ItemView::ClampFirstItemPosition(float targetPosition, const Vector3& targ
   return clamppedPosition;
 }
 
-void ItemView::OnPan(PanGesture gesture)
+void ItemView::OnPan( const PanGesture& gesture )
 {
   Actor self = Self();
   const Vector3 layoutSize = Self().GetCurrentSize();

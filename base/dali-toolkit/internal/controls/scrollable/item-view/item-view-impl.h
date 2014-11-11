@@ -444,7 +444,7 @@ private:
    *
    * @param[in] gesture The gesture event.
    */
-  void OnPan(PanGesture pan);
+  void OnPan( const PanGesture& pan );
 
   /**
    * Helper to handle anchoring animations.

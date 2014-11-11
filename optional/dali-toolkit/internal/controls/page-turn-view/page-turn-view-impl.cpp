@@ -666,7 +666,7 @@ void PageTurnView::RefreshCurrentPage()
   RenderPage( mCurrentPageIndex );
 }
 
-void PageTurnView::OnPan( PanGesture gesture )
+void PageTurnView::OnPan( const PanGesture& gesture )
 {
   if( mIsEditMode )
   {
