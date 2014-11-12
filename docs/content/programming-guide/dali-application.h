@@ -18,8 +18,8 @@ void CreateProgram(Application& app)
 
 int main (int argc, char **argv)
 {
-  Application app = Application::New(argc, argv);
-  app.SignalInit().Connect(&CreateProgram);
+  Application app = Application::New(&argc, &argv);
+  app.InitSignal().Connect(&CreateProgram);
   app.MainLoop();
 }
 @endcode
