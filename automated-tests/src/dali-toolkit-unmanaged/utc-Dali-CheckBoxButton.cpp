@@ -27,9 +27,9 @@ namespace
 {
 
 static bool gCheckBoxButtonState = false;
-bool CheckBoxButtonClicked( Button button )
+bool CheckBoxButtonClicked( Button button, bool state )
 {
-  gCheckBoxButtonState = static_cast<CheckBoxButton&>( button ).IsChecked();
+  gCheckBoxButtonState = state;
   return true;
 }
 
@@ -75,7 +75,7 @@ int UtcDaliCheckBoxButtonSetGetChecked(void)
   tet_infoline(" UtcDaliCheckBoxButtonSetGetChecked");
 
   CheckBoxButton checkBoxButton = CheckBoxButton::New();
-  checkBoxButton.ClickedSignal().Connect( &CheckBoxButtonClicked );
+  checkBoxButton.ToggledSignal().Connect( &CheckBoxButtonClicked );
 
   // global var used to check if CheckBoxButtonClicked is called;
   gCheckBoxButtonState = false;

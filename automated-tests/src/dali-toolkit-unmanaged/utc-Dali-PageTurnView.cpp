@@ -26,18 +26,6 @@
 using namespace Dali;
 using namespace Dali::Toolkit;
 
-void dali_page_turn_view_startup(void)
-{
-  test_return_value = TET_UNDEF;
-}
-
-void dali_page_turn_view_cleanup(void)
-{
-  test_return_value = TET_PASS;
-}
-
-
-
 namespace
 {
 const int RENDER_FRAME_INTERVAL = 16;                           ///< Duration of each frame in ms. (at approx 60FPS)
@@ -61,20 +49,14 @@ static void TestCallback(BaseHandle handle)
  *
  * @param application Test application instance
  * @param duration Time to pass in milliseconds.
- * @return The actual time passed in milliseconds
  */
-int Wait(ToolkitTestApplication& application, int duration = 0)
+void Wait(ToolkitTestApplication& application, int duration = 0)
 {
-  int time = 0;
-
   for(int i = 0; i <= ( duration / RENDER_FRAME_INTERVAL); i++)
   {
     application.SendNotification();
     application.Render(RENDER_FRAME_INTERVAL);
-    time += RENDER_FRAME_INTERVAL;
   }
-
-  return time;
 }
 
 // Generate a PanGestureEvent to send to Core
@@ -256,6 +238,15 @@ private:
 
 }// namespace
 
+void dali_page_turn_view_startup(void)
+{
+  test_return_value = TET_UNDEF;
+}
+
+void dali_page_turn_view_cleanup(void)
+{
+  test_return_value = TET_PASS;
+}
 
 int UtcDaliPageTurnPortraitViewNew(void)
 {
@@ -374,6 +365,8 @@ int UtcDaliPageTurnViewEnterLeaveEditMode(void)
 
   tet_infoline( " UtcDaliPageTurnViewEnterLeaveEditMode " );
 
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
+
   TestPageFactory factory(application);
   factory.EnableOffscreenRendering( );
 
@@ -423,6 +416,8 @@ int UtcDaliPageTurnViewGetHitActor(void)
 
   tet_infoline(" UtcDaliPageTurnViewGetHitActor ");
 
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
+
   TestPageFactory factory(application);
   factory.EnableOffscreenRendering( );
 
@@ -457,6 +452,8 @@ int UtcDaliPageTurnViewRefresh(void)
   ToolkitTestApplication application;
 
   tet_infoline(" UtcDaliPageTurnViewRefresh ");
+
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
 
   TestPageFactory factory(application);
   factory.EnableOffscreenRendering( );
@@ -495,6 +492,8 @@ int UtcDaliPageTurnViewSignals(void)
   ToolkitTestApplication application;
 
   tet_infoline(" UtcDaliPageTurnViewSignals ");
+
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
 
   TestPageFactory factory(application);
   Vector2 size = Stage::GetCurrent().GetSize();

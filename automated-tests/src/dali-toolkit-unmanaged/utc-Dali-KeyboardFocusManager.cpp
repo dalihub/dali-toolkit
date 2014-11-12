@@ -388,7 +388,7 @@ int UtcDaliKeyboardFocusManagerSignalFocusGroupChanged(void)
   manager.FocusGroupChangedSignal().Connect( &focusGroupChangedCallback, &FocusGroupChangedCallback::Callback );
 
   Integration::KeyEvent tabEvent("Tab", "", 0, 0, 0, Integration::KeyEvent::Down);
-  Integration::KeyEvent shiftTabEvent("Tab", "", 1, 0, 0, Integration::KeyEvent::Down);
+  Integration::KeyEvent shiftTabEvent("Tab", "", 0, 1, 0, Integration::KeyEvent::Down);
 
   // Send the tab event to change focus group in the forward direction
   application.ProcessEvent(tabEvent);
