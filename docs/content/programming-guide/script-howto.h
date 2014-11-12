@@ -55,7 +55,7 @@
  *   return connection ;
  * }
  *
- * bool MyActor::DoActionCustom(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes)
+ * bool MyActor::DoActionCustom(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes)
  * {
  *   bool actioned = false ;
  *

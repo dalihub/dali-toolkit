@@ -413,7 +413,7 @@ Toolkit::NavigationControl::ItemPoppedSignalV2& NavigationControl::ItemPoppedSig
   return mItemPoppedSignal;
 }
 
-bool NavigationControl::DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes)
+bool NavigationControl::DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes)
 {
   bool ret = false;
 

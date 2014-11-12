@@ -961,7 +961,7 @@ Actor Control::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit:
   return Actor();
 }
 
-bool Control::DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes)
+bool Control::DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes)
 {
   bool ret = false;
 

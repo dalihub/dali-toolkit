@@ -529,7 +529,7 @@ void Cluster::OnControlChildRemove(Actor& child)
   child.RemoveConstraints();
 }
 
-bool Cluster::DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes)
+bool Cluster::DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes)
 {
   bool ret = false;
 
