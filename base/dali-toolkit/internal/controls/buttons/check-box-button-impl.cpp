@@ -217,7 +217,7 @@ float CheckBoxButton::OnAnimationTimeRequested() const
 void CheckBoxButton::OnActivated()
 {
   // When the button is activated, it performs the click action
-  std::vector<Property::Value> attributes;
+  PropertyValueContainer attributes;
   DoClickAction(attributes);
 }
 
@@ -233,7 +233,7 @@ void CheckBoxButton::DoClickAction(const PropertyValueContainer& attributes)
   }
 }
 
-bool CheckBoxButton::DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes)
+bool CheckBoxButton::DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes)
 {
   bool ret = false;
 
@@ -253,7 +253,9 @@ bool CheckBoxButton::DoAction(BaseObject* object, const std::string& actionName,
 CheckBoxButton::CheckBoxButton()
 : Button(),
   mChecked( false ),
-  mClickActionPerforming(false)
+  mClickActionPerforming(false),
+  mUseFadeAnimationProperty(Property::INVALID_INDEX),
+  mUseCheckAnimationProperty(Property::INVALID_INDEX)
 {
   // Creates specific painter.
   mPainter = new CheckBoxButtonDefaultPainter();

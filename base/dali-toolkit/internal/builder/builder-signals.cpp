@@ -49,7 +49,7 @@ struct ChildActorAction
   std::string actorName;
   std::string actionName;
   std::string childAlias;
-  std::vector<Property::Value> parameters;
+  PropertyValueContainer parameters;
 
   void operator()(void)
   {
@@ -110,7 +110,7 @@ struct GenericAction
 {
   std::string actorName;
   std::string actionName;
-  std::vector<Property::Value> parameters;
+  PropertyValueContainer parameters;
 
   void operator()(void)
   {
@@ -194,7 +194,7 @@ Property::Value GetPropertyValue(const TreeNode &child)
  * Gets Parmeter list from child
  * params is be cleared before insertion
  */
-void GetParameters(const TreeNode &child, std::vector<Property::Value> &params)
+void GetParameters(const TreeNode& child, PropertyValueContainer& params)
 {
   if( OptionalChild c = IsChild(child, "parameters") )
   {
@@ -322,15 +322,10 @@ float GetConditionArg0(const TreeNode &child)
   {
     f = IsFloat( IsChild(child, "min") );
   }
+
   DALI_ASSERT_ALWAYS(f && "Notification condition for arg0 not specified");
-  if(f)
-  {
-    return *f;
-  }
-  else
-  {
-    return 0.f;
-  }
+
+  return *f;
 }
 
 /**
@@ -344,15 +339,10 @@ float GetConditionArg1(const TreeNode &child)
   {
     f = IsFloat( IsChild(child, "max") );
   }
+
   DALI_ASSERT_ALWAYS(f && "Notification condition for arg1 not specified");
-  if(f)
-  {
-    return *f;
-  }
-  else
-  {
-    return 0.f;
-  }
+
+  return *f;
 }
 
 

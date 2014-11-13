@@ -497,7 +497,7 @@ private:
    * @param[in] actor Handle of the text-view.
    * @param[in] gesture Data structure with the parameters of the gesture.
    */
-  void OnTextPan( Actor actor, PanGesture gesture );
+  void OnTextPan( Actor actor, const PanGesture& gesture );
 
   /**
    * Ensures the text-view's boundaries are fully covered of text.

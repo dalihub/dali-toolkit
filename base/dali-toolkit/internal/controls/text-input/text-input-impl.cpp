@@ -37,7 +37,6 @@
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 
-using namespace std;
 using namespace Dali;
 
 // Local Data
@@ -1207,7 +1206,7 @@ float TextInput::GetHeightForWidth( float width )
 
 // Private Internal methods
 
-void TextInput::OnHandlePan(Actor actor, PanGesture gesture)
+void TextInput::OnHandlePan(Actor actor, const PanGesture& gesture)
 {
   switch (gesture.state)
   {
@@ -1332,7 +1331,7 @@ bool TextInput::OnHandleTwoTouched(Dali::Actor actor, const TouchEvent& touch)
   return false;
 }
 
-void TextInput::OnDoubleTap(Dali::Actor actor, Dali::TapGesture tap)
+void TextInput::OnDoubleTap(Dali::Actor actor, const Dali::TapGesture& tap)
 {
    // If text exists then select nearest word.
    if ( !mStyledText.empty())
@@ -1397,7 +1396,7 @@ void TextInput::OnDoubleTap(Dali::Actor actor, Dali::TapGesture tap)
 }
 
 // TODO: Change the function name to be more general.
-void TextInput::OnTextTap(Dali::Actor actor, Dali::TapGesture tap)
+void TextInput::OnTextTap(Dali::Actor actor, const Dali::TapGesture& tap)
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "OnTap mPreEditFlag[%s] mEditOnTouch[%s] mEditModeActive[%s] ", (mPreEditFlag)?"true":"false"
                                                                                                            , (mEditOnTouch)?"true":"false"
@@ -1519,7 +1518,7 @@ void TextInput::OnTextTap(Dali::Actor actor, Dali::TapGesture tap)
   }
 }
 
-void TextInput::OnLongPress(Dali::Actor actor, Dali::LongPressGesture longPress)
+void TextInput::OnLongPress(Dali::Actor actor, const Dali::LongPressGesture& longPress)
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "OnLongPress\n" );
 
@@ -1767,7 +1766,6 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
     {
       // Some text is selected so erase it before adding space.
       DeleteHighlightedText( true );
-      update = true;
     }
 
     mCursorPosition = mCursorPosition + InsertAt(Text(keyString), mCursorPosition, 0);
@@ -3528,7 +3526,6 @@ void TextInput::GetVisualTextSelection( std::vector<bool>& selectedVisualText, s
 TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
 {
   // At the moment there is no public API to modify the block alignment option.
-  const bool blockAlignEnabled = true;
 
   mNewHighlightInfo.mQuadList.clear(); // clear last quad information.
 
@@ -3597,7 +3594,7 @@ TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
           float rowTop = rowBottom - rowSize.height;
 
           // Still selected, and block-align mode then set rowRight to max, so it can be clamped afterwards
-          if(charSelected && blockAlignEnabled)
+          if(charSelected)
           {
             rowRight = std::numeric_limits<float>::max();
           }
@@ -3609,7 +3606,7 @@ TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
           if( charSelected )
           {
             // if block-align mode then set rowLeft to min, so it can be clamped afterwards
-            rowLeft = blockAlignEnabled ? 0.0f : charInfo.mPosition.x - mTextLayoutInfo.mScrollOffset.x;
+            rowLeft = 0.0f;
             rowRight = ( charInfo.mPosition.x - mTextLayoutInfo.mScrollOffset.x ) + charInfo.mSize.width;
             selectionState = SelectionStarted;
           }
@@ -3654,8 +3651,6 @@ TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
     mNewHighlightInfo.Clamp2D( topLeft, bottomRight );
 
     // For block-align align Further Clamp quads to max left and right extents
-    if(blockAlignEnabled)
-    {
       // BlockAlign: Will adjust highlight to block:
       // i.e.
       //   H[ello] (top row right = max of all rows right)
@@ -3670,9 +3665,7 @@ TextInput::HighlightInfo TextInput::CalculateHighlightInfo()
       // [is some]
       // [text]
       // (common in regular text editors/web browser selection)
-
       mNewHighlightInfo.Clamp2D( Vector2(maxRowLeft, topLeft.y), Vector2(maxRowRight, bottomRight.y ) );
-    }
 
     // Finally clamp quads again so they don't exceed the boundry of the control.
     const Vector3& controlSize = GetControlSize();
@@ -4183,7 +4176,7 @@ bool TextInput::ReturnClosestIndex(const Vector2& source, std::size_t& closestIn
         ++closestIndex;
       }
     }
-    else if( closestIndex == numeric_limits<std::size_t>::max() ) // -1 RTL (after last arabic character on line)
+    else if( closestIndex == std::numeric_limits<std::size_t>::max() ) // -1 RTL (after last arabic character on line)
     {
       closestIndex = mTextLayoutInfo.mCharacterVisualToLogicalMap.size();
     }

@@ -122,7 +122,7 @@ public:
    * @param[in] attributes The attributes with which to perfrom this action.
    * @return true if action has been accepted by this control
    */
-  static bool DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes);
+  static bool DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes);
 
 public:
 

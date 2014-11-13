@@ -188,6 +188,11 @@ unsigned int DefaultRuler::GetTotalPages() const
 FixedRuler::FixedRuler(float spacing)
 : mSpacing(spacing)
 {
+  if(fabsf(mSpacing) <= Math::MACHINE_EPSILON_1)
+  {
+    DALI_LOG_ERROR( "Page spacing too small (%f).", double(spacing) );
+    mSpacing = spacing >= 0.0f ? Math::MACHINE_EPSILON_1 : -Math::MACHINE_EPSILON_1;
+  }
   mType = Fixed;
 }
 
@@ -203,7 +208,7 @@ float FixedRuler::GetPositionFromPage(unsigned int page, unsigned int &volume, b
   volume = 0;
 
   // spacing must be present.
-  if(mEnabled && fabsf(mSpacing) > Math::MACHINE_EPSILON_1)
+  if( mEnabled )
   {
     unsigned int column = page;
 
@@ -237,7 +242,7 @@ unsigned int FixedRuler::GetPageFromPosition(float position, bool wrap) const
   unsigned int page = 0;
 
   // spacing must be present.
-  if(mEnabled && fabsf(mSpacing) > Math::MACHINE_EPSILON_1)
+  if( mEnabled )
   {
     if( wrap )
     {
@@ -248,6 +253,12 @@ unsigned int FixedRuler::GetPageFromPosition(float position, bool wrap) const
     if(wrap)
     {
       unsigned int pagesPerVolume = mDomain.GetSize() / mSpacing;
+      // Defensive check to avoid a divide by zero below when the ruler is in an invalid state (entire domain smaller than spacing between pages of it):
+      if(pagesPerVolume < 1u)
+      {
+        pagesPerVolume = 1u;
+        DALI_LOG_ERROR("Ruler domain(%f) is smaller than its spacing(%f).", mDomain.GetSize() * 1.0, mSpacing * 1.0 );
+      }
       page %= pagesPerVolume;
     }
   }
@@ -260,7 +271,7 @@ unsigned int FixedRuler::GetTotalPages() const
   unsigned int pagesPerVolume = 1;
 
   // spacing must be present.
-  if(mEnabled && fabsf(mSpacing) > Math::MACHINE_EPSILON_1)
+  if( mEnabled )
   {
     pagesPerVolume = mDomain.GetSize() / mSpacing;
   }

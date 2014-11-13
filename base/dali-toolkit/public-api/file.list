@@ -22,7 +22,6 @@ public_api_base_src_files = \
   $(public_api_base_src_dir)/controls/scrollable/item-view/navigation-layout.cpp \
   $(public_api_base_src_dir)/controls/scrollable/item-view/roll-layout.cpp \
   $(public_api_base_src_dir)/controls/scrollable/item-view/spiral-layout.cpp \
-  $(public_api_base_src_dir)/controls/scrollable/item-view/album-layout.cpp \
   $(public_api_base_src_dir)/controls/scrollable/scrollable.cpp \
   $(public_api_base_src_dir)/controls/scrollable/scroll-connector.cpp \
   $(public_api_base_src_dir)/controls/scrollable/scroll-component-impl.cpp \
@@ -38,7 +37,6 @@ public_api_base_src_files = \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-page-carousel-effect.cpp \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-page-spiral-effect.cpp \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-slide-effect.cpp \
-  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-twist-effect.cpp \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect.cpp \
   $(public_api_base_src_dir)/controls/table-view/table-view.cpp \
   $(public_api_base_src_dir)/controls/text-input/text-input.cpp \
@@ -82,12 +80,11 @@ public_api_base_item_view_header_files = \
   $(public_api_base_src_dir)/controls/scrollable/item-view/roll-layout.h \
   $(public_api_base_src_dir)/controls/scrollable/item-view/spiral-layout.h \
   $(public_api_base_src_dir)/controls/scrollable/item-view/navigation-layout.h \
-  $(public_api_base_src_dir)/controls/scrollable/item-view/album-layout.h \
   $(public_api_base_src_dir)/controls/scrollable/item-view/grid-layout.h \
   $(public_api_base_src_dir)/controls/scrollable/item-view/item-factory.h \
   $(public_api_base_src_dir)/controls/scrollable/item-view/item-layout.h \
   $(public_api_base_src_dir)/controls/scrollable/item-view/item-view.h \
-  $(public_api_base_src_dir)/controls/scrollable/item-view/item-view-declarations.h 
+  $(public_api_base_src_dir)/controls/scrollable/item-view/item-view-declarations.h
 
 public_api_base_popup_header_files = \
   $(public_api_base_src_dir)/controls/popup/popup.h
@@ -113,8 +110,7 @@ public_api_base_scroll_view_header_files = \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-custom-effect.h \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-cube-effect.h \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-page-spiral-effect.h \
-  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-slide-effect.h \
-  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-twist-effect.h
+  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-slide-effect.h
 
 public_api_base_table_view_header_files = \
   $(public_api_base_src_dir)/controls/table-view/table-view.h

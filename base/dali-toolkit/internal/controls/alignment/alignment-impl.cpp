@@ -54,14 +54,6 @@ struct ScaleToFillConstraint
   {}
 
   /**
-   * CopyConstructor. Used by Boost.
-   * @param rhs Copying from.
-   */
-  ScaleToFillConstraint( const ScaleToFillConstraint& rhs )
-  : mPadding( rhs.mPadding )
-  {}
-
-  /**
    * Called by render thread
    */
   Vector3 operator()( const Vector3& currentSize,
@@ -97,16 +89,6 @@ struct ScaleToFitKeepAspectConstraint
   : mPadding( padding ),
     mSizeStored( false ),
     mOriginalSize()
-  {}
-
-  /**
-   * CopyConstructor. Used by Boost.
-   * @param rhs Copying from.
-   */
-  ScaleToFitKeepAspectConstraint( const ScaleToFitKeepAspectConstraint& rhs )
-  : mPadding( rhs.mPadding ),
-    mSizeStored( rhs.mSizeStored ),
-    mOriginalSize( rhs.mOriginalSize )
   {}
 
   /**
@@ -158,16 +140,6 @@ struct ScaleToFillKeepAspectConstraint
   { }
 
   /**
-   * CopyConstructor. Used by Boost.
-   * @param rhs Copying from.
-   */
-  ScaleToFillKeepAspectConstraint( const ScaleToFillKeepAspectConstraint& rhs )
-  : mPadding( rhs.mPadding ),
-    mSizeStored( rhs.mSizeStored ),
-    mOriginalSize( rhs.mOriginalSize )
-  {}
-
-  /**
    * Called by render thread
    */
   Vector3 operator()( const Vector3& currentSize,
@@ -214,16 +186,6 @@ struct ShrinkToFitConstraint
     mSizeStored( false ),
     mOriginalSize()
   {}
-
-  /**
-   * CopyConstructor. Used by Boost.
-   * @param rhs Copying from.
-   */
-  ShrinkToFitConstraint( const ShrinkToFitConstraint& rhs )
-  : mPadding( rhs.mPadding ),
-    mSizeStored( rhs.mSizeStored ),
-    mOriginalSize( rhs.mOriginalSize )
-  { }
 
   /**
    * Called by render thread
@@ -277,16 +239,6 @@ struct ShrinkToFitKeepAspectConstraint
   {}
 
   /**
-   * CopyConstructor. Used by Boost.
-   * @param rhs Copying from.
-   */
-  ShrinkToFitKeepAspectConstraint( const ShrinkToFitKeepAspectConstraint& rhs )
-  : mPadding( rhs.mPadding ),
-    mSizeStored( rhs.mSizeStored ),
-    mOriginalSize( rhs.mOriginalSize )
-  { }
-
-  /**
    * Called by render thread
    */
   Vector3 operator()( const Vector3& currentSize,
@@ -337,16 +289,6 @@ struct PositionConstraint
   : mPadding( padding ),
     mHorizontalAlignment( horizontalAlignment ),
     mVerticalAlignment( verticalAlignment )
-  {}
-
-  /**
-   * CopyConstructor. Used by Boost.
-   * @param rhs Copying from.
-   */
-  PositionConstraint( const PositionConstraint& rhs )
-  : mPadding( rhs.mPadding ),
-    mHorizontalAlignment( rhs.mHorizontalAlignment ),
-    mVerticalAlignment( rhs.mVerticalAlignment )
   {}
 
   /**

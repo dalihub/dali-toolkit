@@ -271,22 +271,22 @@ public:
 
   // Gesture Detection Methods
 
-  void PinchDetected(Actor actor, PinchGesture pinch)
+  void PinchDetected(Actor actor, const PinchGesture& pinch)
   {
     mControlImpl.OnPinch(pinch);
   }
 
-  void PanDetected(Actor actor, PanGesture pan)
+  void PanDetected(Actor actor, const PanGesture& pan)
   {
     mControlImpl.OnPan(pan);
   }
 
-  void TapDetected(Actor actor, TapGesture tap)
+  void TapDetected(Actor actor, const TapGesture& tap)
   {
     mControlImpl.OnTap(tap);
   }
 
-  void LongPressDetected(Actor actor, LongPressGesture longPress)
+  void LongPressDetected(Actor actor, const LongPressGesture& longPress)
   {
     mControlImpl.OnLongPress(longPress);
   }
@@ -749,7 +749,7 @@ void Control::SetBackground( Image image )
   {
     // Remove Current actor, unset AFTER removal so that we do not inform deriving classes
     Self().Remove( background.actor );
-    background.actor = NULL;
+    background.actor.Reset();
   }
 
   ImageActor imageActor = ImageActor::New( image );
@@ -787,7 +787,7 @@ void Control::OnThemeChange( Toolkit::StyleManager styleManager )
   GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
 }
 
-void Control::OnPinch(PinchGesture pinch)
+void Control::OnPinch(const PinchGesture& pinch)
 {
   if( !( mImpl->mStartingPinchScale ) )
   {
@@ -801,6 +801,18 @@ void Control::OnPinch(PinchGesture pinch)
   }
 
   Self().SetScale( *( mImpl->mStartingPinchScale ) * pinch.scale );
+}
+
+void Control::OnPan( const PanGesture& pan )
+{
+}
+
+void Control::OnTap(const TapGesture& tap)
+{
+}
+
+void Control::OnLongPress( const LongPressGesture& longPress )
+{
 }
 
 void Control::OnStageConnection()
@@ -949,7 +961,7 @@ Actor Control::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit:
   return Actor();
 }
 
-bool Control::DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes)
+bool Control::DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes)
 {
   bool ret = false;
 

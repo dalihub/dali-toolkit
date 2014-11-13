@@ -48,11 +48,11 @@ IrisEffect IrisEffect::New()
   // append the default version
   std::string vertexShader(
               "uniform mediump vec2 uCenter;\n"
-              "varying vec2 vRelativePosition;\n"
+              "varying mediump vec2 vRelativePosition;\n"
               "\n"
               "void main()\n"
               "{\n"
-              "    vec4 world = uModelView * vec4(aPosition,1.0);\n"
+              "    mediump vec4 world = uModelView * vec4(aPosition,1.0);\n"
               "    gl_Position = uProjection * world;\n"
               "    \n"
               "    vTexCoord = aTexCoord;\n"
@@ -60,12 +60,12 @@ IrisEffect IrisEffect::New()
               "}\n");
 
   std::string fragmentShader(
-              "uniform float uRadius;                                                           \n"
-              "uniform float uBlendFactor;                                                      \n"
-              "varying vec2 vRelativePosition;                                                  \n"
+              "uniform mediump float uRadius;                                                           \n"
+              "uniform mediump float uBlendFactor;                                                      \n"
+              "varying mediump vec2 vRelativePosition;                                                  \n"
               "void main()                                                                      \n"
               "{                                                                                \n"
-              "   float delta = (length(vRelativePosition) - uRadius);                          \n"
+              "   mediump float delta = (length(vRelativePosition) - uRadius);                          \n"
               "   delta = clamp(0.0 - delta * uBlendFactor, 0.0, 1.0);                          \n"
               "   gl_FragColor = texture2D(sTexture, vTexCoord) * uColor;                       \n"
               "   gl_FragColor.a *= delta;                                                      \n"
@@ -118,4 +118,3 @@ const std::string& IrisEffect::GetCenterPropertyName() const
 
 }
 }
-

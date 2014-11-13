@@ -191,7 +191,7 @@ private: // from Control
   /**
    * @copydoc Toolkit::Control::OnPan
    */
-  virtual void OnPan( PanGesture gesture );
+  virtual void OnPan( const PanGesture& gesture );
 
   /**
    * @copydoc Toolkit::Control::OnInitialize

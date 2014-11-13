@@ -2435,7 +2435,7 @@ void ScrollView::GestureContinuing(const Vector2& panDelta)
 // TODO: Upgrade to use a more powerful gesture detector (one that supports multiple touches on pan - so works as pan and flick gesture)
 // BUG: Gesture::Finished doesn't always return velocity on release (due to
 // timeDelta between last two events being 0 sometimes, or posiiton being the same)
-void ScrollView::OnPan(PanGesture gesture)
+void ScrollView::OnPan( const PanGesture& gesture )
 {
   // Guard against destruction during signal emission
   // Note that Emit() methods are called indirectly e.g. from within ScrollView::OnGestureEx()

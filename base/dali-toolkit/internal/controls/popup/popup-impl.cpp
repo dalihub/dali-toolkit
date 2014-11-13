@@ -37,7 +37,6 @@
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 
 using namespace Dali;
-using namespace std;
 
 namespace
 {
@@ -183,7 +182,9 @@ Popup::Popup(PopupStyle& style)
   mShowing(false),
   mState(Toolkit::Popup::POPUP_NONE), // Initially, the popup state should not be set, it's set in OnInitialize
   mAlterAddedChild(false),
-  mPopupStyle(PopupStylePtr(&style))
+  mPopupStyle(PopupStylePtr(&style)),
+  mPropertyTitle(Property::INVALID_INDEX),
+  mPropertyState(Property::INVALID_INDEX)
 {
   SetKeyboardNavigationSupport( true );
 }

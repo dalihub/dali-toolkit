@@ -28,7 +28,6 @@
 // INTERNAL INCLUDES
 
 using namespace Dali;
-using namespace std;
 
 namespace
 {
@@ -101,7 +100,6 @@ void TextHighlight::GetVisualTextSelection(std::vector<bool>& selectedVisualText
 TextHighlight::HighlightInfo TextHighlight::CalculateHighlightInfo( std::size_t handlePositionStart, std::size_t handlePositionEnd, Toolkit::TextView::TextLayoutInfo& textLayoutInfo )
 {
   // At the moment there is no public API to modify the block alignment option.
-  const bool blockAlignEnabled = true;
 
   TextHighlight::HighlightInfo newHighlightInfo;
   //newHighlightInfo.mQuadList.clear(); // clear last quad information.
@@ -171,7 +169,7 @@ TextHighlight::HighlightInfo TextHighlight::CalculateHighlightInfo( std::size_t 
           float rowTop = rowBottom - rowSize.height;
 
           // Still selected, and block-align mode then set rowRight to max, so it can be clamped afterwards
-          if(charSelected && blockAlignEnabled)
+          if(charSelected)
           {
             rowRight = std::numeric_limits<float>::max();
           }
@@ -183,7 +181,7 @@ TextHighlight::HighlightInfo TextHighlight::CalculateHighlightInfo( std::size_t 
           if( charSelected )
           {
             // if block-align mode then set rowLeft to min, so it can be clamped afterwards
-            rowLeft = blockAlignEnabled ? 0.0f : charInfo.mPosition.x - textLayoutInfo.mScrollOffset.x;
+            rowLeft = 0.0f;
             rowRight = ( charInfo.mPosition.x - textLayoutInfo.mScrollOffset.x ) + charInfo.mSize.width;
             selectionState = SelectionStarted;
           }
@@ -206,7 +204,7 @@ TextHighlight::HighlightInfo TextHighlight::CalculateHighlightInfo( std::size_t 
       {
         // finished selection.
         Vector2 min, max;
-        if(lastIt->mIsNewParagraphChar)
+        if(lastIt != end && lastIt->mIsNewParagraphChar)
         {
           lastIt = std::max( textLayoutInfo.mCharacterLayoutInfoTable.begin(), lastIt - 1 );
         }
@@ -228,8 +226,6 @@ TextHighlight::HighlightInfo TextHighlight::CalculateHighlightInfo( std::size_t 
     newHighlightInfo.Clamp2D( topLeft, bottomRight );
 
     // For block-align align Further Clamp quads to max left and right extents
-    if(blockAlignEnabled)
-    {
       // BlockAlign: Will adjust highlight to block:
       // i.e.
       //   H[ello] (top row right = max of all rows right)
@@ -244,9 +240,8 @@ TextHighlight::HighlightInfo TextHighlight::CalculateHighlightInfo( std::size_t 
       // [is some]
       // [text]
       // (common in regular text editors/web browser selection)
-
       newHighlightInfo.Clamp2D( Vector2(maxRowLeft, topLeft.y), Vector2(maxRowRight, bottomRight.y ) );
-    }
+
   }
 
   return newHighlightInfo;

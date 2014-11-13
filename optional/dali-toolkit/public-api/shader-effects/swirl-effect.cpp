@@ -51,21 +51,21 @@ SwirlEffect SwirlEffect::New(bool warp)
 {
   // append the default version
   std::string fragmentShader(
-      "uniform vec2  uTextureSize;\n"
-      "uniform float uRadius;\n"
-      "uniform float uAngle;\n"
-      "uniform vec2  uCenter;\n"
+      "uniform mediump vec2  uTextureSize;\n"
+      "uniform highp float uRadius;\n"
+      "uniform highp float uAngle;\n"
+      "uniform mediump vec2  uCenter;\n"
       "void main()\n"
       "{\n"
-      "  vec2 textureCenter = (sTextureRect.xy + sTextureRect.zw) * 0.5;\n"
+      "  highp vec2 textureCenter = (sTextureRect.xy + sTextureRect.zw) * 0.5;\n"
       "  textureCenter = vTexCoord.st - textureCenter;\n"
-      "  float distance = length(textureCenter);\n"
+      "  highp float distance = length(textureCenter);\n"
       "  if (distance >= uRadius)\n"
       "     discard;\n"
-      "  float percent = (uRadius - distance) / uRadius;\n"
-      "  float theta = percent * percent * uAngle * 4.0;\n"
-      "  float sinTheta = sin(theta);\n"
-      "  float cosTheta = cos(theta);\n" );
+      "  highp float percent = (uRadius - distance) / uRadius;\n"
+      "  highp float theta = percent * percent * uAngle * 4.0;\n"
+      "  highp float sinTheta = sin(theta);\n"
+      "  highp float cosTheta = cos(theta);\n" );
       // if warp, loose the sign from sin
   if( warp )
   {

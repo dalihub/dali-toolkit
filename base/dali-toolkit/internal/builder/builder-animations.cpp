@@ -96,7 +96,6 @@ Property::Value GetPropertyValue( const Property::Type& propType, const TreeNode
     default:
     {
       DALI_ASSERT_ALWAYS( !"Property type incorrect" );
-      return Property::Value();
     }
   }
 }

@@ -34,7 +34,6 @@
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 
 using namespace Dali;
-using namespace std;
 
 namespace
 {

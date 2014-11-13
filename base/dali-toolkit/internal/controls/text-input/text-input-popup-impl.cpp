@@ -25,7 +25,6 @@
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 
-using namespace std;
 using namespace Dali;
 
 #define GET_LOCALE_TEXT(string) dgettext("sys_string", string)
@@ -422,12 +421,6 @@ void TextInputPopup::CreateOrderedListOfOptions()
       {
         Image clipboardIcon = Image::New( OPTION_ICON_CLIPBOARD );
         currentButton = CreateRequiredButton( ButtonsClipboard, mClipboardOptionPriority, OPTION_CLIPBOARD, GET_LOCALE_TEXT("IDS_COM_BODY_CLIPBOARD"), clipboardIcon, false );
-        break;
-      }
-      case ButtonsEnumEnd:
-      {
-        DALI_ASSERT_DEBUG( "ButtonsEnumEnd used but an invalid choice");
-        currentButton.orderOfPriority = 0;
         break;
       }
     }

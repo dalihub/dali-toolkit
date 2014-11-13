@@ -28,7 +28,8 @@ namespace Internal
 {
 
 CubeTransitionCrossEffect::CubeTransitionCrossEffect( unsigned int numRows, unsigned int numColumns, Size viewAreaSize )
-: CubeTransitionEffect( numRows, numColumns, viewAreaSize)
+: CubeTransitionEffect( numRows, numColumns, viewAreaSize),
+  mDisplacementRatio( 1.f )
 {
 }
 

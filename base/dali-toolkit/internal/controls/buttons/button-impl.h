@@ -211,7 +211,7 @@ private:
    * @param[in]  actor  The tapped actor.
    * @param[in]  tap    The tap gesture.
    */
-  void OnTap(Actor actor, TapGesture tap);
+  void OnTap(Actor actor, const TapGesture& tap);
 
 private:
 

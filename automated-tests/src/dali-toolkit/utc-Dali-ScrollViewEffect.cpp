@@ -307,24 +307,6 @@ int UtcDaliScrollViewSlideEffectSetup(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewTwistEffectSetup(void)
-{
-  tet_infoline(" UtcDaliScrollViewTwistEffectSetup");
-
-  ScrollViewTwistEffect effect;
-
-  DALI_TEST_CHECK( !effect );
-
-  BaseHandle handle = ScrollViewTwistEffect::New();
-
-  DALI_TEST_CHECK( handle );
-
-  effect = ScrollViewTwistEffect::DownCast(handle);
-
-  DALI_TEST_CHECK( effect );
-  END_TEST;
-}
-
 int UtcDaliScrollViewCubeEffectTest(void)
 {
   ToolkitTestApplication application;
@@ -426,46 +408,6 @@ int UtcDaliScrollViewSlideEffectTest(void)
   Vector3 actorPrePosition = actor.GetCurrentPosition();
 
   effect.ApplyToActor(actor, 0.0f, 0.5f);
-
-  scrollView.ScrollTo(1);
-  while(!gOnScrollCompleteCalled)
-  {
-    Wait(application);
-  }
-  // test that the first page has reached centre of screen
-  Vector3 actorPostPosition = actor.GetCurrentPosition();
-  // just check the actor has moved
-  DALI_TEST_CHECK((actorPostPosition - actorPrePosition).Length() > Math::MACHINE_EPSILON_1);
-  CleanupTest();
-  END_TEST;
-}
-
-int UtcDaliScrollViewTwistEffectTest(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewTwistEffectTest");
-
-  Vector2 size = Stage::GetCurrent().GetSize();
-
-  ScrollView scrollView = SetupTestScrollView(1, 3, size);
-  Actor testPage = gPages[1];
-  Wait(application, 500);
-
-  ScrollViewTwistEffect effect = ScrollViewTwistEffect::New();
-  float shrinkDist = 0.2f;
-  effect.SetMinimumDistanceForShrink(shrinkDist);
-  DALI_TEST_CHECK((shrinkDist - effect.GetMinimumDistanceForShrink()) < Math::MACHINE_EPSILON_0);
-  effect.EnableEffect(true);
-  scrollView.ApplyEffect(effect);
-
-  Actor actor = AddActorToPage(testPage, 0.5f, 0.5f, 3, 3);
-  Wait(application);
-  Vector3 actorPrePosition = actor.GetCurrentPosition();
-
-  effect.ApplyToActor( actor,
-      true,
-      Vector2(Math::PI_2, Math::PI_2),
-      0.0f);
 
   scrollView.ScrollTo(1);
   while(!gOnScrollCompleteCalled)

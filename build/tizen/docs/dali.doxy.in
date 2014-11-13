@@ -554,6 +554,7 @@ WARN_LOGFILE           =
 INPUT                  = @DOXYGEN_DOCS_DIR@/content \
                          ../../../../dali-toolkit/base/dali-toolkit/public-api \
                          ../../../../dali-toolkit/optional/dali-toolkit/public-api \
+                         ../../../automated-tests/README.md \
                          @prefix@/include/dali
 
 # This tag can be used to specify the character encoding of the source files
@@ -595,6 +596,7 @@ FILE_PATTERNS          = *.c \
                          *.php3 \
                          *.inc \
                          *.m \
+                         *.md \
                          *.mm \
                          *.dox \
                          *.py \

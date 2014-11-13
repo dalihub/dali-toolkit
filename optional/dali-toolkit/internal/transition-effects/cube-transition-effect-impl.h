@@ -69,7 +69,7 @@ public:
   static FullAreaImageCreator New()
   {
     std::string vertexShader(
-      "uniform vec4 uRegion; \n"
+      "uniform mediump vec4 uRegion; \n"
        "void main() \n"
       "{\n"
       "  gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);\n"
@@ -79,7 +79,7 @@ public:
     );
 
     std::string fragmentShader(
-      "uniform vec4 uRegion; \n"
+      "uniform mediump vec4 uRegion; \n"
       "void main() \n"
       "{\n"
       "  if( vTexCoord.s > 0.0 && vTexCoord.s < 1.0 && vTexCoord.t > 0.0 && vTexCoord.t < 1.0) \n"

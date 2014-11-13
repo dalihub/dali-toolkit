@@ -116,25 +116,22 @@ struct ScrollDepthScaleConstraint
     }
 
     const Vector3& pageSize = pageSizeProperty.GetVector3();
+
     // Don't have enough parameters, to provide Wrap mode (need a way of having 'uniforms' instead of scrollWrap.GetBoolean())
-    const bool wrap = true;
 
-    if(wrap)
+    const Vector3& min = scrollPositionMin.GetVector3();
+    const Vector3& max = scrollPositionMax.GetVector3();
+
+    if(fabsf(min.x - max.x) > Math::MACHINE_EPSILON_1)
     {
-      const Vector3& min = scrollPositionMin.GetVector3();
-      const Vector3& max = scrollPositionMax.GetVector3();
+      // WRAP X (based on the position of the right side)
+      position.x = WrapInDomain(position.x + pageSize.x, min.x, max.x) - pageSize.x;
+    }
 
-      if(fabsf(min.x - max.x) > Math::MACHINE_EPSILON_1)
-      {
-        // WRAP X (based on the position of the right side)
-        position.x = WrapInDomain(position.x + pageSize.x, min.x, max.x) - pageSize.x;
-      }
-
-      if(fabsf(min.y - max.y) > Math::MACHINE_EPSILON_1)
-      {
-        // WRAP Y (based on the position of the bottom side)
-        position.y = WrapInDomain(position.y + pageSize.y, min.y, max.y) - pageSize.y;
-      }
+    if(fabsf(min.y - max.y) > Math::MACHINE_EPSILON_1)
+    {
+      // WRAP Y (based on the position of the bottom side)
+      position.y = WrapInDomain(position.y + pageSize.y, min.y, max.y) - pageSize.y;
     }
 
     // short circuit: for pages outside of view.

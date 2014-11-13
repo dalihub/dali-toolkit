@@ -129,7 +129,8 @@ TextView::TextViewProcessorMetadata::TextViewProcessorMetadata()
 : mType( TextView::TextSet ),
   mPosition( 0u ),
   mNumberOfCharacters( 0u ),
-  mText()
+  mText(),
+  mStyleMask(TextStyle::NONE)
 {
 }
 
@@ -926,6 +927,7 @@ bool TextView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* 
 
 TextView::LayoutParameters::LayoutParameters()
 : mMultilinePolicy( Toolkit::TextView::SplitByNewLineChar ),
+  mExceedPolicy( TextView::Original ),
   mWidthExceedPolicy( Toolkit::TextView::Original ),
   mHeightExceedPolicy( Toolkit::TextView::Original ),
   mHorizontalAlignment( Toolkit::Alignment::HorizontalCenter ),
@@ -948,6 +950,7 @@ TextView::LayoutParameters::LayoutParameters( Toolkit::TextView::MultilinePolicy
                                               float                                lineHeightOffset,
                                               bool                                 markUpEnabled )
 : mMultilinePolicy( multilinePolicy ),
+  mExceedPolicy( TextView::Original ),
   mWidthExceedPolicy( widthExceedPolicy ),
   mHeightExceedPolicy( heightExceedPolicy ),
   mHorizontalAlignment(),
@@ -970,6 +973,7 @@ TextView::LayoutParameters::LayoutParameters( Toolkit::TextView::MultilinePolicy
 
 TextView::LayoutParameters::LayoutParameters( const TextView::LayoutParameters& layoutParameters )
 : mMultilinePolicy( layoutParameters.mMultilinePolicy ),
+  mExceedPolicy( TextView::Original ),
   mWidthExceedPolicy( layoutParameters.mWidthExceedPolicy ),
   mHeightExceedPolicy( layoutParameters.mHeightExceedPolicy ),
   mHorizontalAlignment( layoutParameters.mHorizontalAlignment ),
@@ -1671,7 +1675,7 @@ void TextView::DestroyOffscreenRenderingResources()
   }
 }
 
-void TextView::OnTextPan( Actor actor, PanGesture gesture )
+void TextView::OnTextPan( Actor actor, const PanGesture& gesture )
 {
   if( 1u == gesture.numberOfTouches )
   {

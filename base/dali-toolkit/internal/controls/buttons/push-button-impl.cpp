@@ -713,7 +713,7 @@ bool PushButton::AutoRepeatingSlot()
 void PushButton::OnActivated()
 {
   // When the button is activated, it performs the click action
-  std::vector<Property::Value> attributes;
+  PropertyValueContainer attributes;
   DoClickAction(attributes);
 }
 
@@ -794,7 +794,7 @@ void PushButton::DoClickAction(const PropertyValueContainer& attributes)
   }
 }
 
-bool PushButton::DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes)
+bool PushButton::DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes)
 {
   bool ret = false;
 

@@ -47,6 +47,17 @@ BubbleEmitter::BubbleEmitter( const Vector2& movementArea,
   mCurrentUniform( 0 ),
   mDensity( 5 )
 {
+  // Calculate how many BubbleEffect shaders are required
+  if( mTotalNumOfBubble>100 )
+  {
+    mNumBubblePerShader = 100;
+    mNumShader = mTotalNumOfBubble / 100;
+  }
+  else
+  {
+    mNumBubblePerShader = mTotalNumOfBubble;
+    mNumShader = 1;
+  }
 }
 
 BubbleEmitter::~BubbleEmitter()
@@ -82,18 +93,6 @@ void BubbleEmitter::OnInitialize()
 
   // Generate the material object, which is used by all meshActors
   GenMaterial();
-
-  // Calculate how many BubbleEffect shaders are required
-  if( mTotalNumOfBubble>100 )
-  {
-    mNumBubblePerShader = 100;
-    mNumShader = mTotalNumOfBubble / 100;
-  }
-  else
-  {
-    mNumBubblePerShader = mTotalNumOfBubble;
-    mNumShader = 1;
-  }
 
   mMesh.resize( mNumShader );
   mMeshActor.resize( mNumShader );

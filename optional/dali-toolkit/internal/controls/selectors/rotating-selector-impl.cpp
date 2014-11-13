@@ -27,8 +27,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/selectors/rotating-selector.h>
 
-using namespace std;
-
 namespace
 {
 const float TOUCH_OPACITY_THRESHOLD = 0.1f;
@@ -112,6 +110,7 @@ RotatingSelector::RotatingSelector()
 : Control( REQUIRES_TOUCH_EVENTS ),
   mSelected(false),
   mSelectable(true),
+  mPressed(false),
   mIsAnimating(false)
 {
 }

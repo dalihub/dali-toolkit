@@ -43,6 +43,7 @@ const float ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 
 const char* EMBOSS_FRAGMENT_SOURCE1 =
 {
+ "precision highp float;\n"
  "uniform vec2 uTexScale;\n"
  "\n"
  "void main()\n"
@@ -72,6 +73,7 @@ const char* EMBOSS_FRAGMENT_SOURCE1 =
 
 const char* EMBOSS_FRAGMENT_SOURCE2 =
 {
+ "precision highp float;\n"
  "uniform vec2 uTexScale;\n"
  "\n"
  "void main()\n"

@@ -175,9 +175,10 @@ struct ScrollViewWobbleEffectConstraint
 };
 
 ScrollViewWobbleEffect::ScrollViewWobbleEffect()
-: mPropertyTime(Property::INVALID_INDEX)
+: mPropertyTime(Property::INVALID_INDEX),
+  mStableCurrent(0),
+  mAnimationCycleId(0)
 {
-
 }
 
 ScrollViewWobbleEffect::~ScrollViewWobbleEffect()

@@ -100,7 +100,7 @@ Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
   meshActor.SetAffectedByLighting(false);
 
   Dali::ShaderEffect shaderEffect = Dali::ShaderEffect::New( "", MESH_FRAGMENT_SHADER,
-                                                             GEOMETRY_TYPE_MESH,
+                                                             GEOMETRY_TYPE_UNTEXTURED_MESH,
                                                              Dali::ShaderEffect::HINT_BLENDING );
   meshActor.SetShaderEffect(shaderEffect);
 

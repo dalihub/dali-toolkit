@@ -149,12 +149,12 @@ protected:
   /**
    * Helper for edit mode.
    */
-  void OnPan( Actor source, PanGesture gesture );
+  void OnPan( Actor source, const PanGesture& gesture );
 
   /**
    * Helper for edit mode.
    */
-  void OnPinch( Actor actor, PinchGesture pinch );
+  void OnPinch( Actor actor, const PinchGesture& pinch );
 
   /**
    * Construct a new MaskedImageView.

@@ -851,8 +851,6 @@ Animation Builder::CreateAnimation( const std::string& animationName )
 
 void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::UIFormat format )
 {
-  DALI_ASSERT_ALWAYS( format == Dali::Toolkit::Builder::JSON && "Currently only JSON is supported" );
-
   // parser to get constants and includes only
   Dali::Toolkit::JsonParser parser = Dali::Toolkit::JsonParser::New();
 

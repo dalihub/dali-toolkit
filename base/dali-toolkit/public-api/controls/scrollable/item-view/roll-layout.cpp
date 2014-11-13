@@ -24,7 +24,6 @@
 
 using namespace Dali;
 using namespace Dali::Toolkit;
-using namespace std;
 
 namespace // unnamed namespace
 {
@@ -69,13 +68,13 @@ struct RollPositionConstraint0
     }
     else
     {
-      float yStep = max(50.0f, min(itemSize.y, scrollSpeedFactor));
+      float yStep = std::max(50.0f, std::min(itemSize.y, scrollSpeedFactor));
       y = adjustedLayoutPosition < Math::MACHINE_EPSILON_0 ? adjustedLayoutPosition * yStep : (layoutSize.height * 0.5f + adjustedRowSpacing) + (adjustedLayoutPosition - 1.0f) * yStep;
       y += itemSize.y * 0.5f - layoutSize.height * 0.5f;
     }
 
     float z = adjustedLayoutPosition * (10.0f + scrollSpeedFactor);
-    z -= min(3000.0f, scrollSpeedFactor * 2.0f);
+    z -= std::min(3000.0f, scrollSpeedFactor * 2.0f);
 
     return Vector3(itemSize.x * 0.5f - layoutSize.x * 0.5f, y, z);
   }
@@ -112,13 +111,13 @@ struct RollPositionConstraint90
     }
     else
     {
-      float xStep = max(50.0f, min(itemSize.y, scrollSpeedFactor));
+      float xStep = std::max(50.0f, std::min(itemSize.y, scrollSpeedFactor));
       x = adjustedLayoutPosition < Math::MACHINE_EPSILON_0 ? adjustedLayoutPosition * xStep : (layoutSize.width * 0.5f + adjustedRowSpacing) + (adjustedLayoutPosition - 1.0f) * xStep;
       x += itemSize.y * 0.5f - layoutSize.width * 0.5f;
     }
 
     float z = adjustedLayoutPosition * (10.0f + scrollSpeedFactor);
-    z -= min(3000.0f, scrollSpeedFactor * 2.0f);
+    z -= std::min(3000.0f, scrollSpeedFactor * 2.0f);
 
     return Vector3(x, itemSize.x * 0.5f - layoutSize.y * 0.5f, z);
   }
@@ -155,13 +154,13 @@ struct RollPositionConstraint180
     }
     else
     {
-      float yStep = max(50.0f, min(itemSize.y, scrollSpeedFactor));
+      float yStep = std::max(50.0f, std::min(itemSize.y, scrollSpeedFactor));
       y = adjustedLayoutPosition < Math::MACHINE_EPSILON_0 ? adjustedLayoutPosition * yStep : (layoutSize.height * 0.5f + adjustedRowSpacing) + (adjustedLayoutPosition - 1.0f) * yStep;
       y += itemSize.y * 0.5f - layoutSize.height * 0.5f;
     }
 
     float z = adjustedLayoutPosition * (10.0f + scrollSpeedFactor);
-    z -= min(3000.0f, scrollSpeedFactor * 2.0f);
+    z -= std::min(3000.0f, scrollSpeedFactor * 2.0f);
 
 
     return Vector3(-(itemSize.x * 0.5f - layoutSize.x * 0.5f),
@@ -201,13 +200,13 @@ struct RollPositionConstraint270
     }
     else
     {
-      float xStep = max(50.0f, min(itemSize.y, scrollSpeedFactor));
+      float xStep = std::max(50.0f, std::min(itemSize.y, scrollSpeedFactor));
       x = adjustedLayoutPosition < Math::MACHINE_EPSILON_0 ? adjustedLayoutPosition * xStep : (layoutSize.width * 0.5f + adjustedRowSpacing) + (adjustedLayoutPosition - 1.0f) * xStep;
       x += itemSize.y * 0.5f - layoutSize.width * 0.5f;
     }
 
     float z = adjustedLayoutPosition * (10.0f + scrollSpeedFactor);
-    z -= min(3000.0f, scrollSpeedFactor * 2.0f);
+    z -= std::min(3000.0f, scrollSpeedFactor * 2.0f);
 
     return Vector3(-x,
                    itemSize.x * 0.5f - layoutSize.y * 0.5f,
@@ -267,10 +266,10 @@ struct RollScaleConstraint
       factor = adjustedLayoutPosition - 1.0f;
     }
 
-    float scale = min(1.0f, max(0.1f, 1.0f - 0.1f * factor));
+    float scale = std::min(1.0f, std::max(0.1f, 1.0f - 0.1f * factor));
     if(scrollSpeed > 0.0f)
     {
-      scale *= min(1.0f, max(0.1f, 1.0f / (scrollSpeed * 0.05f)));
+      scale *= std::min(1.0f, std::max(0.1f, 1.0f / (scrollSpeed * 0.05f)));
     }
 
     return Vector3(scale, scale, scale);
@@ -293,8 +292,8 @@ struct RollColorConstraint
       factor = adjustedLayoutPosition - 1.0f;
     }
 
-    float darkness = min(1.0f, max(0.5f, 1.0f - 0.5f * factor));
-    float alpha = min(1.0f, max(0.0f, 1.0f - 0.9f * factor));
+    float darkness = std::min(1.0f, std::max(0.5f, 1.0f - 0.5f * factor));
+    float alpha = std::min(1.0f, std::max(0.0f, 1.0f - 0.9f * factor));
     return Vector4(darkness, darkness, darkness, alpha);
   }
 };

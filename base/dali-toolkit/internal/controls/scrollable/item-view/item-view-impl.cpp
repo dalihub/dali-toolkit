@@ -337,6 +337,7 @@ ItemView::ItemView(ItemFactory& factory)
   mRefreshOrderHint(true/*Refresh item 0 first*/),
   mMinimumSwipeSpeed(DEFAULT_MINIMUM_SWIPE_SPEED),
   mMinimumSwipeDistance(DEFAULT_MINIMUM_SWIPE_DISTANCE),
+  mMouseWheelScrollDistanceStep(0.0f),
   mScrollDistance(0.0f),
   mScrollSpeed(0.0f),
   mTotalPanDisplacement(Vector2::ZERO),
@@ -344,6 +345,9 @@ ItemView::ItemView(ItemFactory& factory)
   mIsFlicking(false),
   mGestureState(Gesture::Clear),
   mAddingItems(false),
+  mPropertyPosition(Property::INVALID_INDEX),
+  mPropertyMinimumLayoutPosition(Property::INVALID_INDEX),
+  mPropertyScrollSpeed(Property::INVALID_INDEX),
   mRefreshEnabled(true),
   mItemsParentOrigin( ParentOrigin::CENTER),
   mItemsAnchorPoint( AnchorPoint::CENTER)
@@ -626,7 +630,7 @@ float ItemView::GetAnchoringDuration() const
 
 void ItemView::SetRefreshInterval(float intervalLayoutPositions)
 {
-  if(mRefreshIntervalLayoutPositions != intervalLayoutPositions)
+  if( !Equals(mRefreshIntervalLayoutPositions, intervalLayoutPositions) )
   {
     mRefreshIntervalLayoutPositions = intervalLayoutPositions;
 
@@ -1110,7 +1114,7 @@ float ItemView::ClampFirstItemPosition(float targetPosition, const Vector3& targ
   return clamppedPosition;
 }
 
-void ItemView::OnPan(PanGesture gesture)
+void ItemView::OnPan( const PanGesture& gesture )
 {
   Actor self = Self();
   const Vector3 layoutSize = Self().GetCurrentSize();
@@ -1643,8 +1647,16 @@ Vector3 ItemView::GetItemsAnchorPoint() const
 
 void ItemView::GetItemsRange(ItemRange& range)
 {
-  range.begin = mItemPool.begin()->first;
-  range.end = mItemPool.rbegin()->first + 1;
+  if( !mItemPool.empty() )
+  {
+    range.begin = mItemPool.begin()->first;
+    range.end = mItemPool.rbegin()->first + 1;
+  }
+  else
+  {
+    range.begin = 0;
+    range.end = 0;
+  }
 }
 
 void ItemView::OnScrollPositionChanged( float position )

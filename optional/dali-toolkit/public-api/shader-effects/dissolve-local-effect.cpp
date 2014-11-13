@@ -36,12 +36,14 @@ namespace
 }
 
 DissolveLocalEffect::DissolveLocalEffect()
+: mNumberOfDimples( 1 )
 {
 }
 
 //Call the Parent copy constructor to add reference to the implementation for this object
 DissolveLocalEffect::DissolveLocalEffect( ShaderEffect handle )
-: ShaderEffect( handle )
+: ShaderEffect( handle ),
+  mNumberOfDimples( 1 )
 {
 }
 
@@ -54,6 +56,7 @@ DissolveLocalEffect DissolveLocalEffect::New( unsigned int numberOfDimples )
   std::ostringstream vertexShaderStringStream;
   vertexShaderStringStream << "#define NUMBER_OF_DIMPLE "<< numberOfDimples << "\n";
   std::string vertexShader(
+    "precision highp float;\n"
     "uniform vec2 uCenter[ NUMBER_OF_DIMPLE ];\n"
     "uniform float uRadius[ NUMBER_OF_DIMPLE ]; \n"
     "uniform float uPercentage[ NUMBER_OF_DIMPLE ]; \n"

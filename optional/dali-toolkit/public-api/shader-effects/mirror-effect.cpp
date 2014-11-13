@@ -48,20 +48,19 @@ MirrorEffect::~MirrorEffect()
 MirrorEffect MirrorEffect::New()
 {
 
-  std::string vertextShader(
-      "precision mediump float;                     \n"
+  std::string vertexShader(
       "void main()                                  \n"
       "{                                            \n"
-      "  vec3 pos = aPosition;                      \n"
+      "  mediump vec3 pos = aPosition;              \n"
       "  pos.y = pos.y * 3.0;                       \n"
-      "  vec4 world = uModelView * vec4(pos,1.0);   \n"
+      "  mediump vec4 world = uModelView * vec4(pos,1.0); \n"
       "  gl_Position = uProjection * world;         \n"
       "  vTexCoord = aTexCoord;                     \n"
       "}                                            \n" );
 
   std::string fragmentShader(
-      "uniform  float  uDepth;                      \n"
-      "uniform  float  uAlpha;                      \n"
+      "uniform  mediump float  uDepth;              \n"
+      "uniform  mediump float  uAlpha;              \n"
       "void main()                                  \n"
       "{                                            \n"
       " if(vTexCoord.y < 1.0 / 3.0)                 \n"
@@ -75,9 +74,9 @@ MirrorEffect MirrorEffect::New()
       " }                                           \n"
       " else                                        \n"
       " {                                           \n"
-      "   float darkness = 3.0 - vTexCoord.y * 3.0;                                                   \n"
+      "   highp float darkness = 3.0 - vTexCoord.y * 3.0;                                                   \n"
       "   darkness = (1.0 - 1.0 / uDepth + darkness * 1.0/ uDepth) * 0.65;                            \n"
-      "   vec4 color = texture2D(sTexture, vec2(vTexCoord.x, -vTexCoord.y *3.0 + 3.0)) * uColor;      \n"
+      "   highp vec4 color = texture2D(sTexture, vec2(vTexCoord.x, -vTexCoord.y *3.0 + 3.0)) * uColor;      \n"
       "   color.a *= uAlpha;                                                                          \n"
       "   gl_FragColor = color * vec4(darkness, darkness, darkness, darkness);                        \n"
       " }                                           \n"
@@ -85,7 +84,7 @@ MirrorEffect MirrorEffect::New()
 
   // Create the implementation, temporarily owned on stack,
   Dali::ShaderEffect shaderEffectCustom =  Dali::ShaderEffect::New(
-      vertextShader,
+      vertexShader,
       fragmentShader,
       GeometryType( GEOMETRY_TYPE_IMAGE ),
       ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ));

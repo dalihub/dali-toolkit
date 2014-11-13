@@ -80,7 +80,7 @@ DisplacementEffect DisplacementEffect::New(Type type)
 
     "void main()\n"
     "{\n"
-    "   vec4 col = texture2D(sTexture, vTexCoord);\n"
+    "  vec4 col = texture2D(sTexture, vTexCoord);\n"
     // calc lighting
     "  float intensity = dot(uLightDirection, uFixedNormal);"
     "  vec3 lighting = (intensity * uDiffuseLightColor) + uAmbientLightColor;\n"
@@ -238,4 +238,3 @@ void DisplacementEffect::SetFixedNormalProperty(const Vector3 fixedNormal)
 }
 
 }
-

@@ -62,6 +62,8 @@ public:
    * Constructor
    */
   ScrollSlideInfo()
+  : mScrollWrap(false),
+    mVertical(false)
   {
   }
 

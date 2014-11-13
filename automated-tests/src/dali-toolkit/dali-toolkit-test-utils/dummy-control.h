@@ -105,10 +105,10 @@ private: // From Internal::Control
   virtual void OnInitialize();
   virtual void OnThemeChange( StyleManager styleManager );
   virtual void OnFontChange(bool defaultFontChange, bool defaultFontSizeChange);
-  virtual void OnPinch(PinchGesture pinch);
-  virtual void OnPan(PanGesture pan);
-  virtual void OnTap(TapGesture tap);
-  virtual void OnLongPress(LongPressGesture longPress);
+  virtual void OnPinch(const PinchGesture& pinch);
+  virtual void OnPan(const PanGesture& pan);
+  virtual void OnTap(const TapGesture& tap);
+  virtual void OnLongPress(const LongPressGesture& longPress);
 
 private: // From CustomActorImpl
 

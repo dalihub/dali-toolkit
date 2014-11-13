@@ -94,7 +94,8 @@ Dali::Toolkit::ImageView ImageView::New()
 }
 
 ImageView::ImageView()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) )
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+  mPropertyDetail( Property::INVALID_INDEX )
 {
 }
 

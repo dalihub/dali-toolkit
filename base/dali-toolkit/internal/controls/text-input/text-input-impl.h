@@ -621,7 +621,7 @@ private:
     * @param actor Handle of the selection or grab handle.
     * @param gesture Data structure with the parameters of the gesture.
     */
-   void OnHandlePan(Actor actor, PanGesture gesture);
+   void OnHandlePan(Actor actor, const PanGesture& gesture);
 
    /**
     * Callback for touch down on Grab handle
@@ -649,21 +649,21 @@ private:
     * @param[in] actor
     * @param[in] tap touch event
     */
-   void OnTextTap(Dali::Actor actor, Dali::TapGesture tap);
+   void OnTextTap(Dali::Actor actor, const Dali::TapGesture& tap);
 
    /**
     * Callback for double tap on TextInput
     * @param[in] actor
     * @param[in] tap touch event
     */
-   void OnDoubleTap(Dali::Actor actor, Dali::TapGesture tap);
+   void OnDoubleTap(Dali::Actor actor, const Dali::TapGesture& tap);
 
     /**
      * Callback for long press on TextInput
      * @param[in] actor
      * @param[in] longPress long press event
      */
-   void OnLongPress(Dali::Actor actor, Dali::LongPressGesture longPress);
+   void OnLongPress(Dali::Actor actor, const Dali::LongPressGesture& longPress);
 
    /**
     * Callback for the ClipboardEventNotifier when text is selected in the clipboard window.

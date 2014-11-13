@@ -43,7 +43,6 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-spiral-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-slide-effect.h>
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-twist-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 #include <dali-toolkit/public-api/controls/super-blur-view/super-blur-view.h>
@@ -85,7 +84,6 @@
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-component.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-component-impl.h>
-#include <dali-toolkit/public-api/controls/scrollable/item-view/album-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/depth-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/navigation-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/roll-layout.h>

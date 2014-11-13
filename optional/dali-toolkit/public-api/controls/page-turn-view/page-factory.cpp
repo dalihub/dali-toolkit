@@ -50,7 +50,7 @@ void PageFactory::SetActorHittability( Actor actor, bool hittable )
   Property::Index propertyActorHittable = actor.GetPropertyIndex(ACTOR_HITTABLE);
   if(propertyActorHittable == Property::INVALID_INDEX && hittable)
   {
-    propertyActorHittable = actor.RegisterProperty(ACTOR_HITTABLE, true);
+    actor.RegisterProperty(ACTOR_HITTABLE, true);
   }
   else
   {

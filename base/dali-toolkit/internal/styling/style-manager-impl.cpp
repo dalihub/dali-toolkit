@@ -347,11 +347,16 @@ void StyleManager::RequestDefaultTheme()
 void StyleManager::SetTheme()
 {
   mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
-  LoadJSON( mThemeBuilder, mThemeFile );
-
-  StyleChange change;
-  change.themeChange = true;
-  mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), change );
+  if ( LoadJSON( mThemeBuilder, mThemeFile ) )
+  {
+    StyleChange change;
+    change.themeChange = true;
+    mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), change );
+  }
+  else
+  {
+    mThemeBuilder.Reset();
+  }
 }
 
 Toolkit::Builder StyleManager::FindCachedBuilder( const std::string& key )

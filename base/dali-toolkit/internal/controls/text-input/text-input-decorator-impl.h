@@ -107,7 +107,7 @@ public:
    * @param actor Handle of the selection or grab handle.
    * @param gesture Data structure with the parameters of the gesture.
    */
-  void OnHandlePan(Actor actor, PanGesture gesture);
+  void OnHandlePan(Actor actor, const PanGesture& gesture);
 
   // Selection Handles
 

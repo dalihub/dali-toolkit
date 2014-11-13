@@ -696,7 +696,7 @@ private:
    *
    * @param[in] gesture The gesture event.
    */
-  void OnPan(PanGesture pan);
+  void OnPan( const PanGesture& pan);
 
   /**
    * Extension of the above gestures.

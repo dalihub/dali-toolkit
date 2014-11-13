@@ -26,6 +26,7 @@
 #include <dali/public-api/events/pinch-gesture.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/object/property-index.h>
+#include <dali/public-api/object/type-info.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -182,7 +183,7 @@ public:
    * @param[in] attributes The attributes with which to perfrom this action.
    * @return true if action has been accepted by this control
    */
-  static bool DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes);
+  static bool DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes);
 
   /**
    * Connects a callback function with the object's signals.
@@ -343,7 +344,7 @@ private: // For derived classes to override
    * @param[in]  pinch  The pinch gesture.
    * @see EnableGestureDetection
    */
-  virtual void OnPinch(PinchGesture pinch);
+  virtual void OnPinch(const PinchGesture& pinch);
 
   /**
    * @brief Called whenever a pan gesture is detected on this control.
@@ -356,7 +357,7 @@ private: // For derived classes to override
    * @param[in]  pan  The pan gesture.
    * @see EnableGestureDetection
    */
-  virtual void OnPan(PanGesture pan) { }
+  virtual void OnPan( const PanGesture& pan );
 
   /**
    * @brief Called whenever a tap gesture is detected on this control.
@@ -369,7 +370,7 @@ private: // For derived classes to override
    * @param[in]  tap  The tap gesture.
    * @see EnableGestureDetection
    */
-  virtual void OnTap(TapGesture tap) { }
+  virtual void OnTap( const TapGesture& tap );
 
   /**
    * @brief Called whenever a long press gesture is detected on this control.
@@ -382,7 +383,7 @@ private: // For derived classes to override
    * @param[in]  longPress  The long press gesture.
    * @see EnableGestureDetection
    */
-  virtual void OnLongPress(LongPressGesture longPress) { }
+  virtual void OnLongPress( const LongPressGesture& longPress );
 
   /**
    * @brief Called whenever the control is added to the stage.
