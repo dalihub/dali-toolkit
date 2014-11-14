@@ -559,8 +559,6 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
           // Move the focus towards right
           MoveFocus(Toolkit::Control::Right);
         }
-
-        isFocusStartableKey = true;
       }
       else
       {
