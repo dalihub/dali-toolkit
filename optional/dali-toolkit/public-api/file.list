@@ -13,7 +13,6 @@ public_api_optional_src_files = \
   $(public_api_optional_src_dir)/controls/page-turn-view/page-factory.cpp \
   $(public_api_optional_src_dir)/controls/page-turn-view/page-turn-portrait-view.cpp \
   $(public_api_optional_src_dir)/controls/page-turn-view/page-turn-landscape-view.cpp \
-  $(public_api_optional_src_dir)/controls/selectors/rotating-selector.cpp \
   $(public_api_optional_src_dir)/controls/shadow-view/shadow-view.cpp \
   $(public_api_optional_src_dir)/controls/slider/slider.cpp \
   $(public_api_optional_src_dir)/controls/super-blur-view/super-blur-view.cpp \
@@ -93,9 +92,6 @@ public_api_optional_page_turn_view_header_files = \
 
 public_api_optional_slider_header_files = \
   $(public_api_optional_src_dir)/controls/slider/slider.h
-
-public_api_optional_selectors_header_files = \
-  $(public_api_optional_src_dir)/controls/selectors/rotating-selector.h
 
 public_api_optional_shadow_view_header_files = \
   $(public_api_optional_src_dir)/controls/shadow-view/shadow-view.h

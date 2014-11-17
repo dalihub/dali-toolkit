@@ -94,7 +94,6 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-carousel-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-cube-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-wobble-effect.h>
-#include <dali-toolkit/public-api/controls/selectors/rotating-selector.h>
 #include <dali-toolkit/public-api/controls/shadow-view/shadow-view.h>
 #include <dali-toolkit/public-api/controls/slider/slider.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
