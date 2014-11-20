@@ -30,6 +30,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/property-notification.h>
+#include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/images/resource-image.h>
 
@@ -1156,10 +1157,10 @@ void TextInput::OnControlSizeSet(const Vector3& targetSize)
   mActiveLayer.SetSize(targetSize);
 }
 
-void TextInput::OnRelayout( const Vector2& size, ActorSizeContainer& container )
+void TextInput::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
-  Relayout( mDisplayedTextView, size, container );
-  Relayout( mPopupPanel.GetRootActor(), size, container );
+  container.Add( mDisplayedTextView, size );
+  container.Add( mPopupPanel.GetRootActor(), size );
 
   GetTextLayoutInfo();
 
@@ -2142,7 +2143,6 @@ void TextInput::CreateTextViewActor()
   mDisplayedTextView.SetLineJustification( Toolkit::TextView::Left );
   mDisplayedTextView.SetTextAlignment( static_cast<Toolkit::Alignment::Type>( Toolkit::Alignment::HorizontalLeft | Toolkit::Alignment::VerticalTop ) );
   mDisplayedTextView.SetPosition( Vector3( 0.0f, 0.0f, DISPLAYED_TEXT_VIEW_Z_OFFSET ) );
-  mDisplayedTextView.SetSizePolicy( Toolkit::Control::Fixed, Toolkit::Control::Fixed );
 
   mDisplayedTextView.ScrolledSignal().Connect( this, &TextInput::OnTextViewScrolled );
 

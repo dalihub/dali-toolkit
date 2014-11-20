@@ -218,7 +218,8 @@ int UtcDaliControlImplOnGestureMethods(void)
   // Check gesture actually happens
   {
     DummyControl dummy = DummyControl::New(true);
-    dummy.SetSize( Vector3(100.0f, 100.0f, 100.0f) );
+    dummy.SetRelayoutEnabled( true );
+    dummy.SetPreferredSize( Vector2(100.0f, 100.0f ) );
 
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
@@ -278,7 +279,8 @@ int UtcDaliControlImplOnGestureMethods(void)
   // Ensure full code coverage
   {
     DummyControl dummy = DummyControl::New();
-    dummy.SetSize( Vector3(100.0f, 100.0f, 100.0f) );
+    dummy.SetRelayoutEnabled( true );
+    dummy.SetPreferredSize( Vector2( 100.0f, 100.0f ) );
 
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
@@ -443,22 +445,23 @@ int UtcDaliControlImplSizeSet(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
+    dummy.SetRelayoutEnabled( true );
     DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
 
     Stage::GetCurrent().Add(dummy);
     application.Render();
     application.SendNotification();
 
-    DALI_TEST_EQUALS( dummyImpl.sizeSetCalled, false, TEST_LOCATION );
-    Vector3 size(100.0f, 200.0f, 0.0f);
-    dummy.SetSize(size);
+    DALI_TEST_EQUALS( dummyImpl.sizeSetCalled, true, TEST_LOCATION ); // Called from size negotiation
+    Vector2 size(100.0f, 200.0f);
+    dummy.SetPreferredSize(size);
 
     application.Render();
     application.SendNotification();
     application.Render();
     application.SendNotification();
 
-    DALI_TEST_EQUALS(size, dummy.GetCurrentSize(), TEST_LOCATION);
+    DALI_TEST_EQUALS(size, dummy.GetCurrentSize().GetVectorXY(), TEST_LOCATION);
     DALI_TEST_EQUALS( dummyImpl.sizeSetCalled, true, TEST_LOCATION );
 
     Stage::GetCurrent().Remove(dummy);
@@ -467,22 +470,23 @@ int UtcDaliControlImplSizeSet(void)
   // Ensure full code coverage
   {
     DummyControl dummy = DummyControl::New();
+    dummy.SetRelayoutEnabled( true );
     Stage::GetCurrent().Add(dummy);
 
-    Vector3 size(100.0f, 200.0f, 0.0f);
-    DALI_TEST_CHECK( size != dummy.GetCurrentSize() );
+    Vector2 size(100.0f, 200.0f);
+    DALI_TEST_CHECK( size != dummy.GetCurrentSize().GetVectorXY() );
 
     application.Render();
     application.SendNotification();
 
-    dummy.SetSize(size);
+    dummy.SetPreferredSize(size);
 
     application.Render();
     application.SendNotification();
     application.Render();
     application.SendNotification();
 
-    DALI_TEST_EQUALS(size, dummy.GetCurrentSize(), TEST_LOCATION);
+    DALI_TEST_EQUALS(size, dummy.GetCurrentSize().GetVectorXY(), TEST_LOCATION);
 
     Stage::GetCurrent().Remove(dummy);
   }
@@ -542,9 +546,10 @@ int UtcDaliControlImplTouchEvent(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
+    dummy.SetRelayoutEnabled( true );
     DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
 
-    dummy.SetSize(100.0f, 100.0f);
+    dummy.SetPreferredSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
@@ -566,8 +571,9 @@ int UtcDaliControlImplTouchEvent(void)
   // Ensure full code coverage
   {
     DummyControl dummy = DummyControl::New();
+    dummy.SetRelayoutEnabled( true );
 
-    dummy.SetSize(100.0f, 100.0f);
+    dummy.SetPreferredSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
@@ -767,9 +773,10 @@ int UtcDaliControlImplMouseWheelEvent(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
+    dummy.SetRelayoutEnabled( true );
     DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
 
-    dummy.SetSize(100.0f, 100.0f);
+    dummy.SetPreferredSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
@@ -794,8 +801,9 @@ int UtcDaliControlImplMouseWheelEvent(void)
   // Ensure full code coverage
   {
     DummyControl dummy = DummyControl::New();
+    dummy.SetRelayoutEnabled( true );
 
-    dummy.SetSize(100.0f, 100.0f);
+    dummy.SetPreferredSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 

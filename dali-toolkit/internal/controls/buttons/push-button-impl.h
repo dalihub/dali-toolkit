@@ -201,7 +201,7 @@ private:
    * @param[inout] image The actor.
    * @param[in] opacity The initial opacity.
    */
-  void FadeInImage( Actor& image, float opacity = 0.f );
+  void FadeInImage( Actor& image, float opacity = 0.f, int priority = -1 );
 
   /**
    * It adds the actor fade out animation and stores it to be removed when the animation finishes.

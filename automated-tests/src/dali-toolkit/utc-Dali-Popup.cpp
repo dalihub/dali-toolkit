@@ -279,7 +279,6 @@ int UtcDaliPopupSetState(void)
 
   // Create the Popup actor
   Popup popup = Popup::New();
-  Stage::GetCurrent().Add( popup );
 
   ImageActor backgroundImage = CreateSolidColorActor( Color::RED );
   popup.SetBackgroundImage(backgroundImage);
@@ -303,7 +302,6 @@ int UtcDaliPopupSetStateSlow(void)
 
   // Create the Popup actor
   Popup popup = Popup::New();
-  Stage::GetCurrent().Add( popup );
 
   ImageActor backgroundImage = CreateSolidColorActor( Color::RED );
   popup.SetBackgroundImage(backgroundImage);
@@ -337,7 +335,6 @@ int UtcDaliPopupShowHide(void)
 
   // Create the Popup actor
   Popup popup = Popup::New();
-  Stage::GetCurrent().Add( popup );
   popup.HiddenSignal().Connect( &OnPopupHidden );
 
   ImageActor backgroundImage = CreateSolidColorActor( Color::RED );
@@ -345,9 +342,9 @@ int UtcDaliPopupShowHide(void)
 
   PushButton button1 = PushButton::New();
   PushButton button2 = PushButton::New();
-  button1.SetSize(DEFAULT_BUTTON_SIZE);
+  button1.SetPreferredSize(DEFAULT_BUTTON_SIZE.GetVectorXY());
   popup.AddButton(button1);
-  button2.SetSize(DEFAULT_BUTTON_SIZE);
+  button2.SetPreferredSize(DEFAULT_BUTTON_SIZE.GetVectorXY());
   popup.AddButton(button2);
 
   // Showing/Hiding popup, results in all child Actors being

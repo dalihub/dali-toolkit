@@ -171,6 +171,11 @@ public:
   float GetRefreshInterval() const;
 
   /**
+   * @copydoc Toolkit::ItemView::Refresh
+   */
+  void Refresh();
+
+  /**
    * @copydoc Toolkit::ItemView::GetItem
    */
   Actor GetItem(unsigned int itemId) const;

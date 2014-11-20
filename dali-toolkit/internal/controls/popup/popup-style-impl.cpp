@@ -26,9 +26,9 @@ namespace // unnamed namespace
 // Popup style default
 const Vector4 DEFAULT_BACKING_COLOR = Vector4(0.0f, 0.0f, 0.0f, 0.5f);
 const float DEFAULT_MARGIN = 20.0f;          //From Tizen GUI UX
-const float DEFAULT_BUTTON_SPACING = 20.0f;  //From Tizen GUI UX
+const float DEFAULT_BUTTON_SPACING = 10.0f;  //From Tizen GUI UX
 const Vector3 DEFAULT_BUTTON_SIZE(275.0f, 74.0f, 0.0f);
-const char* DEFAULT_BACKGROUND_IMAGE_PATH = DALI_IMAGE_DIR "00_popup_bg.png";
+const char* DEFAULT_BACKGROUND_IMAGE_PATH = DALI_IMAGE_DIR "00_popup_bg.9.png";
 const char* DEFAULT_BUTTON_AREA_IMAGE_PATH = DALI_IMAGE_DIR "00_popup_button_bg.png";
 const char* DEFAULT_TAIL_UP_IMAGE_PATH = DALI_IMAGE_DIR "popup_tail_up.png";
 const char* DEFAULT_TAIL_DOWN_IMAGE_PATH = DALI_IMAGE_DIR "popup_tail_down.png";
@@ -37,7 +37,7 @@ const char* DEFAULT_TAIL_RIGHT_IMAGE_PATH = DALI_IMAGE_DIR "popup_tail_right.png
 const Vector3 DEFAULT_BOTTOM_SIZE(620.0f,96.0f,0.0f);
 const Vector2 DEFAULT_BACKGROUND_SIZE(620.0f, 236.0f);
 const Vector4 DEFAULT_BACKGROUND_STYLE_9_BORDER( 25.0f, 25.0f, 26.0f, 50.0f );
-const Vector4 DEFAULT_BACKGROUND_OUTER_BORDER( 0.0f, 0.0f, 0.0f, 0.0f );
+const Vector4 DEFAULT_BACKGROUND_OUTER_BORDER( 40.0f, 0.0f, 30.0f, 0.0f );
 const Vector4 DEFAULT_BUTTON_AREA_9_PATCH_BORDER( 13.0f, 8.0f, 13.0f, 8.0f );
 }
 

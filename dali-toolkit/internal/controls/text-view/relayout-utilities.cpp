@@ -1995,6 +1995,7 @@ void CreateTextActor( const TextView::VisualParameters& visualParameters,
       {
         TextActorParameters parameters( style, TextActorParameters::FONT_DETECTION_OFF );
         textActor = TextActor::New( Text(), parameters );
+        textActor.SetRelayoutEnabled( false );
       }
       else
       {
@@ -2548,6 +2549,9 @@ RenderableActor CreateGlyphActor( const Text& text, const TextStyle& style, Text
     TextActorParameters parameters( style, TextActorParameters::FONT_DETECTION_OFF );
     textActor = TextActor::New( text, parameters );
   }
+
+  // Exclude from size negotiation
+  textActor.SetRelayoutEnabled( false );
 
   return textActor;
 }

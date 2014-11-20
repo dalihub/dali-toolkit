@@ -30,13 +30,16 @@
  * \section Constraints
  * - \link constraints-intro Introduction to Constraints \endlink
  *
+ * \section SizeNegotiation Size Negotiation
+ * - \link size-negotiation Size Negotiation \endlink
+ *
  * \section UIControls UI Controls
  * - \link item-view Item View \endlink
  * - \link text-view Text View \endlink
  * - \link text-input Text Input \endlink
  * - \link scroll-view Scroll View \endlink
+ * - \link size-negotiation-controls Size Negotiation for Controls \endlink
  * - \link markup-processor Markup Processor \endlink
- * - \link size-negotiation Size Negotiation \endlink
  * - \link type-registration Type Registration \endlink
  * - \link properties Properties \endlink
  * - \link background Background \endlink

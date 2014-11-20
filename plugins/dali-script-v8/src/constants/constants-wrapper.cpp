@@ -202,7 +202,6 @@ const IntegerPair EnumTable[] =
     { "CULL_FRONT_AND_BACK_FACE",                           CullFrontAndBack },
 
     { "USE_OWN_SIZE",                                       USE_OWN_SIZE },
-    { "SIZE_EQUAL_TO_PARENT",                               SIZE_EQUAL_TO_PARENT },
     { "SIZE_RELATIVE_TO_PARENT",                            SIZE_RELATIVE_TO_PARENT },
     { "SIZE_FIXED_OFFSET_FROM_PARENT",                      SIZE_FIXED_OFFSET_FROM_PARENT },
 

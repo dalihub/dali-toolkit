@@ -119,6 +119,7 @@ void CubeTransitionEffect::Initialize()
   mEmptyImage.SetSize(Stage::GetCurrent().GetSize());
   mEmptyImage.SetParentOrigin( ParentOrigin::CENTER );
   mEmptyImage.SetAnchorPoint( AnchorPoint::CENTER );
+  mEmptyImage.SetRelayoutEnabled( false );
   mFullImageCreator = FullAreaImageCreator::New();
   mEmptyImage.SetShaderEffect( mFullImageCreator );
   Stage::GetCurrent().Add(mEmptyImage);
@@ -141,6 +142,7 @@ ImageActor CubeTransitionEffect::CreateTile( Image image, const Vector4& color )
   ImageActor tile = ImageActor::New( image );
   tile.SetParentOrigin( ParentOrigin::CENTER );
   tile.SetAnchorPoint( AnchorPoint::CENTER );
+  tile.SetRelayoutEnabled( false );
   tile.SetSize( mTileSize );
   tile.SetColorMode( Dali::USE_OWN_COLOR );
   tile.SetColor( color );

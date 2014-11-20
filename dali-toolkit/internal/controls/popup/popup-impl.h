@@ -27,6 +27,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/popup/popup.h>
 #include <dali-toolkit/internal/controls/popup/popup-style-impl.h>
+#include <dali-toolkit/public-api/controls/table-view/table-view.h>
 
 namespace Dali
 {
@@ -122,7 +123,6 @@ public:
    */
   void HideTail();
 
-
   /**
    * Sets the style of the popup
    * @param[in] style The style of the popup
@@ -134,6 +134,11 @@ public:
    * @return style of the popup
    */
   PopupStylePtr GetStyle() const;
+
+  /**
+   * @copydoc Toolkit::Popup::MarkDirtyForRelayout
+   */
+  void MarkDirtyForRelayout();
 
 protected:
 
@@ -251,14 +256,14 @@ private:
   virtual void OnControlChildAdd( Actor& child );
 
   /**
-   * @copydoc Toolkit::Control::OnControlSizeSet( const Vector3& size )
-   */
-  virtual void OnControlSizeSet( const Vector3& size );
-
-  /**
    * @copydoc Control::OnRelayOut()
    */
-  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+
+  /**
+   * @copydoc Control::OnSetResizePolicy()
+   */
+  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension );
 
   /**
    * @copydoc Control::OnKeyEvent()
@@ -285,6 +290,11 @@ private:
    */
   Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
 
+  /**
+   * Create the root actor for the footer
+   */
+  void CreateFooter();
+
 private:
 
   // Undefined
@@ -308,7 +318,7 @@ private:
   bool mShowing;                          ///< Popup is showing or not
 
   Layer mLayer;                           ///< Popup Layer (i.e. Dim backing and PopupBg reside in this)
-  Actor mPopupBg;                         ///< Popup Background (i.e. dialog reside in this)
+  Toolkit::TableView mPopupLayout;        ///< Popup layout (i.e. dialog reside in this)
   ImageActor mBacking;                    ///< Backing actor (dim effect)
 
   Actor mPreviousFocusedActor;            ///< Store the previous focused actor to restore the focus when popup hide

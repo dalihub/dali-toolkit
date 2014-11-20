@@ -530,9 +530,9 @@ int UtcDaliTextViewTestLayoutOptions02(void)
     DALI_TEST_EQUALS( position.height, positions[index].height, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   }
 
-  textView.SetSize( 50.f, 50.f );
+  textView.SetPreferredSize( Vector2( 50.0f, 50.0f ) );
   textView.SetTextAlignment( static_cast<Alignment::Type>( Alignment::HorizontalCenter | Alignment::VerticalCenter ) );
-  textView.SetSizePolicy( Toolkit::Control::Fixed, Toolkit::Control::Fixed );
+  textView.SetResizePolicy( FIXED, ALL_DIMENSIONS );
   textView.SetLineJustification( Toolkit::TextView::Left );
 
   application.SendNotification();
