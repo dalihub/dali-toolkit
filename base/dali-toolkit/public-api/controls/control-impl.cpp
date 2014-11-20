@@ -606,439 +606,6 @@ Control::~Control()
   delete mImpl;
 }
 
-void Control::Initialize()
-{
-
-  // Calling deriving classes
-  OnInitialize();
-
-  if( mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS )
-  {
-    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
-
-    // Register for style changes
-    styleManager.StyleChangeSignal().Connect( this, &Control::DoStyleChange );
-
-    // SetTheme
-    GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
-  }
-
-  SetRequiresHoverEvents(mImpl->mFlags & REQUIRES_HOVER_EVENTS);
-  SetRequiresMouseWheelEvents(mImpl->mFlags & REQUIRES_MOUSE_WHEEL_EVENTS);
-
-  mImpl->mInitialized = true;
-}
-
-void Control::EnableGestureDetection(Gesture::Type type)
-{
-  if ( (type & Gesture::Pinch) && !mImpl->mPinchGestureDetector )
-  {
-    mImpl->mPinchGestureDetector = PinchGestureDetector::New();
-    mImpl->mPinchGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PinchDetected);
-    mImpl->mPinchGestureDetector.Attach(Self());
-  }
-
-  if ( (type & Gesture::Pan) && !mImpl->mPanGestureDetector )
-  {
-    mImpl->mPanGestureDetector = PanGestureDetector::New();
-    mImpl->mPanGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PanDetected);
-    mImpl->mPanGestureDetector.Attach(Self());
-  }
-
-  if ( (type & Gesture::Tap) && !mImpl->mTapGestureDetector )
-  {
-    mImpl->mTapGestureDetector = TapGestureDetector::New();
-    mImpl->mTapGestureDetector.DetectedSignal().Connect(mImpl, &Impl::TapDetected);
-    mImpl->mTapGestureDetector.Attach(Self());
-  }
-
-  if ( (type & Gesture::LongPress) && !mImpl->mLongPressGestureDetector )
-  {
-    mImpl->mLongPressGestureDetector = LongPressGestureDetector::New();
-    mImpl->mLongPressGestureDetector.DetectedSignal().Connect(mImpl, &Impl::LongPressDetected);
-    mImpl->mLongPressGestureDetector.Attach(Self());
-  }
-}
-
-void Control::DisableGestureDetection(Gesture::Type type)
-{
-  if ( (type & Gesture::Pinch) && mImpl->mPinchGestureDetector )
-  {
-    mImpl->mPinchGestureDetector.Detach(Self());
-    mImpl->mPinchGestureDetector.Reset();
-  }
-
-  if ( (type & Gesture::Pan) && mImpl->mPanGestureDetector )
-  {
-    mImpl->mPanGestureDetector.Detach(Self());
-    mImpl->mPanGestureDetector.Reset();
-  }
-
-  if ( (type & Gesture::Tap) && mImpl->mTapGestureDetector )
-  {
-    mImpl->mTapGestureDetector.Detach(Self());
-    mImpl->mTapGestureDetector.Reset();
-  }
-
-  if ( (type & Gesture::LongPress) && mImpl->mLongPressGestureDetector)
-  {
-    mImpl->mLongPressGestureDetector.Detach(Self());
-    mImpl->mLongPressGestureDetector.Reset();
-  }
-}
-
-PinchGestureDetector Control::GetPinchGestureDetector() const
-{
-  return mImpl->mPinchGestureDetector;
-}
-
-PanGestureDetector Control::GetPanGestureDetector() const
-{
-  return mImpl->mPanGestureDetector;
-}
-
-TapGestureDetector Control::GetTapGestureDetector() const
-{
-  return mImpl->mTapGestureDetector;
-}
-
-LongPressGestureDetector Control::GetLongPressGestureDetector() const
-{
-  return mImpl->mLongPressGestureDetector;
-}
-
-void Control::SetBackgroundColor( const Vector4& color )
-{
-  Background& background( mImpl->GetBackground() );
-
-  if ( background.actor )
-  {
-    // Just set the actor color
-    background.actor.SetColor( color );
-  }
-  else
-  {
-    // Create Mesh Actor
-    MeshActor meshActor = MeshActor::New( CreateMesh() );
-
-    meshActor.SetAffectedByLighting( false );
-    SetupBackgroundActor( meshActor, Actor::SCALE, color );
-
-    // Set the background actor before adding so that we do not inform deriving classes
-    background.actor = meshActor;
-    Self().Add( meshActor );
-  }
-
-  background.color = color;
-}
-
-Vector4 Control::GetBackgroundColor() const
-{
-  if ( mImpl->mBackground )
-  {
-    return mImpl->mBackground->color;
-  }
-  return Color::TRANSPARENT;
-}
-
-void Control::SetBackground( Image image )
-{
-  Background& background( mImpl->GetBackground() );
-
-  if ( background.actor )
-  {
-    // Remove Current actor, unset AFTER removal so that we do not inform deriving classes
-    Self().Remove( background.actor );
-    background.actor.Reset();
-  }
-
-  ImageActor imageActor = ImageActor::New( image );
-  SetupBackgroundActor( imageActor, Actor::SIZE, background.color );
-
-  // Set the background actor before adding so that we do not inform derived classes
-  background.actor = imageActor;
-  Self().Add( imageActor );
-}
-
-void Control::ClearBackground()
-{
-  if ( mImpl->mBackground )
-  {
-    Background& background( mImpl->GetBackground() );
-    Self().Remove( background.actor );
-
-    delete mImpl->mBackground;
-    mImpl->mBackground = NULL;
-  }
-}
-
-Actor Control::GetBackgroundActor() const
-{
-  if ( mImpl->mBackground )
-  {
-    return mImpl->mBackground->actor;
-  }
-
-  return Actor();
-}
-
-void Control::OnThemeChange( Toolkit::StyleManager styleManager )
-{
-  GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
-}
-
-void Control::OnPinch(const PinchGesture& pinch)
-{
-  if( !( mImpl->mStartingPinchScale ) )
-  {
-    // lazy allocate
-    mImpl->mStartingPinchScale = new Vector3;
-  }
-
-  if( pinch.state == Gesture::Started )
-  {
-    *( mImpl->mStartingPinchScale ) = Self().GetCurrentScale();
-  }
-
-  Self().SetScale( *( mImpl->mStartingPinchScale ) * pinch.scale );
-}
-
-void Control::OnPan( const PanGesture& pan )
-{
-}
-
-void Control::OnTap(const TapGesture& tap)
-{
-}
-
-void Control::OnLongPress( const LongPressGesture& longPress )
-{
-}
-
-void Control::OnStageConnection()
-{
-  RelayoutRequest();
-
-  // Notify derived classes.
-  OnControlStageConnection();
-}
-
-void Control::OnStageDisconnection()
-{
-  // Notify derived classes
-  OnControlStageDisconnection();
-}
-
-void Control::OnChildAdd(Actor& child)
-{
-  // If this is the background actor, then we do not want to relayout or inform deriving classes
-  if ( mImpl->mBackground && ( child == mImpl->mBackground->actor ) )
-  {
-    return;
-  }
-
-  // Request for relayout as we may need to position the new child and old ones
-  RelayoutRequest();
-
-  // Notify derived classes.
-  OnControlChildAdd( child );
-}
-
-void Control::OnChildRemove(Actor& child)
-{
-  // If this is the background actor, then we do not want to relayout or inform deriving classes
-  if ( mImpl->mBackground && ( child == mImpl->mBackground->actor ) )
-  {
-    return;
-  }
-
-  // Request for relayout as we may need to re-position the old child
-  RelayoutRequest();
-
-  // Notify derived classes.
-  OnControlChildRemove( child );
-}
-
-void Control::OnSizeSet(const Vector3& targetSize)
-{
-  if( ( !mImpl->mInsideRelayout ) && ( targetSize != mImpl->mNaturalSize ) )
-  {
-    // Only updates size if set through Actor's API
-    mImpl->mNaturalSize = targetSize;
-  }
-
-  if( targetSize != mImpl->mCurrentSize )
-  {
-    // Update control size.
-    mImpl->mCurrentSize = targetSize;
-
-    // Notify derived classes.
-    OnControlSizeSet( targetSize );
-  }
-}
-
-void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
-{
-  // @todo consider animating negotiated child sizes to target size
-}
-
-bool Control::OnTouchEvent(const TouchEvent& event)
-{
-  return false; // Do not consume
-}
-
-bool Control::OnHoverEvent(const HoverEvent& event)
-{
-  return false; // Do not consume
-}
-
-bool Control::OnKeyEvent(const KeyEvent& event)
-{
-  return false; // Do not consume
-}
-
-bool Control::OnMouseWheelEvent(const MouseWheelEvent& event)
-{
-  return false; // Do not consume
-}
-
-void Control::OnKeyInputFocusGained()
-{
-  // Do Nothing
-}
-
-void Control::OnKeyInputFocusLost()
-{
-  // Do Nothing
-}
-
-Actor Control::GetChildByAlias(const std::string& actorAlias)
-{
-  return Actor();
-}
-
-bool Control::OnAccessibilityPan(PanGesture gesture)
-{
-  return false; // Accessibility pan gesture is not handled by default
-}
-
-bool Control::OnAccessibilityTouch(const TouchEvent& touchEvent)
-{
-  return false; // Accessibility touch event is not handled by default
-}
-
-bool Control::OnAccessibilityValueChange(bool isIncrease)
-{
-  return false; // Accessibility value change action is not handled by default
-}
-
-
-void Control::SetKeyboardNavigationSupport(bool isSupported)
-{
-  mImpl->mIsKeyboardNavigationSupported = isSupported;
-}
-
-bool Control::IsKeyboardNavigationSupported()
-{
-  return mImpl->mIsKeyboardNavigationSupported;
-}
-
-void Control::SetAsKeyboardFocusGroup(bool isFocusGroup)
-{
-  mImpl->mIsKeyboardFocusGroup = isFocusGroup;
-
-  // The following line will be removed when the deprecated API in KeyboardFocusManager is deleted
-  Toolkit::KeyboardFocusManager::Get().SetAsFocusGroup(Self(), isFocusGroup);
-}
-
-bool Control::IsKeyboardFocusGroup()
-{
-  return Toolkit::KeyboardFocusManager::Get().IsFocusGroup(Self());
-}
-
-Actor Control::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
-{
-  return Actor();
-}
-
-bool Control::DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes)
-{
-  bool ret = false;
-
-  if( object && (actionName == Toolkit::Control::ACTION_CONTROL_ACTIVATED) )
-  {
-    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
-    if( control )
-    {
-      // if cast succeeds there is an implementation so no need to check
-      control.GetImplementation().OnActivated();
-    }
-  }
-
-  return ret;
-}
-
-bool Control::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
-{
-  Dali::BaseHandle handle( object );
-
-  bool connected( false );
-  Toolkit::Control control = Toolkit::Control::DownCast(handle);
-  if ( control )
-  {
-    Control& controlImpl( control.GetImplementation() );
-    connected = true;
-
-    if ( Toolkit::Control::SIGNAL_KEY_EVENT == signalName )
-    {
-      controlImpl.KeyEventSignal().Connect( tracker, functor );
-    }
-    else if( Toolkit::Control::SIGNAL_TAPPED == signalName )
-    {
-      controlImpl.EnableGestureDetection( Gesture::Tap );
-      controlImpl.GetTapGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else if( Toolkit::Control::SIGNAL_PANNED == signalName )
-    {
-      controlImpl.EnableGestureDetection( Gesture::Pan );
-      controlImpl.GetPanGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else if( Toolkit::Control::SIGNAL_PINCHED == signalName )
-    {
-      controlImpl.EnableGestureDetection( Gesture::Pinch );
-      controlImpl.GetPinchGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else if( Toolkit::Control::SIGNAL_LONG_PRESSED == signalName )
-    {
-      controlImpl.EnableGestureDetection( Gesture::LongPress );
-      controlImpl.GetLongPressGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else
-    {
-      // signalName does not match any signal
-      connected = false;
-    }
-  }
-  return connected;
-}
-
-void Control::DoStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
-{
-  if( change.themeChange )
-  {
-    OnThemeChange( styleManager );
-  }
-  else if( change.defaultFontChange || change.defaultFontSizeChange )
-  {
-    OnFontChange( change.defaultFontChange, change.defaultFontSizeChange );
-  }
-}
-
-Toolkit::Control::KeyEventSignalV2& Control::KeyEventSignal()
-{
-  return mImpl->mKeyEventSignalV2;
-}
-
 void Control::SetSizePolicy( Toolkit::Control::SizePolicy widthPolicy, Toolkit::Control::SizePolicy heightPolicy )
 {
   bool relayoutRequest( false );
@@ -1172,52 +739,130 @@ void Control::ClearKeyInputFocus()
   }
 }
 
-void Control::RelayoutRequest()
+PinchGestureDetector Control::GetPinchGestureDetector() const
 {
-  // unfortunate double negative but thats to guarantee new controls get size negotiation
-  // by default and have to "opt-out" if they dont want it
-  if( !(mImpl->mFlags & NO_SIZE_NEGOTIATION) )
+  return mImpl->mPinchGestureDetector;
+}
+
+PanGestureDetector Control::GetPanGestureDetector() const
+{
+  return mImpl->mPanGestureDetector;
+}
+
+TapGestureDetector Control::GetTapGestureDetector() const
+{
+  return mImpl->mTapGestureDetector;
+}
+
+LongPressGestureDetector Control::GetLongPressGestureDetector() const
+{
+  return mImpl->mLongPressGestureDetector;
+}
+
+void Control::SetBackgroundColor( const Vector4& color )
+{
+  Background& background( mImpl->GetBackground() );
+
+  if ( background.actor )
   {
-    Internal::RelayoutController::Request();
+    // Just set the actor color
+    background.actor.SetColor( color );
+  }
+  else
+  {
+    // Create Mesh Actor
+    MeshActor meshActor = MeshActor::New( CreateMesh() );
+
+    meshActor.SetAffectedByLighting( false );
+    SetupBackgroundActor( meshActor, Actor::SCALE, color );
+
+    // Set the background actor before adding so that we do not inform deriving classes
+    background.actor = meshActor;
+    Self().Add( meshActor );
+  }
+
+  background.color = color;
+}
+
+Vector4 Control::GetBackgroundColor() const
+{
+  if ( mImpl->mBackground )
+  {
+    return mImpl->mBackground->color;
+  }
+  return Color::TRANSPARENT;
+}
+
+void Control::SetBackground( Image image )
+{
+  Background& background( mImpl->GetBackground() );
+
+  if ( background.actor )
+  {
+    // Remove Current actor, unset AFTER removal so that we do not inform deriving classes
+    Self().Remove( background.actor );
+    background.actor.Reset();
+  }
+
+  ImageActor imageActor = ImageActor::New( image );
+  SetupBackgroundActor( imageActor, Actor::SIZE, background.color );
+
+  // Set the background actor before adding so that we do not inform derived classes
+  background.actor = imageActor;
+  Self().Add( imageActor );
+}
+
+void Control::ClearBackground()
+{
+  if ( mImpl->mBackground )
+  {
+    Background& background( mImpl->GetBackground() );
+    Self().Remove( background.actor );
+
+    delete mImpl->mBackground;
+    mImpl->mBackground = NULL;
   }
 }
 
-void Control::Relayout(Vector2 size, ActorSizeContainer& container)
+Actor Control::GetBackgroundActor() const
 {
-  // Avoids relayout again when OnSizeSet callback arrives.
-  mImpl->mInsideRelayout = true;
-  Self().SetSize( size );
-  // @todo this really needs to be at the end of method but not sure why the scope used to be only the SetSize, needs to be cleaned up in size negotiation rework
-  mImpl->mInsideRelayout = false;
+  if ( mImpl->mBackground )
+  {
+    return mImpl->mBackground->actor;
+  }
 
-  // Only relayout controls which requested to be relaid out.
-  OnRelaidOut( size, container );
+  return Actor();
 }
 
-void Control::Relayout( Actor actor, Vector2 size, ActorSizeContainer& container )
+void Control::SetKeyboardNavigationSupport(bool isSupported)
 {
-  if ( actor )
-  {
-    Toolkit::Control control( Toolkit::Control::DownCast( actor ) );
-    if( control )
-    {
-      control.GetImplementation().NegotiateSize( size, container );
-    }
-    else
-    {
-      container.push_back( ActorSizePair( actor, size ) );
-    }
-  }
+  mImpl->mIsKeyboardNavigationSupported = isSupported;
 }
 
-void Control::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+bool Control::IsKeyboardNavigationSupported()
 {
-  unsigned int numChildren = Self().GetChildCount();
+  return mImpl->mIsKeyboardNavigationSupported;
+}
 
-  for( unsigned int i=0; i<numChildren; ++i )
-  {
-    container.push_back( ActorSizePair( Self().GetChildAt(i), size ) );
-  }
+void Control::Activate()
+{
+  // Inform deriving classes
+  OnActivated();
+}
+
+bool Control::OnAccessibilityPan(PanGesture gesture)
+{
+  return false; // Accessibility pan gesture is not handled by default
+}
+
+bool Control::OnAccessibilityTouch(const TouchEvent& touchEvent)
+{
+  return false; // Accessibility touch event is not handled by default
+}
+
+bool Control::OnAccessibilityValueChange(bool isIncrease)
+{
+  return false; // Accessibility value change action is not handled by default
 }
 
 void Control::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& container )
@@ -1325,6 +970,94 @@ void Control::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& containe
   Relayout( size, container );
 }
 
+void Control::SetAsKeyboardFocusGroup(bool isFocusGroup)
+{
+  mImpl->mIsKeyboardFocusGroup = isFocusGroup;
+
+  // The following line will be removed when the deprecated API in KeyboardFocusManager is deleted
+  Toolkit::KeyboardFocusManager::Get().SetAsFocusGroup(Self(), isFocusGroup);
+}
+
+bool Control::IsKeyboardFocusGroup()
+{
+  return Toolkit::KeyboardFocusManager::Get().IsFocusGroup(Self());
+}
+
+Actor Control::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
+{
+  return Actor();
+}
+
+void Control::OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
+{
+}
+
+bool Control::DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes)
+{
+  bool ret = false;
+
+  if( object && (actionName == Toolkit::Control::ACTION_CONTROL_ACTIVATED) )
+  {
+    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
+    if( control )
+    {
+      // if cast succeeds there is an implementation so no need to check
+      control.GetImplementation().OnActivated();
+    }
+  }
+
+  return ret;
+}
+
+bool Control::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+{
+  Dali::BaseHandle handle( object );
+
+  bool connected( false );
+  Toolkit::Control control = Toolkit::Control::DownCast(handle);
+  if ( control )
+  {
+    Control& controlImpl( control.GetImplementation() );
+    connected = true;
+
+    if ( Toolkit::Control::SIGNAL_KEY_EVENT == signalName )
+    {
+      controlImpl.KeyEventSignal().Connect( tracker, functor );
+    }
+    else if( Toolkit::Control::SIGNAL_TAPPED == signalName )
+    {
+      controlImpl.EnableGestureDetection( Gesture::Tap );
+      controlImpl.GetTapGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else if( Toolkit::Control::SIGNAL_PANNED == signalName )
+    {
+      controlImpl.EnableGestureDetection( Gesture::Pan );
+      controlImpl.GetPanGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else if( Toolkit::Control::SIGNAL_PINCHED == signalName )
+    {
+      controlImpl.EnableGestureDetection( Gesture::Pinch );
+      controlImpl.GetPinchGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else if( Toolkit::Control::SIGNAL_LONG_PRESSED == signalName )
+    {
+      controlImpl.EnableGestureDetection( Gesture::LongPress );
+      controlImpl.GetLongPressGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else
+    {
+      // signalName does not match any signal
+      connected = false;
+    }
+  }
+  return connected;
+}
+
+Toolkit::Control::KeyEventSignalV2& Control::KeyEventSignal()
+{
+  return mImpl->mKeyEventSignalV2;
+}
+
 bool Control::EmitKeyEventSignal( const KeyEvent& event )
 {
   // Guard against destruction during signal emission
@@ -1347,6 +1080,297 @@ bool Control::EmitKeyEventSignal( const KeyEvent& event )
   return consumed;
 }
 
+Control::Control( ControlBehaviour behaviourFlags )
+: CustomActorImpl( behaviourFlags & REQUIRES_TOUCH_EVENTS ),
+  mImpl(new Impl(*this))
+{
+  mImpl->mFlags = behaviourFlags;
+}
+
+void Control::Initialize()
+{
+
+  // Calling deriving classes
+  OnInitialize();
+
+  if( mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS )
+  {
+    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+
+    // Register for style changes
+    styleManager.StyleChangeSignal().Connect( this, &Control::DoStyleChange );
+
+    // SetTheme
+    GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
+  }
+
+  SetRequiresHoverEvents(mImpl->mFlags & REQUIRES_HOVER_EVENTS);
+  SetRequiresMouseWheelEvents(mImpl->mFlags & REQUIRES_MOUSE_WHEEL_EVENTS);
+
+  mImpl->mInitialized = true;
+}
+
+void Control::EnableGestureDetection(Gesture::Type type)
+{
+  if ( (type & Gesture::Pinch) && !mImpl->mPinchGestureDetector )
+  {
+    mImpl->mPinchGestureDetector = PinchGestureDetector::New();
+    mImpl->mPinchGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PinchDetected);
+    mImpl->mPinchGestureDetector.Attach(Self());
+  }
+
+  if ( (type & Gesture::Pan) && !mImpl->mPanGestureDetector )
+  {
+    mImpl->mPanGestureDetector = PanGestureDetector::New();
+    mImpl->mPanGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PanDetected);
+    mImpl->mPanGestureDetector.Attach(Self());
+  }
+
+  if ( (type & Gesture::Tap) && !mImpl->mTapGestureDetector )
+  {
+    mImpl->mTapGestureDetector = TapGestureDetector::New();
+    mImpl->mTapGestureDetector.DetectedSignal().Connect(mImpl, &Impl::TapDetected);
+    mImpl->mTapGestureDetector.Attach(Self());
+  }
+
+  if ( (type & Gesture::LongPress) && !mImpl->mLongPressGestureDetector )
+  {
+    mImpl->mLongPressGestureDetector = LongPressGestureDetector::New();
+    mImpl->mLongPressGestureDetector.DetectedSignal().Connect(mImpl, &Impl::LongPressDetected);
+    mImpl->mLongPressGestureDetector.Attach(Self());
+  }
+}
+
+void Control::DisableGestureDetection(Gesture::Type type)
+{
+  if ( (type & Gesture::Pinch) && mImpl->mPinchGestureDetector )
+  {
+    mImpl->mPinchGestureDetector.Detach(Self());
+    mImpl->mPinchGestureDetector.Reset();
+  }
+
+  if ( (type & Gesture::Pan) && mImpl->mPanGestureDetector )
+  {
+    mImpl->mPanGestureDetector.Detach(Self());
+    mImpl->mPanGestureDetector.Reset();
+  }
+
+  if ( (type & Gesture::Tap) && mImpl->mTapGestureDetector )
+  {
+    mImpl->mTapGestureDetector.Detach(Self());
+    mImpl->mTapGestureDetector.Reset();
+  }
+
+  if ( (type & Gesture::LongPress) && mImpl->mLongPressGestureDetector)
+  {
+    mImpl->mLongPressGestureDetector.Detach(Self());
+    mImpl->mLongPressGestureDetector.Reset();
+  }
+}
+
+void Control::RelayoutRequest()
+{
+  // unfortunate double negative but thats to guarantee new controls get size negotiation
+  // by default and have to "opt-out" if they dont want it
+  if( !(mImpl->mFlags & NO_SIZE_NEGOTIATION) )
+  {
+    Internal::RelayoutController::Request();
+  }
+}
+
+void Control::Relayout( Actor actor, Vector2 size, ActorSizeContainer& container )
+{
+  if ( actor )
+  {
+    Toolkit::Control control( Toolkit::Control::DownCast( actor ) );
+    if( control )
+    {
+      control.GetImplementation().NegotiateSize( size, container );
+    }
+    else
+    {
+      container.push_back( ActorSizePair( actor, size ) );
+    }
+  }
+}
+
+void Control::OnInitialize()
+{
+}
+
+void Control::OnActivated()
+{
+}
+
+void Control::OnThemeChange( Toolkit::StyleManager styleManager )
+{
+  GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
+}
+
+void Control::OnFontChange( bool defaultFontChange, bool defaultFontSizeChange )
+{
+}
+
+void Control::OnPinch(const PinchGesture& pinch)
+{
+  if( !( mImpl->mStartingPinchScale ) )
+  {
+    // lazy allocate
+    mImpl->mStartingPinchScale = new Vector3;
+  }
+
+  if( pinch.state == Gesture::Started )
+  {
+    *( mImpl->mStartingPinchScale ) = Self().GetCurrentScale();
+  }
+
+  Self().SetScale( *( mImpl->mStartingPinchScale ) * pinch.scale );
+}
+
+void Control::OnPan( const PanGesture& pan )
+{
+}
+
+void Control::OnTap(const TapGesture& tap)
+{
+}
+
+void Control::OnLongPress( const LongPressGesture& longPress )
+{
+}
+
+void Control::OnControlStageConnection()
+{
+}
+
+void Control::OnControlStageDisconnection()
+{
+}
+
+void Control::OnControlChildAdd( Actor& child )
+{
+}
+
+void Control::OnControlChildRemove( Actor& child )
+{
+}
+
+void Control::OnControlSizeSet( const Vector3& size )
+{
+}
+
+void Control::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+{
+  unsigned int numChildren = Self().GetChildCount();
+
+  for( unsigned int i=0; i<numChildren; ++i )
+  {
+    container.push_back( ActorSizePair( Self().GetChildAt(i), size ) );
+  }
+}
+
+void Control::OnKeyInputFocusGained()
+{
+  // Do Nothing
+}
+
+void Control::OnKeyInputFocusLost()
+{
+  // Do Nothing
+}
+
+void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
+{
+  // @todo consider animating negotiated child sizes to target size
+}
+
+bool Control::OnTouchEvent(const TouchEvent& event)
+{
+  return false; // Do not consume
+}
+
+bool Control::OnHoverEvent(const HoverEvent& event)
+{
+  return false; // Do not consume
+}
+
+bool Control::OnKeyEvent(const KeyEvent& event)
+{
+  return false; // Do not consume
+}
+
+bool Control::OnMouseWheelEvent(const MouseWheelEvent& event)
+{
+  return false; // Do not consume
+}
+
+Actor Control::GetChildByAlias(const std::string& actorAlias)
+{
+  return Actor();
+}
+
+void Control::OnStageConnection()
+{
+  RelayoutRequest();
+
+  // Notify derived classes.
+  OnControlStageConnection();
+}
+
+void Control::OnStageDisconnection()
+{
+  // Notify derived classes
+  OnControlStageDisconnection();
+}
+
+void Control::OnChildAdd(Actor& child)
+{
+  // If this is the background actor, then we do not want to relayout or inform deriving classes
+  if ( mImpl->mBackground && ( child == mImpl->mBackground->actor ) )
+  {
+    return;
+  }
+
+  // Request for relayout as we may need to position the new child and old ones
+  RelayoutRequest();
+
+  // Notify derived classes.
+  OnControlChildAdd( child );
+}
+
+void Control::OnChildRemove(Actor& child)
+{
+  // If this is the background actor, then we do not want to relayout or inform deriving classes
+  if ( mImpl->mBackground && ( child == mImpl->mBackground->actor ) )
+  {
+    return;
+  }
+
+  // Request for relayout as we may need to re-position the old child
+  RelayoutRequest();
+
+  // Notify derived classes.
+  OnControlChildRemove( child );
+}
+
+void Control::OnSizeSet(const Vector3& targetSize)
+{
+  if( ( !mImpl->mInsideRelayout ) && ( targetSize != mImpl->mNaturalSize ) )
+  {
+    // Only updates size if set through Actor's API
+    mImpl->mNaturalSize = targetSize;
+  }
+
+  if( targetSize != mImpl->mCurrentSize )
+  {
+    // Update control size.
+    mImpl->mCurrentSize = targetSize;
+
+    // Notify derived classes.
+    OnControlSizeSet( targetSize );
+  }
+}
+
 void Control::SignalConnected( SlotObserver* slotObserver, CallbackBase* callback )
 {
   mImpl->SignalConnected( slotObserver, callback );
@@ -1357,11 +1381,28 @@ void Control::SignalDisconnected( SlotObserver* slotObserver, CallbackBase* call
   mImpl->SignalDisconnected( slotObserver, callback );
 }
 
-Control::Control( ControlBehaviour behaviourFlags )
-: CustomActorImpl( behaviourFlags & REQUIRES_TOUCH_EVENTS ),
-  mImpl(new Impl(*this))
+void Control::DoStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
 {
-  mImpl->mFlags = behaviourFlags;
+  if( change.themeChange )
+  {
+    OnThemeChange( styleManager );
+  }
+  else if( change.defaultFontChange || change.defaultFontSizeChange )
+  {
+    OnFontChange( change.defaultFontChange, change.defaultFontSizeChange );
+  }
+}
+
+void Control::Relayout(Vector2 size, ActorSizeContainer& container)
+{
+  // Avoids relayout again when OnSizeSet callback arrives.
+  mImpl->mInsideRelayout = true;
+  Self().SetSize( size );
+  // @todo this really needs to be at the end of method but not sure why the scope used to be only the SetSize, needs to be cleaned up in size negotiation rework
+  mImpl->mInsideRelayout = false;
+
+  // Only relayout controls which requested to be relaid out.
+  OnRelaidOut( size, container );
 }
 
 } // namespace Internal

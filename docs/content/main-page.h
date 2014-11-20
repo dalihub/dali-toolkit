@@ -99,7 +99,7 @@
  * When the button is pressed, the actor will receive an event and adjust the color of its button face
  * element.
  *
- * \section scene_dali Why does Dali internally have a second scene graph?
+ * \section scene_internal Why does Dali internally have a second scene graph?
  * Actors and elements are contained in a scene graph which deals with input, layout and some animation
  * it doesn't perform any drawing.
  *

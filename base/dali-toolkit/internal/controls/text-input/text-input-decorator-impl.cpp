@@ -93,6 +93,7 @@ Decorator::Decorator( TextViewCharacterPositioning& textViewManager, TextInputTe
   mCursorRTLEnabled( false ),
   mIsGrabHandleInScrollArea( false ),
   mIsCursorInScrollArea( false ),
+  mGrabHandleVisibility( false ),
   mGrabHandleEnabled( true )
 {
 }

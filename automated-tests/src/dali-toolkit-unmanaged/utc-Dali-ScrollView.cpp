@@ -1039,26 +1039,15 @@ int UtcDaliRulerFixedRulerSpacing(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliRulerFixedRulerSpacing");
 
-  RulerPtr rulerZero = new FixedRuler( 0.0f );
-  rulerZero->SetDomain( RulerDomain(10.0f, 90.0f, true) );
-
   RulerPtr rulerNormal = new FixedRuler( 25.0f );
   rulerNormal->SetDomain( RulerDomain(10.0f, 90.0f, true) );
 
   unsigned int volume;
   float position;
 
-  position = rulerZero->GetPositionFromPage(1, volume, true);
-  DALI_TEST_EQUALS( position, 10.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( volume, 1u, TEST_LOCATION );
-
   position = rulerNormal->GetPositionFromPage(1, volume, true);
   DALI_TEST_EQUALS( position, 35.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( volume, 0u, TEST_LOCATION );
-
-  position = rulerZero->GetPositionFromPage(2, volume, true);
-  DALI_TEST_EQUALS( position, 10.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( volume, 2u, TEST_LOCATION );
 
   position = rulerNormal->GetPositionFromPage(2, volume, true);
   DALI_TEST_EQUALS( position, 60.0f, TEST_LOCATION );

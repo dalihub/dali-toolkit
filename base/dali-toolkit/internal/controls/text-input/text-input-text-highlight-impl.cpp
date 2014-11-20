@@ -208,12 +208,15 @@ TextHighlight::HighlightInfo TextHighlight::CalculateHighlightInfo( std::size_t 
         {
           lastIt = std::max( textLayoutInfo.mCharacterLayoutInfoTable.begin(), lastIt - 1 );
         }
-        const Size rowSize( mTextViewCharacterPositioning.GetRowRectFromCharacterPosition( lastIt - textLayoutInfo.mCharacterLayoutInfoTable.begin(), min, max ) );
-        maxRowLeft = std::min(maxRowLeft, min.x);
-        maxRowRight = std::max(maxRowRight, max.x);
-        float rowBottom = lastIt->mPosition.y - textLayoutInfo.mScrollOffset.y;
-        float rowTop = rowBottom - rowSize.height;
-        newHighlightInfo.AddQuad( rowLeft, rowTop, rowRight, rowBottom );
+        if( lastIt != end )
+        {
+          const Size rowSize( mTextViewCharacterPositioning.GetRowRectFromCharacterPosition( lastIt - textLayoutInfo.mCharacterLayoutInfoTable.begin(), min, max ) );
+          maxRowLeft = std::min(maxRowLeft, min.x);
+          maxRowRight = std::max(maxRowRight, max.x);
+          float rowBottom = lastIt->mPosition.y - textLayoutInfo.mScrollOffset.y;
+          float rowTop = rowBottom - rowSize.height;
+          newHighlightInfo.AddQuad( rowLeft, rowTop, rowRight, rowBottom );
+        }
       }
     }
 

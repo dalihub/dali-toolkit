@@ -28,7 +28,6 @@ SET(TC_SOURCES
  utc-Dali-PageTurnEffect.cpp
  utc-Dali-PageTurnView.cpp
  utc-Dali-RollLayout.cpp
- utc-Dali-RotatingSelector.cpp
  utc-Dali-ScrollView.cpp
  utc-Dali-ShadowView.cpp
  utc-Dali-ShearEffect.cpp

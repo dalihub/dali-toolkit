@@ -297,7 +297,7 @@ public:
    * @brief Retrieves the pinch gesture detector of the control.
    *
    * @return The pinch gesture detector.
-   * @pre Pinch detection should have been enabled in the control.
+   * @note Will return an empty handle if the control does not handle the gesture itself.
    */
   PinchGestureDetector GetPinchGestureDetector() const;
 
@@ -305,7 +305,7 @@ public:
    * @brief Retrieves the pan gesture detector of the control.
    *
    * @return The pan gesture detector.
-   * @pre Pan detection should have been enabled in the control.
+   * @note Will return an empty handle if the control does not handle the gesture itself.
    */
   PanGestureDetector GetPanGestureDetector() const;
 
@@ -313,7 +313,7 @@ public:
    * @brief Retrieves the tap gesture detector of the control.
    *
    * @return The tap gesture detector.
-   * @pre Tap detection should have been enabled in the control.
+   * @note Will return an empty handle if the control does not handle the gesture itself.
    */
   TapGestureDetector GetTapGestureDetector() const;
 
@@ -321,7 +321,7 @@ public:
    * @brief Retrieves the long press gesture detector of the control.
    *
    * @return The long press gesture detector.
-   * @pre Long press detection should have been enabled in the control.
+   * @note Will return an empty handle if the control does not handle the gesture itself.
    */
   LongPressGestureDetector GetLongPressGestureDetector() const;
 
