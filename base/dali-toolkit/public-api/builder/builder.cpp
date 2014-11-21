@@ -144,6 +144,11 @@ FrameBufferImage Builder::GetFrameBufferImage( const std::string &name )
   return GetImpl(*this).GetFrameBufferImage( name );
 }
 
+Path Builder::GetPath( const std::string &name )
+{
+  return GetImpl(*this).GetPath( name );
+}
+
 Builder::Signal& Builder::QuitSignal()
 {
   return GetImpl( *this ).QuitSignal();

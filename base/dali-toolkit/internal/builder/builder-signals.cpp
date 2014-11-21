@@ -29,7 +29,7 @@ namespace Toolkit
 {
 namespace Internal
 {
-extern Animation CreateAnimation( const TreeNode& child );
+extern Animation CreateAnimation( const TreeNode& child, Dali::Toolkit::Internal::Builder* const builder  );
 extern bool SetPropertyFromNode( const TreeNode& node, Property::Value& value );
 }
 }
@@ -126,11 +126,12 @@ struct GenericAction
 // Delay an animation play; ie wait as its not on stage yet
 struct DelayedAnimationPlay
 {
-  Toolkit::JsonParser memento;
+  OptionalChild                                         animNode;
+  Dali::IntrusivePtr<Dali::Toolkit::Internal::Builder>  builder;
 
   void operator()(void)
   {
-    Animation anim = Toolkit::Internal::CreateAnimation(*memento.GetRoot());
+    Animation anim = Toolkit::Internal::CreateAnimation(*animNode, builder.Get() );
     if(anim)
     {
       anim.Play();
@@ -222,7 +223,7 @@ void DoNothing(void) {};
 /**
  * Get an action as boost function callback
  */
-boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction)
+boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction, Dali::Toolkit::Internal::Builder* const builder)
 {
   OptionalString childActorName(IsString( IsChild(&child, "child-actor")) );
   OptionalString actorName(IsString( IsChild(&child, "actor")) );
@@ -279,7 +280,8 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
       if( OptionalChild animNode = IsChild(*animations, *animationName) )
       {
         DelayedAnimationPlay action;
-        action.memento = Toolkit::JsonParser::New(*animNode);
+        action.animNode = animNode;
+        action.builder = builder;
         // @todo; put constants into the map
         callback = action;
       }
@@ -356,13 +358,13 @@ namespace Toolkit
 namespace Internal
 {
 
-Actor SetupSignalAction(const TreeNode &child, Actor actor);
-Actor SetupPropertyNotification(const TreeNode &child, Actor actor);
+Actor SetupSignalAction(const TreeNode &child, Actor actor, Dali::Toolkit::Internal::Builder* const builder );
+Actor SetupPropertyNotification(const TreeNode &child, Actor actor, Dali::Toolkit::Internal::Builder* const builder );
 
 /**
  * Setup signals and actions on an actor
  */
-Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction)
+Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction, Dali::Toolkit::Internal::Builder* const builder )
 {
   DALI_ASSERT_ALWAYS(actor);
 
@@ -379,7 +381,7 @@ Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const 
       OptionalString name( IsString( IsChild( key_child.second, "name")) );
       DALI_ASSERT_ALWAYS(name && "Signal must have a name");
 
-      boost::function<void (void)> callback = GetAction(root, key_child.second, actor, quitAction);
+      boost::function<void (void)> callback = GetAction(root, key_child.second, actor, quitAction, builder );
 
       actor.ConnectSignal(tracker, *name, callback);
     }
@@ -391,7 +393,7 @@ Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const 
 /**
  * Setup Property notifications for an actor
  */
-Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction)
+Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction, Dali::Toolkit::Internal::Builder* const builder )
 {
   DALI_ASSERT_ALWAYS(actor);
 
@@ -405,7 +407,7 @@ Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root
 
       // Actor actions reference by pointer because of circular reference actor->signal
       // So this callback should only go onto the actor maintained list.
-      boost::function<void (void)> callback = GetAction(root, key_child.second, actor, quitAction);
+      boost::function<void (void)> callback = GetAction(root, key_child.second, actor, quitAction, builder );
 
       OptionalString prop(IsString( IsChild(key_child.second, "property")) );
       DALI_ASSERT_ALWAYS(prop && "Notification signal must specify a property");

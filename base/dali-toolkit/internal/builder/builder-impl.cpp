@@ -44,13 +44,13 @@ namespace Internal
 {
 class Replacement;
 
-extern Animation CreateAnimation(const TreeNode& child, const Replacement& replacements, const Dali::Actor searchRoot );
+extern Animation CreateAnimation(const TreeNode& child, const Replacement& replacements, const Dali::Actor searchRoot, Builder* const builder );
 extern bool SetPropertyFromNode( const TreeNode& node, Property::Value& value );
 extern bool SetPropertyFromNode( const TreeNode& node, Property::Value& value, const Replacement& replacements );
 extern bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value );
 extern bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value, const Replacement& replacements );
-extern Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction);
-extern Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction);
+extern Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction, Dali::Toolkit::Internal::Builder* const builder);
+extern Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction, Dali::Toolkit::Internal::Builder* const builder);
 extern Actor SetupActor( const TreeNode& node, Actor& actor, const Replacement& constant );
 
 #if defined(DEBUG_ENABLED)
@@ -355,8 +355,8 @@ void Builder::ApplyProperties( const TreeNode& root, const TreeNode& node,
 
       // add signals
       QuitAction quitAction( *this );
-      SetupSignalAction( mSlotDelegate.GetConnectionTracker(), root, node, actor, quitAction );
-      SetupPropertyNotification( mSlotDelegate.GetConnectionTracker(), root, node, actor, quitAction );
+      SetupSignalAction( mSlotDelegate.GetConnectionTracker(), root, node, actor, quitAction, this );
+      SetupPropertyNotification( mSlotDelegate.GetConnectionTracker(), root, node, actor, quitAction, this );
    }
   }
   else
@@ -745,6 +745,69 @@ FrameBufferImage Builder::GetFrameBufferImage( const std::string &name, const Re
   return ret;
 }
 
+Path Builder::GetPath( const std::string& name )
+{
+  DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
+
+  Path ret;
+
+  PathLut::const_iterator iter( mPathLut.find( name ) );
+  if( iter != mPathLut.end() )
+  {
+    ret = iter->second;
+  }
+  else
+  {
+    if( OptionalChild paths = IsChild( *mParser.GetRoot(), "paths") )
+    {
+      if( OptionalChild path = IsChild( *paths, name ) )
+      {
+        //points property
+        if( OptionalChild pointsProperty = IsChild( *path, "points") )
+        {
+          Dali::Property::Value points(Property::ARRAY);
+          if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
+          {
+            ret = Path::New();
+            ret.SetProperty( Path::POINTS, points);
+
+            //control-points property
+            if( OptionalChild pointsProperty = IsChild( *path, "control-points") )
+            {
+              Dali::Property::Value points(Property::ARRAY);
+              if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
+              {
+                ret.SetProperty( Path::CONTROL_POINTS, points);
+              }
+            }
+            else
+            {
+              //Curvature
+              float curvature(0.25f);
+              if( OptionalFloat pointsProperty = IsFloat( *path, "curvature") )
+              {
+                curvature = *pointsProperty;
+              }
+              ret.GenerateControlPoints(curvature);
+            }
+
+            //Add the new path to the hash table for paths
+            mPathLut[ name ] = ret;
+          }
+        }
+        else
+        {
+          //Interpolation points not specified
+          DALI_SCRIPT_WARNING("Interpolation points not specified for path '%s'\n", name.c_str() );
+        }
+      }
+
+    }
+  }
+
+  return ret;
+}
+
 Toolkit::Builder::Signal& Builder::QuitSignal()
 {
   return mQuitSignal;
@@ -808,7 +871,7 @@ Animation Builder::CreateAnimation( const std::string& animationName, const Repl
   {
     if( OptionalChild animation = IsChild(*animations, animationName) )
     {
-      anim = Dali::Toolkit::Internal::CreateAnimation( *animation, replacement, sourceActor );
+      anim = Dali::Toolkit::Internal::CreateAnimation( *animation, replacement, sourceActor, this );
     }
     else
     {

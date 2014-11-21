@@ -163,7 +163,7 @@ namespace Toolkit
 namespace Internal
 {
 
-Animation CreateAnimation( const TreeNode& child, const Replacement& constant, Dali::Actor searchRoot )
+Animation CreateAnimation( const TreeNode& child, const Replacement& constant, Dali::Actor searchRoot, Builder* const builder )
 {
   float durationSum = 0.f;
 
@@ -227,52 +227,53 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
       OptionalString actorName( constant.IsString( IsChild(pKeyChild.second, "actor" ) ) );
       OptionalString property(  constant.IsString( IsChild(pKeyChild.second, "property" ) ) );
       DALI_ASSERT_ALWAYS( actorName && "Animation must specify actor name" );
-      DALI_ASSERT_ALWAYS( property  && "Animation must specify a property name" );
 
       Handle targetHandle = searchActor.FindChildByName( *actorName );
       DALI_ASSERT_ALWAYS( targetHandle && "Actor must exist for property" );
 
-      Property::Index idx( targetHandle.GetPropertyIndex( *property ) );
-
-      // if the property is not found from the (actor) handle, try to downcast it to renderable actor
-      // to allow animating shader uniforms
-      if( idx == Property::INVALID_INDEX )
+      Property::Value propValue;
+      Property::Index propIndex;
+      if( property )
       {
-        RenderableActor renderable = RenderableActor::DownCast( targetHandle );
-        if( renderable )
+        propIndex = targetHandle.GetPropertyIndex( *property );
+
+        // if the property is not found from the (actor) handle, try to downcast it to renderable actor
+        // to allow animating shader uniforms
+        if( propIndex == Property::INVALID_INDEX )
         {
-          // A limitation here is that its possible that between creation of animation
-          // and running it the ShaderEffect of the actor has been changed.
-          // However this is a unlikely use case especially when using scripts.
-          if( ShaderEffect effect = renderable.GetShaderEffect() )
+          RenderableActor renderable = RenderableActor::DownCast( targetHandle );
+          if( renderable )
           {
-            idx = effect.GetPropertyIndex( *property );
-            if(idx != Property::INVALID_INDEX)
+            // A limitation here is that its possible that between creation of animation
+            // and running it the ShaderEffect of the actor has been changed.
+            // However this is a unlikely use case especially when using scripts.
+            if( ShaderEffect effect = renderable.GetShaderEffect() )
             {
-              targetHandle = effect;
-            }
-            else
-            {
-              DALI_SCRIPT_WARNING( "Cannot find property on object or ShaderEffect\n" );
-              continue;
+              propIndex = effect.GetPropertyIndex( *property );
+              if(propIndex != Property::INVALID_INDEX)
+              {
+                targetHandle = effect;
+              }
+              else
+              {
+                DALI_SCRIPT_WARNING( "Cannot find property on object or ShaderEffect\n" );
+                continue;
+              }
             }
           }
+          else
+          {
+            DALI_SCRIPT_WARNING( "Cannot find property on object or ShaderEffect\n" );
+            continue;
+          }
         }
-        else
+
+        if( propIndex == Property::INVALID_INDEX)
         {
-          DALI_SCRIPT_WARNING( "Cannot find property on object or ShaderEffect\n" );
+          DALI_ASSERT_ALWAYS( propIndex != Property::INVALID_INDEX && "Animation must specify a valid property" );
           continue;
         }
       }
-
-      if( idx == Property::INVALID_INDEX)
-      {
-        DALI_ASSERT_ALWAYS( idx != Property::INVALID_INDEX && "Animation must specify a valid property" );
-        continue;
-      }
-
-      Property prop( Property( targetHandle, idx ) );
-      Property::Value propValue;
 
       // these are the defaults
       AlphaFunction alphaFunction( AlphaFunctions::Default );
@@ -294,6 +295,9 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
 
       if( OptionalChild keyFrameChild = IsChild(pKeyChild.second, "key-frames") )
       {
+        DALI_ASSERT_ALWAYS( property  && "Animation must specify a property name" );
+        Property prop = Property( targetHandle, propIndex );
+
         KeyFrames keyframes = KeyFrames::New();
 
         const TreeNode::ConstIterator endIter = (*keyFrameChild).CEnd();
@@ -338,8 +342,45 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
           animation.AnimateBetween( prop, keyframes, alphaFunction );
         }
       }
+      else if( OptionalString pathChild = IsString(pKeyChild.second, "path") )
+      {
+        //Get path
+        Path path = builder->GetPath(*pathChild);
+        if( path )
+        {
+          //Get forward vector if specified
+          Vector3 forward( 0.0f, 0.0f, 0.0f );
+          OptionalVector3 forwardProperty = constant.IsVector3( IsChild(pKeyChild.second, "forward" ) );
+          if( forwardProperty )
+          {
+            forward = *forwardProperty;
+          }
+
+          Actor actor = Actor::DownCast( targetHandle );
+          if( actor )
+          {
+            if( timeChild )
+            {
+              animation.Animate( actor, path, forward, alphaFunction, timePeriod );
+            }
+            else
+            {
+              animation.Animate( actor, path, forward, alphaFunction );
+            }
+
+          }
+        }
+        else
+        {
+          //Path not found
+          DALI_SCRIPT_WARNING( "Cannot find animation path '%s'\n", (*pathChild).c_str() );
+        }
+      }
       else
       {
+        DALI_ASSERT_ALWAYS( property  && "Animation must specify a property name" );
+
+        Property prop = Property( targetHandle, propIndex );
         try
         {
           propValue = GetPropertyValue( prop.object.GetPropertyType(prop.propertyIndex), *IsChild(pKeyChild.second, "value") );
@@ -386,10 +427,10 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
   return animation;
 }
 
-Animation CreateAnimation( const TreeNode& child )
+Animation CreateAnimation( const TreeNode& child, Builder* const builder )
 {
   Replacement replacement;
-  return CreateAnimation( child, replacement, Stage::GetCurrent().GetRootLayer() );
+  return CreateAnimation( child, replacement, Stage::GetCurrent().GetRootLayer(), builder );
 }
 
 } // namespace Internal
