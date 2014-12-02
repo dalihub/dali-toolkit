@@ -399,6 +399,15 @@ class DALI_IMPORT_API Builder : public BaseHandle
    */
   FrameBufferImage GetFrameBufferImage( const std::string &name );
 
+  /**
+   * Get or create Path from the Path instance library.
+   * An empty handle is returned otherwise.
+   * @pre The Builder has been initialized.
+   * @param name The name of a Path in the loaded representation
+   * @return A handle to a Path if found, otherwise empty
+   */
+  Path GetPath( const std::string &name );
+
   // Signals
 
   /**
