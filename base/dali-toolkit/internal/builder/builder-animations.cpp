@@ -232,7 +232,7 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
       DALI_ASSERT_ALWAYS( targetHandle && "Actor must exist for property" );
 
       Property::Value propValue;
-      Property::Index propIndex;
+      Property::Index propIndex = Property::INVALID_INDEX;
       if( property )
       {
         propIndex = targetHandle.GetPropertyIndex( *property );
