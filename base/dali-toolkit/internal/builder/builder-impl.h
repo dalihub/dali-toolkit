@@ -180,6 +180,10 @@ public:
   FrameBufferImage GetFrameBufferImage( const std::string &name, const Replacement& constant );
 
   /**
+   * @copydoc Toolkit::Builder::GetPath
+   */
+  Path GetPath( const std::string &name );
+  /**
    * @copydoc Toolkit::Builder::QuitSignal
    */
   Toolkit::Builder::Signal& QuitSignal();
@@ -208,6 +212,9 @@ private:
 
   typedef std::map<const std::string, ShaderEffect> ShaderEffectLut;
   ShaderEffectLut mShaderEffectLut;
+
+  typedef std::map<const std::string, Path> PathLut;
+  PathLut mPathLut;
 
   SlotDelegate<Builder> mSlotDelegate;
 
