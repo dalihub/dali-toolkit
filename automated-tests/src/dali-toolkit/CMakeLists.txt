@@ -36,6 +36,7 @@ SET(TC_SOURCES
 
 # Append list of test harness files (Won't get parsed for test cases)
 LIST(APPEND TC_SOURCES
+   dali-toolkit-test-utils/test-harness.cpp
    dali-toolkit-test-utils/toolkit-accessibility-manager.cpp
    dali-toolkit-test-utils/toolkit-application.cpp
    dali-toolkit-test-utils/toolkit-clipboard.cpp
