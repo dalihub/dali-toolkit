@@ -1042,7 +1042,7 @@ void TextInput::OnKeyInputFocusGained()
     imfManager.Activate();
 
     // When window gain lost focus, the imf manager is deactivated. Thus when window gain focus again, the imf manager must be activated.
-    imfManager.SetRestoreAferFocusLost( true );
+    imfManager.SetRestoreAfterFocusLost( true );
 
     imfManager.SetCursorPosition( mCursorPosition );
     imfManager.NotifyCursorPosition();
@@ -1076,7 +1076,7 @@ void TextInput::OnKeyInputFocusLost()
   if ( imfManager )
   {
     // The text editing is finished. Therefore the imf manager don't have restore activation.
-    imfManager.SetRestoreAferFocusLost( false );
+    imfManager.SetRestoreAfterFocusLost( false );
 
     // Notify that the text editing finish.
     imfManager.Deactivate();
