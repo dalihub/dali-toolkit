@@ -380,15 +380,17 @@ public:
    */
   KeyEventSignalV2& KeyEventSignal();
 
-public: // Intended for control developers (used implicitly)
+public: // Intended for control developers
 
   /**
    * @brief Create an initialised Control.
    *
    * @param[in] implementation The implementation for this control.
    * @return A handle to a newly allocated Dali resource.
+   *
+   * @note Should NOT be called to create a handle from the implementation. As stated, this allocates a NEW Dali resource.
    */
-  Control(Internal::Control& implementation);
+  explicit Control(Internal::Control& implementation);
 
   /**
    * @brief This constructor is used by CustomActor within Dali core to create additional Control handles
@@ -396,7 +398,7 @@ public: // Intended for control developers (used implicitly)
    *
    * @param [in] internal A pointer to a newly allocated Dali resource
    */
-  Control(Dali::Internal::CustomActor* internal);
+  explicit Control(Dali::Internal::CustomActor* internal);
 
 public: // Templates for Deriving Classes
 
