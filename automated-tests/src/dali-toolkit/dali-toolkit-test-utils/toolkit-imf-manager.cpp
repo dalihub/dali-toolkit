@@ -50,7 +50,7 @@ public:
   void Reset();
 
   bool RestoreAfterFocusLost() const;
-  void SetRestoreAferFocusLost( bool toggle );
+  void SetRestoreAfterFocusLost( bool toggle );
   void NotifyCursorPosition();
   int GetCursorPosition();
   void SetCursorPosition( unsigned int cursorPosition );
@@ -170,7 +170,7 @@ bool ImfManager::RestoreAfterFocusLost() const
   return mRestoreAfterFocusLost;
 }
 
-void ImfManager::SetRestoreAferFocusLost( bool toggle )
+void ImfManager::SetRestoreAfterFocusLost( bool toggle )
 {
   mRestoreAfterFocusLost = toggle;
 }
@@ -241,9 +241,9 @@ bool ImfManager::RestoreAfterFocusLost() const
   return Internal::Adaptor::ImfManager::GetImplementation(*this).RestoreAfterFocusLost();
 }
 
-void ImfManager::SetRestoreAferFocusLost( bool toggle )
+void ImfManager::SetRestoreAfterFocusLost( bool toggle )
 {
-  Internal::Adaptor::ImfManager::GetImplementation(*this).SetRestoreAferFocusLost( toggle );
+  Internal::Adaptor::ImfManager::GetImplementation(*this).SetRestoreAfterFocusLost( toggle );
 }
 
 void ImfManager::Reset()
