@@ -289,7 +289,7 @@ private:
   /**
    * Remove an Actor if found in the ItemPool.
    * @param[in] itemId The item to remove.
-   * @return True if an actor was removed.
+   * @return True if the remaining actors were reordered.
    */
   bool RemoveActor( unsigned int itemId );
 
@@ -397,6 +397,11 @@ private:
    * @param[in] durationSeconds The time taken to fully constrain the actors.
    */
   void ReapplyAllConstraints( float durationSeconds );
+
+  /**
+   * Helper to relayout after item(s) are removed.
+   */
+  void OnItemsRemoved();
 
   /**
    * Helper to remove items outside a given range.
