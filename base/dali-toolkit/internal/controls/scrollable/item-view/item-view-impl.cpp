@@ -686,21 +686,42 @@ void ItemView::InsertItem( Item newItem, float durationSeconds )
 {
   mAddingItems = true;
 
-  SetupActor( newItem, durationSeconds );
-  Self().Add( newItem.second );
+  Actor displacedActor;
+  ItemPoolIter afterDisplacedIter = mItemPool.end();
 
   ItemPoolIter foundIter = mItemPool.find( newItem.first );
   if( mItemPool.end() != foundIter )
   {
-    Actor moveMe = foundIter->second;
+    SetupActor( newItem, durationSeconds );
+    Self().Add( newItem.second );
+
+    displacedActor = foundIter->second;
     foundIter->second = newItem.second;
 
+    afterDisplacedIter = ++foundIter;
+  }
+  else
+  {
+    // Inserting before the existing item range?
+    ItemPoolIter iter = mItemPool.begin();
+    if( iter != mItemPool.end() &&
+        iter->first > newItem.first )
+    {
+      displacedActor = iter->second;
+      mItemPool.erase( iter++ ); // iter is still valid after the erase
+
+      afterDisplacedIter = iter;
+    }
+  }
+
+  if( displacedActor )
+  {
     // Move the existing actors to make room
-    for( ItemPoolIter iter = ++foundIter; mItemPool.end() != iter; ++iter )
+    for( ItemPoolIter iter = afterDisplacedIter; mItemPool.end() != iter; ++iter )
     {
       Actor temp = iter->second;
-      iter->second = moveMe;
-      moveMe = temp;
+      iter->second = displacedActor;
+      displacedActor = temp;
 
       iter->second.RemoveConstraints();
       mActiveLayout->ApplyConstraints(iter->second, iter->first, durationSeconds, mScrollPositionObject, Self() );
@@ -708,15 +729,11 @@ void ItemView::InsertItem( Item newItem, float durationSeconds )
 
     // Create last item
     ItemId lastId = mItemPool.rbegin()->first;
-    Item lastItem( lastId + 1, moveMe );
+    Item lastItem( lastId + 1, displacedActor );
     mItemPool.insert( lastItem );
 
     lastItem.second.RemoveConstraints();
     mActiveLayout->ApplyConstraints(lastItem.second, lastItem.first, durationSeconds, mScrollPositionObject, Self() );
-  }
-  else
-  {
-    mItemPool.insert( newItem );
   }
 
   CalculateDomainSize(Self().GetCurrentSize());
@@ -786,16 +803,18 @@ void ItemView::InsertItems( const ItemContainer& newItems, float durationSeconds
 
 void ItemView::RemoveItem( unsigned int itemId, float durationSeconds )
 {
-  bool actorRemoved = RemoveActor( itemId );
-  if( actorRemoved )
+  bool actorsReordered = RemoveActor( itemId );
+  if( actorsReordered )
   {
     ReapplyAllConstraints( durationSeconds );
+
+    OnItemsRemoved();
   }
 }
 
 void ItemView::RemoveItems( const ItemIdContainer& itemIds, float durationSeconds )
 {
-  bool actorRemoved( false );
+  bool actorsReordered( false );
 
   // Remove from highest id to lowest
   set<ItemId> sortedItems;
@@ -808,27 +827,44 @@ void ItemView::RemoveItems( const ItemIdContainer& itemIds, float durationSecond
   {
     if( RemoveActor( *iter ) )
     {
-      actorRemoved = true;
+      actorsReordered = true;
     }
   }
 
-  if( actorRemoved )
+  if( actorsReordered )
   {
     ReapplyAllConstraints( durationSeconds );
+
+    OnItemsRemoved();
   }
 }
 
 bool ItemView::RemoveActor(unsigned int itemId)
 {
-  bool removed( false );
+  bool reordered( false );
 
-  const ItemPoolIter removeIter = mItemPool.find( itemId );
-
+  ItemPoolIter removeIter = mItemPool.find( itemId );
   if( removeIter != mItemPool.end() )
   {
     ReleaseActor(itemId, removeIter->second);
+  }
+  else
+  {
+    // Removing before the existing item range?
+    ItemPoolIter iter = mItemPool.begin();
+    if( iter != mItemPool.end() &&
+        iter->first > itemId )
+    {
+      // In order to decrement the first visible item ID
+      mItemPool.insert( Item(iter->first - 1, Actor()) );
 
-    removed = true;
+      removeIter = mItemPool.begin();
+    }
+  }
+
+  if( removeIter != mItemPool.end() )
+  {
+    reordered = true;
 
     // Adjust the remaining item IDs, for example if item 2 is removed:
     //   Initial actors:     After insert:
@@ -850,7 +886,7 @@ bool ItemView::RemoveActor(unsigned int itemId)
     }
   }
 
-  return removed;
+  return reordered;
 }
 
 void ItemView::ReplaceItem( Item replacementItem, float durationSeconds )
@@ -1099,8 +1135,19 @@ void ItemView::ReapplyAllConstraints( float durationSeconds )
     actor.RemoveConstraints();
     mActiveLayout->ApplyConstraints(actor, id, durationSeconds, mScrollPositionObject, Self());
   }
+}
 
+void ItemView::OnItemsRemoved()
+{
   CalculateDomainSize(Self().GetCurrentSize());
+
+  // Adjust scroll-position after an item is removed
+  if( mActiveLayout )
+  {
+    float firstItemScrollPosition = ClampFirstItemPosition(GetCurrentLayoutPosition(0), Self().GetCurrentSize(), *mActiveLayout);
+
+    mScrollPositionObject.SetProperty( ScrollConnector::SCROLL_POSITION, firstItemScrollPosition );
+  }
 }
 
 float ItemView::ClampFirstItemPosition(float targetPosition, const Vector3& targetSize, ItemLayout& layout)

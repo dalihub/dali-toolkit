@@ -1101,7 +1101,7 @@ void Control::Initialize()
     styleManager.StyleChangeSignal().Connect( this, &Control::DoStyleChange );
 
     // SetTheme
-    GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
+    GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
   }
 
   SetRequiresHoverEvents(mImpl->mFlags & REQUIRES_HOVER_EVENTS);
@@ -1204,7 +1204,7 @@ void Control::OnActivated()
 
 void Control::OnThemeChange( Toolkit::StyleManager styleManager )
 {
-  GetImpl( styleManager ).ApplyThemeStyle( GetOwner() );
+  GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
 }
 
 void Control::OnFontChange( bool defaultFontChange, bool defaultFontSizeChange )

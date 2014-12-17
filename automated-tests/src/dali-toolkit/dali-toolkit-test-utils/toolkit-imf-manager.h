@@ -151,7 +151,7 @@ public:
    * Set status whether the IMF has to restore the keyboard after losing focus.
    * @param[in] toggle True means that keyboard should be restored after focus lost and regained.
    */
-  void SetRestoreAferFocusLost( bool toggle );
+  void SetRestoreAfterFocusLost( bool toggle );
 
   /**
    * Send message reset the pred-edit state / imf module.  Used to interupt pre-edit state maybe due to a touch input.
