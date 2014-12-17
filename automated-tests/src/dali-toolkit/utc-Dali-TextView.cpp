@@ -450,7 +450,7 @@ int UtcDaliTextViewSetAndGetHeightExceedPolicy(void)
             }
             catch( Dali::DaliException& e )
             {
-              DALI_TEST_EQUALS( e.mCondition, "!\"TextView::CombineExceedPolicies() Invalid width and height exceed policies combination\"", TEST_LOCATION );
+              DALI_TEST_EQUALS( e.condition, "!\"TextView::CombineExceedPolicies() Invalid width and height exceed policies combination\"", TEST_LOCATION );
             }
             catch( ... )
             {

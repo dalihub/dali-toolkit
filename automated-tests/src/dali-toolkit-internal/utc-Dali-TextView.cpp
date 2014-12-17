@@ -1817,8 +1817,8 @@ int UtcDaliTextViewMergeWord02(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "!\"TextViewProcessor::MergeWord(). ERROR: White spaces or new paragraph characters can't be merged with other words.\"", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS( e.condition, "!\"TextViewProcessor::MergeWord(). ERROR: White spaces or new paragraph characters can't be merged with other words.\"", TEST_LOCATION );
     assert1 = true;
   }
   try
@@ -1828,8 +1828,8 @@ int UtcDaliTextViewMergeWord02(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "!\"TextViewProcessor::MergeWord(). ERROR: White spaces or new paragraph characters can't be merged with other words.\"", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS( e.condition, "!\"TextViewProcessor::MergeWord(). ERROR: White spaces or new paragraph characters can't be merged with other words.\"", TEST_LOCATION );
     assert2 = true;
   }
   try
@@ -1839,8 +1839,8 @@ int UtcDaliTextViewMergeWord02(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "!\"TextViewProcessor::MergeWord(). ERROR: White spaces or new paragraph characters can't be merged with other words.\"", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS( e.condition, "!\"TextViewProcessor::MergeWord(). ERROR: White spaces or new paragraph characters can't be merged with other words.\"", TEST_LOCATION );
     assert3 = true;
   }
   try
@@ -1850,8 +1850,8 @@ int UtcDaliTextViewMergeWord02(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "!\"TextViewProcessor::MergeWord(). ERROR: White spaces or new paragraph characters can't be merged with other words.\"", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS( e.condition, "!\"TextViewProcessor::MergeWord(). ERROR: White spaces or new paragraph characters can't be merged with other words.\"", TEST_LOCATION );
     assert4 = true;
   }
   try
@@ -1861,8 +1861,8 @@ int UtcDaliTextViewMergeWord02(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "!\"TextViewProcessor::MergeWord(). ERROR: White spaces or new paragraph characters can't be merged with other words.\"", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS( e.condition, "!\"TextViewProcessor::MergeWord(). ERROR: White spaces or new paragraph characters can't be merged with other words.\"", TEST_LOCATION );
     assert5 = true;
   }
   try
@@ -1872,8 +1872,8 @@ int UtcDaliTextViewMergeWord02(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "!\"TextViewProcessor::MergeWord(). ERROR: White spaces or new paragraph characters can't be merged with other words.\"", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS( e.condition, "!\"TextViewProcessor::MergeWord(). ERROR: White spaces or new paragraph characters can't be merged with other words.\"", TEST_LOCATION );
     assert6 = true;
   }
 
@@ -1998,8 +1998,8 @@ int UtcDaliTextViewMergeParagraph02(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "!\"TextViewProcessor::MergeParagraph(). ERROR: A paragraph can't be merged to another paragraph which finishes with a new paragraph character.\"", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS( e.condition, "!\"TextViewProcessor::MergeParagraph(). ERROR: A paragraph can't be merged to another paragraph which finishes with a new paragraph character.\"", TEST_LOCATION );
     assert1 = true;
   }
 

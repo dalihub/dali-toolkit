@@ -801,8 +801,8 @@ int UtcDaliTextViewMiscelaneousAsserts(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "!\"TextViewRelayout::CalculateXoffset: Wrong horizontal text alignment. Did you set a vertical one?\"", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS( e.condition, "!\"TextViewRelayout::CalculateXoffset: Wrong horizontal text alignment. Did you set a vertical one?\"", TEST_LOCATION );
     assert1 = true;
   }
   catch( ... )
@@ -817,8 +817,8 @@ int UtcDaliTextViewMiscelaneousAsserts(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "!\"TextViewRelayout::CalculateXoffset: Wrong vertical text alignment. Did you set an horizontal one?\"", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS( e.condition, "!\"TextViewRelayout::CalculateXoffset: Wrong vertical text alignment. Did you set an horizontal one?\"", TEST_LOCATION );
     assert2 = true;
   }
   catch( ... )

@@ -63,12 +63,9 @@ int UtcDaliAlignmentConstructorNegative(void)
     alignment.SetPadding(padding);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& exception)
+  catch (DaliException& e)
   {
-    if (exception.mCondition == "alignment")
-    {
-      tet_result(TET_PASS);
-    }
+    DALI_TEST_ASSERT(e, "alignment", TEST_LOCATION );
   }
   END_TEST;
 }
@@ -422,19 +419,10 @@ int UtcDaliAlignmentSetAlignmentTypeNegative(void)
   {
     Alignment alignment = Alignment::New();
     Alignment::Type type(Alignment::Type(Alignment::HorizontalLeft | Alignment::HorizontalCenter));
-
-    try
-    {
-      alignment.SetAlignmentType(type);
-      tet_result(TET_FAIL);
-    }
-    catch (DaliException& exception)
-    {
-      if (exception.mCondition == "!horizontalSet")
-      {
-        tet_result(TET_PASS);
-      }
-    }
+    alignment.SetAlignmentType(type);
+    // center will prevail in conflict
+    DALI_TEST_CHECK( Alignment::HorizontalCenter & alignment.GetAlignmentType() );
+    DALI_TEST_CHECK( !(Alignment::HorizontalLeft & alignment.GetAlignmentType()) );
   }
 
   // Setting HorizontalCenter, HorizontalRight
@@ -442,56 +430,30 @@ int UtcDaliAlignmentSetAlignmentTypeNegative(void)
     Alignment alignment = Alignment::New();
     Alignment::Type type(Alignment::Type(Alignment::HorizontalCenter | Alignment::HorizontalRight));
 
-    try
-    {
-      alignment.SetAlignmentType(type);
-      tet_result(TET_FAIL);
-    }
-    catch (DaliException& exception)
-    {
-      if (exception.mCondition == "!horizontalSet")
-      {
-        tet_result(TET_PASS);
-      }
-    }
+    alignment.SetAlignmentType(type);
+    // center will prevail in conflict
+    DALI_TEST_CHECK( Alignment::HorizontalCenter & alignment.GetAlignmentType() );
+    DALI_TEST_CHECK( !(Alignment::HorizontalRight & alignment.GetAlignmentType()) );
   }
 
   // Setting VerticalTop, VerticalCenter
   {
     Alignment alignment = Alignment::New();
     Alignment::Type type(Alignment::Type(Alignment::VerticalTop | Alignment::VerticalCenter));
-
-    try
-    {
-      alignment.SetAlignmentType(type);
-      tet_result(TET_FAIL);
-    }
-    catch (DaliException& exception)
-    {
-      if (exception.mCondition == "!verticalSet")
-      {
-        tet_result(TET_PASS);
-      }
-    }
+    alignment.SetAlignmentType(type);
+    // center will prevail in conflict
+    DALI_TEST_CHECK( Alignment::VerticalCenter & alignment.GetAlignmentType() );
+    DALI_TEST_CHECK( !(Alignment::VerticalTop & alignment.GetAlignmentType()) );
   }
 
   // Setting VerticalCenter, VerticalBottom
   {
     Alignment alignment = Alignment::New();
     Alignment::Type type(Alignment::Type(Alignment::VerticalTop | Alignment::VerticalBottom));
-
-    try
-    {
-      alignment.SetAlignmentType(type);
-      tet_result(TET_FAIL);
-    }
-    catch (DaliException& exception)
-    {
-      if (exception.mCondition == "!veritcalSet")
-      {
-        tet_result(TET_PASS);
-      }
-    }
+    alignment.SetAlignmentType(type);
+    // top will prevail in conflict
+    DALI_TEST_CHECK( Alignment::VerticalTop & alignment.GetAlignmentType() );
+    DALI_TEST_CHECK( !(Alignment::VerticalBottom & alignment.GetAlignmentType()) );
   }
   END_TEST;
 }
@@ -874,12 +836,9 @@ int UtcDaliAlignmentSetPaddingNegative(void)
     alignment.SetPadding(padding);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& exception)
+  catch (DaliException& e)
   {
-    if (exception.mCondition == "( padding.left >= 0.f ) && ( padding.top >= 0.f ) && ( padding.right >= 0.f ) && ( padding.bottom >= 0.f )")
-    {
-      tet_result(TET_PASS);
-    }
+    DALI_TEST_ASSERT(e, "( padding.left >= 0.f ) && ( padding.top >= 0.f ) && ( padding.right >= 0.f ) && ( padding.bottom >= 0.f )", TEST_LOCATION );
   }
 
   try
@@ -888,12 +847,9 @@ int UtcDaliAlignmentSetPaddingNegative(void)
     alignment.SetPadding(padding);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& exception)
+  catch (DaliException& e)
   {
-    if (exception.mCondition == "( padding.left >= 0.f ) && ( padding.top >= 0.f ) && ( padding.right >= 0.f ) && ( padding.bottom >= 0.f )")
-    {
-      tet_result(TET_PASS);
-    }
+    DALI_TEST_ASSERT(e, "( padding.left >= 0.f ) && ( padding.top >= 0.f ) && ( padding.right >= 0.f ) && ( padding.bottom >= 0.f )", TEST_LOCATION );
   }
 
   try
@@ -902,12 +858,9 @@ int UtcDaliAlignmentSetPaddingNegative(void)
     alignment.SetPadding(padding);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& exception)
+  catch (DaliException& e)
   {
-    if (exception.mCondition == "( padding.left >= 0.f ) && ( padding.top >= 0.f ) && ( padding.right >= 0.f ) && ( padding.bottom >= 0.f )")
-    {
-      tet_result(TET_PASS);
-    }
+    DALI_TEST_ASSERT(e, "( padding.left >= 0.f ) && ( padding.top >= 0.f ) && ( padding.right >= 0.f ) && ( padding.bottom >= 0.f )", TEST_LOCATION );
   }
 
   try
@@ -916,12 +869,9 @@ int UtcDaliAlignmentSetPaddingNegative(void)
     alignment.SetPadding(padding);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& exception)
+  catch (DaliException& e)
   {
-    if (exception.mCondition == "( padding.left >= 0.f ) && ( padding.top >= 0.f ) && ( padding.right >= 0.f ) && ( padding.bottom >= 0.f )")
-    {
-      tet_result(TET_PASS);
-    }
+    DALI_TEST_ASSERT(e, "( padding.left >= 0.f ) && ( padding.top >= 0.f ) && ( padding.right >= 0.f ) && ( padding.bottom >= 0.f )", TEST_LOCATION );
   }
   END_TEST;
 }
