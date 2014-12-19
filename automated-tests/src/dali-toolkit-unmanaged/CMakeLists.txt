@@ -46,7 +46,6 @@ SET(TC_SOURCES
  utc-Dali-ItemView.cpp
  utc-Dali-KeyboardFocusManager.cpp
  utc-Dali-ScrollViewEffect.cpp
- utc-Dali-TextInput.cpp
  utc-Dali-StyleManager.cpp
  utc-Dali-RadioButton.cpp
 )

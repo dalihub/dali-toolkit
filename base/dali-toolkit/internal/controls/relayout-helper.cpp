@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
-#include <dali/public-api/actors/text-actor.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -60,21 +59,6 @@ Vector3 GetNaturalSize( Actor actor )
       Image image = imageActor.GetImage();
       size = Vector3( static_cast<float>( image.GetWidth() ), static_cast<float>( image.GetHeight() ), depth );
     }
-    else
-    {
-      // Get natural size for TextActor.
-      TextActor textActor = TextActor::DownCast( actor );
-      if( textActor )
-      {
-        Font font = textActor.GetFont();
-        if( !font )
-        {
-          font = Font::New();
-        }
-        size = font.MeasureText( textActor.GetText() );
-        size.depth = depth;
-      }
-    }
   }
 
   return size;
@@ -104,22 +88,7 @@ float GetHeightForWidth( Actor actor, float width )
     }
     else
     {
-      TextActor textActor = TextActor::DownCast( actor );
-      if( textActor )
-      {
-        Font font = textActor.GetFont();
-        if( !font )
-        {
-          font = Font::New();
-        }
-        size = font.MeasureText( textActor.GetText() );
-
-        constrainSize = true;
-      }
-      else
-      {
-        size = actor.GetCurrentSize();
-      }
+      size = actor.GetCurrentSize();
     }
 
     // Scale the actor

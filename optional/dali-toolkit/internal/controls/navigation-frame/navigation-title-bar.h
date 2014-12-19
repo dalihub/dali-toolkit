@@ -19,7 +19,6 @@
  */
 
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
 #include <dali-toolkit/internal/controls/navigation-frame/navigation-control-impl.h>
 #include <dali-toolkit/internal/controls/navigation-frame/navigation-bar.h>
 #include <dali-toolkit/public-api/controls/navigation-frame/page.h>
@@ -79,9 +78,6 @@ private:
   Toolkit::TableView mButtonLayout;
   Toolkit::TableView mTitleLayout;
   Toolkit::TableView mTitleIconLayout;
-
-  Toolkit::TextView  mTitle;
-  Toolkit::TextView  mSubTitle;
 
 };
 

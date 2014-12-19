@@ -25,7 +25,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/slider/slider.h>
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
 
 namespace Dali
 {
@@ -441,7 +440,7 @@ private:
    *
    * @return The textview created for the popup
    */
-  Toolkit::TextView CreatePopupText();
+  //Toolkit::TextView CreatePopupText();
 
   /**
    * Create the value display for the slider
@@ -694,8 +693,6 @@ private:
   ImageActor mPopup;                        ///< Popup backing
   ImageActor mPopupArrow;                   ///< Popup arrow backing
 
-  Toolkit::TextView mValueTextView;         //< The text value in popup
-  Toolkit::TextView mHandleValueTextView;   ///< The text value on handle
   Vector2 mHandleLastTouchPoint;            ///< The last touch point for the handle
   Timer mValueTimer;                        ///< Timer used to hide value view
 

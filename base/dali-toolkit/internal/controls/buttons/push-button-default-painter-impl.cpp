@@ -26,7 +26,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
 #include "push-button-impl.h"
 
 namespace Dali

@@ -27,7 +27,6 @@
 // INTERNAL INCLUDES
 #include "push-button-default-painter-impl.h"
 
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
 #include <dali-toolkit/internal/controls/relayout-helper.h>
 
 namespace Dali
@@ -324,9 +323,7 @@ Actor PushButton::GetDimmedImage() const
 
 void PushButton::SetLabelText( const std::string& text )
 {
-  Toolkit::TextView textView ( Toolkit::TextView::New( text ) );
-  textView.SetWidthExceedPolicy( Toolkit::TextView::ShrinkToFit ); // Make sure our text always fits inside the button
-  SetLabelText( textView );
+  // TODO
 }
 
 void PushButton::SetLabelText( Actor text )
@@ -756,23 +753,6 @@ Vector3 PushButton::GetNaturalSize()
       if( heightIsZero )
       {
         size.height = std::max( size.height, imageSize.height );
-      }
-    }
-
-    // If label, test against it's size
-    Toolkit::TextView textView = Toolkit::TextView::DownCast( mLabel );
-    if( textView )
-    {
-      Vector3 textViewSize = textView.GetNaturalSize();
-
-      if( widthIsZero )
-      {
-        size.width = std::max( size.width, textViewSize.width + TEXT_PADDING * 2.0f );
-      }
-
-      if( heightIsZero )
-      {
-        size.height = std::max( size.height, textViewSize.height + TEXT_PADDING * 2.0f );
       }
     }
   }

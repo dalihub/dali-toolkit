@@ -297,33 +297,12 @@ void Popup::SetButtonAreaImage( Actor image )
 
 void Popup::SetTitle( const std::string& text )
 {
-  Toolkit::TextView titleActor = Toolkit::TextView::New();
-  titleActor.SetText( text );
-  titleActor.SetColor( Color::BLACK );
-  titleActor.SetMultilinePolicy( Toolkit::TextView::SplitByWord );
-  titleActor.SetWidthExceedPolicy( Toolkit::TextView::Split );
-  titleActor.SetLineJustification( Toolkit::TextView::Center );
-
-  SetTitle( titleActor );
 }
 
-void Popup::SetTitle( Toolkit::TextView titleActor )
+const std::string& Popup::GetTitle() const
 {
-  // Replaces the current title actor.
-  if( mTitle && mPopupBg )
-  {
-    mPopupBg.Remove( mTitle );
-  }
-  mTitle = titleActor;
-
-  mPopupBg.Add( mTitle );
-
-  RelayoutRequest();
-}
-
-Toolkit::TextView Popup::GetTitle() const
-{
-  return mTitle;
+  static std::string temp("");
+  return temp;
 }
 
 void Popup::AddButton( Toolkit::Button button )
@@ -721,24 +700,7 @@ void Popup::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
 
   // Relayout title
   Vector3 positionOffset( 0.0f, mPopupStyle->margin + POPUP_OUT_MARGIN_WIDTH, CONTENT_DEPTH );
-  if( mTitle )
-  {
-    Vector2 titleSize;
-    titleSize.width  = popupSize.width;
-    titleSize.height = mTitle.GetHeightForWidth( titleSize.width );
-
-    // As the default size policy for text-view is Fixed & Fixed, a size needs to be set.
-    // Otherwise size-negotiation algorithm uses the GetNaturalSize() with doesn't take
-    // into account the multiline and exceed policies, giving as result a wrong size.
-    mTitle.SetSize( titleSize );
-    Relayout( mTitle, titleSize, container );
-
-    mTitle.SetAnchorPoint( AnchorPoint::TOP_CENTER );
-    mTitle.SetParentOrigin( ParentOrigin::TOP_CENTER );
-    mTitle.SetPosition( positionOffset );
-
-    positionOffset.y += titleSize.height + mPopupStyle->margin;
-  }
+  // TODO
 
   // Relayout content
   if( mContent )
@@ -833,32 +795,8 @@ bool Popup::OnKeyEvent(const KeyEvent& event)
 Vector3 Popup::GetNaturalSize()
 {
   float margin = 2.0f * ( POPUP_OUT_MARGIN_WIDTH + mPopupStyle->margin );
-  const float maxWidth = Stage::GetCurrent().GetSize().width - margin;
 
   Vector3 naturalSize( 0.0f, 0.0f, 0.0f );
-
-  if ( mTitle )
-  {
-    Vector3 titleNaturalSize = mTitle.GetImplementation().GetNaturalSize();
-    // Buffer to avoid errors. The width of the popup could potentially be the width of the title text.
-    // It was observed in this case that text wrapping was then inconsistent when seen on device
-    const float titleBuffer = 0.5f;
-    titleNaturalSize.width += titleBuffer;
-
-    // As TextView GetNaturalSize does not take wrapping into account, limit the width
-    // to that of the stage
-    if( titleNaturalSize.width >= maxWidth)
-    {
-      naturalSize.width = maxWidth;
-      naturalSize.height = mTitle.GetImplementation().GetHeightForWidth( naturalSize.width );
-    }
-    else
-    {
-      naturalSize += titleNaturalSize;
-    }
-
-    naturalSize.height += mPopupStyle->margin;
-  }
 
   if( mContent )
   {
@@ -884,12 +822,6 @@ float Popup::GetHeightForWidth( float width )
 {
   float height( 0.0f );
   float popupWidth( width - 2.f * ( POPUP_OUT_MARGIN_WIDTH + mPopupStyle->margin ) );
-
-  if ( mTitle )
-  {
-    height += mTitle.GetImplementation().GetHeightForWidth( popupWidth );
-    height += mPopupStyle->margin;
-  }
 
   if( mContent )
   {

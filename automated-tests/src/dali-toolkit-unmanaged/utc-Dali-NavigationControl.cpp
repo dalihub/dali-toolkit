@@ -327,14 +327,10 @@ int UtcDaliNavigationControlCreateNavigationTitleBar(void)
   tet_infoline( "UtcDaliNavigationControlCreateNavigationTitleBar" );
 
   ImageActor background = CreateSolidColorActor( Color::RED );
-  TextStyle textStyle;
   Stage stage = Stage::GetCurrent();
 
   NavigationControl naviControl = NavigationControl::New();
   stage.Add( naviControl );
-
-  Toolkit::NaviTitleBarStyle titleBarStyle( background, textStyle, textStyle, 720, 111, 68, 48, 34, 16, 11, 45, 63, 26, 14, 22 );
-  naviControl.CreateNavigationTitleBar( titleBarStyle, titleBarStyle );
 
   Page naviItem = Page::New();
 

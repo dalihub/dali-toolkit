@@ -420,18 +420,8 @@ int UtcDaliPushButtonSetLabelText(void)
   application.SendNotification();
   application.Render();
 
-  TextView textView;
-
   pushButton.SetLabelText( STR );
 
-  textView = TextView::DownCast( pushButton.GetLabelText() );
-  DALI_TEST_CHECK( STR == textView.GetText() );
-
-  TextView text = TextView::New( STR );
-  pushButton.SetLabelText( text );
-
-  textView = TextView::DownCast( pushButton.GetLabelText() );
-  DALI_TEST_CHECK( STR == textView.GetText() );
   END_TEST;
 }
 

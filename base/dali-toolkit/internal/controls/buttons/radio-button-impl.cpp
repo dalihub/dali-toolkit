@@ -20,7 +20,6 @@
 #include "radio-button-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/text-actor.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/scripting/scripting.h>
 
@@ -85,16 +84,7 @@ RadioButton::~RadioButton()
 
 void RadioButton::SetLabel(const std::string& label)
 {
-  TextActor textActor = TextActor::DownCast( mLabel );
-  if( textActor )
-  {
-    textActor.SetText( label );
-  }
-  else
-  {
-    Toolkit::TextView newTextView = Toolkit::TextView::New( label );
-    SetLabel( newTextView );
-  }
+  // TODO
 
   RelayoutRequest();
 }

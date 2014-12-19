@@ -46,12 +46,9 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 #include <dali-toolkit/public-api/controls/super-blur-view/super-blur-view.h>
-#include <dali-toolkit/public-api/controls/text-input/text-input.h>
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
 #include <dali-toolkit/public-api/enums.h>
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
-#include <dali-toolkit/public-api/markup-processor/markup-processor.h>
 #include <dali-toolkit/public-api/shader-effects/dissolve-effect.h>
 #include <dali-toolkit/public-api/shader-effects/image-region-effect.h>
 #include <dali-toolkit/public-api/shader-effects/iris-effect.h>

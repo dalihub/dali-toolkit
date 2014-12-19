@@ -168,7 +168,7 @@ int UtcDaliPopoupSetProperty(void)
   //Test properties
   std::string testString = "Hello World";
   popup.SetProperty(popup.GetPropertyIndex("title"), testString);
-  DALI_TEST_EQUALS( testString, popup.GetTitle().GetText(), TEST_LOCATION );
+  DALI_TEST_EQUALS( testString, popup.GetTitle(), TEST_LOCATION );
   END_TEST;
 }
 
@@ -191,63 +191,7 @@ int UtcDaliPopupSetBackgroundImage(void)
 
 int UtcDaliPopupSetTitle(void)
 {
-  ToolkitTestApplication application;  // Exceptions require ToolkitTestApplication
-  tet_infoline(" UtcDaliPopupSetTitle");
-
-  // Create the Popup actor
-  Popup popup = Popup::New();
-  Stage::GetCurrent().Add( popup );
-  // Put in show state so it's layer is connected to popup (for ancestor check).
-  popup.SetState(Popup::POPUP_SHOW, 0.0f);
-
-  TextView titleActor = TextView::New();
-  titleActor.SetText("title");
-
-  DALI_TEST_CHECK( !popup.GetTitle() );
-  popup.SetTitle(titleActor);
-  DALI_TEST_CHECK( popup.GetTitle() == titleActor );
-  DALI_TEST_CHECK( (popup.GetTitle()) && (popup.GetTitle().GetText() == "title") );
-  // verify titleActor is actually inside popup, and not elsewhere on stage, or off even.
-  DALI_TEST_CHECK( HasAncestor(titleActor, popup) );
-
-  TextView titleActor2 = TextView::New();
-  titleActor2.SetText("anothertitle");
-  popup.SetTitle(titleActor2);
-  DALI_TEST_CHECK( popup.GetTitle() != titleActor );
-  DALI_TEST_CHECK( popup.GetTitle() == titleActor2 );
-  DALI_TEST_CHECK( (popup.GetTitle()) && (popup.GetTitle().GetText() == "anothertitle") );
-  // verify titleActor is actually inside popup, and not elsewhere on stage, or off even.
-  DALI_TEST_CHECK( HasAncestor(titleActor2, popup) );
-  END_TEST;
-}
-
-int UtcDaliPopupSetTitleText(void)
-{
-  ToolkitTestApplication application;  // Exceptions require ToolkitTestApplication
-  tet_infoline(" UtcDaliPopupSetTitleText");
-
-  // Create the Popup actor
-  Popup popup = Popup::New();
-  Stage::GetCurrent().Add( popup );
-  // Put in show state so it's layer is connected to popup (for ancestor check).
-  popup.SetState(Popup::POPUP_SHOW, 0.0f);
-
-  TextView titleActor = TextView::New();
-  titleActor.SetText("title");
-
-  DALI_TEST_CHECK( !popup.GetTitle() );
-  popup.SetTitle(titleActor);
-  DALI_TEST_CHECK( popup.GetTitle() == titleActor );
-  DALI_TEST_CHECK( (popup.GetTitle()) && (popup.GetTitle().GetText() == "title") );
-  // verify titleActor is actually inside popup, and not elsewhere on stage, or off even.
-  DALI_TEST_CHECK( HasAncestor(titleActor, popup) );
-
-  // this text should replace titleImage actor.
-  popup.SetTitle("newtext");
-  DALI_TEST_CHECK( popup.GetTitle() != titleActor );
-  DALI_TEST_CHECK( (popup.GetTitle()) && (popup.GetTitle().GetText() == "newtext") );
-  // verify titleActor is no longer inside popup. (been displaced by newtext actor)
-  DALI_TEST_CHECK( !HasAncestor(titleActor, popup) );
+  // TODO
   END_TEST;
 }
 

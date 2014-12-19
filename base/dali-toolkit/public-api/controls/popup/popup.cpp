@@ -87,12 +87,7 @@ void Popup::SetTitle( const std::string& text )
   GetImpl(*this).SetTitle( text );
 }
 
-void Popup::SetTitle( TextView titleActor )
-{
-  GetImpl(*this).SetTitle( titleActor );
-}
-
-TextView Popup::GetTitle() const
+const std::string& Popup::GetTitle() const
 {
   return GetImpl(*this).GetTitle();
 }

@@ -378,14 +378,6 @@ void Slider::DisplayValue( float value, bool raiseSignals )
       mMarkSignal.Emit( self, markIndex );
     }
   }
-
-  if( mHandleValueTextView )
-  {
-    std::stringstream ss;
-    ss.precision( GetValuePrecision() );
-    ss << std::fixed << clampledValue;
-    mHandleValueTextView.SetText( ss.str() );
-  }
 }
 
 void Slider::SetMarks( const MarkList& marks )
@@ -549,24 +541,15 @@ ImageActor Slider::CreatePopupArrow()
   return arrow;
 }
 
-Toolkit::TextView Slider::CreatePopupText()
-{
-  Toolkit::TextView textView = Toolkit::TextView::New();
-  textView.SetParentOrigin( ParentOrigin::CENTER );
-  textView.SetAnchorPoint( AnchorPoint::CENTER );
-  textView.SetSizePolicy( Toolkit::Control::Flexible, Toolkit::Control::Flexible );
-  textView.SetZ( VALUE_DISPLAY_TEXT_Z );
-  return textView;
-}
+//Toolkit::TextView Slider::CreatePopupText()
+//{
+//}
 
 ImageActor Slider::CreatePopup()
 {
   ImageActor popup = ImageActor::New();
   popup.SetParentOrigin( ParentOrigin::TOP_CENTER );
   popup.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
-
-  mValueTextView = CreatePopupText();
-  popup.Add( mValueTextView );
 
   return popup;
 }
@@ -600,24 +583,10 @@ void Slider::ResizeHandleRegion( const Vector2& region )
 
 void Slider::CreateHandleValueDisplay()
 {
-  if( mHandle && !mHandleValueTextView )
-  {
-    mHandleValueTextView = Toolkit::TextView::New();
-    mHandleValueTextView.SetParentOrigin( ParentOrigin::CENTER );
-    mHandleValueTextView.SetAnchorPoint( AnchorPoint::CENTER );
-    mHandleValueTextView.SetSize( GetHandleRegion() );
-    mHandleValueTextView.SetZ( HANDLE_VALUE_DISPLAY_TEXT_Z );
-    mHandle.Add( mHandleValueTextView );
-  }
 }
 
 void Slider::DestroyHandleValueDisplay()
 {
-  if(mHandleValueTextView)
-  {
-    mHandleValueTextView.Unparent();
-    mHandleValueTextView.Reset();
-  }
 }
 
 void Slider::SetPopupTextColor( const Vector4& color )
@@ -1046,32 +1015,6 @@ bool Slider::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tr
 
 void Slider::DisplayPopup( float value )
 {
-  // Value displayDoConnectSignal
-  if( mValueTextView )
-  {
-    std::stringstream ss;
-    ss.precision( GetValuePrecision() );
-    ss << std::fixed << value;
-    mValueTextView.SetText( ss.str() );
-    TextStyle style;
-    style.SetTextColor( GetPopupTextColor() );
-    mValueTextView.SetStyleToCurrentText( style, TextStyle::COLOR);
-
-    if( mValueDisplay )
-    {
-      Font font = Font::New();
-      float popupWidth = font.MeasureText( ss.str() ).x + VALUE_POPUP_MARGIN * 2.0f;
-      if( popupWidth < VALUE_POPUP_MIN_WIDTH )
-      {
-        popupWidth = VALUE_POPUP_MIN_WIDTH;
-      }
-
-      mPopup.SetSize( popupWidth, VALUE_POPUP_HEIGHT );
-      mValueDisplay.SetVisible( true );
-
-      mValueTimer.SetInterval( VALUE_VIEW_SHOW_DURATION );
-    }
-  }
 }
 
 void Slider::SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )

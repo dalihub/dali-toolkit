@@ -103,17 +103,7 @@ int UtcDaliRadioButtonDownCast(void)
 
 int UtcDaliRadioButtonLabelActor(void)
 {
-  ToolkitTestApplication application;
-
-  TextView actor1 = TextView::New( "test actor 1" );
-
-  RadioButton radioButton = RadioButton::New( actor1 );
-  DALI_TEST_CHECK( actor1 == radioButton.GetLabel() );
-
-  TextView actor2 = TextView::New( "test actor 2" );
-  radioButton.SetLabel( actor2 );
-  DALI_TEST_CHECK( actor2 == radioButton.GetLabel() );
-
+  // TODO
   END_TEST;
 }
 

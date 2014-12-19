@@ -35,25 +35,6 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/controls/scrollable/scroll-view/scroll-view-slide-effect-impl.cpp \
    $(toolkit_base_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect-impl.cpp \
    $(toolkit_base_src_dir)/controls/table-view/table-view-impl.cpp \
-   $(toolkit_base_src_dir)/controls/text-input/text-input-decorator-impl.cpp \
-   $(toolkit_base_src_dir)/controls/text-input/text-input-handles-impl.cpp \
-   $(toolkit_base_src_dir)/controls/text-input/text-input-text-highlight-impl.cpp \
-   $(toolkit_base_src_dir)/controls/text-input/text-input-impl.cpp \
-   $(toolkit_base_src_dir)/controls/text-input/text-input-popup-impl.cpp \
-   $(toolkit_base_src_dir)/controls/text-view/relayout-utilities.cpp   \
-   $(toolkit_base_src_dir)/controls/text-view/split-by-new-line-char-policies.cpp   \
-   $(toolkit_base_src_dir)/controls/text-view/split-by-word-policies.cpp   \
-   $(toolkit_base_src_dir)/controls/text-view/split-by-char-policies.cpp   \
-   $(toolkit_base_src_dir)/controls/text-view/text-actor-cache.cpp   \
-   $(toolkit_base_src_dir)/controls/text-view/text-processor.cpp   \
-   $(toolkit_base_src_dir)/controls/text-view/text-processor-bidirectional-info.cpp  \
-   $(toolkit_base_src_dir)/controls/text-view/text-view-impl.cpp   \
-   $(toolkit_base_src_dir)/controls/text-view/text-view-character-processor.cpp  \
-   $(toolkit_base_src_dir)/controls/text-view/text-view-paragraph-processor.cpp  \
-   $(toolkit_base_src_dir)/controls/text-view/text-view-processor.cpp  \
-   $(toolkit_base_src_dir)/controls/text-view/text-view-processor-dbg.cpp  \
-   $(toolkit_base_src_dir)/controls/text-view/text-view-processor-helper-functions.cpp  \
-   $(toolkit_base_src_dir)/controls/text-view/text-view-word-processor.cpp  \
    $(toolkit_base_src_dir)/focus-manager/focus-manager-impl.cpp \
    $(toolkit_base_src_dir)/focus-manager/keyboard-focus-manager-impl.cpp \
    $(toolkit_base_src_dir)/focus-manager/keyinput-focus-manager-impl.cpp \

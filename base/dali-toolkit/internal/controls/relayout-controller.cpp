@@ -30,7 +30,6 @@
 
 #include "dali-toolkit/public-api/controls/control.h"
 #include "dali-toolkit/public-api/controls/control-impl.h"
-#include "dali-toolkit/public-api/controls/text-view/text-view.h"
 
 namespace Dali
 {

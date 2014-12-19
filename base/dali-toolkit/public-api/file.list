@@ -39,12 +39,9 @@ public_api_base_src_files = \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-slide-effect.cpp \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect.cpp \
   $(public_api_base_src_dir)/controls/table-view/table-view.cpp \
-  $(public_api_base_src_dir)/controls/text-input/text-input.cpp \
-  $(public_api_base_src_dir)/controls/text-view/text-view.cpp \
   $(public_api_base_src_dir)/focus-manager/focus-manager.cpp \
   $(public_api_base_src_dir)/focus-manager/keyboard-focus-manager.cpp \
   $(public_api_base_src_dir)/focus-manager/keyinput-focus-manager.cpp \
-  $(public_api_base_src_dir)/markup-processor/markup-processor.cpp \
   $(public_api_base_src_dir)/shader-effects/image-region-effect.cpp \
   $(public_api_base_src_dir)/shader-effects/bouncing-effect.cpp \
   $(public_api_base_src_dir)/styling/style-manager.cpp \
@@ -115,19 +112,10 @@ public_api_base_scroll_view_header_files = \
 public_api_base_table_view_header_files = \
   $(public_api_base_src_dir)/controls/table-view/table-view.h
 
-public_api_base_text_input_header_files = \
-  $(public_api_base_src_dir)/controls/text-input/text-input.h
-
-public_api_base_text_view_header_files = \
-  $(public_api_base_src_dir)/controls/text-view/text-view.h
-
 public_api_base_focus_manager_header_files = \
   $(public_api_base_src_dir)/focus-manager/keyinput-focus-manager.h \
   $(public_api_base_src_dir)/focus-manager/focus-manager.h \
   $(public_api_base_src_dir)/focus-manager/keyboard-focus-manager.h
-
-public_api_base_markup_processor_header_files = \
-  $(public_api_base_src_dir)/markup-processor/markup-processor.h
 
 public_api_base_shader_effects_header_files = \
   $(public_api_base_src_dir)/shader-effects/bouncing-effect.h \

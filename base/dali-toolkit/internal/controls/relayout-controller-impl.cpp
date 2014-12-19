@@ -28,9 +28,6 @@
 #include <sstream>
 #endif // defined(DEBUG_ENABLED)
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
-
 namespace Dali
 {
 

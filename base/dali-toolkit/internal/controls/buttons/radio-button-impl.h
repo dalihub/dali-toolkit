@@ -23,7 +23,6 @@
 #include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
 #include <dali-toolkit/public-api/controls/buttons/radio-button.h>
 #include "button-impl.h"
 
