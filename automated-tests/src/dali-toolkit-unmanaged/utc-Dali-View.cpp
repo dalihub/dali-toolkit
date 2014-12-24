@@ -189,8 +189,8 @@ int UtcDaliViewAddGetRemoveContentLayer02(void)
   }
   catch( DaliException& e )
   {
-    tet_printf("Assertion %s failed at %s when an unitialized layer is added.\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS( e.mCondition, "layer", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS( e.condition, "layer", TEST_LOCATION );
   }
 
   // Test: get a layer which was not added before.
@@ -262,8 +262,8 @@ int UtcDaliViewSetGetBackgroundLayer02(void)
   }
   catch( DaliException& e )
   {
-    tet_printf("Assertion %s failed at %s when trying to add background to the view and the view is not on the stage.\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS( e.mCondition, "mBackgroundLayer.OnStage()", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS( e.condition, "mBackgroundLayer.OnStage()", TEST_LOCATION );
     assert = true;
   }
 

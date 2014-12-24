@@ -393,43 +393,31 @@ Toolkit::Alignment Alignment::New( Toolkit::Alignment::Type horizontal, Toolkit:
 void Alignment::SetAlignmentType( Toolkit::Alignment::Type type )
 {
   // Horizontal Alignment
-  bool horizontalSet(false);
-
+  if( type & Toolkit::Alignment::HorizontalRight )
+  {
+    mHorizontal = Toolkit::Alignment::HorizontalRight;
+  }
   if( type & Toolkit::Alignment::HorizontalLeft )
   {
     mHorizontal = Toolkit::Alignment::HorizontalLeft;
-    horizontalSet = true;
   }
   if( type & Toolkit::Alignment::HorizontalCenter )
   {
-    DALI_ASSERT_ALWAYS(!horizontalSet);
     mHorizontal = Toolkit::Alignment::HorizontalCenter;
-    horizontalSet = true;
-  }
-  if( type & Toolkit::Alignment::HorizontalRight )
-  {
-    DALI_ASSERT_ALWAYS(!horizontalSet);
-    mHorizontal = Toolkit::Alignment::HorizontalRight;
   }
 
   // Vertical Alignment
-  bool verticalSet(false);
-
+  if( type & Toolkit::Alignment::VerticalBottom )
+  {
+    mVertical = Toolkit::Alignment::VerticalBottom;
+  }
   if( type & Toolkit::Alignment::VerticalTop )
   {
     mVertical = Toolkit::Alignment::VerticalTop;
-    verticalSet = true;
   }
   if( type & Toolkit::Alignment::VerticalCenter )
   {
-    DALI_ASSERT_ALWAYS(!verticalSet);
     mVertical = Toolkit::Alignment::VerticalCenter;
-    verticalSet = true;
-  }
-  if( type & Toolkit::Alignment::VerticalBottom )
-  {
-    DALI_ASSERT_ALWAYS(!verticalSet);
-    mVertical = Toolkit::Alignment::VerticalBottom;
   }
 
   RelayoutRequest();

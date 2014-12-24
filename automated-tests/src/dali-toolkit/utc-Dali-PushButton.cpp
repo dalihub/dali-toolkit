@@ -251,8 +251,8 @@ int UtcDaliPushButtonSetGetAutorepeatingDelayValues02(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS(e.mCondition, "initialAutoRepeatingDelay > 0.f", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS(e.condition, "initialAutoRepeatingDelay > 0.f", TEST_LOCATION);
     assert1 = true;
   }
 
@@ -262,8 +262,8 @@ int UtcDaliPushButtonSetGetAutorepeatingDelayValues02(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS(e.mCondition, "nextAutoRepeatingDelay > 0.f", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS(e.condition, "nextAutoRepeatingDelay > 0.f", TEST_LOCATION);
     assert2 = true;
   }
 

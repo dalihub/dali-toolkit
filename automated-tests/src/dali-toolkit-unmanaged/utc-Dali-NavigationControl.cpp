@@ -272,8 +272,8 @@ int UtcDaliNavigationControlSetBackground(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS(e.mCondition, "segmentIndex+1 < mKnots.size() && segmentIndex < mKnots.size()", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS(e.condition, "segmentIndex+1 < mKnots.size() && segmentIndex < mKnots.size()", TEST_LOCATION);
     tet_result(TET_FAIL);
   }
 
