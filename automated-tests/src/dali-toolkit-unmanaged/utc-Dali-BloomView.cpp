@@ -52,7 +52,7 @@ int UtcDaliBloomViewUninitialized(void)
   catch (Dali::DaliException& e)
   {
     // Tests that a negative test of an assertion succeeds
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_CHECK(!view);
   }
   END_TEST;

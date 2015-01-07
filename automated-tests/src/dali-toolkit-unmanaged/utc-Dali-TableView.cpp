@@ -432,10 +432,10 @@ int UtcDaliTableViewChildAssert(void)
     // should assert
     tet_result(TET_FAIL);
   }
-  catch( Dali::DaliException &e )
+  catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS(e.mCondition, "child", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS(e.condition, "child", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -457,10 +457,10 @@ int UtcDaliTableViewMetricsAssert(void)
 
     tet_result(TET_FAIL);
   }
-  catch( Dali::DaliException &e)
+  catch( Dali::DaliException& e )
   {
-    tet_printf("1. Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS(e.mCondition, "rowIndex < mFixedHeights.size()", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS(e.condition, "rowIndex < mFixedHeights.size()", TEST_LOCATION);
   }
 
   try
@@ -469,10 +469,10 @@ int UtcDaliTableViewMetricsAssert(void)
 
     tet_result(TET_FAIL);
   }
-  catch( Dali::DaliException &e)
+  catch( Dali::DaliException& e )
   {
-    tet_printf("2. Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS(e.mCondition, "rowIndex < mFixedHeights.size()", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS(e.condition, "rowIndex < mFixedHeights.size()", TEST_LOCATION);
   }
 
   try
@@ -481,10 +481,10 @@ int UtcDaliTableViewMetricsAssert(void)
 
     tet_result(TET_FAIL);
   }
-  catch( Dali::DaliException &e)
+  catch( Dali::DaliException& e )
   {
-    tet_printf("3. Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS(e.mCondition, "columnIndex < mFixedWidths.size()", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS(e.condition, "columnIndex < mFixedWidths.size()", TEST_LOCATION);
   }
 
   try
@@ -493,10 +493,10 @@ int UtcDaliTableViewMetricsAssert(void)
 
     tet_result(TET_FAIL);
   }
-  catch( Dali::DaliException &e)
+  catch( Dali::DaliException& e )
   {
-    tet_printf("4. Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS(e.mCondition, "columnIndex < mFixedWidths.size()", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS(e.condition, "columnIndex < mFixedWidths.size()", TEST_LOCATION);
   }
 
   // relatives...
@@ -507,10 +507,10 @@ int UtcDaliTableViewMetricsAssert(void)
 
     tet_result(TET_FAIL);
   }
-  catch( Dali::DaliException &e)
+  catch( Dali::DaliException& e )
   {
-    tet_printf("5. Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS(e.mCondition, "rowIndex < mRelativeHeights.size()", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS(e.condition, "rowIndex < mRelativeHeights.size()", TEST_LOCATION);
   }
 
   try
@@ -519,10 +519,10 @@ int UtcDaliTableViewMetricsAssert(void)
 
     tet_result(TET_FAIL);
   }
-  catch( Dali::DaliException &e)
+  catch( Dali::DaliException& e )
   {
-    tet_printf("6. Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS(e.mCondition, "rowIndex < mRelativeHeights.size()", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS(e.condition, "rowIndex < mRelativeHeights.size()", TEST_LOCATION);
   }
 
   try
@@ -531,10 +531,10 @@ int UtcDaliTableViewMetricsAssert(void)
 
     tet_result(TET_FAIL);
   }
-  catch( Dali::DaliException &e)
+  catch( Dali::DaliException& e )
   {
-    tet_printf("7. Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS(e.mCondition, "columnIndex < mRelativeWidths.size()", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS(e.condition, "columnIndex < mRelativeWidths.size()", TEST_LOCATION);
   }
 
   try
@@ -543,10 +543,10 @@ int UtcDaliTableViewMetricsAssert(void)
 
     tet_result(TET_FAIL);
   }
-  catch( Dali::DaliException &e)
+  catch( Dali::DaliException& e )
   {
-    tet_printf("8. Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS(e.mCondition, "columnIndex < mRelativeWidths.size()", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS(e.condition, "columnIndex < mRelativeWidths.size()", TEST_LOCATION);
   }
   END_TEST;
 }

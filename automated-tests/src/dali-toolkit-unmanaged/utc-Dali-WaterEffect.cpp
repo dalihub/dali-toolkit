@@ -49,7 +49,7 @@ int UtcDaliWaterEffectUninitialized(void)
   catch (Dali::DaliException& e)
   {
     // Tests that a negative test of an assertion succeeds
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_CHECK(!effect);
   }
   END_TEST;
@@ -86,7 +86,7 @@ int UtcDaliWaterEffectOutOfBounds(void)
   catch (Dali::DaliException& e)
   {
     // Tests that a negative test of an assertion succeeds
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_CHECK( true );
   }
   END_TEST;
@@ -217,12 +217,9 @@ int UtcDaliWaterEffectGetAmplitudeNegative(void)
     effect.GetAmplitude(9999);
     tet_result(TET_FAIL);
   }
-  catch(DaliException& exception)
+  catch(DaliException& e)
   {
-    if (exception.mCondition == "index < mNumberOfWaves")
-    {
-      tet_result(TET_PASS);
-    }
+    DALI_TEST_ASSERT(e, "index < mNumberOfWaves", TEST_LOCATION );
   }
   END_TEST;
 }
@@ -271,12 +268,9 @@ int UtcDaliWaterEffectGetCenterNegative(void)
     effect.GetCenter(9999);
     tet_result(TET_FAIL);
   }
-  catch(DaliException& exception)
+  catch(DaliException& e)
   {
-    if (exception.mCondition == "index < mNumberOfWaves")
-    {
-      tet_result(TET_PASS);
-    }
+    DALI_TEST_ASSERT(e, "index < mNumberOfWaves", TEST_LOCATION );
   }
   END_TEST;
 }
@@ -325,12 +319,9 @@ int UtcDaliWaterEffectGetPropagationNegative(void)
     effect.GetPropagation(9999);
     tet_result(TET_FAIL);
   }
-  catch(DaliException& exception)
+  catch(DaliException& e)
   {
-    if (exception.mCondition == "index < mNumberOfWaves")
-    {
-      tet_result(TET_PASS);
-    }
+    DALI_TEST_ASSERT(e, "index < mNumberOfWaves", TEST_LOCATION );
   }
   END_TEST;
 }

@@ -724,16 +724,20 @@ void ItemView::InsertItem( Item newItem, float durationSeconds )
       displacedActor = temp;
 
       iter->second.RemoveConstraints();
-      mActiveLayout->ApplyConstraints(iter->second, iter->first, durationSeconds, mScrollPositionObject, Self() );
+      mActiveLayout->ApplyConstraints( iter->second, iter->first, durationSeconds, mScrollPositionObject, Self() );
     }
 
     // Create last item
-    ItemId lastId = mItemPool.rbegin()->first;
-    Item lastItem( lastId + 1, displacedActor );
-    mItemPool.insert( lastItem );
+    ItemPool::reverse_iterator lastIter = mItemPool.rbegin();
+    if ( lastIter != mItemPool.rend() )
+    {
+      ItemId lastId = lastIter->first;
+      Item lastItem( lastId + 1, displacedActor );
+      mItemPool.insert( lastItem );
 
-    lastItem.second.RemoveConstraints();
-    mActiveLayout->ApplyConstraints(lastItem.second, lastItem.first, durationSeconds, mScrollPositionObject, Self() );
+      lastItem.second.RemoveConstraints();
+      mActiveLayout->ApplyConstraints( lastItem.second, lastItem.first, durationSeconds, mScrollPositionObject, Self() );
+    }
   }
 
   CalculateDomainSize(Self().GetCurrentSize());
