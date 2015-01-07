@@ -24,7 +24,6 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.cpp \
    $(toolkit_base_src_dir)/controls/scrollable/scroll-view/scroll-view-impl.cpp \
    $(toolkit_base_src_dir)/controls/scrollable/scroll-view/scroll-view-effect-impl.cpp \
-   $(toolkit_base_src_dir)/controls/scrollable/scroll-view/scroll-view-custom-effect-impl.cpp \
    $(toolkit_base_src_dir)/controls/scrollable/scroll-view/scroll-view-carousel-effect-impl.cpp \
    $(toolkit_base_src_dir)/controls/scrollable/scroll-view/scroll-view-cube-effect-impl.cpp \
    $(toolkit_base_src_dir)/controls/scrollable/scroll-view/scroll-view-depth-effect-impl.cpp \

@@ -29,7 +29,6 @@ public_api_base_src_files = \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view.cpp \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-constraints.cpp \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-effect.cpp \
-  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-custom-effect.cpp \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-carousel-effect.cpp \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-cube-effect.cpp \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-depth-effect.cpp \
@@ -107,7 +106,6 @@ public_api_base_scroll_view_header_files = \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect.h \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view.h \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-effect.h \
-  $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-custom-effect.h \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-cube-effect.h \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-page-spiral-effect.h \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-slide-effect.h

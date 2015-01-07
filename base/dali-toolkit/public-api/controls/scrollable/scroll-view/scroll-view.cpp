@@ -614,11 +614,6 @@ void ScrollView::ApplyEffect(ScrollViewEffect effect)
   GetImpl(*this).ApplyEffect(effect);
 }
 
-ScrollViewEffect ScrollView::ApplyEffect(ScrollView::PageEffect effect)
-{
-  return GetImpl(*this).ApplyEffect(effect);
-}
-
 void ScrollView::RemoveEffect(ScrollViewEffect effect)
 {
   GetImpl(*this).RemoveEffect(effect);
