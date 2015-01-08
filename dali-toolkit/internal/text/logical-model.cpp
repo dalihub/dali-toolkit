@@ -105,6 +105,13 @@ Character LogicalModel::GetCharacter( CharacterIndex characterIndex ) const
   return mImpl->mText[characterIndex];
 }
 
+void LogicalModel::ReplaceText( CharacterIndex characterIndex,
+                                Length numberOfCharactersToRemove,
+                                const Character* const text,
+                                Length numberOfCharactersToInsert )
+{
+}
+
 void LogicalModel::SetScripts( const ScriptRun* const scripts,
                                Length numberOfRuns )
 {
@@ -215,6 +222,13 @@ Script LogicalModel::GetScript( CharacterIndex characterIndex ) const
   return TextAbstraction::UNKNOWN;
 }
 
+void LogicalModel::ReplaceScripts( CharacterIndex characterIndex,
+                                   Length numberOfCharactersToRemove,
+                                   const ScriptRun* const scriptRuns,
+                                   Length numberOfCharactersToInsert )
+{
+}
+
 void LogicalModel::SetFonts( const FontRun* const fonts,
                              Length numberOfRuns )
 {
@@ -323,6 +337,13 @@ FontId LogicalModel::GetFont( CharacterIndex characterIndex ) const
   return 0u;
 }
 
+void LogicalModel::ReplaceFonts( CharacterIndex characterIndex,
+                                 Length numberOfCharactersToRemove,
+                                 const FontRun* const fontRuns,
+                                 Length numberOfCharactersToInsert )
+{
+}
+
 void LogicalModel::SetLineBreakInfo( const LineBreakInfo* const lineBreakInfo,
                                      Length length )
 {
@@ -351,6 +372,13 @@ LineBreakInfo LogicalModel::GetLineBreakInfo( CharacterIndex characterIndex ) co
   return *( mImpl->mLineBreakInfo.Begin() + characterIndex );
 }
 
+void LogicalModel::ReplaceLineBreakInfo( CharacterIndex characterIndex,
+                                         Length numberOfItemsToRemove,
+                                         const LineBreakInfo* const lineBreakInfo,
+                                         Length numberOfItemsToInsert )
+{
+}
+
 void LogicalModel::SetWordBreakInfo( const WordBreakInfo* const wordBreakInfo,
                                      Length length )
 {
@@ -377,6 +405,13 @@ void LogicalModel::GetWordBreakInfo( WordBreakInfo* wordBreakInfo,
 WordBreakInfo LogicalModel::GetWordBreakInfo( CharacterIndex characterIndex ) const
 {
   return *( mImpl->mWordBreakInfo.Begin() + characterIndex );
+}
+
+void LogicalModel::ReplaceWordBreakInfo( CharacterIndex characterIndex,
+                                         Length numberOfItemsToRemove,
+                                         const WordBreakInfo* const wordBreakInfo,
+                                         Length numberOfItemsToInsert )
+{
 }
 
 void LogicalModel::SetBidirectionalInfo( const BidirectionalParagraphInfoRun* const bidirectionalInfo,
@@ -465,6 +500,13 @@ void LogicalModel::GetBidirectionalInfo( BidirectionalParagraphInfoRun* bidirect
   memcpy( bidirectionalInfo, modelBidirectionalParagraphInfo.Begin() + bidiCache.firstRun, bidiCache.numberOfRuns * sizeof( BidirectionalParagraphInfoRun ) );
 }
 
+void ReplaceBidirectionalInfo( CharacterIndex characterIndex,
+                               Length numberOfCharactersToRemove,
+                               const BidirectionalParagraphInfoRun* const bidirectionalInfo,
+                               Length numberOfCharactersToInsert )
+{
+}
+
 void LogicalModel::GetCharacterDirections( CharacterDirection* directions,
                                            CharacterIndex characterIndex,
                                            Length numberOfCharacters ) const
@@ -531,6 +573,13 @@ void LogicalModel::SetVisualToLogicalMap( const BidirectionalLineInfoRun* const 
       *( modelLogicalToVisualMapBuffer + *( modelVisualToLogicalMapBuffer + index ) ) = index;
     }
   }
+}
+
+void LogicalModel::ReplaceVisualToLogicalMap( CharacterIndex characterIndex,
+                                              Length numberOfCharactersToRemove,
+                                              const BidirectionalLineInfoRun* const bidirectionalInfo,
+                                              Length numberOfCharactersToInsert )
+{
 }
 
 CharacterIndex LogicalModel::GetVisualCharacterIndex( CharacterIndex logicalCharacterIndex ) const
