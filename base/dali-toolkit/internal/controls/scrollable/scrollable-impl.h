@@ -119,6 +119,16 @@ public:
    */
   Vector4 GetOvershootEffectColor() const;
 
+  /**
+   * @copydoc Dali::Toolkit::Scrollable::SetOvershootAnimationSpeed(float pixelsPerSecond)
+   */
+  void SetOvershootAnimationSpeed( float pixelsPerSecond );
+
+  /**
+   * @copydoc Dali::Toolkit::Scrollable::GetOvershootAnimationSpeed()
+   */
+  float GetOvershootAnimationSpeed() const;
+
 private:
 
   /**
@@ -224,6 +234,7 @@ private:
 protected:
 
   Vector4         mOvershootEffectColor;    ///<The color of the overshoot bouncing effect
+  float           mOvershootAnimationSpeed; ///<The speed of the overshoot animation (pixels per second)
 
   Property::Index mPropertyRelativePosition;///< Scroll Relative Position ("scroll-relative-position") [range from 0.0f - 1.0f in each axes]
   Property::Index mPropertyPositionMin;     ///< Scroll Domain Minimum ("position-min")

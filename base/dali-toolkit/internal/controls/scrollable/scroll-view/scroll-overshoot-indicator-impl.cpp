@@ -30,7 +30,6 @@ using namespace Dali;
 
 namespace
 {
-const float DEFAULT_MAX_OVERSHOOT_HEIGHT = 36.0f;  // 36 pixels
 const Vector2 OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE( 720.0f, 42.0f );
 const float OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD = 180.0f;
 
@@ -40,10 +39,9 @@ float GetBounceActorHeight( float width )
   return (width > OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD) ? OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height : OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height * 0.5f;
 }
 
-const float DEFAULT_OVERSHOOT_ANIMATION_DURATION = 0.35f;  // time in seconds
-const float MAX_OVERSHOOT_NOTIFY_AMOUNT = 0.9f;                     // maximum amount to set notification for increased overshoot, beyond this we just wait for it to reduce again
-const float MIN_OVERSHOOT_NOTIFY_AMOUNT = Math::MACHINE_EPSILON_1;  // minimum amount to set notification for reduced overshoot, beyond this we just wait for it to increase again
-const float OVERSHOOT_NOTIFY_STEP = 0.1f;                           // amount to set notifications beyond current overshoot value
+const float MAX_OVERSHOOT_NOTIFY_AMOUNT = 0.99f;                     // maximum amount to set notification for increased overshoot, beyond this we just wait for it to reduce again
+const float MIN_OVERSHOOT_NOTIFY_AMOUNT = Math::MACHINE_EPSILON_0;  // minimum amount to set notification for reduced overshoot, beyond this we just wait for it to increase again
+const float OVERSHOOT_NOTIFY_STEP = 0.01f;                          // amount to set notifications beyond current overshoot value
 
 }
 
@@ -143,11 +141,8 @@ bool ScrollOvershootEffect::IsVertical() const
 ScrollOvershootEffectRipple::ScrollOvershootEffectRipple( bool vertical, Scrollable& scrollable ) :
     ScrollOvershootEffect( vertical ),
     mAttachedScrollView(scrollable),
-    mCanScrollPropertyIndex(Property::INVALID_INDEX),
     mOvershootProperty(Property::INVALID_INDEX),
     mEffectOvershootProperty(Property::INVALID_INDEX),
-    mMaxOvershootImageSize(DEFAULT_MAX_OVERSHOOT_HEIGHT),
-    mOvershootAnimationDuration(DEFAULT_OVERSHOOT_ANIMATION_DURATION),
     mOvershoot(0.0f),
     mAnimationStateFlags(0)
 {
@@ -164,7 +159,6 @@ void ScrollOvershootEffectRipple::Apply()
 {
   Actor self = mAttachedScrollView.Self();
   mOvershootProperty = self.GetPropertyIndex(IsVertical() ? Toolkit::ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME : Toolkit::ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME);
-  mCanScrollPropertyIndex = self.GetPropertyIndex(IsVertical() ? Scrollable::SCROLLABLE_CAN_SCROLL_VERTICAL : Scrollable::SCROLLABLE_CAN_SCROLL_HORIZONTAL);
 
   // make sure height is set, since we only create a constraint for image width
   mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.width, OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height);
@@ -301,22 +295,7 @@ void ScrollOvershootEffectRipple::OnOvershootNotification(PropertyNotification& 
 {
   Actor self = mAttachedScrollView.Self();
   mOvershoot = self.GetProperty<float>(mOvershootProperty);
-  if( source == mOvershootIncreaseNotification )
-  {
-    if( mOvershoot > Math::MACHINE_EPSILON_0 )
-    {
-      SetOvershoot(1.0f);
-    }
-    else if ( mOvershoot < -Math::MACHINE_EPSILON_0 )
-    {
-      SetOvershoot(-1.0f);
-    }
-  }
-  else if( source == mOvershootDecreaseNotification )
-  {
-    SetOvershoot(0.0f);
-    // overshoot reducing
-  }
+  SetOvershoot(mOvershoot, false);
   UpdatePropertyNotifications();
 }
 
@@ -344,12 +323,18 @@ void ScrollOvershootEffectRipple::SetOvershoot(float amount, bool animate)
     mAnimationStateFlags |= AnimateBack;
     return;
   }
-  // When we need to animate overshoot to 0
-  if( mOvershootAnimationDuration > Math::MACHINE_EPSILON_1 )
+
+  if( absAmount > Math::MACHINE_EPSILON_1 )
   {
-    // setup the new overshoot to 0 animation
+    UpdateVisibility(true);
+  }
+
+  float overshootAnimationSpeed = mAttachedScrollView.Self().GetProperty<float>(Toolkit::Scrollable::PROPERTY_OVERSHOOT_ANIMATION_SPEED);
+
+  if( animate && overshootAnimationSpeed > Math::MACHINE_EPSILON_0 )
+  {
     float currentOvershoot = fabsf( mOvershootOverlay.GetProperty( mEffectOvershootProperty ).Get<float>() );
-    float duration = mOvershootAnimationDuration * (animatingOn ? (1.0f - currentOvershoot) : currentOvershoot);
+    float duration = mOvershootOverlay.GetCurrentSize().height * (animatingOn ? (1.0f - currentOvershoot) : currentOvershoot) / overshootAnimationSpeed;
 
     if( duration > Math::MACHINE_EPSILON_0 )
     {
@@ -369,10 +354,6 @@ void ScrollOvershootEffectRipple::SetOvershoot(float amount, bool animate)
   else
   {
     mOvershootOverlay.SetProperty( mEffectOvershootProperty, amount);
-  }
-  if( absAmount > Math::MACHINE_EPSILON_1 )
-  {
-    UpdateVisibility(true);
   }
 }
 

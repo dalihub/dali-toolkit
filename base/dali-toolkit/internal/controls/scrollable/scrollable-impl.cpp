@@ -36,6 +36,7 @@ namespace Toolkit
 {
 
 const Property::Index Scrollable::PROPERTY_OVERSHOOT_EFFECT_COLOR( Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX + 1 );
+const Property::Index Scrollable::PROPERTY_OVERSHOOT_ANIMATION_SPEED( Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX + 2 );
 
 namespace Internal
 {
@@ -43,6 +44,7 @@ namespace Internal
 namespace
 {
 const Vector4 DEFAULT_OVERSHOOT_COLOUR(0.0f, 0.64f, 0.85f, 0.25f);
+const float DEFAULT_OVERSHOOT_ANIMATION_SPEED(120.0f); // 120 pixels per second
 
 BaseHandle Create()
 {
@@ -64,6 +66,13 @@ PropertyRegistration property1( mType,
                                 &Scrollable::SetProperty,
                                 &Scrollable::GetProperty );
 
+PropertyRegistration property2( mType,
+                                "overshoot-animation-speed",
+                                Toolkit::Scrollable::PROPERTY_OVERSHOOT_ANIMATION_SPEED,
+                                Property::FLOAT,
+                                &Scrollable::SetProperty,
+                                &Scrollable::GetProperty );
+
 }
 
 const std::string Scrollable::SCROLLABLE_CAN_SCROLL_VERTICAL( "scrollable-can-scroll-vertical" );
@@ -78,6 +87,7 @@ const std::string Scrollable::SCROLLABLE_CAN_SCROLL_HORIZONTAL( "scrollable-can-
 Scrollable::Scrollable()
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | NO_SIZE_NEGOTIATION ) ),
   mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
+  mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
   mPropertyRelativePosition(Property::INVALID_INDEX),
   mPropertyPositionMin(Property::INVALID_INDEX),
   mPropertyPositionMax(Property::INVALID_INDEX),
@@ -169,6 +179,16 @@ Vector4 Scrollable::GetOvershootEffectColor() const
   return mOvershootEffectColor;
 };
 
+void Scrollable::SetOvershootAnimationSpeed( float pixelsPerSecond )
+{
+  mOvershootAnimationSpeed = pixelsPerSecond;
+}
+
+float Scrollable::GetOvershootAnimationSpeed() const
+{
+  return mOvershootAnimationSpeed;
+};
+
 Toolkit::Scrollable::ScrollStartedSignalV2& Scrollable::ScrollStartedSignal()
 {
   return mScrollStartedSignalV2;
@@ -235,6 +255,11 @@ void Scrollable::SetProperty( BaseObject* object, Property::Index index, const P
         scrollableImpl.SetOvershootEffectColor( value.Get<Vector4>() );
         break;
       }
+      case Toolkit::Scrollable::PROPERTY_OVERSHOOT_ANIMATION_SPEED:
+      {
+        scrollableImpl.SetOvershootAnimationSpeed( value.Get<float>() );
+        break;
+      }
     }
   }
 }
@@ -253,6 +278,11 @@ Property::Value Scrollable::GetProperty( BaseObject* object, Property::Index ind
       case Toolkit::Scrollable::PROPERTY_OVERSHOOT_EFFECT_COLOR:
       {
         value = scrollableImpl.GetOvershootEffectColor();
+        break;
+      }
+      case Toolkit::Scrollable::PROPERTY_OVERSHOOT_ANIMATION_SPEED:
+      {
+        value = scrollableImpl.GetOvershootAnimationSpeed();
         break;
       }
     }

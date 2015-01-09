@@ -101,6 +101,7 @@ public:
   /// @name Properties
   /** @{ */
   static const Property::Index PROPERTY_OVERSHOOT_EFFECT_COLOR;         ///< Property, name "overshoot-effect-color",  @see SetOvershootEffectColor(),  type VECTOR4
+  static const Property::Index PROPERTY_OVERSHOOT_ANIMATION_SPEED;      ///< Property, name "overshoot-animation-speed",  @see SetOvershootAnimationSpeed(),  type FLOAT
   /** @} */
 
   /// @name Signals
@@ -218,6 +219,19 @@ public:
    * @return The color of the overshoot effect.
    */
   Vector4 GetOvershootEffectColor() const;
+
+  /**
+   * @brief Set the speed of overshoot animation in pixels per second.
+   * When the speed is not greater than 0, the overshoot is set instantly with no animation.
+   * @param[in] pixelsPerSecond The speed of the overshoot animation.
+   */
+  void SetOvershootAnimationSpeed( float pixelsPerSecond );
+
+  /**
+   * @brief Get the speed of overshoot animation in pixels per second.
+   * @return The speed of the overshoot animation.
+   */
+  float GetOvershootAnimationSpeed() const;
 
 public: // Not intended for application developers
 

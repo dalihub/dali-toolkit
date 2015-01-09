@@ -59,8 +59,6 @@ const float MILLISECONDS_PER_SECONDS = 1000.0f;
 const Vector2 OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE( 720.0f, 42.0f );
 const float OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD = 180.0f;
 const Vector4 OVERSHOOT_OVERLAY_NINE_PATCH_BORDER(0.0f, 0.0f, 1.0f, 12.0f);
-const float MAXIMUM_OVERSHOOT_HEIGHT = 36.0f;  // 36 pixels
-const float DEFAULT_OVERSHOOT_ANIMATION_DURATION = 0.5f;  // 0.5 second
 const float DEFAULT_KEYBOARD_FOCUS_SCROLL_DURATION = 0.2f;
 
 const string LAYOUT_POSITION_PROPERTY_NAME( "item-view-layout-position" );
@@ -1256,23 +1254,18 @@ void ItemView::OnPan( const PanGesture& gesture )
 
       float firstItemScrollPosition = ClampFirstItemPosition(layoutPositionDelta, layoutSize, *mActiveLayout);
 
+      float currentOvershoot = mScrollPositionObject.GetProperty<float>(ScrollConnector::OVERSHOOT);
+
       mScrollPositionObject.SetProperty( ScrollConnector::SCROLL_POSITION, firstItemScrollPosition );
       self.SetProperty(mPropertyPosition, GetScrollPosition(firstItemScrollPosition, layoutSize));
 
-      mTotalPanDisplacement += gesture.displacement;
-      mScrollOvershoot = layoutPositionDelta - firstItemScrollPosition;
-      if( mScrollOvershoot > Math::MACHINE_EPSILON_1 )
+      if( (firstItemScrollPosition >= 0.0f && currentOvershoot < 1.0f) || (firstItemScrollPosition <= mActiveLayout->GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), layoutSize) && currentOvershoot > -1.0f) )
       {
-        AnimateScrollOvershoot(1.0f);
+        mTotalPanDisplacement += gesture.displacement;
       }
-      else if( mScrollOvershoot < -Math::MACHINE_EPSILON_1 )
-      {
-        AnimateScrollOvershoot(-1.0f);
-      }
-      else
-      {
-        AnimateScrollOvershoot(0.0f);
-      }
+
+      mScrollOvershoot = CalculateScrollOvershoot();
+      mScrollPositionObject.SetProperty( ScrollConnector::OVERSHOOT, mScrollOvershoot );
     }
     break;
 
@@ -1600,7 +1593,6 @@ void ItemView::SetOvershootEnabled( bool enable )
                                         OvershootOverlayVisibilityConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
 
-    Actor self = Self();
     constraint = Constraint::New<float>( effectOvershootPropertyIndex,
                                          Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                          EqualToConstraint() );
@@ -1633,7 +1625,7 @@ float ItemView::CalculateScrollOvershoot()
     overshoot = positionDelta - clamppedPosition;
   }
 
-  return overshoot;
+  return overshoot > 0.0f ? std::min(overshoot, 1.0f) : std::max(overshoot, -1.0f);
 }
 
 void ItemView::AnimateScrollOvershoot(float overshootAmount, bool animateBack)
@@ -1649,17 +1641,23 @@ void ItemView::AnimateScrollOvershoot(float overshootAmount, bool animateBack)
     return;
   }
 
-  Actor self = Self();
-  float currentOvershoot = mScrollPositionObject.GetProperty<float>(ScrollConnector::OVERSHOOT);
-  float duration = DEFAULT_OVERSHOOT_ANIMATION_DURATION * (animatingOn ? (1.0f - fabsf(currentOvershoot)) : fabsf(currentOvershoot));
+  if(mOvershootAnimationSpeed > Math::MACHINE_EPSILON_0)
+  {
+    float currentOvershoot = mScrollPositionObject.GetProperty<float>(ScrollConnector::OVERSHOOT);
+    float duration = mOvershootOverlay.GetCurrentSize().height * (animatingOn ? (1.0f - fabsf(currentOvershoot)) : fabsf(currentOvershoot)) / mOvershootAnimationSpeed;
 
-  RemoveAnimation(mScrollOvershootAnimation);
-  mScrollOvershootAnimation = Animation::New(duration);
-  mScrollOvershootAnimation.FinishedSignal().Connect(this, &ItemView::OnOvershootOnFinished);
-  mScrollOvershootAnimation.AnimateTo( Property(mScrollPositionObject, ScrollConnector::OVERSHOOT), overshootAmount, TimePeriod(0.0f, duration) );
-  mScrollOvershootAnimation.Play();
+    RemoveAnimation(mScrollOvershootAnimation);
+    mScrollOvershootAnimation = Animation::New(duration);
+    mScrollOvershootAnimation.FinishedSignal().Connect(this, &ItemView::OnOvershootOnFinished);
+    mScrollOvershootAnimation.AnimateTo( Property(mScrollPositionObject, ScrollConnector::OVERSHOOT), overshootAmount, TimePeriod(0.0f, duration) );
+    mScrollOvershootAnimation.Play();
 
-  mAnimatingOvershootOn = animatingOn;
+    mAnimatingOvershootOn = animatingOn;
+  }
+  else
+  {
+    mScrollPositionObject.SetProperty( ScrollConnector::OVERSHOOT, overshootAmount );
+  }
 }
 
 void ItemView::SetItemsParentOrigin( const Vector3& parentOrigin )

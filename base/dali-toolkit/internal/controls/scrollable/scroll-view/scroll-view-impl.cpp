@@ -61,8 +61,6 @@ const float FLICK_ORTHO_ANGLE_RANGE = 75.0f;                                    
 const unsigned int MAXIMUM_NUMBER_OF_VALUES = 5;                                          ///< Number of values to use for weighted pan calculation.
 const Vector2 DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION = Vector2(0.17f, 0.1f); ///< The step of horizontal scroll distance in the proportion of stage size for each mouse wheel event received.
 const unsigned long MINIMUM_TIME_BETWEEN_DOWN_AND_UP_FOR_RESET( 150u );
-const float DEFAULT_OVERSHOOT_ANIMATION_DURATION = 0.35f;  // time in seconds
-const Vector2 OVERSCROLL_CLAMP(1.0f, 1.0f);                // maximum overscroll allowed in pixels when overshoot indicator is being used
 const float TOUCH_DOWN_TIMER_INTERVAL = 100.0f;
 const float DEFAULT_SCROLL_UPDATE_DISTANCE( 30.0f );                               ///< Default distance to travel in pixels for scroll update signal
 
@@ -1230,7 +1228,7 @@ void ScrollView::ScrollTo(const Vector3& position, float duration,
 void ScrollView::ScrollTo(const Vector3& position, float duration, AlphaFunction alpha,
                 DirectionBias horizontalBias, DirectionBias verticalBias)
 {
-  DALI_LOG_SCROLL_STATE("[0x%X] position[%.2f, %.2f] duration[%.2f]", this, position.x, position.y, duration, int(horizontalBias), int(verticalBias));
+  DALI_LOG_SCROLL_STATE("[0x%X] position[%.2f, %.2f] duration[%.2f], bias[%d, %d]", this, position.x, position.y, duration, int(horizontalBias), int(verticalBias));
   TransformTo(position, duration, alpha, horizontalBias, verticalBias);
 }
 
@@ -1698,7 +1696,6 @@ void ScrollView::SetOvershootEnabled(bool enabled)
   }
   if( enabled )
   {
-    mMaxOvershoot = OVERSCROLL_CLAMP;
     mOvershootIndicator->AttachToScrollable(*this);
   }
   else
