@@ -1578,7 +1578,12 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
       }
     }
   }
-  positionSnap += clampDelta;
+
+  if(IsScrollComponentEnabled(Toolkit::Scrollable::OvershootIndicator))
+  {
+    // Scroll to the end of the overshoot only when overshoot is enabled.
+    positionSnap += clampDelta;
+  }
 
   bool animating = AnimateTo(positionSnap, positionDuration,
                              alphaFunction, false,
