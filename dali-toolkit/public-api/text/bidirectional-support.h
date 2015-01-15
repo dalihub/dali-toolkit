@@ -47,6 +47,25 @@ void SetBidirectionalInfo( const Vector<Character>& text,
                            Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo );
 
 /**
+ * Replaces the bidirectional info from the logical model.
+ *
+ * @pre The @p model needs to have a text set.
+ * @pre The @p model needs to have the line break info set.
+ *
+ * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
+ * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
+ *
+ * @param[in,out] model The text's logical model.
+ * @param[in] characterIndex Index to the first character.
+ * @param[in] numberOfCharactersToRemove The number of characters removed from the text.
+ * @param[in] numberOfCharactersToInsert The number of characters inserted in the text.
+ */
+void ReplaceBidirectionalInfo( LogicalModel& model,
+                               CharacterIndex characterIndex,
+                               Length numberOfCharactersToRemove,
+                               Length numberOfCharactersToInsert );
+
+/**
  * Sets the visual to logical and logical to visual map tables.
  *
  * Any map tables previously set are removed.
@@ -62,6 +81,28 @@ void SetBidirectionalInfo( const Vector<Character>& text,
 void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
                    const Vector<CharacterRun>& lineRuns,
                    Vector<BidirectionalLineInfoRun>& lineInfoRuns );
+
+/**
+ * Replaces the visual to logical and logical to visual map tables.
+ *
+ * @pre The @p logicalModel needs to have a text set.
+ * @pre The @p logicalModel needs to have the line break info set.
+ * @pre The @p visualModel needs to have the laid-out lines info set.
+ *
+ * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
+ * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
+ *
+ * @param[in,out] logicalModel The text's logical model.
+ * @param[in] visualModel The text's visual model.
+ * @param[in] characterIndex Index to the first character.
+ * @param[in] numberOfCharactersToRemove The number of characters removed from the text.
+ * @param[in] numberOfCharactersToInsert The number of characters inserted in the text.
+ */
+void ReorderLines( LogicalModel& logicalModel,
+                   const VisualModel& visualModel,
+                   CharacterIndex characterIndex,
+                   Length numberOfCharactersToRemove,
+                   Length numberOfCharactersToInsert );
 
 } // namespace Text
 

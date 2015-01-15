@@ -33,12 +33,26 @@ void SetBidirectionalInfo( const Vector<Character>& text,
 {
 }
 
+void ReplaceBidirectionalInfo( LogicalModel& model,
+                               CharacterIndex characterIndex,
+                               Length numberOfCharactersToRemove,
+                               Length numberOfCharactersToInsert )
+{
+}
+
 void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
                    const Vector<CharacterRun>& lineRuns,
                    Vector<BidirectionalLineInfoRun>& lineInfoRuns )
 {
 }
 
+void ReorderLines( LogicalModel& logicalModel,
+                   const VisualModel& visualModel,
+                   CharacterIndex characterIndex,
+                   Length numberOfCharactersToRemove,
+                   Length numberOfCharactersToInsert )
+{
+}
 
 } // namespace Text
 
