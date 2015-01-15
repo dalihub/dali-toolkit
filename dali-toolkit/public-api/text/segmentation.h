@@ -31,6 +31,8 @@ namespace Toolkit
 namespace Text
 {
 
+class LogicalModel;
+
 /**
  * Sets line break info.
  *
@@ -47,6 +49,24 @@ void SetLineBreakInfo( const Vector<Character>& text,
                        Vector<LineBreakInfo>& lineBreakInfo );
 
 /**
+ * Replaces line break info.
+ *
+ * @pre The @p model needs to have a text set.
+ *
+ * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
+ * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
+ *
+ * @param[in,out] model The text's logical model.
+ * @param[in] characterIndex Index to the first character.
+ * @param[in] numberOfCharactersToRemove The number of characters removed from the text.
+ * @param[in] numberOfCharactersToInsert The number of characters inserted in the text.
+ */
+void ReplaceLineBreakInfo( LogicalModel& model,
+                           CharacterIndex characterIndex,
+                           Length numberOfCharactersToRemove,
+                           Length numberOfCharactersToInsert );
+
+/**
  * Sets word break info.
  *
  * - 0 is a WORD_BREAK.    Text can be broken into a new word.
@@ -57,6 +77,24 @@ void SetLineBreakInfo( const Vector<Character>& text,
  */
 void SetWordBreakInfo( const Vector<Character>& text,
                        Vector<WordBreakInfo>& wordBreakInfo );
+
+/**
+ * Replaces word break info.
+ *
+ * @pre The @p model needs to have a text set.
+ *
+ * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
+ * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
+ *
+ * @param[in,out] model The text's logical model.
+ * @param[in] characterIndex Index to the first character.
+ * @param[in] numberOfCharactersToRemove The number of characters removed from the text.
+ * @param[in] numberOfCharactersToInsert The number of characters inserted in the text.
+ */
+void ReplaceWordBreakInfo( LogicalModel& model,
+                           CharacterIndex characterIndex,
+                           Length numberOfCharactersToRemove,
+                           Length numberOfCharactersToInsert );
 
 } // namespace Text
 

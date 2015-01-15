@@ -48,6 +48,13 @@ void SetLineBreakInfo( const Vector<Character>& text,
                                                               lineBreakInfo.Begin() );
 }
 
+void ReplaceLineBreakInfo( LogicalModel& model,
+                           CharacterIndex characterIndex,
+                           Length numberOfCharactersToRemove,
+                           Length numberOfCharactersToInsert )
+{
+}
+
 void SetWordBreakInfo( const Vector<Character>& text,
                        Vector<WordBreakInfo>& wordBreakInfo )
 {
@@ -64,6 +71,13 @@ void SetWordBreakInfo( const Vector<Character>& text,
   TextAbstraction::Segmentation::Get().GetWordBreakPositions( text.Begin(),
                                                               numberOfCharacters,
                                                               wordBreakInfo.Begin() );
+}
+
+void ReplaceWordBreakInfo( LogicalModel& model,
+                           CharacterIndex characterIndex,
+                           Length numberOfCharactersToRemove,
+                           Length numberOfCharactersToInsert )
+{
 }
 
 } // namespace Text
