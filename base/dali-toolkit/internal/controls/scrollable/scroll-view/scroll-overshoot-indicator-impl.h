@@ -254,13 +254,10 @@ private:
   Animation             mScrollOvershootAnimation;     ///< overshoot animation
   PropertyNotification  mOvershootIncreaseNotification;///< notification used to inform as overshoot increases
   PropertyNotification  mOvershootDecreaseNotification;///< notification used to inform as overshoot decreases
-  Property::Index       mCanScrollPropertyIndex;       ///< property index to a property that informs indicator if it is needed
   Property::Index       mOvershootProperty;            ///< index of the overshoot property in the scrollable actor
   Property::Index       mEffectOvershootProperty;      ///< index of the effect's overshoot property
-  float                 mMaxOvershootImageSize;        ///< maximum height of the image when overshoot value is 1.0f
-  float                 mOvershootAnimationDuration;   ///< time taken for overshoot to go from fully offscreen to fully onscreen and vice versa
-  float                 mOvershoot;                    ///< last overshoot value as detected by notifications
-  unsigned short        mAnimationStateFlags;          ///< contains flags indicating the current state of the overshoot animation
+  float                mOvershoot;                    ///< last overshoot value as detected by notifications
+  unsigned short      mAnimationStateFlags;          ///< contains flags indicating the current state of the overshoot animation
 };
 
 } // namespace Internal

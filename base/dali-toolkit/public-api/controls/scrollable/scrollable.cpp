@@ -119,6 +119,16 @@ Vector4 Scrollable::GetOvershootEffectColor() const
   return GetImpl(*this).GetOvershootEffectColor();
 }
 
+void Scrollable::SetOvershootAnimationSpeed( float pixelsPerSecond )
+{
+  GetImpl(*this).SetOvershootAnimationSpeed(pixelsPerSecond);
+}
+
+float Scrollable::GetOvershootAnimationSpeed() const
+{
+  return GetImpl(*this).GetOvershootAnimationSpeed();
+}
+
 } // namespace Toolkit
 
 } // namespace Dali
