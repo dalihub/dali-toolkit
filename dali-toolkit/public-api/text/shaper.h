@@ -32,6 +32,9 @@ namespace Toolkit
 namespace Text
 {
 
+class LogicalModel;
+class VisualModel;
+
 /**
  * Shapes the whole text.
  *
@@ -50,6 +53,29 @@ void ShapeText( const Vector<Character>& text,
                 Vector<GlyphInfo>& glyphs,
                 Vector<CharacterIndex>& characterIndices,
                 Vector<Length>& charactersPerGlyph );
+
+/**
+ * Replaces the shape info of the given range of characters.
+ *
+ * @pre The @p model needs to have a text set.
+ * @pre The @p model needs to have the scripts set.
+ * @pre The @p model needs to have the fonts set.
+ * @pre The @p model needs to have the bidirectional info set.
+ *
+ * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
+ * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
+ *
+ * @param[in] logicalModel The text's logical model.
+ * @param[in,out] visualModel The text's logical model.
+ * @param[in] characterIndex Index to the first character.
+ * @param[in] numberOfCharactersToRemove The number of characters removed from the text.
+ * @param[in] numberOfCharactersToInsert The number of characters inserted in the text.
+ */
+void ShapeText( const LogicalModel& logicalModel,
+                VisualModel& visualModel,
+                CharacterIndex characterIndex,
+                Length numberOfCharactersToRemove,
+                Length numberOfCharactersToInsert );
 
 } // namespace Text
 

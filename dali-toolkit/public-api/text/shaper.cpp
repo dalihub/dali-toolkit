@@ -193,6 +193,14 @@ void ShapeText( const Vector<Character>& text,
   charactersPerGlyph.Resize( totalNumberOfGlyphs );
 }
 
+void ShapeText( const LogicalModel& logicalModel,
+                VisualModel& visualModel,
+                CharacterIndex characterIndex,
+                Length numberOfCharactersToRemove,
+                Length numberOfCharactersToInsert )
+{
+}
+
 } // namespace Text
 
 } // namespace Toolkit
