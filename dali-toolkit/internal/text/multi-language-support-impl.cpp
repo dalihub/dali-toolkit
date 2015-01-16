@@ -353,6 +353,13 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
   }
 }
 
+void MultilanguageSupport::ReplaceScripts( LogicalModel& model,
+                                           CharacterIndex characterIndex,
+                                           Length numberOfCharactersToRemove,
+                                           Length numberOfCharactersToInsert )
+{
+}
+
 void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                                           const Vector<ScriptRun>& scripts,
                                           Vector<FontRun>& fonts )
@@ -526,6 +533,13 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     // Store the last run.
     fonts.PushBack( currentFontRun );
   }
+}
+
+void MultilanguageSupport::ValidateFonts( LogicalModel& model,
+                                          CharacterIndex characterIndex,
+                                          Length numberOfCharactersToRemove,
+                                          Length numberOfCharactersToInsert )
+{
 }
 
 } // namespace Internal

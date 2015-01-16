@@ -96,13 +96,29 @@ public:
   void SetScripts( const Vector<Character>& text,
                    const Vector<LineBreakInfo>& lineBreakInfo,
                    Vector<ScriptRun>& scripts );
+
   /**
-   * @copydoc Dali::MultilanguageSupport::ValidateFonts()
+   * @copydoc Dali::MultilanguageSupport::ReplaceScripts()
+   */
+  void ReplaceScripts( LogicalModel& model,
+                       CharacterIndex characterIndex,
+                       Length numberOfCharactersToRemove,
+                       Length numberOfCharactersToInsert );
+
+  /**
+   * @copydoc Dali::MultilanguageSupport::ValidateFonts( const Vector<Character>& text, const Vector<ScriptRun>& scripts, Vector<FontRun>& fonts )
    */
   void ValidateFonts( const Vector<Character>& text,
                       const Vector<ScriptRun>& scripts,
                       Vector<FontRun>& fonts );
 
+  /**
+   * @copydoc Dali::MultilanguageSupport::ValidateFonts( LogicalModel& model, CharacterIndex characterIndex, Length numberOfCharactersToRemove, Length numberOfCharactersToInsert )
+   */
+  void ValidateFonts( LogicalModel& model,
+                      CharacterIndex characterIndex,
+                      Length numberOfCharactersToRemove,
+                      Length numberOfCharactersToInsert );
 private:
   Vector<FontId>                  mDefaultFontPerScriptCache; ///< Caches the default font for a script.
   Vector<ValidateFontsPerScript*> mValidFontsPerScriptCache;  ///< Caches valid fonts for a script.

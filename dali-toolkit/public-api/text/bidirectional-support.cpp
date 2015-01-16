@@ -39,6 +39,7 @@ void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInf
 {
 }
 
+
 } // namespace Text
 
 } // namespace Toolkit
