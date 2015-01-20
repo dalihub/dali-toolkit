@@ -1,0 +1,57 @@
+# Add local source files here
+
+v8_plugin_dir =\
+ $(plugin_src_dir)/dali-script-v8/src
+
+script_v8_plugin_src_files = \
+   $(v8_plugin_dir)/dali-script-v8.cpp \
+   $(v8_plugin_dir)/utils/v8-utils.cpp \
+   $(v8_plugin_dir)/dali-wrapper.cpp \
+   $(v8_plugin_dir)/shared/base-wrapped-object.cpp \
+   $(v8_plugin_dir)/shared/object-template-helper.cpp \
+   $(v8_plugin_dir)/actors/actor-wrapper.cpp \
+   $(v8_plugin_dir)/actors/actor-api.cpp \
+   $(v8_plugin_dir)/actors/layer-api.cpp \
+   $(v8_plugin_dir)/actors/text-actor-api.cpp \
+   $(v8_plugin_dir)/actors/image-actor-api.cpp \
+   $(v8_plugin_dir)/actors/camera-actor-api.cpp \
+   $(v8_plugin_dir)/actors/mesh-actor-api.cpp \
+   $(v8_plugin_dir)/actors/renderable-actor-api.cpp \
+   $(v8_plugin_dir)/constants/constants-wrapper.cpp \
+   $(v8_plugin_dir)/text/font-api.cpp \
+   $(v8_plugin_dir)/text/font-wrapper.cpp \
+   $(v8_plugin_dir)/animation/animation-api.cpp \
+   $(v8_plugin_dir)/animation/animation-wrapper.cpp \
+   $(v8_plugin_dir)/animation/path-api.cpp \
+   $(v8_plugin_dir)/animation/path-wrapper.cpp \
+   $(v8_plugin_dir)/stage/stage-wrapper.cpp \
+   $(v8_plugin_dir)/events/event-object-generator.cpp \
+   $(v8_plugin_dir)/events/pan-gesture-detector-api.cpp \
+   $(v8_plugin_dir)/events/pan-gesture-detector-wrapper.cpp \
+   $(v8_plugin_dir)/stage/stage-api.cpp \
+   $(v8_plugin_dir)/image/image-attributes-api.cpp \
+   $(v8_plugin_dir)/shader-effects/shader-effect-api.cpp \
+   $(v8_plugin_dir)/shader-effects/shader-effect-wrapper.cpp \
+   $(v8_plugin_dir)/image/image-attributes-wrapper.cpp \
+   $(v8_plugin_dir)/image/image-wrapper.cpp \
+   $(v8_plugin_dir)/image/image-api.cpp \
+   $(v8_plugin_dir)/image/buffer-image-api.cpp \
+   $(v8_plugin_dir)/image/native-image-api.cpp \
+   $(v8_plugin_dir)/image/frame-buffer-image-api.cpp \
+   $(v8_plugin_dir)/image/resource-image-api.cpp \
+   $(v8_plugin_dir)/image/nine-patch-image-api.cpp \
+   $(v8_plugin_dir)/object/handle-wrapper.cpp \
+   $(v8_plugin_dir)/object/property-value-wrapper.cpp \
+   $(v8_plugin_dir)/signals/signal-manager.cpp \
+   $(v8_plugin_dir)/render-tasks/render-task-list-api.cpp \
+   $(v8_plugin_dir)/render-tasks/render-task-list-wrapper.cpp \
+   $(v8_plugin_dir)/render-tasks/render-task-api.cpp \
+   $(v8_plugin_dir)/render-tasks/render-task-wrapper.cpp \
+   $(v8_plugin_dir)/toolkit/builder/builder-api.cpp \
+   $(v8_plugin_dir)/toolkit/builder/builder-wrapper.cpp \
+   $(v8_plugin_dir)/toolkit/focus-manager/keyboard-focus-manager-api.cpp \
+   $(v8_plugin_dir)/toolkit/focus-manager/keyboard-focus-manager-wrapper.cpp \
+   $(v8_plugin_dir)/signals/dali-any-javascript-converter.cpp \
+   $(v8_plugin_dir)/garbage-collector/garbage-collector.cpp \
+   $(v8_plugin_dir)/module-loader/module.cpp \
+   $(v8_plugin_dir)/module-loader/module-loader.cpp
