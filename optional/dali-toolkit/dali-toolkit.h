@@ -39,6 +39,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-cube-effect.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-custom-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-spiral-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-slide-effect.h>

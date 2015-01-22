@@ -380,6 +380,18 @@ class ScrollView;
 class DALI_IMPORT_API ScrollView : public Scrollable
 {
 public:
+  /// Page effect types
+  enum PageEffect
+  {
+    PageEffectNone,      ///< No Effect (Standard ScrollView)
+    PageEffectOuterCube, ///< 3D Rotating Cube Effect
+    PageEffectDepth,     ///< Depth Effect
+    PageEffectInnerCube, ///< Page Cube Effect
+    PageEffectCarousel,  ///< Page Carousel Effect
+    PageEffectSpiral,    ///< Page Spiral Effect
+
+    Total                ///< The total number of effect types
+  };
 
   // Custom properties
 
@@ -1041,6 +1053,14 @@ public:
    * @param[in] effect The effect to apply to scroll view
    */
   void ApplyEffect(ScrollViewEffect effect);
+
+  /**
+   * @brief ApplyEffect Applies a predefined effect.
+   *
+   * @param[in] effect enum for the predefined effect
+   * @return The scrollview effect that was applied
+   */
+  ScrollViewEffect ApplyEffect(ScrollView::PageEffect effect);
 
   /**
    * @brief Remove Effect from ScrollView.

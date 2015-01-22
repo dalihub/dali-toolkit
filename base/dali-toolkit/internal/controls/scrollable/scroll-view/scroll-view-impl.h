@@ -29,6 +29,9 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 
+// predefined effect includes
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-custom-effect.h>
+
 namespace Dali
 {
 
@@ -144,6 +147,12 @@ public:
    * @copydoc Toolkit::ScrollView::ApplyEffect
    */
   void ApplyEffect(Toolkit::ScrollViewEffect effect);
+
+  /**
+   * @brief ApplyEffect Applies a predefined effect
+   * @param effect
+   */
+  Toolkit::ScrollViewEffect ApplyEffect(Toolkit::ScrollView::PageEffect effect);
 
   /**
    * @copydoc Toolkit::ScrollView::RemoveEffect
