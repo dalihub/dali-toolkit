@@ -42,7 +42,6 @@ class ClipboardEventNotifier : public BaseHandle
 {
 public:
   typedef SignalV2< void ( ClipboardEventNotifier& ) > ClipboardEventSignalV2;
-  static const char* const SIGNAL_CONTENT_SELECTED; ///< name "content-selected"
 
   ClipboardEventNotifier();
   static ClipboardEventNotifier Get();
