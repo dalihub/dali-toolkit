@@ -146,8 +146,6 @@ ClipboardEventNotifier::~ClipboardEventNotifier()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const char* const ClipboardEventNotifier::SIGNAL_CONTENT_SELECTED( "content-selected" );
-
 ClipboardEventNotifier::ClipboardEventNotifier()
 {
 }
