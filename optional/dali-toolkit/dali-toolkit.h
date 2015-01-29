@@ -59,6 +59,11 @@
 #include <dali-toolkit/public-api/shader-effects/ripple-effect.h>
 #include <dali-toolkit/public-api/shader-effects/ripple2d-effect.h>
 #include <dali-toolkit/public-api/shader-effects/swirl-effect.h>
+#include <dali-toolkit/public-api/text/logical-model.h>
+#include <dali-toolkit/public-api/text/text-definitions.h>
+#include <dali-toolkit/public-api/text/text-view.h>
+#include <dali-toolkit/public-api/text/text-view-interface.h>
+#include <dali-toolkit/public-api/text/visual-model.h>
 
 // INTERNAL INCLUDES
 

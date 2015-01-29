@@ -39,6 +39,9 @@ public_api_base_src_files = \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-slide-effect.cpp \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect.cpp \
   $(public_api_base_src_dir)/controls/table-view/table-view.cpp \
+  $(public_api_base_src_dir)/text/logical-model.cpp \
+  $(public_api_base_src_dir)/text/text-view.cpp \
+  $(public_api_base_src_dir)/text/visual-model.cpp \
   $(public_api_base_src_dir)/focus-manager/focus-manager.cpp \
   $(public_api_base_src_dir)/focus-manager/keyboard-focus-manager.cpp \
   $(public_api_base_src_dir)/focus-manager/keyinput-focus-manager.cpp \
@@ -111,6 +114,11 @@ public_api_base_scroll_view_header_files = \
 
 public_api_base_table_view_header_files = \
   $(public_api_base_src_dir)/controls/table-view/table-view.h
+
+public_api_base_text_header_files = \
+  $(public_api_base_src_dir)/text/logical-model.h \
+  $(public_api_base_src_dir)/text/text-definitions.h \
+  $(public_api_base_src_dir)/text/visual-model.h
 
 public_api_base_focus_manager_header_files = \
   $(public_api_base_src_dir)/focus-manager/keyinput-focus-manager.h \
