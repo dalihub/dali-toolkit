@@ -19,7 +19,7 @@
 
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -46,7 +46,7 @@ public: // Style Information
   void SetTheme(std::string theme);
 
 public: // Signals
-  Dali::StyleMonitor::StyleChangeSignalV2& StyleChangeSignal();
+  Dali::StyleMonitor::StyleChangeSignalType& StyleChangeSignal();
 
   void EmitStyleChangeSignal(StyleChange styleChange)
   {
@@ -54,7 +54,7 @@ public: // Signals
   }
 
 private:
-  Dali::StyleMonitor::StyleChangeSignalV2 mStyleChangeSignal;
+  Dali::StyleMonitor::StyleChangeSignalType mStyleChangeSignal;
   static Dali::StyleMonitor mToolkitStyleMonitor;
   std::string mTheme;
 };
@@ -103,7 +103,7 @@ void StyleMonitor::SetTheme(std::string path)
   EmitStyleChangeSignal(styleChange);
 }
 
-Dali::StyleMonitor::StyleChangeSignalV2& StyleMonitor::StyleChangeSignal()
+Dali::StyleMonitor::StyleChangeSignalType& StyleMonitor::StyleChangeSignal()
 {
   return mStyleChangeSignal;
 }
@@ -165,7 +165,7 @@ void StyleMonitor::SetTheme(std::string themeFilePath)
   GetImplementation(*this).SetTheme(themeFilePath);
 }
 
-StyleMonitor::StyleChangeSignalV2& StyleMonitor::StyleChangeSignal()
+StyleMonitor::StyleChangeSignalType& StyleMonitor::StyleChangeSignal()
 {
   return GetImplementation(*this).StyleChangeSignal();
 }

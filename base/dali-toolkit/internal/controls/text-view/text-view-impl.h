@@ -332,7 +332,7 @@ public:
   /**
    * @copydoc ScrolledSignal()
    */
-  Toolkit::TextView::ScrolledSignalV2& ScrolledSignal();
+  Toolkit::TextView::ScrolledSignalType& ScrolledSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -747,7 +747,7 @@ private:
   bool                                            mPreviousSnapshotModeEnabled:1; ///< Stores the previous snapshot mode value.
   bool                                            mMarkUpEnabled:1;               ///< enable to scan for mark-up
 
-  Toolkit::TextView::ScrolledSignalV2             mScrolledSignalV2;              ///< Signal emitted when text is scrolled.
+  Toolkit::TextView::ScrolledSignalType             mScrolledSignal;              ///< Signal emitted when text is scrolled.
 };
 
 } // namespace Internal

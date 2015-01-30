@@ -234,7 +234,7 @@ void View::OrientationChanged( Dali::Orientation orientation )
   }
 
   Toolkit::View handle( GetOwner() );
-  mOrientationAnimationStartedSignalV2.Emit( handle, mRotateAnimation, orientation );
+  mOrientationAnimationStartedSignal.Emit( handle, mRotateAnimation, orientation );
 
   mRotateAnimation.Play();
 }
@@ -244,9 +244,9 @@ void View::SetAutoRotate( bool enabled )
   mAutoRotateEnabled = enabled;
 }
 
-Toolkit::View::OrientationAnimationStartedSignalV2& View::OrientationAnimationStartedSignal()
+Toolkit::View::OrientationAnimationStartedSignalType& View::OrientationAnimationStartedSignal()
 {
-  return mOrientationAnimationStartedSignalV2;
+  return mOrientationAnimationStartedSignal;
 }
 
 bool View::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )

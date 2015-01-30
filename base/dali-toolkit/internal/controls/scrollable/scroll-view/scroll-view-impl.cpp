@@ -1154,8 +1154,8 @@ void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunct
   {
     // set mScrolling to false, in case user has code that interrogates mScrolling Getter() in complete.
     mScrolling = false;
-    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 1 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
-    mScrollCompletedSignalV2.Emit( currentScrollPosition );
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 1 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+    mScrollCompletedSignal.Emit( currentScrollPosition );
   }
 
   if( mPanning ) // are we interrupting a current pan?
@@ -1174,8 +1174,8 @@ void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunct
   self.SetProperty(mPropertyScrolling, true);
   mScrolling = true;
 
-  DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignalV2 1 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
-  mScrollStartedSignalV2.Emit( currentScrollPosition );
+  DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignal 1 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+  mScrollStartedSignal.Emit( currentScrollPosition );
   bool animating = AnimateTo(-position,
                              Vector3::ONE * duration,
                              alpha,
@@ -1198,9 +1198,9 @@ void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunct
       completedPosition = position;
     }
 
-    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 2 [%.2f, %.2f]", this, completedPosition.x, completedPosition.y);
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 2 [%.2f, %.2f]", this, completedPosition.x, completedPosition.y);
     SetScrollUpdateNotification(false);
-    mScrollCompletedSignalV2.Emit( completedPosition );
+    mScrollCompletedSignal.Emit( completedPosition );
   }
 }
 
@@ -1687,8 +1687,8 @@ bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDurat
   snapEvent.position = -mScrollTargetPosition;
   snapEvent.duration = totalDuration;
 
-  DALI_LOG_SCROLL_STATE("[0x%X] mSnapStartedSignalV2 [%.2f, %.2f]", this, snapEvent.position.x, snapEvent.position.y);
-  mSnapStartedSignalV2.Emit( snapEvent );
+  DALI_LOG_SCROLL_STATE("[0x%X] mSnapStartedSignal [%.2f, %.2f]", this, snapEvent.position.x, snapEvent.position.y);
+  mSnapStartedSignal.Emit( snapEvent );
 
   return (mScrollStateFlags & SCROLL_ANIMATION_FLAGS) != 0;
 }
@@ -1745,9 +1745,9 @@ void ScrollView::RemoveScrollingDirection( Radian direction )
   panGesture.RemoveDirection( direction );
 }
 
-Toolkit::ScrollView::SnapStartedSignalV2& ScrollView::SnapStartedSignal()
+Toolkit::ScrollView::SnapStartedSignalType& ScrollView::SnapStartedSignal()
 {
-  return mSnapStartedSignalV2;
+  return mSnapStartedSignal;
 }
 
 void ScrollView::FindAndUnbindActor(Actor child)
@@ -1790,8 +1790,8 @@ void ScrollView::HandleSnapAnimationFinished()
   self.SetProperty(mPropertyPrePosition, mScrollPrePosition);
 
   Vector3 currentScrollPosition = GetCurrentScrollPosition();
-  DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 3 current[%.2f, %.2f], mScrollTargetPosition[%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y, -mScrollTargetPosition.x, -mScrollTargetPosition.y );
-  mScrollCompletedSignalV2.Emit( currentScrollPosition );
+  DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 3 current[%.2f, %.2f], mScrollTargetPosition[%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y, -mScrollTargetPosition.x, -mScrollTargetPosition.y );
+  mScrollCompletedSignal.Emit( currentScrollPosition );
 
   mDomainOffset += deltaPosition - mScrollPostPosition;
   self.SetProperty(mPropertyDomainOffset, mDomainOffset);
@@ -1833,7 +1833,7 @@ void ScrollView::OnScrollUpdateNotification(Dali::PropertyNotification& source)
   Toolkit::ScrollView handle( GetOwner() );
 
   Vector3 currentScrollPosition = GetCurrentScrollPosition();
-  mScrollUpdatedSignalV2.Emit( currentScrollPosition );
+  mScrollUpdatedSignal.Emit( currentScrollPosition );
 }
 
 bool ScrollView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -1948,8 +1948,8 @@ bool ScrollView::OnTouchDownTimeout()
 
       UpdateLocalScrollProperties();
       Vector3 currentScrollPosition = GetCurrentScrollPosition();
-      DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 4 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
-      mScrollCompletedSignalV2.Emit( currentScrollPosition );
+      DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 4 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+      mScrollCompletedSignal.Emit( currentScrollPosition );
     }
   }
 
@@ -2332,8 +2332,8 @@ void ScrollView::GestureStarted()
       mScrolling = false;
       // send negative scroll position since scroll internal scroll position works as an offset for actors,
       // give applications the position within the domain from the scroll view's anchor position
-      DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 5 [%.2f, %.2f]", this, -mScrollPostPosition.x, -mScrollPostPosition.y);
-      mScrollCompletedSignalV2.Emit( -mScrollPostPosition );
+      DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 5 [%.2f, %.2f]", this, -mScrollPostPosition.x, -mScrollPostPosition.y);
+      mScrollCompletedSignal.Emit( -mScrollPostPosition );
     }
   }
 }
@@ -2457,8 +2457,8 @@ void ScrollView::OnGestureEx(Gesture::State state)
     Vector3 currentScrollPosition = GetCurrentScrollPosition();
     Self().SetProperty(mPropertyScrolling, true);
     mScrolling = true;
-    DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignalV2 2 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
-    mScrollStartedSignalV2.Emit( currentScrollPosition );
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignal 2 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+    mScrollStartedSignal.Emit( currentScrollPosition );
   }
   else if( (state == Gesture::Finished) ||
            (state == Gesture::Cancelled) ) // Finished/default
@@ -2512,8 +2512,8 @@ void ScrollView::FinishTransform()
       SnapInternalYTo(mScrollTargetPosition.y);
     }
     Vector3 currentScrollPosition = GetCurrentScrollPosition();
-    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 6 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
-    mScrollCompletedSignalV2.Emit( currentScrollPosition );
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 6 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+    mScrollCompletedSignal.Emit( currentScrollPosition );
   }
 }
 

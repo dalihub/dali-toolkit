@@ -58,13 +58,13 @@ public:
   static const char* const SIGNAL_SHOW_FINISHED;
 
   // Popup Button Pressed
-  typedef SignalV2< bool( Toolkit::Button ) > PopUpPressedSignal;
+  typedef Signal< bool( Toolkit::Button ) > PopUpPressedSignal;
 
   // Popup Hide Finished
-  typedef SignalV2< void( TextInputPopupNew& ) > PopUpHideFinishedSignal;
+  typedef Signal< void( TextInputPopupNew& ) > PopUpHideFinishedSignal;
 
   // Popup Show Finished
-  typedef SignalV2< void( TextInputPopupNew& ) > PopUpShowFinishedSignal;
+  typedef Signal< void( TextInputPopupNew& ) > PopUpShowFinishedSignal;
 
   /**
    * Signal emitted when the button is touched.

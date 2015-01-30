@@ -189,24 +189,24 @@ float Scrollable::GetOvershootAnimationSpeed() const
   return mOvershootAnimationSpeed;
 };
 
-Toolkit::Scrollable::ScrollStartedSignalV2& Scrollable::ScrollStartedSignal()
+Toolkit::Scrollable::ScrollStartedSignalType& Scrollable::ScrollStartedSignal()
 {
-  return mScrollStartedSignalV2;
+  return mScrollStartedSignal;
 }
 
-Toolkit::Scrollable::ScrollUpdatedSignalV2& Scrollable::ScrollUpdatedSignal()
+Toolkit::Scrollable::ScrollUpdatedSignalType& Scrollable::ScrollUpdatedSignal()
 {
-  return mScrollUpdatedSignalV2;
+  return mScrollUpdatedSignal;
 }
 
-Toolkit::Scrollable::ScrollCompletedSignalV2& Scrollable::ScrollCompletedSignal()
+Toolkit::Scrollable::ScrollCompletedSignalType& Scrollable::ScrollCompletedSignal()
 {
-  return mScrollCompletedSignalV2;
+  return mScrollCompletedSignal;
 }
 
-Toolkit::Scrollable::ScrollClampedSignalV2& Scrollable::ScrollClampedSignal()
+Toolkit::Scrollable::ScrollClampedSignalType& Scrollable::ScrollClampedSignal()
 {
-  return mScrollClampedSignalV2;
+  return mScrollClampedSignal;
 }
 
 bool Scrollable::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )

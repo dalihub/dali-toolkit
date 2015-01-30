@@ -78,12 +78,12 @@ float Button::GetAnimationTime() const
   return Dali::Toolkit::GetImplementation( *this ).GetAnimationTime();
 }
 
-Button::ClickedSignalV2& Button::ClickedSignal()
+Button::ClickedSignalType& Button::ClickedSignal()
 {
   return Dali::Toolkit::GetImplementation( *this ).ClickedSignal();
 }
 
-Button::ToggledSignalV2& Button::ToggledSignal()
+Button::ToggledSignalType& Button::ToggledSignal()
 {
   return Dali::Toolkit::GetImplementation( *this ).ToggledSignal();
 }

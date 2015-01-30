@@ -208,7 +208,7 @@ void PushButton::SetToggled( bool toggle )
     GetPushButtonPainter( mPainter )->Toggled( handle );
 
     // Emit signal.
-    mToggledSignalV2.Emit( handle, mToggled );
+    mToggledSignal.Emit( handle, mToggled );
   }
 }
 
@@ -355,14 +355,14 @@ Actor& PushButton::GetFadeOutButtonImage()
   return mFadeOutButtonImage;
 }
 
-Toolkit::PushButton::PressedSignalV2& PushButton::PressedSignal()
+Toolkit::PushButton::PressedSignalType& PushButton::PressedSignal()
 {
-  return mPressedSignalV2;
+  return mPressedSignal;
 }
 
-Toolkit::PushButton::ReleasedSignalV2& PushButton::ReleasedSignal()
+Toolkit::PushButton::ReleasedSignalType& PushButton::ReleasedSignal()
 {
-  return mReleasedSignalV2;
+  return mReleasedSignal;
 }
 
 bool PushButton::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -561,7 +561,7 @@ void PushButton::OnButtonDown()
     }
 
     //Emit signal.
-    mPressedSignalV2.Emit( handle );
+    mPressedSignal.Emit( handle );
   }
 }
 
@@ -579,7 +579,7 @@ void PushButton::OnButtonUp()
       GetPushButtonPainter( mPainter )->Toggled( handle );
 
       // Emit signal.
-      mToggledSignalV2.Emit( handle, mToggled );
+      mToggledSignal.Emit( handle, mToggled );
     }
     else
     {
@@ -595,8 +595,8 @@ void PushButton::OnButtonUp()
       }
 
       //Emit signal.
-      mReleasedSignalV2.Emit( handle );
-      mClickedSignalV2.Emit( handle );
+      mReleasedSignal.Emit( handle );
+      mClickedSignal.Emit( handle );
     }
   }
 }
@@ -618,7 +618,7 @@ void PushButton::OnTouchPointLeave()
       }
 
       //Emit signal.
-      mReleasedSignalV2.Emit( handle );
+      mReleasedSignal.Emit( handle );
     }
   }
 }
@@ -702,9 +702,9 @@ bool PushButton::AutoRepeatingSlot()
     GetPushButtonPainter( mPainter )->Pressed( handle );
 
     //Emit signal.
-    consumed = mReleasedSignalV2.Emit( handle );
-    consumed |= mClickedSignalV2.Emit( handle );
-    consumed |= mPressedSignalV2.Emit( handle );
+    consumed = mReleasedSignal.Emit( handle );
+    consumed |= mClickedSignal.Emit( handle );
+    consumed |= mPressedSignal.Emit( handle );
  }
 
   return consumed;

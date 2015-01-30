@@ -563,8 +563,8 @@ private:
 
 public:
 
-  typedef SignalV2< bool( Toolkit::Button ) > PressedSignal;
-  typedef SignalV2< void () > CursorPositionedSignal;
+  typedef Signal< bool( Toolkit::Button ) > PressedSignal;
+  typedef Signal< void () > CursorPositionedSignal;
   /**
    * @brief Signal emitted when the button is touched.
    * This is relayed from the PopUp class.  It enables the owner of the Decorator to act on the PopUp button press.

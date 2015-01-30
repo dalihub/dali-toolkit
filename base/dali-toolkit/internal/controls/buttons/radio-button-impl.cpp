@@ -158,7 +158,7 @@ void RadioButton::SetActive(bool active)
 
     // Raise toggled signal
     Toolkit::RadioButton handle( GetOwner() );
-    mToggledSignalV2.Emit( handle, mActive );
+    mToggledSignal.Emit( handle, mActive );
 
     RelayoutRequest();
   }

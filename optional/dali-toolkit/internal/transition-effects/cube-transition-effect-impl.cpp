@@ -337,12 +337,12 @@ void CubeTransitionEffect::OnTransitionFinished(Animation& source)
 
   //Emit signal
   Toolkit::CubeTransitionEffect handle( this );
-  mTransitionCompletedSignalV2.Emit( handle, mCurrentImage );
+  mTransitionCompletedSignal.Emit( handle, mCurrentImage );
 }
 
-Toolkit::CubeTransitionEffect::TransitionCompletedSignalV2& CubeTransitionEffect::TransitionCompletedSignal()
+Toolkit::CubeTransitionEffect::TransitionCompletedSignalType& CubeTransitionEffect::TransitionCompletedSignal()
 {
-  return mTransitionCompletedSignalV2;
+  return mTransitionCompletedSignal;
 }
 
 } // namespace Internal

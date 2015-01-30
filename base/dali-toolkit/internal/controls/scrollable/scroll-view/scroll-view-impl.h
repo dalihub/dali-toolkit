@@ -492,7 +492,7 @@ public: //Signals
   /**
    * @copydoc Dali::Toolkit::ScrollView::SnapStartedSignal()
    */
-  Toolkit::ScrollView::SnapStartedSignalV2& SnapStartedSignal();
+  Toolkit::ScrollView::SnapStartedSignalType& SnapStartedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -912,7 +912,7 @@ private:
 
   ScrollOvershootIndicatorPtr mOvershootIndicator;
 
-  Toolkit::ScrollView::SnapStartedSignalV2 mSnapStartedSignalV2;
+  Toolkit::ScrollView::SnapStartedSignalType mSnapStartedSignal;
 
   bool mInAccessibilityPan : 1;           ///< With AccessibilityPan its easier to move between snap positions
   bool mInitialized:1;

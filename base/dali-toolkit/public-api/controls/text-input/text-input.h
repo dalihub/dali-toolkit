@@ -564,24 +564,24 @@ public:
 public: /* Signals */
 
   /// @brief Input Signal.
-  typedef SignalV2< void ( TextInput textInput ) > InputSignalV2;
+  typedef Signal< void ( TextInput textInput ) > InputSignalType;
 
   /// @brief Input style changed signal.
-  typedef SignalV2< void ( TextInput textInput, const TextStyle& style ) > StyleChangedSignalV2;
+  typedef Signal< void ( TextInput textInput, const TextStyle& style ) > StyleChangedSignalType;
 
   /// @brief Text modified signal.
-  typedef SignalV2< void ( TextInput textInput  ) > TextModifiedSignalType;
+  typedef Signal< void ( TextInput textInput  ) > TextModifiedSignalType;
 
   /// @brief Max input characters reached signal.
-  typedef SignalV2< void ( TextInput textInput ) > MaxInputCharactersReachedSignalV2;
+  typedef Signal< void ( TextInput textInput ) > MaxInputCharactersReachedSignalType;
 
   /// @brief Input text exceeds boundaries signal.
-  typedef SignalV2< void ( TextInput textInput ) > InputTextExceedBoundariesSignalV2;
+  typedef Signal< void ( TextInput textInput ) > InputTextExceedBoundariesSignalType;
 
   /**
    * @brief Signal emitted when the Text-Input starts receiving input.
    */
-  InputSignalV2& InputStartedSignal();
+  InputSignalType& InputStartedSignal();
 
   /**
    * @brief Signal emitted when the Text-Input is finished receiving input.
@@ -589,21 +589,21 @@ public: /* Signals */
    * TextInput::GetText() can be called to get current text string.
    * @return The signal to connect to
    */
-  InputSignalV2& InputFinishedSignal();
+  InputSignalType& InputFinishedSignal();
 
   /**
    * @brief Signal emitted when the cut and paste toolbar is displayed.
    *
    * @return The signal to connect to
    */
-  InputSignalV2& CutAndPasteToolBarDisplayedSignal();
+  InputSignalType& CutAndPasteToolBarDisplayedSignal();
 
   /**
    * @brief Signal emitted when style changes.
    *
    * @return The signal to connect to
    */
-  StyleChangedSignalV2& StyleChangedSignal();
+  StyleChangedSignalType& StyleChangedSignal();
 
   /**
    * @brief Signal emitted when text changes.
@@ -617,14 +617,14 @@ public: /* Signals */
    *
    * @return The signal to connect to
    */
-  MaxInputCharactersReachedSignalV2& MaxInputCharactersReachedSignal();
+  MaxInputCharactersReachedSignalType& MaxInputCharactersReachedSignal();
 
   /**
    * @brief Signal emitted when input text exceeds the boundaries of the text-input.
    *
    * @return The signal to connect to
    */
-  InputTextExceedBoundariesSignalV2& InputTextExceedBoundariesSignal();
+  InputTextExceedBoundariesSignalType& InputTextExceedBoundariesSignal();
 
 public: // Not intended for application developers
 

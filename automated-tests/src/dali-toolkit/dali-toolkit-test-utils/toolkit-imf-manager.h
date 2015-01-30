@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #define __DALI_IMF_MANAGER_H__
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali DALI_IMPORT_API
 {
@@ -109,9 +109,9 @@ public:
     bool preeditResetRequired; // flag if preedit reset is required.
   };
 
-  typedef SignalV2< void (ImfManager&) > ImfManagerSignalV2;
+  typedef Signal< void (ImfManager&) > ImfManagerSignalType;
 
-  typedef SignalV2< ImfCallbackData ( ImfManager&, const ImfEventData& ) > ImfEventSignalV2;
+  typedef Signal< ImfCallbackData ( ImfManager&, const ImfEventData& ) > ImfEventSignalType;
 
 public:
 
@@ -195,13 +195,13 @@ public:
    * This is emitted when the virtual keyboard is connected to or the hardware keyboard is activated.
    * @return The IMF Activated signal.
    */
-  ImfManagerSignalV2& ActivatedSignal();
+  ImfManagerSignalType& ActivatedSignal();
 
   /**
    * This is emitted when the IMF manager receives an event from the IMF
    * @return The Event signal containing the event data.
    */
-  ImfEventSignalV2& EventReceivedSignal();
+  ImfEventSignalType& EventReceivedSignal();
 
   // Construction & Destruction
 

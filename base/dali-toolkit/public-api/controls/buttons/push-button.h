@@ -333,20 +333,20 @@ public:
 public: //Signals
 
   /// @brief PushButton Pressed signal type.
-  typedef SignalV2< bool ( Button ) > PressedSignalV2;
+  typedef Signal< bool ( Button ) > PressedSignalType;
 
   /// @brief PushButton Released signal type.
-  typedef SignalV2< bool ( Button ) > ReleasedSignalV2;
+  typedef Signal< bool ( Button ) > ReleasedSignalType;
 
   /**
    * @brief Signal emitted when the button is touched.
    */
-  PressedSignalV2& PressedSignal();
+  PressedSignalType& PressedSignal();
 
   /**
    * @brief Signal emitted when the button is touched and the touch point leaves the boundary of the button.
    */
-  ReleasedSignalV2& ReleasedSignal();
+  ReleasedSignalType& ReleasedSignal();
 
 public: // Not intended for application developers
 

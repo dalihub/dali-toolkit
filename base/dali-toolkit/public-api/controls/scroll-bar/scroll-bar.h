@@ -50,7 +50,7 @@ public:
 
   // Signals
   static const char* const SCROLL_POSITION_NOTIFIED_SIGNAL_NAME;        ///< "scroll-position-notified" signal name
-  typedef SignalV2< void ( float ) > ScrollPositionNotifiedSignalType;
+  typedef Signal< void ( float ) > ScrollPositionNotifiedSignalType;
 
   // Properties
   static const Property::Index PROPERTY_INDICATOR_HEIGHT_POLICY;         ///< name "indicator-height-policy", @see SetIndicatorHeightPolicy(), type STRING

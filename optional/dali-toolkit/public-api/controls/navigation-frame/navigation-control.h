@@ -196,8 +196,8 @@ public:
 
 public: //Signal
 
-  typedef SignalV2< void( NavigationControl, Page ) > ItemPushedSignalV2;
-  typedef SignalV2< void( NavigationControl, Page ) > ItemPoppedSignalV2;
+  typedef Signal< void( NavigationControl, Page ) > ItemPushedSignalType;
+  typedef Signal< void( NavigationControl, Page ) > ItemPoppedSignalType;
 
   /**
    * Signal emitted right after a new item is pushed into the navigation stack.
@@ -207,7 +207,7 @@ public: //Signal
    * @endcode
    * @return The signal to connect to.
    */
-  ItemPushedSignalV2& ItemPushedSignal();
+  ItemPushedSignalType& ItemPushedSignal();
 
   /**
    * Signal emitted right after an item is popped out from the navigation stack.
@@ -219,7 +219,7 @@ public: //Signal
    * The app can use this signal and check the poppedItem to be uninitialized to know the app window should be lower
    * @return The signal to connect to.
    */
-  ItemPoppedSignalV2& ItemPoppedSignal();
+  ItemPoppedSignalType& ItemPoppedSignal();
 
 
 

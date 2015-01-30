@@ -63,10 +63,10 @@ public:
 
   // Signals
   static const char* const DOMAIN_CHANGED_SIGNAL_NAME;    ///< "domain-changed" signal name
-  typedef SignalV2< void ( float min, float max, float size ) > DomainChangedSignalType;
+  typedef Signal< void ( float min, float max, float size ) > DomainChangedSignalType;
 
   static const char* const SCROLL_POSITION_CHANGED_SIGNAL_NAME;    ///< "scroll-position-changed" signal name
-  typedef SignalV2< void ( float position ) > ScrollPositionChangedSignalType;
+  typedef Signal< void ( float position ) > ScrollPositionChangedSignalType;
 
   /**
    * Create a ScrollConnector.

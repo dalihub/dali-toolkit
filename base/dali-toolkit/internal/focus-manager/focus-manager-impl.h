@@ -194,17 +194,17 @@ public:
   /**
    * @copydoc Toolkit::FocusManager::FocusChangedSignal()
    */
-  Toolkit::FocusManager::FocusChangedSignalV2& FocusChangedSignal();
+  Toolkit::FocusManager::FocusChangedSignalType& FocusChangedSignal();
 
   /**
    * @copydoc Toolkit::FocusManager::FocusOvershotSignal()
    */
-  Toolkit::FocusManager::FocusOvershotSignalV2& FocusOvershotSignal();
+  Toolkit::FocusManager::FocusOvershotSignalType& FocusOvershotSignal();
 
   /**
    * @copydoc Toolkit::FocusManager::FocusedActorActivatedSignal()
    */
-  Toolkit::FocusManager::FocusedActorActivatedSignalV2& FocusedActorActivatedSignal();
+  Toolkit::FocusManager::FocusedActorActivatedSignalType& FocusedActorActivatedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -374,9 +374,9 @@ private:
 
 private:
 
-  Toolkit::FocusManager::FocusChangedSignalV2 mFocusChangedSignalV2; ///< The signal to notify the focus change
-  Toolkit::FocusManager::FocusOvershotSignalV2 mFocusOvershotSignalV2; ///< The signal to notify the focus overshooted
-  Toolkit::FocusManager::FocusedActorActivatedSignalV2 mFocusedActorActivatedSignalV2; ///< The signal to notify the activation of focused actor
+  Toolkit::FocusManager::FocusChangedSignalType mFocusChangedSignal; ///< The signal to notify the focus change
+  Toolkit::FocusManager::FocusOvershotSignalType mFocusOvershotSignal; ///< The signal to notify the focus overshooted
+  Toolkit::FocusManager::FocusedActorActivatedSignalType mFocusedActorActivatedSignal; ///< The signal to notify the activation of focused actor
 
   bool mIsWrapped; ///< Whether the focus movement is wrapped around or not
   bool mIsFocusWithinGroup; ///< Whether the focus movement is limited to the current focus group or not

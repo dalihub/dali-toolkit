@@ -80,7 +80,7 @@ public: //Signal
   /**
    * Signal type for notification
    */
-  typedef SignalV2< void ( int ) > RefreshSignal;
+  typedef Signal< void ( int ) > RefreshSignal;
 
   /**
    * Signal emitted when the Actor tree is ready for rendering into the page image.

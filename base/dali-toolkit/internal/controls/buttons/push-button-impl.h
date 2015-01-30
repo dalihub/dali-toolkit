@@ -245,12 +245,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::PushButton::PressedSignal()
    */
-  Toolkit::PushButton::PressedSignalV2& PressedSignal();
+  Toolkit::PushButton::PressedSignalType& PressedSignal();
 
   /**
    * @copydoc Dali::Toolkit::PushButton::ReleasedSignal()
    */
-  Toolkit::PushButton::ReleasedSignalV2& ReleasedSignal();
+  Toolkit::PushButton::ReleasedSignalType& ReleasedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -395,8 +395,8 @@ private:
   bool  mToggled;                   ///< Stores the toggle state.
 
   // Signals
-  Toolkit::PushButton::PressedSignalV2 mPressedSignalV2;   ///< Signal emitted when the button is pressed.
-  Toolkit::PushButton::ReleasedSignalV2 mReleasedSignalV2; ///< Signal emitted when the button is released.
+  Toolkit::PushButton::PressedSignalType mPressedSignal;   ///< Signal emitted when the button is pressed.
+  Toolkit::PushButton::ReleasedSignalType mReleasedSignal; ///< Signal emitted when the button is released.
 
   Actor mButtonImage;               ///< Stores the released image.
   Actor mBackgroundImage;           ///< Stores the background image.

@@ -218,12 +218,12 @@ Actor PushButton::GetLabelText() const
   return Dali::Toolkit::GetImplementation( *this ).GetLabelText();
 }
 
-PushButton::PressedSignalV2& PushButton::PressedSignal()
+PushButton::PressedSignalType& PushButton::PressedSignal()
 {
   return Dali::Toolkit::GetImplementation( *this ).PressedSignal();
 }
 
-PushButton::ReleasedSignalV2& PushButton::ReleasedSignal()
+PushButton::ReleasedSignalType& PushButton::ReleasedSignal()
 {
   return Dali::Toolkit::GetImplementation( *this ).ReleasedSignal();
 }

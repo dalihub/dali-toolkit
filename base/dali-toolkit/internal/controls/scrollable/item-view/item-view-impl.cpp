@@ -572,7 +572,7 @@ void ItemView::DoRefresh(float currentLayoutPosition, bool cacheExtra)
     RemoveActorsOutsideRange( range );
     AddActorsWithinRange( range, 0.0f/*immediate*/ );
 
-    mScrollUpdatedSignalV2.Emit( Vector3(0.0f, currentLayoutPosition, 0.0f) );
+    mScrollUpdatedSignal.Emit( Vector3(0.0f, currentLayoutPosition, 0.0f) );
   }
 }
 
@@ -1067,7 +1067,7 @@ bool ItemView::OnTouchEvent(const TouchEvent& event)
 
     if(mScrollAnimation)
     {
-      mScrollCompletedSignalV2.Emit(GetCurrentScrollPosition());
+      mScrollCompletedSignal.Emit(GetCurrentScrollPosition());
     }
 
     RemoveAnimation(mScrollAnimation);
@@ -1088,7 +1088,7 @@ bool ItemView::OnMouseWheelEvent(const MouseWheelEvent& event)
 
     mScrollPositionObject.SetProperty( ScrollConnector::SCROLL_POSITION, firstItemScrollPosition );
     self.SetProperty(mPropertyPosition, GetScrollPosition(firstItemScrollPosition, layoutSize));
-    mScrollStartedSignalV2.Emit(GetCurrentScrollPosition());
+    mScrollStartedSignal.Emit(GetCurrentScrollPosition());
     mRefreshEnabled = true;
   }
 
@@ -1120,7 +1120,7 @@ bool ItemView::OnMouseWheelEventFinished()
       mScrollOvershoot = 0.0f;
       AnimateScrollOvershoot(0.0f);
 
-      mScrollCompletedSignalV2.Emit(GetCurrentScrollPosition());
+      mScrollCompletedSignal.Emit(GetCurrentScrollPosition());
     }
   }
 
@@ -1228,7 +1228,7 @@ void ItemView::OnPan( const PanGesture& gesture )
       // Reset the overshoot if no scroll animation.
       if (!mScrollAnimation)
       {
-        mScrollCompletedSignalV2.Emit(GetCurrentScrollPosition());
+        mScrollCompletedSignal.Emit(GetCurrentScrollPosition());
 
         AnimateScrollOvershoot(0.0f, false);
       }
@@ -1238,7 +1238,7 @@ void ItemView::OnPan( const PanGesture& gesture )
     case Gesture::Started: // Fall through
     {
       mTotalPanDisplacement = Vector2::ZERO;
-      mScrollStartedSignalV2.Emit(GetCurrentScrollPosition());
+      mScrollStartedSignal.Emit(GetCurrentScrollPosition());
       mRefreshEnabled = true;
     }
 
@@ -1369,7 +1369,7 @@ void ItemView::OnScrollFinished(Animation& source)
 
   RemoveAnimation(mScrollAnimation); // mScrollAnimation is used to query whether we're scrolling
 
-  mScrollCompletedSignalV2.Emit(GetCurrentScrollPosition());
+  mScrollCompletedSignal.Emit(GetCurrentScrollPosition());
 
   if(mIsFlicking && fabsf(mScrollOvershoot) > Math::MACHINE_EPSILON_1)
   {
@@ -1424,7 +1424,7 @@ void ItemView::ScrollToItem(unsigned int itemId, float durationSeconds)
     AnimateScrollOvershoot(0.0f);
   }
 
-  mScrollStartedSignalV2.Emit(GetCurrentScrollPosition());
+  mScrollStartedSignal.Emit(GetCurrentScrollPosition());
   mRefreshEnabled = true;
 }
 
@@ -1541,7 +1541,7 @@ void ItemView::ScrollTo(const Vector3& position, float duration)
     AnimateScrollOvershoot(0.0f);
   }
 
-  mScrollStartedSignalV2.Emit(GetCurrentScrollPosition());
+  mScrollStartedSignal.Emit(GetCurrentScrollPosition());
   mRefreshEnabled = true;
 }
 

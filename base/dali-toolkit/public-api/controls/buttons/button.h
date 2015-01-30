@@ -124,22 +124,22 @@ public: //Signals
   /**
    * @brief Button Clicked signal type
    */
-  typedef SignalV2< bool ( Button ) > ClickedSignalV2;
+  typedef Signal< bool ( Button ) > ClickedSignalType;
 
   /**
    * @brief Button toggled signal type
    */
-  typedef SignalV2< bool ( Button, bool ) > ToggledSignalV2;
+  typedef Signal< bool ( Button, bool ) > ToggledSignalType;
 
   /**
    * @brief Signal emitted when the button is touched and the touch point doesn't leave the boundary of the button.
    */
-  ClickedSignalV2& ClickedSignal();
+  ClickedSignalType& ClickedSignal();
 
   /**
    * @brief Signal emitted when the button's state is toggled.
    */
-  ToggledSignalV2& ToggledSignal();
+  ToggledSignalType& ToggledSignal();
 
 public: // Not intended for application developers
 

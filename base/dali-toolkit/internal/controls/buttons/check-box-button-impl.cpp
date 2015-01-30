@@ -86,7 +86,7 @@ void CheckBoxButton::SetChecked( bool checked )
     GetCheckBoxButtonPainter( mPainter )->Checked( handle );
 
     // Raise toggled signal
-    mToggledSignalV2.Emit( handle, mChecked );
+    mToggledSignal.Emit( handle, mChecked );
   }
 }
 

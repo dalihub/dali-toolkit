@@ -338,7 +338,7 @@ bool FocusManager::DoSetCurrentFocusActor(const unsigned int actorID)
       }
 
       // Send notification for the change of focus actor
-      mFocusChangedSignalV2.Emit( GetCurrentFocusActor(), actor );
+      mFocusChangedSignal.Emit( GetCurrentFocusActor(), actor );
 
       // Save the current focused actor
       mCurrentFocusActor = FocusIDPair(GetFocusOrder(actor), actorID);
@@ -463,7 +463,7 @@ void FocusManager::DoActivate(Actor actor)
     }
 
     // Send notification for the activation of focused actor
-    mFocusedActorActivatedSignalV2.Emit(actor);
+    mFocusedActorActivatedSignal.Emit(actor);
   }
 }
 
@@ -478,7 +478,7 @@ void FocusManager::ClearFocus()
   mCurrentFocusActor = FocusIDPair(0, 0);
 
   // Send notification for the change of focus actor
-  mFocusChangedSignalV2.Emit(actor, Actor());
+  mFocusChangedSignal.Emit(actor, Actor());
 
   if(mIsAccessibilityTtsEnabled)
   {
@@ -611,7 +611,7 @@ bool FocusManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapp
     {
       DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Overshot\n", __FUNCTION__, __LINE__);
       // Send notification for handling overshooted situation
-      mFocusOvershotSignalV2.Emit(GetCurrentFocusActor(), forward ? Toolkit::FocusManager::OVERSHOT_NEXT : Toolkit::FocusManager::OVERSHOT_PREVIOUS);
+      mFocusOvershotSignal.Emit(GetCurrentFocusActor(), forward ? Toolkit::FocusManager::OVERSHOT_NEXT : Toolkit::FocusManager::OVERSHOT_PREVIOUS);
 
       return false; // Try to move the focus out of the scope
     }
@@ -951,19 +951,19 @@ bool FocusManager::HandlePanGesture(const Integration::PanGestureEvent& panEvent
   return handled;
 }
 
-Toolkit::FocusManager::FocusChangedSignalV2& FocusManager::FocusChangedSignal()
+Toolkit::FocusManager::FocusChangedSignalType& FocusManager::FocusChangedSignal()
 {
-  return mFocusChangedSignalV2;
+  return mFocusChangedSignal;
 }
 
-Toolkit::FocusManager::FocusOvershotSignalV2& FocusManager::FocusOvershotSignal()
+Toolkit::FocusManager::FocusOvershotSignalType& FocusManager::FocusOvershotSignal()
 {
-  return mFocusOvershotSignalV2;
+  return mFocusOvershotSignal;
 }
 
-Toolkit::FocusManager::FocusedActorActivatedSignalV2& FocusManager::FocusedActorActivatedSignal()
+Toolkit::FocusManager::FocusedActorActivatedSignalType& FocusManager::FocusedActorActivatedSignal()
 {
-  return mFocusedActorActivatedSignalV2;
+  return mFocusedActorActivatedSignal;
 }
 
 bool FocusManager::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )

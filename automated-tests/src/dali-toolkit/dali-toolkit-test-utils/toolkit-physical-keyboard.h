@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -36,12 +36,12 @@ class PhysicalKeyboard;
 class PhysicalKeyboard : public BaseHandle
 {
 public:
-  typedef SignalV2< void (PhysicalKeyboard) > Signal;
+  typedef Signal< void (PhysicalKeyboard) > PhysicalKeyboardSignalType;
   PhysicalKeyboard();
   ~PhysicalKeyboard();
   static PhysicalKeyboard Get();
   bool IsAttached() const;
-  Signal& StatusChangedSignal();
+  PhysicalKeyboardSignalType& StatusChangedSignal();
   PhysicalKeyboard( Internal::Adaptor::PhysicalKeyboard* impl );
 };
 

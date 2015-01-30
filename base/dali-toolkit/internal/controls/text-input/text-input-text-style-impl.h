@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 #include <dali/public-api/text/text-style.h>
 
 // INTERNAL INCLUDES
@@ -81,7 +81,7 @@ public:
    */
 
   /* Input style changed signal.*/
-  typedef SignalV2< void( const TextStyle& style ) > StyleChangedSignalType;
+  typedef Signal< void( const TextStyle& style ) > StyleChangedSignalType;
 
   /**
    * @brief Signal emitted when style changes.

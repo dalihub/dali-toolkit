@@ -153,8 +153,8 @@ public:
 public: //Signal
 
   // Page Turned signal, with page index and boolean turning direction (true = forward, false = backward)
-  typedef SignalV2< void ( PageTurnView, unsigned int, bool ) > PageTurnSignal;
-  typedef SignalV2< void ( PageTurnView ) > PagePanSignal;
+  typedef Signal< void ( PageTurnView, unsigned int, bool ) > PageTurnSignal;
+  typedef Signal< void ( PageTurnView ) > PagePanSignal;
 
   /**
    * Signal emitted when a page has started to turn over.

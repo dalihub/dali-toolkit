@@ -186,7 +186,7 @@ public:
   /**
    * @copydoc Toolkit::Builder::QuitSignal
    */
-  Toolkit::Builder::Signal& QuitSignal();
+  Toolkit::Builder::BuilderSignalType& QuitSignal();
 
   /**
    * Emits the quit signal
@@ -243,7 +243,7 @@ private:
 
   void SetProperties( const TreeNode& node, Handle& handle, const Replacement& constant );
 
-  Toolkit::Builder::Signal mQuitSignal;
+  Toolkit::Builder::BuilderSignalType mQuitSignal;
 };
 
 } // namespace Internal

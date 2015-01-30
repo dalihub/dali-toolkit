@@ -53,16 +53,16 @@ public:
 public:
 
   /// @brief Pre focus change signal
-  typedef SignalV2< Actor ( Actor, Actor, Control::KeyboardFocusNavigationDirection ) > PreFocusChangeSignalV2;
+  typedef Signal< Actor ( Actor, Actor, Control::KeyboardFocusNavigationDirection ) > PreFocusChangeSignalType;
 
   /// @brief Focus changed signal
-  typedef SignalV2< void ( Actor, Actor ) > FocusChangedSignalV2;
+  typedef Signal< void ( Actor, Actor ) > FocusChangedSignalType;
 
   /// @brief Focus group changed signal
-  typedef SignalV2< void ( Actor, bool ) > FocusGroupChangedSignalV2;
+  typedef Signal< void ( Actor, bool ) > FocusGroupChangedSignalType;
 
   /// @brief Focused actor activated signal
-  typedef SignalV2< void ( Actor ) > FocusedActorActivatedSignalV2;
+  typedef Signal< void ( Actor ) > FocusedActorActivatedSignalType;
 
   /**
    * @brief Create a KeyboardFocusManager handle; this can be initialised with KeyboardFocusManager::New().
@@ -217,7 +217,7 @@ public: // Signals
    * @pre The Object has been initialized.
    * @return The signal to connect to.
    */
-  PreFocusChangeSignalV2& PreFocusChangeSignal();
+  PreFocusChangeSignalType& PreFocusChangeSignal();
 
   /**
    * @brief This signal is emitted after the current focused actor has been changed.
@@ -229,7 +229,7 @@ public: // Signals
    * @pre The Object has been initialized.
    * @return The signal to connect to.
    */
-  FocusChangedSignalV2& FocusChangedSignal();
+  FocusChangedSignalType& FocusChangedSignal();
 
   /**
    * @brief This signal is emitted when the focus group has been changed.
@@ -246,7 +246,7 @@ public: // Signals
    * @pre The Object has been initialized.
    * @return The signal to connect to.
    */
-  FocusGroupChangedSignalV2& FocusGroupChangedSignal();
+  FocusGroupChangedSignalType& FocusGroupChangedSignal();
 
   /**
    * @brief This signal is emitted when the current focused actor is activated.
@@ -258,7 +258,7 @@ public: // Signals
    * @pre The Object has been initialized.
    * @return The signal to connect to.
    */
-  FocusedActorActivatedSignalV2& FocusedActorActivatedSignal();
+  FocusedActorActivatedSignalType& FocusedActorActivatedSignal();
 
   // Not intended for application developers
 

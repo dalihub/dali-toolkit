@@ -105,14 +105,14 @@ float Button::OnAnimationTimeRequested() const
   return 0.f;
 }
 
-Toolkit::Button::ClickedSignalV2& Button::ClickedSignal()
+Toolkit::Button::ClickedSignalType& Button::ClickedSignal()
 {
-  return mClickedSignalV2;
+  return mClickedSignal;
 }
 
-Toolkit::Button::ToggledSignalV2& Button::ToggledSignal()
+Toolkit::Button::ToggledSignalType& Button::ToggledSignal()
 {
-  return mToggledSignalV2;
+  return mToggledSignal;
 }
 
 bool Button::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )

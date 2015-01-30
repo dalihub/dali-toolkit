@@ -403,12 +403,12 @@ void NavigationControl::OnPopupTouchedOutside()
   }
 }
 
-Toolkit::NavigationControl::ItemPushedSignalV2& NavigationControl::ItemPushedSignal()
+Toolkit::NavigationControl::ItemPushedSignalType& NavigationControl::ItemPushedSignal()
 {
   return mItemPushedSignal;
 }
 
-Toolkit::NavigationControl::ItemPoppedSignalV2& NavigationControl::ItemPoppedSignal()
+Toolkit::NavigationControl::ItemPoppedSignalType& NavigationControl::ItemPoppedSignal()
 {
   return mItemPoppedSignal;
 }

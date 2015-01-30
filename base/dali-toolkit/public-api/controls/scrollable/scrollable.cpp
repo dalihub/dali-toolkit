@@ -74,22 +74,22 @@ Scrollable Scrollable::DownCast( BaseHandle handle )
   return Control::DownCast<Scrollable, Internal::Scrollable>(handle);
 }
 
-Scrollable::ScrollStartedSignalV2& Scrollable::ScrollStartedSignal()
+Scrollable::ScrollStartedSignalType& Scrollable::ScrollStartedSignal()
 {
   return GetImpl(*this).ScrollStartedSignal();
 }
 
-Scrollable::ScrollUpdatedSignalV2& Scrollable::ScrollUpdatedSignal()
+Scrollable::ScrollUpdatedSignalType& Scrollable::ScrollUpdatedSignal()
 {
   return GetImpl(*this).ScrollUpdatedSignal();
 }
 
-Scrollable::ScrollCompletedSignalV2& Scrollable::ScrollCompletedSignal()
+Scrollable::ScrollCompletedSignalType& Scrollable::ScrollCompletedSignal()
 {
   return GetImpl(*this).ScrollCompletedSignal();
 }
 
-Scrollable::ScrollClampedSignalV2& Scrollable::ScrollClampedSignal()
+Scrollable::ScrollClampedSignalType& Scrollable::ScrollClampedSignal()
 {
   return GetImpl(*this).ScrollClampedSignal();
 }

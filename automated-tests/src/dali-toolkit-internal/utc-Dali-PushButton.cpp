@@ -73,9 +73,9 @@ class TETButton : public Button
 {
 public:
   // PushButton Pressed
-  typedef SignalV2< bool ( Button ) > PressedSignalV2;
+  typedef Signal< bool ( Button ) > PressedSignalType;
 
-  PressedSignalV2& PressedSignal();
+  PressedSignalType& PressedSignal();
 
   /**
    * Default constructor.
@@ -142,7 +142,7 @@ public:
   /**
    * @return the pressed signal.
    */
-  Toolkit::TETButton::PressedSignalV2& PressedSignal();
+  Toolkit::TETButton::PressedSignalType& PressedSignal();
 
   /**
    * Callback called when an interrupt events is received.
@@ -154,7 +154,7 @@ public:
    */
   void OnButtonDown();
 
-  Toolkit::TETButton::PressedSignalV2 mPressedSignal;   ///< Signal emitted when the button is pressed.
+  Toolkit::TETButton::PressedSignalType mPressedSignal;   ///< Signal emitted when the button is pressed.
 };
 
 } // namespace Internal
@@ -187,7 +187,7 @@ TETButton TETButton::DownCast( BaseHandle handle )
   return Control::DownCast<TETButton, Internal::TETButton>(handle);
 }
 
-TETButton::PressedSignalV2& TETButton::PressedSignal()
+TETButton::PressedSignalType& TETButton::PressedSignal()
 {
   TETButton button( *this );
   DALI_ASSERT_ALWAYS( button );
@@ -235,7 +235,7 @@ Toolkit::TETButton TETButton::New()
   return tetButton;
 }
 
-Toolkit::TETButton::PressedSignalV2& TETButton::PressedSignal()
+Toolkit::TETButton::PressedSignalType& TETButton::PressedSignal()
 {
   return mPressedSignal;
 }

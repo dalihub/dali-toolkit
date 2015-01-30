@@ -889,17 +889,17 @@ void TextInputPopup::OnShowFinished(Animation& source)
   mShowFinishedSignal.Emit( *this );
 }
 
-TextInputPopup::PressedSignalV2& TextInputPopup::PressedSignal()
+TextInputPopup::PressedSignalType& TextInputPopup::PressedSignal()
 {
   return mPressedSignal;
 }
 
-TextInputPopup::HideFinishedSignalV2& TextInputPopup::HideFinishedSignal()
+TextInputPopup::HideFinishedSignalType& TextInputPopup::HideFinishedSignal()
 {
   return mHideFinishedSignal;
 }
 
-TextInputPopup::ShowFinishedSignalV2& TextInputPopup::ShowFinishedSignal()
+TextInputPopup::ShowFinishedSignalType& TextInputPopup::ShowFinishedSignal()
 {
   return mShowFinishedSignal;
 }
