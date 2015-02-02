@@ -267,27 +267,6 @@ int UtcDaliScrollViewSpiralEffectSetup(void)
   END_TEST;
 }
 
-
-
-
-int UtcDaliScrollViewSlideEffectSetup(void)
-{
-  tet_infoline(" UtcDaliScrollViewSlideEffectSetup");
-
-  ScrollViewSlideEffect effect;
-
-  DALI_TEST_CHECK( !effect );
-
-  BaseHandle handle = ScrollViewSlideEffect::New();
-
-  DALI_TEST_CHECK( handle );
-
-  effect = ScrollViewSlideEffect::DownCast(handle);
-
-  DALI_TEST_CHECK( effect );
-  END_TEST;
-}
-
 int UtcDaliScrollViewCubeEffectTest(void)
 {
   ToolkitTestApplication application;
@@ -360,45 +339,3 @@ int UtcDaliScrollViewSpiralEffectTest(void)
   END_TEST;
 }
 
-
-
-int UtcDaliScrollViewSlideEffectTest(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewSlideEffectTest");
-
-  Vector2 size = Stage::GetCurrent().GetSize();
-  Vector3 pageSize(size.x, size.y, 0.0f);
-
-  ScrollView scrollView = SetupTestScrollView(1, 3, size);
-  Actor testPage = gPages[1];
-  Wait(application, 500);
-
-  ScrollViewSlideEffect effect = ScrollViewSlideEffect::New();
-  effect.SetDelayReferenceOffset(pageSize * 0.25);
-  DALI_TEST_EQUALS(effect.GetDelayReferenceOffset(), pageSize * 0.25, Math::MACHINE_EPSILON_0, TEST_LOCATION);
-  effect.SetMaxDelayDuration(0.5f);
-  DALI_TEST_EQUALS(effect.GetMaxDelayDuration(), 0.5f, Math::MACHINE_EPSILON_0, TEST_LOCATION);
-  effect.SetSlideDirection(false);
-  DALI_TEST_CHECK(!effect.GetSlideDirection());
-
-  scrollView.ApplyEffect(effect);
-
-  Actor actor = AddActorToPage(testPage, 0.5f, 0.5f, 3, 3);
-  Wait(application);
-  Vector3 actorPrePosition = actor.GetCurrentPosition();
-
-  effect.ApplyToActor(actor, 0.0f, 0.5f);
-
-  scrollView.ScrollTo(1);
-  while(!gOnScrollCompleteCalled)
-  {
-    Wait(application);
-  }
-  // test that the first page has reached centre of screen
-  Vector3 actorPostPosition = actor.GetCurrentPosition();
-  // just check the actor has moved
-  DALI_TEST_CHECK((actorPostPosition - actorPrePosition).Length() > Math::MACHINE_EPSILON_1);
-  CleanupTest();
-  END_TEST;
-}
