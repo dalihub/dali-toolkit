@@ -35,6 +35,7 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/controls/scrollable/scroll-view/scroll-view-slide-effect-impl.cpp \
    $(toolkit_base_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect-impl.cpp \
    $(toolkit_base_src_dir)/controls/table-view/table-view-impl.cpp \
+   $(toolkit_base_src_dir)/controls/text-controls/text-label-impl.cpp \
    $(toolkit_base_src_dir)/focus-manager/focus-manager-impl.cpp \
    $(toolkit_base_src_dir)/focus-manager/keyboard-focus-manager-impl.cpp \
    $(toolkit_base_src_dir)/focus-manager/keyinput-focus-manager-impl.cpp \

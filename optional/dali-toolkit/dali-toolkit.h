@@ -46,6 +46,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 #include <dali-toolkit/public-api/controls/super-blur-view/super-blur-view.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/enums.h>
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
@@ -61,6 +62,7 @@
 #include <dali-toolkit/public-api/shader-effects/swirl-effect.h>
 #include <dali-toolkit/public-api/text/logical-model.h>
 #include <dali-toolkit/public-api/text/text-definitions.h>
+#include <dali-toolkit/public-api/text/text-renderer.h>
 #include <dali-toolkit/public-api/text/text-view.h>
 #include <dali-toolkit/public-api/text/text-view-interface.h>
 #include <dali-toolkit/public-api/text/visual-model.h>

@@ -39,7 +39,9 @@ public_api_base_src_files = \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-slide-effect.cpp \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect.cpp \
   $(public_api_base_src_dir)/controls/table-view/table-view.cpp \
+  $(public_api_base_src_dir)/controls/text-controls/text-label.cpp \
   $(public_api_base_src_dir)/text/logical-model.cpp \
+  $(public_api_base_src_dir)/text/text-renderer.cpp \
   $(public_api_base_src_dir)/text/text-view.cpp \
   $(public_api_base_src_dir)/text/text-view-interface.cpp \
   $(public_api_base_src_dir)/text/visual-model.cpp \
@@ -116,9 +118,13 @@ public_api_base_scroll_view_header_files = \
 public_api_base_table_view_header_files = \
   $(public_api_base_src_dir)/controls/table-view/table-view.h
 
+public_api_base_text_controls_header_files = \
+  $(public_api_base_src_dir)/controls/text-controls/text-label.h
+
 public_api_base_text_header_files = \
   $(public_api_base_src_dir)/text/logical-model.h \
   $(public_api_base_src_dir)/text/text-definitions.h \
+  $(public_api_base_src_dir)/text/text-renderer.h \
   $(public_api_base_src_dir)/text/text-view.h \
   $(public_api_base_src_dir)/text/text-view-interface.h \
   $(public_api_base_src_dir)/text/visual-model.h
