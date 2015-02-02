@@ -185,6 +185,98 @@ public:
    */
   FontId GetFont( CharacterIndex characterIndex ) const;
 
+  // Break info interface.
+
+  /**
+   * Sets the line break info.
+   *
+   * See GetLineBreakInfo() to get how the line break info is encoded.
+   *
+   * Replaces any line break info previously set.
+   *
+   * @param[in] lineBreakInfo Pointer to a buffer with the line break info.
+   * @param[in] length The size of the buffer.
+   */
+  void SetLineBreakInfo( const LineBreakInfo* const lineBreakInfo,
+                         Length length );
+
+  /**
+   * Retrieves the line break info in the given buffer.
+   *
+   * The size of the @p lineBreakInfo buffer needs to be big enough to copy the @p numberOfItems.
+   *
+   * Possible values for LineBreakInfo are:
+   *
+   *  - 0 is a LINE_MUST_BREAK.  Text must be broken into a new line.
+   *  - 1 is a LINE_ALLOW_BREAK. Is possible to break the text into a new line.
+   *  - 2 is a LINE_NO_BREAK.    Text can't be broken into a new line.
+   *
+     @verbatim
+     i.e. Hello big\nworld produces:
+          2222212220 22220
+     @endverbatim
+   *
+   * @param[out] lineBreakInfo Pointer to a buffer where the line break info is copied.
+   * @param[in] characterIndex Index to the first line break info item.
+   * @param[in] numberOfItems The number of items to be copied.
+   */
+  void GetLineBreakInfo( LineBreakInfo* lineBreakInfo,
+                         CharacterIndex characterIndex,
+                         Length numberOfItems ) const;
+
+  /**
+   * Retrieves the line break info for the given item index.
+   *
+   * @param[in] characterIndex Index to the line break info item.
+   */
+  LineBreakInfo GetLineBreakInfo( CharacterIndex characterIndex ) const;
+
+  /**
+   * Sets the word break info.
+   *
+   * See GetWordBreakInfo() to get how the word break info is encoded.
+   *
+   * Replaces any word break info previously set.
+   *
+   * @param[in] wordBreakInfo Pointer to a buffer with the word break info.
+   * @param[in] length The size of the buffer.
+   */
+  void SetWordBreakInfo( const WordBreakInfo* const wordBreakInfo,
+                         Length length );
+
+  /**
+   * Retrieves the word break info in the given buffer.
+   *
+   * The size of the @p wordBreakInfo buffer needs to be big enough to copy the @p numberOfItems.
+   *
+   * The size of the buffer has to be big enough to store the whole word break info per character.
+   * Call GetNumberOfCharacters() to get the number of characters.
+   *
+   * Possible values for WordBreakInfo are:
+   *
+   * - 0 is a WORD_BREAK.    Text can be broken into a new word.
+   * - 1 is a WORD_NO_BREAK. Text can't be broken into a new word.
+   *
+     @verbatim
+     i.e. Hello big\nworld produces:
+          1111001100 11110
+     @endverbatim
+   *
+   * @param[out] wordBreakInfo Pointer to a buffer where the word break info is copied.
+   * @param[in] characterIndex Index to the first word break info item.
+   * @param[in] numberOfItems The number of items to be copied.
+   */
+  void GetWordBreakInfo( WordBreakInfo* wordBreakInfo,
+                         CharacterIndex characterIndex,
+                         Length numberOfItems ) const;
+
+  /**
+   * Retrieves the word break info for the given item index.
+   *
+   * @param[in] characterIndex Index to the word break info item.
+   */
+  WordBreakInfo GetWordBreakInfo( CharacterIndex characterIndex ) const;
+
 protected:
 
   /**

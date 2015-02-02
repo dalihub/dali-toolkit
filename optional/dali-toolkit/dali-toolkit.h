@@ -58,8 +58,13 @@
 #include <dali-toolkit/public-api/shader-effects/ripple-effect.h>
 #include <dali-toolkit/public-api/shader-effects/ripple2d-effect.h>
 #include <dali-toolkit/public-api/shader-effects/swirl-effect.h>
+#include <dali-toolkit/public-api/text/character-run.h>
 #include <dali-toolkit/public-api/text/character-set-conversion.h>
+#include <dali-toolkit/public-api/text/font-run.h>
 #include <dali-toolkit/public-api/text/logical-model.h>
+#include <dali-toolkit/public-api/text/segmentation.h>
+#include <dali-toolkit/public-api/text/multi-language-support.h>
+#include <dali-toolkit/public-api/text/script.h>
 #include <dali-toolkit/public-api/text/text-controller.h>
 #include <dali-toolkit/public-api/text/text-definitions.h>
 #include <dali-toolkit/public-api/text/text-view.h>

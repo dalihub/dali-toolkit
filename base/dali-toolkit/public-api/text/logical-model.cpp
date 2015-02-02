@@ -233,6 +233,38 @@ FontId LogicalModel::GetFont( CharacterIndex characterIndex ) const
   return 0u;
 }
 
+void LogicalModel::SetLineBreakInfo( const LineBreakInfo* const lineBreakInfo,
+                                     Length length )
+{
+}
+
+void LogicalModel::GetLineBreakInfo( LineBreakInfo* lineBreakInfo,
+                                     CharacterIndex characterIndex,
+                                     Length numberOfItems ) const
+{
+}
+
+LineBreakInfo LogicalModel::GetLineBreakInfo( CharacterIndex characterIndex ) const
+{
+  return 0;
+}
+
+void LogicalModel::SetWordBreakInfo( const WordBreakInfo* const wordBreakInfo,
+                                     Length length )
+{
+}
+
+void LogicalModel::GetWordBreakInfo( WordBreakInfo* wordBreakInfo,
+                                     CharacterIndex characterIndex,
+                                     Length numberOfItems ) const
+{
+}
+
+WordBreakInfo LogicalModel::GetWordBreakInfo( CharacterIndex characterIndex ) const
+{
+  return 0;
+}
+
 LogicalModel::~LogicalModel()
 {
   delete mImpl;
