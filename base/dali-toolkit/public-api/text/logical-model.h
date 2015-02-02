@@ -33,6 +33,8 @@ namespace Toolkit
 namespace Text
 {
 
+struct BidirectionalLineInfoRun;
+struct BidirectionalParagraphInfoRun;
 struct FontRun;
 class LogicalModel;
 typedef IntrusivePtr<LogicalModel> LogicalModelPtr;
@@ -277,6 +279,122 @@ public:
    */
   WordBreakInfo GetWordBreakInfo( CharacterIndex characterIndex ) const;
 
+  // Bidirectional support interface.
+
+  /**
+   * Sets the bidirectional info runs.
+   *
+   * Replaces any bidirectional info previously set.
+   *
+   * Each bidirectional info run stores bidirectional info for a whole 'paragraph' of text which contains right to left scripts.
+
+   * In terms of the bidirectional algorithm, a 'paragraph' is understood as a run of characters between Paragraph Separators or appropriate Newline Functions.
+   * A 'paragraph' may also be determined by higher-level protocols like a mark-up tag.
+   *
+   * @param[in] bidirectionalInfo Pointer to a buffer with all the bidirectional info runs.
+   * @param[in] numberOfRuns The number of bidirectional info runs.
+   */
+  void SetBidirectionalInfo( const BidirectionalParagraphInfoRun* const bidirectionalInfo,
+                             Length numberOfRuns );
+
+  /**
+   * Retrieves the number of bidirectional info runs for the given range of characters.
+   *
+   * It may be zero if there is no right to left scripts.
+   *
+   * @param[in] characterIndex Index to the first character.
+   * @param[in] numberOfCharacters The number of characters.
+   *
+   * @return The number of bidirectional info runs.
+   */
+  Length GetNumberOfBidirectionalInfoRuns( CharacterIndex characterIndex,
+                                           Length numberOfCharacters ) const;
+
+  /**
+   * Retrieves the direction of the characters.
+   *
+   * It sets @c true for right to left characters and @c false for left to right.
+   * For neutral characters it check's the next and previous character's directions:
+   * - If they are equals set that direction. If they are not, sets the paragraph's direction.
+   * - If there is no next, sets the paragraph's direction.
+   *
+   * See SetBidirectionalInfo() to get an explanation of the 'paragraph' meaning in the bidirectional algorithm.
+   *
+   * @param[out] directions Whether the characters are right to left or left to right.
+   * @param[in] characterIndex Index to the first character.
+   * @param[in] numberOfCharacters The number of characters.
+   */
+  void GetCharacterDirections( CharacterDirection* directions,
+                               CharacterIndex characterIndex,
+                               Length numberOfCharacters ) const;
+
+  /**
+   * Retrieves the direction of a characters.
+   *
+   * See GetCharacterDirections().
+   *
+   * @param[in] characterIndex Index to a character.
+   *
+   * @return The character's direction.
+   */
+  CharacterDirection GetCharacterDirection( CharacterIndex characterIndex ) const;
+
+  // Visual <--> Logical conversion tables.
+
+  /**
+   * Sets the visual to logical and the logical to visual map tables.
+   *
+   * Replaces any map tables previously set.
+   *
+   * @param[in] bidirectionalInfo Pointer to a buffer with all the bidirectional info runs.
+   * @param[in] numberOfRuns The number of bidirectional info runs.
+   */
+  void SetVisualToLogicalMap( const BidirectionalLineInfoRun* const bidirectionalInfo,
+                              Length numberOfRuns );
+
+  /**
+   * Retrieves the visual character index for the given logical character index.
+   *
+   * @param[in] logicalCharacterIndex The logical character index.
+   *
+   * @return The visual character index.
+   */
+  CharacterIndex GetVisualCharacterIndex( CharacterIndex logicalCharacterIndex ) const;
+
+  /**
+   * Retrieves the logical character index for the given visual character index.
+   *
+   * @param[in] visualCharacterIndex The visual character index.
+   *
+   * @return The logical character index.
+   */
+  CharacterIndex GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex ) const;
+
+  /**
+   * Retrieves the whole or part of the logical to visual conversion map.
+   *
+   * The size of the buffer needs to be big enough to copy the @p numberOfCharacters.
+   *
+   * @param[out] logicalToVisualMap Pointer to a buffer where the conversion map is copied.
+   * @param[in] characterIndex Index to the first character.
+   * @param[in] numberOfCharacters The number of characters.
+   */
+  void GetLogicalToVisualMap( CharacterIndex* logicalToVisualMap,
+                              CharacterIndex characterIndex,
+                              Length numberOfCharacters ) const;
+
+  /**
+   * Retrieves the whole or part of the visual to logical conversion map.
+   *
+   * The size of the buffer needs to be big enough to copy the @p numberOfCharacters.
+   *
+   * @param[out] visualToLogicalMap Pointer to a buffer where the conversion map is copied.
+   * @param[in] characterIndex Index to the first character.
+   * @param[in] numberOfCharacters The number of characters.
+   */
+  void GetVisualToLogicalMap( CharacterIndex* visualToLogicalMap,
+                              CharacterIndex characterIndex,
+                              Length numberOfCharacters ) const;
 protected:
 
   /**

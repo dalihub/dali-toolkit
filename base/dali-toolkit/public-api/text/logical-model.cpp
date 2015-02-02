@@ -265,6 +265,55 @@ WordBreakInfo LogicalModel::GetWordBreakInfo( CharacterIndex characterIndex ) co
   return 0;
 }
 
+void LogicalModel::SetBidirectionalInfo( const BidirectionalParagraphInfoRun* const bidirectionalInfo,
+                                         Length numberOfRuns )
+{
+}
+
+Length LogicalModel::GetNumberOfBidirectionalInfoRuns( CharacterIndex characterIndex,
+                                                       Length numberOfCharacters ) const
+{
+  return 0u;
+}
+
+void LogicalModel::GetCharacterDirections( CharacterDirection* directions,
+                                           CharacterIndex characterIndex,
+                                           Length numberOfCharacters ) const
+{
+}
+
+CharacterDirection LogicalModel::GetCharacterDirection( CharacterIndex characterIndex ) const
+{
+  return false;
+}
+
+void LogicalModel::SetVisualToLogicalMap( const BidirectionalLineInfoRun* const bidirectionalInfo,
+                                          Length numberOfRuns )
+{
+}
+
+CharacterIndex LogicalModel::GetVisualCharacterIndex( CharacterIndex logicalCharacterIndex ) const
+{
+  return 0u;
+}
+
+CharacterIndex LogicalModel::GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex ) const
+{
+  return 0u;
+}
+
+void LogicalModel::GetLogicalToVisualMap( CharacterIndex* logicalToVisualMap,
+                                          CharacterIndex characterIndex,
+                                          Length numberOfCharacters ) const
+{
+}
+
+void LogicalModel::GetVisualToLogicalMap( CharacterIndex* visualToLogicalMap,
+                                          CharacterIndex characterIndex,
+                                          Length numberOfCharacters ) const
+{
+}
+
 LogicalModel::~LogicalModel()
 {
   delete mImpl;
