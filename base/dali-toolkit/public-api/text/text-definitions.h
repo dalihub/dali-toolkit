@@ -40,6 +40,7 @@ typedef TextAbstraction::GlyphInfo       GlyphInfo;       ///< The information d
 typedef TextAbstraction::CharacterIndex  CharacterIndex;  ///< An index into an array of characters
 typedef TextAbstraction::Length          Length;          ///< The length of an array
 typedef TextAbstraction::BidiInfoIndex   BidiInfoIndex;   ///< Index to the bidirectional info for a paragraph.
+typedef TextAbstraction::Script          Script;          ///< The character's script.
 
 typedef uint32_t GlyphIndex;     ///< An index into an array of glyphs
 
