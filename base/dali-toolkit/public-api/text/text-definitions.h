@@ -36,10 +36,11 @@ typedef TextAbstraction::FaceIndex       FaceIndex;       ///< Used with fonts w
 typedef TextAbstraction::GlyphIndex      GlyphIndex;      ///< Uniquely identifies a glyph within a particular font
 typedef TextAbstraction::Character       Character;       ///< A UTF-32 representation of a character
 typedef TextAbstraction::GlyphInfo       GlyphInfo;       ///< The information describing a glyph (font ID, index, metrics)
+typedef TextAbstraction::CharacterIndex  CharacterIndex;  ///< An index into an array of characters
+typedef TextAbstraction::Length          Length;          ///< The length of an array
+typedef TextAbstraction::BidiInfoIndex   BidiInfoIndex;   ///< Index to the bidirectional info for a paragraph.
 
-typedef uint32_t CharacterIndex; ///< An index into an array of characters
 typedef uint32_t GlyphIndex;     ///< An index into an array of glyphs
-typedef uint32_t Length;         ///< The length of an array
 
 } // namespace Text
 
