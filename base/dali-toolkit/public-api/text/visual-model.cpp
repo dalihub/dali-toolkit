@@ -120,6 +120,7 @@ void VisualModel::GetGlyphPositions( GlyphIndex glyphIndex,
 
 VisualModel::~VisualModel()
 {
+  delete mImpl;
 }
 
 VisualModel::VisualModel()

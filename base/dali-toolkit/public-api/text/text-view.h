@@ -18,10 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/object/ref-object.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/text-view-interface.h>
 #include <dali-toolkit/public-api/text/visual-model.h>
@@ -37,22 +33,22 @@ namespace Toolkit
 namespace Text
 {
 
-class View;
-typedef IntrusivePtr<View> ViewPtr;
-
 /**
  * @brief View provides an interface between the Text layout engine and rendering back-end.
  */
-class View : public RefObject, public ViewInterface
+class View : public ViewInterface
 {
 public:
 
   /**
    * @brief Create a new instance of a View.
-   *
-   * @return A pointer to a new View.
    */
-  static ViewPtr New();
+  View();
+
+  /**
+   * @brief Virtual destructor.
+   */
+  virtual ~View();
 
   /**
    * @brief Set the visual model.
@@ -80,19 +76,7 @@ public:
                                   Vector2* glyphPositions,
                                   Length numberOfGlyphs ) const;
 
-protected:
-
-  /**
-   * @brief A reference counted object may only be deleted by calling Unreference().
-   */
-  virtual ~View();
-
 private:
-
-  /**
-   * @brief Private constructor.
-   */
-  View();
 
   // Undefined
   View( const View& handle );

@@ -60,6 +60,7 @@ void LogicalModel::GetText( CharacterIndex characterIndex, Character* text, Leng
 
 LogicalModel::~LogicalModel()
 {
+  delete mImpl;
 }
 
 LogicalModel::LogicalModel()

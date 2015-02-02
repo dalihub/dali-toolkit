@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
+#include <dali-toolkit/public-api/text/text-controller.h>
 
 namespace Dali
 {
@@ -83,6 +84,12 @@ private: // From Control
 private: // Implementation
 
   /**
+   * Helper for SetProperty.
+   * @param[in] text The new "text" property value.
+   */
+  void SetText( const std::string& text );
+
+  /**
    * Construct a new TextLabel.
    */
   TextLabel();
@@ -100,9 +107,8 @@ private:
 
 private: // Data
 
-  // TODO - Use Controller/Model for storage
+  Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
-  std::string mText;
 };
 
 } // namespace Internal

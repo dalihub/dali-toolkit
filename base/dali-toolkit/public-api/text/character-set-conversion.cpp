@@ -15,7 +15,7 @@
  *
  */
 
-// FILE HEATHER
+// FILE HEADER
 #include <dali-toolkit/public-api/text/character-set-conversion.h>
 
 namespace Dali
@@ -122,47 +122,51 @@ uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length, uint32_t* utf3
   for( ; begin < end ; ++numberOfCharacters )
   {
     const uint8_t leadByte = *begin;
+
     switch( UTF8_LENGTH[leadByte] )
     {
-    case U1:
-    {
-      *utf32 = leadByte;
-      begin++;
-      break;
-    }
-    case U2:
-    {
-      uint32_t& code = *utf32;
-      code = leadByte & 0x1fu;
-      begin++;
-      code <<= 6u;
-      code |= *begin++ & 0x3fu;
-      break;
-    }
-    case U3:
-    {
-      uint32_t& code = *utf32;
-      code = leadByte & 0x1fu;
-      begin++;
-      code <<= 6u;
-      code |= *begin++ & 0x3fu;
-      code <<= 6u;
-      code |= *begin++ & 0x3fu;
-      break;
-    }
-    case U4:
-    {
-      uint32_t& code = *utf32;
-      code = leadByte & 0x1fu;
-      begin++;
-      code <<= 6u;
-      code |= *begin++ & 0x3fu;
-      code <<= 6u;
-      code |= *begin++ & 0x3fu;
-      code <<= 6u;
-      code |= *begin++ & 0x3fu;
-      break;
-    }
+      case U1:
+      {
+        *utf32++ = leadByte;
+        begin++;
+        break;
+      }
+
+      case U2:
+      {
+        uint32_t& code = *utf32++;
+        code = leadByte & 0x1fu;
+        begin++;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        break;
+      }
+
+      case U3:
+      {
+        uint32_t& code = *utf32++;
+        code = leadByte & 0x1fu;
+        begin++;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        break;
+      }
+
+      case U4:
+      {
+        uint32_t& code = *utf32++;
+        code = leadByte & 0x1fu;
+        begin++;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        break;
+      }
     }
   }
 

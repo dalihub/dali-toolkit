@@ -18,8 +18,9 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/text-controls/text-label-impl.h>
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
+#include <dali/integration-api/debug.h>
 
 namespace
 {
@@ -83,9 +84,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
     {
       case Toolkit::TextLabel::PROPERTY_TEXT:
       {
-        labelImpl.mText = value.Get< std::string >();
-
-        // TODO - Update Model etc.
+        labelImpl.SetText( value.Get< std::string >() );
         break;
       }
     }
@@ -100,12 +99,11 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
 
   if( label )
   {
-    TextLabel& labelImpl( GetImpl( label ) );
     switch( index )
     {
       case Toolkit::TextLabel::PROPERTY_TEXT:
       {
-        value = labelImpl.mText;
+        DALI_LOG_WARNING( "UTF-8 text representation was discarded\n" );
         break;
       }
     }
@@ -116,6 +114,26 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
 
 void TextLabel::OnInitialize()
 {
+  mController = Text::Controller::New();
+}
+
+void TextLabel::SetText( const std::string& text )
+{
+  if( mController )
+  {
+    // The Controller updates the View for the renderer
+    mController->SetText( text );
+
+    if( mRenderer )
+    {
+      Actor renderableActor = mRenderer->Render( mController->GetView() );
+
+      if( renderableActor )
+      {
+        Self().Add( renderableActor );
+      }
+    }
+  }
 }
 
 TextLabel::TextLabel()

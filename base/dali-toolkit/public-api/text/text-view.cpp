@@ -35,9 +35,15 @@ struct View::Impl
   VisualModelPtr mVisualModel;
 };
 
-ViewPtr View::New()
+View::View()
+: mImpl( NULL )
 {
-  return ViewPtr( new View() );
+  mImpl = new View::Impl();
+}
+
+View::~View()
+{
+  delete mImpl;
 }
 
 void View::SetVisualModel( VisualModelPtr visualModel )
@@ -73,16 +79,6 @@ void View::GetGlyphPositions( GlyphIndex glyphIndex,
   {
     mImpl->mVisualModel->GetGlyphPositions( glyphIndex, glyphPositions, numberOfGlyphs );
   }
-}
-
-View::~View()
-{
-}
-
-View::View()
-: mImpl( NULL )
-{
-  mImpl = new View::Impl();
 }
 
 } // namespace Text
