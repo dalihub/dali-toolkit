@@ -34,6 +34,7 @@ namespace Toolkit
 namespace Text
 {
 
+struct LineRun;
 class VisualModel;
 typedef IntrusivePtr<VisualModel> VisualModelPtr;
 
@@ -89,6 +90,15 @@ public:
                   GlyphInfo* glyphs,
                   Length numberOfGlyphs ) const;
 
+  /**
+   * Retrieves a glyph.
+   *
+   * @param[in] glyphIndex Index to a glyph.
+   *
+   * @return A glyph.
+   */
+  const GlyphInfo& GetGlyphInfo( GlyphIndex glyphIndex ) const;
+
   // Character <--> Glyph conversion
 
   /**
@@ -119,6 +129,43 @@ public:
    */
   GlyphIndex GetGlyphIndex( CharacterIndex characterIndex ) const;
 
+  /**
+   * Retrieves the whole or part of the character to glyph conversion map.
+   *
+   * The size of the buffer needs to be big enough to copy the @p numberOfCharacters.
+   *
+   * @param[out] characterToGlyphMap Pointer to a buffer where the conversion map is copied.
+   * @param[in] characterIndex Index to the first character.
+   * @param[in] numberOfCharacters The number of characters.
+   */
+  void GetCharacterToGlyphMap( GlyphIndex* characterToGlyphMap,
+                               CharacterIndex characterIndex,
+                               Length numberOfCharacters ) const;
+
+  /**
+   * Retrieves for each glyph the number of characters the glyph represents.
+   *
+   * @param[out] charactersPerGlyph Pointer to a buffer where the number of characters for each glyph are copied.
+   * @param[in] glyphIndex Index to the first glyph.
+   * @param[in] numberOfGlyphs The number of glyphs.
+   */
+  void GetCharactersPerGlyphMap( Length* charactersPerGlyph,
+                                 GlyphIndex glyphIndex,
+                                 Length numberOfGlyphs ) const;
+
+  /**
+   * Retrieves the whole or part of the glyph to character conversion map.
+   *
+   * The size of the buffer needs to be big enough to copy the @p numberOfGlyphs.
+   *
+   * @param[out] glyphToCharacter Pointer to a buffer where the conversion map is copied.
+   * @param[in] glyphIndex Index to the first glyph.
+   * @param[in] numberOfGlyphs The number of glyphs.
+   */
+  void GetGlyphToCharacterMap( CharacterIndex* glyphToCharacter,
+                               GlyphIndex glyphIndex,
+                               Length numberOfGlyphs ) const;
+
   // Position interface
 
   /**
@@ -141,6 +188,103 @@ public:
   void GetGlyphPositions( GlyphIndex glyphIndex,
                           Vector2* glyphPositions,
                           Length numberOfGlyphs ) const;
+
+  /**
+   * Retrieve the glyph's position of the given glyph.
+   *
+   * @param[in] glyphIndex Index to the glyph.
+   *
+   * @return The glyph's position.
+   */
+  const Vector2& GetGlyphPosition( GlyphIndex glyphIndex ) const;
+
+  // Line interface.
+
+  /**
+   * Sets the lines.
+   *
+   * Replaces any lines previously set.
+   *
+   * Every line is an item run containing the index to the first glyph of the line and the number of glyphs.
+   *
+   * @param[in] lines Pointer to a buffer containing all the line runs.
+   * @param[in] numberOfLines The number of lines in the buffer.
+   */
+  void SetLines( const LineRun* const lines,
+                 Length numberOfLines );
+
+  /**
+   * Retrieves the number of lines of the whole text.
+   *
+   * @return The number of lines.
+   */
+  Length GetNumberOfLines() const;
+
+  /**
+   * Retrieves lines.
+   *
+   * The size of the @p lines buffer needs to be big enough to copy the @p numberOfLines.
+   *
+   * @param[out] lines Pointer to a buffer where the lines are copied.
+   * @param[in] lineIndex Index to the first line.
+   * @param[in] numberOfLines Number of lines to be copied.
+   */
+  void GetLines( LineRun* lines,
+                 LineIndex lineIndex,
+                 Length numberOfLines ) const;
+
+  /**
+   * Retrieves the number of lines where the given range of glyphs is laid out.
+   *
+   * @param[in] glyphIndex Index to the first glyph.
+   * @param[in] numberOfGlyphs The number of glyph.
+   *
+   * @return The number of lines.
+   */
+  TextAbstraction::Length GetNumberOfLines( GlyphIndex glyphIndex,
+                                            Length numberOfGlyphs ) const;
+  /**
+   * Retrieves the lines where the given range of glyphs is laid out.
+   *
+   * The size of the @p lines buffer needs to be big enough to copy the @p numberOfLines.
+   *
+   * @param[out] lines Pointer to a buffer where the lines are copied.
+   * @param[in] glyphIndex Index to the first glyphs of the range.
+   * @param[in] numberOfGlyphs Number of glyphs in the range.
+   */
+  void GetLinesOfGlyphRange( LineRun* lines,
+                             GlyphIndex glyphIndex,
+                             Length numberOfGlyphs ) const;
+
+  // Size interface
+
+  /**
+   * Sets the natural size.
+   *
+   * @param[in] size The text's natural size.
+   */
+  void SetNaturalSize( const Vector2& size  );
+
+  /**
+   * Retrieves the natural size.
+   *
+   * @return The text's natural size.
+   */
+  const Vector2& GetNaturalSize() const;
+
+  /**
+   * Sets the text's actual size after it has been laid out.
+   *
+   * @param[in] size The text's size.
+   */
+  void SetActualSize( const Vector2& size );
+
+  /**
+   * Retrieves the text's actual size after it has been laid out.
+   *
+   * @return The text's size.
+   */
+  const Vector2& GetActualSize() const;
 
 protected:
 

@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/vector2.h>
+#include <dali-toolkit/public-api/text/line-run.h>
 
 // EXTERNAL INCLUDES
 #include <memory.h>
@@ -34,6 +35,8 @@ namespace Toolkit
 
 namespace Text
 {
+
+const GlyphInfo GLYPH_INFO; // VCC to be removed.
 
 struct VisualModel::Impl
 {
@@ -79,6 +82,11 @@ void VisualModel::GetGlyphs( GlyphIndex glyphIndex,
   memcpy( glyphs, &modelGlyphs[glyphIndex], numberOfGlyphs*sizeof(GlyphInfo) );
 }
 
+const GlyphInfo& VisualModel::GetGlyphInfo( GlyphIndex glyphIndex ) const
+{
+  return GLYPH_INFO;
+}
+
 CharacterIndex VisualModel::GetCharacterIndex( GlyphIndex glyphIndex ) const
 {
   return mImpl->mGlyphsToCharacters[glyphIndex];
@@ -105,6 +113,24 @@ GlyphIndex VisualModel::GetGlyphIndex( CharacterIndex characterIndex ) const
   return index;
 }
 
+void VisualModel::GetCharacterToGlyphMap( GlyphIndex* characterToGlyphMap,
+                                          CharacterIndex characterIndex,
+                                          Length numberOfCharacters ) const
+{
+}
+
+void VisualModel::GetCharactersPerGlyphMap( Length* charactersPerGlyph,
+                                            GlyphIndex glyphIndex,
+                                            Length numberOfGlyphs ) const
+{
+}
+
+void VisualModel::GetGlyphToCharacterMap( CharacterIndex* glyphToCharacter,
+                                          GlyphIndex glyphIndex,
+                                          Length numberOfGlyphs ) const
+{
+}
+
 void VisualModel::SetGlyphPositions( const Vector2* glyphPositions,
                                      Length numberOfGlyphs )
 {
@@ -119,6 +145,57 @@ void VisualModel::GetGlyphPositions( GlyphIndex glyphIndex,
 {
   std::vector<Vector2>& modelPositions = mImpl->mGlyphPositions;
   memcpy( glyphPositions, &modelPositions[0], numberOfGlyphs*sizeof(Vector2) );
+}
+
+const Vector2& VisualModel::GetGlyphPosition( GlyphIndex glyphIndex ) const
+{
+  return Vector2::ZERO;
+}
+
+void VisualModel::SetLines( const LineRun* const lines,
+                            Length numberOfLines )
+{
+}
+
+Length VisualModel::GetNumberOfLines() const
+{
+  return 0u;
+}
+
+void VisualModel::GetLines( LineRun* lines,
+                            LineIndex lineIndex,
+                            Length numberOfLines ) const
+{
+}
+
+Length VisualModel::GetNumberOfLines( GlyphIndex glyphIndex,
+                                      Length numberOfGlyphs ) const
+{
+  return 0u;
+}
+
+void VisualModel::GetLinesOfGlyphRange( LineRun* lines,
+                                        GlyphIndex glyphIndex,
+                                        Length numberOfGlyphs ) const
+{
+}
+
+void VisualModel::SetNaturalSize( const Vector2& size  )
+{
+}
+
+const Vector2& VisualModel::GetNaturalSize() const
+{
+  return Vector2::ZERO;
+}
+
+void VisualModel::SetActualSize( const Vector2& size )
+{
+}
+
+const Vector2& VisualModel::GetActualSize() const
+{
+  return Vector2::ZERO;
 }
 
 VisualModel::~VisualModel()
