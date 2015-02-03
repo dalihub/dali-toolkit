@@ -22,6 +22,7 @@
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/render-tasks/render-task.h>
+#include <dali/public-api/actors/image-actor.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -130,7 +131,7 @@ private:
 
   RenderTask mTask;                             ///< Render Task to render the source actor contents.
   CameraActor mCameraActor;                     ///< CameraActor attached to RenderTask
-  Layer mFrameLayer;                            ///< Frame is placed on separate layer added to stage.
+  ImageActor mFrame;                            ///< The Magnifier Frame
   Property::Index mPropertySourcePosition;      ///< Source Position ("source-position")
   Actor mSourceActor;                           ///< Source Delegate Actor represents the source position to read.
   float mDefaultCameraDistance;                 ///< Default RenderTask's camera distance from target.
