@@ -38,6 +38,7 @@ toolkit_base_src_files = \
    $(toolkit_base_src_dir)/focus-manager/keyboard-focus-manager-impl.cpp \
    $(toolkit_base_src_dir)/focus-manager/keyinput-focus-manager-impl.cpp \
    $(toolkit_base_src_dir)/styling/style-manager-impl.cpp \
+   $(toolkit_base_src_dir)/text/multi-language-support-impl.cpp \
    $(toolkit_base_src_dir)/builder/builder-impl.cpp \
    $(toolkit_base_src_dir)/builder/builder-animations.cpp \
    $(toolkit_base_src_dir)/builder/builder-set-property.cpp \

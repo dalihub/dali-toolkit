@@ -18,6 +18,9 @@
 // FILE HEADER
 #include <dali-toolkit/public-api/text/multi-language-support.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/multi-language-support-impl.h>
+
 namespace Dali
 {
 
@@ -36,20 +39,23 @@ MultilanguageSupport::~MultilanguageSupport()
 }
 
 MultilanguageSupport::MultilanguageSupport( Internal::MultilanguageSupport* implementation )
+: BaseHandle( implementation )
 {
 }
 
 MultilanguageSupport MultilanguageSupport::Get()
 {
-  return MultilanguageSupport();
+  return Internal::MultilanguageSupport::Get();
 }
 
 void MultilanguageSupport::SetScripts( LogicalModel& model )
 {
+  GetImplementation( *this ).SetScripts( model );
 }
 
 void MultilanguageSupport::ValidateFonts( LogicalModel& model )
 {
+  GetImplementation( *this ).ValidateFonts( model );
 }
 
 } // namespace Text

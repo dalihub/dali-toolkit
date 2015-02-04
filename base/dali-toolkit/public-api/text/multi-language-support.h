@@ -64,7 +64,7 @@ public:
   /**
    * @brief This constructor is used by MultilanguageSupport::Get().
    *
-   * @param[in] implementation A pointer to the internal multilanguage support object.
+   * @param[in] implementation A pointer to the internal multi-language support object.
    */
   explicit DALI_INTERNAL MultilanguageSupport( Internal::MultilanguageSupport* implementation );
 
@@ -80,6 +80,8 @@ public:
    *
    * Any script info previously set is removed.
    *
+   * Scripts are used to validate and set default fonts and to shape the text in further steps.
+   *
    * @pre The @p model needs to have a text set.
    *
    * @param[in,out] model The text's logical model.
@@ -89,8 +91,15 @@ public:
   /**
    * @brief Validates the character's font of the whole text.
    *
-   * It may update fonts set by the mark-up processor.
-   * It sets default fonts based on the script to those characters without a font set.
+   * It may update fonts set by application developers.
+   *
+   * This method ensures all characters are going to be rendered using an appropriate font. Provided a valid font
+   * exists in the platform.
+   *
+   * For those characters with no font set, it sets a default one.
+   *
+   * If a font has been set by the application developer, this method checks if the font supports the character.
+   * If it doesn't, this method replaces it by a default one.
    *
    * @pre The @p model needs to have a text set.
    * @pre The @p model needs to have the scripts set.

@@ -41,6 +41,7 @@ public_api_base_src_files = \
   $(public_api_base_src_dir)/text/character-set-conversion.cpp \
   $(public_api_base_src_dir)/text/logical-model.cpp \
   $(public_api_base_src_dir)/text/multi-language-support.cpp \
+  $(public_api_base_src_dir)/text/script.cpp \
   $(public_api_base_src_dir)/text/segmentation.cpp \
   $(public_api_base_src_dir)/text/text-controller.cpp \
   $(public_api_base_src_dir)/text/text-view.cpp \
@@ -131,6 +132,7 @@ public_api_base_text_header_files = \
   $(public_api_base_src_dir)/text/logical-model.h \
   $(public_api_base_src_dir)/text/multi-language-support.h \
   $(public_api_base_src_dir)/text/script.h \
+  $(public_api_base_src_dir)/text/script-run.h \
   $(public_api_base_src_dir)/text/segmentation.h \
   $(public_api_base_src_dir)/text/text-controller.h \
   $(public_api_base_src_dir)/text/text-definitions.h \
