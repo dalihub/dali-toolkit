@@ -185,6 +185,12 @@ protected:
    */
   virtual ~MaskedImageView();
 
+  /**
+   *
+   * @copydoc Toolkit::Control::OnControlSizeSet( const Vector3& targetSize )
+   */
+  virtual void OnControlSizeSet( const Vector3& targetSize );
+
 private:
 
   // Undefined

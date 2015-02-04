@@ -109,13 +109,17 @@ void ImageView::Initialize()
   Image emptyImage;
   mImageActor = ImageActor::New( emptyImage );
   self.Add( mImageActor );
-  mImageActor.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
   mImageActor.SetParentOrigin( ParentOrigin::CENTER );
 }
 
 ImageView::~ImageView()
 {
 
+}
+
+void ImageView::OnControlSizeSet( const Vector3& targetSize )
+{
+  mImageActor.SetSize( targetSize );
 }
 
 void ImageView::SetImage(const std::string& filename, ImageType type, float min, float max)

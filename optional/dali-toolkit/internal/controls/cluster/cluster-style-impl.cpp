@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/controls/cluster/cluster-style-impl.h>
 
 // EXTERNAL INCLUDES
-
+#include <dali/public-api/animation/animation.h>
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/cluster/cluster.h>
 
@@ -175,110 +175,10 @@ const unsigned int CLUSTER_RANDOM_SEED(0x17eac9f3);         ///< Random seed for
 
 const int STYLE_RANDOM_CHILDREN_NUMBER = 16;
 
-// Constraints
-
-/**
- * First order equation of the form y = Mx + C
- * current' = current * relative + offset
- */
-struct FirstOrderEquationConstraint
+Vector3 FirstOrderEquation( const Vector3& source, const Vector3& relative, const Vector3& offset = Vector3::ZERO  )
 {
-  /**
-   * @param relative The relative multiplier of the source property
-   * @param offset The offset to add onto the result.
-   */
-  FirstOrderEquationConstraint(Vector3 relative, Vector3 offset = Vector3::ZERO)
-  : mRelative(relative),
-    mOffset(offset)
-  {
-  }
-
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& sourceProperty)
-  {
-    const Vector3 source = sourceProperty.GetVector3();
-
-    return source * mRelative + mOffset;
-  }
-
-public:
-
-  Vector3 mRelative;
-  Vector3 mOffset;
-};
-
-/**
- * Depth Constraint.
- * current' = current.xy | + Vector3::ONE.z
- */
-struct DepthConstraint
-{
-  /**
-   * constructor
-   */
-  DepthConstraint()
-  {
-  }
-
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& depthProperty)
-  {
-    Vector3 position(current);
-    position.z = depthProperty.GetFloat();
-    return position;
-  }
-};
-
-
-/**
- * Position Constraint.
- * current' = current * relative + offset
- */
-struct PositionConstraint
-{
-  /**
-   * @param relative The relative multiplier of the source property
-   * @param offset The offset to add onto the result.
-   */
-  PositionConstraint(Vector3 relative, Vector3 offset = Vector3::ZERO)
-  : mRelative(relative),
-    mOffset(offset)
-  {
-  }
-
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& sourceProperty,
-                     const PropertyInput& depthProperty)
-  {
-    const Vector3 source = sourceProperty.GetVector3();
-
-    Vector3 position(source * mRelative + mOffset);
-    position.z += depthProperty.GetFloat();
-    return position;
-  }
-
-public:
-
-  Vector3 mRelative;
-  Vector3 mOffset;
-};
-
-template <class T>
-struct SetConstraint
-{
-  SetConstraint(T value)
-  : mValue(value)
-  {
-
-  }
-
-  T operator()(const T&    current)
-  {
-    return mValue;
-  }
-
-  T mValue;
-};
+  return source * relative + offset;
+}
 
 // random data generator //////////////////////////////////////////////////////
 
@@ -318,7 +218,8 @@ ClusterStyle::ClusterStyle()
   mTitleSize(Vector3::ONE),
   mBackgroundPositionRelative(Vector3::ONE),
   mBackgroundPositionOffset(Vector3::ZERO),
-  mBackgroundSize(Vector3::ONE)
+  mBackgroundSize(Vector3::ONE),
+  mClusterSize( Vector3::ZERO )
 {
 }
 
@@ -337,6 +238,24 @@ unsigned int ClusterStyle::GetMaximumNumberOfChildren() const
   return mMaxChildren;
 }
 
+void ClusterStyle::ApplyStyleToBackground(Actor background, AlphaFunction alpha, const TimePeriod& durationSeconds)
+{
+  Apply( background,
+         FirstOrderEquation( GetClusterSize(), mBackgroundPositionRelative, mBackgroundPositionOffset ),
+         FirstOrderEquation( GetClusterSize(), mBackgroundSize ),
+         alpha,
+         durationSeconds);
+}
+
+void ClusterStyle::ApplyStyleToTitle(Actor title, AlphaFunction alpha, const TimePeriod& durationSeconds)
+{
+  Apply( title,
+         FirstOrderEquation( GetClusterSize(), mTitlePositionRelative, mTitlePositionOffset ),
+         FirstOrderEquation( GetClusterSize(), mTitleSize ),
+         alpha,
+         durationSeconds);
+}
+
 void ClusterStyle::SetTitleProperties(const Vector3& relativePosition,
                                       const Vector3& offsetPosition,
                                       const Vector3& size)
@@ -353,6 +272,64 @@ void ClusterStyle::SetBackgroundProperties(const Vector3& relativePosition,
   mBackgroundPositionRelative = relativePosition;
   mBackgroundPositionOffset = offsetPosition;
   mBackgroundSize = size;
+}
+
+void ClusterStyle::SetClusterSize( const Vector3& clusterSize )
+{
+  mClusterSize = clusterSize;
+}
+
+Vector3 ClusterStyle::GetClusterSize() const
+{
+  return mClusterSize;
+}
+
+void ClusterStyle::Apply( Actor actor,
+                          const Vector3& position,
+                          const Vector3& size,
+                          AlphaFunction alpha,
+                          const TimePeriod& durationSeconds)
+{
+  float animationDuration = durationSeconds.delaySeconds + durationSeconds.durationSeconds;
+  if( animationDuration > 0.f )
+  {
+    Animation animation = Animation::New(animationDuration);
+    animation.MoveTo( actor, position, alpha, durationSeconds.delaySeconds, durationSeconds.durationSeconds );
+    animation.Resize( actor, size, alpha, durationSeconds.delaySeconds, durationSeconds.durationSeconds );
+    animation.Play();
+  }
+  else
+  {
+    actor.SetPosition( position );
+    actor.SetSize( size );
+  }
+}
+
+void ClusterStyle::Apply( Actor actor,
+                          const Vector3& position,
+                          const Vector3& size,
+                          const Quaternion& rotation,
+                          const Vector3& scale,
+                          AlphaFunction alpha,
+                          const TimePeriod& durationSeconds)
+{
+  float animationDuration = durationSeconds.delaySeconds + durationSeconds.durationSeconds;
+  if( animationDuration > 0.f )
+  {
+    Animation animation = Animation::New(animationDuration);
+    animation.MoveTo( actor, position, alpha, durationSeconds.delaySeconds, durationSeconds.durationSeconds );
+    animation.Resize( actor, size, alpha, durationSeconds.delaySeconds, durationSeconds.durationSeconds );
+    animation.RotateTo( actor, rotation, alpha, durationSeconds.delaySeconds, durationSeconds.durationSeconds );
+    animation.ScaleTo( actor, scale, alpha, durationSeconds.delaySeconds, durationSeconds.durationSeconds );
+    animation.Play();
+  }
+  else
+  {
+    actor.SetPosition( position );
+    actor.SetSize( size );
+    actor.SetRotation( rotation );
+    actor.SetScale( scale );
+  }
 }
 
 // ClusterStyleStandard ///////////////////////////////////////////////////////
@@ -449,76 +426,14 @@ void ClusterStyleStandard::ApplyStyle(Actor child, unsigned int index, AlphaFunc
     // counter top-left parent origin and top-left anchor point.
     const Vector3 position = mPositions[index] - Vector3(0.5f, 0.5f, 0.0f) + Vector3(size, size, 0.0f) * 0.5f;
 
-    Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                      ParentSource( Actor::SIZE ),
-                                                      FirstOrderEquationConstraint(Vector3(position.x, position.y, 0.0f),
-                                                                                   Vector3(0.0f, 0.0f, position.z)) );
-
-    constraint.SetApplyTime(durationSeconds);
-    constraint.SetAlphaFunction(alpha);
-    constraint.SetRemoveAction(Constraint::Bake);
-    child.ApplyConstraint(constraint);
-
-    constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                           ParentSource( Actor::SIZE ),
-                                           FirstOrderEquationConstraint(Vector3::ONE * size) );
-    constraint.SetApplyTime(durationSeconds);
-    constraint.SetAlphaFunction(alpha);
-    constraint.SetRemoveAction(Constraint::Bake);
-    child.ApplyConstraint(constraint);
-
-    constraint = Constraint::New<Quaternion>( Actor::ROTATION,
-                                              SetConstraint<Quaternion>(Quaternion()) );
-    constraint.SetApplyTime(durationSeconds);
-    constraint.SetAlphaFunction(alpha);
-    constraint.SetRemoveAction(Constraint::Bake);
-    child.ApplyConstraint(constraint);
-
-    constraint = Constraint::New<Vector3>( Actor::SCALE,
-                                           SetConstraint<Vector3>(Vector3::ONE) );
-    constraint.SetApplyTime(durationSeconds);
-    constraint.SetAlphaFunction(alpha);
-    constraint.SetRemoveAction(Constraint::Bake);
-    child.ApplyConstraint(constraint);
+    Apply( child,
+           FirstOrderEquation( GetClusterSize(), Vector3(position.x, position.y, 0.0f), Vector3(0.0f, 0.0f, position.z) ),
+           FirstOrderEquation( GetClusterSize(), Vector3::ONE * size ),
+           Quaternion(),
+           Vector3::ONE,
+           alpha,
+           durationSeconds);
   }
-}
-
-void ClusterStyleStandard::ApplyStyleToBackground(Actor background, AlphaFunction alpha, const TimePeriod& durationSeconds)
-{
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                         ParentSource( Actor::SIZE ),
-                                         FirstOrderEquationConstraint(mBackgroundPositionRelative, mBackgroundPositionOffset) );
-  constraint.SetApplyTime(durationSeconds);
-  constraint.SetAlphaFunction(alpha);
-  constraint.SetRemoveAction(Constraint::Bake);
-  background.ApplyConstraint(constraint);
-
-  constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                         ParentSource( Actor::SIZE ),
-                                         FirstOrderEquationConstraint(mBackgroundSize) );
-  constraint.SetApplyTime(durationSeconds);
-  constraint.SetAlphaFunction(alpha);
-  constraint.SetRemoveAction(Constraint::Bake);
-  background.ApplyConstraint(constraint);
-}
-
-void ClusterStyleStandard::ApplyStyleToTitle(Actor title, AlphaFunction alpha, const TimePeriod& durationSeconds)
-{
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                         ParentSource( Actor::SIZE ),
-                                         FirstOrderEquationConstraint(mTitlePositionRelative, mTitlePositionOffset) );
-  constraint.SetApplyTime(durationSeconds);
-  constraint.SetAlphaFunction(alpha);
-  constraint.SetRemoveAction(Constraint::Bake);
-  title.ApplyConstraint(constraint);
-
-  constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                         ParentSource( Actor::SIZE ),
-                                         FirstOrderEquationConstraint(mTitleSize) );
-  constraint.SetApplyTime(durationSeconds);
-  constraint.SetAlphaFunction(alpha);
-  constraint.SetRemoveAction(Constraint::Bake);
-  title.ApplyConstraint(constraint);
 }
 
 // ClusterStyleRandom /////////////////////////////////////////////////////////
@@ -552,85 +467,16 @@ void ClusterStyleRandom::ApplyStyle(Actor child, unsigned int index, AlphaFuncti
                          0.0f);
 
   Property::Index depthProperty = child.GetPropertyIndex(Toolkit::Cluster::CLUSTER_ACTOR_DEPTH);
+  float depthPropertyValue = child.GetProperty<float>( depthProperty );
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                    ParentSource( Actor::SIZE ),
-                                                    FirstOrderEquationConstraint( Vector3(position.x, position.y, 0.0f),
-                                                                                  Vector3(0.0f, 0.0f, position.z) ) );
 
-  constraint.SetApplyTime(durationSeconds);
-  constraint.SetAlphaFunction(alpha);
-  constraint.SetRemoveAction(Constraint::Bake);
-  child.ApplyConstraint(constraint);
-
-  // this constraint overrides the Z position. setting it to cluster-actor-depth
-  constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                         LocalSource( depthProperty ),
-                                         DepthConstraint() );
-
-  constraint.SetAlphaFunction(alpha);
-  constraint.SetRemoveAction(Constraint::Bake);
-  child.ApplyConstraint(constraint);
-
-  constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                         ParentSource( Actor::SIZE ),
-                                         FirstOrderEquationConstraint(Vector3::ONE * size) );
-  constraint.SetApplyTime(durationSeconds);
-  constraint.SetAlphaFunction(alpha);
-  constraint.SetRemoveAction(Constraint::Bake);
-  child.ApplyConstraint(constraint);
-
-  constraint = Constraint::New<Quaternion>( Actor::ROTATION,
-                                            SetConstraint<Quaternion>(Quaternion(rotation, Vector3::ZAXIS)) );
-  constraint.SetApplyTime(durationSeconds);
-  constraint.SetAlphaFunction(alpha);
-  constraint.SetRemoveAction(Constraint::Bake);
-  child.ApplyConstraint(constraint);
-
-  constraint = Constraint::New<Vector3>( Actor::SCALE,
-                                         SetConstraint<Vector3>(Vector3::ONE) );
-  constraint.SetApplyTime(durationSeconds);
-  constraint.SetAlphaFunction(alpha);
-  constraint.SetRemoveAction(Constraint::Bake);
-  child.ApplyConstraint(constraint);
-}
-
-void ClusterStyleRandom::ApplyStyleToBackground(Actor background, AlphaFunction alpha, const TimePeriod& durationSeconds)
-{
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                         ParentSource( Actor::SIZE ),
-                                         FirstOrderEquationConstraint(mBackgroundPositionRelative, mBackgroundPositionOffset) );
-  constraint.SetApplyTime(durationSeconds);
-  constraint.SetAlphaFunction(alpha);
-  constraint.SetRemoveAction(Constraint::Bake);
-  background.ApplyConstraint(constraint);
-
-  constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                         ParentSource( Actor::SIZE ),
-                                         FirstOrderEquationConstraint(mBackgroundSize) );
-  constraint.SetApplyTime(durationSeconds);
-  constraint.SetAlphaFunction(alpha);
-  constraint.SetRemoveAction(Constraint::Bake);
-  background.ApplyConstraint(constraint);
-}
-
-void ClusterStyleRandom::ApplyStyleToTitle(Actor title, AlphaFunction alpha, const TimePeriod& durationSeconds)
-{
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                         ParentSource( Actor::SIZE ),
-                                         FirstOrderEquationConstraint(mTitlePositionRelative, mTitlePositionOffset) );
-  constraint.SetApplyTime(durationSeconds);
-  constraint.SetAlphaFunction(alpha);
-  constraint.SetRemoveAction(Constraint::Bake);
-  title.ApplyConstraint(constraint);
-
-  constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                         ParentSource( Actor::SIZE ),
-                                         FirstOrderEquationConstraint(mTitleSize) );
-  constraint.SetApplyTime(durationSeconds);
-  constraint.SetAlphaFunction(alpha);
-  constraint.SetRemoveAction(Constraint::Bake);
-  title.ApplyConstraint(constraint);
+  Apply( child,
+         FirstOrderEquation( GetClusterSize(), Vector3(position.x, position.y, 0.0f), Vector3(0.0f, 0.0f, depthPropertyValue) ),
+         FirstOrderEquation( GetClusterSize(), Vector3::ONE * size),
+         Quaternion(rotation, Vector3::ZAXIS),
+         Vector3::ONE,
+         alpha,
+         durationSeconds);
 }
 
 } // namespace Internal

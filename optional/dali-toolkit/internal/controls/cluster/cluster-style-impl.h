@@ -55,12 +55,17 @@ public:
   /**
    * @copydoc Toolkit::ClusterStyle::ApplyStyleToBackground
    */
-  virtual void ApplyStyleToBackground(Actor background, AlphaFunction alpha, const TimePeriod& durationSeconds) = 0;
+  virtual void ApplyStyleToBackground(Actor background, AlphaFunction alpha, const TimePeriod& durationSeconds);
 
   /**
    * @copydoc Toolkit::ClusterStyle::ApplyStyleToTitle
    */
-  virtual void ApplyStyleToTitle(Actor title, AlphaFunction alpha, const TimePeriod& durationSeconds) = 0;
+  virtual void ApplyStyleToTitle(Actor title, AlphaFunction alpha, const TimePeriod& durationSeconds);
+
+  /**
+    * Set the size of cluster
+    */
+  void SetClusterSize( const Vector3& clusterSize );
 
 protected:
 
@@ -90,6 +95,43 @@ protected:
                                const Vector3& offsetPosition,
                                const Vector3& size);
 
+  /**
+   * Get the size of cluster.
+   * @return the cluster size
+   */
+   Vector3 GetClusterSize() const;
+
+   /**
+    * Apply the given position & size to the actor
+    * @param[in] position The target position
+    * @param[in] size The target size
+    * @param[in] size The size to resize to
+    * @param[in] alpha The alpha function to use.
+    * @param[in] durationSeconds The time period to apply this style.
+    */
+   void Apply( Actor actor,
+               const Vector3& position,
+               const Vector3& size,
+               AlphaFunction alpha,
+               const TimePeriod& durationSeconds);
+   /**
+    * Apply the given position & size to the actor
+    * @param[in] actor The actor to apply the changes
+    * @param[in] position The target position
+    * @param[in] size The target size
+    * @param[in] rotation The target Quaternion value
+    * @param[in] scale The target scale
+    * @param[in] alpha The alpha function to use.
+    * @param[in] durationSeconds The time period to apply this style.
+    */
+   void Apply( Actor actor,
+               const Vector3& position,
+               const Vector3& size,
+               const Quaternion& rotation,
+               const Vector3& scale,
+               AlphaFunction alpha,
+               const TimePeriod& durationSeconds);
+
 protected:
 
   /**
@@ -111,7 +153,7 @@ protected:
   Vector3 mBackgroundPositionRelative;            ///< Background's position relative to size of cluster
   Vector3 mBackgroundPositionOffset;              ///< Background's position offset
   Vector3 mBackgroundSize;                        ///< Background's size relative to size of cluster
-
+  Vector3 mClusterSize;                           ///< The size of cluster
 };
 
 /**
@@ -138,16 +180,6 @@ public:
    * @copydoc Toolkit::ClusterStyle::ApplyStyle
    */
   void ApplyStyle(Actor child, unsigned int index, AlphaFunction alpha, const TimePeriod& durationSeconds);
-
-  /**
-   * @copydoc Toolkit::ClusterStyle::ApplyStyleToBackground
-   */
-  void ApplyStyleToBackground(Actor background, AlphaFunction alpha, const TimePeriod& durationSeconds);
-
-  /**
-   * @copydoc Toolkit::ClusterStyle::ApplyStyleToTitle
-   */
-  void ApplyStyleToTitle(Actor title, AlphaFunction alpha, const TimePeriod& durationSeconds);
 
 private:
 
@@ -196,16 +228,6 @@ public:
    * @copydoc Toolkit::ClusterStyle::ApplyStyle
    */
   void ApplyStyle(Actor child, unsigned int index, AlphaFunction alpha, const TimePeriod& durationSeconds);
-
-  /**
-   * @copydoc Toolkit::ClusterStyle::ApplyStyleToBackground
-   */
-  void ApplyStyleToBackground(Actor background, AlphaFunction alpha, const TimePeriod& durationSeconds);
-
-  /**
-   * @copydoc Toolkit::ClusterStyle::ApplyStyleToTitle
-   */
-  void ApplyStyleToTitle(Actor title, AlphaFunction alpha, const TimePeriod& durationSeconds);
 
 protected:
 

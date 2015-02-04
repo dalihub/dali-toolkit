@@ -138,6 +138,12 @@ protected:
    */
   virtual ~ImageView();
 
+  /**
+   *
+   * @copydoc Toolkit::Control::OnControlSizeSet( const Vector3& targetSize )
+   */
+  virtual void OnControlSizeSet( const Vector3& targetSize );
+
 private:
 
   /**

@@ -256,6 +256,12 @@ private: // From Control
    */
   virtual void OnInitialize();
 
+  /**
+   *
+   * @copydoc Toolkit::Control::OnControlSizeSet( const Vector3& targetSize )
+   */
+  virtual void OnControlSizeSet( const Vector3& targetSize );
+
 protected:
 
   /**
@@ -281,6 +287,7 @@ private:
 
   Toolkit::ClusterStyle mClusterStyle;
   ChildInfoContainer mChildren;
+  Vector3 mClusterSize;
 
   Actor mBackgroundImage;           ///< Stores the background image.
   Actor mTitle;                     ///< Stores the text title.

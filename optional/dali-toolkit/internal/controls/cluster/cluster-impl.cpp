@@ -26,6 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/cluster/cluster-style.h>
+#include <dali-toolkit/internal/controls/cluster/cluster-style-impl.h>
 
 using namespace Dali;
 
@@ -90,6 +91,27 @@ Cluster::Cluster(Toolkit::ClusterStyle& style)
 
 void Cluster::OnInitialize()
 {
+}
+
+void Cluster::OnControlSizeSet( const Vector3& targetSize )
+{
+  mClusterSize = targetSize;
+  GetImpl(mClusterStyle).SetClusterSize(targetSize);
+
+  for(ChildInfoIter iter = mChildren.begin(); iter != mChildren.end(); ++iter)
+  {
+
+    if((*iter).mActor)
+    {
+      mClusterStyle.ApplyStyle( (*iter).mActor,
+                                (*iter).mPositionIndex,
+                                AlphaFunctions::EaseOut,
+                                0.f );
+    }
+  }
+
+  UpdateBackground(0.f);
+  UpdateTitle(0.f);
 }
 
 Cluster::~Cluster()
@@ -389,6 +411,7 @@ void Cluster::SetStyle(Toolkit::ClusterStyle style)
 {
   unsigned int previousChildrenNum = mChildren.size();
   mClusterStyle = style;
+  GetImpl(mClusterStyle).SetClusterSize(mClusterSize);
   unsigned int newChildrenNum = mClusterStyle.GetMaximumNumberOfChildren();
 
   // New style supports less children (remove those that no longer belong)
@@ -406,14 +429,12 @@ void Cluster::SetStyle(Toolkit::ClusterStyle style)
     mChildren.erase( removeStart, mChildren.end() );
   }
 
-  // Remove constraints from previous style, and apply new style's constraints.
   for(ChildInfoIter iter = mChildren.begin(); iter != mChildren.end(); ++iter)
   {
 
     if((*iter).mActor)
     {
-      (*iter).mActor.RemoveConstraints();
-      style.ApplyStyle( (*iter).mActor,
+      mClusterStyle.ApplyStyle( (*iter).mActor,
                         (*iter).mPositionIndex,
                         AlphaFunctions::EaseOut,
                         CLUSTER_STYLE_CONSTRAINT_DURATION );
@@ -443,7 +464,6 @@ void Cluster::UpdateBackground(float duration)
 {
   if (mBackgroundImage)
   {
-    mBackgroundImage.RemoveConstraints();
     mClusterStyle.ApplyStyleToBackground(mBackgroundImage, AlphaFunctions::EaseOut, duration);
   }
 }
@@ -452,7 +472,6 @@ void Cluster::UpdateTitle(float duration)
 {
   if (mTitle)
   {
-    mTitle.RemoveConstraints();
     mClusterStyle.ApplyStyleToTitle(mTitle, AlphaFunctions::EaseOut, duration);
   }
 }
