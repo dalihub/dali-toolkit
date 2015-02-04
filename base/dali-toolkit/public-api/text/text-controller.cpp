@@ -157,20 +157,16 @@ void Controller::UpdateVisualPositions()
       visualModel.GetGlyphs( 0, &firstGlyph, 1 );
       mImpl->mFontClient.GetFontMetrics( firstGlyph.fontId, fontMetrics );
 
-      int penX( 0 );
-      int penY( fontMetrics.ascender ); // Move to baseline
+      float penX( 0 );
+      float penY( fontMetrics.ascender ); // Move to baseline
 
       for( unsigned int i=0; i<glyphCount; ++i )
       {
         GlyphInfo glyph;
         visualModel.GetGlyphs( i, &glyph, 1 );
 
-        if( glyph.width > 0 &&
-            glyph.height > 0 ) // Skip whitespace
-        {
-          glyphPositions.push_back( Vector2( penX + glyph.xBearing,
-                                             penY - glyph.yBearing ) );
-        }
+        glyphPositions.push_back( Vector2( penX + glyph.xBearing,
+                                           penY - glyph.yBearing ) );
 
         penX += glyph.advance;
       }
