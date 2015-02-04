@@ -143,88 +143,88 @@ public:
   Actor GetBackgroundImage() const;
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::SetPressedImage( const Image image )
+   * @copydoc Dali::Toolkit::PushButton::SetSelectedImage( const Image image )
    */
-  void SetPressedImage( Image image );
+  void SetSelectedImage( Image image );
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::SetPressedImage( Actor image )
+   * @copydoc Dali::Toolkit::PushButton::SetSelectedImage( Actor image )
    */
-  void SetPressedImage( Actor image );
-
-  /**
-   * Used by the painter only.
-   * @return A reference to the pressed image.
-   */
-  Actor& GetPressedImage();
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::GetPressedImage()
-   */
-  Actor GetPressedImage() const;
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetDimmedBackgroundImage( Image image )
-   */
-  void SetDimmedBackgroundImage( Image image );
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetDimmedBackgroundImage( Actor image )
-   */
-  void SetDimmedBackgroundImage( Actor image );
+  void SetSelectedImage( Actor image );
 
   /**
    * Used by the painter only.
-   * @return A reference to the dimmed background image.
+   * @return A reference to the selected image.
    */
-  Actor& GetDimmedBackgroundImage();
+  Actor& GetSelectedImage();
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::GetDimmedBackgroundImage()
+   * @copydoc Dali::Toolkit::PushButton::GetSelectedImage()
    */
-  Actor GetDimmedBackgroundImage() const;
+  Actor GetSelectedImage() const;
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::SetDimmedImage( Image image )
+   * @copydoc Dali::Toolkit::PushButton::SetDisabledBackgroundImage( Image image )
    */
-  void SetDimmedImage( Image image );
+  void SetDisabledBackgroundImage( Image image );
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::SetDimmedImage( Actor image )
+   * @copydoc Dali::Toolkit::PushButton::SetDisabledBackgroundImage( Actor image )
    */
-  void SetDimmedImage( Actor image );
+  void SetDisabledBackgroundImage( Actor image );
 
   /**
    * Used by the painter only.
-   * @return A reference to the dimmed button image.
+   * @return A reference to the disabled background image.
    */
-  Actor& GetDimmedImage();
+  Actor& GetDisabledBackgroundImage();
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::GetDimmedImage()
+   * @copydoc Dali::Toolkit::PushButton::GetDisabledBackgroundImage()
    */
-  Actor GetDimmedImage() const;
+  Actor GetDisabledBackgroundImage() const;
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::SetLabelText( const std::string& text )
+   * @copydoc Dali::Toolkit::PushButton::SetDisabledImage( Image image )
    */
-  void SetLabelText( const std::string& text );
+  void SetDisabledImage( Image image );
 
   /**
-   * @copydoc Dali::Toolkit::PushButton::SetLabelText( Actor text )
+   * @copydoc Dali::Toolkit::PushButton::SetDisabledImage( Actor image )
    */
-  void SetLabelText( Actor text );
+  void SetDisabledImage( Actor image );
+
+  /**
+   * Used by the painter only.
+   * @return A reference to the disabled button image.
+   */
+  Actor& GetDisabledImage();
+
+  /**
+   * @copydoc Dali::Toolkit::PushButton::GetDisabledImage()
+   */
+  Actor GetDisabledImage() const;
+
+  /**
+   * @copydoc Dali::Toolkit::PushButton::SetLabel( const std::string& label )
+   */
+  void SetLabel( const std::string& label );
+
+  /**
+   * @copydoc Dali::Toolkit::PushButton::SetLabel( Actor label )
+   */
+  void SetLabel( Actor label );
+
+  /**
+   * @copydoc Dali::Toolkit::PushButton::GetLabel()
+   */
+  Actor GetLabel() const;
 
   /**
    * Used by the painter only.
    * @return A reference to the label actor.
    */
   Actor& GetLabel();
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::GetLabelText()
-   */
-  Actor GetLabelText() const;
 
   /**
    * Used by the painter only.
@@ -398,11 +398,11 @@ private:
   Toolkit::PushButton::PressedSignalType mPressedSignal;   ///< Signal emitted when the button is pressed.
   Toolkit::PushButton::ReleasedSignalType mReleasedSignal; ///< Signal emitted when the button is released.
 
-  Actor mButtonImage;               ///< Stores the released image.
+  Actor mButtonImage;               ///< Stores the unselected image.
   Actor mBackgroundImage;           ///< Stores the background image.
-  Actor mPressedImage;              ///< Stores the pressed image.
-  Actor mDimmedImage;               ///< Stores the dimmed image.
-  Actor mDimmedBackgroundImage;     ///< Stores the dimmed background image.
+  Actor mSelectedImage;             ///< Stores the selected image.
+  Actor mDisabledImage;             ///< Stores the disabled image.
+  Actor mDisabledBackgroundImage;   ///< Stores the disabled background image.
 
   Actor mLabel;                     ///< Stores the text label.
 

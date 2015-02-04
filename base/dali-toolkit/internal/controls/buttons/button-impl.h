@@ -63,14 +63,14 @@ protected:
 public:
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetDimmed( bool dimmed )
+   * @copydoc Dali::Toolkit::Button::SetDisabled( bool disabled )
    */
-  void SetDimmed( bool dimmed );
+  void SetDisabled( bool disabled );
 
   /**
-   * @copydoc Dali::Toolkit::Button::IsDimmed() const
+   * @copydoc Dali::Toolkit::Button::IsDisabled() const
    */
-  bool IsDimmed() const;
+  bool IsDisabled() const;
 
   /**
    * @copydoc Dali::Toolkit::Button::SetAnimationTime()
@@ -94,13 +94,13 @@ private:
    * This method is called from the OnTouchEvent method when the button is down.
    * Could be reimplemented in subclasses to provide specific behaviour.
    */
-  virtual void OnButtonDown() { }
+  virtual void OnButtonDown();
 
   /**
    * This method is called from the OnTouchEvent method when the button is up.
    * Could be reimplemented in subclasses to provide specific behaviour.
    */
-  virtual void OnButtonUp() { }
+  virtual void OnButtonUp();
 
   /**
    * This method is called from the OnTouchEvent method when the touch point leaves the boundary of the button or
@@ -143,9 +143,9 @@ public:
   Toolkit::Button::ClickedSignalType& ClickedSignal();
 
   /**
-   * @copydoc Dali::Toolkit::Button::ToggledSignal()
+   * @copydoc Dali::Toolkit::Button::StateChangedSignal()
    */
-  Toolkit::Button::ToggledSignalType& ToggledSignal();
+  Toolkit::Button::StateChangedSignalType& StateChangedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -221,7 +221,7 @@ private:
   // Undefined
   Button& operator = ( const Button& );
 
-protected: // Signals
+protected:
 
   enum ButtonState
   {
@@ -229,16 +229,16 @@ protected: // Signals
     ButtonDown,                       ///< The button is down.
   };
 
-  ButtonState      mState;                ///< Stores the button state.
-
-  bool             mDimmed;               ///< Stores the dimmed property.
-
   ButtonPainterPtr mPainter;              ///< Pointer to a ButtonPainter base class.
 
-  Toolkit::Button::ClickedSignalType mClickedSignal; ///< Signal emitted when the button is clicked.
-  Toolkit::Button::ToggledSignalType mToggledSignal; ///< Signal emitted when the button is toggled.
+  Toolkit::Button::ClickedSignalType mClickedSignal;           ///< Signal emitted when the button is clicked.
+  Toolkit::Button::StateChangedSignalType mStateChangedSignal; ///< Signal emitted when the button's state is changed.
 
   TapGestureDetector mTapDetector;
+
+  ButtonState      mState;                ///< Stores the button state.
+
+  bool             mDisabled;             ///< Stores the disabled property.
 };
 
 } // namespace Internal

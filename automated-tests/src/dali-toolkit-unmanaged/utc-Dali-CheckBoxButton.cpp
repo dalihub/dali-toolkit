@@ -75,7 +75,7 @@ int UtcDaliCheckBoxButtonSetGetChecked(void)
   tet_infoline(" UtcDaliCheckBoxButtonSetGetChecked");
 
   CheckBoxButton checkBoxButton = CheckBoxButton::New();
-  checkBoxButton.ToggledSignal().Connect( &CheckBoxButtonClicked );
+  checkBoxButton.StateChangedSignal().Connect( &CheckBoxButtonClicked );
 
   // global var used to check if CheckBoxButtonClicked is called;
   gCheckBoxButtonState = false;

@@ -40,12 +40,12 @@ class CheckBoxButton;
  * By default a CheckBoxButton emits a Button::ClickedSignal() signal when the button changes its state to checked or unchecked.
  *
  * The button's appearance could be modified by setting images or actors with CheckBoxButton::SetBackgroundImage,
- * CheckBoxButton::SetCheckedImage, CheckBoxButton::SetDimmedBackgroundImage and CheckBoxButton::SetDimmedCheckedImage.
+ * CheckBoxButton::SetCheckedImage, CheckBoxButton::SetDisabledBackgroundImage and CheckBoxButton::SetDisabledCheckedImage.
  *
- * When the button is not dimmed, if it's not checked it only shows the \e background image. The \e checked image is shown over the
+ * When the button is not disabled, if it's not checked it only shows the \e background image. The \e checked image is shown over the
  * \e background image when the box is checked (\e background image is not replaced by \e checked image).
  *
- * When the button is dimmed, \e background image and \e checked image are replaced by \e dimmed images.
+ * When the button is disabled, \e background image and \e checked image are replaced by \e disabled images.
  *
  * CheckBoxButton doesn't have a text. However, a Dali::Toolkit::TableView with a Dali::TextActor or a Dali::Toolkit::TextView
  * and a CheckBoxButton could be used instead.
@@ -55,10 +55,6 @@ class DALI_IMPORT_API CheckBoxButton : public Button
 public:
   //Action Names
   static const char* const ACTION_CHECK_BOX_BUTTON_CLICK;
-
-  // Properties
-  static const std::string USE_FADE_ANIMATION_PROPERTY_NAME;
-  static const std::string USE_CHECK_ANIMATION_PROPERTY_NAME;
 
 public:
 
@@ -102,7 +98,7 @@ public:
   /**
    * Sets the button as checked or unchecked.
    *
-   * Emits a Button::ClickedSignal() signal if the checkbox is not dimmed and the new state,
+   * Emits a Button::ClickedSignal() signal if the checkbox is not disabled and the new state,
    * given in the \e checked param, is different than the previous one.
    *
    * @param[in] checked state.
@@ -151,40 +147,40 @@ public:
   Actor GetCheckedImage() const;
 
   /**
-   * Sets the dimmed background image.
+   * Sets the disabled background image.
    *
-   * @param[in] image The dimmed background image.
+   * @param[in] image The disabled background image.
    */
-  void SetDimmedBackgroundImage( Image image );
+  void SetDisabledBackgroundImage( Image image );
 
   /**
-   * @copydoc SetDimmedBackgroundImage( Image image )
+   * @copydoc SetDisabledBackgroundImage( Image image )
    */
-  void SetDimmedBackgroundImage( Actor image );
+  void SetDisabledBackgroundImage( Actor image );
 
   /**
-   * Gets the dimmed background image.
-   * @return An actor with the dimmed background image.
+   * Gets the disabled background image.
+   * @return An actor with the disabled background image.
    */
-  Actor GetDimmedBackgroundImage() const;
+  Actor GetDisabledBackgroundImage() const;
 
   /**
-   * Sets the dimmed checked image.
+   * Sets the disabled checked image.
    *
-   * @param[in] image The dimmed checked image.
+   * @param[in] image The disabled checked image.
    */
-  void SetDimmedCheckedImage( Image image );
+  void SetDisabledCheckedImage( Image image );
 
   /**
-   * @copydoc SetDimmedCheckedImage( Image image )
+   * @copydoc SetDisabledCheckedImage( Image image )
    */
-  void SetDimmedCheckedImage( Actor image );
+  void SetDisabledCheckedImage( Actor image );
 
   /**
-   * Gets the dimmed checked image.
-   * @return An actor with the dimmed checked image.
+   * Gets the disabled checked image.
+   * @return An actor with the disabled checked image.
    */
-  Actor GetDimmedCheckedImage() const;
+  Actor GetDisabledCheckedImage() const;
 
 public: // Not intended for application developers
 

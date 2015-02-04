@@ -52,7 +52,7 @@ Alignment CreateAlignedImage( const std::string& imagePath )
 } // namespace
 
 
-CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& checkedImagePath, const std::string& dimmedBackgroundImagePath, const std::string& dimmedCheckedImagePath )
+CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& checkedImagePath, const std::string& disabledBackgroundImagePath, const std::string& disabledCheckedImagePath )
 {
   CheckBoxButton button = Toolkit::CheckBoxButton::New();
 
@@ -66,20 +66,20 @@ CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, con
     button.SetCheckedImage( CreateAlignedImage( checkedImagePath ) );
   }
 
-  if( !dimmedBackgroundImagePath.empty() )
+  if( !disabledBackgroundImagePath.empty() )
   {
-    button.SetDimmedBackgroundImage( CreateAlignedImage( dimmedBackgroundImagePath ) );
+    button.SetDisabledBackgroundImage( CreateAlignedImage( disabledBackgroundImagePath ) );
   }
 
-  if( !dimmedCheckedImagePath.empty() )
+  if( !disabledCheckedImagePath.empty() )
   {
-    button.SetDimmedCheckedImage( CreateAlignedImage( dimmedCheckedImagePath ) );
+    button.SetDisabledCheckedImage( CreateAlignedImage( disabledCheckedImagePath ) );
   }
 
   return button;
 }
 
-CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedImageActor, Actor dimmedBackgroundImageActor, Actor dimmedCheckedImagActor )
+CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedImageActor, Actor disabledBackgroundImageActor, Actor disabledCheckedImagActor )
 {
   CheckBoxButton button = Toolkit::CheckBoxButton::New();
 
@@ -93,14 +93,14 @@ CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedIm
     button.SetCheckedImage( CreateAlignedImage( checkedImageActor ) );
   }
 
-  if( dimmedBackgroundImageActor )
+  if( disabledBackgroundImageActor )
   {
-    button.SetDimmedBackgroundImage( CreateAlignedImage( dimmedBackgroundImageActor ) );
+    button.SetDisabledBackgroundImage( CreateAlignedImage( disabledBackgroundImageActor ) );
   }
 
-  if( dimmedCheckedImagActor )
+  if( disabledCheckedImagActor )
   {
-    button.SetDimmedCheckedImage( CreateAlignedImage( dimmedCheckedImagActor ) );
+    button.SetDisabledCheckedImage( CreateAlignedImage( disabledCheckedImagActor ) );
   }
 
   return button;

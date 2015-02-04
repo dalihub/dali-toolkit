@@ -35,23 +35,32 @@ class Button;
 /**
  * @brief Button is a base class for different kind of buttons.
  *
- * This class provides the dimmed property and the clicked signal.
+ * This class provides the disabled property and the clicked signal.
  *
  * A ClickedSignal() is emitted when the button is touched and the touch
  * point doesn't leave the boundary of the button.
  *
- * When the \e dimmed property is set to \e true, no signal is emitted.
+ * When the \e disabled property is set to \e true, no signal is emitted.
  */
 class DALI_IMPORT_API Button : public Control
 {
 public:
 
   // Signal Names
-  static const char* const SIGNAL_CLICKED; ///< name "clicked"
-  static const char* const SIGNAL_TOGGLED; ///< name "toggled"
+  static const char* const SIGNAL_CLICKED;       ///< name "clicked"
+  static const char* const SIGNAL_STATE_CHANGED; ///< name "state-changed"
 
   // Properties
-  static const Property::Index PROPERTY_DIMMED; ///< name "dimmed", @see SetDimmed(), type BOOLEAN
+  static const Property::Index PROPERTY_DISABLED;                     ///< name "disabled",                     @see SetDisabled(),                  type BOOLEAN
+  static const Property::Index PROPERTY_AUTO_REPEATING;               ///< name "auto-repeating",               @see SetAutoRepeating(),             type BOOLEAN
+  static const Property::Index PROPERTY_INITIAL_AUTO_REPEATING_DELAY; ///< name "initial-auto-repeating-delay", @see SetInitialAutoRepeatingDelay(), type FLOAT
+  static const Property::Index PROPERTY_NEXT_AUTO_REPEATING_DELAY;    ///< name "next-auto-repeating-delay",    @see SetNextAutoRepeatingDelay(),    type FLOAT
+  static const Property::Index PROPERTY_TOGGLABLE;                    ///< name "togglable",                    @see SetToggleButton(),              type BOOLEAN
+  static const Property::Index PROPERTY_TOGGLED;                      ///< name "toggled",                      @see SetToggled(),                   type BOOLEAN
+  static const Property::Index PROPERTY_NORMAL_STATE_ACTOR;           ///< name "button-state-actor",           @see SetButtonImage(),               type MAP
+  static const Property::Index PROPERTY_SELECTED_STATE_ACTOR;         ///< name "selected-state-actor",         @see SetSelectedImage(),             type MAP
+  static const Property::Index PROPERTY_DISABLED_STATE_ACTOR;         ///< name "disabled-state-actor",         @see SetDisabledImage(),             type MAP
+  static const Property::Index PROPERTY_LABEL_ACTOR;                  ///< name "label-actor",                  @see SetLabel(),                     type MAP
 
 public:
 
@@ -92,18 +101,18 @@ public:
   ~Button();
 
   /**
-   * @brief Sets the button as \e dimmed.
+   * @brief Sets the button as \e disabled.
    *
-   * No signals are emitted when the \e dimmed property is set.
+   * No signals are emitted when the \e disabled property is set.
    *
-   * @param[in] dimmed property.
+   * @param[in] disabled property.
    */
-  void SetDimmed( bool dimmed );
+  void SetDisabled( bool disabled );
 
   /**
-   * @return \e true if the button is \e dimmed.
+   * @return \e true if the button is \e disabled.
    */
-  bool IsDimmed() const;
+  bool IsDisabled() const;
 
   /**
    * @brief Sets the animation time.
@@ -127,9 +136,9 @@ public: //Signals
   typedef Signal< bool ( Button ) > ClickedSignalType;
 
   /**
-   * @brief Button toggled signal type
+   * @brief Button state changed signal type
    */
-  typedef Signal< bool ( Button, bool ) > ToggledSignalType;
+  typedef Signal< bool ( Button, bool ) > StateChangedSignalType;
 
   /**
    * @brief Signal emitted when the button is touched and the touch point doesn't leave the boundary of the button.
@@ -137,9 +146,9 @@ public: //Signals
   ClickedSignalType& ClickedSignal();
 
   /**
-   * @brief Signal emitted when the button's state is toggled.
+   * @brief Signal emitted when the button's state is changed.
    */
-  ToggledSignalType& ToggledSignal();
+  StateChangedSignalType& StateChangedSignal();
 
 public: // Not intended for application developers
 

@@ -30,7 +30,7 @@ namespace Toolkit
 {
 
 const char* const Button::SIGNAL_CLICKED = "clicked";
-const char* const Button::SIGNAL_TOGGLED = "toggled";
+const char* const Button::SIGNAL_STATE_CHANGED = "state-changed";
 
 Button::Button()
 {}
@@ -58,14 +58,14 @@ Button Button::DownCast( BaseHandle handle )
   return Control::DownCast<Button, Internal::Button>(handle);
 }
 
-void Button::SetDimmed( bool dimmed )
+void Button::SetDisabled( bool disabled )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDimmed( dimmed );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabled( disabled );
 }
 
-bool Button::IsDimmed() const
+bool Button::IsDisabled() const
 {
-  return Dali::Toolkit::GetImplementation( *this ).IsDimmed();
+  return Dali::Toolkit::GetImplementation( *this ).IsDisabled();
 }
 
 void Button::SetAnimationTime( float animationTime )
@@ -83,9 +83,9 @@ Button::ClickedSignalType& Button::ClickedSignal()
   return Dali::Toolkit::GetImplementation( *this ).ClickedSignal();
 }
 
-Button::ToggledSignalType& Button::ToggledSignal()
+Button::StateChangedSignalType& Button::StateChangedSignal()
 {
-  return Dali::Toolkit::GetImplementation( *this ).ToggledSignal();
+  return Dali::Toolkit::GetImplementation( *this ).StateChangedSignal();
 }
 
 Button::Button( Internal::Button& implementation )

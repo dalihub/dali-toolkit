@@ -518,7 +518,7 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
   optionPressedBackground.Add( pressedIcon );
 
   // 12. Set the pressed option image
-  option.SetPressedImage( optionPressedContainer );
+  option.SetSelectedImage( optionPressedContainer );
 
   // 13. Add the divider
   if ( !finalOption )
