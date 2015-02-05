@@ -700,7 +700,7 @@ int UtcDaliPushButtonProperties(void)
 
   //  Button::PROPERTY_DISABLED_STATE_ACTOR
   {
-    button.SetDimmedImage( Image::New( "IMAGE_PATH_3") );
+    button.SetDisabledImage( Image::New( "IMAGE_PATH_3") );
     DALI_TEST_EQUALS( "IMAGE_PATH_3", button.GetProperty( Button::PROPERTY_DISABLED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;

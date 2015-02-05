@@ -96,10 +96,10 @@ int UtcDaliButtonSetProperty(void)
 
   PushButton pushButton = PushButton::New();
 
-  pushButton.SetProperty(pushButton.GetPropertyIndex("dimmed"), false);
-  DALI_TEST_CHECK( false == pushButton.IsDimmed() );
-  pushButton.SetProperty(pushButton.GetPropertyIndex("dimmed"), true);
-  DALI_TEST_CHECK( true == pushButton.IsDimmed() );
+  pushButton.SetProperty(pushButton.GetPropertyIndex("disabled"), false);
+  DALI_TEST_CHECK( false == pushButton.IsDisabled() );
+  pushButton.SetProperty(pushButton.GetPropertyIndex("disabled"), true);
+  DALI_TEST_CHECK( true == pushButton.IsDisabled() );
   END_TEST;
 }
 
@@ -110,21 +110,21 @@ int UtcDaliButtonSetGetDimmed(void)
 
   PushButton pushButton = PushButton::New();
 
-  pushButton.SetDimmed( true );
+  pushButton.SetDisabled( true );
 
-  DALI_TEST_CHECK( pushButton.IsDimmed() );
+  DALI_TEST_CHECK( pushButton.IsDisabled() );
 
-  pushButton.SetDimmed( false );
+  pushButton.SetDisabled( false );
 
-  DALI_TEST_CHECK( !pushButton.IsDimmed() );
+  DALI_TEST_CHECK( !pushButton.IsDisabled() );
 
-  pushButton.SetDimmed( true );
+  pushButton.SetDisabled( true );
 
-  DALI_TEST_CHECK( pushButton.IsDimmed() );
+  DALI_TEST_CHECK( pushButton.IsDisabled() );
 
-  pushButton.SetDimmed( false );
+  pushButton.SetDisabled( false );
 
-  DALI_TEST_CHECK( !pushButton.IsDimmed() );
+  DALI_TEST_CHECK( !pushButton.IsDisabled() );
   END_TEST;
 }
 

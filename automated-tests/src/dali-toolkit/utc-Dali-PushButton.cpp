@@ -366,42 +366,42 @@ int UtcDaliPushButtonSetImages(void)
   DALI_TEST_EQUALS( size.width, 60.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 60.f, TEST_LOCATION );
 
-  pushButton.SetDimmedBackgroundImage( image04 );
+  pushButton.SetDisabledBackgroundImage( image04 );
 
   application.SendNotification();
   application.Render();
 
-  size = pushButton.GetDimmedBackgroundImage().GetCurrentSize();
+  size = pushButton.GetDisabledBackgroundImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 70.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 70.f, TEST_LOCATION );
 
-  pushButton.SetDimmedBackgroundImage( imageActor04 );
+  pushButton.SetDisabledBackgroundImage( imageActor04 );
 
   application.SendNotification();
   application.Render();
 
-  size = pushButton.GetDimmedBackgroundImage().GetCurrentSize();
+  size = pushButton.GetDisabledBackgroundImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 80.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 80.f, TEST_LOCATION );
 
-  pushButton.SetDimmedImage( image05 );
+  pushButton.SetDisabledImage( image05 );
 
   application.SendNotification();
   application.Render();
 
-  size = pushButton.GetDimmedImage().GetCurrentSize();
+  size = pushButton.GetDisabledImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 90.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 90.f, TEST_LOCATION );
 
-  pushButton.SetDimmedImage( imageActor05 );
+  pushButton.SetDisabledImage( imageActor05 );
 
   application.SendNotification();
   application.Render();
 
-  size = pushButton.GetDimmedImage().GetCurrentSize();
+  size = pushButton.GetDisabledImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 100.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 100.f, TEST_LOCATION );

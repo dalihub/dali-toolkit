@@ -124,27 +124,27 @@ int UtcDaliRadioButtonActive(void)
   RadioButton radioButton = RadioButton::New();
 
   // Default active
-  DALI_TEST_CHECK( radioButton.IsActive() == false );
+  DALI_TEST_CHECK( radioButton.IsSelected() == false );
 
   // False to true
   radioButton.ToggleState();
-  DALI_TEST_CHECK( radioButton.IsActive() == true );
+  DALI_TEST_CHECK( radioButton.IsSelected() == true );
 
   // True to false
   radioButton.ToggleState();
-  DALI_TEST_CHECK( radioButton.IsActive() == false );
+  DALI_TEST_CHECK( radioButton.IsSelected() == false );
 
   // False
-  radioButton.SetActive( false );
-  DALI_TEST_CHECK( radioButton.IsActive() == false );
+  radioButton.SetSelected( false );
+  DALI_TEST_CHECK( radioButton.IsSelected() == false );
 
   // True
-  radioButton.SetActive( true );
-  DALI_TEST_CHECK( radioButton.IsActive() == true );
+  radioButton.SetSelected( true );
+  DALI_TEST_CHECK( radioButton.IsSelected() == true );
 
   // False
-  radioButton.SetActive( false );
-  DALI_TEST_CHECK( radioButton.IsActive() == false );
+  radioButton.SetSelected( false );
+  DALI_TEST_CHECK( radioButton.IsSelected() == false );
 
   END_TEST;
 }

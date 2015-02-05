@@ -42,23 +42,6 @@ const float BACKGROUND_DEPTH( 0.25f );
 
 const float ANIMATION_TIME( 0.26f );  // EFL checkbox tick time
 
-/**
- * Constraint to wrap an actor in y that is moving vertically
- */
-Vector3 EqualToPercentageWidthConstraint( const Vector3& current,
-                                          const PropertyInput& percentageProperty,
-                                          const PropertyInput& parentSizeProperty )
-{
-  float percentage = percentageProperty.GetFloat();
-  const Vector3& parentSize = parentSizeProperty.GetVector3();
-
-  Vector3 size( parentSize );
-  size.x *= percentage;
-
-  return size;
-}
-
-
 inline Toolkit::Internal::CheckBoxButton& GetCheckBoxButtonImpl( Toolkit::Button& button )
 {
   DALI_ASSERT_ALWAYS( button );
