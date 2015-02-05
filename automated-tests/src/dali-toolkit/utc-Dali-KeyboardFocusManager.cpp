@@ -183,6 +183,13 @@ int UtcDaliKeyboardFocusManagerGet(void)
 
   tet_infoline(" UtcDaliKeyboardKeyboardFocusManagerGet");
 
+  // Register Type
+  TypeInfo type;
+  type = TypeRegistry::Get().GetTypeInfo( "KeyboardFocusManager" );
+  DALI_TEST_CHECK( type );
+  BaseHandle handle = type.CreateInstance();
+  DALI_TEST_CHECK( handle );
+
   KeyboardFocusManager manager;
 
   manager = KeyboardFocusManager::Get();
@@ -258,6 +265,13 @@ int UtcDaliKeyboardFocusManagerMoveFocus(void)
 
   tet_infoline(" UtcDaliKeyboardFocusManagerMoveFocus");
 
+  // Register Type
+  TypeInfo type;
+  type = TypeRegistry::Get().GetTypeInfo( "KeyboardFocusManager" );
+  DALI_TEST_CHECK( type );
+  BaseHandle handle = type.CreateInstance();
+  DALI_TEST_CHECK( handle );
+
   KeyboardFocusManager manager = KeyboardFocusManager::Get();
   DALI_TEST_CHECK(manager);
 
@@ -326,6 +340,85 @@ int UtcDaliKeyboardFocusManagerMoveFocus(void)
   preFocusChangeCallback.Reset();
   DALI_TEST_CHECK(!focusChangedCallback.mSignalVerified);
 
+  // Create a 2x2 table view and try to move focus inside it
+  TableView tableView = TableView::New( 2, 2 );
+  Stage::GetCurrent().Add(tableView);
+
+  // Create the third actor
+  Actor third = Actor::New();
+  third.SetKeyboardFocusable(true);
+
+  // Create the fourth actor
+  Actor fourth = Actor::New();
+  fourth.SetKeyboardFocusable(true);
+
+  // Add the four children to table view
+  tableView.AddChild(first, TableView::CellPosition(0, 0));
+  tableView.AddChild(second, TableView::CellPosition(0, 1));
+  tableView.AddChild(third, TableView::CellPosition(1, 0));
+  tableView.AddChild(fourth, TableView::CellPosition(1, 1));
+
+  // Set the focus to the first actor
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == second);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == first);
+  focusChangedCallback.Reset();
+
+  // Move the focus towards right
+  DALI_TEST_CHECK(manager.MoveFocus(Control::Right) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == first);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == second);
+  focusChangedCallback.Reset();
+
+  // Move the focus towards down
+  DALI_TEST_CHECK(manager.MoveFocus(Control::Down) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == fourth);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == second);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == fourth);
+  focusChangedCallback.Reset();
+
+  // Move the focus towards left
+  DALI_TEST_CHECK(manager.MoveFocus(Control::Left) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == fourth);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == third);
+  focusChangedCallback.Reset();
+
+  // Move the focus towards up
+  DALI_TEST_CHECK(manager.MoveFocus(Control::Up) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == third);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == first);
+  focusChangedCallback.Reset();
+
+  // Move the focus towards left. The focus move will fail as no way to move it upwards
+  DALI_TEST_CHECK(manager.MoveFocus(Control::Left) == false);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+  DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
+  DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == first);
+  DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == Actor());
+  DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::Left);
+  preFocusChangeCallback.Reset();
+  DALI_TEST_CHECK(!focusChangedCallback.mSignalVerified);
+
+  // Enable the loop
+  manager.SetFocusGroupLoop(true);
+  DALI_TEST_CHECK(manager.GetFocusGroupLoop() == true);
+
+  // Move the focus towards left again. The focus should move to the fourth actor.
+  DALI_TEST_CHECK(manager.MoveFocus(Control::Left) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == fourth);
+  DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == first);
+  DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == fourth);
+  focusChangedCallback.Reset();
   END_TEST;
 }
 
@@ -533,5 +626,44 @@ int UtcDaliKeyboardFocusManagerSignalFocusedActorActivated(void)
   DALI_TEST_CHECK(focusedActorActivatedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusedActorActivatedCallback.mActivatedActor == secondPushButton);
   focusedActorActivatedCallback.Reset();
+  END_TEST;
+}
+
+int UtcDaliKeyboardFocusManagerSignalFocusGroupChanged(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliKeyboardFocusManagerSignalFocusGroupChanged");
+
+  // Register Type
+  TypeInfo type;
+  type = TypeRegistry::Get().GetTypeInfo( "KeyboardFocusManager" );
+  DALI_TEST_CHECK( type );
+  BaseHandle handle = type.CreateInstance();
+  DALI_TEST_CHECK( handle );
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  bool focusGroupChangedSignalVerified = false;
+  FocusGroupChangedCallback focusGroupChangedCallback(focusGroupChangedSignalVerified);
+  manager.FocusGroupChangedSignal().Connect( &focusGroupChangedCallback, &FocusGroupChangedCallback::Callback );
+
+  Integration::KeyEvent tabEvent("Tab", "", 0, 0, 0, Integration::KeyEvent::Down);
+  Integration::KeyEvent shiftTabEvent("Tab", "", 0, 1, 0, Integration::KeyEvent::Down);
+
+  // Send the tab event to change focus group in the forward direction
+  application.ProcessEvent(tabEvent);
+  DALI_TEST_CHECK(focusGroupChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusGroupChangedCallback.mCurrentFocusedActor == Actor());
+  DALI_TEST_CHECK(focusGroupChangedCallback.mForward == true);
+  focusGroupChangedCallback.Reset();
+
+  // Send the shift tab event to change focus group in the backward direction
+  application.ProcessEvent(shiftTabEvent);
+  DALI_TEST_CHECK(focusGroupChangedCallback.mSignalVerified);
+  DALI_TEST_CHECK(focusGroupChangedCallback.mCurrentFocusedActor == Actor());
+  DALI_TEST_CHECK(focusGroupChangedCallback.mForward == false);
+  focusGroupChangedCallback.Reset();
   END_TEST;
 }

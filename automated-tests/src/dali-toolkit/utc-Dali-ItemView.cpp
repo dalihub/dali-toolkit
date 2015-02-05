@@ -149,9 +149,24 @@ int UtcDaliItemViewAddAndGetLayout(void)
   // As we have added one layout, check the number of layout is now 1
   DALI_TEST_CHECK(view.GetLayoutCount() == 1);
 
+  // Create a depth layout and add it to ItemView
+  DepthLayoutPtr depthLayout = DepthLayout::New();
+  view.AddLayout(*depthLayout);
+
+  // As we have added another layout, check the number of layout is now 2
+  DALI_TEST_CHECK(view.GetLayoutCount() == 2);
+
+  // Create a spiral layout and add it to ItemView
+  SpiralLayoutPtr spiralLayout = SpiralLayout::New();
+  view.AddLayout(*spiralLayout);
+
+  // As we have added another layout, check the number of layout is now 3
+  DALI_TEST_CHECK(view.GetLayoutCount() == 3);
 
   // Check we are getting the correct layout from ItemView
   DALI_TEST_CHECK(view.GetLayout(0) == gridLayout);
+  DALI_TEST_CHECK(view.GetLayout(1) == depthLayout);
+  DALI_TEST_CHECK(view.GetLayout(2) == spiralLayout);
   END_TEST;
 }
 
@@ -170,15 +185,31 @@ int UtcDaliItemViewAddAndRemoveLayout(void)
   // As we have added one layout, check the number of layout is now 1
   DALI_TEST_CHECK(view.GetLayoutCount() == 1);
 
+  // Create a depth layout and add it to ItemView
+  DepthLayoutPtr depthLayout = DepthLayout::New();
+  view.AddLayout(*depthLayout);
+
+  // As we have added another layout, check the number of layout is now 2
+  DALI_TEST_CHECK(view.GetLayoutCount() == 2);
+
   // Check we are getting the correct layout from ItemView
   DALI_TEST_CHECK(view.GetLayout(0) == gridLayout);
+  DALI_TEST_CHECK(view.GetLayout(1) == depthLayout);
 
   // Remove the grid layout
   view.RemoveLayout(0);
 
-  // As we have removed the grid layout, check the number of layout is now 0
-  DALI_TEST_CHECK(view.GetLayoutCount() == 0);
+  // As we have removed the grid layout, check the number of layout is now 1
+  DALI_TEST_CHECK(view.GetLayoutCount() == 1);
 
+  // Check we are getting the correct layout from ItemView
+  DALI_TEST_CHECK(view.GetLayout(0) == depthLayout);
+
+  // Remove the depth layout
+  view.RemoveLayout(0);
+
+  // As we also removed the depth layout, check the number of layout is now 0
+  DALI_TEST_CHECK(view.GetLayoutCount() == 0);
   END_TEST;
 }
 
@@ -194,18 +225,38 @@ int UtcDaliItemViewActivateLayoutAndGetActiveLayout(void)
   GridLayoutPtr gridLayout = GridLayout::New();
   view.AddLayout(*gridLayout);
 
-  DALI_TEST_CHECK(view.GetLayoutCount() == 1);
+  // Create a depth layout and add it to ItemView
+  DepthLayoutPtr depthLayout = DepthLayout::New();
+  view.AddLayout(*depthLayout);
+
+  // Create a spiral layout and add it to ItemView
+  SpiralLayoutPtr spiralLayout = SpiralLayout::New();
+  view.AddLayout(*spiralLayout);
+
+  // As we have added three layouts, check the number of layout is now 3
+  DALI_TEST_CHECK(view.GetLayoutCount() == 3);
 
   // Check there is no active layout at the moment
   DALI_TEST_CHECK(view.GetActiveLayout() == NULL);
 
-  // Activate the grid layout
+  // Activate the depth layout
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  view.ActivateLayout(1, stageSize, 0.5f);
+
+  // Check the current active layout is the depth layout
+  DALI_TEST_CHECK(view.GetActiveLayout() == depthLayout);
+
+  // Activate the grid layout
   view.ActivateLayout(0, stageSize, 0.5f);
 
   // Check the current active layout is the grid layout
   DALI_TEST_CHECK(view.GetActiveLayout() == gridLayout);
 
+  // Activate the spiral layout
+  view.ActivateLayout(2, stageSize, 0.5f);
+
+  // Check the current active layout is the spiral layout
+  DALI_TEST_CHECK(view.GetActiveLayout() == spiralLayout);
   END_TEST;
 }
 
