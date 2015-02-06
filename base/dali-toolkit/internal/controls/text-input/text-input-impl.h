@@ -576,9 +576,9 @@ private: // From Control
   virtual void OnControlSizeSet(const Vector3& targetSize);
 
   /**
-   * @copydoc Control::OnRelaidOut()
+   * @copydoc Control::OnRelayout()
    */
-  virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
+  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 
   /**
    * Retrieves the text-input's natural size by calling TextView::GetNaturalSize().

@@ -101,9 +101,9 @@ class RadioButton: public Button
   void ToggleState();
 
   /**
-   * @copydoc Dali::Toolkit::Control::OnRelaidOut(Vector2 size, ActorSizeContainer& container)
+   * @copydoc Dali::Toolkit::Control::OnRelayout()
    */
-  virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
+  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 
  public:
   // Properties

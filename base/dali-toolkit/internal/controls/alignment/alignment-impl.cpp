@@ -454,7 +454,7 @@ const Toolkit::Alignment::Padding& Alignment::GetPadding() const
   return mPadding;
 }
 
-void Alignment::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+void Alignment::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   // lay out the actors
   Vector3 anchorPointAndParentOrigin  = Vector3::ZERO;

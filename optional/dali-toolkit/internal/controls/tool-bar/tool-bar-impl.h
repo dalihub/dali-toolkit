@@ -82,13 +82,6 @@ private: // From Control
   virtual void OnControlChildAdd(Actor& child);
 
   /**
-   * Called when the tool-bar is relaid out.
-   * @param[in] size The size allocated.
-   * @param[in/out] container the container to put actors not handled.
-   */
-  virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
-
-  /**
    *
    * @copydoc Toolkit::Control::OnControlSizeSet( const Vector3& targetSize )
    */

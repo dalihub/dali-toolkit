@@ -278,7 +278,7 @@ Layer NavigationControl::GetBarLayer() const
   return mBarLayer;
 }
 
-void NavigationControl::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+void NavigationControl::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   const Vector2 setSize( size );
 

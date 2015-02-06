@@ -151,7 +151,8 @@ public:
 
   /**
    * @brief Sets the new alignment. By default ( HorizontalCenter | VerticalCenter ).
-   * Note! there should only be one horizontal and one vertical policy
+   *
+   * @note there should only be one horizontal and one vertical policy
    * @param [in] type The new alignment option.
    */
   void SetAlignmentType( Type type );

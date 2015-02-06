@@ -75,8 +75,8 @@ public:
     EllipsizeEnd          ///< Ellipsized by the end if it exceeds the width and/or the height.
   };
 
-  // Between two OnRelaidOut methods, several calls to InsertTextAt, RemoveTextFrom or SetText can happen.
-  // TextViewProcessorMetadata stores the type of operation. A vector stores all operations between two OnRelaidOut calls.
+  // Between two OnRelayout methods, several calls to InsertTextAt, RemoveTextFrom or SetText can happen.
+  // TextViewProcessorMetadata stores the type of operation. A vector stores all operations between two OnRelayout calls.
 
   enum TextViewProcessorMetadataType
   {
@@ -89,7 +89,7 @@ public:
   };
 
   /**
-   * Stores info about which data structures need to be modified when the OnRelaidOut() method is called
+   * Stores info about which data structures need to be modified when the OnRelayout() method is called
    */
   struct TextViewProcessorMetadata
   {
@@ -382,11 +382,9 @@ private: // From Control
   virtual void OnControlSizeSet( const Vector3& size );
 
   /**
-   * @copydoc Toolkit::Control::OnRelaidOut()
-   *
-   * Removes text-actor and calls DoRelayOut()..
+   * @copydoc Toolkit::Control::OnRelayout()
    */
-  virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
+  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 
   /**
    * Retrieves the text-view's natural size.
@@ -456,7 +454,7 @@ private:
   /**
    * Process Snapshot. It refresh the render-task in order to generate a new snapshot image.
    *
-   * ProcessSnapshot is called from OnRelaidOut() only if text has been relaid out.
+   * ProcessSnapshot is called from OnRelayout() only if text has been relaid out.
    * It creates a new image buffer only if the size of the text has changed.
    *
    * @param[in] textViewSize The new text-view's size.
@@ -708,7 +706,7 @@ public:
 private:
 
   MarkupProcessor::StyledTextArray       mCurrentStyledText;           ///< text currently displayed by the view
-  std::vector<TextViewProcessorMetadata> mTextViewProcessorOperations; ///< Stores all relayout operations which arrive between two consecutive OnRelaidOut() calls.
+  std::vector<TextViewProcessorMetadata> mTextViewProcessorOperations; ///< Stores all relayout operations which arrive between two consecutive OnRelayout() calls.
 
   LayoutParameters                       mLayoutParameters;            ///< Stores some layout parameters in a struct. To be passed in layout functions.
   VisualParameters                       mVisualParameters;            ///< Some parameters which afects text-view visualization.

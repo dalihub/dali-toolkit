@@ -1166,7 +1166,7 @@ void TextInput::OnControlSizeSet(const Vector3& targetSize)
   mActiveLayer.SetSize(targetSize);
 }
 
-void TextInput::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+void TextInput::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   Relayout( mDisplayedTextView, size, container );
   Relayout( mPopupPanel.GetRootActor(), size, container );

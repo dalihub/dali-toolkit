@@ -125,6 +125,9 @@ public:
    * @brief This method is called during size negotiation when a height is required for a given width.
    *
    * Derived classes should override this if they wish to customize the height returned.
+   *
+   * @param width to use.
+   * @return the height based on the width.
    */
   virtual float GetHeightForWidth( float width );
 
@@ -132,6 +135,9 @@ public:
    * @brief This method is called during size negotiation when a width is required for a given height.
    *
    * Derived classes should override this if they wish to customize the width returned.
+   *
+   * @param height to use.
+   * @return the width based on the width.
    */
   virtual float GetWidthForHeight( float height );
 
@@ -306,7 +312,7 @@ public:
    * @param[in,out]  container  The container that holds actors that are fed back into the
    *                            RelayoutController algorithm.
    */
-  DALI_INTERNAL void NegotiateSize( Vector2 size, ActorSizeContainer& container );
+  DALI_INTERNAL void NegotiateSize( const Vector2& size, ActorSizeContainer& container );
 
   // Keyboard Focus
 
@@ -435,22 +441,17 @@ protected:
   // Size Negotiation
 
   /**
-   * @brief Sends a request to be relaid-out.
+   * @brief Request a relayout, which means performing a size negotiation on this control, its parent and children (and potentially whole scene)
    *
-   * This method is called from OnStageConnection(), OnChildAdd(),
-   * OnChildRemove(), SetSizePolicy(), SetMinimumSize() and
-   * SetMaximumSize().
+   * This method is automatically called from OnStageConnection(), OnChildAdd(),
+   * OnChildRemove(), SetSizePolicy(), SetMinimumSize() and SetMaximumSize().
    *
-   * This method could also be called from derived classes every time
-   * a control's poperty change and it needs to be relaid-out.  After
-   * the Dali::Stage::SignalMessageQueueFlushed() is emitted a
-   * relayout process starts and all controls which called this method
-   * will be relaid-out.
+   * This method can also be called from a derived class every time it needs a different size.
+   * At the end of event processing, the relayout process starts and
+   * all controls which requested Relayout will have their sizes (re)negotiated.
    *
-   * @note RelayoutRequest() only sends a request per Control before
-   * the Dali::Stage::SignalMessageQueueFlushed() signal is
-   * emitted. That means a control will be relaid-out only once, even
-   * if more than one request is sent between two consecutive signals.
+   * @note RelayoutRequest() can be called multiple times; the size negotiation is still
+   * only performed once, i.e. there is no need to keep track of this in the calling side.
    */
   void RelayoutRequest();
 
@@ -462,7 +463,7 @@ protected:
    * @param[in]      size       The size to allocate to the actor.
    * @param[in,out]  container  The container that holds actors that have not been allocated a size yet.
    */
-  static void Relayout( Actor actor, Vector2 size, ActorSizeContainer& container );
+  static void Relayout( Actor actor, const Vector2& size, ActorSizeContainer& container );
 
 private:
 
@@ -594,18 +595,22 @@ private:
   virtual void OnControlSizeSet( const Vector3& size );
 
   /**
-   * @brief Called after the Dali::Stage::SignalMessageQueueFlushed()
-   * signal is emitted if this control requested to be relaid-out.
+   * @brief Called after the size negotiation has been finished for this control.
+   *
+   * The control is expected to assign this given size to itself/its children.
    *
    * Should be overridden by derived classes if they need to layout
    * actors differently after certain operations like add or remove
-   * actors, resize or after changing especific properties.
+   * actors, resize or after changing specific properties.
+   *
+   * Note! As this function is called from inside the size negotiation algorithm, you cannot
+   * call RequestRelayout (the call would just be ignored)
    *
    * @param[in]      size       The allocated size.
    * @param[in,out]  container  The control should add actors to this container that it is not able
    *                            to allocate a size for.
    */
-  virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
+  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 
   /**
    * @brief Called when the control gains key input focus.
@@ -737,19 +742,6 @@ private:
    * @param[in] change  Information denoting what has changed.
    */
   DALI_INTERNAL void DoStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
-
-  // Size Negotiation
-
-  /**
-   * @brief Called by NegotiateSize when the size to allocate to the control has been calculated.
-   *
-   * It calls the OnRelaidOut() method which can be overridden by derived classes.
-   *
-   * @param[in]      size       The allocated size.
-   * @param[in,out]  container  The control should add actors to this container that it is not able
-   *                            to allocate a size for.
-   */
-  DALI_INTERNAL void Relayout( Vector2 size, ActorSizeContainer& container );
 
 private:
 

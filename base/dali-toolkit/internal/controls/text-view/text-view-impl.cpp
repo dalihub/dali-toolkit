@@ -1229,7 +1229,7 @@ void TextView::OnControlSizeSet( const Vector3& size )
   }
 }
 
-void TextView::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+void TextView::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {

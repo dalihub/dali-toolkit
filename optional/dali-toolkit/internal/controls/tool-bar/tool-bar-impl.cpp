@@ -352,11 +352,6 @@ void ToolBar::OnControlChildAdd(Actor& child)
   // actor is in mLayout not in Self().
 }
 
-void ToolBar::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
-{
-  Relayout( mLayout, size, container );
-}
-
 void ToolBar::OnControlSizeSet( const Vector3& targetSize )
 {
   mToolBarSize = targetSize;

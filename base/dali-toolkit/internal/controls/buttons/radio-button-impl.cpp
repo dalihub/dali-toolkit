@@ -162,7 +162,7 @@ void RadioButton::ToggleState()
   SetSelected(!mSelected);
 }
 
-void RadioButton::OnRelaidOut( Vector2 /*size*/, ActorSizeContainer& container )
+void RadioButton::OnRelayout( const Vector2& /*size*/, ActorSizeContainer& container )
 {
   Vector3 newSize( mRadioIcon.GetNaturalSize() );
 

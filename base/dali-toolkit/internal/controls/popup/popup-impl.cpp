@@ -666,7 +666,7 @@ void Popup::OnControlChildAdd( Actor& child )
   }
 }
 
-void Popup::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+void Popup::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   // Set the popup size
   Vector2 popupSize;
