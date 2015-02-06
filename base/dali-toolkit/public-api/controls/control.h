@@ -112,7 +112,7 @@ public:
   // Typedefs
 
   /// @brief Key Event signal type;
-  typedef SignalV2<bool ( Control, const KeyEvent& ) > KeyEventSignalV2;
+  typedef Signal<bool ( Control, const KeyEvent& ) > KeyEventSignalType;
 
 public: // Creation & Destruction
 
@@ -378,7 +378,7 @@ public:
    * @pre The Control has been initialized.
    * @return The signal to connect to.
    */
-  KeyEventSignalV2& KeyEventSignal();
+  KeyEventSignalType& KeyEventSignal();
 
 public: // Intended for control developers
 

@@ -89,44 +89,44 @@ public:
   void SetBackgroundImage( Toolkit::PushButton& pushButton, Actor image );
 
   /**
-   * Sets the pressed image.
+   * Sets the selected image.
    *
-   * It adds the pressed image to the root actor and creates the image transition if needed.
-   *
-   * @param[inout] pushButton The button in which all actors that form its appearance are going to be added.
-   * @param[in] image The pressed image.
-   */
-  void SetPressedImage( Toolkit::PushButton& pushButton, Actor image );
-
-  /**
-   * Sets the dimmed background image.
-   *
-   * It adds the dimmed background image to the root actor and creates the image transition if needed.
+   * It adds the selected image to the root actor and creates the image transition if needed.
    *
    * @param[inout] pushButton The button in which all actors that form its appearance are going to be added.
-   * @param[in] image The dimmed background image.
+   * @param[in] image The selected image.
    */
-  void SetDimmedBackgroundImage( Toolkit::PushButton& pushButton, Actor image );
+  void SetSelectedImage( Toolkit::PushButton& pushButton, Actor image );
 
   /**
-   * Sets the dimmed image.
+   * Sets the disabled background image.
    *
-   * It adds the dimmed image to the root actor and creates the image transition if needed.
+   * It adds the disabled background image to the root actor and creates the image transition if needed.
+   *
+   * @param[inout] pushButton The button in which all actors that form its appearance are going to be added.
+   * @param[in] image The disabled background image.
+   */
+  void SetDisabledBackgroundImage( Toolkit::PushButton& pushButton, Actor image );
+
+  /**
+   * Sets the disabled image.
+   *
+   * It adds the disabled image to the root actor and creates the image transition if needed.
    *
    * @param[inout] pushButton The button in which all actors that form its appearance are going to be added.
    * @param[in] image The  image.
    */
-  void SetDimmedImage( Toolkit::PushButton& pushButton, Actor image );
+  void SetDisabledImage( Toolkit::PushButton& pushButton, Actor image );
 
   /**
-   * Sets the text label.
+   * Sets the label.
    *
-   * It adds the text to the root actor.
+   * It adds the label to the root actor.
    *
    * @param[inout] pushButton The button in which all actors that form its appearance are going to be added.
-   * @param[in] text Label text.
+   * @param[in] label Button label.
    */
-  void SetLabelText( Toolkit::PushButton& pushButton, Actor text );
+  void SetLabel( Toolkit::PushButton& pushButton, Actor label );
 
   /////////////////////////////////////////////////////////////////////////////
   // ButtonPainter interface
@@ -150,14 +150,14 @@ public:
   void SetSize( Toolkit::Button& button, const Vector3& size );
 
   /**
-   * This method is called when the \e dimmed property in the Dali::Toolkit::PushButton changes.
+   * This method is called when the \e disabled property in the Dali::Toolkit::PushButton changes.
    *
    * Creates image transitions if needed.
    *
    * @param[inout] button The button in which all actors that form its appearance are going to be added.
-   * @param[in] dimmed property.
+   * @param[in] disabled property.
    */
-  void SetDimmed( Toolkit::Button& button, bool dimmed );
+  void SetDisabled( Toolkit::Button& button, bool disabled );
 
   /**
    * Sets the animation time.
@@ -183,7 +183,7 @@ public:
 
   /**
    * This method is called when the Dali::Toolkit::Internal::PushButton in which this object is registered
-   * is pressed. It changes to the pressed image with a transition.
+   * is pressed. It changes to the selected image with a transition.
    *
    * @param[inout] button The Dali::Toolkit::PushButton in which this object is registered.
    */
@@ -228,16 +228,16 @@ private:
    */
   enum PaintState
   {
-    ReleasedState,             ///< The push button is released.
-    PressedState,              ///< The push button is pressed.
-    DimmedReleasedState,       ///< The push button is dimmed and released.
-    DimmedPressedState,        ///< The push button is dimemd and pressed.
-    ReleasedPressedTransition, ///< The push button is in transition from released to pressed.
-    PressedReleasedTransition, ///< The push button is in transition from pressed to released.
-    ReleasedDimmedTransition,  ///< The push button is in transition from released to dimmed.
-    DimmedReleasedTransition,  ///< The push button is in transition from dimmed to released.
-    PressedDimmedTransition,   ///< The push button is in transition from pressed to dimmed.
-    DimmedPressedTransition    ///< The push button is in transition from dimmed to pressed.
+    ReleasedState,              ///< The push button is released.
+    PressedState,               ///< The push button is pressed.
+    DisabledReleasedState,      ///< The push button is disabled and released.
+    DisabledPressedState,       ///< The push button is Disabled and pressed.
+    ReleasedPressedTransition,  ///< The push button is in transition from released to pressed.
+    PressedReleasedTransition,  ///< The push button is in transition from pressed to released.
+    ReleasedDisabledTransition, ///< The push button is in transition from released to disabled.
+    DisabledReleasedTransition, ///< The push button is in transition from disabled to released.
+    PressedDisabledTransition,  ///< The push button is in transition from pressed to disabled.
+    DisabledPressedTransition   ///< The push button is in transition from disabled to pressed.
   };
 
   /**
@@ -337,7 +337,7 @@ private:
 
 private:
   bool                  mAutoRepeating;    ///< Stores the autorepeating property.
-  bool                  mDimmed;           ///< Stores the dimmed property.
+  bool                  mDisabled;         ///< Stores the disabled property.
 
   PaintState            mPaintState;       ///< The painter state.
   Animation             mFadeInAnimation;  ///< Animation used in the state transitions.

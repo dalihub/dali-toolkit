@@ -364,7 +364,7 @@ bool TextView::IsScrollPositionTrimmed() const
   return GetImpl( *this ).IsScrollPositionTrimmed();
 }
 
-TextView::ScrolledSignalV2& TextView::ScrolledSignal()
+TextView::ScrolledSignalType& TextView::ScrolledSignal()
 {
   return GetImpl( *this ).ScrolledSignal();
 }

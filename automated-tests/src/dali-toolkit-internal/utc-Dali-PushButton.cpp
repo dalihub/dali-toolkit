@@ -73,9 +73,9 @@ class TETButton : public Button
 {
 public:
   // PushButton Pressed
-  typedef SignalV2< bool ( Button ) > PressedSignalV2;
+  typedef Signal< bool ( Button ) > PressedSignalType;
 
-  PressedSignalV2& PressedSignal();
+  PressedSignalType& PressedSignal();
 
   /**
    * Default constructor.
@@ -142,7 +142,7 @@ public:
   /**
    * @return the pressed signal.
    */
-  Toolkit::TETButton::PressedSignalV2& PressedSignal();
+  Toolkit::TETButton::PressedSignalType& PressedSignal();
 
   /**
    * Callback called when an interrupt events is received.
@@ -154,7 +154,7 @@ public:
    */
   void OnButtonDown();
 
-  Toolkit::TETButton::PressedSignalV2 mPressedSignal;   ///< Signal emitted when the button is pressed.
+  Toolkit::TETButton::PressedSignalType mPressedSignal;   ///< Signal emitted when the button is pressed.
 };
 
 } // namespace Internal
@@ -187,7 +187,7 @@ TETButton TETButton::DownCast( BaseHandle handle )
   return Control::DownCast<TETButton, Internal::TETButton>(handle);
 }
 
-TETButton::PressedSignalV2& TETButton::PressedSignal()
+TETButton::PressedSignalType& TETButton::PressedSignal()
 {
   TETButton button( *this );
   DALI_ASSERT_ALWAYS( button );
@@ -235,7 +235,7 @@ Toolkit::TETButton TETButton::New()
   return tetButton;
 }
 
-Toolkit::TETButton::PressedSignalV2& TETButton::PressedSignal()
+Toolkit::TETButton::PressedSignalType& TETButton::PressedSignal()
 {
   return mPressedSignal;
 }
@@ -638,88 +638,88 @@ int UtcDaliPushButtonProperties(void)
   PushButton button = PushButton::New();
   Stage::GetCurrent().Add( button );
 
-  // PushButton::PROPERTY_AUTO_REPEATING
+  // Button::PROPERTY_AUTO_REPEATING
   button.SetAutoRepeating( false );
-  DALI_TEST_CHECK( ! button.GetProperty< bool >( PushButton::PROPERTY_AUTO_REPEATING ) );
-  button.SetProperty( PushButton::PROPERTY_AUTO_REPEATING, true );
+  DALI_TEST_CHECK( ! button.GetProperty< bool >( Button::PROPERTY_AUTO_REPEATING ) );
+  button.SetProperty( Button::PROPERTY_AUTO_REPEATING, true );
   DALI_TEST_CHECK( button.IsAutoRepeating() ) ;
-  DALI_TEST_CHECK( button.GetProperty< bool >( PushButton::PROPERTY_AUTO_REPEATING ) );
+  DALI_TEST_CHECK( button.GetProperty< bool >( Button::PROPERTY_AUTO_REPEATING ) );
 
-  // PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY
+  // Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY
   button.SetInitialAutoRepeatingDelay( 10.0f );
-  DALI_TEST_EQUALS( 10.0f, button.GetProperty< float >( PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY ), TEST_LOCATION );
-  button.SetProperty( PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY, 25.0f );
+  DALI_TEST_EQUALS( 10.0f, button.GetProperty< float >( Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY ), TEST_LOCATION );
+  button.SetProperty( Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY, 25.0f );
   DALI_TEST_EQUALS( 25.0f, button.GetInitialAutoRepeatingDelay(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 25.0f, button.GetProperty< float >( PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 25.0f, button.GetProperty< float >( Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY ), TEST_LOCATION );
 
-  //  PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY
+  //  Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY
   button.SetNextAutoRepeatingDelay( 3.0f );
-  DALI_TEST_EQUALS( 3.0f, button.GetProperty< float >( PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY ), TEST_LOCATION );
-  button.SetProperty( PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY, 4.0f );
+  DALI_TEST_EQUALS( 3.0f, button.GetProperty< float >( Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY ), TEST_LOCATION );
+  button.SetProperty( Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY, 4.0f );
   DALI_TEST_EQUALS( 4.0f, button.GetNextAutoRepeatingDelay(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 4.0f, button.GetProperty< float >( PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 4.0f, button.GetProperty< float >( Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY ), TEST_LOCATION );
 
-  //  PushButton::PROPERTY_TOGGLABLE
+  //  Button::PROPERTY_TOGGLABLE
   button.SetToggleButton( false );
-  DALI_TEST_CHECK( ! button.GetProperty< bool >( PushButton::PROPERTY_TOGGLABLE ) );
-  button.SetProperty( PushButton::PROPERTY_TOGGLABLE, true );
+  DALI_TEST_CHECK( ! button.GetProperty< bool >( Button::PROPERTY_TOGGLABLE ) );
+  button.SetProperty( Button::PROPERTY_TOGGLABLE, true );
   DALI_TEST_CHECK( button.IsToggleButton() ) ;
-  DALI_TEST_CHECK( button.GetProperty< bool >( PushButton::PROPERTY_TOGGLABLE ) );
+  DALI_TEST_CHECK( button.GetProperty< bool >( Button::PROPERTY_TOGGLABLE ) );
 
-  //  PushButton::PROPERTY_TOGGLE
+  //  Button::PROPERTY_TOGGLED
   button.SetToggled( false );
-  DALI_TEST_CHECK( ! button.GetProperty< bool >( PushButton::PROPERTY_TOGGLE ) );
-  button.SetProperty( PushButton::PROPERTY_TOGGLE, true );
+  DALI_TEST_CHECK( ! button.GetProperty< bool >( Button::PROPERTY_TOGGLED ) );
+  button.SetProperty( Button::PROPERTY_TOGGLED, true );
   DALI_TEST_CHECK( button.IsToggled() ) ;
-  DALI_TEST_CHECK( button.GetProperty< bool >( PushButton::PROPERTY_TOGGLE ) );
+  DALI_TEST_CHECK( button.GetProperty< bool >( Button::PROPERTY_TOGGLED ) );
 
-  //  PushButton::PROPERTY_NORMAL_STATE_ACTOR
+  //  Button::PROPERTY_NORMAL_STATE_ACTOR
   {
     button.SetButtonImage( Image::New( "IMAGE_PATH_1") );
-    DALI_TEST_EQUALS( "IMAGE_PATH_1", button.GetProperty( PushButton::PROPERTY_NORMAL_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
+    DALI_TEST_EQUALS( "IMAGE_PATH_1", button.GetProperty( Button::PROPERTY_NORMAL_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;
     map[ "type" ] = "ImageActor";
 
-    button.SetProperty( PushButton::PROPERTY_NORMAL_STATE_ACTOR, map );
-    DALI_TEST_EQUALS( "ImageActor", button.GetProperty( PushButton::PROPERTY_NORMAL_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+    button.SetProperty( Button::PROPERTY_NORMAL_STATE_ACTOR, map );
+    DALI_TEST_EQUALS( "ImageActor", button.GetProperty( Button::PROPERTY_NORMAL_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
   }
 
-  //  PushButton::PROPERTY_PRESSED_IMAGE
+  //  Button::PROPERTY_SELECTED_STATE_ACTOR
   {
-    button.SetPressedImage( Image::New( "IMAGE_PATH_2") );
-    DALI_TEST_EQUALS( "IMAGE_PATH_2", button.GetProperty( PushButton::PROPERTY_PRESSED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
+    button.SetSelectedImage( Image::New( "IMAGE_PATH_2") );
+    DALI_TEST_EQUALS( "IMAGE_PATH_2", button.GetProperty( Button::PROPERTY_SELECTED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;
     map[ "type" ] = "Actor";
 
-    button.SetProperty( PushButton::PROPERTY_PRESSED_STATE_ACTOR, map );
-    DALI_TEST_EQUALS( "Actor", button.GetProperty( PushButton::PROPERTY_PRESSED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
-    DALI_TEST_CHECK( "ImageActor" != button.GetProperty( PushButton::PROPERTY_PRESSED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >() );
+    button.SetProperty( Button::PROPERTY_SELECTED_STATE_ACTOR, map );
+    DALI_TEST_EQUALS( "Actor", button.GetProperty( Button::PROPERTY_SELECTED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+    DALI_TEST_CHECK( "ImageActor" != button.GetProperty( Button::PROPERTY_SELECTED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >() );
   }
 
-  //  PushButton::PROPERTY_DIMMED_STATE_ACTOR
+  //  Button::PROPERTY_DISABLED_STATE_ACTOR
   {
-    button.SetDimmedImage( Image::New( "IMAGE_PATH_3") );
-    DALI_TEST_EQUALS( "IMAGE_PATH_3", button.GetProperty( PushButton::PROPERTY_DIMMED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
+    button.SetDisabledImage( Image::New( "IMAGE_PATH_3") );
+    DALI_TEST_EQUALS( "IMAGE_PATH_3", button.GetProperty( Button::PROPERTY_DISABLED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;
     map[ "type" ] = "Actor";
 
-    button.SetProperty( PushButton::PROPERTY_DIMMED_STATE_ACTOR, map );
-    DALI_TEST_EQUALS( "Actor", button.GetProperty( PushButton::PROPERTY_DIMMED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+    button.SetProperty( Button::PROPERTY_DISABLED_STATE_ACTOR, map );
+    DALI_TEST_EQUALS( "Actor", button.GetProperty( Button::PROPERTY_DISABLED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
   }
 
-  //  PushButton::PROPERTY_LABEL_ACTOR
+  //  Button::PROPERTY_LABEL_ACTOR
   {
-    button.SetLabelText( "LABEL_TEXT_CUSTOM" );
-    DALI_TEST_EQUALS( "TextView", button.GetProperty( PushButton::PROPERTY_LABEL_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+    button.SetLabel( "LABEL_TEXT_CUSTOM" );
+    DALI_TEST_EQUALS( "TextView", button.GetProperty( Button::PROPERTY_LABEL_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;
     map[ "type" ] = "Actor";
 
-    button.SetProperty( PushButton::PROPERTY_LABEL_ACTOR, map );
-    DALI_TEST_EQUALS( "Actor", button.GetProperty( PushButton::PROPERTY_LABEL_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+    button.SetProperty( Button::PROPERTY_LABEL_ACTOR, map );
+    DALI_TEST_EQUALS( "Actor", button.GetProperty( Button::PROPERTY_LABEL_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
   }
   END_TEST;
 }

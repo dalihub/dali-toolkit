@@ -220,7 +220,7 @@ void EffectsView::SetOutputImage( FrameBufferImage image )
       }
       mActorForResult = Actor::New();
       mActorForResult.SetParentOrigin( ParentOrigin::CENTER );
-      mActorForResult.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+      mActorForResult.SetSize( mTargetSize );
       mActorForResult.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
 
       Self().Add( mActorForResult );
@@ -266,7 +266,6 @@ void EffectsView::SetupProperties()
   mEffectOffsetPropertyIndex   = self.RegisterProperty(EFFECT_OFFSET_PROPERTY_NAME, EFFECT_OFFSET_DEFAULT);
   mEffectColorPropertyIndex    = self.RegisterProperty(EFFECT_COLOR_PROPERTY_NAME, EFFECT_COLOR_DEFAULT);
   mActorPostFilter.ApplyConstraint( Constraint::New<Vector3>( Actor::POSITION, Source( self, mEffectOffsetPropertyIndex ), EqualToConstraint() ) );
-  mActorPostFilter.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
   mActorPostFilter.ApplyConstraint( Constraint::New<Vector4>( Actor::COLOR, Source( self, mEffectColorPropertyIndex ), EqualToConstraint() ) );
 }
 
@@ -290,12 +289,10 @@ void EffectsView::OnInitialize()
 
   mActorForChildren = ImageActor::New();
   mActorForChildren.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-  mActorForChildren.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) ); // same size as EffectsView object
   mActorForChildren.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
 
   mActorPostFilter = ImageActor::New();
   mActorPostFilter.SetParentOrigin( ParentOrigin::CENTER );
-  mActorPostFilter.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) ); // same size as EffectsView object
   mActorPostFilter.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
   mActorPostFilter.SetShaderEffect( ShaderEffect::New( "", EFFECTS_VIEW_FRAGMENT_SOURCE ) );
 
@@ -316,6 +313,38 @@ void EffectsView::OnControlSizeSet(const Vector3& targetSize)
   {
     AllocateResources();
   }
+
+  if( mActorForResult )
+  {
+    mActorForResult.SetSize( targetSize );
+  }
+  if( mActorForChildren )
+  {
+    mActorForChildren.SetSize( targetSize );
+  }
+  if( mActorPostFilter )
+  {
+    mActorPostFilter.SetSize( targetSize );
+  }
+
+  // Children render camera must move when EffectsView object is resized.
+  // This is since we cannot change render target size - so we need to remap the child actors' rendering
+  // accordingly so they still exactly fill the render target.
+  // Note that this means the effective resolution of the child render changes as the EffectsView object
+  // changes size, this is the trade off for not being able to modify render target size
+  // Change camera z position based on EffectsView actor height
+  if( mCameraForChildren )
+  {
+    const float cameraPosScale( 0.5f / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f) );
+    mCameraForChildren.SetZ( targetSize.height * cameraPosScale );
+  }
+
+  const size_t numFilters( mFilters.size() );
+  for( size_t i = 0; i < numFilters; ++i )
+  {
+    mFilters[i]->SetSize( mTargetSize );
+  }
+
 }
 
 void EffectsView::OnStageDisconnection()
@@ -421,7 +450,7 @@ void EffectsView::AllocateResources()
 
 void EffectsView::SetupCameras()
 {
-  const float cameraPosConstraintScale( 0.5f / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f) );
+  const float cameraPosScale( 0.5f / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f) );
 
   // Create and place a camera for the children render, corresponding to its render target size
   mCameraForChildren.SetFieldOfView(ARBITRARY_FIELD_OF_VIEW);
@@ -429,17 +458,9 @@ void EffectsView::SetupCameras()
   mCameraForChildren.SetNearClippingPlane(1.0f);
   mCameraForChildren.SetAspectRatio(mTargetSize.width / mTargetSize.height);
   mCameraForChildren.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
-  mCameraForChildren.SetPosition(0.0f, 0.0f, mTargetSize.height * cameraPosConstraintScale);
+  mCameraForChildren.SetPosition(0.0f, 0.0f, mTargetSize.height * cameraPosScale);
   mCameraForChildren.SetRotation(Quaternion(M_PI, Vector3::YAXIS));
-
-  // Children render camera must move when EffectsView object is resized.
-  // This is since we cannot change render target size - so we need to remap the child actors' rendering
-  // accordingly so they still exactly fill the render target.
-  // Note that this means the effective resolution of the child render changes as the EffectsView object
-  // changes size, this is the trade off for not being able to modify render target size
-  // Change camera z position based on EffectsView actor height
-  mCameraForChildren.RemoveConstraints();
-  mCameraForChildren.ApplyConstraint( Constraint::New<float>( Actor::POSITION_Z, ParentSource( Actor::SIZE_HEIGHT ), RelativeToConstraintFloat(cameraPosConstraintScale) ) );
+  mCameraForChildren.SetZ( mTargetSize.height * cameraPosScale );
 }
 
 void EffectsView::CreateRenderTasks()

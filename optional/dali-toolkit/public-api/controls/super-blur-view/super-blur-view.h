@@ -62,7 +62,7 @@ public:
   /**
    * @brief Signal type for notifications.
    */
-  typedef SignalV2< void (SuperBlurView source) > SuperBlurViewSignal;
+  typedef Signal< void (SuperBlurView source) > SuperBlurViewSignal;
 
   /**
    * @brief Creates an empty SuperBlurView handle.

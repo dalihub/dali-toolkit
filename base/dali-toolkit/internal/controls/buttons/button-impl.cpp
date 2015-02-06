@@ -22,18 +22,22 @@
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
 
-namespace
-{
-const char* const PROPERTY_DIMMED = "dimmed";
-} // unnamed namespace
-
 namespace Dali
 {
 
 namespace Toolkit
 {
 
-const Property::Index Button::PROPERTY_DIMMED( Internal::Button::BUTTON_PROPERTY_START_INDEX );
+const Property::Index Button::PROPERTY_DISABLED                     = Internal::Button::BUTTON_PROPERTY_START_INDEX;
+const Property::Index Button::PROPERTY_AUTO_REPEATING               = Internal::Button::BUTTON_PROPERTY_START_INDEX + 1;
+const Property::Index Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY = Internal::Button::BUTTON_PROPERTY_START_INDEX + 2;
+const Property::Index Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY    = Internal::Button::BUTTON_PROPERTY_START_INDEX + 3;
+const Property::Index Button::PROPERTY_TOGGLABLE                    = Internal::Button::BUTTON_PROPERTY_START_INDEX + 4;
+const Property::Index Button::PROPERTY_TOGGLED                      = Internal::Button::BUTTON_PROPERTY_START_INDEX + 5;
+const Property::Index Button::PROPERTY_NORMAL_STATE_ACTOR           = Internal::Button::BUTTON_PROPERTY_START_INDEX + 6;
+const Property::Index Button::PROPERTY_SELECTED_STATE_ACTOR         = Internal::Button::BUTTON_PROPERTY_START_INDEX + 7;
+const Property::Index Button::PROPERTY_DISABLED_STATE_ACTOR         = Internal::Button::BUTTON_PROPERTY_START_INDEX + 8;
+const Property::Index Button::PROPERTY_LABEL_ACTOR                  = Internal::Button::BUTTON_PROPERTY_START_INDEX + 9;
 
 namespace Internal
 {
@@ -50,17 +54,26 @@ BaseHandle Create()
 TypeRegistration typeRegistration( typeid(Toolkit::Button), typeid(Toolkit::Control), Create );
 
 SignalConnectorType signalConnector1( typeRegistration, Toolkit::Button::SIGNAL_CLICKED, &Button::DoConnectSignal );
-SignalConnectorType signalConnector2( typeRegistration, Toolkit::Button::SIGNAL_TOGGLED, &Button::DoConnectSignal );
+SignalConnectorType signalConnector2( typeRegistration, Toolkit::Button::SIGNAL_STATE_CHANGED, &Button::DoConnectSignal );
 
-PropertyRegistration property1( typeRegistration, "dimmed", Toolkit::Button::PROPERTY_DIMMED, Property::BOOLEAN, &Button::SetProperty, &Button::GetProperty );
+PropertyRegistration property1( typeRegistration, "disabled",                     Toolkit::Button::PROPERTY_DISABLED,                     Property::BOOLEAN, &Button::SetProperty, &Button::GetProperty );
+PropertyRegistration property2( typeRegistration, "auto-repeating",               Toolkit::Button::PROPERTY_AUTO_REPEATING,               Property::BOOLEAN, &Button::SetProperty, &Button::GetProperty );
+PropertyRegistration property3( typeRegistration, "initial-auto-repeating-delay", Toolkit::Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY, Property::FLOAT,   &Button::SetProperty, &Button::GetProperty );
+PropertyRegistration property4( typeRegistration, "next-auto-repeating-delay",    Toolkit::Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY,    Property::FLOAT,   &Button::SetProperty, &Button::GetProperty );
+PropertyRegistration property5( typeRegistration, "togglable",                    Toolkit::Button::PROPERTY_TOGGLABLE,                    Property::BOOLEAN, &Button::SetProperty, &Button::GetProperty );
+PropertyRegistration property6( typeRegistration, "toggled",                      Toolkit::Button::PROPERTY_TOGGLED,                      Property::BOOLEAN, &Button::SetProperty, &Button::GetProperty );
+PropertyRegistration property7( typeRegistration, "normal-state-actor",           Toolkit::Button::PROPERTY_NORMAL_STATE_ACTOR,           Property::MAP,     &Button::SetProperty, &Button::GetProperty );
+PropertyRegistration property8( typeRegistration, "selected-state-actor",         Toolkit::Button::PROPERTY_SELECTED_STATE_ACTOR,         Property::MAP,     &Button::SetProperty, &Button::GetProperty );
+PropertyRegistration property9( typeRegistration, "disabled-state-actor",         Toolkit::Button::PROPERTY_DISABLED_STATE_ACTOR,         Property::MAP,     &Button::SetProperty, &Button::GetProperty );
+PropertyRegistration property10( typeRegistration, "label-actor",                 Toolkit::Button::PROPERTY_LABEL_ACTOR,                  Property::MAP,     &Button::SetProperty, &Button::GetProperty );
 
 } // unnamed namespace
 
 Button::Button()
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+  mPainter( NULL ),
   mState( ButtonUp ),
-  mDimmed( false ),
-  mPainter( NULL )
+  mDisabled( false )
 {
 }
 
@@ -68,21 +81,21 @@ Button::~Button()
 {
 }
 
-void Button::SetDimmed( bool dimmed )
+void Button::SetDisabled( bool disabled )
 {
-  mDimmed = dimmed;
+  mDisabled = disabled;
 
   // Notifies the painter.
   Toolkit::Button handle( GetOwner() );
   if( mPainter )
   {
-    mPainter->SetDimmed( handle, mDimmed );
+    mPainter->SetDisabled( handle, mDisabled );
   }
 }
 
-bool Button::IsDimmed() const
+bool Button::IsDisabled() const
 {
-  return mDimmed;
+  return mDisabled;
 }
 
 void Button::SetAnimationTime( float animationTime )
@@ -100,19 +113,29 @@ void Button::OnAnimationTimeSet( float animationTime )
   // nothing to do.
 }
 
+void Button::OnButtonDown()
+{
+
+}
+
+void Button::OnButtonUp()
+{
+
+}
+
 float Button::OnAnimationTimeRequested() const
 {
   return 0.f;
 }
 
-Toolkit::Button::ClickedSignalV2& Button::ClickedSignal()
+Toolkit::Button::ClickedSignalType& Button::ClickedSignal()
 {
-  return mClickedSignalV2;
+  return mClickedSignal;
 }
 
-Toolkit::Button::ToggledSignalV2& Button::ToggledSignal()
+Toolkit::Button::StateChangedSignalType& Button::StateChangedSignal()
 {
-  return mToggledSignalV2;
+  return mStateChangedSignal;
 }
 
 bool Button::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -126,9 +149,9 @@ bool Button::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tr
   {
     button.ClickedSignal().Connect( tracker, functor );
   }
-  else if( Dali::Toolkit::Button::SIGNAL_TOGGLED == signalName )
+  else if( Dali::Toolkit::Button::SIGNAL_STATE_CHANGED == signalName )
   {
-    button.ToggledSignal().Connect( tracker, functor );
+    button.StateChangedSignal().Connect( tracker, functor );
   }
   else
   {
@@ -141,9 +164,9 @@ bool Button::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tr
 
 bool Button::OnTouchEvent(const TouchEvent& event)
 {
-  // Only events are processed when the button is not dimmed and the touch event has only
+  // Only events are processed when the button is not disabled and the touch event has only
   // one touch point.
-  if( ( !mDimmed ) && ( 1 == event.GetPointCount() ) )
+  if( ( !mDisabled ) && ( 1 == event.GetPointCount() ) )
   {
     switch( event.GetPoint(0).state )
     {
@@ -247,9 +270,9 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
 {
   Toolkit::Button button = Toolkit::Button::DownCast( Dali::BaseHandle( object ) );
 
-  if ( button && ( index == Toolkit::Button::PROPERTY_DIMMED ) )
+  if ( button && ( index == Toolkit::Button::PROPERTY_DISABLED ) )
   {
-    GetImplementation( button ).SetDimmed( value.Get<bool>() );
+    GetImplementation( button ).SetDisabled( value.Get<bool>() );
   }
 }
 
@@ -257,9 +280,9 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
 {
   Toolkit::Button button = Toolkit::Button::DownCast( Dali::BaseHandle( object ) );
 
-  if ( button && ( propertyIndex == Toolkit::Button::PROPERTY_DIMMED ) )
+  if ( button && ( propertyIndex == Toolkit::Button::PROPERTY_DISABLED ) )
   {
-    return Property::Value( GetImplementation( button ).mDimmed );
+    return Property::Value( GetImplementation( button ).mDisabled );
   }
 
   return Property::Value();

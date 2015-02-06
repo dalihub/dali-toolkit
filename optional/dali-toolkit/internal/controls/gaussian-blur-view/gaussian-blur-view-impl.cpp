@@ -256,8 +256,6 @@ void GaussianBlurView::OnInitialize()
 {
   // root actor to parent all user added actors, needed to allow us to set that subtree as exclusive for our child render task
   mChildrenRoot.SetParentOrigin(ParentOrigin::CENTER);
-  mChildrenRoot.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) ); // same size as GaussianBlurView object
-
 
   //////////////////////////////////////////////////////
   // Create shaders
@@ -297,7 +295,6 @@ void GaussianBlurView::OnInitialize()
   {
     mImageActorComposite = ImageActor::New();
     mImageActorComposite.SetParentOrigin(ParentOrigin::CENTER);
-    mImageActorComposite.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) ); // same size as GaussianBlurView object
     mImageActorComposite.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
     mImageActorComposite.SetOpacity(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
 
@@ -307,7 +304,6 @@ void GaussianBlurView::OnInitialize()
     // Create an ImageActor for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
     mTargetActor = ImageActor::New();
     mTargetActor.SetParentOrigin(ParentOrigin::CENTER);
-    mTargetActor.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) ); // same size as GaussianBlurView object
     mTargetActor.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
 
 
@@ -370,6 +366,22 @@ void GaussianBlurView::OnControlSizeSet(const Vector3& targetSize)
 {
   mTargetSize = Vector2(targetSize);
 
+  mChildrenRoot.SetSize(targetSize);
+
+  if( !mBlurUserImage )
+  {
+    mImageActorComposite.SetSize(targetSize);
+    mTargetActor.SetSize(targetSize);
+
+    // Children render camera must move when GaussianBlurView object is resized. This is since we cannot change render target size - so we need to remap the child actors' rendering
+    // accordingly so they still exactly fill the render target. Note that this means the effective resolution of the child render changes as the GaussianBlurView object changes
+    // size, this is the trade off for not being able to modify render target size
+    // Change camera z position based on GaussianBlurView actor height
+    float cameraPosConstraintScale = 0.5f / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f);
+    mRenderFullSizeCamera.SetZ(mTargetSize.height * cameraPosConstraintScale);
+  }
+
+
   // if we are already on stage, need to update render target sizes now to reflect the new size of this actor
   if(Self().OnStage())
   {
@@ -413,13 +425,6 @@ void GaussianBlurView::AllocateResources()
 
       float cameraPosConstraintScale = 0.5f / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f);
       mRenderFullSizeCamera.SetPosition(0.0f, 0.0f, mTargetSize.height * cameraPosConstraintScale);
-
-      // Children render camera must move when GaussianBlurView object is resized. This is since we cannot change render target size - so we need to remap the child actors' rendering
-      // accordingly so they still exactly fill the render target. Note that this means the effective resolution of the child render changes as the GaussianBlurView object changes
-      // size, this is the trade off for not being able to modify render target size
-      // Change camera z position based on GaussianBlurView actor height
-      mRenderFullSizeCamera.RemoveConstraints();
-      mRenderFullSizeCamera.ApplyConstraint( Constraint::New<Vector3>( Actor::POSITION, ParentSource( Actor::SIZE ), ZrelativeToYconstraint(cameraPosConstraintScale) ) );
 
       // create offscreen buffer of new size to render our child actors to
       mRenderTargetForRenderingChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::Unused );

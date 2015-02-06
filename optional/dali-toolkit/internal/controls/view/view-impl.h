@@ -117,7 +117,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::View::AnimationStartedSignalOrientation()
    */
-  Toolkit::View::OrientationAnimationStartedSignalV2& OrientationAnimationStartedSignal();
+  Toolkit::View::OrientationAnimationStartedSignalType& OrientationAnimationStartedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -175,7 +175,7 @@ private:
   float          mOrientationFunction[4]; ///< The orientation function used to transform from degrees to the internal orientation.
   bool           mAutoRotateEnabled;      ///< Whether the view rotates if the OrientationChanged method is called.
 
-  Toolkit::View::OrientationAnimationStartedSignalV2 mOrientationAnimationStartedSignalV2;
+  Toolkit::View::OrientationAnimationStartedSignalType mOrientationAnimationStartedSignal;
 };
 
 } // namespace Internal

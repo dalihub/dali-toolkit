@@ -75,7 +75,7 @@ int UtcDaliCheckBoxButtonSetGetChecked(void)
   tet_infoline(" UtcDaliCheckBoxButtonSetGetChecked");
 
   CheckBoxButton checkBoxButton = CheckBoxButton::New();
-  checkBoxButton.ToggledSignal().Connect( &CheckBoxButtonClicked );
+  checkBoxButton.StateChangedSignal().Connect( &CheckBoxButtonClicked );
 
   // global var used to check if CheckBoxButtonClicked is called;
   gCheckBoxButtonState = false;
@@ -168,42 +168,42 @@ int UtcDaliCheckBoxButtonSetImages(void)
   DALI_TEST_EQUALS( size.width, 40.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 40.f, TEST_LOCATION );
 
-  checkBoxButton.SetDimmedBackgroundImage( image03 );
+  checkBoxButton.SetDisabledBackgroundImage( image03 );
 
   application.SendNotification();
   application.Render();
 
-  size = checkBoxButton.GetDimmedBackgroundImage().GetCurrentSize();
+  size = checkBoxButton.GetDisabledBackgroundImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 50.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 50.f, TEST_LOCATION );
 
-  checkBoxButton.SetDimmedBackgroundImage( imageActor03 );
+  checkBoxButton.SetDisabledBackgroundImage( imageActor03 );
 
   application.SendNotification();
   application.Render();
 
-  size = checkBoxButton.GetDimmedBackgroundImage().GetCurrentSize();
+  size = checkBoxButton.GetDisabledBackgroundImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 60.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 60.f, TEST_LOCATION );
 
-  checkBoxButton.SetDimmedCheckedImage( image04 );
+  checkBoxButton.SetDisabledCheckedImage( image04 );
 
   application.SendNotification();
   application.Render();
 
-  size = checkBoxButton.GetDimmedCheckedImage().GetCurrentSize();
+  size = checkBoxButton.GetDisabledCheckedImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 70.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 70.f, TEST_LOCATION );
 
-  checkBoxButton.SetDimmedCheckedImage( imageActor04 );
+  checkBoxButton.SetDisabledCheckedImage( imageActor04 );
 
   application.SendNotification();
   application.Render();
 
-  size = checkBoxButton.GetDimmedCheckedImage().GetCurrentSize();
+  size = checkBoxButton.GetDisabledCheckedImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 80.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 80.f, TEST_LOCATION );

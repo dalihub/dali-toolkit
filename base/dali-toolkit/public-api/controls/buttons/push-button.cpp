@@ -158,72 +158,72 @@ Actor PushButton::GetBackgroundImage() const
   return Dali::Toolkit::GetImplementation( *this ).GetBackgroundImage();
 }
 
-void PushButton::SetPressedImage( Image image )
+void PushButton::SetSelectedImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetPressedImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( image );
 }
 
-void PushButton::SetPressedImage( Actor image )
+void PushButton::SetSelectedImage( Actor image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetPressedImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( image );
 }
 
-Actor PushButton::GetPressedImage() const
+Actor PushButton::GetSelectedImage() const
 {
-  return Dali::Toolkit::GetImplementation( *this ).GetPressedImage();
+  return Dali::Toolkit::GetImplementation( *this ).GetSelectedImage();
 }
 
-void PushButton::SetDimmedBackgroundImage( Image image )
+void PushButton::SetDisabledBackgroundImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDimmedBackgroundImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( image );
 }
 
-void PushButton::SetDimmedBackgroundImage( Actor image )
+void PushButton::SetDisabledBackgroundImage( Actor image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDimmedBackgroundImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( image );
 }
 
-Actor PushButton::GetDimmedBackgroundImage() const
+Actor PushButton::GetDisabledBackgroundImage() const
 {
-  return Dali::Toolkit::GetImplementation( *this ).GetDimmedBackgroundImage();
+  return Dali::Toolkit::GetImplementation( *this ).GetDisabledBackgroundImage();
 }
 
-void PushButton::SetDimmedImage( Image image )
+void PushButton::SetDisabledImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDimmedImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledImage( image );
 }
 
-void PushButton::SetDimmedImage( Actor image )
+void PushButton::SetDisabledImage( Actor image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDimmedImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledImage( image );
 }
 
-Actor PushButton::GetDimmedImage() const
+Actor PushButton::GetDisabledImage() const
 {
-  return Dali::Toolkit::GetImplementation( *this ).GetDimmedImage();
+  return Dali::Toolkit::GetImplementation( *this ).GetDisabledImage();
 }
 
-void PushButton::SetLabelText( const std::string& text )
+void PushButton::SetLabel( const std::string& label )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetLabelText( text );
+  Dali::Toolkit::GetImplementation( *this ).SetLabel( label );
 }
 
-void PushButton::SetLabelText( Actor text )
+void PushButton::SetLabel( Actor label )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetLabelText( text );
+  Dali::Toolkit::GetImplementation( *this ).SetLabel( label );
 }
 
-Actor PushButton::GetLabelText() const
+Actor PushButton::GetLabel() const
 {
-  return Dali::Toolkit::GetImplementation( *this ).GetLabelText();
+  return Dali::Toolkit::GetImplementation( *this ).GetLabel();
 }
 
-PushButton::PressedSignalV2& PushButton::PressedSignal()
+PushButton::PressedSignalType& PushButton::PressedSignal()
 {
   return Dali::Toolkit::GetImplementation( *this ).PressedSignal();
 }
 
-PushButton::ReleasedSignalV2& PushButton::ReleasedSignal()
+PushButton::ReleasedSignalType& PushButton::ReleasedSignal()
 {
   return Dali::Toolkit::GetImplementation( *this ).ReleasedSignal();
 }

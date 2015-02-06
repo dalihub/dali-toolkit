@@ -149,7 +149,7 @@ Path Builder::GetPath( const std::string &name )
   return GetImpl(*this).GetPath( name );
 }
 
-Builder::Signal& Builder::QuitSignal()
+Builder::BuilderSignalType& Builder::QuitSignal()
 {
   return GetImpl( *this ).QuitSignal();
 }

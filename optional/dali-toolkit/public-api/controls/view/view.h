@@ -187,12 +187,12 @@ public:
 public: //Signals
 
   // Orientation change animation starts.
-  typedef SignalV2< void ( View, Animation&, const Orientation& ) > OrientationAnimationStartedSignalV2;
+  typedef Signal< void ( View, Animation&, const Orientation& ) > OrientationAnimationStartedSignalType;
 
   /**
    * Signal emitted just before the rotate animation starts when the device orientation changes.
    */
-  OrientationAnimationStartedSignalV2& OrientationAnimationStartedSignal();
+  OrientationAnimationStartedSignalType& OrientationAnimationStartedSignal();
 
 public: // Not intended for application developers
 

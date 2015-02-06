@@ -20,7 +20,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/common/map-wrapper.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {

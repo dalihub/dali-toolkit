@@ -25,7 +25,7 @@
 #include <string>
 #include <boost/function.hpp>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 #include <dali/public-api/events/touch-point.h>
 
 namespace Dali
@@ -47,7 +47,7 @@ class TouchPoint;
 class AccessibilityManager : public BaseHandle
 {
 public: // Typedefs
-  typedef SignalV2< bool ( AccessibilityManager& ) > AccessibilityActionSignalV2;
+  typedef Signal< bool ( AccessibilityManager& ) > AccessibilityActionSignalType;
 
 public: // Construction & Destruction
   AccessibilityManager();
@@ -74,18 +74,18 @@ public: // Getters
   void HandleActionDisableEvent();
 
 public:  // Signals
-  AccessibilityActionSignalV2& StatusChangedSignal();
-  AccessibilityActionSignalV2& ActionNextSignal();
-  AccessibilityActionSignalV2& ActionPreviousSignal();
-  AccessibilityActionSignalV2& ActionActivateSignal();
-  AccessibilityActionSignalV2& ActionReadSignal();
-  AccessibilityActionSignalV2& ActionOverSignal();
-  AccessibilityActionSignalV2& ActionReadNextSignal();
-  AccessibilityActionSignalV2& ActionReadPreviousSignal();
-  AccessibilityActionSignalV2& ActionUpSignal();
-  AccessibilityActionSignalV2& ActionDownSignal();
-  AccessibilityActionSignalV2& ActionClearFocusSignal();
-  AccessibilityActionSignalV2& ActionBackSignal();
+  AccessibilityActionSignalType& StatusChangedSignal();
+  AccessibilityActionSignalType& ActionNextSignal();
+  AccessibilityActionSignalType& ActionPreviousSignal();
+  AccessibilityActionSignalType& ActionActivateSignal();
+  AccessibilityActionSignalType& ActionReadSignal();
+  AccessibilityActionSignalType& ActionOverSignal();
+  AccessibilityActionSignalType& ActionReadNextSignal();
+  AccessibilityActionSignalType& ActionReadPreviousSignal();
+  AccessibilityActionSignalType& ActionUpSignal();
+  AccessibilityActionSignalType& ActionDownSignal();
+  AccessibilityActionSignalType& ActionClearFocusSignal();
+  AccessibilityActionSignalType& ActionBackSignal();
 
   AccessibilityManager( Internal::Adaptor::AccessibilityManager* manager );
 };

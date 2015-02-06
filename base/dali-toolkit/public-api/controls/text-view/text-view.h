@@ -614,7 +614,7 @@ public:
 
 public:
   /// @brief Signal types
-  typedef SignalV2< void ( TextView textView, Vector2 scrollDelta ) > ScrolledSignalV2;
+  typedef Signal< void ( TextView textView, Vector2 scrollDelta ) > ScrolledSignalType;
 
   /**
    * @brief Signal emitted when the text is scrolled inside the text-view.
@@ -627,7 +627,7 @@ public:
    * \e scrollDelta is the differente of the current scroll position with the previous one.
    * @return The signal to connect to
    */
-  ScrolledSignalV2& ScrolledSignal();
+  ScrolledSignalType& ScrolledSignal();
 
 public: // Not intended for application developers
 

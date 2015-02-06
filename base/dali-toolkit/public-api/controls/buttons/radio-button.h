@@ -37,30 +37,24 @@ class RadioButton;
 }
 
 /**
- * @brief A RadioButton provides a radio button which two states \e active or \e inactive.
+ * @brief A RadioButton provides a radio button which two states \e selected or \e unselected.
  *
  * Radio buttons are designed to select one of many option at the same time.
  *
- * Every button have its own \e label and \e state, which can be modified by RadioButton::SetLabel and RadioButton::SetActive.
+ * Every button have its own \e label and \e state, which can be modified by RadioButton::SetLabel and RadioButton::SetSelected.
  *
  * RadioButton can change its current state using RadioButton::ToggleState.
  *
  * RadioButtons can be grouped.
  * Two or more RadioButtons are in one group when they have this same parent.
- * In each groups only one RadioButton can be \e active at a given time.
- * So when RadioButton is set to \e active, other RadioButtons in its group are set to \e inactive.
- * When \e active RadioButton is set to \e inactive no other RadioButtons in his group is set to \e active.
+ * In each groups only one RadioButton can be \e selected at a given time.
+ * So when RadioButton is set to \e selected, other RadioButtons in its group are set to \e unselected.
+ * When \e selected RadioButton is set to \e unselected no other RadioButtons in his group is set to \e selected.
  *
- * A Button::ClickedSignal() is emitted when the RadioButton change its state to \e active or \e inactive.
+ * A Button::ClickedSignal() is emitted when the RadioButton change its state to \e selected or \e unselected.
  */
 class DALI_IMPORT_API RadioButton: public Button
 {
- public:
-
-  // Properties
-  static const Property::Index PROPERTY_ACTIVE;         ///< name "active",           @see SetActive(),     type BOOLEAN
-  static const Property::Index PROPERTY_LABEL_ACTOR;    ///< name "label-actor",      @see SetLabel(),      type MAP
-
  public:
   /**
    * @brief Create an uninitialized RadioButton; this can be initialized with RadioButton::New().
@@ -144,21 +138,21 @@ class DALI_IMPORT_API RadioButton: public Button
   Actor GetLabel() const;
 
   /**
-   * @brief Sets the button as active or inactive.
+   * @brief Sets the button as selected or unselected.
    *
-   * @param[in] active property
+   * @param[in] selected property
    */
-  void SetActive(bool active);
+  void SetSelected(bool selected);
 
   /**
-   * @return true if button is active, false if button is inactive.
+   * @return true if button is selected, false if button is unselected.
    */
-  bool IsActive()const;
+  bool IsSelected()const;
 
   /**
    * @brief Change button state.
    *
-   * If button is active deactivate it. If button is inactive activate it.
+   * If button is selected unselect it. If button is unselected select it.
    */
   void ToggleState();
 

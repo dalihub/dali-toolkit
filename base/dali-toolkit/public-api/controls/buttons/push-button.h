@@ -51,29 +51,29 @@ class PushButton;
  *
  *       The intervals could be modified with the PushButton::SetInitialAutoRepeatingDelay and PushButton::SetNextAutoRepeatingDelay methods.
  *
- *       A \e toggle button can't be \e autorepeating. If the \e autorepeating property is set to \e true, then the \e toggle property is set to
+ *       A \e toggle button can't be \e autorepeating. If the \e autorepeating property is set to \e true, then the \e toggled property is set to
  *       false but no signal is emitted.
  *
  *   <li>\e toggle
  *
- *       When \e toggle is set to \e true, a PushButton::ToggledSignal() signal is emitted, with the toggle state, every time the button is touched instead
+ *       When \e toggle is set to \e true, a Button::StateChangedSignal() signal is emitted, with the toggle state, every time the button is touched instead
  *       of emit PushButton::PressedSignal(), Button::ClickedSignal() and PushButton::ReleasedSignal() signals.
  *
- *       An \e autorepeating button can't be \e toggle. If the \e toggle property is set to \e true, then the \e autorepeating property is set to false.
+ *       An \e autorepeating button can't be \e toggle. If the \e toggled property is set to \e true, then the \e autorepeating property is set to false.
  * </ul>
  *
  * The button's appearance could be modified by setting images or actors with PushButton::SetButtonImage, PushButton::SetBackgroundImage,
- * PushButton::SetPressedImage, PushButton::SetDimmedBackgroundImage and  PushButton::SetDimmedImage or setting a text with
- * PushButton::SetLabelText.
+ * PushButton::SetSelectedImage, PushButton::SetDisabledBackgroundImage and  PushButton::SetDisabledImage or setting a text with
+ * PushButton::SetLabel.
  *
  * The \e background is always shown and doesn't change if the button is pressed or released. The \e button image is shown over the \e background image when the
- * button is not pressed and is replaced by the \e pressed image when the button is pressed. The text label is placed always on the top of all images.
+ * button is not pressed and is replaced by the \e selected image when the button is pressed. The text label is placed always on the top of all images.
  *
- * When the button is dimmed, \e background, \e button and \e pressed images are replaced by their \e dimmed images.
+ * When the button is disabled, \e background, \e button and \e selected images are replaced by their \e disabled images.
  *
  * The methods used to modify the button's appearance could receive Dali::Actor objects as a parameter, so more complex images could be defined.
  *
- * Is not mandatory set all images. A button could be defined only by setting its \e background image or by setting its \e background and \e pressed images.
+ * Is not mandatory set all images. A button could be defined only by setting its \e background image or by setting its \e background and \e selected images.
  */
 class DALI_IMPORT_API PushButton : public Button
 {
@@ -85,17 +85,6 @@ public:
 
   //Action Names
   static const char* const ACTION_PUSH_BUTTON_CLICK; ///< name "push-button-click"
-
-  // Properties
-  static const Property::Index PROPERTY_AUTO_REPEATING;               ///< name "auto-repeating",               @see SetAutoRepeating(),             type BOOLEAN
-  static const Property::Index PROPERTY_INITIAL_AUTO_REPEATING_DELAY; ///< name "initial-auto-repeating-delay", @see SetInitialAutoRepeatingDelay(), type FLOAT
-  static const Property::Index PROPERTY_NEXT_AUTO_REPEATING_DELAY;    ///< name "next-auto-repeating-delay",    @see SetNextAutoRepeatingDelay(),    type FLOAT
-  static const Property::Index PROPERTY_TOGGLABLE;                    ///< name "togglable",                    @see SetToggleButton(),              type BOOLEAN
-  static const Property::Index PROPERTY_TOGGLE;                       ///< name "toggle",                       @see SetToggled(),                   type BOOLEAN
-  static const Property::Index PROPERTY_NORMAL_STATE_ACTOR;           ///< name "button-state-actor",           @see SetButtonImage(),               type MAP
-  static const Property::Index PROPERTY_PRESSED_STATE_ACTOR;          ///< name "pressed-state-actor",          @see SetPressedImage(),              type MAP
-  static const Property::Index PROPERTY_DIMMED_STATE_ACTOR;           ///< name "dimmed-state-actor",           @see SetDimmedImage(),               type MAP
-  static const Property::Index PROPERTY_LABEL_ACTOR;                  ///< name "label-actor",                  @see SetLabelText(),                 type STRING
 
 public:
 
@@ -144,7 +133,7 @@ public:
   /**
    * @brief Sets the \e autorepeating property.
    *
-   * If the \e autorepeating property is set to \e true, then the \e toggle property is set to false
+   * If the \e autorepeating property is set to \e true, then the \e toggled property is set to false
    * but no signal is emitted.
    *
    * @param[in] autoRepeating \e autorepeating property.
@@ -187,32 +176,32 @@ public:
   float GetNextAutoRepeatingDelay() const;
 
   /**
-   * @brief Sets the \e toggle property.
+   * @brief Sets the \e toggled property.
    *
-   * If the \e toggle property is set to \e true, then the \e autorepeating property is set to false.
+   * If the \e toggled property is set to \e true, then the \e autorepeating property is set to false.
    *
    * @param[in] toggle property.
    */
   void SetToggleButton( bool toggle );
 
   /**
-   * @return \e true if the \e toggle property is set.
+   * @return \e true if the \e toggled property is set.
    */
   bool IsToggleButton() const;
 
   /**
    * @brief Sets the button as toggled or not toggled.
    *
-   * \e toggle property must be set to \e true.
+   * \e toggled property must be set to \e true.
    *
-   * Emits a PushButton::ToggledSignal() signal.
+   * Emits a Button::StateChangedSignal() signal.
    *
    * @param[in] toggle state.
    */
   void SetToggled( bool toggle );
 
   /**
-   * @return \e true if the \e toggle property is set and the button is toggled.
+   * @return \e true if the \e toggled property is set and the button is toggled.
    */
   bool IsToggled() const;
 
@@ -255,98 +244,98 @@ public:
   Actor GetBackgroundImage() const;
 
   /**
-   * @brief Sets the pressed image.
+   * @brief Sets the selected image.
    *
-   * @param[in] image The pressed image.
+   * @param[in] image The selected image.
    */
-  void SetPressedImage( Image image );
+  void SetSelectedImage( Image image );
 
   /**
-   * @copydoc SetPressedImage( Image image )
+   * @copydoc SetSelectedImage( Image image )
    */
-  void SetPressedImage( Actor image );
+  void SetSelectedImage( Actor image );
 
   /**
-   * @brief Gets the pressed image.
+   * @brief Gets the selected image.
    *
-   * @return An actor with the pressed image.
+   * @return An actor with the selected image.
    */
-  Actor GetPressedImage() const;
+  Actor GetSelectedImage() const;
 
   /**
-   * @brief Sets the dimmed background image.
+   * @brief Sets the disabled background image.
    *
-   * @param[in] image The dimmed background image.
+   * @param[in] image The disabled background image.
    */
-  void SetDimmedBackgroundImage( Image image );
+  void SetDisabledBackgroundImage( Image image );
 
   /**
-   * @copydoc SetDimmedBackgroundImage( Image image )
+   * @copydoc SetDisabledBackgroundImage( Image image )
    */
-  void SetDimmedBackgroundImage( Actor image );
+  void SetDisabledBackgroundImage( Actor image );
 
   /**
-   * @brief Gets the dimmed background image.
+   * @brief Gets the disabled background image.
    *
-   * @return An actor with the dimmed background image.
+   * @return An actor with the disabled background image.
    */
-  Actor GetDimmedBackgroundImage() const;
+  Actor GetDisabledBackgroundImage() const;
 
   /**
-   * @brief Sets the dimmed button image.
+   * @brief Sets the disabled button image.
    *
-   * @param[in] image The dimmed button image.
+   * @param[in] image The disabled button image.
    */
-  void SetDimmedImage( Image image );
+  void SetDisabledImage( Image image );
 
   /**
-   * @copydoc SetDimmedImage( Image image )
+   * @copydoc SetDisabledImage( Image image )
    */
-  void SetDimmedImage( Actor image );
+  void SetDisabledImage( Actor image );
 
   /**
-   * @brief Gets the dimmed image.
+   * @brief Gets the disabled image.
    *
-   * @return An actor with the dimmed image.
+   * @return An actor with the disabled image.
    */
-  Actor GetDimmedImage() const;
+  Actor GetDisabledImage() const;
 
   /**
-   * @brief Sets the text label.
+   * @brief Sets the button label.
    *
-   * @param[in] text Label text.
+   * @param[in] label The button label.
    */
-  void SetLabelText( const std::string& text );
+  void SetLabel( const std::string& label );
 
   /**
-   * @copydoc SetLabelText( const std::string& text )
+   * @copydoc SetLabel( const std::string& label )
    */
-  void SetLabelText( Actor text );
+  void SetLabel( Actor label );
 
   /**
-   * @brief Gets the label text.
+   * @brief Gets the label.
    *
-   * @return An actor with the label text.
+   * @return An actor with the label.
    */
-  Actor GetLabelText() const;
+  Actor GetLabel() const;
 
 public: //Signals
 
   /// @brief PushButton Pressed signal type.
-  typedef SignalV2< bool ( Button ) > PressedSignalV2;
+  typedef Signal< bool ( Button ) > PressedSignalType;
 
   /// @brief PushButton Released signal type.
-  typedef SignalV2< bool ( Button ) > ReleasedSignalV2;
+  typedef Signal< bool ( Button ) > ReleasedSignalType;
 
   /**
    * @brief Signal emitted when the button is touched.
    */
-  PressedSignalV2& PressedSignal();
+  PressedSignalType& PressedSignal();
 
   /**
    * @brief Signal emitted when the button is touched and the touch point leaves the boundary of the button.
    */
-  ReleasedSignalV2& ReleasedSignal();
+  ReleasedSignalType& ReleasedSignal();
 
 public: // Not intended for application developers
 

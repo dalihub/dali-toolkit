@@ -245,7 +245,7 @@ public:
   : mControlImpl( controlImpl ),
     mBackground( NULL ),
     mStartingPinchScale( NULL ),
-    mKeyEventSignalV2(),
+    mKeyEventSignal(),
     mPinchGestureDetector(),
     mPanGestureDetector(),
     mTapGestureDetector(),
@@ -548,7 +548,7 @@ public:
   Control& mControlImpl;
   Background* mBackground;           ///< Only create the background if we use it
   Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
-  Toolkit::Control::KeyEventSignalV2 mKeyEventSignalV2;
+  Toolkit::Control::KeyEventSignalType mKeyEventSignal;
 
   // Gesture Detection
   PinchGestureDetector mPinchGestureDetector;
@@ -1053,9 +1053,9 @@ bool Control::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* t
   return connected;
 }
 
-Toolkit::Control::KeyEventSignalV2& Control::KeyEventSignal()
+Toolkit::Control::KeyEventSignalType& Control::KeyEventSignal()
 {
-  return mImpl->mKeyEventSignalV2;
+  return mImpl->mKeyEventSignal;
 }
 
 bool Control::EmitKeyEventSignal( const KeyEvent& event )
@@ -1066,9 +1066,9 @@ bool Control::EmitKeyEventSignal( const KeyEvent& event )
   bool consumed = false;
 
   // signals are allocated dynamically when someone connects
-  if ( !mImpl->mKeyEventSignalV2.Empty() )
+  if ( !mImpl->mKeyEventSignal.Empty() )
   {
-    consumed = mImpl->mKeyEventSignalV2.Emit( handle, event );
+    consumed = mImpl->mKeyEventSignal.Emit( handle, event );
   }
 
   if (!consumed)

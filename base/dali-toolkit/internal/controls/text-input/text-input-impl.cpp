@@ -538,24 +538,24 @@ const Vector4& TextInput::GetMaterialDiffuseColor() const
 
 // Signals
 
-Toolkit::TextInput::InputSignalV2& TextInput::InputStartedSignal()
+Toolkit::TextInput::InputSignalType& TextInput::InputStartedSignal()
 {
-  return mInputStartedSignalV2;
+  return mInputStartedSignal;
 }
 
-Toolkit::TextInput::InputSignalV2& TextInput::InputFinishedSignal()
+Toolkit::TextInput::InputSignalType& TextInput::InputFinishedSignal()
 {
-  return mInputFinishedSignalV2;
+  return mInputFinishedSignal;
 }
 
-Toolkit::TextInput::InputSignalV2& TextInput::CutAndPasteToolBarDisplayedSignal()
+Toolkit::TextInput::InputSignalType& TextInput::CutAndPasteToolBarDisplayedSignal()
 {
-  return mCutAndPasteToolBarDisplayedV2;
+  return mCutAndPasteToolBarDisplayed;
 }
 
-Toolkit::TextInput::StyleChangedSignalV2& TextInput::StyleChangedSignal()
+Toolkit::TextInput::StyleChangedSignalType& TextInput::StyleChangedSignal()
 {
-  return mStyleChangedSignalV2;
+  return mStyleChangedSignal;
 }
 
 Toolkit::TextInput::TextModifiedSignalType& TextInput::TextModifiedSignal()
@@ -563,14 +563,14 @@ Toolkit::TextInput::TextModifiedSignalType& TextInput::TextModifiedSignal()
   return mTextModifiedSignal;
 }
 
-Toolkit::TextInput::MaxInputCharactersReachedSignalV2& TextInput::MaxInputCharactersReachedSignal()
+Toolkit::TextInput::MaxInputCharactersReachedSignalType& TextInput::MaxInputCharactersReachedSignal()
 {
-  return mMaxInputCharactersReachedSignalV2;
+  return mMaxInputCharactersReachedSignal;
 }
 
-Toolkit::TextInput::InputTextExceedBoundariesSignalV2& TextInput::InputTextExceedBoundariesSignal()
+Toolkit::TextInput::InputTextExceedBoundariesSignalType& TextInput::InputTextExceedBoundariesSignal()
 {
-  return mInputTextExceedBoundariesSignalV2;
+  return mInputTextExceedBoundariesSignal;
 }
 
 bool TextInput::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -1030,7 +1030,7 @@ void TextInput::OnKeyInputFocusGained()
   StartCursorBlinkTimer();
 
   Toolkit::TextInput handle( GetOwner() );
-  mInputStartedSignalV2.Emit( handle );
+  mInputStartedSignal.Emit( handle );
 
   ImfManager imfManager = ImfManager::Get();
 
@@ -1087,7 +1087,7 @@ void TextInput::OnKeyInputFocusLost()
   VirtualKeyboard::LanguageChangedSignal().Disconnect( this, &TextInput::SetTextDirection );
 
   Toolkit::TextInput handle( GetOwner() );
-  mInputFinishedSignalV2.Emit( handle );
+  mInputFinishedSignal.Emit( handle );
   mEditModeActive = false;
   mPreEditFlag = false;
   RemoveHighlight();
@@ -5507,7 +5507,7 @@ void TextInput::EmitStyleChangedSignal()
 {
   // emit signal if input style changes.
   Toolkit::TextInput handle( GetOwner() );
-  mStyleChangedSignalV2.Emit( handle, mInputStyle );
+  mStyleChangedSignal.Emit( handle, mInputStyle );
 }
 
 void TextInput::EmitTextModified()
@@ -5524,7 +5524,7 @@ void TextInput::EmitMaxInputCharactersReachedSignal()
   DALI_LOG_INFO(gLogFilter, Debug::General, "EmitMaxInputCharactersReachedSignal \n");
 
   Toolkit::TextInput handle( GetOwner() );
-  mMaxInputCharactersReachedSignalV2.Emit( handle );
+  mMaxInputCharactersReachedSignal.Emit( handle );
 }
 
 void TextInput::EmitInputTextExceedsBoundariesSignal()
@@ -5532,7 +5532,7 @@ void TextInput::EmitInputTextExceedsBoundariesSignal()
   // Emit a signal when the input text exceeds the boundaries of the text input.
 
   Toolkit::TextInput handle( GetOwner() );
-  mInputTextExceedBoundariesSignalV2.Emit( handle );
+  mInputTextExceedBoundariesSignal.Emit( handle );
 }
 
 } // namespace Internal

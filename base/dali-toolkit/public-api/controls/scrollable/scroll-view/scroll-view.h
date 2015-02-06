@@ -437,13 +437,13 @@ public:
     float duration;   ///< Duration of snap animation.
   };
 
-  typedef SignalV2< void ( const SnapEvent& ) > SnapStartedSignalV2; ///< SnapStarted signal type
+  typedef Signal< void ( const SnapEvent& ) > SnapStartedSignalType; ///< SnapStarted signal type
 
   /**
    * @brief Signal emitted when the ScrollView has started to snap or flick (it tells the target
    * position, scale, rotation for the snap or flick)
    */
-  SnapStartedSignalV2& SnapStartedSignal();
+  SnapStartedSignalType& SnapStartedSignal();
 
 public:
 

@@ -634,7 +634,7 @@ void ScrollView::UnbindActor(Actor child)
   GetImpl(*this).UnbindActor(child);
 }
 
-ScrollView::SnapStartedSignalV2& ScrollView::SnapStartedSignal()
+ScrollView::SnapStartedSignalType& ScrollView::SnapStartedSignal()
 {
   return GetImpl(*this).SnapStartedSignal();
 }

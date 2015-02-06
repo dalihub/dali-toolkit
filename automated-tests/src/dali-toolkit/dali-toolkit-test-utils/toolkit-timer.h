@@ -24,7 +24,7 @@
 // PUBLIC INCLUDES
 #define __DALI_TIMER_H__
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -40,7 +40,7 @@ class Timer;
 class Timer : public BaseHandle
 {
 public:
-  typedef SignalV2< bool () > TimerSignalV2;
+  typedef Signal< bool () > TimerSignalType;
   Timer();
   static Timer New( unsigned int milliSec );
   Timer( const Timer& timer );
@@ -52,7 +52,7 @@ public:
   void SetInterval( unsigned int milliSec );
   unsigned int GetInterval() const;
   bool IsRunning() const;
-  TimerSignalV2& TickSignal();
+  TimerSignalType& TickSignal();
 private:
   Timer(Internal::Adaptor::Timer* timer);
 };

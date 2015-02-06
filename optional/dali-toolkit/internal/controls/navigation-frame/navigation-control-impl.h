@@ -129,12 +129,12 @@ public:
   /**
    * @copydoc Dali::Toolkit::NavigatinControl::ItemPushedSignal()
    */
-  Toolkit::NavigationControl::ItemPushedSignalV2& ItemPushedSignal();
+  Toolkit::NavigationControl::ItemPushedSignalType& ItemPushedSignal();
 
   /**
    * @copydoc Dali::Toolkit::NavigatinControl::ItemPoppedSignal()
    */
-  Toolkit::NavigationControl::ItemPoppedSignalV2& ItemPoppedSignal();
+  Toolkit::NavigationControl::ItemPoppedSignalType& ItemPoppedSignal();
 
 private: // override functions from Control
 
@@ -234,8 +234,8 @@ private:
   Toolkit::Popup               mPopupMenu;
 
 private:
-  Toolkit::NavigationControl::ItemPushedSignalV2 mItemPushedSignal;   ///< The signal to notify the item push
-  Toolkit::NavigationControl::ItemPoppedSignalV2 mItemPoppedSignal;   ///< The signal to notify the item pop
+  Toolkit::NavigationControl::ItemPushedSignalType mItemPushedSignal;   ///< The signal to notify the item push
+  Toolkit::NavigationControl::ItemPoppedSignalType mItemPoppedSignal;   ///< The signal to notify the item pop
 };
 
 } // namespace Internal

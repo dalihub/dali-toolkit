@@ -112,22 +112,22 @@ public:
   /**
    * @copydoc Toolkit::KeyboardFocusManager::PreFocusChangeSignal()
    */
-  Toolkit::KeyboardFocusManager::PreFocusChangeSignalV2& PreFocusChangeSignal();
+  Toolkit::KeyboardFocusManager::PreFocusChangeSignalType& PreFocusChangeSignal();
 
   /**
    * @copydoc Toolkit::KeyboardFocusManager::FocusChangedSignal()
    */
-  Toolkit::KeyboardFocusManager::FocusChangedSignalV2& FocusChangedSignal();
+  Toolkit::KeyboardFocusManager::FocusChangedSignalType& FocusChangedSignal();
 
   /**
    * @copydoc Toolkit::KeyboardFocusManager::FocusGroupChangedSignal()
    */
-  Toolkit::KeyboardFocusManager::FocusGroupChangedSignalV2& FocusGroupChangedSignal();
+  Toolkit::KeyboardFocusManager::FocusGroupChangedSignalType& FocusGroupChangedSignal();
 
   /**
    * @copydoc Toolkit::KeyboardFocusManager::FocusedActorActivatedSignal()
    */
-  Toolkit::KeyboardFocusManager::FocusedActorActivatedSignalV2& FocusedActorActivatedSignal();
+  Toolkit::KeyboardFocusManager::FocusedActorActivatedSignalType& FocusedActorActivatedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -240,10 +240,10 @@ private:
 
 private:
 
-  Toolkit::KeyboardFocusManager::PreFocusChangeSignalV2 mPreFocusChangeSignalV2; ///< The signal to notify the focus will be changed
-  Toolkit::KeyboardFocusManager::FocusChangedSignalV2 mFocusChangedSignalV2; ///< The signal to notify the focus change
-  Toolkit::KeyboardFocusManager::FocusGroupChangedSignalV2 mFocusGroupChangedSignalV2; ///< The signal to notify the focus group change
-  Toolkit::KeyboardFocusManager::FocusedActorActivatedSignalV2 mFocusedActorActivatedSignalV2; ///< The signal to notify the activation of focused actor
+  Toolkit::KeyboardFocusManager::PreFocusChangeSignalType mPreFocusChangeSignal; ///< The signal to notify the focus will be changed
+  Toolkit::KeyboardFocusManager::FocusChangedSignalType mFocusChangedSignal; ///< The signal to notify the focus change
+  Toolkit::KeyboardFocusManager::FocusGroupChangedSignalType mFocusGroupChangedSignal; ///< The signal to notify the focus group change
+  Toolkit::KeyboardFocusManager::FocusedActorActivatedSignalType mFocusedActorActivatedSignal; ///< The signal to notify the activation of focused actor
 
   unsigned int mCurrentFocusActor; ///< The actor ID of current focused actor
 

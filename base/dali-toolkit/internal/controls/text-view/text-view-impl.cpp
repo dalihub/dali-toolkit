@@ -900,9 +900,9 @@ bool TextView::IsScrollPositionTrimmed() const
   return mVisualParameters.mScrollPositionTrimmed;
 }
 
-Toolkit::TextView::ScrolledSignalV2& TextView::ScrolledSignal()
+Toolkit::TextView::ScrolledSignalType& TextView::ScrolledSignal()
 {
-  return mScrolledSignalV2;
+  return mScrolledSignal;
 }
 
 bool TextView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -1793,7 +1793,7 @@ void TextView::DoSetScrollPosition( const Vector2& position )
 
   // Emit the signal.
   Toolkit::TextView handle( GetOwner() );
-  mScrolledSignalV2.Emit( handle, delta );
+  mScrolledSignal.Emit( handle, delta );
 }
 
 void TextView::CombineExceedPolicies()

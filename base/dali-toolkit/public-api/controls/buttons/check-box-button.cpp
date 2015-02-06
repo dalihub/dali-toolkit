@@ -31,10 +31,6 @@ namespace Toolkit
 
 const char* const CheckBoxButton::ACTION_CHECK_BOX_BUTTON_CLICK = "check-box-button-click";
 
-const std::string CheckBoxButton::USE_FADE_ANIMATION_PROPERTY_NAME( "use-fade-animation" );
-const std::string CheckBoxButton::USE_CHECK_ANIMATION_PROPERTY_NAME( "use-check-animation" );
-
-
 CheckBoxButton::CheckBoxButton()
 : Button()
 {
@@ -109,34 +105,34 @@ Actor CheckBoxButton::GetCheckedImage() const
   return Dali::Toolkit::GetImplementation( *this ).GetCheckedImage();
 }
 
-void CheckBoxButton::SetDimmedBackgroundImage( Image image )
+void CheckBoxButton::SetDisabledBackgroundImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDimmedBackgroundImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( image );
 }
 
-void CheckBoxButton::SetDimmedBackgroundImage( Actor image )
+void CheckBoxButton::SetDisabledBackgroundImage( Actor image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDimmedBackgroundImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( image );
 }
 
-Actor CheckBoxButton::GetDimmedBackgroundImage() const
+Actor CheckBoxButton::GetDisabledBackgroundImage() const
 {
-  return Dali::Toolkit::GetImplementation( *this ).GetDimmedBackgroundImage();
+  return Dali::Toolkit::GetImplementation( *this ).GetDisabledBackgroundImage();
 }
 
-void CheckBoxButton::SetDimmedCheckedImage( Image image )
+void CheckBoxButton::SetDisabledCheckedImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDimmedCheckedImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledCheckedImage( image );
 }
 
-void CheckBoxButton::SetDimmedCheckedImage( Actor image )
+void CheckBoxButton::SetDisabledCheckedImage( Actor image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDimmedCheckedImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledCheckedImage( image );
 }
 
-Actor CheckBoxButton::GetDimmedCheckedImage() const
+Actor CheckBoxButton::GetDisabledCheckedImage() const
 {
-  return Dali::Toolkit::GetImplementation( *this ).GetDimmedCheckedImage();
+  return Dali::Toolkit::GetImplementation( *this ).GetDisabledCheckedImage();
 }
 
 CheckBoxButton::CheckBoxButton( Internal::CheckBoxButton& implementation )

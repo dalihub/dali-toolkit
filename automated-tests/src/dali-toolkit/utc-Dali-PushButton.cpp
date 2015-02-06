@@ -168,7 +168,7 @@ int UtcDaliPushButtonSetGetToggled01(void)
   PushButton pushButton = PushButton::New();
 
   pushButton.SetToggleButton( true );
-  pushButton.ToggledSignal().Connect( &PushButtonToggled );
+  pushButton.StateChangedSignal().Connect( &PushButtonToggled );
 
   gPushButtonToggleState = false;
   pushButton.SetToggled( true );
@@ -196,7 +196,7 @@ int UtcDaliPushButtonSetGetToggled02(void)
   PushButton pushButton = PushButton::New();
 
   pushButton.SetToggleButton( false );
-  pushButton.ToggledSignal().Connect( &PushButtonToggled );
+  pushButton.StateChangedSignal().Connect( &PushButtonToggled );
 
   gPushButtonToggleState = false;
   pushButton.SetToggled( true );
@@ -346,62 +346,62 @@ int UtcDaliPushButtonSetImages(void)
   DALI_TEST_EQUALS( size.width, 40.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 40.f, TEST_LOCATION );
 
-  pushButton.SetPressedImage( image03 );
+  pushButton.SetSelectedImage( image03 );
 
   application.SendNotification();
   application.Render();
 
-  size = pushButton.GetPressedImage().GetCurrentSize();
+  size = pushButton.GetSelectedImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 50.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 50.f, TEST_LOCATION );
 
-  pushButton.SetPressedImage( imageActor03 );
+  pushButton.SetSelectedImage( imageActor03 );
 
   application.SendNotification();
   application.Render();
 
-  size = pushButton.GetPressedImage().GetCurrentSize();
+  size = pushButton.GetSelectedImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 60.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 60.f, TEST_LOCATION );
 
-  pushButton.SetDimmedBackgroundImage( image04 );
+  pushButton.SetDisabledBackgroundImage( image04 );
 
   application.SendNotification();
   application.Render();
 
-  size = pushButton.GetDimmedBackgroundImage().GetCurrentSize();
+  size = pushButton.GetDisabledBackgroundImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 70.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 70.f, TEST_LOCATION );
 
-  pushButton.SetDimmedBackgroundImage( imageActor04 );
+  pushButton.SetDisabledBackgroundImage( imageActor04 );
 
   application.SendNotification();
   application.Render();
 
-  size = pushButton.GetDimmedBackgroundImage().GetCurrentSize();
+  size = pushButton.GetDisabledBackgroundImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 80.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 80.f, TEST_LOCATION );
 
-  pushButton.SetDimmedImage( image05 );
+  pushButton.SetDisabledImage( image05 );
 
   application.SendNotification();
   application.Render();
 
-  size = pushButton.GetDimmedImage().GetCurrentSize();
+  size = pushButton.GetDisabledImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 90.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 90.f, TEST_LOCATION );
 
-  pushButton.SetDimmedImage( imageActor05 );
+  pushButton.SetDisabledImage( imageActor05 );
 
   application.SendNotification();
   application.Render();
 
-  size = pushButton.GetDimmedImage().GetCurrentSize();
+  size = pushButton.GetDisabledImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 100.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 100.f, TEST_LOCATION );
@@ -422,15 +422,15 @@ int UtcDaliPushButtonSetLabelText(void)
 
   TextView textView;
 
-  pushButton.SetLabelText( STR );
+  pushButton.SetLabel( STR );
 
-  textView = TextView::DownCast( pushButton.GetLabelText() );
+  textView = TextView::DownCast( pushButton.GetLabel() );
   DALI_TEST_CHECK( STR == textView.GetText() );
 
   TextView text = TextView::New( STR );
-  pushButton.SetLabelText( text );
+  pushButton.SetLabel( text );
 
-  textView = TextView::DownCast( pushButton.GetLabelText() );
+  textView = TextView::DownCast( pushButton.GetLabel() );
   DALI_TEST_CHECK( STR == textView.GetText() );
   END_TEST;
 }
@@ -568,7 +568,7 @@ int UtcDaliPushButtonToggled(void)
   application.Render();
 
   // connect to its touch signal
-  pushButton.ToggledSignal().Connect( &PushButtonToggled );
+  pushButton.StateChangedSignal().Connect( &PushButtonToggled );
 
   Dali::Integration::TouchEvent event;
 

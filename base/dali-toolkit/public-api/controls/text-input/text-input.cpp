@@ -335,22 +335,22 @@ Vector2 TextInput::GetScrollPosition() const
   return GetImpl( *this ).GetScrollPosition();
 }
 
-TextInput::InputSignalV2& TextInput::InputStartedSignal()
+TextInput::InputSignalType& TextInput::InputStartedSignal()
 {
   return GetImpl(*this).InputStartedSignal();
 }
 
-TextInput::InputSignalV2& TextInput::InputFinishedSignal()
+TextInput::InputSignalType& TextInput::InputFinishedSignal()
 {
   return GetImpl(*this).InputFinishedSignal();
 }
 
-TextInput::InputSignalV2& TextInput::CutAndPasteToolBarDisplayedSignal()
+TextInput::InputSignalType& TextInput::CutAndPasteToolBarDisplayedSignal()
 {
   return GetImpl(*this).CutAndPasteToolBarDisplayedSignal();
 }
 
-TextInput::StyleChangedSignalV2& TextInput::StyleChangedSignal()
+TextInput::StyleChangedSignalType& TextInput::StyleChangedSignal()
 {
   return GetImpl(*this).StyleChangedSignal();
 }
@@ -360,12 +360,12 @@ TextInput::TextModifiedSignalType& TextInput::TextModifiedSignal()
   return GetImpl(*this).TextModifiedSignal();
 }
 
-TextInput::MaxInputCharactersReachedSignalV2& TextInput::MaxInputCharactersReachedSignal()
+TextInput::MaxInputCharactersReachedSignalType& TextInput::MaxInputCharactersReachedSignal()
 {
   return GetImpl(*this).MaxInputCharactersReachedSignal();
 }
 
-TextInput::InputTextExceedBoundariesSignalV2& TextInput::InputTextExceedBoundariesSignal()
+TextInput::InputTextExceedBoundariesSignalType& TextInput::InputTextExceedBoundariesSignal()
 {
   return GetImpl(*this).InputTextExceedBoundariesSignal();
 }

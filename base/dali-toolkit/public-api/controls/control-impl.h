@@ -373,7 +373,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Control::KeyEventSignal()
    */
-  Toolkit::Control::KeyEventSignalV2& KeyEventSignal();
+  Toolkit::Control::KeyEventSignalType& KeyEventSignal();
 
   /**
    * @brief Called by the KeyInputFocusManager to emit key event signals.

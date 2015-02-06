@@ -125,22 +125,22 @@ public:
   /**
    * @copydoc Toolkit::TextInput::InputStartedSignal()
    */
-  Toolkit::TextInput::InputSignalV2& InputStartedSignal();
+  Toolkit::TextInput::InputSignalType& InputStartedSignal();
 
   /**
    * @copydoc Toolkit::TextInput::InputFinishedSignal()
    */
-  Toolkit::TextInput::InputSignalV2& InputFinishedSignal();
+  Toolkit::TextInput::InputSignalType& InputFinishedSignal();
 
   /**
    * @copydoc Toolkit::TextInput::CutAndPasteToolBarDisplayedSignal()
    */
-  Toolkit::TextInput::InputSignalV2& CutAndPasteToolBarDisplayedSignal();
+  Toolkit::TextInput::InputSignalType& CutAndPasteToolBarDisplayedSignal();
 
   /**
    * @copydoc Toolkit::TextInput::StyleChangedSignal()
    */
-  Toolkit::TextInput::StyleChangedSignalV2& StyleChangedSignal();
+  Toolkit::TextInput::StyleChangedSignalType& StyleChangedSignal();
 
   /**
    * @copydoc Toolkit::TextInput::TextModifiedSignal()
@@ -150,12 +150,12 @@ public:
   /**
    * @copydoc Toolkit::TextInput::MaxInputCharactersReachedSignal()
    */
-  Toolkit::TextInput::MaxInputCharactersReachedSignalV2& MaxInputCharactersReachedSignal();
+  Toolkit::TextInput::MaxInputCharactersReachedSignalType& MaxInputCharactersReachedSignal();
 
   /**
    * @copydoc Toolkit::TextInput::InputTextExceedBoundariesSignal()
    */
-  Toolkit::TextInput::InputTextExceedBoundariesSignalV2& InputTextExceedBoundariesSignal();
+  Toolkit::TextInput::InputTextExceedBoundariesSignalType& InputTextExceedBoundariesSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -1538,13 +1538,13 @@ private:
   bool mPlaceHolderSet:1;                ///< Whether the place holder text is set.
   bool mMarkUpEnabled:1;                 ///< enable to scan for mark-up
 
-  Toolkit::TextInput::InputSignalV2                      mInputStartedSignalV2;              ///< Signal emitted when input starts
-  Toolkit::TextInput::InputSignalV2                      mInputFinishedSignalV2;             ///< Signal emitted when input ends
-  Toolkit::TextInput::StyleChangedSignalV2               mStyleChangedSignalV2;              ///< Signal emitted when style changes.
+  Toolkit::TextInput::InputSignalType                      mInputStartedSignal;              ///< Signal emitted when input starts
+  Toolkit::TextInput::InputSignalType                      mInputFinishedSignal;             ///< Signal emitted when input ends
+  Toolkit::TextInput::StyleChangedSignalType               mStyleChangedSignal;              ///< Signal emitted when style changes.
   Toolkit::TextInput::TextModifiedSignalType             mTextModifiedSignal;                ///< Signal emitted when text modified.
-  Toolkit::TextInput::MaxInputCharactersReachedSignalV2  mMaxInputCharactersReachedSignalV2; ///< Signal emitted when max input characters is reached.
-  Toolkit::TextInput::InputSignalV2                      mCutAndPasteToolBarDisplayedV2;     ///< Signal emitted when toolbar displayed
-  Toolkit::TextInput::InputTextExceedBoundariesSignalV2  mInputTextExceedBoundariesSignalV2; ///< Signal emitted when input text exceeds the boundaries of the text-input.
+  Toolkit::TextInput::MaxInputCharactersReachedSignalType  mMaxInputCharactersReachedSignal; ///< Signal emitted when max input characters is reached.
+  Toolkit::TextInput::InputSignalType                      mCutAndPasteToolBarDisplayed;       ///< Signal emitted when toolbar displayed
+  Toolkit::TextInput::InputTextExceedBoundariesSignalType  mInputTextExceedBoundariesSignal; ///< Signal emitted when input text exceeds the boundaries of the text-input.
 };
 
 } // namespace Internal

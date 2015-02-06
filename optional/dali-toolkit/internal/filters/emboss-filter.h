@@ -61,6 +61,9 @@ public: // From ImageFilter
   /// @copydoc Dali::Toolkit::Internal::ImageFilter::Refresh
   virtual void Refresh();
 
+  /// @copydoc Dali::Toolkit::Internal::ImageFilter::SetSize
+  virtual void SetSize( const Vector2& size );
+
 private:
   /**
    * Setup position and parameters for camera

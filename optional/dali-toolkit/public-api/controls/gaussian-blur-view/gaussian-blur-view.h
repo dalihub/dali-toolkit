@@ -102,7 +102,7 @@ public:
   /**
    * Signal type for notifications
    */
-  typedef SignalV2< void (GaussianBlurView source) > GaussianBlurViewSignal;
+  typedef Signal< void (GaussianBlurView source) > GaussianBlurViewSignal;
 
   /**
    * Create an uninitialized GaussianBlurView; this can be initialized with GaussianBlurView::New()

@@ -413,12 +413,12 @@ class DALI_IMPORT_API Builder : public BaseHandle
   /**
    * @brief Builder signal type
    */
-  typedef SignalV2< void () > Signal;
+  typedef Signal< void () > BuilderSignalType;
 
   /**
    * @brief Signal emitted when a quit action is requested by the builder.
    */
-  Signal& QuitSignal();
+  BuilderSignalType& QuitSignal();
 
 private:
   explicit DALI_INTERNAL Builder(Internal::Builder *impl);

@@ -107,7 +107,7 @@ void CubeTransitionEffect::StopTransition()
   GetImpl(*this).StopTransition();
 }
 
-CubeTransitionEffect::TransitionCompletedSignalV2& CubeTransitionEffect::TransitionCompletedSignal()
+CubeTransitionEffect::TransitionCompletedSignalType& CubeTransitionEffect::TransitionCompletedSignal()
 {
   return GetImpl( *this ).TransitionCompletedSignal();
 }

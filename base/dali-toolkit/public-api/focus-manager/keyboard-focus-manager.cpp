@@ -111,22 +111,22 @@ Actor KeyboardFocusManager::GetFocusIndicatorActor()
   return GetImpl(*this).GetFocusIndicatorActor();
 }
 
-KeyboardFocusManager::PreFocusChangeSignalV2& KeyboardFocusManager::PreFocusChangeSignal()
+KeyboardFocusManager::PreFocusChangeSignalType& KeyboardFocusManager::PreFocusChangeSignal()
 {
   return GetImpl(*this).PreFocusChangeSignal();
 }
 
-KeyboardFocusManager::FocusChangedSignalV2& KeyboardFocusManager::FocusChangedSignal()
+KeyboardFocusManager::FocusChangedSignalType& KeyboardFocusManager::FocusChangedSignal()
 {
   return GetImpl(*this).FocusChangedSignal();
 }
 
-KeyboardFocusManager::FocusGroupChangedSignalV2& KeyboardFocusManager::FocusGroupChangedSignal()
+KeyboardFocusManager::FocusGroupChangedSignalType& KeyboardFocusManager::FocusGroupChangedSignal()
 {
   return GetImpl(*this).FocusGroupChangedSignal();
 }
 
-KeyboardFocusManager::FocusedActorActivatedSignalV2& KeyboardFocusManager::FocusedActorActivatedSignal()
+KeyboardFocusManager::FocusedActorActivatedSignalType& KeyboardFocusManager::FocusedActorActivatedSignal()
 {
   return GetImpl(*this).FocusedActorActivatedSignal();
 }

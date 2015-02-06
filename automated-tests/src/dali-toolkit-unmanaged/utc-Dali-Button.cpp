@@ -105,11 +105,11 @@ int UtcDaliButtonProperties(void)
   PushButton pushButton = PushButton::New();
 
   //Test various properties
-  checkBoxButton.SetProperty( checkBoxButton.GetPropertyIndex("dimmed"), false );
-  DALI_TEST_CHECK( false == checkBoxButton.IsDimmed() );
+  checkBoxButton.SetProperty( checkBoxButton.GetPropertyIndex("disabled"), false );
+  DALI_TEST_CHECK( false == checkBoxButton.IsDisabled() );
 
-  checkBoxButton.SetProperty( checkBoxButton.GetPropertyIndex("dimmed"), true );
-  DALI_TEST_CHECK( true == checkBoxButton.IsDimmed() );
+  checkBoxButton.SetProperty( checkBoxButton.GetPropertyIndex("disabled"), true );
+  DALI_TEST_CHECK( true == checkBoxButton.IsDisabled() );
   END_TEST;
 }
 
@@ -119,17 +119,17 @@ int UtcDaliButtonSetGetDimmed(void)
   tet_infoline(" UtcDaliButtonSetGetDimmed");
 
   CheckBoxButton checkBoxButton = CheckBoxButton::New();
-  checkBoxButton.SetDimmed( true );
+  checkBoxButton.SetDisabled( true );
 
-  DALI_TEST_CHECK( checkBoxButton.IsDimmed() );
-  checkBoxButton.SetDimmed( false );
+  DALI_TEST_CHECK( checkBoxButton.IsDisabled() );
+  checkBoxButton.SetDisabled( false );
 
-  DALI_TEST_CHECK( !checkBoxButton.IsDimmed() );
-  checkBoxButton.SetDimmed( true );
+  DALI_TEST_CHECK( !checkBoxButton.IsDisabled() );
+  checkBoxButton.SetDisabled( true );
 
-  DALI_TEST_CHECK( checkBoxButton.IsDimmed() );
-  checkBoxButton.SetDimmed( false );
+  DALI_TEST_CHECK( checkBoxButton.IsDisabled() );
+  checkBoxButton.SetDisabled( false );
 
-  DALI_TEST_CHECK( !checkBoxButton.IsDimmed() );
+  DALI_TEST_CHECK( !checkBoxButton.IsDisabled() );
   END_TEST;
 }

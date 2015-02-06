@@ -178,7 +178,7 @@ public: //Signal
   static const char* const SIGNAL_TRANSITION_COMPLETED;
 
   //Transition animation completed signal
-  typedef SignalV2< void ( CubeTransitionEffect, ImageActor ) > TransitionCompletedSignalV2;
+  typedef Signal< void ( CubeTransitionEffect, ImageActor ) > TransitionCompletedSignalType;
 
   /**
    * Signal emitted when the transition has completed animation
@@ -188,7 +188,7 @@ public: //Signal
    * @endcode
    * @return The Signal to connect to.
    */
-  TransitionCompletedSignalV2& TransitionCompletedSignal();
+  TransitionCompletedSignalType& TransitionCompletedSignal();
 
 public: // Not intended for developer use
 

@@ -96,7 +96,7 @@ void SpreadFilter::Enable()
   // create actor to render input with applied emboss effect
   mActorForInput = ImageActor::New( mInputImage );
   mActorForInput.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForInput.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+  mActorForInput.SetSize(mTargetSize);
   mActorForInput.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
 
   // create internal offscreen for result of horizontal pass
@@ -105,7 +105,7 @@ void SpreadFilter::Enable()
   // create an actor to render mImageForHorz for vertical blur pass
   mActorForHorz = ImageActor::New( mImageForHorz );
   mActorForHorz.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForHorz.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+  mActorForHorz.SetSize(mTargetSize);
   mActorForHorz.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
 
   mRootActor.Add( mActorForInput );
@@ -180,6 +180,19 @@ void SpreadFilter::Refresh()
   if( mRenderTaskForVert )
   {
     mRenderTaskForVert.SetRefreshRate( mRefreshOnDemand ? RenderTask::REFRESH_ONCE : RenderTask::REFRESH_ALWAYS );
+  }
+}
+
+void SpreadFilter::SetSize( const Vector2& size )
+{
+  mTargetSize = size;
+  if( mActorForInput )
+  {
+    mActorForInput.SetSize(mTargetSize);
+  }
+  if( mActorForHorz )
+  {
+    mActorForHorz.SetSize(mTargetSize);
   }
 }
 

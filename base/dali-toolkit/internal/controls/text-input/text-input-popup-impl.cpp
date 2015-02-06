@@ -518,7 +518,7 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
   optionPressedBackground.Add( pressedIcon );
 
   // 12. Set the pressed option image
-  option.SetPressedImage( optionPressedContainer );
+  option.SetSelectedImage( optionPressedContainer );
 
   // 13. Add the divider
   if ( !finalOption )
@@ -889,17 +889,17 @@ void TextInputPopup::OnShowFinished(Animation& source)
   mShowFinishedSignal.Emit( *this );
 }
 
-TextInputPopup::PressedSignalV2& TextInputPopup::PressedSignal()
+TextInputPopup::PressedSignalType& TextInputPopup::PressedSignal()
 {
   return mPressedSignal;
 }
 
-TextInputPopup::HideFinishedSignalV2& TextInputPopup::HideFinishedSignal()
+TextInputPopup::HideFinishedSignalType& TextInputPopup::HideFinishedSignal()
 {
   return mHideFinishedSignal;
 }
 
-TextInputPopup::ShowFinishedSignalV2& TextInputPopup::ShowFinishedSignal()
+TextInputPopup::ShowFinishedSignalType& TextInputPopup::ShowFinishedSignal()
 {
   return mShowFinishedSignal;
 }

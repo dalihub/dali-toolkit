@@ -20,7 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -53,7 +53,7 @@ public:
 
 public: // Signals
 
-  Dali::Timer::TimerSignalV2& TickSignal();
+  Dali::Timer::TimerSignalType& TickSignal();
 
 private: // Implementation
 
@@ -63,7 +63,7 @@ private: // Implementation
 
 private: // Data
 
-  Dali::Timer::TimerSignalV2 mTickSignal;
+  Dali::Timer::TimerSignalType mTickSignal;
   unsigned int mInterval;
 };
 
@@ -128,7 +128,7 @@ bool Timer::Tick()
   return false;
 }
 
-Dali::Timer::TimerSignalV2& Timer::TickSignal()
+Dali::Timer::TimerSignalType& Timer::TickSignal()
 {
   return mTickSignal;
 }
@@ -196,7 +196,7 @@ bool Timer::IsRunning() const
   return true;
 }
 
-Timer::TimerSignalV2& Timer::TickSignal()
+Timer::TimerSignalType& Timer::TickSignal()
 {
   return Internal::Adaptor::GetImplementation( *this ).TickSignal();
 }

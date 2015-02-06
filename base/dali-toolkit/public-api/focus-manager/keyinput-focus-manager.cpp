@@ -92,12 +92,12 @@ bool KeyInputFocusManager::IsKeyboardListener(Control control)
   return GetImpl(*this).IsKeyboardListener(control);
 }
 
-KeyInputFocusManager::KeyInputFocusChangedSignalV2& KeyInputFocusManager::KeyInputFocusChangedSignal()
+KeyInputFocusManager::KeyInputFocusChangedSignalType& KeyInputFocusManager::KeyInputFocusChangedSignal()
 {
   return GetImpl(*this).KeyInputFocusChangedSignal();
 }
 
-KeyInputFocusManager::UnhandledKeyEventSignalV2& KeyInputFocusManager::UnhandledKeyEventSignal()
+KeyInputFocusManager::UnhandledKeyEventSignalType& KeyInputFocusManager::UnhandledKeyEventSignal()
 {
   return GetImpl(*this).UnhandledKeyEventSignal();
 }

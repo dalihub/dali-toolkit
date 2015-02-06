@@ -33,15 +33,15 @@ namespace Toolkit
  * @note Images won't be scaled to fill the whole button size.
  * @note If an image path is empty, this image is not set to the button.
  *
- * @param[in] releasedImagePath          Image path to be shown when the button is released.
- * @param[in] pressedImagePath           Image path to be shown when the button is pressed.
- * @param[in] backgroundImagePath        Image path to be shown as button background.
- * @param[in] dimmedReleasedImagePath    Image path to be shown when the button is released and dimmed.
- * @param[in] dimmedBackgroundImagePath  Image path to be shown as button background when the button is dimmed.
+ * @param[in] unselectedImagePath         Image path to be shown when the button is unselected.
+ * @param[in] selectedImagePath           Image path to be shown when the button is selected.
+ * @param[in] backgroundImagePath         Image path to be shown as button background.
+ * @param[in] disabledUnselectedImagePath Image path to be shown when the button is unselected and disabled.
+ * @param[in] disabledBackgroundImagePath Image path to be shown as button background when the button is disabled.
  * @return A handle to the new push button
  */
-DALI_IMPORT_API PushButton CreatePushButton( const std::string& releasedImagePath, const std::string& pressedImagePath, const std::string& backgroundImagePath,
-                             const std::string& dimmedReleasedImagePath, const std::string& dimmedBackgroundImagePath );
+DALI_IMPORT_API PushButton CreatePushButton( const std::string& unselectedImagePath, const std::string& selectedImagePath, const std::string& backgroundImagePath,
+                             const std::string& disabledUnselectedImagePath, const std::string& disabledBackgroundImagePath );
 
 /**
  * @brief Creates a push button with the given images.
@@ -50,15 +50,15 @@ DALI_IMPORT_API PushButton CreatePushButton( const std::string& releasedImagePat
  * @note Images won't be scaled to fill the whole button size.
  * @note If an image is an empty handle, this image is not set to the button.
  *
- * @param[in] releasedImageActor          Image to be shown when the button is released.
- * @param[in] pressedImageActor           Image to be shown when the button is pressed.
- * @param[in] backgroundImageActor        Image to be shown as button background.
- * @param[in] dimmedReleasedImageActor    Image to be shown when the button is released and dimmed.
- * @param[in] dimmedBackgroundImageActor  Image to be shown as button background when the button is dimmed.
+ * @param[in] unselectedImageActor         Image to be shown when the button is unselected.
+ * @param[in] selectedImageActor           Image to be shown when the button is pressed.
+ * @param[in] backgroundImageActor         Image to be shown as button background.
+ * @param[in] disabledUnselectedImageActor Image to be shown when the button is unselected and disabled.
+ * @param[in] disabledBackgroundImageActor Image to be shown as button background when the button is disabled.
  * @return A handle to the new pushbutton
  */
-DALI_IMPORT_API PushButton CreatePushButton( Actor releasedImageActor, Actor pressedImageActor, Actor backgroundImageActor,
-                             Actor dimmedReleasedImageActor, Actor dimmedBackgroundImageActor );
+DALI_IMPORT_API PushButton CreatePushButton( Actor unselectedImageActor, Actor selectedImageActor, Actor backgroundImageActor,
+                             Actor disabledUnselectedImageActor, Actor disabledBackgroundImageActor );
 
 /**
  * @brief Creates a push button with the given background image.

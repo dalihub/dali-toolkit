@@ -44,7 +44,7 @@ namespace // unnamed namespace
  * When at middle of the screen the position is not altered.
  * When one screen away from middle the position is rotated about it's origin + mAnchor
  */
-class ScrollCubeEffectInfo : public Dali::RefObject
+class ScrollCubeEffectInfo
 {
 public:
 
@@ -285,8 +285,6 @@ public:
   Vector3 mPositionSwing;                                 ///< Maximum amount in X and Y axes to alter position.
 };
 
-typedef IntrusivePtr<ScrollCubeEffectInfo> ScrollCubeEffectInfoPtr;
-
 /**
  * Helper: Applies the 3D scroll cube constraints to the child actor
  *
@@ -297,7 +295,7 @@ typedef IntrusivePtr<ScrollCubeEffectInfo> ScrollCubeEffectInfoPtr;
 void ApplyScrollCubeConstraints(Toolkit::ScrollView scrollView,
                                 Actor child,
                                 Actor parentPage,
-                                ScrollCubeEffectInfoPtr info)
+                                const ScrollCubeEffectInfo& info)
 {
   // Apply constraints to this actor //
   Constraint constraint;
@@ -363,7 +361,7 @@ void ScrollViewCubeEffect::ApplyToActor(Actor child,
                                         const Vector2& angleSwing,
                                         const Vector2& positionSwing)
 {
-  ScrollCubeEffectInfoPtr info(new ScrollCubeEffectInfo(anchor, angleSwing, positionSwing));
+  ScrollCubeEffectInfo info( anchor, angleSwing, positionSwing );
 
   ApplyScrollCubeConstraints( GetScrollView(), child, child.GetParent(), info );
 }
@@ -374,7 +372,7 @@ void ScrollViewCubeEffect::ApplyToActor(Actor child,
                                         const Vector2& angleSwing,
                                         const Vector2& positionSwing)
 {
-  ScrollCubeEffectInfoPtr info(new ScrollCubeEffectInfo(anchor, angleSwing, positionSwing));
+  ScrollCubeEffectInfo info( anchor, angleSwing, positionSwing );
 
   ApplyScrollCubeConstraints( GetScrollView(), child, parentPage, info );
 }
