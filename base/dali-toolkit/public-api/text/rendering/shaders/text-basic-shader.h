@@ -1,3 +1,6 @@
+#ifndef __DALI_TOOLKIT_TEXT_BASIC_SHADER_H__
+#define __DALI_TOOLKIT_TEXT_BASIC_SHADER_H__
+
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
@@ -15,8 +18,8 @@
  *
  */
 
-// CLASS HEADER
-#include <dali-toolkit/public-api/text/text-renderer.h>
+// EXTERNAL INCLUDES
+#include <dali/public-api/shader-effects/shader-effect.h>
 
 namespace Dali
 {
@@ -27,16 +30,24 @@ namespace Toolkit
 namespace Text
 {
 
-Renderer::Renderer()
+/**
+ * @brief A basic shader for rendering glyphs in Pixel::L8 format.
+ */
+namespace BasicShader
 {
-}
 
-Renderer::~Renderer()
-{
-}
+/**
+ * Create a basic text shader.
+ * @return A handle to a newly allocated ShaderEffect
+ */
+Dali::ShaderEffect New();
+
+} // namespace BasicShader
 
 } // namespace Text
 
 } // namespace Toolkit
 
 } // namespace Dali
+
+#endif // __DALI_TOOLKIT_TEXT_BASIC_SHADER_H__
