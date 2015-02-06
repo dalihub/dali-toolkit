@@ -222,8 +222,8 @@ void Magnifier::Initialize()
   //Property::Index propertySourcePositionDelayed = mCameraActor.RegisterProperty("delayed-source-position", Vector3::ZERO);
 
   constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                    Source( mSourceActor, Actor::WORLD_POSITION ),
-                                                    CameraActorPositionConstraint(stageSize, mDefaultCameraDistance) );
+                                         Source( mSourceActor, Actor::WORLD_POSITION ),
+                                         CameraActorPositionConstraint(stageSize, mDefaultCameraDistance) );
   mCameraActor.ApplyConstraint(constraint);
 
   // Apply constraint to render-task viewport position
@@ -283,8 +283,13 @@ void Magnifier::SetFrameVisibility(bool visible)
     mFrame = ImageActor::New( image );
     mFrame.SetDrawMode(DrawMode::OVERLAY);
     mFrame.SetStyle( ImageActor::STYLE_NINE_PATCH );
-    mFrame.SetPositionInheritanceMode(USE_PARENT_POSITION);
+    mFrame.SetPositionInheritanceMode(DONT_INHERIT_POSITION);
     mFrame.SetInheritScale(true);
+
+    Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
+                                                      ParentSource(Actor::WORLD_POSITION),
+                                                      EqualToConstraint());
+    mFrame.ApplyConstraint( constraint );
 
     mFrame.SetNinePatchBorder( Vector4::ONE * IMAGE_BORDER_INDENT );
     self.Add(mFrame);
