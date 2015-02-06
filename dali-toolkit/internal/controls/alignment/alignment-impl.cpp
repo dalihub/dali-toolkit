@@ -301,60 +301,65 @@ struct PositionConstraint
     const Vector3& currentSize( currentSizeProperty.GetVector3() );
     const Vector3& parentSize( parentSizeProperty.GetVector3() );
 
+    return GetPosition( currentSize, parentSize );
+  }
+
+  inline Vector3 GetPosition( const Vector3& currentSize, const Vector3& parentSize )
+  {
     Vector3 position( 0.f, 0.f, 0.f );
 
     switch( mHorizontalAlignment )
     {
-      case Dali::Toolkit::Alignment::HorizontalLeft:
+    case Dali::Toolkit::Alignment::HorizontalLeft:
+    {
+      position.x += mPadding.left;
+      break;
+    }
+    case Dali::Toolkit::Alignment::HorizontalCenter:
+    {
+      if( currentSize.width + mPadding.left + mPadding.right >= parentSize.width )
       {
-        position.x += mPadding.left;
-        break;
+        position.x += 0.5f * ( mPadding.left - mPadding.right );
       }
-      case Dali::Toolkit::Alignment::HorizontalCenter:
-      {
-        if( currentSize.width + mPadding.left + mPadding.right >= parentSize.width )
-        {
-          position.x += 0.5f * ( mPadding.left - mPadding.right );
-        }
-        break;
-      }
-      case Dali::Toolkit::Alignment::HorizontalRight:
-      {
-        position.x -= mPadding.right;
-        break;
-      }
-      default:
-      {
-        DALI_ASSERT_ALWAYS( !"Wrong horizontal alignment value" );
-        break;
-      }
+      break;
+    }
+    case Dali::Toolkit::Alignment::HorizontalRight:
+    {
+      position.x -= mPadding.right;
+      break;
+    }
+    default:
+    {
+      DALI_ASSERT_ALWAYS( !"Wrong horizontal alignment value" );
+      break;
+    }
     }
 
     switch( mVerticalAlignment )
     {
-      case Dali::Toolkit::Alignment::VerticalTop:
+    case Dali::Toolkit::Alignment::VerticalTop:
+    {
+      position.y += mPadding.top;
+      break;
+    }
+    case Dali::Toolkit::Alignment::VerticalCenter:
+    {
+      if( currentSize.height + mPadding.top + mPadding.bottom >= parentSize.height )
       {
-        position.y += mPadding.top;
-        break;
+        position.y += 0.5f * ( mPadding.top - mPadding.bottom );
       }
-      case Dali::Toolkit::Alignment::VerticalCenter:
-      {
-        if( currentSize.height + mPadding.top + mPadding.bottom >= parentSize.height )
-        {
-          position.y += 0.5f * ( mPadding.top - mPadding.bottom );
-        }
-        break;
-      }
-      case Dali::Toolkit::Alignment::VerticalBottom:
-      {
-        position.y -= mPadding.bottom;
-        break;
-      }
-      default:
-      {
-        DALI_ASSERT_ALWAYS( !"Wrong vertical alignment value" );
-        break;
-      }
+      break;
+    }
+    case Dali::Toolkit::Alignment::VerticalBottom:
+    {
+      position.y -= mPadding.bottom;
+      break;
+    }
+    default:
+    {
+      DALI_ASSERT_ALWAYS( !"Wrong vertical alignment value" );
+      break;
+    }
     }
 
     return position;
@@ -364,15 +369,6 @@ struct PositionConstraint
   const Toolkit::Alignment::Type mHorizontalAlignment;
   const Toolkit::Alignment::Type mVerticalAlignment;
 };
-
-void SetPositionConstraint( Actor actor, const Toolkit::Alignment::Padding& padding, Toolkit::Alignment::Type horizontal, Toolkit::Alignment::Type vertical )
-{
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                    LocalSource( Actor::SIZE ),
-                                                    ParentSource( Actor::SIZE ),
-                                                    PositionConstraint( padding, horizontal, vertical ) );
-  actor.ApplyConstraint( constraint );
-}
 } // namespace
 
 Toolkit::Alignment Alignment::New( Toolkit::Alignment::Type horizontal, Toolkit::Alignment::Type vertical )
@@ -486,61 +482,51 @@ void Alignment::OnRelayout( const Vector2& size, ActorSizeContainer& container )
     actor.SetAnchorPoint( anchorPointAndParentOrigin );
     actor.SetParentOrigin( anchorPointAndParentOrigin );
 
-    if( Toolkit::Alignment::ScaleNone != mScaling )
-    {
-      actor.RemoveConstraints();
-    }
-
-    Vector3 actorSize ( actor.GetCurrentSize() );
+    Vector3 actorSize ( actor.GetSize() );
     Toolkit::Control control( Toolkit::Control::DownCast( actor ) );
     if ( actorSize == Vector3::ZERO && control )
     {
       actorSize = control.GetNaturalSize();
     }
 
-    Vector2 childSize;
+    Vector3 childSize;
 
     switch( mScaling )
     {
       case Toolkit::Alignment::ScaleNone:
       {
         // Nothing to do but needed just to not to jump to the default.
-        childSize = size;
+        childSize = actorSize;
         break;
       }
       case Toolkit::Alignment::ScaleToFill:
       {
         ScaleToFillConstraint constraint( mPadding );
-        childSize = Vector2( constraint.GetSize( actorSize, Vector3(size) ) );
-        SetPositionConstraint( actor, mPadding, mHorizontal, mVertical );
+        childSize = constraint.GetSize( actorSize, Vector3(size) ) ;
         break;
       }
       case Toolkit::Alignment::ScaleToFitKeepAspect:
       {
         ScaleToFitKeepAspectConstraint constraint( mPadding );
-        childSize = Vector2( constraint.GetSize( actorSize, Vector3(size) ) );
-        SetPositionConstraint( actor, mPadding, mHorizontal, mVertical );
+        childSize = constraint.GetSize( actorSize, Vector3(size) ) ;
         break;
       }
       case Toolkit::Alignment::ScaleToFillKeepAspect:
       {
         ScaleToFillKeepAspectConstraint constraint( mPadding );
-        childSize = Vector2( constraint.GetSize( actorSize, Vector3(size) ) );
-        SetPositionConstraint( actor, mPadding, mHorizontal, mVertical );
+        childSize = constraint.GetSize( actorSize, Vector3(size) );
         break;
       }
       case Toolkit::Alignment::ShrinkToFit:
       {
         ShrinkToFitConstraint constraint( mPadding );
-        childSize = Vector2( constraint.GetSize( actorSize, Vector3(size) ) );
-        SetPositionConstraint( actor, mPadding, mHorizontal, mVertical );
+        childSize = constraint.GetSize( actorSize, Vector3(size) );
         break;
       }
       case Toolkit::Alignment::ShrinkToFitKeepAspect:
       {
         ShrinkToFitKeepAspectConstraint constraint( mPadding );
-        childSize = Vector2( constraint.GetSize( actorSize, Vector3(size) ) );
-        SetPositionConstraint( actor, mPadding, mHorizontal, mVertical );
+        childSize = constraint.GetSize( actorSize, Vector3(size) );
         break;
       }
       default:
@@ -550,7 +536,15 @@ void Alignment::OnRelayout( const Vector2& size, ActorSizeContainer& container )
       }
     }
 
-    Relayout( actor, childSize, container );
+    PositionConstraint positionConstraint(mPadding, mHorizontal, mVertical);
+    actor.SetPosition( positionConstraint.GetPosition(childSize, actorSize) );
+
+    if( !control )
+    {
+      actor.SetScale(childSize / actorSize);
+    }
+
+    Relayout( actor, Vector2(childSize), container );
   }
 }
 

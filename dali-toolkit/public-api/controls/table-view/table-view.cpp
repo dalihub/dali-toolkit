@@ -175,16 +175,6 @@ float TableView::GetRelativeWidth( unsigned int columnIndex ) const
   return GetImpl(*this).GetRelativeWidth( columnIndex );
 }
 
-void TableView::SetLayoutAnimationDuration( float duration )
-{
-  GetImpl(*this).SetLayoutAnimationDuration( duration );
-}
-
-float TableView::GetLayoutAnimationDuration()
-{
-  return GetImpl(*this).GetLayoutAnimationDuration();
-}
-
 unsigned int TableView::GetRows()
 {
   return GetImpl(*this).GetRows();

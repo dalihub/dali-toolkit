@@ -40,35 +40,15 @@ const float DEFAULT_PAN_GESTURE_PROCESS_TIME(16.7f); // 16.7 milliseconds, i.e. 
 const float DEFAULT_INDICATOR_FIXED_HEIGHT(80.0f);
 
 /**
- * Indicator size constraint
  * Indicator size depends on both indicator's parent size and the scroll content size
  */
-struct IndicatorSizeConstraint
+Vector3 IndicatorSize( const Vector3& parentSize, float contentSize)
 {
-  /**
-   * @param[in] contentSize The size of scrollable content
-   */
-  IndicatorSizeConstraint(float contentSize)
-  : mContentSize(contentSize)
-  {
-  }
-
-  /**
-   * Constraint operator
-   * @param[in] current The current indicator size
-   * @param[in] parentSizeProperty The parent size of scroll indicator.
-   * @return The new scroll indicator size.
-   */
-  Vector3 operator()(const Vector3& current,
-                     const PropertyInput& parentSizeProperty)
-  {
-    const Vector3& parentSize = parentSizeProperty.GetVector3();
-    float height = mContentSize > parentSize.height ? parentSize.height * ( parentSize.height / mContentSize ) : parentSize.height * ( (parentSize.height - mContentSize * 0.5f) / parentSize.height);
-    return Vector3( parentSize.width, std::max(MINIMUM_INDICATOR_HEIGHT, height), parentSize.depth );
-  }
-
-  float mContentSize;  ///< The size of scrollable content
-};
+  float height = contentSize > parentSize.height ?
+                 parentSize.height * ( parentSize.height / contentSize ) :
+                 parentSize.height * ( (parentSize.height - contentSize * 0.5f) / parentSize.height);
+  return Vector3( parentSize.width, std::max(MINIMUM_INDICATOR_HEIGHT, height), parentSize.depth );
+}
 
 /**
  * Indicator position constraint
@@ -228,10 +208,7 @@ void ScrollBar::ApplyConstraints()
     }
     else
     {
-      constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                             ParentSource( Actor::SIZE ),
-                                             IndicatorSizeConstraint( mScrollConnector.GetContentLength() ) );
-      mIndicatorSizeConstraint = mIndicator.ApplyConstraint( constraint );
+      mIndicator.SetSize( IndicatorSize( Self().GetCurrentSize(), mScrollConnector.GetContentLength() ) );
     }
 
     if(mIndicatorPositionConstraint)
@@ -245,16 +222,6 @@ void ScrollBar::ApplyConstraints()
                                            Source( mScrollPositionObject, Toolkit::ScrollConnector::SCROLL_POSITION ),
                                            IndicatorPositionConstraint( mScrollConnector.GetMinLimit(), mScrollConnector.GetMaxLimit() ) );
     mIndicatorPositionConstraint = mIndicator.ApplyConstraint( constraint );
-
-    if( mBackground )
-    {
-      mBackground.RemoveConstraints();
-
-      constraint = Constraint::New<Vector3>(Actor::SIZE,
-                                            ParentSource(Actor::SIZE),
-                                            EqualToConstraint());
-      mBackground.ApplyConstraint(constraint);
-    }
   }
 }
 
@@ -394,6 +361,14 @@ void ScrollBar::OnPan( PanGesture gesture )
       // Disable automatic refresh in ItemView during fast scrolling
       GetImpl(itemView).SetRefreshEnabled(!mIsPanning);
     }
+  }
+}
+
+void ScrollBar::OnControlSizeSet( const Vector3& size )
+{
+  if(mIndicatorHeightPolicy != Toolkit::ScrollBar::Fixed && mScrollConnector)
+  {
+    mIndicator.SetSize( IndicatorSize( size, mScrollConnector.GetContentLength() ) );
   }
 }
 
