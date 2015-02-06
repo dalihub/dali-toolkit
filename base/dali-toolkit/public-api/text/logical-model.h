@@ -33,8 +33,10 @@ namespace Toolkit
 namespace Text
 {
 
+struct FontRun;
 class LogicalModel;
 typedef IntrusivePtr<LogicalModel> LogicalModelPtr;
+struct ScriptRun;
 
 /**
  * @brief A logical text model contains layout independent information.
@@ -82,6 +84,106 @@ public:
   void GetText( CharacterIndex characterIndex,
                 Character* text,
                 Length numberOfCharacters ) const;
+
+  // Language support interface.
+
+  /**
+   * Sets the script runs.
+   *
+   * Replaces any scripts previously set.
+   *
+   * A run is a group of consecutive characters. A script run contains the script for a run.
+   *
+   * @param[in] scripts Pointer to a buffer with all the script runs.
+   * @param[in] numberOfRuns The number of script runs.
+   */
+  void SetScripts( const ScriptRun* const scripts,
+                   Length numberOfRuns );
+
+  /**
+   * Retrieves the number of script runs for the given range of characters.
+   *
+   * A run is a group of consecutive characters. A script run contains the script for a run.
+   *
+   * @param[in] characterIndex Index to the first character.
+   * @param[in] numberOfCharacters The number of characters.
+   *
+   * @return The number of script runs.
+   */
+  Length GetNumberOfScriptRuns( CharacterIndex characterIndex,
+                                Length numberOfCharacters ) const;
+
+  /**
+   * Retrieves the script runs for the given range of characters.
+   *
+   * The @p scriptRuns buffer needs to be big enough to copy the number of script runs.
+   * Call GetNumberOfScriptRuns() to retrieve the number of script runs.
+   *
+   * @param[out] scriptRuns Pointer to a buffer where the script runs are copied.
+   * @param[in] characterIndex Index to the first character.
+   * @param[in] numberOfCharacters The number of characters.
+   */
+  void GetScriptRuns( ScriptRun* scriptRuns,
+                      CharacterIndex characterIndex,
+                      Length numberOfCharacters ) const;
+
+  /**
+   * Retrieves the script for the given character index.
+   *
+   * @param[in] characterIndex Index to the character.
+   *
+   * @return The character's script.
+   */
+  Script GetScript( CharacterIndex characterIndex ) const;
+
+  /**
+   * Sets the font runs.
+   *
+   * Replaces any fonts previously set.
+   *
+   * A run is a group of consecutive characters. A font run contains the font id for a run.
+   *
+   * @param[in] fonts Pointer to a buffer with all the font runs.
+   * @param[in] numberOfRuns The number of font runs.
+   */
+  void SetFonts( const FontRun* const fonts,
+                 Length numberOfRuns );
+
+  /**
+   * Retrieves the number of font runs for the given range of characters.
+   *
+   * A run is a group of consecutive characters. A font run contains the font id for a run.
+   *
+   * @param[in] characterIndex Index to the first character.
+   * @param[in] numberOfCharacters The number of characters.
+   *
+   * @return The number of font runs.
+   */
+  Length GetNumberOfFontRuns( CharacterIndex characterIndex,
+                              Length numberOfCharacters ) const;
+
+  /**
+   * Retrieves the font runs for the given range of characters.
+   *
+   * The @p fontRuns buffer needs to be big enough to copy the number of font runs.
+   * Call GetNumberOfFontRuns() to retrieve the number of font runs.
+   *
+   * @param[out] fontRuns Pointer to a buffer where the font runs are copied.
+   * @param[in] characterIndex Index to the first character.
+   * @param[in] numberOfCharacters The number of characters.
+   */
+  void GetFontRuns( FontRun* fontRuns,
+                    CharacterIndex characterIndex,
+                    Length numberOfCharacters ) const;
+
+  /**
+   * Retrieves the font id for the given character index.
+   *
+   * @param[in] characterIndex Index to the first character.
+   *
+   * @return The font id.
+   */
+  FontId GetFont( CharacterIndex characterIndex ) const;
 
 protected:
 
