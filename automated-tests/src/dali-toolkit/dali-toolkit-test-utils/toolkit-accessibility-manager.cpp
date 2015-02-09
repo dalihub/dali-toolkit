@@ -48,35 +48,35 @@ public:
 
 public: // Signals
 
-  Dali::AccessibilityManager::AccessibilityActionSignalV2& StatusChangedSignal();
-  Dali::AccessibilityManager::AccessibilityActionSignalV2& ActionNextSignal();
-  Dali::AccessibilityManager::AccessibilityActionSignalV2& ActionPreviousSignal();
-  Dali::AccessibilityManager::AccessibilityActionSignalV2& ActionActivateSignal();
-  Dali::AccessibilityManager::AccessibilityActionSignalV2& ActionReadSignal();
-  Dali::AccessibilityManager::AccessibilityActionSignalV2& ActionReadNextSignal();
-  Dali::AccessibilityManager::AccessibilityActionSignalV2& ActionReadPreviousSignal();
-  Dali::AccessibilityManager::AccessibilityActionSignalV2& ActionOverSignal();
-  Dali::AccessibilityManager::AccessibilityActionSignalV2& ActionUpSignal();
-  Dali::AccessibilityManager::AccessibilityActionSignalV2& ActionDownSignal();
-  Dali::AccessibilityManager::AccessibilityActionSignalV2& ActionClearFocusSignal();
-  Dali::AccessibilityManager::AccessibilityActionSignalV2& ActionBackSignal();
-  Dali::AccessibilityManager::AccessibilityActionSignalV2& ActionControlPanelOpenSignal();
+  Dali::AccessibilityManager::AccessibilityActionSignalType& StatusChangedSignal();
+  Dali::AccessibilityManager::AccessibilityActionSignalType& ActionNextSignal();
+  Dali::AccessibilityManager::AccessibilityActionSignalType& ActionPreviousSignal();
+  Dali::AccessibilityManager::AccessibilityActionSignalType& ActionActivateSignal();
+  Dali::AccessibilityManager::AccessibilityActionSignalType& ActionReadSignal();
+  Dali::AccessibilityManager::AccessibilityActionSignalType& ActionReadNextSignal();
+  Dali::AccessibilityManager::AccessibilityActionSignalType& ActionReadPreviousSignal();
+  Dali::AccessibilityManager::AccessibilityActionSignalType& ActionOverSignal();
+  Dali::AccessibilityManager::AccessibilityActionSignalType& ActionUpSignal();
+  Dali::AccessibilityManager::AccessibilityActionSignalType& ActionDownSignal();
+  Dali::AccessibilityManager::AccessibilityActionSignalType& ActionClearFocusSignal();
+  Dali::AccessibilityManager::AccessibilityActionSignalType& ActionBackSignal();
+  Dali::AccessibilityManager::AccessibilityActionSignalType& ActionControlPanelOpenSignal();
 
 private:
 
-  Dali::AccessibilityManager::AccessibilityActionSignalV2 mStatusChangedSignal;
-  Dali::AccessibilityManager::AccessibilityActionSignalV2 mActionNextSignal;
-  Dali::AccessibilityManager::AccessibilityActionSignalV2 mActionPreviousSignal;
-  Dali::AccessibilityManager::AccessibilityActionSignalV2 mActionActivateSignal;
-  Dali::AccessibilityManager::AccessibilityActionSignalV2 mActionReadSignal;
-  Dali::AccessibilityManager::AccessibilityActionSignalV2 mActionReadNextSignal;
-  Dali::AccessibilityManager::AccessibilityActionSignalV2 mActionReadPreviousSignal;
-  Dali::AccessibilityManager::AccessibilityActionSignalV2 mActionOverSignal;
-  Dali::AccessibilityManager::AccessibilityActionSignalV2 mActionUpSignal;
-  Dali::AccessibilityManager::AccessibilityActionSignalV2 mActionDownSignal;
-  Dali::AccessibilityManager::AccessibilityActionSignalV2 mActionClearFocusSignal;
-  Dali::AccessibilityManager::AccessibilityActionSignalV2 mActionBackSignal;
-  Dali::AccessibilityManager::AccessibilityActionSignalV2 mActionControlPanelOpenSignal;
+  Dali::AccessibilityManager::AccessibilityActionSignalType mStatusChangedSignal;
+  Dali::AccessibilityManager::AccessibilityActionSignalType mActionNextSignal;
+  Dali::AccessibilityManager::AccessibilityActionSignalType mActionPreviousSignal;
+  Dali::AccessibilityManager::AccessibilityActionSignalType mActionActivateSignal;
+  Dali::AccessibilityManager::AccessibilityActionSignalType mActionReadSignal;
+  Dali::AccessibilityManager::AccessibilityActionSignalType mActionReadNextSignal;
+  Dali::AccessibilityManager::AccessibilityActionSignalType mActionReadPreviousSignal;
+  Dali::AccessibilityManager::AccessibilityActionSignalType mActionOverSignal;
+  Dali::AccessibilityManager::AccessibilityActionSignalType mActionUpSignal;
+  Dali::AccessibilityManager::AccessibilityActionSignalType mActionDownSignal;
+  Dali::AccessibilityManager::AccessibilityActionSignalType mActionClearFocusSignal;
+  Dali::AccessibilityManager::AccessibilityActionSignalType mActionBackSignal;
+  Dali::AccessibilityManager::AccessibilityActionSignalType mActionControlPanelOpenSignal;
 
   bool mIsEnabled;
   Dali::AccessibilityActionHandler* mActionHandler;
@@ -121,67 +121,67 @@ void AccessibilityManager::SetGestureHandler(Dali::AccessibilityGestureHandler& 
   mGestureHandler = &handler;
 }
 
-Dali::AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::StatusChangedSignal()
+Dali::AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::StatusChangedSignal()
 {
   return mStatusChangedSignal;
 }
 
-Dali::AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionNextSignal()
+Dali::AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionNextSignal()
 {
   return mActionNextSignal;
 }
 
-Dali::AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionPreviousSignal()
+Dali::AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionPreviousSignal()
 {
   return mActionPreviousSignal;
 }
 
-Dali::AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionActivateSignal()
+Dali::AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionActivateSignal()
 {
   return mActionActivateSignal;
 }
 
-Dali::AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionReadSignal()
+Dali::AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionReadSignal()
 {
   return mActionReadSignal;
 }
 
-Dali::AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionReadNextSignal()
+Dali::AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionReadNextSignal()
 {
   return mActionReadNextSignal;
 }
 
-Dali::AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionReadPreviousSignal()
+Dali::AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionReadPreviousSignal()
 {
   return mActionReadPreviousSignal;
 }
 
-Dali::AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionOverSignal()
+Dali::AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionOverSignal()
 {
   return mActionOverSignal;
 }
 
-Dali::AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionUpSignal()
+Dali::AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionUpSignal()
 {
   return mActionUpSignal;
 }
 
-Dali::AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionDownSignal()
+Dali::AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionDownSignal()
 {
   return mActionDownSignal;
 }
 
-Dali::AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionClearFocusSignal()
+Dali::AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionClearFocusSignal()
 {
   return mActionClearFocusSignal;
 }
 
-Dali::AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionBackSignal()
+Dali::AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionBackSignal()
 {
   return mActionBackSignal;
 }
 
-Dali::AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionControlPanelOpenSignal()
+Dali::AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionControlPanelOpenSignal()
 {
   return mActionControlPanelOpenSignal;
 }
@@ -298,62 +298,62 @@ void AccessibilityManager::HandleActionDisableEvent()
   //Internal::Adaptor::GetImplementation(*this).HandleActionDisableEvent();
 }
 
-AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::StatusChangedSignal()
+AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::StatusChangedSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).StatusChangedSignal();
 }
 
-AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionNextSignal()
+AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionNextSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).ActionNextSignal();
 }
 
-AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionPreviousSignal()
+AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionPreviousSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).ActionPreviousSignal();
 }
 
-AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionActivateSignal()
+AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionActivateSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).ActionActivateSignal();
 }
 
-AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionOverSignal()
+AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionOverSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).ActionOverSignal();
 }
 
-AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionReadSignal()
+AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionReadSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).ActionReadSignal();
 }
 
-AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionReadNextSignal()
+AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionReadNextSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).ActionReadNextSignal();
 }
 
-AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionReadPreviousSignal()
+AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionReadPreviousSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).ActionReadPreviousSignal();
 }
 
-AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionUpSignal()
+AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionUpSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).ActionUpSignal();
 }
 
-AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionDownSignal()
+AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionDownSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).ActionDownSignal();
 }
 
-AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionClearFocusSignal()
+AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionClearFocusSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).ActionClearFocusSignal();
 }
 
-AccessibilityManager::AccessibilityActionSignalV2& AccessibilityManager::ActionBackSignal()
+AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionBackSignal()
 {
   return Internal::Adaptor::GetImplementation(*this).ActionBackSignal();
 }

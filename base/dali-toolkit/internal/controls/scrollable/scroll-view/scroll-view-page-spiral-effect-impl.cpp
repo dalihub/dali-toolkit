@@ -69,7 +69,7 @@ using namespace ScrollViewHelperFunctions;
  * relative to the middle of the screen.
  * When at middle of the screen the position is not altered.
  */
-class ScrollPageSpiralEffectInfo : public Dali::RefObject
+class ScrollPageSpiralEffectInfo
 {
 public:
 
@@ -336,8 +336,6 @@ public:
   bool mScrollWrap;      ///< Whether the scroll view wraps or not.
 };
 
-typedef IntrusivePtr<ScrollPageSpiralEffectInfo> ScrollPageSpiralEffectInfoPtr;
-
 /**
  * Helper: Applies the 3D scroll cube constraints to the child actor
  *
@@ -347,7 +345,7 @@ typedef IntrusivePtr<ScrollPageSpiralEffectInfo> ScrollPageSpiralEffectInfoPtr;
  */
 void ApplyScrollCubeConstraints(Toolkit::ScrollView scrollView,
                                 Actor child,
-                                ScrollPageSpiralEffectInfoPtr info)
+                                ScrollPageSpiralEffectInfo& info)
 {
   // Apply constraints to this actor //
   Constraint constraint;
@@ -405,7 +403,7 @@ void ScrollViewPageSpiralEffect::ApplyToPage( Actor page, const Vector2& spiralA
 
   if ( scrollView )
   {
-    ScrollPageSpiralEffectInfoPtr info(new ScrollPageSpiralEffectInfo( spiralAngle, GetImpl( scrollView ).GetWrapMode() ));
+    ScrollPageSpiralEffectInfo info( spiralAngle, GetImpl( scrollView ).GetWrapMode() );
     ApplyScrollCubeConstraints( scrollView, page, info );
   }
 }

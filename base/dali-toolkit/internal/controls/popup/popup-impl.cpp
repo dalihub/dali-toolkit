@@ -551,18 +551,18 @@ void Popup::HandleStateChangeComplete()
 
     // Guard against destruction during signal emission
     Toolkit::Popup handle( GetOwner() );
-    mHiddenSignalV2.Emit();
+    mHiddenSignal.Emit();
   }
 }
 
-Toolkit::Popup::TouchedOutsideSignalV2& Popup::OutsideTouchedSignal()
+Toolkit::Popup::TouchedOutsideSignalType& Popup::OutsideTouchedSignal()
 {
-  return mTouchedOutsideSignalV2;
+  return mTouchedOutsideSignal;
 }
 
-Toolkit::Popup::HiddenSignalV2& Popup::HiddenSignal()
+Toolkit::Popup::HiddenSignalType& Popup::HiddenSignal()
 {
-  return mHiddenSignalV2;
+  return mHiddenSignal;
 }
 
 bool Popup::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -605,7 +605,7 @@ bool Popup::OnBackingTouched(Actor actor, const TouchEvent& event)
       // Guard against destruction during signal emission
       Toolkit::Popup handle( GetOwner() );
 
-      mTouchedOutsideSignalV2.Emit();
+      mTouchedOutsideSignal.Emit();
     }
   }
 
@@ -645,7 +645,7 @@ void Popup::OnControlChildAdd( Actor& child )
   }
 }
 
-void Popup::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+void Popup::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   // Set the popup size
   Vector2 popupSize;

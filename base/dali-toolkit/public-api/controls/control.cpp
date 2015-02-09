@@ -179,7 +179,7 @@ Actor Control::GetBackgroundActor() const
   return GetImplementation().GetBackgroundActor();
 }
 
-Control::KeyEventSignalV2& Control::KeyEventSignal()
+Control::KeyEventSignalType& Control::KeyEventSignal()
 {
   return GetImplementation().KeyEventSignal();
 }

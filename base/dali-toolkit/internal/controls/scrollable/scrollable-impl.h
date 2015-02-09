@@ -143,22 +143,22 @@ public: //Signals
   /**
    * @copydoc Dali::Toolkit::Scrollable::ScrollStartedSignal()
    */
-  Toolkit::Scrollable::ScrollStartedSignalV2& ScrollStartedSignal();
+  Toolkit::Scrollable::ScrollStartedSignalType& ScrollStartedSignal();
 
   /**
    * @copydoc Dali::Toolkit::Scrollable::ScrollUpdatedSignal()
    */
-  Toolkit::Scrollable::ScrollUpdatedSignalV2& ScrollUpdatedSignal();
+  Toolkit::Scrollable::ScrollUpdatedSignalType& ScrollUpdatedSignal();
 
   /**
    * @copydoc Dali::Toolkit::Scrollable::ScrollCompletedSignal()
    */
-  Toolkit::Scrollable::ScrollCompletedSignalV2& ScrollCompletedSignal();
+  Toolkit::Scrollable::ScrollCompletedSignalType& ScrollCompletedSignal();
 
   /**
    * @copydoc Dali::Toolkit::Scrollable::ScrollClampedSignal()
    */
-  Toolkit::Scrollable::ScrollClampedSignalV2& ScrollClampedSignal();
+  Toolkit::Scrollable::ScrollClampedSignalType& ScrollClampedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -245,10 +245,10 @@ protected:
 
   std::map<Toolkit::Scrollable::ScrollComponentType, ScrollComponentPtr> mComponent;  ///< ScrollComponent (such as a scrollbar/page indicator/status)
 
-  Toolkit::Scrollable::ScrollStartedSignalV2 mScrollStartedSignalV2;
-  Toolkit::Scrollable::ScrollUpdatedSignalV2 mScrollUpdatedSignalV2;
-  Toolkit::Scrollable::ScrollCompletedSignalV2 mScrollCompletedSignalV2;
-  Toolkit::Scrollable::ScrollClampedSignalV2 mScrollClampedSignalV2;
+  Toolkit::Scrollable::ScrollStartedSignalType mScrollStartedSignal;
+  Toolkit::Scrollable::ScrollUpdatedSignalType mScrollUpdatedSignal;
+  Toolkit::Scrollable::ScrollCompletedSignalType mScrollCompletedSignal;
+  Toolkit::Scrollable::ScrollClampedSignalType mScrollClampedSignal;
 
 private:
 

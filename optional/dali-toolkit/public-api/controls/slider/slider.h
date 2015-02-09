@@ -115,8 +115,8 @@ public:
   // Signals
 
   // Value changed
-  typedef SignalV2< bool ( Slider, float ) > ValueChangedSignalType;
-  typedef SignalV2< bool ( Slider, int ) > MarkSignalType;
+  typedef Signal< bool ( Slider, float ) > ValueChangedSignalType;
+  typedef Signal< bool ( Slider, int ) > MarkSignalType;
 
   /**
    * Signal emitted when the slider value changes

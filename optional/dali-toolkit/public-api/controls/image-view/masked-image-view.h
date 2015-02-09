@@ -266,7 +266,7 @@ public:
 public: /* Signals */
 
   /// @brief Finished signal type.
-  typedef SignalV2< void (MaskedImageView& source) > MaskedImageViewSignal;
+  typedef Signal< void (MaskedImageView& source) > MaskedImageViewSignal;
 
   /**
    * @brief Signal emitted when the render task which targets the

@@ -77,12 +77,12 @@ public:
   /**
    * @copydoc Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignal()
    */
-  Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalV2& KeyInputFocusChangedSignal();
+  Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalType& KeyInputFocusChangedSignal();
 
   /**
    * @copydoc Toolkit::KeyInputFocusManager::UnhandledKeyEventSignal()
    */
-  Toolkit::KeyInputFocusManager::UnhandledKeyEventSignalV2& UnhandledKeyEventSignal();
+  Toolkit::KeyInputFocusManager::UnhandledKeyEventSignalType& UnhandledKeyEventSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -139,10 +139,10 @@ private:
 private:
 
   // The key input focus change signal
-  Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalV2 mKeyInputFocusChangedSignalV2;
+  Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalType mKeyInputFocusChangedSignal;
 
   // The un-handled key event signal
-  Toolkit::KeyInputFocusManager::UnhandledKeyEventSignalV2 mUnhandledKeyEventSignalV2;
+  Toolkit::KeyInputFocusManager::UnhandledKeyEventSignalType mUnhandledKeyEventSignal;
 
   // Keyboard events are sent to the current focus actor, which will be the actor on the top of the focus actors stack.
   FocusStack mFocusStack;

@@ -625,7 +625,7 @@ float TableView::GetLayoutAnimationDuration()
   return mConstraintDuration;
 }
 
-void TableView::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+void TableView::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   float fixedHeightsTotal = 0.0f;
   float fixedWidthsTotal = 0.0f;

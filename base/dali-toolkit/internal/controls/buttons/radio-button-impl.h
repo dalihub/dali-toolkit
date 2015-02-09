@@ -85,14 +85,14 @@ class RadioButton: public Button
   Actor GetLabel() const;
 
   /**
-   * @copydoc Dali::Toolkit::RadioButton::SetActive(bool active)
+   * @copydoc Dali::Toolkit::RadioButton::SetSelected(bool selected)
    */
-  void SetActive(bool active);
+  void SetSelected(bool selected);
 
   /**
-   * @copydoc Dali::Toolkit::RadioButton::IsActive()
+   * @copydoc Dali::Toolkit::RadioButton::IsSelected()
    */
-  bool IsActive()const;
+  bool IsSelected()const;
 
   /**
    * @copydoc Dali::Toolkit::RadioButton::ToggleState()
@@ -100,9 +100,9 @@ class RadioButton: public Button
   void ToggleState();
 
   /**
-   * @copydoc Dali::Toolkit::Control::OnRelaidOut(Vector2 size, ActorSizeContainer& container)
+   * @copydoc Dali::Toolkit::Control::OnRelayout()
    */
-  virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
+  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 
  public:
   // Properties
@@ -138,11 +138,11 @@ class RadioButton: public Button
   // Undefined
   RadioButton& operator=(const RadioButton& origin);
 
-  Image mInactiveImage;     ///< Stores the inactive image
-  Image mActiveImage;       ///< Stores the active image
+  Image mUnselectedImage;  ///< Stores the unselected image
+  Image mSelectedImage;    ///< Stores the selected image
   ImageActor mRadioIcon;   ///< Stores the current image
-  Actor mLabel;             ///< Stores the button label
-  bool mActive;             ///< Stores the active state
+  Actor mLabel;            ///< Stores the button label
+  bool mSelected;          ///< Stores the selected state
 } ;
 
 } // namespace Internal

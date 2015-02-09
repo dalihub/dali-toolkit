@@ -114,25 +114,25 @@ public:
 
 public:
 
-  typedef SignalV2< void ( const Vector3& ) > ScrollStartedSignalV2;   ///< ScrollStarted signal type
-  typedef SignalV2< void ( const Vector3& ) > ScrollCompletedSignalV2; ///< ScrollCompleted signal type
-  typedef SignalV2< void ( const Vector3& ) > ScrollUpdatedSignalV2;   ///< Scroll updated signal type
-  typedef SignalV2< void ( const ClampEvent& ) > ScrollClampedSignalV2; ///< Scroll clamped signal type
+  typedef Signal< void ( const Vector3& ) > ScrollStartedSignalType;   ///< ScrollStarted signal type
+  typedef Signal< void ( const Vector3& ) > ScrollCompletedSignalType; ///< ScrollCompleted signal type
+  typedef Signal< void ( const Vector3& ) > ScrollUpdatedSignalType;   ///< Scroll updated signal type
+  typedef Signal< void ( const ClampEvent& ) > ScrollClampedSignalType; ///< Scroll clamped signal type
 
   /**
    * @brief Signal emitted when the Scrollable has moved (whether by touch or animation).
    */
-  ScrollStartedSignalV2& ScrollStartedSignal();
+  ScrollStartedSignalType& ScrollStartedSignal();
 
   /**
    * @brief Signal emitted when the Scrollable has moved (whether by touch or animation).
    */
-  ScrollUpdatedSignalV2& ScrollUpdatedSignal();
+  ScrollUpdatedSignalType& ScrollUpdatedSignal();
 
   /**
    * @brief Signal emitted when the Scrollable has completed movement (whether by touch or animation).
    */
-  ScrollCompletedSignalV2& ScrollCompletedSignal();
+  ScrollCompletedSignalType& ScrollCompletedSignal();
 
   /**
    * @brief Signal emitted when the Scrollable is pushing against a domain boundary
@@ -140,7 +140,7 @@ public:
    *
    * @return The signal to connect to
    */
-  ScrollClampedSignalV2& ScrollClampedSignal();
+  ScrollClampedSignalType& ScrollClampedSignal();
 
 public:
 

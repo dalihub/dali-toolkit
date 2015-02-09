@@ -19,7 +19,7 @@
 
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -43,10 +43,10 @@ public:
   bool IsAttached() const;
 
 public: // Signals
-  Dali::PhysicalKeyboard::Signal& StatusChangedSignal();
+  Dali::PhysicalKeyboard::PhysicalKeyboardSignalType& StatusChangedSignal();
 
 private:
-  Dali::PhysicalKeyboard::Signal mStatusChangedSignal;
+  Dali::PhysicalKeyboard::PhysicalKeyboardSignalType mStatusChangedSignal;
   bool mIsAttached;
   static Dali::PhysicalKeyboard mPhysicalKeyboard;
 };
@@ -76,7 +76,7 @@ bool PhysicalKeyboard::IsAttached() const
   return mIsAttached;
 }
 
-Dali::PhysicalKeyboard::Signal& PhysicalKeyboard::StatusChangedSignal()
+Dali::PhysicalKeyboard::PhysicalKeyboardSignalType& PhysicalKeyboard::StatusChangedSignal()
 {
   return mStatusChangedSignal;
 }
@@ -106,7 +106,7 @@ bool PhysicalKeyboard::IsAttached() const
   return pyke.IsAttached();
 }
 
-PhysicalKeyboard::Signal& PhysicalKeyboard::StatusChangedSignal()
+PhysicalKeyboard::PhysicalKeyboardSignalType& PhysicalKeyboard::StatusChangedSignal()
 {
   BaseObject& object = GetBaseObject();
   Internal::Adaptor::PhysicalKeyboard& pyke = static_cast< Internal::Adaptor::PhysicalKeyboard& >( object );

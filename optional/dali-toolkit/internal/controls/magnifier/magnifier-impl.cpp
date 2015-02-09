@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/controls/magnifier/magnifier-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
@@ -177,10 +176,6 @@ void Magnifier::Initialize()
   mPropertySourcePosition = self.RegisterProperty( Toolkit::Magnifier::SOURCE_POSITION_PROPERTY_NAME, Vector3::ZERO );
   Vector2 stageSize(Stage::GetCurrent().GetSize());
 
-  Layer dummyLayer = Layer::New();
-  Stage().GetCurrent().Add(dummyLayer);
-  dummyLayer.SetParentOrigin(ParentOrigin::CENTER);
-
   // NOTE:
   // sourceActor is a dummy delegate actor that takes the source property position,
   // and generates a WORLD_POSITION, which is 1 frame behind the source property.
@@ -192,7 +187,7 @@ void Magnifier::Initialize()
   // Perhaps this is a bug in the way the constraint system factors into what is dirty
   // and what is not.
   mSourceActor = Actor::New();
-  dummyLayer.Add(mSourceActor);
+  Stage().GetCurrent().Add(mSourceActor);
   mSourceActor.SetParentOrigin(ParentOrigin::CENTER);
   Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
                                                     Source( self, mPropertySourcePosition ),
@@ -227,8 +222,8 @@ void Magnifier::Initialize()
   //Property::Index propertySourcePositionDelayed = mCameraActor.RegisterProperty("delayed-source-position", Vector3::ZERO);
 
   constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                    Source( mSourceActor, Actor::WORLD_POSITION ),
-                                                    CameraActorPositionConstraint(stageSize, mDefaultCameraDistance) );
+                                         Source( mSourceActor, Actor::WORLD_POSITION ),
+                                         CameraActorPositionConstraint(stageSize, mDefaultCameraDistance) );
   mCameraActor.ApplyConstraint(constraint);
 
   // Apply constraint to render-task viewport position
@@ -275,56 +270,47 @@ void Magnifier::InitializeRenderTask()
 
 bool Magnifier::GetFrameVisibility() const
 {
-  return mFrameLayer;
+  return mFrame;
 }
 
 void Magnifier::SetFrameVisibility(bool visible)
 {
-  if(visible && !mFrameLayer)
+  if(visible && !mFrame)
   {
     Actor self(Self());
 
-    Layer mFrameLayer = Layer::New();
-    mFrameLayer.SetParentOrigin( ParentOrigin::CENTER );
-    Stage::GetCurrent().Add(mFrameLayer);
-
     Image image = Image::New( DEFAULT_FRAME_IMAGE_PATH );
-    ImageActor frame = ImageActor::New( image );
-    frame.SetDrawMode(DrawMode::OVERLAY);
-    frame.SetStyle( ImageActor::STYLE_NINE_PATCH );
+    mFrame = ImageActor::New( image );
+    mFrame.SetDrawMode(DrawMode::OVERLAY);
+    mFrame.SetStyle( ImageActor::STYLE_NINE_PATCH );
+    mFrame.SetPositionInheritanceMode(DONT_INHERIT_POSITION);
+    mFrame.SetInheritScale(true);
 
-    frame.SetNinePatchBorder( Vector4::ONE * IMAGE_BORDER_INDENT );
-    mFrameLayer.Add(frame);
-
-    // Apply position constraint to the frame
     Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                      Source( self, Actor::WORLD_POSITION ),
-                                                      EqualToConstraint() );
-    frame.ApplyConstraint(constraint);
+                                                      ParentSource(Actor::WORLD_POSITION),
+                                                      EqualToConstraint());
+    mFrame.ApplyConstraint( constraint );
 
-    // Apply scale constraint to the frame
-    constraint = Constraint::New<Vector3>( Actor::SCALE,
-                                           Source( self, Actor::SCALE ),
-                                           EqualToConstraint() );
-    frame.ApplyConstraint(constraint);
+    mFrame.SetNinePatchBorder( Vector4::ONE * IMAGE_BORDER_INDENT );
+    self.Add(mFrame);
 
-    Source(self, Actor::SCALE),
-
-    // Apply size constraint to the the frame
-    constraint = Constraint::New<Vector3>(Actor::SIZE,
-                                          Source(self, Actor::SIZE),
-                                          ImageBorderSizeConstraint());
-    frame.ApplyConstraint(constraint);
+    Vector3 sizeOffset(IMAGE_BORDER_INDENT*2.f - 2.f, IMAGE_BORDER_INDENT*2.f - 2.f, 0.0f);
+    mFrame.SetSize(mActorSize + sizeOffset);
   }
-  else if(!visible && mFrameLayer)
+  else if(!visible && mFrame)
   {
-    Stage::GetCurrent().Remove(mFrameLayer);
-    mFrameLayer.Reset();
+    UnparentAndReset(mFrame);
   }
 }
 
 void Magnifier::OnControlSizeSet(const Vector3& targetSize)
 {
+  if( mFrame )
+  {
+    Vector3 sizeOffset(IMAGE_BORDER_INDENT*2.f - 2.f, IMAGE_BORDER_INDENT*2.f - 2.f, 0.0f);
+    mFrame.SetSize(targetSize + sizeOffset);
+  }
+
   // TODO: Once Camera/CameraActor properties function as proper animatable properties
   // this code can disappear.
   // whenever the size of the magnifier changes, the field of view needs to change

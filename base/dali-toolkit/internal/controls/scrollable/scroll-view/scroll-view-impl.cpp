@@ -727,84 +727,6 @@ void ScrollView::ApplyEffect(Toolkit::ScrollViewEffect effect)
   GetImpl(effect).Attach(self);
 }
 
-Toolkit::ScrollViewEffect ScrollView::ApplyEffect(Toolkit::ScrollView::PageEffect effect)
-{
-  Toolkit::ScrollViewEffect scrollEffect;
-  switch(effect)
-  {
-    case Toolkit::ScrollView::PageEffectNone:
-    {
-      break;
-    }
-    case Toolkit::ScrollView::PageEffectOuterCube:
-    {
-      Toolkit::ScrollViewCustomEffect customEffect;
-      scrollEffect = customEffect = Toolkit::ScrollViewCustomEffect::New();
-      Vector2 pageSize = Stage::GetCurrent().GetSize();
-      // set the page translation to the slide off distance, also add an extra value to space the pages, having a smaller spacing on translationOut will allow the spacing to reduce over time
-      // the page moving onto screen will start 50.0f further out (1.0f * 50.0f) and the spacing will reduce as its position reaches the centre (0.0f * 50.0f)
-      // the page moving off screen will slowly build a spacing from 0.0f to 20.0f
-      // the spacing from each page is added together for the final spacing between the two pages.
-      customEffect.SetPageTranslation(Vector3(pageSize.x, pageSize.y, 0) + Vector3(50.0f, 50.0f, 0.0f), Vector3(pageSize.x, pageSize.y, 0) + Vector3(20.0f, 20.0f, 0.0f));
-      customEffect.SetSwingAngleOut(ANGLE_CUSTOM_CUBE_SWING.x, Vector3(0.0f, -1.0f, 0.0f));
-      customEffect.SetSwingAnchor(AnchorPoint::CENTER, AnchorPoint::CENTER_LEFT);
-      customEffect.SetOpacityThreshold(0.7f);
-      break;
-    }
-    case Toolkit::ScrollView::PageEffectDepth:
-    {
-      Toolkit::ScrollViewCustomEffect customEffect;
-      scrollEffect = customEffect = Toolkit::ScrollViewCustomEffect::New();
-      break;
-    }
-    case Toolkit::ScrollView::PageEffectInnerCube:
-    {
-      Toolkit::ScrollViewCustomEffect customEffect;
-      scrollEffect = customEffect = Toolkit::ScrollViewCustomEffect::New();
-      customEffect.SetPageSpacing(Vector2(30.0f, 30.0f));
-      customEffect.SetAngledOriginPageRotation(ANGLE_CUBE_PAGE_ROTATE);
-      customEffect.SetSwingAngle(ANGLE_CUBE_PAGE_ROTATE.x, Vector3(0,-1,0));
-      customEffect.SetOpacityThreshold(0.5f);
-      break;
-    }
-    case Toolkit::ScrollView::PageEffectCarousel:
-    {
-      Toolkit::ScrollViewCustomEffect customEffect;
-      scrollEffect = customEffect = Toolkit::ScrollViewCustomEffect::New();
-      customEffect.SetPageTranslation(Vector3(0,0,0), Vector3(-30, 0, 0));
-      customEffect.SetPageSpacing(Vector2(60.0f, 60.0f));
-      customEffect.SetAngledOriginPageRotation(-ANGLE_CUBE_PAGE_ROTATE);
-      customEffect.SetOpacityThreshold(0.2f, 0.6f);
-      break;
-    }
-    case Toolkit::ScrollView::PageEffectSpiral:
-    {
-      Toolkit::ScrollViewCustomEffect customEffect;
-      scrollEffect = customEffect = Toolkit::ScrollViewCustomEffect::New();
-
-      Vector2 pageSize = Stage::GetCurrent().GetSize();
-      customEffect.SetSwingAngle(-ANGLE_SPIRAL_SWING_IN.x, Vector3(0.0f, -1.0f, 0.0f), ANGLE_SPIRAL_SWING_OUT.x, Vector3(0.0f, -1.0f, 0.0f));
-      //customEffect.SetSwingAngleAlphaFunctionOut(AlphaFunctions::EaseOut);
-      customEffect.SetSwingAnchor(AnchorPoint::CENTER_RIGHT);
-      customEffect.SetPageTranslation(Vector3(pageSize.x, pageSize.y, 0) + Vector3(100.0f, 100.0f, 0.0f), Vector3(pageSize.x, pageSize.y, -pageSize.y * 2.0f) * 0.33f);
-      //customEffect.SetPageTranslateAlphaFunctionOut(AlphaFunctions::EaseOut);
-      customEffect.SetOpacityThreshold(0.75f, 0.6f);
-      customEffect.SetOpacityAlphaFunctionIn(AlphaFunctions::EaseInOut);
-      break;
-    }
-    default:
-    {
-      DALI_ASSERT_DEBUG(0 && "unknown scroll view effect");
-    }
-  }
-  RemoveConstraintsFromChildren();
-  if(scrollEffect)
-  {
-    ApplyEffect(scrollEffect);
-  }
-  return scrollEffect;
-}
-
 void ScrollView::RemoveEffect(Toolkit::ScrollViewEffect effect)
 {
   Dali::Toolkit::ScrollView self = Dali::Toolkit::ScrollView::DownCast(Self());
@@ -1232,8 +1154,8 @@ void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunct
   {
     // set mScrolling to false, in case user has code that interrogates mScrolling Getter() in complete.
     mScrolling = false;
-    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 1 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
-    mScrollCompletedSignalV2.Emit( currentScrollPosition );
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 1 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+    mScrollCompletedSignal.Emit( currentScrollPosition );
   }
 
   if( mPanning ) // are we interrupting a current pan?
@@ -1252,8 +1174,8 @@ void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunct
   self.SetProperty(mPropertyScrolling, true);
   mScrolling = true;
 
-  DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignalV2 1 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
-  mScrollStartedSignalV2.Emit( currentScrollPosition );
+  DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignal 1 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+  mScrollStartedSignal.Emit( currentScrollPosition );
   bool animating = AnimateTo(-position,
                              Vector3::ONE * duration,
                              alpha,
@@ -1276,9 +1198,9 @@ void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunct
       completedPosition = position;
     }
 
-    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 2 [%.2f, %.2f]", this, completedPosition.x, completedPosition.y);
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 2 [%.2f, %.2f]", this, completedPosition.x, completedPosition.y);
     SetScrollUpdateNotification(false);
-    mScrollCompletedSignalV2.Emit( completedPosition );
+    mScrollCompletedSignal.Emit( completedPosition );
   }
 }
 
@@ -1765,8 +1687,8 @@ bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDurat
   snapEvent.position = -mScrollTargetPosition;
   snapEvent.duration = totalDuration;
 
-  DALI_LOG_SCROLL_STATE("[0x%X] mSnapStartedSignalV2 [%.2f, %.2f]", this, snapEvent.position.x, snapEvent.position.y);
-  mSnapStartedSignalV2.Emit( snapEvent );
+  DALI_LOG_SCROLL_STATE("[0x%X] mSnapStartedSignal [%.2f, %.2f]", this, snapEvent.position.x, snapEvent.position.y);
+  mSnapStartedSignal.Emit( snapEvent );
 
   return (mScrollStateFlags & SCROLL_ANIMATION_FLAGS) != 0;
 }
@@ -1823,9 +1745,9 @@ void ScrollView::RemoveScrollingDirection( Radian direction )
   panGesture.RemoveDirection( direction );
 }
 
-Toolkit::ScrollView::SnapStartedSignalV2& ScrollView::SnapStartedSignal()
+Toolkit::ScrollView::SnapStartedSignalType& ScrollView::SnapStartedSignal()
 {
-  return mSnapStartedSignalV2;
+  return mSnapStartedSignal;
 }
 
 void ScrollView::FindAndUnbindActor(Actor child)
@@ -1868,8 +1790,8 @@ void ScrollView::HandleSnapAnimationFinished()
   self.SetProperty(mPropertyPrePosition, mScrollPrePosition);
 
   Vector3 currentScrollPosition = GetCurrentScrollPosition();
-  DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 3 current[%.2f, %.2f], mScrollTargetPosition[%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y, -mScrollTargetPosition.x, -mScrollTargetPosition.y );
-  mScrollCompletedSignalV2.Emit( currentScrollPosition );
+  DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 3 current[%.2f, %.2f], mScrollTargetPosition[%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y, -mScrollTargetPosition.x, -mScrollTargetPosition.y );
+  mScrollCompletedSignal.Emit( currentScrollPosition );
 
   mDomainOffset += deltaPosition - mScrollPostPosition;
   self.SetProperty(mPropertyDomainOffset, mDomainOffset);
@@ -1911,7 +1833,7 @@ void ScrollView::OnScrollUpdateNotification(Dali::PropertyNotification& source)
   Toolkit::ScrollView handle( GetOwner() );
 
   Vector3 currentScrollPosition = GetCurrentScrollPosition();
-  mScrollUpdatedSignalV2.Emit( currentScrollPosition );
+  mScrollUpdatedSignal.Emit( currentScrollPosition );
 }
 
 bool ScrollView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -2026,8 +1948,8 @@ bool ScrollView::OnTouchDownTimeout()
 
       UpdateLocalScrollProperties();
       Vector3 currentScrollPosition = GetCurrentScrollPosition();
-      DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 4 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
-      mScrollCompletedSignalV2.Emit( currentScrollPosition );
+      DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 4 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+      mScrollCompletedSignal.Emit( currentScrollPosition );
     }
   }
 
@@ -2410,8 +2332,8 @@ void ScrollView::GestureStarted()
       mScrolling = false;
       // send negative scroll position since scroll internal scroll position works as an offset for actors,
       // give applications the position within the domain from the scroll view's anchor position
-      DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 5 [%.2f, %.2f]", this, -mScrollPostPosition.x, -mScrollPostPosition.y);
-      mScrollCompletedSignalV2.Emit( -mScrollPostPosition );
+      DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 5 [%.2f, %.2f]", this, -mScrollPostPosition.x, -mScrollPostPosition.y);
+      mScrollCompletedSignal.Emit( -mScrollPostPosition );
     }
   }
 }
@@ -2535,8 +2457,8 @@ void ScrollView::OnGestureEx(Gesture::State state)
     Vector3 currentScrollPosition = GetCurrentScrollPosition();
     Self().SetProperty(mPropertyScrolling, true);
     mScrolling = true;
-    DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignalV2 2 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
-    mScrollStartedSignalV2.Emit( currentScrollPosition );
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignal 2 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+    mScrollStartedSignal.Emit( currentScrollPosition );
   }
   else if( (state == Gesture::Finished) ||
            (state == Gesture::Cancelled) ) // Finished/default
@@ -2590,8 +2512,8 @@ void ScrollView::FinishTransform()
       SnapInternalYTo(mScrollTargetPosition.y);
     }
     Vector3 currentScrollPosition = GetCurrentScrollPosition();
-    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignalV2 6 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
-    mScrollCompletedSignalV2.Emit( currentScrollPosition );
+    DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 6 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
+    mScrollCompletedSignal.Emit( currentScrollPosition );
   }
 }
 

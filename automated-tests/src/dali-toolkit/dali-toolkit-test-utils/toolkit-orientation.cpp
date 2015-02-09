@@ -19,7 +19,7 @@
 
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -58,7 +58,7 @@ public: // Setters & Getters
 
 public: // Signals
 
-  Dali::Orientation::OrientationSignalV2& ChangedSignal();
+  Dali::Orientation::OrientationSignalType& ChangedSignal();
 
   void EmitChangedSignal()
   {
@@ -67,7 +67,7 @@ public: // Signals
 
 private:
 
-  Dali::Orientation::OrientationSignalV2 mChangedSignal;
+  Dali::Orientation::OrientationSignalType mChangedSignal;
 
   ToolkitOrientation* mToolkitOrientation;
 
@@ -102,7 +102,7 @@ float Orientation::GetRadians() const
   return Math::PI * (float)mOrientation / 180.0f;
 }
 
-Dali::Orientation::OrientationSignalV2& Orientation::ChangedSignal()
+Dali::Orientation::OrientationSignalType& Orientation::ChangedSignal()
 {
   mToolkitOrientation->mFunctionsCalled.ChangedSignal = true;
   return mChangedSignal;

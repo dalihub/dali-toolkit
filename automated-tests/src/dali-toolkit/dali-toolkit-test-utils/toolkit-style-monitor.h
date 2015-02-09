@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #define __DALI_STYLE_MONITOR_H__
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 #include <dali/public-api/adaptor-framework/style-change.h>
 
 namespace Dali
@@ -41,7 +41,7 @@ class StyleMonitor;
 class StyleMonitor : public BaseHandle
 {
 public: // Typedefs
-  typedef SignalV2< void (StyleMonitor, StyleChange) > StyleChangeSignalV2;
+  typedef Signal< void (StyleMonitor, StyleChange) > StyleChangeSignalType;
   static const std::string DEFAULT_FONT_FAMILY;
   static const float       DEFAULT_FONT_SIZE;
 
@@ -59,7 +59,7 @@ public: // Style Information
   void SetTheme(std::string themeFilePath);
 
 public: // Signals
-  StyleChangeSignalV2& StyleChangeSignal();
+  StyleChangeSignalType& StyleChangeSignal();
   void EmitStyleChangeSignal(StyleChange handle);
 
 public: // Operators

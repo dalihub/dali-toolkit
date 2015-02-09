@@ -36,8 +36,8 @@ class RenderSurface;
 class ImfManager : public Dali::BaseObject
 {
 public:
-  typedef Dali::ImfManager::ImfManagerSignalV2 ImfManagerSignalV2;
-  typedef Dali::ImfManager::ImfEventSignalV2 ImfEventSignalV2;
+  typedef Dali::ImfManager::ImfManagerSignalType ImfManagerSignalType;
+  typedef Dali::ImfManager::ImfEventSignalType ImfEventSignalType;
 
 public:
   static Dali::ImfManager Get();
@@ -58,8 +58,8 @@ public:
   std::string GetSurroundingText();
 
 public:  // Signals
-  ImfManagerSignalV2& ActivatedSignal() { return mActivatedSignalV2; }
-  ImfEventSignalV2& EventReceivedSignal() { return mEventSignalV2; }
+  ImfManagerSignalType& ActivatedSignal() { return mActivatedSignal; }
+  ImfEventSignalType& EventReceivedSignal() { return mEventSignal; }
 
 protected:
   virtual ~ImfManager();
@@ -80,8 +80,8 @@ private:
   bool mIdleCallbackConnected:1;             ///< Whether the idle callback is already connected.
 
   std::vector<Dali::Integration::KeyEvent> mKeyEvents; ///< Stores key events to be sent from idle call-back.
-  ImfManagerSignalV2      mActivatedSignalV2;
-  ImfEventSignalV2        mEventSignalV2;
+  ImfManagerSignalType      mActivatedSignal;
+  ImfEventSignalType        mEventSignal;
 
 
   static Dali::ImfManager mToolkitImfManager;
@@ -276,12 +276,12 @@ std::string ImfManager::GetSurroundingText()
   return Internal::Adaptor::ImfManager::GetImplementation(*this).GetSurroundingText();
 }
 
-ImfManager::ImfManagerSignalV2& ImfManager::ActivatedSignal()
+ImfManager::ImfManagerSignalType& ImfManager::ActivatedSignal()
 {
   return Internal::Adaptor::ImfManager::GetImplementation(*this).ActivatedSignal();
 }
 
-ImfManager::ImfEventSignalV2& ImfManager::EventReceivedSignal()
+ImfManager::ImfEventSignalType& ImfManager::EventReceivedSignal()
 {
   return Internal::Adaptor::ImfManager::GetImplementation(*this).EventReceivedSignal();
 }

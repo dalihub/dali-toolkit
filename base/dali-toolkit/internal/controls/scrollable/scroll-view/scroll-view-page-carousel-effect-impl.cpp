@@ -53,7 +53,7 @@ using namespace ScrollViewHelperFunctions;
  * When at middle of the screen the position is not altered.
  * When one screen away from middle the position is rotated as per expected in a 3D carousel.
  */
-class ScrollPageCarouselEffectInfo : public Dali::RefObject
+class ScrollPageCarouselEffectInfo
 {
 public:
 
@@ -174,8 +174,6 @@ public:
   const Vector2 mPositionToPageSizeRatio; ///< The page will move its position according to this ratio.
 };
 
-typedef IntrusivePtr<ScrollPageCarouselEffectInfo> ScrollPageCarouselEffectInfoPtr;
-
 /**
  * Helper: Applies the 3D scroll cube constraints to the child actor
  *
@@ -185,7 +183,7 @@ typedef IntrusivePtr<ScrollPageCarouselEffectInfo> ScrollPageCarouselEffectInfoP
  */
 void ApplyScrollCubeConstraints(Toolkit::ScrollView scrollView,
                                 Actor child,
-                                ScrollPageCarouselEffectInfoPtr info)
+                                ScrollPageCarouselEffectInfo& info)
 {
   // Apply constraints to this actor //
   Constraint constraint;
@@ -227,7 +225,7 @@ ScrollViewPageCarouselEffect::~ScrollViewPageCarouselEffect()
 
 void ScrollViewPageCarouselEffect::ApplyToPage( Actor page, const Vector2& positionToPageSizeRatio )
 {
-  ScrollPageCarouselEffectInfoPtr info(new ScrollPageCarouselEffectInfo( positionToPageSizeRatio ) );
+  ScrollPageCarouselEffectInfo info( positionToPageSizeRatio );
 
   ApplyScrollCubeConstraints( GetScrollView(), page, info );
 }

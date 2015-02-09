@@ -231,25 +231,6 @@ Actor AddActorToPage(Actor page, float x, float y, float cols, float rows)
 } // unnamed namespace
 
 
-int UtcDaliScrollViewCustomEffectSetup(void)
-{
-  tet_infoline(" UtcDaliScrollViewCustomEffectSetup");
-
-  ScrollViewCustomEffect effect;
-
-  DALI_TEST_CHECK( !effect );
-
-  BaseHandle handle = ScrollViewCustomEffect::New();
-
-  DALI_TEST_CHECK( handle );
-
-  effect = ScrollViewCustomEffect::DownCast(handle);
-
-  DALI_TEST_CHECK( effect );
-
-  END_TEST;
-}
-
 int UtcDaliScrollViewCubeEffectSetup(void)
 {
   tet_infoline(" UtcDaliScrollViewCubeEffectSetup");
@@ -281,27 +262,6 @@ int UtcDaliScrollViewSpiralEffectSetup(void)
   DALI_TEST_CHECK( handle );
 
   effect = ScrollViewPageSpiralEffect::DownCast(handle);
-
-  DALI_TEST_CHECK( effect );
-  END_TEST;
-}
-
-
-
-
-int UtcDaliScrollViewSlideEffectSetup(void)
-{
-  tet_infoline(" UtcDaliScrollViewSlideEffectSetup");
-
-  ScrollViewSlideEffect effect;
-
-  DALI_TEST_CHECK( !effect );
-
-  BaseHandle handle = ScrollViewSlideEffect::New();
-
-  DALI_TEST_CHECK( handle );
-
-  effect = ScrollViewSlideEffect::DownCast(handle);
 
   DALI_TEST_CHECK( effect );
   END_TEST;
@@ -379,37 +339,171 @@ int UtcDaliScrollViewSpiralEffectTest(void)
   END_TEST;
 }
 
+int UtcDaliScrollViewPageCubeEffectSetup(void)
+{
+  tet_infoline(" UtcDaliScrollViewPageCubeEffectSetup");
+
+  ScrollViewPageCubeEffect effect;
+
+  DALI_TEST_CHECK( !effect );
+
+  BaseHandle handle = ScrollViewPageCubeEffect::New();
+
+  DALI_TEST_CHECK( handle );
+
+  effect = ScrollViewPageCubeEffect::DownCast(handle);
+
+  DALI_TEST_CHECK( effect );
+  END_TEST;
+}
 
 
-int UtcDaliScrollViewSlideEffectTest(void)
+int UtcDaliScrollViewPageCarouselEffectSetup(void)
+{
+  tet_infoline(" UtcDaliScrollViewCarouselEffectSetup");
+
+  ScrollViewPageCarouselEffect effect;
+
+  DALI_TEST_CHECK( !effect );
+
+  BaseHandle handle = ScrollViewPageCarouselEffect::New();
+
+  DALI_TEST_CHECK( handle );
+
+  effect = ScrollViewPageCarouselEffect::DownCast(handle);
+
+  DALI_TEST_CHECK( effect );
+  END_TEST;
+}
+
+int UtcDaliScrollViewCarouselEffectSetup(void)
+{
+  tet_infoline(" UtcDaliScrollViewCarouselEffectSetup");
+
+  ScrollViewCarouselEffect effect;
+
+  DALI_TEST_CHECK( !effect );
+
+  BaseHandle handle = ScrollViewCarouselEffect::New();
+
+  DALI_TEST_CHECK( handle );
+
+  effect = ScrollViewCarouselEffect::DownCast(handle);
+
+  DALI_TEST_CHECK( effect );
+  END_TEST;
+}
+
+int UtcDaliScrollViewDepthEffectSetup(void)
+{
+  tet_infoline(" UtcDaliScrollViewDepthEffectSetup");
+
+  ScrollViewDepthEffect effect;
+
+  DALI_TEST_CHECK( !effect );
+
+  BaseHandle handle = ScrollViewDepthEffect::New();
+
+  DALI_TEST_CHECK( handle );
+
+  effect = ScrollViewDepthEffect::DownCast(handle);
+
+  DALI_TEST_CHECK( effect );
+  END_TEST;
+}
+
+
+int UtcDaliScrollViewPageCubeEffectTest(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewSlideEffectTest");
+  tet_infoline(" UtcDaliScrollViewPageCubeEffectTest");
 
   Vector2 size = Stage::GetCurrent().GetSize();
-  Vector3 pageSize(size.x, size.y, 0.0f);
 
   ScrollView scrollView = SetupTestScrollView(1, 3, size);
   Actor testPage = gPages[1];
   Wait(application, 500);
 
-  ScrollViewSlideEffect effect = ScrollViewSlideEffect::New();
-  effect.SetDelayReferenceOffset(pageSize * 0.25);
-  DALI_TEST_EQUALS(effect.GetDelayReferenceOffset(), pageSize * 0.25, Math::MACHINE_EPSILON_0, TEST_LOCATION);
-  effect.SetMaxDelayDuration(0.5f);
-  DALI_TEST_EQUALS(effect.GetMaxDelayDuration(), 0.5f, Math::MACHINE_EPSILON_0, TEST_LOCATION);
-  effect.SetSlideDirection(false);
-  DALI_TEST_CHECK(!effect.GetSlideDirection());
+  ScrollViewPageCubeEffect effect = ScrollViewPageCubeEffect::New();
+  scrollView.ApplyEffect(effect);
 
+  for(ActorIter pageIter = gPages.begin(); pageIter != gPages.end(); ++pageIter)
+  {
+    Actor page = *pageIter;
+    page.RemoveConstraints();
+    page.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+    effect.ApplyToPage(page, Vector2(Math::PI_2, 0.0f));
+  }
+  Wait(application);
+
+  scrollView.ScrollTo(1);
+  while(!gOnScrollCompleteCalled)
+  {
+    Wait(application);
+  }
+  // test that the first page has reached centre of screen
+  Vector3 pagePos = testPage.GetCurrentPosition();
+  DALI_TEST_EQUALS(pagePos, Vector3::ZERO, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+  CleanupTest();
+  END_TEST;
+}
+
+int UtcDaliScrollViewPageCarouselEffectTest(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliScrollViewPageCarouselEffectTest");
+
+  Vector2 size = Stage::GetCurrent().GetSize();
+
+  ScrollView scrollView = SetupTestScrollView(1, 3, size);
+  Actor testPage = gPages[1];
+  Wait(application, 500);
+
+  ScrollViewPageCarouselEffect effect = ScrollViewPageCarouselEffect::New();
+  scrollView.ApplyEffect(effect);
+
+  for(ActorIter pageIter = gPages.begin(); pageIter != gPages.end(); ++pageIter)
+  {
+    Actor page = *pageIter;
+    page.RemoveConstraints();
+    page.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+    effect.ApplyToPage(page);
+  }
+  Wait(application);
+
+  scrollView.ScrollTo(1, 0.5f, DirectionBiasNone);
+  while(!gOnScrollCompleteCalled)
+  {
+    Wait(application);
+  }
+  // test that the first page has reached centre of screen
+  Vector3 pagePos = testPage.GetCurrentPosition();
+  DALI_TEST_EQUALS(pagePos, Vector3::ZERO, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+  CleanupTest();
+  END_TEST;
+}
+
+int UtcDaliScrollViewCarouselEffectTest(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliScrollViewCarouselEffectTest");
+
+  Vector2 size = Stage::GetCurrent().GetSize();
+
+  ScrollView scrollView = SetupTestScrollView(1, 3, size);
+  Actor testPage = gPages[1];
+  Wait(application, 500);
+
+  ScrollViewCarouselEffect effect = ScrollViewCarouselEffect::New();
   scrollView.ApplyEffect(effect);
 
   Actor actor = AddActorToPage(testPage, 0.5f, 0.5f, 3, 3);
   Wait(application);
   Vector3 actorPrePosition = actor.GetCurrentPosition();
 
-  effect.ApplyToActor(actor, 0.0f, 0.5f);
+  effect.ApplyToActor( actor, Vector2(1.2f, 1.2f) );
 
-  scrollView.ScrollTo(1);
+  scrollView.ScrollTo(Vector3(size.x, 0.0f, 0.0f), 0.5f, DirectionBiasNone, DirectionBiasNone);
   while(!gOnScrollCompleteCalled)
   {
     Wait(application);
@@ -422,172 +516,40 @@ int UtcDaliScrollViewSlideEffectTest(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewCustomEffectTest(void)
+int UtcDaliScrollViewDepthEffectTest(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewCustomEffectTest");
+  tet_infoline(" UtcDaliScrollViewDepthEffectTest");
 
   Vector2 size = Stage::GetCurrent().GetSize();
-  Vector3 pageSize(size.x, size.y, 0.0f);
 
   ScrollView scrollView = SetupTestScrollView(1, 3, size);
   Actor testPage = gPages[1];
   Wait(application, 500);
-  Vector3 pageStartPos, pagePos;
-  pageStartPos = pagePos = testPage.GetCurrentPosition();
-  //scrollView.RemoveConstraintsFromChildren();
 
-  ScrollViewCustomEffect effect = ScrollViewCustomEffect::DownCast(scrollView.ApplyEffect(ScrollView::PageEffectCarousel));
-
-  for(ActorIter pageIter = gPages.begin(); pageIter != gPages.end(); ++pageIter)
-  {
-    Actor page = *pageIter;
-    page.RemoveConstraints();
-    page.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
-    effect.ApplyToPage(page, pageSize);
-  }
-  Wait(application);
-  pagePos = testPage.GetCurrentPosition();
-  DALI_TEST_EQUALS(pagePos, pageStartPos, Math::MACHINE_EPSILON_0, TEST_LOCATION);
-
-  scrollView.ScrollTo(1);
-  while(!gOnScrollCompleteCalled)
-  {
-    Wait(application);
-  }
-  ResetScrollCallbackResults();
-  // test that the first page has reached centre of screen
-  pagePos = testPage.GetCurrentPosition();
-  DALI_TEST_EQUALS(pagePos, Vector3::ZERO, Math::MACHINE_EPSILON_0, TEST_LOCATION);
-
-  // scroll back to page 0
-  scrollView.ScrollTo(0);
-  while(!gOnScrollCompleteCalled)
-  {
-    Wait(application);
-  }
-  ResetScrollCallbackResults();
-  pagePos = testPage.GetCurrentPosition();
-  DALI_TEST_EQUALS(pagePos, pageStartPos, Math::MACHINE_EPSILON_0, TEST_LOCATION);
-
-  scrollView.RemoveEffect(effect);
-
-  effect = ScrollViewCustomEffect::New();
-  effect.SetPageTranslation(Vector3(20.0f, 20.0f, 5.0f));
-  effect.SetPageTranslation(Vector3(20.0f, 20.0f, 5.0f), Vector3(20.0f, 20.0f, -5.0f));
-  effect.SetPageTranslationIn(Vector3(20.0f, 20.0f, 5.0f));
-  effect.SetPageTranslationOut(Vector3(20.0f, 20.0f, -5.0f));
-  effect.SetPageTranslation(Vector3(20.0f, 0.0f, 0.0f));
-  effect.SetSwingAngle(Math::PI, Vector3::YAXIS);
-  effect.SetPageSpacing(Vector2(20.0f, 20.0f));
+  ScrollViewDepthEffect effect = ScrollViewDepthEffect::New();
   scrollView.ApplyEffect(effect);
 
-  for(ActorIter pageIter = gPages.begin(); pageIter != gPages.end(); ++pageIter)
-  {
-    Actor page = *pageIter;
-    page.RemoveConstraints();
-    page.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
-    effect.ApplyToPage(page, pageSize);
-  }
+  Actor actor = AddActorToPage(testPage, 0.5f, 0.5f, 3, 3);
   Wait(application);
-  pagePos = testPage.GetCurrentPosition();
-  DALI_TEST_EQUALS(pagePos, pageStartPos, Math::MACHINE_EPSILON_0, TEST_LOCATION);
+  Vector3 actorPrePosition = actor.GetCurrentPosition();
+
+  const Vector2 positionExtent(0.5f, 2.5f);
+  const Vector2 offsetExtent(1.0f, 1.0f);
+  const float positionScale(1.5f);
+  const float scaleExtent(0.5f);
+
+  effect.ApplyToActor( actor, positionExtent, offsetExtent, positionScale, scaleExtent );
 
   scrollView.ScrollTo(1);
   while(!gOnScrollCompleteCalled)
   {
     Wait(application);
   }
-  ResetScrollCallbackResults();
   // test that the first page has reached centre of screen
-  pagePos = testPage.GetCurrentPosition();
-  DALI_TEST_EQUALS(pagePos, Vector3::ZERO, Math::MACHINE_EPSILON_0, TEST_LOCATION);
-
-  // scroll back to page 0
-  scrollView.ScrollTo(0);
-  while(!gOnScrollCompleteCalled)
-  {
-    Wait(application);
-  }
-  ResetScrollCallbackResults();
-  pagePos = testPage.GetCurrentPosition();
-  DALI_TEST_EQUALS(pagePos, pageStartPos, Math::MACHINE_EPSILON_0, TEST_LOCATION);
-
-  scrollView.RemoveEffect(effect);
-  effect = ScrollViewCustomEffect::New();
-  effect.SetSwingAngle(Math::PI, Vector3::YAXIS);
-  effect.SetSwingAnchor(AnchorPoint::CENTER_LEFT);
-  effect.SetPageTranslation(Vector3(size.x, size.y, 0));
-  effect.SetOpacityThreshold(0.66f);
-  scrollView.ApplyEffect(effect);
-
-  for(ActorIter pageIter = gPages.begin(); pageIter != gPages.end(); ++pageIter)
-  {
-    Actor page = *pageIter;
-    page.RemoveConstraints();
-    page.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
-    effect.ApplyToPage(page, pageSize);
-  }
-  Wait(application);
-
-  scrollView.ScrollTo(1);
-  while(!gOnScrollCompleteCalled)
-  {
-    Wait(application);
-  }
-  ResetScrollCallbackResults();
-  // test that the first page has reached centre of screen
-  pagePos = testPage.GetCurrentPosition();
-  DALI_TEST_EQUALS(pagePos, Vector3::ZERO, Math::MACHINE_EPSILON_0, TEST_LOCATION);
-
-  // scroll back to page 0
-  scrollView.ScrollTo(0);
-  while(!gOnScrollCompleteCalled)
-  {
-    Wait(application);
-  }
-  ResetScrollCallbackResults();
-  pagePos = testPage.GetCurrentPosition();
-  DALI_TEST_EQUALS(pagePos, pageStartPos, Math::MACHINE_EPSILON_0, TEST_LOCATION);
-  scrollView.RemoveEffect(effect);
-
-
-  effect.SetPageTranslateAlphaFunction(AlphaFunctions::Linear);
-  effect.SetPageTranslateAlphaFunction(AlphaFunctions::Linear, AlphaFunctions::Linear);
-  effect.SetPageTranslateAlphaFunctionIn(AlphaFunctions::Linear);
-  effect.SetPageTranslateAlphaFunctionOut(AlphaFunctions::Linear);
-  effect.SetGlobalPageRotation(Math::PI, Vector3::YAXIS);
-  effect.SetAngledOriginPageRotation(Vector3(Math::PI, Math::PI, 0.0f));
-  effect.SetGlobalPageRotation(Math::PI, Vector3::YAXIS, Math::PI, Vector3::YAXIS);
-  effect.SetGlobalPageRotationIn(Math::PI, Vector3::YAXIS);
-  effect.SetGlobalPageRotationOut(Math::PI, Vector3::YAXIS);
-  effect.SetGlobalPageRotationOrigin(Vector3::ZERO);
-  effect.SetGlobalPageRotationOrigin(Vector3::ZERO, Vector3::ZERO);
-  effect.SetGlobalPageRotationOriginIn(Vector3::ZERO);
-  effect.SetGlobalPageRotationOriginOut(Vector3::ZERO);
-  effect.SetSwingAngle(Math::PI, Vector3::YAXIS);
-  effect.SetSwingAngle(Math::PI, Vector3::YAXIS, Math::PI, Vector3::YAXIS);
-  effect.SetSwingAngleIn(Math::PI, Vector3::YAXIS);
-  effect.SetSwingAngleOut(Math::PI, Vector3::YAXIS);
-  effect.SetSwingAngleAlphaFunction(AlphaFunctions::Linear);
-  effect.SetSwingAngleAlphaFunction(AlphaFunctions::Linear, AlphaFunctions::Linear);
-  effect.SetSwingAngleAlphaFunctionIn(AlphaFunctions::Linear);
-  effect.SetSwingAngleAlphaFunctionOut(AlphaFunctions::Linear);
-  effect.SetSwingAnchor(AnchorPoint::CENTER, AnchorPoint::CENTER_LEFT);
-  effect.SetSwingAnchorIn(AnchorPoint::CENTER);
-  effect.SetSwingAnchorOut(AnchorPoint::CENTER);
-  effect.SetSwingAnchorAlphaFunction(AlphaFunctions::Linear);
-  effect.SetSwingAnchorAlphaFunction(AlphaFunctions::Linear, AlphaFunctions::Linear);
-  effect.SetSwingAnchorAlphaFunctionIn(AlphaFunctions::Linear);
-  effect.SetSwingAnchorAlphaFunctionOut(AlphaFunctions::Linear);
-  effect.SetOpacityThreshold(0.5f);
-  effect.SetOpacityThreshold(0.5f, 0.5f);
-  effect.SetOpacityThresholdIn(0.5f);
-  effect.SetOpacityThresholdOut(0.5f);
-  effect.SetOpacityAlphaFunction(AlphaFunctions::Linear);
-  effect.SetOpacityAlphaFunction(AlphaFunctions::Linear, AlphaFunctions::Linear);
-  effect.SetOpacityAlphaFunctionIn(AlphaFunctions::Linear);
-  effect.SetOpacityAlphaFunctionOut(AlphaFunctions::Linear);
+  Vector3 actorPostPosition = actor.GetCurrentPosition();
+  // just check the actor has moved
+  DALI_TEST_CHECK((actorPostPosition - actorPrePosition).Length() > Math::MACHINE_EPSILON_1);
   CleanupTest();
   END_TEST;
 }

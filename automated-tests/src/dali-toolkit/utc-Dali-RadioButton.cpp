@@ -114,27 +114,27 @@ int UtcDaliRadioButtonActive(void)
   RadioButton radioButton = RadioButton::New();
 
   // Default active
-  DALI_TEST_CHECK( radioButton.IsActive() == false );
+  DALI_TEST_CHECK( radioButton.IsSelected() == false );
 
   // False to true
   radioButton.ToggleState();
-  DALI_TEST_CHECK( radioButton.IsActive() == true );
+  DALI_TEST_CHECK( radioButton.IsSelected() == true );
 
   // True to false
   radioButton.ToggleState();
-  DALI_TEST_CHECK( radioButton.IsActive() == false );
+  DALI_TEST_CHECK( radioButton.IsSelected() == false );
 
   // False
-  radioButton.SetActive( false );
-  DALI_TEST_CHECK( radioButton.IsActive() == false );
+  radioButton.SetSelected( false );
+  DALI_TEST_CHECK( radioButton.IsSelected() == false );
 
   // True
-  radioButton.SetActive( true );
-  DALI_TEST_CHECK( radioButton.IsActive() == true );
+  radioButton.SetSelected( true );
+  DALI_TEST_CHECK( radioButton.IsSelected() == true );
 
   // False
-  radioButton.SetActive( false );
-  DALI_TEST_CHECK( radioButton.IsActive() == false );
+  radioButton.SetSelected( false );
+  DALI_TEST_CHECK( radioButton.IsSelected() == false );
 
   END_TEST;
 }
@@ -152,19 +152,19 @@ int UtcDaliRadioButtonActiveProperty(void)
   radioButton.SetPosition( 0.0f, 0.0f );
 
   // Default active
-  DALI_TEST_CHECK( radioButton.GetProperty<bool>( RadioButton::PROPERTY_ACTIVE ) == false );
+  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
 
   // Setting false active
-  radioButton.SetProperty( RadioButton::PROPERTY_ACTIVE, false );
-  DALI_TEST_CHECK( radioButton.GetProperty<bool>( RadioButton::PROPERTY_ACTIVE ) == false );
+  radioButton.SetProperty( Button::PROPERTY_TOGGLED, false );
+  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
 
   // Setting true active
-  radioButton.SetProperty( RadioButton::PROPERTY_ACTIVE, true );
-  DALI_TEST_CHECK( radioButton.GetProperty<bool>( RadioButton::PROPERTY_ACTIVE ) == true );
+  radioButton.SetProperty( Button::PROPERTY_TOGGLED, true );
+  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == true );
 
   // Setting false again
-  radioButton.SetProperty( RadioButton::PROPERTY_ACTIVE, false );
-  DALI_TEST_CHECK( radioButton.GetProperty<bool>( RadioButton::PROPERTY_ACTIVE ) == false );
+  radioButton.SetProperty( Button::PROPERTY_TOGGLED, false );
+  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
 
   // Test selecting radio buttons
   RadioButton radioButton2 = RadioButton::New( "label" );
@@ -191,8 +191,8 @@ int UtcDaliRadioButtonActiveProperty(void)
   application.Render();
 
   // Simulate touch events
-  DALI_TEST_CHECK( radioButton2.GetProperty<bool>( RadioButton::PROPERTY_ACTIVE ) == false );
-  DALI_TEST_CHECK( radioButton3.GetProperty<bool>( RadioButton::PROPERTY_ACTIVE ) == false );
+  DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
+  DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
 
   // Select first radio
   {
@@ -206,8 +206,8 @@ int UtcDaliRadioButtonActiveProperty(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( RadioButton::PROPERTY_ACTIVE ) == true );
-    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( RadioButton::PROPERTY_ACTIVE ) == false );
+    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == true );
+    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
   }
 
   // Select an already selected radio
@@ -222,8 +222,8 @@ int UtcDaliRadioButtonActiveProperty(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( RadioButton::PROPERTY_ACTIVE ) == true );
-    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( RadioButton::PROPERTY_ACTIVE ) == false );
+    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == true );
+    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
   }
 
   // Select second radio
@@ -238,8 +238,8 @@ int UtcDaliRadioButtonActiveProperty(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( RadioButton::PROPERTY_ACTIVE ) == false );
-    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( RadioButton::PROPERTY_ACTIVE ) == true );
+    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
+    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == true );
   }
 
   // Select outside radio group
@@ -254,8 +254,8 @@ int UtcDaliRadioButtonActiveProperty(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( RadioButton::PROPERTY_ACTIVE ) == false );
-    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( RadioButton::PROPERTY_ACTIVE ) == true );
+    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
+    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == true );
   }
 
   END_TEST;

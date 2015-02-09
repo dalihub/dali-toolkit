@@ -35,10 +35,10 @@ namespace Toolkit
  *
  * @param[in] backgroundImagePath Image path to be shown as button background.
  * @param[in] checkedImagePath Image path to be shown as checked button.
- * @param[in] dimmedBackgroundImagePath Image path to be shown as button dimmed background.
- * @param[in] dimmedCheckedImagePath Image path to be shown as dimmed checked button.
+ * @param[in] disabledBackgroundImagePath Image path to be shown as button isabled background.
+ * @param[in] disabledCheckedImagePath Image path to be shown as disabled checked button.
  */
-DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& checkedImagePath, const std::string& dimmedBackgroundImagePath, const std::string& dimmedCheckedImagePath );
+DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& checkedImagePath, const std::string& disabledBackgroundImagePath, const std::string& disabledCheckedImagePath );
 
 /**
  * Creates a check box button with the given images.
@@ -48,10 +48,10 @@ DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( const std::string& backgrou
  *
  * @param[in] backgroundImageActor  Image to be shown as button background.
  * @param[in] checkedImageActor  Image to be shown as checked button.
- * @param[in] dimmedBackgroundImageActor Image to be shown as button dimmed background.
- * @param[in] dimmedCheckedImagActor Image to be shown as dimmed checked button.
+ * @param[in] disabledBackgroundImageActor Image to be shown as button disabled background.
+ * @param[in] disabledCheckedImagActor Image to be shown as disabled checked button.
  */
-DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedImageActor, Actor dimmedBackgroundImageActor, Actor dimmedCheckedImagActor );
+DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedImageActor, Actor disabledBackgroundImageActor, Actor disabledCheckedImagActor );
 
 /**
  * Creates a check box button with the given background and checked images.

@@ -105,7 +105,7 @@ void View::SetAutoRotate( bool enabled )
   GetImpl( *this ).SetAutoRotate( enabled );
 }
 
-View::OrientationAnimationStartedSignalV2& View::OrientationAnimationStartedSignal()
+View::OrientationAnimationStartedSignalType& View::OrientationAnimationStartedSignal()
 {
   return GetImpl( *this ).OrientationAnimationStartedSignal();
 }

@@ -136,7 +136,7 @@ void View::SetBackground( ImageActor backgroundImage )
     mBackgroundLayer = Layer::New();
 
     mBackgroundLayer.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-    mBackgroundLayer.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+    mBackgroundLayer.SetSize( mViewSize );
 
     // Add background layer to custom actor.
     Self().Add( mBackgroundLayer );
@@ -156,12 +156,7 @@ void View::SetBackground( ImageActor backgroundImage )
   }
 
   backgroundImage.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-  Constraint constraint = Constraint::New<Vector3>(
-      Actor::SCALE,
-      LocalSource( Actor::SIZE ),
-      ParentSource( Actor::SIZE ),
-      ScaleToFillXYKeepAspectRatioConstraint() );
-  backgroundImage.ApplyConstraint( constraint );
+  backgroundImage.SetScale( FillXYKeepAspectRatio( mViewSize, backgroundImage.GetSize() ) );
   mBackgroundLayer.Add( backgroundImage );
 }
 
@@ -234,7 +229,7 @@ void View::OrientationChanged( Dali::Orientation orientation )
   }
 
   Toolkit::View handle( GetOwner() );
-  mOrientationAnimationStartedSignalV2.Emit( handle, mRotateAnimation, orientation );
+  mOrientationAnimationStartedSignal.Emit( handle, mRotateAnimation, orientation );
 
   mRotateAnimation.Play();
 }
@@ -244,9 +239,9 @@ void View::SetAutoRotate( bool enabled )
   mAutoRotateEnabled = enabled;
 }
 
-Toolkit::View::OrientationAnimationStartedSignalV2& View::OrientationAnimationStartedSignal()
+Toolkit::View::OrientationAnimationStartedSignalType& View::OrientationAnimationStartedSignal()
 {
-  return mOrientationAnimationStartedSignalV2;
+  return mOrientationAnimationStartedSignal;
 }
 
 bool View::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -296,6 +291,20 @@ void View::OnInitialize()
   if( mFullScreen )
   {
     Self().SetSize( Stage::GetCurrent().GetSize() );
+  }
+}
+
+void View::OnControlSizeSet( const Vector3& targetSize )
+{
+  mViewSize = targetSize;
+  if( mBackgroundLayer )
+  {
+    mBackgroundLayer.SetSize( mViewSize );
+    if( mBackgroundLayer.GetChildCount() > 0 )
+    {
+      Actor background = mBackgroundLayer.GetChildAt(0);
+      background.SetScale( FillXYKeepAspectRatio( mViewSize, background.GetSize() ) );
+    }
   }
 }
 

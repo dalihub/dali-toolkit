@@ -131,31 +131,31 @@ void EmbossFilter::Enable()
   // create actor to render input with applied emboss effect
   mActorForInput1 = ImageActor::New( mInputImage );
   mActorForInput1.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForInput1.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+  mActorForInput1.SetSize(mTargetSize);
   mActorForInput1.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
   mActorForInput1.SetColor( Color::WHITE );
 
   mActorForInput2 = ImageActor::New( mInputImage );
   mActorForInput2.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForInput2.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+  mActorForInput2.SetSize(mTargetSize);
   mActorForInput2.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
   mActorForInput2.SetColor( Color::WHITE );
 
   mActorForEmboss1 = ImageActor::New( mImageForEmboss1 );
   mActorForEmboss1.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForEmboss1.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+  mActorForEmboss1.SetSize(mTargetSize);
   mActorForEmboss1.SetColor( Color::BLACK );
   mActorForEmboss1.SetShaderEffect( ShaderEffect::New( "", COMPOSITE_FRAGMENT_SOURCE ) );
 
   mActorForEmboss2 = ImageActor::New( mImageForEmboss2 );
   mActorForEmboss2.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForEmboss2.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+  mActorForEmboss2.SetSize(mTargetSize);
   mActorForEmboss2.SetColor( Color::WHITE );
   mActorForEmboss2.SetShaderEffect( ShaderEffect::New( "", COMPOSITE_FRAGMENT_SOURCE ) );
 
   mActorForComposite = Actor::New();
   mActorForComposite.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForComposite.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+  mActorForComposite.SetSize(mTargetSize);
   mActorForComposite.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
 
   // create custom shader effect
@@ -244,6 +244,31 @@ void EmbossFilter::Refresh()
   if( mRenderTaskForEmboss2 )
   {
     mRenderTaskForEmboss2.SetRefreshRate( mRefreshOnDemand ? RenderTask::REFRESH_ONCE : RenderTask::REFRESH_ALWAYS );
+  }
+}
+
+void EmbossFilter::SetSize( const Vector2& size )
+{
+  mTargetSize = size;
+  if( mActorForInput1 )
+  {
+    mActorForInput1.SetSize(mTargetSize);
+  }
+  if( mActorForInput2 )
+  {
+    mActorForInput2.SetSize(mTargetSize);
+  }
+  if( mActorForEmboss1 )
+  {
+    mActorForEmboss1.SetSize(mTargetSize);
+  }
+  if( mActorForEmboss2 )
+  {
+    mActorForEmboss2.SetSize(mTargetSize);
+  }
+  if( mActorForComposite )
+  {
+    mActorForComposite.SetSize(mTargetSize);
   }
 }
 

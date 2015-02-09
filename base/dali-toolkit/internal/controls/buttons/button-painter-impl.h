@@ -81,12 +81,12 @@ public:
   virtual void SetSize( Toolkit::Button& button, const Vector3& size ) = 0;
 
   /**
-   * This method is called from the Dali::Toolkit::Internal::PushButton when the \e dimmed property changes.
+   * This method is called from the Dali::Toolkit::Internal::PushButton when the \e disabled property changes.
    *
    * @param[inout] button The button in which all actors that form its appearance are going to be added.
-   * @param[in] dimmed The dimmed state.
+   * @param[in] disabled The disabled state.
    */
-  virtual void SetDimmed( Toolkit::Button& button, bool dimmed ) = 0;
+  virtual void SetDisabled( Toolkit::Button& button, bool disabled ) = 0;
 
   /**
    * Sets the animation time.

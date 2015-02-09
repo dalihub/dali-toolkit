@@ -102,14 +102,14 @@ Actor RadioButton::GetLabel() const
   return Dali::Toolkit::GetImplementation(*this).GetLabel();
 }
 
-void RadioButton::SetActive(bool active)
+void RadioButton::SetSelected(bool selected)
 {
-  Dali::Toolkit::GetImplementation(*this).SetActive(active);
+  Dali::Toolkit::GetImplementation(*this).SetSelected(selected);
 }
 
-bool RadioButton::IsActive()const
+bool RadioButton::IsSelected()const
 {
-  return Dali::Toolkit::GetImplementation(*this).IsActive();
+  return Dali::Toolkit::GetImplementation(*this).IsSelected();
 }
 
 void RadioButton::ToggleState()

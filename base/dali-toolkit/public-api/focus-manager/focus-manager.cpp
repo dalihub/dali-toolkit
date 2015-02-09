@@ -188,17 +188,17 @@ Actor FocusManager::GetFocusGroup(Actor actor)
   return GetImpl(*this).GetFocusGroup(actor);
 }
 
-FocusManager::FocusChangedSignalV2& FocusManager::FocusChangedSignal()
+FocusManager::FocusChangedSignalType& FocusManager::FocusChangedSignal()
 {
   return GetImpl(*this).FocusChangedSignal();
 }
 
-FocusManager::FocusOvershotSignalV2& FocusManager::FocusOvershotSignal()
+FocusManager::FocusOvershotSignalType& FocusManager::FocusOvershotSignal()
 {
   return GetImpl(*this).FocusOvershotSignal();
 }
 
-FocusManager::FocusedActorActivatedSignalV2& FocusManager::FocusedActorActivatedSignal()
+FocusManager::FocusedActorActivatedSignalType& FocusManager::FocusedActorActivatedSignal()
 {
   return GetImpl(*this).FocusedActorActivatedSignal();
 }

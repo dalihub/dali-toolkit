@@ -102,46 +102,46 @@ public:
   Actor GetCheckedImage() const;
 
   /**
-   * @copydoc Dali::Toolkit::CheckBoxButton::SetDimmedBackgroundImage( Image image )
+   * @copydoc Dali::Toolkit::CheckBoxButton::SetDisabledBackgroundImage( Image image )
    */
-  void SetDimmedBackgroundImage( Image image );
+  void SetDisabledBackgroundImage( Image image );
 
   /**
-   * @copydoc Dali::Toolkit::CheckBoxButton::SetDimmedBackgroundImage( Actor image )
+   * @copydoc Dali::Toolkit::CheckBoxButton::SetDisabledBackgroundImage( Actor image )
    */
-  void SetDimmedBackgroundImage( Actor image );
-
-  /**
-   * Used by the painter only.
-   * @return A reference to the dimmed background image.
-   */
-  Actor& GetDimmedBackgroundImage();
-
-  /**
-   * @copydoc Dali::Toolkit::CheckBoxButton::GetDimmedBackgroundImage()
-   */
-  Actor GetDimmedBackgroundImage() const;
-
-  /**
-   * @copydoc Dali::Toolkit::CheckBoxButton::SetDimmedCheckedImage( Image image )
-   */
-  void SetDimmedCheckedImage( Image image );
-
-  /**
-   * @copydoc Dali::Toolkit::CheckBoxButton::SetDimmedCheckedImage( Actor image )
-   */
-  void SetDimmedCheckedImage( Actor image );
+  void SetDisabledBackgroundImage( Actor image );
 
   /**
    * Used by the painter only.
-   * @return A reference to the dimmed checked image.
+   * @return A reference to the disabled background image.
    */
-  Actor& GetDimmedCheckedImage();
+  Actor& GetDisabledBackgroundImage();
 
   /**
-   * @copydoc Dali::Toolkit::CheckBoxButton::GetDimmedCheckedImage()
+   * @copydoc Dali::Toolkit::CheckBoxButton::GetDisabledBackgroundImage()
    */
-  Actor GetDimmedCheckedImage() const;
+  Actor GetDisabledBackgroundImage() const;
+
+  /**
+   * @copydoc Dali::Toolkit::CheckBoxButton::SetDisabledCheckedImage( Image image )
+   */
+  void SetDisabledCheckedImage( Image image );
+
+  /**
+   * @copydoc Dali::Toolkit::CheckBoxButton::SetDisabledCheckedImage( Actor image )
+   */
+  void SetDisabledCheckedImage( Actor image );
+
+  /**
+   * Used by the painter only.
+   * @return A reference to the disabled checked image.
+   */
+  Actor& GetDisabledCheckedImage();
+
+  /**
+   * @copydoc Dali::Toolkit::CheckBoxButton::GetDisabledCheckedImage()
+   */
+  Actor GetDisabledCheckedImage() const;
 
   /**
    * Used by the painter only.
@@ -231,17 +231,13 @@ private:
 
   Actor mBackgroundImage;         ///< Stores the background image.
   Actor mCheckedImage;            ///< Stores the checked image.
-  Actor mDimmedCheckedImage;      ///< Stores the dimmed checked image.
-  Actor mDimmedBackgroundImage;   ///< Stores the dimmed background image.
+  Actor mDisabledCheckedImage;    ///< Stores the disabled checked image.
+  Actor mDisabledBackgroundImage; ///< Stores the disabled background image.
   Actor mFadeOutBackgroundImage;  ///< Stores a background image, which is in a fade out animation, to be removed when the animation finishes.
   Actor mFadeOutCheckedImage;     ///< Stores a foreground image, which is in a fade out animation, to be removed when the animation finishes.
 
   // Actions
   bool mClickActionPerforming;
-
-  // Properties
-  Property::Index mUseFadeAnimationProperty;
-  Property::Index mUseCheckAnimationProperty;
 };
 
 } // namespace Internal

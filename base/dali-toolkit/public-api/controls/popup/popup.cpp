@@ -132,12 +132,12 @@ void Popup::HideTail()
   GetImpl(*this).HideTail();
 }
 
-Popup::TouchedOutsideSignalV2& Popup::OutsideTouchedSignal()
+Popup::TouchedOutsideSignalType& Popup::OutsideTouchedSignal()
 {
   return GetImpl(*this).OutsideTouchedSignal();
 }
 
-Popup::HiddenSignalV2& Popup::HiddenSignal()
+Popup::HiddenSignalType& Popup::HiddenSignal()
 {
   return GetImpl(*this).HiddenSignal();
 }

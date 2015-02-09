@@ -79,13 +79,13 @@ public:
  public:
 
   /// @brief Focus changed signal
-  typedef SignalV2< void ( Actor, Actor ) > FocusChangedSignalV2;
+  typedef Signal< void ( Actor, Actor ) > FocusChangedSignalType;
 
   /// @brief Focus overshooted signal
-  typedef SignalV2< void ( Actor, FocusOvershotDirection ) > FocusOvershotSignalV2;
+  typedef Signal< void ( Actor, FocusOvershotDirection ) > FocusOvershotSignalType;
 
   /// @brief Focused actor activated signal
-  typedef SignalV2< void ( Actor ) > FocusedActorActivatedSignalV2;
+  typedef Signal< void ( Actor ) > FocusedActorActivatedSignalType;
 
   /**
    * @brief Create a FocusManager handle; this can be initialised with FocusManager::New().
@@ -375,7 +375,7 @@ public:
    * @pre The Object has been initialized.
    * @return The signal to connect to.
    */
-  FocusChangedSignalV2& FocusChangedSignal();
+  FocusChangedSignalType& FocusChangedSignal();
 
   /**
    * @brief This signal is emitted when there is no way to move focus further.
@@ -387,7 +387,7 @@ public:
    * @pre The Object has been initialized.
    * @return The signal to connect to.
    */
-  FocusOvershotSignalV2& FocusOvershotSignal();
+  FocusOvershotSignalType& FocusOvershotSignal();
 
   /**
    * @brief This signal is emitted when the current focused actor is activated.
@@ -399,7 +399,7 @@ public:
    * @pre The Object has been initialized.
    * @return The signal to connect to.
    */
-  FocusedActorActivatedSignalV2& FocusedActorActivatedSignal();
+  FocusedActorActivatedSignalType& FocusedActorActivatedSignal();
 
 private:
 

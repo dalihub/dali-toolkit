@@ -52,19 +52,19 @@ Alignment CreateAlignedImage( const std::string& imagePath )
 } // namespace
 
 
-PushButton CreatePushButton( const std::string& releasedImagePath, const std::string& pressedImagePath, const std::string& backgroundImagePath,
-                             const std::string& dimmedReleasedImagePath, const std::string& dimmedBackgroundImagePath )
+PushButton CreatePushButton( const std::string& unselectedImagePath, const std::string& selectedImagePath, const std::string& backgroundImagePath,
+                             const std::string& disabledUnselectedImagePath, const std::string& disabledBackgroundImagePath )
 {
   PushButton button = Toolkit::PushButton::New();
 
-  if( !releasedImagePath.empty() )
+  if( !unselectedImagePath.empty() )
   {
-    button.SetButtonImage( CreateAlignedImage( releasedImagePath ) );
+    button.SetButtonImage( CreateAlignedImage( unselectedImagePath ) );
   }
 
-  if( !pressedImagePath.empty() )
+  if( !selectedImagePath.empty() )
   {
-    button.SetPressedImage( CreateAlignedImage( pressedImagePath ) );
+    button.SetSelectedImage( CreateAlignedImage( selectedImagePath ) );
   }
 
   if( !backgroundImagePath.empty() )
@@ -72,32 +72,32 @@ PushButton CreatePushButton( const std::string& releasedImagePath, const std::st
     button.SetBackgroundImage( CreateAlignedImage( backgroundImagePath ) );
   }
 
-  if( !dimmedReleasedImagePath.empty() )
+  if( !disabledUnselectedImagePath.empty() )
   {
-    button.SetDimmedImage( CreateAlignedImage( dimmedReleasedImagePath ) );
+    button.SetDisabledImage( CreateAlignedImage( disabledUnselectedImagePath ) );
   }
 
-  if( !dimmedBackgroundImagePath.empty() )
+  if( !disabledBackgroundImagePath.empty() )
   {
-    button.SetDimmedBackgroundImage( CreateAlignedImage( dimmedBackgroundImagePath ) );
+    button.SetDisabledBackgroundImage( CreateAlignedImage( disabledBackgroundImagePath ) );
   }
 
   return button;
 }
 
-PushButton CreatePushButton( Actor releasedImageActor, Actor pressedImageActor, Actor backgroundImageActor,
-                             Actor dimmedReleasedImageActor, Actor dimmedBackgroundImageActor )
+PushButton CreatePushButton( Actor unselectedImageActor, Actor selectedImageActor, Actor backgroundImageActor,
+                             Actor disabledUnselectedImageActor, Actor disabledBackgroundImageActor )
 {
   PushButton button = Toolkit::PushButton::New();
 
-  if( releasedImageActor )
+  if( unselectedImageActor )
   {
-    button.SetButtonImage( CreateAlignedImage( releasedImageActor ) );
+    button.SetButtonImage( CreateAlignedImage( unselectedImageActor ) );
   }
 
-  if( pressedImageActor )
+  if( selectedImageActor )
   {
-    button.SetPressedImage( CreateAlignedImage( pressedImageActor ) );
+    button.SetSelectedImage( CreateAlignedImage( selectedImageActor ) );
   }
 
   if( backgroundImageActor )
@@ -105,14 +105,14 @@ PushButton CreatePushButton( Actor releasedImageActor, Actor pressedImageActor, 
     button.SetBackgroundImage( CreateAlignedImage( backgroundImageActor ) );
   }
 
-  if( dimmedReleasedImageActor )
+  if( disabledUnselectedImageActor )
   {
-    button.SetDimmedImage( CreateAlignedImage( dimmedReleasedImageActor ) );
+    button.SetDisabledImage( CreateAlignedImage( disabledUnselectedImageActor ) );
   }
 
-  if( dimmedBackgroundImageActor )
+  if( disabledBackgroundImageActor )
   {
-    button.SetDimmedBackgroundImage( CreateAlignedImage( dimmedBackgroundImageActor ) );
+    button.SetDisabledBackgroundImage( CreateAlignedImage( disabledBackgroundImageActor ) );
   }
 
   return button;

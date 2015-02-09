@@ -81,18 +81,18 @@ public:
     POPUP_SHOW,               ///< Shown (visible in default size)
   };
 
-  typedef SignalV2< void () > TouchedOutsideSignalV2; ///< Touched outside signal type.
-  typedef SignalV2< void () > HiddenSignalV2;         ///< Hidden signal type.
+  typedef Signal< void () > TouchedOutsideSignalType; ///< Touched outside signal type.
+  typedef Signal< void () > HiddenSignalType;         ///< Hidden signal type.
 
   /**
    * @brief Signal emitted when user has touched outside of the Dialog.
    */
-  TouchedOutsideSignalV2& OutsideTouchedSignal();
+  TouchedOutsideSignalType& OutsideTouchedSignal();
 
   /**
    * @brief Signal emitted when popup has been hidden.
    */
-  HiddenSignalV2& HiddenSignal();
+  HiddenSignalType& HiddenSignal();
 
 public:
 

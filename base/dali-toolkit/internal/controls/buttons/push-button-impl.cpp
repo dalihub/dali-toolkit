@@ -35,16 +35,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const Property::Index PushButton::PROPERTY_AUTO_REPEATING               = Internal::Button::BUTTON_PROPERTY_END_INDEX + 1;
-const Property::Index PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY = Internal::Button::BUTTON_PROPERTY_END_INDEX + 2;
-const Property::Index PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY    = Internal::Button::BUTTON_PROPERTY_END_INDEX + 3;
-const Property::Index PushButton::PROPERTY_TOGGLABLE                    = Internal::Button::BUTTON_PROPERTY_END_INDEX + 4;
-const Property::Index PushButton::PROPERTY_TOGGLE                       = Internal::Button::BUTTON_PROPERTY_END_INDEX + 5;
-const Property::Index PushButton::PROPERTY_NORMAL_STATE_ACTOR           = Internal::Button::BUTTON_PROPERTY_END_INDEX + 6;
-const Property::Index PushButton::PROPERTY_PRESSED_STATE_ACTOR          = Internal::Button::BUTTON_PROPERTY_END_INDEX + 7;
-const Property::Index PushButton::PROPERTY_DIMMED_STATE_ACTOR           = Internal::Button::BUTTON_PROPERTY_END_INDEX + 8;
-const Property::Index PushButton::PROPERTY_LABEL_ACTOR                  = Internal::Button::BUTTON_PROPERTY_END_INDEX + 9;
-
 namespace Internal
 {
 
@@ -62,16 +52,6 @@ SignalConnectorType signalConnector1( typeRegistration, Toolkit::PushButton::SIG
 SignalConnectorType signalConnector2( typeRegistration, Toolkit::PushButton::SIGNAL_RELEASED, &PushButton::DoConnectSignal );
 
 TypeAction action1( typeRegistration, Toolkit::PushButton::ACTION_PUSH_BUTTON_CLICK, &PushButton::DoAction );
-
-PropertyRegistration property1( typeRegistration, "auto-repeating",               Toolkit::PushButton::PROPERTY_AUTO_REPEATING,               Property::BOOLEAN, &PushButton::SetProperty, &PushButton::GetProperty );
-PropertyRegistration property2( typeRegistration, "initial-auto-repeating-delay", Toolkit::PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY, Property::FLOAT,   &PushButton::SetProperty, &PushButton::GetProperty );
-PropertyRegistration property3( typeRegistration, "next-auto-repeating-delay",    Toolkit::PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY,    Property::FLOAT,   &PushButton::SetProperty, &PushButton::GetProperty );
-PropertyRegistration property4( typeRegistration, "togglable",                    Toolkit::PushButton::PROPERTY_TOGGLABLE,                    Property::BOOLEAN, &PushButton::SetProperty, &PushButton::GetProperty );
-PropertyRegistration property5( typeRegistration, "toggle",                       Toolkit::PushButton::PROPERTY_TOGGLE,                       Property::BOOLEAN, &PushButton::SetProperty, &PushButton::GetProperty );
-PropertyRegistration property6( typeRegistration, "normal-state-actor",           Toolkit::PushButton::PROPERTY_NORMAL_STATE_ACTOR,           Property::MAP,     &PushButton::SetProperty, &PushButton::GetProperty );
-PropertyRegistration property7( typeRegistration, "pressed-state-actor",          Toolkit::PushButton::PROPERTY_PRESSED_STATE_ACTOR,          Property::MAP,     &PushButton::SetProperty, &PushButton::GetProperty );
-PropertyRegistration property8( typeRegistration, "dimmed-state-actor",           Toolkit::PushButton::PROPERTY_DIMMED_STATE_ACTOR,           Property::MAP,     &PushButton::SetProperty, &PushButton::GetProperty );
-PropertyRegistration property9( typeRegistration, "label-actor",                  Toolkit::PushButton::PROPERTY_LABEL_ACTOR,                  Property::MAP,     &PushButton::SetProperty, &PushButton::GetProperty );
 
 } // unnamed namespace
 
@@ -197,7 +177,7 @@ bool PushButton::IsToggleButton() const
 
 void PushButton::SetToggled( bool toggle )
 {
-  if( !mDimmed && mToggleButton && ( toggle != mToggled ) )
+  if( !mDisabled && mToggleButton && ( toggle != mToggled ) )
   {
     mToggled = toggle;
 
@@ -207,7 +187,7 @@ void PushButton::SetToggled( bool toggle )
     GetPushButtonPainter( mPainter )->Toggled( handle );
 
     // Emit signal.
-    mToggledSignalV2.Emit( handle, mToggled );
+    mStateChangedSignal.Emit( handle, mToggled );
   }
 }
 
@@ -258,86 +238,86 @@ Actor PushButton::GetBackgroundImage() const
   return mBackgroundImage;
 }
 
-void PushButton::SetPressedImage( Image image )
+void PushButton::SetSelectedImage( Image image )
 {
-  SetPressedImage( ImageActor::New( image ) );
+  SetSelectedImage( ImageActor::New( image ) );
 }
 
-void PushButton::SetPressedImage( Actor image )
-{
-  Toolkit::PushButton handle( GetOwner() );
-  GetPushButtonPainter( mPainter )->SetPressedImage( handle, image );
-}
-
-Actor& PushButton::GetPressedImage()
-{
-  return mPressedImage;
-}
-
-Actor PushButton::GetPressedImage() const
-{
-  return mPressedImage;
-}
-
-void PushButton::SetDimmedBackgroundImage( Image image )
-{
-  SetDimmedBackgroundImage( ImageActor::New( image ) );
-}
-
-void PushButton::SetDimmedBackgroundImage( Actor image )
+void PushButton::SetSelectedImage( Actor image )
 {
   Toolkit::PushButton handle( GetOwner() );
-  GetPushButtonPainter( mPainter )->SetDimmedBackgroundImage( handle, image );
+  GetPushButtonPainter( mPainter )->SetSelectedImage( handle, image );
 }
 
-Actor& PushButton::GetDimmedBackgroundImage()
+Actor& PushButton::GetSelectedImage()
 {
-  return mDimmedBackgroundImage;
+  return mSelectedImage;
 }
 
-Actor PushButton::GetDimmedBackgroundImage() const
+Actor PushButton::GetSelectedImage() const
 {
-  return mDimmedBackgroundImage;
+  return mSelectedImage;
 }
 
-void PushButton::SetDimmedImage( Image image )
+void PushButton::SetDisabledBackgroundImage( Image image )
 {
-  SetDimmedImage( ImageActor::New( image ) );
+  SetDisabledBackgroundImage( ImageActor::New( image ) );
 }
 
-void PushButton::SetDimmedImage( Actor image )
+void PushButton::SetDisabledBackgroundImage( Actor image )
 {
   Toolkit::PushButton handle( GetOwner() );
-  GetPushButtonPainter( mPainter )->SetDimmedImage( handle, image );
+  GetPushButtonPainter( mPainter )->SetDisabledBackgroundImage( handle, image );
 }
 
-Actor& PushButton::GetDimmedImage()
+Actor& PushButton::GetDisabledBackgroundImage()
 {
-  return mDimmedImage;
+  return mDisabledBackgroundImage;
 }
 
-Actor PushButton::GetDimmedImage() const
+Actor PushButton::GetDisabledBackgroundImage() const
 {
-  return mDimmedImage;
+  return mDisabledBackgroundImage;
 }
 
-void PushButton::SetLabelText( const std::string& text )
+void PushButton::SetDisabledImage( Image image )
+{
+  SetDisabledImage( ImageActor::New( image ) );
+}
+
+void PushButton::SetDisabledImage( Actor image )
+{
+  Toolkit::PushButton handle( GetOwner() );
+  GetPushButtonPainter( mPainter )->SetDisabledImage( handle, image );
+}
+
+Actor& PushButton::GetDisabledImage()
+{
+  return mDisabledImage;
+}
+
+Actor PushButton::GetDisabledImage() const
+{
+  return mDisabledImage;
+}
+
+void PushButton::SetLabel( const std::string& label )
 {
   // TODO
 }
 
-void PushButton::SetLabelText( Actor text )
+void PushButton::SetLabel( Actor label )
 {
   Toolkit::PushButton handle( GetOwner() );
-  GetPushButtonPainter( mPainter )->SetLabelText( handle, text );
+  GetPushButtonPainter( mPainter )->SetLabel( handle, label );
 }
 
-Actor& PushButton::GetLabel()
+Actor PushButton::GetLabel() const
 {
   return mLabel;
 }
 
-Actor PushButton::GetLabelText() const
+Actor& PushButton::GetLabel()
 {
   return mLabel;
 }
@@ -352,14 +332,14 @@ Actor& PushButton::GetFadeOutButtonImage()
   return mFadeOutButtonImage;
 }
 
-Toolkit::PushButton::PressedSignalV2& PushButton::PressedSignal()
+Toolkit::PushButton::PressedSignalType& PushButton::PressedSignal()
 {
-  return mPressedSignalV2;
+  return mPressedSignal;
 }
 
-Toolkit::PushButton::ReleasedSignalV2& PushButton::ReleasedSignal()
+Toolkit::PushButton::ReleasedSignalType& PushButton::ReleasedSignal()
 {
-  return mReleasedSignalV2;
+  return mReleasedSignal;
 }
 
 bool PushButton::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -369,9 +349,9 @@ bool PushButton::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   bool connected( true );
   Toolkit::PushButton button = Toolkit::PushButton::DownCast(handle);
 
-  if( Toolkit::PushButton::SIGNAL_TOGGLED == signalName )
+  if( Toolkit::PushButton::SIGNAL_STATE_CHANGED == signalName )
   {
-    button.ToggledSignal().Connect( tracker, functor );
+    button.StateChangedSignal().Connect( tracker, functor );
   }
   else if( Toolkit::PushButton::SIGNAL_PRESSED == signalName )
   {
@@ -398,61 +378,41 @@ void PushButton::SetProperty( BaseObject* object, Property::Index propertyIndex,
   {
     PushButton& pushButtonImpl( GetImplementation( pushButton ) );
 
-    switch ( propertyIndex )
+    if ( propertyIndex == Toolkit::Button::PROPERTY_AUTO_REPEATING )
     {
-      case Toolkit::PushButton::PROPERTY_AUTO_REPEATING:
-      {
-        pushButtonImpl.SetAutoRepeating( value.Get< bool >() );
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY:
-      {
-        pushButtonImpl.SetInitialAutoRepeatingDelay( value.Get< float >() );
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY:
-      {
-        pushButtonImpl.SetNextAutoRepeatingDelay( value.Get< float >() );
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_TOGGLABLE:
-      {
-        pushButtonImpl.SetToggleButton( value.Get< bool >() );
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_TOGGLE:
-      {
-        pushButtonImpl.SetToggled( value.Get< bool >() );
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_NORMAL_STATE_ACTOR:
-      {
-        pushButtonImpl.SetButtonImage( Scripting::NewActor( value.Get< Property::Map >() ) );
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_PRESSED_STATE_ACTOR:
-      {
-        pushButtonImpl.SetPressedImage( Scripting::NewActor( value.Get< Property::Map >() ) );
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_DIMMED_STATE_ACTOR:
-      {
-        pushButtonImpl.SetDimmedImage( Scripting::NewActor( value.Get< Property::Map >() ) );
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_LABEL_ACTOR:
-      {
-        pushButtonImpl.SetLabelText( Scripting::NewActor( value.Get< Property::Map >() ) );
-        break;
-      }
+      pushButtonImpl.SetAutoRepeating( value.Get< bool >() );
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY )
+    {
+      pushButtonImpl.SetInitialAutoRepeatingDelay( value.Get< float >() );
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY )
+    {
+      pushButtonImpl.SetNextAutoRepeatingDelay( value.Get< float >() );
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_TOGGLABLE )
+    {
+      pushButtonImpl.SetToggleButton( value.Get< bool >() );
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_TOGGLED )
+    {
+      pushButtonImpl.SetToggled( value.Get< bool >() );
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_NORMAL_STATE_ACTOR )
+    {
+      pushButtonImpl.SetButtonImage( Scripting::NewActor( value.Get< Property::Map >() ) );
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_SELECTED_STATE_ACTOR )
+    {
+      pushButtonImpl.SetSelectedImage( Scripting::NewActor( value.Get< Property::Map >() ) );
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_DISABLED_STATE_ACTOR )
+    {
+      pushButtonImpl.SetDisabledImage( Scripting::NewActor( value.Get< Property::Map >() ) );
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_LABEL_ACTOR )
+    {
+      pushButtonImpl.SetLabel( Scripting::NewActor( value.Get< Property::Map >() ) );
     }
   }
 }
@@ -467,69 +427,49 @@ Property::Value PushButton::GetProperty( BaseObject* object, Property::Index pro
   {
     PushButton& pushButtonImpl( GetImplementation( pushButton ) );
 
-    switch ( propertyIndex )
+    if ( propertyIndex == Toolkit::Button::PROPERTY_AUTO_REPEATING )
     {
-      case Toolkit::PushButton::PROPERTY_AUTO_REPEATING:
-      {
-        value = pushButtonImpl.mAutoRepeating;
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_INITIAL_AUTO_REPEATING_DELAY:
-      {
-        value = pushButtonImpl.mInitialAutoRepeatingDelay;
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_NEXT_AUTO_REPEATING_DELAY:
-      {
-        value = pushButtonImpl.mNextAutoRepeatingDelay;
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_TOGGLABLE:
-      {
-        value = pushButtonImpl.mToggleButton;
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_TOGGLE:
-      {
-        value = pushButtonImpl.mToggled;
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_NORMAL_STATE_ACTOR:
-      {
-        Property::Map map;
-        Scripting::CreatePropertyMap( pushButtonImpl.mButtonImage, map );
-        value = map;
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_PRESSED_STATE_ACTOR:
-      {
-        Property::Map map;
-        Scripting::CreatePropertyMap( pushButtonImpl.mPressedImage, map );
-        value = map;
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_DIMMED_STATE_ACTOR:
-      {
-        Property::Map map;
-        Scripting::CreatePropertyMap( pushButtonImpl.mDimmedImage, map );
-        value = map;
-        break;
-      }
-
-      case Toolkit::PushButton::PROPERTY_LABEL_ACTOR:
-      {
-        Property::Map map;
-        Scripting::CreatePropertyMap( pushButtonImpl.mLabel, map );
-        value = map;
-        break;
-      }
+      value = pushButtonImpl.mAutoRepeating;
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY )
+    {
+      value = pushButtonImpl.mInitialAutoRepeatingDelay;
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY )
+    {
+      value = pushButtonImpl.mNextAutoRepeatingDelay;
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_TOGGLABLE )
+    {
+      value = pushButtonImpl.mToggleButton;
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_TOGGLED )
+    {
+      value = pushButtonImpl.mToggled;
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_NORMAL_STATE_ACTOR )
+    {
+      Property::Map map;
+      Scripting::CreatePropertyMap( pushButtonImpl.mButtonImage, map );
+      value = map;
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_SELECTED_STATE_ACTOR )
+    {
+      Property::Map map;
+      Scripting::CreatePropertyMap( pushButtonImpl.mSelectedImage, map );
+      value = map;
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_DISABLED_STATE_ACTOR )
+    {
+      Property::Map map;
+      Scripting::CreatePropertyMap( pushButtonImpl.mDisabledImage, map );
+      value = map;
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_LABEL_ACTOR )
+    {
+      Property::Map map;
+      Scripting::CreatePropertyMap( pushButtonImpl.mLabel, map );
+      value = map;
     }
   }
 
@@ -558,7 +498,7 @@ void PushButton::OnButtonDown()
     }
 
     //Emit signal.
-    mPressedSignalV2.Emit( handle );
+    mPressedSignal.Emit( handle );
   }
 }
 
@@ -576,7 +516,7 @@ void PushButton::OnButtonUp()
       GetPushButtonPainter( mPainter )->Toggled( handle );
 
       // Emit signal.
-      mToggledSignalV2.Emit( handle, mToggled );
+      mStateChangedSignal.Emit( handle, mToggled );
     }
     else
     {
@@ -592,8 +532,8 @@ void PushButton::OnButtonUp()
       }
 
       //Emit signal.
-      mReleasedSignalV2.Emit( handle );
-      mClickedSignalV2.Emit( handle );
+      mReleasedSignal.Emit( handle );
+      mClickedSignal.Emit( handle );
     }
   }
 }
@@ -615,7 +555,7 @@ void PushButton::OnTouchPointLeave()
       }
 
       //Emit signal.
-      mReleasedSignalV2.Emit( handle );
+      mReleasedSignal.Emit( handle );
     }
   }
 }
@@ -688,7 +628,7 @@ void PushButton::SetUpTimer( float delay )
 bool PushButton::AutoRepeatingSlot()
 {
   bool consumed = false;
-  if( !mDimmed )
+  if( !mDisabled )
   {
     // Restart the autorepeat timer.
     SetUpTimer( mNextAutoRepeatingDelay );
@@ -699,9 +639,9 @@ bool PushButton::AutoRepeatingSlot()
     GetPushButtonPainter( mPainter )->Pressed( handle );
 
     //Emit signal.
-    consumed = mReleasedSignalV2.Emit( handle );
-    consumed |= mClickedSignalV2.Emit( handle );
-    consumed |= mPressedSignalV2.Emit( handle );
+    consumed = mReleasedSignal.Emit( handle );
+    consumed |= mClickedSignal.Emit( handle );
+    consumed |= mPressedSignal.Emit( handle );
  }
 
   return consumed;

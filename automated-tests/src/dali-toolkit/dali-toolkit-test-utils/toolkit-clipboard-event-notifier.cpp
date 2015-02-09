@@ -19,7 +19,7 @@
 
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -34,7 +34,7 @@ class ClipboardEventNotifier : public Dali::BaseObject
 {
 public:
 
-  typedef Dali::ClipboardEventNotifier::ClipboardEventSignalV2 ClipboardEventSignalV2;
+  typedef Dali::ClipboardEventNotifier::ClipboardEventSignalType ClipboardEventSignalType;
 
   // Creation
   static Dali::ClipboardEventNotifier New();
@@ -47,9 +47,9 @@ public:
   void EmitContentSelectedSignal();
 
   // Signals
-  ClipboardEventSignalV2& ContentSelectedSignal()
+  ClipboardEventSignalType& ContentSelectedSignal()
   {
-    return mContentSelectedSignalV2;
+    return mContentSelectedSignal;
   }
 
 private:
@@ -64,7 +64,7 @@ private:
 private:
 
   std::string mContent;    ///< The current selected content.
-  ClipboardEventSignalV2 mContentSelectedSignalV2;
+  ClipboardEventSignalType mContentSelectedSignal;
 
   static Dali::ClipboardEventNotifier mToolkitClipboardEventNotifier;
 
@@ -125,10 +125,10 @@ void ClipboardEventNotifier::ClearContent()
 
 void ClipboardEventNotifier::EmitContentSelectedSignal()
 {
-  if ( !mContentSelectedSignalV2.Empty() )
+  if ( !mContentSelectedSignal.Empty() )
   {
     Dali::ClipboardEventNotifier handle( this );
-    mContentSelectedSignalV2.Emit( handle );
+    mContentSelectedSignal.Emit( handle );
   }
 }
 
@@ -145,8 +145,6 @@ ClipboardEventNotifier::~ClipboardEventNotifier()
 } // namespace Internal
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-const char* const ClipboardEventNotifier::SIGNAL_CONTENT_SELECTED( "content-selected" );
 
 ClipboardEventNotifier::ClipboardEventNotifier()
 {
@@ -181,7 +179,7 @@ void ClipboardEventNotifier::EmitContentSelectedSignal()
   Internal::Adaptor::ClipboardEventNotifier::GetImplementation(*this).EmitContentSelectedSignal();
 }
 
-ClipboardEventNotifier::ClipboardEventSignalV2& ClipboardEventNotifier::ContentSelectedSignal()
+ClipboardEventNotifier::ClipboardEventSignalType& ClipboardEventNotifier::ContentSelectedSignal()
 {
   return Internal::Adaptor::ClipboardEventNotifier::GetImplementation(*this).ContentSelectedSignal();
 }

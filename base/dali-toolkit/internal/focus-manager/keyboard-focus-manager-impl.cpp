@@ -147,9 +147,9 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(const unsigned int actorID)
       }
 
       // Send notification for the change of focus actor
-      if( !mFocusChangedSignalV2.Empty() )
+      if( !mFocusChangedSignal.Empty() )
       {
-        mFocusChangedSignalV2.Emit(GetCurrentFocusActor(), actor);
+        mFocusChangedSignal.Emit(GetCurrentFocusActor(), actor);
       }
 
       DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Focus Changed\n", __FUNCTION__, __LINE__);
@@ -219,11 +219,11 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocusNavigationDi
     parentLayoutControl = GetParentLayoutControl(parentLayoutControl);
   }
 
-  if(!succeed && !mPreFocusChangeSignalV2.Empty())
+  if(!succeed && !mPreFocusChangeSignal.Empty())
   {
     // Don't know how to move the focus further. The application needs to tell us which actor to move the focus to
     mIsWaitingKeyboardFocusChangeCommit = true;
-    Actor nextFocusableActor = mPreFocusChangeSignalV2.Emit(currentFocusActor, Actor(), direction);
+    Actor nextFocusableActor = mPreFocusChangeSignal.Emit(currentFocusActor, Actor(), direction);
     mIsWaitingKeyboardFocusChangeCommit = false;
 
     if ( nextFocusableActor && nextFocusableActor.IsKeyboardFocusable() )
@@ -264,10 +264,10 @@ bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control contr
 
       // We will try to move the focus to the actor. Emit a signal to notify the proposed actor to focus
       // Signal handler can check the proposed actor and return a different actor if it wishes.
-      if( !mPreFocusChangeSignalV2.Empty() )
+      if( !mPreFocusChangeSignal.Empty() )
       {
         mIsWaitingKeyboardFocusChangeCommit = true;
-        committedFocusActor = mPreFocusChangeSignalV2.Emit(currentFocusActor, nextFocusableActor, direction);
+        committedFocusActor = mPreFocusChangeSignal.Emit(currentFocusActor, nextFocusableActor, direction);
         mIsWaitingKeyboardFocusChangeCommit = false;
       }
 
@@ -323,10 +323,10 @@ bool KeyboardFocusManager::DoMoveFocusToNextFocusGroup(bool forward)
     parentLayoutControl = GetParentLayoutControl(parentLayoutControl);
   }
 
-  if(!mFocusGroupChangedSignalV2.Empty())
+  if(!mFocusGroupChangedSignal.Empty())
   {
     // Emit a focus group changed signal. The applicaton can move the focus to a new focus group
-    mFocusGroupChangedSignalV2.Emit(GetCurrentFocusActor(), forward);
+    mFocusGroupChangedSignal.Emit(GetCurrentFocusActor(), forward);
   }
 
   return succeed;
@@ -344,9 +344,9 @@ void KeyboardFocusManager::DoActivate(Actor actor)
     }
 
     // Send notification for the activation of focused actor
-    if( !mFocusedActorActivatedSignalV2.Empty() )
+    if( !mFocusedActorActivatedSignal.Empty() )
     {
-      mFocusedActorActivatedSignalV2.Emit(actor);
+      mFocusedActorActivatedSignal.Emit(actor);
     }
   }
 }
@@ -362,9 +362,9 @@ void KeyboardFocusManager::ClearFocus()
     }
 
     // Send notification for the change of focus actor
-    if( !mFocusChangedSignalV2.Empty() )
+    if( !mFocusChangedSignal.Empty() )
     {
-      mFocusChangedSignalV2.Emit(actor, Actor());
+      mFocusChangedSignal.Emit(actor, Actor());
     }
   }
 
@@ -695,24 +695,24 @@ void KeyboardFocusManager::OnTouched(const TouchEvent& touchEvent)
   ClearFocus();
 }
 
-Toolkit::KeyboardFocusManager::PreFocusChangeSignalV2& KeyboardFocusManager::PreFocusChangeSignal()
+Toolkit::KeyboardFocusManager::PreFocusChangeSignalType& KeyboardFocusManager::PreFocusChangeSignal()
 {
-  return mPreFocusChangeSignalV2;
+  return mPreFocusChangeSignal;
 }
 
-Toolkit::KeyboardFocusManager::FocusChangedSignalV2& KeyboardFocusManager::FocusChangedSignal()
+Toolkit::KeyboardFocusManager::FocusChangedSignalType& KeyboardFocusManager::FocusChangedSignal()
 {
-  return mFocusChangedSignalV2;
+  return mFocusChangedSignal;
 }
 
-Toolkit::KeyboardFocusManager::FocusGroupChangedSignalV2& KeyboardFocusManager::FocusGroupChangedSignal()
+Toolkit::KeyboardFocusManager::FocusGroupChangedSignalType& KeyboardFocusManager::FocusGroupChangedSignal()
 {
-  return mFocusGroupChangedSignalV2;
+  return mFocusGroupChangedSignal;
 }
 
-Toolkit::KeyboardFocusManager::FocusedActorActivatedSignalV2& KeyboardFocusManager::FocusedActorActivatedSignal()
+Toolkit::KeyboardFocusManager::FocusedActorActivatedSignalType& KeyboardFocusManager::FocusedActorActivatedSignal()
 {
-  return mFocusedActorActivatedSignalV2;
+  return mFocusedActorActivatedSignal;
 }
 
 bool KeyboardFocusManager::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )

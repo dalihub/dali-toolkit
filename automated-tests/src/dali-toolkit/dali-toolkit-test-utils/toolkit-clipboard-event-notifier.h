@@ -24,7 +24,7 @@
 // PUBLIC INCLUDES
 #define __DALI_CLIPBOARD_EVENT_NOTIFIER_H__
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 
 namespace Dali
@@ -41,8 +41,7 @@ class ClipboardEventNotifier;
 class ClipboardEventNotifier : public BaseHandle
 {
 public:
-  typedef SignalV2< void ( ClipboardEventNotifier& ) > ClipboardEventSignalV2;
-  static const char* const SIGNAL_CONTENT_SELECTED; ///< name "content-selected"
+  typedef Signal< void ( ClipboardEventNotifier& ) > ClipboardEventSignalType;
 
   ClipboardEventNotifier();
   static ClipboardEventNotifier Get();
@@ -53,7 +52,7 @@ public:
   void ClearContent();
 
   void EmitContentSelectedSignal();
-  ClipboardEventSignalV2& ContentSelectedSignal();
+  ClipboardEventSignalType& ContentSelectedSignal();
 
   ClipboardEventNotifier( Internal::Adaptor::ClipboardEventNotifier* notifier );
 };

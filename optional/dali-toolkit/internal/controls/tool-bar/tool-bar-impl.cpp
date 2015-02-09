@@ -73,7 +73,7 @@ void ToolBar::SetBackground( Actor background )
   // ToolBar image
   background.SetParentOrigin( Dali::ParentOrigin::TOP_CENTER );
   background.SetAnchorPoint( Dali::AnchorPoint::TOP_CENTER );
-  background.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+  background.SetSize( mToolBarSize );
 
   RenderableActor renderableActor = RenderableActor::DownCast( background );
   if ( renderableActor )
@@ -82,6 +82,7 @@ void ToolBar::SetBackground( Actor background )
   }
 
   Self().Add( background );
+  mBackground = background;
 }
 
 void ToolBar::AddControl( Actor control, float relativeSize, Toolkit::Alignment::Type alignment, const Toolkit::Alignment::Padding& padding )
@@ -351,9 +352,10 @@ void ToolBar::OnControlChildAdd(Actor& child)
   // actor is in mLayout not in Self().
 }
 
-void ToolBar::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+void ToolBar::OnControlSizeSet( const Vector3& targetSize )
 {
-  Relayout( mLayout, size, container );
+  mToolBarSize = targetSize;
+  mBackground.SetSize( mToolBarSize );
 }
 
 } // namespace Internal

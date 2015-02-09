@@ -6,7 +6,6 @@ toolkit_optional_src_files = \
    $(toolkit_optional_src_dir)/controls/cluster/cluster-style-impl.cpp \
    $(toolkit_optional_src_dir)/controls/effects-view/effects-view-impl.cpp \
    $(toolkit_optional_src_dir)/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp \
-   $(toolkit_optional_src_dir)/controls/image-view/image-view-impl.cpp \
    $(toolkit_optional_src_dir)/controls/image-view/masked-image-view-impl.cpp \
    $(toolkit_optional_src_dir)/controls/page-turn-view/page-turn-view-impl.cpp \
    $(toolkit_optional_src_dir)/controls/page-turn-view/page-turn-portrait-view-impl.cpp \

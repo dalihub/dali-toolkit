@@ -3,7 +3,7 @@ Testing environment   {#auto_testing}
 
 The new test environment from Tizen is the Web-TCT test suite. This was written for testing web components, but can easily be used for testing Dali.
 
-Each of the DALi repositories, **dali-core**, **dali-adaptor** and **dali-toolkit**, have their own test suites under the `automated-tests` folder. Within the src folder are a number of secondary folders - these correspond to 'managed' tests (for testing the frozen API for products), unmanaged tests (tests for other APIs) and internal (for desktop testing only)
+Each of the DALi repositories, **dali-core**, **dali-adaptor** and **dali-toolkit**, have their own test suites under the `automated-tests` folder. Within the src folder are a number of secondary folders - these correspond to 'API' tests  and internal (for desktop testing only)
 
 Installation
 ------------
@@ -62,11 +62,11 @@ Run the following commands:
     cd automated-tests
     ./build.sh
 
-This will build dali, dali-unmanaged and dali-internal test sets.
+This will build dali and dali-internal test sets.
 
 Test sets can be built individually:
 
-    ./build.sh dali-unmanaged
+    ./build.sh dali
 
 They can also be built without regenerating test case scripts (Useful for quicker rebuilds)
 
@@ -84,7 +84,7 @@ To execute tests, cd into automated-tests and run
 
     ./execute.sh
 
-This will execute dali, dali-unmanaged and dali-internal test sets. Note that the output summary for the first will be printed before running the second.
+This will execute dali and dali-internal test sets. Note that the output summary for the first will be printed before running the second.
 
 By default the tests execute in parallel, which is faster but does not produce a single output file (summary.xml).  Use this to execute the tests in series:
 
@@ -123,17 +123,14 @@ For core Dali cd into automated-tests, and use:
 
 sudo ./tcbuild build dali
 
-    sudo ./tcbuild build dali-unmanaged
+    sudo ./tcbuild build dali
     ./tcbuild install dali
-    ./tcbuild install dali-unmanaged
 
 For Dali Adaptor, cd into automated-tests, and use:
 
     sudo ./tcbuild build dali-adaptor
-    sudo ./tcbuild build dali-adaptor-unmanaged # < Currently failing as needs a ".spec" file.
     sudo ./tcbuild build dali-platform-abstraction
     ./tcbuild install dali-adaptor
-    ./tcbuild install dali-adaptor-unmanaged
     ./tcbuild install dali-platform-abstraction
 
 Ensure your handset's filesystem is writable:
@@ -144,7 +141,7 @@ To execute tests, cd into automated-tests and run
 
     tct-mgr
 
-This will bring up the java test suite program. You should see the Plan pane with a list of all tests in. Select the tct-dali-core-tests and tct-dali-unmanaged-tests. and you will be offered a dialog to choose a test plan: either create a new one or use temp.
+This will bring up the java test suite program. You should see the Plan pane with a list of all tests in. Select the tct-dali-core-tests. and you will be offered a dialog to choose a test plan: either create a new one or use temp.
 Select dali test suite, and click Run, then "Create a new plan", and call it "Dali-Core" or some such. It will now run the dali-test suite.
 
 You can find the output files under /opt/tct/manager/result/
@@ -157,11 +154,6 @@ To Managed API
 --------------
 
 If you are adding test cases for new or existing managed API (CAPI), you need to add your changes to the src/dali mirror, and copy your change to the managed test suite in core-api. You need to inform HQ of your update.
-
-To Unmanaged API
-----------------
-
-If you are adding test cases for unmanaged API, you need to add your changes to the src/dali-unmanaged test suite.
 
 For internal API
 ----------------
@@ -201,9 +193,9 @@ On desktop, you can debug the tests by running gdb on the test program:
 
 replace `<TestCase>` with the name of the failing testcase.
 
-For example, using testcase UtcDaliNinePatch01 from the dali-core unmanaged test suite:
+For example, using testcase UtcDaliNinePatch01 from the dali-core test suite:
 
-    $ gdb build/src/dali-unmanaged/tct-dali-unmanaged-core
+    $ gdb build/src/dali/tct-dali-core
     gdb> r UtcDaliNinePatch01
 
 
@@ -226,4 +218,4 @@ If when running tct-mgr tests, if "Health-Check get" fails and leaves a white sc
 
 If the test results show that the test cases fail with "Undefined reference to XXX", it means you have probably failed to update the dali packages on target.
 
-If all the tests are failing then make sure that you have enabled the engineering mode on the target with the 'change-booting-mode.sh --update' command in sdb shell, as the tests may not have installed correctly.
+If all the tests are failing then make sure that you have enabled the engineering mode on the target with the 'change-booting-mode.sh --update' command in sdb shell, as the tests may not have installed correctly

@@ -75,7 +75,7 @@ Dali::Toolkit::CheckBoxButton CheckBoxButton::New()
 
 void CheckBoxButton::SetChecked( bool checked )
 {
-  if( !mDimmed && ( checked != mChecked ) )
+  if( !mDisabled && ( checked != mChecked ) )
   {
     // Stores the state.
     mChecked = checked;
@@ -85,8 +85,8 @@ void CheckBoxButton::SetChecked( bool checked )
     // Notifies the painter the checkbox has been checked.
     GetCheckBoxButtonPainter( mPainter )->Checked( handle );
 
-    // Raise toggled signal
-    mToggledSignalV2.Emit( handle, mChecked );
+    // Raise state changed signal
+    mStateChangedSignal.Emit( handle, mChecked );
   }
 }
 
@@ -137,46 +137,46 @@ Actor CheckBoxButton::GetCheckedImage() const
   return mCheckedImage;
 }
 
-void CheckBoxButton::SetDimmedBackgroundImage( Image image )
+void CheckBoxButton::SetDisabledBackgroundImage( Image image )
 {
-  SetDimmedBackgroundImage( ImageActor::New( image ) );
+  SetDisabledBackgroundImage( ImageActor::New( image ) );
 }
 
-void CheckBoxButton::SetDimmedBackgroundImage( Actor image )
+void CheckBoxButton::SetDisabledBackgroundImage( Actor image )
 {
   Toolkit::CheckBoxButton handle( GetOwner() );
-  GetCheckBoxButtonPainter( mPainter )->SetDimmedBackgroundImage( handle, image );
+  GetCheckBoxButtonPainter( mPainter )->SetDisabledBackgroundImage( handle, image );
 }
 
-Actor& CheckBoxButton::GetDimmedBackgroundImage()
+Actor& CheckBoxButton::GetDisabledBackgroundImage()
 {
-  return mDimmedBackgroundImage;
+  return mDisabledBackgroundImage;
 }
 
-Actor CheckBoxButton::GetDimmedBackgroundImage() const
+Actor CheckBoxButton::GetDisabledBackgroundImage() const
 {
-  return mDimmedBackgroundImage;
+  return mDisabledBackgroundImage;
 }
 
-void CheckBoxButton::SetDimmedCheckedImage( Image image )
+void CheckBoxButton::SetDisabledCheckedImage( Image image )
 {
-  SetDimmedCheckedImage( ImageActor::New( image ) );
+  SetDisabledCheckedImage( ImageActor::New( image ) );
 }
 
-void CheckBoxButton::SetDimmedCheckedImage( Actor image )
+void CheckBoxButton::SetDisabledCheckedImage( Actor image )
 {
   Toolkit::CheckBoxButton handle( GetOwner() );
-  GetCheckBoxButtonPainter( mPainter )->SetDimmedCheckedImage( handle, image );
+  GetCheckBoxButtonPainter( mPainter )->SetDisabledCheckedImage( handle, image );
 }
 
-Actor& CheckBoxButton::GetDimmedCheckedImage()
+Actor& CheckBoxButton::GetDisabledCheckedImage()
 {
-  return mDimmedCheckedImage;
+  return mDisabledCheckedImage;
 }
 
-Actor CheckBoxButton::GetDimmedCheckedImage() const
+Actor CheckBoxButton::GetDisabledCheckedImage() const
 {
-  return mDimmedCheckedImage;
+  return mDisabledCheckedImage;
 }
 
 Actor& CheckBoxButton::GetFadeOutBackgroundImage()
@@ -191,8 +191,6 @@ Actor& CheckBoxButton::GetFadeOutCheckedImage()
 
 void CheckBoxButton::OnButtonInitialize()
 {
-  mUseFadeAnimationProperty = Self().RegisterProperty( Toolkit::CheckBoxButton::USE_FADE_ANIMATION_PROPERTY_NAME, false );
-  mUseCheckAnimationProperty = Self().RegisterProperty( Toolkit::CheckBoxButton::USE_CHECK_ANIMATION_PROPERTY_NAME, true );
 }
 
 void CheckBoxButton::OnButtonUp()
@@ -253,9 +251,7 @@ bool CheckBoxButton::DoAction(BaseObject* object, const std::string& actionName,
 CheckBoxButton::CheckBoxButton()
 : Button(),
   mChecked( false ),
-  mClickActionPerforming(false),
-  mUseFadeAnimationProperty(Property::INVALID_INDEX),
-  mUseCheckAnimationProperty(Property::INVALID_INDEX)
+  mClickActionPerforming(false)
 {
   // Creates specific painter.
   mPainter = new CheckBoxButtonDefaultPainter();

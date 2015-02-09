@@ -39,10 +39,8 @@
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-cube-effect.h>
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-custom-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-spiral-effect.h>
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-slide-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 #include <dali-toolkit/public-api/controls/super-blur-view/super-blur-view.h>
@@ -82,7 +80,6 @@
 
 #include <dali-toolkit/public-api/controls/effects-view/effects-view.h>
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/controls/magnifier/magnifier.h>
 #include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
 #include <dali-toolkit/public-api/controls/page-turn-view/page-turn-portrait-view.h>

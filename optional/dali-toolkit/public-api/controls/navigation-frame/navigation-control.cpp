@@ -126,12 +126,12 @@ void NavigationControl::SetOrientationRotateAnimation( float duration, AlphaFunc
   GetImpl( *this ).SetOrientationRotateAnimation( duration, alphaFunc );
 }
 
-NavigationControl::ItemPushedSignalV2& NavigationControl::ItemPushedSignal()
+NavigationControl::ItemPushedSignalType& NavigationControl::ItemPushedSignal()
 {
   return GetImpl( *this ).ItemPushedSignal();
 }
 
-NavigationControl::ItemPoppedSignalV2& NavigationControl::ItemPoppedSignal()
+NavigationControl::ItemPoppedSignalType& NavigationControl::ItemPoppedSignal()
 {
   return GetImpl( *this ).ItemPoppedSignal();
 }

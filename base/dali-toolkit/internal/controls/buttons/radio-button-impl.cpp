@@ -26,15 +26,6 @@
 using namespace Dali;
 using namespace Dali::Toolkit::Internal;
 
-namespace Dali
-{
-namespace Toolkit
-{
-const Property::Index RadioButton::PROPERTY_ACTIVE = Internal::Button::BUTTON_PROPERTY_END_INDEX + 11;
-const Property::Index RadioButton::PROPERTY_LABEL_ACTOR = Internal::Button::BUTTON_PROPERTY_END_INDEX + 12;
-}
-}
-
 namespace
 {
 
@@ -45,11 +36,8 @@ BaseHandle Create()
 
 TypeRegistration typeRegistration( typeid( Toolkit::RadioButton ), typeid( Toolkit::Button ), Create);
 
-PropertyRegistration property1(typeRegistration, "active", Toolkit::RadioButton::PROPERTY_ACTIVE, Property::BOOLEAN, &RadioButton::SetProperty, &RadioButton::GetProperty);
-PropertyRegistration property2(typeRegistration, "label-actor", Toolkit::RadioButton::PROPERTY_LABEL_ACTOR, Property::MAP, &RadioButton::SetProperty, &RadioButton::GetProperty);
-
-const char* const INACTIVE_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-inactive.png";
-const char* const ACTIVE_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-active.png";
+const char* const UNSELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-unselected.png";
+const char* const SELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-selected.png";
 
 const Vector3 DISTANCE_BETWEEN_IMAGE_AND_LABEL(5.0f, 0.0f, 0.0f);
 }
@@ -70,12 +58,12 @@ Dali::Toolkit::RadioButton RadioButton::New()
 }
 
 RadioButton::RadioButton()
-  : mActive(false)
+  : mSelected(false)
 {
-  mInactiveImage = Dali::Image::New( INACTIVE_BUTTON_IMAGE_DIR );
-  mActiveImage = Dali::Image::New( ACTIVE_BUTTON_IMAGE_DIR );
+  mUnselectedImage = Dali::Image::New( UNSELECTED_BUTTON_IMAGE_DIR );
+  mSelectedImage = Dali::Image::New( SELECTED_BUTTON_IMAGE_DIR );
 
-  mRadioIcon = Dali::ImageActor::New( mInactiveImage );
+  mRadioIcon = Dali::ImageActor::New( mUnselectedImage );
 }
 
 RadioButton::~RadioButton()
@@ -117,11 +105,11 @@ Actor RadioButton::GetLabel() const
   return mLabel;
 }
 
-void RadioButton::SetActive(bool active)
+void RadioButton::SetSelected(bool selected)
 {
-  if( mActive != active )
+  if( mSelected != selected )
   {
-    if( active )
+    if( selected )
     {
       Actor parent = Self().GetParent();
       if( parent )
@@ -132,39 +120,39 @@ void RadioButton::SetActive(bool active)
 
           if( rbChild )
           {
-            rbChild.SetActive(false);
+            rbChild.SetSelected(false);
           }
         }
       }
 
-      mActive = true;
-      mRadioIcon.SetImage(mActiveImage);
+      mSelected = true;
+      mRadioIcon.SetImage(mSelectedImage);
     }
     else
     {
-      mActive = false;
-      mRadioIcon.SetImage(mInactiveImage);
+      mSelected = false;
+      mRadioIcon.SetImage(mUnselectedImage);
     }
 
-    // Raise toggled signal
+    // Raise state changed signal
     Toolkit::RadioButton handle( GetOwner() );
-    mToggledSignalV2.Emit( handle, mActive );
+    mStateChangedSignal.Emit( handle, mSelected );
 
     RelayoutRequest();
   }
 }
 
-bool RadioButton::IsActive()const
+bool RadioButton::IsSelected()const
 {
-  return mActive;
+  return mSelected;
 }
 
 void RadioButton::ToggleState()
 {
-  SetActive(!mActive);
+  SetSelected(!mSelected);
 }
 
-void RadioButton::OnRelaidOut( Vector2 /*size*/, ActorSizeContainer& container )
+void RadioButton::OnRelayout( const Vector2& /*size*/, ActorSizeContainer& container )
 {
   Vector3 newSize( mRadioIcon.GetNaturalSize() );
 
@@ -196,8 +184,8 @@ void RadioButton::OnInitialize()
 
 void RadioButton::OnButtonUp()
 {
-  // Don't allow selection on an already active radio button
-  if( !mActive )
+  // Don't allow selection on an already selected radio button
+  if( !mSelected )
   {
     ToggleState();
   }
@@ -211,18 +199,13 @@ void RadioButton::SetProperty(BaseObject* object, Property::Index propertyIndex,
   {
     RadioButton& radioButtonImpl( GetImplementation( radioButton ) );
 
-    switch ( propertyIndex )
+    if ( propertyIndex == Toolkit::Button::PROPERTY_TOGGLED )
     {
-      case Toolkit::RadioButton::PROPERTY_ACTIVE:
-      {
-        radioButtonImpl.SetActive( value.Get< bool >( ) );
-        break;
-      }
-      case Toolkit::RadioButton::PROPERTY_LABEL_ACTOR:
-      {
-        radioButtonImpl.SetLabel( Scripting::NewActor( value.Get< Property::Map >( ) ) );
-        break;
-      }
+      radioButtonImpl.SetSelected( value.Get< bool >( ) );
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_LABEL_ACTOR )
+    {
+      radioButtonImpl.SetLabel( Scripting::NewActor( value.Get< Property::Map >( ) ) );
     }
   }
 }
@@ -237,20 +220,15 @@ Property::Value RadioButton::GetProperty(BaseObject* object, Property::Index pro
   {
     RadioButton& radioButtonImpl( GetImplementation( radioButton ) );
 
-    switch ( propertyIndex )
+    if ( propertyIndex == Toolkit::Button::PROPERTY_TOGGLED )
     {
-      case Toolkit::RadioButton::PROPERTY_ACTIVE:
-      {
-        value = radioButtonImpl.mActive;
-        break;
-      }
-      case Toolkit::RadioButton::PROPERTY_LABEL_ACTOR:
-      {
-        Property::Map map;
-        Scripting::CreatePropertyMap( radioButtonImpl.mLabel, map );
-        value = map;
-        break;
-      }
+      value = radioButtonImpl.mSelected;
+    }
+    else if ( propertyIndex == Toolkit::Button::PROPERTY_LABEL_ACTOR )
+    {
+      Property::Map map;
+      Scripting::CreatePropertyMap( radioButtonImpl.mLabel, map );
+      value = map;
     }
   }
 

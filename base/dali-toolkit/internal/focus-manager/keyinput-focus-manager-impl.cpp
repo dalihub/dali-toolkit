@@ -86,9 +86,9 @@ void KeyInputFocusManager::SetFocus( Toolkit::Control control )
   control.GetImplementation().OnKeyInputFocusGained();
 
   // Emit the signal to inform focus change to the application.
-  if ( !mKeyInputFocusChangedSignalV2.Empty() )
+  if ( !mKeyInputFocusChangedSignal.Empty() )
   {
-    mKeyInputFocusChangedSignalV2.Emit( control, previousFocusControl );
+    mKeyInputFocusChangedSignal.Emit( control, previousFocusControl );
   }
 }
 
@@ -151,14 +151,14 @@ bool KeyInputFocusManager::IsKeyboardListener( Toolkit::Control control ) const
   return result;
 }
 
-Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalV2& KeyInputFocusManager::KeyInputFocusChangedSignal()
+Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalType& KeyInputFocusManager::KeyInputFocusChangedSignal()
 {
-  return mKeyInputFocusChangedSignalV2;
+  return mKeyInputFocusChangedSignal;
 }
 
-Toolkit::KeyInputFocusManager::UnhandledKeyEventSignalV2& KeyInputFocusManager::UnhandledKeyEventSignal()
+Toolkit::KeyInputFocusManager::UnhandledKeyEventSignalType& KeyInputFocusManager::UnhandledKeyEventSignal()
 {
-  return mUnhandledKeyEventSignalV2;
+  return mUnhandledKeyEventSignal;
 }
 
 KeyInputFocusManager::FocusStackIterator KeyInputFocusManager::FindFocusControlInStack( Toolkit::Control control ) const
@@ -191,9 +191,9 @@ void KeyInputFocusManager::OnKeyEvent( const KeyEvent& event )
   if( !consumed )
   {
     // Emit signal to inform that a key event is not consumed.
-    if( !mUnhandledKeyEventSignalV2.Empty() )
+    if( !mUnhandledKeyEventSignal.Empty() )
     {
-      mUnhandledKeyEventSignalV2.Emit(event);
+      mUnhandledKeyEventSignal.Emit(event);
     }
   }
 }

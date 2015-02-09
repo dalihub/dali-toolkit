@@ -56,7 +56,7 @@ using namespace ScrollViewHelperFunctions;
  * When at middle of the screen the position is not altered.
  * When one screen away from middle the position is rotated as per expected in a 3D inner cube.
  */
-class ScrollPageCubeEffectInfo : public Dali::RefObject
+class ScrollPageCubeEffectInfo
 {
 public:
 
@@ -243,8 +243,6 @@ public:
   Vector2 mAngleSwing;                                    ///< Maximum amount in X and Y axes to rotate.
 };
 
-typedef IntrusivePtr<ScrollPageCubeEffectInfo> ScrollPageCubeEffectInfoPtr;
-
 /**
  * Helper: Applies the 3D scroll cube constraints to the child actor
  *
@@ -254,7 +252,7 @@ typedef IntrusivePtr<ScrollPageCubeEffectInfo> ScrollPageCubeEffectInfoPtr;
  */
 void ApplyScrollCubeConstraints(Toolkit::ScrollView scrollView,
                                 Actor child,
-                                ScrollPageCubeEffectInfoPtr info)
+                                ScrollPageCubeEffectInfo& info)
 {
   // Apply constraints to this actor //
   Constraint constraint;
@@ -308,7 +306,7 @@ ScrollViewPageCubeEffect::~ScrollViewPageCubeEffect()
 
 void ScrollViewPageCubeEffect::ApplyToPage( Actor page, const Vector2& angleSwing )
 {
-  ScrollPageCubeEffectInfoPtr info(new ScrollPageCubeEffectInfo( angleSwing ));
+  ScrollPageCubeEffectInfo info( angleSwing );
 
   ApplyScrollCubeConstraints( GetScrollView(), page, info );
 }

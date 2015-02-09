@@ -534,7 +534,6 @@ void MaskedImageView::Initialize( unsigned int targetWidth,
   // Create actor to display result of off-screen rendering
   mDestinationImageActor = ImageActor::New( mDestinationImage );
   self.Add( mDestinationImageActor );
-  mDestinationImageActor.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
   mDestinationImageActor.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
   // Start the masking operation
@@ -631,6 +630,11 @@ MaskedImageView::~MaskedImageView()
   {
     Stage::GetCurrent().GetRenderTaskList().RemoveTask( mRenderTask );
   }
+}
+
+void MaskedImageView::OnControlSizeSet( const Vector3& targetSize )
+{
+  mDestinationImageActor.SetSize(targetSize);
 }
 
 void MaskedImageView::OnRenderTaskFinished( Dali::RenderTask& renderTask )

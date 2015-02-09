@@ -6,7 +6,6 @@ public_api_optional_src_files = \
   $(public_api_optional_src_dir)/controls/cluster/cluster-style.cpp \
   $(public_api_optional_src_dir)/controls/effects-view/effects-view.cpp \
   $(public_api_optional_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.cpp \
-  $(public_api_optional_src_dir)/controls/image-view/image-view.cpp \
   $(public_api_optional_src_dir)/controls/image-view/masked-image-view.cpp \
   $(public_api_optional_src_dir)/controls/magnifier/magnifier.cpp \
   $(public_api_optional_src_dir)/controls/page-turn-view/page-turn-view.cpp \
@@ -78,7 +77,6 @@ public_api_optional_gaussian_blur_view_header_files = \
   $(public_api_optional_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.h
 
 public_api_optional_image_view_header_files = \
-  $(public_api_optional_src_dir)/controls/image-view/image-view.h \
   $(public_api_optional_src_dir)/controls/image-view/masked-image-view.h
 
 public_api_optional_magnifier_header_files = \

@@ -48,10 +48,10 @@ public:
   static const char* const SIGNAL_UNHANDLED_KEY_EVENT;
 
   // KeyInputFocusChanged
-  typedef SignalV2< void (Control, Control) > KeyInputFocusChangedSignalV2;
+  typedef Signal< void (Control, Control) > KeyInputFocusChangedSignalType;
 
   // Unhandled Key Event
-  typedef SignalV2< void (const KeyEvent&) > UnhandledKeyEventSignalV2;
+  typedef Signal< void (const KeyEvent&) > UnhandledKeyEventSignalType;
 
 public:
 
@@ -119,7 +119,7 @@ public: // Signals
    * @endcode
    * @return The signal to connect to.
    */
-  KeyInputFocusChangedSignalV2& KeyInputFocusChangedSignal();
+  KeyInputFocusChangedSignalType& KeyInputFocusChangedSignal();
 
   /**
    * This signal is emitted when a key event was received, and none of the focused controls on the stage have consumed it.
@@ -129,7 +129,7 @@ public: // Signals
    * @endcode
    * @return The signal to connect to.
    */
-  UnhandledKeyEventSignalV2& UnhandledKeyEventSignal();
+  UnhandledKeyEventSignalType& UnhandledKeyEventSignal();
 
 private:
 

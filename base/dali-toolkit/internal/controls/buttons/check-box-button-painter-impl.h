@@ -76,9 +76,9 @@ public:
   virtual void SetSize( Toolkit::Button& button, const Vector3& size ) = 0;
 
   /**
-   * @copydoc ButtonPainter::SetDimmed( Toolkit::Button& button, bool dimmed )
+   * @copydoc ButtonPainter::SetDisabled( Toolkit::Button& button, bool disabled )
    */
-  virtual void SetDimmed( Toolkit::Button& button, bool dimmed ) = 0;
+  virtual void SetDisabled( Toolkit::Button& button, bool disabled ) = 0;
 
   /**
    * @copydoc ButtonPainter::SetAnimationTime()

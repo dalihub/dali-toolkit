@@ -89,24 +89,24 @@ public:
   void SetCheckedImage( Toolkit::CheckBoxButton& checkBox, Actor image );
 
   /**
-   * Sets the  dimmed backgroundimage.
+   * Sets the disabled backgroundimage.
    *
-   * It adds the  dimmed backgroundimage to the root actor and creates the image transition if needed.
+   * It adds the disabled backgroundimage to the root actor and creates the image transition if needed.
    *
    * @param[inout] checkBox The button in which all actors that form its appearance are going to be added.
-   * @param[in] image The  dimmed backgroundimage.
+   * @param[in] image The disabled backgroundimage.
    */
-  void SetDimmedBackgroundImage( Toolkit::CheckBoxButton& checkBox, Actor image );
+  void SetDisabledBackgroundImage( Toolkit::CheckBoxButton& checkBox, Actor image );
 
   /**
-   * Sets the dimmed checked image.
+   * Sets the disabled checked image.
    *
-   * It adds the dimmed checked image to the root actor and creates the image transition if needed.
+   * It adds the disabled checked image to the root actor and creates the image transition if needed.
    *
    * @param[inout] checkBox The button in which all actors that form its appearance are going to be added.
-   * @param[in] image The dimmed checked image.
+   * @param[in] image The disabled checked image.
    */
-  void SetDimmedCheckedImage( Toolkit::CheckBoxButton& checkBox, Actor image );
+  void SetDisabledCheckedImage( Toolkit::CheckBoxButton& checkBox, Actor image );
 
   /////////////////////////////////////////////////////////////////////////////
   // ButtonPainter interface
@@ -130,14 +130,14 @@ public:
   void SetSize( Toolkit::Button& button, const Vector3& size );
 
   /**
-   * Changes the Vega::Toolkit::CheckBoxButton for the given dimmed state.
+   * Changes the Vega::Toolkit::CheckBoxButton for the given disabled state.
    *
    * It creates the image transition if needed.
    *
    * @param[inout] button The button in which all actors that form its appearance are going to be added.
-   * @param[in] dimmed The dimmed state.
+   * @param[in] disabled The disabled state.
    */
-  void SetDimmed( Toolkit::Button& button, bool dimmed );
+  void SetDisabled( Toolkit::Button& button, bool disabled );
 
   /**
    * Sets the animation time.
@@ -178,16 +178,16 @@ private:
    */
   enum PaintState
   {
-    UncheckedState,             ///< The check box button is unchecked.
-    CheckedState,               ///< The check box button is checked.
-    DimmedUncheckedState,       ///< The check box button is dimmed and unchecked.
-    DimmedCheckedState,         ///< The check box button is dimmed and checked.
-    UncheckedCheckedTransition, ///< The check box button is in transition from unchecked to checked.
-    CheckedUncheckedTransition, ///< The check box button is in transition from checked to unchecked.
-    UncheckedDimmedTransition,  ///< The check box button is in transition from unchecked to dimmed.
-    DimmedUncheckedTransition,  ///< The check box button is in transition from dimmed to unchecked.
-    CheckedDimmedTransition,    ///< The check box button is in transition from checked to dimmed.
-    DimmedCheckedTransition     ///< The check box button is in transition from dimmed to checked.
+    UncheckedState,              ///< The check box button is unchecked.
+    CheckedState,                ///< The check box button is checked.
+    DisabledUncheckedState,      ///< The check box button is disabled and unchecked.
+    DisabledCheckedState,        ///< The check box button is disabled and checked.
+    UncheckedCheckedTransition,  ///< The check box button is in transition from unchecked to checked.
+    CheckedUncheckedTransition,  ///< The check box button is in transition from checked to unchecked.
+    UncheckedDisabledTransition, ///< The check box button is in transition from unchecked to disabled.
+    DisabledUncheckedTransition, ///< The check box button is in transition from disabled to unchecked.
+    CheckedDisabledTransition,   ///< The check box button is in transition from checked to disabled.
+    DisabledCheckedTransition    ///< The check box button is in transition from disabled to checked.
   };
 
   /**
@@ -318,7 +318,7 @@ private:
   void CheckInAnimationFinished( Dali::Animation& source );
 
 private:
-  bool                      mDimmed;           ///< Stores the dimmed property.
+  bool                      mDisabled;           ///< Stores the disabled property.
 
   PaintState                mPaintState;       ///< The painter state.
 

@@ -179,12 +179,12 @@ public: // Signals
   /**
    * @copydoc Dali::Toolkit::Popup::OutsideTouchedSignal()
    */
-  Toolkit::Popup::TouchedOutsideSignalV2& OutsideTouchedSignal();
+  Toolkit::Popup::TouchedOutsideSignalType& OutsideTouchedSignal();
 
   /**
    * @copydoc Dali::Toolkit::Popup::HiddenSignal()
    */
-  Toolkit::Popup::HiddenSignalV2& HiddenSignal();
+  Toolkit::Popup::HiddenSignalType& HiddenSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -246,9 +246,9 @@ private:
   virtual void OnControlChildAdd( Actor& child );
 
   /**
-   * @copydoc Control::OnRelaidOut()
+   * @copydoc Control::OnRelayout()
    */
-  virtual void OnRelaidOut( Vector2 size, ActorSizeContainer& container );
+  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 
   /**
    * @copydoc Control::OnKeyEvent()
@@ -317,8 +317,8 @@ private:
 
   LayoutInfo mLayoutInfo;                 ///< Stores sizes of all popup components.
 
-  Toolkit::Popup::TouchedOutsideSignalV2 mTouchedOutsideSignalV2;
-  Toolkit::Popup::HiddenSignalV2 mHiddenSignalV2;
+  Toolkit::Popup::TouchedOutsideSignalType mTouchedOutsideSignal;
+  Toolkit::Popup::HiddenSignalType mHiddenSignal;
 
   Property::Index mPropertyTitle;         ///< Property index for Title.
   Property::Index mPropertyState;         ///< Property index for popup state.

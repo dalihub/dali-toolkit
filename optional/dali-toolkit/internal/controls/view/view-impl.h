@@ -117,7 +117,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::View::AnimationStartedSignalOrientation()
    */
-  Toolkit::View::OrientationAnimationStartedSignalV2& OrientationAnimationStartedSignal();
+  Toolkit::View::OrientationAnimationStartedSignalType& OrientationAnimationStartedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -136,6 +136,12 @@ private: // From Control
    * @copydoc Toolkit::Control::OnInitialize()
    */
   virtual void OnInitialize();
+
+  /**
+   *
+   * @copydoc Toolkit::Control::OnControlSizeSet( const Vector3& targetSize )
+   */
+  virtual void OnControlSizeSet( const Vector3& targetSize );
 
 private:
 
@@ -174,8 +180,9 @@ private:
   Animation      mRotateAnimation;        ///< The animation which rotates the view (and all layers added to it)
   float          mOrientationFunction[4]; ///< The orientation function used to transform from degrees to the internal orientation.
   bool           mAutoRotateEnabled;      ///< Whether the view rotates if the OrientationChanged method is called.
+  Vector3        mViewSize;               ///< The Control Size
 
-  Toolkit::View::OrientationAnimationStartedSignalV2 mOrientationAnimationStartedSignalV2;
+  Toolkit::View::OrientationAnimationStartedSignalType mOrientationAnimationStartedSignal;
 };
 
 } // namespace Internal

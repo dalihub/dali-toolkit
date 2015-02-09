@@ -68,7 +68,7 @@ inline const Toolkit::Internal::PushButton& GetPushButtonImpl( const Toolkit::Bu
 PushButtonDefaultPainter::PushButtonDefaultPainter()
 : PushButtonPainter(),
   mAutoRepeating( false ),
-  mDimmed( false ),
+  mDisabled( false ),
   mPaintState( ReleasedState ),
   mButton( NULL ),
   mAnimationTime( ANIMATION_TIME ),
@@ -118,7 +118,7 @@ void PushButtonDefaultPainter::SetButtonImage( Toolkit::PushButton& pushButton, 
       break;
     }
     case ReleasedPressedTransition: // FALLTHROUGH
-    case ReleasedDimmedTransition:
+    case ReleasedDisabledTransition:
     {
       float opacity = 1.f;
       if( fadeOutButtonImage )
@@ -137,7 +137,7 @@ void PushButtonDefaultPainter::SetButtonImage( Toolkit::PushButton& pushButton, 
       break;
     }
     case PressedReleasedTransition: // FALLTHROUGH
-    case DimmedReleasedTransition:
+    case DisabledReleasedTransition:
     {
       StopFadeInAnimation();
       pushButton.Remove( buttonImage );
@@ -190,8 +190,8 @@ void PushButtonDefaultPainter::SetBackgroundImage( Toolkit::PushButton& pushButt
       }
       break;
     }
-    case ReleasedDimmedTransition: // FALLTHROUGH
-    case PressedDimmedTransition:
+    case ReleasedDisabledTransition: // FALLTHROUGH
+    case PressedDisabledTransition:
     {
       float opacity = 1.f;
       if( fadeOutBackgroundImage )
@@ -209,8 +209,8 @@ void PushButtonDefaultPainter::SetBackgroundImage( Toolkit::PushButton& pushButt
       StartFadeOutAnimation( pushButton );
       break;
     }
-    case DimmedReleasedTransition: // FALLTHROUGH
-    case DimmedPressedTransition:
+    case DisabledReleasedTransition: // FALLTHROUGH
+    case DisabledPressedTransition:
     {
       StopFadeInAnimation();
       pushButton.Remove( backgroundImage );
@@ -231,37 +231,37 @@ void PushButtonDefaultPainter::SetBackgroundImage( Toolkit::PushButton& pushButt
   ApplyConstraint( backgroundImage, BACKGROUND_DEPTH );
 }
 
-void PushButtonDefaultPainter::SetPressedImage( Toolkit::PushButton& pushButton, Actor image )
+void PushButtonDefaultPainter::SetSelectedImage( Toolkit::PushButton& pushButton, Actor image )
 {
   Toolkit::Internal::PushButton& pushButtonImpl = GetImplementation( pushButton );
-  Actor& pressedImage = pushButtonImpl.GetPressedImage();
+  Actor& selectedImage = pushButtonImpl.GetSelectedImage();
   Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
 
   switch( mPaintState )
   {
     case PressedState:
     {
-      if( pressedImage && pressedImage.GetParent() )
+      if( selectedImage && selectedImage.GetParent() )
       {
         StopFadeOutAnimation( pushButton );
-        FadeOutImage( pushButton, Foreground, pressedImage  );
+        FadeOutImage( pushButton, Foreground, selectedImage  );
 
-        pressedImage = image;
+        selectedImage = image;
 
-        FadeInImage( pushButton, pressedImage );
+        FadeInImage( pushButton, selectedImage );
 
         StartFadeOutAnimation( pushButton );
         StartFadeInAnimation();
       }
       else
       {
-        pressedImage = image;
-        pushButton.Add( pressedImage );
+        selectedImage = image;
+        pushButton.Add( selectedImage );
       }
       break;
     }
     case PressedReleasedTransition: // FALLTHROUGH
-    case PressedDimmedTransition:
+    case PressedDisabledTransition:
     {
       float opacity = 1.f;
       if( fadeOutButtonImage )
@@ -271,80 +271,80 @@ void PushButtonDefaultPainter::SetPressedImage( Toolkit::PushButton& pushButton,
       StopFadeOutAnimation( pushButton );
 
       // Replaces the button image.
-      pressedImage = image;
+      selectedImage = image;
 
-      pushButton.Add( pressedImage );
-      FadeOutImage( pushButton, Foreground, pressedImage, opacity );
+      pushButton.Add( selectedImage );
+      FadeOutImage( pushButton, Foreground, selectedImage, opacity );
 
       StartFadeOutAnimation( pushButton );
       break;
     }
     case ReleasedPressedTransition: // FALLTHROUGH
-    case DimmedPressedTransition:
+    case DisabledPressedTransition:
     {
       StopFadeInAnimation();
-      pushButton.Remove( pressedImage );
+      pushButton.Remove( selectedImage );
 
-      pressedImage = image;
+      selectedImage = image;
 
-      FadeInImage( pushButton, pressedImage );
+      FadeInImage( pushButton, selectedImage );
       StartFadeInAnimation();
       break;
     }
     default:
-      pressedImage = image;
+      selectedImage = image;
       break;
   }
 
-  pressedImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  pressedImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  ApplyConstraint( pressedImage, FOREGROUND_DEPTH );
+  selectedImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  selectedImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  ApplyConstraint( selectedImage, FOREGROUND_DEPTH );
 }
 
-void PushButtonDefaultPainter::SetDimmedImage( Toolkit::PushButton& pushButton, Actor image )
+void PushButtonDefaultPainter::SetDisabledImage( Toolkit::PushButton& pushButton, Actor image )
 {
   Toolkit::Internal::PushButton& pushButtonImpl = GetImplementation( pushButton );
-  Actor& dimmedImage = pushButtonImpl.GetDimmedImage();
+  Actor& disabledImage = pushButtonImpl.GetDisabledImage();
   Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
 
   switch( mPaintState )
   {
-    case DimmedReleasedState: // FALLTHROUGH
-    case DimmedPressedState:
+    case DisabledReleasedState: // FALLTHROUGH
+    case DisabledPressedState:
     {
-      if( dimmedImage && dimmedImage.GetParent() )
+      if( disabledImage && disabledImage.GetParent() )
       {
         StopFadeOutAnimation( pushButton );
-        FadeOutImage( pushButton, Foreground, dimmedImage  );
+        FadeOutImage( pushButton, Foreground, disabledImage  );
 
-        dimmedImage = image;
+        disabledImage = image;
 
-        FadeInImage( pushButton, dimmedImage );
+        FadeInImage( pushButton, disabledImage );
 
         StartFadeOutAnimation( pushButton );
         StartFadeInAnimation();
       }
       else
       {
-        dimmedImage = image;
-        pushButton.Add( dimmedImage );
+        disabledImage = image;
+        pushButton.Add( disabledImage );
       }
       break;
     }
-    case ReleasedDimmedTransition: // FALLTHROUGH
-    case PressedDimmedTransition:
+    case ReleasedDisabledTransition: // FALLTHROUGH
+    case PressedDisabledTransition:
     {
       StopFadeInAnimation();
-      pushButton.Remove( dimmedImage );
+      pushButton.Remove( disabledImage );
 
-      dimmedImage = image;
+      disabledImage = image;
 
-      FadeInImage( pushButton, dimmedImage );
+      FadeInImage( pushButton, disabledImage );
       StartFadeInAnimation();
       break;
     }
-    case DimmedReleasedTransition: // FALLTHROUGH
-    case DimmedPressedTransition:
+    case DisabledReleasedTransition: // FALLTHROUGH
+    case DisabledPressedTransition:
     {
       float opacity = 1.f;
       if( fadeOutButtonImage )
@@ -354,68 +354,68 @@ void PushButtonDefaultPainter::SetDimmedImage( Toolkit::PushButton& pushButton, 
       StopFadeOutAnimation( pushButton );
 
       // Replaces the button image.
-      dimmedImage = image;
+      disabledImage = image;
 
-      pushButton.Add( dimmedImage );
-      FadeOutImage( pushButton, Foreground, dimmedImage, opacity );
+      pushButton.Add( disabledImage );
+      FadeOutImage( pushButton, Foreground, disabledImage, opacity );
 
       StartFadeOutAnimation( pushButton );
       break;
     }
     default:
-      dimmedImage = image;
+      disabledImage = image;
       break;
   }
 
-  dimmedImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  dimmedImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  ApplyConstraint( dimmedImage, FOREGROUND_DEPTH );
+  disabledImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  disabledImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  ApplyConstraint( disabledImage, FOREGROUND_DEPTH );
 }
 
-void PushButtonDefaultPainter::SetDimmedBackgroundImage( Toolkit::PushButton& pushButton, Actor image )
+void PushButtonDefaultPainter::SetDisabledBackgroundImage( Toolkit::PushButton& pushButton, Actor image )
 {
   Toolkit::Internal::PushButton& pushButtonImpl = GetImplementation( pushButton );
-  Actor& dimmedBackgroundImage = pushButtonImpl.GetDimmedBackgroundImage();
+  Actor& disabledBackgroundImage = pushButtonImpl.GetDisabledBackgroundImage();
   Actor& fadeOutBackgroundImage = pushButtonImpl.GetFadeOutBackgroundImage();
 
   switch( mPaintState )
   {
-    case DimmedReleasedState: // FALLTHROUGH
-    case DimmedPressedState:
+    case DisabledReleasedState: // FALLTHROUGH
+    case DisabledPressedState:
     {
-      if( dimmedBackgroundImage && dimmedBackgroundImage.GetParent() )
+      if( disabledBackgroundImage && disabledBackgroundImage.GetParent() )
       {
         StopFadeOutAnimation( pushButton );
-        FadeOutImage( pushButton, Background, dimmedBackgroundImage  );
+        FadeOutImage( pushButton, Background, disabledBackgroundImage  );
 
-        dimmedBackgroundImage = image;
+        disabledBackgroundImage = image;
 
-        FadeInImage( pushButton, dimmedBackgroundImage );
+        FadeInImage( pushButton, disabledBackgroundImage );
 
         StartFadeOutAnimation( pushButton );
         StartFadeInAnimation();
       }
       else
       {
-        dimmedBackgroundImage = image;
-        pushButton.Add( dimmedBackgroundImage );
+        disabledBackgroundImage = image;
+        pushButton.Add( disabledBackgroundImage );
       }
       break;
     }
-    case ReleasedDimmedTransition: // FALLTHROUGH
-    case PressedDimmedTransition:
+    case ReleasedDisabledTransition: // FALLTHROUGH
+    case PressedDisabledTransition:
     {
       StopFadeInAnimation();
-      pushButton.Remove( dimmedBackgroundImage );
+      pushButton.Remove( disabledBackgroundImage );
 
-      dimmedBackgroundImage = image;
+      disabledBackgroundImage = image;
 
-      FadeInImage( pushButton, dimmedBackgroundImage );
+      FadeInImage( pushButton, disabledBackgroundImage );
       StartFadeInAnimation();
       break;
     }
-    case DimmedReleasedTransition: // FALLTHROUGH
-    case DimmedPressedTransition:
+    case DisabledReleasedTransition: // FALLTHROUGH
+    case DisabledPressedTransition:
     {
       float opacity = 1.f;
       if( fadeOutBackgroundImage )
@@ -425,52 +425,52 @@ void PushButtonDefaultPainter::SetDimmedBackgroundImage( Toolkit::PushButton& pu
       StopFadeOutAnimation( pushButton );
 
       // Replaces the button image.
-      dimmedBackgroundImage = image;
+      disabledBackgroundImage = image;
 
-      pushButton.Add( dimmedBackgroundImage );
-      FadeOutImage( pushButton, Background, dimmedBackgroundImage, opacity );
+      pushButton.Add( disabledBackgroundImage );
+      FadeOutImage( pushButton, Background, disabledBackgroundImage, opacity );
 
       StartFadeOutAnimation( pushButton );
       break;
     }
     default:
-      dimmedBackgroundImage = image;
+      disabledBackgroundImage = image;
       break;
   }
 
-  dimmedBackgroundImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  dimmedBackgroundImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  ApplyConstraint( dimmedBackgroundImage, BACKGROUND_DEPTH );
+  disabledBackgroundImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  disabledBackgroundImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  ApplyConstraint( disabledBackgroundImage, BACKGROUND_DEPTH );
 }
 
-void PushButtonDefaultPainter::SetLabelText( Toolkit::PushButton& pushButton, Actor text )
+void PushButtonDefaultPainter::SetLabel( Toolkit::PushButton& pushButton, Actor label )
 {
   Toolkit::Internal::PushButton& pushButtonImpl = GetImplementation( pushButton );
-  Actor& label = pushButtonImpl.GetLabel();
+  Actor& labelActor = pushButtonImpl.GetLabel();
 
-  if( label && label.GetParent() )
+  if( labelActor && labelActor.GetParent() )
   {
-    label.GetParent().Remove( label );
+    labelActor.GetParent().Remove( labelActor );
   }
 
-  label = text;
-  label.SetAnchorPoint( AnchorPoint::CENTER );
-  label.SetParentOrigin( ParentOrigin::CENTER );
+  labelActor = label;
+  labelActor.SetAnchorPoint( AnchorPoint::CENTER );
+  labelActor.SetParentOrigin( ParentOrigin::CENTER );
 
-  label.SetPosition( 0.f, 0.f, LABEL_DEPTH );
-  label.SetSize( mSize );
+  labelActor.SetPosition( 0.f, 0.f, LABEL_DEPTH );
+  labelActor.SetSize( mSize );
 
-  pushButton.Add( label  );
+  pushButton.Add( labelActor  );
 }
 
 void PushButtonDefaultPainter::Initialize( Toolkit::Button& button )
 {
   Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
   Actor& buttonImage = pushButtonImpl.GetButtonImage();
-  Actor& pressedImage = pushButtonImpl.GetPressedImage();
+  Actor& selectedImage = pushButtonImpl.GetSelectedImage();
   Actor& backgroundImage = pushButtonImpl.GetBackgroundImage();
-  Actor& dimmedImage = pushButtonImpl.GetDimmedImage();
-  Actor& dimmedBackgroundImage = pushButtonImpl.GetDimmedBackgroundImage();
+  Actor& disabledImage = pushButtonImpl.GetDisabledImage();
+  Actor& disabledBackgroundImage = pushButtonImpl.GetDisabledBackgroundImage();
   Actor& label = pushButtonImpl.GetLabel();
 
   Toolkit::PushButton& pushButton = static_cast<Toolkit::PushButton&>( button );
@@ -485,27 +485,27 @@ void PushButtonDefaultPainter::Initialize( Toolkit::Button& button )
     SetBackgroundImage( pushButton, backgroundImage );
   }
 
-  if( pressedImage )
+  if( selectedImage )
   {
-    SetPressedImage( pushButton, pressedImage );
+    SetSelectedImage( pushButton, selectedImage );
   }
 
-  if( dimmedImage )
+  if( disabledImage )
   {
-    SetDimmedImage( pushButton, dimmedImage );
+    SetDisabledImage( pushButton, disabledImage );
   }
 
-  if( dimmedBackgroundImage )
+  if( disabledBackgroundImage )
   {
-    SetDimmedBackgroundImage( pushButton, dimmedBackgroundImage );
+    SetDisabledBackgroundImage( pushButton, disabledBackgroundImage );
   }
 
   if( label )
   {
-    SetLabelText( pushButton, label );
+    SetLabel( pushButton, label );
   }
 
-  SetDimmed( pushButton, mDimmed );
+  SetDisabled( pushButton, mDisabled );
 }
 
 void PushButtonDefaultPainter::SetSize( Toolkit::Button& button, const Vector3& size )
@@ -516,17 +516,17 @@ void PushButtonDefaultPainter::SetSize( Toolkit::Button& button, const Vector3& 
 
     Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
     Actor& buttonImage = pushButtonImpl.GetButtonImage();
-    Actor& pressedImage = pushButtonImpl.GetPressedImage();
+    Actor& selectedImage = pushButtonImpl.GetSelectedImage();
     Actor& backgroundImage = pushButtonImpl.GetBackgroundImage();
-    Actor& dimmedImage = pushButtonImpl.GetDimmedImage();
-    Actor& dimmedBackgroundImage = pushButtonImpl.GetDimmedBackgroundImage();
+    Actor& disabledImage = pushButtonImpl.GetDisabledImage();
+    Actor& disabledBackgroundImage = pushButtonImpl.GetDisabledBackgroundImage();
     Actor& label = pushButtonImpl.GetLabel();
 
     ApplyConstraint( buttonImage, FOREGROUND_DEPTH );
     ApplyConstraint( backgroundImage, BACKGROUND_DEPTH );
-    ApplyConstraint( pressedImage, FOREGROUND_DEPTH );
-    ApplyConstraint( dimmedImage, FOREGROUND_DEPTH );
-    ApplyConstraint( dimmedBackgroundImage, BACKGROUND_DEPTH );
+    ApplyConstraint( selectedImage, FOREGROUND_DEPTH );
+    ApplyConstraint( disabledImage, FOREGROUND_DEPTH );
+    ApplyConstraint( disabledBackgroundImage, BACKGROUND_DEPTH );
 
     if( label )
     {
@@ -536,83 +536,83 @@ void PushButtonDefaultPainter::SetSize( Toolkit::Button& button, const Vector3& 
   }
 }
 
-void PushButtonDefaultPainter::SetDimmed( Toolkit::Button& button, bool dimmed )
+void PushButtonDefaultPainter::SetDisabled( Toolkit::Button& button, bool disabled )
 {
   Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
   Actor& buttonImage = pushButtonImpl.GetButtonImage();
-  Actor& pressedImage = pushButtonImpl.GetPressedImage();
+  Actor& selectedImage = pushButtonImpl.GetSelectedImage();
   Actor& backgroundImage = pushButtonImpl.GetBackgroundImage();
-  Actor& dimmedImage = pushButtonImpl.GetDimmedImage();
-  Actor& dimmedBackgroundImage = pushButtonImpl.GetDimmedBackgroundImage();
+  Actor& disabledImage = pushButtonImpl.GetDisabledImage();
+  Actor& disabledBackgroundImage = pushButtonImpl.GetDisabledBackgroundImage();
   Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
 
   Toolkit::PushButton& pushButton = static_cast<Toolkit::PushButton&>( button );
 
-  mDimmed = dimmed;
+  mDisabled = disabled;
 
   switch( mPaintState )
   {
   case ReleasedState:
   {
-    if( dimmed )
+    if( disabled )
     {
       StopFadeOutAnimation( pushButton );
       FadeOutImage( pushButton, Background, backgroundImage );
       FadeOutImage( pushButton, Foreground, buttonImage );
-      FadeInImage( pushButton, dimmedBackgroundImage );
-      FadeInImage( pushButton, dimmedImage );
+      FadeInImage( pushButton, disabledBackgroundImage );
+      FadeInImage( pushButton, disabledImage );
       StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
-      if( buttonImage || dimmedImage || backgroundImage || dimmedBackgroundImage )
+      if( buttonImage || disabledImage || backgroundImage || disabledBackgroundImage )
       {
-        mPaintState = ReleasedDimmedTransition;
+        mPaintState = ReleasedDisabledTransition;
       }
       else
       {
-        mPaintState = DimmedReleasedState;
+        mPaintState = DisabledReleasedState;
       }
     }
     break;
   }
   case PressedState:
   {
-    if( dimmed )
+    if( disabled )
     {
       StopFadeOutAnimation( pushButton );
       FadeOutImage( pushButton, Background, backgroundImage );
-      FadeOutImage( pushButton, Foreground, pressedImage );
-      FadeInImage( pushButton, dimmedBackgroundImage );
-      FadeInImage( pushButton, dimmedImage );
+      FadeOutImage( pushButton, Foreground, selectedImage );
+      FadeInImage( pushButton, disabledBackgroundImage );
+      FadeInImage( pushButton, disabledImage );
       StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
-      if( pressedImage || dimmedImage || backgroundImage || dimmedBackgroundImage )
+      if( selectedImage || disabledImage || backgroundImage || disabledBackgroundImage )
       {
-        mPaintState = PressedDimmedTransition;
+        mPaintState = PressedDisabledTransition;
       }
       else
       {
-        mPaintState = DimmedPressedState;
+        mPaintState = DisabledPressedState;
       }
     }
     break;
   }
-  case DimmedReleasedState:
+  case DisabledReleasedState:
   {
-    if( !dimmed )
+    if( !disabled )
     {
       StopFadeOutAnimation( pushButton );
-      FadeOutImage( pushButton, Background, dimmedBackgroundImage );
-      FadeOutImage( pushButton, Foreground, dimmedImage );
+      FadeOutImage( pushButton, Background, disabledBackgroundImage );
+      FadeOutImage( pushButton, Foreground, disabledImage );
       FadeInImage( pushButton, backgroundImage );
       FadeInImage( pushButton, buttonImage );
       StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
-      if( buttonImage || dimmedImage || backgroundImage || dimmedBackgroundImage )
+      if( buttonImage || disabledImage || backgroundImage || disabledBackgroundImage )
       {
-        mPaintState = DimmedReleasedTransition;
+        mPaintState = DisabledReleasedTransition;
       }
       else
       {
@@ -621,21 +621,21 @@ void PushButtonDefaultPainter::SetDimmed( Toolkit::Button& button, bool dimmed )
     }
     break;
   }
-  case DimmedPressedState:
+  case DisabledPressedState:
   {
-    if( !dimmed )
+    if( !disabled )
     {
       StopFadeOutAnimation( pushButton );
-      FadeOutImage( pushButton, Background, dimmedBackgroundImage );
-      FadeOutImage( pushButton, Foreground, dimmedImage );
+      FadeOutImage( pushButton, Background, disabledBackgroundImage );
+      FadeOutImage( pushButton, Foreground, disabledImage );
       FadeInImage( pushButton, backgroundImage );
-      FadeInImage( pushButton, pressedImage );
+      FadeInImage( pushButton, selectedImage );
       StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
-      if( pressedImage || dimmedImage || backgroundImage || dimmedBackgroundImage )
+      if( selectedImage || disabledImage || backgroundImage || disabledBackgroundImage )
       {
-        mPaintState = DimmedPressedTransition;
+        mPaintState = DisabledPressedTransition;
       }
       else
       {
@@ -646,7 +646,7 @@ void PushButtonDefaultPainter::SetDimmed( Toolkit::Button& button, bool dimmed )
   }
   case ReleasedPressedTransition:
   {
-    if( dimmed )
+    if( disabled )
     {
       float opacity = 1.f;
       if( fadeOutButtonImage )
@@ -656,29 +656,29 @@ void PushButtonDefaultPainter::SetDimmed( Toolkit::Button& button, bool dimmed )
       StopFadeOutAnimation( pushButton );
       StopFadeInAnimation();
 
-      FadeOutImage( pushButton, Foreground, pressedImage, 1.f - opacity );
+      FadeOutImage( pushButton, Foreground, selectedImage, 1.f - opacity );
       FadeOutImage( pushButton, Background, backgroundImage );
 
-      FadeInImage( pushButton, dimmedImage );
-      FadeInImage( pushButton, dimmedBackgroundImage );
+      FadeInImage( pushButton, disabledImage );
+      FadeInImage( pushButton, disabledBackgroundImage );
 
       StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
-      if( pressedImage || dimmedImage || backgroundImage || dimmedBackgroundImage )
+      if( selectedImage || disabledImage || backgroundImage || disabledBackgroundImage )
       {
-        mPaintState = PressedDimmedTransition;
+        mPaintState = PressedDisabledTransition;
       }
       else
       {
-        mPaintState = DimmedPressedState;
+        mPaintState = DisabledPressedState;
       }
     }
     break;
   }
   case PressedReleasedTransition:
   {
-    if( dimmed )
+    if( disabled )
     {
       float opacity = 1.f;
       if( fadeOutButtonImage )
@@ -691,26 +691,26 @@ void PushButtonDefaultPainter::SetDimmed( Toolkit::Button& button, bool dimmed )
       FadeOutImage( pushButton, Foreground, buttonImage, 1.f - opacity );
       FadeOutImage( pushButton, Background, backgroundImage );
 
-      FadeInImage( pushButton, dimmedImage );
-      FadeInImage( pushButton, dimmedBackgroundImage );
+      FadeInImage( pushButton, disabledImage );
+      FadeInImage( pushButton, disabledBackgroundImage );
 
       StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
-      if( buttonImage || dimmedImage || backgroundImage || dimmedBackgroundImage )
+      if( buttonImage || disabledImage || backgroundImage || disabledBackgroundImage )
       {
-        mPaintState = ReleasedDimmedTransition;
+        mPaintState = ReleasedDisabledTransition;
       }
       else
       {
-        mPaintState = DimmedReleasedState;
+        mPaintState = DisabledReleasedState;
       }
     }
     break;
   }
-  case ReleasedDimmedTransition:
+  case ReleasedDisabledTransition:
   {
-    if( !dimmed )
+    if( !disabled )
     {
       float opacity = 1.f;
       if( fadeOutButtonImage )
@@ -720,17 +720,17 @@ void PushButtonDefaultPainter::SetDimmed( Toolkit::Button& button, bool dimmed )
       StopFadeOutAnimation( pushButton, false );
       StopFadeInAnimation();
 
-      FadeOutImage( pushButton, Foreground, dimmedImage, 1.f - opacity );
-      FadeOutImage( pushButton, Background, dimmedBackgroundImage, 1.f - opacity );
+      FadeOutImage( pushButton, Foreground, disabledImage, 1.f - opacity );
+      FadeOutImage( pushButton, Background, disabledBackgroundImage, 1.f - opacity );
       FadeInImage( pushButton, buttonImage, opacity );
       FadeInImage( pushButton, backgroundImage, opacity );
 
       StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
-      if( buttonImage || dimmedImage || backgroundImage || dimmedBackgroundImage )
+      if( buttonImage || disabledImage || backgroundImage || disabledBackgroundImage )
       {
-        mPaintState = DimmedReleasedTransition;
+        mPaintState = DisabledReleasedTransition;
       }
       else
       {
@@ -739,9 +739,9 @@ void PushButtonDefaultPainter::SetDimmed( Toolkit::Button& button, bool dimmed )
     }
     break;
   }
-  case DimmedReleasedTransition:
+  case DisabledReleasedTransition:
   {
-    if( dimmed )
+    if( disabled )
     {
       float opacity = 1.f;
       if( fadeOutButtonImage )
@@ -753,26 +753,26 @@ void PushButtonDefaultPainter::SetDimmed( Toolkit::Button& button, bool dimmed )
 
       FadeOutImage( pushButton, Foreground, buttonImage, 1.f - opacity );
       FadeOutImage( pushButton, Background, backgroundImage, 1.f - opacity );
-      FadeInImage( pushButton, dimmedImage, opacity );
-      FadeInImage( pushButton, dimmedBackgroundImage, opacity );
+      FadeInImage( pushButton, disabledImage, opacity );
+      FadeInImage( pushButton, disabledBackgroundImage, opacity );
 
       StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
-      if( buttonImage || dimmedImage || backgroundImage || dimmedBackgroundImage )
+      if( buttonImage || disabledImage || backgroundImage || disabledBackgroundImage )
       {
-        mPaintState = ReleasedDimmedTransition;
+        mPaintState = ReleasedDisabledTransition;
       }
       else
       {
-        mPaintState = DimmedReleasedState;
+        mPaintState = DisabledReleasedState;
       }
     }
     break;
   }
-  case PressedDimmedTransition:
+  case PressedDisabledTransition:
   {
-    if( !dimmed )
+    if( !disabled )
     {
       float opacity = 1.f;
       if( fadeOutButtonImage )
@@ -782,17 +782,17 @@ void PushButtonDefaultPainter::SetDimmed( Toolkit::Button& button, bool dimmed )
       StopFadeOutAnimation( pushButton, false );
       StopFadeInAnimation();
 
-      FadeOutImage( pushButton, Foreground, dimmedImage, 1.f - opacity );
-      FadeOutImage( pushButton, Background, dimmedBackgroundImage, 1.f - opacity );
-      FadeInImage( pushButton, pressedImage, opacity );
+      FadeOutImage( pushButton, Foreground, disabledImage, 1.f - opacity );
+      FadeOutImage( pushButton, Background, disabledBackgroundImage, 1.f - opacity );
+      FadeInImage( pushButton, selectedImage, opacity );
       FadeInImage( pushButton, backgroundImage, opacity );
 
       StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
-      if( pressedImage || dimmedImage || backgroundImage || dimmedBackgroundImage )
+      if( selectedImage || disabledImage || backgroundImage || disabledBackgroundImage )
       {
-        mPaintState = DimmedPressedTransition;
+        mPaintState = DisabledPressedTransition;
       }
       else
       {
@@ -801,9 +801,9 @@ void PushButtonDefaultPainter::SetDimmed( Toolkit::Button& button, bool dimmed )
     }
     break;
   }
-  case DimmedPressedTransition:
+  case DisabledPressedTransition:
   {
-    if( dimmed )
+    if( disabled )
     {
       float opacity = 1.f;
       if( fadeOutButtonImage )
@@ -813,21 +813,21 @@ void PushButtonDefaultPainter::SetDimmed( Toolkit::Button& button, bool dimmed )
       StopFadeOutAnimation( pushButton, false );
       StopFadeInAnimation();
 
-      FadeOutImage( pushButton, Foreground, pressedImage, 1.f - opacity );
+      FadeOutImage( pushButton, Foreground, selectedImage, 1.f - opacity );
       FadeOutImage( pushButton, Background, backgroundImage, 1.f - opacity );
-      FadeInImage( pushButton, dimmedImage, opacity );
-      FadeInImage( pushButton, dimmedBackgroundImage, opacity );
+      FadeInImage( pushButton, disabledImage, opacity );
+      FadeInImage( pushButton, disabledBackgroundImage, opacity );
 
       StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
-      if( pressedImage || dimmedImage || backgroundImage || dimmedBackgroundImage )
+      if( selectedImage || disabledImage || backgroundImage || disabledBackgroundImage )
       {
-        mPaintState = PressedDimmedTransition;
+        mPaintState = PressedDisabledTransition;
       }
       else
       {
-        mPaintState = DimmedPressedState;
+        mPaintState = DisabledPressedState;
       }
     }
     break;
@@ -855,7 +855,7 @@ void PushButtonDefaultPainter::SetAutoRepeating( bool autorepeating )
 void PushButtonDefaultPainter::Pressed( Toolkit::PushButton& button )
 {
   Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
-  Actor& pressedImage = pushButtonImpl.GetPressedImage();
+  Actor& selectedImage = pushButtonImpl.GetSelectedImage();
   Actor& buttonImage = pushButtonImpl.GetButtonImage();
   Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
 
@@ -865,11 +865,11 @@ void PushButtonDefaultPainter::Pressed( Toolkit::PushButton& button )
     {
       StopFadeOutAnimation( button );
       FadeOutImage( button, Foreground, buttonImage );
-      FadeInImage( button, pressedImage );
+      FadeInImage( button, selectedImage );
       StartFadeOutAnimation( button );
       StartFadeInAnimation();
 
-      if( buttonImage || pressedImage )
+      if( buttonImage || selectedImage )
       {
         mPaintState = ReleasedPressedTransition;
       }
@@ -898,12 +898,12 @@ void PushButtonDefaultPainter::Pressed( Toolkit::PushButton& button )
       StopFadeInAnimation();
 
       FadeOutImage( button, Foreground, buttonImage, 1.f - opacity );
-      FadeInImage( button, pressedImage, opacity );
+      FadeInImage( button, selectedImage, opacity );
 
       StartFadeOutAnimation( button );
       StartFadeInAnimation();
 
-      if( buttonImage || pressedImage )
+      if( buttonImage || selectedImage )
       {
         mPaintState = ReleasedPressedTransition;
       }
@@ -921,7 +921,7 @@ void PushButtonDefaultPainter::Pressed( Toolkit::PushButton& button )
 void PushButtonDefaultPainter::Released( Toolkit::PushButton& button )
 {
   Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
-  Actor& pressedImage = pushButtonImpl.GetPressedImage();
+  Actor& selectedImage = pushButtonImpl.GetSelectedImage();
   Actor& buttonImage = pushButtonImpl.GetButtonImage();
   Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
 
@@ -930,12 +930,12 @@ void PushButtonDefaultPainter::Released( Toolkit::PushButton& button )
     case PressedState:
     {
       StopFadeOutAnimation( button );
-      FadeOutImage( button, Foreground, pressedImage );
+      FadeOutImage( button, Foreground, selectedImage );
       FadeInImage( button, buttonImage );
       StartFadeOutAnimation( button );
       StartFadeInAnimation();
 
-      if( buttonImage || pressedImage )
+      if( buttonImage || selectedImage )
       {
         mPaintState = PressedReleasedTransition;
       }
@@ -955,13 +955,13 @@ void PushButtonDefaultPainter::Released( Toolkit::PushButton& button )
       StopFadeOutAnimation( button, false );
       StopFadeInAnimation();
 
-      FadeOutImage( button, Foreground, pressedImage, 1.f - opacity );
+      FadeOutImage( button, Foreground, selectedImage, 1.f - opacity );
       FadeInImage( button, buttonImage, opacity );
 
       StartFadeOutAnimation( button );
       StartFadeInAnimation();
 
-      if( buttonImage || pressedImage )
+      if( buttonImage || selectedImage )
       {
         mPaintState = PressedReleasedTransition;
       }
@@ -986,7 +986,7 @@ void PushButtonDefaultPainter::Clicked( Toolkit::PushButton& button )
 void PushButtonDefaultPainter::Toggled( Toolkit::PushButton& button )
 {
   Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
-  Actor& pressedImage = pushButtonImpl.GetPressedImage();
+  Actor& selectedImage = pushButtonImpl.GetSelectedImage();
   Actor& buttonImage = pushButtonImpl.GetButtonImage();
   Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
 
@@ -996,11 +996,11 @@ void PushButtonDefaultPainter::Toggled( Toolkit::PushButton& button )
     {
       StopFadeOutAnimation( button );
       FadeOutImage( button, Foreground, buttonImage );
-      FadeInImage( button, pressedImage );
+      FadeInImage( button, selectedImage );
       StartFadeOutAnimation( button );
       StartFadeInAnimation();
 
-      if( buttonImage || pressedImage )
+      if( buttonImage || selectedImage )
       {
         mPaintState = ReleasedPressedTransition;
       }
@@ -1013,12 +1013,12 @@ void PushButtonDefaultPainter::Toggled( Toolkit::PushButton& button )
     case PressedState:
     {
       StopFadeOutAnimation( button );
-      FadeOutImage( button, Foreground, pressedImage );
+      FadeOutImage( button, Foreground, selectedImage );
       FadeInImage( button, buttonImage );
       StartFadeOutAnimation( button );
       StartFadeInAnimation();
 
-      if( buttonImage || pressedImage )
+      if( buttonImage || selectedImage )
       {
         mPaintState = PressedReleasedTransition;
       }
@@ -1038,13 +1038,13 @@ void PushButtonDefaultPainter::Toggled( Toolkit::PushButton& button )
       StopFadeOutAnimation( button, false );
       StopFadeInAnimation();
 
-      FadeOutImage( button, Foreground, pressedImage, 1.f - opacity );
+      FadeOutImage( button, Foreground, selectedImage, 1.f - opacity );
       FadeInImage( button, buttonImage, opacity );
 
       StartFadeOutAnimation( button );
       StartFadeInAnimation();
 
-      if( buttonImage || pressedImage )
+      if( buttonImage || selectedImage )
       {
         mPaintState = PressedReleasedTransition;
       }
@@ -1065,12 +1065,12 @@ void PushButtonDefaultPainter::Toggled( Toolkit::PushButton& button )
       StopFadeInAnimation();
 
       FadeOutImage( button, Foreground, buttonImage, 1.f - opacity );
-      FadeInImage( button, pressedImage, opacity );
+      FadeInImage( button, selectedImage, opacity );
 
       StartFadeOutAnimation( button );
       StartFadeInAnimation();
 
-      if( buttonImage || pressedImage )
+      if( buttonImage || selectedImage )
       {
         mPaintState = ReleasedPressedTransition;
       }
@@ -1222,22 +1222,22 @@ void PushButtonDefaultPainter::PressedReleasedFadeOutAnimationFinished( Dali::An
       mPaintState = ReleasedState;
       break;
     }
-    case ReleasedDimmedTransition:
+    case ReleasedDisabledTransition:
     {
-      mPaintState = DimmedReleasedState;
+      mPaintState = DisabledReleasedState;
       break;
     }
-    case DimmedReleasedTransition:
+    case DisabledReleasedTransition:
     {
       mPaintState = ReleasedState;
       break;
     }
-    case PressedDimmedTransition:
+    case PressedDisabledTransition:
     {
-      mPaintState = DimmedPressedState;
+      mPaintState = DisabledPressedState;
       break;
     }
-    case DimmedPressedTransition:
+    case DisabledPressedTransition:
     {
       mPaintState = PressedState;
       break;
@@ -1267,22 +1267,22 @@ void PushButtonDefaultPainter::PressedReleasedFadeInAnimationFinished( Dali::Ani
       mPaintState = ReleasedState;
       break;
     }
-    case ReleasedDimmedTransition:
+    case ReleasedDisabledTransition:
     {
-      mPaintState = DimmedReleasedState;
+      mPaintState = DisabledReleasedState;
       break;
     }
-    case DimmedReleasedTransition:
+    case DisabledReleasedTransition:
     {
       mPaintState = ReleasedState;
       break;
     }
-    case PressedDimmedTransition:
+    case PressedDisabledTransition:
     {
-      mPaintState = DimmedPressedState;
+      mPaintState = DisabledPressedState;
       break;
     }
-    case DimmedPressedTransition:
+    case DisabledPressedTransition:
     {
       mPaintState = PressedState;
       break;

@@ -808,7 +808,7 @@ Path Builder::GetPath( const std::string& name )
   return ret;
 }
 
-Toolkit::Builder::Signal& Builder::QuitSignal()
+Toolkit::Builder::BuilderSignalType& Builder::QuitSignal()
 {
   return mQuitSignal;
 }

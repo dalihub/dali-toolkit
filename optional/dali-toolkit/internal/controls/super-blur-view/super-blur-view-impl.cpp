@@ -246,7 +246,7 @@ void SuperBlurView::ClearBlurResource()
   }
 }
 
-void SuperBlurView::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+void SuperBlurView::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   unsigned int numChildren = Self().GetChildCount();
 

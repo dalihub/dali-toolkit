@@ -63,6 +63,9 @@ public: // From ImageFilter
   /// @copydoc Dali::Toolkit::Internal::ImageFilter::Refresh
   virtual void Refresh();
 
+  /// @copydoc Dali::Toolkit::Internal::ImageFilter::SetSize
+  virtual void SetSize( const Vector2& size );
+
   /**
    * Get the property index that controls the strength of the blur applied to the image. Useful for animating this property.
    * This property represents a value in the range [0.0 - 1.0] where 0.0 is no blur and 1.0 is full blur.

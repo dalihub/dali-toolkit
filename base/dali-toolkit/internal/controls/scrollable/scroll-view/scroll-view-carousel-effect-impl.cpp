@@ -63,7 +63,7 @@ Property::Index SafeRegisterProperty( Handle& handle, const std::string& name, P
  * move the Actor's edge visually away from the neighboring actor, as they rotate
  * around their default anchor point.
  */
-class ScrollCarouselEffectInfo : public Dali::RefObject
+class ScrollCarouselEffectInfo
 {
 public:
 
@@ -212,8 +212,6 @@ public:
   Vector2 mVisibilityThreshold;                           ///< Threshold for when to to switch off visibility of Actor (for performance)
 };
 
-typedef IntrusivePtr<ScrollCarouselEffectInfo> ScrollCarouselEffectInfoPtr;
-
 /**
  * Helper: Applies the 3D scroll carousel constraints to the child actor
  *
@@ -223,7 +221,7 @@ typedef IntrusivePtr<ScrollCarouselEffectInfo> ScrollCarouselEffectInfoPtr;
  */
 void ApplyScrollCarouselConstraints(Toolkit::ScrollView scrollView,
                                     Actor child,
-                                    ScrollCarouselEffectInfoPtr info)
+                                    ScrollCarouselEffectInfo& info)
 {
   // Apply constraints to this actor //
   Constraint constraint;
@@ -284,7 +282,7 @@ ScrollViewCarouselEffect::~ScrollViewCarouselEffect()
 
 void ScrollViewCarouselEffect::ApplyToActor(Actor child, const Vector2& angleSwing)
 {
-  ScrollCarouselEffectInfoPtr info(new ScrollCarouselEffectInfo(angleSwing));
+  ScrollCarouselEffectInfo info( angleSwing );
 
   ApplyScrollCarouselConstraints( GetScrollView(), child, info );
 }

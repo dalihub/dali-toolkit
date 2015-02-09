@@ -245,7 +245,7 @@ public:
   : mControlImpl( controlImpl ),
     mBackground( NULL ),
     mStartingPinchScale( NULL ),
-    mKeyEventSignalV2(),
+    mKeyEventSignal(),
     mPinchGestureDetector(),
     mPanGestureDetector(),
     mTapGestureDetector(),
@@ -548,7 +548,7 @@ public:
   Control& mControlImpl;
   Background* mBackground;           ///< Only create the background if we use it
   Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
-  Toolkit::Control::KeyEventSignalV2 mKeyEventSignalV2;
+  Toolkit::Control::KeyEventSignalType mKeyEventSignal;
 
   // Gesture Detection
   PinchGestureDetector mPinchGestureDetector;
@@ -865,7 +865,7 @@ bool Control::OnAccessibilityValueChange(bool isIncrease)
   return false; // Accessibility value change action is not handled by default
 }
 
-void Control::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& container )
+void Control::NegotiateSize( const Vector2& allocatedSize, ActorSizeContainer& container )
 {
   Vector2 size;
 
@@ -967,7 +967,12 @@ void Control::NegotiateSize( Vector2 allocatedSize, ActorSizeContainer& containe
                  allocatedSize.x, allocatedSize.y,
                  size.x, size.y );
 
-  Relayout( size, container );
+  // Avoids relayout again when OnSizeSet callback arrives as a function of us or deriving class calling SetSize()
+  mImpl->mInsideRelayout = true;
+  Self().SetSize( size );
+  // Only relayout controls which requested to be relaid out.
+  OnRelayout( size, container );
+  mImpl->mInsideRelayout = false;
 }
 
 void Control::SetAsKeyboardFocusGroup(bool isFocusGroup)
@@ -1053,9 +1058,9 @@ bool Control::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* t
   return connected;
 }
 
-Toolkit::Control::KeyEventSignalV2& Control::KeyEventSignal()
+Toolkit::Control::KeyEventSignalType& Control::KeyEventSignal()
 {
-  return mImpl->mKeyEventSignalV2;
+  return mImpl->mKeyEventSignal;
 }
 
 bool Control::EmitKeyEventSignal( const KeyEvent& event )
@@ -1066,9 +1071,9 @@ bool Control::EmitKeyEventSignal( const KeyEvent& event )
   bool consumed = false;
 
   // signals are allocated dynamically when someone connects
-  if ( !mImpl->mKeyEventSignalV2.Empty() )
+  if ( !mImpl->mKeyEventSignal.Empty() )
   {
-    consumed = mImpl->mKeyEventSignalV2.Emit( handle, event );
+    consumed = mImpl->mKeyEventSignal.Emit( handle, event );
   }
 
   if (!consumed)
@@ -1178,7 +1183,7 @@ void Control::RelayoutRequest()
   }
 }
 
-void Control::Relayout( Actor actor, Vector2 size, ActorSizeContainer& container )
+void Control::Relayout( Actor actor, const Vector2& size, ActorSizeContainer& container )
 {
   if ( actor )
   {
@@ -1259,7 +1264,7 @@ void Control::OnControlSizeSet( const Vector3& size )
 {
 }
 
-void Control::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+void Control::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   unsigned int numChildren = Self().GetChildCount();
 
@@ -1391,18 +1396,6 @@ void Control::DoStyleChange( Toolkit::StyleManager styleManager, StyleChange cha
   {
     OnFontChange( change.defaultFontChange, change.defaultFontSizeChange );
   }
-}
-
-void Control::Relayout(Vector2 size, ActorSizeContainer& container)
-{
-  // Avoids relayout again when OnSizeSet callback arrives.
-  mImpl->mInsideRelayout = true;
-  Self().SetSize( size );
-  // @todo this really needs to be at the end of method but not sure why the scope used to be only the SetSize, needs to be cleaned up in size negotiation rework
-  mImpl->mInsideRelayout = false;
-
-  // Only relayout controls which requested to be relaid out.
-  OnRelaidOut( size, container );
 }
 
 } // namespace Internal

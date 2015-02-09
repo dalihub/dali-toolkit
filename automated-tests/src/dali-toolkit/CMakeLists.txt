@@ -8,7 +8,40 @@ SET(CAPI_LIB "dali-toolkit")
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
    utc-Dali-Alignment.cpp
+   utc-Dali-BendyEffect.cpp
+   utc-Dali-BlindEffect.cpp
+   utc-Dali-BloomView.cpp
    utc-Dali-BubbleEmitter.cpp
+   utc-Dali-Builder.cpp
+   utc-Dali-CarouselEffect.cpp
+   utc-Dali-CheckBoxButton.cpp
+   utc-Dali-Cluster.cpp
+   utc-Dali-CubeTransitionEffect.cpp
+   utc-Dali-DepthLayout.cpp
+   utc-Dali-DisplacementEffect.cpp
+   utc-Dali-DistanceFieldEffect.cpp
+   utc-Dali-GaussianBlurView.cpp
+   utc-Dali-JsonParser.cpp
+   utc-Dali-KeyInputFocusManager.cpp
+   utc-Dali-NavigationControl.cpp
+   utc-Dali-NavigationLayout.cpp
+   utc-Dali-OverlayEffect.cpp
+   utc-Dali-Page.cpp
+   utc-Dali-PageTurnEffect.cpp
+   utc-Dali-PageTurnView.cpp
+   utc-Dali-RollLayout.cpp
+   utc-Dali-ScrollView.cpp
+   utc-Dali-ShadowView.cpp
+   utc-Dali-ShearEffect.cpp
+   utc-Dali-Slider.cpp
+   utc-Dali-SoftButtonEffect.cpp
+   utc-Dali-SpiralLayout.cpp
+   utc-Dali-SpotEffect.cpp
+   utc-Dali-SquareDissolveEffect.cpp
+   utc-Dali-TableView.cpp
+   utc-Dali-ToolBar.cpp
+   utc-Dali-View.cpp
+   utc-Dali-WaterEffect.cpp
    utc-Dali-Button.cpp
    utc-Dali-Control.cpp
    utc-Dali-ControlImpl.cpp
@@ -24,9 +57,11 @@ SET(TC_SOURCES
    utc-Dali-NinePatchMaskEffect.cpp
    utc-Dali-Popup.cpp
    utc-Dali-PushButton.cpp
+   utc-Dali-RadioButton.cpp
    utc-Dali-Ripple2DEffect.cpp
    utc-Dali-RippleEffect.cpp
    utc-Dali-ScrollViewEffect.cpp
+   utc-Dali-StyleManager.cpp
    utc-Dali-SuperBlurView.cpp
    utc-Dali-SwirlEffect.cpp
 )

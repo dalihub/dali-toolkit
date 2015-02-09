@@ -207,7 +207,7 @@ public: //Signal
   /**
    * @copydoc Toolkit::CubeTransitionEffect::TransitionCompletedSignal()
    */
-  Toolkit::CubeTransitionEffect::TransitionCompletedSignalV2& TransitionCompletedSignal();
+  Toolkit::CubeTransitionEffect::TransitionCompletedSignalType& TransitionCompletedSignal();
 
 protected:
 
@@ -318,7 +318,7 @@ protected:
 
 private:
 
-  Toolkit::CubeTransitionEffect::TransitionCompletedSignalV2 mTransitionCompletedSignalV2;
+  Toolkit::CubeTransitionEffect::TransitionCompletedSignalType mTransitionCompletedSignal;
 
 };
 

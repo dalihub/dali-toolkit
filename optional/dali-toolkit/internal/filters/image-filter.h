@@ -90,7 +90,7 @@ public:
    * Set size of ImageFilter. Used to create internal offscreen buffers
    * @param[in] size  THe size.
    */
-  void SetSize( const Vector2& size );
+  virtual void SetSize( const Vector2& size );
 
   /**
    * Set the pixel format for internal offscreen buffers
