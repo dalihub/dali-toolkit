@@ -72,7 +72,6 @@
 
 #include <dali-toolkit/public-api/controls/effects-view/effects-view.h>
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/controls/magnifier/magnifier.h>
 #include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
 #include <dali-toolkit/public-api/controls/page-turn-view/page-turn-portrait-view.h>
