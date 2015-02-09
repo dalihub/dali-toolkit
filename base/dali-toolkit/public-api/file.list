@@ -44,10 +44,12 @@ public_api_base_src_files = \
   $(public_api_base_src_dir)/text/logical-model.cpp \
   $(public_api_base_src_dir)/text/multi-language-support.cpp \
   $(public_api_base_src_dir)/text/text-controller.cpp \
-  $(public_api_base_src_dir)/text/text-renderer.cpp \
   $(public_api_base_src_dir)/text/text-view.cpp \
   $(public_api_base_src_dir)/text/text-view-interface.cpp \
   $(public_api_base_src_dir)/text/visual-model.cpp \
+  $(public_api_base_src_dir)/text/rendering/text-renderer.cpp \
+  $(public_api_base_src_dir)/text/rendering/basic/text-basic-renderer.cpp \
+  $(public_api_base_src_dir)/text/rendering/shaders/text-basic-shader.cpp \
   $(public_api_base_src_dir)/focus-manager/focus-manager.cpp \
   $(public_api_base_src_dir)/focus-manager/keyboard-focus-manager.cpp \
   $(public_api_base_src_dir)/focus-manager/keyinput-focus-manager.cpp \
@@ -130,10 +132,18 @@ public_api_base_text_header_files = \
   $(public_api_base_src_dir)/text/multi-language-support.h \
   $(public_api_base_src_dir)/text/text-controller.h \
   $(public_api_base_src_dir)/text/text-definitions.h \
-  $(public_api_base_src_dir)/text/text-renderer.h \
   $(public_api_base_src_dir)/text/text-view.h \
   $(public_api_base_src_dir)/text/text-view-interface.h \
   $(public_api_base_src_dir)/text/visual-model.h
+
+public_api_base_text_rendering_header_files = \
+  $(public_api_base_src_dir)/text/rendering/text-renderer.h
+
+public_api_base_text_rendering_basic_header_files = \
+  $(public_api_base_src_dir)/text/rendering/basic/text-basic-renderer.h
+
+public_api_base_text_rendering_shaders_header_files = \
+  $(public_api_base_src_dir)/text/rendering/shaders/text-basic-shader.h
 
 public_api_base_focus_manager_header_files = \
   $(public_api_base_src_dir)/focus-manager/keyinput-focus-manager.h \

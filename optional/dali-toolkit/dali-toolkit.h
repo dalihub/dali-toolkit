@@ -64,10 +64,12 @@
 #include <dali-toolkit/public-api/text/logical-model.h>
 #include <dali-toolkit/public-api/text/text-controller.h>
 #include <dali-toolkit/public-api/text/text-definitions.h>
-#include <dali-toolkit/public-api/text/text-renderer.h>
 #include <dali-toolkit/public-api/text/text-view.h>
 #include <dali-toolkit/public-api/text/text-view-interface.h>
 #include <dali-toolkit/public-api/text/visual-model.h>
+#include <dali-toolkit/public-api/text/rendering/text-renderer.h>
+#include <dali-toolkit/public-api/text/rendering/basic/text-basic-renderer.h>
+#include <dali-toolkit/public-api/text/rendering/shaders/text-basic-shader.h>
 
 // INTERNAL INCLUDES
 
