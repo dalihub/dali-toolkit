@@ -21,11 +21,9 @@
 // EXTERNAL INCLUDES
 #include <stack>
 #include <dali/public-api/actors/image-actor.h>
-#include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/geometry/mesh.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
@@ -185,36 +183,6 @@ float Calculate( Control::SizePolicy policy, float minimum, float maximum, float
   return size;
 }
 
-/**
- * Creates a white coloured Mesh.
- */
-Mesh CreateMesh()
-{
-  Vector3 white( Color::WHITE );
-
-  MeshData meshData;
-
-  // Create vertices with a white color (actual color is set by actor color)
-  MeshData::VertexContainer vertices(4);
-  vertices[ 0 ] = MeshData::Vertex( Vector3( -0.5f, -0.5f, 0.0f ), Vector2::ZERO, white );
-  vertices[ 1 ] = MeshData::Vertex( Vector3(  0.5f, -0.5f, 0.0f ), Vector2::ZERO, white );
-  vertices[ 2 ] = MeshData::Vertex( Vector3( -0.5f,  0.5f, 0.0f ), Vector2::ZERO, white );
-  vertices[ 3 ] = MeshData::Vertex( Vector3(  0.5f,  0.5f, 0.0f ), Vector2::ZERO, white );
-
-  // Specify all the faces
-  MeshData::FaceIndices faces;
-  faces.reserve( 6 ); // 2 triangles in Quad
-  faces.push_back( 0 ); faces.push_back( 3 ); faces.push_back( 1 );
-  faces.push_back( 0 ); faces.push_back( 2 ); faces.push_back( 3 );
-
-  // Create the mesh data from the vertices and faces
-  meshData.SetMaterial( Material::New( "ControlMaterial" ) );
-  meshData.SetVertices( vertices );
-  meshData.SetFaceIndices( faces );
-  meshData.SetHasColor( true );
-
-  return Mesh::New( meshData );
-}
 
 /**
  * Sets all the required properties for the background actor.
@@ -782,17 +750,6 @@ void Control::SetBackgroundColor( const Vector4& color )
   {
     // Just set the actor color
     background.actor.SetColor( color );
-  }
-  else
-  {
-    // Create Mesh Actor
-    MeshActor meshActor = MeshActor::New( CreateMesh() );
-
-    SetupBackgroundActor( meshActor, Actor::Property::Scale, color );
-
-    // Set the background actor before adding so that we do not inform deriving classes
-    background.actor = meshActor;
-    Self().Add( meshActor );
   }
 
   background.color = color;

@@ -32,7 +32,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
-#include <dali-toolkit/internal/controls/scrollable/bouncing-effect-actor.h>
 
 using std::string;
 using std::set;
@@ -1562,12 +1561,6 @@ void ItemView::SetOvershootEnabled( bool enable )
   if( enable )
   {
     Property::Index effectOvershootPropertyIndex = Property::INVALID_INDEX;
-    mOvershootOverlay = CreateBouncingEffectActor( effectOvershootPropertyIndex );
-    mOvershootOverlay.SetColor(mOvershootEffectColor);
-    mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
-    mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-    mOvershootOverlay.SetDrawMode(DrawMode::OVERLAY);
-    self.Add(mOvershootOverlay);
 
     Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size,
                                                       ParentSource( mPropertyScrollDirection ),

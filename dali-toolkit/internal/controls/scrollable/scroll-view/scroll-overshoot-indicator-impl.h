@@ -249,7 +249,6 @@ public:
   static ScrollOvershootEffectRipplePtr New( bool vertical, Scrollable& scrollable );
 
 private:
-  Actor                 mOvershootOverlay;             ///< the actor which displays the overshoot effect
   Scrollable&           mAttachedScrollView;           ///< the actor that this indicator has been attached to
   Animation             mScrollOvershootAnimation;     ///< overshoot animation
   PropertyNotification  mOvershootIncreaseNotification;///< notification used to inform as overshoot increases

@@ -25,7 +25,6 @@
 #include <dali-toolkit/public-api/builder/tree-node.h>
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 #include <dali-toolkit/public-api/controls/bloom-view/bloom-view.h>
-#include <dali-toolkit/public-api/controls/bubble-effect/bubble-emitter.h>
 #include <dali-toolkit/public-api/controls/buttons/button.h>
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
@@ -92,7 +91,6 @@
 #include <dali-toolkit/public-api/shader-effects/alpha-discard-effect.h>
 #include <dali-toolkit/public-api/shader-effects/bendy-effect.h>
 #include <dali-toolkit/public-api/shader-effects/blind-effect.h>
-#include <dali-toolkit/public-api/shader-effects/bouncing-effect.h>
 #include <dali-toolkit/public-api/shader-effects/carousel-effect.h>
 #include <dali-toolkit/public-api/shader-effects/displacement-effect.h>
 #include <dali-toolkit/public-api/shader-effects/dissolve-local-effect.h>
@@ -106,8 +104,6 @@
 #include <dali-toolkit/public-api/shader-effects/spot-effect.h>
 #include <dali-toolkit/public-api/shader-effects/square-dissolve-effect.h>
 #include <dali-toolkit/public-api/shader-effects/water-effect.h>
-#include <dali-toolkit/public-api/shader-effects/bubble-effect/bubble-effect.h>
-#include <dali-toolkit/public-api/shader-effects/bubble-effect/color-adjuster.h>
 #include <dali-toolkit/public-api/shader-effects/dissolve-effect.h>
 #include <dali-toolkit/public-api/shader-effects/image-region-effect.h>
 #include <dali-toolkit/public-api/shader-effects/iris-effect.h>

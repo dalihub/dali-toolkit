@@ -7,7 +7,6 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/control-impl.cpp \
   $(public_api_src_dir)/controls/control.cpp \
   $(public_api_src_dir)/controls/alignment/alignment.cpp \
-  $(public_api_src_dir)/controls/bubble-effect/bubble-emitter.cpp \
   $(public_api_src_dir)/controls/buttons/button.cpp \
   $(public_api_src_dir)/controls/buttons/check-box-button.cpp \
   $(public_api_src_dir)/controls/buttons/push-button.cpp \
@@ -64,12 +63,9 @@ public_api_src_files = \
   $(public_api_src_dir)/focus-manager/keyboard-focus-manager.cpp \
   $(public_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
   $(public_api_src_dir)/markup-processor/markup-processor.cpp \
-  $(public_api_src_dir)/shader-effects/bubble-effect/bubble-effect.cpp \
-  $(public_api_src_dir)/shader-effects/bubble-effect/color-adjuster.cpp \
   $(public_api_src_dir)/shader-effects/alpha-discard-effect.cpp \
   $(public_api_src_dir)/shader-effects/bendy-effect.cpp \
   $(public_api_src_dir)/shader-effects/blind-effect.cpp \
-  $(public_api_src_dir)/shader-effects/bouncing-effect.cpp \
   $(public_api_src_dir)/shader-effects/carousel-effect.cpp \
   $(public_api_src_dir)/shader-effects/displacement-effect.cpp \
   $(public_api_src_dir)/shader-effects/dissolve-effect.cpp \
@@ -130,8 +126,7 @@ public_api_buttons_header_files = \
 public_api_bloom_view_header_files = \
   $(public_api_src_dir)/controls/bloom-view/bloom-view.h
 
-public_api_bubble_emitter_header_files = \
-  $(public_api_src_dir)/controls/bubble-effect/bubble-emitter.h
+public_api_bubble_emitter_header_files =
 
 public_api_cluster_header_files = \
   $(public_api_src_dir)/controls/cluster/cluster-style.h \
@@ -236,7 +231,6 @@ public_api_shader_effects_header_files = \
   $(public_api_src_dir)/shader-effects/alpha-discard-effect.h \
   $(public_api_src_dir)/shader-effects/bendy-effect.h \
   $(public_api_src_dir)/shader-effects/blind-effect.h \
-  $(public_api_src_dir)/shader-effects/bouncing-effect.h \
   $(public_api_src_dir)/shader-effects/carousel-effect.h \
   $(public_api_src_dir)/shader-effects/displacement-effect.h \
   $(public_api_src_dir)/shader-effects/dissolve-effect.h \
@@ -262,9 +256,7 @@ public_api_shader_effects_header_files = \
   $(public_api_src_dir)/shader-effects/swirl-effect.h \
   $(public_api_src_dir)/shader-effects/water-effect.h
 
-public_api_bubble_effect_header_files =  \
-  $(public_api_src_dir)/shader-effects/bubble-effect/bubble-effect.h \
-  $(public_api_src_dir)/shader-effects/bubble-effect/color-adjuster.h
+public_api_bubble_effect_header_files =
 
 public_api_styling_header_files = \
   $(public_api_src_dir)/styling/style-manager.h
