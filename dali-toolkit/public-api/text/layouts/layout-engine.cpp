@@ -43,44 +43,20 @@ struct LayoutEngine::Impl
     mFontClient = TextAbstraction::FontClient::Get();
   }
 
-  void UpdateVisualModel( const Vector2& boundingBox, const LogicalModel& logicalModel, VisualModel& visualModel )
+  void UpdateVisualModel( const Vector2& boundingBox,
+                          const Vector<GlyphInfo>& glyphs,
+                          const Vector<CharacterIndex>& characterIndices,
+                          const Vector<Length>& charactersPerGlyph,
+                          VisualModel& visualModel )
   {
     // TODO Switch between different layouts
 
-    TextAbstraction::FontId fontId = mFontClient.GetFontId( "/usr/share/fonts/truetype/ubuntu-font-family/UbuntuMono-R.ttf", 13*64 );
+    visualModel.SetGlyphs( &glyphs[0],
+                           &characterIndices[0],
+                           &charactersPerGlyph[0],
+                           glyphs.Count() );
 
-    const Length characterCount = logicalModel.GetNumberOfCharacters();
-
-    Vector<GlyphInfo> glyphs;
-    glyphs.Reserve( characterCount );
-
-    Vector<CharacterIndex> characterIndices;
-    characterIndices.Reserve( characterCount );
-
-    std::vector<Length> charactersPerGlyph;
-    charactersPerGlyph.assign( characterCount, 1 );
-
-    for( unsigned int i=0; i<characterCount; ++i )
-    {
-      Character charcode;
-      logicalModel.GetText( i, &charcode, 1 );
-
-      // TODO - Perform shaping to get correct glyph indices
-      GlyphIndex glyphIndex = mFontClient.GetGlyphIndex( fontId, charcode );
-
-      glyphs.PushBack( GlyphInfo(fontId, glyphIndex) );
-      characterIndices.PushBack( 1 );
-    }
-
-    if( mFontClient.GetGlyphMetrics( &glyphs[0], glyphs.Size() ) )
-    {
-      visualModel.SetGlyphs( &glyphs[0],
-                             &characterIndices[0],
-                             &charactersPerGlyph[0],
-                             characterCount );
-
-      UpdateGlyphPositions( boundingBox, visualModel );
-    }
+    UpdateGlyphPositions( boundingBox, visualModel );
   }
 
   void UpdateGlyphPositions( const Vector2& boundingBox, VisualModel& visualModel )
@@ -240,9 +216,17 @@ void LayoutEngine::SetLayout( Layout layout )
   mImpl->mLayout = layout;
 }
 
-void LayoutEngine::UpdateVisualModel( const Vector2& boundingBox, const LogicalModel& logicalModel, VisualModel& visualModel )
+void LayoutEngine::UpdateVisualModel( const Vector2& boundingBox,
+                                      const Vector<GlyphInfo>& glyphs,
+                                      const Vector<CharacterIndex>& characterIndices,
+                                      const Vector<Length>& charactersPerGlyph,
+                                      VisualModel& visualModel )
 {
-  mImpl->UpdateVisualModel( boundingBox, logicalModel, visualModel );
+  mImpl->UpdateVisualModel( boundingBox,
+                            glyphs,
+                            characterIndices,
+                            charactersPerGlyph,
+                            visualModel );
 }
 
 } // namespace Text

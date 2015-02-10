@@ -69,7 +69,7 @@ FontId GetFontId( Length index,
       fontId = fontRun.fontId;
     }
 
-    if( index == fontRun.characterRun.characterIndex + fontRun.characterRun.numberOfCharacters )
+    if( index + 1u == fontRun.characterRun.characterIndex + fontRun.characterRun.numberOfCharacters )
     {
       // All the characters of the current run have been traversed. Get the next one for the next iteration.
       ++fontRunIt;
@@ -106,7 +106,7 @@ Script GetScript( Length index,
       script = scriptRun.script;
     }
 
-    if( index == scriptRun.characterRun.characterIndex + scriptRun.characterRun.numberOfCharacters )
+    if( index + 1u == scriptRun.characterRun.characterIndex + scriptRun.characterRun.numberOfCharacters )
     {
       // All the characters of the current run have been traversed. Get the next one for the next iteration.
       ++scriptRunIt;

@@ -27,6 +27,7 @@
 #include <dali-toolkit/public-api/text/logical-model.h>
 #include <dali-toolkit/public-api/text/multi-language-support.h>
 #include <dali-toolkit/public-api/text/script-run.h>
+#include <dali-toolkit/public-api/text/shaper.h>
 #include <dali-toolkit/public-api/text/text-view.h>
 #include <dali-toolkit/public-api/text/visual-model.h>
 
@@ -106,13 +107,36 @@ bool Controller::Relayout( const Vector2& size )
                                         scripts,
                                         fonts );
 
+    Vector<LineBreakInfo> lineBreakInfo;
+    lineBreakInfo.Resize( characterCount, TextAbstraction::LINE_NO_BREAK );
+
+    Vector<GlyphInfo> glyphs;
+    Vector<CharacterIndex> characterIndices;
+    Vector<Length> charactersPerGlyph;
+
+    ShapeText( utf32Characters,
+               lineBreakInfo,
+               scripts,
+               fonts,
+               glyphs,
+               characterIndices,
+               charactersPerGlyph );
+
     // Manipulate the logical model
     mImpl->mLogicalModel->SetText( &utf32Characters[0], characterCount );
+    mImpl->mLogicalModel->SetLineBreakInfo( &lineBreakInfo[0], characterCount );
     mImpl->mLogicalModel->SetScripts( &scripts[0], scripts.Count() );
     mImpl->mLogicalModel->SetFonts( &fonts[0], fonts.Count() );
 
-    // Update the visual model
-    mImpl->mLayoutEngine.UpdateVisualModel( size, *mImpl->mLogicalModel, *mImpl->mVisualModel );
+    if( TextAbstraction::FontClient::Get().GetGlyphMetrics( &glyphs[0], glyphs.Size() ) )
+    {
+      // Update the visual model
+      mImpl->mLayoutEngine.UpdateVisualModel( size,
+                                              glyphs,
+                                              characterIndices,
+                                              charactersPerGlyph,
+                                              *mImpl->mVisualModel );
+    }
 
     // Discard temporary text
     mImpl->mNewTextArrived = false;

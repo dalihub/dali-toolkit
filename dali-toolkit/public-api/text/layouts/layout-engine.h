@@ -18,6 +18,12 @@
  *
  */
 
+// INTERNAL INCLUDE
+#include <dali-toolkit/public-api/text/text-definitions.h>
+
+// EXTERNAL INCLUDE
+#include <dali/public-api/common/dali-vector.h>
+
 namespace Dali
 {
 
@@ -66,10 +72,16 @@ public:
    * @brief Store the visual position of glyphs in the VisualModel.
    *
    * @param[in] boundingBox The size of the box containing the text.
-   * @param[in] logicalModel The logical model.
+   * @param[in] glyphs A vector with glyphs.
+   * @param[in] characterIndices Vector with indices pointing the first character of each glyph.
+   * @param[in] charactersPerGlyph Vector with the number of characters that forms each glyph.
    * @param[in] visualModel The visual model to update.
    */
-  void UpdateVisualModel( const Vector2& boundingBox, const LogicalModel& logicalModel, VisualModel& visualModel );
+  void UpdateVisualModel( const Vector2& boundingBox,
+                          const Vector<GlyphInfo>& glyphs,
+                          const Vector<CharacterIndex>& characterIndices,
+                          const Vector<Length>& charactersPerGlyph,
+                          VisualModel& visualModel );
 
 private:
 
