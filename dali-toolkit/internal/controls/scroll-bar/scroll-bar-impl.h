@@ -186,6 +186,11 @@ private: // from Control
    */
   virtual void OnPan( PanGesture gesture );
 
+  /**
+   * @copydoc Toolkit::Control::OnControlSizeSet( const Vector3& size )
+   */
+  virtual void OnControlSizeSet( const Vector3& size );
+
 private:
 
   /**
@@ -225,7 +230,6 @@ private:
 
   Constrainable mScrollPositionObject;                               ///< From mScrollConnector
 
-  ImageActor mBackground;                                            ///< Background image of scroll bar.
   ImageActor mIndicator;                                             ///< Image of scroll indicator.
   Animation mAnimation;                                              ///< Scroll indicator Show/Hide Animation.
 

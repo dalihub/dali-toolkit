@@ -20,8 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <sstream>
-#include <dali/public-api/animation/constraint.h>
-#include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/scripting/scripting.h>
@@ -34,39 +32,17 @@ namespace
 const float DEFAULT_CONSTRAINT_DURATION = 0.0f;
 
 /**
- * Constraint that sets a child property relative to parents Width or Height
+ * sets a child property relative to parents size and applies a unit based padding before the relative calculation.
+ * @param[in] scale of parent minus padding between 0 and 1
+ * @param[in] padding in world coordinate units
+ * @param[in] fixed part in world coordinate units
+ * @param[in] size of the parent
+ * @return The relative size with padding.
  */
-struct RelativeToWidthOrHeight
+Vector2 RelativeToSize( const Vector2& scale, const Vector2& padding, const Vector2& fixed, const Vector2& parentSize)
 {
-  /**
-   * Constraint that is relative (%) to parent width/height and applies a
-   * unit based padding before the relative calculation.
-   * @param scale of parent minus padding between 0 and 1
-   * @param padding in world coordinate units
-   * @param fixed part in world coordinate units
-   */
-  RelativeToWidthOrHeight( float scale, float padding, float fixed )
-  : mScaleFactor( scale ),
-    mPadding( padding ),
-    mFixed( fixed )
-  {
-  }
-
-  inline float operator()( const float& parentWidthOrHeight )
-  {
-    return mFixed  + ( parentWidthOrHeight - mPadding  ) * mScaleFactor;
-  }
-
-  float operator()( const float& current,
-                    const PropertyInput& parentWidthOrHeight )
-  {
-    return operator()( parentWidthOrHeight.GetFloat() );
-  }
-
-  float mScaleFactor;
-  float mPadding;
-  float mFixed;
-};
+  return fixed + ( parentSize - padding ) * scale;
+}
 
 #if defined(DEBUG_ENABLED)
 // debugging support, very useful when new features are added or bugs are hunted down
@@ -137,9 +113,8 @@ namespace Toolkit
 const Property::Index TableView::PROPERTY_ROWS( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX );
 const Property::Index TableView::PROPERTY_COLUMNS( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 1 );
 const Property::Index TableView::PROPERTY_CELL_PADDING( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 2 );
-const Property::Index TableView::PROPERTY_LAYOUT_ANIMATION_DURATION( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 3 );
-const Property::Index TableView::PROPERTY_LAYOUT_ROWS( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 4 );
-const Property::Index TableView::PROPERTY_LAYOUT_COLUMNS( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 5 );
+const Property::Index TableView::PROPERTY_LAYOUT_ROWS( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 3 );
+const Property::Index TableView::PROPERTY_LAYOUT_COLUMNS( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 4 );
 
 namespace Internal
 {
@@ -166,9 +141,8 @@ TypeRegistration mType( typeid(Toolkit::TableView), typeid(Toolkit::Control), Cr
 PropertyRegistration property1( mType, "rows", Toolkit::TableView::PROPERTY_ROWS, Property::UNSIGNED_INTEGER, &TableView::SetProperty, &TableView::GetProperty );
 PropertyRegistration property2( mType, "columns", Toolkit::TableView::PROPERTY_COLUMNS, Property::UNSIGNED_INTEGER, &TableView::SetProperty, &TableView::GetProperty );
 PropertyRegistration property3( mType, "cell-padding", Toolkit::TableView::PROPERTY_CELL_PADDING, Property::VECTOR2, &TableView::SetProperty, &TableView::GetProperty );
-PropertyRegistration property4( mType, "layout-animation-duration", Toolkit::TableView::PROPERTY_LAYOUT_ANIMATION_DURATION, Property::FLOAT, &TableView::SetProperty, &TableView::GetProperty );
-PropertyRegistration property5( mType, "layout-rows", Toolkit::TableView::PROPERTY_LAYOUT_ROWS, Property::MAP, &TableView::SetProperty, &TableView::GetProperty );
-PropertyRegistration property6( mType, "layout-columns", Toolkit::TableView::PROPERTY_LAYOUT_COLUMNS, Property::MAP, &TableView::SetProperty, &TableView::GetProperty );
+PropertyRegistration property4( mType, "layout-rows", Toolkit::TableView::PROPERTY_LAYOUT_ROWS, Property::MAP, &TableView::SetProperty, &TableView::GetProperty );
+PropertyRegistration property5( mType, "layout-columns", Toolkit::TableView::PROPERTY_LAYOUT_COLUMNS, Property::MAP, &TableView::SetProperty, &TableView::GetProperty );
 
 } // namespace
 
@@ -615,16 +589,6 @@ float TableView::GetRelativeWidth( unsigned int columnIndex ) const
   return mRelativeWidths[ columnIndex ];
 }
 
-void TableView::SetLayoutAnimationDuration( float duration )
-{
-  mConstraintDuration = duration;
-}
-
-float TableView::GetLayoutAnimationDuration()
-{
-  return mConstraintDuration;
-}
-
 void TableView::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   float fixedHeightsTotal = 0.0f;
@@ -679,23 +643,8 @@ void TableView::OnRelayout( const Vector2& size, ActorSizeContainer& container )
         Vector2 fixedPosition( ( colPos + 1.0f ) * mPadding.width + cumulatedFixedWidth,
                                  ( rowPos + 1.0f ) * mPadding.height + cumulatedFixedHeight );
 
-        Constraint widthConstraint = Constraint::New<float>( Actor::POSITION_X,
-                                                             ParentSource( Actor::SIZE_WIDTH ),
-                                                             RelativeToWidthOrHeight( relativePosition.x, positionPadding.x, fixedPosition.x ) );
-
-        Constraint heightConstraint = Constraint::New<float>( Actor::POSITION_Y,
-                                                              ParentSource( Actor::SIZE_HEIGHT ),
-                                                              RelativeToWidthOrHeight( relativePosition.y, positionPadding.y, fixedPosition.y ) );
-
-        widthConstraint.SetApplyTime( mConstraintDuration );
-        heightConstraint.SetApplyTime( mConstraintDuration );
-
-        // bake constrained position value if constraint is removed
-        widthConstraint.SetRemoveAction( Constraint::Bake );
-        heightConstraint.SetRemoveAction( Constraint::Bake );
-
-        actor.ApplyConstraint( widthConstraint );
-        actor.ApplyConstraint( heightConstraint );
+        Vector3 actorPosition( RelativeToSize( relativePosition, positionPadding, fixedPosition, size ) );
+        actor.SetPosition( actorPosition );
 
         // 2. set size
         // constrain the actor size to be relative to the size of table
@@ -731,29 +680,11 @@ void TableView::OnRelayout( const Vector2& size, ActorSizeContainer& container )
         fixedSize.width += ( position.columnSpan - 1.0f ) * mPadding.width;
         fixedSize.height += ( position.rowSpan - 1.0f ) * mPadding.height;
 
-        RelativeToWidthOrHeight relativeWidthFunctor( relativeSize.x, sizePadding.x, fixedSize.x );
-        RelativeToWidthOrHeight relativeHeightFunctor( relativeSize.y, sizePadding.y, fixedSize.y );
-
-        widthConstraint = Constraint::New<float>( Actor::SIZE_WIDTH,
-                                                  ParentSource( Actor::SIZE_WIDTH ),
-                                                  relativeWidthFunctor );
-
-        heightConstraint = Constraint::New<float>( Actor::SIZE_HEIGHT,
-                                                   ParentSource( Actor::SIZE_HEIGHT ),
-                                                   relativeHeightFunctor );
-
-        widthConstraint.SetApplyTime( mConstraintDuration );
-        heightConstraint.SetApplyTime( mConstraintDuration );
-
-        // bake constrained size value if constraint is removed
-        widthConstraint.SetRemoveAction( Constraint::Bake );
-        heightConstraint.SetRemoveAction( Constraint::Bake );
-
-        actor.ApplyConstraint( widthConstraint );
-        actor.ApplyConstraint( heightConstraint );
+        Vector2 actorSize( RelativeToSize( relativeSize, sizePadding, fixedSize, size ) );
+        actor.SetSize(actorSize.x, actorSize.y);
 
         // Relayout Children
-        Relayout ( actor, Vector2( relativeWidthFunctor( size.width ), relativeHeightFunctor( size.height ) ), container );
+        Relayout ( actor, actorSize, container );
       }
       // for position we need to keep track of current fixed width and relative width
       // increase for next column
@@ -807,11 +738,6 @@ void TableView::SetProperty( BaseObject* object, Property::Index index, const Pr
         tableViewImpl.SetCellPadding( value.Get<Vector2>() );
         break;
       }
-      case Toolkit::TableView::PROPERTY_LAYOUT_ANIMATION_DURATION:
-      {
-        tableViewImpl.SetLayoutAnimationDuration( value.Get<float>() );
-        break;
-      }
       case Toolkit::TableView::PROPERTY_LAYOUT_ROWS:
       {
         SetHeightOrWidthProperty( tableViewImpl, &TableView::SetFixedHeight, &TableView::SetRelativeHeight, value );
@@ -850,11 +776,6 @@ Property::Value TableView::GetProperty( BaseObject* object, Property::Index inde
       case Toolkit::TableView::PROPERTY_CELL_PADDING:
       {
         value = tableViewImpl.GetCellPadding();
-        break;
-      }
-      case Toolkit::TableView::PROPERTY_LAYOUT_ANIMATION_DURATION:
-      {
-        value = tableViewImpl.GetLayoutAnimationDuration();
         break;
       }
       case Toolkit::TableView::PROPERTY_LAYOUT_ROWS:
@@ -953,8 +874,7 @@ void TableView::OnControlChildRemove( Actor& child )
 TableView::TableView( unsigned int initialRows, unsigned int initialColumns )
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mCellData( initialRows, initialColumns ),
-  mLayoutingChild( false ),
-  mConstraintDuration( DEFAULT_CONSTRAINT_DURATION )
+  mLayoutingChild( false )
 {
   SetKeyboardNavigationSupport( true );
   ResizeContainers( initialRows, initialColumns );

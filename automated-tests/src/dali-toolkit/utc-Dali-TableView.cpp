@@ -39,7 +39,6 @@ namespace
 const char* const PROPERTY_NAME_ROWS = "rows";
 const char* const PROPERTY_NAME_COLUMNS = "columns";
 const char* const PROPERTY_NAME_CELL_PADDING = "cell-padding";
-const char* const PROPERTY_NAME_LAYOUT_ANIMATION_DURATION = "layout-animation-duration";
 const char* const PROPERTY_NAME_LAYOUT_ROWS = "layout-rows";
 const char* const PROPERTY_NAME_LAYOUT_COLUMNS = "layout-columns";
 
@@ -74,8 +73,7 @@ static void SetupTableViewAndActors(TableView& tableView, Actor& actor1, Actor& 
   DALI_TEST_CHECK(tableView);
 
   Stage::GetCurrent().Add( tableView );
-  tableView.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, Constraint100() ) );
-  tableView.SetLayoutAnimationDuration(0.0f);
+  tableView.SetSize( Dali::Vector3( 100.0f, 100.0f, 100.0f ) );
 
   actor1 = Actor::New();
   actor2 = Actor::New();
@@ -219,23 +217,6 @@ int UtcDaliTableViewMetricsRelative(void)
   END_TEST;
 }
 
-
-// Test animation duration setting.
-int UtcDaliTableViewAnimation(void)
-{
-  ToolkitTestApplication application;
-
-  tet_infoline("UtcDaliTableViewAnimation");
-  TableView tableView = TableView::New(10,10);
-  DALI_TEST_CHECK(tableView);
-
-  tableView.SetLayoutAnimationDuration(5.0f);
-  DALI_TEST_EQUALS(tableView.GetLayoutAnimationDuration(), 5.0f, TEST_LOCATION);
-
-  tableView.SetLayoutAnimationDuration(2.5f);
-  DALI_TEST_EQUALS(tableView.GetLayoutAnimationDuration(), 2.5f, TEST_LOCATION);
-  END_TEST;
-}
 
 // Test Adding/Removing/Finding Children.
 int UtcDaliTableViewChild(void)
@@ -584,14 +565,6 @@ int UtcDaliTableViewSetGetProperty(void)
 
   DALI_TEST_EQUALS( tableView.GetCellPadding(), Size(6.f, 8.f), TEST_LOCATION );
   DALI_TEST_EQUALS( tableView.GetProperty(TableView::PROPERTY_CELL_PADDING).Get<Vector2>(), Vector2(6.f,8.f), TEST_LOCATION );
-
-  // Test "layout-animation-duration" property
-  DALI_TEST_CHECK( tableView.GetPropertyIndex(PROPERTY_NAME_LAYOUT_ANIMATION_DURATION) == TableView::PROPERTY_LAYOUT_ANIMATION_DURATION );
-
-  tableView.SetProperty( TableView::PROPERTY_LAYOUT_ANIMATION_DURATION, 1.5f );
-
-  DALI_TEST_EQUALS( tableView.GetLayoutAnimationDuration(), 1.5f, TEST_LOCATION );
-  DALI_TEST_EQUALS( tableView.GetProperty(TableView::PROPERTY_LAYOUT_ANIMATION_DURATION).Get<float>(), 1.5f, TEST_LOCATION );
 
   //{ "policy": "fixed", "value": 30.0 },
   Property::Map item1;

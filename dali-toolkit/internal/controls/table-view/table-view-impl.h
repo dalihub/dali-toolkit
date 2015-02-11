@@ -174,17 +174,6 @@ public:
   float GetRelativeWidth( unsigned int columnIndex ) const;
 
   /**
-   * @copydoc Toolkit::TableView::SetLayoutAnimationDuration
-   */
-  void SetLayoutAnimationDuration( float duration );
-
-  /**
-   * @copydoc Toolkit::TableView::GetLayoutAnimationDuration
-   */
-  float GetLayoutAnimationDuration();
-
-
-  /**
    * @copydoc Toolkit::TableView::GetRows
    */
   unsigned int GetRows();
@@ -376,7 +365,6 @@ private: // Data
   std::vector<float> mRelativeWidths;
   Size mPadding;
   bool mLayoutingChild;
-  float mConstraintDuration;
 
 };
 

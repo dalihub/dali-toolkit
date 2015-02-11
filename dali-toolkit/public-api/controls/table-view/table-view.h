@@ -50,7 +50,6 @@ public:
   static const Property::Index PROPERTY_ROWS;                       ///< name "rows",                      type UNSIGNED_INTEGER
   static const Property::Index PROPERTY_COLUMNS;                    ///< name "columns",                   type UNSIGNED_INTEGER
   static const Property::Index PROPERTY_CELL_PADDING;               ///< name "cell-padding",              type VECTOR2
-  static const Property::Index PROPERTY_LAYOUT_ANIMATION_DURATION;  ///< name "layout-animation-duration", type FLOAT
 
   /*
    * PROPERTY_LAYOUT_ROWS set the height of the rows
@@ -331,19 +330,6 @@ public:
    * @return width in percentage units, between 0.0f and 1.0f.
    */
   float GetRelativeWidth( unsigned int columnIndex ) const;
-
-  /**
-   * Sets the layout animation duration for add, remove and relayout
-   * @param duration for the layout animations
-   * @note The default duration is 0.0f.
-   */
-  void SetLayoutAnimationDuration( float duration );
-
-  /**
-   * Gets the layout animation duration for add, remove and relayout
-   * @return duration for the layout animations
-   */
-  float GetLayoutAnimationDuration();
 
   /**
    * @return the amount of rows in the table
