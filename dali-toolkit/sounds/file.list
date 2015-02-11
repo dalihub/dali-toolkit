@@ -1,0 +1,4 @@
+# Files to install here
+
+dali_toolkit_sound_files =\
+	$(toolkit_sounds_dir)/*.ogg

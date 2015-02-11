@@ -61,10 +61,6 @@ AC_ARG_ENABLE([profile],
               [dali_profile=$enableval],
               [dali_profile=COMMON])
 
-# Different platforms use either the full Toolkit or the basic version
-# The basic version excludes components under dali-toolkit/optional
-AM_CONDITIONAL([TOOLKIT_BASIC_VERSION], [test x$dali_profile = xLITE])
-
 if test x$DALI_DATA_RW_DIR != x; then
   dataReadWriteDir=${DALI_DATA_RW_DIR}/
 else

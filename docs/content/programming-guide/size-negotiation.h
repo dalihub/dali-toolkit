@@ -391,7 +391,7 @@ Vector3 ControlA::GetNaturalSize()
 GetHeightForWidth() and GetWidthForHeight() can be created in a similar manner.
 
 @code
-void ControlA::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+void ControlA::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   // Width to be shared between ControlD and ActorD
   Vector2 childSize( size.width * 0.5f, size.height );
@@ -441,7 +441,7 @@ In this example we have the following requirements:
 </tr></table>
 
 @code
-void ControlA::OnRelaidOut( Vector2 size, ActorSizeContainer& container )
+void ControlA::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   // Width of children is our size minus border
   Vector3 childSize( size.width - mBorder.width * 2.0f,
