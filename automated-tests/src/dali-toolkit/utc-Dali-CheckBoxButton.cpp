@@ -27,9 +27,9 @@ namespace
 {
 
 static bool gCheckBoxButtonState = false;
-bool CheckBoxButtonClicked( Button button, bool state )
+bool CheckBoxButtonClicked( Button button )
 {
-  gCheckBoxButtonState = state;
+  gCheckBoxButtonState = button.IsSelected();
   return true;
 }
 
@@ -69,10 +69,10 @@ void checkbox_button_cleanup(void)
   test_return_value = TET_PASS;
 }
 
-int UtcDaliCheckBoxButtonSetGetChecked(void)
+int UtcDaliCheckBoxButtonSetGetSelected(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliCheckBoxButtonSetGetChecked");
+  tet_infoline(" UtcDaliCheckBoxButtonSetGetSelected");
 
   CheckBoxButton checkBoxButton = CheckBoxButton::New();
   checkBoxButton.StateChangedSignal().Connect( &CheckBoxButtonClicked );
@@ -80,19 +80,19 @@ int UtcDaliCheckBoxButtonSetGetChecked(void)
   // global var used to check if CheckBoxButtonClicked is called;
   gCheckBoxButtonState = false;
 
-  checkBoxButton.SetChecked( true );
+  checkBoxButton.SetSelected( true );
 
-  DALI_TEST_CHECK( checkBoxButton.IsChecked() );
+  DALI_TEST_CHECK( checkBoxButton.IsSelected() );
   DALI_TEST_CHECK( gCheckBoxButtonState );
 
-  checkBoxButton.SetChecked( false );
+  checkBoxButton.SetSelected( false );
 
-  DALI_TEST_CHECK( !checkBoxButton.IsChecked() );
+  DALI_TEST_CHECK( !checkBoxButton.IsSelected() );
   DALI_TEST_CHECK( !gCheckBoxButtonState );
 
-  checkBoxButton.SetChecked( true );
+  checkBoxButton.SetSelected( true );
 
-  DALI_TEST_CHECK( checkBoxButton.IsChecked() );
+  DALI_TEST_CHECK( checkBoxButton.IsSelected() );
   DALI_TEST_CHECK( gCheckBoxButtonState );
   END_TEST;
 }
@@ -148,22 +148,22 @@ int UtcDaliCheckBoxButtonSetImages(void)
   DALI_TEST_EQUALS( size.width, 20.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 20.f, TEST_LOCATION );
 
-  checkBoxButton.SetCheckedImage( image02 );
+  checkBoxButton.SetSelectedImage( image02 );
 
   application.SendNotification();
   application.Render();
 
-  size = checkBoxButton.GetCheckedImage().GetCurrentSize();
+  size = checkBoxButton.GetSelectedImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 30.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 30.f, TEST_LOCATION );
 
-  checkBoxButton.SetCheckedImage( imageActor02 );
+  checkBoxButton.SetSelectedImage( imageActor02 );
 
   application.SendNotification();
   application.Render();
 
-  size = checkBoxButton.GetCheckedImage().GetCurrentSize();
+  size = checkBoxButton.GetSelectedImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 40.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 40.f, TEST_LOCATION );
@@ -188,22 +188,22 @@ int UtcDaliCheckBoxButtonSetImages(void)
   DALI_TEST_EQUALS( size.width, 60.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 60.f, TEST_LOCATION );
 
-  checkBoxButton.SetDisabledCheckedImage( image04 );
+  checkBoxButton.SetDisabledSelectedImage( image04 );
 
   application.SendNotification();
   application.Render();
 
-  size = checkBoxButton.GetDisabledCheckedImage().GetCurrentSize();
+  size = checkBoxButton.GetDisabledSelectedImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 70.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 70.f, TEST_LOCATION );
 
-  checkBoxButton.SetDisabledCheckedImage( imageActor04 );
+  checkBoxButton.SetDisabledSelectedImage( imageActor04 );
 
   application.SendNotification();
   application.Render();
 
-  size = checkBoxButton.GetDisabledCheckedImage().GetCurrentSize();
+  size = checkBoxButton.GetDisabledSelectedImage().GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 80.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 80.f, TEST_LOCATION );

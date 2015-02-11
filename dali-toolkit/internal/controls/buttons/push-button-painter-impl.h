@@ -54,45 +54,6 @@ public:
    */
   virtual ~PushButtonPainter() {}
 
-  /**
-   * This method is called from the Dali::Toolkit::Internal::PushButton when the
-   * \e autorepeating property changes.
-   * @param[in] autorepeating property.
-   */
-  virtual void SetAutoRepeating( bool autorepeating ) = 0;
-
-  /**
-   * This method is called when the Dali::Toolkit::Internal::PushButton, in which this
-   * object is registered, is pressed.
-   * @param[inout] button The Dali::Toolkit::PushButton, linked to the internal
-   * implementation, in which this object is registered.
-   */
-  virtual void Pressed( Toolkit::PushButton& button ) = 0;
-
-  /**
-   * This method is called when the Dali::Toolkit::Internal::PushButton, in which this
-   * object is registered, is released.
-   * @param[inout] button The Dali::Toolkit::PushButton, linked to the internal
-   * implementation, in which this object is registered.
-   */
-  virtual void Released( Toolkit::PushButton& button ) = 0;
-
-  /**
-   * This method is called when the Dali::Toolkit::Internal::PushButton, in which this
-   * object is registered, is clicked.
-   * @param[inout] button The Dali::Toolkit::PushButton, linked to the internal
-   * implementation, in which this object is registered.
-   */
-  virtual void Clicked( Toolkit::PushButton& button ) = 0;
-
-  /**
-   * This method is called when the Dali::Toolkit::Internal::PushButton, in which this
-   * object is registered, is toggled.
-   * @param[inout] button The Dali::Toolkit::PushButton, linked to the internal
-   * implementation, in which this object is registered.
-   */
-  virtual void Toggled( Toolkit::PushButton& button ) = 0;
-
   /////////////////////////////////////////////////////////////////////////////
   // ButtonPainter interface
   /////////////////////////////////////////////////////////////////////////////
