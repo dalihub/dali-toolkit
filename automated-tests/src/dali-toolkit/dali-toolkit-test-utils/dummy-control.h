@@ -72,10 +72,9 @@ public:
   inline LongPressGestureDetector GetLongPressGestureDetector() const { return Internal::Control::GetLongPressGestureDetector(); }
 
   // Used to test signal connections
-  void CustomSlot1( Actor actor, const Vector3& value );
+  void CustomSlot1( Actor actor );
 
   bool mCustomSlot1Called;
-  Vector3 mCustomSlot1Value;
 
 protected:
 
