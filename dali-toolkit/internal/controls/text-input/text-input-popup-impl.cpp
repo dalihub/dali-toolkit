@@ -287,7 +287,7 @@ void TextInputPopup::CreateBackground()
     mBackgroundEffect.SetAnchorPoint( AnchorPoint::CENTER );
     mBackgroundEffect.SetParentOrigin( ParentOrigin::CENTER );
     mBackgroundEffect.SetName( "text-input-popup-background-effect" );
-    mBackgroundEffect.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+    mBackgroundEffect.SetSizeMode( SIZE_EQUAL_TO_PARENT );
     mBackgroundEffect.SetZ( 1.0f );
     mBackground.Add( mBackgroundEffect );
 
@@ -296,7 +296,7 @@ void TextInputPopup::CreateBackground()
     mBackgroundLine.SetAnchorPoint( AnchorPoint::CENTER);
     mBackgroundLine.SetParentOrigin( ParentOrigin::CENTER );
     mBackgroundLine.SetName( "text-input-popup-background-effect" );
-    mBackgroundLine.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+    mBackgroundLine.SetSizeMode( SIZE_EQUAL_TO_PARENT );
     mBackgroundLine.SetColor( mLineColor );
     mBackgroundLine.SetZ( 0.1f );
     mBackgroundEffect.Add( mBackgroundLine );
@@ -322,7 +322,7 @@ void TextInputPopup::CreateTail()
     mTailEffect.SetParentOrigin( ParentOrigin::CENTER );
     mTailEffect.SetAnchorPoint( AnchorPoint::CENTER );
     mTailEffect.SetName( "text-input-popup-tail-effect" );
-    mTailEffect.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+    mTailEffect.SetSizeMode( SIZE_EQUAL_TO_PARENT );
     mTailEffect.SetZ( 0.1f );
     mTail.Add( mTailEffect );
 
@@ -330,7 +330,7 @@ void TextInputPopup::CreateTail()
     mTailLine = ImageActor::New( tailLine );
     mTailLine.SetParentOrigin( ParentOrigin::CENTER );
     mTailLine.SetAnchorPoint( AnchorPoint::CENTER );
-    mTailLine.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+    mTailLine.SetSizeMode( SIZE_EQUAL_TO_PARENT );
     mTailLine.SetName( "text-input-popup-tail-line" );
     mTailLine.SetColor( mLineColor );
     mTailLine.SetZ( 0.1f );

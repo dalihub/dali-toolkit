@@ -62,7 +62,8 @@ Actor CreateGrabArea( const std::string& name, const Vector3& relativeScale )
 
   Actor handleGrabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
   handleGrabArea.SetName( name );
-  handleGrabArea.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), RelativeToConstraint( relativeScale ) ) );  // grab area to be larger than text actor
+  handleGrabArea.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
+  handleGrabArea.SetSizeModeFactor( relativeScale );
   handleGrabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
   return handleGrabArea;
