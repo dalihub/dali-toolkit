@@ -81,6 +81,11 @@ private: // From Control
    */
   virtual void OnInitialize();
 
+  /**
+   * @copydoc Control::OnInitialize()
+   */
+  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
+
 private: // Implementation
 
   /**
@@ -88,6 +93,12 @@ private: // Implementation
    * @param[in] text The new "text" property value.
    */
   void SetText( const std::string& text );
+
+  /**
+   * Helper for SetProperty.
+   * @param[in] multiLine The new "multi-line" property value.
+   */
+  void SetMultiLine( bool multiLine );
 
   /**
    * Construct a new TextLabel.

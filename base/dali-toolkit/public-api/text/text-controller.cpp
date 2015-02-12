@@ -18,8 +18,12 @@
 // CLASS HEADER
 #include <dali-toolkit/public-api/text/text-controller.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/text-abstraction/font-client.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/character-set-conversion.h>
+#include <dali-toolkit/public-api/text/layouts/layout-engine.h>
 #include <dali-toolkit/public-api/text/logical-model.h>
 #include <dali-toolkit/public-api/text/text-view.h>
 #include <dali-toolkit/public-api/text/visual-model.h>
@@ -36,6 +40,7 @@ namespace Text
 struct Controller::Impl
 {
   Impl()
+  : mNewTextArrived( false )
   {
     mLogicalModel = LogicalModel::New();
     mVisualModel  = VisualModel::New();
@@ -45,10 +50,15 @@ struct Controller::Impl
     mFontClient = TextAbstraction::FontClient::Get();
   }
 
+  std::string mNewText;
+  bool mNewTextArrived;
+
   LogicalModelPtr mLogicalModel;
   VisualModelPtr  mVisualModel;
 
   View mView;
+
+  LayoutEngine mLayoutEngine;
 
   TextAbstraction::FontClient mFontClient;
 };
@@ -60,24 +70,52 @@ ControllerPtr Controller::New()
 
 void Controller::SetText( const std::string& text )
 {
-  //  Convert text into UTF-32
-  Vector<Character> utf32Characters;
-  utf32Characters.Resize( text.size() );
+  // Keep until size negotiation
+  mImpl->mNewText = text;
+  mImpl->mNewTextArrived = true;
+}
 
-  // This is a bit horrible but std::string returns a (signed) char*
-  const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
+bool Controller::Relayout( const Vector2& size )
+{
+  bool viewUpdated( false );
 
-  Length characterCount = Utf8ToUtf32( utf8, text.size(), &utf32Characters[0] );
+  if( mImpl->mNewTextArrived )
+  {
+    std::string& text = mImpl->mNewText;
 
-  // Manipulate the logical model
-  mImpl->mLogicalModel->SetText( &utf32Characters[0], characterCount );
+    //  Convert text into UTF-32
+    Vector<Character> utf32Characters;
+    utf32Characters.Resize( text.size() );
 
-  UpdateVisualModel();
+    // This is a bit horrible but std::string returns a (signed) char*
+    const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
+
+    Length characterCount = Utf8ToUtf32( utf8, text.size(), &utf32Characters[0] );
+
+    // Manipulate the logical model
+    mImpl->mLogicalModel->SetText( &utf32Characters[0], characterCount );
+
+    // Update the visual model
+    mImpl->mLayoutEngine.UpdateVisualModel( size, *mImpl->mLogicalModel, *mImpl->mVisualModel );
+
+    // Discard temporary text
+    mImpl->mNewTextArrived = false;
+    text.clear();
+
+    viewUpdated = true;
+  }
+
+  return viewUpdated;
 }
 
 View& Controller::GetView()
 {
   return mImpl->mView;
+}
+
+LayoutEngine& Controller::GetLayoutEngine()
+{
+  return mImpl->mLayoutEngine;
 }
 
 Controller::~Controller()
@@ -89,91 +127,6 @@ Controller::Controller()
 : mImpl( NULL )
 {
   mImpl = new Controller::Impl();
-}
-
-// TODO - Move this with LayoutEngine
-void Controller::UpdateVisualModel()
-{
-  if( mImpl->mLogicalModel &&
-      mImpl->mVisualModel )
-  {
-    const LogicalModel& logicalModel = *(mImpl->mLogicalModel);
-    VisualModel& visualModel = *(mImpl->mVisualModel);
-
-    TextAbstraction::FontId fontId = mImpl->mFontClient.GetFontId( "/usr/share/fonts/truetype/ubuntu-font-family/UbuntuMono-R.ttf", 13*64 );
-
-    const Length characterCount = logicalModel.GetNumberOfCharacters();
-
-    Vector<GlyphInfo> glyphs;
-    glyphs.Reserve( characterCount );
-
-    Vector<CharacterIndex> characterIndices;
-    characterIndices.Reserve( characterCount );
-
-    std::vector<Length> charactersPerGlyph;
-    charactersPerGlyph.assign( characterCount, 1 );
-
-    for( unsigned int i=0; i<characterCount; ++i )
-    {
-      Character charcode;
-      logicalModel.GetText( i, &charcode, 1 );
-
-      // TODO - Perform shaping to get correct glyph indices
-      GlyphIndex glyphIndex = mImpl->mFontClient.GetGlyphIndex( fontId, charcode );
-
-      glyphs.PushBack( GlyphInfo(fontId, glyphIndex) );
-      characterIndices.PushBack( 1 );
-    }
-
-    if( mImpl->mFontClient.GetGlyphMetrics( &glyphs[0], glyphs.Size() ) )
-    {
-      visualModel.SetGlyphs( &glyphs[0],
-                             &characterIndices[0],
-                             &charactersPerGlyph[0],
-                             characterCount );
-
-      UpdateVisualPositions();
-    }
-  }
-}
-
-// TODO - Move this with LayoutEngine
-void Controller::UpdateVisualPositions()
-{
-  if( mImpl->mVisualModel )
-  {
-    VisualModel& visualModel = *(mImpl->mVisualModel);
-
-    Length glyphCount = visualModel.GetNumberOfGlyphs();
-
-    std::vector<Vector2> glyphPositions;
-    glyphPositions.reserve( glyphCount );
-
-    if( glyphCount > 0 )
-    {
-      // FIXME Single font assumption
-      Text::FontMetrics fontMetrics;
-      GlyphInfo firstGlyph;
-      visualModel.GetGlyphs( 0, &firstGlyph, 1 );
-      mImpl->mFontClient.GetFontMetrics( firstGlyph.fontId, fontMetrics );
-
-      float penX( 0 );
-      float penY( fontMetrics.ascender ); // Move to baseline
-
-      for( unsigned int i=0; i<glyphCount; ++i )
-      {
-        GlyphInfo glyph;
-        visualModel.GetGlyphs( i, &glyph, 1 );
-
-        glyphPositions.push_back( Vector2( penX + glyph.xBearing,
-                                           penY - glyph.yBearing ) );
-
-        penX += glyph.advance;
-      }
-
-      visualModel.SetGlyphPositions( &glyphPositions[0], glyphCount );
-    }
-  }
 }
 
 } // namespace Text

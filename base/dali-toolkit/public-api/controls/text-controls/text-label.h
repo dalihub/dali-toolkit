@@ -41,10 +41,12 @@ class DALI_IMPORT_API TextLabel : public Control
 public:
 
   // Property indices
-  static const Property::Index PROPERTY_TEXT; ///< name "text", type STRING
+  static const Property::Index PROPERTY_TEXT;       ///< name "text", type STRING
+  static const Property::Index PROPERTY_MULTI_LINE; ///< name "multi-line", type BOOLEAN
 
   // Property names
-  static const std::string TEXT_PROPERTY_NAME; ///< Property, name "text", type STRING
+  static const std::string TEXT_PROPERTY_NAME;       ///< Property, name "text", type STRING
+  static const std::string MULTI_LINE_PROPERTY_NAME; ///< Property, name "multi-line", type BOOLEAN
 
   /**
    * Create the TextLabel control.

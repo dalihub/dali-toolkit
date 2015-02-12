@@ -35,6 +35,8 @@ namespace Text
 {
 
 class Controller;
+class LayoutEngine;
+
 typedef IntrusivePtr<Controller> ControllerPtr;
 
 /**
@@ -54,8 +56,6 @@ public:
    */
   static ControllerPtr New();
 
-  // TODO - Layouting options e.g. single vs multi-line
-
   /**
    * @brief Replaces any text previously set.
    *
@@ -65,9 +65,25 @@ public:
   void SetText( const std::string& text );
 
   /**
+   * @brief Triggers a relayout which updates View (if necessary).
+   *
+   * @note UI Controls are expected to minimize calls to this method e.g. call once after size negotiation.
+   * @param[in] size A the size of a bounding box to layout text within.
+   * @return True if the View was updated.
+   */
+  bool Relayout( const Vector2& size );
+
+  /**
+   * @brief Return the layout engine.
+   *
+   * @return A reference to the layout engine.
+   */
+  LayoutEngine& GetLayoutEngine();
+
+  /**
    * @brief Return a view of the text.
    *
-   * @return An interface to the view.
+   * @return A reference to the view.
    */
   View& GetView();
 
@@ -86,10 +102,9 @@ private:
   Controller();
 
   /**
-   * TODO - Move these with LayoutEngine
+   * @brief Populates the visual model.
    */
   void UpdateVisualModel();
-  void UpdateVisualPositions();
 
   // Undefined
   Controller( const Controller& handle );

@@ -62,14 +62,15 @@
 #include <dali-toolkit/public-api/text/character-set-conversion.h>
 #include <dali-toolkit/public-api/text/font-run.h>
 #include <dali-toolkit/public-api/text/logical-model.h>
+#include <dali-toolkit/public-api/text/script.h>
 #include <dali-toolkit/public-api/text/segmentation.h>
 #include <dali-toolkit/public-api/text/multi-language-support.h>
-#include <dali-toolkit/public-api/text/script.h>
 #include <dali-toolkit/public-api/text/text-controller.h>
 #include <dali-toolkit/public-api/text/text-definitions.h>
 #include <dali-toolkit/public-api/text/text-view.h>
 #include <dali-toolkit/public-api/text/text-view-interface.h>
 #include <dali-toolkit/public-api/text/visual-model.h>
+#include <dali-toolkit/public-api/text/layouts/layout-engine.h>
 #include <dali-toolkit/public-api/text/rendering/text-renderer.h>
 #include <dali-toolkit/public-api/text/rendering/basic/text-basic-renderer.h>
 #include <dali-toolkit/public-api/text/rendering/shaders/text-basic-shader.h>
