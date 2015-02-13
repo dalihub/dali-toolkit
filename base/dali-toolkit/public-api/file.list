@@ -38,6 +38,7 @@ public_api_base_src_files = \
   $(public_api_base_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect.cpp \
   $(public_api_base_src_dir)/controls/table-view/table-view.cpp \
   $(public_api_base_src_dir)/controls/text-controls/text-label.cpp \
+  $(public_api_base_src_dir)/text/bidirectional-support.cpp \
   $(public_api_base_src_dir)/text/character-set-conversion.cpp \
   $(public_api_base_src_dir)/text/logical-model.cpp \
   $(public_api_base_src_dir)/text/multi-language-support.cpp \
@@ -126,6 +127,7 @@ public_api_base_text_controls_header_files = \
   $(public_api_base_src_dir)/controls/text-controls/text-label.h
 
 public_api_base_text_header_files = \
+  $(public_api_base_src_dir)/text/bidirectional-support.h \
   $(public_api_base_src_dir)/text/character-run.h \
   $(public_api_base_src_dir)/text/character-set-conversion.h \
   $(public_api_base_src_dir)/text/font-run.h \
