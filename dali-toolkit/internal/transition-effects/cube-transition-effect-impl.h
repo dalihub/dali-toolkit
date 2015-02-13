@@ -25,6 +25,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/transition-effects/cube-transition-effect.h>
@@ -249,7 +250,13 @@ private:
    * Set image and pixelArea to tiles
    * @param[in] image The image content of the imageActor for transition
    */
-  void OnImageLoaded(Image image);
+  void OnImageLoaded(ResourceImage image);
+
+  /**
+   * Set sub-image to each tile.
+   * @param[in] image The image content of the imageActor for transition
+   */
+  void PrepareTiles( Image image );
 
   /**
    * Callback function of transition animation finished

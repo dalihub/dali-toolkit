@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
@@ -148,7 +149,7 @@ void ScrollBar::OnInitialize()
 {
   Actor self = Self();
 
-  Image indicatorImage = Image::New( DEFAULT_INDICATOR_IMAGE_PATH );
+  Image indicatorImage = ResourceImage::New( DEFAULT_INDICATOR_IMAGE_PATH );
   mIndicator = ImageActor::New( indicatorImage );
   mIndicator.SetNinePatchBorder( DEFAULT_INDICATOR_NINE_PATCH_BORDER );
   mIndicator.SetStyle( ImageActor::STYLE_NINE_PATCH );

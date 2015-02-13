@@ -380,7 +380,7 @@ int UtcDaliControlBackgroundImage(void)
   DALI_TEST_CHECK( !control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
 
-  Image image = Image::New("TestImage");
+  Image image = ResourceImage::New("TestImage");
   control.SetBackground( image );
   DALI_TEST_CHECK( control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::WHITE, TEST_LOCATION );

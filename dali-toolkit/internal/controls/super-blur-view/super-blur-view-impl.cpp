@@ -266,7 +266,7 @@ void SuperBlurView::OnControlSizeSet( const Vector3& targetSize )
     {
       float exponent = static_cast<float>(i+1);
       mBlurredImage[i] = FrameBufferImage::New( mTargetSize.width/std::pow(2.f,exponent) , mTargetSize.height/std::pow(2.f,exponent),
-                                                GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT, Dali::Image::Never );
+                                                GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT, Dali::Image::NEVER );
     }
   }
 }

@@ -24,6 +24,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali/public-api/images/resource-image.h>
 
 #include <sstream>
 
@@ -439,7 +440,7 @@ void Slider::SetBackingImageName( const std::string& imageName )
 {
   if( mBacking && imageName != String::EMPTY )
   {
-    Image image = Image::New( imageName );
+    Image image = ResourceImage::New( imageName );
     mBacking.SetImage( image );
   }
 }
@@ -448,7 +449,7 @@ std::string Slider::GetBackingImageName()
 {
   if( mBacking )
   {
-    return mBacking.GetImage().GetFilename();
+    return ResourceImage::DownCast( mBacking.GetImage() ).GetUrl();
   }
 
   return std::string( "" );
@@ -468,7 +469,7 @@ void Slider::SetProgressImageName( const std::string& imageName )
 {
   if( mProgress && imageName != String::EMPTY )
   {
-    Image image = Image::New( imageName );
+    Image image = ResourceImage::New( imageName );
     mProgress.SetImage( image );
   }
 }
@@ -477,7 +478,7 @@ std::string Slider::GetProgressImageName()
 {
   if( mProgress )
   {
-    return mProgress.GetImage().GetFilename();
+    return ResourceImage::DownCast( mProgress.GetImage()).GetUrl();
   }
 
   return std::string( "" );
@@ -497,7 +498,7 @@ void Slider::CreatePopupImage( const std::string& imageName )
 {
   if( mPopup && imageName != String::EMPTY )
   {
-    Image image = Image::New( imageName );
+    Image image = ResourceImage::New( imageName );
     mPopup.SetImage( image );
   }
 }
@@ -516,7 +517,7 @@ void Slider::CreatePopupArrowImage( const std::string& imageName )
 {
   if( mPopupArrow && imageName != String::EMPTY )
   {
-    Image image = Image::New( imageName );
+    Image image = ResourceImage::New( imageName );
     mPopupArrow.SetImage( image );
   }
 }
@@ -575,7 +576,7 @@ void Slider::SetHandleImageName( const std::string& imageName )
 {
   if( mHandle && imageName != String::EMPTY )
   {
-    Image image = Image::New( imageName );
+    Image image = ResourceImage::New( imageName );
     mHandle.SetImage( image );
   }
 }
@@ -584,7 +585,7 @@ std::string Slider::GetHandleImageName()
 {
   if( mHandle )
   {
-    return mHandle.GetImage().GetFilename();
+    return ResourceImage::DownCast( mHandle.GetImage() ).GetUrl();
   }
 
   return std::string( "" );

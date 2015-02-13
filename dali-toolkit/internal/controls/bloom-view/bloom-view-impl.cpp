@@ -357,9 +357,9 @@ void BloomView::AllocateResources()
     // Create render targets
 
     // create off screen buffer of new size to render our child actors to
-    mRenderTargetForRenderingChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::Unused );
-    mBloomExtractTarget = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat, Dali::Image::Unused );
-    mOutputRenderTarget = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::Unused );
+    mRenderTargetForRenderingChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
+    mBloomExtractTarget = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat, Dali::Image::UNUSED );
+    mOutputRenderTarget = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED);
 
 
     //////////////////////////////////////////////////////

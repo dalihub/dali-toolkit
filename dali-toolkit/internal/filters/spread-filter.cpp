@@ -100,7 +100,7 @@ void SpreadFilter::Enable()
   mActorForInput.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
 
   // create internal offscreen for result of horizontal pass
-  mImageForHorz = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::Unused );
+  mImageForHorz = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::UNUSED );
 
   // create an actor to render mImageForHorz for vertical blur pass
   mActorForHorz = ImageActor::New( mImageForHorz );

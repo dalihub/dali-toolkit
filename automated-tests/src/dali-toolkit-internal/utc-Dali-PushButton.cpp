@@ -675,7 +675,7 @@ int UtcDaliPushButtonProperties(void)
 
   //  Button::PROPERTY_NORMAL_STATE_ACTOR
   {
-    button.SetButtonImage( Image::New( "IMAGE_PATH_1") );
+    button.SetButtonImage( ResourceImage::New( "IMAGE_PATH_1") );
     DALI_TEST_EQUALS( "IMAGE_PATH_1", button.GetProperty( Button::PROPERTY_NORMAL_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;
@@ -687,7 +687,7 @@ int UtcDaliPushButtonProperties(void)
 
   //  Button::PROPERTY_SELECTED_STATE_ACTOR
   {
-    button.SetSelectedImage( Image::New( "IMAGE_PATH_2") );
+    button.SetSelectedImage( ResourceImage::New( "IMAGE_PATH_2") );
     DALI_TEST_EQUALS( "IMAGE_PATH_2", button.GetProperty( Button::PROPERTY_SELECTED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;
@@ -700,7 +700,7 @@ int UtcDaliPushButtonProperties(void)
 
   //  Button::PROPERTY_DISABLED_STATE_ACTOR
   {
-    button.SetDisabledImage( Image::New( "IMAGE_PATH_3") );
+    button.SetDisabledImage( ResourceImage::New( "IMAGE_PATH_3") );
     DALI_TEST_EQUALS( "IMAGE_PATH_3", button.GetProperty( Button::PROPERTY_DISABLED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;

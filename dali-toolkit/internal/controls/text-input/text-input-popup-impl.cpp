@@ -19,6 +19,7 @@
 #include <libintl.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-input/text-input-popup-impl.h>
@@ -274,14 +275,14 @@ void TextInputPopup::CreateBackground()
   // Create background-panel if not already created (required if we have at least one option)
   if ( !mBackground )
   {
-    Image bgImg = Image::New( POPUP_BACKGROUND );
+    Image bgImg = ResourceImage::New( POPUP_BACKGROUND );
     mBackground = ImageActor::New( bgImg );
     mBackground.SetAnchorPoint( AnchorPoint::CENTER );
     mBackground.SetParentOrigin( ParentOrigin::CENTER );
     mBackground.SetName( "text-input-popup-background" );
     mBackground.SetColor( mBackgroundColor );
 
-    Image bgEffectImg = Image::New( POPUP_BACKGROUND_EFFECT );
+    Image bgEffectImg = ResourceImage::New( POPUP_BACKGROUND_EFFECT );
     mBackgroundEffect = ImageActor::New( bgEffectImg );
     mBackgroundEffect.SetAnchorPoint( AnchorPoint::CENTER );
     mBackgroundEffect.SetParentOrigin( ParentOrigin::CENTER );
@@ -290,7 +291,7 @@ void TextInputPopup::CreateBackground()
     mBackgroundEffect.SetZ( 1.0f );
     mBackground.Add( mBackgroundEffect );
 
-    Image bgLine = Image::New( POPUP_BACKGROUND_LINE );
+    Image bgLine = ResourceImage::New( POPUP_BACKGROUND_LINE );
     mBackgroundLine = ImageActor::New( bgLine );
     mBackgroundLine.SetAnchorPoint( AnchorPoint::CENTER);
     mBackgroundLine.SetParentOrigin( ParentOrigin::CENTER );
@@ -308,7 +309,7 @@ void TextInputPopup::CreateTail()
 {
   if ( !mTail )
   {
-    Image tail = Image::New( POPUP_TAIL_BOTTOM );
+    Image tail = ResourceImage::New( POPUP_TAIL_BOTTOM );
     mTail = ImageActor::New( tail );
     mTail.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
     mTail.SetAnchorPoint( AnchorPoint::TOP_CENTER );
@@ -316,7 +317,7 @@ void TextInputPopup::CreateTail()
     mTail.SetPosition( 0.0f, POPUP_TAIL_Y_OFFSET - POPUP_BORDER.w, 1.2f );
     mTail.SetColor( mBackgroundColor );
 
-    Image tailEffect = Image::New( POPUP_TAIL_BOTTOM_EFFECT );
+    Image tailEffect = ResourceImage::New( POPUP_TAIL_BOTTOM_EFFECT );
     mTailEffect = ImageActor::New( tailEffect );
     mTailEffect.SetParentOrigin( ParentOrigin::CENTER );
     mTailEffect.SetAnchorPoint( AnchorPoint::CENTER );
@@ -325,7 +326,7 @@ void TextInputPopup::CreateTail()
     mTailEffect.SetZ( 0.1f );
     mTail.Add( mTailEffect );
 
-    Image tailLine = Image::New( POPUP_TAIL_BOTTOM_LINE );
+    Image tailLine = ResourceImage::New( POPUP_TAIL_BOTTOM_LINE );
     mTailLine = ImageActor::New( tailLine );
     mTailLine.SetParentOrigin( ParentOrigin::CENTER );
     mTailLine.SetAnchorPoint( AnchorPoint::CENTER );
@@ -389,37 +390,37 @@ void TextInputPopup::CreateOrderedListOfOptions()
     {
       case ButtonsCut:
       {
-        Image cutIcon = Image::New( OPTION_ICON_CUT );
+        Image cutIcon = ResourceImage::New( OPTION_ICON_CUT );
         currentButton = CreateRequiredButton( ButtonsCut, mCutOptionPriority, OPTION_CUT, GET_LOCALE_TEXT("IDS_COM_BODY_CUT"), cutIcon, false );
         break;
       }
       case ButtonsCopy:
       {
-        Image copyIcon = Image::New( OPTION_ICON_COPY );
+        Image copyIcon = ResourceImage::New( OPTION_ICON_COPY );
         currentButton = CreateRequiredButton( ButtonsCopy, mCopyOptionPriority, OPTION_COPY, GET_LOCALE_TEXT("IDS_COM_BODY_COPY"), copyIcon, false );
         break;
       }
       case ButtonsPaste:
       {
-        Image pasteIcon = Image::New( OPTION_ICON_PASTE );
+        Image pasteIcon = ResourceImage::New( OPTION_ICON_PASTE );
         currentButton = CreateRequiredButton( ButtonsPaste, mPasteOptionPriority, OPTION_PASTE, GET_LOCALE_TEXT("IDS_COM_BODY_PASTE"), pasteIcon, false );
         break;
       }
       case ButtonsSelect:
       {
-        Image selectIcon = Image::New( OPTION_ICON_SELECT );
+        Image selectIcon = ResourceImage::New( OPTION_ICON_SELECT );
         currentButton = CreateRequiredButton( ButtonsSelect, mSelectOptionPriority, OPTION_SELECT_WORD, GET_LOCALE_TEXT("IDS_COM_SK_SELECT"), selectIcon, false );
         break;
       }
       case ButtonsSelectAll:
       {
-        Image selectAllIcon = Image::New( OPTION_ICON_SELECT_ALL );
+        Image selectAllIcon = ResourceImage::New( OPTION_ICON_SELECT_ALL );
         currentButton = CreateRequiredButton( ButtonsSelectAll, mSelectAllOptionPriority, OPTION_SELECT_ALL, GET_LOCALE_TEXT("IDS_COM_BODY_SELECT_ALL"), selectAllIcon, false );
         break;
       }
       case ButtonsClipboard:
       {
-        Image clipboardIcon = Image::New( OPTION_ICON_CLIPBOARD );
+        Image clipboardIcon = ResourceImage::New( OPTION_ICON_CLIPBOARD );
         currentButton = CreateRequiredButton( ButtonsClipboard, mClipboardOptionPriority, OPTION_CLIPBOARD, GET_LOCALE_TEXT("IDS_COM_BODY_CLIPBOARD"), clipboardIcon, false );
         break;
       }
@@ -854,9 +855,9 @@ void TextInputPopup::SetTailPosition( const Vector3& position, bool yAxisFlip )
 
   if ( yAxisFlip )
   {
-    Image tail = Image::New( POPUP_TAIL_TOP );
-    Image tailEffect = Image::New( POPUP_TAIL_TOP_EFFECT );
-    Image tailLine = Image::New( POPUP_TAIL_TOP_LINE );
+    Image tail = ResourceImage::New( POPUP_TAIL_TOP );
+    Image tailEffect = ResourceImage::New( POPUP_TAIL_TOP_EFFECT );
+    Image tailLine = ResourceImage::New( POPUP_TAIL_TOP_LINE );
 
     mTail.SetImage( tail );
     mTailEffect.SetImage( tailEffect );

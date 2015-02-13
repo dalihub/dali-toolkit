@@ -27,6 +27,7 @@
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/button.h>
@@ -340,7 +341,7 @@ void Popup::ShowTail(const Vector3& position)
 
   if(image != "")
   {
-    Image tail = Image::New( image );
+    Image tail = ResourceImage::New( image );
     mTailImage = ImageActor::New(tail);
     const Vector3 anchorPoint = AnchorPoint::FRONT_BOTTOM_RIGHT - position;
 
@@ -369,12 +370,12 @@ PopupStylePtr Popup::GetStyle() const
 
 void Popup::SetDefaultBackgroundImage()
 {
-  Image bg = Image::New( mPopupStyle->backgroundImage );
+  Image bg = ResourceImage::New( mPopupStyle->backgroundImage );
   ImageActor bgImage = ImageActor::New( bg );
   bgImage.SetStyle( ImageActor::STYLE_NINE_PATCH );
   bgImage.SetNinePatchBorder( mPopupStyle->backgroundScale9Border );
 
-  Image buttonBg = Image::New( mPopupStyle->buttonAreaImage );
+  Image buttonBg = ResourceImage::New( mPopupStyle->buttonAreaImage );
   ImageActor buttonBgImage = ImageActor::New( buttonBg );
   buttonBgImage.SetStyle( ImageActor::STYLE_NINE_PATCH );
   buttonBgImage.SetNinePatchBorder( mPopupStyle->buttonArea9PatchBorder );

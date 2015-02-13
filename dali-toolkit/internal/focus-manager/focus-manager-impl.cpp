@@ -25,6 +25,7 @@
 #include <dali/public-api/adaptor-framework/tts-player.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/events/hit-test-algorithm.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -658,7 +659,7 @@ void FocusManager::SetFocusable(Actor actor, bool focusable)
 void FocusManager::CreateDefaultFocusIndicatorActor()
 {
   // Create a focus indicator actor shared by all the focusable actors
-  Image borderImage = Image::New(FOCUS_BORDER_IMAGE_PATH);
+  Image borderImage = ResourceImage::New(FOCUS_BORDER_IMAGE_PATH);
 
   ImageActor focusIndicator = ImageActor::New(borderImage);
   focusIndicator.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION_PLUS_LOCAL_POSITION );

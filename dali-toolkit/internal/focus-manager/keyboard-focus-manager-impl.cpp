@@ -26,6 +26,7 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -458,7 +459,7 @@ Actor KeyboardFocusManager::GetFocusIndicatorActor()
 void KeyboardFocusManager::CreateDefaultFocusIndicatorActor()
 {
   // Create a focus indicator actor shared by all the keyboard focusable actors
-  Image borderImage = Image::New(FOCUS_BORDER_IMAGE_PATH);
+  Image borderImage = ResourceImage::New(FOCUS_BORDER_IMAGE_PATH);
 
   ImageActor focusIndicator = ImageActor::New(borderImage);
   focusIndicator.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION_PLUS_LOCAL_POSITION );

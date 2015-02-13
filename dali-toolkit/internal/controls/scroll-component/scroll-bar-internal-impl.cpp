@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/enums.h>
@@ -367,7 +368,7 @@ ScrollBarInternal::ScrollBarInternal(Toolkit::Scrollable& container, bool vertic
   mAxisMask(vertical ? Vector3::YAXIS : Vector3::XAXIS),
   mDragMode(false)
 {
-  Image sliderImage = Image::New( BAR_TAB_IMAGE_PATH );
+  Image sliderImage = ResourceImage::New( BAR_TAB_IMAGE_PATH );
 
   mSlider = ImageActor::New( sliderImage );
   mSlider.SetParentOrigin( ParentOrigin::TOP_LEFT );

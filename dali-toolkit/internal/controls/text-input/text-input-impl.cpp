@@ -30,6 +30,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-view/text-processor.h>
@@ -3021,7 +3022,7 @@ void TextInput::CreateGrabHandle( Dali::Image image )
   {
     if ( !image )
     {
-      mGrabHandleImage = Image::New(DEFAULT_GRAB_HANDLE);
+      mGrabHandleImage = ResourceImage::New(DEFAULT_GRAB_HANDLE);
     }
     else
     {
@@ -3270,8 +3271,8 @@ void TextInput::CreateSelectionHandles( std::size_t start, std::size_t end, Dali
   if ( !mSelectionHandleOne )
   {
     // create normal and pressed images
-    mSelectionHandleOneImage = Image::New( DEFAULT_SELECTION_HANDLE_ONE );
-    mSelectionHandleOneImagePressed = Image::New( DEFAULT_SELECTION_HANDLE_ONE_PRESSED );
+    mSelectionHandleOneImage = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE );
+    mSelectionHandleOneImagePressed = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE_PRESSED );
 
     mSelectionHandleOne = ImageActor::New( mSelectionHandleOneImage );
     mSelectionHandleOne.SetName("SelectionHandleOne");
@@ -3298,8 +3299,8 @@ void TextInput::CreateSelectionHandles( std::size_t start, std::size_t end, Dali
   if ( !mSelectionHandleTwo )
   {
     // create normal and pressed images
-    mSelectionHandleTwoImage = Image::New( DEFAULT_SELECTION_HANDLE_TWO );
-    mSelectionHandleTwoImagePressed = Image::New( DEFAULT_SELECTION_HANDLE_TWO_PRESSED );
+    mSelectionHandleTwoImage = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO );
+    mSelectionHandleTwoImagePressed = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO_PRESSED );
 
     mSelectionHandleTwo = ImageActor::New( mSelectionHandleTwoImage );
     mSelectionHandleTwo.SetName("SelectionHandleTwo");

@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
@@ -44,7 +45,7 @@ Alignment CreateAlignedImage( Actor image )
 
 Alignment CreateAlignedImage( const std::string& imagePath )
 {
-  Image image = Image::New( imagePath );
+  Image image = ResourceImage::New( imagePath );
 
   return CreateAlignedImage( ImageActor::New( image ) );
 }

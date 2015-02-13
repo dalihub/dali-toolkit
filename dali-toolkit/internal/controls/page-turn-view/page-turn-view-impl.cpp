@@ -376,7 +376,7 @@ void PageTurnView::SetupRenderTasks()
     Self().Add( mPageSourceActor[i] );
     mPageSourceActor[i].SetSensitive( false );
 
-    mRenderedPage[i] = FrameBufferImage::New( mControlSize.width, mControlSize.height, Pixel::RGB8888, Image::Unused );
+    mRenderedPage[i] = FrameBufferImage::New( mControlSize.width, mControlSize.height, Pixel::RGB8888, Image::UNUSED );
     mOffscreenTask[i] = taskList.CreateTask();
     mOffscreenTask[i].SetRefreshRate( RenderTask::REFRESH_ONCE );
     mOffscreenTask[i].SetCameraActor(mCameraActor);

@@ -24,6 +24,7 @@
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-input/text-input-handles-impl.h>
@@ -493,7 +494,7 @@ ImageActor Decorator::CreateCursor( Image cursorImage, const Vector4& border, co
   }
   else
   {
-    cursor = ImageActor::New( Image::New( DEFAULT_CURSOR ) );
+    cursor = ImageActor::New( ResourceImage::New( DEFAULT_CURSOR ) );
   }
 
   cursor.SetStyle(ImageActor::STYLE_NINE_PATCH);
@@ -506,7 +507,7 @@ ImageActor Decorator::CreateCursor( Image cursorImage, const Vector4& border, co
 
 void Decorator::CreateCursors( Actor targetParent )
 {
-  Image mCursorImage = Image::New( DEFAULT_CURSOR );
+  Image mCursorImage = ResourceImage::New( DEFAULT_CURSOR );
   mCursor = CreateCursor (mCursorImage, DEFAULT_CURSOR_IMAGE_9_BORDER , "mainCursor");
   mCursorRTL = CreateCursor ( mCursorImage, DEFAULT_CURSOR_IMAGE_9_BORDER, "rtlCursor");
   targetParent.Add( mCursor );

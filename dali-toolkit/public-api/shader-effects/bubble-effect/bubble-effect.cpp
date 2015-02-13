@@ -52,7 +52,7 @@ BubbleEffect::~BubbleEffect()
 {
 }
 
-BubbleEffect BubbleEffect::New( unsigned int numberOfBubble, const std::string& shapeImagePath)
+BubbleEffect BubbleEffect::New( unsigned int numberOfBubble)
 {
   std::ostringstream vertexShaderStringStream;
   vertexShaderStringStream << "#define NUMBER_OF_BUBBLE "<< numberOfBubble << "\n";
@@ -60,8 +60,6 @@ BubbleEffect BubbleEffect::New( unsigned int numberOfBubble, const std::string& 
     "  precision mediump float;\n"
     // the gravity applied to the y direction
     "  uniform float uGravity; \n"
-    // Width of the texture in pixels
-    "  uniform float uShapeWidth; \n"
     // xy: the emit position of the bubble; zw: the destinationof the bubble.
     // The bubble is moving from (xy) to (zw plus the y drop influenced by gravity).
     "  uniform vec4 uStartAndEndPos[NUMBER_OF_BUBBLE];\n"
@@ -118,9 +116,7 @@ BubbleEffect BubbleEffect::New( unsigned int numberOfBubble, const std::string& 
     "    gl_Position = uMvpMatrix * position;\n"
     "\n"
     // Add multiple bubble shapes in the effect
-    "    mediump float texCoordX = floor( mod(startAndEnd.z, uShapeWidth) );\n "
-    "    mediump float texCoordY = floor( mod(startAndEnd.w, uShapeWidth) );\n "
-    "    vTexCoord = vec2( (texCoordX + aTexCoord.x)/ uShapeWidth,(texCoordY + aTexCoord.y)/ uShapeWidth );\n"
+    "    vTexCoord = aTexCoord;\n"
     "    vPercentage = percentage;\n"
     // Use the emit position color for the bubble
     "    vEffectTexCoord = startAndEnd.xy * uInvertedMovementArea;\n"
@@ -156,10 +152,6 @@ BubbleEffect BubbleEffect::New( unsigned int numberOfBubble, const std::string& 
   handle.SetUniform( "uGravity", 50.f );
   handle.SetUniform( "uMagnification", 1.f );
   handle.SetUniform( "uDynamicScale", 1.f );
-
-  //Get pixel width of the shape
-  float width = Image::GetImageSize(shapeImagePath).width;
-  handle.SetUniform( "uShapeWidth", (width/EACH_WIDTH_PER_SHAPE) );
 
   Vector4 zeroVector;
   for( unsigned int i=0; i<numberOfBubble; i++ )
@@ -211,11 +203,6 @@ void BubbleEffect::SetPercentage( unsigned int index, float percentage )
 void BubbleEffect::SetGravity( float gravity )
 {
   SetUniform( "uGravity", gravity );
-}
-
-void BubbleEffect::SetShapeImageWidth( float imageWidth )
-{
-  SetUniform( "uShapeWidth", (imageWidth/EACH_WIDTH_PER_SHAPE) );
 }
 
 void BubbleEffect::SetDynamicScale( float scale )

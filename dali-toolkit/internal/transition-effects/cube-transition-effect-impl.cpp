@@ -179,19 +179,21 @@ void CubeTransitionEffect::SetTargetImage( ImageActor imageActor )
 void CubeTransitionEffect::SetImage( ImageActor imageActor )
 {
   mCurrentImage = imageActor;
-  mIsImageLoading = true;
 
   Image image = imageActor.GetImage();
+  ResourceImage resourceImage = ResourceImage::DownCast( image );
   mBufferIndex = mBufferIndex^1;
 
   //must make sure the image is already loaded before using its attributes
-  if( image.GetLoadingState() == ResourceLoadingSucceeded )
+  if( resourceImage && resourceImage.GetLoadingState() != ResourceLoadingSucceeded )
   {
-    OnImageLoaded( image );
+    mIsImageLoading = true;
+    resourceImage.LoadingFinishedSignal().Connect( this, &CubeTransitionEffect::OnImageLoaded );
   }
   else
   {
-    image.LoadingFinishedSignal().Connect( this, &CubeTransitionEffect::OnImageLoaded );
+    mIsImageLoading = false;
+    PrepareTiles( image );
   }
 }
 
@@ -299,12 +301,21 @@ void CubeTransitionEffect::StopTransition()
   }
 }
 
-void CubeTransitionEffect::OnImageLoaded(Image image)
+void CubeTransitionEffect::OnImageLoaded(ResourceImage image)
+{
+  mIsImageLoading = false;
+  PrepareTiles( image );
+}
+
+/**
+ * Set sub-image to each tile.
+ * @param[in] image The image content of the imageActor for transition
+ */
+void CubeTransitionEffect::PrepareTiles( Image image )
 {
   // Fit the image to view area, while keeping the aspect; FitKeepAspectRatio(imageSize, viewAreaSize)
-  ImageAttributes attributes( image.GetAttributes() );
-  float scale = std::min(  mViewAreaSize.width / attributes.GetWidth(), mViewAreaSize.height / attributes.GetHeight() );
-  Vector2 imageSize(attributes.GetWidth()*scale, attributes.GetHeight()*scale);
+  float scale = std::min(  mViewAreaSize.width / image.GetWidth(), mViewAreaSize.height / image.GetHeight() );
+  Vector2 imageSize(image.GetWidth()*scale, image.GetHeight()*scale);
 
   mFullImageCreator.SetEffectImage(image);
   mFullImageCreator.SetRegionSize(mViewAreaSize, imageSize);
@@ -325,8 +336,8 @@ void CubeTransitionEffect::OnImageLoaded(Image image)
       mTiles[mContainerIndex][idx].SetPixelArea( pixelArea );
     }
   }
-  mIsImageLoading = false;
 }
+
 
 void CubeTransitionEffect::OnTransitionFinished(Animation& source)
 {
