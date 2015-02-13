@@ -50,8 +50,7 @@ ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
 INCLUDE_DIRECTORIES(
     ${${CAPI_LIB}_INCLUDE_DIRS}
     ../dali-toolkit/dali-toolkit-test-utils
-    ../../../base
-    ../../../optional
+    ../../../
 )
 
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
