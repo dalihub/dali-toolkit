@@ -295,6 +295,7 @@ RenderableActor BasicRenderer::Render( Text::ViewInterface& view )
 
     MeshActor actor = MeshActor::New( mImpl->CreateMesh( glyphs, positions, atlas ) );
     actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
     actor.SetAffectedByLighting( false );
 
     ShaderEffect shader = BasicShader::New();
