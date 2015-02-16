@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 #include <dali-toolkit/public-api/text/text-definitions.h>
 
 namespace Dali
@@ -30,29 +31,32 @@ namespace Toolkit
 namespace Text
 {
 
-class LogicalModel;
-
 /**
  * Sets line break info.
  *
- * Any line break info previously set is removed.
+ * Possible values for LineBreakInfo are:
  *
- * @pre The @p model needs to have a text set.
+ *  - 0 is a LINE_MUST_BREAK.  Text must be broken into a new line.
+ *  - 1 is a LINE_ALLOW_BREAK. Is possible to break the text into a new line.
+ *  - 2 is a LINE_NO_BREAK.    Text can't be broken into a new line.
  *
- * @param[in,out] model The text's logical model.
+ * @param[in] text Vector of UTF-32 characters.
+ * @param[out] lineBreakInfo The line break info
  */
-void SetLineBreakInfo( LogicalModel& model );
+void SetLineBreakInfo( const Vector<Character>& text,
+                       Vector<LineBreakInfo>& lineBreakInfo );
 
 /**
  * Sets word break info.
  *
- * Any word break info previously set is removed.
+ * - 0 is a WORD_BREAK.    Text can be broken into a new word.
+ * - 1 is a WORD_NO_BREAK. Text can't be broken into a new word.
  *
- * @pre The @p model needs to have a text set.
- *
- * @param[in,out] model The text's logical model.
+ * @param[in] text Vector of UTF-32 characters.
+ * @param[out] wordBreakInfo The word break info.
  */
-void SetWordBreakInfo( LogicalModel& model );
+void SetWordBreakInfo( const Vector<Character>& text,
+                       Vector<WordBreakInfo>& wordBreakInfo );
 
 } // namespace Text
 

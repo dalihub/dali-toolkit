@@ -93,12 +93,14 @@ public:
   /**
    * @copydoc Dali::MultilanguageSupport::SetScripts()
    */
-  void SetScripts( LogicalModel& model );
-
+  void SetScripts( const Vector<Character>& text,
+                   Vector<ScriptRun>& scripts );
   /**
    * @copydoc Dali::MultilanguageSupport::ValidateFonts()
    */
-  void ValidateFonts( LogicalModel& model );
+  void ValidateFonts( const Vector<Character>& text,
+                      const Vector<ScriptRun>& scripts,
+                      Vector<FontRun>& fonts );
 
 private:
   Vector<FontId>                  mDefaultFontPerScriptCache; ///< Caches the default font for a script.

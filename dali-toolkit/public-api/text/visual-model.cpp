@@ -18,10 +18,13 @@
 // CLASS HEADER
 #include <dali-toolkit/public-api/text/visual-model.h>
 
-// EXTERNAL INCLUDES
-#include <string.h>
-#include <vector>
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/vector2.h>
+
+// EXTERNAL INCLUDES
+#include <memory.h>
+#include <vector>
 
 namespace Dali
 {

@@ -25,6 +25,8 @@
 #include <dali-toolkit/public-api/text/character-set-conversion.h>
 #include <dali-toolkit/public-api/text/layouts/layout-engine.h>
 #include <dali-toolkit/public-api/text/logical-model.h>
+#include <dali-toolkit/public-api/text/multi-language-support.h>
+#include <dali-toolkit/public-api/text/script-run.h>
 #include <dali-toolkit/public-api/text/text-view.h>
 #include <dali-toolkit/public-api/text/visual-model.h>
 
@@ -91,9 +93,23 @@ bool Controller::Relayout( const Vector2& size )
     const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
 
     Length characterCount = Utf8ToUtf32( utf8, text.size(), &utf32Characters[0] );
+    utf32Characters.Resize( characterCount );
+
+    Vector<ScriptRun> scripts;
+    MultilanguageSupport multilanguageSupport = MultilanguageSupport::Get();
+
+    multilanguageSupport.SetScripts( utf32Characters,
+                                     scripts );
+
+    Vector<FontRun> fonts;
+    multilanguageSupport.ValidateFonts( utf32Characters,
+                                        scripts,
+                                        fonts );
 
     // Manipulate the logical model
     mImpl->mLogicalModel->SetText( &utf32Characters[0], characterCount );
+    mImpl->mLogicalModel->SetScripts( &scripts[0], scripts.Count() );
+    mImpl->mLogicalModel->SetFonts( &fonts[0], fonts.Count() );
 
     // Update the visual model
     mImpl->mLayoutEngine.UpdateVisualModel( size, *mImpl->mLogicalModel, *mImpl->mVisualModel );

@@ -19,10 +19,10 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/text-definitions.h>
-
-// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/base-handle.h>
+#include <dali-toolkit/public-api/text/font-run.h>
+#include <dali-toolkit/public-api/text/script-run.h>
 
 namespace Dali
 {
@@ -78,15 +78,13 @@ public:
   /**
    * @brief Sets the scripts of the whole text.
    *
-   * Any script info previously set is removed.
-   *
    * Scripts are used to validate and set default fonts and to shape the text in further steps.
    *
-   * @pre The @p model needs to have a text set.
-   *
-   * @param[in,out] model The text's logical model.
+   * @param[in] text Vector of UTF-32 characters.
+   * @param[out] scripts Vector containing the script runs for the whole text.
    */
-  void SetScripts( LogicalModel& model );
+  void SetScripts( const Vector<Character>& text,
+                   Vector<ScriptRun>& scripts );
 
   /**
    * @brief Validates the character's font of the whole text.
@@ -101,12 +99,13 @@ public:
    * If a font has been set by the application developer, this method checks if the font supports the character.
    * If it doesn't, this method replaces it by a default one.
    *
-   * @pre The @p model needs to have a text set.
-   * @pre The @p model needs to have the scripts set.
-   *
-   * @param[in,out] model The text's logical model.
+   * @param[in] text Vector of UTF-32 characters.
+   * @param[in] scripts Vector containing the script runs for the whole text.
+   * @param[in,out] fonts Initially contains the fonts set by the application developers. Returns the validated fonts.
    */
-  void ValidateFonts( LogicalModel& model );
+  void ValidateFonts( const Vector<Character>& text,
+                      const Vector<ScriptRun>& scripts,
+                      Vector<FontRun>& fonts );
 };
 
 } // namespace Text

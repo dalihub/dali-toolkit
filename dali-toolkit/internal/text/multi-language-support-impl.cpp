@@ -20,11 +20,15 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/singleton-service.h>
+#include <dali/public-api/text-abstraction/font-client.h>
 #include <dali-toolkit/public-api/text/logical-model.h>
 #include <dali-toolkit/public-api/text/font-run.h>
 #include <dali-toolkit/public-api/text/script.h>
 #include <dali-toolkit/public-api/text/script-run.h>
 #include <dali/integration-api/debug.h>
+
+// EXTERNAL INCLUDES
+#include <memory.h>
 
 namespace Dali
 {
@@ -179,10 +183,10 @@ Text::MultilanguageSupport MultilanguageSupport::Get()
   return multilanguageSupportHandle;
 }
 
-void MultilanguageSupport::SetScripts( LogicalModel& model )
+void MultilanguageSupport::SetScripts( const Vector<Character>& text,
+                                       Vector<ScriptRun>& scripts )
 {
-  // 1) Retrieve the text from the model.
-  const Length numberOfCharacters = model.GetNumberOfCharacters();
+  const Length numberOfCharacters = text.Count();
 
   if( 0u == numberOfCharacters )
   {
@@ -190,14 +194,7 @@ void MultilanguageSupport::SetScripts( LogicalModel& model )
     return;
   }
 
-  Vector<Character> text;
-  text.Resize( numberOfCharacters );
-
-  model.GetText( 0u,
-                 text.Begin(),
-                 numberOfCharacters );
-
-  // 2) Traverse all characters and set the scripts.
+  // Traverse all characters and set the scripts.
 
   // Stores the current script run.
   ScriptRun currentScriptRun;
@@ -205,16 +202,12 @@ void MultilanguageSupport::SetScripts( LogicalModel& model )
   currentScriptRun.characterRun.numberOfCharacters = 0u;
   currentScriptRun.script = TextAbstraction::UNKNOWN;
 
-  // Temporary stores the script runs.
-  std::vector<ScriptRun> scriptRuns;
-  scriptRuns.reserve( numberOfCharacters << 2u ); // To reduce the number of reallocations.
+  // Reserve some space to reduce the number of reallocations.
+  scripts.Reserve( numberOfCharacters << 2u );
 
-  for( Vector<Character>::ConstIterator it = text.Begin(),
-         endIt = text.End();
-       it != endIt;
-       ++it )
+  for( Length index = 0u; index < numberOfCharacters; ++index )
   {
-    const Character character = *it;
+    const Character character = *( text.Begin() + index );
 
     Script script = GetCharacterScript( character );
 
@@ -231,7 +224,7 @@ void MultilanguageSupport::SetScripts( LogicalModel& model )
       if( 0u != currentScriptRun.characterRun.numberOfCharacters )
       {
         // Store the script run.
-        scriptRuns.push_back( currentScriptRun );
+        scripts.PushBack( currentScriptRun );
       }
 
       // Initialize the new one.
@@ -247,19 +240,15 @@ void MultilanguageSupport::SetScripts( LogicalModel& model )
   if( 0u != currentScriptRun.characterRun.numberOfCharacters )
   {
     // Store the last run.
-    scriptRuns.push_back( currentScriptRun );
+    scripts.PushBack( currentScriptRun );
   }
-
-  // 3) Set the script runs into the model.
-
-  model.SetScripts( &scriptRuns[0u],
-                    scriptRuns.size() );
 }
 
-void MultilanguageSupport::ValidateFonts( LogicalModel& model )
+void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
+                                          const Vector<ScriptRun>& scripts,
+                                          Vector<FontRun>& fonts )
 {
-  // 1) Retrieve the text from the model.
-  const Length numberOfCharacters = model.GetNumberOfCharacters();
+  const Length numberOfCharacters = text.Count();
 
   if( 0u == numberOfCharacters )
   {
@@ -267,47 +256,19 @@ void MultilanguageSupport::ValidateFonts( LogicalModel& model )
     return;
   }
 
-  Vector<Character> text;
-  text.Resize( numberOfCharacters );
+  // Copy the fonts set by application developers.
+  const Length numberOfFontRuns = fonts.Count();
+  const Vector<FontRun> definedFonts = fonts;
+  fonts.Clear();
 
-  Character* textBuffer = text.Begin();
-  model.GetText( 0u,
-                 textBuffer,
-                 numberOfCharacters );
-
-  // 2) Retrieve any font previously set.
-
-  const Length numberOfFontRuns = model.GetNumberOfFontRuns( 0u, numberOfCharacters );
-
-  Vector<FontRun> fontRuns;
-  fontRuns.Reserve( numberOfFontRuns );
-
-  FontRun* fontRunsBuffer = fontRuns.Begin();
-  model.GetFontRuns( fontRunsBuffer,
-                     0u,
-                     numberOfCharacters );
-
-  // 3) Retrieve the scripts from the model.
-
-  const Length numberOfScriptRuns = model.GetNumberOfScriptRuns( 0u, numberOfCharacters );
-
-  Vector<ScriptRun> scriptRuns;
-  scriptRuns.Reserve( numberOfScriptRuns );
-
-  ScriptRun* scriptRunsBuffer = scriptRuns.Begin();
-  model.GetScriptRuns( scriptRunsBuffer,
-                       0u,
-                       numberOfCharacters );
-
-  // 4) Traverse the characters and validate/set the fonts.
+  // Traverse the characters and validate/set the fonts.
 
   // Get the caches.
   FontId* defaultFontPerScriptCacheBuffer = mDefaultFontPerScriptCache.Begin();
   ValidateFontsPerScript** validFontsPerScriptCacheBuffer = mValidFontsPerScriptCache.Begin();
 
   // Stores the validated font runs.
-  Vector<FontRun> validatedFontRuns;
-  validatedFontRuns.Reserve( numberOfFontRuns );
+  fonts.Reserve( numberOfFontRuns );
 
   // Initializes a validated font run.
   FontRun currentFontRun;
@@ -320,15 +281,15 @@ void MultilanguageSupport::ValidateFonts( LogicalModel& model )
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
 
   // Iterators of the font and script runs.
-  Vector<FontRun>::ConstIterator fontRunIt = fontRuns.Begin();
-  Vector<FontRun>::ConstIterator fontRunEndIt = fontRuns.End();
-  Vector<ScriptRun>::ConstIterator scriptRunIt = scriptRuns.Begin();
-  Vector<ScriptRun>::ConstIterator scriptRunEndIt = scriptRuns.End();
+  Vector<FontRun>::ConstIterator fontRunIt = definedFonts.Begin();
+  Vector<FontRun>::ConstIterator fontRunEndIt = definedFonts.End();
+  Vector<ScriptRun>::ConstIterator scriptRunIt = scripts.Begin();
+  Vector<ScriptRun>::ConstIterator scriptRunEndIt = scripts.End();
 
   for( Length index = 0u; index < numberOfCharacters; ++index )
   {
     // Get the character.
-    const Character character = *( textBuffer + index );
+    const Character character = *( text.Begin() + index );
 
     // Get the font for the character.
     FontId fontId = GetFontId( index,
@@ -437,7 +398,7 @@ void MultilanguageSupport::ValidateFonts( LogicalModel& model )
       if( 0u != currentFontRun.characterRun.numberOfCharacters )
       {
         // Store the font run.
-        validatedFontRuns.PushBack( currentFontRun );
+        fonts.PushBack( currentFontRun );
       }
 
       // Initialize the new one.
@@ -454,12 +415,8 @@ void MultilanguageSupport::ValidateFonts( LogicalModel& model )
   if( 0u != currentFontRun.characterRun.numberOfCharacters )
   {
     // Store the last run.
-    validatedFontRuns.PushBack( currentFontRun );
+    fonts.PushBack( currentFontRun );
   }
-
-  // 5) Sets the validated font runs to the model.
-  model.SetFonts( validatedFontRuns.Begin(),
-                  validatedFontRuns.Count() );
 }
 
 } // namespace Internal

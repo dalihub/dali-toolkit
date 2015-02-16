@@ -98,6 +98,7 @@ public_api_src_files = \
   $(public_api_src_dir)/text/multi-language-support.cpp \
   $(public_api_src_dir)/text/script.cpp \
   $(public_api_src_dir)/text/segmentation.cpp \
+  $(public_api_src_dir)/text/shaper.cpp \
   $(public_api_src_dir)/text/text-controller.cpp \
   $(public_api_src_dir)/text/text-view.cpp \
   $(public_api_src_dir)/text/text-view-interface.cpp \
@@ -227,11 +228,13 @@ public_api_text_header_files = \
   $(public_api_src_dir)/text/character-run.h \
   $(public_api_src_dir)/text/character-set-conversion.h \
   $(public_api_src_dir)/text/font-run.h \
+  $(public_api_src_dir)/text/line-run.h \
   $(public_api_src_dir)/text/logical-model.h \
   $(public_api_src_dir)/text/multi-language-support.h \
   $(public_api_src_dir)/text/script.h \
   $(public_api_src_dir)/text/script-run.h \
   $(public_api_src_dir)/text/segmentation.h \
+  $(public_api_src_dir)/text/shaper.h \
   $(public_api_src_dir)/text/text-controller.h \
   $(public_api_src_dir)/text/text-definitions.h \
   $(public_api_src_dir)/text/text-view.h \

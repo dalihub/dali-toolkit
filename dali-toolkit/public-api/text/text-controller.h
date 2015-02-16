@@ -18,12 +18,13 @@
  *
  */
 
-// EXTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
-
-// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/text-view.h>
+
+// EXTERNAL INCLUDES
+#include <string>
 
 namespace Dali
 {

@@ -1,3 +1,6 @@
+#ifndef __DALI_TOOLKIT_TEXT_LINE_RUN_H__
+#define __DALI_TOOLKIT_TEXT_LINE_RUN_H__
+
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
@@ -15,8 +18,8 @@
  *
  */
 
-// CLASS HEADER
-#include <dali-toolkit/public-api/text/segmentation.h>
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/text/text-definitions.h>
 
 namespace Dali
 {
@@ -27,18 +30,20 @@ namespace Toolkit
 namespace Text
 {
 
-void SetLineBreakInfo( const Vector<Character>& text,
-                       Vector<LineBreakInfo>& lineBreakInfo )
+/**
+ * @brief LineRun
+ */
+struct LineRun
 {
-}
-
-void SetWordBreakInfo( const Vector<Character>& text,
-                       Vector<WordBreakInfo>& wordBreakInfo )
-{
-}
+  GlyphIndex glyphIndex;     ///< The initial glyph index.
+  Length     numberOfGlyphs; ///< The number of characters of the run.
+  // VCC More info to be added. i.e the size, ...
+};
 
 } // namespace Text
 
 } // namespace Toolkit
 
 } // namespace Dali
+
+#endif // __DALI_TOOLKIT_TEXT_LINE_RUN_H__

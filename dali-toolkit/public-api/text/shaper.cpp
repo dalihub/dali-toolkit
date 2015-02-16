@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/public-api/text/segmentation.h>
+#include <dali-toolkit/public-api/text/shaper.h>
 
 namespace Dali
 {
@@ -27,13 +27,13 @@ namespace Toolkit
 namespace Text
 {
 
-void SetLineBreakInfo( const Vector<Character>& text,
-                       Vector<LineBreakInfo>& lineBreakInfo )
-{
-}
-
-void SetWordBreakInfo( const Vector<Character>& text,
-                       Vector<WordBreakInfo>& wordBreakInfo )
+void ShapeText( const Vector<Character>& text,
+                const Vector<LineBreakInfo>& lineBreakInfo,
+                const Vector<ScriptRun>& scripts,
+                const Vector<FontRun>& fonts,
+                Vector<GlyphInfo>& glyphs,
+                Vector<CharacterIndex>& characterIndices,
+                Vector<Length>& charactersPerGlyph )
 {
 }
 

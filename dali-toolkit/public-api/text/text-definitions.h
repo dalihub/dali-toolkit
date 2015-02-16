@@ -19,7 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/text-abstraction/text-abstraction.h>
+#include <dali/public-api/text-abstraction/text-abstraction-definitions.h>
+#include <dali/public-api/text-abstraction/font-metrics.h>
+#include <dali/public-api/text-abstraction/glyph-info.h>
+#include <dali/public-api/text-abstraction/script.h>
 
 namespace Dali
 {

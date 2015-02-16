@@ -18,10 +18,11 @@
 // CLASS HEADER
 #include <dali-toolkit/public-api/text/rendering/basic/text-basic-renderer.h>
 
-// EXTERNAL INCLUDES
-#include <dali/dali.h>
-
 // INTERNAL INCLUDES
+#include <dali/public-api/text-abstraction/font-client.h>
+#include <dali/public-api/actors/mesh-actor.h>
+#include <dali/public-api/images/atlas.h>
+#include <dali/public-api/geometry/mesh.h>
 #include <dali-toolkit/public-api/text/rendering/shaders/text-basic-shader.h>
 
 using namespace Dali;

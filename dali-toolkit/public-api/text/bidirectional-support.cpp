@@ -27,12 +27,15 @@ namespace Toolkit
 namespace Text
 {
 
-void SetBidirectionalInfo( LogicalModel& model )
+void SetBidirectionalInfo( const Vector<Character>& text,
+                           const Vector<LineBreakInfo>& lineBreakInfo,
+                           Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo )
 {
 }
 
-void ReorderLines( LogicalModel& logicalModel,
-                   const VisualModel& visualModel )
+void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                   const Vector<CharacterRun>& lineRuns,
+                   Vector<BidirectionalLineInfoRun>& lineInfoRuns )
 {
 }
 

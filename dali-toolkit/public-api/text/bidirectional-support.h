@@ -19,7 +19,9 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/text-definitions.h>
+#include <dali/public-api/common/dali-vector.h>
+#include <dali-toolkit/public-api/text/bidirectional-line-info-run.h>
+#include <dali-toolkit/public-api/text/bidirectional-paragraph-info-run.h>
 
 namespace Dali
 {
@@ -36,14 +38,13 @@ class VisualModel;
 /**
  * Sets the bidirectional info into the logical model.
  *
- * Any bidirectional info previously set is removed.
- *
- * @pre The @p model needs to have a text set.
- * @pre The @p model needs to have the line break info set.
- *
- * @param[in,out] model The text's logical model.
+ * @param[in] text Vector of UTF-32 characters.
+ * @param[in] lineBreakInfo The line break info.
+ * @param[out] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
  */
-void SetBidirectionalInfo( LogicalModel& model );
+void SetBidirectionalInfo( const Vector<Character>& text,
+                           const Vector<LineBreakInfo>& lineBreakInfo,
+                           Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo );
 
 /**
  * Sets the visual to logical and logical to visual map tables.
@@ -51,14 +52,16 @@ void SetBidirectionalInfo( LogicalModel& model );
  * Any map tables previously set are removed.
  *
  * @pre The @p logicalModel needs to have a text set.
- * @pre The @p logicalModel needs to have the line break info set.
+ * @pre The @p logicalModel needs to have the bidirectional info indices for each paragraph set.
  * @pre The @p visualModel needs to have the laid-out lines info set.
  *
- * @param[in,out] logicalModel The text's logical model.
- * @param[in] visualModel The text's visual model.
+ * @param[in] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
+ * @param[in] lineRuns The line runs converted to characters.
+ * @param[out] lineInfoRuns line runs with the visual to logical and logical to visual conversion maps.
  */
-void ReorderLines( LogicalModel& logicalModel,
-                   const VisualModel& visualModel );
+void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                   const Vector<CharacterRun>& lineRuns,
+                   Vector<BidirectionalLineInfoRun>& lineInfoRuns );
 
 } // namespace Text
 

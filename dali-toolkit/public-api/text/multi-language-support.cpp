@@ -48,14 +48,20 @@ MultilanguageSupport MultilanguageSupport::Get()
   return Internal::MultilanguageSupport::Get();
 }
 
-void MultilanguageSupport::SetScripts( LogicalModel& model )
+void MultilanguageSupport::SetScripts( const Vector<Character>& text,
+                                       Vector<ScriptRun>& scripts )
 {
-  GetImplementation( *this ).SetScripts( model );
+  GetImplementation( *this ).SetScripts( text,
+                                         scripts );
 }
 
-void MultilanguageSupport::ValidateFonts( LogicalModel& model )
+void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
+                                          const Vector<ScriptRun>& scripts,
+                                          Vector<FontRun>& fonts )
 {
-  GetImplementation( *this ).ValidateFonts( model );
+  GetImplementation( *this ).ValidateFonts( text,
+                                            scripts,
+                                            fonts );
 }
 
 } // namespace Text

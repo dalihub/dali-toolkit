@@ -19,12 +19,13 @@
 #include <dali-toolkit/public-api/text/logical-model.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/text/bidirectional-line-info-run.h>
+#include <dali-toolkit/public-api/text/bidirectional-paragraph-info-run.h>
 #include <dali-toolkit/public-api/text/font-run.h>
 #include <dali-toolkit/public-api/text/script-run.h>
 
 // EXTERNAL INCLUDES
 #include <memory.h>
-#include <stdlib.h>
 
 namespace Dali
 {
@@ -47,11 +48,12 @@ LogicalModelPtr LogicalModel::New()
   return LogicalModelPtr( new LogicalModel() );
 }
 
-void LogicalModel::SetText( const Character* text, Length length )
+void LogicalModel::SetText( const Character* const text,
+                            Length numberOfCharacters )
 {
   Vector<Character>& modelText = mImpl->mText;
-  modelText.Resize( length );
-  memcpy( &modelText[0], text, length*sizeof(Character) );
+  modelText.Resize( numberOfCharacters );
+  memcpy( modelText.Begin(), text, numberOfCharacters * sizeof( Character ) );
 }
 
 Length LogicalModel::GetNumberOfCharacters() const
@@ -59,10 +61,17 @@ Length LogicalModel::GetNumberOfCharacters() const
   return mImpl->mText.Count();
 }
 
-void LogicalModel::GetText( CharacterIndex characterIndex, Character* text, Length numberOfCharacters ) const
+void LogicalModel::GetText( CharacterIndex characterIndex,
+                            Character* text,
+                            Length numberOfCharacters ) const
 {
   Vector<Character>& modelText = mImpl->mText;
-  memcpy( text, &modelText[characterIndex], numberOfCharacters*sizeof(Character) );
+  memcpy( text, modelText.Begin() + characterIndex, numberOfCharacters * sizeof( Character ) );
+}
+
+Character LogicalModel::GetCharacter( CharacterIndex characterIndex ) const
+{
+  return mImpl->mText[characterIndex];
 }
 
 void LogicalModel::SetScripts( const ScriptRun* const scripts,

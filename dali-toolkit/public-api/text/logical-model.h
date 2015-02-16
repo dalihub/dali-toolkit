@@ -18,10 +18,10 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/common/intrusive-ptr.h>
-
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/object/ref-object.h>
 #include <dali-toolkit/public-api/text/text-definitions.h>
 
 namespace Dali
@@ -63,10 +63,10 @@ public:
    * @brief Replaces any text previously set.
    *
    * @param[in] text An array of UTF-32 characters.
-   * @param[in] length The length of the array.
+   * @param[in] numberOfCharacters The length of the array.
    */
-  void SetText( const Character* text,
-                Length length );
+  void SetText( const Character* const text,
+                Length numberOfCharacters );
 
   /**
    * @brief Retrieves the number of characters of the text.
@@ -86,6 +86,15 @@ public:
   void GetText( CharacterIndex characterIndex,
                 Character* text,
                 Length numberOfCharacters ) const;
+
+  /**
+   * Retrieves a character.
+   *
+   * @param[in] characterIndex Index to a character.
+   *
+   * @return A character.
+   */
+  Character GetCharacter( CharacterIndex characterIndex ) const;
 
   // Language support interface.
 
@@ -395,6 +404,7 @@ public:
   void GetVisualToLogicalMap( CharacterIndex* visualToLogicalMap,
                               CharacterIndex characterIndex,
                               Length numberOfCharacters ) const;
+
 protected:
 
   /**

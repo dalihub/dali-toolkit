@@ -18,10 +18,9 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/common/intrusive-ptr.h>
-
 // INTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/object/ref-object.h>
 #include <dali-toolkit/public-api/text/text-definitions.h>
 
 namespace Dali
@@ -63,7 +62,7 @@ public:
    *
    * @param[in] glyphs An array of glyphs in the visual order.
    * @param[in] characterIndices An array containing the first character in the logical model that each glyph relates to.
-   * @param[in] charactersPerGlyph An array of containing the number of characters per glyph.
+   * @param[in] charactersPerGlyph An array containing the number of characters per glyph.
    * @param[in] numberOfGlyphs The number of glyphs.
    */
   void SetGlyphs( const GlyphInfo* glyphs,
