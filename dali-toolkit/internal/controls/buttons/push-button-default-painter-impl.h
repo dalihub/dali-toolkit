@@ -68,150 +68,89 @@ public:
    */
   ~PushButtonDefaultPainter();
 
-  /**
-   * Sets the button image.
-   *
-   * It adds the button image to the root actor and creates the image transition if needed.
-   *
-   * @param[inout] pushButton The button in which all actors that form its appearance are going to be added.
-   * @param[in] image The button image.
-   */
-  void SetButtonImage( Toolkit::PushButton& pushButton, Actor image );
-
-  /**
-   * Sets the background image.
-   *
-   * It adds the background image to the root actor and creates the image transition if needed.
-   *
-   * @param[inout] pushButton The button in which all actors that form its appearance are going to be added.
-   * @param[in] image The background image.
-   */
-  void SetBackgroundImage( Toolkit::PushButton& pushButton, Actor image );
-
-  /**
-   * Sets the selected image.
-   *
-   * It adds the selected image to the root actor and creates the image transition if needed.
-   *
-   * @param[inout] pushButton The button in which all actors that form its appearance are going to be added.
-   * @param[in] image The selected image.
-   */
-  void SetSelectedImage( Toolkit::PushButton& pushButton, Actor image );
-
-  /**
-   * Sets the disabled background image.
-   *
-   * It adds the disabled background image to the root actor and creates the image transition if needed.
-   *
-   * @param[inout] pushButton The button in which all actors that form its appearance are going to be added.
-   * @param[in] image The disabled background image.
-   */
-  void SetDisabledBackgroundImage( Toolkit::PushButton& pushButton, Actor image );
-
-  /**
-   * Sets the disabled image.
-   *
-   * It adds the disabled image to the root actor and creates the image transition if needed.
-   *
-   * @param[inout] pushButton The button in which all actors that form its appearance are going to be added.
-   * @param[in] image The  image.
-   */
-  void SetDisabledImage( Toolkit::PushButton& pushButton, Actor image );
-
-  /**
-   * Sets the label.
-   *
-   * It adds the label to the root actor.
-   *
-   * @param[inout] pushButton The button in which all actors that form its appearance are going to be added.
-   * @param[in] label Button label.
-   */
-  void SetLabel( Toolkit::PushButton& pushButton, Actor label );
-
   /////////////////////////////////////////////////////////////////////////////
   // ButtonPainter interface
   /////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Initializes the painter by setting the default images.
-   *
-   * @param[inout] button The button in which all actors that form its appearance are going to be added.
+   * @copydoc ButtonPainter::Initialize( Toolkit::Button& button )
    */
-  void Initialize( Toolkit::Button& button );
+  virtual void Initialize( Toolkit::Button& button );
 
   /**
-   * Sets the new size.
-   *
-   * Resizes actors. It applies size constraints.
-   *
-   * @param[inout] button The button which stores button's images.
-   * @param[in] size The new size.
+   * @copydoc ButtonPainter::SetSize( Toolkit::Button& button, const Vector3& size )
    */
-  void SetSize( Toolkit::Button& button, const Vector3& size );
+  virtual void SetSize( Toolkit::Button& button, const Vector3& size );
 
   /**
-   * This method is called when the \e disabled property in the Dali::Toolkit::PushButton changes.
-   *
-   * Creates image transitions if needed.
-   *
-   * @param[inout] button The button in which all actors that form its appearance are going to be added.
-   * @param[in] disabled property.
+   * @copydoc ButtonPainter::SetDisabled( Toolkit::Button& button, bool disabled )
    */
-  void SetDisabled( Toolkit::Button& button, bool disabled );
+  virtual void SetDisabled( Toolkit::Button& button, bool disabled );
 
   /**
-   * Sets the animation time.
-   * @param[in] animationTime The animation time.
+   * @copydoc ButtonPainter::SetAnimationTime( float animationTime )
    */
-  void SetAnimationTime( float animationTime );
+  virtual void SetAnimationTime( float animationTime );
 
   /**
-   * Retrieves the animation time.
-   * @return The animation time.
+   * @copydoc ButtonPainter::GetAnimationTime()
    */
-  float GetAnimationTime() const;
-
-  /////////////////////////////////////////////////////////////////////////////
-  // PushButtonPainter interface
-  /////////////////////////////////////////////////////////////////////////////
+  virtual float GetAnimationTime() const;
 
   /**
-   * This method is called when the \e autorepeating property in the Dali::Toolkit::PushButton changes.
-   * @param[in] autorepeating property.
+   * @copydoc ButtonPainter::SetLabel( Toolkit::Button& button, Actor label )
    */
-  void SetAutoRepeating( bool autorepeating );
+  virtual void SetLabel( Toolkit::Button& button, Actor label );
 
   /**
-   * This method is called when the Dali::Toolkit::Internal::PushButton in which this object is registered
-   * is pressed. It changes to the selected image with a transition.
-   *
-   * @param[inout] button The Dali::Toolkit::PushButton in which this object is registered.
+   * @copydoc ButtonPainter::SetAutoRepeating( bool autorepeating )
    */
-  void Pressed( Toolkit::PushButton& button );
+  virtual void SetAutoRepeating( bool autorepeating );
 
   /**
-   * This method is called when the Dali::Toolkit::Internal::PushButton in which this object is registered
-   * is released. It changes to the button image with a transition.
-   *
-   * @param[inout] button The Dali::Toolkit::PushButton in which this object is registered.
+   * @copydoc ButtonPainter::SetButtonImage( Toolkit::Button& button, Actor image )
    */
-  void Released( Toolkit::PushButton& button );
+  virtual void SetButtonImage( Toolkit::Button& button, Actor image );
 
   /**
-   * This method is called when the Dali::Toolkit::Internal::PushButton in which this object is registered
-   * is clicked.
-   *
-   * @param[inout] button The Dali::Toolkit::PushButton in which this object is registered.
+   * @copydoc ButtonPainter::SetSelectedImage( Toolkit::Button& button, Actor image )
    */
-  void Clicked( Toolkit::PushButton& button );
+  virtual void SetSelectedImage( Toolkit::Button& button, Actor image );
 
   /**
-   * This method is called when the Dali::Toolkit::Internal::PushButton in which this object is registered
-   * is toggled.
-   *
-   * @param[inout] button The Dali::Toolkit::PushButton in which this object is registered.
+   * @copydoc ButtonPainter::SetBackgroundImage( Toolkit::Button& button, Actor image )
    */
-  void Toggled( Toolkit::PushButton& button );
+  virtual void SetBackgroundImage( Toolkit::Button& button, Actor image );
+
+  /**
+   * @copydoc ButtonPainter::SetDisabledImage( Toolkit::Button& button, Actor image )
+   */
+  virtual void SetDisabledImage( Toolkit::Button& button, Actor image );
+
+  /**
+   * @copydoc ButtonPainter::SetDisabledBackgroundImage( Toolkit::Button& button, Actor image )
+   */
+  virtual void SetDisabledBackgroundImage( Toolkit::Button& button, Actor image );
+
+  /**
+   * @copydoc ButtonPainter::Pressed( Toolkit::Button& button )
+   */
+  void Pressed( Toolkit::Button& button );
+
+  /**
+   * @copydoc ButtonPainter::Released( Toolkit::Button& button )
+   */
+  void Released( Toolkit::Button& button );
+
+  /**
+   * @copydoc ButtonPainter::Clicked( Toolkit::Button& button )
+   */
+  void Clicked( Toolkit::Button& button );
+
+  /**
+   * @copydoc ButtonPainter::Selected( Toolkit::Button& button )
+   */
+  void Selected( Toolkit::Button& button );
 
 private:
 

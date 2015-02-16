@@ -19,8 +19,6 @@
 #include "check-box-button-impl.h"
 
 // EXTERNAL INCLUDES
-#include <algorithm>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
@@ -45,18 +43,7 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Toolkit::CheckBoxButton), typeid(Toolkit::Button), Create );
 
-TypeAction a1(mType, Toolkit::CheckBoxButton::ACTION_CHECK_BOX_BUTTON_CLICK, &CheckBoxButton::DoAction);
-
 }
-
-namespace
-{
-  // Helper function used to cast a ButtonPainterPtr to CheckBoxButtonDefaultPainterPtr
-  CheckBoxButtonDefaultPainterPtr GetCheckBoxButtonPainter( ButtonPainterPtr painter )
-  {
-    return static_cast<CheckBoxButtonDefaultPainter*>( painter.Get() );
-  }
-} // namespace
 
 Dali::Toolkit::CheckBoxButton CheckBoxButton::New()
 {
@@ -73,193 +60,19 @@ Dali::Toolkit::CheckBoxButton CheckBoxButton::New()
   return checkBoxButton;
 }
 
-void CheckBoxButton::SetChecked( bool checked )
-{
-  if( !mDisabled && ( checked != mChecked ) )
-  {
-    // Stores the state.
-    mChecked = checked;
-
-    Toolkit::CheckBoxButton handle( GetOwner() );
-
-    // Notifies the painter the checkbox has been checked.
-    GetCheckBoxButtonPainter( mPainter )->Checked( handle );
-
-    // Raise state changed signal
-    mStateChangedSignal.Emit( handle, mChecked );
-  }
-}
-
-bool CheckBoxButton::IsChecked() const
-{
-  return mChecked;
-}
-
-void CheckBoxButton::SetBackgroundImage( Image image )
-{
-  SetBackgroundImage( ImageActor::New( image ) );
-}
-
-void CheckBoxButton::SetBackgroundImage( Actor image )
-{
-  Toolkit::CheckBoxButton handle( GetOwner() );
-  GetCheckBoxButtonPainter( mPainter )->SetBackgroundImage( handle, image );
-}
-
-Actor& CheckBoxButton::GetBackgroundImage()
-{
-  return mBackgroundImage;
-}
-
-Actor CheckBoxButton::GetBackgroundImage() const
-{
-  return mBackgroundImage;
-}
-
-void CheckBoxButton::SetCheckedImage( Image image )
-{
-  SetCheckedImage( ImageActor::New( image ) );
-}
-
-void CheckBoxButton::SetCheckedImage( Actor image )
-{
-  Toolkit::CheckBoxButton handle( GetOwner() );
-  GetCheckBoxButtonPainter( mPainter )->SetCheckedImage( handle, image );
-}
-
-Actor& CheckBoxButton::GetCheckedImage()
-{
-  return mCheckedImage;
-}
-
-Actor CheckBoxButton::GetCheckedImage() const
-{
-  return mCheckedImage;
-}
-
-void CheckBoxButton::SetDisabledBackgroundImage( Image image )
-{
-  SetDisabledBackgroundImage( ImageActor::New( image ) );
-}
-
-void CheckBoxButton::SetDisabledBackgroundImage( Actor image )
-{
-  Toolkit::CheckBoxButton handle( GetOwner() );
-  GetCheckBoxButtonPainter( mPainter )->SetDisabledBackgroundImage( handle, image );
-}
-
-Actor& CheckBoxButton::GetDisabledBackgroundImage()
-{
-  return mDisabledBackgroundImage;
-}
-
-Actor CheckBoxButton::GetDisabledBackgroundImage() const
-{
-  return mDisabledBackgroundImage;
-}
-
-void CheckBoxButton::SetDisabledCheckedImage( Image image )
-{
-  SetDisabledCheckedImage( ImageActor::New( image ) );
-}
-
-void CheckBoxButton::SetDisabledCheckedImage( Actor image )
-{
-  Toolkit::CheckBoxButton handle( GetOwner() );
-  GetCheckBoxButtonPainter( mPainter )->SetDisabledCheckedImage( handle, image );
-}
-
-Actor& CheckBoxButton::GetDisabledCheckedImage()
-{
-  return mDisabledCheckedImage;
-}
-
-Actor CheckBoxButton::GetDisabledCheckedImage() const
-{
-  return mDisabledCheckedImage;
-}
-
-Actor& CheckBoxButton::GetFadeOutBackgroundImage()
-{
-  return mFadeOutBackgroundImage;
-}
-
-Actor& CheckBoxButton::GetFadeOutCheckedImage()
-{
-  return mFadeOutCheckedImage;
-}
-
-void CheckBoxButton::OnButtonInitialize()
-{
-}
-
-void CheckBoxButton::OnButtonUp()
-{
-  if( ButtonDown == mState )
-  {
-    // Stores the state, notifies the painter and emits a signal.
-    SetChecked( !mChecked );
-  }
-}
-
-void CheckBoxButton::OnAnimationTimeSet( float animationTime )
-{
-  GetCheckBoxButtonPainter( mPainter )->SetAnimationTime( animationTime );
-}
-
-float CheckBoxButton::OnAnimationTimeRequested() const
-{
-  return GetCheckBoxButtonPainter( mPainter )->GetAnimationTime();
-}
-
-void CheckBoxButton::OnActivated()
-{
-  // When the button is activated, it performs the click action
-  PropertyValueContainer attributes;
-  DoClickAction(attributes);
-}
-
-void CheckBoxButton::DoClickAction(const PropertyValueContainer& attributes)
-{
-  // Prevents the button signals from doing a recursive loop by sending an action
-  // and re-emitting the signals.
-  if(!mClickActionPerforming)
-  {
-    mClickActionPerforming = true;
-    SetChecked( !mChecked );
-    mClickActionPerforming = false;
-  }
-}
-
-bool CheckBoxButton::DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes)
-{
-  bool ret = false;
-
-  Dali::BaseHandle handle(object);
-
-  Toolkit::CheckBoxButton button = Toolkit::CheckBoxButton::DownCast(handle);
-
-  if(Toolkit::CheckBoxButton::ACTION_CHECK_BOX_BUTTON_CLICK == actionName)
-  {
-    GetImplementation(button).DoClickAction(attributes);
-    ret = true;
-  }
-
-  return ret;
-}
-
 CheckBoxButton::CheckBoxButton()
-: Button(),
-  mChecked( false ),
-  mClickActionPerforming(false)
+: Button()
 {
   // Creates specific painter.
-  mPainter = new CheckBoxButtonDefaultPainter();
+  ButtonPainterPtr painter = new CheckBoxButtonDefaultPainter();
+  SetPainter( painter );
+
+  SetTogglableButton( true );
 }
 
 CheckBoxButton::~CheckBoxButton()
 {
-  mPainter = NULL;
+  SetPainter( NULL );
 }
 
 } // namespace Internal
