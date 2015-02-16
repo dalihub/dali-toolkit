@@ -38,9 +38,11 @@ namespace Text
 
 struct LogicalModel::Impl
 {
-  Vector<Character> mText;
-  Vector<ScriptRun> mScriptRuns;
-  Vector<FontRun>   mFontRuns;
+  Vector<Character>     mText;
+  Vector<ScriptRun>     mScriptRuns;
+  Vector<FontRun>       mFontRuns;
+  Vector<LineBreakInfo> mLineBreakInfo;
+  Vector<WordBreakInfo> mWordBreakInfo;
 };
 
 LogicalModelPtr LogicalModel::New()
@@ -245,33 +247,41 @@ FontId LogicalModel::GetFont( CharacterIndex characterIndex ) const
 void LogicalModel::SetLineBreakInfo( const LineBreakInfo* const lineBreakInfo,
                                      Length length )
 {
+  Vector<LineBreakInfo>& modelLineBreakInfo = mImpl->mLineBreakInfo;
+  modelLineBreakInfo.Resize( length );
+  memcpy( modelLineBreakInfo.Begin(), lineBreakInfo, length * sizeof( LineBreakInfo ) );
 }
 
 void LogicalModel::GetLineBreakInfo( LineBreakInfo* lineBreakInfo,
                                      CharacterIndex characterIndex,
                                      Length numberOfItems ) const
 {
+  memcpy( lineBreakInfo, mImpl->mLineBreakInfo.Begin() + characterIndex, numberOfItems * sizeof( LineBreakInfo ) );
 }
 
 LineBreakInfo LogicalModel::GetLineBreakInfo( CharacterIndex characterIndex ) const
 {
-  return 0;
+  return *( mImpl->mLineBreakInfo.Begin() + characterIndex );
 }
 
 void LogicalModel::SetWordBreakInfo( const WordBreakInfo* const wordBreakInfo,
                                      Length length )
 {
+  Vector<WordBreakInfo>& modelWordBreakInfo = mImpl->mWordBreakInfo;
+  modelWordBreakInfo.Resize( length );
+  memcpy( modelWordBreakInfo.Begin(), wordBreakInfo, length * sizeof( WordBreakInfo ) );
 }
 
 void LogicalModel::GetWordBreakInfo( WordBreakInfo* wordBreakInfo,
                                      CharacterIndex characterIndex,
                                      Length numberOfItems ) const
 {
+  memcpy( wordBreakInfo, mImpl->mWordBreakInfo.Begin() + characterIndex, numberOfItems * sizeof( WordBreakInfo ) );
 }
 
 WordBreakInfo LogicalModel::GetWordBreakInfo( CharacterIndex characterIndex ) const
 {
-  return 0;
+  return *( mImpl->mWordBreakInfo.Begin() + characterIndex );
 }
 
 void LogicalModel::SetBidirectionalInfo( const BidirectionalParagraphInfoRun* const bidirectionalInfo,

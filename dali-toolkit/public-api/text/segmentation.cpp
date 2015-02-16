@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali-toolkit/public-api/text/segmentation.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/text-abstraction/segmentation.h>
+
 namespace Dali
 {
 
@@ -30,11 +33,37 @@ namespace Text
 void SetLineBreakInfo( const Vector<Character>& text,
                        Vector<LineBreakInfo>& lineBreakInfo )
 {
+  const Length numberOfCharacters = text.Count();
+
+  if( 0u == numberOfCharacters )
+  {
+    // Nothing to do if there are no characters.
+    return;
+  }
+
+  // Retrieve the line break info.
+  lineBreakInfo.Resize( numberOfCharacters );
+  TextAbstraction::Segmentation::Get().GetLineBreakPositions( text.Begin(),
+                                                              numberOfCharacters,
+                                                              lineBreakInfo.Begin() );
 }
 
 void SetWordBreakInfo( const Vector<Character>& text,
                        Vector<WordBreakInfo>& wordBreakInfo )
 {
+  const Length numberOfCharacters = text.Count();
+
+  if( 0u == numberOfCharacters )
+  {
+    // Nothing to do if there are no characters.
+    return;
+  }
+
+  // Retrieve the word break info.
+  wordBreakInfo.Resize( numberOfCharacters );
+  TextAbstraction::Segmentation::Get().GetWordBreakPositions( text.Begin(),
+                                                              numberOfCharacters,
+                                                              wordBreakInfo.Begin() );
 }
 
 } // namespace Text
