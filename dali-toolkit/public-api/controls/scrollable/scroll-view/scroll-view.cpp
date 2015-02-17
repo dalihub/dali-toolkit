@@ -283,14 +283,12 @@ unsigned int FixedRuler::GetTotalPages() const
 // ScrollView
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-const std::string ScrollView::SCROLL_PAGE_CURRENT( "scroll-page-current" );
 const std::string ScrollView::SCROLL_TIME_PROPERTY_NAME( "scroll-time" );
 const std::string ScrollView::SCROLL_POSITION_PROPERTY_NAME( "scroll-position" );
 const std::string ScrollView::SCROLL_PRE_POSITION_PROPERTY_NAME( "scroll-pre-position" );
 const std::string ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME( "scroll-overshoot-x" );
 const std::string ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME( "scroll-overshoot-y" );
 const std::string ScrollView::SCROLL_FINAL_PROPERTY_NAME( "scroll-final" );
-const std::string ScrollView::SCROLL_SCALE_PROPERTY_NAME( "scroll-scale" );
 const std::string ScrollView::SCROLL_WRAP_PROPERTY_NAME( "scroll-wrap" );
 const std::string ScrollView::SCROLL_PANNING_PROPERTY_NAME( "scroll-panning" );
 const std::string ScrollView::SCROLL_SCROLLING_PROPERTY_NAME( "scroll-scrolling" );
@@ -418,11 +416,6 @@ void ScrollView::SetSnapOvershootAlphaFunction(AlphaFunction alpha)
 void ScrollView::SetSnapOvershootDuration(float duration)
 {
   GetImpl(*this).SetSnapOvershootDuration(duration);
-}
-
-void ScrollView::SetTouchesRequiredForPanning(unsigned int minTouches, unsigned int maxTouches, bool endOutside)
-{
-  GetImpl(*this).SetTouchesRequiredForPanning(minTouches, maxTouches, endOutside);
 }
 
 void ScrollView::SetActorAutoSnap(bool enable)

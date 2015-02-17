@@ -206,11 +206,6 @@ public:
   void SetSnapOvershootDuration(float duration);
 
   /**
-   * @copydoc Toolkit::ScrollView::SetTouchesRequiredForPanning
-   */
-  void SetTouchesRequiredForPanning(unsigned int minTouches, unsigned int maxTouches, bool endOutside);
-
-  /**
    * @copydoc Toolkit::ScrollView::SetActorAutoSnap
    */
   void SetActorAutoSnap(bool enable);
@@ -737,7 +732,7 @@ private:
    * @param[in,out] position The position you wish to clamp
    * @param[out] clamped The results of the clamping.
    */
-  void ClampPosition(Vector3& position, ClampState3 &clamped) const;
+  void ClampPosition(Vector3& position, ClampState3D &clamped) const;
 
   /**
    * Wraps position within the domain set up by X/Y Rulers
@@ -860,9 +855,6 @@ private:
   Vector3 mMinScroll;
   Vector3 mMaxScroll;
 
-  unsigned int mMinTouchesForPanning;   ///< Minimum number of touches for panning to be used.
-  unsigned int mMaxTouchesForPanning;   ///< Maximum number of touches for panning to be used.
-
   Animation mInternalXAnimation;        ///< Animates mPropertyX to a snap position or application requested scroll position
   Animation mInternalYAnimation;        ///< Animates mPropertyY to a snap position or application requested scroll position
 
@@ -880,7 +872,6 @@ private:
 
   ScrollViewEffectContainer mEffects;   ///< Container keeping track of all the applied effects.
 
-  float     mOvershootDelay;                    ///< Time to wait for input before reducing overshoot back to 0
   Vector2   mMaxOvershoot;                      ///< Number of scrollable pixels that will take overshoot from 0.0f to 1.0f
   Vector2   mUserMaxOvershoot;                  ///< Set by user, allows overriding of default max overshoot for the scroll indicator
   float     mSnapOvershootDuration;             ///< Duration for overshoot snapping back to Vector3::ZERO

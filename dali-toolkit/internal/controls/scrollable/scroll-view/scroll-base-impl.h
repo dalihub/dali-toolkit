@@ -200,7 +200,6 @@ protected:
   Property::Index mPropertyTime;                    ///< Scroll Time (0 to animationDuration while animating, otherwise 0)
   Property::Index mPropertyPrePosition;             ///< Scroll Position ("scroll-position") [function of scroll-x, scroll-y]
   Property::Index mPropertyPosition;                ///< Scroll Position ("scroll-position") [function of scroll-pre-position]
-  Property::Index mPropertyScale;                   ///< Scroll Scale ("scroll-scale")
   Property::Index mPropertyOvershootX;              ///< Scroll Overshoot ("scroll-overshoot-x") [function of scroll-pre-position, scroll-position]
   Property::Index mPropertyOvershootY;              ///< Scroll Overshoot ("scroll-overshoot-y") [function of scroll-pre-position, scroll-position]
   Property::Index mPropertyWrap;                    ///< Scroll Wrap ("scroll-wrap")

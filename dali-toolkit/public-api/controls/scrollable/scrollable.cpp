@@ -84,11 +84,6 @@ Scrollable::ScrollCompletedSignalType& Scrollable::ScrollCompletedSignal()
   return GetImpl(*this).ScrollCompletedSignal();
 }
 
-Scrollable::ScrollClampedSignalType& Scrollable::ScrollClampedSignal()
-{
-  return GetImpl(*this).ScrollClampedSignal();
-}
-
 bool Scrollable::IsScrollComponentEnabled(Scrollable::ScrollComponentType indicator) const
 {
   return GetImpl(*this).IsScrollComponentEnabled(indicator);

@@ -310,38 +310,6 @@ public:
   virtual Degree GetScrollDirection() const = 0;
 
   /**
-   * @brief Tells scroll components how to interpolate our logical scroll position as a screen x/y direction.
-   *
-   * Application developer wants to use -ve y, +ve x as up direction and +ve y, -ve x as down direction scroll values in a
-   * vertical scroll type effect (SpiralLayout). This means that scroll bar/overshoot indicator should be affected by y-axis.
-   * Returning (0.0f, 0.0f) for x and (0.0f, -1.0f) for y tells us that we need to use the y scroll value to move the scroll bar
-   * along y axis with y scroll of 0 starting at bottom (due to -1.0f on y), a value of (0.0f, 1.0f) on x axis mask would mean using y scroll value to move scroll bar along x axis
-   *
-   * This function is used by numerous objects such as scroll indicators and scroll overshoot indicators and all
-   * layout implementations should provide their own version of this function to ensure proper functionality of
-   * internal toolkit systems.
-   *
-   * @param[out] scrollHint Vector2 describing how x and y scroll values should be used for x-axis scrolling
-   */
-  DALI_IMPORT_API virtual void GetXAxisScrollHint(Vector2& scrollHint) const;
-
-  /**
-   * @brief Tells scroll components how to interpolate our logical scroll position as a screen x/y direction.
-   *
-   * Application developer wants to use -ve y, +ve x as up direction and +ve y, -ve x as down direction scroll values in a
-   * vertical scroll type effect (SpiralLayout). This means that scroll bar/overshoot indicator should be affected by y-axis.
-   * Returning (0.0f, 0.0f) for x and (0.0f, -1.0f) for y tells us that we need to use the y scroll value to move the scroll bar
-   * along y axis with y scroll of 0 starting at bottom (due to -1.0f on y), a value of (0.0f, 1.0f) on x axis mask would mean using y scroll value to move scroll bar along x axis
-   *
-   * This function is used by numerous objects such as scroll indicators and scroll overshoot indicators and all
-   * layout implementations should provide their own version of this function to ensure proper functionality of
-   * internal toolkit systems.
-   *
-   * @param[out] scrollHint Vector2 describing how x and y scroll values should be used for y-axis scrolling
-   */
-  DALI_IMPORT_API virtual void GetYAxisScrollHint(Vector2& scrollHint) const;
-
-  /**
    * @brief Query the scroll speed factor of the layout while dragging.
    *
    * This factor is used by the layout to customise its scroll speed while dragging.
