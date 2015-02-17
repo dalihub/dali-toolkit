@@ -35,13 +35,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const char* const TextInput::SIGNAL_START_INPUT( "start-input" );
-const char* const TextInput::SIGNAL_END_INPUT( "end-input" );
-const char* const TextInput::SIGNAL_STYLE_CHANGED( "style-changed" );
-const char* const TextInput::SIGNAL_MAX_INPUT_CHARACTERS_REACHED( "max-input-characters-reached" );
-const char* const TextInput::SIGNAL_TOOLBAR_DISPLAYED = "toolbar-displayed";
-const char* const TextInput::SIGNAL_TEXT_EXCEED_BOUNDARIES = "text-exceed-boundaries";
-
 TextInput::TextInput()
 {
 }

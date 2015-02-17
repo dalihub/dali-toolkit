@@ -66,6 +66,14 @@ struct ClampState3
  * (via touch) or automatically.
  *
  * Scrollables such as ScrollView and ItemView can be derived from this class.
+ *
+ * Signals
+ * | %Signal Name      | Method                       |
+ * |-------------------|------------------------------|
+ * | scroll-started    | @ref ScrollStartedSignal()   |
+ * | scroll-completed  | @ref ScrollUpdatedSignal()   |
+ * | scroll-updated    | @ref ScrollCompletedSignal() |
+ * | scroll-clamped    | @ref ScrollClampedSignal()   |
  */
 class DALI_IMPORT_API Scrollable : public Control
 {
@@ -102,14 +110,6 @@ public:
   /** @{ */
   static const Property::Index PROPERTY_OVERSHOOT_EFFECT_COLOR;         ///< Property, name "overshoot-effect-color",  @see SetOvershootEffectColor(),  type VECTOR4
   static const Property::Index PROPERTY_OVERSHOOT_ANIMATION_SPEED;      ///< Property, name "overshoot-animation-speed",  @see SetOvershootAnimationSpeed(),  type FLOAT
-  /** @} */
-
-  /// @name Signals
-  /** @{ */
-  static const char* const SIGNAL_SCROLL_STARTED;   ///< "scroll-started";
-  static const char* const SIGNAL_SCROLL_COMPLETED; ///< "scroll-completed";
-  static const char* const SIGNAL_SCROLL_UPDATED;   ///< "scroll-updated";
-  static const char* const SIGNAL_SCROLL_CLAMPED;   ///< "scroll-clamped";
   /** @} */
 
 public:

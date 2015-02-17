@@ -40,15 +40,22 @@ namespace Internal
 
 namespace // to register type
 {
+
+// Actions
+
+const char* const ACTION_PUSH = "push";
+const char* const ACTION_POP =  "pop";
+
 BaseHandle Create()
 {
   return Toolkit::NavigationControl::New();
 }
 
-TypeRegistration mType( typeid(Toolkit::NavigationControl), typeid(Toolkit::Control), Create );
+TypeRegistration mType( typeid( Toolkit::NavigationControl ), typeid( Toolkit::Control ), Create );
 
-TypeAction a1(mType, Toolkit::NavigationControl::ACTION_PUSH, &NavigationControl::DoAction);
-TypeAction a2(mType, Toolkit::NavigationControl::ACTION_POP, &NavigationControl::DoAction);
+TypeAction a1( mType, ACTION_PUSH, &NavigationControl::DoAction );
+TypeAction a2( mType, ACTION_POP, &NavigationControl::DoAction );
+
 }
 
 NavigationControl::NavigationControl()
@@ -413,38 +420,38 @@ Toolkit::NavigationControl::ItemPoppedSignalType& NavigationControl::ItemPoppedS
   return mItemPoppedSignal;
 }
 
-bool NavigationControl::DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes)
+bool NavigationControl::DoAction( BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes )
 {
   bool ret = false;
 
-  Dali::BaseHandle handle(object);
-  Toolkit::NavigationControl control = Toolkit::NavigationControl::DownCast(handle);
-  DALI_ASSERT_ALWAYS(control);
+  Dali::BaseHandle handle( object );
+  Toolkit::NavigationControl control = Toolkit::NavigationControl::DownCast( handle );
+  DALI_ASSERT_ALWAYS( control );
 
-  if (Toolkit::NavigationControl::ACTION_PUSH == actionName)
+  if( 0 == strcmp( actionName.c_str(), ACTION_PUSH ) )
   {
-    for (PropertyValueConstIter iter = attributes.begin(); iter != attributes.end(); ++iter)
+    for( PropertyValueConstIter iter = attributes.begin(); iter != attributes.end(); ++iter )
     {
       const Property::Value& value = *iter;
 
-      DALI_ASSERT_ALWAYS(value.GetType() == Property::STRING);
-      std::string itemName = value.Get<std::string> ();
+      DALI_ASSERT_ALWAYS( value.GetType() == Property::STRING );
+      std::string itemName = value.Get<std::string>();
 
-      for (std::list<Toolkit::Page>::iterator itemsIter = GetImpl(control).mUnpushedItems.begin(); itemsIter != GetImpl(control).mUnpushedItems.end(); ++itemsIter)
+      for( std::list<Toolkit::Page>::iterator itemsIter = GetImpl( control ).mUnpushedItems.begin(); itemsIter != GetImpl( control ).mUnpushedItems.end(); ++itemsIter )
       {
         Toolkit::Page page = *itemsIter;
-        if (page.GetName() == itemName)
+        if( page.GetName() == itemName )
         {
-          GetImpl(control).PushItem(page);
+          GetImpl( control ).PushItem( page );
           ret = true;
           break;
         }
       }
     }
   }
-  else if(Toolkit::NavigationControl::ACTION_POP == actionName)
+  else if( 0 == strcmp( actionName.c_str(), ACTION_POP ) )
   {
-    GetImpl(control).PopItem();
+    GetImpl( control ).PopItem();
 
     ret = true;
   }

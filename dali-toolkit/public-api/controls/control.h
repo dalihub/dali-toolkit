@@ -46,6 +46,20 @@ class Control;
  *
  * The implementation of the control must be supplied; see Internal::Control for more details.
  * @see Internal::Control
+ *
+ * Signals
+ * | %Signal Name      | Method                                              |
+ * |-------------------|-----------------------------------------------------|
+ * | key-event         | @ref KeyEventSignal()                               |
+ * | tapped            | @ref GetTapGestureDetector().DetectedSignal()       |
+ * | panned            | @ref GetPanGestureDetector().DetectedSignal()       |
+ * | pinched           | @ref GetPinchGestureDetector().DetectedSignal()     |
+ * | long-pressed      | @ref GetLongPressGestureDetector().DetectedSignal() |
+ *
+ * Actions
+ * | %Action Name      | %Control method called                              |
+ * |-------------------|-----------------------------------------------------|
+ * | control-activated | %OnActivated()                                      |
  */
 class DALI_IMPORT_API Control : public CustomActor
 {
@@ -60,20 +74,6 @@ public:
   static const Property::Index PROPERTY_MINIMUM_SIZE;        ///< name "minimum-size",            @see SetMinimumSize,            type VECTOR3
   static const Property::Index PROPERTY_MAXIMUM_SIZE;        ///< name "maximum-size",            @see SetMaximumSize,            type VECTOR3
   static const Property::Index PROPERTY_KEY_INPUT_FOCUS;     ///< name "key-input-focus",         @see SetKeyInputFocus,          type BOOLEAN
-  /** @} */
-
-  /// @name Signals
-  /** @{ */
-  static const char* const SIGNAL_KEY_EVENT;                 ///< name "key-event"
-  static const char* const SIGNAL_TAPPED;                    ///< name "tapped"
-  static const char* const SIGNAL_PANNED;                    ///< name "panned"
-  static const char* const SIGNAL_PINCHED;                   ///< name "pinched"
-  static const char* const SIGNAL_LONG_PRESSED;              ///< name "long-pressed"
-  /** @} */
-
-  /// @name Actions
-  /** @{ */
-  static const char* const ACTION_CONTROL_ACTIVATED;         ///< name "control-activated"
   /** @} */
 
   /**

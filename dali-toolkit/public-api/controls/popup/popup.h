@@ -62,15 +62,17 @@ class Button;
  *
  * A popup can use various custom transition effects, e.g.
  * Alpha fade, Scaling transition, position/rotation, shader effects.
+ *
+ * Signals
+ * | %Signal Name      | Method                       |
+ * |-------------------|------------------------------|
+ * | touched-outside   | @ref OutsideTouchedSignal()  |
+ * | hidden            | @ref HiddenSignal()          |
  */
 class DALI_IMPORT_API Popup : public Control
 {
 
 public:
-
-  //Signal Names
-  static const char* const SIGNAL_TOUCHED_OUTSIDE; ///< name "touched-outside"
-  static const char* const SIGNAL_HIDDEN;          ///< name "hidden"
 
   /**
    * @brief Current popup state.

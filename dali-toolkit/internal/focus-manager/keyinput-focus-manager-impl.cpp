@@ -35,6 +35,16 @@ namespace Toolkit
 namespace Internal
 {
 
+namespace
+{
+
+// Signals
+
+const char* const SIGNAL_KEY_INPUT_FOCUS_CHANGED = "key-input-focus-changed";
+const char* const SIGNAL_UNHANDLED_KEY_EVENT =     "unhandled-key-event";
+
+}
+
 KeyInputFocusManager::KeyInputFocusManager()
 : mSlotDelegate( this )
 {
@@ -220,11 +230,15 @@ bool KeyInputFocusManager::DoConnectSignal( BaseObject* object, ConnectionTracke
   Dali::BaseHandle handle( object );
 
   bool connected( true );
-  KeyInputFocusManager* manager = dynamic_cast<KeyInputFocusManager*>(object);
+  KeyInputFocusManager* manager = dynamic_cast<KeyInputFocusManager*>( object );
 
-  if( Dali::Toolkit::KeyInputFocusManager::SIGNAL_KEY_INPUT_FOCUS_CHANGED == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_CHANGED ) )
   {
     manager->KeyInputFocusChangedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_UNHANDLED_KEY_EVENT ) )
+  {
+    manager->UnhandledKeyEventSignal().Connect( tracker, functor );
   }
   else
   {

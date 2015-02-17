@@ -40,15 +40,17 @@ class KeyboardFocusManager;
  * in four directions (i.e. Left, Right, Up and Down). It also draws a
  * highlight for the focused actor and emits a signal when the focus
  * is changed.
+ *
+ * Signals
+ * | %Signal Name                     | Method                             |
+ * |----------------------------------|------------------------------------|
+ * | keyboard-pre-focus-change        | @ref PreFocusChangeSignal()        |
+ * | keyboard-focus-changed           | @ref FocusChangedSignal()          |
+ * | keyboard-focus-group-changed     | @ref FocusGroupChangedSignal()     |
+ * | keyboard-focused-actor-activated | @ref FocusedActorActivatedSignal() |
  */
 class DALI_IMPORT_API KeyboardFocusManager : public BaseHandle
 {
-public:
-  //Signal Names
-  static const char* const SIGNAL_PRE_FOCUS_CHANGE; ///< name "keyboard-pre-focus-change"
-  static const char* const SIGNAL_FOCUS_CHANGED; ///< name "keyboard-focus-changed"
-  static const char* const SIGNAL_FOCUS_GROUP_CHANGED; ///< name "keyboard-focus-group-changed"
-  static const char* const SIGNAL_FOCUSED_ACTOR_ACTIVATED; ///< name "keyboard-focused-actor-activated"
 
 public:
 

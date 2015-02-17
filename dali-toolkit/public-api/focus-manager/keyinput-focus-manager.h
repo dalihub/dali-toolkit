@@ -39,13 +39,16 @@ class KeyInputFocusManager;
  * all the keyboard events first. And if the conrol doesn't consume the event it is passed to
  * the next control in the stack. If none of the controls in the stack consume the key event then
  * UnhandledKeyEventSignal() is emitted.
+ *
+ * Signals
+ * | %Signal Name            | Method                            |
+ * |-------------------------|-----------------------------------|
+ * | key-input-focus-changed | @ref KeyInputFocusChangedSignal() |
+ * | unhandled-key-event     | @ref UnhandledKeyEventSignal()    |
  */
 class DALI_IMPORT_API KeyInputFocusManager : public BaseHandle
 {
 public:
-  // Signal Names
-  static const char* const SIGNAL_KEY_INPUT_FOCUS_CHANGED;
-  static const char* const SIGNAL_UNHANDLED_KEY_EVENT;
 
   // KeyInputFocusChanged
   typedef Signal< void (Control, Control) > KeyInputFocusChangedSignalType;

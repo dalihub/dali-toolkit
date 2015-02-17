@@ -51,20 +51,31 @@ namespace
 const unsigned int INITIAL_AUTOREPEATING_DELAY( 0.15f );
 const unsigned int NEXT_AUTOREPEATING_DELAY( 0.05f );
 
+// Signals
+
+const char* const SIGNAL_PRESSED =       "pressed";
+const char* const SIGNAL_RELEASED =      "released";
+const char* const SIGNAL_CLICKED =       "clicked";
+const char* const SIGNAL_STATE_CHANGED = "state-changed";
+
+// Actions
+
+const char* const ACTION_BUTTON_CLICK =  "button-click";
+
 BaseHandle Create()
 {
   // empty handle as we cannot create button (but type registered for clicked signal)
   return BaseHandle();
 }
 
-TypeRegistration typeRegistration( typeid(Toolkit::Button), typeid(Toolkit::Control), Create );
+TypeRegistration typeRegistration( typeid( Toolkit::Button ), typeid( Toolkit::Control ), Create );
 
-SignalConnectorType signalConnector1( typeRegistration, Toolkit::Button::SIGNAL_PRESSED , &Button::DoConnectSignal );
-SignalConnectorType signalConnector2( typeRegistration, Toolkit::Button::SIGNAL_RELEASED, &Button::DoConnectSignal );
-SignalConnectorType signalConnector3( typeRegistration, Toolkit::Button::SIGNAL_CLICKED, &Button::DoConnectSignal );
-SignalConnectorType signalConnector4( typeRegistration, Toolkit::Button::SIGNAL_STATE_CHANGED, &Button::DoConnectSignal );
+SignalConnectorType signalConnector1( typeRegistration, SIGNAL_PRESSED , &Button::DoConnectSignal );
+SignalConnectorType signalConnector2( typeRegistration, SIGNAL_RELEASED, &Button::DoConnectSignal );
+SignalConnectorType signalConnector3( typeRegistration, SIGNAL_CLICKED, &Button::DoConnectSignal );
+SignalConnectorType signalConnector4( typeRegistration, SIGNAL_STATE_CHANGED, &Button::DoConnectSignal );
 
-TypeAction action1( typeRegistration, Toolkit::Button::ACTION_BUTTON_CLICK, &Button::DoAction );
+TypeAction action1( typeRegistration, ACTION_BUTTON_CLICK, &Button::DoAction );
 
 PropertyRegistration property1( typeRegistration, "disabled",                     Toolkit::Button::PROPERTY_DISABLED,                     Property::BOOLEAN, &Button::SetProperty, &Button::GetProperty );
 PropertyRegistration property2( typeRegistration, "auto-repeating",               Toolkit::Button::PROPERTY_AUTO_REPEATING,               Property::BOOLEAN, &Button::SetProperty, &Button::GetProperty );
@@ -396,7 +407,7 @@ bool Button::DoAction( BaseObject* object, const std::string& actionName, const 
 
   DALI_ASSERT_ALWAYS( button );
 
-  if( Toolkit::Button::ACTION_BUTTON_CLICK == actionName )
+  if( 0 == strcmp( actionName.c_str(), ACTION_BUTTON_CLICK ) )
   {
     GetImplementation( button ).DoClickAction( attributes );
     ret = true;
@@ -547,21 +558,21 @@ bool Button::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tr
   Dali::BaseHandle handle( object );
 
   bool connected( true );
-  Toolkit::Button button = Toolkit::Button::DownCast(handle);
+  Toolkit::Button button = Toolkit::Button::DownCast( handle );
 
-  if( Toolkit::Button::SIGNAL_PRESSED == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_PRESSED ) )
   {
     button.PressedSignal().Connect( tracker, functor );
   }
-  else if( Toolkit::Button::SIGNAL_RELEASED == signalName )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_RELEASED ) )
   {
     button.ReleasedSignal().Connect( tracker, functor );
   }
-  else if( Dali::Toolkit::Button::SIGNAL_CLICKED == signalName )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_CLICKED ) )
   {
     button.ClickedSignal().Connect( tracker, functor );
   }
-  else if( Dali::Toolkit::Button::SIGNAL_STATE_CHANGED == signalName )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_STATE_CHANGED ) )
   {
     button.StateChangedSignal().Connect( tracker, functor );
   }

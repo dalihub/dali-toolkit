@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/image-attributes.h>
+#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 namespace Dali
@@ -31,6 +32,19 @@ namespace Toolkit
 
 namespace Internal
 {
+
+namespace
+{
+
+// Signals
+
+const char* const SIGNAL_TRANSITION_COMPLETED = "transition-completed";
+
+TypeRegistration typeRegistration( typeid( Toolkit::CubeTransitionEffect ), typeid( Dali::BaseHandle ), NULL );
+
+SignalConnectorType signalConnector1( typeRegistration, SIGNAL_TRANSITION_COMPLETED , &CubeTransitionEffect::DoConnectSignal );
+
+}
 
 const Vector4 CubeTransitionEffect::FULL_BRIGHTNESS( 1.0f, 1.0f, 1.0f, 1.0f );
 const Vector4 CubeTransitionEffect::HALF_BRIGHTNESS( 0.5f, 0.5f, 0.5f, 1.0f );
@@ -354,6 +368,26 @@ void CubeTransitionEffect::OnTransitionFinished(Animation& source)
 Toolkit::CubeTransitionEffect::TransitionCompletedSignalType& CubeTransitionEffect::TransitionCompletedSignal()
 {
   return mTransitionCompletedSignal;
+}
+
+bool CubeTransitionEffect::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+{
+  Dali::BaseHandle handle( object );
+
+  bool connected( true );
+  Toolkit::CubeTransitionEffect cubeTransitionEffect = Toolkit::CubeTransitionEffect::DownCast( handle );
+
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_TRANSITION_COMPLETED ) )
+  {
+    cubeTransitionEffect.TransitionCompletedSignal().Connect( tracker, functor );
+  }
+  else
+  {
+    // signalName does not match any signal
+    connected = false;
+  }
+
+  return connected;
 }
 
 } // namespace Internal

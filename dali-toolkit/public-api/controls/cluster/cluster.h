@@ -35,7 +35,14 @@ class Cluster;
 class ClusterStyle;
 
 /**
- * Cluster is a container of grouped actors positioned in different cluster styles.
+ * @brief Cluster is a container of grouped actors positioned in different cluster styles.
+ *
+ * Actions
+ * | %Action Name              | Method                    |
+ * |---------------------------|---------------------------|
+ * | expand                    | DoExpandAction()          |
+ * | collapse                  | DoCollapseAction()        |
+ * | transform                 | DoTransformAction()       |
  */
 class DALI_IMPORT_API Cluster : public Control
 {
@@ -44,11 +51,6 @@ public:
   // Custom properties
 
   static const std::string CLUSTER_ACTOR_DEPTH;                           ///< Property, name "cluster-actor-depth",      type FLOAT
-
-  //Action Names
-  static const char* const ACTION_EXPAND;
-  static const char* const ACTION_COLLAPSE;
-  static const char* const ACTION_TRANSFORM;
 
 public:
 

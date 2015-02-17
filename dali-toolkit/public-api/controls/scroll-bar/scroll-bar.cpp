@@ -24,8 +24,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const char* const ScrollBar::SCROLL_POSITION_NOTIFIED_SIGNAL_NAME = "scroll-position-notified";
-
 ScrollBar::ScrollBar()
 {
 }

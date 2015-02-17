@@ -307,8 +307,6 @@ const float ScrollView::DEFAULT_FRICTION_COEFFICIENT(1.0f);
 const float ScrollView::DEFAULT_FLICK_SPEED_COEFFICIENT(1.0f);
 const float ScrollView::DEFAULT_MAX_FLICK_SPEED(3.0f);
 
-const char* const ScrollView::SIGNAL_SNAP_STARTED = "snap-started";
-
 ScrollView::ScrollView()
 {
 }

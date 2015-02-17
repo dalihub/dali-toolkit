@@ -30,9 +30,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const char* const KeyInputFocusManager::SIGNAL_KEY_INPUT_FOCUS_CHANGED = "key-input-focus-changed";
-const char* const KeyInputFocusManager::SIGNAL_UNHANDLED_KEY_EVENT = "unhandled-key-event";
-
 KeyInputFocusManager::KeyInputFocusManager()
 {
 }

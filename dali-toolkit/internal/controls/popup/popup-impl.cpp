@@ -53,8 +53,15 @@ const float POPUP_BUTTON_BG_HEIGHT = 96.f;                    ///< Height of But
 const Vector3 DEFAULT_DIALOG_SIZE = Vector3(POPUP_TITLE_WIDTH/POPUP_WIDTH, 0.5f, 0.0f);
 const Vector3 DEFAULT_BOTTOM_SIZE = Vector3(1.0f, 0.2f, 0.0f);
 
-const char* const PROPERTY_TITLE = "title";
-const char* const PROPERTY_STATE = "state";
+// Signals
+
+const char* const SIGNAL_TOUCHED_OUTSIDE = "touched-outside";
+const char* const SIGNAL_HIDDEN =          "hidden";
+
+// Properties
+
+const char* const PROPERTY_TITLE =         "title";
+const char* const PROPERTY_STATE =         "state";
 
 /**
  * The background size should be at least as big as the Dialog.
@@ -109,10 +116,10 @@ BaseHandle Create()
   return Toolkit::Popup::New();
 }
 
-TypeRegistration typeRegistration( typeid(Toolkit::Popup), typeid(Toolkit::Control), Create );
+TypeRegistration typeRegistration( typeid( Toolkit::Popup ), typeid( Toolkit::Control ), Create );
 
-SignalConnectorType signalConnector1( typeRegistration, Toolkit::Popup::SIGNAL_TOUCHED_OUTSIDE, &Popup::DoConnectSignal );
-SignalConnectorType signalConnector2( typeRegistration, Toolkit::Popup::SIGNAL_HIDDEN, &Popup::DoConnectSignal );
+SignalConnectorType signalConnector1( typeRegistration, SIGNAL_TOUCHED_OUTSIDE, &Popup::DoConnectSignal );
+SignalConnectorType signalConnector2( typeRegistration, SIGNAL_HIDDEN, &Popup::DoConnectSignal );
 
 
 }
@@ -551,13 +558,13 @@ bool Popup::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   Dali::BaseHandle handle( object );
 
   bool connected( true );
-  Toolkit::Popup popup = Toolkit::Popup::DownCast(handle);
+  Toolkit::Popup popup = Toolkit::Popup::DownCast( handle );
 
-  if( Dali::Toolkit::Popup::SIGNAL_TOUCHED_OUTSIDE == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_TOUCHED_OUTSIDE ) )
   {
     popup.OutsideTouchedSignal().Connect( tracker, functor );
   }
-  else if( Dali::Toolkit::Popup::SIGNAL_HIDDEN == signalName )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_HIDDEN ) )
   {
     popup.HiddenSignal().Connect( tracker, functor );
   }

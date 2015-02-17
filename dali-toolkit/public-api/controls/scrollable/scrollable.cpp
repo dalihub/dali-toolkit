@@ -31,11 +31,6 @@ const std::string Scrollable::SCROLL_POSITION_MIN_PROPERTY_NAME( "scroll-positio
 const std::string Scrollable::SCROLL_POSITION_MAX_PROPERTY_NAME( "scroll-position-max" );
 const std::string Scrollable::SCROLL_DIRECTION_PROPERTY_NAME( "scroll-direction" );
 
-const char* const Scrollable::SIGNAL_SCROLL_STARTED = "scroll-started";
-const char* const Scrollable::SIGNAL_SCROLL_COMPLETED = "scroll-completed";
-const char* const Scrollable::SIGNAL_SCROLL_UPDATED = "scroll-updated";
-const char* const Scrollable::SIGNAL_SCROLL_CLAMPED = "scroll-clamped";
-
 Scrollable::Scrollable()
 {
 }

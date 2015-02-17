@@ -49,17 +49,23 @@ namespace Internal
 namespace
 {
 
+// Actions
+
+const char* const ACTION_EXPAND =    "expand";
+const char* const ACTION_COLLAPSE =  "collapse";
+const char* const ACTION_TRANSFORM = "transform";
+
 BaseHandle Create()
 {
-  Toolkit::ClusterStyleStandard s = Toolkit::ClusterStyleStandard::New(Toolkit::ClusterStyleStandard::ClusterStyle1);
+  Toolkit::ClusterStyleStandard s = Toolkit::ClusterStyleStandard::New( Toolkit::ClusterStyleStandard::ClusterStyle1 );
   return Toolkit::Cluster::New( s );
 }
 
-TypeRegistration mType( typeid(Toolkit::Cluster), typeid(Toolkit::Control), Create );
+TypeRegistration mType( typeid( Toolkit::Cluster ), typeid( Toolkit::Control ), Create );
 
-TypeAction a1(mType, Toolkit::Cluster::ACTION_EXPAND   , &Cluster::DoAction);
-TypeAction a2(mType, Toolkit::Cluster::ACTION_COLLAPSE , &Cluster::DoAction);
-TypeAction a3(mType, Toolkit::Cluster::ACTION_TRANSFORM, &Cluster::DoAction);
+TypeAction a1( mType, ACTION_EXPAND,    &Cluster::DoAction );
+TypeAction a2( mType, ACTION_COLLAPSE,  &Cluster::DoAction );
+TypeAction a3( mType, ACTION_TRANSFORM, &Cluster::DoAction );
 
 }
 
@@ -552,25 +558,25 @@ bool Cluster::DoAction(BaseObject* object, const std::string& actionName, const 
 {
   bool ret = false;
 
-  Dali::BaseHandle handle(object);
+  Dali::BaseHandle handle( object );
 
-  Toolkit::Cluster cluster = Toolkit::Cluster::DownCast(handle);
+  Toolkit::Cluster cluster = Toolkit::Cluster::DownCast( handle );
 
-  DALI_ASSERT_ALWAYS(cluster);
+  DALI_ASSERT_ALWAYS( cluster );
 
-  if(Toolkit::Cluster::ACTION_EXPAND == actionName)
+  if( 0 == strcmp( actionName.c_str(), ACTION_EXPAND ) )
   {
-    GetImpl(cluster).DoExpandAction(attributes);
+    GetImpl( cluster ).DoExpandAction( attributes );
     ret = true;
   }
-  else if(Toolkit::Cluster::ACTION_COLLAPSE == actionName)
+  else if( 0 == strcmp( actionName.c_str(), ACTION_COLLAPSE ) )
   {
-    GetImpl(cluster).DoCollapseAction(attributes);
+    GetImpl( cluster ).DoCollapseAction( attributes );
     ret = true;
   }
-  else if(Toolkit::Cluster::ACTION_TRANSFORM == actionName)
+  else if( 0 == strcmp( actionName.c_str(), ACTION_TRANSFORM ) )
   {
-    GetImpl(cluster).DoTransformAction(attributes);
+    GetImpl( cluster ).DoTransformAction( attributes );
     ret = true;
   }
 

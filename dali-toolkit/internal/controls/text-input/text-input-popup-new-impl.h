@@ -52,19 +52,11 @@ public:
     StateShown
   };
 
-  // Signal names
-  static const char* const SIGNAL_PRESSED;
-  static const char* const SIGNAL_HIDE_FINISHED;
-  static const char* const SIGNAL_SHOW_FINISHED;
-
   // Popup Button Pressed
   typedef Signal< bool( Toolkit::Button ) > PopUpPressedSignal;
 
   // Popup Hide Finished
-  typedef Signal< void( TextInputPopupNew& ) > PopUpHideFinishedSignal;
-
-  // Popup Show Finished
-  typedef Signal< void( TextInputPopupNew& ) > PopUpShowFinishedSignal;
+  typedef Signal< void( TextInputPopupNew& ) > PopUpVisibilityChangeFinishedSignal;
 
   /**
    * Signal emitted when the button is touched.
@@ -75,13 +67,13 @@ public:
    * Signal emitted when popup is completely hidden
    * @note Only occurs after a Show() call with animation enabled.
    */
-  PopUpHideFinishedSignal& HideFinishedSignal() {return mHideFinishedSignal;}
+  PopUpVisibilityChangeFinishedSignal& HideFinishedSignal() { return mHideFinishedSignal; }
 
   /**
    * Signal emitted when popup is completely shown
    * @note Only occurs after a Hide() call with animation enabled.
    */
-  PopUpShowFinishedSignal& ShowFinishedSignal() {return mShowFinishedSignal;}
+  PopUpVisibilityChangeFinishedSignal& ShowFinishedSignal() { return mShowFinishedSignal; }
 
 public:
 
@@ -261,9 +253,9 @@ private:
   ActorContainer mDividerContainer;                   // List of dividers added to popup.
   Animation mAnimation;                               // Popup Hide/Show animation.
 
-  PopUpPressedSignal mPressedSignal;                     // Signal emitted when a button within the popup is pressed.
-  PopUpHideFinishedSignal mHideFinishedSignal;           // Signal emitted when popup is completely hidden
-  PopUpShowFinishedSignal mShowFinishedSignal;           // Signal emitted when popup is completely shown
+  PopUpPressedSignal mPressedSignal;                  // Signal emitted when a button within the popup is pressed.
+  PopUpVisibilityChangeFinishedSignal mHideFinishedSignal; // Signal emitted when popup is completely hidden
+  PopUpVisibilityChangeFinishedSignal mShowFinishedSignal; // Signal emitted when popup is completely shown
 
 };
 

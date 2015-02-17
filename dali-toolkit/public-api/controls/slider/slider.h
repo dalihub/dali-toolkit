@@ -34,14 +34,16 @@ class Slider;
 
 /**
  * @brief Slider is a control to enable sliding an indicator between two values
+ *
+ * Signals
+ * | %Signal Name      | Method                      |
+ * |-------------------|-----------------------------|
+ * | value-changed     | @ref ValueChangedSignal()   |
+ * | mark              | @ref MarkSignal()           |
  */
 class DALI_IMPORT_API Slider : public Control
 {
 public:
-
-  //Signal Names
-  static const char* const SIGNAL_VALUE_CHANGED;
-  static const char* const SIGNAL_MARK;
 
   // Properties
   static const Property::Index LOWER_BOUND_PROPERTY;            ///< Property, name "lower-bound",       type FLOAT
