@@ -47,17 +47,22 @@ class DALI_IMPORT_API Button : public Control
 public:
 
   // Signal Names
+  static const char* const SIGNAL_PRESSED;       ///< name "pressed"
+  static const char* const SIGNAL_RELEASED;      ///< name "released"
   static const char* const SIGNAL_CLICKED;       ///< name "clicked"
   static const char* const SIGNAL_STATE_CHANGED; ///< name "state-changed"
+
+  //Action Names
+  static const char* const ACTION_BUTTON_CLICK; ///< name "button-click"
 
   // Properties
   static const Property::Index PROPERTY_DISABLED;                     ///< name "disabled",                     @see SetDisabled(),                  type BOOLEAN
   static const Property::Index PROPERTY_AUTO_REPEATING;               ///< name "auto-repeating",               @see SetAutoRepeating(),             type BOOLEAN
   static const Property::Index PROPERTY_INITIAL_AUTO_REPEATING_DELAY; ///< name "initial-auto-repeating-delay", @see SetInitialAutoRepeatingDelay(), type FLOAT
   static const Property::Index PROPERTY_NEXT_AUTO_REPEATING_DELAY;    ///< name "next-auto-repeating-delay",    @see SetNextAutoRepeatingDelay(),    type FLOAT
-  static const Property::Index PROPERTY_TOGGLABLE;                    ///< name "togglable",                    @see SetToggleButton(),              type BOOLEAN
-  static const Property::Index PROPERTY_TOGGLED;                      ///< name "toggled",                      @see SetToggled(),                   type BOOLEAN
-  static const Property::Index PROPERTY_NORMAL_STATE_ACTOR;           ///< name "button-state-actor",           @see SetButtonImage(),               type MAP
+  static const Property::Index PROPERTY_TOGGLABLE;                    ///< name "togglable",                    @see SetTogglableButton(),           type BOOLEAN
+  static const Property::Index PROPERTY_SELECTED;                     ///< name "selected",                     @see SetSelected(),                  type BOOLEAN
+  static const Property::Index PROPERTY_NORMAL_STATE_ACTOR;           ///< name "normal-state-actor",           @see SetButtonImage(),               type MAP
   static const Property::Index PROPERTY_SELECTED_STATE_ACTOR;         ///< name "selected-state-actor",         @see SetSelectedImage(),             type MAP
   static const Property::Index PROPERTY_DISABLED_STATE_ACTOR;         ///< name "disabled-state-actor",         @see SetDisabledImage(),             type MAP
   static const Property::Index PROPERTY_LABEL_ACTOR;                  ///< name "label-actor",                  @see SetLabel(),                     type MAP
@@ -115,6 +120,81 @@ public:
   bool IsDisabled() const;
 
   /**
+   * @brief Sets the \e autorepeating property.
+   *
+   * If the \e autorepeating property is set to \e true, then the \e togglable property is set to false
+   * but no signal is emitted.
+   *
+   * @param[in] autoRepeating \e autorepeating property.
+   */
+  void SetAutoRepeating( bool autoRepeating );
+
+  /**
+   * @return \e true if the \e autorepeating property is set.
+   */
+  bool IsAutoRepeating() const;
+
+  /**
+   * @brief Sets the initial autorepeating delay.
+   *
+   * By default this value is set to 0.15 seconds.
+   *
+   * @pre initialAutoRepeatingDelay must be greater than zero.
+   * @param[in] initialAutoRepeatingDelay in seconds.
+   */
+  void SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay );
+
+  /**
+   * @return the initial autorepeating delay in seconds.
+   */
+  float GetInitialAutoRepeatingDelay() const;
+
+  /**
+   * @brief Sets the next autorepeating delay.
+   *
+   * By default this value is set to 0.05 seconds.
+   *
+   * @pre nextAutoRepeatingDelay must be greater than zero.
+   * @param[in] nextAutoRepeatingDelay in seconds.
+   */
+  void SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay );
+
+  /**
+   * @return the next autorepeating delay in seconds.
+   */
+  float GetNextAutoRepeatingDelay() const;
+
+  /**
+   * @brief Sets the \e togglable property.
+   *
+   * If the \e togglable property is set to \e true, then the \e autorepeating property is set to false.
+   *
+   * @param[in] togglable property.
+   */
+  void SetTogglableButton( bool togglable );
+
+  /**
+   * @return \e true if the \e togglable property is set.
+   */
+  bool IsTogglableButton() const;
+
+  /**
+   * Sets the button as selected or unselected.
+   *
+   * \e togglable property must be set to \e true.
+   *
+   * Emits a Button::StateChangedSignal() signal.
+   *
+   * @param[in] selected property.
+   */
+  void SetSelected( bool selected );
+
+  /**
+   * @return \e true if the \e selected property is set and the button is togglable.
+   */
+  bool IsSelected() const;
+
+  /**
    * @brief Sets the animation time.
    *
    * @param [in] animationTime The animation time in seconds.
@@ -128,27 +208,76 @@ public:
    */
   float GetAnimationTime() const;
 
+  /**
+   * @brief Sets the button label.
+   *
+   * @param[in] label The button label.
+   */
+  void SetLabel( const std::string& label );
+
+  /**
+   * @copydoc SetLabel( const std::string& label )
+   */
+  void SetLabel( Actor label );
+
+  /**
+   * @brief Gets the label.
+   *
+   * @return An actor with the label.
+   */
+  Actor GetLabel() const;
+
 public: //Signals
 
   /**
-   * @brief Button Clicked signal type
+   * @brief Button signal type
    */
-  typedef Signal< bool ( Button ) > ClickedSignalType;
+  typedef Signal< bool ( Button ) > ButtonSignalType;
 
   /**
-   * @brief Button state changed signal type
+   * @brief This signal is emitted when the button is touched.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool YourCallbackName( Button button );
+   * @endcode
+   * @return The signal to connect to.
    */
-  typedef Signal< bool ( Button, bool ) > StateChangedSignalType;
+  ButtonSignalType& PressedSignal();
 
   /**
-   * @brief Signal emitted when the button is touched and the touch point doesn't leave the boundary of the button.
+   * @brief This signal is emitted when the button is touched and the touch point leaves the boundary of the button.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool YourCallbackName( Button button );
+   * @endcode
+   * @return The signal to connect to.
    */
-  ClickedSignalType& ClickedSignal();
+  ButtonSignalType& ReleasedSignal();
 
   /**
-   * @brief Signal emitted when the button's state is changed.
+   * @brief This signal is emitted when the button is touched and the touch point doesn't leave the boundary of the button.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool YourCallbackName( Button button );
+   * @endcode
+   * @return The signal to connect to.
    */
-  StateChangedSignalType& StateChangedSignal();
+  ButtonSignalType& ClickedSignal();
+
+  /**
+   * @brief This signal is emitted when the button's state is changed.
+   * The application can get the state by calling IsSelected().
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool YourCallbackName( Button button );
+   * @endcode
+   * @return The signal to connect to.
+   */
+  ButtonSignalType& StateChangedSignal();
 
 public: // Not intended for application developers
 

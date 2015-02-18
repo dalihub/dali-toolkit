@@ -29,8 +29,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const char* const CheckBoxButton::ACTION_CHECK_BOX_BUTTON_CLICK = "check-box-button-click";
-
 CheckBoxButton::CheckBoxButton()
 : Button()
 {
@@ -64,16 +62,6 @@ CheckBoxButton CheckBoxButton::DownCast( BaseHandle handle )
   return Control::DownCast<CheckBoxButton, Internal::CheckBoxButton>(handle);
 }
 
-void CheckBoxButton::SetChecked( bool checked )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetChecked( checked );
-}
-
-bool CheckBoxButton::IsChecked() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).IsChecked();
-}
-
 void CheckBoxButton::SetBackgroundImage( Image image )
 {
   Dali::Toolkit::GetImplementation( *this ).SetBackgroundImage( image );
@@ -89,20 +77,20 @@ Actor CheckBoxButton::GetBackgroundImage() const
   return Dali::Toolkit::GetImplementation( *this ).GetBackgroundImage();
 }
 
-void CheckBoxButton::SetCheckedImage( Image image )
+void CheckBoxButton::SetSelectedImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetCheckedImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( image );
 }
 
-void CheckBoxButton::SetCheckedImage( Actor image )
+void CheckBoxButton::SetSelectedImage( Actor image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetCheckedImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( image );
 }
 
 
-Actor CheckBoxButton::GetCheckedImage() const
+Actor CheckBoxButton::GetSelectedImage() const
 {
-  return Dali::Toolkit::GetImplementation( *this ).GetCheckedImage();
+  return Dali::Toolkit::GetImplementation( *this ).GetSelectedImage();
 }
 
 void CheckBoxButton::SetDisabledBackgroundImage( Image image )
@@ -120,19 +108,19 @@ Actor CheckBoxButton::GetDisabledBackgroundImage() const
   return Dali::Toolkit::GetImplementation( *this ).GetDisabledBackgroundImage();
 }
 
-void CheckBoxButton::SetDisabledCheckedImage( Image image )
+void CheckBoxButton::SetDisabledSelectedImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledCheckedImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledSelectedImage( image );
 }
 
-void CheckBoxButton::SetDisabledCheckedImage( Actor image )
+void CheckBoxButton::SetDisabledSelectedImage( Actor image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledCheckedImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledSelectedImage( image );
 }
 
-Actor CheckBoxButton::GetDisabledCheckedImage() const
+Actor CheckBoxButton::GetDisabledSelectedImage() const
 {
-  return Dali::Toolkit::GetImplementation( *this ).GetDisabledCheckedImage();
+  return Dali::Toolkit::GetImplementation( *this ).GetDisabledSelectedImage();
 }
 
 CheckBoxButton::CheckBoxButton( Internal::CheckBoxButton& implementation )

@@ -37,25 +37,21 @@ class CheckBoxButton;
 /**
  * CheckBoxButton provides a check box button which user can check or uncheck.
  *
- * By default a CheckBoxButton emits a Button::ClickedSignal() signal when the button changes its state to checked or unchecked.
+ * By default a CheckBoxButton emits a Button::ClickedSignal() signal when the button changes its state to selected or unselected.
  *
  * The button's appearance could be modified by setting images or actors with CheckBoxButton::SetBackgroundImage,
- * CheckBoxButton::SetCheckedImage, CheckBoxButton::SetDisabledBackgroundImage and CheckBoxButton::SetDisabledCheckedImage.
+ * CheckBoxButton::SetSelectedImage, CheckBoxButton::SetDisabledBackgroundImage and CheckBoxButton::SetDisabledSelectedImage.
  *
- * When the button is not disabled, if it's not checked it only shows the \e background image. The \e checked image is shown over the
- * \e background image when the box is checked (\e background image is not replaced by \e checked image).
+ * When the button is not disabled, if it's not selected it only shows the \e background image. The \e selected image is shown over the
+ * \e background image when the box is selected (\e background image is not replaced by \e selected image).
  *
- * When the button is disabled, \e background image and \e checked image are replaced by \e disabled images.
+ * When the button is disabled, \e background image and \e selected image are replaced by \e disabled images.
  *
  * CheckBoxButton doesn't have a text. However, a Dali::Toolkit::TableView with a Dali::TextActor or a Dali::Toolkit::TextView
  * and a CheckBoxButton could be used instead.
  */
 class DALI_IMPORT_API CheckBoxButton : public Button
 {
-public:
-  //Action Names
-  static const char* const ACTION_CHECK_BOX_BUTTON_CLICK;
-
 public:
 
   /**
@@ -96,21 +92,6 @@ public:
   static CheckBoxButton DownCast( BaseHandle handle );
 
   /**
-   * Sets the button as checked or unchecked.
-   *
-   * Emits a Button::ClickedSignal() signal if the checkbox is not disabled and the new state,
-   * given in the \e checked param, is different than the previous one.
-   *
-   * @param[in] checked state.
-   */
-  void SetChecked( bool checked );
-
-  /**
-   * @return \e true if the button is checked.
-   */
-  bool IsChecked() const;
-
-  /**
    * Sets the background image.
    *
    * @param[in] image The background image.
@@ -129,22 +110,22 @@ public:
   Actor GetBackgroundImage() const;
 
   /**
-   * Sets the checked image.
+   * Sets the selected image.
    *
-   * @param[in] image The checked image.
+   * @param[in] image The selected image.
    */
-  void SetCheckedImage( Image image );
+  void SetSelectedImage( Image image );
 
   /**
-   * @copydoc SetCheckedImage( Image image )
+   * @copydoc SetSelectedImage( Image image )
    */
-  void SetCheckedImage( Actor image );
+  void SetSelectedImage( Actor image );
 
   /**
-   * Gets the checked image.
-   * @return An actor with the checked image.
+   * Gets the selected image.
+   * @return An actor with the selected image.
    */
-  Actor GetCheckedImage() const;
+  Actor GetSelectedImage() const;
 
   /**
    * Sets the disabled background image.
@@ -165,22 +146,22 @@ public:
   Actor GetDisabledBackgroundImage() const;
 
   /**
-   * Sets the disabled checked image.
+   * Sets the disabled selected image.
    *
-   * @param[in] image The disabled checked image.
+   * @param[in] image The disabled selected image.
    */
-  void SetDisabledCheckedImage( Image image );
+  void SetDisabledSelectedImage( Image image );
 
   /**
-   * @copydoc SetDisabledCheckedImage( Image image )
+   * @copydoc SetDisabledSelectedImage( Image image )
    */
-  void SetDisabledCheckedImage( Actor image );
+  void SetDisabledSelectedImage( Actor image );
 
   /**
-   * Gets the disabled checked image.
-   * @return An actor with the disabled checked image.
+   * Gets the disabled selected image.
+   * @return An actor with the disabled selected image.
    */
-  Actor GetDisabledCheckedImage() const;
+  Actor GetDisabledSelectedImage() const;
 
 public: // Not intended for application developers
 

@@ -41,9 +41,9 @@ class RadioButton;
  *
  * Radio buttons are designed to select one of many option at the same time.
  *
- * Every button have its own \e label and \e state, which can be modified by RadioButton::SetLabel and RadioButton::SetSelected.
+ * Every button have its own \e label and \e state, which can be modified by RadioButton::SetLabel and Button::SetSelected.
  *
- * RadioButton can change its current state using RadioButton::ToggleState.
+ * RadioButton can change its current state using Button::SetSelected.
  *
  * RadioButtons can be grouped.
  * Two or more RadioButtons are in one group when they have this same parent.
@@ -51,7 +51,7 @@ class RadioButton;
  * So when RadioButton is set to \e selected, other RadioButtons in its group are set to \e unselected.
  * When \e selected RadioButton is set to \e unselected no other RadioButtons in his group is set to \e selected.
  *
- * A Button::ClickedSignal() is emitted when the RadioButton change its state to \e selected or \e unselected.
+ * A Button::StateChangedSignal() is emitted when the RadioButton change its state to \e selected or \e unselected.
  */
 class DALI_IMPORT_API RadioButton: public Button
 {
@@ -66,12 +66,12 @@ class DALI_IMPORT_API RadioButton: public Button
   /**
    * @brief Copy constructor.
    */
-  RadioButton(const RadioButton& radioButton);
+  RadioButton( const RadioButton& radioButton );
 
   /**
    * @brief Assignment operator.
    */
-  RadioButton& operator=(const RadioButton& radioButton);
+  RadioButton& operator=( const RadioButton& radioButton );
 
   /**
    * @brief Destructor
@@ -94,7 +94,7 @@ class DALI_IMPORT_API RadioButton: public Button
    *
    * @return A handle to a newly allocated Dali resource.
    */
-  static RadioButton New(const std::string& label);
+  static RadioButton New( const std::string& label );
 
   /**
    * @brief Create an initialized RadioButton with existing Actor.
@@ -103,7 +103,7 @@ class DALI_IMPORT_API RadioButton: public Button
    *
    * @return A handle to a newly allocated Dali resource.
    */
-  static RadioButton New(Actor label);
+  static RadioButton New( Actor label );
 
   /**
    * @brief Downcast an Object handle to RadioButton.
@@ -114,47 +114,7 @@ class DALI_IMPORT_API RadioButton: public Button
    * @param[in] handle Handle to an object
    * @return handle to a RadioButton or an uninitialized handle
    */
-  static RadioButton DownCast(BaseHandle handle);
-
-  /**
-   * @brief Sets the button label.
-   *
-   * @param[in] label The button label.
-   */
-  void SetLabel(const std::string& label);
-
-  /**
-   * @brief Sets the button label using existing Actor.
-   *
-   * @param[in] label An Actor with the label.
-   */
-  void SetLabel(Actor label);
-
-  /**
-   * @brief Gets the label.
-   *
-   * @return An Actor with the label.
-   */
-  Actor GetLabel() const;
-
-  /**
-   * @brief Sets the button as selected or unselected.
-   *
-   * @param[in] selected property
-   */
-  void SetSelected(bool selected);
-
-  /**
-   * @return true if button is selected, false if button is unselected.
-   */
-  bool IsSelected()const;
-
-  /**
-   * @brief Change button state.
-   *
-   * If button is selected unselect it. If button is unselected select it.
-   */
-  void ToggleState();
+  static RadioButton DownCast( BaseHandle handle );
 
  public: // Not intended for application developers
 
@@ -163,15 +123,14 @@ class DALI_IMPORT_API RadioButton: public Button
    *
    * @param[in]  implementation  The Control implementation.
    */
-  DALI_INTERNAL RadioButton(Internal::RadioButton& implementation);
+  DALI_INTERNAL RadioButton( Internal::RadioButton& implementation );
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @param[in]  internal  A pointer to the internal CustomActor.
    */
-  DALI_INTERNAL RadioButton(Dali::Internal::CustomActor* internal);
-
+  DALI_INTERNAL RadioButton( Dali::Internal::CustomActor* internal );
 };
 
 } // namespace Toolkit

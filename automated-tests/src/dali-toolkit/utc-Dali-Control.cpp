@@ -271,28 +271,24 @@ int UtcDaliControlSignalConnectDisconnect(void)
     DummyControl dummy = DummyControlImpl::New();
 
     Actor actor = Actor::New();
-    DALI_TEST_EQUALS( actor.SetSizeSignal().GetConnectionCount(), 0u, TEST_LOCATION );
+    DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 0u, TEST_LOCATION );
     Toolkit::Internal::Control& control = dummy.GetImplementation();
     DummyControlImpl* dummyImpl = dynamic_cast<DummyControlImpl*>(&control);
     DALI_TEST_CHECK( dummyImpl );
 
-    actor.SetSizeSignal().Connect( dummyImpl, &DummyControlImpl::CustomSlot1 );
-    DALI_TEST_EQUALS( actor.SetSizeSignal().GetConnectionCount(), 1u, TEST_LOCATION );
+    actor.OnStageSignal().Connect( dummyImpl, &DummyControlImpl::CustomSlot1 );
+    DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Called, false, TEST_LOCATION );
-    DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Value,  Vector3::ZERO, TEST_LOCATION );
 
-    const Vector3 newSize( 10, 10, 0 );
-    actor.SetSize( newSize );
+    Stage::GetCurrent().Add( actor );
     DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Called, true, TEST_LOCATION );
-    DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Value,  newSize, TEST_LOCATION );
 
     dummyImpl->mCustomSlot1Called = false;
-    actor.SetSizeSignal().Disconnect( dummyImpl, &DummyControlImpl::CustomSlot1 );
-    DALI_TEST_EQUALS( actor.SetSizeSignal().GetConnectionCount(), 0u, TEST_LOCATION );
-    const Vector3 ignoredSize( 20, 20, 0 );
-    actor.SetSize( ignoredSize );
+    actor.OnStageSignal().Disconnect( dummyImpl, &DummyControlImpl::CustomSlot1 );
+    DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 0u, TEST_LOCATION );
+    Stage::GetCurrent().Remove( actor );
+    Stage::GetCurrent().Add( actor );
     DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Called, false, TEST_LOCATION );
-    DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Value,  newSize/*not ignoredSize*/, TEST_LOCATION );
   }
   END_TEST;
 }
@@ -309,19 +305,17 @@ int UtcDaliControlSignalAutomaticDisconnect(void)
     DummyControlImpl* dummyImpl = dynamic_cast<DummyControlImpl*>(&control);
     DALI_TEST_CHECK( dummyImpl );
 
-    actor.SetSizeSignal().Connect( dummyImpl, &DummyControlImpl::CustomSlot1 );
-    DALI_TEST_EQUALS( actor.SetSizeSignal().GetConnectionCount(), 1u, TEST_LOCATION );
+    actor.OnStageSignal().Connect( dummyImpl, &DummyControlImpl::CustomSlot1 );
+    DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 1u, TEST_LOCATION );
     DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Called, false, TEST_LOCATION );
-    DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Value,  Vector3::ZERO, TEST_LOCATION );
 
-    const Vector3 newSize( 10, 10, 0 );
-    actor.SetSize( newSize );
+    Stage::GetCurrent().Add( actor );
     DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Called, true, TEST_LOCATION );
-    DALI_TEST_EQUALS( dummyImpl->mCustomSlot1Value,  newSize, TEST_LOCATION );
+    Stage::GetCurrent().Remove( actor );
   }
   // dummyControl automatically disconnects
 
-  DALI_TEST_EQUALS( actor.SetSizeSignal().GetConnectionCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 0u, TEST_LOCATION );
 
   const Vector3 ignoredSize( 20, 20, 0 );
   actor.SetSize( ignoredSize );

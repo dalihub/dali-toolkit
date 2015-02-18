@@ -42,10 +42,10 @@ void utc_dali_toolkit_pushbutton_cleanup(void)
 namespace
 {
 
-static bool gPushButtonToggleState = false;
-bool PushButtonToggled( Button button, bool toggled )
+static bool gPushButtonSelectedState = false;
+bool PushButtonSelected( Button button )
 {
-  gPushButtonToggleState = toggled && ( toggled == static_cast<PushButton&>( button ).IsToggled() );
+  gPushButtonSelectedState = button.IsSelected();
   return true;
 }
 
@@ -118,101 +118,101 @@ int UtcDaliPushButtonSetGetAutoRepeating(void)
   END_TEST;
 }
 
-int UtcDaliPushButtonSetGetToggleButton(void)
+int UtcDaliPushButtonSetGetTogglableButton(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliPushButtonSetGetToggleButton");
+  tet_infoline(" UtcDaliPushButtonSetGetTogglableButton");
 
   PushButton pushButton = PushButton::New();
 
-  pushButton.SetToggleButton( true );
+  pushButton.SetTogglableButton( true );
 
-  DALI_TEST_CHECK( pushButton.IsToggleButton() );
+  DALI_TEST_CHECK( pushButton.IsTogglableButton() );
 
-  pushButton.SetToggleButton( false );
+  pushButton.SetTogglableButton( false );
 
-  DALI_TEST_CHECK( !pushButton.IsToggleButton() );
+  DALI_TEST_CHECK( !pushButton.IsTogglableButton() );
 
-  pushButton.SetToggleButton( true );
+  pushButton.SetTogglableButton( true );
 
-  DALI_TEST_CHECK( pushButton.IsToggleButton() );
+  DALI_TEST_CHECK( pushButton.IsTogglableButton() );
   END_TEST;
 }
 
-int UtcDaliPushButtonSetGetAutoRepeatingAndToggleButton(void)
+int UtcDaliPushButtonSetGetAutoRepeatingAndTogglableButton(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliPushButtonSetGetAutoRepeatingAndToggleButton");
+  tet_infoline(" UtcDaliPushButtonSetGetAutoRepeatingAndTogglableButton");
 
   PushButton pushButton = PushButton::New();
 
   pushButton.SetAutoRepeating( true );
-  pushButton.SetToggleButton( true );
+  pushButton.SetTogglableButton( true );
 
-  DALI_TEST_CHECK( pushButton.IsToggleButton() );
+  DALI_TEST_CHECK( pushButton.IsTogglableButton() );
   DALI_TEST_CHECK( !pushButton.IsAutoRepeating() );
 
-  pushButton.SetToggleButton( true );
+  pushButton.SetTogglableButton( true );
   pushButton.SetAutoRepeating( true );
 
   DALI_TEST_CHECK( pushButton.IsAutoRepeating() );
-  DALI_TEST_CHECK( !pushButton.IsToggleButton() );
+  DALI_TEST_CHECK( !pushButton.IsTogglableButton() );
   END_TEST;
 }
 
-int UtcDaliPushButtonSetGetToggled01(void)
+int UtcDaliPushButtonSetGetSelected01(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliPushButtonSetGetToggled01");
+  tet_infoline(" UtcDaliPushButtonSetGetSelected01");
 
   PushButton pushButton = PushButton::New();
 
-  pushButton.SetToggleButton( true );
-  pushButton.StateChangedSignal().Connect( &PushButtonToggled );
+  pushButton.SetTogglableButton( true );
+  pushButton.StateChangedSignal().Connect( &PushButtonSelected );
 
-  gPushButtonToggleState = false;
-  pushButton.SetToggled( true );
+  gPushButtonSelectedState = false;
+  pushButton.SetSelected( true );
 
-  DALI_TEST_CHECK( pushButton.IsToggled() );
-  DALI_TEST_CHECK( gPushButtonToggleState );
+  DALI_TEST_CHECK( pushButton.IsSelected() );
+  DALI_TEST_CHECK( gPushButtonSelectedState );
 
-  pushButton.SetToggled( false );
+  pushButton.SetSelected( false );
 
-  DALI_TEST_CHECK( !pushButton.IsToggled() );
-  DALI_TEST_CHECK( !gPushButtonToggleState );
+  DALI_TEST_CHECK( !pushButton.IsSelected() );
+  DALI_TEST_CHECK( !gPushButtonSelectedState );
 
-  pushButton.SetToggled( true );
+  pushButton.SetSelected( true );
 
-  DALI_TEST_CHECK( pushButton.IsToggled() );
-  DALI_TEST_CHECK( gPushButtonToggleState );
+  DALI_TEST_CHECK( pushButton.IsSelected() );
+  DALI_TEST_CHECK( gPushButtonSelectedState );
   END_TEST;
 }
 
-int UtcDaliPushButtonSetGetToggled02(void)
+int UtcDaliPushButtonSetGetSelected02(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliPushButtonSetGetToggled02");
+  tet_infoline(" UtcDaliPushButtonSetGetSelected02");
 
   PushButton pushButton = PushButton::New();
 
-  pushButton.SetToggleButton( false );
-  pushButton.StateChangedSignal().Connect( &PushButtonToggled );
+  pushButton.SetTogglableButton( false );
+  pushButton.StateChangedSignal().Connect( &PushButtonSelected );
 
-  gPushButtonToggleState = false;
-  pushButton.SetToggled( true );
+  gPushButtonSelectedState = false;
+  pushButton.SetSelected( true );
 
-  DALI_TEST_CHECK( !pushButton.IsToggled() );
-  DALI_TEST_CHECK( !gPushButtonToggleState );
+  DALI_TEST_CHECK( !pushButton.IsSelected() );
+  DALI_TEST_CHECK( !gPushButtonSelectedState );
 
-  pushButton.SetToggled( false );
+  pushButton.SetSelected( false );
 
-  DALI_TEST_CHECK( !pushButton.IsToggled() );
-  DALI_TEST_CHECK( !gPushButtonToggleState );
+  DALI_TEST_CHECK( !pushButton.IsSelected() );
+  DALI_TEST_CHECK( !gPushButtonSelectedState );
 
-  pushButton.SetToggled( true );
+  pushButton.SetSelected( true );
 
-  DALI_TEST_CHECK( !pushButton.IsToggled() );
-  DALI_TEST_CHECK( !gPushButtonToggleState );
+  DALI_TEST_CHECK( !pushButton.IsSelected() );
+  DALI_TEST_CHECK( !gPushButtonSelectedState );
   END_TEST;
 }
 
@@ -551,10 +551,10 @@ int UtcDaliPushButtonReleased(void)
   END_TEST;
 }
 
-int UtcDaliPushButtonToggled(void)
+int UtcDaliPushButtonSelected(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliPushButtonToggled");
+  tet_infoline(" UtcDaliPushButtonSelected");
 
   PushButton pushButton = PushButton::New();
   pushButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
@@ -568,13 +568,13 @@ int UtcDaliPushButtonToggled(void)
   application.Render();
 
   // connect to its touch signal
-  pushButton.StateChangedSignal().Connect( &PushButtonToggled );
+  pushButton.StateChangedSignal().Connect( &PushButtonSelected );
 
   Dali::Integration::TouchEvent event;
 
-  // Test1. No toggle button.
+  // Test1. No togglable button.
 
-  gPushButtonToggleState = false;
+  gPushButtonSelectedState = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownInside );
   application.ProcessEvent( event );
@@ -583,13 +583,13 @@ int UtcDaliPushButtonToggled(void)
   event.AddPoint( pointUpInside );
   application.ProcessEvent( event );
 
-  DALI_TEST_CHECK( !gPushButtonToggleState );
+  DALI_TEST_CHECK( !gPushButtonSelectedState );
 
-  // Set toggle property.
-  pushButton.SetToggleButton( true );
+  // Set togglable property.
+  pushButton.SetTogglableButton( true );
 
   // Test2. Touch point down and up inside the button twice.
-  gPushButtonToggleState = false;
+  gPushButtonSelectedState = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownInside );
   application.ProcessEvent( event );
@@ -598,7 +598,7 @@ int UtcDaliPushButtonToggled(void)
   event.AddPoint( pointUpInside );
   application.ProcessEvent( event );
 
-  DALI_TEST_CHECK( gPushButtonToggleState );
+  DALI_TEST_CHECK( gPushButtonSelectedState );
 
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownInside );
@@ -608,11 +608,11 @@ int UtcDaliPushButtonToggled(void)
   event.AddPoint( pointUpInside );
   application.ProcessEvent( event );
 
-  DALI_TEST_CHECK( !gPushButtonToggleState );
+  DALI_TEST_CHECK( !gPushButtonSelectedState );
 
   // Test3. Touch point down and up outside the button.
 
-  gPushButtonToggleState = false;
+  gPushButtonSelectedState = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownOutside );
   application.ProcessEvent( event );
@@ -621,11 +621,11 @@ int UtcDaliPushButtonToggled(void)
   event.AddPoint( pointUpOutside );
   application.ProcessEvent( event );
 
-  DALI_TEST_CHECK( !gPushButtonToggleState );
+  DALI_TEST_CHECK( !gPushButtonSelectedState );
 
   // Test4. Touch point down inside and up outside the button.
 
-  gPushButtonToggleState = false;
+  gPushButtonSelectedState = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownInside );
   application.ProcessEvent( event );
@@ -638,11 +638,11 @@ int UtcDaliPushButtonToggled(void)
   event.AddPoint( pointUpOutside );
   application.ProcessEvent( event );
 
-  DALI_TEST_CHECK( !gPushButtonToggleState );
+  DALI_TEST_CHECK( !gPushButtonSelectedState );
 
   // Test5. Touch point down outside and up inside the button.
 
-  gPushButtonToggleState = false;
+  gPushButtonSelectedState = false;
   event = Dali::Integration::TouchEvent();
   event.AddPoint( pointDownOutside );
   application.ProcessEvent( event );
@@ -655,6 +655,6 @@ int UtcDaliPushButtonToggled(void)
   event.AddPoint( pointUpInside );
   application.ProcessEvent( event );
 
-  DALI_TEST_CHECK( !gPushButtonToggleState );
+  DALI_TEST_CHECK( !gPushButtonSelectedState );
   END_TEST;
 }

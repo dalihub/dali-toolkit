@@ -50,10 +50,9 @@ DummyControl& DummyControl::operator=(const DummyControl& control)
 }
 
 // Used to test signal connections
-void DummyControlImpl::CustomSlot1( Actor actor, const Vector3& value )
+void DummyControlImpl::CustomSlot1( Actor actor )
 {
   mCustomSlot1Called = true;
-  mCustomSlot1Value = value;
 }
 
 DummyControl DummyControlImpl::New()
@@ -66,8 +65,7 @@ DummyControl DummyControlImpl::New()
 
 DummyControlImpl::DummyControlImpl()
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
-  mCustomSlot1Called(false),
-  mCustomSlot1Value(Vector3::ZERO)
+  mCustomSlot1Called(false)
 {
 }
 

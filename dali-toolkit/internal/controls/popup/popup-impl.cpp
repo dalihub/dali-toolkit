@@ -55,78 +55,39 @@ const Vector3 DEFAULT_BOTTOM_SIZE = Vector3(1.0f, 0.2f, 0.0f);
 const char* const PROPERTY_TITLE = "title";
 const char* const PROPERTY_STATE = "state";
 
-// Constraints ///////////////////////////////////////////////////////////////////////////
-
 /**
- * BackgroundSizeConstraint
- *
  * The background size should be at least as big as the Dialog.
  * In some cases a background may have graphics which are visible
  * outside of the Dialog, e.g. A Shadow. For this we need to alter
  * the size of Background.
+ *
+ * @param[in] outerBorder The border to extend beyond parent's Size.
+ * @param[in] parentSize  The parent's size
  */
-struct BackgroundSizeConstraint
+Vector3 BackgroundSize(const Vector4& outerBoarder, const Vector3& parentSize)
 {
+  Vector3 size( parentSize );
+  size.width += outerBoarder.x + outerBoarder.y;
+  size.height += outerBoarder.z + outerBoarder.w;
+
+  return size;
+}
+
   /**
-   * Constraint that sets size to parent's size plus a border.
+   * sets button area size to parent's size plus a border.
    *
    * @param[in] outerBorder The border to extend beyond parent's Size.
+   * @param[in] parentSize  The parent's size
    */
-  BackgroundSizeConstraint( Vector4 outerBorder )
-  : mOuterBorder( outerBorder )
-  {
-  }
-
-  /**
-   * (render thread code)
-   * @param[in] current The current size.
-   * @param[in] parentSizeProperty The parent's size
-   */
-  Vector3 operator()( const Vector3& current,
-                      const PropertyInput& parentSizeProperty )
-  {
-    Vector3 size = parentSizeProperty.GetVector3();
-
-    size.width += mOuterBorder.x + mOuterBorder.y;
-    size.height += mOuterBorder.z + mOuterBorder.w;
-
-    return size;
-  }
-
-  const Vector4 mOuterBorder;  ///< The size of the outer-border (Set to 0.0, 0.0f, 0.0f, 0.0f if doesn't exist).
-};
-
-struct ButtonAreaSizeConstraint
+Vector3 ButtonAreaSize( const Vector4& outBoarder, const Vector3& parentSize )
 {
-  /**
-   * Constraint that sets size to parent's size plus a border.
-   *
-   * @param[in] outerBorder The border to extend beyond parent's Size.
-   */
-  ButtonAreaSizeConstraint( Vector4 outerBorder )
-  : mOuterBorder( outerBorder )
-  {
-  }
+  Vector3 size( parentSize );
+  size.width += outBoarder.x + outBoarder.y;
+  size.width -= (POPUP_OUT_MARGIN_WIDTH + POPUP_OUT_MARGIN_WIDTH);
+  size.height = POPUP_BUTTON_BG_HEIGHT;
 
-  /**
-   * (render thread code)
-   * @param[in] current The current size.
-   * @param[in] parentSizeProperty The parent's size
-   */
-  Vector3 operator()( const Vector3& current,
-                      const PropertyInput& parentSizeProperty )
-  {
-    Vector3 size = parentSizeProperty.GetVector3();
-
-    size.width += mOuterBorder.x + mOuterBorder.y;
-    size.width -= (POPUP_OUT_MARGIN_WIDTH + POPUP_OUT_MARGIN_WIDTH);
-    size.height = POPUP_BUTTON_BG_HEIGHT;
-
-    return size;
-  }
-
-  const Vector4 mOuterBorder;  ///< The size of the outer-border (Set to 0.0, 0.0f, 0.0f, 0.0f if doesn't exist).
-};
+  return size;
+}
 
 } // unnamed namespace
 
@@ -199,13 +160,11 @@ void Popup::OnInitialize()
   mLayer.SetParentOrigin(ParentOrigin::CENTER);
   mLayer.SetAnchorPoint(AnchorPoint::CENTER);
   mLayer.RaiseToTop();
-  mLayer.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
   self.Add(mLayer);
 
   mPopupBg = Actor::New();
   mPopupBg.SetParentOrigin(ParentOrigin::CENTER);
   mPopupBg.SetAnchorPoint(AnchorPoint::CENTER);
-  mPopupBg.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
   mLayer.Add(mPopupBg);
 
   // Any content after this point which is added to Self() will be reparented to
@@ -666,6 +625,23 @@ void Popup::OnControlChildAdd( Actor& child )
   }
 }
 
+void Popup::OnControlSizeSet( const Vector3& targetSize )
+{
+  mLayer.SetSize( targetSize );
+  mPopupBg.SetSize( targetSize );
+
+  const Vector4 outerBorder = mPopupStyle->backgroundOuterBorder;
+  if( mBackgroundImage )
+  {
+    mBackgroundImage.SetSize( BackgroundSize( outerBorder,targetSize ) );
+  }
+  if( mButtonAreaImage )
+  {
+    mButtonAreaImage.SetSize( ButtonAreaSize( outerBorder, targetSize ) );
+  }
+
+}
+
 void Popup::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   // Set the popup size
@@ -683,13 +659,7 @@ void Popup::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 
   if( mBackgroundImage )
   {
-    Constraint constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                                      ParentSource( Actor::SIZE ),
-                                                      BackgroundSizeConstraint(outerBorder) );
-
-    mBackgroundImage.RemoveConstraints();
-    mBackgroundImage.ApplyConstraint( constraint );
-
+    mBackgroundImage.SetSize(BackgroundSize(outerBorder, Vector3(size)));
     mBackgroundImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
     mBackgroundImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
     mBackgroundImage.SetPosition( -outerBorder.x, -outerBorder.y, 0.0f );
@@ -704,13 +674,7 @@ void Popup::OnRelayout( const Vector2& size, ActorSizeContainer& container )
     }
     else
     {
-      Constraint constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                                      ParentSource( Actor::SIZE ),
-                                                      ButtonAreaSizeConstraint(outerBorder) );
-
-      mButtonAreaImage.RemoveConstraints();
-      mButtonAreaImage.ApplyConstraint( constraint );
-
+      mButtonAreaImage.SetSize( ButtonAreaSize(outerBorder, Vector3(size)) );
       mButtonAreaImage.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
       mButtonAreaImage.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
       mButtonAreaImage.SetY( -outerBorder.z - POPUP_OUT_MARGIN_HEIGHT );
@@ -865,6 +829,11 @@ Vector3 Popup::GetNaturalSize()
     Vector3 contentSize = RelayoutHelper::GetNaturalSize( mContent );
     // Choose the biggest width
     naturalSize.width = std::max( naturalSize.width, contentSize.width );
+    if( naturalSize.width > maxWidth )
+    {
+      naturalSize.width = maxWidth;
+      contentSize.height = RelayoutHelper::GetHeightForWidth( mContent, maxWidth );
+    }
     naturalSize.height += contentSize.height + mPopupStyle->margin;
   }
 

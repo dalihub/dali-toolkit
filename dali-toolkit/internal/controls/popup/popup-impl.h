@@ -251,7 +251,12 @@ private:
   virtual void OnControlChildAdd( Actor& child );
 
   /**
-   * @copydoc Control::OnRelayout()
+   * @copydoc Toolkit::Control::OnControlSizeSet( const Vector3& size )
+   */
+  virtual void OnControlSizeSet( const Vector3& size );
+
+  /**
+   * @copydoc Control::OnRelayOut()
    */
   virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 

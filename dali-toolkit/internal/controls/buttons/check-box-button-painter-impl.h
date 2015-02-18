@@ -53,14 +53,6 @@ public:
    */
   virtual ~CheckBoxButtonPainter() {}
 
-  /**
-   * This method is called when the Dali::Toolkit::Internal::CheckBoxButton, in which this
-   * object is registered, changes its state.
-   * @param[inout] button The Dali::Toolkit::CheckBoxButton, linked to the internal
-   * implementation, in which this object is registered.
-   */
-  virtual void Checked( Toolkit::CheckBoxButton& button ) = 0;
-
   /////////////////////////////////////////////////////////////////////////////
   // ButtonPainter interface
   /////////////////////////////////////////////////////////////////////////////

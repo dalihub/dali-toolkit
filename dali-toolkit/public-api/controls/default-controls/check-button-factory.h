@@ -34,11 +34,11 @@ namespace Toolkit
  * @note If an image path is empty, this image is not set to the button.
  *
  * @param[in] backgroundImagePath Image path to be shown as button background.
- * @param[in] checkedImagePath Image path to be shown as checked button.
+ * @param[in] selectedImagePath Image path to be shown as selected button.
  * @param[in] disabledBackgroundImagePath Image path to be shown as button isabled background.
- * @param[in] disabledCheckedImagePath Image path to be shown as disabled checked button.
+ * @param[in] disabledSelectedImagePath Image path to be shown as disabled selected button.
  */
-DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& checkedImagePath, const std::string& disabledBackgroundImagePath, const std::string& disabledCheckedImagePath );
+DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& selectedImagePath, const std::string& disabledBackgroundImagePath, const std::string& disabledSelectedImagePath );
 
 /**
  * Creates a check box button with the given images.
@@ -47,31 +47,31 @@ DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( const std::string& backgrou
  * @note If an image is an empty handle, this image is not set to the button.
  *
  * @param[in] backgroundImageActor  Image to be shown as button background.
- * @param[in] checkedImageActor  Image to be shown as checked button.
+ * @param[in] selectedImageActor  Image to be shown as selected button.
  * @param[in] disabledBackgroundImageActor Image to be shown as button disabled background.
- * @param[in] disabledCheckedImagActor Image to be shown as disabled checked button.
+ * @param[in] disabledSelectedImagActor Image to be shown as disabled selected button.
  */
-DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedImageActor, Actor disabledBackgroundImageActor, Actor disabledCheckedImagActor );
+DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor selectedImageActor, Actor disabledBackgroundImageActor, Actor disabledSelectedImagActor );
 
 /**
- * Creates a check box button with the given background and checked images.
- * Background and checked images will be shrunk to fit the button size keeping their aspect ratio.
- * @note Background and checked images won't be scaled to fill the whole button size.
+ * Creates a check box button with the given background and selected images.
+ * Background and selected images will be shrunk to fit the button size keeping their aspect ratio.
+ * @note Background and selected images won't be scaled to fill the whole button size.
  *
  * @param[in] backgroundImagePath  Image path to be shown as button background.
- * @param[in] checkedImagePath  Image path to be shown as checked button.
+ * @param[in] selectedImagePath  Image path to be shown as selected button.
  */
-DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& checkedImagePath );
+DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& selectedImagePath );
 
 /**
- * Creates a check box button with the given background and checked images.
- * Background and checked images will be shrunk to fit the button size keeping their aspect ratio.
- * @note Background and checked images won't be scaled to fill the whole button size.
+ * Creates a check box button with the given background and selected images.
+ * Background and selected images will be shrunk to fit the button size keeping their aspect ratio.
+ * @note Background and selected images won't be scaled to fill the whole button size.
  *
  * @param[in] backgroundImageActor  Image to be shown as button background.
- * @param[in] checkedImageActor  Image to be shown as checked button.
+ * @param[in] selectedImageActor  Image to be shown as selected button.
  */
-DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedImageActor );
+DALI_IMPORT_API CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor selectedImageActor );
 
 } // namespace Toolkit
 
