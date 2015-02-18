@@ -31,9 +31,6 @@ namespace Toolkit
 // Popup
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-const char* const Popup::SIGNAL_TOUCHED_OUTSIDE = "touched-outside";
-const char* const Popup::SIGNAL_HIDDEN = "hidden";
-
 Popup::Popup()
 {
 }

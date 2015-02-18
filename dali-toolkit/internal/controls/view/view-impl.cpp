@@ -37,14 +37,18 @@ namespace Internal
 namespace // to register type
 {
 
+// Signals
+
+const char* const SIGNAL_ORIENTATION_ANIMATION_START = "orientation-animation-start";
+
 BaseHandle Create()
 {
   return Toolkit::View::New();
 }
 
-TypeRegistration typeRegistration( typeid(Toolkit::View), typeid(Toolkit::Control), Create );
+TypeRegistration typeRegistration( typeid( Toolkit::View ), typeid( Toolkit::Control ), Create );
 
-SignalConnectorType signalConnector1( typeRegistration, Toolkit::View::SIGNAL_ORIENTATION_ANIMATION_START , &View::DoConnectSignal );
+SignalConnectorType signalConnector1( typeRegistration, SIGNAL_ORIENTATION_ANIMATION_START , &View::DoConnectSignal );
 
 }
 
@@ -251,7 +255,7 @@ bool View::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* trac
   bool connected( true );
   Toolkit::View view = Toolkit::View::DownCast(handle);
 
-  if( Toolkit::View::SIGNAL_ORIENTATION_ANIMATION_START == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_ORIENTATION_ANIMATION_START ) )
   {
     view.OrientationAnimationStartedSignal().Connect( tracker, functor );
   }

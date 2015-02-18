@@ -73,15 +73,15 @@ class NavigationControl;
  *                 | +-+        +-----+  +-----+        +-+ |
  *                 | +-+        +-----+  +-----+        +-+ |  tool bar
  *                 +----------------------------------------+
+ *
+ * Actions
+ * | %Action Name      | %NavigationControl method called |
+ * |-------------------|----------------------------------|
+ * | push              | %PushItem()                      |
+ * | pop               | %PopItem()                       |
  */
-
 class DALI_IMPORT_API NavigationControl : public Control
 {
-
-public:
-  //Action Names
-  static const char* const ACTION_PUSH;
-  static const char* const ACTION_POP;
 
 public:
 

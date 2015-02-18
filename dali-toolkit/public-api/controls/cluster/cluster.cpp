@@ -35,10 +35,6 @@ namespace Toolkit
 
 const std::string Cluster::CLUSTER_ACTOR_DEPTH( "cluster-actor-depth" );
 
-const char* const Cluster::ACTION_EXPAND = "expand";
-const char* const Cluster::ACTION_COLLAPSE = "collapse";
-const char* const Cluster::ACTION_TRANSFORM = "transform";
-
 Cluster::Cluster()
 {
 }

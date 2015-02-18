@@ -121,7 +121,9 @@ BaseHandle Create()
   return Toolkit::ScrollBar::New();
 }
 
-TypeRegistration typeRegistration( typeid(Toolkit::ScrollBar), typeid(Toolkit::ScrollComponent), Create );
+TypeRegistration typeRegistration( typeid( Toolkit::ScrollBar ), typeid( Toolkit::ScrollComponent ), Create );
+
+const char* const SCROLL_POSITION_NOTIFIED_SIGNAL_NAME = "scroll-position-notified";
 
 PropertyRegistration property1( typeRegistration, "indicator-height-policy", Toolkit::ScrollBar::PROPERTY_INDICATOR_HEIGHT_POLICY, Property::STRING, &ScrollBar::SetProperty, &ScrollBar::GetProperty );
 PropertyRegistration property2( typeRegistration, "indicator-fixed-height",  Toolkit::ScrollBar::PROPERTY_INDICATOR_FIXED_HEIGHT,  Property::FLOAT,  &ScrollBar::SetProperty, &ScrollBar::GetProperty );
@@ -436,6 +438,26 @@ void ScrollBar::OnIndicatorHeightPolicyPropertySet( Property::Value propertyValu
   {
     DALI_ASSERT_ALWAYS( !"ScrollBar::OnIndicatorHeightPolicyPropertySet(). Invalid Property value." );
   }
+}
+
+bool ScrollBar::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+{
+  Dali::BaseHandle handle( object );
+
+  bool connected( true );
+  Toolkit::ScrollBar scrollBar = Toolkit::ScrollBar::DownCast( handle );
+
+  if( 0 == strcmp( signalName.c_str(), SCROLL_POSITION_NOTIFIED_SIGNAL_NAME ) )
+  {
+    scrollBar.ScrollPositionNotifiedSignal().Connect( tracker, functor );
+  }
+  else
+  {
+    // signalName does not match any signal
+    connected = false;
+  }
+
+  return connected;
 }
 
 void ScrollBar::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )

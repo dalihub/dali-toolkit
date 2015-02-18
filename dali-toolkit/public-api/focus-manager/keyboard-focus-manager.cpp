@@ -31,11 +31,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const char* const KeyboardFocusManager::SIGNAL_PRE_FOCUS_CHANGE = "keyboard-pre-focus-change";
-const char* const KeyboardFocusManager::SIGNAL_FOCUS_CHANGED = "keyboard-focus-changed";
-const char* const KeyboardFocusManager::SIGNAL_FOCUS_GROUP_CHANGED = "keyboard-focus-group-changed";
-const char* const KeyboardFocusManager::SIGNAL_FOCUSED_ACTOR_ACTIVATED = "keyboard-focused-actor-activated";
-
 KeyboardFocusManager::KeyboardFocusManager()
 {
 }

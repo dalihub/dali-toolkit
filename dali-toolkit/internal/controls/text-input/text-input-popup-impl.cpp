@@ -18,8 +18,8 @@
 // EXTERNAL INCLUDES
 #include <libintl.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/integration-api/debug.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-input/text-input-popup-impl.h>
@@ -101,9 +101,16 @@ namespace Toolkit
 namespace Internal
 {
 
-const char* const TextInputPopup::SIGNAL_PRESSED = "pressed";
-const char* const TextInputPopup::SIGNAL_HIDE_FINISHED = "hide-finished";
-const char* const TextInputPopup::SIGNAL_SHOW_FINISHED = "show-finished";
+namespace
+{
+
+// Signals
+
+const char* const SIGNAL_PRESSED =       "pressed";
+const char* const SIGNAL_HIDE_FINISHED = "hide-finished";
+const char* const SIGNAL_SHOW_FINISHED = "show-finished";
+
+}
 
 const char* const TextInputPopup::OPTION_SELECT_WORD = "option-select_word";                       // "Select Word" popup option.
 const char* const TextInputPopup::OPTION_SELECT_ALL("option-select_all");                          // "Select All" popup option.
@@ -895,12 +902,12 @@ TextInputPopup::PressedSignalType& TextInputPopup::PressedSignal()
   return mPressedSignal;
 }
 
-TextInputPopup::HideFinishedSignalType& TextInputPopup::HideFinishedSignal()
+TextInputPopup::VisibilityChangeFinishedSignalType& TextInputPopup::HideFinishedSignal()
 {
   return mHideFinishedSignal;
 }
 
-TextInputPopup::ShowFinishedSignalType& TextInputPopup::ShowFinishedSignal()
+TextInputPopup::VisibilityChangeFinishedSignalType& TextInputPopup::ShowFinishedSignal()
 {
   return mShowFinishedSignal;
 }

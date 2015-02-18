@@ -73,6 +73,11 @@ class CubeTransitionEffect;
  * cubeEffect.StartTransition( );
  *
  * @endcode
+ *
+ * Signals
+ * | %Signal Name         | Method                           |
+ * |----------------------|----------------------------------|
+ * | transition-completed | @ref TransitionCompletedSignal() |
  */
 class DALI_IMPORT_API CubeTransitionEffect : public BaseHandle
 {
@@ -88,6 +93,17 @@ public:
    * Destructor
    */
   ~CubeTransitionEffect();
+
+  /**
+   * @brief Downcast an Object handle to a CubeTransitionEffect handle.
+   *
+   * If handle points to a CubeTransitionEffect object the downcast produces
+   * a valid handle. If not the returned handle is left uninitialized.
+   *
+   * @param[in] handle A handle to an object
+   * @return A handle to a CubeTransitionEffect object or an uninitialized handle
+   */
+  static CubeTransitionEffect DownCast( BaseHandle handle );
 
   /**
    * Set the duration of transition animation
@@ -173,9 +189,6 @@ public:
   void StopTransition();
 
 public: //Signal
-
-  //signal name
-  static const char* const SIGNAL_TRANSITION_COMPLETED;
 
   //Transition animation completed signal
   typedef Signal< void ( CubeTransitionEffect, ImageActor ) > TransitionCompletedSignalType;

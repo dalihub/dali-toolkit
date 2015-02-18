@@ -116,15 +116,20 @@ const bool DEFAULT_SHOW_VALUE = true;
 const bool DEFAULT_ENABLED = true;
 const bool DEFAULT_SNAP_TO_MARKS = false;
 
+// Signals
+
+const char* const SIGNAL_VALUE_CHANGED = "value-changed";
+const char* const SIGNAL_MARK =          "mark";
+
 BaseHandle Create()
 {
   return Dali::Toolkit::Slider::New();
 }
 
-TypeRegistration typeRegistration( typeid(Dali::Toolkit::Slider), typeid(Dali::Toolkit::Control), Create );
+TypeRegistration typeRegistration( typeid( Dali::Toolkit::Slider ), typeid( Dali::Toolkit::Control ), Create );
 
-SignalConnectorType signalConnector1( typeRegistration, Toolkit::Slider::SIGNAL_VALUE_CHANGED, &Toolkit::Internal::Slider::DoConnectSignal );
-SignalConnectorType signalConnector2( typeRegistration, Toolkit::Slider::SIGNAL_MARK, &Toolkit::Internal::Slider::DoConnectSignal );
+SignalConnectorType signalConnector1( typeRegistration, SIGNAL_VALUE_CHANGED, &Toolkit::Internal::Slider::DoConnectSignal );
+SignalConnectorType signalConnector2( typeRegistration, SIGNAL_MARK, &Toolkit::Internal::Slider::DoConnectSignal );
 
 PropertyRegistration property1( typeRegistration, "lower-bound",  Toolkit::Slider::LOWER_BOUND_PROPERTY, Property::FLOAT, &Slider::SetProperty, &Slider::GetProperty );
 PropertyRegistration property2( typeRegistration, "upper-bound",  Toolkit::Slider::UPPER_BOUND_PROPERTY, Property::FLOAT, &Slider::SetProperty, &Slider::GetProperty );
@@ -1019,8 +1024,7 @@ float Slider::GetMarkTolerance() const
   return mMarkTolerance;
 }
 
-// static class method to support script connecting signals
-
+// Static class method to support script connecting signals
 bool Slider::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::BaseHandle handle( object );
@@ -1028,11 +1032,11 @@ bool Slider::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tr
   bool connected = true;
   Toolkit::Slider slider = Toolkit::Slider::DownCast( handle );
 
-  if( signalName == Dali::Toolkit::Slider::SIGNAL_VALUE_CHANGED )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_VALUE_CHANGED ) )
   {
     slider.ValueChangedSignal().Connect( tracker, functor );
   }
-  else if( signalName == Dali::Toolkit::Slider::SIGNAL_MARK )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_MARK ) )
   {
     slider.MarkSignal().Connect( tracker, functor );
   }

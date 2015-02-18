@@ -43,15 +43,17 @@ class FocusManager;
  * It provides functionality of setting the
  * focus and moving the focus forward and backward. It also draws a highlight for the
  * focused actor and emits a signal when the focus is changed.
+ *
+ * Signals
+ * | %Signal Name            | Method                             |
+ * |-------------------------|------------------------------------|
+ * | focus-changed           | @ref FocusChangedSignal()          |
+ * | focus-overshot          | @ref FocusOvershotSignal()         |
+ * | focused-actor-activated | @ref FocusedActorActivatedSignal() |
  */
-
 class DALI_IMPORT_API FocusManager : public BaseHandle
 {
 public:
-  // Signal Names
-  static const char* const SIGNAL_FOCUS_CHANGED; ///< name "focus-changed"
-  static const char* const SIGNAL_FOCUS_OVERSHOT; ///< name "focus-overshot"
-  static const char* const SIGNAL_FOCUSED_ACTOR_ACTIVATED; ///< name "focused-actor-activated"
 
   /**
    * @brief Accessibility needs four information which will be read by screen-reader.

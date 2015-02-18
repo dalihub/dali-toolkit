@@ -30,10 +30,6 @@ namespace Toolkit
 // Slider
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Signals
-const char* const Slider::SIGNAL_VALUE_CHANGED = "value-changed";
-const char* const Slider::SIGNAL_MARK = "mark";
-
 Slider::Slider()
 {
 }

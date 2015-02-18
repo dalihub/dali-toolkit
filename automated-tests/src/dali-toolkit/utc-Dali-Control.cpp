@@ -518,19 +518,19 @@ int UtcDaliControlGestureSignals(void)
 
   // Each gesture detector gets created when connecting to the gesture signals
   DALI_TEST_CHECK( !control.GetTapGestureDetector() );
-  control.ConnectSignal( &connectionTracker, Control::SIGNAL_TAPPED, &TestVoidCallback );
+  control.ConnectSignal( &connectionTracker, "tapped", &TestVoidCallback );
   DALI_TEST_CHECK( control.GetTapGestureDetector() );
 
   DALI_TEST_CHECK( !control.GetPanGestureDetector() );
-  control.ConnectSignal( &connectionTracker, Control::SIGNAL_PANNED, &TestVoidCallback );
+  control.ConnectSignal( &connectionTracker, "panned", &TestVoidCallback );
   DALI_TEST_CHECK( control.GetPanGestureDetector() );
 
   DALI_TEST_CHECK( !control.GetPinchGestureDetector() );
-  control.ConnectSignal( &connectionTracker, Control::SIGNAL_PINCHED, &TestVoidCallback );
+  control.ConnectSignal( &connectionTracker, "pinched", &TestVoidCallback );
   DALI_TEST_CHECK( control.GetPinchGestureDetector() );
 
   DALI_TEST_CHECK( !control.GetLongPressGestureDetector() );
-  control.ConnectSignal( &connectionTracker, Control::SIGNAL_LONG_PRESSED, &TestVoidCallback );
+  control.ConnectSignal( &connectionTracker, "long-pressed", &TestVoidCallback );
   DALI_TEST_CHECK( control.GetLongPressGestureDetector() );
 
   END_TEST;

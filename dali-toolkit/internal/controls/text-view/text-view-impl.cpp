@@ -55,6 +55,10 @@ namespace Internal
 namespace
 {
 
+// Signals
+
+const char* const SIGNAL_TEXT_SCROLLED = "scrolled";
+
 const char* MULTILINE_POLICY_NAME[] = {"SplitByNewLineChar", "SplitByWord", "SplitByChar"};
 const char* EXCEED_POLICY_NAME[] = {"Original", "Truncate", "Fade", "Split","ShrinkToFit","EllipsizeEnd"};
 const char* LINE_JUSTIFICATION_NAME[] = {"Left","Center","Right","Justified"};
@@ -68,9 +72,9 @@ BaseHandle Create()
   return Toolkit::TextView::New();
 }
 
-TypeRegistration typeRegistration( typeid(Toolkit::TextView), typeid(Toolkit::Control), Create );
+TypeRegistration typeRegistration( typeid( Toolkit::TextView ), typeid( Toolkit::Control ), Create );
 
-SignalConnectorType signalConnector1( typeRegistration, Toolkit::TextView::SIGNAL_TEXT_SCROLLED , &TextView::DoConnectSignal );
+SignalConnectorType signalConnector1( typeRegistration, SIGNAL_TEXT_SCROLLED , &TextView::DoConnectSignal );
 
 PropertyRegistration property1( typeRegistration,  "markup-enabled",       Toolkit::TextView::PROPERTY_MARKUP_ENABLED,       Property::BOOLEAN, &TextView::SetProperty, &TextView::GetProperty );
 PropertyRegistration property2( typeRegistration,  "text",                 Toolkit::TextView::PROPERTY_TEXT,                 Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
@@ -910,9 +914,9 @@ bool TextView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* 
   Dali::BaseHandle handle( object );
 
   bool connected( true );
-  Toolkit::TextView textView = Toolkit::TextView::DownCast(handle);
+  Toolkit::TextView textView = Toolkit::TextView::DownCast( handle );
 
-  if( Dali::Toolkit::TextView::SIGNAL_TEXT_SCROLLED == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_TEXT_SCROLLED ) )
   {
     textView.ScrolledSignal().Connect( tracker, functor );
   }

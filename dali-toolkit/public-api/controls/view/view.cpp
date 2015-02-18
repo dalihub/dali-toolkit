@@ -31,8 +31,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const char* const View::SIGNAL_ORIENTATION_ANIMATION_START = "orientation-animation-start";
-
 View::View()
 {
 }

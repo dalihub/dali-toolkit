@@ -41,19 +41,23 @@ class Button;
  * point doesn't leave the boundary of the button.
  *
  * When the \e disabled property is set to \e true, no signal is emitted.
+ *
+ * Signals
+ * | %Signal Name      | Method                      |
+ * |-------------------|-----------------------------|
+ * | pressed           | @ref PressedSignal()        |
+ * | released          | @ref ReleasedSignal()       |
+ * | clicked           | @ref ClickedSignal()        |
+ * | state-changed     | @ref StateChangedSignal()   |
+ *
+ * Actions
+ * | %Action Name      | %Button method called       |
+ * |-------------------|-----------------------------|
+ * | button-click      | %DoClickAction()            |
  */
 class DALI_IMPORT_API Button : public Control
 {
 public:
-
-  // Signal Names
-  static const char* const SIGNAL_PRESSED;       ///< name "pressed"
-  static const char* const SIGNAL_RELEASED;      ///< name "released"
-  static const char* const SIGNAL_CLICKED;       ///< name "clicked"
-  static const char* const SIGNAL_STATE_CHANGED; ///< name "state-changed"
-
-  //Action Names
-  static const char* const ACTION_BUTTON_CLICK; ///< name "button-click"
 
   // Properties
   static const Property::Index PROPERTY_DISABLED;                     ///< name "disabled",                     @see SetDisabled(),                  type BOOLEAN
