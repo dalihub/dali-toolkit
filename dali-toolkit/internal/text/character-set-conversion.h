@@ -18,11 +18,11 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
-
 // EXTERNAL INCLUDES
 #include <stdint.h>
+
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {

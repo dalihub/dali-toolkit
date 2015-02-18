@@ -20,10 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <memory.h>
-
-// INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/vector2.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/line-run.h>
 
 namespace Dali
@@ -53,6 +53,7 @@ struct VisualModel::Impl
   Vector<CharacterIndex> mGlyphsToCharacters; ///< For each glyph, the index of the first character.
   Vector<GlyphIndex>     mCharactersToGlyph;  ///< For each character, the index of the first glyph.
   Vector<Length>         mCharactersPerGlyph; ///< For each glyph, the number of characters that form the glyph.
+  Vector<Length>         mGlyphsPerCharacter; ///< For each character, the number of glyphs that are shaped.
   Vector<Vector2>        mGlyphPositions;     ///< For each glyph, the position.
   Vector<LineRun>        mLines;              ///< The laid out lines.
 
@@ -74,8 +75,9 @@ void VisualModel::SetGlyphs( const GlyphInfo* glyphs,
 {
   Vector<GlyphInfo>& modelGlyphs = mImpl->mGlyphs;
   Vector<CharacterIndex>& modelGlyphsToCharacters = mImpl->mGlyphsToCharacters;
-  Vector<Length>& modelCharactersPerGlyph = mImpl->mCharactersPerGlyph;
   Vector<GlyphIndex>& modelCharactersToGlyph = mImpl->mCharactersToGlyph;
+  Vector<Length>& modelCharactersPerGlyph = mImpl->mCharactersPerGlyph;
+  Vector<Length>& modelGlyphsPerCharacter = mImpl->mGlyphsPerCharacter;
 
   if( 0u == numberOfGlyphs )
   {
@@ -83,6 +85,7 @@ void VisualModel::SetGlyphs( const GlyphInfo* glyphs,
     modelGlyphsToCharacters.Clear();
     modelCharactersToGlyph.Clear();
     modelCharactersPerGlyph.Clear();
+    modelGlyphsPerCharacter.Clear();
   }
   else
   {
@@ -106,11 +109,17 @@ void VisualModel::SetGlyphs( const GlyphInfo* glyphs,
       // Build the characters to glyph conversion table.
 
       // 1) Reserve some space for the characters to avoid reallocations.
-      modelCharactersToGlyph.Reserve( static_cast<Length> ( static_cast<float>( numberOfGlyphs ) * 1.3f ) );
+      const Length numberOfCharacters = static_cast<Length> ( static_cast<float>( numberOfGlyphs ) * 1.3f );
+      modelCharactersToGlyph.Reserve( numberOfCharacters );
+      modelGlyphsPerCharacter.Reserve( numberOfCharacters );
 
-      // 2) Traverse the glyphs and set the glyph indices.
+      // 2) Traverse the glyphs and set the glyph indices and the glyphs per character.
+
+      // The number of 'characters per glyph' equal to zero.
+      Length zeroCharactersPerGlyph = 0u;
+
+      // Index to the glyph.
       GlyphIndex glyphIndex = 0u;
-      Length totalNumberOfCharacters = 0u;
       for( Vector<Length>::ConstIterator it = modelCharactersPerGlyph.Begin(),
              endIt = modelCharactersPerGlyph.End();
            it != endIt;
@@ -118,9 +127,28 @@ void VisualModel::SetGlyphs( const GlyphInfo* glyphs,
       {
         const Length numberOfCharacters = *it;
 
-        for( Length index = 0u; index < numberOfCharacters; ++index, ++totalNumberOfCharacters )
+        // Set the glyph indices.
+        for( Length index = 0u; index < numberOfCharacters; ++index )
         {
           modelCharactersToGlyph.PushBack( glyphIndex );
+        }
+
+        // Set the glyphs per character.
+        if( 0u == numberOfCharacters )
+        {
+          ++zeroCharactersPerGlyph;
+        }
+        else
+        {
+          const Length numberOfZeroGlyphsPerCharacter = ( numberOfCharacters - 1u );
+          for( Length zeroIndex = 0u; zeroIndex < numberOfZeroGlyphsPerCharacter ; ++zeroIndex )
+          {
+            modelGlyphsPerCharacter.PushBack( 0u );
+          }
+
+          modelGlyphsPerCharacter.PushBack( 1u + zeroCharactersPerGlyph );
+
+          zeroCharactersPerGlyph = 0u;
         }
       }
     }
@@ -168,6 +196,14 @@ void VisualModel::GetCharacterToGlyphMap( GlyphIndex* characterToGlyphMap,
   memcpy( characterToGlyphMap, modelCharactersToGlyph.Begin() + characterIndex, numberOfCharacters * sizeof( GlyphIndex ) );
 }
 
+void VisualModel::GetGlyphToCharacterMap( CharacterIndex* glyphToCharacter,
+                                          GlyphIndex glyphIndex,
+                                          Length numberOfGlyphs ) const
+{
+  const Vector<CharacterIndex>& modelGlyphsToCharacters = mImpl->mGlyphsToCharacters;
+  memcpy( glyphToCharacter, modelGlyphsToCharacters.Begin() + glyphIndex, numberOfGlyphs * sizeof( CharacterIndex ) );
+}
+
 void VisualModel::GetCharactersPerGlyphMap( Length* charactersPerGlyph,
                                             GlyphIndex glyphIndex,
                                             Length numberOfGlyphs ) const
@@ -176,12 +212,12 @@ void VisualModel::GetCharactersPerGlyphMap( Length* charactersPerGlyph,
   memcpy( charactersPerGlyph, modelCharactersPerGlyph.Begin() + glyphIndex, numberOfGlyphs * sizeof( Length ) );
 }
 
-void VisualModel::GetGlyphToCharacterMap( CharacterIndex* glyphToCharacter,
-                                          GlyphIndex glyphIndex,
-                                          Length numberOfGlyphs ) const
+void VisualModel::GetGlyphsPerCharacterMap( Length* glyphsPerCharacter,
+                                            CharacterIndex characterIndex,
+                                            Length numberOfCharacters ) const
 {
-  const Vector<CharacterIndex>& modelGlyphsToCharacters = mImpl->mGlyphsToCharacters;
-  memcpy( glyphToCharacter, modelGlyphsToCharacters.Begin() + glyphIndex, numberOfGlyphs * sizeof( CharacterIndex ) );
+  const Vector<Length>& modelGlyphsPerCharacter = mImpl->mGlyphsPerCharacter;
+  memcpy( glyphsPerCharacter, modelGlyphsPerCharacter.Begin() + characterIndex, numberOfCharacters * sizeof( Length ) );
 }
 
 void VisualModel::SetGlyphPositions( const Vector2* glyphPositions,
@@ -284,7 +320,7 @@ Length VisualModel::GetNumberOfLines( GlyphIndex glyphIndex,
   const Vector<LineRun>& modelLines = mImpl->mLines;
   const GlyphIndex lastGlyphIndex = glyphIndex + numberOfGlyphs;
 
-  // Traverse the lines and cound those lines within the range of glyphs.
+  // Traverse the lines and count those lines within the range of glyphs.
   for( Vector<LineRun>::ConstIterator it = modelLines.Begin(),
          endIt = modelLines.End();
        it != endIt;

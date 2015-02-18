@@ -33,6 +33,8 @@ namespace Toolkit
 namespace Text
 {
 
+struct BidirectionalLineInfoRun;
+
 /**
  * @brief Struct used to pass parameters.
  */
@@ -62,7 +64,11 @@ struct LayoutParameters
     totalNumberOfGlyphs( totalNumberOfGlyphs ),
     glyphsBuffer( glyphsBuffer ),
     glyphsToCharactersBuffer( glyphsToCharactersBuffer ),
-    charactersPerGlyphBuffer( charactersPerGlyphBuffer )
+    charactersPerGlyphBuffer( charactersPerGlyphBuffer ),
+    charactersToGlyphsBuffer( NULL ),
+    glyphsPerCharacterBuffer( NULL ),
+    lineBidirectionalInfoRunsBuffer( NULL ),
+    numberOfBidirectionalInfoRuns( 0u )
   {}
 
   Vector2                     boundingBox;
@@ -72,6 +78,10 @@ struct LayoutParameters
   const GlyphInfo* const      glyphsBuffer;
   const CharacterIndex* const glyphsToCharactersBuffer;
   const Length* const         charactersPerGlyphBuffer;
+  GlyphIndex*                 charactersToGlyphsBuffer;        ///< The character to glyph conversion table.
+  Length*                     glyphsPerCharacterBuffer;        ///< The number of glyphs per character.
+  BidirectionalLineInfoRun*   lineBidirectionalInfoRunsBuffer; ///< Bidirectional conversion tables per line.
+  Length                      numberOfBidirectionalInfoRuns;   ///< The number of lines with bidirectional info.
 };
 
 } // namespace Text

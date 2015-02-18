@@ -18,10 +18,12 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali
@@ -81,12 +83,12 @@ public:
    * @brief Retrieves characters from the text in the given buffer.
    *
    * @pre The size of the @p text buffer needs to be big enough to copy the @p numberOfCharacters.
-   * @param[in] characterIndex The index to the first character to copy.
    * @param[out] text Pointer to a buffer where the text is copied.
+   * @param[in] characterIndex The index to the first character to copy.
    * @param[in] numberOfCharacters The number of characters to be copied.
    */
-  void GetText( CharacterIndex characterIndex,
-                Character* text,
+  void GetText( Character* text,
+                CharacterIndex characterIndex,
                 Length numberOfCharacters ) const;
 
   /**
@@ -330,6 +332,21 @@ public:
    */
   Length GetNumberOfBidirectionalInfoRuns( CharacterIndex characterIndex,
                                            Length numberOfCharacters ) const;
+
+  /**
+   * Retrieves the bidirectional paragraph info runs for the given range of characters.
+   *
+   * The @p bidirectionalInfo buffer needs to be big enough to copy the number of bidirectional
+   * paragraph info runs.
+   * Call GetNumberOfBidirectionalInfoRuns() to retrieve the number of bidirectional runs.
+   *
+   * @param[out] bidirectionalInfo Pointer to a buffer where the bidirectional info runs are copied.
+   * @param[in] characterIndex Index to the first character.
+   * @param[in] numberOfCharacters The number of characters.
+   */
+  void GetBidirectionalInfo( BidirectionalParagraphInfoRun* bidirectionalInfo,
+                             CharacterIndex characterIndex,
+                             Length numberOfCharacters ) const;
 
   /**
    * Retrieves the direction of the characters.

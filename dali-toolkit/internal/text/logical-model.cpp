@@ -18,14 +18,14 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/text/logical-model.h>
 
+// EXTERNAL INCLUDES
+#include <memory.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
 #include <dali-toolkit/internal/text/bidirectional-paragraph-info-run.h>
 #include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
-
-// EXTERNAL INCLUDES
-#include <memory.h>
 
 namespace Dali
 {
@@ -50,14 +50,20 @@ struct GetRunCache
 
 struct LogicalModel::Impl
 {
-  Vector<Character>     mText;
-  Vector<ScriptRun>     mScriptRuns;
-  Vector<FontRun>       mFontRuns;
-  Vector<LineBreakInfo> mLineBreakInfo;
-  Vector<WordBreakInfo> mWordBreakInfo;
+  Vector<Character>                     mText;
+  Vector<ScriptRun>                     mScriptRuns;
+  Vector<FontRun>                       mFontRuns;
+  Vector<LineBreakInfo>                 mLineBreakInfo;
+  Vector<WordBreakInfo>                 mWordBreakInfo;
+  Vector<BidirectionalParagraphInfoRun> mBidirectionalParagraphInfo;
 
-  GetRunCache           mGetScriptCache; ///< Caches the GetNumberOfScriptRuns( characterIndex, numberOfCharacters ) operation.
-  GetRunCache           mGetFontCache;   ///< Caches the GetNumberOfFontRuns( characterIndex, numberOfCharacters ) operation.
+  Vector<BidirectionalLineInfoRun>      mBidirectionalLineInfo;
+  Vector<CharacterIndex>                mLogicalToVisualMap; ///< Bidirectional logical to visual conversion table.
+  Vector<CharacterIndex>                mVisualToLogicalMap; ///< Bidirectional visual to logical conversion table.
+
+  GetRunCache                           mGetScriptCache;             ///< Caches the GetNumberOfScriptRuns( characterIndex, numberOfCharacters ) operation.
+  GetRunCache                           mGetFontCache;               ///< Caches the GetNumberOfFontRuns( characterIndex, numberOfCharacters ) operation.
+  GetRunCache                           mGetBidirectionalCache;      ///< Caches the GetNumberOfBidirectionalInfoRuns( characterIndex, numberOfCharacters ) operation.
 };
 
 LogicalModelPtr LogicalModel::New()
@@ -86,8 +92,8 @@ Length LogicalModel::GetNumberOfCharacters() const
   return mImpl->mText.Count();
 }
 
-void LogicalModel::GetText( CharacterIndex characterIndex,
-                            Character* text,
+void LogicalModel::GetText( Character* text,
+                            CharacterIndex characterIndex,
                             Length numberOfCharacters ) const
 {
   Vector<Character>& modelText = mImpl->mText;
@@ -376,12 +382,87 @@ WordBreakInfo LogicalModel::GetWordBreakInfo( CharacterIndex characterIndex ) co
 void LogicalModel::SetBidirectionalInfo( const BidirectionalParagraphInfoRun* const bidirectionalInfo,
                                          Length numberOfRuns )
 {
+  Vector<BidirectionalParagraphInfoRun>& modelBidirectionalParagraphInfo = mImpl->mBidirectionalParagraphInfo;
+
+  if( 0u == numberOfRuns )
+  {
+    modelBidirectionalParagraphInfo.Clear();
+  }
+  else
+  {
+    modelBidirectionalParagraphInfo.Resize( numberOfRuns );
+    memcpy( modelBidirectionalParagraphInfo.Begin(), bidirectionalInfo, numberOfRuns * sizeof( BidirectionalParagraphInfoRun ) );
+  }
+
+  mImpl->mGetBidirectionalCache.characterIndex = 0u;
+  mImpl->mGetBidirectionalCache.numberOfCharacters = 0u;
+  mImpl->mGetBidirectionalCache.firstRun = 0u;
+  mImpl->mGetBidirectionalCache.numberOfRuns = 0u;
 }
 
 Length LogicalModel::GetNumberOfBidirectionalInfoRuns( CharacterIndex characterIndex,
                                                        Length numberOfCharacters ) const
 {
-  return 0u;
+  GetRunCache& bidiCache = mImpl->mGetBidirectionalCache;
+
+  // Set the character index and the number of characters into the cache.
+  bidiCache.characterIndex = characterIndex;
+  bidiCache.numberOfCharacters = numberOfCharacters;
+
+  if( ( 0u == characterIndex ) &&
+      ( mImpl->mText.Count() == numberOfCharacters ) )
+  {
+    bidiCache.firstRun = 0u;
+    bidiCache.numberOfRuns = mImpl->mBidirectionalParagraphInfo.Count();
+    return bidiCache.numberOfRuns;
+  }
+
+  // Initialize the number of bidi paragraphs and the index to the first paragraph.
+  bidiCache.firstRun = 0u;
+  bidiCache.numberOfRuns = 0;
+  bool firstParagraphFound = false;
+
+  const Vector<BidirectionalParagraphInfoRun>& modelBidirectionalParagraphInfo = mImpl->mBidirectionalParagraphInfo;
+
+  // Traverse the bidirectional paragraph info and count those bidi paragraphs within the range of characters.
+  for( Vector<BidirectionalParagraphInfoRun>::ConstIterator it = modelBidirectionalParagraphInfo.Begin(),
+         endIt = modelBidirectionalParagraphInfo.End();
+       it != endIt;
+       ++it )
+  {
+    const BidirectionalParagraphInfoRun& bidi = *it;
+
+    if( ( bidi.characterRun.characterIndex + bidi.characterRun.numberOfCharacters > characterIndex ) &&
+        ( characterIndex + numberOfCharacters > bidi.characterRun.characterIndex ) )
+    {
+      firstParagraphFound = true;
+      ++bidiCache.numberOfRuns;
+    }
+
+    if( !firstParagraphFound )
+    {
+      ++bidiCache.firstRun;
+    }
+  }
+
+  return bidiCache.numberOfRuns;
+}
+
+void LogicalModel::GetBidirectionalInfo( BidirectionalParagraphInfoRun* bidirectionalInfo,
+                                         CharacterIndex characterIndex,
+                                         Length numberOfCharacters ) const
+{
+  const Vector<BidirectionalParagraphInfoRun>& modelBidirectionalParagraphInfo = mImpl->mBidirectionalParagraphInfo;
+  GetRunCache& bidiCache = mImpl->mGetBidirectionalCache;
+
+  if( ( characterIndex != bidiCache.characterIndex ) ||
+      ( numberOfCharacters != bidiCache.numberOfCharacters ) )
+  {
+    GetNumberOfBidirectionalInfoRuns( characterIndex,
+                                      numberOfCharacters );
+  }
+
+  memcpy( bidirectionalInfo, modelBidirectionalParagraphInfo.Begin() + bidiCache.firstRun, bidiCache.numberOfRuns * sizeof( BidirectionalParagraphInfoRun ) );
 }
 
 void LogicalModel::GetCharacterDirections( CharacterDirection* directions,
@@ -398,28 +479,96 @@ CharacterDirection LogicalModel::GetCharacterDirection( CharacterIndex character
 void LogicalModel::SetVisualToLogicalMap( const BidirectionalLineInfoRun* const bidirectionalInfo,
                                           Length numberOfRuns )
 {
+  Vector<CharacterIndex>& modelVisualToLogicalMap = mImpl->mVisualToLogicalMap;
+  Vector<CharacterIndex>& modelLogicalToVisualMap = mImpl->mLogicalToVisualMap;
+
+  if( 0u == numberOfRuns )
+  {
+    modelVisualToLogicalMap.Clear();
+    modelLogicalToVisualMap.Clear();
+  }
+  else
+  {
+    const Length numberOfCharacters = mImpl->mText.Count();
+    modelVisualToLogicalMap.Resize( numberOfCharacters );
+    modelLogicalToVisualMap.Resize( numberOfCharacters );
+
+    CharacterIndex* modelVisualToLogicalMapBuffer = modelVisualToLogicalMap.Begin();
+    CharacterIndex* modelLogicalToVisualMapBuffer = modelLogicalToVisualMap.Begin();
+
+    CharacterIndex lastIndex = 0u;
+    for( unsigned int bidiIndex = 0u; bidiIndex < numberOfRuns; ++bidiIndex )
+    {
+      const BidirectionalLineInfoRun& bidiLineInfo = *( bidirectionalInfo + bidiIndex );
+
+      if( lastIndex < bidiLineInfo.characterRun.characterIndex )
+      {
+        // Fill with the identity.
+        for( ; lastIndex < bidiLineInfo.characterRun.characterIndex; ++lastIndex )
+        {
+          *( modelVisualToLogicalMapBuffer + lastIndex ) = lastIndex;
+        }
+      }
+
+      // Fill the conversion table of the run.
+      for( CharacterIndex index = 0u;
+           index < bidiLineInfo.characterRun.numberOfCharacters;
+           ++index, ++lastIndex )
+      {
+        *( modelVisualToLogicalMapBuffer + lastIndex ) = bidiLineInfo.characterRun.characterIndex + *( bidiLineInfo.visualToLogicalMap + index );
+      }
+    }
+
+    // Complete with the identity if there are some left to right characters after the last right to left.
+    for( ; lastIndex < numberOfCharacters; ++lastIndex )
+    {
+      *( modelVisualToLogicalMapBuffer + lastIndex ) = lastIndex;
+    }
+
+    // Sets the logical to visual conversion map.
+    for( CharacterIndex index = 0u; index < numberOfCharacters; ++index )
+    {
+      *( modelLogicalToVisualMapBuffer + *( modelVisualToLogicalMapBuffer + index ) ) = index;
+    }
+  }
 }
 
 CharacterIndex LogicalModel::GetVisualCharacterIndex( CharacterIndex logicalCharacterIndex ) const
 {
-  return 0u;
+  if( 0u == mImpl->mLogicalToVisualMap.Count() )
+  {
+    // If there is no logical to visual info is because the whole text is left to right.
+    // Return the identity.
+    return logicalCharacterIndex;
+  }
+
+  return *( mImpl->mLogicalToVisualMap.Begin() + logicalCharacterIndex );
 }
 
 CharacterIndex LogicalModel::GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex ) const
 {
-  return 0u;
+  if( 0u == mImpl->mVisualToLogicalMap.Count() )
+  {
+    // If there is no visual to logical info is because the whole text is left to right.
+    // Return the identity.
+    return visualCharacterIndex;
+  }
+
+  return *( mImpl->mVisualToLogicalMap.Begin() + visualCharacterIndex );
 }
 
 void LogicalModel::GetLogicalToVisualMap( CharacterIndex* logicalToVisualMap,
                                           CharacterIndex characterIndex,
                                           Length numberOfCharacters ) const
 {
+  memcpy( logicalToVisualMap, mImpl->mLogicalToVisualMap.Begin() + characterIndex, numberOfCharacters * sizeof( CharacterIndex ) );
 }
 
 void LogicalModel::GetVisualToLogicalMap( CharacterIndex* visualToLogicalMap,
                                           CharacterIndex characterIndex,
                                           Length numberOfCharacters ) const
 {
+  memcpy( visualToLogicalMap, mImpl->mVisualToLogicalMap.Begin() + characterIndex, numberOfCharacters * sizeof( CharacterIndex ) );
 }
 
 LogicalModel::~LogicalModel()

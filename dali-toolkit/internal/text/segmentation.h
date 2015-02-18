@@ -18,8 +18,10 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali

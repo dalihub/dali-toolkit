@@ -18,9 +18,11 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali
@@ -146,17 +148,6 @@ public:
                                Length numberOfCharacters ) const;
 
   /**
-   * Retrieves for each glyph the number of characters the glyph represents.
-   *
-   * @param[out] charactersPerGlyph Pointer to a buffer where the number of characters for each glyph are copied.
-   * @param[in] glyphIndex Index to the first glyph.
-   * @param[in] numberOfGlyphs The number of glyphs.
-   */
-  void GetCharactersPerGlyphMap( Length* charactersPerGlyph,
-                                 GlyphIndex glyphIndex,
-                                 Length numberOfGlyphs ) const;
-
-  /**
    * Retrieves the whole or part of the glyph to character conversion map.
    *
    * The size of the buffer needs to be big enough to copy the @p numberOfGlyphs.
@@ -168,6 +159,28 @@ public:
   void GetGlyphToCharacterMap( CharacterIndex* glyphToCharacter,
                                GlyphIndex glyphIndex,
                                Length numberOfGlyphs ) const;
+
+  /**
+   * Retrieves for each glyph the number of characters the glyph represents.
+   *
+   * @param[out] charactersPerGlyph Pointer to a buffer where the number of characters for each glyph are copied.
+   * @param[in] glyphIndex Index to the first glyph.
+   * @param[in] numberOfGlyphs The number of glyphs.
+   */
+  void GetCharactersPerGlyphMap( Length* charactersPerGlyph,
+                                 GlyphIndex glyphIndex,
+                                 Length numberOfGlyphs ) const;
+
+  /**
+   * Retrieves for each character the number of glyphs the character is shaped.
+   *
+   * @param[out] glyphsPerCharacter Pointer to a buffer where the number of glyphs for each character are copied.
+   * @param[in] characterIndex Index to the first character.
+   * @param[in] numberOfCharacters The number of characters.
+   */
+  void GetGlyphsPerCharacterMap( Length* glyphsPerCharacter,
+                                 CharacterIndex characterIndex,
+                                 Length numberOfCharacters ) const;
 
   // Position interface
 

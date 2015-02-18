@@ -18,18 +18,18 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/decorator/text-decorator.h>
-#include <dali-toolkit/internal/text/text-control-interface.h>
-#include <dali-toolkit/internal/text/text-view.h>
-
 // EXTERNAL INCLUDES
+#include <string>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/ref-object.h>
-#include <string>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/decorator/text-decorator.h>
+#include <dali-toolkit/internal/text/text-control-interface.h>
+#include <dali-toolkit/internal/text/text-view.h>
 
 namespace Dali
 {
@@ -70,15 +70,16 @@ private:
     VALIDATE_FONTS     = 0x0004,
     GET_LINE_BREAKS    = 0x0008,
     GET_WORD_BREAKS    = 0x0010,
-    SHAPE_TEXT         = 0x0020,
-    GET_GLYPH_METRICS  = 0x0040,
-    LAYOUT             = 0x0080,
-    UPDATE_ACTUAL_SIZE = 0x0100,
-    UPDATE_POSITIONS   = 0x0200,
-    UPDATE_LINES       = 0x0400,
-    REORDER            = 0x0800,
-    ALIGNMENT          = 0x1000,
-    RENDER             = 0x2000,
+    BIDI_INFO          = 0x0020,
+    SHAPE_TEXT         = 0x0040,
+    GET_GLYPH_METRICS  = 0x0080,
+    LAYOUT             = 0x0100,
+    UPDATE_ACTUAL_SIZE = 0x0200,
+    UPDATE_POSITIONS   = 0x0400,
+    UPDATE_LINES       = 0x0800,
+    REORDER            = 0x1000,
+    ALIGNMENT          = 0x2000,
+    RENDER             = 0x4000,
     ALL_OPERATIONS     = 0xFFFF
   };
 

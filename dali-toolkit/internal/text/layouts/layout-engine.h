@@ -18,12 +18,12 @@
  *
  */
 
-// INTERNAL INCLUDE
-#include <dali-toolkit/internal/text/line-run.h>
-
 // EXTERNAL INCLUDE
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/vector2.h>
+
+// INTERNAL INCLUDE
+#include <dali-toolkit/internal/text/line-run.h>
 
 namespace Dali
 {
@@ -89,6 +89,17 @@ public:
                    Vector<Vector2>& glyphPositions,
                    Vector<LineRun>& lines,
                    Size& actualSize );
+
+  /**
+   * Re-lays out those lines with right to left characters.
+   *
+   * It doesn't change the phisical position of the glyphs in the model but sets their new position.
+   *
+   * @param[in] layoutParameters The parameters needed to layout the text.
+   * @param[in,out] glyphPositions The positions of all the glyphs.
+   */
+  void ReLayoutRightToLeftLines( const LayoutParameters& layoutParameters,
+                                 Vector<Vector2>& glyphPositions );
 
 private:
 

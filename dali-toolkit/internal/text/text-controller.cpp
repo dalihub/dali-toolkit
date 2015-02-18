@@ -18,7 +18,14 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/text/text-controller.h>
 
+// EXTERNAL INCLUDES
+#include <limits>
+#include <vector>
+#include <dali/public-api/adaptor-framework/key.h>
+#include <dali/public-api/text-abstraction/font-client.h>
+
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
@@ -29,12 +36,6 @@
 #include <dali-toolkit/internal/text/shaper.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/text/visual-model.h>
-
-// EXTERNAL INCLUDES
-#include <limits>
-#include <vector>
-#include <dali/public-api/adaptor-framework/key.h>
-#include <dali/public-api/text-abstraction/font-client.h>
 
 using std::vector;
 
@@ -434,6 +435,18 @@ void Controller::SetText( const std::string& text )
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
 
+  // Reset buffers.
+  mImpl->mLogicalModel->SetText( NULL, 0u );
+  mImpl->mLogicalModel->SetScripts( NULL, 0u );
+  mImpl->mLogicalModel->SetFonts( NULL, 0u );
+  mImpl->mLogicalModel->SetLineBreakInfo( NULL, 0u );
+  mImpl->mLogicalModel->SetWordBreakInfo( NULL, 0u );
+  mImpl->mLogicalModel->SetBidirectionalInfo( NULL, 0u );
+  mImpl->mLogicalModel->SetVisualToLogicalMap( NULL, 0u );
+  mImpl->mVisualModel->SetGlyphs( NULL, NULL, NULL, 0u );
+  mImpl->mVisualModel->SetGlyphPositions( NULL, 0u );
+  mImpl->mVisualModel->SetLines( NULL, 0u );
+
   if( mImpl->mTextInput )
   {
     // Cancel previously queued events
@@ -687,6 +700,68 @@ bool Controller::DoRelayout( const Vector2& size,
     }
   }
 
+  Vector<BidirectionalParagraphInfoRun> bidirectionalInfo;
+  if( BIDI_INFO & operations )
+  {
+    // Some vectors with data needed to get the paragraph's bidirectional info may be void
+    // after the first time the text has been laid out.
+    // Fill the vectors again.
+
+    const Length numberOfCharacters = mImpl->mLogicalModel->GetNumberOfCharacters();
+
+    if( 0u == utf32Characters.Count() )
+    {
+      utf32Characters.Resize( numberOfCharacters );
+
+      mImpl->mLogicalModel->GetText( utf32Characters.Begin(),
+                                     0u,
+                                     numberOfCharacters );
+    }
+
+    if( 0u == lineBreakInfo.Count() )
+    {
+      lineBreakInfo.Resize( numberOfCharacters );
+
+      mImpl->mLogicalModel->GetLineBreakInfo( lineBreakInfo.Begin(),
+                                              0u,
+                                              numberOfCharacters );
+    }
+
+    if( 0u == scripts.Count() )
+    {
+      scripts.Resize( mImpl->mLogicalModel->GetNumberOfScriptRuns( 0u,
+                                                                   numberOfCharacters ) );
+      mImpl->mLogicalModel->GetScriptRuns( scripts.Begin(),
+                                           0u,
+                                           numberOfCharacters );
+    }
+
+    // Count the number of LINE_NO_BREAK to reserve some space for the vector of paragraph's
+    // bidirectional info.
+
+    Length numberOfParagraphs = 0u;
+
+    const TextAbstraction::LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
+    for( Length index = 0u; index < characterCount; ++index )
+    {
+      if( TextAbstraction::LINE_NO_BREAK == *( lineBreakInfoBuffer + index ) )
+      {
+        ++numberOfParagraphs;
+      }
+    }
+
+    bidirectionalInfo.Reserve( numberOfParagraphs );
+
+    // Calculates the bidirectional info for the whole paragraph if it contains right to left scripts.
+    SetBidirectionalInfo( utf32Characters,
+                          scripts,
+                          lineBreakInfo,
+                          bidirectionalInfo );
+
+    mImpl->mLogicalModel->SetBidirectionalInfo( bidirectionalInfo.Begin(),
+                                                bidirectionalInfo.Count() );
+  }
+
   Vector<GlyphInfo> glyphs;
   Vector<CharacterIndex> glyphsToCharactersMap;
   Vector<Length> charactersPerGlyph;
@@ -719,34 +794,48 @@ bool Controller::DoRelayout( const Vector2& size,
 
   if( LAYOUT & operations )
   {
+    // Some vectors with data needed to layout and reorder may be void
+    // after the first time the text has been laid out.
+    // Fill the vectors again.
+
     const Length numberOfCharacters = mImpl->mLogicalModel->GetNumberOfCharacters();
+    numberOfGlyphs = mImpl->mVisualModel->GetNumberOfGlyphs();
 
-    if( 0u == numberOfGlyphs )
+    if( 0u == lineBreakInfo.Count() )
     {
-      numberOfGlyphs = mImpl->mVisualModel->GetNumberOfGlyphs();
-
       lineBreakInfo.Resize( numberOfCharacters );
-      wordBreakInfo.Resize( numberOfCharacters );
-      glyphs.Resize( numberOfGlyphs );
-      glyphsToCharactersMap.Resize( numberOfGlyphs );
-      charactersPerGlyph.Resize( numberOfGlyphs );
-
       mImpl->mLogicalModel->GetLineBreakInfo( lineBreakInfo.Begin(),
                                               0u,
                                               numberOfCharacters );
+    }
 
+    if( 0u == wordBreakInfo.Count() )
+    {
+      wordBreakInfo.Resize( numberOfCharacters );
       mImpl->mLogicalModel->GetWordBreakInfo( wordBreakInfo.Begin(),
                                               0u,
                                               numberOfCharacters );
+    }
 
+    if( 0u == glyphs.Count() )
+    {
+      glyphs.Resize( numberOfGlyphs );
       mImpl->mVisualModel->GetGlyphs( glyphs.Begin(),
                                       0u,
                                       numberOfGlyphs );
+    }
 
+    if( 0u == glyphsToCharactersMap.Count() )
+    {
+      glyphsToCharactersMap.Resize( numberOfGlyphs );
       mImpl->mVisualModel->GetGlyphToCharacterMap( glyphsToCharactersMap.Begin(),
                                                    0u,
                                                    numberOfGlyphs );
+    }
 
+    if( 0u == charactersPerGlyph.Count() )
+    {
+      charactersPerGlyph.Resize( numberOfGlyphs );
       mImpl->mVisualModel->GetCharactersPerGlyphMap( charactersPerGlyph.Begin(),
                                                      0u,
                                                      numberOfGlyphs );
@@ -780,6 +869,76 @@ bool Controller::DoRelayout( const Vector2& size,
 
     if( viewUpdated )
     {
+      // Reorder the lines
+      if( REORDER & operations )
+      {
+        const Length numberOfBidiParagraphs = mImpl->mLogicalModel->GetNumberOfBidirectionalInfoRuns( 0u, numberOfCharacters );
+
+        if( 0u == bidirectionalInfo.Count() )
+        {
+          bidirectionalInfo.Resize( numberOfBidiParagraphs );
+          mImpl->mLogicalModel->GetBidirectionalInfo( bidirectionalInfo.Begin(),
+                                                      0u,
+                                                      numberOfCharacters );
+        }
+
+        // Check first if there are paragraphs with bidirectional info.
+        if( 0u != bidirectionalInfo.Count() )
+        {
+          // Get the lines
+          const Length numberOfLines = mImpl->mVisualModel->GetNumberOfLines();
+
+          // Reorder the lines.
+          Vector<BidirectionalLineInfoRun> lineBidirectionalInfoRuns;
+          lineBidirectionalInfoRuns.Reserve( numberOfLines ); // Reserve because is not known yet how many lines have right to left characters.
+          ReorderLines( bidirectionalInfo,
+                        lines,
+                        lineBidirectionalInfoRuns );
+
+          // Set the bidirectional info into the model.
+          const Length numberOfBidirectionalInfoRuns = lineBidirectionalInfoRuns.Count();
+          mImpl->mLogicalModel->SetVisualToLogicalMap( lineBidirectionalInfoRuns.Begin(),
+                                                       numberOfBidirectionalInfoRuns );
+
+          // Set the bidirectional info per line into the layout parameters.
+          layoutParameters.lineBidirectionalInfoRunsBuffer = lineBidirectionalInfoRuns.Begin();
+          layoutParameters.numberOfBidirectionalInfoRuns = numberOfBidirectionalInfoRuns;
+
+          // Get the character to glyph conversion table and set into the layout.
+          Vector<GlyphIndex> characterToGlyphMap;
+          characterToGlyphMap.Resize( numberOfCharacters );
+
+          layoutParameters.charactersToGlyphsBuffer = characterToGlyphMap.Begin();
+          mImpl->mVisualModel->GetCharacterToGlyphMap( layoutParameters.charactersToGlyphsBuffer,
+                                                       0u,
+                                                       numberOfCharacters );
+
+          // Get the glyphs per character table and set into the layout.
+          Vector<Length> glyphsPerCharacter;
+          glyphsPerCharacter.Resize( numberOfCharacters );
+
+          layoutParameters.glyphsPerCharacterBuffer = glyphsPerCharacter.Begin();
+          mImpl->mVisualModel->GetGlyphsPerCharacterMap( layoutParameters.glyphsPerCharacterBuffer,
+                                                         0u,
+                                                         numberOfCharacters );
+
+          // Re-layout the text. Reorder those lines with right to left characters.
+          mImpl->mLayoutEngine.ReLayoutRightToLeftLines( layoutParameters,
+                                                         glyphPositions );
+
+          // Free the allocated memory used to store the conversion table in the bidirectional line info run.
+          for( Vector<BidirectionalLineInfoRun>::Iterator it = lineBidirectionalInfoRuns.Begin(),
+                 endIt = lineBidirectionalInfoRuns.End();
+               it != endIt;
+               ++it )
+          {
+            BidirectionalLineInfoRun& bidiLineInfo = *it;
+
+            free( bidiLineInfo.visualToLogicalMap );
+          }
+        }
+      }
+
       // Sets the positions into the model.
       if( UPDATE_POSITIONS & operations )
       {

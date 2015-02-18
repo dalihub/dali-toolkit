@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
+#include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
 
 namespace Dali
 {
@@ -293,7 +294,43 @@ struct LayoutEngine::Impl
     return update;
   }
 
-  // TODO - Rewrite this to handle bidi
+  void ReLayoutRightToLeftLines( const LayoutParameters& layoutParameters,
+                                 Vector<Vector2>& glyphPositions )
+  {
+    for( Length lineIndex = 0u; lineIndex < layoutParameters.numberOfBidirectionalInfoRuns; ++lineIndex )
+    {
+      const BidirectionalLineInfoRun& bidiLine = *( layoutParameters.lineBidirectionalInfoRunsBuffer +lineIndex  );
+
+      float penX = 0.f;
+
+      Vector2* glyphPositionsBuffer = glyphPositions.Begin();
+
+      for( CharacterIndex characterLogicalIndex = 0u;
+           characterLogicalIndex < bidiLine.characterRun.numberOfCharacters;
+           ++characterLogicalIndex )
+      {
+        // Convert the character in the logical order into the character in the visual order.
+        const CharacterIndex characterVisualIndex = bidiLine.characterRun.characterIndex + *( bidiLine.visualToLogicalMap + characterLogicalIndex );
+
+        // Get the number of glyphs of the character.
+        const Length numberOfGlyphs = *( layoutParameters.glyphsPerCharacterBuffer + characterVisualIndex );
+
+        for( GlyphIndex index = 0u; index < numberOfGlyphs; ++index )
+        {
+          // Convert the character in the visual order into the glyph in the visual order.
+          GlyphIndex glyphIndex = 1u + *( layoutParameters.charactersToGlyphsBuffer + characterVisualIndex + index ) - numberOfGlyphs;
+
+          const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + glyphIndex );
+          Vector2& position = *( glyphPositionsBuffer + glyphIndex );
+
+          position.x = penX + glyph.xBearing;
+
+          penX += glyph.advance;
+        }
+      }
+    }
+  }
+
   bool SingleLineLayout( const LayoutParameters& layoutParameters,
                          Vector<Vector2>& glyphPositions,
                          Vector<LineRun>& lines,
@@ -339,7 +376,6 @@ struct LayoutEngine::Impl
     return true;
   }
 
-  // TODO - Rewrite this to handle bidi
   bool MultiLineLayout( const LayoutParameters& layoutParameters,
                         Vector<Vector2>& glyphPositions,
                         Vector<LineRun>& lines,
@@ -441,6 +477,13 @@ bool LayoutEngine::LayoutText( const LayoutParameters& layoutParameters,
                             glyphPositions,
                             lines,
                             actualSize );
+}
+
+void LayoutEngine::ReLayoutRightToLeftLines( const LayoutParameters& layoutParameters,
+                                             Vector<Vector2>& glyphPositions )
+{
+  mImpl->ReLayoutRightToLeftLines( layoutParameters,
+                                   glyphPositions );
 }
 
 } // namespace Text

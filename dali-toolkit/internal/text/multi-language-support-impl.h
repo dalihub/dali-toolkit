@@ -18,11 +18,11 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/multi-language-support.h>
-
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/multi-language-support.h>
 
 namespace Dali
 {

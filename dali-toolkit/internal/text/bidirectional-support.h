@@ -18,10 +18,14 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
 #include <dali-toolkit/internal/text/bidirectional-paragraph-info-run.h>
+#include <dali-toolkit/internal/text/line-run.h>
+#include <dali-toolkit/internal/text/script-run.h>
 
 namespace Dali
 {
@@ -39,10 +43,12 @@ class VisualModel;
  * Sets the bidirectional info into the logical model.
  *
  * @param[in] text Vector of UTF-32 characters.
+ * @param[in] scripts Vector containing the script runs for the whole text.
  * @param[in] lineBreakInfo The line break info.
  * @param[out] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
  */
 void SetBidirectionalInfo( const Vector<Character>& text,
+                           const Vector<ScriptRun>& scripts,
                            const Vector<LineBreakInfo>& lineBreakInfo,
                            Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo );
 
@@ -79,7 +85,7 @@ void ReplaceBidirectionalInfo( LogicalModel& model,
  * @param[out] lineInfoRuns line runs with the visual to logical and logical to visual conversion maps.
  */
 void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
-                   const Vector<CharacterRun>& lineRuns,
+                   const Vector<LineRun>& lineRuns,
                    Vector<BidirectionalLineInfoRun>& lineInfoRuns );
 
 /**
