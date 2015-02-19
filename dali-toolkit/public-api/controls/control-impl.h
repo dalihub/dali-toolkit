@@ -477,7 +477,7 @@ private:
   virtual void OnInitialize();
 
   /**
-   * @brief This method is called when the control is activates.
+   * @brief This method is called when the control is activated.
    *
    * Derived classes should override this if they wish to be notified when they are activated.
    */
