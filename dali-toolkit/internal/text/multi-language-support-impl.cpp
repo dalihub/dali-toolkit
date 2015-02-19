@@ -213,8 +213,21 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
 
     if( TextAbstraction::UNKNOWN == script )
     {
-      script = TextAbstraction::LATIN;
-      DALI_ASSERT_DEBUG( !"MultilanguageSupport::SetScripts. Unkown script!" );
+      if( IsZeroWidthNonJoiner( character ) ||
+          IsZeroWidthJoiner( character ) ||
+          IsZeroWidthSpace( character ) ||
+          IsLeftToRightMark( character ) ||
+          IsRightToLeftMark( character ) ||
+          IsThinSpace( character ) )
+      {
+        // Keep previous script if the character is a zero width joiner or a zero width non joiner.
+        script = currentScriptRun.script;
+      }
+      else
+      {
+        script = TextAbstraction::LATIN;
+        DALI_ASSERT_DEBUG( !"MultilanguageSupport::SetScripts. Unkown script!" );
+      }
     }
 
     if( script != currentScriptRun.script )

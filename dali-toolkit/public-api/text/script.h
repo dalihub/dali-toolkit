@@ -39,6 +39,60 @@ namespace Text
  */
 Script GetCharacterScript( Character character );
 
+/**
+ * @brief Whether the character is a zero width non joiner.
+ *
+ * @param[in] character The character.
+ *
+ * @return @e true if the character is a zero width non joiner.
+ */
+bool IsZeroWidthNonJoiner( Character character );
+
+/**
+ * @brief Whether the character is a zero width joiner.
+ *
+ * @param[in] character The character.
+ *
+ * @return @e true if the character is a zero width joiner.
+ */
+bool IsZeroWidthJoiner( Character character );
+
+/**
+ * @brief Whether the character is a zero width space.
+ *
+ * @param[in] character The character.
+ *
+ * @return @e true if the character is a zero width space.
+ */
+bool IsZeroWidthSpace( Character character );
+
+/**
+ * @brief Whether the character is a left to right mark.
+ *
+ * @param[in] character The character.
+ *
+ * @return @e true if the character is a left to right mark.
+ */
+bool IsLeftToRightMark( Character character );
+
+/**
+ * @brief Whether the character is a right to left mark.
+ *
+ * @param[in] character The character.
+ *
+ * @return @e true if the character is a right to left mark.
+ */
+bool IsRightToLeftMark( Character character );
+
+/**
+ * @brief Whether the character is a thin space.
+ *
+ * @param[in] character The character.
+ *
+ * @return @e true if the character is a thin space.
+ */
+bool IsThinSpace( Character character );
+
 } // namespace Text
 
 } // namespace Toolkit

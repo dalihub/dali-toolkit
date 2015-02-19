@@ -27,6 +27,16 @@ namespace Toolkit
 namespace Text
 {
 
+namespace
+{
+const unsigned int CHAR_ZWS  = 0x200B; ///< Zero width space.
+const unsigned int CHAR_ZWNJ = 0x200C; ///< Zero width non joiner.
+const unsigned int CHAR_ZWJ  = 0x200D; ///< Zero width joiner.
+const unsigned int CHAR_LTRM = 0x200E; ///< Left to Right Mark.
+const unsigned int CHAR_RTLM = 0x200F; ///< Right to Left Mark.
+const unsigned int CHAR_TS   = 0x2009; ///< Thin Space.
+} // namespace
+
 Script GetCharacterScript( Character character )
 {
   // Latin script:
@@ -107,7 +117,7 @@ Script GetCharacterScript( Character character )
   // 0x0e00 - 0x0e7f Thai
 
   // Burmese script
-  // 0x1000 - 0x104f Myanmar
+  // 0x1000 - 0x109f Myanmar
 
 
   if( character <= 0x0cff )
@@ -201,7 +211,7 @@ Script GetCharacterScript( Character character )
         {
           return TextAbstraction::LAO;
         }
-        if( ( 0x1000 <= character ) && ( character <= 0x104f ) )
+        if( ( 0x1000 <= character ) && ( character <= 0x109f ) )
         {
           return TextAbstraction::BURMESE;
         }
@@ -362,6 +372,36 @@ Script GetCharacterScript( Character character )
   }
 
   return TextAbstraction::UNKNOWN;
+}
+
+bool IsZeroWidthNonJoiner( Character character )
+{
+  return CHAR_ZWNJ == character;
+}
+
+bool IsZeroWidthJoiner( Character character )
+{
+  return CHAR_ZWJ == character;
+}
+
+bool IsZeroWidthSpace( Character character )
+{
+  return CHAR_ZWS == character;
+}
+
+bool IsLeftToRightMark( Character character )
+{
+  return CHAR_LTRM == character;
+}
+
+bool IsRightToLeftMark( Character character )
+{
+  return CHAR_RTLM == character;
+}
+
+bool IsThinSpace( Character character )
+{
+  return CHAR_TS == character;
 }
 
 } // namespace Text
