@@ -21,6 +21,9 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-view/text-view-processor-types.h>
 
+// EXTERNAL INCLUDES
+#include <iostream>
+
 namespace Dali
 {
 
