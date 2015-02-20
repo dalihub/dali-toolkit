@@ -61,23 +61,23 @@ Length View::GetNumberOfGlyphs() const
   return 0;
 }
 
-void View::GetGlyphs( GlyphIndex glyphIndex,
-                      GlyphInfo* glyphs,
+void View::GetGlyphs( GlyphInfo* glyphs,
+                      GlyphIndex glyphIndex,
                       Length numberOfGlyphs ) const
 {
   if( mImpl->mVisualModel )
   {
-    mImpl->mVisualModel->GetGlyphs( glyphIndex, glyphs, numberOfGlyphs );
+    mImpl->mVisualModel->GetGlyphs( glyphs, glyphIndex, numberOfGlyphs );
   }
 }
 
-void View::GetGlyphPositions( GlyphIndex glyphIndex,
-                              Vector2* glyphPositions,
+void View::GetGlyphPositions( Vector2* glyphPositions,
+                              GlyphIndex glyphIndex,
                               Length numberOfGlyphs ) const
 {
   if( mImpl->mVisualModel )
   {
-    mImpl->mVisualModel->GetGlyphPositions( glyphIndex, glyphPositions, numberOfGlyphs );
+    mImpl->mVisualModel->GetGlyphPositions( glyphPositions, glyphIndex, numberOfGlyphs );
   }
 }
 

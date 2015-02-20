@@ -35,7 +35,6 @@ namespace Toolkit
 namespace Text
 {
 
-class LogicalModel;
 class VisualModel;
 
 /**

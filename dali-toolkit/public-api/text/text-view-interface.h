@@ -69,20 +69,20 @@ public:
    * @param[in] glyphIndex Index to the first glyph.
    * @param[in] numberOfGlyphs Number of glyphs to be copied.
    */
-  virtual void GetGlyphs( GlyphIndex glyphIndex,
-                          GlyphInfo* glyphs,
+  virtual void GetGlyphs( GlyphInfo* glyphs,
+                          GlyphIndex glyphIndex,
                           Length numberOfGlyphs ) const = 0;
 
   /**
    * @brief Retrieves the glyph positions.
    *
    * @pre The size of the @p positions buffer needs to be big enough to copy the @p numberOfGlyphs positions.
-   * @param[in] glyphIndex Index to the first glyph position.
    * @param[out] glyphPositions Pointer to a buffer where the glyph positions are copied.
+   * @param[in] glyphIndex Index to the first glyph position.
    * @param[in] numberOfGlyphs The number of positions to be copied.
    */
-  virtual void GetGlyphPositions( GlyphIndex glyphIndex,
-                                  Vector2* glyphPositions,
+  virtual void GetGlyphPositions( Vector2* glyphPositions,
+                                  GlyphIndex glyphIndex,
                                   Length numberOfGlyphs ) const = 0;
 };
 

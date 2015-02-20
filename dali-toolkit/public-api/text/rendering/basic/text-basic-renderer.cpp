@@ -286,11 +286,11 @@ RenderableActor BasicRenderer::Render( Text::ViewInterface& view )
     Vector<GlyphInfo> glyphs;
     glyphs.Resize( numberOfGlyphs );
 
-    view.GetGlyphs( 0, &glyphs[0], numberOfGlyphs );
+    view.GetGlyphs( &glyphs[0], 0, numberOfGlyphs );
 
     std::vector<Vector2> positions;
     positions.resize( numberOfGlyphs );
-    view.GetGlyphPositions( 0, &positions[0], numberOfGlyphs );
+    view.GetGlyphPositions( &positions[0], 0, numberOfGlyphs );
 
     Atlas atlas = mImpl->CreateAtlas( glyphs );
 

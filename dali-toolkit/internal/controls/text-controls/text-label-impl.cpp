@@ -130,6 +130,16 @@ void TextLabel::OnInitialize()
   mController = Text::Controller::New();
 }
 
+Vector3 TextLabel::GetNaturalSize()
+{
+  return mController->GetNaturalSize();
+}
+
+float TextLabel::GetHeightForWidth( float width )
+{
+  return mController->GetHeightForWidth( width );
+}
+
 void TextLabel::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   if( mController->Relayout( size ) )

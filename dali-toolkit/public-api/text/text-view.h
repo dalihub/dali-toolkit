@@ -65,15 +65,15 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetGlyphs()
    */
-  virtual void GetGlyphs( GlyphIndex glyphIndex,
-                          GlyphInfo* glyphs,
+  virtual void GetGlyphs( GlyphInfo* glyphs,
+                          GlyphIndex glyphIndex,
                           Length numberOfGlyphs ) const;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetGlyphPositions()
    */
-  virtual void GetGlyphPositions( GlyphIndex glyphIndex,
-                                  Vector2* glyphPositions,
+  virtual void GetGlyphPositions( Vector2* glyphPositions,
+                                  GlyphIndex glyphIndex,
                                   Length numberOfGlyphs ) const;
 
 private:

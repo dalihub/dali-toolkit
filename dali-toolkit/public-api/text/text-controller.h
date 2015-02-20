@@ -19,11 +19,13 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/object/ref-object.h>
 #include <dali-toolkit/public-api/text/text-view.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/math/vector3.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/object/ref-object.h>
 #include <string>
 
 namespace Dali
@@ -48,6 +50,28 @@ typedef IntrusivePtr<Controller> ControllerPtr;
  */
 class Controller : public RefObject
 {
+private:
+
+  /**
+   * @brief Text related operations to be done in the relayout process.
+   */
+  enum OperationsMask
+  {
+    NO_OPERATION      = 0x0,
+    CONVERT_TO_UTF32  = 0x1,
+    GET_SCRIPTS       = 0x2,
+    VALIDATE_FONTS    = 0x4,
+    GET_LINE_BREAKS   = 0x8,
+    GET_WORD_BREAKS   = 0x10,
+    SHAPE_TEXT        = 0x20,
+    GET_GLYPH_METRICS = 0x40,
+    LAYOUT            = 0x80,
+    REORDER           = 0x100,
+    ALIGNEMENT        = 0x200,
+    RENDER            = 0x400,
+    ALL_OPERATIONS    = 0xFFF
+  };
+
 public:
 
   /**
@@ -73,6 +97,21 @@ public:
    * @return True if the View was updated.
    */
   bool Relayout( const Vector2& size );
+
+  /**
+   *
+   */
+  bool DoRelayout( const Vector2& size, OperationsMask operations );
+
+  /**
+   * @copydoc Control::GetNaturalSize()
+   */
+  Vector3 GetNaturalSize();
+
+  /**
+   * @copydoc Control::GetHeightForWidth()
+   */
+  float GetHeightForWidth( float width );
 
   /**
    * @brief Return the layout engine.
@@ -117,7 +156,10 @@ private:
 
   struct Impl;
   Impl* mImpl;
+
+  Size mControlSize;
 };
+
 } // namespace Text
 
 } // namespace Toolkit

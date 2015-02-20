@@ -86,6 +86,16 @@ private: // From Control
    */
   virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 
+  /**
+   * @copydoc Control::GetNaturalSize()
+   */
+  virtual Vector3 GetNaturalSize();
+
+  /**
+   * @copydoc Control::GetHeightForWidth()
+   */
+  virtual float GetHeightForWidth( float width );
+
 private: // Implementation
 
   /**

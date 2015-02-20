@@ -44,6 +44,9 @@ struct VisualModel::Impl
   Vector<CharacterIndex> mGlyphsToCharacters;
   Vector<Length>         mCharactersPerGlyph;
   std::vector<Vector2>   mGlyphPositions;
+
+  Size                   mNaturalSize;
+  Size                   mActualSize;
 };
 
 VisualModelPtr VisualModel::New()
@@ -74,8 +77,8 @@ Length VisualModel::GetNumberOfGlyphs() const
   return mImpl->mGlyphs.Count();
 }
 
-void VisualModel::GetGlyphs( GlyphIndex glyphIndex,
-                             GlyphInfo* glyphs,
+void VisualModel::GetGlyphs( GlyphInfo* glyphs,
+                             GlyphIndex glyphIndex,
                              Length numberOfGlyphs ) const
 {
   Vector<GlyphInfo>& modelGlyphs = mImpl->mGlyphs;
@@ -139,8 +142,8 @@ void VisualModel::SetGlyphPositions( const Vector2* glyphPositions,
   memcpy( &modelPositions[0], glyphPositions, numberOfGlyphs*sizeof(Vector2) );
 }
 
-void VisualModel::GetGlyphPositions( GlyphIndex glyphIndex,
-                                     Vector2* glyphPositions,
+void VisualModel::GetGlyphPositions( Vector2* glyphPositions,
+                                     GlyphIndex glyphIndex,
                                      Length numberOfGlyphs ) const
 {
   std::vector<Vector2>& modelPositions = mImpl->mGlyphPositions;
@@ -182,20 +185,22 @@ void VisualModel::GetLinesOfGlyphRange( LineRun* lines,
 
 void VisualModel::SetNaturalSize( const Vector2& size  )
 {
+  mImpl->mNaturalSize = size;
 }
 
 const Vector2& VisualModel::GetNaturalSize() const
 {
-  return Vector2::ZERO;
+  return mImpl->mNaturalSize;
 }
 
 void VisualModel::SetActualSize( const Vector2& size )
 {
+  mImpl->mActualSize = size;
 }
 
 const Vector2& VisualModel::GetActualSize() const
 {
-  return Vector2::ZERO;
+  return mImpl->mActualSize;
 }
 
 VisualModel::~VisualModel()

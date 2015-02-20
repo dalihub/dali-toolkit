@@ -84,7 +84,7 @@ struct LayoutEngine::Impl
       // FIXME Single font assumption
       Text::FontMetrics fontMetrics;
       GlyphInfo firstGlyph;
-      visualModel.GetGlyphs( 0, &firstGlyph, 1 );
+      visualModel.GetGlyphs( &firstGlyph, 0, 1 );
       mFontClient.GetFontMetrics( firstGlyph.fontId, fontMetrics );
 
       float penX( 0 );
@@ -93,7 +93,7 @@ struct LayoutEngine::Impl
       for( unsigned int i=0; i<glyphCount; ++i )
       {
         GlyphInfo glyph;
-        visualModel.GetGlyphs( i, &glyph, 1 );
+        visualModel.GetGlyphs( &glyph, i, 1 );
 
         glyphPositions.push_back( Vector2( penX + glyph.xBearing,
                                            penY - glyph.yBearing ) );
@@ -115,10 +115,12 @@ struct LayoutEngine::Impl
 
     if( glyphCount > 0 )
     {
+      Size actualSize;
+
       // FIXME Single font assumption
       Text::FontMetrics fontMetrics;
       GlyphInfo firstGlyph;
-      visualModel.GetGlyphs( 0, &firstGlyph, 1 );
+      visualModel.GetGlyphs( &firstGlyph, 0, 1 );
       mFontClient.GetFontMetrics( firstGlyph.fontId, fontMetrics );
 
       float penX( 0 );
@@ -131,7 +133,7 @@ struct LayoutEngine::Impl
         for( ; i<glyphCount; ++i )
         {
           GlyphInfo glyph;
-          visualModel.GetGlyphs( i, &glyph, 1 );
+          visualModel.GetGlyphs( &glyph, i, 1 );
 
           if( glyph.width  > 0 &&
               glyph.height > 0 )
@@ -152,7 +154,7 @@ struct LayoutEngine::Impl
         for( ; j<glyphCount; ++j )
         {
           GlyphInfo glyph;
-          visualModel.GetGlyphs( j, &glyph, 1 );
+          visualModel.GetGlyphs( &glyph, j, 1 );
 
           endPenX += glyph.advance;
 
@@ -164,6 +166,7 @@ struct LayoutEngine::Impl
           }
           else if( endPenX > boundingBox.width )
           {
+            actualSize.width = ( actualSize.width < endPenX - glyph.advance ) ? endPenX - glyph.advance : actualSize.width;
             break;
           }
         }
@@ -178,7 +181,7 @@ struct LayoutEngine::Impl
         for( ; i<endIndex; ++i )
         {
           GlyphInfo glyph;
-          visualModel.GetGlyphs( i, &glyph, 1 );
+          visualModel.GetGlyphs( &glyph, i, 1 );
 
           glyphPositions.push_back( Vector2( penX + glyph.xBearing,
                                              penY - glyph.yBearing ) );
@@ -189,9 +192,13 @@ struct LayoutEngine::Impl
         // Go to next line
         penX = 0;
         penY += fontMetrics.height;
+
+        actualSize.height += fontMetrics.height;
       }
 
       visualModel.SetGlyphPositions( &glyphPositions[0], glyphCount );
+
+      visualModel.SetActualSize( actualSize );
     }
   }
 
