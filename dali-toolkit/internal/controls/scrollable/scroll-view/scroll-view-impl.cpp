@@ -1142,6 +1142,9 @@ void ScrollView::TransformTo(const Vector3& position,
 void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunction alpha,
                              DirectionBias horizontalBias, DirectionBias verticalBias)
 {
+  // If this is called while the timer is running, then cancel it
+  StopTouchDownTimer();
+
   Actor self( Self() );
 
   // Guard against destruction during signal emission
