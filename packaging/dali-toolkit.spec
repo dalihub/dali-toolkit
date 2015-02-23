@@ -52,7 +52,7 @@ Application development package for the OpenGLES Canvas toolkit - headers and pa
 %build
 PREFIX="/usr"
 CXXFLAGS+=" -Wall -g -Os -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
-LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections "
+LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -Wl,-Bsymbolic-functions "
 
 libtoolize --force
 cd %{_builddir}/dali-toolkit-%{version}/build/tizen
