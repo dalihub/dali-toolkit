@@ -85,6 +85,7 @@ public_api_src_files = \
   $(public_api_src_dir)/shader-effects/overlay-effect.cpp \
   $(public_api_src_dir)/shader-effects/page-turn-book-spine-effect.cpp \
   $(public_api_src_dir)/shader-effects/page-turn-effect.cpp \
+  $(public_api_src_dir)/shader-effects/quadratic-bezier.cpp \
   $(public_api_src_dir)/shader-effects/ripple-effect.cpp \
   $(public_api_src_dir)/shader-effects/ripple2d-effect.cpp \
   $(public_api_src_dir)/shader-effects/shear-effect.cpp \
@@ -250,6 +251,7 @@ public_api_shader_effects_header_files = \
   $(public_api_src_dir)/shader-effects/overlay-effect.h \
   $(public_api_src_dir)/shader-effects/page-turn-book-spine-effect.h \
   $(public_api_src_dir)/shader-effects/page-turn-effect.h \
+  $(public_api_src_dir)/shader-effects/quadratic-bezier.h \
   $(public_api_src_dir)/shader-effects/ripple-effect.h \
   $(public_api_src_dir)/shader-effects/ripple2d-effect.h \
   $(public_api_src_dir)/shader-effects/shear-effect.h \
