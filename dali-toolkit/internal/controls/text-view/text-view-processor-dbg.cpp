@@ -18,11 +18,11 @@
 // FILE HEADER
 #include <dali-toolkit/internal/controls/text-view/text-view-processor-dbg.h>
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/text-view/text-view-processor-types.h>
-
 // EXTERNAL INCLUDES
 #include <iostream>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/text-view/text-view-processor-types.h>
 
 namespace Dali
 {
