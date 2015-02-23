@@ -80,7 +80,7 @@ int UtcDaliSwirlDefaultValuesEffect(void)
   Toolkit::SwirlEffect effect = Toolkit::SwirlEffect::New(true);
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -115,7 +115,7 @@ int UtcDaliSwirlCustomValuesEffect(void)
   Toolkit::SwirlEffect effect = Toolkit::SwirlEffect::New(false);
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );

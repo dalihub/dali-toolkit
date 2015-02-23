@@ -34,11 +34,11 @@ void utc_distance_field_effect_cleanup(void)
 
 namespace
 {
-// Create bitmap image
-BitmapImage CreateDistanceField()
+// Create buffer image
+BufferImage CreateDistanceField()
 {
-  BitmapImage image = BitmapImage::New(256, 256, Pixel::RGBA8888);
-  BitmapImage distanceFieldImage = BitmapImage::New(256, 256, Pixel::L8);
+  BufferImage image = BufferImage::New(256, 256, Pixel::RGBA8888);
+  BufferImage distanceFieldImage = BufferImage::New(256, 256, Pixel::L8);
 
   PixelBuffer* pixbuf = image.GetBuffer();
 
@@ -112,7 +112,7 @@ int UtcDaliDistanceFieldEffectDefaultValues(void)
   Toolkit::DistanceFieldEffect effect = Toolkit::DistanceFieldEffect::New();
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateDistanceField();
+  BufferImage image = CreateDistanceField();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -146,7 +146,7 @@ int UtcDaliDistanceFieldEffectCustomValues(void)
   Toolkit::DistanceFieldEffect effect = Toolkit::DistanceFieldEffect::New();
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateDistanceField();
+  BufferImage image = CreateDistanceField();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );

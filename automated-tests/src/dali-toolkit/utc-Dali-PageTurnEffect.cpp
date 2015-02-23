@@ -38,7 +38,7 @@ int UtcDaliPageTurnEffectApply(void)
 {
   ToolkitTestApplication application;
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   Toolkit::PageTurnEffect pageTurnEffect = Toolkit::PageTurnEffect::New();
   Toolkit::PageTurnEffect pageTurnEffect2 = Toolkit::PageTurnEffect::New(false);

@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/images/image-attributes.h>
+#include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
@@ -90,7 +90,7 @@ void CubeTransitionEffect::Initialize()
                               (-mViewAreaSize.height + mTileSize.height) * 0.5f,
                               -mTileSize.width * 0.5f );
 
-  Image placeHolder = BitmapImage::WHITE();
+  Image placeHolder = BufferImage::WHITE();
   for( unsigned int y = 0; y < mNumRows; y++ )
   {
     float positionY = y * mTileSize.height + basePosition.y;

@@ -53,7 +53,7 @@ static void TestCallback(BaseHandle handle)
 void Wait(ToolkitTestApplication& application, float durationToPass)
 {
   int duration = static_cast<int>(durationToPass*1000.f);
-  // wait 2 more frames to compensate the two frames used by the bitmapImage waiting for the loading succeeded signal
+  // wait 2 more frames to compensate the two frames used by the image waiting for the loading succeeded signal
   for(int i = 0; i <=  duration/RENDER_FRAME_INTERVAL+2 ; i++)
   {
     application.SendNotification();

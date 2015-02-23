@@ -42,7 +42,7 @@ int UtcDaliMaskEffectCreateEffect(void)
 {
   ToolkitTestApplication application;
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ShaderEffect effect = Toolkit::MaskEffect::New( image );
   DALI_TEST_CHECK( effect );

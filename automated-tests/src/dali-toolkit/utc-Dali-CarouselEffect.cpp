@@ -76,7 +76,7 @@ int UtcDaliCarouselEffectDefaultValues(void)
   Toolkit::CarouselEffect effect = Toolkit::CarouselEffect::New();
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -105,7 +105,7 @@ int UtcDaliCarouselEffectCustomValues(void)
   Toolkit::CarouselEffect effect = Toolkit::CarouselEffect::New();
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
