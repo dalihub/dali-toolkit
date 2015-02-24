@@ -18,10 +18,13 @@
 // CLASS HEADER
 #include <dali-toolkit/public-api/text/shaper.h>
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/text-abstraction/shaping.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/font-run.h>
 #include <dali-toolkit/public-api/text/logical-model.h>
+#include <dali-toolkit/public-api/text/script.h>
 #include <dali-toolkit/public-api/text/script-run.h>
 #include <dali-toolkit/public-api/text/visual-model.h>
 
@@ -79,9 +82,6 @@ void ShapeText( const Vector<Character>& text,
   Vector<FontRun>::ConstIterator fontRunIt = fonts.Begin();
   Vector<ScriptRun>::ConstIterator scriptRunIt = scripts.Begin();
 
-  // The line must break token converted to LineBreakInfo to be compared and avoid a compile error.
-  const LineBreakInfo MUST_BREAK = static_cast<LineBreakInfo>( TextAbstraction::LINE_MUST_BREAK );
-
   // Index to the the next one to be shaped. Is pointing the character after the last one it was shaped.
   CharacterIndex previousIndex = 0u;
 
@@ -100,6 +100,11 @@ void ShapeText( const Vector<Character>& text,
   // The actual number of glyphs.
   Length totalNumberOfGlyphs = 0u;
 
+  const Character* textBuffer = text.Begin();
+  const LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
+  GlyphInfo* glyphsBuffer = glyphs.Begin();
+  Length* charactersPerGlyphBuffer = charactersPerGlyph.Begin();
+
   // Traverse the characters and shape the text.
   for( previousIndex = 0; previousIndex < numberOfCharacters; )
   {
@@ -115,18 +120,28 @@ void ShapeText( const Vector<Character>& text,
                                        scriptRun.characterRun.characterIndex + scriptRun.characterRun.numberOfCharacters );
 
     // Check if there is a line must break.
+    bool mustBreak = false;
     for( CharacterIndex index = previousIndex; index < currentIndex; ++index )
     {
-      if( MUST_BREAK == lineBreakInfo.Begin() + index )
+      mustBreak = TextAbstraction::LINE_MUST_BREAK == *( lineBreakInfoBuffer + index );
+      if( mustBreak )
       {
         currentIndex = index;
         break;
       }
     }
 
+    // Check if the current index is a white space. Do not want to shape a \n.
+    // The last character is always a must-break even if it's not a \n.
+    Length numberOfCharactersToShape = currentIndex - previousIndex;
+    if( mustBreak && !IsWhiteSpace( *( textBuffer + currentIndex ) ) )
+    {
+      ++numberOfCharactersToShape;
+    }
+
     // Shape the text for the current chunk.
-    const Length numberOfGlyphs = shaping.Shape( text.Begin() + previousIndex,
-                                                 currentIndex - previousIndex,
+    const Length numberOfGlyphs = shaping.Shape( textBuffer + previousIndex,
+                                                 numberOfCharactersToShape,
                                                  currentFontId,
                                                  currentScript );
 
@@ -139,11 +154,15 @@ void ShapeText( const Vector<Character>& text,
       numberOfGlyphsReserved = static_cast<Length>( totalNumberOfGlyphs * 1.3f );
       glyphs.Resize( numberOfGlyphsReserved );
       charactersPerGlyph.Resize( numberOfGlyphsReserved );
+
+      // Iterators are not valid anymore, set them again.
+      glyphsBuffer = glyphs.Begin();
+      charactersPerGlyphBuffer = charactersPerGlyph.Begin();
     }
 
     // Retrieve the glyphs and the glyph to character conversion map.
-    shaping.GetGlyphs( glyphs.Begin() + glyphIndex,
-                       charactersPerGlyph.Begin() + glyphIndex );
+    shaping.GetGlyphs( glyphsBuffer + glyphIndex,
+                       charactersPerGlyphBuffer + glyphIndex );
 
     // Update the iterators to get the next font or script run.
     if( currentIndex == fontRun.characterRun.characterIndex + fontRun.characterRun.numberOfCharacters )
@@ -155,8 +174,8 @@ void ShapeText( const Vector<Character>& text,
       ++scriptRunIt;
     }
 
-    // Update the previous index.
-    previousIndex = currentIndex;
+    // Update the previous index. Jumps the \n if needed.
+    previousIndex = mustBreak ? currentIndex + 1u : currentIndex;
   }
 
   characterIndices.Reserve( totalNumberOfGlyphs );
@@ -164,7 +183,7 @@ void ShapeText( const Vector<Character>& text,
   characterIndices.PushBack( characterIndex );
   for( Length index = 0u, length = totalNumberOfGlyphs - 1u; index < length; ++index )
   {
-    characterIndex += *( charactersPerGlyph.Begin() + index );
+    characterIndex += *( charactersPerGlyphBuffer + index );
     characterIndices.PushBack( characterIndex );
   }
 
