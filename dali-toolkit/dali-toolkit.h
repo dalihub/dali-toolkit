@@ -130,6 +130,7 @@
 #include <dali-toolkit/public-api/text/text-view.h>
 #include <dali-toolkit/public-api/text/text-view-interface.h>
 #include <dali-toolkit/public-api/text/visual-model.h>
+#include <dali-toolkit/public-api/text/decorator/text-decorator.h>
 #include <dali-toolkit/public-api/text/layouts/layout-engine.h>
 #include <dali-toolkit/public-api/text/rendering/text-renderer.h>
 #include <dali-toolkit/public-api/text/rendering/basic/text-basic-renderer.h>
