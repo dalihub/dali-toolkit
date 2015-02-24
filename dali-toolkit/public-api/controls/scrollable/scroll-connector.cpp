@@ -75,7 +75,7 @@ float ScrollConnector::GetContentLength() const
   return GetImpl(*this).GetContentLength();
 }
 
-Constrainable ScrollConnector::GetScrollPositionObject() const
+Handle ScrollConnector::GetScrollPositionObject() const
 {
   return GetImpl(*this).GetScrollPositionObject();
 }

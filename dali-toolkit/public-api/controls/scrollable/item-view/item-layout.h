@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/alpha-functions.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
@@ -407,7 +408,7 @@ public:
    * @param[in] scrollPositionObject The object which provides the layout position property.
    * @param[in] itemViewActor The item view instance which requests the application of constraints.
    */
-  DALI_IMPORT_API virtual void ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, Constrainable scrollPositionObject, const Actor& itemViewActor );
+  DALI_IMPORT_API virtual void ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, Handle scrollPositionObject, const Actor& itemViewActor );
 
   /**
    * @brief Gets the position of a given item

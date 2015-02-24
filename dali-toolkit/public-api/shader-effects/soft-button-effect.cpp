@@ -15,7 +15,14 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/object/property-input.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/shader-effects/soft-button-effect.h>
+
 namespace Dali
 {
 

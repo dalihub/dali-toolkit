@@ -19,6 +19,8 @@
 #include <dali-toolkit/public-api/shader-effects/motion-blur-effect.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 
 namespace Dali

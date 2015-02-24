@@ -18,6 +18,10 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/alpha-functions.h>
+#include <dali/public-api/animation/time-period.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 

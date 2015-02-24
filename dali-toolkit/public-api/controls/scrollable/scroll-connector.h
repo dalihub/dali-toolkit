@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/constrainable.h>
+#include <dali/public-api/object/handle.h>
 
 namespace Dali
 {
@@ -161,7 +161,7 @@ public:
    * @brief Retrieve the object which provides the "scroll-position" property.
    * @return The scroll-position object.
    */
-  Constrainable GetScrollPositionObject() const;
+  Handle GetScrollPositionObject() const;
 
 public: // Not intended for application developers
 

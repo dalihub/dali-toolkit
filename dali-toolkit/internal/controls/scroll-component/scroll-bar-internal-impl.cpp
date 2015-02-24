@@ -19,6 +19,9 @@
 #include <dali-toolkit/internal/controls/scroll-component/scroll-bar-internal-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/images/resource-image.h>
 

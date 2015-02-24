@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/animation/alpha-functions.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/navigation-frame/page.h>
 #include <dali-toolkit/public-api/controls/navigation-frame/navigation-bar-style.h>

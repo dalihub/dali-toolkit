@@ -588,7 +588,7 @@ private:
   Actor mOvershootOverlay;           ///< The overlay actor for overshoot effect
 
   Dali::Toolkit::ScrollConnector mScrollConnector; ///< Connects ItemView with scrollable components e.g. scroll bars
-  Constrainable   mScrollPositionObject;     ///< From mScrollConnector
+  Handle   mScrollPositionObject;     ///< From mScrollConnector
 
   bool mAddingItems;
 
