@@ -371,8 +371,8 @@ SoftButtonEffect SoftButtonEffect::New(Type type)
     }
 
     // precalc 1.0 / uInsideCircleSizeScale on CPU to save shader insns, using constraint to tie to the normal property
-    Property::Index insideCircleSizeScalePropertyIndex = handle.GetPropertyIndex(SOFT_BUTTON_INSIDE_SHAPE_SIZE_SCALE_PROPERTY_NAME);
-    Property::Index recipInsideCircleSizeScalePropertyIndex = handle.GetPropertyIndex(SOFT_BUTTON_RECIP_INSIDE_SHAPE_SIZE_SCALE_PROPERTY_NAME);
+    Dali::Property::Index insideCircleSizeScalePropertyIndex = handle.GetPropertyIndex(SOFT_BUTTON_INSIDE_SHAPE_SIZE_SCALE_PROPERTY_NAME);
+    Dali::Property::Index recipInsideCircleSizeScalePropertyIndex = handle.GetPropertyIndex(SOFT_BUTTON_RECIP_INSIDE_SHAPE_SIZE_SCALE_PROPERTY_NAME);
     Constraint constraint = Constraint::New<float>( recipInsideCircleSizeScalePropertyIndex, LocalSource(insideCircleSizeScalePropertyIndex), ReciprocalConstraint());
     handle.ApplyConstraint(constraint);
   }

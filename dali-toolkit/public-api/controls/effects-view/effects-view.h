@@ -175,25 +175,25 @@ public:
     * Get the property index to the effect size
     * @return The property index to the effect size
     */
-   Property::Index GetEffectSizePropertyIndex() const;
+   Dali::Property::Index GetEffectSizePropertyIndex() const;
 
    /**
     * Get the property index to the effect strength
     * @return The property index to the effect strength
     */
-   Property::Index GetEffectStrengthPropertyIndex() const;
+   Dali::Property::Index GetEffectStrengthPropertyIndex() const;
 
    /**
     * Get the property index to the Vector3 specifying the effect offset (eg drop shadow offset)
     * @return The property index to the Vector3 specifying the effect offset
     */
-   Property::Index GetEffectOffsetPropertyIndex() const;
+   Dali::Property::Index GetEffectOffsetPropertyIndex() const;
 
    /**
     * Get the property index to the effect color (eg shadow color)
     * @return The property index to the effect color
     */
-   Property::Index GetEffectColorPropertyIndex() const;
+   Dali::Property::Index GetEffectColorPropertyIndex() const;
 
    /**
     * Set background color for the view. The background will be filled with this color.

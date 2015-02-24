@@ -539,7 +539,7 @@ int UtcDaliTableViewSetGetProperty(void)
 
   // Create a 1x1 table-view
   TableView tableView = TableView::New(1,1);
-  tableView.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, Constraint100() ) );
+  tableView.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::Size, Constraint100() ) );
   DALI_TEST_CHECK( tableView );
 
   // Test "rows" property
@@ -637,7 +637,7 @@ int UtcDaliTableViewCustomProperties(void)
 
   // Create a 10x10 table-view
   TableView tableView = TableView::New(10,10);
-  tableView.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, Constraint100() ) );
+  tableView.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::Size, Constraint100() ) );
   DALI_TEST_CHECK( tableView );
 
   // Create a child actor with the custom properties

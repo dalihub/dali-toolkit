@@ -231,7 +231,7 @@ void SetupBackgroundActor( Actor actor, Property::Index constrainingIndex, const
   actor.SetZ( BACKGROUND_ACTOR_Z_POSITION );
 
   Constraint constraint = Constraint::New<Vector3>( constrainingIndex,
-                                                    ParentSource( Actor::SIZE ),
+                                                    ParentSource( Actor::Property::Size ),
                                                     EqualToConstraint() );
   actor.ApplyConstraint( constraint );
 }
@@ -788,7 +788,7 @@ void Control::SetBackgroundColor( const Vector4& color )
     // Create Mesh Actor
     MeshActor meshActor = MeshActor::New( CreateMesh() );
 
-    SetupBackgroundActor( meshActor, Actor::SCALE, color );
+    SetupBackgroundActor( meshActor, Actor::Property::Scale, color );
 
     // Set the background actor before adding so that we do not inform deriving classes
     background.actor = meshActor;
@@ -819,7 +819,7 @@ void Control::SetBackground( Image image )
   }
 
   ImageActor imageActor = ImageActor::New( image );
-  SetupBackgroundActor( imageActor, Actor::SIZE, background.color );
+  SetupBackgroundActor( imageActor, Actor::Property::Size, background.color );
 
   // Set the background actor before adding so that we do not inform derived classes
   background.actor = imageActor;

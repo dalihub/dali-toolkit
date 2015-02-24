@@ -591,7 +591,7 @@ void ScrollView::OnInitialize()
   mInternalActor = Actor::New();
   mInternalActor.SetDrawMode(DrawMode::OVERLAY);
   self.Add(mInternalActor);
-  mInternalActor.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+  mInternalActor.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::Size, ParentSource( Actor::Property::Size ), EqualToConstraint() ) );
   mInternalActor.SetParentOrigin(ParentOrigin::CENTER);
   mInternalActor.SetAnchorPoint(AnchorPoint::CENTER);
 
@@ -2613,8 +2613,8 @@ void ScrollView::UpdateMainInternalConstraint()
   if( mPanning )
   {
     constraint = Constraint::New<Vector3>( mPropertyPrePosition,
-                                                      Source( detector, PanGestureDetector::LOCAL_POSITION ),
-                                                      Source( self, Actor::SIZE ),
+                                                      Source( detector, PanGestureDetector::Property::LocalPosition ),
+                                                      Source( self, Actor::Property::Size ),
                                                       InternalPrePositionConstraint( mPanStartPosition, initialPanMask, mAxisAutoLock, mAxisAutoLockGradient, mLockAxis, mMaxOvershoot, mRulerX->GetDomain(), mRulerY->GetDomain() ) );
     mScrollMainInternalPrePositionConstraint = self.ApplyConstraint( constraint );
   }
@@ -2624,7 +2624,7 @@ void ScrollView::UpdateMainInternalConstraint()
                                          LocalSource( mPropertyPrePosition ),
                                          LocalSource( mPropertyPositionMin ),
                                          LocalSource( mPropertyPositionMax ),
-                                         Source( self, Actor::SIZE ),
+                                         Source( self, Actor::Property::Size ),
                                          InternalPositionConstraint( mRulerX->GetDomain(),
                                                                      mRulerY->GetDomain(), mWrapMode ) );
   mScrollMainInternalPositionConstraint = self.ApplyConstraint( constraint );
@@ -2647,7 +2647,7 @@ void ScrollView::UpdateMainInternalConstraint()
                                          LocalSource( mPropertyPosition ),
                                          LocalSource( mPropertyPositionMin ),
                                          LocalSource( mPropertyPositionMax ),
-                                         LocalSource( Actor::SIZE ),
+                                         LocalSource( Actor::Property::Size ),
                                          InternalRelativePositionConstraint );
   mScrollMainInternalRelativeConstraint = self.ApplyConstraint( constraint );
 
@@ -2703,17 +2703,17 @@ void ScrollView::SetInternalConstraints()
   Constraint constraint;
 
   // MoveActor (scrolling)
-  constraint = Constraint::New<Vector3>( Actor::POSITION,
+  constraint = Constraint::New<Vector3>( Actor::Property::Position,
                                          Source( self, mPropertyPosition ),
                                          MoveActorConstraint );
   constraint.SetRemoveAction(Constraint::Discard);
   ApplyConstraintToBoundActors(constraint);
 
   // WrapActor (wrap functionality)
-  constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                 LocalSource( Actor::SCALE ),
-                                                 LocalSource( Actor::ANCHOR_POINT ),
-                                                 LocalSource( Actor::SIZE ),
+  constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                                 LocalSource( Actor::Property::Scale ),
+                                                 LocalSource( Actor::Property::AnchorPoint ),
+                                                 LocalSource( Actor::Property::Size ),
                                                  Source( self, mPropertyPositionMin ),
                                                  Source( self, mPropertyPositionMax ),
                                                  Source( self, mPropertyWrap ),

@@ -818,7 +818,7 @@ int UtcDaliScrollViewConstraints(void)
   Wait(application);
 
   Property::Index scrollPositionProperty = scrollView.GetPropertyIndex(ScrollView::SCROLL_POSITION_PROPERTY_NAME);
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
                                                        Source(scrollView, scrollPositionProperty),
                                                        TestSumConstraint( TEST_CONSTRAINT_OFFSET ) );
   constraint.SetRemoveAction(Constraint::Discard);
@@ -867,7 +867,7 @@ int UtcDaliScrollViewBind(void)
 
   Property::Index scrollPositionProperty = scrollView.GetPropertyIndex(ScrollView::SCROLL_POSITION_PROPERTY_NAME);
   // apply this constraint to scrollview
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
                                                        Source(scrollView, scrollPositionProperty),
                                                        TestSumConstraint( TEST_CONSTRAINT_OFFSET ) );
 

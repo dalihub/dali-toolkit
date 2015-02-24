@@ -141,7 +141,7 @@ ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
   scrollView.SetSize(size);
   scrollView.SetAnchorPoint(AnchorPoint::CENTER);
   scrollView.SetParentOrigin(ParentOrigin::CENTER);
-  scrollView.ApplyConstraint( Constraint::New<Dali::Vector3>( Dali::Actor::SIZE, Dali::ParentSource( Dali::Actor::SIZE ), Dali::EqualToConstraint() ) );
+  scrollView.ApplyConstraint( Constraint::New<Dali::Vector3>( Dali::Actor::Property::Size, Dali::ParentSource( Dali::Actor::Property::Size ), Dali::EqualToConstraint() ) );
   scrollView.SetWrapMode(false);
   scrollView.ScrollStartedSignal().Connect( &OnScrollStart );
   scrollView.ScrollUpdatedSignal().Connect( &OnScrollUpdate );
@@ -175,7 +175,7 @@ ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
   container.SetAnchorPoint(AnchorPoint::CENTER);
   container.SetSize( size );
   scrollView.Add( container );
-  container.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+  container.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::Size, ParentSource( Actor::Property::Size ), EqualToConstraint() ) );
 
   gPages.clear();
   for(int row = 0;row<rows;row++)
@@ -183,7 +183,7 @@ ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
     for(int column = 0;column<columns;column++)
     {
       Actor page = Actor::New();
-      page.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+      page.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::Size, ParentSource( Actor::Property::Size ), EqualToConstraint() ) );
       page.SetParentOrigin( ParentOrigin::CENTER );
       page.SetAnchorPoint( AnchorPoint::CENTER );
       page.SetPosition( column * size.x, row * size.y );
@@ -322,7 +322,7 @@ int UtcDaliScrollViewSpiralEffectTest(void)
   {
     Actor page = *pageIter;
     page.RemoveConstraints();
-    page.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+    page.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::Size, ParentSource( Actor::Property::Size ), EqualToConstraint() ) );
     effect.ApplyToPage(page, Vector2(Math::PI_2, 0.0f));
   }
   Wait(application);
@@ -431,7 +431,7 @@ int UtcDaliScrollViewPageCubeEffectTest(void)
   {
     Actor page = *pageIter;
     page.RemoveConstraints();
-    page.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+    page.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::Size, ParentSource( Actor::Property::Size ), EqualToConstraint() ) );
     effect.ApplyToPage(page, Vector2(Math::PI_2, 0.0f));
   }
   Wait(application);
@@ -466,7 +466,7 @@ int UtcDaliScrollViewPageCarouselEffectTest(void)
   {
     Actor page = *pageIter;
     page.RemoveConstraints();
-    page.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ) );
+    page.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::Size, ParentSource( Actor::Property::Size ), EqualToConstraint() ) );
     effect.ApplyToPage(page);
   }
   Wait(application);

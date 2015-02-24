@@ -259,36 +259,36 @@ void ApplyScrollCubeConstraints(Toolkit::ScrollView scrollView,
 {
   // Apply constraints to this actor //
   Constraint constraint;
-  constraint = Constraint::New<Quaternion>( Actor::ROTATION,
-                                            LocalSource(Actor::POSITION),
+  constraint = Constraint::New<Quaternion>( Actor::Property::Rotation,
+                                            LocalSource(Actor::Property::Position),
                                             Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_FINAL_PROPERTY_NAME ) ),
                                             Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
                                             Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
-                                            Source(scrollView, Actor::SIZE ),
+                                            Source(scrollView, Actor::Property::Size ),
                                             Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME ) ),
                                             boost::bind( &ScrollPageCubeEffectInfo::RotationConstraint, info, _1, _2, _3, _4, _5, _6, _7) );
 
   constraint.SetRemoveAction( Constraint::Discard );
   child.ApplyConstraint( constraint );
 
-  constraint = Constraint::New<Vector4>( Actor::COLOR,
-                                         LocalSource(Actor::POSITION),
+  constraint = Constraint::New<Vector4>( Actor::Property::Color,
+                                         LocalSource(Actor::Property::Position),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_FINAL_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
-                                         Source(scrollView, Actor::SIZE ),
+                                         Source(scrollView, Actor::Property::Size ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME ) ),
                                          boost::bind( &ScrollPageCubeEffectInfo::ColorConstraint, info, _1, _2, _3, _4, _5, _6, _7) );
 
   constraint.SetRemoveAction( Constraint::Discard );
   child.ApplyConstraint( constraint );
 
-  constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                         LocalSource(Actor::POSITION),
+  constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                         LocalSource(Actor::Property::Position),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_FINAL_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
-                                         Source(scrollView, Actor::SIZE ),
+                                         Source(scrollView, Actor::Property::Size ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME ) ),
                                          boost::bind( &ScrollPageCubeEffectInfo::PositionConstraint, info, _1, _2, _3, _4, _5, _6, _7) );
 

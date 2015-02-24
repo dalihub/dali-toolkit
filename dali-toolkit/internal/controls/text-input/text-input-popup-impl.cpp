@@ -549,8 +549,8 @@ void TextInputPopup::Hide(bool animate)
     if(animate)
     {
       mAnimation = Animation::New( HIDE_POPUP_ANIMATION_DURATION );
-      mAnimation.AnimateTo( Property(mRoot, Actor::SCALE), Vector3::ZERO, AlphaFunctions::EaseOut );
-      mAnimation.AnimateTo( Property(mRoot, Actor::COLOR_ALPHA), 0.0f, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRoot, Actor::Property::Scale), Vector3::ZERO, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRoot, Actor::Property::ColorAlpha), 0.0f, AlphaFunctions::EaseOut );
       mAnimation.Play();
 
       mAnimation.FinishedSignal().Connect( this, &TextInputPopup::OnHideFinished );
@@ -558,8 +558,8 @@ void TextInputPopup::Hide(bool animate)
     }
     else
     {
-      mRoot.SetProperty(Actor::SCALE, Vector3::ZERO);
-      mRoot.SetProperty(Actor::COLOR_ALPHA, 0.0f);
+      mRoot.SetProperty(Actor::Property::Scale, Vector3::ZERO);
+      mRoot.SetProperty(Actor::Property::ColorAlpha, 0.0f);
       mState = StateHidden;
     }
   }
@@ -585,8 +585,8 @@ void TextInputPopup::Show( Actor target, bool animate )
     if(animate)
     {
       mAnimation = Animation::New( SHOW_POPUP_ANIMATION_DURATION );
-      mAnimation.AnimateTo( Property(mRoot, Actor::SCALE), Vector3::ONE, AlphaFunctions::EaseOut );
-      mAnimation.AnimateTo( Property(mRoot, Actor::COLOR_ALPHA), 1.0f, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRoot, Actor::Property::Scale), Vector3::ONE, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRoot, Actor::Property::ColorAlpha), 1.0f, AlphaFunctions::EaseOut );
       mAnimation.Play();
 
       mAnimation.FinishedSignal().Connect( this, &TextInputPopup::OnShowFinished );
@@ -594,8 +594,8 @@ void TextInputPopup::Show( Actor target, bool animate )
     }
     else
     {
-      mRoot.SetProperty(Actor::SCALE, Vector3::ONE);
-      mRoot.SetProperty(Actor::COLOR_ALPHA, 1.0f);
+      mRoot.SetProperty(Actor::Property::Scale, Vector3::ONE);
+      mRoot.SetProperty(Actor::Property::ColorAlpha, 1.0f);
       mState = StateShown;
     }
   }

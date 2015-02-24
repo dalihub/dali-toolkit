@@ -53,16 +53,16 @@ class DALI_IMPORT_API TextView : public Control
 public:
 
   // Properties
-  static const Property::Index PROPERTY_MARKUP_ENABLED;         ///< name "markup-enabled",       @see SetMarkupProcessingEnabled(), type BOOLEAN
-  static const Property::Index PROPERTY_TEXT;                   ///< name "text",                 @see SetText(),                    type STRING
-  static const Property::Index PROPERTY_MULTILINE_POLICY;       ///< name "multiline-policy",     @see SetMultilinePolicy(),         type STRING
-  static const Property::Index PROPERTY_WIDTH_EXCEED_POLICY;    ///< name "width-exceed-policy",  @see SetWidthExceedPolicy(),       type STRING
-  static const Property::Index PROPERTY_HEIGHT_EXCEED_POLICY;   ///< name "height-exceed-policy", @see SetHeightExceedPolicy(),      type STRING
-  static const Property::Index PROPERTY_LINE_JUSTIFICATION;     ///< name "line-justification",   @see SetLineJustification(),       type STRING
-  static const Property::Index PROPERTY_FADE_BOUNDARY;          ///< name "fade-boundary",        @see SetFadeBoundary(),            type VECTOR4
-  static const Property::Index PROPERTY_LINE_HEIGHT_OFFSET;     ///< name "line-height-offset",   @see SetLineHeightOffset(),        type FLOAT
-  static const Property::Index PROPERTY_HORIZONTAL_ALIGNMENT;   ///< name "horizontal-alignment", @see SetTextAlignment(),           type STRING
-  static const Property::Index PROPERTY_VERTICAL_ALIGNMENT;     ///< name "vertical-alignment",   @see SetTextAlignment(),           type STRING
+  static const Dali::Property::Index PROPERTY_MARKUP_ENABLED;         ///< name "markup-enabled",       @see SetMarkupProcessingEnabled(), type BOOLEAN
+  static const Dali::Property::Index PROPERTY_TEXT;                   ///< name "text",                 @see SetText(),                    type STRING
+  static const Dali::Property::Index PROPERTY_MULTILINE_POLICY;       ///< name "multiline-policy",     @see SetMultilinePolicy(),         type STRING
+  static const Dali::Property::Index PROPERTY_WIDTH_EXCEED_POLICY;    ///< name "width-exceed-policy",  @see SetWidthExceedPolicy(),       type STRING
+  static const Dali::Property::Index PROPERTY_HEIGHT_EXCEED_POLICY;   ///< name "height-exceed-policy", @see SetHeightExceedPolicy(),      type STRING
+  static const Dali::Property::Index PROPERTY_LINE_JUSTIFICATION;     ///< name "line-justification",   @see SetLineJustification(),       type STRING
+  static const Dali::Property::Index PROPERTY_FADE_BOUNDARY;          ///< name "fade-boundary",        @see SetFadeBoundary(),            type VECTOR4
+  static const Dali::Property::Index PROPERTY_LINE_HEIGHT_OFFSET;     ///< name "line-height-offset",   @see SetLineHeightOffset(),        type FLOAT
+  static const Dali::Property::Index PROPERTY_HORIZONTAL_ALIGNMENT;   ///< name "horizontal-alignment", @see SetTextAlignment(),           type STRING
+  static const Dali::Property::Index PROPERTY_VERTICAL_ALIGNMENT;     ///< name "vertical-alignment",   @see SetTextAlignment(),           type STRING
 
   /**
    * @brief Structure used to retrieve Layout info per character.
