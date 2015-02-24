@@ -23,8 +23,9 @@
 #include <boost/function.hpp>
 #include <sstream>
 
-// INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+
+// INTERNAL INCLUDES
 
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/builder/json-parser.h>

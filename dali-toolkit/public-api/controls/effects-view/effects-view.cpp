@@ -15,8 +15,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-
 // CLASS HEADER
 #include <dali-toolkit/public-api/controls/effects-view/effects-view.h>
 

@@ -19,14 +19,13 @@
 #include <dali-toolkit/internal/controls/slider/slider-impl.h>
 
 // EXTERNAL INCLUDES
+#include <sstream>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
-
-// EXTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/public-api/images/resource-image.h>
 
-#include <sstream>
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control-impl.h>
 
 using namespace Dali;
 

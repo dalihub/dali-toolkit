@@ -15,11 +15,13 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/object/base-object.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/cluster/cluster-style.h>
 
 namespace Dali

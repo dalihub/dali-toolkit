@@ -15,7 +15,10 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/public-api/controls/control.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali

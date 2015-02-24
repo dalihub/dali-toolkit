@@ -18,7 +18,7 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/builder/json-parser-state.h>
 
-// EXTERNAL
+// EXTERNAL INCLUDES
 #include <algorithm>
 
 namespace Dali

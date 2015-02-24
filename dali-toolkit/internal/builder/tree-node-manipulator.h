@@ -18,13 +18,15 @@
  *
  */
 
+// EXTERNAL INCLUDES
 #include <utility> // pair
 #include <iterator>
 #include <vector>
 #include <cstring>
 
-// INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/builder/tree-node.h>
 
 namespace Dali

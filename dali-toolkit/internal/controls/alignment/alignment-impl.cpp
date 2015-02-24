@@ -16,7 +16,6 @@
  */
 
 // CLASS HEADER
-
 #include "alignment-impl.h"
 
 // EXTERNAL INCLUDES

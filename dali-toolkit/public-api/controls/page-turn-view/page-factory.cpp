@@ -15,6 +15,7 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/public-api/controls/page-turn-view/page-factory.h>
 
 namespace Dali

@@ -15,6 +15,7 @@
  *
  */
 
+// CLASS HEADER
 #include "check-button-factory.h"
 
 // EXTERNAL INCLUDES

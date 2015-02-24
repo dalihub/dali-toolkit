@@ -15,7 +15,10 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scroll-bar/scroll-bar-impl.h>
 
 namespace Dali

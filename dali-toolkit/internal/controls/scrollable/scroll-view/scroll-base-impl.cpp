@@ -15,6 +15,7 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-base-impl.h>
 
 using namespace Dali;

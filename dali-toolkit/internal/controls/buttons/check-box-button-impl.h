@@ -18,9 +18,10 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
 
 #include "button-impl.h"

@@ -27,13 +27,13 @@
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>
-#include <dali/integration-api/debug.h>
 
 namespace Dali
 {

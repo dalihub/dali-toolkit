@@ -32,8 +32,6 @@
 #include <dali-toolkit/public-api/controls/bubble-effect/bubble-emitter.h>
 #include <dali-toolkit/public-api/shader-effects/bubble-effect/bubble-effect.h>
 
-#include <map>
-
 namespace Dali
 {
 

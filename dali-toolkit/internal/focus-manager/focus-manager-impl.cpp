@@ -26,11 +26,11 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/events/hit-test-algorithm.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali/integration-api/debug.h>
 
 namespace Dali
 {

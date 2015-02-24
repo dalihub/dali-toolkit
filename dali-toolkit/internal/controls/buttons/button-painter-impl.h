@@ -18,7 +18,7 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/signals/connection-tracker.h>
 

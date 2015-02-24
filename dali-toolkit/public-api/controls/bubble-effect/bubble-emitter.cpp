@@ -15,9 +15,10 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/public-api/controls/bubble-effect/bubble-emitter.h>
 
-//INTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/bubble-effect/bubble-emitter-impl.h>
 
 

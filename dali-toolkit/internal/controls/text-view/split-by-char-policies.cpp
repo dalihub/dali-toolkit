@@ -18,8 +18,10 @@
 // FILE HEADER
 #include <dali-toolkit/internal/controls/text-view/split-by-char-policies.h>
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-view/relayout-utilities.h>
 #include <dali-toolkit/internal/controls/text-view/text-view-processor.h>
 
