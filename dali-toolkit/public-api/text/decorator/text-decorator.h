@@ -32,7 +32,10 @@ class Vector4;
 namespace Toolkit
 {
 
-class ControlImpl;
+namespace Internal
+{
+class Control;
+}
 
 namespace Text
 {
@@ -72,7 +75,7 @@ public:
    * @param[in] parent Decorations will be added to this parent control.
    * @return A pointer to a new Decorator.
    */
-  static DecoratorPtr New( ControlImpl& parent );
+  static DecoratorPtr New( Internal::Control& parent );
 
   /**
    * @brief The decorator waits until a relayout before creating actors etc.
@@ -119,22 +122,21 @@ public:
   /**
    * @brief Sets the image for a cursor.
    *
-   * @param[in] cursor The cursor to set.
    * @param[in] image The image to use.
    */
-  void SetImage( Cursor cursor, Dali::Image image );
+  void SetCursorImage( Dali::Image image );
 
   /**
    * @brief Retrieves the image for a cursor.
    *
    * @return The cursor image.
    */
-  Dali::Image GetImage( Cursor cursor ) const;
+  Dali::Image GetCursorImage() const;
 
   /**
    * @brief Sets the color for a cursor.
    *
-   * @param[in] cursor The cursor to set.
+   * @param[in] cursor Whether this color is for the primary or secondary cursor.
    * @param[in] color The color to use.
    */
   void SetColor( Cursor cursor, const Dali::Vector4& color );
@@ -142,6 +144,7 @@ public:
   /**
    * @brief Retrieves the color for a cursor.
    *
+   * @param[in] cursor Whether this color is for the primary or secondary cursor.
    * @return The cursor color.
    */
   const Dali::Vector4& GetColor( Cursor cursor ) const;
@@ -197,7 +200,7 @@ private:
    * @brief Private constructor.
    * @param[in] parent Decorations will be added to this parent control.
    */
-  Decorator(ControlImpl& parent);
+  Decorator(Internal::Control& parent);
 
   // Undefined
   Decorator( const Decorator& handle );

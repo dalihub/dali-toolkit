@@ -35,6 +35,8 @@ class TextLabel;
 
 /**
  * @brief A control which renders a short text string.
+ *
+ * Text labels are lightweight, non-editable and do not respond to user input.
  */
 class DALI_IMPORT_API TextLabel : public Control
 {

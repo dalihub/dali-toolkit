@@ -49,11 +49,10 @@ struct Decorator::Impl
     float y;
     float height;
 
-    Image image;
     Vector4 color;
   };
 
-  Impl(ControlImpl& parent)
+  Impl(Internal::Control& parent)
   : mParent(parent),
     mActiveCursor(ACTIVE_CURSOR_NONE),
     mCursorBlinkInterval(0.5f),
@@ -66,17 +65,19 @@ struct Decorator::Impl
     // TODO
   }
 
-  ControlImpl& mParent;
+  Internal::Control& mParent;
 
   unsigned int mActiveCursor;
 
   CursorImpl mCursor[CURSOR_COUNT];
 
+  Image mCursorImage;
+
   float mCursorBlinkInterval;
   float mCursorBlinkDuration;
 };
 
-DecoratorPtr Decorator::New(ControlImpl& parent)
+DecoratorPtr Decorator::New(Internal::Control& parent)
 {
   return DecoratorPtr( new Decorator(parent) );
 }
@@ -110,14 +111,14 @@ void Decorator::GetPosition( Cursor cursor, float& x, float& y, float& height ) 
   height = mImpl->mCursor[cursor].height;
 }
 
-void Decorator::SetImage( Cursor cursor, Dali::Image image )
+void Decorator::SetCursorImage( Dali::Image image )
 {
-  mImpl->mCursor[cursor].image = image;
+  mImpl->mCursorImage = image;
 }
 
-Dali::Image Decorator::GetImage( Cursor cursor ) const
+Dali::Image Decorator::GetCursorImage() const
 {
-  return mImpl->mCursor[cursor].image;
+  return mImpl->mCursorImage;
 }
 
 void Decorator::SetColor( Cursor cursor, const Dali::Vector4& color )
@@ -165,7 +166,7 @@ Decorator::~Decorator()
   delete mImpl;
 }
 
-Decorator::Decorator(ControlImpl& parent)
+Decorator::Decorator(Internal::Control& parent)
 : mImpl( NULL )
 {
   mImpl = new Decorator::Impl(parent);
