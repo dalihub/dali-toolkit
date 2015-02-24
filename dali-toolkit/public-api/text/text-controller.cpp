@@ -24,6 +24,7 @@
 #include <dali-toolkit/public-api/text/logical-model.h>
 #include <dali-toolkit/public-api/text/multi-language-support.h>
 #include <dali-toolkit/public-api/text/script-run.h>
+#include <dali-toolkit/public-api/text/segmentation.h>
 #include <dali-toolkit/public-api/text/shaper.h>
 #include <dali-toolkit/public-api/text/text-view.h>
 #include <dali-toolkit/public-api/text/visual-model.h>
@@ -45,7 +46,8 @@ struct Controller::Impl
 {
   Impl()
   : mNewText(),
-    mOperations( NO_OPERATION )
+    mOperations( NO_OPERATION ),
+    mControlSize()
   {
     mLogicalModel = LogicalModel::New();
     mVisualModel  = VisualModel::New();
@@ -67,6 +69,8 @@ struct Controller::Impl
   TextAbstraction::FontClient mFontClient;
 
   OperationsMask mOperations;
+
+  Size mControlSize;
 };
 
 ControllerPtr Controller::New()
@@ -91,14 +95,14 @@ bool Controller::Relayout( const Vector2& size )
 
   bool viewUpdated = false;
 
-  if( size != mControlSize )
+  if( size != mImpl->mControlSize )
   {
     viewUpdated = DoRelayout( size, mImpl->mOperations );
 
     // Do not re-do any operation until something changes.
     mImpl->mOperations = NO_OPERATION;
 
-    mControlSize = size;
+    mImpl->mControlSize = size;
   }
 
   return viewUpdated;
@@ -132,6 +136,21 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
     text.clear();
   }
 
+  Vector<LineBreakInfo> lineBreakInfo;
+  if( GET_LINE_BREAKS & operations )
+  {
+    // Retrieves the line break info. The line break info is used to split the text in 'paragraphs' to
+    // calculate the bidirectional info for each 'paragraph'.
+    // It's also used to layout the text (where it should be a new line) or to shape the text (text in different lines
+    // is not shaped together).
+    lineBreakInfo.Resize( characterCount, TextAbstraction::LINE_NO_BREAK );
+
+    SetLineBreakInfo( utf32Characters,
+                      lineBreakInfo );
+
+    mImpl->mLogicalModel->SetLineBreakInfo( lineBreakInfo.Begin(), characterCount );
+  }
+
   const bool getScripts = GET_SCRIPTS & operations;
   const bool validateFonts = VALIDATE_FONTS & operations;
 
@@ -147,6 +166,7 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
     {
       // Retrieves the scripts used in the text.
       multilanguageSupport.SetScripts( utf32Characters,
+                                       lineBreakInfo,
                                        scripts );
 
       // Sets the scripts into the model.
@@ -164,17 +184,6 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
       // Sets the fonts into the model.
       mImpl->mLogicalModel->SetFonts( fonts.Begin(), fonts.Count() );
     }
-  }
-
-  Vector<LineBreakInfo> lineBreakInfo;
-  if( GET_LINE_BREAKS & operations )
-  {
-    // Retrieves the line break info. The line break info is used to split the text in 'paragraphs' to
-    // calculate the bidirectional info for each 'paragraph'.
-    // It's also used to layout the text (where it should be a new line) or to shape the text (text in different lines
-    // is not shaped together).
-    lineBreakInfo.Resize( characterCount, TextAbstraction::LINE_NO_BREAK );
-    mImpl->mLogicalModel->SetLineBreakInfo( lineBreakInfo.Begin(), characterCount );
   }
 
   Vector<GlyphInfo> glyphs;
@@ -210,7 +219,7 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
       mImpl->mVisualModel->GetGlyphs( glyphs.Begin(),
                                       0u,
                                       numberOfGlyphs );
-      
+
       mImpl->mVisualModel->GetGlyphToCharacterMap( characterIndices.Begin(),
                                                    0u,
                                                    numberOfGlyphs );
@@ -306,8 +315,7 @@ Controller::~Controller()
 }
 
 Controller::Controller()
-: mImpl( NULL ),
-  mControlSize()
+: mImpl( NULL )
 {
   mImpl = new Controller::Impl();
 }

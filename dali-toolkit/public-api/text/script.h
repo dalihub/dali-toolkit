@@ -40,6 +40,24 @@ namespace Text
 Script GetCharacterScript( Character character );
 
 /**
+ * @brief Whether the character is a white space.
+ *
+ * @param[in] character The character.
+ *
+ * @return @e true if the character is a white space.
+ */
+bool IsWhiteSpace( Character character );
+
+/**
+ * @brief Whether the character is a new paragraph character.
+ *
+ * @param[in] character The character.
+ *
+ * @return @e true if the character is a new paragraph character.
+ */
+bool IsNewParagraph( Character character );
+
+/**
  * @brief Whether the character is a zero width non joiner.
  *
  * @param[in] character The character.

@@ -49,9 +49,11 @@ MultilanguageSupport MultilanguageSupport::Get()
 }
 
 void MultilanguageSupport::SetScripts( const Vector<Character>& text,
+                                       const Vector<LineBreakInfo>& lineBreakInfo,
                                        Vector<ScriptRun>& scripts )
 {
   GetImplementation( *this ).SetScripts( text,
+                                         lineBreakInfo,
                                          scripts );
 }
 

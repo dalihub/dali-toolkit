@@ -67,7 +67,7 @@ private:
     GET_GLYPH_METRICS = 0x40,
     LAYOUT            = 0x80,
     REORDER           = 0x100,
-    ALIGNEMENT        = 0x200,
+    ALIGNMENT         = 0x200,
     RENDER            = 0x400,
     ALL_OPERATIONS    = 0xFFF
   };
@@ -156,8 +156,6 @@ private:
 
   struct Impl;
   Impl* mImpl;
-
-  Size mControlSize;
 };
 
 } // namespace Text

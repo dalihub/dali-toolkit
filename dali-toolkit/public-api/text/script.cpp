@@ -29,6 +29,14 @@ namespace Text
 
 namespace
 {
+const unsigned int WHITE_SPACE_THRESHOLD  = 0x21; ///< All characters below 0x21 are considered white spaces.
+const unsigned int CHAR_FL   = 0x000A; ///< NL Line feed, new line.
+const unsigned int CHAR_VT   = 0x000B; ///< Vertical tab.
+const unsigned int CHAR_FF   = 0x000C; ///< NP Form feed, new page.
+const unsigned int CHAR_NEL  = 0x0085; ///< Next line.
+const unsigned int CHAR_LS   = 0x2028; ///< Line separator.
+const unsigned int CHAR_PS   = 0x2029; ///< Paragraph separator
+
 const unsigned int CHAR_ZWS  = 0x200B; ///< Zero width space.
 const unsigned int CHAR_ZWNJ = 0x200C; ///< Zero width non joiner.
 const unsigned int CHAR_ZWJ  = 0x200D; ///< Zero width joiner.
@@ -118,7 +126,6 @@ Script GetCharacterScript( Character character )
 
   // Burmese script
   // 0x1000 - 0x109f Myanmar
-
 
   if( character <= 0x0cff )
   {
@@ -372,6 +379,21 @@ Script GetCharacterScript( Character character )
   }
 
   return TextAbstraction::UNKNOWN;
+}
+
+bool IsWhiteSpace( Character character )
+{
+  return character < WHITE_SPACE_THRESHOLD;
+}
+
+bool IsNewParagraph( Character character )
+{
+  return ( ( CHAR_FL == character )  ||
+           ( CHAR_VT == character )  ||
+           ( CHAR_FF == character )  ||
+           ( CHAR_NEL == character ) ||
+           ( CHAR_LS == character )  ||
+           ( CHAR_PS == character ) );
 }
 
 bool IsZeroWidthNonJoiner( Character character )

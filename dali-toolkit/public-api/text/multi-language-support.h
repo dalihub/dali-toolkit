@@ -80,10 +80,20 @@ public:
    *
    * Scripts are used to validate and set default fonts and to shape the text in further steps.
    *
+   * Some characters (like white spaces) are valid for many scripts. The rules to set a script
+   * for them are:
+   * - If they are at the begining of a paragraph they get the script of the first character with
+   *   a defined script. If they are at the end, they get the script of the last one.
+   * - If they are between two scripts with the same direction, they get the script of the previous
+   *   character with a defined script. If the two scripts have different directions, they get the
+   *   script of the first character of the paragraph with a defined script.
+   *
    * @param[in] text Vector of UTF-32 characters.
+   * @param[in] lineBreakInfo Vector with the line break info.
    * @param[out] scripts Vector containing the script runs for the whole text.
    */
   void SetScripts( const Vector<Character>& text,
+                   const Vector<LineBreakInfo>& lineBreakInfo,
                    Vector<ScriptRun>& scripts );
 
   /**

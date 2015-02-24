@@ -18,17 +18,17 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/text/multi-language-support-impl.h>
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
+#include <memory.h>
+#include <dali/integration-api/debug.h>
 #include <dali/public-api/adaptor-framework/singleton-service.h>
 #include <dali/public-api/text-abstraction/font-client.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/logical-model.h>
 #include <dali-toolkit/public-api/text/font-run.h>
 #include <dali-toolkit/public-api/text/script.h>
 #include <dali-toolkit/public-api/text/script-run.h>
-#include <dali/integration-api/debug.h>
-
-// EXTERNAL INCLUDES
-#include <memory.h>
 
 namespace Dali
 {
@@ -116,6 +116,24 @@ Script GetScript( Length index,
   return script;
 }
 
+/**
+ * @brief Whether the character is valid for all scripts. i.e. the white space.
+ *
+ * @param[in] character The character.
+ *
+ * @return @e true if the character is valid for all scripts.
+ */
+bool IsValidForAllScripts( Character character )
+{
+  return ( IsWhiteSpace( character )         ||
+           IsZeroWidthNonJoiner( character ) ||
+           IsZeroWidthJoiner( character )    ||
+           IsZeroWidthSpace( character )     ||
+           IsLeftToRightMark( character )    ||
+           IsRightToLeftMark( character )    ||
+           IsThinSpace( character ) );
+}
+
 bool ValidateFontsPerScript::FindValidFont( FontId fontId ) const
 {
   for( Vector<FontId>::ConstIterator it = mValidFonts.Begin(),
@@ -184,6 +202,7 @@ Text::MultilanguageSupport MultilanguageSupport::Get()
 }
 
 void MultilanguageSupport::SetScripts( const Vector<Character>& text,
+                                       const Vector<LineBreakInfo>& lineBreakInfo,
                                        Vector<ScriptRun>& scripts )
 {
   const Length numberOfCharacters = text.Count();
@@ -194,8 +213,6 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
     return;
   }
 
-  // Traverse all characters and set the scripts.
-
   // Stores the current script run.
   ScriptRun currentScriptRun;
   currentScriptRun.characterRun.characterIndex = 0u;
@@ -205,34 +222,91 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
   // Reserve some space to reduce the number of reallocations.
   scripts.Reserve( numberOfCharacters << 2u );
 
+  // Whether the first valid script need to be set.
+  bool firstValidScript = true;
+
+  // Whether the first valid script is a right to left script.
+  bool isParagraphRTL = false;
+
+  // Count the number of characters which are valid for all scripts. i.e. white spaces or '\n'.
+  Length numberOfAllScriptCharacters = 0u;
+
+  // Pointers to the text and break info buffers.
+  const Character* textBuffer = text.Begin();
+  const LineBreakInfo* breakInfoBuffer = lineBreakInfo.Begin();
+
+  // Traverse all characters and set the scripts.
   for( Length index = 0u; index < numberOfCharacters; ++index )
   {
-    const Character character = *( text.Begin() + index );
+    Character character = *( textBuffer + index );
+    LineBreakInfo breakInfo = *( breakInfoBuffer + index );
 
+    // Some characters (like white spaces) are valid for many scripts. The rules to set a script
+    // for them are:
+    // - If they are at the begining of a paragraph they get the script of the first character with
+    //   a defined script. If they are at the end, they get the script of the last one.
+    // - If they are between two scripts with the same direction, they get the script of the previous
+    //   character with a defined script. If the two scripts have different directions, they get the
+    //   script of the first character of the paragraph with a defined script.
+
+    // Skip those characters valid for many scripts like white spaces or '\n'.
+    bool endOfText = index == numberOfCharacters;
+    while( !endOfText &&
+           IsValidForAllScripts( character ) )
+    {
+      // Count all these characters to be added into a script.
+      ++numberOfAllScriptCharacters;
+
+      if( TextAbstraction::LINE_MUST_BREAK == breakInfo )
+      {
+        // The next character is a new paragraph.
+        // Know when there is a new paragraph is needed because if there is a white space
+        // between two scripts with different directions, it is added to the script with
+        // the same direction than the first script of the paragraph.
+        firstValidScript = true;
+        isParagraphRTL = false;
+      }
+
+      // Get the next character.
+      ++index;
+      endOfText = index == numberOfCharacters;
+      if( !endOfText )
+      {
+        character = *( textBuffer + index );
+        breakInfo = *( breakInfoBuffer + index );
+      }
+    }
+
+    if( endOfText )
+    {
+      // Last characters of the text are 'white spaces'.
+      // There is nothing else to do. Just add the remaining characters to the last script after this bucle.
+      break;
+    }
+
+    // Get the script of the character.
     Script script = GetCharacterScript( character );
 
-    if( TextAbstraction::UNKNOWN == script )
+    // Check if it is the first character of a paragraph.
+    if( firstValidScript &&
+        ( TextAbstraction::UNKNOWN != script ) )
     {
-      if( IsZeroWidthNonJoiner( character ) ||
-          IsZeroWidthJoiner( character ) ||
-          IsZeroWidthSpace( character ) ||
-          IsLeftToRightMark( character ) ||
-          IsRightToLeftMark( character ) ||
-          IsThinSpace( character ) )
-      {
-        // Keep previous script if the character is a zero width joiner or a zero width non joiner.
-        script = currentScriptRun.script;
-      }
-      else
-      {
-        script = TextAbstraction::LATIN;
-        DALI_ASSERT_DEBUG( !"MultilanguageSupport::SetScripts. Unkown script!" );
-      }
+      // Sets the direction of the first valid script.
+      isParagraphRTL = ( TextAbstraction::ARABIC == script );
+      firstValidScript = false;
     }
 
     if( script != currentScriptRun.script )
     {
       // Current run needs to be stored and a new one initialized.
+
+      if( isParagraphRTL != ( TextAbstraction::ARABIC == script ) )
+      {
+        // Current script has different direction than the first script of the paragraph.
+        // All the previously skipped characters need to be added to the previous script before it's stored.
+        currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
+        numberOfAllScriptCharacters = 0u;
+      }
 
       if( 0u != currentScriptRun.characterRun.numberOfCharacters )
       {
@@ -242,16 +316,38 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
 
       // Initialize the new one.
       currentScriptRun.characterRun.characterIndex = currentScriptRun.characterRun.characterIndex + currentScriptRun.characterRun.numberOfCharacters;
-      currentScriptRun.characterRun.numberOfCharacters = 0u;
+      currentScriptRun.characterRun.numberOfCharacters = numberOfAllScriptCharacters; // Adds the white spaces which are at the begining of the script.
       currentScriptRun.script = script;
+      numberOfAllScriptCharacters = 0u;
+    }
+    else
+    {
+      // Adds white spaces between characters.
+      currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
+      numberOfAllScriptCharacters = 0u;
+    }
+
+    if( TextAbstraction::LINE_MUST_BREAK == breakInfo )
+    {
+      // The next character is a new paragraph.
+      firstValidScript = true;
+      isParagraphRTL = false;
     }
 
     // Add one more character to the run.
     ++currentScriptRun.characterRun.numberOfCharacters;
   }
 
+  // Add remaining characters into the last script.
+  currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
   if( 0u != currentScriptRun.characterRun.numberOfCharacters )
   {
+    if( TextAbstraction::UNKNOWN == currentScriptRun.script )
+    {
+      // There are only white spaces in the last script. Set the latin script.
+      currentScriptRun.script = TextAbstraction::LATIN;
+    }
+
     // Store the last run.
     scripts.PushBack( currentScriptRun );
   }
