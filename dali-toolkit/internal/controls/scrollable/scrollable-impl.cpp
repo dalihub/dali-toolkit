@@ -51,7 +51,6 @@ const float DEFAULT_OVERSHOOT_ANIMATION_SPEED(120.0f); // 120 pixels per second
 const char* const SIGNAL_SCROLL_STARTED =   "scroll-started";
 const char* const SIGNAL_SCROLL_COMPLETED = "scroll-completed";
 const char* const SIGNAL_SCROLL_UPDATED =   "scroll-updated";
-const char* const SIGNAL_SCROLL_CLAMPED =   "scroll-clamped";
 
 BaseHandle Create()
 {
@@ -64,7 +63,6 @@ TypeRegistration mType( typeid( Toolkit::Scrollable ), typeid( Toolkit::Control 
 SignalConnectorType s1( mType, SIGNAL_SCROLL_STARTED,   &Scrollable::DoConnectSignal );
 SignalConnectorType s2( mType, SIGNAL_SCROLL_COMPLETED, &Scrollable::DoConnectSignal );
 SignalConnectorType s3( mType, SIGNAL_SCROLL_UPDATED,   &Scrollable::DoConnectSignal );
-SignalConnectorType s4( mType, SIGNAL_SCROLL_CLAMPED,   &Scrollable::DoConnectSignal );
 
 PropertyRegistration property1( mType,
                                 "overshoot-effect-color",
@@ -211,11 +209,6 @@ Toolkit::Scrollable::ScrollCompletedSignalType& Scrollable::ScrollCompletedSigna
   return mScrollCompletedSignal;
 }
 
-Toolkit::Scrollable::ScrollClampedSignalType& Scrollable::ScrollClampedSignal()
-{
-  return mScrollClampedSignal;
-}
-
 bool Scrollable::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::BaseHandle handle( object );
@@ -234,10 +227,6 @@ bool Scrollable::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   else if( 0 == strcmp( signalName.c_str(), SIGNAL_SCROLL_COMPLETED ) )
   {
     scrollable.ScrollCompletedSignal().Connect( tracker, functor );
-  }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_SCROLL_CLAMPED ) )
-  {
-    scrollable.ScrollClampedSignal().Connect( tracker, functor );
   }
   else
   {
