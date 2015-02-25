@@ -62,7 +62,7 @@ private:
 
 inline ImageActor CreateSolidColorImageActor(ToolkitTestApplication& application, const Vector4& color, int width, int height)
 {
-  ImageActor actor = ImageActor::New(CreateBitmapImage(width, height, color));
+  ImageActor actor = ImageActor::New(CreateBufferImage(width, height, color));
   application.SendNotification();
   application.Render();
   return actor;

@@ -396,8 +396,8 @@ struct DefaultFunctionCoverage
 
 
 // Helper to Create bitmap image
-BitmapImage CreateBitmapImage();
-BitmapImage CreateBitmapImage(int width, int height, const Vector4& color);
+BufferImage CreateBufferImage();
+BufferImage CreateBufferImage(int width, int height, const Vector4& color);
 
 
 #endif // __DALI_TEST_SUITE_UTILS_H__

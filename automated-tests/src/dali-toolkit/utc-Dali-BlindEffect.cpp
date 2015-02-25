@@ -76,7 +76,7 @@ int UtcDaliBlindEffectDefaultValues(void)
   Toolkit::BlindEffect effect = Toolkit::BlindEffect::New();
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -101,7 +101,7 @@ int UtcDaliBlindEffectCustomValues(void)
   Toolkit::BlindEffect effect = Toolkit::BlindEffect::New();
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );

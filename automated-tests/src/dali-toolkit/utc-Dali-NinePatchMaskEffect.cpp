@@ -42,7 +42,7 @@ int UtcDaliNinePatchMaskEffectApply(void)
 {
   ToolkitTestApplication application;
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
   ImageActor actor0 = ImageActor::New( image );
   Toolkit::NinePatchMaskEffect::Apply( actor0, "" );
 

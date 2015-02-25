@@ -102,7 +102,7 @@ int UtcDaliWaterEffectDefaultValues(void)
   // Check that the effect has the number of waves it was requested
   DALI_TEST_CHECK( effect.GetNumberOfWaves() == 4 );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -140,7 +140,7 @@ int UtcDaliWaterEffectCustomValues(void)
   Toolkit::WaterEffect effect = Toolkit::WaterEffect::New(4);
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -180,7 +180,7 @@ int UtcDaliWaterEffectGetAmplitudePositive(void)
   Toolkit::WaterEffect effect = Toolkit::WaterEffect::New(4);
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -205,7 +205,7 @@ int UtcDaliWaterEffectGetAmplitudeNegative(void)
   Toolkit::WaterEffect effect = Toolkit::WaterEffect::New(4);
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -231,7 +231,7 @@ int UtcDaliWaterEffectGetCenterPositive(void)
   Toolkit::WaterEffect effect = Toolkit::WaterEffect::New(4);
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -256,7 +256,7 @@ int UtcDaliWaterEffectGetCenterNegative(void)
   Toolkit::WaterEffect effect = Toolkit::WaterEffect::New(4);
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -282,7 +282,7 @@ int UtcDaliWaterEffectGetPropagationPositive(void)
   Toolkit::WaterEffect effect = Toolkit::WaterEffect::New(4);
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -307,7 +307,7 @@ int UtcDaliWaterEffectGetPropagationNegative(void)
   Toolkit::WaterEffect effect = Toolkit::WaterEffect::New(4);
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );

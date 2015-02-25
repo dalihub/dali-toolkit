@@ -81,7 +81,7 @@ int UtcDaliDissolveDefaultValuesEffect(void)
   Toolkit::DissolveEffect effect = Toolkit::DissolveEffect::New();
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -106,7 +106,7 @@ int UtcDaliDissolveCustomValuesEffect(void)
   Toolkit::DissolveEffect effect = Toolkit::DissolveEffect::New();
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -133,10 +133,10 @@ int UtcDaliSetEffectImageEffect(void)
   Toolkit::DissolveEffect effect = Toolkit::DissolveEffect::New();
   DALI_TEST_CHECK( effect );
 
-  Image effectImage = CreateBitmapImage();
+  Image effectImage = CreateBufferImage();
   effect.SetEffectImage(effectImage);
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );

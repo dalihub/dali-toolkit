@@ -79,7 +79,7 @@ int UtcDaliRipple2DEffectDefaultValues(void)
   Toolkit::Ripple2DEffect effect = Toolkit::Ripple2DEffect::New();
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -107,7 +107,7 @@ int UtcDaliRipple2DEffectCustomValues(void)
   Toolkit::Ripple2DEffect effect = Toolkit::Ripple2DEffect::New();
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );

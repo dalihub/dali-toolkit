@@ -133,7 +133,7 @@ int UtcDaliButtonSize(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliButtonSize");
 
-  ImageActor image01 = ImageActor::New(CreateBitmapImage());
+  ImageActor image01 = ImageActor::New(CreateBufferImage());
   image01.SetSize( 100, 50 );
 
   PushButton pushButton;

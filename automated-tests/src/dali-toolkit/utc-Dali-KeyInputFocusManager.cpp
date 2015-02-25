@@ -543,7 +543,7 @@ int UtcDaliKeyInputFocusManagerDestroyObject02(void)
   dummy2Impl.keyInputFocusLost = false;
 
   {
-    BitmapImage image = CreateBitmapImage();
+    BufferImage image = CreateBufferImage();
     ImageActor imageActor = ImageActor::New( image );
     stage.Add( imageActor );
     imageActor.SetSize(100, 100);
