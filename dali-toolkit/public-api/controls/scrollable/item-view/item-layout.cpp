@@ -19,6 +19,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/time-period.h>
 
@@ -329,7 +330,7 @@ float ItemLayout::GetFlickSpeedFactor() const
   return GetScrollSpeedFactor();
 }
 
-void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, Constrainable scrollPositionObject, const Actor& itemViewActor )
+void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, Handle scrollPositionObject, const Actor& itemViewActor )
 {
   // This just implements the default behaviour of constraint application.
   // Custom layouts can override this function to apply their custom constraints.

@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/alpha-functions.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 

@@ -20,6 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <sstream>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/render-tasks/render-task-list.h>

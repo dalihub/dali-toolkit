@@ -19,6 +19,9 @@
 #include <dali-toolkit/public-api/shader-effects/nine-patch-mask-effect.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/object/property-input.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/public-api/images/resource-image.h>
 

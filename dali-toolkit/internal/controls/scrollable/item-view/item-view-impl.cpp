@@ -20,6 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/set-wrapper.h>
 #include <dali/public-api/common/stage.h>

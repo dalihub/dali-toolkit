@@ -22,12 +22,15 @@
 #include <stack>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/mesh-actor.h>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/geometry/mesh.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/relayout-controller.h>
 #include <dali-toolkit/internal/controls/relayout-helper.h>
 #include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>

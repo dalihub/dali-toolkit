@@ -99,7 +99,7 @@ ScrollConnector::ScrollConnector()
   mMaxLimit( 0.0f ),
   mContentLength( 0.0f )
 {
-  mScrollPositionObject = Constrainable::New();
+  mScrollPositionObject = Handle::New();
 
   mScrollPositionObject.RegisterProperty( Toolkit::ScrollConnector::SCROLL_POSITION_PROPERTY_NAME, 0.0f );
   mScrollPositionObject.RegisterProperty( Toolkit::ScrollConnector::OVERSHOOT_PROPERTY_NAME, 0.0f );
