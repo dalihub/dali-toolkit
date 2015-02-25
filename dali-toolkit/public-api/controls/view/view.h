@@ -72,12 +72,15 @@ class View;
  * contentLayer.ApplyConstraint( ParentConstraint::Size::New( ParentSize() ) );
  * view.AddContentLayer( contentLayer );
  * \endcode
+ *
+ * Signals
+ * | %Signal Name                | Method                                   |
+ * |-----------------------------|------------------------------------------|
+ * | orientation-animation-start | @ref OrientationAnimationStartedSignal() |
+
  */
 class DALI_IMPORT_API View : public Control
 {
-public:
-  //Signal Names
-  static const char* const SIGNAL_ORIENTATION_ANIMATION_START;
 
 public:
 

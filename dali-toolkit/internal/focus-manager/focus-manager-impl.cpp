@@ -25,11 +25,12 @@
 #include <dali/public-api/adaptor-framework/tts-player.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/events/hit-test-algorithm.h>
+#include <dali/public-api/images/resource-image.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -43,12 +44,18 @@ namespace Internal
 namespace // unnamed namespace
 {
 
+// Signals
+
+const char* const SIGNAL_FOCUS_CHANGED =           "focus-changed";
+const char* const SIGNAL_FOCUS_OVERSHOT =          "focus-overshot";
+const char* const SIGNAL_FOCUSED_ACTOR_ACTIVATED = "focused-actor-activated";
+
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_FOCUS_MANAGER");
 #endif
 
-const char * const ACTOR_FOCUSABLE("focusable");
-const char * const IS_FOCUS_GROUP("is-focus-group");
+const char* const ACTOR_FOCUSABLE("focusable");
+const char* const IS_FOCUS_GROUP("is-focus-group");
 
 const char* FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "B16-8_TTS_focus.png";
 const Vector4 FOCUS_BORDER_IMAGE_BORDER = Vector4(7.0f, 7.0f, 7.0f, 7.0f);
@@ -658,7 +665,7 @@ void FocusManager::SetFocusable(Actor actor, bool focusable)
 void FocusManager::CreateDefaultFocusIndicatorActor()
 {
   // Create a focus indicator actor shared by all the focusable actors
-  Image borderImage = Image::New(FOCUS_BORDER_IMAGE_PATH);
+  Image borderImage = ResourceImage::New(FOCUS_BORDER_IMAGE_PATH);
 
   ImageActor focusIndicator = ImageActor::New(borderImage);
   focusIndicator.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
@@ -667,10 +674,7 @@ void FocusManager::CreateDefaultFocusIndicatorActor()
   focusIndicator.SetPosition(Vector3(0.0f, 0.0f, 1.0f));
 
   // Apply size constraint to the focus indicator
-  Constraint constraint = Constraint::New<Vector3>(Actor::SIZE,
-                                                   ParentSource(Actor::SIZE),
-                                                   EqualToConstraint());
-  focusIndicator.ApplyConstraint(constraint);
+  focusIndicator.SetSizeMode( SIZE_EQUAL_TO_PARENT );
 
   SetFocusIndicatorActor(focusIndicator);
 }
@@ -971,17 +975,17 @@ bool FocusManager::DoConnectSignal( BaseObject* object, ConnectionTrackerInterfa
   Dali::BaseHandle handle( object );
 
   bool connected( true );
-  FocusManager* manager = dynamic_cast<FocusManager*>(object);
+  FocusManager* manager = dynamic_cast<FocusManager*>( object );
 
-  if( Dali::Toolkit::FocusManager::SIGNAL_FOCUS_CHANGED == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_CHANGED ) )
   {
     manager->FocusChangedSignal().Connect( tracker, functor );
   }
-  else if( Dali::Toolkit::FocusManager::SIGNAL_FOCUS_OVERSHOT == signalName )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_OVERSHOT ) )
   {
     manager->FocusOvershotSignal().Connect( tracker, functor );
   }
-  else if( Dali::Toolkit::FocusManager::SIGNAL_FOCUSED_ACTOR_ACTIVATED== signalName )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUSED_ACTOR_ACTIVATED ) )
   {
     manager->FocusedActorActivatedSignal().Connect( tracker, functor );
   }

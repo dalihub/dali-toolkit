@@ -73,10 +73,10 @@ public: // From ImageFilter
   Property::Index GetBlurStrengthPropertyIndex() const {return mBlurStrengthPropertyIndex;}
 
   /**
-   * Retrieve the constrainable object to animate or constrain the blur strength property
-   * @return the constrainable object which blend the output image according to the blur strength
+   * Retrieve the handle to the object in order to animate or constrain the blur strength property
+   * @return The hadnle to the object which blends the output image according to the blur strength
    */
-  Constrainable GetHandleForAnimateBlurStrength();
+  Handle GetHandleForAnimateBlurStrength();
 
 private:
   /**

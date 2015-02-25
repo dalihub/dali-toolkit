@@ -15,7 +15,10 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/public-api/controls/popup/popup.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/popup/popup-impl.h>
 #include <dali-toolkit/public-api/controls/buttons/button.h>
 
@@ -30,9 +33,6 @@ namespace Toolkit
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Popup
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-const char* const Popup::SIGNAL_TOUCHED_OUTSIDE = "touched-outside";
-const char* const Popup::SIGNAL_HIDDEN = "hidden";
 
 Popup::Popup()
 {

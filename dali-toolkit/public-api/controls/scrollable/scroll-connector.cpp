@@ -32,9 +32,6 @@ const char* const ScrollConnector::OVERSHOOT_PROPERTY_NAME       = "overshoot";
 const Property::Index ScrollConnector::SCROLL_POSITION = Internal::ScrollConnector::SCROLL_POSITION;
 const Property::Index ScrollConnector::OVERSHOOT       = Internal::ScrollConnector::OVERSHOOT;
 
-const char* const ScrollConnector::DOMAIN_CHANGED_SIGNAL_NAME    = "domain-changed";
-const char* const ScrollConnector::SCROLL_POSITION_CHANGED_SIGNAL_NAME    = "scroll-position-changed";
-
 ScrollConnector ScrollConnector::New()
 {
   return ScrollConnector( Internal::ScrollConnector::New() );
@@ -78,7 +75,7 @@ float ScrollConnector::GetContentLength() const
   return GetImpl(*this).GetContentLength();
 }
 
-Constrainable ScrollConnector::GetScrollPositionObject() const
+Handle ScrollConnector::GetScrollPositionObject() const
 {
   return GetImpl(*this).GetScrollPositionObject();
 }

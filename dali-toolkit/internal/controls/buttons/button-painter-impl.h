@@ -18,7 +18,7 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/signals/connection-tracker.h>
 
@@ -81,12 +81,18 @@ public:
   virtual void SetSize( Toolkit::Button& button, const Vector3& size ) = 0;
 
   /**
-   * This method is called from the Dali::Toolkit::Internal::PushButton when the \e disabled property changes.
+   * This method is called from the Dali::Toolkit::Internal::Button when the \e disabled property changes.
    *
    * @param[inout] button The button in which all actors that form its appearance are going to be added.
    * @param[in] disabled The disabled state.
    */
   virtual void SetDisabled( Toolkit::Button& button, bool disabled ) = 0;
+
+  /**
+   * This method is called from the Dali::Toolkit::Internal::PushButton when the \e autorepeating property changes.
+   * @param[in] autorepeating property.
+   */
+  virtual void SetAutoRepeating( bool autorepeating ) {}
 
   /**
    * Sets the animation time.
@@ -99,6 +105,94 @@ public:
    * @return The animation time in seconds.
    */
   virtual float GetAnimationTime() const = 0;
+
+  /**
+   * Sets the label.
+   * It adds the label to the root actor.
+   * @param[inout] button The button in which all actors that form its appearance are going to be added.
+   * @param[in] label Button label.
+   */
+  virtual void SetLabel( Toolkit::Button& button, Actor label ) {}
+
+  /**
+   * Sets the button image.
+   * It adds the button image to the root actor and creates the image transition if needed.
+   * @param[inout] button The button in which all actors that form its appearance are going to be added.
+   * @param[in] image The button image.
+   */
+  virtual void SetButtonImage( Toolkit::Button& button, Actor image ) {}
+
+  /**
+   * Sets the selected image.
+   * It adds the selected image to the root actor and creates the image transition if needed.
+   * @param[inout] button The button in which all actors that form its appearance are going to be added.
+   * @param[in] image The selected image.
+   */
+  virtual void SetSelectedImage( Toolkit::Button& button, Actor image ) {}
+
+  /**
+   * Sets the background image.
+   * It adds the background image to the root actor and creates the image transition if needed.
+   * @param[inout] button The button in which all actors that form its appearance are going to be added.
+   * @param[in] image The background image.
+   */
+  virtual void SetBackgroundImage( Toolkit::Button& button, Actor image ) {}
+
+  /**
+   * Sets the disabled image.
+   * It adds the disabled image to the root actor and creates the image transition if needed.
+   * @param[inout] button The button in which all actors that form its appearance are going to be added.
+   * @param[in] image The disabled button image.
+   */
+  virtual void SetDisabledImage( Toolkit::Button& button, Actor image ) {}
+
+  /**
+   * Sets the disabled selected image.
+   * It adds the disabled selected image to the root actor and creates the image transition if needed.
+   * @param[inout] button The button in which all actors that form its appearance are going to be added.
+   * @param[in] image The disabled selected image.
+   */
+  virtual void SetDisabledSelectedImage( Toolkit::Button& button, Actor image ) {}
+
+  /**
+   * Sets the disabled background image.
+   * It adds the disabled background image to the root actor and creates the image transition if needed.
+   * @param[inout] button The button in which all actors that form its appearance are going to be added.
+   * @param[in] image The disabled background image.
+   */
+  virtual void SetDisabledBackgroundImage( Toolkit::Button& button, Actor image ) {}
+
+  /**
+   * This method is called when the Dali::Toolkit::Internal::Button, in which this
+   * object is registered, is pressed.
+   * @param[inout] button The Dali::Toolkit::Button, linked to the internal
+   * implementation, in which this object is registered.
+   */
+  virtual void Pressed( Toolkit::Button& button ) {}
+
+  /**
+   * This method is called when the Dali::Toolkit::Internal::Button, in which this
+   * object is registered, is released.
+   * @param[inout] button The Dali::Toolkit::Button, linked to the internal
+   * implementation, in which this object is registered.
+   */
+  virtual void Released( Toolkit::Button& button ) {}
+
+  /**
+   * This method is called when the Dali::Toolkit::Internal::Button, in which this
+   * object is registered, is clicked.
+   * @param[inout] button The Dali::Toolkit::Button, linked to the internal
+   * implementation, in which this object is registered.
+   */
+  virtual void Clicked( Toolkit::Button& button ) {}
+
+  /**
+   * This method is called when the Dali::Toolkit::Internal::Button, in which this
+   * object is registered, changes its state.
+   * @param[inout] button The Dali::Toolkit::Button, linked to the internal
+   * implementation, in which this object is registered.
+   */
+  virtual void Selected( Toolkit::Button& button ) {}
 };
 
 } // namespace Internal

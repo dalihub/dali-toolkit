@@ -15,10 +15,8 @@
  *
  */
 
-// FILE HEADER
-
+// CLASS HEADER
 #include "relayout-controller.h"
-#include "relayout-controller-impl.h"
 
 // EXTERNAL INCLUDES
 #include <stack>
@@ -28,6 +26,7 @@
 
 // INTERNAL INCLUDES
 
+#include "relayout-controller-impl.h"
 #include "dali-toolkit/public-api/controls/control.h"
 #include "dali-toolkit/public-api/controls/control-impl.h"
 

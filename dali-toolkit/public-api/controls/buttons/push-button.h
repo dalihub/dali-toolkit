@@ -39,27 +39,27 @@ class PushButton;
 /**
  * @brief A PushButton changes its appearance when is pressed and returns to its original when is released.
  *
- * By default a PushButton emits a PushButton::PressedSignal() signal when the button is pressed, a Button::ClickedSignal() signal when it's clicked
- * and a PushButton::ReleasedSignal() signal when it's released or having pressed it, the touch point leaves the boundary of the button.
+ * By default a PushButton emits a Button::PressedSignal() signal when the button is pressed, a Button::ClickedSignal() signal when it's clicked
+ * and a Button::ReleasedSignal() signal when it's released or having pressed it, the touch point leaves the boundary of the button.
  *
  * PushButton provides the following properties which modify signals emitted:
  * <ul>
  *   <li>\e autorepeating
  *
- *       When \e autorepeating is set to \e true, a PushButton::PressedSignal(), PushButton::ReleasedSignal() and Button::ClickedSignal() signals are emitted at regular
+ *       When \e autorepeating is set to \e true, a Button::PressedSignal(), Button::ReleasedSignal() and Button::ClickedSignal() signals are emitted at regular
  *       intervals while the button is touched.
  *
  *       The intervals could be modified with the PushButton::SetInitialAutoRepeatingDelay and PushButton::SetNextAutoRepeatingDelay methods.
  *
- *       A \e toggle button can't be \e autorepeating. If the \e autorepeating property is set to \e true, then the \e toggled property is set to
+ *       A \e togglable button can't be \e autorepeating. If the \e autorepeating property is set to \e true, then the \e togglable property is set to
  *       false but no signal is emitted.
  *
- *   <li>\e toggle
+ *   <li>\e togglable
  *
- *       When \e toggle is set to \e true, a Button::StateChangedSignal() signal is emitted, with the toggle state, every time the button is touched instead
- *       of emit PushButton::PressedSignal(), Button::ClickedSignal() and PushButton::ReleasedSignal() signals.
+ *       When \e togglable is set to \e true, a Button::StateChangedSignal() signal is emitted, with the selected state, every time the button is touched instead
+ *       of emit Button::PressedSignal(), Button::ClickedSignal() and Button::ReleasedSignal() signals.
  *
- *       An \e autorepeating button can't be \e toggle. If the \e toggled property is set to \e true, then the \e autorepeating property is set to false.
+ *       An \e autorepeating button can't be \e togglable. If the \e togglable property is set to \e true, then the \e autorepeating property is set to false.
  * </ul>
  *
  * The button's appearance could be modified by setting images or actors with PushButton::SetButtonImage, PushButton::SetBackgroundImage,
@@ -77,15 +77,6 @@ class PushButton;
  */
 class DALI_IMPORT_API PushButton : public Button
 {
-public:
-
-  //Signal Names
-  static const char* const SIGNAL_PRESSED; ///< name "pressed"
-  static const char* const SIGNAL_RELEASED; ///< name "released"
-
-  //Action Names
-  static const char* const ACTION_PUSH_BUTTON_CLICK; ///< name "push-button-click"
-
 public:
 
   /**
@@ -129,81 +120,6 @@ public:
    * @return handle to a PushButton or an uninitialized handle
    */
   static PushButton DownCast( BaseHandle handle );
-
-  /**
-   * @brief Sets the \e autorepeating property.
-   *
-   * If the \e autorepeating property is set to \e true, then the \e toggled property is set to false
-   * but no signal is emitted.
-   *
-   * @param[in] autoRepeating \e autorepeating property.
-   */
-  void SetAutoRepeating( bool autoRepeating );
-
-  /**
-   * @return \e true if the \e autorepeating property is set.
-   */
-  bool IsAutoRepeating() const;
-
-  /**
-   * @brief Sets the initial autorepeating delay.
-   *
-   * By default this value is set to 0.15 seconds.
-   *
-   * @pre initialAutoRepeatingDelay must be greater than zero.
-   * @param[in] initialAutoRepeatingDelay in seconds.
-   */
-  void SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay );
-
-  /**
-   * @return the initial autorepeating delay in seconds.
-   */
-  float GetInitialAutoRepeatingDelay() const;
-
-  /**
-   * @brief Sets the next autorepeating delay.
-   *
-   * By default this value is set to 0.05 seconds.
-   *
-   * @pre nextAutoRepeatingDelay must be greater than zero.
-   * @param[in] nextAutoRepeatingDelay in seconds.
-   */
-  void SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay );
-
-  /**
-   * @return the next autorepeating delay in seconds.
-   */
-  float GetNextAutoRepeatingDelay() const;
-
-  /**
-   * @brief Sets the \e toggled property.
-   *
-   * If the \e toggled property is set to \e true, then the \e autorepeating property is set to false.
-   *
-   * @param[in] toggle property.
-   */
-  void SetToggleButton( bool toggle );
-
-  /**
-   * @return \e true if the \e toggled property is set.
-   */
-  bool IsToggleButton() const;
-
-  /**
-   * @brief Sets the button as toggled or not toggled.
-   *
-   * \e toggled property must be set to \e true.
-   *
-   * Emits a Button::StateChangedSignal() signal.
-   *
-   * @param[in] toggle state.
-   */
-  void SetToggled( bool toggle );
-
-  /**
-   * @return \e true if the \e toggled property is set and the button is toggled.
-   */
-  bool IsToggled() const;
 
   /**
    * @brief Sets the button image.
@@ -299,43 +215,6 @@ public:
    * @return An actor with the disabled image.
    */
   Actor GetDisabledImage() const;
-
-  /**
-   * @brief Sets the button label.
-   *
-   * @param[in] label The button label.
-   */
-  void SetLabel( const std::string& label );
-
-  /**
-   * @copydoc SetLabel( const std::string& label )
-   */
-  void SetLabel( Actor label );
-
-  /**
-   * @brief Gets the label.
-   *
-   * @return An actor with the label.
-   */
-  Actor GetLabel() const;
-
-public: //Signals
-
-  /// @brief PushButton Pressed signal type.
-  typedef Signal< bool ( Button ) > PressedSignalType;
-
-  /// @brief PushButton Released signal type.
-  typedef Signal< bool ( Button ) > ReleasedSignalType;
-
-  /**
-   * @brief Signal emitted when the button is touched.
-   */
-  PressedSignalType& PressedSignal();
-
-  /**
-   * @brief Signal emitted when the button is touched and the touch point leaves the boundary of the button.
-   */
-  ReleasedSignalType& ReleasedSignal();
 
 public: // Not intended for application developers
 

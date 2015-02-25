@@ -25,6 +25,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/transition-effects/cube-transition-effect.h>
@@ -209,6 +210,17 @@ public: //Signal
    */
   Toolkit::CubeTransitionEffect::TransitionCompletedSignalType& TransitionCompletedSignal();
 
+  /**
+   * Connects a callback function with the object's signals.
+   * @param[in] object The object providing the signal.
+   * @param[in] tracker Used to disconnect the signal.
+   * @param[in] signalName The signal to connect to.
+   * @param[in] functor A newly allocated FunctorDelegate.
+   * @return True if the signal was connected.
+   * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
+   */
+  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+
 protected:
 
   /**
@@ -249,7 +261,13 @@ private:
    * Set image and pixelArea to tiles
    * @param[in] image The image content of the imageActor for transition
    */
-  void OnImageLoaded(Image image);
+  void OnImageLoaded(ResourceImage image);
+
+  /**
+   * Set sub-image to each tile.
+   * @param[in] image The image content of the imageActor for transition
+   */
+  void PrepareTiles( Image image );
 
   /**
    * Callback function of transition animation finished

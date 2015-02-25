@@ -15,7 +15,10 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/public-api/controls/control.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
 namespace Dali
@@ -23,14 +26,6 @@ namespace Dali
 
 namespace Toolkit
 {
-
-const char* const Control::ACTION_CONTROL_ACTIVATED = "control-activated";
-
-const char* const Control::SIGNAL_KEY_EVENT = "key-event";
-const char* const Control::SIGNAL_TAPPED = "tapped";
-const char* const Control::SIGNAL_PANNED = "panned";
-const char* const Control::SIGNAL_PINCHED = "pinched";
-const char* const Control::SIGNAL_LONG_PRESSED = "long-pressed";
 
 Control Control::New()
 {

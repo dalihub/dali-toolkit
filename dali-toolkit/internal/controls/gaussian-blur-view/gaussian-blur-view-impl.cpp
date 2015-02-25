@@ -21,6 +21,8 @@
 // EXTERNAL INCLUDES
 #include <sstream>
 #include <iomanip>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
@@ -427,13 +429,13 @@ void GaussianBlurView::AllocateResources()
       mRenderFullSizeCamera.SetPosition(0.0f, 0.0f, mTargetSize.height * cameraPosConstraintScale);
 
       // create offscreen buffer of new size to render our child actors to
-      mRenderTargetForRenderingChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::Unused );
+      mRenderTargetForRenderingChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
 
       // Set ImageActor for performing a horizontal blur on the texture
       mImageActorHorizBlur.SetImage( mRenderTargetForRenderingChildren );
 
       // Create offscreen buffer for vert blur pass
-      mRenderTarget1 = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat, Dali::Image::Unused );
+      mRenderTarget1 = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat, Dali::Image::UNUSED );
 
       // use the completed blur in the first buffer and composite with the original child actors render
       mImageActorComposite.SetImage( mRenderTarget1 );
@@ -443,7 +445,7 @@ void GaussianBlurView::AllocateResources()
     }
 
     // Create offscreen buffer for horiz blur pass
-    mRenderTarget2 = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat, Dali::Image::Unused );
+    mRenderTarget2 = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat, Dali::Image::UNUSED );
 
     // size needs to match render target
     mImageActorHorizBlur.SetSize(mDownsampledWidth, mDownsampledHeight);

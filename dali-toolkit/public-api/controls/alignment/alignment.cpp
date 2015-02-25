@@ -16,14 +16,12 @@
  */
 
 // CLASS HEADER
-
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-
-#include <dali/integration-api/debug.h>
 #include <dali-toolkit/internal/controls/alignment/alignment-impl.h>
 
 namespace Dali

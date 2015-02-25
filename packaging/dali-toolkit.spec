@@ -1,6 +1,6 @@
 Name:       dali-toolkit
 Summary:    The OpenGLES Canvas Core Library Toolkit
-Version:    1.0.29
+Version:    1.0.30
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0
@@ -51,7 +51,7 @@ Application development package for the OpenGLES Canvas toolkit - headers and pa
 %build
 PREFIX="/usr"
 CXXFLAGS+=" -Wall -g -Os -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
-LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections "
+LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -Wl,-Bsymbolic-functions "
 
 libtoolize --force
 cd %{_builddir}/dali-toolkit-%{version}/build/tizen

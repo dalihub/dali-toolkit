@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/constrainable.h>
+#include <dali/public-api/object/handle.h>
 
 namespace Dali
 {
@@ -50,6 +50,12 @@ class ScrollConnector;
  * The overshoot property is intended for implementing 'end of list' style indicators. This property is expected to be in the range
  * -1 to 1, where -1 shows an attempt the scroll beyond the minimum limit, and 1 shows an attempt the scroll beyond the maximum limit.
  * Zero indicates normal scrolling i.e. when overshoot indicators should be hidden.
+ *
+ * Signals
+ * | %Signal Name            | Method                             |
+ * |-------------------------|------------------------------------|
+ * | domain-changed          | @ref DomainChangedSignal()         |
+ * | scroll-position-changed | @ref ScrollPositionChangedSignal() |
  */
 class DALI_IMPORT_API ScrollConnector : public BaseHandle
 {
@@ -62,10 +68,7 @@ public:
   static const Property::Index OVERSHOOT;                 ///< The index of the "overshoot" property
 
   // Signals
-  static const char* const DOMAIN_CHANGED_SIGNAL_NAME;    ///< "domain-changed" signal name
   typedef Signal< void ( float min, float max, float size ) > DomainChangedSignalType;
-
-  static const char* const SCROLL_POSITION_CHANGED_SIGNAL_NAME;    ///< "scroll-position-changed" signal name
   typedef Signal< void ( float position ) > ScrollPositionChangedSignalType;
 
   /**
@@ -158,7 +161,7 @@ public:
    * @brief Retrieve the object which provides the "scroll-position" property.
    * @return The scroll-position object.
    */
-  Constrainable GetScrollPositionObject() const;
+  Handle GetScrollPositionObject() const;
 
 public: // Not intended for application developers
 

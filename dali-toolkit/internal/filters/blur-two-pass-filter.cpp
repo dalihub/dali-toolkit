@@ -146,7 +146,7 @@ void BlurTwoPassFilter::Enable()
   mActorForInput.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
 
   // create internal offscreen for result of horizontal pass
-  mImageForHorz = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::Unused );
+  mImageForHorz = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::UNUSED );
 
   // create an actor to render mImageForHorz for vertical blur pass
   mActorForHorz = ImageActor::New( mImageForHorz );
@@ -155,7 +155,7 @@ void BlurTwoPassFilter::Enable()
   mActorForHorz.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
 
   // create internal offscreen for result of the two pass blurred image
-  mBlurredImage = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::Unused );
+  mBlurredImage = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::UNUSED);
 
   // create an actor to blend the blurred image and the input image with the given blur strength
   mActorForBlending = ImageActor::New( mBlurredImage );
@@ -288,7 +288,7 @@ void BlurTwoPassFilter::SetSize( const Vector2& size )
   }
 }
 
-Constrainable BlurTwoPassFilter::GetHandleForAnimateBlurStrength()
+Handle BlurTwoPassFilter::GetHandleForAnimateBlurStrength()
 {
   return mShaderForBlending;
 }

@@ -16,10 +16,10 @@
  */
 
 // CLASS HEADER
-
 #include "alignment-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES

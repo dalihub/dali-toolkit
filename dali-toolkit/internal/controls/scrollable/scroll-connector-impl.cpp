@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/property-index.h>
+#include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -30,6 +31,21 @@ namespace Toolkit
 
 namespace Internal
 {
+
+namespace
+{
+
+// Signals
+
+const char* const DOMAIN_CHANGED_SIGNAL_NAME =          "domain-changed";
+const char* const SCROLL_POSITION_CHANGED_SIGNAL_NAME = "scroll-position-changed";
+
+TypeRegistration typeRegistration( typeid( Toolkit::ScrollConnector ), typeid( Dali::BaseHandle ), NULL );
+
+SignalConnectorType signalConnector1( typeRegistration, DOMAIN_CHANGED_SIGNAL_NAME , &ScrollConnector::DoConnectSignal );
+SignalConnectorType signalConnector2( typeRegistration, SCROLL_POSITION_CHANGED_SIGNAL_NAME , &ScrollConnector::DoConnectSignal );
+
+}
 
 const Property::Index ScrollConnector::SCROLL_POSITION = Dali::PROPERTY_CUSTOM_START_INDEX;
 const Property::Index ScrollConnector::OVERSHOOT       = Dali::PROPERTY_CUSTOM_START_INDEX + 1;
@@ -54,12 +70,36 @@ void ScrollConnector::SetScrollPosition( float position )
   mScrollPositionChangedSignal.Emit( position );
 }
 
+bool ScrollConnector::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+{
+  Dali::BaseHandle handle( object );
+
+  bool connected( true );
+  Toolkit::ScrollConnector scrollConnector = Toolkit::ScrollConnector::DownCast( handle );
+
+  if( 0 == strcmp( signalName.c_str(), DOMAIN_CHANGED_SIGNAL_NAME ) )
+  {
+    scrollConnector.DomainChangedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SCROLL_POSITION_CHANGED_SIGNAL_NAME ) )
+  {
+    scrollConnector.ScrollPositionChangedSignal().Connect( tracker, functor );
+  }
+  else
+  {
+    // signalName does not match any signal
+    connected = false;
+  }
+
+  return connected;
+}
+
 ScrollConnector::ScrollConnector()
 : mMinLimit( 0.0f ),
   mMaxLimit( 0.0f ),
   mContentLength( 0.0f )
 {
-  mScrollPositionObject = Constrainable::New();
+  mScrollPositionObject = Handle::New();
 
   mScrollPositionObject.RegisterProperty( Toolkit::ScrollConnector::SCROLL_POSITION_PROPERTY_NAME, 0.0f );
   mScrollPositionObject.RegisterProperty( Toolkit::ScrollConnector::OVERSHOOT_PROPERTY_NAME, 0.0f );

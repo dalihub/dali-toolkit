@@ -21,7 +21,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/scripting/scripting.h>
+#include <dali/public-api/images/resource-image.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit::Internal;
@@ -58,26 +58,21 @@ Dali::Toolkit::RadioButton RadioButton::New()
 }
 
 RadioButton::RadioButton()
-  : mSelected(false)
 {
-  mUnselectedImage = Dali::Image::New( UNSELECTED_BUTTON_IMAGE_DIR );
-  mSelectedImage = Dali::Image::New( SELECTED_BUTTON_IMAGE_DIR );
+  mUnselectedImage = Dali::ResourceImage::New( UNSELECTED_BUTTON_IMAGE_DIR );
+  mSelectedImage = Dali::ResourceImage::New( SELECTED_BUTTON_IMAGE_DIR );
 
   mRadioIcon = Dali::ImageActor::New( mUnselectedImage );
+
+//  SetTogglableButton(true);
+  mTogglableButton = true;    // TODO: Use SetTogglableButton() after refactoring painter
 }
 
 RadioButton::~RadioButton()
 {
 }
 
-void RadioButton::SetLabel(const std::string& label)
-{
-  // TODO
-
-  RelayoutRequest();
-}
-
-void RadioButton::SetLabel(Actor label)
+void RadioButton::SetLabel( Actor label )
 {
   if( mLabel != label )
   {
@@ -100,14 +95,9 @@ void RadioButton::SetLabel(Actor label)
   }
 }
 
-Actor RadioButton::GetLabel() const
+void RadioButton::SetSelected( bool selected )
 {
-  return mLabel;
-}
-
-void RadioButton::SetSelected(bool selected)
-{
-  if( mSelected != selected )
+  if( IsSelected() != selected )
   {
     if( selected )
     {
@@ -136,36 +126,28 @@ void RadioButton::SetSelected(bool selected)
 
     // Raise state changed signal
     Toolkit::RadioButton handle( GetOwner() );
-    mStateChangedSignal.Emit( handle, mSelected );
+    StateChangedSignal().Emit( handle );
 
     RelayoutRequest();
   }
-}
-
-bool RadioButton::IsSelected()const
-{
-  return mSelected;
-}
-
-void RadioButton::ToggleState()
-{
-  SetSelected(!mSelected);
 }
 
 void RadioButton::OnRelayout( const Vector2& /*size*/, ActorSizeContainer& container )
 {
   Vector3 newSize( mRadioIcon.GetNaturalSize() );
 
-  if( mLabel )
+  Actor& label = GetLabel();
+
+  if( label )
   {
     // Offset the label from the radio button image
     newSize.width += DISTANCE_BETWEEN_IMAGE_AND_LABEL.width;
 
     // Find the size of the control using size negotiation
-    Vector3 actorNaturalSize( mLabel.GetNaturalSize() );
-    Control::Relayout( mLabel, Vector2( actorNaturalSize.width, actorNaturalSize.height ), container );
+    Vector3 actorNaturalSize( label.GetNaturalSize() );
+    Control::Relayout( label, Vector2( actorNaturalSize.width, actorNaturalSize.height ), container );
 
-    Vector3 actorSize( mLabel.GetSize() );
+    Vector3 actorSize( label.GetSize() );
     newSize.width += actorSize.width;
     newSize.height = std::max( newSize.height, actorSize.height );
   }
@@ -184,53 +166,12 @@ void RadioButton::OnInitialize()
 
 void RadioButton::OnButtonUp()
 {
-  // Don't allow selection on an already selected radio button
-  if( !mSelected )
+  if( ButtonDown == GetState() )
   {
-    ToggleState();
-  }
-}
-
-void RadioButton::SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value)
-{
-  Toolkit::RadioButton radioButton = Toolkit::RadioButton::DownCast( Dali::BaseHandle( object ) );
-
-  if( radioButton )
-  {
-    RadioButton& radioButtonImpl( GetImplementation( radioButton ) );
-
-    if ( propertyIndex == Toolkit::Button::PROPERTY_TOGGLED )
+    // Don't allow selection on an already selected radio button
+    if( !IsSelected() )
     {
-      radioButtonImpl.SetSelected( value.Get< bool >( ) );
-    }
-    else if ( propertyIndex == Toolkit::Button::PROPERTY_LABEL_ACTOR )
-    {
-      radioButtonImpl.SetLabel( Scripting::NewActor( value.Get< Property::Map >( ) ) );
+      SetSelected(!IsSelected());
     }
   }
-}
-
-Property::Value RadioButton::GetProperty(BaseObject* object, Property::Index propertyIndex)
-{
-  Property::Value value;
-
-  Toolkit::RadioButton radioButton = Toolkit::RadioButton::DownCast( Dali::BaseHandle(object) );
-
-  if( radioButton )
-  {
-    RadioButton& radioButtonImpl( GetImplementation( radioButton ) );
-
-    if ( propertyIndex == Toolkit::Button::PROPERTY_TOGGLED )
-    {
-      value = radioButtonImpl.mSelected;
-    }
-    else if ( propertyIndex == Toolkit::Button::PROPERTY_LABEL_ACTOR )
-    {
-      Property::Map map;
-      Scripting::CreatePropertyMap( radioButtonImpl.mLabel, map );
-      value = map;
-    }
-  }
-
-  return value;
 }

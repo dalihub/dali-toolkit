@@ -22,12 +22,15 @@
 #include <stack>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/mesh-actor.h>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/geometry/mesh.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/relayout-controller.h>
 #include <dali-toolkit/internal/controls/relayout-helper.h>
 #include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>
@@ -52,6 +55,18 @@ const Property::Index Control::PROPERTY_KEY_INPUT_FOCUS       = Internal::Contro
 
 namespace
 {
+
+// Signals
+
+const char* const SIGNAL_KEY_EVENT =    "key-event";
+const char* const SIGNAL_TAPPED =       "tapped";
+const char* const SIGNAL_PANNED =       "panned";
+const char* const SIGNAL_PINCHED =      "pinched";
+const char* const SIGNAL_LONG_PRESSED = "long-pressed";
+
+// Actions
+
+const char* const ACTION_CONTROL_ACTIVATED = "control-activated";
 
 const Scripting::StringEnum< Control::SizePolicy > SIZE_POLICY_STRING_TABLE[] =
 {
@@ -80,13 +95,13 @@ TypeRegistration CONTROL_TYPE( typeid(Control), typeid(CustomActor), Create );
 
 // Property Registration after Internal::Control::Impl definition below
 
-TypeAction ACTION_TYPE_1( CONTROL_TYPE, Toolkit::Control::ACTION_CONTROL_ACTIVATED, &Internal::Control::DoAction );
+TypeAction ACTION_TYPE_1( CONTROL_TYPE, ACTION_CONTROL_ACTIVATED, &Internal::Control::DoAction );
 
-SignalConnectorType SIGNAL_CONNECTOR_1( CONTROL_TYPE, Toolkit::Control::SIGNAL_KEY_EVENT,     &Internal::Control::DoConnectSignal );
-SignalConnectorType SIGNAL_CONNECTOR_2( CONTROL_TYPE, Toolkit::Control::SIGNAL_TAPPED,        &Internal::Control::DoConnectSignal );
-SignalConnectorType SIGNAL_CONNECTOR_3( CONTROL_TYPE, Toolkit::Control::SIGNAL_PANNED,        &Internal::Control::DoConnectSignal );
-SignalConnectorType SIGNAL_CONNECTOR_4( CONTROL_TYPE, Toolkit::Control::SIGNAL_PINCHED,       &Internal::Control::DoConnectSignal );
-SignalConnectorType SIGNAL_CONNECTOR_5( CONTROL_TYPE, Toolkit::Control::SIGNAL_LONG_PRESSED,  &Internal::Control::DoConnectSignal );
+SignalConnectorType SIGNAL_CONNECTOR_1( CONTROL_TYPE, SIGNAL_KEY_EVENT,     &Internal::Control::DoConnectSignal );
+SignalConnectorType SIGNAL_CONNECTOR_2( CONTROL_TYPE, SIGNAL_TAPPED,        &Internal::Control::DoConnectSignal );
+SignalConnectorType SIGNAL_CONNECTOR_3( CONTROL_TYPE, SIGNAL_PANNED,        &Internal::Control::DoConnectSignal );
+SignalConnectorType SIGNAL_CONNECTOR_4( CONTROL_TYPE, SIGNAL_PINCHED,       &Internal::Control::DoConnectSignal );
+SignalConnectorType SIGNAL_CONNECTOR_5( CONTROL_TYPE, SIGNAL_LONG_PRESSED,  &Internal::Control::DoConnectSignal );
 
 /**
  * Structure which holds information about the background of a control
@@ -352,13 +367,13 @@ public:
 
         case Toolkit::Control::PROPERTY_WIDTH_POLICY:
         {
-          controlImpl.mImpl->mWidthPolicy = Scripting::GetEnumeration< Toolkit::Control::SizePolicy >( value.Get< std::string >(), SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT );
+          controlImpl.mImpl->mWidthPolicy = Scripting::GetEnumeration< Toolkit::Control::SizePolicy >( value.Get< std::string >().c_str(), SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT );
           break;
         }
 
         case Toolkit::Control::PROPERTY_HEIGHT_POLICY:
         {
-          controlImpl.mImpl->mHeightPolicy = Scripting::GetEnumeration< Toolkit::Control::SizePolicy >( value.Get< std::string >(), SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT );
+          controlImpl.mImpl->mHeightPolicy = Scripting::GetEnumeration< Toolkit::Control::SizePolicy >( value.Get< std::string >().c_str(), SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT );
           break;
         }
 
@@ -1001,7 +1016,7 @@ bool Control::DoAction(BaseObject* object, const std::string& actionName, const 
 {
   bool ret = false;
 
-  if( object && (actionName == Toolkit::Control::ACTION_CONTROL_ACTIVATED) )
+  if( object && ( 0 == strcmp( actionName.c_str(), ACTION_CONTROL_ACTIVATED ) ) )
   {
     Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
     if( control )
@@ -1019,32 +1034,32 @@ bool Control::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* t
   Dali::BaseHandle handle( object );
 
   bool connected( false );
-  Toolkit::Control control = Toolkit::Control::DownCast(handle);
+  Toolkit::Control control = Toolkit::Control::DownCast( handle );
   if ( control )
   {
     Control& controlImpl( control.GetImplementation() );
     connected = true;
 
-    if ( Toolkit::Control::SIGNAL_KEY_EVENT == signalName )
+    if ( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_EVENT ) )
     {
       controlImpl.KeyEventSignal().Connect( tracker, functor );
     }
-    else if( Toolkit::Control::SIGNAL_TAPPED == signalName )
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_TAPPED ) )
     {
       controlImpl.EnableGestureDetection( Gesture::Tap );
       controlImpl.GetTapGestureDetector().DetectedSignal().Connect( tracker, functor );
     }
-    else if( Toolkit::Control::SIGNAL_PANNED == signalName )
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_PANNED ) )
     {
       controlImpl.EnableGestureDetection( Gesture::Pan );
       controlImpl.GetPanGestureDetector().DetectedSignal().Connect( tracker, functor );
     }
-    else if( Toolkit::Control::SIGNAL_PINCHED == signalName )
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_PINCHED ) )
     {
       controlImpl.EnableGestureDetection( Gesture::Pinch );
       controlImpl.GetPinchGestureDetector().DetectedSignal().Connect( tracker, functor );
     }
-    else if( Toolkit::Control::SIGNAL_LONG_PRESSED == signalName )
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_LONG_PRESSED ) )
     {
       controlImpl.EnableGestureDetection( Gesture::LongPress );
       controlImpl.GetLongPressGestureDetector().DetectedSignal().Connect( tracker, functor );

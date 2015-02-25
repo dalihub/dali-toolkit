@@ -19,9 +19,12 @@
 #include <dali-toolkit/internal/controls/magnifier/magnifier-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/public-api/images/resource-image.h>
 
 using namespace Dali;
 
@@ -279,7 +282,7 @@ void Magnifier::SetFrameVisibility(bool visible)
   {
     Actor self(Self());
 
-    Image image = Image::New( DEFAULT_FRAME_IMAGE_PATH );
+    Image image = ResourceImage::New( DEFAULT_FRAME_IMAGE_PATH );
     mFrame = ImageActor::New( image );
     mFrame.SetDrawMode(DrawMode::OVERLAY);
     mFrame.SetStyle( ImageActor::STYLE_NINE_PATCH );

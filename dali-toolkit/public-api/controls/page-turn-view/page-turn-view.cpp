@@ -15,7 +15,10 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-view-impl.h>
 
 using namespace Dali;

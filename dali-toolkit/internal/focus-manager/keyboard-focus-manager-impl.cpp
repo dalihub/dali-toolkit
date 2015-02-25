@@ -26,13 +26,14 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/images/resource-image.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>
-#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -45,6 +46,13 @@ namespace Internal
 
 namespace // unnamed namespace
 {
+
+// Signals
+
+const char* const SIGNAL_PRE_FOCUS_CHANGE =        "keyboard-pre-focus-change";
+const char* const SIGNAL_FOCUS_CHANGED =           "keyboard-focus-changed";
+const char* const SIGNAL_FOCUS_GROUP_CHANGED =     "keyboard-focus-group-changed";
+const char* const SIGNAL_FOCUSED_ACTOR_ACTIVATED = "keyboard-focused-actor-activated";
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_KEYBOARD_FOCUS_MANAGER");
@@ -72,7 +80,13 @@ BaseHandle Create()
 
   return handle;
 }
+
 TypeRegistration KEYBOARD_FOCUS_MANAGER_TYPE( typeid(Dali::Toolkit::KeyboardFocusManager), typeid(Dali::BaseHandle), Create, true /* Create instance at startup */ );
+
+SignalConnectorType signalConnector1( KEYBOARD_FOCUS_MANAGER_TYPE, SIGNAL_PRE_FOCUS_CHANGE , &KeyboardFocusManager::DoConnectSignal );
+SignalConnectorType signalConnector2( KEYBOARD_FOCUS_MANAGER_TYPE, SIGNAL_FOCUS_CHANGED , &KeyboardFocusManager::DoConnectSignal );
+SignalConnectorType signalConnector3( KEYBOARD_FOCUS_MANAGER_TYPE, SIGNAL_FOCUS_GROUP_CHANGED , &KeyboardFocusManager::DoConnectSignal );
+SignalConnectorType signalConnector4( KEYBOARD_FOCUS_MANAGER_TYPE, SIGNAL_FOCUSED_ACTOR_ACTIVATED , &KeyboardFocusManager::DoConnectSignal );
 
 } // unnamed namespace
 
@@ -458,7 +472,7 @@ Actor KeyboardFocusManager::GetFocusIndicatorActor()
 void KeyboardFocusManager::CreateDefaultFocusIndicatorActor()
 {
   // Create a focus indicator actor shared by all the keyboard focusable actors
-  Image borderImage = Image::New(FOCUS_BORDER_IMAGE_PATH);
+  Image borderImage = ResourceImage::New(FOCUS_BORDER_IMAGE_PATH);
 
   ImageActor focusIndicator = ImageActor::New(borderImage);
   focusIndicator.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
@@ -467,10 +481,7 @@ void KeyboardFocusManager::CreateDefaultFocusIndicatorActor()
   focusIndicator.SetPosition(Vector3(0.0f, 0.0f, 1.0f));
 
   // Apply size constraint to the focus indicator
-  Constraint constraint = Constraint::New<Vector3>(Actor::SIZE,
-                                                   ParentSource(Actor::SIZE),
-                                                   EqualToConstraint());
-  focusIndicator.ApplyConstraint(constraint);
+  focusIndicator.SetSizeMode( SIZE_EQUAL_TO_PARENT );
 
   SetFocusIndicatorActor(focusIndicator);
 }
@@ -720,21 +731,21 @@ bool KeyboardFocusManager::DoConnectSignal( BaseObject* object, ConnectionTracke
   Dali::BaseHandle handle( object );
 
   bool connected( true );
-  KeyboardFocusManager* manager = dynamic_cast<KeyboardFocusManager*>(object);
+  KeyboardFocusManager* manager = dynamic_cast<KeyboardFocusManager*>( object );
 
-  if( Dali::Toolkit::KeyboardFocusManager::SIGNAL_PRE_FOCUS_CHANGE == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_PRE_FOCUS_CHANGE ) )
   {
     manager->PreFocusChangeSignal().Connect( tracker, functor );
   }
-  if( Dali::Toolkit::KeyboardFocusManager::SIGNAL_FOCUS_CHANGED == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_CHANGED ) )
   {
     manager->FocusChangedSignal().Connect( tracker, functor );
   }
-  if( Dali::Toolkit::KeyboardFocusManager::SIGNAL_FOCUS_GROUP_CHANGED == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_GROUP_CHANGED ) )
   {
     manager->FocusGroupChangedSignal().Connect( tracker, functor );
   }
-  else if( Dali::Toolkit::KeyboardFocusManager::SIGNAL_FOCUSED_ACTOR_ACTIVATED== signalName )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUSED_ACTOR_ACTIVATED ) )
   {
     manager->FocusedActorActivatedSignal().Connect( tracker, functor );
   }

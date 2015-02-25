@@ -17,6 +17,10 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/constraint.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/shader-effects/page-turn-effect.h>
 

@@ -52,25 +52,19 @@ using namespace Dali;
 namespace
 {
 
-const int DEFAULT_REFRESH_INTERVAL_MILLISECONDS = 50;                                     ///< Refresh rate TODO: Animation should have an update signal (and see item-view-impl)
+// Signals
+
+const char* const SIGNAL_SNAP_STARTED = "snap-started";
+
 const Vector2 DEFAULT_MIN_FLICK_DISTANCE(30.0f, 30.0f);                                   ///< minimum distance for pan before flick allowed
 const float DEFAULT_MIN_FLICK_SPEED_THRESHOLD(500.0f);                          ///< Minimum pan speed required for flick in pixels/s
 const float FREE_FLICK_SPEED_THRESHOLD = 200.0f;                                          ///< Free-Flick threshold in pixels/ms
 const float AUTOLOCK_AXIS_MINIMUM_DISTANCE2 = 100.0f;                                     ///< Auto-lock axis after minimum distance squared.
 const float FLICK_ORTHO_ANGLE_RANGE = 75.0f;                                              ///< degrees. (if >45, then supports diagonal flicking)
-const unsigned int MAXIMUM_NUMBER_OF_VALUES = 5;                                          ///< Number of values to use for weighted pan calculation.
 const Vector2 DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION = Vector2(0.17f, 0.1f); ///< The step of horizontal scroll distance in the proportion of stage size for each mouse wheel event received.
 const unsigned long MINIMUM_TIME_BETWEEN_DOWN_AND_UP_FOR_RESET( 150u );
 const float TOUCH_DOWN_TIMER_INTERVAL = 100.0f;
 const float DEFAULT_SCROLL_UPDATE_DISTANCE( 30.0f );                               ///< Default distance to travel in pixels for scroll update signal
-
-// predefined effect values
-const Vector3 ANGLE_CAROUSEL_ROTATE(Math::PI * 0.5f, Math::PI * 0.5f, 0.0f);
-const Vector3 ANGLE_CUBE_PAGE_ROTATE(Math::PI * 0.2f, Math::PI * 0.2f, 0.0f);  ///< Cube page rotates as if it has ten sides with the camera positioned inside
-const Vector2 ANGLE_CUSTOM_CUBE_SWING(-Math::PI * 0.45f, -Math::PI * 0.45f);  ///< outer cube pages swing 90 degrees as they pan offscreen
-const Vector2 ANGLE_SPIRAL_SWING_IN(Math::PI * 0.5f, Math::PI * 0.5f);
-const Vector2 ANGLE_SPIRAL_SWING_OUT(Math::PI * 0.35f, Math::PI * 0.35f);
-const Vector2 ANGLE_OUTER_CUBE_SWING(Math::PI * 0.5f, Math::PI * 0.5f);  ///< outer cube pages swing 90 degrees as they pan offscreen
 
 // Helpers ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -522,9 +516,9 @@ BaseHandle Create()
   return Toolkit::ScrollView::New();
 }
 
-TypeRegistration typeRegistration( typeid(Toolkit::ScrollView), typeid(Toolkit::Scrollable), Create );
+TypeRegistration typeRegistration( typeid( Toolkit::ScrollView ), typeid( Toolkit::Scrollable ), Create );
 
-SignalConnectorType signalConnector1( typeRegistration, Toolkit::ScrollView::SIGNAL_SNAP_STARTED, &ScrollView::DoConnectSignal );
+SignalConnectorType signalConnector1( typeRegistration, SIGNAL_SNAP_STARTED, &ScrollView::DoConnectSignal );
 
 }
 
@@ -553,11 +547,8 @@ ScrollView::ScrollView()
   mTouchDownTime(0u),
   mGestureStackDepth(0),
   mScrollStateFlags(0),
-  mMinTouchesForPanning(1),
-  mMaxTouchesForPanning(1),
   mLockAxis(LockPossible),
   mScrollUpdateDistance(DEFAULT_SCROLL_UPDATE_DISTANCE),
-  mOvershootDelay(1.0f),
   mMaxOvershoot(Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT, Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT),
   mUserMaxOvershoot(Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT, Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT),
   mSnapOvershootDuration(Toolkit::ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION),
@@ -618,9 +609,6 @@ void ScrollView::OnInitialize()
   mGestureStackDepth = 0;
 
   EnableGestureDetection( Gesture::Type( Gesture::Pan ) );
-
-  // For pan, default to only 1 touch required, ignoring touches outside this range.
-  SetTouchesRequiredForPanning(1, 1, false);
 
   // By default we'll allow the user to freely drag the scroll view,
   // while disabling the other rulers.
@@ -955,25 +943,6 @@ void ScrollView::SetSnapOvershootDuration(float duration)
   mSnapOvershootDuration = duration;
 }
 
-void ScrollView::SetTouchesRequiredForPanning(unsigned int minTouches, unsigned int maxTouches, bool endOutside)
-{
-  PanGestureDetector panGesture( GetPanGestureDetector() );
-
-  mMinTouchesForPanning = minTouches;
-  mMaxTouchesForPanning = maxTouches;
-
-  if(endOutside)
-  {
-    panGesture.SetMinimumTouchesRequired(minTouches);
-    panGesture.SetMaximumTouchesRequired(maxTouches);
-  }
-  else
-  {
-    panGesture.SetMinimumTouchesRequired(1);
-    panGesture.SetMaximumTouchesRequired(UINT_MAX);
-  }
-}
-
 void ScrollView::SetActorAutoSnap(bool enable)
 {
   mActorAutoSnapEnabled = enable;
@@ -1138,6 +1107,9 @@ void ScrollView::TransformTo(const Vector3& position,
 void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunction alpha,
                              DirectionBias horizontalBias, DirectionBias verticalBias)
 {
+  // If this is called while the timer is running, then cancel it
+  StopTouchDownTimer();
+
   Actor self( Self() );
 
   // Guard against destruction during signal emission
@@ -1808,8 +1780,9 @@ void ScrollView::SetScrollUpdateNotification( bool enabled )
     self.RemovePropertyNotification(mScrollXUpdateNotification);
     mScrollXUpdateNotification.Reset();
   }
-  if( enabled )
+  if( enabled && !mScrollUpdatedSignal.Empty())
   {
+    // Only set up the notification when the application has connected to the updated signal
     mScrollXUpdateNotification = self.AddPropertyNotification(mPropertyPosition, 0, StepCondition(mScrollUpdateDistance, 0.0f));
     mScrollXUpdateNotification.NotifySignal().Connect( this, &ScrollView::OnScrollUpdateNotification );
   }
@@ -1820,8 +1793,9 @@ void ScrollView::SetScrollUpdateNotification( bool enabled )
     self.RemovePropertyNotification(mScrollYUpdateNotification);
     mScrollYUpdateNotification.Reset();
   }
-  if( enabled )
+  if( enabled && !mScrollUpdatedSignal.Empty())
   {
+    // Only set up the notification when the application has connected to the updated signal
     mScrollYUpdateNotification = self.AddPropertyNotification(mPropertyPosition, 1, StepCondition(mScrollUpdateDistance, 0.0f));
     mScrollYUpdateNotification.NotifySignal().Connect( this, &ScrollView::OnScrollUpdateNotification );
   }
@@ -1843,7 +1817,7 @@ bool ScrollView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   bool connected( true );
   Toolkit::ScrollView view = Toolkit::ScrollView::DownCast( handle );
 
-  if( Toolkit::ScrollView::SIGNAL_SNAP_STARTED == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_SNAP_STARTED ) )
   {
     view.SnapStartedSignal().Connect( tracker, functor );
   }
@@ -2568,11 +2542,11 @@ bool ScrollView::OnAccessibilityPan(PanGesture gesture)
 
 void ScrollView::ClampPosition(Vector3& position) const
 {
-  ClampState3 clamped;
+  ClampState3D clamped;
   ClampPosition(position, clamped);
 }
 
-void ScrollView::ClampPosition(Vector3& position, ClampState3 &clamped) const
+void ScrollView::ClampPosition(Vector3& position, ClampState3D &clamped) const
 {
   Vector3 size = Self().GetCurrentSize();
 

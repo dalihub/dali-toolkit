@@ -18,7 +18,10 @@
  *
  */
 
+// EXTERNAL INCLUDES
 #include <dali/public-api/object/property-value.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/builder/builder.h>
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
 

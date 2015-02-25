@@ -29,11 +29,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const char* const PushButton::SIGNAL_PRESSED = "pressed";
-const char* const PushButton::SIGNAL_RELEASED = "released";
-
-const char* const PushButton::ACTION_PUSH_BUTTON_CLICK = "push-button-click";
-
 PushButton::PushButton()
 : Button()
 {
@@ -76,56 +71,6 @@ PushButton PushButton::New()
 PushButton PushButton::DownCast( BaseHandle handle )
 {
   return Control::DownCast<PushButton, Internal::PushButton>(handle);
-}
-
-void PushButton::SetAutoRepeating( bool autoRepeating )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetAutoRepeating( autoRepeating );
-}
-
-bool PushButton::IsAutoRepeating() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).IsAutoRepeating();
-}
-
-void PushButton::SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetInitialAutoRepeatingDelay( initialAutoRepeatingDelay );
-}
-
-float PushButton::GetInitialAutoRepeatingDelay() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).GetInitialAutoRepeatingDelay();
-}
-
-void PushButton::SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetNextAutoRepeatingDelay( nextAutoRepeatingDelay );
-}
-
-float PushButton::GetNextAutoRepeatingDelay() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).GetNextAutoRepeatingDelay();
-}
-
-void PushButton::SetToggleButton( bool toggle )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetToggleButton( toggle );
-}
-
-bool PushButton::IsToggleButton() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).IsToggleButton();
-}
-
-void PushButton::SetToggled( bool toggle )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetToggled( toggle );
-}
-
-bool PushButton::IsToggled() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).IsToggled();
 }
 
 void PushButton::SetButtonImage( Image image )
@@ -201,31 +146,6 @@ void PushButton::SetDisabledImage( Actor image )
 Actor PushButton::GetDisabledImage() const
 {
   return Dali::Toolkit::GetImplementation( *this ).GetDisabledImage();
-}
-
-void PushButton::SetLabel( const std::string& label )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetLabel( label );
-}
-
-void PushButton::SetLabel( Actor label )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetLabel( label );
-}
-
-Actor PushButton::GetLabel() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).GetLabel();
-}
-
-PushButton::PressedSignalType& PushButton::PressedSignal()
-{
-  return Dali::Toolkit::GetImplementation( *this ).PressedSignal();
-}
-
-PushButton::ReleasedSignalType& PushButton::ReleasedSignal()
-{
-  return Dali::Toolkit::GetImplementation( *this ).ReleasedSignal();
 }
 
 } // namespace Toolkit

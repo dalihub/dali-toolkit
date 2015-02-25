@@ -43,13 +43,17 @@ class ScrollBar;
 /**
  * ScrollBar is a UI component that can be added to the scrollable controls
  * indicating the current scroll position of the scrollable content.
+ *
+ * Signals
+ * | %Signal Name             | Method                              |
+ * |--------------------------|-------------------------------------|
+ * | scroll-position-notified | @ref ScrollPositionNotifiedSignal() |
  */
 class DALI_IMPORT_API ScrollBar : public ScrollComponent
 {
 public:
 
   // Signals
-  static const char* const SCROLL_POSITION_NOTIFIED_SIGNAL_NAME;        ///< "scroll-position-notified" signal name
   typedef Signal< void ( float ) > ScrollPositionNotifiedSignalType;
 
   // Properties

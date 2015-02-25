@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/alpha-functions.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 
@@ -31,6 +34,26 @@ namespace Internal DALI_INTERNAL
 {
 class ScrollView;
 }
+
+/**
+ * @brief How axes/rotation or scale are clamped
+ */
+enum ClampState
+{
+  NotClamped,   ///< The quantity isn't clamped
+  ClampedToMin, ///< The quantity is clamped to the min value
+  ClampedToMax  ///< The quantity is clamped to the max value
+};
+
+/**
+ * @brief A 3 dimensional clamp
+ */
+struct ClampState3D
+{
+  ClampState x; ///< The clamp state of the x axis
+  ClampState y; ///< The clamp state of the y axis
+  ClampState z; ///< The clamp state of the z axis
+};
 
 /**
  * @brief The snap type
@@ -376,6 +399,11 @@ class ScrollView;
 /**
  * @brief ScrollView contains actors that can be scrolled manually (via touch)
  * or automatically.
+ *
+ * Signals
+ * | %Signal Name      | Method                     |
+ * |-------------------|----------------------------|
+ * | snap-started      | @ref SnapStartedSignal()   |
  */
 class DALI_IMPORT_API ScrollView : public Scrollable
 {
@@ -383,14 +411,12 @@ public:
 
   // Custom properties
 
-  static const std::string SCROLL_PAGE_CURRENT;                         ///< Property, name "scroll-page-current",       type INT
   static const std::string SCROLL_TIME_PROPERTY_NAME;                   ///< Property, name "scroll-time",               type FLOAT
   static const std::string SCROLL_POSITION_PROPERTY_NAME;               ///< Property, name "scroll-position",           type VECTOR3
   static const std::string SCROLL_PRE_POSITION_PROPERTY_NAME;           ///< Property, name "scroll-pre-position",       type VECTOR3
   static const std::string SCROLL_OVERSHOOT_X_PROPERTY_NAME;            ///< Property, name "scroll-overshoot-x",         type float
   static const std::string SCROLL_OVERSHOOT_Y_PROPERTY_NAME;            ///< Property, name "scroll-overshoot-y",         type float
   static const std::string SCROLL_FINAL_PROPERTY_NAME;                  ///< Property, name "scroll-final",              type VECTOR3
-  static const std::string SCROLL_SCALE_PROPERTY_NAME;                  ///< Property, name "scroll-scale",              type VECTOR3
   static const std::string SCROLL_WRAP_PROPERTY_NAME;                   ///< Property, name "scroll-wrap",               type BOOLEAN
   static const std::string SCROLL_PANNING_PROPERTY_NAME;                ///< Property, name "scroll-panning",            type BOOLEAN
   static const std::string SCROLL_SCROLLING_PROPERTY_NAME;              ///< Property, name "scroll-scrolling",          type BOOLEAN
@@ -409,23 +435,17 @@ public:
   static const float DEFAULT_FLICK_SPEED_COEFFICIENT;                   ///< Default Flick speed coefficient (multiples input touch velocity)
   static const float DEFAULT_MAX_FLICK_SPEED;                           ///< Default Maximum flick speed. (in stage diagonals per second)
 
-  //Signal Names
-  static const char* const SIGNAL_SNAP_STARTED; ///< Name "snap-started"
-
-  /// Direction of transitions
-  enum EDirectionFlag
-  {
-    DirectionFlagLeft               = 0x01,
-    DirectionFlagRight              = 0x02,
-    DirectionFlagUp                 = 0x04,
-    DirectionFlagDown               = 0x08,
-    DirectionFlagTransitionOn       = 0x10,            ///< doesnt mean a page is moving towards centre, it affects whether the current page is using values for moving onto screen or off screen, if the user changes scroll direction we dont want things to flip over when in view
-    DirectionFlagTransitionOff      = 0x20,
-    DirectionFlagMask_Direction     = DirectionFlagLeft | DirectionFlagRight | DirectionFlagUp | DirectionFlagDown,
-    DirectionFlagMask_Transition    = DirectionFlagTransitionOn | DirectionFlagTransitionOff
-  };
-
 public:
+
+  /**
+   * @brief Clamp signal event's data
+   */
+  struct ClampEvent
+  {
+    ClampState3D scale;       ///< Clamp information for scale axes
+    ClampState3D position;    ///< Clamp information for position axes
+    ClampState   rotation;    ///< Clamp information for rotation
+  };
 
   /**
    * @brief Snap signal event's data.
@@ -619,24 +639,6 @@ public:
    * @param[in] duration The duration of the overshoot snap animation.
    */
   void SetSnapOvershootDuration(float duration);
-
-  /**
-   * @brief Sets Touches required for pan gestures.
-   *
-   * Panning requires number of touches to be within (minTouches) and
-   * (maxTouches).
-   *
-   * If (endOutside) is true, then outside this range of touches,
-   * the pan gesture will end and thus will snap.
-   *
-   * If (endOutside) is false, then outside this range of touches,
-   * the pan gesture will pause. but will not end until touches = 0.
-   *
-   * @param[in] minTouches Minimum touches for panning to occur.
-   * @param[out] maxTouches Maxiumum touches for panning to occur.
-   * @param[in] endOutside Whether to end the panning gesture outside of touch range
-   */
-  void SetTouchesRequiredForPanning(unsigned int minTouches = 1, unsigned int maxTouches = 1, bool endOutside = true);
 
   /**
    * @brief Enables or Disables Actor Auto-Snap mode.

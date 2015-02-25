@@ -19,11 +19,13 @@
 #include "check-box-button-default-painter-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/image-actor.h>
-#include <dali/public-api/object/ref-object.h>
 #include "check-box-button-impl.h"
 
 namespace Dali
@@ -65,7 +67,7 @@ inline const Toolkit::Internal::CheckBoxButton& GetCheckBoxButtonImpl( const Too
 CheckBoxButtonDefaultPainter::CheckBoxButtonDefaultPainter()
 : CheckBoxButtonPainter(),
   mDisabled( false ),
-  mPaintState( UncheckedState ),
+  mPaintState( UnselectedState ),
   mButton(NULL),
   mAnimationTime( ANIMATION_TIME )
 {
@@ -83,18 +85,374 @@ CheckBoxButtonDefaultPainter::~CheckBoxButtonDefaultPainter()
   }
 }
 
-void CheckBoxButtonDefaultPainter::SetBackgroundImage( Toolkit::CheckBoxButton& checkBox, Actor image )
+void CheckBoxButtonDefaultPainter::Initialize( Toolkit::Button& button )
 {
-  Toolkit::Internal::CheckBoxButton& checkBoxImpl = GetImplementation( checkBox );
-  Actor& backgroundImage = checkBoxImpl.GetBackgroundImage();
-  Actor& fadeOutBackgroundImage = checkBoxImpl.GetFadeOutBackgroundImage();
+  Toolkit::Internal::CheckBoxButton& buttonImpl = GetCheckBoxButtonImpl( button );
+  Actor& backgroundImage = buttonImpl.GetBackgroundImage();
+  Actor& selectedImage = buttonImpl.GetSelectedImage();
+  Actor& disabledBackgroundImage = buttonImpl.GetDisabledBackgroundImage();
+  Actor& disabledSelectedImage = buttonImpl.GetDisabledSelectedImage();
+
+  Toolkit::CheckBoxButton& checkBox = static_cast<Toolkit::CheckBoxButton&>( button );
+
+  if( backgroundImage )
+  {
+    SetBackgroundImage( checkBox, backgroundImage );
+  }
+
+  if( selectedImage )
+  {
+    SetSelectedImage( checkBox, selectedImage );
+  }
+
+  if( disabledBackgroundImage )
+  {
+    SetDisabledBackgroundImage( checkBox, disabledBackgroundImage );
+  }
+
+  if( disabledSelectedImage )
+  {
+    SetDisabledSelectedImage( checkBox, disabledSelectedImage );
+  }
+
+  SetDisabled( button, mDisabled );
+}
+
+void CheckBoxButtonDefaultPainter::SetSize( Toolkit::Button& button, const Vector3& size )
+{
+  Toolkit::Internal::CheckBoxButton& buttonImpl = GetCheckBoxButtonImpl( button );
+  Actor& backgroundImage = buttonImpl.GetBackgroundImage();
+  Actor& selectedImage = buttonImpl.GetSelectedImage();
+  Actor& disabledBackgroundImage = buttonImpl.GetDisabledBackgroundImage();
+  Actor& disabledSelectedImage = buttonImpl.GetDisabledSelectedImage();
+
+  ApplySelectedConstraint( selectedImage, FOREGROUND_DEPTH );
+  ApplyConstraint( backgroundImage, BACKGROUND_DEPTH );
+  ApplyConstraint( disabledSelectedImage, FOREGROUND_DEPTH );
+  ApplyConstraint( disabledBackgroundImage, BACKGROUND_DEPTH );
+}
+
+void CheckBoxButtonDefaultPainter::SetDisabled( Toolkit::Button& button, bool disabled )
+{
+  mDisabled = disabled;
+
+  Toolkit::Internal::CheckBoxButton& buttonImpl = GetCheckBoxButtonImpl( button );
+  Actor& backgroundImage = buttonImpl.GetBackgroundImage();
+  Actor& selectedImage = buttonImpl.GetSelectedImage();
+  Actor& disabledBackgroundImage = buttonImpl.GetDisabledBackgroundImage();
+  Actor& disabledSelectedImage = buttonImpl.GetDisabledSelectedImage();
+  Actor& fadeOutSelectedImage = buttonImpl.GetFadeOutSelectedImage();
+  Actor& fadeOutBackgroundImage = buttonImpl.GetFadeOutBackgroundImage();
+
+  Toolkit::CheckBoxButton& checkBox = static_cast<Toolkit::CheckBoxButton&>( button );
 
   switch( mPaintState )
   {
-    case UncheckedState:             // FALLTHROUGH
-    case CheckedState:
-    case UncheckedCheckedTransition:
-    case CheckedUncheckedTransition:
+    case UnselectedState:
+    {
+      if( disabled )
+      {
+        StopCheckOutAnimation( checkBox );
+        FadeOutImage( checkBox, Background, backgroundImage );
+        FadeInImage( checkBox, disabledBackgroundImage );
+        StartCheckOutAnimation( checkBox );
+        StartCheckInAnimation();
+
+        mPaintState = UnselectedDisabledTransition;
+      }
+      break;
+    }
+    case SelectedState:
+    {
+      if( disabled )
+      {
+        StopCheckOutAnimation( checkBox );
+        FadeOutImage( checkBox, Background, backgroundImage );
+        FadeOutImage( checkBox, Foreground, selectedImage );
+        FadeInImage( checkBox, disabledSelectedImage );
+        FadeInImage( checkBox, disabledBackgroundImage );
+        StartCheckOutAnimation( checkBox );
+        StartCheckInAnimation();
+
+        mPaintState = SelectedDisabledTransition;
+      }
+      break;
+    }
+    case DisabledUnselectedState:
+    {
+      if( !disabled )
+      {
+        StopCheckOutAnimation( checkBox );
+        FadeOutImage( checkBox, Background, disabledBackgroundImage );
+        FadeInImage( checkBox, backgroundImage );
+        StartCheckOutAnimation( checkBox );
+        StartCheckInAnimation();
+
+        mPaintState = DisabledUnselectedTransition;
+      }
+      break;
+    }
+    case DisabledSelectedState:
+    {
+      if( !disabled )
+      {
+        StopCheckOutAnimation( checkBox );
+        FadeOutImage( checkBox, Background, disabledBackgroundImage );
+        FadeOutImage( checkBox, Foreground, disabledSelectedImage );
+        FadeInImage( checkBox, backgroundImage );
+        FadeInImage( checkBox, selectedImage );
+        StartCheckOutAnimation( checkBox );
+        StartCheckInAnimation();
+
+        mPaintState = DisabledSelectedTransition;
+      }
+      break;
+    }
+    case UnselectedSelectedTransition:
+    {
+      if( disabled )
+      {
+        float opacity = 1.f;
+        if( selectedImage )
+        {
+          opacity = selectedImage.GetCurrentOpacity();
+        }
+        StopCheckOutAnimation( checkBox );
+        StopCheckInAnimation();
+
+        FadeOutImage( checkBox, Foreground, selectedImage, opacity );
+        FadeOutImage( checkBox, Background, backgroundImage );
+
+        FadeInImage( checkBox, disabledSelectedImage );
+        FadeInImage( checkBox, disabledBackgroundImage );
+
+        StartCheckOutAnimation( checkBox );
+        StartCheckInAnimation();
+
+        mPaintState = SelectedDisabledTransition;
+      }
+      break;
+    }
+    case SelectedUnselectedTransition:
+    {
+      if( disabled )
+      {
+        float opacity = 1.f;
+        if( fadeOutSelectedImage )
+        {
+          opacity = fadeOutSelectedImage.GetCurrentOpacity();
+        }
+        StopCheckOutAnimation( checkBox );
+        StopCheckInAnimation();
+
+        button.Add( disabledSelectedImage );
+        FadeOutImage( checkBox, Foreground, disabledSelectedImage, opacity );
+        FadeOutImage( checkBox, Background, backgroundImage );
+
+        FadeInImage( checkBox, disabledBackgroundImage );
+
+        StartCheckOutAnimation( checkBox );
+        StartCheckInAnimation();
+
+        mPaintState = UnselectedDisabledTransition;
+      }
+      break;
+    }
+    case UnselectedDisabledTransition:
+    {
+      if( !disabled )
+      {
+        float opacity = 1.f;
+        if( fadeOutBackgroundImage )
+        {
+          opacity = fadeOutBackgroundImage.GetCurrentOpacity();
+        }
+        StopCheckOutAnimation( checkBox, false );
+        StopCheckInAnimation();
+
+        FadeOutImage( checkBox, Background, disabledBackgroundImage, 1.f - opacity );
+        FadeInImage( checkBox, backgroundImage, opacity );
+
+        StartCheckOutAnimation( checkBox );
+        StartCheckInAnimation();
+
+        mPaintState = DisabledUnselectedTransition;
+      }
+      break;
+    }
+    case DisabledUnselectedTransition:
+    {
+      if( disabled )
+      {
+        float opacity = 1.f;
+        if( fadeOutBackgroundImage )
+        {
+          opacity = fadeOutBackgroundImage.GetCurrentOpacity();
+        }
+        StopCheckOutAnimation( checkBox, false );
+        StopCheckInAnimation();
+
+        FadeOutImage( checkBox, Background, backgroundImage, 1.f - opacity );
+        FadeInImage( checkBox, disabledBackgroundImage, opacity );
+
+        StartCheckOutAnimation( checkBox );
+        StartCheckInAnimation();
+
+        mPaintState = UnselectedDisabledTransition;
+      }
+      break;
+    }
+    case SelectedDisabledTransition:
+    {
+      if( !disabled )
+      {
+        float opacity = 1.f;
+        if( fadeOutBackgroundImage )
+        {
+          opacity = fadeOutBackgroundImage.GetCurrentOpacity();
+        }
+        StopCheckOutAnimation( checkBox, false );
+        StopCheckInAnimation();
+
+        FadeOutImage( checkBox, Foreground, disabledSelectedImage, 1.f - opacity );
+        FadeOutImage( checkBox, Background, disabledBackgroundImage, 1.f - opacity );
+        FadeInImage( checkBox, selectedImage, opacity );
+        FadeInImage( checkBox, backgroundImage, opacity );
+
+        StartCheckOutAnimation( checkBox );
+        StartCheckInAnimation();
+
+        mPaintState = DisabledSelectedTransition;
+      }
+      break;
+    }
+    case DisabledSelectedTransition:
+    {
+      if( disabled )
+      {
+        float opacity = 1.f;
+        if( fadeOutBackgroundImage )
+        {
+          opacity = fadeOutBackgroundImage.GetCurrentOpacity();
+        }
+        StopCheckOutAnimation( checkBox, false );
+        StopCheckInAnimation();
+
+        FadeOutImage( checkBox, Foreground, selectedImage, 1.f - opacity );
+        FadeOutImage( checkBox, Background, backgroundImage, 1.f - opacity );
+        FadeInImage( checkBox, disabledSelectedImage, opacity );
+        FadeInImage( checkBox, disabledBackgroundImage, opacity );
+
+        StartCheckOutAnimation( checkBox );
+        StartCheckInAnimation();
+
+        mPaintState = SelectedDisabledTransition;
+      }
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+void CheckBoxButtonDefaultPainter::SetAnimationTime( float animationTime )
+{
+  mAnimationTime = animationTime;
+}
+
+float CheckBoxButtonDefaultPainter::GetAnimationTime() const
+{
+  return mAnimationTime;
+}
+
+void CheckBoxButtonDefaultPainter::SetSelectedImage( Toolkit::Button& button, Actor image )
+{
+  Toolkit::Internal::CheckBoxButton& checkBoxImpl = GetCheckBoxButtonImpl( button );
+  Actor& selectedImage = checkBoxImpl.GetSelectedImage();
+  Actor& fadeOutSelectedImage = checkBoxImpl.GetFadeOutSelectedImage();
+
+  Toolkit::CheckBoxButton& checkBox = static_cast<Toolkit::CheckBoxButton&>( button );
+
+  switch( mPaintState )
+  {
+    case SelectedState:
+    {
+      if( selectedImage && selectedImage.GetParent() )
+      {
+        StopCheckOutAnimation( checkBox );
+        FadeOutImage( checkBox, Foreground, selectedImage );
+
+        selectedImage = image;
+
+        FadeInImage( checkBox, selectedImage );
+
+        StartCheckOutAnimation( checkBox );
+        StartCheckInAnimation();
+      }
+      else
+      {
+        selectedImage = image;
+        checkBox.Add( selectedImage );
+      }
+      break;
+    }
+    case UnselectedSelectedTransition: // FALLTHROUGH
+    case DisabledSelectedTransition:
+    {
+      StopCheckInAnimation();
+      checkBox.Remove( selectedImage );
+
+      selectedImage = image;
+
+      FadeInImage( checkBox, selectedImage );
+      StartCheckInAnimation();
+      break;
+    }
+    case SelectedUnselectedTransition: // FALLTHROUGH
+    case SelectedDisabledTransition:
+    {
+      float opacity = 1.f;
+      if( fadeOutSelectedImage )
+      {
+        opacity = fadeOutSelectedImage.GetCurrentOpacity();
+      }
+      StopCheckOutAnimation( checkBox );
+
+      // Replaces the button image.
+      selectedImage = image;
+
+      checkBox.Add( selectedImage );
+      FadeOutImage( checkBox, Foreground, selectedImage, opacity );
+
+      StartCheckOutAnimation( checkBox );
+      break;
+    }
+    default:
+    {
+      selectedImage = image;
+      break;
+    }
+    }
+
+  selectedImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  selectedImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  ApplySelectedConstraint( selectedImage, FOREGROUND_DEPTH );
+}
+
+void CheckBoxButtonDefaultPainter::SetBackgroundImage( Toolkit::Button& button, Actor image )
+{
+  Toolkit::Internal::CheckBoxButton& checkBoxImpl = GetCheckBoxButtonImpl( button );
+  Actor& backgroundImage = checkBoxImpl.GetBackgroundImage();
+  Actor& fadeOutBackgroundImage = checkBoxImpl.GetFadeOutBackgroundImage();
+
+  Toolkit::CheckBoxButton& checkBox = static_cast<Toolkit::CheckBoxButton&>( button );
+
+  switch( mPaintState )
+  {
+    case UnselectedState:             // FALLTHROUGH
+    case SelectedState:
+    case UnselectedSelectedTransition:
+    case SelectedUnselectedTransition:
     {
       if( backgroundImage && backgroundImage.GetParent() )
       {
@@ -115,8 +473,8 @@ void CheckBoxButtonDefaultPainter::SetBackgroundImage( Toolkit::CheckBoxButton& 
       }
       break;
     }
-    case DisabledUncheckedTransition: // FALLTHROUGH
-    case DisabledCheckedTransition:
+    case DisabledUnselectedTransition: // FALLTHROUGH
+    case DisabledSelectedTransition:
     {
       StopCheckInAnimation();
       checkBox.Remove( backgroundImage );
@@ -127,8 +485,8 @@ void CheckBoxButtonDefaultPainter::SetBackgroundImage( Toolkit::CheckBoxButton& 
       StartCheckInAnimation();
       break;
     }
-    case CheckedDisabledTransition:   // FALLTHROUGH
-    case UncheckedDisabledTransition:
+    case SelectedDisabledTransition:   // FALLTHROUGH
+    case UnselectedDisabledTransition:
     {
       float opacity = 1.f;
       if( fadeOutBackgroundImage )
@@ -158,158 +516,90 @@ void CheckBoxButtonDefaultPainter::SetBackgroundImage( Toolkit::CheckBoxButton& 
   ApplyConstraint( backgroundImage, BACKGROUND_DEPTH );
 }
 
-void CheckBoxButtonDefaultPainter::SetCheckedImage( Toolkit::CheckBoxButton& checkBox, Actor image )
+void CheckBoxButtonDefaultPainter::SetDisabledSelectedImage( Toolkit::Button& button, Actor image )
 {
-  Toolkit::Internal::CheckBoxButton& checkBoxImpl = GetImplementation( checkBox );
-  Actor& checkedImage = checkBoxImpl.GetCheckedImage();
-  Actor& fadeOutCheckedImage = checkBoxImpl.GetFadeOutCheckedImage();
+  Toolkit::Internal::CheckBoxButton& checkBoxImpl = GetCheckBoxButtonImpl( button );
+  Actor& disabledSelectedImage = checkBoxImpl.GetDisabledSelectedImage();
+  Actor& fadeOutSelectedImage = checkBoxImpl.GetFadeOutSelectedImage();
+
+  Toolkit::CheckBoxButton& checkBox = static_cast<Toolkit::CheckBoxButton&>( button );
 
   switch( mPaintState )
   {
-    case CheckedState:
+    case DisabledSelectedState:
     {
-      if( checkedImage && checkedImage.GetParent() )
+      if( disabledSelectedImage && disabledSelectedImage.GetParent() )
       {
         StopCheckOutAnimation( checkBox );
-        FadeOutImage( checkBox, Foreground, checkedImage );
+        FadeOutImage( checkBox, Foreground, disabledSelectedImage );
 
-        checkedImage = image;
+        disabledSelectedImage = image;
 
-        FadeInImage( checkBox, checkedImage );
+        FadeInImage( checkBox, disabledSelectedImage );
 
         StartCheckOutAnimation( checkBox );
         StartCheckInAnimation();
       }
       else
       {
-        checkedImage = image;
-        checkBox.Add( checkedImage );
+        disabledSelectedImage = image;
+        checkBox.Add( disabledSelectedImage );
       }
       break;
     }
-    case UncheckedCheckedTransition: // FALLTHROUGH
-    case DisabledCheckedTransition:
+    case SelectedDisabledTransition:
     {
       StopCheckInAnimation();
-      checkBox.Remove( checkedImage );
+      checkBox.Remove( disabledSelectedImage );
 
-      checkedImage = image;
+      disabledSelectedImage = image;
 
-      FadeInImage( checkBox, checkedImage );
+      FadeInImage( checkBox, disabledSelectedImage );
       StartCheckInAnimation();
       break;
     }
-    case CheckedUncheckedTransition: // FALLTHROUGH
-    case CheckedDisabledTransition:
+    case DisabledSelectedTransition:
     {
       float opacity = 1.f;
-      if( fadeOutCheckedImage )
+      if( fadeOutSelectedImage )
       {
-        opacity = fadeOutCheckedImage.GetCurrentOpacity();
+        opacity = fadeOutSelectedImage.GetCurrentOpacity();
       }
       StopCheckOutAnimation( checkBox );
 
       // Replaces the button image.
-      checkedImage = image;
+      disabledSelectedImage = image;
 
-      checkBox.Add( checkedImage );
-      FadeOutImage( checkBox, Foreground, checkedImage, opacity );
+      checkBox.Add( disabledSelectedImage );
+      FadeOutImage( checkBox, Foreground, disabledSelectedImage, opacity );
 
       StartCheckOutAnimation( checkBox );
       break;
     }
     default:
     {
-      checkedImage = image;
-      break;
-    }
-    }
-
-  checkedImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  checkedImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  ApplyCheckedConstraint( checkedImage, FOREGROUND_DEPTH );
-}
-
-void CheckBoxButtonDefaultPainter::SetDisabledCheckedImage( Toolkit::CheckBoxButton& checkBox, Actor image )
-{
-  Toolkit::Internal::CheckBoxButton& checkBoxImpl = GetImplementation( checkBox );
-  Actor& disabledCheckedImage = checkBoxImpl.GetDisabledCheckedImage();
-  Actor& fadeOutCheckedImage = checkBoxImpl.GetFadeOutCheckedImage();
-
-  switch( mPaintState )
-  {
-    case DisabledCheckedState:
-    {
-      if( disabledCheckedImage && disabledCheckedImage.GetParent() )
-      {
-        StopCheckOutAnimation( checkBox );
-        FadeOutImage( checkBox, Foreground, disabledCheckedImage );
-
-        disabledCheckedImage = image;
-
-        FadeInImage( checkBox, disabledCheckedImage );
-
-        StartCheckOutAnimation( checkBox );
-        StartCheckInAnimation();
-      }
-      else
-      {
-        disabledCheckedImage = image;
-        checkBox.Add( disabledCheckedImage );
-      }
-      break;
-    }
-    case CheckedDisabledTransition:
-    {
-      StopCheckInAnimation();
-      checkBox.Remove( disabledCheckedImage );
-
-      disabledCheckedImage = image;
-
-      FadeInImage( checkBox, disabledCheckedImage );
-      StartCheckInAnimation();
-      break;
-    }
-    case DisabledCheckedTransition:
-    {
-      float opacity = 1.f;
-      if( fadeOutCheckedImage )
-      {
-        opacity = fadeOutCheckedImage.GetCurrentOpacity();
-      }
-      StopCheckOutAnimation( checkBox );
-
-      // Replaces the button image.
-      disabledCheckedImage = image;
-
-      checkBox.Add( disabledCheckedImage );
-      FadeOutImage( checkBox, Foreground, disabledCheckedImage, opacity );
-
-      StartCheckOutAnimation( checkBox );
-      break;
-    }
-    default:
-    {
-      disabledCheckedImage = image;
+      disabledSelectedImage = image;
       break;
     }
   }
 
-  disabledCheckedImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  disabledCheckedImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  ApplyConstraint( disabledCheckedImage, FOREGROUND_DEPTH );
+  disabledSelectedImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  disabledSelectedImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  ApplyConstraint( disabledSelectedImage, FOREGROUND_DEPTH );
 }
 
-void CheckBoxButtonDefaultPainter::SetDisabledBackgroundImage( Toolkit::CheckBoxButton& checkBox, Actor image )
+void CheckBoxButtonDefaultPainter::SetDisabledBackgroundImage( Toolkit::Button& button, Actor image )
 {
-  Toolkit::Internal::CheckBoxButton& checkBoxImpl = GetImplementation( checkBox );
+  Toolkit::Internal::CheckBoxButton& checkBoxImpl = GetCheckBoxButtonImpl( button );
   Actor& disabledBackgroundImage = checkBoxImpl.GetDisabledBackgroundImage();
   Actor& fadeOutBackgroundImage = checkBoxImpl.GetFadeOutBackgroundImage();
 
+  Toolkit::CheckBoxButton& checkBox = static_cast<Toolkit::CheckBoxButton&>( button );
+
   switch( mPaintState )
   {
-    case DisabledCheckedState:   // FALLTHROUGH
-    case DisabledUncheckedState:
+    case DisabledSelectedState:   // FALLTHROUGH
+    case DisabledUnselectedState:
     {
       if( disabledBackgroundImage && disabledBackgroundImage.GetParent() )
       {
@@ -330,8 +620,8 @@ void CheckBoxButtonDefaultPainter::SetDisabledBackgroundImage( Toolkit::CheckBox
       }
       break;
     }
-    case UncheckedDisabledTransition: // FALLTHROUGH
-    case CheckedDisabledTransition:
+    case UnselectedDisabledTransition: // FALLTHROUGH
+    case SelectedDisabledTransition:
     {
       StopCheckInAnimation();
       checkBox.Remove( disabledBackgroundImage );
@@ -342,8 +632,8 @@ void CheckBoxButtonDefaultPainter::SetDisabledBackgroundImage( Toolkit::CheckBox
       StartCheckInAnimation();
       break;
     }
-    case DisabledUncheckedTransition: // FALLTHROUGH
-    case DisabledCheckedTransition:
+    case DisabledUnselectedTransition: // FALLTHROUGH
+    case DisabledSelectedTransition:
     {
       float opacity = 1.f;
       if( fadeOutBackgroundImage )
@@ -373,345 +663,67 @@ void CheckBoxButtonDefaultPainter::SetDisabledBackgroundImage( Toolkit::CheckBox
   ApplyConstraint( disabledBackgroundImage, BACKGROUND_DEPTH );
 }
 
-void CheckBoxButtonDefaultPainter::Initialize( Toolkit::Button& button )
-{
-  Toolkit::Internal::CheckBoxButton& buttonImpl = GetCheckBoxButtonImpl( button );
-  Actor& backgroundImage = buttonImpl.GetBackgroundImage();
-  Actor& checkedImage = buttonImpl.GetCheckedImage();
-  Actor& disabledBackgroundImage = buttonImpl.GetDisabledBackgroundImage();
-  Actor& disabledCheckedImage = buttonImpl.GetDisabledCheckedImage();
-
-  Toolkit::CheckBoxButton& checkBox = static_cast<Toolkit::CheckBoxButton&>( button );
-
-  if( backgroundImage )
-  {
-    SetBackgroundImage( checkBox, backgroundImage );
-  }
-
-  if( checkedImage )
-  {
-    SetCheckedImage( checkBox, checkedImage );
-  }
-
-  if( disabledBackgroundImage )
-  {
-    SetDisabledBackgroundImage( checkBox, disabledBackgroundImage );
-  }
-
-  if( disabledCheckedImage )
-  {
-    SetDisabledCheckedImage( checkBox, disabledCheckedImage );
-  }
-
-  SetDisabled( button, mDisabled );
-}
-
-void CheckBoxButtonDefaultPainter::SetSize( Toolkit::Button& button, const Vector3& size )
-{
-  Toolkit::Internal::CheckBoxButton& buttonImpl = GetCheckBoxButtonImpl( button );
-  Actor& backgroundImage = buttonImpl.GetBackgroundImage();
-  Actor& checkedImage = buttonImpl.GetCheckedImage();
-  Actor& disabledBackgroundImage = buttonImpl.GetDisabledBackgroundImage();
-  Actor& disabledCheckedImage = buttonImpl.GetDisabledCheckedImage();
-
-  ApplyCheckedConstraint( checkedImage, FOREGROUND_DEPTH );
-  ApplyConstraint( backgroundImage, BACKGROUND_DEPTH );
-  ApplyConstraint( disabledCheckedImage, FOREGROUND_DEPTH );
-  ApplyConstraint( disabledBackgroundImage, BACKGROUND_DEPTH );
-}
-
-void CheckBoxButtonDefaultPainter::SetDisabled( Toolkit::Button& button, bool disabled )
-{
-  mDisabled = disabled;
-
-  Toolkit::Internal::CheckBoxButton& buttonImpl = GetCheckBoxButtonImpl( button );
-  Actor& backgroundImage = buttonImpl.GetBackgroundImage();
-  Actor& checkedImage = buttonImpl.GetCheckedImage();
-  Actor& disabledBackgroundImage = buttonImpl.GetDisabledBackgroundImage();
-  Actor& disabledCheckedImage = buttonImpl.GetDisabledCheckedImage();
-  Actor& fadeOutCheckedImage = buttonImpl.GetFadeOutCheckedImage();
-  Actor& fadeOutBackgroundImage = buttonImpl.GetFadeOutBackgroundImage();
-
-  Toolkit::CheckBoxButton& checkBox = static_cast<Toolkit::CheckBoxButton&>( button );
-
-  switch( mPaintState )
-  {
-    case UncheckedState:
-    {
-      if( disabled )
-      {
-        StopCheckOutAnimation( checkBox );
-        FadeOutImage( checkBox, Background, backgroundImage );
-        FadeInImage( checkBox, disabledBackgroundImage );
-        StartCheckOutAnimation( checkBox );
-        StartCheckInAnimation();
-
-        mPaintState = UncheckedDisabledTransition;
-      }
-      break;
-    }
-    case CheckedState:
-    {
-      if( disabled )
-      {
-        StopCheckOutAnimation( checkBox );
-        FadeOutImage( checkBox, Background, backgroundImage );
-        FadeOutImage( checkBox, Foreground, checkedImage );
-        FadeInImage( checkBox, disabledCheckedImage );
-        FadeInImage( checkBox, disabledBackgroundImage );
-        StartCheckOutAnimation( checkBox );
-        StartCheckInAnimation();
-
-        mPaintState = CheckedDisabledTransition;
-      }
-      break;
-    }
-    case DisabledUncheckedState:
-    {
-      if( !disabled )
-      {
-        StopCheckOutAnimation( checkBox );
-        FadeOutImage( checkBox, Background, disabledBackgroundImage );
-        FadeInImage( checkBox, backgroundImage );
-        StartCheckOutAnimation( checkBox );
-        StartCheckInAnimation();
-
-        mPaintState = DisabledUncheckedTransition;
-      }
-      break;
-    }
-    case DisabledCheckedState:
-    {
-      if( !disabled )
-      {
-        StopCheckOutAnimation( checkBox );
-        FadeOutImage( checkBox, Background, disabledBackgroundImage );
-        FadeOutImage( checkBox, Foreground, disabledCheckedImage );
-        FadeInImage( checkBox, backgroundImage );
-        FadeInImage( checkBox, checkedImage );
-        StartCheckOutAnimation( checkBox );
-        StartCheckInAnimation();
-
-        mPaintState = DisabledCheckedTransition;
-      }
-      break;
-    }
-    case UncheckedCheckedTransition:
-    {
-      if( disabled )
-      {
-        float opacity = 1.f;
-        if( checkedImage )
-        {
-          opacity = checkedImage.GetCurrentOpacity();
-        }
-        StopCheckOutAnimation( checkBox );
-        StopCheckInAnimation();
-
-        FadeOutImage( checkBox, Foreground, checkedImage, opacity );
-        FadeOutImage( checkBox, Background, backgroundImage );
-
-        FadeInImage( checkBox, disabledCheckedImage );
-        FadeInImage( checkBox, disabledBackgroundImage );
-
-        StartCheckOutAnimation( checkBox );
-        StartCheckInAnimation();
-
-        mPaintState = CheckedDisabledTransition;
-      }
-      break;
-    }
-    case CheckedUncheckedTransition:
-    {
-      if( disabled )
-      {
-        float opacity = 1.f;
-        if( fadeOutCheckedImage )
-        {
-          opacity = fadeOutCheckedImage.GetCurrentOpacity();
-        }
-        StopCheckOutAnimation( checkBox );
-        StopCheckInAnimation();
-
-        button.Add( disabledCheckedImage );
-        FadeOutImage( checkBox, Foreground, disabledCheckedImage, opacity );
-        FadeOutImage( checkBox, Background, backgroundImage );
-
-        FadeInImage( checkBox, disabledBackgroundImage );
-
-        StartCheckOutAnimation( checkBox );
-        StartCheckInAnimation();
-
-        mPaintState = UncheckedDisabledTransition;
-      }
-      break;
-    }
-    case UncheckedDisabledTransition:
-    {
-      if( !disabled )
-      {
-        float opacity = 1.f;
-        if( fadeOutBackgroundImage )
-        {
-          opacity = fadeOutBackgroundImage.GetCurrentOpacity();
-        }
-        StopCheckOutAnimation( checkBox, false );
-        StopCheckInAnimation();
-
-        FadeOutImage( checkBox, Background, disabledBackgroundImage, 1.f - opacity );
-        FadeInImage( checkBox, backgroundImage, opacity );
-
-        StartCheckOutAnimation( checkBox );
-        StartCheckInAnimation();
-
-        mPaintState = DisabledUncheckedTransition;
-      }
-      break;
-    }
-    case DisabledUncheckedTransition:
-    {
-      if( disabled )
-      {
-        float opacity = 1.f;
-        if( fadeOutBackgroundImage )
-        {
-          opacity = fadeOutBackgroundImage.GetCurrentOpacity();
-        }
-        StopCheckOutAnimation( checkBox, false );
-        StopCheckInAnimation();
-
-        FadeOutImage( checkBox, Background, backgroundImage, 1.f - opacity );
-        FadeInImage( checkBox, disabledBackgroundImage, opacity );
-
-        StartCheckOutAnimation( checkBox );
-        StartCheckInAnimation();
-
-        mPaintState = UncheckedDisabledTransition;
-      }
-      break;
-    }
-    case CheckedDisabledTransition:
-    {
-      if( !disabled )
-      {
-        float opacity = 1.f;
-        if( fadeOutBackgroundImage )
-        {
-          opacity = fadeOutBackgroundImage.GetCurrentOpacity();
-        }
-        StopCheckOutAnimation( checkBox, false );
-        StopCheckInAnimation();
-
-        FadeOutImage( checkBox, Foreground, disabledCheckedImage, 1.f - opacity );
-        FadeOutImage( checkBox, Background, disabledBackgroundImage, 1.f - opacity );
-        FadeInImage( checkBox, checkedImage, opacity );
-        FadeInImage( checkBox, backgroundImage, opacity );
-
-        StartCheckOutAnimation( checkBox );
-        StartCheckInAnimation();
-
-        mPaintState = DisabledCheckedTransition;
-      }
-      break;
-    }
-    case DisabledCheckedTransition:
-    {
-      if( disabled )
-      {
-        float opacity = 1.f;
-        if( fadeOutBackgroundImage )
-        {
-          opacity = fadeOutBackgroundImage.GetCurrentOpacity();
-        }
-        StopCheckOutAnimation( checkBox, false );
-        StopCheckInAnimation();
-
-        FadeOutImage( checkBox, Foreground, checkedImage, 1.f - opacity );
-        FadeOutImage( checkBox, Background, backgroundImage, 1.f - opacity );
-        FadeInImage( checkBox, disabledCheckedImage, opacity );
-        FadeInImage( checkBox, disabledBackgroundImage, opacity );
-
-        StartCheckOutAnimation( checkBox );
-        StartCheckInAnimation();
-
-        mPaintState = CheckedDisabledTransition;
-      }
-      break;
-    }
-    default:
-      break;
-  }
-}
-
-void CheckBoxButtonDefaultPainter::SetAnimationTime( float animationTime )
-{
-  mAnimationTime = animationTime;
-}
-
-float CheckBoxButtonDefaultPainter::GetAnimationTime() const
-{
-  return mAnimationTime;
-}
-
-void CheckBoxButtonDefaultPainter::Checked( Toolkit::CheckBoxButton& button )
+void CheckBoxButtonDefaultPainter::Selected( Toolkit::Button& button )
 {
   Toolkit::Internal::CheckBoxButton& checkBoxImpl = GetCheckBoxButtonImpl( button );
-  Actor& checkedImage = checkBoxImpl.GetCheckedImage();
-  Actor& fadeOutCheckedImage = checkBoxImpl.GetFadeOutCheckedImage();
+  Actor& selectedImage = checkBoxImpl.GetSelectedImage();
+  Actor& fadeOutSelectedImage = checkBoxImpl.GetFadeOutSelectedImage();
+
+  Toolkit::CheckBoxButton& checkBoxButton = static_cast<Toolkit::CheckBoxButton&>( button );
 
   switch( mPaintState )
   {
-    case UncheckedState:
+    case UnselectedState:
     {
       // Fade in the 'check' actor.
-      FadeInImage( button, checkedImage );
-      SetupCheckedAnimation( button, checkedImage );    // Animate in the check actor
+      FadeInImage( checkBoxButton, selectedImage );
+      SetupSelectedAnimation( checkBoxButton, selectedImage );    // Animate in the check actor
       StartCheckInAnimation();
 
-      mPaintState = UncheckedCheckedTransition;
+      mPaintState = UnselectedSelectedTransition;
       break;
     }
-    case CheckedState:
+    case SelectedState:
     {
       // Fade out the 'check' actor.
-      StopCheckOutAnimation( button );
-      FadeOutImage( button, Foreground, checkedImage );
-      StartCheckOutAnimation( button );
+      StopCheckOutAnimation( checkBoxButton );
+      FadeOutImage( checkBoxButton, Foreground, selectedImage );
+      StartCheckOutAnimation( checkBoxButton );
 
-      mPaintState = UncheckedState;
+      mPaintState = UnselectedState;
       break;
     }
-    case UncheckedCheckedTransition:
+    case UnselectedSelectedTransition:
     {
       // Stop fade in and start fade out.
-      StopCheckOutAnimation( button );
+      StopCheckOutAnimation( checkBoxButton );
       StopCheckInAnimation();
 
       float opacity = 0.f;
-      if( checkedImage )
+      if( selectedImage )
       {
-        opacity = checkedImage.GetCurrentOpacity();
+        opacity = selectedImage.GetCurrentOpacity();
       }
-      FadeOutImage( button, Foreground, checkedImage, opacity );
-      StartCheckOutAnimation( button );
+      FadeOutImage( checkBoxButton, Foreground, selectedImage, opacity );
+      StartCheckOutAnimation( checkBoxButton );
 
-      mPaintState = UncheckedState;
+      mPaintState = UnselectedState;
       break;
     }
-    case CheckedUncheckedTransition:
+    case SelectedUnselectedTransition:
     {
       // Stop fade out and start fade in.
       float opacity = 1.f;
-      if( fadeOutCheckedImage )
+      if( fadeOutSelectedImage )
       {
-        opacity = fadeOutCheckedImage.GetCurrentOpacity();
+        opacity = fadeOutSelectedImage.GetCurrentOpacity();
       }
-      StopCheckOutAnimation( button );
+      StopCheckOutAnimation( checkBoxButton );
 
-      FadeInImage( button, checkedImage, opacity );
+      FadeInImage( checkBoxButton, selectedImage, opacity );
       StartCheckInAnimation();
 
-      mPaintState = UncheckedCheckedTransition;
+      mPaintState = UnselectedSelectedTransition;
       break;
     }
     default:
@@ -729,7 +741,7 @@ void CheckBoxButtonDefaultPainter::ApplyConstraint( Actor& actor, float depth )
   }
 }
 
-void CheckBoxButtonDefaultPainter::ApplyCheckedConstraint( Actor& actor, float depth )
+void CheckBoxButtonDefaultPainter::ApplySelectedConstraint( Actor& actor, float depth )
 {
   if( actor )
   {
@@ -799,14 +811,14 @@ void CheckBoxButtonDefaultPainter::StopCheckOutAnimation( Toolkit::CheckBoxButto
   }
 
   Toolkit::Internal::CheckBoxButton& checkBoxImpl = GetCheckBoxButtonImpl( checkBox );
-  Actor& fadeOutCheckedImage = checkBoxImpl.GetFadeOutCheckedImage();
+  Actor& fadeOutSelectedImage = checkBoxImpl.GetFadeOutSelectedImage();
   Actor& fadeOutBackgroundImage = checkBoxImpl.GetFadeOutBackgroundImage();
 
   if( remove )
   {
-    if( fadeOutCheckedImage && fadeOutCheckedImage.GetParent() )
+    if( fadeOutSelectedImage && fadeOutSelectedImage.GetParent() )
     {
-      fadeOutCheckedImage.GetParent().Remove( fadeOutCheckedImage );
+      fadeOutSelectedImage.GetParent().Remove( fadeOutSelectedImage );
     }
 
     if( fadeOutBackgroundImage && fadeOutBackgroundImage.GetParent() )
@@ -814,7 +826,7 @@ void CheckBoxButtonDefaultPainter::StopCheckOutAnimation( Toolkit::CheckBoxButto
       fadeOutBackgroundImage.GetParent().Remove( fadeOutBackgroundImage );
     }
 
-    fadeOutCheckedImage.Reset();
+    fadeOutSelectedImage.Reset();
     fadeOutBackgroundImage.Reset();
   }
 }
@@ -837,10 +849,10 @@ void CheckBoxButtonDefaultPainter::FadeOutImage( Toolkit::CheckBoxButton& checkB
   if( image )
   {
     Toolkit::Internal::CheckBoxButton& checkBoxImpl = GetCheckBoxButtonImpl( checkBox );
-    Actor& fadeOutCheckedImage = checkBoxImpl.GetFadeOutCheckedImage();
+    Actor& fadeOutSelectedImage = checkBoxImpl.GetFadeOutSelectedImage();
     Actor& fadeOutBackgroundImage = checkBoxImpl.GetFadeOutBackgroundImage();
 
-    Actor& actorLayer = ( ( Background == layer ) ? fadeOutBackgroundImage : fadeOutCheckedImage );
+    Actor& actorLayer = ( ( Background == layer ) ? fadeOutBackgroundImage : fadeOutSelectedImage );
 
     actorLayer = image;
 
@@ -863,7 +875,7 @@ void CheckBoxButtonDefaultPainter::AddToCheckInAnimation( const Actor& actor )
   mCheckInAnimation.AnimateTo( Property( handle, Actor::SCALE_X ), 1.0f);
 }
 
-void CheckBoxButtonDefaultPainter::SetupCheckedAnimation( Toolkit::CheckBoxButton& checkBox, Actor& image )
+void CheckBoxButtonDefaultPainter::SetupSelectedAnimation( Toolkit::CheckBoxButton& checkBox, Actor& image )
 {
   if( image )
   {
@@ -892,34 +904,34 @@ void CheckBoxButtonDefaultPainter::EndCheckOutAnimation()
 {
   switch( mPaintState )
   {
-    case UncheckedCheckedTransition:
+    case UnselectedSelectedTransition:
     {
-      mPaintState = CheckedState;
+      mPaintState = SelectedState;
       break;
     }
-    case CheckedUncheckedTransition:
+    case SelectedUnselectedTransition:
     {
-      mPaintState = UncheckedState;
+      mPaintState = UnselectedState;
       break;
     }
-    case UncheckedDisabledTransition:
+    case UnselectedDisabledTransition:
     {
-      mPaintState = DisabledUncheckedState;
+      mPaintState = DisabledUnselectedState;
       break;
     }
-    case DisabledUncheckedTransition:
+    case DisabledUnselectedTransition:
     {
-      mPaintState = UncheckedState;
+      mPaintState = UnselectedState;
       break;
     }
-    case CheckedDisabledTransition:
+    case SelectedDisabledTransition:
     {
-      mPaintState = DisabledCheckedState;
+      mPaintState = DisabledSelectedState;
       break;
     }
-    case DisabledCheckedTransition:
+    case DisabledSelectedTransition:
     {
-      mPaintState = CheckedState;
+      mPaintState = SelectedState;
       break;
     }
     default:
@@ -942,34 +954,34 @@ void CheckBoxButtonDefaultPainter::CheckInAnimationFinished( Dali::Animation& so
 {
   switch( mPaintState )
   {
-    case UncheckedCheckedTransition:
+    case UnselectedSelectedTransition:
     {
-      mPaintState = CheckedState;
+      mPaintState = SelectedState;
       break;
     }
-    case CheckedUncheckedTransition:
+    case SelectedUnselectedTransition:
     {
-      mPaintState = UncheckedState;
+      mPaintState = UnselectedState;
       break;
     }
-    case UncheckedDisabledTransition:
+    case UnselectedDisabledTransition:
     {
-      mPaintState = DisabledUncheckedState;
+      mPaintState = DisabledUnselectedState;
       break;
     }
-    case DisabledUncheckedTransition:
+    case DisabledUnselectedTransition:
     {
-      mPaintState = UncheckedState;
+      mPaintState = UnselectedState;
       break;
     }
-    case CheckedDisabledTransition:
+    case SelectedDisabledTransition:
     {
-      mPaintState = DisabledCheckedState;
+      mPaintState = DisabledSelectedState;
       break;
     }
-    case DisabledCheckedTransition:
+    case DisabledSelectedTransition:
     {
-      mPaintState = CheckedState;
+      mPaintState = SelectedState;
       break;
     }
     default:

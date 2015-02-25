@@ -19,7 +19,11 @@
 #include <dali-toolkit/public-api/shader-effects/nine-patch-mask-effect.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/object/property-input.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/public-api/images/resource-image.h>
 
 namespace Dali
 {
@@ -83,7 +87,7 @@ static void DoApply( ImageActor actor, const std::string& maskImage, const Vecto
     GeometryType( GEOMETRY_TYPE_IMAGE ),
     ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ) );
 
-  maskEffect.SetEffectImage( Image::New( maskImage ) );
+  maskEffect.SetEffectImage( ResourceImage::New( maskImage ) );
 
   maskEffect.SetUniform( "uImageSize", Vector2(0,0) /*Constrained to actor size*/ );
   maskEffect.ApplyConstraint( Constraint::New<Vector2>( maskEffect.GetPropertyIndex("uImageSize"),
@@ -101,7 +105,7 @@ static void DoApply( ImageActor actor, const std::string& maskImage, const Vecto
 
 void Apply( ImageActor actor, const std::string& maskImage )
 {
-  Vector2 maskSize = Image::GetImageSize( maskImage );
+  Vector2 maskSize = ResourceImage::GetImageSize( maskImage );
 
   const float leftRight = (maskSize.width  - 1.0f) * 0.5f;
   const float topBottom = (maskSize.height - 1.0f) * 0.5f;
@@ -111,7 +115,7 @@ void Apply( ImageActor actor, const std::string& maskImage )
 
 void Apply( ImageActor actor, const std::string& maskImage, const Vector4& maskBorder )
 {
-  Vector2 maskSize = Image::GetImageSize( maskImage );
+  Vector2 maskSize = ResourceImage::GetImageSize( maskImage );
 
   DoApply( actor, maskImage, maskSize, maskBorder );
 }

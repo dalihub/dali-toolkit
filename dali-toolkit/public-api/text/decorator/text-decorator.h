@@ -75,7 +75,7 @@ public:
    * @param[in] parent Decorations will be added to this parent control.
    * @return A pointer to a new Decorator.
    */
-  static DecoratorPtr New( Internal::Control& parent );
+  static DecoratorPtr New( Dali::Toolkit::Internal::Control& parent );
 
   /**
    * @brief The decorator waits until a relayout before creating actors etc.
@@ -200,7 +200,7 @@ private:
    * @brief Private constructor.
    * @param[in] parent Decorations will be added to this parent control.
    */
-  Decorator(Internal::Control& parent);
+  Decorator(Dali::Toolkit::Internal::Control& parent);
 
   // Undefined
   Decorator( const Decorator& handle );

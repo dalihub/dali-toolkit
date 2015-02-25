@@ -106,7 +106,7 @@ int UtcDaliDisplacementEffectTestSetProperty(void)
   Toolkit::DisplacementEffect effect = Toolkit::DisplacementEffect::New(Toolkit::DisplacementEffect::DISPLACED);
   DALI_TEST_CHECK( effect );
 
-  ImageActor actor = ImageActor::New( Image::New(TEST_IMAGE_FILE_NAME) );
+  ImageActor actor = ImageActor::New( ResourceImage::New(TEST_IMAGE_FILE_NAME) );
   actor.SetSize( 100.0f, 100.0f );
   actor.SetShaderEffect( effect );
   Stage::GetCurrent().Add( actor );
@@ -114,7 +114,7 @@ int UtcDaliDisplacementEffectTestSetProperty(void)
   Toolkit::DisplacementEffect effect2 = Toolkit::DisplacementEffect::New(Toolkit::DisplacementEffect::FIXED);
   DALI_TEST_CHECK( effect );
 
-  ImageActor actor2 = ImageActor::New( Image::New(TEST_IMAGE_FILE_NAME) );
+  ImageActor actor2 = ImageActor::New( ResourceImage::New(TEST_IMAGE_FILE_NAME) );
   actor2.SetSize( 100.0f, 100.0f );
   actor2.SetShaderEffect( effect2 );
   Stage::GetCurrent().Add( actor2 );

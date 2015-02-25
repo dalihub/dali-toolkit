@@ -326,9 +326,8 @@ int UtcDaliCubeTransitionEffectSetCurrentImage(void)
 
   //check the size of the off screen rendered image
   Wait( application, OFFSCREEN_RENDER_DURATION );
-  ImageAttributes attributes( tile.GetImage().GetAttributes() );
-  DALI_TEST_EQUALS( static_cast<float>(attributes.GetWidth()), VIEW_AREA_SIZE.x, TEST_LOCATION  );
-  DALI_TEST_EQUALS( static_cast<float>(attributes.GetHeight()), VIEW_AREA_SIZE.y, TEST_LOCATION  );
+  DALI_TEST_EQUALS( tile.GetImage().GetWidth(), VIEW_AREA_SIZE.x, TEST_LOCATION  );
+  DALI_TEST_EQUALS( tile.GetImage().GetHeight(), VIEW_AREA_SIZE.y, TEST_LOCATION  );
   END_TEST;
 }
 
@@ -358,9 +357,8 @@ int UtcDaliCubeTransitionEffectSetTargetImage(void)
 
   //check the size of the off screen rendered image
   Wait( application, OFFSCREEN_RENDER_DURATION );
-  ImageAttributes attributes( tile.GetImage().GetAttributes() );
-  DALI_TEST_EQUALS( static_cast<float>(attributes.GetWidth()), VIEW_AREA_SIZE.x, TEST_LOCATION  );
-  DALI_TEST_EQUALS( static_cast<float>(attributes.GetHeight()), VIEW_AREA_SIZE.y, TEST_LOCATION  );
+  DALI_TEST_EQUALS( tile.GetImage().GetWidth(), VIEW_AREA_SIZE.x, TEST_LOCATION  );
+  DALI_TEST_EQUALS( tile.GetImage().GetHeight(), VIEW_AREA_SIZE.y, TEST_LOCATION  );
   END_TEST;
 }
 
@@ -370,7 +368,7 @@ int UtcDaliCubeTransitionWaveEffectStartTransition(void)
   tet_infoline(" UtcDaliCubeTransitionWaveEffectStartTransition ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-  ImageActor imageActor = CreateSolidColorImageActor(application, Color::BLUE,30,30);
+  ImageActor imageActor = ImageActor::New(ResourceImage::New("Image.jpg"));
 
   CubeTransitionEffect waveEffect = CubeTransitionWaveEffect::New( NUM_ROWS, NUM_COLUMNS, VIEW_AREA_SIZE );
   waveEffect.SetTransitionDuration( TRANSITION_DURATION );
@@ -421,7 +419,7 @@ int UtcDaliCubeTransitionCrossEffectStartTransition(void)
   tet_infoline(" UtcDaliCubeTransitionCrossEffectStartTransition ");
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-  ImageActor imageActor = CreateSolidColorImageActor(application, Color::BLUE,30,30);
+  ImageActor imageActor = ImageActor::New(ResourceImage::New("Image.jpg"));
 
   CubeTransitionEffect crossEffect = CubeTransitionCrossEffect::New( NUM_ROWS, NUM_COLUMNS, VIEW_AREA_SIZE );
   crossEffect.SetTransitionDuration( TRANSITION_DURATION );

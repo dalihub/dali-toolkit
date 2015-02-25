@@ -57,12 +57,12 @@ class RadioButton: public Button
   /**
    * Construct a new PushButton with label.
    */
-  RadioButton(const std::string& label);
+  RadioButton( const std::string& label );
 
   /**
    * Construct a new PushButton with label.
    */
-  RadioButton(Actor label);
+  RadioButton( Actor label );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -70,52 +70,19 @@ class RadioButton: public Button
   virtual ~RadioButton();
 
   /**
-   * @copydoc Dali::Toolkit::RadioButton::SetLabel(const std::string& label)
+   * @copydoc Dali::Toolkit::Button::SetLabel( Actor label )
    */
-  void SetLabel(const std::string& label);
+  virtual void SetLabel( Actor label );   // TODO: After refactoring painter, this will be removed
 
   /**
-   * @copydoc Dali::Toolkit::RadioButton::SetLabel(Actor label)
+   * @copydoc Dali::Toolkit::Button::SetSelected( bool selected )
    */
-  void SetLabel(Actor label);
-
-  /**
-   * @copydoc Dali::Toolkit::RadioButton::GetLabel()
-   */
-  Actor GetLabel() const;
-
-  /**
-   * @copydoc Dali::Toolkit::RadioButton::SetSelected(bool selected)
-   */
-  void SetSelected(bool selected);
-
-  /**
-   * @copydoc Dali::Toolkit::RadioButton::IsSelected()
-   */
-  bool IsSelected()const;
-
-  /**
-   * @copydoc Dali::Toolkit::RadioButton::ToggleState()
-   */
-  void ToggleState();
+  virtual void SetSelected( bool selected );
 
   /**
    * @copydoc Dali::Toolkit::Control::OnRelayout()
    */
   virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
-
- public:
-  // Properties
-
-  /**
-   * @copydoc Button::SetProperty
-   */
-  static void SetProperty(BaseObject* object, Property::Index propertyIndex, const Property::Value& value);
-
-  /**
-   * @copydoc Button::GetProperty
-   */
-  static Property::Value GetProperty(BaseObject* object, Property::Index propertyIndex);
 
  protected: // From Control
 
@@ -133,17 +100,15 @@ class RadioButton: public Button
  private:
 
   // Undefined
-  RadioButton(const RadioButton& origin);
+  RadioButton( const RadioButton& origin );
 
   // Undefined
-  RadioButton& operator=(const RadioButton& origin);
+  RadioButton& operator=( const RadioButton& origin );
 
   Image mUnselectedImage;  ///< Stores the unselected image
   Image mSelectedImage;    ///< Stores the selected image
   ImageActor mRadioIcon;   ///< Stores the current image
-  Actor mLabel;            ///< Stores the button label
-  bool mSelected;          ///< Stores the selected state
-} ;
+};
 
 } // namespace Internal
 

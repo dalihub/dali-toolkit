@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/images/image.h>
+#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 
@@ -122,8 +122,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::PROPERTY_CURSOR_IMAGE:
       {
-        Image image = Image::New( value.Get< std::string >() );
-        //ResourceImage image = ResourceImage::New( value.Get< std::string >() );
+        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
 
         if( impl.mDecorator )
         {
@@ -201,12 +200,10 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mDecorator )
         {
-          Image image = impl.mDecorator->GetCursorImage();
-          //ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetCursorImage() );
+          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetCursorImage() );
           if( image )
           {
-            value = image.GetFilename();
-            //value = image.GetUrl();
+            value = image.GetUrl();
           }
         }
         break;

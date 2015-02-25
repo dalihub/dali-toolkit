@@ -1090,7 +1090,7 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
       {
         if( item.HasKey( "policy" ) && item.HasKey( "value" ) )
         {
-          Toolkit::TableView::LayoutPolicy policy = Scripting::GetEnumeration< Toolkit::TableView::LayoutPolicy >( item.GetValue("policy").Get<std::string>(), LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT );
+          Toolkit::TableView::LayoutPolicy policy = Scripting::GetEnumeration< Toolkit::TableView::LayoutPolicy >( item.GetValue("policy").Get<std::string>().c_str(), LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT );
           if( policy == Toolkit::TableView::Fixed )
           {
             (tableViewImpl.*funcFixed)( rowIndex, item.GetValue("value").Get<float>() );

@@ -66,7 +66,7 @@ public: // From ItemFactory
   virtual Actor NewItem(unsigned int itemId)
   {
     // Create an image actor for this item
-    Image image = Image::New( TEST_IMAGE_FILE_NAME );
+    Image image = ResourceImage::New( TEST_IMAGE_FILE_NAME );
     Actor actor = ImageActor::New(image);
 
     return actor;
@@ -92,48 +92,5 @@ int UtcDaliItemLayoutSetAndGetOrientation(void)
 
   // Check the orientation of the layout is horizontal from left to right
   DALI_TEST_CHECK(layout->GetOrientation() == ControlOrientation::Left);
-  END_TEST;
-}
-
-int UtcDaliItemLayoutGetScrollHints(void)
-{
-  ToolkitTestApplication application;
-
-  // Create the ItemView actor
-  TestItemFactory factory;
-  ItemView view = ItemView::New(factory);
-
-  // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
-  view.AddLayout(*gridLayout);
-
-  // Set the orientation of the layout to be horizontal from left to right
-  ItemLayoutPtr layout = view.GetLayout(0);
-
-  Vector2 axisScrollHint;
-
-  layout->SetOrientation(ControlOrientation::Up);
-  layout->GetXAxisScrollHint(axisScrollHint);
-  DALI_TEST_EQUALS(axisScrollHint, Vector2::ZERO, Math::MACHINE_EPSILON_1, TEST_LOCATION);
-  layout->GetYAxisScrollHint(axisScrollHint);
-  DALI_TEST_EQUALS(axisScrollHint, Vector2::YAXIS, Math::MACHINE_EPSILON_1, TEST_LOCATION);
-
-  layout->SetOrientation(ControlOrientation::Down);
-  layout->GetXAxisScrollHint(axisScrollHint);
-  DALI_TEST_EQUALS(axisScrollHint, Vector2::ZERO, Math::MACHINE_EPSILON_1, TEST_LOCATION);
-  layout->GetYAxisScrollHint(axisScrollHint);
-  DALI_TEST_EQUALS(axisScrollHint, Vector2::YAXIS, Math::MACHINE_EPSILON_1, TEST_LOCATION);
-
-  layout->SetOrientation(ControlOrientation::Left);
-  layout->GetXAxisScrollHint(axisScrollHint);
-  DALI_TEST_EQUALS(axisScrollHint, Vector2::XAXIS, Math::MACHINE_EPSILON_1, TEST_LOCATION);
-  layout->GetYAxisScrollHint(axisScrollHint);
-  DALI_TEST_EQUALS(axisScrollHint, Vector2::ZERO, Math::MACHINE_EPSILON_1, TEST_LOCATION);
-
-  layout->SetOrientation(ControlOrientation::Right);
-  layout->GetXAxisScrollHint(axisScrollHint);
-  DALI_TEST_EQUALS(axisScrollHint, Vector2::XAXIS, Math::MACHINE_EPSILON_1, TEST_LOCATION);
-  layout->GetYAxisScrollHint(axisScrollHint);
-  DALI_TEST_EQUALS(axisScrollHint, Vector2::ZERO, Math::MACHINE_EPSILON_1, TEST_LOCATION);
   END_TEST;
 }

@@ -34,17 +34,17 @@ RadioButton::RadioButton()
 {
 }
 
-RadioButton::RadioButton(Internal::RadioButton& implementation)
-  : Button(implementation)
+RadioButton::RadioButton( Internal::RadioButton& implementation )
+  : Button( implementation )
 {
 }
 
-RadioButton::RadioButton(const RadioButton& radioButton)
-  : Button(radioButton)
+RadioButton::RadioButton( const RadioButton& radioButton )
+  : Button( radioButton )
 {
 }
 
-RadioButton& RadioButton::operator=(const RadioButton& radioButton )
+RadioButton& RadioButton::operator=( const RadioButton& radioButton )
 {
   if( &radioButton != this )
   {
@@ -53,8 +53,8 @@ RadioButton& RadioButton::operator=(const RadioButton& radioButton )
   return *this;
 }
 
-RadioButton::RadioButton(Dali::Internal::CustomActor* internal)
-  : Button(internal)
+RadioButton::RadioButton( Dali::Internal::CustomActor* internal )
+  : Button( internal )
 {
   VerifyCustomActorPointer<Internal::RadioButton>( internal );
 }
@@ -68,53 +68,23 @@ RadioButton RadioButton::New()
   return Internal::RadioButton::New();
 }
 
-RadioButton RadioButton::New(const std::string& label)
+RadioButton RadioButton::New( const std::string& label )
 {
   RadioButton radioButton = Internal::RadioButton::New();
-  radioButton.SetLabel(label);
+  radioButton.SetLabel( label );
   return radioButton;
 }
 
-RadioButton RadioButton::New(Actor label)
+RadioButton RadioButton::New( Actor label )
 {
   RadioButton radioButton = Internal::RadioButton::New();
-  radioButton.SetLabel(label);
+  radioButton.SetLabel( label );
   return radioButton;
 }
 
-RadioButton RadioButton::DownCast(BaseHandle handle)
+RadioButton RadioButton::DownCast( BaseHandle handle )
 {
   return Control::DownCast<RadioButton, Internal::RadioButton>( handle );
-}
-
-void RadioButton::SetLabel(const std::string& label)
-{
-  Dali::Toolkit::GetImplementation(*this).SetLabel(label);
-}
-
-void RadioButton::SetLabel(Actor label)
-{
-  Dali::Toolkit::GetImplementation(*this).SetLabel(label);
-}
-
-Actor RadioButton::GetLabel() const
-{
-  return Dali::Toolkit::GetImplementation(*this).GetLabel();
-}
-
-void RadioButton::SetSelected(bool selected)
-{
-  Dali::Toolkit::GetImplementation(*this).SetSelected(selected);
-}
-
-bool RadioButton::IsSelected()const
-{
-  return Dali::Toolkit::GetImplementation(*this).IsSelected();
-}
-
-void RadioButton::ToggleState()
-{
-  Dali::Toolkit::GetImplementation(*this).ToggleState();
 }
 
 } // namespace Toolkit

@@ -25,6 +25,8 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/ref-object.h>
 
+#include <string>
+
 namespace Dali
 {
 

@@ -56,13 +56,14 @@ void ShapeText( const Vector<Character>& text,
     return;
   }
 
+#ifdef DEBUG_ENABLED
   const Length numberOfFontRuns = fonts.Count();
+  const Length numberOfScriptRuns = scripts.Count();
+#endif
 
   DALI_ASSERT_DEBUG( ( 0u != numberOfFontRuns ) &&
                      ( numberOfCharacters == fonts[numberOfFontRuns - 1u].characterRun.characterIndex + fonts[numberOfFontRuns - 1u].characterRun.numberOfCharacters ) &&
                      "Toolkit::Text::ShapeText. All characters must have a font set." );
-
-  const Length numberOfScriptRuns = scripts.Count();
 
   DALI_ASSERT_DEBUG( ( 0u != numberOfScriptRuns ) &&
                      ( numberOfCharacters == scripts[numberOfScriptRuns - 1u].characterRun.characterIndex + scripts[numberOfScriptRuns - 1u].characterRun.numberOfCharacters ) &&

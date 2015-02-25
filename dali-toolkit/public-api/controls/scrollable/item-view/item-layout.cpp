@@ -19,6 +19,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/time-period.h>
 
@@ -151,150 +152,6 @@ float ItemLayout::GetClosestOnScreenLayoutPosition(int itemID, float currentLayo
   return currentLayoutPosition;
 }
 
-void ItemLayout::GetXAxisScrollHint(Vector2& scrollHint) const
-{
-  scrollHint = Vector2::ZERO;
-  Radian scrollAngle(GetScrollDirection());
-  Vector2 scrollDirection(sinf(scrollAngle), cosf(scrollAngle));
-  switch(mOrientation)
-  {
-    case ControlOrientation::Up:
-    {
-      if(fabsf(scrollDirection.y) < Math::MACHINE_EPSILON_1)
-      {
-        // we probably want x scrolling
-        if(scrollDirection.x > 0.0f)
-        {
-          // normal positive scrolling
-          scrollHint = Vector2::XAXIS;
-        }
-        else
-        {
-          scrollHint = -Vector2::XAXIS;
-        }
-      }
-      break;
-    }
-    case ControlOrientation::Down:
-    {
-      if(fabsf(scrollDirection.y) < Math::MACHINE_EPSILON_1)
-      {
-        // we probably want x scrolling
-        if(scrollDirection.x > 0.0f)
-        {
-          // normal positive scrolling
-          scrollHint = -Vector2::XAXIS;
-        }
-        else
-        {
-          scrollHint = Vector2::XAXIS;
-        }
-      }
-      break;
-    }
-    case ControlOrientation::Left:
-    {
-      // we probably want x scrolling
-      if(scrollDirection.x > 0.0f)
-      {
-        // normal positive scrolling
-        scrollHint = Vector2::XAXIS;
-      }
-      else
-      {
-        scrollHint = -Vector2::XAXIS;
-      }
-      break;
-    }
-    case ControlOrientation::Right:
-    {
-      // we probably want x scrolling
-      if(scrollDirection.x > 0.0f)
-      {
-        // normal positive scrolling
-        scrollHint = -Vector2::XAXIS;
-      }
-      else
-      {
-        scrollHint = Vector2::XAXIS;
-      }
-      break;
-    }
-  }
-}
-
-void ItemLayout::GetYAxisScrollHint(Vector2& scrollHint) const
-{
-  scrollHint = Vector2::ZERO;
-  Radian scrollAngle(GetScrollDirection());
-  Vector2 scrollDirection(sinf(scrollAngle), cosf(scrollAngle));
-  switch(mOrientation)
-  {
-    case ControlOrientation::Up:
-    {
-      // we probably want x scrolling
-      if(scrollDirection.y > 0.0f)
-      {
-        // normal positive scrolling
-        scrollHint = Vector2::YAXIS;
-      }
-      else
-      {
-        scrollHint = -Vector2::YAXIS;
-      }
-      break;
-    }
-    case ControlOrientation::Down:
-    {
-      // we probably want x scrolling
-      if(scrollDirection.y > 0.0f)
-      {
-        // normal positive scrolling
-        scrollHint = -Vector2::YAXIS;
-      }
-      else
-      {
-        scrollHint = Vector2::YAXIS;
-      }
-      break;
-    }
-    case ControlOrientation::Left:
-    {
-      if(fabsf(scrollDirection.x) < Math::MACHINE_EPSILON_1)
-      {
-        // we probably want x scrolling
-        if(scrollDirection.y > 0.0f)
-        {
-          // normal positive scrolling
-          scrollHint = -Vector2::YAXIS;
-        }
-        else
-        {
-          scrollHint = Vector2::YAXIS;
-        }
-      }
-      break;
-    }
-    case ControlOrientation::Right:
-    {
-      if(fabsf(scrollDirection.x) < Math::MACHINE_EPSILON_1)
-      {
-        // we probably want x scrolling
-        if(scrollDirection.y > 0.0f)
-        {
-          // normal positive scrolling
-          scrollHint = Vector2::YAXIS;
-        }
-        else
-        {
-          scrollHint = -Vector2::YAXIS;
-        }
-      }
-      break;
-    }
-  }
-}
-
 int ItemLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
 {
   switch( direction )
@@ -329,7 +186,7 @@ float ItemLayout::GetFlickSpeedFactor() const
   return GetScrollSpeedFactor();
 }
 
-void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, Constrainable scrollPositionObject, const Actor& itemViewActor )
+void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, Handle scrollPositionObject, const Actor& itemViewActor )
 {
   // This just implements the default behaviour of constraint application.
   // Custom layouts can override this function to apply their custom constraints.

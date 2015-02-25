@@ -15,6 +15,7 @@
  *
  */
 
+// EXTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/popup/popup-style-impl.h>
 
 using namespace Dali;

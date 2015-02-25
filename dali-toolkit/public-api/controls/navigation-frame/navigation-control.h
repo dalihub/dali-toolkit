@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/animation/alpha-functions.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/navigation-frame/page.h>
 #include <dali-toolkit/public-api/controls/navigation-frame/navigation-bar-style.h>
@@ -73,15 +74,15 @@ class NavigationControl;
  *                 | +-+        +-----+  +-----+        +-+ |
  *                 | +-+        +-----+  +-----+        +-+ |  tool bar
  *                 +----------------------------------------+
+ *
+ * Actions
+ * | %Action Name      | %NavigationControl method called |
+ * |-------------------|----------------------------------|
+ * | push              | %PushItem()                      |
+ * | pop               | %PopItem()                       |
  */
-
 class DALI_IMPORT_API NavigationControl : public Control
 {
-
-public:
-  //Action Names
-  static const char* const ACTION_PUSH;
-  static const char* const ACTION_POP;
 
 public:
 

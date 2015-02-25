@@ -27,6 +27,7 @@
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/button.h>
@@ -52,8 +53,15 @@ const float POPUP_BUTTON_BG_HEIGHT = 96.f;                    ///< Height of But
 const Vector3 DEFAULT_DIALOG_SIZE = Vector3(POPUP_TITLE_WIDTH/POPUP_WIDTH, 0.5f, 0.0f);
 const Vector3 DEFAULT_BOTTOM_SIZE = Vector3(1.0f, 0.2f, 0.0f);
 
-const char* const PROPERTY_TITLE = "title";
-const char* const PROPERTY_STATE = "state";
+// Signals
+
+const char* const SIGNAL_TOUCHED_OUTSIDE = "touched-outside";
+const char* const SIGNAL_HIDDEN =          "hidden";
+
+// Properties
+
+const char* const PROPERTY_TITLE =         "title";
+const char* const PROPERTY_STATE =         "state";
 
 /**
  * The background size should be at least as big as the Dialog.
@@ -108,10 +116,10 @@ BaseHandle Create()
   return Toolkit::Popup::New();
 }
 
-TypeRegistration typeRegistration( typeid(Toolkit::Popup), typeid(Toolkit::Control), Create );
+TypeRegistration typeRegistration( typeid( Toolkit::Popup ), typeid( Toolkit::Control ), Create );
 
-SignalConnectorType signalConnector1( typeRegistration, Toolkit::Popup::SIGNAL_TOUCHED_OUTSIDE, &Popup::DoConnectSignal );
-SignalConnectorType signalConnector2( typeRegistration, Toolkit::Popup::SIGNAL_HIDDEN, &Popup::DoConnectSignal );
+SignalConnectorType signalConnector1( typeRegistration, SIGNAL_TOUCHED_OUTSIDE, &Popup::DoConnectSignal );
+SignalConnectorType signalConnector2( typeRegistration, SIGNAL_HIDDEN, &Popup::DoConnectSignal );
 
 
 }
@@ -319,7 +327,7 @@ void Popup::ShowTail(const Vector3& position)
 
   if(image != "")
   {
-    Image tail = Image::New( image );
+    Image tail = ResourceImage::New( image );
     mTailImage = ImageActor::New(tail);
     const Vector3 anchorPoint = AnchorPoint::FRONT_BOTTOM_RIGHT - position;
 
@@ -348,12 +356,12 @@ PopupStylePtr Popup::GetStyle() const
 
 void Popup::SetDefaultBackgroundImage()
 {
-  Image bg = Image::New( mPopupStyle->backgroundImage );
+  Image bg = ResourceImage::New( mPopupStyle->backgroundImage );
   ImageActor bgImage = ImageActor::New( bg );
   bgImage.SetStyle( ImageActor::STYLE_NINE_PATCH );
   bgImage.SetNinePatchBorder( mPopupStyle->backgroundScale9Border );
 
-  Image buttonBg = Image::New( mPopupStyle->buttonAreaImage );
+  Image buttonBg = ResourceImage::New( mPopupStyle->buttonAreaImage );
   ImageActor buttonBgImage = ImageActor::New( buttonBg );
   buttonBgImage.SetStyle( ImageActor::STYLE_NINE_PATCH );
   buttonBgImage.SetNinePatchBorder( mPopupStyle->buttonArea9PatchBorder );
@@ -529,13 +537,13 @@ bool Popup::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   Dali::BaseHandle handle( object );
 
   bool connected( true );
-  Toolkit::Popup popup = Toolkit::Popup::DownCast(handle);
+  Toolkit::Popup popup = Toolkit::Popup::DownCast( handle );
 
-  if( Dali::Toolkit::Popup::SIGNAL_TOUCHED_OUTSIDE == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_TOUCHED_OUTSIDE ) )
   {
     popup.OutsideTouchedSignal().Connect( tracker, functor );
   }
-  else if( Dali::Toolkit::Popup::SIGNAL_HIDDEN == signalName )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_HIDDEN ) )
   {
     popup.HiddenSignal().Connect( tracker, functor );
   }

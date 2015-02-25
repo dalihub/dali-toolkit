@@ -15,10 +15,12 @@
  *
  */
 
+// CLASS HEADER
 #include "check-button-factory.h"
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
@@ -44,7 +46,7 @@ Alignment CreateAlignedImage( Actor image )
 
 Alignment CreateAlignedImage( const std::string& imagePath )
 {
-  Image image = Image::New( imagePath );
+  Image image = ResourceImage::New( imagePath );
 
   return CreateAlignedImage( ImageActor::New( image ) );
 }
@@ -52,7 +54,7 @@ Alignment CreateAlignedImage( const std::string& imagePath )
 } // namespace
 
 
-CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& checkedImagePath, const std::string& disabledBackgroundImagePath, const std::string& disabledCheckedImagePath )
+CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& selectedImagePath, const std::string& disabledBackgroundImagePath, const std::string& disabledSelectedImagePath )
 {
   CheckBoxButton button = Toolkit::CheckBoxButton::New();
 
@@ -61,9 +63,9 @@ CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, con
     button.SetBackgroundImage( CreateAlignedImage( backgroundImagePath ) );
   }
 
-  if( !checkedImagePath.empty() )
+  if( !selectedImagePath.empty() )
   {
-    button.SetCheckedImage( CreateAlignedImage( checkedImagePath ) );
+    button.SetSelectedImage( CreateAlignedImage( selectedImagePath ) );
   }
 
   if( !disabledBackgroundImagePath.empty() )
@@ -71,15 +73,15 @@ CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, con
     button.SetDisabledBackgroundImage( CreateAlignedImage( disabledBackgroundImagePath ) );
   }
 
-  if( !disabledCheckedImagePath.empty() )
+  if( !disabledSelectedImagePath.empty() )
   {
-    button.SetDisabledCheckedImage( CreateAlignedImage( disabledCheckedImagePath ) );
+    button.SetDisabledSelectedImage( CreateAlignedImage( disabledSelectedImagePath ) );
   }
 
   return button;
 }
 
-CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedImageActor, Actor disabledBackgroundImageActor, Actor disabledCheckedImagActor )
+CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor selectedImageActor, Actor disabledBackgroundImageActor, Actor disabledSelectedImagActor )
 {
   CheckBoxButton button = Toolkit::CheckBoxButton::New();
 
@@ -88,9 +90,9 @@ CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedIm
     button.SetBackgroundImage( CreateAlignedImage( backgroundImageActor ) );
   }
 
-  if( checkedImageActor )
+  if( selectedImageActor )
   {
-    button.SetCheckedImage( CreateAlignedImage( checkedImageActor ) );
+    button.SetSelectedImage( CreateAlignedImage( selectedImageActor ) );
   }
 
   if( disabledBackgroundImageActor )
@@ -98,15 +100,15 @@ CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedIm
     button.SetDisabledBackgroundImage( CreateAlignedImage( disabledBackgroundImageActor ) );
   }
 
-  if( disabledCheckedImagActor )
+  if( disabledSelectedImagActor )
   {
-    button.SetDisabledCheckedImage( CreateAlignedImage( disabledCheckedImagActor ) );
+    button.SetDisabledSelectedImage( CreateAlignedImage( disabledSelectedImagActor ) );
   }
 
   return button;
 }
 
-CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& checkedImagePath )
+CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, const std::string& selectedImagePath )
 {
   CheckBoxButton button = Toolkit::CheckBoxButton::New();
 
@@ -115,15 +117,15 @@ CheckBoxButton CreateCheckBoxButton( const std::string& backgroundImagePath, con
     button.SetBackgroundImage( CreateAlignedImage( backgroundImagePath ) );
   }
 
-  if( !checkedImagePath.empty() )
+  if( !selectedImagePath.empty() )
   {
-    button.SetCheckedImage( CreateAlignedImage( checkedImagePath ) );
+    button.SetSelectedImage( CreateAlignedImage( selectedImagePath ) );
   }
 
   return button;
 }
 
-CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedImageActor )
+CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor selectedImageActor )
 {
   CheckBoxButton button = Toolkit::CheckBoxButton::New();
 
@@ -132,9 +134,9 @@ CheckBoxButton CreateCheckBoxButton( Actor backgroundImageActor, Actor checkedIm
     button.SetBackgroundImage( CreateAlignedImage( backgroundImageActor ) );
   }
 
-  if( checkedImageActor )
+  if( selectedImageActor )
   {
-    button.SetCheckedImage( CreateAlignedImage( checkedImageActor ) );
+    button.SetSelectedImage( CreateAlignedImage( selectedImageActor ) );
   }
 
   return button;

@@ -21,6 +21,8 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/ref-object.h>
 
@@ -86,381 +88,6 @@ PushButtonDefaultPainter::~PushButtonDefaultPainter()
   {
     mFadeOutAnimation.Clear();
   }
-}
-
-void PushButtonDefaultPainter::SetButtonImage( Toolkit::PushButton& pushButton, Actor image )
-{
-  Toolkit::Internal::PushButton& pushButtonImpl = GetImplementation( pushButton );
-  Actor& buttonImage = pushButtonImpl.GetButtonImage();
-  Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
-
-  switch( mPaintState )
-  {
-    case ReleasedState:
-    {
-      if( buttonImage && buttonImage.GetParent() )
-      {
-        StopFadeOutAnimation( pushButton );
-        FadeOutImage( pushButton, Foreground, buttonImage );
-
-        buttonImage = image;
-
-        FadeInImage( pushButton, buttonImage );
-
-        StartFadeOutAnimation( pushButton );
-        StartFadeInAnimation();
-      }
-      else
-      {
-        buttonImage = image;
-        pushButton.Add( buttonImage );
-      }
-      break;
-    }
-    case ReleasedPressedTransition: // FALLTHROUGH
-    case ReleasedDisabledTransition:
-    {
-      float opacity = 1.f;
-      if( fadeOutButtonImage )
-      {
-        opacity = fadeOutButtonImage.GetCurrentOpacity();
-      }
-      StopFadeOutAnimation( pushButton );
-
-      // Replaces the button image.
-      buttonImage = image;
-
-      pushButton.Add( buttonImage );
-      FadeOutImage( pushButton, Foreground, buttonImage, opacity );
-
-      StartFadeOutAnimation( pushButton );
-      break;
-    }
-    case PressedReleasedTransition: // FALLTHROUGH
-    case DisabledReleasedTransition:
-    {
-      StopFadeInAnimation();
-      pushButton.Remove( buttonImage );
-
-      buttonImage = image;
-
-      FadeInImage( pushButton, buttonImage );
-      StartFadeInAnimation();
-      break;
-    }
-    default:
-      buttonImage = image;
-      break;
-  }
-
-  buttonImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  buttonImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  ApplyConstraint( buttonImage, FOREGROUND_DEPTH );
-}
-
-void PushButtonDefaultPainter::SetBackgroundImage( Toolkit::PushButton& pushButton, Actor image )
-{
-  Toolkit::Internal::PushButton& pushButtonImpl = GetImplementation( pushButton );
-  Actor& backgroundImage = pushButtonImpl.GetBackgroundImage();
-  Actor& fadeOutBackgroundImage = pushButtonImpl.GetFadeOutBackgroundImage();
-
-  switch( mPaintState )
-  {
-    case ReleasedState:             // FALLTHROUGH
-    case PressedState:
-    case ReleasedPressedTransition:
-    case PressedReleasedTransition:
-    {
-      if( backgroundImage && backgroundImage.GetParent() )
-      {
-        StopFadeOutAnimation( pushButton );
-        FadeOutImage( pushButton, Background, backgroundImage  );
-
-        backgroundImage = image;
-
-        FadeInImage( pushButton, backgroundImage );
-
-        StartFadeOutAnimation( pushButton );
-        StartFadeInAnimation();
-      }
-      else
-      {
-        backgroundImage = image;
-        pushButton.Add( backgroundImage );
-      }
-      break;
-    }
-    case ReleasedDisabledTransition: // FALLTHROUGH
-    case PressedDisabledTransition:
-    {
-      float opacity = 1.f;
-      if( fadeOutBackgroundImage )
-      {
-        opacity = fadeOutBackgroundImage.GetCurrentOpacity();
-      }
-      StopFadeOutAnimation( pushButton );
-
-      // Replaces the button image.
-      backgroundImage = image;
-
-      pushButton.Add( backgroundImage );
-      FadeOutImage( pushButton, Background, backgroundImage, opacity );
-
-      StartFadeOutAnimation( pushButton );
-      break;
-    }
-    case DisabledReleasedTransition: // FALLTHROUGH
-    case DisabledPressedTransition:
-    {
-      StopFadeInAnimation();
-      pushButton.Remove( backgroundImage );
-
-      backgroundImage = image;
-
-      FadeInImage( pushButton, backgroundImage );
-      StartFadeInAnimation();
-      break;
-    }
-    default:
-      backgroundImage = image;
-      break;
-    }
-
-  backgroundImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  backgroundImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  ApplyConstraint( backgroundImage, BACKGROUND_DEPTH );
-}
-
-void PushButtonDefaultPainter::SetSelectedImage( Toolkit::PushButton& pushButton, Actor image )
-{
-  Toolkit::Internal::PushButton& pushButtonImpl = GetImplementation( pushButton );
-  Actor& selectedImage = pushButtonImpl.GetSelectedImage();
-  Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
-
-  switch( mPaintState )
-  {
-    case PressedState:
-    {
-      if( selectedImage && selectedImage.GetParent() )
-      {
-        StopFadeOutAnimation( pushButton );
-        FadeOutImage( pushButton, Foreground, selectedImage  );
-
-        selectedImage = image;
-
-        FadeInImage( pushButton, selectedImage );
-
-        StartFadeOutAnimation( pushButton );
-        StartFadeInAnimation();
-      }
-      else
-      {
-        selectedImage = image;
-        pushButton.Add( selectedImage );
-      }
-      break;
-    }
-    case PressedReleasedTransition: // FALLTHROUGH
-    case PressedDisabledTransition:
-    {
-      float opacity = 1.f;
-      if( fadeOutButtonImage )
-      {
-        opacity = fadeOutButtonImage.GetCurrentOpacity();
-      }
-      StopFadeOutAnimation( pushButton );
-
-      // Replaces the button image.
-      selectedImage = image;
-
-      pushButton.Add( selectedImage );
-      FadeOutImage( pushButton, Foreground, selectedImage, opacity );
-
-      StartFadeOutAnimation( pushButton );
-      break;
-    }
-    case ReleasedPressedTransition: // FALLTHROUGH
-    case DisabledPressedTransition:
-    {
-      StopFadeInAnimation();
-      pushButton.Remove( selectedImage );
-
-      selectedImage = image;
-
-      FadeInImage( pushButton, selectedImage );
-      StartFadeInAnimation();
-      break;
-    }
-    default:
-      selectedImage = image;
-      break;
-  }
-
-  selectedImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  selectedImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  ApplyConstraint( selectedImage, FOREGROUND_DEPTH );
-}
-
-void PushButtonDefaultPainter::SetDisabledImage( Toolkit::PushButton& pushButton, Actor image )
-{
-  Toolkit::Internal::PushButton& pushButtonImpl = GetImplementation( pushButton );
-  Actor& disabledImage = pushButtonImpl.GetDisabledImage();
-  Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
-
-  switch( mPaintState )
-  {
-    case DisabledReleasedState: // FALLTHROUGH
-    case DisabledPressedState:
-    {
-      if( disabledImage && disabledImage.GetParent() )
-      {
-        StopFadeOutAnimation( pushButton );
-        FadeOutImage( pushButton, Foreground, disabledImage  );
-
-        disabledImage = image;
-
-        FadeInImage( pushButton, disabledImage );
-
-        StartFadeOutAnimation( pushButton );
-        StartFadeInAnimation();
-      }
-      else
-      {
-        disabledImage = image;
-        pushButton.Add( disabledImage );
-      }
-      break;
-    }
-    case ReleasedDisabledTransition: // FALLTHROUGH
-    case PressedDisabledTransition:
-    {
-      StopFadeInAnimation();
-      pushButton.Remove( disabledImage );
-
-      disabledImage = image;
-
-      FadeInImage( pushButton, disabledImage );
-      StartFadeInAnimation();
-      break;
-    }
-    case DisabledReleasedTransition: // FALLTHROUGH
-    case DisabledPressedTransition:
-    {
-      float opacity = 1.f;
-      if( fadeOutButtonImage )
-      {
-        opacity = fadeOutButtonImage.GetCurrentOpacity();
-      }
-      StopFadeOutAnimation( pushButton );
-
-      // Replaces the button image.
-      disabledImage = image;
-
-      pushButton.Add( disabledImage );
-      FadeOutImage( pushButton, Foreground, disabledImage, opacity );
-
-      StartFadeOutAnimation( pushButton );
-      break;
-    }
-    default:
-      disabledImage = image;
-      break;
-  }
-
-  disabledImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  disabledImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  ApplyConstraint( disabledImage, FOREGROUND_DEPTH );
-}
-
-void PushButtonDefaultPainter::SetDisabledBackgroundImage( Toolkit::PushButton& pushButton, Actor image )
-{
-  Toolkit::Internal::PushButton& pushButtonImpl = GetImplementation( pushButton );
-  Actor& disabledBackgroundImage = pushButtonImpl.GetDisabledBackgroundImage();
-  Actor& fadeOutBackgroundImage = pushButtonImpl.GetFadeOutBackgroundImage();
-
-  switch( mPaintState )
-  {
-    case DisabledReleasedState: // FALLTHROUGH
-    case DisabledPressedState:
-    {
-      if( disabledBackgroundImage && disabledBackgroundImage.GetParent() )
-      {
-        StopFadeOutAnimation( pushButton );
-        FadeOutImage( pushButton, Background, disabledBackgroundImage  );
-
-        disabledBackgroundImage = image;
-
-        FadeInImage( pushButton, disabledBackgroundImage );
-
-        StartFadeOutAnimation( pushButton );
-        StartFadeInAnimation();
-      }
-      else
-      {
-        disabledBackgroundImage = image;
-        pushButton.Add( disabledBackgroundImage );
-      }
-      break;
-    }
-    case ReleasedDisabledTransition: // FALLTHROUGH
-    case PressedDisabledTransition:
-    {
-      StopFadeInAnimation();
-      pushButton.Remove( disabledBackgroundImage );
-
-      disabledBackgroundImage = image;
-
-      FadeInImage( pushButton, disabledBackgroundImage );
-      StartFadeInAnimation();
-      break;
-    }
-    case DisabledReleasedTransition: // FALLTHROUGH
-    case DisabledPressedTransition:
-    {
-      float opacity = 1.f;
-      if( fadeOutBackgroundImage )
-      {
-        opacity = fadeOutBackgroundImage.GetCurrentOpacity();
-      }
-      StopFadeOutAnimation( pushButton );
-
-      // Replaces the button image.
-      disabledBackgroundImage = image;
-
-      pushButton.Add( disabledBackgroundImage );
-      FadeOutImage( pushButton, Background, disabledBackgroundImage, opacity );
-
-      StartFadeOutAnimation( pushButton );
-      break;
-    }
-    default:
-      disabledBackgroundImage = image;
-      break;
-  }
-
-  disabledBackgroundImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  disabledBackgroundImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  ApplyConstraint( disabledBackgroundImage, BACKGROUND_DEPTH );
-}
-
-void PushButtonDefaultPainter::SetLabel( Toolkit::PushButton& pushButton, Actor label )
-{
-  Toolkit::Internal::PushButton& pushButtonImpl = GetImplementation( pushButton );
-  Actor& labelActor = pushButtonImpl.GetLabel();
-
-  if( labelActor && labelActor.GetParent() )
-  {
-    labelActor.GetParent().Remove( labelActor );
-  }
-
-  labelActor = label;
-  labelActor.SetAnchorPoint( AnchorPoint::CENTER );
-  labelActor.SetParentOrigin( ParentOrigin::CENTER );
-
-  labelActor.SetPosition( 0.f, 0.f, LABEL_DEPTH );
-  labelActor.SetSize( mSize );
-
-  pushButton.Add( labelActor  );
 }
 
 void PushButtonDefaultPainter::Initialize( Toolkit::Button& button )
@@ -852,21 +479,410 @@ void PushButtonDefaultPainter::SetAutoRepeating( bool autorepeating )
   mAutoRepeating = autorepeating;
 }
 
-void PushButtonDefaultPainter::Pressed( Toolkit::PushButton& button )
+void PushButtonDefaultPainter::SetLabel( Toolkit::Button& button, Actor label )
+{
+  Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
+  Actor& labelActor = pushButtonImpl.GetLabel();
+
+  Toolkit::PushButton& pushButton = static_cast<Toolkit::PushButton&>( button );
+
+  if( labelActor && labelActor.GetParent() )
+  {
+    labelActor.GetParent().Remove( labelActor );
+  }
+
+  labelActor = label;
+  labelActor.SetAnchorPoint( AnchorPoint::CENTER );
+  labelActor.SetParentOrigin( ParentOrigin::CENTER );
+
+  labelActor.SetPosition( 0.f, 0.f, LABEL_DEPTH );
+  labelActor.SetSize( mSize );
+
+  pushButton.Add( labelActor  );
+}
+
+void PushButtonDefaultPainter::SetButtonImage( Toolkit::Button& button, Actor image )
+{
+  Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
+  Actor& buttonImage = pushButtonImpl.GetButtonImage();
+  Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
+
+  Toolkit::PushButton& pushButton = static_cast<Toolkit::PushButton&>( button );
+
+  switch( mPaintState )
+  {
+    case ReleasedState:
+    {
+      if( buttonImage && buttonImage.GetParent() )
+      {
+        StopFadeOutAnimation( pushButton );
+        FadeOutImage( pushButton, Foreground, buttonImage );
+
+        buttonImage = image;
+
+        FadeInImage( pushButton, buttonImage );
+
+        StartFadeOutAnimation( pushButton );
+        StartFadeInAnimation();
+      }
+      else
+      {
+        buttonImage = image;
+        pushButton.Add( buttonImage );
+      }
+      break;
+    }
+    case ReleasedPressedTransition: // FALLTHROUGH
+    case ReleasedDisabledTransition:
+    {
+      float opacity = 1.f;
+      if( fadeOutButtonImage )
+      {
+        opacity = fadeOutButtonImage.GetCurrentOpacity();
+      }
+      StopFadeOutAnimation( pushButton );
+
+      // Replaces the button image.
+      buttonImage = image;
+
+      pushButton.Add( buttonImage );
+      FadeOutImage( pushButton, Foreground, buttonImage, opacity );
+
+      StartFadeOutAnimation( pushButton );
+      break;
+    }
+    case PressedReleasedTransition: // FALLTHROUGH
+    case DisabledReleasedTransition:
+    {
+      StopFadeInAnimation();
+      pushButton.Remove( buttonImage );
+
+      buttonImage = image;
+
+      FadeInImage( pushButton, buttonImage );
+      StartFadeInAnimation();
+      break;
+    }
+    default:
+      buttonImage = image;
+      break;
+  }
+
+  buttonImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  buttonImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  ApplyConstraint( buttonImage, FOREGROUND_DEPTH );
+}
+
+void PushButtonDefaultPainter::SetSelectedImage( Toolkit::Button& button, Actor image )
+{
+  Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
+  Actor& selectedImage = pushButtonImpl.GetSelectedImage();
+  Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
+
+  Toolkit::PushButton& pushButton = static_cast<Toolkit::PushButton&>( button );
+
+  switch( mPaintState )
+  {
+    case PressedState:
+    {
+      if( selectedImage && selectedImage.GetParent() )
+      {
+        StopFadeOutAnimation( pushButton );
+        FadeOutImage( pushButton, Foreground, selectedImage  );
+
+        selectedImage = image;
+
+        FadeInImage( pushButton, selectedImage );
+
+        StartFadeOutAnimation( pushButton );
+        StartFadeInAnimation();
+      }
+      else
+      {
+        selectedImage = image;
+        pushButton.Add( selectedImage );
+      }
+      break;
+    }
+    case PressedReleasedTransition: // FALLTHROUGH
+    case PressedDisabledTransition:
+    {
+      float opacity = 1.f;
+      if( fadeOutButtonImage )
+      {
+        opacity = fadeOutButtonImage.GetCurrentOpacity();
+      }
+      StopFadeOutAnimation( pushButton );
+
+      // Replaces the button image.
+      selectedImage = image;
+
+      pushButton.Add( selectedImage );
+      FadeOutImage( pushButton, Foreground, selectedImage, opacity );
+
+      StartFadeOutAnimation( pushButton );
+      break;
+    }
+    case ReleasedPressedTransition: // FALLTHROUGH
+    case DisabledPressedTransition:
+    {
+      StopFadeInAnimation();
+      pushButton.Remove( selectedImage );
+
+      selectedImage = image;
+
+      FadeInImage( pushButton, selectedImage );
+      StartFadeInAnimation();
+      break;
+    }
+    default:
+      selectedImage = image;
+      break;
+  }
+
+  selectedImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  selectedImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  ApplyConstraint( selectedImage, FOREGROUND_DEPTH );
+}
+
+void PushButtonDefaultPainter::SetBackgroundImage( Toolkit::Button& button, Actor image )
+{
+  Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
+  Actor& backgroundImage = pushButtonImpl.GetBackgroundImage();
+  Actor& fadeOutBackgroundImage = pushButtonImpl.GetFadeOutBackgroundImage();
+
+  Toolkit::PushButton& pushButton = static_cast<Toolkit::PushButton&>( button );
+
+  switch( mPaintState )
+  {
+    case ReleasedState:             // FALLTHROUGH
+    case PressedState:
+    case ReleasedPressedTransition:
+    case PressedReleasedTransition:
+    {
+      if( backgroundImage && backgroundImage.GetParent() )
+      {
+        StopFadeOutAnimation( pushButton );
+        FadeOutImage( pushButton, Background, backgroundImage  );
+
+        backgroundImage = image;
+
+        FadeInImage( pushButton, backgroundImage );
+
+        StartFadeOutAnimation( pushButton );
+        StartFadeInAnimation();
+      }
+      else
+      {
+        backgroundImage = image;
+        pushButton.Add( backgroundImage );
+      }
+      break;
+    }
+    case ReleasedDisabledTransition: // FALLTHROUGH
+    case PressedDisabledTransition:
+    {
+      float opacity = 1.f;
+      if( fadeOutBackgroundImage )
+      {
+        opacity = fadeOutBackgroundImage.GetCurrentOpacity();
+      }
+      StopFadeOutAnimation( pushButton );
+
+      // Replaces the button image.
+      backgroundImage = image;
+
+      pushButton.Add( backgroundImage );
+      FadeOutImage( pushButton, Background, backgroundImage, opacity );
+
+      StartFadeOutAnimation( pushButton );
+      break;
+    }
+    case DisabledReleasedTransition: // FALLTHROUGH
+    case DisabledPressedTransition:
+    {
+      StopFadeInAnimation();
+      pushButton.Remove( backgroundImage );
+
+      backgroundImage = image;
+
+      FadeInImage( pushButton, backgroundImage );
+      StartFadeInAnimation();
+      break;
+    }
+    default:
+      backgroundImage = image;
+      break;
+    }
+
+  backgroundImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  backgroundImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  ApplyConstraint( backgroundImage, BACKGROUND_DEPTH );
+}
+
+void PushButtonDefaultPainter::SetDisabledImage( Toolkit::Button& button, Actor image )
+{
+  Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
+  Actor& disabledImage = pushButtonImpl.GetDisabledImage();
+  Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
+
+  Toolkit::PushButton& pushButton = static_cast<Toolkit::PushButton&>( button );
+
+  switch( mPaintState )
+  {
+    case DisabledReleasedState: // FALLTHROUGH
+    case DisabledPressedState:
+    {
+      if( disabledImage && disabledImage.GetParent() )
+      {
+        StopFadeOutAnimation( pushButton );
+        FadeOutImage( pushButton, Foreground, disabledImage  );
+
+        disabledImage = image;
+
+        FadeInImage( pushButton, disabledImage );
+
+        StartFadeOutAnimation( pushButton );
+        StartFadeInAnimation();
+      }
+      else
+      {
+        disabledImage = image;
+        pushButton.Add( disabledImage );
+      }
+      break;
+    }
+    case ReleasedDisabledTransition: // FALLTHROUGH
+    case PressedDisabledTransition:
+    {
+      StopFadeInAnimation();
+      pushButton.Remove( disabledImage );
+
+      disabledImage = image;
+
+      FadeInImage( pushButton, disabledImage );
+      StartFadeInAnimation();
+      break;
+    }
+    case DisabledReleasedTransition: // FALLTHROUGH
+    case DisabledPressedTransition:
+    {
+      float opacity = 1.f;
+      if( fadeOutButtonImage )
+      {
+        opacity = fadeOutButtonImage.GetCurrentOpacity();
+      }
+      StopFadeOutAnimation( pushButton );
+
+      // Replaces the button image.
+      disabledImage = image;
+
+      pushButton.Add( disabledImage );
+      FadeOutImage( pushButton, Foreground, disabledImage, opacity );
+
+      StartFadeOutAnimation( pushButton );
+      break;
+    }
+    default:
+      disabledImage = image;
+      break;
+  }
+
+  disabledImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  disabledImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  ApplyConstraint( disabledImage, FOREGROUND_DEPTH );
+}
+
+void PushButtonDefaultPainter::SetDisabledBackgroundImage( Toolkit::Button& button, Actor image )
+{
+  Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
+  Actor& disabledBackgroundImage = pushButtonImpl.GetDisabledBackgroundImage();
+  Actor& fadeOutBackgroundImage = pushButtonImpl.GetFadeOutBackgroundImage();
+
+  Toolkit::PushButton& pushButton = static_cast<Toolkit::PushButton&>( button );
+
+  switch( mPaintState )
+  {
+    case DisabledReleasedState: // FALLTHROUGH
+    case DisabledPressedState:
+    {
+      if( disabledBackgroundImage && disabledBackgroundImage.GetParent() )
+      {
+        StopFadeOutAnimation( pushButton );
+        FadeOutImage( pushButton, Background, disabledBackgroundImage  );
+
+        disabledBackgroundImage = image;
+
+        FadeInImage( pushButton, disabledBackgroundImage );
+
+        StartFadeOutAnimation( pushButton );
+        StartFadeInAnimation();
+      }
+      else
+      {
+        disabledBackgroundImage = image;
+        pushButton.Add( disabledBackgroundImage );
+      }
+      break;
+    }
+    case ReleasedDisabledTransition: // FALLTHROUGH
+    case PressedDisabledTransition:
+    {
+      StopFadeInAnimation();
+      pushButton.Remove( disabledBackgroundImage );
+
+      disabledBackgroundImage = image;
+
+      FadeInImage( pushButton, disabledBackgroundImage );
+      StartFadeInAnimation();
+      break;
+    }
+    case DisabledReleasedTransition: // FALLTHROUGH
+    case DisabledPressedTransition:
+    {
+      float opacity = 1.f;
+      if( fadeOutBackgroundImage )
+      {
+        opacity = fadeOutBackgroundImage.GetCurrentOpacity();
+      }
+      StopFadeOutAnimation( pushButton );
+
+      // Replaces the button image.
+      disabledBackgroundImage = image;
+
+      pushButton.Add( disabledBackgroundImage );
+      FadeOutImage( pushButton, Background, disabledBackgroundImage, opacity );
+
+      StartFadeOutAnimation( pushButton );
+      break;
+    }
+    default:
+      disabledBackgroundImage = image;
+      break;
+  }
+
+  disabledBackgroundImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  disabledBackgroundImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  ApplyConstraint( disabledBackgroundImage, BACKGROUND_DEPTH );
+}
+
+void PushButtonDefaultPainter::Pressed( Toolkit::Button& button )
 {
   Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
   Actor& selectedImage = pushButtonImpl.GetSelectedImage();
   Actor& buttonImage = pushButtonImpl.GetButtonImage();
   Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
 
+  Toolkit::PushButton& pushButton = static_cast<Toolkit::PushButton&>( button );
+
   switch( mPaintState )
   {
     case ReleasedState:
     {
-      StopFadeOutAnimation( button );
-      FadeOutImage( button, Foreground, buttonImage );
-      FadeInImage( button, selectedImage );
-      StartFadeOutAnimation( button );
+      StopFadeOutAnimation( pushButton );
+      FadeOutImage( pushButton, Foreground, buttonImage );
+      FadeInImage( pushButton, selectedImage );
+      StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
       if( buttonImage || selectedImage )
@@ -894,13 +910,13 @@ void PushButtonDefaultPainter::Pressed( Toolkit::PushButton& button )
       {
         opacity = fadeOutButtonImage.GetCurrentOpacity();
       }
-      StopFadeOutAnimation( button, false );
+      StopFadeOutAnimation( pushButton, false );
       StopFadeInAnimation();
 
-      FadeOutImage( button, Foreground, buttonImage, 1.f - opacity );
-      FadeInImage( button, selectedImage, opacity );
+      FadeOutImage( pushButton, Foreground, buttonImage, 1.f - opacity );
+      FadeInImage( pushButton, selectedImage, opacity );
 
-      StartFadeOutAnimation( button );
+      StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
       if( buttonImage || selectedImage )
@@ -918,21 +934,23 @@ void PushButtonDefaultPainter::Pressed( Toolkit::PushButton& button )
   }
 }
 
-void PushButtonDefaultPainter::Released( Toolkit::PushButton& button )
+void PushButtonDefaultPainter::Released( Toolkit::Button& button )
 {
   Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
   Actor& selectedImage = pushButtonImpl.GetSelectedImage();
   Actor& buttonImage = pushButtonImpl.GetButtonImage();
   Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
 
+  Toolkit::PushButton& pushButton = static_cast<Toolkit::PushButton&>( button );
+
   switch( mPaintState )
   {
     case PressedState:
     {
-      StopFadeOutAnimation( button );
-      FadeOutImage( button, Foreground, selectedImage );
-      FadeInImage( button, buttonImage );
-      StartFadeOutAnimation( button );
+      StopFadeOutAnimation( pushButton );
+      FadeOutImage( pushButton, Foreground, selectedImage );
+      FadeInImage( pushButton, buttonImage );
+      StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
       if( buttonImage || selectedImage )
@@ -952,13 +970,13 @@ void PushButtonDefaultPainter::Released( Toolkit::PushButton& button )
       {
         opacity = fadeOutButtonImage.GetCurrentOpacity();
       }
-      StopFadeOutAnimation( button, false );
+      StopFadeOutAnimation( pushButton, false );
       StopFadeInAnimation();
 
-      FadeOutImage( button, Foreground, selectedImage, 1.f - opacity );
-      FadeInImage( button, buttonImage, opacity );
+      FadeOutImage( pushButton, Foreground, selectedImage, 1.f - opacity );
+      FadeInImage( pushButton, buttonImage, opacity );
 
-      StartFadeOutAnimation( button );
+      StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
       if( buttonImage || selectedImage )
@@ -978,26 +996,28 @@ void PushButtonDefaultPainter::Released( Toolkit::PushButton& button )
   }
 }
 
-void PushButtonDefaultPainter::Clicked( Toolkit::PushButton& button )
+void PushButtonDefaultPainter::Clicked( Toolkit::Button& button )
 {
   Released( button );
 }
 
-void PushButtonDefaultPainter::Toggled( Toolkit::PushButton& button )
+void PushButtonDefaultPainter::Selected( Toolkit::Button& button )
 {
   Toolkit::Internal::PushButton& pushButtonImpl = GetPushButtonImpl( button );
   Actor& selectedImage = pushButtonImpl.GetSelectedImage();
   Actor& buttonImage = pushButtonImpl.GetButtonImage();
   Actor& fadeOutButtonImage = pushButtonImpl.GetFadeOutButtonImage();
+
+  Toolkit::PushButton& pushButton = static_cast<Toolkit::PushButton&>( button );
 
   switch( mPaintState )
   {
     case ReleasedState:
     {
-      StopFadeOutAnimation( button );
-      FadeOutImage( button, Foreground, buttonImage );
-      FadeInImage( button, selectedImage );
-      StartFadeOutAnimation( button );
+      StopFadeOutAnimation( pushButton );
+      FadeOutImage( pushButton, Foreground, buttonImage );
+      FadeInImage( pushButton, selectedImage );
+      StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
       if( buttonImage || selectedImage )
@@ -1012,10 +1032,10 @@ void PushButtonDefaultPainter::Toggled( Toolkit::PushButton& button )
     }
     case PressedState:
     {
-      StopFadeOutAnimation( button );
-      FadeOutImage( button, Foreground, selectedImage );
-      FadeInImage( button, buttonImage );
-      StartFadeOutAnimation( button );
+      StopFadeOutAnimation( pushButton );
+      FadeOutImage( pushButton, Foreground, selectedImage );
+      FadeInImage( pushButton, buttonImage );
+      StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
       if( buttonImage || selectedImage )
@@ -1035,13 +1055,13 @@ void PushButtonDefaultPainter::Toggled( Toolkit::PushButton& button )
       {
         opacity = fadeOutButtonImage.GetCurrentOpacity();
       }
-      StopFadeOutAnimation( button, false );
+      StopFadeOutAnimation( pushButton, false );
       StopFadeInAnimation();
 
-      FadeOutImage( button, Foreground, selectedImage, 1.f - opacity );
-      FadeInImage( button, buttonImage, opacity );
+      FadeOutImage( pushButton, Foreground, selectedImage, 1.f - opacity );
+      FadeInImage( pushButton, buttonImage, opacity );
 
-      StartFadeOutAnimation( button );
+      StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
       if( buttonImage || selectedImage )
@@ -1061,13 +1081,13 @@ void PushButtonDefaultPainter::Toggled( Toolkit::PushButton& button )
       {
         opacity = 1.f - fadeOutButtonImage.GetCurrentOpacity();
       }
-      StopFadeOutAnimation( button, false );
+      StopFadeOutAnimation( pushButton, false );
       StopFadeInAnimation();
 
-      FadeOutImage( button, Foreground, buttonImage, 1.f - opacity );
-      FadeInImage( button, selectedImage, opacity );
+      FadeOutImage( pushButton, Foreground, buttonImage, 1.f - opacity );
+      FadeInImage( pushButton, selectedImage, opacity );
 
-      StartFadeOutAnimation( button );
+      StartFadeOutAnimation( pushButton );
       StartFadeInAnimation();
 
       if( buttonImage || selectedImage )

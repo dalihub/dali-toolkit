@@ -15,8 +15,7 @@
  *
  */
 
-// FILE HEADER
-
+// CLASS HEADER
 #include "relayout-controller-impl.h"
 
 // EXTERNAL INCLUDES

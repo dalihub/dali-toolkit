@@ -18,12 +18,14 @@
  *
  */
 
+// EXTERNAL INCLUDES
 #include <string>
 #include <vector>
 #include <list>
 
-//
 #include <dali/public-api/object/base-object.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/builder/json-parser.h>
 #include <dali-toolkit/public-api/builder/tree-node.h>
 

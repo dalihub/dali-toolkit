@@ -29,9 +29,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const char* const Button::SIGNAL_CLICKED = "clicked";
-const char* const Button::SIGNAL_STATE_CHANGED = "state-changed";
-
 Button::Button()
 {}
 
@@ -68,6 +65,56 @@ bool Button::IsDisabled() const
   return Dali::Toolkit::GetImplementation( *this ).IsDisabled();
 }
 
+void Button::SetAutoRepeating( bool autoRepeating )
+{
+  Dali::Toolkit::GetImplementation( *this ).SetAutoRepeating( autoRepeating );
+}
+
+bool Button::IsAutoRepeating() const
+{
+  return Dali::Toolkit::GetImplementation( *this ).IsAutoRepeating();
+}
+
+void Button::SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay )
+{
+  Dali::Toolkit::GetImplementation( *this ).SetInitialAutoRepeatingDelay( initialAutoRepeatingDelay );
+}
+
+float Button::GetInitialAutoRepeatingDelay() const
+{
+  return Dali::Toolkit::GetImplementation( *this ).GetInitialAutoRepeatingDelay();
+}
+
+void Button::SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay )
+{
+  Dali::Toolkit::GetImplementation( *this ).SetNextAutoRepeatingDelay( nextAutoRepeatingDelay );
+}
+
+float Button::GetNextAutoRepeatingDelay() const
+{
+  return Dali::Toolkit::GetImplementation( *this ).GetNextAutoRepeatingDelay();
+}
+
+void Button::SetTogglableButton( bool togglable )
+{
+  Dali::Toolkit::GetImplementation( *this ).SetTogglableButton( togglable );
+}
+
+bool Button::IsTogglableButton() const
+{
+  return Dali::Toolkit::GetImplementation( *this ).IsTogglableButton();
+}
+
+void Button::SetSelected( bool selected )
+{
+  Dali::Toolkit::GetImplementation( *this ).SetSelected( selected );
+}
+
+bool Button::IsSelected() const
+{
+  return Dali::Toolkit::GetImplementation( *this ).IsSelected();
+}
+
 void Button::SetAnimationTime( float animationTime )
 {
   Dali::Toolkit::GetImplementation( *this ).SetAnimationTime( animationTime );
@@ -78,12 +125,37 @@ float Button::GetAnimationTime() const
   return Dali::Toolkit::GetImplementation( *this ).GetAnimationTime();
 }
 
-Button::ClickedSignalType& Button::ClickedSignal()
+void Button::SetLabel( const std::string& label )
+{
+  Dali::Toolkit::GetImplementation( *this ).SetLabel( label );
+}
+
+void Button::SetLabel( Actor label )
+{
+  Dali::Toolkit::GetImplementation( *this ).SetLabel( label );
+}
+
+Actor Button::GetLabel() const
+{
+  return Dali::Toolkit::GetImplementation( *this ).GetLabel();
+}
+
+Button::ButtonSignalType& Button::PressedSignal()
+{
+  return Dali::Toolkit::GetImplementation( *this ).PressedSignal();
+}
+
+Button::ButtonSignalType& Button::ReleasedSignal()
+{
+  return Dali::Toolkit::GetImplementation( *this ).ReleasedSignal();
+}
+
+Button::ButtonSignalType& Button::ClickedSignal()
 {
   return Dali::Toolkit::GetImplementation( *this ).ClickedSignal();
 }
 
-Button::StateChangedSignalType& Button::StateChangedSignal()
+Button::ButtonSignalType& Button::StateChangedSignal()
 {
   return Dali::Toolkit::GetImplementation( *this ).StateChangedSignal();
 }

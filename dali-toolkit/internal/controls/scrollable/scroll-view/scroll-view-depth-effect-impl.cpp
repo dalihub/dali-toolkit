@@ -15,6 +15,12 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/object/property-input.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-depth-effect-impl.h>
 

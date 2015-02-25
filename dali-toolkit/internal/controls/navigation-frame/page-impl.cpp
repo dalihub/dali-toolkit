@@ -16,7 +16,6 @@
  */
 
 // CLASS HEADER
-
 #include "page-impl.h"
 
 // EXTERNAL INCLUDES

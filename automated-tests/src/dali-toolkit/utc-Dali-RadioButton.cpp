@@ -107,21 +107,13 @@ int UtcDaliRadioButtonLabelActor(void)
   END_TEST;
 }
 
-int UtcDaliRadioButtonActive(void)
+int UtcDaliRadioButtonSelected(void)
 {
   ToolkitTestApplication application;
 
   RadioButton radioButton = RadioButton::New();
 
-  // Default active
-  DALI_TEST_CHECK( radioButton.IsSelected() == false );
-
-  // False to true
-  radioButton.ToggleState();
-  DALI_TEST_CHECK( radioButton.IsSelected() == true );
-
-  // True to false
-  radioButton.ToggleState();
+  // Default selected
   DALI_TEST_CHECK( radioButton.IsSelected() == false );
 
   // False
@@ -139,10 +131,10 @@ int UtcDaliRadioButtonActive(void)
   END_TEST;
 }
 
-int UtcDaliRadioButtonActiveProperty(void)
+int UtcDaliRadioButtonSelectedProperty(void)
 {
   ToolkitTestApplication application;  // Exceptions require ToolkitTestApplication
-  tet_infoline(" UtcDaliRadioButtonActiveProperty");
+  tet_infoline(" UtcDaliRadioButtonSelectedProperty");
 
   // Create the RadioButton actor
   RadioButton radioButton = RadioButton::New();
@@ -151,20 +143,20 @@ int UtcDaliRadioButtonActiveProperty(void)
   radioButton.SetAnchorPoint(ParentOrigin::TOP_LEFT);
   radioButton.SetPosition( 0.0f, 0.0f );
 
-  // Default active
-  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
+  // Default selected
+  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
 
-  // Setting false active
-  radioButton.SetProperty( Button::PROPERTY_TOGGLED, false );
-  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
+  // Setting false selected
+  radioButton.SetProperty( Button::PROPERTY_SELECTED, false );
+  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
 
-  // Setting true active
-  radioButton.SetProperty( Button::PROPERTY_TOGGLED, true );
-  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == true );
+  // Setting true selected
+  radioButton.SetProperty( Button::PROPERTY_SELECTED, true );
+  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_SELECTED ) == true );
 
   // Setting false again
-  radioButton.SetProperty( Button::PROPERTY_TOGGLED, false );
-  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
+  radioButton.SetProperty( Button::PROPERTY_SELECTED, false );
+  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
 
   // Test selecting radio buttons
   RadioButton radioButton2 = RadioButton::New( "label" );
@@ -191,71 +183,91 @@ int UtcDaliRadioButtonActiveProperty(void)
   application.Render();
 
   // Simulate touch events
-  DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
-  DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
+  DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
+  DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
 
   // Select first radio
   {
-    Dali::Integration::TouchEvent event = Dali::Integration::TouchEvent();
+    Dali::Integration::TouchEvent event1 = Dali::Integration::TouchEvent();
+    Dali::Integration::TouchEvent event2 = Dali::Integration::TouchEvent();
 
+    const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 10.0f, 10.0f );
     const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 10.0f, 10.0f );
-    event.AddPoint( pointUp );
 
-    application.ProcessEvent( event );
+    event1.AddPoint( pointDown );
+    application.ProcessEvent( event1 );
+
+    event2.AddPoint( pointUp );
+    application.ProcessEvent( event2 );
 
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == true );
-    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
+    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_SELECTED ) == true );
+    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
   }
 
   // Select an already selected radio
   {
-    Dali::Integration::TouchEvent event = Dali::Integration::TouchEvent();
+    Dali::Integration::TouchEvent event1 = Dali::Integration::TouchEvent();
+    Dali::Integration::TouchEvent event2 = Dali::Integration::TouchEvent();
 
-    const Dali::TouchPoint pointDown( 0, TouchPoint::Up, 10.0f, 10.0f );
-    event.AddPoint( pointDown );
+    const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 10.0f, 10.0f );
+    const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 10.0f, 10.0f );
 
-    application.ProcessEvent( event );
+    event1.AddPoint( pointDown );
+    application.ProcessEvent( event1 );
+
+    event2.AddPoint( pointUp );
+    application.ProcessEvent( event2 );
 
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == true );
-    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
+    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_SELECTED ) == true );
+    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
   }
 
   // Select second radio
   {
-    Dali::Integration::TouchEvent event = Dali::Integration::TouchEvent();
+    Dali::Integration::TouchEvent event1 = Dali::Integration::TouchEvent();
+    Dali::Integration::TouchEvent event2 = Dali::Integration::TouchEvent();
 
-    const Dali::TouchPoint pointDown( 0, TouchPoint::Up, 10.0f, 50.0f );
-    event.AddPoint( pointDown );
+    const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 10.0f, 50.0f );
+    const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 10.0f, 50.0f );
 
-    application.ProcessEvent( event );
+    event1.AddPoint( pointDown );
+    application.ProcessEvent( event1 );
+
+    event2.AddPoint( pointUp );
+    application.ProcessEvent( event2 );
 
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
-    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == true );
+    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
+    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_SELECTED ) == true );
   }
 
   // Select outside radio group
   {
-    Dali::Integration::TouchEvent event = Dali::Integration::TouchEvent();
+    Dali::Integration::TouchEvent event1 = Dali::Integration::TouchEvent();
+    Dali::Integration::TouchEvent event2 = Dali::Integration::TouchEvent();
 
-    const Dali::TouchPoint pointDown( 0, TouchPoint::Up, 10.0f, 500.0f );
-    event.AddPoint( pointDown );
+    const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 10.0f, 500.0f );
+    const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 10.0f, 500.0f );
 
-    application.ProcessEvent( event );
+    event1.AddPoint( pointDown );
+    application.ProcessEvent( event1 );
+
+    event2.AddPoint( pointUp );
+    application.ProcessEvent( event2 );
 
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == false );
-    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_TOGGLED ) == true );
+    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
+    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_SELECTED ) == true );
   }
 
   END_TEST;

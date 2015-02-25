@@ -52,7 +52,7 @@ struct Decorator::Impl
     Vector4 color;
   };
 
-  Impl(Internal::Control& parent)
+  Impl(Dali::Toolkit::Internal::Control& parent)
   : mParent(parent),
     mActiveCursor(ACTIVE_CURSOR_NONE),
     mCursorBlinkInterval(0.5f),
@@ -166,7 +166,7 @@ Decorator::~Decorator()
   delete mImpl;
 }
 
-Decorator::Decorator(Internal::Control& parent)
+Decorator::Decorator(Dali::Toolkit::Internal::Control& parent)
 : mImpl( NULL )
 {
   mImpl = new Decorator::Impl(parent);

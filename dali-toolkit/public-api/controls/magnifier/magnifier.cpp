@@ -15,6 +15,7 @@
  *
  */
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/magnifier/magnifier.h>
 #include <dali-toolkit/internal/controls/magnifier/magnifier-impl.h>
 

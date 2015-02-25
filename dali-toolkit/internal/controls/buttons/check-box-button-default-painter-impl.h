@@ -18,13 +18,14 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/animation/animation.h>
-#include <dali-toolkit/public-api/shader-effects/image-region-effect.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/shader-effects/image-region-effect.h>
 #include "check-box-button-painter-impl.h"
 
 namespace Dali
@@ -68,88 +69,54 @@ public:
    */
   ~CheckBoxButtonDefaultPainter();
 
-  /**
-   * Sets the background image.
-   *
-   * It adds the background image to the root actor and creates the image transition if needed.
-   *
-   * @param[inout] checkBox The button in which all actors that form its appearance are going to be added.
-   * @param[in] image The background image.
-   */
-  void SetBackgroundImage( Toolkit::CheckBoxButton& checkBox, Actor image );
-
-  /**
-   * Sets the checked image.
-   *
-   * It adds the checked image to the root actor and creates the image transition if needed.
-   *
-   * @param[inout] checkBox The button in which all actors that form its appearance are going to be added.
-   * @param[in] image The checked image.
-   */
-  void SetCheckedImage( Toolkit::CheckBoxButton& checkBox, Actor image );
-
-  /**
-   * Sets the disabled backgroundimage.
-   *
-   * It adds the disabled backgroundimage to the root actor and creates the image transition if needed.
-   *
-   * @param[inout] checkBox The button in which all actors that form its appearance are going to be added.
-   * @param[in] image The disabled backgroundimage.
-   */
-  void SetDisabledBackgroundImage( Toolkit::CheckBoxButton& checkBox, Actor image );
-
-  /**
-   * Sets the disabled checked image.
-   *
-   * It adds the disabled checked image to the root actor and creates the image transition if needed.
-   *
-   * @param[inout] checkBox The button in which all actors that form its appearance are going to be added.
-   * @param[in] image The disabled checked image.
-   */
-  void SetDisabledCheckedImage( Toolkit::CheckBoxButton& checkBox, Actor image );
-
   /////////////////////////////////////////////////////////////////////////////
   // ButtonPainter interface
   /////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Initializes the painter by setting the default images.
-   *
-   * @param[inout] button The button in which all actors that form its appearance are going to be added.
+   * @copydoc ButtonPainter::Initialize( Toolkit::Button& button )
    */
-  void Initialize( Toolkit::Button& button );
+  virtual void Initialize( Toolkit::Button& button );
 
   /**
-   * Sets the new size.
-   *
-   * Resizes images. It applies size constraints.
-   *
-   * @param[inout] button The button which stores button's images.
-   * @param[in] size The new size.
+   * @copydoc ButtonPainter::SetSize( Toolkit::Button& button, const Vector3& size )
    */
-  void SetSize( Toolkit::Button& button, const Vector3& size );
+  virtual void SetSize( Toolkit::Button& button, const Vector3& size );
 
   /**
-   * Changes the Vega::Toolkit::CheckBoxButton for the given disabled state.
-   *
-   * It creates the image transition if needed.
-   *
-   * @param[inout] button The button in which all actors that form its appearance are going to be added.
-   * @param[in] disabled The disabled state.
+   * @copydoc ButtonPainter::SetDisabled( Toolkit::Button& button, bool disabled )
    */
-  void SetDisabled( Toolkit::Button& button, bool disabled );
+  virtual void SetDisabled( Toolkit::Button& button, bool disabled );
 
   /**
-   * Sets the animation time.
-   * @param[in] animationTime The animation time.
+   * @copydoc ButtonPainter::SetAnimationTime( float animationTime )
    */
-  void SetAnimationTime( float animationTime );
+  virtual void SetAnimationTime( float animationTime );
 
   /**
-   * Retrieves the animation time.
-   * @return The animation time.
+   * @copydoc ButtonPainter::GetAnimationTime()
    */
-  float GetAnimationTime() const;
+  virtual float GetAnimationTime() const;
+
+  /**
+   * @copydoc ButtonPainter::SetSelectedImage( Toolkit::Button& button, Actor image )
+   */
+  virtual void SetSelectedImage( Toolkit::Button& button, Actor image );
+
+  /**
+   * @copydoc ButtonPainter::SetBackgroundImage( Toolkit::Button& button, Actor image )
+   */
+  virtual void SetBackgroundImage( Toolkit::Button& button, Actor image );
+
+  /**
+   * @copydoc ButtonPainter::SetDisabledSelectedImage( Toolkit::Button& button, Actor image )
+   */
+  virtual void SetDisabledSelectedImage( Toolkit::Button& button, Actor image );
+
+  /**
+   * @copydoc ButtonPainter::SetDisabledBackgroundImage( Toolkit::Button& button, Actor image )
+   */
+  virtual void SetDisabledBackgroundImage( Toolkit::Button& button, Actor image );
 
   /////////////////////////////////////////////////////////////////////////////
   // CheckBoxButtonPainter interface
@@ -161,7 +128,7 @@ public:
    *
    * @param[inout] checkBox The Dali::Toolkit::CheckBoxButton in which this object is registered.
    */
-  void Checked( Toolkit::CheckBoxButton& checkBox );
+  void Selected( Toolkit::Button& checkBox );
 
 private:
 
@@ -178,16 +145,16 @@ private:
    */
   enum PaintState
   {
-    UncheckedState,              ///< The check box button is unchecked.
-    CheckedState,                ///< The check box button is checked.
-    DisabledUncheckedState,      ///< The check box button is disabled and unchecked.
-    DisabledCheckedState,        ///< The check box button is disabled and checked.
-    UncheckedCheckedTransition,  ///< The check box button is in transition from unchecked to checked.
-    CheckedUncheckedTransition,  ///< The check box button is in transition from checked to unchecked.
-    UncheckedDisabledTransition, ///< The check box button is in transition from unchecked to disabled.
-    DisabledUncheckedTransition, ///< The check box button is in transition from disabled to unchecked.
-    CheckedDisabledTransition,   ///< The check box button is in transition from checked to disabled.
-    DisabledCheckedTransition    ///< The check box button is in transition from disabled to checked.
+    UnselectedState,              ///< The check box button is unselected.
+    SelectedState,                ///< The check box button is selected.
+    DisabledUnselectedState,      ///< The check box button is disabled and unselected.
+    DisabledSelectedState,        ///< The check box button is disabled and selected.
+    UnselectedSelectedTransition, ///< The check box button is in transition from unselected to selected.
+    SelectedUnselectedTransition, ///< The check box button is in transition from selected to unselected.
+    UnselectedDisabledTransition, ///< The check box button is in transition from unselected to disabled.
+    DisabledUnselectedTransition, ///< The check box button is in transition from disabled to unselected.
+    SelectedDisabledTransition,   ///< The check box button is in transition from selected to disabled.
+    DisabledSelectedTransition    ///< The check box button is in transition from disabled to selected.
   };
 
   /**
@@ -214,7 +181,7 @@ private:
    * @param[inout] actor The actor.
    * @param[in] depth Depth position.
    */
-  void ApplyCheckedConstraint( Actor& actor, float depth );
+  void ApplySelectedConstraint( Actor& actor, float depth );
 
   /**
    * Adds the actor to the fade in animation. It creates a fade in animation if needed.
@@ -255,7 +222,7 @@ private:
    * Stops the fade out animation.
    *
    * It removes the actor stored in CheckBoxButtonDefaultPainter::mFadeOutBackgroundImage and
-   * CheckBoxButtonDefaultPainter::mFadeOutCheckedImage.
+   * CheckBoxButtonDefaultPainter::mFadeOutSelectedImage.
    *
    * @param[inout] checkBox The button which holds images.
    * @param[in] remove If true, removes the fadeout actor from root.
@@ -275,7 +242,7 @@ private:
    * It adds the actor fade out animation and stores it to be removed when the animation finishes.
    *
    * @param[inout] checkBox The button which holds images.
-   * @param[in] layer Defines if the actor is going to be stored in the mFadeOutBackgroundImage or mFadeOutCheckedImage member.
+   * @param[in] layer Defines if the actor is going to be stored in the mFadeOutBackgroundImage or mFadeOutSelectedImage member.
    * @param[inout] image The actor.
    * @param[in] opacity The initial opacity.
    */
@@ -294,7 +261,7 @@ private:
    * @param[inout] checkBox The button which holds images.
    * @param[inout] image The actor.
    */
-  void SetupCheckedAnimation( Toolkit::CheckBoxButton& checkBox, Actor& image );
+  void SetupSelectedAnimation( Toolkit::CheckBoxButton& checkBox, Actor& image );
 
   /**
    * Signal end of check out animation

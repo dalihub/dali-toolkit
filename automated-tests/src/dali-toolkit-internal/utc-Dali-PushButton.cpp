@@ -18,10 +18,10 @@
 #include <iostream>
 
 #include <stdlib.h>
+#include <dali-toolkit/internal/controls/buttons/push-button-impl.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali-toolkit/internal/controls/buttons/button-impl.h>
 
 
 using namespace Dali;
@@ -30,10 +30,10 @@ using namespace Toolkit;
 namespace
 {
 
-static bool gPushButtonToggleState = false;
-bool PushButtonToggled( Button button, bool toggled )
+static bool gPushButtonSelectedState = false;
+bool PushButtonSelected( Button button, bool selected )
 {
-  gPushButtonToggleState = toggled && ( toggled == static_cast<PushButton&>( button ).IsToggled() );
+  gPushButtonSelectedState = selected && ( selected == static_cast<PushButton&>( button ).IsSelected() );
   return true;
 }
 
@@ -67,15 +67,15 @@ class TETButton;
 }
 
 /**
- * Creates a Button to test if interrupt events are handled correctly.
+ * Creates a PushButton to test if interrupt events are handled correctly.
  */
-class TETButton : public Button
+class TETButton : public PushButton
 {
 public:
   // PushButton Pressed
-  typedef Signal< bool ( Button ) > PressedSignalType;
+  typedef Signal< bool ( PushButton ) > ButtonSignalType;
 
-  PressedSignalType& PressedSignal();
+  ButtonSignalType& PressedSignal();
 
   /**
    * Default constructor.
@@ -85,7 +85,7 @@ public:
   /**
    * Copy constructor.
    */
-  TETButton( const Button& button );
+  TETButton( const PushButton& button );
 
   /**
    * Assignment operator.
@@ -121,7 +121,7 @@ namespace Internal
 /**
  * Internal implementation
  */
-class TETButton : public Button
+class TETButton : public PushButton
 {
 public:
   /**
@@ -142,7 +142,7 @@ public:
   /**
    * @return the pressed signal.
    */
-  Toolkit::TETButton::PressedSignalType& PressedSignal();
+  Toolkit::TETButton::ButtonSignalType& PressedSignal();
 
   /**
    * Callback called when an interrupt events is received.
@@ -154,7 +154,7 @@ public:
    */
   void OnButtonDown();
 
-  Toolkit::TETButton::PressedSignalType mPressedSignal;   ///< Signal emitted when the button is pressed.
+  Toolkit::TETButton::ButtonSignalType mPressedSignal;   ///< Signal emitted when the button is pressed.
 };
 
 } // namespace Internal
@@ -163,8 +163,8 @@ TETButton::TETButton()
 {
 }
 
-TETButton::TETButton( const Button& button )
-: Button( button )
+TETButton::TETButton( const PushButton& button )
+: PushButton( button )
 {
 }
 
@@ -172,7 +172,7 @@ TETButton& TETButton::operator=( const TETButton& button )
 {
   if( &button != this )
   {
-    Button::operator=( button );
+    PushButton::operator=( button );
   }
   return *this;
 }
@@ -187,7 +187,7 @@ TETButton TETButton::DownCast( BaseHandle handle )
   return Control::DownCast<TETButton, Internal::TETButton>(handle);
 }
 
-TETButton::PressedSignalType& TETButton::PressedSignal()
+TETButton::ButtonSignalType& TETButton::PressedSignal()
 {
   TETButton button( *this );
   DALI_ASSERT_ALWAYS( button );
@@ -198,11 +198,11 @@ TETButton::PressedSignalType& TETButton::PressedSignal()
 }
 
 TETButton::TETButton( Internal::TETButton& implementation )
-: Button( implementation )
+: PushButton( implementation )
 {}
 
 TETButton::TETButton( Dali::Internal::CustomActor* internal )
-: Button( internal )
+: PushButton( internal )
 {
   VerifyCustomActorPointer<Internal::TETButton>(internal);
 }
@@ -211,7 +211,7 @@ namespace Internal
 {
 
 TETButton::TETButton()
-: Button(),
+: PushButton(),
   mPressedSignal()
 {
 }
@@ -235,7 +235,7 @@ Toolkit::TETButton TETButton::New()
   return tetButton;
 }
 
-Toolkit::TETButton::PressedSignalType& TETButton::PressedSignal()
+Toolkit::TETButton::ButtonSignalType& TETButton::PressedSignal()
 {
   return mPressedSignal;
 }
@@ -277,7 +277,7 @@ public:
   {
   }
 
-  bool Callback( Button button )
+  bool Callback( PushButton button )
   {
     switch( mTest )
     {
@@ -660,22 +660,22 @@ int UtcDaliPushButtonProperties(void)
   DALI_TEST_EQUALS( 4.0f, button.GetProperty< float >( Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY ), TEST_LOCATION );
 
   //  Button::PROPERTY_TOGGLABLE
-  button.SetToggleButton( false );
+  button.SetTogglableButton( false );
   DALI_TEST_CHECK( ! button.GetProperty< bool >( Button::PROPERTY_TOGGLABLE ) );
   button.SetProperty( Button::PROPERTY_TOGGLABLE, true );
-  DALI_TEST_CHECK( button.IsToggleButton() ) ;
+  DALI_TEST_CHECK( button.IsTogglableButton() ) ;
   DALI_TEST_CHECK( button.GetProperty< bool >( Button::PROPERTY_TOGGLABLE ) );
 
-  //  Button::PROPERTY_TOGGLED
-  button.SetToggled( false );
-  DALI_TEST_CHECK( ! button.GetProperty< bool >( Button::PROPERTY_TOGGLED ) );
-  button.SetProperty( Button::PROPERTY_TOGGLED, true );
-  DALI_TEST_CHECK( button.IsToggled() ) ;
-  DALI_TEST_CHECK( button.GetProperty< bool >( Button::PROPERTY_TOGGLED ) );
+  //  Button::PROPERTY_SELECTED
+  button.SetSelected( false );
+  DALI_TEST_CHECK( ! button.GetProperty< bool >( Button::PROPERTY_SELECTED ) );
+  button.SetProperty( Button::PROPERTY_SELECTED, true );
+  DALI_TEST_CHECK( button.IsSelected() ) ;
+  DALI_TEST_CHECK( button.GetProperty< bool >( Button::PROPERTY_SELECTED ) );
 
   //  Button::PROPERTY_NORMAL_STATE_ACTOR
   {
-    button.SetButtonImage( Image::New( "IMAGE_PATH_1") );
+    button.SetButtonImage( ResourceImage::New( "IMAGE_PATH_1") );
     DALI_TEST_EQUALS( "IMAGE_PATH_1", button.GetProperty( Button::PROPERTY_NORMAL_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;
@@ -687,7 +687,7 @@ int UtcDaliPushButtonProperties(void)
 
   //  Button::PROPERTY_SELECTED_STATE_ACTOR
   {
-    button.SetSelectedImage( Image::New( "IMAGE_PATH_2") );
+    button.SetSelectedImage( ResourceImage::New( "IMAGE_PATH_2") );
     DALI_TEST_EQUALS( "IMAGE_PATH_2", button.GetProperty( Button::PROPERTY_SELECTED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;
@@ -700,7 +700,7 @@ int UtcDaliPushButtonProperties(void)
 
   //  Button::PROPERTY_DISABLED_STATE_ACTOR
   {
-    button.SetDisabledImage( Image::New( "IMAGE_PATH_3") );
+    button.SetDisabledImage( ResourceImage::New( "IMAGE_PATH_3") );
     DALI_TEST_EQUALS( "IMAGE_PATH_3", button.GetProperty( Button::PROPERTY_DISABLED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;

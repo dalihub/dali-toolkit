@@ -46,18 +46,23 @@ namespace
 const Vector4 DEFAULT_OVERSHOOT_COLOUR(0.0f, 0.64f, 0.85f, 0.25f);
 const float DEFAULT_OVERSHOOT_ANIMATION_SPEED(120.0f); // 120 pixels per second
 
+// Signals
+
+const char* const SIGNAL_SCROLL_STARTED =   "scroll-started";
+const char* const SIGNAL_SCROLL_COMPLETED = "scroll-completed";
+const char* const SIGNAL_SCROLL_UPDATED =   "scroll-updated";
+
 BaseHandle Create()
 {
   // empty handle as we cannot create Scrollable (but type registered for scroll signal)
   return BaseHandle();
 }
 
-TypeRegistration mType( typeid(Toolkit::Scrollable), typeid(Toolkit::Control), Create );
+TypeRegistration mType( typeid( Toolkit::Scrollable ), typeid( Toolkit::Control ), Create );
 
-SignalConnectorType s1(mType, Toolkit::Scrollable::SIGNAL_SCROLL_STARTED,   &Scrollable::DoConnectSignal);
-SignalConnectorType s2(mType, Toolkit::Scrollable::SIGNAL_SCROLL_COMPLETED, &Scrollable::DoConnectSignal);
-SignalConnectorType s3(mType, Toolkit::Scrollable::SIGNAL_SCROLL_UPDATED,   &Scrollable::DoConnectSignal);
-SignalConnectorType s4(mType, Toolkit::Scrollable::SIGNAL_SCROLL_CLAMPED,   &Scrollable::DoConnectSignal);
+SignalConnectorType s1( mType, SIGNAL_SCROLL_STARTED,   &Scrollable::DoConnectSignal );
+SignalConnectorType s2( mType, SIGNAL_SCROLL_COMPLETED, &Scrollable::DoConnectSignal );
+SignalConnectorType s3( mType, SIGNAL_SCROLL_UPDATED,   &Scrollable::DoConnectSignal );
 
 PropertyRegistration property1( mType,
                                 "overshoot-effect-color",
@@ -204,11 +209,6 @@ Toolkit::Scrollable::ScrollCompletedSignalType& Scrollable::ScrollCompletedSigna
   return mScrollCompletedSignal;
 }
 
-Toolkit::Scrollable::ScrollClampedSignalType& Scrollable::ScrollClampedSignal()
-{
-  return mScrollClampedSignal;
-}
-
 bool Scrollable::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::BaseHandle handle( object );
@@ -216,21 +216,17 @@ bool Scrollable::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   bool connected( true );
   Toolkit::Scrollable scrollable = Toolkit::Scrollable::DownCast( handle );
 
-  if( Toolkit::Scrollable::SIGNAL_SCROLL_STARTED == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_SCROLL_STARTED ) )
   {
     scrollable.ScrollStartedSignal().Connect( tracker, functor );
   }
-  else if( Toolkit::Scrollable::SIGNAL_SCROLL_UPDATED == signalName )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_SCROLL_UPDATED ) )
   {
     scrollable.ScrollUpdatedSignal().Connect( tracker, functor );
   }
-  else if( Toolkit::Scrollable::SIGNAL_SCROLL_COMPLETED == signalName )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_SCROLL_COMPLETED ) )
   {
     scrollable.ScrollCompletedSignal().Connect( tracker, functor );
-  }
-  else if( Toolkit::Scrollable::SIGNAL_SCROLL_CLAMPED == signalName )
-  {
-    scrollable.ScrollClampedSignal().Connect( tracker, functor );
   }
   else
   {
