@@ -16,11 +16,11 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/images/bitmap-image.h>
 
 // INTERNAL INCLUDES
-
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
-#include <dali/public-api/images/bitmap-image.h>
+
 
 namespace Dali
 {

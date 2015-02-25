@@ -376,6 +376,11 @@ class ScrollView;
 /**
  * @brief ScrollView contains actors that can be scrolled manually (via touch)
  * or automatically.
+ *
+ * Signals
+ * | %Signal Name      | Method                     |
+ * |-------------------|----------------------------|
+ * | snap-started      | @ref SnapStartedSignal()   |
  */
 class DALI_IMPORT_API ScrollView : public Scrollable
 {
@@ -408,9 +413,6 @@ public:
   static const float DEFAULT_FRICTION_COEFFICIENT;                      ///< Default Friction Co-efficient. (in stage diagonals per second)
   static const float DEFAULT_FLICK_SPEED_COEFFICIENT;                   ///< Default Flick speed coefficient (multiples input touch velocity)
   static const float DEFAULT_MAX_FLICK_SPEED;                           ///< Default Maximum flick speed. (in stage diagonals per second)
-
-  //Signal Names
-  static const char* const SIGNAL_SNAP_STARTED; ///< Name "snap-started"
 
   /// Direction of transitions
   enum EDirectionFlag

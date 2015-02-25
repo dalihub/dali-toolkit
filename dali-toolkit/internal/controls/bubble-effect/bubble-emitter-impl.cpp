@@ -22,6 +22,7 @@
 #include <cmath>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/shader-effects/bubble-effect/color-adjuster.h>
@@ -89,7 +90,7 @@ void BubbleEmitter::OnInitialize()
   mBubbleRoot.SetSize(mMovementArea);
 
   // Prepare the frame buffer to store the color adjusted background image
-  mEffectImage = FrameBufferImage::New( mMovementArea.width/4.f, mMovementArea.height/4.f, Pixel::RGBA8888, Dali::Image::Unused );
+  mEffectImage = FrameBufferImage::New( mMovementArea.width/4.f, mMovementArea.height/4.f, Pixel::RGBA8888, Dali::Image::UNUSED );
 
   // Generate the material object, which is used by all meshActors
   GenMaterial();
@@ -107,7 +108,7 @@ void BubbleEmitter::OnInitialize()
     mMeshActor[i] = MeshActor::New( mMesh[i] );
     mMeshActor[i].SetAffectedByLighting( false );
     mMeshActor[i].SetParentOrigin(ParentOrigin::TOP_LEFT);
-    mEffect[i] = BubbleEffect::New( mNumBubblePerShader, mShapeImage.GetFilename() );
+    mEffect[i] = BubbleEffect::New( mNumBubblePerShader );
     mEffect[i].SetEffectImage( mEffectImage );
     mEffect[i].SetMovementArea( mMovementArea );
     mMeshActor[i].SetShaderEffect( mEffect[i] );
@@ -120,7 +121,7 @@ void BubbleEmitter::OnInitialize()
   mMeshActorForNoise = MeshActor::New( Mesh::New(meshDataForNoise) );
   mMeshActorForNoise.SetAffectedByLighting( false );
   mMeshActorForNoise.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  mEffectForNoise = BubbleEffect::New( mNumBubblePerShader, mShapeImage.GetFilename() );
+  mEffectForNoise = BubbleEffect::New( mNumBubblePerShader );
   mEffectForNoise.SetMovementArea( mMovementArea );
   mEffectForNoise.SetEffectImage( mEffectImage );
   mMeshActorForNoise.SetShaderEffect( mEffectForNoise );
@@ -169,15 +170,6 @@ void BubbleEmitter::SetBackground( Image bgImage, const Vector3& hsvDelta )
 void BubbleEmitter::SetShapeImage( Image shapeImage )
 {
   mCustomMaterial.SetDiffuseTexture( shapeImage );
-
-  //Get pixel width of the shape
-  float width = Image::GetImageSize(shapeImage.GetFilename()).width;
-
-  for(unsigned int i=0; i < mNumShader; i++ )
-  {
-    mEffect[i].SetShapeImageWidth(width);
-  }
-  mEffectForNoise.SetShapeImageWidth(width);
 }
 
 void BubbleEmitter::SetBubbleScale( float scale )

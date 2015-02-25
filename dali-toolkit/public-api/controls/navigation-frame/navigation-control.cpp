@@ -29,9 +29,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const char* const NavigationControl::ACTION_PUSH = "push";
-const char* const NavigationControl::ACTION_POP = "pop";
-
 NavigationControl::NavigationControl()
 {
 }

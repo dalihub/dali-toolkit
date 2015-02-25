@@ -52,6 +52,10 @@ using namespace Dali;
 namespace
 {
 
+// Signals
+
+const char* const SIGNAL_SNAP_STARTED = "snap-started";
+
 const int DEFAULT_REFRESH_INTERVAL_MILLISECONDS = 50;                                     ///< Refresh rate TODO: Animation should have an update signal (and see item-view-impl)
 const Vector2 DEFAULT_MIN_FLICK_DISTANCE(30.0f, 30.0f);                                   ///< minimum distance for pan before flick allowed
 const float DEFAULT_MIN_FLICK_SPEED_THRESHOLD(500.0f);                          ///< Minimum pan speed required for flick in pixels/s
@@ -522,9 +526,9 @@ BaseHandle Create()
   return Toolkit::ScrollView::New();
 }
 
-TypeRegistration typeRegistration( typeid(Toolkit::ScrollView), typeid(Toolkit::Scrollable), Create );
+TypeRegistration typeRegistration( typeid( Toolkit::ScrollView ), typeid( Toolkit::Scrollable ), Create );
 
-SignalConnectorType signalConnector1( typeRegistration, Toolkit::ScrollView::SIGNAL_SNAP_STARTED, &ScrollView::DoConnectSignal );
+SignalConnectorType signalConnector1( typeRegistration, SIGNAL_SNAP_STARTED, &ScrollView::DoConnectSignal );
 
 }
 
@@ -1138,6 +1142,9 @@ void ScrollView::TransformTo(const Vector3& position,
 void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunction alpha,
                              DirectionBias horizontalBias, DirectionBias verticalBias)
 {
+  // If this is called while the timer is running, then cancel it
+  StopTouchDownTimer();
+
   Actor self( Self() );
 
   // Guard against destruction during signal emission
@@ -1843,7 +1850,7 @@ bool ScrollView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   bool connected( true );
   Toolkit::ScrollView view = Toolkit::ScrollView::DownCast( handle );
 
-  if( Toolkit::ScrollView::SIGNAL_SNAP_STARTED == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_SNAP_STARTED ) )
   {
     view.SnapStartedSignal().Connect( tracker, functor );
   }

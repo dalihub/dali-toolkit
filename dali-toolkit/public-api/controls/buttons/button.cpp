@@ -29,13 +29,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const char* const Button::SIGNAL_PRESSED = "pressed";
-const char* const Button::SIGNAL_RELEASED = "released";
-const char* const Button::SIGNAL_CLICKED = "clicked";
-const char* const Button::SIGNAL_STATE_CHANGED = "state-changed";
-
-const char* const Button::ACTION_BUTTON_CLICK = "button-click";
-
 Button::Button()
 {}
 

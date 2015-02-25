@@ -27,8 +27,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const char* const CubeTransitionEffect::SIGNAL_TRANSITION_COMPLETED = "transition-completed";
-
 CubeTransitionEffect::CubeTransitionEffect()
 {
 }
@@ -40,6 +38,11 @@ CubeTransitionEffect::~CubeTransitionEffect()
 CubeTransitionEffect::CubeTransitionEffect(Internal::CubeTransitionEffect* impl)
 : BaseHandle(impl)
 {
+}
+
+CubeTransitionEffect CubeTransitionEffect::DownCast( BaseHandle handle )
+{
+  return CubeTransitionEffect( dynamic_cast< Dali::Toolkit::Internal::CubeTransitionEffect* >( handle.GetObjectPtr() ) );
 }
 
 void CubeTransitionEffect::SetTransitionDuration( float duration )

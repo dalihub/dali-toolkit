@@ -27,9 +27,6 @@ namespace Dali
 namespace Toolkit
 {
 
-
-const char* const TextView::SIGNAL_TEXT_SCROLLED = "scrolled";
-
 TextView::CharacterLayoutInfo::CharacterLayoutInfo()
 : mSize(),
   mPosition(),

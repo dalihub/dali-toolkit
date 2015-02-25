@@ -79,19 +79,11 @@ public:
   static const char* const OPTION_PASTE;
   static const char* const OPTION_CLIPBOARD;
 
-  // Signal names
-  static const char* const SIGNAL_PRESSED;
-  static const char* const SIGNAL_HIDE_FINISHED;
-  static const char* const SIGNAL_SHOW_FINISHED;
-
   // Popup Button Pressed
   typedef Signal< bool( Toolkit::Button ) > PressedSignalType;
 
-  // Popup Hide Finished
-  typedef Signal< void( TextInputPopup& ) > HideFinishedSignalType;
-
-  // Popup Show Finished
-  typedef Signal< void( TextInputPopup& ) > ShowFinishedSignalType;
+  // Popup Hide / Show Finished
+  typedef Signal< void( TextInputPopup& ) > VisibilityChangeFinishedSignalType;
 
   /**
    * Signal emitted when the button is touched.
@@ -102,13 +94,13 @@ public:
    * Signal emitted when popup is completely hidden
    * @note Only occurs after a Show() call with animation enabled.
    */
-  HideFinishedSignalType& HideFinishedSignal();
+  VisibilityChangeFinishedSignalType& HideFinishedSignal();
 
   /**
    * Signal emitted when popup is completely shown
    * @note Only occurs after a Hide() call with animation enabled.
    */
-  ShowFinishedSignalType& ShowFinishedSignal();
+  VisibilityChangeFinishedSignalType& ShowFinishedSignal();
 
 public:
 
@@ -463,8 +455,8 @@ private:
   std::size_t mClipboardOptionPriority;  // Position of Clipboard button
 
   PressedSignalType mPressedSignal;              ///< Signal emitted when a button within the popup is pressed.
-  HideFinishedSignalType mHideFinishedSignal;    ///< Signal emitted when popup is completely hidden
-  ShowFinishedSignalType mShowFinishedSignal;    ///< Signal emitted when popup is completely shown
+  VisibilityChangeFinishedSignalType mHideFinishedSignal; ///< Signal emitted when popup is completely hidden
+  VisibilityChangeFinishedSignalType mShowFinishedSignal; ///< Signal emitted when popup is completely shown
 
 };
 

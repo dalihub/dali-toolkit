@@ -15,6 +15,7 @@
  *
  */
 
+// CLASS HEADER
 #include "navigation-tool-bar.h"
 
 namespace Dali

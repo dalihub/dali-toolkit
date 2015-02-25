@@ -54,10 +54,9 @@ public:
    * Ideally use one group of uniform to control one bubble.
    * If the num of patches in the MeshActor is more than groups of uniforms,
    * the uniform values will be shared by multiple bubbles. Allow up to 9 times.
-   * @param shapeImagePath File path of the image that will be used as a texture for each bubble.
    * @return A handle to a newly allocated Dali resource.
    */
-  static BubbleEffect New( unsigned int numberOfBubble, const std::string& shapeImagePath);
+  static BubbleEffect New( unsigned int numberOfBubble);
 
   /**
    * Set the bubble movement area for the BubbleEffect
@@ -87,13 +86,6 @@ public:
    * @param[in] gravity The gravity on the y direction.
    */
   void SetGravity( float gravity );
-
-  /*
-   * Set the width of shape image
-   * If one image has multiple shape, bubble effect will parse one shape from the image randomly.
-   * @param[in] imageWidth width of shape image
-   */
-  void SetShapeImageWidth( float imageWidth );
 
   /**
    * Set the scale factor applied to the bubbles

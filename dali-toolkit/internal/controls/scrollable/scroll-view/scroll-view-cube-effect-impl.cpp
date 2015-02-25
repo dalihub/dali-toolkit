@@ -18,6 +18,7 @@
 // EXTERNAL INCLUDES
 #include <boost/bind.hpp>
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-cube-effect-impl.h>
 

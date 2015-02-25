@@ -18,6 +18,9 @@
 // FILE HEADER
 #include <dali-toolkit/internal/controls/text-view/text-view-processor-dbg.h>
 
+// EXTERNAL INCLUDES
+#include <iostream>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-view/text-view-processor-types.h>
 

@@ -60,17 +60,6 @@ public:
   static const Property::Index CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY;  // Property, name "clipboard-button-position-priority", type unsigned int
   static const Property::Index POP_UP_OFFSET_FROM_TEXT_PROPERTY;             // Property, name "popup-offset-from-text", type VECTOR4
   static const Property::Index CURSOR_COLOR_PROPERTY;                        // Property, name "cursor-color", type VECTOR4
-
-  /** @} */
-
-  /// @name Signals
-  /** @{ */
-  static const char* const SIGNAL_START_INPUT; ///< name "start-input"
-  static const char* const SIGNAL_END_INPUT; ///< name "end-input"
-  static const char* const SIGNAL_STYLE_CHANGED; ///< name "style-changed"
-  static const char* const SIGNAL_MAX_INPUT_CHARACTERS_REACHED; ///< name "max-input-characters-reached"
-  static const char* const SIGNAL_TOOLBAR_DISPLAYED; ///< name "toolbar-displayed"
-  static const char* const SIGNAL_TEXT_EXCEED_BOUNDARIES; ///< name "text-exceed-boundaries"
   /** @} */
 
 public:

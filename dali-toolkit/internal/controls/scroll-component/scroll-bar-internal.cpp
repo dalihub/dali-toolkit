@@ -15,6 +15,7 @@
  *
  */
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scroll-component/scroll-bar-internal.h>
 #include <dali-toolkit/internal/controls/scroll-component/scroll-bar-internal-impl.h>
 

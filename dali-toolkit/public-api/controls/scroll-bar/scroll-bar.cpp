@@ -15,7 +15,10 @@
  *
  */
 
+// CLASS HEADER
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scroll-bar/scroll-bar-impl.h>
 
 namespace Dali
@@ -23,8 +26,6 @@ namespace Dali
 
 namespace Toolkit
 {
-
-const char* const ScrollBar::SCROLL_POSITION_NOTIFIED_SIGNAL_NAME = "scroll-position-notified";
 
 ScrollBar::ScrollBar()
 {

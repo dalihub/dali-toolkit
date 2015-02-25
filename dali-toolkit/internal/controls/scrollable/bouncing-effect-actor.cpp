@@ -18,14 +18,13 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/scrollable/bouncing-effect-actor.h>
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/geometry/animatable-mesh.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/public-api/math/vector3.h>
 
-// EXTERNAL INCLUDES
 #include <math.h>
 
 namespace Dali

@@ -15,15 +15,15 @@
  *
  */
 
+// CLASS HEADER
+#include "super-blur-view-impl.h"
+
 // EXTERNAL INCLUDES
 #include <cmath>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
-
-// CLASS HEADER
-#include "super-blur-view-impl.h"
 
 namespace //unnamed namespace
 {
@@ -266,7 +266,7 @@ void SuperBlurView::OnControlSizeSet( const Vector3& targetSize )
     {
       float exponent = static_cast<float>(i+1);
       mBlurredImage[i] = FrameBufferImage::New( mTargetSize.width/std::pow(2.f,exponent) , mTargetSize.height/std::pow(2.f,exponent),
-                                                GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT, Dali::Image::Never );
+                                                GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT, Dali::Image::NEVER );
     }
   }
 }

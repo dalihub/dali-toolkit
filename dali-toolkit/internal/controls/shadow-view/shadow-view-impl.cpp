@@ -180,9 +180,9 @@ void ShadowView::SetShadowPlane(Actor shadowPlane)
 
   ConstrainCamera();
 
-  mShadowPlane.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, Source( mShadowPlaneBg, Actor::SIZE ), EqualToConstraint() ) );
+  mShadowPlane.SetSizeMode( SIZE_EQUAL_TO_PARENT );
 
-  mBlurRootActor.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, Source( mShadowPlane, Actor::SIZE ), EqualToConstraint() ) );
+  mBlurRootActor.SetSizeMode( SIZE_EQUAL_TO_PARENT );
 }
 
 void ShadowView::SetPointLight(Actor pointLight)
@@ -237,7 +237,7 @@ void ShadowView::OnInitialize()
 {
   // root actor to parent all user added actors. Used as source actor for shadow render task.
   mChildrenRoot.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-  mChildrenRoot.ApplyConstraint(Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() ));
+  mChildrenRoot.SetSizeMode( SIZE_EQUAL_TO_PARENT );
 
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   mCameraActor = CameraActor::New(stageSize);

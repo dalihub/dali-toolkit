@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-input/textview-character-positions-impl.h>
@@ -61,7 +62,8 @@ Actor CreateGrabArea( const std::string& name, const Vector3& relativeScale )
 
   Actor handleGrabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
   handleGrabArea.SetName( name );
-  handleGrabArea.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), RelativeToConstraint( relativeScale ) ) );  // grab area to be larger than text actor
+  handleGrabArea.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
+  handleGrabArea.SetSizeModeFactor( relativeScale );
   handleGrabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
   return handleGrabArea;
@@ -112,8 +114,8 @@ void TextInputHandles::CreateSelectionHandles()
 {
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "TextInputHandles: CreateSelectionHandles\n" );
 
-  mSelectionHandleOneImage = Image::New( DEFAULT_SELECTION_HANDLE_ONE );
-  mSelectionHandleOneImagePressed = Image::New( DEFAULT_SELECTION_HANDLE_ONE_PRESSED );
+  mSelectionHandleOneImage = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE );
+  mSelectionHandleOneImagePressed = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE_PRESSED );
   mSelectionHandleOne = CreateHandle( AnchorPoint::TOP_RIGHT, mSelectionHandleOneImage, "SelectionHandleOne" );
   mIsSelectionHandleOneFlipped = false;
 
@@ -123,8 +125,8 @@ void TextInputHandles::CreateSelectionHandles()
 
 //  mTapDetector.Attach( mHandleOneGrabArea );
 
-  mSelectionHandleTwoImage = Image::New( DEFAULT_SELECTION_HANDLE_TWO );
-  mSelectionHandleTwoImagePressed = Image::New( DEFAULT_SELECTION_HANDLE_TWO_PRESSED );
+  mSelectionHandleTwoImage = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO );
+  mSelectionHandleTwoImagePressed = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO_PRESSED );
   mSelectionHandleTwo = CreateHandle( AnchorPoint::TOP_LEFT, mSelectionHandleTwoImage, "SelectionHandleTwo" );
   mIsSelectionHandleTwoFlipped = false;
 
@@ -245,7 +247,7 @@ void TextInputHandles::CreateGrabHandle()
   {
     if ( !mGrabHandleImage )
     {
-      mGrabHandleImage = Image::New( DEFAULT_GRAB_HANDLE );
+      mGrabHandleImage = ResourceImage::New( DEFAULT_GRAB_HANDLE );
     }
 
     mGrabHandle = CreateHandle( AnchorPoint::TOP_CENTER, mGrabHandleImage, "GrabHandle" );

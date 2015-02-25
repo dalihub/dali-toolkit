@@ -18,13 +18,14 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/animation/animation.h>
-#include <dali-toolkit/public-api/shader-effects/image-region-effect.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/shader-effects/image-region-effect.h>
 #include "check-box-button-painter-impl.h"
 
 namespace Dali

@@ -18,9 +18,10 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/cluster/cluster.h>
 #include <dali-toolkit/public-api/controls/cluster/cluster-style.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>

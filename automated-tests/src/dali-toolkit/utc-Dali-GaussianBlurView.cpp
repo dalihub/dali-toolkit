@@ -195,7 +195,7 @@ int UtcDaliGaussianBlurViewSetGetRenderTarget(void)
   view.Activate();
 
   FrameBufferImage renderTarget = FrameBufferImage::New( 480.0f, 800.0f, Pixel::RGB888 );
-  view.SetUserImageAndOutputRenderTarget(Image::New(TEST_IMAGE_FILE_NAME), renderTarget);
+  view.SetUserImageAndOutputRenderTarget(ResourceImage::New(TEST_IMAGE_FILE_NAME), renderTarget);
   DALI_TEST_CHECK( view.GetBlurredRenderTarget() == renderTarget );
   END_TEST;
 }

@@ -17,9 +17,11 @@
 
 // CLASS HEADER
 #include <dali-toolkit/internal/builder/json-parser-impl.h>
-// EXTERNAL
+
+// EXTERNAL INCLUDES
 #include <cstring>
 
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/builder/tree-node-manipulator.h>
 #include <dali-toolkit/internal/builder/json-parser-state.h>
 

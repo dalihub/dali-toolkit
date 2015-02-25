@@ -438,10 +438,10 @@ void EffectsView::AllocateResources()
 
     SetupCameras();
 
-    mImageForChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::Unused );
+    mImageForChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
     mActorForChildren.SetImage(mImageForChildren);
 
-    mImagePostFilter = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::Unused );
+    mImagePostFilter = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Dali::Image::UNUSED );
     mActorPostFilter.SetImage(mImagePostFilter);
 
     SetupFilters();

@@ -42,13 +42,15 @@ class TextView;
  * It provides support for multi-line wrapping, multi-language font detection, text alignment, scrolling and styling.
  *
  * See the \link text-view Text View \endlink page of the Programming Guide for more details and examples.
+ *
+ * Signals
+ * | %Signal Name      | Method                    |
+ * |-------------------|---------------------------|
+ * | scrolled          | @ref ScrolledSignal()     |
  */
 class DALI_IMPORT_API TextView : public Control
 {
 public:
-
-  // Signal Names
-  static const char* const SIGNAL_TEXT_SCROLLED; ///< Signal emitted when the scroll position changes. @see ScrolledSignal()
 
   // Properties
   static const Property::Index PROPERTY_MARKUP_ENABLED;         ///< name "markup-enabled",       @see SetMarkupProcessingEnabled(), type BOOLEAN

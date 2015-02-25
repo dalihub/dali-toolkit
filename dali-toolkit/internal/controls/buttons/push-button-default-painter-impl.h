@@ -18,12 +18,13 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/animation/animation.h>
 
+// INTERNAL INCLUDES
 #include "push-button-painter-impl.h"
 
 namespace Dali

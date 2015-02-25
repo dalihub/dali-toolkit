@@ -21,6 +21,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/images/resource-image.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit::Internal;
@@ -58,8 +59,8 @@ Dali::Toolkit::RadioButton RadioButton::New()
 
 RadioButton::RadioButton()
 {
-  mUnselectedImage = Dali::Image::New( UNSELECTED_BUTTON_IMAGE_DIR );
-  mSelectedImage = Dali::Image::New( SELECTED_BUTTON_IMAGE_DIR );
+  mUnselectedImage = Dali::ResourceImage::New( UNSELECTED_BUTTON_IMAGE_DIR );
+  mSelectedImage = Dali::ResourceImage::New( SELECTED_BUTTON_IMAGE_DIR );
 
   mRadioIcon = Dali::ImageActor::New( mUnselectedImage );
 

@@ -125,8 +125,8 @@ void EmbossFilter::Enable()
   mCameraActor = CameraActor::New();
   mCameraActor.SetParentOrigin(ParentOrigin::CENTER);
 
-  mImageForEmboss1 = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::Unused );
-  mImageForEmboss2 = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::Unused );
+  mImageForEmboss1 = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::UNUSED );
+  mImageForEmboss2 = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat, Image::UNUSED );
 
   // create actor to render input with applied emboss effect
   mActorForInput1 = ImageActor::New( mInputImage );

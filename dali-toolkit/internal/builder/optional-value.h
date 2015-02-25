@@ -18,7 +18,6 @@
  *
  */
 
-// INTERNAL INCLUDES
 template <typename T>
 struct OptionalTypes
 {

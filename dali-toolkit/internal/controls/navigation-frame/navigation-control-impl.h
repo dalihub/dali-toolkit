@@ -26,8 +26,8 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/navigation-frame/navigation-control.h>
 #include <dali-toolkit/public-api/controls/navigation-frame/page.h>
-#include <dali-toolkit/internal/controls/navigation-frame/navigation-bar.h>
 #include <dali-toolkit/public-api/controls/popup/popup.h>
+#include <dali-toolkit/internal/controls/navigation-frame/navigation-bar.h>
 
 namespace Dali
 {

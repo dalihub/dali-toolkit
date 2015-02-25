@@ -30,6 +30,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-view/text-processor.h>
@@ -197,19 +198,28 @@ namespace Internal
 namespace
 {
 
+// Signals
+
+const char* const SIGNAL_START_INPUT =                  "start-input";
+const char* const SIGNAL_END_INPUT =                    "end-input";
+const char* const SIGNAL_STYLE_CHANGED =                "style-changed";
+const char* const SIGNAL_MAX_INPUT_CHARACTERS_REACHED = "max-input-characters-reached";
+const char* const SIGNAL_TOOLBAR_DISPLAYED =            "toolbar-displayed";
+const char* const SIGNAL_TEXT_EXCEED_BOUNDARIES =       "text-exceed-boundaries";
+
 BaseHandle Create()
 {
   return Toolkit::TextInput::New();
 }
 
-TypeRegistration typeRegistration( typeid(Toolkit::TextInput), typeid(Toolkit::Control), Create );
+TypeRegistration typeRegistration( typeid( Toolkit::TextInput ), typeid( Toolkit::Control ), Create );
 
-SignalConnectorType signalConnector1( typeRegistration, Toolkit::TextInput::SIGNAL_START_INPUT,                  &TextInput::DoConnectSignal );
-SignalConnectorType signalConnector2( typeRegistration, Toolkit::TextInput::SIGNAL_END_INPUT,                    &TextInput::DoConnectSignal );
-SignalConnectorType signalConnector3( typeRegistration, Toolkit::TextInput::SIGNAL_STYLE_CHANGED,                &TextInput::DoConnectSignal );
-SignalConnectorType signalConnector4( typeRegistration, Toolkit::TextInput::SIGNAL_MAX_INPUT_CHARACTERS_REACHED, &TextInput::DoConnectSignal );
-SignalConnectorType signalConnector5( typeRegistration, Toolkit::TextInput::SIGNAL_TOOLBAR_DISPLAYED,            &TextInput::DoConnectSignal );
-SignalConnectorType signalConnector6( typeRegistration, Toolkit::TextInput::SIGNAL_TEXT_EXCEED_BOUNDARIES,       &TextInput::DoConnectSignal );
+SignalConnectorType signalConnector1( typeRegistration, SIGNAL_START_INPUT,                  &TextInput::DoConnectSignal );
+SignalConnectorType signalConnector2( typeRegistration, SIGNAL_END_INPUT,                    &TextInput::DoConnectSignal );
+SignalConnectorType signalConnector3( typeRegistration, SIGNAL_STYLE_CHANGED,                &TextInput::DoConnectSignal );
+SignalConnectorType signalConnector4( typeRegistration, SIGNAL_MAX_INPUT_CHARACTERS_REACHED, &TextInput::DoConnectSignal );
+SignalConnectorType signalConnector5( typeRegistration, SIGNAL_TOOLBAR_DISPLAYED,            &TextInput::DoConnectSignal );
+SignalConnectorType signalConnector6( typeRegistration, SIGNAL_TEXT_EXCEED_BOUNDARIES,       &TextInput::DoConnectSignal );
 
 }
 
@@ -578,25 +588,29 @@ bool TextInput::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   Dali::BaseHandle handle( object );
 
   bool connected( true );
-  Toolkit::TextInput textInput = Toolkit::TextInput::DownCast(handle);
+  Toolkit::TextInput textInput = Toolkit::TextInput::DownCast( handle );
 
-  if( Toolkit::TextInput::SIGNAL_START_INPUT == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_START_INPUT ) )
   {
     textInput.InputStartedSignal().Connect( tracker, functor );
   }
-  else if( Toolkit::TextInput::SIGNAL_END_INPUT == signalName )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_END_INPUT ) )
   {
     textInput.InputFinishedSignal().Connect( tracker, functor );
   }
-  else if( Toolkit::TextInput::SIGNAL_STYLE_CHANGED == signalName )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_STYLE_CHANGED ) )
   {
     textInput.StyleChangedSignal().Connect( tracker, functor );
   }
-  else if( Toolkit::TextInput::SIGNAL_MAX_INPUT_CHARACTERS_REACHED == signalName )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_MAX_INPUT_CHARACTERS_REACHED ) )
   {
     textInput.MaxInputCharactersReachedSignal().Connect( tracker, functor );
   }
-  else if( Toolkit::TextInput::SIGNAL_TEXT_EXCEED_BOUNDARIES == signalName )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_TOOLBAR_DISPLAYED ) )
+  {
+    textInput.CutAndPasteToolBarDisplayedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_TEXT_EXCEED_BOUNDARIES ) )
   {
     textInput.InputTextExceedBoundariesSignal().Connect( tracker, functor );
   }
@@ -3021,7 +3035,7 @@ void TextInput::CreateGrabHandle( Dali::Image image )
   {
     if ( !image )
     {
-      mGrabHandleImage = Image::New(DEFAULT_GRAB_HANDLE);
+      mGrabHandleImage = ResourceImage::New(DEFAULT_GRAB_HANDLE);
     }
     else
     {
@@ -3047,7 +3061,8 @@ void TextInput::CreateGrabArea( Actor& parent )
   mGrabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
   mGrabArea.SetName( "GrabArea" );
   mGrabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-  mGrabArea.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), RelativeToConstraint( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE ) ) );  // grab area to be larger than text actor
+  mGrabArea.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
+  mGrabArea.SetSizeModeFactor( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE );
   mGrabArea.TouchedSignal().Connect(this,&TextInput::OnPressDown);
   mTapDetector.Attach( mGrabArea );
   mPanGestureDetector.Attach( mGrabArea );
@@ -3270,8 +3285,8 @@ void TextInput::CreateSelectionHandles( std::size_t start, std::size_t end, Dali
   if ( !mSelectionHandleOne )
   {
     // create normal and pressed images
-    mSelectionHandleOneImage = Image::New( DEFAULT_SELECTION_HANDLE_ONE );
-    mSelectionHandleOneImagePressed = Image::New( DEFAULT_SELECTION_HANDLE_ONE_PRESSED );
+    mSelectionHandleOneImage = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE );
+    mSelectionHandleOneImagePressed = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE_PRESSED );
 
     mSelectionHandleOne = ImageActor::New( mSelectionHandleOneImage );
     mSelectionHandleOne.SetName("SelectionHandleOne");
@@ -3283,7 +3298,8 @@ void TextInput::CreateSelectionHandles( std::size_t start, std::size_t end, Dali
     mHandleOneGrabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
     mHandleOneGrabArea.SetName("SelectionHandleOneGrabArea");
 
-    mHandleOneGrabArea.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), RelativeToConstraint( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE ) ) );  // grab area to be larger than text actor
+    mHandleOneGrabArea.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
+    mHandleOneGrabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
     mHandleOneGrabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
     mTapDetector.Attach( mHandleOneGrabArea );
@@ -3298,8 +3314,8 @@ void TextInput::CreateSelectionHandles( std::size_t start, std::size_t end, Dali
   if ( !mSelectionHandleTwo )
   {
     // create normal and pressed images
-    mSelectionHandleTwoImage = Image::New( DEFAULT_SELECTION_HANDLE_TWO );
-    mSelectionHandleTwoImagePressed = Image::New( DEFAULT_SELECTION_HANDLE_TWO_PRESSED );
+    mSelectionHandleTwoImage = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO );
+    mSelectionHandleTwoImagePressed = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO_PRESSED );
 
     mSelectionHandleTwo = ImageActor::New( mSelectionHandleTwoImage );
     mSelectionHandleTwo.SetName("SelectionHandleTwo");
@@ -3310,7 +3326,8 @@ void TextInput::CreateSelectionHandles( std::size_t start, std::size_t end, Dali
 
     mHandleTwoGrabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
     mHandleTwoGrabArea.SetName("SelectionHandleTwoGrabArea");
-    mHandleTwoGrabArea.ApplyConstraint( Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), RelativeToConstraint( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE ) ) );  // grab area to be larger than text actor
+    mHandleTwoGrabArea.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
+    mHandleTwoGrabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
     mHandleTwoGrabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
     mTapDetector.Attach( mHandleTwoGrabArea );

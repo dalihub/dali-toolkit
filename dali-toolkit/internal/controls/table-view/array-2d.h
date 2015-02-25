@@ -19,7 +19,7 @@
  *
  */
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 
 namespace Dali

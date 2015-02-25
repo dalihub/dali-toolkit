@@ -111,6 +111,7 @@
 #include <dali-toolkit/public-api/shader-effects/nine-patch-mask-effect.h>
 #include <dali-toolkit/public-api/shader-effects/page-turn-book-spine-effect.h>
 #include <dali-toolkit/public-api/shader-effects/page-turn-effect.h>
+#include <dali-toolkit/public-api/shader-effects/quadratic-bezier.h>
 #include <dali-toolkit/public-api/shader-effects/ripple-effect.h>
 #include <dali-toolkit/public-api/shader-effects/ripple2d-effect.h>
 #include <dali-toolkit/public-api/shader-effects/swirl-effect.h>

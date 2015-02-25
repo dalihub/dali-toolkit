@@ -507,7 +507,7 @@ int UtcDaliPageTurnViewSignals(void)
 
   // [0]: testing PageTurnStartedSignal;  [1]: testing PageTurnFinishedSignal
   // [2]: testing PagePanStartedSignal;   [3]: testing PagePanFinishedSignal
-  bool signalVerified[4];
+  bool signalVerified[4] = {false, false, false, false};
   PageTurnView currentView;
   unsigned int pageIndex;
   bool isTurningForwards;
