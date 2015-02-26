@@ -42,12 +42,55 @@ namespace Toolkit
 namespace Text
 {
 
+struct Controller::TextInput
+{
+  // Used to queue input events until DoRelayout()
+  enum EventType
+  {
+    KEYBOARD_FOCUS_GAIN_EVENT,
+    KEYBOARD_FOCUS_LOST_EVENT,
+    TAP_EVENT,
+    GRAB_HANDLE_EVENT
+  };
+
+  union Param
+  {
+    int mInt;
+    float mFloat;
+  };
+
+  struct Event
+  {
+    Event( EventType eventType )
+    : type( eventType )
+    {
+      p1.mInt = 0;
+      p2.mInt = 0;
+    }
+
+    EventType type;
+    Param p1;
+    Param p2;
+  };
+
+  TextInput( DecoratorPtr decorator )
+  : mDecorator( decorator )
+  {
+  }
+
+  DecoratorPtr mDecorator;
+
+  std::vector<Event> mEventQueue;
+};
+
 struct Controller::Impl
 {
-  Impl()
-  : mNewText(),
+  Impl( ControlInterface& controlInterface )
+  : mControlInterface( controlInterface ),
+    mNewText(),
     mOperations( NO_OPERATION ),
-    mControlSize()
+    mControlSize(),
+    mTextInput( NULL )
   {
     mLogicalModel = LogicalModel::New();
     mVisualModel  = VisualModel::New();
@@ -56,6 +99,13 @@ struct Controller::Impl
 
     mFontClient = TextAbstraction::FontClient::Get();
   }
+
+  ~Impl()
+  {
+    delete mTextInput;
+  }
+
+  ControlInterface& mControlInterface;
 
   std::string mNewText;
 
@@ -71,11 +121,14 @@ struct Controller::Impl
   OperationsMask mOperations;
 
   Size mControlSize;
+
+  // Avoid allocating everything for text input until EnableTextInput()
+  Controller::TextInput* mTextInput;
 };
 
-ControllerPtr Controller::New()
+ControllerPtr Controller::New( ControlInterface& controlInterface )
 {
-  return ControllerPtr( new Controller() );
+  return ControllerPtr( new Controller( controlInterface ) );
 }
 
 void Controller::SetText( const std::string& text )
@@ -83,6 +136,22 @@ void Controller::SetText( const std::string& text )
   // Keep until size negotiation
   mImpl->mNewText = text;
   mImpl->mOperations = ALL_OPERATIONS;
+
+  if( mImpl->mTextInput )
+  {
+    // Cancel previously queued events
+    mImpl->mTextInput->mEventQueue.clear();
+
+    // TODO - Hide selection decorations
+  }
+}
+
+void Controller::EnableTextInput( DecoratorPtr decorator )
+{
+  if( !mImpl->mTextInput )
+  {
+    mImpl->mTextInput = new TextInput( decorator );
+  }
 }
 
 bool Controller::Relayout( const Vector2& size )
@@ -239,6 +308,8 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
     viewUpdated = true;
   }
 
+  // TODO - process input events to move grab handle
+
   return viewUpdated;
 }
 
@@ -309,15 +380,74 @@ LayoutEngine& Controller::GetLayoutEngine()
   return mImpl->mLayoutEngine;
 }
 
+void Controller::RequestRelayout()
+{
+  mImpl->mControlInterface.RequestTextRelayout();
+}
+
+void Controller::KeyboardFocusGainEvent()
+{
+  DALI_ASSERT_DEBUG( mImpl->mTextInput && "Unexpected KeyboardFocusGainEvent" );
+
+  if( mImpl->mTextInput )
+  {
+    TextInput::Event event( TextInput::KEYBOARD_FOCUS_GAIN_EVENT );
+    mImpl->mTextInput->mEventQueue.push_back( event );
+
+    RequestRelayout();
+  }
+}
+
+void Controller::KeyboardFocusLostEvent()
+{
+  DALI_ASSERT_DEBUG( mImpl->mTextInput && "Unexpected KeyboardFocusLostEvent" );
+
+  if( mImpl->mTextInput )
+  {
+    TextInput::Event event( TextInput::KEYBOARD_FOCUS_LOST_EVENT );
+    mImpl->mTextInput->mEventQueue.push_back( event );
+
+    RequestRelayout();
+  }
+}
+
+void Controller::TapEvent( float x, float y)
+{
+  DALI_ASSERT_DEBUG( mImpl->mTextInput && "Unexpected TapEvent" );
+
+  if( mImpl->mTextInput )
+  {
+    TextInput::Event event( TextInput::TAP_EVENT );
+    event.p1.mFloat = x;
+    event.p2.mFloat = y;
+
+    RequestRelayout();
+  }
+}
+
+void Controller::GrabHandleEvent( GrabHandleState state, float x )
+{
+  DALI_ASSERT_DEBUG( mImpl->mTextInput && "Unexpected GrabHandleEvent" );
+
+  if( mImpl->mTextInput )
+  {
+    TextInput::Event event( TextInput::GRAB_HANDLE_EVENT );
+    event.p1.mInt   = state;
+    event.p2.mFloat = x;
+
+    RequestRelayout();
+  }
+}
+
 Controller::~Controller()
 {
   delete mImpl;
 }
 
-Controller::Controller()
+Controller::Controller( ControlInterface& controlInterface )
 : mImpl( NULL )
 {
-  mImpl = new Controller::Impl();
+  mImpl = new Controller::Impl( controlInterface );
 }
 
 } // namespace Text

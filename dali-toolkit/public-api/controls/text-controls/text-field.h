@@ -49,6 +49,7 @@ public:
   static const Property::Index PROPERTY_ENABLE_CURSOR_BLINK;    ///< name "enable-cursor-blink",    type BOOLEAN
   static const Property::Index PROPERTY_CURSOR_BLINK_INTERVAL;  ///< name "cursor-blink-interval",  type FLOAT
   static const Property::Index PROPERTY_CURSOR_BLINK_DURATION;  ///< name "cursor-blink-duration",  type FLOAT
+  static const Property::Index PROPERTY_GRAB_HANDLE_IMAGE;      ///< name "grab-handle-image",      type STRING
 
   // Property names
   static const std::string PLACEHOLDER_TEXT_PROPERTY_NAME;       ///< Property, name "placeholder-text",       type STRING
@@ -59,6 +60,7 @@ public:
   static const std::string ENABLE_CURSOR_BLINK_PROPERTY_NAME;    ///< Property, name "enable-cursor-blink",    type BOOLEAN
   static const std::string CURSOR_BLINK_INTERVAL_PROPERTY_NAME;  ///< Property, name "cursor-blink-interval",  type FLOAT
   static const std::string CURSOR_BLINK_DURATION_PROPERTY_NAME;  ///< Property, name "cursor-blink-duration",  type FLOAT
+  static const std::string GRAB_HANDLE_IMAGE_PROPERTY_NAME;      ///< Property, name "grab-handle-image",      type STRING
 
   /**
    * Create the TextField control.

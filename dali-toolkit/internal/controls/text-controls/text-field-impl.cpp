@@ -48,6 +48,7 @@ const Property::Index TextField::PROPERTY_SECONDARY_CURSOR_COLOR( Internal::Text
 const Property::Index TextField::PROPERTY_ENABLE_CURSOR_BLINK(    Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 5 );
 const Property::Index TextField::PROPERTY_CURSOR_BLINK_INTERVAL(  Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 6 );
 const Property::Index TextField::PROPERTY_CURSOR_BLINK_DURATION(  Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 7 );
+const Property::Index TextField::PROPERTY_GRAB_HANDLE_IMAGE(      Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 8 );
 
 namespace Internal
 {
@@ -71,6 +72,7 @@ PropertyRegistration property5( mType, "secondary-cursor-color", Toolkit::TextFi
 PropertyRegistration property6( mType, "enable-cursor-blink",    Toolkit::TextField::PROPERTY_ENABLE_CURSOR_BLINK,    Property::BOOLEAN, &TextField::SetProperty, &TextField::GetProperty );
 PropertyRegistration property7( mType, "cursor-blink-interval",  Toolkit::TextField::PROPERTY_CURSOR_BLINK_INTERVAL,  Property::FLOAT,   &TextField::SetProperty, &TextField::GetProperty );
 PropertyRegistration property8( mType, "cursor-blink-duration",  Toolkit::TextField::PROPERTY_CURSOR_BLINK_DURATION,  Property::FLOAT,   &TextField::SetProperty, &TextField::GetProperty );
+PropertyRegistration property9( mType, "grab-handle-image",      Toolkit::TextField::PROPERTY_GRAB_HANDLE_IMAGE,      Property::STRING,  &TextField::SetProperty, &TextField::GetProperty );
 
 } // namespace
 
@@ -170,6 +172,16 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::TextField::PROPERTY_GRAB_HANDLE_IMAGE:
+      {
+        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
+
+        if( impl.mDecorator )
+        {
+          impl.mDecorator->SetGrabHandleImage( image );
+        }
+        break;
+      }
     }
   }
 }
@@ -245,6 +257,18 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::TextField::PROPERTY_GRAB_HANDLE_IMAGE:
+      {
+        if( impl.mDecorator )
+        {
+          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetCursorImage() );
+          if( image )
+          {
+            value = image.GetUrl();
+          }
+        }
+        break;
+      }
     }
   }
 
@@ -253,11 +277,16 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
 
 void TextField::OnInitialize()
 {
-  mDecorator = Text::Decorator::New( *this );
+  mController = Text::Controller::New( *this );
 
-  mController = Text::Controller::New();
+  mDecorator = Text::Decorator::New( *this, *mController );
+
   mController->GetLayoutEngine().SetLayout( LayoutEngine::SINGLE_LINE_BOX );
-  //mController->EnableTextInput( mDecorator ); TODO
+
+  mController->EnableTextInput( mDecorator );
+
+  // Forward input events to controller
+  EnableGestureDetection( Gesture::Tap );
 }
 
 void TextField::OnRelayout( const Vector2& size, ActorSizeContainer& container )
@@ -280,6 +309,16 @@ void TextField::OnRelayout( const Vector2& size, ActorSizeContainer& container )
       }
     }
   }
+}
+
+void TextField::OnTap( const TapGesture& tap )
+{
+  mController->TapEvent( tap.localPoint.x, tap.localPoint.y );
+}
+
+void TextField::RequestTextRelayout()
+{
+  RelayoutRequest();
 }
 
 TextField::TextField()

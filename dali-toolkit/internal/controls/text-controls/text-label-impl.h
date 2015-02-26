@@ -35,7 +35,7 @@ namespace Internal
 /**
  * @brief A control which renders a short text string.
  */
-class TextLabel : public Control
+class TextLabel : public Control, public Text::ControlInterface
 {
 public:
 
@@ -95,6 +95,11 @@ private: // From Control
    * @copydoc Control::GetHeightForWidth()
    */
   virtual float GetHeightForWidth( float width );
+
+  /**
+   * @copydoc Text::ControlInterface::RequestTextRelayout()
+   */
+  virtual void RequestTextRelayout();
 
 private: // Implementation
 

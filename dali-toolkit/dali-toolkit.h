@@ -74,6 +74,7 @@
 #include <dali-toolkit/public-api/controls/slider/slider.h>
 #include <dali-toolkit/public-api/controls/super-blur-view/super-blur-view.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-field.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/tool-bar/tool-bar.h>
 #include <dali-toolkit/public-api/controls/view/view.h>
