@@ -41,7 +41,7 @@ namespace Internal
  */
 class RadioButton: public Button
 {
- public:
+public:
 
   /**
    * Create a new RadioButton.
@@ -70,45 +70,54 @@ class RadioButton: public Button
    */
   virtual ~RadioButton();
 
-  /**
-   * @copydoc Dali::Toolkit::Button::SetLabel( Actor label )
-   */
-  virtual void SetLabel( Actor label );   // TODO: After refactoring painter, this will be removed
+public: // From Button
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetSelected( bool selected )
+   * @copydoc Toolkit::Internal::Button::SetButtonImage( Actor image )
    */
-  virtual void SetSelected( bool selected );
+  virtual void SetButtonImage( Actor image );
+
+  /**
+   * @copydoc Toolkit::Internal::Button::SetSelectedImage( Actor image )
+   */
+  virtual void SetSelectedImage( Actor image );
+
+private: // From Button
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnButtonInitialize()
+   */
+  virtual void OnButtonInitialize();
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnButtonUp()
+   */
+  virtual void OnButtonUp();
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnSelected()
+   */
+  virtual void OnSelected( bool selected );
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnLabelSet()
+   */
+  virtual void OnLabelSet();
+
+private: // From Control
 
   /**
    * @copydoc Dali::Toolkit::Control::OnRelayout()
    */
   virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 
- protected: // From Control
-
-  /**
-   * Sets the relative position of image and label.
-   */
-  virtual void OnInitialize();
-
- protected: // From Button
-  /**
-   * Change button state when the button is pressed.
-   */
-  virtual void OnButtonUp();
-
- private:
+private:
 
   // Undefined
   RadioButton( const RadioButton& origin );
 
   // Undefined
   RadioButton& operator=( const RadioButton& origin );
-
-  Image mUnselectedImage;  ///< Stores the unselected image
-  Image mSelectedImage;    ///< Stores the selected image
-  ImageActor mRadioIcon;   ///< Stores the current image
 };
 
 } // namespace Internal

@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/button.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include "button-painter-impl.h"
 
 namespace Dali
 {
@@ -118,7 +117,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Button::SetSelected( bool selected )
    */
-  virtual void SetSelected( bool selected );
+  void SetSelected( bool selected );
 
   /**
    * @copydoc Dali::Toolkit::Button::IsSelected() const
@@ -143,7 +142,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Button::SetLabel( Actor label )
    */
-  virtual void SetLabel( Actor label );   // TODO: After refactoring painter, virtual will be removed
+  void SetLabel( Actor label );
 
   /**
    * @copydoc Dali::Toolkit::Button::GetLabel()
@@ -151,41 +150,15 @@ public:
   Actor GetLabel() const;
 
   /**
-   * Used by the painter only.
-   * @return A reference to the label actor.
-   */
-  Actor& GetLabel();
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetButtonImage( const Image image )
-   */
-  void SetButtonImage( Image image );
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetButtonImage( Actor image )
-   */
-  void SetButtonImage( Actor image );
-
-  /**
    * @copydoc Dali::Toolkit::PushButton::GetButtonImage()
    */
   Actor GetButtonImage() const;
 
   /**
-   * Used by the painter only.
+   * Internal use only.
    * @return A reference to the button image.
    */
   Actor& GetButtonImage();
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetSelectedImage( const Image image )
-   */
-  void SetSelectedImage( Image image );
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetSelectedImage( Actor image )
-   */
-  void SetSelectedImage( Actor image );
 
   /**
    * @copydoc Dali::Toolkit::PushButton::GetSelectedImage()
@@ -193,20 +166,10 @@ public:
   Actor GetSelectedImage() const;
 
   /**
-   * Used by the painter only.
+   * Internal use only.
    * @return A reference to the selected image.
    */
   Actor& GetSelectedImage();
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetBackgroundImage( const Image image )
-   */
-  void SetBackgroundImage( Image image );
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetBackgroundImage( Actor image )
-   */
-  void SetBackgroundImage( Actor image );
 
   /**
    * @copydoc Dali::Toolkit::PushButton::GetBackgroundImage()
@@ -214,20 +177,10 @@ public:
   Actor GetBackgroundImage() const;
 
   /**
-   * Used by the painter only.
+   * Internal use only.
    * @return A reference to the background image.
    */
   Actor& GetBackgroundImage();
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetDisabledImage( Image image )
-   */
-  void SetDisabledImage( Image image );
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetDisabledImage( Actor image )
-   */
-  void SetDisabledImage( Actor image );
 
   /**
    * @copydoc Dali::Toolkit::PushButton::GetDisabledImage()
@@ -235,20 +188,10 @@ public:
   Actor GetDisabledImage() const;
 
   /**
-   * Used by the painter only.
+   * Internal use only.
    * @return A reference to the disabled button image.
    */
   Actor& GetDisabledImage();
-
-  /**
-   * @copydoc Dali::Toolkit::CheckBoxButton::SetDisabledSelectedImage( Image image )
-   */
-  void SetDisabledSelectedImage( Image image );
-
-  /**
-   * @copydoc Dali::Toolkit::CheckBoxButton::SetDisabledSelectedImage( Actor image )
-   */
-  void SetDisabledSelectedImage( Actor image );
 
   /**
    * @copydoc Dali::Toolkit::CheckBoxButton::GetDisabledSelectedImage()
@@ -256,20 +199,10 @@ public:
   Actor GetDisabledSelectedImage() const;
 
   /**
-   * Used by the painter only.
+   * Internal use only.
    * @return A reference to the disabled selected image.
    */
   Actor& GetDisabledSelectedImage();
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetDisabledBackgroundImage( Image image )
-   */
-  void SetDisabledBackgroundImage( Image image );
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetDisabledBackgroundImage( Actor image )
-   */
-  void SetDisabledBackgroundImage( Actor image );
 
   /**
    * @copydoc Dali::Toolkit::PushButton::GetDisabledBackgroundImage()
@@ -277,28 +210,10 @@ public:
   Actor GetDisabledBackgroundImage() const;
 
   /**
-   * Used by the painter only.
+   * Internal use only.
    * @return A reference to the disabled background image.
    */
   Actor& GetDisabledBackgroundImage();
-
-  /**
-   * Used by the painter only.
-   * @return A reference to the button image that is fading out.
-   */
-  Actor& GetFadeOutButtonImage();
-
-  /**
-   * Used by the painter only.
-   * @return A reference to the selected image that is fading out.
-   */
-  Actor& GetFadeOutSelectedImage();
-
-  /**
-   * Used by the painter only.
-   * @return A reference to the background image that is fading out.
-   */
-  Actor& GetFadeOutBackgroundImage();
 
   /**
    * Performs actions as requested using the action name.
@@ -309,7 +224,46 @@ public:
    */
   static bool DoAction( BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes );
 
+  /**
+   * @copydoc Dali::Toolkit::PushButton::SetButtonImage( Actor image )
+   */
+  virtual void SetButtonImage( Actor image ) {}
+
+  /**
+   * @copydoc Dali::Toolkit::PushButton::SetSelectedImage( Actor image )
+   */
+  virtual void SetSelectedImage( Actor image ) {}
+
+  /**
+   * @copydoc Dali::Toolkit::PushButton::SetBackgroundImage( Actor image )
+   */
+  virtual void SetBackgroundImage( Actor image ) {}
+
+  /**
+   * @copydoc Dali::Toolkit::PushButton::SetDisabledImage( Actor image )
+   */
+  virtual void SetDisabledImage( Actor image ) {}
+
+  /**
+   * @copydoc Dali::Toolkit::CheckBoxButton::SetDisabledSelectedImage( Actor image )
+   */
+  virtual void SetDisabledSelectedImage( Actor image ) {}
+
+  /**
+   * @copydoc Dali::Toolkit::PushButton::SetDisabledBackgroundImage( Actor image )
+   */
+  virtual void SetDisabledBackgroundImage( Actor image ) {}
+
+protected:
+
+  /**
+   * Internal use only.
+   * @return A reference to the label actor.
+   */
+  Actor& GetLabel();
+
 private:
+
   /**
    * Perform the click action to click the button.
    * @param[in] attributes The attributes to perfrom this action.
@@ -348,24 +302,40 @@ private:
   virtual void OnTouchPointInterrupted();
 
   /**
-   * This method is called when the animation time is set.
-   * Needs to be reimplemented in subclasses to set the animation time in different buttons.
-   * @param animationTime The animation time in seconds.
-   */
-  virtual void OnAnimationTimeSet( float animationTime );
-
-  /**
-   * This method is called when the animation time is requested.
-   * Needs to be reimplemented in subclases to return the animation time.
-   * @return The animation time in seconds.
-   */
-  virtual float OnAnimationTimeRequested() const;
-
-  /**
    * This method is called when the button is removed from the stage.
    * Could be reimplemented in subclasses to provide specific behaviour.
    */
   virtual void OnButtonStageDisconnection();
+
+  /**
+   * This method is called when the label is set.
+   */
+  virtual void OnLabelSet() {}
+
+  /**
+   * This method is called when the \e selected property is changed.
+   */
+  virtual void OnSelected( bool selected ) {}
+
+  /**
+   * This method is called when the \e disabled property is changed.
+   */
+  virtual void OnDisabled( bool disabled ) {}
+
+  /**
+   * This method is called when the button is pressed.
+   */
+  virtual void OnPressed() {}
+
+  /**
+   * This method is called when the button is released.
+   */
+  virtual void OnReleased() {}
+
+  /**
+   * This method is called when the button is clicked
+   */
+  virtual void OnClicked() {}
 
 public:
 
@@ -438,11 +408,6 @@ private: // From Control
   virtual void OnActivated();
 
   /**
-   * @copydoc Toolkit::Control::OnControlSizeSet( const Vector3& targetSize )
-   */
-  virtual void OnControlSizeSet( const Vector3& targetSize );
-
-  /**
    * Callback received when the button is disconnected from the stage.
    * It resets the button status.
    */
@@ -479,13 +444,24 @@ protected:
     ButtonDown,                                ///< The button is down.
   };
 
-  void SetPainter(ButtonPainterPtr painter);
+  /**
+   * Button paint states.
+   */
+  enum PaintState
+  {
+    UnselectedState,              ///< The button is unselected.
+    SelectedState,                ///< The button is selected.
+    DisabledUnselectedState,      ///< The button is disabled and unselected.
+    DisabledSelectedState,        ///< The button is disabled and selected.
+    UnselectedSelectedTransition, ///< The button is in transition from unselected to selected.
+    SelectedUnselectedTransition, ///< The push button is in transition from selected to unselected.
+    UnselectedDisabledTransition, ///< The button is in transition from unselected to disabled.
+    DisabledUnselectedTransition, ///< The button is in transition from disabled to unselected.
+    SelectedDisabledTransition,   ///< The button is in transition from selected to disabled.
+    DisabledSelectedTransition    ///< The button is in transition from disabled to selected.
+  };
 
   ButtonState GetState();
-
-  Actor mLabel;                                //TODO: After refactoring painter, this will be private
-  bool  mTogglableButton;                      //TODO: After refactoring painter, this will be private
-  bool  mSelected;                             //TODO: After refactoring painter, this will be private
 
 private:
 
@@ -497,37 +473,32 @@ private:
 
 private:
 
-  ButtonPainterPtr mPainter;                   ///< Pointer to a ButtonPainter base class.
-
   // Signals
   Toolkit::Button::ButtonSignalType mPressedSignal;           ///< Signal emitted when the button is pressed.
-  Toolkit::Button::ButtonSignalType mReleasedSignal;         ///< Signal emitted when the button is released.
+  Toolkit::Button::ButtonSignalType mReleasedSignal;          ///< Signal emitted when the button is released.
   Toolkit::Button::ButtonSignalType mClickedSignal;           ///< Signal emitted when the button is clicked.
-  Toolkit::Button::ButtonSignalType mStateChangedSignal; ///< Signal emitted when the button's state is changed.
+  Toolkit::Button::ButtonSignalType mStateChangedSignal;      ///< Signal emitted when the button's state is changed.
 
   Timer mAutoRepeatingTimer;                   ///< Timer used to implement the autorepeating property.
 
-//  Actor mLabel;                                ///< Stores the button label.
+  Actor mLabel;                                ///< Stores the button label.
 
-  Actor mButtonImage;                          ///< Stores the unselected image.
-  Actor mSelectedImage;                        ///< Stores the selected image.
-  Actor mBackgroundImage;                      ///< Stores the background image.
-  Actor mDisabledImage;                        ///< Stores the disabled image.
-  Actor mDisabledSelectedImage;                ///< Stores the disabled selected image.
-  Actor mDisabledBackgroundImage;              ///< Stores the disabled background image.
-
-  Actor mFadeOutButtonImage;                   ///< Stores a foreground image, which is in a fade out animation, to be removed when the animation finishes.
-  Actor mFadeOutSelectedImage;                 ///< Stores a foreground image, which is in a fade out animation, to be removed when the animation finishes.
-  Actor mFadeOutBackgroundImage;               ///< Stores a background image, which is in a fade out animation, to be removed when the animation finishes.
+  Actor mButtonContent;                        ///< Stores the unselected content.
+  Actor mSelectedContent;                      ///< Stores the selected content.
+  Actor mBackgroundContent;                    ///< Stores the background content.
+  Actor mDisabledContent;                      ///< Stores the disabled content.
+  Actor mDisabledSelectedContent;              ///< Stores the disabled selected content.
+  Actor mDisabledBackgroundContent;            ///< Stores the disabled background content.
 
   TapGestureDetector mTapDetector;
 
   bool             mDisabled;                  ///< Stores the disabled property.
   bool             mAutoRepeating;             ///< Stores the autorepeating property.
-//  bool             mTogglableButton;           ///< Stores the togglable property.
-//  bool             mSelected;                  ///< Stores the selected state.
+  bool             mTogglableButton;           ///< Stores the togglable property.
+  bool             mSelected;                  ///< Stores the selected state.
   float            mInitialAutoRepeatingDelay; ///< Stores the initial autorepeating delay in seconds.
   float            mNextAutoRepeatingDelay;    ///< Stores the next autorepeating delay in seconds.
+  float            mAnimationTime;             ///< The animation time.
 
   // Actions
   bool             mClickActionPerforming;
@@ -536,7 +507,6 @@ private:
 };
 
 } // namespace Internal
-
 
 // Helpers for public-api forwarding methods
 
