@@ -86,14 +86,6 @@ struct LayoutEngine::Impl
       // because there are glyphs formed by more than one character but their break info is
       // given only for the last character.
       const Length charactersPerGlyph = *( parameters.charactersPerGlyphBuffer + glyphIndex );
-      const CharacterIndex characterFirstIndex = *( parameters.glyphsToCharactersBuffer + glyphIndex );
-      const CharacterIndex characterLastIndex = characterFirstIndex + ( ( 1u > charactersPerGlyph ) ? 0u : charactersPerGlyph - 1u );
-
-      // Get the line break info for the current character.
-      const LineBreakInfo lineBreakInfo = *( parameters.lineBreakInfoBuffer + characterLastIndex );
-
-      // Get the word break info for the current character.
-      const WordBreakInfo wordBreakInfo = *( parameters.wordBreakInfoBuffer + characterLastIndex );
 
       // Increase the number of characters.
       lineLayout.numberOfCharacters += charactersPerGlyph;
@@ -103,13 +95,6 @@ struct LayoutEngine::Impl
 
       // Increase the accumulated length.
       lineLayout.length += ( glyphIndex == lastGlyphIndex ) ? glyphInfo.width : glyphInfo.advance;
-
-      if( TextAbstraction::LINE_MUST_BREAK == lineBreakInfo )
-      {
-      }
-      if( TextAbstraction::WORD_BREAK == wordBreakInfo )
-      {
-      }
 
       if( lastFontId != glyphInfo.fontId )
       {
@@ -277,6 +262,7 @@ struct LayoutEngine::Impl
 
   bool LayoutText( const LayoutParameters& layoutParameters,
                    Vector<Vector2>& glyphPositions,
+                   Vector<LineRun>& lines,
                    Size& actualSize )
   {
     // TODO Switch between different layouts
@@ -288,6 +274,7 @@ struct LayoutEngine::Impl
       {
         update = SingleLineLayout( layoutParameters,
                                    glyphPositions,
+                                   lines,
                                    actualSize );
         break;
       }
@@ -295,6 +282,7 @@ struct LayoutEngine::Impl
       {
         update = MultiLineLayout( layoutParameters,
                                   glyphPositions,
+                                  lines,
                                   actualSize );
         break;
       }
@@ -308,6 +296,7 @@ struct LayoutEngine::Impl
   // TODO - Rewrite this to handle bidi
   bool SingleLineLayout( const LayoutParameters& layoutParameters,
                          Vector<Vector2>& glyphPositions,
+                         Vector<LineRun>& lines,
                          Size& actualSize )
   {
     LineLayout layout;
@@ -315,11 +304,18 @@ struct LayoutEngine::Impl
     GetLineLayoutForBox( layoutParameters,
                          layout );
 
-    if( 0u == layout.numberOfGlyphs )
-    {
-      // The width is too small and no characters are laid-out.
-      return false;
-    }
+    // Create a line run and add it to the lines.
+    const GlyphIndex lastGlyphIndex = layoutParameters.totalNumberOfGlyphs - 1u;
+
+    LineRun lineRun;
+    lineRun.glyphIndex = 0u;
+    lineRun.numberOfGlyphs = layoutParameters.totalNumberOfGlyphs;
+    lineRun.characterRun.characterIndex = 0u;
+    lineRun.characterRun.numberOfCharacters = *( layoutParameters.glyphsToCharactersBuffer + lastGlyphIndex ) + *( layoutParameters.charactersPerGlyphBuffer + lastGlyphIndex );
+    lineRun.lineSize.width = layout.length;
+    lineRun.lineSize.height = layout.height;
+
+    lines.PushBack( lineRun );
 
     // Update the actual size.
     actualSize.width = layout.length;
@@ -346,6 +342,7 @@ struct LayoutEngine::Impl
   // TODO - Rewrite this to handle bidi
   bool MultiLineLayout( const LayoutParameters& layoutParameters,
                         Vector<Vector2>& glyphPositions,
+                        Vector<LineRun>& lines,
                         Size& actualSize )
   {
     float penY = 0.f;
@@ -364,6 +361,19 @@ struct LayoutEngine::Impl
         // The width is too small and no characters are laid-out.
         return false;
       }
+
+      // Create a line run and add it to the lines.
+      const GlyphIndex lastGlyphIndex = index + layout.numberOfGlyphs - 1u;
+
+      LineRun lineRun;
+      lineRun.glyphIndex = index;
+      lineRun.numberOfGlyphs = layout.numberOfGlyphs;
+      lineRun.characterRun.characterIndex = *( layoutParameters.glyphsToCharactersBuffer + index );
+      lineRun.characterRun.numberOfCharacters = ( *( layoutParameters.glyphsToCharactersBuffer + lastGlyphIndex ) + *( layoutParameters.charactersPerGlyphBuffer + lastGlyphIndex ) ) - lineRun.characterRun.characterIndex;
+      lineRun.lineSize.width = layout.length;
+      lineRun.lineSize.height = layout.height;
+
+      lines.PushBack( lineRun );
 
       // Update the actual size.
       if( layout.length > actualSize.width )
@@ -424,10 +434,12 @@ unsigned int LayoutEngine::GetLayout() const
 
 bool LayoutEngine::LayoutText( const LayoutParameters& layoutParameters,
                                Vector<Vector2>& glyphPositions,
+                               Vector<LineRun>& lines,
                                Size& actualSize )
 {
   return mImpl->LayoutText( layoutParameters,
                             glyphPositions,
+                            lines,
                             actualSize );
 }
 

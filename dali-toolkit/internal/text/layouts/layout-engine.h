@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDE
-#include <dali-toolkit/internal/text/text-definitions.h>
+#include <dali-toolkit/internal/text/line-run.h>
 
 // EXTERNAL INCLUDE
 #include <dali/public-api/common/dali-vector.h>
@@ -80,12 +80,14 @@ public:
    *
    * @param[in] layoutParameters The parameters needed to layout the text.
    * @param[out] glyphPositions The positions of all the glyphs.
+   * @param[out] lines The laid-out lines.
    * @param[out] actualSize The size of the text after it has been laid-out.
    *
    * @return \e true if the text has been re-laid-out. \e false means the given width is too small to layout even a single character.
    */
   bool LayoutText( const LayoutParameters& layoutParameters,
                    Vector<Vector2>& glyphPositions,
+                   Vector<LineRun>& lines,
                    Size& actualSize );
 
 private:
