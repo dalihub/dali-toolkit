@@ -350,7 +350,7 @@ void Popup::ShowTail(const Vector3& position)
   {
     Image tail = ResourceImage::New( image );
     mTailImage = ImageActor::New(tail);
-    const Vector3 anchorPoint = AnchorPoint::FRONT_BOTTOM_RIGHT - position;
+    const Vector3 anchorPoint = AnchorPoint::BOTTOM_RIGHT - position;
 
     mTailImage.SetParentOrigin(position);
     mTailImage.SetAnchorPoint(anchorPoint);
