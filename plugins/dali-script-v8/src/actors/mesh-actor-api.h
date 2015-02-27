@@ -34,15 +34,6 @@ namespace MeshActorApi
    * constructor
    */
   Actor New( const v8::FunctionCallbackInfo< v8::Value >& args );
-
-  /**
-   * Mesh actor API
-   */
-  void SetAffectedByLighting( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void IsAffectedByLighting( const v8::FunctionCallbackInfo< v8::Value >& args );
-
-
-
 }; // namespace MeshActorApi
 
 } // namespace V8Plugin

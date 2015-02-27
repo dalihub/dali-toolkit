@@ -788,7 +788,6 @@ void Control::SetBackgroundColor( const Vector4& color )
     // Create Mesh Actor
     MeshActor meshActor = MeshActor::New( CreateMesh() );
 
-    meshActor.SetAffectedByLighting( false );
     SetupBackgroundActor( meshActor, Actor::SCALE, color );
 
     // Set the background actor before adding so that we do not inform deriving classes

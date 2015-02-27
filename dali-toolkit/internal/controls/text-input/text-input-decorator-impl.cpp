@@ -584,7 +584,6 @@ void Decorator::CreateHighlight( Actor parent )
   {
     mHighlightMeshActor = MeshActor::New( mTextHighlight.CreateHighLightMesh() );
     mHighlightMeshActor.SetName( "HighlightMeshActor" );
-    mHighlightMeshActor.SetAffectedByLighting(false);
     parent.Add( mHighlightMeshActor );
   }
 }
@@ -1081,4 +1080,3 @@ MarkupProcessor::StyledTextArray Decorator::GetSelectedText()
 } // namespace Toolkit
 
 } // namespace Dali
-
