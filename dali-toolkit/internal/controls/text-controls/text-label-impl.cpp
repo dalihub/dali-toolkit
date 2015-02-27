@@ -127,7 +127,7 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
 
 void TextLabel::OnInitialize()
 {
-  mController = Text::Controller::New();
+  mController = Text::Controller::New( *this );
 }
 
 Vector3 TextLabel::GetNaturalSize()
@@ -184,6 +184,11 @@ void TextLabel::SetMultiLine( bool multiLine )
       mController->GetLayoutEngine().SetLayout( LayoutEngine::SINGLE_LINE_BOX );
     }
   }
+}
+
+void TextLabel::RequestTextRelayout()
+{
+  RelayoutRequest();
 }
 
 TextLabel::TextLabel()

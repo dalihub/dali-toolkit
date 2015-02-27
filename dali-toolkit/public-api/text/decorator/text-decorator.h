@@ -59,23 +59,57 @@ enum ActiveCursor
   ACTIVE_CURSOR_BOTH     ///< Both primary and secondary cursor are active
 };
 
+// The state information for grab handle events
+enum GrabHandleState
+{
+  GRAB_HANDLE_MOVING,
+  GRAB_HANDLE_RELEASED
+};
+
 /**
  * @brief A Text Decorator is used to display cursors, handles, selection highlights and pop-ups.
  *
  * The decorator is responsible for clipping decorations which are positioned outside of the parent area.
  * In some cases the decorations will be moved or flipped around, to maintain visibility on-screen.
+ *
+ * Decorator components forward input events to a controller class through an observer interface.
+ * The controller is responsible for selecting which components are active.
  */
 class Decorator : public RefObject
 {
 public:
 
+  class Observer
+  {
+  public:
+
+    /**
+     * @brief Constructor.
+     */
+    Observer() {};
+
+    /**
+     * @brief Virtual destructor.
+     */
+    virtual ~Observer() {};
+
+    /**
+     * @brief An input event from the grab handle.
+     *
+     * @param[in] state The grab handle state.
+     * @param[in] x The x position relative to the top-left of the parent control.
+     */
+    virtual void GrabHandleEvent( GrabHandleState state, float x ) = 0;
+  };
+
   /**
    * @brief Create a new instance of a Decorator.
    *
    * @param[in] parent Decorations will be added to this parent control.
+   * @param[in] observer A class which receives input events from Decorator components.
    * @return A pointer to a new Decorator.
    */
-  static DecoratorPtr New( Dali::Toolkit::Internal::Control& parent );
+  static DecoratorPtr New( Dali::Toolkit::Internal::Control& parent, Observer& observer );
 
   /**
    * @brief The decorator waits until a relayout before creating actors etc.
@@ -93,7 +127,7 @@ public:
   void SetActiveCursor( ActiveCursor activeCursor );
 
   /**
-   * @brief Sets whether a cursor should be visible.
+   * @brief Query which of the cursors are active.
    *
    * @return  Which of the cursors are active (if any).
    */
@@ -187,6 +221,35 @@ public:
    */
   float GetCursorBlinkDuration() const;
 
+  /**
+   * @brief Sets whether the grab handle is active.
+   *
+   * @note The grab handle follows the cursor position set with SetPosition(Cursor, ...)
+   * @param[in] active True if the grab handle should be active.
+   */
+  void SetGrabHandleActive( bool active );
+
+  /**
+   * @brief Query whether the grab handle is active.
+   *
+   * @return True if the grab handle should be active.
+   */
+  bool IsGrabHandleActive() const;
+
+  /**
+   * @brief Sets the image for the grab handle.
+   *
+   * @param[in] image The image to use.
+   */
+  void SetGrabHandleImage( Dali::Image image );
+
+  /**
+   * @brief Retrieves the image for the grab handle.
+   *
+   * @return The grab handle image.
+   */
+  Dali::Image GetGrabHandleImage() const;
+
 protected:
 
   /**
@@ -199,8 +262,9 @@ private:
   /**
    * @brief Private constructor.
    * @param[in] parent Decorations will be added to this parent control.
+   * @param[in] observer A class which receives input events from Decorator components.
    */
-  Decorator(Dali::Toolkit::Internal::Control& parent);
+  Decorator(Dali::Toolkit::Internal::Control& parent, Observer& observer );
 
   // Undefined
   Decorator( const Decorator& handle );

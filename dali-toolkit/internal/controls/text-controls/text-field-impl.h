@@ -22,6 +22,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
 #include <dali-toolkit/public-api/text/decorator/text-decorator.h>
+#include <dali-toolkit/public-api/text/text-control-interface.h>
 #include <dali-toolkit/public-api/text/text-controller.h>
 
 namespace Dali
@@ -36,7 +37,7 @@ namespace Internal
 /**
  * @brief A control which renders a short text string.
  */
-class TextField : public Control
+class TextField : public Control, public Text::ControlInterface
 {
 public:
 
@@ -87,13 +88,17 @@ private: // From Control
    */
   virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 
-private: // Implementation
+  /**
+   * @copydoc Control::OnTap()
+   */
+  virtual void OnTap( const TapGesture& tap );
 
   /**
-   * Helper for SetProperty.
-   * @param[in] text The new "text" property value.
+   * @copydoc Text::ControlInterface::RequestTextRelayout()
    */
-  void SetText( const std::string& text );
+  virtual void RequestTextRelayout();
+
+private: // Implementation
 
   /**
    * Construct a new TextField.

@@ -52,8 +52,9 @@ struct Decorator::Impl
     Vector4 color;
   };
 
-  Impl(Dali::Toolkit::Internal::Control& parent)
+  Impl(Dali::Toolkit::Internal::Control& parent, Observer& observer)
   : mParent(parent),
+    mObserver(observer),
     mActiveCursor(ACTIVE_CURSOR_NONE),
     mCursorBlinkInterval(0.5f),
     mCursorBlinkDuration(0.0f)
@@ -66,20 +67,22 @@ struct Decorator::Impl
   }
 
   Internal::Control& mParent;
+  Observer& mObserver;
 
   unsigned int mActiveCursor;
 
   CursorImpl mCursor[CURSOR_COUNT];
 
   Image mCursorImage;
+  Image mGrabHandleImage;
 
   float mCursorBlinkInterval;
   float mCursorBlinkDuration;
 };
 
-DecoratorPtr Decorator::New(Internal::Control& parent)
+DecoratorPtr Decorator::New( Internal::Control& parent, Observer& observer )
 {
-  return DecoratorPtr( new Decorator(parent) );
+  return DecoratorPtr( new Decorator(parent, observer) );
 }
 
 void Decorator::Relayout( const Vector2& size )
@@ -161,15 +164,25 @@ float Decorator::GetCursorBlinkDuration() const
   return mImpl->mCursorBlinkDuration;
 }
 
+void Decorator::SetGrabHandleImage( Dali::Image image )
+{
+  mImpl->mGrabHandleImage = image;
+}
+
+Dali::Image Decorator::GetGrabHandleImage() const
+{
+  return mImpl->mGrabHandleImage;
+}
+
 Decorator::~Decorator()
 {
   delete mImpl;
 }
 
-Decorator::Decorator(Dali::Toolkit::Internal::Control& parent)
+Decorator::Decorator(Dali::Toolkit::Internal::Control& parent, Observer& observer)
 : mImpl( NULL )
 {
-  mImpl = new Decorator::Impl(parent);
+  mImpl = new Decorator::Impl(parent, observer);
 }
 
 } // namespace Text

@@ -19,6 +19,8 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/text/decorator/text-decorator.h>
+#include <dali-toolkit/public-api/text/text-control-interface.h>
 #include <dali-toolkit/public-api/text/text-view.h>
 
 // EXTERNAL INCLUDES
@@ -41,14 +43,18 @@ class Controller;
 class LayoutEngine;
 
 typedef IntrusivePtr<Controller> ControllerPtr;
+typedef Dali::Toolkit::Text::ControlInterface ControlInterface;
 
 /**
  * @brief A Text Controller is used by UI Controls which display text.
  *
  * It manipulates the Logical & Visual text models on behalf of the UI Controls.
  * It provides a view of the text that can be used by rendering back-ends.
+ *
+ * For selectable/editable UI controls, the controller handles input events from the UI control
+ * and decorations (grab handles etc) via an observer interface.
  */
-class Controller : public RefObject
+class Controller : public RefObject, public Decorator::Observer
 {
 private:
 
@@ -77,9 +83,10 @@ public:
   /**
    * @brief Create a new instance of a Controller.
    *
+   * @param[in] controlInterface An interface used to request a text relayout.
    * @return A pointer to a new Controller.
    */
-  static ControllerPtr New();
+  static ControllerPtr New( ControlInterface& controlInterface );
 
   /**
    * @brief Replaces any text previously set.
@@ -88,6 +95,14 @@ public:
    * @param[in] text A string of UTF-8 characters.
    */
   void SetText( const std::string& text );
+
+  /**
+   * @brief Called to enable text input.
+   *
+   * @note Only selectable or editable controls should calls this.
+   * @param[in] decorator Used to create cursor, selection handle decorations etc.
+   */
+  void EnableTextInput( DecoratorPtr decorator );
 
   /**
    * @brief Triggers a relayout which updates View (if necessary).
@@ -127,6 +142,26 @@ public:
    */
   View& GetView();
 
+  /**
+   * @brief Caller by editable UI controls when keyboard focus is gained.
+   */
+  void KeyboardFocusGainEvent();
+
+  /**
+   * @brief Caller by editable UI controls when focus is lost.
+   */
+  void KeyboardFocusLostEvent();
+
+  /**
+   * @brief Caller by editable UI controls when focus is lost.
+   */
+  void TapEvent( float x, float y );
+
+  /**
+   * @copydoc Dali::Toolkit::Text::Decorator::Observer::GrabHandleEvent()
+   */
+  virtual void GrabHandleEvent( GrabHandleState state, float x );
+
 protected:
 
   /**
@@ -137,14 +172,14 @@ protected:
 private:
 
   /**
-   * @brief Private constructor.
+   * @brief Request a relayout using the ControlInterface.
    */
-  Controller();
+  void RequestRelayout();
 
   /**
-   * @brief Populates the visual model.
+   * @brief Private constructor.
    */
-  void UpdateVisualModel();
+  Controller( ControlInterface& controlInterface );
 
   // Undefined
   Controller( const Controller& handle );
@@ -156,6 +191,9 @@ private:
 
   struct Impl;
   Impl* mImpl;
+
+  // Avoid allocating this for non-editable controls
+  struct TextInput;
 };
 
 } // namespace Text

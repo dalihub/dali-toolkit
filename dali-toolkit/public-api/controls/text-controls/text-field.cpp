@@ -35,6 +35,7 @@ const std::string TextField::SECONDARY_CURSOR_COLOR_PROPERTY_NAME("secondary-cur
 const std::string TextField::ENABLE_CURSOR_BLINK_PROPERTY_NAME("enable-cursor-blink");
 const std::string TextField::CURSOR_BLINK_INTERVAL_PROPERTY_NAME("cursor-blink-interval");
 const std::string TextField::CURSOR_BLINK_DURATION_PROPERTY_NAME("cursor-blink-duration");
+const std::string TextField::GRAB_HANDLE_IMAGE_PROPERTY_NAME("grab-handle-image");
 
 TextField TextField::New()
 {
