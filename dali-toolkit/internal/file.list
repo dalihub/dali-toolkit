@@ -95,5 +95,8 @@ toolkit_src_files = \
    $(toolkit_src_dir)/transition-effects/cube-transition-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-cross-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-fold-effect-impl.cpp \
-   $(toolkit_src_dir)/transition-effects/cube-transition-wave-effect-impl.cpp
+   $(toolkit_src_dir)/transition-effects/cube-transition-wave-effect-impl.cpp \
+   $(toolkit_src_dir)/scripting/script-impl.cpp \
+   $(toolkit_src_dir)/scripting/script-plugin-proxy.cpp
+
 
