@@ -356,9 +356,6 @@ const ActorFunctions ActorFunctionTable[]=
     // @todo a version of MeshActor::New( AnimatableMesh )
     // @todo SetMaterial
     // @todo GetMaterial
-    // SetAffectedByLighting  should be a property really
-    { "SetAffectedByLighting", MeshActorApi::SetAffectedByLighting, MESH_ACTOR_API },
-    { "IsAffectedByLighting",  MeshActorApi::IsAffectedByLighting,  MESH_ACTOR_API },
     // @todo BindBonesToMesh
 
     /**************************************

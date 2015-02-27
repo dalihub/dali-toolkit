@@ -96,7 +96,6 @@ Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
   }
 
   meshActor = Dali::MeshActor::New(mesh);
-  meshActor.SetAffectedByLighting(false);
 
   Dali::ShaderEffect shaderEffect = Dali::ShaderEffect::New( "", MESH_FRAGMENT_SHADER,
                                                              GEOMETRY_TYPE_UNTEXTURED_MESH,

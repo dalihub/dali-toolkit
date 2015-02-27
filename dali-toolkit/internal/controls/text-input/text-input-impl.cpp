@@ -4894,7 +4894,6 @@ void TextInput::CreateHighlight()
     mHighlightMeshActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
     mHighlightMeshActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
     mHighlightMeshActor.SetPosition( 0.0f, 0.0f, DISPLAYED_HIGHLIGHT_Z_OFFSET );
-    mHighlightMeshActor.SetAffectedByLighting(false);
 
     Self().Add(mHighlightMeshActor);
   }

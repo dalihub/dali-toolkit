@@ -54,43 +54,6 @@ Actor MeshActorApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
 {
   return MeshActor::New();
 }
-/**
- *
- * @for MeshActor
- * @method SetAffectedByLighting
- * @param {Boolean} true = yes affected by lighting
- */
-void MeshActorApi::SetAffectedByLighting( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  MeshActor actor =  GetMeshActor( isolate, args );
-
-  bool parameterFound( false );
-  bool afftedByLight = V8Utils::GetBooleanParameter(  PARAMETER_0, parameterFound, isolate, args );
-  if( !parameterFound )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "bad parameter");
-    return;
-  }
-  actor.SetAffectedByLighting( afftedByLight  );
-}
-/**
- *
- * @for MeshActor
- * @method IsAffectedByLighting
- * @return {Boolean} true = yes affected by lighting
- */
-void MeshActorApi::IsAffectedByLighting( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  MeshActor actor =  GetMeshActor( isolate, args );
-
-  args.GetReturnValue().Set(  v8::Boolean::New( isolate, actor.IsAffectedByLighting() ) );
-
-}
-
 
 } // namespace V8Plugin
 
