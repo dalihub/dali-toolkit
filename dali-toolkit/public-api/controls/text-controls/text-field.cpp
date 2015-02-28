@@ -27,6 +27,7 @@ namespace Dali
 namespace Toolkit
 {
 
+const std::string TextField::RENDERING_BACKEND_PROPERTY_NAME("rendering-backend");
 const std::string TextField::PLACEHOLDER_TEXT_PROPERTY_NAME("placeholder-text");
 const std::string TextField::TEXT_PROPERTY_NAME("text");
 const std::string TextField::CURSOR_IMAGE_PROPERTY_NAME("cursor-image");
@@ -67,11 +68,6 @@ TextField::~TextField()
 TextField TextField::DownCast( BaseHandle handle )
 {
   return Control::DownCast<TextField, Internal::TextField>(handle);
-}
-
-void TextField::SetRenderer( Text::RendererPtr renderer )
-{
-  GetImpl(*this).SetRenderer( renderer );
 }
 
 TextField::TextField( Internal::TextField& implementation )

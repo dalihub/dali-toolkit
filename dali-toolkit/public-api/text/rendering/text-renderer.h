@@ -39,7 +39,7 @@ class Renderer;
 typedef IntrusivePtr<Renderer> RendererPtr;
 
 /**
- * @brief Abstract base class for Text rendering back-ends.
+ * @brief Abstract base class for Text renderers.
  *
  * This is reponsible for rendering the glyphs from a ViewInterface in the specified positions.
  * It is implemented by returning a RenderableActor intended as the child of a UI control.

@@ -223,6 +223,11 @@ void LayoutEngine::SetLayout( Layout layout )
   mImpl->mLayout = layout;
 }
 
+unsigned int LayoutEngine::GetLayout() const
+{
+  return mImpl->mLayout;
+}
+
 void LayoutEngine::UpdateVisualModel( const Vector2& boundingBox,
                                       const Vector<GlyphInfo>& glyphs,
                                       const Vector<CharacterIndex>& characterIndices,

@@ -22,6 +22,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/text/text-controller.h>
+#include <dali-toolkit/public-api/text/rendering/text-renderer.h>
 
 namespace Dali
 {
@@ -50,11 +51,6 @@ public:
    * @copydoc Dali::Toollkit::TextLabel::New()
    */
   static Toolkit::TextLabel New();
-
-  /**
-   * @copydoc Dali::Toollkit::TextLabel::SetRenderer()
-   */
-  void SetRenderer( Text::RendererPtr renderer );
 
   // Properties
 
@@ -104,18 +100,6 @@ private: // From Control
 private: // Implementation
 
   /**
-   * Helper for SetProperty.
-   * @param[in] text The new "text" property value.
-   */
-  void SetText( const std::string& text );
-
-  /**
-   * Helper for SetProperty.
-   * @param[in] multiLine The new "multi-line" property value.
-   */
-  void SetMultiLine( bool multiLine );
-
-  /**
    * Construct a new TextLabel.
    */
   TextLabel();
@@ -135,6 +119,8 @@ private: // Data
 
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
+
+  unsigned int mRenderingBackend;
 };
 
 } // namespace Internal

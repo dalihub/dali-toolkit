@@ -68,6 +68,13 @@ public:
   void SetLayout( Layout layout );
 
   /**
+   * @brief Query the required layout.
+   *
+   * @return The required layout.
+   */
+  unsigned int GetLayout() const;
+
+  /**
    * @brief Store the visual position of glyphs in the VisualModel.
    *
    * @param[in] boundingBox The size of the box containing the text.

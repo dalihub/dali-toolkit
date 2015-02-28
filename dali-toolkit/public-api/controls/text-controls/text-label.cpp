@@ -27,6 +27,7 @@ namespace Dali
 namespace Toolkit
 {
 
+const std::string TextLabel::RENDERING_BACKEND_PROPERTY_NAME("rendering-backend");
 const std::string TextLabel::TEXT_PROPERTY_NAME("text");
 const std::string TextLabel::MULTI_LINE_PROPERTY_NAME("multi-line");
 
@@ -60,11 +61,6 @@ TextLabel::~TextLabel()
 TextLabel TextLabel::DownCast( BaseHandle handle )
 {
   return Control::DownCast<TextLabel, Internal::TextLabel>(handle);
-}
-
-void TextLabel::SetRenderer( Text::RendererPtr renderer )
-{
-  GetImpl(*this).SetRenderer( renderer );
 }
 
 TextLabel::TextLabel( Internal::TextLabel& implementation )

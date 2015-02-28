@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H__
-#define __DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H__
+#ifndef __DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H__
+#define __DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H__
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -52,11 +52,6 @@ public:
    * @copydoc Dali::Toollkit::TextField::New()
    */
   static Toolkit::TextField New();
-
-  /**
-   * @copydoc Dali::Toollkit::TextField::SetRenderer()
-   */
-  void SetRenderer( Text::RendererPtr renderer );
 
   // Properties
 
@@ -121,26 +116,28 @@ private: // Data
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
   Text::DecoratorPtr mDecorator;
+
+  unsigned int mRenderingBackend;
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::TextField& GetImpl( Toolkit::TextField& textLabel )
+inline Toolkit::Internal::TextField& GetImpl( Toolkit::TextField& textField )
 {
-  DALI_ASSERT_ALWAYS(textLabel);
+  DALI_ASSERT_ALWAYS(textField);
 
-  Dali::RefObject& handle = textLabel.GetImplementation();
+  Dali::RefObject& handle = textField.GetImplementation();
 
   return static_cast<Toolkit::Internal::TextField&>(handle);
 }
 
-inline const Toolkit::Internal::TextField& GetImpl( const Toolkit::TextField& textLabel )
+inline const Toolkit::Internal::TextField& GetImpl( const Toolkit::TextField& textField )
 {
-  DALI_ASSERT_ALWAYS(textLabel);
+  DALI_ASSERT_ALWAYS(textField);
 
-  const Dali::RefObject& handle = textLabel.GetImplementation();
+  const Dali::RefObject& handle = textField.GetImplementation();
 
   return static_cast<const Toolkit::Internal::TextField&>(handle);
 }
@@ -149,4 +146,4 @@ inline const Toolkit::Internal::TextField& GetImpl( const Toolkit::TextField& te
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_TEXT_LABEL_H__
+#endif // __DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H__

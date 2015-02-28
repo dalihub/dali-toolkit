@@ -24,12 +24,15 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/layouts/layout-engine.h>
-#include <dali-toolkit/public-api/text/rendering/basic/text-basic-renderer.h> // TODO - Get from RendererFactory
+#include <dali-toolkit/public-api/text/rendering/text-backend.h>
 
 using Dali::Toolkit::Text::LayoutEngine;
+using Dali::Toolkit::Text::Backend;
 
 namespace
 {
+
+const unsigned int DEFAULT_RENDERING_BACKEND = 0;
 
 } // namespace
 
@@ -39,8 +42,9 @@ namespace Dali
 namespace Toolkit
 {
 
-const Property::Index TextLabel::PROPERTY_TEXT(       Internal::TextLabel::TEXTLABEL_PROPERTY_START_INDEX );
-const Property::Index TextLabel::PROPERTY_MULTI_LINE( Internal::TextLabel::TEXTLABEL_PROPERTY_START_INDEX + 1 );
+const Property::Index TextLabel::PROPERTY_RENDERING_BACKEND( Internal::TextLabel::TEXTLABEL_PROPERTY_START_INDEX );
+const Property::Index TextLabel::PROPERTY_TEXT(              Internal::TextLabel::TEXTLABEL_PROPERTY_START_INDEX + 1 );
+const Property::Index TextLabel::PROPERTY_MULTI_LINE(        Internal::TextLabel::TEXTLABEL_PROPERTY_START_INDEX + 2 );
 
 namespace Internal
 {
@@ -56,8 +60,9 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Toolkit::TextLabel), typeid(Toolkit::Control), Create );
 
-PropertyRegistration property1( mType, "text",       Toolkit::TextLabel::PROPERTY_TEXT,       Property::STRING, &TextLabel::SetProperty, &TextLabel::GetProperty );
-PropertyRegistration property2( mType, "multi-line", Toolkit::TextLabel::PROPERTY_MULTI_LINE, Property::STRING, &TextLabel::SetProperty, &TextLabel::GetProperty );
+PropertyRegistration property1( mType, "rendering-backend", Toolkit::TextLabel::PROPERTY_RENDERING_BACKEND, Property::UNSIGNED_INTEGER, &TextLabel::SetProperty, &TextLabel::GetProperty );
+PropertyRegistration property2( mType, "text",              Toolkit::TextLabel::PROPERTY_TEXT,              Property::STRING,           &TextLabel::SetProperty, &TextLabel::GetProperty );
+PropertyRegistration property3( mType, "multi-line",        Toolkit::TextLabel::PROPERTY_MULTI_LINE,        Property::STRING,           &TextLabel::SetProperty, &TextLabel::GetProperty );
 
 } // namespace
 
@@ -76,28 +81,41 @@ Toolkit::TextLabel TextLabel::New()
   return handle;
 }
 
-void TextLabel::SetRenderer( Text::RendererPtr renderer )
-{
-  mRenderer = renderer;
-}
-
 void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
 {
   Toolkit::TextLabel label = Toolkit::TextLabel::DownCast( Dali::BaseHandle( object ) );
 
   if( label )
   {
-    TextLabel& labelImpl( GetImpl( label ) );
+    TextLabel& impl( GetImpl( label ) );
     switch( index )
     {
+      case Toolkit::TextLabel::PROPERTY_RENDERING_BACKEND:
+      {
+        unsigned int backend = value.Get< unsigned int >();
+
+        if( impl.mRenderingBackend != backend )
+        {
+          impl.mRenderingBackend = backend;
+          impl.mRenderer.Reset();
+        }
+        break;
+      }
       case Toolkit::TextLabel::PROPERTY_TEXT:
       {
-        labelImpl.SetText( value.Get< std::string >() );
+        if( impl.mController )
+        {
+          impl.mController->SetText( value.Get< std::string >() );
+        }
         break;
       }
       case Toolkit::TextLabel::PROPERTY_MULTI_LINE:
       {
-        labelImpl.SetMultiLine( value.Get< bool >() );
+        if( impl.mController )
+        {
+          LayoutEngine::Layout layout = value.Get< bool >() ? LayoutEngine::MULTI_LINE_BOX : LayoutEngine::SINGLE_LINE_BOX;
+          impl.mController->GetLayoutEngine().SetLayout( layout );
+        }
         break;
       }
     }
@@ -112,11 +130,27 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
 
   if( label )
   {
+    TextLabel& impl( GetImpl( label ) );
     switch( index )
     {
+      case Toolkit::TextLabel::PROPERTY_RENDERING_BACKEND:
+      {
+        value = impl.mRenderingBackend;
+        break;
+      }
+
       case Toolkit::TextLabel::PROPERTY_TEXT:
       {
         DALI_LOG_WARNING( "UTF-8 text representation was discarded\n" );
+        break;
+      }
+
+      case Toolkit::TextLabel::PROPERTY_MULTI_LINE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetLayoutEngine().GetLayout();
+        }
         break;
       }
     }
@@ -146,8 +180,7 @@ void TextLabel::OnRelayout( const Vector2& size, ActorSizeContainer& container )
   {
     if( !mRenderer )
     {
-      // TODO - Get from RendererFactory
-      mRenderer = Dali::Toolkit::Text::BasicRenderer::New();
+      mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
 
     if( mRenderer )
@@ -162,37 +195,14 @@ void TextLabel::OnRelayout( const Vector2& size, ActorSizeContainer& container )
   }
 }
 
-void TextLabel::SetText( const std::string& text )
-{
-  if( mController )
-  {
-    // The Controller updates the View for the renderer
-    mController->SetText( text );
-  }
-}
-
-void TextLabel::SetMultiLine( bool multiLine )
-{
-  if( mController )
-  {
-    if( multiLine )
-    {
-      mController->GetLayoutEngine().SetLayout( LayoutEngine::MULTI_LINE_BOX );
-    }
-    else
-    {
-      mController->GetLayoutEngine().SetLayout( LayoutEngine::SINGLE_LINE_BOX );
-    }
-  }
-}
-
 void TextLabel::RequestTextRelayout()
 {
   RelayoutRequest();
 }
 
 TextLabel::TextLabel()
-: Control( ControlBehaviour( CONTROL_BEHAVIOUR_NONE ) )
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_NONE ) ),
+  mRenderingBackend( DEFAULT_RENDERING_BACKEND )
 {
 }
 

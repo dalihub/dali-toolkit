@@ -75,6 +75,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/shader-effects/page-turn-effect-impl.cpp \
    $(toolkit_src_dir)/shader-effects/water-effect-impl.cpp \
    $(toolkit_src_dir)/styling/style-manager-impl.cpp \
+   $(toolkit_src_dir)/text/rendering/text-backend-impl.cpp \
    $(toolkit_src_dir)/text/multi-language-support-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-cross-effect-impl.cpp \
