@@ -279,6 +279,8 @@ Text::RendererPtr BasicRenderer::New()
 
 RenderableActor BasicRenderer::Render( Text::ViewInterface& view )
 {
+  UnparentAndReset( mImpl->mActor );
+
   Text::Length numberOfGlyphs = view.GetNumberOfGlyphs();
 
   if( numberOfGlyphs > 0 )

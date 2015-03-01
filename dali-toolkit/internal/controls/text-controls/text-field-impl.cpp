@@ -32,7 +32,10 @@ using namespace Dali::Toolkit::Text;
 namespace
 {
 
+const unsigned int DEFAULT_RENDERING_BACKEND = 0;
+
 } // namespace
+
 
 namespace Dali
 {
@@ -300,12 +303,23 @@ void TextField::OnInitialize()
 
   // Forward input events to controller
   EnableGestureDetection( Gesture::Tap );
+
+  // TODO - Fix TapGestureDetector to support single and double tap
+  mDoubleTapDetector = TapGestureDetector::New();
+  mDoubleTapDetector.SetTapsRequired( 2 );
+  mDoubleTapDetector.DetectedSignal().Connect( this, &TextField::OnDoubleTap );
+  mDoubleTapDetector.Attach(Self());
 }
 
 void TextField::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   if( mController->Relayout( size ) )
   {
+    if( mDecorator )
+    {
+      mDecorator->Relayout( size );
+    }
+
     if( !mRenderer )
     {
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
@@ -325,7 +339,12 @@ void TextField::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 
 void TextField::OnTap( const TapGesture& tap )
 {
-  mController->TapEvent( tap.localPoint.x, tap.localPoint.y );
+  mController->TapEvent( tap.numberOfTaps, tap.localPoint.x, tap.localPoint.y );
+}
+
+void TextField::OnDoubleTap( Actor actor, const TapGesture& tap )
+{
+  mController->TapEvent( tap.numberOfTaps, tap.localPoint.x, tap.localPoint.y );
 }
 
 void TextField::RequestTextRelayout()
@@ -334,7 +353,8 @@ void TextField::RequestTextRelayout()
 }
 
 TextField::TextField()
-: Control( ControlBehaviour( CONTROL_BEHAVIOUR_NONE ) )
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_NONE ) ),
+  mRenderingBackend( DEFAULT_RENDERING_BACKEND )
 {
 }
 

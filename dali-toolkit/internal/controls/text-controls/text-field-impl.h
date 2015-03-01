@@ -89,6 +89,11 @@ private: // From Control
   virtual void OnTap( const TapGesture& tap );
 
   /**
+   * TODO - Fix TapGestureDetector to support single and double tap
+   */
+  void OnDoubleTap( Actor actor, const TapGesture& tap );
+
+  /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
    */
   virtual void RequestTextRelayout();
@@ -116,6 +121,8 @@ private: // Data
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
   Text::DecoratorPtr mDecorator;
+
+  TapGestureDetector mDoubleTapDetector;
 
   unsigned int mRenderingBackend;
 };

@@ -62,8 +62,23 @@ enum ActiveCursor
 // The state information for grab handle events
 enum GrabHandleState
 {
-  GRAB_HANDLE_MOVING,
+  GRAB_HANDLE_TAPPED,
+  GRAB_HANDLE_PRESSED,
   GRAB_HANDLE_RELEASED
+};
+
+// The set the selection-handle positions etc.
+enum SelectionHandle
+{
+  PRIMARY_SELECTION_HANDLE,
+  SECONDARY_SELECTION_HANDLE,
+  SELECTION_HANDLE_COUNT
+};
+
+enum SelectionHandleState
+{
+  SELECTION_HANDLE_PRESSED,
+  SELECTION_HANDLE_RELEASED
 };
 
 /**
@@ -249,6 +264,58 @@ public:
    * @return The grab handle image.
    */
   Dali::Image GetGrabHandleImage() const;
+
+  /**
+   * @brief Sets whether the selection handles and highlight are active.
+   *
+   * @param[in] active True if the selection handles and highlight are active.
+   */
+  void SetSelectionActive( bool active );
+
+  /**
+   * @brief Query whether the selection handles and highlight are active.
+   *
+   * @return True if the selection handles and highlight are active.
+   */
+  bool IsSelectionActive() const;
+
+  /**
+   * @brief Sets the position of a selection handle.
+   *
+   * @param[in] handle The handle to set.
+   * @param[in] x The x position relative to the top-left of the parent control.
+   * @param[in] y The y position relative to the top-left of the parent control.
+   * @param[in] cursorHeight The logical cursor height at this position.
+   */
+  void SetPosition( SelectionHandle handle, float x, float y, float cursorHeight );
+
+  /**
+   * @brief Retrieves the position of a selection handle.
+   *
+   * @param[in] handle The handle to get.
+   * @param[out] x The x position relative to the top-left of the parent control.
+   * @param[out] y The y position relative to the top-left of the parent control.
+   * @param[out] cursorHeight The logical cursor height at this position.
+   */
+  void GetPosition( SelectionHandle handle, float& x, float& y, float& cursorHeight ) const;
+
+  /**
+   * @brief Sets the image for one of the selection handles.
+   *
+   * @param[in] handle The selection handle.
+   * @param[in] state A different image can be set for the pressed/released states.
+   * @param[in] image The image to use.
+   */
+  void SetImage( SelectionHandle handle, SelectionHandleState state, Dali::Image image );
+
+  /**
+   * @brief Retrieves the image for a selection handle.
+   *
+   * @param[in] handle The selection handle.
+   * @param[in] state A different image can be set for the pressed/released states.
+   * @return The image.
+   */
+  Dali::Image GetImage( SelectionHandle handle, SelectionHandleState state ) const;
 
 protected:
 

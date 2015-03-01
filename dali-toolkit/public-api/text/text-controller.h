@@ -109,7 +109,7 @@ public:
    *
    * @note UI Controls are expected to minimize calls to this method e.g. call once after size negotiation.
    * @param[in] size A the size of a bounding box to layout text within.
-   * @return True if the View was updated.
+   * @return True if the text model or decorations were updated.
    */
   bool Relayout( const Vector2& size );
 
@@ -153,9 +153,12 @@ public:
   void KeyboardFocusLostEvent();
 
   /**
-   * @brief Caller by editable UI controls when focus is lost.
+   * @brief Caller by editable UI controls when a tap gesture occurs.
+   * @param[in] tapCount The number of taps.
+   * @param[in] x The x position relative to the top-left of the parent control.
+   * @param[in] y The y position relative to the top-left of the parent control.
    */
-  void TapEvent( float x, float y );
+  void TapEvent( unsigned int tapCount, float x, float y );
 
   /**
    * @copydoc Dali::Toolkit::Text::Decorator::Observer::GrabHandleEvent()

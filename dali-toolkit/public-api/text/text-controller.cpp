@@ -30,8 +30,11 @@
 #include <dali-toolkit/public-api/text/visual-model.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/text-abstraction/font-client.h>
 #include <limits>
+#include <vector>
+#include <dali/public-api/text-abstraction/font-client.h>
+
+using std::vector;
 
 namespace Dali
 {
@@ -56,6 +59,7 @@ struct Controller::TextInput
   union Param
   {
     int mInt;
+    unsigned int mUint;
     float mFloat;
   };
 
@@ -71,16 +75,102 @@ struct Controller::TextInput
     EventType type;
     Param p1;
     Param p2;
+    Param p3;
+  };
+
+  enum State
+  {
+    INACTIVE,
+    SELECTING,
+    EDITING
   };
 
   TextInput( DecoratorPtr decorator )
-  : mDecorator( decorator )
+  : mDecorator( decorator ),
+    mState( INACTIVE )
   {
   }
 
-  DecoratorPtr mDecorator;
+  /**
+   * @brief Helper to move the cursor, grab handle etc.
+   */
+  bool ProcessTouchEvents()
+  {
+    mDecoratorUpdated = false;
 
-  std::vector<Event> mEventQueue;
+    if( mDecorator )
+    {
+      for( vector<TextInput::Event>::iterator iter = mEventQueue.begin(); iter != mEventQueue.end(); ++iter )
+      {
+        switch( iter->type )
+        {
+          case KEYBOARD_FOCUS_GAIN_EVENT:
+          {
+            OnKeyboardFocus( true );
+            break;
+          }
+          case KEYBOARD_FOCUS_LOST_EVENT:
+          {
+            OnKeyboardFocus( false );
+            break;
+          }
+          case TAP_EVENT:
+          {
+            OnTapEvent( *iter );
+            break;
+          }
+          case GRAB_HANDLE_EVENT:
+          {
+            OnGrabHandleEvent( *iter );
+            break;
+          }
+        }
+      }
+    }
+
+    mEventQueue.clear();
+
+    return mDecoratorUpdated;
+  }
+
+  void OnKeyboardFocus( bool hasFocus )
+  {
+    // TODO
+  }
+
+  void OnTapEvent( const Event& event )
+  {
+    if( 1u == event.p1.mUint )
+    {
+      mState = TextInput::EDITING;
+      mDecorator->SetGrabHandleActive( true );
+      mDecorator->SetPosition( PRIMARY_CURSOR, 0, 0, 10 );
+      mDecoratorUpdated = true;
+    }
+    else if( 2u == event.p1.mUint )
+    {
+      mState = TextInput::SELECTING;
+      mDecorator->SetGrabHandleActive( false );
+      mDecorator->SetSelectionActive( true );
+      mDecoratorUpdated = true;
+    }
+  }
+
+  void OnGrabHandleEvent( const Event& event )
+  {
+    // TODO
+  }
+
+  DecoratorPtr mDecorator;
+  bool mDecoratorUpdated;
+
+  State mState;
+
+  /**
+   * This is used to delay handling events until after the model has been updated.
+   * The number of updates to the model is minimized to improve performance.
+   */
+  vector<Event> mEventQueue; ///< The queue of touch events etc.
 };
 
 struct Controller::Impl
@@ -162,11 +252,11 @@ bool Controller::Relayout( const Vector2& size )
     return false;
   }
 
-  bool viewUpdated = false;
+  bool updated = false;
 
   if( size != mImpl->mControlSize )
   {
-    viewUpdated = DoRelayout( size, mImpl->mOperations );
+    updated = DoRelayout( size, mImpl->mOperations );
 
     // Do not re-do any operation until something changes.
     mImpl->mOperations = NO_OPERATION;
@@ -174,7 +264,13 @@ bool Controller::Relayout( const Vector2& size )
     mImpl->mControlSize = size;
   }
 
-  return viewUpdated;
+  if( mImpl->mTextInput )
+  {
+    // Move the cursor, grab handle etc.
+    updated = mImpl->mTextInput->ProcessTouchEvents() || updated;
+  }
+
+  return updated;
 }
 
 bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
@@ -308,8 +404,6 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
     viewUpdated = true;
   }
 
-  // TODO - process input events to move grab handle
-
   return viewUpdated;
 }
 
@@ -411,15 +505,17 @@ void Controller::KeyboardFocusLostEvent()
   }
 }
 
-void Controller::TapEvent( float x, float y)
+void Controller::TapEvent( unsigned int tapCount, float x, float y )
 {
   DALI_ASSERT_DEBUG( mImpl->mTextInput && "Unexpected TapEvent" );
 
   if( mImpl->mTextInput )
   {
     TextInput::Event event( TextInput::TAP_EVENT );
-    event.p1.mFloat = x;
-    event.p2.mFloat = y;
+    event.p1.mUint = tapCount;
+    event.p2.mFloat = x;
+    event.p3.mFloat = y;
+    mImpl->mTextInput->mEventQueue.push_back( event );
 
     RequestRelayout();
   }
@@ -434,6 +530,7 @@ void Controller::GrabHandleEvent( GrabHandleState state, float x )
     TextInput::Event event( TextInput::GRAB_HANDLE_EVENT );
     event.p1.mInt   = state;
     event.p2.mFloat = x;
+    mImpl->mTextInput->mEventQueue.push_back( event );
 
     RequestRelayout();
   }
