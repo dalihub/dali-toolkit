@@ -143,8 +143,10 @@ struct Controller::TextInput
     if( 1u == event.p1.mUint )
     {
       mState = TextInput::EDITING;
+      mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+      mDecorator->StartCursorBlink();
       mDecorator->SetGrabHandleActive( true );
-      mDecorator->SetPosition( PRIMARY_CURSOR, 0, 0, 10 );
+      mDecorator->SetPosition( PRIMARY_CURSOR, 10, 0, 18 );
       mDecoratorUpdated = true;
     }
     else if( 2u == event.p1.mUint )

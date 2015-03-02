@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/constants.h>
@@ -49,9 +50,12 @@ const char* DEFAULT_SELECTION_HANDLE_ONE( DALI_IMAGE_DIR "text-input-selection-h
 const char* DEFAULT_SELECTION_HANDLE_TWO( DALI_IMAGE_DIR "text-input-selection-handle-right.png" );
 //const char* DEFAULT_SELECTION_HANDLE_ONE_PRESSED( DALI_IMAGE_DIR "text-input-selection-handle-left-press.png" );
 //const char* DEFAULT_SELECTION_HANDLE_TWO_PRESSED( DALI_IMAGE_DIR "text-input-selection-handle-right-press.png" );
+const char* DEFAULT_CURSOR_IMAGE( DALI_IMAGE_DIR "decorator-cursor.png");
 
 const Dali::Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE( 1.5f, 2.0f, 1.0f );
 const Dali::Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.5f, 1.5f, 1.0f );
+
+const std::size_t CURSOR_BLINK_INTERVAL = 500; // Cursor blink interval
 
 } // end of namespace
 
@@ -110,13 +114,21 @@ struct Decorator::Impl : public ConnectionTracker
     mObserver(observer),
     mActiveCursor(ACTIVE_CURSOR_NONE),
     mActiveGrabHandle(false),
-    mCursorBlinkInterval(0.5f),
-    mCursorBlinkDuration(0.0f)
+    mActiveSelection( false ),
+    mCursorBlinkInterval( CURSOR_BLINK_INTERVAL ),
+    mCursorBlinkDuration(0.0f),
+    mCursorBlinkStatus( true )
   {
   }
 
+  /**
+   * Relayout of the decorations owned by the decorator.
+   * @param[in] size The Size of the UI control the decorater is adding it's decorations to.
+   */
   void Relayout( const Vector2& size )
   {
+    SetCursors();
+
     // Show or hide the grab handle
     if( mActiveGrabHandle )
     {
@@ -153,8 +165,81 @@ struct Decorator::Impl : public ConnectionTracker
       UnparentAndReset( mSelectionHandle[ PRIMARY_SELECTION_HANDLE ].actor );
       UnparentAndReset( mSelectionHandle[ SECONDARY_SELECTION_HANDLE ].actor );
     }
+  }
 
-    // TODO
+  /**
+   * Creates a cursor
+   */
+  void CreateCursor( ImageActor& cursor )
+  {
+    if ( !mCursorImage )
+    {
+      mCursorImage = ResourceImage::New( DEFAULT_CURSOR_IMAGE );
+    }
+    cursor = ImageActor::New( mCursorImage );
+    cursor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+  }
+
+  /**
+   * Add / Remove cursor(s) from parent
+   */
+  void SetCursors()
+  {
+    Actor parent = mParent.Self();
+    /* Create Primary and or Secondary Cursor(s) if active and add to parent */
+    if ( mActiveCursor == ACTIVE_CURSOR_PRIMARY )
+    {
+      if ( !mPrimaryCursor )
+      {
+        CreateCursor( mPrimaryCursor );
+#ifdef DECORATOR_DEBUG
+        mPrimaryCursor.SetName( "PrimaryCursorActor" );
+#endif
+        parent.Add( mPrimaryCursor);
+      }
+    }
+    else if ( mActiveCursor == ACTIVE_CURSOR_BOTH )
+    {
+      if ( !mSecondaryCursor )
+      {
+        CreateCursor( mSecondaryCursor );
+#ifdef DECORATOR_DEBUG
+        mSecondaryCursor.SetName( "SecondaryCursorActor" );
+#endif
+        parent.Add( mSecondaryCursor);
+      }
+    }
+    else
+    {
+      /* ACTIVE_CURSOR_NONE so unparent cursors*/
+      if ( mPrimaryCursor )
+      {
+        UnparentAndReset( mPrimaryCursor );
+      }
+
+      if ( mSecondaryCursor )
+      {
+        UnparentAndReset( mSecondaryCursor );
+      }
+    }
+  }
+
+  bool OnCursorBlinkTimerTick()
+  {
+    // Cursor blinking
+    if ( ACTIVE_CURSOR_PRIMARY )
+    {
+      mPrimaryCursor.SetVisible( mCursorBlinkStatus );
+    }
+    else if ( ACTIVE_CURSOR_BOTH )
+    {
+      mPrimaryCursor.SetVisible( mCursorBlinkStatus );
+      mSecondaryCursor.SetVisible( mCursorBlinkStatus );
+    }
+
+    mCursorBlinkStatus = !mCursorBlinkStatus;
+
+    return true;
   }
 
   void SetupTouchEvents()
@@ -329,13 +414,21 @@ struct Decorator::Impl : public ConnectionTracker
   Internal::Control& mParent;
   Observer& mObserver;
 
-  Layer mActiveLayer; ///< Layer for active handles and alike that ensures they are above all else.
+  Layer mActiveLayer; // Layer for active handles and alike that ensures they are above all else.
 
   unsigned int mActiveCursor;
   bool         mActiveGrabHandle;
   bool         mActiveSelection;
 
   CursorImpl mCursor[CURSOR_COUNT];
+
+  Timer mCursorBlinkTimer; // Timer to signal cursor to blink
+  unsigned int mCursorBlinkInterval;
+  float mCursorBlinkDuration;
+  bool mCursorBlinkStatus; // Flag to switch between blink on and blink off
+
+  ImageActor mPrimaryCursor;
+  ImageActor mSecondaryCursor;
 
   ImageActor mGrabHandle;
   Actor mGrabArea;
@@ -348,8 +441,7 @@ struct Decorator::Impl : public ConnectionTracker
   TapGestureDetector mTapDetector;
   PanGestureDetector mPanGestureDetector;
 
-  float mCursorBlinkInterval;
-  float mCursorBlinkDuration;
+
 };
 
 DecoratorPtr Decorator::New( Internal::Control& parent, Observer& observer )
@@ -361,6 +453,8 @@ void Decorator::Relayout( const Vector2& size )
 {
   mImpl->Relayout( size );
 }
+
+/** Cursor **/
 
 void Decorator::SetActiveCursor( ActiveCursor activeCursor )
 {
@@ -408,17 +502,29 @@ const Dali::Vector4& Decorator::GetColor( Cursor cursor ) const
 
 void Decorator::StartCursorBlink()
 {
-  // TODO
+  if ( !mImpl->mCursorBlinkTimer )
+  {
+    mImpl->mCursorBlinkTimer = Timer::New( mImpl->mCursorBlinkInterval );
+    mImpl->mCursorBlinkTimer.TickSignal().Connect( mImpl, &Decorator::Impl::OnCursorBlinkTimerTick );
+  }
+
+  if ( !mImpl->mCursorBlinkTimer.IsRunning() )
+  {
+    mImpl->mCursorBlinkTimer.Start();
+  }
 }
 
 void Decorator::StopCursorBlink()
 {
-  // TODO
+  if ( mImpl->mCursorBlinkTimer )
+  {
+    mImpl->mCursorBlinkTimer.Stop();
+  }
 }
 
 void Decorator::SetCursorBlinkInterval( float seconds )
 {
-  mImpl->mCursorBlinkInterval = seconds;
+  mImpl->mCursorBlinkInterval = seconds*1000; // Convert to milliseconds
 }
 
 float Decorator::GetCursorBlinkInterval() const
@@ -435,6 +541,8 @@ float Decorator::GetCursorBlinkDuration() const
 {
   return mImpl->mCursorBlinkDuration;
 }
+
+/** GrabHandle **/
 
 void Decorator::SetGrabHandleActive( bool active )
 {
@@ -455,6 +563,8 @@ Dali::Image Decorator::GetGrabHandleImage() const
 {
   return mImpl->mGrabHandleImage;
 }
+
+/** Selection **/
 
 void Decorator::SetSelectionActive( bool active )
 {
