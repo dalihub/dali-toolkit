@@ -24,6 +24,7 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/events/hit-test-algorithm.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
@@ -31,10 +32,12 @@
 
 using namespace Dali;
 
-namespace //unnamed namespace
+namespace //Unnamed namespace
 {
 // To register type
-TypeRegistration mType( typeid(Toolkit::PageTurnView), typeid(Toolkit::Control), NULL );
+
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::PageTurnView, Toolkit::Control, NULL )
+DALI_TYPE_REGISTRATION_END()
 
 // default grid density for page turn effect, 10 pixels by 10 pixels
 const float DEFAULT_GRID_DENSITY(10.0f);

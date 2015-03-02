@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -29,13 +30,6 @@
 #include <dali-toolkit/internal/controls/cluster/cluster-style-impl.h>
 
 using namespace Dali;
-
-namespace // unnamed namespace
-{
-
-const float CLUSTER_STYLE_CONSTRAINT_DURATION = 1.0f;
-
-}
 
 namespace Dali
 {
@@ -49,23 +43,21 @@ namespace Internal
 namespace
 {
 
-// Actions
-
-const char* const ACTION_EXPAND =    "expand";
-const char* const ACTION_COLLAPSE =  "collapse";
-const char* const ACTION_TRANSFORM = "transform";
-
 BaseHandle Create()
 {
   Toolkit::ClusterStyleStandard s = Toolkit::ClusterStyleStandard::New( Toolkit::ClusterStyleStandard::ClusterStyle1 );
   return Toolkit::Cluster::New( s );
 }
 
-TypeRegistration mType( typeid( Toolkit::Cluster ), typeid( Toolkit::Control ), Create );
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Cluster, Toolkit::Control, Create )
 
-TypeAction a1( mType, ACTION_EXPAND,    &Cluster::DoAction );
-TypeAction a2( mType, ACTION_COLLAPSE,  &Cluster::DoAction );
-TypeAction a3( mType, ACTION_TRANSFORM, &Cluster::DoAction );
+DALI_ACTION_REGISTRATION( Cluster, "expand",    ACTION_EXPAND    )
+DALI_ACTION_REGISTRATION( Cluster, "collapse",  ACTION_COLLAPSE  )
+DALI_ACTION_REGISTRATION( Cluster, "transform", ACTION_TRANSFORM )
+
+DALI_TYPE_REGISTRATION_END()
+
+const float CLUSTER_STYLE_CONSTRAINT_DURATION = 1.0f;
 
 }
 

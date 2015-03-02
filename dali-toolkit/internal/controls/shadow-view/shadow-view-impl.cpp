@@ -25,6 +25,7 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/integration-api/debug.h>
 
@@ -69,8 +70,8 @@ BaseHandle Create()
   return Toolkit::ShadowView::New();
 }
 
-TypeRegistration mType( typeid(Toolkit::ShadowView), typeid(Toolkit::Control), Create );
-
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ShadowView, Toolkit::Control, Create )
+DALI_TYPE_REGISTRATION_END()
 
 const float BLUR_STRENGTH_DEFAULT = 1.0f;
 
@@ -79,12 +80,11 @@ const float DEFAULT_FIELD_OF_VIEW_RADIANS = Math::PI / 4.0f; // 45 degrees
 
 const Vector4 DEFAULT_SHADOW_COLOR = Vector4(0.2f, 0.2f, 0.2f, 0.8f);
 
-const std::string SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME( "uLightCameraProjectionMatrix" );
-const std::string SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME( "uLightCameraViewMatrix" );
-const std::string SHADER_SHADOW_COLOR_PROPERTY_NAME( "uShadowColor" );
-
-const std::string BLUR_STRENGTH_PROPERTY_NAME( "BlurStrengthProperty" );
-const std::string SHADOW_COLOR_PROPERTY_NAME( "ShadowColorProperty" );
+const char* const SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME = "uLightCameraProjectionMatrix";
+const char* const SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME = "uLightCameraViewMatrix";
+const char* const SHADER_SHADOW_COLOR_PROPERTY_NAME = "uShadowColor";
+const char* const BLUR_STRENGTH_PROPERTY_NAME = "BlurStrengthProperty";
+const char* const SHADOW_COLOR_PROPERTY_NAME = "ShadowColorProperty";
 
 const char* const RENDER_SHADOW_VERTEX_SOURCE =
   " uniform mediump mat4 uLightCameraProjectionMatrix;\n"

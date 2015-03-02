@@ -22,6 +22,7 @@
 #include <sstream>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
@@ -110,41 +111,39 @@ namespace Dali
 namespace Toolkit
 {
 
-const Property::Index TableView::PROPERTY_ROWS( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX );
-const Property::Index TableView::PROPERTY_COLUMNS( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 1 );
-const Property::Index TableView::PROPERTY_CELL_PADDING( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 2 );
-const Property::Index TableView::PROPERTY_LAYOUT_ROWS( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 3 );
-const Property::Index TableView::PROPERTY_LAYOUT_COLUMNS( Internal::TableView::TABLEVIEW_PROPERTY_START_INDEX + 4 );
-
 namespace Internal
 {
 
 namespace
 {
 
+// Type registration
+BaseHandle Create()
+{
+  return Toolkit::TableView::New( 0, 0 );
+}
+
+// Setup properties, signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TableView, Toolkit::Control, Create );
+
+DALI_PROPERTY_REGISTRATION( TableView, "rows",           UNSIGNED_INTEGER, ROWS           )
+DALI_PROPERTY_REGISTRATION( TableView, "columns",        UNSIGNED_INTEGER, COLUMNS        )
+DALI_PROPERTY_REGISTRATION( TableView, "cell-padding",   VECTOR2,          CELL_PADDING   )
+DALI_PROPERTY_REGISTRATION( TableView, "layout-rows",    MAP,              LAYOUT_ROWS    )
+DALI_PROPERTY_REGISTRATION( TableView, "layout-columns", MAP,              LAYOUT_COLUMNS )
+
+DALI_TYPE_REGISTRATION_END()
+
 const Scripting::StringEnum< Toolkit::TableView::LayoutPolicy > LAYOUT_POLICY_STRING_TABLE[] =
 {
  { "fixed",    Toolkit::TableView::Fixed    },
  { "relative", Toolkit::TableView::Relative },
- { "fill",     Toolkit::TableView::Fill }
+ { "fill",     Toolkit::TableView::Fill     }
 };
 
 const unsigned int LAYOUT_POLICY_STRING_TABLE_COUNT = sizeof(LAYOUT_POLICY_STRING_TABLE) / sizeof( LAYOUT_POLICY_STRING_TABLE[0] );
 
-// Type registration
-BaseHandle Create()
-{
-  return Toolkit::TableView::New(0, 0);
-}
-TypeRegistration mType( typeid(Toolkit::TableView), typeid(Toolkit::Control), Create );
-
-PropertyRegistration property1( mType, "rows", Toolkit::TableView::PROPERTY_ROWS, Property::UNSIGNED_INTEGER, &TableView::SetProperty, &TableView::GetProperty );
-PropertyRegistration property2( mType, "columns", Toolkit::TableView::PROPERTY_COLUMNS, Property::UNSIGNED_INTEGER, &TableView::SetProperty, &TableView::GetProperty );
-PropertyRegistration property3( mType, "cell-padding", Toolkit::TableView::PROPERTY_CELL_PADDING, Property::VECTOR2, &TableView::SetProperty, &TableView::GetProperty );
-PropertyRegistration property4( mType, "layout-rows", Toolkit::TableView::PROPERTY_LAYOUT_ROWS, Property::MAP, &TableView::SetProperty, &TableView::GetProperty );
-PropertyRegistration property5( mType, "layout-columns", Toolkit::TableView::PROPERTY_LAYOUT_COLUMNS, Property::MAP, &TableView::SetProperty, &TableView::GetProperty );
-
-} // namespace
+} // Unnamed namespace
 
 Toolkit::TableView TableView::New( unsigned int initialRows, unsigned int initialColumns )
 {
@@ -717,7 +716,7 @@ void TableView::SetProperty( BaseObject* object, Property::Index index, const Pr
     TableView& tableViewImpl( GetImpl( tableView ) );
     switch( index )
     {
-      case Toolkit::TableView::PROPERTY_ROWS:
+      case Toolkit::TableView::Property::ROWS:
       {
         if( value.Get<unsigned int>() != tableViewImpl.GetRows() )
         {
@@ -725,7 +724,7 @@ void TableView::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::TableView::PROPERTY_COLUMNS:
+      case Toolkit::TableView::Property::COLUMNS:
       {
         if( value.Get<unsigned int>() != tableViewImpl.GetColumns() )
         {
@@ -733,17 +732,17 @@ void TableView::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::TableView::PROPERTY_CELL_PADDING:
+      case Toolkit::TableView::Property::CELL_PADDING:
       {
         tableViewImpl.SetCellPadding( value.Get<Vector2>() );
         break;
       }
-      case Toolkit::TableView::PROPERTY_LAYOUT_ROWS:
+      case Toolkit::TableView::Property::LAYOUT_ROWS:
       {
         SetHeightOrWidthProperty( tableViewImpl, &TableView::SetFixedHeight, &TableView::SetRelativeHeight, value );
         break;
       }
-      case Toolkit::TableView::PROPERTY_LAYOUT_COLUMNS:
+      case Toolkit::TableView::Property::LAYOUT_COLUMNS:
       {
         SetHeightOrWidthProperty( tableViewImpl, &TableView::SetFixedWidth, &TableView::SetRelativeWidth, value );
         break;
@@ -763,27 +762,27 @@ Property::Value TableView::GetProperty( BaseObject* object, Property::Index inde
     TableView& tableViewImpl( GetImpl( tableView ) );
     switch( index )
     {
-      case Toolkit::TableView::PROPERTY_ROWS:
+      case Toolkit::TableView::Property::ROWS:
       {
         value = tableViewImpl.GetRows();
         break;
       }
-      case Toolkit::TableView::PROPERTY_COLUMNS:
+      case Toolkit::TableView::Property::COLUMNS:
       {
         value = tableViewImpl.GetColumns();
         break;
       }
-      case Toolkit::TableView::PROPERTY_CELL_PADDING:
+      case Toolkit::TableView::Property::CELL_PADDING:
       {
         value = tableViewImpl.GetCellPadding();
         break;
       }
-      case Toolkit::TableView::PROPERTY_LAYOUT_ROWS:
+      case Toolkit::TableView::Property::LAYOUT_ROWS:
       {
         value = tableViewImpl.GetRowHeightsPropertyValue();
         break;
       }
-      case Toolkit::TableView::PROPERTY_LAYOUT_COLUMNS:
+      case Toolkit::TableView::Property::LAYOUT_COLUMNS:
       {
         value = tableViewImpl.GetColumnWidthsPropertyValue();
         break;
@@ -1210,6 +1209,7 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolki
           break;
         }
         case Toolkit::Control::Down:
+
         {
           if(++currentRow > numberOfRows - 1)
           {

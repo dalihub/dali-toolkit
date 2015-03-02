@@ -28,21 +28,24 @@
 #include <dali/public-api/events/mouse-wheel-event.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
-#include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/bouncing-effect-actor.h>
+#include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
 
 using std::string;
 using std::set;
 using namespace Dali;
 
-namespace // unnamed namespace
+namespace // Unnamed namespace
 {
 
 //Type registration
-TypeRegistration mType( typeid(Toolkit::ItemView), typeid(Toolkit::Scrollable), NULL );
+
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ItemView, Toolkit::Scrollable, NULL )
+DALI_TYPE_REGISTRATION_END()
 
 const float DEFAULT_MINIMUM_SWIPE_SPEED = 1.0f;
 const float DEFAULT_MINIMUM_SWIPE_DISTANCE = 3.0f;

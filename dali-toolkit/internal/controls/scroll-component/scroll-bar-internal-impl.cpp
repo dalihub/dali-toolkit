@@ -23,6 +23,7 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
@@ -361,7 +362,8 @@ BaseHandle Create()
   return BaseHandle();
 }
 
-TypeRegistration mType( typeid(Toolkit::ScrollBarInternal), typeid(Toolkit::ScrollComponent), Create );
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ScrollBarInternal, Toolkit::ScrollComponent, Create )
+DALI_TYPE_REGISTRATION_END()
 
 }
 

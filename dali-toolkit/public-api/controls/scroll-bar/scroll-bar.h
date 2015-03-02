@@ -53,14 +53,31 @@ class DALI_IMPORT_API ScrollBar : public ScrollComponent
 {
 public:
 
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+  };
+
+  /**
+   * @brief An enumeration of properties belonging to the ScrollBar class.
+   */
+  struct Property
+  {
+    enum
+    {
+      INDICATOR_HEIGHT_POLICY = PROPERTY_START_INDEX, ///< name "indicator-height-policy", @see SetIndicatorHeightPolicy(), type STRING
+      INDICATOR_FIXED_HEIGHT,                         ///< name "indicator-fixed-height",  @see SetIndicatorFixedHeight(),  type FLOAT
+      INDICATOR_SHOW_DURATION,                        ///< name "indicator-show-duration", @see SetIndicatorShowDuration(), type FLOAT
+      INDICATOR_HIDE_DURATION,                        ///< name "indicator-hide-duration", @see SetIndicatorHideDuration(), type FLOAT
+    };
+  };
+
   // Signals
   typedef Signal< void ( float ) > ScrollPositionNotifiedSignalType;
-
-  // Properties
-  static const Dali::Property::Index PROPERTY_INDICATOR_HEIGHT_POLICY;         ///< name "indicator-height-policy", @see SetIndicatorHeightPolicy(), type STRING
-  static const Dali::Property::Index PROPERTY_INDICATOR_FIXED_HEIGHT;          ///< name "indicator-fixed-height",  @see SetIndicatorFixedHeight(),  type FLOAT
-  static const Dali::Property::Index PROPERTY_INDICATOR_SHOW_DURATION;         ///< name "indicator-show-duration", @see SetIndicatorShowDuration(), type FLOAT
-  static const Dali::Property::Index PROPERTY_INDICATOR_HIDE_DURATION;         ///< name "indicator-hide-duration", @see SetIndicatorHideDuration(), type FLOAT
 
 public:
 

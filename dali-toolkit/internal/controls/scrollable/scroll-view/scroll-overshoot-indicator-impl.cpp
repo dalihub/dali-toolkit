@@ -329,7 +329,7 @@ void ScrollOvershootEffectRipple::SetOvershoot(float amount, bool animate)
     UpdateVisibility(true);
   }
 
-  float overshootAnimationSpeed = mAttachedScrollView.Self().GetProperty<float>(Toolkit::Scrollable::PROPERTY_OVERSHOOT_ANIMATION_SPEED);
+  float overshootAnimationSpeed = mAttachedScrollView.Self().GetProperty<float>(Toolkit::Scrollable::Property::OVERSHOOT_ANIMATION_SPEED);
 
   if( animate && overshootAnimationSpeed > Math::MACHINE_EPSILON_0 )
   {

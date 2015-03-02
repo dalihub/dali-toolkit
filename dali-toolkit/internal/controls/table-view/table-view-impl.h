@@ -40,13 +40,6 @@ class TableView : public Control
 {
 public:
 
-  // Properties
-  enum
-  {
-    TABLEVIEW_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    TABLEVIEW_PROPERTY_END_INDEX = TABLEVIEW_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
-  };
-
   /**
    * Structure for the layout data
    */

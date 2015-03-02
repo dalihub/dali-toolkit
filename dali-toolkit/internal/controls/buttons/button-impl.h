@@ -41,14 +41,6 @@ namespace Internal
  */
 class Button : public Control
 {
-public:
-
-  // Properties
-  enum
-  {
-    BUTTON_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    BUTTON_PROPERTY_END_INDEX = BUTTON_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
-  };
 
 protected:
 
@@ -533,4 +525,3 @@ inline const Toolkit::Internal::Button& GetImplementation( const Toolkit::Button
 } // namespace Dali
 
 #endif // __DALI_TOOLKIT_INTERNAL_BUTTON_H__
-

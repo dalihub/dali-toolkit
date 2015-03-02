@@ -26,6 +26,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/integration-api/debug.h>
 
@@ -38,7 +39,6 @@
 // default near clip value
 // mChildrenRoot Add()/Remove() overloads - better solution
 // Manager object - re-use render targets if there are multiple GaussianBlurViews created
-
 
 
 /////////////////////////////////////////////////////////
@@ -85,14 +85,14 @@ BaseHandle Create()
   return Toolkit::GaussianBlurView::New();
 }
 
-TypeRegistration mType( typeid(Toolkit::GaussianBlurView), typeid(Toolkit::Control), Create );
-
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::GaussianBlurView, Toolkit::Control, Create )
+DALI_TYPE_REGISTRATION_END()
 
 const unsigned int GAUSSIAN_BLUR_VIEW_DEFAULT_NUM_SAMPLES = 5;
 const float GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_BELL_CURVE_WIDTH = 1.5f;
 const Pixel::Format GAUSSIAN_BLUR_VIEW_DEFAULT_RENDER_TARGET_PIXEL_FORMAT = Pixel::RGBA8888;
 const float GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH = 1.0f;                                       // default, fully blurred
-const std::string GAUSSIAN_BLUR_VIEW_STRENGTH_PROPERTY_NAME("GaussianBlurStrengthPropertyName");
+const char* const GAUSSIAN_BLUR_VIEW_STRENGTH_PROPERTY_NAME = "GaussianBlurStrengthPropertyName";
 const float GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_WIDTH_SCALE = 0.5f;
 const float GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_HEIGHT_SCALE = 0.5f;
 

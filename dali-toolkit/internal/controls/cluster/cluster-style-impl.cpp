@@ -470,7 +470,6 @@ void ClusterStyleRandom::ApplyStyle(Actor child, unsigned int index, AlphaFuncti
   Property::Index depthProperty = child.GetPropertyIndex(Toolkit::Cluster::CLUSTER_ACTOR_DEPTH);
   float depthPropertyValue = child.GetProperty<float>( depthProperty );
 
-
   Apply( child,
          FirstOrderEquation( GetClusterSize(), Vector3(position.x, position.y, 0.0f), Vector3(0.0f, 0.0f, depthPropertyValue) ),
          FirstOrderEquation( GetClusterSize(), Vector3::ONE * size),

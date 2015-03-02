@@ -24,13 +24,14 @@
 #include <dali/public-api/events/mouse-wheel-event.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-component-impl.h>
-#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
+#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
 
 //#define ENABLED_SCROLL_STATE_LOGGING
 
@@ -51,10 +52,6 @@ using namespace Dali;
 
 namespace
 {
-
-// Signals
-
-const char* const SIGNAL_SNAP_STARTED = "snap-started";
 
 const Vector2 DEFAULT_MIN_FLICK_DISTANCE(30.0f, 30.0f);                                   ///< minimum distance for pan before flick allowed
 const float DEFAULT_MIN_FLICK_SPEED_THRESHOLD(500.0f);                          ///< Minimum pan speed required for flick in pixels/s
@@ -207,6 +204,18 @@ namespace Internal
 
 namespace
 {
+
+BaseHandle Create()
+{
+  return Toolkit::ScrollView::New();
+}
+
+// Setup properties, signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ScrollView, Toolkit::Scrollable, Create )
+
+DALI_SIGNAL_REGISTRATION( ScrollView, "value-changed", SIGNAL_SNAP_STARTED )
+
+DALI_TYPE_REGISTRATION_END()
 
 /**
  * Returns whether to lock scrolling to a particular axis
@@ -509,16 +518,6 @@ struct InternalFinalConstraint
   AlphaFunction mFunctionX;
   AlphaFunction mFunctionY;
 };
-
-
-BaseHandle Create()
-{
-  return Toolkit::ScrollView::New();
-}
-
-TypeRegistration typeRegistration( typeid( Toolkit::ScrollView ), typeid( Toolkit::Scrollable ), Create );
-
-SignalConnectorType signalConnector1( typeRegistration, SIGNAL_SNAP_STARTED, &ScrollView::DoConnectSignal );
 
 }
 
