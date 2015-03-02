@@ -22,6 +22,7 @@
 #include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/actors/image-actor.h>
 
 namespace Dali
 {
@@ -98,7 +99,12 @@ MotionStretchEffect::~MotionStretchEffect()
 MotionStretchEffect MotionStretchEffect::Apply( RenderableActor renderable )
 {
   MotionStretchEffect newEffect = New();
-  renderable.SetShaderEffect( newEffect );
+
+  ImageActor imageActor = ImageActor::DownCast(renderable);
+  if( imageActor )
+  {
+    imageActor.SetShaderEffect( newEffect );
+  }
 
   Dali::Property::Index uModelProperty = newEffect.GetPropertyIndex( MOTION_STRETCH_MODELVIEW_LASTFRAME );
 

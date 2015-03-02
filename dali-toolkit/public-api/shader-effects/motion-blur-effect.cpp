@@ -22,6 +22,7 @@
 #include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/actors/image-actor.h>
 
 namespace Dali
 {
@@ -84,7 +85,11 @@ MotionBlurEffect::~MotionBlurEffect()
 MotionBlurEffect MotionBlurEffect::Apply( RenderableActor renderable )
 {
   MotionBlurEffect newEffect = New( MOTION_BLUR_NUM_SAMPLES );
-  renderable.SetShaderEffect( newEffect );
+  ImageActor imageActor = ImageActor::DownCast(renderable);
+  if( imageActor )
+  {
+    imageActor.SetShaderEffect( newEffect );
+  }
 
   Dali::Property::Index uModelProperty = newEffect.GetPropertyIndex( MOTION_BLUR_MODEL_LASTFRAME );
 

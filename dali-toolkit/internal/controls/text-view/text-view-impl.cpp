@@ -736,12 +736,12 @@ void TextView::SetSortModifier( float depthOffset )
        it != endIt;
        ++it )
   {
-    ( *it ).SetSortModifier( depthOffset );
+   // ( *it ).SetSortModifier( depthOffset );
   }
 
   if( mOffscreenImageActor )
   {
-    mOffscreenImageActor.SetSortModifier( depthOffset );
+   // mOffscreenImageActor.SetSortModifier( depthOffset );
   }
 }
 

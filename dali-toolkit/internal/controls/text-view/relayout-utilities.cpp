@@ -242,10 +242,10 @@ void SetVisualParameters( CurrentTextActorInfo& currentTextActorInfo,
   relayoutData.mTextLayoutInfo.mMaxItalicsOffset = std::max( relayoutData.mTextLayoutInfo.mMaxItalicsOffset, italicsOffset );
 
   // Sets the sort modifier value.
-  currentTextActorInfo.textActor.SetSortModifier( visualParameters.mSortModifier );
+ // currentTextActorInfo.textActor.SetSortModifier( visualParameters.mSortModifier );
 
   // Enables or disables the blending.
-  currentTextActorInfo.textActor.SetBlendMode( !visualParameters.mSnapshotModeEnabled ? BlendingMode::ON : BlendingMode::OFF );
+ // currentTextActorInfo.textActor.SetBlendMode( !visualParameters.mSnapshotModeEnabled ? BlendingMode::ON : BlendingMode::OFF );
 }
 
 void CalculateLineLayout( float parentWidth,
@@ -1895,7 +1895,7 @@ void CreateEmoticon( const TextView::VisualParameters& visualParameters,
   imageActor.SetSize( characterLayout.mSize );
 
   // Sets the sort modifier value.
-  imageActor.SetSortModifier( visualParameters.mSortModifier );
+ // imageActor.SetSortModifier( visualParameters.mSortModifier );
 
   characterLayout.mGlyphActor = imageActor;
 }
@@ -2248,10 +2248,10 @@ void UpdateTextActorInfo( const TextView::VisualParameters& visualParameters,
     glyphActor.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
 
     // Sets the sort modifier value.
-    glyphActor.SetSortModifier( visualParameters.mSortModifier );
+   // glyphActor.SetSortModifier( visualParameters.mSortModifier );
 
     // Enables or disables the blending.
-    glyphActor.SetBlendMode( !visualParameters.mSnapshotModeEnabled ? BlendingMode::ON : BlendingMode::OFF );
+   // glyphActor.SetBlendMode( !visualParameters.mSnapshotModeEnabled ? BlendingMode::ON : BlendingMode::OFF );
   }
 }
 

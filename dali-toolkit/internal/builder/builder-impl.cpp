@@ -273,7 +273,7 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
       // special field 'effect' references the shader effect instances
       if(key == "effect")
       {
-        RenderableActor actor = RenderableActor::DownCast(handle);
+        ImageActor actor = ImageActor::DownCast(handle);
         if( actor )
         {
           OptionalString str = constant.IsString( keyChild.second );
@@ -297,7 +297,7 @@ void Builder::SetProperties( const TreeNode& node, Handle& handle, const Replace
 
       if( Property::INVALID_INDEX == index )
       {
-        RenderableActor actor = RenderableActor::DownCast(handle);
+        ImageActor actor = ImageActor::DownCast(handle);
         if( actor )
         {
           if( ShaderEffect effect = actor.GetShaderEffect() )
