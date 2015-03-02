@@ -113,8 +113,9 @@ public:
      *
      * @param[in] state The grab handle state.
      * @param[in] x The x position relative to the top-left of the parent control.
+     * @param[in] y The y position relative to the top-left of the parent control.
      */
-    virtual void GrabHandleEvent( GrabHandleState state, float x ) = 0;
+    virtual void GrabHandleEvent( GrabHandleState state, float x, float y ) = 0;
   };
 
   /**

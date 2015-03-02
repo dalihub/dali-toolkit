@@ -85,8 +85,12 @@ struct Controller::TextInput
     EDITING
   };
 
-  TextInput( DecoratorPtr decorator )
-  : mDecorator( decorator ),
+  TextInput( LogicalModelPtr logicalModel,
+             VisualModelPtr visualModel,
+             DecoratorPtr decorator )
+  : mLogicalModel( logicalModel ),
+    mVisualModel( visualModel ),
+    mDecorator( decorator ),
     mState( INACTIVE )
   {
   }
@@ -146,7 +150,13 @@ struct Controller::TextInput
       mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
       mDecorator->StartCursorBlink();
       mDecorator->SetGrabHandleActive( true );
-      mDecorator->SetPosition( PRIMARY_CURSOR, 10, 0, 18 );
+
+      float xPosition = event.p2.mFloat;
+      float yPosition = event.p3.mFloat;
+      float height(0.0f);
+      GetClosestCursorPosition( xPosition, yPosition, height );
+      mDecorator->SetPosition( PRIMARY_CURSOR, xPosition, yPosition, height );
+
       mDecoratorUpdated = true;
     }
     else if( 2u == event.p1.mUint )
@@ -160,11 +170,68 @@ struct Controller::TextInput
 
   void OnGrabHandleEvent( const Event& event )
   {
-    // TODO
+    unsigned int state = event.p1.mUint;
+
+    if( GRAB_HANDLE_PRESSED == state )
+    {
+      float xPosition = event.p2.mFloat;
+      float yPosition = event.p3.mFloat;
+      float height(0.0f);
+
+      GetClosestCursorPosition( xPosition, yPosition, height );
+
+      mDecorator->SetPosition( PRIMARY_CURSOR, xPosition, yPosition, height );
+      mDecoratorUpdated = true;
+    }
   }
 
-  DecoratorPtr mDecorator;
-  bool mDecoratorUpdated;
+  void GetClosestCursorPosition( float& x, float& y, float& height )
+  {
+    // TODO - Look at LineRuns first
+
+    Text::Length numberOfGlyphs = mVisualModel->GetNumberOfGlyphs();
+    if( 0 == numberOfGlyphs )
+    {
+      return;
+    }
+
+    Vector<GlyphInfo> glyphs;
+    glyphs.Resize( numberOfGlyphs );
+    mVisualModel->GetGlyphs( &glyphs[0], 0, numberOfGlyphs );
+
+    std::vector<Vector2> positions;
+    positions.resize( numberOfGlyphs );
+    mVisualModel->GetGlyphPositions( &positions[0], 0, numberOfGlyphs );
+
+    unsigned int closestGlyph = 0;
+    float closestDistance = std::numeric_limits<float>::max();
+
+    for( unsigned int i=0; i<glyphs.Count(); ++i )
+    {
+      float glyphX = positions[i].x + glyphs[i].width*0.5f;
+      float glyphY = positions[i].y + glyphs[i].height*0.5f;
+
+      float distanceToGlyph = fabsf( glyphX - x ) + fabsf( glyphY - y );
+
+      if( distanceToGlyph < closestDistance )
+      {
+        closestDistance = distanceToGlyph;
+        closestGlyph = i;
+      }
+    }
+
+    // TODO - Consider RTL languages
+    x = positions[closestGlyph].x + glyphs[closestGlyph].width;
+    y = 0.0f;
+
+    FontMetrics metrics;
+    TextAbstraction::FontClient::Get().GetFontMetrics( glyphs[closestGlyph].fontId, metrics );
+    height = metrics.height; // TODO - Fix for multi-line
+  }
+
+  LogicalModelPtr mLogicalModel;
+  VisualModelPtr  mVisualModel;
+  DecoratorPtr    mDecorator;
 
   State mState;
 
@@ -173,6 +240,8 @@ struct Controller::TextInput
    * The number of updates to the model is minimized to improve performance.
    */
   vector<Event> mEventQueue; ///< The queue of touch events etc.
+
+  bool mDecoratorUpdated;
 };
 
 struct Controller::Impl
@@ -242,7 +311,7 @@ void Controller::EnableTextInput( DecoratorPtr decorator )
 {
   if( !mImpl->mTextInput )
   {
-    mImpl->mTextInput = new TextInput( decorator );
+    mImpl->mTextInput = new TextInput( mImpl->mLogicalModel, mImpl->mVisualModel, decorator );
   }
 }
 
@@ -370,7 +439,7 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
 
   if( GET_GLYPH_METRICS & operations )
   {
-    TextAbstraction::FontClient::Get().GetGlyphMetrics( glyphs.Begin(), glyphs.Count() );
+    mImpl->mFontClient.GetGlyphMetrics( glyphs.Begin(), glyphs.Count() );
   }
 
   if( LAYOUT & operations )
@@ -523,15 +592,16 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
   }
 }
 
-void Controller::GrabHandleEvent( GrabHandleState state, float x )
+void Controller::GrabHandleEvent( GrabHandleState state, float x, float y )
 {
   DALI_ASSERT_DEBUG( mImpl->mTextInput && "Unexpected GrabHandleEvent" );
 
   if( mImpl->mTextInput )
   {
     TextInput::Event event( TextInput::GRAB_HANDLE_EVENT );
-    event.p1.mInt   = state;
+    event.p1.mUint  = state;
     event.p2.mFloat = x;
+    event.p3.mFloat = y;
     mImpl->mTextInput->mEventQueue.push_back( event );
 
     RequestRelayout();

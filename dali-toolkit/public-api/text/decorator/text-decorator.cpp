@@ -117,7 +117,9 @@ struct Decorator::Impl : public ConnectionTracker
     mActiveSelection( false ),
     mCursorBlinkInterval( CURSOR_BLINK_INTERVAL ),
     mCursorBlinkDuration(0.0f),
-    mCursorBlinkStatus( true )
+    mCursorBlinkStatus( true ),
+    mGrabDisplacementX(0.0f),
+    mGrabDisplacementY(0.0f)
   {
   }
 
@@ -197,6 +199,8 @@ struct Decorator::Impl : public ConnectionTracker
 #endif
         parent.Add( mPrimaryCursor);
       }
+
+      mPrimaryCursor.SetPosition( mCursor[PRIMARY_CURSOR].x, mCursor[PRIMARY_CURSOR].y );
     }
     else if ( mActiveCursor == ACTIVE_CURSOR_BOTH )
     {
@@ -393,9 +397,29 @@ struct Decorator::Impl : public ConnectionTracker
 
   void OnPan( Actor actor, const PanGesture& gesture )
   {
-    if( actor == mGrabHandle )
+    if( actor == mGrabArea )
     {
-      // TODO
+      if( Gesture::Started == gesture.state )
+      {
+        mGrabDisplacementX = mGrabDisplacementY = 0;
+      }
+
+      mGrabDisplacementX += gesture.displacement.x;
+      mGrabDisplacementY += gesture.displacement.y;
+
+      float x = mCursor[PRIMARY_CURSOR].x + mGrabDisplacementX;
+      float y = mCursor[PRIMARY_CURSOR].y + mCursor[PRIMARY_CURSOR].height*0.5f + mGrabDisplacementY;
+
+      if( Gesture::Started    == gesture.state ||
+          Gesture::Continuing == gesture.state )
+      {
+        mObserver.GrabHandleEvent( GRAB_HANDLE_PRESSED, x, y );
+      }
+      else if( Gesture::Finished  == gesture.state ||
+               Gesture::Cancelled == gesture.state )
+      {
+        mObserver.GrabHandleEvent( GRAB_HANDLE_RELEASED, x, y );
+      }
     }
   }
 
@@ -432,6 +456,8 @@ struct Decorator::Impl : public ConnectionTracker
 
   ImageActor mGrabHandle;
   Actor mGrabArea;
+  float mGrabDisplacementX;
+  float mGrabDisplacementY;
 
   SelectionHandleImpl mSelectionHandle[SELECTION_HANDLE_COUNT];
 
@@ -468,6 +494,10 @@ unsigned int Decorator::GetActiveCursor() const
 
 void Decorator::SetPosition( Cursor cursor, float x, float y, float height )
 {
+  // Adjust grab handle displacement
+  mImpl->mGrabDisplacementX -= x - mImpl->mCursor[cursor].x;
+  mImpl->mGrabDisplacementY -= y - mImpl->mCursor[cursor].y;
+
   mImpl->mCursor[cursor].x = x;
   mImpl->mCursor[cursor].y = y;
   mImpl->mCursor[cursor].height = height;

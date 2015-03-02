@@ -163,7 +163,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::Decorator::Observer::GrabHandleEvent()
    */
-  virtual void GrabHandleEvent( GrabHandleState state, float x );
+  virtual void GrabHandleEvent( GrabHandleState state, float x, float y );
 
 protected:
 
