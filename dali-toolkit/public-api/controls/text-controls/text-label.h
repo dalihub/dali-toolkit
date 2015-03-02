@@ -43,12 +43,12 @@ class DALI_IMPORT_API TextLabel : public Control
 public:
 
   // Property indices
-  static const Property::Index PROPERTY_RENDERING_BACKEND; ///< name "rendering-backend", type UNSIGNED INT
+  static const Property::Index PROPERTY_RENDERING_BACKEND; ///< name "rendering-backend", type INT
   static const Property::Index PROPERTY_TEXT;              ///< name "text", type STRING
   static const Property::Index PROPERTY_MULTI_LINE;        ///< name "multi-line", type BOOLEAN
 
   // Property names
-  static const std::string RENDERING_BACKEND_PROPERTY_NAME; ///< Property, name "rendering-backend", type UNSIGNED INT
+  static const std::string RENDERING_BACKEND_PROPERTY_NAME; ///< Property, name "rendering-backend", type INT
   static const std::string TEXT_PROPERTY_NAME;              ///< Property, name "text", type STRING
   static const std::string MULTI_LINE_PROPERTY_NAME;        ///< Property, name "multi-line", type BOOLEAN
 

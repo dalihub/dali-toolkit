@@ -68,7 +68,7 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Toolkit::TextField), typeid(Toolkit::Control), Create );
 
-PropertyRegistration property01( mType, "rendering-backend",      Toolkit::TextField::PROPERTY_RENDERING_BACKEND,      Property::UNSIGNED_INTEGER, &TextField::SetProperty, &TextField::GetProperty );
+PropertyRegistration property01( mType, "rendering-backend",      Toolkit::TextField::PROPERTY_RENDERING_BACKEND,      Property::INTEGER,          &TextField::SetProperty, &TextField::GetProperty );
 PropertyRegistration property02( mType, "placeholder-text",       Toolkit::TextField::PROPERTY_PLACEHOLDER_TEXT,       Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );
 PropertyRegistration property03( mType, "text",                   Toolkit::TextField::PROPERTY_TEXT,                   Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );
 PropertyRegistration property04( mType, "cursor-image",           Toolkit::TextField::PROPERTY_CURSOR_IMAGE,           Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );

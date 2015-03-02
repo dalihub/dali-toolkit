@@ -60,7 +60,7 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Toolkit::TextLabel), typeid(Toolkit::Control), Create );
 
-PropertyRegistration property1( mType, "rendering-backend", Toolkit::TextLabel::PROPERTY_RENDERING_BACKEND, Property::UNSIGNED_INTEGER, &TextLabel::SetProperty, &TextLabel::GetProperty );
+PropertyRegistration property1( mType, "rendering-backend", Toolkit::TextLabel::PROPERTY_RENDERING_BACKEND, Property::INTEGER,          &TextLabel::SetProperty, &TextLabel::GetProperty );
 PropertyRegistration property2( mType, "text",              Toolkit::TextLabel::PROPERTY_TEXT,              Property::STRING,           &TextLabel::SetProperty, &TextLabel::GetProperty );
 PropertyRegistration property3( mType, "multi-line",        Toolkit::TextLabel::PROPERTY_MULTI_LINE,        Property::STRING,           &TextLabel::SetProperty, &TextLabel::GetProperty );
 
@@ -92,11 +92,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
     {
       case Toolkit::TextLabel::PROPERTY_RENDERING_BACKEND:
       {
-        unsigned int backend = value.Get< unsigned int >();
+        unsigned int backend = value.Get< int >();
 
         if( impl.mRenderingBackend != backend )
         {
-          impl.mRenderingBackend = backend;
+          impl.mRenderingBackend = static_cast< unsigned int >( backend );
           impl.mRenderer.Reset();
         }
         break;

@@ -41,7 +41,7 @@ class DALI_IMPORT_API TextField : public Control
 public:
 
   // Property indices
-  static const Property::Index PROPERTY_RENDERING_BACKEND;      ///< name "rendering-backend",      type UNSIGNED INT
+  static const Property::Index PROPERTY_RENDERING_BACKEND;      ///< name "rendering-backend",      type INT
   static const Property::Index PROPERTY_PLACEHOLDER_TEXT;       ///< name "placeholder-text",       type STRING
   static const Property::Index PROPERTY_TEXT;                   ///< name "text",                   type STRING
   static const Property::Index PROPERTY_CURSOR_IMAGE;           ///< name "cursor-image",           type STRING
@@ -53,7 +53,7 @@ public:
   static const Property::Index PROPERTY_GRAB_HANDLE_IMAGE;      ///< name "grab-handle-image",      type STRING
 
   // Property names
-  static const std::string RENDERING_BACKEND_PROPERTY_NAME;      ///< Property, name "rendering-backend",      type UNSIGNED INT
+  static const std::string RENDERING_BACKEND_PROPERTY_NAME;      ///< Property, name "rendering-backend",      type INT
   static const std::string PLACEHOLDER_TEXT_PROPERTY_NAME;       ///< Property, name "placeholder-text",       type STRING
   static const std::string TEXT_PROPERTY_NAME;                   ///< Property, name "text",                   type STRING
   static const std::string CURSOR_IMAGE_PROPERTY_NAME;           ///< Property, name "cursor-image",           type STRING
