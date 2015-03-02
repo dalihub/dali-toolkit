@@ -22,6 +22,7 @@
 // INTERNAL INCLUDES
 
 #include <dali-toolkit/internal/controls/buttons/push-button-impl.h>
+#include <dali/public-api/actors/image-actor.h>
 
 namespace Dali
 {
@@ -75,7 +76,7 @@ PushButton PushButton::DownCast( BaseHandle handle )
 
 void PushButton::SetButtonImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetButtonImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetButtonImage( ImageActor::New( image ) );
 }
 
 void PushButton::SetButtonImage( Actor image )
@@ -90,7 +91,7 @@ Actor PushButton::GetButtonImage() const
 
 void PushButton::SetBackgroundImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetBackgroundImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetBackgroundImage( ImageActor::New( image ) );
 }
 
 void PushButton::SetBackgroundImage( Actor image )
@@ -105,7 +106,7 @@ Actor PushButton::GetBackgroundImage() const
 
 void PushButton::SetSelectedImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( ImageActor::New( image ) );
 }
 
 void PushButton::SetSelectedImage( Actor image )
@@ -120,7 +121,7 @@ Actor PushButton::GetSelectedImage() const
 
 void PushButton::SetDisabledBackgroundImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( ImageActor::New( image ) );
 }
 
 void PushButton::SetDisabledBackgroundImage( Actor image )
@@ -135,7 +136,7 @@ Actor PushButton::GetDisabledBackgroundImage() const
 
 void PushButton::SetDisabledImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledImage( ImageActor::New( image ) );
 }
 
 void PushButton::SetDisabledImage( Actor image )

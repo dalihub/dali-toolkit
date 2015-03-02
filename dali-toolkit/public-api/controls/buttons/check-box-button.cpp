@@ -22,6 +22,7 @@
 // INTERNAL INCLUDES
 
 #include <dali-toolkit/internal/controls/buttons/check-box-button-impl.h>
+#include <dali/public-api/actors/image-actor.h>
 
 namespace Dali
 {
@@ -64,7 +65,7 @@ CheckBoxButton CheckBoxButton::DownCast( BaseHandle handle )
 
 void CheckBoxButton::SetBackgroundImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetBackgroundImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetBackgroundImage( ImageActor::New( image ) );
 }
 
 void CheckBoxButton::SetBackgroundImage( Actor image )
@@ -79,14 +80,13 @@ Actor CheckBoxButton::GetBackgroundImage() const
 
 void CheckBoxButton::SetSelectedImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( ImageActor::New( image ) );
 }
 
 void CheckBoxButton::SetSelectedImage( Actor image )
 {
   Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( image );
 }
-
 
 Actor CheckBoxButton::GetSelectedImage() const
 {
@@ -95,7 +95,7 @@ Actor CheckBoxButton::GetSelectedImage() const
 
 void CheckBoxButton::SetDisabledBackgroundImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( ImageActor::New( image ) );
 }
 
 void CheckBoxButton::SetDisabledBackgroundImage( Actor image )
@@ -110,7 +110,7 @@ Actor CheckBoxButton::GetDisabledBackgroundImage() const
 
 void CheckBoxButton::SetDisabledSelectedImage( Image image )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledSelectedImage( image );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledSelectedImage( ImageActor::New( image ) );
 }
 
 void CheckBoxButton::SetDisabledSelectedImage( Actor image )
