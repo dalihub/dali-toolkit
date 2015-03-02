@@ -79,6 +79,16 @@ private: // From Control
   virtual void OnInitialize();
 
   /**
+   * @copydoc Control::GetNaturalSize()
+   */
+  virtual Vector3 GetNaturalSize();
+
+  /**
+   * @copydoc Control::GetHeightForWidth()
+   */
+  virtual float GetHeightForWidth( float width );
+
+  /**
    * @copydoc Control::OnInitialize()
    */
   virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );

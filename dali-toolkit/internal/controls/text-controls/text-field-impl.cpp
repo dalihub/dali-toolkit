@@ -336,6 +336,16 @@ void TextField::OnInitialize()
   }
 }
 
+Vector3 TextField::GetNaturalSize()
+{
+  return mController->GetNaturalSize();
+}
+
+float TextField::GetHeightForWidth( float width )
+{
+  return mController->GetHeightForWidth( width );
+}
+
 void TextField::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
   if( mController->Relayout( size ) )

@@ -102,6 +102,8 @@ struct LayoutEngine::Impl
       }
 
       visualModel.SetGlyphPositions( &glyphPositions[0], glyphCount );
+
+      visualModel.SetActualSize( Vector2(penX, fontMetrics.height) );
     }
   }
 
@@ -166,10 +168,11 @@ struct LayoutEngine::Impl
           }
           else if( endPenX > boundingBox.width )
           {
-            actualSize.width = ( actualSize.width < endPenX - glyph.advance ) ? endPenX - glyph.advance : actualSize.width;
             break;
           }
         }
+
+        actualSize.width = ( actualSize.width < endPenX ) ? endPenX : actualSize.width;
 
         // If end of text or no whitespace found
         if( glyphCount == j ||
