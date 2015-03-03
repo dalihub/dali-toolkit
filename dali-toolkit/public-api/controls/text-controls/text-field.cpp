@@ -37,6 +37,7 @@ const std::string TextField::ENABLE_CURSOR_BLINK_PROPERTY_NAME("enable-cursor-bl
 const std::string TextField::CURSOR_BLINK_INTERVAL_PROPERTY_NAME("cursor-blink-interval");
 const std::string TextField::CURSOR_BLINK_DURATION_PROPERTY_NAME("cursor-blink-duration");
 const std::string TextField::GRAB_HANDLE_IMAGE_PROPERTY_NAME("grab-handle-image");
+const std::string TextField::DECORATION_BOUNDING_BOX("decoration-bounding-box");
 
 TextField TextField::New()
 {

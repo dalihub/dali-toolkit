@@ -24,6 +24,7 @@
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/pan-gesture.h>
@@ -56,6 +57,7 @@ const Dali::Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE( 1.5f, 2.0f, 1.0f );
 const Dali::Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.5f, 1.5f, 1.0f );
 
 const std::size_t CURSOR_BLINK_INTERVAL = 500; // Cursor blink interval
+const std::size_t MILLISECONDS = 1000;
 
 } // end of namespace
 
@@ -116,10 +118,11 @@ struct Decorator::Impl : public ConnectionTracker
     mActiveGrabHandle(false),
     mActiveSelection( false ),
     mCursorBlinkInterval( CURSOR_BLINK_INTERVAL ),
-    mCursorBlinkDuration(0.0f),
+    mCursorBlinkDuration( 0.0f ),
     mCursorBlinkStatus( true ),
-    mGrabDisplacementX(0.0f),
-    mGrabDisplacementY(0.0f)
+    mGrabDisplacementX( 0.0f ),
+    mGrabDisplacementY( 0.0f ),
+    mBoundingBox( Rect<int>() )
   {
   }
 
@@ -467,12 +470,22 @@ struct Decorator::Impl : public ConnectionTracker
   TapGestureDetector mTapDetector;
   PanGestureDetector mPanGestureDetector;
 
-
+  Rect<int> mBoundingBox;
 };
 
 DecoratorPtr Decorator::New( Internal::Control& parent, Observer& observer )
 {
   return DecoratorPtr( new Decorator(parent, observer) );
+}
+
+void Decorator::SetBoundingBox( const Rect<int>& boundingBox )
+{
+  mImpl->mBoundingBox = boundingBox;
+}
+
+const Rect<int>& Decorator::GetBoundingBox() const
+{
+  return mImpl->mBoundingBox;
 }
 
 void Decorator::Relayout( const Vector2& size )
@@ -554,7 +567,7 @@ void Decorator::StopCursorBlink()
 
 void Decorator::SetCursorBlinkInterval( float seconds )
 {
-  mImpl->mCursorBlinkInterval = seconds*1000; // Convert to milliseconds
+  mImpl->mCursorBlinkInterval = seconds*MILLISECONDS; // Convert to milliseconds
 }
 
 float Decorator::GetCursorBlinkInterval() const

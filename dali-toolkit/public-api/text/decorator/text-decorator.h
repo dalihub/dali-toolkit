@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/math/rect.h>
 
 namespace Dali
 {
@@ -126,6 +127,36 @@ public:
    * @return A pointer to a new Decorator.
    */
   static DecoratorPtr New( Dali::Toolkit::Internal::Control& parent, Observer& observer );
+
+  /**
+   * @brief Set the bounding box which handles, popup and similar decorations will not exceed.
+   *
+   * The default value is the width and height of the stage from the top left origin.
+   * If a title bar for example is on the top of the screen then the y should be the title's height and
+   * the boundary height the stage height minus the title's height.
+   * Restrictions - The boundary box should be set up with a fixed z position for the text-input and the default camera.
+   *
+   * ------------------------------------------
+   * |(x,y)                                   |
+   * |o---------------------------------------|
+   * ||                                      ||
+   * ||            Bounding Box              || boundary height
+   * ||                                      ||
+   * |----------------------------------------|
+   * ------------------------------------------
+   *               boundary width
+   *
+   * @param[in] boundingBox Vector( x coordinate, y coordinate, width, height )
+   */
+  void SetBoundingBox( const Rect<int>& boundingBox );
+
+  /**
+   * @brief Retrieve the bounding box origin and dimensions.
+   *
+   * default is set once control is added to stage, before this the return vector will be Vector4:ZERO
+   * @return Rect<int> the bounding box origin, width and height
+   */
+  const Rect<int>& GetBoundingBox() const;
 
   /**
    * @brief The decorator waits until a relayout before creating actors etc.

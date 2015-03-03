@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/common/stage.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -43,16 +44,17 @@ namespace Dali
 namespace Toolkit
 {
 
-const Property::Index TextField::PROPERTY_RENDERING_BACKEND(      Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX );
-const Property::Index TextField::PROPERTY_PLACEHOLDER_TEXT(       Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 1 );
-const Property::Index TextField::PROPERTY_TEXT(                   Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 2 );
-const Property::Index TextField::PROPERTY_CURSOR_IMAGE(           Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 3 );
-const Property::Index TextField::PROPERTY_PRIMARY_CURSOR_COLOR(   Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 4 );
-const Property::Index TextField::PROPERTY_SECONDARY_CURSOR_COLOR( Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 5 );
-const Property::Index TextField::PROPERTY_ENABLE_CURSOR_BLINK(    Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 6 );
-const Property::Index TextField::PROPERTY_CURSOR_BLINK_INTERVAL(  Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 7 );
-const Property::Index TextField::PROPERTY_CURSOR_BLINK_DURATION(  Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 8 );
-const Property::Index TextField::PROPERTY_GRAB_HANDLE_IMAGE(      Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 9 );
+const Property::Index TextField::PROPERTY_RENDERING_BACKEND(       Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX );
+const Property::Index TextField::PROPERTY_PLACEHOLDER_TEXT(        Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 1 );
+const Property::Index TextField::PROPERTY_TEXT(                    Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 2 );
+const Property::Index TextField::PROPERTY_CURSOR_IMAGE(            Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 3 );
+const Property::Index TextField::PROPERTY_PRIMARY_CURSOR_COLOR(    Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 4 );
+const Property::Index TextField::PROPERTY_SECONDARY_CURSOR_COLOR(  Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 5 );
+const Property::Index TextField::PROPERTY_ENABLE_CURSOR_BLINK(     Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 6 );
+const Property::Index TextField::PROPERTY_CURSOR_BLINK_INTERVAL(   Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 7 );
+const Property::Index TextField::PROPERTY_CURSOR_BLINK_DURATION(   Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 8 );
+const Property::Index TextField::PROPERTY_GRAB_HANDLE_IMAGE(       Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 9 );
+const Property::Index TextField::PROPERTY_DECORATION_BOUNDING_BOX( Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 10 );
 
 namespace Internal
 {
@@ -68,17 +70,17 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Toolkit::TextField), typeid(Toolkit::Control), Create );
 
-PropertyRegistration property01( mType, "rendering-backend",      Toolkit::TextField::PROPERTY_RENDERING_BACKEND,      Property::INTEGER,          &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property02( mType, "placeholder-text",       Toolkit::TextField::PROPERTY_PLACEHOLDER_TEXT,       Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property03( mType, "text",                   Toolkit::TextField::PROPERTY_TEXT,                   Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property04( mType, "cursor-image",           Toolkit::TextField::PROPERTY_CURSOR_IMAGE,           Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property05( mType, "primary-cursor-color",   Toolkit::TextField::PROPERTY_PRIMARY_CURSOR_COLOR,   Property::VECTOR4,          &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property06( mType, "secondary-cursor-color", Toolkit::TextField::PROPERTY_SECONDARY_CURSOR_COLOR, Property::VECTOR4,          &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property07( mType, "enable-cursor-blink",    Toolkit::TextField::PROPERTY_ENABLE_CURSOR_BLINK,    Property::BOOLEAN,          &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property08( mType, "cursor-blink-interval",  Toolkit::TextField::PROPERTY_CURSOR_BLINK_INTERVAL,  Property::FLOAT,            &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property09( mType, "cursor-blink-duration",  Toolkit::TextField::PROPERTY_CURSOR_BLINK_DURATION,  Property::FLOAT,            &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property10( mType, "grab-handle-image",      Toolkit::TextField::PROPERTY_GRAB_HANDLE_IMAGE,      Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );
-
+PropertyRegistration property01( mType, "rendering-backend",       Toolkit::TextField::PROPERTY_RENDERING_BACKEND,       Property::INTEGER,          &TextField::SetProperty, &TextField::GetProperty );
+PropertyRegistration property02( mType, "placeholder-text",        Toolkit::TextField::PROPERTY_PLACEHOLDER_TEXT,        Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );
+PropertyRegistration property03( mType, "text",                    Toolkit::TextField::PROPERTY_TEXT,                    Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );
+PropertyRegistration property04( mType, "cursor-image",            Toolkit::TextField::PROPERTY_CURSOR_IMAGE,            Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );
+PropertyRegistration property05( mType, "primary-cursor-color",    Toolkit::TextField::PROPERTY_PRIMARY_CURSOR_COLOR,    Property::VECTOR4,          &TextField::SetProperty, &TextField::GetProperty );
+PropertyRegistration property06( mType, "secondary-cursor-color",  Toolkit::TextField::PROPERTY_SECONDARY_CURSOR_COLOR,  Property::VECTOR4,          &TextField::SetProperty, &TextField::GetProperty );
+PropertyRegistration property07( mType, "enable-cursor-blink",     Toolkit::TextField::PROPERTY_ENABLE_CURSOR_BLINK,     Property::BOOLEAN,          &TextField::SetProperty, &TextField::GetProperty );
+PropertyRegistration property08( mType, "cursor-blink-interval",   Toolkit::TextField::PROPERTY_CURSOR_BLINK_INTERVAL,   Property::FLOAT,            &TextField::SetProperty, &TextField::GetProperty );
+PropertyRegistration property09( mType, "cursor-blink-duration",   Toolkit::TextField::PROPERTY_CURSOR_BLINK_DURATION,   Property::FLOAT,            &TextField::SetProperty, &TextField::GetProperty );
+PropertyRegistration property10( mType, "grab-handle-image",       Toolkit::TextField::PROPERTY_GRAB_HANDLE_IMAGE,       Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );
+PropertyRegistration property11( mType, "decoration bounding-box", Toolkit::TextField::PROPERTY_DECORATION_BOUNDING_BOX, Property::RECTANGLE,        &TextField::SetProperty, &TextField::GetProperty );
 } // namespace
 
 Toolkit::TextField TextField::New()
@@ -193,6 +195,14 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::TextField::PROPERTY_DECORATION_BOUNDING_BOX:
+      {
+        if( impl.mDecorator )
+        {
+          impl.mDecorator->SetBoundingBox( value.Get< Rect<int> >() );
+        }
+        break;
+      }
     }
   }
 }
@@ -285,6 +295,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::TextField::PROPERTY_DECORATION_BOUNDING_BOX:
+      {
+        if( impl.mDecorator )
+        {
+          value = impl.mDecorator->GetBoundingBox();
+        }
+        break;
+      }
     }
   }
 
@@ -309,6 +327,13 @@ void TextField::OnInitialize()
   mDoubleTapDetector.SetTapsRequired( 2 );
   mDoubleTapDetector.DetectedSignal().Connect( this, &TextField::OnDoubleTap );
   mDoubleTapDetector.Attach(Self());
+
+  // Set BoundingBox to stage size if not already set.
+  if ( mDecorator->GetBoundingBox().IsEmpty() )
+  {
+    Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
+    mDecorator->SetBoundingBox( Rect<int>( 0.0f, 0.0f, stageSize.width, stageSize.height ) );
+  }
 }
 
 void TextField::OnRelayout( const Vector2& size, ActorSizeContainer& container )
