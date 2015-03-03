@@ -17,8 +17,6 @@
 
 #include "toolkit-application.h"
 
-#include <boost/any.hpp>
-
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/dali-signal.h>
 #include <dali/public-api/adaptor-framework/orientation.h>
