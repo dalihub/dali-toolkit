@@ -2132,8 +2132,7 @@ void TextInput::SetUpTouchEvents()
 
   if ( !mDoubleTapDetector )
   {
-    mDoubleTapDetector = TapGestureDetector::New();
-    mDoubleTapDetector.SetTapsRequired( 2 );
+    mDoubleTapDetector = TapGestureDetector::New( 2 );
     mDoubleTapDetector.DetectedSignal().Connect(this, &TextInput::OnDoubleTap);
 
     // Only attach and detach the actor to the double tap detector when we enter/leave edit mode
