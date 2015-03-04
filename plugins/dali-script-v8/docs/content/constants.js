@@ -4,7 +4,7 @@
 
 Constants accessible under the dali global object.
   
-    actor.parentOrigin = dali.BACK_TOP_LEFT;
+    actor.parentOrigin = dali.TOP_LEFT;
     actor.color = dali.COLOR_RED;
     actor.setBlendFunc( dali.BLEND_FACTOR_ONE_MINUS_SRC_COLOR, dali.BLEND_FACTOR_SRC_ALPHA_SATURATE );
 
@@ -12,15 +12,6 @@ Constants accessible under the dali global object.
 | Constant Name | value |
 |---------------|-------|
 |  ** actor.parentOrigin and actor.anchorPoint  **      |                      |
-|BACK_TOP_LEFT      |  (0.0f, 0.0f, 0.0f)  |
-|BACK_TOP_CENTER    |  (0.5f, 0.0f, 0.0f)  |
-|BACK_TOP_RIGHT     |  (1.0f, 0.0f, 0.0f)  |
-|BACK_CENTER_LEFT   |  (0.0f, 0.5f, 0.0f)  |
-|BACK_CENTER        |  (0.5f, 0.5f, 0.0f)  |
-|BACK_CENTER_RIGHT  |  (1.0f, 0.5f, 0.0f)  |
-|BACK_BOTTOM_LEFT   |  (0.0f, 1.0f, 0.0f)  |
-|BACK_BOTTOM_CENTER  |  (0.5f, 1.0f, 0.0f)  |
-|BACK_BOTTOM_RIGHT   |  (1.0f, 1.0f, 0.0f)  |
 |TOP_LEFT            |  (0.0f, 0.0f, 0.5f)  |
 |TOP_CENTER          |  (0.5f, 0.0f, 0.5f)  |
 |TOP_RIGHT          |  (1.0f, 0.0f, 0.5f)  |
@@ -30,16 +21,6 @@ Constants accessible under the dali global object.
 |BOTTOM_LEFT         |  (0.0f, 1.0f, 0.5f)  |
 |BOTTOM_CENTER       |  (0.5f, 1.0f, 0.5f)  |
 |BOTTOM_RIGHT        |  (1.0f, 1.0f, 0.5f)  |
-
-|FRONT_TOP_LEFT      |  (0.0f, 0.0f, 1.0f)  |
-|FRONT_TOP_CENTER    |  (0.5f, 0.0f, 1.0f)  |
-|FRONT_TOP_RIGHT     |  (1.0f, 0.0f, 1.0f)  |
-|FRONT_CENTER_LEFT   |  (0.0f, 0.5f, 1.0f)  |
-|FRONT_CENTER        |  (0.5f, 0.5f, 1.0f)  |
-|FRONT_CENTER_RIGHT  |  (1.0f, 0.5f, 1.0f)  |
-|FRONT_BOTTOM_LEFT   |  (0.0f, 1.0f, 1.0f)  |
-|FRONT_BOTTOM_CENTER |  (0.5f, 1.0f, 1.0f)  |
-|FRONT_BOTTOM_RIGHT  |  (1.0f, 1.0f, 1.0f)  |
 
 
 |** Vector3 ** | |

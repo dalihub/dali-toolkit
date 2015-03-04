@@ -168,7 +168,7 @@ var animOptions = {
 // if we go to 1.0 then it will go to a full box
 shaderAnim.animateTo( revealEffect, "uRadius", 0.5,animOptions);
 shaderAnim.play();
-
+```
 * * *
 ### Example of paper twisting in the wind with color (Vertex + Fragment Shader)
 
@@ -185,7 +185,7 @@ vertices. To do this we can break the image into a grid using the gridX and grid
 
 <img src="../assets/img/shader-grid-hint.png">
 
-
+```
 createTwistEffect = function()
 {
 
