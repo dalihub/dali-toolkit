@@ -36,6 +36,13 @@ namespace Dali
 namespace Toolkit
 {
 
+namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_MULTI_LANGUAGE_SUPPORT");
+#endif
+}
+
 namespace Text
 {
 
@@ -499,6 +506,11 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
         // Find a default font.
         fontId = fontClient.FindDefaultFont( character, pointSize );
 
+#ifdef DEBUG_ENABLED
+        Dali::TextAbstraction::FontDescription description;
+        fontClient.GetDescription( fontId, description );
+        DALI_LOG_INFO( gLogFilter, Debug::Concise, "Script: %s; Selected font: %s\n", Dali::TextAbstraction::ScriptName[script], description.path.c_str() );
+#endif
         // Cache the font.
         *( defaultFontPerScriptCacheBuffer + script ) = fontId;
       }
