@@ -323,9 +323,9 @@ void ConstraintAppliedCheck::CheckSignalNotReceived()
   }
 }
 
-BitmapImage CreateBitmapImage(int width, int height, const Vector4& color)
+BufferImage CreateBufferImage(int width, int height, const Vector4& color)
 {
-  BitmapImage image = BitmapImage::New(width, height, Pixel::RGBA8888);
+  BufferImage image = BufferImage::New(width, height, Pixel::RGBA8888);
 
   PixelBuffer* pixbuf = image.GetBuffer();
 
@@ -342,7 +342,7 @@ BitmapImage CreateBitmapImage(int width, int height, const Vector4& color)
   return image;
 }
 
-BitmapImage CreateBitmapImage()
+BufferImage CreateBufferImage()
 {
-  return CreateBitmapImage(4, 4, Color::WHITE);
+  return CreateBufferImage(4, 4, Color::WHITE);
 }

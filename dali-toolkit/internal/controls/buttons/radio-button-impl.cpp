@@ -23,8 +23,14 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/images/resource-image.h>
 
-using namespace Dali;
-using namespace Dali::Toolkit::Internal;
+namespace Dali
+{
+
+namespace Toolkit
+{
+
+namespace Internal
+{
 
 namespace
 {
@@ -59,82 +65,171 @@ Dali::Toolkit::RadioButton RadioButton::New()
 
 RadioButton::RadioButton()
 {
-  mUnselectedImage = Dali::ResourceImage::New( UNSELECTED_BUTTON_IMAGE_DIR );
-  mSelectedImage = Dali::ResourceImage::New( SELECTED_BUTTON_IMAGE_DIR );
-
-  mRadioIcon = Dali::ImageActor::New( mUnselectedImage );
-
-//  SetTogglableButton(true);
-  mTogglableButton = true;    // TODO: Use SetTogglableButton() after refactoring painter
+  SetTogglableButton(true);
 }
 
 RadioButton::~RadioButton()
 {
 }
 
-void RadioButton::SetLabel( Actor label )
+void RadioButton::SetButtonImage( Actor image )
 {
-  if( mLabel != label )
+  Actor& buttonImage = GetButtonImage();
+
+  if( !IsSelected() )
   {
-    if( mLabel )
+    if( buttonImage && buttonImage.GetParent() )
     {
-      mRadioIcon.Remove( mLabel );
+      buttonImage.GetParent().Remove( buttonImage );
+      buttonImage.Reset();
     }
+
+    Self().Add( image );
+
+    Actor& label = GetLabel();
 
     if( label )
     {
-      label.SetParentOrigin( ParentOrigin::CENTER_RIGHT );
-      label.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
-      label.MoveBy( DISTANCE_BETWEEN_IMAGE_AND_LABEL );
-      mRadioIcon.Add( label );
+      buttonImage.Remove( label );
+      image.Add( label );
+    }
+  }
+
+  buttonImage = image;
+
+  buttonImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  buttonImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
+}
+
+void RadioButton::SetSelectedImage( Actor image )
+{
+  Actor& selectedImage = GetSelectedImage();
+
+  if( IsSelected() )
+  {
+    if( selectedImage && selectedImage.GetParent() )
+    {
+      selectedImage.GetParent().Remove( selectedImage );
+      selectedImage.Reset();
     }
 
-    mLabel = label;
+    Self().Add( image );
 
-    RelayoutRequest();
+    Actor& label = GetLabel();
+
+    if( label )
+    {
+      selectedImage.Remove( label );
+      image.Add( label );
+    }
+  }
+
+  selectedImage = image;
+
+  selectedImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  selectedImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
+}
+
+void RadioButton::OnButtonInitialize()
+{
+  Image buttonImage = Dali::ResourceImage::New( UNSELECTED_BUTTON_IMAGE_DIR );
+  Image selectedImage = Dali::ResourceImage::New( SELECTED_BUTTON_IMAGE_DIR );
+
+  SetButtonImage( ImageActor::New( buttonImage ) );
+  SetSelectedImage( ImageActor::New( selectedImage ) );
+
+  RelayoutRequest();
+}
+
+void RadioButton::OnButtonUp()
+{
+  if( ButtonDown == GetState() )
+  {
+    // Don't allow selection on an already selected radio button
+    if( !IsSelected() )
+    {
+      SetSelected(!IsSelected());
+    }
   }
 }
 
-void RadioButton::SetSelected( bool selected )
+void RadioButton::OnLabelSet()
 {
-  if( IsSelected() != selected )
+  Actor& label = GetLabel();
+
+  if( label )
   {
-    if( selected )
+    label.SetParentOrigin( ParentOrigin::CENTER_RIGHT );
+    label.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+    label.MoveBy( DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+
+    if( IsSelected() )
     {
-      Actor parent = Self().GetParent();
-      if( parent )
-      {
-        for( unsigned int i = 0; i < parent.GetChildCount(); ++i )
-        {
-          Dali::Toolkit::RadioButton rbChild = Dali::Toolkit::RadioButton::DownCast(parent.GetChildAt(i));
-
-          if( rbChild )
-          {
-            rbChild.SetSelected(false);
-          }
-        }
-      }
-
-      mSelected = true;
-      mRadioIcon.SetImage(mSelectedImage);
+      GetSelectedImage().Add( label );
     }
     else
     {
-      mSelected = false;
-      mRadioIcon.SetImage(mUnselectedImage);
+      GetButtonImage().Add( label );
+    }
+  }
+}
+
+void RadioButton::OnSelected( bool selected )
+{
+  Actor& buttonImage = GetButtonImage();
+  Actor& selectedImage = GetSelectedImage();
+  Actor& label = GetLabel();
+
+  if( selected )
+  {
+    Actor parent = Self().GetParent();
+    if( parent )
+    {
+      for( unsigned int i = 0; i < parent.GetChildCount(); ++i )
+      {
+        Dali::Toolkit::RadioButton rbChild = Dali::Toolkit::RadioButton::DownCast(parent.GetChildAt(i));
+
+        if( rbChild )
+        {
+          rbChild.SetSelected(false);
+        }
+      }
     }
 
-    // Raise state changed signal
-    Toolkit::RadioButton handle( GetOwner() );
-    StateChangedSignal().Emit( handle );
+    buttonImage.GetParent().Remove( buttonImage );
+    Self().Add( selectedImage );
 
-    RelayoutRequest();
+    if( label )
+    {
+      label.GetParent().Remove( label );
+      selectedImage.Add( label );
+    }
+  }
+  else
+  {
+    selectedImage.GetParent().Remove( selectedImage );
+    Self().Add( buttonImage );
+
+    if( label )
+    {
+      label.GetParent().Remove( label );
+      buttonImage.Add( label );
+    }
   }
 }
 
 void RadioButton::OnRelayout( const Vector2& /*size*/, ActorSizeContainer& container )
 {
-  Vector3 newSize( mRadioIcon.GetNaturalSize() );
+  Vector3 newSize;
+
+  if( IsSelected() )
+  {
+    newSize = GetSelectedImage().GetNaturalSize();
+  }
+  else
+  {
+    newSize = GetButtonImage().GetNaturalSize();
+  }
 
   Actor& label = GetLabel();
 
@@ -155,23 +250,8 @@ void RadioButton::OnRelayout( const Vector2& /*size*/, ActorSizeContainer& conta
   Self().SetSize( newSize );
 }
 
-void RadioButton::OnInitialize()
-{
-  mRadioIcon.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
-  mRadioIcon.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  Self().Add( mRadioIcon );
+} // namespace Internal
 
-  RelayoutRequest();
-}
+} // namespace Toolkit
 
-void RadioButton::OnButtonUp()
-{
-  if( ButtonDown == GetState() )
-  {
-    // Don't allow selection on an already selected radio button
-    if( !IsSelected() )
-    {
-      SetSelected(!IsSelected());
-    }
-  }
-}
+} // namespace Dali

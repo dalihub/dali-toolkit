@@ -77,7 +77,7 @@ int UtcDaliBendyDefaultValuesEffect(void)
   Toolkit::BendyEffect effect = Toolkit::BendyEffect::New();
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -115,7 +115,7 @@ int UtcDaliBendyCustomValuesEffect(void)
   Toolkit::BendyEffect effect = Toolkit::BendyEffect::New();
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );

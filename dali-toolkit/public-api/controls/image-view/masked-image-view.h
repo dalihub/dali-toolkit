@@ -183,7 +183,7 @@ public:
    * @param[in] customProperty A custom property enum defined in this class.
    * @return The property index e.g. for use with Animation::AnimateTo()
    */
-  Property::Index GetPropertyIndex( CustomProperty customProperty ) const;
+  Dali::Property::Index GetPropertyIndex( CustomProperty customProperty ) const;
 
   /**
    * @brief Pause the masking operation to improve performance.

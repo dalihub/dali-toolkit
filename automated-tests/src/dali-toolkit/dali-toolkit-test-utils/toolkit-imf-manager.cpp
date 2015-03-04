@@ -19,7 +19,6 @@
 #include "toolkit-imf-manager.h"
 
 // EXTERNAL INCLUDES
-#include <boost/bind.hpp>
 #include <dali/public-api/object/base-object.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/key-event-integ.h>

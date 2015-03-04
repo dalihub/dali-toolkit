@@ -17,6 +17,9 @@
 
 // EXTERNAL INCLUDES
 #include <boost/bind.hpp>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/object/property-input.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
@@ -300,36 +303,36 @@ void ApplyScrollCubeConstraints(Toolkit::ScrollView scrollView,
 {
   // Apply constraints to this actor //
   Constraint constraint;
-  constraint = Constraint::New<Quaternion>( Actor::ROTATION,
-                                         Source(parentPage, Actor::POSITION),
+  constraint = Constraint::New<Quaternion>( Actor::Property::Rotation,
+                                         Source(parentPage, Actor::Property::Position),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_FINAL_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
-                                         Source(scrollView, Actor::SIZE ),
+                                         Source(scrollView, Actor::Property::Size ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME ) ),
                                          boost::bind( &ScrollCubeEffectInfo::RotationConstraint, info, _1, _2, _3, _4, _5, _6, _7) );
 
   constraint.SetRemoveAction( Constraint::Discard );
   child.ApplyConstraint( constraint );
 
-  constraint = Constraint::New<Vector4>( Actor::COLOR,
-                                         Source(parentPage, Actor::POSITION),
+  constraint = Constraint::New<Vector4>( Actor::Property::Color,
+                                         Source(parentPage, Actor::Property::Position),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_FINAL_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
-                                         Source(scrollView, Actor::SIZE ),
+                                         Source(scrollView, Actor::Property::Size ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME ) ),
                                          boost::bind( &ScrollCubeEffectInfo::ColorConstraint, info, _1, _2, _3, _4, _5, _6, _7) );
 
   constraint.SetRemoveAction( Constraint::Discard );
   child.ApplyConstraint( constraint );
 
-  constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                         Source(parentPage, Actor::POSITION),
+  constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                         Source(parentPage, Actor::Property::Position),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_FINAL_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
-                                         Source(scrollView, Actor::SIZE ),
+                                         Source(scrollView, Actor::Property::Size ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME ) ),
                                          boost::bind( &ScrollCubeEffectInfo::PositionConstraint, info, _1, _2, _3, _4, _5, _6, _7) );
 

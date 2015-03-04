@@ -20,6 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/events/hit-test-algorithm.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
@@ -309,7 +311,7 @@ void PageTurnView::OnInitialize()
   for( int i = 0; i < MAXIMUM_TURNING_NUM; i++ )
   {
     mTurnEffect[i] = Toolkit::PageTurnEffect::New( false );
-    mTurnEffect[i].SetProperty( ShaderEffect::GRID_DENSITY, Property::Value( DEFAULT_GRID_DENSITY ) );
+    mTurnEffect[i].SetProperty( ShaderEffect::Property::GridDensity, Property::Value( DEFAULT_GRID_DENSITY ) );
     mTurnEffect[i].SetPageSize( mPageSize );
     mTurnEffect[i].SetShadowWidth(0.f);
     mTurnEffect[i].SetSpineShadowParameter( mSpineShadowParameter );
@@ -887,7 +889,7 @@ void PageTurnView::PanContinuing( const Vector2& gesturePosition )
         GetImpl( mTurnEffect[mIndex] ).ApplyInternalConstraint();
 
         float distance = offset.Length();
-        Constraint rotationConstraint = Constraint::New<Quaternion>( Actor::ROTATION,
+        Constraint rotationConstraint = Constraint::New<Quaternion>( Actor::Property::Rotation,
                                                                      Source( self, mPropertyPanDisplacement[mIndex] ),
                                                                      RotationConstraint(distance, mPageSize.width, mIsTurnBack[mPanActor]));
         mPanActor.ApplyConstraint( rotationConstraint );

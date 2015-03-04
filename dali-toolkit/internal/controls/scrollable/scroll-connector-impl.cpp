@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/property-index.h>
+#include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 
@@ -99,7 +99,7 @@ ScrollConnector::ScrollConnector()
   mMaxLimit( 0.0f ),
   mContentLength( 0.0f )
 {
-  mScrollPositionObject = Constrainable::New();
+  mScrollPositionObject = Handle::New();
 
   mScrollPositionObject.RegisterProperty( Toolkit::ScrollConnector::SCROLL_POSITION_PROPERTY_NAME, 0.0f );
   mScrollPositionObject.RegisterProperty( Toolkit::ScrollConnector::OVERSHOOT_PROPERTY_NAME, 0.0f );

@@ -33,7 +33,7 @@ namespace Toolkit
  * Usage Example:
  *
  *  // Create the an imageActor, set shader effect, and add it to the stage
- *  ImageActor imageActor = ImageActor::New( BitmapImage::New( 1, 1 ) );
+ *  ImageActor imageActor = ImageActor::New( BufferImage::New( 1, 1 ) );
  *  imageActor.SetSize(720.f,58.f);
  *  Toolkit::BouncingEffect bouncingEffect = Toolkit::BouncingEffect::New( Vector4(0.f,1.f,1.f,0.5f) );
  *  imageActor.SetShaderEffect( bouncingEffect );

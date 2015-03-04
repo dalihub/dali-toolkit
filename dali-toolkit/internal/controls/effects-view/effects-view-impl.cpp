@@ -19,6 +19,8 @@
 #include "effects-view-impl.h"
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
@@ -265,8 +267,8 @@ void EffectsView::SetupProperties()
   mEffectStrengthPropertyIndex = self.RegisterProperty(EFFECT_STRENGTH_PROPERTY_NAME, EFFECT_STRENGTH_DEFAULT, Property::READ_WRITE);
   mEffectOffsetPropertyIndex   = self.RegisterProperty(EFFECT_OFFSET_PROPERTY_NAME, EFFECT_OFFSET_DEFAULT);
   mEffectColorPropertyIndex    = self.RegisterProperty(EFFECT_COLOR_PROPERTY_NAME, EFFECT_COLOR_DEFAULT);
-  mActorPostFilter.ApplyConstraint( Constraint::New<Vector3>( Actor::POSITION, Source( self, mEffectOffsetPropertyIndex ), EqualToConstraint() ) );
-  mActorPostFilter.ApplyConstraint( Constraint::New<Vector4>( Actor::COLOR, Source( self, mEffectColorPropertyIndex ), EqualToConstraint() ) );
+  mActorPostFilter.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::Position, Source( self, mEffectOffsetPropertyIndex ), EqualToConstraint() ) );
+  mActorPostFilter.ApplyConstraint( Constraint::New<Vector4>( Actor::Property::Color, Source( self, mEffectColorPropertyIndex ), EqualToConstraint() ) );
 }
 
 void EffectsView::SetBackgroundColor( const Vector4& color )

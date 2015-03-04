@@ -106,7 +106,6 @@ void BubbleEmitter::OnInitialize()
   {
     mMesh[i] = Mesh::New( meshData );
     mMeshActor[i] = MeshActor::New( mMesh[i] );
-    mMeshActor[i].SetAffectedByLighting( false );
     mMeshActor[i].SetParentOrigin(ParentOrigin::TOP_LEFT);
     mEffect[i] = BubbleEffect::New( mNumBubblePerShader );
     mEffect[i].SetEffectImage( mEffectImage );
@@ -119,7 +118,6 @@ void BubbleEmitter::OnInitialize()
   MeshData meshDataForNoise;
   ConstructBubbleMesh( meshDataForNoise, mNumBubblePerShader);
   mMeshActorForNoise = MeshActor::New( Mesh::New(meshDataForNoise) );
-  mMeshActorForNoise.SetAffectedByLighting( false );
   mMeshActorForNoise.SetParentOrigin(ParentOrigin::TOP_LEFT);
   mEffectForNoise = BubbleEffect::New( mNumBubblePerShader );
   mEffectForNoise.SetMovementArea( mMovementArea );

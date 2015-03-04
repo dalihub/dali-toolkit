@@ -722,57 +722,6 @@ int UtcDaliScrollViewScrollSensitive(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewTouchesRequired(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewTouchesRequired");
-
-  // Set up a scrollView...
-  ScrollView scrollView = ScrollView::New();
-  Stage::GetCurrent().Add( scrollView );
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
-  scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-
-  // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
-  rulerX->SetDomain( RulerDomain(0.0f, stageSize.width + CLAMP_EXCESS_WIDTH, true) );
-  rulerY->SetDomain( RulerDomain(0.0f, stageSize.height + CLAMP_EXCESS_HEIGHT, true) );
-  scrollView.SetRulerX(rulerX);
-  scrollView.SetRulerY(rulerY);
-  scrollView.ScrollStartedSignal().Connect( &OnScrollStart );
-  scrollView.ScrollUpdatedSignal().Connect( &OnScrollUpdate );
-  scrollView.ScrollCompletedSignal().Connect( &OnScrollComplete );
-  scrollView.SnapStartedSignal().Connect( &OnSnapStart );
-
-  scrollView.ScrollTo(CLAMP_START_SCROLL_POSITION, 0.0f); // move in a little.
-  Wait(application);
-
-  // First try touches required being a minimum and maximum of 2.
-  scrollView.SetTouchesRequiredForPanning(2, 2, true);
-  PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, CLAMP_TOUCH_MOVEMENT, CLAMP_GESTURE_FRAMES, true);
-
-  DALI_TEST_CHECK( !gOnScrollStartCalled );
-  DALI_TEST_CHECK( !gOnScrollUpdateCalled );
-  DALI_TEST_CHECK( !gOnScrollCompleteCalled );
-  DALI_TEST_CHECK( !gOnSnapStartCalled );
-
-  scrollView.ScrollTo(CLAMP_START_SCROLL_POSITION, 0.0f); // move in a little.
-  Wait(application);
-
-  // Second try touches required being a minimum and maximum of 1.
-  scrollView.SetTouchesRequiredForPanning(1, 1, true);
-  PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, CLAMP_TOUCH_MOVEMENT * 0.1f, CLAMP_GESTURE_FRAMES * 0.1f, true);
-
-  DALI_TEST_CHECK( gOnScrollStartCalled );
-  DALI_TEST_CHECK( gOnScrollUpdateCalled );
-  DALI_TEST_CHECK( gOnScrollCompleteCalled );
-  DALI_TEST_CHECK( gOnSnapStartCalled );
-  END_TEST;
-}
-
 int UtcDaliScrollViewAxisAutoLock(void)
 {
   ToolkitTestApplication application;
@@ -869,7 +818,7 @@ int UtcDaliScrollViewConstraints(void)
   Wait(application);
 
   Property::Index scrollPositionProperty = scrollView.GetPropertyIndex(ScrollView::SCROLL_POSITION_PROPERTY_NAME);
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
                                                        Source(scrollView, scrollPositionProperty),
                                                        TestSumConstraint( TEST_CONSTRAINT_OFFSET ) );
   constraint.SetRemoveAction(Constraint::Discard);
@@ -918,7 +867,7 @@ int UtcDaliScrollViewBind(void)
 
   Property::Index scrollPositionProperty = scrollView.GetPropertyIndex(ScrollView::SCROLL_POSITION_PROPERTY_NAME);
   // apply this constraint to scrollview
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
                                                        Source(scrollView, scrollPositionProperty),
                                                        TestSumConstraint( TEST_CONSTRAINT_OFFSET ) );
 

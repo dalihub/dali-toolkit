@@ -20,9 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
+#include <dali-toolkit/public-api/shader-effects/image-region-effect.h>
 
 #include "button-impl.h"
 
@@ -50,7 +52,53 @@ public:
    */
   static Dali::Toolkit::CheckBoxButton New();
 
-protected:
+public: // From Button
+
+  /**
+   * @copydoc Toolkit::Internal::Button::SetSelectedImage( Actor image )
+   */
+  virtual void SetSelectedImage( Actor image );
+
+  /**
+   * @copydoc Toolkit::Internal::Button::SetBackgroundImage( Actor image )
+   */
+  virtual void SetBackgroundImage( Actor image );
+
+  /**
+   * @copydoc Toolkit::Internal::Button::SetDisabledSelectedImage( Actor image )
+   */
+  virtual void SetDisabledSelectedImage( Actor image );
+
+  /**
+   * @copydoc Toolkit::Internal::Button::SetDisabledBackgroundImage( Actor image )
+   */
+  virtual void SetDisabledBackgroundImage( Actor image );
+
+private: // From Button
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnLabelSet()
+   */
+  virtual void OnLabelSet();
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnSelected()
+   */
+  virtual void OnSelected( bool selected );
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnDisabled( bool disabled )
+   */
+  virtual void OnDisabled( bool disabled );
+
+private: // From Control
+
+  /**
+   * @copydoc Dali::Toolkit::Control::OnRelayout()
+   */
+  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
+
+private:
 
   /**
    * Construct a new CheckBoxButton.
@@ -64,11 +112,49 @@ protected:
 
 private:
 
+  /**
+   * Adds the actor to the button.
+   */
+  void AddChild( Actor& actor );
+
+  /**
+   * Removes the actor from the button.
+   */
+  void RemoveChild( Actor& actor );
+
+  /**
+   * Adds the actor to the check in animation.
+   * It creates a check in animation if needed and starts the check in animation.
+   * @param[in] actor The actor.
+   */
+  void StartCheckInAnimation( Actor& actor );
+
+  /**
+   * Stops the check in animation.
+   */
+  void StopCheckInAnimation();
+
+  // slots
+
+  /**
+   * Called when the check in animation finishes.
+   * It changes the check button paint state.
+   */
+  void CheckInAnimationFinished( Dali::Animation& source );
+
+private:
+
   // Undefined
   CheckBoxButton( const CheckBoxButton& );
 
   // Undefined
   CheckBoxButton& operator=( const CheckBoxButton& );
+
+private:
+  Animation                 mCheckInAnimation;  ///< Animation used in the state transitions.
+  ImageRegionEffect         mTickUVEffect;      ///< ImageRegionEffect to expand the tick across
+
+  PaintState                mPaintState;        ///< The paint state.
 };
 
 } // namespace Internal

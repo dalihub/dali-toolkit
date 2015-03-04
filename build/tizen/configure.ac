@@ -46,13 +46,26 @@ AC_ARG_ENABLE([debug],
               [enable_debug=$enableval],
               [enable_debug=no])
 
+# option for JavaScript plugin
+AC_ARG_ENABLE(javascript,
+              [AC_HELP_STRING([--enable-javascript],
+                              [Enable JavaScript plugin])] ,
+               [enable_javascript=yes],
+               [enable_javascript=no])
+
 if test "x$enable_debug" = "xyes"; then
   DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDEBUG_ENABLED"
+  DALI_SCRIPTV8_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDEBUG_ENABLED"
 fi
 
 if test "x$enable_debug" = "xno" -a "x$enable_exportall" = "xno"; then
   DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -fvisibility=hidden -DHIDE_DALI_INTERNALS"
+  DALI_SCRIPTV8_CFLAGS="$DALI_TOOLKIT_CFLAGS -fvisibility=hidden -DHIDE_DALI_INTERNALS"
 fi
+
+#set a variable for the makefile to conditionally compile the plugin
+AM_CONDITIONAL([ENABLE_JAVASCRIPT_PLUGIN], [test x$enable_javascript = xyes])
+
 
 # Tizen Profile options
 AC_ARG_ENABLE([profile],
@@ -76,6 +89,8 @@ fi
 AC_SUBST(dataReadWriteDir)
 AC_SUBST(dataReadOnlyDir)
 AC_SUBST(DALI_TOOLKIT_CFLAGS)
+AC_SUBST(DALI_SCRIPTV8_CFLAGS)
+AC_SUBST(DALI_SCRIPTV8_LIBS)
 
 # Specify the include directory for development headers
 #devincludepath=${includedir}/dali/internal
@@ -91,6 +106,7 @@ AC_SUBST(DOXYGEN_ROOT_DIR)
 AC_CONFIG_FILES([
  Makefile
  dali-toolkit/Makefile
+ plugins/Makefile
  dali-toolkit.pc
  docs/Makefile
  docs/dali.doxy
@@ -103,6 +119,7 @@ Configuration
 -------------
   Prefix:                           $prefix
   Debug Build:                      $enable_debug
+  JavaScript support (V8 required)  $enable_javascript
   Profile:                          $dali_profile
   Data Dir (Read/Write):            $dataReadWriteDir
   Data Dir (Read Only):             $dataReadOnlyDir

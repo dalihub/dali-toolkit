@@ -14,9 +14,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/bloom-view/bloom-view-impl.cpp \
    $(toolkit_src_dir)/controls/bubble-effect/bubble-emitter-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/button-impl.cpp \
-   $(toolkit_src_dir)/controls/buttons/check-box-button-default-painter-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/check-box-button-impl.cpp \
-   $(toolkit_src_dir)/controls/buttons/push-button-default-painter-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/push-button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/radio-button-impl.cpp \
    $(toolkit_src_dir)/controls/cluster/cluster-impl.cpp \
@@ -95,5 +93,8 @@ toolkit_src_files = \
    $(toolkit_src_dir)/transition-effects/cube-transition-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-cross-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-fold-effect-impl.cpp \
-   $(toolkit_src_dir)/transition-effects/cube-transition-wave-effect-impl.cpp
+   $(toolkit_src_dir)/transition-effects/cube-transition-wave-effect-impl.cpp \
+   $(toolkit_src_dir)/scripting/script-impl.cpp \
+   $(toolkit_src_dir)/scripting/script-plugin-proxy.cpp
+
 

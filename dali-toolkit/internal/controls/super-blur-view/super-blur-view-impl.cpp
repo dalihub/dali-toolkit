@@ -20,6 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <cmath>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/scripting/scripting.h>
@@ -148,7 +150,7 @@ void SuperBlurView::OnInitialize()
 
   for(unsigned int i=0; i < mBlurLevels; i++)
   {
-    mImageActors[i].ApplyConstraint( Constraint::New<float>( Actor::COLOR_ALPHA, ParentSource( mBlurStrengthPropertyIndex ), ActorOpacityConstraint(mBlurLevels, i) ) );
+    mImageActors[i].ApplyConstraint( Constraint::New<float>( Actor::Property::ColorAlpha, ParentSource( mBlurStrengthPropertyIndex ), ActorOpacityConstraint(mBlurLevels, i) ) );
   }
 
   Self().SetSize(Stage::GetCurrent().GetSize());

@@ -20,6 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/set-wrapper.h>
 #include <dali/public-api/common/stage.h>
@@ -376,7 +378,7 @@ void ItemView::OnInitialize()
                                                    LocalSource(mPropertyPosition),
                                                    LocalSource(mPropertyPositionMin),
                                                    LocalSource(mPropertyPositionMax),
-                                                   LocalSource(Actor::SIZE),
+                                                   LocalSource(Actor::Property::Size),
                                                    RelativePositionConstraint);
   self.ApplyConstraint(constraint);
 
@@ -1567,28 +1569,28 @@ void ItemView::SetOvershootEnabled( bool enable )
     mOvershootOverlay.SetDrawMode(DrawMode::OVERLAY);
     self.Add(mOvershootOverlay);
 
-    Constraint constraint = Constraint::New<Vector3>( Actor::SIZE,
+    Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size,
                                                       ParentSource( mPropertyScrollDirection ),
                                                       Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
-                                                      ParentSource( Actor::SIZE ),
+                                                      ParentSource( Actor::Property::Size ),
                                                       OvershootOverlaySizeConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
     mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.width, OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height);
 
-    constraint = Constraint::New<Quaternion>( Actor::ROTATION,
+    constraint = Constraint::New<Quaternion>( Actor::Property::Rotation,
                                               ParentSource( mPropertyScrollDirection ),
                                               Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                               OvershootOverlayRotationConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
 
-    constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                           ParentSource( Actor::SIZE ),
+    constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                           ParentSource( Actor::Property::Size ),
                                            ParentSource( mPropertyScrollDirection ),
                                            Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                            OvershootOverlayPositionConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
 
-    constraint = Constraint::New<bool>( Actor::VISIBLE,
+    constraint = Constraint::New<bool>( Actor::Property::Visible,
                                         ParentSource( mPropertyCanScrollVertical ),
                                         OvershootOverlayVisibilityConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);

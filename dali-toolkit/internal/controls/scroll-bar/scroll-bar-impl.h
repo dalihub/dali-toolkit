@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/property-notification.h>
 
@@ -239,7 +240,7 @@ private:
 
 private:
 
-  Constrainable mScrollPositionObject;                               ///< From mScrollConnector
+  Handle mScrollPositionObject;                               ///< From mScrollConnector
 
   ImageActor mIndicator;                                             ///< Image of scroll indicator.
   Animation mAnimation;                                              ///< Scroll indicator Show/Hide Animation.

@@ -108,7 +108,7 @@ DissolveLocalEffect DissolveLocalEffect::New( unsigned int numberOfDimples )
     handle.SetRadius(i, 0.f);
     handle.SetDistortion( i, 0.f );
   }
-  handle.SetProperty( ShaderEffect::GRID_DENSITY, Property::Value(5.f) );
+  handle.SetProperty( ShaderEffect::Property::GridDensity, Dali::Property::Value(5.f) );
   handle.SetTransparency( 0.5f );
 
   return handle;

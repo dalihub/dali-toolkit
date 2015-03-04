@@ -156,11 +156,6 @@ public: //Signals
   Toolkit::Scrollable::ScrollCompletedSignalType& ScrollCompletedSignal();
 
   /**
-   * @copydoc Dali::Toolkit::Scrollable::ScrollClampedSignal()
-   */
-  Toolkit::Scrollable::ScrollClampedSignalType& ScrollClampedSignal();
-
-  /**
    * Connects a callback function with the object's signals.
    * @param[in] object The object providing the signal.
    * @param[in] tracker Used to disconnect the signal.
@@ -248,7 +243,6 @@ protected:
   Toolkit::Scrollable::ScrollStartedSignalType mScrollStartedSignal;
   Toolkit::Scrollable::ScrollUpdatedSignalType mScrollUpdatedSignal;
   Toolkit::Scrollable::ScrollCompletedSignalType mScrollCompletedSignal;
-  Toolkit::Scrollable::ScrollClampedSignalType mScrollClampedSignal;
 
 private:
 

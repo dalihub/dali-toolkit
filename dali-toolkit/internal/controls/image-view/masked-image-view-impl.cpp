@@ -20,6 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <sstream>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
@@ -543,7 +545,7 @@ void MaskedImageView::Initialize( unsigned int targetWidth,
   mRenderTask.SetInputEnabled( false );
   mRenderTask.SetExclusive( true );
   mRenderTask.SetClearEnabled( true );
-  mRenderTask.ApplyConstraint( Constraint::New<Vector4>( RenderTask::CLEAR_COLOR,
+  mRenderTask.ApplyConstraint( Constraint::New<Vector4>( RenderTask::Property::ClearColor,
                                                          Source( self, mCustomProperties[ Dali::Toolkit::MaskedImageView::BACKGROUND_COLOR ] ),
                                                          EqualToConstraint() ) );
   mRenderTask.FinishedSignal().Connect( this, &MaskedImageView::OnRenderTaskFinished );

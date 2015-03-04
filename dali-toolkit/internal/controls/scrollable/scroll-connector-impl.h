@@ -115,7 +115,7 @@ public:
    * Retrieve the object which provides the "scroll-position" property.
    * @return The scroll-position object.
    */
-  Constrainable GetScrollPositionObject() const
+  Handle GetScrollPositionObject() const
   {
     return mScrollPositionObject;
   }
@@ -151,7 +151,7 @@ private:
 
 private:
 
-  Constrainable mScrollPositionObject;
+  Handle mScrollPositionObject;
 
   DomainChangedSignalType mDomainChangedSignal;
   ScrollPositionChangedSignalType mScrollPositionChangedSignal;

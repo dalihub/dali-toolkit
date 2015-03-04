@@ -21,6 +21,8 @@
 // EXTERNAL INCLUDES
 #include <sstream>
 #include <iomanip>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
@@ -313,15 +315,15 @@ void ShadowView::ConstrainCamera()
     // is under control of application, can't use transform inheritance)
 
     Constraint cameraOrientationConstraint =
-      Constraint::New<Quaternion> ( Actor::ROTATION,
-                                    Source( mShadowPlane, Actor::WORLD_POSITION ),
-                                    Source( mPointLight,  Actor::WORLD_POSITION ),
-                                    Source( mShadowPlane, Actor::WORLD_ROTATION ),
+      Constraint::New<Quaternion> ( Actor::Property::Rotation,
+                                    Source( mShadowPlane, Actor::Property::WorldPosition ),
+                                    Source( mPointLight,  Actor::Property::WorldPosition ),
+                                    Source( mShadowPlane, Actor::Property::WorldRotation ),
                                     &LookAt );
 
     mCameraActor.ApplyConstraint( cameraOrientationConstraint );
 
-    Constraint pointLightPositionConstraint = Constraint::New<Vector3>( Actor::POSITION, Source( mPointLight, Actor::WORLD_POSITION ), EqualToConstraint() );
+    Constraint pointLightPositionConstraint = Constraint::New<Vector3>( Actor::Property::Position, Source( mPointLight, Actor::Property::WorldPosition ), EqualToConstraint() );
 
     mCameraActor.ApplyConstraint( pointLightPositionConstraint );
   }
@@ -369,8 +371,8 @@ void ShadowView::SetShaderConstants()
   Property::Index lightCameraProjectionMatrixPropertyIndex = mShadowRenderShader.GetPropertyIndex(SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME);
   Property::Index lightCameraViewMatrixPropertyIndex = mShadowRenderShader.GetPropertyIndex(SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME);
 
-  Constraint projectionMatrixConstraint = Constraint::New<Dali::Matrix>( lightCameraProjectionMatrixPropertyIndex, Source( mCameraActor, CameraActor::PROJECTION_MATRIX ), EqualToConstraintMatrix());
-  Constraint viewMatrixConstraint = Constraint::New<Dali::Matrix>( lightCameraViewMatrixPropertyIndex, Source( mCameraActor, CameraActor::VIEW_MATRIX ), EqualToConstraintMatrix());
+  Constraint projectionMatrixConstraint = Constraint::New<Dali::Matrix>( lightCameraProjectionMatrixPropertyIndex, Source( mCameraActor, CameraActor::Property::ProjectionMatrix ), EqualToConstraintMatrix());
+  Constraint viewMatrixConstraint = Constraint::New<Dali::Matrix>( lightCameraViewMatrixPropertyIndex, Source( mCameraActor, CameraActor::Property::ViewMatrix ), EqualToConstraintMatrix());
 
   mShadowRenderShader.ApplyConstraint(projectionMatrixConstraint);
   mShadowRenderShader.ApplyConstraint(viewMatrixConstraint);

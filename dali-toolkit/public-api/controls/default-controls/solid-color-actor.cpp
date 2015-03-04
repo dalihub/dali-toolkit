@@ -16,7 +16,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/images/bitmap-image.h>
+#include <dali/public-api/images/buffer-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
@@ -42,7 +42,7 @@ ImageActor CreateSolidColorActor( const Vector4& color, bool border, const Vecto
   }
 
   const unsigned int bitmapWidth = borderSize * 2 + 2;
-  BitmapImage imageData = BitmapImage::New( bitmapWidth, bitmapWidth, Pixel::RGBA8888 );
+  BufferImage imageData = BufferImage::New( bitmapWidth, bitmapWidth, Pixel::RGBA8888 );
 
   // Create the image
   PixelBuffer* pixbuf = imageData.GetBuffer();

@@ -94,16 +94,14 @@ PropertyRegistration property10( typeRegistration, "label-actor",               
 
 Button::Button()
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
-  mTogglableButton( false ),
-  mSelected( false ),
-  mPainter( NULL ),
   mAutoRepeatingTimer(),
   mDisabled( false ),
   mAutoRepeating( false ),
-//  mTogglableButton( false ),
-//  mSelected( false ),
+  mTogglableButton( false ),
+  mSelected( false ),
   mInitialAutoRepeatingDelay( INITIAL_AUTOREPEATING_DELAY ),
   mNextAutoRepeatingDelay( NEXT_AUTOREPEATING_DELAY ),
+  mAnimationTime( 0.0f ),
   mClickActionPerforming( false ),
   mState( ButtonUp )
 {
@@ -119,13 +117,11 @@ Button::~Button()
 
 void Button::SetDisabled( bool disabled )
 {
-  mDisabled = disabled;
-
-  // Notifies the painter.
-  Toolkit::Button handle( GetOwner() );
-  if( mPainter )
+  if( disabled != mDisabled )
   {
-    mPainter->SetDisabled( handle, mDisabled );
+    mDisabled = disabled;
+
+    OnDisabled( mDisabled );
   }
 }
 
@@ -142,17 +138,17 @@ void Button::SetAutoRepeating( bool autoRepeating )
   if( autoRepeating )
   {
     mTogglableButton = false;
+
     if( mSelected )
     {
       // Emit a signal is not wanted, only change the appearance.
-      Toolkit::Button handle( GetOwner() );
-      mPainter->Selected( handle );
+      OnSelected( false );
+
       mSelected = false;
+
+      RelayoutRequest();
     }
   }
-
-  // Notifies the painter.
-  mPainter->SetAutoRepeating( mAutoRepeating );
 }
 
 bool Button::IsAutoRepeating() const
@@ -190,9 +186,6 @@ void Button::SetTogglableButton( bool togglable )
   if( togglable )
   {
     mAutoRepeating = false;
-
-    // Notifies the painter.
-    mPainter->SetAutoRepeating( mAutoRepeating );
   }
 }
 
@@ -205,15 +198,17 @@ void Button::SetSelected( bool selected )
 {
   if( !mDisabled && mTogglableButton && ( selected != mSelected ) )
   {
+    // Notifies the derived class the button has been selected.
+    OnSelected( selected );
+
     mSelected = selected;
 
     Toolkit::Button handle( GetOwner() );
 
-    // Notifies the painter the button has been selected.
-    mPainter->Selected( handle );
-
     // Emit signal.
     mStateChangedSignal.Emit( handle );
+
+    RelayoutRequest();
   }
 }
 
@@ -224,12 +219,12 @@ bool Button::IsSelected() const
 
 void Button::SetAnimationTime( float animationTime )
 {
-  OnAnimationTimeSet( animationTime );
+  mAnimationTime = animationTime;
 }
 
 float Button::GetAnimationTime() const
 {
-  return OnAnimationTimeRequested();
+  return mAnimationTime;
 }
 
 void Button::SetLabel( const std::string& label )
@@ -237,15 +232,23 @@ void Button::SetLabel( const std::string& label )
   Toolkit::TextView textView = Toolkit::TextView::New( label );
   textView.SetWidthExceedPolicy( Toolkit::TextView::ShrinkToFit ); // Make sure our text always fits inside the button
   SetLabel( textView );
-
-  RelayoutRequest();
 }
 
 void Button::SetLabel( Actor label )
 {
-  Toolkit::Button handle( GetOwner() );
+  if( mLabel != label )
+  {
+    if( mLabel && mLabel.GetParent() )
+    {
+      mLabel.GetParent().Remove( mLabel );
+    }
 
-  mPainter->SetLabel( handle, label );
+    mLabel = label;
+
+    OnLabelSet();
+
+    RelayoutRequest();
+  }
 }
 
 Actor Button::GetLabel() const
@@ -258,145 +261,64 @@ Actor& Button::GetLabel()
   return mLabel;
 }
 
-void Button::SetButtonImage( Image image )
-{
-  SetButtonImage( ImageActor::New( image ) );
-}
-
-void Button::SetButtonImage( Actor image )
-{
-  Toolkit::Button handle( GetOwner() );
-  mPainter->SetButtonImage( handle, image );
-}
-
 Actor Button::GetButtonImage() const
 {
-  return mButtonImage;
+  return mButtonContent;
 }
 
 Actor& Button::GetButtonImage()
 {
-  return mButtonImage;
-}
-
-void Button::SetSelectedImage( Image image )
-{
-  SetSelectedImage( ImageActor::New( image ) );
-}
-
-void Button::SetSelectedImage( Actor image )
-{
-  Toolkit::Button handle( GetOwner() );
-  mPainter->SetSelectedImage( handle, image );
+  return mButtonContent;
 }
 
 Actor Button::GetSelectedImage() const
 {
-  return mSelectedImage;
+  return mSelectedContent;
 }
 
 Actor& Button::GetSelectedImage()
 {
-  return mSelectedImage;
-}
-
-void Button::SetBackgroundImage( Image image )
-{
-  SetBackgroundImage( ImageActor::New( image ) );
-}
-
-void Button::SetBackgroundImage( Actor image )
-{
-  Toolkit::Button handle( GetOwner() );
-  mPainter->SetBackgroundImage( handle, image );
+  return mSelectedContent;
 }
 
 Actor Button::GetBackgroundImage() const
 {
-  return mBackgroundImage;
+  return mBackgroundContent;
 }
 
 Actor& Button::GetBackgroundImage()
 {
-  return mBackgroundImage;
-}
-
-void Button::SetDisabledImage( Image image )
-{
-  SetDisabledImage( ImageActor::New( image ) );
-}
-
-void Button::SetDisabledImage( Actor image )
-{
-  Toolkit::Button handle( GetOwner() );
-  mPainter->SetDisabledImage( handle, image );
+  return mBackgroundContent;
 }
 
 Actor Button::GetDisabledImage() const
 {
-  return mDisabledImage;
+  return mDisabledContent;
 }
 
 Actor& Button::GetDisabledImage()
 {
-  return mDisabledImage;
-}
-
-void Button::SetDisabledSelectedImage( Image image )
-{
-  SetDisabledSelectedImage( ImageActor::New( image ) );
-}
-
-void Button::SetDisabledSelectedImage( Actor image )
-{
-  Toolkit::Button handle( GetOwner() );
-  mPainter->SetDisabledSelectedImage( handle, image );
+  return mDisabledContent;
 }
 
 Actor Button::GetDisabledSelectedImage() const
 {
-  return mDisabledSelectedImage;
+  return mDisabledSelectedContent;
 }
 
 Actor& Button::GetDisabledSelectedImage()
 {
-  return mDisabledSelectedImage;
-}
-
-void Button::SetDisabledBackgroundImage( Image image )
-{
-  SetDisabledBackgroundImage( ImageActor::New( image ) );
-}
-
-void Button::SetDisabledBackgroundImage( Actor image )
-{
-  Toolkit::Button handle( GetOwner() );
-  mPainter->SetDisabledBackgroundImage( handle, image );
+  return mDisabledSelectedContent;
 }
 
 Actor Button::GetDisabledBackgroundImage() const
 {
-  return mDisabledBackgroundImage;
+  return mDisabledBackgroundContent;
 }
 
 Actor& Button::GetDisabledBackgroundImage()
 {
-  return mDisabledBackgroundImage;
-}
-
-Actor& Button::GetFadeOutButtonImage()
-{
-  return mFadeOutButtonImage;
-}
-
-Actor& Button::GetFadeOutSelectedImage()
-{
-  return mFadeOutSelectedImage;
-}
-
-Actor& Button::GetFadeOutBackgroundImage()
-{
-  return mFadeOutBackgroundImage;
+  return mDisabledBackgroundContent;
 }
 
 bool Button::DoAction( BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes )
@@ -432,16 +354,6 @@ void Button::DoClickAction( const PropertyValueContainer& attributes )
   }
 }
 
-void Button::OnAnimationTimeSet( float animationTime )
-{
-  mPainter->SetAnimationTime( animationTime );
-}
-
-float Button::OnAnimationTimeRequested() const
-{
-  return mPainter->GetAnimationTime();
-}
-
 void Button::OnButtonStageDisconnection()
 {
   if( ButtonDown == mState )
@@ -450,8 +362,8 @@ void Button::OnButtonStageDisconnection()
     {
       Toolkit::Button handle( GetOwner() );
 
-      // Notifies the painter the button has been released.
-      mPainter->Released( handle );
+      // Notifies the derived class the button has been released.
+      OnReleased();
 
       if( mAutoRepeating )
       {
@@ -467,8 +379,8 @@ void Button::OnButtonDown()
   {
     Toolkit::Button handle( GetOwner() );
 
-    // Notifies the painter the button has been pressed.
-    mPainter->Pressed( handle );
+    // Notifies the derived class the button has been pressed.
+    OnPressed();
 
     if( mAutoRepeating )
     {
@@ -490,16 +402,16 @@ void Button::OnButtonUp()
     }
     else
     {
-      Toolkit::Button handle( GetOwner() );
-
-      // Notifies the painter the button has been clicked.
-      mPainter->Released( handle );
-      mPainter->Clicked( handle );
+      // Notifies the derived class the button has been clicked.
+      OnReleased();
+      OnClicked();
 
       if( mAutoRepeating )
       {
         mAutoRepeatingTimer.Reset();
       }
+
+      Toolkit::Button handle( GetOwner() );
 
       //Emit signal.
       mReleasedSignal.Emit( handle );
@@ -516,8 +428,8 @@ void Button::OnTouchPointLeave()
     {
       Toolkit::Button handle( GetOwner() );
 
-      // Notifies the painter the button has been released.
-      mPainter->Released( handle );
+      // Notifies the derived class the button has been released.
+      OnReleased();
 
       if( mAutoRepeating )
       {
@@ -653,13 +565,6 @@ bool Button::OnTouchEvent(const TouchEvent& event)
 
 void Button::OnInitialize()
 {
-  // Initialize the painter and notifies subclasses.
-  Toolkit::Button handle( GetOwner() );
-  if( mPainter )
-  {
-    mPainter->Initialize( handle );
-  }
-
   Actor self = Self();
 
   mTapDetector = TapGestureDetector::New();
@@ -676,15 +581,6 @@ void Button::OnActivated()
   // When the button is activated, it performs the click action
   PropertyValueContainer attributes;
   DoClickAction( attributes );
-}
-
-void Button::OnControlSizeSet(const Vector3& targetSize)
-{
-  Toolkit::Button handle( GetOwner() );
-  if( mPainter )
-  {
-    mPainter->SetSize( handle, targetSize );
-  }
 }
 
 void Button::OnTap(Actor actor, const TapGesture& tap)
@@ -709,8 +605,8 @@ bool Button::AutoRepeatingSlot()
 
     Toolkit::Button handle( GetOwner() );
 
-    // Notifies the painter the button has been pressed.
-    mPainter->Pressed( handle );
+    // Notifies the derived class the button has been pressed.
+    OnPressed();
 
     //Emit signal.
     consumed = mReleasedSignal.Emit( handle );
@@ -725,11 +621,6 @@ void Button::OnControlStageDisconnection()
 {
   OnButtonStageDisconnection(); // Notification for derived classes.
   mState = ButtonUp;
-}
-
-void Button::SetPainter(ButtonPainterPtr painter)
-{
-  mPainter = painter;
 }
 
 Button::ButtonState Button::GetState()
@@ -857,7 +748,7 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
       case Toolkit::Button::PROPERTY_NORMAL_STATE_ACTOR:
       {
         Property::Map map;
-        Scripting::CreatePropertyMap( GetImplementation( button ).mButtonImage, map );
+        Scripting::CreatePropertyMap( GetImplementation( button ).mButtonContent, map );
         value = map;
         break;
       }
@@ -865,7 +756,7 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
       case Toolkit::Button::PROPERTY_SELECTED_STATE_ACTOR:
       {
         Property::Map map;
-        Scripting::CreatePropertyMap( GetImplementation( button ).mSelectedImage, map );
+        Scripting::CreatePropertyMap( GetImplementation( button ).mSelectedContent, map );
         value = map;
         break;
       }
@@ -873,7 +764,7 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
       case Toolkit::Button::PROPERTY_DISABLED_STATE_ACTOR:
       {
         Property::Map map;
-        Scripting::CreatePropertyMap( GetImplementation( button ).mDisabledImage, map );
+        Scripting::CreatePropertyMap( GetImplementation( button ).mDisabledContent, map );
         value = map;
         break;
       }

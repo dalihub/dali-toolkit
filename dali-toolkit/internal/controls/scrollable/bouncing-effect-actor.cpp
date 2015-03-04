@@ -19,13 +19,13 @@
 #include <dali-toolkit/internal/controls/scrollable/bouncing-effect-actor.h>
 
 // EXTERNAL INCLUDES
+#include <math.h>
 #include <dali/public-api/actors/mesh-actor.h>
-#include <dali/public-api/geometry/animatable-mesh.h>
+#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/geometry/animatable-mesh.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/public-api/math/vector3.h>
-
-#include <math.h>
 
 namespace Dali
 {
@@ -96,7 +96,6 @@ Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
   }
 
   meshActor = Dali::MeshActor::New(mesh);
-  meshActor.SetAffectedByLighting(false);
 
   Dali::ShaderEffect shaderEffect = Dali::ShaderEffect::New( "", MESH_FRAGMENT_SHADER,
                                                              GEOMETRY_TYPE_UNTEXTURED_MESH,
@@ -108,10 +107,10 @@ Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
   for( size_t i=0;i<NUM_LAYERS;i++ )
   {
     size_t j=i*4;
-    mesh.ApplyConstraint( Constraint::New<Vector3>( mesh.GetPropertyIndex(j+2, AnimatableVertex::POSITION ),
+    mesh.ApplyConstraint( Constraint::New<Vector3>( mesh.GetPropertyIndex(j+2, AnimatableVertex::Property::Position ),
                                                     Source(meshActor, bouncePropertyIndex),
                                                     VertexPositionConstraint(-0.5f, LAYER_HEIGHTS[i]) ) );
-    mesh.ApplyConstraint( Constraint::New<Vector3>( mesh.GetPropertyIndex(j+3,  AnimatableVertex::POSITION),
+    mesh.ApplyConstraint( Constraint::New<Vector3>( mesh.GetPropertyIndex(j+3,  AnimatableVertex::Property::Position),
                                                     Source(meshActor, bouncePropertyIndex),
                                                     VertexPositionConstraint(-0.5f, LAYER_HEIGHTS[i]) ) );
   }

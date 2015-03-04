@@ -230,7 +230,7 @@ public:
    * the GaussianBlurView object from the stage also.
    * @return Index of the property that can be used to fade the blur in / out
    */
-  Property::Index GetBlurStrengthPropertyIndex() const;
+  Dali::Property::Index GetBlurStrengthPropertyIndex() const;
 
   /**
    * Get the final blurred image.

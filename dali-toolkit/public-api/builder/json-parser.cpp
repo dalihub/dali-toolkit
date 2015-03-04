@@ -22,7 +22,6 @@
 #include <memory.h>
 #include <functional>
 #include <iostream>
-#include <vector>
 #include <cstring>
 #include <algorithm>
 

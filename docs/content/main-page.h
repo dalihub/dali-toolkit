@@ -54,8 +54,6 @@
  * - \link script-hello Hello World in script \endlink
  *
  * - \link handle-body-idiom Handle – body idiom \endlink
- * - \link boost-library Boost Library \endlink
- * - \link boost-function Boost function usage \endlink
  *
  * \section Rendering
  * - \link viewing-modes Viewing modes \endlink

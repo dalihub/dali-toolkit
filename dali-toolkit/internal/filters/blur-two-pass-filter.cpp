@@ -288,7 +288,7 @@ void BlurTwoPassFilter::SetSize( const Vector2& size )
   }
 }
 
-Constrainable BlurTwoPassFilter::GetHandleForAnimateBlurStrength()
+Handle BlurTwoPassFilter::GetHandleForAnimateBlurStrength()
 {
   return mShaderForBlending;
 }

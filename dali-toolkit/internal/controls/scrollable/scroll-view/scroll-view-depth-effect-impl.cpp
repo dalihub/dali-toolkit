@@ -15,6 +15,11 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/object/property-input.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-depth-effect-impl.h>
@@ -331,24 +336,24 @@ void ApplyScrollDepthConstraints(Toolkit::ScrollView scrollView,
                                  float scaleExtent)
 {
   // Scale Constraint
-  Constraint constraint = Constraint::New<Vector3>( Actor::SCALE,
-                                         LocalSource(Actor::POSITION),
-                                         ParentSource(Actor::POSITION),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Scale,
+                                         LocalSource(Actor::Property::Position),
+                                         ParentSource(Actor::Property::Position),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
-                                         Source(scrollView, Actor::SIZE ),
+                                         Source(scrollView, Actor::Property::Size ),
                                          ScrollDepthScaleConstraint( positionExtent, offsetExtent, positionScale, scaleExtent ) );
   constraint.SetRemoveAction( Constraint::Discard );
   child.ApplyConstraint( constraint );
 
   // Position Constraint (apply last as other constraints use Actor::POSITION as a function input)
-  constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                         ParentSource(Actor::POSITION),
+  constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                         ParentSource(Actor::Property::Position),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
-                                         Source(scrollView, Actor::SIZE ),
+                                         Source(scrollView, Actor::Property::Size ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME ) ),
                                          ScrollDepthPositionConstraint( positionExtent, offsetExtent, positionScale ) );
 

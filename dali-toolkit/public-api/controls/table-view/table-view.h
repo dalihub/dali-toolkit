@@ -47,9 +47,9 @@ public:
 
   /// @name Properties
   /** @{ */
-  static const Property::Index PROPERTY_ROWS;                       ///< name "rows",                      type UNSIGNED_INTEGER
-  static const Property::Index PROPERTY_COLUMNS;                    ///< name "columns",                   type UNSIGNED_INTEGER
-  static const Property::Index PROPERTY_CELL_PADDING;               ///< name "cell-padding",              type VECTOR2
+  static const Dali::Property::Index PROPERTY_ROWS;                       ///< name "rows",                      type UNSIGNED_INTEGER
+  static const Dali::Property::Index PROPERTY_COLUMNS;                    ///< name "columns",                   type UNSIGNED_INTEGER
+  static const Dali::Property::Index PROPERTY_CELL_PADDING;               ///< name "cell-padding",              type VECTOR2
 
   /*
    * PROPERTY_LAYOUT_ROWS set the height of the rows
@@ -62,7 +62,7 @@ public:
       }
    * @endcode
    */
-  static const Property::Index PROPERTY_LAYOUT_ROWS;                ///< name "layout-rows",               type MAP
+  static const Dali::Property::Index PROPERTY_LAYOUT_ROWS;                ///< name "layout-rows",               type MAP
 
   /*
    * PROPERTY_LAYOUT_COLUMNS set the height of the rows
@@ -75,7 +75,7 @@ public:
       }
    * @endcode
    */
-  static const Property::Index PROPERTY_LAYOUT_COLUMNS;             ///< name "layout-columns",            type MAP
+  static const Dali::Property::Index PROPERTY_LAYOUT_COLUMNS;             ///< name "layout-columns",            type MAP
   /** @} */
 
 

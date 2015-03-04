@@ -14,7 +14,14 @@
 # limitations under the License.
 #
 
-SUBDIRS = dali-toolkit docs
+SUBDIRS = dali-toolkit
+
+if ENABLE_JAVASCRIPT_PLUGIN
+SUBDIRS +=plugins
+endif
+
+# perform documentation last, so it doesn't prevent code from building if there's an error
+SUBDIRS += docs
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = dali-toolkit.pc

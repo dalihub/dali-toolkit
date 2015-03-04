@@ -21,6 +21,8 @@
 // EXTERNAL INCLUDES
 #include <sstream>
 #include <iomanip>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
@@ -298,7 +300,7 @@ void GaussianBlurView::OnInitialize()
     mImageActorComposite.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
     mImageActorComposite.SetOpacity(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
 
-    Constraint blurStrengthConstraint = Constraint::New<float>( Actor::COLOR_ALPHA, ParentSource(mBlurStrengthPropertyIndex), EqualToConstraintFloat());
+    Constraint blurStrengthConstraint = Constraint::New<float>( Actor::Property::ColorAlpha, ParentSource(mBlurStrengthPropertyIndex), EqualToConstraintFloat());
     mImageActorComposite.ApplyConstraint(blurStrengthConstraint);
 
     // Create an ImageActor for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task

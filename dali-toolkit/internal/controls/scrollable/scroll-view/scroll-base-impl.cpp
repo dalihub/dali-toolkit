@@ -41,7 +41,6 @@ ScrollBase::ScrollBase()
   mPropertyTime(Property::INVALID_INDEX),
   mPropertyPrePosition(Property::INVALID_INDEX),
   mPropertyPosition(Property::INVALID_INDEX),
-  mPropertyScale(Property::INVALID_INDEX),
   mPropertyOvershootX(Property::INVALID_INDEX),
   mPropertyOvershootY(Property::INVALID_INDEX),
   mPropertyWrap(Property::INVALID_INDEX),
@@ -74,7 +73,6 @@ void ScrollBase::RegisterProperties()
   mPropertyOvershootX = self.RegisterProperty(Toolkit::ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME, 0.0f);
   mPropertyOvershootY = self.RegisterProperty(Toolkit::ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME, 0.0f);
   mPropertyFinal = self.RegisterProperty(Toolkit::ScrollView::SCROLL_FINAL_PROPERTY_NAME, Vector3::ZERO);
-  mPropertyScale = self.RegisterProperty(Toolkit::ScrollView::SCROLL_SCALE_PROPERTY_NAME, Vector3::ONE);
   mPropertyWrap = self.RegisterProperty(Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME, false);
   mPropertyPanning = self.RegisterProperty(Toolkit::ScrollView::SCROLL_PANNING_PROPERTY_NAME, false);
   mPropertyScrolling = self.RegisterProperty(Toolkit::ScrollView::SCROLL_SCROLLING_PROPERTY_NAME, false);

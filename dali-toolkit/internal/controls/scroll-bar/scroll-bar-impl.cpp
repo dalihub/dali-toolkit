@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/scroll-bar/scroll-bar-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/images/resource-image.h>
@@ -219,9 +220,9 @@ void ScrollBar::ApplyConstraints()
       mIndicator.RemoveConstraint(mIndicatorPositionConstraint);
     }
 
-    constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                           LocalSource( Actor::SIZE ),
-                                           ParentSource( Actor::SIZE ),
+    constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                           LocalSource( Actor::Property::Size ),
+                                           ParentSource( Actor::Property::Size ),
                                            Source( mScrollPositionObject, Toolkit::ScrollConnector::SCROLL_POSITION ),
                                            IndicatorPositionConstraint( mScrollConnector.GetMinLimit(), mScrollConnector.GetMaxLimit() ) );
     mIndicatorPositionConstraint = mIndicator.ApplyConstraint( constraint );
