@@ -434,7 +434,7 @@ ImageActor Slider::CreateBacking()
 
 void Slider::SetBackingImageName( const std::string& imageName )
 {
-  if( mBacking && imageName != String::EMPTY )
+  if( mBacking && ( imageName.size() > 0 ) )
   {
     Image image = ResourceImage::New( imageName );
     mBacking.SetImage( image );
@@ -463,7 +463,7 @@ ImageActor Slider::CreateProgress()
 
 void Slider::SetProgressImageName( const std::string& imageName )
 {
-  if( mProgress && imageName != String::EMPTY )
+  if( mProgress && ( imageName.size() > 0 ) )
   {
     Image image = ResourceImage::New( imageName );
     mProgress.SetImage( image );
@@ -492,7 +492,7 @@ std::string Slider::GetPopupImageName()
 
 void Slider::CreatePopupImage( const std::string& imageName )
 {
-  if( mPopup && imageName != String::EMPTY )
+  if( mPopup && ( imageName.size() > 0 ) )
   {
     Image image = ResourceImage::New( imageName );
     mPopup.SetImage( image );
@@ -511,7 +511,7 @@ std::string Slider::GetPopupArrowImageName()
 
 void Slider::CreatePopupArrowImage( const std::string& imageName )
 {
-  if( mPopupArrow && imageName != String::EMPTY )
+  if( mPopupArrow && ( imageName.size() > 0 ) )
   {
     Image image = ResourceImage::New( imageName );
     mPopupArrow.SetImage( image );
@@ -561,7 +561,7 @@ ImageActor Slider::CreatePopup()
 
 void Slider::SetHandleImageName( const std::string& imageName )
 {
-  if( mHandle && imageName != String::EMPTY )
+  if( mHandle && ( imageName.size() > 0 ) )
   {
     Image image = ResourceImage::New( imageName );
     mHandle.SetImage( image );

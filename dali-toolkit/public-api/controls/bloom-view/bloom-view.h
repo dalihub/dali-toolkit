@@ -194,42 +194,42 @@ public:
    * This property represents a value such that pixels brighter than this threshold will be bloomed. Values are normalised, i.e. RGB 0.0 = 0, 1.0 = 255.  Default 0.25.
    * @return The property index that can be used with e.g. AnimateTo( ... )
    */
-  Property::Index GetBloomThresholdPropertyIndex() const;
+  Dali::Property::Index GetBloomThresholdPropertyIndex() const;
 
   /**
    * Get the property index that controls the strength of the blur applied to the bloom. Useful for animating this property.
    * This property represents a value in the range [0.0 - 1.0] where 0.0 is no blur and 1.0 is full blur. Default 1.0.
    * @return The property index that can be used with e.g. AnimateTo( ... )
    */
-  Property::Index GetBlurStrengthPropertyIndex() const;
+  Dali::Property::Index GetBlurStrengthPropertyIndex() const;
 
   /**
    * Get the property index that controls the intensity of the child actor render texture used during compositing. Useful for animating this property.
    * This property represents a multiplier on the intensity of the bloom texture. Default 1.0.
    * @return The property index that can be used with e.g. AnimateTo( ... )
    */
-  Property::Index GetBloomIntensityPropertyIndex() const;
+  Dali::Property::Index GetBloomIntensityPropertyIndex() const;
 
   /**
    * Get the property index that controls the saturation of the child actor render texture used during compositing. Useful for animating this property.
    * This property represents a multiplier on the saturation of the bloom texture. Default 1.0.
    * @return The property index that can be used with e.g. AnimateTo( ... )
    */
-  Property::Index GetBloomSaturationPropertyIndex() const;
+  Dali::Property::Index GetBloomSaturationPropertyIndex() const;
 
   /**
    * Get the property index that controls the intensity of the child actor render texture used during compositing. Useful for animating this property.
    * This property represents a multiplier on the intensity of the image texture. Default 1.0.
    * @return The property index that can be used with e.g. AnimateTo( ... )
    */
-  Property::Index GetImageIntensityPropertyIndex() const;
+  Dali::Property::Index GetImageIntensityPropertyIndex() const;
 
   /**
    * Get the property index that controls the saturation of the child actor render texture used during compositing. Useful for animating this property.
    * This property represents a multiplier on the saturation of the image texture. Default 1.0.
    * @return The property index that can be used with e.g. AnimateTo( ... )
    */
-  Property::Index GetImageSaturationPropertyIndex() const;
+  Dali::Property::Index GetImageSaturationPropertyIndex() const;
 
 public:
 

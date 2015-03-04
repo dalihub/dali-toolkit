@@ -57,10 +57,10 @@ public:
   typedef Signal< void ( float ) > ScrollPositionNotifiedSignalType;
 
   // Properties
-  static const Property::Index PROPERTY_INDICATOR_HEIGHT_POLICY;         ///< name "indicator-height-policy", @see SetIndicatorHeightPolicy(), type STRING
-  static const Property::Index PROPERTY_INDICATOR_FIXED_HEIGHT;          ///< name "indicator-fixed-height",  @see SetIndicatorFixedHeight(),  type FLOAT
-  static const Property::Index PROPERTY_INDICATOR_SHOW_DURATION;         ///< name "indicator-show-duration", @see SetIndicatorShowDuration(), type FLOAT
-  static const Property::Index PROPERTY_INDICATOR_HIDE_DURATION;         ///< name "indicator-hide-duration", @see SetIndicatorHideDuration(), type FLOAT
+  static const Dali::Property::Index PROPERTY_INDICATOR_HEIGHT_POLICY;         ///< name "indicator-height-policy", @see SetIndicatorHeightPolicy(), type STRING
+  static const Dali::Property::Index PROPERTY_INDICATOR_FIXED_HEIGHT;          ///< name "indicator-fixed-height",  @see SetIndicatorFixedHeight(),  type FLOAT
+  static const Dali::Property::Index PROPERTY_INDICATOR_SHOW_DURATION;         ///< name "indicator-show-duration", @see SetIndicatorShowDuration(), type FLOAT
+  static const Dali::Property::Index PROPERTY_INDICATOR_HIDE_DURATION;         ///< name "indicator-hide-duration", @see SetIndicatorHideDuration(), type FLOAT
 
 public:
 

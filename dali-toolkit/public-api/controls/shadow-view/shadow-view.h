@@ -230,14 +230,14 @@ public:
    * This property represents a value in the range [0.0 - 1.0] where 0.0 is no blur and 1.0 is full blur. Default 0.2.
    * @return The property index that can be used with e.g. AnimateTo( ... )
    */
-  Property::Index GetBlurStrengthPropertyIndex() const;
+  Dali::Property::Index GetBlurStrengthPropertyIndex() const;
 
   /**
    * Get the property index that controls the color of the shadow. Useful for animating this property.
    * This property represents a value in the Vector4 format. Default color value is Vector4(0.2f, 0.2f, 0.2f, 0.8f) (i.e grey color).
    * @return The property index that can be used with e.g. AnimateTo( ... )
    */
-  Property::Index GetShadowColorPropertyIndex() const;
+  Dali::Property::Index GetShadowColorPropertyIndex() const;
 
 
 public:

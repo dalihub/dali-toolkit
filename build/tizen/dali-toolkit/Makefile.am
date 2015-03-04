@@ -114,6 +114,7 @@ publicapishadereffectsdir = $(publicapidir)/shader-effects
 publicapibubbleeffectdir = $(publicapidir)/shader-effects/bubble-effect
 publicapistylingdir = $(publicapidir)/styling
 publicapitransitioneffectsdir = $(publicapidir)/transition-effects
+publicapiscriptingdir = $(publicapidir)/scripting
 
 publicapi_HEADERS = $(public_api_header_files)
 publicapicontrols_HEADERS = $(public_api_controls_header_files)
@@ -132,6 +133,7 @@ publicapinavigationframe_HEADERS = $(public_api_navigation_frame_header_files)
 publicapipageturnview_HEADERS = $(public_api_page_turn_view_header_files)
 publicapipopup_HEADERS = $(public_api_popup_header_files)
 publicapiscrollbar_HEADERS = $(public_api_scroll_bar_header_files)
+
 publicapiscrollcomponent_HEADERS = $(public_api_scroll_component_header_files)
 publicapiscrollable_HEADERS = $(public_api_scrollable_header_files)
 publicapiscrollview_HEADERS = $(public_api_scroll_view_header_files)
@@ -155,4 +157,5 @@ publicapishadereffects_HEADERS = $(public_api_shader_effects_header_files)
 publicapibubbleeffect_HEADERS = $(public_api_bubble_effect_header_files)
 publicapistyling_HEADERS = $(public_api_styling_header_files)
 publicapitransitioneffects_HEADERS = $(public_api_transition_effects_header_files)
+publicapiscripting_HEADERS = $(public_api_scripting_header_files)
 

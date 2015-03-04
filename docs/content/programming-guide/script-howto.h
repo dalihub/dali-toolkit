@@ -41,7 +41,7 @@
  *   return MyActor::New();
  * }
  *
- * Dali::Connection MyActor::DoConnectSignalCustom(BaseObject* object, const std::string& signalName, SignalCallback callback)
+ * Dali::Connection MyActor::DoConnectSignalCustom(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
  * {
  *   Dali::Connection connection ;
  *
@@ -49,7 +49,7 @@
  *
  *   if(actor && "page-changed" == signalName)
  *   {
- *     connection = return actor->SignalPageChanged().Connect((boost::lambda::bind(callback)));
+ *     connection = return actor->PageChangedSignal().Connect( tracker, functor );
  *   }
  *
  *   return connection ;

@@ -80,7 +80,7 @@ int UtcDaliIrisEffectDefaultValues(void)
   Toolkit::IrisEffect effect = Toolkit::IrisEffect::New();
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -109,7 +109,7 @@ int UtcDaliIrisEffectCustomValues(void)
   Toolkit::IrisEffect effect = Toolkit::IrisEffect::New();
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );

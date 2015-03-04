@@ -25,7 +25,7 @@
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pinch-gesture.h>
 #include <dali/public-api/events/tap-gesture.h>
-#include <dali/public-api/object/property-index.h>
+#include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/type-info.h>
 
 // INTERNAL INCLUDES

@@ -75,7 +75,7 @@ const Dali::TouchPoint pointUpOutside( 0, TouchPoint::Up, 10, 10 );
 
 Image CreateSolidColorImage( const Vector4& color, unsigned int width, unsigned int height )
 {
-  BitmapImage imageData = BitmapImage::New( width, height, Pixel::RGBA8888 );
+  BufferImage imageData = BufferImage::New( width, height, Pixel::RGBA8888 );
 
   // Create the image
   PixelBuffer* pixbuf = imageData.GetBuffer();

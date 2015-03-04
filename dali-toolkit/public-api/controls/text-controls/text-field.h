@@ -41,17 +41,17 @@ class DALI_IMPORT_API TextField : public Control
 public:
 
   // Property indices
-  static const Property::Index PROPERTY_RENDERING_BACKEND;       ///< name "rendering-backend",       type INT
-  static const Property::Index PROPERTY_PLACEHOLDER_TEXT;        ///< name "placeholder-text",        type STRING
-  static const Property::Index PROPERTY_TEXT;                    ///< name "text",                    type STRING
-  static const Property::Index PROPERTY_CURSOR_IMAGE;            ///< name "cursor-image",            type STRING
-  static const Property::Index PROPERTY_PRIMARY_CURSOR_COLOR;    ///< name "primary-cursor-color",    type VECTOR4
-  static const Property::Index PROPERTY_SECONDARY_CURSOR_COLOR;  ///< name "secondary-cursor-color",  type VECTOR4
-  static const Property::Index PROPERTY_ENABLE_CURSOR_BLINK;     ///< name "enable-cursor-blink",     type BOOLEAN
-  static const Property::Index PROPERTY_CURSOR_BLINK_INTERVAL;   ///< name "cursor-blink-interval",   type FLOAT
-  static const Property::Index PROPERTY_CURSOR_BLINK_DURATION;   ///< name "cursor-blink-duration",   type FLOAT
-  static const Property::Index PROPERTY_GRAB_HANDLE_IMAGE;       ///< name "grab-handle-image",       type STRING
-  static const Property::Index PROPERTY_DECORATION_BOUNDING_BOX; ///< name "decoration-bounding-box", type RECTANGLE
+  static const Dali::Property::Index PROPERTY_RENDERING_BACKEND;       ///< name "rendering-backend",       type INT
+  static const Dali::Property::Index PROPERTY_PLACEHOLDER_TEXT;        ///< name "placeholder-text",        type STRING
+  static const Dali::Property::Index PROPERTY_TEXT;                    ///< name "text",                    type STRING
+  static const Dali::Property::Index PROPERTY_CURSOR_IMAGE;            ///< name "cursor-image",            type STRING
+  static const Dali::Property::Index PROPERTY_PRIMARY_CURSOR_COLOR;    ///< name "primary-cursor-color",    type VECTOR4
+  static const Dali::Property::Index PROPERTY_SECONDARY_CURSOR_COLOR;  ///< name "secondary-cursor-color",  type VECTOR4
+  static const Dali::Property::Index PROPERTY_ENABLE_CURSOR_BLINK;     ///< name "enable-cursor-blink",     type BOOLEAN
+  static const Dali::Property::Index PROPERTY_CURSOR_BLINK_INTERVAL;   ///< name "cursor-blink-interval",   type FLOAT
+  static const Dali::Property::Index PROPERTY_CURSOR_BLINK_DURATION;   ///< name "cursor-blink-duration",   type FLOAT
+  static const Dali::Property::Index PROPERTY_GRAB_HANDLE_IMAGE;       ///< name "grab-handle-image",       type STRING
+  static const Dali::Property::Index PROPERTY_DECORATION_BOUNDING_BOX; ///< name "decoration-bounding-box", type RECTANGLE
 
   // Property names
   static const std::string RENDERING_BACKEND_PROPERTY_NAME;      ///< Property, name "rendering-backend",       type INT

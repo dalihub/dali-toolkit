@@ -39,7 +39,7 @@ int UtcDaliOverlayConstructor(void)
 {
   ToolkitTestApplication application;
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   Toolkit::OverlayEffect effect = Toolkit::OverlayEffect::New( image );
   DALI_TEST_CHECK( effect );
@@ -63,7 +63,7 @@ int UtcDaliOverlayUninitializedEffect(void)
 
   try
   {
-    BitmapImage image = CreateBitmapImage();
+    BufferImage image = CreateBufferImage();
 
     // New() must be called to create a OverlayEffect or it wont be valid.
     effect.SetEffectImage( image );

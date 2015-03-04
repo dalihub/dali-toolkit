@@ -1,0 +1,13 @@
+{
+    "name": "DALI JavaScript API",
+    "description": "DALI is a dynamic animtaion library for building advanced 3D applications",
+    "version": "1.0.0",
+    "themedir": "dali-theme",
+    "url": "https://review.tizen.org/gerrit/platform/core/uifw/dali-core",
+    "options": {
+        "outdir": "generated",
+        "markdown": {
+          "gfm":"true"
+       }
+    }
+}

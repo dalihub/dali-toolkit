@@ -106,7 +106,7 @@ DissolveEffect DissolveEffect::New( bool useHighPrecision )
   Dali::Toolkit::DissolveEffect handle( shaderEffectCustom );
 
   handle.SetUniform( DISTORTION_PROPERTY_NAME, 0.0f );
-  handle.SetProperty( ShaderEffect::GRID_DENSITY, Property::Value(50.0f) );
+  handle.SetProperty( ShaderEffect::Property::GridDensity, Dali::Property::Value(50.0f) );
 
   handle.SetCentralLine( Vector2(1.0f,0.5f), Vector2(-1.0f, 0.0f) );
 

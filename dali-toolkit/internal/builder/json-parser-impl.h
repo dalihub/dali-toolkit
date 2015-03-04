@@ -20,9 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <string>
-#include <vector>
 #include <list>
-
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES

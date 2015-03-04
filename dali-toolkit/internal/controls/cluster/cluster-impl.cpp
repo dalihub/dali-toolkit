@@ -351,9 +351,9 @@ void Cluster::TransformChild( unsigned int index, const Vector3& position, const
 
       child.RemoveConstraints();
       Animation animation = Animation::New(period.delaySeconds + period.durationSeconds);
-      animation.AnimateTo( Property(child, Actor::POSITION), position, AlphaFunctions::EaseOut, period);
-      animation.AnimateTo( Property(child, Actor::SCALE), scale, AlphaFunctions::EaseOut, period);
-      animation.AnimateTo( Property(child, Actor::ROTATION), rotation, AlphaFunctions::EaseOut, period);
+      animation.AnimateTo( Property(child, Actor::Property::Position), position, AlphaFunctions::EaseOut, period);
+      animation.AnimateTo( Property(child, Actor::Property::Scale), scale, AlphaFunctions::EaseOut, period);
+      animation.AnimateTo( Property(child, Actor::Property::Rotation), rotation, AlphaFunctions::EaseOut, period);
       animation.Play();
     }
   }

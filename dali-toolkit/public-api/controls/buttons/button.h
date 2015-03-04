@@ -60,16 +60,16 @@ class DALI_IMPORT_API Button : public Control
 public:
 
   // Properties
-  static const Property::Index PROPERTY_DISABLED;                     ///< name "disabled",                     @see SetDisabled(),                  type BOOLEAN
-  static const Property::Index PROPERTY_AUTO_REPEATING;               ///< name "auto-repeating",               @see SetAutoRepeating(),             type BOOLEAN
-  static const Property::Index PROPERTY_INITIAL_AUTO_REPEATING_DELAY; ///< name "initial-auto-repeating-delay", @see SetInitialAutoRepeatingDelay(), type FLOAT
-  static const Property::Index PROPERTY_NEXT_AUTO_REPEATING_DELAY;    ///< name "next-auto-repeating-delay",    @see SetNextAutoRepeatingDelay(),    type FLOAT
-  static const Property::Index PROPERTY_TOGGLABLE;                    ///< name "togglable",                    @see SetTogglableButton(),           type BOOLEAN
-  static const Property::Index PROPERTY_SELECTED;                     ///< name "selected",                     @see SetSelected(),                  type BOOLEAN
-  static const Property::Index PROPERTY_NORMAL_STATE_ACTOR;           ///< name "normal-state-actor",           @see SetButtonImage(),               type MAP
-  static const Property::Index PROPERTY_SELECTED_STATE_ACTOR;         ///< name "selected-state-actor",         @see SetSelectedImage(),             type MAP
-  static const Property::Index PROPERTY_DISABLED_STATE_ACTOR;         ///< name "disabled-state-actor",         @see SetDisabledImage(),             type MAP
-  static const Property::Index PROPERTY_LABEL_ACTOR;                  ///< name "label-actor",                  @see SetLabel(),                     type MAP
+  static const Dali::Property::Index PROPERTY_DISABLED;                     ///< name "disabled",                     @see SetDisabled(),                  type BOOLEAN
+  static const Dali::Property::Index PROPERTY_AUTO_REPEATING;               ///< name "auto-repeating",               @see SetAutoRepeating(),             type BOOLEAN
+  static const Dali::Property::Index PROPERTY_INITIAL_AUTO_REPEATING_DELAY; ///< name "initial-auto-repeating-delay", @see SetInitialAutoRepeatingDelay(), type FLOAT
+  static const Dali::Property::Index PROPERTY_NEXT_AUTO_REPEATING_DELAY;    ///< name "next-auto-repeating-delay",    @see SetNextAutoRepeatingDelay(),    type FLOAT
+  static const Dali::Property::Index PROPERTY_TOGGLABLE;                    ///< name "togglable",                    @see SetTogglableButton(),           type BOOLEAN
+  static const Dali::Property::Index PROPERTY_SELECTED;                     ///< name "selected",                     @see SetSelected(),                  type BOOLEAN
+  static const Dali::Property::Index PROPERTY_NORMAL_STATE_ACTOR;           ///< name "normal-state-actor",           @see SetButtonImage(),               type MAP
+  static const Dali::Property::Index PROPERTY_SELECTED_STATE_ACTOR;         ///< name "selected-state-actor",         @see SetSelectedImage(),             type MAP
+  static const Dali::Property::Index PROPERTY_DISABLED_STATE_ACTOR;         ///< name "disabled-state-actor",         @see SetDisabledImage(),             type MAP
+  static const Dali::Property::Index PROPERTY_LABEL_ACTOR;                  ///< name "label-actor",                  @see SetLabel(),                     type MAP
 
 public:
 

@@ -21,7 +21,8 @@
 #include <dali/dali.h>
 
 // Toolkit
-
+#include <dali-toolkit/public-api/builder/builder.h>
+#include <dali-toolkit/public-api/builder/tree-node.h>
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 #include <dali-toolkit/public-api/controls/bloom-view/bloom-view.h>
 #include <dali-toolkit/public-api/controls/bubble-effect/bubble-emitter.h>
@@ -82,6 +83,9 @@
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>
+
+#include <dali-toolkit/public-api/scripting/script.h>
+#include <dali-toolkit/public-api/scripting/script-plugin.h>
 
 #include <dali-toolkit/public-api/shader-effects/alpha-discard-effect.h>
 #include <dali-toolkit/public-api/shader-effects/bendy-effect.h>

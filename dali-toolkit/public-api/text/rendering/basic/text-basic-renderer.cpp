@@ -137,7 +137,7 @@ struct AtlasHelper
     for( unsigned int i=0; i<mGlyphs.size(); ++i )
     {
       AtlasHelperGlyph& glyph = mGlyphs[i];
-      BitmapImage bitmap = mFontClient.CreateBitmap( glyph.fontId, glyph.index );
+      BufferImage bitmap = mFontClient.CreateBitmap( glyph.fontId, glyph.index );
       atlas.Upload( bitmap, glyph.xOffset, 0 );
 
       TextureCoordinates& coords = glyph.coords;
@@ -299,7 +299,6 @@ RenderableActor BasicRenderer::Render( Text::ViewInterface& view )
     MeshActor actor = MeshActor::New( mImpl->CreateMesh( glyphs, positions, atlas ) );
     actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
     actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
-    actor.SetAffectedByLighting( false );
 
     ShaderEffect shader = BasicShader::New();
     actor.SetShaderEffect( shader );

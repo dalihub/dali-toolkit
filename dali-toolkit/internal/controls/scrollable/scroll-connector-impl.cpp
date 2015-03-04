@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/object/property-index.h>
+#include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 
