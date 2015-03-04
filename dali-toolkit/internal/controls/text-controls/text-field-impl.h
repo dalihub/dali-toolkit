@@ -94,14 +94,9 @@ private: // From Control
   virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 
   /**
-   * @copydoc Control::OnTap()
+   * Received for single & double taps
    */
-  virtual void OnTap( const TapGesture& tap );
-
-  /**
-   * TODO - Fix TapGestureDetector to support single and double tap
-   */
-  void OnDoubleTap( Actor actor, const TapGesture& tap );
+  void OnTap( Actor actor, const TapGesture& tap );
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()

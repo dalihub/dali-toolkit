@@ -320,12 +320,9 @@ void TextField::OnInitialize()
   mController->EnableTextInput( mDecorator );
 
   // Forward input events to controller
-  EnableGestureDetection( Gesture::Tap );
-
-  // TODO - Fix TapGestureDetector to support single and double tap
   mDoubleTapDetector = TapGestureDetector::New();
-  mDoubleTapDetector.SetTapsRequired( 2 );
-  mDoubleTapDetector.DetectedSignal().Connect( this, &TextField::OnDoubleTap );
+  mDoubleTapDetector.SetMaximumTapsRequired( 2 );
+  mDoubleTapDetector.DetectedSignal().Connect( this, &TextField::OnTap );
   mDoubleTapDetector.Attach(Self());
 
   // Set BoundingBox to stage size if not already set.
@@ -372,14 +369,9 @@ void TextField::OnRelayout( const Vector2& size, ActorSizeContainer& container )
   }
 }
 
-void TextField::OnTap( const TapGesture& tap )
+void TextField::OnTap( Actor actor, const TapGesture& gesture )
 {
-  mController->TapEvent( tap.numberOfTaps, tap.localPoint.x, tap.localPoint.y );
-}
-
-void TextField::OnDoubleTap( Actor actor, const TapGesture& tap )
-{
-  mController->TapEvent( tap.numberOfTaps, tap.localPoint.x, tap.localPoint.y );
+  mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x, gesture.localPoint.y );
 }
 
 void TextField::RequestTextRelayout()
