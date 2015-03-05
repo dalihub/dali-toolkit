@@ -245,6 +245,31 @@ struct Controller::TextInput
   bool mDecoratorUpdated;
 };
 
+struct Controller::FontDefaults
+{
+  FontDefaults()
+  : mDefaultPointSize(0.0f),
+    mFontId(0u)
+  {
+  }
+
+  FontId GetFontId( TextAbstraction::FontClient& fontClient )
+  {
+    if( !mFontId )
+    {
+      Dali::TextAbstraction::PointSize26Dot6 pointSize = mDefaultPointSize*64;
+      mFontId = fontClient.GetFontId( mDefaultFontFamily, mDefaultFontStyle, pointSize );
+    }
+
+    return mFontId;
+  }
+
+  std::string mDefaultFontFamily;
+  std::string mDefaultFontStyle;
+  float mDefaultPointSize;
+  FontId mFontId;
+};
+
 struct Controller::Impl
 {
   Impl( ControlInterface& controlInterface )
@@ -252,6 +277,7 @@ struct Controller::Impl
     mNewText(),
     mOperations( NO_OPERATION ),
     mControlSize(),
+    mFontDefaults( NULL ),
     mTextInput( NULL )
   {
     mLogicalModel = LogicalModel::New();
@@ -284,6 +310,9 @@ struct Controller::Impl
 
   Size mControlSize;
 
+  // Avoid allocating this when the user does not specify a font
+  FontDefaults* mFontDefaults;
+
   // Avoid allocating everything for text input until EnableTextInput()
   Controller::TextInput* mTextInput;
 };
@@ -308,7 +337,7 @@ void Controller::SetText( const std::string& text )
   }
 }
 
-void Controller::GetText( std::string& text )
+void Controller::GetText( std::string& text ) const
 {
   if( !mImpl->mNewText.empty() )
   {
@@ -318,6 +347,72 @@ void Controller::GetText( std::string& text )
   {
     // TODO - Convert from UTF-32
   }
+}
+
+void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
+{
+  if( !mImpl->mFontDefaults )
+  {
+    mImpl->mFontDefaults = new Controller::FontDefaults();
+  }
+
+  mImpl->mFontDefaults->mDefaultFontFamily = defaultFontFamily;
+  mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
+  mImpl->mOperations = ALL_OPERATIONS;
+}
+
+const std::string& Controller::GetDefaultFontFamily() const
+{
+  if( mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->mDefaultFontFamily;
+  }
+
+  return Dali::String::EMPTY;
+}
+
+void Controller::SetDefaultFontStyle( const std::string& defaultFontStyle )
+{
+  if( !mImpl->mFontDefaults )
+  {
+    mImpl->mFontDefaults = new Controller::FontDefaults();
+  }
+
+  mImpl->mFontDefaults->mDefaultFontStyle = defaultFontStyle;
+  mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
+  mImpl->mOperations = ALL_OPERATIONS;
+}
+
+const std::string& Controller::GetDefaultFontStyle() const
+{
+  if( mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->mDefaultFontStyle;
+  }
+
+  return Dali::String::EMPTY;
+}
+
+void Controller::SetDefaultPointSize( float pointSize )
+{
+  if( !mImpl->mFontDefaults )
+  {
+    mImpl->mFontDefaults = new Controller::FontDefaults();
+  }
+
+  mImpl->mFontDefaults->mDefaultPointSize = pointSize;
+  mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
+  mImpl->mOperations = ALL_OPERATIONS;
+}
+
+float Controller::GetDefaultPointSize() const
+{
+  if( mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->mDefaultPointSize;
+  }
+
+  return 0.0f;
 }
 
 void Controller::EnableTextInput( DecoratorPtr decorator )
@@ -417,6 +512,12 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
 
   Vector<ScriptRun> scripts;
   Vector<FontRun> fonts;
+
+  if( mImpl->mFontDefaults )
+  {
+    // TODO - pass into ValidateFonts
+  }
+
   if( getScripts || validateFonts )
   {
     // Validates the fonts assigned by the application or assigns default ones.

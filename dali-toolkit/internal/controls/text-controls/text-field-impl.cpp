@@ -44,18 +44,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const Property::Index TextField::PROPERTY_RENDERING_BACKEND(       Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX );
-const Property::Index TextField::PROPERTY_PLACEHOLDER_TEXT(        Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 1 );
-const Property::Index TextField::PROPERTY_TEXT(                    Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 2 );
-const Property::Index TextField::PROPERTY_CURSOR_IMAGE(            Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 3 );
-const Property::Index TextField::PROPERTY_PRIMARY_CURSOR_COLOR(    Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 4 );
-const Property::Index TextField::PROPERTY_SECONDARY_CURSOR_COLOR(  Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 5 );
-const Property::Index TextField::PROPERTY_ENABLE_CURSOR_BLINK(     Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 6 );
-const Property::Index TextField::PROPERTY_CURSOR_BLINK_INTERVAL(   Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 7 );
-const Property::Index TextField::PROPERTY_CURSOR_BLINK_DURATION(   Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 8 );
-const Property::Index TextField::PROPERTY_GRAB_HANDLE_IMAGE(       Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 9 );
-const Property::Index TextField::PROPERTY_DECORATION_BOUNDING_BOX( Internal::TextField::TEXTFIELD_PROPERTY_START_INDEX + 10 );
-
 namespace Internal
 {
 
@@ -70,17 +58,26 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Toolkit::TextField), typeid(Toolkit::Control), Create );
 
-PropertyRegistration property01( mType, "rendering-backend",       Toolkit::TextField::PROPERTY_RENDERING_BACKEND,       Property::INTEGER,          &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property02( mType, "placeholder-text",        Toolkit::TextField::PROPERTY_PLACEHOLDER_TEXT,        Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property03( mType, "text",                    Toolkit::TextField::PROPERTY_TEXT,                    Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property04( mType, "cursor-image",            Toolkit::TextField::PROPERTY_CURSOR_IMAGE,            Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property05( mType, "primary-cursor-color",    Toolkit::TextField::PROPERTY_PRIMARY_CURSOR_COLOR,    Property::VECTOR4,          &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property06( mType, "secondary-cursor-color",  Toolkit::TextField::PROPERTY_SECONDARY_CURSOR_COLOR,  Property::VECTOR4,          &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property07( mType, "enable-cursor-blink",     Toolkit::TextField::PROPERTY_ENABLE_CURSOR_BLINK,     Property::BOOLEAN,          &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property08( mType, "cursor-blink-interval",   Toolkit::TextField::PROPERTY_CURSOR_BLINK_INTERVAL,   Property::FLOAT,            &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property09( mType, "cursor-blink-duration",   Toolkit::TextField::PROPERTY_CURSOR_BLINK_DURATION,   Property::FLOAT,            &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property10( mType, "grab-handle-image",       Toolkit::TextField::PROPERTY_GRAB_HANDLE_IMAGE,       Property::STRING,           &TextField::SetProperty, &TextField::GetProperty );
-PropertyRegistration property11( mType, "decoration bounding-box", Toolkit::TextField::PROPERTY_DECORATION_BOUNDING_BOX, Property::RECTANGLE,        &TextField::SetProperty, &TextField::GetProperty );
+// Setup properties, signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextField, Toolkit::Control, Create );
+
+DALI_PROPERTY_REGISTRATION( TextField, "rendering-backend",       INT,       RENDERING_BACKEND       )
+DALI_PROPERTY_REGISTRATION( TextField, "placeholder-text",        STRING,    PLACEHOLDER_TEXT        )
+DALI_PROPERTY_REGISTRATION( TextField, "text",                    STRING,    TEXT                    )
+DALI_PROPERTY_REGISTRATION( TextField, "font-family",             STRING,    FONT_FAMILY             )
+DALI_PROPERTY_REGISTRATION( TextField, "font-style",              STRING,    FONT_STYLE              )
+DALI_PROPERTY_REGISTRATION( TextField, "point-size",              FLOAT,     POINT_SIZE              )
+DALI_PROPERTY_REGISTRATION( TextField, "cursor-image",            STRING,    CURSOR_IMAGE            )
+DALI_PROPERTY_REGISTRATION( TextField, "primary-cursor-color",    VECTOR4,   PRIMARY_CURSOR_COLOR    )
+DALI_PROPERTY_REGISTRATION( TextField, "secondary-cursor-color",  VECTOR4,   SECONDARY_CURSOR_COLOR  )
+DALI_PROPERTY_REGISTRATION( TextField, "enable-cursor-blink",     BOOLEAN,   ENABLE_CURSOR_BLINK     )
+DALI_PROPERTY_REGISTRATION( TextField, "cursor-blink-interval",   FLOAT,     CURSOR_BLINK_INTERVAL   )
+DALI_PROPERTY_REGISTRATION( TextField, "cursor-blink-duration",   FLOAT,     CURSOR_BLINK_DURATION   )
+DALI_PROPERTY_REGISTRATION( TextField, "grab-handle-image",       STRING,    GRAB_HANDLE_IMAGE       )
+DALI_PROPERTY_REGISTRATION( TextField, "decoration bounding-box", RECTANGLE, DECORATION_BOUNDING_BOX )
+
+DALI_TYPE_REGISTRATION_END()
+
 } // namespace
 
 Toolkit::TextField TextField::New()

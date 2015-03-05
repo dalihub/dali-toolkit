@@ -41,15 +41,30 @@ class DALI_IMPORT_API TextLabel : public Control
 {
 public:
 
-  // Property indices
-  static const Dali::Property::Index PROPERTY_RENDERING_BACKEND; ///< name "rendering-backend", type INT
-  static const Dali::Property::Index PROPERTY_TEXT;              ///< name "text", type STRING
-  static const Dali::Property::Index PROPERTY_MULTI_LINE;        ///< name "multi-line", type BOOLEAN
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+  };
 
-  // Property names
-  static const std::string RENDERING_BACKEND_PROPERTY_NAME; ///< Property, name "rendering-backend", type INT
-  static const std::string TEXT_PROPERTY_NAME;              ///< Property, name "text", type STRING
-  static const std::string MULTI_LINE_PROPERTY_NAME;        ///< Property, name "multi-line", type BOOLEAN
+  /**
+   * @brief An enumeration of properties belonging to the TextLabel class.
+   */
+  struct Property
+  {
+    enum
+    {
+      PROPERTY_RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "rendering-backend", The type or rendering e.g. bitmap-based,      type INT
+      PROPERTY_TEXT,                                     ///< name "text",              The text to display in UTF-8 format,          type STRING
+      PROPERTY_FONT_FAMILY,                              ///< name "font-family",       The requested font family,                    type STRING
+      PROPERTY_FONT_STYLE,                               ///< name "font-style",        The requested font style e.g. Regular/Italic, type STRING
+      PROPERTY_POINT_SIZE,                               ///< name "point-size",        The size of font in points,                   type FLOAT
+      PROPERTY_MULTI_LINE,                               ///< name "multi-line",        The single-line or multi-line layout option,  type BOOLEAN
+    };
+  };
 
   /**
    * Create the TextLabel control.

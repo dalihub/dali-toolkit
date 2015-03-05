@@ -42,10 +42,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const Property::Index TextLabel::PROPERTY_RENDERING_BACKEND( Internal::TextLabel::TEXTLABEL_PROPERTY_START_INDEX );
-const Property::Index TextLabel::PROPERTY_TEXT(              Internal::TextLabel::TEXTLABEL_PROPERTY_START_INDEX + 1 );
-const Property::Index TextLabel::PROPERTY_MULTI_LINE(        Internal::TextLabel::TEXTLABEL_PROPERTY_START_INDEX + 2 );
-
 namespace Internal
 {
 
@@ -58,11 +54,17 @@ BaseHandle Create()
   return Toolkit::TextLabel::New();
 }
 
-TypeRegistration mType( typeid(Toolkit::TextLabel), typeid(Toolkit::Control), Create );
+// Setup properties, signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextLabel, Toolkit::Control, Create );
 
-PropertyRegistration property1( mType, "rendering-backend", Toolkit::TextLabel::PROPERTY_RENDERING_BACKEND, Property::INTEGER,          &TextLabel::SetProperty, &TextLabel::GetProperty );
-PropertyRegistration property2( mType, "text",              Toolkit::TextLabel::PROPERTY_TEXT,              Property::STRING,           &TextLabel::SetProperty, &TextLabel::GetProperty );
-PropertyRegistration property3( mType, "multi-line",        Toolkit::TextLabel::PROPERTY_MULTI_LINE,        Property::STRING,           &TextLabel::SetProperty, &TextLabel::GetProperty );
+DALI_PROPERTY_REGISTRATION( TextLabel, "rendering-backend", INT,     RENDERING_BACKEND )
+DALI_PROPERTY_REGISTRATION( TextLabel, "text",              STRING,  TEXT              )
+DALI_PROPERTY_REGISTRATION( TextLabel, "font-family",       STRING,  FONT_FAMILY       )
+DALI_PROPERTY_REGISTRATION( TextLabel, "font-style",        STRING,  FONT_STYLE        )
+DALI_PROPERTY_REGISTRATION( TextLabel, "point-size",        FLOAT,   POINT_SIZE        )
+DALI_PROPERTY_REGISTRATION( TextLabel, "multi-line",        BOOLEAN, MULTI_LINE        )
+
+DALI_TYPE_REGISTRATION_END()
 
 } // namespace
 
@@ -107,6 +109,49 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mController )
         {
           impl.mController->SetText( value.Get< std::string >() );
+          impl.RequestTextRelayout();
+        }
+        break;
+      }
+      case Toolkit::TextLabel::PROPERTY_FONT_FAMILY:
+      {
+        if( impl.mController )
+        {
+          std::string fontFamily = value.Get< std::string >();
+
+          if( impl.mController->GetDefaultFontFamily() != fontFamily )
+          {
+            impl.mController->SetDefaultFontFamily( fontFamily );
+            impl.RequestTextRelayout();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextLabel::PROPERTY_FONT_STYLE:
+      {
+        if( impl.mController )
+        {
+          std::string fontStyle = value.Get< std::string >();
+
+          if( impl.mController->GetDefaultFontStyle() != fontStyle )
+          {
+            impl.mController->SetDefaultFontStyle( fontStyle );
+            impl.RequestTextRelayout();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextLabel::PROPERTY_POINT_SIZE:
+      {
+        if( impl.mController )
+        {
+          float pointSize = value.Get< float >();
+
+          if( impl.mController->GetDefaultPointSize() != pointSize /*TODO - epsilon*/ )
+          {
+            impl.mController->SetDefaultPointSize( pointSize );
+            impl.RequestTextRelayout();
+          }
         }
         break;
       }
@@ -114,9 +159,14 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
+          LayoutEngine& engine = impl.mController->GetLayoutEngine();
           LayoutEngine::Layout layout = value.Get< bool >() ? LayoutEngine::MULTI_LINE_BOX : LayoutEngine::SINGLE_LINE_BOX;
-          impl.mController->GetLayoutEngine().SetLayout( layout );
-          impl.RequestTextRelayout();
+
+          if( engine.GetLayout() != layout )
+          {
+            impl.mController->GetLayoutEngine().SetLayout( layout );
+            impl.RequestTextRelayout();
+          }
         }
         break;
       }
@@ -140,7 +190,6 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         value = impl.mRenderingBackend;
         break;
       }
-
       case Toolkit::TextLabel::PROPERTY_TEXT:
       {
         if( impl.mController )
@@ -153,7 +202,6 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         DALI_LOG_WARNING( "UTF-8 text representation was discarded\n" );
         break;
       }
-
       case Toolkit::TextLabel::PROPERTY_MULTI_LINE:
       {
         if( impl.mController )

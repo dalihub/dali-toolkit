@@ -27,10 +27,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const std::string TextLabel::RENDERING_BACKEND_PROPERTY_NAME("rendering-backend");
-const std::string TextLabel::TEXT_PROPERTY_NAME("text");
-const std::string TextLabel::MULTI_LINE_PROPERTY_NAME("multi-line");
-
 TextLabel TextLabel::New()
 {
   return Internal::TextLabel::New();

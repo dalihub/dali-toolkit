@@ -27,18 +27,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const std::string TextField::RENDERING_BACKEND_PROPERTY_NAME("rendering-backend");
-const std::string TextField::PLACEHOLDER_TEXT_PROPERTY_NAME("placeholder-text");
-const std::string TextField::TEXT_PROPERTY_NAME("text");
-const std::string TextField::CURSOR_IMAGE_PROPERTY_NAME("cursor-image");
-const std::string TextField::PRIMARY_CURSOR_COLOR_PROPERTY_NAME("primary-cursor-color");
-const std::string TextField::SECONDARY_CURSOR_COLOR_PROPERTY_NAME("secondary-cursor-color");
-const std::string TextField::ENABLE_CURSOR_BLINK_PROPERTY_NAME("enable-cursor-blink");
-const std::string TextField::CURSOR_BLINK_INTERVAL_PROPERTY_NAME("cursor-blink-interval");
-const std::string TextField::CURSOR_BLINK_DURATION_PROPERTY_NAME("cursor-blink-duration");
-const std::string TextField::GRAB_HANDLE_IMAGE_PROPERTY_NAME("grab-handle-image");
-const std::string TextField::DECORATION_BOUNDING_BOX("decoration-bounding-box");
-
 TextField TextField::New()
 {
   return Internal::TextField::New();

@@ -39,31 +39,38 @@ class DALI_IMPORT_API TextField : public Control
 {
 public:
 
-  // Property indices
-  static const Dali::Property::Index PROPERTY_RENDERING_BACKEND;       ///< name "rendering-backend",       type INT
-  static const Dali::Property::Index PROPERTY_PLACEHOLDER_TEXT;        ///< name "placeholder-text",        type STRING
-  static const Dali::Property::Index PROPERTY_TEXT;                    ///< name "text",                    type STRING
-  static const Dali::Property::Index PROPERTY_CURSOR_IMAGE;            ///< name "cursor-image",            type STRING
-  static const Dali::Property::Index PROPERTY_PRIMARY_CURSOR_COLOR;    ///< name "primary-cursor-color",    type VECTOR4
-  static const Dali::Property::Index PROPERTY_SECONDARY_CURSOR_COLOR;  ///< name "secondary-cursor-color",  type VECTOR4
-  static const Dali::Property::Index PROPERTY_ENABLE_CURSOR_BLINK;     ///< name "enable-cursor-blink",     type BOOLEAN
-  static const Dali::Property::Index PROPERTY_CURSOR_BLINK_INTERVAL;   ///< name "cursor-blink-interval",   type FLOAT
-  static const Dali::Property::Index PROPERTY_CURSOR_BLINK_DURATION;   ///< name "cursor-blink-duration",   type FLOAT
-  static const Dali::Property::Index PROPERTY_GRAB_HANDLE_IMAGE;       ///< name "grab-handle-image",       type STRING
-  static const Dali::Property::Index PROPERTY_DECORATION_BOUNDING_BOX; ///< name "decoration-bounding-box", type RECTANGLE
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+  };
 
-  // Property names
-  static const std::string RENDERING_BACKEND_PROPERTY_NAME;      ///< Property, name "rendering-backend",       type INT
-  static const std::string PLACEHOLDER_TEXT_PROPERTY_NAME;       ///< Property, name "placeholder-text",        type STRING
-  static const std::string TEXT_PROPERTY_NAME;                   ///< Property, name "text",                    type STRING
-  static const std::string CURSOR_IMAGE_PROPERTY_NAME;           ///< Property, name "cursor-image",            type STRING
-  static const std::string PRIMARY_CURSOR_COLOR_PROPERTY_NAME;   ///< Property, name "primary-cursor-color",    type VECTOR4
-  static const std::string SECONDARY_CURSOR_COLOR_PROPERTY_NAME; ///< Property, name "secondary-cursor-color",  type VECTOR4
-  static const std::string ENABLE_CURSOR_BLINK_PROPERTY_NAME;    ///< Property, name "enable-cursor-blink",     type BOOLEAN
-  static const std::string CURSOR_BLINK_INTERVAL_PROPERTY_NAME;  ///< Property, name "cursor-blink-interval",   type FLOAT
-  static const std::string CURSOR_BLINK_DURATION_PROPERTY_NAME;  ///< Property, name "cursor-blink-duration",   type FLOAT
-  static const std::string GRAB_HANDLE_IMAGE_PROPERTY_NAME;      ///< Property, name "grab-handle-image",       type STRING
-  static const std::string DECORATION_BOUNDING_BOX;              ///< Property, name "decoration-bounding-box", type RECTANGLE
+  /**
+   * @brief An enumeration of properties belonging to the TextLabel class.
+   */
+  struct Property
+  {
+    enum
+    {
+      PROPERTY_RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "rendering-backend",       The type or rendering e.g. bitmap-based,                                  type INT
+      PROPERTY_PLACEHOLDER_TEXT,                         ///< name "placeholder-text",        The text to display when the TextField is empty,                          type STRING
+      PROPERTY_TEXT,                                     ///< name "text",                    The text to display in UTF-8 format,                                      type STRING
+      PROPERTY_FONT_FAMILY,                              ///< name "font-family",             The requested font family,                                                type STRING
+      PROPERTY_FONT_STYLE,                               ///< name "font-style",              The requested font style e.g. Regular/Italic,                             type STRING
+      PROPERTY_POINT_SIZE,                               ///< name "point-size",              The size of font in points,                                               type FLOAT
+      PROPERTY_CURSOR_IMAGE,                             ///< name "cursor-image",            The image to display for cursors,                                         type STRING
+      PROPERTY_PRIMARY_CURSOR_COLOR,                     ///< name "primary-cursor-color",    The color to apply to the primary cursor,                                 type VECTOR4
+      PROPERTY_SECONDARY_CURSOR_COLOR,                   ///< name "secondary-cursor-color",  The color to apply to the secondary cursor,                               type VECTOR4
+      PROPERTY_ENABLE_CURSOR_BLINK,                      ///< name "enable-cursor-blink",     Whether the cursor should blink or not,                                   type BOOLEAN
+      PROPERTY_CURSOR_BLINK_INTERVAL,                    ///< name "cursor-blink-interval",   The time interval between cursor on/off states,                           type FLOAT
+      PROPERTY_CURSOR_BLINK_DURATION,                    ///< name "cursor-blink-duration",   The cursor will stop blinking after this duration (if non-zero),          type FLOAT
+      PROPERTY_GRAB_HANDLE_IMAGE,                        ///< name "grab-handle-image",       The image to display for grab handle,                                     type STRING
+      PROPERTY_DECORATION_BOUNDING_BOX                   ///< name "decoration-bounding-box", The decorations (handles etc) will positioned within this area on-screen, type RECTANGLE
+    };
+  };
 
   /**
    * Create the TextField control.

@@ -103,7 +103,49 @@ public:
    *
    * @return A string of UTF-8 characters.
    */
-  void GetText( std::string& text );
+  void GetText( std::string& text ) const;
+
+  /**
+   * @brief Set the default font family.
+   *
+   * @param[in] defaultFontFamily The default font family.
+   */
+  void SetDefaultFontFamily( const std::string& defaultFontFamily );
+
+  /**
+   * @brief Retrieve the default font family.
+   *
+   * @return The default font family.
+   */
+   const std::string& GetDefaultFontFamily() const;
+
+  /**
+   * @brief Set the default font style.
+   *
+   * @param[in] defaultFontStyle The default font style.
+   */
+  void SetDefaultFontStyle( const std::string& defaultFontStyle );
+
+  /**
+   * @brief Retrieve the default font style.
+   *
+   * @return The default font style.
+   */
+   const std::string& GetDefaultFontStyle() const;
+
+  /**
+   * @brief Set the default point size.
+   *
+   * @param[in] defaultFontStyle The default point size.
+   */
+  void SetDefaultPointSize( float pointSize );
+
+  /**
+   * @brief Retrieve the default point size.
+   *
+   * @return The default point size.
+   */
+   float GetDefaultPointSize() const;
 
   /**
    * @brief Called to enable text input.
@@ -208,6 +250,9 @@ private:
 
   struct Impl;
   Impl* mImpl;
+
+  // Avoid allocating this when the user does not specify a font
+  struct FontDefaults;
 
   // Avoid allocating this for non-editable controls
   struct TextInput;
