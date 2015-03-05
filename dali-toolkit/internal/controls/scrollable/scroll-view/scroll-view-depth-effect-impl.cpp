@@ -336,24 +336,24 @@ void ApplyScrollDepthConstraints(Toolkit::ScrollView scrollView,
                                  float scaleExtent)
 {
   // Scale Constraint
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Scale,
-                                         LocalSource(Actor::Property::Position),
-                                         ParentSource(Actor::Property::Position),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::SCALE,
+                                         LocalSource(Actor::Property::POSITION),
+                                         ParentSource(Actor::Property::POSITION),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
-                                         Source(scrollView, Actor::Property::Size ),
+                                         Source(scrollView, Actor::Property::SIZE ),
                                          ScrollDepthScaleConstraint( positionExtent, offsetExtent, positionScale, scaleExtent ) );
   constraint.SetRemoveAction( Constraint::Discard );
   child.ApplyConstraint( constraint );
 
   // Position Constraint (apply last as other constraints use Actor::POSITION as a function input)
-  constraint = Constraint::New<Vector3>( Actor::Property::Position,
-                                         ParentSource(Actor::Property::Position),
+  constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
+                                         ParentSource(Actor::Property::POSITION),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
-                                         Source(scrollView, Actor::Property::Size ),
+                                         Source(scrollView, Actor::Property::SIZE ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME ) ),
                                          ScrollDepthPositionConstraint( positionExtent, offsetExtent, positionScale ) );
 

@@ -192,7 +192,7 @@ void Magnifier::Initialize()
   mSourceActor = Actor::New();
   Stage().GetCurrent().Add(mSourceActor);
   mSourceActor.SetParentOrigin(ParentOrigin::CENTER);
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
                                                     Source( self, mPropertySourcePosition ),
                                                     EqualToConstraint() );
   mSourceActor.ApplyConstraint(constraint);
@@ -224,23 +224,23 @@ void Magnifier::Initialize()
   // at the end of the update cycle i.e. after constraints have been applied.)
   //Property::Index propertySourcePositionDelayed = mCameraActor.RegisterProperty("delayed-source-position", Vector3::ZERO);
 
-  constraint = Constraint::New<Vector3>( Actor::Property::Position,
-                                         Source( mSourceActor, Actor::Property::WorldPosition ),
+  constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
+                                         Source( mSourceActor, Actor::Property::WORLD_POSITION ),
                                          CameraActorPositionConstraint(stageSize, mDefaultCameraDistance) );
   mCameraActor.ApplyConstraint(constraint);
 
   // Apply constraint to render-task viewport position
-  constraint = Constraint::New<Vector2>( RenderTask::Property::ViewportPosition,
-                                         Source( self, Actor::Property::WorldPosition ),//mPropertySourcePosition ),
-                                         Source( self, Actor::Property::Size ),
-                                         Source( self, Actor::Property::WorldScale ),
+  constraint = Constraint::New<Vector2>( RenderTask::Property::VIEWPORT_POSITION,
+                                         Source( self, Actor::Property::WORLD_POSITION ),//mPropertySourcePosition ),
+                                         Source( self, Actor::Property::SIZE ),
+                                         Source( self, Actor::Property::WORLD_SCALE ),
                                          RenderTaskViewportPositionConstraint(stageSize) );
   mTask.ApplyConstraint(constraint);
 
   // Apply constraint to render-task viewport position
-  constraint = Constraint::New<Vector2>( RenderTask::Property::ViewportSize,
-                                         Source( self, Actor::Property::Size ),
-                                         Source( self, Actor::Property::WorldScale ),
+  constraint = Constraint::New<Vector2>( RenderTask::Property::VIEWPORT_SIZE,
+                                         Source( self, Actor::Property::SIZE ),
+                                         Source( self, Actor::Property::WORLD_SCALE ),
                                          RenderTaskViewportSizeConstraint() );
   mTask.ApplyConstraint(constraint);
 }
@@ -289,8 +289,8 @@ void Magnifier::SetFrameVisibility(bool visible)
     mFrame.SetPositionInheritanceMode(DONT_INHERIT_POSITION);
     mFrame.SetInheritScale(true);
 
-    Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
-                                                      ParentSource( Actor::Property::WorldPosition ),
+    Constraint constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
+                                                      ParentSource( Actor::Property::WORLD_POSITION ),
                                                       EqualToConstraint() );
     mFrame.ApplyConstraint( constraint );
 
