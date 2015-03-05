@@ -370,6 +370,20 @@ bool TestPlatformAbstraction::LoadFile( const std::string& filename, std::vector
 }
 
 /**
+ * @copydoc PlatformAbstraction::LoadShaderBinFile()
+ */
+bool TestPlatformAbstraction::LoadShaderBinFile( const std::string& filename, std::vector< unsigned char >& buffer ) const
+{
+  mTrace.PushCall("LoadShaderBinFile", "");
+  if( mLoadFileResult.loadResult )
+  {
+    buffer = mLoadFileResult.buffer;
+  }
+
+  return mLoadFileResult.loadResult;
+}
+
+/**
  * @copydoc PlatformAbstraction::SaveFile()
  */
 bool TestPlatformAbstraction::SaveFile(const std::string& filename, std::vector< unsigned char >& buffer) const
@@ -498,6 +512,7 @@ bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
     case LoadResourceFunc:                    return mTrace.FindMethod("LoadResource");
     case SaveResourceFunc:                    return mTrace.FindMethod("SaveResource");
     case LoadFileFunc:                        return mTrace.FindMethod("LoadFile");
+    case LoadShaderBinFileFunc:               return mTrace.FindMethod("LoadShaderBinFile");
     case SaveFileFunc:                        return mTrace.FindMethod("SaveFile");
     case CancelLoadFunc:                      return mTrace.FindMethod("CancelLoad");
     case GetResourcesFunc:                    return mTrace.FindMethod("GetResources");
