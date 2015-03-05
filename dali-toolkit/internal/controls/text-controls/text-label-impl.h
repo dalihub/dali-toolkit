@@ -21,8 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
-#include <dali-toolkit/public-api/text/text-controller.h>
-#include <dali-toolkit/public-api/text/rendering/text-renderer.h>
+#include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/rendering/text-renderer.h>
 
 namespace Dali
 {

@@ -25,8 +25,8 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/layouts/layout-engine.h>
-#include <dali-toolkit/public-api/text/rendering/text-backend.h>
+#include <dali-toolkit/internal/text/layouts/layout-engine.h>
+#include <dali-toolkit/internal/text/rendering/text-backend.h>
 
 using namespace Dali::Toolkit::Text;
 

@@ -94,24 +94,6 @@ public_api_src_files = \
   $(public_api_src_dir)/shader-effects/swirl-effect.cpp \
   $(public_api_src_dir)/shader-effects/water-effect.cpp \
   $(public_api_src_dir)/styling/style-manager.cpp \
-  $(public_api_src_dir)/text/bidirectional-support.cpp \
-  $(public_api_src_dir)/text/character-set-conversion.cpp \
-  $(public_api_src_dir)/text/logical-model.cpp \
-  $(public_api_src_dir)/text/multi-language-support.cpp \
-  $(public_api_src_dir)/text/text-script.cpp \
-  $(public_api_src_dir)/text/segmentation.cpp \
-  $(public_api_src_dir)/text/shaper.cpp \
-  $(public_api_src_dir)/text/text-control-interface.cpp \
-  $(public_api_src_dir)/text/text-controller.cpp \
-  $(public_api_src_dir)/text/text-view.cpp \
-  $(public_api_src_dir)/text/text-view-interface.cpp \
-  $(public_api_src_dir)/text/visual-model.cpp \
-  $(public_api_src_dir)/text/decorator/text-decorator.cpp \
-  $(public_api_src_dir)/text/layouts/layout-engine.cpp \
-  $(public_api_src_dir)/text/rendering/text-backend.cpp \
-  $(public_api_src_dir)/text/rendering/text-renderer.cpp \
-  $(public_api_src_dir)/text/rendering/basic/text-basic-renderer.cpp \
-  $(public_api_src_dir)/text/rendering/shaders/text-basic-shader.cpp \
   $(public_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
   $(public_api_src_dir)/transition-effects/cube-transition-effect.cpp \
   $(public_api_src_dir)/transition-effects/cube-transition-fold-effect.cpp \
@@ -227,49 +209,6 @@ public_api_table_view_header_files = \
 public_api_text_controls_header_files = \
   $(public_api_src_dir)/controls/text-controls/text-label.h \
   $(public_api_src_dir)/controls/text-controls/text-field.h
-
-public_api_text_header_files = \
-  $(public_api_src_dir)/text/bidirectional-line-info-run.h \
-  $(public_api_src_dir)/text/bidirectional-paragraph-info-run.h \
-  $(public_api_src_dir)/text/bidirectional-support.h \
-  $(public_api_src_dir)/text/character-run.h \
-  $(public_api_src_dir)/text/character-set-conversion.h \
-  $(public_api_src_dir)/text/font-run.h \
-  $(public_api_src_dir)/text/line-run.h \
-  $(public_api_src_dir)/text/logical-model.h \
-  $(public_api_src_dir)/text/multi-language-support.h \
-  $(public_api_src_dir)/text/script.h \
-  $(public_api_src_dir)/text/script-run.h \
-  $(public_api_src_dir)/text/segmentation.h \
-  $(public_api_src_dir)/text/shaper.h \
-  $(public_api_src_dir)/text/text-control-interface.h \
-  $(public_api_src_dir)/text/text-controller.h \
-  $(public_api_src_dir)/text/text-definitions.h \
-  $(public_api_src_dir)/text/text-view.h \
-  $(public_api_src_dir)/text/text-view-interface.h \
-  $(public_api_src_dir)/text/visual-model.h
-
-public_api_text_decorator_header_files = \
-  $(public_api_src_dir)/text/decorator/text-decorator.h
-
-public_api_text_layouts_header_files = \
-  $(public_api_src_dir)/text/layouts/layout-engine.h
-
-public_api_text_rendering_header_files = \
-  $(public_api_src_dir)/text/rendering/text-backend.h \
-  $(public_api_src_dir)/text/rendering/text-renderer.h
-
-public_api_text_rendering_basic_header_files = \
-  $(public_api_src_dir)/text/rendering/basic/text-basic-renderer.h
-
-public_api_text_rendering_shaders_header_files = \
-  $(public_api_src_dir)/text/rendering/shaders/text-basic-shader.h
-
-public_api_text_input_header_files = \
-  $(public_api_src_dir)/controls/text-input/text-input.h
-
-public_api_text_view_header_files = \
-  $(public_api_src_dir)/controls/text-view/text-view.h
 
 public_api_tool_bar_header_files = \
   $(public_api_src_dir)/controls/tool-bar/tool-bar.h

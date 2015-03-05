@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/multi-language-support.h>
+#include <dali-toolkit/internal/text/multi-language-support.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>

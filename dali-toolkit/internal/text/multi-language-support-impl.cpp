@@ -25,10 +25,10 @@
 #include <dali/public-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/logical-model.h>
-#include <dali-toolkit/public-api/text/font-run.h>
-#include <dali-toolkit/public-api/text/script.h>
-#include <dali-toolkit/public-api/text/script-run.h>
+#include <dali-toolkit/internal/text/logical-model.h>
+#include <dali-toolkit/internal/text/font-run.h>
+#include <dali-toolkit/internal/text/script.h>
+#include <dali-toolkit/internal/text/script-run.h>
 
 namespace Dali
 {

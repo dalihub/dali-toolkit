@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
-#include <dali-toolkit/public-api/text/rendering/text-renderer.h>
 
 namespace Dali
 {

@@ -73,8 +73,26 @@ toolkit_src_files = \
    $(toolkit_src_dir)/shader-effects/page-turn-effect-impl.cpp \
    $(toolkit_src_dir)/shader-effects/water-effect-impl.cpp \
    $(toolkit_src_dir)/styling/style-manager-impl.cpp \
-   $(toolkit_src_dir)/text/rendering/text-backend-impl.cpp \
+   $(toolkit_src_dir)/text/bidirectional-support.cpp \
+   $(toolkit_src_dir)/text/character-set-conversion.cpp \
+   $(toolkit_src_dir)/text/logical-model.cpp \
+   $(toolkit_src_dir)/text/multi-language-support.cpp \
+   $(toolkit_src_dir)/text/text-script.cpp \
+   $(toolkit_src_dir)/text/segmentation.cpp \
+   $(toolkit_src_dir)/text/shaper.cpp \
+   $(toolkit_src_dir)/text/text-control-interface.cpp \
+   $(toolkit_src_dir)/text/text-controller.cpp \
+   $(toolkit_src_dir)/text/text-view.cpp \
+   $(toolkit_src_dir)/text/text-view-interface.cpp \
+   $(toolkit_src_dir)/text/visual-model.cpp \
+   $(toolkit_src_dir)/text/decorator/text-decorator.cpp \
+   $(toolkit_src_dir)/text/layouts/layout-engine.cpp \
    $(toolkit_src_dir)/text/multi-language-support-impl.cpp \
+   $(toolkit_src_dir)/text/rendering/text-backend.cpp \
+   $(toolkit_src_dir)/text/rendering/text-renderer.cpp \
+   $(toolkit_src_dir)/text/rendering/basic/text-basic-renderer.cpp \
+   $(toolkit_src_dir)/text/rendering/shaders/text-basic-shader.cpp \
+   $(toolkit_src_dir)/text/rendering/text-backend-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-cross-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-fold-effect-impl.cpp \

@@ -23,7 +23,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/rendering/basic/text-basic-renderer.h>
+#include <dali-toolkit/internal/text/rendering/basic/text-basic-renderer.h>
 
 namespace Dali
 {

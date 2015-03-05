@@ -118,30 +118,6 @@
 #include <dali-toolkit/public-api/shader-effects/ripple2d-effect.h>
 #include <dali-toolkit/public-api/shader-effects/swirl-effect.h>
 
-#include <dali-toolkit/public-api/text/bidirectional-line-info-run.h>
-#include <dali-toolkit/public-api/text/bidirectional-paragraph-info-run.h>
-#include <dali-toolkit/public-api/text/bidirectional-support.h>
-#include <dali-toolkit/public-api/text/character-run.h>
-#include <dali-toolkit/public-api/text/character-set-conversion.h>
-#include <dali-toolkit/public-api/text/font-run.h>
-#include <dali-toolkit/public-api/text/line-run.h>
-#include <dali-toolkit/public-api/text/logical-model.h>
-#include <dali-toolkit/public-api/text/multi-language-support.h>
-#include <dali-toolkit/public-api/text/script.h>
-#include <dali-toolkit/public-api/text/script-run.h>
-#include <dali-toolkit/public-api/text/segmentation.h>
-#include <dali-toolkit/public-api/text/shaper.h>
-#include <dali-toolkit/public-api/text/text-controller.h>
-#include <dali-toolkit/public-api/text/text-definitions.h>
-#include <dali-toolkit/public-api/text/text-view.h>
-#include <dali-toolkit/public-api/text/text-view-interface.h>
-#include <dali-toolkit/public-api/text/visual-model.h>
-#include <dali-toolkit/public-api/text/decorator/text-decorator.h>
-#include <dali-toolkit/public-api/text/layouts/layout-engine.h>
-#include <dali-toolkit/public-api/text/rendering/text-renderer.h>
-#include <dali-toolkit/public-api/text/rendering/basic/text-basic-renderer.h>
-#include <dali-toolkit/public-api/text/rendering/shaders/text-basic-shader.h>
-
 #include <dali-toolkit/public-api/transition-effects/cube-transition-effect.h>
 #include <dali-toolkit/public-api/transition-effects/cube-transition-wave-effect.h>
 #include <dali-toolkit/public-api/transition-effects/cube-transition-cross-effect.h>

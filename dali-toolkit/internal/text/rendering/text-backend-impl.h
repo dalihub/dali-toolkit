@@ -22,7 +22,7 @@
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/text/rendering/text-backend.h>
+#include <dali-toolkit/internal/text/rendering/text-backend.h>
 
 namespace Dali
 {
