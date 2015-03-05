@@ -97,6 +97,13 @@ public:
   void SetText( const std::string& text );
 
   /**
+   * @brief Retrieve any text previously set.
+   *
+   * @return A string of UTF-8 characters.
+   */
+  void GetText( std::string& text );
+
+  /**
    * @brief Called to enable text input.
    *
    * @note Only selectable or editable controls should calls this.

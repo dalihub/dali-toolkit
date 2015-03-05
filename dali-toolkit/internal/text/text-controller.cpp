@@ -307,6 +307,18 @@ void Controller::SetText( const std::string& text )
   }
 }
 
+void Controller::GetText( std::string& text )
+{
+  if( !mImpl->mNewText.empty() )
+  {
+    text = mImpl->mNewText;
+  }
+  else
+  {
+    // TODO - Convert from UTF-32
+  }
+}
+
 void Controller::EnableTextInput( DecoratorPtr decorator )
 {
   if( !mImpl->mTextInput )
@@ -480,6 +492,9 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
 
 Vector3 Controller::GetNaturalSize()
 {
+  // TODO - Finish implementing
+  return Vector3::ZERO;
+
   // Operations that can be done only once until the text changes.
   const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32 |
                                                                          GET_SCRIPTS      |

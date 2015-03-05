@@ -98,6 +98,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         {
           impl.mRenderingBackend = static_cast< unsigned int >( backend );
           impl.mRenderer.Reset();
+          impl.RequestTextRelayout();
         }
         break;
       }
@@ -115,6 +116,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         {
           LayoutEngine::Layout layout = value.Get< bool >() ? LayoutEngine::MULTI_LINE_BOX : LayoutEngine::SINGLE_LINE_BOX;
           impl.mController->GetLayoutEngine().SetLayout( layout );
+          impl.RequestTextRelayout();
         }
         break;
       }
@@ -141,6 +143,13 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
 
       case Toolkit::TextLabel::PROPERTY_TEXT:
       {
+        if( impl.mController )
+        {
+          std::string text;
+          impl.mController->GetText( text );
+          value = text;
+        }
+
         DALI_LOG_WARNING( "UTF-8 text representation was discarded\n" );
         break;
       }
@@ -149,7 +158,7 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          value = impl.mController->GetLayoutEngine().GetLayout();
+          value = static_cast<bool>( LayoutEngine::MULTI_LINE_BOX == impl.mController->GetLayoutEngine().GetLayout() );
         }
         break;
       }
@@ -176,21 +185,30 @@ float TextLabel::GetHeightForWidth( float width )
 
 void TextLabel::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
-  if( mController->Relayout( size ) )
+  if( mController->Relayout( size ) ||
+      !mRenderer )
   {
     if( !mRenderer )
     {
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
 
+    RenderableActor renderableActor;
     if( mRenderer )
     {
-      Actor renderableActor = mRenderer->Render( mController->GetView() );
+      renderableActor = mRenderer->Render( mController->GetView() );
+    }
+
+    if( renderableActor != mRenderableActor )
+    {
+      UnparentAndReset( mRenderableActor );
 
       if( renderableActor )
       {
         Self().Add( renderableActor );
       }
+
+      mRenderableActor = renderableActor;
     }
   }
 }
