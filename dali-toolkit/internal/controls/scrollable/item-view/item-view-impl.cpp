@@ -378,7 +378,7 @@ void ItemView::OnInitialize()
                                                    LocalSource(mPropertyPosition),
                                                    LocalSource(mPropertyPositionMin),
                                                    LocalSource(mPropertyPositionMax),
-                                                   LocalSource(Actor::Property::Size),
+                                                   LocalSource(Actor::Property::SIZE),
                                                    RelativePositionConstraint);
   self.ApplyConstraint(constraint);
 
@@ -1569,28 +1569,28 @@ void ItemView::SetOvershootEnabled( bool enable )
     mOvershootOverlay.SetDrawMode(DrawMode::OVERLAY);
     self.Add(mOvershootOverlay);
 
-    Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size,
+    Constraint constraint = Constraint::New<Vector3>( Actor::Property::SIZE,
                                                       ParentSource( mPropertyScrollDirection ),
                                                       Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
-                                                      ParentSource( Actor::Property::Size ),
+                                                      ParentSource( Actor::Property::SIZE ),
                                                       OvershootOverlaySizeConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
     mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.width, OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height);
 
-    constraint = Constraint::New<Quaternion>( Actor::Property::Rotation,
+    constraint = Constraint::New<Quaternion>( Actor::Property::ROTATION,
                                               ParentSource( mPropertyScrollDirection ),
                                               Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                               OvershootOverlayRotationConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
 
-    constraint = Constraint::New<Vector3>( Actor::Property::Position,
-                                           ParentSource( Actor::Property::Size ),
+    constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
+                                           ParentSource( Actor::Property::SIZE ),
                                            ParentSource( mPropertyScrollDirection ),
                                            Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                            OvershootOverlayPositionConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
 
-    constraint = Constraint::New<bool>( Actor::Property::Visible,
+    constraint = Constraint::New<bool>( Actor::Property::VISIBLE,
                                         ParentSource( mPropertyCanScrollVertical ),
                                         OvershootOverlayVisibilityConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);

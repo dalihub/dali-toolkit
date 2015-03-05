@@ -3240,37 +3240,37 @@ void TextInput::SetUpHandlePropertyNotifications()
   Vector3 handlesize = GetSelectionHandleSize();
 
   // Exceeding horizontal boundary
-  PropertyNotification leftNotification = mSelectionHandleOne.AddPropertyNotification( Actor::Property::WorldPositionX, LessThanCondition( mBoundingRectangleWorldCoordinates.x + handlesize.x) );
+  PropertyNotification leftNotification = mSelectionHandleOne.AddPropertyNotification( Actor::Property::WORLD_POSITION_X, LessThanCondition( mBoundingRectangleWorldCoordinates.x + handlesize.x) );
   leftNotification.NotifySignal().Connect( this, &TextInput::OnLeftBoundaryExceeded );
 
-  PropertyNotification rightNotification = mSelectionHandleTwo.AddPropertyNotification( Actor::Property::WorldPositionX, GreaterThanCondition( mBoundingRectangleWorldCoordinates.z - handlesize.x ) );
+  PropertyNotification rightNotification = mSelectionHandleTwo.AddPropertyNotification( Actor::Property::WORLD_POSITION_X, GreaterThanCondition( mBoundingRectangleWorldCoordinates.z - handlesize.x ) );
   rightNotification.NotifySignal().Connect( this, &TextInput::OnRightBoundaryExceeded );
 
   // Within horizontal boundary
-  PropertyNotification leftLeaveNotification = mSelectionHandleOne.AddPropertyNotification( Actor::Property::WorldPositionX, GreaterThanCondition( mBoundingRectangleWorldCoordinates.x + 2*handlesize.x ) );
+  PropertyNotification leftLeaveNotification = mSelectionHandleOne.AddPropertyNotification( Actor::Property::WORLD_POSITION_X, GreaterThanCondition( mBoundingRectangleWorldCoordinates.x + 2*handlesize.x ) );
   leftLeaveNotification.NotifySignal().Connect( this, &TextInput::OnReturnToLeftBoundary );
 
-  PropertyNotification rightLeaveNotification = mSelectionHandleTwo.AddPropertyNotification( Actor::Property::WorldPositionX, LessThanCondition( mBoundingRectangleWorldCoordinates.z - 2*handlesize.x ) );
+  PropertyNotification rightLeaveNotification = mSelectionHandleTwo.AddPropertyNotification( Actor::Property::WORLD_POSITION_X, LessThanCondition( mBoundingRectangleWorldCoordinates.z - 2*handlesize.x ) );
   rightLeaveNotification.NotifySignal().Connect( this, &TextInput::OnReturnToRightBoundary );
 
   // Exceeding vertical boundary
-  PropertyNotification verticalExceedNotificationOne = mSelectionHandleOne.AddPropertyNotification( Actor::Property::WorldPositionY,
+  PropertyNotification verticalExceedNotificationOne = mSelectionHandleOne.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
                                                        OutsideCondition( mBoundingRectangleWorldCoordinates.y + handlesize.y,
                                                                          mBoundingRectangleWorldCoordinates.w - handlesize.y ) );
   verticalExceedNotificationOne.NotifySignal().Connect( this, &TextInput::OnHandleOneLeavesBoundary );
 
-  PropertyNotification verticalExceedNotificationTwo = mSelectionHandleTwo.AddPropertyNotification( Actor::Property::WorldPositionY,
+  PropertyNotification verticalExceedNotificationTwo = mSelectionHandleTwo.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
                                                        OutsideCondition( mBoundingRectangleWorldCoordinates.y + handlesize.y,
                                                                          mBoundingRectangleWorldCoordinates.w - handlesize.y ) );
   verticalExceedNotificationTwo.NotifySignal().Connect( this, &TextInput::OnHandleTwoLeavesBoundary );
 
   // Within vertical boundary
-  PropertyNotification verticalWithinNotificationOne = mSelectionHandleOne.AddPropertyNotification( Actor::Property::WorldPositionY,
+  PropertyNotification verticalWithinNotificationOne = mSelectionHandleOne.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
                                                        InsideCondition( mBoundingRectangleWorldCoordinates.y + handlesize.y,
                                                                         mBoundingRectangleWorldCoordinates.w - handlesize.y ) );
   verticalWithinNotificationOne.NotifySignal().Connect( this, &TextInput::OnHandleOneWithinBoundary );
 
-  PropertyNotification verticalWithinNotificationTwo = mSelectionHandleTwo.AddPropertyNotification( Actor::Property::WorldPositionY,
+  PropertyNotification verticalWithinNotificationTwo = mSelectionHandleTwo.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
                                                        InsideCondition( mBoundingRectangleWorldCoordinates.y + handlesize.y,
                                                                         mBoundingRectangleWorldCoordinates.w - handlesize.y ) );
   verticalWithinNotificationTwo.NotifySignal().Connect( this, &TextInput::OnHandleTwoWithinBoundary );

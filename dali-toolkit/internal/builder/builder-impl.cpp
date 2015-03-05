@@ -770,7 +770,7 @@ Path Builder::GetPath( const std::string& name )
           if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
           {
             ret = Path::New();
-            ret.SetProperty( Path::Property::Points, points);
+            ret.SetProperty( Path::Property::POINTS, points);
 
             //control-points property
             if( OptionalChild pointsProperty = IsChild( *path, "control-points") )
@@ -778,7 +778,7 @@ Path Builder::GetPath( const std::string& name )
               Dali::Property::Value points(Property::ARRAY);
               if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
               {
-                ret.SetProperty( Path::Property::ControlPoints, points);
+                ret.SetProperty( Path::Property::CONTROL_POINTS, points);
               }
             }
             else

@@ -454,7 +454,7 @@ void CheckBoxButton::StartCheckInAnimation( Actor& actor )
     mCheckInAnimation.AnimateTo( Property( mTickUVEffect, mTickUVEffect.GetBottomRightPropertyName() ), Vector2( 1.0f, 1.0f ) );
 
     // Actor size anim
-    mCheckInAnimation.AnimateTo( Property( actor, Actor::Property::ScaleX ), 1.0f );
+    mCheckInAnimation.AnimateTo( Property( actor, Actor::Property::SCALE_X ), 1.0f );
 
     mCheckInAnimation.FinishedSignal().Connect( this, &CheckBoxButton::CheckInAnimationFinished );
     mCheckInAnimation.Play();

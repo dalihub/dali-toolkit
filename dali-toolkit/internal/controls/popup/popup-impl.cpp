@@ -509,13 +509,13 @@ void Popup::HandleStateChange( Toolkit::Popup::PopupState state, float duration 
 
     if(mShowing)
     {
-      mAnimation.AnimateTo( Property(mBacking, Actor::Property::ColorAlpha), targetBackingAlpha, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
-      mAnimation.AnimateTo( Property(mPopupBg, Actor::Property::Scale), targetSize, AlphaFunctions::EaseInOut, TimePeriod(duration * 0.5f, duration * 0.5f) );
+      mAnimation.AnimateTo( Property(mBacking, Actor::Property::COLOR_ALPHA), targetBackingAlpha, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
+      mAnimation.AnimateTo( Property(mPopupBg, Actor::Property::SCALE), targetSize, AlphaFunctions::EaseInOut, TimePeriod(duration * 0.5f, duration * 0.5f) );
     }
     else
     {
-      mAnimation.AnimateTo( Property(mBacking, Actor::Property::ColorAlpha), targetBackingAlpha, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
-      mAnimation.AnimateTo( Property(mPopupBg, Actor::Property::Scale), targetSize, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
+      mAnimation.AnimateTo( Property(mBacking, Actor::Property::COLOR_ALPHA), targetBackingAlpha, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
+      mAnimation.AnimateTo( Property(mPopupBg, Actor::Property::SCALE), targetSize, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
     }
     mAnimation.Play();
     mAnimation.FinishedSignal().Connect(this, &Popup::OnStateAnimationFinished);
