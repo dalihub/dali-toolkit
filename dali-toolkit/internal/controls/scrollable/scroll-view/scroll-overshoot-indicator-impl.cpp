@@ -257,12 +257,12 @@ void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
       const Vector3 parentSize = self.GetCurrentSize();
       if(IsVertical())
       {
-        mOvershootOverlay.SetRotation(Quaternion(0.0f, Vector3::ZAXIS));
+        mOvershootOverlay.SetOrientation(Quaternion(0.0f, Vector3::ZAXIS));
         mOvershootOverlay.SetSize(parentSize.width, GetBounceActorHeight(parentSize.width), size.depth);
       }
       else
       {
-        mOvershootOverlay.SetRotation(Quaternion(1.5f * Math::PI, Vector3::ZAXIS));
+        mOvershootOverlay.SetOrientation(Quaternion(1.5f * Math::PI, Vector3::ZAXIS));
         mOvershootOverlay.SetSize(parentSize.height, GetBounceActorHeight(parentSize.height), size.depth);
         relativeOffset = Vector3(0.0f, 1.0f, 0.0f);
       }
@@ -276,13 +276,13 @@ void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
       const Vector3 parentSize = self.GetCurrentSize();
       if(IsVertical())
       {
-        mOvershootOverlay.SetRotation(Quaternion(Math::PI, Vector3::ZAXIS));
+        mOvershootOverlay.SetOrientation(Quaternion(Math::PI, Vector3::ZAXIS));
         mOvershootOverlay.SetSize(parentSize.width, GetBounceActorHeight(parentSize.width), size.depth);
         relativeOffset = Vector3(1.0f, 1.0f, 0.0f);
       }
       else
       {
-        mOvershootOverlay.SetRotation(Quaternion(0.5f * Math::PI, Vector3::ZAXIS));
+        mOvershootOverlay.SetOrientation(Quaternion(0.5f * Math::PI, Vector3::ZAXIS));
         mOvershootOverlay.SetSize(parentSize.height, GetBounceActorHeight(parentSize.height), size.depth);
         relativeOffset = Vector3(1.0f, 0.0f, 0.0f);
       }

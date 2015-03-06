@@ -74,15 +74,15 @@ void CubeTransitionWaveEffect::OnStartTransition( Vector2 panPosition, Vector2 p
   {
     for( unsigned int idx = 0; idx < totalNum; idx++ )
     {
-      mTiles[mContainerIndex][idx].SetRotation( Degree( angle),  Vector3::YAXIS );
+      mTiles[mContainerIndex][idx].SetOrientation( Degree( angle),  Vector3::YAXIS );
     }
   }
   else if(!mChangeTurningDirection)  // reset rotation, translation
   {
     for( unsigned int idx = 0; idx < totalNum; idx++ )
     {
-      mTiles[mContainerIndex][idx].MoveBy( translation );
-      mTiles[mContainerIndex][idx].SetRotation( Degree( angle),  Vector3::YAXIS );
+      mTiles[mContainerIndex][idx].TranslateBy( translation );
+      mTiles[mContainerIndex][idx].SetOrientation( Degree( angle),  Vector3::YAXIS );
     }
   }
 
@@ -118,7 +118,7 @@ void CubeTransitionWaveEffect::OnStopTransition()
   unsigned int totalNum = mNumRows * mNumColumns;
   for( unsigned int idx = 0; idx < totalNum; idx++ )
   {
-    mBoxes[idx].SetRotation( Degree( angle ), Vector3::YAXIS );
+    mBoxes[idx].SetOrientation( Degree( angle ), Vector3::YAXIS );
   }
 }
 

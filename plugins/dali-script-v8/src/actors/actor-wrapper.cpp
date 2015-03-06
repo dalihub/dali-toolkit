@@ -211,17 +211,17 @@ const ActorFunctions ActorFunctionTable[]=
     // ignore. GetCurrentSize() use Actor.size
     // ignore. SetPosition(....) use Actor.position
     // ignore. SetX, SetY, SetZ,  use Actor.position.x, Actor.position.y, Actor.position.z
-    { "MoveBy",         ActorApi::MoveBy,              ACTOR_API },
+    { "TranslateBy",         ActorApi::TranslateBy,              ACTOR_API },
     // ignore GetCurrentPosition(). use Actor.position
     // ignore GetCurrentWorldPosition() use Actor.worldPosition
     // ignore SetPositionInheritanceMode() use Actor.positionInheritance
     // ignore GetPositionInheritanceMode()  use Actor.positionInheritance
-    // ignore SetRotation() use Actor.rotation
+    // ignore SetOrientation() use Actor.orientation
     { "RotateBy",         ActorApi::RotateBy,          ACTOR_API },
-    // ignore GetCurrentRotation() use Actor.rotation
-    // ignore SetInheritRotation() use Actor.inheritRotation
-    // ignore IsRotationInherited() use Actor.inheritRotation
-    // ignore GetCurrentWorldRotation() use Actor.worldRotation
+    // ignore GetCurrentOrientation() use Actor.orientation
+    // ignore SetInheritOrientation() use Actor.inheritOrientation
+    // ignore IsOrientationInherited() use Actor.inheritOrientation
+    // ignore GetCurrentWorldOrientation() use Actor.worldOrientation
     // ignore SetScale() use Actor.scale
     { "ScaleBy",         ActorApi::ScaleBy,            ACTOR_API },
     // ignore GetCurrentScale() use Actor.scale
@@ -232,10 +232,8 @@ const ActorFunctions ActorFunctionTable[]=
     // ignore SetVisible() use Actor.visible
     // ignore IsVisible() use Actor.visible
     // ignore SetOpacity() use Actor.opacity
-    { "OpactiyBy",         ActorApi::OpacityBy,        ACTOR_API },
     // ignore GetCurrentOpacity() use Actor.opacity
     // ignore SetColor() use Actor.color
-    { "ColorBy",         ActorApi::ColorBy,            ACTOR_API },
     // ignore GetCurrentColor() use Actor.color
     // ignore SetColorMode() use Actor.colorMode
     // ignore GetColorMode() use Actor.colorMode

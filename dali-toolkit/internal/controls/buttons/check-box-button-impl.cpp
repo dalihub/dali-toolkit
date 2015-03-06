@@ -236,7 +236,7 @@ void CheckBoxButton::OnLabelSet()
   {
     label.SetParentOrigin( ParentOrigin::CENTER_RIGHT );
     label.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
-    label.MoveBy( DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+    label.TranslateBy( DISTANCE_BETWEEN_IMAGE_AND_LABEL );
 
     if( IsDisabled() && GetDisabledBackgroundImage() )
     {

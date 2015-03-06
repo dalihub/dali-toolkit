@@ -892,7 +892,7 @@ void PageTurnView::PanContinuing( const Vector2& gesturePosition )
         GetImpl( mTurnEffect[mIndex] ).ApplyInternalConstraint();
 
         float distance = offset.Length();
-        Constraint rotationConstraint = Constraint::New<Quaternion>( Actor::Property::ROTATION,
+        Constraint rotationConstraint = Constraint::New<Quaternion>( Actor::Property::ORIENTATION,
                                                                      Source( self, mPropertyPanDisplacement[mIndex] ),
                                                                      RotationConstraint(distance, mPageSize.width, mIsTurnBack[mPanActor]));
         mPanActor.ApplyConstraint( rotationConstraint );

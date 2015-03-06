@@ -2954,7 +2954,7 @@ void TextInput::DrawCursor()
   mCursor.SetSize(size);
 
   // If the character is italic then the cursor also tilts.
-  mCursor.SetRotation( mInputStyle.IsItalicsEnabled() ? Degree( mInputStyle.GetItalicsAngle() - CURSOR_ANGLE_OFFSET ) : Degree( 0.f ), Vector3::ZAXIS );
+  mCursor.SetOrientation( mInputStyle.IsItalicsEnabled() ? Degree( mInputStyle.GetItalicsAngle() - CURSOR_ANGLE_OFFSET ) : Degree( 0.f ), Vector3::ZAXIS );
 
   DALI_ASSERT_DEBUG( mCursorPosition <= mTextLayoutInfo.mCharacterLayoutInfoTable.size() );
 

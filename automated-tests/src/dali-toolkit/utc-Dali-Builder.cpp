@@ -64,7 +64,7 @@ namespace
       [                                                        \
         {                                                      \
           'actor':'text',                                      \
-          'property':'rotation',                               \
+          'property':'orientation',                            \
           'value':[0, 3, 0, 0],                                \
           'alpha-function': 'EASE_IN_OUT',                     \
           'time-period': {'delay': 0, 'duration': 3 }          \

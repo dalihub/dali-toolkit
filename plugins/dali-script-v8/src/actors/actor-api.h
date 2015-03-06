@@ -64,11 +64,9 @@ namespace ActorApi
   void ScreenToLocal( const v8::FunctionCallbackInfo< v8::Value >& args );
   void SetKeyboardFocusable( const v8::FunctionCallbackInfo< v8::Value >& args );
   void IsKeyboardFocusable( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void MoveBy( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void TranslateBy( const v8::FunctionCallbackInfo< v8::Value >& args );
   void RotateBy( const v8::FunctionCallbackInfo< v8::Value >& args );
   void ScaleBy( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void OpacityBy( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void ColorBy( const v8::FunctionCallbackInfo< v8::Value >& args );
 
   // new function just for JavaScript API, to help developers know what type of actor
   // they're dealing with, returns actor name as a string
