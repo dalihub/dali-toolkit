@@ -18,14 +18,13 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/text/visual-model.h>
 
+// EXTERNAL INCLUDES
+#include <memory.h>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali-toolkit/internal/text/line-run.h>
-
-// EXTERNAL INCLUDES
-#include <memory.h>
-#include <vector>
 
 namespace Dali
 {
@@ -36,14 +35,13 @@ namespace Toolkit
 namespace Text
 {
 
-const GlyphInfo GLYPH_INFO; // VCC to be removed.
-
 struct VisualModel::Impl
 {
-  Vector<GlyphInfo>      mGlyphs;
-  Vector<CharacterIndex> mGlyphsToCharacters;
-  Vector<Length>         mCharactersPerGlyph;
-  std::vector<Vector2>   mGlyphPositions;
+  Vector<GlyphInfo>      mGlyphs;             ///< For each glyph, the font's id, glyph's index within the font and glyph's metrics.
+  Vector<CharacterIndex> mGlyphsToCharacters; ///< For each glyph, the index of the first character.
+  Vector<GlyphIndex>     mCharactersToGlyph;  ///< For each character, the index of the first glyph.
+  Vector<Length>         mCharactersPerGlyph; ///< For each glyph, the number of characters that form the glyph.
+  Vector<Vector2>        mGlyphPositions;     ///< For each glyph, the position.
 
   Size                   mNaturalSize;
   Size                   mActualSize;
@@ -61,15 +59,37 @@ void VisualModel::SetGlyphs( const GlyphInfo* glyphs,
 {
   Vector<GlyphInfo>& modelGlyphs = mImpl->mGlyphs;
   modelGlyphs.Resize( numberOfGlyphs );
-  memcpy( &modelGlyphs[0], glyphs, numberOfGlyphs*sizeof(GlyphInfo) );
+  memcpy( modelGlyphs.Begin(), glyphs, numberOfGlyphs * sizeof( GlyphInfo ) );
 
-  Vector<CharacterIndex>& glyphsToCharacters = mImpl->mGlyphsToCharacters;
-  glyphsToCharacters.Resize( numberOfGlyphs );
-  memcpy( &glyphsToCharacters[0], characterIndices, numberOfGlyphs*sizeof(CharacterIndex) );
+  Vector<CharacterIndex>& modelGlyphsToCharacters = mImpl->mGlyphsToCharacters;
+  modelGlyphsToCharacters.Resize( numberOfGlyphs );
+  memcpy( modelGlyphsToCharacters.Begin(), characterIndices, numberOfGlyphs * sizeof( CharacterIndex ) );
 
   Vector<Length>& modelCharactersPerGlyph = mImpl->mCharactersPerGlyph;
   modelCharactersPerGlyph.Resize( numberOfGlyphs );
-  memcpy( &modelCharactersPerGlyph[0], charactersPerGlyph, numberOfGlyphs*sizeof(Length) );
+  memcpy( modelCharactersPerGlyph.Begin(), charactersPerGlyph, numberOfGlyphs * sizeof( Length ) );
+
+  // Build the characters to glyph conversion table.
+  Vector<GlyphIndex>& modelCharactersToGlyph = mImpl->mCharactersToGlyph;
+
+  // 1) Reserve some space for the characters to avoid reallocations.
+  modelCharactersToGlyph.Reserve( static_cast<Length> ( static_cast<float>( numberOfGlyphs ) * 1.3f ) );
+
+  // 2) Traverse the glyphs and set the glyph indices.
+  GlyphIndex glyphIndex = 0u;
+  Length totalNumberOfCharacters = 0u;
+  for( Vector<Length>::ConstIterator it = modelCharactersPerGlyph.Begin(),
+         endIt = modelCharactersPerGlyph.End();
+       it != endIt;
+       ++it, ++glyphIndex )
+  {
+    const Length numberOfCharacters = *it;
+
+    for( Length index = 0u; index < numberOfCharacters; ++index, ++totalNumberOfCharacters )
+    {
+      modelCharactersToGlyph.PushBack( glyphIndex );
+    }
+  }
 }
 
 Length VisualModel::GetNumberOfGlyphs() const
@@ -82,12 +102,12 @@ void VisualModel::GetGlyphs( GlyphInfo* glyphs,
                              Length numberOfGlyphs ) const
 {
   Vector<GlyphInfo>& modelGlyphs = mImpl->mGlyphs;
-  memcpy( glyphs, &modelGlyphs[glyphIndex], numberOfGlyphs*sizeof(GlyphInfo) );
+  memcpy( glyphs, modelGlyphs.Begin() + glyphIndex, numberOfGlyphs * sizeof( GlyphInfo ) );
 }
 
 const GlyphInfo& VisualModel::GetGlyphInfo( GlyphIndex glyphIndex ) const
 {
-  return GLYPH_INFO;
+  return mImpl->mGlyphs[glyphIndex];
 }
 
 CharacterIndex VisualModel::GetCharacterIndex( GlyphIndex glyphIndex ) const
@@ -102,57 +122,52 @@ Length VisualModel::GetCharactersPerGlyph( GlyphIndex glyphIndex ) const
 
 GlyphIndex VisualModel::GetGlyphIndex( CharacterIndex characterIndex ) const
 {
-  GlyphIndex index( 0 );
-
-  for( unsigned int i=0; i<mImpl->mGlyphsToCharacters.Count(); ++i )
-  {
-    if( mImpl->mGlyphsToCharacters[i] == characterIndex )
-    {
-      index = i;
-      break;
-    }
-  }
-
-  return index;
+  return mImpl->mCharactersToGlyph[characterIndex];
 }
 
 void VisualModel::GetCharacterToGlyphMap( GlyphIndex* characterToGlyphMap,
                                           CharacterIndex characterIndex,
                                           Length numberOfCharacters ) const
 {
+  Vector<GlyphIndex>& modelCharactersToGlyph = mImpl->mCharactersToGlyph;
+  memcpy( characterToGlyphMap, modelCharactersToGlyph.Begin() + characterIndex, numberOfCharacters * sizeof( GlyphIndex ) );
 }
 
 void VisualModel::GetCharactersPerGlyphMap( Length* charactersPerGlyph,
                                             GlyphIndex glyphIndex,
                                             Length numberOfGlyphs ) const
 {
+  Vector<Length>& modelCharactersPerGlyph = mImpl->mCharactersPerGlyph;
+  memcpy( charactersPerGlyph, modelCharactersPerGlyph.Begin() + glyphIndex, numberOfGlyphs * sizeof( Length ) );
 }
 
 void VisualModel::GetGlyphToCharacterMap( CharacterIndex* glyphToCharacter,
                                           GlyphIndex glyphIndex,
                                           Length numberOfGlyphs ) const
 {
+  Vector<CharacterIndex>& modelGlyphsToCharacters = mImpl->mGlyphsToCharacters;
+  memcpy( glyphToCharacter, modelGlyphsToCharacters.Begin() + glyphIndex, numberOfGlyphs * sizeof( CharacterIndex ) );
 }
 
 void VisualModel::SetGlyphPositions( const Vector2* glyphPositions,
                                      Length numberOfGlyphs )
 {
-  std::vector<Vector2>& modelPositions = mImpl->mGlyphPositions;
-  modelPositions.resize( numberOfGlyphs );
-  memcpy( &modelPositions[0], glyphPositions, numberOfGlyphs*sizeof(Vector2) );
+  Vector<Vector2>& modelPositions = mImpl->mGlyphPositions;
+  modelPositions.Resize( numberOfGlyphs );
+  memcpy( modelPositions.Begin(), glyphPositions, numberOfGlyphs * sizeof( Vector2 ) );
 }
 
 void VisualModel::GetGlyphPositions( Vector2* glyphPositions,
                                      GlyphIndex glyphIndex,
                                      Length numberOfGlyphs ) const
 {
-  std::vector<Vector2>& modelPositions = mImpl->mGlyphPositions;
-  memcpy( glyphPositions, &modelPositions[0], numberOfGlyphs*sizeof(Vector2) );
+  Vector<Vector2> modelPositions = mImpl->mGlyphPositions;
+  memcpy( glyphPositions, modelPositions.Begin() + glyphIndex, numberOfGlyphs * sizeof( Vector2 ) );
 }
 
 const Vector2& VisualModel::GetGlyphPosition( GlyphIndex glyphIndex ) const
 {
-  return Vector2::ZERO;
+  return *( mImpl->mGlyphPositions.Begin() + glyphIndex );
 }
 
 void VisualModel::SetLines( const LineRun* const lines,
