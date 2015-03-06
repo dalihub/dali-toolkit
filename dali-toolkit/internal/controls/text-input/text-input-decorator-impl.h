@@ -20,11 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
-#include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/geometry/mesh.h>
 #include <dali/public-api/signals/connection-tracker.h>
 
 // INTERNAL INCLUDES
@@ -609,7 +607,6 @@ private:
   Timer mScrollTimer;                           // Timer to scroll text over a period of time not all in one update.
 
   TextHighlight mTextHighlight;                 // Holds data required to construct the highlight
-  MeshActor mHighlightMeshActor;                // Mesh Actor to display highlight
 
   PanGestureDetector mPanGestureDetector;
 

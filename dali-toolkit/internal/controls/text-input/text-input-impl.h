@@ -19,13 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/adaptor-framework/clipboard.h>
 #include <dali/public-api/adaptor-framework/clipboard-event-notifier.h>
 #include <dali/public-api/adaptor-framework/imf-manager.h>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/geometry/mesh.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -1469,10 +1467,6 @@ private:
   Actor mHandleOneGrabArea;                     ///< invisible actor that receives pans events for the selection handle.
   Actor mHandleTwoGrabArea;                     ///< invisible actor that receives pans events for the selection handle.
 
-  Mesh              mHighlightMesh;             ///< Mesh Data for highlight
-  MeshActor         mHighlightMeshActor;        ///< Mesh Actor to display highlight
-  MeshData          mMeshData;                  ///< Container to hold meshData for highlight
-  Material          mCustomMaterial;            ///< Custom material used for highlight
   HighlightInfo     mNewHighlightInfo;          ///< Geometry info to create highlight.
 
   Text mPreEditString;                          ///< Holds current input string prior to it being committed.

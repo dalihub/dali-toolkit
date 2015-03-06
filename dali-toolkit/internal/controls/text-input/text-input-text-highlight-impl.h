@@ -18,10 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/geometry/mesh.h>
-#include <dali/public-api/modeling/material.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-input/textview-character-positions-impl.h>
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>
@@ -141,7 +137,7 @@ public:
   /**
    * Creates the Mesh data needed by the Mesh Actor
    */
-  Mesh CreateHighLightMesh();
+  void CreateHighLightMesh();
 
 private:
 
@@ -163,9 +159,6 @@ private:
 
   TextViewCharacterPositioning& mTextViewCharacterPositioning;
 
-  Mesh              mHighlightMesh;             ///< Mesh Data for highlight
-  MeshData          mMeshData;                  ///< Container to hold meshData for highlight
-  Material          mCustomMaterial;            ///< Custom material used for highlight
   HighlightInfo     mNewHighlightInfo;          ///< Geometry info to create highlight.
 
 };

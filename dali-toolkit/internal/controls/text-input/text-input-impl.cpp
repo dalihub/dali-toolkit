@@ -534,11 +534,6 @@ std::size_t TextInput::GetNumberOfCharacters() const
 void TextInput::SetMaterialDiffuseColor( const Vector4& color )
 {
   mMaterialColor = color;
-  if ( mCustomMaterial )
-  {
-    mCustomMaterial.SetDiffuseColor( mMaterialColor );
-    mMeshData.SetMaterial( mCustomMaterial );
-  }
 }
 
 const Vector4& TextInput::GetMaterialDiffuseColor() const
@@ -697,7 +692,7 @@ bool TextInput::IsTextSelectable() const
 
 bool TextInput::IsTextSelected() const
 {
-  return mHighlightMeshActor;
+  return false;
 }
 
 void TextInput::DeSelectText()
@@ -1537,10 +1532,6 @@ void TextInput::OnLongPress(Dali::Actor actor, const Dali::LongPressGesture& lon
   DALI_LOG_INFO( gLogFilter, Debug::General, "OnLongPress\n" );
 
   // Ignore longpress if in selection mode already
-  if( mHighlightMeshActor )
-  {
-    return;
-  }
 
   if(longPress.state == Dali::Gesture::Started)
   {
@@ -1708,10 +1699,6 @@ void TextInput::OnPopupHideFinished(TextInputPopup& popup)
   popup.HideFinishedSignal().Disconnect( this, &TextInput::OnPopupHideFinished );
 
   // Change Popup menu to Cut/Copy/Paste if text has been selected.
-  if(mHighlightMeshActor && mState == StateEdit)
-  {
-    ShowPopupCutCopyPaste();
-  }
 }
 
 //FIXME this routine needs to be re-written as it contains too many branches.
@@ -1776,11 +1763,6 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
   } // Return
   else if ( keyName == "space" )
   {
-    if ( mHighlightMeshActor )
-    {
-      // Some text is selected so erase it before adding space.
-      DeleteHighlightedText( true );
-    }
 
     mCursorPosition = mCursorPosition + InsertAt(Text(keyString), mCursorPosition, 0);
 
@@ -1795,13 +1777,6 @@ bool TextInput::OnKeyDownEvent(const KeyEvent& event)
   } // space
   else if (keyName == "BackSpace")
   {
-    if ( mHighlightMeshActor )
-    {
-      // Some text is selected so erase it
-      DeleteHighlightedText( true );
-      update = true;
-    }
-    else
     {
       if ( mCursorPosition > 0 )
       {
@@ -2007,11 +1982,6 @@ void TextInput::OnTextViewScrolled( Toolkit::TextView textView, Vector2 scrollPo
     mSelectionHandleOne.SetPosition( mSelectionHandleOneActualPosition + UI_OFFSET + mSelectionHandleOneOffset );
     mSelectionHandleTwo.SetPosition( mSelectionHandleTwoActualPosition + UI_OFFSET + mSelectionHandleTwoOffset );
 
-    if( mHighlightMeshActor )
-    {
-      mHighlightMeshActor.SetVisible( true );
-      UpdateHighlight();
-    }
   }
 }
 
@@ -2265,11 +2235,6 @@ ImfManager::ImfCallbackData TextInput::ImfEventReceived( Dali::ImfManager& imfMa
       mIgnoreFirstCommitFlag = false;
 
       // Some text may be selected, hiding keyboard causes an empty predictive string to be sent, we don't want to delete highlight in this case
-      if ( mHighlightMeshActor &&  (!imfEvent.predictiveString.empty()) )
-      {
-        // replaces highlighted text with new character
-        DeleteHighlightedText( false );
-      }
 
       preeditResetRequired = PreEditReceived( imfEvent.predictiveString, imfEvent.cursorOffset );
 
@@ -2296,11 +2261,6 @@ ImfManager::ImfCallbackData TextInput::ImfEventReceived( Dali::ImfManager& imfMa
         // A Commit message is a word that has been accepted, it may have been a pre-edit word previously but now commited.
 
         // Some text may be selected, hiding keyboard causes an empty predictive string to be sent, we don't want to delete highlight in this case
-        if ( mHighlightMeshActor &&  (!imfEvent.predictiveString.empty()) )
-        {
-          // replaces highlighted text with new character
-          DeleteHighlightedText( false );
-        }
 
        // A PreEditReset can cause a commit message to be sent, the Ignore Commit flag is used in scenarios where the word is
        // not needed, one such scenario is when the pre-edit word is too long to fit.
@@ -2336,13 +2296,6 @@ ImfManager::ImfCallbackData TextInput::ImfEventReceived( Dali::ImfManager& imfMa
       std::size_t toDelete = 0;
       std::size_t numberOfCharacters = 0;
 
-      if( mHighlightMeshActor )
-      {
-        // delete highlighted text.
-        toDelete = std::min( mSelectionHandleOnePosition, mSelectionHandleTwoPosition );
-        numberOfCharacters = std::max( mSelectionHandleOnePosition, mSelectionHandleTwoPosition ) - toDelete;
-      }
-      else
       {
         if( static_cast<std::size_t>(std::abs( imfEvent.cursorOffset )) < mCursorPosition )
         {
@@ -2372,7 +2325,7 @@ ImfManager::ImfCallbackData TextInput::ImfEventReceived( Dali::ImfManager& imfMa
     {
       // If text is selected/highlighted and surrounding text received we do not want the keyboard to store the word at cursor and return it as a predictive word along with
       // the next key pressed.  Instead the Select function sets the cursor position and surrounding text.
-      if (! ( mHighlightMeshActor || mSelectingText ) )
+      if (! ( false || mSelectingText ) )
       {
         std::string text( GetText() );
         DALI_LOG_INFO( gLogFilter, Debug::General, "OnKey - surrounding text - set text [%s] and cursor[%u] \n", text.c_str(), mCursorPosition );
@@ -2657,78 +2610,6 @@ void TextInput::DeleteHighlightedText( bool inheritStyle )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "DeleteHighlightedText handlePosOne[%u] handlePosTwo[%u]\n", mSelectionHandleOnePosition, mSelectionHandleTwoPosition);
 
-  if( mHighlightMeshActor )
-  {
-    mCursorPosition = std::min( mSelectionHandleOnePosition, mSelectionHandleTwoPosition );
-
-    MarkupProcessor::StyledTextArray::iterator start = mStyledText.begin() + mCursorPosition;
-    MarkupProcessor::StyledTextArray::iterator end =  mStyledText.begin() + std::max( mSelectionHandleOnePosition, mSelectionHandleTwoPosition );
-
-    // Get the styled text of the characters to be deleted as it may be needed if
-    // the "exceed the text-input's boundaries" option is disabled.
-    MarkupProcessor::StyledTextArray styledCharactersToDelete;
-
-    styledCharactersToDelete.insert( styledCharactersToDelete.begin(), start, end );
-
-    mStyledText.erase( start, end ); // erase range of characters
-
-    // Remove text from TextView and update place holder text if required
-
-    // Set the placeholder text only if the styled text is empty.
-    if( mStyledText.empty() )
-    {
-      ShowPlaceholderText( mStyledPlaceHolderText );
-    }
-    else
-    {
-      const std::size_t numberOfCharacters = std::max( mSelectionHandleOnePosition, mSelectionHandleTwoPosition ) - mCursorPosition;
-
-      mDisplayedTextView.RemoveTextFrom( mCursorPosition, numberOfCharacters );
-
-      // It may happen than after removing a white space or a new line character,
-      // two words merge, this new word could be big enough to not fit in its
-      // current line, so moved to the next one, and make some part of the text to
-      // exceed the text-input's boundary.
-      if( !mExceedEnabled )
-      {
-        // Get the new text layout after removing some characters.
-        mDisplayedTextView.GetTextLayoutInfo( mTextLayoutInfo );
-
-        // Get text-input's size.
-        const Vector3& size = GetControlSize();
-
-        if( ( mTextLayoutInfo.mTextSize.width > size.width ) ||
-            ( mTextLayoutInfo.mTextSize.height > size.height ) )
-        {
-          mDisplayedTextView.InsertTextAt( mCursorPosition, styledCharactersToDelete );
-
-          mStyledText.insert( mStyledText.begin() + mCursorPosition,
-                              styledCharactersToDelete.begin(),
-                              styledCharactersToDelete.end() );
-        }
-      }
-    }
-    GetTextLayoutInfo();
-
-    RemoveHighlight();
-
-    EmitTextModified();
-
-    if( inheritStyle )
-    {
-      const TextStyle oldInputStyle( mInputStyle );
-
-      mInputStyle = GetStyleAtCursor(); // Inherit style from cursor position
-
-      if( oldInputStyle != mInputStyle )
-      {
-        // Updates the line height accordingly with the input style.
-        UpdateLineHeight();
-
-        EmitStyleChangedSignal();
-      }
-    }
-  }
 }
 
 void TextInput::DeleteRange( const std::size_t start, const std::size_t ncharacters )
@@ -2747,29 +2628,6 @@ void TextInput::DeleteRange( const std::size_t start, const std::size_t ncharact
     mStyledText.erase(itStart, itEnd);
 
     // update the selection handles if they are visible.
-    if( mHighlightMeshActor )
-    {
-      std::size_t& minHandle = ( mSelectionHandleOnePosition <= mSelectionHandleTwoPosition ? mSelectionHandleOnePosition : mSelectionHandleTwoPosition );
-      std::size_t& maxHandle = ( mSelectionHandleTwoPosition > mSelectionHandleOnePosition ? mSelectionHandleTwoPosition : mSelectionHandleOnePosition );
-
-      if( minHandle >= start + ncharacters )
-      {
-        minHandle -= ncharacters;
-      }
-      else if( ( minHandle > start ) && ( minHandle < start + ncharacters ) )
-      {
-        minHandle = start;
-      }
-
-      if( maxHandle >= start + ncharacters )
-      {
-        maxHandle -= ncharacters;
-      }
-      else if( ( maxHandle > start ) && ( maxHandle < start + ncharacters ) )
-      {
-        maxHandle = start;
-      }
-    }
 
     // Set text is not called here as currently it can not process the set text from deletion and then the set text from the in-coming pre-edit.
   }
@@ -3778,74 +3636,6 @@ void TextInput::UpdateHighlight()
 //  9*    *7
 //
 
-  if ( mHighlightMeshActor )
-  {
-    // vertex and triangle buffers should always be present if MeshActor is alive.
-    HighlightInfo newHighlightInfo = CalculateHighlightInfoRtl();
-    MeshData::VertexContainer vertices;
-    Dali::MeshData::FaceIndices faceIndices;
-
-    if( !newHighlightInfo.mQuadList.empty() )
-    {
-      std::vector<QuadCoordinates>::iterator iter = newHighlightInfo.mQuadList.begin();
-      std::vector<QuadCoordinates>::iterator endIter = newHighlightInfo.mQuadList.end();
-
-      // vertex position defaults to (0 0 0)
-      MeshData::Vertex vertex;
-      // set normal for all vertices as (0 0 1) pointing outward from TextInput Actor.
-      vertex.nZ = 1.0f;
-
-      for(std::size_t v = 0; iter != endIter; ++iter,v+=4 )
-      {
-        // Add each quad geometry (a sub-selection) to the mesh data.
-
-        // 0-----1
-        // |\    |
-        // | \ A |
-        // |  \  |
-        // | B \ |
-        // |    \|
-        // 2-----3
-
-        QuadCoordinates& quad = *iter;
-        // top-left (v+0)
-        vertex.x = quad.min.x;
-        vertex.y = quad.min.y;
-        vertices.push_back( vertex );
-
-        // top-right (v+1)
-        vertex.x = quad.max.x;
-        vertex.y = quad.min.y;
-        vertices.push_back( vertex );
-
-        // bottom-left (v+2)
-        vertex.x = quad.min.x;
-        vertex.y = quad.max.y;
-        vertices.push_back( vertex );
-
-        // bottom-right (v+3)
-        vertex.x = quad.max.x;
-        vertex.y = quad.max.y;
-        vertices.push_back( vertex );
-
-        // triangle A (3, 1, 0)
-        faceIndices.push_back( v + 3 );
-        faceIndices.push_back( v + 1 );
-        faceIndices.push_back( v );
-
-        // triangle B (0, 2, 3)
-        faceIndices.push_back( v );
-        faceIndices.push_back( v + 2 );
-        faceIndices.push_back( v + 3 );
-
-        mMeshData.SetFaceIndices( faceIndices );
-      }
-
-      BoneContainer bones(0); // passed empty as bones not required
-      mMeshData.SetData( vertices, faceIndices, bones, mCustomMaterial );
-      mHighlightMesh.UpdateMeshData(mMeshData);
-    }
-  }
 }
 
 void TextInput::ClearPopup()
@@ -3917,7 +3707,7 @@ void TextInput::ShowPopup( bool animate )
   Vector3 position;
   Vector2 alternativePopupPosition;
 
-  if(mHighlightMeshActor && mState == StateEdit)
+  if(false && mState == StateEdit)
   {
     Vector3 topHandle;
     Vector3 bottomHandle; // referring to the bottom most point of the handle or the bottom line of selection.
@@ -4710,7 +4500,7 @@ void TextInput::OnStageTouched(const TouchEvent& event)
 
       bool textInputTouched = (touchedActor && WasTouchedCheck( touchedActor ));
 
-      if ( ( mHighlightMeshActor || popUpShown ) && !textInputTouched )
+      if ( ( false || popUpShown ) && !textInputTouched )
       {
         EndMonitoringStageForTouch();
         HidePopup( true, false );
@@ -4838,7 +4628,7 @@ void TextInput::RemoveHighlight( bool hidePopup )
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "RemoveHighlight\n");
 
-  if ( mHighlightMeshActor )
+  if ( false )
   {
     if ( mSelectionHandleOne )
     {
@@ -4855,12 +4645,10 @@ void TextInput::RemoveHighlight( bool hidePopup )
 
     mNewHighlightInfo.mQuadList.clear();
 
-    Self().Remove( mHighlightMeshActor );
 
     SetCursorVisibility( true );
     StartCursorBlinkTimer();
 
-    mHighlightMeshActor.Reset();
     // NOTE: We cannot dereference mHighlightMesh, due
     // to a bug in how the scene-graph MeshRenderer uses the Mesh data incorrectly.
 
@@ -4876,26 +4664,6 @@ void TextInput::RemoveHighlight( bool hidePopup )
 
 void TextInput::CreateHighlight()
 {
-  if ( !mHighlightMeshActor )
-  {
-    mMeshData = MeshData( );
-    mMeshData.SetHasNormals( true );
-
-    mCustomMaterial = Material::New("CustomMaterial");
-    mCustomMaterial.SetDiffuseColor( mMaterialColor );
-
-    mMeshData.SetMaterial( mCustomMaterial );
-
-    mHighlightMesh = Mesh::New( mMeshData );
-
-    mHighlightMeshActor = MeshActor::New( mHighlightMesh );
-    mHighlightMeshActor.SetName( "HighlightMeshActor" );
-    mHighlightMeshActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    mHighlightMeshActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-    mHighlightMeshActor.SetPosition( 0.0f, 0.0f, DISPLAYED_HIGHLIGHT_Z_OFFSET );
-
-    Self().Add(mHighlightMeshActor);
-  }
 }
 
 
@@ -4923,7 +4691,7 @@ void TextInput::PasteText( const Text& text )
   // Any key stroke that results in a visual change of the text-input should
   // set this flag to true.
   bool update = false;
-  if( mHighlightMeshActor )
+  if( false )
   {
     /* if highlighted, delete entire text, and position cursor at start of deleted text. */
     mCursorPosition = std::min(mSelectionHandleOnePosition, mSelectionHandleTwoPosition);
@@ -5119,10 +4887,6 @@ void TextInput::SetScrollEnabled( bool enable )
       mSelectionHandleOne.SetVisible( true );
       mSelectionHandleTwo.SetVisible( true );
 
-      if( mHighlightMeshActor )
-      {
-        mHighlightMeshActor.SetVisible( true );
-      }
     }
   }
 }

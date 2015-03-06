@@ -19,7 +19,6 @@
 #include <dali-toolkit/public-api/controls/text-input/text-input.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/adaptor-framework/clipboard.h>
 #include <dali/public-api/adaptor-framework/clipboard-event-notifier.h>
 #include <dali/public-api/adaptor-framework/imf-manager.h>

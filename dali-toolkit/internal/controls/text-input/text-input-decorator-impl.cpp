@@ -580,30 +580,14 @@ void Decorator::CreateHighlight( Actor parent )
 {
   DALI_ASSERT_DEBUG( parent && "Highlight target parent does not exist" );
 
-  if ( !mHighlightMeshActor )
-  {
-    mHighlightMeshActor = MeshActor::New( mTextHighlight.CreateHighLightMesh() );
-    mHighlightMeshActor.SetName( "HighlightMeshActor" );
-    parent.Add( mHighlightMeshActor );
-  }
 }
 
 void Decorator::RemoveHighlight()
 {
-  if ( mHighlightMeshActor )
-  {
-    mHighlightMeshActor.Unparent();
-    mHighlightMeshActor.Reset();
-    // NOTE: We cannot dereference mHighlightMesh, due to a how the scene-graph MeshRenderer uses the Mesh data.
-  }
 }
 
 void Decorator::HighlightVisibility( bool visiblility )
 {
-  if ( mHighlightMeshActor )
-  {
-    mHighlightMeshActor.SetVisible( visiblility );
-  }
 }
 
 /**
@@ -790,11 +774,6 @@ void Decorator::ShowPopUp()
 
   DALI_ASSERT_DEBUG( mPopUpTarget && "PopUp Target Actor does not exist" );
 
-  if( mHighlightMeshActor ) // Text Selection mode
-  {
-    position = PositionOfPopUpRelativeToSelectionHandles();
-  }
-  else // Not in Text Selection mode so position relative to cursor.
   {
     position = PositionOfPopUpRelativeToCursor();
   }
@@ -818,7 +797,7 @@ void Decorator::ShowPopupCutCopyPaste()
 {
   bool isAllTextSelectedAlready = ( mTextViewCharacterPositioning.StyledTextSize() == GetSelectedText().size() );
   bool isTextEmpty = mTextViewCharacterPositioning.IsStyledTextEmpty() ;
-  bool isSubsetOfTextAlreadySelected = ( !isAllTextSelectedAlready ) && mHighlightMeshActor;
+  bool isSubsetOfTextAlreadySelected = ( !isAllTextSelectedAlready ) &&false;
 
   Clipboard clipboard = Clipboard::Get();
   bool hasClipboardGotContent = clipboard.NumberOfItems();
@@ -845,11 +824,6 @@ void Decorator::PopUpLeavesVerticalBoundary( PropertyNotification& source)
 {
   Vector3 position, alternativePosition;
 
-  if( mHighlightMeshActor ) // Text Selection mode
-  {
-    alternativePosition = AlternatePopUpPositionRelativeToSelectionHandles();
-  }
-  else // Not in Text Selection mode
   {
     alternativePosition = AlternatePopUpPositionRelativeToCursor();
     // if can't be positioned above, then position below row.
@@ -947,11 +921,6 @@ void Decorator::TextViewScrolled( Toolkit::TextView textView, Vector2 scrollPosi
     PositionSelectionHandle( selectionHandleOne, mSelectionHandleOneActualPosition, mSelectionHandleOnePosition );
     PositionSelectionHandle( selectionHandleTwo, mSelectionHandleTwoActualPosition, mSelectionHandleTwoPosition );
 
-    if( mHighlightMeshActor )
-    {
-      mHighlightMeshActor.SetVisible( true );
-      ShowUpdatedHighlight();
-    }
   }
 }
 
@@ -1061,17 +1030,6 @@ MarkupProcessor::StyledTextArray Decorator::GetSelectedText()
 {
   MarkupProcessor::StyledTextArray currentSelectedText;
 
-  if ( mHighlightMeshActor ) // Text Selected
-  {
-    MarkupProcessor::StyledTextArray::iterator it = mTextViewCharacterPositioning.GetStyledTextArray().begin() + std::min(mSelectionHandleOnePosition, mSelectionHandleTwoPosition);
-    MarkupProcessor::StyledTextArray::iterator end = mTextViewCharacterPositioning.GetStyledTextArray().begin() + std::max(mSelectionHandleOnePosition, mSelectionHandleTwoPosition);
-
-    for(; it != end; ++it)
-    {
-      MarkupProcessor::StyledText& styledText( *it );
-      currentSelectedText.push_back( styledText );
-    }
-  }
   return currentSelectedText;
 }
 
