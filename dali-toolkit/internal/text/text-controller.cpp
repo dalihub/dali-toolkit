@@ -435,7 +435,7 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
   }
 
   Vector<GlyphInfo> glyphs;
-  Vector<CharacterIndex> characterIndices;
+  Vector<CharacterIndex> glyphsToCharactersMap;
   Vector<Length> charactersPerGlyph;
   if( SHAPE_TEXT & operations )
   {
@@ -445,7 +445,7 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
                scripts,
                fonts,
                glyphs,
-               characterIndices,
+               glyphsToCharactersMap,
                charactersPerGlyph );
   }
 
@@ -461,14 +461,14 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
       const Length numberOfGlyphs = mImpl->mVisualModel->GetNumberOfGlyphs();
 
       glyphs.Resize( numberOfGlyphs );
-      characterIndices.Resize( numberOfGlyphs );
+      glyphsToCharactersMap.Resize( numberOfGlyphs );
       charactersPerGlyph.Resize( numberOfGlyphs );
 
       mImpl->mVisualModel->GetGlyphs( glyphs.Begin(),
                                       0u,
                                       numberOfGlyphs );
 
-      mImpl->mVisualModel->GetGlyphToCharacterMap( characterIndices.Begin(),
+      mImpl->mVisualModel->GetGlyphToCharacterMap( glyphsToCharactersMap.Begin(),
                                                    0u,
                                                    numberOfGlyphs );
 
@@ -480,7 +480,7 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
     // Update the visual model
     mImpl->mLayoutEngine.UpdateVisualModel( size,
                                             glyphs,
-                                            characterIndices,
+                                            glyphsToCharactersMap,
                                             charactersPerGlyph,
                                             *mImpl->mVisualModel );
 
