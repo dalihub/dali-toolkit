@@ -221,4 +221,3 @@ private:
 }
 
 #endif //#ifndef __DALI_TOOLKIT_SHADER_EFFECT_DISPLACEMENT_H__
-

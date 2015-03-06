@@ -65,16 +65,32 @@ class DALI_IMPORT_API Control : public CustomActor
 {
 public:
 
-  /// @name Properties
-  /** @{ */
-  static const Dali::Property::Index PROPERTY_BACKGROUND_COLOR;    ///< name "background-color",        @see SetBackgroundColor,        type VECTOR4
-  static const Dali::Property::Index PROPERTY_BACKGROUND;          ///< name "background",              @see SetBackground,             type MAP
-  static const Dali::Property::Index PROPERTY_WIDTH_POLICY;        ///< name "width-policy",            @see SetSizePolicy,             type STRING
-  static const Dali::Property::Index PROPERTY_HEIGHT_POLICY;       ///< name "height-policy",           @see SetSizePolicy,             type STRING
-  static const Dali::Property::Index PROPERTY_MINIMUM_SIZE;        ///< name "minimum-size",            @see SetMinimumSize,            type VECTOR3
-  static const Dali::Property::Index PROPERTY_MAXIMUM_SIZE;        ///< name "maximum-size",            @see SetMaximumSize,            type VECTOR3
-  static const Dali::Property::Index PROPERTY_KEY_INPUT_FOCUS;     ///< name "key-input-focus",         @see SetKeyInputFocus,          type BOOLEAN
-  /** @} */
+  /**
+   * @brief The start and end property ranges for control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = PROPERTY_REGISTRATION_START_INDEX,        ///< Start index is used by the property registration macro.
+    CONTROL_PROPERTY_START_INDEX = PROPERTY_START_INDEX,             ///< Start index of Control properties.
+    CONTROL_PROPERTY_END_INDEX = CONTROL_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices.
+  };
+
+  /**
+   * @brief An enumeration of properties belonging to the Control class.
+   */
+  struct Property
+  {
+    enum
+    {
+      BACKGROUND_COLOR = PROPERTY_START_INDEX, ///< name "background-color", @see SetBackgroundColor, type VECTOR4
+      BACKGROUND,                              ///< name "background",       @see SetBackground,      type MAP
+      WIDTH_POLICY,                            ///< name "width-policy",     @see SetSizePolicy,      type STRING
+      HEIGHT_POLICY,                           ///< name "height-policy",    @see SetSizePolicy,      type STRING
+      MINIMUM_SIZE,                            ///< name "minimum-size",     @see SetMinimumSize,     type VECTOR3
+      MAXIMUM_SIZE,                            ///< name "maximum-size",     @see SetMaximumSize,     type VECTOR3
+      KEY_INPUT_FOCUS,                         ///< name "key-input-focus",  @see SetKeyInputFocus,   type BOOLEAN
+    };
+  };
 
   /**
    * @brief Describes how a control could be resized.

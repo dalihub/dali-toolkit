@@ -28,21 +28,24 @@
 #include <dali/public-api/events/mouse-wheel-event.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
-#include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/bouncing-effect-actor.h>
+#include <dali-toolkit/internal/controls/scrollable/scroll-connector-impl.h>
 
 using std::string;
 using std::set;
 using namespace Dali;
 
-namespace // unnamed namespace
+namespace // Unnamed namespace
 {
 
 //Type registration
-TypeRegistration mType( typeid(Toolkit::ItemView), typeid(Toolkit::Scrollable), NULL );
+
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ItemView, Toolkit::Scrollable, NULL )
+DALI_TYPE_REGISTRATION_END()
 
 const float DEFAULT_MINIMUM_SWIPE_SPEED = 1.0f;
 const float DEFAULT_MINIMUM_SWIPE_DISTANCE = 3.0f;
@@ -378,7 +381,7 @@ void ItemView::OnInitialize()
                                                    LocalSource(mPropertyPosition),
                                                    LocalSource(mPropertyPositionMin),
                                                    LocalSource(mPropertyPositionMax),
-                                                   LocalSource(Actor::Property::Size),
+                                                   LocalSource(Actor::Property::SIZE),
                                                    RelativePositionConstraint);
   self.ApplyConstraint(constraint);
 
@@ -1569,28 +1572,28 @@ void ItemView::SetOvershootEnabled( bool enable )
     mOvershootOverlay.SetDrawMode(DrawMode::OVERLAY);
     self.Add(mOvershootOverlay);
 
-    Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size,
+    Constraint constraint = Constraint::New<Vector3>( Actor::Property::SIZE,
                                                       ParentSource( mPropertyScrollDirection ),
                                                       Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
-                                                      ParentSource( Actor::Property::Size ),
+                                                      ParentSource( Actor::Property::SIZE ),
                                                       OvershootOverlaySizeConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
     mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.width, OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height);
 
-    constraint = Constraint::New<Quaternion>( Actor::Property::Rotation,
+    constraint = Constraint::New<Quaternion>( Actor::Property::ROTATION,
                                               ParentSource( mPropertyScrollDirection ),
                                               Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                               OvershootOverlayRotationConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
 
-    constraint = Constraint::New<Vector3>( Actor::Property::Position,
-                                           ParentSource( Actor::Property::Size ),
+    constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
+                                           ParentSource( Actor::Property::SIZE ),
                                            ParentSource( mPropertyScrollDirection ),
                                            Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                            OvershootOverlayPositionConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
 
-    constraint = Constraint::New<bool>( Actor::Property::Visible,
+    constraint = Constraint::New<bool>( Actor::Property::VISIBLE,
                                         ParentSource( mPropertyCanScrollVertical ),
                                         OvershootOverlayVisibilityConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);

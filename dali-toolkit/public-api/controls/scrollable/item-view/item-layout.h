@@ -128,7 +128,7 @@ struct ItemRange
  * An ItemLayout also describes the direction of input gestures, used to scroll through the layout.
  * Whilst scrolling, the layout provides a range of items that are within a layout-area (3D bounding volume).
  */
-class ItemLayout : public RefObject
+class DALI_IMPORT_API ItemLayout : public RefObject
 {
 public:
 

@@ -24,13 +24,14 @@
 #include <dali/public-api/events/mouse-wheel-event.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-component-impl.h>
-#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
+#include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
 
 //#define ENABLED_SCROLL_STATE_LOGGING
 
@@ -51,10 +52,6 @@ using namespace Dali;
 
 namespace
 {
-
-// Signals
-
-const char* const SIGNAL_SNAP_STARTED = "snap-started";
 
 const Vector2 DEFAULT_MIN_FLICK_DISTANCE(30.0f, 30.0f);                                   ///< minimum distance for pan before flick allowed
 const float DEFAULT_MIN_FLICK_SPEED_THRESHOLD(500.0f);                          ///< Minimum pan speed required for flick in pixels/s
@@ -207,6 +204,18 @@ namespace Internal
 
 namespace
 {
+
+BaseHandle Create()
+{
+  return Toolkit::ScrollView::New();
+}
+
+// Setup properties, signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ScrollView, Toolkit::Scrollable, Create )
+
+DALI_SIGNAL_REGISTRATION( ScrollView, "value-changed", SIGNAL_SNAP_STARTED )
+
+DALI_TYPE_REGISTRATION_END()
 
 /**
  * Returns whether to lock scrolling to a particular axis
@@ -510,16 +519,6 @@ struct InternalFinalConstraint
   AlphaFunction mFunctionY;
 };
 
-
-BaseHandle Create()
-{
-  return Toolkit::ScrollView::New();
-}
-
-TypeRegistration typeRegistration( typeid( Toolkit::ScrollView ), typeid( Toolkit::Scrollable ), Create );
-
-SignalConnectorType signalConnector1( typeRegistration, SIGNAL_SNAP_STARTED, &ScrollView::DoConnectSignal );
-
 }
 
 
@@ -591,7 +590,7 @@ void ScrollView::OnInitialize()
   mInternalActor = Actor::New();
   mInternalActor.SetDrawMode(DrawMode::OVERLAY);
   self.Add(mInternalActor);
-  mInternalActor.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::Size, ParentSource( Actor::Property::Size ), EqualToConstraint() ) );
+  mInternalActor.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::SIZE, ParentSource( Actor::Property::SIZE ), EqualToConstraint() ) );
   mInternalActor.SetParentOrigin(ParentOrigin::CENTER);
   mInternalActor.SetAnchorPoint(AnchorPoint::CENTER);
 
@@ -2613,8 +2612,8 @@ void ScrollView::UpdateMainInternalConstraint()
   if( mPanning )
   {
     constraint = Constraint::New<Vector3>( mPropertyPrePosition,
-                                                      Source( detector, PanGestureDetector::Property::LocalPosition ),
-                                                      Source( self, Actor::Property::Size ),
+                                                      Source( detector, PanGestureDetector::Property::LOCAL_POSITION ),
+                                                      Source( self, Actor::Property::SIZE ),
                                                       InternalPrePositionConstraint( mPanStartPosition, initialPanMask, mAxisAutoLock, mAxisAutoLockGradient, mLockAxis, mMaxOvershoot, mRulerX->GetDomain(), mRulerY->GetDomain() ) );
     mScrollMainInternalPrePositionConstraint = self.ApplyConstraint( constraint );
   }
@@ -2624,7 +2623,7 @@ void ScrollView::UpdateMainInternalConstraint()
                                          LocalSource( mPropertyPrePosition ),
                                          LocalSource( mPropertyPositionMin ),
                                          LocalSource( mPropertyPositionMax ),
-                                         Source( self, Actor::Property::Size ),
+                                         Source( self, Actor::Property::SIZE ),
                                          InternalPositionConstraint( mRulerX->GetDomain(),
                                                                      mRulerY->GetDomain(), mWrapMode ) );
   mScrollMainInternalPositionConstraint = self.ApplyConstraint( constraint );
@@ -2647,7 +2646,7 @@ void ScrollView::UpdateMainInternalConstraint()
                                          LocalSource( mPropertyPosition ),
                                          LocalSource( mPropertyPositionMin ),
                                          LocalSource( mPropertyPositionMax ),
-                                         LocalSource( Actor::Property::Size ),
+                                         LocalSource( Actor::Property::SIZE ),
                                          InternalRelativePositionConstraint );
   mScrollMainInternalRelativeConstraint = self.ApplyConstraint( constraint );
 
@@ -2703,17 +2702,17 @@ void ScrollView::SetInternalConstraints()
   Constraint constraint;
 
   // MoveActor (scrolling)
-  constraint = Constraint::New<Vector3>( Actor::Property::Position,
+  constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
                                          Source( self, mPropertyPosition ),
                                          MoveActorConstraint );
   constraint.SetRemoveAction(Constraint::Discard);
   ApplyConstraintToBoundActors(constraint);
 
   // WrapActor (wrap functionality)
-  constraint = Constraint::New<Vector3>( Actor::Property::Position,
-                                                 LocalSource( Actor::Property::Scale ),
-                                                 LocalSource( Actor::Property::AnchorPoint ),
-                                                 LocalSource( Actor::Property::Size ),
+  constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
+                                                 LocalSource( Actor::Property::SCALE ),
+                                                 LocalSource( Actor::Property::ANCHOR_POINT ),
+                                                 LocalSource( Actor::Property::SIZE ),
                                                  Source( self, mPropertyPositionMin ),
                                                  Source( self, mPropertyPositionMax ),
                                                  Source( self, mPropertyWrap ),

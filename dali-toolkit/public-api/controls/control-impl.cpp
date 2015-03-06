@@ -27,6 +27,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/geometry/mesh.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
@@ -45,28 +46,8 @@ namespace Dali
 namespace Toolkit
 {
 
-const Property::Index Control::PROPERTY_BACKGROUND_COLOR      = Internal::Control::CONTROL_PROPERTY_START_INDEX;
-const Property::Index Control::PROPERTY_BACKGROUND            = Internal::Control::CONTROL_PROPERTY_START_INDEX + 1;
-const Property::Index Control::PROPERTY_WIDTH_POLICY          = Internal::Control::CONTROL_PROPERTY_START_INDEX + 2;
-const Property::Index Control::PROPERTY_HEIGHT_POLICY         = Internal::Control::CONTROL_PROPERTY_START_INDEX + 3;
-const Property::Index Control::PROPERTY_MINIMUM_SIZE          = Internal::Control::CONTROL_PROPERTY_START_INDEX + 4;
-const Property::Index Control::PROPERTY_MAXIMUM_SIZE          = Internal::Control::CONTROL_PROPERTY_START_INDEX + 5;
-const Property::Index Control::PROPERTY_KEY_INPUT_FOCUS       = Internal::Control::CONTROL_PROPERTY_START_INDEX + 6;
-
 namespace
 {
-
-// Signals
-
-const char* const SIGNAL_KEY_EVENT =    "key-event";
-const char* const SIGNAL_TAPPED =       "tapped";
-const char* const SIGNAL_PANNED =       "panned";
-const char* const SIGNAL_PINCHED =      "pinched";
-const char* const SIGNAL_LONG_PRESSED = "long-pressed";
-
-// Actions
-
-const char* const ACTION_CONTROL_ACTIVATED = "control-activated";
 
 const Scripting::StringEnum< Control::SizePolicy > SIZE_POLICY_STRING_TABLE[] =
 {
@@ -91,17 +72,20 @@ BaseHandle Create()
   return Internal::Control::New();
 }
 
-TypeRegistration CONTROL_TYPE( typeid(Control), typeid(CustomActor), Create );
+// Setup signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Control, CustomActor, Create );
 
-// Property Registration after Internal::Control::Impl definition below
+// Note: Properties are registered separately below,
 
-TypeAction ACTION_TYPE_1( CONTROL_TYPE, ACTION_CONTROL_ACTIVATED, &Internal::Control::DoAction );
+DALI_SIGNAL_REGISTRATION( Control, "key-event",                 SIGNAL_KEY_EVENT         )
+DALI_SIGNAL_REGISTRATION( Control, "tapped",                    SIGNAL_TAPPED            )
+DALI_SIGNAL_REGISTRATION( Control, "panned",                    SIGNAL_PANNED            )
+DALI_SIGNAL_REGISTRATION( Control, "pinched",                   SIGNAL_PINCHED           )
+DALI_SIGNAL_REGISTRATION( Control, "long-pressed",              SIGNAL_LONG_PRESSED      )
 
-SignalConnectorType SIGNAL_CONNECTOR_1( CONTROL_TYPE, SIGNAL_KEY_EVENT,     &Internal::Control::DoConnectSignal );
-SignalConnectorType SIGNAL_CONNECTOR_2( CONTROL_TYPE, SIGNAL_TAPPED,        &Internal::Control::DoConnectSignal );
-SignalConnectorType SIGNAL_CONNECTOR_3( CONTROL_TYPE, SIGNAL_PANNED,        &Internal::Control::DoConnectSignal );
-SignalConnectorType SIGNAL_CONNECTOR_4( CONTROL_TYPE, SIGNAL_PINCHED,       &Internal::Control::DoConnectSignal );
-SignalConnectorType SIGNAL_CONNECTOR_5( CONTROL_TYPE, SIGNAL_LONG_PRESSED,  &Internal::Control::DoConnectSignal );
+DALI_ACTION_REGISTRATION( Control, "control-activated",         ACTION_CONTROL_ACTIVATED )
+
+DALI_TYPE_REGISTRATION_END()
 
 /**
  * Structure which holds information about the background of a control
@@ -231,7 +215,7 @@ void SetupBackgroundActor( Actor actor, Property::Index constrainingIndex, const
   actor.SetZ( BACKGROUND_ACTOR_Z_POSITION );
 
   Constraint constraint = Constraint::New<Vector3>( constrainingIndex,
-                                                    ParentSource( Actor::Property::Size ),
+                                                    ParentSource( Actor::Property::SIZE ),
                                                     EqualToConstraint() );
   actor.ApplyConstraint( constraint );
 }
@@ -339,13 +323,13 @@ public:
 
       switch ( index )
       {
-        case Toolkit::Control::PROPERTY_BACKGROUND_COLOR:
+        case Toolkit::Control::Property::BACKGROUND_COLOR:
         {
           controlImpl.SetBackgroundColor( value.Get< Vector4 >() );
           break;
         }
 
-        case Toolkit::Control::PROPERTY_BACKGROUND:
+        case Toolkit::Control::Property::BACKGROUND:
         {
           if ( value.HasKey( "image" ) )
           {
@@ -365,31 +349,31 @@ public:
           break;
         }
 
-        case Toolkit::Control::PROPERTY_WIDTH_POLICY:
+        case Toolkit::Control::Property::WIDTH_POLICY:
         {
           controlImpl.mImpl->mWidthPolicy = Scripting::GetEnumeration< Toolkit::Control::SizePolicy >( value.Get< std::string >().c_str(), SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT );
           break;
         }
 
-        case Toolkit::Control::PROPERTY_HEIGHT_POLICY:
+        case Toolkit::Control::Property::HEIGHT_POLICY:
         {
           controlImpl.mImpl->mHeightPolicy = Scripting::GetEnumeration< Toolkit::Control::SizePolicy >( value.Get< std::string >().c_str(), SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT );
           break;
         }
 
-        case Toolkit::Control::PROPERTY_MINIMUM_SIZE:
+        case Toolkit::Control::Property::MINIMUM_SIZE:
         {
           controlImpl.SetMinimumSize( value.Get< Vector3 >() );
           break;
         }
 
-        case Toolkit::Control::PROPERTY_MAXIMUM_SIZE:
+        case Toolkit::Control::Property::MAXIMUM_SIZE:
         {
           controlImpl.SetMaximumSize( value.Get< Vector3 >() );
           break;
         }
 
-        case Toolkit::Control::PROPERTY_KEY_INPUT_FOCUS:
+        case Toolkit::Control::Property::KEY_INPUT_FOCUS:
         {
           if ( value.Get< bool >() )
           {
@@ -423,13 +407,13 @@ public:
 
       switch ( index )
       {
-        case Toolkit::Control::PROPERTY_BACKGROUND_COLOR:
+        case Toolkit::Control::Property::BACKGROUND_COLOR:
         {
           value = controlImpl.GetBackgroundColor();
           break;
         }
 
-        case Toolkit::Control::PROPERTY_BACKGROUND:
+        case Toolkit::Control::Property::BACKGROUND:
         {
           Property::Map map;
 
@@ -450,31 +434,31 @@ public:
           break;
         }
 
-        case Toolkit::Control::PROPERTY_WIDTH_POLICY:
+        case Toolkit::Control::Property::WIDTH_POLICY:
         {
           value = std::string( Scripting::GetEnumerationName< Toolkit::Control::SizePolicy >( controlImpl.mImpl->mWidthPolicy, SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT ) );
           break;
         }
 
-        case Toolkit::Control::PROPERTY_HEIGHT_POLICY:
+        case Toolkit::Control::Property::HEIGHT_POLICY:
         {
           value = std::string( Scripting::GetEnumerationName< Toolkit::Control::SizePolicy >( controlImpl.mImpl->mHeightPolicy, SIZE_POLICY_STRING_TABLE, SIZE_POLICY_STRING_TABLE_COUNT ) );
           break;
         }
 
-        case Toolkit::Control::PROPERTY_MINIMUM_SIZE:
+        case Toolkit::Control::Property::MINIMUM_SIZE:
         {
           value = controlImpl.mImpl->GetMinimumSize();
           break;
         }
 
-        case Toolkit::Control::PROPERTY_MAXIMUM_SIZE:
+        case Toolkit::Control::Property::MAXIMUM_SIZE:
         {
           value = controlImpl.mImpl->GetMaximumSize();
           break;
         }
 
-        case Toolkit::Control::PROPERTY_KEY_INPUT_FOCUS:
+        case Toolkit::Control::Property::KEY_INPUT_FOCUS:
         {
           value = controlImpl.HasKeyInputFocus();
           break;
@@ -583,7 +567,7 @@ public:
   bool mIsKeyboardFocusGroup:1;           ///< Stores whether the control is a focus group.
   bool mInitialized:1;
 
-  // Properties - these need to be members of Internal::Control::Impl as they need to functions within this class.
+  // Properties - these need to be members of Internal::Control::Impl as they need to function within this class.
   static PropertyRegistration PROPERTY_1;
   static PropertyRegistration PROPERTY_2;
   static PropertyRegistration PROPERTY_3;
@@ -593,13 +577,14 @@ public:
   static PropertyRegistration PROPERTY_7;
 };
 
-PropertyRegistration Control::Impl::PROPERTY_1( CONTROL_TYPE, "background-color", Toolkit::Control::PROPERTY_BACKGROUND_COLOR, Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_2( CONTROL_TYPE, "background",       Toolkit::Control::PROPERTY_BACKGROUND,       Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_3( CONTROL_TYPE, "width-policy",     Toolkit::Control::PROPERTY_WIDTH_POLICY,     Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_4( CONTROL_TYPE, "height-policy",    Toolkit::Control::PROPERTY_HEIGHT_POLICY,    Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_5( CONTROL_TYPE, "minimum-size",     Toolkit::Control::PROPERTY_MINIMUM_SIZE,     Property::VECTOR3, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_6( CONTROL_TYPE, "maximum-size",     Toolkit::Control::PROPERTY_MAXIMUM_SIZE,     Property::VECTOR3, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_7( CONTROL_TYPE, "key-input-focus",  Toolkit::Control::PROPERTY_KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+// Properties registered without macro to use specific member variables.
+PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "background-color", Toolkit::Control::Property::BACKGROUND_COLOR, Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "background",       Toolkit::Control::Property::BACKGROUND,      Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "width-policy",     Toolkit::Control::Property::WIDTH_POLICY,     Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "height-policy",    Toolkit::Control::Property::HEIGHT_POLICY,    Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "minimum-size",     Toolkit::Control::Property::MINIMUM_SIZE,     Property::VECTOR3, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "maximum-size",     Toolkit::Control::Property::MAXIMUM_SIZE,     Property::VECTOR3, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "key-input-focus",  Toolkit::Control::Property::KEY_INPUT_FOCUS,   Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {
@@ -788,7 +773,7 @@ void Control::SetBackgroundColor( const Vector4& color )
     // Create Mesh Actor
     MeshActor meshActor = MeshActor::New( CreateMesh() );
 
-    SetupBackgroundActor( meshActor, Actor::Property::Scale, color );
+    SetupBackgroundActor( meshActor, Actor::Property::SCALE, color );
 
     // Set the background actor before adding so that we do not inform deriving classes
     background.actor = meshActor;
@@ -819,7 +804,7 @@ void Control::SetBackground( Image image )
   }
 
   ImageActor imageActor = ImageActor::New( image );
-  SetupBackgroundActor( imageActor, Actor::Property::Size, background.color );
+  SetupBackgroundActor( imageActor, Actor::Property::SIZE, background.color );
 
   // Set the background actor before adding so that we do not inform derived classes
   background.actor = imageActor;

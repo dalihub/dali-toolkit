@@ -42,13 +42,6 @@ class TextField : public Control, public Text::ControlInterface
 {
 public:
 
-  // Properties
-  enum
-  {
-    TEXTFIELD_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    TEXTFIELD_PROPERTY_END_INDEX = TEXTFIELD_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
-  };
-
   /**
    * @copydoc Dali::Toollkit::TextField::New()
    */

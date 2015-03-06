@@ -145,6 +145,11 @@ public:
   virtual bool LoadFile( const std::string& filename, std::vector< unsigned char >& buffer ) const;
 
   /**
+   * @copydoc PlatformAbstraction::LoadShaderBinFile()
+   */
+  virtual bool LoadShaderBinFile( const std::string& filename, std::vector< unsigned char >& buffer ) const;
+
+  /**
    * @copydoc PlatformAbstraction::SaveFile()
    */
   virtual bool SaveFile(const std::string& filename, std::vector< unsigned char >& buffer) const;
@@ -165,6 +170,7 @@ public: // TEST FUNCTIONS
     SaveResourceFunc,
     SaveFileFunc,
     LoadFileFunc,
+    LoadShaderBinFileFunc,
     CancelLoadFunc,
     GetResourcesFunc,
     IsLoadingFunc,

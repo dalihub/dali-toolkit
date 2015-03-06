@@ -24,10 +24,11 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
-namespace //unnamed namespace
+namespace //Unnamed namespace
 {
 
 using namespace Dali;
@@ -81,13 +82,12 @@ namespace Dali
 namespace Toolkit
 {
 
-const Property::Index SuperBlurView::PROPERTY_IMAGE( Internal::SuperBlurView::SUPER_BLUR_VIEW_PROPERTY_START_INDEX );
-
 namespace Internal
 {
 
 namespace
 {
+
 const unsigned int DEFAULT_BLUR_LEVEL(5u); ///< The default blur level when creating SuperBlurView from the type registry
 
 BaseHandle Create()
@@ -95,10 +95,12 @@ BaseHandle Create()
   return Toolkit::SuperBlurView::New( DEFAULT_BLUR_LEVEL );
 }
 
-// Type registration
-TypeRegistration typeRegistration( typeid(Toolkit::SuperBlurView), typeid(Toolkit::Control), Create );
+// Setup properties, signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::SuperBlurView, Toolkit::Control, Create )
 
-PropertyRegistration property1( typeRegistration, "image", Toolkit::SuperBlurView::PROPERTY_IMAGE,   Property::MAP, &SuperBlurView::SetProperty, &SuperBlurView::GetProperty );
+DALI_PROPERTY_REGISTRATION( SuperBlurView, "image", MAP, IMAGE )
+
+DALI_TYPE_REGISTRATION_END()
 
 } // unnamed namespace
 
@@ -150,7 +152,7 @@ void SuperBlurView::OnInitialize()
 
   for(unsigned int i=0; i < mBlurLevels; i++)
   {
-    mImageActors[i].ApplyConstraint( Constraint::New<float>( Actor::Property::ColorAlpha, ParentSource( mBlurStrengthPropertyIndex ), ActorOpacityConstraint(mBlurLevels, i) ) );
+    mImageActors[i].ApplyConstraint( Constraint::New<float>( Actor::Property::COLOR_ALPHA, ParentSource( mBlurStrengthPropertyIndex ), ActorOpacityConstraint(mBlurLevels, i) ) );
   }
 
   Self().SetSize(Stage::GetCurrent().GetSize());
@@ -277,24 +279,20 @@ void SuperBlurView::SetProperty( BaseObject* object, Property::Index propertyInd
 {
   Toolkit::SuperBlurView superBlurView = Toolkit::SuperBlurView::DownCast( Dali::BaseHandle( object ) );
 
-  if ( superBlurView )
+  if( superBlurView )
   {
     SuperBlurView& superBlurViewImpl( GetImpl( superBlurView ) );
 
-    switch ( propertyIndex )
+    if( propertyIndex == Toolkit::SuperBlurView::Property::IMAGE )
     {
-      case Toolkit::SuperBlurView::PROPERTY_IMAGE:
+      Dali::Image image = Scripting::NewImage( value );
+      if ( image )
       {
-        Dali::Image image = Scripting::NewImage( value );
-        if ( image )
-        {
-          superBlurViewImpl.SetImage( image );
-        }
-        else
-        {
-          DALI_LOG_ERROR( "Cannot create image from property value\n" );
-        }
-        break;
+        superBlurViewImpl.SetImage( image );
+      }
+      else
+      {
+        DALI_LOG_ERROR( "Cannot create image from property value\n" );
       }
     }
   }
@@ -306,22 +304,18 @@ Property::Value SuperBlurView::GetProperty( BaseObject* object, Property::Index 
 
   Toolkit::SuperBlurView pushButton = Toolkit::SuperBlurView::DownCast( Dali::BaseHandle( object ) );
 
-  if ( pushButton )
+  if( pushButton )
   {
     SuperBlurView& superBlurViewImpl( GetImpl( pushButton ) );
 
-    switch ( propertyIndex )
+    if( propertyIndex == Toolkit::SuperBlurView::Property::IMAGE )
     {
-      case Toolkit::SuperBlurView::PROPERTY_IMAGE:
+      Property::Map map;
+      if( !superBlurViewImpl.mImageActors.empty() && superBlurViewImpl.mImageActors[0] )
       {
-        Property::Map map;
-        if ( !superBlurViewImpl.mImageActors.empty() && superBlurViewImpl.mImageActors[0] )
-        {
-          Scripting::CreatePropertyMap( superBlurViewImpl.mImageActors[0], map );
-        }
-        value = Property::Value( map );
-        break;
+        Scripting::CreatePropertyMap( superBlurViewImpl.mImageActors[0], map );
       }
+      value = Property::Value( map );
     }
   }
 

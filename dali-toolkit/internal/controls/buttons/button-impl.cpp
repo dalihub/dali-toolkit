@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/scripting/scripting.h>
 
@@ -32,36 +33,11 @@ namespace Dali
 namespace Toolkit
 {
 
-const Property::Index Button::PROPERTY_DISABLED                     = Internal::Button::BUTTON_PROPERTY_START_INDEX;
-const Property::Index Button::PROPERTY_AUTO_REPEATING               = Internal::Button::BUTTON_PROPERTY_START_INDEX + 1;
-const Property::Index Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY = Internal::Button::BUTTON_PROPERTY_START_INDEX + 2;
-const Property::Index Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY    = Internal::Button::BUTTON_PROPERTY_START_INDEX + 3;
-const Property::Index Button::PROPERTY_TOGGLABLE                    = Internal::Button::BUTTON_PROPERTY_START_INDEX + 4;
-const Property::Index Button::PROPERTY_SELECTED                     = Internal::Button::BUTTON_PROPERTY_START_INDEX + 5;
-const Property::Index Button::PROPERTY_NORMAL_STATE_ACTOR           = Internal::Button::BUTTON_PROPERTY_START_INDEX + 6;
-const Property::Index Button::PROPERTY_SELECTED_STATE_ACTOR         = Internal::Button::BUTTON_PROPERTY_START_INDEX + 7;
-const Property::Index Button::PROPERTY_DISABLED_STATE_ACTOR         = Internal::Button::BUTTON_PROPERTY_START_INDEX + 8;
-const Property::Index Button::PROPERTY_LABEL_ACTOR                  = Internal::Button::BUTTON_PROPERTY_START_INDEX + 9;
-
 namespace Internal
 {
 
 namespace
 {
-
-const unsigned int INITIAL_AUTOREPEATING_DELAY( 0.15f );
-const unsigned int NEXT_AUTOREPEATING_DELAY( 0.05f );
-
-// Signals
-
-const char* const SIGNAL_PRESSED =       "pressed";
-const char* const SIGNAL_RELEASED =      "released";
-const char* const SIGNAL_CLICKED =       "clicked";
-const char* const SIGNAL_STATE_CHANGED = "state-changed";
-
-// Actions
-
-const char* const ACTION_BUTTON_CLICK =  "button-click";
 
 BaseHandle Create()
 {
@@ -69,25 +45,31 @@ BaseHandle Create()
   return BaseHandle();
 }
 
-TypeRegistration typeRegistration( typeid( Toolkit::Button ), typeid( Toolkit::Control ), Create );
+// Setup properties, signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Button, Toolkit::Control, Create );
 
-SignalConnectorType signalConnector1( typeRegistration, SIGNAL_PRESSED , &Button::DoConnectSignal );
-SignalConnectorType signalConnector2( typeRegistration, SIGNAL_RELEASED, &Button::DoConnectSignal );
-SignalConnectorType signalConnector3( typeRegistration, SIGNAL_CLICKED, &Button::DoConnectSignal );
-SignalConnectorType signalConnector4( typeRegistration, SIGNAL_STATE_CHANGED, &Button::DoConnectSignal );
+DALI_PROPERTY_REGISTRATION( Button, "disabled",                     BOOLEAN, DISABLED                     )
+DALI_PROPERTY_REGISTRATION( Button, "auto-repeating",               BOOLEAN, AUTO_REPEATING               )
+DALI_PROPERTY_REGISTRATION( Button, "initial-auto-repeating-delay", FLOAT,   INITIAL_AUTO_REPEATING_DELAY )
+DALI_PROPERTY_REGISTRATION( Button, "next-auto-repeating-delay",    FLOAT,   NEXT_AUTO_REPEATING_DELAY    )
+DALI_PROPERTY_REGISTRATION( Button, "togglable",                    BOOLEAN, TOGGLABLE                    )
+DALI_PROPERTY_REGISTRATION( Button, "selected",                     BOOLEAN, SELECTED                     )
+DALI_PROPERTY_REGISTRATION( Button, "normal-state-actor",           MAP,     NORMAL_STATE_ACTOR           )
+DALI_PROPERTY_REGISTRATION( Button, "selected-state-actor",         MAP,     SELECTED_STATE_ACTOR         )
+DALI_PROPERTY_REGISTRATION( Button, "disabled-state-actor",         MAP,     DISABLED_STATE_ACTOR         )
+DALI_PROPERTY_REGISTRATION( Button, "label-actor",                  MAP,     LABEL_ACTOR                  )
 
-TypeAction action1( typeRegistration, ACTION_BUTTON_CLICK, &Button::DoAction );
+DALI_SIGNAL_REGISTRATION(   Button, "pressed",                               SIGNAL_PRESSED               )
+DALI_SIGNAL_REGISTRATION(   Button, "released",                              SIGNAL_RELEASED              )
+DALI_SIGNAL_REGISTRATION(   Button, "clicked",                               SIGNAL_CLICKED               )
+DALI_SIGNAL_REGISTRATION(   Button, "state-changed",                         SIGNAL_STATE_CHANGED         )
 
-PropertyRegistration property1( typeRegistration, "disabled",                     Toolkit::Button::PROPERTY_DISABLED,                     Property::BOOLEAN, &Button::SetProperty, &Button::GetProperty );
-PropertyRegistration property2( typeRegistration, "auto-repeating",               Toolkit::Button::PROPERTY_AUTO_REPEATING,               Property::BOOLEAN, &Button::SetProperty, &Button::GetProperty );
-PropertyRegistration property3( typeRegistration, "initial-auto-repeating-delay", Toolkit::Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY, Property::FLOAT,   &Button::SetProperty, &Button::GetProperty );
-PropertyRegistration property4( typeRegistration, "next-auto-repeating-delay",    Toolkit::Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY,    Property::FLOAT,   &Button::SetProperty, &Button::GetProperty );
-PropertyRegistration property5( typeRegistration, "togglable",                    Toolkit::Button::PROPERTY_TOGGLABLE,                    Property::BOOLEAN, &Button::SetProperty, &Button::GetProperty );
-PropertyRegistration property6( typeRegistration, "selected",                     Toolkit::Button::PROPERTY_SELECTED,                     Property::BOOLEAN, &Button::SetProperty, &Button::GetProperty );
-PropertyRegistration property7( typeRegistration, "normal-state-actor",           Toolkit::Button::PROPERTY_NORMAL_STATE_ACTOR,           Property::MAP,     &Button::SetProperty, &Button::GetProperty );
-PropertyRegistration property8( typeRegistration, "selected-state-actor",         Toolkit::Button::PROPERTY_SELECTED_STATE_ACTOR,         Property::MAP,     &Button::SetProperty, &Button::GetProperty );
-PropertyRegistration property9( typeRegistration, "disabled-state-actor",         Toolkit::Button::PROPERTY_DISABLED_STATE_ACTOR,         Property::MAP,     &Button::SetProperty, &Button::GetProperty );
-PropertyRegistration property10( typeRegistration, "label-actor",                 Toolkit::Button::PROPERTY_LABEL_ACTOR,                  Property::MAP,     &Button::SetProperty, &Button::GetProperty );
+DALI_ACTION_REGISTRATION(   Button, "button-click",                          ACTION_BUTTON_CLICK          )
+
+DALI_TYPE_REGISTRATION_END()
+
+const unsigned int INITIAL_AUTOREPEATING_DELAY( 0.15f );
+const unsigned int NEXT_AUTOREPEATING_DELAY( 0.05f );
 
 } // unnamed namespace
 
@@ -632,61 +614,61 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
   {
     switch ( index )
     {
-      case Toolkit::Button::PROPERTY_DISABLED:
+      case Toolkit::Button::Property::DISABLED:
       {
         GetImplementation( button ).SetDisabled( value.Get<bool>() );
         break;
       }
 
-      case Toolkit::Button::PROPERTY_AUTO_REPEATING:
+      case Toolkit::Button::Property::AUTO_REPEATING:
       {
         GetImplementation( button ).SetAutoRepeating( value.Get< bool >() );
         break;
       }
 
-      case Toolkit::Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY:
+      case Toolkit::Button::Property::INITIAL_AUTO_REPEATING_DELAY:
       {
         GetImplementation( button ).SetInitialAutoRepeatingDelay( value.Get< float >() );
         break;
       }
 
-      case Toolkit::Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY:
+      case Toolkit::Button::Property::NEXT_AUTO_REPEATING_DELAY:
       {
         GetImplementation( button ).SetNextAutoRepeatingDelay( value.Get< float >() );
         break;
       }
 
-      case Toolkit::Button::PROPERTY_TOGGLABLE:
+      case Toolkit::Button::Property::TOGGLABLE:
       {
         GetImplementation( button ).SetTogglableButton( value.Get< bool >() );
         break;
       }
 
-      case Toolkit::Button::PROPERTY_SELECTED:
+      case Toolkit::Button::Property::SELECTED:
       {
         GetImplementation( button ).SetSelected( value.Get< bool >() );
         break;
       }
 
-      case Toolkit::Button::PROPERTY_NORMAL_STATE_ACTOR:
+      case Toolkit::Button::Property::NORMAL_STATE_ACTOR:
       {
         GetImplementation( button ).SetButtonImage( Scripting::NewActor( value.Get< Property::Map >() ) );
         break;
       }
 
-      case Toolkit::Button::PROPERTY_SELECTED_STATE_ACTOR:
+      case Toolkit::Button::Property::SELECTED_STATE_ACTOR:
       {
         GetImplementation( button ).SetSelectedImage( Scripting::NewActor( value.Get< Property::Map >() ) );
         break;
       }
 
-      case Toolkit::Button::PROPERTY_DISABLED_STATE_ACTOR:
+      case Toolkit::Button::Property::DISABLED_STATE_ACTOR:
       {
         GetImplementation( button ).SetDisabledImage( Scripting::NewActor( value.Get< Property::Map >() ) );
         break;
       }
 
-      case Toolkit::Button::PROPERTY_LABEL_ACTOR:
+      case Toolkit::Button::Property::LABEL_ACTOR:
       {
         GetImplementation( button ).SetLabel( Scripting::NewActor( value.Get< Property::Map >() ) );
         break;
@@ -705,43 +687,43 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
   {
     switch ( propertyIndex )
     {
-      case Toolkit::Button::PROPERTY_DISABLED:
+      case Toolkit::Button::Property::DISABLED:
       {
         value = GetImplementation( button ).mDisabled;
         break;
       }
 
-      case Toolkit::Button::PROPERTY_AUTO_REPEATING:
+      case Toolkit::Button::Property::AUTO_REPEATING:
       {
         value = GetImplementation( button ).mAutoRepeating;
         break;
       }
 
-      case Toolkit::Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY:
+      case Toolkit::Button::Property::INITIAL_AUTO_REPEATING_DELAY:
       {
         value = GetImplementation( button ).mInitialAutoRepeatingDelay;
         break;
       }
 
-      case Toolkit::Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY:
+      case Toolkit::Button::Property::NEXT_AUTO_REPEATING_DELAY:
       {
         value = GetImplementation( button ).mNextAutoRepeatingDelay;
         break;
       }
 
-      case Toolkit::Button::PROPERTY_TOGGLABLE:
+      case Toolkit::Button::Property::TOGGLABLE:
       {
         value = GetImplementation( button ).mTogglableButton;
         break;
       }
 
-      case Toolkit::Button::PROPERTY_SELECTED:
+      case Toolkit::Button::Property::SELECTED:
       {
         value = GetImplementation( button ).mSelected;
         break;
       }
 
-      case Toolkit::Button::PROPERTY_NORMAL_STATE_ACTOR:
+      case Toolkit::Button::Property::NORMAL_STATE_ACTOR:
       {
         Property::Map map;
         Scripting::CreatePropertyMap( GetImplementation( button ).mButtonContent, map );
@@ -749,7 +731,7 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
         break;
       }
 
-      case Toolkit::Button::PROPERTY_SELECTED_STATE_ACTOR:
+      case Toolkit::Button::Property::SELECTED_STATE_ACTOR:
       {
         Property::Map map;
         Scripting::CreatePropertyMap( GetImplementation( button ).mSelectedContent, map );
@@ -757,7 +739,7 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
         break;
       }
 
-      case Toolkit::Button::PROPERTY_DISABLED_STATE_ACTOR:
+      case Toolkit::Button::Property::DISABLED_STATE_ACTOR:
       {
         Property::Map map;
         Scripting::CreatePropertyMap( GetImplementation( button ).mDisabledContent, map );
@@ -765,7 +747,7 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
         break;
       }
 
-      case Toolkit::Button::PROPERTY_LABEL_ACTOR:
+      case Toolkit::Button::Property::LABEL_ACTOR:
       {
         Property::Map map;
         Scripting::CreatePropertyMap( GetImplementation( button ).mLabel, map );

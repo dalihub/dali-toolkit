@@ -214,4 +214,3 @@ private:
 }
 
 #endif //#ifndef __DALI_TOOLKIT_SHADER_EFFECT_MOTION_BLUR_H__
-

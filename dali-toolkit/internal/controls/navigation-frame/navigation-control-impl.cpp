@@ -22,12 +22,13 @@
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 #include <dali-toolkit/internal/controls/navigation-frame/navigation-tool-bar.h>
 #include <dali-toolkit/internal/controls/navigation-frame/navigation-title-bar.h>
 #include <dali-toolkit/internal/controls/relayout-controller.h>
-#include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 
 namespace Dali
 {
@@ -41,20 +42,18 @@ namespace Internal
 namespace // to register type
 {
 
-// Actions
-
-const char* const ACTION_PUSH = "push";
-const char* const ACTION_POP =  "pop";
-
 BaseHandle Create()
 {
   return Toolkit::NavigationControl::New();
 }
 
-TypeRegistration mType( typeid( Toolkit::NavigationControl ), typeid( Toolkit::Control ), Create );
+// Setup properties, signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::NavigationControl, Toolkit::Control, Create )
 
-TypeAction a1( mType, ACTION_PUSH, &NavigationControl::DoAction );
-TypeAction a2( mType, ACTION_POP, &NavigationControl::DoAction );
+DALI_ACTION_REGISTRATION( NavigationControl, "push", ACTION_PUSH )
+DALI_ACTION_REGISTRATION( NavigationControl, "pop",  ACTION_POP  )
+
+DALI_TYPE_REGISTRATION_END()
 
 }
 

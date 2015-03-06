@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/integration-api/debug.h>
 
@@ -56,12 +57,10 @@ BaseHandle Create()
   return Toolkit::TextField::New();
 }
 
-TypeRegistration mType( typeid(Toolkit::TextField), typeid(Toolkit::Control), Create );
-
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextField, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( TextField, "rendering-backend",       INT,       RENDERING_BACKEND       )
+DALI_PROPERTY_REGISTRATION( TextField, "rendering-backend",       INTEGER,   RENDERING_BACKEND       )
 DALI_PROPERTY_REGISTRATION( TextField, "placeholder-text",        STRING,    PLACEHOLDER_TEXT        )
 DALI_PROPERTY_REGISTRATION( TextField, "text",                    STRING,    TEXT                    )
 DALI_PROPERTY_REGISTRATION( TextField, "font-family",             STRING,    FONT_FAMILY             )
@@ -105,7 +104,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 
     switch( index )
     {
-      case Toolkit::TextField::PROPERTY_RENDERING_BACKEND:
+      case Toolkit::TextField::Property::RENDERING_BACKEND:
       {
         unsigned int backend = value.Get< unsigned int >();
 
@@ -116,7 +115,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_PLACEHOLDER_TEXT:
+      case Toolkit::TextField::Property::PLACEHOLDER_TEXT:
       {
         if( impl.mController )
         {
@@ -124,7 +123,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_TEXT:
+      case Toolkit::TextField::Property::TEXT:
       {
         if( impl.mController )
         {
@@ -132,7 +131,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_CURSOR_IMAGE:
+      case Toolkit::TextField::Property::CURSOR_IMAGE:
       {
         ResourceImage image = ResourceImage::New( value.Get< std::string >() );
 
@@ -142,7 +141,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_PRIMARY_CURSOR_COLOR:
+      case Toolkit::TextField::Property::PRIMARY_CURSOR_COLOR:
       {
         if( impl.mDecorator )
         {
@@ -150,7 +149,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_SECONDARY_CURSOR_COLOR:
+      case Toolkit::TextField::Property::SECONDARY_CURSOR_COLOR:
       {
         if( impl.mDecorator )
         {
@@ -158,7 +157,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_ENABLE_CURSOR_BLINK:
+      case Toolkit::TextField::Property::ENABLE_CURSOR_BLINK:
       {
         if( impl.mController )
         {
@@ -166,7 +165,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_CURSOR_BLINK_INTERVAL:
+      case Toolkit::TextField::Property::CURSOR_BLINK_INTERVAL:
       {
         if( impl.mDecorator )
         {
@@ -174,7 +173,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_CURSOR_BLINK_DURATION:
+      case Toolkit::TextField::Property::CURSOR_BLINK_DURATION:
       {
         if( impl.mDecorator )
         {
@@ -182,7 +181,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_GRAB_HANDLE_IMAGE:
+      case Toolkit::TextField::Property::GRAB_HANDLE_IMAGE:
       {
         ResourceImage image = ResourceImage::New( value.Get< std::string >() );
 
@@ -192,7 +191,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_DECORATION_BOUNDING_BOX:
+      case Toolkit::TextField::Property::DECORATION_BOUNDING_BOX:
       {
         if( impl.mDecorator )
         {
@@ -216,22 +215,22 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
 
     switch( index )
     {
-      case Toolkit::TextField::PROPERTY_RENDERING_BACKEND:
+      case Toolkit::TextField::Property::RENDERING_BACKEND:
       {
         value = impl.mRenderingBackend;
         break;
       }
-      case Toolkit::TextField::PROPERTY_PLACEHOLDER_TEXT:
+      case Toolkit::TextField::Property::PLACEHOLDER_TEXT:
       {
         DALI_LOG_WARNING( "UTF-8 text representation was discarded\n" );
         break;
       }
-      case Toolkit::TextField::PROPERTY_TEXT:
+      case Toolkit::TextField::Property::TEXT:
       {
         DALI_LOG_WARNING( "UTF-8 text representation was discarded\n" );
         break;
       }
-      case Toolkit::TextField::PROPERTY_CURSOR_IMAGE:
+      case Toolkit::TextField::Property::CURSOR_IMAGE:
       {
         if( impl.mDecorator )
         {
@@ -243,7 +242,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_PRIMARY_CURSOR_COLOR:
+      case Toolkit::TextField::Property::PRIMARY_CURSOR_COLOR:
       {
         if( impl.mDecorator )
         {
@@ -251,7 +250,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_SECONDARY_CURSOR_COLOR:
+      case Toolkit::TextField::Property::SECONDARY_CURSOR_COLOR:
       {
         if( impl.mDecorator )
         {
@@ -259,12 +258,12 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_ENABLE_CURSOR_BLINK:
+      case Toolkit::TextField::Property::ENABLE_CURSOR_BLINK:
       {
         //value = impl.mController->GetEnableCursorBlink(); TODO
         break;
       }
-      case Toolkit::TextField::PROPERTY_CURSOR_BLINK_INTERVAL:
+      case Toolkit::TextField::Property::CURSOR_BLINK_INTERVAL:
       {
         if( impl.mDecorator )
         {
@@ -272,7 +271,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_CURSOR_BLINK_DURATION:
+      case Toolkit::TextField::Property::CURSOR_BLINK_DURATION:
       {
         if( impl.mDecorator )
         {
@@ -280,7 +279,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_GRAB_HANDLE_IMAGE:
+      case Toolkit::TextField::Property::GRAB_HANDLE_IMAGE:
       {
         if( impl.mDecorator )
         {
@@ -292,7 +291,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
-      case Toolkit::TextField::PROPERTY_DECORATION_BOUNDING_BOX:
+      case Toolkit::TextField::Property::DECORATION_BOUNDING_BOX:
       {
         if( impl.mDecorator )
         {

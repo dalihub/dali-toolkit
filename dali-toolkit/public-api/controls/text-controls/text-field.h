@@ -55,20 +55,20 @@ public:
   {
     enum
     {
-      PROPERTY_RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "rendering-backend",       The type or rendering e.g. bitmap-based,                                  type INT
-      PROPERTY_PLACEHOLDER_TEXT,                         ///< name "placeholder-text",        The text to display when the TextField is empty,                          type STRING
-      PROPERTY_TEXT,                                     ///< name "text",                    The text to display in UTF-8 format,                                      type STRING
-      PROPERTY_FONT_FAMILY,                              ///< name "font-family",             The requested font family,                                                type STRING
-      PROPERTY_FONT_STYLE,                               ///< name "font-style",              The requested font style e.g. Regular/Italic,                             type STRING
-      PROPERTY_POINT_SIZE,                               ///< name "point-size",              The size of font in points,                                               type FLOAT
-      PROPERTY_CURSOR_IMAGE,                             ///< name "cursor-image",            The image to display for cursors,                                         type STRING
-      PROPERTY_PRIMARY_CURSOR_COLOR,                     ///< name "primary-cursor-color",    The color to apply to the primary cursor,                                 type VECTOR4
-      PROPERTY_SECONDARY_CURSOR_COLOR,                   ///< name "secondary-cursor-color",  The color to apply to the secondary cursor,                               type VECTOR4
-      PROPERTY_ENABLE_CURSOR_BLINK,                      ///< name "enable-cursor-blink",     Whether the cursor should blink or not,                                   type BOOLEAN
-      PROPERTY_CURSOR_BLINK_INTERVAL,                    ///< name "cursor-blink-interval",   The time interval between cursor on/off states,                           type FLOAT
-      PROPERTY_CURSOR_BLINK_DURATION,                    ///< name "cursor-blink-duration",   The cursor will stop blinking after this duration (if non-zero),          type FLOAT
-      PROPERTY_GRAB_HANDLE_IMAGE,                        ///< name "grab-handle-image",       The image to display for grab handle,                                     type STRING
-      PROPERTY_DECORATION_BOUNDING_BOX                   ///< name "decoration-bounding-box", The decorations (handles etc) will positioned within this area on-screen, type RECTANGLE
+      RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "rendering-backend",       The type or rendering e.g. bitmap-based,                                  type INT
+      PLACEHOLDER_TEXT,                         ///< name "placeholder-text",        The text to display when the TextField is empty,                          type STRING
+      TEXT,                                     ///< name "text",                    The text to display in UTF-8 format,                                      type STRING
+      FONT_FAMILY,                              ///< name "font-family",             The requested font family,                                                type STRING
+      FONT_STYLE,                               ///< name "font-style",              The requested font style e.g. Regular/Italic,                             type STRING
+      POINT_SIZE,                               ///< name "point-size",              The size of font in points,                                               type FLOAT
+      CURSOR_IMAGE,                             ///< name "cursor-image",            The image to display for cursors,                                         type STRING
+      PRIMARY_CURSOR_COLOR,                     ///< name "primary-cursor-color",    The color to apply to the primary cursor,                                 type VECTOR4
+      SECONDARY_CURSOR_COLOR,                   ///< name "secondary-cursor-color",  The color to apply to the secondary cursor,                               type VECTOR4
+      ENABLE_CURSOR_BLINK,                      ///< name "enable-cursor-blink",     Whether the cursor should blink or not,                                   type BOOLEAN
+      CURSOR_BLINK_INTERVAL,                    ///< name "cursor-blink-interval",   The time interval between cursor on/off states,                           type FLOAT
+      CURSOR_BLINK_DURATION,                    ///< name "cursor-blink-duration",   The cursor will stop blinking after this duration (if non-zero),          type FLOAT
+      GRAB_HANDLE_IMAGE,                        ///< name "grab-handle-image",       The image to display for grab handle,                                     type STRING
+      DECORATION_BOUNDING_BOX                   ///< name "decoration-bounding-box", The decorations (handles etc) will positioned within this area on-screen, type RECTANGLE
     };
   };
 

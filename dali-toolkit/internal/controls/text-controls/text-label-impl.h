@@ -40,13 +40,6 @@ class TextLabel : public Control, public Text::ControlInterface
 {
 public:
 
-  // Properties
-  enum
-  {
-    TEXTLABEL_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    TEXTLABEL_PROPERTY_END_INDEX = TEXTLABEL_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
-  };
-
   /**
    * @copydoc Dali::Toollkit::TextLabel::New()
    */
