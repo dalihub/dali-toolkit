@@ -23,6 +23,7 @@
 
 // EXTERNAL INCLUDE
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/math/vector2.h>
 
 namespace Dali
 {
@@ -35,7 +36,7 @@ namespace Toolkit
 namespace Text
 {
 
-class VisualModel;
+struct LayoutParameters;
 
 /**
  * @brief LayoutEngine is responsible for calculating the visual position of glyphs in layout.
@@ -77,17 +78,15 @@ public:
   /**
    * @brief Store the visual position of glyphs in the VisualModel.
    *
-   * @param[in] boundingBox The size of the box containing the text.
-   * @param[in] glyphs A vector with glyphs.
-   * @param[in] characterIndices Vector with indices pointing the first character of each glyph.
-   * @param[in] charactersPerGlyph Vector with the number of characters that forms each glyph.
-   * @param[in] visualModel The visual model to update.
+   * @param[in] layoutParameters The parameters needed to layout the text.
+   * @param[out] glyphPositions The positions of all the glyphs.
+   * @param[out] actualSize The size of the text after it has been laid-out.
+   *
+   * @return \e true if the text has been re-laid-out. \e false means the given width is too small to layout even a single character.
    */
-  void UpdateVisualModel( const Vector2& boundingBox,
-                          const Vector<GlyphInfo>& glyphs,
-                          const Vector<CharacterIndex>& characterIndices,
-                          const Vector<Length>& charactersPerGlyph,
-                          VisualModel& visualModel );
+  bool LayoutText( const LayoutParameters& layoutParameters,
+                   Vector<Vector2>& glyphPositions,
+                   Size& actualSize );
 
 private:
 

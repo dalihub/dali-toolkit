@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
+#include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 #include <dali-toolkit/internal/text/logical-model.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/script-run.h>
@@ -381,7 +382,7 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
     mImpl->mLogicalModel->SetText( utf32Characters.Begin(), characterCount );
 
     // Discard temporary text
-    text.clear();
+    //text.clear(); temporary keep the text. will be fixed in the next patch.
   }
 
   Vector<LineBreakInfo> lineBreakInfo;
@@ -397,6 +398,18 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
                       lineBreakInfo );
 
     mImpl->mLogicalModel->SetLineBreakInfo( lineBreakInfo.Begin(), characterCount );
+  }
+
+  Vector<WordBreakInfo> wordBreakInfo;
+  if( GET_WORD_BREAKS & operations )
+  {
+    // Retrieves the word break info. The word break info is used to layout the text (where to wrap the text in lines).
+    wordBreakInfo.Resize( characterCount, TextAbstraction::WORD_NO_BREAK );
+
+    SetWordBreakInfo( utf32Characters,
+                      wordBreakInfo );
+
+    mImpl->mLogicalModel->SetWordBreakInfo( wordBreakInfo.Begin(), characterCount );
   }
 
   const bool getScripts = GET_SCRIPTS & operations;
@@ -454,15 +467,36 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
     mImpl->mFontClient.GetGlyphMetrics( glyphs.Begin(), glyphs.Count() );
   }
 
+  Length numberOfGlyphs = glyphs.Count();
+  if( 0u != numberOfGlyphs )
+  {
+    // Sets the glyphs into the model.
+    mImpl->mVisualModel->SetGlyphs( glyphs.Begin(),
+                                    glyphsToCharactersMap.Begin(),
+                                    charactersPerGlyph.Begin(),
+                                    numberOfGlyphs );
+  }
+
   if( LAYOUT & operations )
   {
-    if( 0u == glyphs.Count() )
+    if( 0u == numberOfGlyphs )
     {
-      const Length numberOfGlyphs = mImpl->mVisualModel->GetNumberOfGlyphs();
+      const Length numberOfCharacters = mImpl->mLogicalModel->GetNumberOfCharacters();
+      numberOfGlyphs = mImpl->mVisualModel->GetNumberOfGlyphs();
 
+      lineBreakInfo.Resize( numberOfCharacters );
+      wordBreakInfo.Resize( numberOfCharacters );
       glyphs.Resize( numberOfGlyphs );
       glyphsToCharactersMap.Resize( numberOfGlyphs );
       charactersPerGlyph.Resize( numberOfGlyphs );
+
+      mImpl->mLogicalModel->GetLineBreakInfo( lineBreakInfo.Begin(),
+                                              0u,
+                                              numberOfCharacters );
+
+      mImpl->mLogicalModel->GetWordBreakInfo( wordBreakInfo.Begin(),
+                                              0u,
+                                              numberOfCharacters );
 
       mImpl->mVisualModel->GetGlyphs( glyphs.Begin(),
                                       0u,
@@ -477,14 +511,32 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
                                                      numberOfGlyphs );
     }
 
-    // Update the visual model
-    mImpl->mLayoutEngine.UpdateVisualModel( size,
-                                            glyphs,
-                                            glyphsToCharactersMap,
-                                            charactersPerGlyph,
-                                            *mImpl->mVisualModel );
+    // Set the layout parameters.
+    LayoutParameters layoutParameters( size,
+                                       lineBreakInfo.Begin(),
+                                       wordBreakInfo.Begin(),
+                                       numberOfGlyphs,
+                                       glyphs.Begin(),
+                                       glyphsToCharactersMap.Begin(),
+                                       charactersPerGlyph.Begin() );
 
-    viewUpdated = true;
+    // Reserve space to set the positions of the glyphs.
+    Vector<Vector2> glyphPositions;
+    glyphPositions.Resize( numberOfGlyphs );
+
+    Size layoutSize;
+
+    // Update the visual model
+    viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
+                                                   glyphPositions,
+                                                   layoutSize );
+
+    // Sets the positions into the model.
+    mImpl->mVisualModel->SetGlyphPositions( glyphPositions.Begin(),
+                                            numberOfGlyphs );
+
+    // Sets the actual size.
+    mImpl->mVisualModel->SetActualSize( layoutSize );
   }
 
   return viewUpdated;

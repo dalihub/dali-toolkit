@@ -63,19 +63,21 @@ private:
    */
   enum OperationsMask
   {
-    NO_OPERATION      = 0x0,
-    CONVERT_TO_UTF32  = 0x1,
-    GET_SCRIPTS       = 0x2,
-    VALIDATE_FONTS    = 0x4,
-    GET_LINE_BREAKS   = 0x8,
-    GET_WORD_BREAKS   = 0x10,
-    SHAPE_TEXT        = 0x20,
-    GET_GLYPH_METRICS = 0x40,
-    LAYOUT            = 0x80,
-    REORDER           = 0x100,
-    ALIGNMENT         = 0x200,
-    RENDER            = 0x400,
-    ALL_OPERATIONS    = 0xFFF
+    NO_OPERATION       = 0x0000,
+    CONVERT_TO_UTF32   = 0x0001,
+    GET_SCRIPTS        = 0x0002,
+    VALIDATE_FONTS     = 0x0004,
+    GET_LINE_BREAKS    = 0x0008,
+    GET_WORD_BREAKS    = 0x0010,
+    SHAPE_TEXT         = 0x0020,
+    GET_GLYPH_METRICS  = 0x0040,
+    LAYOUT             = 0x0080,
+    UPDATE_ACTUAL_SIZE = 0x0100,
+    UPDATE_POSITIONS   = 0x0200,
+    REORDER            = 0x0400,
+    ALIGNMENT          = 0x0800,
+    RENDER             = 0x1000,
+    ALL_OPERATIONS     = 0xFFFF
   };
 
 public:
@@ -121,7 +123,12 @@ public:
   bool Relayout( const Vector2& size );
 
   /**
+   * @brief Lays-out the text.
    *
+   * GetNaturalSize(), GetHeightForWidth() and Relayout() calls this method.
+   *
+   * @param[in] size A the size of a bounding box to layout text within.
+   * @param[in] operations The layout operations which need to be done.
    */
   bool DoRelayout( const Vector2& size, OperationsMask operations );
 
