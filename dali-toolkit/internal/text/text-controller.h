@@ -186,8 +186,11 @@ public:
    *
    * @param[in] size A the size of a bounding box to layout text within.
    * @param[in] operations The layout operations which need to be done.
+   * @param[out] layoutSize The size of the laid-out text.
    */
-  bool DoRelayout( const Vector2& size, OperationsMask operations );
+  bool DoRelayout( const Vector2& size,
+                   OperationsMask operations,
+                   Size& layoutSize );
 
   /**
    * @copydoc Control::GetNaturalSize()

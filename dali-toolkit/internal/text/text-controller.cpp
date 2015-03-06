@@ -38,6 +38,11 @@
 
 using std::vector;
 
+namespace
+{
+const float MAX_FLOAT = std::numeric_limits<float>::max();
+} // namespace
+
 namespace Dali
 {
 
@@ -284,19 +289,23 @@ struct Controller::TextInput
 
     Vector<GlyphInfo> glyphs;
     glyphs.Resize( numberOfGlyphs );
-    mVisualModel->GetGlyphs( &glyphs[0], 0, numberOfGlyphs );
+    mVisualModel->GetGlyphs( glyphs.Begin(), 0, numberOfGlyphs );
+    const GlyphInfo* const glyphsBuffer = glyphs.Begin();
 
-    std::vector<Vector2> positions;
-    positions.resize( numberOfGlyphs );
-    mVisualModel->GetGlyphPositions( &positions[0], 0, numberOfGlyphs );
+    Vector<Vector2> positions;
+    positions.Resize( numberOfGlyphs );
+    mVisualModel->GetGlyphPositions( positions.Begin(), 0, numberOfGlyphs );
+    const Vector2* const positionsBuffer = positions.Begin();
 
     unsigned int closestGlyph = 0;
-    float closestDistance = std::numeric_limits<float>::max();
+    float closestDistance = MAX_FLOAT;
 
-    for( unsigned int i=0; i<glyphs.Count(); ++i )
+    for( unsigned int i = 0, numberOfGLyphs = glyphs.Count(); i < numberOfGLyphs; ++i )
     {
-      float glyphX = positions[i].x + glyphs[i].width*0.5f;
-      float glyphY = positions[i].y + glyphs[i].height*0.5f;
+      const GlyphInfo& glyphInfo = *( glyphsBuffer + i );
+      const Vector2& position = *( positionsBuffer + i );
+      float glyphX = position.x + glyphInfo.width*0.5f;
+      float glyphY = position.y + glyphInfo.height*0.5f;
 
       float distanceToGlyph = fabsf( glyphX - x ) + fabsf( glyphY - y );
 
@@ -362,18 +371,24 @@ struct Controller::Impl
 {
   Impl( ControlInterface& controlInterface )
   : mControlInterface( controlInterface ),
-    mNewText(),
-    mOperations( NO_OPERATION ),
-    mControlSize(),
+    mLogicalModel(),
+    mVisualModel(),
     mFontDefaults( NULL ),
-    mTextInput( NULL )
+    mTextInput( NULL ),
+    mFontClient(),
+    mView(),
+    mLayoutEngine(),
+    mNewText(),
+    mControlSize(),
+    mOperationsPending( NO_OPERATION ),
+    mRecalculateNaturalSize( true )
   {
     mLogicalModel = LogicalModel::New();
     mVisualModel  = VisualModel::New();
 
-    mView.SetVisualModel( mVisualModel );
-
     mFontClient = TextAbstraction::FontClient::Get();
+
+    mView.SetVisualModel( mVisualModel );
   }
 
   ~Impl()
@@ -381,28 +396,18 @@ struct Controller::Impl
     delete mTextInput;
   }
 
-  ControlInterface& mControlInterface;
-
-  std::string mNewText;
-
-  LogicalModelPtr mLogicalModel;
-  VisualModelPtr  mVisualModel;
-
-  View mView;
-
-  LayoutEngine mLayoutEngine;
-
-  TextAbstraction::FontClient mFontClient;
-
-  OperationsMask mOperations;
-
-  Size mControlSize;
-
-  // Avoid allocating this when the user does not specify a font
-  FontDefaults* mFontDefaults;
-
-  // Avoid allocating everything for text input until EnableTextInput()
-  Controller::TextInput* mTextInput;
+  ControlInterface& mControlInterface;     ///< Reference to the text controller.
+  LogicalModelPtr mLogicalModel;           ///< Pointer to the logical model.
+  VisualModelPtr  mVisualModel;            ///< Pointer to the visual model.
+  FontDefaults* mFontDefaults;             ///< Avoid allocating this when the user does not specify a font.
+  Controller::TextInput* mTextInput;       ///< Avoid allocating everything for text input until EnableTextInput().
+  TextAbstraction::FontClient mFontClient; ///< Handle to the font client.
+  View mView;                              ///< The view interface to the rendering back-end.
+  LayoutEngine mLayoutEngine;              ///< The layout engine.
+  std::string mNewText;                    ///< Temporary stores the text set until the next relayout.
+  Size mControlSize;                       ///< The size of the control.
+  OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
+  bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
 };
 
 ControllerPtr Controller::New( ControlInterface& controlInterface )
@@ -414,7 +419,12 @@ void Controller::SetText( const std::string& text )
 {
   // Keep until size negotiation
   mImpl->mNewText = text;
-  mImpl->mOperations = ALL_OPERATIONS;
+
+  // All operations need to be done. (convert to utf32, get break info, ..., layout, ...)
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+
+  // The natural size needs to be re-calculated.
+  mImpl->mRecalculateNaturalSize = true;
 
   if( mImpl->mTextInput )
   {
@@ -462,7 +472,8 @@ void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
 
   mImpl->mFontDefaults->mDefaultFontFamily = defaultFontFamily;
   mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
-  mImpl->mOperations = ALL_OPERATIONS;
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  mImpl->mRecalculateNaturalSize = true;
 }
 
 const std::string& Controller::GetDefaultFontFamily() const
@@ -484,7 +495,8 @@ void Controller::SetDefaultFontStyle( const std::string& defaultFontStyle )
 
   mImpl->mFontDefaults->mDefaultFontStyle = defaultFontStyle;
   mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
-  mImpl->mOperations = ALL_OPERATIONS;
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  mImpl->mRecalculateNaturalSize = true;
 }
 
 const std::string& Controller::GetDefaultFontStyle() const
@@ -506,7 +518,8 @@ void Controller::SetDefaultPointSize( float pointSize )
 
   mImpl->mFontDefaults->mDefaultPointSize = pointSize;
   mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
-  mImpl->mOperations = ALL_OPERATIONS;
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  mImpl->mRecalculateNaturalSize = true;
 }
 
 float Controller::GetDefaultPointSize() const
@@ -535,17 +548,25 @@ bool Controller::Relayout( const Vector2& size )
     return false;
   }
 
-  bool updated = false;
-
   if( size != mImpl->mControlSize )
   {
-    updated = DoRelayout( size, mImpl->mOperations );
-
-    // Do not re-do any operation until something changes.
-    mImpl->mOperations = NO_OPERATION;
+    // Operations that need to be done if the size changes.
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                             LAYOUT                    |
+                                                             UPDATE_ACTUAL_SIZE        |
+                                                             UPDATE_POSITIONS          |
+                                                             REORDER );
 
     mImpl->mControlSize = size;
   }
+
+  Size layoutSize;
+  bool updated = DoRelayout( mImpl->mControlSize,
+                             mImpl->mOperationsPending,
+                             layoutSize );
+
+  // Do not re-do any operation until something changes.
+  mImpl->mOperationsPending = NO_OPERATION;
 
   if( mImpl->mTextInput )
   {
@@ -556,9 +577,14 @@ bool Controller::Relayout( const Vector2& size )
   return updated;
 }
 
-bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
+bool Controller::DoRelayout( const Vector2& size,
+                             OperationsMask operationsRequired,
+                             Size& layoutSize )
 {
   bool viewUpdated( false );
+
+  // Calculate the operations to be done.
+  const OperationsMask operations = static_cast<OperationsMask>( mImpl->mOperationsPending & operationsRequired );
 
   Vector<Character> utf32Characters;
   Length characterCount = 0u;
@@ -581,7 +607,7 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
     mImpl->mLogicalModel->SetText( utf32Characters.Begin(), characterCount );
 
     // Discard temporary text
-    //text.clear(); temporary keep the text. will be fixed in the next patch.
+    text.clear();
   }
 
   Vector<LineBreakInfo> lineBreakInfo;
@@ -729,19 +755,27 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
     Vector<Vector2> glyphPositions;
     glyphPositions.Resize( numberOfGlyphs );
 
-    Size layoutSize;
-
     // Update the visual model
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
                                                    glyphPositions,
                                                    layoutSize );
 
     // Sets the positions into the model.
-    mImpl->mVisualModel->SetGlyphPositions( glyphPositions.Begin(),
-                                            numberOfGlyphs );
+    if( UPDATE_POSITIONS & operations )
+    {
+      mImpl->mVisualModel->SetGlyphPositions( glyphPositions.Begin(),
+                                              numberOfGlyphs );
+    }
 
     // Sets the actual size.
-    mImpl->mVisualModel->SetActualSize( layoutSize );
+    if( UPDATE_ACTUAL_SIZE & operations )
+    {
+      mImpl->mVisualModel->SetActualSize( layoutSize );
+    }
+  }
+  else
+  {
+    layoutSize = mImpl->mVisualModel->GetActualSize();
   }
 
   return viewUpdated;
@@ -749,62 +783,83 @@ bool Controller::DoRelayout( const Vector2& size, OperationsMask operations )
 
 Vector3 Controller::GetNaturalSize()
 {
-  // TODO - Finish implementing
-  return Vector3::ZERO;
+  Vector3 naturalSize;
 
-  // Operations that can be done only once until the text changes.
-  const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32 |
-                                                                         GET_SCRIPTS      |
-                                                                         VALIDATE_FONTS   |
-                                                                         GET_LINE_BREAKS  |
-                                                                         GET_WORD_BREAKS  |
-                                                                         SHAPE_TEXT       |
-                                                                         GET_GLYPH_METRICS );
+  if( mImpl->mRecalculateNaturalSize )
+  {
+    // Operations that can be done only once until the text changes.
+    const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |
+                                                                           GET_SCRIPTS       |
+                                                                           VALIDATE_FONTS    |
+                                                                           GET_LINE_BREAKS   |
+                                                                           GET_WORD_BREAKS   |
+                                                                           SHAPE_TEXT        |
+                                                                           GET_GLYPH_METRICS );
 
-  // Operations that need to be done if the size or the text changes.
-  const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
-                                                                      REORDER );
+    // Operations that need to be done if the size changes.
+    const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
+                                                                        REORDER );
 
-  const float maxFloat = std::numeric_limits<float>::max();
-  DoRelayout( Vector2( maxFloat, maxFloat ),
-              static_cast<OperationsMask>( onlyOnceOperations |
-                                           sizeOperations ) );
+    DoRelayout( Size( MAX_FLOAT, MAX_FLOAT ),
+                static_cast<OperationsMask>( onlyOnceOperations |
+                                             sizeOperations ),
+                naturalSize.GetVectorXY() );
 
-  // Do not do again the only once operations.
-  mImpl->mOperations = static_cast<OperationsMask>( mImpl->mOperations & ~onlyOnceOperations );
+    // Do not do again the only once operations.
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending & ~onlyOnceOperations );
 
-  // Do the size related operations again.
-  mImpl->mOperations = static_cast<OperationsMask>( mImpl->mOperations | sizeOperations );
+    // Do the size related operations again.
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | sizeOperations );
 
-  return Vector3( mImpl->mVisualModel->GetNaturalSize() );
+    // Stores the natural size to avoid recalculate it again
+    // unless the text/style changes.
+    mImpl->mVisualModel->SetNaturalSize( naturalSize.GetVectorXY() );
+
+    mImpl->mRecalculateNaturalSize = false;
+  }
+  else
+  {
+    naturalSize = mImpl->mVisualModel->GetNaturalSize();
+  }
+
+  return naturalSize;
 }
 
 float Controller::GetHeightForWidth( float width )
 {
-  // Operations that can be done only once until the text changes.
-  const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32 |
-                                                                         GET_SCRIPTS      |
-                                                                         VALIDATE_FONTS   |
-                                                                         GET_LINE_BREAKS  |
-                                                                         GET_WORD_BREAKS  |
-                                                                         SHAPE_TEXT       |
-                                                                         GET_GLYPH_METRICS );
+  Size layoutSize;
+  if( width != mImpl->mControlSize.width )
+  {
+    // Operations that can be done only once until the text changes.
+    const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |
+                                                                           GET_SCRIPTS       |
+                                                                           VALIDATE_FONTS    |
+                                                                           GET_LINE_BREAKS   |
+                                                                           GET_WORD_BREAKS   |
+                                                                           SHAPE_TEXT        |
+                                                                           GET_GLYPH_METRICS );
 
-  // Operations that need to be done if the size or the text changes.
-  const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
-                                                                      REORDER );
+    // Operations that need to be done if the size changes.
+    const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
+                                                                        REORDER );
 
-  DoRelayout( Size( width, 0.f ),
-              static_cast<OperationsMask>( onlyOnceOperations |
-                                           sizeOperations ) );
+    DoRelayout( Size( width, MAX_FLOAT ),
+                static_cast<OperationsMask>( onlyOnceOperations |
+                                             sizeOperations ),
+                layoutSize );
 
-  // Do not do again the only once operations.
-  mImpl->mOperations = static_cast<OperationsMask>( mImpl->mOperations & ~onlyOnceOperations );
+    // Do not do again the only once operations.
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending & ~onlyOnceOperations );
 
-  // Do the size related operations again.
-  mImpl->mOperations = static_cast<OperationsMask>( mImpl->mOperations | sizeOperations );
+    // Do the size related operations again.
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | sizeOperations );
+  }
+  else
+  {
+    layoutSize = mImpl->mVisualModel->GetActualSize();
+  }
 
-  return mImpl->mVisualModel->GetActualSize().height;
+  return layoutSize.height;
 }
 
 View& Controller::GetView()
