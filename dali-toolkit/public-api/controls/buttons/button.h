@@ -75,16 +75,16 @@ public:
   {
     enum
     {
-      DISABLED = PROPERTY_START_INDEX, ///< name "disabled",                     @see SetDisabled(),                  type BOOLEAN
-      AUTO_REPEATING,                  ///< name "auto-repeating",               @see SetAutoRepeating(),             type BOOLEAN
-      INITIAL_AUTO_REPEATING_DELAY,    ///< name "initial-auto-repeating-delay", @see SetInitialAutoRepeatingDelay(), type FLOAT
-      NEXT_AUTO_REPEATING_DELAY,       ///< name "next-auto-repeating-delay",    @see SetNextAutoRepeatingDelay(),    type FLOAT
-      TOGGLABLE,                       ///< name "togglable",                    @see SetTogglableButton(),           type BOOLEAN
-      SELECTED,                        ///< name "selected",                     @see SetSelected(),                  type BOOLEAN
-      NORMAL_STATE_ACTOR,              ///< name "normal-state-actor",           @see SetButtonImage(),               type MAP
-      SELECTED_STATE_ACTOR,            ///< name "selected-state-actor",         @see SetSelectedImage(),             type MAP
-      DISABLED_STATE_ACTOR,            ///< name "disabled-state-actor",         @see SetDisabledImage(),             type MAP
-      LABEL_ACTOR,                     ///< name "label-actor",                  @see SetLabel(),                     type MAP
+      DISABLED = PROPERTY_START_INDEX, ///< name "disabled",                     @see SetDisabled(),                  type bool
+      AUTO_REPEATING,                  ///< name "auto-repeating",               @see SetAutoRepeating(),             type bool
+      INITIAL_AUTO_REPEATING_DELAY,    ///< name "initial-auto-repeating-delay", @see SetInitialAutoRepeatingDelay(), type float
+      NEXT_AUTO_REPEATING_DELAY,       ///< name "next-auto-repeating-delay",    @see SetNextAutoRepeatingDelay(),    type float
+      TOGGLABLE,                       ///< name "togglable",                    @see SetTogglableButton(),           type bool
+      SELECTED,                        ///< name "selected",                     @see SetSelected(),                  type bool
+      NORMAL_STATE_ACTOR,              ///< name "normal-state-actor",           @see SetButtonImage(),               type Map
+      SELECTED_STATE_ACTOR,            ///< name "selected-state-actor",         @see SetSelectedImage(),             type Map
+      DISABLED_STATE_ACTOR,            ///< name "disabled-state-actor",         @see SetDisabledImage(),             type Map
+      LABEL_ACTOR,                     ///< name "label-actor",                  @see SetLabel(),                     type Map
     };
   };
 

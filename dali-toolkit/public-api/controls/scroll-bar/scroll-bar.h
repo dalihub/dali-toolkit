@@ -69,10 +69,10 @@ public:
   {
     enum
     {
-      INDICATOR_HEIGHT_POLICY = PROPERTY_START_INDEX, ///< name "indicator-height-policy", @see SetIndicatorHeightPolicy(), type STRING
-      INDICATOR_FIXED_HEIGHT,                         ///< name "indicator-fixed-height",  @see SetIndicatorFixedHeight(),  type FLOAT
-      INDICATOR_SHOW_DURATION,                        ///< name "indicator-show-duration", @see SetIndicatorShowDuration(), type FLOAT
-      INDICATOR_HIDE_DURATION,                        ///< name "indicator-hide-duration", @see SetIndicatorHideDuration(), type FLOAT
+      INDICATOR_HEIGHT_POLICY = PROPERTY_START_INDEX, ///< name "indicator-height-policy", @see SetIndicatorHeightPolicy(), type std::string
+      INDICATOR_FIXED_HEIGHT,                         ///< name "indicator-fixed-height",  @see SetIndicatorFixedHeight(),  type float
+      INDICATOR_SHOW_DURATION,                        ///< name "indicator-show-duration", @see SetIndicatorShowDuration(), type float
+      INDICATOR_HIDE_DURATION,                        ///< name "indicator-hide-duration", @see SetIndicatorHideDuration(), type float
     };
   };
 

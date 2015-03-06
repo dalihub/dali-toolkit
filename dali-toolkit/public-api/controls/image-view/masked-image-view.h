@@ -59,11 +59,11 @@ public:
    */
   enum CustomProperty
   {
-    BACKGROUND_COLOR,    ///< Name "background-color", type VECTOR4
-    SOURCE_SIZE,         ///< Name "source-size",      type VECTOR2
-    SOURCE_OFFSET,       ///< Name "source-offset",    type VECTOR2
-    MASK_SIZE,           ///< Name "mask-size",        type VECTOR2
-    MASK_OFFSET,         ///< Name "mask-offset",      type VECTOR2
+    BACKGROUND_COLOR,    ///< Name "background-color", type Vector4
+    SOURCE_SIZE,         ///< Name "source-size",      type Vector2
+    SOURCE_OFFSET,       ///< Name "source-offset",    type Vector2
+    MASK_SIZE,           ///< Name "mask-size",        type Vector2
+    MASK_OFFSET,         ///< Name "mask-offset",      type Vector2
 
     CUSTOM_PROPERTY_COUNT
   };

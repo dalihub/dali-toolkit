@@ -411,17 +411,17 @@ public:
 
   // Custom properties
 
-  static const std::string SCROLL_TIME_PROPERTY_NAME;                   ///< Property, name "scroll-time",               type FLOAT
-  static const std::string SCROLL_POSITION_PROPERTY_NAME;               ///< Property, name "scroll-position",           type VECTOR3
-  static const std::string SCROLL_PRE_POSITION_PROPERTY_NAME;           ///< Property, name "scroll-pre-position",       type VECTOR3
-  static const std::string SCROLL_OVERSHOOT_X_PROPERTY_NAME;            ///< Property, name "scroll-overshoot-x",         type float
-  static const std::string SCROLL_OVERSHOOT_Y_PROPERTY_NAME;            ///< Property, name "scroll-overshoot-y",         type float
-  static const std::string SCROLL_FINAL_PROPERTY_NAME;                  ///< Property, name "scroll-final",              type VECTOR3
-  static const std::string SCROLL_WRAP_PROPERTY_NAME;                   ///< Property, name "scroll-wrap",               type BOOLEAN
-  static const std::string SCROLL_PANNING_PROPERTY_NAME;                ///< Property, name "scroll-panning",            type BOOLEAN
-  static const std::string SCROLL_SCROLLING_PROPERTY_NAME;              ///< Property, name "scroll-scrolling",          type BOOLEAN
-  static const std::string SCROLL_POSITION_DELTA_PROPERTY_NAME;         ///< Property, name "scroll-position-delta"      type VECTOR3
-  static const std::string SCROLL_START_PAGE_POSITION_PROPERTY_NAME;    ///< Property, name "scroll-start-page-position" type VECTOR3
+  static const std::string SCROLL_TIME_PROPERTY_NAME;                   ///< Property, name "scroll-time",               type float
+  static const std::string SCROLL_POSITION_PROPERTY_NAME;               ///< Property, name "scroll-position",           type Vector3
+  static const std::string SCROLL_PRE_POSITION_PROPERTY_NAME;           ///< Property, name "scroll-pre-position",       type Vector3
+  static const std::string SCROLL_OVERSHOOT_X_PROPERTY_NAME;            ///< Property, name "scroll-overshoot-x",        type float
+  static const std::string SCROLL_OVERSHOOT_Y_PROPERTY_NAME;            ///< Property, name "scroll-overshoot-y",        type float
+  static const std::string SCROLL_FINAL_PROPERTY_NAME;                  ///< Property, name "scroll-final",              type Vector3
+  static const std::string SCROLL_WRAP_PROPERTY_NAME;                   ///< Property, name "scroll-wrap",               type bool
+  static const std::string SCROLL_PANNING_PROPERTY_NAME;                ///< Property, name "scroll-panning",            type bool
+  static const std::string SCROLL_SCROLLING_PROPERTY_NAME;              ///< Property, name "scroll-scrolling",          type bool
+  static const std::string SCROLL_POSITION_DELTA_PROPERTY_NAME;         ///< Property, name "scroll-position-delta"      type Vector3
+  static const std::string SCROLL_START_PAGE_POSITION_PROPERTY_NAME;    ///< Property, name "scroll-start-page-position" type Vector3
 
   // Default settings
 

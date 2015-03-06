@@ -58,22 +58,22 @@ public:
   {
     enum
     {
-      HIGHLIGHT_COLOR = PROPERTY_START_INDEX, // Property, name "highlight-color",                     type VECTOR4
-      CUT_AND_PASTE_COLOR,                    // Property, name "cut-and-paste-bg-color",              type VECTOR4
-      CUT_AND_PASTE_PRESSED_COLOR,            // Property, name "cut-and-paste-pressed-color",         type VECTOR4
-      CUT_AND_PASTE_BORDER_COLOR,             // Property, name "cut-and-paste-border-color",          type VECTOR4
-      CUT_AND_PASTE_ICON_COLOR,               // Property, name "cut-and-paste-icon-color",            type VECTOR4
-      CUT_AND_PASTE_ICON_PRESSED_COLOR,       // Property, name "cut-and-paste-icon-pressed-color",    type VECTOR4
-      CUT_AND_PASTE_TEXT_COLOR,               // Property, name "cut-and-paste-text-color",            type VECTOR4
-      CUT_AND_PASTE_TEXT_PRESSED_COLOR,       // Property, name "cut-and-paste-text-pressed-color",    type VECTOR4
-      CUT_BUTTON_POSITION_PRIORITY,           // Property, name "cut-button-position-priority",        type UNSIGNED_INTEGER
-      COPY_BUTTON_POSITION_PRIORITY,          // Property, name "copy-button-position-priority",       type UNSIGNED_INTEGER
-      PASTE_BUTTON_POSITION_PRIORITY,         // Property, name "paste-button-position-priority",      type UNSIGNED_INTEGER
-      SELECT_BUTTON_POSITION_PRIORITY,        // Property, name "select-button-position-priority",     type UNSIGNED_INTEGER
-      SELECT_ALL_BUTTON_POSITION_PRIORITY,    // Property, name "select-all-button-position-priority", type UNSIGNED_INTEGER
-      CLIPBOARD_BUTTON_POSITION_PRIORITY,     // Property, name "clipboard-button-position-priority",  type UNSIGNED_INTEGER
-      POP_UP_OFFSET_FROM_TEXT,                // Property, name "popup-offset-from-text",              type VECTOR4
-      CURSOR_COLOR,                           // Property, name "cursor-color",                        type VECTOR4
+      HIGHLIGHT_COLOR = PROPERTY_START_INDEX, // Property, name "highlight-color",                     type Vector4
+      CUT_AND_PASTE_COLOR,                    // Property, name "cut-and-paste-bg-color",              type Vector4
+      CUT_AND_PASTE_PRESSED_COLOR,            // Property, name "cut-and-paste-pressed-color",         type Vector4
+      CUT_AND_PASTE_BORDER_COLOR,             // Property, name "cut-and-paste-border-color",          type Vector4
+      CUT_AND_PASTE_ICON_COLOR,               // Property, name "cut-and-paste-icon-color",            type Vector4
+      CUT_AND_PASTE_ICON_PRESSED_COLOR,       // Property, name "cut-and-paste-icon-pressed-color",    type Vector4
+      CUT_AND_PASTE_TEXT_COLOR,               // Property, name "cut-and-paste-text-color",            type Vector4
+      CUT_AND_PASTE_TEXT_PRESSED_COLOR,       // Property, name "cut-and-paste-text-pressed-color",    type Vector4
+      CUT_BUTTON_POSITION_PRIORITY,           // Property, name "cut-button-position-priority",        type unsigned int
+      COPY_BUTTON_POSITION_PRIORITY,          // Property, name "copy-button-position-priority",       type unsigned int
+      PASTE_BUTTON_POSITION_PRIORITY,         // Property, name "paste-button-position-priority",      type unsigned int
+      SELECT_BUTTON_POSITION_PRIORITY,        // Property, name "select-button-position-priority",     type unsigned int
+      SELECT_ALL_BUTTON_POSITION_PRIORITY,    // Property, name "select-all-button-position-priority", type unsigned int
+      CLIPBOARD_BUTTON_POSITION_PRIORITY,     // Property, name "clipboard-button-position-priority",  type unsigned int
+      POP_UP_OFFSET_FROM_TEXT,                // Property, name "popup-offset-from-text",              type Vector4
+      CURSOR_COLOR,                           // Property, name "cursor-color",                        type Vector4
     };
   };
 

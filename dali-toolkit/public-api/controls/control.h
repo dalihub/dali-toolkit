@@ -82,13 +82,13 @@ public:
   {
     enum
     {
-      BACKGROUND_COLOR = PROPERTY_START_INDEX, ///< name "background-color", @see SetBackgroundColor, type VECTOR4
-      BACKGROUND,                              ///< name "background",       @see SetBackground,      type MAP
-      WIDTH_POLICY,                            ///< name "width-policy",     @see SetSizePolicy,      type STRING
-      HEIGHT_POLICY,                           ///< name "height-policy",    @see SetSizePolicy,      type STRING
-      MINIMUM_SIZE,                            ///< name "minimum-size",     @see SetMinimumSize,     type VECTOR3
-      MAXIMUM_SIZE,                            ///< name "maximum-size",     @see SetMaximumSize,     type VECTOR3
-      KEY_INPUT_FOCUS,                         ///< name "key-input-focus",  @see SetKeyInputFocus,   type BOOLEAN
+      BACKGROUND_COLOR = PROPERTY_START_INDEX, ///< name "background-color", @see SetBackgroundColor, type Vector4
+      BACKGROUND,                              ///< name "background",       @see SetBackground,      type Map
+      WIDTH_POLICY,                            ///< name "width-policy",     @see SetSizePolicy,      type std::string
+      HEIGHT_POLICY,                           ///< name "height-policy",    @see SetSizePolicy,      type std::string
+      MINIMUM_SIZE,                            ///< name "minimum-size",     @see SetMinimumSize,     type Vector3
+      MAXIMUM_SIZE,                            ///< name "maximum-size",     @see SetMaximumSize,     type Vector3
+      KEY_INPUT_FOCUS,                         ///< name "key-input-focus",  @see SetKeyInputFocus,   type bool
     };
   };
 

@@ -68,16 +68,16 @@ public:
   {
     enum
     {
-      MARKUP_ENABLED = PROPERTY_START_INDEX, ///< name "markup-enabled",       @see SetMarkupProcessingEnabled(), type BOOLEAN
-      TEXT,                                  ///< name "text",                 @see SetText(),                    type STRING
-      MULTILINE_POLICY,                      ///< name "multiline-policy",     @see SetMultilinePolicy(),         type STRING
-      WIDTH_EXCEED_POLICY,                   ///< name "width-exceed-policy",  @see SetWidthExceedPolicy(),       type STRING
-      HEIGHT_EXCEED_POLICY,                  ///< name "height-exceed-policy", @see SetHeightExceedPolicy(),      type STRING
-      LINE_JUSTIFICATION,                    ///< name "line-justification",   @see SetLineJustification(),       type STRING
-      FADE_BOUNDARY,                         ///< name "fade-boundary",        @see SetFadeBoundary(),            type VECTOR4
-      LINE_HEIGHT_OFFSET,                    ///< name "line-height-offset",   @see SetLineHeightOffset(),        type FLOAT
-      HORIZONTAL_ALIGNMENT,                  ///< name "horizontal-alignment", @see SetTextAlignment(),           type STRING
-      VERTICAL_ALIGNMENT,                    ///< name "vertical-alignment",   @see SetTextAlignment(),           type STRING
+      MARKUP_ENABLED = PROPERTY_START_INDEX, ///< name "markup-enabled",       @see SetMarkupProcessingEnabled(), type bool
+      TEXT,                                  ///< name "text",                 @see SetText(),                    type std::string
+      MULTILINE_POLICY,                      ///< name "multiline-policy",     @see SetMultilinePolicy(),         type std::string
+      WIDTH_EXCEED_POLICY,                   ///< name "width-exceed-policy",  @see SetWidthExceedPolicy(),       type std::string
+      HEIGHT_EXCEED_POLICY,                  ///< name "height-exceed-policy", @see SetHeightExceedPolicy(),      type std::string
+      LINE_JUSTIFICATION,                    ///< name "line-justification",   @see SetLineJustification(),       type std::string
+      FADE_BOUNDARY,                         ///< name "fade-boundary",        @see SetFadeBoundary(),            type Vector4
+      LINE_HEIGHT_OFFSET,                    ///< name "line-height-offset",   @see SetLineHeightOffset(),        type float
+      HORIZONTAL_ALIGNMENT,                  ///< name "horizontal-alignment", @see SetTextAlignment(),           type std::string
+      VERTICAL_ALIGNMENT,                    ///< name "vertical-alignment",   @see SetTextAlignment(),           type std::string
     };
   };
 

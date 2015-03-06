@@ -54,7 +54,7 @@ public:
 
   // Custom properties
 
-  static const std::string CLUSTER_ACTOR_DEPTH;                           ///< Property, name "cluster-actor-depth",      type FLOAT
+  static const std::string CLUSTER_ACTOR_DEPTH;                           ///< Property, name "cluster-actor-depth",      type float
 
 public:
 

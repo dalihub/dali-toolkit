@@ -61,26 +61,26 @@ public:
   {
     enum
     {
-      LOWER_BOUND = PROPERTY_START_INDEX, ///< Property, name "lower-bound",            type FLOAT
-      UPPER_BOUND,                        ///< Property, name "upper-bound",            type FLOAT
-      VALUE,                              ///< Property, name "value",                  type FLOAT
-      HIT_REGION,                         ///< Property, name "hit-region",             type VECTOR2
-      BACKING_REGION,                     ///< Property, name "backing-region",         type VECTOR2
-      HANDLE_REGION,                      ///< Property, name "handle-region",          type VECTOR2
-      BACKING_IMAGE_NAME,                 ///< Property, name "backing-image-name",     type STRING
-      HANDLE_IMAGE_NAME,                  ///< Property, name "handle-image-name",      type STRING
-      PROGRESS_IMAGE_NAME,                ///< Property, name "progress-image-name",    type STRING
-      POPUP_IMAGE_NAME,                   ///< Property, name "popup-image-name",       type STRING
-      POPUP_ARROW_IMAGE_NAME,             ///< Property, name "popup-arrow-image-name", type STRING
-      DISABLE_COLOR,                      ///< Property, name "disable-color",          type VECTOR4
-      POPUP_TEXT_COLOR,                   ///< Property, name "popup-text-color",       type VECTOR4
-      VALUE_PRECISION,                    ///< Property, name "value-precision",        type INTEGER
-      SHOW_POPUP,                         ///< Property, name "show-popup",             type BOOLEAN
-      SHOW_VALUE,                         ///< Property, name "show-value",             type BOOLEAN
-      ENABLED,                            ///< Property, name "enabled",                type BOOLEAN
-      MARKS,                              ///< Property, name "marks",                  type Property::Array<FLOAT>
-      SNAP_TO_MARKS,                      ///< Property, name "snap-to-marks",          type BOOLEAN
-      MARK_TOLERANCE,                     ///< Property, name "mark-tolerance",         type FLOAT
+      LOWER_BOUND = PROPERTY_START_INDEX, ///< Property, name "lower-bound",            type float
+      UPPER_BOUND,                        ///< Property, name "upper-bound",            type float
+      VALUE,                              ///< Property, name "value",                  type float
+      HIT_REGION,                         ///< Property, name "hit-region",             type Vector2
+      BACKING_REGION,                     ///< Property, name "backing-region",         type Vector2
+      HANDLE_REGION,                      ///< Property, name "handle-region",          type Vector2
+      BACKING_IMAGE_NAME,                 ///< Property, name "backing-image-name",     type std::string
+      HANDLE_IMAGE_NAME,                  ///< Property, name "handle-image-name",      type std::string
+      PROGRESS_IMAGE_NAME,                ///< Property, name "progress-image-name",    type std::string
+      POPUP_IMAGE_NAME,                   ///< Property, name "popup-image-name",       type std::string
+      POPUP_ARROW_IMAGE_NAME,             ///< Property, name "popup-arrow-image-name", type std::string
+      DISABLE_COLOR,                      ///< Property, name "disable-color",          type Vector4
+      POPUP_TEXT_COLOR,                   ///< Property, name "popup-text-color",       type Vector4
+      VALUE_PRECISION,                    ///< Property, name "value-precision",        type int
+      SHOW_POPUP,                         ///< Property, name "show-popup",             type bool
+      SHOW_VALUE,                         ///< Property, name "show-value",             type bool
+      ENABLED,                            ///< Property, name "enabled",                type bool
+      MARKS,                              ///< Property, name "marks",                  type Property::Array<float>
+      SNAP_TO_MARKS,                      ///< Property, name "snap-to-marks",          type bool
+      MARK_TOLERANCE,                     ///< Property, name "mark-tolerance",         type float
     };
   };
 

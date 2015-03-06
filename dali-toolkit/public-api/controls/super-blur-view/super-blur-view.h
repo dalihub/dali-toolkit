@@ -72,7 +72,7 @@ public:
   {
     enum
     {
-      IMAGE = PROPERTY_START_INDEX, ///< name "image",    @see SetImage,    type MAP
+      IMAGE = PROPERTY_START_INDEX, ///< name "image",    @see SetImage,    type Map
     };
   };
 
