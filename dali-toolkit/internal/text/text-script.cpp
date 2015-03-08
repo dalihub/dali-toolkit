@@ -127,12 +127,30 @@ Script GetCharacterScript( Character character )
   // Burmese script
   // 0x1000 - 0x109f Myanmar
 
+  // The Emoji which map to standardized Unicode characters
+  // 1. Emoticons ( 1F601 - 1F64F )
+  // 2. Dingbats ( 2702 - 27B0 )
+  // 3. Transport and map symbols ( 1F680 - 1F6C0 )
+  // 4. Enclosed characters ( 24C2 - 1F251 )
+  // 5. Uncategorized :-S
+  // 6. Additional Emoticons ( 1F600 - 1F636 )
+  // 6b. Additional transport and map symbols ( 1F681 - 1F6C5 )
+  // 6c. Other additional symbols ( 1F30D - 1F567 )
+
   if( character <= 0x0cff )
   {
     if( character <= 0x09ff )
     {
       if( character <= 0x077f )
       {
+        if( character == 0x00A9 )
+        {
+          return TextAbstraction::EMOJI; // 5. Uncategorized: copyright sign
+        }
+        if( character == 0x00AE )
+        {
+          return TextAbstraction::EMOJI; // 5. Uncategorized: registered sign
+        }
         if( character <= 0x02ff )
         {
           return TextAbstraction::LATIN;
@@ -241,13 +259,39 @@ Script GetCharacterScript( Character character )
       }
       else // > 0x1eff
       {
+        if( character == 0x203c )
+        {
+          return TextAbstraction::EMOJI; // 5. Uncategorized: double exclamation mark
+        }
+        if( character == 0x2049 )
+        {
+          return TextAbstraction::EMOJI; // 5. Uncategorized: exclamation question mark
+        }
         if( ( 0x2070 <= character ) && ( character <= 0x209f ) )
         {
           return TextAbstraction::LATIN;
         }
+        if( character == 0x20e3 )
+        {
+          return TextAbstraction::EMOJI; // 5. Uncategorized: combining enclosing keycap
+        }
+        if( character == 0x2122 )
+        {
+          return TextAbstraction::EMOJI; // 5. Uncategorized: trade mark sign
+        }
+        if( character == 0x2139 )
+        {
+          return TextAbstraction::EMOJI; // 5. Uncategorized: information source
+        }
         if( ( 0x2100 <= character ) && ( character <= 0x218f ) )
         {
           return TextAbstraction::LATIN;
+        }
+        // U+2194 5. Uncategorized: left right arrow
+        // U+2B55 5. Uncategorized: heavy large circle
+        if( ( 0x2194 <= character ) && ( character <= 0x2B55 ) )
+        {
+          return TextAbstraction::EMOJI;
         }
         if( ( 0x2c60 <= character ) && ( character <= 0x2c7f ) )
         {
@@ -337,6 +381,12 @@ Script GetCharacterScript( Character character )
         if( ( 0x1ee00 <= character ) && ( character <= 0x1eeff ) )
         {
           return TextAbstraction::ARABIC;
+        }
+        // U+1f170 4. Enclosed characters: negative squared latin capital letter A
+        // U+1f6c5 6b. Additional transport and map symbols
+        if( ( 0x1f170 <= character ) && ( character <= 0x1f6c5 ) )
+        {
+          return TextAbstraction::EMOJI;
         }
         if( ( 0x20000 <= character ) && ( character <= 0x215ff ) )
         {

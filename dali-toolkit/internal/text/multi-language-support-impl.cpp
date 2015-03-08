@@ -41,6 +41,8 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_MULTI_LANGUAGE_SUPPORT");
 #endif
+
+const Dali::Toolkit::Text::Character UTF32_A = 0x0041;
 }
 
 namespace Text
@@ -505,6 +507,16 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
       {
         // Find a default font.
         fontId = fontClient.FindDefaultFont( character, pointSize );
+
+        // If the system does not support a suitable font, fallback to Latin
+        if( 0u == fontId )
+        {
+          fontId = *( defaultFontPerScriptCacheBuffer + TextAbstraction::LATIN );
+        }
+        if( 0u == fontId )
+        {
+          fontId = fontClient.FindDefaultFont( UTF32_A, pointSize );
+        }
 
 #ifdef DEBUG_ENABLED
         Dali::TextAbstraction::FontDescription description;
