@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -222,12 +223,22 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextField::Property::PLACEHOLDER_TEXT:
       {
-        DALI_LOG_WARNING( "UTF-8 text representation was discarded\n" );
+        if( impl.mController )
+        {
+          std::string text;
+          impl.mController->GetPlaceholderText( text );
+          value = text;
+        }
         break;
       }
       case Toolkit::TextField::Property::TEXT:
       {
-        DALI_LOG_WARNING( "UTF-8 text representation was discarded\n" );
+        if( impl.mController )
+        {
+          std::string text;
+          impl.mController->GetText( text );
+          value = text;
+        }
         break;
       }
       case Toolkit::TextField::Property::CURSOR_IMAGE:
@@ -316,10 +327,8 @@ void TextField::OnInitialize()
   mController->EnableTextInput( mDecorator );
 
   // Forward input events to controller
-  mDoubleTapDetector = TapGestureDetector::New();
-  mDoubleTapDetector.SetMaximumTapsRequired( 2 );
-  mDoubleTapDetector.DetectedSignal().Connect( this, &TextField::OnTap );
-  mDoubleTapDetector.Attach(Self());
+  EnableGestureDetection(Gesture::Tap);
+  GetTapGestureDetector().SetMaximumTapsRequired( 2 );
 
   // Set BoundingBox to stage size if not already set.
   if ( mDecorator->GetBoundingBox().IsEmpty() )
@@ -365,9 +374,21 @@ void TextField::OnRelayout( const Vector2& size, ActorSizeContainer& container )
   }
 }
 
-void TextField::OnTap( Actor actor, const TapGesture& gesture )
+void TextField::OnTap( const TapGesture& gesture )
 {
+  SetKeyInputFocus();
+
   mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x, gesture.localPoint.y );
+}
+
+bool TextField::OnKeyEvent( const KeyEvent& event )
+{
+  if( Dali::DALI_KEY_ESCAPE == event.keyCode )
+  {
+    ClearKeyInputFocus();
+  }
+
+  return mController->KeyEvent( event );
 }
 
 void TextField::RequestTextRelayout()

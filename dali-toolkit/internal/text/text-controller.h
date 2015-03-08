@@ -25,6 +25,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/events/key-event.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/ref-object.h>
@@ -104,6 +105,20 @@ public:
    * @return A string of UTF-8 characters.
    */
   void GetText( std::string& text ) const;
+
+  /**
+   * @brief Replaces any placeholder text previously set.
+   *
+   * @param[in] text A string of UTF-8 characters.
+   */
+  void SetPlaceholderText( const std::string& text );
+
+  /**
+   * @brief Retrieve any placeholder text previously set.
+   *
+   * @return A string of UTF-8 characters.
+   */
+  void GetPlaceholderText( std::string& text ) const;
 
   /**
    * @brief Set the default font family.
@@ -207,6 +222,13 @@ public:
    * @brief Caller by editable UI controls when focus is lost.
    */
   void KeyboardFocusLostEvent();
+
+  /**
+   * @brief Caller by editable UI controls when key events are received.
+   *
+   * @param[in] event The key event.
+   */
+  bool KeyEvent( const Dali::KeyEvent& event );
 
   /**
    * @brief Caller by editable UI controls when a tap gesture occurs.

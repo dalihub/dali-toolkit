@@ -199,8 +199,6 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
           impl.mController->GetText( text );
           value = text;
         }
-
-        DALI_LOG_WARNING( "UTF-8 text representation was discarded\n" );
         break;
       }
       case Toolkit::TextLabel::Property::MULTI_LINE:

@@ -33,6 +33,7 @@
 // EXTERNAL INCLUDES
 #include <limits>
 #include <vector>
+#include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/text-abstraction/font-client.h>
 
 using std::vector;
@@ -53,6 +54,7 @@ struct Controller::TextInput
   {
     KEYBOARD_FOCUS_GAIN_EVENT,
     KEYBOARD_FOCUS_LOST_EVENT,
+    KEY_EVENT,
     TAP_EVENT,
     GRAB_HANDLE_EVENT
   };
@@ -62,6 +64,7 @@ struct Controller::TextInput
     int mInt;
     unsigned int mUint;
     float mFloat;
+    char* mString;
   };
 
   struct Event
@@ -99,7 +102,7 @@ struct Controller::TextInput
   /**
    * @brief Helper to move the cursor, grab handle etc.
    */
-  bool ProcessTouchEvents()
+  bool ProcessInputEvents()
   {
     mDecoratorUpdated = false;
 
@@ -117,6 +120,11 @@ struct Controller::TextInput
           case KEYBOARD_FOCUS_LOST_EVENT:
           {
             OnKeyboardFocus( false );
+            break;
+          }
+          case KEY_EVENT:
+          {
+            OnKeyEvent( *iter );
             break;
           }
           case TAP_EVENT:
@@ -140,17 +148,65 @@ struct Controller::TextInput
 
   void OnKeyboardFocus( bool hasFocus )
   {
+  }
+
+  void OnKeyEvent( const Event& event )
+  {
+    int keyCode = event.p1.mInt;
+
+    // Handle state changes
+    if( Dali::DALI_KEY_ESCAPE == keyCode )
+    {
+      ChangeState( INACTIVE ); // Escape key ends edit mode
+    }
+    else if ( event.p2.mString )
+    {
+      // Some text may be selected, hiding keyboard causes an empty keystring to be sent, we don't want to delete highlight in this case
+      ChangeState( EDITING );
+    }
+
+    // Handle the actual key event
+    if( Dali::DALI_KEY_BACKSPACE == keyCode )
+    {
+      HandleBackspaceKey();
+    }
+    else if( Dali::DALI_KEY_CURSOR_LEFT  == keyCode ||
+             Dali::DALI_KEY_CURSOR_RIGHT == keyCode ||
+             Dali::DALI_KEY_CURSOR_UP    == keyCode ||
+             Dali::DALI_KEY_CURSOR_DOWN  == keyCode )
+    {
+      HandleCursorKey( keyCode );
+    }
+    else if ( event.p2.mString )
+    {
+      HandleKeyString( event.p2.mString );
+
+      delete [] event.p2.mString;
+    }
+  }
+
+  void HandleBackspaceKey()
+  {
+    // TODO
+  }
+
+  void HandleCursorKey( int keyCode )
+  {
+    // TODO
+  }
+
+  void HandleKeyString( const char* keyString )
+  {
     // TODO
   }
 
   void OnTapEvent( const Event& event )
   {
-    if( 1u == event.p1.mUint )
+    unsigned int tapCount = event.p1.mUint;
+
+    if( 1u == tapCount )
     {
-      mState = TextInput::EDITING;
-      mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
-      mDecorator->StartCursorBlink();
-      mDecorator->SetGrabHandleActive( true );
+      ChangeState( EDITING );
 
       float xPosition = event.p2.mFloat;
       float yPosition = event.p3.mFloat;
@@ -160,12 +216,9 @@ struct Controller::TextInput
 
       mDecoratorUpdated = true;
     }
-    else if( 2u == event.p1.mUint )
+    else if( 2u == tapCount )
     {
-      mState = TextInput::SELECTING;
-      mDecorator->SetGrabHandleActive( false );
-      mDecorator->SetSelectionActive( true );
-      mDecoratorUpdated = true;
+      ChangeState( SELECTING );
     }
   }
 
@@ -183,6 +236,39 @@ struct Controller::TextInput
 
       mDecorator->SetPosition( PRIMARY_CURSOR, xPosition, yPosition, height );
       mDecoratorUpdated = true;
+    }
+  }
+
+  void ChangeState( State newState )
+  {
+    if( mState != newState )
+    {
+      mState = newState;
+
+      if( INACTIVE == mState )
+      {
+        mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
+        mDecorator->StopCursorBlink();
+        mDecorator->SetGrabHandleActive( false );
+        mDecorator->SetSelectionActive( false );
+        mDecoratorUpdated = true;
+      }
+      else if ( SELECTING == mState )
+      {
+        mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
+        mDecorator->StopCursorBlink();
+        mDecorator->SetGrabHandleActive( false );
+        mDecorator->SetSelectionActive( true );
+        mDecoratorUpdated = true;
+      }
+      else if( EDITING == mState )
+      {
+        mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+        mDecorator->StartCursorBlink();
+        mDecorator->SetGrabHandleActive( true );
+        mDecorator->SetSelectionActive( false );
+        mDecoratorUpdated = true;
+      }
     }
   }
 
@@ -234,13 +320,15 @@ struct Controller::TextInput
   VisualModelPtr  mVisualModel;
   DecoratorPtr    mDecorator;
 
-  State mState;
+  std::string mPlaceholderText;
 
   /**
    * This is used to delay handling events until after the model has been updated.
    * The number of updates to the model is minimized to improve performance.
    */
   vector<Event> mEventQueue; ///< The queue of touch events etc.
+
+  State mState;
 
   bool mDecoratorUpdated;
 };
@@ -349,6 +437,22 @@ void Controller::GetText( std::string& text ) const
   }
 }
 
+void Controller::SetPlaceholderText( const std::string& text )
+{
+  if( !mImpl->mTextInput )
+  {
+    mImpl->mTextInput->mPlaceholderText = text;
+  }
+}
+
+void Controller::GetPlaceholderText( std::string& text ) const
+{
+  if( !mImpl->mTextInput )
+  {
+    text = mImpl->mTextInput->mPlaceholderText;
+  }
+}
+
 void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
 {
   if( !mImpl->mFontDefaults )
@@ -446,7 +550,7 @@ bool Controller::Relayout( const Vector2& size )
   if( mImpl->mTextInput )
   {
     // Move the cursor, grab handle etc.
-    updated = mImpl->mTextInput->ProcessTouchEvents() || updated;
+    updated = mImpl->mTextInput->ProcessInputEvents() || updated;
   }
 
   return updated;
@@ -742,6 +846,32 @@ void Controller::KeyboardFocusLostEvent()
 
     RequestRelayout();
   }
+}
+
+bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
+{
+  DALI_ASSERT_DEBUG( mImpl->mTextInput && "Unexpected KeyEvent" );
+
+  if( mImpl->mTextInput )
+  {
+    TextInput::Event event( TextInput::KEY_EVENT );
+    event.p1.mInt = keyEvent.keyCode;
+    event.p2.mString = NULL;
+
+    const std::string& keyString = keyEvent.keyPressed;
+    if ( !keyString.empty() )
+    {
+      event.p2.mString = new char[keyString.size() + 1];
+      std::copy(keyString.begin(), keyString.end(), event.p2.mString);
+      event.p2.mString[keyString.size()] = '\0';
+    }
+
+    mImpl->mTextInput->mEventQueue.push_back( event );
+
+    RequestRelayout();
+  }
+
+  return false;
 }
 
 void Controller::TapEvent( unsigned int tapCount, float x, float y )

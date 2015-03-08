@@ -90,7 +90,12 @@ private: // From Control
   /**
    * Received for single & double taps
    */
-  void OnTap( Actor actor, const TapGesture& tap );
+  virtual void OnTap( const TapGesture& tap );
+
+  /**
+   * @copydoc Dali::CustomActorImpl::OnKeyEvent(const KeyEvent&)
+   */
+  virtual bool OnKeyEvent(const KeyEvent& event);
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
@@ -120,8 +125,6 @@ private: // Data
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
   Text::DecoratorPtr mDecorator;
-
-  TapGestureDetector mDoubleTapDetector;
 
   unsigned int mRenderingBackend;
 };
