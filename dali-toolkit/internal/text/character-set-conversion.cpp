@@ -145,7 +145,7 @@ uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length, uint32_t* utf3
       case U3:
       {
         uint32_t& code = *utf32++;
-        code = leadByte & 0x1fu;
+        code = leadByte & 0x0fu;
         begin++;
         code <<= 6u;
         code |= *begin++ & 0x3fu;
@@ -157,7 +157,7 @@ uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length, uint32_t* utf3
       case U4:
       {
         uint32_t& code = *utf32++;
-        code = leadByte & 0x1fu;
+        code = leadByte & 0x07u;
         begin++;
         code <<= 6u;
         code |= *begin++ & 0x3fu;
