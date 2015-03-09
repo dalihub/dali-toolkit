@@ -35,6 +35,18 @@ namespace Toolkit
 
 namespace Text
 {
+/**
+ * @brief caches some temporary values of the GetNumberOfScriptRuns( characterIndex, numberOfCharacters )
+ * operation and the GetNumberOfFontRuns( characterIndex, numberOfCharacters ) as they are going to be
+ * used in the GetScriptRuns() and the GetFontRuns() calls.
+ */
+struct GetRunCache
+{
+  CharacterIndex characterIndex;     ///< The character index.
+  Length         numberOfCharacters; ///< The number of characters.
+  Length         firstRun;           ///< Index to the first run.
+  Length         numberOfRuns;       ///< The number of runs.
+};
 
 struct LogicalModel::Impl
 {
@@ -43,6 +55,9 @@ struct LogicalModel::Impl
   Vector<FontRun>       mFontRuns;
   Vector<LineBreakInfo> mLineBreakInfo;
   Vector<WordBreakInfo> mWordBreakInfo;
+
+  GetRunCache           mGetScriptCache; ///< Caches the GetNumberOfScriptRuns( characterIndex, numberOfCharacters ) operation.
+  GetRunCache           mGetFontCache;   ///< Caches the GetNumberOfFontRuns( characterIndex, numberOfCharacters ) operation.
 };
 
 LogicalModelPtr LogicalModel::New()
@@ -98,65 +113,82 @@ void LogicalModel::SetScripts( const ScriptRun* const scripts,
     scriptRuns.Resize( numberOfRuns );
     memcpy( scriptRuns.Begin(), scripts, numberOfRuns * sizeof( ScriptRun ) );
   }
+
+  mImpl->mGetScriptCache.characterIndex = 0u;
+  mImpl->mGetScriptCache.numberOfCharacters = 0u;
+  mImpl->mGetScriptCache.firstRun = 0u;
+  mImpl->mGetScriptCache.numberOfRuns = 0u;
 }
 
 Length LogicalModel::GetNumberOfScriptRuns( CharacterIndex characterIndex,
                                             Length numberOfCharacters ) const
 {
-  if( ( 0u == characterIndex ) && ( mImpl->mText.Count() == numberOfCharacters ) )
+  GetRunCache& scriptCache = mImpl->mGetScriptCache;
+
+  // Set the character index and the number of characters into the cache.
+  scriptCache.characterIndex = characterIndex;
+  scriptCache.numberOfCharacters = numberOfCharacters;
+
+  if( ( 0u == characterIndex ) &&
+      ( mImpl->mText.Count() == numberOfCharacters ) )
   {
-    return mImpl->mScriptRuns.Count();
+    scriptCache.firstRun = 0u;
+    scriptCache.numberOfRuns = mImpl->mScriptRuns.Count();
+    return scriptCache.numberOfRuns;
   }
 
-  const CharacterIndex charcterEndIndex = characterIndex + numberOfCharacters;
-  Length numberOfScriptRuns = 0u;
-  bool firstIndexFound = false;
+  // Initialize the number of scripts and the index to the first script.
+  scriptCache.firstRun = 0u;
+  scriptCache.numberOfRuns = 0;
+  bool firstScriptFound = false;
 
-  for( Length index = 0u, length = mImpl->mScriptRuns.Count(); index < length; ++index )
+  const Vector<ScriptRun>& modelScripts = mImpl->mScriptRuns;
+  const CharacterIndex lastCharacterIndex = characterIndex + numberOfCharacters;
+
+  // Traverse the scripts and count those scripts within the range of characters.
+  for( Vector<ScriptRun>::ConstIterator it = modelScripts.Begin(),
+         endIt = modelScripts.End();
+       it != endIt;
+       ++it )
   {
-    const ScriptRun* const scriptRun = mImpl->mScriptRuns.Begin() + index;
+    const ScriptRun& script = *it;
 
-    if( !firstIndexFound &&
-        ( characterIndex < scriptRun->characterRun.characterIndex + scriptRun->characterRun.numberOfCharacters ) )
+    if( ( script.characterRun.characterIndex + script.characterRun.numberOfCharacters > characterIndex ) &&
+        ( lastCharacterIndex > script.characterRun.characterIndex ) )
     {
-      // The character index is within this script run.
-      // Starts the counter of script runs.
-      firstIndexFound = true;
+      firstScriptFound = true;
+      ++scriptCache.numberOfRuns;
+    }
+    else if( lastCharacterIndex <= script.characterRun.characterIndex )
+    {
+      // nothing else to do.
+      break;
     }
 
-    if( firstIndexFound )
+    if( !firstScriptFound )
     {
-      ++numberOfScriptRuns;
-      if( scriptRun->characterRun.characterIndex + scriptRun->characterRun.numberOfCharacters > charcterEndIndex )
-      {
-        // This script run exceeds the given range. The number of scripts can be returned.
-        return numberOfScriptRuns;
-      }
+      ++scriptCache.firstRun;
     }
   }
 
-  return numberOfScriptRuns;
+  return scriptCache.numberOfRuns;
 }
 
 void LogicalModel::GetScriptRuns( ScriptRun* scriptRuns,
                                   CharacterIndex characterIndex,
                                   Length numberOfCharacters ) const
 {
-  // A better implementation can cache the first script run and the number of then when the GetNumberOfScriptRuns() is called.
+  const Vector<ScriptRun>& modelScripts = mImpl->mScriptRuns;
+  GetRunCache& scriptCache = mImpl->mGetScriptCache;
 
-  Length numberOfScriptRuns = GetNumberOfScriptRuns( characterIndex,
-                                                     numberOfCharacters );
-
-  for( Length index = 0u, length = mImpl->mScriptRuns.Count(); index < length; ++index )
+  if( ( characterIndex != scriptCache.characterIndex ) ||
+      ( numberOfCharacters != scriptCache.numberOfCharacters ) )
   {
-    const ScriptRun* const scriptRun = mImpl->mScriptRuns.Begin() + index;
-
-    if( characterIndex < scriptRun->characterRun.characterIndex + scriptRun->characterRun.numberOfCharacters )
-    {
-      memcpy( scriptRuns, scriptRun, sizeof( ScriptRun ) * numberOfScriptRuns );
-      return;
-    }
+    GetNumberOfScriptRuns( characterIndex,
+                           numberOfCharacters );
   }
+
+  memcpy( scriptRuns, modelScripts.Begin() + scriptCache.firstRun, scriptCache.numberOfRuns * sizeof( ScriptRun ) );
 }
 
 Script LogicalModel::GetScript( CharacterIndex characterIndex ) const
@@ -191,65 +223,82 @@ void LogicalModel::SetFonts( const FontRun* const fonts,
     fontRuns.Resize( numberOfRuns );
     memcpy( fontRuns.Begin(), fonts, numberOfRuns * sizeof( FontRun ) );
   }
+
+  mImpl->mGetFontCache.characterIndex = 0u;
+  mImpl->mGetFontCache.numberOfCharacters = 0u;
+  mImpl->mGetFontCache.firstRun = 0u;
+  mImpl->mGetFontCache.numberOfRuns = 0u;
 }
 
 Length LogicalModel::GetNumberOfFontRuns( CharacterIndex characterIndex,
                                           Length numberOfCharacters ) const
 {
-  if( ( 0u == characterIndex ) && ( mImpl->mText.Count() == numberOfCharacters ) )
+  GetRunCache& fontCache = mImpl->mGetFontCache;
+
+  // Set the character index and the number of characters into the cache.
+  fontCache.characterIndex = characterIndex;
+  fontCache.numberOfCharacters = numberOfCharacters;
+
+  if( ( 0u == characterIndex ) &&
+      ( mImpl->mText.Count() == numberOfCharacters ) )
   {
-    return mImpl->mFontRuns.Count();
+    fontCache.firstRun = 0u;
+    fontCache.numberOfRuns = mImpl->mFontRuns.Count();
+    return fontCache.numberOfRuns;
   }
 
-  const CharacterIndex charcterEndIndex = characterIndex + numberOfCharacters;
-  Length numberOfFontRuns = 0u;
-  bool firstIndexFound = false;
+  // Initialize the number of fonts and the index to the first font.
+  fontCache.firstRun = 0u;
+  fontCache.numberOfRuns = 0;
+  bool firstFontFound = false;
 
-  for( Length index = 0u, length = mImpl->mFontRuns.Count(); index < length; ++index )
+  const Vector<FontRun>& modelFonts = mImpl->mFontRuns;
+  const CharacterIndex lastCharacterIndex = characterIndex + numberOfCharacters;
+
+  // Traverse the fonts and count those fonts within the range of characters.
+  for( Vector<FontRun>::ConstIterator it = modelFonts.Begin(),
+         endIt = modelFonts.End();
+       it != endIt;
+       ++it )
   {
-    const FontRun* const fontRun = mImpl->mFontRuns.Begin() + index;
+    const FontRun& font = *it;
 
-    if( !firstIndexFound &&
-        ( characterIndex < fontRun->characterRun.characterIndex + fontRun->characterRun.numberOfCharacters ) )
+    if( ( font.characterRun.characterIndex + font.characterRun.numberOfCharacters > characterIndex ) &&
+        ( characterIndex + numberOfCharacters > font.characterRun.characterIndex ) )
     {
-      // The character index is within this font run.
-      // Starts the counter of font runs.
-      firstIndexFound = true;
+      firstFontFound = true;
+      ++fontCache.numberOfRuns;
+    }
+    else if( lastCharacterIndex <= font.characterRun.characterIndex )
+    {
+      // nothing else to do.
+      break;
     }
 
-    if( firstIndexFound )
+    if( !firstFontFound )
     {
-      ++numberOfFontRuns;
-      if( fontRun->characterRun.characterIndex + fontRun->characterRun.numberOfCharacters > charcterEndIndex )
-      {
-        // This font run exceeds the given range. The number of fonts can be returned.
-        return numberOfFontRuns;
-      }
+      ++fontCache.firstRun;
     }
   }
 
-  return numberOfFontRuns;
+  return fontCache.numberOfRuns;
 }
 
 void LogicalModel::GetFontRuns( FontRun* fontRuns,
                                 CharacterIndex characterIndex,
                                 Length numberOfCharacters ) const
 {
-  // A better implementation can cache the first font run and the number of then when the GetNumberOfFontRuns() is called.
+  const Vector<FontRun>& modelFonts = mImpl->mFontRuns;
+  GetRunCache& fontCache = mImpl->mGetFontCache;
 
-  Length numberOfFontRuns = GetNumberOfFontRuns( characterIndex,
-                                                 numberOfCharacters );
-
-  for( Length index = 0u, length = mImpl->mFontRuns.Count(); index < length; ++index )
+  if( ( characterIndex != fontCache.characterIndex ) ||
+      ( numberOfCharacters != fontCache.numberOfCharacters ) )
   {
-    const FontRun* const fontRun = mImpl->mFontRuns.Begin() + index;
-
-    if( characterIndex < fontRun->characterRun.characterIndex + fontRun->characterRun.numberOfCharacters )
-    {
-      memcpy( fontRuns, fontRun, sizeof( FontRun ) * numberOfFontRuns );
-      return;
-    }
+    GetNumberOfFontRuns( characterIndex,
+                         numberOfCharacters );
   }
+
+  memcpy( fontRuns, modelFonts.Begin() + fontCache.firstRun, fontCache.numberOfRuns * sizeof( FontRun ) );
 }
 
 FontId LogicalModel::GetFont( CharacterIndex characterIndex ) const
