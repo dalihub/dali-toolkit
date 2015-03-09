@@ -86,7 +86,11 @@ enum SelectionHandleState
  * @brief A Text Decorator is used to display cursors, handles, selection highlights and pop-ups.
  *
  * The decorator is responsible for clipping decorations which are positioned outside of the parent area.
- * In some cases the decorations will be moved or flipped around, to maintain visibility on-screen.
+ *
+ * The Popup decoration will be positioned either above the Grab handle or above the selection handles but if doing so
+ * would cause the Popup to exceed the Decoration Bounding Box ( see SetBoundingBox API ) the the Popup will be repositioned below the handle(s).
+ *
+ * Selection handles will be flipped around to ensure they do not exceed the Decoration Bounding Box. ( Stay visible ).
  *
  * Decorator components forward input events to a controller class through an observer interface.
  * The controller is responsible for selecting which components are active.
@@ -348,6 +352,16 @@ public:
    * @return The image.
    */
   Dali::Image GetImage( SelectionHandle handle, SelectionHandleState state ) const;
+
+  /**
+   * @brief Show the Copy and Paste Popup
+   */
+  void ShowPopup();
+
+  /**
+   * @brief Hide the Copy and Paste Popup
+   */
+  void HidePopup();
 
 protected:
 

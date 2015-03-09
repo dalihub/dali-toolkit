@@ -24,7 +24,6 @@
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/constants.h>
-#include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/pan-gesture.h>
@@ -32,15 +31,23 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/public-api/images/nine-patch-image.h>
 #include <dali/public-api/signals/connection-tracker.h>
+#include <libintl.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
+#include <dali-toolkit/public-api/controls/buttons/push-button.h>
 
 #ifdef DEBUG_ENABLED
 #define DECORATOR_DEBUG
 #endif
+
+// todo Move this to adaptor??
+#define GET_LOCALE_TEXT(string) dgettext("elementary", string)
 
 // Local Data
 namespace
@@ -58,6 +65,100 @@ const Dali::Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.5f, 1.5f, 1.0f );
 
 const std::size_t CURSOR_BLINK_INTERVAL = 500; // Cursor blink interval
 const std::size_t MILLISECONDS = 1000;
+
+const std::string POPUP_BACKGROUND( DALI_IMAGE_DIR "popup_bubble_bg.#.png" );
+const std::string POPUP_BACKGROUND_EFFECT( DALI_IMAGE_DIR "popup_bubble_bg_ef.#.png" );
+const std::string POPUP_BACKGROUND_LINE( DALI_IMAGE_DIR "popup_bubble_bg_line.#.png" );
+
+const Dali::Vector4 DEFAULT_POPUP_BACKGROUND( Dali::Vector4( .20f, 0.29f, 0.44f, 1.0f ) );
+const Dali::Vector4 DEFAULT_POPUP_BACKGROUND_PRESSED( Dali::Vector4( 0.07f, 0.10f, 0.17f, 1.0f ) );
+const Dali::Vector4 DEFAULT_POPUP_LINE_COLOR( Dali::Vector4( 0.36f, 0.45f, 0.59f, 1.0f ) );
+const Dali::Vector4 DEFAULT_OPTION_ICON( Dali::Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
+const Dali::Vector4 DEFAULT_OPTION_ICON_PRESSED( Dali::Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
+const Dali::Vector4 DEFAULT_OPTION_TEXT( Dali::Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
+const Dali::Vector4 DEFAULT_OPTION_TEXT_PRESSED( Dali::Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
+const std::string OPTION_ICON_CLIPBOARD( DALI_IMAGE_DIR "copy_paste_icon_clipboard.png" );
+const std::string OPTION_ICON_COPY( DALI_IMAGE_DIR "copy_paste_icon_copy.png" );
+const std::string OPTION_ICON_CUT( DALI_IMAGE_DIR "copy_paste_icon_cut.png" );
+const std::string OPTION_ICON_PASTE( DALI_IMAGE_DIR "copy_paste_icon_paste.png" );
+const std::string OPTION_ICON_SELECT( DALI_IMAGE_DIR "copy_paste_icon_select.png" );
+const std::string OPTION_ICON_SELECT_ALL( DALI_IMAGE_DIR "copy_paste_icon_select_all.png" );
+
+const Dali::Vector2 DEFAULT_POPUP_MAX_SIZE( 470.0f, 120.0f ); ///< The maximum size of the popup.
+
+const float OPTION_TEXT_LINE_HEIGHT( 32.0f );     ///< The line height of the text.
+const Dali::Vector2 OPTION_ICON_SIZE( 0.f, 0.f );       ///< The size of the icon.
+const float OPTION_GAP_ICON_TEXT( 6.f );          ///< The gap between the icon and the text
+const float OPTION_MARGIN_WIDTH( 10.f );          ///< The margin between the right or lefts edge and the text or icon.
+const float OPTION_MAX_WIDTH( DEFAULT_POPUP_MAX_SIZE.width / 6 ); ///< The maximum width of the option (currently set to the max)
+const float OPTION_MIN_WIDTH( 86.0f );           ///< The minimum width of the option.
+
+const float POPUP_DIVIDER_WIDTH( 1.f );        ///< The size of the divider.
+
+const Dali::Vector2 POPUP_TAIL_SIZE( 20.0f, 16.0f ); ///< The size of the tail.
+const float POPUP_TAIL_Y_OFFSET( 5.f );        ///< The y offset of the tail (when its position is on the bottom).
+const float POPUP_TAIL_TOP_Y_OFFSET( 3.f );    ///< The y offset of the tail (when its position is on the top).
+
+const float HIDE_POPUP_ANIMATION_DURATION( 0.2f ); ///< Duration of popup hide animation in seconds.
+const float SHOW_POPUP_ANIMATION_DURATION( 0.2f ); ///< Duration of popup show animation in seconds.
+
+const char* const OPTION_SELECT_WORD = "option-select_word";                       // "Select Word" popup option.
+const char* const OPTION_SELECT_ALL("option-select_all");                          // "Select All" popup option.
+const char* const OPTION_CUT("option-cut");                                        // "Cut" popup option.
+const char* const OPTION_COPY("option-copy");                                      // "Copy" popup option.
+const char* const OPTION_PASTE("option-paste");                                    // "Paste" popup option.
+const char* const OPTION_CLIPBOARD("option-clipboard");                            // "Clipboard" popup option.
+
+enum Buttons
+{
+  ButtonsCut,
+  ButtonsCopy,
+  ButtonsPaste,
+  ButtonsSelect,
+  ButtonsSelectAll,
+  ButtonsClipboard,
+  ButtonsEnumEnd
+};
+
+struct ButtonRequirement
+{
+  ButtonRequirement()
+  : id( ButtonsEnumEnd ),
+    priority( 0u ),
+    name(),
+    caption(),
+    icon(),
+    enabled( false )
+  {}
+
+  ButtonRequirement( Buttons buttonId,
+                     std::size_t buttonPriority,
+                     const std::string& buttonName,
+                     const std::string& buttonCaption,
+                     Dali::ResourceImage buttonIcon,
+                     bool buttonEnabled )
+  : id( buttonId ),
+    priority( buttonPriority ),
+    name( buttonName ),
+    caption( buttonCaption ),
+    icon( buttonIcon ),
+    enabled( buttonEnabled )
+  {}
+
+  Buttons id;
+  std::size_t priority;
+  std::string name;
+  std::string caption;
+  Dali::ResourceImage icon;
+  bool enabled;
+};
+
+// Comparison function for ButtonRequirement Priority
+bool PriorityCompare( ButtonRequirement const& a, ButtonRequirement const& b)
+{
+  return a.priority < b.priority;
+}
 
 } // end of namespace
 
@@ -111,12 +212,67 @@ struct Decorator::Impl : public ConnectionTracker
     Image releasedImage;
   };
 
+  struct PopupImpl
+  {
+    PopupImpl()
+    : mVisiblePopUpSize( Vector2( 100.0f, 100.0f ) ),
+      mRequiredPopUpSize( Vector2( 100.0f, 100.0f ) ),
+      mMaxWidth( DEFAULT_POPUP_MAX_SIZE.width ),
+      mBackgroundColor( DEFAULT_POPUP_BACKGROUND ),
+      mBackgroundPressedColor( DEFAULT_POPUP_BACKGROUND_PRESSED ),
+      mLineColor( DEFAULT_POPUP_LINE_COLOR ),
+      mIconColor( DEFAULT_OPTION_ICON ),
+      mIconPressedColor( DEFAULT_OPTION_ICON_PRESSED ),
+      mTextColor( DEFAULT_OPTION_TEXT ),
+      mTextPressedColor( DEFAULT_OPTION_TEXT_PRESSED )
+      {
+      }
+
+      Layer mRoot;                                        // The actor which all popup content is added to (i.e. panel and buttons)
+      Actor mButtons;                                     // Actor which holds all the buttons, sensitivity can be set on all buttons via this actor
+      ImageActor mBackground;                             // The background popup panel
+      ImageActor mTail;                                   // The tail for the popup
+      ImageActor mTailEffect;                             // the tail effect
+      ImageActor mTailLine;                               // The border/outline around the tail
+
+      Size mVisiblePopUpSize;                             // Visible Size of popup excluding content that needs scrolling.
+      Size mRequiredPopUpSize;                            // Total size of popup including any invisible margin
+      float mMaxWidth;                                    // Max width of the Popup
+
+      Vector4 mNinePatchMargins;                          // Margins between the edge of the cropped image and the nine patch rect (left, right, top, bottom).
+
+      Size mContentSize;                                  // Size of Content (i.e. Buttons)
+      //Animation mAnimation;                               // Popup Hide/Show animation.
+
+      std::vector<ButtonRequirement> mOrderListOfButtons; // List of buttons in the order to be displayed and a flag to indicate if needed.
+
+      Vector4 mBackgroundColor;             // Color of the background of the text input popup
+      Vector4 mBackgroundPressedColor;      // Color of the option background.
+      Vector4 mLineColor;                   // Color of the line around the text input popup
+      Vector4 mIconColor;                   // Color of the popup icon.
+      Vector4 mIconPressedColor;            // Color of the popup icon when pressed.
+      Vector4 mTextColor;                   // Color of the popup text.
+      Vector4 mTextPressedColor;            // Color of the popup text when pressed.
+
+      // Priority of Options/Buttons in the Cut and Paste pop-up, higher priority buttons are displayed first, left to right.
+      std::size_t mSelectOptionPriority;    // Position of Select Button
+      std::size_t mSelectAllOptionPriority; // Position of Select All button
+      std::size_t mCutOptionPriority;       // Position of Cut button
+      std::size_t mCopyOptionPriority;      // Position of Copy button
+      std::size_t mPasteOptionPriority;     // Position of Paste button
+      std::size_t mClipboardOptionPriority; // Position of Clipboard button
+
+      bool mShowIcons; // Flag to show icons
+  };
+
+
   Impl( Dali::Toolkit::Internal::Control& parent, Observer& observer )
   : mParent(parent),
     mObserver(observer),
     mActiveCursor(ACTIVE_CURSOR_NONE),
     mActiveGrabHandle(false),
     mActiveSelection( false ),
+    mActiveCopyPastePopup( false ),
     mCursorBlinkInterval( CURSOR_BLINK_INTERVAL ),
     mCursorBlinkDuration( 0.0f ),
     mCursorBlinkStatus( true ),
@@ -170,11 +326,19 @@ struct Decorator::Impl : public ConnectionTracker
       UnparentAndReset( mSelectionHandle[ PRIMARY_SELECTION_HANDLE ].actor );
       UnparentAndReset( mSelectionHandle[ SECONDARY_SELECTION_HANDLE ].actor );
     }
+
+    if ( mActiveCopyPastePopup )
+    {
+      CreatePopup();
+
+      mCopyPastePopup.mRoot.SetPosition( Vector3( 180.0f, -100.0f, 0.0f ) ); //todo grabhandle or selection handle postions to be used
+    }
+    else
+    {
+      DestroyPopup();
+    }
   }
 
-  /**
-   * Creates a cursor
-   */
   void CreateCursor( ImageActor& cursor )
   {
     if ( !mCursorImage )
@@ -185,9 +349,7 @@ struct Decorator::Impl : public ConnectionTracker
     cursor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
   }
 
-  /**
-   * Add / Remove cursor(s) from parent
-   */
+  // Add or Remove cursor(s) from parent
   void SetCursors()
   {
     Actor parent = mParent.Self();
@@ -438,6 +600,291 @@ struct Decorator::Impl : public ConnectionTracker
     return false;
   }
 
+  /**
+   * Popup
+   */
+
+  void CreateOrderedListOfPopupOptions()
+  {
+    mCopyPastePopup.mOrderListOfButtons.clear();
+
+    // Create button for each possible option using Option priority
+    ResourceImage cutIcon = ResourceImage::New( OPTION_ICON_CUT );
+    mCopyPastePopup.mOrderListOfButtons.push_back( ButtonRequirement( ButtonsCut, mCopyPastePopup.mCutOptionPriority, OPTION_CUT, GET_LOCALE_TEXT("IDS_COM_BODY_CUT"), cutIcon, true ) );
+
+    ResourceImage copyIcon = ResourceImage::New( OPTION_ICON_COPY );
+    mCopyPastePopup.mOrderListOfButtons.push_back( ButtonRequirement( ButtonsCopy, mCopyPastePopup.mCopyOptionPriority, OPTION_COPY, GET_LOCALE_TEXT("IDS_COM_BODY_COPY"), copyIcon, true ) );
+
+    ResourceImage pasteIcon = ResourceImage::New( OPTION_ICON_PASTE );
+    mCopyPastePopup.mOrderListOfButtons.push_back( ButtonRequirement( ButtonsPaste, mCopyPastePopup.mPasteOptionPriority, OPTION_PASTE, GET_LOCALE_TEXT("IDS_COM_BODY_PASTE"), pasteIcon, true ) );
+
+    ResourceImage selectIcon = ResourceImage::New( OPTION_ICON_SELECT );
+    mCopyPastePopup.mOrderListOfButtons.push_back( ButtonRequirement( ButtonsSelect, mCopyPastePopup.mSelectOptionPriority, OPTION_SELECT_WORD, GET_LOCALE_TEXT("IDS_COM_SK_SELECT"), selectIcon, true ) );
+
+    ResourceImage selectAllIcon = ResourceImage::New( OPTION_ICON_SELECT_ALL );
+    mCopyPastePopup.mOrderListOfButtons.push_back( ButtonRequirement( ButtonsSelectAll, mCopyPastePopup.mSelectAllOptionPriority, OPTION_SELECT_ALL, GET_LOCALE_TEXT("IDS_COM_BODY_SELECT_ALL"), selectAllIcon, true ) );
+
+    ResourceImage clipboardIcon = ResourceImage::New( OPTION_ICON_CLIPBOARD );
+    mCopyPastePopup.mOrderListOfButtons.push_back( ButtonRequirement( ButtonsClipboard, mCopyPastePopup.mClipboardOptionPriority, OPTION_CLIPBOARD, GET_LOCALE_TEXT("IDS_COM_BODY_CLIPBOARD"), clipboardIcon, true ) );
+
+    // Sort the buttons according their priorities.
+    std::sort( mCopyPastePopup.mOrderListOfButtons.begin(), mCopyPastePopup.mOrderListOfButtons.end(), PriorityCompare );
+  }
+
+  void CreateBackground( PopupImpl& popup )
+  {
+    // Create background-panel if not already created (required if we have at least one option)
+    if ( !popup.mBackground )
+    {
+      ResourceImage bgImg = ResourceImage::New( POPUP_BACKGROUND );
+      popup.mBackground = ImageActor::New( bgImg );
+      popup.mBackground.SetColor( popup.mBackgroundColor );
+      popup.mBackground.SetParentOrigin( ParentOrigin::CENTER );
+
+      NinePatchImage backgroundImageNinePatch = NinePatchImage::DownCast( bgImg );
+      if( backgroundImageNinePatch )
+      {
+        const Size ninePatchImageSize = Size( static_cast<float>( bgImg.GetWidth() ), static_cast<float>( bgImg.GetHeight() ) );
+        Rect<int> childRect = backgroundImageNinePatch.GetChildRectangle();
+
+        // -1u because of the cropping.
+        popup.mNinePatchMargins.x = childRect.x - 1u;
+        popup.mNinePatchMargins.y = ninePatchImageSize.width - ( childRect.x + childRect.width ) - 1u;
+        popup.mNinePatchMargins.z = childRect.y - 1u;
+        popup.mNinePatchMargins.w = ninePatchImageSize.height - ( childRect.y + childRect.height ) - 1u;
+      }
+
+      ResourceImage::Image bgEffectImg = ResourceImage::New( POPUP_BACKGROUND_EFFECT );
+      ImageActor backgroundEffect = ImageActor::New( bgEffectImg );
+      backgroundEffect.SetParentOrigin( ParentOrigin::CENTER );
+
+      ResourceImage::Image bgLine = ResourceImage::New( POPUP_BACKGROUND_LINE );
+      ImageActor backgroundLine = ImageActor::New( bgLine );
+      backgroundLine.SetParentOrigin( ParentOrigin::CENTER );
+      backgroundLine.SetColor( popup.mLineColor );
+
+      popup.mBackground.Add( backgroundEffect );
+      popup.mBackground.Add( backgroundLine );
+    }
+  }
+
+  void AddOption( Actor& parent, const std::string& name, const std::string& caption, const Image iconImage, bool finalOption, bool showIcons )
+  {
+    // 1. Create the backgrounds for the popup option both normal and pressed.
+    // Both containers will be added to a button.
+    Actor optionContainer = Actor::New();
+    optionContainer.SetDrawMode( DrawMode::OVERLAY );
+    //optionContainer.SetParentOrigin( ParentOrigin::CENTER );
+    optionContainer.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+    ImageActor optionPressedContainer = Toolkit::CreateSolidColorActor( mCopyPastePopup.mBackgroundPressedColor );
+    optionPressedContainer.SetDrawMode( DrawMode::OVERLAY );
+    //optionPressedContainer.SetParentOrigin( ParentOrigin::CENTER );
+    optionPressedContainer.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+    // 2. Add text.
+    Toolkit::TextLabel captionTextLabel = Toolkit::TextLabel::New();
+    captionTextLabel.SetProperty( TextLabel::Property::TEXT, caption );
+    optionContainer.Add( captionTextLabel );
+
+    Toolkit::TextLabel pressedCaptionTextLabel = Toolkit::TextLabel::New();
+    pressedCaptionTextLabel.SetProperty( TextLabel::Property::TEXT, caption );
+    optionPressedContainer.Add( pressedCaptionTextLabel );
+
+    // Calculates the icon/text position.
+    float iconTextOffsetY = 0.0f;
+
+    if ( showIcons )
+    {
+      // 3. Create the icons
+      ImageActor pressedIcon = ImageActor::New(  iconImage );
+      ImageActor icon = ImageActor::New(  iconImage );
+
+      optionContainer.Add( icon );
+      optionPressedContainer.Add( pressedIcon );
+
+      iconTextOffsetY = 0.5f * ( ( DEFAULT_POPUP_MAX_SIZE.height - mCopyPastePopup.mNinePatchMargins.z - mCopyPastePopup.mNinePatchMargins.w ) - ( OPTION_ICON_SIZE.height + OPTION_GAP_ICON_TEXT + OPTION_TEXT_LINE_HEIGHT ) );
+
+      icon.SetParentOrigin( ParentOrigin::TOP_CENTER );
+      icon.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+      icon.SetY( iconTextOffsetY );
+
+      pressedIcon.SetParentOrigin( ParentOrigin::TOP_CENTER );
+      pressedIcon.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+      pressedIcon.SetY( iconTextOffsetY );
+
+      // Layout icon + gap + text
+      captionTextLabel.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
+      pressedCaptionTextLabel.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
+      pressedCaptionTextLabel.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
+      captionTextLabel.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
+      pressedCaptionTextLabel.SetY( -iconTextOffsetY );
+      captionTextLabel.SetY( -iconTextOffsetY );
+    }
+    else
+    {
+      // Centre option text
+      captionTextLabel.SetAnchorPoint( AnchorPoint::CENTER );
+      captionTextLabel.SetParentOrigin( ParentOrigin::CENTER );
+      pressedCaptionTextLabel.SetAnchorPoint( AnchorPoint::CENTER );
+      pressedCaptionTextLabel.SetParentOrigin( ParentOrigin::CENTER );
+    }
+
+    // Calculate the size of the text.
+    Vector3 textSize = captionTextLabel.GetNaturalSize();
+    textSize.width = std::min( textSize.width, OPTION_MAX_WIDTH - 2.f * OPTION_MARGIN_WIDTH );
+
+    // Set the size to the text. Text will be ellipsized if exceeds the max width.
+    captionTextLabel.SetSize( textSize );
+    pressedCaptionTextLabel.SetSize( textSize );
+
+    // 4. Calculate the size of option.
+
+    // The width is the max size of the text or the icon plus the margins clamped between the option min and max size.
+    // The height is the whole popup height minus the ninepatch margins.
+    const Vector2 optionSize( std::min( OPTION_MAX_WIDTH, std::max( OPTION_MIN_WIDTH, std::max( textSize.width, OPTION_ICON_SIZE.width ) + 2.f * OPTION_MARGIN_WIDTH ) ),
+                              DEFAULT_POPUP_MAX_SIZE.height - mCopyPastePopup.mNinePatchMargins.z - mCopyPastePopup.mNinePatchMargins.w );
+
+    optionContainer.SetSize( optionSize );
+    optionPressedContainer.SetSize( optionSize );
+
+    // 5. Create a option.
+    Toolkit::PushButton option = Toolkit::PushButton::New();
+    option.SetSizePolicy( Toolkit::Control::Fixed, Toolkit::Control::Fixed );
+    option.SetSize( optionSize );
+    option.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+    option.SetX( mCopyPastePopup.mContentSize.width );
+    option.SetName( name );
+    option.SetAnimationTime( 0.0f );
+    //option.ClickedSignal().Connect( this, &TextInputPopup::OnButtonPressed );
+
+    parent.Add( option );
+
+    // 6. Set the normal option image.
+    option.SetButtonImage( optionContainer );
+
+    // 7. Set the pressed option image
+    option.SetSelectedImage( optionPressedContainer );
+
+    // 8. Update the content size.
+    mCopyPastePopup.mContentSize.width += optionSize.width;
+    mCopyPastePopup.mContentSize.height = std::max ( optionSize.height, mCopyPastePopup.mContentSize.height );
+
+    // 9. Add the divider
+    if( !finalOption )
+    {
+      const Size size( POPUP_DIVIDER_WIDTH, mCopyPastePopup.mContentSize.height );
+
+      ImageActor divider =  Toolkit::CreateSolidColorActor( Color::WHITE );
+      divider.SetSize (size);
+      divider.SetParentOrigin( ParentOrigin::TOP_LEFT );
+      divider.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      divider.SetPosition( mCopyPastePopup.mContentSize.width - POPUP_DIVIDER_WIDTH, 0.0f );
+      parent.Add( divider );
+    }
+  }
+
+  void SetUpPopup( Actor& parent, Size& size )
+  {
+    // Create Layer and Stencil.
+    parent = Layer::New();
+    Layer layer = Layer::New();
+    ImageActor stencil = CreateSolidColorActor( Color::RED );
+    stencil.SetDrawMode( DrawMode::STENCIL );
+    stencil.SetVisible( true );
+    Actor scrollview = Actor::New();
+
+    //todo Use Size negotiation
+    layer.SetSize( size ); // matches stencil size
+    parent.SetSize( size ); // matches stencil size
+    stencil.SetSize( size );
+    scrollview.SetSize( size );
+    mCopyPastePopup.mButtons.SetSize( size );
+
+    layer.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    scrollview.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    //mCopyPastePopup.mBackground.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    mCopyPastePopup.mButtons.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+    parent.Add( mCopyPastePopup.mBackground );
+    parent.Add( layer );
+    layer.Add( stencil );
+    layer.Add( scrollview );
+    scrollview.Add( mCopyPastePopup.mButtons );
+  }
+
+  void AddPopupOptions( bool createTail, bool showIcons )
+  {
+    mCopyPastePopup.mShowIcons = showIcons;
+
+    mCopyPastePopup.mContentSize = Vector2::ZERO;
+
+    mCopyPastePopup.mButtons = Actor::New();
+
+    // Add the options into the buttons container.
+
+    // 1. Determine how many buttons are active and should be added to container.
+    std::size_t numberOfOptions = 0u;
+    for( std::vector<ButtonRequirement>::const_iterator it = mCopyPastePopup.mOrderListOfButtons.begin(), endIt = mCopyPastePopup.mOrderListOfButtons.end(); ( it != endIt ); ++it )
+    {
+      const ButtonRequirement& button( *it );
+      if( button.enabled )
+      {
+        ++numberOfOptions;
+      }
+    }
+
+    // 2. Iterate list of buttons and add active ones.
+    std::size_t optionsAdded = 0u;
+    for( std::vector<ButtonRequirement>::const_iterator it = mCopyPastePopup.mOrderListOfButtons.begin(), endIt = mCopyPastePopup.mOrderListOfButtons.end(); ( it != endIt ); ++it )
+    {
+      const ButtonRequirement& button( *it );
+      if ( button.enabled )
+      {
+        ++optionsAdded;
+        AddOption( mCopyPastePopup.mButtons, button.name, button.caption, button.icon, optionsAdded == numberOfOptions, mCopyPastePopup.mShowIcons );
+      }
+    }
+
+    // Calculate the size of the whole popup which may not be all visible.
+    mCopyPastePopup.mRequiredPopUpSize = Size( std::min( mCopyPastePopup.mMaxWidth, mCopyPastePopup.mContentSize.width + mCopyPastePopup.mNinePatchMargins.x + mCopyPastePopup.mNinePatchMargins.y ), DEFAULT_POPUP_MAX_SIZE. height );
+
+    // Set the size of the background, background line and background effect.
+    mCopyPastePopup.mBackground.SetSize( mCopyPastePopup.mRequiredPopUpSize);
+    for( std::size_t index = 0u, childCount = mCopyPastePopup.mBackground.GetChildCount(); index < childCount; ++index )
+    {
+      mCopyPastePopup.mBackground.GetChildAt( index ).SetSize( mCopyPastePopup.mRequiredPopUpSize );
+    }
+
+    // Size of the contents within the popup
+    mCopyPastePopup.mVisiblePopUpSize = Size( mCopyPastePopup.mRequiredPopUpSize.width - mCopyPastePopup.mNinePatchMargins.x - mCopyPastePopup.mNinePatchMargins.y, mCopyPastePopup.mRequiredPopUpSize.height - mCopyPastePopup.mNinePatchMargins.z - mCopyPastePopup.mNinePatchMargins.w );
+
+  }
+
+  void CreatePopup()
+  {
+    if ( !mCopyPastePopup.mRoot )
+    {
+      mActiveCopyPastePopup = true;
+      CreateOrderedListOfPopupOptions();  //todo Currently causes all options to be shown
+      CreateBackground( mCopyPastePopup );
+      AddPopupOptions( true, true );
+      SetUpPopup( mCopyPastePopup.mRoot, mCopyPastePopup.mVisiblePopUpSize );
+      Actor parent = mParent.Self();
+      parent.Add( mCopyPastePopup.mRoot );
+    }
+  }
+
+  void DestroyPopup()
+  {
+    if ( mCopyPastePopup.mRoot )
+    {
+      mActiveCopyPastePopup = false;
+      UnparentAndReset( mCopyPastePopup.mButtons );
+      UnparentAndReset( mCopyPastePopup.mRoot );
+    }
+  }
+
   Internal::Control& mParent;
   Observer& mObserver;
 
@@ -446,6 +893,7 @@ struct Decorator::Impl : public ConnectionTracker
   unsigned int mActiveCursor;
   bool         mActiveGrabHandle;
   bool         mActiveSelection;
+  bool         mActiveCopyPastePopup;
 
   CursorImpl mCursor[CURSOR_COUNT];
 
@@ -463,6 +911,8 @@ struct Decorator::Impl : public ConnectionTracker
   float mGrabDisplacementY;
 
   SelectionHandleImpl mSelectionHandle[SELECTION_HANDLE_COUNT];
+
+  PopupImpl mCopyPastePopup;
 
   Image mCursorImage;
   Image mGrabHandleImage;
@@ -653,6 +1103,22 @@ Dali::Image Decorator::GetImage( SelectionHandle handle, SelectionHandleState st
   }
 
   return mImpl->mSelectionHandle[handle].releasedImage;
+}
+
+void Decorator::ShowPopup()
+{
+  if ( !mImpl->mCopyPastePopup.mRoot )
+  {
+    mImpl->CreatePopup();
+  }
+}
+
+void Decorator::HidePopup()
+{
+  if ( mImpl->mCopyPastePopup.mRoot )
+  {
+    mImpl->DestroyPopup();
+  }
 }
 
 Decorator::~Decorator()

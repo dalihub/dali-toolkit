@@ -241,8 +241,14 @@ struct Controller::TextInput
       GetClosestCursorPosition( xPosition, yPosition, height );
 
       mDecorator->SetPosition( PRIMARY_CURSOR, xPosition, yPosition, height );
+      mDecorator->HidePopup();
       mDecoratorUpdated = true;
     }
+    else if ( GRAB_HANDLE_RELEASED == state )
+    {
+      mDecorator->ShowPopup();
+    }
+
   }
 
   void ChangeState( State newState )
@@ -257,6 +263,7 @@ struct Controller::TextInput
         mDecorator->StopCursorBlink();
         mDecorator->SetGrabHandleActive( false );
         mDecorator->SetSelectionActive( false );
+        mDecorator->HidePopup();
         mDecoratorUpdated = true;
       }
       else if ( SELECTING == mState )
