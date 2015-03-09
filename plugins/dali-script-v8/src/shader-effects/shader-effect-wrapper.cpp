@@ -126,8 +126,11 @@ void ShaderEffectWrapper::NewShaderEffect( const v8::FunctionCallbackInfo< v8::V
   }
   Dali::ShaderEffect shaderEffect = ShaderEffectApi::New( isolate, args );
 
-  v8::Local<v8::Object> localObject = WrapShaderEffect( isolate, shaderEffect );
-  args.GetReturnValue().Set( localObject );
+  if(shaderEffect)
+  {
+    v8::Local<v8::Object> localObject = WrapShaderEffect( isolate, shaderEffect );
+    args.GetReturnValue().Set( localObject );
+  }
 }
 
 
