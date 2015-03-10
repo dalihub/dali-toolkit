@@ -23,11 +23,11 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/adaptor-framework/singleton-service.h>
 #include <dali/public-api/text-abstraction/font-client.h>
+#include <dali/public-api/text-abstraction/script.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/logical-model.h>
 #include <dali-toolkit/internal/text/font-run.h>
-#include <dali-toolkit/internal/text/script.h>
 #include <dali-toolkit/internal/text/script-run.h>
 
 namespace Dali
@@ -134,13 +134,13 @@ Script GetScript( Length index,
  */
 bool IsValidForAllScripts( Character character )
 {
-  return ( IsWhiteSpace( character )         ||
-           IsZeroWidthNonJoiner( character ) ||
-           IsZeroWidthJoiner( character )    ||
-           IsZeroWidthSpace( character )     ||
-           IsLeftToRightMark( character )    ||
-           IsRightToLeftMark( character )    ||
-           IsThinSpace( character ) );
+  return ( TextAbstraction::IsWhiteSpace( character )         ||
+           TextAbstraction::IsZeroWidthNonJoiner( character ) ||
+           TextAbstraction::IsZeroWidthJoiner( character )    ||
+           TextAbstraction::IsZeroWidthSpace( character )     ||
+           TextAbstraction::IsLeftToRightMark( character )    ||
+           TextAbstraction::IsRightToLeftMark( character )    ||
+           TextAbstraction::IsThinSpace( character ) );
 }
 
 bool ValidateFontsPerScript::FindValidFont( FontId fontId ) const
@@ -294,14 +294,14 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
     }
 
     // Get the script of the character.
-    Script script = GetCharacterScript( character );
+    Script script = TextAbstraction::GetCharacterScript( character );
 
     // Check if it is the first character of a paragraph.
     if( firstValidScript &&
         ( TextAbstraction::UNKNOWN != script ) )
     {
       // Sets the direction of the first valid script.
-      isParagraphRTL = ( TextAbstraction::ARABIC == script );
+      isParagraphRTL = TextAbstraction::IsRightToLeftScript( script );
       firstValidScript = false;
     }
 
@@ -309,7 +309,7 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
     {
       // Current run needs to be stored and a new one initialized.
 
-      if( isParagraphRTL != ( TextAbstraction::ARABIC == script ) )
+      if( isParagraphRTL != TextAbstraction::IsRightToLeftScript( script ) )
       {
         // Current script has different direction than the first script of the paragraph.
         // All the previously skipped characters need to be added to the previous script before it's stored.

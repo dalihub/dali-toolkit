@@ -19,12 +19,12 @@
 #include <dali-toolkit/internal/text/shaper.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/text-abstraction/script.h>
 #include <dali/public-api/text-abstraction/shaping.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/logical-model.h>
-#include <dali-toolkit/internal/text/script.h>
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/visual-model.h>
 
@@ -134,7 +134,7 @@ void ShapeText( const Vector<Character>& text,
     // Check if the current index is a white space. Do not want to shape a \n.
     // The last character is always a must-break even if it's not a \n.
     Length numberOfCharactersToShape = currentIndex - previousIndex;
-    if( mustBreak && !IsWhiteSpace( *( textBuffer + currentIndex ) ) )
+    if( mustBreak && !TextAbstraction::IsWhiteSpace( *( textBuffer + currentIndex ) ) )
     {
       ++numberOfCharactersToShape;
     }

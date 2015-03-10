@@ -77,7 +77,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/character-set-conversion.cpp \
    $(toolkit_src_dir)/text/logical-model.cpp \
    $(toolkit_src_dir)/text/multi-language-support.cpp \
-   $(toolkit_src_dir)/text/text-script.cpp \
    $(toolkit_src_dir)/text/segmentation.cpp \
    $(toolkit_src_dir)/text/shaper.cpp \
    $(toolkit_src_dir)/text/text-control-interface.cpp \
