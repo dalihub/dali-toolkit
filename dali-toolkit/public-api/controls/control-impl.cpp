@@ -1308,11 +1308,6 @@ bool Control::OnMouseWheelEvent(const MouseWheelEvent& event)
   return false; // Do not consume
 }
 
-Actor Control::GetChildByAlias(const std::string& actorAlias)
-{
-  return Actor();
-}
-
 void Control::OnStageConnection()
 {
   RelayoutRequest();
