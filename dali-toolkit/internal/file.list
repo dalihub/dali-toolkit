@@ -91,6 +91,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/rendering/text-renderer.cpp \
    $(toolkit_src_dir)/text/rendering/basic/text-basic-renderer.cpp \
    $(toolkit_src_dir)/text/rendering/shaders/text-basic-shader.cpp \
+   $(toolkit_src_dir)/text/rendering/shaders/text-bgra-shader.cpp \
    $(toolkit_src_dir)/text/rendering/text-backend-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-cross-effect-impl.cpp \

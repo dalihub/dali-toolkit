@@ -25,6 +25,8 @@
 #include <dali/public-api/images/atlas.h>
 #include <dali/public-api/geometry/mesh.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-basic-shader.h>
+#include <dali-toolkit/internal/text/rendering/shaders/text-bgra-shader.h>
+
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -367,7 +369,7 @@ RenderableActor BasicRenderer::Render( Text::ViewInterface& view )
       actorBGRA8888 = MeshActor::New( mImpl->CreateMesh( glyphs, positions, Pixel::BGRA8888, mImpl->mAtlasBGRA8888 ) );
       actorBGRA8888.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
 
-      ShaderEffect shader = BasicShader::New();
+      ShaderEffect shader = BGRAShader::New();
       actorBGRA8888.SetShaderEffect( shader );
     }
 
