@@ -48,7 +48,8 @@ public:
   // Properties
 
   /**
-   * Called when a property of an object of this type is set.
+   * @brief Called when a property of an object of this type is set.
+   *
    * @param[in] object The object whose property is set.
    * @param[in] index The property index.
    * @param[in] value The new property value.
@@ -56,7 +57,8 @@ public:
   static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
 
   /**
-   * Called to retrieve a property of an object of this type.
+   * @brief Called to retrieve a property of an object of this type.
+   *
    * @param[in] object The object whose property is to be retrieved.
    * @param[in] index The property index.
    * @return The current value of the property.
@@ -114,7 +116,7 @@ private: // Data
   Text::RendererPtr mRenderer;
   RenderableActor mRenderableActor;
 
-  unsigned int mRenderingBackend;
+  int mRenderingBackend;
 };
 
 } // namespace Internal

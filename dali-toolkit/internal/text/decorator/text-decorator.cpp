@@ -267,7 +267,7 @@ struct Decorator::Impl : public ConnectionTracker
 
 
   Impl( Dali::Toolkit::Internal::Control& parent, Observer& observer )
-  : mParent(parent),
+  : mTextControlParent(parent),
     mObserver(observer),
     mActiveCursor(ACTIVE_CURSOR_NONE),
     mActiveGrabHandle(false),
@@ -288,14 +288,25 @@ struct Decorator::Impl : public ConnectionTracker
    */
   void Relayout( const Vector2& size )
   {
-    SetCursors();
+    // TODO - Remove this if nothing is active
+    CreateActiveLayer();
+
+    // Show or hide the cursors
+    CreateCursors();
+    if( mPrimaryCursor )
+    {
+      mPrimaryCursor.SetPosition( mCursor[PRIMARY_CURSOR].x, mCursor[PRIMARY_CURSOR].y );
+    }
+    if( mSecondaryCursor )
+    {
+      mSecondaryCursor.SetPosition( mCursor[SECONDARY_CURSOR].x, mCursor[SECONDARY_CURSOR].y );
+    }
 
     // Show or hide the grab handle
     if( mActiveGrabHandle )
     {
       SetupTouchEvents();
 
-      CreateActiveLayer();
       CreateGrabHandle();
 
       mGrabHandle.SetPosition( mCursor[PRIMARY_CURSOR].x, mCursor[PRIMARY_CURSOR].y + mCursor[PRIMARY_CURSOR].height );
@@ -310,7 +321,6 @@ struct Decorator::Impl : public ConnectionTracker
     {
       SetupTouchEvents();
 
-      CreateActiveLayer();
       CreateSelectionHandles();
 
       SelectionHandleImpl& primary = mSelectionHandle[ PRIMARY_SELECTION_HANDLE ];
@@ -350,45 +360,39 @@ struct Decorator::Impl : public ConnectionTracker
   }
 
   // Add or Remove cursor(s) from parent
-  void SetCursors()
+  void CreateCursors()
   {
-    Actor parent = mParent.Self();
-    /* Create Primary and or Secondary Cursor(s) if active and add to parent */
-    if ( mActiveCursor == ACTIVE_CURSOR_PRIMARY )
+    if( mActiveCursor == ACTIVE_CURSOR_NONE )
     {
-      if ( !mPrimaryCursor )
-      {
-        CreateCursor( mPrimaryCursor );
-#ifdef DECORATOR_DEBUG
-        mPrimaryCursor.SetName( "PrimaryCursorActor" );
-#endif
-        parent.Add( mPrimaryCursor);
-      }
-
-      mPrimaryCursor.SetPosition( mCursor[PRIMARY_CURSOR].x, mCursor[PRIMARY_CURSOR].y );
-    }
-    else if ( mActiveCursor == ACTIVE_CURSOR_BOTH )
-    {
-      if ( !mSecondaryCursor )
-      {
-        CreateCursor( mSecondaryCursor );
-#ifdef DECORATOR_DEBUG
-        mSecondaryCursor.SetName( "SecondaryCursorActor" );
-#endif
-        parent.Add( mSecondaryCursor);
-      }
+      UnparentAndReset( mPrimaryCursor );
+      UnparentAndReset( mSecondaryCursor );
     }
     else
     {
-      /* ACTIVE_CURSOR_NONE so unparent cursors*/
-      if ( mPrimaryCursor )
+      /* Create Primary and or Secondary Cursor(s) if active and add to parent */
+      if ( mActiveCursor == ACTIVE_CURSOR_PRIMARY ||
+           mActiveCursor == ACTIVE_CURSOR_BOTH )
       {
-        UnparentAndReset( mPrimaryCursor );
+        if ( !mPrimaryCursor )
+        {
+          CreateCursor( mPrimaryCursor );
+#ifdef DECORATOR_DEBUG
+          mPrimaryCursor.SetName( "PrimaryCursorActor" );
+#endif
+          mActiveLayer.Add( mPrimaryCursor);
+        }
       }
 
-      if ( mSecondaryCursor )
+      if ( mActiveCursor == ACTIVE_CURSOR_BOTH )
       {
-        UnparentAndReset( mSecondaryCursor );
+        if ( !mSecondaryCursor )
+        {
+          CreateCursor( mSecondaryCursor );
+#ifdef DECORATOR_DEBUG
+          mSecondaryCursor.SetName( "SecondaryCursorActor" );
+#endif
+          mActiveLayer.Add( mSecondaryCursor);
+        }
       }
     }
   }
@@ -396,13 +400,12 @@ struct Decorator::Impl : public ConnectionTracker
   bool OnCursorBlinkTimerTick()
   {
     // Cursor blinking
-    if ( ACTIVE_CURSOR_PRIMARY )
+    if ( mPrimaryCursor )
     {
       mPrimaryCursor.SetVisible( mCursorBlinkStatus );
     }
-    else if ( ACTIVE_CURSOR_BOTH )
+    if ( mSecondaryCursor )
     {
-      mPrimaryCursor.SetVisible( mCursorBlinkStatus );
       mSecondaryCursor.SetVisible( mCursorBlinkStatus );
     }
 
@@ -430,7 +433,7 @@ struct Decorator::Impl : public ConnectionTracker
   {
     if( !mActiveLayer )
     {
-      Actor parent = mParent.Self();
+      Actor parent = mTextControlParent.Self();
 
       mActiveLayer = Layer::New();
 #ifdef DECORATOR_DEBUG
@@ -870,8 +873,8 @@ struct Decorator::Impl : public ConnectionTracker
       CreateBackground( mCopyPastePopup );
       AddPopupOptions( true, true );
       SetUpPopup( mCopyPastePopup.mRoot, mCopyPastePopup.mVisiblePopUpSize );
-      Actor parent = mParent.Self();
-      parent.Add( mCopyPastePopup.mRoot );
+      Actor textControl = mTextControlParent.Self();
+      textControl.Add( mCopyPastePopup.mRoot );
     }
   }
 
@@ -885,7 +888,7 @@ struct Decorator::Impl : public ConnectionTracker
     }
   }
 
-  Internal::Control& mParent;
+  Internal::Control& mTextControlParent;
   Observer& mObserver;
 
   Layer mActiveLayer; // Layer for active handles and alike that ensures they are above all else.

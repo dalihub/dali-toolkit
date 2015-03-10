@@ -19,11 +19,12 @@
 #include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 
 // EXTERNAL INCLUDES
+#include <string>
 #include <dali/public-api/adaptor-framework/key.h>
+#include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/common/stage.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -67,6 +68,7 @@ DALI_PROPERTY_REGISTRATION( TextField, "text",                    STRING,    TEX
 DALI_PROPERTY_REGISTRATION( TextField, "font-family",             STRING,    FONT_FAMILY             )
 DALI_PROPERTY_REGISTRATION( TextField, "font-style",              STRING,    FONT_STYLE              )
 DALI_PROPERTY_REGISTRATION( TextField, "point-size",              FLOAT,     POINT_SIZE              )
+DALI_PROPERTY_REGISTRATION( TextField, "exceed-policy",           INTEGER,   EXCEED_POLICY           )
 DALI_PROPERTY_REGISTRATION( TextField, "cursor-image",            STRING,    CURSOR_IMAGE            )
 DALI_PROPERTY_REGISTRATION( TextField, "primary-cursor-color",    VECTOR4,   PRIMARY_CURSOR_COLOR    )
 DALI_PROPERTY_REGISTRATION( TextField, "secondary-cursor-color",  VECTOR4,   SECONDARY_CURSOR_COLOR  )
@@ -107,7 +109,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
     {
       case Toolkit::TextField::Property::RENDERING_BACKEND:
       {
-        unsigned int backend = value.Get< unsigned int >();
+        int backend = value.Get< int >();
 
         if( impl.mRenderingBackend != backend )
         {
@@ -130,6 +132,53 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         {
           impl.mController->SetText( value.Get< std::string >() );
         }
+        break;
+      }
+      case Toolkit::TextField::Property::FONT_FAMILY:
+      {
+        if( impl.mController )
+        {
+          std::string fontFamily = value.Get< std::string >();
+
+          if( impl.mController->GetDefaultFontFamily() != fontFamily )
+          {
+            impl.mController->SetDefaultFontFamily( fontFamily );
+            impl.RequestTextRelayout();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::FONT_STYLE:
+      {
+        if( impl.mController )
+        {
+          std::string fontStyle = value.Get< std::string >();
+
+          if( impl.mController->GetDefaultFontStyle() != fontStyle )
+          {
+            impl.mController->SetDefaultFontStyle( fontStyle );
+            impl.RequestTextRelayout();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::POINT_SIZE:
+      {
+        if( impl.mController )
+        {
+          float pointSize = value.Get< float >();
+
+          if( impl.mController->GetDefaultPointSize() != pointSize /*TODO - epsilon*/ )
+          {
+            impl.mController->SetDefaultPointSize( pointSize );
+            impl.RequestTextRelayout();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::EXCEED_POLICY:
+      {
+        impl.mExceedPolicy = value.Get< int >();
         break;
       }
       case Toolkit::TextField::Property::CURSOR_IMAGE:
@@ -241,6 +290,11 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::TextField::Property::EXCEED_POLICY:
+      {
+        value = impl.mExceedPolicy;
+        break;
+      }
       case Toolkit::TextField::Property::CURSOR_IMAGE:
       {
         if( impl.mDecorator )
@@ -350,7 +404,8 @@ float TextField::GetHeightForWidth( float width )
 
 void TextField::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 {
-  if( mController->Relayout( size ) )
+  if( mController->Relayout( size ) ||
+      !mRenderer )
   {
     if( mDecorator )
     {
@@ -362,13 +417,30 @@ void TextField::OnRelayout( const Vector2& size, ActorSizeContainer& container )
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
 
+    RenderableActor renderableActor;
     if( mRenderer )
     {
-      Actor renderableActor = mRenderer->Render( mController->GetView() );
+      renderableActor = mRenderer->Render( mController->GetView() );
+    }
 
-      if( renderableActor )
+    EnableClipping( (Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy), size );
+
+    if( renderableActor != mRenderableActor )
+    {
+      UnparentAndReset( mRenderableActor );
+      mRenderableActor = renderableActor;
+    }
+
+    if( mRenderableActor )
+    {
+      // Make sure the actor is parented correctly with/without clipping
+      if( mClipper )
       {
-        Self().Add( renderableActor );
+        mClipper->GetRootActor().Add( mRenderableActor );
+      }
+      else
+      {
+        Self().Add( mRenderableActor );
       }
     }
   }
@@ -396,14 +468,44 @@ void TextField::RequestTextRelayout()
   RelayoutRequest();
 }
 
+void TextField::EnableClipping( bool clipping, const Vector2& size )
+{
+  if( clipping )
+  {
+    // Not worth to created clip actor if width or height is equal to zero.
+    if( size.width > Math::MACHINE_EPSILON_1000 && size.height > Math::MACHINE_EPSILON_1000 )
+    {
+      if( !mClipper )
+      {
+        Actor self = Self();
+
+        mClipper = Clipper::New( size );
+        self.Add( mClipper->GetRootActor() );
+        self.Add( mClipper->GetImageActor() );
+      }
+      else if ( mClipper )
+      {
+        mClipper->Refresh( size );
+      }
+    }
+  }
+  else
+  {
+    // Note - this will automatically remove the root & image actors
+    mClipper.Reset();
+  }
+}
+
 TextField::TextField()
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_NONE ) ),
-  mRenderingBackend( DEFAULT_RENDERING_BACKEND )
+  mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
+  mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP )
 {
 }
 
 TextField::~TextField()
 {
+  mClipper.Reset();
 }
 
 } // namespace Internal

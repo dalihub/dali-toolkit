@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
+#include <dali-toolkit/internal/text/clipping/text-clipper.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller.h>
@@ -50,7 +51,8 @@ public:
   // Properties
 
   /**
-   * Called when a property of an object of this type is set.
+   * @brief Called when a property of an object of this type is set.
+   *
    * @param[in] object The object whose property is set.
    * @param[in] index The property index.
    * @param[in] value The new property value.
@@ -58,7 +60,8 @@ public:
   static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
 
   /**
-   * Called to retrieve a property of an object of this type.
+   * @brief Called to retrieve a property of an object of this type.
+   *
    * @param[in] object The object whose property is to be retrieved.
    * @param[in] index The property index.
    * @return The current value of the property.
@@ -105,6 +108,14 @@ private: // From Control
 private: // Implementation
 
   /**
+   * @brief Enable or disable clipping.
+   *
+   * @param[in] clipping True if clipping should be enabled.
+   * @param[in] size The area to clip within.
+   */
+  void EnableClipping( bool clipping, const Vector2& size );
+
+  /**
    * Construct a new TextField.
    */
   TextField();
@@ -125,8 +136,12 @@ private: // Data
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
   Text::DecoratorPtr mDecorator;
+  Text::ClipperPtr mClipper; ///< For EXCEED_POLICY_CLIP
 
-  unsigned int mRenderingBackend;
+  RenderableActor mRenderableActor;
+
+  int mRenderingBackend;
+  int mExceedPolicy;
 };
 
 } // namespace Internal

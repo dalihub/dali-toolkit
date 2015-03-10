@@ -61,6 +61,7 @@ public:
       FONT_FAMILY,                              ///< name "font-family",             The requested font family,                                                type STRING
       FONT_STYLE,                               ///< name "font-style",              The requested font style e.g. Regular/Italic,                             type STRING
       POINT_SIZE,                               ///< name "point-size",              The size of font in points,                                               type FLOAT
+      EXCEED_POLICY,                            ///< name "exceed-policy"            Specifies how the text is truncated when it does not fit,                 type INT
       CURSOR_IMAGE,                             ///< name "cursor-image",            The image to display for cursors,                                         type STRING
       PRIMARY_CURSOR_COLOR,                     ///< name "primary-cursor-color",    The color to apply to the primary cursor,                                 type VECTOR4
       SECONDARY_CURSOR_COLOR,                   ///< name "secondary-cursor-color",  The color to apply to the secondary cursor,                               type VECTOR4
@@ -70,6 +71,17 @@ public:
       GRAB_HANDLE_IMAGE,                        ///< name "grab-handle-image",       The image to display for grab handle,                                     type STRING
       DECORATION_BOUNDING_BOX                   ///< name "decoration-bounding-box", The decorations (handles etc) will positioned within this area on-screen, type RECTANGLE
     };
+  };
+
+  /**
+   * @brief Specifies how the text is truncated when it does not fit
+   *
+   * The default value is \e EXCEED_POLICY_CLIP.
+   */
+  enum ExceedPolicy
+  {
+    EXCEED_POLICY_ORIGINAL,        ///< The text will be display at original size, and may exceed the TextField boundary.
+    EXCEED_POLICY_CLIP             ///< The end of text will be clipped to fit within the TextField.
   };
 
   /**

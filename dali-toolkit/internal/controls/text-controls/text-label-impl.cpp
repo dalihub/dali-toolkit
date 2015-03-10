@@ -95,11 +95,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
     {
       case Toolkit::TextLabel::Property::RENDERING_BACKEND:
       {
-        unsigned int backend = value.Get< int >();
+        int backend = value.Get< int >();
 
         if( impl.mRenderingBackend != backend )
         {
-          impl.mRenderingBackend = static_cast< unsigned int >( backend );
+          impl.mRenderingBackend = backend;
           impl.mRenderer.Reset();
           impl.RequestTextRelayout();
         }
