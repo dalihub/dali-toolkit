@@ -73,36 +73,56 @@ void VisualModel::SetGlyphs( const GlyphInfo* glyphs,
                              Length numberOfGlyphs )
 {
   Vector<GlyphInfo>& modelGlyphs = mImpl->mGlyphs;
-  modelGlyphs.Resize( numberOfGlyphs );
-  memcpy( modelGlyphs.Begin(), glyphs, numberOfGlyphs * sizeof( GlyphInfo ) );
-
   Vector<CharacterIndex>& modelGlyphsToCharacters = mImpl->mGlyphsToCharacters;
-  modelGlyphsToCharacters.Resize( numberOfGlyphs );
-  memcpy( modelGlyphsToCharacters.Begin(), characterIndices, numberOfGlyphs * sizeof( CharacterIndex ) );
-
   Vector<Length>& modelCharactersPerGlyph = mImpl->mCharactersPerGlyph;
-  modelCharactersPerGlyph.Resize( numberOfGlyphs );
-  memcpy( modelCharactersPerGlyph.Begin(), charactersPerGlyph, numberOfGlyphs * sizeof( Length ) );
-
-  // Build the characters to glyph conversion table.
   Vector<GlyphIndex>& modelCharactersToGlyph = mImpl->mCharactersToGlyph;
 
-  // 1) Reserve some space for the characters to avoid reallocations.
-  modelCharactersToGlyph.Reserve( static_cast<Length> ( static_cast<float>( numberOfGlyphs ) * 1.3f ) );
-
-  // 2) Traverse the glyphs and set the glyph indices.
-  GlyphIndex glyphIndex = 0u;
-  Length totalNumberOfCharacters = 0u;
-  for( Vector<Length>::ConstIterator it = modelCharactersPerGlyph.Begin(),
-         endIt = modelCharactersPerGlyph.End();
-       it != endIt;
-       ++it, ++glyphIndex )
+  if( 0u == numberOfGlyphs )
   {
-    const Length numberOfCharacters = *it;
-
-    for( Length index = 0u; index < numberOfCharacters; ++index, ++totalNumberOfCharacters )
+    modelGlyphs.Clear();
+    modelGlyphsToCharacters.Clear();
+    modelCharactersToGlyph.Clear();
+    modelCharactersPerGlyph.Clear();
+  }
+  else
+  {
+    if( NULL != glyphs )
     {
-      modelCharactersToGlyph.PushBack( glyphIndex );
+      modelGlyphs.Resize( numberOfGlyphs );
+      memcpy( modelGlyphs.Begin(), glyphs, numberOfGlyphs * sizeof( GlyphInfo ) );
+    }
+
+    if( NULL != characterIndices )
+    {
+      modelGlyphsToCharacters.Resize( numberOfGlyphs );
+      memcpy( modelGlyphsToCharacters.Begin(), characterIndices, numberOfGlyphs * sizeof( CharacterIndex ) );
+    }
+
+    if( NULL != charactersPerGlyph )
+    {
+      modelCharactersPerGlyph.Resize( numberOfGlyphs );
+      memcpy( modelCharactersPerGlyph.Begin(), charactersPerGlyph, numberOfGlyphs * sizeof( Length ) );
+
+      // Build the characters to glyph conversion table.
+
+      // 1) Reserve some space for the characters to avoid reallocations.
+      modelCharactersToGlyph.Reserve( static_cast<Length> ( static_cast<float>( numberOfGlyphs ) * 1.3f ) );
+
+      // 2) Traverse the glyphs and set the glyph indices.
+      GlyphIndex glyphIndex = 0u;
+      Length totalNumberOfCharacters = 0u;
+      for( Vector<Length>::ConstIterator it = modelCharactersPerGlyph.Begin(),
+             endIt = modelCharactersPerGlyph.End();
+           it != endIt;
+           ++it, ++glyphIndex )
+      {
+        const Length numberOfCharacters = *it;
+
+        for( Length index = 0u; index < numberOfCharacters; ++index, ++totalNumberOfCharacters )
+        {
+          modelCharactersToGlyph.PushBack( glyphIndex );
+        }
+      }
     }
   }
 }
@@ -168,8 +188,15 @@ void VisualModel::SetGlyphPositions( const Vector2* glyphPositions,
                                      Length numberOfGlyphs )
 {
   Vector<Vector2>& modelPositions = mImpl->mGlyphPositions;
-  modelPositions.Resize( numberOfGlyphs );
-  memcpy( modelPositions.Begin(), glyphPositions, numberOfGlyphs * sizeof( Vector2 ) );
+  if( 0u == numberOfGlyphs )
+  {
+    modelPositions.Clear();
+  }
+  else
+  {
+    modelPositions.Resize( numberOfGlyphs );
+    memcpy( modelPositions.Begin(), glyphPositions, numberOfGlyphs * sizeof( Vector2 ) );
+  }
 }
 
 Length VisualModel::GetNumberOfGlyphPositions() const
@@ -196,8 +223,15 @@ void VisualModel::SetLines( const LineRun* const lines,
   Vector<LineRun>& modelLines = mImpl->mLines;
   GetLineCache& lineCache = mImpl->mGetLineCache;
 
-  modelLines.Resize( numberOfLines );
-  memcpy( modelLines.Begin(), lines, numberOfLines * sizeof( LineRun ) );
+  if( 0u == numberOfLines )
+  {
+    modelLines.Clear();
+  }
+  else
+  {
+    modelLines.Resize( numberOfLines );
+    memcpy( modelLines.Begin(), lines, numberOfLines * sizeof( LineRun ) );
+  }
 
   // Clear the get line cache.
   lineCache.glyphIndex = 0u;
