@@ -62,6 +62,8 @@ public:
   /**
    * @brief Replaces any text previously set.
    *
+   * @note If the number of characters is zero the text buffer is cleared.
+   *
    * @param[in] text An array of UTF-32 characters.
    * @param[in] numberOfCharacters The length of the array.
    */
@@ -104,6 +106,8 @@ public:
    * Replaces any scripts previously set.
    *
    * A run is a group of consecutive characters. A script run contains the script for a run.
+   *
+   * @note If the number of runs is zero the script buffer is cleared.
    *
    * @param[in] scripts Pointer to a buffer with all the script runs.
    * @param[in] numberOfRuns The number of script runs.
@@ -153,6 +157,8 @@ public:
    * Replaces any fonts previously set.
    *
    * A run is a group of consecutive characters. A font run contains the font id for a run.
+   *
+   * @note If the number of runs is zero the font buffer is cleared.
    *
    * @param[in] fonts Pointer to a buffer with all the font runs.
    * @param[in] numberOfRuns The number of font runs.
@@ -205,6 +211,8 @@ public:
    *
    * Replaces any line break info previously set.
    *
+   * @note If the @length is zero the break info buffer is cleared.
+   *
    * @param[in] lineBreakInfo Pointer to a buffer with the line break info.
    * @param[in] length The size of the buffer.
    */
@@ -248,6 +256,8 @@ public:
    * See GetWordBreakInfo() to get how the word break info is encoded.
    *
    * Replaces any word break info previously set.
+   *
+   * @note If the @length is zero the break info buffer is cleared.
    *
    * @param[in] wordBreakInfo Pointer to a buffer with the word break info.
    * @param[in] length The size of the buffer.
@@ -299,6 +309,8 @@ public:
 
    * In terms of the bidirectional algorithm, a 'paragraph' is understood as a run of characters between Paragraph Separators or appropriate Newline Functions.
    * A 'paragraph' may also be determined by higher-level protocols like a mark-up tag.
+   *
+   * @note If the number of runs is zero the bidirectional info buffer is cleared.
    *
    * @param[in] bidirectionalInfo Pointer to a buffer with all the bidirectional info runs.
    * @param[in] numberOfRuns The number of bidirectional info runs.
@@ -354,6 +366,8 @@ public:
    * Sets the visual to logical and the logical to visual map tables.
    *
    * Replaces any map tables previously set.
+   *
+   * @note If the number of runs is zero the bidirectional info buffer is cleared.
    *
    * @param[in] bidirectionalInfo Pointer to a buffer with all the bidirectional info runs.
    * @param[in] numberOfRuns The number of bidirectional info runs.

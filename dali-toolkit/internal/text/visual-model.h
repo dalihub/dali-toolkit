@@ -61,6 +61,9 @@ public:
   /**
    * @brief Replaces any glyphs previously set.
    *
+   * @note If the number of glyphs is zero, all buffers are cleared.
+   * @note If one pointer is NULL and the number of glyphs is not zero, the buffer is not touched.
+   *
    * @param[in] glyphs An array of glyphs in the visual order.
    * @param[in] characterIndices An array containing the first character in the logical model that each glyph relates to.
    * @param[in] charactersPerGlyph An array containing the number of characters per glyph.
@@ -171,6 +174,8 @@ public:
   /**
    * @brief Replaces any glyph positions previously set.
    *
+   * @note If the number of glyphs is zero the position buffer is cleared.
+   *
    * @param[in] glyphPositions An array of visual positions for each glyph.
    * @param[in] numberOfGlyphs The number of positions.
    */
@@ -206,6 +211,8 @@ public:
    * Replaces any lines previously set.
    *
    * Every line is an item run containing the index to the first glyph of the line and the number of glyphs.
+   *
+   * @note If the number of lines is zero or the pointer is NULL, the lines buffer is cleared.
    *
    * @param[in] lines Pointer to a buffer containing all the line runs.
    * @param[in] numberOfLines The number of lines in the buffer.

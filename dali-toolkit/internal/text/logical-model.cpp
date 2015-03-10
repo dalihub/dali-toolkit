@@ -54,8 +54,16 @@ void LogicalModel::SetText( const Character* const text,
                             Length numberOfCharacters )
 {
   Vector<Character>& modelText = mImpl->mText;
-  modelText.Resize( numberOfCharacters );
-  memcpy( modelText.Begin(), text, numberOfCharacters * sizeof( Character ) );
+
+  if( 0u == numberOfCharacters )
+  {
+    modelText.Clear();
+  }
+  else
+  {
+    modelText.Resize( numberOfCharacters );
+    memcpy( modelText.Begin(), text, numberOfCharacters * sizeof( Character ) );
+  }
 }
 
 Length LogicalModel::GetNumberOfCharacters() const
@@ -80,8 +88,16 @@ void LogicalModel::SetScripts( const ScriptRun* const scripts,
                                Length numberOfRuns )
 {
   Vector<ScriptRun>& scriptRuns = mImpl->mScriptRuns;
-  scriptRuns.Resize( numberOfRuns );
-  memcpy( scriptRuns.Begin(), scripts, numberOfRuns * sizeof( ScriptRun ) );
+
+  if( 0u == numberOfRuns )
+  {
+    scriptRuns.Clear();
+  }
+  else
+  {
+    scriptRuns.Resize( numberOfRuns );
+    memcpy( scriptRuns.Begin(), scripts, numberOfRuns * sizeof( ScriptRun ) );
+  }
 }
 
 Length LogicalModel::GetNumberOfScriptRuns( CharacterIndex characterIndex,
@@ -165,8 +181,16 @@ void LogicalModel::SetFonts( const FontRun* const fonts,
                              Length numberOfRuns )
 {
   Vector<FontRun>& fontRuns = mImpl->mFontRuns;
-  fontRuns.Resize( numberOfRuns );
-  memcpy( fontRuns.Begin(), fonts, numberOfRuns * sizeof( FontRun ) );
+
+  if( 0u == numberOfRuns )
+  {
+    fontRuns.Clear();
+  }
+  else
+  {
+    fontRuns.Resize( numberOfRuns );
+    memcpy( fontRuns.Begin(), fonts, numberOfRuns * sizeof( FontRun ) );
+  }
 }
 
 Length LogicalModel::GetNumberOfFontRuns( CharacterIndex characterIndex,
@@ -248,8 +272,16 @@ void LogicalModel::SetLineBreakInfo( const LineBreakInfo* const lineBreakInfo,
                                      Length length )
 {
   Vector<LineBreakInfo>& modelLineBreakInfo = mImpl->mLineBreakInfo;
-  modelLineBreakInfo.Resize( length );
-  memcpy( modelLineBreakInfo.Begin(), lineBreakInfo, length * sizeof( LineBreakInfo ) );
+
+  if( 0u == length )
+  {
+    modelLineBreakInfo.Clear();
+  }
+  else
+  {
+    modelLineBreakInfo.Resize( length );
+    memcpy( modelLineBreakInfo.Begin(), lineBreakInfo, length * sizeof( LineBreakInfo ) );
+  }
 }
 
 void LogicalModel::GetLineBreakInfo( LineBreakInfo* lineBreakInfo,
@@ -268,8 +300,16 @@ void LogicalModel::SetWordBreakInfo( const WordBreakInfo* const wordBreakInfo,
                                      Length length )
 {
   Vector<WordBreakInfo>& modelWordBreakInfo = mImpl->mWordBreakInfo;
-  modelWordBreakInfo.Resize( length );
-  memcpy( modelWordBreakInfo.Begin(), wordBreakInfo, length * sizeof( WordBreakInfo ) );
+
+  if( 0u == length )
+  {
+    modelWordBreakInfo.Clear();
+  }
+  else
+  {
+    modelWordBreakInfo.Resize( length );
+    memcpy( modelWordBreakInfo.Begin(), wordBreakInfo, length * sizeof( WordBreakInfo ) );
+  }
 }
 
 void LogicalModel::GetWordBreakInfo( WordBreakInfo* wordBreakInfo,
