@@ -35,6 +35,18 @@ namespace Toolkit
 namespace Text
 {
 
+/**
+ * @brief caches some temporary values of the GetNumberOfLines( glyphIndex, numberOfGlyphs ) operation
+ * as they are going to be used in the GetLinesOfGlyphRange() call.
+ */
+struct GetLineCache
+{
+  GlyphIndex glyphIndex;     ///< The glyph index.
+  Length     numberOfGlyphs; ///< The number of glyphs.
+  Length     firstLine;      ///< Index to the first line.
+  Length     numberOfLines;  ///< The number of lines.
+};
+
 struct VisualModel::Impl
 {
   Vector<GlyphInfo>      mGlyphs;             ///< For each glyph, the font's id, glyph's index within the font and glyph's metrics.
@@ -42,9 +54,12 @@ struct VisualModel::Impl
   Vector<GlyphIndex>     mCharactersToGlyph;  ///< For each character, the index of the first glyph.
   Vector<Length>         mCharactersPerGlyph; ///< For each glyph, the number of characters that form the glyph.
   Vector<Vector2>        mGlyphPositions;     ///< For each glyph, the position.
+  Vector<LineRun>        mLines;              ///< The laid out lines.
 
-  Size                   mNaturalSize;
-  Size                   mActualSize;
+  Size                   mNaturalSize;        ///< Size of the text with no line wrapping.
+  Size                   mActualSize;         ///< Size of the laid-out text considering the layout properties set.
+
+  GetLineCache           mGetLineCache;       ///< Caches the GetNumberOfLines( glyphIndex, numberOfGlyphs ) operation.
 };
 
 VisualModelPtr VisualModel::New()
@@ -101,7 +116,7 @@ void VisualModel::GetGlyphs( GlyphInfo* glyphs,
                              GlyphIndex glyphIndex,
                              Length numberOfGlyphs ) const
 {
-  Vector<GlyphInfo>& modelGlyphs = mImpl->mGlyphs;
+  const Vector<GlyphInfo>& modelGlyphs = mImpl->mGlyphs;
   memcpy( glyphs, modelGlyphs.Begin() + glyphIndex, numberOfGlyphs * sizeof( GlyphInfo ) );
 }
 
@@ -129,7 +144,7 @@ void VisualModel::GetCharacterToGlyphMap( GlyphIndex* characterToGlyphMap,
                                           CharacterIndex characterIndex,
                                           Length numberOfCharacters ) const
 {
-  Vector<GlyphIndex>& modelCharactersToGlyph = mImpl->mCharactersToGlyph;
+  const Vector<GlyphIndex>& modelCharactersToGlyph = mImpl->mCharactersToGlyph;
   memcpy( characterToGlyphMap, modelCharactersToGlyph.Begin() + characterIndex, numberOfCharacters * sizeof( GlyphIndex ) );
 }
 
@@ -137,7 +152,7 @@ void VisualModel::GetCharactersPerGlyphMap( Length* charactersPerGlyph,
                                             GlyphIndex glyphIndex,
                                             Length numberOfGlyphs ) const
 {
-  Vector<Length>& modelCharactersPerGlyph = mImpl->mCharactersPerGlyph;
+  const Vector<Length>& modelCharactersPerGlyph = mImpl->mCharactersPerGlyph;
   memcpy( charactersPerGlyph, modelCharactersPerGlyph.Begin() + glyphIndex, numberOfGlyphs * sizeof( Length ) );
 }
 
@@ -145,7 +160,7 @@ void VisualModel::GetGlyphToCharacterMap( CharacterIndex* glyphToCharacter,
                                           GlyphIndex glyphIndex,
                                           Length numberOfGlyphs ) const
 {
-  Vector<CharacterIndex>& modelGlyphsToCharacters = mImpl->mGlyphsToCharacters;
+  const Vector<CharacterIndex>& modelGlyphsToCharacters = mImpl->mGlyphsToCharacters;
   memcpy( glyphToCharacter, modelGlyphsToCharacters.Begin() + glyphIndex, numberOfGlyphs * sizeof( CharacterIndex ) );
 }
 
@@ -166,7 +181,7 @@ void VisualModel::GetGlyphPositions( Vector2* glyphPositions,
                                      GlyphIndex glyphIndex,
                                      Length numberOfGlyphs ) const
 {
-  Vector<Vector2> modelPositions = mImpl->mGlyphPositions;
+  const Vector<Vector2>& modelPositions = mImpl->mGlyphPositions;
   memcpy( glyphPositions, modelPositions.Begin() + glyphIndex, numberOfGlyphs * sizeof( Vector2 ) );
 }
 
@@ -178,29 +193,107 @@ const Vector2& VisualModel::GetGlyphPosition( GlyphIndex glyphIndex ) const
 void VisualModel::SetLines( const LineRun* const lines,
                             Length numberOfLines )
 {
+  Vector<LineRun>& modelLines = mImpl->mLines;
+  GetLineCache& lineCache = mImpl->mGetLineCache;
+
+  modelLines.Resize( numberOfLines );
+  memcpy( modelLines.Begin(), lines, numberOfLines * sizeof( LineRun ) );
+
+  // Clear the get line cache.
+  lineCache.glyphIndex = 0u;
+  lineCache.numberOfGlyphs = 0u;
+  lineCache.firstLine = 0u;
+  lineCache.numberOfLines = 0u;
 }
 
 Length VisualModel::GetNumberOfLines() const
 {
-  return 0u;
+  return mImpl->mLines.Count();
 }
 
 void VisualModel::GetLines( LineRun* lines,
                             LineIndex lineIndex,
                             Length numberOfLines ) const
 {
+  const Vector<LineRun>& modelLines = mImpl->mLines;
+  memcpy( lines, modelLines.Begin() + lineIndex, numberOfLines * sizeof( LineRun ) );
 }
 
 Length VisualModel::GetNumberOfLines( GlyphIndex glyphIndex,
                                       Length numberOfGlyphs ) const
 {
-  return 0u;
+  // If is likely the user query consecutively for the number of lines with the same
+  // glyph index and number of glyphs, use the cache could be considered.
+  GetLineCache& lineCache = mImpl->mGetLineCache;
+
+  // Cache the glyph index and number of glyphs to be used in the GetLinesOfGlyphRange().
+  lineCache.glyphIndex = glyphIndex;
+  lineCache.numberOfGlyphs = numberOfGlyphs;
+
+  // Check first if the query is for the total number of glyphs.
+  const Length totalNumberOfGlyphs = mImpl->mGlyphs.Count();
+
+  if( ( 0u == glyphIndex ) &&
+      ( totalNumberOfGlyphs == numberOfGlyphs ) )
+  {
+    lineCache.firstLine = 0u;
+    lineCache.numberOfLines = mImpl->mLines.Count();
+
+    return lineCache.numberOfLines;
+  }
+
+  // Initialize the number of lines and the first line.
+  lineCache.numberOfLines = 0u;
+  lineCache.firstLine = 0u;
+  bool firstLineFound = false;
+
+  const Vector<LineRun>& modelLines = mImpl->mLines;
+  const GlyphIndex lastGlyphIndex = glyphIndex + numberOfGlyphs;
+
+  // Traverse the lines and cound those lines within the range of glyphs.
+  for( Vector<LineRun>::ConstIterator it = modelLines.Begin(),
+         endIt = modelLines.End();
+       it != endIt;
+       ++it )
+  {
+    const LineRun& line = *it;
+
+    if( ( line.glyphIndex + line.numberOfGlyphs > glyphIndex ) &&
+        ( lastGlyphIndex > line.glyphIndex ) )
+    {
+      firstLineFound = true;
+      ++lineCache.numberOfLines;
+    }
+    else if( lastGlyphIndex <= line.glyphIndex )
+    {
+      // nothing else to do.
+      break;
+    }
+
+    if( !firstLineFound )
+    {
+      ++lineCache.firstLine;
+    }
+  }
+
+  return lineCache.numberOfLines;
 }
 
 void VisualModel::GetLinesOfGlyphRange( LineRun* lines,
                                         GlyphIndex glyphIndex,
                                         Length numberOfGlyphs ) const
 {
+  const Vector<LineRun>& modelLines = mImpl->mLines;
+  GetLineCache& lineCache = mImpl->mGetLineCache;
+
+  if( ( glyphIndex != lineCache.glyphIndex ) ||
+      ( numberOfGlyphs != lineCache.numberOfGlyphs ) )
+  {
+    GetNumberOfLines( glyphIndex,
+                      numberOfGlyphs );
+  }
+
+  memcpy( lines, modelLines.Begin() + lineCache.firstLine, lineCache.numberOfLines * sizeof( LineRun ) );
 }
 
 void VisualModel::SetNaturalSize( const Vector2& size  )

@@ -249,8 +249,8 @@ public:
    *
    * @return The number of lines.
    */
-  TextAbstraction::Length GetNumberOfLines( GlyphIndex glyphIndex,
-                                            Length numberOfGlyphs ) const;
+  Length GetNumberOfLines( GlyphIndex glyphIndex,
+                           Length numberOfGlyphs ) const;
   /**
    * Retrieves the lines where the given range of glyphs is laid out.
    *

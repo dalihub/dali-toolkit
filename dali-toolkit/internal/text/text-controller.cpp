@@ -555,6 +555,7 @@ bool Controller::Relayout( const Vector2& size )
                                                              LAYOUT                    |
                                                              UPDATE_ACTUAL_SIZE        |
                                                              UPDATE_POSITIONS          |
+                                                             UPDATE_LINES              |
                                                              REORDER );
 
     mImpl->mControlSize = size;
@@ -710,9 +711,10 @@ bool Controller::DoRelayout( const Vector2& size,
 
   if( LAYOUT & operations )
   {
+    const Length numberOfCharacters = mImpl->mLogicalModel->GetNumberOfCharacters();
+
     if( 0u == numberOfGlyphs )
     {
-      const Length numberOfCharacters = mImpl->mLogicalModel->GetNumberOfCharacters();
       numberOfGlyphs = mImpl->mVisualModel->GetNumberOfGlyphs();
 
       lineBreakInfo.Resize( numberOfCharacters );
@@ -755,22 +757,40 @@ bool Controller::DoRelayout( const Vector2& size,
     Vector<Vector2> glyphPositions;
     glyphPositions.Resize( numberOfGlyphs );
 
-    // Update the visual model
+    // The laid-out lines.
+    // It's not possible to know in how many lines the text is going to be laid-out,
+    // but it can be resized at least with the number of 'paragraphs' to avoid
+    // some re-allocations.
+    Vector<LineRun> lines;
+    lines.Reserve( mImpl->mLogicalModel->GetNumberOfBidirectionalInfoRuns( 0u, numberOfCharacters ) );
+
+    // Update the visual model.
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
                                                    glyphPositions,
+                                                   lines,
                                                    layoutSize );
 
-    // Sets the positions into the model.
-    if( UPDATE_POSITIONS & operations )
+    if( viewUpdated )
     {
-      mImpl->mVisualModel->SetGlyphPositions( glyphPositions.Begin(),
-                                              numberOfGlyphs );
-    }
+      // Sets the positions into the model.
+      if( UPDATE_POSITIONS & operations )
+      {
+        mImpl->mVisualModel->SetGlyphPositions( glyphPositions.Begin(),
+                                                numberOfGlyphs );
+      }
 
-    // Sets the actual size.
-    if( UPDATE_ACTUAL_SIZE & operations )
-    {
-      mImpl->mVisualModel->SetActualSize( layoutSize );
+      // Sets the lines into the model.
+      if( UPDATE_LINES & operations )
+      {
+        mImpl->mVisualModel->SetLines( lines.Begin(),
+                                       lines.Count() );
+      }
+
+      // Sets the actual size.
+      if( UPDATE_ACTUAL_SIZE & operations )
+      {
+        mImpl->mVisualModel->SetActualSize( layoutSize );
+      }
     }
   }
   else
