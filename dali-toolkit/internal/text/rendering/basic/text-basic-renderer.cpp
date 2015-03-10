@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/text-abstraction/font-client.h>
+#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/images/atlas.h>
 #include <dali/public-api/geometry/mesh.h>
@@ -50,9 +51,9 @@ struct TextureCoordinates
   Vector2 bottomRight;
 };
 
-struct AtlasHelperGlyph
+struct AtlasGlyph
 {
-  AtlasHelperGlyph()
+  AtlasGlyph()
   : fontId( 0 ),
     index( 0 ),
     xOffset( 0 ),
@@ -61,16 +62,18 @@ struct AtlasHelperGlyph
   {
   }
 
-  AtlasHelperGlyph( FontId id,
-                    GlyphIndex glyphIndex,
-                    std::size_t offset,
-                    std::size_t widthPixels,
-                    std::size_t heightPixels )
+  AtlasGlyph( FontId id,
+              GlyphIndex glyphIndex,
+              std::size_t offset,
+              std::size_t widthPixels,
+              std::size_t heightPixels,
+              BufferImage bitmap )
   : fontId( id ),
     index( glyphIndex ),
     xOffset( offset ),
     width( widthPixels ),
-    height( heightPixels )
+    height( heightPixels ),
+    mBitmap( bitmap )
   {
   }
 
@@ -79,35 +82,114 @@ struct AtlasHelperGlyph
   std::size_t xOffset;
   std::size_t width;
   std::size_t height;
+  BufferImage mBitmap;
   TextureCoordinates coords;
 };
 
-struct AtlasHelper
+} // unnamed namespace
+
+struct BasicRenderer::Impl
 {
-  AtlasHelper()
-  : mWidth( 0.0f ),
-    mHeight( 0.0f )
+  /**
+   * @brief Create the renderer implementation.
+   */
+  Impl()
+  : mWidthL8( 0.0f ),
+    mHeightL8( 0.0f ),
+    mWidthBGRA8888( 0.0f ),
+    mHeightBGRA8888( 0.0f )
   {
     mFontClient = TextAbstraction::FontClient::Get();
   }
 
-  void Reset()
+  /**
+   * @brief Reset the previous glyph calculations.
+   *
+   * @param[in] size The glyph space to reserve.
+   */
+  void Reset( std::size_t size )
   {
-    mWidth = 0.0f;
-    mHeight = 0.0f;
+    mWidthL8 = 0.0f;
+    mHeightL8 = 0.0f;
+    mWidthBGRA8888 = 0.0f;
+    mHeightBGRA8888 = 0.0f;
     mGlyphs.clear();
-  }
-
-  void Reserve( std::size_t size )
-  {
     mGlyphs.reserve( size );
+    mAtlasL8.Reset();
+    mAtlasBGRA8888.Reset();
   }
 
+  /**
+   * @brief Ccreate an Atlas, uploading the necessary glyph bitmaps
+   *
+   * @param[in] glyphs The glyphs to upload.
+   */
+  void CreateAtlases( const Vector<GlyphInfo>& glyphs )
+  {
+    // Clear previous atlas
+    Reset( glyphs.Count() );
+
+    for( unsigned int i=0; i<glyphs.Count(); ++i )
+    {
+      float width  = glyphs[i].width;
+      float height = glyphs[i].height;
+
+      if( width > 0 &&
+          height > 0 ) // skip whitespace
+      {
+        if( !GlyphFound( glyphs[i].fontId, glyphs[i].index ) )
+        {
+          AddGlyph( glyphs[i] );
+        }
+      }
+    }
+
+    mAtlasL8 = CreateAtlas( mWidthL8, mHeightL8, Pixel::L8 );
+    mAtlasBGRA8888 = CreateAtlas( mWidthBGRA8888, mHeightBGRA8888, Pixel::BGRA8888 );
+  }
+
+  Atlas CreateAtlas( unsigned int width, unsigned int height, Pixel::Format format )
+  {
+    Atlas atlas;
+
+    if( width > 0 && height > 0 )
+    {
+      atlas = Atlas::New( width, height, format );
+
+      for( unsigned int i=0; i<mGlyphs.size(); ++i )
+      {
+        AtlasGlyph& glyph = mGlyphs[i];
+
+        const Pixel::Format glyphFormat = glyph.mBitmap.GetPixelFormat();
+
+        if( format == glyphFormat )
+        {
+          atlas.Upload( glyph.mBitmap, glyph.xOffset, 0 );
+
+          TextureCoordinates& coords = glyph.coords;
+          coords.topLeft.x     = static_cast<float>(glyph.xOffset) / static_cast<float>(width);
+          coords.topLeft.y     = 0.0f;
+          coords.topRight.x    = static_cast<float>(glyph.xOffset + glyph.width) / static_cast<float>(width);
+          coords.topRight.y    = 0.0f;
+          coords.bottomLeft.x  = static_cast<float>(glyph.xOffset) / static_cast<float>(width);
+          coords.bottomLeft.y  = static_cast<float>(glyph.height) / static_cast<float>(height);
+          coords.bottomRight.x = static_cast<float>(glyph.xOffset + glyph.width) / static_cast<float>(width);
+          coords.bottomRight.y = static_cast<float>(glyph.height) / static_cast<float>(height);
+        }
+      }
+    }
+
+    return atlas;
+  }
+
+  /**
+   * @brief Check whether we already have the glyph.
+   */
   bool GlyphFound( FontId fontId, GlyphIndex index ) const
   {
     for( unsigned int i=0; i<mGlyphs.size(); ++i )
     {
-      const AtlasHelperGlyph& glyph = mGlyphs[i];
+      const AtlasGlyph& glyph = mGlyphs[i];
 
       if( fontId == glyph.fontId &&
           index  == glyph.index )
@@ -119,100 +201,60 @@ struct AtlasHelper
     return false;
   }
 
+  /**
+   * @brief Add the glyph.
+   */
   void AddGlyph( const GlyphInfo& glyphInfo )
   {
-    mGlyphs.push_back( AtlasHelperGlyph( glyphInfo.fontId, glyphInfo.index, mWidth, glyphInfo.width, glyphInfo.height ) );
+    BufferImage bitmap = mFontClient.CreateBitmap( glyphInfo.fontId, glyphInfo.index );
 
-    mWidth += glyphInfo.width + PADDING;
-    if( mHeight < glyphInfo.height + PADDING )
+    const Pixel::Format format = bitmap.GetPixelFormat();
+
+    if( Pixel::L8 == format )
     {
-      mHeight = glyphInfo.height + PADDING;
+      mGlyphs.push_back( AtlasGlyph( glyphInfo.fontId, glyphInfo.index, mWidthL8, glyphInfo.width, glyphInfo.height, bitmap ) );
+
+      // Increase the Atlas width/height
+      mWidthL8 += glyphInfo.width + PADDING;
+      if( mHeightL8 < glyphInfo.height + PADDING )
+      {
+        mHeightL8 = glyphInfo.height + PADDING;
+      }
+    }
+    else if ( Pixel::BGRA8888 == format )
+    {
+       mGlyphs.push_back( AtlasGlyph( glyphInfo.fontId, glyphInfo.index, mWidthBGRA8888, glyphInfo.width, glyphInfo.height, bitmap ) );
+
+      // A separate Atlas is used for color Emojis
+      mWidthBGRA8888 += glyphInfo.width + PADDING;
+      if( mHeightBGRA8888 < glyphInfo.height + PADDING )
+      {
+        mHeightBGRA8888 = glyphInfo.height + PADDING;
+      }
     }
   }
 
-  Atlas CreateAtlas()
-  {
-    Atlas atlas = Atlas::New( mWidth, mHeight, Pixel::L8 );
-
-    for( unsigned int i=0; i<mGlyphs.size(); ++i )
-    {
-      AtlasHelperGlyph& glyph = mGlyphs[i];
-      BufferImage bitmap = mFontClient.CreateBitmap( glyph.fontId, glyph.index );
-      atlas.Upload( bitmap, glyph.xOffset, 0 );
-
-      TextureCoordinates& coords = glyph.coords;
-      coords.topLeft.x     = static_cast<float>(glyph.xOffset) / static_cast<float>(mWidth);
-      coords.topLeft.y     = 0.0f;
-      coords.topRight.x    = static_cast<float>(glyph.xOffset + glyph.width) / static_cast<float>(mWidth);
-      coords.topRight.y    = 0.0f;
-      coords.bottomLeft.x  = static_cast<float>(glyph.xOffset) / static_cast<float>(mWidth);
-      coords.bottomLeft.y  = static_cast<float>(glyph.height) / static_cast<float>(mHeight);
-      coords.bottomRight.x = static_cast<float>(glyph.xOffset + glyph.width) / static_cast<float>(mWidth);
-      coords.bottomRight.y = static_cast<float>(glyph.height) / static_cast<float>(mHeight);
-    }
-
-    return atlas;
-  }
-
-  void GetTextureCoordinates( FontId fontId, GlyphIndex index, TextureCoordinates& coords )
+  /**
+   * @brief Get the texture coordinates for a glyph.
+   */
+  bool GetTextureCoordinates( Pixel::Format format, FontId fontId, GlyphIndex index, TextureCoordinates& coords )
   {
     for( unsigned int i=0; i<mGlyphs.size(); ++i )
     {
-      const AtlasHelperGlyph& glyph = mGlyphs[i];
+      const AtlasGlyph& glyph = mGlyphs[i];
 
-      if( fontId == glyph.fontId &&
+      const Pixel::Format glyphFormat = glyph.mBitmap.GetPixelFormat();
+
+      if( format == glyphFormat &&
+          fontId == glyph.fontId &&
           index  == glyph.index )
       {
         coords = glyph.coords;
-        return;
-      }
-    }
-  }
-
-private: // Data
-
-  std::size_t mWidth;
-  std::size_t mHeight;
-
-  std::vector<AtlasHelperGlyph> mGlyphs;
-
-  TextAbstraction::FontClient mFontClient;
-};
-
-} // unnamed namespace
-
-struct BasicRenderer::Impl
-{
-  /**
-   * @brief Ccreate an Atlas, uploading the necessary glyph bitmaps
-   *
-   * @param[in] glyphs The glyphs to upload.
-   */
-  Atlas CreateAtlas( const Vector<GlyphInfo>& glyphs )
-  {
-    AtlasHelper& helper = mAtlasHelper;
-
-    // Clear previous atlas
-    helper.Reset();
-    helper.Reserve( glyphs.Count() );
-
-    for( unsigned int i=0; i<glyphs.Count(); ++i )
-    {
-      float width  = glyphs[i].width;
-      float height = glyphs[i].height;
-
-      if( width > 0 &&
-          height > 0 ) // skip whitespace
-      {
-        if( !helper.GlyphFound( glyphs[i].fontId, glyphs[i].index ) )
-        {
-          helper.AddGlyph( glyphs[i] );
-        }
+        return true;
       }
     }
 
-    // Uploads the bitmaps to Dali
-    return helper.CreateAtlas();
+    return false;
   }
 
   /**
@@ -222,7 +264,7 @@ struct BasicRenderer::Impl
    * @param[in] positions The 2D positions of the glyphs.
    * @param[in] image The material uses this as a diffuse texture.
    */
-  Mesh CreateMesh( const Vector<GlyphInfo>& glyphs, const std::vector<Vector2>& positions, Image image )
+  Mesh CreateMesh( const Vector<GlyphInfo>& glyphs, const std::vector<Vector2>& positions, Pixel::Format format, Image image )
   {
     MeshData::VertexContainer vertices( 4 * glyphs.Count() ); // 1 quad per glyph
 
@@ -240,15 +282,16 @@ struct BasicRenderer::Impl
         const Vector2& position = positions[i];
 
         TextureCoordinates coords;
-        mAtlasHelper.GetTextureCoordinates( glyphs[i].fontId, glyphs[i].index, coords );
+        if( GetTextureCoordinates( format, glyphs[i].fontId, glyphs[i].index, coords ) )
+        {
+          vertices[ i*4 + 0 ] = MeshData::Vertex( Vector3( position.x + 0.0f*width, position.y + 0.0f*height, 0.0f ), coords.topLeft,     Vector3( 1.0f, 0.0f, 0.0f ) );
+          vertices[ i*4 + 1 ] = MeshData::Vertex( Vector3( position.x + 1.0f*width, position.y + 0.0f*height, 0.0f ), coords.topRight,    Vector3( 1.0f, 1.0f, 0.0f ) );
+          vertices[ i*4 + 2 ] = MeshData::Vertex( Vector3( position.x + 0.0f*width, position.y + 1.0f*height, 0.0f ), coords.bottomLeft,  Vector3( 0.0f, 1.0f, 0.0f ) );
+          vertices[ i*4 + 3 ] = MeshData::Vertex( Vector3( position.x + 1.0f*width, position.y + 1.0f*height, 0.0f ), coords.bottomRight, Vector3( 0.0f, 0.0f, 1.0f ) );
 
-        vertices[ i*4 + 0 ] = MeshData::Vertex( Vector3( position.x + 0.0f*width, position.y + 0.0f*height, 0.0f ), coords.topLeft,     Vector3( 1.0f, 0.0f, 0.0f ) );
-        vertices[ i*4 + 1 ] = MeshData::Vertex( Vector3( position.x + 1.0f*width, position.y + 0.0f*height, 0.0f ), coords.topRight,    Vector3( 1.0f, 1.0f, 0.0f ) );
-        vertices[ i*4 + 2 ] = MeshData::Vertex( Vector3( position.x + 0.0f*width, position.y + 1.0f*height, 0.0f ), coords.bottomLeft,  Vector3( 0.0f, 1.0f, 0.0f ) );
-        vertices[ i*4 + 3 ] = MeshData::Vertex( Vector3( position.x + 1.0f*width, position.y + 1.0f*height, 0.0f ), coords.bottomRight, Vector3( 0.0f, 0.0f, 1.0f ) );
-
-        faces.push_back( i*4 + 0 ); faces.push_back( i*4 + 3 ); faces.push_back( i*4 + 1 );
-        faces.push_back( i*4 + 0 ); faces.push_back( i*4 + 2 ); faces.push_back( i*4 + 3 );
+          faces.push_back( i*4 + 0 ); faces.push_back( i*4 + 3 ); faces.push_back( i*4 + 1 );
+          faces.push_back( i*4 + 0 ); faces.push_back( i*4 + 2 ); faces.push_back( i*4 + 3 );
+        }
       }
     }
 
@@ -269,7 +312,18 @@ struct BasicRenderer::Impl
 
   RenderableActor mActor; ///< The actor which renders the text
 
-  AtlasHelper mAtlasHelper; ///< A helper class for storing atlas positions etc.
+  Atlas mAtlasL8;
+  unsigned int mWidthL8;
+  unsigned int mHeightL8;
+
+  // A separate Atlas is used for color Emojis
+  Atlas mAtlasBGRA8888;
+  unsigned int mWidthBGRA8888;
+  unsigned int mHeightBGRA8888;
+
+  std::vector<AtlasGlyph> mGlyphs;
+
+  TextAbstraction::FontClient mFontClient;
 };
 
 Text::RendererPtr BasicRenderer::New()
@@ -279,6 +333,7 @@ Text::RendererPtr BasicRenderer::New()
 
 RenderableActor BasicRenderer::Render( Text::ViewInterface& view )
 {
+  // Remove the previous text
   UnparentAndReset( mImpl->mActor );
 
   Text::Length numberOfGlyphs = view.GetNumberOfGlyphs();
@@ -294,16 +349,46 @@ RenderableActor BasicRenderer::Render( Text::ViewInterface& view )
     positions.resize( numberOfGlyphs );
     view.GetGlyphPositions( &positions[0], 0, numberOfGlyphs );
 
-    Atlas atlas = mImpl->CreateAtlas( glyphs );
+    mImpl->CreateAtlases( glyphs );
 
-    MeshActor actor = MeshActor::New( mImpl->CreateMesh( glyphs, positions, atlas ) );
-    actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+    MeshActor actorL8;
+    if( mImpl->mAtlasL8 )
+    {
+      actorL8 = MeshActor::New( mImpl->CreateMesh( glyphs, positions, Pixel::L8, mImpl->mAtlasL8 ) );
+      actorL8.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
 
-    ShaderEffect shader = BasicShader::New();
-    actor.SetShaderEffect( shader );
+      ShaderEffect shader = BasicShader::New();
+      actorL8.SetShaderEffect( shader );
+    }
 
-    mImpl->mActor = actor;
+    MeshActor actorBGRA8888;
+    if( mImpl->mAtlasBGRA8888 )
+    {
+      actorBGRA8888 = MeshActor::New( mImpl->CreateMesh( glyphs, positions, Pixel::BGRA8888, mImpl->mAtlasBGRA8888 ) );
+      actorBGRA8888.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+
+      ShaderEffect shader = BasicShader::New();
+      actorBGRA8888.SetShaderEffect( shader );
+    }
+
+    // If we have both monochrome & color glyphs, two mesh actors are returned in a container
+    if( actorL8 && actorBGRA8888 )
+    {
+      mImpl->mActor = ImageActor::New();
+      mImpl->mActor.Add( actorL8 );
+      mImpl->mActor.Add( actorBGRA8888 );
+    }
+    else
+    {
+      if( actorL8 )
+      {
+        mImpl->mActor = actorL8;
+      }
+      else if( actorBGRA8888 )
+      {
+        mImpl->mActor = actorBGRA8888;
+      }
+    }
   }
 
   return mImpl->mActor;
