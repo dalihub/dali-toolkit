@@ -178,6 +178,14 @@ public:
                           Length numberOfGlyphs );
 
   /**
+   * Retrieves the number of glyph positions set.
+   *
+   * @note This may be less than the number of glyphs in the model.
+   * @return The number of glyphs.
+   */
+  Length GetNumberOfGlyphPositions() const;
+
+  /**
    * @brief Retrieves the glyph positions.
    *
    * @pre The size of the @p positions buffer needs to be big enough to copy the @p numberOfGlyphs positions.

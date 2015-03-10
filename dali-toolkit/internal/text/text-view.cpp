@@ -55,7 +55,14 @@ Length View::GetNumberOfGlyphs() const
 {
   if( mImpl->mVisualModel )
   {
-    return mImpl->mVisualModel->GetNumberOfGlyphs();
+    VisualModel& model = *mImpl->mVisualModel;
+
+    Length glyphCount = model.GetNumberOfGlyphs();
+    Length positionCount = model.GetNumberOfGlyphPositions();
+
+    DALI_ASSERT_DEBUG( positionCount <= glyphCount && "Invalid glyph positions in Model" );
+
+    return (positionCount < glyphCount) ? positionCount : glyphCount;
   }
 
   return 0;

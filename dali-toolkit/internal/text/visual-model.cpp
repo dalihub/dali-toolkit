@@ -157,6 +157,11 @@ void VisualModel::SetGlyphPositions( const Vector2* glyphPositions,
   memcpy( modelPositions.Begin(), glyphPositions, numberOfGlyphs * sizeof( Vector2 ) );
 }
 
+Length VisualModel::GetNumberOfGlyphPositions() const
+{
+  return mImpl->mGlyphPositions.Count();
+}
+
 void VisualModel::GetGlyphPositions( Vector2* glyphPositions,
                                      GlyphIndex glyphIndex,
                                      Length numberOfGlyphs ) const
