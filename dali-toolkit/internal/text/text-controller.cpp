@@ -41,6 +41,7 @@ using std::vector;
 namespace
 {
 const float MAX_FLOAT = std::numeric_limits<float>::max();
+const std::string EMPTY_STRING;
 } // namespace
 
 namespace Dali
@@ -483,7 +484,7 @@ const std::string& Controller::GetDefaultFontFamily() const
     return mImpl->mFontDefaults->mDefaultFontFamily;
   }
 
-  return Dali::String::EMPTY;
+  return EMPTY_STRING;
 }
 
 void Controller::SetDefaultFontStyle( const std::string& defaultFontStyle )
@@ -506,7 +507,7 @@ const std::string& Controller::GetDefaultFontStyle() const
     return mImpl->mFontDefaults->mDefaultFontStyle;
   }
 
-  return Dali::String::EMPTY;
+  return EMPTY_STRING;
 }
 
 void Controller::SetDefaultPointSize( float pointSize )
