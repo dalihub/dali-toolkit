@@ -505,8 +505,11 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
       // If the cache has not a default font, get one from the font client.
       if( 0u == fontId )
       {
+        // Emojis are present in many monochrome fonts; prefer color by default.
+        bool preferColor = ( TextAbstraction::EMOJI == script );
+
         // Find a default font.
-        fontId = fontClient.FindDefaultFont( character, pointSize );
+        fontId = fontClient.FindDefaultFont( character, pointSize, preferColor );
 
         // If the system does not support a suitable font, fallback to Latin
         if( 0u == fontId )
