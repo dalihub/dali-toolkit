@@ -34,7 +34,7 @@ namespace Text
 /**
  * @brief A BGRA shader for rendering glyphs.
  */
-namespace BGRAShader
+namespace BgraShader
 {
 
 /**

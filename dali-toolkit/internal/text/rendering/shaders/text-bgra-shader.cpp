@@ -27,7 +27,7 @@ namespace Toolkit
 namespace Text
 {
 
-namespace BGRAShader
+namespace BgraShader
 {
 
 Dali::ShaderEffect New()

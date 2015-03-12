@@ -369,7 +369,7 @@ RenderableActor BasicRenderer::Render( Text::ViewInterface& view )
       actorBGRA8888 = MeshActor::New( mImpl->CreateMesh( glyphs, positions, Pixel::BGRA8888, mImpl->mAtlasBGRA8888 ) );
       actorBGRA8888.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
 
-      ShaderEffect shader = BGRAShader::New();
+      ShaderEffect shader = BgraShader::New();
       actorBGRA8888.SetShaderEffect( shader );
     }
 
