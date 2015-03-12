@@ -228,8 +228,9 @@ struct Decorator::Impl : public ConnectionTracker
       {
       }
 
-      Layer mRoot;                                        // The actor which all popup content is added to (i.e. panel and buttons)
-      Actor mButtons;                                     // Actor which holds all the buttons, sensitivity can be set on all buttons via this actor
+      Actor mRoot;                                        // The actor which all popup content is added to (i.e. panel and buttons)
+      Actor mButtons;                                     // Actor which holds all the buttons, sensitivity can be set oActor buttons via this actor
+      Layer mStencilLayer;                                // Layer to enable clipping when buttons exceed popup
       ImageActor mBackground;                             // The background popup panel
       ImageActor mTail;                                   // The tail for the popup
       ImageActor mTailEffect;                             // the tail effect
@@ -340,7 +341,6 @@ struct Decorator::Impl : public ConnectionTracker
     if ( mActiveCopyPastePopup )
     {
       CreatePopup();
-
       mCopyPastePopup.mRoot.SetPosition( Vector3( 180.0f, -100.0f, 0.0f ) ); //todo grabhandle or selection handle postions to be used
     }
     else
@@ -787,32 +787,32 @@ struct Decorator::Impl : public ConnectionTracker
     }
   }
 
-  void SetUpPopup( Actor& parent, Size& size )
+  void SetUpPopup( Actor& popupRootActor, Size& size )
   {
     // Create Layer and Stencil.
-    parent = Layer::New();
-    Layer layer = Layer::New();
+    popupRootActor = Actor::New();
+    mCopyPastePopup.mStencilLayer = Layer::New();
     ImageActor stencil = CreateSolidColorActor( Color::RED );
     stencil.SetDrawMode( DrawMode::STENCIL );
     stencil.SetVisible( true );
     Actor scrollview = Actor::New();
 
     //todo Use Size negotiation
-    layer.SetSize( size ); // matches stencil size
-    parent.SetSize( size ); // matches stencil size
+    mCopyPastePopup.mStencilLayer.SetSize( size ); // matches stencil size
+    popupRootActor.SetSize( size ); // matches stencil size
     stencil.SetSize( size );
     scrollview.SetSize( size );
     mCopyPastePopup.mButtons.SetSize( size );
 
-    layer.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    mCopyPastePopup.mStencilLayer.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     scrollview.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-    //mCopyPastePopup.mBackground.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     mCopyPastePopup.mButtons.SetAnchorPoint( AnchorPoint::TOP_LEFT );
 
-    parent.Add( mCopyPastePopup.mBackground );
-    parent.Add( layer );
-    layer.Add( stencil );
-    layer.Add( scrollview );
+    mActiveLayer.Add( mCopyPastePopup.mRoot );
+    popupRootActor.Add( mCopyPastePopup.mBackground );
+    popupRootActor.Add( mCopyPastePopup.mStencilLayer );
+    mCopyPastePopup.mStencilLayer.Add( stencil );
+    mCopyPastePopup.mStencilLayer.Add( scrollview );
     scrollview.Add( mCopyPastePopup.mButtons );
   }
 
@@ -873,9 +873,9 @@ struct Decorator::Impl : public ConnectionTracker
       CreateBackground( mCopyPastePopup );
       AddPopupOptions( true, true );
       SetUpPopup( mCopyPastePopup.mRoot, mCopyPastePopup.mVisiblePopUpSize );
-      Actor textControl = mTextControlParent.Self();
-      textControl.Add( mCopyPastePopup.mRoot );
     }
+
+    mCopyPastePopup.mStencilLayer.RaiseToTop();
   }
 
   void DestroyPopup()
