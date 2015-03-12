@@ -101,10 +101,8 @@ void Clipper::Initialize( const Vector2& size )
   mOffscreenRootActor.SetInheritScale( false );
   mOffscreenRootActor.SetDepthTestDisabled( true );
   mOffscreenRootActor.SetSize( offscreenSize );
-  mOffscreenRootActor.SetPosition( 0.0f, 0.0f, 0.0f );
 
   mImageActor = ImageActor::New();
-  mImageActor.SetAnchorPoint( ParentOrigin::CENTER );
   mImageActor.SetParentOrigin( ParentOrigin::CENTER );
   mImageActor.SetBlendFunc( BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA,
                             BlendingFactor::ONE, BlendingFactor::ONE );
@@ -114,16 +112,12 @@ void Clipper::Initialize( const Vector2& size )
   // Creates a new camera actor.
   mOffscreenCameraActor = CameraActor::New();
   mOffscreenCameraActor.SetParentOrigin( ParentOrigin::CENTER );
-  mOffscreenCameraActor.SetAnchorPoint( AnchorPoint::CENTER );
-  mOffscreenCameraActor.SetRotation(Degree(180.f), Vector3::YAXIS);
-  mOffscreenCameraActor.SetType( Dali::Camera::FREE_LOOK ); // Inherits position from the offscreen root actor.
   mOffscreenCameraActor.SetOrthographicProjection( offscreenSize );
   mOffscreenRootActor.Add( mOffscreenCameraActor ); // camera to shoot the offscreen text
 
   // Creates a new render task.
   mRenderTask = Stage::GetCurrent().GetRenderTaskList().CreateTask();
   mRenderTask.SetSourceActor( mOffscreenRootActor );
-  mRenderTask.SetInputEnabled( false );
   mRenderTask.SetClearColor( Color::TRANSPARENT );
   mRenderTask.SetClearEnabled( true );
   mRenderTask.SetExclusive( true );
