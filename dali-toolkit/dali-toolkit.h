@@ -87,6 +87,8 @@
 #include <dali-toolkit/public-api/scripting/script.h>
 #include <dali-toolkit/public-api/scripting/script-plugin.h>
 
+#include <dali-toolkit/public-api/text/rendering-backend.h>
+
 #include <dali-toolkit/public-api/shader-effects/alpha-discard-effect.h>
 #include <dali-toolkit/public-api/shader-effects/bendy-effect.h>
 #include <dali-toolkit/public-api/shader-effects/blind-effect.h>

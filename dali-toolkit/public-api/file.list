@@ -273,3 +273,5 @@ public_api_scripting_header_files = \
   $(public_api_src_dir)/scripting/script.h \
   $(public_api_src_dir)/scripting/script-plugin.h
 
+public_api_rendering_backend_header_files = \
+  $(public_api_src_dir)/text/rendering-backend.h

@@ -109,6 +109,7 @@ publicapibubbleeffectdir = $(publicapidir)/shader-effects/bubble-effect
 publicapistylingdir = $(publicapidir)/styling
 publicapitransitioneffectsdir = $(publicapidir)/transition-effects
 publicapiscriptingdir = $(publicapidir)/scripting
+publicapirenderingbackenddir = $(publicapidir)/text
 
 publicapi_HEADERS = $(public_api_header_files)
 publicapicontrols_HEADERS = $(public_api_controls_header_files)
@@ -146,4 +147,5 @@ publicapibubbleeffect_HEADERS = $(public_api_bubble_effect_header_files)
 publicapistyling_HEADERS = $(public_api_styling_header_files)
 publicapitransitioneffects_HEADERS = $(public_api_transition_effects_header_files)
 publicapiscripting_HEADERS = $(public_api_scripting_header_files)
+publicapirenderingbackend_HEADERS = $(public_api_rendering_backend_header_files)
 

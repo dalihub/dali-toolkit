@@ -23,6 +23,8 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/text/rendering-backend.h>
+#include <dali-toolkit/internal/text/rendering/atlas/text-atlas-renderer.h>
 #include <dali-toolkit/internal/text/rendering/basic/text-basic-renderer.h>
 
 namespace Dali
@@ -92,7 +94,7 @@ RendererPtr Backend::NewRenderer( unsigned int renderingType )
 
     case Dali::Toolkit::Text::RENDERING_SHARED_ATLAS:
     {
-      // TODO
+      renderer = Dali::Toolkit::Text::AtlasRenderer::New();
     }
     break;
 

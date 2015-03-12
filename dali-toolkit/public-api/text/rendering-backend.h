@@ -1,6 +1,5 @@
-
-#ifndef __DALI_TOOLKIT_TEXT_BGRA_SHADER_H__
-#define __DALI_TOOLKIT_TEXT_BGRA_SHADER_H__
+#ifndef __DALI_TOOLKIT_RENDERING_BACKEND_H__
+#define __DALI_TOOLKIT_RENDERING_BACKEND_H__
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -19,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/shader-effects/shader-effect.h>
-
 namespace Dali
 {
 
@@ -31,19 +27,14 @@ namespace Toolkit
 namespace Text
 {
 
-/**
- * @brief A BGRA shader for rendering glyphs.
- */
-namespace BgraShader
+// The type of text renderer required
+enum RenderingType
 {
+  RENDERING_BASIC,       ///< A bitmap-based reference implementation
+  RENDERING_SHARED_ATLAS ///< A bitmap-based solution where renderers can share a texture atlas
+};
 
-/**
- * Create a basic text shader.
- * @return A handle to a newly allocated ShaderEffect
- */
-Dali::ShaderEffect New();
-
-} // namespace BGRAShader
+const unsigned int DEFAULT_RENDERING_BACKEND = RENDERING_SHARED_ATLAS;
 
 } // namespace Text
 
@@ -51,4 +42,4 @@ Dali::ShaderEffect New();
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_BGRA_SHADER_H__
+#endif // __DALI_TOOLKIT_RENDERING_BACKEND_H__

@@ -30,16 +30,9 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
+#include <dali-toolkit/public-api/text/rendering-backend.h>
 
 using namespace Dali::Toolkit::Text;
-
-namespace
-{
-
-const unsigned int DEFAULT_RENDERING_BACKEND = 0;
-
-} // namespace
-
 
 namespace Dali
 {
@@ -49,6 +42,11 @@ namespace Toolkit
 
 namespace Internal
 {
+
+namespace
+{
+  const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
+}
 
 namespace
 {
