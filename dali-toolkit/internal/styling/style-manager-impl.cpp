@@ -23,6 +23,7 @@
 #include <sstream>
 #include <dali/public-api/adaptor-framework/singleton-service.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -72,7 +73,9 @@ BaseHandle Create()
 
   return handle;
 }
-TypeRegistration STYLE_MANAGER_TYPE( typeid(Dali::Toolkit::StyleManager), typeid(Dali::BaseHandle), Create, true /* Create instance at startup */ );
+
+DALI_TYPE_REGISTRATION_BEGIN_CREATE( Toolkit::StyleManager, Dali::BaseHandle, Create, true )
+DALI_TYPE_REGISTRATION_END()
 
 } // namespace
 

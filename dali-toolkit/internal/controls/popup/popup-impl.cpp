@@ -25,22 +25,50 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/touch-event.h>
-#include <dali/public-api/object/type-registry.h>
-#include <dali/integration-api/debug.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/button.h>
-#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
+#include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 #include <dali-toolkit/internal/controls/relayout-helper.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
-#include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 
 using namespace Dali;
 
+namespace Dali
+{
+
+namespace Toolkit
+{
+
+namespace Internal
+{
+
 namespace
 {
+
+BaseHandle Create()
+{
+  return Toolkit::Popup::New();
+}
+
+// Setup properties, signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Popup, Toolkit::Control, Create )
+
+DALI_SIGNAL_REGISTRATION( Popup, "touched-outside", SIGNAL_TOUCHED_OUTSIDE )
+DALI_SIGNAL_REGISTRATION( Popup, "hidden",          SIGNAL_HIDDEN          )
+
+DALI_TYPE_REGISTRATION_END()
+
+// Properties
+const char* const PROPERTY_TITLE = "title";
+const char* const PROPERTY_STATE = "state";
+
 const float CONTENT_DEPTH = 1.0f;                                 ///< 3D Effect of buttons/title etc. appearing off the popup.
 const float POPUP_ANIMATION_DURATION = 0.5f;                      ///< Duration of hide/show animations
 const float BACKING_DEPTH = -1.0f;                                ///< Depth of backing (positioned just behind dialog, so dialog catches hit events first)
@@ -52,16 +80,6 @@ const float POPUP_TITLE_WIDTH = 648.0f;                       ///<Width of Popup
 const float POPUP_BUTTON_BG_HEIGHT = 96.f;                    ///< Height of Button Background.
 const Vector3 DEFAULT_DIALOG_SIZE = Vector3(POPUP_TITLE_WIDTH/POPUP_WIDTH, 0.5f, 0.0f);
 const Vector3 DEFAULT_BOTTOM_SIZE = Vector3(1.0f, 0.2f, 0.0f);
-
-// Signals
-
-const char* const SIGNAL_TOUCHED_OUTSIDE = "touched-outside";
-const char* const SIGNAL_HIDDEN =          "hidden";
-
-// Properties
-
-const char* const PROPERTY_TITLE =         "title";
-const char* const PROPERTY_STATE =         "state";
 
 /**
  * The background size should be at least as big as the Dialog.
@@ -98,32 +116,6 @@ Vector3 ButtonAreaSize( const Vector4& outBoarder, const Vector3& parentSize )
 }
 
 } // unnamed namespace
-
-namespace Dali
-{
-
-namespace Toolkit
-{
-
-namespace Internal
-{
-
-namespace
-{
-
-BaseHandle Create()
-{
-  return Toolkit::Popup::New();
-}
-
-TypeRegistration typeRegistration( typeid( Toolkit::Popup ), typeid( Toolkit::Control ), Create );
-
-SignalConnectorType signalConnector1( typeRegistration, SIGNAL_TOUCHED_OUTSIDE, &Popup::DoConnectSignal );
-SignalConnectorType signalConnector2( typeRegistration, SIGNAL_HIDDEN, &Popup::DoConnectSignal );
-
-
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Popup
@@ -509,13 +501,13 @@ void Popup::HandleStateChange( Toolkit::Popup::PopupState state, float duration 
 
     if(mShowing)
     {
-      mAnimation.AnimateTo( Property(mBacking, Actor::Property::ColorAlpha), targetBackingAlpha, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
-      mAnimation.AnimateTo( Property(mPopupBg, Actor::Property::Scale), targetSize, AlphaFunctions::EaseInOut, TimePeriod(duration * 0.5f, duration * 0.5f) );
+      mAnimation.AnimateTo( Property(mBacking, Actor::Property::COLOR_ALPHA), targetBackingAlpha, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
+      mAnimation.AnimateTo( Property(mPopupBg, Actor::Property::SCALE), targetSize, AlphaFunctions::EaseInOut, TimePeriod(duration * 0.5f, duration * 0.5f) );
     }
     else
     {
-      mAnimation.AnimateTo( Property(mBacking, Actor::Property::ColorAlpha), targetBackingAlpha, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
-      mAnimation.AnimateTo( Property(mPopupBg, Actor::Property::Scale), targetSize, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
+      mAnimation.AnimateTo( Property(mBacking, Actor::Property::COLOR_ALPHA), targetBackingAlpha, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
+      mAnimation.AnimateTo( Property(mPopupBg, Actor::Property::SCALE), targetSize, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
     }
     mAnimation.Play();
     mAnimation.FinishedSignal().Connect(this, &Popup::OnStateAnimationFinished);

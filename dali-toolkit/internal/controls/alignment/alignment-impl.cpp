@@ -21,8 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/type-registry.h>
-
-// INTERNAL INCLUDES
+#include <dali/public-api/object/type-registry-helper.h>
 
 namespace Dali
 {
@@ -42,7 +41,8 @@ BaseHandle Create()
   return Toolkit::Alignment::New();
 }
 
-TypeRegistration mType( typeid(Toolkit::Alignment), typeid(Toolkit::Control), Create );
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Alignment, Toolkit::Control, Create )
+DALI_TYPE_REGISTRATION_END()
 
 struct ScaleToFillConstraint
 {

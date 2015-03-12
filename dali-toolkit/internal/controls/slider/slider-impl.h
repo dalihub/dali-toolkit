@@ -49,13 +49,6 @@ class Slider : public Control
 {
 public:
 
-  // Properties
-  enum
-  {
-    SLIDER_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    SLIDER_PROPERTY_END_INDEX = SLIDER_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
-  };
-
   typedef Property::Array MarkList;
 
   /**

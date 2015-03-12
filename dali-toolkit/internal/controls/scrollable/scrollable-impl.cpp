@@ -17,6 +17,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
@@ -24,33 +25,17 @@
 
 using namespace Dali;
 
-namespace
-{
-
-} // unnamed namespace
-
 namespace Dali
 {
 
 namespace Toolkit
 {
 
-const Property::Index Scrollable::PROPERTY_OVERSHOOT_EFFECT_COLOR( Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX + 1 );
-const Property::Index Scrollable::PROPERTY_OVERSHOOT_ANIMATION_SPEED( Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX + 2 );
-
 namespace Internal
 {
 
 namespace
 {
-const Vector4 DEFAULT_OVERSHOOT_COLOUR(0.0f, 0.64f, 0.85f, 0.25f);
-const float DEFAULT_OVERSHOOT_ANIMATION_SPEED(120.0f); // 120 pixels per second
-
-// Signals
-
-const char* const SIGNAL_SCROLL_STARTED =   "scroll-started";
-const char* const SIGNAL_SCROLL_COMPLETED = "scroll-completed";
-const char* const SIGNAL_SCROLL_UPDATED =   "scroll-updated";
 
 BaseHandle Create()
 {
@@ -58,30 +43,25 @@ BaseHandle Create()
   return BaseHandle();
 }
 
-TypeRegistration mType( typeid( Toolkit::Scrollable ), typeid( Toolkit::Control ), Create );
+// Setup properties, signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Scrollable, Toolkit::Control, Create );
 
-SignalConnectorType s1( mType, SIGNAL_SCROLL_STARTED,   &Scrollable::DoConnectSignal );
-SignalConnectorType s2( mType, SIGNAL_SCROLL_COMPLETED, &Scrollable::DoConnectSignal );
-SignalConnectorType s3( mType, SIGNAL_SCROLL_UPDATED,   &Scrollable::DoConnectSignal );
+DALI_PROPERTY_REGISTRATION( Scrollable, "overshoot-effect-color",    VECTOR4, OVERSHOOT_EFFECT_COLOR    )
+DALI_PROPERTY_REGISTRATION( Scrollable, "overshoot-animation-speed", FLOAT,   OVERSHOOT_ANIMATION_SPEED )
 
-PropertyRegistration property1( mType,
-                                "overshoot-effect-color",
-                                Toolkit::Scrollable::PROPERTY_OVERSHOOT_EFFECT_COLOR,
-                                Property::VECTOR4,
-                                &Scrollable::SetProperty,
-                                &Scrollable::GetProperty );
+DALI_SIGNAL_REGISTRATION(   Scrollable, "scroll-started",                     SIGNAL_SCROLL_STARTED     )
+DALI_SIGNAL_REGISTRATION(   Scrollable, "scroll-completed",                   SIGNAL_SCROLL_COMPLETED   )
+DALI_SIGNAL_REGISTRATION(   Scrollable, "scroll-updated",                     SIGNAL_SCROLL_UPDATED     )
 
-PropertyRegistration property2( mType,
-                                "overshoot-animation-speed",
-                                Toolkit::Scrollable::PROPERTY_OVERSHOOT_ANIMATION_SPEED,
-                                Property::FLOAT,
-                                &Scrollable::SetProperty,
-                                &Scrollable::GetProperty );
+DALI_TYPE_REGISTRATION_END()
+
+const Vector4 DEFAULT_OVERSHOOT_COLOUR(0.0f, 0.64f, 0.85f, 0.25f);
+const float DEFAULT_OVERSHOOT_ANIMATION_SPEED(120.0f); // 120 pixels per second
 
 }
 
-const std::string Scrollable::SCROLLABLE_CAN_SCROLL_VERTICAL( "scrollable-can-scroll-vertical" );
-const std::string Scrollable::SCROLLABLE_CAN_SCROLL_HORIZONTAL( "scrollable-can-scroll-horizontal" );
+const char* const Scrollable::SCROLLABLE_CAN_SCROLL_VERTICAL = "scrollable-can-scroll-vertical";
+const char* const Scrollable::SCROLLABLE_CAN_SCROLL_HORIZONTAL = "scrollable-can-scroll-horizontal";
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Scrollable
@@ -246,12 +226,12 @@ void Scrollable::SetProperty( BaseObject* object, Property::Index index, const P
     Scrollable& scrollableImpl( GetImpl( scrollable ) );
     switch( index )
     {
-      case Toolkit::Scrollable::PROPERTY_OVERSHOOT_EFFECT_COLOR:
+      case Toolkit::Scrollable::Property::OVERSHOOT_EFFECT_COLOR:
       {
         scrollableImpl.SetOvershootEffectColor( value.Get<Vector4>() );
         break;
       }
-      case Toolkit::Scrollable::PROPERTY_OVERSHOOT_ANIMATION_SPEED:
+      case Toolkit::Scrollable::Property::OVERSHOOT_ANIMATION_SPEED:
       {
         scrollableImpl.SetOvershootAnimationSpeed( value.Get<float>() );
         break;
@@ -271,12 +251,12 @@ Property::Value Scrollable::GetProperty( BaseObject* object, Property::Index ind
     Scrollable& scrollableImpl( GetImpl( scrollable ) );
     switch( index )
     {
-      case Toolkit::Scrollable::PROPERTY_OVERSHOOT_EFFECT_COLOR:
+      case Toolkit::Scrollable::Property::OVERSHOOT_EFFECT_COLOR:
       {
         value = scrollableImpl.GetOvershootEffectColor();
         break;
       }
-      case Toolkit::Scrollable::PROPERTY_OVERSHOOT_ANIMATION_SPEED:
+      case Toolkit::Scrollable::Property::OVERSHOOT_ANIMATION_SPEED:
       {
         value = scrollableImpl.GetOvershootAnimationSpeed();
         break;

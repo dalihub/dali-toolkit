@@ -61,16 +61,31 @@ public:
 
   // Custom properties
 
-  static const std::string SCROLL_RELATIVE_POSITION_PROPERTY_NAME;      ///< Property, name "scroll-relative-position", type VECTOR3
-  static const std::string SCROLL_POSITION_MIN_PROPERTY_NAME;           ///< Property, name "scroll-position-min",      type VECTOR3
-  static const std::string SCROLL_POSITION_MAX_PROPERTY_NAME;           ///< Property, name "scroll-position-max",      type VECTOR3
-  static const std::string SCROLL_DIRECTION_PROPERTY_NAME;              ///< Property, name "scroll-direction",         type VECTOR2
+  static const std::string SCROLL_RELATIVE_POSITION_PROPERTY_NAME;      ///< Property, name "scroll-relative-position", type Vector3
+  static const std::string SCROLL_POSITION_MIN_PROPERTY_NAME;           ///< Property, name "scroll-position-min",      type Vector3
+  static const std::string SCROLL_POSITION_MAX_PROPERTY_NAME;           ///< Property, name "scroll-position-max",      type Vector3
+  static const std::string SCROLL_DIRECTION_PROPERTY_NAME;              ///< Property, name "scroll-direction",         type Vector2
 
-  /// @name Properties
-  /** @{ */
-  static const Dali::Property::Index PROPERTY_OVERSHOOT_EFFECT_COLOR;         ///< Property, name "overshoot-effect-color",  @see SetOvershootEffectColor(),  type VECTOR4
-  static const Dali::Property::Index PROPERTY_OVERSHOOT_ANIMATION_SPEED;      ///< Property, name "overshoot-animation-speed",  @see SetOvershootAnimationSpeed(),  type FLOAT
-  /** @} */
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+  };
+
+  /**
+   * @brief An enumeration of properties belonging to the Scrollable class.
+   */
+  struct Property
+  {
+    enum
+    {
+      OVERSHOOT_EFFECT_COLOR = PROPERTY_START_INDEX, ///< Property, name "overshoot-effect-color",    @see SetOvershootEffectColor(),    type Vector4
+      OVERSHOOT_ANIMATION_SPEED,                     ///< Property, name "overshoot-animation-speed", @see SetOvershootAnimationSpeed(), type float
+    };
+  };
 
 public:
 

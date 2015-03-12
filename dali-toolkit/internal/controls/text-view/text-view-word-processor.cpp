@@ -37,7 +37,7 @@ namespace TextViewProcessor
 namespace
 {
 
-const std::string EMOJI_FONT_NAME( "SamsungEmoji" ); // Emoticons font family name.
+const char* const EMOJI_FONT_NAME = "SamsungEmoji"; ///< Emoticons font family name.
 
 } // namespace
 

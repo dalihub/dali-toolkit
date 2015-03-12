@@ -42,25 +42,40 @@ class DALI_IMPORT_API TextInput : public Control
 
 public:
 
-  /// @name Properties
-  /** @{ */
-  static const Dali::Property::Index HIGHLIGHT_COLOR_PROPERTY;                     // Property, name "highlight-color", type VECTOR4
-  static const Dali::Property::Index CUT_AND_PASTE_COLOR_PROPERTY;                 // Property, name "cut-and-paste-bg-color", type VECTOR4
-  static const Dali::Property::Index CUT_AND_PASTE_PRESSED_COLOR_PROPERTY;         // Property, name "cut-and-paste-pressed-color", type VECTOR4
-  static const Dali::Property::Index CUT_AND_PASTE_BORDER_COLOR_PROPERTY;          // Property, name "cut-and-paste-border-color", type VECTOR4
-  static const Dali::Property::Index CUT_AND_PASTE_ICON_COLOR_PROPERTY;            // Property, name "cut-and-paste-icon-color", type VECTOR4
-  static const Dali::Property::Index CUT_AND_PASTE_ICON_PRESSED_COLOR_PROPERTY;    // Property, name "cut-and-paste-icon-pressed-color", type VECTOR4
-  static const Dali::Property::Index CUT_AND_PASTE_TEXT_COLOR_PROPERTY;            // Property, name "cut-and-paste-text-color", type VECTOR4
-  static const Dali::Property::Index CUT_AND_PASTE_TEXT_PRESSED_COLOR_PROPERTY;    // Property, name "cut-and-paste-text-pressed-color", type VECTOR4
-  static const Dali::Property::Index CUT_BUTTON_POSITION_PRIORITY_PROPERTY;        // Property, name "cut-button-position-priority", type unsigned int
-  static const Dali::Property::Index COPY_BUTTON_POSITION_PRIORITY_PROPERTY;       // Property, name "copy-button-position-priority", type unsigned int
-  static const Dali::Property::Index PASTE_BUTTON_POSITION_PRIORITY_PROPERTY;      // Property, name "paste-button-position-priority", type unsigned int
-  static const Dali::Property::Index SELECT_BUTTON_POSITION_PRIORITY_PROPERTY;     // Property, name "select-button-position-priority", type unsigned int
-  static const Dali::Property::Index SELECT_ALL_BUTTON_POSITION_PRIORITY_PROPERTY; // Property, name "select-all-button-position-priority", type unsigned int
-  static const Dali::Property::Index CLIPBOARD_BUTTON_POSITION_PRIORITY_PROPERTY;  // Property, name "clipboard-button-position-priority", type unsigned int
-  static const Dali::Property::Index POP_UP_OFFSET_FROM_TEXT_PROPERTY;             // Property, name "popup-offset-from-text", type VECTOR4
-  static const Dali::Property::Index CURSOR_COLOR_PROPERTY;                        // Property, name "cursor-color", type VECTOR4
-  /** @} */
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 512              ///< Reserve property indices
+  };
+
+  /**
+   * @brief An enumeration of properties belonging to the TextInput class.
+   */
+  struct Property
+  {
+    enum
+    {
+      HIGHLIGHT_COLOR = PROPERTY_START_INDEX, // Property, name "highlight-color",                     type Vector4
+      CUT_AND_PASTE_COLOR,                    // Property, name "cut-and-paste-bg-color",              type Vector4
+      CUT_AND_PASTE_PRESSED_COLOR,            // Property, name "cut-and-paste-pressed-color",         type Vector4
+      CUT_AND_PASTE_BORDER_COLOR,             // Property, name "cut-and-paste-border-color",          type Vector4
+      CUT_AND_PASTE_ICON_COLOR,               // Property, name "cut-and-paste-icon-color",            type Vector4
+      CUT_AND_PASTE_ICON_PRESSED_COLOR,       // Property, name "cut-and-paste-icon-pressed-color",    type Vector4
+      CUT_AND_PASTE_TEXT_COLOR,               // Property, name "cut-and-paste-text-color",            type Vector4
+      CUT_AND_PASTE_TEXT_PRESSED_COLOR,       // Property, name "cut-and-paste-text-pressed-color",    type Vector4
+      CUT_BUTTON_POSITION_PRIORITY,           // Property, name "cut-button-position-priority",        type unsigned int
+      COPY_BUTTON_POSITION_PRIORITY,          // Property, name "copy-button-position-priority",       type unsigned int
+      PASTE_BUTTON_POSITION_PRIORITY,         // Property, name "paste-button-position-priority",      type unsigned int
+      SELECT_BUTTON_POSITION_PRIORITY,        // Property, name "select-button-position-priority",     type unsigned int
+      SELECT_ALL_BUTTON_POSITION_PRIORITY,    // Property, name "select-all-button-position-priority", type unsigned int
+      CLIPBOARD_BUTTON_POSITION_PRIORITY,     // Property, name "clipboard-button-position-priority",  type unsigned int
+      POP_UP_OFFSET_FROM_TEXT,                // Property, name "popup-offset-from-text",              type Vector4
+      CURSOR_COLOR,                           // Property, name "cursor-color",                        type Vector4
+    };
+  };
 
 public:
 

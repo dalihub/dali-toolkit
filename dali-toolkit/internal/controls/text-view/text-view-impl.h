@@ -47,13 +47,6 @@ class TextView : public Control
 {
 public:
 
-  // Properties
-  enum
-  {
-    TEXTVIEW_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    TEXTVIEW_PROPERTY_END_INDEX = TEXTVIEW_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
-  };
-
   /**
    * Internal exceed policy with the valid combinations.
    */

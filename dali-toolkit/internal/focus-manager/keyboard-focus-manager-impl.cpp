@@ -26,6 +26,7 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/integration-api/debug.h>
 
@@ -44,23 +45,16 @@ namespace Toolkit
 namespace Internal
 {
 
-namespace // unnamed namespace
+namespace // Unnamed namespace
 {
-
-// Signals
-
-const char* const SIGNAL_PRE_FOCUS_CHANGE =        "keyboard-pre-focus-change";
-const char* const SIGNAL_FOCUS_CHANGED =           "keyboard-focus-changed";
-const char* const SIGNAL_FOCUS_GROUP_CHANGED =     "keyboard-focus-group-changed";
-const char* const SIGNAL_FOCUSED_ACTOR_ACTIVATED = "keyboard-focused-actor-activated";
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_KEYBOARD_FOCUS_MANAGER");
 #endif
 
-const std::string IS_FOCUS_GROUP_PROPERTY_NAME("is-keyboard-focus-group"); // This property will be replaced by a flag in Control.
+const char* const IS_FOCUS_GROUP_PROPERTY_NAME = "is-keyboard-focus-group"; // This property will be replaced by a flag in Control.
 
-const char* FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "keyboard_focus.png";
+const char* const FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "keyboard_focus.png";
 const Vector4 FOCUS_BORDER_IMAGE_BORDER = Vector4(7.0f, 7.0f, 7.0f, 7.0f);
 
 BaseHandle Create()
@@ -81,12 +75,14 @@ BaseHandle Create()
   return handle;
 }
 
-TypeRegistration KEYBOARD_FOCUS_MANAGER_TYPE( typeid(Dali::Toolkit::KeyboardFocusManager), typeid(Dali::BaseHandle), Create, true /* Create instance at startup */ );
+DALI_TYPE_REGISTRATION_BEGIN_CREATE( Toolkit::KeyboardFocusManager, Dali::BaseHandle, Create, true )
 
-SignalConnectorType signalConnector1( KEYBOARD_FOCUS_MANAGER_TYPE, SIGNAL_PRE_FOCUS_CHANGE , &KeyboardFocusManager::DoConnectSignal );
-SignalConnectorType signalConnector2( KEYBOARD_FOCUS_MANAGER_TYPE, SIGNAL_FOCUS_CHANGED , &KeyboardFocusManager::DoConnectSignal );
-SignalConnectorType signalConnector3( KEYBOARD_FOCUS_MANAGER_TYPE, SIGNAL_FOCUS_GROUP_CHANGED , &KeyboardFocusManager::DoConnectSignal );
-SignalConnectorType signalConnector4( KEYBOARD_FOCUS_MANAGER_TYPE, SIGNAL_FOCUSED_ACTOR_ACTIVATED , &KeyboardFocusManager::DoConnectSignal );
+DALI_SIGNAL_REGISTRATION( KeyboardFocusManager, "keyboard-pre-focus-change",        SIGNAL_PRE_FOCUS_CHANGE        )
+DALI_SIGNAL_REGISTRATION( KeyboardFocusManager, "keyboard-focus-changed",           SIGNAL_FOCUS_CHANGED           )
+DALI_SIGNAL_REGISTRATION( KeyboardFocusManager, "keyboard-focus-group-changed",     SIGNAL_FOCUS_GROUP_CHANGED     )
+DALI_SIGNAL_REGISTRATION( KeyboardFocusManager, "keyboard-focused-actor-activated", SIGNAL_FOCUSED_ACTOR_ACTIVATED )
+
+DALI_TYPE_REGISTRATION_END()
 
 } // unnamed namespace
 

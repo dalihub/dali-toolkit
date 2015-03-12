@@ -175,4 +175,3 @@ private:
 }
 
 #endif //#ifndef __DALI_TOOLKIT_SHADER_EFFECT_SOFT_BUTTON_H__
-

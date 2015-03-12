@@ -45,34 +45,44 @@ class DALI_IMPORT_API Slider : public Control
 {
 public:
 
-  // Properties
-  static const Dali::Property::Index LOWER_BOUND_PROPERTY;            ///< Property, name "lower-bound",       type FLOAT
-  static const Dali::Property::Index UPPER_BOUND_PROPERTY;            ///< Property, name "upper-bound",       type FLOAT
-  static const Dali::Property::Index VALUE_PROPERTY;                  ///< Property, name "value",             type FLOAT
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserving 1000 property indices
+  };
 
-  static const Dali::Property::Index HIT_REGION_PROPERTY;             ///< Property, name "hit-region",        type VECTOR2
-  static const Dali::Property::Index BACKING_REGION_PROPERTY;         ///< Property, name "backing-region",    type VECTOR2
-  static const Dali::Property::Index HANDLE_REGION_PROPERTY;          ///< Property, name "handle-region",     type VECTOR2
-
-  static const Dali::Property::Index BACKING_IMAGE_NAME_PROPERTY;     ///< Property, name "backing-image-name",  type STRING
-  static const Dali::Property::Index HANDLE_IMAGE_NAME_PROPERTY;      ///< Property, name "handle-image-name",   type STRING
-  static const Dali::Property::Index PROGRESS_IMAGE_NAME_PROPERTY;    ///< Property, name "progress-image-name", type STRING
-  static const Dali::Property::Index POPUP_IMAGE_NAME_PROPERTY;       ///< Property, name "popup-image-name",    type STRING
-  static const Dali::Property::Index POPUP_ARROW_IMAGE_NAME_PROPERTY; ///< Property, name "popup-arrow-image-name", type STRING
-
-  static const Dali::Property::Index DISABLE_COLOR_PROPERTY;          ///< Property, name "disable-color",    type VECTOR4
-  static const Dali::Property::Index POPUP_TEXT_COLOR_PROPERTY;       ///< Property, name "popup-text-color", type VECTOR4
-
-  static const Dali::Property::Index VALUE_PRECISION_PROPERTY;        ///< Property, name "value-precision",  type INT
-
-  static const Dali::Property::Index SHOW_POPUP_PROPERTY;             ///< Property, name "show-popup",       type BOOLEAN
-  static const Dali::Property::Index SHOW_VALUE_PROPERTY;             ///< Property, name "show-value",       type BOOLEAN
-
-  static const Dali::Property::Index ENABLED_PROPERTY;                ///< Property, name "enabled",          type BOOLEAN
-
-  static const Dali::Property::Index MARKS_PROPERTY;                  ///< Property, name "marks",            type Property::Array<float>
-  static const Dali::Property::Index SNAP_TO_MARKS_PROPERTY;          ///< Property, name "snap-to-marks",    type BOOLEAN
-  static const Dali::Property::Index MARK_TOLERANCE_PROPERTY;         ///< Property, name "mark-tolerance",   type FLOAT
+  /**
+   * @brief An enumeration of properties belonging to the Slider class.
+   */
+  struct Property
+  {
+    enum
+    {
+      LOWER_BOUND = PROPERTY_START_INDEX, ///< Property, name "lower-bound",            type float
+      UPPER_BOUND,                        ///< Property, name "upper-bound",            type float
+      VALUE,                              ///< Property, name "value",                  type float
+      HIT_REGION,                         ///< Property, name "hit-region",             type Vector2
+      BACKING_REGION,                     ///< Property, name "backing-region",         type Vector2
+      HANDLE_REGION,                      ///< Property, name "handle-region",          type Vector2
+      BACKING_IMAGE_NAME,                 ///< Property, name "backing-image-name",     type std::string
+      HANDLE_IMAGE_NAME,                  ///< Property, name "handle-image-name",      type std::string
+      PROGRESS_IMAGE_NAME,                ///< Property, name "progress-image-name",    type std::string
+      POPUP_IMAGE_NAME,                   ///< Property, name "popup-image-name",       type std::string
+      POPUP_ARROW_IMAGE_NAME,             ///< Property, name "popup-arrow-image-name", type std::string
+      DISABLE_COLOR,                      ///< Property, name "disable-color",          type Vector4
+      POPUP_TEXT_COLOR,                   ///< Property, name "popup-text-color",       type Vector4
+      VALUE_PRECISION,                    ///< Property, name "value-precision",        type int
+      SHOW_POPUP,                         ///< Property, name "show-popup",             type bool
+      SHOW_VALUE,                         ///< Property, name "show-value",             type bool
+      ENABLED,                            ///< Property, name "enabled",                type bool
+      MARKS,                              ///< Property, name "marks",                  type Property::Array<float>
+      SNAP_TO_MARKS,                      ///< Property, name "snap-to-marks",          type bool
+      MARK_TOLERANCE,                     ///< Property, name "mark-tolerance",         type float
+    };
+  };
 
 public:
 

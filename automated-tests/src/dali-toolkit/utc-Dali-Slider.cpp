@@ -136,8 +136,8 @@ int UtcDaliSliderSignals(void)
   {
     marks.push_back( MIN_BOUND + ( static_cast<float>(i) / ( NUM_MARKS - 1) ) * ( MAX_BOUND - MIN_BOUND ) );
   }
-  slider.SetProperty( Slider::MARKS_PROPERTY, marks );
-  slider.SetProperty( Slider::MARK_TOLERANCE_PROPERTY, 0.1f );
+  slider.SetProperty( Slider::Property::MARKS, marks );
+  slider.SetProperty( Slider::Property::MARK_TOLERANCE, 0.1f );
 
   slider.ValueChangedSignal().Connect( &OnSliderValueChanged );
   slider.MarkSignal().Connect( &OnSliderMark );

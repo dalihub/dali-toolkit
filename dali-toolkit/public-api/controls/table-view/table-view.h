@@ -45,14 +45,19 @@ class DALI_IMPORT_API TableView : public Control
 {
 public:
 
-  /// @name Properties
-  /** @{ */
-  static const Dali::Property::Index PROPERTY_ROWS;                       ///< name "rows",                      type UNSIGNED_INTEGER
-  static const Dali::Property::Index PROPERTY_COLUMNS;                    ///< name "columns",                   type UNSIGNED_INTEGER
-  static const Dali::Property::Index PROPERTY_CELL_PADDING;               ///< name "cell-padding",              type VECTOR2
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+  };
 
-  /*
-   * PROPERTY_LAYOUT_ROWS set the height of the rows
+  /**
+   * @brief An enumeration of properties belonging to the TableView class.
+   *
+   * LayoutRows: set the height of the rows.
    * It has the format as follows in script:
    * @code
    * "layout-rows":
@@ -61,11 +66,8 @@ public:
         "2": { "policy": "relative", "value": 0.33 }   //@see SetRelativeHeight
       }
    * @endcode
-   */
-  static const Dali::Property::Index PROPERTY_LAYOUT_ROWS;                ///< name "layout-rows",               type MAP
-
-  /*
-   * PROPERTY_LAYOUT_COLUMNS set the height of the rows
+   *
+   * LayoutColumns: set the height of the rows.
    * It has the format as follows in script:
    * @code
    * "layout-columns":
@@ -75,15 +77,22 @@ public:
       }
    * @endcode
    */
-  static const Dali::Property::Index PROPERTY_LAYOUT_COLUMNS;             ///< name "layout-columns",            type MAP
-  /** @} */
-
+  struct Property
+  {
+    enum
+    {
+      ROWS = PROPERTY_START_INDEX, ///< name "rows",           type unsigned int
+      COLUMNS,                     ///< name "columns",        type unsigned int
+      CELL_PADDING,                ///< name "cell-padding",   type Vector2
+      LAYOUT_ROWS,                 ///< name "layout-rows",    type Map
+      LAYOUT_COLUMNS,              ///< name "layout-columns", type Map
+    };
+  };
 
   // Custom properties for where to put the actor, these properties should be registered to the child which would be added to the table
-  static const std::string CELL_INDICES_PROPERTY_NAME;           ///< Property, name "cell-indices", type VECTOR2
-  static const std::string ROW_SPAN_PROPERTY_NAME;               ///< Property, name "row-span",     type FLOAT (Currently builder unable to differentiate integer and float from Json string)
-  static const std::string COLUMN_SPAN_PROPERTY_NAME;            ///< Property, name "column-span",  type FLOAT (Currently builder unable to differentiate integer and float from Json string)
-
+  static const std::string CELL_INDICES_PROPERTY_NAME;           ///< Property, name "cell-indices", type Vector2
+  static const std::string ROW_SPAN_PROPERTY_NAME;               ///< Property, name "row-span",     type float (Currently builder is unable to differentiate integer and float from Json string)
+  static const std::string COLUMN_SPAN_PROPERTY_NAME;            ///< Property, name "column-span",  type float (Currently builder is unable to differentiate integer and float from Json string)
 
   /**
    * @brief Describes how the size of a row / column been set

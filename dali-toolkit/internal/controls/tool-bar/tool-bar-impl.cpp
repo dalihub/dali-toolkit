@@ -22,12 +22,11 @@
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
-
-// EXTERNAL INCLUDES
 
 namespace Dali
 {
@@ -40,12 +39,14 @@ namespace Internal
 
 namespace
 {
+
 BaseHandle Create()
 {
   return Toolkit::ToolBar::New();
 }
 
-TypeRegistration mType( typeid(Toolkit::ToolBar), typeid(Toolkit::Control), Create );
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ToolBar, Toolkit::Control, Create )
+DALI_TYPE_REGISTRATION_END()
 
 const float DEFAULT_RELATIVE_SIZE( 0.1f );
 const Toolkit::Alignment::Type DEFAULT_ALIGNMENT( Toolkit::Alignment::HorizontalLeft );

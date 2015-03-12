@@ -165,4 +165,3 @@ private:
 }
 
 #endif //#ifndef __DALI_TOOLKIT_SHADER_EFFECT_MOTION_STRETCH_H__
-

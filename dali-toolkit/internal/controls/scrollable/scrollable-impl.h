@@ -44,8 +44,8 @@ typedef IntrusivePtr<Scrollable> ScrollablePtr;
 class Scrollable : public Control
 {
 public:
-  static const std::string SCROLLABLE_CAN_SCROLL_VERTICAL;
-  static const std::string SCROLLABLE_CAN_SCROLL_HORIZONTAL;
+  static const char* const SCROLLABLE_CAN_SCROLL_VERTICAL;
+  static const char* const SCROLLABLE_CAN_SCROLL_HORIZONTAL;
 
   /**
    * Create a new Scrollable.

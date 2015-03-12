@@ -56,8 +56,25 @@ class DALI_IMPORT_API SuperBlurView : public Control
 {
 public:
 
-  // Properties
-  static const Dali::Property::Index PROPERTY_IMAGE;     ///< name "image",    @see SetImage,    type MAP
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+  };
+
+  /**
+   * @brief An enumeration of properties belonging to the SuperBlurView class.
+   */
+  struct Property
+  {
+    enum
+    {
+      IMAGE = PROPERTY_START_INDEX, ///< name "image",    @see SetImage,    type Map
+    };
+  };
 
   /**
    * @brief Signal type for notifications.

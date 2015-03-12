@@ -62,13 +62,6 @@ class DALI_IMPORT_API Control : public CustomActorImpl, public ConnectionTracker
 {
 public:
 
-  // Properties
-  enum
-  {
-    CONTROL_PROPERTY_START_INDEX = PROPERTY_REGISTRATION_START_INDEX,
-    CONTROL_PROPERTY_END_INDEX = CONTROL_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
-  };
-
   // Creation & Destruction
 
   /**
@@ -652,11 +645,6 @@ private:
    * @copydoc Dali::CustomActorImpl::OnMouseWheelEvent(const MouseWheelEvent&)
    */
   virtual bool OnMouseWheelEvent(const MouseWheelEvent& event);
-
-  /**
-   * @copydoc Dali::CustomActorImpl::GetChildByAlias(const std::string& actorAlias)
-   */
-  virtual Actor GetChildByAlias(const std::string& actorAlias);
 
   // From CustomActorImpl, derived classes should NOT override these.
 

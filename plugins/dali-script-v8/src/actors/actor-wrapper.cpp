@@ -199,7 +199,6 @@ const ActorFunctions ActorFunctionTable[]=
     { "GetChildCount",     ActorApi::GetChildCount,    ACTOR_API },
     { "GetChildAt"   ,     ActorApi::GetChildAt,       ACTOR_API },
     { "FindChildByName",   ActorApi::FindChildByName,  ACTOR_API },
-    { "FindChildByAlias",  ActorApi::FindChildByAlias, ACTOR_API },
     { "FindChildById",     ActorApi::FindChildById,    ACTOR_API },
     { "GetParent" ,        ActorApi::GetParent,        ACTOR_API },
     { "GetActorType" ,     ActorApi::GetActorType,     ACTOR_API }, // custom for javascript

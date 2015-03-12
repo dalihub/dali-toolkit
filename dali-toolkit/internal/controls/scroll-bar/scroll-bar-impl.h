@@ -52,13 +52,6 @@ class ScrollBar : public ScrollComponentImpl
 
 public:
 
-  // Properties
-  enum
-  {
-    SCROLLBAR_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    SCROLLBAR_PROPERTY_END_INDEX = SCROLLBAR_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
-  };
-
   // Signals
   typedef Toolkit::ScrollBar::ScrollPositionNotifiedSignalType ScrollPositionNotifiedSignalType;
 

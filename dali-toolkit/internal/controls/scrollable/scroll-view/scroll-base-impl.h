@@ -182,7 +182,7 @@ public:
 
 protected:
 
-  static const std::string SCROLL_DOMAIN_OFFSET_PROPERTY_NAME;
+  static const char* const SCROLL_DOMAIN_OFFSET_PROPERTY_NAME;
 
 protected:
 

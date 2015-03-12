@@ -193,10 +193,10 @@ Dali::PROPERTY_REGISTRATION_MAX_INDEX.
 
 Furthermore, if deriving from \link Dali::Toolkit::Control Control\endlink, the control writer
 needs to be aware of their parent class's property range. Control reserves a property range between
-\link Dali::Toolkit::Internal::Control::CONTROL_PROPERTY_START_INDEX ControlImpl::CONTROL_PROPERTY_START_INDEX\endlink
-and \link Dali::Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX Internal::Control::CONTROL_PROPERTY_END_INDEX\endlink.
+\link Dali::Toolkit::Control::CONTROL_PROPERTY_START_INDEX ControlImpl::CONTROL_PROPERTY_START_INDEX\endlink
+and \link Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX Control::CONTROL_PROPERTY_END_INDEX\endlink.
 Any deriving control should start their property indices from
-\link Dali::Toolkit::Internal::Control::CONTROL_PROPERTY_END_INDEX Internal::Control::CONTROL_PROPERTY_END_INDEX\endlink + 1.
+\link Dali::Toolkit::Control::CONTROL_PROPERTY_END_INDEX Control::CONTROL_PROPERTY_END_INDEX\endlink + 1.
 
 Please have a look at \ref property-indices for more information.
 

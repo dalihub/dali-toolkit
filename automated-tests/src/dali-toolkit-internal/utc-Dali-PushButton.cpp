@@ -640,86 +640,86 @@ int UtcDaliPushButtonProperties(void)
 
   // Button::PROPERTY_AUTO_REPEATING
   button.SetAutoRepeating( false );
-  DALI_TEST_CHECK( ! button.GetProperty< bool >( Button::PROPERTY_AUTO_REPEATING ) );
-  button.SetProperty( Button::PROPERTY_AUTO_REPEATING, true );
+  DALI_TEST_CHECK( ! button.GetProperty< bool >( Button::Property::AUTO_REPEATING ) );
+  button.SetProperty( Button::Property::AUTO_REPEATING, true );
   DALI_TEST_CHECK( button.IsAutoRepeating() ) ;
-  DALI_TEST_CHECK( button.GetProperty< bool >( Button::PROPERTY_AUTO_REPEATING ) );
+  DALI_TEST_CHECK( button.GetProperty< bool >( Button::Property::AUTO_REPEATING ) );
 
   // Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY
   button.SetInitialAutoRepeatingDelay( 10.0f );
-  DALI_TEST_EQUALS( 10.0f, button.GetProperty< float >( Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY ), TEST_LOCATION );
-  button.SetProperty( Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY, 25.0f );
+  DALI_TEST_EQUALS( 10.0f, button.GetProperty< float >( Button::Property::INITIAL_AUTO_REPEATING_DELAY ), TEST_LOCATION );
+  button.SetProperty( Button::Property::INITIAL_AUTO_REPEATING_DELAY, 25.0f );
   DALI_TEST_EQUALS( 25.0f, button.GetInitialAutoRepeatingDelay(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 25.0f, button.GetProperty< float >( Button::PROPERTY_INITIAL_AUTO_REPEATING_DELAY ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 25.0f, button.GetProperty< float >( Button::Property::INITIAL_AUTO_REPEATING_DELAY ), TEST_LOCATION );
 
   //  Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY
   button.SetNextAutoRepeatingDelay( 3.0f );
-  DALI_TEST_EQUALS( 3.0f, button.GetProperty< float >( Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY ), TEST_LOCATION );
-  button.SetProperty( Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY, 4.0f );
+  DALI_TEST_EQUALS( 3.0f, button.GetProperty< float >( Button::Property::NEXT_AUTO_REPEATING_DELAY ), TEST_LOCATION );
+  button.SetProperty( Button::Property::NEXT_AUTO_REPEATING_DELAY, 4.0f );
   DALI_TEST_EQUALS( 4.0f, button.GetNextAutoRepeatingDelay(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 4.0f, button.GetProperty< float >( Button::PROPERTY_NEXT_AUTO_REPEATING_DELAY ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 4.0f, button.GetProperty< float >( Button::Property::NEXT_AUTO_REPEATING_DELAY ), TEST_LOCATION );
 
   //  Button::PROPERTY_TOGGLABLE
   button.SetTogglableButton( false );
-  DALI_TEST_CHECK( ! button.GetProperty< bool >( Button::PROPERTY_TOGGLABLE ) );
-  button.SetProperty( Button::PROPERTY_TOGGLABLE, true );
+  DALI_TEST_CHECK( ! button.GetProperty< bool >( Button::Property::TOGGLABLE ) );
+  button.SetProperty( Button::Property::TOGGLABLE, true );
   DALI_TEST_CHECK( button.IsTogglableButton() ) ;
-  DALI_TEST_CHECK( button.GetProperty< bool >( Button::PROPERTY_TOGGLABLE ) );
+  DALI_TEST_CHECK( button.GetProperty< bool >( Button::Property::TOGGLABLE ) );
 
   //  Button::PROPERTY_SELECTED
   button.SetSelected( false );
-  DALI_TEST_CHECK( ! button.GetProperty< bool >( Button::PROPERTY_SELECTED ) );
-  button.SetProperty( Button::PROPERTY_SELECTED, true );
+  DALI_TEST_CHECK( ! button.GetProperty< bool >( Button::Property::SELECTED ) );
+  button.SetProperty( Button::Property::SELECTED, true );
   DALI_TEST_CHECK( button.IsSelected() ) ;
-  DALI_TEST_CHECK( button.GetProperty< bool >( Button::PROPERTY_SELECTED ) );
+  DALI_TEST_CHECK( button.GetProperty< bool >( Button::Property::SELECTED ) );
 
   //  Button::PROPERTY_NORMAL_STATE_ACTOR
   {
     button.SetButtonImage( ResourceImage::New( "IMAGE_PATH_1") );
-    DALI_TEST_EQUALS( "IMAGE_PATH_1", button.GetProperty( Button::PROPERTY_NORMAL_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
+    DALI_TEST_EQUALS( "IMAGE_PATH_1", button.GetProperty( Button::Property::NORMAL_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;
     map[ "type" ] = "ImageActor";
 
-    button.SetProperty( Button::PROPERTY_NORMAL_STATE_ACTOR, map );
-    DALI_TEST_EQUALS( "ImageActor", button.GetProperty( Button::PROPERTY_NORMAL_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+    button.SetProperty( Button::Property::NORMAL_STATE_ACTOR, map );
+    DALI_TEST_EQUALS( "ImageActor", button.GetProperty( Button::Property::NORMAL_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
   }
 
   //  Button::PROPERTY_SELECTED_STATE_ACTOR
   {
     button.SetSelectedImage( ResourceImage::New( "IMAGE_PATH_2") );
-    DALI_TEST_EQUALS( "IMAGE_PATH_2", button.GetProperty( Button::PROPERTY_SELECTED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
+    DALI_TEST_EQUALS( "IMAGE_PATH_2", button.GetProperty( Button::Property::SELECTED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;
     map[ "type" ] = "Actor";
 
-    button.SetProperty( Button::PROPERTY_SELECTED_STATE_ACTOR, map );
-    DALI_TEST_EQUALS( "Actor", button.GetProperty( Button::PROPERTY_SELECTED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
-    DALI_TEST_CHECK( "ImageActor" != button.GetProperty( Button::PROPERTY_SELECTED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >() );
+    button.SetProperty( Button::Property::SELECTED_STATE_ACTOR, map );
+    DALI_TEST_EQUALS( "Actor", button.GetProperty( Button::Property::SELECTED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+    DALI_TEST_CHECK( "ImageActor" != button.GetProperty( Button::Property::SELECTED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >() );
   }
 
   //  Button::PROPERTY_DISABLED_STATE_ACTOR
   {
     button.SetDisabledImage( ResourceImage::New( "IMAGE_PATH_3") );
-    DALI_TEST_EQUALS( "IMAGE_PATH_3", button.GetProperty( Button::PROPERTY_DISABLED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
+    DALI_TEST_EQUALS( "IMAGE_PATH_3", button.GetProperty( Button::Property::DISABLED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;
     map[ "type" ] = "Actor";
 
-    button.SetProperty( Button::PROPERTY_DISABLED_STATE_ACTOR, map );
-    DALI_TEST_EQUALS( "Actor", button.GetProperty( Button::PROPERTY_DISABLED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+    button.SetProperty( Button::Property::DISABLED_STATE_ACTOR, map );
+    DALI_TEST_EQUALS( "Actor", button.GetProperty( Button::Property::DISABLED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
   }
 
   //  Button::PROPERTY_LABEL_ACTOR
   {
     button.SetLabel( "LABEL_TEXT_CUSTOM" );
-    DALI_TEST_EQUALS( "TextView", button.GetProperty( Button::PROPERTY_LABEL_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+    DALI_TEST_EQUALS( "TextView", button.GetProperty( Button::Property::LABEL_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;
     map[ "type" ] = "Actor";
 
-    button.SetProperty( Button::PROPERTY_LABEL_ACTOR, map );
-    DALI_TEST_EQUALS( "Actor", button.GetProperty( Button::PROPERTY_LABEL_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+    button.SetProperty( Button::Property::LABEL_ACTOR, map );
+    DALI_TEST_EQUALS( "Actor", button.GetProperty( Button::Property::LABEL_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
   }
   END_TEST;
 }

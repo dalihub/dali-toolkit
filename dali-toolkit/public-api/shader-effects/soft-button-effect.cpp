@@ -428,4 +428,3 @@ const std::string& SoftButtonEffect::GetRectangleSizeScalePropertyName() const
 }
 
 }
-

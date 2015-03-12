@@ -40,23 +40,23 @@ const Vector2 DEFAULT_POPUP_INDICATOR_OFFSET(0.0f, 60.0f);
 /**
  * Image resource paths
  */
-const std::string POPUP_BACKGROUND( DALI_IMAGE_DIR "popup_bubble_bg.#.png" );
-const std::string POPUP_BACKGROUND_EFFECT( DALI_IMAGE_DIR "popup_bubble_bg_ef.#.png" );
-const std::string POPUP_BACKGROUND_LINE( DALI_IMAGE_DIR "popup_bubble_bg_line.#.png" );
+const char* const POPUP_BACKGROUND = DALI_IMAGE_DIR "popup_bubble_bg.#.png";
+const char* const POPUP_BACKGROUND_EFFECT = DALI_IMAGE_DIR "popup_bubble_bg_ef.#.png";
+const char* const POPUP_BACKGROUND_LINE = DALI_IMAGE_DIR "popup_bubble_bg_line.#.png";
 
-const std::string POPUP_TAIL_BOTTOM( DALI_IMAGE_DIR "popup_bubble_tail_bottom.png" );
-const std::string POPUP_TAIL_BOTTOM_EFFECT( DALI_IMAGE_DIR "popup_bubble_tail_bottom_ef.png" );
-const std::string POPUP_TAIL_BOTTOM_LINE( DALI_IMAGE_DIR "popup_bubble_tail_bottom_line.png" );
-const std::string POPUP_TAIL_TOP( DALI_IMAGE_DIR "popup_bubble_tail_top.png" );
-const std::string POPUP_TAIL_TOP_EFFECT( DALI_IMAGE_DIR "popup_bubble_tail_top_ef.png" );
-const std::string POPUP_TAIL_TOP_LINE( DALI_IMAGE_DIR "popup_bubble_tail_top_line.png" );
+const char* const POPUP_TAIL_BOTTOM = DALI_IMAGE_DIR "popup_bubble_tail_bottom.png";
+const char* const POPUP_TAIL_BOTTOM_EFFECT = DALI_IMAGE_DIR "popup_bubble_tail_bottom_ef.png";
+const char* const POPUP_TAIL_BOTTOM_LINE = DALI_IMAGE_DIR "popup_bubble_tail_bottom_line.png";
+const char* const POPUP_TAIL_TOP = DALI_IMAGE_DIR "popup_bubble_tail_top.png";
+const char* const POPUP_TAIL_TOP_EFFECT = DALI_IMAGE_DIR "popup_bubble_tail_top_ef.png";
+const char* const POPUP_TAIL_TOP_LINE = DALI_IMAGE_DIR "popup_bubble_tail_top_line.png";
 
-const std::string OPTION_ICON_CLIPBOARD( DALI_IMAGE_DIR "copy_paste_icon_clipboard.png" );
-const std::string OPTION_ICON_COPY( DALI_IMAGE_DIR "copy_paste_icon_copy.png" );
-const std::string OPTION_ICON_CUT( DALI_IMAGE_DIR "copy_paste_icon_cut.png" );
-const std::string OPTION_ICON_PASTE( DALI_IMAGE_DIR "copy_paste_icon_paste.png" );
-const std::string OPTION_ICON_SELECT( DALI_IMAGE_DIR "copy_paste_icon_select.png" );
-const std::string OPTION_ICON_SELECT_ALL( DALI_IMAGE_DIR "copy_paste_icon_select_all.png" );
+const char* const OPTION_ICON_CLIPBOARD = DALI_IMAGE_DIR "copy_paste_icon_clipboard.png";
+const char* const OPTION_ICON_COPY = DALI_IMAGE_DIR "copy_paste_icon_copy.png";
+const char* const OPTION_ICON_CUT = DALI_IMAGE_DIR "copy_paste_icon_cut.png";
+const char* const OPTION_ICON_PASTE = DALI_IMAGE_DIR "copy_paste_icon_paste.png";
+const char* const OPTION_ICON_SELECT = DALI_IMAGE_DIR "copy_paste_icon_select.png";
+const char* const OPTION_ICON_SELECT_ALL = DALI_IMAGE_DIR "copy_paste_icon_select_all.png";
 
 /**
  * Constant values for building the GUI
@@ -549,8 +549,8 @@ void TextInputPopup::Hide(bool animate)
     if(animate)
     {
       mAnimation = Animation::New( HIDE_POPUP_ANIMATION_DURATION );
-      mAnimation.AnimateTo( Property(mRoot, Actor::Property::Scale), Vector3::ZERO, AlphaFunctions::EaseOut );
-      mAnimation.AnimateTo( Property(mRoot, Actor::Property::ColorAlpha), 0.0f, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRoot, Actor::Property::SCALE), Vector3::ZERO, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRoot, Actor::Property::COLOR_ALPHA), 0.0f, AlphaFunctions::EaseOut );
       mAnimation.Play();
 
       mAnimation.FinishedSignal().Connect( this, &TextInputPopup::OnHideFinished );
@@ -558,8 +558,8 @@ void TextInputPopup::Hide(bool animate)
     }
     else
     {
-      mRoot.SetProperty(Actor::Property::Scale, Vector3::ZERO);
-      mRoot.SetProperty(Actor::Property::ColorAlpha, 0.0f);
+      mRoot.SetProperty(Actor::Property::SCALE, Vector3::ZERO);
+      mRoot.SetProperty(Actor::Property::COLOR_ALPHA, 0.0f);
       mState = StateHidden;
     }
   }
@@ -585,8 +585,8 @@ void TextInputPopup::Show( Actor target, bool animate )
     if(animate)
     {
       mAnimation = Animation::New( SHOW_POPUP_ANIMATION_DURATION );
-      mAnimation.AnimateTo( Property(mRoot, Actor::Property::Scale), Vector3::ONE, AlphaFunctions::EaseOut );
-      mAnimation.AnimateTo( Property(mRoot, Actor::Property::ColorAlpha), 1.0f, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRoot, Actor::Property::SCALE), Vector3::ONE, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRoot, Actor::Property::COLOR_ALPHA), 1.0f, AlphaFunctions::EaseOut );
       mAnimation.Play();
 
       mAnimation.FinishedSignal().Connect( this, &TextInputPopup::OnShowFinished );
@@ -594,8 +594,8 @@ void TextInputPopup::Show( Actor target, bool animate )
     }
     else
     {
-      mRoot.SetProperty(Actor::Property::Scale, Vector3::ONE);
-      mRoot.SetProperty(Actor::Property::ColorAlpha, 1.0f);
+      mRoot.SetProperty(Actor::Property::SCALE, Vector3::ONE);
+      mRoot.SetProperty(Actor::Property::COLOR_ALPHA, 1.0f);
       mState = StateShown;
     }
   }
@@ -917,4 +917,3 @@ TextInputPopup::VisibilityChangeFinishedSignalType& TextInputPopup::ShowFinished
 } // namespace Toolkit
 
 } // namespace Dali
-
