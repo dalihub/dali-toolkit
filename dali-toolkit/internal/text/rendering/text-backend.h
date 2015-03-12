@@ -38,13 +38,6 @@ namespace Internal DALI_INTERNAL
 class Backend;
 }
 
-// The type of text renderer required
-enum RenderingType
-{
-  RENDERING_BASIC,       ///< A bitmap-based reference implementation
-  RENDERING_SHARED_ATLAS ///< A bitmap-based solution where renderers can share a texture atlas
-};
-
 /**
  * @brief Provides access to different text rendering backends.
  */
