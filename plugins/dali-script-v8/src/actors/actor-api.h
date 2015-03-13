@@ -58,7 +58,6 @@ namespace ActorApi
   void Unparent( const v8::FunctionCallbackInfo< v8::Value >& args);
   void GetChildAt( const v8::FunctionCallbackInfo< v8::Value >& args);
   void FindChildByName( const v8::FunctionCallbackInfo< v8::Value >& args);
-  void FindChildByAlias( const v8::FunctionCallbackInfo< v8::Value >& args);
   void FindChildById( const v8::FunctionCallbackInfo< v8::Value >& args);
   void GetParent( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetChildCount( const v8::FunctionCallbackInfo< v8::Value >& args );

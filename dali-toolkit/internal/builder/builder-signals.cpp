@@ -43,12 +43,12 @@ using namespace Dali;
 // Signal Actions
 //
 
-// Action on child actor. The child is found by alias so can be 'previous' etc.
+// Action on child actor. The child is found by name
 struct ChildActorAction
 {
   std::string actorName;
   std::string actionName;
-  std::string childAlias;
+  std::string childName;
   PropertyValueContainer parameters;
 
   void operator()(void)
@@ -57,7 +57,7 @@ struct ChildActorAction
 
     if(actor)
     {
-      Actor child_actor = actor.FindChildByAlias(childAlias);
+      Actor child_actor = actor.FindChildByName(childName);
 
       if(child_actor)
       {
@@ -65,7 +65,7 @@ struct ChildActorAction
       }
       else
       {
-        DALI_SCRIPT_WARNING("Could not find child by alias '%s'\n", childAlias.c_str());
+        DALI_SCRIPT_WARNING("Could not find child by name '%s'\n", childName.c_str());
       }
     }
   };
@@ -239,7 +239,7 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
   {
     ChildActorAction action;
     action.actorName       = *actorName;
-    action.childAlias      = *childActorName;
+    action.childName       = *childActorName;
     action.actionName      = *actionName;
     GetParameters(child, action.parameters);
     callback = action;

@@ -646,11 +646,6 @@ private:
    */
   virtual bool OnMouseWheelEvent(const MouseWheelEvent& event);
 
-  /**
-   * @copydoc Dali::CustomActorImpl::GetChildByAlias(const std::string& actorAlias)
-   */
-  virtual Actor GetChildByAlias(const std::string& actorAlias);
-
   // From CustomActorImpl, derived classes should NOT override these.
 
   /**

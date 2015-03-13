@@ -335,39 +335,6 @@ void ActorApi::FindChildByName( const v8::FunctionCallbackInfo<v8::Value>& args 
 }
 
 /**
- * Search through this actor's hierarchy for an actor with the given name or alias.
- *
- * Actors can customize this function to provide actors with preferred alias'
- * For example 'previous' could return the last selected child.
- * If no aliased actor is found then FindChildByName() is called.
- *
- * @for Actor
- * @method findChildByAlias
- * @param {String} actor alias
- * @return {Object} actor on success, empty actor handle if not found
- */
-void ActorApi::FindChildByAlias( const v8::FunctionCallbackInfo<v8::Value>& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  Actor parent = GetActor( isolate, args );
-  bool found( false );
-  std::string name = V8Utils::GetStringParameter( PARAMETER_0, found, isolate, args );
-  if( !found )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "String parameter not found" );
-    return;
-  }
-  Actor childActor = parent.FindChildByAlias( name );
-  if( childActor )
-  {
-    // wrap the child
-    v8::Local < v8::Object > wrappedLayer = ActorWrapper::WrapActor( isolate, childActor );
-    args.GetReturnValue().Set( wrappedLayer );
-  }
-}
-
-/**
  * Search through this actor's hierarchy for an actor with the given unique ID.
  * The actor itself is also considered in the search
  *

@@ -47,7 +47,7 @@ public:
 
   // Custom properties
 
-  static const std::string SOURCE_POSITION_PROPERTY_NAME;                   ///< Property, name "source-position",              type VECTOR3
+  static const std::string SOURCE_POSITION_PROPERTY_NAME;                   ///< Property, name "source-position",              type Vector3
 
 public:
 

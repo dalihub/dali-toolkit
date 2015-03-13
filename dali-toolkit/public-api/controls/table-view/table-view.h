@@ -81,18 +81,18 @@ public:
   {
     enum
     {
-      ROWS = PROPERTY_START_INDEX, ///< name "rows",           type UNSIGNED_INTEGER
-      COLUMNS,                     ///< name "columns",        type UNSIGNED_INTEGER
-      CELL_PADDING,                ///< name "cell-padding",   type VECTOR2
-      LAYOUT_ROWS,                 ///< name "layout-rows",    type MAP
-      LAYOUT_COLUMNS,              ///< name "layout-columns", type MAP
+      ROWS = PROPERTY_START_INDEX, ///< name "rows",           type unsigned int
+      COLUMNS,                     ///< name "columns",        type unsigned int
+      CELL_PADDING,                ///< name "cell-padding",   type Vector2
+      LAYOUT_ROWS,                 ///< name "layout-rows",    type Map
+      LAYOUT_COLUMNS,              ///< name "layout-columns", type Map
     };
   };
 
   // Custom properties for where to put the actor, these properties should be registered to the child which would be added to the table
-  static const std::string CELL_INDICES_PROPERTY_NAME;           ///< Property, name "cell-indices", type VECTOR2
-  static const std::string ROW_SPAN_PROPERTY_NAME;               ///< Property, name "row-span",     type FLOAT (Currently builder unable to differentiate integer and float from Json string)
-  static const std::string COLUMN_SPAN_PROPERTY_NAME;            ///< Property, name "column-span",  type FLOAT (Currently builder unable to differentiate integer and float from Json string)
+  static const std::string CELL_INDICES_PROPERTY_NAME;           ///< Property, name "cell-indices", type Vector2
+  static const std::string ROW_SPAN_PROPERTY_NAME;               ///< Property, name "row-span",     type float (Currently builder is unable to differentiate integer and float from Json string)
+  static const std::string COLUMN_SPAN_PROPERTY_NAME;            ///< Property, name "column-span",  type float (Currently builder is unable to differentiate integer and float from Json string)
 
   /**
    * @brief Describes how the size of a row / column been set
