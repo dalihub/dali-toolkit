@@ -69,7 +69,7 @@ AM_CONDITIONAL([ENABLE_JAVASCRIPT_PLUGIN], [test x$enable_javascript = xyes])
 
 # Tizen Profile options
 AC_ARG_ENABLE([profile],
-              [AC_HELP_STRING([--enable-profile=COMMON,MOBILE,LITE,WEARABLE,TV],
+              [AC_HELP_STRING([--enable-profile=COMMON,MOBILE,WEARABLE,TV],
                             [Select the variant of tizen])],
               [dali_profile=$enableval],
               [dali_profile=COMMON])
