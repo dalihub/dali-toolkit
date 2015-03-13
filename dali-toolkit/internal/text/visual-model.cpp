@@ -173,6 +173,14 @@ const GlyphInfo& VisualModel::GetGlyphInfo( GlyphIndex glyphIndex ) const
   return mImpl->mGlyphs[glyphIndex];
 }
 
+void VisualModel::ReplaceGlyphs( GlyphIndex glyphIndex,
+                                 Length numberOfGlyphsToRemove,
+                                 const GlyphInfo* const glyphs,
+                                 const Length* const numberOfCharacters,
+                                 Length numberOfGlyphsToInsert )
+{
+}
+
 CharacterIndex VisualModel::GetCharacterIndex( GlyphIndex glyphIndex ) const
 {
   return mImpl->mGlyphsToCharacters[glyphIndex];
@@ -251,6 +259,13 @@ void VisualModel::GetGlyphPositions( Vector2* glyphPositions,
 const Vector2& VisualModel::GetGlyphPosition( GlyphIndex glyphIndex ) const
 {
   return *( mImpl->mGlyphPositions.Begin() + glyphIndex );
+}
+
+void VisualModel::ReplaceGlyphPositions( GlyphIndex glyphIndex,
+                                         Length numberOfGlyphsToRemove,
+                                         const Vector2* const positions,
+                                         Length numberOfGlyphsToInsert )
+{
 }
 
 void VisualModel::SetLines( const LineRun* const lines,
@@ -364,6 +379,13 @@ void VisualModel::GetLinesOfGlyphRange( LineRun* lines,
   }
 
   memcpy( lines, modelLines.Begin() + lineCache.firstLine, lineCache.numberOfLines * sizeof( LineRun ) );
+}
+
+void VisualModel::ReplaceLines( GlyphIndex glyphIndex,
+                                Length numberOfGlyphsToRemove,
+                                const LineRun* const lines,
+                                Length numberOfGlyphsToInsert )
+{
 }
 
 void VisualModel::SetNaturalSize( const Vector2& size  )

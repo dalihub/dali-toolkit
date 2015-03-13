@@ -100,6 +100,22 @@ public:
    */
   Character GetCharacter( CharacterIndex characterIndex ) const;
 
+  /**
+   * Replaces characters from the text.
+   *
+   * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
+   * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
+   *
+   * @param[in] characterIndex Where to replace the text.
+   * @param[in] numberOfCharactersToRemove The number of characters to be removed.
+   * @param[in] text Pointer to a buffer with the text encoded in utf32.
+   * @param[in] numberOfCharactersToInsert The number of characters in the buffer.
+   */
+  void ReplaceText( CharacterIndex characterIndex,
+                    Length numberOfCharactersToRemove,
+                    const Character* const text,
+                    Length numberOfCharactersToInsert );
+
   // Language support interface.
 
   /**
@@ -154,6 +170,22 @@ public:
   Script GetScript( CharacterIndex characterIndex ) const;
 
   /**
+   * Replaces script runs for the given range of characters.
+   *
+   * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
+   * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
+   *
+   * @param[in] characterIndex Index of the first character where to replace the scripts.
+   * @param[in] numberOfCharactersToRemove The number of characters to be the script removed.
+   * @param[in] scriptRuns Pointer to a buffer with the script runs.
+   * @param[in] numberOfCharactersToInsert The number of characters to be the script inserted.
+   */
+  void ReplaceScripts( CharacterIndex characterIndex,
+                       Length numberOfCharactersToRemove,
+                       const ScriptRun* const scriptRuns,
+                       Length numberOfCharactersToInsert );
+
+  /**
    * Sets the font runs.
    *
    * Replaces any fonts previously set.
@@ -204,6 +236,22 @@ public:
    */
   FontId GetFont( CharacterIndex characterIndex ) const;
 
+  /**
+   * Replaces font runs for the given range of characters.
+   *
+   * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
+   * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
+   *
+   * @param[in] characterIndex Index of the first character where to replace the fonts.
+   * @param[in] numberOfCharactersToRemove The number of characters to be the font removed.
+   * @param[in] fontRuns Pointer to a buffer with the font runs.
+   * @param[in] numberOfCharactersToInsert The number of characters to be the font inserted.
+   */
+  void ReplaceFonts( CharacterIndex characterIndex,
+                     Length numberOfCharactersToRemove,
+                     const FontRun* const fontRuns,
+                     Length numberOfCharactersToInsert );
+
   // Break info interface.
 
   /**
@@ -253,6 +301,24 @@ public:
   LineBreakInfo GetLineBreakInfo( CharacterIndex characterIndex ) const;
 
   /**
+   * Replaces line break info.
+   *
+   * See GetLineBreakInfo() to get how the line break info is encoded.
+   *
+   * If the @p numberOfItemsToRemove is zero, this operation is like an insert.
+   * If the @p numberOfItemsToInsert is zero, this operation is like a remove.
+   *
+   * @param[in] characterIndex Where to replace the line break info.
+   * @param[in] numberOfItemsToRemove The number of items to be removed.
+   * @param[in] lineBreakInfo Pointer to a buffer with the line break info.
+   * @param[in] numberOfItemsToInsert The number of items in the buffer.
+   */
+  void ReplaceLineBreakInfo( CharacterIndex characterIndex,
+                             Length numberOfItemsToRemove,
+                             const LineBreakInfo* const lineBreakInfo,
+                             Length numberOfItemsToInsert );
+
+  /**
    * Sets the word break info.
    *
    * See GetWordBreakInfo() to get how the word break info is encoded.
@@ -299,6 +365,24 @@ public:
    * @param[in] characterIndex Index to the word break info item.
    */
   WordBreakInfo GetWordBreakInfo( CharacterIndex characterIndex ) const;
+
+  /**
+   * Replaces word break info.
+   *
+   * See GetWordBreakInfo() to get how the word break info is encoded.
+   *
+   * If the @p numberOfItemsToRemove is zero, this operation is like an insert.
+   * If the @p numberOfItemsToInsert is zero, this operation is like a remove.
+   *
+   * @param[in] characterIndex Where to replace the word break info.
+   * @param[in] numberOfItemsToRemove The number of items to be removed.
+   * @param[in] wordBreakInfo Pointer to a buffer with the word break info.
+   * @param[in] numberOfItemsToInsert The number of items in the buffer.
+   */
+  void ReplaceWordBreakInfo( CharacterIndex characterIndex,
+                             Length numberOfItemsToRemove,
+                             const WordBreakInfo* const wordBreakInfo,
+                             Length numberOfItemsToInsert );
 
   // Bidirectional support interface.
 
@@ -349,6 +433,22 @@ public:
                              Length numberOfCharacters ) const;
 
   /**
+   * Replaces bidirectional info runs for the given range of characters.
+   *
+   * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
+   * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
+   *
+   * @param[in] characterIndex Index of the first character where to replace the bidirectional info.
+   * @param[in] numberOfCharactersToRemove The number of characters to be the bidirectional info removed.
+   * @param[in] bidirectionalInfo Pointer to a buffer with the bidirectional info runs.
+   * @param[in] numberOfCharactersToInsert The number of characters to be the bidirectional info inserted.
+   */
+  void ReplaceBidirectionalInfo( CharacterIndex characterIndex,
+                                 Length numberOfCharactersToRemove,
+                                 const BidirectionalParagraphInfoRun* const bidirectionalInfo,
+                                 Length numberOfCharactersToInsert );
+
+  /**
    * Retrieves the direction of the characters.
    *
    * It sets @c true for right to left characters and @c false for left to right.
@@ -391,6 +491,22 @@ public:
    */
   void SetVisualToLogicalMap( const BidirectionalLineInfoRun* const bidirectionalInfo,
                               Length numberOfRuns );
+
+  /**
+   * Replaces the visual to logical and logical to visual map tables for the given range of characters.
+   *
+   * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
+   * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
+   *
+   * @param[in] characterIndex Index of the first character where to replace the map tables.
+   * @param[in] numberOfCharactersToRemove The number of characters to be removed.
+   * @param[in] bidirectionalInfo Pointer to a buffer with the bidirectional info runs.
+   * @param[in] numberOfCharactersToInsert The number of characters to be inserted.
+   */
+  void ReplaceVisualToLogicalMap( CharacterIndex characterIndex,
+                                  Length numberOfCharactersToRemove,
+                                  const BidirectionalLineInfoRun* const bidirectionalInfo,
+                                  Length numberOfCharactersToInsert );
 
   /**
    * Retrieves the visual character index for the given logical character index.

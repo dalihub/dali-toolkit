@@ -104,6 +104,24 @@ public:
    */
   const GlyphInfo& GetGlyphInfo( GlyphIndex glyphIndex ) const;
 
+  /**
+   * Replaces glyphs.
+   *
+   * If the @p numberOfGlyphsToRemove is zero, this operation is like an insert.
+   * If the @p numberOfGlyphsToInsert is zero, this operation is like a remove.
+   *
+   * @param[in] glyphIndex Where to replace the glyphs.
+   * @param[in] numberOfGlyphsToRemove The number of glyphs to be removed.
+   * @param[in] glyphs Pointer to a buffer with the new glyphs.
+   * @param[in] numberOfCharacters Pointer to a buffer with the number of characters per glyph.
+   * @param[in] numberOfGlyphsToInsert The number of new glyphs in the buffer.
+   */
+  void ReplaceGlyphs( GlyphIndex glyphIndex,
+                      Length numberOfGlyphsToRemove,
+                      const GlyphInfo* const glyphs,
+                      const Length* const numberOfCharacters,
+                      Length numberOfGlyphsToInsert );
+
   // Character <--> Glyph conversion
 
   /**
@@ -224,6 +242,22 @@ public:
    */
   const Vector2& GetGlyphPosition( GlyphIndex glyphIndex ) const;
 
+  /**
+   * Replaces glyph's positions.
+   *
+   * If the @p numberOfGlyphsToRemove is zero, this operation is like an insert.
+   * If the @p numberOfGlyphsToInsert is zero, this operation is like a remove.
+   *
+   * @param[in] glyphIndex Where to replace the glyph's positions.
+   * @param[in] numberOfGlyphsToRemove The number of glyph's positions to be removed.
+   * @param[in] positions Pointer to a buffer with the new glyph's positions.
+   * @param[in] numberOfGlyphsToInsert The number of new glyph's positions in the buffer.
+   */
+  void ReplaceGlyphPositions( GlyphIndex glyphIndex,
+                              Length numberOfGlyphsToRemove,
+                              const Vector2* const positions,
+                              Length numberOfGlyphsToInsert );
+
   // Line interface.
 
   /**
@@ -283,6 +317,22 @@ public:
   void GetLinesOfGlyphRange( LineRun* lines,
                              GlyphIndex glyphIndex,
                              Length numberOfGlyphs ) const;
+
+  /**
+   * Replaces lines for the given range of glyphs.
+   *
+   * If the @p numberOfGlyphsToRemove is zero, this operation is like an insert.
+   * If the @p numberOfGlyphsToInsert is zero, this operation is like a remove.
+   *
+   * @param[in] glyphIndex Index of the first glyph where to replace the line info.
+   * @param[in] numberOfGlyphsToRemove The number of glyphs to be the line info removed.
+   * @param[in] lines Pointer to a buffer with the lines.
+   * @param[in] numberOfGlyphsToInsert The number of characters to be the line info inserted.
+   */
+  void ReplaceLines( GlyphIndex glyphIndex,
+                     Length numberOfGlyphsToRemove,
+                     const LineRun* const lines,
+                     Length numberOfGlyphsToInsert );
 
   // Size interface
 
