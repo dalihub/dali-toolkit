@@ -24,9 +24,10 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
-#include <dali-toolkit/public-api/text/rendering-backend.h>
+#include <dali-toolkit/internal/styling/style-manager-impl.h>
 
 using Dali::Toolkit::Text::LayoutEngine;
 using Dali::Toolkit::Text::Backend;
@@ -219,6 +220,11 @@ void TextLabel::OnInitialize()
   mController = Text::Controller::New( *this );
 }
 
+void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
+{
+  GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+}
+
 Vector3 TextLabel::GetNaturalSize()
 {
   return mController->GetNaturalSize();
@@ -265,7 +271,7 @@ void TextLabel::RequestTextRelayout()
 }
 
 TextLabel::TextLabel()
-: Control( ControlBehaviour( CONTROL_BEHAVIOUR_NONE ) ),
+: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND )
 {
 }

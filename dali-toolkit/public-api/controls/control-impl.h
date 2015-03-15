@@ -477,21 +477,12 @@ private:
   virtual void OnActivated();
 
   /**
-   * @brief This method should be overridden by deriving classes when
-   * they wish to be notified when the style manager changes the theme.
+   * @brief This method should be overridden by deriving classes requiring notifications when the style changes.
    *
    * @param[in] styleManager  The StyleManager object.
+   * @param[in] change  Information denoting what has changed.
    */
-  virtual void OnThemeChange( Toolkit::StyleManager styleManager );
-
-  /**
-   * @brief This method should be overridden by deriving classes when
-   * they wish to be notified when the style changes the default font.
-   *
-   * @param[in] defaultFontChange  Information denoting whether the default font has changed.
-   * @param[in] defaultFontSizeChange Information denoting whether the default font size has changed.
-   */
-  virtual void OnFontChange( bool defaultFontChange, bool defaultFontSizeChange );
+  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
 
   /**
    * @brief Called whenever a pinch gesture is detected on this control.
@@ -720,16 +711,6 @@ private:
    * @copydoc ConnectionTrackerInterface::SignalDisconnected
    */
   virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback );
-
-  // Style
-
-  /**
-   * @brief This method is the callback for the StyleChangeSignal from StyleManager
-   *
-   * @param[in] styleManager The StyleManager Object
-   * @param[in] change  Information denoting what has changed.
-   */
-  DALI_INTERNAL void DoStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
 
 private:
 

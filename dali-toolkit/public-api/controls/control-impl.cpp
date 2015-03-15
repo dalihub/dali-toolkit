@@ -1102,7 +1102,7 @@ void Control::Initialize()
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
 
     // Register for style changes
-    styleManager.StyleChangeSignal().Connect( this, &Control::DoStyleChange );
+    styleManager.StyleChangeSignal().Connect( this, &Control::OnStyleChange );
 
     // SetTheme
     GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
@@ -1206,13 +1206,13 @@ void Control::OnActivated()
 {
 }
 
-void Control::OnThemeChange( Toolkit::StyleManager styleManager )
+void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
 {
-  GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
-}
-
-void Control::OnFontChange( bool defaultFontChange, bool defaultFontSizeChange )
-{
+  // By default the control is only interested in theme (not font) changes
+  if( change.themeChange )
+  {
+    GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+  }
 }
 
 void Control::OnPinch(const PinchGesture& pinch)
@@ -1378,18 +1378,6 @@ void Control::SignalConnected( SlotObserver* slotObserver, CallbackBase* callbac
 void Control::SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback )
 {
   mImpl->SignalDisconnected( slotObserver, callback );
-}
-
-void Control::DoStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
-{
-  if( change.themeChange )
-  {
-    OnThemeChange( styleManager );
-  }
-  else if( change.defaultFontChange || change.defaultFontSizeChange )
-  {
-    OnFontChange( change.defaultFontChange, change.defaultFontSizeChange );
-  }
 }
 
 } // namespace Internal

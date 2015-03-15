@@ -76,6 +76,11 @@ private: // From Control
   virtual void OnInitialize();
 
   /**
+   * @copydoc Control::OnStyleChange()
+   */
+  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
+
+  /**
    * @copydoc Control::GetNaturalSize()
    */
   virtual Vector3 GetNaturalSize();

@@ -28,9 +28,10 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
-#include <dali-toolkit/public-api/text/rendering-backend.h>
+#include <dali-toolkit/internal/styling/style-manager-impl.h>
 
 using namespace Dali::Toolkit::Text;
 
@@ -390,6 +391,11 @@ void TextField::OnInitialize()
   }
 }
 
+void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
+{
+  GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+}
+
 Vector3 TextField::GetNaturalSize()
 {
   return mController->GetNaturalSize();
@@ -495,7 +501,7 @@ void TextField::EnableClipping( bool clipping, const Vector2& size )
 }
 
 TextField::TextField()
-: Control( ControlBehaviour( CONTROL_BEHAVIOUR_NONE ) ),
+: Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP )
 {

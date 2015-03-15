@@ -73,7 +73,12 @@ private: // From Control
   virtual void OnInitialize();
 
   /**
-   * @copydoc Control::OnInitialize()
+   * @copydoc Control::OnStyleChange()
+   */
+  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
+
+  /**
+   * @copydoc Control::OnRelayout()
    */
   virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 
