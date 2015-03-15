@@ -29,6 +29,7 @@
 #include <dali-toolkit/internal/text/logical-model.h>
 #include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
+#include <dali-toolkit/internal/text/text-io.h>
 
 namespace Dali
 {
@@ -484,7 +485,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
             // The font is not valid. Set to zero and a default one will be set.
             fontId = 0u;
           }
-          else
+          else if( !IsValidForAllScripts( character ) )
           {
             // Add the font to the valid font cache.
             validateFontsPerScript = new ValidateFontsPerScript();
@@ -494,7 +495,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
           }
         }
       }
-    }
+    } // !isDefault
 
     // The font has not been validated. Find a default one.
     if( 0u == fontId )

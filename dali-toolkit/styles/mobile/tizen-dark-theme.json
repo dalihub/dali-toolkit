@@ -33,15 +33,15 @@ distributing this software or its derivatives.
   {
     "textlabel":
     {
-      "font-family":"UbuntuMono",
+      "font-family":"SamsungSans",
       "font-style":"Regular",
-      "point-size":13
+      "point-size":12
     },
     "textfield":
     {
-      "font-family":"DejaVuSans",
+      "font-family":"SamsungSans",
       "font-style":"Regular",
-      "point-size":10
+      "point-size":12
     },
     "scrollview":
     {

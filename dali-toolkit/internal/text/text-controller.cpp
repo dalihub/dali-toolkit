@@ -553,6 +553,20 @@ float Controller::GetDefaultPointSize() const
   return 0.0f;
 }
 
+void Controller::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfCharacters )
+{
+  if( mImpl->mFontDefaults )
+  {
+    FontRun fontRun;
+    fontRun.characterRun.characterIndex = 0;
+    fontRun.characterRun.numberOfCharacters = numberOfCharacters;
+    fontRun.fontId = mImpl->mFontDefaults->GetFontId( mImpl->mFontClient );
+    fontRun.isDefault = true;
+
+    fonts.PushBack( fontRun );
+  }
+}
+
 void Controller::EnableTextInput( DecoratorPtr decorator )
 {
   if( !mImpl->mTextInput )
@@ -632,6 +646,8 @@ bool Controller::DoRelayout( const Vector2& size,
     text.clear();
   }
 
+  const Length numberOfCharacters = mImpl->mLogicalModel->GetNumberOfCharacters();
+
   Vector<LineBreakInfo> lineBreakInfo;
   if( GET_LINE_BREAKS & operations )
   {
@@ -663,12 +679,7 @@ bool Controller::DoRelayout( const Vector2& size,
   const bool validateFonts = VALIDATE_FONTS & operations;
 
   Vector<ScriptRun> scripts;
-  Vector<FontRun> fonts;
-
-  if( mImpl->mFontDefaults )
-  {
-    // TODO - pass into ValidateFonts
-  }
+  Vector<FontRun> validFonts;
 
   if( getScripts || validateFonts )
   {
@@ -689,14 +700,18 @@ bool Controller::DoRelayout( const Vector2& size,
 
     if( validateFonts )
     {
+      // Copy the requested font defaults received via the property system.
+      // These may not be valid i.e. may not contain glyphs for the necessary scripts.
+      GetDefaultFonts( validFonts, numberOfCharacters );
+
       // Validates the fonts. If there is a character with no assigned font it sets a default one.
       // After this call, fonts are validated.
       multilanguageSupport.ValidateFonts( utf32Characters,
                                           scripts,
-                                          fonts );
+                                          validFonts );
 
       // Sets the fonts into the model.
-      mImpl->mLogicalModel->SetFonts( fonts.Begin(), fonts.Count() );
+      mImpl->mLogicalModel->SetFonts( validFonts.Begin(), validFonts.Count() );
     }
   }
 
@@ -706,8 +721,6 @@ bool Controller::DoRelayout( const Vector2& size,
     // Some vectors with data needed to get the paragraph's bidirectional info may be void
     // after the first time the text has been laid out.
     // Fill the vectors again.
-
-    const Length numberOfCharacters = mImpl->mLogicalModel->GetNumberOfCharacters();
 
     if( 0u == utf32Characters.Count() )
     {
@@ -767,11 +780,20 @@ bool Controller::DoRelayout( const Vector2& size,
   Vector<Length> charactersPerGlyph;
   if( SHAPE_TEXT & operations )
   {
+    if( 0u == validFonts.Count() )
+    {
+      validFonts.Resize( mImpl->mLogicalModel->GetNumberOfFontRuns( 0u,
+                                                                    numberOfCharacters ) );
+      mImpl->mLogicalModel->GetFontRuns( validFonts.Begin(),
+                                         0u,
+                                         numberOfCharacters );
+    }
+
     // Shapes the text.
     ShapeText( utf32Characters,
                lineBreakInfo,
                scripts,
-               fonts,
+               validFonts,
                glyphs,
                glyphsToCharactersMap,
                charactersPerGlyph );

@@ -18,9 +18,14 @@
 
 toolkit_images_dir = ../../../dali-toolkit/images
 toolkit_sounds_dir = ../../../dali-toolkit/sounds
-toolkit_styles_dir = ../../../dali-toolkit/styles
 toolkit_src_dir    = ../../../dali-toolkit/internal
 public_api_src_dir = ../../../dali-toolkit/public-api
+
+if MOBILE_PROFILE
+toolkit_styles_dir = ../../../dali-toolkit/styles/mobile
+else
+toolkit_styles_dir = ../../../dali-toolkit/styles
+endif
 
 include ../../../dali-toolkit/images/file.list
 include ../../../dali-toolkit/sounds/file.list

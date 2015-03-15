@@ -84,6 +84,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/shaper.cpp \
    $(toolkit_src_dir)/text/text-control-interface.cpp \
    $(toolkit_src_dir)/text/text-controller.cpp \
+   $(toolkit_src_dir)/text/text-io.cpp \
    $(toolkit_src_dir)/text/text-view.cpp \
    $(toolkit_src_dir)/text/text-view-interface.cpp \
    $(toolkit_src_dir)/text/visual-model.cpp \
