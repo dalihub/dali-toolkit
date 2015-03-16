@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/math/vector3.h>
@@ -28,6 +29,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
+#include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-view.h>
 
@@ -163,6 +165,14 @@ public:
    * @return The default point size.
    */
    float GetDefaultPointSize() const;
+
+  /**
+   * @brief Retrieve the default fonts.
+   *
+   * @param[out] fonts The default font family, style and point sizes.
+   * @param[in] numberOfCharacters The number of characters in the logical model.
+   */
+   void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters );
 
   /**
    * @brief Called to enable text input.

@@ -85,6 +85,10 @@ else
   dataReadOnlyDir=${prefix}/share/dali/
 fi
 
+DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDALI_PROFILE_${enable_profile}"
+AM_CONDITIONAL([COMMON_PROFILE], [test x$enable_profile = xCOMMON])
+AM_CONDITIONAL([MOBILE_PROFILE], [test x$enable_profile = xMOBILE])
+
 AC_SUBST(dataReadWriteDir)
 AC_SUBST(dataReadOnlyDir)
 AC_SUBST(DALI_TOOLKIT_CFLAGS)
