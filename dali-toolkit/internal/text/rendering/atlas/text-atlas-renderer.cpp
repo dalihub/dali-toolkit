@@ -53,6 +53,12 @@ struct AtlasRenderer::Impl
     Text::GlyphIndex mIndex;
   };
 
+  struct MaxBlockSize
+  {
+    FontId mFontId;
+    Vector2 mNeededBlockSize;
+  };
+
   Impl()
   : mSlotDelegate( this )
   {
@@ -67,6 +73,7 @@ struct AtlasRenderer::Impl
   {
     AtlasManager::AtlasSlot slot;
     std::vector< MeshRecord > meshContainer;
+    FontId lastFontId = 0;
 
     if (mImageIds.Size() )
     {
@@ -74,8 +81,7 @@ struct AtlasRenderer::Impl
       RemoveText();
     }
 
-    // Set the block size to use, if an atlas is created
-    mGlyphManager.SetAtlasSize( DEFAULT_ATLAS_SIZE, CalculateBlockSize( glyphs ) );
+    CalculateBlocksSize( glyphs );
 
     for ( uint32_t i = 0; i < glyphs.Size(); ++i )
     {
@@ -96,6 +102,20 @@ struct AtlasRenderer::Impl
         }
         else
         {
+
+          // Select correct size for new atlas if needed....?
+          if ( lastFontId != glyph.fontId )
+          {
+            for ( uint32_t j = 0; j < mBlockSizes.size(); ++j )
+            {
+              if ( mBlockSizes[ j ].mFontId == glyph.fontId )
+              {
+                mGlyphManager.SetAtlasSize( DEFAULT_ATLAS_SIZE, mBlockSizes[ j ].mNeededBlockSize );
+              }
+            }
+            lastFontId = glyph.fontId;
+          }
+
           // Glyph doesn't currently exist in atlas so upload
           BufferImage bitmap = mFontClient.CreateBitmap( glyph.fontId, glyph.index );
 
@@ -187,23 +207,40 @@ struct AtlasRenderer::Impl
     mImageIds.Resize( 0 );
   }
 
-  Vector2 CalculateBlockSize( const Vector<GlyphInfo>& glyphs )
+  void CalculateBlocksSize( const Vector<GlyphInfo>& glyphs )
   {
-    float maxWidth = glyphs[ 0 ].width;
-    float maxHeight = glyphs[ 0 ].height;
-
-    for ( uint32_t i = 1u; i < glyphs.Size(); ++i )
+    MaxBlockSize maxBlockSize;
+    for ( uint32_t i = 0; i < glyphs.Size(); ++i )
     {
-      if ( maxWidth < glyphs[ i ].width )
+      // Get the fontId of this glyph and check to see if a max size exists?
+      FontId fontId = glyphs[ i ].fontId;
+      float paddedWidth = glyphs[ i ].width + PADDING.x;
+      float paddedHeight = glyphs[ i ].height + PADDING.y;
+      bool foundFont = false;
+
+      for ( uint32_t j = 0; j < mBlockSizes.size(); ++j )
       {
-        maxWidth = glyphs[ i ].width;
+        if ( mBlockSizes[ j ].mFontId == fontId )
+        {
+          foundFont = true;
+          if ( mBlockSizes[ j ].mNeededBlockSize.x < paddedWidth )
+          {
+            mBlockSizes[ j ].mNeededBlockSize.x = paddedWidth;
+          }
+          if ( mBlockSizes[ j ].mNeededBlockSize.y < paddedHeight )
+          {
+            mBlockSizes[ j ].mNeededBlockSize.y = paddedHeight;
+          }
+        }
       }
-      if ( maxHeight < glyphs[ i ].height )
+
+      if ( !foundFont )
       {
-        maxHeight = glyphs[ i ].height;
+        maxBlockSize.mNeededBlockSize = Vector2( paddedWidth, paddedHeight );
+        maxBlockSize.mFontId = fontId;
+        mBlockSizes.push_back( maxBlockSize );
       }
     }
-    return Vector2( maxWidth + PADDING.x, maxHeight + PADDING.y );
   }
 
   RenderableActor mActor;                             ///< The actor parent which renders the text
@@ -213,6 +250,7 @@ struct AtlasRenderer::Impl
   SlotDelegate< AtlasRenderer::Impl > mSlotDelegate;  ///> Signal generated to unreference glyphs when renderable actor is removed
   ShaderEffect mBasicShader;                          ///> Shader to render L8 glyphs
   ShaderEffect mBGRAShader;                           ///> Shader to render BGRA glyphs
+  std::vector< MaxBlockSize > mBlockSizes;            ///> Maximum size needed to contain a glyph in a block within a new atlas
 };
 
 Text::RendererPtr AtlasRenderer::New()
