@@ -173,10 +173,12 @@ uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length, uint32_t* utf3
   return numberOfCharacters;
 }
 
-void Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, uint8_t* utf8 )
+uint32_t Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, uint8_t* utf8 )
 {
   const uint32_t* begin = utf32;
   const uint32_t* end = utf32 + numberOfCharacters;
+
+  uint8_t* utf8Begin = utf8;
 
   for( ; begin < end; ++begin )
   {
@@ -205,6 +207,8 @@ void Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, uint
       *utf8++ = static_cast<uint8_t>(   code          & 0x3f ) | 0x80u; // continuation byte
     }
   }
+
+  return utf8 - utf8Begin;
 }
 
 } // namespace Toolkit

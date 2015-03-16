@@ -71,8 +71,10 @@ DALI_IMPORT_API uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length
  * @param[in] utf32 The pointer to the UTF32 array.
  * @param[in] numberOfCharacters The number of characters of the UTF32 array.
  * @param[out] utf8 The pointer to the UTF8 array.
+ *
+ * @return The number of bytes.
  */
-DALI_IMPORT_API void Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, uint32_t* utf8 );
+DALI_IMPORT_API uint32_t Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, uint8_t* utf8 );
 
 } // namespace Toolkit
 
