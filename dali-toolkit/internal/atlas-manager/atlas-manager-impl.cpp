@@ -17,8 +17,9 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/atlas-manager/atlas-manager-impl.h>
 
-// EXTERNAL INCLUDES
+// EXTERNAL INCLUDE
 #include <iostream>
+#include <string.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -34,12 +35,15 @@ namespace
 {
   const Vector2 DEFAULT_ATLAS_SIZE( 512.0f, 512.0f );
   const Vector2 DEFAULT_BLOCK_SIZE( 32.0f, 32.0f );
+  const uint32_t PIXEL_PADDING( 2u );
 }
 
 AtlasManager::AtlasManager()
 : mNewAtlasSize( DEFAULT_ATLAS_SIZE ),
   mNewBlockSize( DEFAULT_BLOCK_SIZE ),
-  mAddFailPolicy( Toolkit::AtlasManager::FAIL_ON_ADD_CREATES )
+  mAddFailPolicy( Toolkit::AtlasManager::FAIL_ON_ADD_CREATES ),
+  mEdgeBuffer( NULL ),
+  mEdgeBufferSize( 0 )
 {
 }
 
@@ -51,6 +55,7 @@ AtlasManagerPtr AtlasManager::New()
 
 AtlasManager::~AtlasManager()
 {
+  delete[] mEdgeBuffer;
 }
 
 Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( SizeType width,
@@ -81,6 +86,22 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( SizeType width,
   atlasDescriptor.mMaterial = Material::New( materialLabel.str() );
   atlasDescriptor.mMaterial.SetDiffuseTexture( atlas );
   atlasDescriptor.mNextFreeBlock = 1u; // indicate next free block will be the first ( +1 )
+
+  // What size do we need for this atlas' edge buffer ( assume RGBA pixel format )?
+  uint32_t neededEdgeSize = ( blockWidth > blockHeight ? blockWidth : blockHeight ) << 2;
+
+  // Is the current edge buffer large enough?
+  if ( neededEdgeSize > mEdgeBufferSize )
+  {
+    delete[] mEdgeBuffer;
+    mEdgeBuffer = new PixelBuffer[ neededEdgeSize ];
+    memset( mEdgeBuffer, 0, neededEdgeSize );
+    mEdgeBufferSize = neededEdgeSize;
+  }
+
+  atlasDescriptor.mEdgeX = BufferImage::New( mEdgeBuffer, blockWidth, PIXEL_PADDING, pixelformat );
+  atlasDescriptor.mEdgeY = BufferImage::New( mEdgeBuffer, PIXEL_PADDING, blockHeight, pixelformat );
+
   mAtlasList.push_back( atlasDescriptor );
   return mAtlasList.size();
 }
@@ -210,29 +231,18 @@ AtlasManager::SizeType AtlasManager::CheckAtlas( SizeType atlas,
 {
   if ( pixelFormat == mAtlasList[ atlas ].mPixelFormat )
   {
-    // Work out how many blocks wide and high our bitmap is in the atlas' block size
-    SizeType widthInBlocks = width / mAtlasList[ atlas ].mBlockWidth;
-    if ( width % mAtlasList[ atlas ].mBlockWidth )
-    {
-      widthInBlocks++;
-    }
-    SizeType heightInBlocks = height / mAtlasList[ atlas ].mBlockHeight;
-    if ( height % mAtlasList[ atlas ].mBlockHeight )
-    {
-      heightInBlocks++;
-    }
-    blockArea = widthInBlocks * heightInBlocks;
-
     // Check to see if there are any unused blocks in this atlas to accomodate our image
     SizeType blocksInX = mAtlasList[ atlas ].mWidth / mAtlasList[ atlas ].mBlockWidth;
     SizeType blocksInY = mAtlasList[ atlas ].mHeight / mAtlasList[ atlas ].mBlockHeight;
     totalBlocks = blocksInX * blocksInY;
     SizeType blocksFree = mAtlasList[ atlas ].mNextFreeBlock ? totalBlocks - mAtlasList[ atlas ].mNextFreeBlock + 1u : 0;
 
-    // Check to see if there are enough blocks to accomodate our sliced image ?
-    if ( blockArea <= ( mAtlasList[ atlas ].mFreeBlocksList.Size() + blocksFree ) )
+    // Check to see if the image will fit in these blocks, if not we'll need to create a new atlas
+    if ( blocksFree
+         && width + PIXEL_PADDING <= mAtlasList[ atlas ].mBlockWidth
+         && height + PIXEL_PADDING <= mAtlasList[ atlas ].mBlockHeight )
     {
-      // Yes, we've found room
+      blockArea = 1u;
       return ( atlas + 1u );
     }
   }
@@ -576,9 +586,26 @@ void AtlasManager::UploadImage( const BufferImage& image,
   SizeType blockOffsetX = blockX * atlasBlockWidth;
   SizeType blockOffsetY = blockY * atlasBlockHeight;
 
+  SizeType width = image.GetWidth();
+  SizeType height = image.GetHeight();
+
   if ( !mAtlasList[ atlas ].mAtlas.Upload( image, blockOffsetX, blockOffsetY ) )
   {
     DALI_LOG_ERROR("Uploading block to Atlas Failed!.\n");
+  }
+  if ( blockOffsetY + height + PIXEL_PADDING <= mAtlasList[ atlas ].mHeight )
+  {
+    if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mEdgeX, blockOffsetX, blockOffsetY + height ) )
+    {
+      DALI_LOG_ERROR("Uploading edgeX to Atlas Failed!.\n");
+    }
+  }
+  if ( blockOffsetX + width + PIXEL_PADDING <= mAtlasList[ atlas ].mWidth )
+  {
+    if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mEdgeY, blockOffsetX + width, blockOffsetY ) )
+    {
+      DALI_LOG_ERROR("Uploading edgeY to Atlas Failed!.\n");
+    }
   }
 }
 
