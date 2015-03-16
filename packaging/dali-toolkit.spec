@@ -7,6 +7,8 @@ License:    Apache-2.0
 URL:        https://review.tizen.org/git/?p=platform/core/uifw/dali-toolkit.git;a=summary
 Source0:    %{name}-%{version}.tar.gz
 
+%define dali_profile MOBILE
+
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 Requires:       dali
@@ -58,7 +60,7 @@ cd %{_builddir}/dali-toolkit-%{version}/build/tizen
 autoreconf --install
 DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
 DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
-%configure
+%configure --enable-profile=%{dali_profile}
 make %{?jobs:-j%jobs}
 
 ##############################

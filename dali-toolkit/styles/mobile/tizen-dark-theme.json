@@ -34,15 +34,57 @@ distributing this software or its derivatives.
     "textlabel":
     {
       "font-family":"SamsungSans",
-      "font-style":"Regular",
-      "point-size":12
+      "font-style":"Regular"
     },
+
+    "textlabel-font-size-0":
+    {
+      "point-size":8
+    },
+    "textlabel-font-size-1":
+    {
+      "point-size":10
+    },
+    "textlabel-font-size-2":
+    {
+      "point-size":15
+    },
+    "textlabel-font-size-3":
+    {
+      "point-size":19
+    },
+    "textlabel-font-size-4":
+    {
+      "point-size":25
+    },
+
     "textfield":
     {
       "font-family":"SamsungSans",
-      "font-style":"Regular",
-      "point-size":12
+      "font-style":"Regular"
     },
+
+    "textfield-font-size-0":
+    {
+      "point-size":10
+    },
+    "textfield-font-size-1":
+    {
+      "point-size":10
+    },
+    "textfield-font-size-2":
+    {
+      "point-size":10
+    },
+    "textfield-font-size-3":
+    {
+      "point-size":10
+    },
+    "textfield-font-size-4":
+    {
+      "point-size":10
+    },
+
     "scrollview":
     {
       "overshoot-effect-color":"B018"

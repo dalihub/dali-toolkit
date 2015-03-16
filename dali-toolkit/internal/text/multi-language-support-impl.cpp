@@ -450,12 +450,30 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
       {
         // Check in the valid fonts cache.
         ValidateFontsPerScript* validateFontsPerScript = *( validFontsPerScriptCacheBuffer + script );
+
+        if( NULL == validateFontsPerScript )
+        {
+          validateFontsPerScript = new ValidateFontsPerScript();
+        }
+
         if( NULL != validateFontsPerScript )
         {
           if( !validateFontsPerScript->FindValidFont( fontId ) )
           {
             // Use the font client to validate the font.
-            const GlyphIndex glyphIndex = fontClient.GetGlyphIndex( fontId, character );
+            GlyphIndex glyphIndex = fontClient.GetGlyphIndex( fontId, character );
+
+            // Emojis are present in many monochrome fonts; prefer color by default.
+            if( TextAbstraction::EMOJI == script &&
+                0u != glyphIndex )
+            {
+              BufferImage bitmap = fontClient.CreateBitmap( fontId, glyphIndex );
+              if( bitmap &&
+                  Pixel::BGRA8888 != bitmap.GetPixelFormat() )
+              {
+                glyphIndex = 0;
+              }
+            }
 
             if( 0u == glyphIndex )
             {
@@ -470,28 +488,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
               // Add the font to the valid font cache.
               validateFontsPerScript->mValidFonts.PushBack( fontId );
             }
-          }
-        }
-        else
-        {
-          // Use the font client to validate the font.
-          const GlyphIndex glyphIndex = fontClient.GetGlyphIndex( fontId, character );
-
-          if( 0u == glyphIndex )
-          {
-            // Get the point size of the current font. It will be used to get a default font id.
-            pointSize = fontClient.GetPointSize( fontId );
-
-            // The font is not valid. Set to zero and a default one will be set.
-            fontId = 0u;
-          }
-          else if( !IsValidForAllScripts( character ) )
-          {
-            // Add the font to the valid font cache.
-            validateFontsPerScript = new ValidateFontsPerScript();
-            *( validFontsPerScriptCacheBuffer + script ) = validateFontsPerScript;
-
-            validateFontsPerScript->mValidFonts.PushBack( fontId );
           }
         }
       }

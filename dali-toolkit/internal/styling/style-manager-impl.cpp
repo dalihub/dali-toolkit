@@ -36,6 +36,7 @@ namespace
 
 const char* LANDSCAPE_QUALIFIER = "landscape";
 const char* PORTRAIT_QUALIFIER  = "portrait";
+const char* FONT_SIZE_QUALIFIER = "font-size-";
 
 const char* DEFAULT_THEME = DALI_STYLE_DIR "tizen-default-theme.json";
 
@@ -99,7 +100,8 @@ Toolkit::StyleManager StyleManager::Get()
 }
 
 StyleManager::StyleManager()
-  : mOrientationDegrees( 0 )  // Portrait
+: mOrientationDegrees( 0 ),  // Portrait
+  mDefaultFontSize( -1 )
 {
   // Add theme builder constants
   mThemeBuilderConstants[ PACKAGE_PATH_KEY ] = DEFAULT_PACKAGE_PATH;
@@ -110,6 +112,8 @@ StyleManager::StyleManager()
   if( styleMonitor )
   {
     styleMonitor.StyleChangeSignal().Connect( this, &StyleManager::StyleMonitorChange );
+
+    mDefaultFontSize = styleMonitor.GetDefaultFontSize();
   }
 }
 
@@ -266,6 +270,14 @@ void StyleManager::ApplyStyle( Toolkit::Builder builder, Toolkit::Control contro
     // Remove the last qualifier in an attempt to find a style that is valid
     qualifiers.pop_back();
   }
+
+  if( mDefaultFontSize >= 0 )
+  {
+    // Apply the style for logical font size
+    std::stringstream fontSizeQualifier;
+    fontSizeQualifier << styleName << "-" << FONT_SIZE_QUALIFIER << mDefaultFontSize;
+    builder.ApplyStyle( fontSizeQualifier.str(), control );
+  }
 }
 
 void StyleManager::ApplyThemeStyle( Toolkit::Control control )
@@ -380,6 +392,11 @@ void StyleManager::CacheBuilder( Toolkit::Builder builder, const std::string& ke
 
 void StyleManager::StyleMonitorChange( StyleMonitor styleMonitor, StyleChange styleChange )
 {
+  if( styleChange.defaultFontSizeChange )
+  {
+    mDefaultFontSize = styleMonitor.GetDefaultFontSize();
+  }
+
   mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), styleChange );
 }
 

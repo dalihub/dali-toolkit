@@ -677,6 +677,18 @@ void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
   mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
   mImpl->mOperationsPending = ALL_OPERATIONS;
   mImpl->mRecalculateNaturalSize = true;
+
+  // Clear the font-specific data
+  mImpl->mLogicalModel->mFontRuns.Clear();
+  mImpl->mVisualModel->mGlyphs.Clear();
+  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
+  mImpl->mVisualModel->mCharactersToGlyph.Clear();
+  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
+  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
+  mImpl->mVisualModel->mGlyphPositions.Clear();
+  mImpl->mVisualModel->mLines.Clear();
+
+  RequestRelayout();
 }
 
 const std::string& Controller::GetDefaultFontFamily() const
@@ -700,6 +712,18 @@ void Controller::SetDefaultFontStyle( const std::string& defaultFontStyle )
   mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
   mImpl->mOperationsPending = ALL_OPERATIONS;
   mImpl->mRecalculateNaturalSize = true;
+
+  // Clear the font-specific data
+  mImpl->mLogicalModel->mFontRuns.Clear();
+  mImpl->mVisualModel->mGlyphs.Clear();
+  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
+  mImpl->mVisualModel->mCharactersToGlyph.Clear();
+  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
+  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
+  mImpl->mVisualModel->mGlyphPositions.Clear();
+  mImpl->mVisualModel->mLines.Clear();
+
+  RequestRelayout();
 }
 
 const std::string& Controller::GetDefaultFontStyle() const
@@ -723,6 +747,18 @@ void Controller::SetDefaultPointSize( float pointSize )
   mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
   mImpl->mOperationsPending = ALL_OPERATIONS;
   mImpl->mRecalculateNaturalSize = true;
+
+  // Clear the font-specific data
+  mImpl->mLogicalModel->mFontRuns.Clear();
+  mImpl->mVisualModel->mGlyphs.Clear();
+  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
+  mImpl->mVisualModel->mCharactersToGlyph.Clear();
+  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
+  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
+  mImpl->mVisualModel->mGlyphPositions.Clear();
+  mImpl->mVisualModel->mLines.Clear();
+
+  RequestRelayout();
 }
 
 float Controller::GetDefaultPointSize() const
