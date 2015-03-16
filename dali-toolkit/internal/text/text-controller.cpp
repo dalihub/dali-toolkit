@@ -102,7 +102,9 @@ struct Controller::TextInput
   : mLogicalModel( logicalModel ),
     mVisualModel( visualModel ),
     mDecorator( decorator ),
-    mState( INACTIVE )
+    mState( INACTIVE ),
+    mDecoratorUpdated( false ),
+    mCursorBlinkEnabled( true )
   {
   }
 
@@ -155,6 +157,14 @@ struct Controller::TextInput
 
   void OnKeyboardFocus( bool hasFocus )
   {
+    if( !hasFocus )
+    {
+      ChangeState( INACTIVE );
+    }
+    else
+    {
+      ChangeState( EDITING );
+    }
   }
 
   void OnKeyEvent( const Event& event )
@@ -278,7 +288,10 @@ struct Controller::TextInput
       else if( EDITING == mState )
       {
         mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
-        mDecorator->StartCursorBlink();
+        if( mCursorBlinkEnabled )
+        {
+          mDecorator->StartCursorBlink();
+        }
         mDecorator->SetGrabHandleActive( true );
         mDecorator->SetSelectionActive( false );
         mDecoratorUpdated = true;
@@ -348,7 +361,8 @@ struct Controller::TextInput
 
   State mState;
 
-  bool mDecoratorUpdated;
+  bool mDecoratorUpdated   : 1;
+  bool mCursorBlinkEnabled : 1;
 };
 
 struct Controller::FontDefaults
@@ -575,12 +589,45 @@ void Controller::EnableTextInput( DecoratorPtr decorator )
   }
 }
 
+void Controller::SetEnableCursorBlink( bool enable )
+{
+  DALI_ASSERT_DEBUG( NULL != mImpl->mTextInput && "TextInput disabled" );
+
+  if( mImpl->mTextInput )
+  {
+    mImpl->mTextInput->mCursorBlinkEnabled = enable;
+
+    if( !enable &&
+        mImpl->mTextInput->mDecorator )
+    {
+      mImpl->mTextInput->mDecorator->StopCursorBlink();
+    }
+  }
+}
+
+bool Controller::GetEnableCursorBlink() const
+{
+  if( mImpl->mTextInput )
+  {
+    return mImpl->mTextInput->mCursorBlinkEnabled;
+  }
+
+  return false;
+}
+
 bool Controller::Relayout( const Vector2& size )
 {
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
+    bool glyphsRemoved( false );
+    if( 0u != mImpl->mVisualModel->GetNumberOfGlyphPositions() )
+    {
+      mImpl->mVisualModel->SetGlyphPositions( NULL, 0u );
+      glyphsRemoved = true;
+    }
+
     // Not worth to relayout if width or height is equal to zero.
-    return false;
+    return glyphsRemoved;
   }
 
   if( size != mImpl->mControlSize )

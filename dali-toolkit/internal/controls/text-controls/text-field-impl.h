@@ -96,6 +96,16 @@ private: // From Control
   virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 
   /**
+   * @copydoc Control::OnKeyInputFocusGained()
+   */
+  virtual void OnKeyInputFocusGained();
+
+  /**
+   * @copydoc Control::OnKeyInputFocusLost()
+   */
+  virtual void OnKeyInputFocusLost();
+
+  /**
    * Received for single & double taps
    */
   virtual void OnTap( const TapGesture& tap );
@@ -119,6 +129,13 @@ private: // Implementation
    * @param[in] size The area to clip within.
    */
   void EnableClipping( bool clipping, const Vector2& size );
+
+  /**
+   * @brief Callback when keyboard is shown/hidden.
+   *
+   * @param[in] keyboardShown True if keyboard is shown.
+   */
+  void KeyboardStatusChanged( bool keyboardShown );
 
   /**
    * Construct a new TextField.

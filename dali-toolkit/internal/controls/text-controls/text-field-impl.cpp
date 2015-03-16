@@ -26,6 +26,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/adaptor-framework/virtual-keyboard.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
@@ -210,7 +211,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          //impl.mController->SetEnableCursorBlink( value.Get< bool >() ); TODO
+          impl.mController->SetEnableCursorBlink( value.Get< bool >() );
         }
         break;
       }
@@ -324,7 +325,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextField::Property::ENABLE_CURSOR_BLINK:
       {
-        //value = impl.mController->GetEnableCursorBlink(); TODO
+        value = impl.mController->GetEnableCursorBlink();
         break;
       }
       case Toolkit::TextField::Property::CURSOR_BLINK_INTERVAL:
@@ -450,8 +451,28 @@ void TextField::OnRelayout( const Vector2& size, ActorSizeContainer& container )
   }
 }
 
+void TextField::OnKeyInputFocusGained()
+{
+  VirtualKeyboard::StatusChangedSignal().Connect( this, &TextField::KeyboardStatusChanged );
+
+  mController->KeyboardFocusGainEvent();
+}
+
+void TextField::OnKeyInputFocusLost()
+{
+  VirtualKeyboard::StatusChangedSignal().Disconnect( this, &TextField::KeyboardStatusChanged );
+
+  mController->KeyboardFocusLostEvent();
+}
+
 void TextField::OnTap( const TapGesture& gesture )
 {
+  // Show the keyboard if it was hidden.
+  if (!VirtualKeyboard::IsVisible())
+  {
+    VirtualKeyboard::Show();
+  }
+
   SetKeyInputFocus();
 
   mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x, gesture.localPoint.y );
@@ -497,6 +518,15 @@ void TextField::EnableClipping( bool clipping, const Vector2& size )
   {
     // Note - this will automatically remove the root & image actors
     mClipper.Reset();
+  }
+}
+
+void TextField::KeyboardStatusChanged(bool keyboardShown)
+{
+  // Just hide the grab handle when keyboard is hidden.
+  if (!keyboardShown )
+  {
+    mController->KeyboardFocusLostEvent();
   }
 }
 

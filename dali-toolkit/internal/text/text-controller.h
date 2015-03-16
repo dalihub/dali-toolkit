@@ -136,7 +136,7 @@ public:
    *
    * @return The default font family.
    */
-   const std::string& GetDefaultFontFamily() const;
+  const std::string& GetDefaultFontFamily() const;
 
   /**
    * @brief Set the default font style.
@@ -150,7 +150,7 @@ public:
    *
    * @return The default font style.
    */
-   const std::string& GetDefaultFontStyle() const;
+  const std::string& GetDefaultFontStyle() const;
 
   /**
    * @brief Set the default point size.
@@ -164,7 +164,7 @@ public:
    *
    * @return The default point size.
    */
-   float GetDefaultPointSize() const;
+  float GetDefaultPointSize() const;
 
   /**
    * @brief Retrieve the default fonts.
@@ -172,7 +172,7 @@ public:
    * @param[out] fonts The default font family, style and point sizes.
    * @param[in] numberOfCharacters The number of characters in the logical model.
    */
-   void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters );
+  void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters );
 
   /**
    * @brief Called to enable text input.
@@ -181,6 +181,21 @@ public:
    * @param[in] decorator Used to create cursor, selection handle decorations etc.
    */
   void EnableTextInput( DecoratorPtr decorator );
+
+  /**
+   * @brief Called to enable/disable cursor blink.
+   *
+   * @note Only editable controls should calls this.
+   * @param[in] enabled Whether the cursor should blink or not.
+   */
+  void SetEnableCursorBlink( bool enable );
+
+  /**
+   * @brief Query whether cursor blink is enabled.
+   *
+   * @return Whether the cursor should blink or not.
+   */
+  bool GetEnableCursorBlink() const;
 
   /**
    * @brief Triggers a relayout which updates View (if necessary).
