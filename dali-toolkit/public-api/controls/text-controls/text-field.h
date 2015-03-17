@@ -62,7 +62,6 @@ public:
       FONT_STYLE,                               ///< name "font-style",              The requested font style e.g. Regular/Italic,                             type STRING
       POINT_SIZE,                               ///< name "point-size",              The size of font in points,                                               type FLOAT
       EXCEED_POLICY,                            ///< name "exceed-policy"            Specifies how the text is truncated when it does not fit,                 type INT
-      CURSOR_IMAGE,                             ///< name "cursor-image",            The image to display for cursors,                                         type STRING
       PRIMARY_CURSOR_COLOR,                     ///< name "primary-cursor-color",    The color to apply to the primary cursor,                                 type VECTOR4
       SECONDARY_CURSOR_COLOR,                   ///< name "secondary-cursor-color",  The color to apply to the secondary cursor,                               type VECTOR4
       ENABLE_CURSOR_BLINK,                      ///< name "enable-cursor-blink",     Whether the cursor should blink or not,                                   type BOOLEAN

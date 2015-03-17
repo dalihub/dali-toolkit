@@ -166,8 +166,9 @@ public:
    * @brief The decorator waits until a relayout before creating actors etc.
    *
    * @param[in] size The size of the parent control after size-negotiation.
+   * @param[in] scrollPosition The cursor, grab-handle positions etc. should be offset by this.
    */
-  void Relayout( const Dali::Vector2& size );
+  void Relayout( const Dali::Vector2& size, const Vector2& scrollPosition );
 
   /**
    * @brief Sets which of the cursors are active.
@@ -203,20 +204,6 @@ public:
    * @param[out] height The logical height of the cursor.
    */
   void GetPosition( Cursor cursor, float& x, float& y, float& height ) const;
-
-  /**
-   * @brief Sets the image for a cursor.
-   *
-   * @param[in] image The image to use.
-   */
-  void SetCursorImage( Dali::Image image );
-
-  /**
-   * @brief Retrieves the image for a cursor.
-   *
-   * @return The cursor image.
-   */
-  Dali::Image GetCursorImage() const;
 
   /**
    * @brief Sets the color for a cursor.

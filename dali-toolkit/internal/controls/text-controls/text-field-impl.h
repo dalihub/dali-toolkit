@@ -109,9 +109,14 @@ private: // From Control
   virtual void OnKeyInputFocusLost();
 
   /**
-   * Received for single & double taps
+   * @copydoc Control::OnTap()
    */
   virtual void OnTap( const TapGesture& tap );
+
+  /**
+   * @copydoc Control::OnPan()
+   */
+  virtual void OnPan( const PanGesture& gesture );
 
   /**
    * @copydoc Dali::CustomActorImpl::OnKeyEvent(const KeyEvent&)

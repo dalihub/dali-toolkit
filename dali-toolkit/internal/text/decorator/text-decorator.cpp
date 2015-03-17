@@ -41,6 +41,7 @@
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
+#include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 
 #ifdef DEBUG_ENABLED
 #define DECORATOR_DEBUG
@@ -58,7 +59,6 @@ const char* DEFAULT_SELECTION_HANDLE_ONE( DALI_IMAGE_DIR "text-input-selection-h
 const char* DEFAULT_SELECTION_HANDLE_TWO( DALI_IMAGE_DIR "text-input-selection-handle-right.png" );
 //const char* DEFAULT_SELECTION_HANDLE_ONE_PRESSED( DALI_IMAGE_DIR "text-input-selection-handle-left-press.png" );
 //const char* DEFAULT_SELECTION_HANDLE_TWO_PRESSED( DALI_IMAGE_DIR "text-input-selection-handle-right-press.png" );
-const char* DEFAULT_CURSOR_IMAGE( DALI_IMAGE_DIR "decorator-cursor.png");
 
 const Dali::Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE( 1.5f, 2.0f, 1.0f );
 const Dali::Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.5f, 1.5f, 1.0f );
@@ -287,7 +287,7 @@ struct Decorator::Impl : public ConnectionTracker
    * Relayout of the decorations owned by the decorator.
    * @param[in] size The Size of the UI control the decorater is adding it's decorations to.
    */
-  void Relayout( const Vector2& size )
+  void Relayout( const Vector2& size, const Vector2& scrollPosition )
   {
     // TODO - Remove this if nothing is active
     CreateActiveLayer();
@@ -296,11 +296,15 @@ struct Decorator::Impl : public ConnectionTracker
     CreateCursors();
     if( mPrimaryCursor )
     {
-      mPrimaryCursor.SetPosition( mCursor[PRIMARY_CURSOR].x, mCursor[PRIMARY_CURSOR].y );
+      mPrimaryCursor.SetPosition( mCursor[PRIMARY_CURSOR].x + scrollPosition.x,
+                                  mCursor[PRIMARY_CURSOR].y + scrollPosition.y );
+      mPrimaryCursor.SetSize( 1.0f, mCursor[PRIMARY_CURSOR].height );
     }
     if( mSecondaryCursor )
     {
-      mSecondaryCursor.SetPosition( mCursor[SECONDARY_CURSOR].x, mCursor[SECONDARY_CURSOR].y );
+      mSecondaryCursor.SetPosition( mCursor[SECONDARY_CURSOR].x + scrollPosition.x,
+                                    mCursor[SECONDARY_CURSOR].y + scrollPosition.y );
+      mSecondaryCursor.SetSize( 1.0f, mCursor[SECONDARY_CURSOR].height );
     }
 
     // Show or hide the grab handle
@@ -310,7 +314,8 @@ struct Decorator::Impl : public ConnectionTracker
 
       CreateGrabHandle();
 
-      mGrabHandle.SetPosition( mCursor[PRIMARY_CURSOR].x, mCursor[PRIMARY_CURSOR].y + mCursor[PRIMARY_CURSOR].height );
+      mGrabHandle.SetPosition( mCursor[PRIMARY_CURSOR].x + scrollPosition.x,
+                               mCursor[PRIMARY_CURSOR].y + scrollPosition.y + mCursor[PRIMARY_CURSOR].height );
     }
     else if( mGrabHandle )
     {
@@ -325,10 +330,12 @@ struct Decorator::Impl : public ConnectionTracker
       CreateSelectionHandles();
 
       SelectionHandleImpl& primary = mSelectionHandle[ PRIMARY_SELECTION_HANDLE ];
-      primary.actor.SetPosition( primary.x, primary.y + primary.cursorHeight );
+      primary.actor.SetPosition( primary.x + scrollPosition.x,
+                                 primary.y + scrollPosition.y + primary.cursorHeight );
 
       SelectionHandleImpl& secondary = mSelectionHandle[ SECONDARY_SELECTION_HANDLE ];
-      secondary.actor.SetPosition( secondary.x, secondary.y + secondary.cursorHeight );
+      secondary.actor.SetPosition( secondary.x + scrollPosition.x,
+                                   secondary.y + scrollPosition.y + secondary.cursorHeight );
 
       //CreateHighlight(); TODO
     }
@@ -351,11 +358,8 @@ struct Decorator::Impl : public ConnectionTracker
 
   void CreateCursor( ImageActor& cursor )
   {
-    if ( !mCursorImage )
-    {
-      mCursorImage = ResourceImage::New( DEFAULT_CURSOR_IMAGE );
-    }
-    cursor = ImageActor::New( mCursorImage );
+    cursor = CreateSolidColorActor( Color::WHITE );
+    cursor.SetParentOrigin( ParentOrigin::TOP_LEFT );
     cursor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
   }
 
@@ -941,9 +945,9 @@ const Rect<int>& Decorator::GetBoundingBox() const
   return mImpl->mBoundingBox;
 }
 
-void Decorator::Relayout( const Vector2& size )
+void Decorator::Relayout( const Vector2& size, const Vector2& scrollPosition )
 {
-  mImpl->Relayout( size );
+  mImpl->Relayout( size, scrollPosition );
 }
 
 /** Cursor **/
@@ -974,16 +978,6 @@ void Decorator::GetPosition( Cursor cursor, float& x, float& y, float& height ) 
   x = mImpl->mCursor[cursor].x;
   y = mImpl->mCursor[cursor].y;
   height = mImpl->mCursor[cursor].height;
-}
-
-void Decorator::SetCursorImage( Dali::Image image )
-{
-  mImpl->mCursorImage = image;
-}
-
-Dali::Image Decorator::GetCursorImage() const
-{
-  return mImpl->mCursorImage;
 }
 
 void Decorator::SetColor( Cursor cursor, const Dali::Vector4& color )

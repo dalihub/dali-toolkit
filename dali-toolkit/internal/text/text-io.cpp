@@ -88,6 +88,24 @@ std::ostream& operator<< (std::ostream& o, const Vector<FontRun>& fontRun)
   return o << std::dec;
 }
 
+std::ostream& operator<< (std::ostream& o, const Vector<LineRun>& lineRuns)
+{
+  for( unsigned int i=0; i<lineRuns.Count(); ++i )
+  {
+    // e.g. Print "Line 0 Glyphs: 0->9 Characters: 0->9 (10)" for a ten character run staring from beginning of the model
+    o << "Line " << i << " Glyphs: " << lineRuns[i].glyphIndex << "->" << (lineRuns[i].glyphIndex + lineRuns[i].numberOfGlyphs );
+    o << " Characters: " << lineRuns[i].characterRun.characterIndex << "->" << (lineRuns[i].characterRun.characterIndex + lineRuns[i].characterRun.numberOfCharacters );
+    o << " Size: " << lineRuns[i].lineSize;
+
+    if( i+1 < lineRuns.Count() )
+    {
+      o << ", ";
+    }
+  }
+
+  return o << std::dec;
+}
+
 } // namespace Text
 
 } // namespace Toolkit

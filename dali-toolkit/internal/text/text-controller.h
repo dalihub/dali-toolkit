@@ -22,6 +22,7 @@
 #include <string>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/events/gesture.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector2.h>
@@ -195,6 +196,13 @@ public:
   bool GetEnableCursorBlink() const;
 
   /**
+   * @brief Query the current scroll position; the UI control is responsible for moving actors to this position.
+   *
+   * @return The scroll position.
+   */
+  const Vector2& GetScrollPosition() const;
+
+  /**
    * @copydoc Control::GetNaturalSize()
    */
   Vector3 GetNaturalSize();
@@ -297,6 +305,14 @@ public:
    * @param[in] y The y position relative to the top-left of the parent control.
    */
   void TapEvent( unsigned int tapCount, float x, float y );
+
+  /**
+   * @brief Caller by editable UI controls when a pan gesture occurs.
+   *
+   * @param[in] state The state of the gesture.
+   * @param[in] displacement This distance panned since the last pan gesture.
+   */
+  void PanEvent( Gesture::State state, const Vector2& displacement );
 
   /**
    * @copydoc Dali::Toolkit::Text::Decorator::Observer::GrabHandleEvent()

@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/font-run.h>
+#include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
 
@@ -62,6 +63,15 @@ std::ostream& operator<< (std::ostream& o, const Vector<ScriptRun>& scriptRuns);
  * @return The output stream operator.
  */
 std::ostream& operator<< (std::ostream& o, const Vector<FontRun>& fontRuns);
+
+/**
+ * @brief Print a vector of line runs.
+ *
+ * @param [in] o The output stream operator.
+ * @param [in] lineRuns The line runs to print.
+ * @return The output stream operator.
+ */
+std::ostream& operator<< (std::ostream& o, const Vector<LineRun>& lineRuns);
 
 } // namespace Text
 

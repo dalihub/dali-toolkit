@@ -78,7 +78,6 @@ DALI_PROPERTY_REGISTRATION( TextField, "font-family",             STRING,    FON
 DALI_PROPERTY_REGISTRATION( TextField, "font-style",              STRING,    FONT_STYLE              )
 DALI_PROPERTY_REGISTRATION( TextField, "point-size",              FLOAT,     POINT_SIZE              )
 DALI_PROPERTY_REGISTRATION( TextField, "exceed-policy",           INTEGER,   EXCEED_POLICY           )
-DALI_PROPERTY_REGISTRATION( TextField, "cursor-image",            STRING,    CURSOR_IMAGE            )
 DALI_PROPERTY_REGISTRATION( TextField, "primary-cursor-color",    VECTOR4,   PRIMARY_CURSOR_COLOR    )
 DALI_PROPERTY_REGISTRATION( TextField, "secondary-cursor-color",  VECTOR4,   SECONDARY_CURSOR_COLOR  )
 DALI_PROPERTY_REGISTRATION( TextField, "enable-cursor-blink",     BOOLEAN,   ENABLE_CURSOR_BLINK     )
@@ -189,16 +188,6 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::EXCEED_POLICY:
       {
         impl.mExceedPolicy = value.Get< int >();
-        break;
-      }
-      case Toolkit::TextField::Property::CURSOR_IMAGE:
-      {
-        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-
-        if( impl.mDecorator )
-        {
-          impl.mDecorator->SetCursorImage( image );
-        }
         break;
       }
       case Toolkit::TextField::Property::PRIMARY_CURSOR_COLOR:
@@ -319,18 +308,6 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         value = impl.mExceedPolicy;
         break;
       }
-      case Toolkit::TextField::Property::CURSOR_IMAGE:
-      {
-        if( impl.mDecorator )
-        {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetCursorImage() );
-          if( image )
-          {
-            value = image.GetUrl();
-          }
-        }
-        break;
-      }
       case Toolkit::TextField::Property::PRIMARY_CURSOR_COLOR:
       {
         if( impl.mDecorator )
@@ -365,18 +342,6 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mDecorator )
         {
           value = impl.mDecorator->GetCursorBlinkDuration();
-        }
-        break;
-      }
-      case Toolkit::TextField::Property::GRAB_HANDLE_IMAGE:
-      {
-        if( impl.mDecorator )
-        {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetCursorImage() );
-          if( image )
-          {
-            value = image.GetUrl();
-          }
         }
         break;
       }
@@ -417,6 +382,7 @@ void TextField::OnInitialize()
   // Forward input events to controller
   EnableGestureDetection(Gesture::Tap);
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
+  EnableGestureDetection(Gesture::Pan);
 
   // Set BoundingBox to stage size if not already set.
   if ( mDecorator->GetBoundingBox().IsEmpty() )
@@ -448,7 +414,7 @@ void TextField::OnRelayout( const Vector2& size, ActorSizeContainer& container )
   {
     if( mDecorator )
     {
-      mDecorator->Relayout( size );
+      mDecorator->Relayout( size, mController->GetScrollPosition() );
     }
 
     if( !mRenderer )
@@ -472,6 +438,9 @@ void TextField::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 
     if( mRenderableActor )
     {
+      const Vector2& scrollPosition = mController->GetScrollPosition();
+      mRenderableActor.SetPosition( scrollPosition.x, scrollPosition.y );
+
       // Make sure the actor is parented correctly with/without clipping
       if( mClipper )
       {
@@ -537,6 +506,11 @@ void TextField::OnTap( const TapGesture& gesture )
   mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x, gesture.localPoint.y );
 }
 
+void TextField::OnPan( const PanGesture& gesture )
+{
+  mController->PanEvent( gesture.state, gesture.displacement );
+}
+
 bool TextField::OnKeyEvent( const KeyEvent& event )
 {
   if( Dali::DALI_KEY_ESCAPE == event.keyCode )
@@ -547,30 +521,19 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
   return mController->KeyEvent( event );
 }
 
-ImfManager::ImfCallbackData TextField::OnImfEvent( Dali::ImfManager& imfManager, const ImfManager::ImfEventData&  imfEvent )
+ImfManager::ImfCallbackData TextField::OnImfEvent( Dali::ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
 {
   switch ( imfEvent.eventName )
   {
-    case ImfManager::PREEDIT:
-    {
-      // TODO
-      break;
-    }
     case ImfManager::COMMIT:
     {
-      // TODO
+      KeyEvent event( "", imfEvent.predictiveString, 0, 0, 0, KeyEvent::Down );
+      mController->KeyEvent( event );
       break;
     }
+    case ImfManager::PREEDIT: // fall through
     case ImfManager::DELETESURROUNDING:
-    {
-      // TODO
-      break;
-    }
     case ImfManager::GETSURROUNDING:
-    {
-      // TODO
-      break;
-    }
     case ImfManager::VOID:
     {
       // do nothing
