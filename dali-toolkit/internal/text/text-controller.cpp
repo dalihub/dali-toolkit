@@ -34,6 +34,7 @@
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
+#include <dali-toolkit/internal/text/text-io.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
 
@@ -41,8 +42,23 @@ using std::vector;
 
 namespace
 {
+
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 const std::string EMPTY_STRING;
+
+enum ModifyType
+{
+  REPLACE_TEXT, ///< Replace the entire text
+  INSERT_TEXT,  ///< Insert characters at the current cursor position
+  DELETE_TEXT   ///< Delete a character at the current cursor position
+};
+
+struct ModifyEvent
+{
+  ModifyType type;
+  std::string text;
+};
+
 } // namespace
 
 namespace Dali
@@ -61,7 +77,7 @@ struct Controller::TextInput
   {
     KEYBOARD_FOCUS_GAIN_EVENT,
     KEYBOARD_FOCUS_LOST_EVENT,
-    KEY_EVENT,
+    CURSOR_KEY_EVENT,
     TAP_EVENT,
     GRAB_HANDLE_EVENT
   };
@@ -71,7 +87,6 @@ struct Controller::TextInput
     int mInt;
     unsigned int mUint;
     float mFloat;
-    char* mString;
   };
 
   struct Event
@@ -103,6 +118,8 @@ struct Controller::TextInput
     mVisualModel( visualModel ),
     mDecorator( decorator ),
     mState( INACTIVE ),
+    mPrimaryCursorPosition( 0u ),
+    mSecondaryCursorPosition( 0u ),
     mDecoratorUpdated( false ),
     mCursorBlinkEnabled( true )
   {
@@ -131,9 +148,9 @@ struct Controller::TextInput
             OnKeyboardFocus( false );
             break;
           }
-          case KEY_EVENT:
+          case CURSOR_KEY_EVENT:
           {
-            OnKeyEvent( *iter );
+            OnCursorKeyEvent( *iter );
             break;
           }
           case TAP_EVENT:
@@ -167,38 +184,25 @@ struct Controller::TextInput
     }
   }
 
-  void OnKeyEvent( const Event& event )
+  void OnCursorKeyEvent( const Event& event )
   {
     int keyCode = event.p1.mInt;
 
-    // Handle state changes
-    if( Dali::DALI_KEY_ESCAPE == keyCode )
+    if( Dali::DALI_KEY_CURSOR_LEFT == keyCode )
     {
-      ChangeState( INACTIVE ); // Escape key ends edit mode
+      // TODO
     }
-    else if ( event.p2.mString )
+    else if( Dali::DALI_KEY_CURSOR_RIGHT == keyCode )
     {
-      // Some text may be selected, hiding keyboard causes an empty keystring to be sent, we don't want to delete highlight in this case
-      ChangeState( EDITING );
+      // TODO
     }
-
-    // Handle the actual key event
-    if( Dali::DALI_KEY_BACKSPACE == keyCode )
+    else if( Dali::DALI_KEY_CURSOR_UP == keyCode )
     {
-      HandleBackspaceKey();
+      // TODO
     }
-    else if( Dali::DALI_KEY_CURSOR_LEFT  == keyCode ||
-             Dali::DALI_KEY_CURSOR_RIGHT == keyCode ||
-             Dali::DALI_KEY_CURSOR_UP    == keyCode ||
-             Dali::DALI_KEY_CURSOR_DOWN  == keyCode )
+    else if(   Dali::DALI_KEY_CURSOR_DOWN == keyCode )
     {
-      HandleCursorKey( keyCode );
-    }
-    else if ( event.p2.mString )
-    {
-      HandleKeyString( event.p2.mString );
-
-      delete [] event.p2.mString;
+      // TODO
     }
   }
 
@@ -355,10 +359,13 @@ struct Controller::TextInput
    */
   vector<Event> mEventQueue; ///< The queue of touch events etc.
 
-  State mState;
+  State mState; ///< Selection mode, edit mode etc.
 
-  bool mDecoratorUpdated   : 1;
-  bool mCursorBlinkEnabled : 1;
+  CharacterIndex mPrimaryCursorPosition;   ///< Index into logical model for primary cursor
+  CharacterIndex mSecondaryCursorPosition; ///< Index into logical model for secondary cursor
+
+  bool mDecoratorUpdated   : 1; ///< True if the decorator was updated during event processing
+  bool mCursorBlinkEnabled : 1; ///< True if cursor should blink when active
 };
 
 struct Controller::FontDefaults
@@ -397,7 +404,7 @@ struct Controller::Impl
     mFontClient(),
     mView(),
     mLayoutEngine(),
-    mNewText(),
+    mModifyEvents(),
     mControlSize(),
     mOperationsPending( NO_OPERATION ),
     mRecalculateNaturalSize( true )
@@ -423,7 +430,7 @@ struct Controller::Impl
   TextAbstraction::FontClient mFontClient; ///< Handle to the font client.
   View mView;                              ///< The view interface to the rendering back-end.
   LayoutEngine mLayoutEngine;              ///< The layout engine.
-  std::string mNewText;                    ///< Temporary stores the text set until the next relayout.
+  std::vector<ModifyEvent> mModifyEvents;  ///< Temporary stores the text set until the next relayout.
   Size mControlSize;                       ///< The size of the control.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
@@ -436,26 +443,14 @@ ControllerPtr Controller::New( ControlInterface& controlInterface )
 
 void Controller::SetText( const std::string& text )
 {
+  // Cancel previously queued inserts etc.
+  mImpl->mModifyEvents.clear();
+
   // Keep until size negotiation
-  mImpl->mNewText = text;
-
-  // All operations need to be done. (convert to utf32, get break info, ..., layout, ...)
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-
-  // The natural size needs to be re-calculated.
-  mImpl->mRecalculateNaturalSize = true;
-
-  // Reset buffers.
-  mImpl->mLogicalModel->SetText( NULL, 0u );
-  mImpl->mLogicalModel->SetScripts( NULL, 0u );
-  mImpl->mLogicalModel->SetFonts( NULL, 0u );
-  mImpl->mLogicalModel->SetLineBreakInfo( NULL, 0u );
-  mImpl->mLogicalModel->SetWordBreakInfo( NULL, 0u );
-  mImpl->mLogicalModel->SetBidirectionalInfo( NULL, 0u );
-  mImpl->mLogicalModel->SetVisualToLogicalMap( NULL, 0u );
-  mImpl->mVisualModel->SetGlyphs( NULL, NULL, NULL, 0u );
-  mImpl->mVisualModel->SetGlyphPositions( NULL, 0u );
-  mImpl->mVisualModel->SetLines( NULL, 0u );
+  ModifyEvent event;
+  event.type = REPLACE_TEXT;
+  event.text = text;
+  mImpl->mModifyEvents.push_back( event );
 
   if( mImpl->mTextInput )
   {
@@ -468,9 +463,10 @@ void Controller::SetText( const std::string& text )
 
 void Controller::GetText( std::string& text ) const
 {
-  if( !mImpl->mNewText.empty() )
+  if( !mImpl->mModifyEvents.empty() &&
+       REPLACE_TEXT == mImpl->mModifyEvents[0].type )
   {
-    text = mImpl->mNewText;
+    text = mImpl->mModifyEvents[0].text;
   }
   else
   {
@@ -615,6 +611,9 @@ Vector3 Controller::GetNaturalSize()
 {
   Vector3 naturalSize;
 
+  // Make sure the model is up-to-date before layouting
+  ProcessModifyEvents();
+
   if( mImpl->mRecalculateNaturalSize )
   {
     // Operations that can be done only once until the text changes.
@@ -626,7 +625,7 @@ Vector3 Controller::GetNaturalSize()
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
     // Make sure the model is up-to-date before layouting
-    ReplaceText( onlyOnceOperations );
+    UpdateModel( onlyOnceOperations );
 
     // Operations that need to be done if the size changes.
     const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
@@ -659,6 +658,9 @@ Vector3 Controller::GetNaturalSize()
 
 float Controller::GetHeightForWidth( float width )
 {
+  // Make sure the model is up-to-date before layouting
+  ProcessModifyEvents();
+
   Size layoutSize;
   if( width != mImpl->mControlSize.width )
   {
@@ -670,9 +672,8 @@ float Controller::GetHeightForWidth( float width )
                                                                            GET_WORD_BREAKS   |
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
-
     // Make sure the model is up-to-date before layouting
-    ReplaceText( onlyOnceOperations );
+    UpdateModel( onlyOnceOperations );
 
     // Operations that need to be done if the size changes.
     const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
@@ -724,7 +725,8 @@ bool Controller::Relayout( const Vector2& size )
   }
 
   // Make sure the model is up-to-date before layouting
-  ReplaceText( mImpl->mOperationsPending );
+  ProcessModifyEvents();
+  UpdateModel( mImpl->mOperationsPending );
 
   Size layoutSize;
   bool updated = DoRelayout( mImpl->mControlSize,
@@ -743,30 +745,166 @@ bool Controller::Relayout( const Vector2& size )
   return updated;
 }
 
-void Controller::ReplaceText( OperationsMask operationsRequired )
+void Controller::ProcessModifyEvents()
+{
+  std::vector<ModifyEvent>& events = mImpl->mModifyEvents;
+
+  for( unsigned int i=0; i<events.size(); ++i )
+  {
+    if( REPLACE_TEXT == events[0].type )
+    {
+      // A (single) replace event should come first, otherwise we wasted time processing NOOP events
+      DALI_ASSERT_DEBUG( 0 == i && "Unexpected REPLACE event" );
+
+      ReplaceTextEvent( events[0].text );
+    }
+    else if( INSERT_TEXT == events[0].type )
+    {
+      InsertTextEvent( events[0].text );
+    }
+    else if( DELETE_TEXT == events[0].type )
+    {
+      DeleteTextEvent();
+    }
+  }
+
+  // Discard temporary text
+  events.clear();
+}
+
+void Controller::ReplaceTextEvent( const std::string& text )
+{
+  // Reset buffers.
+  mImpl->mLogicalModel->mScriptRuns.Clear();
+  mImpl->mLogicalModel->mFontRuns.Clear();
+  mImpl->mLogicalModel->mLineBreakInfo.Clear();
+  mImpl->mLogicalModel->mWordBreakInfo.Clear();
+  mImpl->mLogicalModel->mBidirectionalParagraphInfo.Clear();
+  mImpl->mVisualModel->mGlyphs.Clear();
+
+  //  Convert text into UTF-32
+  Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
+  utf32Characters.Resize( text.size() );
+
+  // This is a bit horrible but std::string returns a (signed) char*
+  const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
+
+  // Transform a text array encoded in utf8 into an array encoded in utf32.
+  // It returns the actual number of characters.
+  Length characterCount = Utf8ToUtf32( utf8, text.size(), utf32Characters.Begin() );
+  utf32Characters.Resize( characterCount );
+
+  // Reset the cursor position
+  if( mImpl->mTextInput )
+  {
+    mImpl->mTextInput->mPrimaryCursorPosition = characterCount;
+    // TODO - handle secondary cursor
+  }
+
+  // The natural size needs to be re-calculated.
+  mImpl->mRecalculateNaturalSize = true;
+
+  // Apply modifications to the model
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  UpdateModel( ALL_OPERATIONS );
+  mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT |
+                                                           UPDATE_ACTUAL_SIZE |
+                                                           REORDER );
+}
+
+void Controller::InsertTextEvent( const std::string& text )
+{
+  DALI_ASSERT_DEBUG( NULL != mImpl->mTextInput && "Unexpected InsertTextEvent" );
+
+  // TODO - Optimize this
+  mImpl->mLogicalModel->mScriptRuns.Clear();
+  mImpl->mLogicalModel->mFontRuns.Clear();
+  mImpl->mLogicalModel->mLineBreakInfo.Clear();
+  mImpl->mLogicalModel->mWordBreakInfo.Clear();
+  mImpl->mLogicalModel->mBidirectionalParagraphInfo.Clear();
+  mImpl->mVisualModel->mGlyphs.Clear();
+
+  //  Convert text into UTF-32
+  Vector<Character> utf32Characters;
+  utf32Characters.Resize( text.size() );
+
+  // This is a bit horrible but std::string returns a (signed) char*
+  const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
+
+  // Transform a text array encoded in utf8 into an array encoded in utf32.
+  // It returns the actual number of characters.
+  Length characterCount = Utf8ToUtf32( utf8, text.size(), utf32Characters.Begin() );
+  utf32Characters.Resize( characterCount );
+
+  // Insert at current cursor position
+  Vector<Character>& modifyText = mImpl->mLogicalModel->mText;
+  CharacterIndex& cursorIndex = mImpl->mTextInput->mPrimaryCursorPosition;
+
+  if( cursorIndex < modifyText.Count() )
+  {
+    modifyText.Insert( modifyText.Begin() + cursorIndex, utf32Characters.Begin(), utf32Characters.End() );
+  }
+  else
+  {
+    modifyText.Insert( modifyText.End(), utf32Characters.Begin(), utf32Characters.End() );
+  }
+
+  // Advance the cursor position
+  ++cursorIndex;
+
+  // The natural size needs to be re-calculated.
+  mImpl->mRecalculateNaturalSize = true;
+
+  // Apply modifications to the model; TODO - Optimize this
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  UpdateModel( ALL_OPERATIONS );
+  mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT |
+                                                           UPDATE_ACTUAL_SIZE |
+                                                           REORDER );
+}
+
+void Controller::DeleteTextEvent()
+{
+  DALI_ASSERT_DEBUG( NULL != mImpl->mTextInput && "Unexpected InsertTextEvent" );
+
+  // TODO - Optimize this
+  mImpl->mLogicalModel->mScriptRuns.Clear();
+  mImpl->mLogicalModel->mFontRuns.Clear();
+  mImpl->mLogicalModel->mLineBreakInfo.Clear();
+  mImpl->mLogicalModel->mWordBreakInfo.Clear();
+  mImpl->mLogicalModel->mBidirectionalParagraphInfo.Clear();
+  mImpl->mVisualModel->mGlyphs.Clear();
+
+  // Delte at current cursor position
+  Vector<Character>& modifyText = mImpl->mLogicalModel->mText;
+  CharacterIndex& cursorIndex = mImpl->mTextInput->mPrimaryCursorPosition;
+
+  if( cursorIndex > 0 &&
+      cursorIndex-1 < modifyText.Count() )
+  {
+    modifyText.Remove( modifyText.Begin() + cursorIndex - 1 );
+
+    // Cursor position retreat
+    --cursorIndex;
+  }
+
+  // The natural size needs to be re-calculated.
+  mImpl->mRecalculateNaturalSize = true;
+
+  // Apply modifications to the model; TODO - Optimize this
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  UpdateModel( ALL_OPERATIONS );
+  mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT |
+                                                           UPDATE_ACTUAL_SIZE |
+                                                           REORDER );
+}
+
+void Controller::UpdateModel( OperationsMask operationsRequired )
 {
   // Calculate the operations to be done.
   const OperationsMask operations = static_cast<OperationsMask>( mImpl->mOperationsPending & operationsRequired );
 
   Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
-  if( CONVERT_TO_UTF32 & operations )
-  {
-    std::string& text = mImpl->mNewText;
-
-    //  Convert text into UTF-32
-    utf32Characters.Resize( text.size() );
-
-    // This is a bit horrible but std::string returns a (signed) char*
-    const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
-
-    // Transform a text array encoded in utf8 into an array encoded in utf32.
-    // It returns the actual number of characters.
-    const Length characterCount = Utf8ToUtf32( utf8, text.size(), utf32Characters.Begin() );
-    utf32Characters.Resize( characterCount );
-
-    // Discard temporary text
-    text.clear();
-  }
 
   const Length numberOfCharacters = mImpl->mLogicalModel->GetNumberOfCharacters();
 
@@ -1055,21 +1193,42 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 {
   DALI_ASSERT_DEBUG( mImpl->mTextInput && "Unexpected KeyEvent" );
 
-  if( mImpl->mTextInput )
+  if( mImpl->mTextInput &&
+      keyEvent.state == KeyEvent::Down )
   {
-    TextInput::Event event( TextInput::KEY_EVENT );
-    event.p1.mInt = keyEvent.keyCode;
-    event.p2.mString = NULL;
-
+    int keyCode = keyEvent.keyCode;
     const std::string& keyString = keyEvent.keyPressed;
-    if ( !keyString.empty() )
-    {
-      event.p2.mString = new char[keyString.size() + 1];
-      std::copy(keyString.begin(), keyString.end(), event.p2.mString);
-      event.p2.mString[keyString.size()] = '\0';
-    }
 
-    mImpl->mTextInput->mEventQueue.push_back( event );
+    // Pre-process to separate modifying events from non-modifying input events.
+    if( Dali::DALI_KEY_ESCAPE == keyCode )
+    {
+      // Escape key is a special case which causes focus loss
+      KeyboardFocusLostEvent();
+    }
+    else if( Dali::DALI_KEY_CURSOR_LEFT  == keyCode ||
+             Dali::DALI_KEY_CURSOR_RIGHT == keyCode ||
+             Dali::DALI_KEY_CURSOR_UP    == keyCode ||
+             Dali::DALI_KEY_CURSOR_DOWN  == keyCode )
+    {
+      TextInput::Event event( TextInput::CURSOR_KEY_EVENT );
+      event.p1.mInt = keyCode;
+      mImpl->mTextInput->mEventQueue.push_back( event );
+    }
+    else if( Dali::DALI_KEY_BACKSPACE == keyCode )
+    {
+      // Queue a delete event
+      ModifyEvent event;
+      event.type = DELETE_TEXT;
+      mImpl->mModifyEvents.push_back( event );
+    }
+    else if( !keyString.empty() )
+    {
+      // Queue an insert event
+      ModifyEvent event;
+      event.type = INSERT_TEXT;
+      event.text = keyString;
+      mImpl->mModifyEvents.push_back( event );
+    }
 
     RequestRelayout();
   }

@@ -215,11 +215,35 @@ public:
   bool Relayout( const Vector2& size );
 
   /**
-   * @brief Update the model with new text.
-   *
-   * @param[in] operations The layout operations which need to be done.
+   * @brief Process queued events which modify the model.
    */
-  void ReplaceText( OperationsMask operations );
+  void ProcessModifyEvents();
+
+  /**
+   * @brief Used to process an event queued from SetText()
+   *
+   * @param[in] newText The new text to store in the logical model.
+   */
+  void ReplaceTextEvent( const std::string& newText );
+
+  /**
+   * @brief Used to process an event queued from key events etc.
+   *
+   * @param[in] text The text to insert into the logical model.
+   */
+  void InsertTextEvent( const std::string& text );
+
+  /**
+   * @brief Used to process an event queued from backspace key etc.
+   */
+  void DeleteTextEvent();
+
+  /**
+   * @brief Update the model following text replace/insert etc.
+   *
+   * @param[in] operationsRequired The layout operations which need to be done.
+   */
+  void UpdateModel( OperationsMask operationsRequired );
 
   /**
    * @brief Lays-out the text.
@@ -247,6 +271,8 @@ public:
    * @return A reference to the view.
    */
   View& GetView();
+
+  // Text-input Event Queuing
 
   /**
    * @brief Caller by editable UI controls when keyboard focus is gained.

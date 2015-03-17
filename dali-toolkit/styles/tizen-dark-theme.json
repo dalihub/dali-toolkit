@@ -39,9 +39,9 @@ distributing this software or its derivatives.
     },
     "textfield":
     {
-      "font-family":"DejaVuSans",
+      "font-family":"UbuntuMono",
       "font-style":"Regular",
-      "point-size":10
+      "point-size":13
     },
     "scrollview":
     {
