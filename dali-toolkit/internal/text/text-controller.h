@@ -207,6 +207,13 @@ public:
   bool Relayout( const Vector2& size );
 
   /**
+   * @brief Update the model with new text.
+   *
+   * @param[in] operations The layout operations which need to be done.
+   */
+  void ReplaceText( OperationsMask operations );
+
+  /**
    * @brief Lays-out the text.
    *
    * GetNaturalSize(), GetHeightForWidth() and Relayout() calls this method.

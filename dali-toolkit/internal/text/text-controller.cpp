@@ -643,6 +643,9 @@ bool Controller::Relayout( const Vector2& size )
     mImpl->mControlSize = size;
   }
 
+  // Make sure the model is up-to-date before layouting
+  ReplaceText( mImpl->mOperationsPending );
+
   Size layoutSize;
   bool updated = DoRelayout( mImpl->mControlSize,
                              mImpl->mOperationsPending,
@@ -660,12 +663,8 @@ bool Controller::Relayout( const Vector2& size )
   return updated;
 }
 
-bool Controller::DoRelayout( const Vector2& size,
-                             OperationsMask operationsRequired,
-                             Size& layoutSize )
+void Controller::ReplaceText( OperationsMask operationsRequired )
 {
-  bool viewUpdated( false );
-
   // Calculate the operations to be done.
   const OperationsMask operations = static_cast<OperationsMask>( mImpl->mOperationsPending & operationsRequired );
 
@@ -762,7 +761,6 @@ bool Controller::DoRelayout( const Vector2& size,
     }
   }
 
-  Vector<BidirectionalParagraphInfoRun> bidirectionalInfo;
   if( BIDI_INFO & operations )
   {
     // Some vectors with data needed to get the paragraph's bidirectional info may be void
@@ -810,6 +808,7 @@ bool Controller::DoRelayout( const Vector2& size,
       }
     }
 
+    Vector<BidirectionalParagraphInfoRun> bidirectionalInfo;
     bidirectionalInfo.Reserve( numberOfParagraphs );
 
     // Calculates the bidirectional info for the whole paragraph if it contains right to left scripts.
@@ -860,6 +859,16 @@ bool Controller::DoRelayout( const Vector2& size,
                                     charactersPerGlyph.Begin(),
                                     numberOfGlyphs );
   }
+}
+
+bool Controller::DoRelayout( const Vector2& size,
+                             OperationsMask operationsRequired,
+                             Size& layoutSize )
+{
+  bool viewUpdated( false );
+
+  // Calculate the operations to be done.
+  const OperationsMask operations = static_cast<OperationsMask>( mImpl->mOperationsPending & operationsRequired );
 
   if( LAYOUT & operations )
   {
@@ -868,47 +877,37 @@ bool Controller::DoRelayout( const Vector2& size,
     // Fill the vectors again.
 
     const Length numberOfCharacters = mImpl->mLogicalModel->GetNumberOfCharacters();
-    numberOfGlyphs = mImpl->mVisualModel->GetNumberOfGlyphs();
+    Length numberOfGlyphs = mImpl->mVisualModel->GetNumberOfGlyphs();
 
-    if( 0u == lineBreakInfo.Count() )
-    {
-      lineBreakInfo.Resize( numberOfCharacters );
-      mImpl->mLogicalModel->GetLineBreakInfo( lineBreakInfo.Begin(),
-                                              0u,
-                                              numberOfCharacters );
-    }
+    Vector<LineBreakInfo> lineBreakInfo;
+    lineBreakInfo.Resize( numberOfCharacters );
+    mImpl->mLogicalModel->GetLineBreakInfo( lineBreakInfo.Begin(),
+                                            0u,
+                                            numberOfCharacters );
 
-    if( 0u == wordBreakInfo.Count() )
-    {
-      wordBreakInfo.Resize( numberOfCharacters );
-      mImpl->mLogicalModel->GetWordBreakInfo( wordBreakInfo.Begin(),
-                                              0u,
-                                              numberOfCharacters );
-    }
+    Vector<WordBreakInfo> wordBreakInfo;
+    wordBreakInfo.Resize( numberOfCharacters );
+    mImpl->mLogicalModel->GetWordBreakInfo( wordBreakInfo.Begin(),
+                                            0u,
+                                            numberOfCharacters );
 
-    if( 0u == glyphs.Count() )
-    {
-      glyphs.Resize( numberOfGlyphs );
-      mImpl->mVisualModel->GetGlyphs( glyphs.Begin(),
-                                      0u,
-                                      numberOfGlyphs );
-    }
+    Vector<GlyphInfo> glyphs;
+    glyphs.Resize( numberOfGlyphs );
+    mImpl->mVisualModel->GetGlyphs( glyphs.Begin(),
+                                    0u,
+                                    numberOfGlyphs );
 
-    if( 0u == glyphsToCharactersMap.Count() )
-    {
-      glyphsToCharactersMap.Resize( numberOfGlyphs );
-      mImpl->mVisualModel->GetGlyphToCharacterMap( glyphsToCharactersMap.Begin(),
+    Vector<CharacterIndex> glyphsToCharactersMap;
+    glyphsToCharactersMap.Resize( numberOfGlyphs );
+    mImpl->mVisualModel->GetGlyphToCharacterMap( glyphsToCharactersMap.Begin(),
+                                                 0u,
+                                                 numberOfGlyphs );
+
+    Vector<Length> charactersPerGlyph;
+    charactersPerGlyph.Resize( numberOfGlyphs );
+    mImpl->mVisualModel->GetCharactersPerGlyphMap( charactersPerGlyph.Begin(),
                                                    0u,
                                                    numberOfGlyphs );
-    }
-
-    if( 0u == charactersPerGlyph.Count() )
-    {
-      charactersPerGlyph.Resize( numberOfGlyphs );
-      mImpl->mVisualModel->GetCharactersPerGlyphMap( charactersPerGlyph.Begin(),
-                                                     0u,
-                                                     numberOfGlyphs );
-    }
 
     // Set the layout parameters.
     LayoutParameters layoutParameters( size,
@@ -943,13 +942,11 @@ bool Controller::DoRelayout( const Vector2& size,
       {
         const Length numberOfBidiParagraphs = mImpl->mLogicalModel->GetNumberOfBidirectionalInfoRuns( 0u, numberOfCharacters );
 
-        if( 0u == bidirectionalInfo.Count() )
-        {
-          bidirectionalInfo.Resize( numberOfBidiParagraphs );
-          mImpl->mLogicalModel->GetBidirectionalInfo( bidirectionalInfo.Begin(),
-                                                      0u,
-                                                      numberOfCharacters );
-        }
+        Vector<BidirectionalParagraphInfoRun> bidirectionalInfo;
+        bidirectionalInfo.Resize( numberOfBidiParagraphs );
+        mImpl->mLogicalModel->GetBidirectionalInfo( bidirectionalInfo.Begin(),
+                                                    0u,
+                                                    numberOfCharacters );
 
         // Check first if there are paragraphs with bidirectional info.
         if( 0u != bidirectionalInfo.Count() )
@@ -1051,6 +1048,8 @@ Vector3 Controller::GetNaturalSize()
                                                                            GET_WORD_BREAKS   |
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
+    // Make sure the model is up-to-date before layouting
+    ReplaceText( onlyOnceOperations );
 
     // Operations that need to be done if the size changes.
     const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
@@ -1094,6 +1093,9 @@ float Controller::GetHeightForWidth( float width )
                                                                            GET_WORD_BREAKS   |
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
+
+    // Make sure the model is up-to-date before layouting
+    ReplaceText( onlyOnceOperations );
 
     // Operations that need to be done if the size changes.
     const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
