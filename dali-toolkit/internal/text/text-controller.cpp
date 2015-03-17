@@ -622,6 +622,7 @@ Vector3 Controller::GetNaturalSize()
                                                                            VALIDATE_FONTS    |
                                                                            GET_LINE_BREAKS   |
                                                                            GET_WORD_BREAKS   |
+                                                                           BIDI_INFO         |
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
     // Make sure the model is up-to-date before layouting
@@ -670,6 +671,7 @@ float Controller::GetHeightForWidth( float width )
                                                                            VALIDATE_FONTS    |
                                                                            GET_LINE_BREAKS   |
                                                                            GET_WORD_BREAKS   |
+                                                                           BIDI_INFO         |
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
     // Make sure the model is up-to-date before layouting
@@ -968,6 +970,8 @@ void Controller::UpdateModel( OperationsMask operationsRequired )
     }
   }
 
+  Vector<Character> mirroredUtf32Characters;
+  bool textMirrored = false;
   if( BIDI_INFO & operations )
   {
     // Count the number of LINE_NO_BREAK to reserve some space for the vector of paragraph's
@@ -992,6 +996,14 @@ void Controller::UpdateModel( OperationsMask operationsRequired )
                           scripts,
                           lineBreakInfo,
                           bidirectionalInfo );
+
+    if( 0u != bidirectionalInfo.Count() )
+    {
+      // This paragraph has right to left text. Some characters may need to be mirrored.
+      // TODO: consider if the mirrored string can be stored as well.
+
+      textMirrored = GetMirroredText( utf32Characters, mirroredUtf32Characters );
+    }
   }
 
   Vector<GlyphInfo>& glyphs = mImpl->mVisualModel->mGlyphs;
@@ -999,8 +1011,9 @@ void Controller::UpdateModel( OperationsMask operationsRequired )
   Vector<Length>& charactersPerGlyph = mImpl->mVisualModel->mCharactersPerGlyph;
   if( SHAPE_TEXT & operations )
   {
+    const Vector<Character>& textToShape = textMirrored ? mirroredUtf32Characters : utf32Characters;
     // Shapes the text.
-    ShapeText( utf32Characters,
+    ShapeText( textToShape,
                lineBreakInfo,
                scripts,
                validFonts,

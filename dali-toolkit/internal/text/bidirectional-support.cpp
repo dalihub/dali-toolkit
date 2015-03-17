@@ -236,6 +236,18 @@ void ReorderLines( LogicalModel& logicalModel,
 {
 }
 
+bool GetMirroredText( const Vector<Character>& text,
+                      Vector<Character>& mirroredText )
+{
+  // Handle to the bidirectional info module in text-abstraction.
+  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
+
+  mirroredText = text;
+
+  return bidirectionalSupport.GetMirroredText( mirroredText.Begin(),
+                                               mirroredText.Count() );
+}
+
 } // namespace Text
 
 } // namespace Toolkit

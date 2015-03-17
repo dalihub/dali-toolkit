@@ -110,6 +110,16 @@ void ReorderLines( LogicalModel& logicalModel,
                    Length numberOfCharactersToRemove,
                    Length numberOfCharactersToInsert );
 
+/**
+ * @brief Replaces any character which could be mirrored.
+ *
+ * @param[in] text The text.
+ * @param[in] mirroredText The mirroredText.
+ *
+ * @return @e true if a character has been replaced.
+ */
+bool GetMirroredText( const Vector<Character>& text,
+                      Vector<Character>& mirroredText );
 } // namespace Text
 
 } // namespace Toolkit
