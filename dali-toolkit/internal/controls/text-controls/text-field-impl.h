@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/imf-manager.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
@@ -114,6 +117,15 @@ private: // From Control
    * @copydoc Dali::CustomActorImpl::OnKeyEvent(const KeyEvent&)
    */
   virtual bool OnKeyEvent(const KeyEvent& event);
+
+  /**
+   * @brief Event received from IMF manager
+   *
+   * @param[in] imfManager The IMF manager.
+   * @param[in] imfEvent The event received.
+   * @return A data struture indicating if update is needed, cursor position and current text.
+   */
+  ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()

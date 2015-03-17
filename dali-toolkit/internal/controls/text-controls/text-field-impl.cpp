@@ -455,12 +455,37 @@ void TextField::OnKeyInputFocusGained()
 {
   VirtualKeyboard::StatusChangedSignal().Connect( this, &TextField::KeyboardStatusChanged );
 
+  ImfManager imfManager = ImfManager::Get();
+
+  if ( imfManager )
+  {
+    imfManager.EventReceivedSignal().Connect( this, &TextField::OnImfEvent );
+
+    // Notify that the text editing start.
+    imfManager.Activate();
+
+    // When window gain lost focus, the imf manager is deactivated. Thus when window gain focus again, the imf manager must be activated.
+    imfManager.SetRestoreAfterFocusLost( true );
+  }
+
   mController->KeyboardFocusGainEvent();
 }
 
 void TextField::OnKeyInputFocusLost()
 {
   VirtualKeyboard::StatusChangedSignal().Disconnect( this, &TextField::KeyboardStatusChanged );
+
+  ImfManager imfManager = ImfManager::Get();
+  if ( imfManager )
+  {
+    // The text editing is finished. Therefore the imf manager don't have restore activation.
+    imfManager.SetRestoreAfterFocusLost( false );
+
+    // Notify that the text editing finish.
+    imfManager.Deactivate();
+
+    imfManager.EventReceivedSignal().Disconnect( this, &TextField::OnImfEvent );
+  }
 
   mController->KeyboardFocusLostEvent();
 }
@@ -486,6 +511,39 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
   }
 
   return mController->KeyEvent( event );
+}
+
+ImfManager::ImfCallbackData TextField::OnImfEvent( Dali::ImfManager& imfManager, const ImfManager::ImfEventData&  imfEvent )
+{
+  switch ( imfEvent.eventName )
+  {
+    case ImfManager::PREEDIT:
+    {
+      // TODO
+      break;
+    }
+    case ImfManager::COMMIT:
+    {
+      // TODO
+      break;
+    }
+    case ImfManager::DELETESURROUNDING:
+    {
+      // TODO
+      break;
+    }
+    case ImfManager::GETSURROUNDING:
+    {
+      // TODO
+      break;
+    }
+    case ImfManager::VOID:
+    {
+      // do nothing
+    }
+  } // end switch
+
+  return ImfManager::ImfCallbackData();
 }
 
 void TextField::RequestTextRelayout()
