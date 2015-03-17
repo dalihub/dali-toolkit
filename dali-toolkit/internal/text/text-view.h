@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-view-interface.h>
-#include <dali-toolkit/internal/text/visual-model.h>
+#include <dali-toolkit/internal/text/visual-model-impl.h>
 
 namespace Dali
 {

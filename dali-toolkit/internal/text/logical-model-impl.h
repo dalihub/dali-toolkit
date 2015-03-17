@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_TEXT_LOGICAL_MODEL_H__
-#define __DALI_TOOLKIT_TEXT_LOGICAL_MODEL_H__
+#ifndef __DALI_TOOLKIT_TEXT_LOGICAL_MODEL_IMPL_H__
+#define __DALI_TOOLKIT_TEXT_LOGICAL_MODEL_IMPL_H__
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -24,7 +24,10 @@
 #include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/text-definitions.h>
+#include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
+#include <dali-toolkit/internal/text/bidirectional-paragraph-info-run.h>
+#include <dali-toolkit/internal/text/font-run.h>
+#include <dali-toolkit/internal/text/script-run.h>
 
 namespace Dali
 {
@@ -134,17 +137,19 @@ public:
                    Length numberOfRuns );
 
   /**
-   * Retrieves the number of script runs for the given range of characters.
+   * Retrieves the number of script runs and the index to the first one for the given range of characters.
    *
    * A run is a group of consecutive characters. A script run contains the script for a run.
    *
    * @param[in] characterIndex Index to the first character.
    * @param[in] numberOfCharacters The number of characters.
-   *
-   * @return The number of script runs.
+   * @param[out] firstScriptRun Index to the script run containing the character index.
+   * @param[out] numberOfScriptRuns The number of script runs.
    */
-  Length GetNumberOfScriptRuns( CharacterIndex characterIndex,
-                                Length numberOfCharacters ) const;
+  void GetNumberOfScriptRuns( CharacterIndex characterIndex,
+                              Length numberOfCharacters,
+                              ScriptRunIndex& firstScriptRun,
+                              Length& numberOfScriptRuns ) const;
 
   /**
    * Retrieves the script runs for the given range of characters.
@@ -201,17 +206,19 @@ public:
                  Length numberOfRuns );
 
   /**
-   * Retrieves the number of font runs for the given range of characters.
+   * Retrieves the number of font runs and the index of the first one for the given range of characters.
    *
    * A run is a group of consecutive characters. A font run contains the font id for a run.
    *
    * @param[in] characterIndex Index to the first character.
    * @param[in] numberOfCharacters The number of characters.
-   *
-   * @return The number of font runs.
+   * @param[out] firstFontRun Index to the font run containing the character index.
+   * @param[out] numberOfFontRuns The number of font runs.
    */
-  Length GetNumberOfFontRuns( CharacterIndex characterIndex,
-                              Length numberOfCharacters ) const;
+  void GetNumberOfFontRuns( CharacterIndex characterIndex,
+                            Length numberOfCharacters,
+                            FontRunIndex& firstFontRun,
+                            Length& numberOfFontRuns ) const;
 
   /**
    * Retrieves the font runs for the given range of characters.
@@ -405,7 +412,7 @@ public:
                              Length numberOfRuns );
 
   /**
-   * Retrieves the number of bidirectional info runs for the given range of characters.
+   * Retrieves the number of bidirectional info runs and the index to the first one for the given range of characters.
    *
    * It may be zero if there is no right to left scripts.
    *
@@ -414,8 +421,10 @@ public:
    *
    * @return The number of bidirectional info runs.
    */
-  Length GetNumberOfBidirectionalInfoRuns( CharacterIndex characterIndex,
-                                           Length numberOfCharacters ) const;
+  void GetNumberOfBidirectionalInfoRuns( CharacterIndex characterIndex,
+                                         Length numberOfCharacters,
+                                         BidirectionalRunIndex& firstBidirectionalRun,
+                                         Length& numberOfFontRuns ) const;
 
   /**
    * Retrieves the bidirectional paragraph info runs for the given range of characters.
@@ -572,10 +581,18 @@ private:
   // Undefined
   LogicalModel& operator=( const LogicalModel& handle );
 
-private:
+public:
 
-  struct Impl;
-  Impl* mImpl;
+  Vector<Character>                     mText;
+  Vector<ScriptRun>                     mScriptRuns;
+  Vector<FontRun>                       mFontRuns;
+  Vector<LineBreakInfo>                 mLineBreakInfo;
+  Vector<WordBreakInfo>                 mWordBreakInfo;
+  Vector<BidirectionalParagraphInfoRun> mBidirectionalParagraphInfo;
+
+  Vector<BidirectionalLineInfoRun>      mBidirectionalLineInfo;
+  Vector<CharacterIndex>                mLogicalToVisualMap; ///< Bidirectional logical to visual conversion table.
+  Vector<CharacterIndex>                mVisualToLogicalMap; ///< Bidirectional visual to logical conversion table.
 };
 
 } // namespace Text
@@ -584,4 +601,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_LOGICAL_MODEL_H__
+#endif // __DALI_TOOLKIT_TEXT_LOGICAL_MODEL_IMPL_H__

@@ -77,11 +77,9 @@ private:
     GET_GLYPH_METRICS  = 0x0080,
     LAYOUT             = 0x0100,
     UPDATE_ACTUAL_SIZE = 0x0200,
-    UPDATE_POSITIONS   = 0x0400,
-    UPDATE_LINES       = 0x0800,
-    REORDER            = 0x1000,
-    ALIGNMENT          = 0x2000,
-    RENDER             = 0x4000,
+    REORDER            = 0x0400,
+    ALIGNMENT          = 0x0800,
+    RENDER             = 0x1000,
     ALL_OPERATIONS     = 0xFFFF
   };
 
@@ -198,6 +196,16 @@ public:
   bool GetEnableCursorBlink() const;
 
   /**
+   * @copydoc Control::GetNaturalSize()
+   */
+  Vector3 GetNaturalSize();
+
+  /**
+   * @copydoc Control::GetHeightForWidth()
+   */
+  float GetHeightForWidth( float width );
+
+  /**
    * @brief Triggers a relayout which updates View (if necessary).
    *
    * @note UI Controls are expected to minimize calls to this method e.g. call once after size negotiation.
@@ -225,16 +233,6 @@ public:
   bool DoRelayout( const Vector2& size,
                    OperationsMask operations,
                    Size& layoutSize );
-
-  /**
-   * @copydoc Control::GetNaturalSize()
-   */
-  Vector3 GetNaturalSize();
-
-  /**
-   * @copydoc Control::GetHeightForWidth()
-   */
-  float GetHeightForWidth( float width );
 
   /**
    * @brief Return the layout engine.

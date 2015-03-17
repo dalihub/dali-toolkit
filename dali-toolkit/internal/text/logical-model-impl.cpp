@@ -16,16 +16,10 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/internal/text/logical-model.h>
+#include <dali-toolkit/internal/text/logical-model-impl.h>
 
 // EXTERNAL INCLUDES
 #include <memory.h>
-
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
-#include <dali-toolkit/internal/text/bidirectional-paragraph-info-run.h>
-#include <dali-toolkit/internal/text/font-run.h>
-#include <dali-toolkit/internal/text/script-run.h>
 
 namespace Dali
 {
@@ -35,36 +29,6 @@ namespace Toolkit
 
 namespace Text
 {
-/**
- * @brief caches some temporary values of the GetNumberOfScriptRuns( characterIndex, numberOfCharacters )
- * operation and the GetNumberOfFontRuns( characterIndex, numberOfCharacters ) as they are going to be
- * used in the GetScriptRuns() and the GetFontRuns() calls.
- */
-struct GetRunCache
-{
-  CharacterIndex characterIndex;     ///< The character index.
-  Length         numberOfCharacters; ///< The number of characters.
-  Length         firstRun;           ///< Index to the first run.
-  Length         numberOfRuns;       ///< The number of runs.
-};
-
-struct LogicalModel::Impl
-{
-  Vector<Character>                     mText;
-  Vector<ScriptRun>                     mScriptRuns;
-  Vector<FontRun>                       mFontRuns;
-  Vector<LineBreakInfo>                 mLineBreakInfo;
-  Vector<WordBreakInfo>                 mWordBreakInfo;
-  Vector<BidirectionalParagraphInfoRun> mBidirectionalParagraphInfo;
-
-  Vector<BidirectionalLineInfoRun>      mBidirectionalLineInfo;
-  Vector<CharacterIndex>                mLogicalToVisualMap; ///< Bidirectional logical to visual conversion table.
-  Vector<CharacterIndex>                mVisualToLogicalMap; ///< Bidirectional visual to logical conversion table.
-
-  GetRunCache                           mGetScriptCache;             ///< Caches the GetNumberOfScriptRuns( characterIndex, numberOfCharacters ) operation.
-  GetRunCache                           mGetFontCache;               ///< Caches the GetNumberOfFontRuns( characterIndex, numberOfCharacters ) operation.
-  GetRunCache                           mGetBidirectionalCache;      ///< Caches the GetNumberOfBidirectionalInfoRuns( characterIndex, numberOfCharacters ) operation.
-};
 
 LogicalModelPtr LogicalModel::New()
 {
@@ -74,35 +38,32 @@ LogicalModelPtr LogicalModel::New()
 void LogicalModel::SetText( const Character* const text,
                             Length numberOfCharacters )
 {
-  Vector<Character>& modelText = mImpl->mText;
-
   if( 0u == numberOfCharacters )
   {
-    modelText.Clear();
+    mText.Clear();
   }
   else
   {
-    modelText.Resize( numberOfCharacters );
-    memcpy( modelText.Begin(), text, numberOfCharacters * sizeof( Character ) );
+    mText.Resize( numberOfCharacters );
+    memcpy( mText.Begin(), text, numberOfCharacters * sizeof( Character ) );
   }
 }
 
 Length LogicalModel::GetNumberOfCharacters() const
 {
-  return mImpl->mText.Count();
+  return mText.Count();
 }
 
 void LogicalModel::GetText( Character* text,
                             CharacterIndex characterIndex,
                             Length numberOfCharacters ) const
 {
-  Vector<Character>& modelText = mImpl->mText;
-  memcpy( text, modelText.Begin() + characterIndex, numberOfCharacters * sizeof( Character ) );
+  memcpy( text, mText.Begin() + characterIndex, numberOfCharacters * sizeof( Character ) );
 }
 
 Character LogicalModel::GetCharacter( CharacterIndex characterIndex ) const
 {
-  return mImpl->mText[characterIndex];
+  return mText[characterIndex];
 }
 
 void LogicalModel::ReplaceText( CharacterIndex characterIndex,
@@ -115,52 +76,32 @@ void LogicalModel::ReplaceText( CharacterIndex characterIndex,
 void LogicalModel::SetScripts( const ScriptRun* const scripts,
                                Length numberOfRuns )
 {
-  Vector<ScriptRun>& scriptRuns = mImpl->mScriptRuns;
-
   if( 0u == numberOfRuns )
   {
-    scriptRuns.Clear();
+    mScriptRuns.Clear();
   }
   else
   {
-    scriptRuns.Resize( numberOfRuns );
-    memcpy( scriptRuns.Begin(), scripts, numberOfRuns * sizeof( ScriptRun ) );
+    mScriptRuns.Resize( numberOfRuns );
+    memcpy( mScriptRuns.Begin(), scripts, numberOfRuns * sizeof( ScriptRun ) );
   }
-
-  mImpl->mGetScriptCache.characterIndex = 0u;
-  mImpl->mGetScriptCache.numberOfCharacters = 0u;
-  mImpl->mGetScriptCache.firstRun = 0u;
-  mImpl->mGetScriptCache.numberOfRuns = 0u;
 }
 
-Length LogicalModel::GetNumberOfScriptRuns( CharacterIndex characterIndex,
-                                            Length numberOfCharacters ) const
+void LogicalModel::GetNumberOfScriptRuns( CharacterIndex characterIndex,
+                                          Length numberOfCharacters,
+                                          ScriptRunIndex& firstScriptRun,
+                                          Length& numberOfScriptRuns ) const
 {
-  GetRunCache& scriptCache = mImpl->mGetScriptCache;
-
-  // Set the character index and the number of characters into the cache.
-  scriptCache.characterIndex = characterIndex;
-  scriptCache.numberOfCharacters = numberOfCharacters;
-
-  if( ( 0u == characterIndex ) &&
-      ( mImpl->mText.Count() == numberOfCharacters ) )
-  {
-    scriptCache.firstRun = 0u;
-    scriptCache.numberOfRuns = mImpl->mScriptRuns.Count();
-    return scriptCache.numberOfRuns;
-  }
-
   // Initialize the number of scripts and the index to the first script.
-  scriptCache.firstRun = 0u;
-  scriptCache.numberOfRuns = 0;
+  firstScriptRun = 0u;
+  numberOfScriptRuns = 0;
   bool firstScriptFound = false;
 
-  const Vector<ScriptRun>& modelScripts = mImpl->mScriptRuns;
   const CharacterIndex lastCharacterIndex = characterIndex + numberOfCharacters;
 
   // Traverse the scripts and count those scripts within the range of characters.
-  for( Vector<ScriptRun>::ConstIterator it = modelScripts.Begin(),
-         endIt = modelScripts.End();
+  for( Vector<ScriptRun>::ConstIterator it = mScriptRuns.Begin(),
+         endIt = mScriptRuns.End();
        it != endIt;
        ++it )
   {
@@ -170,7 +111,7 @@ Length LogicalModel::GetNumberOfScriptRuns( CharacterIndex characterIndex,
         ( lastCharacterIndex > script.characterRun.characterIndex ) )
     {
       firstScriptFound = true;
-      ++scriptCache.numberOfRuns;
+      ++numberOfScriptRuns;
     }
     else if( lastCharacterIndex <= script.characterRun.characterIndex )
     {
@@ -180,37 +121,33 @@ Length LogicalModel::GetNumberOfScriptRuns( CharacterIndex characterIndex,
 
     if( !firstScriptFound )
     {
-      ++scriptCache.firstRun;
+      ++firstScriptRun;
     }
   }
-
-  return scriptCache.numberOfRuns;
 }
 
 void LogicalModel::GetScriptRuns( ScriptRun* scriptRuns,
                                   CharacterIndex characterIndex,
                                   Length numberOfCharacters ) const
 {
-  const Vector<ScriptRun>& modelScripts = mImpl->mScriptRuns;
-  GetRunCache& scriptCache = mImpl->mGetScriptCache;
+  ScriptRunIndex firstScriptRun = 0u;
+  Length numberOfScriptRuns = 0u;
 
-  if( ( characterIndex != scriptCache.characterIndex ) ||
-      ( numberOfCharacters != scriptCache.numberOfCharacters ) )
-  {
-    GetNumberOfScriptRuns( characterIndex,
-                           numberOfCharacters );
-  }
+  GetNumberOfScriptRuns( characterIndex,
+                         numberOfCharacters,
+                         firstScriptRun,
+                         numberOfScriptRuns );
 
-  memcpy( scriptRuns, modelScripts.Begin() + scriptCache.firstRun, scriptCache.numberOfRuns * sizeof( ScriptRun ) );
+  memcpy( scriptRuns, mScriptRuns.Begin() + firstScriptRun, numberOfScriptRuns * sizeof( ScriptRun ) );
 }
 
 Script LogicalModel::GetScript( CharacterIndex characterIndex ) const
 {
   // If this operation is too slow, consider a binary search.
 
-  for( Length index = 0u, length = mImpl->mScriptRuns.Count(); index < length; ++index )
+  for( Length index = 0u, length = mScriptRuns.Count(); index < length; ++index )
   {
-    const ScriptRun* const scriptRun = mImpl->mScriptRuns.Begin() + index;
+    const ScriptRun* const scriptRun = mScriptRuns.Begin() + index;
 
     if( ( scriptRun->characterRun.characterIndex <= characterIndex ) &&
         ( characterIndex < scriptRun->characterRun.characterIndex + scriptRun->characterRun.numberOfCharacters ) )
@@ -232,52 +169,32 @@ void LogicalModel::ReplaceScripts( CharacterIndex characterIndex,
 void LogicalModel::SetFonts( const FontRun* const fonts,
                              Length numberOfRuns )
 {
-  Vector<FontRun>& fontRuns = mImpl->mFontRuns;
-
   if( 0u == numberOfRuns )
   {
-    fontRuns.Clear();
+    mFontRuns.Clear();
   }
   else
   {
-    fontRuns.Resize( numberOfRuns );
-    memcpy( fontRuns.Begin(), fonts, numberOfRuns * sizeof( FontRun ) );
+    mFontRuns.Resize( numberOfRuns );
+    memcpy( mFontRuns.Begin(), fonts, numberOfRuns * sizeof( FontRun ) );
   }
-
-  mImpl->mGetFontCache.characterIndex = 0u;
-  mImpl->mGetFontCache.numberOfCharacters = 0u;
-  mImpl->mGetFontCache.firstRun = 0u;
-  mImpl->mGetFontCache.numberOfRuns = 0u;
 }
 
-Length LogicalModel::GetNumberOfFontRuns( CharacterIndex characterIndex,
-                                          Length numberOfCharacters ) const
+void LogicalModel::GetNumberOfFontRuns( CharacterIndex characterIndex,
+                                        Length numberOfCharacters,
+                                        FontRunIndex& firstFontRun,
+                                        Length& numberOfFontRuns ) const
 {
-  GetRunCache& fontCache = mImpl->mGetFontCache;
-
-  // Set the character index and the number of characters into the cache.
-  fontCache.characterIndex = characterIndex;
-  fontCache.numberOfCharacters = numberOfCharacters;
-
-  if( ( 0u == characterIndex ) &&
-      ( mImpl->mText.Count() == numberOfCharacters ) )
-  {
-    fontCache.firstRun = 0u;
-    fontCache.numberOfRuns = mImpl->mFontRuns.Count();
-    return fontCache.numberOfRuns;
-  }
-
   // Initialize the number of fonts and the index to the first font.
-  fontCache.firstRun = 0u;
-  fontCache.numberOfRuns = 0;
+  firstFontRun = 0u;
+  numberOfFontRuns = 0;
   bool firstFontFound = false;
 
-  const Vector<FontRun>& modelFonts = mImpl->mFontRuns;
   const CharacterIndex lastCharacterIndex = characterIndex + numberOfCharacters;
 
   // Traverse the fonts and count those fonts within the range of characters.
-  for( Vector<FontRun>::ConstIterator it = modelFonts.Begin(),
-         endIt = modelFonts.End();
+  for( Vector<FontRun>::ConstIterator it = mFontRuns.Begin(),
+         endIt = mFontRuns.End();
        it != endIt;
        ++it )
   {
@@ -287,7 +204,7 @@ Length LogicalModel::GetNumberOfFontRuns( CharacterIndex characterIndex,
         ( characterIndex + numberOfCharacters > font.characterRun.characterIndex ) )
     {
       firstFontFound = true;
-      ++fontCache.numberOfRuns;
+      ++numberOfFontRuns;
     }
     else if( lastCharacterIndex <= font.characterRun.characterIndex )
     {
@@ -297,35 +214,31 @@ Length LogicalModel::GetNumberOfFontRuns( CharacterIndex characterIndex,
 
     if( !firstFontFound )
     {
-      ++fontCache.firstRun;
+      ++firstFontRun;
     }
   }
-
-  return fontCache.numberOfRuns;
 }
 
 void LogicalModel::GetFontRuns( FontRun* fontRuns,
                                 CharacterIndex characterIndex,
                                 Length numberOfCharacters ) const
 {
-  const Vector<FontRun>& modelFonts = mImpl->mFontRuns;
-  GetRunCache& fontCache = mImpl->mGetFontCache;
+  FontRunIndex firstFontRun = 0u;
+  Length numberOfFontRuns = 0u;
 
-  if( ( characterIndex != fontCache.characterIndex ) ||
-      ( numberOfCharacters != fontCache.numberOfCharacters ) )
-  {
-    GetNumberOfFontRuns( characterIndex,
-                         numberOfCharacters );
-  }
+  GetNumberOfFontRuns( characterIndex,
+                       numberOfCharacters,
+                       firstFontRun,
+                       numberOfFontRuns );
 
-  memcpy( fontRuns, modelFonts.Begin() + fontCache.firstRun, fontCache.numberOfRuns * sizeof( FontRun ) );
+  memcpy( fontRuns, mFontRuns.Begin() + firstFontRun, numberOfFontRuns * sizeof( FontRun ) );
 }
 
 FontId LogicalModel::GetFont( CharacterIndex characterIndex ) const
 {
-  for( Length index = 0u, length = mImpl->mFontRuns.Count(); index < length; ++index )
+  for( Length index = 0u, length = mFontRuns.Count(); index < length; ++index )
   {
-    const FontRun* const fontRun = mImpl->mFontRuns.Begin() + index;
+    const FontRun* const fontRun = mFontRuns.Begin() + index;
 
     if( ( fontRun->characterRun.characterIndex <= characterIndex ) &&
         ( characterIndex < fontRun->characterRun.characterIndex + fontRun->characterRun.numberOfCharacters ) )
@@ -347,16 +260,14 @@ void LogicalModel::ReplaceFonts( CharacterIndex characterIndex,
 void LogicalModel::SetLineBreakInfo( const LineBreakInfo* const lineBreakInfo,
                                      Length length )
 {
-  Vector<LineBreakInfo>& modelLineBreakInfo = mImpl->mLineBreakInfo;
-
   if( 0u == length )
   {
-    modelLineBreakInfo.Clear();
+    mLineBreakInfo.Clear();
   }
   else
   {
-    modelLineBreakInfo.Resize( length );
-    memcpy( modelLineBreakInfo.Begin(), lineBreakInfo, length * sizeof( LineBreakInfo ) );
+    mLineBreakInfo.Resize( length );
+    memcpy( mLineBreakInfo.Begin(), lineBreakInfo, length * sizeof( LineBreakInfo ) );
   }
 }
 
@@ -364,12 +275,12 @@ void LogicalModel::GetLineBreakInfo( LineBreakInfo* lineBreakInfo,
                                      CharacterIndex characterIndex,
                                      Length numberOfItems ) const
 {
-  memcpy( lineBreakInfo, mImpl->mLineBreakInfo.Begin() + characterIndex, numberOfItems * sizeof( LineBreakInfo ) );
+  memcpy( lineBreakInfo, mLineBreakInfo.Begin() + characterIndex, numberOfItems * sizeof( LineBreakInfo ) );
 }
 
 LineBreakInfo LogicalModel::GetLineBreakInfo( CharacterIndex characterIndex ) const
 {
-  return *( mImpl->mLineBreakInfo.Begin() + characterIndex );
+  return *( mLineBreakInfo.Begin() + characterIndex );
 }
 
 void LogicalModel::ReplaceLineBreakInfo( CharacterIndex characterIndex,
@@ -382,16 +293,14 @@ void LogicalModel::ReplaceLineBreakInfo( CharacterIndex characterIndex,
 void LogicalModel::SetWordBreakInfo( const WordBreakInfo* const wordBreakInfo,
                                      Length length )
 {
-  Vector<WordBreakInfo>& modelWordBreakInfo = mImpl->mWordBreakInfo;
-
   if( 0u == length )
   {
-    modelWordBreakInfo.Clear();
+    mWordBreakInfo.Clear();
   }
   else
   {
-    modelWordBreakInfo.Resize( length );
-    memcpy( modelWordBreakInfo.Begin(), wordBreakInfo, length * sizeof( WordBreakInfo ) );
+    mWordBreakInfo.Resize( length );
+    memcpy( mWordBreakInfo.Begin(), wordBreakInfo, length * sizeof( WordBreakInfo ) );
   }
 }
 
@@ -399,12 +308,12 @@ void LogicalModel::GetWordBreakInfo( WordBreakInfo* wordBreakInfo,
                                      CharacterIndex characterIndex,
                                      Length numberOfItems ) const
 {
-  memcpy( wordBreakInfo, mImpl->mWordBreakInfo.Begin() + characterIndex, numberOfItems * sizeof( WordBreakInfo ) );
+  memcpy( wordBreakInfo, mWordBreakInfo.Begin() + characterIndex, numberOfItems * sizeof( WordBreakInfo ) );
 }
 
 WordBreakInfo LogicalModel::GetWordBreakInfo( CharacterIndex characterIndex ) const
 {
-  return *( mImpl->mWordBreakInfo.Begin() + characterIndex );
+  return *( mWordBreakInfo.Begin() + characterIndex );
 }
 
 void LogicalModel::ReplaceWordBreakInfo( CharacterIndex characterIndex,
@@ -417,51 +326,30 @@ void LogicalModel::ReplaceWordBreakInfo( CharacterIndex characterIndex,
 void LogicalModel::SetBidirectionalInfo( const BidirectionalParagraphInfoRun* const bidirectionalInfo,
                                          Length numberOfRuns )
 {
-  Vector<BidirectionalParagraphInfoRun>& modelBidirectionalParagraphInfo = mImpl->mBidirectionalParagraphInfo;
-
   if( 0u == numberOfRuns )
   {
-    modelBidirectionalParagraphInfo.Clear();
+    mBidirectionalParagraphInfo.Clear();
   }
   else
   {
-    modelBidirectionalParagraphInfo.Resize( numberOfRuns );
-    memcpy( modelBidirectionalParagraphInfo.Begin(), bidirectionalInfo, numberOfRuns * sizeof( BidirectionalParagraphInfoRun ) );
+    mBidirectionalParagraphInfo.Resize( numberOfRuns );
+    memcpy( mBidirectionalParagraphInfo.Begin(), bidirectionalInfo, numberOfRuns * sizeof( BidirectionalParagraphInfoRun ) );
   }
-
-  mImpl->mGetBidirectionalCache.characterIndex = 0u;
-  mImpl->mGetBidirectionalCache.numberOfCharacters = 0u;
-  mImpl->mGetBidirectionalCache.firstRun = 0u;
-  mImpl->mGetBidirectionalCache.numberOfRuns = 0u;
 }
 
-Length LogicalModel::GetNumberOfBidirectionalInfoRuns( CharacterIndex characterIndex,
-                                                       Length numberOfCharacters ) const
+void LogicalModel::GetNumberOfBidirectionalInfoRuns( CharacterIndex characterIndex,
+                                                     Length numberOfCharacters,
+                                                     BidirectionalRunIndex& firstBidirectionalRun,
+                                                     Length& numberOfFontRuns  ) const
 {
-  GetRunCache& bidiCache = mImpl->mGetBidirectionalCache;
-
-  // Set the character index and the number of characters into the cache.
-  bidiCache.characterIndex = characterIndex;
-  bidiCache.numberOfCharacters = numberOfCharacters;
-
-  if( ( 0u == characterIndex ) &&
-      ( mImpl->mText.Count() == numberOfCharacters ) )
-  {
-    bidiCache.firstRun = 0u;
-    bidiCache.numberOfRuns = mImpl->mBidirectionalParagraphInfo.Count();
-    return bidiCache.numberOfRuns;
-  }
-
   // Initialize the number of bidi paragraphs and the index to the first paragraph.
-  bidiCache.firstRun = 0u;
-  bidiCache.numberOfRuns = 0;
+  firstBidirectionalRun = 0u;
+  numberOfFontRuns = 0;
   bool firstParagraphFound = false;
 
-  const Vector<BidirectionalParagraphInfoRun>& modelBidirectionalParagraphInfo = mImpl->mBidirectionalParagraphInfo;
-
   // Traverse the bidirectional paragraph info and count those bidi paragraphs within the range of characters.
-  for( Vector<BidirectionalParagraphInfoRun>::ConstIterator it = modelBidirectionalParagraphInfo.Begin(),
-         endIt = modelBidirectionalParagraphInfo.End();
+  for( Vector<BidirectionalParagraphInfoRun>::ConstIterator it = mBidirectionalParagraphInfo.Begin(),
+         endIt = mBidirectionalParagraphInfo.End();
        it != endIt;
        ++it )
   {
@@ -471,33 +359,29 @@ Length LogicalModel::GetNumberOfBidirectionalInfoRuns( CharacterIndex characterI
         ( characterIndex + numberOfCharacters > bidi.characterRun.characterIndex ) )
     {
       firstParagraphFound = true;
-      ++bidiCache.numberOfRuns;
+      ++numberOfFontRuns;
     }
 
     if( !firstParagraphFound )
     {
-      ++bidiCache.firstRun;
+      ++firstBidirectionalRun;
     }
   }
-
-  return bidiCache.numberOfRuns;
 }
 
 void LogicalModel::GetBidirectionalInfo( BidirectionalParagraphInfoRun* bidirectionalInfo,
                                          CharacterIndex characterIndex,
                                          Length numberOfCharacters ) const
 {
-  const Vector<BidirectionalParagraphInfoRun>& modelBidirectionalParagraphInfo = mImpl->mBidirectionalParagraphInfo;
-  GetRunCache& bidiCache = mImpl->mGetBidirectionalCache;
+  BidirectionalRunIndex firstBidirectionalRun = 0u;
+  Length numberOfFontRuns = 0u;
 
-  if( ( characterIndex != bidiCache.characterIndex ) ||
-      ( numberOfCharacters != bidiCache.numberOfCharacters ) )
-  {
-    GetNumberOfBidirectionalInfoRuns( characterIndex,
-                                      numberOfCharacters );
-  }
+  GetNumberOfBidirectionalInfoRuns( characterIndex,
+                                    numberOfCharacters,
+                                    firstBidirectionalRun,
+                                    numberOfFontRuns );
 
-  memcpy( bidirectionalInfo, modelBidirectionalParagraphInfo.Begin() + bidiCache.firstRun, bidiCache.numberOfRuns * sizeof( BidirectionalParagraphInfoRun ) );
+  memcpy( bidirectionalInfo, mBidirectionalParagraphInfo.Begin() + firstBidirectionalRun, numberOfFontRuns * sizeof( BidirectionalParagraphInfoRun ) );
 }
 
 void ReplaceBidirectionalInfo( CharacterIndex characterIndex,
@@ -521,22 +405,19 @@ CharacterDirection LogicalModel::GetCharacterDirection( CharacterIndex character
 void LogicalModel::SetVisualToLogicalMap( const BidirectionalLineInfoRun* const bidirectionalInfo,
                                           Length numberOfRuns )
 {
-  Vector<CharacterIndex>& modelVisualToLogicalMap = mImpl->mVisualToLogicalMap;
-  Vector<CharacterIndex>& modelLogicalToVisualMap = mImpl->mLogicalToVisualMap;
-
   if( 0u == numberOfRuns )
   {
-    modelVisualToLogicalMap.Clear();
-    modelLogicalToVisualMap.Clear();
+    mVisualToLogicalMap.Clear();
+    mLogicalToVisualMap.Clear();
   }
   else
   {
-    const Length numberOfCharacters = mImpl->mText.Count();
-    modelVisualToLogicalMap.Resize( numberOfCharacters );
-    modelLogicalToVisualMap.Resize( numberOfCharacters );
+    const Length numberOfCharacters = mText.Count();
+    mVisualToLogicalMap.Resize( numberOfCharacters );
+    mLogicalToVisualMap.Resize( numberOfCharacters );
 
-    CharacterIndex* modelVisualToLogicalMapBuffer = modelVisualToLogicalMap.Begin();
-    CharacterIndex* modelLogicalToVisualMapBuffer = modelLogicalToVisualMap.Begin();
+    CharacterIndex* modelVisualToLogicalMapBuffer = mVisualToLogicalMap.Begin();
+    CharacterIndex* modelLogicalToVisualMapBuffer = mLogicalToVisualMap.Begin();
 
     CharacterIndex lastIndex = 0u;
     for( unsigned int bidiIndex = 0u; bidiIndex < numberOfRuns; ++bidiIndex )
@@ -584,51 +465,48 @@ void LogicalModel::ReplaceVisualToLogicalMap( CharacterIndex characterIndex,
 
 CharacterIndex LogicalModel::GetVisualCharacterIndex( CharacterIndex logicalCharacterIndex ) const
 {
-  if( 0u == mImpl->mLogicalToVisualMap.Count() )
+  if( 0u == mLogicalToVisualMap.Count() )
   {
     // If there is no logical to visual info is because the whole text is left to right.
     // Return the identity.
     return logicalCharacterIndex;
   }
 
-  return *( mImpl->mLogicalToVisualMap.Begin() + logicalCharacterIndex );
+  return *( mLogicalToVisualMap.Begin() + logicalCharacterIndex );
 }
 
 CharacterIndex LogicalModel::GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex ) const
 {
-  if( 0u == mImpl->mVisualToLogicalMap.Count() )
+  if( 0u == mVisualToLogicalMap.Count() )
   {
     // If there is no visual to logical info is because the whole text is left to right.
     // Return the identity.
     return visualCharacterIndex;
   }
 
-  return *( mImpl->mVisualToLogicalMap.Begin() + visualCharacterIndex );
+  return *( mVisualToLogicalMap.Begin() + visualCharacterIndex );
 }
 
 void LogicalModel::GetLogicalToVisualMap( CharacterIndex* logicalToVisualMap,
                                           CharacterIndex characterIndex,
                                           Length numberOfCharacters ) const
 {
-  memcpy( logicalToVisualMap, mImpl->mLogicalToVisualMap.Begin() + characterIndex, numberOfCharacters * sizeof( CharacterIndex ) );
+  memcpy( logicalToVisualMap, mLogicalToVisualMap.Begin() + characterIndex, numberOfCharacters * sizeof( CharacterIndex ) );
 }
 
 void LogicalModel::GetVisualToLogicalMap( CharacterIndex* visualToLogicalMap,
                                           CharacterIndex characterIndex,
                                           Length numberOfCharacters ) const
 {
-  memcpy( visualToLogicalMap, mImpl->mVisualToLogicalMap.Begin() + characterIndex, numberOfCharacters * sizeof( CharacterIndex ) );
+  memcpy( visualToLogicalMap, mVisualToLogicalMap.Begin() + characterIndex, numberOfCharacters * sizeof( CharacterIndex ) );
 }
 
 LogicalModel::~LogicalModel()
 {
-  delete mImpl;
 }
 
 LogicalModel::LogicalModel()
-: mImpl( NULL )
 {
-  mImpl = new LogicalModel::Impl();
 }
 
 } // namespace Text

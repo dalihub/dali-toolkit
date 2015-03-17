@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_TEXT_VISUAL_MODEL_H__
-#define __DALI_TOOLKIT_TEXT_VISUAL_MODEL_H__
+#ifndef __DALI_TOOLKIT_TEXT_VISUAL_MODEL_IMPL_H__
+#define __DALI_TOOLKIT_TEXT_VISUAL_MODEL_IMPL_H__
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -19,11 +19,12 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/text-definitions.h>
+#include <dali-toolkit/internal/text/line-run.h>
 
 namespace Dali
 {
@@ -75,6 +76,20 @@ public:
                   const CharacterIndex* characterIndices,
                   const Length* charactersPerGlyph,
                   Length numberOfGlyphs );
+
+  /**
+   * @brief Creates the character to glyph conversion table.
+   *
+   * @param[in] numberOfCharacters The number of characters.
+   */
+  void CreateCharacterToGlyphTable( Length numberOfCharacters = 0u );
+
+  /**
+   * @brief Creates an array containing the number of glyphs per character.
+   *
+   * @param[in] numberOfCharacters The number of characters.
+   */
+  void CreateGlyphsPerCharacterTable( Length numberOfCharacters = 0u );
 
   /**
    * Retrieves the number of glyphs.
@@ -296,15 +311,17 @@ public:
                  Length numberOfLines ) const;
 
   /**
-   * Retrieves the number of lines where the given range of glyphs is laid out.
+   * Retrieves the number of lines and the index to the first line where the given range of glyphs is laid out.
    *
    * @param[in] glyphIndex Index to the first glyph.
    * @param[in] numberOfGlyphs The number of glyph.
-   *
-   * @return The number of lines.
+   * @param[out] firstLine Index to the line containing the glyph index.
+   * @param[out] numberOfLines The number of lines.
    */
-  Length GetNumberOfLines( GlyphIndex glyphIndex,
-                           Length numberOfGlyphs ) const;
+  void GetNumberOfLines( GlyphIndex glyphIndex,
+                         Length numberOfGlyphs,
+                         LineIndex& firstLine,
+                         Length& numberOfLines ) const;
   /**
    * Retrieves the lines where the given range of glyphs is laid out.
    *
@@ -384,15 +401,26 @@ private:
   // Undefined
   VisualModel& operator=( const VisualModel& handle );
 
+public:
+
+  Vector<GlyphInfo>      mGlyphs;             ///< For each glyph, the font's id, glyph's index within the font and glyph's metrics.
+  Vector<CharacterIndex> mGlyphsToCharacters; ///< For each glyph, the index of the first character.
+  Vector<GlyphIndex>     mCharactersToGlyph;  ///< For each character, the index of the first glyph.
+  Vector<Length>         mCharactersPerGlyph; ///< For each glyph, the number of characters that form the glyph.
+  Vector<Length>         mGlyphsPerCharacter; ///< For each character, the number of glyphs that are shaped.
+  Vector<Vector2>        mGlyphPositions;     ///< For each glyph, the position.
+  Vector<LineRun>        mLines;              ///< The laid out lines.
+
 private:
 
-  struct Impl;
-  Impl* mImpl;
+  Size                   mNaturalSize;        ///< Size of the text with no line wrapping.
+  Size                   mActualSize;         ///< Size of the laid-out text considering the layout properties set.
 };
+
 } // namespace Text
 
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_VISUAL_MODEL_H__
+#endif // __DALI_TOOLKIT_TEXT_VISUAL_MODEL_IMPL_H__

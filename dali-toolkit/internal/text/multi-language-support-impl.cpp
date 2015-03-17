@@ -26,7 +26,7 @@
 #include <dali/public-api/text-abstraction/script.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/logical-model.h>
+#include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/text-io.h>
