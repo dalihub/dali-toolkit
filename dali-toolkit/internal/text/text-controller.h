@@ -78,8 +78,7 @@ private:
     LAYOUT             = 0x0100,
     UPDATE_ACTUAL_SIZE = 0x0200,
     REORDER            = 0x0400,
-    ALIGNMENT          = 0x0800,
-    RENDER             = 0x1000,
+    ALIGN              = 0x0800,
     ALL_OPERATIONS     = 0xFFFF
   };
 

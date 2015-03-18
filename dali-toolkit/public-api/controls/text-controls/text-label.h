@@ -63,6 +63,7 @@ public:
       FONT_STYLE,                               ///< name "font-style",        The requested font style e.g. Regular/Italic, type STRING
       POINT_SIZE,                               ///< name "point-size",        The size of font in points,                   type FLOAT
       MULTI_LINE,                               ///< name "multi-line",        The single-line or multi-line layout option,  type BOOLEAN
+      ALIGNMENT,                                ///< name "alignment",         The line alignment,                           type STRING,  values "BEGIN", "CENTER", "END"
     };
   };
 

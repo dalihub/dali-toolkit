@@ -44,6 +44,7 @@ struct LayoutParameters
    * Constructor with the needed parameters to layout the text.
    *
    * @param[in] boundingBox The size of the box containing the text.
+   * @param[in] textBuffer The text buffer.
    * @param[in] lineBreakInfoBuffer The line break info.
    * @param[in] wordBreakInfoBuffer The word break info.
    * @param[in] totalNumberOfGlyphs The number of glyphs.
@@ -52,6 +53,7 @@ struct LayoutParameters
    * @param[in] charactersPerGlyphBuffer Vector with the number of characters that forms each glyph.
    */
   LayoutParameters( const Vector2& boundingBox,
+                    const Character* const textBuffer,
                     const LineBreakInfo* const lineBreakInfoBuffer,
                     const WordBreakInfo* const wordBreakInfoBuffer,
                     Length totalNumberOfGlyphs,
@@ -59,6 +61,7 @@ struct LayoutParameters
                     const CharacterIndex* const glyphsToCharactersBuffer,
                     const Length* const charactersPerGlyphBuffer )
   : boundingBox( boundingBox ),
+    textBuffer( textBuffer ),
     lineBreakInfoBuffer( lineBreakInfoBuffer ),
     wordBreakInfoBuffer( wordBreakInfoBuffer ),
     totalNumberOfGlyphs( totalNumberOfGlyphs ),
@@ -72,6 +75,7 @@ struct LayoutParameters
   {}
 
   Vector2                     boundingBox;
+  const Character* const      textBuffer;
   const LineBreakInfo* const  lineBreakInfoBuffer;
   const WordBreakInfo* const  wordBreakInfoBuffer;
   Length                      totalNumberOfGlyphs;

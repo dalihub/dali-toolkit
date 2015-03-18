@@ -53,7 +53,8 @@ struct LineLayout
 struct LayoutEngine::Impl
 {
   Impl()
-  : mLayout( LayoutEngine::SINGLE_LINE_BOX )
+  : mLayout( LayoutEngine::SINGLE_LINE_BOX ),
+    mAlignment( LayoutEngine::ALIGN_BEGIN )
   {
     mFontClient = TextAbstraction::FontClient::Get();
   }
@@ -83,6 +84,10 @@ struct LayoutEngine::Impl
       // Get the glyph info.
       const GlyphInfo& glyphInfo = *( parameters.glyphsBuffer + glyphIndex );
 
+      // Check whether is a white space.
+      const Character character = *( parameters.textBuffer + lineLayout.numberOfCharacters );
+      const bool isWhiteSpace = TextAbstraction::IsWhiteSpace( character );
+
       // Get the character indices for the current glyph. The last character index is needed
       // because there are glyphs formed by more than one character but their break info is
       // given only for the last character.
@@ -95,7 +100,21 @@ struct LayoutEngine::Impl
       lineLayout.numberOfGlyphs++;
 
       // Increase the accumulated length.
-      lineLayout.length += ( glyphIndex == lastGlyphIndex ) ? glyphInfo.width : glyphInfo.advance;
+      const float glyphLength = ( glyphIndex == lastGlyphIndex ) ? glyphInfo.width : glyphInfo.advance;
+
+      if( isWhiteSpace )
+      {
+        // Add the length to the length of white spaces at the end of the line.
+        lineLayout.wsLengthEndOfLine += glyphLength;
+      }
+      else
+      {
+        // Add as well any previous white space length.
+        lineLayout.length += lineLayout.wsLengthEndOfLine + glyphLength;
+
+        // Clear the white space length at the end of the line.
+        lineLayout.wsLengthEndOfLine = 0.f;
+      }
 
       if( lastFontId != glyphInfo.fontId )
       {
@@ -172,11 +191,27 @@ struct LayoutEngine::Impl
       // Increase the number of glyphs.
       tmpLineLayout.numberOfGlyphs++;
 
+      // Check whether is a white space.
+      const Character character = *( parameters.textBuffer + characterFirstIndex );
+      const bool isWhiteSpace = TextAbstraction::IsWhiteSpace( character );
+
       // Increase the accumulated length.
-      tmpLineLayout.length += ( glyphIndex == lastGlyphIndex ) ? glyphInfo.width : glyphInfo.advance;
+      if( isWhiteSpace )
+      {
+        // Add the length to the length of white spaces at the end of the line.
+        tmpLineLayout.wsLengthEndOfLine += glyphInfo.advance; // I use the advance as the width is always zero for the white spaces.
+      }
+      else
+      {
+        // Add as well any previous white space length.
+        tmpLineLayout.length += tmpLineLayout.wsLengthEndOfLine + ( glyphIndex == lastGlyphIndex ) ? glyphInfo.width : glyphInfo.advance;
+
+        // Clear the white space length at the end of the line.
+        tmpLineLayout.wsLengthEndOfLine = 0.f;
+      }
 
       // Check if the accumulated length fits in the width of the box.
-      if( lineLayout.length + tmpLineLayout.length > parameters.boundingBox.width )
+      if( lineLayout.length + tmpLineLayout.length + ( ( 0.f < tmpLineLayout.length ) ? lineLayout.wsLengthEndOfLine : 0.f ) > parameters.boundingBox.width )
       {
         // Current word does not fit in the box's width.
         return;
@@ -190,7 +225,17 @@ struct LayoutEngine::Impl
           lineLayout.numberOfCharacters += tmpLineLayout.numberOfCharacters;
           lineLayout.numberOfGlyphs += tmpLineLayout.numberOfGlyphs;
           lineLayout.length += tmpLineLayout.length;
-          lineLayout.wsLengthEndOfLine = tmpLineLayout.wsLengthEndOfLine;
+
+          if( 0.f < tmpLineLayout.length )
+          {
+            lineLayout.length += lineLayout.wsLengthEndOfLine;
+
+            lineLayout.wsLengthEndOfLine = tmpLineLayout.wsLengthEndOfLine;
+          }
+          else
+          {
+            lineLayout.wsLengthEndOfLine += tmpLineLayout.wsLengthEndOfLine;
+          }
 
           if( tmpLineLayout.height > lineLayout.height )
           {
@@ -219,7 +264,16 @@ struct LayoutEngine::Impl
         lineLayout.numberOfCharacters += tmpLineLayout.numberOfCharacters;
         lineLayout.numberOfGlyphs += tmpLineLayout.numberOfGlyphs;
         lineLayout.length += tmpLineLayout.length;
-        lineLayout.wsLengthEndOfLine = tmpLineLayout.wsLengthEndOfLine;
+        if( 0.f < tmpLineLayout.length )
+        {
+          lineLayout.length += lineLayout.wsLengthEndOfLine;
+
+          lineLayout.wsLengthEndOfLine = tmpLineLayout.wsLengthEndOfLine;
+        }
+        else
+        {
+          lineLayout.wsLengthEndOfLine += tmpLineLayout.wsLengthEndOfLine;
+        }
 
         if( tmpLineLayout.height > lineLayout.height )
         {
@@ -297,7 +351,7 @@ struct LayoutEngine::Impl
   void ReLayoutRightToLeftLines( const LayoutParameters& layoutParameters,
                                  Vector<Vector2>& glyphPositions )
   {
-    for( Length lineIndex = 0u; lineIndex < layoutParameters.numberOfBidirectionalInfoRuns; ++lineIndex )
+    for( LineIndex lineIndex = 0u; lineIndex < layoutParameters.numberOfBidirectionalInfoRuns; ++lineIndex )
     {
       const BidirectionalLineInfoRun& bidiLine = *( layoutParameters.lineBidirectionalInfoRunsBuffer +lineIndex  );
 
@@ -324,9 +378,68 @@ struct LayoutEngine::Impl
           Vector2& position = *( glyphPositionsBuffer + glyphIndex );
 
           position.x = penX + glyph.xBearing;
-
           penX += glyph.advance;
         }
+      }
+    }
+  }
+
+  void Align( const LayoutParameters& layoutParameters,
+              const Vector<LineRun>& lines,
+              Vector<Vector2>& glyphPositions )
+  {
+    Vector2* glyphPositionsBuffer = glyphPositions.Begin();
+
+    // Traverse all lines and align the glyphs.
+    // LayoutParameters contains bidirectional info for those lines with
+    // right to left text, this info includes the paragraph's direction.
+
+    LineIndex bidiLineIndex = 0u;
+    for( Vector<LineRun>::ConstIterator it = lines.Begin(), endIt = lines.End();
+         it != endIt;
+         ++it )
+    {
+      const LineRun& line = *it;
+
+      // 1) Get the paragrap's direction.
+      bool paragraphDirection = false;
+
+      // Check if there is any right to left line.
+      if( ( NULL != layoutParameters.lineBidirectionalInfoRunsBuffer ) &&
+          ( bidiLineIndex < layoutParameters.numberOfBidirectionalInfoRuns ) )
+      {
+        const BidirectionalLineInfoRun* bidiLine = layoutParameters.lineBidirectionalInfoRunsBuffer + bidiLineIndex;
+
+        // Get the right to left line that match with current line.
+        while( ( line.characterRun.characterIndex > bidiLine->characterRun.characterIndex ) &&
+               ( bidiLineIndex < layoutParameters.numberOfBidirectionalInfoRuns ) )
+        {
+          ++bidiLineIndex;
+          bidiLine = layoutParameters.lineBidirectionalInfoRunsBuffer + bidiLineIndex;
+        }
+
+        if( line.characterRun.characterIndex == bidiLine->characterRun.characterIndex )
+        {
+          paragraphDirection = bidiLine->direction;
+        }
+      }
+
+      // 2) Calculate the alignment offset accordingly with the align option,
+      //    the box width, line length, and the paragraphs direction.
+      float alignOffset = CalculateAlignment( layoutParameters.boundingBox.width,
+                                              line.lineSize.width,
+                                              line.extraLength,
+                                              paragraphDirection );
+
+      // 3) Traverse all glyphs and update the 'x' position.
+      for( GlyphIndex index = line.glyphIndex,
+             endIndex = line.glyphIndex + line.numberOfGlyphs;
+           index < endIndex;
+           ++index )
+      {
+        Vector2& position = *( glyphPositionsBuffer + index );
+
+        position.x += alignOffset;
       }
     }
   }
@@ -351,6 +464,7 @@ struct LayoutEngine::Impl
     lineRun.characterRun.numberOfCharacters = *( layoutParameters.glyphsToCharactersBuffer + lastGlyphIndex ) + *( layoutParameters.charactersPerGlyphBuffer + lastGlyphIndex );
     lineRun.lineSize.width = layout.length;
     lineRun.lineSize.height = layout.height;
+    lineRun.extraLength = layout.wsLengthEndOfLine;
 
     lines.PushBack( lineRun );
 
@@ -408,6 +522,7 @@ struct LayoutEngine::Impl
       lineRun.characterRun.numberOfCharacters = ( *( layoutParameters.glyphsToCharactersBuffer + lastGlyphIndex ) + *( layoutParameters.charactersPerGlyphBuffer + lastGlyphIndex ) ) - lineRun.characterRun.characterIndex;
       lineRun.lineSize.width = layout.length;
       lineRun.lineSize.height = layout.height;
+      lineRun.extraLength = layout.wsLengthEndOfLine;
 
       lines.PushBack( lineRun );
 
@@ -442,7 +557,56 @@ struct LayoutEngine::Impl
     return true;
   }
 
+  float CalculateAlignment( float boxWidth,
+                            float lineLength,
+                            float extraLength,
+                            bool paragraphDirection )
+  {
+    float offset = 0.f;
+
+    Alignment alignment = mAlignment;
+    if( paragraphDirection &&
+        ( ALIGN_CENTER != alignment ) )
+    {
+      if( ALIGN_BEGIN == alignment )
+      {
+        alignment = ALIGN_END;
+      }
+      else
+      {
+        alignment = ALIGN_BEGIN;
+      }
+    }
+
+    switch( alignment )
+    {
+      case ALIGN_BEGIN:
+      {
+        offset = 0.f;
+        break;
+      }
+      case ALIGN_CENTER:
+      {
+        offset = 0.5f * ( boxWidth - lineLength );
+        break;
+      }
+      case ALIGN_END:
+      {
+        offset = boxWidth - lineLength;
+        break;
+      }
+    }
+
+    if( paragraphDirection )
+    {
+      offset -= extraLength;
+    }
+
+    return offset;
+  }
+
   LayoutEngine::Layout mLayout;
+  LayoutEngine::Alignment mAlignment;
 
   TextAbstraction::FontClient mFontClient;
 };
@@ -468,6 +632,16 @@ unsigned int LayoutEngine::GetLayout() const
   return mImpl->mLayout;
 }
 
+void LayoutEngine::SetAlignment( Alignment alignment )
+{
+  mImpl->mAlignment = alignment;
+}
+
+LayoutEngine::Alignment LayoutEngine::GetAlignment() const
+{
+  return mImpl->mAlignment;
+}
+
 bool LayoutEngine::LayoutText( const LayoutParameters& layoutParameters,
                                Vector<Vector2>& glyphPositions,
                                Vector<LineRun>& lines,
@@ -484,6 +658,15 @@ void LayoutEngine::ReLayoutRightToLeftLines( const LayoutParameters& layoutParam
 {
   mImpl->ReLayoutRightToLeftLines( layoutParameters,
                                    glyphPositions );
+}
+
+void LayoutEngine::Align( const LayoutParameters& layoutParameters,
+                          const Vector<LineRun>& lines,
+                          Vector<Vector2>& glyphPositions )
+{
+  mImpl->Align( layoutParameters,
+                lines,
+                glyphPositions );
 }
 
 } // namespace Text

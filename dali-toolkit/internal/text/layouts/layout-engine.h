@@ -51,6 +51,13 @@ public:
     MULTI_LINE_BOX
   };
 
+  enum Alignment
+  {
+    ALIGN_BEGIN,
+    ALIGN_CENTER,
+    ALIGN_END
+  };
+
   /**
    * @brief Create a new instance of a LayoutEngine.
    */
@@ -76,6 +83,20 @@ public:
   unsigned int GetLayout() const;
 
   /**
+   * @brief Choose the required line alignment.
+   *
+   * @param[in] alignment The required alignment.
+   */
+  void SetAlignment( Alignment alignment );
+
+  /**
+   * @brief Query the required line alignment.
+   *
+   * @return The required alignment.
+   */
+  Alignment GetAlignment() const;
+
+  /**
    * @brief Store the visual position of glyphs in the VisualModel.
    *
    * @param[in] layoutParameters The parameters needed to layout the text.
@@ -91,7 +112,7 @@ public:
                    Size& actualSize );
 
   /**
-   * Re-lays out those lines with right to left characters.
+   * @brief Re-lays out those lines with right to left characters.
    *
    * It doesn't change the phisical position of the glyphs in the model but sets their new position.
    *
@@ -100,6 +121,17 @@ public:
    */
   void ReLayoutRightToLeftLines( const LayoutParameters& layoutParameters,
                                  Vector<Vector2>& glyphPositions );
+
+  /**
+   * @brief Aligns the laid out lines.
+   *
+   * @param[in] layoutParameters The parameters needed to layout the text.
+   * @param[in] lines The laid-out lines.
+   * @param[in,out] glyphPositions The positions of all the glyphs.
+   */
+  void Align( const LayoutParameters& layoutParameters,
+              const Vector<LineRun>& lines,
+              Vector<Vector2>& glyphPositions );
 
 private:
 

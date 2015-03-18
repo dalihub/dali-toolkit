@@ -185,6 +185,7 @@ void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInf
        ++it )
   {
     const BidirectionalParagraphInfoRun& paragraphInfo = *it;
+    const CharacterDirection direction = bidirectionalSupport.GetParagraphDirection( paragraphInfo.bidirectionalInfoIndex );
 
     // Get the lines for this paragraph.
     unsigned int firstLine = 0u;
@@ -211,6 +212,7 @@ void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInf
       BidirectionalLineInfoRun lineInfoRun;
       lineInfoRun.characterRun.characterIndex = line.characterRun.characterIndex;
       lineInfoRun.characterRun.numberOfCharacters = line.characterRun.numberOfCharacters;
+      lineInfoRun.direction = direction;
 
       // Allocate space for the conversion maps.
       // The memory is freed after the visual to logical to visual conversion tables are built in the logical model.

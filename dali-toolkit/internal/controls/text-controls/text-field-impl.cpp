@@ -25,6 +25,7 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/adaptor-framework/virtual-keyboard.h>
 
@@ -53,6 +54,14 @@ namespace
 namespace
 {
 
+const Scripting::StringEnum< Toolkit::Text::LayoutEngine::Alignment > ALIGNMENT_STRING_TABLE[] =
+{
+  { "BEGIN",  Toolkit::Text::LayoutEngine::ALIGN_BEGIN  },
+  { "CENTER", Toolkit::Text::LayoutEngine::ALIGN_CENTER },
+  { "END",    Toolkit::Text::LayoutEngine::ALIGN_END    },
+};
+const unsigned int ALIGNMENT_STRING_TABLE_COUNT = sizeof( ALIGNMENT_STRING_TABLE ) / sizeof( ALIGNMENT_STRING_TABLE[0] );
+
 // Type registration
 BaseHandle Create()
 {
@@ -77,6 +86,7 @@ DALI_PROPERTY_REGISTRATION( TextField, "cursor-blink-interval",   FLOAT,     CUR
 DALI_PROPERTY_REGISTRATION( TextField, "cursor-blink-duration",   FLOAT,     CURSOR_BLINK_DURATION   )
 DALI_PROPERTY_REGISTRATION( TextField, "grab-handle-image",       STRING,    GRAB_HANDLE_IMAGE       )
 DALI_PROPERTY_REGISTRATION( TextField, "decoration bounding-box", RECTANGLE, DECORATION_BOUNDING_BOX )
+DALI_PROPERTY_REGISTRATION( TextField, "alignment",               STRING,    ALIGNMENT               )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -249,6 +259,20 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::TextField::Property::ALIGNMENT:
+      {
+        LayoutEngine& engine = impl.mController->GetLayoutEngine();
+        const LayoutEngine::Alignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::Alignment >( value.Get< std::string >().c_str(),
+                                                                                                                       ALIGNMENT_STRING_TABLE,
+                                                                                                                       ALIGNMENT_STRING_TABLE_COUNT );
+
+        if( engine.GetAlignment() != alignment )
+        {
+          engine.SetAlignment( alignment );
+          impl.RequestTextRelayout();
+        }
+        break;
+      }
     }
   }
 }
@@ -361,6 +385,16 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mDecorator )
         {
           value = impl.mDecorator->GetBoundingBox();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::ALIGNMENT:
+      {
+        if( impl.mController )
+        {
+          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::Alignment >( impl.mController->GetLayoutEngine().GetAlignment(),
+                                                                                                        ALIGNMENT_STRING_TABLE,
+                                                                                                        ALIGNMENT_STRING_TABLE_COUNT ) );
         }
         break;
       }

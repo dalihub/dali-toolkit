@@ -42,6 +42,7 @@ struct LineRun
   Length       numberOfGlyphs; ///< The number of glyphs of the run.
   CharacterRun characterRun;   ///< The initial character and the number of characters.
   Size         lineSize;       ///< The size of the line.
+  float        extraLength;    ///< The length of the white spaces at the end of the line.
 };
 
 } // namespace Text

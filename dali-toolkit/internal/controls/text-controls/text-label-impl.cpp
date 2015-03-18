@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -49,6 +50,14 @@ namespace
 namespace
 {
 
+const Scripting::StringEnum< Toolkit::Text::LayoutEngine::Alignment > ALIGNMENT_STRING_TABLE[] =
+{
+  { "BEGIN",  Toolkit::Text::LayoutEngine::ALIGN_BEGIN  },
+  { "CENTER", Toolkit::Text::LayoutEngine::ALIGN_CENTER },
+  { "END",    Toolkit::Text::LayoutEngine::ALIGN_END    },
+};
+const unsigned int ALIGNMENT_STRING_TABLE_COUNT = sizeof( ALIGNMENT_STRING_TABLE ) / sizeof( ALIGNMENT_STRING_TABLE[0] );
+
 // Type registration
 BaseHandle Create()
 {
@@ -64,6 +73,7 @@ DALI_PROPERTY_REGISTRATION( TextLabel, "font-family",       STRING,  FONT_FAMILY
 DALI_PROPERTY_REGISTRATION( TextLabel, "font-style",        STRING,  FONT_STYLE        )
 DALI_PROPERTY_REGISTRATION( TextLabel, "point-size",        FLOAT,   POINT_SIZE        )
 DALI_PROPERTY_REGISTRATION( TextLabel, "multi-line",        BOOLEAN, MULTI_LINE        )
+DALI_PROPERTY_REGISTRATION( TextLabel, "alignment",         STRING,  ALIGNMENT         )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -165,9 +175,23 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
 
           if( engine.GetLayout() != layout )
           {
-            impl.mController->GetLayoutEngine().SetLayout( layout );
+            engine.SetLayout( layout );
             impl.RequestTextRelayout();
           }
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::ALIGNMENT:
+      {
+        LayoutEngine& engine = impl.mController->GetLayoutEngine();
+        const LayoutEngine::Alignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::Alignment >( value.Get< std::string >().c_str(),
+                                                                                                                       ALIGNMENT_STRING_TABLE,
+                                                                                                                       ALIGNMENT_STRING_TABLE_COUNT );
+
+        if( engine.GetAlignment() != alignment )
+        {
+          engine.SetAlignment( alignment );
+          impl.RequestTextRelayout();
         }
         break;
       }
@@ -206,6 +230,16 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mController )
         {
           value = static_cast<bool>( LayoutEngine::MULTI_LINE_BOX == impl.mController->GetLayoutEngine().GetLayout() );
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::ALIGNMENT:
+      {
+        if( impl.mController )
+        {
+          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::Alignment >( impl.mController->GetLayoutEngine().GetAlignment(),
+                                                                                                        ALIGNMENT_STRING_TABLE,
+                                                                                                        ALIGNMENT_STRING_TABLE_COUNT ) );
         }
         break;
       }

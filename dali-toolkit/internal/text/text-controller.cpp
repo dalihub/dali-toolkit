@@ -630,6 +630,7 @@ Vector3 Controller::GetNaturalSize()
 
     // Operations that need to be done if the size changes.
     const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
+                                                                        ALIGN  |
                                                                         REORDER );
 
     DoRelayout( Size( MAX_FLOAT, MAX_FLOAT ),
@@ -679,6 +680,7 @@ float Controller::GetHeightForWidth( float width )
 
     // Operations that need to be done if the size changes.
     const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
+                                                                        ALIGN  |
                                                                         REORDER );
 
     DoRelayout( Size( width, MAX_FLOAT ),
@@ -720,6 +722,7 @@ bool Controller::Relayout( const Vector2& size )
     // Operations that need to be done if the size changes.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                              LAYOUT                    |
+                                                             ALIGN                     |
                                                              UPDATE_ACTUAL_SIZE        |
                                                              REORDER );
 
@@ -777,12 +780,22 @@ void Controller::ProcessModifyEvents()
 void Controller::ReplaceTextEvent( const std::string& text )
 {
   // Reset buffers.
+  mImpl->mLogicalModel->mText.Clear();
   mImpl->mLogicalModel->mScriptRuns.Clear();
   mImpl->mLogicalModel->mFontRuns.Clear();
   mImpl->mLogicalModel->mLineBreakInfo.Clear();
   mImpl->mLogicalModel->mWordBreakInfo.Clear();
   mImpl->mLogicalModel->mBidirectionalParagraphInfo.Clear();
+  mImpl->mLogicalModel->mBidirectionalLineInfo.Clear();
+  mImpl->mLogicalModel->mLogicalToVisualMap.Clear();
+  mImpl->mLogicalModel->mVisualToLogicalMap.Clear();
   mImpl->mVisualModel->mGlyphs.Clear();
+  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
+  mImpl->mVisualModel->mCharactersToGlyph.Clear();
+  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
+  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
+  mImpl->mVisualModel->mGlyphPositions.Clear();
+  mImpl->mVisualModel->mLines.Clear();
 
   //  Convert text into UTF-32
   Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
@@ -809,7 +822,8 @@ void Controller::ReplaceTextEvent( const std::string& text )
   // Apply modifications to the model
   mImpl->mOperationsPending = ALL_OPERATIONS;
   UpdateModel( ALL_OPERATIONS );
-  mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT |
+  mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT             |
+                                                           ALIGN              |
                                                            UPDATE_ACTUAL_SIZE |
                                                            REORDER );
 }
@@ -860,7 +874,8 @@ void Controller::InsertTextEvent( const std::string& text )
   // Apply modifications to the model; TODO - Optimize this
   mImpl->mOperationsPending = ALL_OPERATIONS;
   UpdateModel( ALL_OPERATIONS );
-  mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT |
+  mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT             |
+                                                           ALIGN              |
                                                            UPDATE_ACTUAL_SIZE |
                                                            REORDER );
 }
@@ -896,7 +911,8 @@ void Controller::DeleteTextEvent()
   // Apply modifications to the model; TODO - Optimize this
   mImpl->mOperationsPending = ALL_OPERATIONS;
   UpdateModel( ALL_OPERATIONS );
-  mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT |
+  mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT             |
+                                                           ALIGN              |
                                                            UPDATE_ACTUAL_SIZE |
                                                            REORDER );
 }
@@ -1052,7 +1068,6 @@ bool Controller::DoRelayout( const Vector2& size,
     // after the first time the text has been laid out.
     // Fill the vectors again.
 
-    const Length numberOfCharacters = mImpl->mLogicalModel->GetNumberOfCharacters();
     Length numberOfGlyphs = mImpl->mVisualModel->GetNumberOfGlyphs();
 
     Vector<LineBreakInfo>& lineBreakInfo = mImpl->mLogicalModel->mLineBreakInfo;
@@ -1063,6 +1078,7 @@ bool Controller::DoRelayout( const Vector2& size,
 
     // Set the layout parameters.
     LayoutParameters layoutParameters( size,
+                                       mImpl->mLogicalModel->mText.Begin(),
                                        lineBreakInfo.Begin(),
                                        wordBreakInfo.Begin(),
                                        numberOfGlyphs,
@@ -1076,17 +1092,15 @@ bool Controller::DoRelayout( const Vector2& size,
     // some re-allocations.
     Vector<LineRun>& lines = mImpl->mVisualModel->mLines;
 
+    // Delete any previous laid out lines before setting the new ones.
+    lines.Clear();
+
+    // The capacity of the bidirectional paragraph info is the number of paragraphs.
+    lines.Reserve( mImpl->mLogicalModel->mBidirectionalParagraphInfo.Capacity() );
+
     // Resize the vector of positions to have the same size than the vector of glyphs.
     Vector<Vector2>& glyphPositions = mImpl->mVisualModel->mGlyphPositions;
     glyphPositions.Resize( numberOfGlyphs );
-
-    BidirectionalRunIndex firstBidiRunIndex = 0u;
-    Length numberOfBidiRuns = 0u;
-    mImpl->mLogicalModel->GetNumberOfBidirectionalInfoRuns( 0u, numberOfCharacters, firstBidiRunIndex, numberOfBidiRuns );
-
-    // Delete any previous laid out lines before setting the new ones.
-    lines.Clear();
-    lines.Reserve( numberOfBidiRuns );
 
     // Update the visual model.
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
@@ -1144,6 +1158,13 @@ bool Controller::DoRelayout( const Vector2& size,
             free( bidiLineInfo.visualToLogicalMap );
           }
         }
+      } // REORDER
+
+      if( ALIGN & operations )
+      {
+        mImpl->mLayoutEngine.Align( layoutParameters,
+                                    lines,
+                                    glyphPositions );
       }
 
       // Sets the actual size.
@@ -1151,7 +1172,7 @@ bool Controller::DoRelayout( const Vector2& size,
       {
         mImpl->mVisualModel->SetActualSize( layoutSize );
       }
-    }
+    } // view updated
   }
   else
   {

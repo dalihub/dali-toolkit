@@ -35,8 +35,9 @@ namespace Text
  */
 struct BidirectionalLineInfoRun
 {
-  CharacterRun    characterRun;       ///< The initial character index within the whole text and the number of characters of the run.
-  CharacterIndex* visualToLogicalMap; ///< Pointer to the visual to logical map table.
+  CharacterRun       characterRun;       ///< The initial character index within the whole text and the number of characters of the run.
+  CharacterIndex*    visualToLogicalMap; ///< Pointer to the visual to logical map table.
+  CharacterDirection direction;          ///< Direction of the first character of the paragraph.
 };
 
 } // namespace Text
