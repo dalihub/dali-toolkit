@@ -148,10 +148,15 @@ public:
   AtlasId GetAtlas( ImageId id ) const;
 
   /**
-   * @copydoc Toolkit::AtlasManager::SetAtlasSize
+   * @copydoc Toolkit::AtlasManager::SetNewAtlasSize
    */
-  void SetAtlasSize( const Vector2& size,
-                     const Vector2& blockSize );
+  void SetNewAtlasSize( const Vector2& size,
+                        const Vector2& blockSize );
+
+  /**
+   * @copydoc Toolkit::AtlasManager::GetAtlasSize
+   */
+  Vector2 GetAtlasSize( AtlasId atlas );
 
   /**
    * @copydoc Toolkit::AtlasManager::GetBlockSize
@@ -172,6 +177,11 @@ public:
    * @copydoc Toolkit::AtlasManager::GetPixelFormat
    */
   Pixel::Format GetPixelFormat( AtlasId atlas );
+
+  /**
+   * @copydoc Toolkit::AtlasManager::GetMetrics
+   */
+  void GetMetrics( Toolkit::AtlasManager::Metrics& metrics );
 
 private:
 

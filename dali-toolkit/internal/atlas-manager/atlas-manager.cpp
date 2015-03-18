@@ -110,15 +110,20 @@ Vector2 AtlasManager::GetBlockSize( AtlasId atlas )
   return GetImplementation(*this).GetBlockSize( atlas );
 }
 
+Vector2 AtlasManager::GetAtlasSize( AtlasId atlas )
+{
+  return GetImplementation(*this).GetAtlasSize( atlas );
+}
+
 AtlasManager::SizeType AtlasManager::GetFreeBlocks( AtlasId atlas )
 {
   return GetImplementation(*this).GetFreeBlocks( atlas );
 }
 
-void AtlasManager::SetAtlasSize( const Vector2& size,
-                                 const Vector2& blockSize )
+void AtlasManager::SetNewAtlasSize( const Vector2& size,
+                                    const Vector2& blockSize )
 {
-  GetImplementation(*this).SetAtlasSize( size, blockSize );
+  GetImplementation(*this).SetNewAtlasSize( size, blockSize );
 }
 
 AtlasManager::SizeType AtlasManager::GetAtlasCount() const
@@ -129,6 +134,11 @@ AtlasManager::SizeType AtlasManager::GetAtlasCount() const
 Pixel::Format AtlasManager::GetPixelFormat( AtlasId atlas )
 {
   return GetImplementation(*this).GetPixelFormat( atlas );
+}
+
+void AtlasManager::GetMetrics( Metrics& metrics )
+{
+  return GetImplementation(*this).GetMetrics( metrics );
 }
 
 } // namespace Toolkit

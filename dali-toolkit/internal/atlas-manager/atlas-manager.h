@@ -161,6 +161,28 @@ public:
   static const bool MESH_OPTIMIZE = true;
 
   /**
+   * Metrics structures to describe Atlas Manager state
+   *
+   */
+  struct AtlasMetricsEntry
+  {
+    SizeType mWidth;                 // width of the atlas in pixels
+    SizeType mHeight;;               // height of the atlas in pixels
+    SizeType mBlockWidth;            // width of a block in pixels
+    SizeType mBlockHeight;           // height of a block in pixels
+    SizeType mBlocksUsed;            // number of blocks used in the atlas
+    SizeType mTotalBlocks;           // total blocks used by atlas
+    Pixel::Format mPixelFormat;      // pixel format of the atlas
+  };
+
+  struct Metrics
+  {
+    SizeType mAtlasCount;                               // number of atlases
+    SizeType mTextureMemoryUsed;                        // texture memory used by atlases
+    Dali::Vector< AtlasMetricsEntry > mAtlasMetrics;    // container of atlas information
+  };
+
+  /**
    * Create an AtlasManager handle; this can be initialised with AtlasManager::New()
    * Calling member functions with an uninitialised handle is not allowed.
    */
@@ -203,11 +225,11 @@ public:
   /**
    * @brief Create a blank atlas of specific dimensions and pixel format with a certain block size
    *
-   * @param width desired atlas width in pixels
-   * @param height desired atlas height in pixels
-   * @param blockWidth block width to use in atlas in pixels
-   * @param blockHeight block height to use in atlas in pixels
-   * @param pixelformat format of a pixel in atlas
+   * @param[in] width desired atlas width in pixels
+   * @param[in] height desired atlas height in pixels
+   * @param[in] blockWidth block width to use in atlas in pixels
+   * @param[in] blockHeight block height to use in atlas in pixels
+   * @param[in] pixelformat format of a pixel in atlas
    *
    * @return atlas Id
    */
@@ -286,7 +308,8 @@ public:
   /**
    * @brief Get the BufferImage containing an atlas
    *
-   * @param atlas AtlasId returned when atlas was created
+   * @param[in] atlas AtlasId returned when atlas was created
+   *
    * @return Atlas Handle
    */
   Dali::Atlas GetAtlasContainer( AtlasId atlas ) const;
@@ -294,7 +317,8 @@ public:
   /**
    * @brief Get the Id of the atlas containing an image
    *
-   * @param id ImageId
+   * @param[in] id ImageId
+   *
    * @return Atlas Id
    */
   AtlasId GetAtlas( ImageId id );
@@ -302,15 +326,26 @@ public:
   /**
    * @brief Get the size of the blocks used in an atlas
    *
-   * @param atlas AtlasId
+   * @param[in] atlas AtlasId
+   *
    * @return width and height of the blocks used
    */
   Vector2 GetBlockSize( AtlasId atlas );
 
   /**
+   * @brief Get the current size of an atlas
+   *
+   * @param[in] atlas AtlasId
+   *
+   * @return width and height of the atlas
+   */
+  Vector2 GetAtlasSize( AtlasId atlas );
+
+  /**
    * @brief Get the number of blocks available in an atlas
    *
-   * @param atlas AtlasId
+   * @param[in] atlas AtlasId
+   *
    * @return Number of blocks free in this atlas
    */
   SizeType GetFreeBlocks( AtlasId atlas );
@@ -318,11 +353,12 @@ public:
   /**
    * @brief Sets the pixel area of any new atlas and also the individual block size
    *
-   * @param size pixel area of atlas
+   * @param[in] size pixel area of atlas
+   *
    * @param blockSize pixel area in atlas for a block
    */
-  void SetAtlasSize( const Vector2& size,
-                     const Vector2& blockSize );
+  void SetNewAtlasSize( const Vector2& size,
+                        const Vector2& blockSize );
 
   /**
    * @brief Get the number of atlases created
@@ -334,10 +370,18 @@ public:
   /**
    * @brief Get the pixel format used by an atlas
    *
-   * @param atlas AtlasId
+   * @param[in] atlas AtlasId
+   *
    * @return Pixel format used by this atlas
    */
   Pixel::Format GetPixelFormat( AtlasId atlas );
+
+  /**
+   * @brief Fill in a metrics structure showing current status of this Atlas Manager
+   *
+   * @param[in] metrics metrics structure to be filled
+   */
+  void GetMetrics( Metrics& metrics );
 
 private:
 

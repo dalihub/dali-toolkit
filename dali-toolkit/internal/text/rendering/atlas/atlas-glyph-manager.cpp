@@ -98,10 +98,10 @@ void AtlasGlyphManager::Cached( Text::FontId fontId,
   GetImplementation(*this).Cached( fontId, index, slot );
 }
 
-void AtlasGlyphManager::SetAtlasSize( const Vector2& size,
-                                      const Vector2& blockSize )
+void AtlasGlyphManager::SetNewAtlasSize( const Vector2& size,
+                                         const Vector2& blockSize )
 {
-  GetImplementation(*this).SetAtlasSize( size, blockSize );
+  GetImplementation(*this).SetNewAtlasSize( size, blockSize );
 }
 
 void AtlasGlyphManager::Remove( uint32_t imageId )
@@ -112,6 +112,11 @@ void AtlasGlyphManager::Remove( uint32_t imageId )
 Pixel::Format AtlasGlyphManager::GetPixelFormat( uint32_t atlasId )
 {
   return GetImplementation(*this).GetPixelFormat( atlasId );
+}
+
+const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
+{
+  return GetImplementation(*this).GetMetrics();
 }
 
 } // namespace Toolkit

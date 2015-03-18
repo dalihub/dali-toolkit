@@ -108,10 +108,10 @@ void AtlasGlyphManager::Cached( Text::FontId fontId,
   slot.mImageId = 0;
 }
 
-void AtlasGlyphManager::SetAtlasSize( const Vector2& size,
-                                      const Vector2& blockSize )
+void AtlasGlyphManager::SetNewAtlasSize( const Vector2& size,
+                                         const Vector2& blockSize )
 {
-    mAtlasManager.SetAtlasSize( size, blockSize );
+    mAtlasManager.SetNewAtlasSize( size, blockSize );
 }
 
 void AtlasGlyphManager::Remove( uint32_t imageId )
@@ -132,6 +132,13 @@ void AtlasGlyphManager::Remove( uint32_t imageId )
 Pixel::Format AtlasGlyphManager::GetPixelFormat( uint32_t atlasId )
 {
   return mAtlasManager.GetPixelFormat( atlasId );
+}
+
+const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
+{
+  mMetrics.mGlyphCount = mGlyphRecords.Size();
+  mAtlasManager.GetMetrics( mMetrics.mAtlasMetrics );
+  return mMetrics;
 }
 
 } // namespace Internal

@@ -93,10 +93,10 @@ public:
                Dali::Toolkit::AtlasManager::AtlasSlot& slot );
 
   /**
-   * @copydoc Toolkit::AtlasGlyphManager::SetAtlasSize
+   * @copydoc Toolkit::AtlasGlyphManager::SetNewAtlasSize
    */
-  void SetAtlasSize( const Vector2& size,
-                     const Vector2& blockSize );
+  void SetNewAtlasSize( const Vector2& size,
+                        const Vector2& blockSize );
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::Remove
@@ -108,11 +108,17 @@ public:
    */
   Pixel::Format GetPixelFormat( uint32_t atlasId );
 
+  /**
+   * @copydoc toolkit::AtlasGlyphManager::GetMetrics
+   */
+  const Toolkit::AtlasGlyphManager::Metrics& GetMetrics();
+
 private:
 
   Dali::Toolkit::AtlasManager mAtlasManager;
   Vector< GlyphRecord > mGlyphRecords;
   uint32_t mCount;
+  Toolkit::AtlasGlyphManager::Metrics mMetrics;
 };
 
 } // namespace Internal
