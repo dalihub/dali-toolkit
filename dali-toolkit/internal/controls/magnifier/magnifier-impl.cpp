@@ -263,7 +263,6 @@ void Magnifier::InitializeRenderTask()
 
   mCameraActor = CameraActor::New();
   mCameraActor.SetType(Camera::FREE_LOOK);
-  mCameraActor.SetOrientation(Quaternion(M_PI, Vector3::YAXIS)); // Look at stage
 
   stage.Add(mCameraActor);
   mTask.SetCameraActor( mCameraActor );
