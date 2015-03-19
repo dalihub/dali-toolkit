@@ -524,7 +524,7 @@ void MaskedImageView::Initialize( unsigned int targetWidth,
   self.Add( mSourceImageActor );
   mSourceImageActor.SetParentOrigin( ParentOrigin::CENTER );
   mSourceImageActor.SetPositionInheritanceMode( DONT_INHERIT_POSITION );
-  mSourceImageActor.SetInheritRotation( false );
+  mSourceImageActor.SetInheritOrientation( false );
   mSourceImageActor.SetInheritScale( false );
   mSourceImageActor.SetColorMode( USE_OWN_COLOR );
   mSourceImageActor.SetSize( Vector3::ONE );

@@ -9,7 +9,7 @@
  *
  * @code
  * Dali::Actor actor;
- * actor.SetRotation(Quaternion(Radian(Degree(45.0f)).value, Vector3::XAXIS)),
+ * actor.SetOrientation(Quaternion(Radian(Degree(45.0f)).value, Vector3::XAXIS)),
  *
  * Quaternion q(Radian(Degree(30.0f)).value, Vector3(1.0f, 1.0f, 0.0f));
  * actor.RotateBy(q);

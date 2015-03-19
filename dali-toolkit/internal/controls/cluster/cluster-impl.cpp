@@ -345,7 +345,7 @@ void Cluster::TransformChild( unsigned int index, const Vector3& position, const
       Animation animation = Animation::New(period.delaySeconds + period.durationSeconds);
       animation.AnimateTo( Property(child, Actor::Property::POSITION), position, AlphaFunctions::EaseOut, period);
       animation.AnimateTo( Property(child, Actor::Property::SCALE), scale, AlphaFunctions::EaseOut, period);
-      animation.AnimateTo( Property(child, Actor::Property::ROTATION), rotation, AlphaFunctions::EaseOut, period);
+      animation.AnimateTo( Property(child, Actor::Property::ORIENTATION), rotation, AlphaFunctions::EaseOut, period);
       animation.Play();
     }
   }

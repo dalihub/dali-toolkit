@@ -57,8 +57,6 @@
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
-#include <dali-toolkit/public-api/controls/scrollable/item-view/navigation-layout.h>
-#include <dali-toolkit/public-api/controls/scrollable/item-view/roll-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/spiral-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-carousel-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>

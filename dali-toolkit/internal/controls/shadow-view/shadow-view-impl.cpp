@@ -249,7 +249,7 @@ void ShadowView::OnInitialize()
   // Target is constrained to point at the shadow plane origin
   mCameraActor.SetNearClippingPlane( 1.0f );
   mCameraActor.SetType( Dali::Camera::FREE_LOOK ); // Camera orientation constrained to point at shadow plane world position
-  mCameraActor.SetRotation(Radian(Degree(180)), Vector3::YAXIS);
+  mCameraActor.SetOrientation(Radian(Degree(180)), Vector3::YAXIS);
   mCameraActor.SetPosition(DEFAULT_LIGHT_POSITION);
 
   mShadowRenderShader = ShaderEffect::New( RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE,
@@ -277,7 +277,7 @@ void ShadowView::OnInitialize()
 
   // Turn off inheritance to ensure filter renders properly
   mBlurRootActor.SetPositionInheritanceMode(USE_PARENT_POSITION);
-  mBlurRootActor.SetInheritRotation(false);
+  mBlurRootActor.SetInheritOrientation(false);
   mBlurRootActor.SetInheritScale(false);
   mBlurRootActor.SetColorMode(USE_OWN_COLOR);
 
@@ -315,10 +315,10 @@ void ShadowView::ConstrainCamera()
     // is under control of application, can't use transform inheritance)
 
     Constraint cameraOrientationConstraint =
-      Constraint::New<Quaternion> ( Actor::Property::ROTATION,
+      Constraint::New<Quaternion> ( Actor::Property::ORIENTATION,
                                     Source( mShadowPlane, Actor::Property::WORLD_POSITION ),
                                     Source( mPointLight,  Actor::Property::WORLD_POSITION ),
-                                    Source( mShadowPlane, Actor::Property::WORLD_ROTATION ),
+                                    Source( mShadowPlane, Actor::Property::WORLD_ORIENTATION ),
                                     &LookAt );
 
     mCameraActor.ApplyConstraint( cameraOrientationConstraint );

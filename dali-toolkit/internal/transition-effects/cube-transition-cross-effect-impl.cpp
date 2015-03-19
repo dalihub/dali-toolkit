@@ -105,12 +105,12 @@ void CubeTransitionCrossEffect::OnStopTransition()
     for( unsigned int x = y%2; x < mNumColumns; x=x+2)
     {
       idx = y*mNumColumns + x;
-      mBoxes[idx].SetRotation( Radian(angle), Vector3::XAXIS );
+      mBoxes[idx].SetOrientation( Radian(angle), Vector3::XAXIS );
     }
     for( unsigned int x = (y+1)%2; x < mNumColumns; x=x+2)
     {
       idx = y*mNumColumns + x;
-      mBoxes[idx].SetRotation( Radian(-angle), Vector3::YAXIS );
+      mBoxes[idx].SetOrientation( Radian(-angle), Vector3::YAXIS );
     }
   }
 }
@@ -120,12 +120,12 @@ void CubeTransitionCrossEffect::SetupAnimation(unsigned int actorIndex, float an
 {
   if ( mFirstTransition && (!mIsToNextImage) ) // for the first transition and it is going to previous image
   {
-    mTiles[mContainerIndex][actorIndex].SetRotation( Radian( angle),  axis );
+    mTiles[mContainerIndex][actorIndex].SetOrientation( Radian( angle),  axis );
   }
   else if( !mChangeTurningDirection )   // reset rotation, translation and color
   {
-    mTiles[mContainerIndex][actorIndex].MoveBy( resetTranslation );
-    mTiles[mContainerIndex][actorIndex].SetRotation( Radian( angle),  axis );
+    mTiles[mContainerIndex][actorIndex].TranslateBy( resetTranslation );
+    mTiles[mContainerIndex][actorIndex].SetOrientation( Radian( angle),  axis );
   }
   mAnimation.RotateTo( mBoxes[actorIndex], Radian( -angle ), axis, AlphaFunctions::EaseInOutSine );
   Vector3 position(mBoxes[actorIndex].GetCurrentPosition());

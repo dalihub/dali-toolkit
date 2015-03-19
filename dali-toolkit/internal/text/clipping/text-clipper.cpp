@@ -98,7 +98,6 @@ void Clipper::Initialize( const Vector2& size )
   mOffscreenRootActor = Layer::New();
   mOffscreenRootActor.SetColorMode( USE_OWN_COLOR );
   mOffscreenRootActor.SetPositionInheritanceMode( DONT_INHERIT_POSITION );
-  mOffscreenRootActor.SetInheritRotation( false );
   mOffscreenRootActor.SetInheritScale( false );
   mOffscreenRootActor.SetDepthTestDisabled( true );
   mOffscreenRootActor.SetSize( offscreenSize );

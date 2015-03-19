@@ -560,7 +560,7 @@ INPUT                  = ../../../docs/content \
                          ../../../../dali-adaptor/plugins \
                          ../../../../dali-adaptor/platform-abstractions/interfaces \
                          ../../../../dali-adaptor/platform-abstractions/portable \
-                         ../../../../dali-adaptor/platform-abstractions/slp \
+                         ../../../../dali-adaptor/platform-abstractions/tizen \
                          ../../../dali-toolkit \
                          ../../../texture-atlas-exporter \
                          ../../../../dali/automated-tests \

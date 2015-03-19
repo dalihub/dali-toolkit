@@ -241,7 +241,7 @@ void ApplyScrollCarouselConstraints(Toolkit::ScrollView scrollView,
   constraint.SetRemoveAction( Constraint::Discard );
   child.ApplyConstraint( constraint );
 
-  constraint = Constraint::New<Quaternion>( Actor::Property::ROTATION,
+  constraint = Constraint::New<Quaternion>( Actor::Property::ORIENTATION,
                                             LocalSource( Actor::Property::POSITION ),
                                             LocalSource( Actor::Property::SCALE ),
                                             LocalSource( Actor::Property::SIZE ),

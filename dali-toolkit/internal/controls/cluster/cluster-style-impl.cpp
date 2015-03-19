@@ -328,7 +328,7 @@ void ClusterStyle::Apply( Actor actor,
   {
     actor.SetPosition( position );
     actor.SetSize( size );
-    actor.SetRotation( rotation );
+    actor.SetOrientation( rotation );
     actor.SetScale( scale );
   }
 }
