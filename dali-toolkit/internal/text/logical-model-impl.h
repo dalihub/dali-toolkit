@@ -95,7 +95,7 @@ public:
                 Length numberOfCharacters ) const;
 
   /**
-   * Retrieves a character.
+   * @brief Retrieves a character.
    *
    * @param[in] characterIndex Index to a character.
    *
@@ -104,7 +104,7 @@ public:
   Character GetCharacter( CharacterIndex characterIndex ) const;
 
   /**
-   * Replaces characters from the text.
+   * @brief Replaces characters from the text.
    *
    * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
    * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
@@ -122,7 +122,7 @@ public:
   // Language support interface.
 
   /**
-   * Sets the script runs.
+   * @brief Sets the script runs.
    *
    * Replaces any scripts previously set.
    *
@@ -137,7 +137,7 @@ public:
                    Length numberOfRuns );
 
   /**
-   * Retrieves the number of script runs and the index to the first one for the given range of characters.
+   * @brief Retrieves the number of script runs and the index to the first one for the given range of characters.
    *
    * A run is a group of consecutive characters. A script run contains the script for a run.
    *
@@ -152,7 +152,7 @@ public:
                               Length& numberOfScriptRuns ) const;
 
   /**
-   * Retrieves the script runs for the given range of characters.
+   * @brief Retrieves the script runs for the given range of characters.
    *
    * The @p scriptRuns buffer needs to be big enough to copy the number of script runs.
    * Call GetNumberOfScriptRuns() to retrieve the number of script runs.
@@ -166,7 +166,7 @@ public:
                       Length numberOfCharacters ) const;
 
   /**
-   * Retrieves the script for the given character index.
+   * @brief Retrieves the script for the given character index.
    *
    * @param[in] characterIndex Index to the character.
    *
@@ -175,7 +175,7 @@ public:
   Script GetScript( CharacterIndex characterIndex ) const;
 
   /**
-   * Replaces script runs for the given range of characters.
+   * @brief Replaces script runs for the given range of characters.
    *
    * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
    * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
@@ -191,7 +191,7 @@ public:
                        Length numberOfCharactersToInsert );
 
   /**
-   * Sets the font runs.
+   * @brief Sets the font runs.
    *
    * Replaces any fonts previously set.
    *
@@ -206,7 +206,7 @@ public:
                  Length numberOfRuns );
 
   /**
-   * Retrieves the number of font runs and the index of the first one for the given range of characters.
+   * @brief Retrieves the number of font runs and the index of the first one for the given range of characters.
    *
    * A run is a group of consecutive characters. A font run contains the font id for a run.
    *
@@ -221,7 +221,7 @@ public:
                             Length& numberOfFontRuns ) const;
 
   /**
-   * Retrieves the font runs for the given range of characters.
+   * @brief Retrieves the font runs for the given range of characters.
    *
    * The @p fontRuns buffer needs to be big enough to copy the number of font runs.
    * Call GetNumberOfFontRuns() to retrieve the number of font runs.
@@ -235,7 +235,7 @@ public:
                     Length numberOfCharacters ) const;
 
   /**
-   * Retrieves the font id for the given character index.
+   * @brief Retrieves the font id for the given character index.
    *
    * @param[in] characterIndex Index to the first character.
    *
@@ -244,7 +244,7 @@ public:
   FontId GetFont( CharacterIndex characterIndex ) const;
 
   /**
-   * Replaces font runs for the given range of characters.
+   * @brief Replaces font runs for the given range of characters.
    *
    * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
    * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
@@ -262,7 +262,7 @@ public:
   // Break info interface.
 
   /**
-   * Sets the line break info.
+   * @brief Sets the line break info.
    *
    * See GetLineBreakInfo() to get how the line break info is encoded.
    *
@@ -277,7 +277,7 @@ public:
                          Length length );
 
   /**
-   * Retrieves the line break info in the given buffer.
+   * @brief Retrieves the line break info in the given buffer.
    *
    * The size of the @p lineBreakInfo buffer needs to be big enough to copy the @p numberOfItems.
    *
@@ -301,14 +301,14 @@ public:
                          Length numberOfItems ) const;
 
   /**
-   * Retrieves the line break info for the given item index.
+   * @brief Retrieves the line break info for the given item index.
    *
    * @param[in] characterIndex Index to the line break info item.
    */
   LineBreakInfo GetLineBreakInfo( CharacterIndex characterIndex ) const;
 
   /**
-   * Replaces line break info.
+   * @brief Replaces line break info.
    *
    * See GetLineBreakInfo() to get how the line break info is encoded.
    *
@@ -326,7 +326,7 @@ public:
                              Length numberOfItemsToInsert );
 
   /**
-   * Sets the word break info.
+   * @brief Sets the word break info.
    *
    * See GetWordBreakInfo() to get how the word break info is encoded.
    *
@@ -341,7 +341,7 @@ public:
                          Length length );
 
   /**
-   * Retrieves the word break info in the given buffer.
+   * @brief Retrieves the word break info in the given buffer.
    *
    * The size of the @p wordBreakInfo buffer needs to be big enough to copy the @p numberOfItems.
    *
@@ -367,14 +367,14 @@ public:
                          Length numberOfItems ) const;
 
   /**
-   * Retrieves the word break info for the given item index.
+   * @brief Retrieves the word break info for the given item index.
    *
    * @param[in] characterIndex Index to the word break info item.
    */
   WordBreakInfo GetWordBreakInfo( CharacterIndex characterIndex ) const;
 
   /**
-   * Replaces word break info.
+   * @brief Replaces word break info.
    *
    * See GetWordBreakInfo() to get how the word break info is encoded.
    *
@@ -394,7 +394,7 @@ public:
   // Bidirectional support interface.
 
   /**
-   * Sets the bidirectional info runs.
+   * @brief Sets the bidirectional info runs.
    *
    * Replaces any bidirectional info previously set.
    *
@@ -412,7 +412,7 @@ public:
                              Length numberOfRuns );
 
   /**
-   * Retrieves the number of bidirectional info runs and the index to the first one for the given range of characters.
+   * @brief Retrieves the number of bidirectional info runs and the index to the first one for the given range of characters.
    *
    * It may be zero if there is no right to left scripts.
    *
@@ -427,7 +427,7 @@ public:
                                          Length& numberOfFontRuns ) const;
 
   /**
-   * Retrieves the bidirectional paragraph info runs for the given range of characters.
+   * @brief Retrieves the bidirectional paragraph info runs for the given range of characters.
    *
    * The @p bidirectionalInfo buffer needs to be big enough to copy the number of bidirectional
    * paragraph info runs.
@@ -442,7 +442,7 @@ public:
                              Length numberOfCharacters ) const;
 
   /**
-   * Replaces bidirectional info runs for the given range of characters.
+   * @brief Replaces bidirectional info runs for the given range of characters.
    *
    * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
    * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
@@ -458,14 +458,28 @@ public:
                                  Length numberOfCharactersToInsert );
 
   /**
-   * Retrieves the direction of the characters.
+   * @brief Replaces the direction of the characters.
    *
-   * It sets @c true for right to left characters and @c false for left to right.
+   * @note If the number of characters is zero the directions buffer is cleared.
+   *
+   * @param[in] directions The directions of the characters.
+   * @param[in] numberOfCharacters The number of characters.
+   */
+  void SetCharacterDirections( const CharacterDirection* const directions,
+                               Length numberOfCharacters );
+
+  /**
+   * @brief Retrieves the direction of the characters.
+   *
+   * It sets @e true for right to left characters and @e false for left to right.
    * For neutral characters it check's the next and previous character's directions:
    * - If they are equals set that direction. If they are not, sets the paragraph's direction.
    * - If there is no next, sets the paragraph's direction.
    *
    * See SetBidirectionalInfo() to get an explanation of the 'paragraph' meaning in the bidirectional algorithm.
+   *
+   * @pre the @p directions vector should be initialized to @e false (left to right) as this method is not going
+   *      to update it if there is no right to left characters.
    *
    * @param[out] directions Whether the characters are right to left or left to right.
    * @param[in] characterIndex Index to the first character.
@@ -476,7 +490,7 @@ public:
                                Length numberOfCharacters ) const;
 
   /**
-   * Retrieves the direction of a characters.
+   * @brief Retrieves the direction of a characters.
    *
    * See GetCharacterDirections().
    *
@@ -489,7 +503,7 @@ public:
   // Visual <--> Logical conversion tables.
 
   /**
-   * Sets the visual to logical and the logical to visual map tables.
+   * @brief Sets the visual to logical and the logical to visual map tables.
    *
    * Replaces any map tables previously set.
    *
@@ -502,7 +516,7 @@ public:
                               Length numberOfRuns );
 
   /**
-   * Replaces the visual to logical and logical to visual map tables for the given range of characters.
+   * @brief Replaces the visual to logical and logical to visual map tables for the given range of characters.
    *
    * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
    * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
@@ -518,7 +532,7 @@ public:
                                   Length numberOfCharactersToInsert );
 
   /**
-   * Retrieves the visual character index for the given logical character index.
+   * @brief Retrieves the visual character index for the given logical character index.
    *
    * @param[in] logicalCharacterIndex The logical character index.
    *
@@ -527,7 +541,7 @@ public:
   CharacterIndex GetVisualCharacterIndex( CharacterIndex logicalCharacterIndex ) const;
 
   /**
-   * Retrieves the logical character index for the given visual character index.
+   * @brief Retrieves the logical character index for the given visual character index.
    *
    * @param[in] visualCharacterIndex The visual character index.
    *
@@ -536,7 +550,7 @@ public:
   CharacterIndex GetLogicalCharacterIndex( CharacterIndex visualCharacterIndex ) const;
 
   /**
-   * Retrieves the whole or part of the logical to visual conversion map.
+   * @brief Retrieves the whole or part of the logical to visual conversion map.
    *
    * The size of the buffer needs to be big enough to copy the @p numberOfCharacters.
    *
@@ -549,7 +563,7 @@ public:
                               Length numberOfCharacters ) const;
 
   /**
-   * Retrieves the whole or part of the visual to logical conversion map.
+   * @brief Retrieves the whole or part of the visual to logical conversion map.
    *
    * The size of the buffer needs to be big enough to copy the @p numberOfCharacters.
    *
@@ -589,10 +603,10 @@ public:
   Vector<LineBreakInfo>                 mLineBreakInfo;
   Vector<WordBreakInfo>                 mWordBreakInfo;
   Vector<BidirectionalParagraphInfoRun> mBidirectionalParagraphInfo;
-
+  Vector<CharacterDirection>            mCharacterDirections;        ///< For each character, whether is right to left. ( @e flase is left to right, @e true right to left ).
   Vector<BidirectionalLineInfoRun>      mBidirectionalLineInfo;
-  Vector<CharacterIndex>                mLogicalToVisualMap; ///< Bidirectional logical to visual conversion table.
-  Vector<CharacterIndex>                mVisualToLogicalMap; ///< Bidirectional visual to logical conversion table.
+  Vector<CharacterIndex>                mLogicalToVisualMap;         ///< Bidirectional logical to visual conversion table.
+  Vector<CharacterIndex>                mVisualToLogicalMap;         ///< Bidirectional visual to logical conversion table.
 };
 
 } // namespace Text

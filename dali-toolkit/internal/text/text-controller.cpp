@@ -951,6 +951,7 @@ void Controller::ReplaceTextEvent( const std::string& text )
   mImpl->mLogicalModel->mLineBreakInfo.Clear();
   mImpl->mLogicalModel->mWordBreakInfo.Clear();
   mImpl->mLogicalModel->mBidirectionalParagraphInfo.Clear();
+  mImpl->mLogicalModel->mCharacterDirections.Clear();
   mImpl->mLogicalModel->mBidirectionalLineInfo.Clear();
   mImpl->mLogicalModel->mLogicalToVisualMap.Clear();
   mImpl->mLogicalModel->mVisualToLogicalMap.Clear();
@@ -1003,6 +1004,7 @@ void Controller::InsertTextEvent( const std::string& text )
   mImpl->mLogicalModel->mLineBreakInfo.Clear();
   mImpl->mLogicalModel->mWordBreakInfo.Clear();
   mImpl->mLogicalModel->mBidirectionalParagraphInfo.Clear();
+  mImpl->mLogicalModel->mCharacterDirections.Clear();
   mImpl->mLogicalModel->mBidirectionalLineInfo.Clear();
   mImpl->mLogicalModel->mLogicalToVisualMap.Clear();
   mImpl->mLogicalModel->mVisualToLogicalMap.Clear();
@@ -1067,6 +1069,7 @@ void Controller::DeleteTextEvent()
   mImpl->mLogicalModel->mLineBreakInfo.Clear();
   mImpl->mLogicalModel->mWordBreakInfo.Clear();
   mImpl->mLogicalModel->mBidirectionalParagraphInfo.Clear();
+  mImpl->mLogicalModel->mCharacterDirections.Clear();
   mImpl->mLogicalModel->mBidirectionalLineInfo.Clear();
   mImpl->mLogicalModel->mLogicalToVisualMap.Clear();
   mImpl->mLogicalModel->mVisualToLogicalMap.Clear();
@@ -1208,8 +1211,21 @@ void Controller::UpdateModel( OperationsMask operationsRequired )
       // TODO: consider if the mirrored string can be stored as well.
 
       textMirrored = GetMirroredText( utf32Characters, mirroredUtf32Characters );
+
+      // Only set the character directions if there is right to left characters.
+      Vector<CharacterDirection>& directions = mImpl->mLogicalModel->mCharacterDirections;
+      directions.Resize( numberOfCharacters );
+
+      GetCharactersDirection( bidirectionalInfo,
+                              directions );
     }
-  }
+    else
+    {
+      // There is no right to left characters. Clear the directions vector.
+      mImpl->mLogicalModel->mCharacterDirections.Clear();
+    }
+
+   }
 
   Vector<GlyphInfo>& glyphs = mImpl->mVisualModel->mGlyphs;
   Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mVisualModel->mGlyphsToCharacters;

@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 
 // EXTERNAL INCLUDES
+#include <memory.h>
 #include <dali/public-api/text-abstraction/bidirectional-support.h>
 
 namespace Dali
@@ -248,6 +249,34 @@ bool GetMirroredText( const Vector<Character>& text,
 
   return bidirectionalSupport.GetMirroredText( mirroredText.Begin(),
                                                mirroredText.Count() );
+}
+
+void GetCharactersDirection( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                             Vector<CharacterDirection>& directions )
+{
+  // Handle to the bidirectional info module in text-abstraction.
+  TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
+
+  CharacterIndex index = 0u;
+  CharacterDirection* directionsBuffer = directions.Begin();
+  for( Vector<BidirectionalParagraphInfoRun>::ConstIterator it = bidirectionalInfo.Begin(),
+         endIt = bidirectionalInfo.End();
+       it != endIt;
+       ++it )
+  {
+    const BidirectionalParagraphInfoRun& paragraph = *it;
+
+    // Fills with left to right those paragraphs without right to left characters.
+    memset( directionsBuffer + index, false, ( paragraph.characterRun.characterIndex - index ) * sizeof( bool ) );
+    index += paragraph.characterRun.numberOfCharacters;
+
+    bidirectionalSupport.GetCharactersDirection( paragraph.bidirectionalInfoIndex,
+                                                 directionsBuffer + paragraph.characterRun.characterIndex,
+                                                 paragraph.characterRun.numberOfCharacters );
+  }
+
+  // Fills with left to right those paragraphs without right to left characters.
+  memset( directionsBuffer + index, false, ( directions.Count() - index ) * sizeof( bool ) );
 }
 
 } // namespace Text
