@@ -215,7 +215,7 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
     {
       WrappedQuaternionConstraint wrapped(rotationConstraint, itemId);
 
-      Constraint constraint = Constraint::New<Quaternion>( Actor::Property::ROTATION,
+      Constraint constraint = Constraint::New<Quaternion>( Actor::Property::ORIENTATION,
                                                            Source( scrollPositionObject, scrollPositionProperty ),
                                                            ParentSource( scrollSpeedProperty ),
                                                            ParentSource( Actor::Property::SIZE ),

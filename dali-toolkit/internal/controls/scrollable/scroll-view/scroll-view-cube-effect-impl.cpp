@@ -303,7 +303,7 @@ void ApplyScrollCubeConstraints(Toolkit::ScrollView scrollView,
 {
   // Apply constraints to this actor //
   Constraint constraint;
-  constraint = Constraint::New<Quaternion>( Actor::Property::ROTATION,
+  constraint = Constraint::New<Quaternion>( Actor::Property::ORIENTATION,
                                          Source(parentPage, Actor::Property::POSITION),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_FINAL_PROPERTY_NAME ) ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),

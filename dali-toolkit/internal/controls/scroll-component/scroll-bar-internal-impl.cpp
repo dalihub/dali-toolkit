@@ -407,7 +407,7 @@ ScrollBarInternal::ScrollBarInternal(Toolkit::Scrollable& container, bool vertic
   mSlider.ApplyConstraint( constraint );
   mSliderWrap.ApplyConstraint( constraint );
 
-  constraint = Constraint::New<Quaternion>( Actor::Property::ROTATION,
+  constraint = Constraint::New<Quaternion>( Actor::Property::ORIENTATION,
                                             Source( target, target.GetPropertyIndex( Toolkit::Scrollable::SCROLL_DIRECTION_PROPERTY_NAME ) ),
                                             ScrollBarInternalRotationConstraint( vertical ) );
   mSlider.ApplyConstraint( constraint );

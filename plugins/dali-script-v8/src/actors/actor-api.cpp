@@ -502,13 +502,13 @@ void ActorApi::GetActorType( const v8::FunctionCallbackInfo<v8::Value>& args )
  * @example
  *
  *    // using an array
- *    actor.moveBy( [20,40,0] );
+ *    actor.translateBy( [20,40,0] );
  *
  * @for Actor
- * @method moveBy
+ * @method translateBy
  * @param {object} an array of 3 numbers
  */
-void ActorApi::MoveBy( const v8::FunctionCallbackInfo<v8::Value>& args )
+void ActorApi::TranslateBy( const v8::FunctionCallbackInfo<v8::Value>& args )
 {
   v8::Isolate* isolate = args.GetIsolate();
   v8::HandleScope handleScope( isolate );
@@ -532,7 +532,7 @@ void ActorApi::MoveBy( const v8::FunctionCallbackInfo<v8::Value>& args )
     DALI_SCRIPT_EXCEPTION( isolate, "Vector3 move parameter missing" );
     return;
   }
-  actor.MoveBy( vector );
+  actor.TranslateBy( vector );
 
 }
 
@@ -557,7 +557,7 @@ void ActorApi::RotateBy( const v8::FunctionCallbackInfo<v8::Value>& args )
   bool found( false );
   Property::Value rotation = V8Utils::GetPropertyValueParameter( PARAMETER_0, found, isolate, args );
 
-  if( rotation.GetType() != Property::ROTATION )
+  if( rotation.GetType() != Property::ORIENTATION )
   {
     DALI_SCRIPT_EXCEPTION( isolate, "Rotation parameter missing" );
     return;
@@ -608,74 +608,6 @@ void ActorApi::ScaleBy( const v8::FunctionCallbackInfo<v8::Value>& args )
   }
   actor.ScaleBy( vector );
 }
-/**
- * Apply a relative scale to an actor.
- * Actor opacity ranges from 0 (see through ) to 1 ( solid )
- * @example
- *    // reduce actor opactiy by a half
- *    actor.opaictyBy(-0.5);
- *
- * @for Actor
- * @method OpacityBy
- * @param {float} relative opacity
- */
-void ActorApi::OpacityBy( const v8::FunctionCallbackInfo<v8::Value>& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  Actor actor = GetActor( isolate, args );
-
-  // void OpacityBy(float relativeOpacity);
-  bool found;
-  float opacity = V8Utils::GetFloatParameter( PARAMETER_0, found, isolate, args, 0.f );
-  if( !found )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "float parameter missing" );
-    return;
-  }
-  actor.OpacityBy( opacity );
-}
-
-/**
- * Apply a relative color change to an actor.
- *
- * @example
- *    // increase actor red by half
- *    actor.colorBy( [0.5, 0, 0, 0]);
- *
- *
- * @for Actor
- * @method colorBy
- * @param {Object} Color JavaScript array
- */
-void ActorApi::ColorBy( const v8::FunctionCallbackInfo<v8::Value>& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  Actor actor = GetActor( isolate, args );
-
-  bool found;
-  int argCount( args.Length() );
-  Vector4 color;
-
-  if( argCount == 1 )
-  {
-    color = V8Utils::GetVector4Parameter( PARAMETER_0, found, isolate, args );
-    if( !found )
-    {
-      DALI_SCRIPT_EXCEPTION( isolate, "Vector4 parameter missing" );
-      return;
-    }
-  }
-  else
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "Vector4 parameter missing" );
-    return;
-  }
-
-  actor.ColorBy( color );
-}
-
 
 } // namespace V8Plugin
 

@@ -126,8 +126,7 @@ struct OvershootOverlayRotationConstraint
     const float parentOvershoot = parentOvershootProperty.GetFloat();
     const Toolkit::ControlOrientation::Type& parentOrientation = static_cast<Toolkit::ControlOrientation::Type>(parentScrollDirection.z);
 
-    Quaternion rotation;
-
+    float multiplier = 0;
     if(Toolkit::IsVertical(parentOrientation))
     {
       if(fabsf(parentScrollDirection.y) <= Math::MACHINE_EPSILON_1)
@@ -135,21 +134,21 @@ struct OvershootOverlayRotationConstraint
         if( (parentOrientation == Toolkit::ControlOrientation::Up && parentOvershoot < Math::MACHINE_EPSILON_0)
             || (parentOrientation == Toolkit::ControlOrientation::Down && parentOvershoot > Math::MACHINE_EPSILON_0) )
         {
-          rotation = Quaternion(0.5f * Math::PI, Vector3::ZAXIS);
+          multiplier = 0.5f;
         }
         else
         {
-          rotation = Quaternion(1.5f * Math::PI, Vector3::ZAXIS);
+          multiplier = 1.5f;
         }
       }
       else if( (parentOvershoot > Math::MACHINE_EPSILON_0 && parentScrollDirection.y > Math::MACHINE_EPSILON_0)
             || (parentOvershoot < Math::MACHINE_EPSILON_0 && parentScrollDirection.y < Math::MACHINE_EPSILON_0) )
       {
-        rotation = Quaternion(0.0f, Vector3::ZAXIS);
+        multiplier = 0.0f;
       }
       else
       {
-        rotation = Quaternion(Math::PI, Vector3::ZAXIS);
+        multiplier = 1.0f;
       }
     }
     else
@@ -159,23 +158,25 @@ struct OvershootOverlayRotationConstraint
         if( (parentOrientation == Toolkit::ControlOrientation::Left && parentOvershoot > Math::MACHINE_EPSILON_0)
             ||(parentOrientation == Toolkit::ControlOrientation::Right && parentOvershoot < Math::MACHINE_EPSILON_0) )
         {
-          rotation = Quaternion(Math::PI, Vector3::ZAXIS);
+          multiplier = 1.0f;
         }
         else
         {
-          rotation = Quaternion(0.0f, Vector3::ZAXIS);
+          multiplier = 0.0f;
         }
       }
       else if( (parentOvershoot > Math::MACHINE_EPSILON_0 && parentScrollDirection.x > Math::MACHINE_EPSILON_0)
             || (parentOvershoot < Math::MACHINE_EPSILON_0 && parentScrollDirection.x < Math::MACHINE_EPSILON_0) )
       {
-        rotation = Quaternion(1.5f * Math::PI, Vector3::ZAXIS);
+        multiplier = 1.5f;
       }
       else
       {
-        rotation = Quaternion(0.5f * Math::PI, Vector3::ZAXIS);
+        multiplier = 0.5f;
       }
     }
+
+    Quaternion rotation( Radian( multiplier * Math::PI ), Vector3::ZAXIS );
 
     return rotation;
   }
@@ -1580,7 +1581,7 @@ void ItemView::SetOvershootEnabled( bool enable )
     mOvershootOverlay.ApplyConstraint(constraint);
     mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.width, OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height);
 
-    constraint = Constraint::New<Quaternion>( Actor::Property::ROTATION,
+    constraint = Constraint::New<Quaternion>( Actor::Property::ORIENTATION,
                                               ParentSource( mPropertyScrollDirection ),
                                               Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                               OvershootOverlayRotationConstraint() );

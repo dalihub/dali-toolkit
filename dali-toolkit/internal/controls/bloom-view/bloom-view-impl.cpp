@@ -335,7 +335,6 @@ void BloomView::AllocateResources()
     mRenderDownsampledCamera.SetNearClippingPlane(1.0f);
     mRenderDownsampledCamera.SetAspectRatio(mDownsampledWidth / mDownsampledHeight);
     mRenderDownsampledCamera.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
-    mRenderDownsampledCamera.SetRotation(Quaternion(M_PI, Vector3::YAXIS)); // Rotate to look at origin
 
     mRenderDownsampledCamera.SetPosition(0.0f, 0.0f, ((mDownsampledHeight * 0.5f) / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f)));
 
@@ -345,7 +344,6 @@ void BloomView::AllocateResources()
     mRenderFullSizeCamera.SetNearClippingPlane(1.0f);
     mRenderFullSizeCamera.SetAspectRatio(mTargetSize.width / mTargetSize.height);
     mRenderFullSizeCamera.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
-    mRenderFullSizeCamera.SetRotation(Quaternion(M_PI, Vector3::YAXIS)); // Rotate to look at origin
 
     float cameraPosConstraintScale = 0.5f / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f);
     mRenderFullSizeCamera.SetPosition(0.0f, 0.0f, mTargetSize.height * cameraPosConstraintScale);

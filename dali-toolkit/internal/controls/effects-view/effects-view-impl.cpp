@@ -465,7 +465,6 @@ void EffectsView::SetupCameras()
   mCameraForChildren.SetAspectRatio(mTargetSize.width / mTargetSize.height);
   mCameraForChildren.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
   mCameraForChildren.SetPosition(0.0f, 0.0f, mTargetSize.height * cameraPosScale);
-  mCameraForChildren.SetRotation(Quaternion(M_PI, Vector3::YAXIS));
   mCameraForChildren.SetZ( mTargetSize.height * cameraPosScale );
 }
 

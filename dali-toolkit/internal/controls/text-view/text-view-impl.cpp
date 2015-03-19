@@ -763,7 +763,7 @@ void TextView::SetSnapshotModeEnabled( bool enable )
 
       mOffscreenRootActor.SetColorMode( USE_OWN_COLOR );
       mOffscreenRootActor.SetPositionInheritanceMode( DONT_INHERIT_POSITION );
-      mOffscreenRootActor.SetInheritRotation( false );
+      mOffscreenRootActor.SetInheritOrientation( false );
       mOffscreenRootActor.SetInheritScale( false );
       mOffscreenRootActor.SetDepthTestDisabled( true );
 
@@ -1494,7 +1494,7 @@ void TextView::ProcessSnapshot( const Size& textViewSize )
           mOffscreenCameraActor = CameraActor::New();
           mOffscreenCameraActor.SetParentOrigin( ParentOrigin::CENTER );
           mOffscreenCameraActor.SetAnchorPoint( AnchorPoint::CENTER );
-          mOffscreenCameraActor.SetRotation(Degree(180.f), Vector3::YAXIS);
+          mOffscreenCameraActor.SetOrientation(Degree(180.f), Vector3::YAXIS);
 
           mOffscreenCameraActor.SetType( Dali::Camera::FREE_LOOK ); // Inherits position from the offscreen root actor.
 

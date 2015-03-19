@@ -170,11 +170,11 @@ bool ModuleLoader::ExecuteScriptFromFile( v8::Isolate* isolate,
  *
  *
  *     // ImageActor.js
- *     function ImageActor( position, rotation, image, name )
+ *     function ImageActor( position, orientation, image, name )
  *     {
  *         this = new dali.ImageActor( image );
  *         this.position = position;
- *         this.rotation = rotation;
+ *         this.orientation = orientation;
  *         this.name = name;
  *     }
  *     module.exports = ImageActor;
@@ -185,7 +185,7 @@ bool ModuleLoader::ExecuteScriptFromFile( v8::Isolate* isolate,
  *
  *     var ImageActor = require(" ImageActor.js");
  *
- *     var imageActor = new ImageActor( position, rotation, image, "my first image actor");
+ *     var imageActor = new ImageActor( position, orientation, image, "my first image actor");
  *
  * #### Exporting as a singleton
  *

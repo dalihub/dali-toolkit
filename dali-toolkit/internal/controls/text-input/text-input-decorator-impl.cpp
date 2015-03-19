@@ -439,7 +439,7 @@ void Decorator::DrawCursor(const std::size_t nthChar)
   {
     DALI_ASSERT_DEBUG( ( 0 <= cursorPosition-1 ) && ( cursorPosition-1 < mTextViewCharacterPositioning.StyledTextSize() ) );
     const TextStyle styleAtCursor = mTextViewCharacterPositioning.GetStyleAt( cursorPosition-1 );
-    mCursor.SetRotation( styleAtCursor.IsItalicsEnabled() ? Degree( styleAtCursor.GetItalicsAngle() - CURSOR_ANGLE_OFFSET ) : Degree( 0.f ), Vector3::ZAXIS );
+    mCursor.SetOrientation( styleAtCursor.IsItalicsEnabled() ? Degree( styleAtCursor.GetItalicsAngle() - CURSOR_ANGLE_OFFSET ) : Degree( 0.f ), Vector3::ZAXIS );
   }
 
   DALI_ASSERT_DEBUG( cursorPosition <= mTextViewCharacterPositioning.GetNumberOfCharactersInText() );
