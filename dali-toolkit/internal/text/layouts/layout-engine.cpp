@@ -588,6 +588,8 @@ struct LayoutEngine::Impl
       case ALIGN_CENTER:
       {
         offset = 0.5f * ( boxWidth - lineLength );
+        const int intOffset = static_cast<int>( offset ); // try to avoid pixel alignment.
+        offset = static_cast<float>( intOffset );
         break;
       }
       case ALIGN_END:
