@@ -131,11 +131,17 @@ void ShapeText( const Vector<Character>& text,
       }
     }
 
-    // Check if the current index is a white space. Do not want to shape a \n.
+    // Check if the current index is a new paragraph character.
+    // A \n is going to be shaped in order to not to mess the conversion tables.
+    // After the \n character is shaped, the glyph is going to be reset to its
+    // default in order to not to get any metric or font index for it.
+    const bool isNewParagraph = TextAbstraction::IsNewParagraph( *( textBuffer + currentIndex ) );
+
     // The last character is always a must-break even if it's not a \n.
     Length numberOfCharactersToShape = currentIndex - previousIndex;
-    if( mustBreak && !TextAbstraction::IsWhiteSpace( *( textBuffer + currentIndex ) ) )
+    if( mustBreak )
     {
+      // Add one more character to shape.
       ++numberOfCharactersToShape;
     }
 
@@ -163,6 +169,18 @@ void ShapeText( const Vector<Character>& text,
     // Retrieve the glyphs and the glyph to character conversion map.
     shaping.GetGlyphs( glyphsBuffer + glyphIndex,
                        glyphToCharacterMapBuffer + glyphIndex );
+
+    if( isNewParagraph )
+    {
+      // TODO : This is a work around to avoid drawing a square in the
+      //        place of a new line character.
+
+      // If the last character is a \n, it resets the glyph to the default
+      // to avoid getting any metric for it.
+      GlyphInfo& glyph = *( glyphsBuffer + glyphIndex + ( numberOfGlyphs - 1u ) );
+
+      glyph = GlyphInfo();
+    }
 
     // Update indices.
     if( 0u != glyphIndex )
