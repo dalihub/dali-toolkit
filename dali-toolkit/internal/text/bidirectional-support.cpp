@@ -220,7 +220,7 @@ void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInf
 
       // Reorders the line.
       bidirectionalSupport.Reorder( paragraphInfo.bidirectionalInfoIndex,
-                                    line.characterRun.characterIndex,
+                                    line.characterRun.characterIndex - paragraphInfo.characterRun.characterIndex,
                                     line.characterRun.numberOfCharacters,
                                     lineInfoRun.visualToLogicalMap );
 

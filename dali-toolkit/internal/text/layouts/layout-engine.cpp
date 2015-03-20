@@ -219,33 +219,30 @@ struct LayoutEngine::Impl
 
       if( TextAbstraction::LINE_MUST_BREAK == lineBreakInfo )
       {
-        if( glyphIndex == lastGlyphIndex )
+        // Must break the line. Update the line layout and return.
+        lineLayout.numberOfCharacters += tmpLineLayout.numberOfCharacters;
+        lineLayout.numberOfGlyphs += tmpLineLayout.numberOfGlyphs;
+        lineLayout.length += tmpLineLayout.length;
+
+        if( 0.f < tmpLineLayout.length )
         {
-          // Must break the line. Update the line layout and return.
-          lineLayout.numberOfCharacters += tmpLineLayout.numberOfCharacters;
-          lineLayout.numberOfGlyphs += tmpLineLayout.numberOfGlyphs;
-          lineLayout.length += tmpLineLayout.length;
+          lineLayout.length += lineLayout.wsLengthEndOfLine;
 
-          if( 0.f < tmpLineLayout.length )
-          {
-            lineLayout.length += lineLayout.wsLengthEndOfLine;
+          lineLayout.wsLengthEndOfLine = tmpLineLayout.wsLengthEndOfLine;
+        }
+        else
+        {
+          lineLayout.wsLengthEndOfLine += tmpLineLayout.wsLengthEndOfLine;
+        }
 
-            lineLayout.wsLengthEndOfLine = tmpLineLayout.wsLengthEndOfLine;
-          }
-          else
-          {
-            lineLayout.wsLengthEndOfLine += tmpLineLayout.wsLengthEndOfLine;
-          }
+        if( tmpLineLayout.height > lineLayout.height )
+        {
+          lineLayout.height = tmpLineLayout.height;
+        }
 
-          if( tmpLineLayout.height > lineLayout.height )
-          {
-            lineLayout.height = tmpLineLayout.height;
-          }
-
-          if( tmpLineLayout.ascender > lineLayout.ascender )
-          {
-            lineLayout.ascender = tmpLineLayout.ascender;
-          }
+        if( tmpLineLayout.ascender > lineLayout.ascender )
+        {
+          lineLayout.ascender = tmpLineLayout.ascender;
         }
 
         tmpLineLayout.numberOfCharacters = 0u;
