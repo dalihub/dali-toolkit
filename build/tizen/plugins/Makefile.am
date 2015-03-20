@@ -20,7 +20,6 @@ plugin_src_dir = ../../../plugins
 
 include ../../../plugins/dali-script-v8/file.list
 
-DALI_SCRIPTV8_LIBS="-lv8 -lpthread"
 
 lib_LTLIBRARIES = libdali-script-plugin-v8.la
 
@@ -46,16 +45,16 @@ libdali_script_plugin_v8_la_CXXFLAGS = -DDALI_COMPILATION \
                             -DDALI_DATA_READ_ONLY_DIR="\"${dataReadOnlyDir}\"" \
                             $(DALI_CFLAGS) \
                             $(DLOG_CFLAGS) \
-                            $(DALI_SCRIPTV8_CFLAGS) \
                             -I../../.. \
                             $(script_plugin_v8_includes) \
+                            $(V8_CFLAGS) \
                             -Werror -Wall
 
 libdali_script_plugin_v8_la_LIBADD = \
                             $(DALICORE_LIBS) \
                             $(DALI_LIBS) \
                             $(DLOG_LIBS) \
-                            $(DALI_SCRIPTV8_LIBS)
+                            $(V8_LIBS)
 
 libdali_script_plugin_v8_la_LDFLAGS = \
                            -rdynamic

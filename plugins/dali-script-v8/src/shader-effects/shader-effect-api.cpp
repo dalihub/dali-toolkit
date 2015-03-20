@@ -44,7 +44,6 @@ struct GeometryTypePair
 const GeometryTypePair GeometryTypeTable[]=
 {
     {"image",         GEOMETRY_TYPE_IMAGE },
-    {"text",          GEOMETRY_TYPE_TEXT  },
     {"mesh",          GEOMETRY_TYPE_UNTEXTURED_MESH  },
     {"textured-mesh", GEOMETRY_TYPE_TEXTURED_MESH },
 };

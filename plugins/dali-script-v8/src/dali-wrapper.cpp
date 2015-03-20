@@ -26,7 +26,6 @@
 #include <stage/stage-wrapper.h>
 #include <image/image-attributes-wrapper.h>
 #include <image/image-wrapper.h>
-#include <text/font-wrapper.h>
 #include <animation/path-wrapper.h>
 #include <animation/animation-wrapper.h>
 #include <events/pan-gesture-detector-wrapper.h>
@@ -59,7 +58,6 @@ const ApiFunction ConstructorFunctionTable[]=
 {
     { "Rotation",           PropertyValueWrapper::NewRotation},
     { "Matrix",             PropertyValueWrapper::NewMatrix},
-    { "Font",               FontWrapper::NewFont },
     { "Path",               PathWrapper::NewPath },
     { "Actor",              ActorWrapper::NewActor },
     { "TextActor",          ActorWrapper::NewActor },
@@ -183,7 +181,7 @@ void DaliWrapper::CreateContext( )
   // Context = multiple contexts can exist in a given Isolate, and share data between contexts
   v8::Handle<v8::Context> context  = v8::Context::New( mIsolate, NULL, global);
 
-  mGlobalObjectTemplate.Reset( mIsolate,  global); 
+  mGlobalObjectTemplate.Reset( mIsolate,  global);
 
   mContext.Reset( mIsolate, context);
 }
@@ -192,10 +190,16 @@ void DaliWrapper::Initialize()
 {
   if( !mIsolate )
   {
-    v8::V8::Initialize();
     v8::V8::InitializeICU();
+
+    v8::V8::Initialize();
+
+    // default isolate removed from V8 version 3.27.1 and beyond.
+    mIsolate = v8::Isolate::New();
+    mIsolate->Enter();
+
     v8::V8::SetFatalErrorHandler( FatalErrorCallback );
-    mIsolate = v8::Isolate::GetCurrent();
+
   }
   // if context is null, create it and add dali object to the global object.
   if( mContext.IsEmpty())
@@ -213,10 +217,6 @@ void DaliWrapper::Initialize()
 
      v8::Local<v8::Object> stageObject = StageWrapper::WrapStage( mIsolate, Stage::GetCurrent() );
      daliObject->Set( v8::String::NewFromUtf8( mIsolate, "stage") , stageObject );
-
-     // fontObject provides static font functionality like GetFontList...
-     v8::Local<v8::Object> fontObject = FontWrapper::GetStaticFontObject( mIsolate );
-     daliObject->Set( v8::String::NewFromUtf8( mIsolate, "font") , fontObject );
 
      // keyboard focus manager is a singleton
      v8::Local<v8::Object> keyboardObject = KeyboardFocusManagerWrapper::WrapKeyboardFocusManager( mIsolate,Toolkit::KeyboardFocusManager::Get() );

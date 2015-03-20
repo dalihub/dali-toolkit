@@ -68,8 +68,8 @@ myActor2.position=[ 100,0,-2000];  // x = 100, y = 0 , z = -2000
 function createAnimation() {
   
   var startRotation = new dali.Rotation(180, -180, 0);
-  myActor1.rotation = startRotation;
-  myActor2.rotation = startRotation;
+  myActor1.orientation = startRotation;
+  myActor2.orientation = startRotation;
   
   dali.stage.add( myActor1 );
   dali.stage.add( myActor2 );
@@ -90,7 +90,7 @@ function createAnimation() {
   var endRotation = new dali.Rotation(0,0,0);
   
   animOptions.alpha = "easeInOutSine";
-  anim.animateTo(myActor1, "rotation", endRotation, animOptions);
+  anim.animateTo(myActor1, "orientation", endRotation, animOptions);
   
   // Delay the myActor2  by  a second
   animOptions.delay = 0.0;
@@ -99,7 +99,7 @@ function createAnimation() {
   
   //  rotate back to correct orientation
   animOptions.alpha = "easeInOutSine";
-  anim.animateTo(myActor2, "rotation", endRotation, animOptions);
+  anim.animateTo(myActor2, "orientation", endRotation, animOptions);
 
   return anim;
 }
@@ -209,7 +209,7 @@ var shaderAnim = createShaderAnimation( shaderEffect, color,zoom, duration, dela
   
 // also rotate the imageActor 90 degrees at the same time.
 var rotation = new dali.Rotation(90,0,0,1);
-shaderAnim.animateTo(imageActor, "rotation", rotation, { alpha:"linear", duration:duration, delay:delay });
+shaderAnim.animateTo(imageActor, "orientation", rotation, { alpha:"linear", duration:duration, delay:delay });
 
 
 shaderAnim.play();
