@@ -391,15 +391,42 @@ void ReplaceBidirectionalInfo( CharacterIndex characterIndex,
 {
 }
 
+void LogicalModel::SetCharacterDirections( const CharacterDirection* const directions,
+                                           Length numberOfCharacters )
+{
+  if( 0u == numberOfCharacters )
+  {
+    mCharacterDirections.Clear();
+  }
+  else
+  {
+    mCharacterDirections.Resize( numberOfCharacters );
+    memcpy( mCharacterDirections.Begin(), directions, numberOfCharacters * sizeof( CharacterDirection ) );
+  }
+}
+
 void LogicalModel::GetCharacterDirections( CharacterDirection* directions,
                                            CharacterIndex characterIndex,
                                            Length numberOfCharacters ) const
 {
+  if( 0u == mCharacterDirections.Count() )
+  {
+    // Nothing to retrieve if the model has no right to left characters.
+    return;
+  }
+
+  memcpy( directions, mCharacterDirections.Begin() + characterIndex, numberOfCharacters * sizeof( CharacterDirection ) );
 }
 
 CharacterDirection LogicalModel::GetCharacterDirection( CharacterIndex characterIndex ) const
 {
-  return false;
+  if( characterIndex >= mCharacterDirections.Count() )
+  {
+    // The model has no right to left characters, so the vector of directions is void.
+    return false;
+  }
+
+  return *( mCharacterDirections.Begin() + characterIndex );
 }
 
 void LogicalModel::SetVisualToLogicalMap( const BidirectionalLineInfoRun* const bidirectionalInfo,

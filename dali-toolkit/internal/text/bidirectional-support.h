@@ -72,7 +72,7 @@ void ReplaceBidirectionalInfo( LogicalModel& model,
                                Length numberOfCharactersToInsert );
 
 /**
- * Sets the visual to logical and logical to visual map tables.
+ * Sets the visual to logical map tables.
  *
  * Any map tables previously set are removed.
  *
@@ -82,7 +82,7 @@ void ReplaceBidirectionalInfo( LogicalModel& model,
  *
  * @param[in] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
  * @param[in] lineRuns The line runs converted to characters.
- * @param[out] lineInfoRuns line runs with the visual to logical and logical to visual conversion maps.
+ * @param[out] lineInfoRuns line runs with the visual to logical conversion maps.
  */
 void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
                    const Vector<LineRun>& lineRuns,
@@ -120,6 +120,19 @@ void ReorderLines( LogicalModel& logicalModel,
  */
 bool GetMirroredText( const Vector<Character>& text,
                       Vector<Character>& mirroredText );
+
+/**
+ * @brief Retrieves the character's directions.
+ *
+ * @pre The @p logicalModel needs to have a text set.
+ * @pre The @p logicalModel needs to have the bidirectional info indices for each paragraph set.
+ *
+ * @param[in] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
+ * @param[out] directions The direction, @e false is left to right and @e true is right to left, of each character of the paragraph.
+ */
+void GetCharactersDirection( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                             Vector<CharacterDirection>& directions );
+
 } // namespace Text
 
 } // namespace Toolkit
