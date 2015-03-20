@@ -31,6 +31,7 @@
  * - \link constraints-intro Introduction to Constraints \endlink
  *
  * \section UIControls UI Controls
+ * - \link text-label Text Label \endlink
  * - \link item-view Item View \endlink
  * - \link scroll-view Scroll View \endlink
  * - \link size-negotiation Size Negotiation \endlink
