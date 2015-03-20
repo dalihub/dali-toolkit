@@ -1,12 +1,11 @@
-/*! \page image-text-mesh-actor Image, Text and Mesh actors
+/*! \page image-mesh-actor Image and Mesh actors
  *
  *
  * <h1 class="pg">Overview</h1>
- * The Dali::ImageActor, Dali::TextActor, Dali::MeshActor are inherited from Dali::Actor and provide means to display resources like Images, Text and Geometries (Triangle meshes) on the stage.
+ * The Dali::ImageActor & Dali::MeshActor are inherited from Dali::Actor and provide means to display resources like Images and Geometries (Triangle meshes) on the stage.
  * All the Dali::Actor methods can be called on them.<br>
  *
  * - <b>ImageActor:</b> An actor for displaying Images. It allows the developer to display a Dali::Image object on the stage.<br>
- * - <b>TextActor:</b>  An actor for displaying text.<br>
  * - <b>MeshActor:</b>  An actor for displaying one or more mesh geometries. It may have children, which may be plain actors or other mesh actors.<br>
  *
  * <h1 class="pg">Image Actor</h1>
@@ -105,80 +104,6 @@
  * // default : 1 Second
  * myImageActor.SetFadeInDuration(seconds);
  * @endcode
- *
- *
- *
- *
- *
- * <h1 class="pg">Text Actor</h1>
- *
- *
- * <h2 class="pg">Displaying Text</h2>
- * The text displayed by the text actor is initialised/set on construction, which can be changed later.
- *
- * @code
- * Dali::TextActor myTextActor = Dali::TextActor::New("Hi");
- * std::string str("Hello");
- * if (myTextActor.GetText() != str)
- * {
- *   myTextActor.SetText(str);
- * }
- * @endcode
- *
- *
- * <h2 class="pg">Fonts</h2>
- * It's possible to specify a font for the text displayed by the text actor.
- * @code
- * Dali::Font freeSerif = Dali::Font::New("FreeSerif", 8);
- * myTextActor.SetFont(freeSerif);
- * @endcode
- *
- *
- * <h2 class="pg">Ellipsis</h2>
- * It is possible to display an ellipsis in the TextActor when the text is truncated.
- * @code
- * std::string str("...");
- * if (myTextActor.GetEllipsis() != str)
- * {
- *   myTextActor.SetEllipsis(str);
- * }
- * @endcode
- *
- * <h2 class="pg">Style</h2>
- *
- * By calling the Dali::TextActor::SetTextStyle or by passing a Dali::TextStyle to the constructor, it's possible to define styling parameters such as color, font, size, outline, glow, shadow, italics or bold.
- * @code
- * TextStyle style;
- * style.SetItalic( true );
- *
- * myTextActor.SetTextStyle( style );
- * @endcode
- *
- * @see Dali::TextActor::SetTextStyle()
- *
- * It is possible to specify the text fit style for the text actor. The developer can specify whether the ellipsis should appear on the left, centre, or at the end
- * @code
- * // default : NONE
- * myTextActor.SetTextFitStyle(TextUtilities::EllipsizeRight);
- * @endcode
- *
- * <h2 class="pg">Loading state</h2>
- * It is possible to get the font loading status for the text and do processing accordingly.
- * @code
- * // observe text loading and do some processing when it's done
- * if( Dali::ResourceLoadingSucceeded == myTextActor.GetLoadingState() )
- * {
- *   // text already loaded, Do the processing here
- *   OnTextFontLoaded();
- * }
- * else
- * {
- *    // text not yet loaded, Connect to the SignalTextAvailable signal and Do the processing when it occurs
- *   myTextActor.SignalTextAvailable().Connect(this, &MyClass::OnTextFontLoaded);
- * }
- * @endcode
- *
- *
  *
  *
  * <h1 class="pg">Mesh Actor</h1>

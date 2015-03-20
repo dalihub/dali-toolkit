@@ -14,7 +14,7 @@
  * - \link hello-world Hello World - explained \endlink
  *
  * \section Actors Actors
- * - \link image-text-mesh-actor Image, Text and Mesh actors \endlink
+ * - \link image-mesh-actor Image and Mesh actors \endlink
  * - \link event-system Event Handling \endlink
  * - \link custom-actor Custom Actor \endlink
  *
@@ -32,10 +32,7 @@
  *
  * \section UIControls UI Controls
  * - \link item-view Item View \endlink
- * - \link text-view Text View \endlink
- * - \link text-input Text Input \endlink
  * - \link scroll-view Scroll View \endlink
- * - \link markup-processor Markup Processor \endlink
  * - \link size-negotiation Size Negotiation \endlink
  * - \link type-registration Type Registration \endlink
  * - \link properties Properties \endlink
