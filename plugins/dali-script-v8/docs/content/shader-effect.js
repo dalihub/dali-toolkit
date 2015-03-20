@@ -238,7 +238,7 @@ imageActor.setCullFace( dali.CULL_FACE_DISABLE ); // disable face culling so we 
 dali.stage.add( imageActor );
   
 // start it of tilted around the y-axis
-imageActor.rotation=new dali.Rotation(90, 0, 1, 0);
+imageActor.orientation=new dali.Rotation(90, 0, 1, 0);
   
 var twistEffect = createTwistEffect();
 imageActor.setShaderEffect( twistEffect );
