@@ -86,7 +86,6 @@ DALI_PROPERTY_REGISTRATION( TextField, "cursor-blink-duration",   FLOAT,     CUR
 DALI_PROPERTY_REGISTRATION( TextField, "grab-handle-image",       STRING,    GRAB_HANDLE_IMAGE       )
 DALI_PROPERTY_REGISTRATION( TextField, "decoration bounding-box", RECTANGLE, DECORATION_BOUNDING_BOX )
 DALI_PROPERTY_REGISTRATION( TextField, "alignment",               STRING,    ALIGNMENT               )
-
 DALI_TYPE_REGISTRATION_END()
 
 } // namespace
@@ -262,8 +261,8 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-    }
-  }
+    } // switch
+  } // textfield
 }
 
 Property::Value TextField::GetProperty( BaseObject* object, Property::Index index )
@@ -363,7 +362,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
-    }
+    } //switch
   }
 
   return value;

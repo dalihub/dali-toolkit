@@ -50,6 +50,7 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/table-view/table-view.cpp \
   $(public_api_src_dir)/controls/text-controls/text-label.cpp \
   $(public_api_src_dir)/controls/text-controls/text-field.cpp \
+  $(public_api_src_dir)/controls/text-controls/text-selection-popup.cpp \
   $(public_api_src_dir)/controls/tool-bar/tool-bar.cpp \
   $(public_api_src_dir)/controls/bloom-view/bloom-view.cpp \
   $(public_api_src_dir)/controls/cluster/cluster-style.cpp \
@@ -204,7 +205,8 @@ public_api_table_view_header_files = \
 
 public_api_text_controls_header_files = \
   $(public_api_src_dir)/controls/text-controls/text-label.h \
-  $(public_api_src_dir)/controls/text-controls/text-field.h
+  $(public_api_src_dir)/controls/text-controls/text-field.h \
+  $(public_api_src_dir)/controls/text-controls/text-selection-popup.h
 
 public_api_tool_bar_header_files = \
   $(public_api_src_dir)/controls/tool-bar/tool-bar.h

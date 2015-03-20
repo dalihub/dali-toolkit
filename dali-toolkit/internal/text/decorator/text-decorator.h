@@ -22,6 +22,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/math/rect.h>
+#include <dali/public-api/math/vector2.h>
 
 namespace Dali
 {
@@ -341,14 +342,18 @@ public:
   Dali::Image GetImage( SelectionHandle handle, SelectionHandleState state ) const;
 
   /**
-   * @brief Show the Copy and Paste Popup
+   * @brief Set the Selection Popup to show or hide via the active flaf
+   * @param[in] active true to show, false to hide
    */
-  void ShowPopup();
+  void SetPopupActive( bool active );
 
   /**
-   * @brief Hide the Copy and Paste Popup
+   * @brief Query whether the Selection Popup is active.
+   *
+   * @return True if the Selection Popup should be active.
    */
-  void HidePopup();
+  bool IsPopupActive() const;
+
 
 protected:
 

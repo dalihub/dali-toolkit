@@ -109,7 +109,8 @@ struct Controller::TextInput
   {
     INACTIVE,
     SELECTING,
-    EDITING
+    EDITING,
+    EDITING_WITH_POPUP
   };
 
   TextInput( LogicalModelPtr logicalModel,
@@ -123,8 +124,8 @@ struct Controller::TextInput
     mSecondaryCursorPosition( 0u ),
     mDecoratorUpdated( false ),
     mCursorBlinkEnabled( true ),
-    mGrabHandleEnabled( false ),
-    mGrabHandlePopupEnabled( false ),
+    mGrabHandleEnabled( true ),
+    mGrabHandlePopupEnabled( true ),
     mSelectionEnabled( false ),
     mHorizontalScrollingEnabled( true ),
     mVerticalScrollingEnabled( false ),
@@ -323,13 +324,16 @@ struct Controller::TextInput
       GetClosestCursorPosition( mPrimaryCursorPosition, xPosition, yPosition, height );
 
       mDecorator->SetPosition( PRIMARY_CURSOR, xPosition, yPosition, height );
-      mDecorator->HidePopup();
+      //mDecorator->HidePopup();
+      ChangeState ( EDITING );
       mDecoratorUpdated = true;
     }
     else if ( mGrabHandlePopupEnabled &&
               GRAB_HANDLE_RELEASED == state )
     {
-      mDecorator->ShowPopup();
+      //mDecorator->ShowPopup();
+      ChangeState ( EDITING_WITH_POPUP );
+      mDecoratorUpdated = true;
     }
   }
 
@@ -345,7 +349,7 @@ struct Controller::TextInput
         mDecorator->StopCursorBlink();
         mDecorator->SetGrabHandleActive( false );
         mDecorator->SetSelectionActive( false );
-        mDecorator->HidePopup();
+        mDecorator->SetPopupActive( false );
         mDecoratorUpdated = true;
       }
       else if ( SELECTING == mState )
@@ -366,6 +370,28 @@ struct Controller::TextInput
         if( mGrabHandleEnabled )
         {
           mDecorator->SetGrabHandleActive( true );
+        }
+        if( mGrabHandlePopupEnabled )
+        {
+          mDecorator->SetPopupActive( false );
+        }
+        mDecorator->SetSelectionActive( false );
+        mDecoratorUpdated = true;
+      }
+      else if( EDITING_WITH_POPUP == mState )
+      {
+        mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+        if( mCursorBlinkEnabled )
+        {
+          mDecorator->StartCursorBlink();
+        }
+        if( mGrabHandleEnabled )
+        {
+          mDecorator->SetGrabHandleActive( true );
+        }
+        if( mGrabHandlePopupEnabled )
+        {
+          mDecorator->SetPopupActive( true );
         }
         mDecorator->SetSelectionActive( false );
         mDecoratorUpdated = true;
@@ -1581,6 +1607,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       event.text = keyString;
       mImpl->mModifyEvents.push_back( event );
     }
+
+    mImpl->mTextInput->ChangeState( TextInput::EDITING ); // todo Confirm this is the best place to change the state of
 
     RequestRelayout();
   }
