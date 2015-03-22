@@ -332,6 +332,9 @@ int UtcDaliNavigationControlCreateNavigationTitleBar(void)
   NavigationControl naviControl = NavigationControl::New();
   stage.Add( naviControl );
 
+  Toolkit::NaviTitleBarStyle titleBarStyle( background, 720, 111, 68, 48, 34, 16, 11, 45, 63, 26, 14, 22 );
+  naviControl.CreateNavigationTitleBar( titleBarStyle, titleBarStyle );
+
   Page naviItem = Page::New();
 
   PushButton firstControl = PushButton::New();
