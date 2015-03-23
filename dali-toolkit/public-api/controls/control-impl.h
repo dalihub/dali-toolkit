@@ -224,9 +224,9 @@ public:
   Vector4 GetBackgroundColor() const;
 
   /**
-   * @copydoc Dali::Toolkit::Control::SetBackground
+   * @copydoc Dali::Toolkit::Control::SetBackgroundImage
    */
-  void SetBackground( Image image );
+  void SetBackgroundImage( Image image );
 
   /**
    * @copydoc Dali::Toolkit::Control::ClearBackground

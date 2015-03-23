@@ -329,7 +329,7 @@ public:
           break;
         }
 
-        case Toolkit::Control::Property::BACKGROUND:
+        case Toolkit::Control::Property::BACKGROUND_IMAGE:
         {
           if ( value.HasKey( "image" ) )
           {
@@ -338,7 +338,7 @@ public:
 
             if ( image )
             {
-              controlImpl.SetBackground( image );
+              controlImpl.SetBackgroundImage( image );
             }
           }
           else if ( value.Get< Property::Map >().Empty() )
@@ -413,7 +413,7 @@ public:
           break;
         }
 
-        case Toolkit::Control::Property::BACKGROUND:
+        case Toolkit::Control::Property::BACKGROUND_IMAGE:
         {
           Property::Map map;
 
@@ -579,12 +579,12 @@ public:
 
 // Properties registered without macro to use specific member variables.
 PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "background-color", Toolkit::Control::Property::BACKGROUND_COLOR, Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "background",       Toolkit::Control::Property::BACKGROUND,      Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "background-image", Toolkit::Control::Property::BACKGROUND_IMAGE, Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "width-policy",     Toolkit::Control::Property::WIDTH_POLICY,     Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "height-policy",    Toolkit::Control::Property::HEIGHT_POLICY,    Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "minimum-size",     Toolkit::Control::Property::MINIMUM_SIZE,     Property::VECTOR3, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "maximum-size",     Toolkit::Control::Property::MAXIMUM_SIZE,     Property::VECTOR3, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "key-input-focus",  Toolkit::Control::Property::KEY_INPUT_FOCUS,   Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "key-input-focus",  Toolkit::Control::Property::KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {
@@ -792,7 +792,7 @@ Vector4 Control::GetBackgroundColor() const
   return Color::TRANSPARENT;
 }
 
-void Control::SetBackground( Image image )
+void Control::SetBackgroundImage( Image image )
 {
   Background& background( mImpl->GetBackground() );
 

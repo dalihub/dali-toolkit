@@ -159,9 +159,9 @@ Vector4 Control::GetBackgroundColor() const
   return GetImplementation().GetBackgroundColor();
 }
 
-void Control::SetBackground( Image image )
+void Control::SetBackgroundImage( Image image )
 {
-  GetImplementation().SetBackground( image );
+  GetImplementation().SetBackgroundImage( image );
 }
 
 void Control::ClearBackground()
