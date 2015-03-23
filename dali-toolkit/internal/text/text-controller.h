@@ -203,6 +203,13 @@ public:
   const Vector2& GetScrollPosition() const;
 
   /**
+   * @brief Query the alignment offset.
+   *
+   * @return The alignmnet offset.
+   */
+  const Vector2& GetAlignmentOffset() const;
+
+  /**
    * @copydoc Control::GetNaturalSize()
    */
   Vector3 GetNaturalSize();
@@ -219,7 +226,7 @@ public:
    * @param[in] size A the size of a bounding box to layout text within.
    * @return True if the text model or decorations were updated.
    */
-  bool Relayout( const Vector2& size );
+  bool Relayout( const Size& size );
 
   /**
    * @brief Process queued events which modify the model.
@@ -261,9 +268,16 @@ public:
    * @param[in] operations The layout operations which need to be done.
    * @param[out] layoutSize The size of the laid-out text.
    */
-  bool DoRelayout( const Vector2& size,
+  bool DoRelayout( const Size& size,
                    OperationsMask operations,
                    Size& layoutSize );
+
+  /**
+   * @brief Calulates the alignment of the whole text inside the bounding box.
+   *
+   * @param[in] size The size of the bounding box.
+   */
+  void CalculateTextAlignment( const Size& size );
 
   /**
    * @brief Return the layout engine.

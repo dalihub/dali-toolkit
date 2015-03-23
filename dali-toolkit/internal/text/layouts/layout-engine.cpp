@@ -45,9 +45,10 @@ struct LineLayout
   Length         numberOfCharacters; ///< The number of characters which fit in one line.
   Length         numberOfGlyphs;     ///< The number of glyph which fit in one line.
   float          length;             ///< The length of the glyphs which fit in one line.
+  float          widthAdvanceDiff;   ///< The difference between the width and the advance of the last glyph.
   float          wsLengthEndOfLine;  ///< The length of the white spaces at the end of the line.
-  float          height;             ///< The maximum height of all fonts in the line.
   float          ascender;           ///< The maximum ascender of all fonts in the line.
+  float          descender;          ///< The maximum descender of all fonts in the line.
 };
 
 struct LayoutEngine::Impl
@@ -70,8 +71,8 @@ struct LayoutEngine::Impl
     lineLayout.numberOfGlyphs = 0u;
     lineLayout.length = 0.f;
     lineLayout.wsLengthEndOfLine = 0.f;
-    lineLayout.height = 0.f;
     lineLayout.ascender = 0.f;
+    lineLayout.descender = 0.f;
 
     // Get the last glyph index.
     const GlyphIndex lastGlyphIndex = parameters.totalNumberOfGlyphs - 1u;
@@ -121,16 +122,16 @@ struct LayoutEngine::Impl
         Text::FontMetrics fontMetrics;
         mFontClient.GetFontMetrics( glyphInfo.fontId, fontMetrics );
 
-        // Sets the maximum height.
-        if( fontMetrics.height > lineLayout.height )
-        {
-          lineLayout.height = fontMetrics.height;
-        }
-
         // Sets the maximum ascender.
         if( fontMetrics.ascender > lineLayout.ascender )
         {
           lineLayout.ascender = fontMetrics.ascender;
+        }
+
+        // Sets the maximum descender.
+        if( fontMetrics.descender > lineLayout.descender )
+        {
+          lineLayout.descender = fontMetrics.descender;
         }
 
         lastFontId = glyphInfo.fontId;
@@ -148,21 +149,20 @@ struct LayoutEngine::Impl
     lineLayout.numberOfCharacters = 0u;
     lineLayout.numberOfGlyphs = 0u;
     lineLayout.length = 0.f;
+    lineLayout.widthAdvanceDiff = 0.f;
     lineLayout.wsLengthEndOfLine = 0.f;
-    lineLayout.height = 0.f;
     lineLayout.ascender = 0.f;
+    lineLayout.descender = 0.f;
 
     // Stores temporary line layout which has not been added to the final line layout.
     LineLayout tmpLineLayout;
     tmpLineLayout.numberOfCharacters = 0u;
     tmpLineLayout.numberOfGlyphs = 0u;
     tmpLineLayout.length = 0.f;
+    tmpLineLayout.widthAdvanceDiff = 0.f;
     tmpLineLayout.wsLengthEndOfLine = 0.f;
-    tmpLineLayout.height = 0.f;
     tmpLineLayout.ascender = 0.f;
-
-    // Get the last glyph index.
-    const GlyphIndex lastGlyphIndex = parameters.totalNumberOfGlyphs - 1u;
+    tmpLineLayout.descender = 0.f;
 
     FontId lastFontId = 0u;
     for( GlyphIndex glyphIndex = lineLayout.glyphIndex;
@@ -200,18 +200,20 @@ struct LayoutEngine::Impl
       {
         // Add the length to the length of white spaces at the end of the line.
         tmpLineLayout.wsLengthEndOfLine += glyphInfo.advance; // I use the advance as the width is always zero for the white spaces.
+        tmpLineLayout.widthAdvanceDiff = 0.f;
       }
       else
       {
         // Add as well any previous white space length.
-        tmpLineLayout.length += tmpLineLayout.wsLengthEndOfLine + ( glyphIndex == lastGlyphIndex ) ? glyphInfo.width : glyphInfo.advance;
+        tmpLineLayout.length += tmpLineLayout.wsLengthEndOfLine + glyphInfo.advance;
+        tmpLineLayout.widthAdvanceDiff = glyphInfo.width - glyphInfo.advance;
 
         // Clear the white space length at the end of the line.
         tmpLineLayout.wsLengthEndOfLine = 0.f;
       }
 
       // Check if the accumulated length fits in the width of the box.
-      if( lineLayout.length + tmpLineLayout.length + ( ( 0.f < tmpLineLayout.length ) ? lineLayout.wsLengthEndOfLine : 0.f ) > parameters.boundingBox.width )
+      if( lineLayout.length + tmpLineLayout.length + tmpLineLayout.widthAdvanceDiff + ( ( 0.f < tmpLineLayout.length ) ? lineLayout.wsLengthEndOfLine : 0.f ) > parameters.boundingBox.width )
       {
         // Current word does not fit in the box's width.
         return;
@@ -223,6 +225,7 @@ struct LayoutEngine::Impl
         lineLayout.numberOfCharacters += tmpLineLayout.numberOfCharacters;
         lineLayout.numberOfGlyphs += tmpLineLayout.numberOfGlyphs;
         lineLayout.length += tmpLineLayout.length;
+        lineLayout.widthAdvanceDiff = tmpLineLayout.widthAdvanceDiff;
 
         if( 0.f < tmpLineLayout.length )
         {
@@ -235,22 +238,23 @@ struct LayoutEngine::Impl
           lineLayout.wsLengthEndOfLine += tmpLineLayout.wsLengthEndOfLine;
         }
 
-        if( tmpLineLayout.height > lineLayout.height )
-        {
-          lineLayout.height = tmpLineLayout.height;
-        }
-
         if( tmpLineLayout.ascender > lineLayout.ascender )
         {
           lineLayout.ascender = tmpLineLayout.ascender;
         }
 
+        if( tmpLineLayout.descender > lineLayout.descender )
+        {
+          lineLayout.descender = tmpLineLayout.descender;
+        }
+
         tmpLineLayout.numberOfCharacters = 0u;
         tmpLineLayout.numberOfGlyphs = 0u;
         tmpLineLayout.length = 0u;
+        tmpLineLayout.widthAdvanceDiff = 0u;
         tmpLineLayout.wsLengthEndOfLine = 0u;
-        tmpLineLayout.height = 0.f;
         tmpLineLayout.ascender = 0.f;
+        tmpLineLayout.descender = 0.f;
         return;
       }
 
@@ -261,6 +265,8 @@ struct LayoutEngine::Impl
         lineLayout.numberOfCharacters += tmpLineLayout.numberOfCharacters;
         lineLayout.numberOfGlyphs += tmpLineLayout.numberOfGlyphs;
         lineLayout.length += tmpLineLayout.length;
+        lineLayout.widthAdvanceDiff = tmpLineLayout.widthAdvanceDiff;
+
         if( 0.f < tmpLineLayout.length )
         {
           lineLayout.length += lineLayout.wsLengthEndOfLine;
@@ -272,22 +278,23 @@ struct LayoutEngine::Impl
           lineLayout.wsLengthEndOfLine += tmpLineLayout.wsLengthEndOfLine;
         }
 
-        if( tmpLineLayout.height > lineLayout.height )
-        {
-          lineLayout.height = tmpLineLayout.height;
-        }
-
         if( tmpLineLayout.ascender > lineLayout.ascender )
         {
           lineLayout.ascender = tmpLineLayout.ascender;
         }
 
+        if( tmpLineLayout.descender > lineLayout.descender )
+        {
+          lineLayout.descender = tmpLineLayout.descender;
+        }
+
         tmpLineLayout.numberOfCharacters = 0u;
         tmpLineLayout.numberOfGlyphs = 0u;
         tmpLineLayout.length = 0u;
+        tmpLineLayout.widthAdvanceDiff = 0u;
         tmpLineLayout.wsLengthEndOfLine = 0u;
-        tmpLineLayout.height = 0.f;
         tmpLineLayout.ascender = 0.f;
+        tmpLineLayout.descender = 0.f;
       }
 
       if( lastFontId != glyphInfo.fontId )
@@ -295,16 +302,16 @@ struct LayoutEngine::Impl
         Text::FontMetrics fontMetrics;
         mFontClient.GetFontMetrics( glyphInfo.fontId, fontMetrics );
 
-        // Sets the maximum height.
-        if( fontMetrics.height > tmpLineLayout.height )
-        {
-          tmpLineLayout.height = fontMetrics.height;
-        }
-
         // Sets the maximum ascender.
         if( fontMetrics.ascender > tmpLineLayout.ascender )
         {
           tmpLineLayout.ascender = fontMetrics.ascender;
+        }
+
+        // Sets the maximum descender.
+        if( -fontMetrics.descender > tmpLineLayout.descender )
+        {
+          tmpLineLayout.descender = -fontMetrics.descender;
         }
 
         lastFontId = glyphInfo.fontId;
@@ -382,6 +389,7 @@ struct LayoutEngine::Impl
   }
 
   void Align( const LayoutParameters& layoutParameters,
+              const Size& layoutSize,
               const Vector<LineRun>& lines,
               Vector<Vector2>& glyphPositions )
   {
@@ -423,7 +431,7 @@ struct LayoutEngine::Impl
 
       // 2) Calculate the alignment offset accordingly with the align option,
       //    the box width, line length, and the paragraphs direction.
-      float alignOffset = CalculateAlignment( layoutParameters.boundingBox.width,
+      float alignOffset = CalculateAlignment( layoutSize.width,
                                               line.lineSize.width,
                                               line.extraLength,
                                               paragraphDirection );
@@ -460,17 +468,17 @@ struct LayoutEngine::Impl
     lineRun.characterRun.characterIndex = 0u;
     lineRun.characterRun.numberOfCharacters = *( layoutParameters.glyphsToCharactersBuffer + lastGlyphIndex ) + *( layoutParameters.charactersPerGlyphBuffer + lastGlyphIndex );
     lineRun.lineSize.width = layout.length;
-    lineRun.lineSize.height = layout.height;
+    lineRun.lineSize.height = layout.ascender + layout.descender;
     lineRun.extraLength = layout.wsLengthEndOfLine;
 
     lines.PushBack( lineRun );
 
     // Update the actual size.
     actualSize.width = layout.length;
-    actualSize.height = layout.height;
+    actualSize.height = lineRun.lineSize.height;
 
     float penX = 0.f;
-    float penY = layout.height;
+    float penY = layout.ascender;
 
     Vector2* glyphPositionsBuffer = glyphPositions.Begin();
     for( GlyphIndex glyphIndex = 0u; glyphIndex < layout.numberOfGlyphs; ++glyphIndex )
@@ -517,23 +525,23 @@ struct LayoutEngine::Impl
       lineRun.numberOfGlyphs = layout.numberOfGlyphs;
       lineRun.characterRun.characterIndex = *( layoutParameters.glyphsToCharactersBuffer + index );
       lineRun.characterRun.numberOfCharacters = ( *( layoutParameters.glyphsToCharactersBuffer + lastGlyphIndex ) + *( layoutParameters.charactersPerGlyphBuffer + lastGlyphIndex ) ) - lineRun.characterRun.characterIndex;
-      lineRun.lineSize.width = layout.length;
-      lineRun.lineSize.height = layout.height;
+      lineRun.lineSize.width = layout.length + ( ( layout.widthAdvanceDiff > 0.f ) ? layout.widthAdvanceDiff : 0.f );
+      lineRun.lineSize.height = layout.ascender + layout.descender;
       lineRun.extraLength = layout.wsLengthEndOfLine;
 
       lines.PushBack( lineRun );
 
       // Update the actual size.
-      if( layout.length > actualSize.width )
+      if( layout.length + layout.widthAdvanceDiff > actualSize.width )
       {
         actualSize.width = layout.length;
       }
 
-      actualSize.height += layout.height;
+      actualSize.height += lineRun.lineSize.height;
 
       // Traverse the glyphs and set the positions.
 
-      penY += layout.height;
+      penY += layout.ascender;
 
       Vector2* glyphPositionsBuffer = glyphPositions.Begin();
       for( GlyphIndex i = index; i < index + layout.numberOfGlyphs; ++i )
@@ -546,6 +554,8 @@ struct LayoutEngine::Impl
 
         penX += glyph.advance;
       }
+
+      penY += layout.descender;
 
       // Increase the glyph index.
       index += layout.numberOfGlyphs;
@@ -660,10 +670,12 @@ void LayoutEngine::ReLayoutRightToLeftLines( const LayoutParameters& layoutParam
 }
 
 void LayoutEngine::Align( const LayoutParameters& layoutParameters,
+                          const Size& layoutSize,
                           const Vector<LineRun>& lines,
                           Vector<Vector2>& glyphPositions )
 {
   mImpl->Align( layoutParameters,
+                layoutSize,
                 lines,
                 glyphPositions );
 }

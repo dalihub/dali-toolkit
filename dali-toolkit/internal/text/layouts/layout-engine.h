@@ -126,10 +126,12 @@ public:
    * @brief Aligns the laid out lines.
    *
    * @param[in] layoutParameters The parameters needed to layout the text.
+   * @param[in] layoutSize The size of the laid out the text.
    * @param[in] lines The laid-out lines.
    * @param[in,out] glyphPositions The positions of all the glyphs.
    */
   void Align( const LayoutParameters& layoutParameters,
+              const Size& layoutSize,
               const Vector<LineRun>& lines,
               Vector<Vector2>& glyphPositions );
 

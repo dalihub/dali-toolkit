@@ -135,7 +135,8 @@ struct Controller::TextInput
   /**
    * @brief Helper to move the cursor, grab handle etc.
    */
-  bool ProcessInputEvents( const Vector2& controlSize )
+  bool ProcessInputEvents( const Vector2& controlSize,
+                           const Vector2& alignmentOffset )
   {
     mDecoratorUpdated = false;
 
@@ -162,12 +163,12 @@ struct Controller::TextInput
           }
           case TAP_EVENT:
           {
-            OnTapEvent( *iter );
+            OnTapEvent( *iter, alignmentOffset );
             break;
           }
           case PAN_EVENT:
           {
-            OnPanEvent( *iter, controlSize );
+            OnPanEvent( *iter, controlSize, alignmentOffset );
             break;
           }
           case GRAB_HANDLE_EVENT:
@@ -230,7 +231,8 @@ struct Controller::TextInput
     // TODO
   }
 
-  void OnTapEvent( const Event& event )
+  void OnTapEvent( const Event& event,
+                   const Vector2& alignmentOffset  )
   {
     unsigned int tapCount = event.p1.mUint;
 
@@ -238,8 +240,8 @@ struct Controller::TextInput
     {
       ChangeState( EDITING );
 
-      float xPosition = event.p2.mFloat;
-      float yPosition = event.p3.mFloat;
+      float xPosition = event.p2.mFloat - alignmentOffset.x;
+      float yPosition = event.p3.mFloat - alignmentOffset.y;
       float height(0.0f);
       GetClosestCursorPosition( mPrimaryCursorPosition, xPosition, yPosition, height );
       mDecorator->SetPosition( PRIMARY_CURSOR, xPosition, yPosition, height );
@@ -254,7 +256,9 @@ struct Controller::TextInput
     }
   }
 
-  void OnPanEvent( const Event& event, const Vector2& controlSize )
+  void OnPanEvent( const Event& event,
+                   const Vector2& controlSize,
+                   const Vector2& alignmentOffset )
   {
     int state = event.p1.mInt;
 
@@ -265,28 +269,43 @@ struct Controller::TextInput
 
       if( mHorizontalScrollingEnabled )
       {
-        float displacementX = event.p2.mFloat;
+        const float displacementX = event.p2.mFloat;
         mScrollPosition.x += displacementX;
 
-        // Clamp between -space & 0
-        float contentWidth = actualSize.width;
-        float space = (contentWidth > controlSize.width) ? contentWidth - controlSize.width : 0.0f;
-        mScrollPosition.x = ( mScrollPosition.x < -space ) ? -space : mScrollPosition.x;
-        mScrollPosition.x = ( mScrollPosition.x > 0 )      ?      0 : mScrollPosition.x;
+        // Clamp between -space & 0 (and the text alignment).
+        const float contentWidth = actualSize.width;
+        if( contentWidth > controlSize.width )
+        {
+          const float space = ( contentWidth - controlSize.width ) + alignmentOffset.x;
+          mScrollPosition.x = ( mScrollPosition.x < -space ) ? -space : mScrollPosition.x;
+          mScrollPosition.x = ( mScrollPosition.x > -alignmentOffset.x ) ? -alignmentOffset.x : mScrollPosition.x;
 
-        mDecoratorUpdated = true;
+          mDecoratorUpdated = true;
+        }
+        else
+        {
+          mScrollPosition.x = 0.f;
+        }
       }
+
       if( mVerticalScrollingEnabled )
       {
-        float displacementY = event.p3.mFloat;
+        const float displacementY = event.p3.mFloat;
         mScrollPosition.y += displacementY;
 
-        // Clamp between -space & 0
-        float space = (actualSize.height > controlSize.height) ? actualSize.height - controlSize.height : 0.0f;
-        mScrollPosition.y = ( mScrollPosition.y < -space ) ? -space : mScrollPosition.y;
-        mScrollPosition.y = ( mScrollPosition.y > 0 )      ?      0 : mScrollPosition.y;
+        // Clamp between -space & 0 (and the text alignment).
+        if( actualSize.height > controlSize.height )
+        {
+          const float space = ( actualSize.height - controlSize.height ) + alignmentOffset.y;
+          mScrollPosition.y = ( mScrollPosition.y < -space ) ? -space : mScrollPosition.y;
+          mScrollPosition.y = ( mScrollPosition.y > -alignmentOffset.y ) ? -alignmentOffset.y : mScrollPosition.y;
 
-        mDecoratorUpdated = true;
+          mDecoratorUpdated = true;
+        }
+        else
+        {
+          mScrollPosition.y = 0.f;
+        }
       }
     }
   }
@@ -561,6 +580,7 @@ struct Controller::Impl
     mLayoutEngine(),
     mModifyEvents(),
     mControlSize(),
+    mAlignmentOffset(),
     mOperationsPending( NO_OPERATION ),
     mRecalculateNaturalSize( true )
   {
@@ -587,6 +607,7 @@ struct Controller::Impl
   LayoutEngine mLayoutEngine;              ///< The layout engine.
   std::vector<ModifyEvent> mModifyEvents;  ///< Temporary stores the text set until the next relayout.
   Size mControlSize;                       ///< The size of the control.
+  Vector2 mAlignmentOffset;                ///< Vertical and horizontal offset of the whole text inside the control due to alignment.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
 };
@@ -772,6 +793,11 @@ const Vector2& Controller::GetScrollPosition() const
   return Vector2::ZERO;
 }
 
+const Vector2& Controller::GetAlignmentOffset() const
+{
+  return mImpl->mAlignmentOffset;
+}
+
 Vector3 Controller::GetNaturalSize()
 {
   Vector3 naturalSize;
@@ -867,7 +893,7 @@ float Controller::GetHeightForWidth( float width )
   return layoutSize.height;
 }
 
-bool Controller::Relayout( const Vector2& size )
+bool Controller::Relayout( const Size& size )
 {
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
@@ -906,10 +932,13 @@ bool Controller::Relayout( const Vector2& size )
   // Do not re-do any operation until something changes.
   mImpl->mOperationsPending = NO_OPERATION;
 
+  // After doing the text layout, the alignment offset to place the actor in the desired position can be calculated.
+  CalculateTextAlignment( size );
+
   if( mImpl->mTextInput )
   {
     // Move the cursor, grab handle etc.
-    updated = mImpl->mTextInput->ProcessInputEvents( mImpl->mControlSize ) || updated;
+    updated = mImpl->mTextInput->ProcessInputEvents( mImpl->mControlSize, mImpl->mAlignmentOffset ) || updated;
   }
 
   return updated;
@@ -1258,7 +1287,7 @@ void Controller::UpdateModel( OperationsMask operationsRequired )
   }
 }
 
-bool Controller::DoRelayout( const Vector2& size,
+bool Controller::DoRelayout( const Size& size,
                              OperationsMask operationsRequired,
                              Size& layoutSize )
 {
@@ -1368,6 +1397,7 @@ bool Controller::DoRelayout( const Vector2& size,
       if( ALIGN & operations )
       {
         mImpl->mLayoutEngine.Align( layoutParameters,
+                                    layoutSize,
                                     lines,
                                     glyphPositions );
       }
@@ -1385,6 +1415,53 @@ bool Controller::DoRelayout( const Vector2& size,
   }
 
   return viewUpdated;
+}
+
+void Controller::CalculateTextAlignment( const Size& size )
+{
+  // TODO : Calculate the vertical offset.
+
+  // Get the direction of the first character.
+  const CharacterDirection firstParagraphDirection = mImpl->mLogicalModel->GetCharacterDirection( 0u );
+
+  const Size& actualSize = mImpl->mVisualModel->GetActualSize();
+
+  // If the first paragraph is right to left swap ALIGN_BEGIN and ALIGN_END;
+  LayoutEngine::Alignment alignment = mImpl->mLayoutEngine.GetAlignment();
+  if( firstParagraphDirection &&
+      ( LayoutEngine::ALIGN_CENTER != alignment ) )
+  {
+    if( LayoutEngine::ALIGN_BEGIN == alignment )
+    {
+      alignment = LayoutEngine::ALIGN_END;
+    }
+    else
+    {
+      alignment = LayoutEngine::ALIGN_BEGIN;
+    }
+  }
+
+  switch( alignment )
+  {
+    case LayoutEngine::ALIGN_BEGIN:
+    {
+      mImpl->mAlignmentOffset = Vector2::ZERO;
+      break;
+    }
+    case LayoutEngine::ALIGN_CENTER:
+    {
+      mImpl->mAlignmentOffset.y = 0.f;
+      const int intOffset = static_cast<int>( 0.5f * ( size.width - actualSize.width ) ); // try to avoid pixel alignment.
+      mImpl->mAlignmentOffset.x = static_cast<float>( intOffset );
+      break;
+    }
+    case LayoutEngine::ALIGN_END:
+    {
+      mImpl->mAlignmentOffset.y = 0.f;
+      mImpl->mAlignmentOffset.x = size.width - actualSize.width;
+      break;
+    }
+  }
 }
 
 View& Controller::GetView()

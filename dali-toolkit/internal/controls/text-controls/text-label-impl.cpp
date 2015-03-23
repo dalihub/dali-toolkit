@@ -291,6 +291,9 @@ void TextLabel::OnRelayout( const Vector2& size, ActorSizeContainer& container )
 
       if( renderableActor )
       {
+        const Vector2& alignmentOffset = mController->GetAlignmentOffset();
+        renderableActor.SetPosition( alignmentOffset.x, alignmentOffset.y );
+
         Self().Add( renderableActor );
       }
 
