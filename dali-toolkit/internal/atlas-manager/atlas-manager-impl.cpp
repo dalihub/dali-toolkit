@@ -67,7 +67,7 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( SizeType width,
   // Check to see if the atlas is large enough to hold a single block even ?
   if ( blockWidth > width || blockHeight > height )
   {
-    DALI_LOG_ERROR("Atlas %i x %i too small. Dimensions need to be at least %i x %i\n",
+    DALI_LOG_ERROR("Atlas %i x %i too small. Dimensions need to be at least %ix%i\n",
                     width, height, blockWidth, blockHeight );
     return 0;
   }
@@ -693,8 +693,8 @@ AtlasManager::AtlasId AtlasManager::GetAtlas( ImageId id ) const
   }
 }
 
-void AtlasManager::SetAtlasSize( const Vector2& size,
-                                 const Vector2& blockSize )
+void AtlasManager::SetNewAtlasSize( const Vector2& size,
+                                    const Vector2& blockSize )
 {
   mNewAtlasSize = size;
   mNewBlockSize = blockSize;
@@ -713,6 +713,19 @@ Vector2 AtlasManager::GetBlockSize( AtlasId atlas )
   }
 }
 
+Vector2 AtlasManager::GetAtlasSize( AtlasId atlas )
+{
+  if ( atlas && atlas <= mAtlasList.size() )
+  {
+    return Vector2( static_cast< float >( mAtlasList[ atlas - 1u ].mWidth ),
+                    static_cast< float >( mAtlasList[ atlas - 1u ].mHeight ) );
+  }
+  else
+  {
+    return Vector2( 0.0f, 0.0f );
+  }
+}
+
 AtlasManager::SizeType AtlasManager::GetFreeBlocks( AtlasId atlas ) const
 {
   if ( atlas && atlas <= mAtlasList.size() )
@@ -723,18 +736,8 @@ AtlasManager::SizeType AtlasManager::GetFreeBlocks( AtlasId atlas ) const
     uint32_t blockWidth = mAtlasList[ index ].mBlockWidth;
     uint32_t blockHeight = mAtlasList[ index ].mBlockHeight;
 
-    //Work out how many blocks wide and high our bitmap is in the atlas' block size
     SizeType widthInBlocks = width / blockWidth;
-    if ( width % blockWidth )
-    {
-      widthInBlocks++;
-    }
     SizeType heightInBlocks = height / blockHeight;
-    if ( height % blockHeight )
-    {
-      heightInBlocks++;
-    }
-
     uint32_t blockCount = widthInBlocks * heightInBlocks;
 
     // Check free previously unallocated blocks and any free blocks
@@ -761,6 +764,43 @@ Pixel::Format AtlasManager::GetPixelFormat( AtlasId atlas )
     return Pixel::L8;
   }
   return mAtlasList[ atlas -1u ].mPixelFormat;
+}
+
+void AtlasManager::GetMetrics( Toolkit::AtlasManager::Metrics& metrics )
+{
+  Toolkit::AtlasManager::AtlasMetricsEntry entry;
+  uint32_t textureMemoryUsed = 0;
+  uint32_t atlasCount = mAtlasList.size();
+  metrics.mAtlasCount = atlasCount;
+  metrics.mAtlasMetrics.Resize(0);
+
+  for ( uint32_t i = 0; i < atlasCount; ++i )
+  {
+    SizeType width = mAtlasList[ i ].mWidth;
+    SizeType height = mAtlasList[ i ].mHeight;
+    SizeType blockWidth = mAtlasList[ i ].mBlockWidth;
+    SizeType blockHeight = mAtlasList[ i ].mBlockHeight;
+
+    entry.mWidth = width;
+    entry.mHeight = height;
+    entry.mBlockWidth = blockWidth;
+    entry.mBlockHeight = blockHeight;
+    entry.mTotalBlocks = ( width / blockWidth ) * ( height / blockHeight );
+    entry.mBlocksUsed = mAtlasList[ i ].mNextFreeBlock ? mAtlasList[ i ].mNextFreeBlock : entry.mTotalBlocks - mAtlasList[ i ].mFreeBlocksList.Size();
+    entry.mPixelFormat = GetPixelFormat( i + 1 );
+
+      metrics.mAtlasMetrics.PushBack( entry );
+
+    uint32_t size = width * height;
+    if ( entry.mPixelFormat == Pixel::BGRA8888 )
+    {
+      size <<= 2;
+    }
+
+    textureMemoryUsed += size;
+
+  }
+  metrics.mTextureMemoryUsed = textureMemoryUsed;
 }
 
 

@@ -20,12 +20,17 @@
 
 // EXTERNAL INCLUDES
 #include <dali/dali.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/atlas-manager/atlas-manager.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-basic-shader.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-bgra-shader.h>
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_ATLAS_RENDERER");
+#endif
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -35,7 +40,7 @@ namespace
 {
   const Vector2 DEFAULT_ATLAS_SIZE( 512.0f, 512.0f );
   const Vector2 DEFAULT_BLOCK_SIZE( 16.0f, 16.0f );
-  const Vector2 PADDING( 2.0f, 2.0f );
+  const Vector2 PADDING( 4.0f, 4.0f ); // Allow for variation in font glyphs
 }
 
 struct AtlasRenderer::Impl
@@ -64,7 +69,7 @@ struct AtlasRenderer::Impl
   {
     mGlyphManager = AtlasGlyphManager::Get();
     mFontClient = TextAbstraction::FontClient::Get();
-    mGlyphManager.SetAtlasSize( DEFAULT_ATLAS_SIZE, DEFAULT_BLOCK_SIZE );
+    mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_SIZE, DEFAULT_BLOCK_SIZE );
     mBasicShader = BasicShader::New();
     mBGRAShader = BgraShader::New();
   }
@@ -110,7 +115,7 @@ struct AtlasRenderer::Impl
             {
               if ( mBlockSizes[ j ].mFontId == glyph.fontId )
               {
-                mGlyphManager.SetAtlasSize( DEFAULT_ATLAS_SIZE, mBlockSizes[ j ].mNeededBlockSize );
+                mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_SIZE, mBlockSizes[ j ].mNeededBlockSize );
               }
             }
             lastFontId = glyph.fontId;
@@ -165,6 +170,25 @@ struct AtlasRenderer::Impl
       }
       mActor.OffStageSignal().Connect( mSlotDelegate, &AtlasRenderer::Impl::OffStageDisconnect );
     }
+#if defined(DEBUG_ENABLED)
+    Toolkit::AtlasGlyphManager::Metrics metrics = mGlyphManager.GetMetrics();
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "TextAtlasRenderer::GlyphManager::GlyphCount: %i, AtlasCount: %i, TextureMemoryUse: %iK\n",
+                                                metrics.mGlyphCount,
+                                                metrics.mAtlasMetrics.mAtlasCount,
+                                                metrics.mAtlasMetrics.mTextureMemoryUsed / 1024 );
+    for ( uint32_t i = 0; i < metrics.mAtlasMetrics.mAtlasCount; ++i )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Atlas [%i] %sPixels: %s Size: %ix%i, BlockSize: %ix%i, BlocksUsed: %i/%i\n",
+                                                 i + 1, i > 8 ? "" : " ",
+                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mPixelFormat == Pixel::L8 ? "L8  " : "BGRA",
+                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mWidth,
+                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mHeight,
+                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mBlockWidth,
+                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mBlockHeight,
+                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mBlocksUsed,
+                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mTotalBlocks );
+    }
+#endif
   }
 
   void StitchTextMesh( std::vector< MeshRecord >& meshContainer,

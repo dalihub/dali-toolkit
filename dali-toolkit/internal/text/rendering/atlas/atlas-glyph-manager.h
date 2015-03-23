@@ -39,6 +39,15 @@ class DALI_IMPORT_API AtlasGlyphManager : public BaseHandle
 public:
 
   /**
+   * Description of GlyphManager state
+   */
+  struct Metrics
+  {
+    uint32_t mGlyphCount;                   // number of glyphs being managed
+    AtlasManager::Metrics mAtlasMetrics;    // metrics from the Atlas Manager
+  };
+
+  /**
    * @brief Create a AtlasGlyphManager handle.
    *
    * Calling member functions with an uninitialised handle is not allowed.
@@ -107,8 +116,8 @@ public:
    * @param[in] size size of the atlas in pixels
    * @param[in] blockSize size of a block in this atlas in pixels
    */
-  void SetAtlasSize( const Vector2& size,
-                     const Vector2& blockSize );
+  void SetNewAtlasSize( const Vector2& size,
+                        const Vector2& blockSize );
 
   /**
    * @brief Unreference an image from the atlas and remove from cache if no longer needed
@@ -120,10 +129,18 @@ public:
   /**
    * @brief Get the Pixel Format used by an atlas
    *
-   * @param atlasId Id of atlas to check
+   * @param[in] atlasId Id of atlas to check
+   *
    * @return The pixel format of the atlas
    */
   Pixel::Format GetPixelFormat( uint32_t atlasId );
+
+  /**
+   * @brief Get Glyph Manager metrics
+   *
+   * @return const reference to glyph manager metrics
+   */
+  const Metrics& GetMetrics();
 
 private:
 
