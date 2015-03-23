@@ -65,8 +65,9 @@ public:
     SizeType mBlockWidth;                                               // width of a block in atlas
     SizeType mBlockHeight;                                              // height of a block in atlas
     Pixel::Format mPixelFormat;                                         // pixel format used by atlas
-    BufferImage mEdgeX;                                                 // Image used to pad upload
-    BufferImage mEdgeY;                                                 // Image used to pad upload
+    BufferImage mHorizontalStrip;                                       // Image used to pad upload
+    BufferImage mVerticalStrip;                                         // Image used to pad upload
+    PixelBuffer* mStripBuffer;                                          // Blank image buffer used to pad upload
     Material mMaterial;                                                 // material used for atlas texture
     SizeType mNextFreeBlock;                                            // next free block will be placed here ( actually +1 )
     Dali::Vector< SizeType > mFreeBlocksList;                           // unless there are any previously freed blocks
@@ -216,8 +217,6 @@ private:
   Vector2 mNewAtlasSize;
   Vector2 mNewBlockSize;
   Toolkit::AtlasManager::AddFailPolicy mAddFailPolicy;
-  PixelBuffer* mEdgeBuffer;
-  uint32_t mEdgeBufferSize;
 };
 
 } // namespace Internal

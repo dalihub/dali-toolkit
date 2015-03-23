@@ -35,15 +35,14 @@ namespace
 {
   const Vector2 DEFAULT_ATLAS_SIZE( 512.0f, 512.0f );
   const Vector2 DEFAULT_BLOCK_SIZE( 32.0f, 32.0f );
-  const uint32_t PIXEL_PADDING( 2u );
+  const uint32_t SINGLE_PIXEL_PADDING( 1u );
+  const uint32_t DOUBLE_PIXEL_PADDING( SINGLE_PIXEL_PADDING << 1 );
 }
 
 AtlasManager::AtlasManager()
 : mNewAtlasSize( DEFAULT_ATLAS_SIZE ),
   mNewBlockSize( DEFAULT_BLOCK_SIZE ),
-  mAddFailPolicy( Toolkit::AtlasManager::FAIL_ON_ADD_CREATES ),
-  mEdgeBuffer( NULL ),
-  mEdgeBufferSize( 0 )
+  mAddFailPolicy( Toolkit::AtlasManager::FAIL_ON_ADD_CREATES )
 {
 }
 
@@ -55,7 +54,10 @@ AtlasManagerPtr AtlasManager::New()
 
 AtlasManager::~AtlasManager()
 {
-  delete[] mEdgeBuffer;
+  for ( uint32_t i = 0; i < mAtlasList.size(); ++i )
+  {
+    delete[] mAtlasList[ i ].mStripBuffer;
+  }
 }
 
 Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( SizeType width,
@@ -87,20 +89,20 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( SizeType width,
   atlasDescriptor.mMaterial.SetDiffuseTexture( atlas );
   atlasDescriptor.mNextFreeBlock = 1u; // indicate next free block will be the first ( +1 )
 
-  // What size do we need for this atlas' edge buffer ( assume RGBA pixel format )?
-  uint32_t neededEdgeSize = ( blockWidth > blockHeight ? blockWidth : blockHeight ) << 2;
+  // What size do we need for this atlas' strip buffer ( assume 32bit pixel format )?
+  uint32_t neededStripSize =( blockWidth > blockHeight - DOUBLE_PIXEL_PADDING ? blockWidth : blockHeight - DOUBLE_PIXEL_PADDING ) << 2;
+  atlasDescriptor.mStripBuffer = new PixelBuffer[ neededStripSize ];
+  memset( atlasDescriptor.mStripBuffer, 0, neededStripSize );
 
-  // Is the current edge buffer large enough?
-  if ( neededEdgeSize > mEdgeBufferSize )
-  {
-    delete[] mEdgeBuffer;
-    mEdgeBuffer = new PixelBuffer[ neededEdgeSize ];
-    memset( mEdgeBuffer, 0, neededEdgeSize );
-    mEdgeBufferSize = neededEdgeSize;
-  }
+  atlasDescriptor.mHorizontalStrip = BufferImage::New( atlasDescriptor.mStripBuffer,
+                                                       blockWidth,
+                                                       SINGLE_PIXEL_PADDING,
+                                                       pixelformat );
 
-  atlasDescriptor.mEdgeX = BufferImage::New( mEdgeBuffer, blockWidth, PIXEL_PADDING, pixelformat );
-  atlasDescriptor.mEdgeY = BufferImage::New( mEdgeBuffer, PIXEL_PADDING, blockHeight, pixelformat );
+  atlasDescriptor.mVerticalStrip = BufferImage::New( atlasDescriptor.mStripBuffer,
+                                                     SINGLE_PIXEL_PADDING,
+                                                     blockHeight - DOUBLE_PIXEL_PADDING,
+                                                     pixelformat );
 
   mAtlasList.push_back( atlasDescriptor );
   return mAtlasList.size();
@@ -239,8 +241,8 @@ AtlasManager::SizeType AtlasManager::CheckAtlas( SizeType atlas,
 
     // Check to see if the image will fit in these blocks, if not we'll need to create a new atlas
     if ( blocksFree
-         && width + PIXEL_PADDING <= mAtlasList[ atlas ].mBlockWidth
-         && height + PIXEL_PADDING <= mAtlasList[ atlas ].mBlockHeight )
+         && width + DOUBLE_PIXEL_PADDING <= mAtlasList[ atlas ].mBlockWidth
+         && height + DOUBLE_PIXEL_PADDING <= mAtlasList[ atlas ].mBlockHeight )
     {
       blockArea = 1u;
       return ( atlas + 1u );
@@ -327,6 +329,10 @@ void AtlasManager::CreateMesh( SizeType atlas,
 
       float fBlockX = texelBlockWidth * static_cast< float >( block % atlasWidthInBlocks );
       float fBlockY = texelBlockHeight * static_cast< float >( block / atlasWidthInBlocks );
+
+      // Add on texture filtering compensation
+      fBlockX += texelX;
+      fBlockY += texelY;
 
       if (  ( widthInBlocks - 1u ) == x && vertexEdgeWidth > 0.0f )
       {
@@ -512,7 +518,6 @@ void AtlasManager::StitchMesh( const MeshData& first,
                                MeshData& out,
                                bool optimize )
 {
-  // TODO Would be much quicker to be able to get a non-const reference to these containers and update in situ
   MeshData::VertexContainer v1 = first.GetVertices();
   MeshData::VertexContainer v2 = second.GetVertices();
   MeshData::FaceIndices f1 = first.GetFaces();
@@ -589,22 +594,49 @@ void AtlasManager::UploadImage( const BufferImage& image,
   SizeType width = image.GetWidth();
   SizeType height = image.GetHeight();
 
-  if ( !mAtlasList[ atlas ].mAtlas.Upload( image, blockOffsetX, blockOffsetY ) )
+  // Blit image 1 pixel to the right and down into the block to compensate for texture filtering
+  if ( !mAtlasList[ atlas ].mAtlas.Upload( image,
+                                           blockOffsetX + SINGLE_PIXEL_PADDING,
+                                           blockOffsetY + SINGLE_PIXEL_PADDING ) )
   {
-    DALI_LOG_ERROR("Uploading block to Atlas Failed!.\n");
+    DALI_LOG_ERROR("Uploading image to Atlas Failed!.\n");
   }
-  if ( blockOffsetY + height + PIXEL_PADDING <= mAtlasList[ atlas ].mHeight )
+
+  // Blit top strip
+  if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mHorizontalStrip,
+                                           blockOffsetX,
+                                           blockOffsetY ) )
   {
-    if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mEdgeX, blockOffsetX, blockOffsetY + height ) )
+    DALI_LOG_ERROR("Uploading top strip to Atlas Failed!\n");
+  }
+
+  // Blit left strip
+  if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mVerticalStrip,
+                                           blockOffsetX,
+                                           blockOffsetY + SINGLE_PIXEL_PADDING ) )
+  {
+    DALI_LOG_ERROR("Uploading left strip to Atlas Failed!\n");
+  }
+
+  // Blit bottom strip
+  if ( blockOffsetY + height + DOUBLE_PIXEL_PADDING <= mAtlasList[ atlas ].mHeight )
+  {
+    if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mHorizontalStrip,
+                                             blockOffsetX,
+                                             blockOffsetY + height + SINGLE_PIXEL_PADDING ) )
     {
-      DALI_LOG_ERROR("Uploading edgeX to Atlas Failed!.\n");
+      DALI_LOG_ERROR("Uploading bottom strip to Atlas Failed!.\n");
     }
   }
-  if ( blockOffsetX + width + PIXEL_PADDING <= mAtlasList[ atlas ].mWidth )
+
+  // Blit right strip
+  if ( blockOffsetX + width + DOUBLE_PIXEL_PADDING <= mAtlasList[ atlas ].mWidth )
   {
-    if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mEdgeY, blockOffsetX + width, blockOffsetY ) )
+    if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mVerticalStrip,
+                                             blockOffsetX + width + SINGLE_PIXEL_PADDING,
+                                             blockOffsetY + SINGLE_PIXEL_PADDING ) )
     {
-      DALI_LOG_ERROR("Uploading edgeY to Atlas Failed!.\n");
+      DALI_LOG_ERROR("Uploading right strip to Atlas Failed!.\n");
     }
   }
 }
