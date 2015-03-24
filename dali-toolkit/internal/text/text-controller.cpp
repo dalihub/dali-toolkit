@@ -126,7 +126,7 @@ struct Controller::TextInput
     mCursorBlinkEnabled( true ),
     mGrabHandleEnabled( true ),
     mGrabHandlePopupEnabled( true ),
-    mSelectionEnabled( false ),
+    mSelectionEnabled( true ),
     mHorizontalScrollingEnabled( true ),
     mVerticalScrollingEnabled( false ),
     mUpdateCursorPosition( false )
@@ -254,6 +254,8 @@ struct Controller::TextInput
              2u == tapCount )
     {
       ChangeState( SELECTING );
+
+      RepositionSelectionHandles( event.p2.mFloat, event.p3.mFloat );
     }
   }
 
@@ -334,6 +336,36 @@ struct Controller::TextInput
       //mDecorator->ShowPopup();
       ChangeState ( EDITING_WITH_POPUP );
       mDecoratorUpdated = true;
+    }
+  }
+
+  void RepositionSelectionHandles( float visualX, float visualY )
+  {
+    // TODO - Find which word was selected
+
+    const Vector<GlyphInfo>& glyphs = mVisualModel->mGlyphs;
+    const Vector<Vector2>::SizeType glyphCount = glyphs.Count();
+
+    const Vector<Vector2>& positions = mVisualModel->mGlyphPositions;
+    const Vector<Vector2>::SizeType positionCount = positions.Count();
+
+    // Guard against glyphs which did not fit inside the layout
+    const Vector<Vector2>::SizeType count = (positionCount < glyphCount) ? positionCount : glyphCount;
+
+    if( count )
+    {
+      float primaryX   = positions[0].x;
+      float secondaryX = positions[count-1].x + glyphs[count-1].width;
+
+      // TODO - multi-line selection
+      const Vector<LineRun>& lines = mVisualModel->mLines;
+      float height = lines.Count() ? lines[0].lineSize.height : 0.0f;
+
+      mDecorator->SetPosition( PRIMARY_SELECTION_HANDLE,   primaryX,   0.0f, height );
+      mDecorator->SetPosition( SECONDARY_SELECTION_HANDLE, secondaryX, 0.0f, height );
+
+      mDecorator->ClearHighlights();
+      mDecorator->AddHighlight( primaryX, 0.0f, secondaryX, height );
     }
   }
 

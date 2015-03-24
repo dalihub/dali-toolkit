@@ -342,6 +342,21 @@ public:
   Dali::Image GetImage( SelectionHandle handle, SelectionHandleState state ) const;
 
   /**
+   * @brief Adds a quad to the existing selection highlights.
+   *
+   * @param[in] x1 The top-left x position.
+   * @param[in] y1 The top-left y position.
+   * @param[in] x2 The bottom-right x position.
+   * @param[in] y3 The bottom-right y position.
+   */
+  void AddHighlight( float x1, float y1, float x2, float y2 );
+
+  /**
+   * @brief Removes all of the previously added highlights.
+   */
+  void ClearHighlights();
+
+  /**
    * @brief Set the Selection Popup to show or hide via the active flaf
    * @param[in] active true to show, false to hide
    */
