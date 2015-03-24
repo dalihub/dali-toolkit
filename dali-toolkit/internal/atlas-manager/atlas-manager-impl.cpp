@@ -237,7 +237,9 @@ AtlasManager::SizeType AtlasManager::CheckAtlas( SizeType atlas,
     SizeType blocksInX = mAtlasList[ atlas ].mWidth / mAtlasList[ atlas ].mBlockWidth;
     SizeType blocksInY = mAtlasList[ atlas ].mHeight / mAtlasList[ atlas ].mBlockHeight;
     totalBlocks = blocksInX * blocksInY;
-    SizeType blocksFree = mAtlasList[ atlas ].mNextFreeBlock ? totalBlocks - mAtlasList[ atlas ].mNextFreeBlock + 1u : 0;
+    SizeType blocksFree = mAtlasList[ atlas ].mNextFreeBlock ?
+                          totalBlocks - mAtlasList[ atlas ].mNextFreeBlock + 1u :
+                          mAtlasList[ atlas ].mFreeBlocksList.Size();
 
     // Check to see if the image will fit in these blocks, if not we'll need to create a new atlas
     if ( blocksFree
@@ -818,7 +820,8 @@ void AtlasManager::GetMetrics( Toolkit::AtlasManager::Metrics& metrics )
     entry.mBlockWidth = blockWidth;
     entry.mBlockHeight = blockHeight;
     entry.mTotalBlocks = ( width / blockWidth ) * ( height / blockHeight );
-    entry.mBlocksUsed = mAtlasList[ i ].mNextFreeBlock ? mAtlasList[ i ].mNextFreeBlock : entry.mTotalBlocks - mAtlasList[ i ].mFreeBlocksList.Size();
+    uint32_t reuseBlocks = mAtlasList[ i ].mFreeBlocksList.Size();
+    entry.mBlocksUsed = mAtlasList[ i ].mNextFreeBlock ? mAtlasList[ i ].mNextFreeBlock - reuseBlocks - 1u: entry.mTotalBlocks - reuseBlocks;
     entry.mPixelFormat = GetPixelFormat( i + 1 );
 
       metrics.mAtlasMetrics.PushBack( entry );
