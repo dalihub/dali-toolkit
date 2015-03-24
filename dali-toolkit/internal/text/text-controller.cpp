@@ -409,11 +409,11 @@ struct Controller::TextInput
       totalHeight += lines[lineIndex].lineSize.height;
       if( y < totalHeight )
       {
-        break;
+        return lineIndex;
       }
     }
 
-    return lineIndex;
+    return lineIndex-1;
   }
 
   void GetClosestCursorPosition( CharacterIndex& logical, float& visualX, float& visualY, float& height )
@@ -509,7 +509,7 @@ struct Controller::TextInput
 
     float visualX( 0.0f );
     float visualY( 0.0f );
-    LineIndex lineIndex( 0u );
+    float height( 0.0f );
     const Vector<LineRun>& lineRuns = mVisualModel->mLines;
 
     if( cursorGlyph > 0 )
@@ -521,17 +521,19 @@ struct Controller::TextInput
         visualX += mVisualModel->mGlyphs[ cursorGlyph ].width;
 
       // Find the line height
-      for( GlyphIndex lastGlyph = 0; lineIndex < lineRuns.Count(); ++lineIndex )
+      GlyphIndex lastGlyph( 0 );
+      for( LineIndex lineIndex = 0u; lineIndex < lineRuns.Count(); ++lineIndex )
       {
         lastGlyph = (lineRuns[lineIndex].glyphIndex + lineRuns[lineIndex].numberOfGlyphs);
         if( cursorGlyph < lastGlyph )
         {
+          height = lineRuns[lineIndex].lineSize.height;
           break;
         }
       }
     }
 
-    mDecorator->SetPosition( PRIMARY_CURSOR, visualX, visualY, lineRuns[lineIndex].lineSize.height );
+    mDecorator->SetPosition( PRIMARY_CURSOR, visualX, visualY, height );
     mDecoratorUpdated = true;
   }
 

@@ -326,11 +326,15 @@ struct Decorator::Impl : public ConnectionTracker
       mGrabHandle.SetAnchorPoint( AnchorPoint::TOP_CENTER );
       mGrabHandle.SetDrawMode( DrawMode::OVERLAY );
 
-      mGrabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
+      // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
+      mGrabArea = Toolkit::CreateSolidColorActor( Vector4(1.0f, 0.0f, 0.0f, 0.5f) );
       mGrabArea.SetName( "GrabArea" );
+#else
+      mGrabArea = Actor::New();
 #endif
-      mGrabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
+      mGrabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
+      mGrabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
       mGrabArea.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
       mGrabArea.SetSizeModeFactor( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE );
       mGrabHandle.Add(mGrabArea);
