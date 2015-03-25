@@ -557,7 +557,7 @@ void ActorApi::RotateBy( const v8::FunctionCallbackInfo<v8::Value>& args )
   bool found( false );
   Property::Value rotation = V8Utils::GetPropertyValueParameter( PARAMETER_0, found, isolate, args );
 
-  if( rotation.GetType() != Property::ORIENTATION )
+  if( rotation.GetType() != Property::ROTATION )
   {
     DALI_SCRIPT_EXCEPTION( isolate, "Rotation parameter missing" );
     return;

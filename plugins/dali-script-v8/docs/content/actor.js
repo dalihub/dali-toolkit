@@ -119,7 +119,7 @@ function OnPressed( actor, touchEvent )
   
   var anim = new dali.Animation( 4 );
   var rotation = new dali.Rotation( 90, 0, 0 ); // pitch, yaw, roll
-  anim.animateBy( actor, "rotation", rotation );
+  anim.animateBy( actor, "orientation", rotation );
   anim.play();
   return true;
 }

@@ -46,25 +46,29 @@ AC_ARG_ENABLE([debug],
               [enable_debug=$enableval],
               [enable_debug=no])
 
-# option for JavaScript plugin
-AC_ARG_ENABLE(javascript,
+# option to build JavaScript plugin
+# configure settings and output
+# --enable-javascript        // enable_javascript = yes
+# --enable-javascript=yes    // enable_javascript = yes
+# --enable-javascript=no     // enable_javascript = no
+# --disable-javascript       // enable_javascript = no
+#  no setting                // enable_javascript = automatic ( enable if v8 present)
+AC_ARG_ENABLE([javascript],
               [AC_HELP_STRING([--enable-javascript],
-                              [Enable JavaScript plugin])] ,
-               [enable_javascript=yes],
-               [enable_javascript=no])
+               [Enable JavaScript plugin])] ,
+               [enable_javascript=$enableval],
+               [enable_javascript=automatic])
+
 
 if test "x$enable_debug" = "xyes"; then
   DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDEBUG_ENABLED"
-  DALI_SCRIPTV8_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDEBUG_ENABLED"
 fi
 
 if test "x$enable_debug" = "xno" -a "x$enable_exportall" = "xno"; then
   DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -fvisibility=hidden -DHIDE_DALI_INTERNALS"
-  DALI_SCRIPTV8_CFLAGS="$DALI_TOOLKIT_CFLAGS -fvisibility=hidden -DHIDE_DALI_INTERNALS"
 fi
 
-#set a variable for the makefile to conditionally compile the plugin
-AM_CONDITIONAL([ENABLE_JAVASCRIPT_PLUGIN], [test x$enable_javascript = xyes])
+
 
 
 # Tizen Profile options
@@ -86,11 +90,37 @@ else
   dataReadOnlyDir=${prefix}/share/dali/
 fi
 
+# v8 version 4+ requires c++11
+PKG_CHECK_MODULES(V8, v8 = 3.32.7, [ pkg_check_v8=yes ],  [ pkg_check_v8=no  ] )
+
+# Rules for building JavaScript plugin
+# If enable_javascript=yes and v8 installed = build javascript
+# If enable_javascript=automatic and v8 installed = build javascript
+# If enable_javascript=yes and v8 not installed = throw an error
+build_javascript_plugin=no
+if test x$enable_javascript = xyes; then
+  if test x$pkg_check_v8 = xno; then
+    [build_javascript_plugin=no]
+    AC_MSG_ERROR("V8 not found or incorrect version installed")
+    AC_MSG_NOTICE("To disable building of JavaScript plugin use --disable-javascript")
+  else
+    [build_javascript_plugin=yes]
+    AC_MSG_NOTICE(V8 library found. Building DALi JavaScript plugin)
+  fi
+fi
+if test x$enable_javascript = xautomatic && test x$pkg_check_v8 = xyes; then
+  [build_javascript_plugin=yes]
+  AC_MSG_NOTICE( V8 library found. Automatic building of JavaScript plugin. Use  use --disable-javascript to disable)
+fi
+
+
+#set a variable for the makefile to force compile the JAvaSplugin
+AM_CONDITIONAL([ENABLE_JAVASCRIPT_PLUGIN], [test x$build_javascript_plugin = xyes])
+
 AC_SUBST(dataReadWriteDir)
 AC_SUBST(dataReadOnlyDir)
 AC_SUBST(DALI_TOOLKIT_CFLAGS)
-AC_SUBST(DALI_SCRIPTV8_CFLAGS)
-AC_SUBST(DALI_SCRIPTV8_LIBS)
+
 
 # Specify the include directory for development headers
 #devincludepath=${includedir}/dali/internal
@@ -119,7 +149,7 @@ Configuration
 -------------
   Prefix:                           $prefix
   Debug Build:                      $enable_debug
-  JavaScript support (V8 required)  $enable_javascript
+  JavaScript support (V8 required)  $build_javascript_plugin
   Profile:                          $dali_profile
   Data Dir (Read/Write):            $dataReadWriteDir
   Data Dir (Read Only):             $dataReadOnlyDir

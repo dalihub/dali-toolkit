@@ -5,7 +5,13 @@
 
 Shader effects provide a visual effect for actors.
 
-For a Custom shader you can provide the vertex and fragment shader code as strings.
+You can create a type-registered shader effect by its type name.
+```
+// create a new shader effect
+var shader = new dali.ShaderEffect("BlindEffect");
+```
+
+Alternatively you can create a Custom shader by providing the vertex and fragment shader code as strings.
 Each shader is provided with default uniforms and attributes.
 For a vertex shader this part contains the following code:
 ```
@@ -238,7 +244,7 @@ imageActor.setCullFace( dali.CULL_FACE_DISABLE ); // disable face culling so we 
 dali.stage.add( imageActor );
   
 // start it of tilted around the y-axis
-imageActor.rotation=new dali.Rotation(90, 0, 1, 0);
+imageActor.orientation=new dali.Rotation(90, 0, 1, 0);
   
 var twistEffect = createTwistEffect();
 imageActor.setShaderEffect( twistEffect );

@@ -62,19 +62,19 @@ Run the following commands:
     cd automated-tests
     ./build.sh
 
-This will build dali and dali-internal test sets.
+This will build dali-toolkit and dali-toolkit-internal test sets.
 
 Test sets can be built individually:
 
-    ./build.sh dali
+    ./build.sh dali-toolkit
 
 They can also be built without regenerating test case scripts (Useful for quicker rebuilds)
 
-    ./build.sh -n dali-internal
+    ./build.sh -n dali-toolkit-internal
 
 Or without cleaning down the build area (Useful for fast build/run/debug cycles)
 
-    ./build.sh -n -r dali-internal
+    ./build.sh -n -r dali-toolkit-internal
 
 
 Executing the tests
