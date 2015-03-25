@@ -46,6 +46,7 @@ enum
   PARAMETER_1 = 1,   ///< second parameter of a function call
   PARAMETER_2 = 2,   ///< third parameter of a function call
   PARAMETER_3 = 3,   ///< forth parameter of a function call
+  PARAMETER_4 = 4,   ///< fifth parameter of a function call
 };
 
 #define DALI_SCRIPT_EXCEPTION( isolate, message ) V8Utils::ScriptError( __FUNCTION__ , isolate, message );
