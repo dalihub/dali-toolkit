@@ -83,7 +83,7 @@ public:
     enum
     {
       BACKGROUND_COLOR = PROPERTY_START_INDEX, ///< name "background-color", @see SetBackgroundColor, type Vector4
-      BACKGROUND,                              ///< name "background",       @see SetBackground,      type Map
+      BACKGROUND_IMAGE,                        ///< name "background-image", @see SetBackgroundImage, type Map
       WIDTH_POLICY,                            ///< name "width-policy",     @see SetSizePolicy,      type std::string
       HEIGHT_POLICY,                           ///< name "height-policy",    @see SetSizePolicy,      type std::string
       MINIMUM_SIZE,                            ///< name "minimum-size",     @see SetMinimumSize,     type Vector3
@@ -366,7 +366,7 @@ public:
    *
    * @param[in] image The image to set as the background.
    */
-  void SetBackground( Image image );
+  void SetBackgroundImage( Image image );
 
   /**
    * @brief Clears the background.
