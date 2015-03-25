@@ -724,6 +724,15 @@ Dali::Property::Value PropertyValueWrapper::ExtractPropertyValue( v8::Isolate* i
       }
       break;
     }
+    case Dali::Property::RECTANGLE:
+    {
+      if( array.GetType() == Dali::Property::VECTOR4)
+      {
+        Vector4 vec4( array.Get<Vector4>());
+        daliPropertyValue = Property::Value(Rect<int>( vec4.x,vec4.y, vec4.z, vec4.w ));
+      }
+      break;
+    }
     case Dali::Property::ROTATION:
     {
       if( array.GetType() == Dali::Property::VECTOR4)
