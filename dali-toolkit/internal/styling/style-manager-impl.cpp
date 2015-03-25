@@ -248,9 +248,13 @@ void StyleManager::BuildQualifiedStyleName( const std::string& styleName, const 
 
 void StyleManager::ApplyStyle( Toolkit::Builder builder, Toolkit::Control control )
 {
-  // Convert control name to lower case
-  std::string styleName = control.GetTypeName();
-  std::transform( styleName.begin(), styleName.end(), styleName.begin(), ::tolower );
+  std::string styleName = control.GetStyleName();
+  if( styleName.empty() )
+  {
+    // Convert control name to lower case
+    styleName = control.GetTypeName();
+    std::transform( styleName.begin(), styleName.end(), styleName.begin(), ::tolower );
+  }
 
   // Apply the style after choosing the correct actual style (e.g. landscape or portrait)
   StringList qualifiers;

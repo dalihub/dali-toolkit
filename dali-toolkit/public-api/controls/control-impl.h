@@ -214,6 +214,16 @@ public:
   // Background
 
   /**
+   * @copydoc Dali::Toolkit::Control::SetStyleName
+   */
+  void SetStyleName( const std::string& styleName );
+
+  /**
+   * @copydoc Dali::Toolkit::Control::GetStyleName
+   */
+  const std::string& GetStyleName() const;
+
+  /**
    * @copydoc Dali::Toolkit::Control::SetBackgroundColor
    */
   void SetBackgroundColor( const Vector4& color );

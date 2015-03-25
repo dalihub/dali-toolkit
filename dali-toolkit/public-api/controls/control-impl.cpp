@@ -242,6 +242,7 @@ public:
   // Construction & Destruction
   Impl(Control& controlImpl)
   : mControlImpl( controlImpl ),
+    mStyleName(""),
     mBackground( NULL ),
     mStartingPinchScale( NULL ),
     mKeyEventSignal(),
@@ -323,6 +324,12 @@ public:
 
       switch ( index )
       {
+        case Toolkit::Control::Property::STYLE_NAME:
+        {
+          controlImpl.SetStyleName( value.Get< std::string >() );
+          break;
+        }
+
         case Toolkit::Control::Property::BACKGROUND_COLOR:
         {
           controlImpl.SetBackgroundColor( value.Get< Vector4 >() );
@@ -407,6 +414,12 @@ public:
 
       switch ( index )
       {
+        case Toolkit::Control::Property::STYLE_NAME:
+        {
+          value = controlImpl.GetStyleName();
+          break;
+        }
+
         case Toolkit::Control::Property::BACKGROUND_COLOR:
         {
           value = controlImpl.GetBackgroundColor();
@@ -545,6 +558,7 @@ public:
   // Data
 
   Control& mControlImpl;
+  std::string mStyleName;
   Background* mBackground;           ///< Only create the background if we use it
   Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;
@@ -575,16 +589,18 @@ public:
   static PropertyRegistration PROPERTY_5;
   static PropertyRegistration PROPERTY_6;
   static PropertyRegistration PROPERTY_7;
+  static PropertyRegistration PROPERTY_8;
 };
 
 // Properties registered without macro to use specific member variables.
-PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "background-color", Toolkit::Control::Property::BACKGROUND_COLOR, Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "background",       Toolkit::Control::Property::BACKGROUND,      Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "width-policy",     Toolkit::Control::Property::WIDTH_POLICY,     Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "height-policy",    Toolkit::Control::Property::HEIGHT_POLICY,    Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "minimum-size",     Toolkit::Control::Property::MINIMUM_SIZE,     Property::VECTOR3, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "maximum-size",     Toolkit::Control::Property::MAXIMUM_SIZE,     Property::VECTOR3, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "key-input-focus",  Toolkit::Control::Property::KEY_INPUT_FOCUS,   Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "style-name",       Toolkit::Control::Property::STYLE_NAME,       Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "background-color", Toolkit::Control::Property::BACKGROUND_COLOR, Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "background",       Toolkit::Control::Property::BACKGROUND,       Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "width-policy",     Toolkit::Control::Property::WIDTH_POLICY,     Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "height-policy",    Toolkit::Control::Property::HEIGHT_POLICY,    Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "minimum-size",     Toolkit::Control::Property::MINIMUM_SIZE,     Property::VECTOR3, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "maximum-size",     Toolkit::Control::Property::MAXIMUM_SIZE,     Property::VECTOR3, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_8( typeRegistration, "key-input-focus",  Toolkit::Control::Property::KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {
@@ -757,6 +773,23 @@ TapGestureDetector Control::GetTapGestureDetector() const
 LongPressGestureDetector Control::GetLongPressGestureDetector() const
 {
   return mImpl->mLongPressGestureDetector;
+}
+
+void Control::SetStyleName( const std::string& styleName )
+{
+  if( styleName != mImpl->mStyleName )
+  {
+    mImpl->mStyleName = styleName;
+
+    // Apply new style
+    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+    GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+  }
+}
+
+const std::string& Control::GetStyleName() const
+{
+  return mImpl->mStyleName;
 }
 
 void Control::SetBackgroundColor( const Vector4& color )
@@ -1093,7 +1126,6 @@ Control::Control( ControlBehaviour behaviourFlags )
 
 void Control::Initialize()
 {
-
   // Calling deriving classes
   OnInitialize();
 
