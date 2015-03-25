@@ -1366,6 +1366,10 @@ void Controller::UpdateModel( OperationsMask operationsRequired )
                glyphs,
                glyphsToCharactersMap,
                charactersPerGlyph );
+
+    // Create the 'number of glyphs' per character and the glyph to character conversion tables.
+    mImpl->mVisualModel->CreateGlyphsPerCharacterTable( numberOfCharacters );
+    mImpl->mVisualModel->CreateCharacterToGlyphTable( numberOfCharacters );
   }
 
   const Length numberOfGlyphs = glyphs.Count();
@@ -1373,13 +1377,6 @@ void Controller::UpdateModel( OperationsMask operationsRequired )
   if( GET_GLYPH_METRICS & operations )
   {
     mImpl->mFontClient.GetGlyphMetrics( glyphs.Begin(), numberOfGlyphs );
-  }
-
-  if( 0u != numberOfGlyphs )
-  {
-    // Create the glyph to character conversion table and the 'number of glyphs' per character.
-    mImpl->mVisualModel->CreateCharacterToGlyphTable(numberOfCharacters );
-    mImpl->mVisualModel->CreateGlyphsPerCharacterTable( numberOfCharacters );
   }
 }
 

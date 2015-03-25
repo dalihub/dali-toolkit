@@ -80,6 +80,8 @@ public:
   /**
    * @brief Creates the character to glyph conversion table.
    *
+   * @pre The glyphs per character table needs to be created first.
+   *
    * @param[in] numberOfCharacters The number of characters.
    */
   void CreateCharacterToGlyphTable( Length numberOfCharacters = 0u );

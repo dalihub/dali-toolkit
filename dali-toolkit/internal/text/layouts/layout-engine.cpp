@@ -355,14 +355,16 @@ struct LayoutEngine::Impl
   void ReLayoutRightToLeftLines( const LayoutParameters& layoutParameters,
                                  Vector<Vector2>& glyphPositions )
   {
+    // Traverses the paragraphs with right to left characters.
     for( LineIndex lineIndex = 0u; lineIndex < layoutParameters.numberOfBidirectionalInfoRuns; ++lineIndex )
     {
-      const BidirectionalLineInfoRun& bidiLine = *( layoutParameters.lineBidirectionalInfoRunsBuffer +lineIndex  );
+      const BidirectionalLineInfoRun& bidiLine = *( layoutParameters.lineBidirectionalInfoRunsBuffer + lineIndex );
 
       float penX = 0.f;
 
       Vector2* glyphPositionsBuffer = glyphPositions.Begin();
 
+      // Traverses the characters of the right to left paragraph.
       for( CharacterIndex characterLogicalIndex = 0u;
            characterLogicalIndex < bidiLine.characterRun.numberOfCharacters;
            ++characterLogicalIndex )
@@ -376,7 +378,9 @@ struct LayoutEngine::Impl
         for( GlyphIndex index = 0u; index < numberOfGlyphs; ++index )
         {
           // Convert the character in the visual order into the glyph in the visual order.
-          GlyphIndex glyphIndex = 1u + *( layoutParameters.charactersToGlyphsBuffer + characterVisualIndex + index ) - numberOfGlyphs;
+          const GlyphIndex glyphIndex = *( layoutParameters.charactersToGlyphsBuffer + characterVisualIndex ) + index;
+
+          DALI_ASSERT_DEBUG( 0u <= glyphIndex && glyphIndex < layoutParameters.totalNumberOfGlyphs );
 
           const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + glyphIndex );
           Vector2& position = *( glyphPositionsBuffer + glyphIndex );

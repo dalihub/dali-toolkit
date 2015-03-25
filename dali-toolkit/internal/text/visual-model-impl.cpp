@@ -68,11 +68,11 @@ void VisualModel::SetGlyphs( const GlyphInfo* glyphs,
       mCharactersPerGlyph.Resize( numberOfGlyphs );
       memcpy( mCharactersPerGlyph.Begin(), charactersPerGlyph, numberOfGlyphs * sizeof( Length ) );
 
-      // Build the characters to glyph conversion table.
-      CreateCharacterToGlyphTable();
-
       // Build the glyphs per character table.
       CreateGlyphsPerCharacterTable();
+
+      // Build the characters to glyph conversion table.
+      CreateCharacterToGlyphTable();
     }
   }
 }
@@ -87,22 +87,31 @@ void VisualModel::CreateCharacterToGlyphTable( Length numberOfCharacters )
   }
   mCharactersToGlyph.Reserve( numberOfCharacters );
 
+  DALI_ASSERT_DEBUG( mGlyphsPerCharacter.Count() != 0u ||
+                     ( 0u == numberOfCharacters ) );
+
+  const Length* const glyphsPerCharacterBuffer = mGlyphsPerCharacter.Begin();
+
   // 2) Traverse the glyphs and set the glyph indices per character.
 
   // Index to the glyph.
   GlyphIndex glyphIndex = 0u;
+  CharacterIndex characterIndex = 0u;
   for( Vector<Length>::ConstIterator it = mCharactersPerGlyph.Begin(),
          endIt = mCharactersPerGlyph.End();
        it != endIt;
-       ++it, ++glyphIndex )
+       ++it )
   {
     const Length numberOfCharactersPerGlyph = *it;
 
+    Length numberOfGlyphs = 0u;
     // Set the glyph indices.
-    for( Length index = 0u; index < numberOfCharactersPerGlyph; ++index )
+    for( Length index = 0u; index < numberOfCharactersPerGlyph; ++index, ++characterIndex )
     {
       mCharactersToGlyph.PushBack( glyphIndex );
+      numberOfGlyphs += *( glyphsPerCharacterBuffer + characterIndex );
     }
+    glyphIndex += numberOfGlyphs;
   }
 }
 
@@ -114,7 +123,7 @@ void VisualModel::CreateGlyphsPerCharacterTable( Length numberOfCharacters )
     // If no number of characters is given, just set something sensible to avoid reallocations.
     numberOfCharacters = static_cast<Length> ( static_cast<float>( mGlyphs.Count() ) * 1.3f );
   }
-  mCharactersToGlyph.Reserve( numberOfCharacters );
+  mGlyphsPerCharacter.Reserve( numberOfCharacters );
 
   // 2) Traverse the glyphs and set the number of glyphs per character.
 
