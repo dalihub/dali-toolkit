@@ -69,7 +69,8 @@ public:
       CURSOR_BLINK_DURATION,                    ///< name "cursor-blink-duration",   The cursor will stop blinking after this duration (if non-zero),          type FLOAT
       GRAB_HANDLE_IMAGE,                        ///< name "grab-handle-image",       The image to display for grab handle,                                     type STRING
       DECORATION_BOUNDING_BOX,                  ///< name "decoration-bounding-box", The decorations (handles etc) will positioned within this area on-screen, type RECTANGLE
-      ALIGNMENT,                                ///< name "alignment",               The line alignment,                                                       type STRING,    values "BEGIN", "CENTER", "END"
+      HORIZONTAL_ALIGNMENT,                     ///< name "horizontal-alignment",    The line horizontal alignment,                                            type STRING,  values "BEGIN", "CENTER", "END"
+      VERTICAL_ALIGNMENT                        ///< name "vertical-alignment",      The line vertical alignment,                                              type STRING,  values   "TOP",   "CENTER",   "BOTTOM"
     };
   };
 

@@ -1512,46 +1512,63 @@ bool Controller::DoRelayout( const Size& size,
 
 void Controller::CalculateTextAlignment( const Size& size )
 {
-  // TODO : Calculate the vertical offset.
-
   // Get the direction of the first character.
   const CharacterDirection firstParagraphDirection = mImpl->mLogicalModel->GetCharacterDirection( 0u );
 
   const Size& actualSize = mImpl->mVisualModel->GetActualSize();
 
   // If the first paragraph is right to left swap ALIGN_BEGIN and ALIGN_END;
-  LayoutEngine::Alignment alignment = mImpl->mLayoutEngine.GetAlignment();
+  LayoutEngine::HorizontalAlignment horizontalAlignment = mImpl->mLayoutEngine.GetHorizontalAlignment();
   if( firstParagraphDirection &&
-      ( LayoutEngine::ALIGN_CENTER != alignment ) )
+      ( LayoutEngine::HORIZONTAL_ALIGN_CENTER != horizontalAlignment ) )
   {
-    if( LayoutEngine::ALIGN_BEGIN == alignment )
+    if( LayoutEngine::HORIZONTAL_ALIGN_BEGIN == horizontalAlignment )
     {
-      alignment = LayoutEngine::ALIGN_END;
+      horizontalAlignment = LayoutEngine::HORIZONTAL_ALIGN_END;
     }
     else
     {
-      alignment = LayoutEngine::ALIGN_BEGIN;
+      horizontalAlignment = LayoutEngine::HORIZONTAL_ALIGN_BEGIN;
     }
   }
 
-  switch( alignment )
+  switch( horizontalAlignment )
   {
-    case LayoutEngine::ALIGN_BEGIN:
+    case LayoutEngine::HORIZONTAL_ALIGN_BEGIN:
     {
-      mImpl->mAlignmentOffset = Vector2::ZERO;
+      mImpl->mAlignmentOffset.x = 0.f;
       break;
     }
-    case LayoutEngine::ALIGN_CENTER:
+    case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
     {
-      mImpl->mAlignmentOffset.y = 0.f;
       const int intOffset = static_cast<int>( 0.5f * ( size.width - actualSize.width ) ); // try to avoid pixel alignment.
       mImpl->mAlignmentOffset.x = static_cast<float>( intOffset );
       break;
     }
-    case LayoutEngine::ALIGN_END:
+    case LayoutEngine::HORIZONTAL_ALIGN_END:
+    {
+      mImpl->mAlignmentOffset.x = size.width - actualSize.width;
+      break;
+    }
+  }
+
+  const LayoutEngine::VerticalAlignment verticalAlignment = mImpl->mLayoutEngine.GetVerticalAlignment();
+  switch( verticalAlignment )
+  {
+    case LayoutEngine::VERTICAL_ALIGN_TOP:
     {
       mImpl->mAlignmentOffset.y = 0.f;
-      mImpl->mAlignmentOffset.x = size.width - actualSize.width;
+      break;
+    }
+    case LayoutEngine::VERTICAL_ALIGN_CENTER:
+    {
+      const int intOffset = static_cast<int>( 0.5f * ( size.height - actualSize.height ) ); // try to avoid pixel alignment.
+      mImpl->mAlignmentOffset.y = static_cast<float>( intOffset );
+      break;
+    }
+    case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
+    {
+      mImpl->mAlignmentOffset.y = size.height - actualSize.height;
       break;
     }
   }

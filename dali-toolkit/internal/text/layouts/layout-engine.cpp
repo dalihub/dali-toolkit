@@ -55,7 +55,8 @@ struct LayoutEngine::Impl
 {
   Impl()
   : mLayout( LayoutEngine::SINGLE_LINE_BOX ),
-    mAlignment( LayoutEngine::ALIGN_BEGIN )
+    mHorizontalAlignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN ),
+    mVerticalAlignment( LayoutEngine::VERTICAL_ALIGN_TOP )
   {
     mFontClient = TextAbstraction::FontClient::Get();
   }
@@ -435,10 +436,10 @@ struct LayoutEngine::Impl
 
       // 2) Calculate the alignment offset accordingly with the align option,
       //    the box width, line length, and the paragraphs direction.
-      float alignOffset = CalculateAlignment( layoutSize.width,
-                                              line.lineSize.width,
-                                              line.extraLength,
-                                              paragraphDirection );
+      float alignOffset = CalculateHorizontalAlignment( layoutSize.width,
+                                                        line.lineSize.width,
+                                                        line.extraLength,
+                                                        paragraphDirection );
 
       // 3) Traverse all glyphs and update the 'x' position.
       for( GlyphIndex index = line.glyphIndex,
@@ -568,42 +569,42 @@ struct LayoutEngine::Impl
     return true;
   }
 
-  float CalculateAlignment( float boxWidth,
-                            float lineLength,
-                            float extraLength,
-                            bool paragraphDirection )
+  float CalculateHorizontalAlignment( float boxWidth,
+                                      float lineLength,
+                                      float extraLength,
+                                      bool paragraphDirection )
   {
     float offset = 0.f;
 
-    Alignment alignment = mAlignment;
+    HorizontalAlignment alignment = mHorizontalAlignment;
     if( paragraphDirection &&
-        ( ALIGN_CENTER != alignment ) )
+        ( HORIZONTAL_ALIGN_CENTER != alignment ) )
     {
-      if( ALIGN_BEGIN == alignment )
+      if( HORIZONTAL_ALIGN_BEGIN == alignment )
       {
-        alignment = ALIGN_END;
+        alignment = HORIZONTAL_ALIGN_END;
       }
       else
       {
-        alignment = ALIGN_BEGIN;
+        alignment = HORIZONTAL_ALIGN_BEGIN;
       }
     }
 
     switch( alignment )
     {
-      case ALIGN_BEGIN:
+      case HORIZONTAL_ALIGN_BEGIN:
       {
         offset = 0.f;
         break;
       }
-      case ALIGN_CENTER:
+      case HORIZONTAL_ALIGN_CENTER:
       {
         offset = 0.5f * ( boxWidth - lineLength );
         const int intOffset = static_cast<int>( offset ); // try to avoid pixel alignment.
         offset = static_cast<float>( intOffset );
         break;
       }
-      case ALIGN_END:
+      case HORIZONTAL_ALIGN_END:
       {
         offset = boxWidth - lineLength;
         break;
@@ -619,7 +620,8 @@ struct LayoutEngine::Impl
   }
 
   LayoutEngine::Layout mLayout;
-  LayoutEngine::Alignment mAlignment;
+  LayoutEngine::HorizontalAlignment mHorizontalAlignment;
+  LayoutEngine::VerticalAlignment mVerticalAlignment;
 
   TextAbstraction::FontClient mFontClient;
 };
@@ -645,14 +647,24 @@ unsigned int LayoutEngine::GetLayout() const
   return mImpl->mLayout;
 }
 
-void LayoutEngine::SetAlignment( Alignment alignment )
+void LayoutEngine::SetHorizontalAlignment( HorizontalAlignment alignment )
 {
-  mImpl->mAlignment = alignment;
+  mImpl->mHorizontalAlignment = alignment;
 }
 
-LayoutEngine::Alignment LayoutEngine::GetAlignment() const
+LayoutEngine::HorizontalAlignment LayoutEngine::GetHorizontalAlignment() const
 {
-  return mImpl->mAlignment;
+  return mImpl->mHorizontalAlignment;
+}
+
+void LayoutEngine::SetVerticalAlignment( VerticalAlignment alignment )
+{
+  mImpl->mVerticalAlignment = alignment;
+}
+
+LayoutEngine::VerticalAlignment LayoutEngine::GetVerticalAlignment() const
+{
+  return mImpl->mVerticalAlignment;
 }
 
 bool LayoutEngine::LayoutText( const LayoutParameters& layoutParameters,

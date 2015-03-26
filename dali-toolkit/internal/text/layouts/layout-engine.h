@@ -51,11 +51,18 @@ public:
     MULTI_LINE_BOX
   };
 
-  enum Alignment
+  enum HorizontalAlignment
   {
-    ALIGN_BEGIN,
-    ALIGN_CENTER,
-    ALIGN_END
+    HORIZONTAL_ALIGN_BEGIN,
+    HORIZONTAL_ALIGN_CENTER,
+    HORIZONTAL_ALIGN_END
+  };
+
+  enum VerticalAlignment
+  {
+    VERTICAL_ALIGN_TOP,
+    VERTICAL_ALIGN_CENTER,
+    VERTICAL_ALIGN_BOTTOM
   };
 
   /**
@@ -83,18 +90,32 @@ public:
   unsigned int GetLayout() const;
 
   /**
-   * @brief Choose the required line alignment.
+   * @brief Choose the required text horizontal alignment.
    *
    * @param[in] alignment The required alignment.
    */
-  void SetAlignment( Alignment alignment );
+  void SetHorizontalAlignment( HorizontalAlignment alignment );
 
   /**
-   * @brief Query the required line alignment.
+   * @brief Query the required text horizontal alignment.
    *
    * @return The required alignment.
    */
-  Alignment GetAlignment() const;
+  HorizontalAlignment GetHorizontalAlignment() const;
+
+  /**
+   * @brief Choose the required text vertical alignment.
+   *
+   * @param[in] alignment The required alignment.
+   */
+  void SetVerticalAlignment( VerticalAlignment alignment );
+
+  /**
+   * @brief Query the required text vertical alignment.
+   *
+   * @return The required alignment.
+   */
+  VerticalAlignment GetVerticalAlignment() const;
 
   /**
    * @brief Store the visual position of glyphs in the VisualModel.

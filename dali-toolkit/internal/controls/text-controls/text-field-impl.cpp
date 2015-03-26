@@ -54,13 +54,21 @@ namespace
 namespace
 {
 
-const Scripting::StringEnum< Toolkit::Text::LayoutEngine::Alignment > ALIGNMENT_STRING_TABLE[] =
+const Scripting::StringEnum< Toolkit::Text::LayoutEngine::HorizontalAlignment > HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 {
-  { "BEGIN",  Toolkit::Text::LayoutEngine::ALIGN_BEGIN  },
-  { "CENTER", Toolkit::Text::LayoutEngine::ALIGN_CENTER },
-  { "END",    Toolkit::Text::LayoutEngine::ALIGN_END    },
+  { "BEGIN",  Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_BEGIN  },
+  { "CENTER", Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_CENTER },
+  { "END",    Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_END    },
 };
-const unsigned int ALIGNMENT_STRING_TABLE_COUNT = sizeof( ALIGNMENT_STRING_TABLE ) / sizeof( ALIGNMENT_STRING_TABLE[0] );
+const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
+
+const Scripting::StringEnum< Toolkit::Text::LayoutEngine::VerticalAlignment > VERTICAL_ALIGNMENT_STRING_TABLE[] =
+{
+  { "TOP",    Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_TOP    },
+  { "CENTER", Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_CENTER },
+  { "BOTTOM", Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_BOTTOM },
+};
+const unsigned int VERTICAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( VERTICAL_ALIGNMENT_STRING_TABLE ) / sizeof( VERTICAL_ALIGNMENT_STRING_TABLE[0] );
 
 // Type registration
 BaseHandle Create()
@@ -84,8 +92,9 @@ DALI_PROPERTY_REGISTRATION( TextField, "enable-cursor-blink",     BOOLEAN,   ENA
 DALI_PROPERTY_REGISTRATION( TextField, "cursor-blink-interval",   FLOAT,     CURSOR_BLINK_INTERVAL   )
 DALI_PROPERTY_REGISTRATION( TextField, "cursor-blink-duration",   FLOAT,     CURSOR_BLINK_DURATION   )
 DALI_PROPERTY_REGISTRATION( TextField, "grab-handle-image",       STRING,    GRAB_HANDLE_IMAGE       )
-DALI_PROPERTY_REGISTRATION( TextField, "decoration bounding-box", RECTANGLE, DECORATION_BOUNDING_BOX )
-DALI_PROPERTY_REGISTRATION( TextField, "alignment",               STRING,    ALIGNMENT               )
+DALI_PROPERTY_REGISTRATION( TextField, "decoration-bounding-box", RECTANGLE, DECORATION_BOUNDING_BOX )
+DALI_PROPERTY_REGISTRATION( TextField, "horizontal-alignment",    STRING,    HORIZONTAL_ALIGNMENT    )
+DALI_PROPERTY_REGISTRATION( TextField, "vertical-alignment",      STRING,    VERTICAL_ALIGNMENT      )
 DALI_TYPE_REGISTRATION_END()
 
 } // namespace
@@ -247,16 +256,30 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::TextField::Property::ALIGNMENT:
+      case Toolkit::TextField::Property::HORIZONTAL_ALIGNMENT:
       {
         LayoutEngine& engine = impl.mController->GetLayoutEngine();
-        const LayoutEngine::Alignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::Alignment >( value.Get< std::string >().c_str(),
-                                                                                                                       ALIGNMENT_STRING_TABLE,
-                                                                                                                       ALIGNMENT_STRING_TABLE_COUNT );
+        const LayoutEngine::HorizontalAlignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::HorizontalAlignment >( value.Get< std::string >().c_str(),
+                                                                                                                                           HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                                                                           HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
 
-        if( engine.GetAlignment() != alignment )
+        if( engine.GetHorizontalAlignment() != alignment )
         {
-          engine.SetAlignment( alignment );
+          engine.SetHorizontalAlignment( alignment );
+          impl.RequestTextRelayout();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::VERTICAL_ALIGNMENT:
+      {
+        LayoutEngine& engine = impl.mController->GetLayoutEngine();
+        const LayoutEngine::VerticalAlignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::VerticalAlignment >( value.Get< std::string >().c_str(),
+                                                                                                                                       VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                                                                                       VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
+
+        if( engine.GetVerticalAlignment() != alignment )
+        {
+          engine.SetVerticalAlignment( alignment );
           impl.RequestTextRelayout();
         }
         break;
@@ -352,13 +375,23 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
-      case Toolkit::TextField::Property::ALIGNMENT:
+      case Toolkit::TextField::Property::HORIZONTAL_ALIGNMENT:
       {
         if( impl.mController )
         {
-          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::Alignment >( impl.mController->GetLayoutEngine().GetAlignment(),
-                                                                                                        ALIGNMENT_STRING_TABLE,
-                                                                                                        ALIGNMENT_STRING_TABLE_COUNT ) );
+          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::HorizontalAlignment >( impl.mController->GetLayoutEngine().GetHorizontalAlignment(),
+                                                                                                                  HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                                                  HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT ) );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::VERTICAL_ALIGNMENT:
+      {
+        if( impl.mController )
+        {
+          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::VerticalAlignment >( impl.mController->GetLayoutEngine().GetVerticalAlignment(),
+                                                                                                                  VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                                                                  VERTICAL_ALIGNMENT_STRING_TABLE_COUNT ) );
         }
         break;
       }
