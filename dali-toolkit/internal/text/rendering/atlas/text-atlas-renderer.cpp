@@ -27,7 +27,7 @@
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-basic-shader.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-bgra-shader.h>
-
+#include <dali-toolkit/internal/text/rendering/shaders/text-basic-shadow-shader.h>
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_ATLAS_RENDERER");
 #endif
@@ -43,13 +43,20 @@ namespace
   const Vector2 PADDING( 4.0f, 4.0f ); // Allow for variation in font glyphs
 }
 
-struct AtlasRenderer::Impl
+struct AtlasRenderer::Impl : public ConnectionTracker
 {
+
+  enum Style
+  {
+    STYLE_NORMAL,
+    STYLE_DROP_SHADOW
+  };
 
   struct MeshRecord
   {
     uint32_t mAtlasId;
     MeshData mMeshData;
+    FrameBufferImage mBuffer;
   };
 
   struct AtlasRecord
@@ -65,22 +72,31 @@ struct AtlasRenderer::Impl
   };
 
   Impl()
-  : mSlotDelegate( this )
   {
     mGlyphManager = AtlasGlyphManager::Get();
     mFontClient = TextAbstraction::FontClient::Get();
     mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_SIZE, DEFAULT_BLOCK_SIZE );
     mBasicShader = BasicShader::New();
-    mBGRAShader = BgraShader::New();
+    mBgraShader = BgraShader::New();
+    mBasicShadowShader = BasicShadowShader::New();
   }
 
-  void AddGlyphs( const std::vector<Vector2>& positions, const Vector<GlyphInfo>& glyphs )
+  void AddGlyphs( const std::vector<Vector2>& positions,
+                  const Vector<GlyphInfo>& glyphs,
+                  const Vector2& shadowOffset,
+                  const Vector4& shadowColor )
   {
     AtlasManager::AtlasSlot slot;
     std::vector< MeshRecord > meshContainer;
     FontId lastFontId = 0;
+    Style style = STYLE_NORMAL;
 
-    if (mImageIds.Size() )
+    if ( shadowOffset.x > 0.0f || shadowOffset.y > 0.0f )
+    {
+      style = STYLE_DROP_SHADOW;
+    }
+
+    if ( mImageIds.Size() )
     {
       // Unreference any currently used glyphs
       RemoveText();
@@ -144,19 +160,23 @@ struct AtlasRenderer::Impl
     {
       for ( uint32_t i = 0; i < meshContainer.size(); ++i )
       {
-        Mesh mesh = Mesh::New( meshContainer[ i ].mMeshData );
-        MeshActor actor = MeshActor::New( mesh );
+        MeshActor actor = MeshActor::New( Mesh::New( meshContainer[ i ].mMeshData ) );
         actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-        actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );;
+        actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
 
         // Check to see what pixel format the shader should be
         if ( mGlyphManager.GetPixelFormat( meshContainer[ i ].mAtlasId ) == Pixel::L8 )
         {
+          // Create an effect if necessary
+          if ( style == STYLE_DROP_SHADOW )
+          {
+            actor.Add( GenerateEffect( meshContainer[ i ], shadowOffset, shadowColor ) );
+          }
           actor.SetShaderEffect( mBasicShader );
         }
         else
         {
-          actor.SetShaderEffect( mBGRAShader );
+          actor.SetShaderEffect( mBgraShader );
         }
 
         if ( i )
@@ -168,7 +188,7 @@ struct AtlasRenderer::Impl
           mActor = actor;
         }
       }
-      mActor.OffStageSignal().Connect( mSlotDelegate, &AtlasRenderer::Impl::OffStageDisconnect );
+      mActor.OffStageSignal().Connect( this, &AtlasRenderer::Impl::OffStageDisconnect );
     }
 #if defined(DEBUG_ENABLED)
     Toolkit::AtlasGlyphManager::Metrics metrics = mGlyphManager.GetMetrics();
@@ -267,13 +287,158 @@ struct AtlasRenderer::Impl
     }
   }
 
+  MeshActor GenerateEffect( MeshRecord& meshRecord,
+                            const Vector2& shadowOffset,
+                            const Vector4& shadowColor )
+  {
+    // Scan vertex buffer to determine width and height of effect buffer needed
+    MeshData::VertexContainer verts = meshRecord.mMeshData.GetVertices();
+    const float zero = 0.0f;
+    const float one = 1.0f;
+    float tlx = verts[ 0 ].x;
+    float tly = verts[ 0 ].y;
+    float brx = zero;
+    float bry = zero;
+
+    for ( uint32_t i = 0; i < verts.size(); ++i )
+    {
+      if ( verts[ i ].x < tlx )
+      {
+        tlx = verts[ i ].x;
+      }
+      if ( verts[ i ].y < tly )
+      {
+        tly = verts[ i ].y;
+      }
+      if ( verts[ i ].x > brx )
+      {
+        brx = verts[ i ].x;
+      }
+      if ( verts[ i ].y > bry )
+      {
+        bry = verts[ i ].y;
+      }
+    }
+
+    float width = brx - tlx;
+    float height = bry - tly;
+    float divWidth = 2.0f / width;
+    float divHeight = 2.0f / height;
+
+    // Create a buffer to render to
+    // TODO bloom style filter from this buffer
+    meshRecord.mBuffer = FrameBufferImage::New( width, height );
+
+    // Create a mesh actor to contain the post-effect render
+    MeshData::VertexContainer vertices;
+    MeshData::FaceIndices face;
+
+    vertices.push_back( MeshData::Vertex( Vector3( tlx + shadowOffset.x, tly + shadowOffset.y, zero ),
+                                          Vector2( zero, zero ),
+                                          Vector3( zero, zero, zero ) ) );
+
+    vertices.push_back( MeshData::Vertex( Vector3( brx + shadowOffset.x, tly + shadowOffset.y, zero ),
+                                          Vector2( one, zero ),
+                                          Vector3( zero, zero, zero ) ) );
+
+    vertices.push_back( MeshData::Vertex( Vector3( tlx + shadowOffset.x, bry + shadowOffset.y, zero ),
+                                          Vector2( zero, one ),
+                                          Vector3( zero, zero, zero ) ) );
+
+    vertices.push_back( MeshData::Vertex( Vector3( brx + shadowOffset.x, bry + shadowOffset.y, zero ),
+                                          Vector2( one, one ),
+                                          Vector3( zero, zero, zero ) ) );
+
+    face.push_back( 0 ); face.push_back( 2u ); face.push_back( 1u );
+    face.push_back( 1u ); face.push_back( 2u ); face.push_back( 3u );
+
+    MeshData meshData;
+    Material newMaterial = Material::New("effect buffer");
+    newMaterial.SetDiffuseTexture( meshRecord.mBuffer );
+    meshData.SetMaterial( newMaterial );
+    meshData.SetVertices( vertices );
+    meshData.SetFaceIndices( face );
+    meshData.SetHasNormals( true );
+    meshData.SetHasColor( false );
+    meshData.SetHasTextureCoords( true );
+    MeshActor actor = MeshActor::New( Mesh::New( meshData ) );
+    actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+    actor.SetShaderEffect( mBgraShader );
+    actor.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
+    actor.SetSortModifier( one ); // force behind main text
+
+    // Create a sub actor to render once with normalized vertex positions
+    MeshData newMeshData;
+    MeshData::VertexContainer newVerts;
+    MeshData::FaceIndices newFaces;
+    MeshData::FaceIndices faces = meshRecord.mMeshData.GetFaces();
+    for ( uint32_t i = 0; i < verts.size(); ++i )
+    {
+      MeshData::Vertex vertex = verts[ i ];
+      vertex.x = ( ( vertex.x - tlx ) * divWidth ) - one;
+      vertex.y = ( ( vertex.y - tly ) * divHeight ) - one;
+      newVerts.push_back( vertex );
+    }
+
+    // Reverse triangle winding order
+    uint32_t faceCount = faces.size() / 3;
+    for ( uint32_t i = 0; i < faceCount; ++i )
+    {
+      uint32_t index = i * 3;
+      newFaces.push_back( faces[ index + 2 ] );
+      newFaces.push_back( faces[ index + 1 ] );
+      newFaces.push_back( faces[ index ] );
+    }
+
+    newMeshData.SetMaterial( meshRecord.mMeshData.GetMaterial() );
+    newMeshData.SetVertices( newVerts );
+    newMeshData.SetFaceIndices( newFaces );
+    newMeshData.SetHasNormals( true );
+    newMeshData.SetHasColor( false );
+    newMeshData.SetHasTextureCoords( true );
+
+    MeshActor subActor = MeshActor::New( Mesh::New( newMeshData ) );
+    subActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    subActor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+    subActor.SetColor( shadowColor );
+    subActor.SetShaderEffect( mBasicShadowShader );
+    subActor.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+
+    // Create a render task to render the effect
+    RenderTask task = Stage::GetCurrent().GetRenderTaskList().CreateTask();
+    task.SetTargetFrameBuffer( meshRecord.mBuffer );
+    task.SetSourceActor( subActor );
+    task.SetClearEnabled( true );
+    task.SetClearColor( Vector4::ZERO );
+    task.SetExclusive( true );
+    task.SetRefreshRate( RenderTask::REFRESH_ONCE );
+    task.FinishedSignal().Connect( this, &AtlasRenderer::Impl::RenderComplete );
+    actor.Add( subActor );
+    return actor;
+  }
+
+  void RenderComplete( RenderTask& renderTask )
+  {
+    // Get the actor used for render to buffer and remove it from the parent
+    Actor renderActor = renderTask.GetSourceActor();
+    if ( renderActor )
+    {
+      Actor parent = renderActor.GetParent();
+      if ( parent )
+      {
+        parent.Remove( renderActor );
+      }
+    }
+  }
+
   RenderableActor mActor;                             ///< The actor parent which renders the text
   AtlasGlyphManager mGlyphManager;                    ///< Glyph Manager to handle upload and caching
   Vector< uint32_t > mImageIds;                       ///< A list of imageIDs used by the renderer
   TextAbstraction::FontClient mFontClient;            ///> The font client used to supply glyph information
-  SlotDelegate< AtlasRenderer::Impl > mSlotDelegate;  ///> Signal generated to unreference glyphs when renderable actor is removed
-  ShaderEffect mBasicShader;                          ///> Shader to render L8 glyphs
-  ShaderEffect mBGRAShader;                           ///> Shader to render BGRA glyphs
+  ShaderEffect mBasicShader;                          ///> Shader used to render L8 glyphs
+  ShaderEffect mBgraShader;                           ///> Shader used to render BGRA glyphs
+  ShaderEffect mBasicShadowShader;                    ///> Shader used to render drop shadow into buffer
   std::vector< MaxBlockSize > mBlockSizes;            ///> Maximum size needed to contain a glyph in a block within a new atlas
 };
 
@@ -299,7 +464,10 @@ RenderableActor AtlasRenderer::Render( Text::ViewInterface& view )
     std::vector<Vector2> positions;
     positions.resize( numberOfGlyphs );
     view.GetGlyphPositions( &positions[0], 0, numberOfGlyphs );
-    mImpl->AddGlyphs( positions, glyphs );
+    mImpl->AddGlyphs( positions,
+                      glyphs,
+                      view.GetShadowOffset(),
+                      view.GetShadowColor() );
   }
   return mImpl->mActor;
 }

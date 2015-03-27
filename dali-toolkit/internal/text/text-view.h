@@ -76,6 +76,16 @@ public:
                                   GlyphIndex glyphIndex,
                                   Length numberOfGlyphs ) const;
 
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetShadowOffset()
+   */
+  virtual const Vector2& GetShadowOffset() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetShadowColor()
+   */
+  virtual const Vector4& GetShadowColor() const;
+
 private:
 
   // Undefined

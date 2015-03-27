@@ -650,6 +650,10 @@ struct Controller::Impl
     mFontClient = TextAbstraction::FontClient::Get();
 
     mView.SetVisualModel( mVisualModel );
+
+    // Set the shadow properties to default
+    mVisualModel->SetShadowOffset( Vector2::ZERO );
+    mVisualModel->SetShadowColor( Vector4::ZERO );
   }
 
   ~Impl()
@@ -843,6 +847,26 @@ void Controller::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfCharact
 
     fonts.PushBack( fontRun );
   }
+}
+
+const Vector2& Controller::GetShadowOffset() const
+{
+  return mImpl->mVisualModel->GetShadowOffset();
+}
+
+const Vector4& Controller::GetShadowColor() const
+{
+  return mImpl->mVisualModel->GetShadowColor();
+}
+
+void Controller::SetShadowOffset( const Vector2& shadowOffset )
+{
+  mImpl->mVisualModel->SetShadowOffset( shadowOffset );
+}
+
+void Controller::SetShadowColor( const Vector4& shadowColor )
+{
+  mImpl->mVisualModel->SetShadowColor( shadowColor );
 }
 
 void Controller::EnableTextInput( DecoratorPtr decorator )

@@ -83,6 +83,8 @@ DALI_PROPERTY_REGISTRATION( TextLabel, "point-size",           FLOAT,   POINT_SI
 DALI_PROPERTY_REGISTRATION( TextLabel, "multi-line",           BOOLEAN, MULTI_LINE           )
 DALI_PROPERTY_REGISTRATION( TextLabel, "horizontal-alignment", STRING,  HORIZONTAL_ALIGNMENT )
 DALI_PROPERTY_REGISTRATION( TextLabel, "vertical-alignment",   STRING,  VERTICAL_ALIGNMENT   )
+DALI_PROPERTY_REGISTRATION( TextLabel, "shadow-offset",     VECTOR2, SHADOW_OFFSET     )
+DALI_PROPERTY_REGISTRATION( TextLabel, "shadow-color",      VECTOR4, SHADOW_COLOR      )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -218,6 +220,32 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+     case Toolkit::TextLabel::Property::SHADOW_OFFSET:
+      {
+        if( impl.mController )
+        {
+          Vector2 shadowOffset = value.Get< Vector2 >();
+          if ( impl.mController->GetShadowOffset() != shadowOffset )
+          {
+            impl.mController->SetShadowOffset( shadowOffset );
+            impl.RequestTextRelayout();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::SHADOW_COLOR:
+      {
+        if( impl.mController )
+        {
+          Vector4 shadowColor = value.Get< Vector4 >();
+          if ( impl.mController->GetShadowColor() != shadowColor )
+          {
+            impl.mController->SetShadowColor( shadowColor );
+            impl.RequestTextRelayout();
+          }
+        }
+        break;
+      }
     }
   }
 }
@@ -273,6 +301,22 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
           value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::VerticalAlignment >( impl.mController->GetLayoutEngine().GetVerticalAlignment(),
                                                                                                                 VERTICAL_ALIGNMENT_STRING_TABLE,
                                                                                                                 VERTICAL_ALIGNMENT_STRING_TABLE_COUNT ) );
+        }
+        break;
+      }
+     case Toolkit::TextLabel::Property::SHADOW_OFFSET:
+      {
+        if ( impl.mController )
+        {
+          value = impl.mController->GetShadowOffset();
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::SHADOW_COLOR:
+      {
+        if ( impl.mController )
+        {
+          value = impl.mController->GetShadowColor();
         }
         break;
       }

@@ -51,6 +51,26 @@ void View::SetVisualModel( VisualModelPtr visualModel )
   mImpl->mVisualModel = visualModel;
 }
 
+const Vector2& View::GetShadowOffset() const
+{
+  if ( mImpl->mVisualModel )
+  {
+    VisualModel& model = *mImpl->mVisualModel;
+    return model.GetShadowOffset();
+  }
+  return Vector2::ZERO;
+}
+
+const Vector4& View::GetShadowColor() const
+{
+  if ( mImpl->mVisualModel )
+  {
+    VisualModel& model = *mImpl->mVisualModel;
+    return model.GetShadowColor();
+  }
+  return Vector4::ZERO;
+}
+
 Length View::GetNumberOfGlyphs() const
 {
   if( mImpl->mVisualModel )

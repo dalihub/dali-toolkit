@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
@@ -383,6 +384,34 @@ public:
    */
   const Vector2& GetActualSize() const;
 
+  /**
+   * @brief Sets the text's shadow offset.
+   *
+   * @param[in] shadowOffset The shadow offset, 0,0 indicates no shadow.
+   */
+  void SetShadowOffset( const Vector2& shadowOffset );
+
+  /**
+   * @brief Retrieves the text's shadow offset.
+   *
+   * @return The text's shadow offset, 0,0 indicates no shadow.
+   */
+  const Vector2& GetShadowOffset() const;
+
+  /**
+   * @brief Sets the text's shadow color.
+   *
+   * @param[in] shadowColor The shadow color.
+   */
+  void SetShadowColor( const Vector4& shadowColor );
+
+  /**
+   * @brief Retrieves the text's shadow color.
+   *
+   * @return The text's shadow color.
+   */
+  const Vector4& GetShadowColor() const;
+
 protected:
 
   /**
@@ -412,6 +441,9 @@ public:
   Vector<Length>         mGlyphsPerCharacter; ///< For each character, the number of glyphs that are shaped.
   Vector<Vector2>        mGlyphPositions;     ///< For each glyph, the position.
   Vector<LineRun>        mLines;              ///< The laid out lines.
+
+  Vector2                mShadowOffset;       ///< Offset for drop shadow, 0.0 indicates no shadow
+  Vector4                mShadowColor;        ///< Color of drop shadow
 
 private:
 

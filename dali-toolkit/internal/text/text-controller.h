@@ -173,6 +173,34 @@ public:
   void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters );
 
   /**
+   * @brief Set the shadow offset.
+   *
+   * @param[in] shadowOffset The shadow offset, 0,0 indicates no shadow.
+   */
+   void SetShadowOffset( const Vector2& shadowOffset );
+
+  /**
+   * @brief Retrieve the shadow offset.
+   *
+   * @return The shadow offset.
+   */
+   const Vector2& GetShadowOffset() const;
+
+  /**
+   * @brief Set the shadow color.
+   *
+   * @param[in] shadowColor The shadow color.
+   */
+   void SetShadowColor( const Vector4& shadowColor );
+
+  /**
+   * @brief Retrieve the shadow color.
+   *
+   * @return The shadow color.
+   */
+   const Vector4& GetShadowColor() const;
+
+  /**
    * @brief Called to enable text input.
    *
    * @note Only selectable or editable controls should calls this.

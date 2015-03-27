@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/math/vector4.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-definitions.h>
 
@@ -84,6 +87,20 @@ public:
   virtual void GetGlyphPositions( Vector2* glyphPositions,
                                   GlyphIndex glyphIndex,
                                   Length numberOfGlyphs ) const = 0;
+
+  /**
+   * @brief Retrieves the shadow offset, 0,0 indicates no shadow.
+   *
+   * @return The shadow offset.
+   */
+  virtual const Vector2& GetShadowOffset() const = 0;
+
+  /**
+   * @brief Retrieves the shadow color.
+   *
+   * @return The shadow color.
+   */
+  virtual const Vector4& GetShadowColor() const = 0;
 };
 
 } // namespace Text

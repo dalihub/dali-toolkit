@@ -370,6 +370,27 @@ const Vector2& VisualModel::GetActualSize() const
   return mActualSize;
 }
 
+void VisualModel::SetShadowOffset( const Vector2& shadowOffset )
+{
+  mShadowOffset = shadowOffset;
+}
+
+void VisualModel::SetShadowColor( const Vector4& shadowColor )
+{
+  mShadowColor = shadowColor;
+}
+
+const Vector2& VisualModel::GetShadowOffset() const
+{
+  return mShadowOffset;
+}
+
+const Vector4& VisualModel::GetShadowColor() const
+{
+  return mShadowColor;
+}
+
+
 VisualModel::~VisualModel()
 {
 }
