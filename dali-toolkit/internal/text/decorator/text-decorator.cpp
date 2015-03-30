@@ -201,7 +201,7 @@ struct Decorator::Impl : public ConnectionTracker
       CreateGrabHandle();
 
       mGrabHandle.SetPosition( mCursor[PRIMARY_CURSOR].x + scrollPosition.x,
-                               mCursor[PRIMARY_CURSOR].y + scrollPosition.y + mCursor[PRIMARY_CURSOR].lineHeight );
+                               mCursor[PRIMARY_CURSOR].lineHeight + scrollPosition.y );
     }
     else if( mGrabHandle )
     {
@@ -217,11 +217,11 @@ struct Decorator::Impl : public ConnectionTracker
 
       SelectionHandleImpl& primary = mSelectionHandle[ PRIMARY_SELECTION_HANDLE ];
       primary.actor.SetPosition( primary.x + scrollPosition.x,
-                                 primary.y + scrollPosition.y + primary.lineHeight );
+                                 primary.lineHeight + scrollPosition.y );
 
       SelectionHandleImpl& secondary = mSelectionHandle[ SECONDARY_SELECTION_HANDLE ];
       secondary.actor.SetPosition( secondary.x + scrollPosition.x,
-                                   secondary.y + scrollPosition.y + secondary.lineHeight );
+                                   secondary.lineHeight + scrollPosition.y );
 
       CreateHighlight();
       UpdateHighlight();

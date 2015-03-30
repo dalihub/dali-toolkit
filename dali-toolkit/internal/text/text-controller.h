@@ -170,7 +170,7 @@ public:
    * @param[out] fonts The default font family, style and point sizes.
    * @param[in] numberOfCharacters The number of characters in the logical model.
    */
-  void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters );
+  void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters ) const;
 
   /**
    * @brief Set the text color
