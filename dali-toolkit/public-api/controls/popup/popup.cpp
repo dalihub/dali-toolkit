@@ -132,6 +132,11 @@ void Popup::HideTail()
   GetImpl(*this).HideTail();
 }
 
+void Popup::MarkDirtyForRelayout()
+{
+  GetImpl(*this).MarkDirtyForRelayout();
+}
+
 Popup::TouchedOutsideSignalType& Popup::OutsideTouchedSignal()
 {
   return GetImpl(*this).OutsideTouchedSignal();

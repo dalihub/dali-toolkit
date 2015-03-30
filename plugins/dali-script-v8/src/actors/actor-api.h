@@ -68,6 +68,12 @@ namespace ActorApi
   void RotateBy( const v8::FunctionCallbackInfo< v8::Value >& args );
   void ScaleBy( const v8::FunctionCallbackInfo< v8::Value >& args );
 
+  // new function just for JavaScript API, to apply a PathConstraint to an actor
+  void ApplyPathConstraint( const v8::FunctionCallbackInfo< v8::Value >& args );
+
+  // new function just for JavaScript API, to remove a PathConstraint from an actor
+  void RemovePathConstraint( const v8::FunctionCallbackInfo< v8::Value >& args );
+
   // new function just for JavaScript API, to help developers know what type of actor
   // they're dealing with, returns actor name as a string
   void GetActorType( const v8::FunctionCallbackInfo< v8::Value >& args );

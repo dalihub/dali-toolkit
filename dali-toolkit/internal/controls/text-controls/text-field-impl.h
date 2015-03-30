@@ -96,7 +96,7 @@ private: // From Control
   /**
    * @copydoc Control::OnInitialize()
    */
-  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
 
   /**
    * @copydoc Control::OnKeyInputFocusGained()

@@ -328,7 +328,13 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
 
 void TextLabel::OnInitialize()
 {
+  Actor self = Self();
+
   mController = Text::Controller::New( *this );
+
+  // Use height-for-width negotiation by default
+  self.SetResizePolicy( FILL_TO_PARENT, WIDTH );
+  self.SetDimensionDependency( HEIGHT, WIDTH );
 }
 
 void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
@@ -346,7 +352,7 @@ float TextLabel::GetHeightForWidth( float width )
   return mController->GetHeightForWidth( width );
 }
 
-void TextLabel::OnRelayout( const Vector2& size, ActorSizeContainer& container )
+void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   if( mController->Relayout( size ) ||
       !mRenderer )

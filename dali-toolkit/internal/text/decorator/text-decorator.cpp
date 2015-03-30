@@ -339,7 +339,7 @@ struct Decorator::Impl : public ConnectionTracker
 
       mActiveLayer.SetAnchorPoint( AnchorPoint::CENTER);
       mActiveLayer.SetParentOrigin( ParentOrigin::CENTER);
-      mActiveLayer.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+      //mActiveLayer.SetSizeMode( SIZE_EQUAL_TO_PARENT ); FIXME
       mActiveLayer.SetPositionInheritanceMode( USE_PARENT_POSITION );
 
       parent.Add( mActiveLayer );

@@ -69,51 +69,6 @@ const Internal::Control& Control::GetImplementation() const
   return static_cast<const Internal::Control&>(CustomActor::GetImplementation());
 }
 
-void Control::SetSizePolicy( SizePolicy widthPolicy, SizePolicy heightPolicy )
-{
-  GetImplementation().SetSizePolicy( widthPolicy, heightPolicy );
-}
-
-void Control::GetSizePolicy( SizePolicy& widthPolicy, SizePolicy& heightPolicy ) const
-{
-  GetImplementation().GetSizePolicy( widthPolicy, heightPolicy );
-}
-
-void Control::SetMinimumSize( const Vector3& size )
-{
-  GetImplementation().SetMinimumSize( size );
-}
-
-const Vector3& Control::GetMinimumSize() const
-{
-  return GetImplementation().GetMinimumSize();
-}
-
-void Control::SetMaximumSize( const Vector3& size )
-{
-  GetImplementation().SetMaximumSize( size );
-}
-
-const Vector3& Control::GetMaximumSize() const
-{
-  return GetImplementation().GetMaximumSize();
-}
-
-Vector3 Control::GetNaturalSize()
-{
-  return GetImplementation().GetNaturalSize();
-}
-
-float Control::GetHeightForWidth( float width )
-{
-  return GetImplementation().GetHeightForWidth( width );
-}
-
-float Control::GetWidthForHeight( float height )
-{
-  return GetImplementation().GetWidthForHeight( height );
-}
-
 void Control::SetKeyInputFocus()
 {
   GetImplementation().SetKeyInputFocus();
@@ -169,9 +124,9 @@ Vector4 Control::GetBackgroundColor() const
   return GetImplementation().GetBackgroundColor();
 }
 
-void Control::SetBackground( Image image )
+void Control::SetBackgroundImage( Image image )
 {
-  GetImplementation().SetBackground( image );
+  GetImplementation().SetBackgroundImage( image );
 }
 
 void Control::ClearBackground()

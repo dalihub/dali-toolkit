@@ -82,6 +82,12 @@ CheckBoxButton::~CheckBoxButton()
   }
 }
 
+void CheckBoxButton::OnButtonInitialize()
+{
+  // Wrap around all children
+  Self().SetResizePolicy( FIT_TO_CHILDREN, ALL_DIMENSIONS );
+}
+
 void CheckBoxButton::SetSelectedImage( Actor image )
 {
   Actor& selectedImage = GetSelectedImage();
@@ -380,38 +386,6 @@ void CheckBoxButton::OnDisabled( bool disabled )
       backgroundImage.Add( label );
     }
   }
-}
-
-void CheckBoxButton::OnRelayout( const Vector2& size, ActorSizeContainer& container )
-{
-  Vector3 newSize;
-
-  if( IsDisabled() && GetDisabledBackgroundImage() )
-  {
-    newSize = GetDisabledBackgroundImage().GetNaturalSize();
-  }
-  else if( GetBackgroundImage() )
-  {
-    newSize = GetBackgroundImage().GetNaturalSize();
-  }
-
-  Actor& label = GetLabel();
-
-  if( label )
-  {
-    // Offset the label from the radio button image
-    newSize.width += DISTANCE_BETWEEN_IMAGE_AND_LABEL.width;
-
-    // Find the size of the control using size negotiation
-    Vector3 actorNaturalSize( label.GetNaturalSize() );
-    Control::Relayout( label, Vector2( actorNaturalSize.width, actorNaturalSize.height ), container );
-
-    Vector3 actorSize( label.GetSize() );
-    newSize.width += actorSize.width;
-    newSize.height = std::max( newSize.height, actorSize.height );
-  }
-
-  Self().SetSize( newSize );
 }
 
 void CheckBoxButton::AddChild( Actor& actor )

@@ -362,11 +362,12 @@ ItemView::ItemView(ItemFactory& factory)
 
 void ItemView::OnInitialize()
 {
-  SetSizePolicy( Toolkit::Control::Fixed, Toolkit::Control::Fixed );
-
   RegisterCommonProperties();
 
   Actor self = Self();
+
+  // Disable size negotiation for item views
+  self.SetRelayoutEnabled( false );
 
   mScrollConnector = Dali::Toolkit::ScrollConnector::New();
   mScrollPositionObject = mScrollConnector.GetScrollPositionObject();
@@ -460,7 +461,6 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
 
   // Move the items to the new layout positions...
 
-  bool resizeAnimationNeeded(false);
   for (ConstItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
   {
     unsigned int itemId = iter->first;
@@ -472,32 +472,12 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
     Vector3 size;
     if(mActiveLayout->GetItemSize(itemId, targetSize, size))
     {
-      if( durationSeconds > 0.0f )
-      {
-        // Use a size animation
-        if (!resizeAnimationNeeded)
-        {
-          resizeAnimationNeeded = true;
-          RemoveAnimation(mResizeAnimation);
-          mResizeAnimation = Animation::New(durationSeconds);
-        }
-
-        // The layout provides its own resize animation
-        mActiveLayout->GetResizeAnimation(mResizeAnimation, actor, size, durationSeconds);
-      }
-      else
-      {
-        // resize immediately
-        actor.SetSize(size);
-      }
+      // resize immediately
+      actor.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+      actor.SetPreferredSize( size.GetVectorXY() );
     }
 
     mActiveLayout->ApplyConstraints(actor, itemId, durationSeconds, mScrollPositionObject, Self() );
-  }
-
-  if (resizeAnimationNeeded)
-  {
-    mResizeAnimation.Play();
   }
 
   // Refresh the new layout
@@ -568,6 +548,17 @@ void ItemView::OnRefreshNotification(PropertyNotification& source)
     // Only refresh the cache during normal scrolling
     DoRefresh(GetCurrentLayoutPosition(0), true);
   }
+}
+
+void ItemView::Refresh()
+{
+  for (ItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter )
+  {
+    ReleaseActor( iter->first, iter->second );
+  }
+  mItemPool.clear();
+
+  DoRefresh(GetCurrentLayoutPosition(0), true);
 }
 
 void ItemView::DoRefresh(float currentLayoutPosition, bool cacheExtra)
@@ -1005,7 +996,8 @@ void ItemView::SetupActor( Item item, float durationSeconds )
     Vector3 size;
     if( mActiveLayout->GetItemSize( item.first, mActiveLayoutTargetSize, size ) )
     {
-      item.second.SetSize( size );
+      item.second.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+      item.second.SetPreferredSize( size.GetVectorXY() );
     }
 
     mActiveLayout->ApplyConstraints( item.second, item.first, durationSeconds, mScrollPositionObject, Self() );

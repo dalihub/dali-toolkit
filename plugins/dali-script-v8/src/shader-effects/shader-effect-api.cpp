@@ -19,6 +19,9 @@
 // CLASS HEADER
 #include "shader-effect-api.h"
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/object/type-registry.h>
+
 // INTERNAL INCLUDES
 #include <v8-utils.h>
 #include <shader-effects/shader-effect-wrapper.h>
@@ -186,14 +189,12 @@ ShaderEffect GetShaderEffect( v8::Isolate* isolate, const v8::FunctionCallbackIn
  */
 ShaderEffect ShaderEffectApi::New(  v8::Isolate* isolate, const v8::FunctionCallbackInfo< v8::Value >& args )
 {
-
-
   v8::HandleScope handleScope( isolate );
-
-  ShaderParameters shaderParams;
 
   if( args[0]->IsObject() )
   {
+    ShaderParameters shaderParams;
+
     v8::Local<v8::Object > obj = args[0]->ToObject();
 
     v8::Local<v8::Value> geometryTypeValue = obj->Get(v8::String::NewFromUtf8( isolate, "geometryType"));
@@ -244,9 +245,39 @@ ShaderEffect ShaderEffectApi::New(  v8::Isolate* isolate, const v8::FunctionCall
       }
       shaderParams.ProcessHintsArray( hintsArray );
     }
-  }
-  return shaderParams.NewShader();
 
+    return shaderParams.NewShader();
+  }
+  else
+  {
+    ShaderEffect effect;
+
+    bool found( false );
+    std::string typeName = V8Utils::GetStringParameter( PARAMETER_0, found, isolate, args );
+    if( !found )
+    {
+      DALI_SCRIPT_EXCEPTION( isolate, "string parameter missing" );
+    }
+    else
+    {
+      // create a new shader effect based on type, using the type registry.
+      Dali::TypeInfo typeInfo = Dali::TypeRegistry::Get().GetTypeInfo( typeName );
+      if( typeInfo ) // handle, check if it has a value
+      {
+        Dali::BaseHandle handle = typeInfo.CreateInstance();
+        if( handle )
+        {
+          effect = ShaderEffect::DownCast( handle );
+        }
+      }
+      else
+      {
+        DALI_SCRIPT_EXCEPTION(isolate,"Unknown shader effect type");
+      }
+    }
+
+    return effect;
+  }
 }
 
 ShaderEffect ShaderEffectApi::GetShaderEffectFromParams( int paramIndex,

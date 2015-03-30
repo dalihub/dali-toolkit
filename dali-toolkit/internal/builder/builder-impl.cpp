@@ -529,6 +529,9 @@ BaseHandle Builder::DoCreate( const TreeNode& root, const TreeNode& node,
 
       if( actor )
       {
+        // TEMP: Assume all script created actors are not using size negotiation for now
+        actor.SetRelayoutEnabled( false );
+
         // add children of all the styles
         if( OptionalChild actors = IsChild( node, KEYNAME_ACTORS ) )
         {

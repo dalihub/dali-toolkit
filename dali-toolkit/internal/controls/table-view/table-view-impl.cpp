@@ -24,25 +24,23 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/scripting/scripting.h>
+#include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/debug.h>
 
 using namespace Dali;
 
 namespace
 {
-const float DEFAULT_CONSTRAINT_DURATION = 0.0f;
 
 /**
- * sets a child property relative to parents size and applies a unit based padding before the relative calculation.
- * @param[in] scale of parent minus padding between 0 and 1
- * @param[in] padding in world coordinate units
- * @param[in] fixed part in world coordinate units
- * @param[in] size of the parent
- * @return The relative size with padding.
+ * @brief Should the tableview fit around the given actor
+ *
+ * @param[in] actor The child actor to test against
+ * @param[dimension] The dimnesion to test against
  */
-Vector2 RelativeToSize( const Vector2& scale, const Vector2& padding, const Vector2& fixed, const Vector2& parentSize)
+bool FitToChild( Actor actor, Dimension dimension )
 {
-  return fixed + ( parentSize - padding ) * scale;
+  return actor.GetResizePolicy( dimension ) != FILL_TO_PARENT && actor.GetRelayoutSize( dimension ) > 0.0f;
 }
 
 #if defined(DEBUG_ENABLED)
@@ -136,9 +134,9 @@ DALI_TYPE_REGISTRATION_END()
 
 const Scripting::StringEnum< Toolkit::TableView::LayoutPolicy > LAYOUT_POLICY_STRING_TABLE[] =
 {
- { "fixed",    Toolkit::TableView::Fixed    },
- { "relative", Toolkit::TableView::Relative },
- { "fill",     Toolkit::TableView::Fill     }
+ { "fixed",    Toolkit::TableView::FIXED    },
+ { "relative", Toolkit::TableView::RELATIVE },
+ { "fill",     Toolkit::TableView::FILL     }
 };
 
 const unsigned int LAYOUT_POLICY_STRING_TABLE_COUNT = sizeof(LAYOUT_POLICY_STRING_TABLE) / sizeof( LAYOUT_POLICY_STRING_TABLE[0] );
@@ -160,7 +158,7 @@ Toolkit::TableView TableView::New( unsigned int initialRows, unsigned int initia
   return handle;
 }
 
-bool TableView::AddChild( Actor child, Toolkit::TableView::CellPosition position )
+bool TableView::AddChild( Actor& child, const Toolkit::TableView::CellPosition& position )
 {
   // check that the child is valid
   DALI_ASSERT_ALWAYS( child );
@@ -170,31 +168,35 @@ bool TableView::AddChild( Actor child, Toolkit::TableView::CellPosition position
   {
     child.GetParent().Remove( child );
   }
+
   // check if we need to expand our data array
   if( position.rowIndex >= mCellData.GetRows() )
   {
     // only adding new rows
     ResizeContainers( position.rowIndex + 1, mCellData.GetColumns() );
   }
+
   if( position.columnIndex >= mCellData.GetColumns() )
   {
     // only adding new columns
     ResizeContainers( mCellData.GetRows(), position.columnIndex + 1 );
   }
+
   // check if there already is something in this cell
   if( mCellData[ position.rowIndex ][ position.columnIndex ].actor )
   {
     return false; // cannot share a cell, it would complicate all logic and not bring much benefit
   }
+
   RelayoutingLock lock( *this );
   // adopt the child
   Self().Add( child );
 
   // put the actor to the main cell
-  CellData data;
+  CellData& data = mCellData[ position.rowIndex ][ position.columnIndex ];
   data.actor = child;
   data.position = position;
-  mCellData[ position.rowIndex ][ position.columnIndex ] = data;
+
   // if child spans multiple rows of columns
   bool spanned = false;
   if( position.rowSpan > 1 )
@@ -205,8 +207,10 @@ bool TableView::AddChild( Actor child, Toolkit::TableView::CellPosition position
       // increase table size for the full span, only increasing rows
       ResizeContainers( position.rowIndex + position.rowSpan, mCellData.GetColumns() );
     }
+
     spanned = true;
   }
+
   if( position.columnSpan > 1 )
   {
     // span might go outside table
@@ -215,8 +219,10 @@ bool TableView::AddChild( Actor child, Toolkit::TableView::CellPosition position
       // increase table size for the full span, only increasing columns
       ResizeContainers( mCellData.GetRows(), position.columnIndex + position.columnSpan );
     }
+
     spanned = true;
   }
+
   // if it spanned multiple rows, put the cellinfo in all of those
   if( spanned )
   {
@@ -232,25 +238,25 @@ bool TableView::AddChild( Actor child, Toolkit::TableView::CellPosition position
       }
     }
   }
-  // relayout the whole table
+
+  // Relayout the whole table
   RelayoutRequest();
-  return true; // addition successful
+
+  return true;    // Addition successful
 }
 
-Actor TableView::GetChildAt( Toolkit::TableView::CellPosition position )
+Actor TableView::GetChildAt( const Toolkit::TableView::CellPosition& position )
 {
-  // check if we have this row and column in the table
-  if( ( position.columnIndex >= mCellData.GetColumns() )||
-      ( position.rowIndex >= mCellData.GetRows() ) )
+  if( ( position.rowIndex < mCellData.GetRows() ) && ( position.columnIndex < mCellData.GetColumns() ) )
   {
-    // return an empty handle
-    return Actor();
+    return mCellData[ position.rowIndex ][ position.columnIndex ].actor;
   }
-  // return the child handle
-  return mCellData[ position.rowIndex ][ position.columnIndex ].actor;
+
+  // Return an empty handle
+  return Actor();
 }
 
-Actor TableView::RemoveChildAt( Toolkit::TableView::CellPosition position )
+Actor TableView::RemoveChildAt( const Toolkit::TableView::CellPosition& position )
 {
   // get the child handle
   Actor child = GetChildAt( position );
@@ -271,62 +277,70 @@ Actor TableView::RemoveChildAt( Toolkit::TableView::CellPosition position )
   return child;
 }
 
-bool TableView::FindChildPosition( Actor child, Toolkit::TableView::CellPosition& position )
+bool TableView::FindChildPosition( const Actor& child, Toolkit::TableView::CellPosition& positionOut )
 {
-  // only find valid child actors
+  // Only find valid child actors
   if( child )
   {
-    // walk through the layout data
+    // Walk through the layout data
     const unsigned int rowCount = mCellData.GetRows();
     const unsigned int columnCount = mCellData.GetColumns();
+
     for( unsigned int row = 0; row < rowCount; ++row )
     {
       for( unsigned int column = 0; column < columnCount; ++column )
       {
         if( mCellData[ row ][ column ].actor == child )
         {
-          position = mCellData[ row ][ column ].position;
+          positionOut = mCellData[ row ][ column ].position;
           return true;
         }
       }
     }
   }
+
   return false;
 }
 
 void TableView::InsertRow( unsigned int rowIndex )
 {
   RelayoutingLock lock( *this );
+
   mCellData.InsertRow( rowIndex );
-  // need to update the cellinfos for the items that moved
+
+  // Need to update the cell infos for the items that moved
   const unsigned int rowCount = mCellData.GetRows();
   const unsigned int columnCount = mCellData.GetColumns();
+
   for( unsigned int row = 0; row < rowCount; ++row )
   {
     for( unsigned int column = 0; column < columnCount; ++column )
     {
       Toolkit::TableView::CellPosition& position = mCellData[ row ][ column ].position;
-      // if cell is spanning and above and spans to inserted row
-      if( ( position.rowSpan > 1 )&&( position.rowIndex <= rowIndex )&&
+
+      // If cell is spanning and above and spans to inserted row
+      if( ( position.rowSpan > 1 ) && ( position.rowIndex <= rowIndex ) &&
           ( position.rowIndex + position.rowSpan > rowIndex ) )
       {
-        // increase span by one
+        // Increment span
         position.rowSpan++;
-        // copy cell to occupy the new column
+
+        // Copy cell to occupy the new column
         mCellData[ rowIndex ][ column ] = mCellData[ row ][ column ];
       }
-      // if below of inserted row, increase row index
-      else if( row > rowIndex )
+      else if( row > rowIndex )   // If below of inserted row, increase row index
       {
-        // increase index by one
+        // Increment index
         position.rowIndex++;
       }
     }
   }
-  mRelativeSizes.InsertRow( rowIndex );
-  // inserting a row requires adjusting the height vectors
-  mFixedHeights.insert( mFixedHeights.begin() + rowIndex, 0 );
-  mRelativeHeights.insert( mRelativeHeights.begin() + rowIndex, 0 );
+
+  // Expand row data array
+  mRowData.Insert( mRowData.Begin() + rowIndex, RowColumnData() );
+
+  // Sizes may have changed, so relayout
+  mRowColumnDirty = true;
   RelayoutRequest();
 }
 
@@ -339,30 +353,34 @@ void TableView::DeleteRow( unsigned int rowIndex )
 void TableView::DeleteRow( unsigned int rowIndex, std::vector<Actor>& removed )
 {
   RelayoutingLock lock( *this );
+
+  // Delete the row
   std::vector< CellData > lost;
   mCellData.DeleteRow( rowIndex, lost );
-  // need to update the cellinfos for the items that moved
+
+  // Need to update the cell infos for the items that moved
   const unsigned int rowCount = mCellData.GetRows();
   const unsigned int columnCount = mCellData.GetColumns();
+
   for( unsigned int row = 0; row < rowCount; ++row )
   {
     for( unsigned int column = 0; column < columnCount; ++column )
     {
       Toolkit::TableView::CellPosition& position = mCellData[ row ][ column ].position;
-      // if cell is spanning and above and spans to deleted row
-      if( ( position.rowSpan > 1 )&&( position.rowIndex <= rowIndex )&&
+
+      // If cell is spanning and above and spans to deleted row
+      if( ( position.rowSpan > 1 ) && ( position.rowIndex <= rowIndex ) &&
           ( position.rowIndex + position.rowSpan > rowIndex ) )
       {
-        // decrease span by one
+        // Decrement span
         if( position.rowSpan > 1 )
         {
           position.rowSpan--;
         }
       }
-      // if below of or at the inserted row, decrease row index
-      else if( row >= rowIndex )
+      else if( row >= rowIndex )    // If below of or at the inserted row, decrease row index
       {
-        // decrease index by one
+        // Decrement index
         if( position.rowIndex > 1 )
         {
           position.rowIndex--;
@@ -370,50 +388,58 @@ void TableView::DeleteRow( unsigned int rowIndex, std::vector<Actor>& removed )
       }
     }
   }
+
   // 1 row removed, 0 columns
   RemoveAndGetLostActors( lost, removed, 1u, 0u );
-  // resize the data structures
-  mRelativeSizes.DeleteRow( rowIndex );
-  // deleting a row requires adjusting the height vectors
-  mFixedHeights.erase( mFixedHeights.begin() + rowIndex );
-  mRelativeHeights.erase( mRelativeHeights.begin() + rowIndex );
+
+  // Contract row data array
+  mRowData.Erase( mRowData.Begin() + rowIndex );
+
+  // Sizes may have changed, so relayout
+  mRowColumnDirty = true;
   RelayoutRequest();
 }
 
 void TableView::InsertColumn( unsigned int columnIndex )
 {
   RelayoutingLock lock( *this );
+
+  // Insert the new column
   mCellData.InsertColumn( columnIndex );
-  // need to update the cellinfos for the items that moved
+
+  // Need to update the cell infos for the items that moved
   const unsigned int rowCount = mCellData.GetRows();
   const unsigned int columnCount = mCellData.GetColumns();
+
   for( unsigned int row = 0; row < rowCount; ++row )
   {
     for( unsigned int column = 0; column < columnCount; ++column )
     {
       Toolkit::TableView::CellPosition& position = mCellData[ row ][ column ].position;
-      // if cell is spanning and left side and spans to inserted column
-      if( ( position.columnSpan > 1 )&&( position.columnIndex <= columnIndex )&&
+
+      // If cell is spanning and left side and spans to inserted column
+      if( ( position.columnSpan > 1 ) && ( position.columnIndex <= columnIndex ) &&
           ( position.columnIndex + position.columnSpan > columnIndex ) )
       {
-        // increase span by one
+        // Increment span
         position.columnSpan++;
-        // copy cell to occupy the new column
+
+        // Copy cell to occupy the new column
         mCellData[ row ][ columnIndex ] = mCellData[ row ][ column ];
       }
-      // if on the right side of inserted column, increase column index
-      else if( column > columnIndex )
+      else if( column > columnIndex )   // If on the right side of inserted column, increase column index
       {
-        // increase index by one
+        // Increment index
         position.columnIndex++;
       }
     }
   }
-  // relative sizes gets recalculated on Relayout
-  mRelativeSizes.InsertColumn( columnIndex );
-  // inserting a column requires adjusting the width vectors
-  mFixedWidths.insert( mFixedWidths.begin() + columnIndex, 0 );
-  mRelativeWidths.insert( mRelativeWidths.begin() + columnIndex, 0 );
+
+  // Expand column data array
+  mColumnData.Insert( mColumnData.Begin() + columnIndex, RowColumnData() );
+
+  // Sizes may have changed so relayout
+  mRowColumnDirty = true;
   RelayoutRequest();
 }
 
@@ -426,30 +452,34 @@ void TableView::DeleteColumn( unsigned int columnIndex )
 void TableView::DeleteColumn( unsigned int columnIndex, std::vector<Actor>& removed )
 {
   RelayoutingLock lock( *this );
+
+  // Remove the column
   std::vector< CellData > lost;
   mCellData.DeleteColumn( columnIndex, lost );
-  // need to update the cellinfos for the items that moved
+
+  // Need to update the cell infos for the items that moved
   const unsigned int rowCount = mCellData.GetRows();
   const unsigned int columnCount = mCellData.GetColumns();
+
   for( unsigned int row = 0; row < rowCount; ++row )
   {
     for( unsigned int column = 0; column < columnCount; ++column )
     {
       Toolkit::TableView::CellPosition& position = mCellData[ row ][ column ].position;
-      // if cell is spanning and left side and spans to inserted column
-      if( ( position.columnSpan > 1 )&&( position.columnIndex <= columnIndex )&&
+
+      // If cell is spanning and left side and spans to inserted column
+      if( ( position.columnSpan > 1 ) && ( position.columnIndex <= columnIndex ) &&
           ( position.columnIndex + position.columnSpan > columnIndex ) )
       {
-        // decrease span by one
+        // Decrement span
         if( position.columnSpan > 1 )
         {
           position.columnSpan--;
         }
       }
-      // if on the right side of or at the inserted column, decrease column index
-      else if( column >= columnIndex )
+      else if( column >= columnIndex )    // If on the right side of or at the inserted column, decrease column index
       {
-        // decrease index by one
+        // Decrement index
         if( position.columnIndex > 0 )
         {
           position.columnIndex--;
@@ -457,14 +487,15 @@ void TableView::DeleteColumn( unsigned int columnIndex, std::vector<Actor>& remo
       }
     }
   }
+
   // 0 rows, 1 column removed
   RemoveAndGetLostActors( lost, removed, 0u, 1u );
-  // resize the data structures
-  mRelativeSizes.DeleteColumn( columnIndex );
-  // deleting a column requires adjusting the width vectors
-  mFixedWidths.erase( mFixedWidths.begin() + columnIndex );
-  mRelativeWidths.erase( mRelativeWidths.begin() + columnIndex );
-  // relayout
+
+  // Contract column data array
+  mColumnData.Erase( mColumnData.Begin() + columnIndex );
+
+  // Size may have changed so relayout
+  mRowColumnDirty = true;
   RelayoutRequest();
 }
 
@@ -477,36 +508,45 @@ void TableView::Resize( unsigned int rows, unsigned int columns )
 void TableView::Resize( unsigned int rows, unsigned int columns, std::vector<Actor>& removed )
 {
   RelayoutingLock lock( *this );
+
   unsigned int oldRows = GetRows();
   unsigned int oldColumns = GetColumns();
-  // resize data array
+
+  // Resize data array
   std::vector< CellData > lost;
   ResizeContainers( rows, columns, lost );
-  // calculate if we lost rows or columns
+
+  // Calculate if we lost rows
   unsigned int rowsRemoved = 0;
   unsigned int newRows = GetRows();
+
   if( oldRows < newRows )
   {
     rowsRemoved = newRows - oldRows;
   }
+
+  // Calculate if we lost columns
   unsigned int columnsRemoved = 0;
   unsigned int newColumns = GetColumns();
   if( oldColumns < newColumns )
   {
     rowsRemoved = newColumns - oldColumns;
   }
+
   RemoveAndGetLostActors( lost, removed, rowsRemoved, columnsRemoved );
-  // finally relayout once all actors are removed
+
+  // Sizes may have changed so request a relayout
+  mRowColumnDirty = true;
   RelayoutRequest();
 }
 
 void TableView::SetCellPadding( Size padding )
 {
-  // if padding really changed
+  // If padding really changed
   if( padding != mPadding )
   {
     mPadding = padding;
-    // do a relayout
+
     RelayoutRequest();
   }
 }
@@ -516,184 +556,224 @@ Size TableView::GetCellPadding()
   return mPadding;
 }
 
+void TableView::SetRowPolicy( unsigned int rowIndex, CellSizePolicy policy )
+{
+  DALI_ASSERT_ALWAYS( rowIndex < mRowData.Size() );
+
+  if( mRowData[ rowIndex ].sizePolicy != policy )
+  {
+    mRowData[ rowIndex ].sizePolicy = policy;
+
+    mRowColumnDirty = true;
+    RelayoutRequest();
+  }
+}
+
+TableView::CellSizePolicy TableView::GetRowPolicy( unsigned int rowIndex ) const
+{
+  DALI_ASSERT_ALWAYS( rowIndex < mRowData.Size() );
+
+  return mRowData[ rowIndex ].sizePolicy;
+}
+
+void TableView::SetColumnPolicy( unsigned int columnIndex, CellSizePolicy policy )
+{
+  DALI_ASSERT_ALWAYS( columnIndex < mColumnData.Size() );
+
+  if( mColumnData[ columnIndex ].sizePolicy != policy )
+  {
+    mColumnData[ columnIndex ].sizePolicy = policy;
+
+    mRowColumnDirty = true;
+    RelayoutRequest();
+  }
+}
+
+TableView::CellSizePolicy TableView::GetColumnPolicy( unsigned int columnIndex ) const
+{
+  DALI_ASSERT_ALWAYS( columnIndex < mColumnData.Size() );
+
+  return mColumnData[ columnIndex ].sizePolicy;
+}
+
 void TableView::SetFixedHeight( unsigned int rowIndex, float height )
 {
-  DALI_ASSERT_ALWAYS( rowIndex < mFixedHeights.size() );
-  // add the fixed height to the array of fixed heights
-  mFixedHeights[ rowIndex ] = height;
-  // remove the relative height of the same row
-  mRelativeHeights[ rowIndex ] = 0.f;
-  // relayout all cells, no lock needed as nothing added or removed
+  DALI_ASSERT_ALWAYS( rowIndex < mRowData.Size() );
+
+  RowColumnData& data = mRowData[ rowIndex ];
+  data.size = height;
+  data.sizePolicy = FIXED;
+
+  mRowColumnDirty = true;
   RelayoutRequest();
 }
 
 float TableView::GetFixedHeight( unsigned int rowIndex ) const
 {
-  DALI_ASSERT_ALWAYS( rowIndex < mFixedHeights.size() );
+  DALI_ASSERT_ALWAYS( rowIndex < mRowData.Size() );
 
-  return mFixedHeights[ rowIndex ];
-}
-
-void TableView::SetRelativeHeight( unsigned int rowIndex, float heightPercentage )
-{
-  DALI_ASSERT_ALWAYS( rowIndex < mRelativeHeights.size() );
-  // add the relative height to the array of relative heights
-  mRelativeHeights[ rowIndex ] = heightPercentage;
-  // remove the fixed height of the same row
-  mFixedHeights[ rowIndex ] = 0.f;
-  // relayout all cells, no lock needed as nothing added or removed
-  RelayoutRequest();
-}
-
-float TableView::GetRelativeHeight( unsigned int rowIndex ) const
-{
-  DALI_ASSERT_ALWAYS( rowIndex < mRelativeHeights.size() );
-
-  return mRelativeHeights[ rowIndex ];
+  return mRowData[ rowIndex ].size;
 }
 
 void TableView::SetFixedWidth( unsigned int columnIndex, float width )
 {
-  DALI_ASSERT_ALWAYS( columnIndex < mFixedWidths.size() );
-  // add the fixed width to the array of fixed column widths
-  mFixedWidths[ columnIndex ] = width;
-  // remove the relative width of the same column
-  mRelativeWidths[ columnIndex ] = 0.f;
-  // relayout all cells, no lock needed as nothing added or removed
+  DALI_ASSERT_ALWAYS( columnIndex < mColumnData.Size() );
+
+  RowColumnData& data = mColumnData[ columnIndex ];
+  data.size = width;
+  data.sizePolicy = FIXED;
+
+  mRowColumnDirty = true;
   RelayoutRequest();
 }
 
 float TableView::GetFixedWidth( unsigned int columnIndex ) const
 {
-  DALI_ASSERT_ALWAYS( columnIndex < mFixedWidths.size() );
+  DALI_ASSERT_ALWAYS( columnIndex < mColumnData.Size() );
 
-  return mFixedWidths[ columnIndex ];
+  return mColumnData[ columnIndex ].size;
+}
+
+void TableView::SetRelativeHeight( unsigned int rowIndex, float heightPercentage )
+{
+  DALI_ASSERT_ALWAYS( rowIndex < mRowData.Size() );
+
+  RowColumnData& data = mRowData[ rowIndex ];
+  data.fillRatio = heightPercentage;
+  data.userFillRatio = true;
+  data.sizePolicy = FILL;
+
+  mRowColumnDirty = true;
+  RelayoutRequest();
+}
+
+float TableView::GetRelativeHeight( unsigned int rowIndex ) const
+{
+  DALI_ASSERT_ALWAYS( rowIndex < mRowData.Size() );
+
+  return mRowData[ rowIndex ].fillRatio;
 }
 
 void TableView::SetRelativeWidth( unsigned int columnIndex, float widthPercentage )
 {
-  DALI_ASSERT_ALWAYS( columnIndex < mRelativeWidths.size() );
-  // add the relative widths to the array of relative widths
-  mRelativeWidths[ columnIndex ] = widthPercentage;
-  // remove the fixed width of the same column
-  mFixedWidths[ columnIndex ] = 0.f;
-  // relayout all cells, no lock needed as nothing added or removed
+  DALI_ASSERT_ALWAYS( columnIndex < mColumnData.Size() );
+
+  RowColumnData& data = mColumnData[ columnIndex ];
+  data.fillRatio = widthPercentage;
+  data.userFillRatio = true;
+  data.sizePolicy = FILL;
+
+  mRowColumnDirty = true;
   RelayoutRequest();
 }
 
 float TableView::GetRelativeWidth( unsigned int columnIndex ) const
 {
-  DALI_ASSERT_ALWAYS( columnIndex < mRelativeWidths.size() );
+  DALI_ASSERT_ALWAYS( columnIndex < mColumnData.Size() );
 
-  return mRelativeWidths[ columnIndex ];
+  return mColumnData[ columnIndex ].fillRatio;
 }
 
-void TableView::OnRelayout( const Vector2& size, ActorSizeContainer& container )
+void TableView::CalculateRowColumnData()
 {
-  float fixedHeightsTotal = 0.0f;
-  float fixedWidthsTotal = 0.0f;
+  // Calculate the relative sizes
+  if( mRowColumnDirty )
+  {
+    ComputeRelativeSizes( mRowData );
+    ComputeRelativeSizes( mColumnData );
 
-  // 1. update the relative sizes and calculate total fixed height and width
-  UpdateRelativeSizes( fixedHeightsTotal, fixedWidthsTotal );
+    mRowColumnDirty = false;
+  }
+}
 
-  // 2. go through the layout data and create constraints
-  float cumulatedFixedHeight = 0.0f;
-  float cumulatedRelativeHeight = 0.0f;
+void TableView::OnCalculateRelayoutSize( Dimension dimension )
+{
+  CalculateRowColumnData();
 
-  // iterate the table
+  if( dimension & WIDTH )
+  {
+    CalculateFixedSizes( mColumnData, WIDTH );
+    mFixedTotals.width = CalculateTotalFixedSize( mColumnData );
+  }
+
+  if( dimension & HEIGHT )
+  {
+    CalculateFixedSizes( mRowData, HEIGHT );
+    mFixedTotals.height = CalculateTotalFixedSize( mRowData );
+  }
+}
+
+void TableView::OnLayoutNegotiated( float size, Dimension dimension )
+{
+  CalculateRowColumnData();
+
+  // Calculate the value of all relative sized rows and columns
+  if( dimension & WIDTH )
+  {
+    float remainingSize = size - mFixedTotals.width;
+    if( remainingSize < 0.0f )
+    {
+      remainingSize = 0.0f;
+    }
+
+    CalculateRelativeSizes( mColumnData, remainingSize );
+  }
+
+  if( dimension & HEIGHT )
+  {
+    float remainingSize = size - mFixedTotals.height;
+    if( remainingSize < 0.0f )
+    {
+      remainingSize = 0.0f;
+    }
+
+    CalculateRelativeSizes( mRowData, remainingSize );
+  }
+}
+
+void TableView::OnRelayout( const Vector2& size, RelayoutContainer& container )
+{
+  CalculateRowColumnData();
+
+  // Go through the layout data
+  float cumulatedHeight = 0.0f;
+
   const unsigned int rowCount = mCellData.GetRows();
   const unsigned int columnCount = mCellData.GetColumns();
-  // float versions of the count + 1 to keep precision
-  const float maxRowPlusOne( rowCount + 1 );
-  const float maxColumnPlusOne( columnCount + 1 );
+
   for( unsigned int row = 0; row < rowCount; ++row )
   {
-    // reset widths at the start of each row
-    float cumulatedFixedWidth = 0.0f;
-    float cumulatedRelativeWidth = 0.0f;
+    float cumulatedWidth = 0.0f;
+
     for( unsigned int column = 0; column < columnCount; ++column )
     {
-      // check if this cell has an actor
-      Actor actor = mCellData[ row ][ column ].actor;
+      Actor& actor = mCellData[ row ][ column ].actor;
       const Toolkit::TableView::CellPosition position = mCellData[ row ][ column ].position;
-      // if there is an actor and this is the main cell of the actor
-      // an actor can be in multiple cells if its row or columnspan is more than 1
-      // we however must only lay out each actor only once
-      if( ( actor )&&( position.rowIndex == row )&&( position.columnIndex == column ) )
+
+      // If there is an actor and this is the main cell of the actor.
+      // An actor can be in multiple cells if its row or columnspan is more than 1.
+      // We however must lay out each actor only once.
+      if( actor && ( position.rowIndex == row ) && ( position.columnIndex == column ) )
       {
-        // anchor actor correctly
+        // Anchor actor to top left of table view
         actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
         actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-        // remove old constraints
-        actor.RemoveConstraints();
 
-        // 1. set position
-        // get the row and column indices
-        float rowPos( position.rowIndex );
-        float colPos( position.columnIndex );
-        // constrain the actor position to be relative to the width and height of table
-        // minus the padding of course (padding is all around cells)
-        Vector2 relativePosition( cumulatedRelativeWidth, cumulatedRelativeHeight );
-        // fixed height rows and fixed width cells are considered as padding so
-        // they are removed from the total size for relative
-        // for position only consider cumulated fixed rows and columns from top and left
-        Vector2 positionPadding( maxColumnPlusOne * mPadding.width + fixedWidthsTotal,
-                                 maxRowPlusOne * mPadding.height + fixedHeightsTotal );
-        Vector2 fixedPosition( ( colPos + 1.0f ) * mPadding.width + cumulatedFixedWidth,
-                                 ( rowPos + 1.0f ) * mPadding.height + cumulatedFixedHeight );
+        Padding padding;
+        actor.GetPadding( padding );
 
-        Vector3 actorPosition( RelativeToSize( relativePosition, positionPadding, fixedPosition, size ) );
+        Vector3 actorPosition( cumulatedWidth + mPadding.width + padding.left,       // Left padding
+                               cumulatedHeight + mPadding.height + padding.top,      // Top padding
+                               0.0f );
         actor.SetPosition( actorPosition );
-
-        // 2. set size
-        // constrain the actor size to be relative to the size of table
-        // get the relative size for this cell
-        Vector2 relativeSize( mRelativeSizes[ row ][ column ] );
-        Vector2 fixedSize( mFixedWidths[ column ], mFixedHeights[ row ] );
-        // if we span multiple cells, need to sum them all up, both fixed and relative parts
-        if( position.rowSpan > 1 )
-        {
-          for( unsigned int i = 1; i < position.rowSpan; ++i )
-          {
-            // accumulate the height only
-            relativeSize.height += mRelativeSizes[ row + i ][ column ].height;
-            fixedSize.height += mFixedHeights[ row + i ];
-          }
-        }
-        if( position.columnSpan > 1 )
-        {
-          for( unsigned int i = 1; i < position.columnSpan; ++i )
-          {
-            // accumulate the width only
-            relativeSize.width += mRelativeSizes[ row ][ column + i ].width;
-            fixedSize.width += mFixedWidths[ column + i ];
-          }
-        }
-        // minus the padding from size (padding is all around cells)
-        // if item spans multiple columns or rows then less padding is added (default span is 1)
-        // fixed height rows and fixed width cells are considered as padding so they are removed
-        // from the total available size for relative cells
-        Vector2 sizePadding( maxColumnPlusOne * mPadding.width + fixedWidthsTotal,
-                             maxRowPlusOne * mPadding.height + fixedHeightsTotal );
-        // and added to the fixed size multiplied by the span of rows and columns
-        fixedSize.width += ( position.columnSpan - 1.0f ) * mPadding.width;
-        fixedSize.height += ( position.rowSpan - 1.0f ) * mPadding.height;
-
-        Vector2 actorSize( RelativeToSize( relativeSize, sizePadding, fixedSize, size ) );
-        actor.SetSize(actorSize.x, actorSize.y);
-
-        // Relayout Children
-        Relayout ( actor, actorSize, container );
       }
-      // for position we need to keep track of current fixed width and relative width
-      // increase for next column
-      cumulatedFixedWidth += mFixedWidths[ column ];
-      cumulatedRelativeWidth += mRelativeSizes[ row ][ column ].width;
+
+      DALI_ASSERT_DEBUG( column < mColumnData.Size() );
+      cumulatedWidth += mColumnData[ column ].size;
     }
-    // for position we need to keep track of current fixed height and relative height
-    // increase for next row
-    cumulatedFixedHeight += mFixedHeights[ row ];
-    cumulatedRelativeHeight += mRelativeSizes[ row ][ 0 ].height; // all columns share same height
+
+    DALI_ASSERT_DEBUG( row < mRowData.Size() );
+    cumulatedHeight += mRowData[ row ].size;
   }
 }
 
@@ -801,15 +881,20 @@ void TableView::OnControlChildAdd( Actor& child )
     return;
   }
 
+  RelayoutRequest();
+
+  // Test properties on actor
   Toolkit::TableView::CellPosition cellPosition;
   if( child.GetPropertyIndex(Toolkit::TableView::ROW_SPAN_PROPERTY_NAME) != Property::INVALID_INDEX )
   {
     cellPosition.rowSpan = static_cast<unsigned int>( child.GetProperty( child.GetPropertyIndex(Toolkit::TableView::ROW_SPAN_PROPERTY_NAME) ).Get<float>() );
   }
+
   if( child.GetPropertyIndex(Toolkit::TableView::COLUMN_SPAN_PROPERTY_NAME) != Property::INVALID_INDEX )
   {
     cellPosition.columnSpan = static_cast<unsigned int>( child.GetProperty( child.GetPropertyIndex(Toolkit::TableView::COLUMN_SPAN_PROPERTY_NAME) ).Get<float>() );
   }
+
   if( child.GetPropertyIndex(Toolkit::TableView::CELL_INDICES_PROPERTY_NAME) != Property::INVALID_INDEX )
   {
     Vector2 indices = child.GetProperty( child.GetPropertyIndex(Toolkit::TableView::CELL_INDICES_PROPERTY_NAME) ).Get<Vector2 >();
@@ -817,44 +902,43 @@ void TableView::OnControlChildAdd( Actor& child )
     cellPosition.columnIndex = static_cast<unsigned int>( indices.y );
 
     AddChild( child, cellPosition );
-    // donot continue
+
+    // Do not continue
     return;
   }
 
-  // check if we're already laying out this child somewhere on the table
-  // walk through the layout data
+  // Find the first available cell to store the actor in
   const unsigned int rowCount = mCellData.GetRows();
   const unsigned int columnCount = mCellData.GetColumns();
-  // child not yet laid out, find the first free slot
   for( unsigned int row = 0; row < rowCount; ++row )
   {
     for( unsigned int column = 0; column < columnCount; ++column )
     {
-      // no actor means free cell
       if( !(mCellData[ row ][ column ].actor) )
       {
-        // put the actor in the cell
+        // Put the actor in the cell
         CellData data;
         data.actor = child;
         data.position.columnIndex = column;
         data.position.rowIndex = row;
         mCellData[ row ][ column ] = data;
-        RelayoutRequest();
-        // don' continue
+
+        // Don't continue
         return;
       }
     }
   }
-  // still here, no room for the poor child so increase the array. Need a new row
-  ResizeContainers( rowCount + 1, columnCount );
-  // put the actor to the first cell of the new row
+
+  // No empty cells, so increase size of the table
+  unsigned int newColumnCount = ( columnCount > 0 ) ? columnCount : 1;
+  ResizeContainers( rowCount + 1, newColumnCount );
+
+  // Put the actor in the first cell of the new row
   CellData data;
   data.actor = child;
   data.position.rowIndex = rowCount;
   data.position.columnIndex = 0;
   mCellData[ rowCount ][ 0 ] = data;
-  // finally relayout the table
-  RelayoutRequest();
 }
 
 void TableView::OnControlChildRemove( Actor& child )
@@ -873,7 +957,8 @@ void TableView::OnControlChildRemove( Actor& child )
 TableView::TableView( unsigned int initialRows, unsigned int initialColumns )
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mCellData( initialRows, initialColumns ),
-  mLayoutingChild( false )
+  mLayoutingChild( false ),
+  mRowColumnDirty( true )     // Force recalculation first time
 {
   SetKeyboardNavigationSupport( true );
   ResizeContainers( initialRows, initialColumns );
@@ -895,13 +980,12 @@ void TableView::ResizeContainers( unsigned int rows, unsigned int columns )
 
 void TableView::ResizeContainers( unsigned int rows, unsigned int columns, std::vector<CellData>& removed )
 {
+  // Resize cell data
   mCellData.Resize( rows, columns, removed );
-  // we dont care if these go smaller, data will be regenerated or is not needed anymore
-  mRelativeSizes.Resize( rows, columns );
-  mFixedHeights.resize( rows );
-  mRelativeHeights.resize( rows );
-  mFixedWidths.resize( columns );
-  mRelativeWidths.resize( columns );
+
+  // We don't care if these go smaller, data will be regenerated or is not needed anymore
+  mRowData.Resize( rows );
+  mColumnData.Resize( columns );
 }
 
 void TableView::RemoveAndGetLostActors( const std::vector<CellData>& lost, std::vector<Actor>& removed,
@@ -952,7 +1036,7 @@ void TableView::RemoveAndGetLostActors( const std::vector<CellData>& lost, std::
   }
 }
 
-bool TableView::RemoveAllInstances( Actor child )
+bool TableView::RemoveAllInstances( const Actor& child )
 {
   bool found = false;
   // walk through the layout data
@@ -971,104 +1055,6 @@ bool TableView::RemoveAllInstances( Actor child )
     }
   }
   return found;
-}
-
-void TableView::UpdateRelativeSizes( float& fixedHeightsTotal, float& fixedWidthsTotal )
-{
-  // 1. check all the fixed heights and widths to know how much size they take in total
-  // as well as the relative heights and widths to know how much is left for the 'fill' cells
-  unsigned int fixedRowCount = 0;
-  unsigned int relativeRowCount = 0;
-  float relativeHeightsTotal = 0.0f;
-  const unsigned int rowCount = mCellData.GetRows();
-  for( unsigned int row = 0; row < rowCount; ++row )
-  {
-    if( mFixedHeights[ row ] > 0.0f )
-    {
-      ++fixedRowCount;
-      fixedHeightsTotal += mFixedHeights[ row ];
-    }
-    if( mRelativeHeights[ row ] > 0.0f )
-    {
-      ++relativeRowCount;
-      relativeHeightsTotal += mRelativeHeights[ row ];
-    }
-  }
-  unsigned int fixedColumnCount = 0;
-  unsigned int relativeColumnCount = 0;
-  const unsigned int columnCount = mCellData.GetColumns();
-  float relativeWidthsTotal = 0.0f;
-  for( unsigned int column = 0; column < columnCount; ++column )
-  {
-    if( mFixedWidths[ column ] > 0.0f )
-    {
-      ++fixedColumnCount;
-      fixedWidthsTotal += mFixedWidths[ column ];
-    }
-    if( mRelativeWidths[ column ] > 0.0f )
-    {
-      ++relativeColumnCount;
-      relativeWidthsTotal += mRelativeWidths[ column ];
-    }
-  }
-
-  // 2. cap the relative width and height totals to 100%
-  if( relativeHeightsTotal > 1.0f )
-  {
-    relativeHeightsTotal = 1.0f;
-  }
-  if( relativeWidthsTotal > 1.0f )
-  {
-    relativeWidthsTotal = 1.0f;
-  }
-
-  // 3. create a table of relative sizes so we can lookup for cells that span multiple rows & colums
-  const float fillRowCount( rowCount - relativeRowCount - fixedRowCount );
-  const float fillColumnCount( columnCount - relativeColumnCount - fixedColumnCount );
-
-  // walk through the data containers
-  for( unsigned int row = 0; row < rowCount; ++row )
-  {
-    float relativeHeight = 0.0f;
-    // if we have a fixed height, relative height is 0
-    if( mFixedHeights[ row ] > 0.0f )
-    {
-      relativeHeight = 0.0f;
-    }
-    // else if we're given a specific row height %, use that
-    else if( mRelativeHeights[ row ] > 0.0f )
-    {
-      relativeHeight = mRelativeHeights[ row ];
-    }
-    // else if there are fill rows
-    else if( fillRowCount > 0 )
-    {
-      // this is a 'fill' row. it gets the remainder of the 100% divided evenly between 'fill' rows
-      relativeHeight = (1.0f - relativeHeightsTotal ) / fillRowCount;
-    }
-    for( unsigned int column = 0; column < columnCount; ++column )
-    {
-      float relativeWidth = 0.0f;
-      // if we have a fixed width, relative width is 0
-      if( mFixedWidths[ column ] > 0.0f )
-      {
-        relativeWidth = 0.0f;
-      }
-      // else if we're given a specific column width %, use that
-      else if( mRelativeWidths[ column ] > 0.0f )
-      {
-        relativeWidth = mRelativeWidths[ column ];
-      }
-      // else if there are fill columns
-      else if( fillColumnCount > 0 )
-      {
-        // this is a 'fill' column. it gets the remainder of the 100% divided evenly between 'fill' columns
-        relativeWidth = (1.0f - relativeWidthsTotal ) / fillColumnCount;
-      }
-      // store the value
-      mRelativeSizes[ row ][ column ] = Size( relativeWidth, relativeHeight );
-    }
-  }
 }
 
 void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
@@ -1090,11 +1076,11 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
         if( item.HasKey( "policy" ) && item.HasKey( "value" ) )
         {
           Toolkit::TableView::LayoutPolicy policy = Scripting::GetEnumeration< Toolkit::TableView::LayoutPolicy >( item.GetValue("policy").Get<std::string>().c_str(), LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT );
-          if( policy == Toolkit::TableView::Fixed )
+          if( policy == Toolkit::TableView::FIXED )
           {
             (tableViewImpl.*funcFixed)( rowIndex, item.GetValue("value").Get<float>() );
           }
-          else if( policy == Toolkit::TableView::Relative )
+          else if( policy == Toolkit::TableView::RELATIVE )
           {
             (tableViewImpl.*funcRelative)( rowIndex, item.GetValue("value").Get<float>() );
           }
@@ -1107,40 +1093,61 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
 Property::Value TableView::GetRowHeightsPropertyValue()
 {
   Property::Map map;
-  GetMapPropertyValue( mFixedHeights, mRelativeHeights, map);
+  GetMapPropertyValue( mRowData, map);
   return Property::Value(map);
 }
 
 Property::Value TableView::GetColumnWidthsPropertyValue()
 {
   Property::Map map;
-  GetMapPropertyValue( mFixedWidths, mRelativeWidths, map);
+  GetMapPropertyValue( mColumnData, map);
   return Property::Value(map);
 }
 
-void TableView::GetMapPropertyValue( const std::vector<float>& fixedSize, const std::vector<float>& relativeSize, Property::Map& map )
+void TableView::GetMapPropertyValue( const RowColumnArray& data, Property::Map& map )
 {
-  std::string fixedPolicy( Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::Fixed, LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT ) );
-  std::string relativePolicy( Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::Relative, LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT ) );
+  std::string fixedPolicy( Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::FIXED, LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT ) );
+  std::string relativePolicy( Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::RELATIVE, LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT ) );
 
-  size_t count = fixedSize.size();
-  for( size_t index = 0; index < count; index++ )
+  const RowColumnArray::SizeType count = data.Size();
+  for( RowColumnArray::SizeType i = 0; i < count; i++ )
   {
-    if( ! EqualsZero( fixedSize[index] ) )
-    {
-      Property::Map item;
-      item[ "policy" ] = fixedPolicy;
-      item[ "value" ] = fixedSize[index];
+    const RowColumnData& dataInstance = data[ i ];
 
-      map[ static_cast<std::ostringstream*>( &(std::ostringstream() << index ) )->str() ] = item;
-    }
-    else if( ! EqualsZero( relativeSize[index] ) )
+    switch( dataInstance.sizePolicy )
     {
-      Property::Map item;
-      item[ "policy" ] = relativePolicy;
-      item[ "value" ] = relativeSize[index];
+      case FIXED:
+      {
+        Property::Map item;
+        item[ "policy" ] = fixedPolicy;
+        item[ "value" ] = dataInstance.size;
 
-      map[ static_cast<std::ostringstream*>( &(std::ostringstream() << index ) )->str() ] = item;
+        std::ostringstream ss;
+        ss << i;
+
+        map[ ss.str() ] = item;
+
+        break;
+      }
+
+      case FILL:
+      {
+        Property::Map item;
+        item[ "policy" ] = relativePolicy;
+        item[ "value" ] = dataInstance.fillRatio;
+
+        std::ostringstream ss;
+        ss << i;
+
+        map[ ss.str() ] = item;
+
+        break;
+      }
+
+      default:
+      {
+        break;
+      }
     }
   }
 }
@@ -1234,6 +1241,257 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolki
   }
 
   return nextFocusableActor;
+}
+
+Vector3 TableView::GetNaturalSize()
+{
+  // Natural size is the size of all fixed cell widths or heights. This ignores cells with relative heights.
+  return Vector3( mFixedTotals.width, mFixedTotals.height, 1.0f );
+}
+
+float TableView::CalculateChildSize( const Actor& child, Dimension dimension )
+{
+  CalculateRowColumnData();
+
+  const unsigned int rowCount = mCellData.GetRows();
+  const unsigned int columnCount = mCellData.GetColumns();
+
+  for( unsigned int row = 0; row < rowCount; ++row )
+  {
+    for( unsigned int column = 0; column < columnCount; ++column )
+    {
+      // check if this cell has an actor
+      Actor& actor = mCellData[ row ][ column ].actor;
+
+      if( actor && ( actor == child ) )
+      {
+        const Toolkit::TableView::CellPosition position = mCellData[ row ][ column ].position;
+
+        // If there is an actor and this is the main cell of the actor.
+        // An actor can be in multiple cells if its row or columnspan is more than 1.
+        if ( ( position.rowIndex == row ) && ( position.columnIndex == column ) )
+        {
+          switch( dimension )
+          {
+            case WIDTH:
+            {
+              float cellSize = 0.0f;
+
+              // Accumulate the width
+              for( unsigned int i = 0; i < position.columnSpan; ++i )
+              {
+                cellSize += mColumnData[ column + i ].size;
+              }
+
+              // Apply padding
+              cellSize -= mPadding.width * 2.0f;
+              if( cellSize < 0.0f )
+              {
+                cellSize = 0.0f;
+              }
+
+              return cellSize;
+            }
+
+            case HEIGHT:
+            {
+              float cellSize = 0.0f;
+
+              // Accumulate the height
+              for( unsigned int i = 0; i < position.rowSpan; ++i )
+              {
+                cellSize += mRowData[ row + i ].size;
+              }
+
+              // Apply padding
+              cellSize -= mPadding.width * 2.0f;
+              if( cellSize < 0.0f )
+              {
+                cellSize = 0.0f;
+              }
+
+              return cellSize;
+            }
+
+            default:
+            {
+              return 0.0f;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return 0.0f;    // Child not found
+}
+
+bool TableView::RelayoutDependentOnChildren( Dimension dimension )
+{
+  if ( Control::RelayoutDependentOnChildren( dimension ) )
+  {
+    return true;
+  }
+
+  return FindFit( mRowData ) || FindFit( mColumnData );
+}
+
+void TableView::SetCellAlignment( Toolkit::TableView::CellPosition position, HorizontalAlignment::Type horizontal, VerticalAlignment::Type vertical )
+{
+  // Check if we need to expand our data array
+  if( position.rowIndex >= mCellData.GetRows() )
+  {
+    // Only adding new rows
+    ResizeContainers( position.rowIndex + 1, mCellData.GetColumns() );
+  }
+
+  if( position.columnIndex >= mCellData.GetColumns() )
+  {
+    // Only adding new columns
+    ResizeContainers( mCellData.GetRows(), position.columnIndex + 1 );
+  }
+
+  // Set the alignment of the cell
+  CellData& data = mCellData[ position.rowIndex ][ position.columnIndex ];
+  data.horizontalAlignment = horizontal;
+  data.verticalAlignment = vertical;
+}
+
+void TableView::ComputeRelativeSizes( RowColumnArray& data )
+{
+  // First pass: Count number of fill entries and calculate used relative space
+  Dali::Vector< RowColumnData* > fillData;
+  float relativeTotal = 0.0f;
+
+  const unsigned int dataCount = data.Size();
+
+  for( unsigned int i = 0; i < dataCount; ++i )
+  {
+    RowColumnData& dataInstance = data[ i ];
+
+    if( dataInstance.sizePolicy == FILL )
+    {
+      if( dataInstance.userFillRatio )
+      {
+        relativeTotal += dataInstance.fillRatio;
+      }
+      else
+      {
+        fillData.PushBack( &dataInstance );
+      }
+    }
+  }
+
+  // Second pass: Distribute remaining relative space
+  const unsigned int fillCount = fillData.Size();
+  if( fillCount > 0 )
+  {
+    if( relativeTotal > 1.0f )
+    {
+      relativeTotal = 1.0f;
+    }
+
+    const float evenFillRatio = (1.0f - relativeTotal ) / fillCount;
+
+    for( unsigned int i = 0; i < fillCount; ++i )
+    {
+      fillData[ i ]->fillRatio = evenFillRatio;
+    }
+  }
+}
+
+float TableView::CalculateTotalFixedSize( const RowColumnArray& data )
+{
+  float totalSize = 0.0f;
+
+  const unsigned int dataCount = data.Size();
+
+  for( unsigned int i = 0; i < dataCount; ++i )
+  {
+    const RowColumnData& dataInstance = data[ i ];
+
+    switch( dataInstance.sizePolicy )
+    {
+      case FIXED:
+      case FIT:
+      {
+        totalSize += dataInstance.size;
+        break;
+      }
+
+      default:
+      {
+        break;
+      }
+    }
+  }
+
+  return totalSize;
+}
+
+void TableView::CalculateFixedSizes( RowColumnArray& data, Dimension dimension )
+{
+  const unsigned int dataCount = data.Size();
+
+  for( unsigned int i = 0; i < dataCount; ++i )
+  {
+    RowColumnData& dataInstance = data[ i ];
+
+    if( dataInstance.sizePolicy == FIT )
+    {
+      // Find the size of the biggest actor in the row or column
+      float maxActorHeight = 0.0f;
+
+      unsigned int fitCount = ( dimension == WIDTH ) ? mCellData.GetRows() : mCellData.GetColumns();
+
+      for( unsigned int j = 0; j < fitCount; ++j )
+      {
+        unsigned int row = ( dimension == WIDTH ) ? j : i;
+        unsigned int column = ( dimension == WIDTH ) ? i : j;
+        DALI_ASSERT_DEBUG( row < mCellData.GetRows() );
+        DALI_ASSERT_DEBUG( column < mCellData.GetColumns() );
+
+        Actor& actor = mCellData[ row ][ column ].actor;
+        if( actor )
+        {
+          if( FitToChild( actor, dimension ) )
+          {
+            maxActorHeight = std::max( maxActorHeight, actor.GetRelayoutSize( dimension ) );
+          }
+        }
+      }
+
+      dataInstance.size = maxActorHeight;
+    }
+  }
+}
+
+void TableView::CalculateRelativeSizes( RowColumnArray& data, float size )
+{
+  const unsigned int dataCount = data.Size();
+
+  for( unsigned int i = 0; i < dataCount; ++i )
+  {
+    RowColumnData& dataInstance = data[ i ];
+
+    if( dataInstance.sizePolicy == FILL )
+    {
+      dataInstance.size = dataInstance.fillRatio * size;
+    }
+  }
+}
+
+bool TableView::FindFit( const RowColumnArray& data )
+{
+  for( unsigned int i = 0, count = data.Size(); i < count; ++i )
+  {
+    if( data[ i ].sizePolicy == FIT )
+    {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 } // namespace Internal

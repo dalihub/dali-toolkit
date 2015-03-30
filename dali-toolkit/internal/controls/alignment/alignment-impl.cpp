@@ -22,6 +22,7 @@
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/size-negotiation/relayout-container.h>
 
 namespace Dali
 {
@@ -450,7 +451,7 @@ const Toolkit::Alignment::Padding& Alignment::GetPadding() const
   return mPadding;
 }
 
-void Alignment::OnRelayout( const Vector2& size, ActorSizeContainer& container )
+void Alignment::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   // lay out the actors
   Vector3 anchorPointAndParentOrigin  = Vector3::ZERO;
@@ -474,59 +475,59 @@ void Alignment::OnRelayout( const Vector2& size, ActorSizeContainer& container )
     anchorPointAndParentOrigin.y = 1.0f;
   }
 
-  unsigned int childCount = Self().GetChildCount();
-  for( unsigned int i=0; i<childCount; ++i )
+  for( unsigned int i = 0, childCount = Self().GetChildCount(); i < childCount; ++i )
   {
-    Actor actor = Self().GetChildAt(i);
+    Actor child = Self().GetChildAt(i);
 
-    actor.SetAnchorPoint( anchorPointAndParentOrigin );
-    actor.SetParentOrigin( anchorPointAndParentOrigin );
+    child.SetAnchorPoint( anchorPointAndParentOrigin );
+    child.SetParentOrigin( anchorPointAndParentOrigin );
 
-    Vector3 actorSize ( actor.GetSize() );
-    Toolkit::Control control( Toolkit::Control::DownCast( actor ) );
-    if ( actorSize == Vector3::ZERO && control )
+    Vector3 currentChildSize( child.GetTargetSize() );
+    if( currentChildSize == Vector3::ZERO )
     {
-      actorSize = control.GetNaturalSize();
+      currentChildSize = child.GetNaturalSize();
     }
 
-    Vector3 childSize;
+    bool renegotiate = true;
+    Vector3 newChildSize;
 
     switch( mScaling )
     {
       case Toolkit::Alignment::ScaleNone:
       {
         // Nothing to do but needed just to not to jump to the default.
-        childSize = actorSize;
+        newChildSize = currentChildSize;
+        renegotiate = false;
         break;
       }
       case Toolkit::Alignment::ScaleToFill:
       {
         ScaleToFillConstraint constraint( mPadding );
-        childSize = constraint.GetSize( actorSize, Vector3(size) ) ;
+        newChildSize = constraint.GetSize( currentChildSize, Vector3(size) ) ;
         break;
       }
       case Toolkit::Alignment::ScaleToFitKeepAspect:
       {
         ScaleToFitKeepAspectConstraint constraint( mPadding );
-        childSize = constraint.GetSize( actorSize, Vector3(size) ) ;
+        newChildSize = constraint.GetSize( currentChildSize, Vector3(size) ) ;
         break;
       }
       case Toolkit::Alignment::ScaleToFillKeepAspect:
       {
         ScaleToFillKeepAspectConstraint constraint( mPadding );
-        childSize = constraint.GetSize( actorSize, Vector3(size) );
+        newChildSize = constraint.GetSize( currentChildSize, Vector3(size) );
         break;
       }
       case Toolkit::Alignment::ShrinkToFit:
       {
         ShrinkToFitConstraint constraint( mPadding );
-        childSize = constraint.GetSize( actorSize, Vector3(size) );
+        newChildSize = constraint.GetSize( currentChildSize, Vector3(size) );
         break;
       }
       case Toolkit::Alignment::ShrinkToFitKeepAspect:
       {
         ShrinkToFitKeepAspectConstraint constraint( mPadding );
-        childSize = constraint.GetSize( actorSize, Vector3(size) );
+        newChildSize = constraint.GetSize( currentChildSize, Vector3(size) );
         break;
       }
       default:
@@ -537,14 +538,12 @@ void Alignment::OnRelayout( const Vector2& size, ActorSizeContainer& container )
     }
 
     PositionConstraint positionConstraint(mPadding, mHorizontal, mVertical);
-    actor.SetPosition( positionConstraint.GetPosition(childSize, actorSize) );
+    child.SetPosition( positionConstraint.GetPosition(newChildSize, currentChildSize) );
 
-    if( !control )
+    if( renegotiate )
     {
-      actor.SetScale(childSize / actorSize);
+      container.Add( child, Vector2(newChildSize) );
     }
-
-    Relayout( actor, Vector2(childSize), container );
   }
 }
 

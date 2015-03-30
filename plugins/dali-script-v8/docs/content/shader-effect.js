@@ -5,7 +5,13 @@
 
 Shader effects provide a visual effect for actors.
 
-For a Custom shader you can provide the vertex and fragment shader code as strings.
+You can create a type-registered shader effect by its type name.
+```
+// create a new shader effect
+var shader = new dali.ShaderEffect("BlindEffect");
+```
+
+Alternatively you can create a Custom shader by providing the vertex and fragment shader code as strings.
 Each shader is provided with default uniforms and attributes.
 For a vertex shader this part contains the following code:
 ```

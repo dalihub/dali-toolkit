@@ -347,6 +347,8 @@ void Slider::DisplayValue( float value, bool raiseSignals )
       mMarkSignal.Emit( self, markIndex );
     }
   }
+
+  // TODO
 }
 
 void Slider::SetMarks( const MarkList& marks )
@@ -389,6 +391,7 @@ Actor Slider::CreateHitRegion()
 ImageActor Slider::CreateBacking()
 {
   ImageActor backing = ImageActor::New();
+  backing.SetRelayoutEnabled( false );
   backing.SetParentOrigin( ParentOrigin::CENTER );
   backing.SetAnchorPoint( AnchorPoint::CENTER );
   backing.SetZ( BACKING_Z );
@@ -418,6 +421,7 @@ std::string Slider::GetBackingImageName()
 ImageActor Slider::CreateProgress()
 {
   ImageActor progress = ImageActor::New();
+  progress.SetRelayoutEnabled( false );
   progress.SetParentOrigin( ParentOrigin::CENTER_LEFT );
   progress.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
   progress.SetZ( PROGRESS_Z );
@@ -493,6 +497,7 @@ void Slider::ResizeProgressRegion( const Vector2& region )
 ImageActor Slider::CreateHandle()
 {
   ImageActor handle = ImageActor::New();
+  handle.SetRelayoutEnabled( false );
   handle.SetParentOrigin( ParentOrigin::CENTER_LEFT );
   handle.SetAnchorPoint( AnchorPoint::CENTER );
   handle.SetZ( HANDLE_Z );
@@ -503,6 +508,7 @@ ImageActor Slider::CreateHandle()
 ImageActor Slider::CreatePopupArrow()
 {
   ImageActor arrow = ImageActor::New();
+  arrow.SetRelayoutEnabled( false );
   arrow.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
   arrow.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
   arrow.SetZ( HANDLE_Z );
@@ -517,6 +523,7 @@ ImageActor Slider::CreatePopupArrow()
 ImageActor Slider::CreatePopup()
 {
   ImageActor popup = ImageActor::New();
+  popup.SetRelayoutEnabled( false );
   popup.SetParentOrigin( ParentOrigin::TOP_CENTER );
   popup.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
 

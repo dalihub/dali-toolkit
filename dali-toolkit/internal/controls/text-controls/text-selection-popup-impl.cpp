@@ -260,7 +260,7 @@ void TextSelectionPopup::OnInitialize()
   CreatePopup();
 }
 
-void TextSelectionPopup::OnRelayout( const Vector2& size, ActorSizeContainer& container )
+void TextSelectionPopup::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
 
 }
@@ -429,8 +429,8 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
      mNinePatchMargins.w = ninePatchImageSize.height - ( childRect.y + childRect.height ) - 1u;
    }
 
-   SetBackground ( mBackgroundImage );
-   SetBackgroundColor ( mBackgroundColor );
+   SetBackgroundImage( mBackgroundImage );
+   SetBackgroundColor( mBackgroundColor );
  }
 
  void TextSelectionPopup::AddOption( Actor& parent, const std::string& name, const std::string& caption, const Image iconImage, bool finalOption, bool showIcons )
@@ -515,7 +515,7 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
 
    // 5. Create a option.
    Toolkit::PushButton option = Toolkit::PushButton::New();
-   option.SetSizePolicy( Toolkit::Control::Fixed, Toolkit::Control::Fixed );
+   //option.SetSizePolicy( Toolkit::Control::Fixed, Toolkit::Control::Fixed ); FIXME
    option.SetSize( optionSize );
    option.SetAnchorPoint( AnchorPoint::TOP_LEFT );
    option.SetX( mContentSize.width );

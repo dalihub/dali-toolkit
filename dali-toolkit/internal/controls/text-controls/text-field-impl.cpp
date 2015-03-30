@@ -439,7 +439,7 @@ float TextField::GetHeightForWidth( float width )
   return mController->GetHeightForWidth( width );
 }
 
-void TextField::OnRelayout( const Vector2& size, ActorSizeContainer& container )
+void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   if( mController->Relayout( size ) ||
       !mRenderer )

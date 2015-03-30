@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/radio-button.h>
+#include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include "button-impl.h"
 
 namespace Dali
@@ -103,12 +104,14 @@ private: // From Button
    */
   virtual void OnLabelSet();
 
-private: // From Control
+private:
 
   /**
-   * @copydoc Dali::Toolkit::Control::OnRelayout()
+   * @brief Set the image to display
+   *
+   * @param[in] image The image to set
    */
-  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
+  void SetImage( Actor image );
 
 private:
 
@@ -117,6 +120,11 @@ private:
 
   // Undefined
   RadioButton& operator=( const RadioButton& origin );
+
+private:
+
+  Toolkit::TableView mLayoutContainer;      ///< Container to position button images and labels
+
 };
 
 } // namespace Internal

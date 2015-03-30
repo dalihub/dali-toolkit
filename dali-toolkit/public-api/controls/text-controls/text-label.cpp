@@ -32,6 +32,14 @@ TextLabel TextLabel::New()
   return Internal::TextLabel::New();
 }
 
+TextLabel TextLabel::New( const std::string& text )
+{
+  TextLabel label = Internal::TextLabel::New();
+  label.SetProperty( TextLabel::Property::TEXT, text );
+
+  return label;
+}
+
 TextLabel::TextLabel()
 {
 }

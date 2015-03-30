@@ -71,10 +71,19 @@ public:
   };
 
   /**
-   * Create the TextLabel control.
+   * @brief Create the TextLabel control.
+   *
    * @return A handle to the TextLabel control.
    */
   static TextLabel New();
+
+  /**
+   * @brief Create the TextLabel control.
+   *
+   * @param[in] text The text to display.
+   * @return A handle to the TextLabel control.
+   */
+  static TextLabel New( const std::string& text );
 
   /**
    * @brief Creates an empty handle.

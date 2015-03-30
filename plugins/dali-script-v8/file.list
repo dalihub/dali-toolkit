@@ -20,6 +20,7 @@ script_v8_plugin_src_files = \
    $(v8_plugin_dir)/animation/animation-api.cpp \
    $(v8_plugin_dir)/animation/animation-wrapper.cpp \
    $(v8_plugin_dir)/animation/path-api.cpp \
+   $(v8_plugin_dir)/animation/path-constraint-wrapper.cpp \
    $(v8_plugin_dir)/animation/path-wrapper.cpp \
    $(v8_plugin_dir)/stage/stage-wrapper.cpp \
    $(v8_plugin_dir)/events/event-object-generator.cpp \
