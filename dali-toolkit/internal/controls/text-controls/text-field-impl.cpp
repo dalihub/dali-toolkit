@@ -403,6 +403,8 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
 
 void TextField::OnInitialize()
 {
+  Actor self = Self();
+
   mController = Text::Controller::New( *this );
 
   mDecorator = Text::Decorator::New( *this, *mController );
@@ -422,6 +424,10 @@ void TextField::OnInitialize()
     Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
     mDecorator->SetBoundingBox( Rect<int>( 0.0f, 0.0f, stageSize.width, stageSize.height ) );
   }
+
+  // Fill-parent area by default
+  self.SetResizePolicy( FILL_TO_PARENT, WIDTH );
+  self.SetResizePolicy( FILL_TO_PARENT, HEIGHT );
 }
 
 void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
