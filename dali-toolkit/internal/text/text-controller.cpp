@@ -359,7 +359,7 @@ struct Controller::TextInput
 
       // TODO - multi-line selection
       const Vector<LineRun>& lines = mVisualModel->mLines;
-      float height = lines.Count() ? lines[0].lineSize.height : 0.0f;
+      float height = lines.Count() ? lines[0].ascender + -lines[0].descender : 0.0f;
 
       mDecorator->SetPosition( PRIMARY_SELECTION_HANDLE,   primaryX,   0.0f, height );
       mDecorator->SetPosition( SECONDARY_SELECTION_HANDLE, secondaryX, 0.0f, height );
@@ -438,7 +438,8 @@ struct Controller::TextInput
     const Vector<LineRun>& lines = mVisualModel->mLines;
     for( float totalHeight = 0; lineIndex < lines.Count(); ++lineIndex )
     {
-      totalHeight += lines[lineIndex].lineSize.height;
+      const LineRun& lineRun = lines[lineIndex];
+      totalHeight += lineRun.ascender + -lineRun.descender;
       if( y < totalHeight )
       {
         return lineIndex;
@@ -515,7 +516,7 @@ struct Controller::TextInput
     }
     visualY = 0.0f;
 
-    height = line.lineSize.height;
+    height = line.ascender + -line.descender;
   }
 
   void UpdateCursorPosition()
@@ -559,7 +560,8 @@ struct Controller::TextInput
         lastGlyph = (lineRuns[lineIndex].glyphIndex + lineRuns[lineIndex].numberOfGlyphs);
         if( cursorGlyph < lastGlyph )
         {
-          height = lineRuns[lineIndex].lineSize.height;
+          const LineRun& lineRun = lineRuns[lineIndex];
+          height = lineRun.ascender + -lineRun.descender;
           break;
         }
       }

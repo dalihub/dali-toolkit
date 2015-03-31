@@ -95,7 +95,9 @@ std::ostream& operator<< (std::ostream& o, const Vector<LineRun>& lineRuns)
     // e.g. Print "Line 0 Glyphs: 0->9 Characters: 0->9 (10)" for a ten character run staring from beginning of the model
     o << "Line " << i << " Glyphs: " << lineRuns[i].glyphIndex << "->" << (lineRuns[i].glyphIndex + lineRuns[i].numberOfGlyphs );
     o << " Characters: " << lineRuns[i].characterRun.characterIndex << "->" << (lineRuns[i].characterRun.characterIndex + lineRuns[i].characterRun.numberOfCharacters );
-    o << " Size: " << lineRuns[i].lineSize;
+    o << " Width: " << lineRuns[i].width;
+    o << " Ascender: " << lineRuns[i].ascender;
+    o << " Descender: " << lineRuns[i].descender;
 
     if( i+1 < lineRuns.Count() )
     {
