@@ -342,9 +342,9 @@ int UtcDaliPopupShowHide(void)
 
   PushButton button1 = PushButton::New();
   PushButton button2 = PushButton::New();
-  button1.SetPreferredSize(DEFAULT_BUTTON_SIZE.GetVectorXY());
+  button1.SetSize(DEFAULT_BUTTON_SIZE.GetVectorXY());
   popup.AddButton(button1);
-  button2.SetPreferredSize(DEFAULT_BUTTON_SIZE.GetVectorXY());
+  button2.SetSize(DEFAULT_BUTTON_SIZE.GetVectorXY());
   popup.AddButton(button2);
 
   // Showing/Hiding popup, results in all child Actors being

@@ -128,6 +128,10 @@ void PushButton::OnButtonImageSet()
   Actor& buttonImage = GetButtonImage();
 
   buttonImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+
+  buttonImage.RelayoutRequestTree();
+
+  RelayoutRequest();
 }
 
 void PushButton::OnSelectedImageSet()
@@ -135,6 +139,10 @@ void PushButton::OnSelectedImageSet()
   Actor& selectedImage = GetSelectedImage();
 
   selectedImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+
+  selectedImage.RelayoutRequestTree();
+
+  RelayoutRequest();
 }
 
 void PushButton::OnBackgroundImageSet()
@@ -142,6 +150,10 @@ void PushButton::OnBackgroundImageSet()
   Actor& backgroundImage = GetBackgroundImage();
 
   backgroundImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+
+  backgroundImage.RelayoutRequestTree();
+
+  RelayoutRequest();
 }
 
 void PushButton::OnSelectedBackgroundImageSet()
@@ -156,6 +168,10 @@ void PushButton::OnDisabledImageSet()
   Actor& disabledImage = GetDisabledImage();
 
   disabledImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+
+  disabledImage.RelayoutRequestTree();
+
+  RelayoutRequest();
 }
 
 void PushButton::OnDisabledBackgroundImageSet()
@@ -163,6 +179,10 @@ void PushButton::OnDisabledBackgroundImageSet()
   Actor& disabledBackgroundImage = GetDisabledBackgroundImage();
 
   disabledBackgroundImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+
+  disabledBackgroundImage.RelayoutRequestTree();
+
+  RelayoutRequest();
 }
 
 bool PushButton::OnSelected()
@@ -558,62 +578,31 @@ void PushButton::OnControlSizeSet( const Vector3& targetSize )
 
 Vector3 PushButton::GetNaturalSize()
 {
-  Vector3 size = Control::GetNaturalSize();
+  Vector3 size;
 
-  const bool widthIsZero = EqualsZero( size.width );
-  const bool heightIsZero = EqualsZero( size.height );
-
-  if( widthIsZero || heightIsZero )
+  // If background and background not scale9 try get size from that
+  ImageActor imageActor = FindImageActor( GetButtonImage() );
+  if( imageActor && imageActor.GetStyle() != ImageActor::STYLE_NINE_PATCH )
   {
-    // If background and background not scale9 try get size from that
-    ImageActor imageActor = FindImageActor( GetButtonImage() );
-    if( imageActor && imageActor.GetStyle() != ImageActor::STYLE_NINE_PATCH )
-    {
-      Vector3 imageSize = imageActor.GetNaturalSize();
+    size.width = imageActor.GetRelayoutSize( WIDTH );
+    size.height = imageActor.GetRelayoutSize( HEIGHT );
+  }
 
-      if( widthIsZero )
-      {
-        size.width = imageSize.width;
-      }
+  ImageActor backgroundImageActor = FindImageActor( GetBackgroundImage() );
+  if( backgroundImageActor && backgroundImageActor.GetStyle() != ImageActor::STYLE_NINE_PATCH )
+  {
+    size.width = std::max( size.width, backgroundImageActor.GetRelayoutSize( WIDTH ) );
+    size.height = std::max( size.height, backgroundImageActor.GetRelayoutSize( HEIGHT ) );
+  }
 
-      if( heightIsZero )
-      {
-        size.height = imageSize.height;
-      }
-    }
+  // If label, test against it's size
+  Toolkit::TextView textView = Toolkit::TextView::DownCast( GetLabel() );
+  if( textView )
+  {
+    Vector3 textViewSize = textView.GetNaturalSize();
 
-    ImageActor backgroundImageActor = FindImageActor( GetBackgroundImage() );
-    if( backgroundImageActor && backgroundImageActor.GetStyle() != ImageActor::STYLE_NINE_PATCH )
-    {
-      Vector3 imageSize = backgroundImageActor.GetNaturalSize();
-
-      if( widthIsZero )
-      {
-        size.width = std::max( size.width, imageSize.width );
-      }
-
-      if( heightIsZero )
-      {
-        size.height = std::max( size.height, imageSize.height );
-      }
-    }
-
-    // If label, test against it's size
-    Toolkit::TextView textView = Toolkit::TextView::DownCast( GetLabel() );
-    if( textView )
-    {
-      Vector3 textViewSize = textView.GetNaturalSize();
-
-      if( widthIsZero )
-      {
-        size.width = std::max( size.width, textViewSize.width + TEXT_PADDING * 2.0f );
-      }
-
-      if( heightIsZero )
-      {
-        size.height = std::max( size.height, textViewSize.height + TEXT_PADDING * 2.0f );
-      }
-    }
+    size.width = std::max( size.width, textViewSize.width + TEXT_PADDING * 2.0f );
+    size.height = std::max( size.height, textViewSize.height + TEXT_PADDING * 2.0f );
   }
 
   return size;

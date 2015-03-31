@@ -473,8 +473,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
     if(mActiveLayout->GetItemSize(itemId, targetSize, size))
     {
       // resize immediately
-      actor.SetResizePolicy( FIXED, ALL_DIMENSIONS );
-      actor.SetPreferredSize( size.GetVectorXY() );
+      actor.SetSize( size.GetVectorXY() );
     }
 
     mActiveLayout->ApplyConstraints(actor, itemId, durationSeconds, mScrollPositionObject, Self() );
@@ -996,8 +995,7 @@ void ItemView::SetupActor( Item item, float durationSeconds )
     Vector3 size;
     if( mActiveLayout->GetItemSize( item.first, mActiveLayoutTargetSize, size ) )
     {
-      item.second.SetResizePolicy( FIXED, ALL_DIMENSIONS );
-      item.second.SetPreferredSize( size.GetVectorXY() );
+      item.second.SetSize( size.GetVectorXY() );
     }
 
     mActiveLayout->ApplyConstraints( item.second, item.first, durationSeconds, mScrollPositionObject, Self() );

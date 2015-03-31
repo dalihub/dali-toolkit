@@ -65,8 +65,7 @@ mBacking.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
 @endcode
 The popup control is added to the layer and a background image is specified to fill the size of the popup and add a border by the following.
 @code
-mBackgroundImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
-mBackgroundImage.SetSizeMode( SIZE_FIXED_OFFSET_FROM_PARENT );
+mBackgroundImage.SetResizePolicy( SIZE_FIXED_OFFSET_FROM_PARENT, ALL_DIMENSIONS );
 Vector3 border( mPopupStyle->backgroundOuterBorder.x, mPopupStyle->backgroundOuterBorder.z, 0.0f );
 mBackgroundImage.SetSizeModeFactor( border );
 @endcode

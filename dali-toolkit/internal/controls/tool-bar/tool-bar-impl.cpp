@@ -74,7 +74,7 @@ void ToolBar::SetBackground( Actor background )
   // ToolBar image
   background.SetParentOrigin( Dali::ParentOrigin::TOP_CENTER );
   background.SetAnchorPoint( Dali::AnchorPoint::TOP_CENTER );
-  background.SetPreferredSize( Vector2( mToolBarSize.width, mToolBarSize.height ) );
+  background.SetSize( Vector2( mToolBarSize.width, mToolBarSize.height ) );
 
   RenderableActor renderableActor = RenderableActor::DownCast( background );
   if ( renderableActor )
@@ -359,7 +359,7 @@ void ToolBar::OnControlChildAdd(Actor& child)
 void ToolBar::OnControlSizeSet( const Vector3& targetSize )
 {
   mToolBarSize = targetSize;
-  mBackground.SetPreferredSize( Vector2( mToolBarSize.width, mToolBarSize.height ) );
+  mBackground.SetSize( Vector2( mToolBarSize.width, mToolBarSize.height ) );
 }
 
 } // namespace Internal

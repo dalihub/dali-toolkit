@@ -3036,7 +3036,7 @@ void TextInput::CreateGrabArea( Actor& parent )
   mGrabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
   mGrabArea.SetName( "GrabArea" );
   mGrabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-  mGrabArea.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
+  mGrabArea.SetResizePolicy( SIZE_RELATIVE_TO_PARENT, ALL_DIMENSIONS );
   mGrabArea.SetSizeModeFactor( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE );
   mGrabArea.TouchedSignal().Connect(this,&TextInput::OnPressDown);
   mTapDetector.Attach( mGrabArea );
@@ -3273,7 +3273,7 @@ void TextInput::CreateSelectionHandles( std::size_t start, std::size_t end, Dali
     mHandleOneGrabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
     mHandleOneGrabArea.SetName("SelectionHandleOneGrabArea");
 
-    mHandleOneGrabArea.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
+    mHandleOneGrabArea.SetResizePolicy( SIZE_RELATIVE_TO_PARENT, ALL_DIMENSIONS );
     mHandleOneGrabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
     mHandleOneGrabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
@@ -3301,7 +3301,7 @@ void TextInput::CreateSelectionHandles( std::size_t start, std::size_t end, Dali
 
     mHandleTwoGrabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
     mHandleTwoGrabArea.SetName("SelectionHandleTwoGrabArea");
-    mHandleTwoGrabArea.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
+    mHandleTwoGrabArea.SetResizePolicy( SIZE_RELATIVE_TO_PARENT, ALL_DIMENSIONS );
     mHandleTwoGrabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
     mHandleTwoGrabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
