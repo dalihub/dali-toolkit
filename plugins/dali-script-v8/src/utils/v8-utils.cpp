@@ -332,7 +332,7 @@ bool GetBooleanValue( v8::Isolate* isolate, const v8::Local<v8::Value>& value )
   else if (value->IsBooleanObject() )
   {
     const v8::Local<v8::BooleanObject> object = v8::Local<v8::BooleanObject>::Cast(value);
-    return object->ValueOf();
+    return object->BooleanValue();
   }
   DALI_SCRIPT_EXCEPTION(isolate, "no bool found");
   return false;

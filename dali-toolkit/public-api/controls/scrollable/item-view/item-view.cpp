@@ -178,6 +178,11 @@ float ItemView::GetRefreshInterval() const
   return GetImpl(*this).GetRefreshInterval();
 }
 
+void ItemView::Refresh()
+{
+  return GetImpl(*this).Refresh();
+}
+
 Actor ItemView::GetItem(unsigned int itemId) const
 {
   return GetImpl(*this).GetItem(itemId);

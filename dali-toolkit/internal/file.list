@@ -32,9 +32,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-portrait-view-impl.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-landscape-view-impl.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-view-impl.cpp \
-   $(toolkit_src_dir)/controls/relayout-controller-impl.cpp \
-   $(toolkit_src_dir)/controls/relayout-controller.cpp \
-   $(toolkit_src_dir)/controls/relayout-helper.cpp \
    $(toolkit_src_dir)/controls/scroll-bar/scroll-bar-impl.cpp \
    $(toolkit_src_dir)/controls/scroll-component/scroll-bar-internal-impl.cpp \
    $(toolkit_src_dir)/controls/scroll-component/scroll-bar-internal.cpp \

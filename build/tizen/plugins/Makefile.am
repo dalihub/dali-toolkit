@@ -20,7 +20,6 @@ plugin_src_dir = ../../../plugins
 
 include ../../../plugins/dali-script-v8/file.list
 
-DALI_SCRIPTV8_LIBS="-lv8 -lpthread"
 
 lib_LTLIBRARIES = libdali-script-plugin-v8.la
 
@@ -31,8 +30,7 @@ lib_LTLIBRARIES = libdali-script-plugin-v8.la
 # It won't be installed until the rpm is installed, and unfortunately the
 # plugin is part of the same rpm
 script_plugin_v8_includes = -I../../../plugins/dali-script-v8/src \
-                         -I../../../plugins/dali-script-v8/src/utils \
-                         -I../../../
+                            -I../../../plugins/dali-script-v8/src/utils
 
 
 libdali_script_plugin_v8_la_SOURCES = \
@@ -41,13 +39,12 @@ libdali_script_plugin_v8_la_SOURCES = \
 libdali_script_plugin_v8_la_DEPENDENCIES =
 
 libdali_script_plugin_v8_la_CXXFLAGS = -DDALI_COMPILATION \
+                            $(V8_CFLAGS) \
                             $(DALI_TOOLKIT_CFLAGS) \
                             $(DALICORE_CFLAGS) \
                             -DDALI_DATA_READ_ONLY_DIR="\"${dataReadOnlyDir}\"" \
                             $(DALI_CFLAGS) \
                             $(DLOG_CFLAGS) \
-                            $(DALI_SCRIPTV8_CFLAGS) \
-                            -I../../.. \
                             $(script_plugin_v8_includes) \
                             -Werror -Wall
 
@@ -55,7 +52,7 @@ libdali_script_plugin_v8_la_LIBADD = \
                             $(DALICORE_LIBS) \
                             $(DALI_LIBS) \
                             $(DLOG_LIBS) \
-                            $(DALI_SCRIPTV8_LIBS)
+                            $(V8_LIBS)
 
 libdali_script_plugin_v8_la_LDFLAGS = \
                            -rdynamic

@@ -71,6 +71,7 @@ public:
       CONNECTION,
       ANIMATION,
       PATH,
+      PATH_CONSTRAINT,
       BUILDER,
       STAGE,
       FONT,

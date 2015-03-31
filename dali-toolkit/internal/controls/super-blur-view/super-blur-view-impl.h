@@ -39,14 +39,6 @@ namespace Internal
  */
 class SuperBlurView : public Control
 {
-public:
-
-  // Properties
-  enum
-  {
-    SUPER_BLUR_VIEW_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    SUPER_BLUR_VIEW_PROPERTY_END_INDEX = SUPER_BLUR_VIEW_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
-  };
 
 public:
 
@@ -130,7 +122,7 @@ private: // from Control
   /**
    * @copydoc Control::OnRelayout()
    */
-  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
 
 private:
 

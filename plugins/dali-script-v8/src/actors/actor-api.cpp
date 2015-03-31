@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <v8-utils.h>
 #include <actors/actor-wrapper.h>
+#include <animation/path-constraint-wrapper.h>
 
 namespace Dali
 {
@@ -335,39 +336,6 @@ void ActorApi::FindChildByName( const v8::FunctionCallbackInfo<v8::Value>& args 
 }
 
 /**
- * Search through this actor's hierarchy for an actor with the given name or alias.
- *
- * Actors can customize this function to provide actors with preferred alias'
- * For example 'previous' could return the last selected child.
- * If no aliased actor is found then FindChildByName() is called.
- *
- * @for Actor
- * @method findChildByAlias
- * @param {String} actor alias
- * @return {Object} actor on success, empty actor handle if not found
- */
-void ActorApi::FindChildByAlias( const v8::FunctionCallbackInfo<v8::Value>& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  Actor parent = GetActor( isolate, args );
-  bool found( false );
-  std::string name = V8Utils::GetStringParameter( PARAMETER_0, found, isolate, args );
-  if( !found )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "String parameter not found" );
-    return;
-  }
-  Actor childActor = parent.FindChildByAlias( name );
-  if( childActor )
-  {
-    // wrap the child
-    v8::Local < v8::Object > wrappedLayer = ActorWrapper::WrapActor( isolate, childActor );
-    args.GetReturnValue().Set( wrappedLayer );
-  }
-}
-
-/**
  * Search through this actor's hierarchy for an actor with the given unique ID.
  * The actor itself is also considered in the search
  *
@@ -535,13 +503,13 @@ void ActorApi::GetActorType( const v8::FunctionCallbackInfo<v8::Value>& args )
  * @example
  *
  *    // using an array
- *    actor.moveBy( [20,40,0] );
+ *    actor.translateBy( [20,40,0] );
  *
  * @for Actor
- * @method moveBy
+ * @method translateBy
  * @param {object} an array of 3 numbers
  */
-void ActorApi::MoveBy( const v8::FunctionCallbackInfo<v8::Value>& args )
+void ActorApi::TranslateBy( const v8::FunctionCallbackInfo<v8::Value>& args )
 {
   v8::Isolate* isolate = args.GetIsolate();
   v8::HandleScope handleScope( isolate );
@@ -565,7 +533,7 @@ void ActorApi::MoveBy( const v8::FunctionCallbackInfo<v8::Value>& args )
     DALI_SCRIPT_EXCEPTION( isolate, "Vector3 move parameter missing" );
     return;
   }
-  actor.MoveBy( vector );
+  actor.TranslateBy( vector );
 
 }
 
@@ -641,74 +609,111 @@ void ActorApi::ScaleBy( const v8::FunctionCallbackInfo<v8::Value>& args )
   }
   actor.ScaleBy( vector );
 }
-/**
- * Apply a relative scale to an actor.
- * Actor opacity ranges from 0 (see through ) to 1 ( solid )
- * @example
- *    // reduce actor opactiy by a half
- *    actor.opaictyBy(-0.5);
- *
- * @for Actor
- * @method OpacityBy
- * @param {float} relative opacity
- */
-void ActorApi::OpacityBy( const v8::FunctionCallbackInfo<v8::Value>& args )
+
+void ActorApi::ApplyPathConstraint( const v8::FunctionCallbackInfo< v8::Value >& args )
 {
   v8::Isolate* isolate = args.GetIsolate();
   v8::HandleScope handleScope( isolate );
-  Actor actor = GetActor( isolate, args );
 
-  // void OpacityBy(float relativeOpacity);
-  bool found;
-  float opacity = V8Utils::GetFloatParameter( PARAMETER_0, found, isolate, args, 0.f );
+  //Get target actor
+  Actor targetActor = GetActor( isolate, args );
+
+  //Get PathConstraint
+  bool found(false);
+  Handle pathConstraintHandle =  V8Utils::GetHandleParameter(PARAMETER_0, found, isolate, args );
   if( !found )
   {
-    DALI_SCRIPT_EXCEPTION( isolate, "float parameter missing" );
+    DALI_SCRIPT_EXCEPTION( isolate, "bad parameter 0 (PathConstraint)" );
     return;
   }
-  actor.OpacityBy( opacity );
-}
+  PathConstraint pathConstraint = PathConstraint::DownCast(pathConstraintHandle);
 
-/**
- * Apply a relative color change to an actor.
- *
- * @example
- *    // increase actor red by half
- *    actor.colorBy( [0.5, 0, 0, 0]);
- *
- *
- * @for Actor
- * @method colorBy
- * @param {Object} Color JavaScript array
- */
-void ActorApi::ColorBy( const v8::FunctionCallbackInfo<v8::Value>& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  Actor actor = GetActor( isolate, args );
-
-  bool found;
-  int argCount( args.Length() );
-  Vector4 color;
-
-  if( argCount == 1 )
+  //Get target property
+  std::string propertyName = V8Utils::GetStringParameter( PARAMETER_1, found, isolate, args );
+  if(!found)
   {
-    color = V8Utils::GetVector4Parameter( PARAMETER_0, found, isolate, args );
-    if( !found )
+    DALI_SCRIPT_EXCEPTION( isolate, "bad parameter 1 (Property name)" );
+    return;
+  }
+
+  // try both properties with dashes and without
+  Property::Index targetPropertyIndex = targetActor.GetPropertyIndex( propertyName );
+  if( targetPropertyIndex == Property::INVALID_INDEX )
+  {
+    std::string convertedName = V8Utils::JavaScriptNameToPropertyName( propertyName );
+    targetPropertyIndex = targetActor.GetPropertyIndex( convertedName );
+
+    if( targetPropertyIndex == Property::INVALID_INDEX )
     {
-      DALI_SCRIPT_EXCEPTION( isolate, "Vector4 parameter missing" );
+      DALI_SCRIPT_EXCEPTION( isolate, "Property not found" );
+    }
+  }
+
+  //Get source actor
+  Actor sourceActor = V8Utils::GetActorParameter( PARAMETER_2, found, isolate, args );
+  if( !found )
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "bad parameter 2 (Actor)" );
+  }
+
+  // try both properties with dashes and without
+  propertyName = V8Utils::GetStringParameter( PARAMETER_3, found, isolate, args );
+  if(!found)
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "bad parameter 3 (Property name)" );
+    return;
+  }
+
+  Property::Index sourcePropertyIndex = sourceActor.GetPropertyIndex( propertyName );
+  if( sourcePropertyIndex == Property::INVALID_INDEX )
+  {
+    std::string convertedName = V8Utils::JavaScriptNameToPropertyName( propertyName );
+    sourcePropertyIndex = sourceActor.GetPropertyIndex( convertedName );
+
+    if( sourcePropertyIndex == Property::INVALID_INDEX )
+    {
+      DALI_SCRIPT_EXCEPTION( isolate, "Property not found" );
       return;
     }
   }
-  else
+
+  //Check if forward vector is specified
+  Vector3 forward( 0.0f,0.0f,0.0f);
+  if( args.Length() > 4 )
   {
-    DALI_SCRIPT_EXCEPTION( isolate, "Vector4 parameter missing" );
-    return;
+    forward =  V8Utils::GetVector3Parameter( PARAMETER_4, found, isolate, args );
+    if( !found )
+    {
+      DALI_SCRIPT_EXCEPTION( isolate, "bad parameter 4 (Vector3)" );
+      return;
+    }
   }
 
-  actor.ColorBy( color );
+  pathConstraint.Apply( Dali::Property(sourceActor,sourcePropertyIndex),
+                        Dali::Property(targetActor,targetPropertyIndex),
+                        forward );
+
 }
 
+void ActorApi::RemovePathConstraint( const v8::FunctionCallbackInfo< v8::Value >& args )
+{
+  v8::Isolate* isolate = args.GetIsolate();
+  v8::HandleScope handleScope( isolate );
+
+  //Get target actor
+  Actor actor = GetActor( isolate, args );
+
+  //Get PathConstraint
+  bool found(false);
+  Handle pathConstraintHandle =  V8Utils::GetHandleParameter(PARAMETER_0, found, isolate, args );
+  if( !found )
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "bad parameter 0 (PathConstraint)" );
+    return;
+  }
+  PathConstraint pathConstraint = PathConstraint::DownCast(pathConstraintHandle);
+  pathConstraint.Remove(actor);
+}
 
 } // namespace V8Plugin
 

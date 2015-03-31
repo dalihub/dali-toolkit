@@ -327,26 +327,10 @@ int UtcDaliControlTestParameters(void)
   ToolkitTestApplication application;
   DummyControl test = DummyControl::New();
 
-  Vector3 maxSize = test.GetNaturalSize();
-  Vector3 minSize = maxSize / 2.0f;
-
-  Toolkit::Control::SizePolicy widthPolicy( Control::Fixed );
-  Toolkit::Control::SizePolicy heightPolicy( Control::Fixed );
-  test.SetSizePolicy( widthPolicy, heightPolicy );
-  test.GetSizePolicy( widthPolicy, heightPolicy );
-
-  DALI_TEST_CHECK( widthPolicy == Control::Fixed && heightPolicy == Control::Fixed );
-
   test.SetSize( 0.7f, 0.7f, 0.7f );
   float width = 640.0f;
   float height = test.GetHeightForWidth( width );
   DALI_TEST_CHECK( test.GetWidthForHeight( height ) == width );
-
-  test.SetMinimumSize( minSize );
-  DALI_TEST_CHECK( test.GetMinimumSize() == minSize );
-
-  test.SetMaximumSize( maxSize );
-  DALI_TEST_CHECK( test.GetMaximumSize() == maxSize );
 
   test.KeyEventSignal();
 
@@ -381,7 +365,7 @@ int UtcDaliControlBackgroundImage(void)
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
 
   Image image = ResourceImage::New("TestImage");
-  control.SetBackground( image );
+  control.SetBackgroundImage( image );
   DALI_TEST_CHECK( control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::WHITE, TEST_LOCATION );
 
@@ -393,7 +377,7 @@ int UtcDaliControlBackgroundImage(void)
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
 
   control.SetBackgroundColor( Color::YELLOW );
-  control.SetBackground( image );
+  control.SetBackgroundImage( image );
   DALI_TEST_CHECK( control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::YELLOW, TEST_LOCATION );
 
@@ -407,84 +391,34 @@ int UtcDaliControlBackgroundProperties(void)
 
   DALI_TEST_CHECK( !control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
-  DALI_TEST_EQUALS( control.GetProperty( Control::PROPERTY_BACKGROUND_COLOR ).Get< Vector4 >(), Color::TRANSPARENT, TEST_LOCATION );
-  DALI_TEST_CHECK( control.GetProperty( Control::PROPERTY_BACKGROUND ).Get< Property::Map >().Empty() );
+  DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::TRANSPARENT, TEST_LOCATION );
+  DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND_IMAGE ).Get< Property::Map >().Empty() );
 
-  control.SetProperty( Control::PROPERTY_BACKGROUND_COLOR, Color::RED );
+  control.SetProperty( Control::Property::BACKGROUND_COLOR, Color::RED );
   DALI_TEST_CHECK( control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::RED, TEST_LOCATION );
-  DALI_TEST_EQUALS( control.GetProperty( Control::PROPERTY_BACKGROUND_COLOR ).Get< Vector4 >(), Color::RED, TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::RED, TEST_LOCATION );
 
   Property::Map imageMap;
   imageMap[ "filename" ] = "TestImage";
   Property::Map map;
   map[ "image" ] = imageMap;
-  control.SetProperty( Control::PROPERTY_BACKGROUND, map );
+  control.SetProperty( Control::Property::BACKGROUND_IMAGE, map );
   DALI_TEST_CHECK( control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::RED, TEST_LOCATION );
-  DALI_TEST_EQUALS( control.GetProperty( Control::PROPERTY_BACKGROUND_COLOR ).Get< Vector4 >(), Color::RED, TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::RED, TEST_LOCATION );
 
-  Property::Value propValue = control.GetProperty( Control::PROPERTY_BACKGROUND );
+  Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND_IMAGE );
   DALI_TEST_CHECK( propValue.HasKey( "image" ) );
   DALI_TEST_CHECK( propValue.GetValue( "image" ).HasKey( "filename" ) );
   DALI_TEST_CHECK( propValue.GetValue( "image" ).GetValue( "filename" ).Get< std::string>() == "TestImage" );
 
   Property::Map emptyMap;
-  control.SetProperty( Control::PROPERTY_BACKGROUND, emptyMap );
+  control.SetProperty( Control::Property::BACKGROUND_IMAGE, emptyMap );
   DALI_TEST_CHECK( !control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
-  DALI_TEST_EQUALS( control.GetProperty( Control::PROPERTY_BACKGROUND_COLOR ).Get< Vector4 >(), Color::TRANSPARENT, TEST_LOCATION );
-  DALI_TEST_CHECK( control.GetProperty( Control::PROPERTY_BACKGROUND ).Get< Property::Map >().Empty() );
-
-  END_TEST;
-}
-
-int UtcDaliControlSizePolicyProperties(void)
-{
-  ToolkitTestApplication application;
-
-  Control control = Control::New();
-
-  Control::SizePolicy widthPolicy( Control::Fixed );
-  Control::SizePolicy heightPolicy( Control::Fixed );
-
-  control.GetSizePolicy( widthPolicy, heightPolicy );
-  DALI_TEST_EQUALS( "FIXED", control.GetProperty( Control::PROPERTY_WIDTH_POLICY ).Get< std::string >(), TEST_LOCATION );
-  DALI_TEST_EQUALS( "FIXED", control.GetProperty( Control::PROPERTY_HEIGHT_POLICY ).Get< std::string >(), TEST_LOCATION );
-
-  control.SetSizePolicy( Control::Flexible, Control::Range );
-  DALI_TEST_EQUALS( "FLEXIBLE", control.GetProperty( Control::PROPERTY_WIDTH_POLICY ).Get< std::string >(), TEST_LOCATION );
-  DALI_TEST_EQUALS( "RANGE", control.GetProperty( Control::PROPERTY_HEIGHT_POLICY ).Get< std::string >(), TEST_LOCATION );
-
-  control.SetProperty( Control::PROPERTY_WIDTH_POLICY, "MAXIMUM" );
-  control.SetProperty( Control::PROPERTY_HEIGHT_POLICY, "MINIMUM" );
-  control.GetSizePolicy( widthPolicy, heightPolicy );
-  DALI_TEST_EQUALS( Control::Maximum, widthPolicy, TEST_LOCATION );
-  DALI_TEST_EQUALS( Control::Minimum, heightPolicy, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliControlSizeProperties(void)
-{
-  ToolkitTestApplication application;
-
-  Control control = Control::New();
-
-  DALI_TEST_EQUALS( control.GetMinimumSize(), control.GetProperty( Control::PROPERTY_MINIMUM_SIZE ).Get< Vector3 >(), TEST_LOCATION );
-  DALI_TEST_EQUALS( control.GetMaximumSize(), control.GetProperty( Control::PROPERTY_MAXIMUM_SIZE ).Get< Vector3 >(), TEST_LOCATION );
-
-  control.SetMinimumSize( Vector3( 100.0f, 200.0f, 300.0f ) );
-  DALI_TEST_EQUALS( Vector3( 100.0f, 200.0f, 300.0f ), control.GetProperty( Control::PROPERTY_MINIMUM_SIZE ).Get< Vector3 >(), TEST_LOCATION );
-
-
-  control.SetMaximumSize( Vector3( 200.0f, 250.0f, 800.0f ) );
-  DALI_TEST_EQUALS( Vector3( 200.0f, 250.0f, 800.0f ), control.GetProperty( Control::PROPERTY_MAXIMUM_SIZE ).Get< Vector3 >(), TEST_LOCATION );
-
-  control.SetProperty( Control::PROPERTY_MINIMUM_SIZE, Vector3( 1.0f, 2.0f, 3.0f ) );
-  control.SetProperty( Control::PROPERTY_MAXIMUM_SIZE, Vector3( 10.0f, 20.0f, 30.0f ) );
-  DALI_TEST_EQUALS( control.GetMinimumSize(), Vector3( 1.0f, 2.0f, 3.0f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( control.GetMaximumSize(), Vector3( 10.0f, 20.0f, 30.0f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::TRANSPARENT, TEST_LOCATION );
+  DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND_IMAGE ).Get< Property::Map >().Empty() );
 
   END_TEST;
 }
@@ -496,15 +430,15 @@ int UtcDaliControlKeyProperties(void)
   Control control = Control::New();
   Stage::GetCurrent().Add( control );
 
-  DALI_TEST_EQUALS( control.HasKeyInputFocus(), control.GetProperty( Control::PROPERTY_KEY_INPUT_FOCUS ).Get< bool >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( control.HasKeyInputFocus(), control.GetProperty( Control::Property::KEY_INPUT_FOCUS ).Get< bool >(), TEST_LOCATION );
 
   control.SetKeyInputFocus();
-  DALI_TEST_EQUALS( true, control.GetProperty( Control::PROPERTY_KEY_INPUT_FOCUS ).Get< bool >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, control.GetProperty( Control::Property::KEY_INPUT_FOCUS ).Get< bool >(), TEST_LOCATION );
 
   control.ClearKeyInputFocus();
-  DALI_TEST_EQUALS( false, control.GetProperty( Control::PROPERTY_KEY_INPUT_FOCUS ).Get< bool >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, control.GetProperty( Control::Property::KEY_INPUT_FOCUS ).Get< bool >(), TEST_LOCATION );
 
-  control.SetProperty( Control::PROPERTY_KEY_INPUT_FOCUS, true );
+  control.SetProperty( Control::Property::KEY_INPUT_FOCUS, true );
   DALI_TEST_EQUALS( true, control.HasKeyInputFocus(), TEST_LOCATION );
 
   END_TEST;

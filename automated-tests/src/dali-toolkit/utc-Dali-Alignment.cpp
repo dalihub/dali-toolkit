@@ -934,15 +934,15 @@ int UtcDaliAlignmentOnSizeSet(void)
   application.Render();
   application.SendNotification();
 
-  Vector3 size(100.0f, 200.0f, 0.0f);
-  alignment.SetSize(size);
+  Vector2 size( 100.0f, 200.0f );
+  alignment.SetPreferredSize(size);
 
   application.Render();
   application.SendNotification();
   application.Render();
   application.SendNotification();
 
-  DALI_TEST_EQUALS(size, alignment.GetImplementation().GetControlSize(), TEST_LOCATION);
+  DALI_TEST_EQUALS(size, alignment.GetImplementation().GetControlSize().GetVectorXY(), TEST_LOCATION);
 
   Stage::GetCurrent().Remove(alignment);
   END_TEST;

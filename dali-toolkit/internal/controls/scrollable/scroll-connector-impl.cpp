@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -35,15 +36,13 @@ namespace Internal
 namespace
 {
 
-// Signals
+// Setup properties, signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ScrollConnector, Dali::BaseHandle, NULL )
 
-const char* const DOMAIN_CHANGED_SIGNAL_NAME =          "domain-changed";
-const char* const SCROLL_POSITION_CHANGED_SIGNAL_NAME = "scroll-position-changed";
+DALI_SIGNAL_REGISTRATION( ScrollConnector, "domain-changed",          DOMAIN_CHANGED_SIGNAL_NAME          )
+DALI_SIGNAL_REGISTRATION( ScrollConnector, "scroll-position-changed", SCROLL_POSITION_CHANGED_SIGNAL_NAME )
 
-TypeRegistration typeRegistration( typeid( Toolkit::ScrollConnector ), typeid( Dali::BaseHandle ), NULL );
-
-SignalConnectorType signalConnector1( typeRegistration, DOMAIN_CHANGED_SIGNAL_NAME , &ScrollConnector::DoConnectSignal );
-SignalConnectorType signalConnector2( typeRegistration, SCROLL_POSITION_CHANGED_SIGNAL_NAME , &ScrollConnector::DoConnectSignal );
+DALI_TYPE_REGISTRATION_END()
 
 }
 

@@ -231,6 +231,10 @@ TAB_SIZE               = 2
 # newlines.
 
 ALIASES                =
+# Clip alias inserts the specified file between two text markers.
+# EG: @clip{"button.h",public,private}
+# Shows all lines between public and private *inclusive*.
+ALIASES += clip{3}="\dontinclude \1 \n \skip \2 \n \until \3"
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"
@@ -859,7 +863,7 @@ EXCLUDE_SYMBOLS        = DaliInternal \
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           =
+EXAMPLE_PATH           = @DOXYGEN_DOCS_DIR@/../
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
@@ -953,7 +957,7 @@ INLINE_SOURCES         = NO
 # Fortran comments will always remain visible.
 # The default value is: YES.
 
-STRIP_CODE_COMMENTS    = YES
+STRIP_CODE_COMMENTS    = NO
 
 # If the REFERENCED_BY_RELATION tag is set to YES then for each documented
 # function all documented functions referencing it will be listed.

@@ -22,8 +22,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
-
-// INTERNAL INCLUDES
+#include <dali/public-api/object/type-registry-helper.h>
 
 namespace Dali
 {
@@ -34,26 +33,19 @@ namespace Toolkit
 namespace Internal
 {
 
-namespace // to register type
+namespace
 {
-
-// Signals
-
-const char* const SIGNAL_ORIENTATION_ANIMATION_START = "orientation-animation-start";
 
 BaseHandle Create()
 {
   return Toolkit::View::New();
 }
 
-TypeRegistration typeRegistration( typeid( Toolkit::View ), typeid( Toolkit::Control ), Create );
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::View, Toolkit::Control, Create )
 
-SignalConnectorType signalConnector1( typeRegistration, SIGNAL_ORIENTATION_ANIMATION_START , &View::DoConnectSignal );
+DALI_SIGNAL_REGISTRATION( View, "orientation-animation-start", SIGNAL_ORIENTATION_ANIMATION_START )
 
-}
-
-namespace
-{
+DALI_TYPE_REGISTRATION_END()
 
 const float ROTATION_ANIMATION_DURATION = 0.5f;
 
@@ -140,7 +132,7 @@ void View::SetBackground( ImageActor backgroundImage )
     mBackgroundLayer = Layer::New();
 
     mBackgroundLayer.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-    mBackgroundLayer.SetSize( mViewSize );
+    mBackgroundLayer.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
 
     // Add background layer to custom actor.
     Self().Add( mBackgroundLayer );
@@ -160,8 +152,10 @@ void View::SetBackground( ImageActor backgroundImage )
   }
 
   backgroundImage.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-  backgroundImage.SetScale( FillXYKeepAspectRatio( mViewSize, backgroundImage.GetSize() ) );
+  backgroundImage.SetRelayoutEnabled( false );    // We will scale its size manually
   mBackgroundLayer.Add( backgroundImage );
+
+  RelayoutRequest();
 }
 
 void View::SetOrientationFunction( Degree portrait, Degree landscale, Degree portraitInverse, Degree landscapeInverse )
@@ -298,16 +292,14 @@ void View::OnInitialize()
   }
 }
 
-void View::OnControlSizeSet( const Vector3& targetSize )
+void View::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
-  mViewSize = targetSize;
   if( mBackgroundLayer )
   {
-    mBackgroundLayer.SetSize( mViewSize );
-    if( mBackgroundLayer.GetChildCount() > 0 )
+    if( mBackgroundLayer && mBackgroundLayer.GetChildCount() > 0 )
     {
       Actor background = mBackgroundLayer.GetChildAt(0);
-      background.SetScale( FillXYKeepAspectRatio( mViewSize, background.GetSize() ) );
+      background.SetScale( FillXYKeepAspectRatio( Vector3( size.width, size.height, 1.0f ), background.GetTargetSize() ) );
     }
   }
 }

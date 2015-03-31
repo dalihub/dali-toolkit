@@ -109,7 +109,7 @@ MotionStretchEffect MotionStretchEffect::Apply( RenderableActor renderable )
   Dali::Property::Index uModelProperty = newEffect.GetPropertyIndex( MOTION_STRETCH_MODELVIEW_LASTFRAME );
 
   Constraint constraint = Constraint::New<Matrix>( uModelProperty,
-                                                   Source( renderable, Actor::Property::WorldMatrix ),
+                                                   Source( renderable, Actor::Property::WORLD_MATRIX ),
                                                    EqualToConstraint() );
 
   // and set up constraint.

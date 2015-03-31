@@ -125,7 +125,7 @@ int UtcDaliSliderSignals(void)
   Stage::GetCurrent().Add( slider );
   slider.SetParentOrigin(ParentOrigin::TOP_LEFT);
   slider.SetAnchorPoint(ParentOrigin::TOP_LEFT);
-  slider.SetSize( Stage::GetCurrent().GetSize().x, 20.0f );
+  slider.SetPreferredSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
   slider.SetPosition( 0.0f, 0.0f );
 
   const float MIN_BOUND = 0.0f;
@@ -136,8 +136,8 @@ int UtcDaliSliderSignals(void)
   {
     marks.push_back( MIN_BOUND + ( static_cast<float>(i) / ( NUM_MARKS - 1) ) * ( MAX_BOUND - MIN_BOUND ) );
   }
-  slider.SetProperty( Slider::MARKS_PROPERTY, marks );
-  slider.SetProperty( Slider::MARK_TOLERANCE_PROPERTY, 0.1f );
+  slider.SetProperty( Slider::Property::MARKS, marks );
+  slider.SetProperty( Slider::Property::MARK_TOLERANCE, 0.1f );
 
   slider.ValueChangedSignal().Connect( &OnSliderValueChanged );
   slider.MarkSignal().Connect( &OnSliderMark );

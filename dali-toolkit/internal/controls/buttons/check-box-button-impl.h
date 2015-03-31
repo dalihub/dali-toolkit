@@ -76,6 +76,12 @@ public: // From Button
 
 private: // From Button
 
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnButtonInitialize()
+   */
+  virtual void OnButtonInitialize();
+
   /**
    * @copydoc Toolkit::Internal::Button::OnLabelSet()
    */
@@ -90,13 +96,6 @@ private: // From Button
    * @copydoc Toolkit::Internal::Button::OnDisabled( bool disabled )
    */
   virtual void OnDisabled( bool disabled );
-
-private: // From Control
-
-  /**
-   * @copydoc Dali::Toolkit::Control::OnRelayout()
-   */
-  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 
 private:
 

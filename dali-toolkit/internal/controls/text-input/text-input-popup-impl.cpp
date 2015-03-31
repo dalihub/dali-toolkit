@@ -40,23 +40,23 @@ const Vector2 DEFAULT_POPUP_INDICATOR_OFFSET(0.0f, 60.0f);
 /**
  * Image resource paths
  */
-const std::string POPUP_BACKGROUND( DALI_IMAGE_DIR "popup_bubble_bg.#.png" );
-const std::string POPUP_BACKGROUND_EFFECT( DALI_IMAGE_DIR "popup_bubble_bg_ef.#.png" );
-const std::string POPUP_BACKGROUND_LINE( DALI_IMAGE_DIR "popup_bubble_bg_line.#.png" );
+const char* const POPUP_BACKGROUND = DALI_IMAGE_DIR "popup_bubble_bg.#.png";
+const char* const POPUP_BACKGROUND_EFFECT = DALI_IMAGE_DIR "popup_bubble_bg_ef.#.png";
+const char* const POPUP_BACKGROUND_LINE = DALI_IMAGE_DIR "popup_bubble_bg_line.#.png";
 
-const std::string POPUP_TAIL_BOTTOM( DALI_IMAGE_DIR "popup_bubble_tail_bottom.png" );
-const std::string POPUP_TAIL_BOTTOM_EFFECT( DALI_IMAGE_DIR "popup_bubble_tail_bottom_ef.png" );
-const std::string POPUP_TAIL_BOTTOM_LINE( DALI_IMAGE_DIR "popup_bubble_tail_bottom_line.png" );
-const std::string POPUP_TAIL_TOP( DALI_IMAGE_DIR "popup_bubble_tail_top.png" );
-const std::string POPUP_TAIL_TOP_EFFECT( DALI_IMAGE_DIR "popup_bubble_tail_top_ef.png" );
-const std::string POPUP_TAIL_TOP_LINE( DALI_IMAGE_DIR "popup_bubble_tail_top_line.png" );
+const char* const POPUP_TAIL_BOTTOM = DALI_IMAGE_DIR "popup_bubble_tail_bottom.png";
+const char* const POPUP_TAIL_BOTTOM_EFFECT = DALI_IMAGE_DIR "popup_bubble_tail_bottom_ef.png";
+const char* const POPUP_TAIL_BOTTOM_LINE = DALI_IMAGE_DIR "popup_bubble_tail_bottom_line.png";
+const char* const POPUP_TAIL_TOP = DALI_IMAGE_DIR "popup_bubble_tail_top.png";
+const char* const POPUP_TAIL_TOP_EFFECT = DALI_IMAGE_DIR "popup_bubble_tail_top_ef.png";
+const char* const POPUP_TAIL_TOP_LINE = DALI_IMAGE_DIR "popup_bubble_tail_top_line.png";
 
-const std::string OPTION_ICON_CLIPBOARD( DALI_IMAGE_DIR "copy_paste_icon_clipboard.png" );
-const std::string OPTION_ICON_COPY( DALI_IMAGE_DIR "copy_paste_icon_copy.png" );
-const std::string OPTION_ICON_CUT( DALI_IMAGE_DIR "copy_paste_icon_cut.png" );
-const std::string OPTION_ICON_PASTE( DALI_IMAGE_DIR "copy_paste_icon_paste.png" );
-const std::string OPTION_ICON_SELECT( DALI_IMAGE_DIR "copy_paste_icon_select.png" );
-const std::string OPTION_ICON_SELECT_ALL( DALI_IMAGE_DIR "copy_paste_icon_select_all.png" );
+const char* const OPTION_ICON_CLIPBOARD = DALI_IMAGE_DIR "copy_paste_icon_clipboard.png";
+const char* const OPTION_ICON_COPY = DALI_IMAGE_DIR "copy_paste_icon_copy.png";
+const char* const OPTION_ICON_CUT = DALI_IMAGE_DIR "copy_paste_icon_cut.png";
+const char* const OPTION_ICON_PASTE = DALI_IMAGE_DIR "copy_paste_icon_paste.png";
+const char* const OPTION_ICON_SELECT = DALI_IMAGE_DIR "copy_paste_icon_select.png";
+const char* const OPTION_ICON_SELECT_ALL = DALI_IMAGE_DIR "copy_paste_icon_select_all.png";
 
 /**
  * Constant values for building the GUI
@@ -260,7 +260,6 @@ Toolkit::TextView TextInputPopup::CreateOptionCaption( const std::string& captio
   styledCaption.push_back( MarkupProcessor::StyledText( Text( caption ), style ) );
 
   Toolkit::TextView textView = Toolkit::TextView::New( styledCaption );
-  textView.SetSizePolicy( Toolkit::Control::Fixed, Toolkit::Control::Fixed );
   textView.SetWidthExceedPolicy( Toolkit::TextView::EllipsizeEnd );
   textView.SetHeightExceedPolicy( Toolkit::TextView::EllipsizeEnd );
   textView.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
@@ -294,7 +293,7 @@ void TextInputPopup::CreateBackground()
     mBackgroundEffect.SetAnchorPoint( AnchorPoint::CENTER );
     mBackgroundEffect.SetParentOrigin( ParentOrigin::CENTER );
     mBackgroundEffect.SetName( "text-input-popup-background-effect" );
-    mBackgroundEffect.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+    mBackgroundEffect.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
     mBackgroundEffect.SetZ( 1.0f );
     mBackground.Add( mBackgroundEffect );
 
@@ -303,7 +302,7 @@ void TextInputPopup::CreateBackground()
     mBackgroundLine.SetAnchorPoint( AnchorPoint::CENTER);
     mBackgroundLine.SetParentOrigin( ParentOrigin::CENTER );
     mBackgroundLine.SetName( "text-input-popup-background-effect" );
-    mBackgroundLine.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+    mBackgroundLine.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
     mBackgroundLine.SetColor( mLineColor );
     mBackgroundLine.SetZ( 0.1f );
     mBackgroundEffect.Add( mBackgroundLine );
@@ -329,7 +328,7 @@ void TextInputPopup::CreateTail()
     mTailEffect.SetParentOrigin( ParentOrigin::CENTER );
     mTailEffect.SetAnchorPoint( AnchorPoint::CENTER );
     mTailEffect.SetName( "text-input-popup-tail-effect" );
-    mTailEffect.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+    mTailEffect.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
     mTailEffect.SetZ( 0.1f );
     mTail.Add( mTailEffect );
 
@@ -337,7 +336,7 @@ void TextInputPopup::CreateTail()
     mTailLine = ImageActor::New( tailLine );
     mTailLine.SetParentOrigin( ParentOrigin::CENTER );
     mTailLine.SetAnchorPoint( AnchorPoint::CENTER );
-    mTailLine.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+    mTailLine.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
     mTailLine.SetName( "text-input-popup-tail-line" );
     mTailLine.SetColor( mLineColor );
     mTailLine.SetZ( 0.1f );
@@ -491,7 +490,6 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
 
   // 5. Create a option.
   Toolkit::PushButton option = Toolkit::PushButton::New();
-  option.SetSizePolicy( Toolkit::Control::Fixed, Toolkit::Control::Fixed );
   option.SetParentOrigin( ParentOrigin::TOP_LEFT );
   option.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   option.SetSize( constrainedOptionSize );
@@ -549,8 +547,8 @@ void TextInputPopup::Hide(bool animate)
     if(animate)
     {
       mAnimation = Animation::New( HIDE_POPUP_ANIMATION_DURATION );
-      mAnimation.AnimateTo( Property(mRoot, Actor::Property::Scale), Vector3::ZERO, AlphaFunctions::EaseOut );
-      mAnimation.AnimateTo( Property(mRoot, Actor::Property::ColorAlpha), 0.0f, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRoot, Actor::Property::SCALE), Vector3::ZERO, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRoot, Actor::Property::COLOR_ALPHA), 0.0f, AlphaFunctions::EaseOut );
       mAnimation.Play();
 
       mAnimation.FinishedSignal().Connect( this, &TextInputPopup::OnHideFinished );
@@ -558,8 +556,8 @@ void TextInputPopup::Hide(bool animate)
     }
     else
     {
-      mRoot.SetProperty(Actor::Property::Scale, Vector3::ZERO);
-      mRoot.SetProperty(Actor::Property::ColorAlpha, 0.0f);
+      mRoot.SetProperty(Actor::Property::SCALE, Vector3::ZERO);
+      mRoot.SetProperty(Actor::Property::COLOR_ALPHA, 0.0f);
       mState = StateHidden;
     }
   }
@@ -585,8 +583,8 @@ void TextInputPopup::Show( Actor target, bool animate )
     if(animate)
     {
       mAnimation = Animation::New( SHOW_POPUP_ANIMATION_DURATION );
-      mAnimation.AnimateTo( Property(mRoot, Actor::Property::Scale), Vector3::ONE, AlphaFunctions::EaseOut );
-      mAnimation.AnimateTo( Property(mRoot, Actor::Property::ColorAlpha), 1.0f, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRoot, Actor::Property::SCALE), Vector3::ONE, AlphaFunctions::EaseOut );
+      mAnimation.AnimateTo( Property(mRoot, Actor::Property::COLOR_ALPHA), 1.0f, AlphaFunctions::EaseOut );
       mAnimation.Play();
 
       mAnimation.FinishedSignal().Connect( this, &TextInputPopup::OnShowFinished );
@@ -594,8 +592,8 @@ void TextInputPopup::Show( Actor target, bool animate )
     }
     else
     {
-      mRoot.SetProperty(Actor::Property::Scale, Vector3::ONE);
-      mRoot.SetProperty(Actor::Property::ColorAlpha, 1.0f);
+      mRoot.SetProperty(Actor::Property::SCALE, Vector3::ONE);
+      mRoot.SetProperty(Actor::Property::COLOR_ALPHA, 1.0f);
       mState = StateShown;
     }
   }
@@ -917,4 +915,3 @@ TextInputPopup::VisibilityChangeFinishedSignalType& TextInputPopup::ShowFinished
 } // namespace Toolkit
 
 } // namespace Dali
-

@@ -114,18 +114,23 @@ int UtcDaliToolBarAddControl01(void)
   try
   {
     ImageActor control1 = CreateSolidColorActor( Color::RED );
-    control1.SetSize( 100.f, 100.f );
+    control1.SetPreferredSize( Vector2( 100.f, 100.f ) );
+    control1.SetResizePolicy( FIXED, ALL_DIMENSIONS );
     ImageActor control2 = CreateSolidColorActor( Color::RED );
-    control2.SetSize( 100.f, 100.f );
+    control2.SetPreferredSize( Vector2( 100.f, 100.f ) );
+    control2.SetResizePolicy( FIXED, ALL_DIMENSIONS );
     ImageActor control3 = CreateSolidColorActor( Color::RED );
-    control3.SetSize( 100.f, 100.f );
+    control3.SetPreferredSize( Vector2( 100.f, 100.f ) );
+    control3.SetResizePolicy( FIXED, ALL_DIMENSIONS );
     ImageActor control4 = CreateSolidColorActor( Color::RED );
-    control4.SetSize( 100.f, 100.f );
+    control4.SetPreferredSize( Vector2( 100.f, 100.f ) );
+    control4.SetResizePolicy( FIXED, ALL_DIMENSIONS );
     ImageActor control5 = CreateSolidColorActor( Color::RED );
-    control5.SetSize( 100.f, 100.f );
+    control5.SetPreferredSize( Vector2( 100.f, 100.f ) );
+    control5.SetResizePolicy( FIXED, ALL_DIMENSIONS );
 
     ToolBar toolbar = ToolBar::New();
-    toolbar.SetSize( 600.f, 100.f );
+    toolbar.SetPreferredSize( Vector2( 600.f, 100.f ) );
 
     application.Render();
     application.SendNotification();
@@ -139,11 +144,14 @@ int UtcDaliToolBarAddControl01(void)
     toolbar.AddControl( control5, 0.1f, Alignment::HorizontalRight, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
 
     ImageActor control6 = CreateSolidColorActor( Color::RED );
-    control6.SetSize( 100.f, 100.f );
+    control6.SetPreferredSize( Vector2( 100.f, 100.f ) );
+    control6.SetResizePolicy( FIXED, ALL_DIMENSIONS );
     ImageActor control7 = CreateSolidColorActor( Color::RED );
-    control7.SetSize( 100.f, 100.f );
+    control7.SetPreferredSize( Vector2( 100.f, 100.f ) );
+    control7.SetResizePolicy( FIXED, ALL_DIMENSIONS );
     ImageActor control8 = CreateSolidColorActor( Color::RED );
-    control8.SetSize( 100.f, 100.f );
+    control8.SetPreferredSize( Vector2( 100.f, 100.f ) );
+    control8.SetResizePolicy( FIXED, ALL_DIMENSIONS );
 
     application.Render();
     application.SendNotification();

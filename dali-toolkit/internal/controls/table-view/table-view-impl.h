@@ -40,21 +40,14 @@ class TableView : public Control
 {
 public:
 
-  // Properties
-  enum
-  {
-    TABLEVIEW_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    TABLEVIEW_PROPERTY_END_INDEX = TABLEVIEW_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
-  };
-
   /**
-   * Structure for the layout data
+   * Enum for the size policies of rows and columns
    */
-  struct CellData
+  enum CellSizePolicy
   {
-    // data members
-    Actor actor;
-    Toolkit::TableView::CellPosition position;
+    FILL,       ///< Fill up available space, may have a ratio associated with it
+    FIXED,      ///< A specific fixed width or height
+    FIT         ///< Fit around actors in the row or column
   };
 
   /**
@@ -66,22 +59,22 @@ public:
   /**
    * @copydoc Toolkit::TableView::AddChild
    */
-  bool AddChild( Actor child, Toolkit::TableView::CellPosition position );
+  bool AddChild( Actor& child, const Toolkit::TableView::CellPosition& position );
 
   /**
    * @copydoc Toolkit::TableView::GetChildAt
    */
-  Actor GetChildAt( Toolkit::TableView::CellPosition position );
+  Actor GetChildAt( const Toolkit::TableView::CellPosition& position );
 
   /**
    * @copydoc Toolkit::TableView::RemoveChildAt
    */
-  Actor RemoveChildAt( Toolkit::TableView::CellPosition position );
+  Actor RemoveChildAt( const Toolkit::TableView::CellPosition& position );
 
   /**
    * @copydoc Toolkit::TableView::FindChildPosition
    */
-  bool FindChildPosition( Actor child, Toolkit::TableView::CellPosition& position );
+  bool FindChildPosition( const Actor& child, Toolkit::TableView::CellPosition& positionOut );
 
   /**
    * @copydoc Toolkit::TableView::InsertRow
@@ -134,6 +127,48 @@ public:
   Size GetCellPadding();
 
   /**
+   * @brief Set a row policy
+   *
+   * @param[in] rowIndex The row to set the policy for
+   * @param[in] policy The policy to set
+   */
+  void SetRowPolicy( unsigned int rowIndex, CellSizePolicy policy );
+
+  /**
+   * @brief Querry a row policy
+   *
+   * @param[in] rowIndex The row to querry
+   * @return Return the policy
+   */
+  CellSizePolicy GetRowPolicy( unsigned int rowIndex ) const;
+
+  /**
+   * @brief Set a column policy
+   *
+   * @param[in] columnIndex The column to set the policy for
+   * @param[in] policy The policy to set
+   */
+  void SetColumnPolicy( unsigned int columnIndex, CellSizePolicy policy );
+
+  /**
+   * @brief Querry a column policy
+   *
+   * @param[in] columnIndex The column to querry
+   * @return Return the policy
+   */
+  CellSizePolicy GetColumnPolicy( unsigned int columnIndex ) const;
+
+  /**
+   * @copydoc Toolkit::TableView::SetFixedWidth
+   */
+  void SetFixedWidth( unsigned int columnIndex, float width );
+
+  /**
+   * @copydoc Toolkit::TableView::GetFixedWidth
+   */
+  float GetFixedWidth( unsigned int columnIndex ) const;
+
+  /**
    * @copydoc Toolkit::TableView::SetFixedHeight
    */
   void SetFixedHeight( unsigned int rowIndex, float height );
@@ -154,16 +189,6 @@ public:
   float GetRelativeHeight( unsigned int rowIndex ) const;
 
   /**
-   * @copydoc Toolkit::TableView::SetFixedWidth
-   */
-  void SetFixedWidth( unsigned int columnIndex, float width );
-
-  /**
-   * @copydoc Toolkit::TableView::GetFixedWidth
-   */
-  float GetFixedWidth( unsigned int columnIndex ) const;
-
-  /**
    * @copydoc Toolkit::TableView::SetRelativeWidth
    */
   void SetRelativeWidth( unsigned int columnIndex, float widthPercentage );
@@ -182,6 +207,11 @@ public:
    * @copydoc Toolkit::TableView::GetColumns
    */
   unsigned int GetColumns();
+
+  /**
+   * @copydoc Toolkit::TableView::SetCellAlignment
+   */
+  void SetCellAlignment( Toolkit::TableView::CellPosition position, HorizontalAlignment::Type horizontal, VerticalAlignment::Type vertical );
 
   // Properties
 
@@ -206,17 +236,22 @@ private: // From Control
   /**
    * @copydoc Control::OnControlChildAdd(Actor& child)
    */
-  virtual void OnControlChildAdd(Actor& child);
+  virtual void OnControlChildAdd( Actor& child );
 
   /**
    * @copydoc Control::OnControlChildRemove(Actor& child)
    */
-  virtual void OnControlChildRemove(Actor& child);
+  virtual void OnControlChildRemove( Actor& child );
 
   /**
    * @copydoc Control::OnRelayout
    */
-  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+
+  /**
+   * @copydoc Control::CalculateChildSize
+   */
+  virtual float CalculateChildSize( const Actor& child, Dimension dimension );
 
   /**
    * @copydoc Control::OnInitialize()
@@ -226,9 +261,92 @@ private: // From Control
   /**
    * @copydoc Control::GetNextKeyboardFocusableActor
    */
-  virtual Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
+  virtual Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled );
+
+  /**
+   * @copydoc Control::GetNaturalSize()
+   */
+  virtual Vector3 GetNaturalSize();
+
+  /**
+   * @copydoc Control::RelayoutDependentOnChildren()
+   */
+  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS );
+
+  /**
+   * @copydoc Control::OnCalculateRelayoutSize
+   */
+  virtual void OnCalculateRelayoutSize( Dimension dimension );
+
+  /**
+   * @copydoc Control::OnLayoutNegotiated
+   */
+  virtual void OnLayoutNegotiated( float size, Dimension dimension );
 
 private: // Implementation
+
+  /**
+   * Struct to hold data for rows and columns
+   *
+   * If sizePolicy is FIXED then size is the absolute size to use.
+   * If sizePolicy is FIT or FILL then size is the calculated value of size.
+   */
+  struct RowColumnData
+  {
+    /**
+     * Default constructor
+     */
+    RowColumnData()
+    : size( 0.0f ),
+      fillRatio( 0.0f ),
+      sizePolicy( FILL ),
+      userFillRatio( false )
+    {
+    }
+
+    /**
+     * Constructor
+     *
+     * @param[in] newSize The size to set for this data
+     * @param[in] newSizePolicy The policy used to interpret the size value
+     */
+    RowColumnData( float newSize, float newFillRatio, CellSizePolicy newSizePolicy, bool newUserFillRatio )
+    : size( newSize ),
+      fillRatio( newFillRatio ),
+      sizePolicy( newSizePolicy ),
+      userFillRatio( newUserFillRatio )
+    {
+    }
+
+    float size;                       ///< Set or calculated size
+    float fillRatio;                  ///< Ratio to fill remaining space
+    CellSizePolicy sizePolicy;        ///< The size policy used to interpret the size value
+    bool userFillRatio : 1;           ///< FillRatio was set by user
+  };
+
+  typedef Dali::Vector<RowColumnData> RowColumnArray;
+
+public:
+
+  /**
+   * Structure for the layout data
+   */
+  struct CellData
+  {
+    CellData()
+    : horizontalAlignment( HorizontalAlignment::LEFT ),
+      verticalAlignment( VerticalAlignment::TOP )
+    {
+    }
+
+    // data members
+    Dali::Actor actor;
+    Toolkit::TableView::CellPosition position;
+    HorizontalAlignment::Type horizontalAlignment;
+    VerticalAlignment::Type verticalAlignment;
+  };
+
+private:
 
   /**
    * Construct a new TableView.
@@ -266,14 +384,50 @@ private: // Implementation
    * @param child actor to remove
    * @return true if the actor was found
    */
-  bool RemoveAllInstances( Actor child );
+  bool RemoveAllInstances( const Actor& child );
 
   /**
-   * Helper to update relative sizes
-   * @param fixedHeightsTotal sum of the fixed height rows
-   * @param fixedWidthsTotal sum of the fixed width columns
+   * @brief Compute relative sizes for an array
+   *
+   * @param[in] data The RowColumn data to compute the relative sizes for
    */
-  void UpdateRelativeSizes( float& fixedHeightsTotal, float& fixedWidthsTotal );
+  void ComputeRelativeSizes( RowColumnArray& data );
+
+  /**
+   * @brief Calculate the total fixed sizes for a row or column
+   *
+   * @param[in] data The row or column data to process
+   */
+  float CalculateTotalFixedSize( const RowColumnArray& data );
+
+  /**
+   * @brief Calculate the fixed sizes for a row or column
+   *
+   * @param[in] data The row or column data to process
+   * @param[in] dimension The dimension being calculated: row == HEIGHT, column == WIDTH
+   */
+  void CalculateFixedSizes( RowColumnArray& data, Dimension dimension );
+
+  /**
+   * @brief Calculate the value of the relative sizes
+   *
+   * @param[in] data The row or column data to process
+   * @param[in] size The size of the table view in that dimension
+   */
+  void CalculateRelativeSizes( RowColumnArray& data, float size );
+
+  /**
+   * @brief Search for a FIT cell in the array
+   *
+   * @param[in] data The row or column data to process
+   * @return Return if a FIT cell was found or not
+   */
+  bool FindFit( const RowColumnArray& data );
+
+  /**
+   * @brief Calculate row and column data when it is dirty
+   */
+  void CalculateRowColumnData();
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -308,11 +462,10 @@ private: // scripting support
 
   /**
    * Generate the map type property value from the size vectors.
-   * @param[in] fixedSize The vector of fixed heights or widths.
-   * @param[in] relativeSize The vector of relative heights or widths.
+   * @param[in] data The array of row or column data
    * @param[out] map The property value.
    */
-  void GetMapPropertyValue( const std::vector<float>& fixedSize, const std::vector<float>& relativeSize, Property::Map& map );
+  void GetMapPropertyValue( const RowColumnArray& data, Property::Map& map );
 
 
   /**
@@ -357,15 +510,15 @@ private:
 
 private: // Data
 
-  Array2d<CellData> mCellData;
-  Array2d<Size> mRelativeSizes;
-  std::vector<float> mFixedHeights;
-  std::vector<float> mRelativeHeights;
-  std::vector<float> mFixedWidths;
-  std::vector<float> mRelativeWidths;
-  Size mPadding;
-  bool mLayoutingChild;
+  Array2d<CellData> mCellData;                ///< Data for each cell: Actor, alignment settings etc
 
+  RowColumnArray mRowData;       ///< Data for each row
+  RowColumnArray mColumnData;    ///< Data for each column
+  Size mFixedTotals;             ///< Accumulated totals for fixed width and height
+
+  Size mPadding;                 ///< Padding to apply to each cell
+  bool mLayoutingChild;          ///< Can't be a bitfield due to Relayouting lock
+  bool mRowColumnDirty : 1;       ///< Flag to indicate the row column data is dirty
 };
 
 } // namespace Internal

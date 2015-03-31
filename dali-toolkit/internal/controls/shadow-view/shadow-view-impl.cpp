@@ -25,6 +25,7 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/integration-api/debug.h>
 
@@ -69,8 +70,8 @@ BaseHandle Create()
   return Toolkit::ShadowView::New();
 }
 
-TypeRegistration mType( typeid(Toolkit::ShadowView), typeid(Toolkit::Control), Create );
-
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ShadowView, Toolkit::Control, Create )
+DALI_TYPE_REGISTRATION_END()
 
 const float BLUR_STRENGTH_DEFAULT = 1.0f;
 
@@ -79,12 +80,11 @@ const float DEFAULT_FIELD_OF_VIEW_RADIANS = Math::PI / 4.0f; // 45 degrees
 
 const Vector4 DEFAULT_SHADOW_COLOR = Vector4(0.2f, 0.2f, 0.2f, 0.8f);
 
-const std::string SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME( "uLightCameraProjectionMatrix" );
-const std::string SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME( "uLightCameraViewMatrix" );
-const std::string SHADER_SHADOW_COLOR_PROPERTY_NAME( "uShadowColor" );
-
-const std::string BLUR_STRENGTH_PROPERTY_NAME( "BlurStrengthProperty" );
-const std::string SHADOW_COLOR_PROPERTY_NAME( "ShadowColorProperty" );
+const char* const SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME = "uLightCameraProjectionMatrix";
+const char* const SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME = "uLightCameraViewMatrix";
+const char* const SHADER_SHADOW_COLOR_PROPERTY_NAME = "uShadowColor";
+const char* const BLUR_STRENGTH_PROPERTY_NAME = "BlurStrengthProperty";
+const char* const SHADOW_COLOR_PROPERTY_NAME = "ShadowColorProperty";
 
 const char* const RENDER_SHADOW_VERTEX_SOURCE =
   " uniform mediump mat4 uLightCameraProjectionMatrix;\n"
@@ -182,9 +182,9 @@ void ShadowView::SetShadowPlane(Actor shadowPlane)
 
   ConstrainCamera();
 
-  mShadowPlane.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+  mShadowPlane.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
 
-  mBlurRootActor.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+  mBlurRootActor.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
 }
 
 void ShadowView::SetPointLight(Actor pointLight)
@@ -239,7 +239,8 @@ void ShadowView::OnInitialize()
 {
   // root actor to parent all user added actors. Used as source actor for shadow render task.
   mChildrenRoot.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-  mChildrenRoot.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+  mChildrenRoot.SetRelayoutEnabled( true );
+  mChildrenRoot.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
 
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   mCameraActor = CameraActor::New(stageSize);
@@ -249,7 +250,7 @@ void ShadowView::OnInitialize()
   // Target is constrained to point at the shadow plane origin
   mCameraActor.SetNearClippingPlane( 1.0f );
   mCameraActor.SetType( Dali::Camera::FREE_LOOK ); // Camera orientation constrained to point at shadow plane world position
-  mCameraActor.SetRotation(Radian(Degree(180)), Vector3::YAXIS);
+  mCameraActor.SetOrientation(Radian(Degree(180)), Vector3::YAXIS);
   mCameraActor.SetPosition(DEFAULT_LIGHT_POSITION);
 
   mShadowRenderShader = ShaderEffect::New( RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE,
@@ -275,9 +276,10 @@ void ShadowView::OnInitialize()
 
   mBlurRootActor = Actor::New();
 
+  mBlurRootActor.SetRelayoutEnabled( true );
   // Turn off inheritance to ensure filter renders properly
   mBlurRootActor.SetPositionInheritanceMode(USE_PARENT_POSITION);
-  mBlurRootActor.SetInheritRotation(false);
+  mBlurRootActor.SetInheritOrientation(false);
   mBlurRootActor.SetInheritScale(false);
   mBlurRootActor.SetColorMode(USE_OWN_COLOR);
 
@@ -315,15 +317,15 @@ void ShadowView::ConstrainCamera()
     // is under control of application, can't use transform inheritance)
 
     Constraint cameraOrientationConstraint =
-      Constraint::New<Quaternion> ( Actor::Property::Rotation,
-                                    Source( mShadowPlane, Actor::Property::WorldPosition ),
-                                    Source( mPointLight,  Actor::Property::WorldPosition ),
-                                    Source( mShadowPlane, Actor::Property::WorldRotation ),
+      Constraint::New<Quaternion> ( Actor::Property::ORIENTATION,
+                                    Source( mShadowPlane, Actor::Property::WORLD_POSITION ),
+                                    Source( mPointLight,  Actor::Property::WORLD_POSITION ),
+                                    Source( mShadowPlane, Actor::Property::WORLD_ORIENTATION ),
                                     &LookAt );
 
     mCameraActor.ApplyConstraint( cameraOrientationConstraint );
 
-    Constraint pointLightPositionConstraint = Constraint::New<Vector3>( Actor::Property::Position, Source( mPointLight, Actor::Property::WorldPosition ), EqualToConstraint() );
+    Constraint pointLightPositionConstraint = Constraint::New<Vector3>( Actor::Property::POSITION, Source( mPointLight, Actor::Property::WORLD_POSITION ), EqualToConstraint() );
 
     mCameraActor.ApplyConstraint( pointLightPositionConstraint );
   }
@@ -371,8 +373,8 @@ void ShadowView::SetShaderConstants()
   Property::Index lightCameraProjectionMatrixPropertyIndex = mShadowRenderShader.GetPropertyIndex(SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME);
   Property::Index lightCameraViewMatrixPropertyIndex = mShadowRenderShader.GetPropertyIndex(SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME);
 
-  Constraint projectionMatrixConstraint = Constraint::New<Dali::Matrix>( lightCameraProjectionMatrixPropertyIndex, Source( mCameraActor, CameraActor::Property::ProjectionMatrix ), EqualToConstraintMatrix());
-  Constraint viewMatrixConstraint = Constraint::New<Dali::Matrix>( lightCameraViewMatrixPropertyIndex, Source( mCameraActor, CameraActor::Property::ViewMatrix ), EqualToConstraintMatrix());
+  Constraint projectionMatrixConstraint = Constraint::New<Dali::Matrix>( lightCameraProjectionMatrixPropertyIndex, Source( mCameraActor, CameraActor::Property::PROJECTION_MATRIX ), EqualToConstraintMatrix());
+  Constraint viewMatrixConstraint = Constraint::New<Dali::Matrix>( lightCameraViewMatrixPropertyIndex, Source( mCameraActor, CameraActor::Property::VIEW_MATRIX ), EqualToConstraintMatrix());
 
   mShadowRenderShader.ApplyConstraint(projectionMatrixConstraint);
   mShadowRenderShader.ApplyConstraint(viewMatrixConstraint);

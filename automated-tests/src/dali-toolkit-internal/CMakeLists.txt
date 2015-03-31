@@ -12,7 +12,6 @@ SET(TC_SOURCES
  utc-Dali-TextView-Processor-Types.cpp
  utc-Dali-TextView-Processor.cpp
  utc-Dali-TextView-Relayout-Utilities.cpp
- utc-Dali-TextView.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)

@@ -200,10 +200,10 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
     if (GetPositionConstraint(itemId, positionConstraint))
     {
       WrappedVector3Constraint wrapped(positionConstraint, itemId);
-      Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
+      Constraint constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
                                                         Source( scrollPositionObject, scrollPositionProperty ),
                                                         ParentSource( scrollSpeedProperty ),
-                                                        ParentSource( Actor::Property::Size ),
+                                                        ParentSource( Actor::Property::SIZE ),
                                                         wrapped );
       constraint.SetApplyTime(durationSeconds);
       constraint.SetAlphaFunction(mAlphaFunction);
@@ -215,10 +215,10 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
     {
       WrappedQuaternionConstraint wrapped(rotationConstraint, itemId);
 
-      Constraint constraint = Constraint::New<Quaternion>( Actor::Property::Rotation,
+      Constraint constraint = Constraint::New<Quaternion>( Actor::Property::ORIENTATION,
                                                            Source( scrollPositionObject, scrollPositionProperty ),
                                                            ParentSource( scrollSpeedProperty ),
-                                                           ParentSource( Actor::Property::Size ),
+                                                           ParentSource( Actor::Property::SIZE ),
                                                            wrapped );
       constraint.SetApplyTime(durationSeconds);
       constraint.SetAlphaFunction(mAlphaFunction);
@@ -231,10 +231,10 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
     {
       WrappedVector3Constraint wrapped(scaleConstraint, itemId);
 
-      Constraint constraint = Constraint::New<Vector3>( Actor::Property::Scale,
+      Constraint constraint = Constraint::New<Vector3>( Actor::Property::SCALE,
                                                         Source( scrollPositionObject, scrollPositionProperty ),
                                                         ParentSource( scrollSpeedProperty ),
-                                                        ParentSource( Actor::Property::Size ),
+                                                        ParentSource( Actor::Property::SIZE ),
                                                         wrapped );
       constraint.SetApplyTime(durationSeconds);
       constraint.SetAlphaFunction(mAlphaFunction);
@@ -247,10 +247,10 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
     {
       WrappedVector4Constraint wrapped(colorConstraint, itemId);
 
-      Constraint constraint = Constraint::New<Vector4>( Actor::Property::Color,
+      Constraint constraint = Constraint::New<Vector4>( Actor::Property::COLOR,
                                                         Source( scrollPositionObject, scrollPositionProperty ),
                                                         ParentSource( scrollSpeedProperty ),
-                                                        ParentSource( Actor::Property::Size ),
+                                                        ParentSource( Actor::Property::SIZE ),
                                                         wrapped );
 
       constraint.SetApplyTime(durationSeconds);
@@ -265,10 +265,10 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
     {
       WrappedBoolConstraint wrapped(visibilityConstraint, itemId);
 
-      Constraint constraint = Constraint::New<bool>( Actor::Property::Visible,
+      Constraint constraint = Constraint::New<bool>( Actor::Property::VISIBLE,
                                                      Source( scrollPositionObject, scrollPositionProperty ),
                                                      ParentSource( scrollSpeedProperty ),
-                                                     ParentSource( Actor::Property::Size ),
+                                                     ParentSource( Actor::Property::SIZE ),
                                                      wrapped );
 
       constraint.SetApplyTime(durationSeconds);

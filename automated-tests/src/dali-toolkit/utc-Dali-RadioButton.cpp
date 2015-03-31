@@ -154,19 +154,19 @@ int UtcDaliRadioButtonSelectedProperty(void)
   radioButton.SetPosition( 0.0f, 0.0f );
 
   // Default selected
-  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
+  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::Property::SELECTED ) == false );
 
   // Setting false selected
-  radioButton.SetProperty( Button::PROPERTY_SELECTED, false );
-  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
+  radioButton.SetProperty( Button::Property::SELECTED, false );
+  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::Property::SELECTED ) == false );
 
   // Setting true selected
-  radioButton.SetProperty( Button::PROPERTY_SELECTED, true );
-  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_SELECTED ) == true );
+  radioButton.SetProperty( Button::Property::SELECTED, true );
+  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::Property::SELECTED ) == true );
 
   // Setting false again
-  radioButton.SetProperty( Button::PROPERTY_SELECTED, false );
-  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
+  radioButton.SetProperty( Button::Property::SELECTED, false );
+  DALI_TEST_CHECK( radioButton.GetProperty<bool>( Button::Property::SELECTED ) == false );
 
   // Test selecting radio buttons
   RadioButton radioButton2 = RadioButton::New( "label" );
@@ -193,8 +193,8 @@ int UtcDaliRadioButtonSelectedProperty(void)
   application.Render();
 
   // Simulate touch events
-  DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
-  DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
+  DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::Property::SELECTED ) == false );
+  DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::Property::SELECTED ) == false );
 
   // Select first radio
   {
@@ -213,8 +213,8 @@ int UtcDaliRadioButtonSelectedProperty(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_SELECTED ) == true );
-    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
+    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::Property::SELECTED ) == true );
+    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::Property::SELECTED ) == false );
   }
 
   // Select an already selected radio
@@ -234,8 +234,8 @@ int UtcDaliRadioButtonSelectedProperty(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_SELECTED ) == true );
-    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
+    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::Property::SELECTED ) == true );
+    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::Property::SELECTED ) == false );
   }
 
   // Select second radio
@@ -255,8 +255,8 @@ int UtcDaliRadioButtonSelectedProperty(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
-    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_SELECTED ) == true );
+    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::Property::SELECTED ) == false );
+    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::Property::SELECTED ) == true );
   }
 
   // Select outside radio group
@@ -276,8 +276,8 @@ int UtcDaliRadioButtonSelectedProperty(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::PROPERTY_SELECTED ) == false );
-    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::PROPERTY_SELECTED ) == true );
+    DALI_TEST_CHECK( radioButton2.GetProperty<bool>( Button::Property::SELECTED ) == false );
+    DALI_TEST_CHECK( radioButton3.GetProperty<bool>( Button::Property::SELECTED ) == true );
   }
 
   END_TEST;

@@ -51,8 +51,8 @@
  * $ dali-demo
  * $
  * $ ...
- * $ I/DALI ( 5692): slp-logging.cpp: LogMessage(40) > Update , min 0.59 ms, max 6.43 ms, total (3.4 secs), avg 1.26 ms
- * $ I/DALI ( 5692): slp-logging.cpp: LogMessage(40) > Render , min 1.67 ms, max 5.01 ms, total (4.5 secs), avg 3.71 ms
+ * $ I/DALI ( 5692): tizen-logging.cpp: LogMessage(40) > Update , min 0.59 ms, max 6.43 ms, total (3.4 secs), avg 1.26 ms
+ * $ I/DALI ( 5692): tizen-logging.cpp: LogMessage(40) > Render , min 1.67 ms, max 5.01 ms, total (4.5 secs), avg 3.71 ms
  * \endcode
  *
  * If nothing is animating Dali will enter a paused state to save power. At this

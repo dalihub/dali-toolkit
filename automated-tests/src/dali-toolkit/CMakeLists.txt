@@ -24,12 +24,10 @@ SET(TC_SOURCES
    utc-Dali-JsonParser.cpp
    utc-Dali-KeyInputFocusManager.cpp
    utc-Dali-NavigationControl.cpp
-   utc-Dali-NavigationLayout.cpp
    utc-Dali-OverlayEffect.cpp
    utc-Dali-Page.cpp
    utc-Dali-PageTurnEffect.cpp
    utc-Dali-PageTurnView.cpp
-   utc-Dali-RollLayout.cpp
    utc-Dali-ScrollView.cpp
    utc-Dali-ShadowView.cpp
    utc-Dali-ShearEffect.cpp
@@ -65,8 +63,6 @@ SET(TC_SOURCES
    utc-Dali-StyleManager.cpp
    utc-Dali-SuperBlurView.cpp
    utc-Dali-SwirlEffect.cpp
-   utc-Dali-TextInput.cpp
-   utc-Dali-TextView.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)

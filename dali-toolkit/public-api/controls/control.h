@@ -65,37 +65,27 @@ class DALI_IMPORT_API Control : public CustomActor
 {
 public:
 
-  /// @name Properties
-  /** @{ */
-  static const Dali::Property::Index PROPERTY_BACKGROUND_COLOR;    ///< name "background-color",        @see SetBackgroundColor,        type VECTOR4
-  static const Dali::Property::Index PROPERTY_BACKGROUND;          ///< name "background",              @see SetBackground,             type MAP
-  static const Dali::Property::Index PROPERTY_WIDTH_POLICY;        ///< name "width-policy",            @see SetSizePolicy,             type STRING
-  static const Dali::Property::Index PROPERTY_HEIGHT_POLICY;       ///< name "height-policy",           @see SetSizePolicy,             type STRING
-  static const Dali::Property::Index PROPERTY_MINIMUM_SIZE;        ///< name "minimum-size",            @see SetMinimumSize,            type VECTOR3
-  static const Dali::Property::Index PROPERTY_MAXIMUM_SIZE;        ///< name "maximum-size",            @see SetMaximumSize,            type VECTOR3
-  static const Dali::Property::Index PROPERTY_KEY_INPUT_FOCUS;     ///< name "key-input-focus",         @see SetKeyInputFocus,          type BOOLEAN
-  /** @} */
-
   /**
-   * @brief Describes how a control could be resized.
+   * @brief The start and end property ranges for control.
    */
-  enum SizePolicy
+  enum PropertyRange
   {
-    Fixed,    ///< Size can't grow or shrink.
-    Minimum,  ///< Size can grow but shrink up to a minimum level.
-    Maximum,  ///< Size can shrink but grow up to a maximum value.
-    Range,    ///< Size can grow or shrink between a minimum and a maximum values.
-    Flexible, ///< Size can grow or shrink with no limits.
+    PROPERTY_START_INDEX = PROPERTY_REGISTRATION_START_INDEX,        ///< Start index is used by the property registration macro.
+    CONTROL_PROPERTY_START_INDEX = PROPERTY_START_INDEX,             ///< Start index of Control properties.
+    CONTROL_PROPERTY_END_INDEX = CONTROL_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices.
   };
 
   /**
-   * @brief Describes what a control should do when a contained actor/control exceeds the boundary of the control.
+   * @brief An enumeration of properties belonging to the Control class.
    */
-  enum ExceedPolicy
+  struct Property
   {
-    Crop,   ///< Control's contents will be cropped.
-    Shrink, ///< Control's contents will be shrunk.
-    Scroll  ///< Control's contents will be added to a scroll.
+    enum
+    {
+      BACKGROUND_COLOR = PROPERTY_START_INDEX, ///< name "background-color", @see SetBackgroundColor, type Vector4
+      BACKGROUND_IMAGE,                        ///< name "background-image", @see SetBackgroundImage, type Map
+      KEY_INPUT_FOCUS,                         ///< name "key-input-focus",  @see SetKeyInputFocus,   type bool
+    };
   };
 
   /**
@@ -183,79 +173,6 @@ public:
    * @return The implementation.
    */
   const Internal::Control& GetImplementation() const;
-
-  // Size Negotiation
-
-  /**
-   * @brief Sets the size policies for the width and height dimensions.
-   *
-   * @param[in] widthPolicy Size policy for the width dimension.
-   * @param[in] heightPolicy Size policy for the height dimension.
-   */
-  void SetSizePolicy( SizePolicy widthPolicy, SizePolicy heightPolicy );
-
-  /**
-   * @brief Retrieves the size policies for the width and height dimensions.
-   *
-   * @param[out] widthPolicy Width's size policy.
-   * @param[out] heightPolicy Height's size policy.
-   */
-  void GetSizePolicy( SizePolicy& widthPolicy, SizePolicy& heightPolicy ) const;
-
-  /**
-   * @brief Sets the minimum size for the control.
-   *
-   * @param[in] size The minimum size.
-   */
-  void SetMinimumSize( const Vector3& size );
-
-  /**
-   * @brief Retrieves the minimum size.
-   *
-   * @return The minimum size.
-   */
-  const Vector3& GetMinimumSize() const;
-
-  /**
-   * @brief Sets the maximum size.
-   *
-   * @param[in] size The maximum size.
-   */
-  void SetMaximumSize( const Vector3& size );
-
-  /**
-   * @brief Retrieves the maximum size.
-   *
-   * @return The maximum size.
-   */
-  const Vector3& GetMaximumSize() const;
-
-  /**
-   * @brief Works out the natural size.
-   *
-   * Natural size is the control's size with any restriction.
-   *
-   * @return The natural size.
-   */
-  Vector3 GetNaturalSize();
-
-  /**
-   * @brief Works out the control's height for a given width.
-   *
-   * @param[in] width The control's width.
-   *
-   * @return The control's height for the given width.
-   */
-  float GetHeightForWidth( float width );
-
-  /**
-   * @brief Works out the control's width for a given height.
-   *
-   * @param[in] height The control's height.
-   *
-   * @return The control's width for the given height.
-   */
-  float GetWidthForHeight( float height );
 
   // Key Input
 
@@ -350,7 +267,7 @@ public:
    *
    * @param[in] image The image to set as the background.
    */
-  void SetBackground( Image image );
+  void SetBackgroundImage( Image image );
 
   /**
    * @brief Clears the background.

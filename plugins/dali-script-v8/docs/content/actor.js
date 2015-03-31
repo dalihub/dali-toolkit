@@ -119,7 +119,7 @@ function OnPressed( actor, touchEvent )
   
   var anim = new dali.Animation( 4 );
   var rotation = new dali.Rotation( 90, 0, 0 ); // pitch, yaw, roll
-  anim.animateBy( actor, "rotation", rotation );
+  anim.animateBy( actor, "orientation", rotation );
   anim.play();
   return true;
 }
@@ -196,8 +196,8 @@ See
  worldPositionX         |FLOAT       | &#10008;     | &#10008;
  worldPositionY         |FLOAT       | &#10008;     | &#10008;
  worldPositionZ         |FLOAT       | &#10008;     | &#10008;
- rotation               |ROTATION    | &#10004;     | &#10004;
- worldRotation          |ROTATION    | &#10008;     | &#10008;
+ orientation            |ROTATION    | &#10004;     | &#10004;
+ worldOrientation       |ROTATION    | &#10008;     | &#10008;
  scale                  |VECTOR3     | &#10004;     | &#10004;
  scaleX                 |FLOAT       | &#10004;     | &#10004;
  scaleY                 |FLOAT       | &#10004;     | &#10004;
@@ -214,7 +214,7 @@ See
  name                   |STRING      | &#10004;     | &#10008;
  sensitive              |BOOLEAN     | &#10004;     | &#10008;
  leaveRequired          |BOOLEAN     | &#10004;     | &#10008;
- inheritRotation        |BOOLEAN     | &#10004;     | &#10008;
+ inheritOrientation     |BOOLEAN     | &#10004;     | &#10008;
  inheritScale           |BOOLEAN     | &#10004;     | &#10008;
  colorMode              |NUMBER      | &#10004;     | &#10008;
  positionInheritance    |NUMBER      | &#10004;     | &#10008;
@@ -381,19 +381,19 @@ WORLD_POSITION_Z
 
 
 /**
- * Actors rotation
- * @property rotation
- * @type dali Rotation object
+ * Actors orientation
+ * @property orientation
+ * @type dali orientation object
  */
-ROTATION
+ORIENTATION
 
 
 /**
- * Actors world-rotation
- * @property worldRotation
- * @type dali Rotation object ( read only)
+ * Actors world-orientation
+ * @property worldOrientation
+ * @type dali Orientation object ( read only)
  */
-WORLD_ROTATION
+WORLD_ORIENTATION
 
 /**
  * Actors scale
@@ -521,10 +521,10 @@ LEAVE_REQUIRED
 /**
  * Set whether a child actor inherits it's parent's orientation.
  * @type Boolean
- * @property inheritRotation
+ * @property inheritOrientation
  * @default true
  */
-INHERIT_ROTATION,
+INHERIT_ORIENTATION,
 
 
 /**

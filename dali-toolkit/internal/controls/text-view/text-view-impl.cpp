@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
@@ -38,26 +39,11 @@ namespace Dali
 namespace Toolkit
 {
 
-const Property::Index TextView::PROPERTY_MARKUP_ENABLED( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX );
-const Property::Index TextView::PROPERTY_TEXT( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 1 );
-const Property::Index TextView::PROPERTY_MULTILINE_POLICY( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 2 );
-const Property::Index TextView::PROPERTY_WIDTH_EXCEED_POLICY( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 3 );
-const Property::Index TextView::PROPERTY_HEIGHT_EXCEED_POLICY( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 4 );
-const Property::Index TextView::PROPERTY_LINE_JUSTIFICATION( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 5 );
-const Property::Index TextView::PROPERTY_FADE_BOUNDARY( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 6 );
-const Property::Index TextView::PROPERTY_LINE_HEIGHT_OFFSET( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 7 );
-const Property::Index TextView::PROPERTY_HORIZONTAL_ALIGNMENT( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 8 );
-const Property::Index TextView::PROPERTY_VERTICAL_ALIGNMENT( Internal::TextView::TEXTVIEW_PROPERTY_START_INDEX + 9 );
-
 namespace Internal
 {
 
 namespace
 {
-
-// Signals
-
-const char* const SIGNAL_TEXT_SCROLLED = "scrolled";
 
 const char* MULTILINE_POLICY_NAME[] = {"SplitByNewLineChar", "SplitByWord", "SplitByChar"};
 const char* EXCEED_POLICY_NAME[] = {"Original", "Truncate", "Fade", "Split","ShrinkToFit","EllipsizeEnd"};
@@ -66,26 +52,29 @@ const char* LINE_JUSTIFICATION_NAME[] = {"Left","Center","Right","Justified"};
 // Currently on desktop machines 2k x 2k is the maximum frame buffer size, on target is 4k x 4k.
 const float MAX_OFFSCREEN_RENDERING_SIZE = 2048.f;
 
-//Type Registration
+// Type Registration
 BaseHandle Create()
 {
   return Toolkit::TextView::New();
 }
 
-TypeRegistration typeRegistration( typeid( Toolkit::TextView ), typeid( Toolkit::Control ), Create );
+// Setup properties, signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextView, Toolkit::Control, Create );
 
-SignalConnectorType signalConnector1( typeRegistration, SIGNAL_TEXT_SCROLLED , &TextView::DoConnectSignal );
+DALI_PROPERTY_REGISTRATION( TextView, "markup-enabled",       BOOLEAN, MARKUP_ENABLED       )
+DALI_PROPERTY_REGISTRATION( TextView, "text",                 STRING,  TEXT                 )
+DALI_PROPERTY_REGISTRATION( TextView, "multiline-policy",     STRING,  MULTILINE_POLICY     )
+DALI_PROPERTY_REGISTRATION( TextView, "width-exceed-policy",  STRING,  WIDTH_EXCEED_POLICY  )
+DALI_PROPERTY_REGISTRATION( TextView, "height-exceed-policy", STRING,  HEIGHT_EXCEED_POLICY )
+DALI_PROPERTY_REGISTRATION( TextView, "line-justification",   STRING,  LINE_JUSTIFICATION   )
+DALI_PROPERTY_REGISTRATION( TextView, "fade-boundary",        VECTOR4, FADE_BOUNDARY        )
+DALI_PROPERTY_REGISTRATION( TextView, "line-height-offset",   FLOAT,   LINE_HEIGHT_OFFSET   )
+DALI_PROPERTY_REGISTRATION( TextView, "horizontal-alignment", STRING,  HORIZONTAL_ALIGNMENT )
+DALI_PROPERTY_REGISTRATION( TextView, "vertical-alignment",   STRING,  VERTICAL_ALIGNMENT   )
 
-PropertyRegistration property1( typeRegistration,  "markup-enabled",       Toolkit::TextView::PROPERTY_MARKUP_ENABLED,       Property::BOOLEAN, &TextView::SetProperty, &TextView::GetProperty );
-PropertyRegistration property2( typeRegistration,  "text",                 Toolkit::TextView::PROPERTY_TEXT,                 Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
-PropertyRegistration property3( typeRegistration,  "multiline-policy",     Toolkit::TextView::PROPERTY_MULTILINE_POLICY,     Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
-PropertyRegistration property4( typeRegistration,  "width-exceed-policy",  Toolkit::TextView::PROPERTY_WIDTH_EXCEED_POLICY,  Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
-PropertyRegistration property5( typeRegistration,  "height-exceed-policy", Toolkit::TextView::PROPERTY_HEIGHT_EXCEED_POLICY, Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
-PropertyRegistration property6( typeRegistration,  "line-justification",   Toolkit::TextView::PROPERTY_LINE_JUSTIFICATION,   Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
-PropertyRegistration property7( typeRegistration,  "fade-boundary",        Toolkit::TextView::PROPERTY_FADE_BOUNDARY,        Property::VECTOR4, &TextView::SetProperty, &TextView::GetProperty );
-PropertyRegistration property8( typeRegistration, "line-height-offset",    Toolkit::TextView::PROPERTY_LINE_HEIGHT_OFFSET,   Property::FLOAT,   &TextView::SetProperty, &TextView::GetProperty );
-PropertyRegistration property9( typeRegistration, "horizontal-alignment",  Toolkit::TextView::PROPERTY_HORIZONTAL_ALIGNMENT, Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
-PropertyRegistration property10( typeRegistration, "vertical-alignment",   Toolkit::TextView::PROPERTY_VERTICAL_ALIGNMENT,   Property::STRING,  &TextView::SetProperty, &TextView::GetProperty );
+DALI_SIGNAL_REGISTRATION(   TextView, "scrolled",                      SIGNAL_TEXT_SCROLLED )
+
+DALI_TYPE_REGISTRATION_END()
 
 /**
  * Whether the text-view-processor operation sets, inserts, replaces, removes text.
@@ -774,7 +763,7 @@ void TextView::SetSnapshotModeEnabled( bool enable )
 
       mOffscreenRootActor.SetColorMode( USE_OWN_COLOR );
       mOffscreenRootActor.SetPositionInheritanceMode( DONT_INHERIT_POSITION );
-      mOffscreenRootActor.SetInheritRotation( false );
+      mOffscreenRootActor.SetInheritOrientation( false );
       mOffscreenRootActor.SetInheritScale( false );
       mOffscreenRootActor.SetDepthTestDisabled( true );
 
@@ -1210,6 +1199,8 @@ float TextView::GetWidthForHeight( float height )
 
 void TextView::OnInitialize()
 {
+  // The actor handle needs to be inialised for this to work
+  Self().SetResizePolicy( USE_NATURAL_SIZE, ALL_DIMENSIONS );
 }
 
 
@@ -1233,7 +1224,7 @@ void TextView::OnControlSizeSet( const Vector3& size )
   }
 }
 
-void TextView::OnRelayout( const Vector2& size, ActorSizeContainer& container )
+void TextView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
@@ -1505,7 +1496,7 @@ void TextView::ProcessSnapshot( const Size& textViewSize )
           mOffscreenCameraActor = CameraActor::New();
           mOffscreenCameraActor.SetParentOrigin( ParentOrigin::CENTER );
           mOffscreenCameraActor.SetAnchorPoint( AnchorPoint::CENTER );
-          mOffscreenCameraActor.SetRotation(Degree(180.f), Vector3::YAXIS);
+          mOffscreenCameraActor.SetOrientation(Degree(180.f), Vector3::YAXIS);
 
           mOffscreenCameraActor.SetType( Dali::Camera::FREE_LOOK ); // Inherits position from the offscreen root actor.
 
@@ -2102,7 +2093,7 @@ void TextView::OnAlignmentPropertySet( Property::Index propertyIndex, Property::
 {
   std::string value( propertyValue.Get<std::string>() );
 
-  if( propertyIndex == Toolkit::TextView::PROPERTY_HORIZONTAL_ALIGNMENT )
+  if( propertyIndex == Toolkit::TextView::Property::HORIZONTAL_ALIGNMENT )
   {
     if(value == "HorizontalLeft")
     {
@@ -2121,7 +2112,7 @@ void TextView::OnAlignmentPropertySet( Property::Index propertyIndex, Property::
       DALI_ASSERT_ALWAYS( !"TextView::OnAlignmentPropertySet(). Invalid Property value." );
     }
   }
-  else if( propertyIndex == Toolkit::TextView::PROPERTY_VERTICAL_ALIGNMENT )
+  else if( propertyIndex == Toolkit::TextView::Property::VERTICAL_ALIGNMENT )
   {
     if( value == "VerticalTop" )
     {
@@ -2202,49 +2193,49 @@ void TextView::SetProperty( BaseObject* object, Property::Index index, const Pro
     TextView& textViewImpl( GetImpl( textView ) );
     switch( index )
     {
-      case Toolkit::TextView::PROPERTY_MARKUP_ENABLED:
+      case Toolkit::TextView::Property::MARKUP_ENABLED:
       {
         textViewImpl.OnMarkupEnabledPeopertySet( value );
         break;
       }
-      case Toolkit::TextView::PROPERTY_TEXT:
+      case Toolkit::TextView::Property::TEXT:
       {
         textViewImpl.SetText( value.Get<std::string>() );
         break;
       }
-      case Toolkit::TextView::PROPERTY_MULTILINE_POLICY:
+      case Toolkit::TextView::Property::MULTILINE_POLICY:
       {
         textViewImpl.OnMultilinePolicyPropertySet( value );
         break;
       }
-      case Toolkit::TextView::PROPERTY_WIDTH_EXCEED_POLICY:
+      case Toolkit::TextView::Property::WIDTH_EXCEED_POLICY:
       {
         textViewImpl.OnWidthExceedPolicyPropertySet( value );
         break;
       }
-      case Toolkit::TextView::PROPERTY_HEIGHT_EXCEED_POLICY:
+      case Toolkit::TextView::Property::HEIGHT_EXCEED_POLICY:
       {
         textViewImpl.OnHeightExceedPolicyPropertySet( value );
         break;
       }
-      case Toolkit::TextView::PROPERTY_LINE_JUSTIFICATION:
+      case Toolkit::TextView::Property::LINE_JUSTIFICATION:
       {
         textViewImpl.OnLineJustificationPropertySet( value );
         break;
       }
-      case Toolkit::TextView::PROPERTY_FADE_BOUNDARY:
+      case Toolkit::TextView::Property::FADE_BOUNDARY:
       {
         textViewImpl.OnFadeBoundaryPropertySet( value );
         break;
       }
-      case Toolkit::TextView::PROPERTY_LINE_HEIGHT_OFFSET:
+      case Toolkit::TextView::Property::LINE_HEIGHT_OFFSET:
       {
         Dali::PointSize pointSize( value.Get<float>() );
         textViewImpl.SetLineHeightOffset(pointSize);
         break;
       }
-      case Toolkit::TextView::PROPERTY_HORIZONTAL_ALIGNMENT:
-      case Toolkit::TextView::PROPERTY_VERTICAL_ALIGNMENT:
+      case Toolkit::TextView::Property::HORIZONTAL_ALIGNMENT:
+      case Toolkit::TextView::Property::VERTICAL_ALIGNMENT:
       {
         textViewImpl.OnAlignmentPropertySet( index, value );
         break;
@@ -2264,37 +2255,37 @@ Property::Value TextView::GetProperty( BaseObject* object, Property::Index index
     TextView& textViewImpl( GetImpl( textView ) );
     switch( index )
     {
-      case Toolkit::TextView::PROPERTY_MARKUP_ENABLED:
+      case Toolkit::TextView::Property::MARKUP_ENABLED:
       {
         value = textViewImpl.IsMarkupProcessingEnabled();
         break;
       }
-      case Toolkit::TextView::PROPERTY_TEXT:
+      case Toolkit::TextView::Property::TEXT:
       {
         value = textViewImpl.GetText();
         break;
       }
-      case Toolkit::TextView::PROPERTY_MULTILINE_POLICY:
+      case Toolkit::TextView::Property::MULTILINE_POLICY:
       {
         value = MULTILINE_POLICY_NAME[ textViewImpl.GetMultilinePolicy() ];
         break;
       }
-      case Toolkit::TextView::PROPERTY_WIDTH_EXCEED_POLICY:
+      case Toolkit::TextView::Property::WIDTH_EXCEED_POLICY:
       {
         value = EXCEED_POLICY_NAME[ textViewImpl.GetWidthExceedPolicy() ];
         break;
       }
-      case Toolkit::TextView::PROPERTY_HEIGHT_EXCEED_POLICY:
+      case Toolkit::TextView::Property::HEIGHT_EXCEED_POLICY:
       {
         value = EXCEED_POLICY_NAME[ textViewImpl.GetHeightExceedPolicy() ];
         break;
       }
-      case Toolkit::TextView::PROPERTY_LINE_JUSTIFICATION:
+      case Toolkit::TextView::Property::LINE_JUSTIFICATION:
       {
         value = LINE_JUSTIFICATION_NAME[ textViewImpl.GetLineJustification() ];
         break;
       }
-      case Toolkit::TextView::PROPERTY_FADE_BOUNDARY:
+      case Toolkit::TextView::Property::FADE_BOUNDARY:
       {
         Toolkit::TextView::FadeBoundary boundary = textViewImpl.GetFadeBoundary();
         value = Vector4( static_cast<float>( boundary.mLeft.value ),
@@ -2303,17 +2294,17 @@ Property::Value TextView::GetProperty( BaseObject* object, Property::Index index
                          static_cast<float>( boundary.mBottom.value ) );
         break;
       }
-      case Toolkit::TextView::PROPERTY_LINE_HEIGHT_OFFSET:
+      case Toolkit::TextView::Property::LINE_HEIGHT_OFFSET:
       {
         value = textViewImpl.GetLineHeightOffset().value;
         break;
       }
-      case Toolkit::TextView::PROPERTY_HORIZONTAL_ALIGNMENT:
+      case Toolkit::TextView::Property::HORIZONTAL_ALIGNMENT:
       {
         value = textViewImpl.OnHorizontalAlignmentPropertyGet();
         break;
       }
-      case Toolkit::TextView::PROPERTY_VERTICAL_ALIGNMENT:
+      case Toolkit::TextView::Property::VERTICAL_ALIGNMENT:
       {
         value = textViewImpl.OnVerticalAlignmentPropertyGet();
         break;

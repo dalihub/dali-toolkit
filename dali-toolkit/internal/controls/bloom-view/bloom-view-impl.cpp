@@ -26,6 +26,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
@@ -52,7 +53,8 @@ BaseHandle Create()
   return Toolkit::BloomView::New();
 }
 
-TypeRegistration mType( typeid(Toolkit::BloomView), typeid(Toolkit::Control), Create );
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::BloomView, Toolkit::Control, Create )
+DALI_TYPE_REGISTRATION_END()
 
 // default parameters
 const float BLOOM_THRESHOLD_DEFAULT = 0.25f;
@@ -72,14 +74,13 @@ const float BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_HEIGHT_SCALE = 0.5f;
 
 const float ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 
-const std::string BLOOM_BLUR_STRENGTH_PROPERTY_NAME( "BlurStrengthProperty" );
-
-const std::string BLOOM_THRESHOLD_PROPERTY_NAME( "uBloomThreshold" );
-const std::string RECIP_ONE_MINUS_BLOOM_THRESHOLD_PROPERTY_NAME( "uRecipOneMinusBloomThreshold" );
-const std::string BLOOM_INTENSITY_PROPERTY_NAME( "uBloomIntensity" );
-const std::string BLOOM_SATURATION_PROPERTY_NAME( "uBloomSaturation" );
-const std::string IMAGE_INTENSITY_PROPERTY_NAME( "uImageIntensity" );
-const std::string IMAGE_SATURATION_PROPERTY_NAME( "uImageSaturation" );
+const char* const BLOOM_BLUR_STRENGTH_PROPERTY_NAME = "BlurStrengthProperty";
+const char* const BLOOM_THRESHOLD_PROPERTY_NAME = "uBloomThreshold";
+const char* const RECIP_ONE_MINUS_BLOOM_THRESHOLD_PROPERTY_NAME = "uRecipOneMinusBloomThreshold";
+const char* const BLOOM_INTENSITY_PROPERTY_NAME = "uBloomIntensity";
+const char* const BLOOM_SATURATION_PROPERTY_NAME = "uBloomSaturation";
+const char* const IMAGE_INTENSITY_PROPERTY_NAME = "uImageIntensity";
+const char* const IMAGE_SATURATION_PROPERTY_NAME = "uImageSaturation";
 
 ///////////////////////////////////////////////////////
 //
@@ -334,7 +335,6 @@ void BloomView::AllocateResources()
     mRenderDownsampledCamera.SetNearClippingPlane(1.0f);
     mRenderDownsampledCamera.SetAspectRatio(mDownsampledWidth / mDownsampledHeight);
     mRenderDownsampledCamera.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
-    mRenderDownsampledCamera.SetRotation(Quaternion(M_PI, Vector3::YAXIS)); // Rotate to look at origin
 
     mRenderDownsampledCamera.SetPosition(0.0f, 0.0f, ((mDownsampledHeight * 0.5f) / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f)));
 
@@ -344,7 +344,6 @@ void BloomView::AllocateResources()
     mRenderFullSizeCamera.SetNearClippingPlane(1.0f);
     mRenderFullSizeCamera.SetAspectRatio(mTargetSize.width / mTargetSize.height);
     mRenderFullSizeCamera.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
-    mRenderFullSizeCamera.SetRotation(Quaternion(M_PI, Vector3::YAXIS)); // Rotate to look at origin
 
     float cameraPosConstraintScale = 0.5f / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f);
     mRenderFullSizeCamera.SetPosition(0.0f, 0.0f, mTargetSize.height * cameraPosConstraintScale);

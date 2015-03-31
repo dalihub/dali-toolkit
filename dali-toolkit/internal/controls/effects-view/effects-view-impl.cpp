@@ -24,6 +24,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
@@ -48,21 +49,24 @@ Dali::BaseHandle Create()
   return Toolkit::EffectsView::New();
 }
 
-Dali::TypeRegistration mType( typeid(Dali::Toolkit::EffectsView), typeid(Dali::Toolkit::Control), Create );
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::EffectsView, Toolkit::Control, Create )
+DALI_TYPE_REGISTRATION_END()
 
 const Pixel::Format EFFECTS_VIEW_DEFAULT_PIXEL_FORMAT = Pixel::RGBA8888;
 const float         ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 const Vector4       EFFECTS_VIEW_DEFAULT_BACKGROUND_COLOR( 1.0f, 1.0f, 1.0f, 0.0 );
 const bool          EFFECTS_VIEW_REFRESH_ON_DEMAND(false);
-// custom properties
+
+// Custom properties
+const char* const   EFFECT_SIZE_PROPERTY_NAME = "EffectSize";
+const char* const   EFFECT_STRENGTH_PROPERTY_NAME = "EffectStrength";
+const char* const   EFFECT_OFFSET_PROPERTY_NAME = "EffectOffset";
+const char* const   EFFECT_COLOR_PROPERTY_NAME = "EffectColor";
+
 const float         EFFECT_SIZE_DEFAULT( 1.0f );
-const std::string   EFFECT_SIZE_PROPERTY_NAME( "EffectSize" );
 const float         EFFECT_STRENGTH_DEFAULT( 0.5f );
-const std::string   EFFECT_STRENGTH_PROPERTY_NAME( "EffectStrength" );
 const Vector3       EFFECT_OFFSET_DEFAULT( 0.0f, 0.0f, 0.0f );
-const std::string   EFFECT_OFFSET_PROPERTY_NAME( "EffectOffset" );
 const Vector4       EFFECT_COLOR_DEFAULT( Color::WHITE );
-const std::string   EFFECT_COLOR_PROPERTY_NAME( "EffectColor" );
 
 const char* const EFFECTS_VIEW_FRAGMENT_SOURCE =
     "void main()\n"
@@ -267,8 +271,8 @@ void EffectsView::SetupProperties()
   mEffectStrengthPropertyIndex = self.RegisterProperty(EFFECT_STRENGTH_PROPERTY_NAME, EFFECT_STRENGTH_DEFAULT, Property::READ_WRITE);
   mEffectOffsetPropertyIndex   = self.RegisterProperty(EFFECT_OFFSET_PROPERTY_NAME, EFFECT_OFFSET_DEFAULT);
   mEffectColorPropertyIndex    = self.RegisterProperty(EFFECT_COLOR_PROPERTY_NAME, EFFECT_COLOR_DEFAULT);
-  mActorPostFilter.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::Position, Source( self, mEffectOffsetPropertyIndex ), EqualToConstraint() ) );
-  mActorPostFilter.ApplyConstraint( Constraint::New<Vector4>( Actor::Property::Color, Source( self, mEffectColorPropertyIndex ), EqualToConstraint() ) );
+  mActorPostFilter.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::POSITION, Source( self, mEffectOffsetPropertyIndex ), EqualToConstraint() ) );
+  mActorPostFilter.ApplyConstraint( Constraint::New<Vector4>( Actor::Property::COLOR, Source( self, mEffectColorPropertyIndex ), EqualToConstraint() ) );
 }
 
 void EffectsView::SetBackgroundColor( const Vector4& color )
@@ -461,7 +465,6 @@ void EffectsView::SetupCameras()
   mCameraForChildren.SetAspectRatio(mTargetSize.width / mTargetSize.height);
   mCameraForChildren.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
   mCameraForChildren.SetPosition(0.0f, 0.0f, mTargetSize.height * cameraPosScale);
-  mCameraForChildren.SetRotation(Quaternion(M_PI, Vector3::YAXIS));
   mCameraForChildren.SetZ( mTargetSize.height * cameraPosScale );
 }
 

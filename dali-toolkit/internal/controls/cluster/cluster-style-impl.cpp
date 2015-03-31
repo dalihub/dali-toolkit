@@ -328,7 +328,7 @@ void ClusterStyle::Apply( Actor actor,
   {
     actor.SetPosition( position );
     actor.SetSize( size );
-    actor.SetRotation( rotation );
+    actor.SetOrientation( rotation );
     actor.SetScale( scale );
   }
 }
@@ -469,7 +469,6 @@ void ClusterStyleRandom::ApplyStyle(Actor child, unsigned int index, AlphaFuncti
 
   Property::Index depthProperty = child.GetPropertyIndex(Toolkit::Cluster::CLUSTER_ACTOR_DEPTH);
   float depthPropertyValue = child.GetProperty<float>( depthProperty );
-
 
   Apply( child,
          FirstOrderEquation( GetClusterSize(), Vector3(position.x, position.y, 0.0f), Vector3(0.0f, 0.0f, depthPropertyValue) ),

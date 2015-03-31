@@ -24,7 +24,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>
-#include <dali-toolkit/internal/controls/relayout-helper.h>
 
 namespace Dali
 {
@@ -124,7 +123,7 @@ void PushButton::SetButtonImage( Actor image )
 
         buttonImage = image;
 
-        FadeInImage( buttonImage );
+        FadeInImage( buttonImage, 0.0f, 0 );
 
         StartFadeOutAnimation();
         StartFadeInAnimation();
@@ -132,7 +131,7 @@ void PushButton::SetButtonImage( Actor image )
       else
       {
         buttonImage = image;
-        Self().Add( buttonImage );
+        Self().Insert( 0, buttonImage );
       }
       break;
     }
@@ -149,7 +148,7 @@ void PushButton::SetButtonImage( Actor image )
       // Replaces the button image.
       buttonImage = image;
 
-      Self().Add( buttonImage );
+      Self().Insert( 0, buttonImage );
       FadeOutImage( Foreground, buttonImage, opacity );
 
       StartFadeOutAnimation();
@@ -163,7 +162,7 @@ void PushButton::SetButtonImage( Actor image )
 
       buttonImage = image;
 
-      FadeInImage( buttonImage );
+      FadeInImage( buttonImage, 0.0f, 0 );
       StartFadeInAnimation();
       break;
     }
@@ -175,7 +174,8 @@ void PushButton::SetButtonImage( Actor image )
   buttonImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   buttonImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
   buttonImage.SetPosition( 0.f, 0.f, FOREGROUND_DEPTH );
-  buttonImage.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+  buttonImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  buttonImage.SetName( "BUTTON_IMAGE" );
 }
 
 void PushButton::SetSelectedImage( Actor image )
@@ -194,7 +194,7 @@ void PushButton::SetSelectedImage( Actor image )
 
         selectedImage = image;
 
-        FadeInImage( selectedImage );
+        FadeInImage( selectedImage, 0.0f, 0 );
 
         StartFadeOutAnimation();
         StartFadeInAnimation();
@@ -202,7 +202,7 @@ void PushButton::SetSelectedImage( Actor image )
       else
       {
         selectedImage = image;
-        Self().Add( selectedImage );
+        Self().Insert( 0, selectedImage );
       }
       break;
     }
@@ -219,7 +219,7 @@ void PushButton::SetSelectedImage( Actor image )
       // Replaces the button image.
       selectedImage = image;
 
-      Self().Add( selectedImage );
+      Self().Insert( 0, selectedImage );
       FadeOutImage( Foreground, selectedImage, opacity );
 
       StartFadeOutAnimation();
@@ -233,7 +233,7 @@ void PushButton::SetSelectedImage( Actor image )
 
       selectedImage = image;
 
-      FadeInImage( selectedImage );
+      FadeInImage( selectedImage, 0.0f, 0 );
       StartFadeInAnimation();
       break;
     }
@@ -245,7 +245,7 @@ void PushButton::SetSelectedImage( Actor image )
   selectedImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   selectedImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
   selectedImage.SetPosition( 0.f, 0.f, FOREGROUND_DEPTH );
-  selectedImage.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+  selectedImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
 }
 
 void PushButton::SetBackgroundImage( Actor image )
@@ -267,7 +267,7 @@ void PushButton::SetBackgroundImage( Actor image )
 
         backgroundImage = image;
 
-        FadeInImage( backgroundImage );
+        FadeInImage( backgroundImage, 0.0f, 0 );
 
         StartFadeOutAnimation();
         StartFadeInAnimation();
@@ -275,7 +275,7 @@ void PushButton::SetBackgroundImage( Actor image )
       else
       {
         backgroundImage = image;
-        Self().Add( backgroundImage );
+        Self().Insert( 0, backgroundImage );
       }
       break;
     }
@@ -292,7 +292,7 @@ void PushButton::SetBackgroundImage( Actor image )
       // Replaces the button image.
       backgroundImage = image;
 
-      Self().Add( backgroundImage );
+      Self().Insert( 0, backgroundImage );
       FadeOutImage( Background, backgroundImage, opacity );
 
       StartFadeOutAnimation();
@@ -306,7 +306,7 @@ void PushButton::SetBackgroundImage( Actor image )
 
       backgroundImage = image;
 
-      FadeInImage( backgroundImage );
+      FadeInImage( backgroundImage, 0.0f, 0 );
       StartFadeInAnimation();
       break;
     }
@@ -318,7 +318,7 @@ void PushButton::SetBackgroundImage( Actor image )
   backgroundImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   backgroundImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
   backgroundImage.SetPosition( 0.f, 0.f, BACKGROUND_DEPTH );
-  backgroundImage.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+  backgroundImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
 }
 
 void PushButton::SetDisabledImage( Actor image )
@@ -338,7 +338,7 @@ void PushButton::SetDisabledImage( Actor image )
 
         disabledImage = image;
 
-        FadeInImage( disabledImage );
+        FadeInImage( disabledImage, 0.0f, 0 );
 
         StartFadeOutAnimation();
         StartFadeInAnimation();
@@ -358,7 +358,7 @@ void PushButton::SetDisabledImage( Actor image )
 
       disabledImage = image;
 
-      FadeInImage( disabledImage );
+      FadeInImage( disabledImage, 0.0f, 0 );
       StartFadeInAnimation();
       break;
     }
@@ -389,7 +389,7 @@ void PushButton::SetDisabledImage( Actor image )
   disabledImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   disabledImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
   disabledImage.SetPosition( 0.f, 0.f, FOREGROUND_DEPTH );
-  disabledImage.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+  disabledImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
 }
 
 void PushButton::SetDisabledBackgroundImage( Actor image )
@@ -409,7 +409,7 @@ void PushButton::SetDisabledBackgroundImage( Actor image )
 
         disabledBackgroundImage = image;
 
-        FadeInImage( disabledBackgroundImage );
+        FadeInImage( disabledBackgroundImage, 0.0f, 0 );
 
         StartFadeOutAnimation();
         StartFadeInAnimation();
@@ -429,7 +429,7 @@ void PushButton::SetDisabledBackgroundImage( Actor image )
 
       disabledBackgroundImage = image;
 
-      FadeInImage( disabledBackgroundImage );
+      FadeInImage( disabledBackgroundImage, 0.0f, 0 );
       StartFadeInAnimation();
       break;
     }
@@ -460,7 +460,7 @@ void PushButton::SetDisabledBackgroundImage( Actor image )
   disabledBackgroundImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   disabledBackgroundImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
   disabledBackgroundImage.SetPosition( 0.f, 0.f, BACKGROUND_DEPTH );
-  disabledBackgroundImage.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+  disabledBackgroundImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
 }
 
 void PushButton::OnButtonInitialize()
@@ -468,6 +468,9 @@ void PushButton::OnButtonInitialize()
   // Push button requires the Leave event.
   Actor root = Self();
   root.SetLeaveRequired( true );
+
+  // Set resize policy to natural size so that buttons will resize to background images
+  root.SetResizePolicy( USE_NATURAL_SIZE, ALL_DIMENSIONS );
 }
 
 void PushButton::OnLabelSet()
@@ -497,7 +500,7 @@ void PushButton::OnSelected( bool selected )
     {
       StopFadeOutAnimation();
       FadeOutImage( Foreground, buttonImage );
-      FadeInImage( selectedImage );
+      FadeInImage( selectedImage, 0.0f, 0 );
       StartFadeOutAnimation();
       StartFadeInAnimation();
 
@@ -515,7 +518,7 @@ void PushButton::OnSelected( bool selected )
     {
       StopFadeOutAnimation();
       FadeOutImage( Foreground, selectedImage );
-      FadeInImage( buttonImage );
+      FadeInImage( buttonImage, 0.0f, 0 );
       StartFadeOutAnimation();
       StartFadeInAnimation();
 
@@ -540,7 +543,7 @@ void PushButton::OnSelected( bool selected )
       StopFadeInAnimation();
 
       FadeOutImage( Foreground, selectedImage, 1.f - opacity );
-      FadeInImage( buttonImage, opacity );
+      FadeInImage( buttonImage, opacity, 0 );
 
       StartFadeOutAnimation();
       StartFadeInAnimation();
@@ -566,7 +569,7 @@ void PushButton::OnSelected( bool selected )
       StopFadeInAnimation();
 
       FadeOutImage( Foreground, buttonImage, 1.f - opacity );
-      FadeInImage( selectedImage, opacity );
+      FadeInImage( selectedImage, opacity, 0 );
 
       StartFadeOutAnimation();
       StartFadeInAnimation();
@@ -606,8 +609,8 @@ void PushButton::OnDisabled( bool disabled )
       StopFadeOutAnimation();
       FadeOutImage( Background, backgroundImage );
       FadeOutImage( Foreground, buttonImage );
-      FadeInImage( disabledBackgroundImage );
-      FadeInImage( disabledImage );
+      FadeInImage( disabledBackgroundImage, 0.0f, 0 );
+      FadeInImage( disabledImage, 0.0f, 0 );
       StartFadeOutAnimation();
       StartFadeInAnimation();
 
@@ -629,8 +632,8 @@ void PushButton::OnDisabled( bool disabled )
       StopFadeOutAnimation();
       FadeOutImage( Background, backgroundImage );
       FadeOutImage( Foreground, selectedImage );
-      FadeInImage( disabledBackgroundImage );
-      FadeInImage( disabledImage );
+      FadeInImage( disabledBackgroundImage, 0.0f, 0 );
+      FadeInImage( disabledImage, 0.0f, 0 );
       StartFadeOutAnimation();
       StartFadeInAnimation();
 
@@ -652,8 +655,8 @@ void PushButton::OnDisabled( bool disabled )
       StopFadeOutAnimation();
       FadeOutImage( Background, disabledBackgroundImage );
       FadeOutImage( Foreground, disabledImage );
-      FadeInImage( backgroundImage );
-      FadeInImage( buttonImage );
+      FadeInImage( backgroundImage, 0.0f, 0 );
+      FadeInImage( buttonImage, 0.0f, 0 );
       StartFadeOutAnimation();
       StartFadeInAnimation();
 
@@ -675,8 +678,8 @@ void PushButton::OnDisabled( bool disabled )
       StopFadeOutAnimation();
       FadeOutImage( Background, disabledBackgroundImage );
       FadeOutImage( Foreground, disabledImage );
-      FadeInImage( backgroundImage );
-      FadeInImage( selectedImage );
+      FadeInImage( backgroundImage, 0.0f, 0 );
+      FadeInImage( selectedImage, 0.0f, 0 );
       StartFadeOutAnimation();
       StartFadeInAnimation();
 
@@ -706,8 +709,8 @@ void PushButton::OnDisabled( bool disabled )
       FadeOutImage( Foreground, selectedImage, 1.f - opacity );
       FadeOutImage( Background, backgroundImage );
 
-      FadeInImage( disabledImage );
-      FadeInImage( disabledBackgroundImage );
+      FadeInImage( disabledImage, 0.0f, 0 );
+      FadeInImage( disabledBackgroundImage, 0.0f, 0 );
 
       StartFadeOutAnimation();
       StartFadeInAnimation();
@@ -738,8 +741,8 @@ void PushButton::OnDisabled( bool disabled )
       FadeOutImage( Foreground, buttonImage, 1.f - opacity );
       FadeOutImage( Background, backgroundImage );
 
-      FadeInImage( disabledImage );
-      FadeInImage( disabledBackgroundImage );
+      FadeInImage( disabledImage, 0.0f, 0);
+      FadeInImage( disabledBackgroundImage, 0.0f, 0 );
 
       StartFadeOutAnimation();
       StartFadeInAnimation();
@@ -769,8 +772,8 @@ void PushButton::OnDisabled( bool disabled )
 
       FadeOutImage( Foreground, disabledImage, 1.f - opacity );
       FadeOutImage( Background, disabledBackgroundImage, 1.f - opacity );
-      FadeInImage( buttonImage, opacity );
-      FadeInImage( backgroundImage, opacity );
+      FadeInImage( buttonImage, opacity, 0 );
+      FadeInImage( backgroundImage, opacity, 0 );
 
       StartFadeOutAnimation();
       StartFadeInAnimation();
@@ -800,8 +803,8 @@ void PushButton::OnDisabled( bool disabled )
 
       FadeOutImage( Foreground, buttonImage, 1.f - opacity );
       FadeOutImage( Background, backgroundImage, 1.f - opacity );
-      FadeInImage( disabledImage, opacity );
-      FadeInImage( disabledBackgroundImage, opacity );
+      FadeInImage( disabledImage, opacity, 0 );
+      FadeInImage( disabledBackgroundImage, opacity, 0 );
 
       StartFadeOutAnimation();
       StartFadeInAnimation();
@@ -831,8 +834,8 @@ void PushButton::OnDisabled( bool disabled )
 
       FadeOutImage( Foreground, disabledImage, 1.f - opacity );
       FadeOutImage( Background, disabledBackgroundImage, 1.f - opacity );
-      FadeInImage( selectedImage, opacity );
-      FadeInImage( backgroundImage, opacity );
+      FadeInImage( selectedImage, opacity, 0 );
+      FadeInImage( backgroundImage, opacity, 0 );
 
       StartFadeOutAnimation();
       StartFadeInAnimation();
@@ -862,8 +865,8 @@ void PushButton::OnDisabled( bool disabled )
 
       FadeOutImage( Foreground, selectedImage, 1.f - opacity );
       FadeOutImage( Background, backgroundImage, 1.f - opacity );
-      FadeInImage( disabledImage, opacity );
-      FadeInImage( disabledBackgroundImage, opacity );
+      FadeInImage( disabledImage, opacity, 0 );
+      FadeInImage( disabledBackgroundImage, opacity, 0 );
 
       StartFadeOutAnimation();
       StartFadeInAnimation();
@@ -896,7 +899,7 @@ void PushButton::OnPressed()
     {
       StopFadeOutAnimation();
       FadeOutImage( Foreground, buttonImage );
-      FadeInImage( selectedImage );
+      FadeInImage( selectedImage, 0.0f, 0 );
       StartFadeOutAnimation();
       StartFadeInAnimation();
 
@@ -929,7 +932,7 @@ void PushButton::OnPressed()
       StopFadeInAnimation();
 
       FadeOutImage( Foreground, buttonImage, 1.f - opacity );
-      FadeInImage( selectedImage, opacity );
+      FadeInImage( selectedImage, opacity, 0 );
 
       StartFadeOutAnimation();
       StartFadeInAnimation();
@@ -961,7 +964,7 @@ void PushButton::OnReleased()
     {
       StopFadeOutAnimation();
       FadeOutImage( Foreground, selectedImage );
-      FadeInImage( buttonImage );
+      FadeInImage( buttonImage, 0.0f, 0 );
       StartFadeOutAnimation();
       StartFadeInAnimation();
 
@@ -986,7 +989,7 @@ void PushButton::OnReleased()
       StopFadeInAnimation();
 
       FadeOutImage( Foreground, selectedImage, 1.f - opacity );
-      FadeInImage( buttonImage, opacity );
+      FadeInImage( buttonImage, opacity, 0 );
 
       StartFadeOutAnimation();
       StartFadeInAnimation();
@@ -1041,7 +1044,7 @@ Vector3 PushButton::GetNaturalSize()
     ImageActor imageActor = FindImageActor( GetButtonImage() );
     if( imageActor && imageActor.GetStyle() != ImageActor::STYLE_NINE_PATCH )
     {
-      Vector3 imageSize = RelayoutHelper::GetNaturalSize( imageActor );
+      Vector3 imageSize = imageActor.GetNaturalSize();
 
       if( widthIsZero )
       {
@@ -1057,7 +1060,7 @@ Vector3 PushButton::GetNaturalSize()
     ImageActor backgroundImageActor = FindImageActor( GetBackgroundImage() );
     if( backgroundImageActor && backgroundImageActor.GetStyle() != ImageActor::STYLE_NINE_PATCH )
     {
-      Vector3 imageSize = RelayoutHelper::GetNaturalSize( backgroundImageActor );
+      Vector3 imageSize = backgroundImageActor.GetNaturalSize();
 
       if( widthIsZero )
       {
@@ -1176,14 +1179,21 @@ void PushButton::StopFadeOutAnimation( bool remove )
   }
 }
 
-void PushButton::FadeInImage( Actor& image, float opacity )
+void PushButton::FadeInImage( Actor& image, float opacity, int priority )
 {
   if( image )
   {
     image.SetOpacity( opacity );
     if( !image.GetParent() )
     {
-      Self().Add( image );
+      if( priority > -1 )
+      {
+        Self().Insert( priority, image );
+      }
+      else
+      {
+        Self().Add( image );
+      }
     }
 
     AddToFadeInAnimation( image );

@@ -52,8 +52,7 @@ public:
     MESH_ACTOR   =3,
     LAYER_ACTOR  =4,
     CAMERA_ACTOR =5,
-    LIGHT_ACTOR  =6,
-    TEXT_VIEW    =7
+    TEXT_VIEW    =6
   };
 
   /**

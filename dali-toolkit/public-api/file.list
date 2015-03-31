@@ -28,8 +28,6 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/scrollable/item-view/item-factory.cpp \
   $(public_api_src_dir)/controls/scrollable/item-view/item-layout.cpp \
   $(public_api_src_dir)/controls/scrollable/item-view/item-view.cpp \
-  $(public_api_src_dir)/controls/scrollable/item-view/navigation-layout.cpp \
-  $(public_api_src_dir)/controls/scrollable/item-view/roll-layout.cpp \
   $(public_api_src_dir)/controls/scrollable/item-view/spiral-layout.cpp \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-carousel-effect.cpp \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-constraints.cpp \
@@ -153,8 +151,6 @@ public_api_item_view_header_files = \
   $(public_api_src_dir)/controls/scrollable/item-view/item-layout.h \
   $(public_api_src_dir)/controls/scrollable/item-view/item-view-declarations.h \
   $(public_api_src_dir)/controls/scrollable/item-view/item-view.h \
-  $(public_api_src_dir)/controls/scrollable/item-view/navigation-layout.h \
-  $(public_api_src_dir)/controls/scrollable/item-view/roll-layout.h \
   $(public_api_src_dir)/controls/scrollable/item-view/spiral-layout.h
 
 public_api_magnifier_header_files = \

@@ -88,4 +88,3 @@ private: // Not intended for application developers
 } // namespace Dali
 
 #endif // __DALI_TOOLKIT_MIRROR_EFFECT_H__
-

@@ -84,7 +84,7 @@ private: // From Control
   /**
    * @copydoc Control::OnRelayout()
    */
-  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
 
 private:
 

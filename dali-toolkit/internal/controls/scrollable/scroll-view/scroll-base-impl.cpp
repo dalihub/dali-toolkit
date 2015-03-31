@@ -33,7 +33,7 @@ namespace Internal
 // ScrollBase
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-const std::string ScrollBase::SCROLL_DOMAIN_OFFSET_PROPERTY_NAME( "domain-offset" );
+const char* const ScrollBase::SCROLL_DOMAIN_OFFSET_PROPERTY_NAME = "domain-offset";
 
 ScrollBase::ScrollBase()
 : Scrollable(),

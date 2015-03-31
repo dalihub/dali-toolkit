@@ -102,11 +102,11 @@ void CubeTransitionFoldEffect::OnStopTransition()
     idx = y*mNumColumns;
     for( unsigned int x = y%2; x < mNumColumns; x=x+2)
     {
-      mBoxes[idx+x].SetRotation( Radian(angle), Vector3::YAXIS );
+      mBoxes[idx+x].SetOrientation( Radian(angle), Vector3::YAXIS );
     }
     for( unsigned int x = (y+1)%2; x < mNumColumns; x=x+2)
     {
-      mBoxes[idx+x].SetRotation( Radian(-angle), Vector3::YAXIS );
+      mBoxes[idx+x].SetOrientation( Radian(-angle), Vector3::YAXIS );
     }
   }
 }
@@ -118,12 +118,12 @@ void CubeTransitionFoldEffect::SetupAnimation(unsigned int actorIndex, float ang
   ImageActor frontTile = mTiles[mContainerIndex^1][actorIndex];
   if ( mFirstTransition && (!mIsToNextImage) ) // for the first transition, it is going to previous image
   {
-    sideTile.SetRotation( Radian( angle),   Vector3::YAXIS );
+    sideTile.SetOrientation( Radian( angle),   Vector3::YAXIS );
   }
   else if( !mChangeTurningDirection )   // reset rotation, translation and color
   {
-    sideTile.MoveBy( resetTranslation );
-    sideTile.SetRotation( Radian( angle),   Vector3::YAXIS );
+    sideTile.TranslateBy( resetTranslation );
+    sideTile.SetOrientation( Radian( angle),   Vector3::YAXIS );
   }
   mAnimation.RotateTo( currentCube, Radian( -angle ), Vector3::YAXIS, AlphaFunctions::Linear );
   Vector3 position(currentCube.GetCurrentPosition());

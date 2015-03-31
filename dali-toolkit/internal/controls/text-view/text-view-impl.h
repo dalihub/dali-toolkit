@@ -47,13 +47,6 @@ class TextView : public Control
 {
 public:
 
-  // Properties
-  enum
-  {
-    TEXTVIEW_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    TEXTVIEW_PROPERTY_END_INDEX = TEXTVIEW_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
-  };
-
   /**
    * Internal exceed policy with the valid combinations.
    */
@@ -384,7 +377,7 @@ private: // From Control
   /**
    * @copydoc Toolkit::Control::OnRelayout()
    */
-  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
 
   /**
    * Retrieves the text-view's natural size.

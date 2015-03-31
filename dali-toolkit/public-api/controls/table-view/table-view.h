@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/actors/actor-enumerations.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -45,14 +46,19 @@ class DALI_IMPORT_API TableView : public Control
 {
 public:
 
-  /// @name Properties
-  /** @{ */
-  static const Dali::Property::Index PROPERTY_ROWS;                       ///< name "rows",                      type UNSIGNED_INTEGER
-  static const Dali::Property::Index PROPERTY_COLUMNS;                    ///< name "columns",                   type UNSIGNED_INTEGER
-  static const Dali::Property::Index PROPERTY_CELL_PADDING;               ///< name "cell-padding",              type VECTOR2
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+  };
 
-  /*
-   * PROPERTY_LAYOUT_ROWS set the height of the rows
+  /**
+   * @brief An enumeration of properties belonging to the TableView class.
+   *
+   * LayoutRows: set the height of the rows.
    * It has the format as follows in script:
    * @code
    * "layout-rows":
@@ -61,11 +67,8 @@ public:
         "2": { "policy": "relative", "value": 0.33 }   //@see SetRelativeHeight
       }
    * @endcode
-   */
-  static const Dali::Property::Index PROPERTY_LAYOUT_ROWS;                ///< name "layout-rows",               type MAP
-
-  /*
-   * PROPERTY_LAYOUT_COLUMNS set the height of the rows
+   *
+   * LayoutColumns: set the height of the rows.
    * It has the format as follows in script:
    * @code
    * "layout-columns":
@@ -75,24 +78,31 @@ public:
       }
    * @endcode
    */
-  static const Dali::Property::Index PROPERTY_LAYOUT_COLUMNS;             ///< name "layout-columns",            type MAP
-  /** @} */
-
+  struct Property
+  {
+    enum
+    {
+      ROWS = PROPERTY_START_INDEX, ///< name "rows",           type unsigned int
+      COLUMNS,                     ///< name "columns",        type unsigned int
+      CELL_PADDING,                ///< name "cell-padding",   type Vector2
+      LAYOUT_ROWS,                 ///< name "layout-rows",    type Map
+      LAYOUT_COLUMNS,              ///< name "layout-columns", type Map
+    };
+  };
 
   // Custom properties for where to put the actor, these properties should be registered to the child which would be added to the table
-  static const std::string CELL_INDICES_PROPERTY_NAME;           ///< Property, name "cell-indices", type VECTOR2
-  static const std::string ROW_SPAN_PROPERTY_NAME;               ///< Property, name "row-span",     type FLOAT (Currently builder unable to differentiate integer and float from Json string)
-  static const std::string COLUMN_SPAN_PROPERTY_NAME;            ///< Property, name "column-span",  type FLOAT (Currently builder unable to differentiate integer and float from Json string)
-
+  static const std::string CELL_INDICES_PROPERTY_NAME;           ///< Property, name "cell-indices", type Vector2
+  static const std::string ROW_SPAN_PROPERTY_NAME;               ///< Property, name "row-span",     type float (Currently builder is unable to differentiate integer and float from Json string)
+  static const std::string COLUMN_SPAN_PROPERTY_NAME;            ///< Property, name "column-span",  type float (Currently builder is unable to differentiate integer and float from Json string)
 
   /**
    * @brief Describes how the size of a row / column been set
    */
   enum LayoutPolicy
   {
-    Fixed,      ///< Fixed with the given value.
-    Relative,   ///< Calculated as percentage of the remainder after subtracting Padding and Fixed height/width
-    Fill        ///< Get the remainder of the 100% (after subtracting Padding, Fixed and Relative height/ width) divided evenly between 'fill' rows/columns
+    FIXED,      ///< Fixed with the given value.
+    RELATIVE,   ///< Calculated as percentage of the remainder after subtracting Padding and Fixed height/width
+    FILL        ///< Get the remainder of the 100% (after subtracting Padding, Fixed and Relative height/ width) divided evenly between 'fill' rows/columns
   };
 
   /**
@@ -262,6 +272,36 @@ public:
   Size GetCellPadding();
 
   /**
+   * @brief Specify this row as fitting its height to its children
+   *
+   * @param[in] rowIndex The row to set
+   */
+  void SetFitHeight( unsigned int rowIndex );
+
+  /**
+   * @brief Is the row a fit row
+   *
+   * @param[in] rowIndex The row to check
+   * @return Return true if the row is fit
+   */
+  bool IsFitHeight( unsigned int rowIndex ) const;
+
+  /**
+   * @brief Specify this column as fitting its width to its children
+   *
+   * @param[in] columnIndex The column to set
+   */
+  void SetFitWidth( unsigned int columnIndex );
+
+  /**
+   * @brief Is the column a fit column
+   *
+   * @param[in] columnIndex The column to check
+   * @return Return true if the column is fit
+   */
+  bool IsFitWidth( unsigned int columnIndex ) const;
+
+  /**
    * Sets a row to have fixed height
    * Setting a fixed height of 0 has no effect
    * @pre The row rowIndex must exist.
@@ -340,6 +380,15 @@ public:
    * @return the amount of columns in the table
    */
   unsigned int GetColumns();
+
+  /**
+   * @brief Set the alignment on a cell
+   *
+   * @param[in] position The cell to set alignment on
+   * @param[in] horizontal The horizontal alignment
+   * @param[in] vertical The vertical alignment
+   */
+  void SetCellAlignment( CellPosition position, HorizontalAlignment::Type horizontal, VerticalAlignment::Type vertical );
 
 public: // Not intended for application developers
 

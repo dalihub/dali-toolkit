@@ -50,13 +50,6 @@ class TextInput : public Control
 {
 public:
 
-  // Properties
-  enum
-  {
-    TEXTINPUT_PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    TEXTINPUT_PROPERTY_END_INDEX = TEXTINPUT_PROPERTY_START_INDEX + 512 ///< Reserving property indices
-  };
-
   /**
    * Create a new TextInput
    * @return instrusive ptr to a TextInput
@@ -576,7 +569,7 @@ private: // From Control
   /**
    * @copydoc Control::OnRelayout()
    */
-  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
 
   /**
    * Retrieves the text-input's natural size by calling TextView::GetNaturalSize().

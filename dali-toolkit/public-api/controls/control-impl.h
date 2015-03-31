@@ -41,12 +41,8 @@ class StyleManager;
 
 namespace Internal DALI_INTERNAL
 {
-class RelayoutControllerImpl;
 class KeyInputFocusManager;
 }
-
-typedef std::pair< Actor, Vector2 > ActorSizePair;       ///< Pair of actor and size
-typedef std::vector< ActorSizePair > ActorSizeContainer; ///< Container of actors and their sizes
 
 namespace Internal
 {
@@ -61,13 +57,6 @@ namespace Internal
 class DALI_IMPORT_API Control : public CustomActorImpl, public ConnectionTrackerInterface
 {
 public:
-
-  // Properties
-  enum
-  {
-    CONTROL_PROPERTY_START_INDEX = PROPERTY_REGISTRATION_START_INDEX,
-    CONTROL_PROPERTY_END_INDEX = CONTROL_PROPERTY_START_INDEX + 1000 ///< Reserving 1000 property indices
-  };
 
   // Creation & Destruction
 
@@ -87,59 +76,19 @@ public:
   // Size negotiation
 
   /**
-   * @copydoc Toolkit::Control::SetSizePolicy()
+   * @copydoc Dali::CustomActorImpl::GetHeightForWidth()
    */
-  void SetSizePolicy( Toolkit::Control::SizePolicy widthPolicy, Toolkit::Control::SizePolicy heightPolicy );
+  virtual float GetHeightForWidth( float width );
 
   /**
-   * @copydoc Toolkit::Control::GetSizePolicy()
+   * @copydoc Dali::CustomActorImpl::GetWidthForHeight()
    */
-  void GetSizePolicy( Toolkit::Control::SizePolicy& widthPolicy, Toolkit::Control::SizePolicy& heightPolicy ) const;
-
-  /**
-   * @copydoc Toolkit::Control::SetMinimumSize()
-   */
-  void SetMinimumSize( const Vector3& size );
-
-  /**
-   * @copydoc Toolkit::Control::GetMinimumSize()
-   */
-  const Vector3& GetMinimumSize() const;
-
-  /**
-   * @copydoc Toolkit::Control::SetMaximumSize()
-   */
-  void SetMaximumSize( const Vector3& size );
-
-  /**
-   * @copydoc Toolkit::Control::GetMaximumSize()
-   */
-  const Vector3& GetMaximumSize() const;
+  virtual float GetWidthForHeight( float height );
 
   /**
    * @copydoc Toolkit::Control::GetNaturalSize()
    */
   virtual Vector3 GetNaturalSize();
-
-  /**
-   * @brief This method is called during size negotiation when a height is required for a given width.
-   *
-   * Derived classes should override this if they wish to customize the height returned.
-   *
-   * @param width to use.
-   * @return the height based on the width.
-   */
-  virtual float GetHeightForWidth( float width );
-
-  /**
-   * @brief This method is called during size negotiation when a width is required for a given height.
-   *
-   * Derived classes should override this if they wish to customize the width returned.
-   *
-   * @param height to use.
-   * @return the width based on the width.
-   */
-  virtual float GetWidthForHeight( float height );
 
   /**
    * @brief Retrieves the current Control's size.
@@ -231,9 +180,9 @@ public:
   Vector4 GetBackgroundColor() const;
 
   /**
-   * @copydoc Dali::Toolkit::Control::SetBackground
+   * @copydoc Dali::Toolkit::Control::SetBackgroundImage
    */
-  void SetBackground( Image image );
+  void SetBackgroundImage( Image image );
 
   /**
    * @copydoc Dali::Toolkit::Control::ClearBackground
@@ -297,22 +246,6 @@ public:
    * @return true if the value changed action has been consumed by this control
    */
   virtual bool OnAccessibilityValueChange(bool isIncrease);
-
-  // Called by the RelayoutController
-
-  /**
-   * @brief Called by the RelayoutController to negotiate the size of a control.
-   *
-   * The size allocated by the the algorithm is passed in which the
-   * control must adhere to.  A container is passed in as well which
-   * the control should populate with actors it has not / or does not
-   * need to handle in its size negotiation.
-   *
-   * @param[in]      size       The allocated size.
-   * @param[in,out]  container  The container that holds actors that are fed back into the
-   *                            RelayoutController algorithm.
-   */
-  DALI_INTERNAL void NegotiateSize( const Vector2& size, ActorSizeContainer& container );
 
   // Keyboard Focus
 
@@ -438,32 +371,10 @@ protected:
    */
   void DisableGestureDetection(Gesture::Type type);
 
-  // Size Negotiation
-
   /**
-   * @brief Request a relayout, which means performing a size negotiation on this control, its parent and children (and potentially whole scene)
-   *
-   * This method is automatically called from OnStageConnection(), OnChildAdd(),
-   * OnChildRemove(), SetSizePolicy(), SetMinimumSize() and SetMaximumSize().
-   *
-   * This method can also be called from a derived class every time it needs a different size.
-   * At the end of event processing, the relayout process starts and
-   * all controls which requested Relayout will have their sizes (re)negotiated.
-   *
-   * @note RelayoutRequest() can be called multiple times; the size negotiation is still
-   * only performed once, i.e. there is no need to keep track of this in the calling side.
+   * @copydoc Dali::CustomActorImpl::RelayoutDependentOnChildren()
    */
-  void RelayoutRequest();
-
-  /**
-   * @brief Helper method for controls to Relayout their children if
-   * they do not know whether that child is a control or not.
-   *
-   * @param[in]      actor      The actor to relayout.
-   * @param[in]      size       The size to allocate to the actor.
-   * @param[in,out]  container  The container that holds actors that have not been allocated a size yet.
-   */
-  static void Relayout( Actor actor, const Vector2& size, ActorSizeContainer& container );
+  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS );
 
 private:
 
@@ -595,24 +506,6 @@ private:
   virtual void OnControlSizeSet( const Vector3& size );
 
   /**
-   * @brief Called after the size negotiation has been finished for this control.
-   *
-   * The control is expected to assign this given size to itself/its children.
-   *
-   * Should be overridden by derived classes if they need to layout
-   * actors differently after certain operations like add or remove
-   * actors, resize or after changing specific properties.
-   *
-   * Note! As this function is called from inside the size negotiation algorithm, you cannot
-   * call RequestRelayout (the call would just be ignored)
-   *
-   * @param[in]      size       The allocated size.
-   * @param[in,out]  container  The control should add actors to this container that it is not able
-   *                            to allocate a size for.
-   */
-  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
-
-  /**
    * @brief Called when the control gains key input focus.
    *
    * Should be overridden by derived classes if they need to customize what happens when focus is gained.
@@ -654,9 +547,29 @@ private:
   virtual bool OnMouseWheelEvent(const MouseWheelEvent& event);
 
   /**
-   * @copydoc Dali::CustomActorImpl::GetChildByAlias(const std::string& actorAlias)
+   * @copydoc Dali::CustomActorImpl::OnCalculateRelayoutSize()
    */
-  virtual Actor GetChildByAlias(const std::string& actorAlias);
+  virtual void OnCalculateRelayoutSize( Dimension dimension );
+
+  /**
+   * @copydoc Dali::CustomActorImpl::OnLayoutNegotiated()
+   */
+  virtual void OnLayoutNegotiated( float size, Dimension dimension );
+
+  /**
+   * @copydoc Dali::CustomActorImpl::OnRelayout()
+   */
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+
+  /**
+   * @copydoc Dali::CustomActorImpl::OnSetResizePolicy()
+   */
+  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension );
+
+  /**
+   * @copydoc Dali::CustomActorImpl::CalculateChildSize()
+   */
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension );
 
   // From CustomActorImpl, derived classes should NOT override these.
 

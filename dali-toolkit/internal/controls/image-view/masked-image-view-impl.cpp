@@ -524,7 +524,7 @@ void MaskedImageView::Initialize( unsigned int targetWidth,
   self.Add( mSourceImageActor );
   mSourceImageActor.SetParentOrigin( ParentOrigin::CENTER );
   mSourceImageActor.SetPositionInheritanceMode( DONT_INHERIT_POSITION );
-  mSourceImageActor.SetInheritRotation( false );
+  mSourceImageActor.SetInheritOrientation( false );
   mSourceImageActor.SetInheritScale( false );
   mSourceImageActor.SetColorMode( USE_OWN_COLOR );
   mSourceImageActor.SetSize( Vector3::ONE );
@@ -545,7 +545,7 @@ void MaskedImageView::Initialize( unsigned int targetWidth,
   mRenderTask.SetInputEnabled( false );
   mRenderTask.SetExclusive( true );
   mRenderTask.SetClearEnabled( true );
-  mRenderTask.ApplyConstraint( Constraint::New<Vector4>( RenderTask::Property::ClearColor,
+  mRenderTask.ApplyConstraint( Constraint::New<Vector4>( RenderTask::Property::CLEAR_COLOR,
                                                          Source( self, mCustomProperties[ Dali::Toolkit::MaskedImageView::BACKGROUND_COLOR ] ),
                                                          EqualToConstraint() ) );
   mRenderTask.FinishedSignal().Connect( this, &MaskedImageView::OnRenderTaskFinished );

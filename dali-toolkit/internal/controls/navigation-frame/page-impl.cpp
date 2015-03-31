@@ -20,8 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
-
-// INTERNAL INCLUDES
+#include <dali/public-api/object/type-registry-helper.h>
 
 namespace Dali
 {
@@ -40,7 +39,8 @@ BaseHandle Create()
   return Toolkit::Page::New();
 }
 
-TypeRegistration mType( typeid(Toolkit::Page), typeid(CustomActor), Create );
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Page, Toolkit::Control, Create )
+DALI_TYPE_REGISTRATION_END()
 
 } // unnamed namespace
 

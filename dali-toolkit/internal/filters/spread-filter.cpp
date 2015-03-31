@@ -203,7 +203,6 @@ void SpreadFilter::SetupCamera()
   mCameraActor.SetNearClippingPlane(1.0f);
   mCameraActor.SetAspectRatio(mTargetSize.width / mTargetSize.height);
   mCameraActor.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
-  mCameraActor.SetRotation(Quaternion(M_PI, Vector3::YAXIS));
   mCameraActor.SetPosition(0.0f, 0.0f, ((mTargetSize.height * 0.5f) / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f)));
 }
 

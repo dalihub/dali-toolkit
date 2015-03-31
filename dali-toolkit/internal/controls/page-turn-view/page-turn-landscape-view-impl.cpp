@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 
 namespace Dali
 {
@@ -33,7 +34,10 @@ namespace Internal
 namespace
 {
 using namespace Dali;
-TypeRegistration mType( typeid(Toolkit::PageTurnLandscapeView), typeid(Toolkit::PageTurnView), NULL );
+
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::PageTurnLandscapeView, Toolkit::PageTurnView, NULL )
+DALI_TYPE_REGISTRATION_END()
+
 }
 
 PageTurnLandscapeView::PageTurnLandscapeView( PageFactory& pageFactory, const Vector2& pageSize )

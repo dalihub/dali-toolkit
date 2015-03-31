@@ -135,6 +135,26 @@ Size TableView::GetCellPadding()
   return GetImpl(*this).GetCellPadding();
 }
 
+void TableView::SetFitHeight( unsigned int rowIndex )
+{
+  GetImpl(*this).SetRowPolicy( rowIndex, Internal::TableView::FIT );
+}
+
+bool TableView::IsFitHeight( unsigned int rowIndex ) const
+{
+  return ( GetImpl(*this).GetRowPolicy( rowIndex ) == Internal::TableView::FIT );
+}
+
+void TableView::SetFitWidth( unsigned int columnIndex )
+{
+  GetImpl(*this).SetColumnPolicy( columnIndex, Internal::TableView::FIT );
+}
+
+bool TableView::IsFitWidth( unsigned int columnIndex ) const
+{
+  return ( GetImpl(*this).GetColumnPolicy( columnIndex ) == Internal::TableView::FIT );
+}
+
 void TableView::SetFixedHeight( unsigned int rowIndex, float height )
 {
   GetImpl(*this).SetFixedHeight( rowIndex, height );
@@ -183,6 +203,11 @@ unsigned int TableView::GetRows()
 unsigned int TableView::GetColumns()
 {
   return GetImpl(*this).GetColumns();
+}
+
+void TableView::SetCellAlignment( CellPosition position, HorizontalAlignment::Type horizontal, VerticalAlignment::Type vertical )
+{
+  GetImpl(*this).SetCellAlignment( position, horizontal, vertical );
 }
 
 TableView::TableView(Internal::TableView& implementation)

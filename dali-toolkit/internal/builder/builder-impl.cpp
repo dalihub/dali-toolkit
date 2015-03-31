@@ -529,6 +529,9 @@ BaseHandle Builder::DoCreate( const TreeNode& root, const TreeNode& node,
 
       if( actor )
       {
+        // TEMP: Assume all script created actors are not using size negotiation for now
+        actor.SetRelayoutEnabled( false );
+
         // add children of all the styles
         if( OptionalChild actors = IsChild( node, KEYNAME_ACTORS ) )
         {
@@ -770,7 +773,7 @@ Path Builder::GetPath( const std::string& name )
           if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
           {
             ret = Path::New();
-            ret.SetProperty( Path::Property::Points, points);
+            ret.SetProperty( Path::Property::POINTS, points);
 
             //control-points property
             if( OptionalChild pointsProperty = IsChild( *path, "control-points") )
@@ -778,7 +781,7 @@ Path Builder::GetPath( const std::string& name )
               Dali::Property::Value points(Property::ARRAY);
               if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
               {
-                ret.SetProperty( Path::Property::ControlPoints, points);
+                ret.SetProperty( Path::Property::CONTROL_POINTS, points);
               }
             }
             else

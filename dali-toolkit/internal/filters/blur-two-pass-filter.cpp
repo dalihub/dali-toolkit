@@ -300,7 +300,6 @@ void BlurTwoPassFilter::SetupCamera()
   mCameraForBlur.SetNearClippingPlane(1.0f);
   mCameraForBlur.SetAspectRatio(mTargetSize.width / mTargetSize.height);
   mCameraForBlur.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
-  mCameraForBlur.SetRotation(Quaternion(M_PI, Vector3::YAXIS));
   mCameraForBlur.SetPosition(0.0f, 0.0f, ((mTargetSize.height * 0.5f) / tanf(ARBITRARY_FIELD_OF_VIEW * 0.5f)));
 }
 

@@ -138,10 +138,9 @@ private: // From Control
   virtual void OnInitialize();
 
   /**
-   *
-   * @copydoc Toolkit::Control::OnControlSizeSet( const Vector3& targetSize )
+   * @copydoc Toolkit::Control::OnRelayout()
    */
-  virtual void OnControlSizeSet( const Vector3& targetSize );
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
 
 private:
 
@@ -180,7 +179,6 @@ private:
   Animation      mRotateAnimation;        ///< The animation which rotates the view (and all layers added to it)
   float          mOrientationFunction[4]; ///< The orientation function used to transform from degrees to the internal orientation.
   bool           mAutoRotateEnabled;      ///< Whether the view rotates if the OrientationChanged method is called.
-  Vector3        mViewSize;               ///< The Control Size
 
   Toolkit::View::OrientationAnimationStartedSignalType mOrientationAnimationStartedSignal;
 };

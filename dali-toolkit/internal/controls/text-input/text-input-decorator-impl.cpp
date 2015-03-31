@@ -439,7 +439,7 @@ void Decorator::DrawCursor(const std::size_t nthChar)
   {
     DALI_ASSERT_DEBUG( ( 0 <= cursorPosition-1 ) && ( cursorPosition-1 < mTextViewCharacterPositioning.StyledTextSize() ) );
     const TextStyle styleAtCursor = mTextViewCharacterPositioning.GetStyleAt( cursorPosition-1 );
-    mCursor.SetRotation( styleAtCursor.IsItalicsEnabled() ? Degree( styleAtCursor.GetItalicsAngle() - CURSOR_ANGLE_OFFSET ) : Degree( 0.f ), Vector3::ZAXIS );
+    mCursor.SetOrientation( styleAtCursor.IsItalicsEnabled() ? Degree( styleAtCursor.GetItalicsAngle() - CURSOR_ANGLE_OFFSET ) : Degree( 0.f ), Vector3::ZAXIS );
   }
 
   DALI_ASSERT_DEBUG( cursorPosition <= mTextViewCharacterPositioning.GetNumberOfCharactersInText() );
@@ -654,37 +654,37 @@ void Decorator::SetUpHandlePropertyNotifications()
   Actor selectionHandleTwo = mTextInputHandles.GetSelectionHandleTwo();
 
   // Exceeding horizontal boundary
-  PropertyNotification leftNotification = selectionHandleOne.AddPropertyNotification( Actor::Property::WorldPositionX, LessThanCondition( mBoundingRectangleWorldCoordinates.x + handlesize.x) );
+  PropertyNotification leftNotification = selectionHandleOne.AddPropertyNotification( Actor::Property::WORLD_POSITION_X, LessThanCondition( mBoundingRectangleWorldCoordinates.x + handlesize.x) );
   leftNotification.NotifySignal().Connect( this, &Decorator::OnLeftBoundaryExceeded );
 
-  PropertyNotification rightNotification = selectionHandleTwo.AddPropertyNotification( Actor::Property::WorldPositionX, GreaterThanCondition( mBoundingRectangleWorldCoordinates.z - handlesize.x ) );
+  PropertyNotification rightNotification = selectionHandleTwo.AddPropertyNotification( Actor::Property::WORLD_POSITION_X, GreaterThanCondition( mBoundingRectangleWorldCoordinates.z - handlesize.x ) );
   rightNotification.NotifySignal().Connect( this, &Decorator::OnRightBoundaryExceeded );
 
   // Within horizontal boundary
-  PropertyNotification leftLeaveNotification = selectionHandleOne.AddPropertyNotification( Actor::Property::WorldPositionX, GreaterThanCondition( mBoundingRectangleWorldCoordinates.x + 2*handlesize.x ) );
+  PropertyNotification leftLeaveNotification = selectionHandleOne.AddPropertyNotification( Actor::Property::WORLD_POSITION_X, GreaterThanCondition( mBoundingRectangleWorldCoordinates.x + 2*handlesize.x ) );
   leftLeaveNotification.NotifySignal().Connect( this, &Decorator::OnReturnToLeftBoundary );
 
-  PropertyNotification rightLeaveNotification = selectionHandleTwo.AddPropertyNotification( Actor::Property::WorldPositionX, LessThanCondition( mBoundingRectangleWorldCoordinates.z - 2*handlesize.x ) );
+  PropertyNotification rightLeaveNotification = selectionHandleTwo.AddPropertyNotification( Actor::Property::WORLD_POSITION_X, LessThanCondition( mBoundingRectangleWorldCoordinates.z - 2*handlesize.x ) );
   rightLeaveNotification.NotifySignal().Connect( this, &Decorator::OnReturnToRightBoundary );
 
   // Exceeding vertical boundary
-  PropertyNotification verticalExceedNotificationOne = selectionHandleOne.AddPropertyNotification( Actor::Property::WorldPositionY,
+  PropertyNotification verticalExceedNotificationOne = selectionHandleOne.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
                                                        OutsideCondition( mBoundingRectangleWorldCoordinates.y + handlesize.y,
                                                                          mBoundingRectangleWorldCoordinates.w - handlesize.y ) );
   verticalExceedNotificationOne.NotifySignal().Connect( this, &Decorator::OnHandleOneLeavesBoundary );
 
-  PropertyNotification verticalExceedNotificationTwo = selectionHandleTwo.AddPropertyNotification( Actor::Property::WorldPositionY,
+  PropertyNotification verticalExceedNotificationTwo = selectionHandleTwo.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
                                                        OutsideCondition( mBoundingRectangleWorldCoordinates.y + handlesize.y,
                                                                          mBoundingRectangleWorldCoordinates.w - handlesize.y ) );
   verticalExceedNotificationTwo.NotifySignal().Connect( this, &Decorator::OnHandleTwoLeavesBoundary );
 
   // Within vertical boundary
-  PropertyNotification verticalWithinNotificationOne = selectionHandleOne.AddPropertyNotification( Actor::Property::WorldPositionY,
+  PropertyNotification verticalWithinNotificationOne = selectionHandleOne.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
                                                        InsideCondition( mBoundingRectangleWorldCoordinates.y + handlesize.y,
                                                                         mBoundingRectangleWorldCoordinates.w - handlesize.y ) );
   verticalWithinNotificationOne.NotifySignal().Connect( this, &Decorator::OnHandleOneWithinBoundary );
 
-  PropertyNotification verticalWithinNotificationTwo = selectionHandleTwo.AddPropertyNotification( Actor::Property::WorldPositionY,
+  PropertyNotification verticalWithinNotificationTwo = selectionHandleTwo.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
                                                        InsideCondition( mBoundingRectangleWorldCoordinates.y + handlesize.y,
                                                                         mBoundingRectangleWorldCoordinates.w - handlesize.y ) );
   verticalWithinNotificationTwo.NotifySignal().Connect( this, &Decorator::OnHandleTwoWithinBoundary );
@@ -837,7 +837,7 @@ void Decorator::SetUpPopUpPositionNotifications( )
   // Note Property notifications ignore any set anchor point so conditions must allow for this.  Default is Top Left.
 
   // Exceeding vertical boundary
-  PropertyNotification verticalExceedNotificationOne = mPopUpPanel.Self().AddPropertyNotification( Actor::Property::WorldPositionY,
+  PropertyNotification verticalExceedNotificationOne = mPopUpPanel.Self().AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
                                                        OutsideCondition( mBoundingRectangleWorldCoordinates.y + mPopUpPanel.GetSize().y/2,
                                                                          mBoundingRectangleWorldCoordinates.w - mPopUpPanel.GetSize().y/2 ) );
   verticalExceedNotificationOne.NotifySignal().Connect( this, &Decorator::PopUpLeavesVerticalBoundary );

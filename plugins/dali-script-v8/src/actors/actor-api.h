@@ -58,18 +58,21 @@ namespace ActorApi
   void Unparent( const v8::FunctionCallbackInfo< v8::Value >& args);
   void GetChildAt( const v8::FunctionCallbackInfo< v8::Value >& args);
   void FindChildByName( const v8::FunctionCallbackInfo< v8::Value >& args);
-  void FindChildByAlias( const v8::FunctionCallbackInfo< v8::Value >& args);
   void FindChildById( const v8::FunctionCallbackInfo< v8::Value >& args);
   void GetParent( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetChildCount( const v8::FunctionCallbackInfo< v8::Value >& args );
   void ScreenToLocal( const v8::FunctionCallbackInfo< v8::Value >& args );
   void SetKeyboardFocusable( const v8::FunctionCallbackInfo< v8::Value >& args );
   void IsKeyboardFocusable( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void MoveBy( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void TranslateBy( const v8::FunctionCallbackInfo< v8::Value >& args );
   void RotateBy( const v8::FunctionCallbackInfo< v8::Value >& args );
   void ScaleBy( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void OpacityBy( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void ColorBy( const v8::FunctionCallbackInfo< v8::Value >& args );
+
+  // new function just for JavaScript API, to apply a PathConstraint to an actor
+  void ApplyPathConstraint( const v8::FunctionCallbackInfo< v8::Value >& args );
+
+  // new function just for JavaScript API, to remove a PathConstraint from an actor
+  void RemovePathConstraint( const v8::FunctionCallbackInfo< v8::Value >& args );
 
   // new function just for JavaScript API, to help developers know what type of actor
   // they're dealing with, returns actor name as a string

@@ -22,6 +22,7 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 namespace Dali
@@ -36,13 +37,12 @@ namespace Internal
 namespace
 {
 
-// Signals
+// Setup properties, signals and actions using the type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::CubeTransitionEffect, Dali::BaseHandle, NULL );
 
-const char* const SIGNAL_TRANSITION_COMPLETED = "transition-completed";
+DALI_SIGNAL_REGISTRATION( CubeTransitionEffect, "transition-completed", SIGNAL_TRANSITION_COMPLETED )
 
-TypeRegistration typeRegistration( typeid( Toolkit::CubeTransitionEffect ), typeid( Dali::BaseHandle ), NULL );
-
-SignalConnectorType signalConnector1( typeRegistration, SIGNAL_TRANSITION_COMPLETED , &CubeTransitionEffect::DoConnectSignal );
+DALI_TYPE_REGISTRATION_END()
 
 }
 
@@ -119,6 +119,7 @@ void CubeTransitionEffect::Initialize()
   mEmptyImage.SetSize(Stage::GetCurrent().GetSize());
   mEmptyImage.SetParentOrigin( ParentOrigin::CENTER );
   mEmptyImage.SetAnchorPoint( AnchorPoint::CENTER );
+  mEmptyImage.SetRelayoutEnabled( false );
   mFullImageCreator = FullAreaImageCreator::New();
   mEmptyImage.SetShaderEffect( mFullImageCreator );
   Stage::GetCurrent().Add(mEmptyImage);
@@ -141,6 +142,7 @@ ImageActor CubeTransitionEffect::CreateTile( Image image, const Vector4& color )
   ImageActor tile = ImageActor::New( image );
   tile.SetParentOrigin( ParentOrigin::CENTER );
   tile.SetAnchorPoint( AnchorPoint::CENTER );
+  tile.SetRelayoutEnabled( false );
   tile.SetSize( mTileSize );
   tile.SetColorMode( Dali::USE_OWN_COLOR );
   tile.SetColor( color );
