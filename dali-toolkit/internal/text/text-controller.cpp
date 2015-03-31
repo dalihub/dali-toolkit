@@ -245,7 +245,7 @@ struct Controller::TextInput
       float yPosition = event.p3.mFloat - alignmentOffset.y;
       float height(0.0f);
       GetClosestCursorPosition( mPrimaryCursorPosition, xPosition, yPosition, height );
-      mDecorator->SetPosition( PRIMARY_CURSOR, xPosition, yPosition, height );
+      mDecorator->SetPosition( PRIMARY_CURSOR, xPosition, yPosition, height, height ); // TODO: To be fixed in the next patch.
       mUpdateCursorPosition = false;
 
       mDecoratorUpdated = true;
@@ -325,7 +325,8 @@ struct Controller::TextInput
 
       GetClosestCursorPosition( mPrimaryCursorPosition, xPosition, yPosition, height );
 
-      mDecorator->SetPosition( PRIMARY_CURSOR, xPosition, yPosition, height );
+      mDecorator->SetPosition( PRIMARY_CURSOR, xPosition, yPosition, height, height ); // TODO: To be fixed in the next patch.
+
       //mDecorator->HidePopup();
       ChangeState ( EDITING );
       mDecoratorUpdated = true;
@@ -567,7 +568,7 @@ struct Controller::TextInput
       }
     }
 
-    mDecorator->SetPosition( PRIMARY_CURSOR, visualX, visualY, height );
+    mDecorator->SetPosition( PRIMARY_CURSOR, visualX, visualY, height, height ); // TODO: To be fixed in the next patch.
     mDecoratorUpdated = true;
   }
 
