@@ -55,6 +55,9 @@ NavigationTitleBar::NavigationTitleBar(NavigationControl& naviControl,
   // title icon layout: the top row, the bottom row and the left column are all for margins
   mTitleIconLayout= Toolkit::TableView::New( 3,2 );
   SetFixedSizes();
+
+  mTitle = Toolkit::TextLabel::New();
+  mSubTitle = Toolkit::TextLabel::New();
 }
 
 void NavigationTitleBar::Update( Toolkit::Page page )
@@ -103,6 +106,21 @@ void NavigationTitleBar::Update( Toolkit::Page page )
     mLayout.InsertColumn(2);
     mLayout.SetFixedWidth(2, numControls * ( mCurrentStyle->buttonSize + mCurrentStyle->gapBetweenButtons) );
     mLayout.AddChild(mButtonLayout, Toolkit::TableView::CellPosition(0,2));
+  }
+
+  // add title and subtitle(if exist)
+  mTitle.SetProperty( Toolkit::TextLabel::Property::TEXT, page.GetTitle() );
+  if( page.GetSubTitle().empty() )  //display title
+  {
+    mTitleLayout.SetFixedHeight( 1,mCurrentStyle->titleHeightWithoutSubtitle - mCurrentStyle->subtitleHeight );
+    mTitleLayout.AddChild( mTitle, Toolkit::TableView::CellPosition(1,0,2,1) );
+  }
+  else //display title and subtitle
+  {
+    mTitleLayout.SetFixedHeight( 1, mCurrentStyle->titleHeightWithSubtitle );
+    mTitleLayout.AddChild( mTitle, Toolkit::TableView::CellPosition(1,0) );
+    mSubTitle.SetProperty( Toolkit::TextLabel::Property::TEXT, page.GetSubTitle() );
+    mTitleLayout.AddChild( mSubTitle, Toolkit::TableView::CellPosition(2,0) );
   }
 
   // insert title icon to the left of the title(if exist)

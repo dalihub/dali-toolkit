@@ -348,7 +348,14 @@ void Slider::DisplayValue( float value, bool raiseSignals )
     }
   }
 
-  // TODO
+  if( mHandleValueTextLabel )
+  {
+    std::stringstream ss;
+    ss.precision( GetValuePrecision() );
+    ss << std::fixed << clampledValue;
+
+    mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, ss.str() );
+  }
 }
 
 void Slider::SetMarks( const MarkList& marks )
@@ -516,9 +523,14 @@ ImageActor Slider::CreatePopupArrow()
   return arrow;
 }
 
-//Toolkit::TextView Slider::CreatePopupText()
-//{
-//}
+Toolkit::TextLabel Slider::CreatePopupText()
+{
+  Toolkit::TextLabel textLabel = Toolkit::TextLabel::New();
+  textLabel.SetParentOrigin( ParentOrigin::CENTER );
+  textLabel.SetAnchorPoint( AnchorPoint::CENTER );
+  textLabel.SetZ( VALUE_DISPLAY_TEXT_Z );
+  return textLabel;
+}
 
 ImageActor Slider::CreatePopup()
 {
@@ -559,10 +571,19 @@ void Slider::ResizeHandleRegion( const Vector2& region )
 
 void Slider::CreateHandleValueDisplay()
 {
+  if( mHandle && !mHandleValueTextLabel )
+  {
+    mHandleValueTextLabel = Toolkit::TextLabel::New();
+    mHandleValueTextLabel.SetParentOrigin( ParentOrigin::CENTER );
+    mHandleValueTextLabel.SetAnchorPoint( AnchorPoint::CENTER );
+    mHandleValueTextLabel.SetDrawMode( DrawMode::OVERLAY );
+    mHandle.Add( mHandleValueTextLabel );
+  }
 }
 
 void Slider::DestroyHandleValueDisplay()
 {
+  UnparentAndReset(mHandleValueTextLabel);
 }
 
 void Slider::SetPopupTextColor( const Vector4& color )
@@ -988,6 +1009,21 @@ bool Slider::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tr
 
 void Slider::DisplayPopup( float value )
 {
+  // Value displayDoConnectSignal
+  if( mValueTextLabel )
+  {
+    std::stringstream ss;
+    ss.precision( GetValuePrecision() );
+    ss << std::fixed << value;
+    mValueTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, ss.str() );
+
+    if( mValueDisplay )
+    {
+      mValueDisplay.SetVisible( true );
+
+      mValueTimer.SetInterval( VALUE_VIEW_SHOW_DURATION );
+    }
+  }
 }
 
 void Slider::SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )

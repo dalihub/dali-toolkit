@@ -26,6 +26,7 @@
 #include <dali/public-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 namespace Dali
 {
@@ -210,6 +211,8 @@ float Button::GetAnimationTime() const
 
 void Button::SetLabel( const std::string& label )
 {
+  Toolkit::TextLabel textLabel = Toolkit::TextLabel::New( label );
+  SetLabel( textLabel );
 }
 
 void Button::SetLabel( Actor label )

@@ -23,6 +23,7 @@
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 namespace Dali
 {
@@ -1069,6 +1070,23 @@ Vector3 PushButton::GetNaturalSize()
       if( heightIsZero )
       {
         size.height = std::max( size.height, imageSize.height );
+      }
+    }
+
+    // If label, test against it's size
+    Toolkit::TextLabel textLabel = Toolkit::TextLabel::DownCast( GetLabel() );
+    if( textLabel )
+    {
+      Vector3 textLabelSize = textLabel.GetNaturalSize();
+
+      if( widthIsZero )
+      {
+        size.width = std::max( size.width, textLabelSize.width + TEXT_PADDING * 2.0f );
+      }
+
+      if( heightIsZero )
+      {
+        size.height = std::max( size.height, textLabelSize.height + TEXT_PADDING * 2.0f );
       }
     }
   }
