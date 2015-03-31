@@ -27,10 +27,8 @@ script_v8_plugin_src_files = \
    $(v8_plugin_dir)/events/pan-gesture-detector-api.cpp \
    $(v8_plugin_dir)/events/pan-gesture-detector-wrapper.cpp \
    $(v8_plugin_dir)/stage/stage-api.cpp \
-   $(v8_plugin_dir)/image/image-attributes-api.cpp \
    $(v8_plugin_dir)/shader-effects/shader-effect-api.cpp \
    $(v8_plugin_dir)/shader-effects/shader-effect-wrapper.cpp \
-   $(v8_plugin_dir)/image/image-attributes-wrapper.cpp \
    $(v8_plugin_dir)/image/image-wrapper.cpp \
    $(v8_plugin_dir)/image/image-api.cpp \
    $(v8_plugin_dir)/image/buffer-image-api.cpp \

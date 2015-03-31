@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <stdint.h>
 #include <cstring>
+#include <dali/public-api/images/image-operations.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/set-wrapper.h>
@@ -97,13 +98,23 @@ public:
    */
   virtual void Resume();
 
-  virtual void GetClosestImageSize( const std::string& filename,
-                                    const ImageAttributes& attributes,
-                                    Vector2& closestSize);
+  /**
+   * @copydoc PlatformAbstraction::GetClosestImageSize()
+   */
+  virtual ImageDimensions GetClosestImageSize( const std::string& filename,
+                                                 ImageDimensions size,
+                                                 FittingMode::Type scalingMode,
+                                                 SamplingMode::Type samplingMode,
+                                                 bool orientationCorrection );
 
-  virtual void GetClosestImageSize( Integration::ResourcePointer resourceBuffer,
-                                    const ImageAttributes& attributes,
-                                    Vector2& closestSize);
+  /**
+   * @copydoc PlatformAbstraction::GetClosestImageSize()
+   */
+  virtual ImageDimensions GetClosestImageSize( Integration::ResourcePointer resourceBuffer,
+                                               ImageDimensions size,
+                                               FittingMode::Type scalingMode,
+                                               SamplingMode::Type samplingMode,
+                                               bool orientationCorrection );
 
   /**
    * @copydoc PlatformAbstraction::LoadResource()
