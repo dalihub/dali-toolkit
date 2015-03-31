@@ -343,6 +343,46 @@ void VisualModel::GetLinesOfGlyphRange( LineRun* lines,
   memcpy( lines, mLines.Begin() + firstLine, numberOfLines * sizeof( LineRun ) );
 }
 
+LineIndex VisualModel::GetLineOfGlyph( GlyphIndex glyphIndex )
+{
+  const CharacterIndex characterIndex = *( mGlyphsToCharacters.Begin() + glyphIndex );
+
+  return GetLineOfCharacter( characterIndex );
+}
+
+LineIndex VisualModel::GetLineOfCharacter( CharacterIndex characterIndex )
+{
+  // 1) Check first in the cached line.
+
+  const LineRun& lineRun = *( mLines.Begin() + mCachedLineIndex );
+
+  if( ( lineRun.characterRun.characterIndex <= characterIndex ) &&
+      ( characterIndex < lineRun.characterRun.characterIndex + lineRun.characterRun.numberOfCharacters ) )
+  {
+    return mCachedLineIndex;
+  }
+
+  // 2) Is not in the cached line. Check in the other lines.
+
+  LineIndex index = characterIndex < lineRun.characterRun.characterIndex ? 0u : mCachedLineIndex + 1u;
+
+  for( Vector<LineRun>::ConstIterator it = mLines.Begin() + index,
+         endIt = mLines.End();
+       it != endIt;
+       ++it, ++index )
+  {
+    const LineRun& lineRun = *it;
+
+    if( characterIndex < lineRun.characterRun.characterIndex + lineRun.characterRun.numberOfCharacters )
+    {
+      mCachedLineIndex = index;
+      break;
+    }
+  }
+
+  return index;
+}
+
 void VisualModel::ReplaceLines( GlyphIndex glyphIndex,
                                 Length numberOfGlyphsToRemove,
                                 const LineRun* const lines,
@@ -426,12 +466,32 @@ bool VisualModel::IsUnderlineEnabled() const
   return mUnderlineEnabled;
 }
 
+void VisualModel::ClearCaches()
+{
+  mCachedLineIndex = 0u;
+}
+
 VisualModel::~VisualModel()
 {
 }
 
 VisualModel::VisualModel()
-: mUnderlineColorSet( false )
+: mGlyphs(),
+  mGlyphsToCharacters(),
+  mCharactersToGlyph(),
+  mCharactersPerGlyph(),
+  mGlyphsPerCharacter(),
+  mGlyphPositions(),
+  mLines(),
+  mTextColor(),
+  mShadowColor(),
+  mUnderlineColor(),
+  mShadowOffset(),
+  mNaturalSize(),
+  mActualSize(),
+  mCachedLineIndex( 0u ),
+  mUnderlineEnabled( false ),
+  mUnderlineColorSet( false )
 {
 }
 
