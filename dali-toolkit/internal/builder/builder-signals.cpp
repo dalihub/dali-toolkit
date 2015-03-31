@@ -16,8 +16,11 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/debug.h>
 #include <boost/function.hpp>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/object/type-info.h>
+#include <dali/public-api/object/property-notification.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/builder/builder-impl.h>

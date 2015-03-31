@@ -22,8 +22,11 @@
 #include <string>
 #include <list>
 #include <map>
+#include <dali/public-api/common/stage.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/property-map.h>
+#include <dali/public-api/render-tasks/render-task.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
