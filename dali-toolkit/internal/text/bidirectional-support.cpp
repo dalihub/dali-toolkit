@@ -170,7 +170,7 @@ void ReplaceBidirectionalInfo( LogicalModel& model,
 }
 
 void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
-                   const Vector<LineRun>& lineRuns,
+                   Vector<LineRun>& lineRuns,
                    Vector<BidirectionalLineInfoRun>& lineInfoRuns )
 {
   // Handle to the bidirectional info module in text-abstraction.
@@ -202,12 +202,15 @@ void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInf
     lineIndex = firstLine + numberOfLines;
 
     // Traverse the lines and reorder them
-    for( Vector<LineRun>::ConstIterator lineIt = lineRuns.Begin() + firstLine,
+    for( Vector<LineRun>::Iterator lineIt = lineRuns.Begin() + firstLine,
            endLineIt = lineRuns.Begin() + firstLine + numberOfLines;
            lineIt != endLineIt;
          ++lineIt )
     {
-      const LineRun& line = *lineIt;
+      LineRun& line = *lineIt;
+
+      // Sets the paragraph's direction.
+      line.direction = direction;
 
       // Creates a bidirectional info for the line run.
       BidirectionalLineInfoRun lineInfoRun;

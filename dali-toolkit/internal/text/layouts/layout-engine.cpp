@@ -475,6 +475,7 @@ struct LayoutEngine::Impl
     lineRun.lineSize.width = layout.length;
     lineRun.lineSize.height = layout.ascender + layout.descender;
     lineRun.extraLength = layout.wsLengthEndOfLine;
+    lineRun.direction = false;
 
     lines.PushBack( lineRun );
 
@@ -533,6 +534,7 @@ struct LayoutEngine::Impl
       lineRun.lineSize.width = layout.length + ( ( layout.widthAdvanceDiff > 0.f ) ? layout.widthAdvanceDiff : 0.f );
       lineRun.lineSize.height = layout.ascender + layout.descender;
       lineRun.extraLength = layout.wsLengthEndOfLine;
+      lineRun.direction = false;
 
       lines.PushBack( lineRun );
 
