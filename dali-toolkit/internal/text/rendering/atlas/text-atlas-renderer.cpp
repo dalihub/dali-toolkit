@@ -420,6 +420,10 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
   void RenderComplete( RenderTask& renderTask )
   {
+    // Disconnect and remove this single shot render task
+    renderTask.FinishedSignal().Disconnect( this, &AtlasRenderer::Impl::RenderComplete );
+    Stage::GetCurrent().GetRenderTaskList().RemoveTask( renderTask );
+
     // Get the actor used for render to buffer and remove it from the parent
     Actor renderActor = renderTask.GetSourceActor();
     if ( renderActor )
