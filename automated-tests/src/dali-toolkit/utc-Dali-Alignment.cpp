@@ -1010,7 +1010,7 @@ int UtcDaliAlignmentOnSizeAnimation(void)
   Stage::GetCurrent().Add(alignment);
 
   Animation animation = Animation::New(100.0f);
-  animation.Resize(alignment, Vector3(100.0f, 150.0f, 200.0f));
+  animation.AnimateTo( Property( alignment, Actor::Property::SIZE ), Vector3( 100.0f, 150.0f, 200.0f ) );
   animation.Play();
 
   application.Render();

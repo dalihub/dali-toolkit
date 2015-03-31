@@ -97,14 +97,14 @@ void CubeTransitionWaveEffect::OnStartTransition( Vector2 panPosition, Vector2 p
       // the delay value is within 0.f ~ 2.f*thirdAnimationDuration
       float delay = thirdAnimationDuration * CalculateDelay(x*mTileSize.width,y*mTileSize.height);
 
-      mAnimation.RotateTo( mBoxes[idx], Degree( -angle ), Vector3::YAXIS,
-                           AlphaFunctions::EaseOutSine, delay, thirdAnimationDuration );
-      mAnimation.MoveBy( mBoxes[idx], Vector3(0.f,0.f,-mCubeDisplacement),
-                         AlphaFunctions::Bounce, delay, thirdAnimationDuration );
-      mAnimation.ColorTo( mTiles[anotherIndex][idx], HALF_BRIGHTNESS,
-                          AlphaFunctions::EaseOut, delay, thirdAnimationDuration );
-      mAnimation.ColorTo( mTiles[mContainerIndex][idx], FULL_BRIGHTNESS,
-                          AlphaFunctions::EaseIn, delay, thirdAnimationDuration );
+      mAnimation.AnimateTo( Property( mBoxes[idx], Actor::Property::ORIENTATION ), Quaternion( Radian( Degree( -angle ) ), Vector3::YAXIS ),
+                            AlphaFunctions::EaseOutSine, TimePeriod( delay, thirdAnimationDuration ) );
+      mAnimation.AnimateBy( Property( mBoxes[idx], Actor::Property::POSITION ), Vector3( 0.f, 0.f, -mCubeDisplacement ),
+                         AlphaFunctions::Bounce, TimePeriod( delay, thirdAnimationDuration ) );
+      mAnimation.AnimateTo( Property( mTiles[anotherIndex][idx], Actor::Property::COLOR ), HALF_BRIGHTNESS,
+                          AlphaFunctions::EaseOut, TimePeriod( delay, thirdAnimationDuration ) );
+      mAnimation.AnimateTo( Property( mTiles[mContainerIndex][idx], Actor::Property::COLOR ), FULL_BRIGHTNESS,
+                          AlphaFunctions::EaseIn, TimePeriod( delay, thirdAnimationDuration ) );
     }
   }
 

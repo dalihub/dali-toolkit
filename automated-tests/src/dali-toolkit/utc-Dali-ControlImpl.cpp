@@ -505,7 +505,7 @@ int UtcDaliControlImplSizeAnimation(void)
 
     DALI_TEST_EQUALS( dummyImpl.sizeAnimationCalled, false, TEST_LOCATION );
     Animation animation = Animation::New(1.0f);
-    animation.Resize(dummy, Vector3(100.0f, 150.0f, 200.0f));
+    animation.AnimateTo( Property( dummy, Actor::Property::SIZE ), Vector3( 100.0f, 150.0f, 200.0f ) );
     animation.Play();
 
     application.Render();
@@ -525,7 +525,7 @@ int UtcDaliControlImplSizeAnimation(void)
     Stage::GetCurrent().Add(dummy);
 
     Animation animation = Animation::New(1.0f);
-    animation.Resize(dummy, Vector3(100.0f, 150.0f, 200.0f));
+    animation.AnimateTo( Property( dummy, Actor::Property::SIZE ), Vector3( 100.0f, 150.0f, 200.0f ) );
     animation.Play();
 
     application.Render();

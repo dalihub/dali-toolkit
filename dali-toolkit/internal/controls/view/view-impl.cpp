@@ -168,6 +168,8 @@ void View::SetOrientationFunction( Degree portrait, Degree landscale, Degree por
 
 void View::OrientationChanged( Dali::Orientation orientation )
 {
+  Actor self = Self();
+
   // Nothing to do if orientation doesn't really change.
   if ( orientation.GetDegrees() == mOrientation || !mAutoRotateEnabled )
   {
@@ -178,13 +180,13 @@ void View::OrientationChanged( Dali::Orientation orientation )
 
   // has parent so we expect it to be on stage
   mRotateAnimation = Animation::New( ROTATION_ANIMATION_DURATION );
-  mRotateAnimation.RotateTo( Self(), Degree( -orientation.GetDegrees() ), Vector3::ZAXIS, AlphaFunctions::EaseOut );
+  mRotateAnimation.AnimateTo( Property( self, Actor::Property::ORIENTATION ), Quaternion( -orientation.GetRadians(), Vector3::ZAXIS ), AlphaFunctions::EaseOut );
 
   // Resize the view
   if( mFullScreen )
   {
     const Vector2& stageSize( Stage::GetCurrent().GetSize() );
-    const Vector3& currentSize( Self().GetCurrentSize() );
+    const Vector3& currentSize( self.GetCurrentSize() );
 
     float minSize = std::min( stageSize.width, stageSize.height );
     float maxSize = std::max( stageSize.width, stageSize.height );
@@ -214,15 +216,15 @@ void View::OrientationChanged( Dali::Orientation orientation )
     {
       // width grows, shrink height faster
       Vector3 shrink( currentSize );shrink.height = targetSize.height;
-      mRotateAnimation.Resize( Self(), shrink, AlphaFunctions::EaseOut, 0.0f, ROTATION_ANIMATION_DURATION * 0.5f );
-      mRotateAnimation.Resize( Self(), targetSize, AlphaFunctions::EaseIn, 0.0f, ROTATION_ANIMATION_DURATION );
+      mRotateAnimation.AnimateTo( Property( self, Actor::Property::SIZE ), shrink, AlphaFunctions::EaseOut, TimePeriod( 0.0f, ROTATION_ANIMATION_DURATION * 0.5f ) );
+      mRotateAnimation.AnimateTo( Property( self, Actor::Property::SIZE ), targetSize, AlphaFunctions::EaseIn, TimePeriod( 0.0f, ROTATION_ANIMATION_DURATION ) );
     }
     else
     {
       // height grows, shrink width faster
       Vector3 shrink( currentSize );shrink.width = targetSize.width;
-      mRotateAnimation.Resize( Self(), shrink, AlphaFunctions::EaseOut, 0.0f, ROTATION_ANIMATION_DURATION * 0.5f );
-      mRotateAnimation.Resize( Self(), targetSize, AlphaFunctions::EaseIn, 0.0f, ROTATION_ANIMATION_DURATION );
+      mRotateAnimation.AnimateTo( Property( self, Actor::Property::SIZE ), shrink, AlphaFunctions::EaseOut, TimePeriod( 0.0f, ROTATION_ANIMATION_DURATION * 0.5f ) );
+      mRotateAnimation.AnimateTo( Property( self, Actor::Property::SIZE ), targetSize, AlphaFunctions::EaseIn, TimePeriod( 0.0f, ROTATION_ANIMATION_DURATION ) );
     }
   }
 

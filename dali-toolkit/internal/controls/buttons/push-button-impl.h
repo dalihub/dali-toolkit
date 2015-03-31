@@ -165,7 +165,7 @@ private:
    * Adds the actor to the fade in animation. It creates a fade in animation if needed.
    * @param[in] actor The actor.
    */
-  void AddToFadeInAnimation( const Actor& actor );
+  void AddToFadeInAnimation( Actor& actor );
 
   /**
    * Starts the fade in animation.
@@ -181,7 +181,7 @@ private:
   /**
    * Adds the actor to the fade out animation. It creates a fade out animation if needed.
    */
-  void AddToFadeOutAnimation( const Actor& actor );
+  void AddToFadeOutAnimation( Actor& actor );
 
   /**
    * Starts the fade out animation.

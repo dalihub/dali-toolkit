@@ -15,19 +15,15 @@
  * actor.RotateBy(q);
  * @endcode
  *
- * The Dali::Animation class provides several RotateTo methods that
- * use \ref Dali::Quaternion "Quaternions" directly.  The other
- * RotateTo methods are specified using Axis+Angle, and these convert
- * to Quaternion internally. You will only need to use the quaternion
- * based methods when you are doing something more complex than
- * initialising with Axis+Angle, such as applying several rotations
- * together.
+ * The Dali::Animation class provides several AnimateTo methods that
+ * use \ref Dali::Quaternion "Quaternions" directly to change the orientation.
+ *
  * @code
  * mAnimation = Animation::New(5.0f); // 5 seconds
  * Quaternion q(Radian(Degree(45.0f)).value, Vector3::YAXIS);
  * Quaternion r(Radian(Degree(30.0f)).value, Vector3::ZAXIS);
  * q *= r;
- * mAnimation.RotateTo(mActor, q, AlphaFunctions::EaseInOut);
+ * mAnimation.AnimateTo(Property(mActor, Actor::Property::ORIENTATION), q, AlphaFunctions::EaseInOut);
  * mAnimation.Play();
  * @endcode
  */

@@ -1104,14 +1104,14 @@ Actor& PushButton::GetFadeOutBackgroundImage()
   return mFadeOutBackgroundContent;
 }
 
-void PushButton::AddToFadeInAnimation( const Actor& actor )
+void PushButton::AddToFadeInAnimation( Actor& actor )
 {
   if( !mFadeInAnimation )
   {
     mFadeInAnimation = Dali::Animation::New( GetAnimationTime() );
   }
 
-  mFadeInAnimation.OpacityTo( actor, 1.f );
+  mFadeInAnimation.AnimateTo( Property( actor, Actor::Property::COLOR_ALPHA ), 1.f );
 }
 
 void PushButton::StartFadeInAnimation()
@@ -1132,14 +1132,14 @@ void PushButton::StopFadeInAnimation()
   }
 }
 
-void PushButton::AddToFadeOutAnimation( const Actor& actor )
+void PushButton::AddToFadeOutAnimation( Actor& actor )
 {
   if( !mFadeOutAnimation )
   {
     mFadeOutAnimation = Dali::Animation::New( GetAnimationTime() );
   }
 
-  mFadeOutAnimation.OpacityTo( actor, 0.f );
+  mFadeOutAnimation.AnimateTo( Property( actor, Actor::Property::COLOR_ALPHA ), 0.f );
 }
 
 void PushButton::StartFadeOutAnimation()
