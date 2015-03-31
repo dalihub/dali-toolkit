@@ -607,6 +607,7 @@ public:
   Vector<BidirectionalLineInfoRun>      mBidirectionalLineInfo;
   Vector<CharacterIndex>                mLogicalToVisualMap;         ///< Bidirectional logical to visual conversion table.
   Vector<CharacterIndex>                mVisualToLogicalMap;         ///< Bidirectional visual to logical conversion table.
+  Vector<CharacterIndex>                mVisualToLogicalCursorMap;   ///< Bidirectional visual to logical cursor conversion table.
 };
 
 } // namespace Text
