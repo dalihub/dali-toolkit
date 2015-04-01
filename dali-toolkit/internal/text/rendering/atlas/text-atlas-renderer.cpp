@@ -161,7 +161,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       for ( uint32_t i = 0; i < meshContainer.size(); ++i )
       {
         MeshActor actor = MeshActor::New( Mesh::New( meshContainer[ i ].mMeshData ) );
-        actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
         actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
 
         // Check to see what pixel format the shader should be
@@ -362,7 +361,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     meshData.SetHasColor( false );
     meshData.SetHasTextureCoords( true );
     MeshActor actor = MeshActor::New( Mesh::New( meshData ) );
-    actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
     actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
     actor.SetShaderEffect( mBgraShader );
     actor.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
@@ -399,7 +397,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     newMeshData.SetHasTextureCoords( true );
 
     MeshActor subActor = MeshActor::New( Mesh::New( newMeshData ) );
-    subActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
     subActor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
     subActor.SetColor( shadowColor );
     subActor.SetShaderEffect( mBasicShadowShader );

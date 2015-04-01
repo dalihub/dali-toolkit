@@ -182,15 +182,13 @@ struct Decorator::Impl : public ConnectionTracker
     {
       mPrimaryCursor.SetPosition( mCursor[PRIMARY_CURSOR].x + scrollPosition.x,
                                   mCursor[PRIMARY_CURSOR].y + scrollPosition.y );
-      mPrimaryCursor.SetResizePolicy( FIXED, ALL_DIMENSIONS );
-      mPrimaryCursor.SetPreferredSize( Vector2( 1.0f, mCursor[PRIMARY_CURSOR].height ) );
+      mPrimaryCursor.SetSize( Vector2( 1.0f, mCursor[PRIMARY_CURSOR].height ) );
     }
     if( mSecondaryCursor )
     {
       mSecondaryCursor.SetPosition( mCursor[SECONDARY_CURSOR].x + scrollPosition.x,
                                     mCursor[SECONDARY_CURSOR].y + scrollPosition.y );
-      mSecondaryCursor.SetResizePolicy( FIXED, ALL_DIMENSIONS );
-      mSecondaryCursor.SetPreferredSize( Vector2( 1.0f, mCursor[SECONDARY_CURSOR].height ) );
+      mSecondaryCursor.SetSize( Vector2( 1.0f, mCursor[SECONDARY_CURSOR].height ) );
     }
 
     // Show or hide the grab handle
@@ -254,8 +252,9 @@ struct Decorator::Impl : public ConnectionTracker
   void CreateCursor( ImageActor& cursor )
   {
     cursor = CreateSolidColorActor( Color::WHITE );
-    cursor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    cursor.SetParentOrigin( ParentOrigin::TOP_LEFT ); // Need to set the default parent origin as CreateSolidColorActor() sets a different one.
     cursor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+    cursor.SetRelayoutEnabled( false );
   }
 
   // Add or Remove cursor(s) from parent
@@ -339,8 +338,7 @@ struct Decorator::Impl : public ConnectionTracker
       mActiveLayer.SetName ( "ActiveLayerActor" );
 #endif
 
-      mActiveLayer.SetAnchorPoint( AnchorPoint::CENTER);
-      mActiveLayer.SetParentOrigin( ParentOrigin::CENTER);
+      mActiveLayer.SetParentOrigin( ParentOrigin::CENTER );
       mActiveLayer.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
       mActiveLayer.SetPositionInheritanceMode( USE_PARENT_POSITION );
 
@@ -363,20 +361,19 @@ struct Decorator::Impl : public ConnectionTracker
 #ifdef DECORATOR_DEBUG
       mGrabHandle.SetName( "GrabHandleActor" );
 #endif
-      mGrabHandle.SetParentOrigin( ParentOrigin::TOP_LEFT );
       mGrabHandle.SetAnchorPoint( AnchorPoint::TOP_CENTER );
       mGrabHandle.SetDrawMode( DrawMode::OVERLAY );
       // Area that Grab handle responds to, larger than actual handle so easier to move
-//#ifdef DECORATOR_DEBUG
-//      mGrabArea = Toolkit::CreateSolidColorActor( Vector4(0.0f, 0.0f, 0.0f, 0.0f), true, Color::RED, 1 );
-//      mGrabArea.SetName( "GrabArea" );
-//#else
-      mGrabArea = Actor::New();  //todo Force use of Actor until SolidColorActor fixed in Size Negotiation
+#ifdef DECORATOR_DEBUG
+     mGrabArea = Toolkit::CreateSolidColorActor( Vector4(0.0f, 0.0f, 0.0f, 0.0f), true, Color::RED, 1 );
+     mGrabArea.SetName( "GrabArea" );
+#else
+      mGrabArea = Actor::New();
       mGrabArea.SetRelayoutEnabled( true );
-//#endif
+#endif
       mGrabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
-      mGrabArea.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
       mGrabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+      mGrabArea.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
       mGrabArea.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
       mGrabArea.SetSizeModeFactor( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE );
       mGrabHandle.Add( mGrabArea );
@@ -402,12 +399,12 @@ struct Decorator::Impl : public ConnectionTracker
 #ifdef DECORATOR_DEBUG
       primary.actor.SetName("SelectionHandleOne");
 #endif
-      primary.actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
       primary.actor.SetAnchorPoint( AnchorPoint::TOP_RIGHT ); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
       primary.actor.SetDrawMode( DrawMode::OVERLAY ); // ensure grab handle above text
       primary.flipped = false;
 
       primary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
+      primary.grabArea.SetRelayoutEnabled( true );
 #ifdef DECORATOR_DEBUG
       primary.grabArea.SetName("SelectionHandleOneGrabArea");
 #endif
@@ -435,12 +432,12 @@ struct Decorator::Impl : public ConnectionTracker
 #ifdef DECORATOR_DEBUG
       secondary.actor.SetName("SelectionHandleTwo");
 #endif
-      secondary.actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
       secondary.actor.SetAnchorPoint( AnchorPoint::TOP_LEFT ); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
       secondary.actor.SetDrawMode( DrawMode::OVERLAY ); // ensure grab handle above text
       secondary.flipped = false;
 
       secondary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
+      secondary.grabArea.SetRelayoutEnabled( true );
 #ifdef DECORATOR_DEBUG
       secondary.grabArea.SetName("SelectionHandleTwoGrabArea");
 #endif
@@ -475,7 +472,6 @@ struct Decorator::Impl : public ConnectionTracker
 #ifdef DECORATOR_DEBUG
       mHighlightMeshActor.SetName( "HighlightMeshActor" );
 #endif
-      mHighlightMeshActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
       mHighlightMeshActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
       mHighlightMeshActor.SetPosition( 0.0f, 0.0f, DISPLAYED_HIGHLIGHT_Z_OFFSET );
 

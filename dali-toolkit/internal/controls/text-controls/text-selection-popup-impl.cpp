@@ -438,23 +438,26 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    // 1. Create the backgrounds for the popup option both normal and pressed.
    // Both containers will be added to a button.
    Actor optionContainer = Actor::New();
+   optionContainer.SetRelayoutEnabled( true );
+   optionContainer.SetResizePolicy( FIXED, ALL_DIMENSIONS );
    optionContainer.SetDrawMode( DrawMode::OVERLAY );
-   //optionContainer.SetParentOrigin( ParentOrigin::CENTER );
    optionContainer.SetAnchorPoint( AnchorPoint::TOP_LEFT );
 
    ImageActor optionPressedContainer = Toolkit::CreateSolidColorActor( mBackgroundPressedColor );
+   optionPressedContainer.SetResizePolicy( FIXED, ALL_DIMENSIONS );
    optionPressedContainer.SetDrawMode( DrawMode::OVERLAY );
-   //optionPressedContainer.SetParentOrigin( ParentOrigin::CENTER );
    optionPressedContainer.SetAnchorPoint( AnchorPoint::TOP_LEFT );
 
    // 2. Add text.
    Toolkit::TextLabel captionTextLabel = Toolkit::TextLabel::New();
+   captionTextLabel.SetResizePolicy( FIXED, ALL_DIMENSIONS );
    captionTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, caption );
-   optionContainer.Add( captionTextLabel );
+   // optionContainer.Add( captionTextLabel ); Temporary removed.
 
    Toolkit::TextLabel pressedCaptionTextLabel = Toolkit::TextLabel::New();
+   pressedCaptionTextLabel.SetResizePolicy( FIXED, ALL_DIMENSIONS );
    pressedCaptionTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, caption );
-   optionPressedContainer.Add( pressedCaptionTextLabel );
+   // optionPressedContainer.Add( pressedCaptionTextLabel ); Temporary removed.
 
    // Calculates the icon/text position.
    float iconTextOffsetY = 0.0f;
@@ -500,8 +503,8 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    textSize.width = std::min( textSize.width, OPTION_MAX_WIDTH - 2.f * OPTION_MARGIN_WIDTH );
 
    // Set the size to the text. Text will be ellipsized if exceeds the max width.
-   captionTextLabel.SetSize( textSize );
-   pressedCaptionTextLabel.SetSize( textSize );
+   captionTextLabel.SetPreferredSize( textSize.GetVectorXY() );
+   pressedCaptionTextLabel.SetPreferredSize( textSize.GetVectorXY() );
 
    // 4. Calculate the size of option.
 
@@ -510,13 +513,13 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    const Vector2 optionSize( std::min( OPTION_MAX_WIDTH, std::max( OPTION_MIN_WIDTH, std::max( textSize.width, OPTION_ICON_SIZE.width ) + 2.f * OPTION_MARGIN_WIDTH ) ),
                              DEFAULT_POPUP_MAX_SIZE.height - mNinePatchMargins.z - mNinePatchMargins.w );
 
-   optionContainer.SetSize( optionSize );
-   optionPressedContainer.SetSize( optionSize );
+   optionContainer.SetPreferredSize( optionSize );
+   optionPressedContainer.SetPreferredSize( optionSize );
 
    // 5. Create a option.
    Toolkit::PushButton option = Toolkit::PushButton::New();
-   //option.SetSizePolicy( Toolkit::Control::Fixed, Toolkit::Control::Fixed ); FIXME
-   option.SetSize( optionSize );
+   option.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+   option.SetPreferredSize( optionSize );
    option.SetAnchorPoint( AnchorPoint::TOP_LEFT );
    option.SetX( mContentSize.width );
    option.SetName( name );
@@ -541,7 +544,8 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
      const Size size( POPUP_DIVIDER_WIDTH, mContentSize.height );
 
      ImageActor divider =  Toolkit::CreateSolidColorActor( Color::WHITE );
-     divider.SetSize (size);
+     divider.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+     divider.SetPreferredSize( size );
      divider.SetParentOrigin( ParentOrigin::TOP_LEFT );
      divider.SetAnchorPoint( AnchorPoint::TOP_LEFT );
      divider.SetPosition( mContentSize.width - POPUP_DIVIDER_WIDTH, 0.0f );
@@ -559,14 +563,17 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    stencil.SetDrawMode( DrawMode::STENCIL );
    stencil.SetVisible( true );
    Actor scrollview = Actor::New(); //todo make a scrollview
+   stencil.SetRelayoutEnabled( true );
 
-   //todo Use Size negotiation
-   //self.SetSize( size ); // control matches stencil size
-   self.SetSize( mRequiredPopUpSize ); // control matches stencil size
-   mStencilLayer.SetSize( size ); // matches stencil size
-   stencil.SetSize( size );
-   scrollview.SetSize( size );
-   mButtons.SetSize( size );
+   self.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+   self.SetPreferredSize( mRequiredPopUpSize ); // control matches stencil size
+
+   mStencilLayer.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+   mStencilLayer.SetPreferredSize( size ); // matches stencil size
+
+   stencil.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+   scrollview.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+   mButtons.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
 
    mStencilLayer.SetAnchorPoint(AnchorPoint::TOP_LEFT);
    scrollview.SetAnchorPoint(AnchorPoint::TOP_LEFT);
@@ -587,6 +594,7 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    mContentSize = Vector2::ZERO;
 
    mButtons = Actor::New();
+   mButtons.SetRelayoutEnabled( true );
 
    // Add the options into the buttons container.
 

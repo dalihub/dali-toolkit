@@ -78,8 +78,8 @@ void Clipper::Refresh( const Vector2& size )
     FrameBufferImage frameBufferImage = FrameBufferImage::New( offscreenSize.width,
                                                                offscreenSize.height,
                                                                Pixel::RGBA8888 );
-    mImageActor.SetPreferredSize( offscreenSize );
-    mImageActor.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+
+    mImageActor.SetSize( offscreenSize );
     mImageActor.SetImage( frameBufferImage );
     mRenderTask.SetTargetFrameBuffer( frameBufferImage );
 
@@ -97,20 +97,20 @@ void Clipper::Initialize( const Vector2& size )
 
   // Create a root actor and an image actor for offscreen rendering.
   mOffscreenRootActor = Layer::New();
+  mOffscreenRootActor.SetRelayoutEnabled( false );
   mOffscreenRootActor.SetColorMode( USE_OWN_COLOR );
   mOffscreenRootActor.SetPositionInheritanceMode( DONT_INHERIT_POSITION );
   mOffscreenRootActor.SetInheritScale( false );
   mOffscreenRootActor.SetDepthTestDisabled( true );
-  mOffscreenRootActor.SetResizePolicy( FIXED, ALL_DIMENSIONS );
-  mOffscreenRootActor.SetPreferredSize( offscreenSize );
+  mOffscreenRootActor.SetSize( offscreenSize );
 
   mImageActor = ImageActor::New();
+  mImageActor.SetRelayoutEnabled( false );
   mImageActor.SetParentOrigin( ParentOrigin::CENTER );
   mImageActor.SetBlendFunc( BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA,
                             BlendingFactor::ONE, BlendingFactor::ONE );
   mImageActor.SetScale( Vector3( 1.0f, -1.0f, 1.0f ) );
-  mImageActor.SetPreferredSize( offscreenSize );
-  mImageActor.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+  mImageActor.SetSize( offscreenSize );
 
   // Creates a new camera actor.
   mOffscreenCameraActor = CameraActor::New();
