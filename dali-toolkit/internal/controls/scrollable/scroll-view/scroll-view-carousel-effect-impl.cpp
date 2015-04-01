@@ -83,7 +83,7 @@ public:
    * @param[in] positionProperty The Actor's Position.
    * @param[in] scaleProperty The Actor's Scale.
    * @param[in] sizeProperty The Actor's Size
-   * @param[in] scrollPositionProperty The scroll-view's position property (SCROLL_POSITION_PROPERTY_NAME)
+   * @param[in] scrollPositionProperty The scroll-view's position property (SCROLL_POSITION)
    * @param[in] scrollSizeProperty The size of the scroll-view (scrollView SIZE)
    * @return The new visibility of this Actor.
    */
@@ -114,7 +114,7 @@ public:
    * @param[in] positionProperty The Actor's Position.
    * @param[in] scaleProperty The Actor's Scale.
    * @param[in] sizeProperty The Actor's Size
-   * @param[in] scrollPositionProperty The scroll-view's position property (SCROLL_POSITION_PROPERTY_NAME)
+   * @param[in] scrollPositionProperty The scroll-view's position property (SCROLL_POSITION)
    * @param[in] scrollSizeProperty The size of the scroll-view (scrollView SIZE)
    * @param[in] activateProperty Activation value (0 - normal, 1.0 - full effect)
    * @return The new orientation of this Actor.
@@ -164,7 +164,7 @@ public:
    * @param[in] current The current position of this Actor
    * @param[in] scaleProperty The Actor's Scale.
    * @param[in] sizeProperty The Actor's Size
-   * @param[in] scrollPositionProperty The scroll-view's position property (SCROLL_POSITION_PROPERTY_NAME)
+   * @param[in] scrollPositionProperty The scroll-view's position property (SCROLL_POSITION)
    * @param[in] scrollSizeProperty The size of the scroll-view (scrollView SIZE)
    * @param[in] activateProperty Activation value (0 - normal, 1.0 - full effect)
    * @return The new position of this Actor.
@@ -234,7 +234,7 @@ void ApplyScrollCarouselConstraints(Toolkit::ScrollView scrollView,
                                       LocalSource( Actor::Property::POSITION ),
                                       LocalSource( Actor::Property::SCALE ),
                                       LocalSource( Actor::Property::SIZE ),
-                                      Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_PROPERTY_NAME ) ),
+                                      Source(scrollView, Toolkit::ScrollView::Property::SCROLL_POSITION ),
                                       Source(scrollView, Actor::Property::SIZE ),
                                       Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollViewCarouselEffect::EFFECT_ACTIVATE ) ),
                                       boost::bind( &ScrollCarouselEffectInfo::VisibilityConstraint, info, _1, _2, _3, _4, _5, _6) );
@@ -245,7 +245,7 @@ void ApplyScrollCarouselConstraints(Toolkit::ScrollView scrollView,
                                             LocalSource( Actor::Property::POSITION ),
                                             LocalSource( Actor::Property::SCALE ),
                                             LocalSource( Actor::Property::SIZE ),
-                                            Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_PROPERTY_NAME ) ),
+                                            Source(scrollView, Toolkit::ScrollView::Property::SCROLL_POSITION ),
                                             Source(scrollView, Actor::Property::SIZE ),
                                             Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollViewCarouselEffect::EFFECT_ACTIVATE ) ),
                                             boost::bind( &ScrollCarouselEffectInfo::RotationConstraint, info, _1, _2, _3, _4, _5, _6, _7) );
@@ -255,7 +255,7 @@ void ApplyScrollCarouselConstraints(Toolkit::ScrollView scrollView,
   constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
                                          LocalSource( Actor::Property::SCALE ),
                                          LocalSource( Actor::Property::SIZE ),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_PROPERTY_NAME ) ),
+                                         Source(scrollView, Toolkit::ScrollView::Property::SCROLL_POSITION ),
                                          Source(scrollView, Actor::Property::SIZE ),
                                          Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollViewCarouselEffect::EFFECT_ACTIVATE ) ),
                                          boost::bind( &ScrollCarouselEffectInfo::PositionConstraint, info, _1, _2, _3, _4, _5, _6) );

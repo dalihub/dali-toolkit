@@ -239,14 +239,11 @@ struct TestSumConstraint
  */
 static float TestOvershootSnapDuration(ToolkitTestApplication &application, ScrollView scrollView)
 {
-  Property::Index overshootPropertyX = scrollView.GetPropertyIndex(ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME);
-  Property::Index overshootPropertyY = scrollView.GetPropertyIndex(ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME);
-
   int timeToReachOrigin = -1;
   for(int i = 0;i<MAX_FRAMES_TO_TEST_OVERSHOOT;i++)
   {
-    float overshootXValue = scrollView.GetProperty<float>(overshootPropertyX);
-    float overshootYValue = scrollView.GetProperty<float>(overshootPropertyY);
+    float overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
+    float overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
     if(overshootXValue == 0.0f && overshootYValue == 0.0f)
     {
       break;
@@ -817,9 +814,8 @@ int UtcDaliScrollViewConstraints(void)
   a.SetPosition( TEST_ACTOR_POSITION );
   Wait(application);
 
-  Property::Index scrollPositionProperty = scrollView.GetPropertyIndex(ScrollView::SCROLL_POSITION_PROPERTY_NAME);
   Constraint constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
-                                                       Source(scrollView, scrollPositionProperty),
+                                                       Source(scrollView, ScrollView::Property::SCROLL_POSITION),
                                                        TestSumConstraint( TEST_CONSTRAINT_OFFSET ) );
   constraint.SetRemoveAction(Constraint::Discard);
   scrollView.ApplyConstraintToChildren(constraint);
@@ -865,10 +861,9 @@ int UtcDaliScrollViewBind(void)
   a.SetPosition( TEST_ACTOR_POSITION );
   Wait(application);
 
-  Property::Index scrollPositionProperty = scrollView.GetPropertyIndex(ScrollView::SCROLL_POSITION_PROPERTY_NAME);
   // apply this constraint to scrollview
   Constraint constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
-                                                       Source(scrollView, scrollPositionProperty),
+                                                       Source(scrollView, ScrollView::Property::SCROLL_POSITION),
                                                        TestSumConstraint( TEST_CONSTRAINT_OFFSET ) );
 
   constraint.SetRemoveAction(Constraint::Discard);
@@ -1034,12 +1029,9 @@ int UtcDaliScrollViewOvershoot(void)
   // 1. Scroll page in NW (-500,-500 pixels), then inspect overshoot. (don't release touch)
   Vector2 currentPos = Vector2(100.0f, 100.0f);
   currentPos = PerformGestureDiagonalSwipe(application, currentPos, Vector2(5.0f, 5.0f), 100, false);
-  Property::Index overshootXProperty = scrollView.GetPropertyIndex(ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME);
-  Property::Index overshootYProperty = scrollView.GetPropertyIndex(ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME);
-  Property::Index scrollPositionProperty = scrollView.GetPropertyIndex(ScrollView::SCROLL_POSITION_PROPERTY_NAME);
-  float overshootXValue = scrollView.GetProperty<float>(overshootXProperty);
-  float overshootYValue = scrollView.GetProperty<float>(overshootYProperty);
-  Vector3 positionValue = scrollView.GetProperty<Vector3>(scrollPositionProperty);
+  float overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
+  float overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
+  Vector3 positionValue = scrollView.GetProperty<Vector3>(ScrollView::Property::SCROLL_POSITION);
   DALI_TEST_EQUALS(overshootXValue, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(overshootYValue, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(positionValue, Vector3::ZERO, TEST_LOCATION);

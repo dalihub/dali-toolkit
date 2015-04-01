@@ -93,11 +93,11 @@ struct ScrollDepthScaleConstraint
   /**
    * @param[in] current The current scale
    * @param[in] pagePositionProperty The page's position.
-   * @param[in] scrollPositionProperty The scroll-view's position property (SCROLL_POSITION_PROPERTY_NAME)
-   * @param[in] scrollPositionMin The minimum extent of this scroll domain. (SCROLL_POSITION_MIN_PROPERTY_NAME)
-   * @param[in] scrollPositionMax The maximum extent of this scroll domain. (SCROLL_POSITION_MIN_PROPERTY_NAME)
+   * @param[in] scrollPositionProperty The scroll-view's position property (SCROLL_POSITION)
+   * @param[in] scrollPositionMin The minimum extent of this scroll domain. (SCROLL_POSITION_MIN)
+   * @param[in] scrollPositionMax The maximum extent of this scroll domain. (SCROLL_POSITION_MAX)
    * @param[in] pageSizeProperty The size of the page. (scrollView SIZE)
-   * @param[in] scrollWrap Whether scroll wrap has been enabled or not (SCROLL_WRAP_PROPERTY_NAME)
+   * @param[in] scrollWrap Whether scroll wrap has been enabled or not (WRAP)
    * @return The new scale of this Actor.
    */
   Vector3 operator()(const Vector3& currentScale,
@@ -218,11 +218,11 @@ struct ScrollDepthPositionConstraint
   /**
    * @param[in] current The current position
    * @param[in] pagePositionProperty The page's position.
-   * @param[in] scrollPositionProperty The scroll-view's position property (SCROLL_POSITION_PROPERTY_NAME)
-   * @param[in] scrollPositionMin The minimum extent of this scroll domain. (SCROLL_POSITION_MIN_PROPERTY_NAME)
-   * @param[in] scrollPositionMax The maximum extent of this scroll domain. (SCROLL_POSITION_MIN_PROPERTY_NAME)
+   * @param[in] scrollPositionProperty The scroll-view's position property (SCROLL_POSITION)
+   * @param[in] scrollPositionMin The minimum extent of this scroll domain. (SCROLL_POSITION_MIN)
+   * @param[in] scrollPositionMax The maximum extent of this scroll domain. (SCROLL_POSITION_MAX)
    * @param[in] pageSizeProperty The size of the page. (scrollView SIZE)
-   * @param[in] scrollWrap Whether scroll wrap has been enabled or not (SCROLL_WRAP_PROPERTY_NAME)
+   * @param[in] scrollWrap Whether scroll wrap has been enabled or not (WRAP)
    * @return The new position of this Actor.
    */
   Vector3 operator()(const Vector3& currentPosition,
@@ -339,9 +339,9 @@ void ApplyScrollDepthConstraints(Toolkit::ScrollView scrollView,
   Constraint constraint = Constraint::New<Vector3>( Actor::Property::SCALE,
                                          LocalSource(Actor::Property::POSITION),
                                          ParentSource(Actor::Property::POSITION),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_PROPERTY_NAME ) ),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
+                                         Source(scrollView, Toolkit::ScrollView::Property::SCROLL_POSITION ),
+                                         Source(scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ),
+                                         Source(scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ),
                                          Source(scrollView, Actor::Property::SIZE ),
                                          ScrollDepthScaleConstraint( positionExtent, offsetExtent, positionScale, scaleExtent ) );
   constraint.SetRemoveAction( Constraint::Discard );
@@ -350,11 +350,11 @@ void ApplyScrollDepthConstraints(Toolkit::ScrollView scrollView,
   // Position Constraint (apply last as other constraints use Actor::POSITION as a function input)
   constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
                                          ParentSource(Actor::Property::POSITION),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_PROPERTY_NAME ) ),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
+                                         Source(scrollView, Toolkit::ScrollView::Property::SCROLL_POSITION ),
+                                         Source(scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ),
+                                         Source(scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ),
                                          Source(scrollView, Actor::Property::SIZE ),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME ) ),
+                                         Source(scrollView, Toolkit::ScrollView::Property::WRAP ),
                                          ScrollDepthPositionConstraint( positionExtent, offsetExtent, positionScale ) );
 
   constraint.SetRemoveAction( Constraint::Discard );

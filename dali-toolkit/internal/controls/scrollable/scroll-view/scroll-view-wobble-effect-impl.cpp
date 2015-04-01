@@ -231,10 +231,6 @@ void ScrollViewWobbleEffect::OnDetach(Toolkit::ScrollView& scrollView)
 
 void ScrollViewWobbleEffect::AttachActor(Actor actor)
 {
-  Property::Index propertyPosition = actor.GetPropertyIndex(Toolkit::ScrollView::SCROLL_POSITION_PROPERTY_NAME);
-  Property::Index propertyOvershootX = actor.GetPropertyIndex(Toolkit::ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME);
-  Property::Index propertyOvershootY = actor.GetPropertyIndex(Toolkit::ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME);
-
   // Create effect-overshoot property if not already created.
   Property::Index propertyEffectOvershoot = actor.GetPropertyIndex(Toolkit::ScrollViewWobbleEffect::EFFECT_OVERSHOOT);
   if(propertyEffectOvershoot == Property::INVALID_INDEX)
@@ -246,9 +242,9 @@ void ScrollViewWobbleEffect::AttachActor(Actor actor)
 
   Constraint constraint = Constraint::New<Vector3>( propertyEffectOvershoot,
                                                     Source(scrollView, mPropertyTime),
-                                                    Source(actor, propertyPosition),
-                                                    Source(actor, propertyOvershootX),
-                                                    Source(actor, propertyOvershootY),
+                                                    Source(actor, Toolkit::ScrollView::Property::SCROLL_POSITION),
+                                                    Source(actor, Toolkit::ScrollView::Property::OVERSHOOT_X),
+                                                    Source(actor, Toolkit::ScrollView::Property::OVERSHOOT_Y),
                                                     ScrollViewWobbleEffectConstraint(*this) );
   actor.ApplyConstraint(constraint);
 }
