@@ -119,6 +119,21 @@ Actor PushButton::GetSelectedImage() const
   return Dali::Toolkit::GetImplementation( *this ).GetSelectedImage();
 }
 
+void PushButton::SetSelectedBackgroundImage( Image image )
+{
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedBackgroundImage( ImageActor::New( image ) );
+}
+
+void PushButton::SetSelectedBackgroundImage( Actor image )
+{
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedBackgroundImage( image );
+}
+
+Actor PushButton::GetSelectedBackgroundImage() const
+{
+  return Dali::Toolkit::GetImplementation( *this ).GetSelectedBackgroundImage();
+}
+
 void PushButton::SetDisabledBackgroundImage( Image image )
 {
   Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( ImageActor::New( image ) );

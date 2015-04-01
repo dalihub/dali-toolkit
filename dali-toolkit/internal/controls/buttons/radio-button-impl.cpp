@@ -45,7 +45,7 @@ TypeRegistration typeRegistration( typeid( Toolkit::RadioButton ), typeid( Toolk
 const char* const UNSELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-unselected.png";
 const char* const SELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-selected.png";
 
-const float DISTANCE_BETWEEN_IMAGE_AND_LABEL = 5.0f;
+const float DISTANCE_BETWEEN_IMAGE_AND_LABEL( 5.0f );
 }
 
 Dali::Toolkit::RadioButton RadioButton::New()
@@ -72,26 +72,6 @@ RadioButton::~RadioButton()
 {
 }
 
-void RadioButton::SetImage( Actor image )
-{
-  mLayoutContainer.RemoveChildAt( Toolkit::TableView::CellPosition( 0, 0 ) );
-  mLayoutContainer.AddChild( image, Toolkit::TableView::CellPosition( 0, 0 ) );
-
-  RelayoutRequest();
-}
-
-void RadioButton::SetButtonImage( Actor image )
-{
-  Actor& buttonImage = GetButtonImage();
-  buttonImage = image;
-}
-
-void RadioButton::SetSelectedImage( Actor image )
-{
-  Actor& selectedImage = GetSelectedImage();
-  selectedImage = image;
-}
-
 void RadioButton::OnButtonInitialize()
 {
   Actor self = Self();
@@ -99,20 +79,11 @@ void RadioButton::OnButtonInitialize()
   // Wrap size of radio button around all its children
   self.SetResizePolicy( FIT_TO_CHILDREN, ALL_DIMENSIONS );
 
-  // Create the layout container empty at first
-  mLayoutContainer = Toolkit::TableView::New( 0, 0 );
-  mLayoutContainer.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  mLayoutContainer.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  mLayoutContainer.SetResizePolicy( FIT_TO_CHILDREN, ALL_DIMENSIONS );
-  self.Add( mLayoutContainer );
-
   Image buttonImage = Dali::ResourceImage::New( UNSELECTED_BUTTON_IMAGE_DIR );
   Image selectedImage = Dali::ResourceImage::New( SELECTED_BUTTON_IMAGE_DIR );
 
   SetButtonImage( ImageActor::New( buttonImage ) );
   SetSelectedImage( ImageActor::New( selectedImage ) );
-
-  SetImage( GetButtonImage() );
 
   RelayoutRequest();
 }
@@ -135,37 +106,71 @@ void RadioButton::OnLabelSet()
 
   if( label )
   {
-    // Add padding to the left of the label to create distance from the image
-    label.SetPadding( Padding( DISTANCE_BETWEEN_IMAGE_AND_LABEL, 0.0f, 0.0f, 0.0f ) );
+    label.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+    label.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
 
-    mLayoutContainer.RemoveChildAt( Toolkit::TableView::CellPosition( 0, 1 ) );
-    mLayoutContainer.AddChild( label, Toolkit::TableView::CellPosition( 0, 1 ) );
+    if( IsSelected() )
+    {
+      label.SetX( GetSelectedImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+    }
+    else
+    {
+      label.SetX( GetButtonImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+    }
   }
 }
 
-void RadioButton::OnSelected( bool selected )
+bool RadioButton::OnSelected()
 {
-  if( selected )
+  Actor& buttonImage = GetButtonImage();
+  Actor& selectedImage = GetSelectedImage();
+  Actor& label = GetLabel();
+
+  PaintState paintState = GetPaintState();
+
+  switch( paintState )
   {
-    Actor parent = Self().GetParent();
-    if( parent )
+    case UnselectedState:
     {
-      for( unsigned int i = 0; i < parent.GetChildCount(); ++i )
+      Actor parent = Self().GetParent();
+      if( parent )
       {
-        Dali::Toolkit::RadioButton radioButtonChild = Dali::Toolkit::RadioButton::DownCast( parent.GetChildAt( i ) );
-        if( radioButtonChild )
+        for( unsigned int i = 0; i < parent.GetChildCount(); ++i )
         {
-          radioButtonChild.SetSelected( false );
+          Dali::Toolkit::RadioButton radioButtonChild = Dali::Toolkit::RadioButton::DownCast( parent.GetChildAt( i ) );
+          if( radioButtonChild && radioButtonChild != Self() )
+          {
+            radioButtonChild.SetSelected( false );
+          }
         }
       }
-    }
 
-    SetImage( GetSelectedImage() );
+      RemoveChild( buttonImage );
+
+      if( label )
+      {
+        label.SetX( selectedImage.GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+      }
+      break;
+    }
+    case SelectedState:
+    {
+      RemoveChild( selectedImage );
+
+      if( label )
+      {
+        label.SetX( buttonImage.GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+      }
+      break;
+    }
+    default:
+    {
+      break;
+    }
   }
-  else
-  {
-    SetImage( GetButtonImage() );
-  }
+
+  // there is no animation
+  return false;
 }
 
 } // namespace Internal

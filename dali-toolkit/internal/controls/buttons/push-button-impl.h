@@ -62,33 +62,6 @@ protected:
    */
   virtual ~PushButton();
 
-public: // From Button
-
-  /**
-   * @copydoc Toolkit::Internal::Button::SetButtonImage( Actor image )
-   */
-  virtual void SetButtonImage( Actor image );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::SetSelectedImage( Actor image )
-   */
-  virtual void SetSelectedImage( Actor image );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::SetBackgroundImage( Actor image )
-   */
-  virtual void SetBackgroundImage( Actor image );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::SetDisabledImage( Actor image )
-   */
-  virtual void SetDisabledImage( Actor image );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::SetDisabledBackgroundImage( Actor image )
-   */
-  virtual void SetDisabledBackgroundImage( Actor image );
-
 private: // From Button
 
   /**
@@ -102,29 +75,59 @@ private: // From Button
   virtual void OnLabelSet();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnSelected()
+   * @copydoc Toolkit::Internal::Button::OnButtonImageSet()
    */
-  virtual void OnSelected( bool selected );
+  virtual void OnButtonImageSet();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnDisabled( bool disabled )
+   * @copydoc Toolkit::Internal::Button::OnSelectedImageSet()
    */
-  virtual void OnDisabled( bool disabled );
+  virtual void OnSelectedImageSet();
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnBackgroundImage()
+   */
+  virtual void OnBackgroundImageSet();
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnSelectedBackgroundImageSet()
+   */
+  virtual void OnSelectedBackgroundImageSet();
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnDisabledImageSet()
+   */
+  virtual void OnDisabledImageSet();
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnDisabledBackgroundImageSet()
+   */
+  virtual void OnDisabledBackgroundImageSet();
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnSelected()
+   */
+  virtual bool OnSelected();
+
+  /**
+   * @copydoc Toolkit::Internal::Button::OnDisabled()
+   */
+  virtual bool OnDisabled();
 
   /**
    * @copydoc Toolkit::Internal::Button::OnPressed()
    */
-  virtual void OnPressed();
+  virtual bool OnPressed();
 
   /**
    * @copydoc Toolkit::Internal::Button::OnReleased()
    */
-  virtual void OnReleased();
+  virtual bool OnReleased();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnClicked()
+   * @copydoc Toolkit::Internal::Button::StopAllAnimations()
    */
-  virtual void OnClicked();
+  virtual void StopAllAnimations();
 
 private: // From Control
 
@@ -141,89 +144,40 @@ private: // From Control
 private:
 
   /**
-   * Used in the FadeOut functions.
+   * Starts the transition animation.
+   * PushButton::TransitionAnimationFinished slot is called when the animation finishes.
    */
-  enum ImageLayer
-  {
-    Background, ///< Fade out the background.
-    Foreground  ///< Fade out the foreground.
-  };
+  void StartTransitionAnimation();
 
   /**
-   * Gets the button image that is fading out.
-   * @return A reference to the button image that is fading out.
-   */
-  Actor& GetFadeOutButtonImage();
-
-  /**
-   * Gets the background image that is fading out.
-   * @return A reference to the background image that is fading out.
-   */
-  Actor& GetFadeOutBackgroundImage();
-
-  /**
-   * Adds the actor to the fade in animation. It creates a fade in animation if needed.
-   * @param[in] actor The actor.
-   */
-  void AddToFadeInAnimation( Actor& actor );
-
-  /**
-   * Starts the fade in animation.
-   * PushButton::FadeInAnimationFinished slot is called when the animation finishes.
-   */
-  void StartFadeInAnimation();
-
-  /**
-   * Stops the fade in animation.
-   */
-  void StopFadeInAnimation();
-
-  /**
-   * Adds the actor to the fade out animation. It creates a fade out animation if needed.
-   */
-  void AddToFadeOutAnimation( Actor& actor );
-
-  /**
-   * Starts the fade out animation.
-   * PushButton::FadeOutAnimationFinished slot is called when the animation finishes.
-   */
-  void StartFadeOutAnimation();
-
-  /**
-   * Stops the fade out animation.
-   * It removes the actor stored in PushButton::mFadeOutBackgroundImage and PushButton::mFadeOutCheckedImage.
+   * Stops the transition animation.
    * @param[in] remove If true, removes the fadeout actor from root.
    */
-  void StopFadeOutAnimation( bool remove = true );
+  void StopTransitionAnimation( bool remove = true );
 
   /**
    * It adds the actor to the root actor and to the fade in animation.
    * @param[inout] image The actor.
    * @param[in] opacity The initial opacity.
+   * @param[in] scale The initial scale.
    */
-  void FadeInImage( Actor& image, float opacity = 0.f, int priority = -1 );
+  void FadeInImage( Actor& image, float opacity = 0.f, Vector3 scale = Vector3( 1.f, 1.f, 1.f ) );
 
   /**
    * It adds the actor fade out animation and stores it to be removed when the animation finishes.
    * @param[in] layer Defines if the actor is going to be stored in the mFadeOutBackgroundImage or mFadeOutCheckedImage member.
    * @param[inout] image The actor.
    * @param[in] opacity The initial opacity.
+   * @param[in] scale The initial scale.
    */
-  void FadeOutImage( ImageLayer layer, Actor& image, float opacity = 1.f );
+  void FadeOutImage( Actor& image, float opacity = 1.f, Vector3 scale = Vector3( 1.f, 1.f, 1.f ) );
 
   // slots
 
   /**
-   * Called when the fade out animation finishes.
-   * It changes the check button paint state and removes actors from the root.
+   * Called when the transition animation finishes.
    */
-  void FadeOutAnimationFinished( Dali::Animation& source );
-
-  /**
-   * Called when the fade in animation finishes.
-   * It changes the check button paint state.
-   */
-  void FadeInAnimationFinished( Dali::Animation& source );
+  void TransitionAnimationFinished( Dali::Animation& source );
 
 private:
 
@@ -235,15 +189,8 @@ private:
 
 private:
 
-  Animation             mFadeInAnimation;           ///< Animation used in the state transitions.
-  Animation             mFadeOutAnimation;          ///< Animation used in the state transitions.
-
-  Actor                 mFadeOutButtonContent;      ///< Stores a foreground content, which is in a fade out animation, to be removed when the animation finishes.
-  Actor                 mFadeOutBackgroundContent;  ///< Stores a background content, which is in a fade out animation, to be removed when the animation finishes.
-
+  Animation             mTransitionAnimation;       ///< Animation used in the state transitions.
   Vector3               mSize;                      ///< The button's size.
-
-  PaintState            mPaintState;                ///< The paint state.
 };
 
 } // namespace Internal

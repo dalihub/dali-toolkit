@@ -34,12 +34,8 @@ namespace Internal
 namespace
 {
 
-const float FOREGROUND_DEPTH( 0.5f );
-const float BACKGROUND_DEPTH( 0.25f );
-
+const float DISTANCE_BETWEEN_IMAGE_AND_LABEL( 5.0f );
 const float ANIMATION_TIME( 0.26f );  // EFL checkbox tick time
-
-const Vector3 DISTANCE_BETWEEN_IMAGE_AND_LABEL(5.0f, 0.0f, 0.0f);
 
 BaseHandle Create()
 {
@@ -66,8 +62,7 @@ Dali::Toolkit::CheckBoxButton CheckBoxButton::New()
 }
 
 CheckBoxButton::CheckBoxButton()
-: Button(),
-  mPaintState( UnselectedState )
+: Button()
 {
   SetTogglableButton( true );
 
@@ -76,9 +71,9 @@ CheckBoxButton::CheckBoxButton()
 
 CheckBoxButton::~CheckBoxButton()
 {
-  if( mCheckInAnimation )
+  if( mTransitionAnimation )
   {
-    mCheckInAnimation.Clear();
+    mTransitionAnimation.Clear();
   }
 }
 
@@ -88,323 +83,147 @@ void CheckBoxButton::OnButtonInitialize()
   Self().SetResizePolicy( FIT_TO_CHILDREN, ALL_DIMENSIONS );
 }
 
-void CheckBoxButton::SetSelectedImage( Actor image )
-{
-  Actor& selectedImage = GetSelectedImage();
-
-  switch( mPaintState )
-  {
-    case SelectedState:
-    {
-      if( selectedImage && selectedImage.GetParent() )
-      {
-        Self().Remove( selectedImage );
-      }
-
-      selectedImage = image;
-      Self().Add( selectedImage );
-      break;
-    }
-    case UnselectedSelectedTransition:
-    {
-      StopCheckInAnimation();
-      Self().Remove( selectedImage );
-
-      selectedImage = image;
-      Self().Add( selectedImage );
-
-      mPaintState = SelectedState;
-      break;
-    }
-    default:
-    {
-      selectedImage = image;
-      break;
-    }
-  }
-
-  selectedImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  selectedImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  selectedImage.SetZ( FOREGROUND_DEPTH );
-}
-
-void CheckBoxButton::SetBackgroundImage( Actor image )
-{
-  Actor& backgroundImage = GetBackgroundImage();
-
-  switch( mPaintState )
-  {
-    case UnselectedState:             // FALLTHROUGH
-    case SelectedState:
-    case UnselectedSelectedTransition:
-    {
-      if( backgroundImage && backgroundImage.GetParent() )
-      {
-        Self().Remove( backgroundImage );
-
-        Actor& label = GetLabel();
-
-        if( label )
-        {
-          backgroundImage.Remove( label );
-          image.Add( label );
-        }
-      }
-
-      backgroundImage = image;
-      Self().Add( backgroundImage );
-      break;
-    }
-    default:
-    {
-      backgroundImage = image;
-      break;
-    }
-  }
-
-  backgroundImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  backgroundImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  backgroundImage.SetZ( BACKGROUND_DEPTH );
-}
-
-void CheckBoxButton::SetDisabledSelectedImage( Actor image )
-{
-  Actor& disabledSelectedImage = GetDisabledSelectedImage();
-
-  switch( mPaintState )
-  {
-    case DisabledSelectedState:
-    {
-      if( disabledSelectedImage && disabledSelectedImage.GetParent() )
-      {
-        Self().Remove( disabledSelectedImage );
-      }
-
-      disabledSelectedImage = image;
-      Self().Add( disabledSelectedImage );
-      break;
-    }
-    default:
-    {
-      disabledSelectedImage = image;
-      break;
-    }
-  }
-
-  disabledSelectedImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  disabledSelectedImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  disabledSelectedImage.SetZ( FOREGROUND_DEPTH );
-}
-
-void CheckBoxButton::SetDisabledBackgroundImage( Actor image )
-{
-  Actor& disabledBackgroundImage = GetDisabledBackgroundImage();
-
-  switch( mPaintState )
-  {
-    case DisabledSelectedState:
-    case DisabledUnselectedState:
-    {
-      if( disabledBackgroundImage && disabledBackgroundImage.GetParent() )
-      {
-        Self().Remove( disabledBackgroundImage );
-
-        Actor& label = GetLabel();
-
-        if( label )
-        {
-          disabledBackgroundImage.Remove( label );
-          image.Add( label );
-        }
-      }
-
-      disabledBackgroundImage = image;
-      Self().Add( disabledBackgroundImage );
-      break;
-    }
-    default:
-    {
-      disabledBackgroundImage = image;
-      break;
-    }
-  }
-
-  disabledBackgroundImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  disabledBackgroundImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  disabledBackgroundImage.SetZ( BACKGROUND_DEPTH );
-}
-
 void CheckBoxButton::OnLabelSet()
 {
   Actor& label = GetLabel();
 
   if( label )
   {
-    label.SetParentOrigin( ParentOrigin::CENTER_RIGHT );
+    label.SetParentOrigin( ParentOrigin::CENTER_LEFT );
     label.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
-    label.TranslateBy( DISTANCE_BETWEEN_IMAGE_AND_LABEL );
 
     if( IsDisabled() && GetDisabledBackgroundImage() )
     {
-      GetDisabledBackgroundImage().Add( label );
+      label.SetX( GetDisabledBackgroundImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
     else if ( GetBackgroundImage() )
     {
-      GetBackgroundImage().Add( label );
+      label.SetX( GetBackgroundImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
     else
     {
-      Self().Add( label );
+      label.SetX( DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
   }
 }
 
-void CheckBoxButton::OnSelected( bool selected )
+bool CheckBoxButton::OnSelected()
 {
   Actor& selectedImage = GetSelectedImage();
 
-  switch( mPaintState )
+  PaintState paintState = GetPaintState();
+
+  switch( paintState )
   {
     case UnselectedState:
     {
-      AddChild( selectedImage );
-      StartCheckInAnimation( selectedImage );    // Animate in the check actor
-
-      mPaintState = UnselectedSelectedTransition;
+      StartTransitionAnimation( selectedImage );
       break;
     }
     case SelectedState:
     {
       RemoveChild( selectedImage );
-
-      mPaintState = UnselectedState;
       break;
     }
     case UnselectedSelectedTransition:
     {
-      StopCheckInAnimation();
+      StopTransitionAnimation( false );
       RemoveChild( selectedImage );
-
-      mPaintState = UnselectedState;
       break;
     }
     default:
+    {
       break;
+    }
   }
+
+  if( mTransitionAnimation )
+  {
+    return true;
+  }
+
+  return false;
 }
 
-void CheckBoxButton::OnDisabled( bool disabled )
+bool CheckBoxButton::OnDisabled()
 {
   Actor& backgroundImage = GetBackgroundImage();
   Actor& selectedImage = GetSelectedImage();
   Actor& disabledBackgroundImage = GetDisabledBackgroundImage();
   Actor& disabledSelectedImage = GetDisabledSelectedImage();
 
-  switch( mPaintState )
+  PaintState paintState = GetPaintState();
+
+  switch( paintState )
   {
     case UnselectedState:
     {
-      if( disabled )
-      {
-        RemoveChild( backgroundImage );
-        AddChild( disabledBackgroundImage );
-        mPaintState = DisabledUnselectedState;
-      }
+      RemoveChild( backgroundImage );
       break;
     }
     case SelectedState:
     {
-      if( disabled )
-      {
-        RemoveChild( backgroundImage );
-        RemoveChild( selectedImage );
-        AddChild( disabledBackgroundImage );
-        AddChild( disabledSelectedImage );
-
-        mPaintState = DisabledSelectedState;
-      }
+      RemoveChild( backgroundImage );
+      RemoveChild( selectedImage );
       break;
     }
     case DisabledUnselectedState:
     {
-      if( !disabled )
-      {
-        RemoveChild( disabledBackgroundImage );
-        AddChild( backgroundImage );
-
-        mPaintState = UnselectedState;
-      }
+      RemoveChild( disabledBackgroundImage );
       break;
     }
     case DisabledSelectedState:
     {
-      if( !disabled )
-      {
-        RemoveChild( disabledBackgroundImage );
-        RemoveChild( disabledSelectedImage );
-        AddChild( backgroundImage );
-        AddChild( selectedImage );
-
-        mPaintState = SelectedState;
-      }
+      RemoveChild( disabledBackgroundImage );
+      RemoveChild( disabledSelectedImage );
       break;
     }
     case UnselectedSelectedTransition:
     {
-      if( disabled )
-      {
-        StopCheckInAnimation();
+      StopTransitionAnimation();
 
-        RemoveChild( backgroundImage );
-        RemoveChild( selectedImage );
-        AddChild( disabledBackgroundImage );
-        AddChild( disabledSelectedImage );
-
-        mPaintState = DisabledSelectedState;
-      }
+      RemoveChild( backgroundImage );
+      RemoveChild( selectedImage );
       break;
     }
     default:
+    {
       break;
+    }
   }
 
   Actor& label = GetLabel();
 
   if( label )
   {
-    if( label.GetParent() )
+    if( IsDisabled() && disabledBackgroundImage)
     {
-      label.GetParent().Remove( label );
-    }
-
-    if( disabled && disabledBackgroundImage)
-    {
-      disabledBackgroundImage.Add( label );
+      label.SetX( disabledBackgroundImage.GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
     else if( backgroundImage )
     {
-      backgroundImage.Add( label );
+      label.SetX( backgroundImage.GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+    }
+    else
+    {
+      label.SetX( DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
   }
-}
 
-void CheckBoxButton::AddChild( Actor& actor )
-{
-  if( actor )
+  if( mTransitionAnimation )
   {
-    Self().Add( actor);
+    return true;
   }
+
+  return false;
 }
 
-void CheckBoxButton::RemoveChild( Actor& actor )
+void CheckBoxButton::StopAllAnimations()
 {
-  if( actor )
-  {
-    Self().Remove( actor );
-  }
+  StopTransitionAnimation();
 }
 
-void CheckBoxButton::StartCheckInAnimation( Actor& actor )
+void CheckBoxButton::StartTransitionAnimation( Actor& actor )
 {
   if( actor )
   {
@@ -419,47 +238,39 @@ void CheckBoxButton::StartCheckInAnimation( Actor& actor )
 
     mTickUVEffect.SetBottomRight( Vector2( 0.0f, 1.0f ) );
 
-    if( !mCheckInAnimation )
+    if( !mTransitionAnimation )
     {
-      mCheckInAnimation = Dali::Animation::New( GetAnimationTime()  );
+      mTransitionAnimation = Dali::Animation::New( GetAnimationTime()  );
     }
 
     // UV anim
-    mCheckInAnimation.AnimateTo( Property( mTickUVEffect, mTickUVEffect.GetBottomRightPropertyName() ), Vector2( 1.0f, 1.0f ) );
+    mTransitionAnimation.AnimateTo( Property( mTickUVEffect, mTickUVEffect.GetBottomRightPropertyName() ), Vector2( 1.0f, 1.0f ) );
 
     // Actor size anim
-    mCheckInAnimation.AnimateTo( Property( actor, Actor::Property::SCALE_X ), 1.0f );
+    mTransitionAnimation.AnimateTo( Property( actor, Actor::Property::SCALE_X ), 1.0f );
 
-    mCheckInAnimation.FinishedSignal().Connect( this, &CheckBoxButton::CheckInAnimationFinished );
-    mCheckInAnimation.Play();
+    mTransitionAnimation.FinishedSignal().Connect( this, &CheckBoxButton::TransitionAnimationFinished );
+    mTransitionAnimation.Play();
   }
 }
 
-void CheckBoxButton::StopCheckInAnimation()
+void CheckBoxButton::StopTransitionAnimation( bool remove )
 {
-  if( mCheckInAnimation )
+  if( mTransitionAnimation )
   {
-    mCheckInAnimation.Clear();
-    mCheckInAnimation.Reset();
+    mTransitionAnimation.Clear();
+    mTransitionAnimation.Reset();
+  }
+
+  if( remove )
+  {
+    UpdatePaintTransitionState();
   }
 }
 
-void CheckBoxButton::CheckInAnimationFinished( Dali::Animation& source )
+void CheckBoxButton::TransitionAnimationFinished( Dali::Animation& source )
 {
-  switch( mPaintState )
-  {
-    case UnselectedSelectedTransition:
-    {
-      mPaintState = SelectedState;
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
-
-  StopCheckInAnimation();
+  StopTransitionAnimation();
 }
 
 } // namespace Internal
