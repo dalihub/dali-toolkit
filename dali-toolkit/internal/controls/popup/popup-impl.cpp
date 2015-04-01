@@ -263,13 +263,35 @@ void Popup::SetButtonAreaImage( Actor image )
 
 void Popup::SetTitle( const std::string& text )
 {
-// TODO
+  // Replaces the current title actor.
+  if( mPopupLayout )
+  {
+    mPopupLayout.RemoveChildAt( Toolkit::TableView::CellPosition( 0, 0 ) );
+  }
+
+  mTitle = Toolkit::TextLabel::New( text );
+  mTitle.SetName( "POPUP_TITLE" );
+  mTitle.SetColor( Color::BLACK );
+
+  if( mPopupLayout )
+  {
+    mTitle.SetPadding( Padding( 0.0f, 0.0f, mPopupStyle->margin, mPopupStyle->margin ) );
+    mTitle.SetResizePolicy( FILL_TO_PARENT, WIDTH );
+    mTitle.SetDimensionDependency( HEIGHT, WIDTH ); // HeightForWidth
+    mPopupLayout.AddChild( mTitle, Toolkit::TableView::CellPosition( 0, 0 ) );
+  }
+
+  RelayoutRequest();
 }
 
-const std::string& Popup::GetTitle() const
+std::string Popup::GetTitle() const
 {
-  static std::string temp("");
-  return temp;
+  if( mTitle )
+  {
+    return mTitle.GetProperty<std::string>( Toolkit::TextLabel::Property::TEXT );
+  }
+
+  return std::string();
 }
 
 void Popup::CreateFooter()
@@ -712,6 +734,29 @@ Vector3 Popup::GetNaturalSize()
 
   Vector3 naturalSize( 0.0f, 0.0f, 0.0f );
 
+  if ( mTitle )
+  {
+    Vector3 titleNaturalSize = mTitle.GetImplementation().GetNaturalSize();
+    // Buffer to avoid errors. The width of the popup could potentially be the width of the title text.
+    // It was observed in this case that text wrapping was then inconsistent when seen on device
+    const float titleBuffer = 0.5f;
+    titleNaturalSize.width += titleBuffer;
+
+    // As TextLabel GetNaturalSize does not take wrapping into account, limit the width
+    // to that of the stage
+    if( titleNaturalSize.width >= maxWidth)
+    {
+      naturalSize.width = maxWidth;
+      naturalSize.height = mTitle.GetImplementation().GetHeightForWidth( naturalSize.width );
+    }
+    else
+    {
+      naturalSize += titleNaturalSize;
+    }
+
+    naturalSize.height += mPopupStyle->margin;
+  }
+
   if( mContent )
   {
     Vector3 contentSize = mContent.GetNaturalSize();
@@ -741,6 +786,12 @@ float Popup::GetHeightForWidth( float width )
 {
   float height( 0.0f );
   float popupWidth( width - 2.f * ( POPUP_OUT_MARGIN_WIDTH + mPopupStyle->margin ) );
+
+  if ( mTitle )
+  {
+    height += mTitle.GetImplementation().GetHeightForWidth( popupWidth );
+    height += mPopupStyle->margin;
+  }
 
   if( mContent )
   {

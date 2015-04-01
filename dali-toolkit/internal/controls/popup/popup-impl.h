@@ -28,6 +28,7 @@
 #include <dali-toolkit/public-api/controls/popup/popup.h>
 #include <dali-toolkit/internal/controls/popup/popup-style-impl.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 namespace Dali
 {
@@ -86,7 +87,7 @@ public:
   /**
    * @copydoc Toolkit::Popup::GetTitle
    */
-  const std::string& GetTitle() const;
+  std::string GetTitle() const;
 
   /**
    * @copydoc Toolkit::Popup::AddButton
@@ -320,6 +321,7 @@ private:
 
   Actor mBackgroundImage;                 ///< Stores the background image.
   Actor mButtonAreaImage;                 ///< Stores the button background image.
+  Toolkit::TextLabel mTitle;               ///< Stores the text title.
   Actor mContent;                         ///< Stores popup's content.
   Actor mBottomBg;                        ///< bottom button bar background. ImageActor is replaced with Actor due to hidden image.
   Actor mTailImage;                       ///< Stores the tail image

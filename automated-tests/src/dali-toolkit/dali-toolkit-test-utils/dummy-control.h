@@ -102,8 +102,7 @@ private:
 private: // From Internal::Control
 
   virtual void OnInitialize();
-  virtual void OnThemeChange( StyleManager styleManager );
-  virtual void OnFontChange(bool defaultFontChange, bool defaultFontSizeChange);
+  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
   virtual void OnPinch(const PinchGesture& pinch);
   virtual void OnPan(const PanGesture& pan);
   virtual void OnTap(const TapGesture& tap);

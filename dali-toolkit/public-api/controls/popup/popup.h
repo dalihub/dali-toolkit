@@ -170,7 +170,7 @@ public:
    *
    * @return The text to appear as the heading for this Popup
    */
-  const std::string& GetTitle() const;
+  std::string GetTitle() const;
 
   /**
    * @brief Adds a button to this Popup.
