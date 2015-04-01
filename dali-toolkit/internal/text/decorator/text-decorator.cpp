@@ -182,13 +182,15 @@ struct Decorator::Impl : public ConnectionTracker
     {
       mPrimaryCursor.SetPosition( mCursor[PRIMARY_CURSOR].x + scrollPosition.x,
                                   mCursor[PRIMARY_CURSOR].y + scrollPosition.y );
-      mPrimaryCursor.SetSize( 1.0f, mCursor[PRIMARY_CURSOR].height );
+      mPrimaryCursor.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+      mPrimaryCursor.SetPreferredSize( Vector2( 1.0f, mCursor[PRIMARY_CURSOR].height ) );
     }
     if( mSecondaryCursor )
     {
       mSecondaryCursor.SetPosition( mCursor[SECONDARY_CURSOR].x + scrollPosition.x,
                                     mCursor[SECONDARY_CURSOR].y + scrollPosition.y );
-      mSecondaryCursor.SetSize( 1.0f, mCursor[SECONDARY_CURSOR].height );
+      mSecondaryCursor.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+      mSecondaryCursor.SetPreferredSize( Vector2( 1.0f, mCursor[SECONDARY_CURSOR].height ) );
     }
 
     // Show or hide the grab handle
@@ -339,7 +341,7 @@ struct Decorator::Impl : public ConnectionTracker
 
       mActiveLayer.SetAnchorPoint( AnchorPoint::CENTER);
       mActiveLayer.SetParentOrigin( ParentOrigin::CENTER);
-      //mActiveLayer.SetSizeMode( SIZE_EQUAL_TO_PARENT ); FIXME
+      mActiveLayer.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
       mActiveLayer.SetPositionInheritanceMode( USE_PARENT_POSITION );
 
       parent.Add( mActiveLayer );
@@ -364,19 +366,20 @@ struct Decorator::Impl : public ConnectionTracker
       mGrabHandle.SetParentOrigin( ParentOrigin::TOP_LEFT );
       mGrabHandle.SetAnchorPoint( AnchorPoint::TOP_CENTER );
       mGrabHandle.SetDrawMode( DrawMode::OVERLAY );
-
       // Area that Grab handle responds to, larger than actual handle so easier to move
-#ifdef DECORATOR_DEBUG
-      mGrabArea = Toolkit::CreateSolidColorActor( Vector4(1.0f, 0.0f, 0.0f, 0.5f) );
-      mGrabArea.SetName( "GrabArea" );
-#else
-      mGrabArea = Actor::New();
-#endif
+//#ifdef DECORATOR_DEBUG
+//      mGrabArea = Toolkit::CreateSolidColorActor( Vector4(0.0f, 0.0f, 0.0f, 0.0f), true, Color::RED, 1 );
+//      mGrabArea.SetName( "GrabArea" );
+//#else
+      mGrabArea = Actor::New();  //todo Force use of Actor until SolidColorActor fixed in Size Negotiation
+      mGrabArea.SetRelayoutEnabled( true );
+//#endif
       mGrabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
+      mGrabArea.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
       mGrabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
       mGrabArea.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
       mGrabArea.SetSizeModeFactor( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE );
-      mGrabHandle.Add(mGrabArea);
+      mGrabHandle.Add( mGrabArea );
 
       mTapDetector.Attach( mGrabArea );
       mPanGestureDetector.Attach( mGrabArea );

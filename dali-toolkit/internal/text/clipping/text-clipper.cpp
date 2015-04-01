@@ -78,11 +78,12 @@ void Clipper::Refresh( const Vector2& size )
     FrameBufferImage frameBufferImage = FrameBufferImage::New( offscreenSize.width,
                                                                offscreenSize.height,
                                                                Pixel::RGBA8888 );
-    mImageActor.SetSize( offscreenSize );
+    mImageActor.SetPreferredSize( offscreenSize );
+    mImageActor.SetResizePolicy( FIXED, ALL_DIMENSIONS );
     mImageActor.SetImage( frameBufferImage );
     mRenderTask.SetTargetFrameBuffer( frameBufferImage );
 
-    // Stores current size to avoid create new Dali resources if text changes.
+    // Stores current sizPe to avoid create new Dali resources if text changes.
     mCurrentOffscreenSize = offscreenSize;
   }
 
@@ -100,14 +101,16 @@ void Clipper::Initialize( const Vector2& size )
   mOffscreenRootActor.SetPositionInheritanceMode( DONT_INHERIT_POSITION );
   mOffscreenRootActor.SetInheritScale( false );
   mOffscreenRootActor.SetDepthTestDisabled( true );
-  mOffscreenRootActor.SetSize( offscreenSize );
+  mOffscreenRootActor.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+  mOffscreenRootActor.SetPreferredSize( offscreenSize );
 
   mImageActor = ImageActor::New();
   mImageActor.SetParentOrigin( ParentOrigin::CENTER );
   mImageActor.SetBlendFunc( BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA,
                             BlendingFactor::ONE, BlendingFactor::ONE );
   mImageActor.SetScale( Vector3( 1.0f, -1.0f, 1.0f ) );
-  mImageActor.SetSize( offscreenSize );
+  mImageActor.SetPreferredSize( offscreenSize );
+  mImageActor.SetResizePolicy( FIXED, ALL_DIMENSIONS );
 
   // Creates a new camera actor.
   mOffscreenCameraActor = CameraActor::New();
