@@ -58,17 +58,17 @@ var borderNinePatch = new dali.ResourceImage( {url:"border.9.png"} );
 var image = new dali.NinePatchImage( {url:"my_image.png"})
 ```
 The nine patch image will scale automatically with the size of the actor.
-
+  
 Tool for making 9 patches
-
+  
   http://romannurik.github.io/AndroidAssetStudio/nine-patches.html
-
+  
 More information on them:
-
+  
   http://radleymarx.com/blog/simple-guide-to-9-patch/
-
+  
   http://developer.android.com/tools/help/draw9patch.html
-
+  
 
 
  @class Image

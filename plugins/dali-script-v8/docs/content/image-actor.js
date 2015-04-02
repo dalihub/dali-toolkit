@@ -45,7 +45,8 @@ dali.stage.add( imageActor );
 ```
 var imageAtlas = new dali.ResourceImage( {url:"atlas.png"} )
 ```
-<img src="../assets/img/example-javascript-code.png">
+![ ](../assets/img/texture-atlas/example-javascript-code.jpg)
+
 
 ### Image Actor Specific Properties
 
