@@ -89,7 +89,14 @@ public:
                                   Length numberOfGlyphs ) const = 0;
 
   /**
-   * @brief Retrieves the shadow offset, 0,0 indicates no shadow.
+   * @brief Retrieves the text color
+   *
+   * @return The text color
+   */
+  virtual const Vector4& GetTextColor() const = 0;
+
+  /**
+   * @brief Retrieves the shadow offset, 0 indicates no shadow.
    *
    * @return The shadow offset.
    */
@@ -101,6 +108,21 @@ public:
    * @return The shadow color.
    */
   virtual const Vector4& GetShadowColor() const = 0;
+
+  /**
+   * @brief Retrieves the underline color.
+   *
+   * @return The underline color.
+   */
+  virtual const Vector4& GetUnderlineColor() const = 0;
+
+  /**
+   * @brief Returns whether is underline is enabled or not.
+   *
+   * @return The underline state.
+   */
+  virtual bool IsUnderlineEnabled() const = 0;
+
 };
 
 } // namespace Text

@@ -385,6 +385,20 @@ public:
   const Vector2& GetActualSize() const;
 
   /**
+   * @brief Set the text's color
+   *
+   * @param[in] textColor The text's color
+   */
+  void SetTextColor( const Vector4& textColor );
+
+  /**
+   * @brief Retrieve the text's color
+   *
+   * @return The text's color
+   */
+  const Vector4& GetTextColor() const;
+
+  /**
    * @brief Sets the text's shadow offset.
    *
    * @param[in] shadowOffset The shadow offset, 0,0 indicates no shadow.
@@ -412,6 +426,34 @@ public:
    */
   const Vector4& GetShadowColor() const;
 
+  /**
+   * @brief Sets the text's underline color.
+   *
+   * @param[in] color The text's underline color.
+   */
+  void SetUnderlineColor( const Vector4& color );
+
+  /**
+   * @brief Retrieves the text's underline color.
+   *
+   * @return The text's underline color.
+   */
+  const Vector4& GetUnderlineColor() const;
+
+  /**
+   * @brief Sets the text underline flag.
+   *
+   * @param[in] enabled true if underlined.
+   */
+  void SetUnderlineEnabled( bool enabled );
+
+  /**
+   * @brief Returns whether the text is underlined or not.
+   *
+   * @return underline state.
+   */
+  bool IsUnderlineEnabled() const;
+
 protected:
 
   /**
@@ -434,16 +476,20 @@ private:
 
 public:
 
-  Vector<GlyphInfo>      mGlyphs;             ///< For each glyph, the font's id, glyph's index within the font and glyph's metrics.
-  Vector<CharacterIndex> mGlyphsToCharacters; ///< For each glyph, the index of the first character.
-  Vector<GlyphIndex>     mCharactersToGlyph;  ///< For each character, the index of the first glyph.
-  Vector<Length>         mCharactersPerGlyph; ///< For each glyph, the number of characters that form the glyph.
-  Vector<Length>         mGlyphsPerCharacter; ///< For each character, the number of glyphs that are shaped.
-  Vector<Vector2>        mGlyphPositions;     ///< For each glyph, the position.
-  Vector<LineRun>        mLines;              ///< The laid out lines.
+  Vector<GlyphInfo>      mGlyphs;               ///< For each glyph, the font's id, glyph's index within the font and glyph's metrics.
+  Vector<CharacterIndex> mGlyphsToCharacters;   ///< For each glyph, the index of the first character.
+  Vector<GlyphIndex>     mCharactersToGlyph;    ///< For each character, the index of the first glyph.
+  Vector<Length>         mCharactersPerGlyph;   ///< For each glyph, the number of characters that form the glyph.
+  Vector<Length>         mGlyphsPerCharacter;   ///< For each character, the number of glyphs that are shaped.
+  Vector<Vector2>        mGlyphPositions;       ///< For each glyph, the position.
+  Vector<LineRun>        mLines;                ///< The laid out lines.
 
-  Vector2                mShadowOffset;       ///< Offset for drop shadow, 0.0 indicates no shadow
-  Vector4                mShadowColor;        ///< Color of drop shadow
+  Vector4                mTextColor;            ///< The text color
+  Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
+  Vector4                mShadowColor;          ///< Color of drop shadow
+  Vector4                mUnderlineColor;       ///< Color of underline
+  bool                   mUnderlineEnabled:1;   ///< Underline enabled flag
+  bool                   mUnderlineColorSet:1;  ///< Has the underline color been explicitly set?
 
 private:
 

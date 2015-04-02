@@ -173,32 +173,74 @@ public:
   void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters );
 
   /**
+   * @brief Set the text color
+   *
+   * @param textColor The text color
+   */
+  void SetTextColor( const Vector4& textColor );
+
+  /**
+   * @brief Retrieve the text color
+   *
+   * @return The text color
+   */
+  const Vector4& GetTextColor() const;
+
+  /**
    * @brief Set the shadow offset.
    *
    * @param[in] shadowOffset The shadow offset, 0,0 indicates no shadow.
    */
-   void SetShadowOffset( const Vector2& shadowOffset );
+  void SetShadowOffset( const Vector2& shadowOffset );
 
   /**
    * @brief Retrieve the shadow offset.
    *
    * @return The shadow offset.
    */
-   const Vector2& GetShadowOffset() const;
+  const Vector2& GetShadowOffset() const;
 
   /**
    * @brief Set the shadow color.
    *
    * @param[in] shadowColor The shadow color.
    */
-   void SetShadowColor( const Vector4& shadowColor );
+  void SetShadowColor( const Vector4& shadowColor );
 
   /**
    * @brief Retrieve the shadow color.
    *
    * @return The shadow color.
    */
-   const Vector4& GetShadowColor() const;
+  const Vector4& GetShadowColor() const;
+
+  /**
+   * @brief Set the underline color.
+   *
+   * @param[in] color color of underline.
+   */
+  void SetUnderlineColor( const Vector4& color );
+
+  /**
+   * @brief Retrieve the underline color.
+   *
+   * @return The underline color.
+   */
+  const Vector4& GetUnderlineColor() const;
+
+  /**
+   * @brief Set the underline enabled flag.
+   *
+   * @param[in] enabled The underline enabled flag.
+   */
+  void SetUnderlineEnabled( bool enabled );
+
+  /**
+   * @brief Returns whether the text is underlined or not.
+   *
+   * @return The underline state.
+   */
+  bool IsUnderlineEnabled() const;
 
   /**
    * @brief Called to enable text input.

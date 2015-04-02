@@ -651,9 +651,11 @@ struct Controller::Impl
 
     mView.SetVisualModel( mVisualModel );
 
-    // Set the shadow properties to default
+    // Set the text properties to default
+    mVisualModel->SetTextColor( Color::WHITE );
     mVisualModel->SetShadowOffset( Vector2::ZERO );
     mVisualModel->SetShadowColor( Vector4::ZERO );
+    mVisualModel->SetUnderlineEnabled( false );
   }
 
   ~Impl()
@@ -849,6 +851,11 @@ void Controller::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfCharact
   }
 }
 
+const Vector4& Controller::GetTextColor() const
+{
+  return mImpl->mVisualModel->GetTextColor();
+}
+
 const Vector2& Controller::GetShadowOffset() const
 {
   return mImpl->mVisualModel->GetShadowOffset();
@@ -859,6 +866,21 @@ const Vector4& Controller::GetShadowColor() const
   return mImpl->mVisualModel->GetShadowColor();
 }
 
+const Vector4& Controller::GetUnderlineColor() const
+{
+  return mImpl->mVisualModel->GetUnderlineColor();
+}
+
+bool Controller::IsUnderlineEnabled() const
+{
+  return mImpl->mVisualModel->IsUnderlineEnabled();
+}
+
+void Controller::SetTextColor( const Vector4& textColor )
+{
+  mImpl->mVisualModel->SetTextColor( textColor );
+}
+
 void Controller::SetShadowOffset( const Vector2& shadowOffset )
 {
   mImpl->mVisualModel->SetShadowOffset( shadowOffset );
@@ -867,6 +889,16 @@ void Controller::SetShadowOffset( const Vector2& shadowOffset )
 void Controller::SetShadowColor( const Vector4& shadowColor )
 {
   mImpl->mVisualModel->SetShadowColor( shadowColor );
+}
+
+void Controller::SetUnderlineColor( const Vector4& color )
+{
+  mImpl->mVisualModel->SetUnderlineColor( color );
+}
+
+void Controller::SetUnderlineEnabled( bool enabled )
+{
+  mImpl->mVisualModel->SetUnderlineEnabled( enabled );
 }
 
 void Controller::EnableTextInput( DecoratorPtr decorator )

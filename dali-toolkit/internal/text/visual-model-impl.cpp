@@ -370,6 +370,16 @@ const Vector2& VisualModel::GetActualSize() const
   return mActualSize;
 }
 
+void VisualModel::SetTextColor( const Vector4& textColor )
+{
+  mTextColor = textColor;
+
+  if ( !mUnderlineColorSet )
+  {
+    mUnderlineColor = textColor;
+  }
+}
+
 void VisualModel::SetShadowOffset( const Vector2& shadowOffset )
 {
   mShadowOffset = shadowOffset;
@@ -378,6 +388,22 @@ void VisualModel::SetShadowOffset( const Vector2& shadowOffset )
 void VisualModel::SetShadowColor( const Vector4& shadowColor )
 {
   mShadowColor = shadowColor;
+}
+
+void VisualModel::SetUnderlineColor( const Vector4& color )
+{
+  mUnderlineColor = color;
+  mUnderlineColorSet = true;
+}
+
+void VisualModel::SetUnderlineEnabled( bool enabled )
+{
+  mUnderlineEnabled = enabled;
+}
+
+const Vector4& VisualModel::GetTextColor() const
+{
+  return mTextColor;
 }
 
 const Vector2& VisualModel::GetShadowOffset() const
@@ -390,12 +416,22 @@ const Vector4& VisualModel::GetShadowColor() const
   return mShadowColor;
 }
 
+const Vector4& VisualModel::GetUnderlineColor() const
+{
+  return mUnderlineColor;
+}
+
+bool VisualModel::IsUnderlineEnabled() const
+{
+  return mUnderlineEnabled;
+}
 
 VisualModel::~VisualModel()
 {
 }
 
 VisualModel::VisualModel()
+: mUnderlineColorSet( false )
 {
 }
 

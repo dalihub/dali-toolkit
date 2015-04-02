@@ -77,6 +77,11 @@ public:
                                   Length numberOfGlyphs ) const;
 
   /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetTextColor()
+   */
+  virtual const Vector4& GetTextColor() const;
+
+  /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetShadowOffset()
    */
   virtual const Vector2& GetShadowOffset() const;
@@ -85,6 +90,16 @@ public:
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetShadowColor()
    */
   virtual const Vector4& GetShadowColor() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetUnderlineColor()
+   */
+  virtual const Vector4& GetUnderlineColor() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::IsUnderlineEnabled()
+   */
+  virtual bool IsUnderlineEnabled() const;
 
 private:
 

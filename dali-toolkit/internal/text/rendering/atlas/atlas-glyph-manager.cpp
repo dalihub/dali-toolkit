@@ -104,6 +104,11 @@ void AtlasGlyphManager::SetNewAtlasSize( const Vector2& size,
   GetImplementation(*this).SetNewAtlasSize( size, blockSize );
 }
 
+Vector2 AtlasGlyphManager::GetAtlasSize( uint32_t atlasId )
+{
+  return GetImplementation(*this).GetAtlasSize( atlasId );
+}
+
 void AtlasGlyphManager::Remove( uint32_t imageId )
 {
   GetImplementation(*this).Remove( imageId );

@@ -64,9 +64,12 @@ public:
       POINT_SIZE,                               ///< name "point-size",           The size of font in points,                   type FLOAT
       MULTI_LINE,                               ///< name "multi-line",           The single-line or multi-line layout option,  type BOOLEAN
       HORIZONTAL_ALIGNMENT,                     ///< name "horizontal-alignment", The line horizontal alignment,                type STRING,  values "BEGIN", "CENTER", "END"
-      VERTICAL_ALIGNMENT,                        ///< name "vertical-alignment",   The line vertical alignment,                  type STRING,  values   "TOP",   "CENTER",   "BOTTOM"
+      VERTICAL_ALIGNMENT,                       ///< name "vertical-alignment",   The line vertical alignment,                  type STRING,  values   "TOP",   "CENTER",   "BOTTOM"
+      TEXT_COLOR,                               ///< name "text-color",           The text color,                               type VECTOR4
       SHADOW_OFFSET,                            ///< name "shadow-offset",        The drop shadow offset 0 indicates no shadow, type VECTOR2
-      SHADOW_COLOR,                             ///< name "shadow-color",         The color of a drop shadow                  , type VECTOR4
+      SHADOW_COLOR,                             ///< name "shadow-color",         The color of a drop shadow,                   type VECTOR4
+      UNDERLINE_ENABLED,                        ///< name "underline-enabled",    The underline enabled flag                    type BOOLEAN
+      UNDERLINE_COLOR,                          ///< name "underline-color",      The color of the underline                    type VECTOR4
     };
   };
 

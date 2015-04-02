@@ -111,6 +111,15 @@ public:
                AtlasManager::AtlasSlot& slot );
 
   /**
+   * @brief Retrieve the size of an atlas
+   *
+   * @param[in] atlasId Id of the atlas to interrogate
+   *
+   * @return The pixel size of the atlas
+   */
+  Vector2 GetAtlasSize( uint32_t atlasId );
+
+  /**
    * @brief Set the Atlas size and block size for subsequent atlas generation
    *
    * @param[in] size size of the atlas in pixels

@@ -67,6 +67,7 @@ public:
     Pixel::Format mPixelFormat;                                         // pixel format used by atlas
     BufferImage mHorizontalStrip;                                       // Image used to pad upload
     BufferImage mVerticalStrip;                                         // Image used to pad upload
+    BufferImage mFilledPixelImage;                                      // Image used by atlas for operations such as underline
     PixelBuffer* mStripBuffer;                                          // Blank image buffer used to pad upload
     Material mMaterial;                                                 // material used for atlas texture
     SizeType mNextFreeBlock;                                            // next free block will be placed here ( actually +1 )
@@ -217,6 +218,7 @@ private:
   Vector2 mNewAtlasSize;
   Vector2 mNewBlockSize;
   Toolkit::AtlasManager::AddFailPolicy mAddFailPolicy;
+  uint32_t mFilledPixel;
 };
 
 } // namespace Internal

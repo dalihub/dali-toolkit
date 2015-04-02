@@ -54,9 +54,21 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
   struct MeshRecord
   {
+    Vector4 mColor;
     uint32_t mAtlasId;
     MeshData mMeshData;
     FrameBufferImage mBuffer;
+    bool mIsUnderline;
+  };
+
+  struct Extent
+  {
+    float mBaseLine;
+    float mLeft;
+    float mRight;
+    float mUnderlinePosition;
+    float mUnderlineThickness;
+    uint32_t mMeshRecordIndex;
   };
 
   struct AtlasRecord
@@ -79,19 +91,30 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     mBasicShader = BasicShader::New();
     mBgraShader = BgraShader::New();
     mBasicShadowShader = BasicShadowShader::New();
+
+    mFace.reserve( 6u );
+    mFace.push_back( 0 ); mFace.push_back( 2u ); mFace.push_back( 1u );
+    mFace.push_back( 1u ); mFace.push_back( 2u ); mFace.push_back( 3u );
   }
 
   void AddGlyphs( const std::vector<Vector2>& positions,
                   const Vector<GlyphInfo>& glyphs,
+                  const Vector4& textColor,
                   const Vector2& shadowOffset,
-                  const Vector4& shadowColor )
+                  const Vector4& shadowColor,
+                  float underlineEnabled,
+                  const Vector4& underlineColor )
   {
     AtlasManager::AtlasSlot slot;
     std::vector< MeshRecord > meshContainer;
+    Vector< Extent > extents;
+
+    float currentUnderlinePosition = 0.0f;
+    float currentUnderlineThickness = 0.0f;
     FontId lastFontId = 0;
     Style style = STYLE_NORMAL;
 
-    if ( shadowOffset.x > 0.0f || shadowOffset.y > 0.0f )
+    if ( shadowOffset.x != 0.0f || shadowOffset.y != 0.0f )
     {
       style = STYLE_DROP_SHADOW;
     }
@@ -111,6 +134,22 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       // No operation for white space
       if ( glyph.width && glyph.height )
       {
+        // Are we still using the same fontId as previous
+        if ( glyph.fontId != lastFontId )
+        {
+          // We need to fetch fresh font underline metrics
+          FontMetrics fontMetrics;
+          mFontClient.GetFontMetrics( glyph.fontId, fontMetrics );
+          currentUnderlinePosition = fontMetrics.underlinePosition;
+          currentUnderlineThickness = fontMetrics.underlineThickness;
+
+          // Ensure that an underline is at least 1 pixel high
+          if ( currentUnderlineThickness < 1.0f )
+          {
+            currentUnderlineThickness = 1.0f;
+          }
+        }
+
         Vector2 position = positions[ i ];
         MeshData newMeshData;
         mGlyphManager.Cached( glyph.fontId, glyph.index, slot );
@@ -151,25 +190,46 @@ struct AtlasRenderer::Impl : public ConnectionTracker
           }
         }
         // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
-        StitchTextMesh( meshContainer, newMeshData, slot );
+        StitchTextMesh( meshContainer,
+                        newMeshData,
+                        extents,
+                        textColor,
+                        position.y + glyph.yBearing,
+                        currentUnderlinePosition,
+                        currentUnderlineThickness,
+                        slot );
       }
+    }
+
+    if ( underlineEnabled )
+    {
+      // Check to see if any of the text needs an underline
+      GenerateUnderlines( meshContainer, extents, underlineColor, textColor );
     }
 
     // For each MeshData object, create a mesh actor and add to the renderable actor
     if ( meshContainer.size() )
     {
-      for ( uint32_t i = 0; i < meshContainer.size(); ++i )
+      for ( std::vector< MeshRecord >::iterator mIt = meshContainer.begin(); mIt != meshContainer.end(); ++mIt )
       {
-        MeshActor actor = MeshActor::New( Mesh::New( meshContainer[ i ].mMeshData ) );
-        actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+        MeshActor actor = MeshActor::New( Mesh::New( mIt->mMeshData ) );
+        actor.SetColor( mIt->mColor );
+        if ( mIt->mIsUnderline )
+        {
+          actor.SetColorMode( USE_OWN_COLOR );
+        }
+        else
+        {
+          actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+        }
 
         // Check to see what pixel format the shader should be
-        if ( mGlyphManager.GetPixelFormat( meshContainer[ i ].mAtlasId ) == Pixel::L8 )
+        if ( mGlyphManager.GetPixelFormat( mIt->mAtlasId ) == Pixel::L8 )
         {
           // Create an effect if necessary
           if ( style == STYLE_DROP_SHADOW )
           {
-            actor.Add( GenerateEffect( meshContainer[ i ], shadowOffset, shadowColor ) );
+            actor.Add( GenerateShadow( *mIt, shadowOffset, shadowColor ) );
           }
           actor.SetShaderEffect( mBasicShader );
         }
@@ -178,7 +238,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
           actor.SetShaderEffect( mBgraShader );
         }
 
-        if ( i )
+        if ( mActor )
         {
           mActor.Add( actor );
         }
@@ -212,17 +272,36 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
   void StitchTextMesh( std::vector< MeshRecord >& meshContainer,
                        MeshData& newMeshData,
+                       Vector< Extent >& extents,
+                       const Vector4& color,
+                       float baseLine,
+                       float underlinePosition,
+                       float underlineThickness,
                        AtlasManager::AtlasSlot& slot )
   {
     if ( slot.mImageId )
     {
+      MeshData::VertexContainer verts = newMeshData.GetVertices();
+      float left = verts[ 0 ].x;
+      float right = verts[ 1 ].x;
+
       // Check to see if there's a mesh data object that references the same atlas ?
-      for ( uint32_t i = 0; i < meshContainer.size(); ++i )
+      uint32_t index = 0;
+      for ( std::vector< MeshRecord >::iterator mIt = meshContainer.begin(); mIt != meshContainer.end(); ++mIt, ++index )
       {
-        if ( slot.mAtlasId == meshContainer[ i ].mAtlasId )
+        if ( slot.mAtlasId == mIt->mAtlasId )
         {
-          // Stitch the mesh to the existing mesh
-          mGlyphManager.StitchMesh( meshContainer[ i ].mMeshData, newMeshData );
+          // Stitch the mesh to the existing mesh and adjust any extents
+          mGlyphManager.StitchMesh( mIt->mMeshData, newMeshData );
+          AdjustExtents( extents,
+                         meshContainer,
+                         index,
+                         color,
+                         left,
+                         right,
+                         baseLine,
+                         underlinePosition,
+                         underlineThickness );
           return;
         }
       }
@@ -231,7 +310,73 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       MeshRecord meshRecord;
       meshRecord.mAtlasId = slot.mAtlasId;
       meshRecord.mMeshData = newMeshData;
+      meshRecord.mColor = color;
+      meshRecord.mIsUnderline = false;
       meshContainer.push_back( meshRecord );
+
+      // Adjust extents for this new meshrecord
+      AdjustExtents( extents,
+                     meshContainer,
+                     meshContainer.size() - 1u,
+                     color,
+                     left,
+                     right,
+                     baseLine,
+                     underlinePosition,
+                     underlineThickness );
+
+    }
+  }
+
+  void AdjustExtents( Vector< Extent >& extents,
+                      std::vector< MeshRecord>& meshRecords,
+                      uint32_t index,
+                      const Vector4& color,
+                      float left,
+                      float right,
+                      float baseLine,
+                      float underlinePosition,
+                      float underlineThickness )
+  {
+    bool foundExtent = false;
+    for ( Vector< Extent >::Iterator eIt = extents.Begin(); eIt != extents.End(); ++eIt )
+    {
+      if ( Equals( baseLine, eIt->mBaseLine ) )
+      {
+        // If we've found an extent with the same color then we don't need to create a new extent
+        if ( color == meshRecords[ index ].mColor )
+        {
+          foundExtent = true;
+          if ( left < eIt->mLeft )
+          {
+            eIt->mLeft = left;
+          }
+          if ( right > eIt->mRight  )
+          {
+            eIt->mRight = right;
+          }
+        }
+        // Font metrics use negative values for lower underline positions
+        if ( underlinePosition < eIt->mUnderlinePosition )
+        {
+          eIt->mUnderlinePosition = underlinePosition;
+        }
+        if ( underlineThickness > eIt->mUnderlineThickness )
+        {
+          eIt->mUnderlineThickness = underlineThickness;
+        }
+      }
+    }
+    if ( !foundExtent )
+    {
+      Extent extent;
+      extent.mLeft = left;
+      extent.mRight = right;
+      extent.mBaseLine = baseLine;
+      extent.mUnderlinePosition = underlinePosition;
+      extent.mUnderlineThickness = underlineThickness;
+      extent.mMeshRecordIndex = index;
+      extents.PushBack( extent );
     }
   }
 
@@ -286,14 +431,77 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     }
   }
 
-  MeshActor GenerateEffect( MeshRecord& meshRecord,
+  void GenerateUnderlines( std::vector< MeshRecord>& meshRecords,
+                           Vector< Extent >& extents,
+                           const Vector4& underlineColor,
+                           const Vector4& textColor )
+  {
+    MeshData newMeshData;
+    const float zero = 0.0f;
+    const float half = 0.5f;
+
+    for ( Vector< Extent >::ConstIterator eIt = extents.Begin(); eIt != extents.End(); ++eIt )
+    {
+      MeshData::VertexContainer newVerts;
+      newVerts.reserve( 4u );
+      uint32_t index = eIt->mMeshRecordIndex;
+      Vector2 uv = mGlyphManager.GetAtlasSize( meshRecords[ index ].mAtlasId );
+
+      // Make sure we don't hit texture edge for single pixel texture ( filled pixel is in top left of every atlas )
+      float u = half / uv.x;
+      float v = half / uv.y;
+      float thickness = eIt->mUnderlineThickness;
+      float baseLine = eIt->mBaseLine - eIt->mUnderlinePosition - ( thickness * 0.5f );
+      float tlx = eIt->mLeft;
+      float brx = eIt->mRight;
+
+      newVerts.push_back( MeshData::Vertex( Vector3( tlx, baseLine, zero ),
+                                            Vector2( zero, zero ),
+                                            Vector3( zero, zero, zero ) ) );
+
+      newVerts.push_back( MeshData::Vertex( Vector3( brx, baseLine, zero ),
+                                            Vector2( u, zero ),
+                                            Vector3( zero, zero, zero ) ) );
+
+      newVerts.push_back( MeshData::Vertex( Vector3( tlx, baseLine + thickness, zero ),
+                                            Vector2( zero, v ),
+                                            Vector3( zero, zero, zero ) ) );
+
+      newVerts.push_back( MeshData::Vertex( Vector3( brx, baseLine + thickness, zero ),
+                                            Vector2( u, v ),
+                                            Vector3( zero, zero, zero ) ) );
+
+      newMeshData.SetVertices( newVerts );
+      newMeshData.SetFaceIndices( mFace );
+
+      if ( underlineColor == textColor )
+      {
+        mGlyphManager.StitchMesh( meshRecords[ index ].mMeshData, newMeshData );
+      }
+      else
+      {
+        MeshRecord record;
+        newMeshData.SetMaterial( meshRecords[ index ].mMeshData.GetMaterial() );
+        newMeshData.SetHasNormals( true );
+        newMeshData.SetHasColor( false );
+        newMeshData.SetHasTextureCoords( true );
+        record.mMeshData = newMeshData;
+        record.mAtlasId = meshRecords[ index ].mAtlasId;
+        record.mColor = underlineColor;
+        record.mIsUnderline = true;
+        meshRecords.push_back( record );
+      }
+    }
+  }
+
+  MeshActor GenerateShadow( MeshRecord& meshRecord,
                             const Vector2& shadowOffset,
                             const Vector4& shadowColor )
   {
     // Scan vertex buffer to determine width and height of effect buffer needed
     MeshData::VertexContainer verts = meshRecord.mMeshData.GetVertices();
-    const float zero = 0.0f;
     const float one = 1.0f;
+    const float zero = 0.0f;
     float tlx = verts[ 0 ].x;
     float tly = verts[ 0 ].y;
     float brx = zero;
@@ -325,7 +533,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     float divHeight = 2.0f / height;
 
     // Create a buffer to render to
-    // TODO bloom style filter from this buffer
     meshRecord.mBuffer = FrameBufferImage::New( width, height );
 
     // Create a mesh actor to contain the post-effect render
@@ -348,15 +555,12 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                                           Vector2( one, one ),
                                           Vector3( zero, zero, zero ) ) );
 
-    face.push_back( 0 ); face.push_back( 2u ); face.push_back( 1u );
-    face.push_back( 1u ); face.push_back( 2u ); face.push_back( 3u );
-
     MeshData meshData;
     Material newMaterial = Material::New("effect buffer");
     newMaterial.SetDiffuseTexture( meshRecord.mBuffer );
     meshData.SetMaterial( newMaterial );
     meshData.SetVertices( vertices );
-    meshData.SetFaceIndices( face );
+    meshData.SetFaceIndices( mFace );
     meshData.SetHasNormals( true );
     meshData.SetHasColor( false );
     meshData.SetHasTextureCoords( true );
@@ -364,7 +568,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
     actor.SetShaderEffect( mBgraShader );
     actor.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
-    actor.SetSortModifier( one ); // force behind main text
+    actor.SetSortModifier( 0.1f ); // force behind main text
 
     // Create a sub actor to render once with normalized vertex positions
     MeshData newMeshData;
@@ -441,6 +645,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
   ShaderEffect mBgraShader;                           ///> Shader used to render BGRA glyphs
   ShaderEffect mBasicShadowShader;                    ///> Shader used to render drop shadow into buffer
   std::vector< MaxBlockSize > mBlockSizes;            ///> Maximum size needed to contain a glyph in a block within a new atlas
+  std::vector< MeshData::FaceIndex > mFace;           ///> Face indices for a quad
 };
 
 Text::RendererPtr AtlasRenderer::New()
@@ -467,8 +672,11 @@ RenderableActor AtlasRenderer::Render( Text::ViewInterface& view )
     view.GetGlyphPositions( &positions[0], 0, numberOfGlyphs );
     mImpl->AddGlyphs( positions,
                       glyphs,
+                      view.GetTextColor(),
                       view.GetShadowOffset(),
-                      view.GetShadowColor() );
+                      view.GetShadowColor(),
+                      view.IsUnderlineEnabled(),
+                      view.GetUnderlineColor() );
   }
   return mImpl->mActor;
 }

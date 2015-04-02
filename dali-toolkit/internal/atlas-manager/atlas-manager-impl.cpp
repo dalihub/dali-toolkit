@@ -37,12 +37,14 @@ namespace
   const Vector2 DEFAULT_BLOCK_SIZE( 32.0f, 32.0f );
   const uint32_t SINGLE_PIXEL_PADDING( 1u );
   const uint32_t DOUBLE_PIXEL_PADDING( SINGLE_PIXEL_PADDING << 1 );
+  const uint32_t FILLED_PIXEL( -1 );
 }
 
 AtlasManager::AtlasManager()
 : mNewAtlasSize( DEFAULT_ATLAS_SIZE ),
   mNewBlockSize( DEFAULT_BLOCK_SIZE ),
-  mAddFailPolicy( Toolkit::AtlasManager::FAIL_ON_ADD_CREATES )
+  mAddFailPolicy( Toolkit::AtlasManager::FAIL_ON_ADD_CREATES ),
+  mFilledPixel( FILLED_PIXEL )
 {
 }
 
@@ -103,7 +105,8 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( SizeType width,
                                                      SINGLE_PIXEL_PADDING,
                                                      blockHeight - DOUBLE_PIXEL_PADDING,
                                                      pixelformat );
-
+  atlasDescriptor.mFilledPixelImage = BufferImage::New( reinterpret_cast< PixelBuffer* >( &mFilledPixel ), 1, 1, pixelformat );
+  atlas.Upload( atlasDescriptor.mFilledPixelImage, 0, 0 );
   mAtlasList.push_back( atlasDescriptor );
   return mAtlasList.size();
 }
@@ -413,7 +416,6 @@ void AtlasManager::CreateMesh( SizeType atlas,
 
   meshData.SetFaceIndices( faces );
   meshData.SetMaterial( mAtlasList[ atlas ].mMaterial );
-  //PrintMeshData( meshData );
 }
 
 void AtlasManager::PrintMeshData( const MeshData& meshData )
@@ -510,9 +512,6 @@ void AtlasManager::StitchMesh( MeshData& first,
   }
 
   first.SetFaceIndices( f1 );
-
-  // TODO rather than set the material to the second, check to see if there's a match and return if not
-  first.SetMaterial( second.GetMaterial() );
 }
 
 void AtlasManager::StitchMesh( const MeshData& first,
@@ -565,8 +564,7 @@ void AtlasManager::StitchMesh( const MeshData& first,
     out.SetVertices( vertices );
   }
 
-  // TODO rather than set the material to the second, check to see if there's a match and return if not
-  out.SetMaterial( second.GetMaterial() );
+  out.SetMaterial( first.GetMaterial() );
   out.SetFaceIndices( faces );
 }
 
@@ -604,20 +602,25 @@ void AtlasManager::UploadImage( const BufferImage& image,
     DALI_LOG_ERROR("Uploading image to Atlas Failed!.\n");
   }
 
-  // Blit top strip
-  if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mHorizontalStrip,
-                                           blockOffsetX,
-                                           blockOffsetY ) )
+  // If this is the first block then we need to keep the first pixel free for underline texture
+  if ( block )
   {
-    DALI_LOG_ERROR("Uploading top strip to Atlas Failed!\n");
-  }
 
-  // Blit left strip
-  if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mVerticalStrip,
-                                           blockOffsetX,
-                                           blockOffsetY + SINGLE_PIXEL_PADDING ) )
-  {
-    DALI_LOG_ERROR("Uploading left strip to Atlas Failed!\n");
+    // Blit top strip
+    if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mHorizontalStrip,
+                                             blockOffsetX,
+                                             blockOffsetY ) )
+    {
+      DALI_LOG_ERROR("Uploading top strip to Atlas Failed!\n");
+    }
+
+    // Blit left strip
+    if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mVerticalStrip,
+                                             blockOffsetX,
+                                             blockOffsetY + SINGLE_PIXEL_PADDING ) )
+    {
+      DALI_LOG_ERROR("Uploading left strip to Atlas Failed!\n");
+    }
   }
 
   // Blit bottom strip
@@ -743,7 +746,7 @@ Vector2 AtlasManager::GetBlockSize( AtlasId atlas )
   }
   else
   {
-    return Vector2( 0.0f, 0.0f );
+    return Vector2::ZERO;
   }
 }
 
@@ -756,7 +759,7 @@ Vector2 AtlasManager::GetAtlasSize( AtlasId atlas )
   }
   else
   {
-    return Vector2( 0.0f, 0.0f );
+    return Vector2::ZERO;
   }
 }
 

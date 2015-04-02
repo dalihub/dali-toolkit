@@ -108,6 +108,11 @@ void AtlasGlyphManager::Cached( Text::FontId fontId,
   slot.mImageId = 0;
 }
 
+Vector2 AtlasGlyphManager::GetAtlasSize( uint32_t atlasId )
+{
+  return mAtlasManager.GetAtlasSize( atlasId );
+}
+
 void AtlasGlyphManager::SetNewAtlasSize( const Vector2& size,
                                          const Vector2& blockSize )
 {

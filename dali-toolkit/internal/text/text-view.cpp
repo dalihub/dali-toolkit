@@ -51,6 +51,16 @@ void View::SetVisualModel( VisualModelPtr visualModel )
   mImpl->mVisualModel = visualModel;
 }
 
+const Vector4& View::GetTextColor() const
+{
+  if ( mImpl->mVisualModel )
+  {
+    VisualModel& model = *mImpl->mVisualModel;
+    return model.GetTextColor();
+  }
+  return Vector4::ZERO;
+}
+
 const Vector2& View::GetShadowOffset() const
 {
   if ( mImpl->mVisualModel )
@@ -69,6 +79,26 @@ const Vector4& View::GetShadowColor() const
     return model.GetShadowColor();
   }
   return Vector4::ZERO;
+}
+
+const Vector4& View::GetUnderlineColor() const
+{
+  if ( mImpl->mVisualModel )
+  {
+    VisualModel& model = *mImpl->mVisualModel;
+    return model.GetUnderlineColor();
+  }
+  return Vector4::ZERO;
+}
+
+bool View::IsUnderlineEnabled() const
+{
+  if ( mImpl->mVisualModel )
+  {
+    VisualModel& model = *mImpl->mVisualModel;
+    return model.IsUnderlineEnabled();
+  }
+  return false;
 }
 
 Length View::GetNumberOfGlyphs() const

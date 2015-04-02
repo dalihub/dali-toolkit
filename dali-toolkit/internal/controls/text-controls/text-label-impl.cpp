@@ -83,9 +83,11 @@ DALI_PROPERTY_REGISTRATION( TextLabel, "point-size",           FLOAT,   POINT_SI
 DALI_PROPERTY_REGISTRATION( TextLabel, "multi-line",           BOOLEAN, MULTI_LINE           )
 DALI_PROPERTY_REGISTRATION( TextLabel, "horizontal-alignment", STRING,  HORIZONTAL_ALIGNMENT )
 DALI_PROPERTY_REGISTRATION( TextLabel, "vertical-alignment",   STRING,  VERTICAL_ALIGNMENT   )
-DALI_PROPERTY_REGISTRATION( TextLabel, "shadow-offset",     VECTOR2, SHADOW_OFFSET     )
-DALI_PROPERTY_REGISTRATION( TextLabel, "shadow-color",      VECTOR4, SHADOW_COLOR      )
-
+DALI_PROPERTY_REGISTRATION( TextLabel, "text-color",           VECTOR4, TEXT_COLOR           )
+DALI_PROPERTY_REGISTRATION( TextLabel, "shadow-offset",        VECTOR2, SHADOW_OFFSET        )
+DALI_PROPERTY_REGISTRATION( TextLabel, "shadow-color",         VECTOR4, SHADOW_COLOR         )
+DALI_PROPERTY_REGISTRATION( TextLabel, "underline-enabled",    BOOLEAN, UNDERLINE_ENABLED    )
+DALI_PROPERTY_REGISTRATION( TextLabel, "underline-color",      VECTOR4, UNDERLINE_COLOR      )
 DALI_TYPE_REGISTRATION_END()
 
 } // namespace
@@ -220,7 +222,22 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-     case Toolkit::TextLabel::Property::SHADOW_OFFSET:
+
+      case Toolkit::TextLabel::Property::TEXT_COLOR:
+      {
+        if ( impl.mController )
+        {
+          Vector4 textColor = value.Get< Vector4 >();
+          if ( impl.mController->GetTextColor() != textColor )
+          {
+            impl.mController->SetTextColor( textColor );
+            impl.RequestTextRelayout();
+          }
+        }
+        break;
+      }
+
+      case Toolkit::TextLabel::Property::SHADOW_OFFSET:
       {
         if( impl.mController )
         {
@@ -241,6 +258,32 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
           if ( impl.mController->GetShadowColor() != shadowColor )
           {
             impl.mController->SetShadowColor( shadowColor );
+            impl.RequestTextRelayout();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::UNDERLINE_COLOR:
+      {
+        if( impl.mController )
+        {
+          Vector4 color = value.Get< Vector4 >();
+          if ( impl.mController->GetUnderlineColor() != color )
+          {
+            impl.mController->SetUnderlineColor( color );
+            impl.RequestTextRelayout();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::UNDERLINE_ENABLED:
+      {
+        if( impl.mController )
+        {
+          bool enabled = value.Get< bool >();
+          if ( impl.mController->IsUnderlineEnabled() != enabled )
+          {
+            impl.mController->SetUnderlineEnabled( enabled );
             impl.RequestTextRelayout();
           }
         }
@@ -304,7 +347,15 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
-     case Toolkit::TextLabel::Property::SHADOW_OFFSET:
+      case Toolkit::TextLabel::Property::TEXT_COLOR:
+      {
+        if ( impl.mController )
+        {
+          value = impl.mController->GetTextColor();
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::SHADOW_OFFSET:
       {
         if ( impl.mController )
         {
@@ -317,6 +368,22 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         if ( impl.mController )
         {
           value = impl.mController->GetShadowColor();
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::UNDERLINE_COLOR:
+      {
+        if ( impl.mController )
+        {
+          value = impl.mController->GetUnderlineColor();
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::UNDERLINE_ENABLED:
+      {
+        if ( impl.mController )
+        {
+          value = impl.mController->IsUnderlineEnabled();
         }
         break;
       }

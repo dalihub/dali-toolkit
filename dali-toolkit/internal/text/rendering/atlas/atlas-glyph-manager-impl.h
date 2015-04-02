@@ -93,6 +93,11 @@ public:
                Dali::Toolkit::AtlasManager::AtlasSlot& slot );
 
   /**
+   * @copydoc Toolkit::AtlasGlyphManager::GetAtlasSize
+   */
+  Vector2 GetAtlasSize( uint32_t atlasId );
+
+  /**
    * @copydoc Toolkit::AtlasGlyphManager::SetNewAtlasSize
    */
   void SetNewAtlasSize( const Vector2& size,
