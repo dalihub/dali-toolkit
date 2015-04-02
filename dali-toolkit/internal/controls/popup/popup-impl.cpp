@@ -271,7 +271,8 @@ void Popup::SetTitle( const std::string& text )
 
   mTitle = Toolkit::TextLabel::New( text );
   mTitle.SetName( "POPUP_TITLE" );
-  mTitle.SetColor( Color::BLACK );
+  mTitle.SetProperty( Toolkit::TextLabel::Property::MULTI_LINE, true );
+  mTitle.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
 
   if( mPopupLayout )
   {
