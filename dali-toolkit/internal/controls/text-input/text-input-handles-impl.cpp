@@ -62,7 +62,7 @@ Actor CreateGrabArea( const std::string& name, const Vector3& relativeScale )
 
   Actor handleGrabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
   handleGrabArea.SetName( name );
-  handleGrabArea.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
+  handleGrabArea.SetResizePolicy( SIZE_RELATIVE_TO_PARENT, ALL_DIMENSIONS );
   handleGrabArea.SetSizeModeFactor( relativeScale );
   handleGrabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 

@@ -111,6 +111,7 @@ int UtcDaliCheckBoxButtonSetImages(void)
   Image image02 = CreateSolidColorImage( Color::RED, 30, 30 );
   ImageActor imageActor02 = CreateSolidColorActor( Color::RED );
   imageActor02.SetSize( 40, 40 );
+  imageActor02.SetName( "imageActor02" );
 
   Image image03 = CreateSolidColorImage( Color::RED, 50, 50 );
   ImageActor imageActor03 = CreateSolidColorActor( Color::RED );
@@ -122,6 +123,8 @@ int UtcDaliCheckBoxButtonSetImages(void)
 
   Vector3 size;
   CheckBoxButton checkBoxButton = CheckBoxButton::New();
+  checkBoxButton.SetName( "UtcDaliCheckBoxButtonSetImages" );
+  Stage::GetCurrent().Add( checkBoxButton );
 
   application.SendNotification();
   application.Render();
@@ -133,79 +136,12 @@ int UtcDaliCheckBoxButtonSetImages(void)
   application.SendNotification();
   application.Render();
 
-  size = checkBoxButton.GetBackgroundImage().GetCurrentSize();
+  size = checkBoxButton.GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 10.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 10.f, TEST_LOCATION );
 
   checkBoxButton.SetBackgroundImage( imageActor01 );
 
-  application.SendNotification();
-  application.Render();
-
-  size = checkBoxButton.GetBackgroundImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 20.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 20.f, TEST_LOCATION );
-
-  checkBoxButton.SetSelectedImage( image02 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = checkBoxButton.GetSelectedImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 30.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 30.f, TEST_LOCATION );
-
-  checkBoxButton.SetSelectedImage( imageActor02 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = checkBoxButton.GetSelectedImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 40.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 40.f, TEST_LOCATION );
-
-  checkBoxButton.SetDisabledBackgroundImage( image03 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = checkBoxButton.GetDisabledBackgroundImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 50.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 50.f, TEST_LOCATION );
-
-  checkBoxButton.SetDisabledBackgroundImage( imageActor03 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = checkBoxButton.GetDisabledBackgroundImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 60.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 60.f, TEST_LOCATION );
-
-  checkBoxButton.SetDisabledSelectedImage( image04 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = checkBoxButton.GetDisabledSelectedImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 70.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 70.f, TEST_LOCATION );
-
-  checkBoxButton.SetDisabledSelectedImage( imageActor04 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = checkBoxButton.GetDisabledSelectedImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 80.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 80.f, TEST_LOCATION );
   END_TEST;
 }

@@ -219,7 +219,7 @@ int UtcDaliControlImplOnGestureMethods(void)
   {
     DummyControl dummy = DummyControl::New(true);
     dummy.SetRelayoutEnabled( true );
-    dummy.SetPreferredSize( Vector2(100.0f, 100.0f ) );
+    dummy.SetSize( Vector2(100.0f, 100.0f ) );
 
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
@@ -280,7 +280,7 @@ int UtcDaliControlImplOnGestureMethods(void)
   {
     DummyControl dummy = DummyControl::New();
     dummy.SetRelayoutEnabled( true );
-    dummy.SetPreferredSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
 
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
@@ -454,7 +454,7 @@ int UtcDaliControlImplSizeSet(void)
 
     DALI_TEST_EQUALS( dummyImpl.sizeSetCalled, true, TEST_LOCATION ); // Called from size negotiation
     Vector2 size(100.0f, 200.0f);
-    dummy.SetPreferredSize(size);
+    dummy.SetSize(size);
 
     application.Render();
     application.SendNotification();
@@ -479,7 +479,7 @@ int UtcDaliControlImplSizeSet(void)
     application.Render();
     application.SendNotification();
 
-    dummy.SetPreferredSize(size);
+    dummy.SetSize(size);
 
     application.Render();
     application.SendNotification();
@@ -549,7 +549,7 @@ int UtcDaliControlImplTouchEvent(void)
     dummy.SetRelayoutEnabled( true );
     DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
 
-    dummy.SetPreferredSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
@@ -573,7 +573,7 @@ int UtcDaliControlImplTouchEvent(void)
     DummyControl dummy = DummyControl::New();
     dummy.SetRelayoutEnabled( true );
 
-    dummy.SetPreferredSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
@@ -776,7 +776,7 @@ int UtcDaliControlImplMouseWheelEvent(void)
     dummy.SetRelayoutEnabled( true );
     DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
 
-    dummy.SetPreferredSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
@@ -803,7 +803,7 @@ int UtcDaliControlImplMouseWheelEvent(void)
     DummyControl dummy = DummyControl::New();
     dummy.SetRelayoutEnabled( true );
 
-    dummy.SetPreferredSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 

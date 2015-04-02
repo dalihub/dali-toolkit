@@ -142,7 +142,7 @@ void BlurTwoPassFilter::Enable()
   // create actor to render input with applied emboss effect
   mActorForInput = ImageActor::New( mInputImage );
   mActorForInput.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForInput.SetSize(mTargetSize);
+  mActorForInput.SetSize( mTargetSize );
   mActorForInput.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
 
   // create internal offscreen for result of horizontal pass
@@ -151,7 +151,7 @@ void BlurTwoPassFilter::Enable()
   // create an actor to render mImageForHorz for vertical blur pass
   mActorForHorz = ImageActor::New( mImageForHorz );
   mActorForHorz.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForHorz.SetSize(mTargetSize);
+  mActorForHorz.SetSize( mTargetSize );
   mActorForHorz.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
 
   // create internal offscreen for result of the two pass blurred image
@@ -160,7 +160,7 @@ void BlurTwoPassFilter::Enable()
   // create an actor to blend the blurred image and the input image with the given blur strength
   mActorForBlending = ImageActor::New( mBlurredImage );
   mActorForBlending.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForBlending.SetSize(mTargetSize);
+  mActorForBlending.SetSize( mTargetSize );
   mActorForBlending.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) );
 
   mRootActor.Add( mActorForInput );

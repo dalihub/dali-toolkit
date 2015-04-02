@@ -328,6 +328,12 @@ int UtcDaliControlTestParameters(void)
   DummyControl test = DummyControl::New();
 
   test.SetSize( 0.7f, 0.7f, 0.7f );
+
+  Stage::GetCurrent().Add( test );
+
+  application.SendNotification();
+  application.Render();
+
   float width = 640.0f;
   float height = test.GetHeightForWidth( width );
   DALI_TEST_CHECK( test.GetWidthForHeight( height ) == width );

@@ -144,6 +144,7 @@ int UtcDaliButtonSize(void)
 
   // First an image is set, then SetSize is called.
   pushButton = PushButton::New();
+  Stage::GetCurrent().Add( pushButton );
 
   pushButton.SetBackgroundImage( image01 );
   pushButton.SetSize( 10.f, 10.f );

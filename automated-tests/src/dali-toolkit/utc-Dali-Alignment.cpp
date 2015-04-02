@@ -935,7 +935,7 @@ int UtcDaliAlignmentOnSizeSet(void)
   application.SendNotification();
 
   Vector2 size( 100.0f, 200.0f );
-  alignment.SetPreferredSize(size);
+  alignment.SetSize(size);
 
   application.Render();
   application.SendNotification();
