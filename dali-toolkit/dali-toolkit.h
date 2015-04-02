@@ -118,6 +118,8 @@
 #include <dali-toolkit/public-api/shader-effects/ripple2d-effect.h>
 #include <dali-toolkit/public-api/shader-effects/swirl-effect.h>
 
+#include <dali-toolkit/public-api/styling/style-manager.h>
+
 #include <dali-toolkit/public-api/transition-effects/cube-transition-effect.h>
 #include <dali-toolkit/public-api/transition-effects/cube-transition-wave-effect.h>
 #include <dali-toolkit/public-api/transition-effects/cube-transition-cross-effect.h>
