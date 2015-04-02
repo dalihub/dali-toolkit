@@ -33,23 +33,9 @@ namespace Internal
 // ScrollBase
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-const char* const ScrollBase::SCROLL_DOMAIN_OFFSET_PROPERTY_NAME = "domain-offset";
-
 ScrollBase::ScrollBase()
 : Scrollable(),
   mParent(NULL),
-  mPropertyTime(Property::INVALID_INDEX),
-  mPropertyPrePosition(Property::INVALID_INDEX),
-  mPropertyPosition(Property::INVALID_INDEX),
-  mPropertyOvershootX(Property::INVALID_INDEX),
-  mPropertyOvershootY(Property::INVALID_INDEX),
-  mPropertyWrap(Property::INVALID_INDEX),
-  mPropertyPanning(Property::INVALID_INDEX),
-  mPropertyScrolling(Property::INVALID_INDEX),
-  mPropertyFinal(Property::INVALID_INDEX),
-  mPropertyDomainOffset(Property::INVALID_INDEX),
-  mPropertyPositionDelta(Property::INVALID_INDEX),
-  mPropertyScrollStartPagePosition(Property::INVALID_INDEX),
   mDelay(0.0f)
 {
 }
@@ -57,28 +43,6 @@ ScrollBase::ScrollBase()
 void ScrollBase::SetParent(ScrollBase *parent)
 {
   mParent = parent;
-}
-
-void ScrollBase::RegisterProperties()
-{
-  Actor self = Self();
-
-  // Register common properties
-  RegisterCommonProperties();
-
-  // Register Scroll Properties.
-  mPropertyTime = self.RegisterProperty(Toolkit::ScrollView::SCROLL_TIME_PROPERTY_NAME, 0.0f);
-  mPropertyPrePosition = self.RegisterProperty(Toolkit::ScrollView::SCROLL_PRE_POSITION_PROPERTY_NAME, Vector3::ZERO);
-  mPropertyPosition = self.RegisterProperty(Toolkit::ScrollView::SCROLL_POSITION_PROPERTY_NAME, Vector3::ZERO);
-  mPropertyOvershootX = self.RegisterProperty(Toolkit::ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME, 0.0f);
-  mPropertyOvershootY = self.RegisterProperty(Toolkit::ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME, 0.0f);
-  mPropertyFinal = self.RegisterProperty(Toolkit::ScrollView::SCROLL_FINAL_PROPERTY_NAME, Vector3::ZERO);
-  mPropertyWrap = self.RegisterProperty(Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME, false);
-  mPropertyPanning = self.RegisterProperty(Toolkit::ScrollView::SCROLL_PANNING_PROPERTY_NAME, false);
-  mPropertyScrolling = self.RegisterProperty(Toolkit::ScrollView::SCROLL_SCROLLING_PROPERTY_NAME, false);
-  mPropertyDomainOffset = self.RegisterProperty(SCROLL_DOMAIN_OFFSET_PROPERTY_NAME, Vector3::ZERO);
-  mPropertyPositionDelta = self.RegisterProperty(Toolkit::ScrollView::SCROLL_POSITION_DELTA_PROPERTY_NAME, Vector3::ZERO);
-  mPropertyScrollStartPagePosition = self.RegisterProperty(Toolkit::ScrollView::SCROLL_START_PAGE_POSITION_PROPERTY_NAME, Vector3::ZERO);
 }
 
 void ScrollBase::BindActor(Actor child)

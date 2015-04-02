@@ -158,7 +158,7 @@ ScrollOvershootEffectRipple::ScrollOvershootEffectRipple( bool vertical, Scrolla
 void ScrollOvershootEffectRipple::Apply()
 {
   Actor self = mAttachedScrollView.Self();
-  mOvershootProperty = self.GetPropertyIndex(IsVertical() ? Toolkit::ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME : Toolkit::ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME);
+  mOvershootProperty = IsVertical() ? Toolkit::ScrollView::Property::OVERSHOOT_Y : Toolkit::ScrollView::Property::OVERSHOOT_X;
 
   // make sure height is set, since we only create a constraint for image width
   mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.width, OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height);

@@ -283,18 +283,6 @@ unsigned int FixedRuler::GetTotalPages() const
 // ScrollView
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-const std::string ScrollView::SCROLL_TIME_PROPERTY_NAME( "scroll-time" );
-const std::string ScrollView::SCROLL_POSITION_PROPERTY_NAME( "scroll-position" );
-const std::string ScrollView::SCROLL_PRE_POSITION_PROPERTY_NAME( "scroll-pre-position" );
-const std::string ScrollView::SCROLL_OVERSHOOT_X_PROPERTY_NAME( "scroll-overshoot-x" );
-const std::string ScrollView::SCROLL_OVERSHOOT_Y_PROPERTY_NAME( "scroll-overshoot-y" );
-const std::string ScrollView::SCROLL_FINAL_PROPERTY_NAME( "scroll-final" );
-const std::string ScrollView::SCROLL_WRAP_PROPERTY_NAME( "scroll-wrap" );
-const std::string ScrollView::SCROLL_PANNING_PROPERTY_NAME( "scroll-panning" );
-const std::string ScrollView::SCROLL_SCROLLING_PROPERTY_NAME( "scroll-scrolling" );
-const std::string ScrollView::SCROLL_POSITION_DELTA_PROPERTY_NAME( "scroll-position-delta" );
-const std::string ScrollView::SCROLL_START_PAGE_POSITION_PROPERTY_NAME( "scroll-start-page-position" );
-
 const float ScrollView::DEFAULT_SLOW_SNAP_ANIMATION_DURATION(0.5f);
 const float ScrollView::DEFAULT_FAST_SNAP_ANIMATION_DURATION(0.25f);
 const float ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION(0.5f);
