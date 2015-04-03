@@ -250,6 +250,8 @@ void ScrollBar::OnScrollPositionNotified(PropertyNotification& source)
 
 void ScrollBar::Show()
 {
+  Actor self = Self();
+
   // Cancel any animation
   if(mAnimation)
   {
@@ -260,17 +262,19 @@ void ScrollBar::Show()
   if(mIndicatorShowDuration > 0.0f)
   {
     mAnimation = Animation::New( mIndicatorShowDuration );
-    mAnimation.OpacityTo( Self(), 1.0f, AlphaFunctions::EaseIn );
+    mAnimation.AnimateTo( Property( self, Actor::Property::COLOR_ALPHA ), 1.0f, AlphaFunctions::EaseIn );
     mAnimation.Play();
   }
   else
   {
-    Self().SetOpacity(1.0f);
+    self.SetOpacity(1.0f);
   }
 }
 
 void ScrollBar::Hide()
 {
+  Actor self = Self();
+
   // Cancel any animation
   if(mAnimation)
   {
@@ -281,12 +285,12 @@ void ScrollBar::Hide()
   if(mIndicatorHideDuration > 0.0f)
   {
     mAnimation = Animation::New( mIndicatorHideDuration );
-    mAnimation.OpacityTo( Self(), 0.0f, AlphaFunctions::EaseIn );
+    mAnimation.AnimateTo( Property( self, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunctions::EaseIn );
     mAnimation.Play();
   }
   else
   {
-    Self().SetOpacity(0.0f);
+    self.SetOpacity(0.0f);
   }
 }
 

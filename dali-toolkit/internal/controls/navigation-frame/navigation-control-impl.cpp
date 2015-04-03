@@ -23,12 +23,13 @@
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/size-negotiation/relayout-container.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 #include <dali-toolkit/internal/controls/navigation-frame/navigation-tool-bar.h>
 #include <dali-toolkit/internal/controls/navigation-frame/navigation-title-bar.h>
-#include <dali-toolkit/internal/controls/relayout-controller.h>
+#include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 
 namespace Dali
 {
@@ -263,11 +264,12 @@ void NavigationControl::OrientationChanged( int angle )
       }
     }
 
+    Actor self = Self();
     Animation animation = Animation::New( mOrientationAnimationDuration );
-    animation.RotateTo( Self(), Degree( -angle ), Vector3::ZAXIS, mOrientationAnimationAlphaFunc );
+    animation.AnimateTo( Property( self, Actor::Property::ORIENTATION ), Quaternion( Radian( Degree( -angle ) ), Vector3::ZAXIS ), mOrientationAnimationAlphaFunc );
     animation.Play();
 
-    Self().SetSize( targetSize );
+    self.SetSize( targetSize );
 
     RelayoutRequest();
   }
@@ -284,7 +286,7 @@ Layer NavigationControl::GetBarLayer() const
   return mBarLayer;
 }
 
-void NavigationControl::OnRelayout( const Vector2& size, ActorSizeContainer& container )
+void NavigationControl::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   const Vector2 setSize( size );
 
@@ -307,11 +309,11 @@ void NavigationControl::OnRelayout( const Vector2& size, ActorSizeContainer& con
     mCurrentItem.SetPosition( mItemPositionCoefficient * positionOffset);
     Vector2 itemSize( setSize.x, setSize.y-sizeShrink );
 
-    Relayout(mCurrentItem, itemSize, container);
+    container.Add( mCurrentItem, itemSize );
   }
 
-  container.push_back(ActorSizePair( mBarLayer, setSize ));
-  container.push_back(ActorSizePair( mPopupLayer, setSize ));
+  container.Add( mBarLayer, setSize );
+  container.Add( mPopupLayer, setSize );
 }
 
 void NavigationControl::OnControlSizeSet( const Vector3& size )

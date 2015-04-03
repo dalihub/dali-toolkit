@@ -179,6 +179,25 @@ public:
   Actor GetSelectedImage() const;
 
   /**
+   * @brief Sets the selected background image.
+   *
+   * @param[in] image The selected background image.
+   */
+  void SetSelectedBackgroundImage( Image image );
+
+  /**
+   * @copydoc SetSelectedBackgroundImage( Image image )
+   */
+  void SetSelectedBackgroundImage( Actor image );
+
+  /**
+   * @brief Gets the selected background image.
+   *
+   * @return An actor with the selected background image.
+   */
+  Actor GetSelectedBackgroundImage() const;
+
+  /**
    * @brief Sets the disabled background image.
    *
    * @param[in] image The disabled background image.

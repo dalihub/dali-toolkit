@@ -83,35 +83,9 @@ public:
     enum
     {
       BACKGROUND_COLOR = PROPERTY_START_INDEX, ///< name "background-color", @see SetBackgroundColor, type Vector4
-      BACKGROUND,                              ///< name "background",       @see SetBackground,      type Map
-      WIDTH_POLICY,                            ///< name "width-policy",     @see SetSizePolicy,      type std::string
-      HEIGHT_POLICY,                           ///< name "height-policy",    @see SetSizePolicy,      type std::string
-      MINIMUM_SIZE,                            ///< name "minimum-size",     @see SetMinimumSize,     type Vector3
-      MAXIMUM_SIZE,                            ///< name "maximum-size",     @see SetMaximumSize,     type Vector3
+      BACKGROUND_IMAGE,                        ///< name "background-image", @see SetBackgroundImage, type Map
       KEY_INPUT_FOCUS,                         ///< name "key-input-focus",  @see SetKeyInputFocus,   type bool
     };
-  };
-
-  /**
-   * @brief Describes how a control could be resized.
-   */
-  enum SizePolicy
-  {
-    Fixed,    ///< Size can't grow or shrink.
-    Minimum,  ///< Size can grow but shrink up to a minimum level.
-    Maximum,  ///< Size can shrink but grow up to a maximum value.
-    Range,    ///< Size can grow or shrink between a minimum and a maximum values.
-    Flexible, ///< Size can grow or shrink with no limits.
-  };
-
-  /**
-   * @brief Describes what a control should do when a contained actor/control exceeds the boundary of the control.
-   */
-  enum ExceedPolicy
-  {
-    Crop,   ///< Control's contents will be cropped.
-    Shrink, ///< Control's contents will be shrunk.
-    Scroll  ///< Control's contents will be added to a scroll.
   };
 
   /**
@@ -199,79 +173,6 @@ public:
    * @return The implementation.
    */
   const Internal::Control& GetImplementation() const;
-
-  // Size Negotiation
-
-  /**
-   * @brief Sets the size policies for the width and height dimensions.
-   *
-   * @param[in] widthPolicy Size policy for the width dimension.
-   * @param[in] heightPolicy Size policy for the height dimension.
-   */
-  void SetSizePolicy( SizePolicy widthPolicy, SizePolicy heightPolicy );
-
-  /**
-   * @brief Retrieves the size policies for the width and height dimensions.
-   *
-   * @param[out] widthPolicy Width's size policy.
-   * @param[out] heightPolicy Height's size policy.
-   */
-  void GetSizePolicy( SizePolicy& widthPolicy, SizePolicy& heightPolicy ) const;
-
-  /**
-   * @brief Sets the minimum size for the control.
-   *
-   * @param[in] size The minimum size.
-   */
-  void SetMinimumSize( const Vector3& size );
-
-  /**
-   * @brief Retrieves the minimum size.
-   *
-   * @return The minimum size.
-   */
-  const Vector3& GetMinimumSize() const;
-
-  /**
-   * @brief Sets the maximum size.
-   *
-   * @param[in] size The maximum size.
-   */
-  void SetMaximumSize( const Vector3& size );
-
-  /**
-   * @brief Retrieves the maximum size.
-   *
-   * @return The maximum size.
-   */
-  const Vector3& GetMaximumSize() const;
-
-  /**
-   * @brief Works out the natural size.
-   *
-   * Natural size is the control's size with any restriction.
-   *
-   * @return The natural size.
-   */
-  Vector3 GetNaturalSize();
-
-  /**
-   * @brief Works out the control's height for a given width.
-   *
-   * @param[in] width The control's width.
-   *
-   * @return The control's height for the given width.
-   */
-  float GetHeightForWidth( float width );
-
-  /**
-   * @brief Works out the control's width for a given height.
-   *
-   * @param[in] height The control's height.
-   *
-   * @return The control's width for the given height.
-   */
-  float GetWidthForHeight( float height );
 
   // Key Input
 
@@ -366,7 +267,7 @@ public:
    *
    * @param[in] image The image to set as the background.
    */
-  void SetBackground( Image image );
+  void SetBackgroundImage( Image image );
 
   /**
    * @brief Clears the background.

@@ -1199,6 +1199,8 @@ float TextView::GetWidthForHeight( float height )
 
 void TextView::OnInitialize()
 {
+  // The actor handle needs to be inialised for this to work
+  Self().SetResizePolicy( USE_NATURAL_SIZE, ALL_DIMENSIONS );
 }
 
 
@@ -1222,7 +1224,7 @@ void TextView::OnControlSizeSet( const Vector3& size )
   }
 }
 
-void TextView::OnRelayout( const Vector2& size, ActorSizeContainer& container )
+void TextView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {

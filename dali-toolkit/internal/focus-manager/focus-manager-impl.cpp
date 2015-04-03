@@ -674,7 +674,7 @@ void FocusManager::CreateDefaultFocusIndicatorActor()
   focusIndicator.SetPosition(Vector3(0.0f, 0.0f, 1.0f));
 
   // Apply size constraint to the focus indicator
-  focusIndicator.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+  focusIndicator.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
 
   SetFocusIndicatorActor(focusIndicator);
 }

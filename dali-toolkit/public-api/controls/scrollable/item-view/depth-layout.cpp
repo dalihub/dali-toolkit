@@ -575,7 +575,7 @@ void DepthLayout::GetResizeAnimation(Animation& animation, Actor actor, Vector3 
 {
   if(animation)
   {
-    animation.Resize(actor, size);
+    animation.AnimateTo( Property( actor, Actor::Property::SIZE ), size );
   }
 }
 

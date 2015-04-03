@@ -28,6 +28,7 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -35,7 +36,6 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
-#include <dali-toolkit/internal/controls/relayout-helper.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 
 using namespace Dali;
@@ -69,9 +69,7 @@ DALI_TYPE_REGISTRATION_END()
 const char* const PROPERTY_TITLE = "title";
 const char* const PROPERTY_STATE = "state";
 
-const float CONTENT_DEPTH = 1.0f;                                 ///< 3D Effect of buttons/title etc. appearing off the popup.
-const float POPUP_ANIMATION_DURATION = 0.5f;                      ///< Duration of hide/show animations
-const float BACKING_DEPTH = -1.0f;                                ///< Depth of backing (positioned just behind dialog, so dialog catches hit events first)
+const float POPUP_ANIMATION_DURATION = 0.45f;                      ///< Duration of hide/show animations
 
 const float POPUP_WIDTH = 720.0f;                             ///< Width of Popup
 const float POPUP_OUT_MARGIN_WIDTH = 16.f;                    ///< Space between the screen edge and the popup edge in the horizontal dimension.
@@ -80,40 +78,6 @@ const float POPUP_TITLE_WIDTH = 648.0f;                       ///<Width of Popup
 const float POPUP_BUTTON_BG_HEIGHT = 96.f;                    ///< Height of Button Background.
 const Vector3 DEFAULT_DIALOG_SIZE = Vector3(POPUP_TITLE_WIDTH/POPUP_WIDTH, 0.5f, 0.0f);
 const Vector3 DEFAULT_BOTTOM_SIZE = Vector3(1.0f, 0.2f, 0.0f);
-
-/**
- * The background size should be at least as big as the Dialog.
- * In some cases a background may have graphics which are visible
- * outside of the Dialog, e.g. A Shadow. For this we need to alter
- * the size of Background.
- *
- * @param[in] outerBorder The border to extend beyond parent's Size.
- * @param[in] parentSize  The parent's size
- */
-Vector3 BackgroundSize(const Vector4& outerBoarder, const Vector3& parentSize)
-{
-  Vector3 size( parentSize );
-  size.width += outerBoarder.x + outerBoarder.y;
-  size.height += outerBoarder.z + outerBoarder.w;
-
-  return size;
-}
-
-  /**
-   * sets button area size to parent's size plus a border.
-   *
-   * @param[in] outerBorder The border to extend beyond parent's Size.
-   * @param[in] parentSize  The parent's size
-   */
-Vector3 ButtonAreaSize( const Vector4& outBoarder, const Vector3& parentSize )
-{
-  Vector3 size( parentSize );
-  size.width += outBoarder.x + outBoarder.y;
-  size.width -= (POPUP_OUT_MARGIN_WIDTH + POPUP_OUT_MARGIN_WIDTH);
-  size.height = POPUP_BUTTON_BG_HEIGHT;
-
-  return size;
-}
 
 } // unnamed namespace
 
@@ -152,33 +116,49 @@ Popup::Popup(PopupStyle& style)
 
 void Popup::OnInitialize()
 {
+  Dali::Stage stage = Dali::Stage::GetCurrent();
+
   Actor self = Self();
   self.SetSensitive(false);
+  // Reisize to fit the height of children
+  self.SetResizePolicy( FIT_TO_CHILDREN, HEIGHT );
 
   // Create Layer
   mLayer = Layer::New();
+  mLayer.SetName( "POPUP_LAYER" );
   mLayer.SetParentOrigin(ParentOrigin::CENTER);
   mLayer.SetAnchorPoint(AnchorPoint::CENTER);
-  mLayer.RaiseToTop();
-  self.Add(mLayer);
+  mLayer.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  mLayer.SetDrawMode( DrawMode::OVERLAY );
 
-  mPopupBg = Actor::New();
-  mPopupBg.SetParentOrigin(ParentOrigin::CENTER);
-  mPopupBg.SetAnchorPoint(AnchorPoint::CENTER);
-  mLayer.Add(mPopupBg);
+  // Any content after this point which is added to Self() will be reparented to
+  // mContent.
+  mAlterAddedChild = true;
+  // Add Backing (Dim effect)
+  CreateBacking();
+  mAlterAddedChild = false;
+
+  // Add Dialog ( background image, title, content container, button container and tail )
+  CreateDialog();
+
+  mLayer.Add( self );
+
+  mPopupLayout = Toolkit::TableView::New( 3, 1 );
+  mPopupLayout.SetName( "POPUP_LAYOUT_TABLE" );
+  mPopupLayout.SetParentOrigin(ParentOrigin::CENTER);
+  mPopupLayout.SetAnchorPoint(AnchorPoint::CENTER);
+  mPopupLayout.SetResizePolicy( FILL_TO_PARENT, WIDTH );
+  mPopupLayout.SetResizePolicy( USE_NATURAL_SIZE, HEIGHT );
+  mPopupLayout.SetFitHeight( 0 );   // Set row to fit
+  mPopupLayout.SetFitHeight( 1 );   // Set row to fit
+  self.Add( mPopupLayout );
 
   // Any content after this point which is added to Self() will be reparented to
   // mContent.
   mAlterAddedChild = true;
 
-  // Add Backing (Dim effect)
-  CreateBacking();
-
-  // Add Dialog ( background image, title, content container, button container and tail )
-  CreateDialog();
-
   // Default content.
-  ShowTail(ParentOrigin::BOTTOM_CENTER);
+//  ShowTail(ParentOrigin::BOTTOM_CENTER);
 
   // Hide content by default.
   SetState( Toolkit::Popup::POPUP_HIDE, 0.0f );
@@ -189,6 +169,12 @@ void Popup::OnInitialize()
   // Make self as keyboard focusable and focus group
   self.SetKeyboardFocusable(true);
   SetAsKeyboardFocusGroup(true);
+}
+
+void Popup::MarkDirtyForRelayout()
+{
+  // Flag all the popup controls for relayout as it is about to be hidden and miss the main flagging pass
+  mLayer.RelayoutRequestTree();
 }
 
 void Popup::OnPropertySet( Property::Index index, Property::Value propertyValue )
@@ -213,6 +199,7 @@ void Popup::OnPropertySet( Property::Index index, Property::Value propertyValue 
 
 Popup::~Popup()
 {
+  mLayer.Unparent();
 }
 
 size_t Popup::GetButtonCount() const
@@ -223,26 +210,38 @@ size_t Popup::GetButtonCount() const
 void Popup::SetBackgroundImage( Actor image )
 {
   // Removes any previous background.
-  if( mBackgroundImage && mPopupBg )
+  if( mBackgroundImage && mPopupLayout )
   {
-    mPopupBg.Remove( mBackgroundImage );
+    mPopupLayout.Remove( mBackgroundImage );
   }
 
   // Adds new background to the dialog.
   mBackgroundImage = image;
 
+  mBackgroundImage.SetName( "POPUP_BACKGROUND_IMAGE" );
+
   // OnDialogTouched only consume the event. It prevents the touch event to be caught by the backing.
   mBackgroundImage.TouchedSignal().Connect( this, &Popup::OnDialogTouched );
 
-  mPopupBg.Add( mBackgroundImage );
+  mBackgroundImage.SetResizePolicy( SIZE_FIXED_OFFSET_FROM_PARENT, ALL_DIMENSIONS );
+  mBackgroundImage.SetAnchorPoint( AnchorPoint::CENTER );
+  mBackgroundImage.SetParentOrigin( ParentOrigin::CENTER );
+
+  Vector3 border( mPopupStyle->backgroundOuterBorder.x, mPopupStyle->backgroundOuterBorder.z, 0.0f );
+  mBackgroundImage.SetSizeModeFactor( border );
+
+  const bool prevAlter = mAlterAddedChild;
+  mAlterAddedChild = false;
+  Self().Add( mBackgroundImage );
+  mAlterAddedChild = prevAlter;
 }
 
 void Popup::SetButtonAreaImage( Actor image )
 {
   // Removes any previous area image.
-  if( mButtonAreaImage && mPopupBg )
+  if( mButtonAreaImage && mPopupLayout )
   {
-    mPopupBg.Remove( mButtonAreaImage );
+    mPopupLayout.Remove( mButtonAreaImage );
   }
 
   // Adds new area image to the dialog.
@@ -251,12 +250,20 @@ void Popup::SetButtonAreaImage( Actor image )
   // OnDialogTouched only consume the event. It prevents the touch event to be caught by the backing.
   mButtonAreaImage.TouchedSignal().Connect( this, &Popup::OnDialogTouched );
 
-  mPopupBg.Add( mButtonAreaImage );
+  mButtonAreaImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  mButtonAreaImage.SetAnchorPoint( AnchorPoint::CENTER );
+  mButtonAreaImage.SetParentOrigin( ParentOrigin::CENTER );
+
+  if( GetButtonCount() > 0 )
+  {
+    mBottomBg.Add( mButtonAreaImage );
+  }
 }
 
 void Popup::SetTitle( const std::string& text )
 {
   Toolkit::TextView titleActor = Toolkit::TextView::New();
+  titleActor.SetName( "POPUP_TITLE" );
   titleActor.SetText( text );
   titleActor.SetColor( Color::BLACK );
   titleActor.SetMultilinePolicy( Toolkit::TextView::SplitByWord );
@@ -269,13 +276,20 @@ void Popup::SetTitle( const std::string& text )
 void Popup::SetTitle( Toolkit::TextView titleActor )
 {
   // Replaces the current title actor.
-  if( mTitle && mPopupBg )
+  if( mPopupLayout )
   {
-    mPopupBg.Remove( mTitle );
+    mPopupLayout.RemoveChildAt( Toolkit::TableView::CellPosition( 0, 0 ) );
   }
+
   mTitle = titleActor;
 
-  mPopupBg.Add( mTitle );
+  if( mPopupLayout )
+  {
+    mTitle.SetPadding( Padding( 0.0f, 0.0f, mPopupStyle->margin, mPopupStyle->margin ) );
+    mTitle.SetResizePolicy( FILL_TO_PARENT, WIDTH );
+    mTitle.SetResizePolicy( DIMENSION_DEPENDENCY, HEIGHT );
+    mPopupLayout.AddChild( mTitle, Toolkit::TableView::CellPosition( 0, 0 ) );
+  }
 
   RelayoutRequest();
 }
@@ -285,9 +299,37 @@ Toolkit::TextView Popup::GetTitle() const
   return mTitle;
 }
 
+void Popup::CreateFooter()
+{
+  if( !mBottomBg )
+  {
+    // Adds bottom background
+    mBottomBg = Actor::New();
+    mBottomBg.SetName( "POPUP_BOTTOM_BG" );
+    mBottomBg.SetRelayoutEnabled( true );
+    mBottomBg.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+
+    mPopupLayout.SetFixedHeight( 2, mPopupStyle->bottomSize.height );   // Buttons
+    mPopupLayout.AddChild( mBottomBg, Toolkit::TableView::CellPosition( 2, 0 ) );
+  }
+}
+
 void Popup::AddButton( Toolkit::Button button )
 {
   mButtons.push_back( button );
+  button.SetResizePolicy( USE_ASSIGNED_SIZE, ALL_DIMENSIONS );    // Size will be assigned to it
+
+  // If this is the first button added
+  if( mButtons.size() == 1 )
+  {
+    CreateFooter();
+
+    if( mButtonAreaImage )
+    {
+      mBottomBg.Add( mButtonAreaImage );
+    }
+  }
+
   mBottomBg.Add( button );
 
   RelayoutRequest();
@@ -347,6 +389,8 @@ void Popup::ShowTail(const Vector3& position)
     mTailImage.SetParentOrigin(position);
     mTailImage.SetAnchorPoint(anchorPoint);
 
+    CreateFooter();
+
     mBottomBg.Add(mTailImage);
   }
 }
@@ -369,30 +413,25 @@ PopupStylePtr Popup::GetStyle() const
 
 void Popup::SetDefaultBackgroundImage()
 {
-  Image bg = ResourceImage::New( mPopupStyle->backgroundImage );
-  ImageActor bgImage = ImageActor::New( bg );
-  bgImage.SetStyle( ImageActor::STYLE_NINE_PATCH );
-  bgImage.SetNinePatchBorder( mPopupStyle->backgroundScale9Border );
-
   Image buttonBg = ResourceImage::New( mPopupStyle->buttonAreaImage );
   ImageActor buttonBgImage = ImageActor::New( buttonBg );
   buttonBgImage.SetStyle( ImageActor::STYLE_NINE_PATCH );
   buttonBgImage.SetNinePatchBorder( mPopupStyle->buttonArea9PatchBorder );
 
-  SetBackgroundImage( bgImage );
+  SetBackgroundImage( ImageActor::New( ResourceImage::New( mPopupStyle->backgroundImage ) ) );
   SetButtonAreaImage( buttonBgImage );
 }
 
 void Popup::CreateBacking()
 {
   mBacking = Dali::Toolkit::CreateSolidColorActor( mPopupStyle->backingColor );
+  mBacking.SetName( "POPUP_BACKING" );
 
-  mBacking.SetPositionInheritanceMode(DONT_INHERIT_POSITION);
+  mBacking.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
   mBacking.SetSensitive(true);
 
-  mLayer.Add(mBacking);
+  mLayer.Add( mBacking );
   mBacking.SetOpacity(0.0f);
-  mBacking.SetPosition(0.0f, 0.0f, BACKING_DEPTH);
   mBacking.TouchedSignal().Connect( this, &Popup::OnBackingTouched );
   mBacking.MouseWheelEventSignal().Connect(this, &Popup::OnBackingMouseWheelEvent);
 }
@@ -401,19 +440,12 @@ void Popup::CreateDialog()
 {
   // Adds default background image.
   SetDefaultBackgroundImage();
-
-  // Adds bottom background
-  mBottomBg = Actor::New();
-  mPopupBg.Add( mBottomBg );
 }
 
 void Popup::HandleStateChange( Toolkit::Popup::PopupState state, float duration )
 {
-  const Vector2& stageSize( Stage::GetCurrent().GetSize() );
-
   Vector3 targetSize;
   float targetBackingAlpha;
-  Vector3 targetBackingSize;
 
   if(mState == state)
   {
@@ -426,7 +458,6 @@ void Popup::HandleStateChange( Toolkit::Popup::PopupState state, float duration 
     {
       targetSize = Vector3(0.0f, 0.0f, 1.0f);
       targetBackingAlpha = 0.0f;
-      targetBackingSize = Vector3(0.0f, 0.0f, 1.0f);
       mShowing = false;
       ClearKeyInputFocus();
 
@@ -448,17 +479,16 @@ void Popup::HandleStateChange( Toolkit::Popup::PopupState state, float duration 
     {
       targetSize = Vector3(1.0f, 1.0f, 1.0f);
       targetBackingAlpha = 1.0f;
-      float length = (stageSize.width > stageSize.height) ? stageSize.width : stageSize.height;
-      targetBackingSize = Vector3( length, length, 1.0f );
       mShowing = true;
 
       // Add contents to stage for showing.
       if( !mLayer.GetParent() )
       {
-        mAlterAddedChild = false;
-        Self().Add(mLayer);
-        mAlterAddedChild = true;
+        Dali::Stage stage = Dali::Stage::GetCurrent();
+        stage.Add( mLayer );
+        mLayer.RaiseToTop();
       }
+
       Self().SetSensitive(true);
       SetKeyInputFocus();
 
@@ -487,8 +517,7 @@ void Popup::HandleStateChange( Toolkit::Popup::PopupState state, float duration 
     }
   }
 
-  mBacking.SetSize( targetBackingSize );
-
+  Actor self = Self();
   if(duration > Math::MACHINE_EPSILON_1)
   {
     if ( mAnimation )
@@ -502,12 +531,12 @@ void Popup::HandleStateChange( Toolkit::Popup::PopupState state, float duration 
     if(mShowing)
     {
       mAnimation.AnimateTo( Property(mBacking, Actor::Property::COLOR_ALPHA), targetBackingAlpha, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
-      mAnimation.AnimateTo( Property(mPopupBg, Actor::Property::SCALE), targetSize, AlphaFunctions::EaseInOut, TimePeriod(duration * 0.5f, duration * 0.5f) );
+      mAnimation.AnimateTo( Property(self, Actor::Property::SCALE), targetSize, AlphaFunctions::EaseInOut, TimePeriod(duration * 0.5f, duration * 0.5f) );
     }
     else
     {
       mAnimation.AnimateTo( Property(mBacking, Actor::Property::COLOR_ALPHA), targetBackingAlpha, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
-      mAnimation.AnimateTo( Property(mPopupBg, Actor::Property::SCALE), targetSize, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
+      mAnimation.AnimateTo( Property(self, Actor::Property::SCALE), targetSize, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
     }
     mAnimation.Play();
     mAnimation.FinishedSignal().Connect(this, &Popup::OnStateAnimationFinished);
@@ -515,7 +544,7 @@ void Popup::HandleStateChange( Toolkit::Popup::PopupState state, float duration 
   else
   {
     mBacking.SetOpacity( targetBackingAlpha );
-    mPopupBg.SetScale( targetSize );
+    self.SetScale( targetSize );
 
     HandleStateChangeComplete();
   }
@@ -524,9 +553,9 @@ void Popup::HandleStateChange( Toolkit::Popup::PopupState state, float duration 
 void Popup::HandleStateChangeComplete()
 {
   // Remove contents from stage if completely hidden.
-  if( (mState == Toolkit::Popup::POPUP_HIDE) && (mLayer.GetParent()) )
+  if( ( mState == Toolkit::Popup::POPUP_HIDE ) && mLayer.GetParent() )
   {
-    Self().Remove(mLayer);
+    mLayer.Unparent();
     Self().SetSensitive( false );
 
     // Guard against destruction during signal emission
@@ -612,169 +641,78 @@ void Popup::OnControlChildAdd( Actor& child )
     // Removes previously added content.
     if( mContent )
     {
-      mPopupBg.Remove( mContent );
+      mPopupLayout.RemoveChildAt( Toolkit::TableView::CellPosition( 1, 0 ) );
     }
-
-    // Reparent new content.
-    Self().Remove( child );
 
     // keep a handle to the new content.
     mContent = child;
 
-    mPopupBg.Add( mContent );
+    mPopupLayout.AddChild( mContent, Toolkit::TableView::CellPosition( 1, 0 ) );
   }
 }
 
-void Popup::OnControlSizeSet( const Vector3& targetSize )
+void Popup::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
-  mLayer.SetSize( targetSize );
-  mPopupBg.SetSize( targetSize );
-
-  const Vector4 outerBorder = mPopupStyle->backgroundOuterBorder;
-  if( mBackgroundImage )
-  {
-    mBackgroundImage.SetSize( BackgroundSize( outerBorder,targetSize ) );
-  }
-  if( mButtonAreaImage )
-  {
-    mButtonAreaImage.SetSize( ButtonAreaSize( outerBorder, targetSize ) );
-  }
-
-}
-
-void Popup::OnRelayout( const Vector2& size, ActorSizeContainer& container )
-{
-  // Set the popup size
-  Vector2 popupSize;
-  popupSize.width  = size.width - 2.f * ( POPUP_OUT_MARGIN_WIDTH + mPopupStyle->margin );
-  popupSize.height = size.height - 2.f * ( POPUP_OUT_MARGIN_WIDTH + mPopupStyle->margin );
-
-  // Update sizes of all popup's components.
-
-  // Relayout background image.
-  // Adjust background position and size relative to parent to cater to outer Border.
-  // Some backgrounds are intended to over-spill. That is some content
-  // should appear outside the Dialog on all sides i.e. Shadows, glow effects.
-  const Vector4 outerBorder = mPopupStyle->backgroundOuterBorder;
-
-  if( mBackgroundImage )
-  {
-    mBackgroundImage.SetSize(BackgroundSize(outerBorder, Vector3(size)));
-    mBackgroundImage.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-    mBackgroundImage.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    mBackgroundImage.SetPosition( -outerBorder.x, -outerBorder.y, 0.0f );
-  }
-
-  if( mPopupBg && mButtonAreaImage )
-  {
-    // If there are no buttons, button background is also removed.
-    if ( mButtons.size() == 0 )
-    {
-      mPopupBg.Remove( mButtonAreaImage );
-    }
-    else
-    {
-      mButtonAreaImage.SetSize( ButtonAreaSize(outerBorder, Vector3(size)) );
-      mButtonAreaImage.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
-      mButtonAreaImage.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
-      mButtonAreaImage.SetY( -outerBorder.z - POPUP_OUT_MARGIN_HEIGHT );
-
-      mPopupBg.Add( mButtonAreaImage );
-    }
-  }
-
-  // Relayout title
-  Vector3 positionOffset( 0.0f, mPopupStyle->margin + POPUP_OUT_MARGIN_WIDTH, CONTENT_DEPTH );
-  if( mTitle )
-  {
-    Vector2 titleSize;
-    titleSize.width  = popupSize.width;
-    titleSize.height = mTitle.GetHeightForWidth( titleSize.width );
-
-    // As the default size policy for text-view is Fixed & Fixed, a size needs to be set.
-    // Otherwise size-negotiation algorithm uses the GetNaturalSize() with doesn't take
-    // into account the multiline and exceed policies, giving as result a wrong size.
-    mTitle.SetSize( titleSize );
-    Relayout( mTitle, titleSize, container );
-
-    mTitle.SetAnchorPoint( AnchorPoint::TOP_CENTER );
-    mTitle.SetParentOrigin( ParentOrigin::TOP_CENTER );
-    mTitle.SetPosition( positionOffset );
-
-    positionOffset.y += titleSize.height + mPopupStyle->margin;
-  }
-
-  // Relayout content
-  if( mContent )
-  {
-    // If the content width is greater than popup width then scale it down/wrap text as needed
-    Vector2 contentSize( RelayoutHelper::GetNaturalSize( mContent ) );
-    if( contentSize.width > popupSize.width )
-    {
-      contentSize.width = popupSize.width;
-      contentSize.height = RelayoutHelper::GetHeightForWidth( mContent, contentSize.width );
-    }
-
-    mContent.SetSize( contentSize );
-    Relayout( mContent, contentSize, container );
-
-    mContent.SetParentOrigin(ParentOrigin::TOP_CENTER);
-    mContent.SetAnchorPoint(AnchorPoint::TOP_CENTER);
-
-    mContent.SetPosition( positionOffset );
-
-    positionOffset.y += contentSize.height + mPopupStyle->margin;
-  }
-
-  // Relayout Button Area
-  if( mBottomBg )
-  {
-    mBottomBg.SetSize( popupSize.width, mPopupStyle->bottomSize.height );
-
-    mBottomBg.SetParentOrigin(ParentOrigin::TOP_CENTER);
-    mBottomBg.SetAnchorPoint(AnchorPoint::TOP_CENTER);
-
-    mBottomBg.SetPosition( positionOffset );
-  }
+  // Hide the background image
+  mBackgroundImage.SetVisible( !( mButtons.empty() && mPopupLayout.GetChildCount() == 0 ) );
 
   // Relayout All buttons
   if ( !mButtons.empty() )
   {
     // All buttons should be the same size and fill the button area. The button spacing needs to be accounted for as well.
-    Vector2 buttonSize( ( ( popupSize.width - mPopupStyle->buttonSpacing * ( mButtons.size() - 1 ) ) / mButtons.size() ),
+    Vector2 buttonSize( ( ( size.width - mPopupStyle->buttonSpacing * ( mButtons.size() + 1 ) ) / mButtons.size() ),
                         mPopupStyle->bottomSize.height - mPopupStyle->margin );
 
-    Vector3 buttonPosition;
+    Vector3 buttonPosition( mPopupStyle->buttonSpacing, 0.0f, 0.0f );
 
     for ( ActorIter iter = mButtons.begin(), endIter = mButtons.end();
           iter != endIter;
           ++iter, buttonPosition.x += mPopupStyle->buttonSpacing + buttonSize.width )
     {
-      iter->SetPosition( buttonPosition );
+      Actor button = *iter;
 
       // If there is only one button, it needs to be laid out on center.
       if ( mButtons.size() == 1 )
       {
-        iter->SetAnchorPoint( AnchorPoint::CENTER );
-        iter->SetParentOrigin( ParentOrigin::CENTER );
+        buttonPosition.x = 0.0f;
+        button.SetAnchorPoint( AnchorPoint::CENTER );
+        button.SetParentOrigin( ParentOrigin::CENTER );
       }
       else
       {
-        iter->SetAnchorPoint( AnchorPoint::CENTER_LEFT );
-        iter->SetParentOrigin( ParentOrigin::CENTER_LEFT );
+        button.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+        button.SetParentOrigin( ParentOrigin::CENTER_LEFT );
       }
 
-      Relayout( *iter, buttonSize, container );
+      button.SetPosition( buttonPosition );
+
+      button.PropagateRelayoutFlags();    // Reset relayout flags for relayout
+      container.Add( button, buttonSize );
     }
   }
+}
 
-  if( mShowing && mBacking )
+void Popup::OnSetResizePolicy( ResizePolicy policy, Dimension dimension )
+{
+  if( mPopupLayout )
   {
-    Vector2 stageSize = Stage::GetCurrent().GetSize();
-    float length = (stageSize.width > stageSize.height) ? stageSize.width : stageSize.height;
-    Vector3 targetBackingSize = Vector3( length, length, 1.0f );
-
-    mBacking.SetSize( targetBackingSize );
+    if( policy == FIT_TO_CHILDREN )
+    {
+      mPopupLayout.SetResizePolicy( USE_NATURAL_SIZE, dimension );
+      if( dimension & HEIGHT )
+      {
+        mPopupLayout.SetFitHeight( 1 );
+      }
+    }
+    else
+    {
+      mPopupLayout.SetResizePolicy( FILL_TO_PARENT, dimension );
+      // Make the content cell fill the whole of the available space
+      if( dimension & HEIGHT )
+      {
+        mPopupLayout.SetRelativeHeight( 1, 1.0f );
+      }
+    }
   }
 }
 
@@ -826,13 +764,13 @@ Vector3 Popup::GetNaturalSize()
 
   if( mContent )
   {
-    Vector3 contentSize = RelayoutHelper::GetNaturalSize( mContent );
+    Vector3 contentSize = mContent.GetNaturalSize();
     // Choose the biggest width
     naturalSize.width = std::max( naturalSize.width, contentSize.width );
     if( naturalSize.width > maxWidth )
     {
       naturalSize.width = maxWidth;
-      contentSize.height = RelayoutHelper::GetHeightForWidth( mContent, maxWidth );
+      contentSize.height = mContent.GetHeightForWidth( maxWidth );
     }
     naturalSize.height += contentSize.height + mPopupStyle->margin;
   }
@@ -862,7 +800,7 @@ float Popup::GetHeightForWidth( float width )
 
   if( mContent )
   {
-    height += RelayoutHelper::GetHeightForWidth( mContent, popupWidth ) + mPopupStyle->margin;
+    height += mContent.GetHeightForWidth( popupWidth ) + mPopupStyle->margin;
   }
 
   if( !mButtons.empty() )

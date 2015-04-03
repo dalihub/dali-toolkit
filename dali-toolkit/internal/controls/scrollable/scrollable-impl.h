@@ -44,16 +44,6 @@ typedef IntrusivePtr<Scrollable> ScrollablePtr;
 class Scrollable : public Control
 {
 public:
-  static const char* const SCROLLABLE_CAN_SCROLL_VERTICAL;
-  static const char* const SCROLLABLE_CAN_SCROLL_HORIZONTAL;
-
-  /**
-   * Create a new Scrollable.
-   * @return A public handle to the newly allocated Scrollable.
-   */
-//  static Dali::Toolkit::Scrollable New();
-
-public:
 
   /**
    * @copydoc Dali::Toolkit::Scrollable::IsScrollComponentEnabled(Scrollable::ScrollComponentType type)
@@ -196,11 +186,6 @@ protected:
    */
   virtual ~Scrollable();
 
-  /**
-   * Register common properties
-   */
-  void RegisterCommonProperties();
-
 private:
 
   /**
@@ -230,13 +215,6 @@ protected:
 
   Vector4         mOvershootEffectColor;    ///<The color of the overshoot bouncing effect
   float           mOvershootAnimationSpeed; ///<The speed of the overshoot animation (pixels per second)
-
-  Property::Index mPropertyRelativePosition;///< Scroll Relative Position ("scroll-relative-position") [range from 0.0f - 1.0f in each axes]
-  Property::Index mPropertyPositionMin;     ///< Scroll Domain Minimum ("position-min")
-  Property::Index mPropertyPositionMax;     ///< Scroll Domain Maximum ("position-max")
-  Property::Index mPropertyScrollDirection; ///< Scroll direction ("scroll-direction")
-  Property::Index mPropertyCanScrollVertical;    ///< Whether the current scroll domain is large enough to scroll vertically
-  Property::Index mPropertyCanScrollHorizontal;    ///< Whether the current scroll domain is large enough to scroll horizontally
 
   std::map<Toolkit::Scrollable::ScrollComponentType, ScrollComponentPtr> mComponent;  ///< ScrollComponent (such as a scrollbar/page indicator/status)
 

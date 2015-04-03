@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-view/text-view.h>
 #include <dali-toolkit/public-api/controls/buttons/radio-button.h>
+#include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include "button-impl.h"
 
 namespace Dali
@@ -46,41 +47,21 @@ public:
   /**
    * Create a new RadioButton.
    *
-   * @return A smart-pointer to the newly allocated PushButton.
+   * @return A smart-pointer to the newly allocated RadioButton.
    */
   static Dali::Toolkit::RadioButton New();
 
+private:
+
   /**
-   * Construct a new PushButton.
+   * Construct a new RadioButton.
    */
   RadioButton();
-
-  /**
-   * Construct a new PushButton with label.
-   */
-  RadioButton( const std::string& label );
-
-  /**
-   * Construct a new PushButton with label.
-   */
-  RadioButton( Actor label );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~RadioButton();
-
-public: // From Button
-
-  /**
-   * @copydoc Toolkit::Internal::Button::SetButtonImage( Actor image )
-   */
-  virtual void SetButtonImage( Actor image );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::SetSelectedImage( Actor image )
-   */
-  virtual void SetSelectedImage( Actor image );
 
 private: // From Button
 
@@ -97,19 +78,12 @@ private: // From Button
   /**
    * @copydoc Toolkit::Internal::Button::OnSelected()
    */
-  virtual void OnSelected( bool selected );
+  virtual bool OnSelected();
 
   /**
    * @copydoc Toolkit::Internal::Button::OnLabelSet()
    */
   virtual void OnLabelSet();
-
-private: // From Control
-
-  /**
-   * @copydoc Dali::Toolkit::Control::OnRelayout()
-   */
-  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
 
 private:
 

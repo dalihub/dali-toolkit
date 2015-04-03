@@ -283,6 +283,7 @@ void Magnifier::SetFrameVisibility(bool visible)
 
     Image image = ResourceImage::New( DEFAULT_FRAME_IMAGE_PATH );
     mFrame = ImageActor::New( image );
+    mFrame.SetRelayoutEnabled( false );
     mFrame.SetDrawMode(DrawMode::OVERLAY);
     mFrame.SetStyle( ImageActor::STYLE_NINE_PATCH );
     mFrame.SetPositionInheritanceMode(DONT_INHERIT_POSITION);

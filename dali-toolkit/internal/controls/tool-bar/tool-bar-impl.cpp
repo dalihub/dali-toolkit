@@ -74,7 +74,7 @@ void ToolBar::SetBackground( Actor background )
   // ToolBar image
   background.SetParentOrigin( Dali::ParentOrigin::TOP_CENTER );
   background.SetAnchorPoint( Dali::AnchorPoint::TOP_CENTER );
-  background.SetSize( mToolBarSize );
+  background.SetSize( Vector2( mToolBarSize.width, mToolBarSize.height ) );
 
   RenderableActor renderableActor = RenderableActor::DownCast( background );
   if ( renderableActor )
@@ -125,8 +125,9 @@ void ToolBar::AddControl( Actor control, float relativeSize, Toolkit::Alignment:
 
   // Create an alignment container where to place the control.
   Toolkit::Alignment alignmentContainer = Toolkit::Alignment::New( alignment );
-  alignmentContainer.SetScaling( Toolkit::Alignment::ScaleToFill );
+  alignmentContainer.SetSizeScalePolicy( FIT_WITH_ASPECT_RATIO );
   alignmentContainer.SetPadding( padding );
+  alignmentContainer.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
   alignmentContainer.Add( control );
 
   // Insert the control in the table view.
@@ -320,6 +321,8 @@ void ToolBar::OnInitialize()
 
   // Layout
   mLayout = Toolkit::TableView::New( 1, 1 );
+  mLayout.SetName( "TOOLBAR_LAYOUT" );
+  mLayout.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
   mLayout.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
   Self().Add( mLayout );
@@ -356,7 +359,7 @@ void ToolBar::OnControlChildAdd(Actor& child)
 void ToolBar::OnControlSizeSet( const Vector3& targetSize )
 {
   mToolBarSize = targetSize;
-  mBackground.SetSize( mToolBarSize );
+  mBackground.SetSize( Vector2( mToolBarSize.width, mToolBarSize.height ) );
 }
 
 } // namespace Internal

@@ -279,27 +279,10 @@ int UtcDaliPushButtonSetImages(void)
   Actor imageActor;
 
   Image image01 = CreateSolidColorImage( Color::RED, 10, 10 );
-  ImageActor imageActor01 = CreateSolidColorActor( Color::RED );
-  imageActor01.SetSize( 20.f, 20.f );
-
-  Image image02 = CreateSolidColorImage( Color::RED, 30, 30 );
-  ImageActor imageActor02 = CreateSolidColorActor( Color::RED );
-  imageActor02.SetSize( 40.f, 40.f );
-
-  Image image03 = CreateSolidColorImage( Color::RED, 50, 50 );
-  ImageActor imageActor03 = CreateSolidColorActor( Color::RED );
-  imageActor03.SetSize( 60.f, 60.f );
-
-  Image image04 = CreateSolidColorImage( Color::RED, 70, 70 );
-  ImageActor imageActor04 = CreateSolidColorActor( Color::RED );
-  imageActor04.SetSize( 80.f, 80.f );
-
-  Image image05 = CreateSolidColorImage( Color::RED, 90, 90 );
-  ImageActor imageActor05 = CreateSolidColorActor( Color::RED );
-  imageActor05.SetSize( 100.f, 100.f );
 
   Vector3 size;
   PushButton pushButton = PushButton::New();
+  Stage::GetCurrent().Add( pushButton );
 
   application.SendNotification();
   application.Render();
@@ -311,100 +294,11 @@ int UtcDaliPushButtonSetImages(void)
   application.SendNotification();
   application.Render();
 
-  size = pushButton.GetButtonImage().GetCurrentSize();
+  size = pushButton.GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 10.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 10.f, TEST_LOCATION );
 
-  pushButton.SetButtonImage( imageActor01 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = pushButton.GetButtonImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 20.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 20.f, TEST_LOCATION );
-
-  pushButton.SetBackgroundImage( image02 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = pushButton.GetBackgroundImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 30.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 30.f, TEST_LOCATION );
-
-  pushButton.SetBackgroundImage( imageActor02 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = pushButton.GetBackgroundImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 40.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 40.f, TEST_LOCATION );
-
-  pushButton.SetSelectedImage( image03 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = pushButton.GetSelectedImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 50.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 50.f, TEST_LOCATION );
-
-  pushButton.SetSelectedImage( imageActor03 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = pushButton.GetSelectedImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 60.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 60.f, TEST_LOCATION );
-
-  pushButton.SetDisabledBackgroundImage( image04 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = pushButton.GetDisabledBackgroundImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 70.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 70.f, TEST_LOCATION );
-
-  pushButton.SetDisabledBackgroundImage( imageActor04 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = pushButton.GetDisabledBackgroundImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 80.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 80.f, TEST_LOCATION );
-
-  pushButton.SetDisabledImage( image05 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = pushButton.GetDisabledImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 90.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 90.f, TEST_LOCATION );
-
-  pushButton.SetDisabledImage( imageActor05 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = pushButton.GetDisabledImage().GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 100.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 100.f, TEST_LOCATION );
   END_TEST;
 }
 

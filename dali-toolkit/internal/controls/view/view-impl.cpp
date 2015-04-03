@@ -132,7 +132,7 @@ void View::SetBackground( ImageActor backgroundImage )
     mBackgroundLayer = Layer::New();
 
     mBackgroundLayer.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-    mBackgroundLayer.SetSize( mViewSize );
+    mBackgroundLayer.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
 
     // Add background layer to custom actor.
     Self().Add( mBackgroundLayer );
@@ -152,8 +152,10 @@ void View::SetBackground( ImageActor backgroundImage )
   }
 
   backgroundImage.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-  backgroundImage.SetScale( FillXYKeepAspectRatio( mViewSize, backgroundImage.GetSize() ) );
+  backgroundImage.SetRelayoutEnabled( false );    // We will scale its size manually
   mBackgroundLayer.Add( backgroundImage );
+
+  RelayoutRequest();
 }
 
 void View::SetOrientationFunction( Degree portrait, Degree landscale, Degree portraitInverse, Degree landscapeInverse )
@@ -166,6 +168,8 @@ void View::SetOrientationFunction( Degree portrait, Degree landscale, Degree por
 
 void View::OrientationChanged( Dali::Orientation orientation )
 {
+  Actor self = Self();
+
   // Nothing to do if orientation doesn't really change.
   if ( orientation.GetDegrees() == mOrientation || !mAutoRotateEnabled )
   {
@@ -176,13 +180,13 @@ void View::OrientationChanged( Dali::Orientation orientation )
 
   // has parent so we expect it to be on stage
   mRotateAnimation = Animation::New( ROTATION_ANIMATION_DURATION );
-  mRotateAnimation.RotateTo( Self(), Degree( -orientation.GetDegrees() ), Vector3::ZAXIS, AlphaFunctions::EaseOut );
+  mRotateAnimation.AnimateTo( Property( self, Actor::Property::ORIENTATION ), Quaternion( -orientation.GetRadians(), Vector3::ZAXIS ), AlphaFunctions::EaseOut );
 
   // Resize the view
   if( mFullScreen )
   {
     const Vector2& stageSize( Stage::GetCurrent().GetSize() );
-    const Vector3& currentSize( Self().GetCurrentSize() );
+    const Vector3& currentSize( self.GetCurrentSize() );
 
     float minSize = std::min( stageSize.width, stageSize.height );
     float maxSize = std::max( stageSize.width, stageSize.height );
@@ -212,15 +216,15 @@ void View::OrientationChanged( Dali::Orientation orientation )
     {
       // width grows, shrink height faster
       Vector3 shrink( currentSize );shrink.height = targetSize.height;
-      mRotateAnimation.Resize( Self(), shrink, AlphaFunctions::EaseOut, 0.0f, ROTATION_ANIMATION_DURATION * 0.5f );
-      mRotateAnimation.Resize( Self(), targetSize, AlphaFunctions::EaseIn, 0.0f, ROTATION_ANIMATION_DURATION );
+      mRotateAnimation.AnimateTo( Property( self, Actor::Property::SIZE ), shrink, AlphaFunctions::EaseOut, TimePeriod( 0.0f, ROTATION_ANIMATION_DURATION * 0.5f ) );
+      mRotateAnimation.AnimateTo( Property( self, Actor::Property::SIZE ), targetSize, AlphaFunctions::EaseIn, TimePeriod( 0.0f, ROTATION_ANIMATION_DURATION ) );
     }
     else
     {
       // height grows, shrink width faster
       Vector3 shrink( currentSize );shrink.width = targetSize.width;
-      mRotateAnimation.Resize( Self(), shrink, AlphaFunctions::EaseOut, 0.0f, ROTATION_ANIMATION_DURATION * 0.5f );
-      mRotateAnimation.Resize( Self(), targetSize, AlphaFunctions::EaseIn, 0.0f, ROTATION_ANIMATION_DURATION );
+      mRotateAnimation.AnimateTo( Property( self, Actor::Property::SIZE ), shrink, AlphaFunctions::EaseOut, TimePeriod( 0.0f, ROTATION_ANIMATION_DURATION * 0.5f ) );
+      mRotateAnimation.AnimateTo( Property( self, Actor::Property::SIZE ), targetSize, AlphaFunctions::EaseIn, TimePeriod( 0.0f, ROTATION_ANIMATION_DURATION ) );
     }
   }
 
@@ -290,16 +294,14 @@ void View::OnInitialize()
   }
 }
 
-void View::OnControlSizeSet( const Vector3& targetSize )
+void View::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
-  mViewSize = targetSize;
   if( mBackgroundLayer )
   {
-    mBackgroundLayer.SetSize( mViewSize );
-    if( mBackgroundLayer.GetChildCount() > 0 )
+    if( mBackgroundLayer && mBackgroundLayer.GetChildCount() > 0 )
     {
       Actor background = mBackgroundLayer.GetChildAt(0);
-      background.SetScale( FillXYKeepAspectRatio( mViewSize, background.GetSize() ) );
+      background.SetScale( FillXYKeepAspectRatio( Vector3( size.width, size.height, 1.0f ), background.GetTargetSize() ) );
     }
   }
 }

@@ -377,7 +377,7 @@ private: // From Control
   /**
    * @copydoc Toolkit::Control::OnRelayout()
    */
-  virtual void OnRelayout( const Vector2& size, ActorSizeContainer& container );
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
 
   /**
    * Retrieves the text-view's natural size.

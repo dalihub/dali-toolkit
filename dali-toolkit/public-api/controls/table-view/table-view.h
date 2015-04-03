@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/actors/actor-enumerations.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -99,9 +100,9 @@ public:
    */
   enum LayoutPolicy
   {
-    Fixed,      ///< Fixed with the given value.
-    Relative,   ///< Calculated as percentage of the remainder after subtracting Padding and Fixed height/width
-    Fill        ///< Get the remainder of the 100% (after subtracting Padding, Fixed and Relative height/ width) divided evenly between 'fill' rows/columns
+    FIXED,      ///< Fixed with the given value.
+    RELATIVE,   ///< Calculated as percentage of the remainder after subtracting Padding and Fixed height/width
+    FILL        ///< Get the remainder of the 100% (after subtracting Padding, Fixed and Relative height/ width) divided evenly between 'fill' rows/columns
   };
 
   /**
@@ -271,6 +272,36 @@ public:
   Size GetCellPadding();
 
   /**
+   * @brief Specify this row as fitting its height to its children
+   *
+   * @param[in] rowIndex The row to set
+   */
+  void SetFitHeight( unsigned int rowIndex );
+
+  /**
+   * @brief Is the row a fit row
+   *
+   * @param[in] rowIndex The row to check
+   * @return Return true if the row is fit
+   */
+  bool IsFitHeight( unsigned int rowIndex ) const;
+
+  /**
+   * @brief Specify this column as fitting its width to its children
+   *
+   * @param[in] columnIndex The column to set
+   */
+  void SetFitWidth( unsigned int columnIndex );
+
+  /**
+   * @brief Is the column a fit column
+   *
+   * @param[in] columnIndex The column to check
+   * @return Return true if the column is fit
+   */
+  bool IsFitWidth( unsigned int columnIndex ) const;
+
+  /**
    * Sets a row to have fixed height
    * Setting a fixed height of 0 has no effect
    * @pre The row rowIndex must exist.
@@ -349,6 +380,15 @@ public:
    * @return the amount of columns in the table
    */
   unsigned int GetColumns();
+
+  /**
+   * @brief Set the alignment on a cell
+   *
+   * @param[in] position The cell to set alignment on
+   * @param[in] horizontal The horizontal alignment
+   * @param[in] vertical The vertical alignment
+   */
+  void SetCellAlignment( CellPosition position, HorizontalAlignment::Type horizontal, VerticalAlignment::Type vertical );
 
 public: // Not intended for application developers
 

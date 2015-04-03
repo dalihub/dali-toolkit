@@ -22,11 +22,16 @@
 #include <sys/stat.h>
 #include <boost/function.hpp>
 #include <sstream>
-
+#include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/public-api/object/type-info.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/actors/camera-actor.h>
+#include <dali/public-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/builder/json-parser.h>
 
@@ -529,6 +534,9 @@ BaseHandle Builder::DoCreate( const TreeNode& root, const TreeNode& node,
 
       if( actor )
       {
+        // TEMP: Assume all script created actors are not using size negotiation for now
+        actor.SetRelayoutEnabled( false );
+
         // add children of all the styles
         if( OptionalChild actors = IsChild( node, KEYNAME_ACTORS ) )
         {

@@ -260,7 +260,6 @@ Toolkit::TextView TextInputPopup::CreateOptionCaption( const std::string& captio
   styledCaption.push_back( MarkupProcessor::StyledText( Text( caption ), style ) );
 
   Toolkit::TextView textView = Toolkit::TextView::New( styledCaption );
-  textView.SetSizePolicy( Toolkit::Control::Fixed, Toolkit::Control::Fixed );
   textView.SetWidthExceedPolicy( Toolkit::TextView::EllipsizeEnd );
   textView.SetHeightExceedPolicy( Toolkit::TextView::EllipsizeEnd );
   textView.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
@@ -294,7 +293,7 @@ void TextInputPopup::CreateBackground()
     mBackgroundEffect.SetAnchorPoint( AnchorPoint::CENTER );
     mBackgroundEffect.SetParentOrigin( ParentOrigin::CENTER );
     mBackgroundEffect.SetName( "text-input-popup-background-effect" );
-    mBackgroundEffect.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+    mBackgroundEffect.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
     mBackgroundEffect.SetZ( 1.0f );
     mBackground.Add( mBackgroundEffect );
 
@@ -303,7 +302,7 @@ void TextInputPopup::CreateBackground()
     mBackgroundLine.SetAnchorPoint( AnchorPoint::CENTER);
     mBackgroundLine.SetParentOrigin( ParentOrigin::CENTER );
     mBackgroundLine.SetName( "text-input-popup-background-effect" );
-    mBackgroundLine.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+    mBackgroundLine.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
     mBackgroundLine.SetColor( mLineColor );
     mBackgroundLine.SetZ( 0.1f );
     mBackgroundEffect.Add( mBackgroundLine );
@@ -329,7 +328,7 @@ void TextInputPopup::CreateTail()
     mTailEffect.SetParentOrigin( ParentOrigin::CENTER );
     mTailEffect.SetAnchorPoint( AnchorPoint::CENTER );
     mTailEffect.SetName( "text-input-popup-tail-effect" );
-    mTailEffect.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+    mTailEffect.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
     mTailEffect.SetZ( 0.1f );
     mTail.Add( mTailEffect );
 
@@ -337,7 +336,7 @@ void TextInputPopup::CreateTail()
     mTailLine = ImageActor::New( tailLine );
     mTailLine.SetParentOrigin( ParentOrigin::CENTER );
     mTailLine.SetAnchorPoint( AnchorPoint::CENTER );
-    mTailLine.SetSizeMode( SIZE_EQUAL_TO_PARENT );
+    mTailLine.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
     mTailLine.SetName( "text-input-popup-tail-line" );
     mTailLine.SetColor( mLineColor );
     mTailLine.SetZ( 0.1f );
@@ -491,7 +490,6 @@ void TextInputPopup::AddOption(const std::string& name, const std::string& capti
 
   // 5. Create a option.
   Toolkit::PushButton option = Toolkit::PushButton::New();
-  option.SetSizePolicy( Toolkit::Control::Fixed, Toolkit::Control::Fixed );
   option.SetParentOrigin( ParentOrigin::TOP_LEFT );
   option.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   option.SetSize( constrainedOptionSize );

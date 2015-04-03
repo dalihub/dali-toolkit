@@ -26,11 +26,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const std::string Scrollable::SCROLL_RELATIVE_POSITION_PROPERTY_NAME( "scroll-relative-position" );
-const std::string Scrollable::SCROLL_POSITION_MIN_PROPERTY_NAME( "scroll-position-min" );
-const std::string Scrollable::SCROLL_POSITION_MAX_PROPERTY_NAME( "scroll-position-max" );
-const std::string Scrollable::SCROLL_DIRECTION_PROPERTY_NAME( "scroll-direction" );
-
 Scrollable::Scrollable()
 {
 }

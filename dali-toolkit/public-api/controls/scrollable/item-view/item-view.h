@@ -277,6 +277,11 @@ public:
   float GetRefreshInterval() const;
 
   /**
+   * @brief Do a refresh of the item view.
+   */
+  void Refresh();
+
+  /**
    * @brief Given the Item ID, this returns the accompanying actor.
    *
    * @param[in] itemId The Item ID of the actor required.

@@ -409,20 +409,6 @@ class DALI_IMPORT_API ScrollView : public Scrollable
 {
 public:
 
-  // Custom properties
-
-  static const std::string SCROLL_TIME_PROPERTY_NAME;                   ///< Property, name "scroll-time",               type float
-  static const std::string SCROLL_POSITION_PROPERTY_NAME;               ///< Property, name "scroll-position",           type Vector3
-  static const std::string SCROLL_PRE_POSITION_PROPERTY_NAME;           ///< Property, name "scroll-pre-position",       type Vector3
-  static const std::string SCROLL_OVERSHOOT_X_PROPERTY_NAME;            ///< Property, name "scroll-overshoot-x",        type float
-  static const std::string SCROLL_OVERSHOOT_Y_PROPERTY_NAME;            ///< Property, name "scroll-overshoot-y",        type float
-  static const std::string SCROLL_FINAL_PROPERTY_NAME;                  ///< Property, name "scroll-final",              type Vector3
-  static const std::string SCROLL_WRAP_PROPERTY_NAME;                   ///< Property, name "scroll-wrap",               type bool
-  static const std::string SCROLL_PANNING_PROPERTY_NAME;                ///< Property, name "scroll-panning",            type bool
-  static const std::string SCROLL_SCROLLING_PROPERTY_NAME;              ///< Property, name "scroll-scrolling",          type bool
-  static const std::string SCROLL_POSITION_DELTA_PROPERTY_NAME;         ///< Property, name "scroll-position-delta"      type Vector3
-  static const std::string SCROLL_START_PAGE_POSITION_PROPERTY_NAME;    ///< Property, name "scroll-start-page-position" type Vector3
-
   // Default settings
 
   static const float DEFAULT_SLOW_SNAP_ANIMATION_DURATION;              ///< Default Drag-Release animation time.
@@ -455,6 +441,36 @@ public:
     SnapType type;    ///< Current snap commencing
     Vector3 position; ///< Target snap position
     float duration;   ///< Duration of snap animation.
+  };
+
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    ANIMATABLE_PROPERTY_START_INDEX = Toolkit::Scrollable::ANIMATABLE_PROPERTY_END_INDEX + 1,
+    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_START_INDEX + 1000                   ///< Reserve animatable property indices
+  };
+
+  /**
+   * @brief An enumeration of properties belonging to the ScrollView class.
+   */
+  struct Property
+  {
+    enum
+    {
+      SCROLL_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scroll-position",       type Vector3
+      SCROLL_PRE_POSITION,                               ///< Property, name "scroll-pre-position",   type Vector3
+      OVERSHOOT_X,                                       ///< Property, name "overshoot-x",           type float
+      OVERSHOOT_Y,                                       ///< Property, name "overshoot-y",           type float
+      SCROLL_FINAL,                                      ///< Property, name "scroll-final",          type Vector3
+      WRAP,                                              ///< Property, name "wrap",                  type bool
+      PANNING,                                           ///< Property, name "panning",               type bool
+      SCROLLING,                                         ///< Property, name "scrolling",             type bool
+      SCROLL_DOMAIN_OFFSET,                              ///< Property, name "scroll-domain-offset"   type Vector3
+      SCROLL_POSITION_DELTA,                             ///< Property, name "scroll-position-delta"  type Vector3
+      START_PAGE_POSITION                                ///< Property, name "start-page-position"    type Vector3
+    };
   };
 
   typedef Signal< void ( const SnapEvent& ) > SnapStartedSignalType; ///< SnapStarted signal type

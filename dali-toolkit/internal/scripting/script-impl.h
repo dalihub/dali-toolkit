@@ -17,6 +17,8 @@
  * limitations under the License.
  *
  */
+// EXTERNAL INCLUDES
+#include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/scripting/script.h>

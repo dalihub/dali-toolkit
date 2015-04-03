@@ -114,18 +114,18 @@ int UtcDaliToolBarAddControl01(void)
   try
   {
     ImageActor control1 = CreateSolidColorActor( Color::RED );
-    control1.SetSize( 100.f, 100.f );
+    control1.SetSize( Vector2( 100.f, 100.f ) );
     ImageActor control2 = CreateSolidColorActor( Color::RED );
-    control2.SetSize( 100.f, 100.f );
+    control2.SetSize( Vector2( 100.f, 100.f ) );
     ImageActor control3 = CreateSolidColorActor( Color::RED );
-    control3.SetSize( 100.f, 100.f );
+    control3.SetSize( Vector2( 100.f, 100.f ) );
     ImageActor control4 = CreateSolidColorActor( Color::RED );
-    control4.SetSize( 100.f, 100.f );
+    control4.SetSize( Vector2( 100.f, 100.f ) );
     ImageActor control5 = CreateSolidColorActor( Color::RED );
-    control5.SetSize( 100.f, 100.f );
+    control5.SetSize( Vector2( 100.f, 100.f ) );
 
     ToolBar toolbar = ToolBar::New();
-    toolbar.SetSize( 600.f, 100.f );
+    toolbar.SetSize( Vector2( 600.f, 100.f ) );
 
     application.Render();
     application.SendNotification();
@@ -139,11 +139,11 @@ int UtcDaliToolBarAddControl01(void)
     toolbar.AddControl( control5, 0.1f, Alignment::HorizontalRight, Alignment::Padding( 1.f, 1.f, 1.f, 1.f ) );
 
     ImageActor control6 = CreateSolidColorActor( Color::RED );
-    control6.SetSize( 100.f, 100.f );
+    control6.SetSize( Vector2( 100.f, 100.f ) );
     ImageActor control7 = CreateSolidColorActor( Color::RED );
-    control7.SetSize( 100.f, 100.f );
+    control7.SetSize( Vector2( 100.f, 100.f ) );
     ImageActor control8 = CreateSolidColorActor( Color::RED );
-    control8.SetSize( 100.f, 100.f );
+    control8.SetSize( Vector2( 100.f, 100.f ) );
 
     application.Render();
     application.SendNotification();
