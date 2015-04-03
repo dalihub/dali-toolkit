@@ -1638,7 +1638,12 @@ void ItemView::AnimateScrollOvershoot(float overshootAmount, bool animateBack)
   if(mOvershootAnimationSpeed > Math::MACHINE_EPSILON_0)
   {
     float currentOvershoot = mScrollPositionObject.GetProperty<float>(ScrollConnector::OVERSHOOT);
-    float duration = mOvershootOverlay.GetCurrentSize().height * (animatingOn ? (1.0f - fabsf(currentOvershoot)) : fabsf(currentOvershoot)) / mOvershootAnimationSpeed;
+    float duration = 0.0f;
+
+    if (mOvershootOverlay)
+    {
+      duration = mOvershootOverlay.GetCurrentSize().height * (animatingOn ? (1.0f - fabsf(currentOvershoot)) : fabsf(currentOvershoot)) / mOvershootAnimationSpeed;
+    }
 
     RemoveAnimation(mScrollOvershootAnimation);
     mScrollOvershootAnimation = Animation::New(duration);
