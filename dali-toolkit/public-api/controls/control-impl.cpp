@@ -138,8 +138,12 @@ void SetupBackgroundActor( Actor actor, Property::Index constrainingIndex, const
   actor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
   actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
   actor.SetZ( BACKGROUND_ACTOR_Z_POSITION );
-  actor.SetRelayoutEnabled( true );
-  actor.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  actor.SetRelayoutEnabled( false );
+
+  Constraint constraint = Constraint::New<Vector3>( constrainingIndex,
+                                                    ParentSource( Actor::Property::SIZE ),
+                                                    EqualToConstraint() );
+  actor.ApplyConstraint( constraint );
 }
 
 } // unnamed namespace

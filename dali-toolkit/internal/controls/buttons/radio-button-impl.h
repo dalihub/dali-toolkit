@@ -46,41 +46,21 @@ public:
   /**
    * Create a new RadioButton.
    *
-   * @return A smart-pointer to the newly allocated PushButton.
+   * @return A smart-pointer to the newly allocated RadioButton.
    */
   static Dali::Toolkit::RadioButton New();
 
+private:
+
   /**
-   * Construct a new PushButton.
+   * Construct a new RadioButton.
    */
   RadioButton();
-
-  /**
-   * Construct a new PushButton with label.
-   */
-  RadioButton( const std::string& label );
-
-  /**
-   * Construct a new PushButton with label.
-   */
-  RadioButton( Actor label );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~RadioButton();
-
-public: // From Button
-
-  /**
-   * @copydoc Toolkit::Internal::Button::SetButtonImage( Actor image )
-   */
-  virtual void SetButtonImage( Actor image );
-
-  /**
-   * @copydoc Toolkit::Internal::Button::SetSelectedImage( Actor image )
-   */
-  virtual void SetSelectedImage( Actor image );
 
 private: // From Button
 
@@ -97,7 +77,7 @@ private: // From Button
   /**
    * @copydoc Toolkit::Internal::Button::OnSelected()
    */
-  virtual void OnSelected( bool selected );
+  virtual bool OnSelected();
 
   /**
    * @copydoc Toolkit::Internal::Button::OnLabelSet()
@@ -106,25 +86,11 @@ private: // From Button
 
 private:
 
-  /**
-   * @brief Set the image to display
-   *
-   * @param[in] image The image to set
-   */
-  void SetImage( Actor image );
-
-private:
-
   // Undefined
   RadioButton( const RadioButton& origin );
 
   // Undefined
   RadioButton& operator=( const RadioButton& origin );
-
-private:
-
-  Toolkit::TableView mLayoutContainer;      ///< Container to position button images and labels
-
 };
 
 } // namespace Internal

@@ -168,6 +168,7 @@ void ShadowView::SetShadowPlane(Actor shadowPlane)
   mShadowPlaneBg = shadowPlane;
 
   mShadowPlane = ImageActor::New();
+  mShadowPlane.SetName( "SHADOW_PLANE" );
   mShadowPlane.SetParentOrigin(ParentOrigin::CENTER);
   mShadowPlane.SetAnchorPoint(AnchorPoint::CENTER);
 
@@ -275,8 +276,9 @@ void ShadowView::OnInitialize()
   mBlurFilter.SetPixelFormat(Pixel::RGBA8888);
 
   mBlurRootActor = Actor::New();
-
+  mBlurRootActor.SetName( "BLUR_ROOT_ACTOR" );
   mBlurRootActor.SetRelayoutEnabled( true );
+
   // Turn off inheritance to ensure filter renders properly
   mBlurRootActor.SetPositionInheritanceMode(USE_PARENT_POSITION);
   mBlurRootActor.SetInheritOrientation(false);

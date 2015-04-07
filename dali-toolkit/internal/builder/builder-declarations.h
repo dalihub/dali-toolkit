@@ -19,7 +19,12 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali.h>
+#include <dali/public-api/math/rect.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/math/vector3.h>
+#include <dali/public-api/math/vector4.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/matrix3.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/builder/tree-node.h>

@@ -125,7 +125,7 @@ int UtcDaliSliderSignals(void)
   Stage::GetCurrent().Add( slider );
   slider.SetParentOrigin(ParentOrigin::TOP_LEFT);
   slider.SetAnchorPoint(ParentOrigin::TOP_LEFT);
-  slider.SetPreferredSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
+  slider.SetSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
   slider.SetPosition( 0.0f, 0.0f );
 
   const float MIN_BOUND = 0.0f;

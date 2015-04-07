@@ -624,8 +624,8 @@ void GridLayout::GetResizeAnimation(Animation& animation, Actor actor, Vector3 s
 
     // Do a nonlinear size animation to shrink the actor first when the actor size changes,
     // so that we can avoid the actors overlapping during orientation change.
-    animation.Resize( actor, shrink, AlphaFunctions::EaseOut, 0.0f, durationSeconds * 0.5f );
-    animation.Resize( actor, size, AlphaFunctions::EaseIn, 0.0f, durationSeconds );
+    animation.AnimateTo( Property( actor, Actor::Property::SIZE ), shrink, AlphaFunctions::EaseOut, TimePeriod( 0.0f, durationSeconds * 0.5f ) );
+    animation.AnimateTo( Property( actor, Actor::Property::SIZE ), size, AlphaFunctions::EaseIn, TimePeriod( 0.0f, durationSeconds ) );
   }
 }
 

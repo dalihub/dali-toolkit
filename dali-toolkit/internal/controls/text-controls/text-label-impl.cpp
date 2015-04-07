@@ -401,7 +401,7 @@ void TextLabel::OnInitialize()
 
   // Use height-for-width negotiation by default
   self.SetResizePolicy( FILL_TO_PARENT, WIDTH );
-  self.SetDimensionDependency( HEIGHT, WIDTH );
+  self.SetResizePolicy( DIMENSION_DEPENDENCY, HEIGHT );
 }
 
 void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )

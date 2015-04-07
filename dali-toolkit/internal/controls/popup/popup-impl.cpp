@@ -223,11 +223,10 @@ void Popup::SetBackgroundImage( Actor image )
   // OnDialogTouched only consume the event. It prevents the touch event to be caught by the backing.
   mBackgroundImage.TouchedSignal().Connect( this, &Popup::OnDialogTouched );
 
-  mBackgroundImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  mBackgroundImage.SetResizePolicy( SIZE_FIXED_OFFSET_FROM_PARENT, ALL_DIMENSIONS );
   mBackgroundImage.SetAnchorPoint( AnchorPoint::CENTER );
   mBackgroundImage.SetParentOrigin( ParentOrigin::CENTER );
 
-  mBackgroundImage.SetSizeMode( SIZE_FIXED_OFFSET_FROM_PARENT );
   Vector3 border( mPopupStyle->backgroundOuterBorder.x, mPopupStyle->backgroundOuterBorder.z, 0.0f );
   mBackgroundImage.SetSizeModeFactor( border );
 
@@ -278,7 +277,7 @@ void Popup::SetTitle( const std::string& text )
   {
     mTitle.SetPadding( Padding( 0.0f, 0.0f, mPopupStyle->margin, mPopupStyle->margin ) );
     mTitle.SetResizePolicy( FILL_TO_PARENT, WIDTH );
-    mTitle.SetDimensionDependency( HEIGHT, WIDTH ); // HeightForWidth
+    mTitle.SetResizePolicy( DIMENSION_DEPENDENCY, HEIGHT );
     mPopupLayout.AddChild( mTitle, Toolkit::TableView::CellPosition( 0, 0 ) );
   }
 

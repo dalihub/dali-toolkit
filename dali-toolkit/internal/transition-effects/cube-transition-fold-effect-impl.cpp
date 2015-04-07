@@ -125,11 +125,11 @@ void CubeTransitionFoldEffect::SetupAnimation(unsigned int actorIndex, float ang
     sideTile.TranslateBy( resetTranslation );
     sideTile.SetOrientation( Radian( angle),   Vector3::YAXIS );
   }
-  mAnimation.RotateTo( currentCube, Radian( -angle ), Vector3::YAXIS, AlphaFunctions::Linear );
+  mAnimation.AnimateTo( Property( currentCube, Actor::Property::ORIENTATION ), Quaternion( Radian( -angle ), Vector3::YAXIS ), AlphaFunctions::Linear );
   Vector3 position(currentCube.GetCurrentPosition());
-  mAnimation.MoveTo(currentCube, Vector3( position.x*mDisplacementRatio, position.y, position.z ), AlphaFunctions::Bounce);
-  mAnimation.ColorTo( frontTile, HALF_BRIGHTNESS, AlphaFunctions::EaseOut );
-  mAnimation.ColorTo( sideTile, FULL_BRIGHTNESS, AlphaFunctions::EaseIn );
+  mAnimation.AnimateTo( Property( currentCube, Actor::Property::POSITION ), Vector3( position.x*mDisplacementRatio, position.y, position.z ), AlphaFunctions::Bounce );
+  mAnimation.AnimateTo( Property( frontTile, Actor::Property::COLOR ), HALF_BRIGHTNESS, AlphaFunctions::EaseOut );
+  mAnimation.AnimateTo( Property( sideTile, Actor::Property::COLOR ), FULL_BRIGHTNESS, AlphaFunctions::EaseIn );
 }
 
 } // namespace Internal

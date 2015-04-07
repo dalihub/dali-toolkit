@@ -362,8 +362,6 @@ ItemView::ItemView(ItemFactory& factory)
 
 void ItemView::OnInitialize()
 {
-  RegisterCommonProperties();
-
   Actor self = Self();
 
   // Disable size negotiation for item views
@@ -379,10 +377,10 @@ void ItemView::OnInitialize()
 
   EnableScrollComponent(Toolkit::Scrollable::OvershootIndicator);
 
-  Constraint constraint = Constraint::New<Vector3>(mPropertyRelativePosition,
+  Constraint constraint = Constraint::New<Vector3>(Toolkit::Scrollable::Property::SCROLL_RELATIVE_POSITION,
                                                    LocalSource(mPropertyPosition),
-                                                   LocalSource(mPropertyPositionMin),
-                                                   LocalSource(mPropertyPositionMax),
+                                                   LocalSource(Toolkit::Scrollable::Property::SCROLL_POSITION_MIN),
+                                                   LocalSource(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX),
                                                    LocalSource(Actor::Property::SIZE),
                                                    RelativePositionConstraint);
   self.ApplyConstraint(constraint);
@@ -473,8 +471,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
     if(mActiveLayout->GetItemSize(itemId, targetSize, size))
     {
       // resize immediately
-      actor.SetResizePolicy( FIXED, ALL_DIMENSIONS );
-      actor.SetPreferredSize( size.GetVectorXY() );
+      actor.SetSize( size.GetVectorXY() );
     }
 
     mActiveLayout->ApplyConstraints(actor, itemId, durationSeconds, mScrollPositionObject, Self() );
@@ -520,7 +517,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
 
   Radian scrollDirection(mActiveLayout->GetScrollDirection());
   float orientation = static_cast<float>(mActiveLayout->GetOrientation());
-  self.SetProperty(mPropertyScrollDirection, Vector3(sinf(scrollDirection), cosf(scrollDirection), orientation));
+  self.SetProperty(Toolkit::Scrollable::Property::SCROLL_DIRECTION, Vector3(sinf(scrollDirection), cosf(scrollDirection), orientation));
 
   self.SetProperty(mPropertyScrollSpeed, mScrollSpeed);
 
@@ -996,8 +993,7 @@ void ItemView::SetupActor( Item item, float durationSeconds )
     Vector3 size;
     if( mActiveLayout->GetItemSize( item.first, mActiveLayoutTargetSize, size ) )
     {
-      item.second.SetResizePolicy( FIXED, ALL_DIMENSIONS );
-      item.second.SetPreferredSize( size.GetVectorXY() );
+      item.second.SetSize( size.GetVectorXY() );
     }
 
     mActiveLayout->ApplyConstraints( item.second, item.first, durationSeconds, mScrollPositionObject, Self() );
@@ -1455,22 +1451,22 @@ void ItemView::CalculateDomainSize(const Vector3& layoutSize)
 
     if(IsHorizontal(mActiveLayout->GetOrientation()))
     {
-      self.SetProperty(mPropertyPositionMin, Vector3(0.0f, firstItemPosition.x, 0.0f));
-      self.SetProperty(mPropertyPositionMax, Vector3(0.0f, lastItemPosition.x, 0.0f));
+      self.SetProperty(Toolkit::Scrollable::Property::SCROLL_POSITION_MIN, Vector3(0.0f, firstItemPosition.x, 0.0f));
+      self.SetProperty(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX, Vector3(0.0f, lastItemPosition.x, 0.0f));
       domainSize = fabs(firstItemPosition.x - lastItemPosition.x);
     }
     else
     {
-      self.SetProperty(mPropertyPositionMin, Vector3(0.0f, firstItemPosition.y, 0.0f));
-      self.SetProperty(mPropertyPositionMax, Vector3(0.0f, lastItemPosition.y, 0.0f));
+      self.SetProperty(Toolkit::Scrollable::Property::SCROLL_POSITION_MIN, Vector3(0.0f, firstItemPosition.y, 0.0f));
+      self.SetProperty(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX, Vector3(0.0f, lastItemPosition.y, 0.0f));
       domainSize = fabs(firstItemPosition.y - lastItemPosition.y);
     }
 
     mScrollConnector.SetScrollDomain(minLayoutPosition, 0.0f, domainSize);
 
     bool isLayoutScrollable = IsLayoutScrollable(layoutSize);
-    self.SetProperty(mPropertyCanScrollVertical, isLayoutScrollable);
-    self.SetProperty(mPropertyCanScrollHorizontal, false);
+    self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL, isLayoutScrollable);
+    self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_HORIZONTAL, false);
   }
 }
 
@@ -1478,8 +1474,8 @@ Vector3 ItemView::GetDomainSize() const
 {
   Actor self = Self();
 
-  float minScrollPosition = self.GetProperty<float>(mPropertyPositionMin);
-  float maxScrollPosition = self.GetProperty<float>(mPropertyPositionMax);
+  float minScrollPosition = self.GetProperty<float>(Toolkit::Scrollable::Property::SCROLL_POSITION_MIN);
+  float maxScrollPosition = self.GetProperty<float>(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX);
 
   return Vector3(0.0f, fabs(maxScrollPosition - minScrollPosition), 0.0f);
 }
@@ -1566,7 +1562,7 @@ void ItemView::SetOvershootEnabled( bool enable )
     self.Add(mOvershootOverlay);
 
     Constraint constraint = Constraint::New<Vector3>( Actor::Property::SIZE,
-                                                      ParentSource( mPropertyScrollDirection ),
+                                                      ParentSource( Toolkit::Scrollable::Property::SCROLL_DIRECTION ),
                                                       Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                                       ParentSource( Actor::Property::SIZE ),
                                                       OvershootOverlaySizeConstraint() );
@@ -1574,20 +1570,20 @@ void ItemView::SetOvershootEnabled( bool enable )
     mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.width, OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height);
 
     constraint = Constraint::New<Quaternion>( Actor::Property::ORIENTATION,
-                                              ParentSource( mPropertyScrollDirection ),
+                                              ParentSource( Toolkit::Scrollable::Property::SCROLL_DIRECTION ),
                                               Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                               OvershootOverlayRotationConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
 
     constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
                                            ParentSource( Actor::Property::SIZE ),
-                                           ParentSource( mPropertyScrollDirection ),
+                                           ParentSource( Toolkit::Scrollable::Property::SCROLL_DIRECTION ),
                                            Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
                                            OvershootOverlayPositionConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
 
     constraint = Constraint::New<bool>( Actor::Property::VISIBLE,
-                                        ParentSource( mPropertyCanScrollVertical ),
+                                        ParentSource( Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL ),
                                         OvershootOverlayVisibilityConstraint() );
     mOvershootOverlay.ApplyConstraint(constraint);
 
@@ -1642,7 +1638,12 @@ void ItemView::AnimateScrollOvershoot(float overshootAmount, bool animateBack)
   if(mOvershootAnimationSpeed > Math::MACHINE_EPSILON_0)
   {
     float currentOvershoot = mScrollPositionObject.GetProperty<float>(ScrollConnector::OVERSHOOT);
-    float duration = mOvershootOverlay.GetCurrentSize().height * (animatingOn ? (1.0f - fabsf(currentOvershoot)) : fabsf(currentOvershoot)) / mOvershootAnimationSpeed;
+    float duration = 0.0f;
+
+    if (mOvershootOverlay)
+    {
+      duration = mOvershootOverlay.GetCurrentSize().height * (animatingOn ? (1.0f - fabsf(currentOvershoot)) : fabsf(currentOvershoot)) / mOvershootAnimationSpeed;
+    }
 
     RemoveAnimation(mScrollOvershootAnimation);
     mScrollOvershootAnimation = Animation::New(duration);

@@ -201,10 +201,6 @@ const IntegerPair EnumTable[] =
     { "CULL_BACK_FACE",                                     CullBack  },
     { "CULL_FRONT_AND_BACK_FACE",                           CullFrontAndBack },
 
-    { "USE_OWN_SIZE",                                       USE_OWN_SIZE },
-    { "SIZE_RELATIVE_TO_PARENT",                            SIZE_RELATIVE_TO_PARENT },
-    { "SIZE_FIXED_OFFSET_FROM_PARENT",                      SIZE_FIXED_OFFSET_FROM_PARENT },
-
     { "CAMERA_FREE_LOOK"             ,      Camera::FREE_LOOK                   },
     { "CAMERA_LOOK_AT_TARGET"        ,      Camera::LOOK_AT_TARGET              },
     { "CAMERA_PERSPECTIVE_PROJECTION" ,     Camera::PERSPECTIVE_PROJECTION      },

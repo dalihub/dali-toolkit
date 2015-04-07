@@ -29,9 +29,11 @@ If a method can process width and height at the same time then the ALL_DIMENSION
 The ResizePolicy enum specifies a range of options for controlling the way actors resize. These are powerful rules that enable much automatic
 resizing behaviour. They are as following:
 
-- FIXED: This is the option to use when you want the specific definite size as set by SetPreferredSize
+- FIXED: This is the option to use when you want the specific definite size as set by SetSize (This is the default for all actors)
 - USE_NATURAL_SIZE: Use this option for objects such as images or text to get their natural size e.g. The dimensions of the image, or the size of the text without wrapping. Also use this on TableViews when the size of the table is dependent on its children.
 - FILL_TO_PARENT: Size will fill up to the size of its parent's size, taking a size factor into account to allow proportionate filling
+- SIZE_RELATIVE_TO_PARENT: Fill up the parent with a relative scale. Use SetSizeModeFactor to specify the ratio to fill up to the parent.
+- SIZE_FIXED_OFFSET_FROM_PARENT: Fill up the parent and add a fixed offset using SetSizeModeFactor.
 - FIT_TO_CHILDREN: Size will scale around the size of the actor's children. E.g. A popup's height may resize itself around it's contents.
 - DIMENSION_DEPENDENCY: This covers rules such as width-for-height and height-for-width. You specify that one dimension depends on another.
 
@@ -44,12 +46,16 @@ This section details how an actor may be used with size negotiation.
 <h3>Enabling Size Negotiation</h3>
 
 The first thing to do is to specify whether you want an actor to be included or excluded from the relayout process. The following method is used to enable or disable the relayout
-for an individual actor.
+for an individual actor. Make sure this is the first thing that is called after the actor is created otherwise the actor may still be negotiated.
 @code void SetRelayoutEnabled( bool enabled ) @endcode
 Text and image actors have relayout enabled by default, while a plain Actor is disabled. Be aware that if desiring to use an Actor in relayout
 then relayout needs to be explicitly enabled first.
 
 <h3>Specifying Size Policies</h3>
+
+Actors have different size policies by default. For example ImageActor is set to USE_NATURAL_SIZE. This ensures that when an image actor is
+placed on the stage it will use its natural size by default. However if the user calls SetSize with non-zero sizes on the image actor then the current
+size policy is overridden by the FIXED size policy and the actor will take on the size specified.
 
 The next step is to specify how an actor will be size negotiated. The resize policies for an actor may be specified by the following method:
 @code void SetResizePolicy( ResizePolicy policy, Dimension dimension ) @endcode
@@ -81,24 +87,20 @@ After:
 This example shows an actor rootActor set to expand to its parent's width and contract/expand around its child's height. The child image actor
 is set to natural size which means it will display at the acutal size of the image.
 
-To specify that a dimension has a dependency on another dimension use the following method. Calling this method will automatically set the resize policy to be DIMENSION_DEPENDENCY
-for the given dimension.
-@code void SetDimensionDependency( Dimension dimension, Dimension dependency ) @endcode
-For example if dimension is HEIGHT and dependency is WIDTH then there is a height-for-width dependency in effect. The classic use case for this
+To specify that a dimension has a dependency on another dimension use DIMENSION_DEPENDENCY. For example if dimension is HEIGHT and dependency is
+WIDTH then there is a height-for-width dependency in effect. The classic use case for this
 is a text view that wraps its text. The following example snippet shows a text view that expands its width to the size of its parent, wraps its
 contents and then determines its height based on the width.
 @code
 TextView text = TextView::New( "Example" );
 text.SetMultilinePolicy( SplitByWord );
 text.SetResizePolicy( FILL_TO_PARENT, WIDTH );
-text.SetDimensionDependency( HEIGHT, WIDTH );
+text.SetResizePolicy( DIMENSION_DEPENDENCY, HEIGHT );
 @endcode
 
 <h3>Specifying Sizes and Size Limits</h3>
 
-When wanting a specific fixed size for an actor then specify the resize policy to be FIXED and set the desired, or preferred size using the following method.
-This method is to be used instead of SetSize when wishing to specify a size for an actor being size negotiated.
-@code void SetPreferredSize( const Vector2& size ) @endcode
+When wanting a specific fixed size for an actor then specify the resize policy to be FIXED and set the desired, or preferred size using SetSize.
 If only one dimension is FIXED then the other value in the size parameter will be ignored, so it is safe to set it to zero.
 
 To constrain the final negotiated size of an actor, set the following for minimum and maximum sizes respectively.
@@ -108,14 +110,6 @@ void SetMaximumSize( const Vector2& size )
 @endcode
 
 <h3>Altering Negotiated Size</h3>
-
-The following method specifies a size mode to use. Use one of: USE_OWN_SIZE, SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT. SIZE_RELATIVE_TO_PARENT will
-scale the image relative to it's parent size when the resize policy of FILL_TO_PARENT is in effect. While SIZE_FIXED_OFFSET_FROM_PARENT will
-add an offset to this parent size, for example when wanting an image to act as a border around its parent.
-@code void SetSizeMode( const SizeMode mode ) @endcode
-
-Use the following with SetSizeMode to specify either the size relative to parent or the fixed offset to apply.
-@code void SetSizeModeFactor( const Vector3& factor ) @endcode
 
 When an actor is required to maintain the aspect ratio of its natural size the following method can be used. This is useful for size negotiating images
 to ensure they maintain their aspect ratio while still fitting within the bounds they have been allocated. This can be one of USE_SIZE_SET, FIT_WITH_ASPECT_RATIO
@@ -152,14 +146,14 @@ text.SetMultilinePolicy( Toolkit::TextView::SplitByWord );
 text.SetWidthExceedPolicy( Toolkit::TextView::Split );
 text.SetLineJustification( Toolkit::TextView::Left );
 text.SetResizePolicy( FILL_TO_PARENT, WIDTH );
-text.SetDimensionDependency( HEIGHT, WIDTH );
+text.SetResizePolicy( DIMENSION_DEPENDENCY, HEIGHT );
 
 content.AddChild( text, Toolkit::TableView::CellPosition( 0, 0 ) );
 
 // Image
 ImageActor image = ImageActor::New( ResourceImage::New( IMAGE1 ) );
 image.SetResizePolicy( FILL_TO_PARENT, WIDTH );
-image.SetDimensionDependency( HEIGHT, WIDTH );
+image.SetResizePolicy( DIMENSION_DEPENDENCY, HEIGHT );
 image.SetPadding( Padding( 20.0f, 0.0f, 0.0f, 0.0f ) );
 content.AddChild( image, Toolkit::TableView::CellPosition( 0, 1 ) );
 
@@ -176,8 +170,7 @@ Dali::Image checked = Dali::ResourceImage::New( CHECKBOX_CHECKED_IMAGE );
 Toolkit::CheckBoxButton checkBox = Toolkit::CheckBoxButton::New();
 checkBox.SetBackgroundImage( unchecked );
 checkBox.SetSelectedImage( checked );
-checkBox.SetPreferredSize( Vector2( 48, 48 ) );
-checkBox.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+checkBox.SetSize( Vector2( 48, 48 ) );
 
 root.AddChild( checkBox, Toolkit::TableView::CellPosition( 0, 0 ) );
 
@@ -213,13 +206,13 @@ will result in a text view that fills up its width to available space in the tab
 height based on its new width. The table view will then fit its height taking the height of the text view into account.
 @code
 text.SetResizePolicy( FILL_TO_PARENT, WIDTH );
-text.SetDimensionDependency( HEIGHT, WIDTH );
+text.SetResizePolicy( DIMENSION_DEPENDENCY, HEIGHT );
 @endcode
 The image view performs a similar relayout. It fits its width to the size of the cell and calculates its height based on the new
 width. Some padding is added to the left of it as well to center it more.
 @code
 image.SetResizePolicy( FILL_TO_PARENT, WIDTH );
-image.SetDimensionDependency( HEIGHT, WIDTH );
+image.SetResizePolicy( DIMENSION_DEPENDENCY, HEIGHT );
 image.SetPadding( Padding( 20.0f, 0.0f, 0.0f, 0.0f ) );
 @endcode
 The sub table view is similar as well in that it expands its width to the size of its cell. When it is added to the table view it

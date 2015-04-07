@@ -264,11 +264,12 @@ void NavigationControl::OrientationChanged( int angle )
       }
     }
 
+    Actor self = Self();
     Animation animation = Animation::New( mOrientationAnimationDuration );
-    animation.RotateTo( Self(), Degree( -angle ), Vector3::ZAXIS, mOrientationAnimationAlphaFunc );
+    animation.AnimateTo( Property( self, Actor::Property::ORIENTATION ), Quaternion( Radian( Degree( -angle ) ), Vector3::ZAXIS ), mOrientationAnimationAlphaFunc );
     animation.Play();
 
-    Self().SetSize( targetSize );
+    self.SetSize( targetSize );
 
     RelayoutRequest();
   }

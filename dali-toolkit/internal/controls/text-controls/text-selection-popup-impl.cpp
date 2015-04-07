@@ -503,8 +503,8 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    textSize.width = std::min( textSize.width, OPTION_MAX_WIDTH - 2.f * OPTION_MARGIN_WIDTH );
 
    // Set the size to the text. Text will be ellipsized if exceeds the max width.
-   captionTextLabel.SetPreferredSize( textSize.GetVectorXY() );
-   pressedCaptionTextLabel.SetPreferredSize( textSize.GetVectorXY() );
+   captionTextLabel.SetSize( textSize.GetVectorXY() );
+   pressedCaptionTextLabel.SetSize( textSize.GetVectorXY() );
 
    // 4. Calculate the size of option.
 
@@ -513,13 +513,13 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    const Vector2 optionSize( std::min( OPTION_MAX_WIDTH, std::max( OPTION_MIN_WIDTH, std::max( textSize.width, OPTION_ICON_SIZE.width ) + 2.f * OPTION_MARGIN_WIDTH ) ),
                              DEFAULT_POPUP_MAX_SIZE.height - mNinePatchMargins.z - mNinePatchMargins.w );
 
-   optionContainer.SetPreferredSize( optionSize );
-   optionPressedContainer.SetPreferredSize( optionSize );
+   optionContainer.SetSize( optionSize );
+   optionPressedContainer.SetSize( optionSize );
 
    // 5. Create a option.
    Toolkit::PushButton option = Toolkit::PushButton::New();
    option.SetResizePolicy( FIXED, ALL_DIMENSIONS );
-   option.SetPreferredSize( optionSize );
+   option.SetSize( optionSize );
    option.SetAnchorPoint( AnchorPoint::TOP_LEFT );
    option.SetX( mContentSize.width );
    option.SetName( name );
@@ -545,7 +545,7 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
 
      ImageActor divider =  Toolkit::CreateSolidColorActor( Color::WHITE );
      divider.SetResizePolicy( FIXED, ALL_DIMENSIONS );
-     divider.SetPreferredSize( size );
+     divider.SetSize( size );
      divider.SetParentOrigin( ParentOrigin::TOP_LEFT );
      divider.SetAnchorPoint( AnchorPoint::TOP_LEFT );
      divider.SetPosition( mContentSize.width - POPUP_DIVIDER_WIDTH, 0.0f );
@@ -566,10 +566,10 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    stencil.SetRelayoutEnabled( true );
 
    self.SetResizePolicy( FIXED, ALL_DIMENSIONS );
-   self.SetPreferredSize( mRequiredPopUpSize ); // control matches stencil size
+   self.SetSize( mRequiredPopUpSize ); // control matches stencil size
 
    mStencilLayer.SetResizePolicy( FIXED, ALL_DIMENSIONS );
-   mStencilLayer.SetPreferredSize( size ); // matches stencil size
+   mStencilLayer.SetSize( size ); // matches stencil size
 
    stencil.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
    scrollview.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );

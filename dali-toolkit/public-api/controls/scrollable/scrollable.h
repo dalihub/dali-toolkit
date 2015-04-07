@@ -59,20 +59,16 @@ public:
     OvershootIndicator,
   };
 
-  // Custom properties
-
-  static const std::string SCROLL_RELATIVE_POSITION_PROPERTY_NAME;      ///< Property, name "scroll-relative-position", type Vector3
-  static const std::string SCROLL_POSITION_MIN_PROPERTY_NAME;           ///< Property, name "scroll-position-min",      type Vector3
-  static const std::string SCROLL_POSITION_MAX_PROPERTY_NAME;           ///< Property, name "scroll-position-max",      type Vector3
-  static const std::string SCROLL_DIRECTION_PROPERTY_NAME;              ///< Property, name "scroll-direction",         type Vector2
-
   /**
    * @brief The start and end property ranges for this control.
    */
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,             ///< Reserve property indices
+
+    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,
+    ANIMATABLE_PROPERTY_END_INDEX =   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000              ///< Reserve animatable property indices
   };
 
   /**
@@ -82,8 +78,17 @@ public:
   {
     enum
     {
+      // Event side properties
       OVERSHOOT_EFFECT_COLOR = PROPERTY_START_INDEX, ///< Property, name "overshoot-effect-color",    @see SetOvershootEffectColor(),    type Vector4
       OVERSHOOT_ANIMATION_SPEED,                     ///< Property, name "overshoot-animation-speed", @see SetOvershootAnimationSpeed(), type float
+
+      // Animatable properties
+      SCROLL_RELATIVE_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scroll-relative-position", type Vector3
+      SCROLL_POSITION_MIN,                                        ///< Property, name "scroll-position-min",      type Vector3
+      SCROLL_POSITION_MAX,                                        ///< Property, name "scroll-position-max",      type Vector3
+      SCROLL_DIRECTION,                                           ///< Property, name "scroll-direction",         type Vector2
+      CAN_SCROLL_VERTICAL,                                        ///< Property, name "can-scroll-vertical",      type bool
+      CAN_SCROLL_HORIZONTAL                                       ///< Property, name "can-scroll-horizontal",    type bool
     };
   };
 
