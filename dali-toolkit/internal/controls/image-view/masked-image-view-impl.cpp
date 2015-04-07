@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <sstream>
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
@@ -97,11 +96,6 @@ const char* const MASKED_IMAGE_VIEW_FRAGMENT_SOURCE =
   "  highp vec4 mask = texture2D(sEffect, vMaskTexCoord);                                                        \n"
   "  gl_FragColor = texture2D(sTexture, vTexCoord) * vec4(1,1,1,mask.a);                                         \n"
   "}";
-
-Vector2 EqualToConstraintVector2( const Vector2& current, const PropertyInput& property )
-{
-  return property.GetVector2();
-}
 
 Vector2 GetSizeForAspectRatio( const Vector2& targetSize, float aspectRatio )
 {
@@ -545,9 +539,10 @@ void MaskedImageView::Initialize( unsigned int targetWidth,
   mRenderTask.SetInputEnabled( false );
   mRenderTask.SetExclusive( true );
   mRenderTask.SetClearEnabled( true );
-  mRenderTask.ApplyConstraint( Constraint::New<Vector4>( RenderTask::Property::CLEAR_COLOR,
-                                                         Source( self, mCustomProperties[ Dali::Toolkit::MaskedImageView::BACKGROUND_COLOR ] ),
-                                                         EqualToConstraint() ) );
+
+  Constraint clearColorConstraint = Constraint::New<Vector4>( mRenderTask, RenderTask::Property::CLEAR_COLOR, EqualToConstraint() );
+  clearColorConstraint.AddSource( Source( self, mCustomProperties[ Dali::Toolkit::MaskedImageView::BACKGROUND_COLOR ] ) );
+  clearColorConstraint.Apply();
   mRenderTask.FinishedSignal().Connect( this, &MaskedImageView::OnRenderTaskFinished );
 
   // Edit mode initialization
@@ -585,22 +580,26 @@ void MaskedImageView::ApplyMaskedImageShader( ImageRotation rotation )
                                            ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ) );
 
   shader.SetUniform( "uTargetSize", mTargetSize );
+
   shader.SetUniform( "uSourceSize", mTargetSize );
-  shader.ApplyConstraint( Constraint::New<Vector2>( shader.GetPropertyIndex( "uSourceSize" ),
-                                                    Source( self, mCustomProperties[ Dali::Toolkit::MaskedImageView::SOURCE_SIZE ] ),
-                                                    EqualToConstraintVector2 ) );
+  Constraint sourceSizeConstraint = Constraint::New<Vector2>( shader, shader.GetPropertyIndex( "uSourceSize" ), EqualToConstraint() );
+  sourceSizeConstraint.AddSource( Source( self, mCustomProperties[ Dali::Toolkit::MaskedImageView::SOURCE_SIZE ] ) );
+  sourceSizeConstraint.Apply();
+
   shader.SetUniform( "uSourceOffset", Vector2::ZERO );
-  shader.ApplyConstraint( Constraint::New<Vector2>( shader.GetPropertyIndex( "uSourceOffset" ),
-                                                    Source( self, mCustomProperties[ Dali::Toolkit::MaskedImageView::SOURCE_OFFSET ] ),
-                                                    EqualToConstraintVector2 ) );
+  Constraint sourceOffsetConstraint = Constraint::New<Vector2>( shader, shader.GetPropertyIndex( "uSourceOffset" ), EqualToConstraint() );
+  sourceOffsetConstraint.AddSource( Source( self, mCustomProperties[ Dali::Toolkit::MaskedImageView::SOURCE_OFFSET ] ) );
+  sourceOffsetConstraint.Apply();
+
   shader.SetUniform( "uMaskSize", mTargetSize );
-  shader.ApplyConstraint( Constraint::New<Vector2>( shader.GetPropertyIndex( "uMaskSize" ),
-                                                    Source( self, mCustomProperties[ Dali::Toolkit::MaskedImageView::MASK_SIZE ] ),
-                                                    EqualToConstraintVector2 ) );
+  Constraint maskSizeConstraint = Constraint::New<Vector2>( shader, shader.GetPropertyIndex( "uMaskSize" ), EqualToConstraint() );
+  maskSizeConstraint.AddSource( Source( self, mCustomProperties[ Dali::Toolkit::MaskedImageView::MASK_SIZE ] ) );
+  maskSizeConstraint.Apply();
+
   shader.SetUniform( "uMaskOffset", mTargetSize );
-  shader.ApplyConstraint( Constraint::New<Vector2>( shader.GetPropertyIndex( "uMaskOffset" ),
-                                                    Source( self, mCustomProperties[ Dali::Toolkit::MaskedImageView::MASK_OFFSET ] ),
-                                                    EqualToConstraintVector2 ) );
+  Constraint maskOffsetConstraint = Constraint::New<Vector2>( shader, shader.GetPropertyIndex( "uMaskOffset" ), EqualToConstraint() );
+  maskOffsetConstraint.AddSource( Source( self, mCustomProperties[ Dali::Toolkit::MaskedImageView::MASK_OFFSET ] ) );
+  maskOffsetConstraint.Apply();
 
   shader.SetEffectImage( mMaskImage );
   mSourceImageActor.SetShaderEffect( shader );

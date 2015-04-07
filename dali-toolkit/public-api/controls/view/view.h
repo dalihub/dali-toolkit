@@ -69,7 +69,6 @@ class View;
  * Layer contentLayer = Layer::New();
  * contentLayer.SetAnchorPoint( AnchorPoint::CENTER );
  * contentLayer.SetParentOrigin( ParentOrigin::CENTER );
- * contentLayer.ApplyConstraint( ParentConstraint::Size::New( ParentSize() ) );
  * view.AddContentLayer( contentLayer );
  * \endcode
  *

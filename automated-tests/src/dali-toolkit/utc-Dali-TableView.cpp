@@ -58,9 +58,9 @@ struct Constraint100
   /**
    * function operator to apply the parent size
    */
-  Dali::Vector3 operator()(const Dali::Vector3& current)
+  void operator()( Dali::Vector3& current, const PropertyInputContainer& /* inputs */ )
   {
-    return Dali::Vector3( 100.0f, 100.0f, 100.0f );
+    current.x = current.y = current.z = 100.0f;
   }
 };
 
@@ -642,7 +642,8 @@ int UtcDaliTableViewCustomProperties(void)
 
   // Create a 10x10 table-view
   TableView tableView = TableView::New(10,10);
-  tableView.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::SIZE, Constraint100() ) );
+  Constraint constraint = Constraint::New<Vector3>( tableView, Actor::Property::SIZE, Constraint100() );
+  constraint.Apply();
   DALI_TEST_CHECK( tableView );
 
   // Create a child actor with the custom properties

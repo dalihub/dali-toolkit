@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <sstream>
 #include <iomanip>
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
@@ -242,18 +241,6 @@ Vector4 GaussianBlurView::GetBackgroundColor() const
 // Private methods
 //
 
-/**
- * EqualToConstraintFloat
- *
- * f(current, property) = property
- */
-struct EqualToConstraintFloat
-{
-  EqualToConstraintFloat(){}
-
-  float operator()(const float current, const PropertyInput& property) {return property.GetFloat();}
-};
-
 void GaussianBlurView::OnInitialize()
 {
   // root actor to parent all user added actors, needed to allow us to set that subtree as exclusive for our child render task
@@ -300,8 +287,9 @@ void GaussianBlurView::OnInitialize()
     mImageActorComposite.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
     mImageActorComposite.SetOpacity(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
 
-    Constraint blurStrengthConstraint = Constraint::New<float>( Actor::Property::COLOR_ALPHA, ParentSource(mBlurStrengthPropertyIndex), EqualToConstraintFloat());
-    mImageActorComposite.ApplyConstraint(blurStrengthConstraint);
+    Constraint blurStrengthConstraint = Constraint::New<float>( mImageActorComposite, Actor::Property::COLOR_ALPHA, EqualToConstraint());
+    blurStrengthConstraint.AddSource( ParentSource(mBlurStrengthPropertyIndex) );
+    blurStrengthConstraint.Apply();
 
     // Create an ImageActor for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
     mTargetActor = ImageActor::New();

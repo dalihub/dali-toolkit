@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <cmath>
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
@@ -54,20 +53,20 @@ struct ActorOpacityConstraint
     mRange = Vector2( index*rangeLength, (index+1.f)*rangeLength );
   }
 
-  float operator()( float current, const PropertyInput& blurProperty )
+  void operator()( float& current, const PropertyInputContainer& inputs )
   {
-    float blurStrength = blurProperty.GetFloat();
+    float blurStrength = inputs[0]->GetFloat();
     if(blurStrength <= mRange.x)
     {
-      return 1.f;
+      current = 1.f;
     }
     else if(blurStrength > mRange.y)
     {
-      return 0.f;
+      current = 0.f;
     }
     else
     {
-      return (mRange.y - blurStrength)/(mRange.y-mRange.x);
+      current = ( mRange.y - blurStrength) / ( mRange.y - mRange.x );
     }
   }
 
@@ -152,7 +151,9 @@ void SuperBlurView::OnInitialize()
 
   for(unsigned int i=0; i < mBlurLevels; i++)
   {
-    mImageActors[i].ApplyConstraint( Constraint::New<float>( Actor::Property::COLOR_ALPHA, ParentSource( mBlurStrengthPropertyIndex ), ActorOpacityConstraint(mBlurLevels, i) ) );
+    Constraint constraint = Constraint::New<float>( mImageActors[i], Actor::Property::COLOR_ALPHA, ActorOpacityConstraint(mBlurLevels, i) );
+    constraint.AddSource( ParentSource( mBlurStrengthPropertyIndex ) );
+    constraint.Apply();
   }
 
   Self().SetSize(Stage::GetCurrent().GetSize());

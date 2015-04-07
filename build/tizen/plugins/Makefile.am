@@ -46,6 +46,7 @@ libdali_script_plugin_v8_la_CXXFLAGS = -DDALI_COMPILATION \
                             $(DALI_CFLAGS) \
                             $(DLOG_CFLAGS) \
                             $(script_plugin_v8_includes) \
+                            $(V8_CFLAGS) \
                             -Werror -Wall
 
 libdali_script_plugin_v8_la_LIBADD = \

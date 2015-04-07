@@ -18,9 +18,6 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
 
-// EXTERNAL INCLUDES
-#include <boost/bind.hpp>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/bouncing-effect-actor.h>
