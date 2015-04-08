@@ -326,15 +326,7 @@ void Slider::DisplayValue( float value, bool raiseSignals )
   // Progress bar
   if( mProgress )
   {
-    if( clampledValue > 0.0f )
-    {
-      mProgress.SetVisible( true ); // Deliberately set this in case multiple SetValues are fired at once
-      mProgress.SetSize( x, GetBackingRegion().y );
-    }
-    else
-    {
-      mProgress.SetVisible( false );
-    }
+    mProgress.SetSize( x, GetBackingRegion().y );
   }
 
   // Signals
