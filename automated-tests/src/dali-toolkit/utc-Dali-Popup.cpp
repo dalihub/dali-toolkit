@@ -191,7 +191,19 @@ int UtcDaliPopupSetBackgroundImage(void)
 
 int UtcDaliPopupSetTitle(void)
 {
-  // TODO
+  ToolkitTestApplication application;  // Exceptions require ToolkitTestApplication
+  tet_infoline(" UtcDaliPopupSetTitle");
+
+  // Create the Popup actor
+  Popup popup = Popup::New();
+  Stage::GetCurrent().Add( popup );
+  // Put in show state so it's layer is connected to popup (for ancestor check).
+  popup.SetState(Popup::POPUP_SHOW, 0.0f);
+
+  popup.SetTitle("title");
+
+  DALI_TEST_CHECK( popup.GetTitle() == "title" );
+
   END_TEST;
 }
 

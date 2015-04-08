@@ -316,6 +316,9 @@ int UtcDaliPushButtonSetLabelText(void)
 
   pushButton.SetLabel( STR );
 
+  TextLabel label = TextLabel::DownCast( pushButton.GetLabel() );
+  DALI_TEST_CHECK( STR == label.GetProperty<std::string>( TextLabel::Property::TEXT ) );
+
   END_TEST;
 }
 
