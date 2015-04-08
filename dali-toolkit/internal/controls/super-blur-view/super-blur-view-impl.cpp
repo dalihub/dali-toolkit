@@ -143,6 +143,7 @@ void SuperBlurView::OnInitialize()
   for(unsigned int i=0; i<=mBlurLevels;i++)
   {
     mImageActors[i] = ImageActor::New(  );
+    mImageActors[i].SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
     mImageActors[i].SetParentOrigin( ParentOrigin::CENTER );
     mImageActors[i].SetZ(-static_cast<float>(i)*0.01f);
     mImageActors[i].SetColorMode( USE_OWN_MULTIPLY_PARENT_ALPHA );
@@ -248,16 +249,6 @@ void SuperBlurView::ClearBlurResource()
       mGaussianBlurView[i].Reset();
     }
     mResourcesCleared = true;
-  }
-}
-
-void SuperBlurView::OnRelayout( const Vector2& size, RelayoutContainer& container )
-{
-  unsigned int numChildren = Self().GetChildCount();
-
-  for( unsigned int i=0; i<numChildren; ++i )
-  {
-    Self().GetChildAt(i).SetSize(size);
   }
 }
 
