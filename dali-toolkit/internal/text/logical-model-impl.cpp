@@ -436,6 +436,7 @@ void LogicalModel::SetVisualToLogicalMap( const BidirectionalLineInfoRun* const 
   {
     mVisualToLogicalMap.Clear();
     mLogicalToVisualMap.Clear();
+    mVisualToLogicalCursorMap.Clear();
   }
   else
   {
@@ -443,8 +444,13 @@ void LogicalModel::SetVisualToLogicalMap( const BidirectionalLineInfoRun* const 
     mVisualToLogicalMap.Resize( numberOfCharacters );
     mLogicalToVisualMap.Resize( numberOfCharacters );
 
+    const Length numberOfCharactersPlus = numberOfCharacters + 1u;
+    mVisualToLogicalCursorMap.Resize( numberOfCharactersPlus );
+
     CharacterIndex* modelVisualToLogicalMapBuffer = mVisualToLogicalMap.Begin();
     CharacterIndex* modelLogicalToVisualMapBuffer = mLogicalToVisualMap.Begin();
+
+    CharacterIndex* modelVisualToLogicalCursorMap = mVisualToLogicalCursorMap.Begin();
 
     CharacterIndex lastIndex = 0u;
     for( unsigned int bidiIndex = 0u; bidiIndex < numberOfRuns; ++bidiIndex )
@@ -479,6 +485,114 @@ void LogicalModel::SetVisualToLogicalMap( const BidirectionalLineInfoRun* const 
     for( CharacterIndex index = 0u; index < numberOfCharacters; ++index )
     {
       *( modelLogicalToVisualMapBuffer + *( modelVisualToLogicalMapBuffer + index ) ) = index;
+    }
+
+    // Sets the visual to logical conversion map for cursor positions.
+
+    const Length numberOfBidirectionalParagraphs = mBidirectionalParagraphInfo.Count();
+    BidirectionalParagraphInfoRun* bidirectionalParagraphInfoBuffer = mBidirectionalParagraphInfo.Begin();
+    BidirectionalParagraphInfoRun* bidirectionalParagraph = bidirectionalParagraphInfoBuffer;
+
+    const CharacterDirection* const modelCharacterDirections = mCharacterDirections.Begin();
+
+    Length bidirectionalParagraphIndex = 0u;
+    bool isRightToLeftParagraph = false;
+    for( CharacterIndex index = 0u; index < numberOfCharactersPlus; ++index )
+    {
+      if( bidirectionalParagraph &&
+          ( bidirectionalParagraph->characterRun.characterIndex == index ) )
+      {
+        isRightToLeftParagraph = true;
+      }
+
+      if( 0u == index )
+      {
+        if( isRightToLeftParagraph )
+        {
+          *( modelVisualToLogicalCursorMap + index ) = numberOfCharacters;
+        }
+        else // else logical position is zero.
+        {
+          *( modelVisualToLogicalCursorMap + index ) = 0u;
+        }
+      }
+      else if( numberOfCharacters == index )
+      {
+        if( isRightToLeftParagraph )
+        {
+          *( modelVisualToLogicalCursorMap + index ) = 0u;
+        }
+        else // else logical position is the number of characters.
+        {
+          *( modelVisualToLogicalCursorMap + index ) = numberOfCharacters;
+        }
+      }
+      else
+      {
+        // Get the character indexed by  index - 1 and index
+        // and calculate the logical position according the directions of
+        // both characters and the direction of the paragraph.
+
+        const CharacterIndex previousIndex = index - 1u;
+        const CharacterIndex logicalPosition0 = *( modelVisualToLogicalMapBuffer + previousIndex );
+        const CharacterIndex logicalPosition1 = *( modelVisualToLogicalMapBuffer + index );
+
+        const CharacterDirection direction0 = *( modelCharacterDirections + logicalPosition0 );
+        const CharacterDirection direction1 = *( modelCharacterDirections + logicalPosition1 );
+
+        if( direction0 == direction1 )
+        {
+          // Both glyphs have the same direction.
+          if( direction0 )
+          {
+            *( modelVisualToLogicalCursorMap + index ) = logicalPosition0;
+          }
+          else
+          {
+            *( modelVisualToLogicalCursorMap + index ) = logicalPosition1;
+          }
+        }
+        else
+        {
+          if( isRightToLeftParagraph )
+          {
+            if( direction1 )
+            {
+              *( modelVisualToLogicalCursorMap + index ) = logicalPosition1 + 1u;
+            }
+            else
+            {
+              *( modelVisualToLogicalCursorMap + index ) = logicalPosition0;
+            }
+          }
+          else
+          {
+            if( direction0 )
+            {
+              *( modelVisualToLogicalCursorMap + index ) = logicalPosition1;
+            }
+            else
+            {
+              *( modelVisualToLogicalCursorMap + index ) = logicalPosition0 + 1u;
+            }
+          }
+        }
+      }
+
+      if( bidirectionalParagraph &&
+          ( bidirectionalParagraph->characterRun.characterIndex + bidirectionalParagraph->characterRun.numberOfCharacters == index ) )
+      {
+        isRightToLeftParagraph = false;
+        ++bidirectionalParagraphIndex;
+        if( bidirectionalParagraphIndex < numberOfBidirectionalParagraphs )
+        {
+          bidirectionalParagraph = bidirectionalParagraphInfoBuffer + bidirectionalParagraphIndex;
+        }
+        else
+        {
+          bidirectionalParagraph = NULL;
+        }
+      }
     }
   }
 }
