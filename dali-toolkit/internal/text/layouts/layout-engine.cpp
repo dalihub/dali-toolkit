@@ -48,6 +48,34 @@ const float MAX_FLOAT = std::numeric_limits<float>::max();
  */
 struct LineLayout
 {
+  LineLayout()
+  : glyphIndex( 0u ),
+    characterIndex( 0u ),
+    numberOfCharacters( 0u ),
+    numberOfGlyphs( 0u ),
+    length( 0.f ),
+    widthAdvanceDiff( 0.f ),
+    wsLengthEndOfLine( 0.f ),
+    ascender( 0.f ),
+    descender( MAX_FLOAT )
+  {}
+
+  ~LineLayout()
+  {}
+
+  void Clear()
+  {
+    glyphIndex = 0u;
+    characterIndex = 0u;
+    numberOfCharacters = 0u;
+    numberOfGlyphs = 0u;
+    length = 0.f;
+    widthAdvanceDiff = 0.f;
+    wsLengthEndOfLine = 0.f;
+    ascender = 0.f;
+    descender = MAX_FLOAT;
+  }
+
   GlyphIndex     glyphIndex;         ///< Index of the first glyph to be laid-out.
   CharacterIndex characterIndex;     ///< Index of the first character to be laid-out.
   Length         numberOfCharacters; ///< The number of characters which fit in one line.
@@ -70,20 +98,51 @@ struct LayoutEngine::Impl
   }
 
   /**
+   * @brief Merges a temporary line layout into the line layout.
+   *
+   * @param[in,out] lineLayout The line layout.
+   * @param[in] tmpLineLayout A temporary line layout.
+   */
+  void MergeLineLayout( LineLayout& lineLayout,
+                        const LineLayout& tmpLineLayout )
+  {
+    lineLayout.numberOfCharacters += tmpLineLayout.numberOfCharacters;
+    lineLayout.numberOfGlyphs += tmpLineLayout.numberOfGlyphs;
+    lineLayout.length += tmpLineLayout.length;
+    lineLayout.widthAdvanceDiff = tmpLineLayout.widthAdvanceDiff;
+
+    if( 0.f < tmpLineLayout.length )
+    {
+      lineLayout.length += lineLayout.wsLengthEndOfLine;
+
+      lineLayout.wsLengthEndOfLine = tmpLineLayout.wsLengthEndOfLine;
+    }
+    else
+    {
+      lineLayout.wsLengthEndOfLine += tmpLineLayout.wsLengthEndOfLine;
+    }
+
+    if( tmpLineLayout.ascender > lineLayout.ascender )
+    {
+      lineLayout.ascender = tmpLineLayout.ascender;
+    }
+
+    if( tmpLineLayout.descender < lineLayout.descender )
+    {
+      lineLayout.descender = tmpLineLayout.descender;
+    }
+  }
+
+  /**
    * Retrieves the line layout for a given box width.
    */
   void GetLineLayoutForBox( const LayoutParameters& parameters,
                             LineLayout& lineLayout )
   {
-    // Initializes the line layout.
-    lineLayout.numberOfCharacters = 0u;
-    lineLayout.numberOfGlyphs = 0u;
-    lineLayout.length = 0.f;
-    lineLayout.wsLengthEndOfLine = 0.f;
-    lineLayout.ascender = 0.f;
-    lineLayout.descender = MAX_FLOAT;
+    // Stores temporary line layout which has not been added to the final line layout.
+    LineLayout tmpLineLayout;
 
-    // Get the last glyph index.
+    const bool isMultiline = mLayout == MULTI_LINE_BOX;
     const GlyphIndex lastGlyphIndex = parameters.totalNumberOfGlyphs - 1u;
 
     FontId lastFontId = 0u;
@@ -91,93 +150,8 @@ struct LayoutEngine::Impl
          glyphIndex < parameters.totalNumberOfGlyphs;
          ++glyphIndex )
     {
-      // Get the glyph info.
-      const GlyphInfo& glyphInfo = *( parameters.glyphsBuffer + glyphIndex );
+      const bool isLastGlyph = glyphIndex == lastGlyphIndex;
 
-      // Check whether is a white space.
-      const Character character = *( parameters.textBuffer + lineLayout.numberOfCharacters );
-      const bool isWhiteSpace = TextAbstraction::IsWhiteSpace( character );
-
-      // Get the character indices for the current glyph. The last character index is needed
-      // because there are glyphs formed by more than one character but their break info is
-      // given only for the last character.
-      const Length charactersPerGlyph = *( parameters.charactersPerGlyphBuffer + glyphIndex );
-
-      // Increase the number of characters.
-      lineLayout.numberOfCharacters += charactersPerGlyph;
-
-      // Increase the number of glyphs.
-      lineLayout.numberOfGlyphs++;
-
-      // Increase the accumulated length.
-      const float glyphLength = ( glyphIndex == lastGlyphIndex ) ? glyphInfo.width : glyphInfo.advance;
-
-      if( isWhiteSpace )
-      {
-        // Add the length to the length of white spaces at the end of the line.
-        lineLayout.wsLengthEndOfLine += glyphLength;
-      }
-      else
-      {
-        // Add as well any previous white space length.
-        lineLayout.length += lineLayout.wsLengthEndOfLine + glyphLength;
-
-        // Clear the white space length at the end of the line.
-        lineLayout.wsLengthEndOfLine = 0.f;
-      }
-
-      if( lastFontId != glyphInfo.fontId )
-      {
-        Text::FontMetrics fontMetrics;
-        mFontClient.GetFontMetrics( glyphInfo.fontId, fontMetrics );
-
-        // Sets the maximum ascender.
-        if( fontMetrics.ascender > lineLayout.ascender )
-        {
-          lineLayout.ascender = fontMetrics.ascender;
-        }
-
-        // Sets the minimum descender.
-        if( fontMetrics.descender < lineLayout.descender )
-        {
-          lineLayout.descender = fontMetrics.descender;
-        }
-
-        lastFontId = glyphInfo.fontId;
-      }
-    }
-  }
-
-  /**
-   * Retrieves the line layout for a given box width.
-   */
-  void GetMultiLineLayoutForBox( const LayoutParameters& parameters,
-                                 LineLayout& lineLayout )
-  {
-    // Initializes the line layout.
-    lineLayout.numberOfCharacters = 0u;
-    lineLayout.numberOfGlyphs = 0u;
-    lineLayout.length = 0.f;
-    lineLayout.widthAdvanceDiff = 0.f;
-    lineLayout.wsLengthEndOfLine = 0.f;
-    lineLayout.ascender = 0.f;
-    lineLayout.descender = MAX_FLOAT;
-
-    // Stores temporary line layout which has not been added to the final line layout.
-    LineLayout tmpLineLayout;
-    tmpLineLayout.numberOfCharacters = 0u;
-    tmpLineLayout.numberOfGlyphs = 0u;
-    tmpLineLayout.length = 0.f;
-    tmpLineLayout.widthAdvanceDiff = 0.f;
-    tmpLineLayout.wsLengthEndOfLine = 0.f;
-    tmpLineLayout.ascender = 0.f;
-    tmpLineLayout.descender = MAX_FLOAT;
-
-    FontId lastFontId = 0u;
-    for( GlyphIndex glyphIndex = lineLayout.glyphIndex;
-         glyphIndex < parameters.totalNumberOfGlyphs;
-         ++glyphIndex )
-    {
       // Get the glyph info.
       const GlyphInfo& glyphInfo = *( parameters.glyphsBuffer + glyphIndex );
 
@@ -222,88 +196,30 @@ struct LayoutEngine::Impl
       }
 
       // Check if the accumulated length fits in the width of the box.
-      if( lineLayout.length + tmpLineLayout.length + tmpLineLayout.widthAdvanceDiff + ( ( 0.f < tmpLineLayout.length ) ? lineLayout.wsLengthEndOfLine : 0.f ) > parameters.boundingBox.width )
+      if( isMultiline &&
+          ( lineLayout.length + tmpLineLayout.length + tmpLineLayout.widthAdvanceDiff + ( ( 0.f < tmpLineLayout.length ) ? lineLayout.wsLengthEndOfLine : 0.f ) > parameters.boundingBox.width ) )
       {
         // Current word does not fit in the box's width.
         return;
       }
 
-      if( TextAbstraction::LINE_MUST_BREAK == lineBreakInfo )
+      if( ( isMultiline || isLastGlyph ) &&
+          ( TextAbstraction::LINE_MUST_BREAK == lineBreakInfo ) )
       {
         // Must break the line. Update the line layout and return.
-        lineLayout.numberOfCharacters += tmpLineLayout.numberOfCharacters;
-        lineLayout.numberOfGlyphs += tmpLineLayout.numberOfGlyphs;
-        lineLayout.length += tmpLineLayout.length;
-        lineLayout.widthAdvanceDiff = tmpLineLayout.widthAdvanceDiff;
+        MergeLineLayout( lineLayout, tmpLineLayout );
 
-        if( 0.f < tmpLineLayout.length )
-        {
-          lineLayout.length += lineLayout.wsLengthEndOfLine;
-
-          lineLayout.wsLengthEndOfLine = tmpLineLayout.wsLengthEndOfLine;
-        }
-        else
-        {
-          lineLayout.wsLengthEndOfLine += tmpLineLayout.wsLengthEndOfLine;
-        }
-
-        if( tmpLineLayout.ascender > lineLayout.ascender )
-        {
-          lineLayout.ascender = tmpLineLayout.ascender;
-        }
-
-        if( tmpLineLayout.descender < lineLayout.descender )
-        {
-          lineLayout.descender = tmpLineLayout.descender;
-        }
-
-        tmpLineLayout.numberOfCharacters = 0u;
-        tmpLineLayout.numberOfGlyphs = 0u;
-        tmpLineLayout.length = 0u;
-        tmpLineLayout.widthAdvanceDiff = 0u;
-        tmpLineLayout.wsLengthEndOfLine = 0u;
-        tmpLineLayout.ascender = 0.f;
-        tmpLineLayout.descender = MAX_FLOAT;
         return;
       }
 
-      if( TextAbstraction::WORD_BREAK == wordBreakInfo )
+      if( isMultiline &&
+          ( TextAbstraction::WORD_BREAK == wordBreakInfo ) )
       {
         // Current glyph is the last one of the current word.
         // Add the temporal layout to the current one.
-        lineLayout.numberOfCharacters += tmpLineLayout.numberOfCharacters;
-        lineLayout.numberOfGlyphs += tmpLineLayout.numberOfGlyphs;
-        lineLayout.length += tmpLineLayout.length;
-        lineLayout.widthAdvanceDiff = tmpLineLayout.widthAdvanceDiff;
+        MergeLineLayout( lineLayout, tmpLineLayout );
 
-        if( 0.f < tmpLineLayout.length )
-        {
-          lineLayout.length += lineLayout.wsLengthEndOfLine;
-
-          lineLayout.wsLengthEndOfLine = tmpLineLayout.wsLengthEndOfLine;
-        }
-        else
-        {
-          lineLayout.wsLengthEndOfLine += tmpLineLayout.wsLengthEndOfLine;
-        }
-
-        if( tmpLineLayout.ascender > lineLayout.ascender )
-        {
-          lineLayout.ascender = tmpLineLayout.ascender;
-        }
-
-        if( tmpLineLayout.descender < lineLayout.descender )
-        {
-          lineLayout.descender = tmpLineLayout.descender;
-        }
-
-        tmpLineLayout.numberOfCharacters = 0u;
-        tmpLineLayout.numberOfGlyphs = 0u;
-        tmpLineLayout.length = 0u;
-        tmpLineLayout.widthAdvanceDiff = 0u;
-        tmpLineLayout.wsLengthEndOfLine = 0u;
-        tmpLineLayout.ascender = 0.f;
-        tmpLineLayout.descender = MAX_FLOAT;
+        tmpLineLayout.Clear();
       }
 
       if( lastFontId != glyphInfo.fontId )
@@ -333,32 +249,70 @@ struct LayoutEngine::Impl
                    Vector<LineRun>& lines,
                    Size& actualSize )
   {
-    // TODO Switch between different layouts
-    bool update = false;
-
-    switch( mLayout )
+    float penY = 0.f;
+    for( GlyphIndex index = 0u; index < layoutParameters.totalNumberOfGlyphs; )
     {
-      case LayoutEngine::SINGLE_LINE_BOX:
+      float penX = 0.f;
+
+      // Get the layout for the line.
+      LineLayout layout;
+      layout.glyphIndex = index;
+      GetLineLayoutForBox( layoutParameters,
+                           layout );
+
+      if( 0u == layout.numberOfGlyphs )
       {
-        update = SingleLineLayout( layoutParameters,
-                                   glyphPositions,
-                                   lines,
-                                   actualSize );
-        break;
+        // The width is too small and no characters are laid-out.
+        return false;
       }
-      case LayoutEngine::MULTI_LINE_BOX:
+
+      // Create a line run and add it to the lines.
+      const GlyphIndex lastGlyphIndex = index + layout.numberOfGlyphs - 1u;
+
+      LineRun lineRun;
+      lineRun.glyphIndex = index;
+      lineRun.numberOfGlyphs = layout.numberOfGlyphs;
+      lineRun.characterRun.characterIndex = *( layoutParameters.glyphsToCharactersBuffer + index );
+      lineRun.characterRun.numberOfCharacters = ( *( layoutParameters.glyphsToCharactersBuffer + lastGlyphIndex ) + *( layoutParameters.charactersPerGlyphBuffer + lastGlyphIndex ) ) - lineRun.characterRun.characterIndex;
+      lineRun.width = layout.length + ( ( layout.widthAdvanceDiff > 0.f ) ? layout.widthAdvanceDiff : 0.f );
+      lineRun.ascender = layout.ascender;
+      lineRun.descender = layout.descender;
+      lineRun.extraLength = layout.wsLengthEndOfLine;
+      lineRun.direction = false;
+
+      lines.PushBack( lineRun );
+
+      // Update the actual size.
+      if( layout.length + layout.widthAdvanceDiff > actualSize.width )
       {
-        update = MultiLineLayout( layoutParameters,
-                                  glyphPositions,
-                                  lines,
-                                  actualSize );
-        break;
+        actualSize.width = layout.length;
       }
-      default:
-        break;
+
+      actualSize.height += ( lineRun.ascender + -lineRun.descender );
+
+      // Traverse the glyphs and set the positions.
+
+      penY += layout.ascender;
+
+      Vector2* glyphPositionsBuffer = glyphPositions.Begin();
+      for( GlyphIndex i = index; i < index + layout.numberOfGlyphs; ++i )
+      {
+        const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + i );
+        Vector2& position = *( glyphPositionsBuffer + i );
+
+        position.x = penX + glyph.xBearing;
+        position.y = penY - glyph.yBearing;
+
+        penX += glyph.advance;
+      }
+
+      penY += -layout.descender;
+
+      // Increase the glyph index.
+      index += layout.numberOfGlyphs;
     }
 
-    return update;
+    return true;
   }
 
   void ReLayoutRightToLeftLines( const LayoutParameters& layoutParameters,
@@ -460,125 +414,6 @@ struct LayoutEngine::Impl
         position.x += alignOffset;
       }
     }
-  }
-
-  bool SingleLineLayout( const LayoutParameters& layoutParameters,
-                         Vector<Vector2>& glyphPositions,
-                         Vector<LineRun>& lines,
-                         Size& actualSize )
-  {
-    LineLayout layout;
-    layout.glyphIndex = 0u;
-    GetLineLayoutForBox( layoutParameters,
-                         layout );
-
-    // Create a line run and add it to the lines.
-    const GlyphIndex lastGlyphIndex = layoutParameters.totalNumberOfGlyphs - 1u;
-
-    LineRun lineRun;
-    lineRun.glyphIndex = 0u;
-    lineRun.numberOfGlyphs = layoutParameters.totalNumberOfGlyphs;
-    lineRun.characterRun.characterIndex = 0u;
-    lineRun.characterRun.numberOfCharacters = *( layoutParameters.glyphsToCharactersBuffer + lastGlyphIndex ) + *( layoutParameters.charactersPerGlyphBuffer + lastGlyphIndex );
-    lineRun.width = layout.length;
-    lineRun.ascender = layout.ascender;
-    lineRun.descender = layout.descender;
-    lineRun.extraLength = layout.wsLengthEndOfLine;
-    lineRun.direction = false;
-
-    lines.PushBack( lineRun );
-
-    // Update the actual size.
-    actualSize.width = layout.length;
-    actualSize.height = lineRun.ascender + -lineRun.descender;
-
-    float penX = 0.f;
-    float penY = layout.ascender;
-
-    Vector2* glyphPositionsBuffer = glyphPositions.Begin();
-    for( GlyphIndex glyphIndex = 0u; glyphIndex < layout.numberOfGlyphs; ++glyphIndex )
-    {
-      const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + glyphIndex );
-      Vector2& position = *( glyphPositionsBuffer + glyphIndex );
-
-      position.x = penX + glyph.xBearing;
-      position.y = penY - glyph.yBearing;
-
-      penX += glyph.advance;
-    }
-
-    return true;
-  }
-
-  bool MultiLineLayout( const LayoutParameters& layoutParameters,
-                        Vector<Vector2>& glyphPositions,
-                        Vector<LineRun>& lines,
-                        Size& actualSize )
-  {
-    float penY = 0.f;
-    for( GlyphIndex index = 0u; index < layoutParameters.totalNumberOfGlyphs; )
-    {
-      float penX = 0.f;
-
-      // Get the layout for the line.
-      LineLayout layout;
-      layout.glyphIndex = index;
-      GetMultiLineLayoutForBox( layoutParameters,
-                                layout );
-
-      if( 0u == layout.numberOfGlyphs )
-      {
-        // The width is too small and no characters are laid-out.
-        return false;
-      }
-
-      // Create a line run and add it to the lines.
-      const GlyphIndex lastGlyphIndex = index + layout.numberOfGlyphs - 1u;
-
-      LineRun lineRun;
-      lineRun.glyphIndex = index;
-      lineRun.numberOfGlyphs = layout.numberOfGlyphs;
-      lineRun.characterRun.characterIndex = *( layoutParameters.glyphsToCharactersBuffer + index );
-      lineRun.characterRun.numberOfCharacters = ( *( layoutParameters.glyphsToCharactersBuffer + lastGlyphIndex ) + *( layoutParameters.charactersPerGlyphBuffer + lastGlyphIndex ) ) - lineRun.characterRun.characterIndex;
-      lineRun.width = layout.length + ( ( layout.widthAdvanceDiff > 0.f ) ? layout.widthAdvanceDiff : 0.f );
-      lineRun.ascender = layout.ascender;
-      lineRun.descender = layout.descender;
-      lineRun.extraLength = layout.wsLengthEndOfLine;
-      lineRun.direction = false;
-
-      lines.PushBack( lineRun );
-
-      // Update the actual size.
-      if( layout.length + layout.widthAdvanceDiff > actualSize.width )
-      {
-        actualSize.width = layout.length;
-      }
-
-      actualSize.height += ( lineRun.ascender + -lineRun.descender );
-
-      // Traverse the glyphs and set the positions.
-
-      penY += layout.ascender;
-
-      Vector2* glyphPositionsBuffer = glyphPositions.Begin();
-      for( GlyphIndex i = index; i < index + layout.numberOfGlyphs; ++i )
-      {
-        const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + i );
-        Vector2& position = *( glyphPositionsBuffer + i );
-
-        position.x = penX + glyph.xBearing;
-        position.y = penY - glyph.yBearing;
-
-        penX += glyph.advance;
-      }
-
-      penY += -layout.descender;
-
-      // Increase the glyph index.
-      index += layout.numberOfGlyphs;
-    }
-
-    return true;
   }
 
   float CalculateHorizontalAlignment( float boxWidth,
