@@ -75,17 +75,18 @@ void ReplaceBidirectionalInfo( LogicalModel& model,
  * Sets the visual to logical map tables.
  *
  * Any map tables previously set are removed.
+ * It sets the paragraph's direction to each line.
  *
  * @pre The @p logicalModel needs to have a text set.
  * @pre The @p logicalModel needs to have the bidirectional info indices for each paragraph set.
  * @pre The @p visualModel needs to have the laid-out lines info set.
  *
  * @param[in] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
- * @param[in] lineRuns The line runs converted to characters.
+ * @param[in,out] lineRuns The line runs converted to characters.
  * @param[out] lineInfoRuns line runs with the visual to logical conversion maps.
  */
 void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
-                   const Vector<LineRun>& lineRuns,
+                   Vector<LineRun>& lineRuns,
                    Vector<BidirectionalLineInfoRun>& lineInfoRuns );
 
 /**
