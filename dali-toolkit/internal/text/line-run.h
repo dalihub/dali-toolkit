@@ -41,7 +41,9 @@ struct LineRun
   GlyphIndex         glyphIndex;     ///< The initial glyph index.
   Length             numberOfGlyphs; ///< The number of glyphs of the run.
   CharacterRun       characterRun;   ///< The initial character and the number of characters.
-  Size               lineSize;       ///< The size of the line.
+  float              width;          ///< The line's width.
+  float              ascender;       ///< The line's ascender.
+  float              descender;      ///< The line's descender.
   float              extraLength;    ///< The length of the white spaces at the end of the line.
   CharacterDirection direction;      ///< Direction of the first character of the paragraph.
 };
