@@ -528,6 +528,8 @@ Toolkit::TextLabel Slider::CreatePopupText()
   Toolkit::TextLabel textLabel = Toolkit::TextLabel::New();
   textLabel.SetParentOrigin( ParentOrigin::CENTER );
   textLabel.SetAnchorPoint( AnchorPoint::CENTER );
+  textLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
+  textLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
   textLabel.SetZ( VALUE_DISPLAY_TEXT_Z );
   return textLabel;
 }
@@ -538,6 +540,9 @@ ImageActor Slider::CreatePopup()
   popup.SetRelayoutEnabled( false );
   popup.SetParentOrigin( ParentOrigin::TOP_CENTER );
   popup.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
+
+  mValueTextLabel = CreatePopupText();
+  popup.Add( mValueTextLabel );
 
   return popup;
 }
@@ -576,6 +581,8 @@ void Slider::CreateHandleValueDisplay()
     mHandleValueTextLabel = Toolkit::TextLabel::New();
     mHandleValueTextLabel.SetParentOrigin( ParentOrigin::CENTER );
     mHandleValueTextLabel.SetAnchorPoint( AnchorPoint::CENTER );
+    mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
+    mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
     mHandleValueTextLabel.SetDrawMode( DrawMode::OVERLAY );
     mHandle.Add( mHandleValueTextLabel );
   }
