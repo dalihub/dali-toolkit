@@ -58,6 +58,8 @@ struct ModifyEvent
   std::string text;
 };
 
+const std::string EMPTY_STRING("");
+
 } // namespace
 
 namespace Dali
@@ -648,8 +650,8 @@ struct Controller::TextInput
       FontId defaultFontId = 0u;
       if( NULL == mFontDefaults )
       {
-        defaultFontId = mFontClient.GetFontId( String::EMPTY,
-                                               String::EMPTY );
+        defaultFontId = mFontClient.GetFontId( EMPTY_STRING,
+                                               EMPTY_STRING );
       }
       else
       {
@@ -1097,7 +1099,7 @@ const std::string& Controller::GetDefaultFontFamily() const
     return mImpl->mFontDefaults->mDefaultFontFamily;
   }
 
-  return String::EMPTY;;
+  return EMPTY_STRING;
 }
 
 void Controller::SetDefaultFontStyle( const std::string& defaultFontStyle )
@@ -1133,7 +1135,7 @@ const std::string& Controller::GetDefaultFontStyle() const
     return mImpl->mFontDefaults->mDefaultFontStyle;
   }
 
-  return String::EMPTY;
+  return EMPTY_STRING;
 }
 
 void Controller::SetDefaultPointSize( float pointSize )
