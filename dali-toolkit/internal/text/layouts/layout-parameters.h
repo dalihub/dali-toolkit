@@ -56,6 +56,7 @@ struct LayoutParameters
                     const Character* const textBuffer,
                     const LineBreakInfo* const lineBreakInfoBuffer,
                     const WordBreakInfo* const wordBreakInfoBuffer,
+                    const CharacterDirection* const characterDirectionBuffer,
                     Length totalNumberOfGlyphs,
                     const GlyphInfo* const glyphsBuffer,
                     const CharacterIndex* const glyphsToCharactersBuffer,
@@ -64,6 +65,7 @@ struct LayoutParameters
     textBuffer( textBuffer ),
     lineBreakInfoBuffer( lineBreakInfoBuffer ),
     wordBreakInfoBuffer( wordBreakInfoBuffer ),
+    characterDirectionBuffer( characterDirectionBuffer ),
     totalNumberOfGlyphs( totalNumberOfGlyphs ),
     glyphsBuffer( glyphsBuffer ),
     glyphsToCharactersBuffer( glyphsToCharactersBuffer ),
@@ -74,18 +76,19 @@ struct LayoutParameters
     numberOfBidirectionalInfoRuns( 0u )
   {}
 
-  Vector2                     boundingBox;
-  const Character* const      textBuffer;
-  const LineBreakInfo* const  lineBreakInfoBuffer;
-  const WordBreakInfo* const  wordBreakInfoBuffer;
-  Length                      totalNumberOfGlyphs;
-  const GlyphInfo* const      glyphsBuffer;
-  const CharacterIndex* const glyphsToCharactersBuffer;
-  const Length* const         charactersPerGlyphBuffer;
-  GlyphIndex*                 charactersToGlyphsBuffer;        ///< The character to glyph conversion table.
-  Length*                     glyphsPerCharacterBuffer;        ///< The number of glyphs per character.
-  BidirectionalLineInfoRun*   lineBidirectionalInfoRunsBuffer; ///< Bidirectional conversion tables per line.
-  Length                      numberOfBidirectionalInfoRuns;   ///< The number of lines with bidirectional info.
+  Vector2                         boundingBox;
+  const Character* const          textBuffer;
+  const LineBreakInfo* const      lineBreakInfoBuffer;
+  const WordBreakInfo* const      wordBreakInfoBuffer;
+  const CharacterDirection* const characterDirectionBuffer;
+  Length                          totalNumberOfGlyphs;
+  const GlyphInfo* const          glyphsBuffer;
+  const CharacterIndex* const     glyphsToCharactersBuffer;
+  const Length* const             charactersPerGlyphBuffer;
+  GlyphIndex*                     charactersToGlyphsBuffer;        ///< The character to glyph conversion table.
+  Length*                         glyphsPerCharacterBuffer;        ///< The number of glyphs per character.
+  BidirectionalLineInfoRun*       lineBidirectionalInfoRunsBuffer; ///< Bidirectional conversion tables per line.
+  Length                          numberOfBidirectionalInfoRuns;   ///< The number of lines with bidirectional info.
 };
 
 } // namespace Text
