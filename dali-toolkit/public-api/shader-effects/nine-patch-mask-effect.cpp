@@ -19,7 +19,6 @@
 #include <dali-toolkit/public-api/shader-effects/nine-patch-mask-effect.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
@@ -34,14 +33,17 @@ namespace Toolkit
 namespace NinePatchMaskEffect
 {
 
-struct NinePatchMaskEffectSizeConstraint
+namespace
 {
-  Vector2 operator()( const Vector2& current, const PropertyInput& property )
-  {
-    const Vector3& actorSize = property.GetVector3();
-    return Vector2( actorSize.x, actorSize.y );
-  }
-};
+
+void NinePatchMaskEffectSizeConstraint( Vector2& current, const PropertyInputContainer& inputs )
+{
+  const Vector3& actorSize = inputs[0]->GetVector3();
+  current.x = actorSize.x;
+  current.y = actorSize.y;
+}
+
+} // unnamed namespace
 
 static void DoApply( ImageActor actor, const std::string& maskImage, const Vector2& maskSize, Vector4 maskBorder )
 {
@@ -90,9 +92,10 @@ static void DoApply( ImageActor actor, const std::string& maskImage, const Vecto
   maskEffect.SetEffectImage( ResourceImage::New( maskImage ) );
 
   maskEffect.SetUniform( "uImageSize", Vector2(0,0) /*Constrained to actor size*/ );
-  maskEffect.ApplyConstraint( Constraint::New<Vector2>( maskEffect.GetPropertyIndex("uImageSize"),
-                                                        Source(actor, Actor::Property::SIZE),
-                                                        NinePatchMaskEffectSizeConstraint() ) );
+
+  Constraint constraint = Constraint::New<Vector2>( maskEffect, maskEffect.GetPropertyIndex("uImageSize"), NinePatchMaskEffectSizeConstraint );
+  constraint.AddSource( Source(actor, Actor::Property::SIZE) );
+  constraint.Apply();
 
   maskEffect.SetUniform( "uMaskSize", maskSize );
 

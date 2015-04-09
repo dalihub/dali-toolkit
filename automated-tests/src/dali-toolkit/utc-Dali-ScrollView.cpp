@@ -207,25 +207,13 @@ struct TestSumConstraint
 
   /**
    * @param[in] current The current base value
-   * @param[in] property The property to be added to current.
+   * @param[in] inputs Contains the property to be added to current.
    * @return The new current Vector.
    */
-  Vector3 operator()(const Vector3& current)
+  void operator()( Vector3& current, const PropertyInputContainer& inputs )
   {
-    gConstraintResult = current + mOffset;
-    return gConstraintResult;
-  }
-
-  /**
-   * @param[in] current The current base value
-   * @param[in] property The property to be added to current.
-   * @return The new current Vector.
-   */
-  Vector3 operator()(const Vector3&    current,
-                    const PropertyInput& property)
-  {
-    gConstraintResult = current + property.GetVector3() + mOffset;
-    return gConstraintResult;
+    gConstraintResult = current + inputs[0]->GetVector3() + mOffset;
+    current = gConstraintResult;
   }
 
   Vector3 mOffset;
@@ -814,9 +802,8 @@ int UtcDaliScrollViewConstraints(void)
   a.SetPosition( TEST_ACTOR_POSITION );
   Wait(application);
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
-                                                       Source(scrollView, ScrollView::Property::SCROLL_POSITION),
-                                                       TestSumConstraint( TEST_CONSTRAINT_OFFSET ) );
+  Constraint constraint = Constraint::New<Vector3>( scrollView, Actor::Property::POSITION, TestSumConstraint( TEST_CONSTRAINT_OFFSET ) );
+  constraint.AddSource( Source(scrollView, ScrollView::Property::SCROLL_POSITION) );
   constraint.SetRemoveAction(Constraint::Discard);
   scrollView.ApplyConstraintToChildren(constraint);
   Wait(application);
@@ -862,10 +849,8 @@ int UtcDaliScrollViewBind(void)
   Wait(application);
 
   // apply this constraint to scrollview
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
-                                                       Source(scrollView, ScrollView::Property::SCROLL_POSITION),
-                                                       TestSumConstraint( TEST_CONSTRAINT_OFFSET ) );
-
+  Constraint constraint = Constraint::New<Vector3>( scrollView, Actor::Property::POSITION, TestSumConstraint( TEST_CONSTRAINT_OFFSET ) );
+  constraint.AddSource( Source(scrollView, ScrollView::Property::SCROLL_POSITION) );
   constraint.SetRemoveAction(Constraint::Discard);
   scrollView.ApplyConstraintToChildren(constraint);
 

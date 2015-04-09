@@ -169,27 +169,21 @@ float ConstantDecelerationAlphaFunction(float progress)
  * scroll domain. This is a value from 0.0f to 1.0f in each
  * scroll position axis.
  */
-Vector3 InternalRelativePositionConstraint(const Vector3&    current,
-                                           const PropertyInput& scrollPositionProperty,
-                                           const PropertyInput& scrollMinProperty,
-                                           const PropertyInput& scrollMaxProperty,
-                                           const PropertyInput& scrollSizeProperty)
+void InternalRelativePositionConstraint( Vector3& relativePosition, const PropertyInputContainer& inputs)
 {
-  Vector3 position = -scrollPositionProperty.GetVector3();
-  const Vector3& min = scrollMinProperty.GetVector3();
-  const Vector3& max = scrollMaxProperty.GetVector3();
-  const Vector3& size = scrollSizeProperty.GetVector3();
+  Vector3 position = -inputs[0]->GetVector3();
+  const Vector3& min = inputs[1]->GetVector3();
+  const Vector3& max = inputs[2]->GetVector3();
+  const Vector3& size = inputs[3]->GetVector3();
 
   position.x = WrapInDomain(position.x, min.x, max.x);
   position.y = WrapInDomain(position.y, min.y, max.y);
 
-  Vector3 relativePosition;
   Vector3 domainSize = (max - min) - size;
 
   relativePosition.x = domainSize.x > Math::MACHINE_EPSILON_1 ? fabsf((position.x - min.x) / domainSize.x) : 0.0f;
   relativePosition.y = domainSize.y > Math::MACHINE_EPSILON_1 ? fabsf((position.y - min.y) / domainSize.y) : 0.0f;
-
-  return relativePosition;
+  relativePosition.z = 0.0f;
 }
 
 } // unnamed namespace
@@ -294,22 +288,19 @@ struct InternalPrePositionConstraint
   {
   }
 
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& gesturePositionProperty,
-                     const PropertyInput& sizeProperty)
+  void operator()( Vector3& scrollPostPosition, const PropertyInputContainer& inputs )
   {
-    Vector3 scrollPostPosition = current;
-    Vector2 panPosition = gesturePositionProperty.GetVector2();
+    const Vector2& panPosition = inputs[0]->GetVector2();
 
     if(!mWasPanning)
     {
-      mPrePosition = current;
+      mPrePosition = scrollPostPosition;
       mCurrentPanMask = mInitialPanMask;
       mWasPanning = true;
     }
 
     // Calculate Deltas...
-    Vector2 currentPosition = gesturePositionProperty.GetVector2();
+    const Vector2& currentPosition = panPosition;
     Vector2 panDelta( currentPosition - mLocalStart );
 
     // Axis Auto Lock - locks the panning to the horizontal or vertical axis if the pan
@@ -335,7 +326,7 @@ struct InternalPrePositionConstraint
     scrollPostPosition.GetVectorXY() += panDelta;
 
     // if no wrapping then clamp preposition to maximum overshoot amount
-    const Vector3& size = sizeProperty.GetVector3();
+    const Vector3& size = inputs[1]->GetVector3();
     if( mClampX )
     {
       float newXPosition = Clamp(scrollPostPosition.x, (mDomainMax.x + size.x) - mMaxOvershoot.x, mDomainMin.x + mMaxOvershoot.x );
@@ -358,8 +349,6 @@ struct InternalPrePositionConstraint
       }
       scrollPostPosition.y = newYPosition;
     }
-
-    return scrollPostPosition;
   }
 
   Vector3 mPrePosition;
@@ -397,16 +386,12 @@ struct InternalPositionConstraint
   {
   }
 
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& scrollPositionProperty,
-                     const PropertyInput& scrollMinProperty,
-                     const PropertyInput& scrollMaxProperty,
-                     const PropertyInput& scrollSizeProperty)
+  void operator()( Vector3& position, const PropertyInputContainer& inputs )
   {
-    Vector3 position = scrollPositionProperty.GetVector3();
-    const Vector2& size = scrollSizeProperty.GetVector3().GetVectorXY();
-    const Vector3& min = scrollMinProperty.GetVector3();
-    const Vector3& max = scrollMaxProperty.GetVector3();
+    position = inputs[0]->GetVector3();
+    const Vector2& size = inputs[3]->GetVector3().GetVectorXY();
+    const Vector3& min = inputs[1]->GetVector3();
+    const Vector3& max = inputs[2]->GetVector3();
 
     if( mWrap )
     {
@@ -419,8 +404,6 @@ struct InternalPositionConstraint
       position.x = mClampX ? Clamp(position.x, mDomainMax.x + size.x, mDomainMin.x ) : position.x;
       position.y = mClampY ? Clamp(position.y, mDomainMax.y + size.y, mDomainMin.y ) : position.y;
     }
-
-    return position;
   }
 
   Vector2 mDomainMin;
@@ -439,19 +422,19 @@ struct OvershootXConstraint
 {
   OvershootXConstraint(float maxOvershoot) : mMaxOvershoot(maxOvershoot) {}
 
-  float operator()(const float&    current,
-      const PropertyInput& scrollPrePositionProperty,
-      const PropertyInput& scrollPostPositionProperty,
-      const PropertyInput& canScrollProperty)
+  void operator()( float& current, const PropertyInputContainer& inputs )
   {
-    if( canScrollProperty.GetBoolean() )
+    if( inputs[2]->GetBoolean() )
     {
-      const Vector3& scrollPrePosition = scrollPrePositionProperty.GetVector3();
-      const Vector3& scrollPostPosition = scrollPostPositionProperty.GetVector3();
+      const Vector3& scrollPrePosition = inputs[0]->GetVector3();
+      const Vector3& scrollPostPosition = inputs[1]->GetVector3();
       float newOvershoot = scrollPrePosition.x - scrollPostPosition.x;
-      return (newOvershoot > 0.0f ? std::min(newOvershoot, mMaxOvershoot) : std::max(newOvershoot, -mMaxOvershoot)) / mMaxOvershoot;
+      current = (newOvershoot > 0.0f ? std::min(newOvershoot, mMaxOvershoot) : std::max(newOvershoot, -mMaxOvershoot)) / mMaxOvershoot;
     }
-    return 0.0f;
+    else
+    {
+      current = 0.0f;
+    }
   }
 
   float mMaxOvershoot;
@@ -465,19 +448,19 @@ struct OvershootYConstraint
 {
   OvershootYConstraint(float maxOvershoot) : mMaxOvershoot(maxOvershoot) {}
 
-  float operator()(const float&    current,
-      const PropertyInput& scrollPrePositionProperty,
-      const PropertyInput& scrollPostPositionProperty,
-      const PropertyInput& canScrollProperty)
+  void operator()( float& current, const PropertyInputContainer& inputs )
   {
-    if( canScrollProperty.GetBoolean() )
+    if( inputs[2]->GetBoolean() )
     {
-      const Vector3& scrollPrePosition = scrollPrePositionProperty.GetVector3();
-      const Vector3& scrollPostPosition = scrollPostPositionProperty.GetVector3();
+      const Vector3& scrollPrePosition = inputs[0]->GetVector3();
+      const Vector3& scrollPostPosition = inputs[1]->GetVector3();
       float newOvershoot = scrollPrePosition.y - scrollPostPosition.y;
-      return (newOvershoot > 0.0f ? std::min(newOvershoot, mMaxOvershoot) : std::max(newOvershoot, -mMaxOvershoot)) / mMaxOvershoot;
+      current = (newOvershoot > 0.0f ? std::min(newOvershoot, mMaxOvershoot) : std::max(newOvershoot, -mMaxOvershoot)) / mMaxOvershoot;
     }
-    return 0.0f;
+    else
+    {
+      current = 0.0f;
+    }
   }
 
   float mMaxOvershoot;
@@ -488,14 +471,12 @@ struct OvershootYConstraint
  *
  * Generates position-delta property based on scroll-position + scroll-offset properties.
  */
-Vector3 InternalPositionDeltaConstraint(const Vector3&    current,
-                                        const PropertyInput& scrollPositionProperty,
-                                        const PropertyInput& scrollOffsetProperty)
+void InternalPositionDeltaConstraint( Vector3& current, const PropertyInputContainer& inputs )
 {
-  const Vector3& scrollPosition = scrollPositionProperty.GetVector3();
-  const Vector3& scrollOffset = scrollOffsetProperty.GetVector3();
+  const Vector3& scrollPosition = inputs[0]->GetVector3();
+  const Vector3& scrollOffset = inputs[1]->GetVector3();
 
-  return scrollPosition + scrollOffset;
+  current = scrollPosition + scrollOffset;
 }
 
 /**
@@ -514,18 +495,15 @@ struct InternalFinalConstraint
   {
   }
 
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& scrollPositionProperty,
-                     const PropertyInput& scrollOvershootXProperty,
-                     const PropertyInput& scrollOvershootYProperty)
+  void operator()( Vector3& current, const PropertyInputContainer& inputs )
   {
-    const float& overshootx = scrollOvershootXProperty.GetFloat();
-    const float& overshooty = scrollOvershootYProperty.GetFloat();
+    const float& overshootx = inputs[1]->GetFloat();
+    const float& overshooty = inputs[2]->GetFloat();
     Vector3 offset( mFunctionX(overshootx),
                     mFunctionY(overshooty),
                     0.0f);
 
-    return scrollPositionProperty.GetVector3() - offset;
+    current = inputs[0]->GetVector3() - offset;
   }
 
   AlphaFunction mFunctionX;
@@ -603,7 +581,9 @@ void ScrollView::OnInitialize()
   mInternalActor = Actor::New();
   mInternalActor.SetDrawMode(DrawMode::OVERLAY);
   self.Add(mInternalActor);
-  mInternalActor.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::SIZE, ParentSource( Actor::Property::SIZE ), EqualToConstraint() ) );
+  Constraint constraint = Constraint::New<Vector3>( mInternalActor, Actor::Property::SIZE, EqualToConstraint() );
+  constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+  constraint.Apply();
   mInternalActor.SetParentOrigin(ParentOrigin::CENTER);
   mInternalActor.SetAnchorPoint(AnchorPoint::CENTER);
 
@@ -1151,7 +1131,7 @@ void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunct
 
     if( mScrollMainInternalPrePositionConstraint )
     {
-      self.RemoveConstraint(mScrollMainInternalPrePositionConstraint);
+      mScrollMainInternalPrePositionConstraint.Remove();
     }
   }
 
@@ -2396,7 +2376,7 @@ void ScrollView::OnPan( const PanGesture& gesture )
 
         if( mScrollMainInternalPrePositionConstraint )
         {
-          self.RemoveConstraint(mScrollMainInternalPrePositionConstraint);
+          mScrollMainInternalPrePositionConstraint.Remove();
         }
 
         if( mOvershootIndicator )
@@ -2586,14 +2566,14 @@ void ScrollView::UpdateMainInternalConstraint()
 
   if(mScrollMainInternalPositionConstraint)
   {
-    self.RemoveConstraint(mScrollMainInternalPositionConstraint);
-    self.RemoveConstraint(mScrollMainInternalDeltaConstraint);
-    self.RemoveConstraint(mScrollMainInternalFinalConstraint);
-    self.RemoveConstraint(mScrollMainInternalRelativeConstraint);
+    mScrollMainInternalPositionConstraint.Remove();
+    mScrollMainInternalDeltaConstraint.Remove();
+    mScrollMainInternalFinalConstraint.Remove();
+    mScrollMainInternalRelativeConstraint.Remove();
   }
   if( mScrollMainInternalPrePositionConstraint )
   {
-    self.RemoveConstraint(mScrollMainInternalPrePositionConstraint);
+    mScrollMainInternalPrePositionConstraint.Remove();
   }
 
   // TODO: It's probably better to use a local displacement value as this will give a displacement when scrolling just commences
@@ -2610,48 +2590,55 @@ void ScrollView::UpdateMainInternalConstraint()
   {
     initialPanMask.x = 0.0f;
   }
-  Constraint constraint;
 
   if( mPanning )
   {
-    constraint = Constraint::New<Vector3>( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION,
-                                                      Source( detector, PanGestureDetector::Property::LOCAL_POSITION ),
-                                                      Source( self, Actor::Property::SIZE ),
-                                                      InternalPrePositionConstraint( mPanStartPosition, initialPanMask, mAxisAutoLock, mAxisAutoLockGradient, mLockAxis, mMaxOvershoot, mRulerX->GetDomain(), mRulerY->GetDomain() ) );
-    mScrollMainInternalPrePositionConstraint = self.ApplyConstraint( constraint );
+    mScrollMainInternalPrePositionConstraint = Constraint::New<Vector3>( self,
+                                                                         Toolkit::ScrollView::Property::SCROLL_PRE_POSITION,
+                                                                         InternalPrePositionConstraint( mPanStartPosition,
+                                                                                                        initialPanMask,
+                                                                                                        mAxisAutoLock,
+                                                                                                        mAxisAutoLockGradient,
+                                                                                                        mLockAxis,
+                                                                                                        mMaxOvershoot,
+                                                                                                        mRulerX->GetDomain(),
+                                                                                                        mRulerY->GetDomain() ) );
+    mScrollMainInternalPrePositionConstraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
+    mScrollMainInternalPrePositionConstraint.AddSource( Source( self, Actor::Property::SIZE ) );
+    mScrollMainInternalPrePositionConstraint.Apply();
   }
 
   // 2. Second calculate the clamped position (actual position)
-  constraint = Constraint::New<Vector3>( Toolkit::ScrollView::Property::SCROLL_POSITION,
-                                         LocalSource( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ),
-                                         LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ),
-                                         LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ),
-                                         Source( self, Actor::Property::SIZE ),
-                                         InternalPositionConstraint( mRulerX->GetDomain(),
-                                                                     mRulerY->GetDomain(), mWrapMode ) );
-  mScrollMainInternalPositionConstraint = self.ApplyConstraint( constraint );
+  mScrollMainInternalPositionConstraint = Constraint::New<Vector3>( self,
+                                                                    Toolkit::ScrollView::Property::SCROLL_POSITION,
+                                                                    InternalPositionConstraint( mRulerX->GetDomain(),
+                                                                                                mRulerY->GetDomain(),
+                                                                                                mWrapMode ) );
+  mScrollMainInternalPositionConstraint.AddSource( LocalSource( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ) );
+  mScrollMainInternalPositionConstraint.AddSource( LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
+  mScrollMainInternalPositionConstraint.AddSource( LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
+  mScrollMainInternalPositionConstraint.AddSource( Source( self, Actor::Property::SIZE ) );
+  mScrollMainInternalPositionConstraint.Apply();
 
-  constraint = Constraint::New<Vector3>( Toolkit::ScrollView::Property::SCROLL_POSITION_DELTA,
-                                         LocalSource( Toolkit::ScrollView::Property::SCROLL_POSITION ),
-                                         LocalSource( Toolkit::ScrollView::Property::SCROLL_DOMAIN_OFFSET ),
-                                         InternalPositionDeltaConstraint );
-  mScrollMainInternalDeltaConstraint = self.ApplyConstraint( constraint );
+  mScrollMainInternalDeltaConstraint = Constraint::New<Vector3>( self, Toolkit::ScrollView::Property::SCROLL_POSITION_DELTA, InternalPositionDeltaConstraint );
+  mScrollMainInternalDeltaConstraint.AddSource( LocalSource( Toolkit::ScrollView::Property::SCROLL_POSITION ) );
+  mScrollMainInternalDeltaConstraint.AddSource( LocalSource( Toolkit::ScrollView::Property::SCROLL_DOMAIN_OFFSET ) );
+  mScrollMainInternalDeltaConstraint.Apply();
 
-  constraint = Constraint::New<Vector3>( Toolkit::ScrollView::Property::SCROLL_FINAL,
-                                         LocalSource( Toolkit::ScrollView::Property::SCROLL_POSITION ),
-                                         LocalSource( Toolkit::ScrollView::Property::OVERSHOOT_X ),
-                                         LocalSource( Toolkit::ScrollView::Property::OVERSHOOT_Y ),
-                                         InternalFinalConstraint( FinalDefaultAlphaFunction,
-                                                                  FinalDefaultAlphaFunction ) );
-  mScrollMainInternalFinalConstraint = self.ApplyConstraint( constraint );
+  mScrollMainInternalFinalConstraint = Constraint::New<Vector3>( self, Toolkit::ScrollView::Property::SCROLL_FINAL,
+                                                                 InternalFinalConstraint( FinalDefaultAlphaFunction,
+                                                                                          FinalDefaultAlphaFunction ) );
+  mScrollMainInternalFinalConstraint .AddSource( LocalSource( Toolkit::ScrollView::Property::SCROLL_POSITION ) );
+  mScrollMainInternalFinalConstraint .AddSource( LocalSource( Toolkit::ScrollView::Property::OVERSHOOT_X ) );
+  mScrollMainInternalFinalConstraint .AddSource( LocalSource( Toolkit::ScrollView::Property::OVERSHOOT_Y ) );
+  mScrollMainInternalFinalConstraint.Apply();
 
-  constraint = Constraint::New<Vector3>( Toolkit::Scrollable::Property::SCROLL_RELATIVE_POSITION,
-                                         LocalSource( Toolkit::ScrollView::Property::SCROLL_POSITION ),
-                                         LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ),
-                                         LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ),
-                                         LocalSource( Actor::Property::SIZE ),
-                                         InternalRelativePositionConstraint );
-  mScrollMainInternalRelativeConstraint = self.ApplyConstraint( constraint );
+  mScrollMainInternalRelativeConstraint = Constraint::New<Vector3>( self, Toolkit::Scrollable::Property::SCROLL_RELATIVE_POSITION, InternalRelativePositionConstraint );
+  mScrollMainInternalRelativeConstraint.AddSource( LocalSource( Toolkit::ScrollView::Property::SCROLL_POSITION ) );
+  mScrollMainInternalRelativeConstraint.AddSource( LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
+  mScrollMainInternalRelativeConstraint.AddSource( LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
+  mScrollMainInternalRelativeConstraint.AddSource( LocalSource( Actor::Property::SIZE ) );
+  mScrollMainInternalRelativeConstraint.Apply();
 
   // When panning we want to make sure overshoot values are affected by pre position and post position
   SetOvershootConstraintsEnabled(!mWrapMode);
@@ -2663,26 +2650,24 @@ void ScrollView::SetOvershootConstraintsEnabled(bool enabled)
   // remove and reset, it may now be in wrong order with the main internal constraints
   if( mScrollMainInternalOvershootXConstraint )
   {
-    self.RemoveConstraint(mScrollMainInternalOvershootXConstraint);
+    mScrollMainInternalOvershootXConstraint.Remove();
     mScrollMainInternalOvershootXConstraint.Reset();
-    self.RemoveConstraint(mScrollMainInternalOvershootYConstraint);
+    mScrollMainInternalOvershootYConstraint.Remove();
     mScrollMainInternalOvershootYConstraint.Reset();
   }
   if( enabled )
   {
-    Constraint constraint = Constraint::New<float>( Toolkit::ScrollView::Property::OVERSHOOT_X,
-                                           LocalSource( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ),
-                                           LocalSource( Toolkit::ScrollView::Property::SCROLL_POSITION ),
-                                           LocalSource( Toolkit::Scrollable::Property::CAN_SCROLL_HORIZONTAL ),
-                                           OvershootXConstraint(mMaxOvershoot.x) );
-    mScrollMainInternalOvershootXConstraint = self.ApplyConstraint( constraint );
+    mScrollMainInternalOvershootXConstraint= Constraint::New<float>( self, Toolkit::ScrollView::Property::OVERSHOOT_X, OvershootXConstraint(mMaxOvershoot.x) );
+    mScrollMainInternalOvershootXConstraint.AddSource( LocalSource( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ) );
+    mScrollMainInternalOvershootXConstraint.AddSource( LocalSource( Toolkit::ScrollView::Property::SCROLL_POSITION ) );
+    mScrollMainInternalOvershootXConstraint.AddSource( LocalSource( Toolkit::Scrollable::Property::CAN_SCROLL_HORIZONTAL ) );
+    mScrollMainInternalOvershootXConstraint.Apply();
 
-    constraint = Constraint::New<float>( Toolkit::ScrollView::Property::OVERSHOOT_Y,
-                                           LocalSource( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ),
-                                           LocalSource( Toolkit::ScrollView::Property::SCROLL_POSITION ),
-                                           LocalSource( Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL ),
-                                           OvershootYConstraint(mMaxOvershoot.y) );
-    mScrollMainInternalOvershootYConstraint = self.ApplyConstraint( constraint );
+    mScrollMainInternalOvershootYConstraint = Constraint::New<float>( self, Toolkit::ScrollView::Property::OVERSHOOT_Y, OvershootYConstraint(mMaxOvershoot.y) );
+    mScrollMainInternalOvershootYConstraint.AddSource( LocalSource( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ) );
+    mScrollMainInternalOvershootYConstraint.AddSource( LocalSource( Toolkit::ScrollView::Property::SCROLL_POSITION ) );
+    mScrollMainInternalOvershootYConstraint.AddSource( LocalSource( Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL ) );
+    mScrollMainInternalOvershootYConstraint.Apply();
   }
   else
   {
@@ -2705,21 +2690,19 @@ void ScrollView::SetInternalConstraints()
   Constraint constraint;
 
   // MoveActor (scrolling)
-  constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
-                                         Source( self, Toolkit::ScrollView::Property::SCROLL_POSITION ),
-                                         MoveActorConstraint );
+  constraint = Constraint::New<Vector3>( self, Actor::Property::POSITION, MoveActorConstraint );
+  constraint.AddSource( Source( self, Toolkit::ScrollView::Property::SCROLL_POSITION ) );
   constraint.SetRemoveAction(Constraint::Discard);
   ApplyConstraintToBoundActors(constraint);
 
   // WrapActor (wrap functionality)
-  constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
-                                                 LocalSource( Actor::Property::SCALE ),
-                                                 LocalSource( Actor::Property::ANCHOR_POINT ),
-                                                 LocalSource( Actor::Property::SIZE ),
-                                                 Source( self, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ),
-                                                 Source( self, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ),
-                                                 Source( self, Toolkit::ScrollView::Property::WRAP ),
-                                                 WrapActorConstraint );
+  constraint = Constraint::New<Vector3>( self, Actor::Property::POSITION, WrapActorConstraint );
+  constraint.AddSource( LocalSource( Actor::Property::SCALE ) );
+  constraint.AddSource( LocalSource( Actor::Property::ANCHOR_POINT ) );
+  constraint.AddSource( LocalSource( Actor::Property::SIZE ) );
+  constraint.AddSource( Source( self, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
+  constraint.AddSource( Source( self, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
+  constraint.AddSource( Source( self, Toolkit::ScrollView::Property::WRAP ) );
   constraint.SetRemoveAction(Constraint::Discard);
   ApplyConstraintToBoundActors(constraint);
 }
