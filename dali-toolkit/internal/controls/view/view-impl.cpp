@@ -152,7 +152,8 @@ void View::SetBackground( ImageActor backgroundImage )
   }
 
   backgroundImage.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-  backgroundImage.SetRelayoutEnabled( false );    // We will scale its size manually
+  backgroundImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  backgroundImage.SetSizeScalePolicy( FILL_WITH_ASPECT_RATIO );
   mBackgroundLayer.Add( backgroundImage );
 
   RelayoutRequest();
@@ -291,18 +292,6 @@ void View::OnInitialize()
   if( mFullScreen )
   {
     Self().SetSize( Stage::GetCurrent().GetSize() );
-  }
-}
-
-void View::OnRelayout( const Vector2& size, RelayoutContainer& container )
-{
-  if( mBackgroundLayer )
-  {
-    if( mBackgroundLayer && mBackgroundLayer.GetChildCount() > 0 )
-    {
-      Actor background = mBackgroundLayer.GetChildAt(0);
-      background.SetScale( FillXYKeepAspectRatio( Vector3( size.width, size.height, 1.0f ), background.GetTargetSize() ) );
-    }
   }
 }
 

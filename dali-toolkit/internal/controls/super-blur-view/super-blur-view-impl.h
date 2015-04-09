@@ -119,11 +119,6 @@ private: // from Control
    */
   virtual void OnControlSizeSet(const Vector3& targetSize);
 
-  /**
-   * @copydoc Control::OnRelayout()
-   */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
-
 private:
 
   /**
