@@ -70,6 +70,31 @@ namespace Toolkit
 namespace Text
 {
 
+struct Controller::FontDefaults
+{
+  FontDefaults()
+  : mDefaultPointSize(0.0f),
+    mFontId(0u)
+  {
+  }
+
+  FontId GetFontId( TextAbstraction::FontClient& fontClient )
+  {
+    if( !mFontId )
+    {
+      Dali::TextAbstraction::PointSize26Dot6 pointSize = mDefaultPointSize*64;
+      mFontId = fontClient.GetFontId( mDefaultFontFamily, mDefaultFontStyle, pointSize );
+    }
+
+    return mFontId;
+  }
+
+  std::string mDefaultFontFamily;
+  std::string mDefaultFontStyle;
+  float mDefaultPointSize;
+  FontId mFontId;
+};
+
 struct Controller::TextInput
 {
   // Used to queue input events until DoRelayout()
@@ -603,31 +628,6 @@ struct Controller::TextInput
   bool mHorizontalScrollingEnabled : 1; ///< True if horizontal scrolling is enabled
   bool mVerticalScrollingEnabled   : 1; ///< True if vertical scrolling is enabled
   bool mUpdateCursorPosition       : 1; ///< True if the visual position of the cursor must be recalculated
-};
-
-struct Controller::FontDefaults
-{
-  FontDefaults()
-  : mDefaultPointSize(0.0f),
-    mFontId(0u)
-  {
-  }
-
-  FontId GetFontId( TextAbstraction::FontClient& fontClient )
-  {
-    if( !mFontId )
-    {
-      Dali::TextAbstraction::PointSize26Dot6 pointSize = mDefaultPointSize*64;
-      mFontId = fontClient.GetFontId( mDefaultFontFamily, mDefaultFontStyle, pointSize );
-    }
-
-    return mFontId;
-  }
-
-  std::string mDefaultFontFamily;
-  std::string mDefaultFontStyle;
-  float mDefaultPointSize;
-  FontId mFontId;
 };
 
 struct Controller::Impl
