@@ -71,24 +71,21 @@ struct IndicatorPositionConstraint
 
   /**
    * Constraint operator
-   * @param[in] current The current indicator position
-   * @param[in] indicatorSizeProperty The size of indicator.
-   * @param[in] parentSizeProperty The parent size of indicator.
-   * @param[in] scrollPositionProperty The scroll position of the scrollable container // (from 0.0 -> 1.0 in each axis)
+   * @param[in,out] current The current indicator position
+   * @param[in] inputs Contains the size of indicator, the size of indicator's parent, and the scroll position of the scrollable container (from 0.0 -> 1.0 in each axis)
    * @return The new indicator position is returned.
    */
-  Vector3 operator()(const Vector3& current,
-                     const PropertyInput& indicatorSizeProperty,
-                     const PropertyInput& parentSizeProperty,
-                     const PropertyInput& scrollPositionProperty)
+  void operator()( Vector3& current, const PropertyInputContainer& inputs )
   {
-    Vector3 indicatorSize = indicatorSizeProperty.GetVector3();
-    Vector3 parentSize = parentSizeProperty.GetVector3();
-    float scrollPosition = scrollPositionProperty.GetFloat();
+    const Vector3& indicatorSize = inputs[0]->GetVector3();
+    const Vector3& parentSize = inputs[1]->GetVector3();
+    float scrollPosition = inputs[2]->GetFloat();
 
     const float domainSize = fabs(mMaxPosition - mMinPosition);
     float relativePosition = (mMaxPosition - scrollPosition) / domainSize;
-    return Vector3(current.x, relativePosition * (parentSize.height - indicatorSize.height), DEFAULT_SLIDER_DEPTH);
+
+    current.y = relativePosition * ( parentSize.height - indicatorSize.height );
+    current.z = DEFAULT_SLIDER_DEPTH;
   }
 
   float mMinPosition;  ///< The minimum scroll position
@@ -198,13 +195,6 @@ void ScrollBar::ApplyConstraints()
 {
   if( mScrollConnector )
   {
-    Constraint constraint;
-
-    if(mIndicatorSizeConstraint)
-    {
-      mIndicator.RemoveConstraint(mIndicatorSizeConstraint);
-    }
-
     // Set indicator height according to the indicator's height policy
     if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
     {
@@ -217,15 +207,14 @@ void ScrollBar::ApplyConstraints()
 
     if(mIndicatorPositionConstraint)
     {
-      mIndicator.RemoveConstraint(mIndicatorPositionConstraint);
+      mIndicatorPositionConstraint.Remove();
     }
 
-    constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
-                                           LocalSource( Actor::Property::SIZE ),
-                                           ParentSource( Actor::Property::SIZE ),
-                                           Source( mScrollPositionObject, Toolkit::ScrollConnector::SCROLL_POSITION ),
-                                           IndicatorPositionConstraint( mScrollConnector.GetMinLimit(), mScrollConnector.GetMaxLimit() ) );
-    mIndicatorPositionConstraint = mIndicator.ApplyConstraint( constraint );
+    mIndicatorPositionConstraint = Constraint::New<Vector3>( mIndicator, Actor::Property::POSITION, IndicatorPositionConstraint( mScrollConnector.GetMinLimit(), mScrollConnector.GetMaxLimit() ) );
+    mIndicatorPositionConstraint.AddSource( LocalSource( Actor::Property::SIZE ) );
+    mIndicatorPositionConstraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+    mIndicatorPositionConstraint.AddSource( Source( mScrollPositionObject, Toolkit::ScrollConnector::SCROLL_POSITION ) );
+    mIndicatorPositionConstraint.Apply();
   }
 }
 

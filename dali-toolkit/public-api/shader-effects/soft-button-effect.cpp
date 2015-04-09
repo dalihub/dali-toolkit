@@ -16,7 +16,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-input.h>
 
@@ -58,20 +57,14 @@ const float SOFT_BUTTON_RECTANGLE_SIZE_SCALE_DEFAULT = 0.5f;
 } // namespace
 
 /**
- * ReciprocalConstraint
+ * InverseConstraint
  *
  * f(current, property) = 1.0 / property
  */
-struct ReciprocalConstraint
+void InverseConstraint( float& current, const PropertyInputContainer& inputs )
 {
-  ReciprocalConstraint(){}
-
-  float operator()(const float current, const PropertyInput& property)
-  {
-    return 1.0f / property.GetFloat();
-  }
-};
-
+  current = 1.0f / inputs[0]->GetFloat();
+}
 
 ////////////////////////////////////////////////////
 //
@@ -373,8 +366,9 @@ SoftButtonEffect SoftButtonEffect::New(Type type)
     // precalc 1.0 / uInsideCircleSizeScale on CPU to save shader insns, using constraint to tie to the normal property
     Dali::Property::Index insideCircleSizeScalePropertyIndex = handle.GetPropertyIndex(SOFT_BUTTON_INSIDE_SHAPE_SIZE_SCALE_PROPERTY_NAME);
     Dali::Property::Index recipInsideCircleSizeScalePropertyIndex = handle.GetPropertyIndex(SOFT_BUTTON_RECIP_INSIDE_SHAPE_SIZE_SCALE_PROPERTY_NAME);
-    Constraint constraint = Constraint::New<float>( recipInsideCircleSizeScalePropertyIndex, LocalSource(insideCircleSizeScalePropertyIndex), ReciprocalConstraint());
-    handle.ApplyConstraint(constraint);
+    Constraint constraint = Constraint::New<float>( handle, recipInsideCircleSizeScalePropertyIndex, InverseConstraint );
+    constraint.AddSource( LocalSource(insideCircleSizeScalePropertyIndex) );
+    constraint.Apply();
   }
 
   return handle;

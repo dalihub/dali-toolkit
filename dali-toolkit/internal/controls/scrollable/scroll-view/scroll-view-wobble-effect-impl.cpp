@@ -89,19 +89,14 @@ struct ScrollViewWobbleEffectConstraint
   }
 
   /**
-   * @param[out] current The new wobble value
-   * @param[in] propertyTime The current time since the wobble effect started
-   * @param[in] propertyPosition The scroll-position
-   * @param[in] propertyOffset The scroll-overshoot
+   * @param[in,out] direction The new wobble value
+   * @param[in] inputs Contains:
+   *                    The current time since the wobble effect started
+   *                    The scroll-position
+   *                    The scroll-overshoot x & y
    */
-  Vector3 operator()(const Vector3& current,
-                    const PropertyInput& propertyTime,
-                    const PropertyInput& propertyPosition,
-                    const PropertyInput& propertyOffsetX,
-                    const PropertyInput& propertyOffsetY)
+  void operator()( Vector3& direction, const PropertyInputContainer& inputs )
   {
-    Vector3 dir;
-
     if(mStabilized)
     {
       // check if animation cycle id has changed (if so then this spells
@@ -114,9 +109,9 @@ struct ScrollViewWobbleEffectConstraint
     else
     {
       // not stable (i.e. wobbling)
-      Vector3 offset(propertyOffsetX.GetFloat(), propertyOffsetY.GetFloat(), 0.0f);
-      const Vector3& position = propertyPosition.GetVector3() - offset;
-      const float time = propertyTime.GetFloat();
+      Vector3 offset(inputs[2]->GetFloat(), inputs[3]->GetFloat(), 0.0f);
+      const Vector3& position = inputs[1]->GetVector3() - offset;
+      const float time = inputs[0]->GetFloat();
       const float timePassed = time - mTime;
 
       mTime = time;
@@ -159,11 +154,9 @@ struct ScrollViewWobbleEffectConstraint
         }
       }
 
-      dir.x = propertyPosition.GetVector3().x - mChase.x;
-      dir.y = propertyPosition.GetVector3().y - mChase.y;
+      direction.x = position.x - mChase.x;
+      direction.y = position.y - mChase.y;
     } // end else
-
-    return dir;
   }
 
   Vector3 mChase;                                 ///< Chaser position
@@ -240,13 +233,12 @@ void ScrollViewWobbleEffect::AttachActor(Actor actor)
 
   Actor scrollView = GetScrollView();
 
-  Constraint constraint = Constraint::New<Vector3>( propertyEffectOvershoot,
-                                                    Source(scrollView, mPropertyTime),
-                                                    Source(actor, Toolkit::ScrollView::Property::SCROLL_POSITION),
-                                                    Source(actor, Toolkit::ScrollView::Property::OVERSHOOT_X),
-                                                    Source(actor, Toolkit::ScrollView::Property::OVERSHOOT_Y),
-                                                    ScrollViewWobbleEffectConstraint(*this) );
-  actor.ApplyConstraint(constraint);
+  Constraint constraint = Constraint::New<Vector3>( actor, propertyEffectOvershoot, ScrollViewWobbleEffectConstraint(*this) );
+  constraint.AddSource( Source( scrollView, mPropertyTime ) );
+  constraint.AddSource( Source( actor, Toolkit::ScrollView::Property::SCROLL_POSITION ) );
+  constraint.AddSource( Source( actor, Toolkit::ScrollView::Property::OVERSHOOT_X ) );
+  constraint.AddSource( Source( actor, Toolkit::ScrollView::Property::OVERSHOOT_Y ) );
+  constraint.Apply();
 }
 
 void ScrollViewWobbleEffect::DetachActor(Actor actor)

@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/controls/scroll-component/scroll-bar-internal-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/type-registry.h>
@@ -59,11 +58,9 @@ const int SECOND_UNIT(1000);
  * ScrollBarInternal Visibility Constraint
  * Returns whether scroll bar is visible
  */
-bool ScrollBarInternalVisibilityConstraint(const bool& current,
-    const PropertyInput& canScrollProperty)
+void ScrollBarInternalVisibilityConstraint( bool& current, const PropertyInputContainer& inputs )
 {
-  bool canScroll = canScrollProperty.GetBoolean();
-  return canScroll;
+  current = inputs[0]->GetBoolean();
 }
 
 /**
@@ -83,35 +80,26 @@ struct ScrollBarInternalSizeConstraint
 
   /**
    * Constraint operator
-   * @param[in] current The current ScrollBarInternal size
-   * @param[in] scrollMinProperty The container's minimum position.
-   * @param[in] scrollMaxProperty The container's maximum position.
-   * @param[in] scrollDirectionProperty The container's scroll direction.
-   * @param[in] scrollSizeProperty The container's size of viewport.
+   * @param[in,out] current The current ScrollBarInternal size
+   * @param[in] inputs Contains the container's minimum position, its maximum position, its scroll direction & its size of viewport.
    * @return The new ScrollBarInternal position is returned.
    */
-  Vector3 operator()(const Vector3& current,
-                     const PropertyInput& scrollMinProperty,
-                     const PropertyInput& scrollMaxProperty,
-                     const PropertyInput& scrollDirectionProperty,
-                     const PropertyInput& scrollSizeProperty)
+  void operator()( Vector3& current, const PropertyInputContainer& inputs )
   {
-    const Vector3& min = scrollMinProperty.GetVector3();
-    const Vector3& max = scrollMaxProperty.GetVector3();
-    const Vector3& scrollDirection = scrollDirectionProperty.GetVector3();
+    const Vector3& min = inputs[0]->GetVector3();
+    const Vector3& max = inputs[1]->GetVector3();
+    const Vector3& scrollDirection = inputs[2]->GetVector3();
     const Toolkit::ControlOrientation::Type& orientation = static_cast<Toolkit::ControlOrientation::Type>(scrollDirection.z);
-    const Vector3& size = scrollSizeProperty.GetVector3();
+    const Vector3& size = inputs[3]->GetVector3();
     const Vector3 domainSize = max - min;
 
     if (mVertical && Toolkit::IsVertical(orientation))
     {
-      float mod = fabsf(domainSize.height) > size.height ? size.height * ( size.height / fabsf(domainSize.height) ) : size.height * ( (size.height - fabsf(domainSize.height * 0.5f)) / size.height);
-      return Vector3( current.width, mod, current.depth );
+      current.height = fabsf(domainSize.height) > size.height ? size.height * ( size.height / fabsf(domainSize.height) ) : size.height * ( (size.height - fabsf(domainSize.height * 0.5f)) / size.height);
     }
     else
     {
-      float mod = fabsf(domainSize.height) > size.width ? size.width * ( size.width / fabsf(domainSize.height) ) : size.width * ( (size.width - fabsf(domainSize.height * 0.5f)) / size.width);
-      return Vector3( current.width, mod, current.depth );
+      current.height = fabsf(domainSize.height) > size.width ? size.width * ( size.width / fabsf(domainSize.height) ) : size.width * ( (size.width - fabsf(domainSize.height * 0.5f)) / size.width);
     }
   }
 
@@ -135,23 +123,22 @@ struct ScrollBarInternalRotationConstraint
 
   /**
    * Constraint operator
-   * @param[in] current The current ScrollBarInternal rotation
+   * @param[in,out] current The current ScrollBarInternal rotation
    * @param[in] scrollDirectionProperty The container's scroll direction.
    * @return The new ScrollBarInternal rotation is returned.
    */
-  Quaternion operator()(const Quaternion& current,
-                        const PropertyInput& scrollDirectionProperty)
+  void operator()( Quaternion& current, const PropertyInputContainer& inputs )
   {
-    const Vector3& scrollDirection = scrollDirectionProperty.GetVector3();
+    const Vector3& scrollDirection = inputs[0]->GetVector3();
     const Toolkit::ControlOrientation::Type& orientation = static_cast<Toolkit::ControlOrientation::Type>(scrollDirection.z);
 
     if( (mVertical && Toolkit::IsVertical(orientation)) || (!mVertical && Toolkit::IsHorizontal(orientation)) )
     {
-      return Quaternion(0.0f, Vector3::ZAXIS);
+      current = Quaternion(0.0f, Vector3::ZAXIS);
     }
     else
     {
-      return Quaternion(0.5f * Math::PI, Vector3::ZAXIS);
+      current = Quaternion(0.5f * Math::PI, Vector3::ZAXIS);
     }
   }
 
@@ -178,29 +165,24 @@ struct ScrollBarInternalPositionConstraint
 
   /**
    * Constraint operator
-   * @param[in] current The current ScrollBarInternal position
-   * @param[in] scrollBarSizeProperty ScrollBarInternal size
-   * @param[in] scrollRelativePositionProperty The container's relative position (from 0.0 -> 1.0 in each axis)
-   * @param[in] scrollMinProperty The container's minimum position.
-   * @param[in] scrollMaxProperty The container's maximum position.
-   * @param[in] scrollDirectionProperty The container's scroll direction.
-   * @param[in] scrollSizeProperty The container's size of viewport.
+   * @param[in] finalPosition The current ScrollBarInternal position
+   * @param[in] inputs Contains:
+   *                    The ScrollBarInternal size,
+   *                    The container's relative position (from 0.0 -> 1.0 in each axis),
+   *                    The container's minimum position,
+   *                    The container's maximum position,
+   *                    The container's scroll direction,
+   *                    The container's size of viewport.
    * @return The new ScrollBarInternal position is returned.
    */
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& scrollBarSizeProperty,
-                     const PropertyInput& scrollRelativePositionProperty,
-                     const PropertyInput& scrollMinProperty,
-                     const PropertyInput& scrollMaxProperty,
-                     const PropertyInput& scrollDirectionProperty,
-                     const PropertyInput& scrollSizeProperty)
+  void operator()( Vector3& finalPosition, const PropertyInputContainer& inputs )
   {
-    Vector3 barSize = scrollBarSizeProperty.GetVector3();
-    Vector3 relativePosition = scrollRelativePositionProperty.GetVector3();
-    Vector3 size = scrollSizeProperty.GetVector3();
-    const Vector3& min = scrollMinProperty.GetVector3();
-    const Vector3& max = scrollMaxProperty.GetVector3();
-    const Vector3& scrollDirection = scrollDirectionProperty.GetVector3();
+    const Vector3& barSize = inputs[0]->GetVector3();
+    const Vector3& relativePosition = inputs[1]->GetVector3();
+    const Vector3& min = inputs[2]->GetVector3();
+    const Vector3& max = inputs[3]->GetVector3();
+    const Vector3& scrollDirection = inputs[4]->GetVector3();
+    const Vector3& size = inputs[5]->GetVector3();
     const Toolkit::ControlOrientation::Type& orientation = static_cast<Toolkit::ControlOrientation::Type>(scrollDirection.z);
 
     Vector3 domainSize = max - min;
@@ -256,7 +238,7 @@ struct ScrollBarInternalPositionConstraint
     Vector3 maskedRelativePosition = Toolkit::IsVertical(orientation) ? Vector3(relativePosition.x * (size.x-barSize.y), relativePosition.y * (size.y-barSize.y), 0.0f) * mask
                                    : Vector3(relativePosition.y * (size.x-barSize.y), relativePosition.x * (size.y-barSize.y), 0.0f) * mask;
 
-    Vector3 finalPosition = relativeOffset * size + absoluteOffset + maskedRelativePosition;
+    finalPosition = relativeOffset * size + absoluteOffset + maskedRelativePosition;
 
     // If Wrapped Slider, then position 1 domain either before or after current slider.
     if(mWrap)
@@ -279,8 +261,6 @@ struct ScrollBarInternalPositionConstraint
         finalPosition.y -= size.y;
       }
     }
-
-    return finalPosition;
   }
 
   bool mVertical;           ///< Whether vertical or horizontal.
@@ -308,17 +288,14 @@ struct ScrollBarInternalHitSizeConstraint
   /**
    * Constraint operator
    * @param[in] current The current HitSize
-   * @param[in] scrollDirectionProperty The container's scroll direction.
-   * @param[in] scrollSizeProperty The container's size of viewport.
+   * @param[in] inputs Contains the container's scroll direction and size of its viewport.
    * @return The new ScrollBarInternal Hit Area size is returned.
    */
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& scrollDirectionProperty,
-                     const PropertyInput& scrollSizeProperty)
+  void operator()( Vector3& current, const PropertyInputContainer& inputs )
   {
-    const Vector3& scrollDirection = scrollDirectionProperty.GetVector3();
+    const Vector3& scrollDirection = inputs[0]->GetVector3();
     const Toolkit::ControlOrientation::Type& orientation = static_cast<Toolkit::ControlOrientation::Type>(scrollDirection.z);
-    Vector3 size = scrollSizeProperty.GetVector3();
+    const Vector3& size = inputs[1]->GetVector3();
 
     Vector3 mask;            // Mask size aspect of hit area.
     Vector3 offset;          // Add Offset size.
@@ -334,7 +311,7 @@ struct ScrollBarInternalHitSizeConstraint
       offset = Vector3::YAXIS * mThickness;
     }
 
-    return size * mask + offset;
+    current = size * mask + offset;
   }
 
   bool mVertical;           ///< Whether vertical or horizontal.
@@ -392,47 +369,47 @@ ScrollBarInternal::ScrollBarInternal(Toolkit::Scrollable& container, bool vertic
 
   // target the container to observe for scrolling
   Actor target = mContainer.Self();
-  Constraint constraint = Constraint::New<bool>( Actor::Property::VISIBLE,
-                                      Source( target, vertical ? Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL : Toolkit::Scrollable::Property::CAN_SCROLL_HORIZONTAL),
-                                      ScrollBarInternalVisibilityConstraint );
-  mSlider.ApplyConstraint( constraint );
-  mSliderWrap.ApplyConstraint( constraint );
+  Constraint constraint = Constraint::New<bool>( mSlider, Actor::Property::VISIBLE, ScrollBarInternalVisibilityConstraint );
+  constraint.AddSource( Source( target, vertical ? Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL : Toolkit::Scrollable::Property::CAN_SCROLL_HORIZONTAL ) );
+  constraint.Apply();
 
-  constraint = Constraint::New<Vector3>( Actor::Property::SIZE,
-                                                   Source( target, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ),
-                                                   Source( target, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ),
-                                                   Source( target, Toolkit::Scrollable::Property::SCROLL_DIRECTION ),
-                                                   Source( target, Actor::Property::SIZE ),
-                                                   ScrollBarInternalSizeConstraint( vertical ) );
-  mSlider.ApplyConstraint( constraint );
-  mSliderWrap.ApplyConstraint( constraint );
+  constraint = constraint.Clone( mSliderWrap );
+  constraint.Apply();
 
-  constraint = Constraint::New<Quaternion>( Actor::Property::ORIENTATION,
-                                            Source( target, Toolkit::Scrollable::Property::SCROLL_DIRECTION ),
-                                            ScrollBarInternalRotationConstraint( vertical ) );
-  mSlider.ApplyConstraint( constraint );
-  mSliderWrap.ApplyConstraint( constraint );
+  constraint = Constraint::New<Vector3>( mSlider, Actor::Property::SIZE, ScrollBarInternalSizeConstraint( vertical ) );
+  constraint.AddSource( Source( target, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
+  constraint.AddSource( Source( target, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
+  constraint.AddSource( Source( target, Toolkit::Scrollable::Property::SCROLL_DIRECTION ) );
+  constraint.AddSource( Source( target, Actor::Property::SIZE ) );
+  constraint.Apply();
 
-  constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
-                                         Source( mSlider, Actor::Property::SIZE),
-                                         Source( target, Toolkit::Scrollable::Property::SCROLL_RELATIVE_POSITION ),
-                                         Source( target, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ),
-                                         Source( target, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ),
-                                         Source( target, Toolkit::Scrollable::Property::SCROLL_DIRECTION ),
-                                         Source( target, Actor::Property::SIZE ),
-                                         ScrollBarInternalPositionConstraint(vertical) );
+  constraint = constraint.Clone( mSliderWrap );
+  constraint.Apply();
 
-  mSlider.ApplyConstraint( constraint );
+  constraint = Constraint::New<Quaternion>( mSlider, Actor::Property::ORIENTATION, ScrollBarInternalRotationConstraint( vertical ) );
+  constraint.AddSource( Source( target, Toolkit::Scrollable::Property::SCROLL_DIRECTION ) );
+  constraint.Apply();
 
-  constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
-                                         Source( mSlider, Actor::Property::SIZE),
-                                         Source( target, Toolkit::Scrollable::Property::SCROLL_RELATIVE_POSITION ),
-                                         Source( target, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ),
-                                         Source( target, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ),
-                                         Source( target, Toolkit::Scrollable::Property::SCROLL_DIRECTION ),
-                                         Source( target, Actor::Property::SIZE ),
-                                         ScrollBarInternalPositionConstraint(vertical, true) );
-  mSliderWrap.ApplyConstraint( constraint );
+  constraint = constraint.Clone( mSliderWrap );
+  constraint.Apply();
+
+  constraint = Constraint::New<Vector3>( mSlider, Actor::Property::POSITION, ScrollBarInternalPositionConstraint(vertical) );
+  constraint.AddSource( Source( mSlider, Actor::Property::SIZE) );
+  constraint.AddSource( Source( target, Toolkit::Scrollable::Property::SCROLL_RELATIVE_POSITION ) );
+  constraint.AddSource( Source( target, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
+  constraint.AddSource( Source( target, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
+  constraint.AddSource( Source( target, Toolkit::Scrollable::Property::SCROLL_DIRECTION ) );
+  constraint.AddSource( Source( target, Actor::Property::SIZE ) );
+  constraint.Apply();
+
+  constraint = Constraint::New<Vector3>( mSliderWrap, Actor::Property::POSITION, ScrollBarInternalPositionConstraint(vertical, true) );
+  constraint.AddSource( Source( mSlider, Actor::Property::SIZE) );
+  constraint.AddSource( Source( target, Toolkit::Scrollable::Property::SCROLL_RELATIVE_POSITION ) );
+  constraint.AddSource( Source( target, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
+  constraint.AddSource( Source( target, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
+  constraint.AddSource( Source( target, Toolkit::Scrollable::Property::SCROLL_DIRECTION ) );
+  constraint.AddSource( Source( target, Actor::Property::SIZE ) );
+  constraint.Apply();
 
   // Add Sliders to internal Actor, to avoid mixing up with regular
   // Actors added by user.
@@ -446,11 +423,10 @@ ScrollBarInternal::ScrollBarInternal(Toolkit::Scrollable& container, bool vertic
   mHitArea.SetPosition(0.0f, 0.0f, 0.2f);
 
   mContainer.AddOverlay( mHitArea );
-  constraint = Constraint::New<Vector3>( Actor::Property::SIZE,
-                                         Source( target, Toolkit::Scrollable::Property::SCROLL_DIRECTION ),
-                                         Source( target, Actor::Property::SIZE ),
-                                         ScrollBarInternalHitSizeConstraint(vertical, BAR_TAB_SIZE.width) );
-  mHitArea.ApplyConstraint( constraint );
+  constraint = Constraint::New<Vector3>( mHitArea, Actor::Property::SIZE, ScrollBarInternalHitSizeConstraint(vertical, BAR_TAB_SIZE.width) );
+  constraint.AddSource( Source( target, Toolkit::Scrollable::Property::SCROLL_DIRECTION ) );
+  constraint.AddSource( Source( target, Actor::Property::SIZE ) );
+  constraint.Apply();
 
   if(vertical)
   {

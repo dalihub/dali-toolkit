@@ -412,7 +412,8 @@ protected:
 protected:
 
   ControlOrientation::Type mOrientation;   ///< the orientation of the layout.
-  AlphaFunction            mAlphaFunction; ///<Alpha function to be applied when removing/adding constraints
+  AlphaFunction            mAlphaFunction; ///< Alpha function to be applied when removing/adding constraints
+  Handle                   mWeightObject;  ///< Weight object gets created to apply the constraints over a certain time
 };
 
 } // namespace Toolkit

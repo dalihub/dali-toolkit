@@ -888,13 +888,13 @@ private:
   Vector2 mMouseWheelScrollDistanceStep;        ///< The step of scroll distance in actor coordinates in X and Y axes for each mouse wheel event received.
 
   //ScrollInternalConstraintsPtr mScrollInternalConstraints;
-  ActiveConstraint mScrollMainInternalPrePositionConstraint;
-  ActiveConstraint mScrollMainInternalPositionConstraint;
-  ActiveConstraint mScrollMainInternalOvershootXConstraint;
-  ActiveConstraint mScrollMainInternalOvershootYConstraint;
-  ActiveConstraint mScrollMainInternalDeltaConstraint;
-  ActiveConstraint mScrollMainInternalFinalConstraint;
-  ActiveConstraint mScrollMainInternalRelativeConstraint;
+  Constraint mScrollMainInternalPrePositionConstraint;
+  Constraint mScrollMainInternalPositionConstraint;
+  Constraint mScrollMainInternalOvershootXConstraint;
+  Constraint mScrollMainInternalOvershootYConstraint;
+  Constraint mScrollMainInternalDeltaConstraint;
+  Constraint mScrollMainInternalFinalConstraint;
+  Constraint mScrollMainInternalRelativeConstraint;
 
   ScrollOvershootIndicatorPtr mOvershootIndicator;
 

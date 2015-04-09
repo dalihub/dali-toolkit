@@ -22,7 +22,6 @@
 #include <stack>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/mesh-actor.h>
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/geometry/mesh.h>
@@ -140,10 +139,11 @@ void SetupBackgroundActor( Actor actor, Property::Index constrainingIndex, const
   actor.SetZ( BACKGROUND_ACTOR_Z_POSITION );
   actor.SetRelayoutEnabled( false );
 
-  Constraint constraint = Constraint::New<Vector3>( constrainingIndex,
-                                                    ParentSource( Actor::Property::SIZE ),
+  Constraint constraint = Constraint::New<Vector3>( actor,
+                                                    constrainingIndex,
                                                     EqualToConstraint() );
-  actor.ApplyConstraint( constraint );
+  constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+  constraint.Apply();
 }
 
 } // unnamed namespace

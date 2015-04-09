@@ -19,8 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-
-// INTERNAL INCLUDES
+#include <dali/public-api/animation/constraint.h>
 
 namespace Dali
 {
@@ -44,21 +43,14 @@ namespace Toolkit
  *
  * Moves an Actor in accordance to scroll position.
  */
-DALI_IMPORT_API Vector3 MoveActorConstraint(const Vector3&    current,
-                                           const PropertyInput& scrollPositionProperty);
+DALI_IMPORT_API void MoveActorConstraint( Vector3& current, const PropertyInputContainer& inputs );
 
 /**
  * Wrap Actor constraint.
  *
  * Wraps an Actors position in accordance to min/max bounds of domain.
  */
-DALI_IMPORT_API Vector3 WrapActorConstraint(const Vector3&    current,
-                                            const PropertyInput& actorScaleProperty,
-                                            const PropertyInput& actorAnchorPointProperty,
-                                            const PropertyInput& actorSizeProperty,
-                                            const PropertyInput& scrollPositionMin,
-                                            const PropertyInput& scrollPositionMax,
-                                            const PropertyInput& scrollWrap);
+DALI_IMPORT_API void WrapActorConstraint( Vector3& position, const PropertyInputContainer& inputs );
 
 } // namespace Toolkit
 
