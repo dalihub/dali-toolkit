@@ -441,11 +441,6 @@ void VisualModel::SetUnderlineEnabled( bool enabled )
   mUnderlineEnabled = enabled;
 }
 
-void VisualModel::SetUnderlineHeight( float height )
-{
-  mUnderlineHeight = height;
-}
-
 const Vector4& VisualModel::GetTextColor() const
 {
   return mTextColor;
@@ -471,11 +466,6 @@ bool VisualModel::IsUnderlineEnabled() const
   return mUnderlineEnabled;
 }
 
-float VisualModel::GetUnderlineHeight() const
-{
-  return mUnderlineHeight;
-}
-
 void VisualModel::ClearCaches()
 {
   mCachedLineIndex = 0u;
@@ -497,12 +487,11 @@ VisualModel::VisualModel()
   mShadowColor(),
   mUnderlineColor(),
   mShadowOffset(),
-  mUnderlineHeight( 0.0f ),
-  mUnderlineEnabled( false ),
-  mUnderlineColorSet( false ),
   mNaturalSize(),
   mActualSize(),
-  mCachedLineIndex( 0u )
+  mCachedLineIndex( 0u ),
+  mUnderlineEnabled( false ),
+  mUnderlineColorSet( false )
 {
 }
 

@@ -19,7 +19,6 @@
 #include <dali-toolkit/internal/text/rendering/atlas/text-atlas-renderer.h>
 
 // EXTERNAL INCLUDES
-#include <math.h>
 #include <dali/dali.h>
 #include <dali/integration-api/debug.h>
 
@@ -39,10 +38,6 @@ using namespace Dali::Toolkit::Text;
 
 namespace
 {
-  const float ZERO( 0.0f );
-  const float HALF( 0.5f );
-  const float ONE( 1.0f );
-  const float TWO( 2.0f );
   const Vector2 DEFAULT_ATLAS_SIZE( 512.0f, 512.0f );
   const Vector2 DEFAULT_BLOCK_SIZE( 16.0f, 16.0f );
   const Vector2 PADDING( 4.0f, 4.0f ); // Allow for variation in font glyphs
@@ -107,21 +102,19 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                   const Vector4& textColor,
                   const Vector2& shadowOffset,
                   const Vector4& shadowColor,
-                  bool underlineEnabled,
-                  const Vector4& underlineColor,
-                  float underlineHeight )
+                  float underlineEnabled,
+                  const Vector4& underlineColor )
   {
     AtlasManager::AtlasSlot slot;
     std::vector< MeshRecord > meshContainer;
     Vector< Extent > extents;
 
-    float currentUnderlinePosition = ZERO;
-    float currentUnderlineThickness = underlineHeight;
-
+    float currentUnderlinePosition = 0.0f;
+    float currentUnderlineThickness = 0.0f;
     FontId lastFontId = 0;
     Style style = STYLE_NORMAL;
 
-    if ( fabsf( shadowOffset.x ) > Math::MACHINE_EPSILON_1 || fabsf( shadowOffset.y ) > Math::MACHINE_EPSILON_1 )
+    if ( shadowOffset.x != 0.0f || shadowOffset.y != 0.0f )
     {
       style = STYLE_DROP_SHADOW;
     }
@@ -147,33 +140,13 @@ struct AtlasRenderer::Impl : public ConnectionTracker
           // We need to fetch fresh font underline metrics
           FontMetrics fontMetrics;
           mFontClient.GetFontMetrics( glyph.fontId, fontMetrics );
-          currentUnderlinePosition = FontMetricsRoundUp( fabsf( fontMetrics.underlinePosition ) );
-          float descender = FontMetricsRoundUp( fabsf( fontMetrics.descender ) );
+          currentUnderlinePosition = fontMetrics.underlinePosition;
+          currentUnderlineThickness = fontMetrics.underlineThickness;
 
-          if ( underlineHeight == ZERO )
+          // Ensure that an underline is at least 1 pixel high
+          if ( currentUnderlineThickness < 1.0f )
           {
-            currentUnderlineThickness = fontMetrics.underlineThickness;
-
-            // Ensure underline will be at least a pixel high
-            if ( currentUnderlineThickness < ONE )
-            {
-              currentUnderlineThickness = ONE;
-            }
-            else
-            {
-              currentUnderlineThickness = FontMetricsRoundUp( currentUnderlineThickness );
-            }
-          }
-
-          // Clamp the underline position at the font descender and check for ( as EFL describes it ) a broken font
-          if ( currentUnderlinePosition > descender )
-          {
-            currentUnderlinePosition = descender;
-          }
-          if ( ZERO == currentUnderlinePosition )
-          {
-            // Move offset down by one ( EFL behavior )
-            currentUnderlinePosition = ONE;
+            currentUnderlineThickness = 1.0f;
           }
         }
 
@@ -200,6 +173,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                 mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_SIZE, mBlockSizes[ j ].mNeededBlockSize );
               }
             }
+            lastFontId = glyph.fontId;
           }
 
           // Glyph doesn't currently exist in atlas so upload
@@ -225,7 +199,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                         currentUnderlineThickness,
                         slot );
       }
-      lastFontId = glyph.fontId;
     }
 
     if ( underlineEnabled )
@@ -316,13 +289,14 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       uint32_t index = 0;
       for ( std::vector< MeshRecord >::iterator mIt = meshContainer.begin(); mIt != meshContainer.end(); ++mIt, ++index )
       {
-        if ( slot.mAtlasId == mIt->mAtlasId && color == mIt->mColor )
+        if ( slot.mAtlasId == mIt->mAtlasId )
         {
           // Stitch the mesh to the existing mesh and adjust any extents
           mGlyphManager.StitchMesh( mIt->mMeshData, newMeshData );
           AdjustExtents( extents,
                          meshContainer,
                          index,
+                         color,
                          left,
                          right,
                          baseLine,
@@ -344,6 +318,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       AdjustExtents( extents,
                      meshContainer,
                      meshContainer.size() - 1u,
+                     color,
                      left,
                      right,
                      baseLine,
@@ -356,6 +331,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
   void AdjustExtents( Vector< Extent >& extents,
                       std::vector< MeshRecord>& meshRecords,
                       uint32_t index,
+                      const Vector4& color,
                       float left,
                       float right,
                       float baseLine,
@@ -367,17 +343,21 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     {
       if ( Equals( baseLine, eIt->mBaseLine ) )
       {
-        foundExtent = true;
-        if ( left < eIt->mLeft )
+        // If we've found an extent with the same color then we don't need to create a new extent
+        if ( color == meshRecords[ index ].mColor )
         {
-          eIt->mLeft = left;
+          foundExtent = true;
+          if ( left < eIt->mLeft )
+          {
+            eIt->mLeft = left;
+          }
+          if ( right > eIt->mRight  )
+          {
+            eIt->mRight = right;
+          }
         }
-        if ( right > eIt->mRight  )
-        {
-          eIt->mRight = right;
-        }
-
-        if ( underlinePosition > eIt->mUnderlinePosition )
+        // Font metrics use negative values for lower underline positions
+        if ( underlinePosition < eIt->mUnderlinePosition )
         {
           eIt->mUnderlinePosition = underlinePosition;
         }
@@ -451,25 +431,15 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     }
   }
 
-  float FontMetricsRoundUp( float value )
-  {
-    double integral_part;
-    if ( modf( value, &integral_part ) )
-    {
-      return ( static_cast< float >( integral_part ) + 1.0f );
-    }
-    else
-    {
-      return static_cast< float >( integral_part );
-    }
-  }
-
   void GenerateUnderlines( std::vector< MeshRecord>& meshRecords,
                            Vector< Extent >& extents,
                            const Vector4& underlineColor,
                            const Vector4& textColor )
   {
     MeshData newMeshData;
+    const float zero = 0.0f;
+    const float half = 0.5f;
+
     for ( Vector< Extent >::ConstIterator eIt = extents.Begin(); eIt != extents.End(); ++eIt )
     {
       MeshData::VertexContainer newVerts;
@@ -478,28 +448,28 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       Vector2 uv = mGlyphManager.GetAtlasSize( meshRecords[ index ].mAtlasId );
 
       // Make sure we don't hit texture edge for single pixel texture ( filled pixel is in top left of every atlas )
-      float u = HALF / uv.x;
-      float v = HALF / uv.y;
+      float u = half / uv.x;
+      float v = half / uv.y;
       float thickness = eIt->mUnderlineThickness;
-      float baseLine = eIt->mBaseLine + eIt->mUnderlinePosition - ( thickness * HALF );
+      float baseLine = eIt->mBaseLine - eIt->mUnderlinePosition - ( thickness * 0.5f );
       float tlx = eIt->mLeft;
       float brx = eIt->mRight;
 
-      newVerts.push_back( MeshData::Vertex( Vector3( tlx, baseLine, ZERO ),
-                                            Vector2::ZERO,
-                                            Vector3::ZERO ) );
+      newVerts.push_back( MeshData::Vertex( Vector3( tlx, baseLine, zero ),
+                                            Vector2( zero, zero ),
+                                            Vector3( zero, zero, zero ) ) );
 
-      newVerts.push_back( MeshData::Vertex( Vector3( brx, baseLine, ZERO ),
-                                            Vector2( u, ZERO ),
-                                            Vector3::ZERO ) );
+      newVerts.push_back( MeshData::Vertex( Vector3( brx, baseLine, zero ),
+                                            Vector2( u, zero ),
+                                            Vector3( zero, zero, zero ) ) );
 
-      newVerts.push_back( MeshData::Vertex( Vector3( tlx, baseLine + thickness, ZERO ),
-                                            Vector2( ZERO, v ),
-                                            Vector3::ZERO ) );
+      newVerts.push_back( MeshData::Vertex( Vector3( tlx, baseLine + thickness, zero ),
+                                            Vector2( zero, v ),
+                                            Vector3( zero, zero, zero ) ) );
 
-      newVerts.push_back( MeshData::Vertex( Vector3( brx, baseLine + thickness, ZERO ),
+      newVerts.push_back( MeshData::Vertex( Vector3( brx, baseLine + thickness, zero ),
                                             Vector2( u, v ),
-                                            Vector3::ZERO ) );
+                                            Vector3( zero, zero, zero ) ) );
 
       newMeshData.SetVertices( newVerts );
       newMeshData.SetFaceIndices( mFace );
@@ -530,10 +500,12 @@ struct AtlasRenderer::Impl : public ConnectionTracker
   {
     // Scan vertex buffer to determine width and height of effect buffer needed
     MeshData::VertexContainer verts = meshRecord.mMeshData.GetVertices();
+    const float one = 1.0f;
+    const float zero = 0.0f;
     float tlx = verts[ 0 ].x;
     float tly = verts[ 0 ].y;
-    float brx = ZERO;
-    float bry = ZERO;
+    float brx = zero;
+    float bry = zero;
 
     for ( uint32_t i = 0; i < verts.size(); ++i )
     {
@@ -557,8 +529,8 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
     float width = brx - tlx;
     float height = bry - tly;
-    float divWidth = TWO / width;
-    float divHeight = TWO / height;
+    float divWidth = 2.0f / width;
+    float divHeight = 2.0f / height;
 
     // Create a buffer to render to
     meshRecord.mBuffer = FrameBufferImage::New( width, height );
@@ -567,21 +539,21 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     MeshData::VertexContainer vertices;
     MeshData::FaceIndices face;
 
-    vertices.push_back( MeshData::Vertex( Vector3( tlx + shadowOffset.x, tly + shadowOffset.y, ZERO ),
-                                          Vector2::ZERO,
-                                          Vector3::ZERO ) );
+    vertices.push_back( MeshData::Vertex( Vector3( tlx + shadowOffset.x, tly + shadowOffset.y, zero ),
+                                          Vector2( zero, zero ),
+                                          Vector3( zero, zero, zero ) ) );
 
-    vertices.push_back( MeshData::Vertex( Vector3( brx + shadowOffset.x, tly + shadowOffset.y, ZERO ),
-                                          Vector2( ONE, ZERO ),
-                                          Vector3::ZERO ) );
+    vertices.push_back( MeshData::Vertex( Vector3( brx + shadowOffset.x, tly + shadowOffset.y, zero ),
+                                          Vector2( one, zero ),
+                                          Vector3( zero, zero, zero ) ) );
 
-    vertices.push_back( MeshData::Vertex( Vector3( tlx + shadowOffset.x, bry + shadowOffset.y, ZERO ),
-                                          Vector2( ZERO, ONE ),
-                                          Vector3::ZERO ) );
+    vertices.push_back( MeshData::Vertex( Vector3( tlx + shadowOffset.x, bry + shadowOffset.y, zero ),
+                                          Vector2( zero, one ),
+                                          Vector3( zero, zero, zero ) ) );
 
-    vertices.push_back( MeshData::Vertex( Vector3( brx + shadowOffset.x, bry + shadowOffset.y, ZERO ),
-                                          Vector2::ONE,
-                                          Vector3::ZERO ) );
+    vertices.push_back( MeshData::Vertex( Vector3( brx + shadowOffset.x, bry + shadowOffset.y, zero ),
+                                          Vector2( one, one ),
+                                          Vector3( zero, zero, zero ) ) );
 
     MeshData meshData;
     Material newMaterial = Material::New("effect buffer");
@@ -606,8 +578,8 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     for ( uint32_t i = 0; i < verts.size(); ++i )
     {
       MeshData::Vertex vertex = verts[ i ];
-      vertex.x = ( ( vertex.x - tlx ) * divWidth ) - ONE;
-      vertex.y = ( ( vertex.y - tly ) * divHeight ) - ONE;
+      vertex.x = ( ( vertex.x - tlx ) * divWidth ) - one;
+      vertex.y = ( ( vertex.y - tly ) * divHeight ) - one;
       newVerts.push_back( vertex );
     }
 
@@ -704,8 +676,7 @@ RenderableActor AtlasRenderer::Render( Text::ViewInterface& view )
                       view.GetShadowOffset(),
                       view.GetShadowColor(),
                       view.IsUnderlineEnabled(),
-                      view.GetUnderlineColor(),
-                      view.GetUnderlineHeight() );
+                      view.GetUnderlineColor() );
   }
   return mImpl->mActor;
 }
