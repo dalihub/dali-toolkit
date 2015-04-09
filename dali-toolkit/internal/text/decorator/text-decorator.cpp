@@ -116,14 +116,16 @@ struct Decorator::Impl : public ConnectionTracker
     CursorImpl()
     : x(0.0f),
       y(0.0f),
-      height(0.0f),
+      cursorHeight(0.0f),
+      lineHeight(0.0f),
       color(Dali::Color::WHITE)
     {
     }
 
     float x;
     float y;
-    float height;
+    float cursorHeight;
+    float lineHeight;
 
     Vector4 color;
   };
@@ -133,14 +135,14 @@ struct Decorator::Impl : public ConnectionTracker
     SelectionHandleImpl()
     : x(0.0f),
       y(0.0f),
-      cursorHeight(0.0f),
+      lineHeight(0.0f),
       flipped(false)
     {
     }
 
     float x;
     float y;
-    float cursorHeight; ///< Not the handle height
+    float lineHeight; ///< Not the handle height
     bool flipped;
 
     ImageActor actor;
@@ -182,13 +184,13 @@ struct Decorator::Impl : public ConnectionTracker
     {
       mPrimaryCursor.SetPosition( mCursor[PRIMARY_CURSOR].x + scrollPosition.x,
                                   mCursor[PRIMARY_CURSOR].y + scrollPosition.y );
-      mPrimaryCursor.SetSize( Vector2( 1.0f, mCursor[PRIMARY_CURSOR].height ) );
+      mPrimaryCursor.SetSize( Size( 1.0f, mCursor[PRIMARY_CURSOR].cursorHeight ) );
     }
     if( mSecondaryCursor )
     {
       mSecondaryCursor.SetPosition( mCursor[SECONDARY_CURSOR].x + scrollPosition.x,
                                     mCursor[SECONDARY_CURSOR].y + scrollPosition.y );
-      mSecondaryCursor.SetSize( Vector2( 1.0f, mCursor[SECONDARY_CURSOR].height ) );
+      mSecondaryCursor.SetSize( Size( 1.0f, mCursor[SECONDARY_CURSOR].cursorHeight ) );
     }
 
     // Show or hide the grab handle
@@ -199,7 +201,7 @@ struct Decorator::Impl : public ConnectionTracker
       CreateGrabHandle();
 
       mGrabHandle.SetPosition( mCursor[PRIMARY_CURSOR].x + scrollPosition.x,
-                               mCursor[PRIMARY_CURSOR].y + scrollPosition.y + mCursor[PRIMARY_CURSOR].height );
+                               mCursor[PRIMARY_CURSOR].y + scrollPosition.y + mCursor[PRIMARY_CURSOR].lineHeight );
     }
     else if( mGrabHandle )
     {
@@ -215,11 +217,11 @@ struct Decorator::Impl : public ConnectionTracker
 
       SelectionHandleImpl& primary = mSelectionHandle[ PRIMARY_SELECTION_HANDLE ];
       primary.actor.SetPosition( primary.x + scrollPosition.x,
-                                 primary.y + scrollPosition.y + primary.cursorHeight );
+                                 primary.y + scrollPosition.y + primary.lineHeight );
 
       SelectionHandleImpl& secondary = mSelectionHandle[ SECONDARY_SELECTION_HANDLE ];
       secondary.actor.SetPosition( secondary.x + scrollPosition.x,
-                                   secondary.y + scrollPosition.y + secondary.cursorHeight );
+                                   secondary.y + scrollPosition.y + secondary.lineHeight );
 
       CreateHighlight();
       UpdateHighlight();
@@ -291,6 +293,10 @@ struct Decorator::Impl : public ConnectionTracker
 #endif
           mActiveLayer.Add( mSecondaryCursor);
         }
+      }
+      else
+      {
+        UnparentAndReset( mSecondaryCursor );
       }
     }
   }
@@ -592,7 +598,7 @@ struct Decorator::Impl : public ConnectionTracker
       mGrabDisplacementY += gesture.displacement.y;
 
       float x = mCursor[PRIMARY_CURSOR].x + mGrabDisplacementX;
-      float y = mCursor[PRIMARY_CURSOR].y + mCursor[PRIMARY_CURSOR].height*0.5f + mGrabDisplacementY;
+      float y = mCursor[PRIMARY_CURSOR].y + mCursor[PRIMARY_CURSOR].lineHeight*0.5f + mGrabDisplacementY;
 
       if( Gesture::Started    == gesture.state ||
           Gesture::Continuing == gesture.state )
@@ -697,7 +703,7 @@ unsigned int Decorator::GetActiveCursor() const
   return mImpl->mActiveCursor;
 }
 
-void Decorator::SetPosition( Cursor cursor, float x, float y, float height )
+void Decorator::SetPosition( Cursor cursor, float x, float y, float cursorHeight, float lineHeight )
 {
   // Adjust grab handle displacement
   mImpl->mGrabDisplacementX -= x - mImpl->mCursor[cursor].x;
@@ -705,14 +711,16 @@ void Decorator::SetPosition( Cursor cursor, float x, float y, float height )
 
   mImpl->mCursor[cursor].x = x;
   mImpl->mCursor[cursor].y = y;
-  mImpl->mCursor[cursor].height = height;
+  mImpl->mCursor[cursor].cursorHeight = cursorHeight;
+  mImpl->mCursor[cursor].lineHeight = lineHeight;
 }
 
-void Decorator::GetPosition( Cursor cursor, float& x, float& y, float& height ) const
+void Decorator::GetPosition( Cursor cursor, float& x, float& y, float& cursorHeight, float& lineHeight ) const
 {
   x = mImpl->mCursor[cursor].x;
   y = mImpl->mCursor[cursor].y;
-  height = mImpl->mCursor[cursor].height;
+  cursorHeight = mImpl->mCursor[cursor].cursorHeight;
+  lineHeight = mImpl->mCursor[cursor].lineHeight;
 }
 
 void Decorator::SetColor( Cursor cursor, const Dali::Vector4& color )
@@ -805,14 +813,14 @@ void Decorator::SetPosition( SelectionHandle handle, float x, float y, float hei
 {
   mImpl->mSelectionHandle[handle].x = x;
   mImpl->mSelectionHandle[handle].y = y;
-  mImpl->mSelectionHandle[handle].cursorHeight = height;
+  mImpl->mSelectionHandle[handle].lineHeight = height;
 }
 
 void Decorator::GetPosition( SelectionHandle handle, float& x, float& y, float& height ) const
 {
   x = mImpl->mSelectionHandle[handle].x;
   y = mImpl->mSelectionHandle[handle].y;
-  height = mImpl->mSelectionHandle[handle].cursorHeight;
+  height = mImpl->mSelectionHandle[handle].lineHeight;
 }
 
 void Decorator::SetImage( SelectionHandle handle, SelectionHandleState state, Dali::Image image )

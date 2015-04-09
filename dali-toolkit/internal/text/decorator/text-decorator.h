@@ -192,9 +192,10 @@ public:
    * @param[in] cursor The cursor to set.
    * @param[in] x The x position relative to the top-left of the parent control.
    * @param[in] y The y position relative to the top-left of the parent control.
-   * @param[in] height The logical height of the cursor.
+   * @param[in] cursorHeight The logical height of the cursor.
+   * @param[in] lineHeight The logical height of the line.
    */
-  void SetPosition( Cursor cursor, float x, float y, float height );
+  void SetPosition( Cursor cursor, float x, float y, float cursorHeight, float lineHeight );
 
   /**
    * @brief Retrieves the position of a cursor.
@@ -202,9 +203,10 @@ public:
    * @param[in] cursor The cursor to get.
    * @param[out] x The x position relative to the top-left of the parent control.
    * @param[out] y The y position relative to the top-left of the parent control.
-   * @param[out] height The logical height of the cursor.
+   * @param[out] cursorHeight The logical height of the cursor.
+   * @param[out] lineHeight The logical height of the line.
    */
-  void GetPosition( Cursor cursor, float& x, float& y, float& height ) const;
+  void GetPosition( Cursor cursor, float& x, float& y, float& cursorHeight, float& lineHeight ) const;
 
   /**
    * @brief Sets the color for a cursor.
@@ -309,9 +311,9 @@ public:
    * @param[in] handle The handle to set.
    * @param[in] x The x position relative to the top-left of the parent control.
    * @param[in] y The y position relative to the top-left of the parent control.
-   * @param[in] cursorHeight The logical cursor height at this position.
+   * @param[in] lineHeight The logical line height at this position.
    */
-  void SetPosition( SelectionHandle handle, float x, float y, float cursorHeight );
+  void SetPosition( SelectionHandle handle, float x, float y, float lineHeight );
 
   /**
    * @brief Retrieves the position of a selection handle.
