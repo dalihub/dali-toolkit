@@ -95,7 +95,7 @@ public:
   void CreateGlyphsPerCharacterTable( Length numberOfCharacters = 0u );
 
   /**
-   * Retrieves the number of glyphs.
+   * @brief Retrieves the number of glyphs.
    *
    * @return The number of glyphs.
    */
@@ -114,7 +114,7 @@ public:
                   Length numberOfGlyphs ) const;
 
   /**
-   * Retrieves a glyph.
+   * @brief Retrieves a glyph.
    *
    * @param[in] glyphIndex Index to a glyph.
    *
@@ -123,7 +123,7 @@ public:
   const GlyphInfo& GetGlyphInfo( GlyphIndex glyphIndex ) const;
 
   /**
-   * Replaces glyphs.
+   * @brief Replaces glyphs.
    *
    * If the @p numberOfGlyphsToRemove is zero, this operation is like an insert.
    * If the @p numberOfGlyphsToInsert is zero, this operation is like a remove.
@@ -161,7 +161,7 @@ public:
   Length GetCharactersPerGlyph( GlyphIndex glyphIndex ) const;
 
   /**
-   * Retrieves the first glyph in the visual model which represents a given character.
+   * @brief Retrieves the first glyph in the visual model which represents a given character.
    *
    * @note After shaping several characters may be represented by the same glyph.
    * Alternatively several glyphs may be required to display a character.
@@ -171,7 +171,7 @@ public:
   GlyphIndex GetGlyphIndex( CharacterIndex characterIndex ) const;
 
   /**
-   * Retrieves the whole or part of the character to glyph conversion map.
+   * @brief Retrieves the whole or part of the character to glyph conversion map.
    *
    * The size of the buffer needs to be big enough to copy the @p numberOfCharacters.
    *
@@ -184,7 +184,7 @@ public:
                                Length numberOfCharacters ) const;
 
   /**
-   * Retrieves the whole or part of the glyph to character conversion map.
+   * @brief Retrieves the whole or part of the glyph to character conversion map.
    *
    * The size of the buffer needs to be big enough to copy the @p numberOfGlyphs.
    *
@@ -197,7 +197,7 @@ public:
                                Length numberOfGlyphs ) const;
 
   /**
-   * Retrieves for each glyph the number of characters the glyph represents.
+   * @brief Retrieves for each glyph the number of characters the glyph represents.
    *
    * @param[out] charactersPerGlyph Pointer to a buffer where the number of characters for each glyph are copied.
    * @param[in] glyphIndex Index to the first glyph.
@@ -208,7 +208,7 @@ public:
                                  Length numberOfGlyphs ) const;
 
   /**
-   * Retrieves for each character the number of glyphs the character is shaped.
+   * @brief Retrieves for each character the number of glyphs the character is shaped.
    *
    * @param[out] glyphsPerCharacter Pointer to a buffer where the number of glyphs for each character are copied.
    * @param[in] characterIndex Index to the first character.
@@ -232,7 +232,7 @@ public:
                           Length numberOfGlyphs );
 
   /**
-   * Retrieves the number of glyph positions set.
+   * @brief Retrieves the number of glyph positions set.
    *
    * @note This may be less than the number of glyphs in the model.
    * @return The number of glyphs.
@@ -252,7 +252,7 @@ public:
                           Length numberOfGlyphs ) const;
 
   /**
-   * Retrieve the glyph's position of the given glyph.
+   * @brief Retrieve the glyph's position of the given glyph.
    *
    * @param[in] glyphIndex Index to the glyph.
    *
@@ -261,7 +261,7 @@ public:
   const Vector2& GetGlyphPosition( GlyphIndex glyphIndex ) const;
 
   /**
-   * Replaces glyph's positions.
+   * @brief Replaces glyph's positions.
    *
    * If the @p numberOfGlyphsToRemove is zero, this operation is like an insert.
    * If the @p numberOfGlyphsToInsert is zero, this operation is like a remove.
@@ -279,7 +279,7 @@ public:
   // Line interface.
 
   /**
-   * Sets the lines.
+   * @brief Sets the lines.
    *
    * Replaces any lines previously set.
    *
@@ -294,14 +294,14 @@ public:
                  Length numberOfLines );
 
   /**
-   * Retrieves the number of lines of the whole text.
+   * @brief Retrieves the number of lines of the whole text.
    *
    * @return The number of lines.
    */
   Length GetNumberOfLines() const;
 
   /**
-   * Retrieves lines.
+   * @brief Retrieves lines.
    *
    * The size of the @p lines buffer needs to be big enough to copy the @p numberOfLines.
    *
@@ -314,7 +314,7 @@ public:
                  Length numberOfLines ) const;
 
   /**
-   * Retrieves the number of lines and the index to the first line where the given range of glyphs is laid out.
+   * @brief Retrieves the number of lines and the index to the first line where the given range of glyphs is laid out.
    *
    * @param[in] glyphIndex Index to the first glyph.
    * @param[in] numberOfGlyphs The number of glyph.
@@ -326,7 +326,7 @@ public:
                          LineIndex& firstLine,
                          Length& numberOfLines ) const;
   /**
-   * Retrieves the lines where the given range of glyphs is laid out.
+   * @brief Retrieves the lines where the given range of glyphs is laid out.
    *
    * The size of the @p lines buffer needs to be big enough to copy the @p numberOfLines.
    *
@@ -339,7 +339,25 @@ public:
                              Length numberOfGlyphs ) const;
 
   /**
-   * Replaces lines for the given range of glyphs.
+   * @brief Retrieves the line index where the glyph is laid-out.
+   *
+   * @param[in] glyphIndex The glyph's index.
+   *
+   * @return The line index.
+   */
+  LineIndex GetLineOfGlyph( GlyphIndex glyphIndex );
+
+  /**
+   * @brief Retrieves the line index where the character is laid-out.
+   *
+   * @param[in] characterIndex The character's index.
+   *
+   * @return The line index.
+   */
+  LineIndex GetLineOfCharacter( CharacterIndex characterIndex );
+
+  /**
+   * @brief Replaces lines for the given range of glyphs.
    *
    * If the @p numberOfGlyphsToRemove is zero, this operation is like an insert.
    * If the @p numberOfGlyphsToInsert is zero, this operation is like a remove.
@@ -357,28 +375,28 @@ public:
   // Size interface
 
   /**
-   * Sets the natural size.
+   * @brief Sets the natural size.
    *
    * @param[in] size The text's natural size.
    */
   void SetNaturalSize( const Vector2& size  );
 
   /**
-   * Retrieves the natural size.
+   * @brief Retrieves the natural size.
    *
    * @return The text's natural size.
    */
   const Vector2& GetNaturalSize() const;
 
   /**
-   * Sets the text's actual size after it has been laid out.
+   * @brief Sets the text's actual size after it has been laid out.
    *
    * @param[in] size The text's size.
    */
   void SetActualSize( const Vector2& size );
 
   /**
-   * Retrieves the text's actual size after it has been laid out.
+   * @brief Retrieves the text's actual size after it has been laid out.
    *
    * @return The text's size.
    */
@@ -454,6 +472,11 @@ public:
    */
   bool IsUnderlineEnabled() const;
 
+  /**
+   * @brief Clear the caches.
+   */
+  void ClearCaches();
+
 protected:
 
   /**
@@ -485,16 +508,21 @@ public:
   Vector<LineRun>        mLines;                ///< The laid out lines.
 
   Vector4                mTextColor;            ///< The text color
-  Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
   Vector4                mShadowColor;          ///< Color of drop shadow
   Vector4                mUnderlineColor;       ///< Color of underline
-  bool                   mUnderlineEnabled:1;   ///< Underline enabled flag
-  bool                   mUnderlineColorSet:1;  ///< Has the underline color been explicitly set?
+  Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
 
 private:
 
   Size                   mNaturalSize;        ///< Size of the text with no line wrapping.
   Size                   mActualSize;         ///< Size of the laid-out text considering the layout properties set.
+
+  // Caches to increase performance in some consecutive operations.
+  LineIndex mCachedLineIndex; ///< Used to increase performance in consecutive calls to GetLineOfGlyph() or GetLineOfCharacter() with consecutive glyphs or characters.
+
+public:
+  bool                   mUnderlineEnabled:1;   ///< Underline enabled flag
+  bool                   mUnderlineColorSet:1;  ///< Has the underline color been explicitly set?
 };
 
 } // namespace Text
