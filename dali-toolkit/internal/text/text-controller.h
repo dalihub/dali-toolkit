@@ -243,6 +243,20 @@ public:
   bool IsUnderlineEnabled() const;
 
   /**
+   * @brief Set the override used for underline height, 0 indicates height will be supplied by adaptor
+   *
+   * @param[in] height The height in pixels of the underline
+   */
+  void SetUnderlineHeight( float height );
+
+  /**
+   * @brief Retrieves the override height of an underline, 0 indicates height is supplied by adaptor
+   *
+   * @return The height of the underline, or 0 if height is not overrided.
+   */
+  float GetUnderlineHeight() const;
+
+  /**
    * @brief Called to enable text input.
    *
    * @note Only selectable or editable controls should calls this.

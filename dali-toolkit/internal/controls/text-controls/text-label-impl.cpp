@@ -88,6 +88,7 @@ DALI_PROPERTY_REGISTRATION( TextLabel, "shadow-offset",        VECTOR2, SHADOW_O
 DALI_PROPERTY_REGISTRATION( TextLabel, "shadow-color",         VECTOR4, SHADOW_COLOR         )
 DALI_PROPERTY_REGISTRATION( TextLabel, "underline-enabled",    BOOLEAN, UNDERLINE_ENABLED    )
 DALI_PROPERTY_REGISTRATION( TextLabel, "underline-color",      VECTOR4, UNDERLINE_COLOR      )
+DALI_PROPERTY_REGISTRATION( TextLabel, "underline-height",     FLOAT,   UNDERLINE_HEIGHT       )
 DALI_TYPE_REGISTRATION_END()
 
 } // namespace
@@ -289,6 +290,20 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+
+      case Toolkit::TextLabel::Property::UNDERLINE_HEIGHT:
+      {
+        if( impl.mController )
+        {
+          float height = value.Get< float >();
+          if ( impl.mController->GetUnderlineHeight() != height )
+          {
+            impl.mController->SetUnderlineHeight( height );
+            impl.RequestTextRelayout();
+          }
+        }
+        break;
+      }
     }
   }
 }
@@ -384,6 +399,14 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         if ( impl.mController )
         {
           value = impl.mController->IsUnderlineEnabled();
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::UNDERLINE_HEIGHT:
+      {
+        if ( impl.mController )
+        {
+          value = impl.mController->GetUnderlineHeight();
         }
         break;
       }

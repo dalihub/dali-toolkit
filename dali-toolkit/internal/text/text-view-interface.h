@@ -117,11 +117,18 @@ public:
   virtual const Vector4& GetUnderlineColor() const = 0;
 
   /**
-   * @brief Returns whether is underline is enabled or not.
+   * @brief Returns whether underline is enabled or not.
    *
    * @return The underline state.
    */
   virtual bool IsUnderlineEnabled() const = 0;
+
+  /**
+   * @brief Retrieves the underline height override
+   *
+   * @return Returns the override height for an underline, 0 indicates that adaptor will determine the height
+   */
+  virtual float GetUnderlineHeight() const = 0;
 
 };
 
