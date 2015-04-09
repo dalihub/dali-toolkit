@@ -51,7 +51,6 @@ SET(TC_SOURCES
    utc-Dali-ItemLayout.cpp
    utc-Dali-ItemView.cpp
    utc-Dali-KeyboardFocusManager.cpp
-   utc-Dali-MarkupProcessor.cpp
    utc-Dali-MaskEffect.cpp
    utc-Dali-NinePatchMaskEffect.cpp
    utc-Dali-Popup.cpp

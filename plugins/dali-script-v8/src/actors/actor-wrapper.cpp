@@ -25,7 +25,6 @@
 #include <actors/layer-api.h>
 #include <actors/actor-api.h>
 #include <actors/image-actor-api.h>
-#include <actors/text-actor-api.h>
 #include <actors/mesh-actor-api.h>
 #include <actors/camera-actor-api.h>
 #include <actors/renderable-actor-api.h>
@@ -40,11 +39,10 @@ namespace V8Plugin
 
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mActorTemplate;
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mImageActorTemplate;
-v8::Persistent<v8::ObjectTemplate> ActorWrapper::mTextActorTemplate;
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mMeshActorTemplate;
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mCameraActorTemplate;
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mLayerActorTemplate;
-v8::Persistent<v8::ObjectTemplate> ActorWrapper::mTextViewTemplate;
+v8::Persistent<v8::ObjectTemplate> ActorWrapper::mTextLabelTemplate;
 
 namespace
 {
@@ -65,11 +63,10 @@ const ActorTemplate ActorTemplateLookup[]=
 {
     { &ActorWrapper::mActorTemplate },        // ACTOR
     { &ActorWrapper::mImageActorTemplate },   // IMAGE_ACTOR
-    { &ActorWrapper::mTextActorTemplate  },   // TEXT_ACTOR
     { &ActorWrapper::mMeshActorTemplate  },   // MESH_ACTOR
     { &ActorWrapper::mLayerActorTemplate },   // LAYER_ACTOR
     { &ActorWrapper::mCameraActorTemplate},   // CAMERA_ACTOR
-    { &ActorWrapper::mTextViewTemplate }
+    { &ActorWrapper::mTextLabelTemplate }
 };
 
 /**
@@ -80,10 +77,9 @@ enum ActorApiBitMask
   ACTOR_API              = 1 << 0,
   RENDERABLE_ACTOR_API   = 1 << 1,
   IMAGE_ACTOR_API        = 1 << 2,
-  TEXT_ACTOR_API         = 1 << 3,
-  MESH_ACTOR_API         = 1 << 4,
-  LAYER_API              = 1 << 5,
-  CAMERA_ACTOR_API       = 1 << 6,
+  MESH_ACTOR_API         = 1 << 3,
+  LAYER_API              = 1 << 4,
+  CAMERA_ACTOR_API       = 1 << 5,
 };
 
 /**
@@ -104,11 +100,10 @@ const ActorApiStruct ActorApiLookup[]=
 {
   {"Actor",      ActorWrapper::ACTOR,        ActorApi::New,       ACTOR_API },
   {"ImageActor", ActorWrapper::IMAGE_ACTOR,  ImageActorApi::New,  ACTOR_API | RENDERABLE_ACTOR_API | IMAGE_ACTOR_API   },
-  {"TextActor",  ActorWrapper::TEXT_ACTOR,   TextActorApi::New,   ACTOR_API | RENDERABLE_ACTOR_API | TEXT_ACTOR_API    },
   {"MeshActor",  ActorWrapper::MESH_ACTOR,   MeshActorApi::New,   ACTOR_API | RENDERABLE_ACTOR_API | MESH_ACTOR_API    },
   {"Layer",      ActorWrapper::LAYER_ACTOR,  LayerApi::New,       ACTOR_API | LAYER_API                                },
   {"CameraActor",ActorWrapper::CAMERA_ACTOR, CameraActorApi::New, ACTOR_API | CAMERA_ACTOR_API                         },
-  {"TextView",   ActorWrapper::TEXT_VIEW,    TextViewApi::New,    ACTOR_API },
+  {"TextLabel",  ActorWrapper::TEXT_LABEL,   TextLabelApi::New,   ACTOR_API },
 
 };
 
@@ -148,7 +143,7 @@ Actor CreateActor( const v8::FunctionCallbackInfo< v8::Value >& args,
   else
   {
     // run the constructor for this type of actor so it can pull out
-    // custom parameters, e.g. new TextActor("hello world"); or ImageActor( MyImage );
+    // custom parameters, e.g. new ImageActor( MyImage );
     actor = (ActorApiLookup[actorType].constructor)( args );
   }
   return actor;
@@ -314,40 +309,6 @@ const ActorFunctions ActorFunctionTable[]=
     // ignore GetFadeInDuration use imageActor.fadeInDuration
     //{ "GetCurrentImageSize", ImageActorApi::GetCurrentImageSize,  IMAGE_ACTOR_API },
 
-
-    /**************************************
-     * Text Actor API (in order of text-actor.h)
-     **************************************/
-    //ignore SetText use textActor.text
-    { "SetToNaturalSize",   TextActorApi::SetToNaturalSize,      TEXT_ACTOR_API },
-    // ignore GetFont use textActor.font
-    // ignore SetFont use textActor.font
-    // ignore SetGradient use textActor.gradientColor
-    // ignore GetGradient textActor.gradientColor
-    // ignore SetGradientStartPoint use textActor.gradientStartPoint
-    // ignore GetGradientStartPoint textActor.gradientStartPoint
-    // ignore SetGradientEndPoint use textActor.gradientEndPoint
-    // ignore GetGradientEndPoint textActor.gradientEndPoint
-    // @todo? SetTextStyle ( can use individual properties as a work around )
-    // @todo? GetTextStyle ( can use individual properties as a work around )
-    // ignore SetTextColor use textActor.textColor
-    // ignore GetTextColor use textActor.textColor
-    // ignore SetSmoothEdge use textActor.smoothEdge
-    // ignore SetOutline use textActor.outLineEnable, outlineColor, thicknessWidth
-    // ignore SetGlow use textActor.glowEnable, glowColor, glowIntensity
-    // ignore SetShadow use textActor.shadowEnable, shadowColor, shadowOffset, shadowSize
-    // ignore SetItalics use textActor.italicsAngle ?
-    // ignore GetItalics  @todo add italics flag? or just stick with angle
-    // ignore GetItalicsAngle  use textActor.italicsAngle
-    // ignore SetUnderline use textActor.underline
-    // ignore GetUnderline use textActor.underline
-    // ignore SetWeight use textActor.weight
-    // ignore GetWeight use textActor.weight
-    // ignore SetFontDetectionAutomatic use textActor.fontDetectionAutomatic
-    // ignore IsFontDetectionAutomatic use textActor.fontDetectionAutomatic
-    // ignore GetLoadingState text is loaded synchronously
-    // ignore TextAvailableSignal text is loaded synchronously
-
     /**************************************
      * Mesh Actor API (in order of mesh-actor.h)
      **************************************/
@@ -489,7 +450,7 @@ void ActorWrapper::NewActor( const v8::FunctionCallbackInfo< v8::Value >& args)
     return;
   }
 
-  // find out the callee function name...e.g. TextActor, ImageActor, MeshActor
+  // find out the callee function name...e.g. ImageActor, MeshActor
   v8::Local<v8::Function> callee = args.Callee();
   v8::Local<v8::Value> v8String = callee->GetName();
   std::string typeName = V8Utils::v8StringToStdString( v8String );

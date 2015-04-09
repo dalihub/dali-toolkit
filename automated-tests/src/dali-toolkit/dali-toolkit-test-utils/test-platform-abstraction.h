@@ -26,7 +26,6 @@
 #include <dali/public-api/common/set-wrapper.h>
 #include <dali/integration-api/platform-abstraction.h>
 
-#include <dali/integration-api/glyph-set.h>
 #include "test-trace-call-stack.h"
 
 
@@ -137,71 +136,19 @@ public:
   virtual bool IsLoading();
 
   /**
-   * @copydoc PlatformAbstraction::GetDefaultFontFamily()
+   * @copydoc PlatformAbstraction::GetDefaultFontDescription()
    */
-  virtual const std::string& GetDefaultFontFamily() const;
+  virtual void GetDefaultFontDescription( std::string& family, std::string& style ) const;
 
   /**
    * @copydoc PlatformAbstraction::GetDefaultFontSize()
    */
-  virtual float GetDefaultFontSize() const;
-
-  /**
-   * @copydoc PlatformAbstraction::GetFontLineHeightFromCapsHeight()
-   */
-  virtual Dali::PixelSize GetFontLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, CapsHeight capsHeight) const;
-
-  /**
-   * @copydoc PlatformAbstraction::GetGlyphData()
-   */
-  virtual Integration::GlyphSet* GetGlyphData ( const Integration::TextResourceType& textRequest,
-                                                const std::string& fontFamily,
-                                                bool getBitmap) const;
-
-  /**
-   * @copydoc PlatformAbstraction::GetCachedGlyphData()
-   */
-  virtual Integration::GlyphSet* GetCachedGlyphData( const Integration::TextResourceType& textRequest,
-                                                     const std::string& fontFamily ) const;
-
-
-  /**
-   * @copydoc PlatformAbstraction::GetGlobalMetrics()
-   */
-  virtual void GetGlobalMetrics( const std::string& fontFamily,
-                                 const std::string& fontStyle,
-                                 Integration::GlobalMetrics& globalMetrics ) const;
-
-  /**
-   * @copydoc PlatformAbstraction::GetFontPath()
-   */
-  virtual std::string GetFontPath(const std::string& family, bool bold, bool italic) const;
+  virtual int GetDefaultFontSize() const;
 
   /**
    * @copydoc PlatformAbstraction::SetDpi()
    */
   virtual void SetDpi (unsigned int dpiHorizontal, unsigned int dpiVertical);
-
-  /**
-   * @copydoc PlatformAbstraction::GetFontFamilyForChars()
-   */
-  virtual const std::string& GetFontFamilyForChars(const Integration::TextArray& charsRequested) const;
-
-  /**
-   * @copydoc PlatformAbstraction::AllGlyphsSupported()
-   */
-  virtual bool AllGlyphsSupported(const std::string& name, const std::string& fontStyle, const Integration::TextArray& text) const;
-
-  /**
-   * @copydoc PlatformAbstraction::ValidateFontFamilyName()
-   */
-  virtual bool ValidateFontFamilyName(const std::string& fontFamily, const std::string& fontStyle, bool& isDefaultSystemFont, std::string& closestMatch, std::string& closestStyleMatch) const;
-
-  /**
-   * @copydoc PlatformAbstraction::GetFontList()
-   */
-  virtual void GetFontList( PlatformAbstraction::FontListMode mode, std::vector<std::string>& fontList ) const;
-
   /**
    * @copydoc PlatformAbstraction::LoadFile()
    */
@@ -219,30 +166,7 @@ public:
 
   virtual void JoinLoaderThreads();
 
-  virtual void UpdateDefaultsFromDevice();
-
   virtual Integration::DynamicsFactory* GetDynamicsFactory();
-
-  virtual bool ReadGlobalMetricsFromCache( const std::string& fontFamily,
-                                           const std::string& fontStyle,
-                                           Integration::GlobalMetrics& globalMetrics );
-
-  virtual void WriteGlobalMetricsToCache( const std::string& fontFamily,
-                                          const std::string& fontStyle,
-                                          const Integration::GlobalMetrics& globalMetrics );
-
-  virtual bool ReadMetricsFromCache( const std::string& fontFamily,
-                                     const std::string& fontStyle,
-                                     std::vector<Integration::GlyphMetrics>& glyphMetricsContainer );
-  virtual void WriteMetricsToCache( const std::string& fontFamily,
-                                    const std::string& fontStyle,
-                                    const Integration::GlyphSet& glyphSet );
-
-
-  virtual void GetFileNamesFromDirectory( const std::string& directoryName,
-                                          std::vector<std::string>& fileNames );
-
-  virtual Integration::BitmapPtr GetGlyphImage( const std::string& fontFamily, const std::string& fontStyle, float fontSize, uint32_t character ) const;
 
 public: // TEST FUNCTIONS
 
@@ -260,24 +184,9 @@ public: // TEST FUNCTIONS
     CancelLoadFunc,
     GetResourcesFunc,
     IsLoadingFunc,
-    GetDefaultFontFamilyFunc,
-    GetDefaultFontSizeFunc,
-    GetFontLineHeightFromCapsHeightFunc,
-    GetGlyphDataFunc,
-    GetCachedGlyphDataFunc,
     SetDpiFunc,
-    GetFontPathFunc,
     JoinLoaderThreadsFunc,
-    GetFontFamilyForCharsFunc,
-    AllGlyphsSupportedFunc,
-    ValidateFontFamilyNameFunc,
-    UpdateDefaultsFromDeviceFunc,
     GetDynamicsFactoryFunc,
-    ValidateGetFontListFunc,
-    ReadGlobalMetricsFromCacheFileFunc,
-    WriteGlobalMetricsToCacheFileFunc,
-    ReadMetricsFromCacheFileFunc,
-    WriteMetricsToCacheFileFunc,
   } TestFuncEnum;
 
   /** Call this every test */
@@ -326,33 +235,18 @@ public: // TEST FUNCTIONS
 
   void SetSaveFileResult( bool result );
 
-  PlatformAbstraction::FontListMode GetLastFontListMode( );
-
-  void SetReadGlobalMetricsResult( bool success, Integration::GlobalMetrics& globalMetrics );
-
-  void SetReadMetricsResult( bool success, std::vector<Integration::GlyphMetrics>& glyphMetricsContainer );
-
-
 private:
   mutable TraceCallStack        mTrace;
   size_t                        mSeconds;
   size_t                        mMicroSeconds;
   bool                          mIsLoadingResult;
-  std::string                   mGetDefaultFontFamilyResult;
-  float                         mGetDefaultFontSizeResult;
-  std::string                   mGetFontPathResult;
   Resources                     mResources;
   Integration::ResourceRequest* mRequest;
   Vector2                       mSize;
   Vector2                       mClosestSize;
-  bool                          mReadGlobalMetricsResult;
-  bool                          mReadMetricsResult;
-  Integration::GlobalMetrics mReadGlobalMetrics;
-  std::vector<Integration::GlyphMetrics> mReadMetrics;
 
   LoadFileResult                mLoadFileResult;
   bool                          mSaveFileResult;
-  mutable FontListMode          mFontListMode;
 };
 
 } // Dali

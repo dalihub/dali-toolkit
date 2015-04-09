@@ -16,15 +16,15 @@ control.SetBackgroundColor( Dali::Color::RED );
 </td>
 </table>
 
-This can be used for ALL existing controls like TextView as well:
+This can be used for ALL existing controls like TextLabel as well:
 @code
-Dali::Toolkit::TextView textView = Dali::Toolkit::TextView::New( "Hello World" );
-textView.SetBackgroundColor( Dali::Color::RED );
+Dali::Toolkit::TextLabel label = Dali::Toolkit::TextLabel::New( "Hello World" );
+label.SetBackgroundColor( Dali::Color::RED );
 @endcode
 
 <table border=0 cellpadding=10><tr>
 <td>
-\image html BackgroundTextView.png
+\image html BackgroundTextLabel.png
 </td>
 </table>
 

@@ -48,11 +48,10 @@ public:
     UNKNOWN_ACTOR = -1,
     ACTOR       = 0,
     IMAGE_ACTOR  =1,
-    TEXT_ACTOR   =2,
-    MESH_ACTOR   =3,
-    LAYER_ACTOR  =4,
-    CAMERA_ACTOR =5,
-    TEXT_VIEW    =6
+    MESH_ACTOR   =2,
+    LAYER_ACTOR  =3,
+    CAMERA_ACTOR =4,
+    TEXT_LABEL   =5
   };
 
   /**
@@ -90,11 +89,10 @@ public:
   // The Actor ObjectTemplates.
   static v8::Persistent<v8::ObjectTemplate> mActorTemplate;
   static v8::Persistent<v8::ObjectTemplate> mImageActorTemplate;
-  static v8::Persistent<v8::ObjectTemplate> mTextActorTemplate;
   static v8::Persistent<v8::ObjectTemplate> mMeshActorTemplate;
   static v8::Persistent<v8::ObjectTemplate> mCameraActorTemplate;
   static v8::Persistent<v8::ObjectTemplate> mLayerActorTemplate;
-  static v8::Persistent<v8::ObjectTemplate> mTextViewTemplate;
+  static v8::Persistent<v8::ObjectTemplate> mTextLabelTemplate;
 
   /**
    * @return the wrapped actor

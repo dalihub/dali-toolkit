@@ -16,7 +16,6 @@ BuildRequires:  pkgconfig(dlog)
 BuildRequires:  boost-devel
 BuildRequires:  pkgconfig(dali)
 BuildRequires:  pkgconfig(dali-core)
-BuildRequires:  fribidi-devel
 
 %description
 The OpenGLES Canvas Core Library Toolkit - a set of controls that provide

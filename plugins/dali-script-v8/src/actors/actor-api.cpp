@@ -19,7 +19,7 @@
 #include "actor-api.h"
 
 // EXTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 // INTERNAL INCLUDES
 #include <v8-utils.h>
@@ -42,11 +42,11 @@ Actor GetActor( v8::Isolate* isolate, const v8::FunctionCallbackInfo<v8::Value>&
 } //unanmed namespace
 
 
-namespace TextViewApi
+namespace TextLabelApi
 {
  Actor New( const v8::FunctionCallbackInfo< v8::Value >& args )
  {
-   return Dali::Toolkit::TextView::New();
+   return Dali::Toolkit::TextLabel::New();
  }
 }
 
@@ -486,7 +486,7 @@ void ActorApi::IsKeyboardFocusable( const v8::FunctionCallbackInfo<v8::Value>& a
  *
  * @for Actor
  * @method getActorType
- * @return {String} Actor, ImageActor, TextActor, MeshActor, Layer, CameraActor ...
+ * @return {String} Actor, ImageActor, MeshActor, Layer, CameraActor ...
  */
 void ActorApi::GetActorType( const v8::FunctionCallbackInfo<v8::Value>& args )
 {

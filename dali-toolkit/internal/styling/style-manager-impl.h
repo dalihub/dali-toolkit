@@ -241,6 +241,8 @@ private:
   Orientation mOrientation;           ///< Handle to application orientation object
   int mOrientationDegrees;            ///< Directly set value of orientation
 
+  int mDefaultFontSize;               ///< Logical size, not a point-size
+
   std::string mThemeFile;             ///< The full path of the current theme file
 
   Property::Map mThemeBuilderConstants;   ///< Contants to give the theme builder

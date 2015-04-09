@@ -314,18 +314,11 @@ int UtcDaliPushButtonSetLabelText(void)
   application.SendNotification();
   application.Render();
 
-  TextView textView;
-
   pushButton.SetLabel( STR );
 
-  textView = TextView::DownCast( pushButton.GetLabel() );
-  DALI_TEST_CHECK( STR == textView.GetText() );
+  TextLabel label = TextLabel::DownCast( pushButton.GetLabel() );
+  DALI_TEST_CHECK( STR == label.GetProperty<std::string>( TextLabel::Property::TEXT ) );
 
-  TextView text = TextView::New( STR );
-  pushButton.SetLabel( text );
-
-  textView = TextView::DownCast( pushButton.GetLabel() );
-  DALI_TEST_CHECK( STR == textView.GetText() );
   END_TEST;
 }
 
