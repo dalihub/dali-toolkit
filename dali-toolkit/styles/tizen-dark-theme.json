@@ -31,23 +31,17 @@ distributing this software or its derivatives.
 {
   "styles":
   {
-    "textinput":
+    "textlabel":
     {
-      "highlight-color":"F060",
-      "cut-and-paste-bg-color":"B061L41",
-      "cut-and-paste-pressed-color":"B061L41P",
-      "cut-and-paste-border-color":"B061L42",
-      "cut-and-paste-icon-color":"T126",
-      "cut-and-paste-icon-pressed-color":"T126P",
-      "cut-and-paste-text-color":"T1221",
-      "cut-and-paste-text-pressed-color":"T1221P",
-      "cut-button-position-priority":4,
-      "copy-button-position-priority":3,
-      "paste-button-position-priority":5,
-      "select-button-position-priority":1,
-      "select-all-button-position-priority":2,
-      "clipboard-button-position-priority":6,
-      "cursor-color":"F052"
+      "font-family":"HelveticaNeue",
+      "font-style":"Regular",
+      "point-size":18
+    },
+    "textfield":
+    {
+      "font-family":"HelveticaNeue",
+      "font-style":"Regular",
+      "point-size":18
     },
     "scrollview":
     {

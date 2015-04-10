@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <math.h>
 #include <dali/public-api/actors/mesh-actor.h>
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/geometry/animatable-mesh.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
@@ -58,10 +57,9 @@ struct VertexPositionConstraint
   {
   }
 
-  Vector3 operator()( const Vector3& current, const PropertyInput& bounceCoef )
+  void operator()( Vector3& current, const PropertyInputContainer& inputs )
   {
-    float positionY = mInitialY + mRange * fabsf(bounceCoef.GetFloat());
-    return Vector3( current.x, positionY, current.z );
+    current.y = mInitialY + mRange * fabsf( inputs[0]->GetFloat() );
   }
 
   float mInitialY;
@@ -107,12 +105,13 @@ Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
   for( size_t i=0;i<NUM_LAYERS;i++ )
   {
     size_t j=i*4;
-    mesh.ApplyConstraint( Constraint::New<Vector3>( mesh.GetPropertyIndex(j+2, AnimatableVertex::Property::POSITION ),
-                                                    Source(meshActor, bouncePropertyIndex),
-                                                    VertexPositionConstraint(-0.5f, LAYER_HEIGHTS[i]) ) );
-    mesh.ApplyConstraint( Constraint::New<Vector3>( mesh.GetPropertyIndex(j+3,  AnimatableVertex::Property::POSITION),
-                                                    Source(meshActor, bouncePropertyIndex),
-                                                    VertexPositionConstraint(-0.5f, LAYER_HEIGHTS[i]) ) );
+    Constraint constraint = Constraint::New<Vector3>( mesh, mesh.GetPropertyIndex(j+2, AnimatableVertex::Property::POSITION ), VertexPositionConstraint(-0.5f, LAYER_HEIGHTS[i]) );
+    constraint.AddSource( Source(meshActor, bouncePropertyIndex) );
+    constraint.Apply();
+
+    constraint = Constraint::New<Vector3>( mesh, mesh.GetPropertyIndex(j+3,  AnimatableVertex::Property::POSITION), VertexPositionConstraint(-0.5f, LAYER_HEIGHTS[i]) );
+    constraint.AddSource( Source(meshActor, bouncePropertyIndex) );
+    constraint.Apply();
   }
 
   return meshActor;

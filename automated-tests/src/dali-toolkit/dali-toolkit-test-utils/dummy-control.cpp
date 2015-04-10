@@ -110,8 +110,7 @@ DummyControlImplOverride::~DummyControlImplOverride() { }
 
 
 void DummyControlImplOverride::OnInitialize() { initializeCalled = true; }
-void DummyControlImplOverride::OnThemeChange(StyleManager change) { themeChangeCalled = true;}
-void DummyControlImplOverride::OnFontChange(bool defaultFontChange, bool defaultFontSizeChange) { fontChangeCalled = true; }
+void DummyControlImplOverride::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change ) { themeChangeCalled = change.themeChange; fontChangeCalled = change.defaultFontSizeChange; }
 void DummyControlImplOverride::OnPinch(const PinchGesture& pinch) { pinchCalled = true; }
 void DummyControlImplOverride::OnPan(const PanGesture& pan) { panCalled = true; }
 void DummyControlImplOverride::OnTap(const TapGesture& tap) { tapCalled = true; }

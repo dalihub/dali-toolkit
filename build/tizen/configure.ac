@@ -30,7 +30,6 @@ AC_SUBST(DALI_TOOLKIT_VERSION)
 
 PKG_CHECK_MODULES(DALICORE, dali-core)
 PKG_CHECK_MODULES(DALI, dali)
-PKG_CHECK_MODULES(FRIBIDI, fribidi)
 
 DALI_TOOLKIT_CFLAGS=-DPLATFORM_TIZEN
 
@@ -89,6 +88,10 @@ if test x$DALI_DATA_RO_DIR != x; then
 else
   dataReadOnlyDir=${prefix}/share/dali/
 fi
+
+DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDALI_PROFILE_${enable_profile}"
+AM_CONDITIONAL([COMMON_PROFILE], [test x$enable_profile = xCOMMON])
+AM_CONDITIONAL([MOBILE_PROFILE], [test x$enable_profile = xMOBILE])
 
 # v8 version 4+ requires c++11
 PKG_CHECK_MODULES(V8, v8 = 3.32.7, [ pkg_check_v8=yes ],  [ pkg_check_v8=no  ] )

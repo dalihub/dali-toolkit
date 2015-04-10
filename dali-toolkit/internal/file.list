@@ -1,6 +1,8 @@
 # Add local source files here
 
 toolkit_src_files = \
+   $(toolkit_src_dir)/atlas-manager/atlas-manager.cpp \
+   $(toolkit_src_dir)/atlas-manager/atlas-manager-impl.cpp \
    $(toolkit_src_dir)/builder/builder-actor.cpp \
    $(toolkit_src_dir)/builder/builder-animations.cpp \
    $(toolkit_src_dir)/builder/builder-impl.cpp \
@@ -56,25 +58,9 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/slider/slider-impl.cpp \
    $(toolkit_src_dir)/controls/super-blur-view/super-blur-view-impl.cpp \
    $(toolkit_src_dir)/controls/table-view/table-view-impl.cpp \
-   $(toolkit_src_dir)/controls/text-input/text-input-decorator-impl.cpp \
-   $(toolkit_src_dir)/controls/text-input/text-input-handles-impl.cpp \
-   $(toolkit_src_dir)/controls/text-input/text-input-impl.cpp \
-   $(toolkit_src_dir)/controls/text-input/text-input-popup-impl.cpp \
-   $(toolkit_src_dir)/controls/text-input/text-input-text-highlight-impl.cpp \
-   $(toolkit_src_dir)/controls/text-view/relayout-utilities.cpp   \
-   $(toolkit_src_dir)/controls/text-view/split-by-char-policies.cpp \
-   $(toolkit_src_dir)/controls/text-view/split-by-new-line-char-policies.cpp \
-   $(toolkit_src_dir)/controls/text-view/split-by-word-policies.cpp \
-   $(toolkit_src_dir)/controls/text-view/text-actor-cache.cpp \
-   $(toolkit_src_dir)/controls/text-view/text-processor-bidirectional-info.cpp \
-   $(toolkit_src_dir)/controls/text-view/text-processor.cpp \
-   $(toolkit_src_dir)/controls/text-view/text-view-character-processor.cpp \
-   $(toolkit_src_dir)/controls/text-view/text-view-impl.cpp \
-   $(toolkit_src_dir)/controls/text-view/text-view-paragraph-processor.cpp \
-   $(toolkit_src_dir)/controls/text-view/text-view-processor-dbg.cpp \
-   $(toolkit_src_dir)/controls/text-view/text-view-processor-helper-functions.cpp \
-   $(toolkit_src_dir)/controls/text-view/text-view-processor.cpp \
-   $(toolkit_src_dir)/controls/text-view/text-view-word-processor.cpp \
+   $(toolkit_src_dir)/controls/text-controls/text-field-impl.cpp \
+   $(toolkit_src_dir)/controls/text-controls/text-label-impl.cpp \
+   $(toolkit_src_dir)/controls/text-controls/text-selection-popup-impl.cpp \
    $(toolkit_src_dir)/controls/tool-bar/tool-bar-impl.cpp \
    $(toolkit_src_dir)/controls/view/view-impl.cpp \
    $(toolkit_src_dir)/focus-manager/focus-manager-impl.cpp \
@@ -87,6 +73,32 @@ toolkit_src_files = \
    $(toolkit_src_dir)/shader-effects/page-turn-effect-impl.cpp \
    $(toolkit_src_dir)/shader-effects/water-effect-impl.cpp \
    $(toolkit_src_dir)/styling/style-manager-impl.cpp \
+   $(toolkit_src_dir)/text/bidirectional-support.cpp \
+   $(toolkit_src_dir)/text/character-set-conversion.cpp \
+   $(toolkit_src_dir)/text/clipping/text-clipper.cpp \
+   $(toolkit_src_dir)/text/logical-model-impl.cpp \
+   $(toolkit_src_dir)/text/multi-language-support.cpp \
+   $(toolkit_src_dir)/text/segmentation.cpp \
+   $(toolkit_src_dir)/text/shaper.cpp \
+   $(toolkit_src_dir)/text/text-control-interface.cpp \
+   $(toolkit_src_dir)/text/text-controller.cpp \
+   $(toolkit_src_dir)/text/text-io.cpp \
+   $(toolkit_src_dir)/text/text-view.cpp \
+   $(toolkit_src_dir)/text/text-view-interface.cpp \
+   $(toolkit_src_dir)/text/visual-model-impl.cpp \
+   $(toolkit_src_dir)/text/decorator/text-decorator.cpp \
+   $(toolkit_src_dir)/text/layouts/layout-engine.cpp \
+   $(toolkit_src_dir)/text/multi-language-support-impl.cpp \
+   $(toolkit_src_dir)/text/rendering/text-backend.cpp \
+   $(toolkit_src_dir)/text/rendering/text-renderer.cpp \
+   $(toolkit_src_dir)/text/rendering/atlas/text-atlas-renderer.cpp \
+   $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager.cpp \
+   $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager-impl.cpp \
+   $(toolkit_src_dir)/text/rendering/basic/text-basic-renderer.cpp \
+   $(toolkit_src_dir)/text/rendering/shaders/text-basic-shader.cpp \
+   $(toolkit_src_dir)/text/rendering/shaders/text-basic-shadow-shader.cpp \
+   $(toolkit_src_dir)/text/rendering/shaders/text-bgra-shader.cpp \
+   $(toolkit_src_dir)/text/rendering/text-backend-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-cross-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-fold-effect-impl.cpp \

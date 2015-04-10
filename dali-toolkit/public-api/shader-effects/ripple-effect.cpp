@@ -94,7 +94,7 @@ RippleEffect RippleEffect::New()
 
   // Create the implementation, temporarily owned on stack
   Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
-      vertexShader, imageFragmentShader, vertexShader, "", GeometryHints(HINT_GRID) );
+      vertexShader, imageFragmentShader, GeometryType(GEOMETRY_TYPE_IMAGE), GeometryHints(HINT_GRID) );
 
   /* Pass ownership to RippleEffect through overloaded constructor, So that it now has access to the
      Dali::ShaderEffect implementation */

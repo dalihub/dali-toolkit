@@ -23,7 +23,7 @@
 #include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 namespace Dali
 {
@@ -53,24 +53,18 @@ namespace
 {
 
 /**
- * Find the first image actor in the actor hierarchy
+ * Get size of Actor if larger than given size
+ * @param[in] root the actor to get the size of
+ * @param[out] size the greater of the given size or the size of the Actor
  */
-ImageActor FindImageActor( Actor root )
+void SizeOfActorIfLarger( Actor root, Vector3& size )
 {
-  ImageActor imageActor = ImageActor::DownCast( root );
-  if( !imageActor && root )
+  if ( root )
   {
-    for( unsigned int i = 0, numChildren = root.GetChildCount(); i < numChildren; ++i )
-    {
-      ImageActor childImageActor = FindImageActor( root.GetChildAt( i ) );
-      if( childImageActor )
-      {
-        return childImageActor;
-      }
-    }
+    // RelayoutSize retreived for Actor to use any padding set to it.
+    size.width = std::max( root.GetRelayoutSize( WIDTH ), size.width );
+    size.height = std::max( root.GetRelayoutSize( HEIGHT ), size.height );
   }
-
-  return imageActor;
 }
 
 } // unnamed namespace
@@ -580,29 +574,18 @@ Vector3 PushButton::GetNaturalSize()
 {
   Vector3 size;
 
-  // If background and background not scale9 try get size from that
-  ImageActor imageActor = FindImageActor( GetButtonImage() );
-  if( imageActor && imageActor.GetStyle() != ImageActor::STYLE_NINE_PATCH )
-  {
-    size.width = imageActor.GetRelayoutSize( WIDTH );
-    size.height = imageActor.GetRelayoutSize( HEIGHT );
-  }
-
-  ImageActor backgroundImageActor = FindImageActor( GetBackgroundImage() );
-  if( backgroundImageActor && backgroundImageActor.GetStyle() != ImageActor::STYLE_NINE_PATCH )
-  {
-    size.width = std::max( size.width, backgroundImageActor.GetRelayoutSize( WIDTH ) );
-    size.height = std::max( size.height, backgroundImageActor.GetRelayoutSize( HEIGHT ) );
-  }
+  // Check Image and Background image and use the largest size as the control's Natural size.
+  SizeOfActorIfLarger( GetButtonImage(), size );
+  SizeOfActorIfLarger( GetBackgroundImage(), size );
 
   // If label, test against it's size
-  Toolkit::TextView textView = Toolkit::TextView::DownCast( GetLabel() );
-  if( textView )
+  Toolkit::TextLabel label = Toolkit::TextLabel::DownCast( GetLabel() );
+  if( label )
   {
-    Vector3 textViewSize = textView.GetNaturalSize();
+    Vector3 labelSize = label.GetNaturalSize();
 
-    size.width = std::max( size.width, textViewSize.width + TEXT_PADDING * 2.0f );
-    size.height = std::max( size.height, textViewSize.height + TEXT_PADDING * 2.0f );
+    size.width  = std::max( size.width,  labelSize.width  + TEXT_PADDING * 2.0f );
+    size.height = std::max( size.height, labelSize.height + TEXT_PADDING * 2.0f );
   }
 
   return size;

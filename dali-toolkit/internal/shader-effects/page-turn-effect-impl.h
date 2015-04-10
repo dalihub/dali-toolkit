@@ -114,7 +114,6 @@ private:
 
   Property::Index mOriginalCenterPropertyIndex;
   Property::Index mCurrentCenterPropertyIndex;
-  Constraint mInternalConstraint;
 
 private:
   //undefined copy constructor.

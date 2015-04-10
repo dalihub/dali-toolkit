@@ -129,7 +129,12 @@ public:
   void SetButtonImage( Image image );
 
   /**
-   * @copydoc SetButtonImage( Image image )
+   * @brief SetButtonImage
+   *
+   * @param[in] image The Actor to be used as the button image.
+   *
+   * The natural size of the button would be the size of this Actor
+   * if it's larger than the background and label
    */
   void SetButtonImage( Actor image );
 
@@ -148,7 +153,12 @@ public:
   void SetBackgroundImage( Image image );
 
   /**
-   * @copydoc SetBackgroundImage( Image image )
+   * @brief SetBackgroundImage
+   *
+   * @param[in] image The Actor to be used as the background image.
+   *
+   * The natural size of the button would be the size of this Actor
+   * if it's larger than the button and label
    */
   void SetBackgroundImage( Actor image );
 

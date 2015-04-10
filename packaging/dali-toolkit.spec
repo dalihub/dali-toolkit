@@ -1,6 +1,6 @@
 Name:       dali-toolkit
 Summary:    The OpenGLES Canvas Core Library Toolkit
-Version:    1.0.36
+Version:    1.0.37
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0
@@ -16,7 +16,6 @@ BuildRequires:  pkgconfig(dlog)
 BuildRequires:  boost-devel
 BuildRequires:  pkgconfig(dali)
 BuildRequires:  pkgconfig(dali-core)
-BuildRequires:  fribidi-devel
 
 %description
 The OpenGLES Canvas Core Library Toolkit - a set of controls that provide

@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/set-wrapper.h>
@@ -87,131 +86,122 @@ float CalculateScrollDistance(Vector2 panDistance, Toolkit::ItemLayout& layout)
 }
 
 // Overshoot overlay constraints
-
-struct OvershootOverlaySizeConstraint
+void OvershootOverlaySizeConstraint( Vector3& current, const PropertyInputContainer& inputs )
 {
-  Vector3 operator()(const Vector3& current,
-                     const PropertyInput& parentScrollDirectionProperty,
-                     const PropertyInput& parentOvershootProperty,
-                     const PropertyInput& parentSizeProperty)
+  const Vector3& parentScrollDirection = inputs[0]->GetVector3();
+  const Vector3& parentSize = inputs[1]->GetVector3();
+  const Toolkit::ControlOrientation::Type& parentOrientation = static_cast<Toolkit::ControlOrientation::Type>(parentScrollDirection.z);
+
+  if(Toolkit::IsVertical(parentOrientation))
   {
-    const Vector3 parentScrollDirection = parentScrollDirectionProperty.GetVector3();
-    const Vector3 parentSize = parentSizeProperty.GetVector3();
-    const Toolkit::ControlOrientation::Type& parentOrientation = static_cast<Toolkit::ControlOrientation::Type>(parentScrollDirection.z);
-
-    float overlayWidth;
-
-    if(Toolkit::IsVertical(parentOrientation))
-    {
-      overlayWidth = fabsf(parentScrollDirection.y) > Math::MACHINE_EPSILON_1 ? parentSize.x : parentSize.y;
-    }
-    else
-    {
-      overlayWidth = fabsf(parentScrollDirection.x) > Math::MACHINE_EPSILON_1 ? parentSize.y : parentSize.x;
-    }
-
-    float overlayHeight = (overlayWidth > OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD) ? OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height : OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height*0.5f;
-
-    return Vector3( overlayWidth, overlayHeight, current.depth );
+    current.width = fabsf(parentScrollDirection.y) > Math::MACHINE_EPSILON_1 ? parentSize.x : parentSize.y;
   }
-};
-
-struct OvershootOverlayRotationConstraint
-{
-  Quaternion operator()(const Quaternion& current,
-                        const PropertyInput& parentScrollDirectionProperty,
-                        const PropertyInput& parentOvershootProperty)
+  else
   {
-    const Vector3 parentScrollDirection = parentScrollDirectionProperty.GetVector3();
-    const float parentOvershoot = parentOvershootProperty.GetFloat();
-    const Toolkit::ControlOrientation::Type& parentOrientation = static_cast<Toolkit::ControlOrientation::Type>(parentScrollDirection.z);
+    current.width = fabsf(parentScrollDirection.x) > Math::MACHINE_EPSILON_1 ? parentSize.y : parentSize.x;
+  }
 
-    float multiplier = 0;
-    if(Toolkit::IsVertical(parentOrientation))
+  current.height = ( current.width > OVERSHOOT_BOUNCE_ACTOR_RESIZE_THRESHOLD ) ? OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height : OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height*0.5f;
+}
+
+void OvershootOverlayRotationConstraint( Quaternion& current, const PropertyInputContainer& inputs )
+{
+  const Vector3& parentScrollDirection = inputs[0]->GetVector3();
+  const float parentOvershoot = inputs[1]->GetFloat();
+  const Toolkit::ControlOrientation::Type& parentOrientation = static_cast<Toolkit::ControlOrientation::Type>(parentScrollDirection.z);
+
+  float multiplier = 0;
+  if(Toolkit::IsVertical(parentOrientation))
+  {
+    if(fabsf(parentScrollDirection.y) <= Math::MACHINE_EPSILON_1)
     {
-      if(fabsf(parentScrollDirection.y) <= Math::MACHINE_EPSILON_1)
-      {
-        if( (parentOrientation == Toolkit::ControlOrientation::Up && parentOvershoot < Math::MACHINE_EPSILON_0)
-            || (parentOrientation == Toolkit::ControlOrientation::Down && parentOvershoot > Math::MACHINE_EPSILON_0) )
-        {
-          multiplier = 0.5f;
-        }
-        else
-        {
-          multiplier = 1.5f;
-        }
-      }
-      else if( (parentOvershoot > Math::MACHINE_EPSILON_0 && parentScrollDirection.y > Math::MACHINE_EPSILON_0)
-            || (parentOvershoot < Math::MACHINE_EPSILON_0 && parentScrollDirection.y < Math::MACHINE_EPSILON_0) )
-      {
-        multiplier = 0.0f;
-      }
-      else
-      {
-        multiplier = 1.0f;
-      }
-    }
-    else
-    {
-      if(fabsf(parentScrollDirection.x) <= Math::MACHINE_EPSILON_1)
-      {
-        if( (parentOrientation == Toolkit::ControlOrientation::Left && parentOvershoot > Math::MACHINE_EPSILON_0)
-            ||(parentOrientation == Toolkit::ControlOrientation::Right && parentOvershoot < Math::MACHINE_EPSILON_0) )
-        {
-          multiplier = 1.0f;
-        }
-        else
-        {
-          multiplier = 0.0f;
-        }
-      }
-      else if( (parentOvershoot > Math::MACHINE_EPSILON_0 && parentScrollDirection.x > Math::MACHINE_EPSILON_0)
-            || (parentOvershoot < Math::MACHINE_EPSILON_0 && parentScrollDirection.x < Math::MACHINE_EPSILON_0) )
-      {
-        multiplier = 1.5f;
-      }
-      else
+      if( (parentOrientation == Toolkit::ControlOrientation::Up && parentOvershoot < Math::MACHINE_EPSILON_0)
+          || (parentOrientation == Toolkit::ControlOrientation::Down && parentOvershoot > Math::MACHINE_EPSILON_0) )
       {
         multiplier = 0.5f;
       }
-    }
-
-    Quaternion rotation( Radian( multiplier * Math::PI ), Vector3::ZAXIS );
-
-    return rotation;
-  }
-};
-
-struct OvershootOverlayPositionConstraint
-{
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& parentSizeProperty,
-                     const PropertyInput& parentScrollDirectionProperty,
-                     const PropertyInput& parentOvershootProperty)
-  {
-    const Vector3 parentScrollDirection = parentScrollDirectionProperty.GetVector3();
-    const float parentOvershoot = parentOvershootProperty.GetFloat();
-    const Vector3 parentSize = parentSizeProperty.GetVector3();
-    const Toolkit::ControlOrientation::Type& parentOrientation = static_cast<Toolkit::ControlOrientation::Type>(parentScrollDirection.z);
-
-    Vector3 relativeOffset;
-
-    if(Toolkit::IsVertical(parentOrientation))
-    {
-      if(fabsf(parentScrollDirection.y) <= Math::MACHINE_EPSILON_1)
+      else
       {
-        if( (parentOrientation == Toolkit::ControlOrientation::Up && parentOvershoot < Math::MACHINE_EPSILON_0)
-            || (parentOrientation == Toolkit::ControlOrientation::Down && parentOvershoot > Math::MACHINE_EPSILON_0) )
-        {
-          relativeOffset = Vector3(1.0f, 0.0f, 0.0f);
-        }
-        else
-        {
-          relativeOffset =Vector3(0.0f, 1.0f, 0.0f);
-        }
+        multiplier = 1.5f;
       }
-      else if( (parentOvershoot > Math::MACHINE_EPSILON_0 && parentScrollDirection.y > Math::MACHINE_EPSILON_0)
-            || (parentOvershoot < Math::MACHINE_EPSILON_0 && parentScrollDirection.y < Math::MACHINE_EPSILON_0) )
+    }
+    else if( (parentOvershoot > Math::MACHINE_EPSILON_0 && parentScrollDirection.y > Math::MACHINE_EPSILON_0)
+          || (parentOvershoot < Math::MACHINE_EPSILON_0 && parentScrollDirection.y < Math::MACHINE_EPSILON_0) )
+    {
+      multiplier = 0.0f;
+    }
+    else
+    {
+      multiplier = 1.0f;
+    }
+  }
+  else
+  {
+    if(fabsf(parentScrollDirection.x) <= Math::MACHINE_EPSILON_1)
+    {
+      if( (parentOrientation == Toolkit::ControlOrientation::Left && parentOvershoot > Math::MACHINE_EPSILON_0)
+          ||(parentOrientation == Toolkit::ControlOrientation::Right && parentOvershoot < Math::MACHINE_EPSILON_0) )
+      {
+        multiplier = 1.0f;
+      }
+      else
+      {
+        multiplier = 0.0f;
+      }
+    }
+    else if( (parentOvershoot > Math::MACHINE_EPSILON_0 && parentScrollDirection.x > Math::MACHINE_EPSILON_0)
+          || (parentOvershoot < Math::MACHINE_EPSILON_0 && parentScrollDirection.x < Math::MACHINE_EPSILON_0) )
+    {
+      multiplier = 1.5f;
+    }
+    else
+    {
+      multiplier = 0.5f;
+    }
+  }
+
+  current = Quaternion( Radian( multiplier * Math::PI ), Vector3::ZAXIS );
+}
+
+void OvershootOverlayPositionConstraint( Vector3& current, const PropertyInputContainer& inputs )
+{
+  const Vector3& parentSize = inputs[0]->GetVector3();
+  const Vector3& parentScrollDirection = inputs[1]->GetVector3();
+  const float parentOvershoot = inputs[2]->GetFloat();
+  const Toolkit::ControlOrientation::Type& parentOrientation = static_cast<Toolkit::ControlOrientation::Type>(parentScrollDirection.z);
+
+  Vector3 relativeOffset;
+
+  if(Toolkit::IsVertical(parentOrientation))
+  {
+    if(fabsf(parentScrollDirection.y) <= Math::MACHINE_EPSILON_1)
+    {
+      if( (parentOrientation == Toolkit::ControlOrientation::Up && parentOvershoot < Math::MACHINE_EPSILON_0)
+          || (parentOrientation == Toolkit::ControlOrientation::Down && parentOvershoot > Math::MACHINE_EPSILON_0) )
+      {
+        relativeOffset = Vector3(1.0f, 0.0f, 0.0f);
+      }
+      else
+      {
+        relativeOffset =Vector3(0.0f, 1.0f, 0.0f);
+      }
+    }
+    else if( (parentOvershoot > Math::MACHINE_EPSILON_0 && parentScrollDirection.y > Math::MACHINE_EPSILON_0)
+          || (parentOvershoot < Math::MACHINE_EPSILON_0 && parentScrollDirection.y < Math::MACHINE_EPSILON_0) )
+    {
+      relativeOffset = Vector3(0.0f, 0.0f, 0.0f);
+    }
+    else
+    {
+      relativeOffset = Vector3(1.0f, 1.0f, 0.0f);
+    }
+  }
+  else
+  {
+    if(fabsf(parentScrollDirection.x) <= Math::MACHINE_EPSILON_1)
+    {
+      if( (parentOrientation == Toolkit::ControlOrientation::Left && parentOvershoot < Math::MACHINE_EPSILON_0)
+          || (parentOrientation == Toolkit::ControlOrientation::Right && parentOvershoot > Math::MACHINE_EPSILON_0) )
       {
         relativeOffset = Vector3(0.0f, 0.0f, 0.0f);
       }
@@ -220,69 +210,41 @@ struct OvershootOverlayPositionConstraint
         relativeOffset = Vector3(1.0f, 1.0f, 0.0f);
       }
     }
+    else if( (parentOvershoot > Math::MACHINE_EPSILON_0 && parentScrollDirection.x > Math::MACHINE_EPSILON_0)
+          || (parentOvershoot < Math::MACHINE_EPSILON_0 && parentScrollDirection.x < Math::MACHINE_EPSILON_0) )
+    {
+      relativeOffset = Vector3(0.0f, 1.0f, 0.0f);
+    }
     else
     {
-      if(fabsf(parentScrollDirection.x) <= Math::MACHINE_EPSILON_1)
-      {
-        if( (parentOrientation == Toolkit::ControlOrientation::Left && parentOvershoot < Math::MACHINE_EPSILON_0)
-            || (parentOrientation == Toolkit::ControlOrientation::Right && parentOvershoot > Math::MACHINE_EPSILON_0) )
-        {
-          relativeOffset = Vector3(0.0f, 0.0f, 0.0f);
-        }
-        else
-        {
-          relativeOffset = Vector3(1.0f, 1.0f, 0.0f);
-        }
-      }
-      else if( (parentOvershoot > Math::MACHINE_EPSILON_0 && parentScrollDirection.x > Math::MACHINE_EPSILON_0)
-            || (parentOvershoot < Math::MACHINE_EPSILON_0 && parentScrollDirection.x < Math::MACHINE_EPSILON_0) )
-      {
-        relativeOffset = Vector3(0.0f, 1.0f, 0.0f);
-      }
-      else
-      {
-        relativeOffset = Vector3(1.0f, 0.0f, 0.0f);
-      }
+      relativeOffset = Vector3(1.0f, 0.0f, 0.0f);
     }
-
-    return relativeOffset * parentSize;
-
   }
-};
 
-struct OvershootOverlayVisibilityConstraint
+  current = relativeOffset * parentSize;
+}
+
+void OvershootOverlayVisibilityConstraint( bool& current, const PropertyInputContainer& inputs )
 {
-  bool operator()(const bool& current,
-                  const PropertyInput& parentLayoutScrollableProperty)
-  {
-    const bool parentLayoutScrollable = parentLayoutScrollableProperty.GetBoolean();
-
-    return parentLayoutScrollable;
-  }
-};
+  current = inputs[0]->GetBoolean();
+}
 
 /**
  * Relative position Constraint
  * Generates the relative position value of the item view based on the layout position,
  * and it's relation to the layout domain. This is a value from 0.0f to 1.0f in each axis.
  */
-Vector3 RelativePositionConstraint(const Vector3& current,
-                                   const PropertyInput& scrollPositionProperty,
-                                   const PropertyInput& scrollMinProperty,
-                                   const PropertyInput& scrollMaxProperty,
-                                   const PropertyInput& layoutSizeProperty)
+void RelativePositionConstraint( Vector3& current, const PropertyInputContainer& inputs )
 {
-  const Vector3& position = Vector3(0.0f, scrollPositionProperty.GetFloat(), 0.0f);
-  const Vector3& min = scrollMinProperty.GetVector3();
-  const Vector3& max = scrollMaxProperty.GetVector3();
+  const Vector3& position = Vector3(0.0f, inputs[0]->GetFloat(), 0.0f);
+  const Vector3& min = inputs[1]->GetVector3();
+  const Vector3& max = inputs[2]->GetVector3();
 
-  Vector3 relativePosition;
   Vector3 domainSize = max - min;
 
-  relativePosition.x = fabsf(domainSize.x) > Math::MACHINE_EPSILON_1 ? ((min.x - position.x) / fabsf(domainSize.x)) : 0.0f;
-  relativePosition.y = fabsf(domainSize.y) > Math::MACHINE_EPSILON_1 ? ((min.y - position.y) / fabsf(domainSize.y)) : 0.0f;
-
-  return relativePosition;
+  current.x = fabsf(domainSize.x) > Math::MACHINE_EPSILON_1 ? ((min.x - position.x) / fabsf(domainSize.x)) : 0.0f;
+  current.y = fabsf(domainSize.y) > Math::MACHINE_EPSILON_1 ? ((min.y - position.y) / fabsf(domainSize.y)) : 0.0f;
+  current.z = 0.0f;
 }
 
 } // unnamed namespace
@@ -377,13 +339,11 @@ void ItemView::OnInitialize()
 
   EnableScrollComponent(Toolkit::Scrollable::OvershootIndicator);
 
-  Constraint constraint = Constraint::New<Vector3>(Toolkit::Scrollable::Property::SCROLL_RELATIVE_POSITION,
-                                                   LocalSource(mPropertyPosition),
-                                                   LocalSource(Toolkit::Scrollable::Property::SCROLL_POSITION_MIN),
-                                                   LocalSource(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX),
-                                                   LocalSource(Actor::Property::SIZE),
-                                                   RelativePositionConstraint);
-  self.ApplyConstraint(constraint);
+  Constraint constraint = Constraint::New<Vector3>( self, Toolkit::Scrollable::Property::SCROLL_RELATIVE_POSITION, RelativePositionConstraint );
+  constraint.AddSource( LocalSource( mPropertyPosition ) );
+  constraint.AddSource( LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
+  constraint.AddSource( LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
+  constraint.Apply();
 
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   mMouseWheelScrollDistanceStep = stageSize.y * DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
@@ -1561,36 +1521,31 @@ void ItemView::SetOvershootEnabled( bool enable )
     mOvershootOverlay.SetDrawMode(DrawMode::OVERLAY);
     self.Add(mOvershootOverlay);
 
-    Constraint constraint = Constraint::New<Vector3>( Actor::Property::SIZE,
-                                                      ParentSource( Toolkit::Scrollable::Property::SCROLL_DIRECTION ),
-                                                      Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
-                                                      ParentSource( Actor::Property::SIZE ),
-                                                      OvershootOverlaySizeConstraint() );
-    mOvershootOverlay.ApplyConstraint(constraint);
+    Constraint constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::SIZE, OvershootOverlaySizeConstraint );
+    constraint.AddSource( ParentSource( Toolkit::Scrollable::Property::SCROLL_DIRECTION ) );
+    constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+    constraint.Apply();
+
     mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.width, OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height);
 
-    constraint = Constraint::New<Quaternion>( Actor::Property::ORIENTATION,
-                                              ParentSource( Toolkit::Scrollable::Property::SCROLL_DIRECTION ),
-                                              Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
-                                              OvershootOverlayRotationConstraint() );
-    mOvershootOverlay.ApplyConstraint(constraint);
+    constraint = Constraint::New<Quaternion>( mOvershootOverlay, Actor::Property::ORIENTATION, OvershootOverlayRotationConstraint );
+    constraint.AddSource( ParentSource( Toolkit::Scrollable::Property::SCROLL_DIRECTION ) );
+    constraint.AddSource( Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ) );
+    constraint.Apply();
 
-    constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
-                                           ParentSource( Actor::Property::SIZE ),
-                                           ParentSource( Toolkit::Scrollable::Property::SCROLL_DIRECTION ),
-                                           Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
-                                           OvershootOverlayPositionConstraint() );
-    mOvershootOverlay.ApplyConstraint(constraint);
+    constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::POSITION, OvershootOverlayPositionConstraint );
+    constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+    constraint.AddSource( ParentSource( Toolkit::Scrollable::Property::SCROLL_DIRECTION ) );
+    constraint.AddSource( Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ) );
+    constraint.Apply();
 
-    constraint = Constraint::New<bool>( Actor::Property::VISIBLE,
-                                        ParentSource( Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL ),
-                                        OvershootOverlayVisibilityConstraint() );
-    mOvershootOverlay.ApplyConstraint(constraint);
+    constraint = Constraint::New<bool>( mOvershootOverlay, Actor::Property::VISIBLE, OvershootOverlayVisibilityConstraint );
+    constraint.AddSource( ParentSource( Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL ) );
+    constraint.Apply();
 
-    constraint = Constraint::New<float>( effectOvershootPropertyIndex,
-                                         Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ),
-                                         EqualToConstraint() );
-    mOvershootOverlay.ApplyConstraint(constraint);
+    constraint = Constraint::New<float>( mOvershootOverlay, effectOvershootPropertyIndex, EqualToConstraint() );
+    constraint.AddSource( Source( mScrollPositionObject, ScrollConnector::OVERSHOOT ) );
+    constraint.Apply();
   }
   else
   {
@@ -1638,7 +1593,12 @@ void ItemView::AnimateScrollOvershoot(float overshootAmount, bool animateBack)
   if(mOvershootAnimationSpeed > Math::MACHINE_EPSILON_0)
   {
     float currentOvershoot = mScrollPositionObject.GetProperty<float>(ScrollConnector::OVERSHOOT);
-    float duration = mOvershootOverlay.GetCurrentSize().height * (animatingOn ? (1.0f - fabsf(currentOvershoot)) : fabsf(currentOvershoot)) / mOvershootAnimationSpeed;
+    float duration = 0.0f;
+
+    if (mOvershootOverlay)
+    {
+      duration = mOvershootOverlay.GetCurrentSize().height * (animatingOn ? (1.0f - fabsf(currentOvershoot)) : fabsf(currentOvershoot)) / mOvershootAnimationSpeed;
+    }
 
     RemoveAnimation(mScrollOvershootAnimation);
     mScrollOvershootAnimation = Animation::New(duration);

@@ -32,7 +32,6 @@
 #include <actors/actor-wrapper.h>
 #include <image/image-wrapper.h>
 #include <animation/animation-wrapper.h>
-#include <text/font-wrapper.h>
 #include <shader-effects/shader-effect-wrapper.h>
 
 
@@ -292,11 +291,6 @@ void BuilderApi::Create( const v8::FunctionCallbackInfo< v8::Value >& args )
   {
     v8::Local<v8::Object> image = ImageWrapper::WrapImage(isolate, Image::DownCast(handle) );
     args.GetReturnValue().Set( image );
-  }
-  if( typeName == "Font ")
-  {
-    v8::Local<v8::Object> font = FontWrapper::WrapFont(isolate, Font::DownCast(handle) );
-    args.GetReturnValue().Set( font );
   }
   if( typeName == "Shader")
   {

@@ -262,26 +262,16 @@ void Popup::SetButtonAreaImage( Actor image )
 
 void Popup::SetTitle( const std::string& text )
 {
-  Toolkit::TextView titleActor = Toolkit::TextView::New();
-  titleActor.SetName( "POPUP_TITLE" );
-  titleActor.SetText( text );
-  titleActor.SetColor( Color::BLACK );
-  titleActor.SetMultilinePolicy( Toolkit::TextView::SplitByWord );
-  titleActor.SetWidthExceedPolicy( Toolkit::TextView::Split );
-  titleActor.SetLineJustification( Toolkit::TextView::Center );
-
-  SetTitle( titleActor );
-}
-
-void Popup::SetTitle( Toolkit::TextView titleActor )
-{
   // Replaces the current title actor.
   if( mPopupLayout )
   {
     mPopupLayout.RemoveChildAt( Toolkit::TableView::CellPosition( 0, 0 ) );
   }
 
-  mTitle = titleActor;
+  mTitle = Toolkit::TextLabel::New( text );
+  mTitle.SetName( "POPUP_TITLE" );
+  mTitle.SetProperty( Toolkit::TextLabel::Property::MULTI_LINE, true );
+  mTitle.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
 
   if( mPopupLayout )
   {
@@ -294,9 +284,14 @@ void Popup::SetTitle( Toolkit::TextView titleActor )
   RelayoutRequest();
 }
 
-Toolkit::TextView Popup::GetTitle() const
+std::string Popup::GetTitle() const
 {
-  return mTitle;
+  if( mTitle )
+  {
+    return mTitle.GetProperty<std::string>( Toolkit::TextLabel::Property::TEXT );
+  }
+
+  return std::string();
 }
 
 void Popup::CreateFooter()
@@ -747,7 +742,7 @@ Vector3 Popup::GetNaturalSize()
     const float titleBuffer = 0.5f;
     titleNaturalSize.width += titleBuffer;
 
-    // As TextView GetNaturalSize does not take wrapping into account, limit the width
+    // As TextLabel GetNaturalSize does not take wrapping into account, limit the width
     // to that of the stage
     if( titleNaturalSize.width >= maxWidth)
     {

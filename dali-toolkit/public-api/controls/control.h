@@ -82,7 +82,8 @@ public:
   {
     enum
     {
-      BACKGROUND_COLOR = PROPERTY_START_INDEX, ///< name "background-color", @see SetBackgroundColor, type Vector4
+      STYLE_NAME = PROPERTY_START_INDEX,       ///< name "style-name",       @see SetStyleName,       type std::string
+      BACKGROUND_COLOR,                        ///< name "background-color", @see SetBackgroundColor, type Vector4
       BACKGROUND_IMAGE,                        ///< name "background-image", @see SetBackgroundImage, type Map
       KEY_INPUT_FOCUS,                         ///< name "key-input-focus",  @see SetKeyInputFocus,   type bool
     };
@@ -241,6 +242,22 @@ public:
    * @note Will return an empty handle if the control does not handle the gesture itself.
    */
   LongPressGestureDetector GetLongPressGestureDetector() const;
+
+  // Background
+
+  /**
+   * @brief Sets the name of the style to be applied to the control.
+   *
+   * @param[in] styleName A string matching a style described in a stylesheet.
+   */
+  void SetStyleName( const std::string& styleName );
+
+  /**
+   * @brief Retrieves the name of the style to be applied to the control (if any).
+   *
+   * @return A string matching a style or an empty string.
+   */
+  const std::string& GetStyleName() const;
 
   // Background
 

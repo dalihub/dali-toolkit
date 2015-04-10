@@ -287,7 +287,7 @@ ConstraintAppliedCheck::ConstraintAppliedCheck( bool& signalReceived )
 {
 }
 
-void ConstraintAppliedCheck::operator()( ActiveConstraint& constraint )
+void ConstraintAppliedCheck::operator()( Constraint& constraint )
 {
   mSignalReceived = true;
 }

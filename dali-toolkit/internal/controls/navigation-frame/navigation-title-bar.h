@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/navigation-frame/page.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/internal/controls/navigation-frame/navigation-control-impl.h>
 #include <dali-toolkit/internal/controls/navigation-frame/navigation-bar.h>
 
@@ -81,8 +81,8 @@ private:
   Toolkit::TableView mTitleLayout;
   Toolkit::TableView mTitleIconLayout;
 
-  Toolkit::TextView  mTitle;
-  Toolkit::TextView  mSubTitle;
+  Toolkit::TextLabel  mTitle;
+  Toolkit::TextLabel  mSubTitle;
 
 };
 

@@ -28,7 +28,7 @@ namespace Dali
 namespace V8Plugin
 {
 
-namespace TextViewApi
+namespace TextLabelApi
 {
   /**
    * Temporary TextView constructor

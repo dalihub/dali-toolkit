@@ -48,8 +48,9 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/slider/slider.cpp \
   $(public_api_src_dir)/controls/super-blur-view/super-blur-view.cpp \
   $(public_api_src_dir)/controls/table-view/table-view.cpp \
-  $(public_api_src_dir)/controls/text-input/text-input.cpp \
-  $(public_api_src_dir)/controls/text-view/text-view.cpp \
+  $(public_api_src_dir)/controls/text-controls/text-label.cpp \
+  $(public_api_src_dir)/controls/text-controls/text-field.cpp \
+  $(public_api_src_dir)/controls/text-controls/text-selection-popup.cpp \
   $(public_api_src_dir)/controls/tool-bar/tool-bar.cpp \
   $(public_api_src_dir)/controls/bloom-view/bloom-view.cpp \
   $(public_api_src_dir)/controls/cluster/cluster-style.cpp \
@@ -61,7 +62,6 @@ public_api_src_files = \
   $(public_api_src_dir)/focus-manager/focus-manager.cpp \
   $(public_api_src_dir)/focus-manager/keyboard-focus-manager.cpp \
   $(public_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
-  $(public_api_src_dir)/markup-processor/markup-processor.cpp \
   $(public_api_src_dir)/shader-effects/bubble-effect/bubble-effect.cpp \
   $(public_api_src_dir)/shader-effects/bubble-effect/color-adjuster.cpp \
   $(public_api_src_dir)/shader-effects/alpha-discard-effect.cpp \
@@ -203,11 +203,10 @@ public_api_super_blur_view_header_files = \
 public_api_table_view_header_files = \
   $(public_api_src_dir)/controls/table-view/table-view.h
 
-public_api_text_input_header_files = \
-  $(public_api_src_dir)/controls/text-input/text-input.h
-
-public_api_text_view_header_files = \
-  $(public_api_src_dir)/controls/text-view/text-view.h
+public_api_text_controls_header_files = \
+  $(public_api_src_dir)/controls/text-controls/text-label.h \
+  $(public_api_src_dir)/controls/text-controls/text-field.h \
+  $(public_api_src_dir)/controls/text-controls/text-selection-popup.h
 
 public_api_tool_bar_header_files = \
   $(public_api_src_dir)/controls/tool-bar/tool-bar.h
@@ -224,9 +223,6 @@ public_api_focus_manager_header_files = \
   $(public_api_src_dir)/focus-manager/focus-manager.h \
   $(public_api_src_dir)/focus-manager/keyboard-focus-manager.h \
   $(public_api_src_dir)/focus-manager/keyinput-focus-manager.h
-
-public_api_markup_processor_header_files = \
-  $(public_api_src_dir)/markup-processor/markup-processor.h
 
 public_api_shader_effects_header_files = \
   $(public_api_src_dir)/shader-effects/alpha-discard-effect.h \
@@ -275,3 +271,5 @@ public_api_scripting_header_files = \
   $(public_api_src_dir)/scripting/script.h \
   $(public_api_src_dir)/scripting/script-plugin.h
 
+public_api_rendering_backend_header_files = \
+  $(public_api_src_dir)/text/rendering-backend.h

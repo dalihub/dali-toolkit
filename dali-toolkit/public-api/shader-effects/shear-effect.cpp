@@ -71,7 +71,7 @@ ShearEffect ShearEffect::New()
   ShaderEffect shaderEffectCustom =  Dali::ShaderEffect::New(
       vertexShader,
       "",
-      GeometryType( GEOMETRY_TYPE_IMAGE | GEOMETRY_TYPE_TEXT ),
+      GeometryType( GEOMETRY_TYPE_IMAGE ),
       GeometryHints( HINT_GRID ));
 
   // Pass ownership to ShearEffect through overloaded constructor, So that it now has access to the

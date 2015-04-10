@@ -60,11 +60,13 @@ void PrintArray( Array2d<Dali::Toolkit::Internal::TableView::CellData>& array )
     {
       Dali::Toolkit::Internal::TableView::CellData data = array[i][j];
       char actor = ' ';
+      std::string actorName;
       if( data.actor )
       {
         actor = 'A';
+        actorName = data.actor.GetName();
       }
-      TV_LOG("Array[%d,%d]=%c %d,%d,%d,%d  ", i, j, actor,
+      TV_LOG("Array[%d,%d]=%c %s %d,%d,%d,%d  ", i, j, actor, actorName.c_str(),
           data.position.rowIndex, data.position.columnIndex,
           data.position.rowSpan, data.position.columnSpan );
     }
@@ -192,50 +194,33 @@ bool TableView::AddChild( Actor& child, const Toolkit::TableView::CellPosition& 
   // adopt the child
   Self().Add( child );
 
-  // put the actor to the main cell
-  CellData& data = mCellData[ position.rowIndex ][ position.columnIndex ];
+  // if child spans multiple rows of columns
+  if( ( position.rowSpan > 1 ) && ( position.rowIndex + position.rowSpan > mCellData.GetRows() ) )
+  {
+    // increase table size for the full span, only increasing rows
+    ResizeContainers( position.rowIndex + position.rowSpan, mCellData.GetColumns() );
+  }
+
+  if( ( position.columnSpan > 1 ) && ( position.columnIndex + position.columnSpan > mCellData.GetColumns() ) )
+  {
+    // increase table size for the full span, only increasing columns
+    ResizeContainers( mCellData.GetRows(), position.columnIndex + position.columnSpan );
+  }
+
+  // Fill in all cells that need the data
+  CellData data;
   data.actor = child;
   data.position = position;
 
-  // if child spans multiple rows of columns
-  bool spanned = false;
-  if( position.rowSpan > 1 )
+  for( unsigned int row = position.rowIndex; row < ( position.rowIndex + position.rowSpan ); ++row )
   {
-    // span might go outside table
-    if( position.rowIndex + position.rowSpan > mCellData.GetRows() )
-    {
-      // increase table size for the full span, only increasing rows
-      ResizeContainers( position.rowIndex + position.rowSpan, mCellData.GetColumns() );
-    }
-
-    spanned = true;
-  }
-
-  if( position.columnSpan > 1 )
-  {
-    // span might go outside table
-    if( position.columnIndex + position.columnSpan > mCellData.GetColumns() )
-    {
-      // increase table size for the full span, only increasing columns
-      ResizeContainers( mCellData.GetRows(), position.columnIndex + position.columnSpan );
-    }
-
-    spanned = true;
-  }
-
-  // if it spanned multiple rows, put the cellinfo in all of those
-  if( spanned )
-  {
-    for( unsigned int row = position.rowIndex; row < ( position.rowIndex + position.rowSpan ); ++row )
+    // store same information to all cells, this way we can identify
+    // if a cell is the prime location of an actor or a spanned one
+    for( unsigned int column = position.columnIndex; column < ( position.columnIndex + position.columnSpan ); ++column )
     {
       // store same information to all cells, this way we can identify
       // if a cell is the prime location of an actor or a spanned one
-      for( unsigned int column = position.columnIndex; column < ( position.columnIndex + position.columnSpan ); ++column )
-      {
-        // store same information to all cells, this way we can identify
-        // if a cell is the prime location of an actor or a spanned one
-        mCellData[ row ][ column ] = data;
-      }
+      mCellData[ row ][ column ] = data;
     }
   }
 
@@ -1280,6 +1265,7 @@ float TableView::CalculateChildSize( const Actor& child, Dimension dimension )
               // Accumulate the width
               for( unsigned int i = 0; i < position.columnSpan; ++i )
               {
+                DALI_ASSERT_DEBUG( column + i < mColumnData.Size() );
                 cellSize += mColumnData[ column + i ].size;
               }
 
@@ -1300,6 +1286,7 @@ float TableView::CalculateChildSize( const Actor& child, Dimension dimension )
               // Accumulate the height
               for( unsigned int i = 0; i < position.rowSpan; ++i )
               {
+                DALI_ASSERT_DEBUG( row + i < mRowData.Size() );
                 cellSize += mRowData[ row + i ].size;
               }
 

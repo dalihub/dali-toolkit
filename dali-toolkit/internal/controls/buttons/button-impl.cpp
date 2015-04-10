@@ -26,7 +26,7 @@
 #include <dali/public-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 /**
  * Button states and contents
@@ -615,9 +615,8 @@ float Button::GetAnimationTime() const
 
 void Button::SetLabel( const std::string& label )
 {
-  Toolkit::TextView textView = Toolkit::TextView::New( label );
-  textView.SetWidthExceedPolicy( Toolkit::TextView::ShrinkToFit ); // Make sure our text always fits inside the button
-  SetLabel( textView );
+  Toolkit::TextLabel textLabel = Toolkit::TextLabel::New( label );
+  SetLabel( textLabel );
 }
 
 void Button::SetLabel( Actor label )
