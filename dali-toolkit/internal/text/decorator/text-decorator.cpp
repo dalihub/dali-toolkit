@@ -345,7 +345,7 @@ struct Decorator::Impl : public ConnectionTracker
 #endif
 
       mActiveLayer.SetParentOrigin( ParentOrigin::CENTER );
-      mActiveLayer.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+      mActiveLayer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
       mActiveLayer.SetPositionInheritanceMode( USE_PARENT_POSITION );
 
       parent.Add( mActiveLayer );
@@ -379,7 +379,7 @@ struct Decorator::Impl : public ConnectionTracker
 #endif
       mGrabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
       mGrabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
-      mGrabArea.SetResizePolicy( SIZE_RELATIVE_TO_PARENT, ALL_DIMENSIONS );
+      mGrabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
       mGrabArea.SetSizeModeFactor( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE );
       mGrabHandle.Add( mGrabArea );
 
@@ -413,7 +413,7 @@ struct Decorator::Impl : public ConnectionTracker
 #ifdef DECORATOR_DEBUG
       primary.grabArea.SetName("SelectionHandleOneGrabArea");
 #endif
-      primary.grabArea.SetResizePolicy( SIZE_RELATIVE_TO_PARENT, ALL_DIMENSIONS );
+      primary.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
       primary.grabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
       primary.grabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
@@ -446,7 +446,7 @@ struct Decorator::Impl : public ConnectionTracker
 #ifdef DECORATOR_DEBUG
       secondary.grabArea.SetName("SelectionHandleTwoGrabArea");
 #endif
-      secondary.grabArea.SetResizePolicy( SIZE_RELATIVE_TO_PARENT, ALL_DIMENSIONS );
+      secondary.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
       secondary.grabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
       secondary.grabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 

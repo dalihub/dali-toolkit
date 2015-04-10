@@ -477,7 +477,7 @@ void KeyboardFocusManager::CreateDefaultFocusIndicatorActor()
   focusIndicator.SetPosition(Vector3(0.0f, 0.0f, 1.0f));
 
   // Apply size constraint to the focus indicator
-  focusIndicator.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  focusIndicator.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   SetFocusIndicatorActor(focusIndicator);
 }

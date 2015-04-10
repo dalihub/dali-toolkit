@@ -400,8 +400,8 @@ void TextLabel::OnInitialize()
   mController = Text::Controller::New( *this );
 
   // Use height-for-width negotiation by default
-  self.SetResizePolicy( FILL_TO_PARENT, WIDTH );
-  self.SetResizePolicy( DIMENSION_DEPENDENCY, HEIGHT );
+  self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+  self.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 }
 
 void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )

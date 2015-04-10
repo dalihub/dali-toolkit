@@ -121,14 +121,14 @@ void Popup::OnInitialize()
   Actor self = Self();
   self.SetSensitive(false);
   // Reisize to fit the height of children
-  self.SetResizePolicy( FIT_TO_CHILDREN, HEIGHT );
+  self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::HEIGHT );
 
   // Create Layer
   mLayer = Layer::New();
   mLayer.SetName( "POPUP_LAYER" );
   mLayer.SetParentOrigin(ParentOrigin::CENTER);
   mLayer.SetAnchorPoint(AnchorPoint::CENTER);
-  mLayer.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  mLayer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   mLayer.SetDrawMode( DrawMode::OVERLAY );
 
   // Any content after this point which is added to Self() will be reparented to
@@ -147,8 +147,8 @@ void Popup::OnInitialize()
   mPopupLayout.SetName( "POPUP_LAYOUT_TABLE" );
   mPopupLayout.SetParentOrigin(ParentOrigin::CENTER);
   mPopupLayout.SetAnchorPoint(AnchorPoint::CENTER);
-  mPopupLayout.SetResizePolicy( FILL_TO_PARENT, WIDTH );
-  mPopupLayout.SetResizePolicy( USE_NATURAL_SIZE, HEIGHT );
+  mPopupLayout.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+  mPopupLayout.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
   mPopupLayout.SetFitHeight( 0 );   // Set row to fit
   mPopupLayout.SetFitHeight( 1 );   // Set row to fit
   self.Add( mPopupLayout );
@@ -223,7 +223,7 @@ void Popup::SetBackgroundImage( Actor image )
   // OnDialogTouched only consume the event. It prevents the touch event to be caught by the backing.
   mBackgroundImage.TouchedSignal().Connect( this, &Popup::OnDialogTouched );
 
-  mBackgroundImage.SetResizePolicy( SIZE_FIXED_OFFSET_FROM_PARENT, ALL_DIMENSIONS );
+  mBackgroundImage.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
   mBackgroundImage.SetAnchorPoint( AnchorPoint::CENTER );
   mBackgroundImage.SetParentOrigin( ParentOrigin::CENTER );
 
@@ -250,7 +250,7 @@ void Popup::SetButtonAreaImage( Actor image )
   // OnDialogTouched only consume the event. It prevents the touch event to be caught by the backing.
   mButtonAreaImage.TouchedSignal().Connect( this, &Popup::OnDialogTouched );
 
-  mButtonAreaImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  mButtonAreaImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   mButtonAreaImage.SetAnchorPoint( AnchorPoint::CENTER );
   mButtonAreaImage.SetParentOrigin( ParentOrigin::CENTER );
 
@@ -276,8 +276,8 @@ void Popup::SetTitle( const std::string& text )
   if( mPopupLayout )
   {
     mTitle.SetPadding( Padding( 0.0f, 0.0f, mPopupStyle->margin, mPopupStyle->margin ) );
-    mTitle.SetResizePolicy( FILL_TO_PARENT, WIDTH );
-    mTitle.SetResizePolicy( DIMENSION_DEPENDENCY, HEIGHT );
+    mTitle.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+    mTitle.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
     mPopupLayout.AddChild( mTitle, Toolkit::TableView::CellPosition( 0, 0 ) );
   }
 
@@ -302,7 +302,7 @@ void Popup::CreateFooter()
     mBottomBg = Actor::New();
     mBottomBg.SetName( "POPUP_BOTTOM_BG" );
     mBottomBg.SetRelayoutEnabled( true );
-    mBottomBg.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+    mBottomBg.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
     mPopupLayout.SetFixedHeight( 2, mPopupStyle->bottomSize.height );   // Buttons
     mPopupLayout.AddChild( mBottomBg, Toolkit::TableView::CellPosition( 2, 0 ) );
@@ -312,7 +312,7 @@ void Popup::CreateFooter()
 void Popup::AddButton( Toolkit::Button button )
 {
   mButtons.push_back( button );
-  button.SetResizePolicy( USE_ASSIGNED_SIZE, ALL_DIMENSIONS );    // Size will be assigned to it
+  button.SetResizePolicy( ResizePolicy::USE_ASSIGNED_SIZE, Dimension::ALL_DIMENSIONS );    // Size will be assigned to it
 
   // If this is the first button added
   if( mButtons.size() == 1 )
@@ -422,7 +422,7 @@ void Popup::CreateBacking()
   mBacking = Dali::Toolkit::CreateSolidColorActor( mPopupStyle->backingColor );
   mBacking.SetName( "POPUP_BACKING" );
 
-  mBacking.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  mBacking.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   mBacking.SetSensitive(true);
 
   mLayer.Add( mBacking );
@@ -687,23 +687,23 @@ void Popup::OnRelayout( const Vector2& size, RelayoutContainer& container )
   }
 }
 
-void Popup::OnSetResizePolicy( ResizePolicy policy, Dimension dimension )
+void Popup::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
 {
   if( mPopupLayout )
   {
-    if( policy == FIT_TO_CHILDREN )
+    if( policy == ResizePolicy::FIT_TO_CHILDREN )
     {
-      mPopupLayout.SetResizePolicy( USE_NATURAL_SIZE, dimension );
-      if( dimension & HEIGHT )
+      mPopupLayout.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, dimension );
+      if( dimension & Dimension::HEIGHT )
       {
         mPopupLayout.SetFitHeight( 1 );
       }
     }
     else
     {
-      mPopupLayout.SetResizePolicy( FILL_TO_PARENT, dimension );
+      mPopupLayout.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, dimension );
       // Make the content cell fill the whole of the available space
-      if( dimension & HEIGHT )
+      if( dimension & Dimension::HEIGHT )
       {
         mPopupLayout.SetRelativeHeight( 1, 1.0f );
       }

@@ -132,7 +132,7 @@ void View::SetBackground( ImageActor backgroundImage )
     mBackgroundLayer = Layer::New();
 
     mBackgroundLayer.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-    mBackgroundLayer.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+    mBackgroundLayer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
     // Add background layer to custom actor.
     Self().Add( mBackgroundLayer );
@@ -152,8 +152,8 @@ void View::SetBackground( ImageActor backgroundImage )
   }
 
   backgroundImage.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-  backgroundImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
-  backgroundImage.SetSizeScalePolicy( FILL_WITH_ASPECT_RATIO );
+  backgroundImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+  backgroundImage.SetSizeScalePolicy( SizeScalePolicy::FILL_WITH_ASPECT_RATIO );
   mBackgroundLayer.Add( backgroundImage );
 
   RelayoutRequest();

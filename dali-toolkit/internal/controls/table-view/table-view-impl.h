@@ -251,7 +251,7 @@ private: // From Control
   /**
    * @copydoc Control::CalculateChildSize
    */
-  virtual float CalculateChildSize( const Actor& child, Dimension dimension );
+  virtual float CalculateChildSize( const Actor& child, Dimension::Type dimension );
 
   /**
    * @copydoc Control::OnInitialize()
@@ -271,17 +271,17 @@ private: // From Control
   /**
    * @copydoc Control::RelayoutDependentOnChildren()
    */
-  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS );
+  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
   /**
    * @copydoc Control::OnCalculateRelayoutSize
    */
-  virtual void OnCalculateRelayoutSize( Dimension dimension );
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension );
 
   /**
    * @copydoc Control::OnLayoutNegotiated
    */
-  virtual void OnLayoutNegotiated( float size, Dimension dimension );
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension );
 
 private: // Implementation
 
@@ -404,9 +404,9 @@ private:
    * @brief Calculate the fixed sizes for a row or column
    *
    * @param[in] data The row or column data to process
-   * @param[in] dimension The dimension being calculated: row == HEIGHT, column == WIDTH
+   * @param[in] dimension The dimension being calculated: row == Dimension::HEIGHT, column == Dimension::WIDTH
    */
-  void CalculateFixedSizes( RowColumnArray& data, Dimension dimension );
+  void CalculateFixedSizes( RowColumnArray& data, Dimension::Type dimension );
 
   /**
    * @brief Calculate the value of the relative sizes
@@ -428,6 +428,14 @@ private:
    * @brief Calculate row and column data when it is dirty
    */
   void CalculateRowColumnData();
+
+  /**
+   * @brief Return the cell padding for a given dimension
+   *
+   * @param[in] dimension The dimension to return the padding for
+   * @return Return the padding (x = low, y = high)
+   */
+  Vector2 GetCellPadding( Dimension::Type dimension );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()

@@ -616,11 +616,6 @@ float Button::GetAnimationTime() const
 void Button::SetLabel( const std::string& label )
 {
   Toolkit::TextLabel textLabel = Toolkit::TextLabel::New( label );
-  textLabel.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
-  textLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
-  textLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
-  textLabel.SetProperty( Toolkit::TextLabel::Property::MULTI_LINE, true );
-
   SetLabel( textLabel );
 }
 

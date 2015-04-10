@@ -259,7 +259,7 @@ private:
   /**
    * @copydoc Control::OnSetResizePolicy()
    */
-  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension );
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
 
   /**
    * @copydoc Control::OnKeyEvent()
