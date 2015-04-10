@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <v8-utils.h>
 #include <actors/actor-wrapper.h>
-#include <animation/path-constraint-wrapper.h>
+#include <animation/path-constrainer-wrapper.h>
 
 namespace Dali
 {
@@ -608,111 +608,6 @@ void ActorApi::ScaleBy( const v8::FunctionCallbackInfo<v8::Value>& args )
     return;
   }
   actor.ScaleBy( vector );
-}
-
-void ActorApi::ApplyPathConstraint( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-
-  //Get target actor
-  Actor targetActor = GetActor( isolate, args );
-
-  //Get PathConstraint
-  bool found(false);
-  Handle pathConstraintHandle =  V8Utils::GetHandleParameter(PARAMETER_0, found, isolate, args );
-  if( !found )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "bad parameter 0 (PathConstraint)" );
-    return;
-  }
-  PathConstraint pathConstraint = PathConstraint::DownCast(pathConstraintHandle);
-
-  //Get target property
-  std::string propertyName = V8Utils::GetStringParameter( PARAMETER_1, found, isolate, args );
-  if(!found)
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "bad parameter 1 (Property name)" );
-    return;
-  }
-
-  // try both properties with dashes and without
-  Property::Index targetPropertyIndex = targetActor.GetPropertyIndex( propertyName );
-  if( targetPropertyIndex == Property::INVALID_INDEX )
-  {
-    std::string convertedName = V8Utils::JavaScriptNameToPropertyName( propertyName );
-    targetPropertyIndex = targetActor.GetPropertyIndex( convertedName );
-
-    if( targetPropertyIndex == Property::INVALID_INDEX )
-    {
-      DALI_SCRIPT_EXCEPTION( isolate, "Property not found" );
-    }
-  }
-
-  //Get source actor
-  Actor sourceActor = V8Utils::GetActorParameter( PARAMETER_2, found, isolate, args );
-  if( !found )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "bad parameter 2 (Actor)" );
-  }
-
-  // try both properties with dashes and without
-  propertyName = V8Utils::GetStringParameter( PARAMETER_3, found, isolate, args );
-  if(!found)
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "bad parameter 3 (Property name)" );
-    return;
-  }
-
-  Property::Index sourcePropertyIndex = sourceActor.GetPropertyIndex( propertyName );
-  if( sourcePropertyIndex == Property::INVALID_INDEX )
-  {
-    std::string convertedName = V8Utils::JavaScriptNameToPropertyName( propertyName );
-    sourcePropertyIndex = sourceActor.GetPropertyIndex( convertedName );
-
-    if( sourcePropertyIndex == Property::INVALID_INDEX )
-    {
-      DALI_SCRIPT_EXCEPTION( isolate, "Property not found" );
-      return;
-    }
-  }
-
-  //Check if forward vector is specified
-  Vector3 forward( 0.0f,0.0f,0.0f);
-  if( args.Length() > 4 )
-  {
-    forward =  V8Utils::GetVector3Parameter( PARAMETER_4, found, isolate, args );
-    if( !found )
-    {
-      DALI_SCRIPT_EXCEPTION( isolate, "bad parameter 4 (Vector3)" );
-      return;
-    }
-  }
-
-  pathConstraint.Apply( Dali::Property(sourceActor,sourcePropertyIndex),
-                        Dali::Property(targetActor,targetPropertyIndex),
-                        forward );
-
-}
-
-void ActorApi::RemovePathConstraint( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-
-  //Get target actor
-  Actor actor = GetActor( isolate, args );
-
-  //Get PathConstraint
-  bool found(false);
-  Handle pathConstraintHandle =  V8Utils::GetHandleParameter(PARAMETER_0, found, isolate, args );
-  if( !found )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "bad parameter 0 (PathConstraint)" );
-    return;
-  }
-  PathConstraint pathConstraint = PathConstraint::DownCast(pathConstraintHandle);
-  pathConstraint.Remove(actor);
 }
 
 } // namespace V8Plugin

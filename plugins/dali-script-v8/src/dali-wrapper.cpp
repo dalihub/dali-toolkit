@@ -25,8 +25,9 @@
 #include <actors/actor-wrapper.h>
 #include <stage/stage-wrapper.h>
 #include <image/image-wrapper.h>
+#include <animation/linear-constrainer-wrapper.h>
+#include <animation/path-constrainer-wrapper.h>
 #include <animation/path-wrapper.h>
-#include <animation/path-constraint-wrapper.h>
 #include <animation/animation-wrapper.h>
 #include <events/pan-gesture-detector-wrapper.h>
 #include <shader-effects/shader-effect-wrapper.h>
@@ -59,7 +60,8 @@ const ApiFunction ConstructorFunctionTable[]=
     { "Rotation",           PropertyValueWrapper::NewRotation},
     { "Matrix",             PropertyValueWrapper::NewMatrix},
     { "Path",               PathWrapper::NewPath },
-    { "PathConstraint",     PathConstraintWrapper::NewPathConstraint },
+    { "PathConstrainer",    PathConstrainerWrapper::NewPathConstrainer},
+    { "LinearConstrainer",  LinearConstrainerWrapper::NewLinearConstrainer},
     { "Actor",              ActorWrapper::NewActor },
     { "TextActor",          ActorWrapper::NewActor },
     { "ImageActor",         ActorWrapper::NewActor },

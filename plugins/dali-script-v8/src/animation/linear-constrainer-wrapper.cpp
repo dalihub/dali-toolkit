@@ -16,12 +16,13 @@
  */
 
 // CLASS HEADER
-#include "path-constraint-wrapper.h"
+#include "linear-constrainer-wrapper.h"
 
 // INTERNAL INCLUDES
-#include <v8-utils.h>
+#include <animation/constrainer-api.h>
 #include <dali-wrapper.h>
 #include <shared/object-template-helper.h>
+#include <v8-utils.h>
 
 namespace Dali
 {
@@ -29,18 +30,33 @@ namespace Dali
 namespace V8Plugin
 {
 
-PathConstraintWrapper::PathConstraintWrapper( PathConstraint pathConstraint, GarbageCollectorInterface& gc )
-:HandleWrapper( BaseWrappedObject::PATH_CONSTRAINT, pathConstraint, gc ),
- mPathConstraint( pathConstraint )
+namespace
+{
+
+const ApiFunction ConstrainerFunctions[]=
+{
+ { "ApplyConstraint",  ConstrainerApi::Apply },
+ { "RemoveConstraint", ConstrainerApi::Remove }
+};
+const unsigned int ConstrainerFunctionTableCount = sizeof(ConstrainerFunctions)/sizeof(ConstrainerFunctions[0]);
+
+} //un-named space
+
+LinearConstrainerWrapper::LinearConstrainerWrapper( LinearConstrainer linearConstrainer, GarbageCollectorInterface& gc )
+:HandleWrapper( BaseWrappedObject::LINEAR_CONSTRAINER, linearConstrainer, gc ),
+ mLinearConstrainer( linearConstrainer )
 {
 }
 
-v8::Handle<v8::ObjectTemplate> PathConstraintWrapper::MakePathConstraintTemplate( v8::Isolate* isolate )
+v8::Handle<v8::ObjectTemplate> LinearConstrainerWrapper::MakeLinearConstrainerTemplate( v8::Isolate* isolate )
 {
   v8::EscapableHandleScope handleScope( isolate );
 
   v8::Local<v8::ObjectTemplate> objTemplate = v8::ObjectTemplate::New();
   objTemplate->SetInternalFieldCount( BaseWrappedObject::FIELD_COUNT );
+
+  // add our function properties
+  ObjectTemplateHelper::InstallFunctions( isolate, objTemplate, ConstrainerFunctions, ConstrainerFunctionTableCount );
 
   // property handle intercepts property getters and setters and signals
   HandleWrapper::AddInterceptsToTemplate( isolate, objTemplate );
@@ -48,18 +64,18 @@ v8::Handle<v8::ObjectTemplate> PathConstraintWrapper::MakePathConstraintTemplate
   return handleScope.Escape( objTemplate );
 }
 
-v8::Handle<v8::Object> PathConstraintWrapper::WrapPathConstraint( v8::Isolate* isolate, PathConstraint pathConstraint )
+v8::Handle<v8::Object> LinearConstrainerWrapper::WrapLinearConstrainer( v8::Isolate* isolate, LinearConstrainer linearConstrainer )
 {
   v8::EscapableHandleScope handleScope( isolate );
   v8::Local<v8::ObjectTemplate> objectTemplate;
 
-  objectTemplate = MakePathConstraintTemplate( isolate );
+  objectTemplate = MakeLinearConstrainerTemplate( isolate );
 
   // create an instance of the template
   v8::Local<v8::Object> localObject = objectTemplate->NewInstance();
 
-  // create the pathconstraint object
-  PathConstraintWrapper* pointer = new PathConstraintWrapper( pathConstraint, Dali::V8Plugin::DaliWrapper::Get().GetDaliGarbageCollector() );
+  // create the pathconstrainer object
+  LinearConstrainerWrapper* pointer = new LinearConstrainerWrapper( linearConstrainer, Dali::V8Plugin::DaliWrapper::Get().GetDaliGarbageCollector() );
 
   // assign the JavaScript object to the wrapper.
   // This also stores Dali object, in an internal field inside the JavaScript object.
@@ -68,18 +84,18 @@ v8::Handle<v8::Object> PathConstraintWrapper::WrapPathConstraint( v8::Isolate* i
   return handleScope.Escape( localObject );
 }
 
-PathConstraint PathConstraintWrapper::GetPathConstraint()
+LinearConstrainer LinearConstrainerWrapper::GetLinearConstrainer()
 {
-  return mPathConstraint;
+  return mLinearConstrainer;
 }
 
 /**
- * Create an initialized PathConstraint handle.
+ * Create an initialized PathConstrainer handle.
  * @constructor
- * @for Path
- * @method Path
+ * @for PathConstrainer
+ * @method PathConstrainer
  */
-void PathConstraintWrapper::NewPathConstraint( const v8::FunctionCallbackInfo< v8::Value >& args)
+void LinearConstrainerWrapper::NewLinearConstrainer( const v8::FunctionCallbackInfo< v8::Value >& args)
 {
   v8::Isolate* isolate = args.GetIsolate();
   v8::HandleScope handleScope( isolate );
@@ -90,26 +106,8 @@ void PathConstraintWrapper::NewPathConstraint( const v8::FunctionCallbackInfo< v
     return;
   }
 
-  //Extract Path Handle
-  bool parameterFound;
-  Handle pathHandle = V8Utils::GetHandleParameter( PARAMETER_0, parameterFound, isolate, args );
-  if( !parameterFound )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "bad parameter 0 (Path)" );
-    return;
-  }
-  Dali::Path path = Path::DownCast(pathHandle);
-
-  //Extract range
-  Vector2 range = V8Utils::GetVector2Parameter( PARAMETER_1, parameterFound, isolate, args );
-  if( !parameterFound )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "bad parameter 1 (Range)" );
-    return;
-  }
-
-  PathConstraint pathConstraint = PathConstraint::New(path, range );
-  v8::Local<v8::Object> localObject = WrapPathConstraint( isolate, pathConstraint );
+  LinearConstrainer linearConstrainer = LinearConstrainer::New();
+  v8::Local<v8::Object> localObject = WrapLinearConstrainer( isolate, linearConstrainer );
   args.GetReturnValue().Set( localObject );
 }
 

@@ -197,8 +197,6 @@ const ActorFunctions ActorFunctionTable[]=
     { "FindChildById",     ActorApi::FindChildById,    ACTOR_API },
     { "GetParent" ,        ActorApi::GetParent,        ACTOR_API },
     { "GetActorType" ,     ActorApi::GetActorType,     ACTOR_API }, // custom for javascript
-    { "ApplyPathConstraint",  ActorApi::ApplyPathConstraint,  ACTOR_API }, // custom for javascript
-    { "RemovePathConstraint", ActorApi::RemovePathConstraint, ACTOR_API }, // custom for javascript
 
     // ignore. SetParentOrigin() use Actor.parentOrigin
     // ignore. GetCurrentParentOrigin()  use Actor.parentOrigin

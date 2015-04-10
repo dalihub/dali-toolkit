@@ -1,5 +1,5 @@
-#ifndef __DALI_V8PLUGIN_PATH_CONSTRAINT_WRAPPER_H__
-#define __DALI_V8PLUGIN_PATH_CONSTRAINT_WRAPPER_H__
+#ifndef __DALI_V8PLUGIN_LINEAR_CONSTRAINER_WRAPPER_H__
+#define __DALI_V8PLUGIN_LINEAR_CONSTRAINER_WRAPPER_H__
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/linear-constrainer.h>
 #include <v8.h>
-#include <dali/public-api/animation/path-constraint.h>
 
 // INTERNAL INCLUDES
 #include <object/handle-wrapper.h>
@@ -33,9 +33,9 @@ namespace V8Plugin
 {
 
 /**
- * Wraps a Path.
+ * Wraps a LinearConstrainer.
  */
-class PathConstraintWrapper : public HandleWrapper
+class LinearConstrainerWrapper : public HandleWrapper
 {
 
 public:
@@ -43,37 +43,37 @@ public:
   /**
    * Constructor
    */
-  PathConstraintWrapper( PathConstraint pathConstraint, GarbageCollectorInterface& gc );
+  LinearConstrainerWrapper( LinearConstrainer linearConstrainer, GarbageCollectorInterface& gc );
 
   /**
    * Virtual destructor
    */
-  virtual ~PathConstraintWrapper(){};
+  virtual ~LinearConstrainerWrapper(){};
 
   /**
-   * Creates a new PathConstraint wrapped inside a Javascript Object.
+   * Creates a new PathConstrainer wrapped inside a Javascript Object.
    * @param[in] args v8 function call arguments interpreted
    */
-  static void NewPathConstraint( const v8::FunctionCallbackInfo< v8::Value >& args);
+  static void NewLinearConstrainer( const v8::FunctionCallbackInfo< v8::Value >& args);
 
   /**
-   * Wraps a PathConstraint inside a Javascript object
+   * Wraps a PathConstrainer inside a Javascript object
    */
-  static v8::Handle<v8::Object> WrapPathConstraint(v8::Isolate* isolate, PathConstraint pathConstraint );
+  static v8::Handle<v8::Object> WrapLinearConstrainer(v8::Isolate* isolate, LinearConstrainer pathConstrainer );
 
   /*
-   * Get the wrapped PathConstraint
+   * Get the wrapped PathConstrainer
    */
-  PathConstraint GetPathConstraint();
+  LinearConstrainer GetLinearConstrainer();
 
 private:
 
   /**
-   * Create a v8 object template for the PathConstraint
+   * Create a v8 object template for the PathConstrainer
    */
-  static v8::Handle<v8::ObjectTemplate> MakePathConstraintTemplate( v8::Isolate* isolate );
+  static v8::Handle<v8::ObjectTemplate> MakeLinearConstrainerTemplate( v8::Isolate* isolate );
 
-  PathConstraint mPathConstraint;
+  Dali::LinearConstrainer mLinearConstrainer;
 };
 
 } // namespace V8Plugin
