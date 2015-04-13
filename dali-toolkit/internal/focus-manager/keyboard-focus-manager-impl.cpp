@@ -19,6 +19,7 @@
 #include "keyboard-focus-manager-impl.h"
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/accessibility-manager.h>
 #include <dali/public-api/adaptor-framework/singleton-service.h>

@@ -19,6 +19,8 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+#include <limits>
 #include <stack>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/mesh-actor.h>

@@ -19,6 +19,7 @@
 #include "keyinput-focus-manager-impl.h"
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/stage.h>
 

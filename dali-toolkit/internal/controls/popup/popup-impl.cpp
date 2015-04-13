@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/popup/popup-impl.h>
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/adaptor-framework/physical-keyboard.h>
 #include <dali/public-api/animation/constraints.h>

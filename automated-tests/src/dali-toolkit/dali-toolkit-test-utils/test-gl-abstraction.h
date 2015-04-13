@@ -19,8 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <cstdio>  // fprintf
 #include <sstream>
 #include <string>
+#include <cstring> // for strcpy, strncpy
 #include <map>
 
 // INTERNAL INCLUDES

@@ -19,7 +19,9 @@
 #include <dali-toolkit/internal/controls/slider/slider-impl.h>
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <sstream>
+#include <limits>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>

@@ -19,6 +19,7 @@
 #include "cube-transition-effect-impl.h"
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/object/type-registry.h>

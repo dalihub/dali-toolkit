@@ -18,6 +18,19 @@
 // CLASS HEADER
 #include "signal-manager.h"
 
+// EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+#include <dali/public-api/images/resource-image.h>
+#include <dali/public-api/object/any.h>
+#include <dali/public-api/events/pan-gesture-detector.h>
+#include <dali/public-api/object/any.h>
+#include <dali/public-api/images/image.h>
+#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/hover-event.h>
+#include <dali/public-api/events/mouse-wheel-event.h>
+#include <dali/public-api/events/key-event.h>
+#include <dali/public-api/events/pan-gesture.h>
+
 // INTERNAL INCLUDES
 #include <v8-utils.h>
 #include <object/handle-wrapper.h>
@@ -29,16 +42,6 @@
 #include <events/pan-gesture-detector-wrapper.h>
 #include <toolkit/focus-manager/keyboard-focus-manager-wrapper.h>
 #include <signals/dali-any-javascript-converter.h>
-#include <dali/public-api/images/resource-image.h>
-#include <dali/public-api/object/any.h>
-#include <dali/public-api/events/pan-gesture-detector.h>
-#include <dali/public-api/object/any.h>
-#include <dali/public-api/images/image.h>
-#include <dali/public-api/events/touch-event.h>
-#include <dali/public-api/events/hover-event.h>
-#include <dali/public-api/events/mouse-wheel-event.h>
-#include <dali/public-api/events/key-event.h>
-#include <dali/public-api/events/pan-gesture.h>
 
 
 

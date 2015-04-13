@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <algorithm>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
