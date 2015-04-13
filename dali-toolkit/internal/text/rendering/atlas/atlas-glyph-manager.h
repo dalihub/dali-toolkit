@@ -34,7 +34,7 @@ class AtlasGlyphManager;
 }
 
 
-class DALI_IMPORT_API AtlasGlyphManager : public BaseHandle
+class AtlasGlyphManager : public BaseHandle
 {
 public:
 

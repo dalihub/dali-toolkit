@@ -41,7 +41,7 @@ class Backend;
 /**
  * @brief Provides access to different text rendering backends.
  */
-class DALI_IMPORT_API Backend : public BaseHandle
+class Backend : public BaseHandle
 {
 public:
 
