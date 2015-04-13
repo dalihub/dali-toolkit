@@ -37,6 +37,8 @@ SET(TC_SOURCES
    utc-Dali-SpotEffect.cpp
    utc-Dali-SquareDissolveEffect.cpp
    utc-Dali-TableView.cpp
+   utc-Dali-TextField.cpp
+   utc-Dali-TextLabel.cpp
    utc-Dali-ToolBar.cpp
    utc-Dali-View.cpp
    utc-Dali-WaterEffect.cpp
