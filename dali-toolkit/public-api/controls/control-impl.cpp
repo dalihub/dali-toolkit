@@ -420,13 +420,13 @@ Vector3 Control::GetNaturalSize()
   return mImpl->mNaturalSize;
 }
 
-float Control::CalculateChildSize( const Dali::Actor& child, Dimension dimension )
+float Control::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
 {
   // Could be overridden in derived classes.
   return CalculateChildSizeBase( child, dimension );
 }
 
-bool Control::RelayoutDependentOnChildren( Dimension dimension )
+bool Control::RelayoutDependentOnChildren( Dimension::Type dimension )
 {
   return RelayoutDependentOnChildrenBase( dimension );
 }
@@ -900,11 +900,11 @@ void Control::OnControlSizeSet( const Vector3& size )
 {
 }
 
-void Control::OnCalculateRelayoutSize( Dimension dimension )
+void Control::OnCalculateRelayoutSize( Dimension::Type dimension )
 {
 }
 
-void Control::OnLayoutNegotiated( float size, Dimension dimension )
+void Control::OnLayoutNegotiated( float size, Dimension::Type dimension )
 {
 }
 
@@ -916,7 +916,7 @@ void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
   }
 }
 
-void Control::OnSetResizePolicy( ResizePolicy policy, Dimension dimension )
+void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
 {
 }
 

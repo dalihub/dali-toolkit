@@ -27,7 +27,7 @@ Relayout requests are put in automatically when a property is changed on an acto
 
 In addition to the resize policies detailed in the Size Negotiation Programming Guide there is one additional policy available to control writers:
 
-- USE_ASSIGNED_SIZE: Tells the actor to use the size that was passed into the size negotiation algorithm for it. This is used in the OnRelayout
+- ResizePolicy::USE_ASSIGNED_SIZE: Tells the actor to use the size that was passed into the size negotiation algorithm for it. This is used in the OnRelayout
 method derived from Actor when passing back controls to be negotiated using the container argument to the method.
 
 <h2 class="pg">Creating a Control: Popups</h2>
@@ -47,42 +47,42 @@ and resized by the popup. The following screen shot shows an example popup.
 \image html size-negotiation/PopupExample.png
 
 The first step is to set the default resize policies. This is done in the OnInitialize method. In the following snippet the popup
-is set to have a height resize policy of FIT_TO_CHILDREN. This assumes that the width of the popup will be specified by the user of
+is set to have a height resize policy of ResizePolicy::FIT_TO_CHILDREN. This assumes that the width of the popup will be specified by the user of
 the popup and that the desired behaviour is to fit the height of the popup to the size of its content.
 @code
 void Popup::OnInitialize()
 ...
 Actor self = Self();
-self.SetResizePolicy( FIT_TO_CHILDREN, HEIGHT );
+self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::HEIGHT );
 @endcode
 The popup will use a layer to place its content in. The layer is created and specified to fill the whole screen by using the following command.
 @code
-mLayer.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+mLayer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 @endcode
 A half transparent backing image is added to the layer and told to fill the layer with the following.
 @code
-mBacking.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+mBacking.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 @endcode
 The popup control is added to the layer and a background image is specified to fill the size of the popup and add a border by the following.
 @code
-mBackgroundImage.SetResizePolicy( SIZE_FIXED_OFFSET_FROM_PARENT, ALL_DIMENSIONS );
+mBackgroundImage.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
 Vector3 border( mPopupStyle->backgroundOuterBorder.x, mPopupStyle->backgroundOuterBorder.z, 0.0f );
 mBackgroundImage.SetSizeModeFactor( border );
 @endcode
 A table view is added to the popup to specify layout. It will fill to the width of the popup and expand/contract around its children cell heights.
 @code
-mPopupLayout.SetResizePolicy( FILL_TO_PARENT, WIDTH );
-mPopupLayout.SetResizePolicy( USE_NATURAL_SIZE, HEIGHT );
+mPopupLayout.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+mPopupLayout.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
 @endcode
 Override the OnRelayout method to position and resize the buttons. The trick to this is that the buttons do not know they are part of a popup and are
 about to be resized so could already have had their sizes negotiated. The call to PropagateRelayoutFlags on the button will ensure that it and all
 its child dependents are ready for a new size negotiation pass. The container.Add call will add the button to the relayout queue to be processed this frame.
 The buttonSize parameter is the desired size for the button. The desired size will only be set if the size policy of the button has already been changed to
-USE_ASSIGNED_SIZE, which is what happens when a button is added to the popup.
+ResizePolicy::USE_ASSIGNED_SIZE, which is what happens when a button is added to the popup.
 @code
 void Popup::AddButton( Toolkit::Button button )
 ...
-button.SetResizePolicy( USE_ASSIGNED_SIZE, ALL_DIMENSIONS );
+button.SetResizePolicy( ResizePolicy::USE_ASSIGNED_SIZE, Dimension::ALL_DIMENSIONS );
 ...
 
 void Popup::OnRelayout( const Vector2& size, RelayoutContainer& container )
@@ -96,22 +96,22 @@ container.Add( button, buttonSize );
 Another aspect to the popup is that depending which resize policies are active on it then the inner table view requires different resize policies itself.
 OnSetResizePolicy can be overridden to receive notice that the resize policy has changed on the control and action can be taken.
 @code
-void Popup::OnSetResizePolicy( ResizePolicy policy, Dimension dimension )
+void Popup::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
 ...
-if( policy == FIT_TO_CHILDREN )
+if( policy == ResizePolicy::FIT_TO_CHILDREN )
 {
   // Make content fit to children
-  mPopupLayout.SetResizePolicy( USE_NATURAL_SIZE, dimension );
-  if( dimension & HEIGHT )
+  mPopupLayout.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, dimension );
+  if( dimension & Dimension::HEIGHT )
   {
     mPopupLayout.SetFitHeight( 1 );
   }
 }
 else
 {
-  mPopupLayout.SetResizePolicy( FILL_TO_PARENT, dimension );
+  mPopupLayout.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, dimension );
   // Make the content cell fill the whole of the available space
-  if( dimension & HEIGHT )
+  if( dimension & Dimension::HEIGHT )
   {
     mPopupLayout.SetRelativeHeight( 1, 1.0f );
   }
@@ -137,7 +137,7 @@ These overridable methods in control provide customization points for the size n
 <h4>Responding to the Change of Size on a Control</h4>
 
 OnRelayout is called during the relayout process at the end of the frame immediately after the new size has been set on the actor. If the actor has calculated
-the size of child actors then add them to container with their desired size and set the USE_ASSIGNED_SIZE resize policy on them.
+the size of child actors then add them to container with their desired size and set the ResizePolicy::USE_ASSIGNED_SIZE resize policy on them.
 At this point the size of the actor has been calculated so it is a good place to calculate positions of child actors etc.
 @code virtual void OnRelayout( const Vector2& size, RelayoutContainer& container ) @endcode
 
@@ -148,11 +148,11 @@ children of an actor that is not a control.
 
 The OnCalculateRelayoutSize is called right before the size is calculated for an actor's dimension during the size negotiation phase. At this point all other actors this actor is
 dependent on have been negotiated so calculations depending on these actors can be performed before the size for this actor is calculated. Useful for container size calculations.
-@code virtual void OnCalculateRelayoutSize( Dimension dimension ) @endcode
+@code virtual void OnCalculateRelayoutSize( Dimension::Type dimension ) @endcode
 
 OnLayoutNegotiated is called right after the size in a given dimension has been negotiated for an actor. This allows calculations to be performed in response to the change
 in a given dimension but before OnRelayout is called.
-@code virtual void OnLayoutNegotiated( float size, Dimension dimension ) @endcode
+@code virtual void OnLayoutNegotiated( float size, Dimension::Type dimension ) @endcode
 
 <h4>Calculating Sizes</h4>
 
@@ -160,11 +160,11 @@ Calculate the natural size for this control. This will be called when a control'
 For example, TableView will calculated the size of the table given its various cell properties.
 @code virtual Vector3 GetNaturalSize() @endcode
 
-Given an input width return the correct height for this control. This will be called when the resize policy is set to DIMENSION_DEPENDENCY and
+Given an input width return the correct height for this control. This will be called when the resize policy is set to ResizePolicy::DIMENSION_DEPENDENCY and
 height has a dependency on width.
 @code virtual float GetHeightForWidth( float width ) @endcode
 
-Given the input height return the correct width for this control. This will be called when the resize policy is set to DIMENSION_DEPENDENCY and
+Given the input height return the correct width for this control. This will be called when the resize policy is set to ResizePolicy::DIMENSION_DEPENDENCY and
 width has a dependency on height.
 @code virtual float GetWidthForHeight( float height ) @endcode
 
@@ -172,15 +172,15 @@ width has a dependency on height.
 
 Return true from this method if this control is dependent on any of its children to calculate its own size. All relayout containers that can be dependent on their
 children for their own size need to return true from this.
-@code virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS ) @endcode
+@code virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) @endcode
 
-This will be called by children when they are using the FILL_TO_PARENT resize policy. It is the parent's responsibility to calculate the child's correct size.
-@code virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension ) @endcode
+This will be called by children when they are using the ResizePolicy::FILL_TO_PARENT resize policy. It is the parent's responsibility to calculate the child's correct size.
+@code virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension ) @endcode
 
 <h4>Events</h4>
 
 OnSetResizePolicy is called when the resize policy is set on an actor. Allows deriving actors to respond to changes in resize policy.
-@code virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension ) @endcode
+@code virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) @endcode
 
 <h2 class="pg">Creating a Control: TableView</h2>
 
@@ -197,19 +197,19 @@ We need to be able to calculate the fixed sizes of all actors placed into table 
 this is called every actor the table view is dependent on has already had their sizes calculated. Calculations can be made that the main calculation
 for the actor can then use.
 @code
-void TableView::OnCalculateRelayoutSize( Dimension dimension )
+void TableView::OnCalculateRelayoutSize( Dimension::Type dimension )
 ...
 CalculateRowColumnData();
 
-if( dimension & WIDTH )
+if( dimension & Dimension::WIDTH )
 {
-  CalculateFixedSizes( mColumnData, WIDTH );
+  CalculateFixedSizes( mColumnData, Dimension::WIDTH );
   mFixedTotals.width = CalculateTotalFixedSize( mColumnData );
 }
 
-if( dimension & HEIGHT )
+if( dimension & Dimension::HEIGHT )
 {
-  CalculateFixedSizes( mRowData, HEIGHT );
+  CalculateFixedSizes( mRowData, Dimension::HEIGHT );
   mFixedTotals.height = CalculateTotalFixedSize( mRowData );
 }
 ...
@@ -225,7 +225,7 @@ return Vector3( mFixedTotals.width, mFixedTotals.height, 1.0f );
 
 When the time comes to calculate the size of each child in the table cells the following method will be called.
 @code
-float TableView::CalculateChildSize( const Actor& child, Dimension dimension )
+float TableView::CalculateChildSize( const Actor& child, Dimension::Type dimension )
 ...
 // Use cell data to calculate child size
 @endcode
@@ -233,7 +233,7 @@ float TableView::CalculateChildSize( const Actor& child, Dimension dimension )
 The table view is dependent on its children if its size policy is set to USE_NATURAL_SIZE or a row or column is set to "fit" an actor.
 The following code shows calling the base class RelayoutDependentOnChildren to check the resize policy and then searches for fit row or columns.
 @code
-bool TableView::RelayoutDependentOnChildren( Dimension dimension )
+bool TableView::RelayoutDependentOnChildren( Dimension::Type dimension )
 {
   if ( Control::RelayoutDependentOnChildren( dimension ) )
   {

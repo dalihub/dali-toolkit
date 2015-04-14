@@ -80,7 +80,7 @@ CheckBoxButton::~CheckBoxButton()
 void CheckBoxButton::OnButtonInitialize()
 {
   // Wrap around all children
-  Self().SetResizePolicy( FIT_TO_CHILDREN, ALL_DIMENSIONS );
+  Self().SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
 }
 
 void CheckBoxButton::OnLabelSet()

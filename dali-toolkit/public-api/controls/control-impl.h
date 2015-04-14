@@ -384,7 +384,7 @@ protected:
   /**
    * @copydoc Dali::CustomActorImpl::RelayoutDependentOnChildren()
    */
-  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS );
+  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
 private:
 
@@ -550,12 +550,12 @@ private:
   /**
    * @copydoc Dali::CustomActorImpl::OnCalculateRelayoutSize()
    */
-  virtual void OnCalculateRelayoutSize( Dimension dimension );
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension );
 
   /**
    * @copydoc Dali::CustomActorImpl::OnLayoutNegotiated()
    */
-  virtual void OnLayoutNegotiated( float size, Dimension dimension );
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension );
 
   /**
    * @copydoc Dali::CustomActorImpl::OnRelayout()
@@ -565,12 +565,12 @@ private:
   /**
    * @copydoc Dali::CustomActorImpl::OnSetResizePolicy()
    */
-  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension );
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
 
   /**
    * @copydoc Dali::CustomActorImpl::CalculateChildSize()
    */
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension );
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension );
 
   // From CustomActorImpl, derived classes should NOT override these.
 

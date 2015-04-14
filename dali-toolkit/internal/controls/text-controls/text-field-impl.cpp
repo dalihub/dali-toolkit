@@ -426,8 +426,8 @@ void TextField::OnInitialize()
   }
 
   // Fill-parent area by default
-  self.SetResizePolicy( FILL_TO_PARENT, WIDTH );
-  self.SetResizePolicy( FILL_TO_PARENT, HEIGHT );
+  self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
+  self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
 }
 
 void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )

@@ -62,8 +62,8 @@ void SizeOfActorIfLarger( Actor root, Vector3& size )
   if ( root )
   {
     // RelayoutSize retreived for Actor to use any padding set to it.
-    size.width = std::max( root.GetRelayoutSize( WIDTH ), size.width );
-    size.height = std::max( root.GetRelayoutSize( HEIGHT ), size.height );
+    size.width = std::max( root.GetRelayoutSize( Dimension::WIDTH ), size.width );
+    size.height = std::max( root.GetRelayoutSize( Dimension::HEIGHT ), size.height );
   }
 }
 
@@ -102,7 +102,7 @@ void PushButton::OnButtonInitialize()
   self.SetLeaveRequired( true );
 
   // Set resize policy to natural size so that buttons will resize to background images
-  self.SetResizePolicy( USE_NATURAL_SIZE, ALL_DIMENSIONS );
+  self.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 }
 
 void PushButton::OnLabelSet()
@@ -113,7 +113,15 @@ void PushButton::OnLabelSet()
   {
     label.SetAnchorPoint( AnchorPoint::CENTER );
     label.SetParentOrigin( ParentOrigin::CENTER );
-    label.SetSize( mSize );
+    label.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+
+    Toolkit::TextLabel textLabel = Toolkit::TextLabel::DownCast( label );
+    if( textLabel )
+    {
+      textLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
+      textLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
+      textLabel.SetProperty( Toolkit::TextLabel::Property::MULTI_LINE, true );
+    }
   }
 }
 
@@ -121,7 +129,7 @@ void PushButton::OnButtonImageSet()
 {
   Actor& buttonImage = GetButtonImage();
 
-  buttonImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  buttonImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   buttonImage.RelayoutRequestTree();
 
@@ -132,7 +140,7 @@ void PushButton::OnSelectedImageSet()
 {
   Actor& selectedImage = GetSelectedImage();
 
-  selectedImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  selectedImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   selectedImage.RelayoutRequestTree();
 
@@ -143,7 +151,7 @@ void PushButton::OnBackgroundImageSet()
 {
   Actor& backgroundImage = GetBackgroundImage();
 
-  backgroundImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  backgroundImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   backgroundImage.RelayoutRequestTree();
 
@@ -154,14 +162,14 @@ void PushButton::OnSelectedBackgroundImageSet()
 {
   Actor& selectedBackgroundImage = GetSelectedBackgroundImage();
 
-  selectedBackgroundImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  selectedBackgroundImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 }
 
 void PushButton::OnDisabledImageSet()
 {
   Actor& disabledImage = GetDisabledImage();
 
-  disabledImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  disabledImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   disabledImage.RelayoutRequestTree();
 
@@ -172,7 +180,7 @@ void PushButton::OnDisabledBackgroundImageSet()
 {
   Actor& disabledBackgroundImage = GetDisabledBackgroundImage();
 
-  disabledBackgroundImage.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  disabledBackgroundImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   disabledBackgroundImage.RelayoutRequestTree();
 

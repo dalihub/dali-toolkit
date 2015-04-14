@@ -266,14 +266,14 @@ void GaussianBlurView::OnInitialize()
 
   // Create an ImageActor for performing a horizontal blur on the texture
   mImageActorHorizBlur = ImageActor::New();
-  mImageActorHorizBlur.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  mImageActorHorizBlur.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   mImageActorHorizBlur.SetParentOrigin(ParentOrigin::CENTER);
   mImageActorHorizBlur.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
   mImageActorHorizBlur.SetShaderEffect( mHorizBlurShader );
 
   // Create an ImageActor for performing a vertical blur on the texture
   mImageActorVertBlur = ImageActor::New();
-  mImageActorVertBlur.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  mImageActorVertBlur.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   mImageActorVertBlur.SetParentOrigin(ParentOrigin::CENTER);
   mImageActorVertBlur.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
   mImageActorVertBlur.SetShaderEffect( mVertBlurShader );
@@ -285,7 +285,7 @@ void GaussianBlurView::OnInitialize()
   if(!mBlurUserImage)
   {
     mImageActorComposite = ImageActor::New();
-    mImageActorComposite.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+    mImageActorComposite.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
     mImageActorComposite.SetParentOrigin(ParentOrigin::CENTER);
     mImageActorComposite.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
     mImageActorComposite.SetOpacity(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
@@ -296,7 +296,7 @@ void GaussianBlurView::OnInitialize()
 
     // Create an ImageActor for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
     mTargetActor = ImageActor::New();
-    mTargetActor.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+    mTargetActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
     mTargetActor.SetParentOrigin(ParentOrigin::CENTER);
     mTargetActor.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
 

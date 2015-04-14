@@ -125,9 +125,9 @@ void ToolBar::AddControl( Actor control, float relativeSize, Toolkit::Alignment:
 
   // Create an alignment container where to place the control.
   Toolkit::Alignment alignmentContainer = Toolkit::Alignment::New( alignment );
-  alignmentContainer.SetSizeScalePolicy( FIT_WITH_ASPECT_RATIO );
+  alignmentContainer.SetSizeScalePolicy( SizeScalePolicy::FIT_WITH_ASPECT_RATIO );
   alignmentContainer.SetPadding( padding );
-  alignmentContainer.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  alignmentContainer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   alignmentContainer.Add( control );
 
   // Insert the control in the table view.
@@ -322,7 +322,7 @@ void ToolBar::OnInitialize()
   // Layout
   mLayout = Toolkit::TableView::New( 1, 1 );
   mLayout.SetName( "TOOLBAR_LAYOUT" );
-  mLayout.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  mLayout.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   mLayout.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
   Self().Add( mLayout );

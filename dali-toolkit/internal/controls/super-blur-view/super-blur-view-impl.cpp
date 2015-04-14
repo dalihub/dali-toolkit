@@ -143,7 +143,7 @@ void SuperBlurView::OnInitialize()
   for(unsigned int i=0; i<=mBlurLevels;i++)
   {
     mImageActors[i] = ImageActor::New(  );
-    mImageActors[i].SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+    mImageActors[i].SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
     mImageActors[i].SetParentOrigin( ParentOrigin::CENTER );
     mImageActors[i].SetZ(-static_cast<float>(i)*0.01f);
     mImageActors[i].SetColorMode( USE_OWN_MULTIPLY_PARENT_ALPHA );

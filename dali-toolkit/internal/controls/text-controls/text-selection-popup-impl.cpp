@@ -439,23 +439,19 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    // Both containers will be added to a button.
    Actor optionContainer = Actor::New();
    optionContainer.SetRelayoutEnabled( true );
-   optionContainer.SetResizePolicy( FIXED, ALL_DIMENSIONS );
    optionContainer.SetDrawMode( DrawMode::OVERLAY );
    optionContainer.SetAnchorPoint( AnchorPoint::TOP_LEFT );
 
    ImageActor optionPressedContainer = Toolkit::CreateSolidColorActor( mBackgroundPressedColor );
-   optionPressedContainer.SetResizePolicy( FIXED, ALL_DIMENSIONS );
    optionPressedContainer.SetDrawMode( DrawMode::OVERLAY );
    optionPressedContainer.SetAnchorPoint( AnchorPoint::TOP_LEFT );
 
    // 2. Add text.
    Toolkit::TextLabel captionTextLabel = Toolkit::TextLabel::New();
-   captionTextLabel.SetResizePolicy( FIXED, ALL_DIMENSIONS );
    captionTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, caption );
    // optionContainer.Add( captionTextLabel ); Temporary removed.
 
    Toolkit::TextLabel pressedCaptionTextLabel = Toolkit::TextLabel::New();
-   pressedCaptionTextLabel.SetResizePolicy( FIXED, ALL_DIMENSIONS );
    pressedCaptionTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, caption );
    // optionPressedContainer.Add( pressedCaptionTextLabel ); Temporary removed.
 
@@ -518,7 +514,6 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
 
    // 5. Create a option.
    Toolkit::PushButton option = Toolkit::PushButton::New();
-   option.SetResizePolicy( FIXED, ALL_DIMENSIONS );
    option.SetSize( optionSize );
    option.SetAnchorPoint( AnchorPoint::TOP_LEFT );
    option.SetX( mContentSize.width );
@@ -544,7 +539,6 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
      const Size size( POPUP_DIVIDER_WIDTH, mContentSize.height );
 
      ImageActor divider =  Toolkit::CreateSolidColorActor( Color::WHITE );
-     divider.SetResizePolicy( FIXED, ALL_DIMENSIONS );
      divider.SetSize( size );
      divider.SetParentOrigin( ParentOrigin::TOP_LEFT );
      divider.SetAnchorPoint( AnchorPoint::TOP_LEFT );
@@ -565,15 +559,13 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    Actor scrollview = Actor::New(); //todo make a scrollview
    stencil.SetRelayoutEnabled( true );
 
-   self.SetResizePolicy( FIXED, ALL_DIMENSIONS );
    self.SetSize( mRequiredPopUpSize ); // control matches stencil size
 
-   mStencilLayer.SetResizePolicy( FIXED, ALL_DIMENSIONS );
    mStencilLayer.SetSize( size ); // matches stencil size
 
-   stencil.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
-   scrollview.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
-   mButtons.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+   stencil.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+   scrollview.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+   mButtons.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
    mStencilLayer.SetAnchorPoint(AnchorPoint::TOP_LEFT);
    scrollview.SetAnchorPoint(AnchorPoint::TOP_LEFT);
