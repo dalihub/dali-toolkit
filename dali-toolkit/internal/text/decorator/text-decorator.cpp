@@ -19,12 +19,15 @@
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/actors/mesh-actor.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/pan-gesture.h>
@@ -32,9 +35,10 @@
 #include <dali/public-api/geometry/mesh.h>
 #include <dali/public-api/geometry/mesh-data.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
-//#include <dali/public-api/images/nine-patch-image.h>
+#include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/signals/connection-tracker.h>
 
 // INTERNAL INCLUDES
@@ -47,7 +51,23 @@
 
 #ifdef DEBUG_ENABLED
 #define DECORATOR_DEBUG
+
 #endif
+
+
+namespace Dali
+{
+namespace Internal
+{
+namespace
+{
+#ifdef DECORATOR_DEBUG
+Integration::Log::Filter* gLogFilter( Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_TEXT_DECORATOR") );
+#endif
+}
+}
+}
+
 
 // Local Data
 namespace
@@ -97,6 +117,26 @@ struct QuadCoordinates
 };
 
 typedef std::vector<QuadCoordinates> QuadContainer;
+
+/**
+ * @brief Takes a bounding rectangle in the local coordinates of an actor and returns the world coordinates Bounding Box.
+ * @param[in] boundingRectangle local bounding
+ * @param[out] Vector4 World coordinate bounding Box.
+ */
+void LocalToWorldCoordinatesBoundingBox( const Dali::Rect<int>& boundingRectangle, Dali::Vector4& boundingBox )
+{
+  // Convert to world coordinates and store as a Vector4 to be compatible with Property Notifications.
+  Dali::Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
+
+  const float originX = boundingRectangle.x - 0.5f * stageSize.width;
+  const float originY = boundingRectangle.y - 0.5f * stageSize.height;
+
+  boundingBox = Dali::Vector4( originX,
+                               originY,
+                               originX + boundingRectangle.width,
+                               originY + boundingRectangle.height );
+}
+
 
 } // end of namespace
 
@@ -238,9 +278,13 @@ struct Decorator::Impl : public ConnectionTracker
       if ( !mCopyPastePopup )
       {
         mCopyPastePopup = TextSelectionPopup::New();
+#ifdef DECORATOR_DEBUG
+        mCopyPastePopup.SetName("mCopyPastePopup");
+#endif
+        mCopyPastePopup.SetAnchorPoint( AnchorPoint::CENTER );
+        mCopyPastePopup.OnRelayoutSignal().Connect( this,  &Decorator::Impl::PopUpRelayoutComplete  ); // Position popup after size negotiation
         mActiveLayer.Add ( mCopyPastePopup );
       }
-      mCopyPastePopup.SetPosition( Vector3( 200.0f, -100.0f, 0.0f ) ); //todo grabhandle or selection handle positions to be used
     }
     else
     {
@@ -249,6 +293,23 @@ struct Decorator::Impl : public ConnectionTracker
        UnparentAndReset( mCopyPastePopup );
      }
     }
+  }
+
+  void PopUpRelayoutComplete( Actor actor )
+  {
+    // Size negotiation for CopyPastePopup complete so can get the size and constrain position within bounding box.
+
+    mCopyPastePopup.OnRelayoutSignal().Disconnect( this, &Decorator::Impl::PopUpRelayoutComplete  );
+
+    Vector3 popupPosition( mCursor[PRIMARY_CURSOR].x, mCursor[PRIMARY_CURSOR].y -100.0f , 0.0f); //todo 100 to be an offset Property
+
+    Vector3 popupSize = Vector3( mCopyPastePopup.GetRelayoutSize( Dimension::WIDTH ), mCopyPastePopup.GetRelayoutSize( Dimension::HEIGHT ), 0.0f );
+
+    GetConstrainedPopupPosition( popupPosition, popupSize, AnchorPoint::CENTER, mActiveLayer, mBoundingBox );
+
+    SetUpPopUpPositionNotifications();
+
+    mCopyPastePopup.SetPosition( popupPosition ); //todo grabhandle(cursor) or selection handle positions to be used
   }
 
   void CreateCursor( ImageActor& cursor )
@@ -364,19 +425,27 @@ struct Decorator::Impl : public ConnectionTracker
       }
 
       mGrabHandle = ImageActor::New( mGrabHandleImage );
-#ifdef DECORATOR_DEBUG
-      mGrabHandle.SetName( "GrabHandleActor" );
-#endif
       mGrabHandle.SetAnchorPoint( AnchorPoint::TOP_CENTER );
       mGrabHandle.SetDrawMode( DrawMode::OVERLAY );
       // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
-     mGrabArea = Toolkit::CreateSolidColorActor( Vector4(0.0f, 0.0f, 0.0f, 0.0f), true, Color::RED, 1 );
-     mGrabArea.SetName( "GrabArea" );
+      mGrabHandle.SetName( "GrabHandleActor" );
+      if ( Dali::Internal::gLogFilter->IsEnabledFor( Debug::Verbose ) )
+      {
+        mGrabArea = Toolkit::CreateSolidColorActor( Vector4(0.0f, 0.0f, 0.0f, 0.0f), true, Color::RED, 1 );
+        mGrabArea.SetName( "GrabArea" );
+      }
+      else
+      {
+        mGrabArea = Actor::New();
+        mGrabArea.SetRelayoutEnabled( true );
+        mGrabArea.SetName( "GrabArea" );
+      }
 #else
       mGrabArea = Actor::New();
       mGrabArea.SetRelayoutEnabled( true );
 #endif
+
       mGrabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
       mGrabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
       mGrabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
@@ -386,7 +455,7 @@ struct Decorator::Impl : public ConnectionTracker
       mTapDetector.Attach( mGrabArea );
       mPanGestureDetector.Attach( mGrabArea );
 
-      mActiveLayer.Add(mGrabHandle);
+      mActiveLayer.Add( mGrabHandle );
     }
   }
 
@@ -625,6 +694,103 @@ struct Decorator::Impl : public ConnectionTracker
     return false;
   }
 
+  // Popup
+
+  float AlternatePopUpPositionRelativeToCursor()
+  {
+    float alternativePosition=0.0f;;
+
+    if ( mPrimaryCursor ) // Secondary cursor not used for paste
+    {
+      Cursor cursor = PRIMARY_CURSOR;
+      alternativePosition = mCursor[cursor].y;
+    }
+
+    const float popupHeight = 120.0f; // todo Set as a MaxSize Property in Control or retrieve from CopyPastePopup class.
+
+    if (  mActiveGrabHandle )
+    {
+      // If grab handle enabled then position pop-up below the grab handle.
+      const Vector2 grabHandleSize( 59.0f, 56.0f ); // todo
+      const float BOTTOM_HANDLE_BOTTOM_OFFSET = 1.5; //todo Should be a property
+      alternativePosition +=  grabHandleSize.height  + popupHeight + BOTTOM_HANDLE_BOTTOM_OFFSET ;
+    }
+    else
+    {
+      alternativePosition += popupHeight;
+    }
+
+    return alternativePosition;
+  }
+
+  void PopUpLeavesVerticalBoundary( PropertyNotification& source )
+  {
+    float alternativeYPosition=0.0f;
+  // todo
+  //  if( mHighlightMeshActor ) // Text Selection mode
+  //  {
+  //    alternativePosition = AlternatePopUpPositionRelativeToSelectionHandles();
+  //  }
+  //  else // Not in Text Selection mode
+  //  {
+    // if can't be positioned above, then position below row.
+    alternativeYPosition = AlternatePopUpPositionRelativeToCursor();
+   // }
+    mCopyPastePopup.SetY( alternativeYPosition );
+  }
+
+
+  void SetUpPopUpPositionNotifications( )
+  {
+    // Note Property notifications ignore any set anchor point so conditions must allow for this.  Default is Top Left.
+
+    // Exceeding vertical boundary
+
+    Vector4 worldCoordinatesBoundingBox;
+    LocalToWorldCoordinatesBoundingBox( mBoundingBox, worldCoordinatesBoundingBox );
+
+    float popupHeight = mCopyPastePopup.GetRelayoutSize( Dimension::HEIGHT);
+
+    PropertyNotification verticalExceedNotification = mCopyPastePopup.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
+                                                      OutsideCondition( worldCoordinatesBoundingBox.y + popupHeight/2,
+                                                                        worldCoordinatesBoundingBox.w - popupHeight/2 ) );
+
+    verticalExceedNotification.NotifySignal().Connect( this, &Decorator::Impl::PopUpLeavesVerticalBoundary );
+  }
+
+  void GetConstrainedPopupPosition( Vector3& requiredPopupPosition, Vector3& popupSize, Vector3 anchorPoint, Actor& parent, Rect<int>& boundingBox )
+  {
+    DALI_ASSERT_DEBUG ( "Popup parent not on stage" && parent.OnStage() )
+
+    // Parent must already by added to Stage for these Get calls to work
+    Vector3 parentAnchorPoint = parent.GetCurrentAnchorPoint();
+    Vector3 parentWorldPositionLeftAnchor = parent.GetCurrentWorldPosition() - parent.GetCurrentSize()*parentAnchorPoint;
+    Vector3 popupWorldPosition = parentWorldPositionLeftAnchor + requiredPopupPosition;  // Parent World position plus popup local position gives World Position
+    Vector3 popupDistanceFromAnchorPoint = popupSize*anchorPoint;
+
+    // Bounding rectangle is supplied as screen coordinates, bounding will be done in world coordinates.
+    Vector4 boundingRectangleWorld;
+    LocalToWorldCoordinatesBoundingBox( boundingBox, boundingRectangleWorld );
+
+    // Calculate distance to move popup (in local space) so fits within the boundary
+    float xOffSetToKeepWithinBounds = 0.0f;
+    if( popupWorldPosition.x - popupDistanceFromAnchorPoint.x < boundingRectangleWorld.x )
+    {
+      xOffSetToKeepWithinBounds = boundingRectangleWorld.x - ( popupWorldPosition.x - popupDistanceFromAnchorPoint.x );
+    }
+    else if ( popupWorldPosition.x +  popupDistanceFromAnchorPoint.x > boundingRectangleWorld.z )
+    {
+      xOffSetToKeepWithinBounds = boundingRectangleWorld.z - ( popupWorldPosition.x +  popupDistanceFromAnchorPoint.x );
+    }
+
+    // Ensure initial display of Popup is in alternative position if can not fit above. As Property notification will be a frame behind.
+    if ( popupWorldPosition.y - popupDistanceFromAnchorPoint.y < boundingRectangleWorld.y )
+    {
+      requiredPopupPosition.y = AlternatePopUpPositionRelativeToCursor();
+    }
+
+    requiredPopupPosition.x = requiredPopupPosition.x + xOffSetToKeepWithinBounds;
+  }
 
   Internal::Control& mTextControlParent;
   Observer& mObserver;

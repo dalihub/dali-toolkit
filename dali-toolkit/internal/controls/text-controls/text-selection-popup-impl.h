@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-selection-popup.h>
 
 // EXTERNAL INCLUDES
@@ -119,7 +120,6 @@ public:
 
   /**
    * @brief Called when a property of an object of this type is set.
-   *
    * @param[in] object The object whose property is set.
    * @param[in] index The property index.
    * @param[in] value The new property value.
@@ -203,11 +203,11 @@ private: // From Control
 
   void CreateBackground();
 
-  void AddOption( Actor& parent, const std::string& name, const std::string& caption, const Image iconImage, bool finalOption, bool showIcons );
+  void AddOption( Dali::Toolkit::TableView& parent, const std::string& name, const std::string& caption, const Image iconImage, bool finalOption, bool showIcons, bool showCaption, std::size_t& indexInTable  );
 
-  void SetUpPopup( Size& size );
+  void SetUpPopup();
 
-  void AddPopupOptions( bool createTail, bool showIcons );
+  void AddPopupOptions( bool createTail, bool showIcons, bool showCaptions );
 
 private: // Implementation
 
@@ -229,7 +229,7 @@ private:
 
 private: // Data
 
-  Actor mButtons;                                     // Actor which holds all the buttons, sensitivity can be set oActor buttons via this actor
+  Dali::Toolkit::TableView mTableOfButtons;                          // Actor which holds all the buttons, sensitivity can be set on buttons via this actor
   Layer mStencilLayer;                                // Layer to enable clipping when buttons exceed popup
 
   // Images to be used by the Popup
@@ -274,6 +274,7 @@ private: // Data
   std::size_t mClipboardOptionPriority; // Position of Clipboard button
 
   bool mShowIcons; // Flag to show icons
+  bool mShowCaptions; // Flag to show text captions
 
 };
 

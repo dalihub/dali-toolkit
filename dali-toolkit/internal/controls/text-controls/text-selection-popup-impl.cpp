@@ -29,6 +29,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <libintl.h>
+#include <cfloat>
 
 // todo Move this to adaptor??
 #define GET_LOCALE_TEXT(string) dgettext("elementary", string)
@@ -48,7 +49,7 @@ const Dali::Vector4 DEFAULT_POPUP_BACKGROUND( Dali::Vector4( .20f, 0.29f, 0.44f,
 const Dali::Vector4 DEFAULT_POPUP_BACKGROUND_PRESSED( Dali::Vector4( 0.07f, 0.10f, 0.17f, 1.0f ) );
 const Dali::Vector4 DEFAULT_POPUP_LINE_COLOR( Dali::Vector4( 0.36f, 0.45f, 0.59f, 1.0f ) );
 const Dali::Vector4 DEFAULT_OPTION_ICON( Dali::Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
-const Dali::Vector4 DEFAULT_OPTION_ICON_PRESSED( Dali::Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
+const Dali::Vector4 DEFAULT_OPTION_ICON_PRESSED( Dali::Vector4( 0.5f, 1.0f, 1.0f, 1.0f ) );
 const Dali::Vector4 DEFAULT_OPTION_TEXT( Dali::Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
 const Dali::Vector4 DEFAULT_OPTION_TEXT_PRESSED( Dali::Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
@@ -60,16 +61,13 @@ const std::string OPTION_ICON_PASTE( DALI_IMAGE_DIR "copy_paste_icon_paste.png" 
 const std::string OPTION_ICON_SELECT( DALI_IMAGE_DIR "copy_paste_icon_select.png" );
 const std::string OPTION_ICON_SELECT_ALL( DALI_IMAGE_DIR "copy_paste_icon_select_all.png" );
 
-const Dali::Vector2 DEFAULT_POPUP_MAX_SIZE( 470.0f, 120.0f ); ///< The maximum size of the popup.
+const Dali::Vector2 DEFAULT_POPUP_MAX_SIZE( 450.0f, 100.0f ); ///< The maximum size of the popup.
 
-const float OPTION_TEXT_LINE_HEIGHT( 32.0f );     ///< The line height of the text.
-const Dali::Vector2 OPTION_ICON_SIZE( 0.f, 0.f );       ///< The size of the icon.
-const float OPTION_GAP_ICON_TEXT( 6.f );          ///< The gap between the icon and the text
+const Dali::Vector2 OPTION_ICON_SIZE( 65.0f, 65.0f );       ///< The size of the icon.
 const float OPTION_MARGIN_WIDTH( 10.f );          ///< The margin between the right or lefts edge and the text or icon.
-const float OPTION_MAX_WIDTH( DEFAULT_POPUP_MAX_SIZE.width / 6 ); ///< The maximum width of the option (currently set to the max)
-const float OPTION_MIN_WIDTH( 86.0f );           ///< The minimum width of the option.
-
-const float POPUP_DIVIDER_WIDTH( 1.f );        ///< The size of the divider.
+const float OPTION_MAX_WIDTH( 110.0f );          ///< The maximum width of the option   //todo Make Property
+const float OPTION_MIN_WIDTH( 86.0f );           ///< The minimum width of the option. //todo Make Property
+const float POPUP_DIVIDER_WIDTH( 3.f );        ///< The size of the divider.
 
 const Dali::Vector2 POPUP_TAIL_SIZE( 20.0f, 16.0f ); ///< The size of the tail.
 const float POPUP_TAIL_Y_OFFSET( 5.f );        ///< The y offset of the tail (when its position is on the bottom).
@@ -411,117 +409,80 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
 
  void TextSelectionPopup::CreateBackground()
  {
-   if ( !mBackgroundImage )
+   if ( mBackgroundImage )
    {
-     mBackgroundImage = ResourceImage::New( DEFAULT_POPUP_BACKGROUND_IMAGE );
+     SetBackgroundImage (  mBackgroundImage );
    }
 
-   NinePatchImage backgroundImageNinePatch = NinePatchImage::DownCast( mBackgroundImage );
-   if( backgroundImageNinePatch )
-   {
-     const Size ninePatchImageSize = Size( static_cast<float>( mBackgroundImage.GetWidth() ), static_cast<float>( mBackgroundImage.GetHeight() ) );
-     Rect<int> childRect = backgroundImageNinePatch.GetChildRectangle();
-
-     // -1u because of the cropping.
-     mNinePatchMargins.x = childRect.x - 1u;
-     mNinePatchMargins.y = ninePatchImageSize.width - ( childRect.x + childRect.width ) - 1u;
-     mNinePatchMargins.z = childRect.y - 1u;
-     mNinePatchMargins.w = ninePatchImageSize.height - ( childRect.y + childRect.height ) - 1u;
-   }
-
-   SetBackgroundImage( mBackgroundImage );
    SetBackgroundColor( mBackgroundColor );
  }
 
- void TextSelectionPopup::AddOption( Actor& parent, const std::string& name, const std::string& caption, const Image iconImage, bool finalOption, bool showIcons )
+ void TextSelectionPopup::AddOption( Dali::Toolkit::TableView& parent, const std::string& name, const std::string& caption, const Image iconImage, bool finalOption, bool showIcons, bool showCaption, std::size_t& indexInTable )
  {
    // 1. Create the backgrounds for the popup option both normal and pressed.
    // Both containers will be added to a button.
-   Actor optionContainer = Actor::New();
-   optionContainer.SetRelayoutEnabled( true );
+
+   Toolkit::TableView optionContainer = Toolkit::TableView::New( (showIcons)?2:1 , 1 );
    optionContainer.SetDrawMode( DrawMode::OVERLAY );
-   optionContainer.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+   optionContainer.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+   optionContainer.SetMinimumSize( Vector2( OPTION_MIN_WIDTH, 0 ) );
+   optionContainer.SetFitWidth( 0 );
 
-   ImageActor optionPressedContainer = Toolkit::CreateSolidColorActor( mBackgroundPressedColor );
+   Toolkit::TableView  optionPressedContainer = Toolkit::TableView::New( (showIcons)?2:1 , 1 );
    optionPressedContainer.SetDrawMode( DrawMode::OVERLAY );
-   optionPressedContainer.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-
+   optionPressedContainer.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+   optionPressedContainer.SetMinimumSize( Vector2( OPTION_MIN_WIDTH, 0 ) );
+   optionPressedContainer.SetFitWidth( 0 );
+#ifdef DECORATOR_DEBUG
+   optionContainer.SetName("optionContainer");
+   optionPressedContainer.SetName("optionPressedContainer");
+#endif
    // 2. Add text.
+
+   if ( showCaption )
+   {
    Toolkit::TextLabel captionTextLabel = Toolkit::TextLabel::New();
    captionTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, caption );
-   // optionContainer.Add( captionTextLabel ); Temporary removed.
+   optionContainer.SetFitHeight( 0 );
 
    Toolkit::TextLabel pressedCaptionTextLabel = Toolkit::TextLabel::New();
    pressedCaptionTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, caption );
-   // optionPressedContainer.Add( pressedCaptionTextLabel ); Temporary removed.
+   optionPressedContainer.SetFitHeight( 0 );
 
-   // Calculates the icon/text position.
-   float iconTextOffsetY = 0.0f;
+   captionTextLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::WIDTH );
+   captionTextLabel.SetMaximumSize( Vector2( OPTION_MAX_WIDTH - 2.f * OPTION_MARGIN_WIDTH , FLT_MAX ) ); //todo FLT_MAX Size negotiation feature needed
+
+   pressedCaptionTextLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::WIDTH );
+   pressedCaptionTextLabel.SetMaximumSize( Vector2( OPTION_MAX_WIDTH - 2.f * OPTION_MARGIN_WIDTH , FLT_MAX) ); //todo FLT_MAX Size negotiation feature needed
+
+   optionContainer.AddChild( captionTextLabel, Toolkit::TableView::CellPosition( 1, 0 )  ); // todo Labels need ellipsis or similar
+   optionPressedContainer.AddChild( pressedCaptionTextLabel, Toolkit::TableView::CellPosition( 1, 0 )  ); // todo Labels need ellipsis or similar
+   }
 
    if ( showIcons )
    {
      // 3. Create the icons
      ImageActor pressedIcon = ImageActor::New(  iconImage );
      ImageActor icon = ImageActor::New(  iconImage );
-
-     optionContainer.Add( icon );
-     optionPressedContainer.Add( pressedIcon );
-
-     iconTextOffsetY = 0.5f * ( ( DEFAULT_POPUP_MAX_SIZE.height - mNinePatchMargins.z - mNinePatchMargins.w ) - ( OPTION_ICON_SIZE.height + OPTION_GAP_ICON_TEXT + OPTION_TEXT_LINE_HEIGHT ) );
-
-     icon.SetParentOrigin( ParentOrigin::TOP_CENTER );
-     icon.SetAnchorPoint( AnchorPoint::TOP_CENTER );
-     icon.SetY( iconTextOffsetY );
-
-     pressedIcon.SetParentOrigin( ParentOrigin::TOP_CENTER );
-     pressedIcon.SetAnchorPoint( AnchorPoint::TOP_CENTER );
-     pressedIcon.SetY( iconTextOffsetY );
-
-     // Layout icon + gap + text
-     captionTextLabel.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
-     pressedCaptionTextLabel.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
-     pressedCaptionTextLabel.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
-     captionTextLabel.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
-     pressedCaptionTextLabel.SetY( -iconTextOffsetY );
-     captionTextLabel.SetY( -iconTextOffsetY );
+     icon.SetName("image-icon-2014");
+     icon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+     pressedIcon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+     pressedIcon.SetColor( mIconPressedColor );
+     optionContainer.SetFitHeight( 0 );
+     optionPressedContainer.SetFitHeight( 0 );
+     optionContainer.AddChild( icon, Toolkit::TableView::CellPosition( 0, 0 )  );
+     optionPressedContainer.AddChild( pressedIcon, Toolkit::TableView::CellPosition( 0, 0 )  );
+     icon.SetPadding( Padding( 10.0f, 10.0f, 10.0f, 10.0f ) );
+     pressedIcon.SetPadding( Padding( 10.0f, 10.0f, 10.0f, 10.0f ) );
    }
-   else
-   {
-     // Centre option text
-     captionTextLabel.SetAnchorPoint( AnchorPoint::CENTER );
-     captionTextLabel.SetParentOrigin( ParentOrigin::CENTER );
-     pressedCaptionTextLabel.SetAnchorPoint( AnchorPoint::CENTER );
-     pressedCaptionTextLabel.SetParentOrigin( ParentOrigin::CENTER );
-   }
-
-   // Calculate the size of the text.
-   Vector3 textSize = captionTextLabel.GetNaturalSize();
-   textSize.width = std::min( textSize.width, OPTION_MAX_WIDTH - 2.f * OPTION_MARGIN_WIDTH );
-
-   // Set the size to the text. Text will be ellipsized if exceeds the max width.
-   captionTextLabel.SetSize( textSize.GetVectorXY() );
-   pressedCaptionTextLabel.SetSize( textSize.GetVectorXY() );
-
-   // 4. Calculate the size of option.
-
-   // The width is the max size of the text or the icon plus the margins clamped between the option min and max size.
-   // The height is the whole popup height minus the ninepatch margins.
-   const Vector2 optionSize( std::min( OPTION_MAX_WIDTH, std::max( OPTION_MIN_WIDTH, std::max( textSize.width, OPTION_ICON_SIZE.width ) + 2.f * OPTION_MARGIN_WIDTH ) ),
-                             DEFAULT_POPUP_MAX_SIZE.height - mNinePatchMargins.z - mNinePatchMargins.w );
-
-   optionContainer.SetSize( optionSize );
-   optionPressedContainer.SetSize( optionSize );
 
    // 5. Create a option.
    Toolkit::PushButton option = Toolkit::PushButton::New();
-   option.SetSize( optionSize );
-   option.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-   option.SetX( mContentSize.width );
    option.SetName( name );
    option.SetAnimationTime( 0.0f );
+   option.SetSize( OPTION_ICON_SIZE );
+   option.SetRelayoutEnabled( false );
    //option.ClickedSignal().Connect( this, &TextInputPopup::OnButtonPressed );
-
-   parent.Add( option );
 
    // 6. Set the normal option image.
    option.SetButtonImage( optionContainer );
@@ -529,65 +490,61 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    // 7. Set the pressed option image
    option.SetSelectedImage( optionPressedContainer );
 
-   // 8. Update the content size.
-   mContentSize.width += optionSize.width;
-   mContentSize.height = std::max ( optionSize.height, mContentSize.height );
+   // 9 Add option to table view
+   parent.SetFitWidth( indexInTable );
+   parent.AddChild( option, Toolkit::TableView::CellPosition( 0, indexInTable )  );
+   indexInTable++;
 
-   // 9. Add the divider
+   // 10. Add the divider
    if( !finalOption )
    {
-     const Size size( POPUP_DIVIDER_WIDTH, mContentSize.height );
+     const Size size( POPUP_DIVIDER_WIDTH, 0.0f ); // Height FILL_TO_PARENT
 
-     ImageActor divider =  Toolkit::CreateSolidColorActor( Color::WHITE );
+     ImageActor divider = Toolkit::CreateSolidColorActor( Color::WHITE );
+
      divider.SetSize( size );
-     divider.SetParentOrigin( ParentOrigin::TOP_LEFT );
-     divider.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-     divider.SetPosition( mContentSize.width - POPUP_DIVIDER_WIDTH, 0.0f );
-     parent.Add( divider );
+     divider.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
+     parent.SetFitWidth( indexInTable );
+     parent.AddChild( divider, Toolkit::TableView::CellPosition( 0, indexInTable )  );
+     indexInTable++;
    }
  }
 
- void TextSelectionPopup::SetUpPopup( Size& size )
+ void TextSelectionPopup::SetUpPopup()
  {
    Actor self = Self();
+   self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
 
    // Create Layer and Stencil.
    mStencilLayer = Layer::New();
+   mStencilLayer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+   mStencilLayer.SetParentOrigin( ParentOrigin::CENTER );
+
    ImageActor stencil = CreateSolidColorActor( Color::RED );
    stencil.SetDrawMode( DrawMode::STENCIL );
    stencil.SetVisible( true );
+   stencil.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+   stencil.SetParentOrigin( ParentOrigin::CENTER );
+
    Actor scrollview = Actor::New(); //todo make a scrollview
-   stencil.SetRelayoutEnabled( true );
+   scrollview.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+   scrollview.SetParentOrigin( ParentOrigin::CENTER );
+   scrollview.SetRelayoutEnabled( true );
 
-   self.SetSize( mRequiredPopUpSize ); // control matches stencil size
+   mTableOfButtons.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+   mTableOfButtons.SetFitHeight( 0 );
+   mTableOfButtons.SetParentOrigin( ParentOrigin::CENTER );
 
-   mStencilLayer.SetSize( size ); // matches stencil size
-
-   stencil.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-   scrollview.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-   mButtons.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-
-   mStencilLayer.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-   scrollview.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-   mButtons.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-
-   mStencilLayer.SetPosition( mNinePatchMargins.x,  mNinePatchMargins.y );
-
-   self.Add( mStencilLayer );
    mStencilLayer.Add( stencil );
    mStencilLayer.Add( scrollview );
-   scrollview.Add( mButtons );
+   scrollview.Add( mTableOfButtons );
+   self.Add( mStencilLayer );
+   //self.Add ( mTableOfButtons );
  }
 
- void TextSelectionPopup::AddPopupOptions( bool createTail, bool showIcons )
+ void TextSelectionPopup::AddPopupOptions( bool createTail, bool showIcons, bool showCaptions )
  {
-   mShowIcons = showIcons;
-
    mContentSize = Vector2::ZERO;
-
-   mButtons = Actor::New();
-   mButtons.SetRelayoutEnabled( true );
-
    // Add the options into the buttons container.
 
    // 1. Determine how many buttons are active and should be added to container.
@@ -603,21 +560,19 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
 
    // 2. Iterate list of buttons and add active ones.
    std::size_t optionsAdded = 0u;
+
+   numberOfOptions = ( numberOfOptions*2 ) - 1 ; // Last Option does not get a divider so -1 or if only one option then also no divider
+
+   mTableOfButtons = Dali::Toolkit::TableView::New( 1, numberOfOptions );
+
    for( std::vector<ButtonRequirement>::const_iterator it = mOrderListOfButtons.begin(), endIt = mOrderListOfButtons.end(); ( it != endIt ); ++it )
    {
      const ButtonRequirement& button( *it );
      if ( button.enabled )
      {
-       ++optionsAdded;
-       AddOption( mButtons, button.name, button.caption, button.icon, optionsAdded == numberOfOptions, mShowIcons );
+       AddOption( mTableOfButtons, button.name, button.caption, button.icon, optionsAdded == numberOfOptions - 1, showIcons, showCaptions, optionsAdded ); // -1 to ignore the last divider
      }
    }
-
-   // Calculate the size of the whole popup which may not be all visible.
-   mRequiredPopUpSize = Size( std::min( mMaxSize.width, mContentSize.width + mNinePatchMargins.x + mNinePatchMargins.y ), DEFAULT_POPUP_MAX_SIZE.height );
-
-   // Size of the contents within the popup
-   mVisiblePopUpSize = Size( mRequiredPopUpSize.width - mNinePatchMargins.x - mNinePatchMargins.y, mRequiredPopUpSize.height - mNinePatchMargins.z - mNinePatchMargins.w );
  }
 
  void TextSelectionPopup::CreatePopup()
@@ -626,8 +581,8 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    {
      CreateOrderedListOfPopupOptions();  //todo Currently causes all options to be shown
      CreateBackground();
-     AddPopupOptions( true, true );
-     SetUpPopup( mVisiblePopUpSize );
+     AddPopupOptions( true, true, false );  // todo false so not to show Labels until ellipses or similar possible.
+     SetUpPopup();
    }
 
    mStencilLayer.RaiseToTop();
@@ -651,7 +606,8 @@ TextSelectionPopup::TextSelectionPopup()
   mCopyOptionPriority ( 4 ),
   mPasteOptionPriority ( 5 ),
   mClipboardOptionPriority( 6 ),
-  mShowIcons( true )
+  mShowIcons( true ),
+  mShowCaptions( false )
 {
 }
 
