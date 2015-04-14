@@ -989,6 +989,7 @@ struct Controller::Impl
     mVisualModel->SetShadowOffset( Vector2::ZERO );
     mVisualModel->SetShadowColor( Vector4::ZERO );
     mVisualModel->SetUnderlineEnabled( false );
+    mVisualModel->SetUnderlineHeight( 0.0f );
   }
 
   ~Impl()
@@ -1212,6 +1213,11 @@ bool Controller::IsUnderlineEnabled() const
   return mImpl->mVisualModel->IsUnderlineEnabled();
 }
 
+float Controller::GetUnderlineHeight() const
+{
+  return mImpl->mVisualModel->GetUnderlineHeight();
+}
+
 void Controller::SetTextColor( const Vector4& textColor )
 {
   mImpl->mVisualModel->SetTextColor( textColor );
@@ -1235,6 +1241,11 @@ void Controller::SetUnderlineColor( const Vector4& color )
 void Controller::SetUnderlineEnabled( bool enabled )
 {
   mImpl->mVisualModel->SetUnderlineEnabled( enabled );
+}
+
+void Controller::SetUnderlineHeight( float height )
+{
+  mImpl->mVisualModel->SetUnderlineHeight( height );
 }
 
 void Controller::EnableTextInput( DecoratorPtr decorator )

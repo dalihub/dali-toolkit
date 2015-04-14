@@ -101,6 +101,11 @@ public:
    */
   virtual bool IsUnderlineEnabled() const;
 
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetUnderlineHeight()
+   */
+  virtual float GetUnderlineHeight() const;
+
 private:
 
   // Undefined

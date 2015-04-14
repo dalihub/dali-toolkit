@@ -477,6 +477,20 @@ public:
    */
   void ClearCaches();
 
+  /**
+   * @brief Set the override used for underline height, 0 indicates height will be come from font metrics
+   *
+   * @param[in] height The height in pixels of the underline
+   */
+  void SetUnderlineHeight( float height );
+
+  /**
+   * @brief Retrieves the underline height override
+   *
+   * @return Returns the override height for an underline, 0 indicates that font metrics will determine the height
+   */
+  float GetUnderlineHeight() const;
+
 protected:
 
   /**
@@ -511,6 +525,9 @@ public:
   Vector4                mShadowColor;          ///< Color of drop shadow
   Vector4                mUnderlineColor;       ///< Color of underline
   Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
+  float                  mUnderlineHeight;      ///< Fixed height for underline to override font metrics.
+
+
 
 private:
 
@@ -521,8 +538,10 @@ private:
   LineIndex mCachedLineIndex; ///< Used to increase performance in consecutive calls to GetLineOfGlyph() or GetLineOfCharacter() with consecutive glyphs or characters.
 
 public:
+
   bool                   mUnderlineEnabled:1;   ///< Underline enabled flag
   bool                   mUnderlineColorSet:1;  ///< Has the underline color been explicitly set?
+
 };
 
 } // namespace Text
