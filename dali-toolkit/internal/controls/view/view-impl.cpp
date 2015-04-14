@@ -162,10 +162,10 @@ void View::SetBackground( ImageActor backgroundImage )
 
 void View::SetOrientationFunction( Degree portrait, Degree landscale, Degree portraitInverse, Degree landscapeInverse )
 {
-  mOrientationFunction[View::PORTRAIT] = portrait;
-  mOrientationFunction[View::LANDSCAPE] = landscale;
-  mOrientationFunction[View::PORTRAIT_INVERSE] = portraitInverse;
-  mOrientationFunction[View::LANDSCAPE_INVERSE] = landscapeInverse;
+  mOrientationFunction[View::PORTRAIT] = portrait.degree;
+  mOrientationFunction[View::LANDSCAPE] = landscale.degree;
+  mOrientationFunction[View::PORTRAIT_INVERSE] = portraitInverse.degree;
+  mOrientationFunction[View::LANDSCAPE_INVERSE] = landscapeInverse.degree;
 }
 
 void View::OrientationChanged( Dali::Orientation orientation )
@@ -182,7 +182,7 @@ void View::OrientationChanged( Dali::Orientation orientation )
 
   // has parent so we expect it to be on stage
   mRotateAnimation = Animation::New( ROTATION_ANIMATION_DURATION );
-  mRotateAnimation.AnimateTo( Property( self, Actor::Property::ORIENTATION ), Quaternion( -orientation.GetRadians(), Vector3::ZAXIS ), AlphaFunctions::EaseOut );
+  mRotateAnimation.AnimateTo( Property( self, Actor::Property::ORIENTATION ), Quaternion( Radian( -orientation.GetRadians() ), Vector3::ZAXIS ), AlphaFunctions::EaseOut );
 
   // Resize the view
   if( mFullScreen )
@@ -300,19 +300,19 @@ View::Orientation View::DegreeToViewOrientation( Degree degree )
 {
   View::Orientation orientation = PORTRAIT;
 
-  if( fabsf( mOrientationFunction[PORTRAIT] - degree ) <= GetRangedEpsilon( mOrientationFunction[PORTRAIT], degree ) )
+  if( fabsf( mOrientationFunction[PORTRAIT] - degree.degree ) <= GetRangedEpsilon( mOrientationFunction[PORTRAIT], degree.degree ) )
   {
     orientation =  PORTRAIT;
   }
-  else if( fabsf( mOrientationFunction[LANDSCAPE] - degree ) <= GetRangedEpsilon( mOrientationFunction[LANDSCAPE], degree ) )
+  else if( fabsf( mOrientationFunction[LANDSCAPE] - degree.degree ) <= GetRangedEpsilon( mOrientationFunction[LANDSCAPE], degree.degree ) )
   {
     orientation = LANDSCAPE;
   }
-  else if( fabsf( mOrientationFunction[PORTRAIT_INVERSE] - degree ) <= GetRangedEpsilon( mOrientationFunction[PORTRAIT_INVERSE], degree ) )
+  else if( fabsf( mOrientationFunction[PORTRAIT_INVERSE] - degree.degree ) <= GetRangedEpsilon( mOrientationFunction[PORTRAIT_INVERSE], degree.degree ) )
   {
     orientation = PORTRAIT_INVERSE;
   }
-  else if( fabsf( mOrientationFunction[LANDSCAPE_INVERSE] - degree ) <= GetRangedEpsilon( mOrientationFunction[LANDSCAPE_INVERSE], degree ) )
+  else if( fabsf( mOrientationFunction[LANDSCAPE_INVERSE] - degree.degree ) <= GetRangedEpsilon( mOrientationFunction[LANDSCAPE_INVERSE], degree.degree ) )
   {
     orientation = LANDSCAPE_INVERSE;
   }

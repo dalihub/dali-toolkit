@@ -130,7 +130,7 @@ int UtcDaliSpiralSetAndGetItemSpacing(void)
   spiralLayout->SetItemSpacing(Radian(0.6f));
 
   // Check whether we get the correct item spacing
-  DALI_TEST_EQUALS(spiralLayout->GetItemSpacing(), 0.6f, TEST_LOCATION );
+  DALI_TEST_EQUALS(spiralLayout->GetItemSpacing(), Radian(0.6f), TEST_LOCATION );
   END_TEST;
 }
 
@@ -464,7 +464,7 @@ int UtcDaliSpiralLayoutScrollDirection(void)
   application.Render();
 
   Degree deg = layout->GetScrollDirection();
-  DALI_TEST_CHECK(deg == -45.0f);
+  DALI_TEST_CHECK(deg.degree == -45.0f);
 
   navigationLayout->SetOrientation(ControlOrientation::Down);
   view.ActivateLayout(0, vec, 0.0f);
@@ -472,7 +472,7 @@ int UtcDaliSpiralLayoutScrollDirection(void)
   application.Render();
 
   deg = layout->GetScrollDirection();
-  DALI_TEST_CHECK((deg == 180.0f - 45.0f));
+  DALI_TEST_CHECK((deg.degree == 180.0f - 45.0f));
 
   layout->SetOrientation(ControlOrientation::Left);
   view.ActivateLayout(0, vec, 0.0f);
@@ -480,7 +480,7 @@ int UtcDaliSpiralLayoutScrollDirection(void)
   application.Render();
 
   deg = layout->GetScrollDirection();
-  DALI_TEST_CHECK(deg == 45.0f);
+  DALI_TEST_CHECK(deg.degree == 45.0f);
 
   navigationLayout->SetOrientation(ControlOrientation::Right);
   view.ActivateLayout(0, vec, 0.0f);
@@ -488,7 +488,7 @@ int UtcDaliSpiralLayoutScrollDirection(void)
   application.Render();
 
   deg = layout->GetScrollDirection();
-  DALI_TEST_CHECK(deg == (270.0f - 45.0f));
+  DALI_TEST_CHECK(deg.degree == (270.0f - 45.0f));
 
   Stage::GetCurrent().Remove(view);
   END_TEST;

@@ -113,7 +113,7 @@ struct RotationConstraint
     mStep = 1.f / pageWidth;
     mSign = isTurnBack ? -1.0f : 1.0f;
     mConst = isTurnBack ? -1.0f : 0.f;
-    mRotation = isTurnBack ? Quaternion( -Math::PI, Vector3::YAXIS ) : Quaternion( 0.f, Vector3::YAXIS );
+    mRotation = isTurnBack ? Quaternion( Radian( -Math::PI ), Vector3::YAXIS ) : Quaternion( Radian(0.f), Vector3::YAXIS );
   }
 
   void operator()( Quaternion& current, const PropertyInputContainer& inputs )
@@ -127,7 +127,7 @@ struct RotationConstraint
     {
       float coef = std::max(-1.0f, mStep*(mDistance-displacement));
       float angle = Math::PI * ( mConst + mSign * coef );
-      current = Quaternion( angle, Vector3::YAXIS );
+      current = Quaternion( Radian( angle ), Vector3::YAXIS );
     }
   }
 

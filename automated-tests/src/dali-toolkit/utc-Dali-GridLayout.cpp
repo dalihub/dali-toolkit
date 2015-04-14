@@ -517,7 +517,7 @@ int UtcDaliGridLayoutScrollDirection(void)
   application.Render();
 
   Degree deg = layout->GetScrollDirection();
-  DALI_TEST_CHECK(deg == 0.0f);
+  DALI_TEST_CHECK(deg.degree == 0.0f);
 
   gridLayout->SetOrientation(ControlOrientation::Down);
   view.ActivateLayout(0, vec, 0.0f);
@@ -525,7 +525,7 @@ int UtcDaliGridLayoutScrollDirection(void)
   application.Render();
 
   deg = layout->GetScrollDirection();
-  DALI_TEST_CHECK((deg == 180.0f));
+  DALI_TEST_CHECK((deg.degree == 180.0f));
 
   layout->SetOrientation(ControlOrientation::Left);
   view.ActivateLayout(0, vec, 0.0f);
@@ -533,7 +533,7 @@ int UtcDaliGridLayoutScrollDirection(void)
   application.Render();
 
   deg = layout->GetScrollDirection();
-  DALI_TEST_CHECK(deg == 90.f);
+  DALI_TEST_CHECK(deg.degree == 90.f);
 
   gridLayout->SetOrientation(ControlOrientation::Right);
   view.ActivateLayout(0, vec, 0.0f);
@@ -541,7 +541,7 @@ int UtcDaliGridLayoutScrollDirection(void)
   application.Render();
 
   deg = layout->GetScrollDirection();
-  DALI_TEST_CHECK(deg == 270.0f);
+  DALI_TEST_CHECK(deg.degree == 270.0f);
 
   Stage::GetCurrent().Remove(view);
   END_TEST;

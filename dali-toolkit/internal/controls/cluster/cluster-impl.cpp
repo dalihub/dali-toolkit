@@ -285,7 +285,7 @@ void Cluster::ExpandChild( unsigned int index )
       const float angle = (rand()%360) * Math::PI / 180.0f;
       Vector3 position(sin(angle) * length, -cos(angle) * length, zOffset);
       const float scale(1.2f);
-      const float rotate = ((rand()%30) - 15) * Math::PI / 180.0f;
+      const Radian rotate( Degree( (rand()%30) - 15 ) );
 
       position += childInfo.mActor.GetCurrentPosition();
 
@@ -521,7 +521,7 @@ void Cluster::DoTransformAction(const PropertyValueContainer& attributes)
   unsigned int index = attributes[0].Get<float>();
   Vector3 position;
   Vector3 scale(Vector3::ONE);
-  Quaternion rotation(0.0f, Vector3::ZAXIS);
+  Quaternion rotation( Dali::ANGLE_0, Vector3::ZAXIS );
 
   DALI_ASSERT_ALWAYS(attributes[1].GetType() == Property::VECTOR3);
   attributes[1].Get(position);

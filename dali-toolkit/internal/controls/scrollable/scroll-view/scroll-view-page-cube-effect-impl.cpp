@@ -108,8 +108,8 @@ public:
     // our page by calculating the amount we've moved as a fraction of the total size of the page.
     Vector2 angle( position / pageSize * Dali::Math::PI_2 );
 
-    current = Quaternion( -angle.x * mAngleSwing.x, Vector3::YAXIS ) *
-              Quaternion(  angle.y * mAngleSwing.y, Vector3::XAXIS ) *
+    current = Quaternion( Radian( -angle.x * mAngleSwing.x ), Vector3::YAXIS ) *
+              Quaternion( Radian( angle.y * mAngleSwing.y ), Vector3::XAXIS ) *
               current;
   }
 

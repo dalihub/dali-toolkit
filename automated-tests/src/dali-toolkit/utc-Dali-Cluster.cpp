@@ -169,7 +169,7 @@ int UtcDaliClusterExpandAndCollapseChild(void)
   DALI_TEST_CHECK( cluster.GetExpandedCount() == 0 );
 
   // Transform and restore the child
-  cluster.TransformChild(1, Vector3(10.0f, 10.0f, 1.0f), Vector3(1.0f, 1.0f, 1.0f), Quaternion(0.0f, Vector3::YAXIS), AlphaFunctions::EaseOut, 0.5f);
+  cluster.TransformChild(1, Vector3(10.0f, 10.0f, 1.0f), Vector3(1.0f, 1.0f, 1.0f), Quaternion( Radian(0.0f), Vector3::YAXIS), AlphaFunctions::EaseOut, 0.5f);
   cluster.RestoreChild(1, AlphaFunctions::EaseOut, 0.25f, true);
   END_TEST;
 }

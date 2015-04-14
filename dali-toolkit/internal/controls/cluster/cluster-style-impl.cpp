@@ -473,7 +473,7 @@ void ClusterStyleRandom::ApplyStyle(Actor child, unsigned int index, AlphaFuncti
   Apply( child,
          FirstOrderEquation( GetClusterSize(), Vector3(position.x, position.y, 0.0f), Vector3(0.0f, 0.0f, depthPropertyValue) ),
          FirstOrderEquation( GetClusterSize(), Vector3::ONE * size),
-         Quaternion(rotation, Vector3::ZAXIS),
+         Quaternion( Radian( rotation ), Vector3::ZAXIS ),
          Vector3::ONE,
          alpha,
          durationSeconds);
