@@ -60,7 +60,7 @@ DALI_TYPE_REGISTRATION_END()
 }
 
 NavigationControl::NavigationControl()
-: Control( REQUIRES_TOUCH_EVENTS ),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),
   mToolBar(NULL),
   mTitleBar(NULL),
   mOrientationAngle( 0 ),

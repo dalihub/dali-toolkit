@@ -244,11 +244,6 @@ public:
    */
   void HideTail();
 
-  /**
-   * @brief Flag the popup as dirty for relayout
-   */
-  void MarkDirtyForRelayout();
-
 public: // Not intended for application developers
 
   /**

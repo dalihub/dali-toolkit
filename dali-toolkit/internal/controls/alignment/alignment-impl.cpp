@@ -548,7 +548,7 @@ void Alignment::OnRelayout( const Vector2& size, RelayoutContainer& container )
 }
 
 Alignment::Alignment( Toolkit::Alignment::Type horizontal, Toolkit::Alignment::Type vertical )
-: Control( CONTROL_BEHAVIOUR_NONE ),
+: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
   mHorizontal( horizontal ),
   mVertical( vertical ),
   mScaling( Toolkit::Alignment::ScaleNone ),

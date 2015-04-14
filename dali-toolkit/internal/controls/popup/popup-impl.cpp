@@ -172,12 +172,6 @@ void Popup::OnInitialize()
   SetAsKeyboardFocusGroup(true);
 }
 
-void Popup::MarkDirtyForRelayout()
-{
-  // Flag all the popup controls for relayout as it is about to be hidden and miss the main flagging pass
-  mLayer.RelayoutRequestTree();
-}
-
 void Popup::OnPropertySet( Property::Index index, Property::Value propertyValue )
 {
   if( index == mPropertyTitle )
@@ -302,7 +296,6 @@ void Popup::CreateFooter()
     // Adds bottom background
     mBottomBg = Actor::New();
     mBottomBg.SetName( "POPUP_BOTTOM_BG" );
-    mBottomBg.SetRelayoutEnabled( true );
     mBottomBg.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
     mPopupLayout.SetFixedHeight( 2, mPopupStyle->bottomSize.height );   // Buttons

@@ -151,28 +151,6 @@ void ImageActorApi::GetImage( const v8::FunctionCallbackInfo<v8::Value>& args )
 }
 
 /**
- * Tell the image actor to use the natural size of the current image
- * or future images.
- *
- * Calling SetSize on this actor or animating the size of the actor
- * overrides this behaviour.
- *
- * The image actor uses the natural image size after an image
- * has been loaded.
- * @for ImageActor
- * @method setToNaturalSize
- */
-void ImageActorApi::SetToNaturalSize( const v8::FunctionCallbackInfo<v8::Value>& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  ImageActor imageActor = GetImageActor( isolate, args );
-
-  imageActor.SetToNaturalSize();
-
-}
-
-/**
  * Query whether a pixel area has been set.
  * @for ImageActor
  * @method isPixelAreaSet

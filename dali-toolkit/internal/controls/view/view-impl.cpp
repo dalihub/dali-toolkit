@@ -267,7 +267,7 @@ bool View::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* trac
 }
 
 View::View(bool fullscreen)
-: Control( CONTROL_BEHAVIOUR_NONE ),
+: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
   mOrientation( -1 ),
   mFullScreen(fullscreen),
   mContentLayers(),

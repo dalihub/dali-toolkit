@@ -97,7 +97,6 @@ void Clipper::Initialize( const Vector2& size )
 
   // Create a root actor and an image actor for offscreen rendering.
   mOffscreenRootActor = Layer::New();
-  mOffscreenRootActor.SetRelayoutEnabled( false );
   mOffscreenRootActor.SetColorMode( USE_OWN_COLOR );
   mOffscreenRootActor.SetPositionInheritanceMode( DONT_INHERIT_POSITION );
   mOffscreenRootActor.SetInheritScale( false );
@@ -105,7 +104,6 @@ void Clipper::Initialize( const Vector2& size )
   mOffscreenRootActor.SetSize( offscreenSize );
 
   mImageActor = ImageActor::New();
-  mImageActor.SetRelayoutEnabled( false );
   mImageActor.SetParentOrigin( ParentOrigin::CENTER );
   mImageActor.SetBlendFunc( BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA,
                             BlendingFactor::ONE, BlendingFactor::ONE );

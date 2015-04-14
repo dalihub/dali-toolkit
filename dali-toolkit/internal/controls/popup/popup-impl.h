@@ -131,11 +131,6 @@ public:
    */
   PopupStylePtr GetStyle() const;
 
-  /**
-   * @copydoc Toolkit::Popup::MarkDirtyForRelayout
-   */
-  void MarkDirtyForRelayout();
-
 protected:
 
   /**

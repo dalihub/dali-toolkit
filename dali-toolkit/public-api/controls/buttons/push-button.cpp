@@ -77,7 +77,6 @@ PushButton PushButton::DownCast( BaseHandle handle )
 void PushButton::SetButtonImage( Image image )
 {
   Actor imageActor = ImageActor::New( image );
-  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   Dali::Toolkit::GetImplementation( *this ).SetButtonImage( imageActor );
 }
 
@@ -94,7 +93,6 @@ Actor PushButton::GetButtonImage() const
 void PushButton::SetBackgroundImage( Image image )
 {
   Actor imageActor = ImageActor::New( image );
-  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   Dali::Toolkit::GetImplementation( *this ).SetBackgroundImage( imageActor );
 }
 

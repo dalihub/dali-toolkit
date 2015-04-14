@@ -34,7 +34,7 @@ method derived from Actor when passing back controls to be negotiated using the 
 
 <h3>Initialization</h3>
 Size negotiation is enabled on controls by default. If a control is desired to not have size negotiation enabled then simply pass in the
-NO_SIZE_NEGOTIATION flag into the Control constructor. This will then call SetRelayoutEnabled( false ) on the base class.
+DISABLE_SIZE_NEGOTIATION flag into the Control constructor.
 
 The other step to perform is to set default resize policies for width and height.
 

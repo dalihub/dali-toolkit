@@ -39,7 +39,7 @@ BubbleEmitter::BubbleEmitter( const Vector2& movementArea,
                               Image shapeImage,
                               unsigned int maximumNumberOfBubble,
                               const Vector2& bubbleSizeRange )
-: Control( REQUIRES_TOUCH_EVENTS ),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),
   mMovementArea( movementArea ),
   mShapeImage( shapeImage ),
   mTotalNumOfBubble( maximumNumberOfBubble ),

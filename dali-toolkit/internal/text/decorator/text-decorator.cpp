@@ -317,7 +317,6 @@ struct Decorator::Impl : public ConnectionTracker
     cursor = CreateSolidColorActor( Color::WHITE );
     cursor.SetParentOrigin( ParentOrigin::TOP_LEFT ); // Need to set the default parent origin as CreateSolidColorActor() sets a different one.
     cursor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
-    cursor.SetRelayoutEnabled( false );
   }
 
   // Add or Remove cursor(s) from parent
@@ -438,12 +437,10 @@ struct Decorator::Impl : public ConnectionTracker
       else
       {
         mGrabArea = Actor::New();
-        mGrabArea.SetRelayoutEnabled( true );
         mGrabArea.SetName( "GrabArea" );
       }
 #else
       mGrabArea = Actor::New();
-      mGrabArea.SetRelayoutEnabled( true );
 #endif
 
       mGrabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
@@ -478,7 +475,6 @@ struct Decorator::Impl : public ConnectionTracker
       primary.flipped = false;
 
       primary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
-      primary.grabArea.SetRelayoutEnabled( true );
 #ifdef DECORATOR_DEBUG
       primary.grabArea.SetName("SelectionHandleOneGrabArea");
 #endif
@@ -511,7 +507,6 @@ struct Decorator::Impl : public ConnectionTracker
       secondary.flipped = false;
 
       secondary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
-      secondary.grabArea.SetRelayoutEnabled( true );
 #ifdef DECORATOR_DEBUG
       secondary.grabArea.SetName("SelectionHandleTwoGrabArea");
 #endif

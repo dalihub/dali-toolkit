@@ -534,7 +534,7 @@ Dali::Toolkit::ScrollView ScrollView::New()
 }
 
 ScrollView::ScrollView()
-: ScrollBase(),
+: ScrollBase( ControlBehaviour( REQUIRES_MOUSE_WHEEL_EVENTS ) ),   // Enable size negotiation
   mTouchDownTime(0u),
   mGestureStackDepth(0),
   mScrollStateFlags(0),
@@ -570,7 +570,6 @@ ScrollView::ScrollView()
   mCanScrollHorizontal(true),
   mCanScrollVertical(true)
 {
-  SetRequiresMouseWheelEvents(true);
 }
 
 void ScrollView::OnInitialize()
