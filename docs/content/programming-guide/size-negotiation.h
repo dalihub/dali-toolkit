@@ -92,8 +92,7 @@ Dimension::WIDTH then there is a height-for-width dependency in effect. The clas
 is a text view that wraps its text. The following example snippet shows a text view that expands its width to the size of its parent, wraps its
 contents and then determines its height based on the width.
 @code
-TextView text = TextView::New( "Example" );
-text.SetMultilinePolicy( SplitByWord );
+TextLabel text = TextLabel::New( "Example" );
 text.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 text.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 @endcode
@@ -140,11 +139,7 @@ content.SetFitHeight( 1 );
 content.SetPadding( Padding( 20.0f, 20.0f, 20.0f, 0.0f ) );
 
 // Text
-Toolkit::TextView text = Toolkit::TextView::New();
-text.SetText( "Do you really want to quit?" );
-text.SetMultilinePolicy( Toolkit::TextView::SplitByWord );
-text.SetWidthExceedPolicy( Toolkit::TextView::Split );
-text.SetLineJustification( Toolkit::TextView::Left );
+Toolkit::TextLabel text = Toolkit::TextLabel::New( "Do you really want to quit?" );
 text.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 text.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 
@@ -174,9 +169,7 @@ checkBox.SetSize( Vector2( 48, 48 ) );
 
 root.AddChild( checkBox, Toolkit::TableView::CellPosition( 0, 0 ) );
 
-Toolkit::TextView text2 = Toolkit::TextView::New();
-text2.SetText( "Don't show again" );
-text2.SetLineJustification( Toolkit::TextView::Left );
+Toolkit::TextLabel text2 = Toolkit::TextLabel::New( "Don't show again" );
 text2.SetPadding( Padding( 20.0f, 0.0f, 0.0f, 10.0f ) );
 
 root.AddChild( text2, Toolkit::TableView::CellPosition( 0, 1 ) );

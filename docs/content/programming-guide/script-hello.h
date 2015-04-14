@@ -6,19 +6,13 @@
  *
  * @code
  * {
- *     "fonts":
- *     {
- *         "freesans": {"name": "FreeSans", "point-size": 12.0, "weight": "WEIGHT_REGULAR" }
- *     },
- *     "actors":
- *     [
- *         {"name":"text-actor",
- *          "type":"Text",
- *          "text":"Hello World",
- *          "font":"freesans",
- *          "parent-origin":"CENTER"
- *         }
- *     ]
+ *  // a tree of actors
+ *  "stage": [{
+ *    "name": "text-label",
+ *    "type": "TextLabel",
+ *    "text": "Hello World",
+ *    "parent-origin": "CENTER"
+ *  }]
  * }
  * @endcode
  *
@@ -31,7 +25,7 @@
  *
  * builder.LoadFromString(json_data);
  *
- * Actor actor = builder.GetActor("text-actor");
+ * Actor actor = builder.GetActor("text-label");
  *
  * Stage::GetCurrent().Add(actor);
  * @endcode
@@ -46,15 +40,15 @@
  * daliscript hello-world.js
  * @endcode
  *
- * The TextActor control to display Hello World can be constructed using Javascript dot notation accessing Dali Actor Properties.
+ * The TextLabel control to display Hello World can be constructed using Javascript dot notation accessing Dali Actor Properties.
  *
  * @code
- * var textActor = Dali.TextActor();
+ * var textLabel = Dali.TextLabel();
  *
- * textActor.text          = "Hello World";
- * textActor.font          = "FreeSans";
- * textActor.font-weight   = "WEIGHT_REGULAR";
- * textActor.parent-origin = "CENTER";
+ * textLabel.text          = "Hello World";
+ * textLabel.font-family   = "FreeSans";
+ * textLabel.font-style    = "Regular";
+ * textLabel.parent-origin = "CENTER";
  *
  * Dali.Run();
  * @endcode

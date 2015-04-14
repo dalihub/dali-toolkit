@@ -12,56 +12,71 @@ Let's take a look at the code for this test application.
 
 <h2 class="pg"> Example code </h2>
 \code
-#include <dali/dali.h>
+
+#include <dali-toolkit/dali-toolkit.h>
 
 using namespace Dali;
+using Dali::Toolkit::TextLabel;
 
-/******************************************************
- * Demonstrates how to display "Hello World" on screen
- ******************************************************/
-
-class ExampleApp
+// This example shows how to create and display Hello World! using a simple TextActor
+//
+class HelloWorldController : public ConnectionTracker
 {
 public:
-  ExampleApp(Application &app)
-  : mApp(app)
+
+  HelloWorldController( Application& application )
+  : mApplication( application )
   {
-    // Connect to Dali::Application init signal. Do not make calls to Dali before this signal is received.
-    app.SignalInit().Connect(this, &ExampleApp::Create);
+    // Connect to the Application's Init signal
+    mApplication.InitSignal().Connect( this, &HelloWorldController::Create );
   }
 
-  ~ExampleApp()
+  ~HelloWorldController()
   {
-    // Remove Hello World TextActor from stage
-    Stage::GetCurrent().Remove(mTextActor);
+    // Remove Hello World actor from stage
+    Stage::GetCurrent().Remove(mTextLabel);
   }
 
-public:
-
-  void Create(Application& app)
+  // The Init signal is received once (only) during the Application lifetime
+  void Create( Application& application )
   {
-    // Initialize the actor
-    mTextActor = TextActor::New("Hello World");
+    // Get a handle to the stage
+    Stage stage = Stage::GetCurrent();
 
-    // Center the actor. Note: default anchor point is CENTER
-    mTextActor.SetParentOrigin(ParentOrigin::CENTER);
+    mTextLabel = TextLabel::New( "Hello World" );
+    mTextLabel.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+    stage.Add( mTextLabel );
 
-    // Display the actor on the stage
-    Stage::GetCurrent().Add(mTextActor);
+    // Respond to a click anywhere on the stage
+    stage.GetRootLayer().TouchedSignal().Connect( this, &HelloWorldController::OnTouch );
+  }
+
+  bool OnTouch( Actor actor, const TouchEvent& touch )
+  {
+    // quit the application
+    mApplication.Quit();
+    return true;
   }
 
 private:
-  Application& mApp;
-  TextActor mTextActor;
+  Application&  mApplication;
+  TextLabel mTextLabel;
 };
 
-int
-main(int argc, char **argv)
+void RunTest( Application& application )
 {
-  Application daliApp(&argc, &argv);
+  HelloWorldController test( application );
 
-  ExampleApp helloApp (daliApp);
-  daliApp.MainLoop();
+  application.MainLoop();
+}
+
+// Entry point for Linux & Tizen applications
+//
+int main( int argc, char **argv )
+{
+  Application application = Application::New( &argc, &argv );
+
+  RunTest( application );
 
   return 0;
 }
@@ -85,10 +100,10 @@ main(int argc, char **argv)
  That's why we store the Actor's handle:
  \code
    ...
-   mTextActor = TextActor::New("Hello World");
+   mTextLabel = TextLabel::New("Hello World");
    ...
  \endcode
- Even if the TextActor is removed from the stage, it will be kept alive through our reference.\n
+ Even if the TextLabel is removed from the stage, it will be kept alive through our reference.\n
  You can read more about implicit smart-pointer semantics in chapter \link handle-body-idiom Handle – body\endlink.
 
  <h2 class="pg"> Main loop </h2>
@@ -107,6 +122,12 @@ main(int argc, char **argv)
 
  After running './hello' this should be visible on the screen:
 
- \image html Text-Actor.png "Hello world example"
+<table border=0 cellpadding=10>
+<tr>
+  <td>
+  \image html Text-Label.png "Hello world example"
+  </td>
+</tr>
+</table>
 
 */
