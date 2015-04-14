@@ -1804,6 +1804,7 @@ bool Controller::DoRelayout( const Size& size,
 
     Vector<LineBreakInfo>& lineBreakInfo = mImpl->mLogicalModel->mLineBreakInfo;
     Vector<WordBreakInfo>& wordBreakInfo = mImpl->mLogicalModel->mWordBreakInfo;
+    Vector<CharacterDirection>& characterDirection = mImpl->mLogicalModel->mCharacterDirections;
     Vector<GlyphInfo>& glyphs = mImpl->mVisualModel->mGlyphs;
     Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mVisualModel->mGlyphsToCharacters;
     Vector<Length>& charactersPerGlyph = mImpl->mVisualModel->mCharactersPerGlyph;
@@ -1813,6 +1814,7 @@ bool Controller::DoRelayout( const Size& size,
                                        mImpl->mLogicalModel->mText.Begin(),
                                        lineBreakInfo.Begin(),
                                        wordBreakInfo.Begin(),
+                                       ( 0u != characterDirection.Count() ) ? characterDirection.Begin() : NULL,
                                        numberOfGlyphs,
                                        glyphs.Begin(),
                                        glyphsToCharactersMap.Begin(),

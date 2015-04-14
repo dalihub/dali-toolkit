@@ -40,6 +40,7 @@ namespace
 {
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
+const bool RTL = true;
 
 } //namespace
 
@@ -81,7 +82,7 @@ struct LineLayout
   Length         numberOfCharacters; ///< The number of characters which fit in one line.
   Length         numberOfGlyphs;     ///< The number of glyph which fit in one line.
   float          length;             ///< The length of the glyphs which fit in one line.
-  float          widthAdvanceDiff;   ///< The difference between the width and the advance of the last glyph.
+  float          widthAdvanceDiff;   ///< The difference between the xBearing + width and the advance of the last glyph.
   float          wsLengthEndOfLine;  ///< The length of the white spaces at the end of the line.
   float          ascender;           ///< The maximum ascender of all fonts in the line.
   float          descender;          ///< The minimum descender of all fonts in the line.
@@ -98,6 +99,30 @@ struct LayoutEngine::Impl
   }
 
   /**
+   * @brief Updates the line ascender and descender with the metrics of a new font.
+   *
+   * @param[in] fontId The id of the new font.
+   * @param[in,out] lineLayout The line layout.
+   */
+  void UpdateLineHeight( FontId fontId, LineLayout& lineLayout )
+  {
+    Text::FontMetrics fontMetrics;
+    mFontClient.GetFontMetrics( fontId, fontMetrics );
+
+    // Sets the maximum ascender.
+    if( fontMetrics.ascender > lineLayout.ascender )
+    {
+      lineLayout.ascender = fontMetrics.ascender;
+    }
+
+    // Sets the minimum descender.
+    if( fontMetrics.descender < lineLayout.descender )
+    {
+      lineLayout.descender = fontMetrics.descender;
+    }
+  }
+
+  /**
    * @brief Merges a temporary line layout into the line layout.
    *
    * @param[in,out] lineLayout The line layout.
@@ -109,13 +134,13 @@ struct LayoutEngine::Impl
     lineLayout.numberOfCharacters += tmpLineLayout.numberOfCharacters;
     lineLayout.numberOfGlyphs += tmpLineLayout.numberOfGlyphs;
     lineLayout.length += tmpLineLayout.length;
-    lineLayout.widthAdvanceDiff = tmpLineLayout.widthAdvanceDiff;
 
     if( 0.f < tmpLineLayout.length )
     {
       lineLayout.length += lineLayout.wsLengthEndOfLine;
 
       lineLayout.wsLengthEndOfLine = tmpLineLayout.wsLengthEndOfLine;
+      lineLayout.widthAdvanceDiff = tmpLineLayout.widthAdvanceDiff;
     }
     else
     {
@@ -145,7 +170,41 @@ struct LayoutEngine::Impl
     const bool isMultiline = mLayout == MULTI_LINE_BOX;
     const GlyphIndex lastGlyphIndex = parameters.totalNumberOfGlyphs - 1u;
 
-    FontId lastFontId = 0u;
+    // If the first glyph has a negative bearing its absolute value needs to be added to the line length.
+    // In the case the line starts with a right to left character the bearing needs to be substracted to the line length.
+    const GlyphInfo& glyphInfo = *( parameters.glyphsBuffer + lineLayout.glyphIndex );
+    float initialHorizontalBearing = glyphInfo.xBearing;
+
+    lineLayout.characterIndex = *( parameters.glyphsToCharactersBuffer + lineLayout.glyphIndex );
+    const CharacterDirection firstCharacterDirection = ( NULL == parameters.characterDirectionBuffer ) ? false : *( parameters.characterDirectionBuffer + lineLayout.characterIndex );
+
+    if( RTL == firstCharacterDirection )
+    {
+      initialHorizontalBearing = -initialHorizontalBearing;
+
+      if( 0.f < glyphInfo.xBearing )
+      {
+        tmpLineLayout.length = glyphInfo.xBearing;
+        initialHorizontalBearing = 0.f;
+      }
+    }
+    else
+    {
+      if( 0.f > glyphInfo.xBearing )
+      {
+        tmpLineLayout.length = -glyphInfo.xBearing;
+        initialHorizontalBearing = 0.f;
+      }
+    }
+
+    // Calculate the line height if there is no characters.
+    FontId lastFontId = glyphInfo.fontId;
+    UpdateLineHeight( lastFontId, tmpLineLayout );
+
+    const float boundingBoxWidth = parameters.boundingBox.width - initialHorizontalBearing;
+
+    bool oneWordLaidOut = false;
+
     for( GlyphIndex glyphIndex = lineLayout.glyphIndex;
          glyphIndex < parameters.totalNumberOfGlyphs;
          ++glyphIndex )
@@ -182,22 +241,28 @@ struct LayoutEngine::Impl
       if( isWhiteSpace )
       {
         // Add the length to the length of white spaces at the end of the line.
-        tmpLineLayout.wsLengthEndOfLine += glyphInfo.advance; // I use the advance as the width is always zero for the white spaces.
-        tmpLineLayout.widthAdvanceDiff = 0.f;
+        tmpLineLayout.wsLengthEndOfLine += glyphInfo.advance; // The advance is used as the width is always zero for the white spaces.
       }
       else
       {
         // Add as well any previous white space length.
         tmpLineLayout.length += tmpLineLayout.wsLengthEndOfLine + glyphInfo.advance;
-        tmpLineLayout.widthAdvanceDiff = glyphInfo.width - glyphInfo.advance;
+        if( RTL == firstCharacterDirection )
+        {
+          tmpLineLayout.widthAdvanceDiff = -glyphInfo.xBearing;
+        }
+        else
+        {
+          tmpLineLayout.widthAdvanceDiff = glyphInfo.xBearing + glyphInfo.width - glyphInfo.advance;
+        }
 
         // Clear the white space length at the end of the line.
         tmpLineLayout.wsLengthEndOfLine = 0.f;
       }
 
       // Check if the accumulated length fits in the width of the box.
-      if( isMultiline &&
-          ( lineLayout.length + tmpLineLayout.length + tmpLineLayout.widthAdvanceDiff + ( ( 0.f < tmpLineLayout.length ) ? lineLayout.wsLengthEndOfLine : 0.f ) > parameters.boundingBox.width ) )
+      if( isMultiline && oneWordLaidOut && !isWhiteSpace &&
+          ( lineLayout.length + lineLayout.wsLengthEndOfLine + tmpLineLayout.length + tmpLineLayout.widthAdvanceDiff > boundingBoxWidth ) )
       {
         // Current word does not fit in the box's width.
         return;
@@ -215,6 +280,11 @@ struct LayoutEngine::Impl
       if( isMultiline &&
           ( TextAbstraction::WORD_BREAK == wordBreakInfo ) )
       {
+        if( !oneWordLaidOut && !isWhiteSpace )
+        {
+          oneWordLaidOut = true;
+        }
+
         // Current glyph is the last one of the current word.
         // Add the temporal layout to the current one.
         MergeLineLayout( lineLayout, tmpLineLayout );
@@ -222,23 +292,11 @@ struct LayoutEngine::Impl
         tmpLineLayout.Clear();
       }
 
+      // Check if the font of the current glyph is the same of the previous one.
+      // If it's different the ascender and descender need to be updated.
       if( lastFontId != glyphInfo.fontId )
       {
-        Text::FontMetrics fontMetrics;
-        mFontClient.GetFontMetrics( glyphInfo.fontId, fontMetrics );
-
-        // Sets the maximum ascender.
-        if( fontMetrics.ascender > tmpLineLayout.ascender )
-        {
-          tmpLineLayout.ascender = fontMetrics.ascender;
-        }
-
-        // Sets the minimum descender.
-        if( -fontMetrics.descender < tmpLineLayout.descender )
-        {
-          tmpLineLayout.descender = fontMetrics.descender;
-        }
-
+        UpdateLineHeight( glyphInfo.fontId, tmpLineLayout );
         lastFontId = glyphInfo.fontId;
       }
     }
@@ -249,11 +307,11 @@ struct LayoutEngine::Impl
                    Vector<LineRun>& lines,
                    Size& actualSize )
   {
+    Vector2* glyphPositionsBuffer = glyphPositions.Begin();
+
     float penY = 0.f;
     for( GlyphIndex index = 0u; index < layoutParameters.totalNumberOfGlyphs; )
     {
-      float penX = 0.f;
-
       // Get the layout for the line.
       LineLayout layout;
       layout.glyphIndex = index;
@@ -266,26 +324,23 @@ struct LayoutEngine::Impl
         return false;
       }
 
-      // Create a line run and add it to the lines.
-      const GlyphIndex lastGlyphIndex = index + layout.numberOfGlyphs - 1u;
-
       LineRun lineRun;
       lineRun.glyphIndex = index;
       lineRun.numberOfGlyphs = layout.numberOfGlyphs;
-      lineRun.characterRun.characterIndex = *( layoutParameters.glyphsToCharactersBuffer + index );
-      lineRun.characterRun.numberOfCharacters = ( *( layoutParameters.glyphsToCharactersBuffer + lastGlyphIndex ) + *( layoutParameters.charactersPerGlyphBuffer + lastGlyphIndex ) ) - lineRun.characterRun.characterIndex;
-      lineRun.width = layout.length + ( ( layout.widthAdvanceDiff > 0.f ) ? layout.widthAdvanceDiff : 0.f );
+      lineRun.characterRun.characterIndex = layout.characterIndex;
+      lineRun.characterRun.numberOfCharacters = layout.numberOfCharacters;
+      lineRun.width = layout.length + layout.widthAdvanceDiff;
       lineRun.ascender = layout.ascender;
       lineRun.descender = layout.descender;
-      lineRun.extraLength = layout.wsLengthEndOfLine;
+      lineRun.extraLength = layout.wsLengthEndOfLine > 0.f ? layout.wsLengthEndOfLine - layout.widthAdvanceDiff : 0.f;
       lineRun.direction = false;
 
       lines.PushBack( lineRun );
 
       // Update the actual size.
-      if( layout.length + layout.widthAdvanceDiff > actualSize.width )
+      if( lineRun.width > actualSize.width )
       {
-        actualSize.width = layout.length;
+        actualSize.width = lineRun.width;
       }
 
       actualSize.height += ( lineRun.ascender + -lineRun.descender );
@@ -294,7 +349,17 @@ struct LayoutEngine::Impl
 
       penY += layout.ascender;
 
-      Vector2* glyphPositionsBuffer = glyphPositions.Begin();
+      // Check if the x bearing of the first character is negative.
+      // If it has a negative x bearing, it will exceed the boundaries of the actor,
+      // so the penX position needs to be moved to the right.
+      float penX = 0.f;
+
+      const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + index );
+      if( 0.f > glyph.xBearing )
+      {
+        penX = -glyph.xBearing;
+      }
+
       for( GlyphIndex i = index; i < index + layout.numberOfGlyphs; ++i )
       {
         const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + i );
@@ -324,6 +389,11 @@ struct LayoutEngine::Impl
       const BidirectionalLineInfoRun& bidiLine = *( layoutParameters.lineBidirectionalInfoRunsBuffer + lineIndex );
 
       float penX = 0.f;
+
+      const CharacterIndex characterVisualIndex = bidiLine.characterRun.characterIndex + *bidiLine.visualToLogicalMap;
+      const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + *( layoutParameters.charactersToGlyphsBuffer + characterVisualIndex ) );
+
+      penX = -glyph.xBearing;
 
       Vector2* glyphPositionsBuffer = glyphPositions.Begin();
 
