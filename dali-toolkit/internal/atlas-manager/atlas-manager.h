@@ -160,16 +160,21 @@ public:
   typedef SizeType ImageId;
   static const bool MESH_OPTIMIZE = true;
 
+  struct AtlasSize
+  {
+    SizeType mWidth;              // width of the atlas in pixels
+    SizeType mHeight;             // height of the atlas in pixels
+    SizeType mBlockWidth;         // width of a block in pixels
+    SizeType mBlockHeight;        // height of a block in pixels
+  };
+
   /**
    * Metrics structures to describe Atlas Manager state
    *
    */
   struct AtlasMetricsEntry
   {
-    SizeType mWidth;                 // width of the atlas in pixels
-    SizeType mHeight;;               // height of the atlas in pixels
-    SizeType mBlockWidth;            // width of a block in pixels
-    SizeType mBlockHeight;           // height of a block in pixels
+    AtlasSize mSize;                 // size of atlas and blocks
     SizeType mBlocksUsed;            // number of blocks used in the atlas
     SizeType mTotalBlocks;           // total blocks used by atlas
     Pixel::Format mPixelFormat;      // pixel format of the atlas
@@ -225,19 +230,12 @@ public:
   /**
    * @brief Create a blank atlas of specific dimensions and pixel format with a certain block size
    *
-   * @param[in] width desired atlas width in pixels
-   * @param[in] height desired atlas height in pixels
-   * @param[in] blockWidth block width to use in atlas in pixels
-   * @param[in] blockHeight block height to use in atlas in pixels
+   * @param[in] size desired atlas dimensions
    * @param[in] pixelformat format of a pixel in atlas
    *
    * @return atlas Id
    */
-  AtlasId CreateAtlas(  SizeType width,
-                        SizeType height,
-                        SizeType blockWidth,
-                        SizeType blockHeight,
-                        Pixel::Format pixelformat = Pixel::RGBA8888 );
+  AtlasId CreateAtlas( const AtlasSize& size, Pixel::Format pixelformat = Pixel::RGBA8888 );
 
   /**
    * @brief Set the policy on failure to add an image to an atlas
@@ -322,24 +320,14 @@ public:
    * @return Atlas Id
    */
   AtlasId GetAtlas( ImageId id );
-
-  /**
-   * @brief Get the size of the blocks used in an atlas
-   *
-   * @param[in] atlas AtlasId
-   *
-   * @return width and height of the blocks used
-   */
-  Vector2 GetBlockSize( AtlasId atlas );
-
   /**
    * @brief Get the current size of an atlas
    *
    * @param[in] atlas AtlasId
    *
-   * @return width and height of the atlas
+   * @return AtlasSize structure for the atlas
    */
-  Vector2 GetAtlasSize( AtlasId atlas );
+  const AtlasSize& GetAtlasSize( AtlasId atlas );
 
   /**
    * @brief Get the number of blocks available in an atlas
@@ -353,12 +341,11 @@ public:
   /**
    * @brief Sets the pixel area of any new atlas and also the individual block size
    *
-   * @param[in] size pixel area of atlas
+   * @param[in] size Atlas size structure
    *
    * @param blockSize pixel area in atlas for a block
    */
-  void SetNewAtlasSize( const Vector2& size,
-                        const Vector2& blockSize );
+  void SetNewAtlasSize( const AtlasSize& size );
 
   /**
    * @brief Get the number of atlases created

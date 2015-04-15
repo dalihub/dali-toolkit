@@ -38,13 +38,12 @@ using namespace Dali::Toolkit::Text;
 
 namespace
 {
-  const Vector2 DEFAULT_ATLAS_SIZE( 512.0f, 512.0f );
-  const Vector2 DEFAULT_BLOCK_SIZE( 16.0f, 16.0f );
-  const Vector2 PADDING( 4.0f, 4.0f ); // Allow for variation in font glyphs
   const float ZERO( 0.0f );
   const float HALF( 0.5f );
   const float ONE( 1.0f );
   const float TWO( 2.0f );
+  const uint32_t DEFAULT_ATLAS_WIDTH = 512u;
+  const uint32_t DEFAULT_ATLAS_HEIGHT = 512u;
 }
 
 struct AtlasRenderer::Impl : public ConnectionTracker
@@ -84,14 +83,14 @@ struct AtlasRenderer::Impl : public ConnectionTracker
   struct MaxBlockSize
   {
     FontId mFontId;
-    Vector2 mNeededBlockSize;
+    uint32_t mNeededBlockWidth;
+    uint32_t mNeededBlockHeight;
   };
 
   Impl()
   {
     mGlyphManager = AtlasGlyphManager::Get();
     mFontClient = TextAbstraction::FontClient::Get();
-    mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_SIZE, DEFAULT_BLOCK_SIZE );
     mBasicShader = BasicShader::New();
     mBgraShader = BgraShader::New();
     mBasicShadowShader = BasicShadowShader::New();
@@ -116,7 +115,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
     float currentUnderlinePosition = ZERO;
     float currentUnderlineThickness = underlineHeight;
-
+    uint32_t currentBlockSize = 0;
     FontId lastFontId = 0;
     Style style = STYLE_NORMAL;
 
@@ -196,14 +195,38 @@ struct AtlasRenderer::Impl : public ConnectionTracker
             {
               if ( mBlockSizes[ j ].mFontId == glyph.fontId )
               {
-                mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_SIZE, mBlockSizes[ j ].mNeededBlockSize );
+                currentBlockSize = j;
+                mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
+                                               DEFAULT_ATLAS_HEIGHT,
+                                               mBlockSizes[ j ].mNeededBlockWidth,
+                                               mBlockSizes[ j ].mNeededBlockHeight );
               }
             }
-            lastFontId = glyph.fontId;
           }
 
-          // Glyph doesn't currently exist in atlas so upload
+          // Create a new image for the glyph
           BufferImage bitmap = mFontClient.CreateBitmap( glyph.fontId, glyph.index );
+
+          // Ensure that the next image will fit into the current block size
+          bool setSize = false;
+          if ( bitmap.GetWidth() > mBlockSizes[ currentBlockSize ].mNeededBlockWidth )
+          {
+            setSize = true;
+            mBlockSizes[ currentBlockSize ].mNeededBlockWidth = bitmap.GetWidth();
+          }
+          if ( bitmap.GetHeight() > mBlockSizes[ currentBlockSize ].mNeededBlockHeight )
+          {
+            setSize = true;
+            mBlockSizes[ currentBlockSize ].mNeededBlockHeight = bitmap.GetHeight();
+          }
+
+          if ( setSize )
+          {
+            mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
+                                           DEFAULT_ATLAS_HEIGHT,
+                                           mBlockSizes[ currentBlockSize ].mNeededBlockWidth,
+                                           mBlockSizes[ currentBlockSize ].mNeededBlockHeight );
+          }
 
           // Locate a new slot for our glyph
           mGlyphManager.Add( glyph, bitmap, slot );
@@ -224,6 +247,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                         currentUnderlinePosition,
                         currentUnderlineThickness,
                         slot );
+       lastFontId = glyph.fontId;
       }
     }
 
@@ -240,6 +264,9 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       {
         MeshActor actor = MeshActor::New( Mesh::New( mIt->mMeshData ) );
         actor.SetColor( mIt->mColor );
+
+        // Ensure that text rendering is unfiltered
+        actor.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
         if ( mIt->mIsUnderline )
         {
           actor.SetColorMode( USE_OWN_COLOR );
@@ -286,10 +313,10 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Atlas [%i] %sPixels: %s Size: %ix%i, BlockSize: %ix%i, BlocksUsed: %i/%i\n",
                                                  i + 1, i > 8 ? "" : " ",
                                                  metrics.mAtlasMetrics.mAtlasMetrics[ i ].mPixelFormat == Pixel::L8 ? "L8  " : "BGRA",
-                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mWidth,
-                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mHeight,
-                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mBlockWidth,
-                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mBlockHeight,
+                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mSize.mWidth,
+                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mSize.mHeight,
+                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mSize.mBlockWidth,
+                                                 metrics.mAtlasMetrics.mAtlasMetrics[ i ].mSize.mBlockHeight,
                                                  metrics.mAtlasMetrics.mAtlasMetrics[ i ].mBlocksUsed,
                                                  metrics.mAtlasMetrics.mAtlasMetrics[ i ].mTotalBlocks );
     }
@@ -419,31 +446,21 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     MaxBlockSize maxBlockSize;
     for ( uint32_t i = 0; i < glyphs.Size(); ++i )
     {
-      // Get the fontId of this glyph and check to see if a max size exists?
       FontId fontId = glyphs[ i ].fontId;
-      float paddedWidth = glyphs[ i ].width + PADDING.x;
-      float paddedHeight = glyphs[ i ].height + PADDING.y;
       bool foundFont = false;
-
       for ( uint32_t j = 0; j < mBlockSizes.size(); ++j )
       {
         if ( mBlockSizes[ j ].mFontId == fontId )
         {
           foundFont = true;
-          if ( mBlockSizes[ j ].mNeededBlockSize.x < paddedWidth )
-          {
-            mBlockSizes[ j ].mNeededBlockSize.x = paddedWidth;
-          }
-          if ( mBlockSizes[ j ].mNeededBlockSize.y < paddedHeight )
-          {
-            mBlockSizes[ j ].mNeededBlockSize.y = paddedHeight;
-          }
         }
       }
-
       if ( !foundFont )
       {
-        maxBlockSize.mNeededBlockSize = Vector2( paddedWidth, paddedHeight );
+        FontMetrics fontMetrics;
+        mFontClient.GetFontMetrics( fontId, fontMetrics );
+        maxBlockSize.mNeededBlockWidth = static_cast< uint32_t >( fontMetrics.height );
+        maxBlockSize.mNeededBlockHeight = static_cast< uint32_t >( fontMetrics.height );
         maxBlockSize.mFontId = fontId;
         mBlockSizes.push_back( maxBlockSize );
       }

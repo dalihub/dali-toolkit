@@ -45,13 +45,9 @@ AtlasManager::AtlasManager(Internal::AtlasManager *impl)
 {
 }
 
-AtlasManager::AtlasId AtlasManager::CreateAtlas( SizeType width,
-                                                 SizeType height,
-                                                 SizeType blockWidth,
-                                                 SizeType blockHeight,
-                                                 Pixel::Format pixelformat )
+AtlasManager::AtlasId AtlasManager::CreateAtlas( const AtlasManager::AtlasSize& size, Pixel::Format pixelformat )
 {
-  return GetImplementation(*this).CreateAtlas( width, height, blockWidth, blockHeight, pixelformat );
+  return GetImplementation(*this).CreateAtlas( size, pixelformat );
 }
 
 void AtlasManager::SetAddPolicy( AddFailPolicy policy )
@@ -105,12 +101,7 @@ AtlasManager::AtlasId AtlasManager::GetAtlas( ImageId id )
   return GetImplementation(*this).GetAtlas( id );
 }
 
-Vector2 AtlasManager::GetBlockSize( AtlasId atlas )
-{
-  return GetImplementation(*this).GetBlockSize( atlas );
-}
-
-Vector2 AtlasManager::GetAtlasSize( AtlasId atlas )
+const AtlasManager::AtlasSize& AtlasManager::GetAtlasSize( AtlasId atlas )
 {
   return GetImplementation(*this).GetAtlasSize( atlas );
 }
@@ -120,10 +111,9 @@ AtlasManager::SizeType AtlasManager::GetFreeBlocks( AtlasId atlas )
   return GetImplementation(*this).GetFreeBlocks( atlas );
 }
 
-void AtlasManager::SetNewAtlasSize( const Vector2& size,
-                                    const Vector2& blockSize )
+void AtlasManager::SetNewAtlasSize( const AtlasSize& size )
 {
-  GetImplementation(*this).SetNewAtlasSize( size, blockSize );
+  GetImplementation(*this).SetNewAtlasSize( size );
 }
 
 AtlasManager::SizeType AtlasManager::GetAtlasCount() const
