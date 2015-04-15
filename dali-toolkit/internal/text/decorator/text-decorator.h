@@ -66,7 +66,9 @@ enum GrabHandleState
 {
   GRAB_HANDLE_TAPPED,
   GRAB_HANDLE_PRESSED,
-  GRAB_HANDLE_RELEASED
+  GRAB_HANDLE_RELEASED,
+  GRAB_HANDLE_SCROLLING,
+  GRAB_HANDLE_STOP_SCROLLING
 };
 
 // The set the selection-handle positions etc.
@@ -385,6 +387,53 @@ public:
    * @return True if the Selection Popup should be active.
    */
   bool IsPopupActive() const;
+
+  /**
+   * @brief Sets the scroll threshold.
+   *
+   * It defines a square area inside the control, close to the edge.
+   * When the cursor enters this area, the decorator starts to send scroll events.
+   *
+   * @param[in] threshold The scroll threshold.
+   */
+  void SetScrollThreshold( float threshold );
+
+  /**
+   * @brief Retrieves the scroll threshold.
+   *
+   * @retunr The scroll threshold.
+   */
+  float GetScrollThreshold() const;
+
+  /**
+   * @brief Sets the scroll speed.
+   *
+   * Is the distance the text is going to be scrolled during a scroll interval.
+   *
+   * @param[in] speed The scroll speed.
+   */
+  void SetScrollSpeed( float speed );
+
+  /**
+   * @brief Retrieves the scroll speed.
+   *
+   * @return The scroll speed.
+   */
+  float GetScrollSpeed() const;
+
+  /**
+   * @brief Sets the scroll interval.
+   *
+   * @param[in] seconds The scroll interval in seconds.
+   */
+  void SetScrollTickInterval( float seconds );
+
+  /**
+   * @brief Retrieves the scroll interval.
+   *
+   * @return The scroll interval.
+   */
+  float GetScrollTickInterval() const;
 
 protected:
 
