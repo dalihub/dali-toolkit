@@ -38,9 +38,9 @@ namespace
  * @param[in] actor The child actor to test against
  * @param[dimension] The dimnesion to test against
  */
-bool FitToChild( Actor actor, Dimension dimension )
+bool FitToChild( Actor actor, Dimension::Type dimension )
 {
-  return actor.GetResizePolicy( dimension ) != FILL_TO_PARENT && actor.GetRelayoutSize( dimension ) > 0.0f;
+  return actor.GetResizePolicy( dimension ) != ResizePolicy::FILL_TO_PARENT && actor.GetRelayoutSize( dimension ) > 0.0f;
 }
 
 #if defined(DEBUG_ENABLED)
@@ -671,29 +671,29 @@ void TableView::CalculateRowColumnData()
   }
 }
 
-void TableView::OnCalculateRelayoutSize( Dimension dimension )
+void TableView::OnCalculateRelayoutSize( Dimension::Type dimension )
 {
   CalculateRowColumnData();
 
-  if( dimension & WIDTH )
+  if( dimension & Dimension::WIDTH )
   {
-    CalculateFixedSizes( mColumnData, WIDTH );
+    CalculateFixedSizes( mColumnData, Dimension::WIDTH );
     mFixedTotals.width = CalculateTotalFixedSize( mColumnData );
   }
 
-  if( dimension & HEIGHT )
+  if( dimension & Dimension::HEIGHT )
   {
-    CalculateFixedSizes( mRowData, HEIGHT );
+    CalculateFixedSizes( mRowData, Dimension::HEIGHT );
     mFixedTotals.height = CalculateTotalFixedSize( mRowData );
   }
 }
 
-void TableView::OnLayoutNegotiated( float size, Dimension dimension )
+void TableView::OnLayoutNegotiated( float size, Dimension::Type dimension )
 {
   CalculateRowColumnData();
 
   // Calculate the value of all relative sized rows and columns
-  if( dimension & WIDTH )
+  if( dimension & Dimension::WIDTH )
   {
     float remainingSize = size - mFixedTotals.width;
     if( remainingSize < 0.0f )
@@ -704,7 +704,7 @@ void TableView::OnLayoutNegotiated( float size, Dimension dimension )
     CalculateRelativeSizes( mColumnData, remainingSize );
   }
 
-  if( dimension & HEIGHT )
+  if( dimension & Dimension::HEIGHT )
   {
     float remainingSize = size - mFixedTotals.height;
     if( remainingSize < 0.0f )
@@ -1234,7 +1234,7 @@ Vector3 TableView::GetNaturalSize()
   return Vector3( mFixedTotals.width, mFixedTotals.height, 1.0f );
 }
 
-float TableView::CalculateChildSize( const Actor& child, Dimension dimension )
+float TableView::CalculateChildSize( const Actor& child, Dimension::Type dimension )
 {
   CalculateRowColumnData();
 
@@ -1258,7 +1258,7 @@ float TableView::CalculateChildSize( const Actor& child, Dimension dimension )
         {
           switch( dimension )
           {
-            case WIDTH:
+            case Dimension::WIDTH:
             {
               float cellSize = 0.0f;
 
@@ -1279,7 +1279,7 @@ float TableView::CalculateChildSize( const Actor& child, Dimension dimension )
               return cellSize;
             }
 
-            case HEIGHT:
+            case Dimension::HEIGHT:
             {
               float cellSize = 0.0f;
 
@@ -1313,7 +1313,7 @@ float TableView::CalculateChildSize( const Actor& child, Dimension dimension )
   return 0.0f;    // Child not found
 }
 
-bool TableView::RelayoutDependentOnChildren( Dimension dimension )
+bool TableView::RelayoutDependentOnChildren( Dimension::Type dimension )
 {
   if ( Control::RelayoutDependentOnChildren( dimension ) )
   {
@@ -1416,8 +1416,31 @@ float TableView::CalculateTotalFixedSize( const RowColumnArray& data )
   return totalSize;
 }
 
-void TableView::CalculateFixedSizes( RowColumnArray& data, Dimension dimension )
+Vector2 TableView::GetCellPadding( Dimension::Type dimension )
 {
+  switch( dimension )
+  {
+    case Dimension::WIDTH:
+    {
+      return Vector2( mPadding.x, mPadding.x );
+    }
+    case Dimension::HEIGHT:
+    {
+      return Vector2( mPadding.y, mPadding.y );
+    }
+    default:
+    {
+      break;
+    }
+  }
+
+  return Vector2();
+}
+
+void TableView::CalculateFixedSizes( RowColumnArray& data, Dimension::Type dimension )
+{
+  Vector2 cellPadding = GetCellPadding( dimension );
+
   const unsigned int dataCount = data.Size();
 
   for( unsigned int i = 0; i < dataCount; ++i )
@@ -1429,12 +1452,12 @@ void TableView::CalculateFixedSizes( RowColumnArray& data, Dimension dimension )
       // Find the size of the biggest actor in the row or column
       float maxActorHeight = 0.0f;
 
-      unsigned int fitCount = ( dimension == WIDTH ) ? mCellData.GetRows() : mCellData.GetColumns();
+      unsigned int fitCount = ( dimension == Dimension::WIDTH ) ? mCellData.GetRows() : mCellData.GetColumns();
 
       for( unsigned int j = 0; j < fitCount; ++j )
       {
-        unsigned int row = ( dimension == WIDTH ) ? j : i;
-        unsigned int column = ( dimension == WIDTH ) ? i : j;
+        unsigned int row = ( dimension == Dimension::WIDTH ) ? j : i;
+        unsigned int column = ( dimension == Dimension::WIDTH ) ? i : j;
         DALI_ASSERT_DEBUG( row < mCellData.GetRows() );
         DALI_ASSERT_DEBUG( column < mCellData.GetColumns() );
 
@@ -1443,7 +1466,7 @@ void TableView::CalculateFixedSizes( RowColumnArray& data, Dimension dimension )
         {
           if( FitToChild( actor, dimension ) )
           {
-            maxActorHeight = std::max( maxActorHeight, actor.GetRelayoutSize( dimension ) );
+            maxActorHeight = std::max( maxActorHeight, actor.GetRelayoutSize( dimension ) + cellPadding.x + cellPadding.y );
           }
         }
       }

@@ -77,7 +77,7 @@ void RadioButton::OnButtonInitialize()
   Actor self = Self();
 
   // Wrap size of radio button around all its children
-  self.SetResizePolicy( FIT_TO_CHILDREN, ALL_DIMENSIONS );
+  self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
 
   Image buttonImage = Dali::ResourceImage::New( UNSELECTED_BUTTON_IMAGE_DIR );
   Image selectedImage = Dali::ResourceImage::New( SELECTED_BUTTON_IMAGE_DIR );
@@ -108,6 +108,12 @@ void RadioButton::OnLabelSet()
   {
     label.SetParentOrigin( ParentOrigin::CENTER_LEFT );
     label.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+
+    // Radio button width is FIT_TO_CHILDREN, so the label must have a sensible policy to fill out the space
+    if( label.GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::FILL_TO_PARENT )
+    {
+      label.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::WIDTH );
+    }
 
     if( IsSelected() )
     {

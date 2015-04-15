@@ -101,6 +101,16 @@ bool View::IsUnderlineEnabled() const
   return false;
 }
 
+float View::GetUnderlineHeight() const
+{
+  if ( mImpl->mVisualModel )
+  {
+    VisualModel& model = *mImpl->mVisualModel;
+    return model.GetUnderlineHeight();
+  }
+  return 0.0f;
+}
+
 Length View::GetNumberOfGlyphs() const
 {
   if( mImpl->mVisualModel )

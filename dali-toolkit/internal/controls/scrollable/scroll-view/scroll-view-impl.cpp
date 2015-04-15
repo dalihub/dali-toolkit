@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl.h>
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/mouse-wheel-event.h>

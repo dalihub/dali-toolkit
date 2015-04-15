@@ -38,7 +38,7 @@ namespace Toolkit
  *
  * @return The number of characters.
  */
-DALI_IMPORT_API uint32_t GetNumberOfUtf8Characters( const uint8_t* const utf8, uint32_t length );
+uint32_t GetNumberOfUtf8Characters( const uint8_t* const utf8, uint32_t length );
 
 /**
  * @brief Retrieves the number of bytes needed to encode in UTF8 the given text array encoded in UTF32.
@@ -48,7 +48,7 @@ DALI_IMPORT_API uint32_t GetNumberOfUtf8Characters( const uint8_t* const utf8, u
  *
  * @return The number of bytes.
  */
-DALI_IMPORT_API uint32_t GetNumberOfUtf8Bytes( const uint32_t* const utf32, uint32_t numberOfCharacters );
+uint32_t GetNumberOfUtf8Bytes( const uint32_t* const utf32, uint32_t numberOfCharacters );
 
 /**
  * @brief Converts a text array encoded in UTF8 into a text array encoded in UTF32.
@@ -61,7 +61,7 @@ DALI_IMPORT_API uint32_t GetNumberOfUtf8Bytes( const uint32_t* const utf32, uint
  *
  * @return The number of characters.
  */
-DALI_IMPORT_API uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length, uint32_t* utf32 );
+uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length, uint32_t* utf32 );
 
 /**
  * @brief Converts a text array encoded in UTF32 into a text array encoded in UTF8.
@@ -74,7 +74,7 @@ DALI_IMPORT_API uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length
  *
  * @return The number of bytes.
  */
-DALI_IMPORT_API uint32_t Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, uint8_t* utf8 );
+uint32_t Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, uint8_t* utf8 );
 
 } // namespace Toolkit
 

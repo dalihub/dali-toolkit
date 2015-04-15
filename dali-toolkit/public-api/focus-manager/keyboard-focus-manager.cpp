@@ -20,6 +20,7 @@
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 

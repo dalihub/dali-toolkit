@@ -989,6 +989,7 @@ struct Controller::Impl
     mVisualModel->SetShadowOffset( Vector2::ZERO );
     mVisualModel->SetShadowColor( Vector4::ZERO );
     mVisualModel->SetUnderlineEnabled( false );
+    mVisualModel->SetUnderlineHeight( 0.0f );
   }
 
   ~Impl()
@@ -1212,6 +1213,11 @@ bool Controller::IsUnderlineEnabled() const
   return mImpl->mVisualModel->IsUnderlineEnabled();
 }
 
+float Controller::GetUnderlineHeight() const
+{
+  return mImpl->mVisualModel->GetUnderlineHeight();
+}
+
 void Controller::SetTextColor( const Vector4& textColor )
 {
   mImpl->mVisualModel->SetTextColor( textColor );
@@ -1235,6 +1241,11 @@ void Controller::SetUnderlineColor( const Vector4& color )
 void Controller::SetUnderlineEnabled( bool enabled )
 {
   mImpl->mVisualModel->SetUnderlineEnabled( enabled );
+}
+
+void Controller::SetUnderlineHeight( float height )
+{
+  mImpl->mVisualModel->SetUnderlineHeight( height );
 }
 
 void Controller::EnableTextInput( DecoratorPtr decorator )
@@ -1804,6 +1815,7 @@ bool Controller::DoRelayout( const Size& size,
 
     Vector<LineBreakInfo>& lineBreakInfo = mImpl->mLogicalModel->mLineBreakInfo;
     Vector<WordBreakInfo>& wordBreakInfo = mImpl->mLogicalModel->mWordBreakInfo;
+    Vector<CharacterDirection>& characterDirection = mImpl->mLogicalModel->mCharacterDirections;
     Vector<GlyphInfo>& glyphs = mImpl->mVisualModel->mGlyphs;
     Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mVisualModel->mGlyphsToCharacters;
     Vector<Length>& charactersPerGlyph = mImpl->mVisualModel->mCharactersPerGlyph;
@@ -1813,6 +1825,7 @@ bool Controller::DoRelayout( const Size& size,
                                        mImpl->mLogicalModel->mText.Begin(),
                                        lineBreakInfo.Begin(),
                                        wordBreakInfo.Begin(),
+                                       ( 0u != characterDirection.Count() ) ? characterDirection.Begin() : NULL,
                                        numberOfGlyphs,
                                        glyphs.Begin(),
                                        glyphsToCharactersMap.Begin(),
