@@ -103,7 +103,7 @@ int UtcDaliTextLabelGetSetProperty(void)
   DALI_TEST_EQUALS( label.GetProperty<int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ), Color::WHITE, TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty<Vector2>( TextLabel::Property::SHADOW_OFFSET ), Vector2::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::SHADOW_COLOR ), Vector4::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::SHADOW_COLOR ), Color::BLACK, TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty<bool>( TextLabel::Property::UNDERLINE_ENABLED ), false, TEST_LOCATION );
 
   // Check that text can be correctly reset

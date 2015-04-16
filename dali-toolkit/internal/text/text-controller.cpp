@@ -987,7 +987,7 @@ struct Controller::Impl
     // Set the text properties to default
     mVisualModel->SetTextColor( Color::WHITE );
     mVisualModel->SetShadowOffset( Vector2::ZERO );
-    mVisualModel->SetShadowColor( Vector4::ZERO );
+    mVisualModel->SetShadowColor( Color::BLACK );
     mVisualModel->SetUnderlineEnabled( false );
     mVisualModel->SetUnderlineHeight( 0.0f );
   }
