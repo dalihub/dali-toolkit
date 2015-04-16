@@ -213,9 +213,9 @@ int UtcDaliTextFieldSetPropertyP(void)
   field.SetProperty( TextField::Property::CURSOR_BLINK_DURATION, 10.0f );
   DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::CURSOR_BLINK_DURATION ), 10.0f, TEST_LOCATION );
 
-  // Blink interval gets converted to milliseconds....
+  // Blink interval
   field.SetProperty( TextField::Property::CURSOR_BLINK_INTERVAL, 1.0f );
-  DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::CURSOR_BLINK_INTERVAL ), 1000.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::CURSOR_BLINK_INTERVAL ), 1.0f, TEST_LOCATION );
 
   // Decoration bounding box
   field.SetProperty( TextField::Property::DECORATION_BOUNDING_BOX, Rect<int>( 0, 0, 1, 1 ) );

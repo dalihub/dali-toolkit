@@ -427,11 +427,6 @@ protected:
 private:
 
   /**
-   * @brief Request a relayout using the ControlInterface.
-   */
-  void RequestRelayout();
-
-  /**
    * @brief Private constructor.
    */
   Controller( ControlInterface& controlInterface );
@@ -446,12 +441,6 @@ private:
 
   struct Impl;
   Impl* mImpl;
-
-  // Avoid allocating this when the user does not specify a font
-  struct FontDefaults;
-
-  // Avoid allocating this for non-editable controls
-  struct TextInput;
 };
 
 } // namespace Text
