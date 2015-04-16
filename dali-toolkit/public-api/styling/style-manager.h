@@ -51,7 +51,7 @@ class StyleManager;
  *   void OnInit(Application& app)
  *   {
  *      Toolkit::StyleManager::Get().RequestThemeChange( CUSTOM_THEME );
- *      Toolkit::StyleManager::Get().SetOrientation( app.GetOrientation() );
+ *      Toolkit::StyleManager::Get().SetOrientation( app.GetWindow().GetOrientation() );
  *      ...
  *   }
  * @endcode
