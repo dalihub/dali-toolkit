@@ -294,7 +294,6 @@ const ActorFunctions ActorFunctionTable[]=
 
     { "SetImage",           ImageActorApi::SetImage,              IMAGE_ACTOR_API },
     { "GetImage",           ImageActorApi::GetImage,              IMAGE_ACTOR_API },
-    { "SetToNaturalSize",   ImageActorApi::SetToNaturalSize,      IMAGE_ACTOR_API },
     // ignore SetPixelArea, use imageActor.pixelArea
     // ignore GetPixelArea, use imageActor.pixelArea
     { "IsPixelAreaSet",     ImageActorApi::IsPixelAreaSet,        IMAGE_ACTOR_API },

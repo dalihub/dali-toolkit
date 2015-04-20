@@ -197,7 +197,6 @@ int UtcDaliSuperBlurViewGetBlurredImage(void)
   tet_infoline( "UtcDaliSuperBlurViewGetBlurredImage" );
 
   SuperBlurView blurView = SuperBlurView::New( BLUR_LEVELS );
-  blurView.SetRelayoutEnabled( false );
   blurView.SetSize( 100.f,100.f );
   Image inputImage = CreateSolidColorImage( application, Color::GREEN, 100, 100 );
   blurView.SetImage( inputImage );

@@ -1461,10 +1461,11 @@ void TableView::CalculateFixedSizes( RowColumnArray& data, Dimension::Type dimen
         DALI_ASSERT_DEBUG( row < mCellData.GetRows() );
         DALI_ASSERT_DEBUG( column < mCellData.GetColumns() );
 
-        Actor& actor = mCellData[ row ][ column ].actor;
+        const CellData& cellData = mCellData[ row ][ column ];
+        const Actor& actor = cellData.actor;
         if( actor )
         {
-          if( FitToChild( actor, dimension ) )
+          if( FitToChild( actor, dimension ) && ( dimension == Dimension::WIDTH ) ? ( cellData.position.columnSpan == 1 ) : ( cellData.position.rowSpan == 1 )  )
           {
             maxActorHeight = std::max( maxActorHeight, actor.GetRelayoutSize( dimension ) + cellPadding.x + cellPadding.y );
           }

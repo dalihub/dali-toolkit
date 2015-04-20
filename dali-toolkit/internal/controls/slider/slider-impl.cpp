@@ -96,6 +96,7 @@ const float DEFAULT_WIDTH = 0.0f;
 const float DEFAULT_HEIGHT = 27.0f;
 const float DEFAULT_HIT_HEIGHT = 72.0f;
 const float DEFAULT_HANDLE_HEIGHT = DEFAULT_HIT_HEIGHT;
+const float POPUP_TEXT_PADDING = 10.0f;
 
 const char* SKINNED_BACKING_IMAGE_NAME = DALI_IMAGE_DIR "slider-skin.9.png";
 const char* SKINNED_HANDLE_IMAGE_NAME = DALI_IMAGE_DIR "slider-skin-handle.png";;
@@ -392,7 +393,6 @@ Actor Slider::CreateHitRegion()
 ImageActor Slider::CreateBacking()
 {
   ImageActor backing = ImageActor::New();
-  backing.SetRelayoutEnabled( false );
   backing.SetParentOrigin( ParentOrigin::CENTER );
   backing.SetAnchorPoint( AnchorPoint::CENTER );
   backing.SetZ( BACKING_Z );
@@ -422,7 +422,6 @@ std::string Slider::GetBackingImageName()
 ImageActor Slider::CreateProgress()
 {
   ImageActor progress = ImageActor::New();
-  progress.SetRelayoutEnabled( false );
   progress.SetParentOrigin( ParentOrigin::CENTER_LEFT );
   progress.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
   progress.SetZ( PROGRESS_Z );
@@ -498,7 +497,6 @@ void Slider::ResizeProgressRegion( const Vector2& region )
 ImageActor Slider::CreateHandle()
 {
   ImageActor handle = ImageActor::New();
-  handle.SetRelayoutEnabled( false );
   handle.SetParentOrigin( ParentOrigin::CENTER_LEFT );
   handle.SetAnchorPoint( AnchorPoint::CENTER );
   handle.SetZ( HANDLE_Z );
@@ -509,7 +507,6 @@ ImageActor Slider::CreateHandle()
 ImageActor Slider::CreatePopupArrow()
 {
   ImageActor arrow = ImageActor::New();
-  arrow.SetRelayoutEnabled( false );
   arrow.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
   arrow.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
   arrow.SetZ( HANDLE_Z );
@@ -522,18 +519,21 @@ Toolkit::TextLabel Slider::CreatePopupText()
   Toolkit::TextLabel textLabel = Toolkit::TextLabel::New();
   textLabel.SetParentOrigin( ParentOrigin::CENTER );
   textLabel.SetAnchorPoint( AnchorPoint::CENTER );
+  textLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   textLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
   textLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
+  textLabel.SetProperty( Toolkit::TextLabel::Property::TEXT_COLOR, DEFAULT_POPUP_TEXT_COLOR );
   textLabel.SetZ( VALUE_DISPLAY_TEXT_Z );
+  textLabel.SetPadding( Padding( POPUP_TEXT_PADDING, POPUP_TEXT_PADDING, 0.0f, 0.0f ) );
   return textLabel;
 }
 
 ImageActor Slider::CreatePopup()
 {
   ImageActor popup = ImageActor::New();
-  popup.SetRelayoutEnabled( false );
   popup.SetParentOrigin( ParentOrigin::TOP_CENTER );
   popup.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
+  popup.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::WIDTH );
 
   mValueTextLabel = CreatePopupText();
   popup.Add( mValueTextLabel );

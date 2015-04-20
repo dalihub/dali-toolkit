@@ -70,8 +70,6 @@ static void SetupTableViewAndActors(TableView& tableView, Actor& actor1, Actor& 
   tableView = TableView::New( 10, 10 ); // 10 by 10 grid.
   DALI_TEST_CHECK( tableView );
 
-  tableView.SetRelayoutEnabled( true );
-
   Stage::GetCurrent().Add( tableView );
   tableView.SetSize( Dali::Vector2( 100.0f, 100.0f ) );
 
@@ -79,11 +77,8 @@ static void SetupTableViewAndActors(TableView& tableView, Actor& actor1, Actor& 
   actor2 = Actor::New();
   actor3 = Actor::New();
 
-  actor1.SetRelayoutEnabled( true );
   actor1.SetSize( Dali::Vector2( 10, 10 ) );
-  actor2.SetRelayoutEnabled( true );
   actor2.SetSize( Dali::Vector2( 10, 10 ) );
-  actor3.SetRelayoutEnabled( true );
   actor3.SetSize( Dali::Vector2( 10, 10 ) );
 
   tableView.AddChild( actor1, TableView::CellPosition( 0, 0 ) );

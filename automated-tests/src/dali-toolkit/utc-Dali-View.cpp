@@ -305,7 +305,6 @@ int UtcDaliViewOrientationChanged(void)
   try
   {
     View view = View::New();
-    view.SetRelayoutEnabled( true );
     Stage::GetCurrent().Add( view );
 
     view.SetSize( Vector2( 480, 800 ) );

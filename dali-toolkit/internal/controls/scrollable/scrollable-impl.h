@@ -182,6 +182,13 @@ protected:
   Scrollable();
 
   /**
+   * @brief Construct a new Scrollable.
+   *
+   * @param[in] behaviourFlags Flags to enable
+   */
+  Scrollable( ControlBehaviour behaviourFlags );
+
+  /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~Scrollable();

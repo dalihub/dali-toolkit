@@ -293,7 +293,7 @@ Dali::Toolkit::ItemView ItemView::New(ItemFactory& factory)
 }
 
 ItemView::ItemView(ItemFactory& factory)
-: Scrollable(),
+: Scrollable( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | REQUIRES_MOUSE_WHEEL_EVENTS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT ) ),
   mItemFactory(factory),
   mActiveLayout(NULL),
   mAnimatingOvershootOn(false),
@@ -319,16 +319,11 @@ ItemView::ItemView(ItemFactory& factory)
   mItemsParentOrigin( ParentOrigin::CENTER),
   mItemsAnchorPoint( AnchorPoint::CENTER)
 {
-  SetRequiresMouseWheelEvents(true);
-  SetKeyboardNavigationSupport(true);
 }
 
 void ItemView::OnInitialize()
 {
   Actor self = Self();
-
-  // Disable size negotiation for item views
-  self.SetRelayoutEnabled( false );
 
   mScrollConnector = Dali::Toolkit::ScrollConnector::New();
   mScrollPositionObject = mScrollConnector.GetScrollPositionObject();

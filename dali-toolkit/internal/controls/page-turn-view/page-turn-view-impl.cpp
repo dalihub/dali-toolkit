@@ -259,7 +259,7 @@ const int PageTurnView::NUMBER_OF_CACHED_PAGES = NUMBER_OF_CACHED_PAGES_EACH_SID
 const float PageTurnView::STATIC_PAGE_INTERVAL_DISTANCE = 1.0f;
 
 PageTurnView::PageTurnView( PageFactory& pageFactory, const Vector2& pageSize )
-: Control( REQUIRES_TOUCH_EVENTS ),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),
   mPageFactory( pageFactory ),
   mPageSize( pageSize ),
   mTotalPageCount( 0 ),

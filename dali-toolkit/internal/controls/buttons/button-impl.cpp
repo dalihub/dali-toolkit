@@ -674,6 +674,8 @@ void Button::SetButtonImage( Actor image )
   }
 
   OnButtonImageSet();
+
+  RelayoutRequest();
 }
 
 Actor Button::GetButtonImage() const
@@ -709,6 +711,8 @@ void Button::SetSelectedImage( Actor image )
   }
 
   OnSelectedImageSet();
+
+  RelayoutRequest();
 }
 
 Actor Button::GetSelectedImage() const
@@ -742,6 +746,8 @@ void Button::SetBackgroundImage( Actor image )
   }
 
   OnBackgroundImageSet();
+
+  RelayoutRequest();
 }
 
 Actor Button::GetBackgroundImage() const
@@ -782,6 +788,8 @@ void Button::SetSelectedBackgroundImage( Actor image )
   }
 
   OnSelectedBackgroundImageSet();
+
+  RelayoutRequest();
 }
 
 Actor Button::GetSelectedBackgroundImage() const

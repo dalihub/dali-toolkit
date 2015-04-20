@@ -104,7 +104,7 @@ DALI_TYPE_REGISTRATION_END()
 } // unnamed namespace
 
 SuperBlurView::SuperBlurView( unsigned int blurLevels )
-: Control( CONTROL_BEHAVIOUR_NONE ),
+: Control( ControlBehaviour( DISABLE_SIZE_NEGOTIATION ) ),
   mBlurLevels( blurLevels ),
   mBlurStrengthPropertyIndex(Property::INVALID_INDEX),
   mResourcesCleared( true ),

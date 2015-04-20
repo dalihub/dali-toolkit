@@ -75,7 +75,15 @@ const float DEFAULT_OVERSHOOT_ANIMATION_SPEED(120.0f); // 120 pixels per second
 // Scrollable controls are not layout containers so they dont need size negotiation..
 // we dont want size negotiation while scrolling if we can avoid it
 Scrollable::Scrollable()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | NO_SIZE_NEGOTIATION ) ),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | DISABLE_SIZE_NEGOTIATION ) ),
+  mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
+  mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
+  mOvershootEnabled(false)
+{
+}
+
+Scrollable::Scrollable( ControlBehaviour behaviourFlags )
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | behaviourFlags ) ),
   mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
   mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
   mOvershootEnabled(false)

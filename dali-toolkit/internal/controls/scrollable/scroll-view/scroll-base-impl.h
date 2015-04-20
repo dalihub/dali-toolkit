@@ -191,6 +191,13 @@ protected:
    */
   ScrollBase();
 
+  /**
+   * @brief Construct a new ScrollBase.
+   *
+   * @param[in] behaviourFlags Flags to enable
+   */
+  ScrollBase( ControlBehaviour behaviourFlags );
+
 protected:
 
   ScrollBase *mParent;                              ///< Pointer to ScrollBase parent, if exists.

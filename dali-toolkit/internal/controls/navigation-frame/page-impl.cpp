@@ -45,7 +45,7 @@ DALI_TYPE_REGISTRATION_END()
 } // unnamed namespace
 
 Page::Page()
-: Control( CONTROL_BEHAVIOUR_NONE ),
+: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
   mTitle(""),
   mSubTitle(""),
   mPropertyTitle(Property::INVALID_INDEX),
