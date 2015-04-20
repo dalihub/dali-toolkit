@@ -525,11 +525,6 @@ private: // private overriden functions from CustomActorImpl and Controls
   virtual void OnChildRemove(Actor& child);
 
   /**
-   * @copydoc Dali::CustomActorImpl::OnPropertySet( Property::Index index, Property::Value propertyValue )
-   */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
-
-  /**
    * From CustomActorImpl; called after a touch-signal is received by the owning actor.
    *
    * We don't listen to these events as content within the contain may consume events.
@@ -591,7 +586,7 @@ private:
   /**
    * Called whenever a snap animation has completed
    * @param[in] source the Animation instance that has completed.
-   * Resets all scrolling animations and states, leaving current scroll position at mPropertyPosition
+   * Resets all scrolling animations and states, leaving current scroll position at SCROLL_POSITION
    */
   void ResetScrolling();
 
@@ -636,7 +631,7 @@ private:
   void OnScrollAnimationFinished( Animation& source );
 
   /**
-   * Called when either the X or Y internal scroll positions have finished snapping back to mPropertyPrePosition
+   * Called when either the X or Y internal scroll positions have finished snapping back to SCROLL_PRE_POSITION
    *
    * @param[in] source the Animation instance that has completed.
    */
@@ -893,13 +888,13 @@ private:
   Vector2 mMouseWheelScrollDistanceStep;        ///< The step of scroll distance in actor coordinates in X and Y axes for each mouse wheel event received.
 
   //ScrollInternalConstraintsPtr mScrollInternalConstraints;
-  ActiveConstraint mScrollMainInternalPrePositionConstraint;
-  ActiveConstraint mScrollMainInternalPositionConstraint;
-  ActiveConstraint mScrollMainInternalOvershootXConstraint;
-  ActiveConstraint mScrollMainInternalOvershootYConstraint;
-  ActiveConstraint mScrollMainInternalDeltaConstraint;
-  ActiveConstraint mScrollMainInternalFinalConstraint;
-  ActiveConstraint mScrollMainInternalRelativeConstraint;
+  Constraint mScrollMainInternalPrePositionConstraint;
+  Constraint mScrollMainInternalPositionConstraint;
+  Constraint mScrollMainInternalOvershootXConstraint;
+  Constraint mScrollMainInternalOvershootYConstraint;
+  Constraint mScrollMainInternalDeltaConstraint;
+  Constraint mScrollMainInternalFinalConstraint;
+  Constraint mScrollMainInternalRelativeConstraint;
 
   ScrollOvershootIndicatorPtr mOvershootIndicator;
 

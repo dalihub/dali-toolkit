@@ -142,6 +142,11 @@ public:
   Actor GetLabel() const;
 
   /**
+   * @copydoc Dali::Toolkit::PushButton::SetButtonImage( Actor image )
+   */
+  void SetButtonImage( Actor image );
+
+  /**
    * @copydoc Dali::Toolkit::PushButton::GetButtonImage()
    */
   Actor GetButtonImage() const;
@@ -151,6 +156,11 @@ public:
    * @return A reference to the button image.
    */
   Actor& GetButtonImage();
+
+  /**
+   * @copydoc Dali::Toolkit::PushButton::SetSelectedImage( Actor image )
+   */
+  void SetSelectedImage( Actor image );
 
   /**
    * @copydoc Dali::Toolkit::PushButton::GetSelectedImage()
@@ -164,6 +174,11 @@ public:
   Actor& GetSelectedImage();
 
   /**
+   * @copydoc Dali::Toolkit::PushButton::SetBackgroundImage( Actor image )
+   */
+  void SetBackgroundImage( Actor image );
+
+  /**
    * @copydoc Dali::Toolkit::PushButton::GetBackgroundImage()
    */
   Actor GetBackgroundImage() const;
@@ -173,6 +188,27 @@ public:
    * @return A reference to the background image.
    */
   Actor& GetBackgroundImage();
+
+  /**
+   * @copydoc Dali::Toolkit::PushButton::SetSelectedBackgroundImage( Actor image )
+   */
+  void SetSelectedBackgroundImage( Actor image );
+
+  /**
+   * @copydoc Dali::Toolkit::PushButton::GetSelectedBackgroundImage()
+   */
+  Actor GetSelectedBackgroundImage() const;
+
+  /**
+   * Internal use only.
+   * @return A reference to the selected background image.
+   */
+  Actor& GetSelectedBackgroundImage();
+
+  /**
+   * @copydoc Dali::Toolkit::PushButton::SetDisabledImage( Actor image )
+   */
+  void SetDisabledImage( Actor image );
 
   /**
    * @copydoc Dali::Toolkit::PushButton::GetDisabledImage()
@@ -186,6 +222,11 @@ public:
   Actor& GetDisabledImage();
 
   /**
+   * @copydoc Dali::Toolkit::CheckBoxButton::SetDisabledSelectedImage( Actor image )
+   */
+  void SetDisabledSelectedImage( Actor image );
+
+  /**
    * @copydoc Dali::Toolkit::CheckBoxButton::GetDisabledSelectedImage()
    */
   Actor GetDisabledSelectedImage() const;
@@ -195,6 +236,11 @@ public:
    * @return A reference to the disabled selected image.
    */
   Actor& GetDisabledSelectedImage();
+
+  /**
+   * @copydoc Dali::Toolkit::PushButton::SetDisabledBackgroundImage( Actor image )
+   */
+  void SetDisabledBackgroundImage( Actor image );
 
   /**
    * @copydoc Dali::Toolkit::PushButton::GetDisabledBackgroundImage()
@@ -216,43 +262,17 @@ public:
    */
   static bool DoAction( BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes );
 
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetButtonImage( Actor image )
-   */
-  virtual void SetButtonImage( Actor image ) {}
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetSelectedImage( Actor image )
-   */
-  virtual void SetSelectedImage( Actor image ) {}
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetBackgroundImage( Actor image )
-   */
-  virtual void SetBackgroundImage( Actor image ) {}
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetDisabledImage( Actor image )
-   */
-  virtual void SetDisabledImage( Actor image ) {}
-
-  /**
-   * @copydoc Dali::Toolkit::CheckBoxButton::SetDisabledSelectedImage( Actor image )
-   */
-  virtual void SetDisabledSelectedImage( Actor image ) {}
-
-  /**
-   * @copydoc Dali::Toolkit::PushButton::SetDisabledBackgroundImage( Actor image )
-   */
-  virtual void SetDisabledBackgroundImage( Actor image ) {}
-
 protected:
 
   /**
-   * Internal use only.
    * @return A reference to the label actor.
    */
   Actor& GetLabel();
+
+  /**
+   * It changes the transition state of the push button.
+   */
+  void UpdatePaintTransitionState();
 
 private:
 
@@ -267,6 +287,46 @@ private:
    * Could be reimplemented in subclasses to provide specific behaviour.
    */
   virtual void OnButtonInitialize() { }
+
+  /**
+   * This method is called when the label is set.
+   */
+  virtual void OnLabelSet() {}
+
+  /**
+   * This method is called when the button image is set
+   */
+  virtual void OnButtonImageSet() {}
+
+  /**
+   * This method is called when the selected image is set
+   */
+  virtual void OnSelectedImageSet() {}
+
+  /**
+   * This method is called when the background image is set
+   */
+  virtual void OnBackgroundImageSet() {}
+
+  /**
+   * This method is called when the selected background image is set
+   */
+  virtual void OnSelectedBackgroundImageSet() {}
+
+  /**
+   * This method is called when the disabled button image is set
+   */
+  virtual void OnDisabledImageSet() {}
+
+  /**
+   * This method is called when the disabled selected image is set
+   */
+  virtual void OnDisabledSelectedImageSet() {}
+
+  /**
+   * This method is called when the disabled background image is set
+   */
+  virtual void OnDisabledBackgroundImageSet() {}
 
   /**
    * This method is called from the OnTouchEvent method when the button is down.
@@ -300,34 +360,33 @@ private:
   virtual void OnButtonStageDisconnection();
 
   /**
-   * This method is called when the label is set.
-   */
-  virtual void OnLabelSet() {}
-
-  /**
    * This method is called when the \e selected property is changed.
+   * @return true if the transition animation is started.
    */
-  virtual void OnSelected( bool selected ) {}
+  virtual bool OnSelected() { return false; }
 
   /**
    * This method is called when the \e disabled property is changed.
+   * @return true if the transition animation is started.
    */
-  virtual void OnDisabled( bool disabled ) {}
+  virtual bool OnDisabled() { return false; }
 
   /**
    * This method is called when the button is pressed.
+   * @return true if the transition animation is started.
    */
-  virtual void OnPressed() {}
+  virtual bool OnPressed() { return false; }
 
   /**
    * This method is called when the button is released.
+   * @return true if the transition animation is started.
    */
-  virtual void OnReleased() {}
+  virtual bool OnReleased() { return false; }
 
   /**
-   * This method is called when the button is clicked
+   * This method stops all animations
    */
-  virtual void OnClicked() {}
+  virtual void StopAllAnimations() {}
 
 public:
 
@@ -428,6 +487,23 @@ private:
    */
   bool AutoRepeatingSlot();
 
+  /**
+   * Sets the button as selected or unselected.
+   * @param[in] selected \e selected property value.
+   * @param[in] emitSignal Emit a signal if this value is \e true.
+   */
+  void SetSelected( bool selected, bool emitSignal );
+
+  /**
+   * This method is called when the button is pressed.
+   */
+  void Pressed();
+
+  /**
+   * This method is called when the button is released.
+   */
+  void Released();
+
 protected:
 
   enum ButtonState
@@ -446,7 +522,7 @@ protected:
     DisabledUnselectedState,      ///< The button is disabled and unselected.
     DisabledSelectedState,        ///< The button is disabled and selected.
     UnselectedSelectedTransition, ///< The button is in transition from unselected to selected.
-    SelectedUnselectedTransition, ///< The push button is in transition from selected to unselected.
+    SelectedUnselectedTransition, ///< The button is in transition from selected to unselected.
     UnselectedDisabledTransition, ///< The button is in transition from unselected to disabled.
     DisabledUnselectedTransition, ///< The button is in transition from disabled to unselected.
     SelectedDisabledTransition,   ///< The button is in transition from selected to disabled.
@@ -454,6 +530,23 @@ protected:
   };
 
   ButtonState GetState();
+  PaintState GetPaintState();
+
+  /**
+   * Inserts the actor to the button.
+   */
+  void InsertChild( unsigned int index, Actor& actor );
+
+  /**
+   * Removes the actor from the button.
+   */
+  void RemoveChild( Actor& actor );
+
+  /**
+   * Finds the index of the actor.
+   * If the actor doesn't exist, return the last index + 1.
+   */
+  unsigned int FindChildIndex( Actor& actor );
 
 private:
 
@@ -478,6 +571,7 @@ private:
   Actor mButtonContent;                        ///< Stores the unselected content.
   Actor mSelectedContent;                      ///< Stores the selected content.
   Actor mBackgroundContent;                    ///< Stores the background content.
+  Actor mSelectedBackgroundContent;            ///< Stores the selected background content.
   Actor mDisabledContent;                      ///< Stores the disabled content.
   Actor mDisabledSelectedContent;              ///< Stores the disabled selected content.
   Actor mDisabledBackgroundContent;            ///< Stores the disabled background content.
@@ -496,6 +590,7 @@ private:
   bool             mClickActionPerforming;
 
   ButtonState      mState;                     ///< Stores the button state.
+  PaintState       mPaintState;                ///< Stores the paint state.
 };
 
 } // namespace Internal

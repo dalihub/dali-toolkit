@@ -25,6 +25,7 @@
 #include <dali-toolkit/public-api/builder/tree-node.h>
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
 #include <dali-toolkit/public-api/controls/bloom-view/bloom-view.h>
+#include <dali-toolkit/public-api/controls/bubble-effect/bubble-emitter.h>
 #include <dali-toolkit/public-api/controls/buttons/button.h>
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
@@ -72,8 +73,8 @@
 #include <dali-toolkit/public-api/controls/slider/slider.h>
 #include <dali-toolkit/public-api/controls/super-blur-view/super-blur-view.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
-#include <dali-toolkit/public-api/controls/text-input/text-input.h>
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-field.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/tool-bar/tool-bar.h>
 #include <dali-toolkit/public-api/controls/view/view.h>
 
@@ -81,14 +82,15 @@
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>
 
-#include <dali-toolkit/public-api/markup-processor/markup-processor.h>
-
 #include <dali-toolkit/public-api/scripting/script.h>
 #include <dali-toolkit/public-api/scripting/script-plugin.h>
+
+#include <dali-toolkit/public-api/text/rendering-backend.h>
 
 #include <dali-toolkit/public-api/shader-effects/alpha-discard-effect.h>
 #include <dali-toolkit/public-api/shader-effects/bendy-effect.h>
 #include <dali-toolkit/public-api/shader-effects/blind-effect.h>
+#include <dali-toolkit/public-api/shader-effects/bouncing-effect.h>
 #include <dali-toolkit/public-api/shader-effects/carousel-effect.h>
 #include <dali-toolkit/public-api/shader-effects/displacement-effect.h>
 #include <dali-toolkit/public-api/shader-effects/dissolve-local-effect.h>
@@ -102,6 +104,8 @@
 #include <dali-toolkit/public-api/shader-effects/spot-effect.h>
 #include <dali-toolkit/public-api/shader-effects/square-dissolve-effect.h>
 #include <dali-toolkit/public-api/shader-effects/water-effect.h>
+#include <dali-toolkit/public-api/shader-effects/bubble-effect/bubble-effect.h>
+#include <dali-toolkit/public-api/shader-effects/bubble-effect/color-adjuster.h>
 #include <dali-toolkit/public-api/shader-effects/dissolve-effect.h>
 #include <dali-toolkit/public-api/shader-effects/image-region-effect.h>
 #include <dali-toolkit/public-api/shader-effects/iris-effect.h>
@@ -113,6 +117,8 @@
 #include <dali-toolkit/public-api/shader-effects/ripple-effect.h>
 #include <dali-toolkit/public-api/shader-effects/ripple2d-effect.h>
 #include <dali-toolkit/public-api/shader-effects/swirl-effect.h>
+
+#include <dali-toolkit/public-api/styling/style-manager.h>
 
 #include <dali-toolkit/public-api/transition-effects/cube-transition-effect.h>
 #include <dali-toolkit/public-api/transition-effects/cube-transition-wave-effect.h>

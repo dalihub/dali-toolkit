@@ -244,7 +244,7 @@ This is a basic example of a button defined in JSON by setting the default prope
         }
       },
       "label-actor": {
-        "type": "TextView",
+        "type": "TextLabel",
         "text": "Normal"
       }
     }

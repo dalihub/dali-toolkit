@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <sstream>
 #include <iomanip>
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
@@ -139,7 +138,7 @@ GaussianBlurView::GaussianBlurView()
 GaussianBlurView::GaussianBlurView( const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
                                     const float downsampleWidthScale, const float downsampleHeightScale,
                                     bool blurUserImage)
-  : Control( CONTROL_BEHAVIOUR_NONE )
+  : Control( NO_SIZE_NEGOTIATION )
   , mNumSamples(numSamples)
   , mBlurBellCurveWidth( 0.001f )
   , mPixelFormat(renderTargetPixelFormat)
@@ -242,18 +241,6 @@ Vector4 GaussianBlurView::GetBackgroundColor() const
 // Private methods
 //
 
-/**
- * EqualToConstraintFloat
- *
- * f(current, property) = property
- */
-struct EqualToConstraintFloat
-{
-  EqualToConstraintFloat(){}
-
-  float operator()(const float current, const PropertyInput& property) {return property.GetFloat();}
-};
-
 void GaussianBlurView::OnInitialize()
 {
   // root actor to parent all user added actors, needed to allow us to set that subtree as exclusive for our child render task
@@ -279,12 +266,14 @@ void GaussianBlurView::OnInitialize()
 
   // Create an ImageActor for performing a horizontal blur on the texture
   mImageActorHorizBlur = ImageActor::New();
+  mImageActorHorizBlur.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   mImageActorHorizBlur.SetParentOrigin(ParentOrigin::CENTER);
   mImageActorHorizBlur.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
   mImageActorHorizBlur.SetShaderEffect( mHorizBlurShader );
 
   // Create an ImageActor for performing a vertical blur on the texture
   mImageActorVertBlur = ImageActor::New();
+  mImageActorVertBlur.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   mImageActorVertBlur.SetParentOrigin(ParentOrigin::CENTER);
   mImageActorVertBlur.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
   mImageActorVertBlur.SetShaderEffect( mVertBlurShader );
@@ -296,15 +285,18 @@ void GaussianBlurView::OnInitialize()
   if(!mBlurUserImage)
   {
     mImageActorComposite = ImageActor::New();
+    mImageActorComposite.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
     mImageActorComposite.SetParentOrigin(ParentOrigin::CENTER);
     mImageActorComposite.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
     mImageActorComposite.SetOpacity(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
 
-    Constraint blurStrengthConstraint = Constraint::New<float>( Actor::Property::COLOR_ALPHA, ParentSource(mBlurStrengthPropertyIndex), EqualToConstraintFloat());
-    mImageActorComposite.ApplyConstraint(blurStrengthConstraint);
+    Constraint blurStrengthConstraint = Constraint::New<float>( mImageActorComposite, Actor::Property::COLOR_ALPHA, EqualToConstraint());
+    blurStrengthConstraint.AddSource( ParentSource(mBlurStrengthPropertyIndex) );
+    blurStrengthConstraint.Apply();
 
     // Create an ImageActor for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
     mTargetActor = ImageActor::New();
+    mTargetActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
     mTargetActor.SetParentOrigin(ParentOrigin::CENTER);
     mTargetActor.ScaleBy( Vector3(1.0f, -1.0f, 1.0f) ); // FIXME
 

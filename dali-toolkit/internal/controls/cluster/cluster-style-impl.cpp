@@ -295,8 +295,8 @@ void ClusterStyle::Apply( Actor actor,
   if( animationDuration > 0.f )
   {
     Animation animation = Animation::New(animationDuration);
-    animation.MoveTo( actor, position, alpha, durationSeconds.delaySeconds, durationSeconds.durationSeconds );
-    animation.Resize( actor, size, alpha, durationSeconds.delaySeconds, durationSeconds.durationSeconds );
+    animation.AnimateTo( Property( actor, Actor::Property::POSITION ), position, alpha, TimePeriod( durationSeconds.delaySeconds, durationSeconds.durationSeconds ) );
+    animation.AnimateTo( Property( actor, Actor::Property::SIZE ), size, alpha, TimePeriod( durationSeconds.delaySeconds, durationSeconds.durationSeconds ) );
     animation.Play();
   }
   else
@@ -318,10 +318,10 @@ void ClusterStyle::Apply( Actor actor,
   if( animationDuration > 0.f )
   {
     Animation animation = Animation::New(animationDuration);
-    animation.MoveTo( actor, position, alpha, durationSeconds.delaySeconds, durationSeconds.durationSeconds );
-    animation.Resize( actor, size, alpha, durationSeconds.delaySeconds, durationSeconds.durationSeconds );
-    animation.RotateTo( actor, rotation, alpha, durationSeconds.delaySeconds, durationSeconds.durationSeconds );
-    animation.ScaleTo( actor, scale, alpha, durationSeconds.delaySeconds, durationSeconds.durationSeconds );
+    animation.AnimateTo( Property( actor, Actor::Property::POSITION ), position, alpha, TimePeriod( durationSeconds.delaySeconds, durationSeconds.durationSeconds ) );
+    animation.AnimateTo( Property( actor, Actor::Property::SIZE ), size, alpha, TimePeriod( durationSeconds.delaySeconds, durationSeconds.durationSeconds ) );
+    animation.AnimateTo( Property( actor, Actor::Property::ORIENTATION ), rotation, alpha, TimePeriod( durationSeconds.delaySeconds, durationSeconds.durationSeconds ) );
+    animation.AnimateTo( Property( actor, Actor::Property::SCALE ), scale, alpha, TimePeriod( durationSeconds.delaySeconds, durationSeconds.durationSeconds ) );
     animation.Play();
   }
   else
@@ -473,7 +473,7 @@ void ClusterStyleRandom::ApplyStyle(Actor child, unsigned int index, AlphaFuncti
   Apply( child,
          FirstOrderEquation( GetClusterSize(), Vector3(position.x, position.y, 0.0f), Vector3(0.0f, 0.0f, depthPropertyValue) ),
          FirstOrderEquation( GetClusterSize(), Vector3::ONE * size),
-         Quaternion(rotation, Vector3::ZAXIS),
+         Quaternion( Radian( rotation ), Vector3::ZAXIS ),
          Vector3::ONE,
          alpha,
          durationSeconds);

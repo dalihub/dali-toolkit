@@ -19,7 +19,9 @@
 #include <dali-toolkit/internal/controls/slider/slider-impl.h>
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <sstream>
+#include <limits>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -348,13 +350,13 @@ void Slider::DisplayValue( float value, bool raiseSignals )
     }
   }
 
-  if( mHandleValueTextView )
+  if( mHandleValueTextLabel )
   {
     std::stringstream ss;
     ss.precision( GetValuePrecision() );
     ss << std::fixed << clampledValue;
 
-    mHandleValueTextView.SetText( ss.str() );
+    mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, ss.str() );
   }
 }
 
@@ -523,13 +525,15 @@ ImageActor Slider::CreatePopupArrow()
   return arrow;
 }
 
-Toolkit::TextView Slider::CreatePopupText()
+Toolkit::TextLabel Slider::CreatePopupText()
 {
-  Toolkit::TextView textView = Toolkit::TextView::New();
-  textView.SetParentOrigin( ParentOrigin::CENTER );
-  textView.SetAnchorPoint( AnchorPoint::CENTER );
-  textView.SetZ( VALUE_DISPLAY_TEXT_Z );
-  return textView;
+  Toolkit::TextLabel textLabel = Toolkit::TextLabel::New();
+  textLabel.SetParentOrigin( ParentOrigin::CENTER );
+  textLabel.SetAnchorPoint( AnchorPoint::CENTER );
+  textLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
+  textLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
+  textLabel.SetZ( VALUE_DISPLAY_TEXT_Z );
+  return textLabel;
 }
 
 ImageActor Slider::CreatePopup()
@@ -539,8 +543,8 @@ ImageActor Slider::CreatePopup()
   popup.SetParentOrigin( ParentOrigin::TOP_CENTER );
   popup.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
 
-  mValueTextView = CreatePopupText();
-  popup.Add( mValueTextView );
+  mValueTextLabel = CreatePopupText();
+  popup.Add( mValueTextLabel );
 
   return popup;
 }
@@ -574,24 +578,21 @@ void Slider::ResizeHandleRegion( const Vector2& region )
 
 void Slider::CreateHandleValueDisplay()
 {
-  if( mHandle && !mHandleValueTextView )
+  if( mHandle && !mHandleValueTextLabel )
   {
-    mHandleValueTextView = Toolkit::TextView::New();
-    mHandleValueTextView.SetParentOrigin( ParentOrigin::CENTER );
-    mHandleValueTextView.SetAnchorPoint( AnchorPoint::CENTER );
-    mHandleValueTextView.SetSize( GetHandleRegion() );
-    mHandleValueTextView.SetZ( HANDLE_VALUE_DISPLAY_TEXT_Z );
-    mHandle.Add( mHandleValueTextView );
+    mHandleValueTextLabel = Toolkit::TextLabel::New();
+    mHandleValueTextLabel.SetParentOrigin( ParentOrigin::CENTER );
+    mHandleValueTextLabel.SetAnchorPoint( AnchorPoint::CENTER );
+    mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
+    mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
+    mHandleValueTextLabel.SetDrawMode( DrawMode::OVERLAY );
+    mHandle.Add( mHandleValueTextLabel );
   }
 }
 
 void Slider::DestroyHandleValueDisplay()
 {
-  if(mHandleValueTextView)
-  {
-    mHandleValueTextView.Unparent();
-    mHandleValueTextView.Reset();
-  }
+  UnparentAndReset(mHandleValueTextLabel);
 }
 
 void Slider::SetPopupTextColor( const Vector4& color )
@@ -1018,26 +1019,15 @@ bool Slider::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tr
 void Slider::DisplayPopup( float value )
 {
   // Value displayDoConnectSignal
-  if( mValueTextView )
+  if( mValueTextLabel )
   {
     std::stringstream ss;
     ss.precision( GetValuePrecision() );
     ss << std::fixed << value;
-    mValueTextView.SetText( ss.str() );
-    TextStyle style;
-    style.SetTextColor( GetPopupTextColor() );
-    mValueTextView.SetStyleToCurrentText( style, TextStyle::COLOR);
+    mValueTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, ss.str() );
 
     if( mValueDisplay )
     {
-      Font font = Font::New();
-      float popupWidth = font.MeasureText( ss.str() ).x + VALUE_POPUP_MARGIN * 2.0f;
-      if( popupWidth < VALUE_POPUP_MIN_WIDTH )
-      {
-        popupWidth = VALUE_POPUP_MIN_WIDTH;
-      }
-
-      mPopup.SetSize( popupWidth, VALUE_POPUP_HEIGHT );
       mValueDisplay.SetVisible( true );
 
       mValueTimer.SetInterval( VALUE_VIEW_SHOW_DURATION );

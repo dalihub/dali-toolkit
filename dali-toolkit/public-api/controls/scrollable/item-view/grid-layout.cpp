@@ -193,7 +193,7 @@ struct GridRotationConstraint0
 {
   Quaternion operator()(const Quaternion& current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)
   {
-    return Quaternion(0.0f, Vector3::ZAXIS);
+    return Quaternion( Radian( 0.0f ), Vector3::ZAXIS);
   }
 };
 
@@ -201,7 +201,7 @@ struct GridRotationConstraint90
 {
   Quaternion operator()(const Quaternion& current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)
   {
-    return Quaternion(1.5f * Math::PI, Vector3::ZAXIS);
+    return Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS);
   }
 };
 
@@ -209,7 +209,7 @@ struct GridRotationConstraint180
 {
   Quaternion operator()(const Quaternion& current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)
   {
-    return Quaternion(Math::PI, Vector3::ZAXIS);
+    return Quaternion( Radian( Math::PI ), Vector3::ZAXIS);
   }
 };
 
@@ -217,7 +217,7 @@ struct GridRotationConstraint270
 {
   Quaternion operator()(const Quaternion& current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)
   {
-    return Quaternion(0.5f * Math::PI, Vector3::ZAXIS);
+    return Quaternion( Radian( 0.5f * Math::PI ), Vector3::ZAXIS);
   }
 };
 
@@ -624,8 +624,8 @@ void GridLayout::GetResizeAnimation(Animation& animation, Actor actor, Vector3 s
 
     // Do a nonlinear size animation to shrink the actor first when the actor size changes,
     // so that we can avoid the actors overlapping during orientation change.
-    animation.Resize( actor, shrink, AlphaFunctions::EaseOut, 0.0f, durationSeconds * 0.5f );
-    animation.Resize( actor, size, AlphaFunctions::EaseIn, 0.0f, durationSeconds );
+    animation.AnimateTo( Property( actor, Actor::Property::SIZE ), shrink, AlphaFunctions::EaseOut, TimePeriod( 0.0f, durationSeconds * 0.5f ) );
+    animation.AnimateTo( Property( actor, Actor::Property::SIZE ), size, AlphaFunctions::EaseIn, TimePeriod( 0.0f, durationSeconds ) );
   }
 }
 
@@ -692,19 +692,19 @@ Degree GridLayout::GetScrollDirection() const
 
   if (mOrientation == ControlOrientation::Up)
   {
-    scrollDirection = 0.0f;
+    scrollDirection = Degree( 0.0f );
   }
   else if (mOrientation == ControlOrientation::Left)
   {
-    scrollDirection = 90.0f;
+    scrollDirection = Degree( 90.0f );
   }
   else if (mOrientation == ControlOrientation::Down)
   {
-    scrollDirection = 180.0f;
+    scrollDirection = Degree( 180.0f );
   }
   else // mOrientation == ControlOrientation::Right
   {
-    scrollDirection = 270.0f;
+    scrollDirection = Degree( 270.0f );
   }
 
   return scrollDirection;

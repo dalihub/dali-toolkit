@@ -83,7 +83,6 @@ ImageActor CreateSolidColorActor( const Vector4& color, bool border, const Vecto
 
   imageData.Update();
   image = ImageActor::New( imageData );
-  image.SetAnchorPoint( AnchorPoint::CENTER );
   image.SetParentOrigin( ParentOrigin::CENTER );
 
   if( border )

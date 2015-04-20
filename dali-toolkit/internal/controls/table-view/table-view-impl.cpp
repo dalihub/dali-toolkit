@@ -38,9 +38,9 @@ namespace
  * @param[in] actor The child actor to test against
  * @param[dimension] The dimnesion to test against
  */
-bool FitToChild( Actor actor, Dimension dimension )
+bool FitToChild( Actor actor, Dimension::Type dimension )
 {
-  return actor.GetResizePolicy( dimension ) != FILL_TO_PARENT && actor.GetRelayoutSize( dimension ) > 0.0f;
+  return actor.GetResizePolicy( dimension ) != ResizePolicy::FILL_TO_PARENT && actor.GetRelayoutSize( dimension ) > 0.0f;
 }
 
 #if defined(DEBUG_ENABLED)
@@ -60,11 +60,13 @@ void PrintArray( Array2d<Dali::Toolkit::Internal::TableView::CellData>& array )
     {
       Dali::Toolkit::Internal::TableView::CellData data = array[i][j];
       char actor = ' ';
+      std::string actorName;
       if( data.actor )
       {
         actor = 'A';
+        actorName = data.actor.GetName();
       }
-      TV_LOG("Array[%d,%d]=%c %d,%d,%d,%d  ", i, j, actor,
+      TV_LOG("Array[%d,%d]=%c %s %d,%d,%d,%d  ", i, j, actor, actorName.c_str(),
           data.position.rowIndex, data.position.columnIndex,
           data.position.rowSpan, data.position.columnSpan );
     }
@@ -192,50 +194,33 @@ bool TableView::AddChild( Actor& child, const Toolkit::TableView::CellPosition& 
   // adopt the child
   Self().Add( child );
 
-  // put the actor to the main cell
-  CellData& data = mCellData[ position.rowIndex ][ position.columnIndex ];
+  // if child spans multiple rows of columns
+  if( ( position.rowSpan > 1 ) && ( position.rowIndex + position.rowSpan > mCellData.GetRows() ) )
+  {
+    // increase table size for the full span, only increasing rows
+    ResizeContainers( position.rowIndex + position.rowSpan, mCellData.GetColumns() );
+  }
+
+  if( ( position.columnSpan > 1 ) && ( position.columnIndex + position.columnSpan > mCellData.GetColumns() ) )
+  {
+    // increase table size for the full span, only increasing columns
+    ResizeContainers( mCellData.GetRows(), position.columnIndex + position.columnSpan );
+  }
+
+  // Fill in all cells that need the data
+  CellData data;
   data.actor = child;
   data.position = position;
 
-  // if child spans multiple rows of columns
-  bool spanned = false;
-  if( position.rowSpan > 1 )
+  for( unsigned int row = position.rowIndex; row < ( position.rowIndex + position.rowSpan ); ++row )
   {
-    // span might go outside table
-    if( position.rowIndex + position.rowSpan > mCellData.GetRows() )
-    {
-      // increase table size for the full span, only increasing rows
-      ResizeContainers( position.rowIndex + position.rowSpan, mCellData.GetColumns() );
-    }
-
-    spanned = true;
-  }
-
-  if( position.columnSpan > 1 )
-  {
-    // span might go outside table
-    if( position.columnIndex + position.columnSpan > mCellData.GetColumns() )
-    {
-      // increase table size for the full span, only increasing columns
-      ResizeContainers( mCellData.GetRows(), position.columnIndex + position.columnSpan );
-    }
-
-    spanned = true;
-  }
-
-  // if it spanned multiple rows, put the cellinfo in all of those
-  if( spanned )
-  {
-    for( unsigned int row = position.rowIndex; row < ( position.rowIndex + position.rowSpan ); ++row )
+    // store same information to all cells, this way we can identify
+    // if a cell is the prime location of an actor or a spanned one
+    for( unsigned int column = position.columnIndex; column < ( position.columnIndex + position.columnSpan ); ++column )
     {
       // store same information to all cells, this way we can identify
       // if a cell is the prime location of an actor or a spanned one
-      for( unsigned int column = position.columnIndex; column < ( position.columnIndex + position.columnSpan ); ++column )
-      {
-        // store same information to all cells, this way we can identify
-        // if a cell is the prime location of an actor or a spanned one
-        mCellData[ row ][ column ] = data;
-      }
+      mCellData[ row ][ column ] = data;
     }
   }
 
@@ -686,29 +671,29 @@ void TableView::CalculateRowColumnData()
   }
 }
 
-void TableView::OnCalculateRelayoutSize( Dimension dimension )
+void TableView::OnCalculateRelayoutSize( Dimension::Type dimension )
 {
   CalculateRowColumnData();
 
-  if( dimension & WIDTH )
+  if( dimension & Dimension::WIDTH )
   {
-    CalculateFixedSizes( mColumnData, WIDTH );
+    CalculateFixedSizes( mColumnData, Dimension::WIDTH );
     mFixedTotals.width = CalculateTotalFixedSize( mColumnData );
   }
 
-  if( dimension & HEIGHT )
+  if( dimension & Dimension::HEIGHT )
   {
-    CalculateFixedSizes( mRowData, HEIGHT );
+    CalculateFixedSizes( mRowData, Dimension::HEIGHT );
     mFixedTotals.height = CalculateTotalFixedSize( mRowData );
   }
 }
 
-void TableView::OnLayoutNegotiated( float size, Dimension dimension )
+void TableView::OnLayoutNegotiated( float size, Dimension::Type dimension )
 {
   CalculateRowColumnData();
 
   // Calculate the value of all relative sized rows and columns
-  if( dimension & WIDTH )
+  if( dimension & Dimension::WIDTH )
   {
     float remainingSize = size - mFixedTotals.width;
     if( remainingSize < 0.0f )
@@ -719,7 +704,7 @@ void TableView::OnLayoutNegotiated( float size, Dimension dimension )
     CalculateRelativeSizes( mColumnData, remainingSize );
   }
 
-  if( dimension & HEIGHT )
+  if( dimension & Dimension::HEIGHT )
   {
     float remainingSize = size - mFixedTotals.height;
     if( remainingSize < 0.0f )
@@ -1249,7 +1234,7 @@ Vector3 TableView::GetNaturalSize()
   return Vector3( mFixedTotals.width, mFixedTotals.height, 1.0f );
 }
 
-float TableView::CalculateChildSize( const Actor& child, Dimension dimension )
+float TableView::CalculateChildSize( const Actor& child, Dimension::Type dimension )
 {
   CalculateRowColumnData();
 
@@ -1273,13 +1258,14 @@ float TableView::CalculateChildSize( const Actor& child, Dimension dimension )
         {
           switch( dimension )
           {
-            case WIDTH:
+            case Dimension::WIDTH:
             {
               float cellSize = 0.0f;
 
               // Accumulate the width
               for( unsigned int i = 0; i < position.columnSpan; ++i )
               {
+                DALI_ASSERT_DEBUG( column + i < mColumnData.Size() );
                 cellSize += mColumnData[ column + i ].size;
               }
 
@@ -1293,13 +1279,14 @@ float TableView::CalculateChildSize( const Actor& child, Dimension dimension )
               return cellSize;
             }
 
-            case HEIGHT:
+            case Dimension::HEIGHT:
             {
               float cellSize = 0.0f;
 
               // Accumulate the height
               for( unsigned int i = 0; i < position.rowSpan; ++i )
               {
+                DALI_ASSERT_DEBUG( row + i < mRowData.Size() );
                 cellSize += mRowData[ row + i ].size;
               }
 
@@ -1326,7 +1313,7 @@ float TableView::CalculateChildSize( const Actor& child, Dimension dimension )
   return 0.0f;    // Child not found
 }
 
-bool TableView::RelayoutDependentOnChildren( Dimension dimension )
+bool TableView::RelayoutDependentOnChildren( Dimension::Type dimension )
 {
   if ( Control::RelayoutDependentOnChildren( dimension ) )
   {
@@ -1429,8 +1416,31 @@ float TableView::CalculateTotalFixedSize( const RowColumnArray& data )
   return totalSize;
 }
 
-void TableView::CalculateFixedSizes( RowColumnArray& data, Dimension dimension )
+Vector2 TableView::GetCellPadding( Dimension::Type dimension )
 {
+  switch( dimension )
+  {
+    case Dimension::WIDTH:
+    {
+      return Vector2( mPadding.x, mPadding.x );
+    }
+    case Dimension::HEIGHT:
+    {
+      return Vector2( mPadding.y, mPadding.y );
+    }
+    default:
+    {
+      break;
+    }
+  }
+
+  return Vector2();
+}
+
+void TableView::CalculateFixedSizes( RowColumnArray& data, Dimension::Type dimension )
+{
+  Vector2 cellPadding = GetCellPadding( dimension );
+
   const unsigned int dataCount = data.Size();
 
   for( unsigned int i = 0; i < dataCount; ++i )
@@ -1442,12 +1452,12 @@ void TableView::CalculateFixedSizes( RowColumnArray& data, Dimension dimension )
       // Find the size of the biggest actor in the row or column
       float maxActorHeight = 0.0f;
 
-      unsigned int fitCount = ( dimension == WIDTH ) ? mCellData.GetRows() : mCellData.GetColumns();
+      unsigned int fitCount = ( dimension == Dimension::WIDTH ) ? mCellData.GetRows() : mCellData.GetColumns();
 
       for( unsigned int j = 0; j < fitCount; ++j )
       {
-        unsigned int row = ( dimension == WIDTH ) ? j : i;
-        unsigned int column = ( dimension == WIDTH ) ? i : j;
+        unsigned int row = ( dimension == Dimension::WIDTH ) ? j : i;
+        unsigned int column = ( dimension == Dimension::WIDTH ) ? i : j;
         DALI_ASSERT_DEBUG( row < mCellData.GetRows() );
         DALI_ASSERT_DEBUG( column < mCellData.GetColumns() );
 
@@ -1456,7 +1466,7 @@ void TableView::CalculateFixedSizes( RowColumnArray& data, Dimension dimension )
         {
           if( FitToChild( actor, dimension ) )
           {
-            maxActorHeight = std::max( maxActorHeight, actor.GetRelayoutSize( dimension ) );
+            maxActorHeight = std::max( maxActorHeight, actor.GetRelayoutSize( dimension ) + cellPadding.x + cellPadding.y );
           }
         }
       }

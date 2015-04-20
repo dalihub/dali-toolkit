@@ -19,7 +19,7 @@
 #include "tool-bar-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -74,12 +74,12 @@ void ToolBar::SetBackground( Actor background )
   // ToolBar image
   background.SetParentOrigin( Dali::ParentOrigin::TOP_CENTER );
   background.SetAnchorPoint( Dali::AnchorPoint::TOP_CENTER );
-  background.SetPreferredSize( Vector2( mToolBarSize.width, mToolBarSize.height ) );
+  background.SetSize( Vector2( mToolBarSize.width, mToolBarSize.height ) );
 
-  ImageActor imageActor = ImageActor::DownCast( background );
-  if ( imageActor )
+  RenderableActor renderableActor = RenderableActor::DownCast( background );
+  if ( renderableActor )
   {
-    imageActor.SetSortModifier( 1.f );
+    renderableActor.SetSortModifier( 1.f );
   }
 
   Self().Add( background );
@@ -125,9 +125,9 @@ void ToolBar::AddControl( Actor control, float relativeSize, Toolkit::Alignment:
 
   // Create an alignment container where to place the control.
   Toolkit::Alignment alignmentContainer = Toolkit::Alignment::New( alignment );
-  alignmentContainer.SetSizeScalePolicy( FIT_WITH_ASPECT_RATIO );
+  alignmentContainer.SetSizeScalePolicy( SizeScalePolicy::FIT_WITH_ASPECT_RATIO );
   alignmentContainer.SetPadding( padding );
-  alignmentContainer.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  alignmentContainer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   alignmentContainer.Add( control );
 
   // Insert the control in the table view.
@@ -322,7 +322,7 @@ void ToolBar::OnInitialize()
   // Layout
   mLayout = Toolkit::TableView::New( 1, 1 );
   mLayout.SetName( "TOOLBAR_LAYOUT" );
-  mLayout.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  mLayout.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   mLayout.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
   Self().Add( mLayout );
@@ -359,7 +359,7 @@ void ToolBar::OnControlChildAdd(Actor& child)
 void ToolBar::OnControlSizeSet( const Vector3& targetSize )
 {
   mToolBarSize = targetSize;
-  mBackground.SetPreferredSize( Vector2( mToolBarSize.width, mToolBarSize.height ) );
+  mBackground.SetSize( Vector2( mToolBarSize.width, mToolBarSize.height ) );
 }
 
 } // namespace Internal

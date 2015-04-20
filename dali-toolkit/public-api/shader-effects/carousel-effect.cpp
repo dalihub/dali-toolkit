@@ -69,7 +69,7 @@ CarouselEffect CarouselEffect::New()
 
   ShaderEffect shaderEffectCustom = ShaderEffect::New(vertexShader,
           "",
-          GeometryType( GEOMETRY_TYPE_IMAGE | GEOMETRY_TYPE_TEXT ),
+          GeometryType( GEOMETRY_TYPE_IMAGE ),
           ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_DEPTH_BUFFER ));
 
   // Pass ownership to CarouselEffect through overloaded constructor, So that it now has access to the

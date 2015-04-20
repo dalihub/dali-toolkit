@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali-toolkit/public-api/controls/cluster/cluster-style.h>
 
+// EXTERNAL INCLUDES
+#include <limits>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/cluster/cluster-style-impl.h>
 

@@ -19,6 +19,7 @@
 #include "view-impl.h"
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
@@ -132,7 +133,7 @@ void View::SetBackground( ImageActor backgroundImage )
     mBackgroundLayer = Layer::New();
 
     mBackgroundLayer.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-    mBackgroundLayer.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+    mBackgroundLayer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
     // Add background layer to custom actor.
     Self().Add( mBackgroundLayer );
@@ -152,7 +153,8 @@ void View::SetBackground( ImageActor backgroundImage )
   }
 
   backgroundImage.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
-  backgroundImage.SetRelayoutEnabled( false );    // We will scale its size manually
+  backgroundImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+  backgroundImage.SetSizeScalePolicy( SizeScalePolicy::FILL_WITH_ASPECT_RATIO );
   mBackgroundLayer.Add( backgroundImage );
 
   RelayoutRequest();
@@ -160,14 +162,16 @@ void View::SetBackground( ImageActor backgroundImage )
 
 void View::SetOrientationFunction( Degree portrait, Degree landscale, Degree portraitInverse, Degree landscapeInverse )
 {
-  mOrientationFunction[View::PORTRAIT] = portrait;
-  mOrientationFunction[View::LANDSCAPE] = landscale;
-  mOrientationFunction[View::PORTRAIT_INVERSE] = portraitInverse;
-  mOrientationFunction[View::LANDSCAPE_INVERSE] = landscapeInverse;
+  mOrientationFunction[View::PORTRAIT] = portrait.degree;
+  mOrientationFunction[View::LANDSCAPE] = landscale.degree;
+  mOrientationFunction[View::PORTRAIT_INVERSE] = portraitInverse.degree;
+  mOrientationFunction[View::LANDSCAPE_INVERSE] = landscapeInverse.degree;
 }
 
 void View::OrientationChanged( Dali::Orientation orientation )
 {
+  Actor self = Self();
+
   // Nothing to do if orientation doesn't really change.
   if ( orientation.GetDegrees() == mOrientation || !mAutoRotateEnabled )
   {
@@ -178,13 +182,13 @@ void View::OrientationChanged( Dali::Orientation orientation )
 
   // has parent so we expect it to be on stage
   mRotateAnimation = Animation::New( ROTATION_ANIMATION_DURATION );
-  mRotateAnimation.RotateTo( Self(), Degree( -orientation.GetDegrees() ), Vector3::ZAXIS, AlphaFunctions::EaseOut );
+  mRotateAnimation.AnimateTo( Property( self, Actor::Property::ORIENTATION ), Quaternion( Radian( -orientation.GetRadians() ), Vector3::ZAXIS ), AlphaFunctions::EaseOut );
 
   // Resize the view
   if( mFullScreen )
   {
     const Vector2& stageSize( Stage::GetCurrent().GetSize() );
-    const Vector3& currentSize( Self().GetCurrentSize() );
+    const Vector3& currentSize( self.GetCurrentSize() );
 
     float minSize = std::min( stageSize.width, stageSize.height );
     float maxSize = std::max( stageSize.width, stageSize.height );
@@ -214,15 +218,15 @@ void View::OrientationChanged( Dali::Orientation orientation )
     {
       // width grows, shrink height faster
       Vector3 shrink( currentSize );shrink.height = targetSize.height;
-      mRotateAnimation.Resize( Self(), shrink, AlphaFunctions::EaseOut, 0.0f, ROTATION_ANIMATION_DURATION * 0.5f );
-      mRotateAnimation.Resize( Self(), targetSize, AlphaFunctions::EaseIn, 0.0f, ROTATION_ANIMATION_DURATION );
+      mRotateAnimation.AnimateTo( Property( self, Actor::Property::SIZE ), shrink, AlphaFunctions::EaseOut, TimePeriod( 0.0f, ROTATION_ANIMATION_DURATION * 0.5f ) );
+      mRotateAnimation.AnimateTo( Property( self, Actor::Property::SIZE ), targetSize, AlphaFunctions::EaseIn, TimePeriod( 0.0f, ROTATION_ANIMATION_DURATION ) );
     }
     else
     {
       // height grows, shrink width faster
       Vector3 shrink( currentSize );shrink.width = targetSize.width;
-      mRotateAnimation.Resize( Self(), shrink, AlphaFunctions::EaseOut, 0.0f, ROTATION_ANIMATION_DURATION * 0.5f );
-      mRotateAnimation.Resize( Self(), targetSize, AlphaFunctions::EaseIn, 0.0f, ROTATION_ANIMATION_DURATION );
+      mRotateAnimation.AnimateTo( Property( self, Actor::Property::SIZE ), shrink, AlphaFunctions::EaseOut, TimePeriod( 0.0f, ROTATION_ANIMATION_DURATION * 0.5f ) );
+      mRotateAnimation.AnimateTo( Property( self, Actor::Property::SIZE ), targetSize, AlphaFunctions::EaseIn, TimePeriod( 0.0f, ROTATION_ANIMATION_DURATION ) );
     }
   }
 
@@ -292,35 +296,23 @@ void View::OnInitialize()
   }
 }
 
-void View::OnRelayout( const Vector2& size, RelayoutContainer& container )
-{
-  if( mBackgroundLayer )
-  {
-    if( mBackgroundLayer && mBackgroundLayer.GetChildCount() > 0 )
-    {
-      Actor background = mBackgroundLayer.GetChildAt(0);
-      background.SetScale( FillXYKeepAspectRatio( Vector3( size.width, size.height, 1.0f ), background.GetTargetSize() ) );
-    }
-  }
-}
-
 View::Orientation View::DegreeToViewOrientation( Degree degree )
 {
   View::Orientation orientation = PORTRAIT;
 
-  if( fabsf( mOrientationFunction[PORTRAIT] - degree ) <= GetRangedEpsilon( mOrientationFunction[PORTRAIT], degree ) )
+  if( fabsf( mOrientationFunction[PORTRAIT] - degree.degree ) <= GetRangedEpsilon( mOrientationFunction[PORTRAIT], degree.degree ) )
   {
     orientation =  PORTRAIT;
   }
-  else if( fabsf( mOrientationFunction[LANDSCAPE] - degree ) <= GetRangedEpsilon( mOrientationFunction[LANDSCAPE], degree ) )
+  else if( fabsf( mOrientationFunction[LANDSCAPE] - degree.degree ) <= GetRangedEpsilon( mOrientationFunction[LANDSCAPE], degree.degree ) )
   {
     orientation = LANDSCAPE;
   }
-  else if( fabsf( mOrientationFunction[PORTRAIT_INVERSE] - degree ) <= GetRangedEpsilon( mOrientationFunction[PORTRAIT_INVERSE], degree ) )
+  else if( fabsf( mOrientationFunction[PORTRAIT_INVERSE] - degree.degree ) <= GetRangedEpsilon( mOrientationFunction[PORTRAIT_INVERSE], degree.degree ) )
   {
     orientation = PORTRAIT_INVERSE;
   }
-  else if( fabsf( mOrientationFunction[LANDSCAPE_INVERSE] - degree ) <= GetRangedEpsilon( mOrientationFunction[LANDSCAPE_INVERSE], degree ) )
+  else if( fabsf( mOrientationFunction[LANDSCAPE_INVERSE] - degree.degree ) <= GetRangedEpsilon( mOrientationFunction[LANDSCAPE_INVERSE], degree.degree ) )
   {
     orientation = LANDSCAPE_INVERSE;
   }

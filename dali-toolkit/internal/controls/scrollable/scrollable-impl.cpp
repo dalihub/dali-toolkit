@@ -16,6 +16,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 
@@ -49,6 +50,13 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Scrollable, Toolkit::Control, Create );
 DALI_PROPERTY_REGISTRATION( Scrollable, "overshoot-effect-color",    VECTOR4, OVERSHOOT_EFFECT_COLOR    )
 DALI_PROPERTY_REGISTRATION( Scrollable, "overshoot-animation-speed", FLOAT,   OVERSHOOT_ANIMATION_SPEED )
 
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Scrollable, "scroll-relative-position", VECTOR3, SCROLL_RELATIVE_POSITION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Scrollable, "scroll-position-min",      VECTOR3, SCROLL_POSITION_MIN)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Scrollable, "scroll-position-max",      VECTOR3, SCROLL_POSITION_MAX)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Scrollable, "scroll-direction",         VECTOR3, SCROLL_DIRECTION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Scrollable, "can-scroll-vertical",      BOOLEAN, CAN_SCROLL_VERTICAL)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Scrollable, "can-scroll-horizontal",    BOOLEAN, CAN_SCROLL_HORIZONTAL)
+
 DALI_SIGNAL_REGISTRATION(   Scrollable, "scroll-started",                     SIGNAL_SCROLL_STARTED     )
 DALI_SIGNAL_REGISTRATION(   Scrollable, "scroll-completed",                   SIGNAL_SCROLL_COMPLETED   )
 DALI_SIGNAL_REGISTRATION(   Scrollable, "scroll-updated",                     SIGNAL_SCROLL_UPDATED     )
@@ -60,9 +68,6 @@ const float DEFAULT_OVERSHOOT_ANIMATION_SPEED(120.0f); // 120 pixels per second
 
 }
 
-const char* const Scrollable::SCROLLABLE_CAN_SCROLL_VERTICAL = "scrollable-can-scroll-vertical";
-const char* const Scrollable::SCROLLABLE_CAN_SCROLL_HORIZONTAL = "scrollable-can-scroll-horizontal";
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Scrollable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,12 +78,6 @@ Scrollable::Scrollable()
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | NO_SIZE_NEGOTIATION ) ),
   mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
   mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
-  mPropertyRelativePosition(Property::INVALID_INDEX),
-  mPropertyPositionMin(Property::INVALID_INDEX),
-  mPropertyPositionMax(Property::INVALID_INDEX),
-  mPropertyScrollDirection(Property::INVALID_INDEX),
-  mPropertyCanScrollVertical(Property::INVALID_INDEX),
-  mPropertyCanScrollHorizontal(Property::INVALID_INDEX),
   mOvershootEnabled(false)
 {
 }
@@ -87,19 +86,6 @@ Scrollable::~Scrollable()
 {
   // Clear scroll components, forces their destruction before Scrollable is destroyed.
   mComponents.clear();
-}
-
-void Scrollable::RegisterCommonProperties()
-{
-  Actor self = Self();
-
-  // Register properties.
-  mPropertyRelativePosition = self.RegisterProperty(Toolkit::Scrollable::SCROLL_RELATIVE_POSITION_PROPERTY_NAME, Vector3::ZERO);
-  mPropertyPositionMin = self.RegisterProperty(Toolkit::Scrollable::SCROLL_POSITION_MIN_PROPERTY_NAME, Vector3::ZERO);
-  mPropertyPositionMax = self.RegisterProperty(Toolkit::Scrollable::SCROLL_POSITION_MAX_PROPERTY_NAME, Vector3::ZERO);
-  mPropertyScrollDirection = self.RegisterProperty(Toolkit::Scrollable::SCROLL_DIRECTION_PROPERTY_NAME, Vector3::ZERO);
-  mPropertyCanScrollVertical = self.RegisterProperty(SCROLLABLE_CAN_SCROLL_VERTICAL, true);
-  mPropertyCanScrollHorizontal = self.RegisterProperty(SCROLLABLE_CAN_SCROLL_HORIZONTAL, true);
 }
 
 bool Scrollable::IsScrollComponentEnabled(Toolkit::Scrollable::ScrollComponentType type) const

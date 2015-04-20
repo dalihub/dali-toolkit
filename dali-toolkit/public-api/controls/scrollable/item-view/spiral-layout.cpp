@@ -178,7 +178,7 @@ struct SpiralRotationConstraintUp
   {
     float angle = -mItemSpacingRadians * layoutPosition;
 
-    return Quaternion(angle, Vector3::YAXIS);
+    return Quaternion( Radian( angle ), Vector3::YAXIS);
   }
 
   float mItemSpacingRadians;
@@ -195,7 +195,7 @@ struct SpiralRotationConstraintLeft
   {
     float angle = -mItemSpacingRadians * layoutPosition;
 
-    return Quaternion(-Math::PI*0.5f, Vector3::ZAXIS) * Quaternion(angle, Vector3::YAXIS);
+    return Quaternion( Radian( -Math::PI * 0.5f ), Vector3::ZAXIS ) * Quaternion( Radian( angle ), Vector3::YAXIS );
   }
 
   float mItemSpacingRadians;
@@ -212,7 +212,7 @@ struct SpiralRotationConstraintDown
   {
     float angle = -mItemSpacingRadians * layoutPosition;
 
-    return Quaternion(-Math::PI, Vector3::ZAXIS) * Quaternion(angle, Vector3::YAXIS);
+    return Quaternion( Radian( -Math::PI ), Vector3::ZAXIS) * Quaternion( Radian( angle ), Vector3::YAXIS );
   }
 
   float mItemSpacingRadians;
@@ -229,7 +229,7 @@ struct SpiralRotationConstraintRight
   {
     float angle = -mItemSpacingRadians * layoutPosition;
 
-    return Quaternion(-Math::PI*1.5f, Vector3::ZAXIS) * Quaternion(angle, Vector3::YAXIS);
+    return Quaternion( Radian( -Math::PI * 1.5f ), Vector3::ZAXIS) * Quaternion( Radian( angle ), Vector3::YAXIS );
   }
 
   float mItemSpacingRadians;
@@ -244,10 +244,9 @@ struct SpiralColorConstraint
 
   Vector4 operator()(const Vector4& current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)
   {
-    Degree angle = Radian(mItemSpacingRadians * fabsf(layoutPosition));
-    angle = (float)((int)angle % 360);
+    Radian angle( mItemSpacingRadians * fabsf(layoutPosition) / Dali::ANGLE_360 );
 
-    float progress = angle / 360.0f;
+    float progress = angle - floorf( angle ); // take fractional bit only to get between 0.0 - 1.0
     progress = (progress > 0.5f) ? 2.0f*(1.0f - progress) : progress*2.0f;
 
     float darkness(1.0f);
@@ -489,7 +488,7 @@ void SpiralLayout::GetResizeAnimation(Animation& animation, Actor actor, Vector3
 {
   if(animation)
   {
-    animation.Resize(actor, size);
+    animation.AnimateTo( Property( actor, Actor::Property::SIZE ), size );
   }
 }
 
@@ -568,19 +567,19 @@ Degree SpiralLayout::GetScrollDirection() const
 
   if (mOrientation == ControlOrientation::Up)
   {
-    scrollDirection = 0.0f - 45.0f; // Allow swiping horizontally & vertically
+    scrollDirection = Degree( -45.0f ); // Allow swiping horizontally & vertically
   }
   else if (mOrientation == ControlOrientation::Left)
   {
-    scrollDirection = 90.0f - 45.0f;
+    scrollDirection = Degree( 45.0f );
   }
   else if (mOrientation == ControlOrientation::Down)
   {
-    scrollDirection = 180.0f - 45.0f;
+    scrollDirection = Degree( 180.0f - 45.0f );
   }
   else // mOrientation == ControlOrientation::Right
   {
-    scrollDirection = 270.0f - 45.0f;
+    scrollDirection = Degree( 270.0f - 45.0f );
   }
 
   return scrollDirection;

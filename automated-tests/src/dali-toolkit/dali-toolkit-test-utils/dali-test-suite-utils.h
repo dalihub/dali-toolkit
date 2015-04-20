@@ -139,13 +139,13 @@ inline bool CompareType<Quaternion>(Quaternion q1, Quaternion q2, float epsilon)
 template <>
 inline bool CompareType<Radian>(Radian q1, Radian q2, float epsilon)
 {
-  return CompareType<float>(float(q1), float(q2), epsilon);
+  return CompareType<float>(q1.radian, q2.radian, epsilon);
 }
 
 template <>
 inline bool CompareType<Degree>(Degree q1, Degree q2, float epsilon)
 {
-  return CompareType<float>(float(q1), float(q2), epsilon);
+  return CompareType<float>(q1.degree, q2.degree, epsilon);
 }
 
 bool operator==(TimePeriod a, TimePeriod b);
@@ -296,41 +296,6 @@ void DALI_TEST_EQUALS( const std::string &str1, const char* str2, const char* lo
 void DALI_TEST_EQUALS( const char* str1, const std::string &str2, const char* location);
 
 /**
- * Test whether two UTF32 strings are equal.
- * @param[in] str1 The first string
- * @param[in] str2 The second string
- * @param[in] location The TEST_LOCATION macro should be used here
- */
-template<>
-inline void DALI_TEST_EQUALS<const Integration::TextArray&>( const Integration::TextArray& str1, const Integration::TextArray& str2, const char* location)
-{
-  if( !std::equal( str1.Begin(), str1.End(), str2.Begin() ) )
-  {
-    fprintf(stderr, "%s, checking '", location);
-
-    for( unsigned int i = 0; i < str1.Count(); ++i )
-    {
-      fprintf(stderr, "%c", str1[i]);
-    }
-
-    fprintf(stderr, "' == '");
-
-    for( unsigned int i = 0; i < str2.Count(); ++i )
-    {
-      fprintf(stderr, "%c", str2[i]);
-    }
-
-    fprintf(stderr, "'\n");
-
-    tet_result(TET_FAIL);
-  }
-  else
-  {
-    tet_result(TET_PASS);
-  }
-}
-
-/**
  * Test whether one unsigned integer value is greater than another.
  * Test succeeds if value1 > value2
  * @param[in] value1 The first value
@@ -371,7 +336,7 @@ inline void DALI_TEST_PRINT_ASSERT( DaliException& e )
 struct ConstraintAppliedCheck
 {
   ConstraintAppliedCheck( bool& signalReceived );
-  void operator()( ActiveConstraint& constraint );
+  void operator()( Constraint& constraint );
   void Reset();
   void CheckSignalReceived();
   void CheckSignalNotReceived();

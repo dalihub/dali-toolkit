@@ -19,11 +19,14 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+#include <limits>
 #include <stack>
 #include <dali/public-api/actors/image-actor.h>
-#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/geometry/mesh.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/scripting/scripting.h>
@@ -92,6 +95,36 @@ struct Background
   }
 };
 
+/**
+ * Creates a white coloured Mesh.
+ */
+Mesh CreateMesh()
+{
+  Vector3 white( Color::WHITE );
+
+  MeshData meshData;
+
+  // Create vertices with a white color (actual color is set by actor color)
+  MeshData::VertexContainer vertices(4);
+  vertices[ 0 ] = MeshData::Vertex( Vector3( -0.5f, -0.5f, 0.0f ), Vector2::ZERO, white );
+  vertices[ 1 ] = MeshData::Vertex( Vector3(  0.5f, -0.5f, 0.0f ), Vector2::ZERO, white );
+  vertices[ 2 ] = MeshData::Vertex( Vector3( -0.5f,  0.5f, 0.0f ), Vector2::ZERO, white );
+  vertices[ 3 ] = MeshData::Vertex( Vector3(  0.5f,  0.5f, 0.0f ), Vector2::ZERO, white );
+
+  // Specify all the faces
+  MeshData::FaceIndices faces;
+  faces.reserve( 6 ); // 2 triangles in Quad
+  faces.push_back( 0 ); faces.push_back( 3 ); faces.push_back( 1 );
+  faces.push_back( 0 ); faces.push_back( 2 ); faces.push_back( 3 );
+
+  // Create the mesh data from the vertices and faces
+  meshData.SetMaterial( Material::New( "ControlMaterial" ) );
+  meshData.SetVertices( vertices );
+  meshData.SetFaceIndices( faces );
+  meshData.SetHasColor( true );
+
+  return Mesh::New( meshData );
+}
 
 /**
  * Sets all the required properties for the background actor.
@@ -106,8 +139,13 @@ void SetupBackgroundActor( Actor actor, Property::Index constrainingIndex, const
   actor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
   actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
   actor.SetZ( BACKGROUND_ACTOR_Z_POSITION );
-  actor.SetRelayoutEnabled( true );
-  actor.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  actor.SetRelayoutEnabled( false );
+
+  Constraint constraint = Constraint::New<Vector3>( actor,
+                                                    constrainingIndex,
+                                                    EqualToConstraint() );
+  constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+  constraint.Apply();
 }
 
 } // unnamed namespace
@@ -132,6 +170,7 @@ public:
   // Construction & Destruction
   Impl(Control& controlImpl)
   : mControlImpl( controlImpl ),
+    mStyleName(""),
     mBackground( NULL ),
     mStartingPinchScale( NULL ),
     mKeyEventSignal(),
@@ -210,6 +249,12 @@ public:
 
       switch ( index )
       {
+        case Toolkit::Control::Property::STYLE_NAME:
+        {
+          controlImpl.SetStyleName( value.Get< std::string >() );
+          break;
+        }
+
         case Toolkit::Control::Property::BACKGROUND_COLOR:
         {
           controlImpl.SetBackgroundColor( value.Get< Vector4 >() );
@@ -270,6 +315,12 @@ public:
 
       switch ( index )
       {
+        case Toolkit::Control::Property::STYLE_NAME:
+        {
+          value = controlImpl.GetStyleName();
+          break;
+        }
+
         case Toolkit::Control::Property::BACKGROUND_COLOR:
         {
           value = controlImpl.GetBackgroundColor();
@@ -311,6 +362,7 @@ public:
   // Data
 
   Control& mControlImpl;
+  std::string mStyleName;
   Background* mBackground;           ///< Only create the background if we use it
   Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;
@@ -333,12 +385,14 @@ public:
   static PropertyRegistration PROPERTY_1;
   static PropertyRegistration PROPERTY_2;
   static PropertyRegistration PROPERTY_3;
+  static PropertyRegistration PROPERTY_4;
 };
 
 // Properties registered without macro to use specific member variables.
-PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "background-color", Toolkit::Control::Property::BACKGROUND_COLOR, Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "background-image", Toolkit::Control::Property::BACKGROUND_IMAGE, Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "key-input-focus",  Toolkit::Control::Property::KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "style-name",       Toolkit::Control::Property::STYLE_NAME,       Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "background-color", Toolkit::Control::Property::BACKGROUND_COLOR, Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "background-image", Toolkit::Control::Property::BACKGROUND_IMAGE, Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "key-input-focus",  Toolkit::Control::Property::KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {
@@ -366,13 +420,13 @@ Vector3 Control::GetNaturalSize()
   return mImpl->mNaturalSize;
 }
 
-float Control::CalculateChildSize( const Dali::Actor& child, Dimension dimension )
+float Control::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
 {
   // Could be overridden in derived classes.
   return CalculateChildSizeBase( child, dimension );
 }
 
-bool Control::RelayoutDependentOnChildren( Dimension dimension )
+bool Control::RelayoutDependentOnChildren( Dimension::Type dimension )
 {
   return RelayoutDependentOnChildrenBase( dimension );
 }
@@ -455,6 +509,23 @@ LongPressGestureDetector Control::GetLongPressGestureDetector() const
   return mImpl->mLongPressGestureDetector;
 }
 
+void Control::SetStyleName( const std::string& styleName )
+{
+  if( styleName != mImpl->mStyleName )
+  {
+    mImpl->mStyleName = styleName;
+
+    // Apply new style
+    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+    GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+  }
+}
+
+const std::string& Control::GetStyleName() const
+{
+  return mImpl->mStyleName;
+}
+
 void Control::SetBackgroundColor( const Vector4& color )
 {
   Background& background( mImpl->GetBackground() );
@@ -463,6 +534,17 @@ void Control::SetBackgroundColor( const Vector4& color )
   {
     // Just set the actor color
     background.actor.SetColor( color );
+  }
+  else
+  {
+    // Create Mesh Actor
+    MeshActor meshActor = MeshActor::New( CreateMesh() );
+
+    SetupBackgroundActor( meshActor, Actor::Property::SCALE, color );
+
+    // Set the background actor before adding so that we do not inform deriving classes
+    background.actor = meshActor;
+    Self().Add( meshActor );
   }
 
   background.color = color;
@@ -683,7 +765,7 @@ void Control::Initialize()
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
 
     // Register for style changes
-    styleManager.StyleChangeSignal().Connect( this, &Control::DoStyleChange );
+    styleManager.StyleChangeSignal().Connect( this, &Control::OnStyleChange );
 
     // SetTheme
     GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
@@ -761,13 +843,13 @@ void Control::OnActivated()
 {
 }
 
-void Control::OnThemeChange( Toolkit::StyleManager styleManager )
+void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
 {
-  GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
-}
-
-void Control::OnFontChange( bool defaultFontChange, bool defaultFontSizeChange )
-{
+  // By default the control is only interested in theme (not font) changes
+  if( change.themeChange )
+  {
+    GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+  }
 }
 
 void Control::OnPinch(const PinchGesture& pinch)
@@ -818,11 +900,11 @@ void Control::OnControlSizeSet( const Vector3& size )
 {
 }
 
-void Control::OnCalculateRelayoutSize( Dimension dimension )
+void Control::OnCalculateRelayoutSize( Dimension::Type dimension )
 {
 }
 
-void Control::OnLayoutNegotiated( float size, Dimension dimension )
+void Control::OnLayoutNegotiated( float size, Dimension::Type dimension )
 {
 }
 
@@ -834,7 +916,7 @@ void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
   }
 }
 
-void Control::OnSetResizePolicy( ResizePolicy policy, Dimension dimension )
+void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
 {
 }
 
@@ -935,18 +1017,6 @@ void Control::SignalConnected( SlotObserver* slotObserver, CallbackBase* callbac
 void Control::SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback )
 {
   mImpl->SignalDisconnected( slotObserver, callback );
-}
-
-void Control::DoStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
-{
-  if( change.themeChange )
-  {
-    OnThemeChange( styleManager );
-  }
-  else if( change.defaultFontChange || change.defaultFontSizeChange )
-  {
-    OnFontChange( change.defaultFontChange, change.defaultFontSizeChange );
-  }
 }
 
 } // namespace Internal

@@ -713,7 +713,7 @@ int UtcDaliPushButtonProperties(void)
   //  Button::PROPERTY_LABEL_ACTOR
   {
     button.SetLabel( "LABEL_TEXT_CUSTOM" );
-    DALI_TEST_EQUALS( "TextView", button.GetProperty( Button::Property::LABEL_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
+    DALI_TEST_EQUALS( "TextLabel", button.GetProperty( Button::Property::LABEL_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
 
     Property::Map map;
     map[ "type" ] = "Actor";

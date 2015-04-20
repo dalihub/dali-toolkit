@@ -18,9 +18,14 @@
 
 toolkit_images_dir = ../../../dali-toolkit/images
 toolkit_sounds_dir = ../../../dali-toolkit/sounds
-toolkit_styles_dir = ../../../dali-toolkit/styles
 toolkit_src_dir    = ../../../dali-toolkit/internal
 public_api_src_dir = ../../../dali-toolkit/public-api
+
+if MOBILE_PROFILE
+toolkit_styles_dir = ../../../dali-toolkit/styles/mobile
+else
+toolkit_styles_dir = ../../../dali-toolkit/styles
+endif
 
 include ../../../dali-toolkit/images/file.list
 include ../../../dali-toolkit/sounds/file.list
@@ -99,19 +104,17 @@ publicapishadowviewdir = $(publicapicontrolsdir)/shadow-view
 publicapisliderdir = $(publicapicontrolsdir)/slider
 publicapisuperblurviewdir = $(publicapicontrolsdir)/super-blur-view
 publicapitableviewdir = $(publicapicontrolsdir)/table-view
-publicapitextviewdir = $(publicapicontrolsdir)/text-view
-publicapitextinputdir = $(publicapicontrolsdir)/text-input
+publicapitextcontrolsdir = $(publicapidir)/controls/text-controls
 publicapitoolbardir = $(publicapicontrolsdir)/tool-bar
 publicapiviewdir = $(publicapicontrolsdir)/view
-
 publicapibuilderdir = $(publicapidir)/builder
 publicapifocusmanagerdir = $(publicapidir)/focus-manager
-publicapimarkupprocessordir = $(publicapidir)/markup-processor
 publicapishadereffectsdir = $(publicapidir)/shader-effects
 publicapibubbleeffectdir = $(publicapidir)/shader-effects/bubble-effect
 publicapistylingdir = $(publicapidir)/styling
 publicapitransitioneffectsdir = $(publicapidir)/transition-effects
 publicapiscriptingdir = $(publicapidir)/scripting
+publicapirenderingbackenddir = $(publicapidir)/text
 
 publicapi_HEADERS = $(public_api_header_files)
 publicapicontrols_HEADERS = $(public_api_controls_header_files)
@@ -139,17 +142,15 @@ publicapishadowview_HEADERS = $(public_api_shadow_view_header_files)
 publicapislider_HEADERS = $(public_api_slider_header_files)
 publicapisuperblurview_HEADERS = $(public_api_super_blur_view_header_files)
 publicapitableview_HEADERS = $(public_api_table_view_header_files)
-publicapitextview_HEADERS = $(public_api_text_view_header_files)
-publicapitextinput_HEADERS = $(public_api_text_input_header_files)
+publicapitextcontrols_HEADERS = $(public_api_text_controls_header_files)
 publicapitoolbar_HEADERS = $(public_api_tool_bar_header_files)
 publicapiview_HEADERS = $(public_api_view_header_files)
-
 publicapibuilder_HEADERS = $(public_api_builder_header_files)
 publicapifocusmanager_HEADERS = $(public_api_focus_manager_header_files)
-publicapimarkupprocessor_HEADERS = $(public_api_markup_processor_header_files)
 publicapishadereffects_HEADERS = $(public_api_shader_effects_header_files)
 publicapibubbleeffect_HEADERS = $(public_api_bubble_effect_header_files)
 publicapistyling_HEADERS = $(public_api_styling_header_files)
 publicapitransitioneffects_HEADERS = $(public_api_transition_effects_header_files)
 publicapiscripting_HEADERS = $(public_api_scripting_header_files)
+publicapirenderingbackend_HEADERS = $(public_api_rendering_backend_header_files)
 

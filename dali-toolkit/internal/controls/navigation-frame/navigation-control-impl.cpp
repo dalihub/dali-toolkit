@@ -19,6 +19,7 @@
 #include "navigation-control-impl.h"
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/object/type-registry.h>
@@ -264,11 +265,12 @@ void NavigationControl::OrientationChanged( int angle )
       }
     }
 
+    Actor self = Self();
     Animation animation = Animation::New( mOrientationAnimationDuration );
-    animation.RotateTo( Self(), Degree( -angle ), Vector3::ZAXIS, mOrientationAnimationAlphaFunc );
+    animation.AnimateTo( Property( self, Actor::Property::ORIENTATION ), Quaternion( Radian( Degree( -angle ) ), Vector3::ZAXIS ), mOrientationAnimationAlphaFunc );
     animation.Play();
 
-    Self().SetSize( targetSize );
+    self.SetSize( targetSize );
 
     RelayoutRequest();
   }

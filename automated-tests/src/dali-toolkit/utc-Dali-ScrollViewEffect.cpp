@@ -137,11 +137,17 @@ static void OnScrollComplete( const Vector3& position )
 
 ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
 {
+  Constraint constraint;
+
   ScrollView scrollView = ScrollView::New();
   scrollView.SetSize(size);
   scrollView.SetAnchorPoint(AnchorPoint::CENTER);
   scrollView.SetParentOrigin(ParentOrigin::CENTER);
-  scrollView.ApplyConstraint( Constraint::New<Dali::Vector3>( Dali::Actor::Property::SIZE, Dali::ParentSource( Dali::Actor::Property::SIZE ), Dali::EqualToConstraint() ) );
+
+  constraint = Constraint::New<Dali::Vector3>( scrollView, Dali::Actor::Property::SIZE, Dali::EqualToConstraint() );
+  constraint.AddSource( Dali::ParentSource( Dali::Actor::Property::SIZE ) );
+  constraint.Apply();
+
   scrollView.SetWrapMode(false);
   scrollView.ScrollStartedSignal().Connect( &OnScrollStart );
   scrollView.ScrollUpdatedSignal().Connect( &OnScrollUpdate );
@@ -175,7 +181,10 @@ ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
   container.SetAnchorPoint(AnchorPoint::CENTER);
   container.SetSize( size );
   scrollView.Add( container );
-  container.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::SIZE, ParentSource( Actor::Property::SIZE ), EqualToConstraint() ) );
+
+  constraint = Constraint::New<Vector3>( container, Actor::Property::SIZE, EqualToConstraint() );
+  constraint.AddSource( Dali::ParentSource( Dali::Actor::Property::SIZE ) );
+  constraint.Apply();
 
   gPages.clear();
   for(int row = 0;row<rows;row++)
@@ -183,7 +192,10 @@ ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
     for(int column = 0;column<columns;column++)
     {
       Actor page = Actor::New();
-      page.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::SIZE, ParentSource( Actor::Property::SIZE ), EqualToConstraint() ) );
+
+      constraint = Constraint::New<Vector3>( page, Actor::Property::SIZE, EqualToConstraint() );
+      constraint.AddSource( Dali::ParentSource( Dali::Actor::Property::SIZE ) );
+      constraint.Apply();
       page.SetParentOrigin( ParentOrigin::CENTER );
       page.SetAnchorPoint( AnchorPoint::CENTER );
       page.SetPosition( column * size.x, row * size.y );
@@ -322,7 +334,10 @@ int UtcDaliScrollViewSpiralEffectTest(void)
   {
     Actor page = *pageIter;
     page.RemoveConstraints();
-    page.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::SIZE, ParentSource( Actor::Property::SIZE ), EqualToConstraint() ) );
+
+    Constraint constraint = Constraint::New<Vector3>( page, Actor::Property::SIZE, EqualToConstraint() );
+    constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+    constraint.Apply();
     effect.ApplyToPage(page, Vector2(Math::PI_2, 0.0f));
   }
   Wait(application);
@@ -431,7 +446,9 @@ int UtcDaliScrollViewPageCubeEffectTest(void)
   {
     Actor page = *pageIter;
     page.RemoveConstraints();
-    page.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::SIZE, ParentSource( Actor::Property::SIZE ), EqualToConstraint() ) );
+    Constraint constraint = Constraint::New<Vector3>( page, Actor::Property::SIZE, EqualToConstraint() );
+    constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+    constraint.Apply();
     effect.ApplyToPage(page, Vector2(Math::PI_2, 0.0f));
   }
   Wait(application);
@@ -466,7 +483,9 @@ int UtcDaliScrollViewPageCarouselEffectTest(void)
   {
     Actor page = *pageIter;
     page.RemoveConstraints();
-    page.ApplyConstraint( Constraint::New<Vector3>( Actor::Property::SIZE, ParentSource( Actor::Property::SIZE ), EqualToConstraint() ) );
+    Constraint constraint = Constraint::New<Vector3>( page, Actor::Property::SIZE, EqualToConstraint() );
+    constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+    constraint.Apply();
     effect.ApplyToPage(page);
   }
   Wait(application);

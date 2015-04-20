@@ -19,12 +19,15 @@
 #include "animation-api.h"
 #include "path-wrapper.h"
 
+// EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+#include <dali/integration-api/debug.h>
+
+
 // INTERNAL INCLUDES
 #include <v8-utils.h>
-#include <dali/integration-api/debug.h>
 #include <animation/animation-wrapper.h>
 #include <object/property-value-wrapper.h>
-#include <dali/public-api/common/map-wrapper.h>
 
 namespace Dali
 {
@@ -43,7 +46,6 @@ struct AlphaFuncStruct
 };
 /**
  * Contains a list of alpha functions that can be used.
- * We use a stl map as lookup to map a string name to the function
  */
 const AlphaFuncStruct AlphaFunctionTable[]=
 {

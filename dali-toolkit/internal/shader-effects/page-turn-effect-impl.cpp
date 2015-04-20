@@ -20,7 +20,6 @@
 
 // EXTERNAL HEADERS
 #include <sstream>
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/stage.h>
 
@@ -54,79 +53,70 @@ const Vector2 DEFAULT_SPINE_SHADOW_PARAMETER(50.0f, 20.0f);
 // when the vanishing point is very far away(pageHeight*THRESHOLD), make it infinitely, in this case, the page bent horizontally
 const float THRESHOLD(20.0);
 
-struct CommonParametersConstraint
+void CommonParametersConstraint( Matrix& current, const PropertyInputContainer& inputs )
 {
-  Matrix operator()( const Matrix& current,
-                     const PropertyInput& originalCenterProperty,
-                     const PropertyInput& currentCenterProperty,
-                     const PropertyInput& pageSizeProperty)
+  const Vector2& originalCenter = inputs[0]->GetVector2();
+  Vector2 currentCenter = inputs[1]->GetVector2();
+  const Vector2& pageSize = inputs[2]->GetVector2();
+
+  // calculate the curve direction and the vanishing point
+  // here, the vanishing point is the intersection of spine with the line passing through original center and vertical to curve direction
+  Vector2 curveDirection( currentCenter - originalCenter );
+  curveDirection.Normalize();
+  if( fabs(curveDirection.y) < 0.01f) // eliminate the possibility of division by zero in the next step
   {
-    const Vector2& originalCenter = originalCenterProperty.GetVector2();
-    Vector2 currentCenter = currentCenterProperty.GetVector2();
-    const Vector2& pageSize = pageSizeProperty.GetVector2();
-
-    // calculate the curve direction and the vanishing point
-    // here, the vanishing point is the intersection of spine with the line passing through original center and vertical to curve direction
-    Vector2 curveDirection( currentCenter - originalCenter );
-    curveDirection.Normalize();
-    if( fabs(curveDirection.y) < 0.01f) // eliminate the possibility of division by zero in the next step
-    {
-      curveDirection.y = 0.01f;
-    }
-    float vanishingPointY = originalCenter.y + curveDirection.x * originalCenter.x / curveDirection.y;
-
-    float curveEndY, cosTheta ,sinTheta ,translateX, translateY;
-    // when the vanishing point is very far away, make it infinitely, in this case, the page bent horizontally
-    if( fabs(vanishingPointY-pageSize.y*0.5f) >= pageSize.y*THRESHOLD )
-    {
-      curveDirection = Vector2(-1.f,0.f);
-      currentCenter.y = originalCenter.y;
-
-      curveEndY = originalCenter.y;
-      cosTheta = 1.f;
-      sinTheta = 0.f;
-      translateX = currentCenter.x - originalCenter.x;
-      translateY = vanishingPointY;
-    }
-    else
-    {
-      curveEndY = currentCenter.y - curveDirection.y * (currentCenter.x/curveDirection.x) ;
-      Vector2 v1( currentCenter.x, currentCenter.y - vanishingPointY );
-      v1.Normalize();
-      Vector2 v2( originalCenter.x, originalCenter.y - vanishingPointY );
-      v2.Normalize();
-      cosTheta = v1.x*v2.x + v1.y*v2.y;
-      sinTheta = ( vanishingPointY > pageSize.y*0.5f ) ? sqrt(1.0-cosTheta*cosTheta) : -sqrt(1.0-cosTheta*cosTheta);
-      translateX = currentCenter.x - cosTheta*originalCenter.x - sinTheta*( originalCenter.y-vanishingPointY );
-      translateY = currentCenter.y + sinTheta*originalCenter.x - cosTheta*( originalCenter.y-vanishingPointY );
-    }
-
-    float originalLength = fabs(originalCenter.x/curveDirection.x);
-    float currentLength = fabs(currentCenter.x/curveDirection.x);
-    float curveHeight = 0.45f*sqrt(originalLength*originalLength - currentLength*currentLength);
-
-    Matrix commonParameters( false );
-    float* parameterArray = commonParameters.AsFloat();
-    parameterArray[0] = cosTheta;
-    parameterArray[1] = -sinTheta;
-    parameterArray[2] = originalCenter.x;
-    parameterArray[3] = originalCenter.y;
-    parameterArray[4] = sinTheta;
-    parameterArray[5] = cosTheta;
-    parameterArray[6] = currentCenter.x;
-    parameterArray[7] = currentCenter.y;
-    parameterArray[8] = translateX;
-    parameterArray[9] = translateY;
-    parameterArray[10] = vanishingPointY;
-    parameterArray[11] = curveEndY;
-    parameterArray[12] = curveDirection.x;
-    parameterArray[13] = curveDirection.y;
-    parameterArray[14] = curveHeight;
-    parameterArray[15] = currentLength;
-
-    return commonParameters;
+    curveDirection.y = 0.01f;
   }
-};
+  float vanishingPointY = originalCenter.y + curveDirection.x * originalCenter.x / curveDirection.y;
+
+  float curveEndY, cosTheta ,sinTheta ,translateX, translateY;
+  // when the vanishing point is very far away, make it infinitely, in this case, the page bent horizontally
+  if( fabs(vanishingPointY-pageSize.y*0.5f) >= pageSize.y*THRESHOLD )
+  {
+    curveDirection = Vector2(-1.f,0.f);
+    currentCenter.y = originalCenter.y;
+
+    curveEndY = originalCenter.y;
+    cosTheta = 1.f;
+    sinTheta = 0.f;
+    translateX = currentCenter.x - originalCenter.x;
+    translateY = vanishingPointY;
+  }
+  else
+  {
+    curveEndY = currentCenter.y - curveDirection.y * (currentCenter.x/curveDirection.x) ;
+    Vector2 v1( currentCenter.x, currentCenter.y - vanishingPointY );
+    v1.Normalize();
+    Vector2 v2( originalCenter.x, originalCenter.y - vanishingPointY );
+    v2.Normalize();
+    cosTheta = v1.x*v2.x + v1.y*v2.y;
+    sinTheta = ( vanishingPointY > pageSize.y*0.5f ) ? sqrt(1.0-cosTheta*cosTheta) : -sqrt(1.0-cosTheta*cosTheta);
+    translateX = currentCenter.x - cosTheta*originalCenter.x - sinTheta*( originalCenter.y-vanishingPointY );
+    translateY = currentCenter.y + sinTheta*originalCenter.x - cosTheta*( originalCenter.y-vanishingPointY );
+  }
+
+  float originalLength = fabs(originalCenter.x/curveDirection.x);
+  float currentLength = fabs(currentCenter.x/curveDirection.x);
+  float curveHeight = 0.45f*sqrt(originalLength*originalLength - currentLength*currentLength);
+
+  float* parameterArray = current.AsFloat();
+  parameterArray[0] = cosTheta;
+  parameterArray[1] = -sinTheta;
+  parameterArray[2] = originalCenter.x;
+  parameterArray[3] = originalCenter.y;
+  parameterArray[4] = sinTheta;
+  parameterArray[5] = cosTheta;
+  parameterArray[6] = currentCenter.x;
+  parameterArray[7] = currentCenter.y;
+  parameterArray[8] = translateX;
+  parameterArray[9] = translateY;
+  parameterArray[10] = vanishingPointY;
+  parameterArray[11] = curveEndY;
+  parameterArray[12] = curveDirection.x;
+  parameterArray[13] = curveDirection.y;
+  parameterArray[14] = curveHeight;
+  parameterArray[15] = currentLength;
+}
 
 }//namespace
 
@@ -401,12 +391,8 @@ Toolkit::PageTurnEffect PageTurnEffect::CreateShaderEffect( bool enableBlending 
 
   shaderImpl->mOriginalCenterPropertyIndex = handle.RegisterProperty( ORIGINAL_CENTER_PROPERTY_NAME, Vector2( defaultPageSize[0], defaultPageSize[1]*0.5f ) );
   shaderImpl->mCurrentCenterPropertyIndex = handle.RegisterProperty( CURRENT_CENTER_PROPERTY_NAME, Vector2( defaultPageSize[0], defaultPageSize[1]*0.5f ) );
-  shaderImpl->mInternalConstraint = Constraint::New<Matrix>( handle.GetPropertyIndex( "uCommonParameters" ),
-                                                        LocalSource( shaderImpl->mOriginalCenterPropertyIndex ),
-                                                        LocalSource( shaderImpl->mCurrentCenterPropertyIndex ),
-                                                        LocalSource( handle.GetPropertyIndex( PAGE_SIZE_PROPERTY_NAME ) ),
-                                                        CommonParametersConstraint() );
-  handle.ApplyConstraint( shaderImpl->mInternalConstraint );
+
+  shaderImpl->ApplyInternalConstraint();
 
   // setting isTurningBack to -1.0f here means turning page forward
   handle.SetUniform( IS_TURNING_BACK_PROPERTY_NAME, -1.0f );
@@ -447,7 +433,11 @@ void PageTurnEffect::SetSpineShadowParameter(const Vector2& spineShadowParameter
 
 void PageTurnEffect::ApplyInternalConstraint()
 {
-  mShaderEffect.ApplyConstraint( mInternalConstraint );
+  Constraint constraint = Constraint::New<Matrix>( mShaderEffect, mShaderEffect.GetPropertyIndex( "uCommonParameters" ), CommonParametersConstraint );
+  constraint.AddSource( LocalSource( mOriginalCenterPropertyIndex ) );
+  constraint.AddSource( LocalSource( mCurrentCenterPropertyIndex ) );
+  constraint.AddSource( LocalSource( mShaderEffect.GetPropertyIndex( PAGE_SIZE_PROPERTY_NAME ) ) );
+  constraint.Apply();
 }
 
 const std::string& PageTurnEffect::GetPageSizePropertyName() const

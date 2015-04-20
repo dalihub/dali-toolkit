@@ -19,10 +19,8 @@
 #include <dali-toolkit/public-api/shader-effects/motion-blur-effect.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/actors/image-actor.h>
 
 namespace Dali
 {
@@ -85,20 +83,15 @@ MotionBlurEffect::~MotionBlurEffect()
 MotionBlurEffect MotionBlurEffect::Apply( RenderableActor renderable )
 {
   MotionBlurEffect newEffect = New( MOTION_BLUR_NUM_SAMPLES );
-  ImageActor imageActor = ImageActor::DownCast(renderable);
-  if( imageActor )
-  {
-    imageActor.SetShaderEffect( newEffect );
-  }
+  renderable.SetShaderEffect( newEffect );
 
   Dali::Property::Index uModelProperty = newEffect.GetPropertyIndex( MOTION_BLUR_MODEL_LASTFRAME );
 
-  Constraint constraint = Constraint::New<Matrix>( uModelProperty,
-                                                   Source( renderable, Actor::Property::WORLD_MATRIX ),
-                                                   EqualToConstraint() );
+  Constraint constraint = Constraint::New<Matrix>( newEffect, uModelProperty, EqualToConstraint() );
+  constraint.AddSource( Source( renderable, Actor::Property::WORLD_MATRIX ) );
 
   // and set up constraint.
-  newEffect.ApplyConstraint( constraint );
+  constraint.Apply();
   return newEffect;
 }
 

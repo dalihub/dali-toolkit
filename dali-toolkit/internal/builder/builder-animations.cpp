@@ -16,6 +16,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/actors/renderable-actor.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -241,13 +243,13 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
         // to allow animating shader uniforms
         if( propIndex == Property::INVALID_INDEX )
         {
-          ImageActor imageActor = ImageActor::DownCast( targetHandle );
-          if( imageActor )
+          RenderableActor renderable = RenderableActor::DownCast( targetHandle );
+          if( renderable )
           {
             // A limitation here is that its possible that between creation of animation
             // and running it the ShaderEffect of the actor has been changed.
             // However this is a unlikely use case especially when using scripts.
-            if( ShaderEffect effect = imageActor.GetShaderEffect() )
+            if( ShaderEffect effect = renderable.GetShaderEffect() )
             {
               propIndex = effect.GetPropertyIndex( *property );
               if(propIndex != Property::INVALID_INDEX)
@@ -438,3 +440,4 @@ Animation CreateAnimation( const TreeNode& child, Builder* const builder )
 } // namespace Toolkit
 
 } // namespace Dali
+

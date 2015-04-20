@@ -235,62 +235,62 @@ struct DepthPositionConstraint270
 
 struct DepthRotationConstraint0
 {
-  DepthRotationConstraint0(float angleRadians)
+  DepthRotationConstraint0(Radian angleRadians)
   : mTiltAngle(angleRadians)
   {
   }
 
   Quaternion operator()(const Quaternion& current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)
   {
-    return Quaternion(0.0f, Vector3::ZAXIS) * Quaternion(mTiltAngle, Vector3::XAXIS);
+    return Quaternion( Radian( 0.0f ), Vector3::ZAXIS ) * Quaternion( mTiltAngle, Vector3::XAXIS );
   }
 
-  float mTiltAngle;
+  Radian mTiltAngle;
 };
 
 struct DepthRotationConstraint90
 {
-  DepthRotationConstraint90(float angleRadians)
+  DepthRotationConstraint90(Radian angleRadians)
   : mTiltAngle(angleRadians)
   {
   }
 
   Quaternion operator()(const Quaternion& current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)
   {
-    return Quaternion(1.5f * Math::PI, Vector3::ZAXIS) * Quaternion(mTiltAngle, Vector3::XAXIS);
+    return Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS) * Quaternion( mTiltAngle, Vector3::XAXIS );
   }
 
-  float mTiltAngle;
+  Radian mTiltAngle;
 };
 
 struct DepthRotationConstraint180
 {
-  DepthRotationConstraint180(float angleRadians)
+  DepthRotationConstraint180(Radian angleRadians)
   : mTiltAngle(angleRadians)
   {
   }
 
   Quaternion operator()(const Quaternion& current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)
   {
-    return Quaternion(-Math::PI, Vector3::ZAXIS) * Quaternion(mTiltAngle, Vector3::XAXIS);
+    return Quaternion( Radian( -Math::PI ), Vector3::ZAXIS) * Quaternion( mTiltAngle, Vector3::XAXIS );
   }
 
-  float mTiltAngle;
+  Radian mTiltAngle;
 };
 
 struct DepthRotationConstraint270
 {
-  DepthRotationConstraint270(float angleRadians)
+  DepthRotationConstraint270(Radian angleRadians)
   : mTiltAngle(angleRadians)
   {
   }
 
   Quaternion operator()(const Quaternion& current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)
   {
-    return Quaternion(0.5f * Math::PI, Vector3::ZAXIS) * Quaternion(mTiltAngle, Vector3::XAXIS);
+    return Quaternion( Radian( 0.5f * Math::PI ), Vector3::ZAXIS) * Quaternion( mTiltAngle, Vector3::XAXIS );
   }
 
-  float mTiltAngle;
+  Radian mTiltAngle;
 };
 
 struct DepthColorConstraint
@@ -450,12 +450,12 @@ float DepthLayout::GetRowSpacing() const
 
 void DepthLayout::SetTiltAngle(Degree angle)
 {
-  mImpl->mTiltAngle = Degree( Clamp<float>(angle, -45.0f, 45.0f) );
+  mImpl->mTiltAngle = Degree( Clamp( angle, -45.0f, 45.0f ) );
 }
 
 Degree DepthLayout::GetTiltAngle() const
 {
-  return mImpl->mTiltAngle;
+  return Degree( mImpl->mTiltAngle );
 }
 
 void DepthLayout::SetItemSizeFunction(ItemSizeFunction function)
@@ -485,7 +485,7 @@ void DepthLayout::SetItemTiltAngle(Degree angle)
 
 Degree DepthLayout::GetItemTiltAngle() const
 {
-  return mImpl->mItemTiltAngle;
+  return Degree( mImpl->mItemTiltAngle );
 }
 
 void DepthLayout::SetColumnPositionFunction(ColumnPositionFunction function)
@@ -575,7 +575,7 @@ void DepthLayout::GetResizeAnimation(Animation& animation, Actor actor, Vector3 
 {
   if(animation)
   {
-    animation.Resize(actor, size);
+    animation.AnimateTo( Property( actor, Actor::Property::SIZE ), size );
   }
 }
 
@@ -673,19 +673,19 @@ Degree DepthLayout::GetScrollDirection() const
 
   if (mOrientation == ControlOrientation::Up)
   {
-    scrollDirection = 180.0f;
+    scrollDirection = Degree( 180.0f );
   }
   else if (mOrientation == ControlOrientation::Left)
   {
-    scrollDirection = 270.0f;
+    scrollDirection = Degree( 270.0f );
   }
   else if (mOrientation == ControlOrientation::Down)
   {
-    scrollDirection = 0.0f;
+    scrollDirection = Degree( 0.0f );
   }
   else // mOrientation == ControlOrientation::Right
   {
-    scrollDirection = 90.0f;
+    scrollDirection = Degree( 90.0f );
   }
 
   return scrollDirection;

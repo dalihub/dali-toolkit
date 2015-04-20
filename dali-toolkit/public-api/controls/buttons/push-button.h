@@ -129,7 +129,12 @@ public:
   void SetButtonImage( Image image );
 
   /**
-   * @copydoc SetButtonImage( Image image )
+   * @brief SetButtonImage
+   *
+   * @param[in] image The Actor to be used as the button image.
+   *
+   * The natural size of the button would be the size of this Actor
+   * if it's larger than the background and label
    */
   void SetButtonImage( Actor image );
 
@@ -148,7 +153,12 @@ public:
   void SetBackgroundImage( Image image );
 
   /**
-   * @copydoc SetBackgroundImage( Image image )
+   * @brief SetBackgroundImage
+   *
+   * @param[in] image The Actor to be used as the background image.
+   *
+   * The natural size of the button would be the size of this Actor
+   * if it's larger than the button and label
    */
   void SetBackgroundImage( Actor image );
 
@@ -177,6 +187,25 @@ public:
    * @return An actor with the selected image.
    */
   Actor GetSelectedImage() const;
+
+  /**
+   * @brief Sets the selected background image.
+   *
+   * @param[in] image The selected background image.
+   */
+  void SetSelectedBackgroundImage( Image image );
+
+  /**
+   * @copydoc SetSelectedBackgroundImage( Image image )
+   */
+  void SetSelectedBackgroundImage( Actor image );
+
+  /**
+   * @brief Gets the selected background image.
+   *
+   * @return An actor with the selected background image.
+   */
+  Actor GetSelectedBackgroundImage() const;
 
   /**
    * @brief Sets the disabled background image.

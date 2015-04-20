@@ -56,12 +56,8 @@ NavigationTitleBar::NavigationTitleBar(NavigationControl& naviControl,
   mTitleIconLayout= Toolkit::TableView::New( 3,2 );
   SetFixedSizes();
 
-  mTitle = Toolkit::TextView::New();
-  mTitle.SetTextAlignment( Toolkit::Alignment::HorizontalLeft );
-  mTitle.SetWidthExceedPolicy(Toolkit::TextView::ShrinkToFit);
-  mSubTitle = Toolkit::TextView::New();
-  mSubTitle.SetTextAlignment( Toolkit::Alignment::HorizontalLeft );
-  mSubTitle.SetWidthExceedPolicy(Toolkit::TextView::ShrinkToFit);
+  mTitle = Toolkit::TextLabel::New();
+  mSubTitle = Toolkit::TextLabel::New();
 }
 
 void NavigationTitleBar::Update( Toolkit::Page page )
@@ -113,8 +109,7 @@ void NavigationTitleBar::Update( Toolkit::Page page )
   }
 
   // add title and subtitle(if exist)
-  mTitle.SetText( page.GetTitle() );
-  mTitle.SetStyleToCurrentText(mCurrentStyle->titleTextStyle);
+  mTitle.SetProperty( Toolkit::TextLabel::Property::TEXT, page.GetTitle() );
   if( page.GetSubTitle().empty() )  //display title
   {
     mTitleLayout.SetFixedHeight( 1,mCurrentStyle->titleHeightWithoutSubtitle - mCurrentStyle->subtitleHeight );
@@ -124,8 +119,7 @@ void NavigationTitleBar::Update( Toolkit::Page page )
   {
     mTitleLayout.SetFixedHeight( 1, mCurrentStyle->titleHeightWithSubtitle );
     mTitleLayout.AddChild( mTitle, Toolkit::TableView::CellPosition(1,0) );
-    mSubTitle.SetText( page.GetSubTitle() );
-    mSubTitle.SetStyleToCurrentText(mCurrentStyle->subtitleTextStyle);
+    mSubTitle.SetProperty( Toolkit::TextLabel::Property::TEXT, page.GetSubTitle() );
     mTitleLayout.AddChild( mSubTitle, Toolkit::TableView::CellPosition(2,0) );
   }
 

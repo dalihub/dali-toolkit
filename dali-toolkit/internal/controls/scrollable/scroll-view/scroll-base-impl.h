@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 // TODO - Replace list with dali-vector.h
 #include <list>
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 
 // INTERNAL INCLUDES
@@ -79,8 +78,9 @@ public:
      */
     void ApplyConstraint(Constraint constraint)
     {
-      ActiveConstraint activeConstraint = mActor.ApplyConstraint( constraint );
-      mConstraints.push_back( activeConstraint );
+      Constraint clone = constraint.Clone( mActor );
+      clone.Apply();
+      mConstraints.push_back( clone );
     }
 
     /**
@@ -90,17 +90,17 @@ public:
      */
     void RemoveConstraints()
     {
-      std::vector<ActiveConstraint>::iterator it = mConstraints.begin();
-      std::vector<ActiveConstraint>::iterator end = mConstraints.end();
+      std::vector<Constraint>::iterator it = mConstraints.begin();
+      std::vector<Constraint>::iterator end = mConstraints.end();
       for(;it!=end;++it)
       {
-        mActor.RemoveConstraint(*it);
+        it->Remove();
       }
       mConstraints.clear();
     }
 
     Actor mActor;                                     ///< The Actor that this ActorInfo represents.
-    std::vector<ActiveConstraint> mConstraints;       ///< A list keeping track of constraints applied to the actor via this delegate.
+    std::vector<Constraint> mConstraints;       ///< A list keeping track of constraints applied to the actor via this delegate.
   };
 
   typedef IntrusivePtr<ActorInfo> ActorInfoPtr;
@@ -191,26 +191,9 @@ protected:
    */
   ScrollBase();
 
-  /**
-   * 2nd-phase initialization.
-   */
-  void RegisterProperties();
-
 protected:
 
   ScrollBase *mParent;                              ///< Pointer to ScrollBase parent, if exists.
-  Property::Index mPropertyTime;                    ///< Scroll Time (0 to animationDuration while animating, otherwise 0)
-  Property::Index mPropertyPrePosition;             ///< Scroll Position ("scroll-position") [function of scroll-x, scroll-y]
-  Property::Index mPropertyPosition;                ///< Scroll Position ("scroll-position") [function of scroll-pre-position]
-  Property::Index mPropertyOvershootX;              ///< Scroll Overshoot ("scroll-overshoot-x") [function of scroll-pre-position, scroll-position]
-  Property::Index mPropertyOvershootY;              ///< Scroll Overshoot ("scroll-overshoot-y") [function of scroll-pre-position, scroll-position]
-  Property::Index mPropertyWrap;                    ///< Scroll Wrap ("scroll-wrap")
-  Property::Index mPropertyPanning;                 ///< Whether we are panning
-  Property::Index mPropertyScrolling;               ///< Whether we are scrolling
-  Property::Index mPropertyFinal;                   ///< Scroll Final Position ("scroll-final") [scroll-position + f(scroll-overshoot)]
-  Property::Index mPropertyDomainOffset;            ///< Scroll Domain Offset ("scroll-domain-offset") keeps track of scroll position as it wraps domains
-  Property::Index mPropertyPositionDelta;           ///< Scroll Position Delta ("scroll-position-delta")
-  Property::Index mPropertyScrollStartPagePosition; ///< Scroll Start Page Position ("scroll-start-page-position")
 
 private:
 

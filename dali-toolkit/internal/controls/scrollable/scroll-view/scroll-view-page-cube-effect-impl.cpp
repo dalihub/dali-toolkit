@@ -19,8 +19,6 @@
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-page-cube-effect-impl.h>
 
 // EXTERNAL INCLUDES
-#include <boost/bind.hpp>
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-input.h>
 
@@ -69,25 +67,20 @@ public:
   }
 
   /**
-   * @param[in] current The current orientation of this Actor
-   * @param[in] pagePositionProperty The page's position.
-   * @param[in] scrollPositionProperty The scroll-view's position property (SCROLL_POSITION_PROPERTY_NAME)
-   * @param[in] scrollPositionMin The minimum extent of this scroll domain. (SCROLL_POSITION_MIN_PROPERTY_NAME)
-   * @param[in] scrollPositionMax The maximum extent of this scroll domain. (SCROLL_POSITION_MIN_PROPERTY_NAME)
-   * @param[in] pageSizeProperty The size of the page. (scrollView SIZE)
-   * @param[in] scrollWrap Whether scroll wrap has been enabled or not (SCROLL_WRAP_PROPERTY_NAME)
+   * @param[in,out] current The current orientation of this Actor
+   * @param[in] inputs Contains:
+   *                    The page's position.
+   *                    The scroll-view's position property (SCROLL_POSITION)
+   *                    The minimum extent of this scroll domain. (SCROLL_POSITION_MIN)
+   *                    The maximum extent of this scroll domain. (SCROLL_POSITION_MIN)
+   *                    The size of the page. (scrollView SIZE)
+   *                    Whether scroll wrap has been enabled or not (SCROLL_WRAP)
    * @return The new orientation of this Actor.
    */
-  Quaternion RotationConstraint(const Quaternion& current,
-                                const PropertyInput& pagePositionProperty,
-                                const PropertyInput& scrollPositionProperty,
-                                const PropertyInput& scrollPositionMin,
-                                const PropertyInput& scrollPositionMax,
-                                const PropertyInput& pageSizeProperty,
-                                const PropertyInput& scrollWrap)
+  void RotationConstraint( Quaternion& current, const PropertyInputContainer& inputs )
   {
-    const Vector3& pagePosition = pagePositionProperty.GetVector3();
-    const Vector3& scrollPosition = scrollPositionProperty.GetVector3();
+    const Vector3& pagePosition = inputs[0]->GetVector3();
+    const Vector3& scrollPosition = inputs[1]->GetVector3();
 
     // Get position of page.
     Vector3 position = pagePosition + scrollPosition;
@@ -95,53 +88,46 @@ public:
     // short circuit: if we're looking straight on at the page.
     if( IsStraightOnView( position ) )
     {
-      return current;
+      return;
     }
 
-    const Vector3& pageSize = pageSizeProperty.GetVector3();
+    const Vector3& pageSize = inputs[4]->GetVector3();
 
-    if( scrollWrap.GetBoolean() )
+    if( inputs[5]->GetBoolean() )
     {
-      WrapPositionWithinDomain( position, pageSize, scrollPositionMin.GetVector3(), scrollPositionMax.GetVector3() );
+      WrapPositionWithinDomain( position, pageSize, inputs[2]->GetVector3(), inputs[3]->GetVector3() );
     }
 
     // short circuit: for pages outside of view.
     if( IsOutsideView( position, pageSize ) )
     {
-      return current;
+      return;
     }
 
     // Our target is a 90 degree (PI/2) rotation per page, so calculate the angle we should be rotate
     // our page by calculating the amount we've moved as a fraction of the total size of the page.
     Vector2 angle( position / pageSize * Dali::Math::PI_2 );
 
-    Quaternion rotation = Quaternion( -angle.x * mAngleSwing.x, Vector3::YAXIS ) *
-                          Quaternion(  angle.y * mAngleSwing.y, Vector3::XAXIS ) *
-                          current;
-
-    return rotation;
+    current = Quaternion( Radian( -angle.x * mAngleSwing.x ), Vector3::YAXIS ) *
+              Quaternion( Radian( angle.y * mAngleSwing.y ), Vector3::XAXIS ) *
+              current;
   }
 
   /**
-   * @param[in] current The current color of this Actor
-   * @param[in] pagePositionProperty The page's position.
-   * @param[in] scrollPositionProperty The scroll-view's position property (SCROLL_POSITION_PROPERTY_NAME)
-   * @param[in] scrollPositionMin The minimum extent of this scroll domain. (SCROLL_POSITION_MIN_PROPERTY_NAME)
-   * @param[in] scrollPositionMax The maximum extent of this scroll domain. (SCROLL_POSITION_MIN_PROPERTY_NAME)
-   * @param[in] pageSizeProperty The size of the page. (scrollView SIZE)
-   * @param[in] scrollWrap Whether scroll wrap has been enabled or not (SCROLL_WRAP_PROPERTY_NAME)
+   * @param[in,out] current The current color of this Actor
+   * @param[in] inputs Contains:
+   *                    The page's position.
+   *                    The scroll-view's position property (SCROLL_POSITION)
+   *                    The minimum extent of this scroll domain. (SCROLL_POSITION_MIN)
+   *                    The maximum extent of this scroll domain. (SCROLL_POSITION_MIN)
+   *                    The size of the page. (scrollView SIZE)
+   *                    Whether scroll wrap has been enabled or not (SCROLL_WRAP)
    * @return The new color of this Actor.
    */
-  Vector4 ColorConstraint(const Vector4& current,
-                          const PropertyInput& pagePositionProperty,
-                          const PropertyInput& scrollPositionProperty,
-                          const PropertyInput& scrollPositionMin,
-                          const PropertyInput& scrollPositionMax,
-                          const PropertyInput& pageSizeProperty,
-                          const PropertyInput& scrollWrap)
+  void ColorConstraint( Vector4& current, const PropertyInputContainer& inputs )
   {
-    const Vector3& pagePosition = pagePositionProperty.GetVector3();
-    const Vector3& scrollPosition = scrollPositionProperty.GetVector3();
+    const Vector3& pagePosition = inputs[0]->GetVector3();
+    const Vector3& scrollPosition = inputs[1]->GetVector3();
 
     // Get position of page.
     Vector3 position = pagePosition + scrollPosition;
@@ -149,14 +135,14 @@ public:
     // short circuit: if we're looking straight on at the page.
     if( IsStraightOnView( position ) )
     {
-      return current;
+      return;
     }
 
-    const Vector3& pageSize = pageSizeProperty.GetVector3();
+    const Vector3& pageSize = inputs[4]->GetVector3();
 
-    if( scrollWrap.GetBoolean() )
+    if( inputs[5]->GetBoolean() )
     {
-      WrapPositionWithinDomain( position, pageSize, scrollPositionMin.GetVector3(), scrollPositionMax.GetVector3() );
+      WrapPositionWithinDomain( position, pageSize, inputs[2]->GetVector3(), inputs[3]->GetVector3() );
     }
 
     // short circuit: for pages outside of view.
@@ -164,7 +150,8 @@ public:
     {
       // note preserve color channels incase there is a shader/further constraint
       // that wishes to do something with that information.
-      return Vector4(current.r, current.g, current.b, 0.0f);
+      current.a = 0.0f;
+      return;
     }
 
     // Calculate the distance of this page from our view and ensure it falls within the appropriate
@@ -176,32 +163,25 @@ public:
 
     if ( distanceFactor > 1.0f )
     {
-      return Vector4(current.r, current.g, current.b, 0.0f);
+      current.a = 0.0f;
     }
-
-    return current;
   }
 
   /**
-   * @param[in] current The current position
-   * @param[in] pagePositionProperty The page's position.
-   * @param[in] scrollPositionProperty The scroll-view's position property (SCROLL_POSITION_PROPERTY_NAME)
-   * @param[in] scrollPositionMin The minimum extent of this scroll domain. (SCROLL_POSITION_MIN_PROPERTY_NAME)
-   * @param[in] scrollPositionMax The maximum extent of this scroll domain. (SCROLL_POSITION_MIN_PROPERTY_NAME)
-   * @param[in] pageSizeProperty The size of the page. (scrollView SIZE)
-   * @param[in] scrollWrap Whether scroll wrap has been enabled or not (SCROLL_WRAP_PROPERTY_NAME)
+   * @param[in,out] current The current position
+   * @param[in] inputs Contains:
+   *                    The page's position.
+   *                    The scroll-view's position property (SCROLL_POSITION)
+   *                    The minimum extent of this scroll domain. (SCROLL_POSITION_MIN)
+   *                    The maximum extent of this scroll domain. (SCROLL_POSITION_MIN)
+   *                    The size of the page. (scrollView SIZE)
+   *                    Whether scroll wrap has been enabled or not (SCROLL_WRAP)
    * @return The new position of this Actor.
    */
-  Vector3 PositionConstraint(const Vector3& current,
-                             const PropertyInput& pagePositionProperty,
-                             const PropertyInput& scrollPositionProperty,
-                             const PropertyInput& scrollPositionMin,
-                             const PropertyInput& scrollPositionMax,
-                             const PropertyInput& pageSizeProperty,
-                             const PropertyInput& scrollWrap)
+  void PositionConstraint( Vector3& current, const PropertyInputContainer& inputs )
   {
-    const Vector3& pagePosition = pagePositionProperty.GetVector3();
-    const Vector3& scrollPosition = scrollPositionProperty.GetVector3();
+    const Vector3& pagePosition = inputs[0]->GetVector3();
+    const Vector3& scrollPosition = inputs[1]->GetVector3();
 
     // Get position of page.
     Vector3 position = pagePosition + scrollPosition;
@@ -209,14 +189,15 @@ public:
     // short circuit: if we're looking straight on at the page.
     if( IsStraightOnView( position ) )
     {
-      return current + scrollPosition;
+      current += scrollPosition;
+      return;
     }
 
-    const Vector3& pageSize = pageSizeProperty.GetVector3();
+    const Vector3& pageSize = inputs[4]->GetVector3();
 
-    if( scrollWrap.GetBoolean() )
+    if( inputs[5]->GetBoolean() )
     {
-      WrapPositionWithinDomain( position, pageSize, scrollPositionMin.GetVector3(), scrollPositionMax.GetVector3() );
+      WrapPositionWithinDomain( position, pageSize, inputs[2]->GetVector3(), inputs[3]->GetVector3() );
     }
 
     // short circuit: for pages outside of view.
@@ -224,7 +205,8 @@ public:
     {
       // position actors at: scrollposition (Property) + pagePosition (Parent) + current (this)
       // they will be invisible so doesn't have to be precise, just away from stage.
-      return current + scrollPosition;
+      current += scrollPosition;
+      return;
     }
 
     // Our target when scrolling is moving from the origin to the following points around a curve:
@@ -236,11 +218,9 @@ public:
     Vector2 angle( position / pageSize * Dali::Math::PI_2 );
     Vector2 radius( pageSize * 0.5 );
 
-    position.x = radius.x * sin( angle.x );
-    position.y = radius.y * sin( angle.y );
-    position.z = ( radius.x - ( radius.x * cos( angle.x ) ) ) + ( radius.y - ( radius.y * cos( angle.y ) ) );
-
-    return position;
+    current.x = radius.x * sin( angle.x );
+    current.y = radius.y * sin( angle.y );
+    current.z = ( radius.x - ( radius.x * cos( angle.x ) ) ) + ( radius.y - ( radius.y * cos( angle.y ) ) );
   }
 
   Vector2 mAngleSwing;                                    ///< Maximum amount in X and Y axes to rotate.
@@ -259,41 +239,35 @@ void ApplyScrollCubeConstraints(Toolkit::ScrollView scrollView,
 {
   // Apply constraints to this actor //
   Constraint constraint;
-  constraint = Constraint::New<Quaternion>( Actor::Property::ORIENTATION,
-                                            LocalSource(Actor::Property::POSITION),
-                                            Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_FINAL_PROPERTY_NAME ) ),
-                                            Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
-                                            Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
-                                            Source(scrollView, Actor::Property::SIZE ),
-                                            Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME ) ),
-                                            boost::bind( &ScrollPageCubeEffectInfo::RotationConstraint, info, _1, _2, _3, _4, _5, _6, _7) );
-
+  constraint = Constraint::New<Quaternion>( child, Actor::Property::ORIENTATION, info, &ScrollPageCubeEffectInfo::RotationConstraint );
+  constraint.AddSource( LocalSource(Actor::Property::POSITION) );
+  constraint.AddSource( Source(scrollView, Toolkit::ScrollView::Property::SCROLL_FINAL ) );
+  constraint.AddSource( Source(scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
+  constraint.AddSource( Source(scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
+  constraint.AddSource( Source(scrollView, Actor::Property::SIZE ) );
+  constraint.AddSource( Source(scrollView, Toolkit::ScrollView::Property::WRAP ) );
   constraint.SetRemoveAction( Constraint::Discard );
-  child.ApplyConstraint( constraint );
+  constraint.Apply();
 
-  constraint = Constraint::New<Vector4>( Actor::Property::COLOR,
-                                         LocalSource(Actor::Property::POSITION),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_FINAL_PROPERTY_NAME ) ),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
-                                         Source(scrollView, Actor::Property::SIZE ),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME ) ),
-                                         boost::bind( &ScrollPageCubeEffectInfo::ColorConstraint, info, _1, _2, _3, _4, _5, _6, _7) );
-
+  constraint = Constraint::New<Vector4>( child, Actor::Property::COLOR, info, &ScrollPageCubeEffectInfo::ColorConstraint );
+  constraint.AddSource( LocalSource(Actor::Property::POSITION) );
+  constraint.AddSource( Source(scrollView, Toolkit::ScrollView::Property::SCROLL_FINAL ) );
+  constraint.AddSource( Source(scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
+  constraint.AddSource( Source(scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
+  constraint.AddSource( Source(scrollView, Actor::Property::SIZE ) );
+  constraint.AddSource( Source(scrollView, Toolkit::ScrollView::Property::WRAP ) );
   constraint.SetRemoveAction( Constraint::Discard );
-  child.ApplyConstraint( constraint );
+  constraint.Apply();
 
-  constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
-                                         LocalSource(Actor::Property::POSITION),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_FINAL_PROPERTY_NAME ) ),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MIN_PROPERTY_NAME ) ),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_POSITION_MAX_PROPERTY_NAME ) ),
-                                         Source(scrollView, Actor::Property::SIZE ),
-                                         Source(scrollView, scrollView.GetPropertyIndex( Toolkit::ScrollView::SCROLL_WRAP_PROPERTY_NAME ) ),
-                                         boost::bind( &ScrollPageCubeEffectInfo::PositionConstraint, info, _1, _2, _3, _4, _5, _6, _7) );
-
+  constraint = Constraint::New<Vector3>( child, Actor::Property::POSITION, info, &ScrollPageCubeEffectInfo::PositionConstraint );
+  constraint.AddSource( LocalSource(Actor::Property::POSITION) );
+  constraint.AddSource( Source(scrollView, Toolkit::ScrollView::Property::SCROLL_FINAL ) );
+  constraint.AddSource( Source(scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
+  constraint.AddSource( Source(scrollView, Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
+  constraint.AddSource( Source(scrollView, Actor::Property::SIZE ) );
+  constraint.AddSource( Source(scrollView, Toolkit::ScrollView::Property::WRAP ) );
   constraint.SetRemoveAction( Constraint::Discard );
-  child.ApplyConstraint( constraint );
+  constraint.Apply();
 }
 
 } // unnamed namespace

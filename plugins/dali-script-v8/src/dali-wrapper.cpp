@@ -26,7 +26,6 @@
 #include <stage/stage-wrapper.h>
 #include <image/image-attributes-wrapper.h>
 #include <image/image-wrapper.h>
-#include <text/font-wrapper.h>
 #include <animation/path-wrapper.h>
 #include <animation/path-constraint-wrapper.h>
 #include <animation/animation-wrapper.h>
@@ -60,7 +59,6 @@ const ApiFunction ConstructorFunctionTable[]=
 {
     { "Rotation",           PropertyValueWrapper::NewRotation},
     { "Matrix",             PropertyValueWrapper::NewMatrix},
-    { "Font",               FontWrapper::NewFont },
     { "Path",               PathWrapper::NewPath },
     { "PathConstraint",     PathConstraintWrapper::NewPathConstraint },
     { "Actor",              ActorWrapper::NewActor },
@@ -221,10 +219,6 @@ void DaliWrapper::Initialize()
 
      v8::Local<v8::Object> stageObject = StageWrapper::WrapStage( mIsolate, Stage::GetCurrent() );
      daliObject->Set( v8::String::NewFromUtf8( mIsolate, "stage") , stageObject );
-
-     // fontObject provides static font functionality like GetFontList...
-     v8::Local<v8::Object> fontObject = FontWrapper::GetStaticFontObject( mIsolate );
-     daliObject->Set( v8::String::NewFromUtf8( mIsolate, "font") , fontObject );
 
      // keyboard focus manager is a singleton
      v8::Local<v8::Object> keyboardObject = KeyboardFocusManagerWrapper::WrapKeyboardFocusManager( mIsolate,Toolkit::KeyboardFocusManager::Get() );

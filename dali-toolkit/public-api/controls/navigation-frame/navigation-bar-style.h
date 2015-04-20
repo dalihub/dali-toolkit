@@ -105,8 +105,6 @@ namespace Toolkit
      * Constructor
      */
     NaviTitleBarStyle( Actor background,
-                       TextStyle titleTextStyle,
-                       TextStyle subtitleTextStyle,
                        int referenceWidth,
                        int height,
                        int titleHeightWithoutSubtitle,
@@ -120,7 +118,6 @@ namespace Toolkit
                        int buttonBottomMargin,
                        int gapBetweenButtons )
     : BasicNaviBarStyle( background, referenceWidth, height),
-      titleTextStyle( titleTextStyle ), subtitleTextStyle( subtitleTextStyle ),
       titleHeightWithoutSubtitle( titleHeightWithoutSubtitle ),
       titleHeightWithSubtitle( titleHeightWithSubtitle ), subtitleHeight( subtitleHeight ),
       titleLeftMargin( titleLeftMargin ), titleBottomMargin( titleBottomMargin ),
@@ -130,8 +127,6 @@ namespace Toolkit
     {
     }
 
-    TextStyle titleTextStyle;               ///< the text style of the tile text
-    TextStyle subtitleTextStyle;            ///< the text style of the subtitle text
     int   titleHeightWithoutSubtitle;       ///< the height of the title when no subtitle exists
     int   titleHeightWithSubtitle;          ///< the height of the title when there is subtitle below
     int   subtitleHeight;                   ///< the height of the subtitle

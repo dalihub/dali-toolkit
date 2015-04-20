@@ -137,11 +137,6 @@ private: // From Control
    */
   virtual void OnInitialize();
 
-  /**
-   * @copydoc Toolkit::Control::OnRelayout()
-   */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
-
 private:
 
 

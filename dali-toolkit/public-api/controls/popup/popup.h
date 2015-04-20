@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
-#include <dali-toolkit/public-api/controls/text-view/text-view.h>
 
 namespace Dali
 {
@@ -167,18 +166,11 @@ public:
   void SetTitle( const std::string& text );
 
   /**
-   * @brief Sets a title for this Popup.
-   *
-   * @param[in] titleActor The TextView to appear as the heading for this Popup
-   */
-  void SetTitle( TextView titleActor );
-
-  /**
    * @brief Gets the text (TextView) for this Popup.
    *
-   * @return The TextView representing this popup is returned.
+   * @return The text to appear as the heading for this Popup
    */
-  TextView GetTitle() const;
+  std::string GetTitle() const;
 
   /**
    * @brief Adds a button to this Popup.

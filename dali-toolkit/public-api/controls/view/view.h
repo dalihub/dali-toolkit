@@ -63,13 +63,12 @@ class View;
  * mView.SetBackground( backgroundImageActor );
  *
  * // Connects the orientation signal with the View::OrientationChanged method.
- * application.GetOrientation().ChangedSignal().Connect( &view, &Toolkit::View::OrientationChanged );
+ * application.GetWindow().GetOrientation().ChangedSignal().Connect( &view, &Toolkit::View::OrientationChanged );
  *
  * // Create a content layer.
  * Layer contentLayer = Layer::New();
  * contentLayer.SetAnchorPoint( AnchorPoint::CENTER );
  * contentLayer.SetParentOrigin( ParentOrigin::CENTER );
- * contentLayer.ApplyConstraint( ParentConstraint::Size::New( ParentSize() ) );
  * view.AddContentLayer( contentLayer );
  * \endcode
  *

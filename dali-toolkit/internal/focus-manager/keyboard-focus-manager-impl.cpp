@@ -19,6 +19,7 @@
 #include "keyboard-focus-manager-impl.h"
 
 // EXTERNAL INCLUDES
+#include <cstring> // for strcmp
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/adaptor-framework/accessibility-manager.h>
 #include <dali/public-api/adaptor-framework/singleton-service.h>
@@ -477,7 +478,7 @@ void KeyboardFocusManager::CreateDefaultFocusIndicatorActor()
   focusIndicator.SetPosition(Vector3(0.0f, 0.0f, 1.0f));
 
   // Apply size constraint to the focus indicator
-  focusIndicator.SetResizePolicy( FILL_TO_PARENT, ALL_DIMENSIONS );
+  focusIndicator.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   SetFocusIndicatorActor(focusIndicator);
 }
