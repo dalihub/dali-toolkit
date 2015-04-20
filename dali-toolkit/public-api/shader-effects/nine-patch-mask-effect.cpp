@@ -108,19 +108,19 @@ static void DoApply( ImageActor actor, const std::string& maskImage, const Vecto
 
 void Apply( ImageActor actor, const std::string& maskImage )
 {
-  Vector2 maskSize = ResourceImage::GetImageSize( maskImage );
+  const Uint16Pair maskSize = ResourceImage::GetImageSize( maskImage );
 
-  const float leftRight = (maskSize.width  - 1.0f) * 0.5f;
-  const float topBottom = (maskSize.height - 1.0f) * 0.5f;
+  const float leftRight = (maskSize.GetWidth()  - 1.0f) * 0.5f;
+  const float topBottom = (maskSize.GetHeight() - 1.0f) * 0.5f;
 
-  DoApply( actor, maskImage, maskSize, Vector4( leftRight, topBottom, leftRight, topBottom ) );
+  DoApply( actor, maskImage, Vector2( maskSize.GetWidth(), maskSize.GetHeight() ), Vector4( leftRight, topBottom, leftRight, topBottom ) );
 }
 
 void Apply( ImageActor actor, const std::string& maskImage, const Vector4& maskBorder )
 {
-  Vector2 maskSize = ResourceImage::GetImageSize( maskImage );
+  const Uint16Pair maskSize = ResourceImage::GetImageSize( maskImage );
 
-  DoApply( actor, maskImage, maskSize, maskBorder );
+  DoApply( actor, maskImage, Vector2( maskSize.GetWidth(), maskSize.GetHeight() ), maskBorder );
 }
 
 } // namespace NinePatchMaskEffect

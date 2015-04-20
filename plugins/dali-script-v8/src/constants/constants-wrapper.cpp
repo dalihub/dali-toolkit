@@ -168,8 +168,18 @@ const IntegerPair EnumTable[] =
     { "RESOURCE_LOADING_SUCCEEDED",                         Dali::ResourceLoadingSucceeded  },
     { "RESOUCE_LOADING_FAILED",                             Dali::ResourceLoadingFailed  },
 
+    { "FITTING_MODE_SHRINK_TO_FIT",     FittingMode::SHRINK_TO_FIT },
+    { "FITTING_MODE_SCALE_TO_FILL",     FittingMode::SCALE_TO_FILL },
+    { "FITTING_MODE_FIT_WIDTH",         FittingMode::FIT_WIDTH },
+    { "FITTING_MODE_FIT_HEIGHT",        FittingMode::FIT_HEIGHT },
 
-
+    { "SAMPLING_MODE_BOX",              SamplingMode::BOX },
+    { "SAMPLING_MODE_NEAREST",          SamplingMode::NEAREST },
+    { "SAMPLING_MODE_LINEAR",           SamplingMode::LINEAR },
+    { "SAMPLING_MODE_BOX_THEN_NEAREST", SamplingMode::BOX_THEN_NEAREST },
+    { "SAMPLING_MODE_BOX_THEN_LINEAR",  SamplingMode::BOX_THEN_LINEAR },
+    { "SAMPLING_MODE_NO_FILTER",        SamplingMode::NO_FILTER },
+    { "SAMPLING_MODE_DONT_CARE",        SamplingMode::DONT_CARE },
 
     { "BLEND_FACTOR_ZERO",                                  BlendingFactor::ZERO                    },
     { "BLEND_FACTOR_ONE",                                   BlendingFactor::ONE                     },
