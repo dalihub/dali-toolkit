@@ -64,7 +64,7 @@ class PageTurnEffect;
  * Animation animation[mAnimationIndex] = Animation::New( ... );\n
  * animation.AnimateTo(Property( pageTurnEffect, pageTurnEffect.PageTurnEffect::GetCurrentCenterPropertyName() ),
  *                            currentCenter,
- *                            AlphaFunctions::...);\n
+ *                            AlphaFunction::...);\n
  * animation[mAnimationIndex].Play(); \n
  */
 

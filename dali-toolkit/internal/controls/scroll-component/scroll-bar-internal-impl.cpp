@@ -534,8 +534,8 @@ void ScrollBarInternal::Show()
   }
 
   mAnimation = Animation::New( BAR_SHOW_TIME );
-  mAnimation.AnimateTo( Property( mSlider, Actor::Property::COLOR_ALPHA ), 1.0f, AlphaFunctions::EaseIn );
-  mAnimation.AnimateTo( Property( mSliderWrap, Actor::Property::COLOR_ALPHA ), 1.0f, AlphaFunctions::EaseIn );
+  mAnimation.AnimateTo( Property( mSlider, Actor::Property::COLOR_ALPHA ), 1.0f, AlphaFunction::EASE_IN );
+  mAnimation.AnimateTo( Property( mSliderWrap, Actor::Property::COLOR_ALPHA ), 1.0f, AlphaFunction::EASE_IN );
   mAnimation.Play();
 
   DestructTimer();
@@ -551,8 +551,8 @@ void ScrollBarInternal::Hide()
   }
 
   mAnimation = Animation::New( BAR_HIDE_TIME );
-  mAnimation.AnimateTo( Property( mSlider, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunctions::EaseIn );
-  mAnimation.AnimateTo( Property( mSliderWrap, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunctions::EaseIn );
+  mAnimation.AnimateTo( Property( mSlider, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunction::EASE_IN );
+  mAnimation.AnimateTo( Property( mSliderWrap, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunction::EASE_IN );
   mAnimation.Play();
 }
 

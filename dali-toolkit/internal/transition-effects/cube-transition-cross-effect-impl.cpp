@@ -127,11 +127,11 @@ void CubeTransitionCrossEffect::SetupAnimation(unsigned int actorIndex, float an
     mTiles[mContainerIndex][actorIndex].TranslateBy( resetTranslation );
     mTiles[mContainerIndex][actorIndex].SetOrientation( Radian( angle),  axis );
   }
-  mAnimation.AnimateTo( Property( mBoxes[actorIndex], Actor::Property::ORIENTATION ), Quaternion( Radian( -angle ), axis ), AlphaFunctions::EaseInOutSine );
+  mAnimation.AnimateTo( Property( mBoxes[actorIndex], Actor::Property::ORIENTATION ), Quaternion( Radian( -angle ), axis ), AlphaFunction::EASE_IN_OUT_SINE );
   Vector3 position(mBoxes[actorIndex].GetCurrentPosition());
-  mAnimation.AnimateTo( Property( mBoxes[actorIndex], Actor::Property::POSITION ), position * mDisplacementRatio + Vector3( 0.f, 0.f, mCubeDisplacement ), AlphaFunctions::Bounce );
-  mAnimation.AnimateTo( Property( mTiles[mContainerIndex^1][actorIndex], Actor::Property::COLOR ), HALF_BRIGHTNESS, AlphaFunctions::EaseOut );
-  mAnimation.AnimateTo( Property( mTiles[mContainerIndex][actorIndex], Actor::Property::COLOR ), FULL_BRIGHTNESS, AlphaFunctions::EaseIn );
+  mAnimation.AnimateTo( Property( mBoxes[actorIndex], Actor::Property::POSITION ), position * mDisplacementRatio + Vector3( 0.f, 0.f, mCubeDisplacement ), AlphaFunction::BOUNCE );
+  mAnimation.AnimateTo( Property( mTiles[mContainerIndex^1][actorIndex], Actor::Property::COLOR ), HALF_BRIGHTNESS, AlphaFunction::EASE_OUT );
+  mAnimation.AnimateTo( Property( mTiles[mContainerIndex][actorIndex], Actor::Property::COLOR ), FULL_BRIGHTNESS, AlphaFunction::EASE_IN );
 }
 
 } // namespace Internal

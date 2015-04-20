@@ -62,11 +62,11 @@ namespace Toolkit
  * ImageActor fancyButton = ImageActor::New( ... );\n
  * fancyButton.SetShaderEffect( buttonEffect );
  *
- * // animate a button push, using e.g. AlphaFunctions::Bounce. With these values the button pushes in and out (animates to and fro between the two states)
+ * // animate a button push, using e.g. AlphaFunction::BOUNCE. With these values the button pushes in and out (animates to and fro between the two states)
  *
  *
  * Animation animation = Animation::New( ... );\n
- * animation.AnimateTo( Property(buttonEffect, buttonEffect.GetStatePropertyName()), 1.0f, AlphaFunctions::Bounce, ... );\n
+ * animation.AnimateTo( Property(buttonEffect, buttonEffect.GetStatePropertyName()), 1.0f, AlphaFunction::BOUNCE, ... );\n
  * animation.Play();\n
  *
  */

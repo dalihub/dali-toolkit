@@ -252,7 +252,7 @@ void ScrollBar::Show()
   if(mIndicatorShowDuration > 0.0f)
   {
     mAnimation = Animation::New( mIndicatorShowDuration );
-    mAnimation.AnimateTo( Property( self, Actor::Property::COLOR_ALPHA ), 1.0f, AlphaFunctions::EaseIn );
+    mAnimation.AnimateTo( Property( self, Actor::Property::COLOR_ALPHA ), 1.0f, AlphaFunction::EASE_IN );
     mAnimation.Play();
   }
   else
@@ -275,7 +275,7 @@ void ScrollBar::Hide()
   if(mIndicatorHideDuration > 0.0f)
   {
     mAnimation = Animation::New( mIndicatorHideDuration );
-    mAnimation.AnimateTo( Property( self, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunctions::EaseIn );
+    mAnimation.AnimateTo( Property( self, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunction::EASE_IN );
     mAnimation.Play();
   }
   else
