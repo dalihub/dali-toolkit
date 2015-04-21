@@ -2,7 +2,7 @@
 #define __DALI_TEST_SUITE_UTILS_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <cstdarg>
+#include <iosfwd>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
@@ -149,7 +153,9 @@ inline bool CompareType<Degree>(Degree q1, Degree q2, float epsilon)
 }
 
 bool operator==(TimePeriod a, TimePeriod b);
-std::ostream& operator<< (std::ostream& o, const TimePeriod value);
+std::ostream& operator<<( std::ostream& ostream, TimePeriod value );
+std::ostream& operator<<( std::ostream& ostream, Radian angle );
+std::ostream& operator<<( std::ostream& ostream, Degree angle );
 
 /**
  * Test whether two values are equal.
