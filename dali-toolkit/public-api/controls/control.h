@@ -48,13 +48,15 @@ class Control;
  * @see Internal::Control
  *
  * Signals
- * | %Signal Name      | Method                                              |
- * |-------------------|-----------------------------------------------------|
- * | key-event         | @ref KeyEventSignal()                               |
- * | tapped            | @ref GetTapGestureDetector().DetectedSignal()       |
- * | panned            | @ref GetPanGestureDetector().DetectedSignal()       |
- * | pinched           | @ref GetPinchGestureDetector().DetectedSignal()     |
- * | long-pressed      | @ref GetLongPressGestureDetector().DetectedSignal() |
+ * | %Signal Name           | Method                                              |
+ * |------------------------|-----------------------------------------------------|
+ * | key-event              | @ref KeyEventSignal()                               |
+ * | key-input-focus-gained | @ref KeyInputFocusGainedSignal()                    |
+ * | key-input-focus-lost   | @ref KeyInputFocusLostSignal()                      |
+ * | tapped                 | @ref GetTapGestureDetector().DetectedSignal()       |
+ * | panned                 | @ref GetPanGestureDetector().DetectedSignal()       |
+ * | pinched                | @ref GetPinchGestureDetector().DetectedSignal()     |
+ * | long-pressed           | @ref GetLongPressGestureDetector().DetectedSignal() |
  *
  * Actions
  * | %Action Name      | %Control method called                              |
@@ -104,6 +106,9 @@ public:
 
   /// @brief Key Event signal type;
   typedef Signal<bool ( Control, const KeyEvent& ) > KeyEventSignalType;
+
+  /// @brief Key InputFocusType signal type;
+  typedef Signal<void ( Control ) > KeyInputFocusSignalType;
 
 public: // Creation & Destruction
 
@@ -307,12 +312,42 @@ public:
    * @code
    *   bool YourCallbackName(Control control, const KeyEvent& event);
    * @endcode
-   * The return value of True, indicates that the touch event should be consumed.
-   * Otherwise the signal will be emitted on the next sensitive parent of the actor.
+   * The return value of True, indicates that the event should be consumed.
+   * Otherwise the signal will be emitted on the next parent of the actor.
    * @pre The Control has been initialized.
    * @return The signal to connect to.
    */
   KeyEventSignalType& KeyEventSignal();
+
+  /**
+   * @brief This signal is emitted when the control gets Key Input Focus
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool YourCallbackName( Control control );
+   * @endcode
+   * The return value of True, indicates that the event should be consumed.
+   * Otherwise the signal will be emitted on the next parent of the actor.
+   * @pre The Control has been initialized.
+   * @return The signal to connect to.
+   */
+  KeyInputFocusSignalType& KeyInputFocusGainedSignal();
+
+  /**
+   * @brief This signal is emitted when the control loses Key Input Focus
+   * which could be due to it being gained by another Control or Actor or just cleared from
+   * this control as no longer required.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool YourCallbackName( Control control );
+   * @endcode
+   * The return value of True, indicates that the event should be consumed.
+   * Otherwise the signal will be emitted on the next parent of the actor.
+   * @pre The Control has been initialized.
+   * @return The signal to connect to.
+   */
+  KeyInputFocusSignalType& KeyInputFocusLostSignal();
 
 public: // Intended for control developers
 

@@ -209,7 +209,7 @@ public:
   /**
    * @brief Sets whether this control supports two dimensional
    * keyboard navigation (i.e. whether it knows how to handle the
-   * keyboardn focus movement between its child actors).
+   * keyboard focus movement between its child actors).
    *
    * The control doesn't support it by default.
    * @param[in] isSupported Whether this control supports two dimensional keyboard navigation.
@@ -296,6 +296,15 @@ public:
    */
   virtual void OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor);
 
+  /**
+   * @brief Emits KeyInputFocusGained signal if true else emits KeyInputFocusLost signal
+   *
+   * Should be called last by the control after it acts on the Input Focus change.
+   *
+   * @param[in] focusGained True if gained, False if lost
+   */
+  void EmitKeyInputFocusSignal( bool focusGained );
+
   // Actions & Signals
 
   /**
@@ -323,6 +332,16 @@ public:
    * @copydoc Dali::Toolkit::Control::KeyEventSignal()
    */
   Toolkit::Control::KeyEventSignalType& KeyEventSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::Control::KeyInputFocusGainedSignal()
+   */
+  Toolkit::Control::KeyInputFocusSignalType& KeyInputFocusGainedSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::Control::KeyInputFocusLostSignal()
+   */
+  Toolkit::Control::KeyInputFocusSignalType& KeyInputFocusLostSignal();
 
   /**
    * @brief Called by the KeyInputFocusManager to emit key event signals.

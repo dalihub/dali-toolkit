@@ -144,6 +144,16 @@ Control::KeyEventSignalType& Control::KeyEventSignal()
   return GetImplementation().KeyEventSignal();
 }
 
+Control::KeyInputFocusSignalType& Control::KeyInputFocusGainedSignal()
+{
+  return GetImplementation().KeyInputFocusGainedSignal();
+}
+
+Control::KeyInputFocusSignalType& Control::KeyInputFocusLostSignal()
+{
+  return GetImplementation().KeyInputFocusLostSignal();
+}
+
 Control::Control(Internal::Control& implementation)
 : CustomActor(implementation)
 {

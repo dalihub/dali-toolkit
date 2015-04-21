@@ -514,6 +514,8 @@ void TextField::OnKeyInputFocusGained()
   }
 
   mController->KeyboardFocusGainEvent();
+
+  EmitKeyInputFocusSignal( true ); // Calls back into the Control hence done last.
 }
 
 void TextField::OnKeyInputFocusLost()
@@ -533,6 +535,8 @@ void TextField::OnKeyInputFocusLost()
   }
 
   mController->KeyboardFocusLostEvent();
+
+  EmitKeyInputFocusSignal( false ); // Calls back into the Control hence done last.
 }
 
 void TextField::OnTap( const TapGesture& gesture )

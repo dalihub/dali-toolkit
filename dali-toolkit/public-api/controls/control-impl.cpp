@@ -67,11 +67,13 @@ DALI_TYPE_REGISTRATION_BEGIN( Control, CustomActor, Create );
 
 // Note: Properties are registered separately below,
 
-DALI_SIGNAL_REGISTRATION( Control, "key-event",                 SIGNAL_KEY_EVENT         )
-DALI_SIGNAL_REGISTRATION( Control, "tapped",                    SIGNAL_TAPPED            )
-DALI_SIGNAL_REGISTRATION( Control, "panned",                    SIGNAL_PANNED            )
-DALI_SIGNAL_REGISTRATION( Control, "pinched",                   SIGNAL_PINCHED           )
-DALI_SIGNAL_REGISTRATION( Control, "long-pressed",              SIGNAL_LONG_PRESSED      )
+DALI_SIGNAL_REGISTRATION( Control, "key-event",                 SIGNAL_KEY_EVENT              )
+DALI_SIGNAL_REGISTRATION( Control, "key-input-focus-gained",    SIGNAL_KEY_INPUT_FOCUS_GAINED )
+DALI_SIGNAL_REGISTRATION( Control, "key-input-focus-lost",      SIGNAL_KEY_INPUT_FOCUS_LOST   )
+DALI_SIGNAL_REGISTRATION( Control, "tapped",                    SIGNAL_TAPPED                 )
+DALI_SIGNAL_REGISTRATION( Control, "panned",                    SIGNAL_PANNED                 )
+DALI_SIGNAL_REGISTRATION( Control, "pinched",                   SIGNAL_PINCHED                )
+DALI_SIGNAL_REGISTRATION( Control, "long-pressed",              SIGNAL_LONG_PRESSED           )
 
 DALI_ACTION_REGISTRATION( Control, "control-activated",         ACTION_CONTROL_ACTIVATED )
 
@@ -380,6 +382,8 @@ public:
   Background* mBackground;           ///< Only create the background if we use it
   Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;
+  Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
+  Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusLostSignal;
 
   // Gesture Detection
   PinchGestureDetector mPinchGestureDetector;
@@ -699,6 +703,14 @@ bool Control::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* t
     {
       controlImpl.KeyEventSignal().Connect( tracker, functor );
     }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_GAINED ) )
+    {
+      controlImpl.KeyInputFocusGainedSignal().Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_LOST ) )
+    {
+      controlImpl.KeyInputFocusLostSignal().Connect( tracker, functor );
+    }
     else if( 0 == strcmp( signalName.c_str(), SIGNAL_TAPPED ) )
     {
       controlImpl.EnableGestureDetection( Gesture::Tap );
@@ -731,6 +743,16 @@ bool Control::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* t
 Toolkit::Control::KeyEventSignalType& Control::KeyEventSignal()
 {
   return mImpl->mKeyEventSignal;
+}
+
+Toolkit::Control::KeyInputFocusSignalType& Control:: KeyInputFocusGainedSignal()
+{
+  return mImpl->mKeyInputFocusGainedSignal;
+}
+
+Toolkit::Control::KeyInputFocusSignalType& Control:: KeyInputFocusLostSignal()
+{
+  return mImpl->mKeyInputFocusLostSignal;
 }
 
 bool Control::EmitKeyEventSignal( const KeyEvent& event )
@@ -929,14 +951,36 @@ void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dime
 {
 }
 
+void Control::EmitKeyInputFocusSignal( bool focusGained )
+{
+  Dali::Toolkit::Control handle( GetOwner() );
+
+  if ( focusGained )
+  {
+     // signals are allocated dynamically when someone connects
+     if ( !mImpl->mKeyInputFocusGainedSignal.Empty() )
+     {
+      mImpl->mKeyInputFocusGainedSignal.Emit( handle );
+     }
+  }
+  else
+  {
+    // signals are allocated dynamically when someone connects
+    if ( !mImpl->mKeyInputFocusLostSignal.Empty() )
+    {
+      mImpl->mKeyInputFocusLostSignal.Emit( handle );
+    }
+  }
+}
+
 void Control::OnKeyInputFocusGained()
 {
-  // Do Nothing
+  EmitKeyInputFocusSignal( true );
 }
 
 void Control::OnKeyInputFocusLost()
 {
-  // Do Nothing
+  EmitKeyInputFocusSignal( false );
 }
 
 void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
