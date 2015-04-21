@@ -55,6 +55,15 @@ void TestVoidCallback()
 {
 }
 
+static bool gKeyInputFocusCallBackCalled;
+
+static void TestKeyInputFocusCallback( Control control )
+{
+  tet_infoline(" TestKeyInputFocusCallback");
+
+  gKeyInputFocusCallBackCalled = true;
+}
+
 } // namespace
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -472,6 +481,52 @@ int UtcDaliControlGestureSignals(void)
   DALI_TEST_CHECK( !control.GetLongPressGestureDetector() );
   control.ConnectSignal( &connectionTracker, "long-pressed", &TestVoidCallback );
   DALI_TEST_CHECK( control.GetLongPressGestureDetector() );
+
+  END_TEST;
+}
+
+int UtcDaliControlImplKeyInputFocusGainedSignal(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  Stage::GetCurrent().Add( control );
+
+  gKeyInputFocusCallBackCalled = false;
+  control.KeyInputFocusGainedSignal().Connect(&TestKeyInputFocusCallback);
+
+  application.SendNotification();
+  application.Render();
+
+  control.SetKeyInputFocus();
+
+  DALI_TEST_CHECK( control.HasKeyInputFocus() );
+
+  DALI_TEST_CHECK( gKeyInputFocusCallBackCalled );
+
+  END_TEST;
+}
+
+int UtcDaliControlImplKeyInputFocusLostSignal(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  Stage::GetCurrent().Add( control );
+
+  gKeyInputFocusCallBackCalled = false;
+  control.KeyInputFocusLostSignal().Connect(&TestKeyInputFocusCallback);
+
+  application.SendNotification();
+  application.Render();
+
+  control.SetKeyInputFocus();
+
+  DALI_TEST_CHECK( control.HasKeyInputFocus() );
+
+  control.ClearKeyInputFocus();
+
+  DALI_TEST_CHECK( gKeyInputFocusCallBackCalled );
 
   END_TEST;
 }
