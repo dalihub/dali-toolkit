@@ -208,7 +208,7 @@ struct Decorator::Impl : public ConnectionTracker
    * Relayout of the decorations owned by the decorator.
    * @param[in] size The Size of the UI control the decorator is adding it's decorations to.
    */
-  void Relayout( const Vector2& size, const Vector2& scrollPosition )
+  void Relayout( const Vector2& size )
   {
     // TODO - Remove this if nothing is active
     CreateActiveLayer();
@@ -217,14 +217,14 @@ struct Decorator::Impl : public ConnectionTracker
     CreateCursors();
     if( mPrimaryCursor )
     {
-      mPrimaryCursor.SetPosition( mCursor[PRIMARY_CURSOR].position.x + scrollPosition.x,
-                                  mCursor[PRIMARY_CURSOR].position.y + scrollPosition.y );
+      mPrimaryCursor.SetPosition( mCursor[PRIMARY_CURSOR].position.x,
+                                  mCursor[PRIMARY_CURSOR].position.y );
       mPrimaryCursor.SetSize( Size( 1.0f, mCursor[PRIMARY_CURSOR].cursorHeight ) );
     }
     if( mSecondaryCursor )
     {
-      mSecondaryCursor.SetPosition( mCursor[SECONDARY_CURSOR].position.x + scrollPosition.x,
-                                    mCursor[SECONDARY_CURSOR].position.y + scrollPosition.y );
+      mSecondaryCursor.SetPosition( mCursor[SECONDARY_CURSOR].position.x,
+                                    mCursor[SECONDARY_CURSOR].position.y );
       mSecondaryCursor.SetSize( Size( 1.0f, mCursor[SECONDARY_CURSOR].cursorHeight ) );
     }
 
@@ -235,8 +235,8 @@ struct Decorator::Impl : public ConnectionTracker
 
       CreateGrabHandle();
 
-      mGrabHandle.SetPosition( mCursor[PRIMARY_CURSOR].position.x + scrollPosition.x,
-                               mCursor[PRIMARY_CURSOR].position.y + mCursor[PRIMARY_CURSOR].lineHeight + scrollPosition.y );
+      mGrabHandle.SetPosition( mCursor[PRIMARY_CURSOR].position.x,
+                               mCursor[PRIMARY_CURSOR].position.y + mCursor[PRIMARY_CURSOR].lineHeight );
     }
     else if( mGrabHandle )
     {
@@ -251,12 +251,12 @@ struct Decorator::Impl : public ConnectionTracker
       CreateSelectionHandles();
 
       SelectionHandleImpl& primary = mSelectionHandle[ PRIMARY_SELECTION_HANDLE ];
-      primary.actor.SetPosition( primary.position.x + scrollPosition.x,
-                                 primary.position.y + primary.lineHeight + scrollPosition.y );
+      primary.actor.SetPosition( primary.position.x,
+                                 primary.position.y + primary.lineHeight );
 
       SelectionHandleImpl& secondary = mSelectionHandle[ SECONDARY_SELECTION_HANDLE ];
-      secondary.actor.SetPosition( secondary.position.x + scrollPosition.x,
-                                   secondary.position.y + secondary.lineHeight + scrollPosition.y );
+      secondary.actor.SetPosition( secondary.position.x,
+                                   secondary.position.y + secondary.lineHeight );
 
       CreateHighlight();
       UpdateHighlight();
@@ -288,6 +288,16 @@ struct Decorator::Impl : public ConnectionTracker
        UnparentAndReset( mCopyPastePopup );
      }
     }
+  }
+
+  void UpdatePositions( const Vector2& scrollOffset )
+  {
+    mCursor[PRIMARY_CURSOR].position += scrollOffset;
+    mCursor[SECONDARY_CURSOR].position += scrollOffset;
+    mSelectionHandle[ PRIMARY_SELECTION_HANDLE ].position += scrollOffset;
+    mSelectionHandle[ SECONDARY_SELECTION_HANDLE ].position += scrollOffset;
+
+    // TODO Highlight box??
   }
 
   void PopUpRelayoutComplete( Actor actor )
@@ -837,9 +847,14 @@ const Rect<int>& Decorator::GetBoundingBox() const
   return mImpl->mBoundingBox;
 }
 
-void Decorator::Relayout( const Vector2& size, const Vector2& scrollPosition )
+void Decorator::Relayout( const Vector2& size )
 {
-  mImpl->Relayout( size, scrollPosition );
+  mImpl->Relayout( size );
+}
+
+void Decorator::UpdatePositions( const Vector2& scrollOffset )
+{
+  mImpl->UpdatePositions( scrollOffset );
 }
 
 /** Cursor **/

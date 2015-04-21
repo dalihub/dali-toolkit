@@ -167,9 +167,15 @@ public:
    * @brief The decorator waits until a relayout before creating actors etc.
    *
    * @param[in] size The size of the parent control after size-negotiation.
-   * @param[in] scrollPosition The cursor, grab-handle positions etc. should be offset by this.
    */
-  void Relayout( const Dali::Vector2& size, const Vector2& scrollPosition );
+  void Relayout( const Dali::Vector2& size );
+
+  /**
+   * @brief Updates the decorator's actor positions after scrolling.
+   *
+   * @param[in] scrollOffset The scroll offset.
+   */
+  void UpdatePositions( const Vector2& scrollOffset );
 
   /**
    * @brief Sets which of the cursors are active.
