@@ -38,6 +38,7 @@ namespace
 
 const char* const PROPERTY_NAME_RENDERING_BACKEND = "rendering-backend";
 const char* const PROPERTY_NAME_PLACEHOLDER_TEXT = "placeholder-text";
+const char* const PROPERTY_NAME_TEXT = "text";
 const char* const PROPERTY_NAME_FONT_FAMILY = "font-family";
 const char* const PROPERTY_NAME_FONT_STYLE = "font-style";
 const char* const PROPERTY_NAME_POINT_SIZE = "point-size";
@@ -52,43 +53,128 @@ const char* const PROPERTY_NAME_DECORATION_BOUNDING_BOX = "decoration-bounding-b
 const char* const PROPERTY_NAME_HORIZONTAL_ALIGNMENT = "horizontal-alignment";
 const char* const PROPERTY_NAME_VERTICAL_ALIGNMENT = "vertical-alignment";
 
-static bool gObjectCreatedCallBackCalled;
-
-static void TestCallback(BaseHandle handle)
-{
-  gObjectCreatedCallBackCalled = true;
-}
-
 } // namespace
 
-int UtcDaliTextFieldNew(void)
+int UtcDaliToolkitTextFieldConstructorP(void)
 {
   ToolkitTestApplication application;
-  TextField field = TextField::New();
-  DALI_TEST_CHECK( field );
-
-  //Additional check to ensure object is created by checking if it's registered
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
-  DALI_TEST_CHECK( registry );
-
-  gObjectCreatedCallBackCalled = false;
-  registry.ObjectCreatedSignal().Connect(&TestCallback);
-  {
-    TextField field = TextField::New();
-  }
-  DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
+  tet_infoline(" UtcDaliToolkitTextFieldConstructorP");
+  TextField textField;
+  DALI_TEST_CHECK( !textField );
   END_TEST;
 }
 
-int UtcDaliTextFieldGetSetProperty(void)
+int UtcDaliToolkitTextFieldNewP(void)
 {
   ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldNewP");
+  TextField textField = TextField::New();
+  DALI_TEST_CHECK( textField );
+  END_TEST;
+}
+
+int UtcDaliToolkitTextFieldDownCastP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldDownCastP");
+  TextField textField1 = TextField::New();
+  BaseHandle object( textField1 );
+
+  TextField textField2 = TextField::DownCast( object );
+  DALI_TEST_CHECK( textField2 );
+
+  TextField textField3 = DownCast< TextField >( object );
+  DALI_TEST_CHECK( textField3 );
+  END_TEST;
+}
+
+int UtcDaliToolkitTextFieldDownCastN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldDownCastN");
+  BaseHandle uninitializedObject;
+  TextField textField1 = TextField::DownCast( uninitializedObject );
+  DALI_TEST_CHECK( !textField1 );
+
+  TextField textField2 = DownCast< TextField >( uninitializedObject );
+  DALI_TEST_CHECK( !textField2 );
+  END_TEST;
+}
+
+int UtcDaliToolkitTextFieldCopyConstructorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldCopyConstructorP");
+  TextField textField = TextField::New();
+  textField.SetProperty( TextField::Property::TEXT, "Test" );
+
+  TextField copy( textField );
+  DALI_TEST_CHECK( copy );
+  DALI_TEST_CHECK( copy.GetProperty<std::string>( TextLabel::Property::TEXT ) == textField.GetProperty<std::string>( TextLabel::Property::TEXT ) );
+  END_TEST;
+}
+
+int UtcDaliToolkitTextFieldAssignmentOperatorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldAssignmentOperatorP");
+  TextField textField = TextField::New();
+  textField.SetProperty( TextField::Property::TEXT, "Test" );
+
+  TextField copy = textField;
+  DALI_TEST_CHECK( copy );
+  DALI_TEST_CHECK( copy.GetProperty<std::string>( TextField::Property::TEXT ) == textField.GetProperty<std::string>( TextField::Property::TEXT ) );
+  END_TEST;
+}
+
+int UtcDaliTextFieldNewP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldNewP");
+  TextField textField = TextField::New();
+  DALI_TEST_CHECK( textField );
+  END_TEST;
+}
+
+int UtcDaliTextFieldGetPropertyN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldGetPropertyN");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  bool assert = false;
+  try
+  {
+    Property::Value value = field.GetProperty<bool>( 0 );
+  }
+  catch ( ... )
+  {
+    assert = true;
+  }
+  if ( assert )
+  {
+    tet_result(TET_PASS);
+  }
+  else
+  {
+    tet_result(TET_FAIL);
+  }
+  END_TEST;
+}
+
+// Positive test case for a method
+int UtcDaliTextFieldGetPropertyP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldGetPropertyP");
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
 
   // Check Property Indices are correct
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_RENDERING_BACKEND ) == TextField::Property::RENDERING_BACKEND );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT ) == TextField::Property::PLACEHOLDER_TEXT );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_TEXT ) == TextField::Property::TEXT );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_FONT_FAMILY ) == TextField::Property::FONT_FAMILY );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_FONT_STYLE ) == TextField::Property::FONT_STYLE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_POINT_SIZE ) == TextField::Property::POINT_SIZE );
@@ -102,6 +188,16 @@ int UtcDaliTextFieldGetSetProperty(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_DECORATION_BOUNDING_BOX ) == TextField::Property::DECORATION_BOUNDING_BOX );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_HORIZONTAL_ALIGNMENT ) == TextField::Property::HORIZONTAL_ALIGNMENT );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_VERTICAL_ALIGNMENT ) == TextField::Property::VERTICAL_ALIGNMENT );
+  END_TEST;
+}
+
+// Positive test case for a method
+int UtcDaliTextFieldSetPropertyP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldSetPropertyP");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
 
   // Check exceed policy
   field.SetProperty( TextField::Property::EXCEED_POLICY, TextField::EXCEED_POLICY_CLIP );
@@ -128,14 +224,54 @@ int UtcDaliTextFieldGetSetProperty(void)
   // Check that the Alignment properties can be correctly set
   field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "BEGIN" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::HORIZONTAL_ALIGNMENT ), "BEGIN", TEST_LOCATION );
-  field.SetProperty( TextField::Property::VERTICAL_ALIGNMENT, "TOP" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::VERTICAL_ALIGNMENT ), "TOP", TEST_LOCATION );
+  field.SetProperty( TextField::Property::VERTICAL_ALIGNMENT, "CENTER" );
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::VERTICAL_ALIGNMENT ), "CENTER", TEST_LOCATION );
+
+  // Set text
+  field.SetProperty( TextField::Property::TEXT, "Setting Text" );
+
+  // Set placeholder text (currently not implemented)
+  field.SetProperty( TextField::Property::PLACEHOLDER_TEXT, "Setting Text" );
+
+  // Set Grab Handle image
+  field.SetProperty( TextField::Property::GRAB_HANDLE_IMAGE, "" );
+
   END_TEST;
 }
 
-int utcDaliTextFieldBasicRender(void)
+// Negative test case for a method
+int UtcDaliTextFieldSetPropertyN(void)
 {
   ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldSetPropertyN");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  bool assert = false;
+  try
+  {
+    field.SetProperty( 0, true );
+  }
+  catch ( ... )
+  {
+    assert = true;
+  }
+  if ( assert )
+  {
+    tet_result(TET_PASS);
+  }
+  else
+  {
+    tet_result(TET_FAIL);
+  }
+  END_TEST;
+}
+
+// Positive Basic Text Renderer test
+int utcDaliTextFieldBasicRenderP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliToolkitTextFieldBasicRenderP");
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
 
@@ -155,9 +291,13 @@ int utcDaliTextFieldBasicRender(void)
   END_TEST;
 }
 
-int utcDaliTextFieldAtlasRender(void)
+// Positive Atlas Text Renderer test
+int utcDaliTextFieldAtlasRenderP(void)
 {
   ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextFieldAtlasRenderP");
+  StyleManager styleManager = StyleManager::Get();
+  styleManager.RequestDefaultTheme();
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
 

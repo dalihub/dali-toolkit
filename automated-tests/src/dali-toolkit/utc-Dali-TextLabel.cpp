@@ -49,38 +49,114 @@ const char* const PROPERTY_NAME_SHADOW_OFFSET = "shadow-offset";
 const char* const PROPERTY_NAME_SHADOW_COLOR = "shadow-color";
 const char* const PROPERTY_NAME_UNDERLINE_ENABLED = "underline-enabled";
 const char* const PROPERTY_NAME_UNDERLINE_COLOR = "underline-color";
-
-static bool gObjectCreatedCallBackCalled;
-
-static void TestCallback(BaseHandle handle)
-{
-  gObjectCreatedCallBackCalled = true;
-}
+const char* const PROPERTY_NAME_UNDERLINE_HEIGHT = "underline-height";
 
 } // namespace
 
-int UtcDaliTextLabelNew(void)
+int UtcDaliToolkitTextLabelConstructorP(void)
 {
   ToolkitTestApplication application;
-  TextLabel label = TextLabel::New("Test Text");
-  DALI_TEST_CHECK( label );
-
-  //Additional check to ensure object is created by checking if it's registered
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
-  DALI_TEST_CHECK( registry );
-
-  gObjectCreatedCallBackCalled = false;
-  registry.ObjectCreatedSignal().Connect(&TestCallback);
-  {
-    TextLabel label = TextLabel::New("Test Text");
-  }
-  DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
+  tet_infoline(" UtcDaliToolkitTextLabelConstructorP");
+  TextLabel textLabel;
+  DALI_TEST_CHECK( !textLabel );
   END_TEST;
 }
 
-int UtcDaliTextLabelGetSetProperty(void)
+int UtcDaliToolkitTextLabelNewP(void)
 {
   ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelNewP");
+  TextLabel textLabel = TextLabel::New( "Test Text" );
+  DALI_TEST_CHECK( textLabel );
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelDownCastP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelDownCastP");
+  TextLabel textLabel1 = TextLabel::New();
+  BaseHandle object( textLabel1 );
+
+  TextLabel textLabel2 = TextLabel::DownCast( object );
+  DALI_TEST_CHECK( textLabel2 );
+
+  TextLabel textLabel3 = DownCast< TextLabel >( object );
+  DALI_TEST_CHECK( textLabel3 );
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelDownCastN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelDownCastN");
+  BaseHandle uninitializedObject;
+  TextLabel textLabel1 = TextLabel::DownCast( uninitializedObject );
+  DALI_TEST_CHECK( !textLabel1 );
+
+  TextLabel textLabel2 = DownCast< TextLabel >( uninitializedObject );
+  DALI_TEST_CHECK( !textLabel2 );
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelCopyConstructorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelCopyConstructorP");
+  TextLabel textLabel = TextLabel::New();
+  textLabel.SetProperty( TextLabel::Property::TEXT_COLOR, Color::RED );
+
+  TextLabel copy( textLabel );
+  DALI_TEST_CHECK( copy );
+  DALI_TEST_CHECK( copy.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ) == textLabel.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ) );
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelAssignmentOperatorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelAssingmentOperatorP");
+  TextLabel textLabel = TextLabel::New();
+  textLabel.SetProperty( TextLabel::Property::TEXT_COLOR, Color::RED );
+
+  TextLabel copy = textLabel;
+  DALI_TEST_CHECK( copy );
+  DALI_TEST_CHECK( copy.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ) == textLabel.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ) );
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelGetPropertyN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelGetPropertyN");
+  TextLabel label = TextLabel::New("Test Text");
+  DALI_TEST_CHECK( label );
+
+  bool assert = false;
+  try
+  {
+    Property::Value value = label.GetProperty<bool>( 0 );
+  }
+  catch ( ... )
+  {
+    assert = true;
+  }
+  if ( assert )
+  {
+    tet_result(TET_PASS);
+  }
+  else
+  {
+    tet_result(TET_FAIL);
+  }
+  END_TEST;
+}
+
+// Positive test case for a method
+int UtcDaliToolkitTextLabelGetPropertyP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelGetPropertyP");
   TextLabel label = TextLabel::New("Test Text");
   DALI_TEST_CHECK( label );
 
@@ -98,6 +174,7 @@ int UtcDaliTextLabelGetSetProperty(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_SHADOW_COLOR ) == TextLabel::Property::SHADOW_COLOR );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_ENABLED ) == TextLabel::Property::UNDERLINE_ENABLED );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_COLOR ) == TextLabel::Property::UNDERLINE_COLOR );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_HEIGHT) == TextLabel::Property::UNDERLINE_HEIGHT );
 
   // Check label defaults are correct
   DALI_TEST_EQUALS( label.GetProperty<int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
@@ -105,6 +182,43 @@ int UtcDaliTextLabelGetSetProperty(void)
   DALI_TEST_EQUALS( label.GetProperty<Vector2>( TextLabel::Property::SHADOW_OFFSET ), Vector2::ZERO, TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::SHADOW_COLOR ), Vector4::ZERO, TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty<bool>( TextLabel::Property::UNDERLINE_ENABLED ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::UNDERLINE_HEIGHT ), 0.0f, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelSetPropertyN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelSetPropertyN");
+  TextLabel label = TextLabel::New("Test Text");
+  DALI_TEST_CHECK( label );
+
+  bool assert = false;
+  try
+  {
+    label.SetProperty( 0, true );
+  }
+  catch ( ... )
+  {
+    assert = true;
+  }
+  if ( assert )
+  {
+    tet_result(TET_PASS);
+  }
+  else
+  {
+    tet_result(TET_FAIL);
+  }
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelSetPropertyP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelSetPropertyP");
+  TextLabel label = TextLabel::New("Test Text");
+  DALI_TEST_CHECK( label );
 
   // Check that text can be correctly reset
   label.SetProperty( TextLabel::Property::TEXT, "Setting Text" );
@@ -127,6 +241,12 @@ int UtcDaliTextLabelGetSetProperty(void)
   DALI_TEST_EQUALS( label.GetProperty<bool>( TextLabel::Property::UNDERLINE_ENABLED ), true, TEST_LOCATION );
   label.SetProperty( TextLabel::Property::UNDERLINE_COLOR, Color::RED );
   DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::UNDERLINE_COLOR ), Color::RED, TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::UNDERLINE_HEIGHT, 1.0f );
+  DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::UNDERLINE_HEIGHT ), 1.0f, TEST_LOCATION );
+
+  // Check that text color can be properly set
+  label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::BLUE );
+  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ), Color::BLUE, TEST_LOCATION );
 
   // Toggle multi-line
   label.SetProperty( TextLabel::Property::MULTI_LINE, true );
@@ -134,9 +254,10 @@ int UtcDaliTextLabelGetSetProperty(void)
   END_TEST;
 }
 
-int utcDaliTextlabelBasicRender(void)
+int UtcDaliToolkitTextlabelBasicRenderP(void)
 {
   ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelBasicRenderP");
   TextLabel label = TextLabel::New("Test Text");
   DALI_TEST_CHECK( label );
 
@@ -157,9 +278,10 @@ int utcDaliTextlabelBasicRender(void)
   END_TEST;
 }
 
-int utcDaliTextlabelAtlasRender(void)
+int UtcDaliToolkitTextlabelAtlasRenderP(void)
 {
   ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelAtlasRenderP");
   TextLabel label = TextLabel::New("Test Text");
   DALI_TEST_CHECK( label );
 
