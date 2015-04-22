@@ -207,36 +207,38 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
           // Create a new image for the glyph
           BufferImage bitmap = mFontClient.CreateBitmap( glyph.fontId, glyph.index );
-
-          // Ensure that the next image will fit into the current block size
-          bool setSize = false;
-          if ( bitmap.GetWidth() > mBlockSizes[ currentBlockSize ].mNeededBlockWidth )
+          if ( bitmap )
           {
-            setSize = true;
-            mBlockSizes[ currentBlockSize ].mNeededBlockWidth = bitmap.GetWidth();
-          }
-          if ( bitmap.GetHeight() > mBlockSizes[ currentBlockSize ].mNeededBlockHeight )
-          {
-            setSize = true;
-            mBlockSizes[ currentBlockSize ].mNeededBlockHeight = bitmap.GetHeight();
-          }
+            // Ensure that the next image will fit into the current block size
+            bool setSize = false;
+            if ( bitmap.GetWidth() > mBlockSizes[ currentBlockSize ].mNeededBlockWidth )
+            {
+              setSize = true;
+              mBlockSizes[ currentBlockSize ].mNeededBlockWidth = bitmap.GetWidth();
+            }
+            if ( bitmap.GetHeight() > mBlockSizes[ currentBlockSize ].mNeededBlockHeight )
+            {
+              setSize = true;
+              mBlockSizes[ currentBlockSize ].mNeededBlockHeight = bitmap.GetHeight();
+            }
 
-          if ( setSize )
-          {
-            mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
-                                           DEFAULT_ATLAS_HEIGHT,
-                                           mBlockSizes[ currentBlockSize ].mNeededBlockWidth,
-                                           mBlockSizes[ currentBlockSize ].mNeededBlockHeight );
-          }
+            if ( setSize )
+            {
+              mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
+                                             DEFAULT_ATLAS_HEIGHT,
+                                             mBlockSizes[ currentBlockSize ].mNeededBlockWidth,
+                                             mBlockSizes[ currentBlockSize ].mNeededBlockHeight );
+            }
 
-          // Locate a new slot for our glyph
-          mGlyphManager.Add( glyph, bitmap, slot );
+            // Locate a new slot for our glyph
+            mGlyphManager.Add( glyph, bitmap, slot );
 
-          // Generate mesh data for this quad, plugging in our supplied position
-          if ( slot.mImageId )
-          {
-            mGlyphManager.GenerateMeshData( slot.mImageId, position, newMeshData );
-            mImageIds.PushBack( slot.mImageId );
+            // Generate mesh data for this quad, plugging in our supplied position
+            if ( slot.mImageId )
+            {
+              mGlyphManager.GenerateMeshData( slot.mImageId, position, newMeshData );
+              mImageIds.PushBack( slot.mImageId );
+            }
           }
         }
         // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
@@ -248,7 +250,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                         currentUnderlinePosition,
                         currentUnderlineThickness,
                         slot );
-       lastFontId = glyph.fontId;
+        lastFontId = glyph.fontId;
       }
     }
 
