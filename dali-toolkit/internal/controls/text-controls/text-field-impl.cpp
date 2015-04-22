@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <cstring>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/resource-image.h>
@@ -85,6 +86,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "text",                         
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "font-family",                          STRING,    FONT_FAMILY                          )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "font-style",                           STRING,    FONT_STYLE                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "point-size",                           FLOAT,     POINT_SIZE                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "max-length",                           INTEGER,   MAX_LENGTH                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "exceed-policy",                        INTEGER,   EXCEED_POLICY                        )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "horizontal-alignment",                 STRING,    HORIZONTAL_ALIGNMENT                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "vertical-alignment",                   STRING,    VERTICAL_ALIGNMENT                   )
@@ -106,6 +108,8 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-right", STRING,    SELECTION_HANDLE_PRESSED_IMAGE_RIGHT )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-highlight-color",            STRING,    SELECTION_HIGHLIGHT_COLOR            )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decoration-bounding-box",              RECTANGLE, DECORATION_BOUNDING_BOX              )
+
+DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "max-length-reached", SIGNAL_MAX_LENGTH_REACHED )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -415,6 +419,14 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::TextField::Property::MAX_LENGTH:
+      {
+        if( impl.mController )
+        {
+          impl.mController->SetMaximumNumberOfCharacters( value.Get< int >() );
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -646,10 +658,43 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::TextField::Property::MAX_LENGTH:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetMaximumNumberOfCharacters();
+        }
+        break;
+      }
     } //switch
   }
 
   return value;
+}
+
+bool TextField::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+{
+  Dali::BaseHandle handle( object );
+
+  bool connected( true );
+  Toolkit::TextField field = Toolkit::TextField::DownCast( handle );
+
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_MAX_LENGTH_REACHED ) )
+  {
+    field.MaxLengthReachedSignal().Connect( tracker, functor );
+  }
+  else
+  {
+    // signalName does not match any signal
+    connected = false;
+  }
+
+  return connected;
+}
+
+Toolkit::TextField::MaxLengthReachedSignalType& TextField::MaxLengthReachedSignal()
+{
+  return mMaxLengthReachedSignal;
 }
 
 void TextField::OnInitialize()
@@ -840,6 +885,12 @@ ImfManager::ImfCallbackData TextField::OnImfEvent( Dali::ImfManager& imfManager,
 void TextField::RequestTextRelayout()
 {
   RelayoutRequest();
+}
+
+void TextField::MaxLengthReached()
+{
+  Dali::Toolkit::TextField handle( GetOwner() );
+  mMaxLengthReachedSignal.Emit( handle );
 }
 
 void TextField::EnableClipping( bool clipping, const Vector2& size )

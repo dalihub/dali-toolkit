@@ -34,6 +34,12 @@ class TextField;
 
 /**
  * @brief A control which provides a single-line editable text field.
+ *
+ *  * Signals
+ * | %Signal Name           | Method                                              |
+ * |------------------------|-----------------------------------------------------|
+ * | max-length-reached     | @ref MaxLengthReachedSignal()                       |
+ *
  */
 class DALI_IMPORT_API TextField : public Control
 {
@@ -61,7 +67,8 @@ public:
       FONT_FAMILY,                              ///< name "font-family",                         The requested font family,                                                type STRING
       FONT_STYLE,                               ///< name "font-style",                          The requested font style e.g. Regular/Italic,                             type STRING
       POINT_SIZE,                               ///< name "point-size",                          The size of font in points,                                               type FLOAT
-      EXCEED_POLICY,                            ///< name "exceed-policy"                        Specifies how the text is truncated when it does not fit,                 type INT
+      MAX_LENGTH,                               ///< name "max-length"                           The maximum number of characters that can be inserted,                    type INTEGER
+      EXCEED_POLICY,                            ///< name "exceed-policy"                        Specifies how the text is truncated when it does not fit,                 type INTEGER
       HORIZONTAL_ALIGNMENT,                     ///< name "horizontal-alignment",                The line horizontal alignment,                                            type STRING,  values "BEGIN", "CENTER", "END"
       VERTICAL_ALIGNMENT,                       ///< name "vertical-alignment",                  The line vertical alignment,                                              type STRING,  values   "TOP",   "CENTER",   "BOTTOM"
       TEXT_COLOR,                               ///< name "text-color",                          The text color,                                                           type VECTOR4
@@ -81,7 +88,7 @@ public:
       SELECTION_HANDLE_PRESSED_IMAGE_LEFT,      ///< name "selection-handle-pressed-image-left"  The image to display when the left selection handle is pressed,           type STRING
       SELECTION_HANDLE_PRESSED_IMAGE_RIGHT,     ///< name "selection-handle-pressed-image-right" The image to display when the right selection handle is pressed,          type STRING
       SELECTION_HIGHLIGHT_COLOR,                ///< name "selection-highlight-color"            The color of the selection highlight,                                     type VECTOR4
-      DECORATION_BOUNDING_BOX                   ///< name "decoration-bounding-box",             The decorations (handles etc) will positioned within this area on-screen, type RECTANGLE
+      DECORATION_BOUNDING_BOX                   ///< name "decoration-bounding-box"              The decorations (handles etc) will positioned within this area on-screen, type RECTANGLE
     };
   };
 
@@ -95,6 +102,11 @@ public:
     EXCEED_POLICY_ORIGINAL,        ///< The text will be display at original size, and may exceed the TextField boundary.
     EXCEED_POLICY_CLIP             ///< The end of text will be clipped to fit within the TextField.
   };
+
+  // Type Defs
+
+  /// @brief Max Characters Exceed signal type;
+  typedef Signal<void ( TextField ) > MaxLengthReachedSignalType;
 
   /**
    * Create the TextField control.
@@ -139,6 +151,19 @@ public:
    * @return handle to a TextField or an empty handle
    */
   static TextField DownCast( BaseHandle handle );
+
+  // Signals
+
+  /**
+   * @brief This signal is emitted when inserted text exceeds the maximum character limit.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName( TextField textField );
+   * @endcode
+   * @return The signal to connect to.
+   */
+  MaxLengthReachedSignalType& MaxLengthReachedSignal();
 
 public: // Not intended for application developers
 

@@ -71,6 +71,22 @@ public:
    */
   static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
+  /**
+   * Connects a callback function with the object's signals.
+   * @param[in] object The object providing the signal.
+   * @param[in] tracker Used to disconnect the signal.
+   * @param[in] signalName The signal to connect to.
+   * @param[in] functor A newly allocated FunctorDelegate.
+   * @return True if the signal was connected.
+   * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
+   */
+  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+
+  /**
+   * @copydoc TextField::MaxLengthReachedSignal()
+   */
+  Toolkit::TextField::MaxLengthReachedSignalType&  MaxLengthReachedSignal();
+
 private: // From Control
 
   /**
@@ -137,6 +153,11 @@ private: // From Control
    */
   virtual void RequestTextRelayout();
 
+  /**
+   * @copydoc Text::ControlInterface::MaxLengthReached()
+   */
+  virtual void MaxLengthReached();
+
 private: // Implementation
 
   /**
@@ -164,13 +185,14 @@ private: // Implementation
    */
   virtual ~TextField();
 
-private:
-
   // Undefined copy constructor and assignment operators
   TextField(const TextField&);
   TextField& operator=(const TextField& rhs);
 
 private: // Data
+
+  // Signals
+  Toolkit::TextField::MaxLengthReachedSignalType mMaxLengthReachedSignal;
 
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;

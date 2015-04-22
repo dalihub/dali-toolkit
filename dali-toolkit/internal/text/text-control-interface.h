@@ -48,6 +48,11 @@ public:
    * @brief Called to request a text relayout.
    */
   virtual void RequestTextRelayout() = 0;
+
+  /**
+   * @brief Called when the number of characters to be inserted exceeds the maximum limit
+   */
+  virtual void MaxLengthReached() = 0;
 };
 
 } // namespace Text

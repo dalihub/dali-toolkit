@@ -106,6 +106,19 @@ void Controller::GetPlaceholderText( std::string& text ) const
   }
 }
 
+void Controller::SetMaximumNumberOfCharacters( int maxCharacters )
+{
+  if ( maxCharacters >= 0 )
+  {
+    mImpl->mMaximumNumberOfCharacters = maxCharacters;
+  }
+}
+
+int Controller::GetMaximumNumberOfCharacters()
+{
+  return mImpl->mMaximumNumberOfCharacters;
+}
+
 void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
 {
   if( !mImpl->mFontDefaults )
@@ -597,21 +610,26 @@ void Controller::InsertTextEvent( const std::string& text )
   Length characterCount = Utf8ToUtf32( utf8, text.size(), utf32Characters.Begin() );
   utf32Characters.Resize( characterCount );
 
+  const Length numberOfCharactersInModel = mImpl->mLogicalModel->GetNumberOfCharacters();
+
+  // Restrict new text to fit within Maximum characters setting
+  Length maxSizeOfNewText = std::min ( ( mImpl->mMaximumNumberOfCharacters - numberOfCharactersInModel ), characterCount );
+
   // Insert at current cursor position
-  Vector<Character>& modifyText = mImpl->mLogicalModel->mText;
   CharacterIndex& cursorIndex = mImpl->mEventData->mPrimaryCursorPosition;
 
-  if( cursorIndex < modifyText.Count() )
+  Vector<Character>& modifyText = mImpl->mLogicalModel->mText;
+
+  if( cursorIndex < numberOfCharactersInModel )
   {
-    modifyText.Insert( modifyText.Begin() + cursorIndex, utf32Characters.Begin(), utf32Characters.End() );
+    modifyText.Insert( modifyText.Begin() + cursorIndex, utf32Characters.Begin(), utf32Characters.Begin()+ maxSizeOfNewText );
   }
   else
   {
-    modifyText.Insert( modifyText.End(), utf32Characters.Begin(), utf32Characters.End() );
+    modifyText.Insert( modifyText.End(), utf32Characters.Begin(), utf32Characters.Begin() + maxSizeOfNewText );
   }
 
-  // Advance the cursor position
-  ++cursorIndex;
+  cursorIndex += maxSizeOfNewText;
 
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
@@ -627,6 +645,11 @@ void Controller::InsertTextEvent( const std::string& text )
   // Queue a cursor reposition event; this must wait until after DoRelayout()
   mImpl->mEventData->mUpdateCursorPosition = true;
   mImpl->mEventData->mScrollAfterUpdateCursorPosition = true;
+
+  if ( characterCount > maxSizeOfNewText )
+  {
+    mImpl->mControlInterface.MaxLengthReached();
+  }
 }
 
 void Controller::DeleteTextEvent()

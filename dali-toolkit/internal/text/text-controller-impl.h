@@ -195,6 +195,7 @@ struct Controller::Impl
     mControlSize(),
     mAlignmentOffset(),
     mOperationsPending( NO_OPERATION ),
+    mMaximumNumberOfCharacters( 50 ),
     mRecalculateNaturalSize( true )
   {
     mLogicalModel = LogicalModel::New();
@@ -221,7 +222,6 @@ struct Controller::Impl
    * @brief Request a relayout using the ControlInterface.
    */
   void RequestRelayout();
-
 
   /**
    * @brief Helper to move the cursor, grab handle etc.
@@ -330,6 +330,7 @@ struct Controller::Impl
   Size mControlSize;                       ///< The size of the control.
   Vector2 mAlignmentOffset;                ///< Vertical and horizontal offset of the whole text inside the control due to alignment.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
+  Length mMaximumNumberOfCharacters;       ///< Maximum number of characters that can be inserted.
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
 };
 

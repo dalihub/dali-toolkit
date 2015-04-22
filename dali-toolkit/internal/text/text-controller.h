@@ -123,6 +123,20 @@ public:
   void GetPlaceholderText( std::string& text ) const;
 
   /**
+   * @brief Sets the maximum number of characters that can be inserted into the TextModel
+   *
+   * @param[in] maxCharacters maximum number of characters to be accepted
+   */
+  void SetMaximumNumberOfCharacters( int maxCharacters );
+
+  /**
+   * @brief Sets the maximum number of characters that can be inserted into the TextModel
+   *
+   * @param[in] maxCharacters maximum number of characters to be accepted
+   */
+  int GetMaximumNumberOfCharacters();
+
+  /**
    * @brief Set the default font family.
    *
    * @param[in] defaultFontFamily The default font family.

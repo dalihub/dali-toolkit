@@ -36,22 +36,22 @@ void dali_textfield_cleanup(void)
 namespace
 {
 
-const char* const PROPERTY_NAME_RENDERING_BACKEND = "rendering-backend";
-const char* const PROPERTY_NAME_PLACEHOLDER_TEXT = "placeholder-text";
-const char* const PROPERTY_NAME_TEXT = "text";
-const char* const PROPERTY_NAME_FONT_FAMILY = "font-family";
-const char* const PROPERTY_NAME_FONT_STYLE = "font-style";
-const char* const PROPERTY_NAME_POINT_SIZE = "point-size";
-const char* const PROPERTY_NAME_EXCEED_POLICY = "exceed-policy";
-const char* const PROPERTY_NAME_PRIMARY_CURSOR_COLOR = "primary-cursor-color";
-const char* const PROPERTY_NAME_SECONDARY_CURSOR_COLOR = "secondary-cursor-color";
-const char* const PROPERTY_NAME_ENABLE_CURSOR_BLINK = "enable-cursor-blink";
-const char* const PROPERTY_NAME_CURSOR_BLINK_INTERVAL = "cursor-blink-interval";
-const char* const PROPERTY_NAME_CURSOR_BLINK_DURATION = "cursor-blink-duration";
-const char* const PROPERTY_NAME_GRAB_HANDLE_IMAGE = "grab-handle-image";
+const char* const PROPERTY_NAME_RENDERING_BACKEND       = "rendering-backend";
+const char* const PROPERTY_NAME_PLACEHOLDER_TEXT        = "placeholder-text";
+const char* const PROPERTY_NAME_TEXT                    = "text";
+const char* const PROPERTY_NAME_FONT_FAMILY             = "font-family";
+const char* const PROPERTY_NAME_FONT_STYLE              = "font-style";
+const char* const PROPERTY_NAME_POINT_SIZE              = "point-size";
+const char* const PROPERTY_NAME_EXCEED_POLICY           = "exceed-policy";
+const char* const PROPERTY_NAME_PRIMARY_CURSOR_COLOR    = "primary-cursor-color";
+const char* const PROPERTY_NAME_SECONDARY_CURSOR_COLOR  = "secondary-cursor-color";
+const char* const PROPERTY_NAME_ENABLE_CURSOR_BLINK     = "enable-cursor-blink";
+const char* const PROPERTY_NAME_CURSOR_BLINK_INTERVAL   = "cursor-blink-interval";
+const char* const PROPERTY_NAME_CURSOR_BLINK_DURATION   = "cursor-blink-duration";
+const char* const PROPERTY_NAME_GRAB_HANDLE_IMAGE       = "grab-handle-image";
 const char* const PROPERTY_NAME_DECORATION_BOUNDING_BOX = "decoration-bounding-box";
-const char* const PROPERTY_NAME_HORIZONTAL_ALIGNMENT = "horizontal-alignment";
-const char* const PROPERTY_NAME_VERTICAL_ALIGNMENT = "vertical-alignment";
+const char* const PROPERTY_NAME_HORIZONTAL_ALIGNMENT    = "horizontal-alignment";
+const char* const PROPERTY_NAME_VERTICAL_ALIGNMENT      = "vertical-alignment";
 
 } // namespace
 
@@ -235,6 +235,11 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   // Set Grab Handle image
   field.SetProperty( TextField::Property::GRAB_HANDLE_IMAGE, "" );
+
+  // Check that the MAX_LENGTH property can be correctly set
+  const int maxNumberOfCharacters = 20;
+  field.SetProperty( TextField::Property::MAX_LENGTH, maxNumberOfCharacters );
+  DALI_TEST_EQUALS( field.GetProperty<int>( TextField::Property::MAX_LENGTH ), maxNumberOfCharacters, TEST_LOCATION );
 
   END_TEST;
 }
