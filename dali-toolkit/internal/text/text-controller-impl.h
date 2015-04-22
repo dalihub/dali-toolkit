@@ -105,34 +105,35 @@ struct EventData
 
   ~EventData();
 
-  DecoratorPtr mDecorator;
-  std::string  mPlaceholderText;
+  DecoratorPtr       mDecorator;               ///< Pointer to the decorator
+  std::string        mPlaceholderText;         ///< The plaxe holder text
 
   /**
    * This is used to delay handling events until after the model has been updated.
    * The number of updates to the model is minimized to improve performance.
    */
-  std::vector<Event> mEventQueue; ///< The queue of touch events etc.
+  std::vector<Event> mEventQueue;              ///< The queue of touch events etc.
 
   /**
    * 0,0 means that the top-left corner of the layout matches the top-left corner of the UI control.
    * Typically this will have a negative value with scrolling occurs.
    */
-  Vector2 mScrollPosition; ///< The text is offset by this position when scrolling.
+  Vector2            mScrollPosition;          ///< The text is offset by this position when scrolling.
 
-  State mState; ///< Selection mode, edit mode etc.
+  State              mState;                   ///< Selection mode, edit mode etc.
 
-  CharacterIndex mPrimaryCursorPosition;   ///< Index into logical model for primary cursor
-  CharacterIndex mSecondaryCursorPosition; ///< Index into logical model for secondary cursor
+  CharacterIndex     mPrimaryCursorPosition;   ///< Index into logical model for primary cursor.
+  CharacterIndex     mSecondaryCursorPosition; ///< Index into logical model for secondary cursor.
 
-  bool mDecoratorUpdated           : 1; ///< True if the decorator was updated during event processing
-  bool mCursorBlinkEnabled         : 1; ///< True if cursor should blink when active
-  bool mGrabHandleEnabled          : 1; ///< True if grab handle is enabled
-  bool mGrabHandlePopupEnabled     : 1; ///< True if the grab handle popu-up should be shown
-  bool mSelectionEnabled           : 1; ///< True if selection handles, highlight etc. are enabled
-  bool mHorizontalScrollingEnabled : 1; ///< True if horizontal scrolling is enabled
-  bool mVerticalScrollingEnabled   : 1; ///< True if vertical scrolling is enabled
-  bool mUpdateCursorPosition       : 1; ///< True if the visual position of the cursor must be recalculated
+  bool mDecoratorUpdated                : 1;   ///< True if the decorator was updated during event processing.
+  bool mCursorBlinkEnabled              : 1;   ///< True if cursor should blink when active.
+  bool mGrabHandleEnabled               : 1;   ///< True if grab handle is enabled.
+  bool mGrabHandlePopupEnabled          : 1;   ///< True if the grab handle popu-up should be shown.
+  bool mSelectionEnabled                : 1;   ///< True if selection handles, highlight etc. are enabled.
+  bool mHorizontalScrollingEnabled      : 1;   ///< True if horizontal scrolling is enabled.
+  bool mVerticalScrollingEnabled        : 1;   ///< True if vertical scrolling is enabled.
+  bool mUpdateCursorPosition            : 1;   ///< True if the visual position of the cursor must be recalculated.
+  bool mScrollAfterUpdateCursorPosition : 1;   ///< Whether to scroll after the cursor position is updated.
 };
 
 struct ModifyEvent
@@ -274,7 +275,35 @@ struct Controller::Impl
    */
   CharacterIndex CalculateNewCursorIndex( CharacterIndex index ) const;
 
+  /**
+   * @brief Updates the cursor position.
+   *
+   * Retrieves the x,y position of the cursor logical position and sets it into the decorator.
+   * It sets the position of the secondary cursor if it's a valid one.
+   * Sets which cursors are active.
+   */
   void UpdateCursorPosition();
+
+  /**
+   * @biref Clamps the horizontal scrolling to get the control always filled with text.
+   *
+   * @param[in] actualSize The size of the laid out text.
+   */
+  void ClampHorizontalScroll( const Vector2& actualSize );
+
+  /**
+   * @biref Clamps the vertical scrolling to get the control always filled with text.
+   *
+   * @param[in] actualSize The size of the laid out text.
+   */
+  void ClampVerticalScroll( const Vector2& actualSize );
+
+  /**
+   * @brief Scrolls the text to make the cursor visible.
+   *
+   * This method is called after inserting, deleting or moving the cursor with the keypad.
+   */
+  void ScrollToMakeCursorVisible();
 
   ControlInterface& mControlInterface;     ///< Reference to the text controller.
   LogicalModelPtr mLogicalModel;           ///< Pointer to the logical model.

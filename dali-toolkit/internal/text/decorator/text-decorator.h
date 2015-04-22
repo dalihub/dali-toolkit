@@ -215,6 +215,15 @@ public:
   void GetPosition( Cursor cursor, float& x, float& y, float& cursorHeight, float& lineHeight ) const;
 
   /**
+   * @brief Retrieves the position of a cursor.
+   *
+   * @param[in] cursor The cursor to get.
+   *
+   * @return The position.
+   */
+  const Vector2& GetPosition( Cursor cursor ) const;
+
+  /**
    * @brief Sets the color for a cursor.
    *
    * @param[in] cursor Whether this color is for the primary or secondary cursor.

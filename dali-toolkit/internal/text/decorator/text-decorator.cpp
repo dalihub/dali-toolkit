@@ -200,7 +200,9 @@ struct Decorator::Impl : public ConnectionTracker
     mActiveGrabHandle( false ),
     mActiveSelection( false ),
     mActiveCopyPastePopup( false ),
-    mCursorBlinkStatus( true )
+    mCursorBlinkStatus( true ),
+    mPrimaryCursorVisible( false ),
+    mSecondaryCursorVisible( false )
   {
   }
 
@@ -217,26 +219,42 @@ struct Decorator::Impl : public ConnectionTracker
     CreateCursors();
     if( mPrimaryCursor )
     {
-      mPrimaryCursor.SetPosition( mCursor[PRIMARY_CURSOR].position.x,
-                                  mCursor[PRIMARY_CURSOR].position.y );
-      mPrimaryCursor.SetSize( Size( 1.0f, mCursor[PRIMARY_CURSOR].cursorHeight ) );
+      mPrimaryCursorVisible = ( mCursor[PRIMARY_CURSOR].position.x <= size.width ) && ( mCursor[PRIMARY_CURSOR].position.x >= 0.f );
+      if( mPrimaryCursorVisible )
+      {
+        mPrimaryCursor.SetPosition( mCursor[PRIMARY_CURSOR].position.x,
+                                    mCursor[PRIMARY_CURSOR].position.y );
+        mPrimaryCursor.SetSize( Size( 1.0f, mCursor[PRIMARY_CURSOR].cursorHeight ) );
+      }
+      mPrimaryCursor.SetVisible( mPrimaryCursorVisible );
     }
     if( mSecondaryCursor )
     {
-      mSecondaryCursor.SetPosition( mCursor[SECONDARY_CURSOR].position.x,
-                                    mCursor[SECONDARY_CURSOR].position.y );
-      mSecondaryCursor.SetSize( Size( 1.0f, mCursor[SECONDARY_CURSOR].cursorHeight ) );
+      mSecondaryCursorVisible = ( mCursor[SECONDARY_CURSOR].position.x <= size.width ) && ( mCursor[SECONDARY_CURSOR].position.x >= 0.f );
+      if( mSecondaryCursorVisible )
+      {
+        mSecondaryCursor.SetPosition( mCursor[SECONDARY_CURSOR].position.x,
+                                      mCursor[SECONDARY_CURSOR].position.y );
+        mSecondaryCursor.SetSize( Size( 1.0f, mCursor[SECONDARY_CURSOR].cursorHeight ) );
+      }
+      mSecondaryCursor.SetVisible( mSecondaryCursorVisible );
     }
 
     // Show or hide the grab handle
     if( mActiveGrabHandle )
     {
-      SetupTouchEvents();
+      const bool isVisible = ( mCursor[PRIMARY_CURSOR].position.x <= size.width ) && ( mCursor[PRIMARY_CURSOR].position.x >= 0.f );
 
-      CreateGrabHandle();
+      if( isVisible )
+      {
+        SetupTouchEvents();
 
-      mGrabHandle.SetPosition( mCursor[PRIMARY_CURSOR].position.x,
-                               mCursor[PRIMARY_CURSOR].position.y + mCursor[PRIMARY_CURSOR].lineHeight );
+        CreateGrabHandle();
+
+        mGrabHandle.SetPosition( mCursor[PRIMARY_CURSOR].position.x,
+                                 mCursor[PRIMARY_CURSOR].position.y + mCursor[PRIMARY_CURSOR].lineHeight );
+      }
+      mGrabHandle.SetVisible( isVisible );
     }
     else if( mGrabHandle )
     {
@@ -371,11 +389,11 @@ struct Decorator::Impl : public ConnectionTracker
     // Cursor blinking
     if ( mPrimaryCursor )
     {
-      mPrimaryCursor.SetVisible( mCursorBlinkStatus );
+      mPrimaryCursor.SetVisible( mPrimaryCursorVisible && mCursorBlinkStatus );
     }
     if ( mSecondaryCursor )
     {
-      mSecondaryCursor.SetVisible( mCursorBlinkStatus );
+      mSecondaryCursor.SetVisible( mSecondaryCursorVisible && mCursorBlinkStatus );
     }
 
     mCursorBlinkStatus = !mCursorBlinkStatus;
@@ -826,10 +844,12 @@ struct Decorator::Impl : public ConnectionTracker
   float               mGrabDisplacementX;
   float               mGrabDisplacementY;
 
-  bool                mActiveGrabHandle:1;
-  bool                mActiveSelection:1;
-  bool                mActiveCopyPastePopup:1;
-  bool                mCursorBlinkStatus:1;       ///< Flag to switch between blink on and blink off
+  bool                mActiveGrabHandle       : 1;
+  bool                mActiveSelection        : 1;
+  bool                mActiveCopyPastePopup   : 1;
+  bool                mCursorBlinkStatus      : 1; ///< Flag to switch between blink on and blink off.
+  bool                mPrimaryCursorVisible   : 1; ///< Whether the primary cursor is visible.
+  bool                mSecondaryCursorVisible : 1; ///< Whether the secondary cursor is visible.
 };
 
 DecoratorPtr Decorator::New( Internal::Control& parent, Observer& observer )
@@ -872,8 +892,11 @@ unsigned int Decorator::GetActiveCursor() const
 void Decorator::SetPosition( Cursor cursor, float x, float y, float cursorHeight, float lineHeight )
 {
   // Adjust grab handle displacement
-  mImpl->mGrabDisplacementX -= x - mImpl->mCursor[cursor].position.x;
-  mImpl->mGrabDisplacementY -= y - mImpl->mCursor[cursor].position.y;
+  if( PRIMARY_CURSOR == cursor )
+  {
+    mImpl->mGrabDisplacementX -= x - mImpl->mCursor[cursor].position.x;
+    mImpl->mGrabDisplacementY -= y - mImpl->mCursor[cursor].position.y;
+  }
 
   mImpl->mCursor[cursor].position.x = x;
   mImpl->mCursor[cursor].position.y = y;
@@ -887,6 +910,11 @@ void Decorator::GetPosition( Cursor cursor, float& x, float& y, float& cursorHei
   y = mImpl->mCursor[cursor].position.y;
   cursorHeight = mImpl->mCursor[cursor].cursorHeight;
   lineHeight = mImpl->mCursor[cursor].lineHeight;
+}
+
+const Vector2& Decorator::GetPosition( Cursor cursor ) const
+{
+  return mImpl->mCursor[cursor].position;
 }
 
 void Decorator::SetColor( Cursor cursor, const Dali::Vector4& color )

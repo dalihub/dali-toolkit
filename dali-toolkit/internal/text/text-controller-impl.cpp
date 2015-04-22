@@ -109,7 +109,8 @@ EventData::EventData( DecoratorPtr decorator )
   mSelectionEnabled( true ),
   mHorizontalScrollingEnabled( true ),
   mVerticalScrollingEnabled( false ),
-  mUpdateCursorPosition( false )
+  mUpdateCursorPosition( false ),
+  mScrollAfterUpdateCursorPosition( false )
 {}
 
 EventData::~EventData()
@@ -170,7 +171,16 @@ bool Controller::Impl::ProcessInputEvents()
   // The cursor must also be repositioned after inserts into the model
   if( mEventData->mUpdateCursorPosition )
   {
+    // Updates the cursor position and scrolls the text to make it visible.
+
     UpdateCursorPosition();
+
+    if( mEventData->mScrollAfterUpdateCursorPosition )
+    {
+      ScrollToMakeCursorVisible();
+      mEventData->mScrollAfterUpdateCursorPosition = false;
+    }
+
     mEventData->mUpdateCursorPosition = false;
   }
 
@@ -230,7 +240,8 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
     // TODO
   }
 
-  UpdateCursorPosition();
+  mEventData->mUpdateCursorPosition = true;
+  mEventData->mScrollAfterUpdateCursorPosition = true;
 }
 
 void Controller::Impl::HandleCursorKey( int keyCode )
@@ -263,7 +274,8 @@ void Controller::Impl::OnTapEvent( const Event& event )
     mEventData->mPrimaryCursorPosition = GetClosestCursorIndex( xPosition,
                                                                 yPosition );
 
-    UpdateCursorPosition();
+    mEventData->mUpdateCursorPosition = true;
+    mEventData->mScrollAfterUpdateCursorPosition = true;
   }
   else if( mEventData->mSelectionEnabled &&
            ( 2u == tapCount ) )
@@ -295,19 +307,7 @@ void Controller::Impl::OnPanEvent( const Event& event )
       const float displacementX = event.p2.mFloat;
       mEventData->mScrollPosition.x += displacementX;
 
-      // Clamp between -space & 0 (and the text alignment).
-      if( actualSize.width > mControlSize.width )
-      {
-        const float space = ( actualSize.width - mControlSize.width ) + mAlignmentOffset.x;
-        mEventData->mScrollPosition.x = ( mEventData->mScrollPosition.x < -space ) ? -space : mEventData->mScrollPosition.x;
-        mEventData->mScrollPosition.x = ( mEventData->mScrollPosition.x > -mAlignmentOffset.x ) ? -mAlignmentOffset.x : mEventData->mScrollPosition.x;
-
-        mEventData->mDecoratorUpdated = true;
-      }
-      else
-      {
-        mEventData->mScrollPosition.x = 0.f;
-      }
+      ClampHorizontalScroll( actualSize );
     }
 
     if( mEventData->mVerticalScrollingEnabled )
@@ -315,19 +315,7 @@ void Controller::Impl::OnPanEvent( const Event& event )
       const float displacementY = event.p3.mFloat;
       mEventData->mScrollPosition.y += displacementY;
 
-      // Clamp between -space & 0 (and the text alignment).
-      if( actualSize.height > mControlSize.height )
-      {
-        const float space = ( actualSize.height - mControlSize.height ) + mAlignmentOffset.y;
-        mEventData->mScrollPosition.y = ( mEventData->mScrollPosition.y < -space ) ? -space : mEventData->mScrollPosition.y;
-        mEventData->mScrollPosition.y = ( mEventData->mScrollPosition.y > -mAlignmentOffset.y ) ? -mAlignmentOffset.y : mEventData->mScrollPosition.y;
-
-        mEventData->mDecoratorUpdated = true;
-      }
-      else
-      {
-        mEventData->mScrollPosition.y = 0.f;
-      }
+      ClampVerticalScroll( actualSize );
     }
 
     if( mEventData->mDecorator )
@@ -353,18 +341,23 @@ void Controller::Impl::OnGrabHandleEvent( const Event& event )
     const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
     const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
 
-    mEventData->mPrimaryCursorPosition = GetClosestCursorIndex( xPosition, yPosition );
-
-    UpdateCursorPosition();
-
     //mDecorator->HidePopup();
     ChangeState ( EventData::EDITING );
+
+    const CharacterIndex newCursorPosition = GetClosestCursorIndex( xPosition, yPosition );
+
+    if( newCursorPosition != mEventData->mPrimaryCursorPosition )
+    {
+      mEventData->mPrimaryCursorPosition = newCursorPosition;
+      mEventData->mUpdateCursorPosition = true;
+    }
   }
   else if( mEventData->mGrabHandlePopupEnabled &&
            ( GRAB_HANDLE_RELEASED == state ) )
   {
     //mDecorator->ShowPopup();
     ChangeState ( EventData::EDITING_WITH_POPUP );
+    mEventData->mUpdateCursorPosition = true;
     mEventData->mDecoratorUpdated = true;
   }
 }
@@ -849,6 +842,73 @@ void Controller::Impl::UpdateCursorPosition()
 
   mEventData->mUpdateCursorPosition = false;
   mEventData->mDecoratorUpdated = true;
+}
+
+void Controller::Impl::ClampHorizontalScroll( const Vector2& actualSize )
+{
+  // Clamp between -space & 0 (and the text alignment).
+  if( actualSize.width > mControlSize.width )
+  {
+    const float space = ( actualSize.width - mControlSize.width ) + mAlignmentOffset.x;
+    mEventData->mScrollPosition.x = ( mEventData->mScrollPosition.x < -space ) ? -space : mEventData->mScrollPosition.x;
+    mEventData->mScrollPosition.x = ( mEventData->mScrollPosition.x > -mAlignmentOffset.x ) ? -mAlignmentOffset.x : mEventData->mScrollPosition.x;
+
+    mEventData->mDecoratorUpdated = true;
+  }
+  else
+  {
+    mEventData->mScrollPosition.x = 0.f;
+  }
+}
+
+void Controller::Impl::ClampVerticalScroll( const Vector2& actualSize )
+{
+  // Clamp between -space & 0 (and the text alignment).
+  if( actualSize.height > mControlSize.height )
+  {
+    const float space = ( actualSize.height - mControlSize.height ) + mAlignmentOffset.y;
+    mEventData->mScrollPosition.y = ( mEventData->mScrollPosition.y < -space ) ? -space : mEventData->mScrollPosition.y;
+    mEventData->mScrollPosition.y = ( mEventData->mScrollPosition.y > -mAlignmentOffset.y ) ? -mAlignmentOffset.y : mEventData->mScrollPosition.y;
+
+    mEventData->mDecoratorUpdated = true;
+  }
+  else
+  {
+    mEventData->mScrollPosition.y = 0.f;
+  }
+}
+
+void Controller::Impl::ScrollToMakeCursorVisible()
+{
+  if( NULL == mEventData )
+  {
+    // Nothing to do if there is no text input.
+    return;
+  }
+
+  const Vector2& primaryCursorPosition = mEventData->mDecorator->GetPosition( PRIMARY_CURSOR );
+
+  Vector2 offset;
+  bool updateDecorator = false;
+  if( primaryCursorPosition.x < 0.f )
+  {
+    offset.x = -primaryCursorPosition.x;
+    mEventData->mScrollPosition.x += offset.x;
+    updateDecorator = true;
+  }
+  else if( primaryCursorPosition.x > mControlSize.width )
+  {
+    offset.x = mControlSize.width - primaryCursorPosition.x;
+    mEventData->mScrollPosition.x += offset.x;
+    updateDecorator = true;
+  }
+
+  if( updateDecorator && mEventData->mDecorator )
+  {
+    mEventData->mDecorator->UpdatePositions( offset );
+  }
+
+  // TODO : calculate the Y scroll.
 }
 
 void Controller::Impl::RequestRelayout()
