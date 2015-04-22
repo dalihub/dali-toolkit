@@ -65,17 +65,17 @@ BaseHandle Create()
 // Setup signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Control, CustomActor, Create );
 
-// Note: Properties are registered separately below,
+// Note: Properties are registered separately below.
 
-DALI_SIGNAL_REGISTRATION( Control, "key-event",                 SIGNAL_KEY_EVENT              )
-DALI_SIGNAL_REGISTRATION( Control, "key-input-focus-gained",    SIGNAL_KEY_INPUT_FOCUS_GAINED )
-DALI_SIGNAL_REGISTRATION( Control, "key-input-focus-lost",      SIGNAL_KEY_INPUT_FOCUS_LOST   )
-DALI_SIGNAL_REGISTRATION( Control, "tapped",                    SIGNAL_TAPPED                 )
-DALI_SIGNAL_REGISTRATION( Control, "panned",                    SIGNAL_PANNED                 )
-DALI_SIGNAL_REGISTRATION( Control, "pinched",                   SIGNAL_PINCHED                )
-DALI_SIGNAL_REGISTRATION( Control, "long-pressed",              SIGNAL_LONG_PRESSED           )
+DALI_SIGNAL_REGISTRATION( Toolkit, Control, "key-event",              SIGNAL_KEY_EVENT              )
+DALI_SIGNAL_REGISTRATION( Toolkit, Control, "key-input-focus-gained", SIGNAL_KEY_INPUT_FOCUS_GAINED )
+DALI_SIGNAL_REGISTRATION( Toolkit, Control, "key-input-focus-lost",   SIGNAL_KEY_INPUT_FOCUS_LOST   )
+DALI_SIGNAL_REGISTRATION( Toolkit, Control, "tapped",                 SIGNAL_TAPPED                 )
+DALI_SIGNAL_REGISTRATION( Toolkit, Control, "panned",                 SIGNAL_PANNED                 )
+DALI_SIGNAL_REGISTRATION( Toolkit, Control, "pinched",                SIGNAL_PINCHED                )
+DALI_SIGNAL_REGISTRATION( Toolkit, Control, "long-pressed",           SIGNAL_LONG_PRESSED           )
 
-DALI_ACTION_REGISTRATION( Control, "control-activated",         ACTION_CONTROL_ACTIVATED )
+DALI_ACTION_REGISTRATION( Toolkit, Control, "control-activated",      ACTION_CONTROL_ACTIVATED      )
 
 DALI_TYPE_REGISTRATION_END()
 

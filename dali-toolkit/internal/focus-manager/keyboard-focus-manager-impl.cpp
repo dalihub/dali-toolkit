@@ -78,10 +78,10 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN_CREATE( Toolkit::KeyboardFocusManager, Dali::BaseHandle, Create, true )
 
-DALI_SIGNAL_REGISTRATION( KeyboardFocusManager, "keyboard-pre-focus-change",        SIGNAL_PRE_FOCUS_CHANGE        )
-DALI_SIGNAL_REGISTRATION( KeyboardFocusManager, "keyboard-focus-changed",           SIGNAL_FOCUS_CHANGED           )
-DALI_SIGNAL_REGISTRATION( KeyboardFocusManager, "keyboard-focus-group-changed",     SIGNAL_FOCUS_GROUP_CHANGED     )
-DALI_SIGNAL_REGISTRATION( KeyboardFocusManager, "keyboard-focused-actor-activated", SIGNAL_FOCUSED_ACTOR_ACTIVATED )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-pre-focus-change",        SIGNAL_PRE_FOCUS_CHANGE        )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-focus-changed",           SIGNAL_FOCUS_CHANGED           )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-focus-group-changed",     SIGNAL_FOCUS_GROUP_CHANGED     )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-focused-actor-activated", SIGNAL_FOCUSED_ACTOR_ACTIVATED )
 
 DALI_TYPE_REGISTRATION_END()
 

@@ -40,8 +40,8 @@ namespace
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ScrollConnector, Dali::BaseHandle, NULL )
 
-DALI_SIGNAL_REGISTRATION( ScrollConnector, "domain-changed",          DOMAIN_CHANGED_SIGNAL_NAME          )
-DALI_SIGNAL_REGISTRATION( ScrollConnector, "scroll-position-changed", SCROLL_POSITION_CHANGED_SIGNAL_NAME )
+DALI_SIGNAL_REGISTRATION( Toolkit, ScrollConnector, "domain-changed",          DOMAIN_CHANGED_SIGNAL_NAME          )
+DALI_SIGNAL_REGISTRATION( Toolkit, ScrollConnector, "scroll-position-changed", SCROLL_POSITION_CHANGED_SIGNAL_NAME )
 
 DALI_TYPE_REGISTRATION_END()
 

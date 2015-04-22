@@ -44,7 +44,7 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::View, Toolkit::Control, Create )
 
-DALI_SIGNAL_REGISTRATION( View, "orientation-animation-start", SIGNAL_ORIENTATION_ANIMATION_START )
+DALI_SIGNAL_REGISTRATION( Toolkit, View, "orientation-animation-start", SIGNAL_ORIENTATION_ANIMATION_START )
 
 DALI_TYPE_REGISTRATION_END()
 

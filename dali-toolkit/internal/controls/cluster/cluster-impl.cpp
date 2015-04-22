@@ -52,9 +52,9 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Cluster, Toolkit::Control, Create )
 
-DALI_ACTION_REGISTRATION( Cluster, "expand",    ACTION_EXPAND    )
-DALI_ACTION_REGISTRATION( Cluster, "collapse",  ACTION_COLLAPSE  )
-DALI_ACTION_REGISTRATION( Cluster, "transform", ACTION_TRANSFORM )
+DALI_ACTION_REGISTRATION( Toolkit, Cluster, "expand",    ACTION_EXPAND    )
+DALI_ACTION_REGISTRATION( Toolkit, Cluster, "collapse",  ACTION_COLLAPSE  )
+DALI_ACTION_REGISTRATION( Toolkit, Cluster, "transform", ACTION_TRANSFORM )
 
 DALI_TYPE_REGISTRATION_END()
 

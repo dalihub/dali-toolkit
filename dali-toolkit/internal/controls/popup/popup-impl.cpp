@@ -61,8 +61,8 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Popup, Toolkit::Control, Create )
 
-DALI_SIGNAL_REGISTRATION( Popup, "touched-outside", SIGNAL_TOUCHED_OUTSIDE )
-DALI_SIGNAL_REGISTRATION( Popup, "hidden",          SIGNAL_HIDDEN          )
+DALI_SIGNAL_REGISTRATION( Toolkit, Popup, "touched-outside", SIGNAL_TOUCHED_OUTSIDE )
+DALI_SIGNAL_REGISTRATION( Toolkit, Popup, "hidden",          SIGNAL_HIDDEN          )
 
 DALI_TYPE_REGISTRATION_END()
 
