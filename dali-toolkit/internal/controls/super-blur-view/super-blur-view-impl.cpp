@@ -97,7 +97,7 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::SuperBlurView, Toolkit::Control, Create )
 
-DALI_PROPERTY_REGISTRATION( SuperBlurView, "image", MAP, IMAGE )
+DALI_PROPERTY_REGISTRATION( Toolkit, SuperBlurView, "image", MAP, IMAGE )
 
 DALI_TYPE_REGISTRATION_END()
 

@@ -126,11 +126,11 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TableView, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( TableView, "rows",           UNSIGNED_INTEGER, ROWS           )
-DALI_PROPERTY_REGISTRATION( TableView, "columns",        UNSIGNED_INTEGER, COLUMNS        )
-DALI_PROPERTY_REGISTRATION( TableView, "cell-padding",   VECTOR2,          CELL_PADDING   )
-DALI_PROPERTY_REGISTRATION( TableView, "layout-rows",    MAP,              LAYOUT_ROWS    )
-DALI_PROPERTY_REGISTRATION( TableView, "layout-columns", MAP,              LAYOUT_COLUMNS )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "rows",           UNSIGNED_INTEGER, ROWS           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "columns",        UNSIGNED_INTEGER, COLUMNS        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "cell-padding",   VECTOR2,          CELL_PADDING   )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layout-rows",    MAP,              LAYOUT_ROWS    )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layout-columns", MAP,              LAYOUT_COLUMNS )
 
 DALI_TYPE_REGISTRATION_END()
 

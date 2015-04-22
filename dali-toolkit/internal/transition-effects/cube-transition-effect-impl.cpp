@@ -41,7 +41,7 @@ namespace
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::CubeTransitionEffect, Dali::BaseHandle, NULL );
 
-DALI_SIGNAL_REGISTRATION( CubeTransitionEffect, "transition-completed", SIGNAL_TRANSITION_COMPLETED )
+DALI_SIGNAL_REGISTRATION( Toolkit, CubeTransitionEffect, "transition-completed", SIGNAL_TRANSITION_COMPLETED )
 
 DALI_TYPE_REGISTRATION_END()
 
