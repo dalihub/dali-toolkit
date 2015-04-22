@@ -71,6 +71,13 @@ enum GrabHandleState
   GRAB_HANDLE_STOP_SCROLLING
 };
 
+// Used to set different grab handle images
+enum GrabHandleImageType
+{
+  GRAB_HANDLE_IMAGE_PRESSED,
+  GRAB_HANDLE_IMAGE_RELEASED
+};
+
 // The set the selection-handle positions etc.
 enum SelectionHandle
 {
@@ -297,16 +304,18 @@ public:
   /**
    * @brief Sets the image for the grab handle.
    *
+   * @param[in] type A different image can be set for the pressed/released states.
    * @param[in] image The image to use.
    */
-  void SetGrabHandleImage( Dali::Image image );
+  void SetGrabHandleImage( GrabHandleImageType type, Dali::Image image );
 
   /**
    * @brief Retrieves the image for the grab handle.
    *
+   * @param[in] type A different image can be set for the pressed/released states.
    * @return The grab handle image.
    */
-  Dali::Image GetGrabHandleImage() const;
+  Dali::Image GetGrabHandleImage( GrabHandleImageType type ) const;
 
   /**
    * @brief Sets whether the selection handles and highlight are active.
@@ -345,20 +354,34 @@ public:
   /**
    * @brief Sets the image for one of the selection handles.
    *
-   * @param[in] handle The selection handle.
    * @param[in] state A different image can be set for the pressed/released states.
    * @param[in] image The image to use.
    */
-  void SetImage( SelectionHandle handle, SelectionHandleState state, Dali::Image image );
+  void SetLeftSelectionImage( SelectionHandleState state, Dali::Image image );
 
   /**
    * @brief Retrieves the image for a selection handle.
    *
-   * @param[in] handle The selection handle.
    * @param[in] state A different image can be set for the pressed/released states.
    * @return The image.
    */
-  Dali::Image GetImage( SelectionHandle handle, SelectionHandleState state ) const;
+  Dali::Image GetLeftSelectionImage( SelectionHandleState state ) const;
+
+  /**
+   * @brief Sets the image for one of the selection handles.
+   *
+   * @param[in] state A different image can be set for the pressed/released states.
+   * @param[in] image The image to use.
+   */
+  void SetRightSelectionImage( SelectionHandleState state, Dali::Image image );
+
+  /**
+   * @brief Retrieves the image for a selection handle.
+   *
+   * @param[in] state A different image can be set for the pressed/released states.
+   * @return The image.
+   */
+  Dali::Image GetRightSelectionImage( SelectionHandleState state ) const;
 
   /**
    * @brief Adds a quad to the existing selection highlights.
@@ -374,6 +397,20 @@ public:
    * @brief Removes all of the previously added highlights.
    */
   void ClearHighlights();
+
+  /**
+   * @brief Sets the selection highlight color.
+   *
+   * @param[in] image The image to use.
+   */
+  void SetHighlightColor( const Vector4& color );
+
+  /**
+   * @brief Retrieves the selection highlight color.
+   *
+   * @return The image.
+   */
+  const Vector4& GetHighlightColor() const;
 
   /**
    * @brief Set the Selection Popup to show or hide via the active flaf

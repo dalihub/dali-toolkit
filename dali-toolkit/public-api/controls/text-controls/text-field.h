@@ -55,22 +55,33 @@ public:
   {
     enum
     {
-      RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "rendering-backend",       The type or rendering e.g. bitmap-based,                                  type INT
-      PLACEHOLDER_TEXT,                         ///< name "placeholder-text",        The text to display when the TextField is empty,                          type STRING
-      TEXT,                                     ///< name "text",                    The text to display in UTF-8 format,                                      type STRING
-      FONT_FAMILY,                              ///< name "font-family",             The requested font family,                                                type STRING
-      FONT_STYLE,                               ///< name "font-style",              The requested font style e.g. Regular/Italic,                             type STRING
-      POINT_SIZE,                               ///< name "point-size",              The size of font in points,                                               type FLOAT
-      EXCEED_POLICY,                            ///< name "exceed-policy"            Specifies how the text is truncated when it does not fit,                 type INT
-      PRIMARY_CURSOR_COLOR,                     ///< name "primary-cursor-color",    The color to apply to the primary cursor,                                 type VECTOR4
-      SECONDARY_CURSOR_COLOR,                   ///< name "secondary-cursor-color",  The color to apply to the secondary cursor,                               type VECTOR4
-      ENABLE_CURSOR_BLINK,                      ///< name "enable-cursor-blink",     Whether the cursor should blink or not,                                   type BOOLEAN
-      CURSOR_BLINK_INTERVAL,                    ///< name "cursor-blink-interval",   The time interval between cursor on/off states,                           type FLOAT
-      CURSOR_BLINK_DURATION,                    ///< name "cursor-blink-duration",   The cursor will stop blinking after this duration (if non-zero),          type FLOAT
-      GRAB_HANDLE_IMAGE,                        ///< name "grab-handle-image",       The image to display for grab handle,                                     type STRING
-      DECORATION_BOUNDING_BOX,                  ///< name "decoration-bounding-box", The decorations (handles etc) will positioned within this area on-screen, type RECTANGLE
-      HORIZONTAL_ALIGNMENT,                     ///< name "horizontal-alignment",    The line horizontal alignment,                                            type STRING,  values "BEGIN", "CENTER", "END"
-      VERTICAL_ALIGNMENT                        ///< name "vertical-alignment",      The line vertical alignment,                                              type STRING,  values   "TOP",   "CENTER",   "BOTTOM"
+      RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "rendering-backend",                   The type or rendering e.g. bitmap-based,                                  type INT
+      PLACEHOLDER_TEXT,                         ///< name "placeholder-text",                    The text to display when the TextField is empty,                          type STRING
+      TEXT,                                     ///< name "text",                                The text to display in UTF-8 format,                                      type STRING
+      FONT_FAMILY,                              ///< name "font-family",                         The requested font family,                                                type STRING
+      FONT_STYLE,                               ///< name "font-style",                          The requested font style e.g. Regular/Italic,                             type STRING
+      POINT_SIZE,                               ///< name "point-size",                          The size of font in points,                                               type FLOAT
+      EXCEED_POLICY,                            ///< name "exceed-policy"                        Specifies how the text is truncated when it does not fit,                 type INT
+      HORIZONTAL_ALIGNMENT,                     ///< name "horizontal-alignment",                The line horizontal alignment,                                            type STRING,  values "BEGIN", "CENTER", "END"
+      VERTICAL_ALIGNMENT,                       ///< name "vertical-alignment",                  The line vertical alignment,                                              type STRING,  values   "TOP",   "CENTER",   "BOTTOM"
+      TEXT_COLOR,                               ///< name "text-color",                          The text color,                                                           type VECTOR4
+      SHADOW_OFFSET,                            ///< name "shadow-offset",                       The drop shadow offset 0 indicates no shadow,                             type VECTOR2
+      SHADOW_COLOR,                             ///< name "shadow-color",                        The color of a drop shadow,                                               type VECTOR4
+      PRIMARY_CURSOR_COLOR,                     ///< name "primary-cursor-color",                The color to apply to the primary cursor,                                 type VECTOR4
+      SECONDARY_CURSOR_COLOR,                   ///< name "secondary-cursor-color",              The color to apply to the secondary cursor,                               type VECTOR4
+      ENABLE_CURSOR_BLINK,                      ///< name "enable-cursor-blink",                 Whether the cursor should blink or not,                                   type BOOLEAN
+      CURSOR_BLINK_INTERVAL,                    ///< name "cursor-blink-interval",               The time interval in seconds between cursor on/off states,                type FLOAT
+      CURSOR_BLINK_DURATION,                    ///< name "cursor-blink-duration",               The cursor will stop blinking after this number of seconds (if non-zero), type FLOAT
+      GRAB_HANDLE_IMAGE,                        ///< name "grab-handle-image",                   The image to display for the grab handle,                                 type STRING
+      GRAB_HANDLE_PRESSED_IMAGE,                ///< name "grab-handle-pressed-image",           The image to display when the grab handle is pressed,                     type STRING
+      SCROLL_THRESHOLD,                         ///< name "scroll-threshold"                     Scrolling will occur if the cursor is this close to the control border,   type FLOAT
+      SCROLL_SPEED,                             ///< name "scroll-speed"                         The scroll speed in pixels per second,                                    type FLOAT
+      SELECTION_HANDLE_IMAGE_LEFT,              ///< name "selection-handle-image-left",         The image to display for the left selection handle,                       type STRING
+      SELECTION_HANDLE_IMAGE_RIGHT,             ///< name "selection-handle-image-right",        The image to display for the right selection handle,                      type STRING
+      SELECTION_HANDLE_PRESSED_IMAGE_LEFT,      ///< name "selection-handle-pressed-image-left"  The image to display when the left selection handle is pressed,           type STRING
+      SELECTION_HANDLE_PRESSED_IMAGE_RIGHT,     ///< name "selection-handle-pressed-image-right" The image to display when the right selection handle is pressed,          type STRING
+      SELECTION_HIGHLIGHT_COLOR,                ///< name "selection-highlight-color"            The color of the selection highlight,                                     type VECTOR4
+      DECORATION_BOUNDING_BOX                   ///< name "decoration-bounding-box",             The decorations (handles etc) will positioned within this area on-screen, type RECTANGLE
     };
   };
 

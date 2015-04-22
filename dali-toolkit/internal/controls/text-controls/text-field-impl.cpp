@@ -79,22 +79,33 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextField, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "rendering-backend",       INTEGER,   RENDERING_BACKEND       )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder-text",        STRING,    PLACEHOLDER_TEXT        )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "text",                    STRING,    TEXT                    )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "font-family",             STRING,    FONT_FAMILY             )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "font-style",              STRING,    FONT_STYLE              )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "point-size",              FLOAT,     POINT_SIZE              )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "exceed-policy",           INTEGER,   EXCEED_POLICY           )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "primary-cursor-color",    VECTOR4,   PRIMARY_CURSOR_COLOR    )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "secondary-cursor-color",  VECTOR4,   SECONDARY_CURSOR_COLOR  )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enable-cursor-blink",     BOOLEAN,   ENABLE_CURSOR_BLINK     )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-blink-interval",   FLOAT,     CURSOR_BLINK_INTERVAL   )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-blink-duration",   FLOAT,     CURSOR_BLINK_DURATION   )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-image",       STRING,    GRAB_HANDLE_IMAGE       )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decoration-bounding-box", RECTANGLE, DECORATION_BOUNDING_BOX )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "horizontal-alignment",    STRING,    HORIZONTAL_ALIGNMENT    )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "vertical-alignment",      STRING,    VERTICAL_ALIGNMENT      )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "rendering-backend",                    INTEGER,   RENDERING_BACKEND                    )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder-text",                     STRING,    PLACEHOLDER_TEXT                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "text",                                 STRING,    TEXT                                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "font-family",                          STRING,    FONT_FAMILY                          )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "font-style",                           STRING,    FONT_STYLE                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "point-size",                           FLOAT,     POINT_SIZE                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "exceed-policy",                        INTEGER,   EXCEED_POLICY                        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "horizontal-alignment",                 STRING,    HORIZONTAL_ALIGNMENT                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "vertical-alignment",                   STRING,    VERTICAL_ALIGNMENT                   )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "text-color",                           VECTOR4,   TEXT_COLOR                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadow-offset",                        VECTOR2,   SHADOW_OFFSET                        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadow-color",                         VECTOR4,   SHADOW_COLOR                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "primary-cursor-color",                 VECTOR4,   PRIMARY_CURSOR_COLOR                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "secondary-cursor-color",               VECTOR4,   SECONDARY_CURSOR_COLOR               )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enable-cursor-blink",                  BOOLEAN,   ENABLE_CURSOR_BLINK                  )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-blink-interval",                FLOAT,     CURSOR_BLINK_INTERVAL                )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-blink-duration",                FLOAT,     CURSOR_BLINK_DURATION                )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-image",                    STRING,    GRAB_HANDLE_IMAGE                    )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-pressed-image",            VECTOR4,   GRAB_HANDLE_PRESSED_IMAGE            )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scroll-threshold",                     FLOAT,     SCROLL_THRESHOLD                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scroll-speed",                         FLOAT,     SCROLL_SPEED                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-left",          STRING,    SELECTION_HANDLE_IMAGE_LEFT          )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-right",         STRING,    SELECTION_HANDLE_IMAGE_RIGHT         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-left",  STRING,    SELECTION_HANDLE_PRESSED_IMAGE_LEFT  )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-right", STRING,    SELECTION_HANDLE_PRESSED_IMAGE_RIGHT )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-highlight-color",            STRING,    SELECTION_HIGHLIGHT_COLOR            )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decoration-bounding-box",              RECTANGLE, DECORATION_BOUNDING_BOX              )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -186,7 +197,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         {
           float pointSize = value.Get< float >();
 
-          if( impl.mController->GetDefaultPointSize() != pointSize /*TODO - epsilon*/ )
+          if( !Equals( impl.mController->GetDefaultPointSize(), pointSize ) )
           {
             impl.mController->SetDefaultPointSize( pointSize );
             impl.RequestTextRelayout();
@@ -197,6 +208,73 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::EXCEED_POLICY:
       {
         impl.mExceedPolicy = value.Get< int >();
+        break;
+      }
+      case Toolkit::TextField::Property::HORIZONTAL_ALIGNMENT:
+      {
+        LayoutEngine& engine = impl.mController->GetLayoutEngine();
+        const LayoutEngine::HorizontalAlignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::HorizontalAlignment >( value.Get< std::string >().c_str(),
+                                                                                                                                           HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                                                                           HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
+
+        if( engine.GetHorizontalAlignment() != alignment )
+        {
+          engine.SetHorizontalAlignment( alignment );
+          impl.RequestTextRelayout();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::VERTICAL_ALIGNMENT:
+      {
+        LayoutEngine& engine = impl.mController->GetLayoutEngine();
+        const LayoutEngine::VerticalAlignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::VerticalAlignment >( value.Get< std::string >().c_str(),
+                                                                                                                                       VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                                                                                       VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
+
+        if( engine.GetVerticalAlignment() != alignment )
+        {
+          engine.SetVerticalAlignment( alignment );
+          impl.RequestTextRelayout();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::TEXT_COLOR:
+      {
+        if ( impl.mController )
+        {
+          Vector4 textColor = value.Get< Vector4 >();
+          if ( impl.mController->GetTextColor() != textColor )
+          {
+            impl.mController->SetTextColor( textColor );
+            impl.RequestTextRelayout();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SHADOW_OFFSET:
+      {
+        if( impl.mController )
+        {
+          Vector2 shadowOffset = value.Get< Vector2 >();
+          if ( impl.mController->GetShadowOffset() != shadowOffset )
+          {
+            impl.mController->SetShadowOffset( shadowOffset );
+            impl.RequestTextRelayout();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SHADOW_COLOR:
+      {
+        if( impl.mController )
+        {
+          Vector4 shadowColor = value.Get< Vector4 >();
+          if ( impl.mController->GetShadowColor() != shadowColor )
+          {
+            impl.mController->SetShadowColor( shadowColor );
+            impl.RequestTextRelayout();
+          }
+        }
         break;
       }
       case Toolkit::TextField::Property::PRIMARY_CURSOR_COLOR:
@@ -245,7 +323,87 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 
         if( impl.mDecorator )
         {
-          impl.mDecorator->SetGrabHandleImage( image );
+          impl.mDecorator->SetGrabHandleImage( GRAB_HANDLE_IMAGE_RELEASED, image );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::GRAB_HANDLE_PRESSED_IMAGE:
+      {
+        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
+
+        if( impl.mDecorator )
+        {
+          impl.mDecorator->SetGrabHandleImage( GRAB_HANDLE_IMAGE_PRESSED, image );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SCROLL_THRESHOLD:
+      {
+        float threshold = value.Get< float >();
+
+        if( impl.mDecorator )
+        {
+          impl.mDecorator->SetScrollThreshold( threshold );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SCROLL_SPEED:
+      {
+        float speed = value.Get< float >();
+
+        if( impl.mDecorator )
+        {
+          impl.mDecorator->SetScrollSpeed( speed );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_LEFT:
+      {
+        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
+
+        if( impl.mDecorator )
+        {
+          impl.mDecorator->SetLeftSelectionImage( SELECTION_HANDLE_RELEASED, image );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT:
+      {
+        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
+
+        if( impl.mDecorator )
+        {
+          impl.mDecorator->SetRightSelectionImage( SELECTION_HANDLE_RELEASED, image );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT:
+      {
+        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
+
+        if( impl.mDecorator )
+        {
+          impl.mDecorator->SetLeftSelectionImage( SELECTION_HANDLE_PRESSED, image );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT:
+      {
+        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
+
+        if( impl.mDecorator )
+        {
+          impl.mDecorator->SetLeftSelectionImage( SELECTION_HANDLE_PRESSED, image );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HIGHLIGHT_COLOR:
+      {
+        Vector4 color = value.Get< Vector4 >();
+
+        if( impl.mDecorator )
+        {
+          impl.mDecorator->SetHighlightColor( color );
         }
         break;
       }
@@ -254,34 +412,6 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mDecorator )
         {
           impl.mDecorator->SetBoundingBox( value.Get< Rect<int> >() );
-        }
-        break;
-      }
-      case Toolkit::TextField::Property::HORIZONTAL_ALIGNMENT:
-      {
-        LayoutEngine& engine = impl.mController->GetLayoutEngine();
-        const LayoutEngine::HorizontalAlignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::HorizontalAlignment >( value.Get< std::string >().c_str(),
-                                                                                                                                           HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                                           HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
-
-        if( engine.GetHorizontalAlignment() != alignment )
-        {
-          engine.SetHorizontalAlignment( alignment );
-          impl.RequestTextRelayout();
-        }
-        break;
-      }
-      case Toolkit::TextField::Property::VERTICAL_ALIGNMENT:
-      {
-        LayoutEngine& engine = impl.mController->GetLayoutEngine();
-        const LayoutEngine::VerticalAlignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::VerticalAlignment >( value.Get< std::string >().c_str(),
-                                                                                                                                       VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                                       VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
-
-        if( engine.GetVerticalAlignment() != alignment )
-        {
-          engine.SetVerticalAlignment( alignment );
-          impl.RequestTextRelayout();
         }
         break;
       }
@@ -331,6 +461,50 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         value = impl.mExceedPolicy;
         break;
       }
+      case Toolkit::TextField::Property::HORIZONTAL_ALIGNMENT:
+      {
+        if( impl.mController )
+        {
+          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::HorizontalAlignment >( impl.mController->GetLayoutEngine().GetHorizontalAlignment(),
+                                                                                                                  HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                                                  HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT ) );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::VERTICAL_ALIGNMENT:
+      {
+        if( impl.mController )
+        {
+          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::VerticalAlignment >( impl.mController->GetLayoutEngine().GetVerticalAlignment(),
+                                                                                                                  VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                                                                  VERTICAL_ALIGNMENT_STRING_TABLE_COUNT ) );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::TEXT_COLOR:
+      {
+        if ( impl.mController )
+        {
+          value = impl.mController->GetTextColor();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SHADOW_OFFSET:
+      {
+        if ( impl.mController )
+        {
+          value = impl.mController->GetShadowOffset();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SHADOW_COLOR:
+      {
+        if ( impl.mController )
+        {
+          value = impl.mController->GetShadowColor();
+        }
+        break;
+      }
       case Toolkit::TextField::Property::PRIMARY_CURSOR_COLOR:
       {
         if( impl.mDecorator )
@@ -368,31 +542,107 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::TextField::Property::GRAB_HANDLE_IMAGE:
+      {
+        if( impl.mDecorator )
+        {
+          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetGrabHandleImage( GRAB_HANDLE_IMAGE_RELEASED ) );
+          if( image )
+          {
+            value = image.GetUrl();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::GRAB_HANDLE_PRESSED_IMAGE:
+      {
+        if( impl.mDecorator )
+        {
+          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetGrabHandleImage( GRAB_HANDLE_IMAGE_PRESSED ) );
+          if( image )
+          {
+            value = image.GetUrl();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SCROLL_THRESHOLD:
+      {
+        if( impl.mDecorator )
+        {
+          value = impl.mDecorator->GetScrollThreshold();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SCROLL_SPEED:
+      {
+        if( impl.mDecorator )
+        {
+          value = impl.mDecorator->GetScrollSpeed();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_LEFT:
+      {
+        if( impl.mDecorator )
+        {
+          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetLeftSelectionImage( SELECTION_HANDLE_RELEASED ) );
+          if( image )
+          {
+            value = image.GetUrl();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT:
+      {
+        if( impl.mDecorator )
+        {
+          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetRightSelectionImage( SELECTION_HANDLE_RELEASED ) );
+          if( image )
+          {
+            value = image.GetUrl();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT:
+      {
+        if( impl.mDecorator )
+        {
+          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetLeftSelectionImage( SELECTION_HANDLE_PRESSED ) );
+          if( image )
+          {
+            value = image.GetUrl();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT:
+      {
+        if( impl.mDecorator )
+        {
+          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetRightSelectionImage( SELECTION_HANDLE_PRESSED ) );
+          if( image )
+          {
+            value = image.GetUrl();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HIGHLIGHT_COLOR:
+      {
+        if( impl.mDecorator )
+        {
+          value = impl.mDecorator->GetHighlightColor();
+        }
+        break;
+      }
       case Toolkit::TextField::Property::DECORATION_BOUNDING_BOX:
       {
         if( impl.mDecorator )
         {
           value = impl.mDecorator->GetBoundingBox();
-        }
-        break;
-      }
-      case Toolkit::TextField::Property::HORIZONTAL_ALIGNMENT:
-      {
-        if( impl.mController )
-        {
-          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::HorizontalAlignment >( impl.mController->GetLayoutEngine().GetHorizontalAlignment(),
-                                                                                                                  HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                  HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT ) );
-        }
-        break;
-      }
-      case Toolkit::TextField::Property::VERTICAL_ALIGNMENT:
-      {
-        if( impl.mController )
-        {
-          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::VerticalAlignment >( impl.mController->GetLayoutEngine().GetVerticalAlignment(),
-                                                                                                                  VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                  VERTICAL_ALIGNMENT_STRING_TABLE_COUNT ) );
         }
         break;
       }

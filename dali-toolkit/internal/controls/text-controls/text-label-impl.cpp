@@ -173,7 +173,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         {
           float pointSize = value.Get< float >();
 
-          if( fabsf(impl.mController->GetDefaultPointSize() - pointSize) > Math::MACHINE_EPSILON_1 )
+          if( !Equals( impl.mController->GetDefaultPointSize(), pointSize ) )
           {
             impl.mController->SetDefaultPointSize( pointSize );
             impl.RequestTextRelayout();

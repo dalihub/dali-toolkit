@@ -72,7 +72,8 @@ Integration::Log::Filter* gLogFilter( Integration::Log::Filter::New(Debug::NoLog
 namespace
 {
 
-const char* DEFAULT_GRAB_HANDLE_IMAGE( DALI_IMAGE_DIR "insertpoint-icon.png" );
+const char* DEFAULT_GRAB_HANDLE_IMAGE_RELEASED( DALI_IMAGE_DIR "insertpoint-icon.png" );
+const char* DEFAULT_GRAB_HANDLE_IMAGE_PRESSED( DALI_IMAGE_DIR "insertpoint-icon-pressed.png" );
 const char* DEFAULT_SELECTION_HANDLE_ONE( DALI_IMAGE_DIR "text-input-selection-handle-left.png" );
 const char* DEFAULT_SELECTION_HANDLE_TWO( DALI_IMAGE_DIR "text-input-selection-handle-right.png" );
 //const char* DEFAULT_SELECTION_HANDLE_ONE_PRESSED( DALI_IMAGE_DIR "text-input-selection-handle-left-press.png" );
@@ -87,9 +88,11 @@ const float TO_SECONDS = 1.f / TO_MILLISECONDS;
 
 const float DISPLAYED_HIGHLIGHT_Z_OFFSET( -0.05f );
 
-const float SCROLL_THRESHOLD = 10.f;
-const float SCROLL_SPEED = 15.f;
 const unsigned int SCROLL_TICK_INTERVAL = 50u;
+
+const float SCROLL_THRESHOLD = 10.f;
+const float SCROLL_SPEED = 300.f;
+const float SCROLL_DISTANCE = SCROLL_SPEED * SCROLL_TICK_INTERVAL * TO_SECONDS;
 
 /**
  * structure to hold coordinates of each quad, which will make up the mesh.
@@ -192,9 +195,6 @@ struct Decorator::Impl : public ConnectionTracker
     ImageActor actor;
     Actor grabArea;
 
-    Image pressedImage;
-    Image releasedImage;
-
     Vector2 position;
     float lineHeight; ///< Not the handle height
     bool flipped;
@@ -213,7 +213,7 @@ struct Decorator::Impl : public ConnectionTracker
     mScrollDirection( SCROLL_NONE ),
     mScrollThreshold( SCROLL_THRESHOLD ),
     mScrollSpeed( SCROLL_SPEED ),
-    mScrollInterval( SCROLL_TICK_INTERVAL ),
+    mScrollDistance( SCROLL_DISTANCE ),
     mActiveGrabHandle( false ),
     mActiveSelection( false ),
     mActiveCopyPastePopup( false ),
@@ -352,9 +352,9 @@ struct Decorator::Impl : public ConnectionTracker
     mCopyPastePopup.SetPosition( popupPosition ); //todo grabhandle(cursor) or selection handle positions to be used
   }
 
-  void CreateCursor( ImageActor& cursor )
+  void CreateCursor( ImageActor& cursor, const Vector4& color )
   {
-    cursor = CreateSolidColorActor( Color::WHITE );
+    cursor = CreateSolidColorActor( color );
     cursor.SetParentOrigin( ParentOrigin::TOP_LEFT ); // Need to set the default parent origin as CreateSolidColorActor() sets a different one.
     cursor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
   }
@@ -375,7 +375,7 @@ struct Decorator::Impl : public ConnectionTracker
       {
         if ( !mPrimaryCursor )
         {
-          CreateCursor( mPrimaryCursor );
+          CreateCursor( mPrimaryCursor, mCursor[PRIMARY_CURSOR].color );
 #ifdef DECORATOR_DEBUG
           mPrimaryCursor.SetName( "PrimaryCursorActor" );
 #endif
@@ -387,7 +387,7 @@ struct Decorator::Impl : public ConnectionTracker
       {
         if ( !mSecondaryCursor )
         {
-          CreateCursor( mSecondaryCursor );
+          CreateCursor( mSecondaryCursor, mCursor[SECONDARY_CURSOR].color );
 #ifdef DECORATOR_DEBUG
           mSecondaryCursor.SetName( "SecondaryCursorActor" );
 #endif
@@ -458,12 +458,16 @@ struct Decorator::Impl : public ConnectionTracker
   {
     if( !mGrabHandle )
     {
-      if ( !mGrabHandleImage )
+      if ( !mGrabHandleImageReleased )
       {
-        mGrabHandleImage = ResourceImage::New( DEFAULT_GRAB_HANDLE_IMAGE );
+        mGrabHandleImageReleased = ResourceImage::New( DEFAULT_GRAB_HANDLE_IMAGE_RELEASED );
+      }
+      if ( !mGrabHandleImagePressed )
+      {
+        mGrabHandleImagePressed = ResourceImage::New( DEFAULT_GRAB_HANDLE_IMAGE_PRESSED );
       }
 
-      mGrabHandle = ImageActor::New( mGrabHandleImage );
+      mGrabHandle = ImageActor::New( mGrabHandleImageReleased );
       mGrabHandle.SetAnchorPoint( AnchorPoint::TOP_CENTER );
       mGrabHandle.SetDrawMode( DrawMode::OVERLAY );
       // Area that Grab handle responds to, larger than actual handle so easier to move
@@ -501,12 +505,12 @@ struct Decorator::Impl : public ConnectionTracker
     SelectionHandleImpl& primary = mSelectionHandle[ PRIMARY_SELECTION_HANDLE ];
     if ( !primary.actor )
     {
-      if ( !primary.releasedImage )
+      if ( !mSelectionReleasedLeft )
       {
-        primary.releasedImage = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE );
+        mSelectionReleasedLeft = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE );
       }
 
-      primary.actor = ImageActor::New( primary.releasedImage );
+      primary.actor = ImageActor::New( mSelectionReleasedLeft );
 #ifdef DECORATOR_DEBUG
       primary.actor.SetName("SelectionHandleOne");
 #endif
@@ -533,12 +537,12 @@ struct Decorator::Impl : public ConnectionTracker
     SelectionHandleImpl& secondary = mSelectionHandle[ SECONDARY_SELECTION_HANDLE ];
     if ( !secondary.actor )
     {
-      if ( !secondary.releasedImage )
+      if ( !mSelectionReleasedRight )
       {
-        secondary.releasedImage = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO );
+        mSelectionReleasedRight = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO );
       }
 
-      secondary.actor = ImageActor::New( secondary.releasedImage );
+      secondary.actor = ImageActor::New( mSelectionReleasedRight );
 #ifdef DECORATOR_DEBUG
       secondary.actor.SetName("SelectionHandleTwo");
 #endif
@@ -696,6 +700,7 @@ struct Decorator::Impl : public ConnectionTracker
       if( Gesture::Started == gesture.state )
       {
         mGrabDisplacementX = mGrabDisplacementY = 0;
+        mGrabHandle.SetImage( mGrabHandleImagePressed );
       }
 
       mGrabDisplacementX += gesture.displacement.x;
@@ -739,6 +744,8 @@ struct Decorator::Impl : public ConnectionTracker
         {
           mObserver.GrabHandleEvent( GRAB_HANDLE_RELEASED, x, y );
         }
+
+        mGrabHandle.SetImage( mGrabHandleImageReleased );
       }
     }
   }
@@ -866,21 +873,12 @@ struct Decorator::Impl : public ConnectionTracker
   void SetScrollSpeed( float speed )
   {
     mScrollSpeed = speed;
+    mScrollDistance = speed * SCROLL_TICK_INTERVAL * TO_SECONDS;
   }
 
   float GetScrollSpeed() const
   {
     return mScrollSpeed;
-  }
-
-  void SetScrollTickInterval( float seconds )
-  {
-    mScrollInterval = static_cast<unsigned int>( seconds * TO_MILLISECONDS );
-  }
-
-  float GetScrollTickInterval() const
-  {
-    return static_cast<float>( mScrollInterval ) * TO_SECONDS;
   }
 
   /**
@@ -892,7 +890,7 @@ struct Decorator::Impl : public ConnectionTracker
   {
     if( !mScrollTimer )
     {
-      mScrollTimer = Timer::New( mScrollInterval );
+      mScrollTimer = Timer::New( SCROLL_TICK_INTERVAL );
       mScrollTimer.TickSignal().Connect( this, &Decorator::Impl::OnScrollTimerTick );
     }
 
@@ -921,7 +919,7 @@ struct Decorator::Impl : public ConnectionTracker
   bool OnScrollTimerTick()
   {
     mObserver.GrabHandleEvent( GRAB_HANDLE_SCROLLING,
-                               mScrollDirection == SCROLL_RIGHT ? mScrollSpeed : -mScrollSpeed,
+                               mScrollDirection == SCROLL_RIGHT ? mScrollDistance : -mScrollDistance,
                                0.f );
     return true;
   }
@@ -943,14 +941,21 @@ struct Decorator::Impl : public ConnectionTracker
   TextSelectionPopup  mCopyPastePopup;
 
   Image               mCursorImage;
-  Image               mGrabHandleImage;
+  Image               mGrabHandleImageReleased;
+  Image               mGrabHandleImagePressed;
   Mesh                mHighlightMesh;             ///< Mesh for highlight
   MeshData            mHighlightMeshData;         ///< Mesh Data for highlight
   Material            mHighlightMaterial;         ///< Material used for highlight
 
   CursorImpl          mCursor[CURSOR_COUNT];
   SelectionHandleImpl mSelectionHandle[SELECTION_HANDLE_COUNT];
+
   QuadContainer       mHighlightQuadList;         ///< Sub-selections that combine to create the complete selection highlight
+
+  Image               mSelectionReleasedLeft;     ///< Selection handle images
+  Image               mSelectionReleasedRight;
+  Image               mSelectionPressedLeft;
+  Image               mSelectionPressedRight;
 
   Rect<int>           mBoundingBox;
   Vector4             mHighlightColor;            ///< Color of the highlight
@@ -962,7 +967,8 @@ struct Decorator::Impl : public ConnectionTracker
   float               mGrabDisplacementY;
   ScrollDirection     mScrollDirection;         ///< The direction of the scroll.
   float               mScrollThreshold;         ///< Defines a square area inside the control, close to the edge. A cursor entering this area will trigger scroll events.
-  float               mScrollSpeed;             ///< Distance the text scrolls during a scroll interval.
+  float               mScrollSpeed;             ///< The scroll speed in pixels per second.
+  float               mScrollDistance;          ///< Distance the text scrolls during a scroll interval.
   unsigned int        mScrollInterval;          ///< Time in milliseconds of a scroll interval.
 
   bool                mActiveGrabHandle       : 1;
@@ -1102,14 +1108,26 @@ bool Decorator::IsGrabHandleActive() const
   return mImpl->mActiveGrabHandle;
 }
 
-void Decorator::SetGrabHandleImage( Dali::Image image )
+void Decorator::SetGrabHandleImage( GrabHandleImageType type, Dali::Image image )
 {
-  mImpl->mGrabHandleImage = image;
+  if( GRAB_HANDLE_IMAGE_PRESSED == type )
+  {
+    mImpl->mGrabHandleImagePressed = image;
+  }
+  else
+  {
+    mImpl->mGrabHandleImageReleased = image;
+  }
 }
 
-Dali::Image Decorator::GetGrabHandleImage() const
+Dali::Image Decorator::GetGrabHandleImage( GrabHandleImageType type ) const
 {
-  return mImpl->mGrabHandleImage;
+  if( GRAB_HANDLE_IMAGE_PRESSED == type )
+  {
+    return mImpl->mGrabHandleImagePressed;
+  }
+
+  return mImpl->mGrabHandleImageReleased;
 }
 
 /** Selection **/
@@ -1138,26 +1156,48 @@ void Decorator::GetPosition( SelectionHandle handle, float& x, float& y, float& 
   height = mImpl->mSelectionHandle[handle].lineHeight;
 }
 
-void Decorator::SetImage( SelectionHandle handle, SelectionHandleState state, Dali::Image image )
+void Decorator::SetLeftSelectionImage( SelectionHandleState state, Dali::Image image )
 {
   if( SELECTION_HANDLE_PRESSED == state )
   {
-    mImpl->mSelectionHandle[handle].pressedImage = image;
+    mImpl->mSelectionPressedLeft = image;
   }
   else
   {
-    mImpl->mSelectionHandle[handle].releasedImage = image;
+    mImpl->mSelectionReleasedLeft = image;
   }
 }
 
-Dali::Image Decorator::GetImage( SelectionHandle handle, SelectionHandleState state ) const
+Dali::Image Decorator::GetLeftSelectionImage( SelectionHandleState state ) const
 {
   if( SELECTION_HANDLE_PRESSED == state )
   {
-    return mImpl->mSelectionHandle[handle].pressedImage;
+    return mImpl->mSelectionPressedLeft;
   }
 
-  return mImpl->mSelectionHandle[handle].releasedImage;
+  return mImpl->mSelectionReleasedLeft;
+}
+
+void Decorator::SetRightSelectionImage( SelectionHandleState state, Dali::Image image )
+{
+  if( SELECTION_HANDLE_PRESSED == state )
+  {
+    mImpl->mSelectionPressedRight = image;
+  }
+  else
+  {
+    mImpl->mSelectionReleasedRight = image;
+  }
+}
+
+Dali::Image Decorator::GetRightSelectionImage( SelectionHandleState state ) const
+{
+  if( SELECTION_HANDLE_PRESSED == state )
+  {
+    return mImpl->mSelectionPressedRight;
+  }
+
+  return mImpl->mSelectionReleasedRight;
 }
 
 void Decorator::AddHighlight( float x1, float y1, float x2, float y2 )
@@ -1168,6 +1208,16 @@ void Decorator::AddHighlight( float x1, float y1, float x2, float y2 )
 void Decorator::ClearHighlights()
 {
   mImpl->mHighlightQuadList.clear();
+}
+
+void Decorator::SetHighlightColor( const Vector4& color )
+{
+  mImpl->mHighlightColor = color;
+}
+
+const Vector4& Decorator::GetHighlightColor() const
+{
+  return mImpl->mHighlightColor;
 }
 
 void Decorator::SetPopupActive( bool active )
@@ -1200,16 +1250,6 @@ void Decorator::SetScrollSpeed( float speed )
 float Decorator::GetScrollSpeed() const
 {
   return mImpl->GetScrollSpeed();
-}
-
-void Decorator::SetScrollTickInterval( float seconds )
-{
-  mImpl->SetScrollTickInterval( seconds );
-}
-
-float Decorator::GetScrollTickInterval() const
-{
-  return mImpl->GetScrollTickInterval();
 }
 
 Decorator::~Decorator()
