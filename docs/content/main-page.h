@@ -28,7 +28,7 @@
  * - \link animation-multi-threading-notes Multi-threading Notes \endlink
  *
  * \section Constraints
- * - \link constraints-intro Introduction to Constraints \endlink
+ * - \link constraints Constraints \endlink
  *
  * \section SizeNegotiation Size Negotiation
  * - \link size-negotiation Size Negotiation \endlink
@@ -51,9 +51,7 @@
  *
  * \section Scripting
  * - \link script-overview Overview \endlink
- * - \link script-howto How to Add a Custom Control \endlink
  * - \link script-hello Hello World in script \endlink
- *
  * - \link handle-body-idiom Handle – body idiom \endlink
  *
  * \section Rendering
