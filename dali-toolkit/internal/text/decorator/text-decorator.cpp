@@ -83,9 +83,13 @@ const Dali::Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.5f, 1.5f, 1.0f );
 
 const unsigned int CURSOR_BLINK_INTERVAL = 500u; // Cursor blink interval
 const float TO_MILLISECONDS = 1000.f;
-const float TO_SECONDS = 1.f / 1000.f;
+const float TO_SECONDS = 1.f / TO_MILLISECONDS;
 
 const float DISPLAYED_HIGHLIGHT_Z_OFFSET( -0.05f );
+
+const float SCROLL_THRESHOLD = 10.f;
+const float SCROLL_SPEED = 15.f;
+const unsigned int SCROLL_TICK_INTERVAL = 50u;
 
 /**
  * structure to hold coordinates of each quad, which will make up the mesh.
@@ -151,6 +155,15 @@ namespace Text
 
 struct Decorator::Impl : public ConnectionTracker
 {
+  enum ScrollDirection
+  {
+    SCROLL_NONE,
+    SCROLL_RIGHT,
+    SCROLL_LEFT,
+    SCROLL_TOP,
+    SCROLL_BOTTOM
+  };
+
   struct CursorImpl
   {
     CursorImpl()
@@ -197,6 +210,10 @@ struct Decorator::Impl : public ConnectionTracker
     mCursorBlinkDuration( 0.0f ),
     mGrabDisplacementX( 0.0f ),
     mGrabDisplacementY( 0.0f ),
+    mScrollDirection( SCROLL_NONE ),
+    mScrollThreshold( SCROLL_THRESHOLD ),
+    mScrollSpeed( SCROLL_SPEED ),
+    mScrollInterval( SCROLL_TICK_INTERVAL ),
     mActiveGrabHandle( false ),
     mActiveSelection( false ),
     mActiveCopyPastePopup( false ),
@@ -690,12 +707,38 @@ struct Decorator::Impl : public ConnectionTracker
       if( Gesture::Started    == gesture.state ||
           Gesture::Continuing == gesture.state )
       {
-        mObserver.GrabHandleEvent( GRAB_HANDLE_PRESSED, x, y );
+        if( x < mScrollThreshold )
+        {
+          mScrollDirection = SCROLL_RIGHT;
+          mGrabDisplacementX -= x;
+          mCursor[PRIMARY_CURSOR].position.x = 0.f;
+          StartScrollTimer();
+        }
+        else if( x > mTextControlParent.GetControlSize().width - mScrollThreshold )
+        {
+          mScrollDirection = SCROLL_LEFT;
+          mGrabDisplacementX += ( mTextControlParent.GetControlSize().width - x );
+          mCursor[PRIMARY_CURSOR].position.x = mTextControlParent.GetControlSize().width;
+          StartScrollTimer();
+        }
+        else
+        {
+          StopScrollTimer();
+          mObserver.GrabHandleEvent( GRAB_HANDLE_PRESSED, x, y );
+        }
       }
       else if( Gesture::Finished  == gesture.state ||
                Gesture::Cancelled == gesture.state )
       {
-        mObserver.GrabHandleEvent( GRAB_HANDLE_RELEASED, x, y );
+        if( mScrollTimer && mScrollTimer.IsRunning() )
+        {
+          StopScrollTimer();
+          mObserver.GrabHandleEvent( GRAB_HANDLE_STOP_SCROLLING, x, y );
+        }
+        else
+        {
+          mObserver.GrabHandleEvent( GRAB_HANDLE_RELEASED, x, y );
+        }
       }
     }
   }
@@ -810,12 +853,86 @@ struct Decorator::Impl : public ConnectionTracker
     requiredPopupPosition.x = requiredPopupPosition.x + xOffSetToKeepWithinBounds;
   }
 
+  void SetScrollThreshold( float threshold )
+  {
+    mScrollThreshold = threshold;
+  }
+
+  float GetScrollThreshold() const
+  {
+    return mScrollThreshold;
+  }
+
+  void SetScrollSpeed( float speed )
+  {
+    mScrollSpeed = speed;
+  }
+
+  float GetScrollSpeed() const
+  {
+    return mScrollSpeed;
+  }
+
+  void SetScrollTickInterval( float seconds )
+  {
+    mScrollInterval = static_cast<unsigned int>( seconds * TO_MILLISECONDS );
+  }
+
+  float GetScrollTickInterval() const
+  {
+    return static_cast<float>( mScrollInterval ) * TO_SECONDS;
+  }
+
+  /**
+   * Creates and starts a timer to scroll the text when handles are close to the edges of the text.
+   *
+   * It only starts the timer if it's already created.
+   */
+  void StartScrollTimer()
+  {
+    if( !mScrollTimer )
+    {
+      mScrollTimer = Timer::New( mScrollInterval );
+      mScrollTimer.TickSignal().Connect( this, &Decorator::Impl::OnScrollTimerTick );
+    }
+
+    if( !mScrollTimer.IsRunning() )
+    {
+      mScrollTimer.Start();
+    }
+  }
+
+  /**
+   * Stops the timer used to scroll the text.
+   */
+  void StopScrollTimer()
+  {
+    if( mScrollTimer )
+    {
+      mScrollTimer.Stop();
+    }
+  }
+
+  /**
+   * Callback called by the timer used to scroll the text.
+   *
+   * It calculates and sets a new scroll position.
+   */
+  bool OnScrollTimerTick()
+  {
+    mObserver.GrabHandleEvent( GRAB_HANDLE_SCROLLING,
+                               mScrollDirection == SCROLL_RIGHT ? mScrollSpeed : -mScrollSpeed,
+                               0.f );
+    return true;
+  }
+
   Internal::Control&  mTextControlParent;
   Observer&           mObserver;
 
   TapGestureDetector  mTapDetector;
   PanGestureDetector  mPanGestureDetector;
   Timer               mCursorBlinkTimer;          ///< Timer to signal cursor to blink
+  Timer               mScrollTimer;               ///< Timer used to scroll the text when the grab handle is moved close to the edges.
 
   Layer               mActiveLayer;               ///< Layer for active handles and alike that ensures they are above all else.
   ImageActor          mPrimaryCursor;
@@ -843,6 +960,10 @@ struct Decorator::Impl : public ConnectionTracker
   float               mCursorBlinkDuration;
   float               mGrabDisplacementX;
   float               mGrabDisplacementY;
+  ScrollDirection     mScrollDirection;         ///< The direction of the scroll.
+  float               mScrollThreshold;         ///< Defines a square area inside the control, close to the edge. A cursor entering this area will trigger scroll events.
+  float               mScrollSpeed;             ///< Distance the text scrolls during a scroll interval.
+  unsigned int        mScrollInterval;          ///< Time in milliseconds of a scroll interval.
 
   bool                mActiveGrabHandle       : 1;
   bool                mActiveSelection        : 1;
@@ -1057,6 +1178,38 @@ void Decorator::SetPopupActive( bool active )
 bool Decorator::IsPopupActive() const
 {
   return mImpl->mActiveCopyPastePopup ;
+}
+
+/** Scroll **/
+
+void Decorator::SetScrollThreshold( float threshold )
+{
+  mImpl->SetScrollThreshold( threshold );
+}
+
+float Decorator::GetScrollThreshold() const
+{
+  return mImpl->GetScrollThreshold();
+}
+
+void Decorator::SetScrollSpeed( float speed )
+{
+  mImpl->SetScrollSpeed( speed );
+}
+
+float Decorator::GetScrollSpeed() const
+{
+  return mImpl->GetScrollSpeed();
+}
+
+void Decorator::SetScrollTickInterval( float seconds )
+{
+  mImpl->SetScrollTickInterval( seconds );
+}
+
+float Decorator::GetScrollTickInterval() const
+{
+  return mImpl->GetScrollTickInterval();
 }
 
 Decorator::~Decorator()

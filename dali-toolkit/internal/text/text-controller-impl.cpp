@@ -353,12 +353,33 @@ void Controller::Impl::OnGrabHandleEvent( const Event& event )
     }
   }
   else if( mEventData->mGrabHandlePopupEnabled &&
-           ( GRAB_HANDLE_RELEASED == state ) )
+           ( ( GRAB_HANDLE_RELEASED == state ) ||
+             ( GRAB_HANDLE_STOP_SCROLLING == state ) ) )
   {
     //mDecorator->ShowPopup();
     ChangeState ( EventData::EDITING_WITH_POPUP );
     mEventData->mUpdateCursorPosition = true;
     mEventData->mDecoratorUpdated = true;
+
+    if( GRAB_HANDLE_STOP_SCROLLING == state )
+    {
+      // The event.p2 and event.p3 are in decorator coords. Need to transforms to text coords.
+      const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
+      const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
+
+      mEventData->mPrimaryCursorPosition = GetClosestCursorIndex( xPosition, yPosition );
+
+      mEventData->mScrollAfterUpdateCursorPosition = true;
+    }
+  }
+  else if( GRAB_HANDLE_SCROLLING == state )
+  {
+    const float xSpeed = event.p2.mFloat;
+    const Vector2& actualSize = mVisualModel->GetActualSize();
+
+    mEventData->mScrollPosition.x += xSpeed;
+
+    ClampHorizontalScroll( actualSize );
   }
 }
 
@@ -908,7 +929,7 @@ void Controller::Impl::ScrollToMakeCursorVisible()
     mEventData->mDecorator->UpdatePositions( offset );
   }
 
-  // TODO : calculate the Y scroll.
+  // TODO : calculate the vertical scroll.
 }
 
 void Controller::Impl::RequestRelayout()
