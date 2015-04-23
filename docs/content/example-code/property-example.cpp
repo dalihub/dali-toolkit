@@ -101,7 +101,7 @@ class PropertyButtonsController: public ConnectionTracker
     }
 
     // Create the last selected button text view.
-    mTagText = Toolkit::TextView::New( "None selected" );
+    mTagText = Toolkit::TextLabel::New( "None selected" );
     mTagText.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
     mTagText.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
     mTagText.SetPosition( Vector3( 0.0f, -30.0f, 0.0f ) );
@@ -121,14 +121,14 @@ class PropertyButtonsController: public ConnectionTracker
     // Property::Index index = button.GetPropertyIndex( TAG_PROPERTY_NAME );
     valueText << "Selected: " << button.GetProperty< float >( mTagPropertyIndex );
 
-    mTagText.SetText( valueText.str() );
+    mTagText.SetProperty( TextLabel::Property::TEXT, valueText.str() );
 
     return true;
   }
 
   private:
 
-  Toolkit::TextView mTagText;        ///< A text label used to show the last button pressed.
+  Toolkit::TextLabel mTagText;        ///< A text label used to show the last button pressed.
   Property::Index mTagPropertyIndex; ///< A cached property index of our custom tag property.
 };
 

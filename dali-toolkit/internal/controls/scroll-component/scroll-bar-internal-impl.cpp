@@ -134,11 +134,11 @@ struct ScrollBarInternalRotationConstraint
 
     if( (mVertical && Toolkit::IsVertical(orientation)) || (!mVertical && Toolkit::IsHorizontal(orientation)) )
     {
-      current = Quaternion(0.0f, Vector3::ZAXIS);
+      current = Quaternion( Radian( 0.0f ), Vector3::ZAXIS );
     }
     else
     {
-      current = Quaternion(0.5f * Math::PI, Vector3::ZAXIS);
+      current = Quaternion( Radian( 0.5f * Math::PI ), Vector3::ZAXIS);
     }
   }
 

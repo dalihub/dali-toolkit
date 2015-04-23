@@ -52,9 +52,9 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Cluster, Toolkit::Control, Create )
 
-DALI_ACTION_REGISTRATION( Cluster, "expand",    ACTION_EXPAND    )
-DALI_ACTION_REGISTRATION( Cluster, "collapse",  ACTION_COLLAPSE  )
-DALI_ACTION_REGISTRATION( Cluster, "transform", ACTION_TRANSFORM )
+DALI_ACTION_REGISTRATION( Toolkit, Cluster, "expand",    ACTION_EXPAND    )
+DALI_ACTION_REGISTRATION( Toolkit, Cluster, "collapse",  ACTION_COLLAPSE  )
+DALI_ACTION_REGISTRATION( Toolkit, Cluster, "transform", ACTION_TRANSFORM )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -82,7 +82,7 @@ Dali::Toolkit::Cluster Cluster::New(Toolkit::ClusterStyle& style)
 }
 
 Cluster::Cluster(Toolkit::ClusterStyle& style)
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | DISABLE_SIZE_NEGOTIATION ) ),
   mClusterStyle(style),
   mExpandedCount(0)
 {
@@ -285,7 +285,7 @@ void Cluster::ExpandChild( unsigned int index )
       const float angle = (rand()%360) * Math::PI / 180.0f;
       Vector3 position(sin(angle) * length, -cos(angle) * length, zOffset);
       const float scale(1.2f);
-      const float rotate = ((rand()%30) - 15) * Math::PI / 180.0f;
+      const Radian rotate( Degree( (rand()%30) - 15 ) );
 
       position += childInfo.mActor.GetCurrentPosition();
 
@@ -521,7 +521,7 @@ void Cluster::DoTransformAction(const PropertyValueContainer& attributes)
   unsigned int index = attributes[0].Get<float>();
   Vector3 position;
   Vector3 scale(Vector3::ONE);
-  Quaternion rotation(0.0f, Vector3::ZAXIS);
+  Quaternion rotation( Dali::ANGLE_0, Vector3::ZAXIS );
 
   DALI_ASSERT_ALWAYS(attributes[1].GetType() == Property::VECTOR3);
   attributes[1].Get(position);

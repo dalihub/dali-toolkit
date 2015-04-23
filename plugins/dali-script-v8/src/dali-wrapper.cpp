@@ -24,7 +24,6 @@
 #include <dali/integration-api/debug.h>
 #include <actors/actor-wrapper.h>
 #include <stage/stage-wrapper.h>
-#include <image/image-attributes-wrapper.h>
 #include <image/image-wrapper.h>
 #include <animation/path-wrapper.h>
 #include <animation/path-constraint-wrapper.h>
@@ -72,7 +71,6 @@ const ApiFunction ConstructorFunctionTable[]=
     { "BufferImage",        ImageWrapper::NewImage },
     { "NinePatchImage",     ImageWrapper::NewImage },
     { "FrameBufferImage",   ImageWrapper::NewImage },
-    { "ImageAttributes",    ImageAttributesWrapper::NewImageAttributes },
     { "Animation",          AnimationWrapper::NewAnimation},
     { "ShaderEffect",       ShaderEffectWrapper::NewShaderEffect},
     { "Builder",            BuilderWrapper::NewBuilder},

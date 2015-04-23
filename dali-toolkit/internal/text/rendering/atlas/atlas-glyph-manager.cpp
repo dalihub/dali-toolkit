@@ -98,10 +98,9 @@ void AtlasGlyphManager::Cached( Text::FontId fontId,
   GetImplementation(*this).Cached( fontId, index, slot );
 }
 
-void AtlasGlyphManager::SetNewAtlasSize( const Vector2& size,
-                                         const Vector2& blockSize )
+void AtlasGlyphManager::SetNewAtlasSize( uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight )
 {
-  GetImplementation(*this).SetNewAtlasSize( size, blockSize );
+  GetImplementation(*this).SetNewAtlasSize( width, height, blockWidth, blockHeight );
 }
 
 Vector2 AtlasGlyphManager::GetAtlasSize( uint32_t atlasId )

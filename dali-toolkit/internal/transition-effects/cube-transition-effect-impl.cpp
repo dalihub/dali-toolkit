@@ -41,7 +41,7 @@ namespace
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::CubeTransitionEffect, Dali::BaseHandle, NULL );
 
-DALI_SIGNAL_REGISTRATION( CubeTransitionEffect, "transition-completed", SIGNAL_TRANSITION_COMPLETED )
+DALI_SIGNAL_REGISTRATION( Toolkit, CubeTransitionEffect, "transition-completed", SIGNAL_TRANSITION_COMPLETED )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -117,8 +117,7 @@ void CubeTransitionEffect::Initialize()
 
   // helper actor to create a off-screen image using shader effect
   mEmptyImage = ImageActor::New( placeHolder );
-  mEmptyImage.SetRelayoutEnabled( false );
-  mEmptyImage.SetSize(Stage::GetCurrent().GetSize());
+  mEmptyImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   mEmptyImage.SetParentOrigin( ParentOrigin::CENTER );
   mEmptyImage.SetAnchorPoint( AnchorPoint::CENTER );
   mFullImageCreator = FullAreaImageCreator::New();
@@ -141,7 +140,6 @@ void CubeTransitionEffect::Initialize()
 ImageActor CubeTransitionEffect::CreateTile( Image image, const Vector4& color )
 {
   ImageActor tile = ImageActor::New( image );
-  tile.SetRelayoutEnabled( false );
   tile.SetParentOrigin( ParentOrigin::CENTER );
   tile.SetAnchorPoint( AnchorPoint::CENTER );
   tile.SetSize( mTileSize );

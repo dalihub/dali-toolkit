@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,7 +193,7 @@ struct GridRotationConstraint0
 {
   Quaternion operator()(const Quaternion& current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)
   {
-    return Quaternion(0.0f, Vector3::ZAXIS);
+    return Quaternion( Radian( 0.0f ), Vector3::ZAXIS);
   }
 };
 
@@ -201,7 +201,7 @@ struct GridRotationConstraint90
 {
   Quaternion operator()(const Quaternion& current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)
   {
-    return Quaternion(1.5f * Math::PI, Vector3::ZAXIS);
+    return Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS);
   }
 };
 
@@ -209,7 +209,7 @@ struct GridRotationConstraint180
 {
   Quaternion operator()(const Quaternion& current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)
   {
-    return Quaternion(Math::PI, Vector3::ZAXIS);
+    return Quaternion( Radian( Math::PI ), Vector3::ZAXIS);
   }
 };
 
@@ -217,7 +217,7 @@ struct GridRotationConstraint270
 {
   Quaternion operator()(const Quaternion& current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)
   {
-    return Quaternion(0.5f * Math::PI, Vector3::ZAXIS);
+    return Quaternion( Radian( 0.5f * Math::PI ), Vector3::ZAXIS);
   }
 };
 
@@ -692,19 +692,19 @@ Degree GridLayout::GetScrollDirection() const
 
   if (mOrientation == ControlOrientation::Up)
   {
-    scrollDirection = 0.0f;
+    scrollDirection = Degree( 0.0f );
   }
   else if (mOrientation == ControlOrientation::Left)
   {
-    scrollDirection = 90.0f;
+    scrollDirection = Degree( 90.0f );
   }
   else if (mOrientation == ControlOrientation::Down)
   {
-    scrollDirection = 180.0f;
+    scrollDirection = Degree( 180.0f );
   }
   else // mOrientation == ControlOrientation::Right
   {
-    scrollDirection = 270.0f;
+    scrollDirection = Degree( 270.0f );
   }
 
   return scrollDirection;

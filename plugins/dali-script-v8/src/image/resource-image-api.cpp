@@ -18,12 +18,12 @@
 // CLASS HEADER
 #include "resource-image-api.h"
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/images/image-operations.h>
+
 // INTERNAL INCLUDES
 #include <v8-utils.h>
 #include <image/image-wrapper.h>
-#include <image/image-attributes-wrapper.h>
-#include <image/image-attributes-api.h>
-
 
 namespace Dali
 {
@@ -51,7 +51,6 @@ ResourceImage ResourceImageApi::GetResourceImage( v8::Isolate* isolate, const v8
  * @for ResourceImage
  * @param {Object} options
  * @param {String} options.url The URL of the image file to use.
- * @param {Object} [option.imageAttributes] image attributes object
  * @param {Integer} [options.loadPolicy] The LoadPolicy to apply when loading the image resource.
  * @param {Integer} [options.releasePolicy] optionally release memory when image is not visible on screen.
  * @return {Object} Image
@@ -62,10 +61,12 @@ Image ResourceImageApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
   v8::HandleScope handleScope( isolate );
 
   std::string url;
+  ImageDimensions dimensions;
+  FittingMode::Type fittingMode = FittingMode::DEFAULT;
+  SamplingMode::Type samplingMode = SamplingMode::DEFAULT;
+  bool orientationCorrection = true;
   ResourceImage::LoadPolicy loadPolicy( ResourceImage::IMMEDIATE );
   Image::ReleasePolicy releasePolicy( Image::NEVER);
-  ImageAttributes imageAttributes;
-  bool useImageAttributes = false;
 
   v8::Local<v8::Value> options( args[0] );
 
@@ -88,13 +89,37 @@ Image ResourceImageApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
     return Image();
   }
 
-  v8::Local<v8::Value> imageAttribsValue= optionsObject->Get( v8::String::NewFromUtf8( isolate, "imageAttributes" ) );
-  if( imageAttribsValue->IsObject() )
+  v8::Local<v8::Value> widthValue = optionsObject->Get( v8::String::NewFromUtf8( isolate, "width" ) );
+  if( widthValue->IsUint32() )
   {
-    imageAttributes = ImageAttributesApi::GetImageAttributesFromObject( isolate, imageAttribsValue->ToObject() );
+    const uint32_t width = widthValue->ToUint32()->Value();
+    dimensions = ImageDimensions( width, dimensions.GetHeight() );
   }
 
+  v8::Local<v8::Value> heightValue = optionsObject->Get( v8::String::NewFromUtf8( isolate, "height" ) );
+  if( heightValue->IsUint32() )
+  {
+    const uint32_t height = heightValue->ToUint32()->Value();
+    dimensions = ImageDimensions( dimensions.GetWidth(), height );
+  }
 
+  v8::Local<v8::Value> fittingModeValue = optionsObject->Get( v8::String::NewFromUtf8( isolate, "fittingMode" ) );
+  if( fittingModeValue->IsUint32() )
+  {
+    fittingMode = static_cast<FittingMode::Type>( fittingModeValue->ToUint32()->Value() );
+  }
+
+  v8::Local<v8::Value> samplingModeValue = optionsObject->Get( v8::String::NewFromUtf8( isolate, "samplingMode" ) );
+  if( samplingModeValue->IsUint32() )
+  {
+    samplingMode = static_cast<SamplingMode::Type>( samplingModeValue->ToUint32()->Value() );
+  }
+
+  v8::Local<v8::Value> orientationCorrectionValue = optionsObject->Get( v8::String::NewFromUtf8( isolate, "orientationCorrection" ) );
+  if( orientationCorrectionValue->IsBoolean() )
+  {
+    orientationCorrection = orientationCorrectionValue->ToBoolean()->Value();
+  }
 
   v8::Local<v8::Value> releasePolicyValue = optionsObject->Get( v8::String::NewFromUtf8( isolate, "releasePolicy" ) );
   if( releasePolicyValue->IsUint32() )
@@ -108,14 +133,7 @@ Image ResourceImageApi::New( const v8::FunctionCallbackInfo< v8::Value >& args )
     loadPolicy = static_cast< ResourceImage::LoadPolicy >( loadPolicyValue->ToUint32()->Value());
   }
 
-  if( useImageAttributes )
-  {
-    return ResourceImage::New( url, imageAttributes, loadPolicy, releasePolicy);
-  }
-  else
-  {
-    return ResourceImage::New( url, loadPolicy, releasePolicy);
-  }
+  return ResourceImage::New( url, loadPolicy, releasePolicy, dimensions, fittingMode, samplingMode, orientationCorrection );
 }
 
 /**
@@ -176,7 +194,6 @@ void ResourceImageApi::GetUrl( const v8::FunctionCallbackInfo< v8::Value >& args
 
 /**
  * Reload the image
- * The set ImageAttributes are used when requesting the image again.
  * @note if Image is offstage and OnDemand policy is set, reload request is ignored.
  * @method reload
  * @for ResourceImage
@@ -190,28 +207,6 @@ void ResourceImageApi::Reload( const v8::FunctionCallbackInfo< v8::Value >& args
   image.Reload();
 }
 
-
-/**
- * Return attributes for the image
- * Only to be used after the image has finished loading.
- * (Ticket's LoadingSucceeded callback was called)
- * The returned value will reflect the true image dimensions once the asynchronous loading has finished.
- *
- * @method getAttributes
- * @for ResourceImage
- * @return {Object} ImageAttributes
- */
-void ResourceImageApi::GetAttributes( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-
-  ResourceImage image = GetResourceImage( isolate, args );
-
-  v8::Local<v8::Object> localObject = ImageAttributesWrapper::WrapImageAttributes(isolate, image.GetAttributes());
-
-  args.GetReturnValue().Set( localObject );
-}
 } // namespace V8Plugin
 
 } // namespace Dali

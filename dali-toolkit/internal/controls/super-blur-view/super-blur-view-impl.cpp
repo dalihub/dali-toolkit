@@ -97,14 +97,14 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::SuperBlurView, Toolkit::Control, Create )
 
-DALI_PROPERTY_REGISTRATION( SuperBlurView, "image", MAP, IMAGE )
+DALI_PROPERTY_REGISTRATION( Toolkit, SuperBlurView, "image", MAP, IMAGE )
 
 DALI_TYPE_REGISTRATION_END()
 
 } // unnamed namespace
 
 SuperBlurView::SuperBlurView( unsigned int blurLevels )
-: Control( CONTROL_BEHAVIOUR_NONE ),
+: Control( ControlBehaviour( DISABLE_SIZE_NEGOTIATION ) ),
   mBlurLevels( blurLevels ),
   mBlurStrengthPropertyIndex(Property::INVALID_INDEX),
   mResourcesCleared( true ),

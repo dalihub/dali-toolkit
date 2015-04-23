@@ -60,10 +60,7 @@ public:
   struct AtlasDescriptor
   {
     Dali::Atlas mAtlas;                                                 // atlas image
-    SizeType mWidth;                                                    // width of atlas
-    SizeType mHeight;                                                   // height of atlas
-    SizeType mBlockWidth;                                               // width of a block in atlas
-    SizeType mBlockHeight;                                              // height of a block in atlas
+    Toolkit::AtlasManager::AtlasSize mSize;                             // size of atlas
     Pixel::Format mPixelFormat;                                         // pixel format used by atlas
     BufferImage mHorizontalStrip;                                       // Image used to pad upload
     BufferImage mVerticalStrip;                                         // Image used to pad upload
@@ -95,11 +92,7 @@ public:
   /**
    * @copydoc: Toolkit::AtlasManager::CreateAtlas
    */
-  AtlasId CreateAtlas( SizeType width,
-                       SizeType height,
-                       SizeType blockWidth,
-                       SizeType blockHeight,
-                       Pixel::Format pixelformat );
+  AtlasId CreateAtlas( const Toolkit::AtlasManager::AtlasSize& size, Pixel::Format pixelformat );
 
   /**
    * @copydoc Toolkit::AtlasManager::SetAddPolicy
@@ -152,13 +145,12 @@ public:
   /**
    * @copydoc Toolkit::AtlasManager::SetNewAtlasSize
    */
-  void SetNewAtlasSize( const Vector2& size,
-                        const Vector2& blockSize );
+  void SetNewAtlasSize( const Toolkit::AtlasManager::AtlasSize& size );
 
   /**
    * @copydoc Toolkit::AtlasManager::GetAtlasSize
    */
-  Vector2 GetAtlasSize( AtlasId atlas );
+  const Toolkit::AtlasManager::AtlasSize& GetAtlasSize( AtlasId atlas );
 
   /**
    * @copydoc Toolkit::AtlasManager::GetBlockSize
@@ -215,8 +207,7 @@ private:
 
   void PrintMeshData( const MeshData& meshData );
 
-  Vector2 mNewAtlasSize;
-  Vector2 mNewBlockSize;
+  Toolkit::AtlasManager::AtlasSize mNewAtlasSize;
   Toolkit::AtlasManager::AddFailPolicy mAddFailPolicy;
   uint32_t mFilledPixel;
 };

@@ -164,7 +164,7 @@ int UtcDaliDepthLayoutSetAndGetTiltAngle(void)
   depthLayout->SetTiltAngle(Degree(25.0f));
 
   // Check whether we get the correct tilt angle
-  DALI_TEST_EQUALS(float(depthLayout->GetTiltAngle()), 25.0f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS(depthLayout->GetTiltAngle(), Degree(25.0f), 0.001f, TEST_LOCATION );
   END_TEST;
 }
 
@@ -209,7 +209,7 @@ int UtcDaliDepthLayoutSetAndGetItemTiltAngle(void)
   depthLayout->SetItemTiltAngle(Degree(5.0f));
 
   // Check whether we get the correct item's tilt angle
-  DALI_TEST_EQUALS(float(depthLayout->GetItemTiltAngle()), 5.0f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS(depthLayout->GetItemTiltAngle(), Degree(5.0f), 0.001f, TEST_LOCATION );
   END_TEST;
 }
 
@@ -587,7 +587,7 @@ int UtcDaliDepthLayoutScrollDirection(void)
   application.Render();
 
   Degree deg = layout->GetScrollDirection();
-  DALI_TEST_CHECK(deg == 180.0f);
+  DALI_TEST_CHECK(deg.degree == 180.0f);
 
   navigationLayout->SetOrientation(ControlOrientation::Down);
   view.ActivateLayout(0, vec, 0.0f);
@@ -595,7 +595,7 @@ int UtcDaliDepthLayoutScrollDirection(void)
   application.Render();
 
   deg = layout->GetScrollDirection();
-  DALI_TEST_CHECK((deg == 0.0f));
+  DALI_TEST_CHECK((deg.degree == 0.0f));
 
   layout->SetOrientation(ControlOrientation::Left);
   view.ActivateLayout(0, vec, 0.0f);
@@ -603,7 +603,7 @@ int UtcDaliDepthLayoutScrollDirection(void)
   application.Render();
 
   deg = layout->GetScrollDirection();
-  DALI_TEST_CHECK(deg == 270.0f);
+  DALI_TEST_CHECK(deg.degree == 270.0f);
 
   navigationLayout->SetOrientation(ControlOrientation::Right);
   view.ActivateLayout(0, vec, 0.0f);
@@ -611,7 +611,7 @@ int UtcDaliDepthLayoutScrollDirection(void)
   application.Render();
 
   deg = layout->GetScrollDirection();
-  DALI_TEST_CHECK(deg == 90.0f);
+  DALI_TEST_CHECK(deg.degree == 90.0f);
 
   Stage::GetCurrent().Remove(view);
   END_TEST;

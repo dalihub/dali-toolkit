@@ -45,11 +45,7 @@ This section details how an actor may be used with size negotiation.
 
 <h3>Enabling Size Negotiation</h3>
 
-The first thing to do is to specify whether you want an actor to be included or excluded from the relayout process. The following method is used to enable or disable the relayout
-for an individual actor. Make sure this is the first thing that is called after the actor is created otherwise the actor may still be negotiated.
-@code void SetRelayoutEnabled( bool enabled ) @endcode
-Text and image actors have relayout enabled by default, while a plain Actor is disabled. Be aware that if desiring to use an Actor in relayout
-then relayout needs to be explicitly enabled first.
+Text and image actors have relayout enabled by default, while a plain Actor is disabled unless a call to SetResizePolicy is made.
 
 <h3>Specifying Size Policies</h3>
 
@@ -69,7 +65,6 @@ the height of the root actor will fit to the height of the child image.
 
 @code
 Actor rootActor = Actor::New();
-rootActor.SetRelayoutEnabled( true );
 rootActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 rootActor.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::HEIGHT );
 ImageActor image = ImageActor::New( Image::New( MY_IMAGE_PATH ) );
@@ -92,8 +87,7 @@ Dimension::WIDTH then there is a height-for-width dependency in effect. The clas
 is a text view that wraps its text. The following example snippet shows a text view that expands its width to the size of its parent, wraps its
 contents and then determines its height based on the width.
 @code
-TextView text = TextView::New( "Example" );
-text.SetMultilinePolicy( SplitByWord );
+TextLabel text = TextLabel::New( "Example" );
 text.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 text.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 @endcode
@@ -140,11 +134,7 @@ content.SetFitHeight( 1 );
 content.SetPadding( Padding( 20.0f, 20.0f, 20.0f, 0.0f ) );
 
 // Text
-Toolkit::TextView text = Toolkit::TextView::New();
-text.SetText( "Do you really want to quit?" );
-text.SetMultilinePolicy( Toolkit::TextView::SplitByWord );
-text.SetWidthExceedPolicy( Toolkit::TextView::Split );
-text.SetLineJustification( Toolkit::TextView::Left );
+Toolkit::TextLabel text = Toolkit::TextLabel::New( "Do you really want to quit?" );
 text.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 text.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 
@@ -174,9 +164,7 @@ checkBox.SetSize( Vector2( 48, 48 ) );
 
 root.AddChild( checkBox, Toolkit::TableView::CellPosition( 0, 0 ) );
 
-Toolkit::TextView text2 = Toolkit::TextView::New();
-text2.SetText( "Don't show again" );
-text2.SetLineJustification( Toolkit::TextView::Left );
+Toolkit::TextLabel text2 = Toolkit::TextLabel::New( "Don't show again" );
 text2.SetPadding( Padding( 20.0f, 0.0f, 0.0f, 10.0f ) );
 
 root.AddChild( text2, Toolkit::TableView::CellPosition( 0, 1 ) );

@@ -144,8 +144,8 @@ public:
 
     angle *= activate;
 
-    current = Quaternion(-angle.x, Vector3::YAXIS) *
-              Quaternion(angle.y, Vector3::XAXIS) *
+    current = Quaternion( Radian( -angle.x ), Vector3::YAXIS ) *
+              Quaternion( Radian( angle.y ), Vector3::XAXIS ) *
               current;
   }
 

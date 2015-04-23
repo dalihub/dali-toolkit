@@ -100,8 +100,7 @@ public:
   /**
    * @copydoc Toolkit::AtlasGlyphManager::SetNewAtlasSize
    */
-  void SetNewAtlasSize( const Vector2& size,
-                        const Vector2& blockSize );
+  void SetNewAtlasSize( uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight );
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::Remove

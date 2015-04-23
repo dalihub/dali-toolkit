@@ -117,9 +117,9 @@ public:
     Vector2 angle( Clamp(position.x, -1.0f,1.0f),
                    Clamp(position.y, -1.0f,1.0f) );
 
-    current = Quaternion( angle.x * mAngleSwing.x, Vector3::YAXIS) *
-                          Quaternion(-angle.y * mAngleSwing.y, Vector3::XAXIS) *
-                          current;
+    current = Quaternion( Radian( angle.x * mAngleSwing.x ), Vector3::YAXIS ) *
+              Quaternion( Radian( -angle.y * mAngleSwing.y ), Vector3::XAXIS ) *
+              current;
   }
 
   /**
@@ -255,9 +255,9 @@ public:
 
     // Rotate position (current) about point.
     Vector3 position = current - mAnchor;
-    Quaternion rotatorY(angle.x, Vector3::YAXIS);
+    Quaternion rotatorY( Radian( angle.x ), Vector3::YAXIS);
     position = rotatorY.Rotate(position);
-    Quaternion rotatorX(-angle.y, Vector3::XAXIS);
+    Quaternion rotatorX( Radian( -angle.y ), Vector3::XAXIS);
     position = rotatorX.Rotate(position);
     position += mAnchor;
     position += relativePosition * mPositionSwing;

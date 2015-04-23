@@ -198,7 +198,7 @@ public:
   void SetPosition( Cursor cursor, float x, float y, float cursorHeight, float lineHeight );
 
   /**
-   * @brief Retrieves the position of a cursor.
+   * @brief Retrieves the position, height and lineHeight of a cursor.
    *
    * @param[in] cursor The cursor to get.
    * @param[out] x The x position relative to the top-left of the parent control.
@@ -370,7 +370,6 @@ public:
    * @return True if the Selection Popup should be active.
    */
   bool IsPopupActive() const;
-
 
 protected:
 

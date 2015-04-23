@@ -110,13 +110,18 @@ void AtlasGlyphManager::Cached( Text::FontId fontId,
 
 Vector2 AtlasGlyphManager::GetAtlasSize( uint32_t atlasId )
 {
-  return mAtlasManager.GetAtlasSize( atlasId );
+  Toolkit::AtlasManager::AtlasSize size = mAtlasManager.GetAtlasSize( atlasId );
+  return Vector2( static_cast< float >( size.mWidth ), static_cast< float >( size.mHeight ) );
 }
 
-void AtlasGlyphManager::SetNewAtlasSize( const Vector2& size,
-                                         const Vector2& blockSize )
+void AtlasGlyphManager::SetNewAtlasSize( uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight )
 {
-    mAtlasManager.SetNewAtlasSize( size, blockSize );
+  Toolkit::AtlasManager::AtlasSize size;
+  size.mWidth = width;
+  size.mHeight = height;
+  size.mBlockWidth = blockWidth;
+  size.mBlockHeight = blockHeight;
+  mAtlasManager.SetNewAtlasSize( size );
 }
 
 void AtlasGlyphManager::Remove( uint32_t imageId )

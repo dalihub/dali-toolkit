@@ -224,14 +224,14 @@ v8::Handle< v8::Value > GetV8ValueFrom( v8::Isolate* isolate,
        else if(field == "axis")
       {
         Dali::Vector3 axis;
-        float angle;
+        Radian angle;
         value.Get<Dali::Quaternion>().ToAxisAngle(axis, angle);
         ret = PropertyValueWrapper::WrapDaliProperty( isolate , Dali::Property::Value( axis ) );
       }
       else if(field == "angle")
       {
         Dali::Vector3 axis;
-        float angle;
+        Radian angle;
         value.Get<Dali::Quaternion>().ToAxisAngle(axis, angle);
         ret = PropertyValueWrapper::WrapDaliProperty( isolate , Dali::Property::Value( angle ) );
       }
@@ -384,24 +384,24 @@ void SetFromV8Value(v8::Isolate* isolate,
       {
         Dali::Vector4 v4 = value.Get<Dali::Quaternion>().EulerAngles();
         v4.z = asFloat;
-        value = Dali::Quaternion(v4.x, v4.y, v4.z);
+        value = Dali::Quaternion( Radian(Degree(v4.x)), Radian(Degree(v4.y)), Radian(Degree(v4.z)) );
       }
       else if(field == "pitch")
       {
         Dali::Vector4 v4 = value.Get<Dali::Quaternion>().EulerAngles();
         v4.x = asFloat;
-        value = Dali::Quaternion(v4.x, v4.y, v4.z);
+        value = Dali::Quaternion( Radian(Degree(v4.x)), Radian(Degree(v4.y)), Radian(Degree(v4.z)) );
       }
       else if(field == "yaw")
       {
         Dali::Vector4 v4 = value.Get<Dali::Quaternion>().EulerAngles();
         v4.y = asFloat;
-        value = Dali::Quaternion(v4.x, v4.y, v4.z);
+        value = Dali::Quaternion( Radian(Degree(v4.x)), Radian(Degree(v4.y)), Radian(Degree(v4.z)) );
       }
       else if(field == "axis")
       {
         Dali::Vector3 axis;
-        float angle;
+        Radian angle;
         value.Get<Dali::Quaternion>().ToAxisAngle(axis, angle);
 
         if( v8Value->IsObject() )
@@ -426,9 +426,9 @@ void SetFromV8Value(v8::Isolate* isolate,
       else if(field == "angle")
       {
         Dali::Vector3 axis;
-        float angle;
-        value.Get<Dali::Quaternion>().ToAxisAngle(axis, angle);
-        value = Dali::Quaternion(asFloat, axis);
+        Radian angle;
+        value.Get<Dali::Quaternion>().ToAxisAngle( axis, angle );
+        value = Dali::Quaternion( Degree( asFloat ), axis );
       }
       else
       {
@@ -734,9 +734,9 @@ Dali::Property::Value PropertyValueWrapper::ExtractPropertyValue( v8::Isolate* i
       }
       else if(array.GetType() == Dali::Property::VECTOR3)
       {
-        // v3 treated as euler
+        // v3 treated as euler in degrees
         Dali::Vector3 v = array.Get<Dali::Vector3>();
-        daliPropertyValue = Dali::Quaternion(v[0], v[1], v[2]);
+        daliPropertyValue = Dali::Quaternion( Radian(Degree(v[0])), Radian(Degree(v[1])), Radian(Degree(v[2])) );
       }
       break;
     }
@@ -785,24 +785,23 @@ void PropertyValueWrapper::NewRotation( const v8::FunctionCallbackInfo< v8::Valu
   bool foundAllArguments(false);
   V8Utils::ReadFloatArguments( foundAllArguments, v, 4, args, 0.f );
 
-  int len = args.Length();
+  int length = args.Length();
 
   // if length = 4 create AngleAxis, else create Quaternion
 
-  if(len > 3)
+  if( length > 3 )
   {
-    Dali::AngleAxis axis(  Dali::Degree(v[0] ), Dali::Vector3(v[1], v[2], v[3]) );
-    object = WrapDaliProperty( isolate ,   Dali::Property::Value( axis ) );
+    const Dali::AngleAxis axis(  Degree( v[0] ), Vector3(v[1], v[2], v[3]) );
+    object = WrapDaliProperty( isolate, Dali::Property::Value( axis ) );
   }
-  else if(len > 2)
+  else if( length > 2 )
   {
-    Dali::Quaternion quaternion( v[0], v[1], v[2] );
-    object = WrapDaliProperty( isolate ,  Dali::Property::Value( quaternion ) );
+    object = WrapDaliProperty( isolate, Dali::Quaternion( Degree(v[0]), Degree(v[1]), Degree(v[2]) ) );
   }
   else
   {
-    Dali::Quaternion quaternion( Dali::Quaternion(0.f, Dali::Vector4::YAXIS));
-    object = WrapDaliProperty( isolate , Dali::Property::Value( quaternion ) );
+    const Dali::Quaternion quaternion( Dali::Quaternion( Dali::ANGLE_0, Dali::Vector3::YAXIS));
+    object = WrapDaliProperty( isolate, quaternion );
   }
 
   args.GetReturnValue().Set( object );

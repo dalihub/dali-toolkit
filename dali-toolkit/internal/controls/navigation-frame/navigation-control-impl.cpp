@@ -52,15 +52,15 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::NavigationControl, Toolkit::Control, Create )
 
-DALI_ACTION_REGISTRATION( NavigationControl, "push", ACTION_PUSH )
-DALI_ACTION_REGISTRATION( NavigationControl, "pop",  ACTION_POP  )
+DALI_ACTION_REGISTRATION( Toolkit, NavigationControl, "push", ACTION_PUSH )
+DALI_ACTION_REGISTRATION( Toolkit, NavigationControl, "pop",  ACTION_POP  )
 
 DALI_TYPE_REGISTRATION_END()
 
 }
 
 NavigationControl::NavigationControl()
-: Control( REQUIRES_TOUCH_EVENTS ),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),
   mToolBar(NULL),
   mTitleBar(NULL),
   mOrientationAngle( 0 ),

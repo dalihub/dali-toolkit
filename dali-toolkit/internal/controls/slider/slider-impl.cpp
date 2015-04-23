@@ -52,29 +52,29 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Slider, Toolkit::Control, Create )
 
-DALI_PROPERTY_REGISTRATION( Slider, "lower-bound",            FLOAT,    LOWER_BOUND            )
-DALI_PROPERTY_REGISTRATION( Slider, "upper-bound",            FLOAT,    UPPER_BOUND            )
-DALI_PROPERTY_REGISTRATION( Slider, "value",                  FLOAT,    VALUE                  )
-DALI_PROPERTY_REGISTRATION( Slider, "hit-region",             VECTOR2,  HIT_REGION             )
-DALI_PROPERTY_REGISTRATION( Slider, "backing-region",         VECTOR2,  BACKING_REGION         )
-DALI_PROPERTY_REGISTRATION( Slider, "handle-region",          VECTOR2,  HANDLE_REGION          )
-DALI_PROPERTY_REGISTRATION( Slider, "backing-image-name",     STRING,   BACKING_IMAGE_NAME     )
-DALI_PROPERTY_REGISTRATION( Slider, "handle-image-name",      STRING,   HANDLE_IMAGE_NAME      )
-DALI_PROPERTY_REGISTRATION( Slider, "progress-image-name",    STRING,   PROGRESS_IMAGE_NAME    )
-DALI_PROPERTY_REGISTRATION( Slider, "popup-image-name",       STRING,   POPUP_IMAGE_NAME       )
-DALI_PROPERTY_REGISTRATION( Slider, "popup-arrow-image-name", STRING,   POPUP_ARROW_IMAGE_NAME )
-DALI_PROPERTY_REGISTRATION( Slider, "disable-color",          VECTOR4,  DISABLE_COLOR          )
-DALI_PROPERTY_REGISTRATION( Slider, "popup-text-color",       VECTOR4,  POPUP_TEXT_COLOR       )
-DALI_PROPERTY_REGISTRATION( Slider, "value-precision",        INTEGER,  VALUE_PRECISION        )
-DALI_PROPERTY_REGISTRATION( Slider, "show-popup",             BOOLEAN,  SHOW_POPUP             )
-DALI_PROPERTY_REGISTRATION( Slider, "show-value",             BOOLEAN,  SHOW_VALUE             )
-DALI_PROPERTY_REGISTRATION( Slider, "enabled",                BOOLEAN,  ENABLED                )
-DALI_PROPERTY_REGISTRATION( Slider, "marks",                  ARRAY,    MARKS                  )
-DALI_PROPERTY_REGISTRATION( Slider, "snap-to-marks",          BOOLEAN,  SNAP_TO_MARKS          )
-DALI_PROPERTY_REGISTRATION( Slider, "mark-tolerance",         FLOAT,    MARK_TOLERANCE         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "lower-bound",            FLOAT,    LOWER_BOUND            )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "upper-bound",            FLOAT,    UPPER_BOUND            )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "value",                  FLOAT,    VALUE                  )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "hit-region",             VECTOR2,  HIT_REGION             )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "backing-region",         VECTOR2,  BACKING_REGION         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "handle-region",          VECTOR2,  HANDLE_REGION          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "backing-image-name",     STRING,   BACKING_IMAGE_NAME     )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "handle-image-name",      STRING,   HANDLE_IMAGE_NAME      )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "progress-image-name",    STRING,   PROGRESS_IMAGE_NAME    )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "popup-image-name",       STRING,   POPUP_IMAGE_NAME       )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "popup-arrow-image-name", STRING,   POPUP_ARROW_IMAGE_NAME )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "disable-color",          VECTOR4,  DISABLE_COLOR          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "popup-text-color",       VECTOR4,  POPUP_TEXT_COLOR       )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "value-precision",        INTEGER,  VALUE_PRECISION        )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "show-popup",             BOOLEAN,  SHOW_POPUP             )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "show-value",             BOOLEAN,  SHOW_VALUE             )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "enabled",                BOOLEAN,  ENABLED                )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "marks",                  ARRAY,    MARKS                  )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "snap-to-marks",          BOOLEAN,  SNAP_TO_MARKS          )
+DALI_PROPERTY_REGISTRATION( Toolkit, Slider, "mark-tolerance",         FLOAT,    MARK_TOLERANCE         )
 
-DALI_SIGNAL_REGISTRATION(   Slider, "value-changed",                    SIGNAL_VALUE_CHANGED   )
-DALI_SIGNAL_REGISTRATION(   Slider, "mark",                             SIGNAL_MARK            )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Slider, "value-changed",                    SIGNAL_VALUE_CHANGED   )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Slider, "mark",                             SIGNAL_MARK            )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -96,6 +96,7 @@ const float DEFAULT_WIDTH = 0.0f;
 const float DEFAULT_HEIGHT = 27.0f;
 const float DEFAULT_HIT_HEIGHT = 72.0f;
 const float DEFAULT_HANDLE_HEIGHT = DEFAULT_HIT_HEIGHT;
+const float POPUP_TEXT_PADDING = 10.0f;
 
 const char* SKINNED_BACKING_IMAGE_NAME = DALI_IMAGE_DIR "slider-skin.9.png";
 const char* SKINNED_HANDLE_IMAGE_NAME = DALI_IMAGE_DIR "slider-skin-handle.png";;
@@ -326,15 +327,7 @@ void Slider::DisplayValue( float value, bool raiseSignals )
   // Progress bar
   if( mProgress )
   {
-    if( clampledValue > 0.0f )
-    {
-      mProgress.SetVisible( true ); // Deliberately set this in case multiple SetValues are fired at once
-      mProgress.SetSize( x, GetBackingRegion().y );
-    }
-    else
-    {
-      mProgress.SetVisible( false );
-    }
+    mProgress.SetSize( x, GetBackingRegion().y );
   }
 
   // Signals
@@ -400,7 +393,6 @@ Actor Slider::CreateHitRegion()
 ImageActor Slider::CreateBacking()
 {
   ImageActor backing = ImageActor::New();
-  backing.SetRelayoutEnabled( false );
   backing.SetParentOrigin( ParentOrigin::CENTER );
   backing.SetAnchorPoint( AnchorPoint::CENTER );
   backing.SetZ( BACKING_Z );
@@ -430,7 +422,6 @@ std::string Slider::GetBackingImageName()
 ImageActor Slider::CreateProgress()
 {
   ImageActor progress = ImageActor::New();
-  progress.SetRelayoutEnabled( false );
   progress.SetParentOrigin( ParentOrigin::CENTER_LEFT );
   progress.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
   progress.SetZ( PROGRESS_Z );
@@ -506,7 +497,6 @@ void Slider::ResizeProgressRegion( const Vector2& region )
 ImageActor Slider::CreateHandle()
 {
   ImageActor handle = ImageActor::New();
-  handle.SetRelayoutEnabled( false );
   handle.SetParentOrigin( ParentOrigin::CENTER_LEFT );
   handle.SetAnchorPoint( AnchorPoint::CENTER );
   handle.SetZ( HANDLE_Z );
@@ -517,7 +507,6 @@ ImageActor Slider::CreateHandle()
 ImageActor Slider::CreatePopupArrow()
 {
   ImageActor arrow = ImageActor::New();
-  arrow.SetRelayoutEnabled( false );
   arrow.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
   arrow.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
   arrow.SetZ( HANDLE_Z );
@@ -530,18 +519,21 @@ Toolkit::TextLabel Slider::CreatePopupText()
   Toolkit::TextLabel textLabel = Toolkit::TextLabel::New();
   textLabel.SetParentOrigin( ParentOrigin::CENTER );
   textLabel.SetAnchorPoint( AnchorPoint::CENTER );
+  textLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   textLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
   textLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
+  textLabel.SetProperty( Toolkit::TextLabel::Property::TEXT_COLOR, DEFAULT_POPUP_TEXT_COLOR );
   textLabel.SetZ( VALUE_DISPLAY_TEXT_Z );
+  textLabel.SetPadding( Padding( POPUP_TEXT_PADDING, POPUP_TEXT_PADDING, 0.0f, 0.0f ) );
   return textLabel;
 }
 
 ImageActor Slider::CreatePopup()
 {
   ImageActor popup = ImageActor::New();
-  popup.SetRelayoutEnabled( false );
   popup.SetParentOrigin( ParentOrigin::TOP_CENTER );
   popup.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
+  popup.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::WIDTH );
 
   mValueTextLabel = CreatePopupText();
   popup.Add( mValueTextLabel );

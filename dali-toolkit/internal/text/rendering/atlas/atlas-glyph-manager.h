@@ -119,14 +119,15 @@ public:
    */
   Vector2 GetAtlasSize( uint32_t atlasId );
 
-  /**
-   * @brief Set the Atlas size and block size for subsequent atlas generation
-   *
-   * @param[in] size size of the atlas in pixels
-   * @param[in] blockSize size of a block in this atlas in pixels
-   */
-  void SetNewAtlasSize( const Vector2& size,
-                        const Vector2& blockSize );
+   /**
+    * @brief Set the atlas size and block size for subsequent Atlas generation
+    *
+    * @param[in] width width of atlas in pixels
+    * @param[in] height height of atlas in pixels
+    * @param[in] blockWidth width of a block in pixels
+    * @param[in] blockHeight height of a block in pixels
+    */
+  void SetNewAtlasSize( uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight );
 
   /**
    * @brief Unreference an image from the atlas and remove from cache if no longer needed
