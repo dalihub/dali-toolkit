@@ -67,6 +67,8 @@ const float TEST_RATIO_TOLERANCE = 0.05;                        ///< +/-5% toler
 
 const int MAX_FRAMES_TO_TEST_OVERSHOOT = 600;                         ///< 10 seconds (at 60 frames per second).
 const Vector3 OVERSHOOT_START_SCROLL_POSITION(100.0f, 100.0f, 0.0f);  ///< Scroll start position for the Overshoot tests.
+const float SCROLL_ANIMATION_DURATION(0.33f);                   ///< Duration of scroll animation in Overshoot tests (i.e. 100 pixels of overshoot in the speed of 500 pixels per 100 frames, 100/(500/(60/100)) = 0.33)
+const Vector3 SNAP_POSITION_WITH_DECELERATED_VELOCITY(74.0f, 74.0f, 0.0f);  ///< the snap position for Overshoot tests with the decelerated velocity (i.e. Decelerated from 500 pixels per 100 frames).
 const float TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION = 0.05f;             ///< a Test duration
 const float TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION = 1.5f;              ///< another Test duration
 const float TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION = TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION * 0.5f; // Same as above, but different alpha function.
@@ -1027,8 +1029,11 @@ int UtcDaliScrollViewOvershoot(void)
   SendPan(application, Gesture::Finished, currentPos);
   timeToReachOrigin = TestOvershootSnapDuration(application, scrollView);
 
-  DALI_TEST_CHECK( (timeToReachOrigin > Toolkit::ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION - TIME_TOLERANCE) &&
-                   (timeToReachOrigin < Toolkit::ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION + TIME_TOLERANCE) );
+  float minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + Toolkit::ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
+  float maxTimeToReachOrigin = SCROLL_ANIMATION_DURATION + Toolkit::ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) + TIME_TOLERANCE;
+
+  DALI_TEST_CHECK( (timeToReachOrigin > minTimeToReachOrigin) &&
+                   (timeToReachOrigin < maxTimeToReachOrigin) );
 
   // 2. Repeat Scroll, but this time change overshoot snap duration to shorter time
   scrollView.SetSnapOvershootDuration(TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION);
@@ -1038,8 +1043,11 @@ int UtcDaliScrollViewOvershoot(void)
   SendPan(application, Gesture::Finished, currentPos);
   timeToReachOrigin = TestOvershootSnapDuration(application, scrollView);
 
-  DALI_TEST_CHECK( (timeToReachOrigin > TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION - TIME_TOLERANCE) &&
-                   (timeToReachOrigin < TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION + TIME_TOLERANCE) );
+  minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
+  maxTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) + TIME_TOLERANCE;
+
+  DALI_TEST_CHECK( (timeToReachOrigin > minTimeToReachOrigin) &&
+                   (timeToReachOrigin < maxTimeToReachOrigin) );
 
   // 3. Repeat Scroll, but this time change overshoot snap duration to longer time.
   scrollView.SetSnapOvershootDuration(TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION);
@@ -1049,8 +1057,11 @@ int UtcDaliScrollViewOvershoot(void)
   SendPan(application, Gesture::Finished, currentPos);
   timeToReachOrigin = TestOvershootSnapDuration(application, scrollView);
 
-  DALI_TEST_CHECK( (timeToReachOrigin > TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION - TIME_TOLERANCE) &&
-                   (timeToReachOrigin < TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION + TIME_TOLERANCE) );
+  minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
+  maxTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) + TIME_TOLERANCE;
+
+  DALI_TEST_CHECK( (timeToReachOrigin > minTimeToReachOrigin) &&
+                   (timeToReachOrigin < maxTimeToReachOrigin) );
 
   // 4. Repeat Scroll, but this time change overshoot function.
   scrollView.SetSnapOvershootDuration(TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION);
@@ -1061,8 +1072,11 @@ int UtcDaliScrollViewOvershoot(void)
   SendPan(application, Gesture::Finished, currentPos);
   timeToReachOrigin = TestOvershootSnapDuration(application, scrollView);
 
-  DALI_TEST_CHECK( (timeToReachOrigin > TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION - TIME_TOLERANCE) &&
-                   (timeToReachOrigin < TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION + TIME_TOLERANCE) );
+  minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
+  maxTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) + TIME_TOLERANCE;
+
+  DALI_TEST_CHECK( (timeToReachOrigin > minTimeToReachOrigin) &&
+                   (timeToReachOrigin < maxTimeToReachOrigin) );
   END_TEST;
 }
 
