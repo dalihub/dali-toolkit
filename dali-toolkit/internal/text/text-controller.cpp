@@ -626,6 +626,7 @@ void Controller::InsertTextEvent( const std::string& text )
 
   // Queue a cursor reposition event; this must wait until after DoRelayout()
   mImpl->mEventData->mUpdateCursorPosition = true;
+  mImpl->mEventData->mScrollAfterUpdateCursorPosition = true;
 }
 
 void Controller::DeleteTextEvent()
@@ -677,6 +678,7 @@ void Controller::DeleteTextEvent()
 
   // Queue a cursor reposition event; this must wait until after DoRelayout()
   mImpl->mEventData->mUpdateCursorPosition = true;
+  mImpl->mEventData->mScrollAfterUpdateCursorPosition = true;
 }
 
 void Controller::UpdateModel( OperationsMask operationsRequired )
