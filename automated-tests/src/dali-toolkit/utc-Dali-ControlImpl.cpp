@@ -633,39 +633,6 @@ int UtcDaliControlImplKeyEvent(void)
   END_TEST;
 }
 
-int UtcDaliControlImplStyleChange(void)
-{
-  ToolkitTestApplication application;
-
-  DummyControl dummy = DummyControl::New( true );
-  DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
-
-  Stage::GetCurrent().Add(dummy);
-
-  application.Render();
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-
-  // Add a Control and normal Actor as children
-  DummyControl dummyChild = DummyControl::New();
-  dummy.Add(dummyChild);
-
-  Actor actor = Actor::New();
-  dummy.Add(actor);
-
-  DALI_TEST_EQUALS( dummyImpl.fontChangeCalled, false, TEST_LOCATION );
-  StyleChange styleChange;
-  styleChange.defaultFontChange = true;
-  Dali::StyleMonitor styleMonitor = StyleMonitor::Get();
-  styleMonitor.EmitStyleChangeSignal(styleChange);
-
-  DALI_TEST_EQUALS( dummyImpl.fontChangeCalled, true, TEST_LOCATION );
-
-  Stage::GetCurrent().Remove(dummy);
-  END_TEST;
-}
-
 int UtcDaliControlImplKeyInputFocusGained(void)
 {
   ToolkitTestApplication application;
