@@ -40,7 +40,6 @@ SET(TC_SOURCES
    utc-Dali-TextField.cpp
    utc-Dali-TextLabel.cpp
    utc-Dali-ToolBar.cpp
-   utc-Dali-View.cpp
    utc-Dali-WaterEffect.cpp
    utc-Dali-Button.cpp
    utc-Dali-Control.cpp
