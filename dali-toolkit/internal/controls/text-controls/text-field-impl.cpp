@@ -451,14 +451,9 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
   if( mController->Relayout( size ) ||
       !mRenderer )
   {
-    const Vector2& scrollPosition = mController->GetScrollPosition();
-    const Vector2& alignmentOffset = mController->GetAlignmentOffset();
-
-    Vector2 offset = scrollPosition + alignmentOffset;
-
     if( mDecorator )
     {
-      mDecorator->Relayout( size, offset );
+      mDecorator->Relayout( size );
     }
 
     if( !mRenderer )
@@ -482,6 +477,8 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
     if( mRenderableActor )
     {
+      const Vector2 offset = mController->GetScrollPosition() + mController->GetAlignmentOffset();
+
       mRenderableActor.SetPosition( offset.x, offset.y );
 
       // Make sure the actor is parented correctly with/without clipping

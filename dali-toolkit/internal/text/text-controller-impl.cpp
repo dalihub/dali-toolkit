@@ -257,8 +257,8 @@ void Controller::Impl::OnTapEvent( const Event& event )
   {
     ChangeState( EventData::EDITING );
 
-    const float xPosition = event.p2.mFloat - mAlignmentOffset.x;
-    const float yPosition = event.p3.mFloat - mAlignmentOffset.y;
+    const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
+    const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
 
     mEventData->mPrimaryCursorPosition = GetClosestCursorIndex( xPosition,
                                                                 yPosition );
@@ -288,6 +288,7 @@ void Controller::Impl::OnPanEvent( const Event& event )
       Gesture::Continuing == state )
   {
     const Vector2& actualSize = mVisualModel->GetActualSize();
+    const Vector2 currentScroll = mEventData->mScrollPosition;
 
     if( mEventData->mHorizontalScrollingEnabled )
     {
@@ -328,6 +329,11 @@ void Controller::Impl::OnPanEvent( const Event& event )
         mEventData->mScrollPosition.y = 0.f;
       }
     }
+
+    if( mEventData->mDecorator )
+    {
+      mEventData->mDecorator->UpdatePositions( mEventData->mScrollPosition - currentScroll );
+    }
   }
 }
 
@@ -343,11 +349,11 @@ void Controller::Impl::OnGrabHandleEvent( const Event& event )
 
   if( GRAB_HANDLE_PRESSED == state )
   {
-    float xPosition = event.p2.mFloat + mEventData->mScrollPosition.x;
-    float yPosition = event.p3.mFloat + mEventData->mScrollPosition.y;
+    // The event.p2 and event.p3 are in decorator coords. Need to transforms to text coords.
+    const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
+    const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
 
-    mEventData->mPrimaryCursorPosition = GetClosestCursorIndex( xPosition,
-                                                                yPosition );
+    mEventData->mPrimaryCursorPosition = GetClosestCursorIndex( xPosition, yPosition );
 
     UpdateCursorPosition();
 
@@ -384,18 +390,18 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY 
 
   if( count )
   {
-    float primaryX   = positions[0].x;
-    float secondaryX = positions[count-1].x + glyphs[count-1].width;
+    float primaryX   = positions[0].x + mEventData->mScrollPosition.x;
+    float secondaryX = positions[count-1].x + glyphs[count-1].width + mEventData->mScrollPosition.x;
 
     // TODO - multi-line selection
     const Vector<LineRun>& lines = mVisualModel->mLines;
     float height = lines.Count() ? lines[0].ascender + -lines[0].descender : 0.0f;
 
-    mEventData->mDecorator->SetPosition( PRIMARY_SELECTION_HANDLE,   primaryX,   0.0f, height );
-    mEventData->mDecorator->SetPosition( SECONDARY_SELECTION_HANDLE, secondaryX, 0.0f, height );
+    mEventData->mDecorator->SetPosition( PRIMARY_SELECTION_HANDLE,     primaryX, mEventData->mScrollPosition.y, height );
+    mEventData->mDecorator->SetPosition( SECONDARY_SELECTION_HANDLE, secondaryX, mEventData->mScrollPosition.y, height );
 
     mEventData->mDecorator->ClearHighlights();
-    mEventData->mDecorator->AddHighlight( primaryX, 0.0f, secondaryX, height );
+    mEventData->mDecorator->AddHighlight( primaryX, mEventData->mScrollPosition.y, secondaryX, height + mEventData->mScrollPosition.y );
   }
 }
 
@@ -506,10 +512,6 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
   {
     return logicalIndex;
   }
-
-  // Transform to visual model coords
-  visualX -= mEventData->mScrollPosition.x;
-  visualY -= mEventData->mScrollPosition.y;
 
   // Find which line is closest
   const LineIndex lineIndex = GetClosestLine( visualY );
@@ -826,8 +828,8 @@ void Controller::Impl::UpdateCursorPosition()
                      cursorInfo );
 
   mEventData->mDecorator->SetPosition( PRIMARY_CURSOR,
-                                       cursorInfo.primaryPosition.x,
-                                       cursorInfo.primaryPosition.y,
+                                       cursorInfo.primaryPosition.x + mEventData->mScrollPosition.x + mAlignmentOffset.x,
+                                       cursorInfo.primaryPosition.y + mEventData->mScrollPosition.y + mAlignmentOffset.y,
                                        cursorInfo.primaryCursorHeight,
                                        cursorInfo.lineHeight );
 
@@ -835,8 +837,8 @@ void Controller::Impl::UpdateCursorPosition()
   {
     mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_BOTH );
     mEventData->mDecorator->SetPosition( SECONDARY_CURSOR,
-                                         cursorInfo.secondaryPosition.x,
-                                         cursorInfo.secondaryPosition.y,
+                                         cursorInfo.secondaryPosition.x + mEventData->mScrollPosition.x + mAlignmentOffset.x,
+                                         cursorInfo.secondaryPosition.y + mEventData->mScrollPosition.y + mAlignmentOffset.y,
                                          cursorInfo.secondaryCursorHeight,
                                          cursorInfo.lineHeight );
   }
