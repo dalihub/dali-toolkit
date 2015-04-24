@@ -101,7 +101,8 @@ EventData::EventData( DecoratorPtr decorator )
   mScrollPosition(),
   mState( INACTIVE ),
   mPrimaryCursorPosition( 0u ),
-  mSecondaryCursorPosition( 0u ),
+  mLeftSelectionPosition( 0u ),
+  mRightSelectionPosition( 0u ),
   mDecoratorUpdated( false ),
   mCursorBlinkEnabled( true ),
   mGrabHandleEnabled( true ),
@@ -110,6 +111,8 @@ EventData::EventData( DecoratorPtr decorator )
   mHorizontalScrollingEnabled( true ),
   mVerticalScrollingEnabled( false ),
   mUpdateCursorPosition( false ),
+  mUpdateLeftSelectionPosition( false ),
+  mUpdateRightSelectionPosition( false ),
   mScrollAfterUpdateCursorPosition( false )
 {}
 
@@ -160,8 +163,10 @@ bool Controller::Impl::ProcessInputEvents()
         break;
       }
       case Event::GRAB_HANDLE_EVENT:
+      case Event::LEFT_SELECTION_HANDLE_EVENT:
+      case Event::RIGHT_SELECTION_HANDLE_EVENT: // Fall through
       {
-        OnGrabHandleEvent( *iter );
+        OnHandleEvent( *iter );
         break;
       }
       }
@@ -181,7 +186,34 @@ bool Controller::Impl::ProcessInputEvents()
       mEventData->mScrollAfterUpdateCursorPosition = false;
     }
 
+    mEventData->mDecoratorUpdated = true;
     mEventData->mUpdateCursorPosition = false;
+  }
+  else if( mEventData->mUpdateLeftSelectionPosition )
+  {
+    UpdateSelectionHandle( LEFT_SELECTION_HANDLE );
+
+    if( mEventData->mScrollAfterUpdateCursorPosition )
+    {
+      ScrollToMakeCursorVisible();
+      mEventData->mScrollAfterUpdateCursorPosition = false;
+    }
+
+    mEventData->mDecoratorUpdated = true;
+    mEventData->mUpdateLeftSelectionPosition = false;
+  }
+  else if( mEventData->mUpdateRightSelectionPosition )
+  {
+    UpdateSelectionHandle( RIGHT_SELECTION_HANDLE );
+
+    if( mEventData->mScrollAfterUpdateCursorPosition )
+    {
+      ScrollToMakeCursorVisible();
+      mEventData->mScrollAfterUpdateCursorPosition = false;
+    }
+
+    mEventData->mDecoratorUpdated = true;
+    mEventData->mUpdateRightSelectionPosition = false;
   }
 
   mEventData->mEventQueue.clear();
@@ -325,7 +357,7 @@ void Controller::Impl::OnPanEvent( const Event& event )
   }
 }
 
-void Controller::Impl::OnGrabHandleEvent( const Event& event )
+void Controller::Impl::OnHandleEvent( const Event& event )
 {
   if( NULL == mEventData )
   {
@@ -333,46 +365,68 @@ void Controller::Impl::OnGrabHandleEvent( const Event& event )
     return;
   }
 
-  unsigned int state = event.p1.mUint;
+  const unsigned int state = event.p1.mUint;
 
-  if( GRAB_HANDLE_PRESSED == state )
+  if( HANDLE_PRESSED == state )
   {
     // The event.p2 and event.p3 are in decorator coords. Need to transforms to text coords.
     const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
     const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
 
-    //mDecorator->HidePopup();
-    ChangeState ( EventData::EDITING );
+    const CharacterIndex handleNewPosition = GetClosestCursorIndex( xPosition, yPosition );
 
-    const CharacterIndex newCursorPosition = GetClosestCursorIndex( xPosition, yPosition );
-
-    if( newCursorPosition != mEventData->mPrimaryCursorPosition )
+    if( Event::GRAB_HANDLE_EVENT == event.type )
     {
-      mEventData->mPrimaryCursorPosition = newCursorPosition;
-      mEventData->mUpdateCursorPosition = true;
+      ChangeState ( EventData::EDITING );
+
+      if( handleNewPosition != mEventData->mPrimaryCursorPosition )
+      {
+        mEventData->mPrimaryCursorPosition = handleNewPosition;
+        mEventData->mUpdateCursorPosition = true;
+      }
+    }
+    else if( Event::LEFT_SELECTION_HANDLE_EVENT == event.type )
+    {
+      if( handleNewPosition != mEventData->mLeftSelectionPosition )
+      {
+        mEventData->mLeftSelectionPosition = handleNewPosition;
+        mEventData->mUpdateLeftSelectionPosition = true;
+      }
+    }
+    else if( Event::RIGHT_SELECTION_HANDLE_EVENT == event.type )
+    {
+      if( handleNewPosition != mEventData->mRightSelectionPosition )
+      {
+        mEventData->mRightSelectionPosition = handleNewPosition;
+        mEventData->mUpdateRightSelectionPosition = true;
+      }
     }
   }
-  else if( mEventData->mGrabHandlePopupEnabled &&
-           ( ( GRAB_HANDLE_RELEASED == state ) ||
-             ( GRAB_HANDLE_STOP_SCROLLING == state ) ) )
+  else if( ( HANDLE_RELEASED == state ) ||
+           ( HANDLE_STOP_SCROLLING == state ) )
   {
-    //mDecorator->ShowPopup();
-    ChangeState ( EventData::EDITING_WITH_POPUP );
-    mEventData->mUpdateCursorPosition = true;
-    mEventData->mDecoratorUpdated = true;
-
-    if( GRAB_HANDLE_STOP_SCROLLING == state )
+    if( mEventData->mGrabHandlePopupEnabled )
     {
-      // The event.p2 and event.p3 are in decorator coords. Need to transforms to text coords.
-      const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
-      const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
-
-      mEventData->mPrimaryCursorPosition = GetClosestCursorIndex( xPosition, yPosition );
-
-      mEventData->mScrollAfterUpdateCursorPosition = true;
+      ChangeState( EventData::EDITING_WITH_POPUP );
     }
+    if( Event::GRAB_HANDLE_EVENT == event.type )
+    {
+      mEventData->mUpdateCursorPosition = true;
+
+      if( HANDLE_STOP_SCROLLING == state )
+      {
+        // The event.p2 and event.p3 are in decorator coords. Need to transforms to text coords.
+        const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
+        const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
+
+        mEventData->mPrimaryCursorPosition = GetClosestCursorIndex( xPosition, yPosition );
+
+        mEventData->mScrollAfterUpdateCursorPosition = true;
+      }
+    }
+    mEventData->mDecoratorUpdated = true;
   }
-  else if( GRAB_HANDLE_SCROLLING == state )
+  else if( HANDLE_SCROLLING == state )
   {
     const float xSpeed = event.p2.mFloat;
     const Vector2& actualSize = mVisualModel->GetActualSize();
@@ -380,6 +434,8 @@ void Controller::Impl::OnGrabHandleEvent( const Event& event )
     mEventData->mScrollPosition.x += xSpeed;
 
     ClampHorizontalScroll( actualSize );
+
+   mEventData->mDecoratorUpdated = true;
   }
 }
 
@@ -411,8 +467,8 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY 
     const Vector<LineRun>& lines = mVisualModel->mLines;
     float height = lines.Count() ? lines[0].ascender + -lines[0].descender : 0.0f;
 
-    mEventData->mDecorator->SetPosition( PRIMARY_SELECTION_HANDLE,     primaryX, mEventData->mScrollPosition.y, height );
-    mEventData->mDecorator->SetPosition( SECONDARY_SELECTION_HANDLE, secondaryX, mEventData->mScrollPosition.y, height );
+    mEventData->mDecorator->SetPosition( LEFT_SELECTION_HANDLE,     primaryX, mEventData->mScrollPosition.y, height );
+    mEventData->mDecorator->SetPosition( RIGHT_SELECTION_HANDLE, secondaryX, mEventData->mScrollPosition.y, height );
 
     mEventData->mDecorator->ClearHighlights();
     mEventData->mDecorator->AddHighlight( primaryX, mEventData->mScrollPosition.y, secondaryX, height + mEventData->mScrollPosition.y );
@@ -435,8 +491,9 @@ void Controller::Impl::ChangeState( EventData::State newState )
     {
       mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
       mEventData->mDecorator->StopCursorBlink();
-      mEventData->mDecorator->SetGrabHandleActive( false );
-      mEventData->mDecorator->SetSelectionActive( false );
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
       mEventData->mDecorator->SetPopupActive( false );
       mEventData->mDecoratorUpdated = true;
     }
@@ -444,8 +501,9 @@ void Controller::Impl::ChangeState( EventData::State newState )
     {
       mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
       mEventData->mDecorator->StopCursorBlink();
-      mEventData->mDecorator->SetGrabHandleActive( false );
-      mEventData->mDecorator->SetSelectionActive( true );
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
       mEventData->mDecoratorUpdated = true;
     }
     else if( EventData::EDITING == mEventData->mState )
@@ -457,13 +515,14 @@ void Controller::Impl::ChangeState( EventData::State newState )
       }
       if( mEventData->mGrabHandleEnabled )
       {
-        mEventData->mDecorator->SetGrabHandleActive( true );
+        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
       }
       if( mEventData->mGrabHandlePopupEnabled )
       {
         mEventData->mDecorator->SetPopupActive( false );
       }
-      mEventData->mDecorator->SetSelectionActive( false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
       mEventData->mDecoratorUpdated = true;
     }
     else if( EventData::EDITING_WITH_POPUP == mEventData->mState )
@@ -475,13 +534,15 @@ void Controller::Impl::ChangeState( EventData::State newState )
       }
       if( mEventData->mGrabHandleEnabled )
       {
-        mEventData->mDecorator->SetGrabHandleActive( true );
+        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
+        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
       }
       if( mEventData->mGrabHandlePopupEnabled )
       {
         mEventData->mDecorator->SetPopupActive( true );
       }
-      mEventData->mDecorator->SetSelectionActive( false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
       mEventData->mDecoratorUpdated = true;
     }
   }
@@ -841,18 +902,28 @@ void Controller::Impl::UpdateCursorPosition()
   GetCursorPosition( mEventData->mPrimaryCursorPosition,
                      cursorInfo );
 
+  const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
+  const Vector2 cursorPosition = cursorInfo.primaryPosition + offset;
+
+  // Sets the cursor position.
   mEventData->mDecorator->SetPosition( PRIMARY_CURSOR,
-                                       cursorInfo.primaryPosition.x + mEventData->mScrollPosition.x + mAlignmentOffset.x,
-                                       cursorInfo.primaryPosition.y + mEventData->mScrollPosition.y + mAlignmentOffset.y,
+                                       cursorPosition.x,
+                                       cursorPosition.y,
                                        cursorInfo.primaryCursorHeight,
+                                       cursorInfo.lineHeight );
+
+  // Sets the grab handle position.
+  mEventData->mDecorator->SetPosition( GRAB_HANDLE,
+                                       cursorPosition.x,
+                                       cursorPosition.y,
                                        cursorInfo.lineHeight );
 
   if( cursorInfo.isSecondaryCursor )
   {
     mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_BOTH );
     mEventData->mDecorator->SetPosition( SECONDARY_CURSOR,
-                                         cursorInfo.secondaryPosition.x + mEventData->mScrollPosition.x + mAlignmentOffset.x,
-                                         cursorInfo.secondaryPosition.y + mEventData->mScrollPosition.y + mAlignmentOffset.y,
+                                         cursorInfo.secondaryPosition.x + offset.x,
+                                         cursorInfo.secondaryPosition.y + offset.y,
                                          cursorInfo.secondaryCursorHeight,
                                          cursorInfo.lineHeight );
   }
@@ -860,9 +931,31 @@ void Controller::Impl::UpdateCursorPosition()
   {
     mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
   }
+}
 
-  mEventData->mUpdateCursorPosition = false;
-  mEventData->mDecoratorUpdated = true;
+void Controller::Impl::UpdateSelectionHandle( HandleType handleType )
+{
+  if( ( LEFT_SELECTION_HANDLE != handleType ) &&
+      ( RIGHT_SELECTION_HANDLE != handleType ) )
+  {
+    return;
+  }
+
+  const bool leftSelectionHandle = LEFT_SELECTION_HANDLE == handleType;
+  const CharacterIndex index = leftSelectionHandle ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition;
+
+  CursorInfo cursorInfo;
+  GetCursorPosition( index,
+                     cursorInfo );
+
+  const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
+  const Vector2 cursorPosition = cursorInfo.primaryPosition + offset;
+
+  // Sets the grab handle position.
+  mEventData->mDecorator->SetPosition( handleType,
+                                       cursorPosition.x,
+                                       cursorPosition.y,
+                                       cursorInfo.lineHeight );
 }
 
 void Controller::Impl::ClampHorizontalScroll( const Vector2& actualSize )

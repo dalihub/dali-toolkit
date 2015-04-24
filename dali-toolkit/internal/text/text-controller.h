@@ -413,9 +413,9 @@ public:
   void PanEvent( Gesture::State state, const Vector2& displacement );
 
   /**
-   * @copydoc Dali::Toolkit::Text::Decorator::Observer::GrabHandleEvent()
+   * @copydoc Dali::Toolkit::Text::Decorator::Observer::HandleEvent()
    */
-  virtual void GrabHandleEvent( GrabHandleState state, float x, float y );
+  virtual void HandleEvent( HandleType handle, HandleState state, float x, float y );
 
 protected:
 

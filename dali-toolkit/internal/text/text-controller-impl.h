@@ -46,7 +46,9 @@ struct Event
     CURSOR_KEY_EVENT,
     TAP_EVENT,
     PAN_EVENT,
-    GRAB_HANDLE_EVENT
+    GRAB_HANDLE_EVENT,
+    LEFT_SELECTION_HANDLE_EVENT,
+    RIGHT_SELECTION_HANDLE_EVENT
   };
 
   union Param
@@ -61,6 +63,7 @@ struct Event
   {
     p1.mInt = 0;
     p2.mInt = 0;
+    p3.mInt = 0;
   }
 
   Type type;
@@ -123,7 +126,8 @@ struct EventData
   State              mState;                   ///< Selection mode, edit mode etc.
 
   CharacterIndex     mPrimaryCursorPosition;   ///< Index into logical model for primary cursor.
-  CharacterIndex     mSecondaryCursorPosition; ///< Index into logical model for secondary cursor.
+  CharacterIndex     mLeftSelectionPosition;   ///< Index into logical model for left selection handle.
+  CharacterIndex     mRightSelectionPosition;  ///< Index into logical model for right selection handle.
 
   bool mDecoratorUpdated                : 1;   ///< True if the decorator was updated during event processing.
   bool mCursorBlinkEnabled              : 1;   ///< True if cursor should blink when active.
@@ -133,6 +137,8 @@ struct EventData
   bool mHorizontalScrollingEnabled      : 1;   ///< True if horizontal scrolling is enabled.
   bool mVerticalScrollingEnabled        : 1;   ///< True if vertical scrolling is enabled.
   bool mUpdateCursorPosition            : 1;   ///< True if the visual position of the cursor must be recalculated.
+  bool mUpdateLeftSelectionPosition     : 1;   ///< True if the visual position of the left selection handle must be recalculated.
+  bool mUpdateRightSelectionPosition    : 1;   ///< True if the visual position of the right selection handle must be recalculated.
   bool mScrollAfterUpdateCursorPosition : 1;   ///< Whether to scroll after the cursor position is updated.
 };
 
@@ -232,7 +238,7 @@ struct Controller::Impl
 
   void OnPanEvent( const Event& event );
 
-  void OnGrabHandleEvent( const Event& event );
+  void OnHandleEvent( const Event& event );
 
   void RepositionSelectionHandles( float visualX, float visualY );
 
@@ -283,6 +289,13 @@ struct Controller::Impl
    * Sets which cursors are active.
    */
   void UpdateCursorPosition();
+
+  /**
+   * @brief Updates the position of the given selection handle.
+   *
+   * @param[in] handleType One of the selection handles.
+   */
+  void UpdateSelectionHandle( HandleType handleType );
 
   /**
    * @biref Clamps the horizontal scrolling to get the control always filled with text.

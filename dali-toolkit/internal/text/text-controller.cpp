@@ -1146,18 +1146,49 @@ void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
   }
 }
 
-void Controller::GrabHandleEvent( GrabHandleState state, float x, float y )
+void Controller::HandleEvent( HandleType handleType, HandleState state, float x, float y )
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected GrabHandleEvent" );
+  DALI_ASSERT_DEBUG( mImpl->mEventData && "Controller::HandleEvent. Unexpected HandleEvent" );
 
   if( mImpl->mEventData )
   {
-    Event event( Event::GRAB_HANDLE_EVENT );
-    event.p1.mUint  = state;
-    event.p2.mFloat = x;
-    event.p3.mFloat = y;
-    
-    mImpl->mEventData->mEventQueue.push_back( event );
+    switch( handleType )
+    {
+      case GRAB_HANDLE:
+      {
+        Event event( Event::GRAB_HANDLE_EVENT );
+        event.p1.mUint  = state;
+        event.p2.mFloat = x;
+        event.p3.mFloat = y;
+
+        mImpl->mEventData->mEventQueue.push_back( event );
+        break;
+      }
+      case LEFT_SELECTION_HANDLE:
+      {
+        Event event( Event::LEFT_SELECTION_HANDLE_EVENT );
+        event.p1.mUint  = state;
+        event.p2.mFloat = x;
+        event.p3.mFloat = y;
+
+        mImpl->mEventData->mEventQueue.push_back( event );
+        break;
+      }
+      case RIGHT_SELECTION_HANDLE:
+      {
+        Event event( Event::RIGHT_SELECTION_HANDLE_EVENT );
+        event.p1.mUint  = state;
+        event.p2.mFloat = x;
+        event.p3.mFloat = y;
+
+        mImpl->mEventData->mEventQueue.push_back( event );
+        break;
+      }
+      case HANDLE_TYPE_COUNT:
+      {
+        DALI_ASSERT_DEBUG( !"Controller::HandleEvent. Unexpected handle type" );
+      }
+    }
 
     mImpl->RequestRelayout();
   }

@@ -323,7 +323,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 
         if( impl.mDecorator )
         {
-          impl.mDecorator->SetGrabHandleImage( GRAB_HANDLE_IMAGE_RELEASED, image );
+          impl.mDecorator->SetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_RELEASED, image );
         }
         break;
       }
@@ -333,7 +333,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 
         if( impl.mDecorator )
         {
-          impl.mDecorator->SetGrabHandleImage( GRAB_HANDLE_IMAGE_PRESSED, image );
+          impl.mDecorator->SetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_PRESSED, image );
         }
         break;
       }
@@ -363,7 +363,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 
         if( impl.mDecorator )
         {
-          impl.mDecorator->SetLeftSelectionImage( SELECTION_HANDLE_RELEASED, image );
+          impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED, image );
         }
         break;
       }
@@ -373,7 +373,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 
         if( impl.mDecorator )
         {
-          impl.mDecorator->SetRightSelectionImage( SELECTION_HANDLE_RELEASED, image );
+          impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED, image );
         }
         break;
       }
@@ -383,7 +383,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 
         if( impl.mDecorator )
         {
-          impl.mDecorator->SetLeftSelectionImage( SELECTION_HANDLE_PRESSED, image );
+          impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, image );
         }
         break;
       }
@@ -393,7 +393,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 
         if( impl.mDecorator )
         {
-          impl.mDecorator->SetLeftSelectionImage( SELECTION_HANDLE_PRESSED, image );
+          impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, image );
         }
         break;
       }
@@ -546,7 +546,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mDecorator )
         {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetGrabHandleImage( GRAB_HANDLE_IMAGE_RELEASED ) );
+          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_RELEASED ) );
           if( image )
           {
             value = image.GetUrl();
@@ -558,7 +558,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mDecorator )
         {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetGrabHandleImage( GRAB_HANDLE_IMAGE_PRESSED ) );
+          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_PRESSED ) );
           if( image )
           {
             value = image.GetUrl();
@@ -586,7 +586,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mDecorator )
         {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetLeftSelectionImage( SELECTION_HANDLE_RELEASED ) );
+          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED ) );
           if( image )
           {
             value = image.GetUrl();
@@ -598,7 +598,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mDecorator )
         {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetRightSelectionImage( SELECTION_HANDLE_RELEASED ) );
+          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED ) );
           if( image )
           {
             value = image.GetUrl();
@@ -610,7 +610,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mDecorator )
         {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetLeftSelectionImage( SELECTION_HANDLE_PRESSED ) );
+          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED ) );
           if( image )
           {
             value = image.GetUrl();
@@ -622,7 +622,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mDecorator )
         {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetRightSelectionImage( SELECTION_HANDLE_PRESSED ) );
+          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED ) );
           if( image )
           {
             value = image.GetUrl();
