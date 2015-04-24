@@ -40,6 +40,8 @@ BaseHandle Create()
 }
 
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Page, Toolkit::Control, Create )
+DALI_PROPERTY_REGISTRATION( Toolkit, Page, "title",     STRING, TITLE     )
+DALI_PROPERTY_REGISTRATION( Toolkit, Page, "sub-title", STRING, SUB_TITLE )
 DALI_TYPE_REGISTRATION_END()
 
 } // unnamed namespace
@@ -47,9 +49,7 @@ DALI_TYPE_REGISTRATION_END()
 Page::Page()
 : Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
   mTitle(""),
-  mSubTitle(""),
-  mPropertyTitle(Property::INVALID_INDEX),
-  mPropertySubTitle(Property::INVALID_INDEX)
+  mSubTitle("")
 {
 }
 
@@ -161,26 +161,54 @@ Toolkit::Popup Page::GetPopupMenu() const
   return mPopupMenu;
 }
 
-void Page::OnInitialize()
+void Page::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
 {
-  Actor self = Self();
+  Toolkit::Page page = Toolkit::Page::DownCast( Dali::BaseHandle( object ) );
 
-  mPropertyTitle = self.RegisterProperty( Dali::Toolkit::Page::PROPERTY_TITLE, "", Property::READ_WRITE );
-  mPropertySubTitle = self.RegisterProperty( Dali::Toolkit::Page::PROPERTY_SUB_TITLE, "", Property::READ_WRITE );
+  if ( page )
+  {
+    switch ( index )
+    {
+      case Toolkit::Page::Property::TITLE:
+      {
+        GetImpl( page ).SetTitle( value.Get< std::string >() );
+        break;
+      }
+
+      case Toolkit::Page::Property::SUB_TITLE:
+      {
+        GetImpl( page ).SetSubTitle( value.Get< std::string >() );
+        break;
+      }
+    }
+  }
 }
 
-void Page::OnPropertySet( Property::Index index, Property::Value propertyValue )
+Property::Value Page::GetProperty( BaseObject* object, Property::Index propertyIndex )
 {
-  if( index == mPropertyTitle )
+  Property::Value value;
+
+  Toolkit::Page page = Toolkit::Page::DownCast( Dali::BaseHandle( object ) );
+
+  if ( page )
   {
-    std::string title( propertyValue.Get<std::string>() );
-    SetTitle(title);
+    switch ( propertyIndex )
+    {
+      case Toolkit::Page::Property::TITLE:
+      {
+        value = GetImpl( page ).mTitle;
+        break;
+      }
+
+      case Toolkit::Page::Property::SUB_TITLE:
+      {
+        value = GetImpl( page ).mSubTitle;
+        break;
+      }
+    }
   }
-  else if( index == mPropertySubTitle )
-  {
-    std::string subTitle( propertyValue.Get<std::string>() );
-    SetSubTitle(subTitle);
-  }
+
+  return value;
 }
 
 } // namespace Internal

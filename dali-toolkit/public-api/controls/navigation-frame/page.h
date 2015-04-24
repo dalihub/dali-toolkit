@@ -49,11 +49,25 @@ class DALI_IMPORT_API Page : public Control
 public:
 
   /**
-   * The names of custom properties installed by this control.
+   * @brief The start and end property ranges for this control.
    */
-  // Property Names
-  static const char* const PROPERTY_TITLE;       ///< name "title", type std::string
-  static const char* const PROPERTY_SUB_TITLE;   ///< name "sub-title", type std::string
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices
+  };
+
+  /**
+   * @brief An enumeration of properties belonging to the Page class.
+   */
+  struct Property
+  {
+    enum
+    {
+      TITLE = PROPERTY_START_INDEX, ///< name "title",          @see SetTitle(),         type string
+      SUB_TITLE,                    ///< name "sub-title",      @see SetSubTitle(),      type string
+    };
+  };
 
   /**
    * Structure to indicate a control on the navigation tool bar and its group (HorizontalLeft, HorizontalRight or HorizontalCenter)
