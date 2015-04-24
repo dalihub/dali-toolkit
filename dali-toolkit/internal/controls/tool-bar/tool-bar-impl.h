@@ -52,17 +52,17 @@ public:
   static Toolkit::ToolBar New();
 
   /**
-   * @copydoc Dali::Toolkit::View::SetBackground()
+   * @copydoc Dali::Toolkit::ToolBar::SetBackground()
    */
   void SetBackground( Actor background );
 
   /**
-   * @copydoc Dali::Toolkit::View::AddControl()
+   * @copydoc Dali::Toolkit::ToolBar::AddControl()
    */
   void AddControl( Dali::Actor control, float relativeSize, Toolkit::Alignment::Type alignment, const Toolkit::Alignment::Padding& padding );
 
   /**
-   * @copydoc Dali::Toolkit::View::RemoveControl()
+   * @copydoc Dali::Toolkit::ToolBar::RemoveControl()
    */
   void RemoveControl( Dali::Actor control );
 
