@@ -62,8 +62,9 @@ public:
     enum
     {
       RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "rendering-backend",                   The type or rendering e.g. bitmap-based,                                  type INT
-      PLACEHOLDER_TEXT,                         ///< name "placeholder-text",                    The text to display when the TextField is empty,                          type STRING
       TEXT,                                     ///< name "text",                                The text to display in UTF-8 format,                                      type STRING
+      PLACEHOLDER_TEXT,                         ///< name "placeholder-text",                    The text to display when the TextField is empty and inactive,             type STRING
+      PLACEHOLDER_TEXT_FOCUSED,                 ///< name "placeholder-text-focused",            The text to display when the TextField is empty with key-input focus,     type STRING
       FONT_FAMILY,                              ///< name "font-family",                         The requested font family,                                                type STRING
       FONT_STYLE,                               ///< name "font-style",                          The requested font style e.g. Regular/Italic,                             type STRING
       POINT_SIZE,                               ///< name "point-size",                          The size of font in points,                                               type FLOAT
@@ -72,6 +73,7 @@ public:
       HORIZONTAL_ALIGNMENT,                     ///< name "horizontal-alignment",                The line horizontal alignment,                                            type STRING,  values "BEGIN", "CENTER", "END"
       VERTICAL_ALIGNMENT,                       ///< name "vertical-alignment",                  The line vertical alignment,                                              type STRING,  values   "TOP",   "CENTER",   "BOTTOM"
       TEXT_COLOR,                               ///< name "text-color",                          The text color,                                                           type VECTOR4
+      PLACEHOLDER_TEXT_COLOR,                   ///< name "placeholder-text-color",              The placeholder-text color,                                               type VECTOR4
       SHADOW_OFFSET,                            ///< name "shadow-offset",                       The drop shadow offset 0 indicates no shadow,                             type VECTOR2
       SHADOW_COLOR,                             ///< name "shadow-color",                        The color of a drop shadow,                                               type VECTOR4
       PRIMARY_CURSOR_COLOR,                     ///< name "primary-cursor-color",                The color to apply to the primary cursor,                                 type VECTOR4

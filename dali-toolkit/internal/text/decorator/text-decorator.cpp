@@ -170,7 +170,7 @@ struct Decorator::Impl : public ConnectionTracker
   struct CursorImpl
   {
     CursorImpl()
-    : color( Dali::Color::WHITE ),
+    : color( Dali::Color::BLACK ),
       position(),
       cursorHeight( 0.0f ),
       lineHeight( 0.0f )

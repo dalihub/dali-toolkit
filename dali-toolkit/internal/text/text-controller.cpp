@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <limits>
+#include <iostream>
 #include <dali/public-api/adaptor-framework/key.h>
 
 // INTERNAL INCLUDES
@@ -62,47 +63,104 @@ void Controller::SetText( const std::string& text )
   // Cancel previously queued inserts etc.
   mImpl->mModifyEvents.clear();
 
-  // Keep until size negotiation
-  ModifyEvent event;
-  event.type = ModifyEvent::REPLACE_TEXT;
-  event.text = text;
-  mImpl->mModifyEvents.push_back( event );
+  // Remove the previously set text
+  ResetText();
+
+  if( ! text.empty() )
+  {
+    //  Convert text into UTF-32
+    Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
+    utf32Characters.Resize( text.size() );
+
+    // This is a bit horrible but std::string returns a (signed) char*
+    const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
+
+    // Transform a text array encoded in utf8 into an array encoded in utf32.
+    // It returns the actual number of characters.
+    Length characterCount = Utf8ToUtf32( utf8, text.size(), utf32Characters.Begin() );
+    utf32Characters.Resize( characterCount );
+
+    // Reset the cursor position
+    if( mImpl->mEventData )
+    {
+      mImpl->mEventData->mPrimaryCursorPosition = characterCount;
+    }
+
+    // Update the rest of the model during size negotiation
+    mImpl->QueueModifyEvent( ModifyEvent::TEXT_REPLACED );
+  }
+  else
+  {
+    mImpl->ShowPlaceholderText();
+  }
 
   if( mImpl->mEventData )
   {
     // Cancel previously queued events
     mImpl->mEventData->mEventQueue.clear();
-
-    // TODO - Hide selection decorations
   }
+
+  // Reset keyboard as text changed
+  mImpl->PreEditReset();
 }
 
 void Controller::GetText( std::string& text ) const
 {
-  if( !mImpl->mModifyEvents.empty() &&
-       ModifyEvent::REPLACE_TEXT == mImpl->mModifyEvents[0].type )
+  if( ! mImpl->IsShowingPlaceholderText() )
   {
-    text = mImpl->mModifyEvents[0].text;
-  }
-  else
-  {
-    // TODO - Convert from UTF-32
+    Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
+
+    if( 0u != utf32Characters.Count() )
+    {
+      uint32_t numberOfBytes = GetNumberOfUtf8Bytes( &utf32Characters[0], utf32Characters.Count() );
+
+      text.resize( numberOfBytes );
+
+      // This is a bit horrible but std::string returns a (signed) char*
+      Utf32ToUtf8( &utf32Characters[0], utf32Characters.Count(), reinterpret_cast<uint8_t*>(&text[0]) );
+    }
   }
 }
 
-void Controller::SetPlaceholderText( const std::string& text )
+unsigned int Controller::GetLogicalCursorPosition() const
 {
-  if( !mImpl->mEventData )
+  if( mImpl->mEventData )
   {
-    mImpl->mEventData->mPlaceholderText = text;
+    return mImpl->mEventData->mPrimaryCursorPosition;
+  }
+
+  return 0u;
+}
+
+void Controller::SetPlaceholderText( PlaceholderType type, const std::string& text )
+{
+  if( mImpl->mEventData )
+  {
+    if( PLACEHOLDER_TYPE_INACTIVE == type )
+    {
+      mImpl->mEventData->mPlaceholderTextInactive = text;
+    }
+    else
+    {
+      mImpl->mEventData->mPlaceholderTextActive = text;
+    }
+
+    mImpl->ShowPlaceholderText();
   }
 }
 
-void Controller::GetPlaceholderText( std::string& text ) const
+void Controller::GetPlaceholderText( PlaceholderType type, std::string& text ) const
 {
-  if( !mImpl->mEventData )
+  if( mImpl->mEventData )
   {
-    text = mImpl->mEventData->mPlaceholderText;
+    if( PLACEHOLDER_TYPE_INACTIVE == type )
+    {
+      text = mImpl->mEventData->mPlaceholderTextInactive;
+    }
+    else
+    {
+      text = mImpl->mEventData->mPlaceholderTextActive;
+    }
   }
 }
 
@@ -227,28 +285,83 @@ float Controller::GetDefaultPointSize() const
   return 0.0f;
 }
 
-void Controller::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfCharacters ) const
-{
-  if( mImpl->mFontDefaults )
-  {
-    FontRun fontRun;
-    fontRun.characterRun.characterIndex = 0;
-    fontRun.characterRun.numberOfCharacters = numberOfCharacters;
-    fontRun.fontId = mImpl->mFontDefaults->GetFontId( mImpl->mFontClient );
-    fontRun.isDefault = true;
-
-    fonts.PushBack( fontRun );
-  }
-}
-
 void Controller::SetTextColor( const Vector4& textColor )
 {
-  mImpl->mVisualModel->SetTextColor( textColor );
+  mImpl->mTextColor = textColor;
+
+  if( ! mImpl->IsShowingPlaceholderText() )
+  {
+    mImpl->mVisualModel->SetTextColor( textColor );
+  }
 }
 
 const Vector4& Controller::GetTextColor() const
 {
-  return mImpl->mVisualModel->GetTextColor();
+  return mImpl->mTextColor;
+}
+
+bool Controller::RemoveText( int cursorOffset, int numberOfChars )
+{
+  bool removed( false );
+
+  if( ! mImpl->IsShowingPlaceholderText() )
+  {
+    // Delete at current cursor position
+    Vector<Character>& currentText = mImpl->mLogicalModel->mText;
+    CharacterIndex& oldCursorIndex = mImpl->mEventData->mPrimaryCursorPosition;
+
+    CharacterIndex cursorIndex = oldCursorIndex;
+
+    // Validate the cursor position & number of characters
+    if( std::abs( cursorOffset ) <= cursorIndex )
+    {
+      cursorIndex = oldCursorIndex + cursorOffset;
+    }
+
+    if( (cursorIndex + numberOfChars) > currentText.Count() )
+    {
+      numberOfChars = currentText.Count() - cursorIndex;
+    }
+
+    if( cursorIndex >= 0 &&
+        (cursorIndex + numberOfChars) <= currentText.Count() )
+    {
+      Vector<Character>::Iterator first = currentText.Begin() + cursorIndex;
+      Vector<Character>::Iterator last  = first + numberOfChars;
+
+      currentText.Erase( first, last );
+
+      // Cursor position retreat
+      oldCursorIndex = cursorIndex;
+
+      removed = true;
+    }
+  }
+
+  return removed;
+}
+
+void Controller::SetPlaceholderTextColor( const Vector4& textColor )
+{
+  if( mImpl->mEventData )
+  {
+    mImpl->mEventData->mPlaceholderTextColor = textColor;
+  }
+
+  if( mImpl->IsShowingPlaceholderText() )
+  {
+    mImpl->mVisualModel->SetTextColor( textColor );
+  }
+}
+
+const Vector4& Controller::GetPlaceholderTextColor() const
+{
+  if( mImpl->mEventData )
+  {
+    return mImpl->mEventData->mPlaceholderTextColor;
+  }
+
+  return Color::BLACK;
 }
 
 void Controller::SetShadowOffset( const Vector2& shadowOffset )
@@ -369,7 +482,7 @@ Vector3 Controller::GetNaturalSize()
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
     // Make sure the model is up-to-date before layouting
-    UpdateModel( onlyOnceOperations );
+    mImpl->UpdateModel( onlyOnceOperations );
 
     // Operations that need to be done if the size changes.
     const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
@@ -419,7 +532,7 @@ float Controller::GetHeightForWidth( float width )
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
     // Make sure the model is up-to-date before layouting
-    UpdateModel( onlyOnceOperations );
+    mImpl->UpdateModel( onlyOnceOperations );
 
     // Operations that need to be done if the size changes.
     const OperationsMask sizeOperations =  static_cast<OperationsMask>( LAYOUT |
@@ -473,7 +586,7 @@ bool Controller::Relayout( const Size& size )
 
   // Make sure the model is up-to-date before layouting
   ProcessModifyEvents();
-  UpdateModel( mImpl->mOperationsPending );
+  mImpl->UpdateModel( mImpl->mOperationsPending );
 
   Size layoutSize;
   bool updated = DoRelayout( mImpl->mControlSize,
@@ -501,20 +614,33 @@ void Controller::ProcessModifyEvents()
 
   for( unsigned int i=0; i<events.size(); ++i )
   {
-    if( ModifyEvent::REPLACE_TEXT == events[0].type )
+    if( ModifyEvent::PLACEHOLDER_TEXT == events[0].type )
+    {
+      // Use placeholder if text is empty
+      if( 0u == mImpl->mLogicalModel->mText.Count() &&
+          mImpl->IsShowingPlaceholderText() )
+      {
+        mImpl->ReplaceTextWithPlaceholder();
+      }
+    }
+    else if( ModifyEvent::TEXT_REPLACED == events[0].type )
     {
       // A (single) replace event should come first, otherwise we wasted time processing NOOP events
-      DALI_ASSERT_DEBUG( 0 == i && "Unexpected REPLACE event" );
+      DALI_ASSERT_DEBUG( 0 == i && "Unexpected TEXT_REPLACED event" );
 
-      ReplaceTextEvent( events[0].text );
+      TextReplacedEvent();
     }
-    else if( ModifyEvent::INSERT_TEXT == events[0].type )
+    else if( ModifyEvent::TEXT_INSERTED == events[0].type )
     {
-      InsertTextEvent( events[0].text );
+      TextInsertedEvent();
     }
-    else if( ModifyEvent::DELETE_TEXT == events[0].type )
+    else if( ModifyEvent::TEXT_DELETED == events[0].type )
     {
-      DeleteTextEvent();
+      // Placeholder-text cannot be deleted
+      if( !mImpl->IsShowingPlaceholderText() )
+      {
+        TextDeletedEvent();
+      }
     }
   }
 
@@ -522,7 +648,7 @@ void Controller::ProcessModifyEvents()
   events.clear();
 }
 
-void Controller::ReplaceTextEvent( const std::string& text )
+void Controller::ResetText()
 {
   // Reset buffers.
   mImpl->mLogicalModel->mText.Clear();
@@ -544,40 +670,58 @@ void Controller::ReplaceTextEvent( const std::string& text )
   mImpl->mVisualModel->mLines.Clear();
   mImpl->mVisualModel->ClearCaches();
 
-  //  Convert text into UTF-32
-  Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
-  utf32Characters.Resize( text.size() );
-
-  // This is a bit horrible but std::string returns a (signed) char*
-  const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
-
-  // Transform a text array encoded in utf8 into an array encoded in utf32.
-  // It returns the actual number of characters.
-  Length characterCount = Utf8ToUtf32( utf8, text.size(), utf32Characters.Begin() );
-  utf32Characters.Resize( characterCount );
-
   // Reset the cursor position
   if( mImpl->mEventData )
   {
-    mImpl->mEventData->mPrimaryCursorPosition = characterCount;
-    // TODO - handle secondary cursor
+    mImpl->mEventData->mPrimaryCursorPosition = 0;
   }
+
+  // We have cleared everything including the placeholder-text
+  mImpl->PlaceholderCleared();
 
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
 
   // Apply modifications to the model
   mImpl->mOperationsPending = ALL_OPERATIONS;
-  UpdateModel( ALL_OPERATIONS );
+}
+
+void Controller::TextReplacedEvent()
+{
+  // Reset buffers.
+  mImpl->mLogicalModel->mScriptRuns.Clear();
+  mImpl->mLogicalModel->mFontRuns.Clear();
+  mImpl->mLogicalModel->mLineBreakInfo.Clear();
+  mImpl->mLogicalModel->mWordBreakInfo.Clear();
+  mImpl->mLogicalModel->mBidirectionalParagraphInfo.Clear();
+  mImpl->mLogicalModel->mCharacterDirections.Clear();
+  mImpl->mLogicalModel->mBidirectionalLineInfo.Clear();
+  mImpl->mLogicalModel->mLogicalToVisualMap.Clear();
+  mImpl->mLogicalModel->mVisualToLogicalMap.Clear();
+  mImpl->mVisualModel->mGlyphs.Clear();
+  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
+  mImpl->mVisualModel->mCharactersToGlyph.Clear();
+  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
+  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
+  mImpl->mVisualModel->mGlyphPositions.Clear();
+  mImpl->mVisualModel->mLines.Clear();
+  mImpl->mVisualModel->ClearCaches();
+
+  // The natural size needs to be re-calculated.
+  mImpl->mRecalculateNaturalSize = true;
+
+  // Apply modifications to the model
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  mImpl->UpdateModel( ALL_OPERATIONS );
   mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT             |
                                                            ALIGN              |
                                                            UPDATE_ACTUAL_SIZE |
                                                            REORDER );
 }
 
-void Controller::InsertTextEvent( const std::string& text )
+void Controller::TextInsertedEvent()
 {
-  DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected InsertTextEvent" );
+  DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected TextInsertedEvent" );
 
   // TODO - Optimize this
   mImpl->mLogicalModel->mScriptRuns.Clear();
@@ -598,45 +742,12 @@ void Controller::InsertTextEvent( const std::string& text )
   mImpl->mVisualModel->mLines.Clear();
   mImpl->mVisualModel->ClearCaches();
 
-  //  Convert text into UTF-32
-  Vector<Character> utf32Characters;
-  utf32Characters.Resize( text.size() );
-
-  // This is a bit horrible but std::string returns a (signed) char*
-  const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
-
-  // Transform a text array encoded in utf8 into an array encoded in utf32.
-  // It returns the actual number of characters.
-  Length characterCount = Utf8ToUtf32( utf8, text.size(), utf32Characters.Begin() );
-  utf32Characters.Resize( characterCount );
-
-  const Length numberOfCharactersInModel = mImpl->mLogicalModel->GetNumberOfCharacters();
-
-  // Restrict new text to fit within Maximum characters setting
-  Length maxSizeOfNewText = std::min ( ( mImpl->mMaximumNumberOfCharacters - numberOfCharactersInModel ), characterCount );
-
-  // Insert at current cursor position
-  CharacterIndex& cursorIndex = mImpl->mEventData->mPrimaryCursorPosition;
-
-  Vector<Character>& modifyText = mImpl->mLogicalModel->mText;
-
-  if( cursorIndex < numberOfCharactersInModel )
-  {
-    modifyText.Insert( modifyText.Begin() + cursorIndex, utf32Characters.Begin(), utf32Characters.Begin()+ maxSizeOfNewText );
-  }
-  else
-  {
-    modifyText.Insert( modifyText.End(), utf32Characters.Begin(), utf32Characters.Begin() + maxSizeOfNewText );
-  }
-
-  cursorIndex += maxSizeOfNewText;
-
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
 
   // Apply modifications to the model; TODO - Optimize this
   mImpl->mOperationsPending = ALL_OPERATIONS;
-  UpdateModel( ALL_OPERATIONS );
+  mImpl->UpdateModel( ALL_OPERATIONS );
   mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT             |
                                                            ALIGN              |
                                                            UPDATE_ACTUAL_SIZE |
@@ -645,16 +756,11 @@ void Controller::InsertTextEvent( const std::string& text )
   // Queue a cursor reposition event; this must wait until after DoRelayout()
   mImpl->mEventData->mUpdateCursorPosition = true;
   mImpl->mEventData->mScrollAfterUpdateCursorPosition = true;
-
-  if ( characterCount > maxSizeOfNewText )
-  {
-    mImpl->mControlInterface.MaxLengthReached();
-  }
 }
 
-void Controller::DeleteTextEvent()
+void Controller::TextDeletedEvent()
 {
-  DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected InsertTextEvent" );
+  DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected TextDeletedEvent" );
 
   // TODO - Optimize this
   mImpl->mLogicalModel->mScriptRuns.Clear();
@@ -675,25 +781,12 @@ void Controller::DeleteTextEvent()
   mImpl->mVisualModel->mLines.Clear();
   mImpl->mVisualModel->ClearCaches();
 
-  // Delte at current cursor position
-  Vector<Character>& modifyText = mImpl->mLogicalModel->mText;
-  CharacterIndex& cursorIndex = mImpl->mEventData->mPrimaryCursorPosition;
-
-  if( cursorIndex > 0 &&
-      cursorIndex-1 < modifyText.Count() )
-  {
-    modifyText.Remove( modifyText.Begin() + cursorIndex - 1 );
-
-    // Cursor position retreat
-    --cursorIndex;
-  }
-
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
 
   // Apply modifications to the model; TODO - Optimize this
   mImpl->mOperationsPending = ALL_OPERATIONS;
-  UpdateModel( ALL_OPERATIONS );
+  mImpl->UpdateModel( ALL_OPERATIONS );
   mImpl->mOperationsPending = static_cast<OperationsMask>( LAYOUT             |
                                                            ALIGN              |
                                                            UPDATE_ACTUAL_SIZE |
@@ -702,152 +795,6 @@ void Controller::DeleteTextEvent()
   // Queue a cursor reposition event; this must wait until after DoRelayout()
   mImpl->mEventData->mUpdateCursorPosition = true;
   mImpl->mEventData->mScrollAfterUpdateCursorPosition = true;
-}
-
-void Controller::UpdateModel( OperationsMask operationsRequired )
-{
-  // Calculate the operations to be done.
-  const OperationsMask operations = static_cast<OperationsMask>( mImpl->mOperationsPending & operationsRequired );
-
-  Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
-
-  const Length numberOfCharacters = mImpl->mLogicalModel->GetNumberOfCharacters();
-
-  Vector<LineBreakInfo>& lineBreakInfo = mImpl->mLogicalModel->mLineBreakInfo;
-  if( GET_LINE_BREAKS & operations )
-  {
-    // Retrieves the line break info. The line break info is used to split the text in 'paragraphs' to
-    // calculate the bidirectional info for each 'paragraph'.
-    // It's also used to layout the text (where it should be a new line) or to shape the text (text in different lines
-    // is not shaped together).
-    lineBreakInfo.Resize( numberOfCharacters, TextAbstraction::LINE_NO_BREAK );
-
-    SetLineBreakInfo( utf32Characters,
-                      lineBreakInfo );
-  }
-
-  Vector<WordBreakInfo>& wordBreakInfo = mImpl->mLogicalModel->mWordBreakInfo;
-  if( GET_WORD_BREAKS & operations )
-  {
-    // Retrieves the word break info. The word break info is used to layout the text (where to wrap the text in lines).
-    wordBreakInfo.Resize( numberOfCharacters, TextAbstraction::WORD_NO_BREAK );
-
-    SetWordBreakInfo( utf32Characters,
-                      wordBreakInfo );
-  }
-
-  const bool getScripts = GET_SCRIPTS & operations;
-  const bool validateFonts = VALIDATE_FONTS & operations;
-
-  Vector<ScriptRun>& scripts = mImpl->mLogicalModel->mScriptRuns;
-  Vector<FontRun>& validFonts = mImpl->mLogicalModel->mFontRuns;
-
-  if( getScripts || validateFonts )
-  {
-    // Validates the fonts assigned by the application or assigns default ones.
-    // It makes sure all the characters are going to be rendered by the correct font.
-    MultilanguageSupport multilanguageSupport = MultilanguageSupport::Get();
-
-    if( getScripts )
-    {
-      // Retrieves the scripts used in the text.
-      multilanguageSupport.SetScripts( utf32Characters,
-                                       lineBreakInfo,
-                                       scripts );
-    }
-
-    if( validateFonts )
-    {
-      if( 0u == validFonts.Count() )
-      {
-        // Copy the requested font defaults received via the property system.
-        // These may not be valid i.e. may not contain glyphs for the necessary scripts.
-        GetDefaultFonts( validFonts, numberOfCharacters );
-      }
-
-      // Validates the fonts. If there is a character with no assigned font it sets a default one.
-      // After this call, fonts are validated.
-      multilanguageSupport.ValidateFonts( utf32Characters,
-                                          scripts,
-                                          validFonts );
-    }
-  }
-
-  Vector<Character> mirroredUtf32Characters;
-  bool textMirrored = false;
-  if( BIDI_INFO & operations )
-  {
-    // Count the number of LINE_NO_BREAK to reserve some space for the vector of paragraph's
-    // bidirectional info.
-
-    Length numberOfParagraphs = 0u;
-
-    const TextAbstraction::LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
-    for( Length index = 0u; index < numberOfCharacters; ++index )
-    {
-      if( TextAbstraction::LINE_NO_BREAK == *( lineBreakInfoBuffer + index ) )
-      {
-        ++numberOfParagraphs;
-      }
-    }
-
-    Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = mImpl->mLogicalModel->mBidirectionalParagraphInfo;
-    bidirectionalInfo.Reserve( numberOfParagraphs );
-
-    // Calculates the bidirectional info for the whole paragraph if it contains right to left scripts.
-    SetBidirectionalInfo( utf32Characters,
-                          scripts,
-                          lineBreakInfo,
-                          bidirectionalInfo );
-
-    if( 0u != bidirectionalInfo.Count() )
-    {
-      // This paragraph has right to left text. Some characters may need to be mirrored.
-      // TODO: consider if the mirrored string can be stored as well.
-
-      textMirrored = GetMirroredText( utf32Characters, mirroredUtf32Characters );
-
-      // Only set the character directions if there is right to left characters.
-      Vector<CharacterDirection>& directions = mImpl->mLogicalModel->mCharacterDirections;
-      directions.Resize( numberOfCharacters );
-
-      GetCharactersDirection( bidirectionalInfo,
-                              directions );
-    }
-    else
-    {
-      // There is no right to left characters. Clear the directions vector.
-      mImpl->mLogicalModel->mCharacterDirections.Clear();
-    }
-
-   }
-
-  Vector<GlyphInfo>& glyphs = mImpl->mVisualModel->mGlyphs;
-  Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mVisualModel->mGlyphsToCharacters;
-  Vector<Length>& charactersPerGlyph = mImpl->mVisualModel->mCharactersPerGlyph;
-  if( SHAPE_TEXT & operations )
-  {
-    const Vector<Character>& textToShape = textMirrored ? mirroredUtf32Characters : utf32Characters;
-    // Shapes the text.
-    ShapeText( textToShape,
-               lineBreakInfo,
-               scripts,
-               validFonts,
-               glyphs,
-               glyphsToCharactersMap,
-               charactersPerGlyph );
-
-    // Create the 'number of glyphs' per character and the glyph to character conversion tables.
-    mImpl->mVisualModel->CreateGlyphsPerCharacterTable( numberOfCharacters );
-    mImpl->mVisualModel->CreateCharacterToGlyphTable( numberOfCharacters );
-  }
-
-  const Length numberOfGlyphs = glyphs.Count();
-
-  if( GET_GLYPH_METRICS & operations )
-  {
-    mImpl->mFontClient.GetGlyphMetrics( glyphs.Begin(), numberOfGlyphs );
-  }
 }
 
 bool Controller::DoRelayout( const Size& size,
@@ -1115,18 +1062,24 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     }
     else if( Dali::DALI_KEY_BACKSPACE == keyCode )
     {
-      // Queue a delete event
-      ModifyEvent event;
-      event.type = ModifyEvent::DELETE_TEXT;
-      mImpl->mModifyEvents.push_back( event );
+      // Remove the character before the current cursor position
+      bool removed = RemoveText( -1, 1 );
+
+      if( removed )
+      {
+        if( 0u == mImpl->mLogicalModel->mText.Count() )
+        {
+          mImpl->ShowPlaceholderText();
+        }
+        else
+        {
+          mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
+        }
+      }
     }
-    else if( !keyString.empty() )
+    else
     {
-      // Queue an insert event
-      ModifyEvent event;
-      event.type = ModifyEvent::INSERT_TEXT;
-      event.text = keyString;
-      mImpl->mModifyEvents.push_back( event );
+      InsertText( keyString, COMMIT );
     }
 
     mImpl->ChangeState( EventData::EDITING ); // todo Confirm this is the best place to change the state of
@@ -1135,6 +1088,96 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
   }
 
   return false;
+}
+
+void Controller::InsertText( const std::string& text, Controller::InsertType type )
+{
+  bool removedPreEdit( false );
+  bool maxLengthReached( false );
+
+  if( ! text.empty() )
+  {
+    if( mImpl->IsShowingPlaceholderText() )
+    {
+      ResetText();
+    }
+  }
+
+  if( mImpl->mEventData )
+  {
+    if( COMMIT == type )
+    {
+      mImpl->mEventData->mPreEditFlag = false;
+    }
+    else // PRE_EDIT
+    {
+      if( mImpl->mEventData->mPreEditFlag &&
+          0 != mImpl->mEventData->mPreEditLength )
+      {
+        // Remove previous pre-edit text
+        mImpl->mEventData->mPrimaryCursorPosition = mImpl->mEventData->mPreEditStartPosition;
+        removedPreEdit = RemoveText( -1, mImpl->mEventData->mPreEditLength );
+      }
+      else
+      {
+        // Record the start of the pre-edit text
+        mImpl->mEventData->mPreEditStartPosition = mImpl->mEventData->mPrimaryCursorPosition;
+        mImpl->mEventData->mPreEditLength = text.size();
+      }
+
+      mImpl->mEventData->mPreEditFlag = true;
+    }
+  }
+
+  if( ! text.empty() )
+  {
+    //  Convert text into UTF-32
+    Vector<Character> utf32Characters;
+    utf32Characters.Resize( text.size() );
+
+    // This is a bit horrible but std::string returns a (signed) char*
+    const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
+
+    // Transform a text array encoded in utf8 into an array encoded in utf32.
+    // It returns the actual number of characters.
+    Length characterCount = Utf8ToUtf32( utf8, text.size(), utf32Characters.Begin() );
+    utf32Characters.Resize( characterCount );
+
+    const Length numberOfCharactersInModel = mImpl->mLogicalModel->GetNumberOfCharacters();
+
+    // Restrict new text to fit within Maximum characters setting
+    Length maxSizeOfNewText = std::min ( ( mImpl->mMaximumNumberOfCharacters - numberOfCharactersInModel ), characterCount );
+    maxLengthReached = ( characterCount > maxSizeOfNewText );
+
+    // Insert at current cursor position
+    CharacterIndex& cursorIndex = mImpl->mEventData->mPrimaryCursorPosition;
+
+    Vector<Character>& modifyText = mImpl->mLogicalModel->mText;
+
+    if( cursorIndex < numberOfCharactersInModel )
+    {
+      modifyText.Insert( modifyText.Begin() + cursorIndex, utf32Characters.Begin(), utf32Characters.Begin() + maxSizeOfNewText );
+    }
+    else
+    {
+      modifyText.Insert( modifyText.End(), utf32Characters.Begin(), utf32Characters.Begin() + maxSizeOfNewText );
+    }
+
+    cursorIndex += maxSizeOfNewText;
+  }
+
+  if( removedPreEdit || !text.empty() )
+  {
+    // Queue an inserted event
+    mImpl->QueueModifyEvent( ModifyEvent::TEXT_INSERTED );
+  }
+
+  if( maxLengthReached )
+  {
+    mImpl->mControlInterface.MaxLengthReached();
+
+    mImpl->PreEditReset();
+  }
 }
 
 void Controller::TapEvent( unsigned int tapCount, float x, float y )
@@ -1151,6 +1194,9 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 
     mImpl->RequestRelayout();
   }
+
+  // Reset keyboard as tap event has occurred.
+  mImpl->PreEditReset();
 }
 
 void Controller::PanEvent( Gesture::State state, const Vector2& displacement )

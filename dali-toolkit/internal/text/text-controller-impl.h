@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/text-abstraction/font-client.h>
+#include <dali/public-api/adaptor-framework/imf-manager.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
@@ -109,7 +110,9 @@ struct EventData
   ~EventData();
 
   DecoratorPtr       mDecorator;               ///< Pointer to the decorator
-  std::string        mPlaceholderText;         ///< The plaxe holder text
+  std::string        mPlaceholderTextActive;   ///< The text to display when the TextField is empty with key-input focus
+  std::string        mPlaceholderTextInactive; ///< The text to display when the TextField is empty and inactive
+  Vector4            mPlaceholderTextColor;    ///< The in/active placeholder text color
 
   /**
    * This is used to delay handling events until after the model has been updated.
@@ -129,30 +132,35 @@ struct EventData
   CharacterIndex     mLeftSelectionPosition;   ///< Index into logical model for left selection handle.
   CharacterIndex     mRightSelectionPosition;  ///< Index into logical model for right selection handle.
 
-  bool mDecoratorUpdated                : 1;   ///< True if the decorator was updated during event processing.
-  bool mCursorBlinkEnabled              : 1;   ///< True if cursor should blink when active.
-  bool mGrabHandleEnabled               : 1;   ///< True if grab handle is enabled.
-  bool mGrabHandlePopupEnabled          : 1;   ///< True if the grab handle popu-up should be shown.
-  bool mSelectionEnabled                : 1;   ///< True if selection handles, highlight etc. are enabled.
-  bool mHorizontalScrollingEnabled      : 1;   ///< True if horizontal scrolling is enabled.
-  bool mVerticalScrollingEnabled        : 1;   ///< True if vertical scrolling is enabled.
-  bool mUpdateCursorPosition            : 1;   ///< True if the visual position of the cursor must be recalculated.
-  bool mUpdateLeftSelectionPosition     : 1;   ///< True if the visual position of the left selection handle must be recalculated.
-  bool mUpdateRightSelectionPosition    : 1;   ///< True if the visual position of the right selection handle must be recalculated.
-  bool mScrollAfterUpdateCursorPosition : 1;   ///< Whether to scroll after the cursor position is updated.
+  CharacterIndex     mPreEditStartPosition;    ///< Used to remove the pre-edit text if necessary.
+  Length             mPreEditLength;           ///< Used to remove the pre-edit text if necessary.
+
+  bool mIsShowingPlaceholderText           : 1;   ///< True if the place-holder text is being displayed.
+  bool mPreEditFlag                        : 1;   ///< True if the model contains text in pre-edit state.
+  bool mDecoratorUpdated                   : 1;   ///< True if the decorator was updated during event processing.
+  bool mCursorBlinkEnabled                 : 1;   ///< True if cursor should blink when active.
+  bool mGrabHandleEnabled                  : 1;   ///< True if grab handle is enabled.
+  bool mGrabHandlePopupEnabled             : 1;   ///< True if the grab handle popu-up should be shown.
+  bool mSelectionEnabled                   : 1;   ///< True if selection handles, highlight etc. are enabled.
+  bool mHorizontalScrollingEnabled         : 1;   ///< True if horizontal scrolling is enabled.
+  bool mVerticalScrollingEnabled           : 1;   ///< True if vertical scrolling is enabled.
+  bool mUpdateCursorPosition               : 1;   ///< True if the visual position of the cursor must be recalculated.
+  bool mUpdateLeftSelectionPosition        : 1;   ///< True if the visual position of the left selection handle must be recalculated.
+  bool mUpdateRightSelectionPosition       : 1;   ///< True if the visual position of the right selection handle must be recalculated.
+  bool mScrollAfterUpdateCursorPosition    : 1;   ///< Whether to scroll after the cursor position is updated.
 };
 
 struct ModifyEvent
 {
   enum Type
   {
-    REPLACE_TEXT, ///< Replace the entire text
-    INSERT_TEXT,  ///< Insert characters at the current cursor position
-    DELETE_TEXT   ///< Delete a character at the current cursor position
+    PLACEHOLDER_TEXT, ///< Show the placeholder text if necessary
+    TEXT_REPLACED,    ///< The entire text was replaced
+    TEXT_INSERTED,      ///< Insert characters at the current cursor position
+    TEXT_DELETED      ///< Characters were deleted
   };
 
   Type type;
-  std::string text;
 };
 
 struct FontDefaults
@@ -193,6 +201,7 @@ struct Controller::Impl
     mLayoutEngine(),
     mModifyEvents(),
     mControlSize(),
+    mTextColor( Color::BLACK ),
     mAlignmentOffset(),
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50 ),
@@ -206,9 +215,6 @@ struct Controller::Impl
     mView.SetVisualModel( mVisualModel );
 
     // Set the text properties to default
-    mVisualModel->SetTextColor( Color::WHITE );
-    mVisualModel->SetShadowOffset( Vector2::ZERO );
-    mVisualModel->SetShadowColor( Color::BLACK );
     mVisualModel->SetUnderlineEnabled( false );
     mVisualModel->SetUnderlineHeight( 0.0f );
   }
@@ -224,15 +230,92 @@ struct Controller::Impl
   void RequestRelayout();
 
   /**
+   * @brief Request a relayout using the ControlInterface.
+   */
+  void QueueModifyEvent( ModifyEvent::Type type )
+  {
+    ModifyEvent event;
+    event.type = type;
+    mModifyEvents.push_back( event );
+
+    // The event will be processed during relayout
+    RequestRelayout();
+  }
+
+  /**
    * @brief Helper to move the cursor, grab handle etc.
    */
   bool ProcessInputEvents();
 
+  /**
+   * @brief Helper to check whether any place-holder text is available.
+   */
+  bool IsPlaceholderAvailable() const
+  {
+    return ( mEventData &&
+             ( !mEventData->mPlaceholderTextInactive.empty() ||
+               !mEventData->mPlaceholderTextActive.empty() )
+           );
+  }
+
+  bool IsShowingPlaceholderText() const
+  {
+    return ( mEventData && mEventData->mIsShowingPlaceholderText );
+  }
+
+  void ShowPlaceholderText()
+  {
+    if( IsPlaceholderAvailable() )
+    {
+      mEventData->mIsShowingPlaceholderText = true;
+
+      // Placeholder-text is dependent on focus state i.e. replace after event processing
+      QueueModifyEvent( ModifyEvent::PLACEHOLDER_TEXT );
+    }
+  }
+
+  /**
+   * @brief Called when placeholder-text is hidden
+   */
+  void PlaceholderCleared()
+  {
+    if( mEventData )
+    {
+      mEventData->mIsShowingPlaceholderText = false;
+
+      // Remove mPlaceholderTextColor
+      mVisualModel->SetTextColor( mTextColor );
+    }
+  }
+
+  void PreEditReset()
+  {
+    // Reset incase we are in a pre-edit state.
+    ImfManager imfManager = ImfManager::Get();
+    if ( imfManager )
+    {
+      imfManager.Reset(); // Will trigger a commit message
+    }
+  }
+
+  /**
+   * @brief Called when placeholder-text is shown
+   */
+  void ReplaceTextWithPlaceholder();
+
+  void UpdateModel( OperationsMask operationsRequired );
+
+  /**
+   * @brief Retrieve the default fonts.
+   *
+   * @param[out] fonts The default font family, style and point sizes.
+   * @param[in] numberOfCharacters The number of characters in the logical model.
+   */
+  void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters );
+
   void OnKeyboardFocus( bool hasFocus );
 
   void OnCursorKeyEvent( const Event& event );
-
-  void HandleCursorKey( int keyCode );
 
   void OnTapEvent( const Event& event );
 
@@ -328,6 +411,7 @@ struct Controller::Impl
   LayoutEngine mLayoutEngine;              ///< The layout engine.
   std::vector<ModifyEvent> mModifyEvents;  ///< Temporary stores the text set until the next relayout.
   Size mControlSize;                       ///< The size of the control.
+  Vector4 mTextColor;                      ///< The regular text color
   Vector2 mAlignmentOffset;                ///< Vertical and horizontal offset of the whole text inside the control due to alignment.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
   Length mMaximumNumberOfCharacters;       ///< Maximum number of characters that can be inserted.

@@ -21,6 +21,17 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/key.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/bidirectional-support.h>
+#include <dali-toolkit/internal/text/character-set-conversion.h>
+#include <dali-toolkit/internal/text/layouts/layout-parameters.h>
+#include <dali-toolkit/internal/text/multi-language-support.h>
+#include <dali-toolkit/internal/text/script-run.h>
+#include <dali-toolkit/internal/text/segmentation.h>
+#include <dali-toolkit/internal/text/shaper.h>
+#include <dali-toolkit/internal/text/text-io.h>
+#include <dali-toolkit/internal/text/text-view.h>
+
 namespace
 {
 
@@ -96,13 +107,19 @@ void GetGlyphsMetrics( GlyphIndex glyphIndex,
 
 EventData::EventData( DecoratorPtr decorator )
 : mDecorator( decorator ),
-  mPlaceholderText(),
+  mPlaceholderTextActive(),
+  mPlaceholderTextInactive(),
+  mPlaceholderTextColor( 0.8f, 0.8f, 0.8f, 0.8f ),
   mEventQueue(),
   mScrollPosition(),
   mState( INACTIVE ),
   mPrimaryCursorPosition( 0u ),
   mLeftSelectionPosition( 0u ),
   mRightSelectionPosition( 0u ),
+  mPreEditStartPosition( 0u ),
+  mPreEditLength( 0u ),
+  mIsShowingPlaceholderText( false ),
+  mPreEditFlag( false ),
   mDecoratorUpdated( false ),
   mCursorBlinkEnabled( true ),
   mGrabHandleEnabled( true ),
@@ -221,6 +238,243 @@ bool Controller::Impl::ProcessInputEvents()
   return mEventData->mDecoratorUpdated;
 }
 
+void Controller::Impl::ReplaceTextWithPlaceholder()
+{
+  DALI_ASSERT_DEBUG( mEventData && "No placeholder text available" );
+  if( !mEventData )
+  {
+    return;
+  }
+
+  // Disable handles when showing place-holder text
+  mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+  mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+  mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+
+  const char* text( NULL );
+  size_t size( 0 );
+
+  if( EventData::INACTIVE != mEventData->mState &&
+      0u != mEventData->mPlaceholderTextActive.c_str() )
+  {
+    text = mEventData->mPlaceholderTextActive.c_str();
+    size = mEventData->mPlaceholderTextActive.size();
+  }
+
+  else
+  {
+    text = mEventData->mPlaceholderTextInactive.c_str();
+    size = mEventData->mPlaceholderTextInactive.size();
+  }
+
+  // Reset buffers.
+  mLogicalModel->mText.Clear();
+  mLogicalModel->mScriptRuns.Clear();
+  mLogicalModel->mFontRuns.Clear();
+  mLogicalModel->mLineBreakInfo.Clear();
+  mLogicalModel->mWordBreakInfo.Clear();
+  mLogicalModel->mBidirectionalParagraphInfo.Clear();
+  mLogicalModel->mCharacterDirections.Clear();
+  mLogicalModel->mBidirectionalLineInfo.Clear();
+  mLogicalModel->mLogicalToVisualMap.Clear();
+  mLogicalModel->mVisualToLogicalMap.Clear();
+  mVisualModel->mGlyphs.Clear();
+  mVisualModel->mGlyphsToCharacters.Clear();
+  mVisualModel->mCharactersToGlyph.Clear();
+  mVisualModel->mCharactersPerGlyph.Clear();
+  mVisualModel->mGlyphsPerCharacter.Clear();
+  mVisualModel->mGlyphPositions.Clear();
+  mVisualModel->mLines.Clear();
+  mVisualModel->ClearCaches();
+  mVisualModel->SetTextColor( mEventData->mPlaceholderTextColor );
+
+  //  Convert text into UTF-32
+  Vector<Character>& utf32Characters = mLogicalModel->mText;
+  utf32Characters.Resize( size );
+
+  // This is a bit horrible but std::string returns a (signed) char*
+  const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text );
+
+  // Transform a text array encoded in utf8 into an array encoded in utf32.
+  // It returns the actual number of characters.
+  Length characterCount = Utf8ToUtf32( utf8, size, utf32Characters.Begin() );
+  utf32Characters.Resize( characterCount );
+
+  // Reset the cursor position
+  mEventData->mPrimaryCursorPosition = 0;
+
+  // The natural size needs to be re-calculated.
+  mRecalculateNaturalSize = true;
+
+  // Apply modifications to the model
+  mOperationsPending = ALL_OPERATIONS;
+  UpdateModel( ALL_OPERATIONS );
+  mOperationsPending = static_cast<OperationsMask>( LAYOUT             |
+                                                    ALIGN              |
+                                                    UPDATE_ACTUAL_SIZE |
+                                                    REORDER );
+}
+
+void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
+{
+  // Calculate the operations to be done.
+  const OperationsMask operations = static_cast<OperationsMask>( mOperationsPending & operationsRequired );
+
+  Vector<Character>& utf32Characters = mLogicalModel->mText;
+
+  const Length numberOfCharacters = mLogicalModel->GetNumberOfCharacters();
+
+  Vector<LineBreakInfo>& lineBreakInfo = mLogicalModel->mLineBreakInfo;
+  if( GET_LINE_BREAKS & operations )
+  {
+    // Retrieves the line break info. The line break info is used to split the text in 'paragraphs' to
+    // calculate the bidirectional info for each 'paragraph'.
+    // It's also used to layout the text (where it should be a new line) or to shape the text (text in different lines
+    // is not shaped together).
+    lineBreakInfo.Resize( numberOfCharacters, TextAbstraction::LINE_NO_BREAK );
+
+    SetLineBreakInfo( utf32Characters,
+                      lineBreakInfo );
+  }
+
+  Vector<WordBreakInfo>& wordBreakInfo = mLogicalModel->mWordBreakInfo;
+  if( GET_WORD_BREAKS & operations )
+  {
+    // Retrieves the word break info. The word break info is used to layout the text (where to wrap the text in lines).
+    wordBreakInfo.Resize( numberOfCharacters, TextAbstraction::WORD_NO_BREAK );
+
+    SetWordBreakInfo( utf32Characters,
+                      wordBreakInfo );
+  }
+
+  const bool getScripts = GET_SCRIPTS & operations;
+  const bool validateFonts = VALIDATE_FONTS & operations;
+
+  Vector<ScriptRun>& scripts = mLogicalModel->mScriptRuns;
+  Vector<FontRun>& validFonts = mLogicalModel->mFontRuns;
+
+  if( getScripts || validateFonts )
+  {
+    // Validates the fonts assigned by the application or assigns default ones.
+    // It makes sure all the characters are going to be rendered by the correct font.
+    MultilanguageSupport multilanguageSupport = MultilanguageSupport::Get();
+
+    if( getScripts )
+    {
+      // Retrieves the scripts used in the text.
+      multilanguageSupport.SetScripts( utf32Characters,
+                                       lineBreakInfo,
+                                       scripts );
+    }
+
+    if( validateFonts )
+    {
+      if( 0u == validFonts.Count() )
+      {
+        // Copy the requested font defaults received via the property system.
+        // These may not be valid i.e. may not contain glyphs for the necessary scripts.
+        GetDefaultFonts( validFonts, numberOfCharacters );
+      }
+
+      // Validates the fonts. If there is a character with no assigned font it sets a default one.
+      // After this call, fonts are validated.
+      multilanguageSupport.ValidateFonts( utf32Characters,
+                                          scripts,
+                                          validFonts );
+    }
+  }
+
+  Vector<Character> mirroredUtf32Characters;
+  bool textMirrored = false;
+  if( BIDI_INFO & operations )
+  {
+    // Count the number of LINE_NO_BREAK to reserve some space for the vector of paragraph's
+    // bidirectional info.
+
+    Length numberOfParagraphs = 0u;
+
+    const TextAbstraction::LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
+    for( Length index = 0u; index < numberOfCharacters; ++index )
+    {
+      if( TextAbstraction::LINE_NO_BREAK == *( lineBreakInfoBuffer + index ) )
+      {
+        ++numberOfParagraphs;
+      }
+    }
+
+    Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = mLogicalModel->mBidirectionalParagraphInfo;
+    bidirectionalInfo.Reserve( numberOfParagraphs );
+
+    // Calculates the bidirectional info for the whole paragraph if it contains right to left scripts.
+    SetBidirectionalInfo( utf32Characters,
+                          scripts,
+                          lineBreakInfo,
+                          bidirectionalInfo );
+
+    if( 0u != bidirectionalInfo.Count() )
+    {
+      // This paragraph has right to left text. Some characters may need to be mirrored.
+      // TODO: consider if the mirrored string can be stored as well.
+
+      textMirrored = GetMirroredText( utf32Characters, mirroredUtf32Characters );
+
+      // Only set the character directions if there is right to left characters.
+      Vector<CharacterDirection>& directions = mLogicalModel->mCharacterDirections;
+      directions.Resize( numberOfCharacters );
+
+      GetCharactersDirection( bidirectionalInfo,
+                              directions );
+    }
+    else
+    {
+      // There is no right to left characters. Clear the directions vector.
+      mLogicalModel->mCharacterDirections.Clear();
+    }
+
+   }
+
+  Vector<GlyphInfo>& glyphs = mVisualModel->mGlyphs;
+  Vector<CharacterIndex>& glyphsToCharactersMap = mVisualModel->mGlyphsToCharacters;
+  Vector<Length>& charactersPerGlyph = mVisualModel->mCharactersPerGlyph;
+  if( SHAPE_TEXT & operations )
+  {
+    const Vector<Character>& textToShape = textMirrored ? mirroredUtf32Characters : utf32Characters;
+    // Shapes the text.
+    ShapeText( textToShape,
+               lineBreakInfo,
+               scripts,
+               validFonts,
+               glyphs,
+               glyphsToCharactersMap,
+               charactersPerGlyph );
+
+    // Create the 'number of glyphs' per character and the glyph to character conversion tables.
+    mVisualModel->CreateGlyphsPerCharacterTable( numberOfCharacters );
+    mVisualModel->CreateCharacterToGlyphTable( numberOfCharacters );
+  }
+
+  const Length numberOfGlyphs = glyphs.Count();
+
+  if( GET_GLYPH_METRICS & operations )
+  {
+    mFontClient.GetGlyphMetrics( glyphs.Begin(), numberOfGlyphs );
+  }
+}
+
+void Controller::Impl::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfCharacters )
+{
+  if( mFontDefaults )
+  {
+    FontRun fontRun;
+    fontRun.characterRun.characterIndex = 0;
+    fontRun.characterRun.numberOfCharacters = numberOfCharacters;
+    fontRun.fontId = mFontDefaults->GetFontId( mFontClient );
+    fontRun.isDefault = true;
+
+    fonts.PushBack( fontRun );
+  }
+}
+
 void Controller::Impl::OnKeyboardFocus( bool hasFocus )
 {
   if( NULL == mEventData )
@@ -276,16 +530,6 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
   mEventData->mScrollAfterUpdateCursorPosition = true;
 }
 
-void Controller::Impl::HandleCursorKey( int keyCode )
-{
-  // TODO
-  if( NULL == mEventData )
-  {
-    // Nothing to do if there is no text input.
-    return;
-  }
-}
-
 void Controller::Impl::OnTapEvent( const Event& event )
 {
   if( NULL == mEventData )
@@ -298,6 +542,17 @@ void Controller::Impl::OnTapEvent( const Event& event )
 
   if( 1u == tapCount )
   {
+    // Grab handle is not shown until a tap is received whilst EDITING
+    if( EventData::EDITING == mEventData->mState &&
+        !IsShowingPlaceholderText() )
+    {
+      if( mEventData->mGrabHandleEnabled )
+      {
+        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+      }
+      mEventData->mDecorator->SetPopupActive( false );
+    }
+
     ChangeState( EventData::EDITING );
 
     const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
@@ -485,7 +740,22 @@ void Controller::Impl::ChangeState( EventData::State newState )
 
   if( mEventData->mState != newState )
   {
+    // Show different placeholder when switching between active & inactive
+    bool updatePlaceholder( false );
+    if( IsShowingPlaceholderText() &&
+        ( EventData::INACTIVE == newState ||
+          EventData::INACTIVE == mEventData->mState ) )
+    {
+      updatePlaceholder = true;
+    }
+
     mEventData->mState = newState;
+
+    if( updatePlaceholder )
+    {
+      ReplaceTextWithPlaceholder();
+      mEventData->mDecoratorUpdated = true;
+    }
 
     if( EventData::INACTIVE == mEventData->mState )
     {
@@ -513,14 +783,8 @@ void Controller::Impl::ChangeState( EventData::State newState )
       {
         mEventData->mDecorator->StartCursorBlink();
       }
-      if( mEventData->mGrabHandleEnabled )
-      {
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
-      }
-      if( mEventData->mGrabHandlePopupEnabled )
-      {
-        mEventData->mDecorator->SetPopupActive( false );
-      }
+      // Grab handle is not shown until a tap is received whilst EDITING
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
       mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
       mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
       mEventData->mDecoratorUpdated = true;
@@ -532,7 +796,8 @@ void Controller::Impl::ChangeState( EventData::State newState )
       {
         mEventData->mDecorator->StartCursorBlink();
       }
-      if( mEventData->mGrabHandleEnabled )
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      if( mEventData->mSelectionEnabled )
       {
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
@@ -541,8 +806,6 @@ void Controller::Impl::ChangeState( EventData::State newState )
       {
         mEventData->mDecorator->SetPopupActive( true );
       }
-      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
       mEventData->mDecoratorUpdated = true;
     }
   }
