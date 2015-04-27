@@ -260,7 +260,7 @@ void ScrollViewWobbleEffect::ContinueAnimation(float endTime)
   Actor scrollView = GetScrollView();
 
   mAnimation = Animation::New(WOBBLEEFFECT_ANIMATION_MAX_TIME);
-  mAnimation.AnimateTo( Property(scrollView, mPropertyTime), endTime, AlphaFunctions::Linear );
+  mAnimation.AnimateTo( Property(scrollView, mPropertyTime), endTime, AlphaFunction::LINEAR );
   mAnimation.FinishedSignal().Connect(this, &ScrollViewWobbleEffect::OnAnimationFinished);
   mAnimation.Play();
 

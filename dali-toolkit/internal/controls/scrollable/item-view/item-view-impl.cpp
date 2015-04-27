@@ -461,8 +461,8 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
   {
     RemoveAnimation(mScrollAnimation);
     mScrollAnimation = Animation::New(durationSeconds);
-    mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunctions::EaseOut );
-    mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, targetSize), AlphaFunctions::EaseOut );
+    mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunction::EASE_OUT );
+    mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, targetSize), AlphaFunction::EASE_OUT );
     mScrollAnimation.FinishedSignal().Connect(this, &ItemView::OnLayoutActivationScrollFinished);
     mScrollAnimation.Play();
   }
@@ -1157,9 +1157,9 @@ void ItemView::OnPan( const PanGesture& gesture )
                                        , DEFAULT_MINIMUM_SWIPE_DURATION, DEFAULT_MAXIMUM_SWIPE_DURATION);
 
         mScrollAnimation = Animation::New(flickAnimationDuration);
-        mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunctions::EaseOut );
-        mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, layoutSize), AlphaFunctions::EaseOut );
-        mScrollAnimation.AnimateTo( Property(self, mPropertyScrollSpeed), 0.0f, AlphaFunctions::EaseOut );
+        mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunction::EASE_OUT );
+        mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, layoutSize), AlphaFunction::EASE_OUT );
+        mScrollAnimation.AnimateTo( Property(self, mPropertyScrollSpeed), 0.0f, AlphaFunction::EASE_OUT );
 
         mIsFlicking = true;
         // Check whether it has already scrolled to the end
@@ -1301,9 +1301,9 @@ Animation ItemView::DoAnchoring()
     float anchorPosition = mActiveLayout->GetClosestAnchorPosition( GetCurrentLayoutPosition(0) );
 
     anchoringAnimation = Animation::New(mAnchoringDuration);
-    anchoringAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), anchorPosition, AlphaFunctions::EaseOut );
-    anchoringAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(anchorPosition, self.GetCurrentSize()), AlphaFunctions::EaseOut );
-    anchoringAnimation.AnimateTo( Property(self, mPropertyScrollSpeed), 0.0f, AlphaFunctions::EaseOut );
+    anchoringAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), anchorPosition, AlphaFunction::EASE_OUT );
+    anchoringAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(anchorPosition, self.GetCurrentSize()), AlphaFunction::EASE_OUT );
+    anchoringAnimation.AnimateTo( Property(self, mPropertyScrollSpeed), 0.0f, AlphaFunction::EASE_OUT );
     if(!mIsFlicking)
     {
       AnimateScrollOvershoot(0.0f);
@@ -1363,8 +1363,8 @@ void ItemView::ScrollToItem(unsigned int itemId, float durationSeconds)
   {
     RemoveAnimation(mScrollAnimation);
     mScrollAnimation = Animation::New(durationSeconds);
-    mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunctions::EaseOut );
-    mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, layoutSize), AlphaFunctions::EaseOut );
+    mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunction::EASE_OUT );
+    mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, layoutSize), AlphaFunction::EASE_OUT );
     mScrollAnimation.FinishedSignal().Connect(this, &ItemView::OnScrollFinished);
     mScrollAnimation.Play();
   }
@@ -1480,8 +1480,8 @@ void ItemView::ScrollTo(const Vector3& position, float duration)
   {
     RemoveAnimation(mScrollAnimation);
     mScrollAnimation = Animation::New(duration);
-    mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunctions::EaseOut );
-    mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, layoutSize), AlphaFunctions::EaseOut );
+    mScrollAnimation.AnimateTo( Property( mScrollPositionObject, ScrollConnector::SCROLL_POSITION ), firstItemScrollPosition, AlphaFunction::EASE_OUT );
+    mScrollAnimation.AnimateTo( Property(self, mPropertyPosition), GetScrollPosition(firstItemScrollPosition, layoutSize), AlphaFunction::EASE_OUT );
     mScrollAnimation.FinishedSignal().Connect(this, &ItemView::OnScrollFinished);
     mScrollAnimation.Play();
   }

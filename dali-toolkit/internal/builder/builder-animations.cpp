@@ -110,34 +110,20 @@ AlphaFunction GetAlphaFunction( const std::string& alphaFunction )
   if( 0 == alphaFunctionLut.size() )
   {
     // coding convention is uppercase enums
-    alphaFunctionLut["DEFAULT"]                    = AlphaFunctions::Default;
-    alphaFunctionLut["LINEAR"]                     = AlphaFunctions::Linear;
-    alphaFunctionLut["SQUARE"]                     = AlphaFunctions::Square;
-    alphaFunctionLut["REVERSE"]                    = AlphaFunctions::Reverse;
-    alphaFunctionLut["EASE_IN"]                    = AlphaFunctions::EaseIn;
-    alphaFunctionLut["EASE_OUT"]                   = AlphaFunctions::EaseOut;
-    alphaFunctionLut["EASE_IN_OUT"]                = AlphaFunctions::EaseInOut;
-    alphaFunctionLut["EASE_IN_SINE"]               = AlphaFunctions::EaseInSine;
-    alphaFunctionLut["EASE_OUT_SINE"]              = AlphaFunctions::EaseOutSine;
-    alphaFunctionLut["EASE_IN_OUT_SINE"]           = AlphaFunctions::EaseInOutSine;
-    alphaFunctionLut["EASE_IN_SINE_33"]            = AlphaFunctions::EaseInSine33;
-    alphaFunctionLut["EASE_OUT_SINE_33"]           = AlphaFunctions::EaseOutSine33;
-    alphaFunctionLut["EASE_IN_OUT_SINE_33"]        = AlphaFunctions::EaseInOutSine33;
-    alphaFunctionLut["EASE_IN_OUT_SINE_50"]        = AlphaFunctions::EaseInOutSine50;
-    alphaFunctionLut["EASE_IN_OUT_SINE_60"]        = AlphaFunctions::EaseInOutSine60;
-    alphaFunctionLut["EASE_IN_OUT_SINE_70"]        = AlphaFunctions::EaseInOutSine70;
-    alphaFunctionLut["EASE_IN_OUT_SINE_80"]        = AlphaFunctions::EaseInOutSine80;
-    alphaFunctionLut["EASE_IN_OUT_SINE_90"]        = AlphaFunctions::EaseInOutSine90;
-    alphaFunctionLut["DOUBLE_EASE_IN_OUT_SINE_60"] = AlphaFunctions::DoubleEaseInOutSine60;
-    alphaFunctionLut["EASE_OUT_QUINT_50"]          = AlphaFunctions::EaseOutQuint50;
-    alphaFunctionLut["EASE_OUT_QUINT_80"]          = AlphaFunctions::EaseOutQuint80;
-    alphaFunctionLut["BOUNCE"]                     = AlphaFunctions::Bounce;
-    alphaFunctionLut["BOUNCE_BACK"]                = AlphaFunctions::BounceBack;
-    alphaFunctionLut["EASE_IN_BACK"]               = AlphaFunctions::EaseInBack;
-    alphaFunctionLut["EASE_OUT_BACK"]              = AlphaFunctions::EaseOutBack;
-    alphaFunctionLut["EASE_IN_OUT_BACK"]           = AlphaFunctions::EaseInOutBack;
-    alphaFunctionLut["SIN"]                        = AlphaFunctions::Sin;
-    alphaFunctionLut["SIN2X"]                      = AlphaFunctions::Sin2x;
+    alphaFunctionLut["DEFAULT"]                    = AlphaFunction(AlphaFunction::DEFAULT);
+    alphaFunctionLut["LINEAR"]                     = AlphaFunction(AlphaFunction::LINEAR);
+    alphaFunctionLut["REVERSE"]                    = AlphaFunction(AlphaFunction::REVERSE);
+    alphaFunctionLut["EASE_IN_SQUARE"]             = AlphaFunction(AlphaFunction::EASE_IN_SQUARE);
+    alphaFunctionLut["EASE_OUT_SQUARE"]            = AlphaFunction(AlphaFunction::EASE_OUT_SQUARE);
+    alphaFunctionLut["EASE_IN"]                    = AlphaFunction(AlphaFunction::EASE_IN);
+    alphaFunctionLut["EASE_OUT"]                   = AlphaFunction(AlphaFunction::EASE_OUT);
+    alphaFunctionLut["EASE_IN_OUT"]                = AlphaFunction(AlphaFunction::EASE_IN_OUT);
+    alphaFunctionLut["EASE_IN_SINE"]               = AlphaFunction(AlphaFunction::EASE_IN_SINE);
+    alphaFunctionLut["EASE_OUT_SINE"]              = AlphaFunction(AlphaFunction::EASE_OUT_SINE);
+    alphaFunctionLut["EASE_IN_OUT_SINE"]           = AlphaFunction(AlphaFunction::EASE_IN_OUT_SINE);
+    alphaFunctionLut["BOUNCE"]                     = AlphaFunction(AlphaFunction::BOUNCE);
+    alphaFunctionLut["SIN"]                        = AlphaFunction(AlphaFunction::SIN);
+    alphaFunctionLut["EASE_OUT_BACK"]              = AlphaFunction(AlphaFunction::EASE_OUT_BACK);
   }
 
   const AlphaFunctionLut::const_iterator iter( alphaFunctionLut.find( alphaFunction ) );
@@ -149,7 +135,7 @@ AlphaFunction GetAlphaFunction( const std::string& alphaFunction )
   else
   {
     DALI_ASSERT_ALWAYS( iter != alphaFunctionLut.end() && "Unknown Anchor Constant" );
-    return Dali::AlphaFunctions::Default;
+    return Dali::AlphaFunction::DEFAULT;
   }
 }
 
@@ -278,7 +264,7 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
       }
 
       // these are the defaults
-      AlphaFunction alphaFunction( AlphaFunctions::Default );
+      AlphaFunction alphaFunction( AlphaFunction::DEFAULT );
       TimePeriod timePeriod( 0.f );
 
       OptionalChild timeChild = IsChild( pKeyChild.second, "time-period" );
@@ -326,7 +312,7 @@ Animation CreateAnimation( const TreeNode& child, const Replacement& constant, D
             throw;
           }
 
-          AlphaFunction kfAlphaFunction( AlphaFunctions::Default );
+          AlphaFunction kfAlphaFunction( AlphaFunction::DEFAULT );
           if( OptionalString alphaFuncStr = constant.IsString( IsChild(pKeyChild.second, "alpha-function") ) )
           {
             kfAlphaFunction = GetAlphaFunction( *alphaFuncStr );

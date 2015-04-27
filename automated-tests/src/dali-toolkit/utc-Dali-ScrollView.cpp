@@ -1087,15 +1087,14 @@ int UtcDaliScrollViewSnapAlphaFunction(void)
 
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
-  scrollView.SetScrollSnapAlphaFunction( AlphaFunctions::EaseIn );
-  DALI_TEST_CHECK( scrollView.GetScrollSnapAlphaFunction() == AlphaFunctions::EaseIn );
-  scrollView.SetScrollSnapAlphaFunction( AlphaFunctions::EaseOut );
-  DALI_TEST_CHECK( scrollView.GetScrollSnapAlphaFunction() == AlphaFunctions::EaseOut );
+  scrollView.SetScrollSnapAlphaFunction( AlphaFunction::EASE_IN );
+  DALI_TEST_CHECK( scrollView.GetScrollSnapAlphaFunction().GetBuiltinFunction() == AlphaFunction::EASE_IN );
+  scrollView.SetScrollSnapAlphaFunction( AlphaFunction::EASE_OUT );
+  DALI_TEST_CHECK( scrollView.GetScrollSnapAlphaFunction().GetBuiltinFunction() == AlphaFunction::EASE_OUT );
 
-  scrollView.SetScrollFlickAlphaFunction( AlphaFunctions::Bounce );
-  DALI_TEST_CHECK( scrollView.GetScrollFlickAlphaFunction() == AlphaFunctions::Bounce );
-  scrollView.SetScrollFlickAlphaFunction( AlphaFunctions::BounceBack );
-  DALI_TEST_CHECK( scrollView.GetScrollFlickAlphaFunction() == AlphaFunctions::BounceBack );
+  scrollView.SetScrollFlickAlphaFunction( AlphaFunction::BOUNCE );
+  DALI_TEST_CHECK( scrollView.GetScrollFlickAlphaFunction().GetBuiltinFunction() == AlphaFunction::BOUNCE );
+
   END_TEST;
 }
 

@@ -43,7 +43,7 @@ namespace Toolkit
  *   // Start the animation
  *   Animation animation = Animation::New(1.f);
  *   animation.AnimateTo( Property( bouncingEffect, bouncingEffect.GetProgressRatePropertyName() ),
- *                        1.f, AlphaFunctions::Bounce );
+ *                        1.f, AlphaFunction::BOUNCE );
  *   animation.Play();
  */
 class DALI_IMPORT_API BouncingEffect : public ShaderEffect
