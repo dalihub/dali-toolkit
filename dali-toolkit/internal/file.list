@@ -19,8 +19,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/buttons/check-box-button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/push-button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/radio-button-impl.cpp \
-   $(toolkit_src_dir)/controls/cluster/cluster-impl.cpp \
-   $(toolkit_src_dir)/controls/cluster/cluster-style-impl.cpp \
    $(toolkit_src_dir)/controls/effects-view/effects-view-impl.cpp \
    $(toolkit_src_dir)/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp \
    $(toolkit_src_dir)/controls/image-view/masked-image-view-impl.cpp \
@@ -62,7 +60,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/text-controls/text-label-impl.cpp \
    $(toolkit_src_dir)/controls/text-controls/text-selection-popup-impl.cpp \
    $(toolkit_src_dir)/controls/tool-bar/tool-bar-impl.cpp \
-   $(toolkit_src_dir)/controls/view/view-impl.cpp \
    $(toolkit_src_dir)/focus-manager/focus-manager-impl.cpp \
    $(toolkit_src_dir)/focus-manager/keyboard-focus-manager-impl.cpp \
    $(toolkit_src_dir)/focus-manager/keyinput-focus-manager-impl.cpp \
@@ -82,6 +79,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/shaper.cpp \
    $(toolkit_src_dir)/text/text-control-interface.cpp \
    $(toolkit_src_dir)/text/text-controller.cpp \
+   $(toolkit_src_dir)/text/text-controller-impl.cpp \
    $(toolkit_src_dir)/text/text-io.cpp \
    $(toolkit_src_dir)/text/text-view.cpp \
    $(toolkit_src_dir)/text/text-view-interface.cpp \

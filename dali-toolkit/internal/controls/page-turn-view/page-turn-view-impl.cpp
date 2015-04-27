@@ -259,7 +259,7 @@ const int PageTurnView::NUMBER_OF_CACHED_PAGES = NUMBER_OF_CACHED_PAGES_EACH_SID
 const float PageTurnView::STATIC_PAGE_INTERVAL_DISTANCE = 1.0f;
 
 PageTurnView::PageTurnView( PageFactory& pageFactory, const Vector2& pageSize )
-: Control( REQUIRES_TOUCH_EVENTS ),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),
   mPageFactory( pageFactory ),
   mPageSize( pageSize ),
   mTotalPageCount( 0 ),
@@ -953,9 +953,9 @@ void PageTurnView::PanFinished( const Vector2& gesturePosition, float gestureSpe
       float width = mPageSize.width*(1.f+PAGE_TURN_OVER_THRESHOLD_RATIO);
       Animation animation = Animation::New( std::max(0.1f,PAGE_TURN_OVER_ANIMATION_DURATION * (1.0f - mPanDisplacement / width)) );
       animation.AnimateTo( Property(self, mPropertyPanDisplacement[mIndex]),
-                           width,AlphaFunctions::EaseOutSine33);
+                           width,AlphaFunction::EASE_OUT_SINE);
       animation.AnimateTo( Property(self, mPropertyCurrentCenter[mIndex]),
-                           Vector2(-mPageSize.width, 0.5f*mPageSize.height), AlphaFunctions::EaseOutSine33);
+                           Vector2(-mPageSize.width, 0.5f*mPageSize.height), AlphaFunction::EASE_OUT_SINE);
       mAnimationActorPair[animation] = actor;
       mAnimationIndexPair[animation] = mIndex;
       animation.Play();
@@ -965,7 +965,7 @@ void PageTurnView::PanFinished( const Vector2& gesturePosition, float gestureSpe
     {
       Animation animation= Animation::New( PAGE_SLIDE_BACK_ANIMATION_DURATION * (mOriginalCenter.x - mCurrentCenter.x) / mPageSize.width / PAGE_TURN_OVER_THRESHOLD_RATIO );
       animation.AnimateTo( Property( mTurnEffect[mIndex], mTurnEffect[mIndex].PageTurnEffect::GetCurrentCenterPropertyName() ),
-                           mOriginalCenter, AlphaFunctions::Linear );
+                           mOriginalCenter, AlphaFunction::LINEAR );
       mAnimationActorPair[animation] = actor;
       mAnimationIndexPair[animation] = mIndex;
       animation.Play();

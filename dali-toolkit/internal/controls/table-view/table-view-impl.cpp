@@ -126,11 +126,11 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TableView, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( TableView, "rows",           UNSIGNED_INTEGER, ROWS           )
-DALI_PROPERTY_REGISTRATION( TableView, "columns",        UNSIGNED_INTEGER, COLUMNS        )
-DALI_PROPERTY_REGISTRATION( TableView, "cell-padding",   VECTOR2,          CELL_PADDING   )
-DALI_PROPERTY_REGISTRATION( TableView, "layout-rows",    MAP,              LAYOUT_ROWS    )
-DALI_PROPERTY_REGISTRATION( TableView, "layout-columns", MAP,              LAYOUT_COLUMNS )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "rows",           UNSIGNED_INTEGER, ROWS           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "columns",        UNSIGNED_INTEGER, COLUMNS        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "cell-padding",   VECTOR2,          CELL_PADDING   )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layout-rows",    MAP,              LAYOUT_ROWS    )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layout-columns", MAP,              LAYOUT_COLUMNS )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -1461,10 +1461,11 @@ void TableView::CalculateFixedSizes( RowColumnArray& data, Dimension::Type dimen
         DALI_ASSERT_DEBUG( row < mCellData.GetRows() );
         DALI_ASSERT_DEBUG( column < mCellData.GetColumns() );
 
-        Actor& actor = mCellData[ row ][ column ].actor;
+        const CellData& cellData = mCellData[ row ][ column ];
+        const Actor& actor = cellData.actor;
         if( actor )
         {
-          if( FitToChild( actor, dimension ) )
+          if( FitToChild( actor, dimension ) && ( dimension == Dimension::WIDTH ) ? ( cellData.position.columnSpan == 1 ) : ( cellData.position.rowSpan == 1 )  )
           {
             maxActorHeight = std::max( maxActorHeight, actor.GetRelayoutSize( dimension ) + cellPadding.x + cellPadding.y );
           }

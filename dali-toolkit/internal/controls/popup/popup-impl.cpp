@@ -61,8 +61,8 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Popup, Toolkit::Control, Create )
 
-DALI_SIGNAL_REGISTRATION( Popup, "touched-outside", SIGNAL_TOUCHED_OUTSIDE )
-DALI_SIGNAL_REGISTRATION( Popup, "hidden",          SIGNAL_HIDDEN          )
+DALI_SIGNAL_REGISTRATION( Toolkit, Popup, "touched-outside", SIGNAL_TOUCHED_OUTSIDE )
+DALI_SIGNAL_REGISTRATION( Toolkit, Popup, "hidden",          SIGNAL_HIDDEN          )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -170,12 +170,6 @@ void Popup::OnInitialize()
   // Make self as keyboard focusable and focus group
   self.SetKeyboardFocusable(true);
   SetAsKeyboardFocusGroup(true);
-}
-
-void Popup::MarkDirtyForRelayout()
-{
-  // Flag all the popup controls for relayout as it is about to be hidden and miss the main flagging pass
-  mLayer.RelayoutRequestTree();
 }
 
 void Popup::OnPropertySet( Property::Index index, Property::Value propertyValue )
@@ -302,7 +296,6 @@ void Popup::CreateFooter()
     // Adds bottom background
     mBottomBg = Actor::New();
     mBottomBg.SetName( "POPUP_BOTTOM_BG" );
-    mBottomBg.SetRelayoutEnabled( true );
     mBottomBg.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
     mPopupLayout.SetFixedHeight( 2, mPopupStyle->bottomSize.height );   // Buttons
@@ -526,13 +519,13 @@ void Popup::HandleStateChange( Toolkit::Popup::PopupState state, float duration 
 
     if(mShowing)
     {
-      mAnimation.AnimateTo( Property(mBacking, Actor::Property::COLOR_ALPHA), targetBackingAlpha, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
-      mAnimation.AnimateTo( Property(self, Actor::Property::SCALE), targetSize, AlphaFunctions::EaseInOut, TimePeriod(duration * 0.5f, duration * 0.5f) );
+      mAnimation.AnimateTo( Property(mBacking, Actor::Property::COLOR_ALPHA), targetBackingAlpha, AlphaFunction::EASE_IN_OUT, TimePeriod(0.0f, duration * 0.5f) );
+      mAnimation.AnimateTo( Property(self, Actor::Property::SCALE), targetSize, AlphaFunction::EASE_IN_OUT, TimePeriod(duration * 0.5f, duration * 0.5f) );
     }
     else
     {
-      mAnimation.AnimateTo( Property(mBacking, Actor::Property::COLOR_ALPHA), targetBackingAlpha, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
-      mAnimation.AnimateTo( Property(self, Actor::Property::SCALE), targetSize, AlphaFunctions::EaseInOut, TimePeriod(0.0f, duration * 0.5f) );
+      mAnimation.AnimateTo( Property(mBacking, Actor::Property::COLOR_ALPHA), targetBackingAlpha, AlphaFunction::EASE_IN_OUT, TimePeriod(0.0f, duration * 0.5f) );
+      mAnimation.AnimateTo( Property(self, Actor::Property::SCALE), targetSize, AlphaFunction::EASE_IN_OUT, TimePeriod(0.0f, duration * 0.5f) );
     }
     mAnimation.Play();
     mAnimation.FinishedSignal().Connect(this, &Popup::OnStateAnimationFinished);

@@ -57,7 +57,7 @@ Toolkit::ToolBar ToolBar::New()
   // Create the implementation, temporarily owned on stack
   IntrusivePtr< ToolBar > internalToolBar = new ToolBar();
 
-  // Pass ownership to Toolkit::View
+  // Pass ownership to Toolkit::Toolbar
   Toolkit::ToolBar toolBar( *internalToolBar );
 
   // Second-phase init of the implementation
@@ -296,7 +296,7 @@ void ToolBar::RemoveControl( Actor control )
 }
 
 ToolBar::ToolBar()
-: Control( CONTROL_BEHAVIOUR_NONE ),
+: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
   mLayout(),
   mLeftOffset( 0 ),
   mCenterBase( 1 ),

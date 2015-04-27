@@ -117,12 +117,12 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ScrollBar, Toolkit::ScrollComponent, Create );
 
-DALI_PROPERTY_REGISTRATION( ScrollBar, "indicator-height-policy", STRING, INDICATOR_HEIGHT_POLICY         )
-DALI_PROPERTY_REGISTRATION( ScrollBar, "indicator-fixed-height",  FLOAT,  INDICATOR_FIXED_HEIGHT          )
-DALI_PROPERTY_REGISTRATION( ScrollBar, "indicator-show-duration", FLOAT,  INDICATOR_SHOW_DURATION         )
-DALI_PROPERTY_REGISTRATION( ScrollBar, "indicator-hide-duration", FLOAT,  INDICATOR_HIDE_DURATION         )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-height-policy", STRING, INDICATOR_HEIGHT_POLICY         )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-fixed-height",  FLOAT,  INDICATOR_FIXED_HEIGHT          )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-show-duration", FLOAT,  INDICATOR_SHOW_DURATION         )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-hide-duration", FLOAT,  INDICATOR_HIDE_DURATION         )
 
-DALI_SIGNAL_REGISTRATION(   ScrollBar, "scroll-position-notified",        SCROLL_POSITION_NOTIFIED_SIGNAL )
+DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "scroll-position-notified",        SCROLL_POSITION_NOTIFIED_SIGNAL )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -252,7 +252,7 @@ void ScrollBar::Show()
   if(mIndicatorShowDuration > 0.0f)
   {
     mAnimation = Animation::New( mIndicatorShowDuration );
-    mAnimation.AnimateTo( Property( self, Actor::Property::COLOR_ALPHA ), 1.0f, AlphaFunctions::EaseIn );
+    mAnimation.AnimateTo( Property( self, Actor::Property::COLOR_ALPHA ), 1.0f, AlphaFunction::EASE_IN );
     mAnimation.Play();
   }
   else
@@ -275,7 +275,7 @@ void ScrollBar::Hide()
   if(mIndicatorHideDuration > 0.0f)
   {
     mAnimation = Animation::New( mIndicatorHideDuration );
-    mAnimation.AnimateTo( Property( self, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunctions::EaseIn );
+    mAnimation.AnimateTo( Property( self, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunction::EASE_IN );
     mAnimation.Play();
   }
   else

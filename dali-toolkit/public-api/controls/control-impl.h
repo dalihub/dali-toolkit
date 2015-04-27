@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_CONTROL_IMPL_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -209,7 +209,7 @@ public:
   /**
    * @brief Sets whether this control supports two dimensional
    * keyboard navigation (i.e. whether it knows how to handle the
-   * keyboardn focus movement between its child actors).
+   * keyboard focus movement between its child actors).
    *
    * The control doesn't support it by default.
    * @param[in] isSupported Whether this control supports two dimensional keyboard navigation.
@@ -296,6 +296,15 @@ public:
    */
   virtual void OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor);
 
+  /**
+   * @brief Emits KeyInputFocusGained signal if true else emits KeyInputFocusLost signal
+   *
+   * Should be called last by the control after it acts on the Input Focus change.
+   *
+   * @param[in] focusGained True if gained, False if lost
+   */
+  void EmitKeyInputFocusSignal( bool focusGained );
+
   // Actions & Signals
 
   /**
@@ -325,6 +334,16 @@ public:
   Toolkit::Control::KeyEventSignalType& KeyEventSignal();
 
   /**
+   * @copydoc Dali::Toolkit::Control::KeyInputFocusGainedSignal()
+   */
+  Toolkit::Control::KeyInputFocusSignalType& KeyInputFocusGainedSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::Control::KeyInputFocusLostSignal()
+   */
+  Toolkit::Control::KeyInputFocusSignalType& KeyInputFocusLostSignal();
+
+  /**
    * @brief Called by the KeyInputFocusManager to emit key event signals.
    *
    * @param[in] event The key event.
@@ -339,13 +358,13 @@ protected:
   // Flags for the constructor
   enum ControlBehaviour
   {
-    CONTROL_BEHAVIOUR_NONE        = 0,
-    REQUIRES_TOUCH_EVENTS         = 1<<1,     ///< True if the OnTouchEvent() callback is required.
-    REQUIRES_STYLE_CHANGE_SIGNALS = 1<<2,     ///< True if needs to monitor style change signals such as theme/font change
-    NO_SIZE_NEGOTIATION           = 1<<3,     ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm
-    REQUIRES_HOVER_EVENTS         = 1<<4,     ///< True if the OnHoverEvent() callback is required.
-    REQUIRES_MOUSE_WHEEL_EVENTS   = 1<<5      ///< True if the OnMouseWheelEvent() callback is required.
+    REQUIRES_STYLE_CHANGE_SIGNALS        = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 0 ),     ///< True if needs to monitor style change signals such as theme/font change
+    REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 1 ),     ///< True if needs to support keyboard navigation
+
+    LAST_CONTROL_BEHAVIOUR_FLAG
   };
+
+  static const int CONTROL_BEHAVIOUR_FLAG_COUNT = Log< LAST_CONTROL_BEHAVIOUR_FLAG - 1 >::value + 1;      ///< Total count of flags
 
   /**
    * @brief Create a Control.

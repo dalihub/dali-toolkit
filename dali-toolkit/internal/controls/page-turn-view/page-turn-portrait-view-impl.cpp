@@ -153,8 +153,8 @@ void PageTurnPortraitView::OnPossibleOutwardsFlick( const Vector2& panPosition, 
 
     animation.AnimateTo( Property( mTurnEffect[mIndex], mTurnEffect[mIndex].PageTurnEffect::GetCurrentCenterPropertyName() ),
                          originalCenter,
-                         AlphaFunctions::EaseOut, PAGE_TURN_OVER_ANIMATION_DURATION*0.75f );
-    animation.AnimateBy( Property( actor, Actor::Property::ORIENTATION ), AngleAxis( Degree( 180.0f ), Vector3::YAXIS ) ,AlphaFunctions::EaseOut );
+                         AlphaFunction::EASE_OUT, TimePeriod(PAGE_TURN_OVER_ANIMATION_DURATION*0.75f) );
+    animation.AnimateBy( Property( actor, Actor::Property::ORIENTATION ), AngleAxis( Degree( 180.0f ), Vector3::YAXIS ) ,AlphaFunction::EASE_OUT );
     animation.Play();
     ImageActor::DownCast(actor).SetCullFace( CullBack );
     animation.FinishedSignal().Connect( this, &PageTurnPortraitView::OnTurnedOver );

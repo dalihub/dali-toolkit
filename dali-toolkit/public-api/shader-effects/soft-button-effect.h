@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_SHADER_EFFECT_SOFT_BUTTON_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +40,12 @@ namespace Toolkit
  * ImageActor imageActor = ImageActor::New( ... );\n
  * imageActor.SetShaderEffect( softButtonEffect );
  *
- * // animate a button push, using e.g. AlphaFunctions::Bounce. With these values the button pushes in and pops out slightly at the end\n
+ * // animate a button push, using e.g. AlphaFunction::BOUNCE. With these values the button pushes in and pops out slightly at the end\n
  * Animation animation = Animation::New( ... );\n
- * animation.AnimateTo( Property(softButtonEffect, softButtonEffect.GetLightingIndentationAmountPropertyName()), 0.25f, AlphaFunctions::Bounce, ... );\n
- * animation.AnimateTo( Property(softButtonEffect, softButtonEffect.GetLightingIndentationAmountPropertyName()), -0.05f, AlphaFunctions::Bounce, ... );\n
- * animation.AnimateTo( Property(softButtonEffect, softButtonEffect.GetTextureDistortionAmountPropertyName()), 0.25f, AlphaFunctions::Bounce, ... );\n
- * animation.AnimateTo( Property(softButtonEffect, softButtonEffect.GetTextureDistortionAmountPropertyName()), -0.05f, AlphaFunctions::Bounce, ... );\n
+ * animation.AnimateTo( Property(softButtonEffect, softButtonEffect.GetLightingIndentationAmountPropertyName()), 0.25f, AlphaFunction::BOUNCE, ... );\n
+ * animation.AnimateTo( Property(softButtonEffect, softButtonEffect.GetLightingIndentationAmountPropertyName()), -0.05f, AlphaFunction::BOUNCE, ... );\n
+ * animation.AnimateTo( Property(softButtonEffect, softButtonEffect.GetTextureDistortionAmountPropertyName()), 0.25f, AlphaFunction::BOUNCE, ... );\n
+ * animation.AnimateTo( Property(softButtonEffect, softButtonEffect.GetTextureDistortionAmountPropertyName()), -0.05f, AlphaFunction::BOUNCE, ... );\n
  * animation.Play();\n
  *
  */

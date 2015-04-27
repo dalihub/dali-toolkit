@@ -40,6 +40,13 @@ ScrollBase::ScrollBase()
 {
 }
 
+ScrollBase::ScrollBase( ControlBehaviour behaviourFlags )
+: Scrollable( behaviourFlags ),
+  mParent(NULL),
+  mDelay(0.0f)
+{
+}
+
 void ScrollBase::SetParent(ScrollBase *parent)
 {
   mParent = parent;

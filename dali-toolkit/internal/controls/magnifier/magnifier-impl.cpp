@@ -123,7 +123,7 @@ Dali::Toolkit::Magnifier Magnifier::New()
 }
 
 Magnifier::Magnifier()
-: Control( REQUIRES_TOUCH_EVENTS ),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),
   mPropertySourcePosition(Property::INVALID_INDEX),
   mDefaultCameraDistance(1000.f),
   mActorSize(Vector3::ZERO),
@@ -247,11 +247,13 @@ void Magnifier::SetFrameVisibility(bool visible)
 
     Image image = ResourceImage::New( DEFAULT_FRAME_IMAGE_PATH );
     mFrame = ImageActor::New( image );
-    mFrame.SetRelayoutEnabled( false );
     mFrame.SetDrawMode(DrawMode::OVERLAY);
     mFrame.SetStyle( ImageActor::STYLE_NINE_PATCH );
     mFrame.SetPositionInheritanceMode(DONT_INHERIT_POSITION);
     mFrame.SetInheritScale(true);
+    mFrame.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
+    Vector3 sizeOffset(IMAGE_BORDER_INDENT*2.f - 2.f, IMAGE_BORDER_INDENT*2.f - 2.f, 0.0f);
+    mFrame.SetSizeModeFactor( sizeOffset );
 
     Constraint constraint = Constraint::New<Vector3>( mFrame, Actor::Property::POSITION, EqualToConstraint() );
     constraint.AddSource( ParentSource( Actor::Property::WORLD_POSITION ) );
@@ -259,9 +261,6 @@ void Magnifier::SetFrameVisibility(bool visible)
 
     mFrame.SetNinePatchBorder( Vector4::ONE * IMAGE_BORDER_INDENT );
     self.Add(mFrame);
-
-    Vector3 sizeOffset(IMAGE_BORDER_INDENT*2.f - 2.f, IMAGE_BORDER_INDENT*2.f - 2.f, 0.0f);
-    mFrame.SetSize(mActorSize + sizeOffset);
   }
   else if(!visible && mFrame)
   {
@@ -271,12 +270,6 @@ void Magnifier::SetFrameVisibility(bool visible)
 
 void Magnifier::OnControlSizeSet(const Vector3& targetSize)
 {
-  if( mFrame )
-  {
-    Vector3 sizeOffset(IMAGE_BORDER_INDENT*2.f - 2.f, IMAGE_BORDER_INDENT*2.f - 2.f, 0.0f);
-    mFrame.SetSize(targetSize + sizeOffset);
-  }
-
   // TODO: Once Camera/CameraActor properties function as proper animatable properties
   // this code can disappear.
   // whenever the size of the magnifier changes, the field of view needs to change

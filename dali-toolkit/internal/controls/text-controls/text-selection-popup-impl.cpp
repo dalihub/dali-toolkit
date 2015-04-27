@@ -481,7 +481,6 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    option.SetName( name );
    option.SetAnimationTime( 0.0f );
    option.SetSize( OPTION_ICON_SIZE );
-   option.SetRelayoutEnabled( false );
    //option.ClickedSignal().Connect( this, &TextInputPopup::OnButtonPressed );
 
    // 6. Set the normal option image.
@@ -529,7 +528,6 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    Actor scrollview = Actor::New(); //todo make a scrollview
    scrollview.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
    scrollview.SetParentOrigin( ParentOrigin::CENTER );
-   scrollview.SetRelayoutEnabled( true );
 
    mTableOfButtons.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
    mTableOfButtons.SetFitHeight( 0 );
@@ -545,6 +543,7 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
  void TextSelectionPopup::AddPopupOptions( bool createTail, bool showIcons, bool showCaptions )
  {
    mContentSize = Vector2::ZERO;
+
    // Add the options into the buttons container.
 
    // 1. Determine how many buttons are active and should be added to container.
@@ -589,7 +588,7 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
  }
 
 TextSelectionPopup::TextSelectionPopup()
-: Control( ControlBehaviour( CONTROL_BEHAVIOUR_NONE ) ),
+: Control( ControlBehaviour( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ) ),
   mMaxSize ( DEFAULT_POPUP_MAX_SIZE ),
   mVisiblePopUpSize( DEFAULT_POPUP_MAX_SIZE ),
   mRequiredPopUpSize( DEFAULT_POPUP_MAX_SIZE ),

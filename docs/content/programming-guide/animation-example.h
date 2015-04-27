@@ -32,11 +32,11 @@
 
    AnimateBy and AnimateTo, method names are appended by 'By' or 'To' either animate to a supplied value or animate by a supplied value.  For example an actor at (10,10,10) calling AnimateBy(Property(actor, Actor::Property::POSITION), 50,0,0) would mean its location is (60,0,0) whilst AnimateTo(Property(actor, Actor::Property::POSITION), 50,0,0) would result in a location (50,0,0).
 
-   Dali::AlphaFunctions can be used to give interesting effects to the animation, for example the MOVEment of an actor on screen can speed up and slow down following a sine curve by using the Dali::AlphaFunctions::EaseInOutSine instead of AlphaFunctions::Linear.
+   Dali::AlphaFunction can be used to give interesting effects to the animation, for example the MOVEment of an actor on screen can speed up and slow down following a sine curve by using the Dali::AlphaFunction::EASE_IN_OUT_SINE instead of AlphaFunction::LINEAR
 
    @code
-   myAnimation.AnimateTo(Property(actor, Actor::Property::POSITION), Vector3(x, y, z), AlphaFunctions::Linear, delay, ANIMATOR_DURATION);
-   myAnimation.AnimateTo(Property(actor, Actor::Property::SIZE), actorSize, AlphaFunctions::EaseIn, delay, ANIMATOR_DURATION);
+   myAnimation.AnimateTo(Property(actor, Actor::Property::POSITION), Vector3(x, y, z), AlphaFunction::LINEAR, delay, ANIMATOR_DURATION);
+   myAnimation.AnimateTo(Property(actor, Actor::Property::SIZE), actorSize, AlphaFunction::EASE_IN, delay, ANIMATOR_DURATION);
    @endcode
    \section playback-control Controlling a playing animation
 

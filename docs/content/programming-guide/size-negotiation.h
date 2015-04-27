@@ -45,11 +45,7 @@ This section details how an actor may be used with size negotiation.
 
 <h3>Enabling Size Negotiation</h3>
 
-The first thing to do is to specify whether you want an actor to be included or excluded from the relayout process. The following method is used to enable or disable the relayout
-for an individual actor. Make sure this is the first thing that is called after the actor is created otherwise the actor may still be negotiated.
-@code void SetRelayoutEnabled( bool enabled ) @endcode
-Text and image actors have relayout enabled by default, while a plain Actor is disabled. Be aware that if desiring to use an Actor in relayout
-then relayout needs to be explicitly enabled first.
+Text and image actors have relayout enabled by default, while a plain Actor is disabled unless a call to SetResizePolicy is made.
 
 <h3>Specifying Size Policies</h3>
 
@@ -69,7 +65,6 @@ the height of the root actor will fit to the height of the child image.
 
 @code
 Actor rootActor = Actor::New();
-rootActor.SetRelayoutEnabled( true );
 rootActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 rootActor.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::HEIGHT );
 ImageActor image = ImageActor::New( Image::New( MY_IMAGE_PATH ) );
@@ -249,7 +244,7 @@ PushButton, OKAY_BUTTON - Pos: [185, 0, 0.1] Size: [165, 76, 76], Dirty: (FALSE,
 
 The format is as follows:
 
-[Actor type], [Actor name] – Pos:[X, Y, Z] Size[Dimension::WIDTH, Dimension::HEIGHT, DEPTH], Dirty:(Dimension::WIDTH, Dimension::HEIGHT), Negotiated: (Dimension::WIDTH, Dimension::HEIGHT), Enabled: BOOLEAN, (Object address)
+[Actor type], [Actor name] ? Pos:[X, Y, Z] Size[Dimension::WIDTH, Dimension::HEIGHT, DEPTH], Dirty:(Dimension::WIDTH, Dimension::HEIGHT), Negotiated: (Dimension::WIDTH, Dimension::HEIGHT), Enabled: BOOLEAN, (Object address)
 - <i>Actor type</i>: The type name of the actor E.g. PushButton
 - <i>Actor name</i>: The name set on the actor with SetName(). Useful for debugging.
 - <i>Pos</i>: The position of the actor

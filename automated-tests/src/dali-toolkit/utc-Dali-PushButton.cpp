@@ -287,17 +287,13 @@ int UtcDaliPushButtonSetImages(void)
   application.SendNotification();
   application.Render();
 
-  // Just check if check box button size changes when a bigger image is set.
-
+  pushButton.SetSize( Vector2( 20.0f, 20.0f ) );
   pushButton.SetButtonImage( image01 );
 
   application.SendNotification();
   application.Render();
 
   size = pushButton.GetCurrentSize();
-
-  DALI_TEST_EQUALS( size.width, 10.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( size.height, 10.f, TEST_LOCATION );
 
   END_TEST;
 }

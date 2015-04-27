@@ -112,7 +112,7 @@ Toolkit::EffectsView EffectsView::New()
 }
 
 EffectsView::EffectsView()
-: Control( CONTROL_BEHAVIOUR_NONE ),
+: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
   mEffectType( Toolkit::EffectsView::INVALID_TYPE ),
   mPixelFormat( EFFECTS_VIEW_DEFAULT_PIXEL_FORMAT ),
   mSpread(0.0f),

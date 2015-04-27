@@ -116,17 +116,23 @@ public:
    */
   Toolkit::Popup GetPopupMenu() const;
 
-private: // From Control
+  // Properties
 
   /**
-   * @copydoc Toolkit::Control::OnInitialize()
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
    */
-  virtual void OnInitialize();
+  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
 
   /**
-   * @copydoc Dali::CustomActorImpl::OnPropertySet()
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
    */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
+  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
 
 private:
 
@@ -144,9 +150,6 @@ private:
 
   ActorContainer                        mTitleBarControls;
   Toolkit::Page::ControlOnBarContainer  mToolBarControls;
-
-  Property::Index  mPropertyTitle;       ///< Property index for title.
-  Property::Index  mPropertySubTitle;    ///< Property index for sub title.
 };
 
 } // namespace Internal

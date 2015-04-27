@@ -137,9 +137,14 @@ private: // From Control
   virtual void OnControlSizeSet( const Vector3& targetSize );
 
   /**
-   * @copydoc Toolkit::Control::GetNaturalSize()
+   * @copydoc Toolkit::Control::GetNaturalSize
    */
-  virtual Vector3 GetNaturalSize();
+  Vector3 GetNaturalSize();
+
+  /**
+   * @copydoc Toolkit::Control::OnSetResizePolicy
+   */
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
 
 private:
 
@@ -171,6 +176,20 @@ private:
    * @param[in] scale The initial scale.
    */
   void FadeOutImage( Actor& image, float opacity = 1.f, Vector3 scale = Vector3( 1.f, 1.f, 1.f ) );
+
+  /**
+   * @brief Custom configuration for size negotiation
+   */
+  void ConfigureSizeNegotiation();
+
+  /**
+   * @brief Configure size negotiation for a given dimension
+   *
+   * @param[in] dimension The dimension to configure
+   * @param[in] images The list of images to configure
+   * @param[in] label The text label to configure
+   */
+  void ConfigureSizeNegotiationDimension( Dimension::Type dimension, const ActorContainer& images, Actor& label );
 
   // slots
 

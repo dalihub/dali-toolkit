@@ -47,19 +47,19 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Scrollable, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Scrollable, "overshoot-effect-color",    VECTOR4, OVERSHOOT_EFFECT_COLOR    )
-DALI_PROPERTY_REGISTRATION( Scrollable, "overshoot-animation-speed", FLOAT,   OVERSHOOT_ANIMATION_SPEED )
+DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshoot-effect-color",    VECTOR4, OVERSHOOT_EFFECT_COLOR    )
+DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshoot-animation-speed", FLOAT,   OVERSHOOT_ANIMATION_SPEED )
 
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Scrollable, "scroll-relative-position", VECTOR3, SCROLL_RELATIVE_POSITION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Scrollable, "scroll-position-min",      VECTOR3, SCROLL_POSITION_MIN)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Scrollable, "scroll-position-max",      VECTOR3, SCROLL_POSITION_MAX)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Scrollable, "scroll-direction",         VECTOR3, SCROLL_DIRECTION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Scrollable, "can-scroll-vertical",      BOOLEAN, CAN_SCROLL_VERTICAL)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Scrollable, "can-scroll-horizontal",    BOOLEAN, CAN_SCROLL_HORIZONTAL)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-relative-position", VECTOR3, SCROLL_RELATIVE_POSITION )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-position-min",      VECTOR3, SCROLL_POSITION_MIN      )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-position-max",      VECTOR3, SCROLL_POSITION_MAX      )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-direction",         VECTOR3, SCROLL_DIRECTION         )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "can-scroll-vertical",      BOOLEAN, CAN_SCROLL_VERTICAL      )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "can-scroll-horizontal",    BOOLEAN, CAN_SCROLL_HORIZONTAL    )
 
-DALI_SIGNAL_REGISTRATION(   Scrollable, "scroll-started",                     SIGNAL_SCROLL_STARTED     )
-DALI_SIGNAL_REGISTRATION(   Scrollable, "scroll-completed",                   SIGNAL_SCROLL_COMPLETED   )
-DALI_SIGNAL_REGISTRATION(   Scrollable, "scroll-updated",                     SIGNAL_SCROLL_UPDATED     )
+DALI_SIGNAL_REGISTRATION(              Toolkit, Scrollable, "scroll-started",                    SIGNAL_SCROLL_STARTED    )
+DALI_SIGNAL_REGISTRATION(              Toolkit, Scrollable, "scroll-completed",                  SIGNAL_SCROLL_COMPLETED  )
+DALI_SIGNAL_REGISTRATION(              Toolkit, Scrollable, "scroll-updated",                    SIGNAL_SCROLL_UPDATED    )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -75,7 +75,15 @@ const float DEFAULT_OVERSHOOT_ANIMATION_SPEED(120.0f); // 120 pixels per second
 // Scrollable controls are not layout containers so they dont need size negotiation..
 // we dont want size negotiation while scrolling if we can avoid it
 Scrollable::Scrollable()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | NO_SIZE_NEGOTIATION ) ),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | DISABLE_SIZE_NEGOTIATION ) ),
+  mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
+  mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
+  mOvershootEnabled(false)
+{
+}
+
+Scrollable::Scrollable( ControlBehaviour behaviourFlags )
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | behaviourFlags ) ),
   mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
   mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
   mOvershootEnabled(false)

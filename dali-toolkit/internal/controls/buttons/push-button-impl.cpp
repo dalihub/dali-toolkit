@@ -113,7 +113,6 @@ void PushButton::OnLabelSet()
   {
     label.SetAnchorPoint( AnchorPoint::CENTER );
     label.SetParentOrigin( ParentOrigin::CENTER );
-    label.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
     Toolkit::TextLabel textLabel = Toolkit::TextLabel::DownCast( label );
     if( textLabel )
@@ -122,68 +121,44 @@ void PushButton::OnLabelSet()
       textLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
       textLabel.SetProperty( Toolkit::TextLabel::Property::MULTI_LINE, true );
     }
+
+    ConfigureSizeNegotiation();
   }
 }
 
 void PushButton::OnButtonImageSet()
 {
-  Actor& buttonImage = GetButtonImage();
-
-  buttonImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-
-  buttonImage.RelayoutRequestTree();
-
+  ConfigureSizeNegotiation();
   RelayoutRequest();
 }
 
 void PushButton::OnSelectedImageSet()
 {
-  Actor& selectedImage = GetSelectedImage();
-
-  selectedImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-
-  selectedImage.RelayoutRequestTree();
-
+  ConfigureSizeNegotiation();
   RelayoutRequest();
 }
 
 void PushButton::OnBackgroundImageSet()
 {
-  Actor& backgroundImage = GetBackgroundImage();
-
-  backgroundImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-
-  backgroundImage.RelayoutRequestTree();
-
+  ConfigureSizeNegotiation();
   RelayoutRequest();
 }
 
 void PushButton::OnSelectedBackgroundImageSet()
 {
-  Actor& selectedBackgroundImage = GetSelectedBackgroundImage();
-
-  selectedBackgroundImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+  ConfigureSizeNegotiation();
+  RelayoutRequest();
 }
 
 void PushButton::OnDisabledImageSet()
 {
-  Actor& disabledImage = GetDisabledImage();
-
-  disabledImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-
-  disabledImage.RelayoutRequestTree();
-
+  ConfigureSizeNegotiation();
   RelayoutRequest();
 }
 
 void PushButton::OnDisabledBackgroundImageSet()
 {
-  Actor& disabledBackgroundImage = GetDisabledBackgroundImage();
-
-  disabledBackgroundImage.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-
-  disabledBackgroundImage.RelayoutRequestTree();
-
+  ConfigureSizeNegotiation();
   RelayoutRequest();
 }
 
@@ -578,27 +553,6 @@ void PushButton::OnControlSizeSet( const Vector3& targetSize )
   }
 }
 
-Vector3 PushButton::GetNaturalSize()
-{
-  Vector3 size;
-
-  // Check Image and Background image and use the largest size as the control's Natural size.
-  SizeOfActorIfLarger( GetButtonImage(), size );
-  SizeOfActorIfLarger( GetBackgroundImage(), size );
-
-  // If label, test against it's size
-  Toolkit::TextLabel label = Toolkit::TextLabel::DownCast( GetLabel() );
-  if( label )
-  {
-    Vector3 labelSize = label.GetNaturalSize();
-
-    size.width  = std::max( size.width,  labelSize.width  + TEXT_PADDING * 2.0f );
-    size.height = std::max( size.height, labelSize.height + TEXT_PADDING * 2.0f );
-  }
-
-  return size;
-}
-
 void PushButton::StartTransitionAnimation()
 {
   if( mTransitionAnimation )
@@ -657,6 +611,103 @@ void PushButton::FadeOutImage( Actor& image, float opacity, Vector3 scale )
 void PushButton::TransitionAnimationFinished( Dali::Animation& source )
 {
   StopTransitionAnimation();
+}
+
+Vector3 PushButton::GetNaturalSize()
+{
+  Vector3 size;
+
+  // If label, test against it's size
+  Toolkit::TextLabel label = Toolkit::TextLabel::DownCast( GetLabel() );
+  if( label )
+  {
+    size.width  = std::max( size.width,  label.GetRelayoutSize( Dimension::WIDTH ) );
+    size.height = std::max( size.height, label.GetRelayoutSize( Dimension::HEIGHT ) );
+  }
+  else
+  {
+    // Check Image and Background image and use the largest size as the control's Natural size.
+    SizeOfActorIfLarger( GetButtonImage(), size );
+    SizeOfActorIfLarger( GetBackgroundImage(), size );
+  }
+
+  return size;
+}
+
+void PushButton::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
+{
+  ConfigureSizeNegotiation();
+}
+
+void PushButton::ConfigureSizeNegotiation()
+{
+  ActorContainer images;
+  images.reserve( 7 );
+
+  images.push_back( GetButtonImage() );
+  images.push_back( GetSelectedImage() );
+  images.push_back( GetSelectedBackgroundImage() );
+  images.push_back( GetBackgroundImage() );
+  images.push_back( GetDisabledImage() );
+  images.push_back( GetDisabledSelectedImage() );
+  images.push_back( GetDisabledBackgroundImage() );
+
+  Actor label = GetLabel();
+
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  {
+    ConfigureSizeNegotiationDimension( static_cast< Dimension::Type >( 1 << i ), images, label );
+  }
+
+  if( label )
+  {
+    label.SetPadding( Padding( TEXT_PADDING, TEXT_PADDING, TEXT_PADDING, TEXT_PADDING) );
+  }
+}
+
+void PushButton::ConfigureSizeNegotiationDimension( Dimension::Type dimension, const ActorContainer& images, Actor& label )
+{
+  ResizePolicy::Type imageResizePolicy = ResizePolicy::FILL_TO_PARENT;
+  ResizePolicy::Type labelResizePolicy = ResizePolicy::FILL_TO_PARENT;
+
+  switch( Self().GetResizePolicy( dimension ) )
+  {
+    case ResizePolicy::FIT_TO_CHILDREN:
+    {
+      imageResizePolicy = labelResizePolicy = ResizePolicy::USE_NATURAL_SIZE;
+      break;
+    }
+    case ResizePolicy::USE_NATURAL_SIZE:
+    {
+      if( label )
+      {
+        labelResizePolicy = ResizePolicy::USE_NATURAL_SIZE;
+      }
+      else
+      {
+        imageResizePolicy = ResizePolicy::USE_NATURAL_SIZE;
+      }
+      break;
+    }
+    default:
+    {
+      break;
+    }
+  }
+
+  if( label )
+  {
+    label.SetResizePolicy( labelResizePolicy, dimension );
+  }
+
+  for( ActorConstIter it = images.begin(), itEnd = images.end(); it != itEnd; ++it )
+  {
+    Actor actor = *it;
+    if( actor )
+    {
+      actor.SetResizePolicy( imageResizePolicy, dimension );
+    }
+  }
 }
 
 } // namespace Internal

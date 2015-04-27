@@ -49,7 +49,6 @@ namespace ResourceImageApi
   void GetLoadingState( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetUrl( const v8::FunctionCallbackInfo< v8::Value >& args );
   void Reload( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void GetAttributes( const v8::FunctionCallbackInfo< v8::Value >& args );
 
 }; // namespace ResourceImageApi
 

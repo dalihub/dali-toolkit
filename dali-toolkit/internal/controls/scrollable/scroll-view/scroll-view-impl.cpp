@@ -209,19 +209,19 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ScrollView, Toolkit::Scrollable, Create )
 
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( ScrollView, "scroll-position", VECTOR3, SCROLL_POSITION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( ScrollView, "scroll-pre-position", VECTOR3, SCROLL_PRE_POSITION)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( ScrollView, "overshoot-x", FLOAT, OVERSHOOT_X)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( ScrollView, "overshoot-y", FLOAT, OVERSHOOT_Y)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( ScrollView, "scroll-final", VECTOR3, SCROLL_FINAL)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( ScrollView, "wrap", BOOLEAN, WRAP)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( ScrollView, "panning", BOOLEAN, PANNING)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( ScrollView, "scrolling", BOOLEAN, SCROLLING)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( ScrollView, "scroll-domain-offset", VECTOR3, SCROLL_DOMAIN_OFFSET)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( ScrollView, "scroll-position-delta", VECTOR3, SCROLL_POSITION_DELTA)
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( ScrollView, "start-page-position", VECTOR3, START_PAGE_POSITION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-position",       VECTOR3, SCROLL_POSITION       )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-pre-position",   VECTOR3, SCROLL_PRE_POSITION   )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "overshoot-x",           FLOAT,   OVERSHOOT_X           )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "overshoot-y",           FLOAT,   OVERSHOOT_Y           )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-final",          VECTOR3, SCROLL_FINAL          )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "wrap",                  BOOLEAN, WRAP                  )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "panning",               BOOLEAN, PANNING               )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrolling",             BOOLEAN, SCROLLING             )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-domain-offset",  VECTOR3, SCROLL_DOMAIN_OFFSET  )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-position-delta", VECTOR3, SCROLL_POSITION_DELTA )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "start-page-position",   VECTOR3, START_PAGE_POSITION   )
 
-DALI_SIGNAL_REGISTRATION( ScrollView, "value-changed", SIGNAL_SNAP_STARTED )
+DALI_SIGNAL_REGISTRATION( Toolkit, ScrollView, "value-changed", SIGNAL_SNAP_STARTED )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -489,8 +489,8 @@ void InternalPositionDeltaConstraint( Vector3& current, const PropertyInputConta
  */
 struct InternalFinalConstraint
 {
-  InternalFinalConstraint(AlphaFunction functionX,
-                          AlphaFunction functionY)
+  InternalFinalConstraint(AlphaFunctionPrototype functionX,
+                          AlphaFunctionPrototype functionY)
   : mFunctionX(functionX),
     mFunctionY(functionY)
   {
@@ -507,8 +507,8 @@ struct InternalFinalConstraint
     current = inputs[0]->GetVector3() - offset;
   }
 
-  AlphaFunction mFunctionX;
-  AlphaFunction mFunctionY;
+  AlphaFunctionPrototype mFunctionX;
+  AlphaFunctionPrototype mFunctionY;
 };
 
 }
@@ -534,7 +534,7 @@ Dali::Toolkit::ScrollView ScrollView::New()
 }
 
 ScrollView::ScrollView()
-: ScrollBase(),
+: ScrollBase( ControlBehaviour( REQUIRES_MOUSE_WHEEL_EVENTS ) ),   // Enable size negotiation
   mTouchDownTime(0u),
   mGestureStackDepth(0),
   mScrollStateFlags(0),
@@ -543,13 +543,13 @@ ScrollView::ScrollView()
   mMaxOvershoot(Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT, Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT),
   mUserMaxOvershoot(Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT, Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT),
   mSnapOvershootDuration(Toolkit::ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION),
-  mSnapOvershootAlphaFunction(AlphaFunctions::EaseOut),
+  mSnapOvershootAlphaFunction(AlphaFunction::EASE_OUT),
   mSnapDuration(Toolkit::ScrollView::DEFAULT_SLOW_SNAP_ANIMATION_DURATION),
-  mSnapAlphaFunction(AlphaFunctions::EaseOut),
+  mSnapAlphaFunction(AlphaFunction::EASE_OUT),
   mMinFlickDistance(DEFAULT_MIN_FLICK_DISTANCE),
   mFlickSpeedThreshold(DEFAULT_MIN_FLICK_SPEED_THRESHOLD),
   mFlickDuration(Toolkit::ScrollView::DEFAULT_FAST_SNAP_ANIMATION_DURATION),
-  mFlickAlphaFunction(AlphaFunctions::EaseOut),
+  mFlickAlphaFunction(AlphaFunction::EASE_OUT),
   mAxisAutoLockGradient(Toolkit::ScrollView::DEFAULT_AXIS_AUTO_LOCK_GRADIENT),
   mFrictionCoefficient(Toolkit::ScrollView::DEFAULT_FRICTION_COEFFICIENT),
   mFlickSpeedCoefficient(Toolkit::ScrollView::DEFAULT_FLICK_SPEED_COEFFICIENT),
@@ -570,7 +570,6 @@ ScrollView::ScrollView()
   mCanScrollHorizontal(true),
   mCanScrollVertical(true)
 {
-  SetRequiresMouseWheelEvents(true);
 }
 
 void ScrollView::OnInitialize()
@@ -2091,7 +2090,7 @@ void ScrollView::AnimateInternalXTo( float position, float duration, AlphaFuncti
     mInternalXAnimation = Animation::New(duration);
     DALI_LOG_SCROLL_STATE("[0x%X], mInternalXAnimation[0x%X]", this, mInternalXAnimation.GetObjectPtr() );
     mInternalXAnimation.FinishedSignal().Connect(this, &ScrollView::OnScrollAnimationFinished);
-    mInternalXAnimation.AnimateTo( Property(self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION, 0), position, alpha, duration);
+    mInternalXAnimation.AnimateTo( Property(self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION, 0), position, alpha, TimePeriod(duration));
     mInternalXAnimation.Play();
 
     // erase current state flags

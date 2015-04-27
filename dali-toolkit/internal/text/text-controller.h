@@ -123,6 +123,20 @@ public:
   void GetPlaceholderText( std::string& text ) const;
 
   /**
+   * @brief Sets the maximum number of characters that can be inserted into the TextModel
+   *
+   * @param[in] maxCharacters maximum number of characters to be accepted
+   */
+  void SetMaximumNumberOfCharacters( int maxCharacters );
+
+  /**
+   * @brief Sets the maximum number of characters that can be inserted into the TextModel
+   *
+   * @param[in] maxCharacters maximum number of characters to be accepted
+   */
+  int GetMaximumNumberOfCharacters();
+
+  /**
    * @brief Set the default font family.
    *
    * @param[in] defaultFontFamily The default font family.
@@ -413,9 +427,9 @@ public:
   void PanEvent( Gesture::State state, const Vector2& displacement );
 
   /**
-   * @copydoc Dali::Toolkit::Text::Decorator::Observer::GrabHandleEvent()
+   * @copydoc Dali::Toolkit::Text::Decorator::Observer::HandleEvent()
    */
-  virtual void GrabHandleEvent( GrabHandleState state, float x, float y );
+  virtual void HandleEvent( HandleType handle, HandleState state, float x, float y );
 
 protected:
 
@@ -425,11 +439,6 @@ protected:
   virtual ~Controller();
 
 private:
-
-  /**
-   * @brief Request a relayout using the ControlInterface.
-   */
-  void RequestRelayout();
 
   /**
    * @brief Private constructor.
@@ -446,12 +455,6 @@ private:
 
   struct Impl;
   Impl* mImpl;
-
-  // Avoid allocating this when the user does not specify a font
-  struct FontDefaults;
-
-  // Avoid allocating this for non-editable controls
-  struct TextInput;
 };
 
 } // namespace Text

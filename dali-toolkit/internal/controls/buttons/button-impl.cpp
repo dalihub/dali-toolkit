@@ -74,23 +74,23 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Button, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Button, "disabled",                     BOOLEAN, DISABLED                     )
-DALI_PROPERTY_REGISTRATION( Button, "auto-repeating",               BOOLEAN, AUTO_REPEATING               )
-DALI_PROPERTY_REGISTRATION( Button, "initial-auto-repeating-delay", FLOAT,   INITIAL_AUTO_REPEATING_DELAY )
-DALI_PROPERTY_REGISTRATION( Button, "next-auto-repeating-delay",    FLOAT,   NEXT_AUTO_REPEATING_DELAY    )
-DALI_PROPERTY_REGISTRATION( Button, "togglable",                    BOOLEAN, TOGGLABLE                    )
-DALI_PROPERTY_REGISTRATION( Button, "selected",                     BOOLEAN, SELECTED                     )
-DALI_PROPERTY_REGISTRATION( Button, "normal-state-actor",           MAP,     NORMAL_STATE_ACTOR           )
-DALI_PROPERTY_REGISTRATION( Button, "selected-state-actor",         MAP,     SELECTED_STATE_ACTOR         )
-DALI_PROPERTY_REGISTRATION( Button, "disabled-state-actor",         MAP,     DISABLED_STATE_ACTOR         )
-DALI_PROPERTY_REGISTRATION( Button, "label-actor",                  MAP,     LABEL_ACTOR                  )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabled",                     BOOLEAN, DISABLED                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "auto-repeating",               BOOLEAN, AUTO_REPEATING               )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "initial-auto-repeating-delay", FLOAT,   INITIAL_AUTO_REPEATING_DELAY )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "next-auto-repeating-delay",    FLOAT,   NEXT_AUTO_REPEATING_DELAY    )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "togglable",                    BOOLEAN, TOGGLABLE                    )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected",                     BOOLEAN, SELECTED                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "normal-state-actor",           MAP,     NORMAL_STATE_ACTOR           )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected-state-actor",         MAP,     SELECTED_STATE_ACTOR         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabled-state-actor",         MAP,     DISABLED_STATE_ACTOR         )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "label-actor",                  MAP,     LABEL_ACTOR                  )
 
-DALI_SIGNAL_REGISTRATION(   Button, "pressed",                               SIGNAL_PRESSED               )
-DALI_SIGNAL_REGISTRATION(   Button, "released",                              SIGNAL_RELEASED              )
-DALI_SIGNAL_REGISTRATION(   Button, "clicked",                               SIGNAL_CLICKED               )
-DALI_SIGNAL_REGISTRATION(   Button, "state-changed",                         SIGNAL_STATE_CHANGED         )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "pressed",                               SIGNAL_PRESSED               )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "released",                              SIGNAL_RELEASED              )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "clicked",                               SIGNAL_CLICKED               )
+DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "state-changed",                         SIGNAL_STATE_CHANGED         )
 
-DALI_ACTION_REGISTRATION(   Button, "button-click",                          ACTION_BUTTON_CLICK          )
+DALI_ACTION_REGISTRATION(   Toolkit, Button, "button-click",                          ACTION_BUTTON_CLICK          )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -674,6 +674,8 @@ void Button::SetButtonImage( Actor image )
   }
 
   OnButtonImageSet();
+
+  RelayoutRequest();
 }
 
 Actor Button::GetButtonImage() const
@@ -709,6 +711,8 @@ void Button::SetSelectedImage( Actor image )
   }
 
   OnSelectedImageSet();
+
+  RelayoutRequest();
 }
 
 Actor Button::GetSelectedImage() const
@@ -742,6 +746,8 @@ void Button::SetBackgroundImage( Actor image )
   }
 
   OnBackgroundImageSet();
+
+  RelayoutRequest();
 }
 
 Actor Button::GetBackgroundImage() const
@@ -782,6 +788,8 @@ void Button::SetSelectedBackgroundImage( Actor image )
   }
 
   OnSelectedBackgroundImageSet();
+
+  RelayoutRequest();
 }
 
 Actor Button::GetSelectedBackgroundImage() const

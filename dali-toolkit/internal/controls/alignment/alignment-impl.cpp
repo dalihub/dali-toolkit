@@ -377,7 +377,7 @@ Toolkit::Alignment Alignment::New( Toolkit::Alignment::Type horizontal, Toolkit:
   // Create the implementation, temporarily owned on stack
   IntrusivePtr< Alignment > internalAlignment = new Alignment( horizontal, vertical );
 
-  // Pass ownership to Toolkit::View
+  // Pass ownership to Toolkit::Alignment
   Toolkit::Alignment alignment( *internalAlignment );
 
   // Second-phase init of the implementation
@@ -548,7 +548,7 @@ void Alignment::OnRelayout( const Vector2& size, RelayoutContainer& container )
 }
 
 Alignment::Alignment( Toolkit::Alignment::Type horizontal, Toolkit::Alignment::Type vertical )
-: Control( CONTROL_BEHAVIOUR_NONE ),
+: Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
   mHorizontal( horizontal ),
   mVertical( vertical ),
   mScaling( Toolkit::Alignment::ScaleNone ),

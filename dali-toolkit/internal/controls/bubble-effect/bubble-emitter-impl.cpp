@@ -39,7 +39,7 @@ BubbleEmitter::BubbleEmitter( const Vector2& movementArea,
                               Image shapeImage,
                               unsigned int maximumNumberOfBubble,
                               const Vector2& bubbleSizeRange )
-: Control( REQUIRES_TOUCH_EVENTS ),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),
   mMovementArea( movementArea ),
   mShapeImage( shapeImage ),
   mTotalNumOfBubble( maximumNumberOfBubble ),
@@ -261,14 +261,14 @@ void BubbleEmitter::EmitBubble( Animation& animation, const Vector2& emitPositio
   unsigned int groupIdx = mCurrentUniform / mNumBubblePerShader;
   SetBubbleParameter( mEffect[groupIdx], curUniform, emitPosition, direction, displacement);
   animation.AnimateTo( Property( mEffect[groupIdx], mEffect[groupIdx].GetPercentagePropertyName(curUniform) ),
-                       1.f, AlphaFunctions::Linear );
+                       1.f, AlphaFunction::LINEAR );
 
   if( mCurrentUniform % mNumShader == 0 )
   {
     unsigned int uniform = mCurrentUniform / mNumShader;
     SetBubbleParameter(mEffectForNoise, uniform, emitPosition, displacement);
     animation.AnimateTo( Property( mEffectForNoise, mEffectForNoise.GetPercentagePropertyName(uniform) ),
-                         1.f, AlphaFunctions::Linear );
+                         1.f, AlphaFunction::LINEAR );
   }
 
   mCurrentUniform = (mCurrentUniform + 1) % mTotalNumOfBubble;
@@ -280,10 +280,10 @@ void BubbleEmitter::StartExplosion( float duration, float multiple )
   for(unsigned int i=0; i < mNumShader; i++ )
   {
     animation.AnimateTo( Property( mEffect[i], mEffect[i].GetMagnificationPropertyName() ),
-                         multiple, AlphaFunctions::EaseOut);
+                         multiple, AlphaFunction::EASE_OUT);
   }
   animation.AnimateTo( Property( mEffectForNoise, mEffectForNoise.GetMagnificationPropertyName() ),
-                       multiple, AlphaFunctions::EaseOut);
+                       multiple, AlphaFunction::EASE_OUT);
   animation.Play();
 
   animation.FinishedSignal().Connect(this, &BubbleEmitter::OnExplosionFinished);

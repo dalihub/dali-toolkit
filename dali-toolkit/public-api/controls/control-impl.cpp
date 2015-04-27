@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,15 +65,17 @@ BaseHandle Create()
 // Setup signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Control, CustomActor, Create );
 
-// Note: Properties are registered separately below,
+// Note: Properties are registered separately below.
 
-DALI_SIGNAL_REGISTRATION( Control, "key-event",                 SIGNAL_KEY_EVENT         )
-DALI_SIGNAL_REGISTRATION( Control, "tapped",                    SIGNAL_TAPPED            )
-DALI_SIGNAL_REGISTRATION( Control, "panned",                    SIGNAL_PANNED            )
-DALI_SIGNAL_REGISTRATION( Control, "pinched",                   SIGNAL_PINCHED           )
-DALI_SIGNAL_REGISTRATION( Control, "long-pressed",              SIGNAL_LONG_PRESSED      )
+DALI_SIGNAL_REGISTRATION( Toolkit, Control, "key-event",              SIGNAL_KEY_EVENT              )
+DALI_SIGNAL_REGISTRATION( Toolkit, Control, "key-input-focus-gained", SIGNAL_KEY_INPUT_FOCUS_GAINED )
+DALI_SIGNAL_REGISTRATION( Toolkit, Control, "key-input-focus-lost",   SIGNAL_KEY_INPUT_FOCUS_LOST   )
+DALI_SIGNAL_REGISTRATION( Toolkit, Control, "tapped",                 SIGNAL_TAPPED                 )
+DALI_SIGNAL_REGISTRATION( Toolkit, Control, "panned",                 SIGNAL_PANNED                 )
+DALI_SIGNAL_REGISTRATION( Toolkit, Control, "pinched",                SIGNAL_PINCHED                )
+DALI_SIGNAL_REGISTRATION( Toolkit, Control, "long-pressed",           SIGNAL_LONG_PRESSED           )
 
-DALI_ACTION_REGISTRATION( Control, "control-activated",         ACTION_CONTROL_ACTIVATED )
+DALI_ACTION_REGISTRATION( Toolkit, Control, "control-activated",      ACTION_CONTROL_ACTIVATED      )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -130,16 +132,30 @@ Mesh CreateMesh()
  * Sets all the required properties for the background actor.
  *
  * @param[in]  actor              The actor to set the properties on.
- * @param[in]  constrainingIndex  The property index to constrain the parent's size on.
  * @param[in]  color              The required color of the actor.
  */
-void SetupBackgroundActor( Actor actor, Property::Index constrainingIndex, const Vector4& color )
+void SetupBackgroundActor( Actor actor, const Vector4& color )
 {
   actor.SetColor( color );
   actor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
   actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
   actor.SetZ( BACKGROUND_ACTOR_Z_POSITION );
-  actor.SetRelayoutEnabled( false );
+  actor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+}
+
+/**
+ * Sets all the required properties for the background actor.
+ *
+ * @param[in]  actor              The actor to set the properties on.
+ * @param[in]  constrainingIndex  The property index to constrain the parent's size on.
+ * @param[in]  color              The required color of the actor.
+ */
+void SetupBackgroundActorConstrained( Actor actor, Property::Index constrainingIndex, const Vector4& color )
+{
+  actor.SetColor( color );
+  actor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
+  actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+  actor.SetZ( BACKGROUND_ACTOR_Z_POSITION );
 
   Constraint constraint = Constraint::New<Vector3>( actor,
                                                     constrainingIndex,
@@ -180,7 +196,7 @@ public:
     mLongPressGestureDetector(),
     mCurrentSize(),
     mNaturalSize(),
-    mFlags( Control::CONTROL_BEHAVIOUR_NONE ),
+    mFlags( Control::ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
     mIsKeyboardNavigationSupported( false ),
     mIsKeyboardFocusGroup( false ),
     mInitialized( false )
@@ -366,6 +382,8 @@ public:
   Background* mBackground;           ///< Only create the background if we use it
   Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;
+  Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
+  Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusLostSignal;
 
   // Gesture Detection
   PinchGestureDetector mPinchGestureDetector;
@@ -376,7 +394,7 @@ public:
   Vector3 mCurrentSize; ///< Stores the current control's size, this is the negotiated size
   Vector3 mNaturalSize; ///< Stores the size set through the Actor's API. This is size the actor wants to be. Useful when reset to the initial size is needed.
 
-  ControlBehaviour mFlags :6;              ///< Flags passed in from constructor. Need to increase this size when new enums are added
+  ControlBehaviour mFlags :CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
   bool mInitialized :1;
@@ -397,7 +415,7 @@ PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "key-input-foc
 Toolkit::Control Control::New()
 {
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr<Control> controlImpl = new Control( CONTROL_BEHAVIOUR_NONE );
+  IntrusivePtr<Control> controlImpl = new Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) );
 
   // Pass ownership to handle
   Toolkit::Control handle( *controlImpl );
@@ -540,7 +558,7 @@ void Control::SetBackgroundColor( const Vector4& color )
     // Create Mesh Actor
     MeshActor meshActor = MeshActor::New( CreateMesh() );
 
-    SetupBackgroundActor( meshActor, Actor::Property::SCALE, color );
+    SetupBackgroundActorConstrained( meshActor, Actor::Property::SCALE, color );
 
     // Set the background actor before adding so that we do not inform deriving classes
     background.actor = meshActor;
@@ -571,7 +589,7 @@ void Control::SetBackgroundImage( Image image )
   }
 
   ImageActor imageActor = ImageActor::New( image );
-  SetupBackgroundActor( imageActor, Actor::Property::SIZE, background.color );
+  SetupBackgroundActor( imageActor, background.color );
 
   // Set the background actor before adding so that we do not inform derived classes
   background.actor = imageActor;
@@ -685,6 +703,14 @@ bool Control::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* t
     {
       controlImpl.KeyEventSignal().Connect( tracker, functor );
     }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_GAINED ) )
+    {
+      controlImpl.KeyInputFocusGainedSignal().Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_LOST ) )
+    {
+      controlImpl.KeyInputFocusLostSignal().Connect( tracker, functor );
+    }
     else if( 0 == strcmp( signalName.c_str(), SIGNAL_TAPPED ) )
     {
       controlImpl.EnableGestureDetection( Gesture::Tap );
@@ -719,6 +745,16 @@ Toolkit::Control::KeyEventSignalType& Control::KeyEventSignal()
   return mImpl->mKeyEventSignal;
 }
 
+Toolkit::Control::KeyInputFocusSignalType& Control:: KeyInputFocusGainedSignal()
+{
+  return mImpl->mKeyInputFocusGainedSignal;
+}
+
+Toolkit::Control::KeyInputFocusSignalType& Control:: KeyInputFocusLostSignal()
+{
+  return mImpl->mKeyInputFocusLostSignal;
+}
+
 bool Control::EmitKeyEventSignal( const KeyEvent& event )
 {
   // Guard against destruction during signal emission
@@ -742,7 +778,7 @@ bool Control::EmitKeyEventSignal( const KeyEvent& event )
 }
 
 Control::Control( ControlBehaviour behaviourFlags )
-: CustomActorImpl( behaviourFlags & REQUIRES_TOUCH_EVENTS ),
+: CustomActorImpl( static_cast< ActorFlags >( behaviourFlags ) ),
   mImpl(new Impl(*this))
 {
   mImpl->mFlags = behaviourFlags;
@@ -752,13 +788,6 @@ void Control::Initialize()
 {
   // Calling deriving classes
   OnInitialize();
-
-  // Test if the no size negotiation flag is not set
-  if( ( mImpl->mFlags & NO_SIZE_NEGOTIATION ) == 0 )
-  {
-    // Size negotiate disabled by default, so turn it on for this actor
-    Self().SetRelayoutEnabled( true );
-  }
 
   if( mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS )
   {
@@ -771,8 +800,10 @@ void Control::Initialize()
     GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
   }
 
-  SetRequiresHoverEvents(mImpl->mFlags & REQUIRES_HOVER_EVENTS);
-  SetRequiresMouseWheelEvents(mImpl->mFlags & REQUIRES_MOUSE_WHEEL_EVENTS);
+  if( mImpl->mFlags & REQUIRES_KEYBOARD_NAVIGATION_SUPPORT )
+  {
+    SetKeyboardNavigationSupport( true );
+  }
 
   mImpl->mInitialized = true;
 }
@@ -920,14 +951,36 @@ void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dime
 {
 }
 
+void Control::EmitKeyInputFocusSignal( bool focusGained )
+{
+  Dali::Toolkit::Control handle( GetOwner() );
+
+  if ( focusGained )
+  {
+     // signals are allocated dynamically when someone connects
+     if ( !mImpl->mKeyInputFocusGainedSignal.Empty() )
+     {
+      mImpl->mKeyInputFocusGainedSignal.Emit( handle );
+     }
+  }
+  else
+  {
+    // signals are allocated dynamically when someone connects
+    if ( !mImpl->mKeyInputFocusLostSignal.Empty() )
+    {
+      mImpl->mKeyInputFocusLostSignal.Emit( handle );
+    }
+  }
+}
+
 void Control::OnKeyInputFocusGained()
 {
-  // Do Nothing
+  EmitKeyInputFocusSignal( true );
 }
 
 void Control::OnKeyInputFocusLost()
 {
-  // Do Nothing
+  EmitKeyInputFocusSignal( false );
 }
 
 void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)

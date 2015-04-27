@@ -428,7 +428,7 @@ void SetFromV8Value(v8::Isolate* isolate,
         Dali::Vector3 axis;
         Radian angle;
         value.Get<Dali::Quaternion>().ToAxisAngle( axis, angle );
-        value = Dali::Quaternion( Radian( Degree( asFloat ) ), axis );
+        value = Dali::Quaternion( Degree( asFloat ), axis );
       }
       else
       {
@@ -791,17 +791,17 @@ void PropertyValueWrapper::NewRotation( const v8::FunctionCallbackInfo< v8::Valu
 
   if( length > 3 )
   {
-    Dali::AngleAxis axis(  Degree( v[0] ), Vector3(v[1], v[2], v[3]) );
+    const Dali::AngleAxis axis(  Degree( v[0] ), Vector3(v[1], v[2], v[3]) );
     object = WrapDaliProperty( isolate, Dali::Property::Value( axis ) );
   }
   else if( length > 2 )
   {
-    object = WrapDaliProperty( isolate, Dali::Property::Value( Dali::Quaternion( Radian( Degree(v[0]) ), Radian( Degree(v[1]) ), Radian( Degree(v[2]) ) ) ) );
+    object = WrapDaliProperty( isolate, Dali::Quaternion( Degree(v[0]), Degree(v[1]), Degree(v[2]) ) );
   }
   else
   {
-    Dali::Quaternion quaternion( Dali::Quaternion( Dali::ANGLE_0, Dali::Vector3::YAXIS));
-    object = WrapDaliProperty( isolate, Dali::Property::Value( quaternion ) );
+    const Dali::Quaternion quaternion( Dali::Quaternion( Dali::ANGLE_0, Dali::Vector3::YAXIS));
+    object = WrapDaliProperty( isolate, quaternion );
   }
 
   args.GetReturnValue().Set( object );

@@ -30,8 +30,6 @@
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/buttons/radio-button.h>
-#include <dali-toolkit/public-api/controls/cluster/cluster-style.h>
-#include <dali-toolkit/public-api/controls/cluster/cluster.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/default-controls/check-button-factory.h>
@@ -76,7 +74,6 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/tool-bar/tool-bar.h>
-#include <dali-toolkit/public-api/controls/view/view.h>
 
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>

@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_SHADER_EFFECT_DISPLACEMENT_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,11 +62,11 @@ namespace Toolkit
  * ImageActor fancyButton = ImageActor::New( ... );\n
  * fancyButton.SetShaderEffect( buttonEffect );
  *
- * // animate a button push, using e.g. AlphaFunctions::Bounce. With these values the button pushes in and out (animates to and fro between the two states)
+ * // animate a button push, using e.g. AlphaFunction::BOUNCE. With these values the button pushes in and out (animates to and fro between the two states)
  *
  *
  * Animation animation = Animation::New( ... );\n
- * animation.AnimateTo( Property(buttonEffect, buttonEffect.GetStatePropertyName()), 1.0f, AlphaFunctions::Bounce, ... );\n
+ * animation.AnimateTo( Property(buttonEffect, buttonEffect.GetStatePropertyName()), 1.0f, AlphaFunction::BOUNCE, ... );\n
  * animation.Play();\n
  *
  */

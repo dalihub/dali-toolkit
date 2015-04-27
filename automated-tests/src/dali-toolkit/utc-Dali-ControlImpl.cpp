@@ -218,7 +218,6 @@ int UtcDaliControlImplOnGestureMethods(void)
   // Check gesture actually happens
   {
     DummyControl dummy = DummyControl::New(true);
-    dummy.SetRelayoutEnabled( true );
     dummy.SetSize( Vector2(100.0f, 100.0f ) );
 
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
@@ -279,7 +278,6 @@ int UtcDaliControlImplOnGestureMethods(void)
   // Ensure full code coverage
   {
     DummyControl dummy = DummyControl::New();
-    dummy.SetRelayoutEnabled( true );
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
 
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
@@ -445,7 +443,6 @@ int UtcDaliControlImplSizeSet(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    dummy.SetRelayoutEnabled( true );
     DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
 
     Stage::GetCurrent().Add(dummy);
@@ -470,7 +467,6 @@ int UtcDaliControlImplSizeSet(void)
   // Ensure full code coverage
   {
     DummyControl dummy = DummyControl::New();
-    dummy.SetRelayoutEnabled( true );
     Stage::GetCurrent().Add(dummy);
 
     Vector2 size(100.0f, 200.0f);
@@ -546,7 +542,6 @@ int UtcDaliControlImplTouchEvent(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    dummy.SetRelayoutEnabled( true );
     DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
@@ -571,7 +566,6 @@ int UtcDaliControlImplTouchEvent(void)
   // Ensure full code coverage
   {
     DummyControl dummy = DummyControl::New();
-    dummy.SetRelayoutEnabled( true );
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
@@ -636,39 +630,6 @@ int UtcDaliControlImplKeyEvent(void)
 
     Stage::GetCurrent().Remove(dummy);
   }
-  END_TEST;
-}
-
-int UtcDaliControlImplStyleChange(void)
-{
-  ToolkitTestApplication application;
-
-  DummyControl dummy = DummyControl::New( true );
-  DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
-
-  Stage::GetCurrent().Add(dummy);
-
-  application.Render();
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-
-  // Add a Control and normal Actor as children
-  DummyControl dummyChild = DummyControl::New();
-  dummy.Add(dummyChild);
-
-  Actor actor = Actor::New();
-  dummy.Add(actor);
-
-  DALI_TEST_EQUALS( dummyImpl.fontChangeCalled, false, TEST_LOCATION );
-  StyleChange styleChange;
-  styleChange.defaultFontChange = true;
-  Dali::StyleMonitor styleMonitor = StyleMonitor::Get();
-  styleMonitor.EmitStyleChangeSignal(styleChange);
-
-  DALI_TEST_EQUALS( dummyImpl.fontChangeCalled, true, TEST_LOCATION );
-
-  Stage::GetCurrent().Remove(dummy);
   END_TEST;
 }
 
@@ -773,7 +734,6 @@ int UtcDaliControlImplMouseWheelEvent(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    dummy.SetRelayoutEnabled( true );
     DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
@@ -801,7 +761,6 @@ int UtcDaliControlImplMouseWheelEvent(void)
   // Ensure full code coverage
   {
     DummyControl dummy = DummyControl::New();
-    dummy.SetRelayoutEnabled( true );
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
