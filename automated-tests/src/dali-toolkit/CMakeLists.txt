@@ -15,7 +15,6 @@ SET(TC_SOURCES
    utc-Dali-Builder.cpp
    utc-Dali-CarouselEffect.cpp
    utc-Dali-CheckBoxButton.cpp
-   utc-Dali-Cluster.cpp
    utc-Dali-CubeTransitionEffect.cpp
    utc-Dali-DepthLayout.cpp
    utc-Dali-DisplacementEffect.cpp
@@ -40,7 +39,6 @@ SET(TC_SOURCES
    utc-Dali-TextField.cpp
    utc-Dali-TextLabel.cpp
    utc-Dali-ToolBar.cpp
-   utc-Dali-View.cpp
    utc-Dali-WaterEffect.cpp
    utc-Dali-Button.cpp
    utc-Dali-Control.cpp

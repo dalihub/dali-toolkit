@@ -125,7 +125,7 @@
  * body.SetKinematic( true );
  * // create a second animation to move the actor 100 units to the right
  * Animation animation( Animation::New( 1 ) );
- * animation.AnimateBy( Property( actor, Actor::Property::POSITION ), Vector3( 100, 0, 0 ), AlphaFunctions::Linear );
+ * animation.AnimateBy( Property( actor, Actor::Property::POSITION ), Vector3( 100, 0, 0 ), AlphaFunction::LINEAR );
  * animation.Play();
  * \endcode
  * <hr>

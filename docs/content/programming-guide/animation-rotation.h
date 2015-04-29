@@ -23,7 +23,7 @@
  * Quaternion q(Radian(Degree(45.0f)).value, Vector3::YAXIS);
  * Quaternion r(Radian(Degree(30.0f)).value, Vector3::ZAXIS);
  * q *= r;
- * mAnimation.AnimateTo(Property(mActor, Actor::Property::ORIENTATION), q, AlphaFunctions::EaseInOut);
+ * mAnimation.AnimateTo(Property(mActor, Actor::Property::ORIENTATION), q, AlphaFunction::EASE_IN_OUT);
  * mAnimation.Play();
  * @endcode
  */

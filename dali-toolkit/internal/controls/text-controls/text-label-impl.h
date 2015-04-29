@@ -97,6 +97,11 @@ private: // From Control
    */
   virtual void RequestTextRelayout();
 
+  /**
+   * @copydoc Text::ControlInterface::MaxLengthReached()
+   */
+  virtual void MaxLengthReached();
+
 private: // Implementation
 
   /**

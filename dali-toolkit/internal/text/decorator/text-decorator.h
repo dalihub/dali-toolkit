@@ -61,26 +61,31 @@ enum ActiveCursor
   ACTIVE_CURSOR_BOTH     ///< Both primary and secondary cursor are active
 };
 
-// The state information for grab handle events
-enum GrabHandleState
+// The state information for handle events.
+enum HandleState
 {
-  GRAB_HANDLE_TAPPED,
-  GRAB_HANDLE_PRESSED,
-  GRAB_HANDLE_RELEASED
+  HANDLE_TAPPED,
+  HANDLE_PRESSED,
+  HANDLE_RELEASED,
+  HANDLE_SCROLLING,
+  HANDLE_STOP_SCROLLING
 };
 
-// The set the selection-handle positions etc.
-enum SelectionHandle
+// Used to set different handle images
+enum HandleImageType
 {
-  PRIMARY_SELECTION_HANDLE,
-  SECONDARY_SELECTION_HANDLE,
-  SELECTION_HANDLE_COUNT
+  HANDLE_IMAGE_PRESSED,
+  HANDLE_IMAGE_RELEASED,
+  HANDLE_IMAGE_TYPE_COUNT
 };
 
-enum SelectionHandleState
+// Types of handles.
+enum HandleType
 {
-  SELECTION_HANDLE_PRESSED,
-  SELECTION_HANDLE_RELEASED
+  GRAB_HANDLE,
+  LEFT_SELECTION_HANDLE,
+  RIGHT_SELECTION_HANDLE,
+  HANDLE_TYPE_COUNT
 };
 
 /**
@@ -115,13 +120,14 @@ public:
     virtual ~Observer() {};
 
     /**
-     * @brief An input event from the grab handle.
+     * @brief An input event from one of the handles.
      *
-     * @param[in] state The grab handle state.
+     * @param[in] handleType The handle's type.
+     * @param[in] state The handle's state.
      * @param[in] x The x position relative to the top-left of the parent control.
      * @param[in] y The y position relative to the top-left of the parent control.
      */
-    virtual void GrabHandleEvent( GrabHandleState state, float x, float y ) = 0;
+    virtual void HandleEvent( HandleType handleType, HandleState state, float x, float y ) = 0;
   };
 
   /**
@@ -167,9 +173,15 @@ public:
    * @brief The decorator waits until a relayout before creating actors etc.
    *
    * @param[in] size The size of the parent control after size-negotiation.
-   * @param[in] scrollPosition The cursor, grab-handle positions etc. should be offset by this.
    */
-  void Relayout( const Dali::Vector2& size, const Vector2& scrollPosition );
+  void Relayout( const Dali::Vector2& size );
+
+  /**
+   * @brief Updates the decorator's actor positions after scrolling.
+   *
+   * @param[in] scrollOffset The scroll offset.
+   */
+  void UpdatePositions( const Vector2& scrollOffset );
 
   /**
    * @brief Sets which of the cursors are active.
@@ -207,6 +219,15 @@ public:
    * @param[out] lineHeight The logical height of the line.
    */
   void GetPosition( Cursor cursor, float& x, float& y, float& cursorHeight, float& lineHeight ) const;
+
+  /**
+   * @brief Retrieves the position of a cursor.
+   *
+   * @param[in] cursor The cursor to get.
+   *
+   * @return The position.
+   */
+  const Vector2& GetPosition( Cursor cursor ) const;
 
   /**
    * @brief Sets the color for a cursor.
@@ -263,85 +284,61 @@ public:
   float GetCursorBlinkDuration() const;
 
   /**
-   * @brief Sets whether the grab handle is active.
+   * @brief Sets whether a handle is active.
    *
-   * @note The grab handle follows the cursor position set with SetPosition(Cursor, ...)
-   * @param[in] active True if the grab handle should be active.
+   * @param[in] handleType One of the handles.
+   * @param[in] active True if the handle should be active.
    */
-  void SetGrabHandleActive( bool active );
+  void SetHandleActive( HandleType handleType,
+                        bool active );
 
   /**
-   * @brief Query whether the grab handle is active.
+   * @brief Query whether a handle is active.
    *
-   * @return True if the grab handle should be active.
+   * @param[in] handleType One of the handles.
+   *
+   * @return True if the handle is active.
    */
-  bool IsGrabHandleActive() const;
+  bool IsHandleActive( HandleType handleType ) const;
 
   /**
-   * @brief Sets the image for the grab handle.
+   * @brief Sets the image for one of the handles.
    *
+   * @param[in] handleType One of the handles.
+   * @param[in] handleImageType A different image can be set for the pressed/released states.
    * @param[in] image The image to use.
    */
-  void SetGrabHandleImage( Dali::Image image );
+  void SetHandleImage( HandleType handleType, HandleImageType handleImageType, Dali::Image image );
 
   /**
-   * @brief Retrieves the image for the grab handle.
+   * @brief Retrieves the image for one of the handles.
+   *
+   * @param[in] handleType One of the handles.
+   * @param[in] handleImageType A different image can be set for the pressed/released states.
    *
    * @return The grab handle image.
    */
-  Dali::Image GetGrabHandleImage() const;
-
-  /**
-   * @brief Sets whether the selection handles and highlight are active.
-   *
-   * @param[in] active True if the selection handles and highlight are active.
-   */
-  void SetSelectionActive( bool active );
-
-  /**
-   * @brief Query whether the selection handles and highlight are active.
-   *
-   * @return True if the selection handles and highlight are active.
-   */
-  bool IsSelectionActive() const;
+  Dali::Image GetHandleImage( HandleType handleType, HandleImageType handleImageType ) const;
 
   /**
    * @brief Sets the position of a selection handle.
    *
-   * @param[in] handle The handle to set.
+   * @param[in] handleType The handle to set.
    * @param[in] x The x position relative to the top-left of the parent control.
    * @param[in] y The y position relative to the top-left of the parent control.
    * @param[in] lineHeight The logical line height at this position.
    */
-  void SetPosition( SelectionHandle handle, float x, float y, float lineHeight );
+  void SetPosition( HandleType handleType, float x, float y, float lineHeight );
 
   /**
    * @brief Retrieves the position of a selection handle.
    *
-   * @param[in] handle The handle to get.
+   * @param[in] handleType The handle to get.
    * @param[out] x The x position relative to the top-left of the parent control.
    * @param[out] y The y position relative to the top-left of the parent control.
-   * @param[out] cursorHeight The logical cursor height at this position.
+   * @param[out] lineHeight The logical line height at this position.
    */
-  void GetPosition( SelectionHandle handle, float& x, float& y, float& cursorHeight ) const;
-
-  /**
-   * @brief Sets the image for one of the selection handles.
-   *
-   * @param[in] handle The selection handle.
-   * @param[in] state A different image can be set for the pressed/released states.
-   * @param[in] image The image to use.
-   */
-  void SetImage( SelectionHandle handle, SelectionHandleState state, Dali::Image image );
-
-  /**
-   * @brief Retrieves the image for a selection handle.
-   *
-   * @param[in] handle The selection handle.
-   * @param[in] state A different image can be set for the pressed/released states.
-   * @return The image.
-   */
-  Dali::Image GetImage( SelectionHandle handle, SelectionHandleState state ) const;
+  void GetPosition( HandleType handleType, float& x, float& y, float& lineHeight ) const;
 
   /**
    * @brief Adds a quad to the existing selection highlights.
@@ -359,6 +356,20 @@ public:
   void ClearHighlights();
 
   /**
+   * @brief Sets the selection highlight color.
+   *
+   * @param[in] image The image to use.
+   */
+  void SetHighlightColor( const Vector4& color );
+
+  /**
+   * @brief Retrieves the selection highlight color.
+   *
+   * @return The image.
+   */
+  const Vector4& GetHighlightColor() const;
+
+  /**
    * @brief Set the Selection Popup to show or hide via the active flaf
    * @param[in] active true to show, false to hide
    */
@@ -370,6 +381,53 @@ public:
    * @return True if the Selection Popup should be active.
    */
   bool IsPopupActive() const;
+
+  /**
+   * @brief Sets the scroll threshold.
+   *
+   * It defines a square area inside the control, close to the edge.
+   * When the cursor enters this area, the decorator starts to send scroll events.
+   *
+   * @param[in] threshold The scroll threshold.
+   */
+  void SetScrollThreshold( float threshold );
+
+  /**
+   * @brief Retrieves the scroll threshold.
+   *
+   * @retunr The scroll threshold.
+   */
+  float GetScrollThreshold() const;
+
+  /**
+   * @brief Sets the scroll speed.
+   *
+   * Is the distance the text is going to be scrolled during a scroll interval.
+   *
+   * @param[in] speed The scroll speed.
+   */
+  void SetScrollSpeed( float speed );
+
+  /**
+   * @brief Retrieves the scroll speed.
+   *
+   * @return The scroll speed.
+   */
+  float GetScrollSpeed() const;
+
+  /**
+   * @brief Sets the scroll interval.
+   *
+   * @param[in] seconds The scroll interval in seconds.
+   */
+  void SetScrollTickInterval( float seconds );
+
+  /**
+   * @brief Retrieves the scroll interval.
+   *
+   * @return The scroll interval.
+   */
+  float GetScrollTickInterval() const;
 
 protected:
 

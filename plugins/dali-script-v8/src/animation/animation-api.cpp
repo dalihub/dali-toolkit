@@ -49,38 +49,30 @@ struct AlphaFuncStruct
  */
 const AlphaFuncStruct AlphaFunctionTable[]=
 {
- {"default"               , AlphaFunctions::Default              },
- {"linear"                , AlphaFunctions::Linear               },
- {"square"                , AlphaFunctions::Square               },
- {"reverse"               , AlphaFunctions::Reverse              },
- {"easeIn"                , AlphaFunctions::EaseIn               },
- {"easeOut"               , AlphaFunctions::EaseOut              },
- {"easeInOut"             , AlphaFunctions::EaseInOut            },
- {"easeInSine"            , AlphaFunctions::EaseInSine           },
- {"easeOutSine"           , AlphaFunctions::EaseOutSine          },
- {"easeInOutSine"         , AlphaFunctions::EaseInOutSine        },
- {"easeInSine33"          , AlphaFunctions::EaseInSine33         },
- {"easeOutSine33"         , AlphaFunctions::EaseOutSine33        },
- {"easeInOutSine33"       , AlphaFunctions::EaseInOutSine33      },
- {"easeInOutSine50"       , AlphaFunctions::EaseInOutSine50      },
- {"easeInOutSine60"       , AlphaFunctions::EaseInOutSine60      },
- {"easeInOutSine70"       , AlphaFunctions::EaseInOutSine70      },
- {"easeInOutSine80"       , AlphaFunctions::EaseInOutSine80      },
- {"easeInOutSine90"       , AlphaFunctions::EaseInOutSine90      },
- {"doubleEaseInOutSine60" , AlphaFunctions::DoubleEaseInOutSine60},
- {"easeOutQuint50"        , AlphaFunctions::EaseOutQuint50       },
- {"easeOutQuint80"        , AlphaFunctions::EaseOutQuint80       },
- {"bounce"                , AlphaFunctions::Bounce               },
- {"bounceBack"            , AlphaFunctions::BounceBack           },
- {"easeInBack"            , AlphaFunctions::EaseInBack           },
- {"easeOutBack"           , AlphaFunctions::EaseOutBack          },
- {"easeInOutBack"         , AlphaFunctions::EaseInOutBack        },
- {"sin"                   , AlphaFunctions::Sin                  },
- {"sin2x"                 , AlphaFunctions::Sin2x                }
+
+ {"default"               , AlphaFunction::DEFAULT              },
+ {"linear"                , AlphaFunction::LINEAR               },
+ {"reverse"               , AlphaFunction::REVERSE              },
+
+ {"easeInSquare"          , AlphaFunction::EASE_IN_SQUARE       },
+ {"easeOutSquare"         , AlphaFunction::EASE_OUT_SQUARE      },
+
+ {"easeIn"                , AlphaFunction::EASE_IN               },
+ {"easeOut"               , AlphaFunction::EASE_OUT              },
+ {"easeInOut"             , AlphaFunction::EASE_IN_OUT           },
+
+ {"easeInSine"            , AlphaFunction::EASE_IN_SINE          },
+ {"easeOutSine"           , AlphaFunction::EASE_OUT_SINE         },
+ {"easeInOutSine"         , AlphaFunction::EASE_IN_OUT_SINE      },
+
+ {"bounce"                , AlphaFunction::BOUNCE                },
+ {"sin"                   , AlphaFunction::SIN                   },
+ {"easeOutBack"           , AlphaFunction::EASE_OUT_BACK         },
+
 };
 const unsigned int AlphaFunctionTableCount = sizeof(AlphaFunctionTable)/sizeof(AlphaFunctionTable[0]);
 const char* const DEFAULT_ALPHA_NAME = "default";
-static AlphaFunction DEFAULT_ALPHA_FUNCTION = AlphaFunctions::Default;
+static AlphaFunction DEFAULT_ALPHA_FUNCTION = AlphaFunction::DEFAULT;
 
 
 
@@ -98,7 +90,7 @@ AlphaFunction GetAlphaFunction( const std::string& alphaFuncName )
   }
 
   DALI_LOG_ERROR("Failed to find alpha func |%s| \n", alphaFuncName.c_str() );
-  return AlphaFunctions::Default;
+  return DEFAULT_ALPHA_FUNCTION;
 }
 
 const char* const GetAlphaFunctionName(  AlphaFunction alphaFunc )
@@ -111,7 +103,7 @@ const char* const GetAlphaFunctionName(  AlphaFunction alphaFunc )
     const AlphaFuncStruct& alphaStruct( AlphaFunctionTable[i] );
 
 
-    if( alphaStruct.alphaFunc  == alphaFunc )
+    if( alphaStruct.alphaFunc.GetBuiltinFunction()  == alphaFunc.GetBuiltinFunction() )
     {
       return alphaStruct.name;
     }

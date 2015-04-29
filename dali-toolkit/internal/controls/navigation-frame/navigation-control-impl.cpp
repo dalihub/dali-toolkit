@@ -65,7 +65,7 @@ NavigationControl::NavigationControl()
   mTitleBar(NULL),
   mOrientationAngle( 0 ),
   mOrientationAnimationDuration( 1.0f ),
-  mOrientationAnimationAlphaFunc( AlphaFunctions::EaseOut ),
+  mOrientationAnimationAlphaFunc( AlphaFunction::EASE_OUT ),
   mItemPositionCoefficient( Vector3( 0.0f, 1.0f, 0.0f) ),
   mItemPushedSignal( ),
   mItemPoppedSignal( )

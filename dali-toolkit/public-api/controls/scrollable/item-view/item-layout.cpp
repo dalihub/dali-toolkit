@@ -130,7 +130,7 @@ namespace Toolkit
 
 ItemLayout::ItemLayout()
 : mOrientation( ControlOrientation::Up ),
-  mAlphaFunction( AlphaFunctions::Linear ),
+  mAlphaFunction( AlphaFunction::LINEAR ),
   mWeightObject()
 {
 }
@@ -291,7 +291,7 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
     keyFrames.Add( 1.0f, 1.0f );
 
     Animation applyAnimation = Dali::Animation::New( durationSeconds );
-    applyAnimation.AnimateBetween( Property( mWeightObject, WeightObject::WEIGHT ), keyFrames, mAlphaFunction, durationSeconds );
+    applyAnimation.AnimateBetween( Property( mWeightObject, WeightObject::WEIGHT ), keyFrames, mAlphaFunction, TimePeriod(durationSeconds) );
     applyAnimation.Play();
   }
 }

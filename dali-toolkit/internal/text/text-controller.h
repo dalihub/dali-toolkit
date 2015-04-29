@@ -50,6 +50,15 @@ typedef IntrusivePtr<Controller> ControllerPtr;
 typedef Dali::Toolkit::Text::ControlInterface ControlInterface;
 
 /**
+ * @brief Different placeholder-text can be shown when the control is active/inactive.
+ */
+enum PlaceholderType
+{
+  PLACEHOLDER_TYPE_ACTIVE,
+  PLACEHOLDER_TYPE_INACTIVE,
+};
+
+/**
  * @brief A Text Controller is used by UI Controls which display text.
  *
  * It manipulates the Logical & Visual text models on behalf of the UI Controls.
@@ -60,7 +69,7 @@ typedef Dali::Toolkit::Text::ControlInterface ControlInterface;
  */
 class Controller : public RefObject, public Decorator::Observer
 {
-private:
+public:
 
   /**
    * @brief Text related operations to be done in the relayout process.
@@ -83,7 +92,14 @@ private:
     ALL_OPERATIONS     = 0xFFFF
   };
 
-public:
+  /**
+   * @brief Used to distinguish between regular key events and IMF events
+   */
+  enum InsertType
+  {
+    COMMIT,
+    PRE_EDIT
+  };
 
   /**
    * @brief Create a new instance of a Controller.
@@ -111,16 +127,48 @@ public:
   /**
    * @brief Replaces any placeholder text previously set.
    *
+   * @param[in] cursorOffset Start position from the current cursor position to start deleting characters.
+   * @param[in] numberOfChars The number of characters to delete from the cursorOffset.
+   * @return True if the remove was successful.
+   */
+  bool RemoveText( int cursorOffset, int numberOfChars );
+
+  /**
+   * @brief Retrieve the current cursor position.
+   *
+   * @return The cursor position.
+   */
+  unsigned int GetLogicalCursorPosition() const;
+
+  /**
+   * @brief Replaces any placeholder text previously set.
+   *
+   * @param[in] type Different placeholder-text can be shown when the control is active/inactive.
    * @param[in] text A string of UTF-8 characters.
    */
-  void SetPlaceholderText( const std::string& text );
+  void SetPlaceholderText( PlaceholderType type, const std::string& text );
 
   /**
    * @brief Retrieve any placeholder text previously set.
    *
-   * @return A string of UTF-8 characters.
+   * @param[in] type Different placeholder-text can be shown when the control is active/inactive.
+   * @param[out] A string of UTF-8 characters.
    */
-  void GetPlaceholderText( std::string& text ) const;
+  void GetPlaceholderText( PlaceholderType type, std::string& text ) const;
+
+  /**
+   * @brief Sets the maximum number of characters that can be inserted into the TextModel
+   *
+   * @param[in] maxCharacters maximum number of characters to be accepted
+   */
+  void SetMaximumNumberOfCharacters( int maxCharacters );
+
+  /**
+   * @brief Sets the maximum number of characters that can be inserted into the TextModel
+   *
+   * @param[in] maxCharacters maximum number of characters to be accepted
+   */
+  int GetMaximumNumberOfCharacters();
 
   /**
    * @brief Set the default font family.
@@ -165,14 +213,6 @@ public:
   float GetDefaultPointSize() const;
 
   /**
-   * @brief Retrieve the default fonts.
-   *
-   * @param[out] fonts The default font family, style and point sizes.
-   * @param[in] numberOfCharacters The number of characters in the logical model.
-   */
-  void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters ) const;
-
-  /**
    * @brief Set the text color
    *
    * @param textColor The text color
@@ -185,6 +225,20 @@ public:
    * @return The text color
    */
   const Vector4& GetTextColor() const;
+
+  /**
+   * @brief Set the text color
+   *
+   * @param textColor The text color
+   */
+  void SetPlaceholderTextColor( const Vector4& textColor );
+
+  /**
+   * @brief Retrieve the text color
+   *
+   * @return The text color
+   */
+  const Vector4& GetPlaceholderTextColor() const;
 
   /**
    * @brief Set the shadow offset.
@@ -318,30 +372,24 @@ public:
   void ProcessModifyEvents();
 
   /**
-   * @brief Used to process an event queued from SetText()
-   *
-   * @param[in] newText The new text to store in the logical model.
+   * @brief Used to remove placeholder text.
    */
-  void ReplaceTextEvent( const std::string& newText );
+  void ResetText();
+
+  /**
+   * @brief Used to process an event queued from SetText()
+   */
+  void TextReplacedEvent();
 
   /**
    * @brief Used to process an event queued from key events etc.
-   *
-   * @param[in] text The text to insert into the logical model.
    */
-  void InsertTextEvent( const std::string& text );
+  void TextInsertedEvent();
 
   /**
    * @brief Used to process an event queued from backspace key etc.
    */
-  void DeleteTextEvent();
-
-  /**
-   * @brief Update the model following text replace/insert etc.
-   *
-   * @param[in] operationsRequired The layout operations which need to be done.
-   */
-  void UpdateModel( OperationsMask operationsRequired );
+  void TextDeletedEvent();
 
   /**
    * @brief Lays-out the text.
@@ -393,8 +441,17 @@ public:
    * @brief Caller by editable UI controls when key events are received.
    *
    * @param[in] event The key event.
+   * @param[in] type Used to distinguish between regular key events and IMF events.
    */
   bool KeyEvent( const Dali::KeyEvent& event );
+
+  /**
+   * @brief Caller by editable UI controls when key events are received.
+   *
+   * @param[in] text The text to insert.
+   * @param[in] type Used to distinguish between regular key events and IMF events.
+   */
+  void InsertText( const std::string& text, InsertType type );
 
   /**
    * @brief Caller by editable UI controls when a tap gesture occurs.
@@ -413,9 +470,9 @@ public:
   void PanEvent( Gesture::State state, const Vector2& displacement );
 
   /**
-   * @copydoc Dali::Toolkit::Text::Decorator::Observer::GrabHandleEvent()
+   * @copydoc Dali::Toolkit::Text::Decorator::Observer::HandleEvent()
    */
-  virtual void GrabHandleEvent( GrabHandleState state, float x, float y );
+  virtual void HandleEvent( HandleType handle, HandleState state, float x, float y );
 
 protected:
 

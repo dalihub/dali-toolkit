@@ -50,7 +50,7 @@ namespace Internal
 
  *  // start the bouncing animation
  *  Animation anim = Animation::New(2.0f);
- *  anim.AnimateTo( Property( bounceActor, bouncePropertyIndex ), 1.f, AlphaFunctions::Sin );
+ *  anim.AnimateTo( Property( bounceActor, bouncePropertyIndex ), 1.f, AlphaFunction::SIN );
  *  anim.Play();
  * @endcode
  *

@@ -98,13 +98,13 @@ void CubeTransitionWaveEffect::OnStartTransition( Vector2 panPosition, Vector2 p
       float delay = thirdAnimationDuration * CalculateDelay(x*mTileSize.width,y*mTileSize.height);
 
       mAnimation.AnimateTo( Property( mBoxes[idx], Actor::Property::ORIENTATION ), Quaternion( Radian( Degree( -angle ) ), Vector3::YAXIS ),
-                            AlphaFunctions::EaseOutSine, TimePeriod( delay, thirdAnimationDuration ) );
+                            AlphaFunction::EASE_OUT_SINE, TimePeriod( delay, thirdAnimationDuration ) );
       mAnimation.AnimateBy( Property( mBoxes[idx], Actor::Property::POSITION ), Vector3( 0.f, 0.f, -mCubeDisplacement ),
-                         AlphaFunctions::Bounce, TimePeriod( delay, thirdAnimationDuration ) );
+                         AlphaFunction::BOUNCE, TimePeriod( delay, thirdAnimationDuration ) );
       mAnimation.AnimateTo( Property( mTiles[anotherIndex][idx], Actor::Property::COLOR ), HALF_BRIGHTNESS,
-                          AlphaFunctions::EaseOut, TimePeriod( delay, thirdAnimationDuration ) );
+                          AlphaFunction::EASE_OUT, TimePeriod( delay, thirdAnimationDuration ) );
       mAnimation.AnimateTo( Property( mTiles[mContainerIndex][idx], Actor::Property::COLOR ), FULL_BRIGHTNESS,
-                          AlphaFunctions::EaseIn, TimePeriod( delay, thirdAnimationDuration ) );
+                          AlphaFunction::EASE_IN, TimePeriod( delay, thirdAnimationDuration ) );
     }
   }
 

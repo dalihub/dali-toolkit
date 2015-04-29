@@ -57,7 +57,7 @@ Toolkit::ToolBar ToolBar::New()
   // Create the implementation, temporarily owned on stack
   IntrusivePtr< ToolBar > internalToolBar = new ToolBar();
 
-  // Pass ownership to Toolkit::View
+  // Pass ownership to Toolkit::Toolbar
   Toolkit::ToolBar toolBar( *internalToolBar );
 
   // Second-phase init of the implementation

@@ -377,7 +377,7 @@ Toolkit::Alignment Alignment::New( Toolkit::Alignment::Type horizontal, Toolkit:
   // Create the implementation, temporarily owned on stack
   IntrusivePtr< Alignment > internalAlignment = new Alignment( horizontal, vertical );
 
-  // Pass ownership to Toolkit::View
+  // Pass ownership to Toolkit::Alignment
   Toolkit::Alignment alignment( *internalAlignment );
 
   // Second-phase init of the implementation

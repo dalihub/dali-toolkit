@@ -29,9 +29,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const char* const Page::PROPERTY_TITLE = "title";
-const char* const Page::PROPERTY_SUB_TITLE = "sub-title";
-
 Page::Page()
 {
 }

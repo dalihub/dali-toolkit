@@ -125,11 +125,11 @@ void CubeTransitionFoldEffect::SetupAnimation(unsigned int actorIndex, float ang
     sideTile.TranslateBy( resetTranslation );
     sideTile.SetOrientation( Radian( angle),   Vector3::YAXIS );
   }
-  mAnimation.AnimateTo( Property( currentCube, Actor::Property::ORIENTATION ), Quaternion( Radian( -angle ), Vector3::YAXIS ), AlphaFunctions::Linear );
+  mAnimation.AnimateTo( Property( currentCube, Actor::Property::ORIENTATION ), Quaternion( Radian( -angle ), Vector3::YAXIS ), AlphaFunction::LINEAR );
   Vector3 position(currentCube.GetCurrentPosition());
-  mAnimation.AnimateTo( Property( currentCube, Actor::Property::POSITION ), Vector3( position.x*mDisplacementRatio, position.y, position.z ), AlphaFunctions::Bounce );
-  mAnimation.AnimateTo( Property( frontTile, Actor::Property::COLOR ), HALF_BRIGHTNESS, AlphaFunctions::EaseOut );
-  mAnimation.AnimateTo( Property( sideTile, Actor::Property::COLOR ), FULL_BRIGHTNESS, AlphaFunctions::EaseIn );
+  mAnimation.AnimateTo( Property( currentCube, Actor::Property::POSITION ), Vector3( position.x*mDisplacementRatio, position.y, position.z ), AlphaFunction::BOUNCE );
+  mAnimation.AnimateTo( Property( frontTile, Actor::Property::COLOR ), HALF_BRIGHTNESS, AlphaFunction::EASE_OUT );
+  mAnimation.AnimateTo( Property( sideTile, Actor::Property::COLOR ), FULL_BRIGHTNESS, AlphaFunction::EASE_IN );
 }
 
 } // namespace Internal

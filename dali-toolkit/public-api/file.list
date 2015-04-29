@@ -53,12 +53,9 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/text-controls/text-selection-popup.cpp \
   $(public_api_src_dir)/controls/tool-bar/tool-bar.cpp \
   $(public_api_src_dir)/controls/bloom-view/bloom-view.cpp \
-  $(public_api_src_dir)/controls/cluster/cluster-style.cpp \
-  $(public_api_src_dir)/controls/cluster/cluster.cpp \
   $(public_api_src_dir)/controls/effects-view/effects-view.cpp \
   $(public_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.cpp \
   $(public_api_src_dir)/controls/image-view/masked-image-view.cpp \
-  $(public_api_src_dir)/controls/view/view.cpp \
   $(public_api_src_dir)/focus-manager/focus-manager.cpp \
   $(public_api_src_dir)/focus-manager/keyboard-focus-manager.cpp \
   $(public_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
@@ -130,10 +127,6 @@ public_api_bloom_view_header_files = \
 
 public_api_bubble_emitter_header_files = \
   $(public_api_src_dir)/controls/bubble-effect/bubble-emitter.h
-
-public_api_cluster_header_files = \
-  $(public_api_src_dir)/controls/cluster/cluster-style.h \
-  $(public_api_src_dir)/controls/cluster/cluster.h
 
 public_api_default_controls_header_files = \
   $(public_api_src_dir)/controls/default-controls/check-button-factory.h \
@@ -215,9 +208,6 @@ public_api_navigation_frame_header_files = \
   $(public_api_src_dir)/controls/navigation-frame/navigation-bar-style.h \
   $(public_api_src_dir)/controls/navigation-frame/navigation-control.h \
   $(public_api_src_dir)/controls/navigation-frame/page.h
-
-public_api_view_header_files = \
-  $(public_api_src_dir)/controls/view/view.h
 
 public_api_focus_manager_header_files = \
   $(public_api_src_dir)/focus-manager/focus-manager.h \
