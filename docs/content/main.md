@@ -69,6 +69,7 @@ the OpenGL API from developers and provides a clean cross-platform C++ & JavaScr
  - \link scriptoverview.html JSON and JavaScript Overview \endlink
  - \link javascriptwrapping.html JavaScript Wrapping Guide for DALi developers\endlink
  - \link script-hello Hello World in script \endlink
+ - \link script-json-specification JSON Specification\endlink
 
  ## Rendering
  - \link viewing-modes Viewing modes \endlink
