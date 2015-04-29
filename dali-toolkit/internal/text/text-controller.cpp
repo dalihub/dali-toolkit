@@ -313,7 +313,7 @@ bool Controller::RemoveText( int cursorOffset, int numberOfChars )
     CharacterIndex cursorIndex = oldCursorIndex;
 
     // Validate the cursor position & number of characters
-    if( std::abs( cursorOffset ) <= cursorIndex )
+    if( static_cast< CharacterIndex >( std::abs( cursorOffset ) ) <= cursorIndex )
     {
       cursorIndex = oldCursorIndex + cursorOffset;
     }
