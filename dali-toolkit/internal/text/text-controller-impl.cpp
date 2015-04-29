@@ -238,83 +238,6 @@ bool Controller::Impl::ProcessInputEvents()
   return mEventData->mDecoratorUpdated;
 }
 
-void Controller::Impl::ReplaceTextWithPlaceholder()
-{
-  DALI_ASSERT_DEBUG( mEventData && "No placeholder text available" );
-  if( !mEventData )
-  {
-    return;
-  }
-
-  // Disable handles when showing place-holder text
-  mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-  mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
-  mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
-
-  const char* text( NULL );
-  size_t size( 0 );
-
-  if( EventData::INACTIVE != mEventData->mState &&
-      0u != mEventData->mPlaceholderTextActive.c_str() )
-  {
-    text = mEventData->mPlaceholderTextActive.c_str();
-    size = mEventData->mPlaceholderTextActive.size();
-  }
-
-  else
-  {
-    text = mEventData->mPlaceholderTextInactive.c_str();
-    size = mEventData->mPlaceholderTextInactive.size();
-  }
-
-  // Reset buffers.
-  mLogicalModel->mText.Clear();
-  mLogicalModel->mScriptRuns.Clear();
-  mLogicalModel->mFontRuns.Clear();
-  mLogicalModel->mLineBreakInfo.Clear();
-  mLogicalModel->mWordBreakInfo.Clear();
-  mLogicalModel->mBidirectionalParagraphInfo.Clear();
-  mLogicalModel->mCharacterDirections.Clear();
-  mLogicalModel->mBidirectionalLineInfo.Clear();
-  mLogicalModel->mLogicalToVisualMap.Clear();
-  mLogicalModel->mVisualToLogicalMap.Clear();
-  mVisualModel->mGlyphs.Clear();
-  mVisualModel->mGlyphsToCharacters.Clear();
-  mVisualModel->mCharactersToGlyph.Clear();
-  mVisualModel->mCharactersPerGlyph.Clear();
-  mVisualModel->mGlyphsPerCharacter.Clear();
-  mVisualModel->mGlyphPositions.Clear();
-  mVisualModel->mLines.Clear();
-  mVisualModel->ClearCaches();
-  mVisualModel->SetTextColor( mEventData->mPlaceholderTextColor );
-
-  //  Convert text into UTF-32
-  Vector<Character>& utf32Characters = mLogicalModel->mText;
-  utf32Characters.Resize( size );
-
-  // This is a bit horrible but std::string returns a (signed) char*
-  const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text );
-
-  // Transform a text array encoded in utf8 into an array encoded in utf32.
-  // It returns the actual number of characters.
-  Length characterCount = Utf8ToUtf32( utf8, size, utf32Characters.Begin() );
-  utf32Characters.Resize( characterCount );
-
-  // Reset the cursor position
-  mEventData->mPrimaryCursorPosition = 0;
-
-  // The natural size needs to be re-calculated.
-  mRecalculateNaturalSize = true;
-
-  // Apply modifications to the model
-  mOperationsPending = ALL_OPERATIONS;
-  UpdateModel( ALL_OPERATIONS );
-  mOperationsPending = static_cast<OperationsMask>( LAYOUT             |
-                                                    ALIGN              |
-                                                    UPDATE_ACTUAL_SIZE |
-                                                    REORDER );
-}
-
 void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 {
   // Calculate the operations to be done.
@@ -740,22 +663,7 @@ void Controller::Impl::ChangeState( EventData::State newState )
 
   if( mEventData->mState != newState )
   {
-    // Show different placeholder when switching between active & inactive
-    bool updatePlaceholder( false );
-    if( IsShowingPlaceholderText() &&
-        ( EventData::INACTIVE == newState ||
-          EventData::INACTIVE == mEventData->mState ) )
-    {
-      updatePlaceholder = true;
-    }
-
     mEventData->mState = newState;
-
-    if( updatePlaceholder )
-    {
-      ReplaceTextWithPlaceholder();
-      mEventData->mDecoratorUpdated = true;
-    }
 
     if( EventData::INACTIVE == mEventData->mState )
     {
