@@ -111,21 +111,22 @@ public:
    */
   void GenerateMeshData( ImageId id,
                          const Vector2& position,
-                         MeshData& mesh );
+                         Toolkit::AtlasManager::Mesh2D& mesh );
 
   /**
    * @copydoc Toolkit::AtlasManager::StitchMesh
    */
-  void StitchMesh( MeshData& first,
-                   const MeshData& second,
+  void StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
+                   const Toolkit::AtlasManager::Mesh2D& second,
                    bool optimize );
 
   /**
    * @copydoc Toolkit::AtlasManager::StitchMesh
    */
-  void StitchMesh( const MeshData& first,
-                   const MeshData& second,
-                   MeshData& out, bool optimize );
+  void StitchMesh(  const Toolkit::AtlasManager::Mesh2D& first,
+                    const Toolkit::AtlasManager::Mesh2D& second,
+                    Toolkit::AtlasManager::Mesh2D& out,
+                    bool optimize );
 
   /**
    * @copydoc Toolkit::AtlasManager::Remove
@@ -177,6 +178,11 @@ public:
    */
   void GetMetrics( Toolkit::AtlasManager::Metrics& metrics );
 
+  /**
+   * @copydoc Toolkit::AtlasManager::GetMaterial
+   */
+  Material GetMaterial( AtlasId atlas ) const;
+
 private:
 
   std::vector< AtlasDescriptor > mAtlasList;        // List of atlases created
@@ -195,17 +201,16 @@ private:
                    const Vector2& position,
                    SizeType widthInBlocks,
                    SizeType heightInBlocks,
-                   Dali::MeshData& meshData,
+                   Toolkit::AtlasManager::Mesh2D& mesh,
                    AtlasSlotDescriptor& desc );
 
-  void OptimizeVertices( const MeshData::VertexContainer& in,
-                         MeshData::FaceIndices& faces,
-                         MeshData::VertexContainer& out );
+  void OptimizeMesh( const Toolkit::AtlasManager::Mesh2D& in,
+                     Toolkit::AtlasManager::Mesh2D& out );
 
   void UploadImage( const BufferImage& image,
                     const AtlasSlotDescriptor& desc );
 
-  void PrintMeshData( const MeshData& meshData );
+  void PrintMeshData( const Toolkit::AtlasManager::Mesh2D& mesh );
 
   Toolkit::AtlasManager::AtlasSize mNewAtlasSize;
   Toolkit::AtlasManager::AddFailPolicy mAddFailPolicy;

@@ -81,13 +81,13 @@ void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
 
 void AtlasGlyphManager::GenerateMeshData( uint32_t imageId,
                                           const Vector2& position,
-                                          MeshData& meshData )
+                                          Toolkit::AtlasManager::Mesh2D& mesh )
 {
-  mAtlasManager.GenerateMeshData( imageId, position, meshData );
+  mAtlasManager.GenerateMeshData( imageId, position, mesh );
 }
 
-void AtlasGlyphManager::StitchMesh( MeshData& first,
-                                    const MeshData& second )
+void AtlasGlyphManager::StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
+                                    const Toolkit::AtlasManager::Mesh2D& second )
 {
   mAtlasManager.StitchMesh( first, second );
 }
@@ -142,6 +142,11 @@ void AtlasGlyphManager::Remove( uint32_t imageId )
 Pixel::Format AtlasGlyphManager::GetPixelFormat( uint32_t atlasId )
 {
   return mAtlasManager.GetPixelFormat( atlasId );
+}
+
+Material AtlasGlyphManager::GetMaterial( uint32_t atlasId ) const
+{
+  return mAtlasManager.GetMaterial( atlasId );
 }
 
 const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()

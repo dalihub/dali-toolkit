@@ -21,14 +21,13 @@
 // EXTERNAL INCLUDES
 #include <dali/dali.h>
 #include <dali/integration-api/debug.h>
+//#include <dali/public-api/actors/renderer.h>
 #include <dali/public-api/text-abstraction/text-abstraction.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/atlas-manager/atlas-manager.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-basic-shader.h>
-#include <dali-toolkit/internal/text/rendering/shaders/text-bgra-shader.h>
-#include <dali-toolkit/internal/text/rendering/shaders/text-basic-shadow-shader.h>
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_ATLAS_RENDERER");
 #endif
@@ -45,6 +44,62 @@ namespace
   const float TWO( 2.0f );
   const uint32_t DEFAULT_ATLAS_WIDTH = 512u;
   const uint32_t DEFAULT_ATLAS_HEIGHT = 512u;
+
+  #define MAKE_SHADER(A)#A
+
+  const char* VERTEX_SHADER = MAKE_SHADER(
+  attribute mediump vec2    aPosition;
+  attribute mediump vec2    aTexCoord;
+  uniform   mediump mat4    uMvpMatrix;
+  uniform   mediump vec3    uSize;
+  varying   mediump vec2    vTexCoord;
+
+  void main()
+  {
+    mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
+    position.xyz *= uSize;
+    gl_Position = uMvpMatrix * position;
+    vTexCoord = aTexCoord;
+  }
+  );
+
+  const char* FRAGMENT_SHADER = MAKE_SHADER(
+  uniform         sampler2D sTexture;
+  varying mediump vec2      vTexCoord;
+
+  void main()
+  {
+    //gl_FragColor = vec4( 1.0 );
+    gl_FragColor = texture2D( sTexture, vTexCoord );
+  }
+  );
+
+  const char* VERTEX_SHADER_SHADOW = MAKE_SHADER(
+  attribute mediump vec2    aPosition;
+  attribute mediump vec2    aTexCoord;
+  uniform   mediump vec3    uSize;
+  varying   mediump vec2    vTexCoord;
+
+  void main()
+  {
+    mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
+    position.xyz *= uSize;
+    gl_Position = position;
+    vTexCoord = aTexCoord;
+  }
+  );
+
+  const char* FRAGMENT_SHADER_SHADOW = MAKE_SHADER(
+  uniform         sampler2D sTexture;
+  uniform lowp    vec4      uColor;
+  varying mediump vec2      vTexCoord;
+
+  void main()
+  {
+    mediump vec4 color = texture2D( sTexture, vTexCoord );
+    gl_FragColor = vec4(uColor.rgb, uColor.a*color.r);
+  }
+  );
 }
 
 struct AtlasRenderer::Impl : public ConnectionTracker
@@ -60,7 +115,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
   {
     Vector4 mColor;
     uint32_t mAtlasId;
-    MeshData mMeshData;
+    AtlasManager::Mesh2D mMesh;
     FrameBufferImage mBuffer;
     bool mIsUnderline;
   };
@@ -92,13 +147,13 @@ struct AtlasRenderer::Impl : public ConnectionTracker
   {
     mGlyphManager = AtlasGlyphManager::Get();
     mFontClient = TextAbstraction::FontClient::Get();
-    mBasicShader = BasicShader::New();
-    mBgraShader = BgraShader::New();
-    mBasicShadowShader = BasicShadowShader::New();
 
-    mFace.reserve( 6u );
-    mFace.push_back( 0 ); mFace.push_back( 2u ); mFace.push_back( 1u );
-    mFace.push_back( 1u ); mFace.push_back( 2u ); mFace.push_back( 3u );
+    mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
+    mQuadVertexFormat[ "aTexCoord" ] = Property::VECTOR2;
+    mQuadIndexFormat[ "indices" ] = Property::UNSIGNED_INTEGER;
+
+    mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    mShadowShader = Shader::New( VERTEX_SHADER_SHADOW, FRAGMENT_SHADER_SHADOW );
   }
 
   void AddGlyphs( const std::vector<Vector2>& positions,
@@ -177,13 +232,13 @@ struct AtlasRenderer::Impl : public ConnectionTracker
         }
 
         Vector2 position = positions[ i ];
-        MeshData newMeshData;
+        AtlasManager::Mesh2D newMesh;
         mGlyphManager.Cached( glyph.fontId, glyph.index, slot );
 
         if ( slot.mImageId )
         {
           // This glyph already exists so generate mesh data plugging in our supplied position
-          mGlyphManager.GenerateMeshData( slot.mImageId, position, newMeshData );
+          mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
           mImageIds.PushBack( slot.mImageId );
         }
         else
@@ -207,50 +262,48 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
           // Create a new image for the glyph
           BufferImage bitmap = mFontClient.CreateBitmap( glyph.fontId, glyph.index );
-          if ( bitmap )
+
+          // Ensure that the next image will fit into the current block size
+          bool setSize = false;
+          if ( bitmap.GetWidth() > mBlockSizes[ currentBlockSize ].mNeededBlockWidth )
           {
-            // Ensure that the next image will fit into the current block size
-            bool setSize = false;
-            if ( bitmap.GetWidth() > mBlockSizes[ currentBlockSize ].mNeededBlockWidth )
-            {
-              setSize = true;
-              mBlockSizes[ currentBlockSize ].mNeededBlockWidth = bitmap.GetWidth();
-            }
-            if ( bitmap.GetHeight() > mBlockSizes[ currentBlockSize ].mNeededBlockHeight )
-            {
-              setSize = true;
-              mBlockSizes[ currentBlockSize ].mNeededBlockHeight = bitmap.GetHeight();
-            }
+            setSize = true;
+            mBlockSizes[ currentBlockSize ].mNeededBlockWidth = bitmap.GetWidth();
+          }
+          if ( bitmap.GetHeight() > mBlockSizes[ currentBlockSize ].mNeededBlockHeight )
+          {
+            setSize = true;
+            mBlockSizes[ currentBlockSize ].mNeededBlockHeight = bitmap.GetHeight();
+          }
 
-            if ( setSize )
-            {
-              mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
-                                             DEFAULT_ATLAS_HEIGHT,
-                                             mBlockSizes[ currentBlockSize ].mNeededBlockWidth,
-                                             mBlockSizes[ currentBlockSize ].mNeededBlockHeight );
-            }
+          if ( setSize )
+          {
+            mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
+                                           DEFAULT_ATLAS_HEIGHT,
+                                           mBlockSizes[ currentBlockSize ].mNeededBlockWidth,
+                                           mBlockSizes[ currentBlockSize ].mNeededBlockHeight );
+          }
 
-            // Locate a new slot for our glyph
-            mGlyphManager.Add( glyph, bitmap, slot );
+          // Locate a new slot for our glyph
+          mGlyphManager.Add( glyph, bitmap, slot );
 
-            // Generate mesh data for this quad, plugging in our supplied position
-            if ( slot.mImageId )
-            {
-              mGlyphManager.GenerateMeshData( slot.mImageId, position, newMeshData );
-              mImageIds.PushBack( slot.mImageId );
-            }
+          // Generate mesh data for this quad, plugging in our supplied position
+          if ( slot.mImageId )
+          {
+            mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
+            mImageIds.PushBack( slot.mImageId );
           }
         }
         // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
         StitchTextMesh( meshContainer,
-                        newMeshData,
+                        newMesh,
                         extents,
                         textColor,
                         position.y + glyph.yBearing,
                         currentUnderlinePosition,
                         currentUnderlineThickness,
                         slot );
-        lastFontId = glyph.fontId;
+       lastFontId = glyph.fontId;
       }
     }
 
@@ -265,33 +318,12 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     {
       for ( std::vector< MeshRecord >::iterator mIt = meshContainer.begin(); mIt != meshContainer.end(); ++mIt )
       {
-        MeshActor actor = MeshActor::New( Mesh::New( mIt->mMeshData ) );
-        actor.SetColor( mIt->mColor );
+        Actor actor = CreateMeshActor( *mIt );
 
-        // Ensure that text rendering is unfiltered
-        actor.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
-        if ( mIt->mIsUnderline )
+        // Create an effect if necessary
+        if ( style == STYLE_DROP_SHADOW )
         {
-          actor.SetColorMode( USE_OWN_COLOR );
-        }
-        else
-        {
-          actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
-        }
-
-        // Check to see what pixel format the shader should be
-        if ( mGlyphManager.GetPixelFormat( mIt->mAtlasId ) == Pixel::L8 )
-        {
-          // Create an effect if necessary
-          if ( style == STYLE_DROP_SHADOW )
-          {
-            actor.Add( GenerateShadow( *mIt, shadowOffset, shadowColor ) );
-          }
-          actor.SetShaderEffect( mBasicShader );
-        }
-        else
-        {
-          actor.SetShaderEffect( mBgraShader );
+          actor.Add( GenerateShadow( *mIt, shadowOffset, shadowColor ) );
         }
 
         if ( mActor )
@@ -326,8 +358,38 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 #endif
   }
 
+  Actor CreateMeshActor( const MeshRecord& meshRecord )
+  {
+    PropertyBuffer quadVertices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadVertexFormat, meshRecord.mMesh.mVertices.Size() );
+    PropertyBuffer quadIndices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadIndexFormat, meshRecord.mMesh.mIndices.Size() >> 1 );
+    quadVertices.SetData( const_cast< AtlasManager::Vertex2D* >( &meshRecord.mMesh.mVertices[ 0 ] ) );
+    quadIndices.SetData( const_cast< unsigned short* >( &meshRecord.mMesh.mIndices[ 0 ] ) );
+
+    Geometry quadGeometry = Geometry::New();
+    quadGeometry.AddVertexBuffer( quadVertices );
+    quadGeometry.SetIndexBuffer( quadIndices );
+
+    Material material = mGlyphManager.GetMaterial( meshRecord.mAtlasId );
+    Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
+    renderer.SetDepthIndex( 0 );
+    Actor actor = Actor::New();
+    actor.AddRenderer( renderer );
+    actor.SetSize( 1.0f, 1.0f );
+    actor.SetColor( meshRecord.mColor );
+
+    if ( meshRecord.mIsUnderline )
+    {
+      actor.SetColorMode( USE_OWN_COLOR );
+    }
+    else
+    {
+      actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+    }
+    return actor;
+  }
+
   void StitchTextMesh( std::vector< MeshRecord >& meshContainer,
-                       MeshData& newMeshData,
+                       AtlasManager::Mesh2D& newMesh,
                        Vector< Extent >& extents,
                        const Vector4& color,
                        float baseLine,
@@ -337,9 +399,8 @@ struct AtlasRenderer::Impl : public ConnectionTracker
   {
     if ( slot.mImageId )
     {
-      MeshData::VertexContainer verts = newMeshData.GetVertices();
-      float left = verts[ 0 ].x;
-      float right = verts[ 1 ].x;
+      float left = newMesh.mVertices[ 0 ].mPosition.x;
+      float right = newMesh.mVertices[ 1 ].mPosition.x;
 
       // Check to see if there's a mesh data object that references the same atlas ?
       uint32_t index = 0;
@@ -348,7 +409,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
         if ( slot.mAtlasId == mIt->mAtlasId && color == mIt->mColor )
         {
           // Stitch the mesh to the existing mesh and adjust any extents
-          mGlyphManager.StitchMesh( mIt->mMeshData, newMeshData );
+          mGlyphManager.StitchMesh( mIt->mMesh, newMesh );
           AdjustExtents( extents,
                          meshContainer,
                          index,
@@ -364,7 +425,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       // No mesh data object currently exists that references this atlas, so create a new one
       MeshRecord meshRecord;
       meshRecord.mAtlasId = slot.mAtlasId;
-      meshRecord.mMeshData = newMeshData;
+      meshRecord.mMesh = newMesh;
       meshRecord.mColor = color;
       meshRecord.mIsUnderline = false;
       meshContainer.push_back( meshRecord );
@@ -475,11 +536,11 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                            const Vector4& underlineColor,
                            const Vector4& textColor )
   {
-    MeshData newMeshData;
+    AtlasManager::Mesh2D newMesh;
+    unsigned short faceIndex = 0;
     for ( Vector< Extent >::ConstIterator eIt = extents.Begin(); eIt != extents.End(); ++eIt )
     {
-      MeshData::VertexContainer newVerts;
-      newVerts.reserve( 4u );
+      AtlasManager::Vertex2D vert;
       uint32_t index = eIt->mMeshRecordIndex;
       Vector2 uv = mGlyphManager.GetAtlasSize( meshRecords[ index ].mAtlasId );
 
@@ -491,37 +552,45 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       float tlx = eIt->mLeft;
       float brx = eIt->mRight;
 
-      newVerts.push_back( MeshData::Vertex( Vector3( tlx, baseLine, ZERO ),
-                                            Vector2::ZERO,
-                                            Vector3::ZERO ) );
+      vert.mPosition.x = tlx;
+      vert.mPosition.y = baseLine;
+      vert.mTexCoords.x = ZERO;
+      vert.mTexCoords.y = ZERO;
+      newMesh.mVertices.PushBack( vert );
 
-      newVerts.push_back( MeshData::Vertex( Vector3( brx, baseLine, ZERO ),
-                                            Vector2( u, ZERO ),
-                                            Vector3::ZERO ) );
+      vert.mPosition.x = brx;
+      vert.mPosition.y = baseLine;
+      vert.mTexCoords.x = u;
+      newMesh.mVertices.PushBack( vert );
 
-      newVerts.push_back( MeshData::Vertex( Vector3( tlx, baseLine + thickness, ZERO ),
-                                            Vector2( ZERO, v ),
-                                            Vector3::ZERO ) );
+      vert.mPosition.x = tlx;
+      vert.mPosition.y = baseLine + thickness;
+      vert.mTexCoords.x = ZERO;
+      vert.mTexCoords.y = v;
+      newMesh.mVertices.PushBack( vert );
 
-      newVerts.push_back( MeshData::Vertex( Vector3( brx, baseLine + thickness, ZERO ),
-                                            Vector2( u, v ),
-                                            Vector3::ZERO ) );
+      vert.mPosition.x = brx;
+      vert.mPosition.y = baseLine + thickness;
+      vert.mTexCoords.x = u;
+      newMesh.mVertices.PushBack( vert );
 
-      newMeshData.SetVertices( newVerts );
-      newMeshData.SetFaceIndices( mFace );
+      // Six indices in counter clockwise winding
+      newMesh.mIndices.PushBack( faceIndex + 1u );
+      newMesh.mIndices.PushBack( faceIndex );
+      newMesh.mIndices.PushBack( faceIndex + 2u );
+      newMesh.mIndices.PushBack( faceIndex + 2u );
+      newMesh.mIndices.PushBack( faceIndex + 3u );
+      newMesh.mIndices.PushBack( faceIndex + 1u );
+      faceIndex += 4;
 
       if ( underlineColor == textColor )
       {
-        mGlyphManager.StitchMesh( meshRecords[ index ].mMeshData, newMeshData );
+        mGlyphManager.StitchMesh( meshRecords[ index ].mMesh, newMesh );
       }
       else
       {
         MeshRecord record;
-        newMeshData.SetMaterial( meshRecords[ index ].mMeshData.GetMaterial() );
-        newMeshData.SetHasNormals( true );
-        newMeshData.SetHasColor( false );
-        newMeshData.SetHasTextureCoords( true );
-        record.mMeshData = newMeshData;
+        record.mMesh = newMesh;
         record.mAtlasId = meshRecords[ index ].mAtlasId;
         record.mColor = underlineColor;
         record.mIsUnderline = true;
@@ -530,34 +599,34 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     }
   }
 
-  MeshActor GenerateShadow( MeshRecord& meshRecord,
-                            const Vector2& shadowOffset,
-                            const Vector4& shadowColor )
+  Actor GenerateShadow( MeshRecord& meshRecord,
+                        const Vector2& shadowOffset,
+                        const Vector4& shadowColor )
   {
     // Scan vertex buffer to determine width and height of effect buffer needed
-    MeshData::VertexContainer verts = meshRecord.mMeshData.GetVertices();
-    float tlx = verts[ 0 ].x;
-    float tly = verts[ 0 ].y;
+    const Vector< AtlasManager::Vertex2D >& verts = meshRecord.mMesh.mVertices;
+    float tlx = verts[ 0 ].mPosition.x;
+    float tly = verts[ 0 ].mPosition.y;
     float brx = ZERO;
     float bry = ZERO;
 
-    for ( uint32_t i = 0; i < verts.size(); ++i )
+    for ( uint32_t i = 0; i < verts.Size(); ++i )
     {
-      if ( verts[ i ].x < tlx )
+      if ( verts[ i ].mPosition.x < tlx )
       {
-        tlx = verts[ i ].x;
+        tlx = verts[ i ].mPosition.x;
       }
-      if ( verts[ i ].y < tly )
+      if ( verts[ i ].mPosition.y < tly )
       {
-        tly = verts[ i ].y;
+        tly = verts[ i ].mPosition.y;
       }
-      if ( verts[ i ].x > brx )
+      if ( verts[ i ].mPosition.x > brx )
       {
-        brx = verts[ i ].x;
+        brx = verts[ i ].mPosition.x;
       }
-      if ( verts[ i ].y > bry )
+      if ( verts[ i ].mPosition.y > bry )
       {
-        bry = verts[ i ].y;
+        bry = verts[ i ].mPosition.y;
       }
     }
 
@@ -569,83 +638,79 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     // Create a buffer to render to
     meshRecord.mBuffer = FrameBufferImage::New( width, height );
 
-    // Create a mesh actor to contain the post-effect render
-    MeshData::VertexContainer vertices;
-    MeshData::FaceIndices face;
+    // We will render a quad into this buffer
+    unsigned short indices[ 6 ] = { 1, 0, 2, 2, 3, 1 };
+    PropertyBuffer quadVertices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadVertexFormat, 4u );
+    PropertyBuffer quadIndices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadIndexFormat, 3u );
 
-    vertices.push_back( MeshData::Vertex( Vector3( tlx + shadowOffset.x, tly + shadowOffset.y, ZERO ),
-                                          Vector2::ZERO,
-                                          Vector3::ZERO ) );
+    AtlasManager::Vertex2D vertices[ 4 ] = {
+    { Vector2( tlx + shadowOffset.x, tly + shadowOffset.y ), Vector2( ZERO, ZERO ) },
+    { Vector2( brx + shadowOffset.x, tly + shadowOffset.y ), Vector2( ONE, ZERO ) },
+    { Vector2( tlx + shadowOffset.x, bry + shadowOffset.y ), Vector2( ZERO, ONE ) },
+    { Vector2( brx + shadowOffset.x, bry + shadowOffset.y ), Vector2( ONE, ONE ) } };
 
-    vertices.push_back( MeshData::Vertex( Vector3( brx + shadowOffset.x, tly + shadowOffset.y, ZERO ),
-                                          Vector2( ONE, ZERO ),
-                                          Vector3::ZERO ) );
+    quadVertices.SetData( vertices );
+    quadIndices.SetData( indices );
 
-    vertices.push_back( MeshData::Vertex( Vector3( tlx + shadowOffset.x, bry + shadowOffset.y, ZERO ),
-                                          Vector2( ZERO, ONE ),
-                                          Vector3::ZERO ) );
+    Geometry quadGeometry = Geometry::New();
+    quadGeometry.AddVertexBuffer( quadVertices );
+    quadGeometry.SetIndexBuffer( quadIndices );
 
-    vertices.push_back( MeshData::Vertex( Vector3( brx + shadowOffset.x, bry + shadowOffset.y, ZERO ),
-                                          Vector2::ONE,
-                                          Vector3::ZERO ) );
+    Sampler sampler = Sampler::New( meshRecord.mBuffer, "sTexture" );
+    Material material = Material::New( mShader );
+    material.AddSampler( sampler );
 
-    MeshData meshData;
-    Material newMaterial = Material::New("effect buffer");
-    newMaterial.SetDiffuseTexture( meshRecord.mBuffer );
-    meshData.SetMaterial( newMaterial );
-    meshData.SetVertices( vertices );
-    meshData.SetFaceIndices( mFace );
-    meshData.SetHasNormals( true );
-    meshData.SetHasColor( false );
-    meshData.SetHasTextureCoords( true );
-    MeshActor actor = MeshActor::New( Mesh::New( meshData ) );
-    actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
-    actor.SetShaderEffect( mBgraShader );
-    actor.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
-    actor.SetSortModifier( 0.1f ); // force behind main text
+    Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
+    renderer.SetDepthIndex( 0.1f );
+    Actor actor = Actor::New();
+    actor.AddRenderer( renderer );
+    actor.SetSize( 1.0f, 1.0f );
 
-    // Create a sub actor to render once with normalized vertex positions
-    MeshData newMeshData;
-    MeshData::VertexContainer newVerts;
-    MeshData::FaceIndices newFaces;
-    MeshData::FaceIndices faces = meshRecord.mMeshData.GetFaces();
-    for ( uint32_t i = 0; i < verts.size(); ++i )
+    // Create a sub actor to render the source with normalized vertex positions
+    Vector< AtlasManager::Vertex2D > normVertexList;
+    Vector< unsigned short > normIndexList;
+    for ( uint32_t i = 0; i < verts.Size(); ++i )
     {
-      MeshData::Vertex vertex = verts[ i ];
-      vertex.x = ( ( vertex.x - tlx ) * divWidth ) - ONE;
-      vertex.y = ( ( vertex.y - tly ) * divHeight ) - ONE;
-      newVerts.push_back( vertex );
+      AtlasManager::Vertex2D vertex = verts[ i ];
+      vertex.mPosition.x = ( ( vertex.mPosition.x - tlx ) * divWidth ) - ONE;
+      vertex.mPosition.y = ( ( vertex.mPosition.y - tly ) * divHeight ) - ONE;
+      normVertexList.PushBack( vertex );
     }
 
-    // Reverse triangle winding order
-    uint32_t faceCount = faces.size() / 3;
-    for ( uint32_t i = 0; i < faceCount; ++i )
+    // Reverse winding
+    for ( uint32_t i = 0; i < meshRecord.mMesh.mIndices.Size() / 3; ++i )
     {
       uint32_t index = i * 3;
-      newFaces.push_back( faces[ index + 2 ] );
-      newFaces.push_back( faces[ index + 1 ] );
-      newFaces.push_back( faces[ index ] );
+      normIndexList.PushBack( meshRecord.mMesh.mIndices[ index + 2 ] );
+      normIndexList.PushBack( meshRecord.mMesh.mIndices[ index + 1 ] );
+      normIndexList.PushBack( meshRecord.mMesh.mIndices[ index ] );
     }
 
-    newMeshData.SetMaterial( meshRecord.mMeshData.GetMaterial() );
-    newMeshData.SetVertices( newVerts );
-    newMeshData.SetFaceIndices( newFaces );
-    newMeshData.SetHasNormals( true );
-    newMeshData.SetHasColor( false );
-    newMeshData.SetHasTextureCoords( true );
+    PropertyBuffer normVertices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadVertexFormat, normVertexList.Size() );
+    PropertyBuffer normIndices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadIndexFormat, normIndexList.Size() >> 1 );
+    normVertices.SetData( const_cast< AtlasManager::Vertex2D* >( &normVertexList[ 0 ] ) );
+    normIndices.SetData( const_cast< unsigned short* >( &normIndexList[ 0 ] ) );
 
-    MeshActor subActor = MeshActor::New( Mesh::New( newMeshData ) );
+    Geometry normGeometry = Geometry::New();
+    normGeometry.AddVertexBuffer( normVertices );
+    normGeometry.SetIndexBuffer( normIndices );
+
+    Material normMaterial = mGlyphManager.GetMaterial( meshRecord.mAtlasId );
+    normMaterial.SetShader( mShadowShader );
+    Dali::Renderer normRenderer = Dali::Renderer::New( normGeometry, normMaterial );
+    Actor subActor = Actor::New();
+    subActor.AddRenderer( normRenderer );
+    subActor.SetSize( 1.0f, 1.0f );
     subActor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
     subActor.SetColor( shadowColor );
-    subActor.SetShaderEffect( mBasicShadowShader );
-    subActor.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
 
     // Create a render task to render the effect
     RenderTask task = Stage::GetCurrent().GetRenderTaskList().CreateTask();
     task.SetTargetFrameBuffer( meshRecord.mBuffer );
     task.SetSourceActor( subActor );
     task.SetClearEnabled( true );
-    task.SetClearColor( Vector4::ZERO );
+    task.SetClearColor( Vector4( 0.0f, 0.0f, 0.0f, 1.0f ) );
+    //task.SetClearColor( Color::BLUE );
     task.SetExclusive( true );
     task.SetRefreshRate( RenderTask::REFRESH_ONCE );
     task.FinishedSignal().Connect( this, &AtlasRenderer::Impl::RenderComplete );
@@ -671,15 +736,16 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     }
   }
 
-  RenderableActor mActor;                             ///< The actor parent which renders the text
+  Actor mActor;                                       ///< The actor parent which renders the text
   AtlasGlyphManager mGlyphManager;                    ///< Glyph Manager to handle upload and caching
   Vector< uint32_t > mImageIds;                       ///< A list of imageIDs used by the renderer
   TextAbstraction::FontClient mFontClient;            ///> The font client used to supply glyph information
-  ShaderEffect mBasicShader;                          ///> Shader used to render L8 glyphs
-  ShaderEffect mBgraShader;                           ///> Shader used to render BGRA glyphs
-  ShaderEffect mBasicShadowShader;                    ///> Shader used to render drop shadow into buffer
+  Shader mShader;                                     ///> Shader used to render drop shadow buffer textures
+  Shader mShadowShader;                               ///> Shader used to render drop shadow into buffer
   std::vector< MaxBlockSize > mBlockSizes;            ///> Maximum size needed to contain a glyph in a block within a new atlas
-  std::vector< MeshData::FaceIndex > mFace;           ///> Face indices for a quad
+  std::vector< uint32_t > mFace;                      ///> Face indices for a quad
+  Property::Map mQuadVertexFormat;
+  Property::Map mQuadIndexFormat;
 };
 
 Text::RendererPtr AtlasRenderer::New()
@@ -687,7 +753,7 @@ Text::RendererPtr AtlasRenderer::New()
   return Text::RendererPtr( new AtlasRenderer() );
 }
 
-RenderableActor AtlasRenderer::Render( Text::ViewInterface& view )
+Actor AtlasRenderer::Render( Text::ViewInterface& view )
 {
 
   UnparentAndReset( mImpl->mActor );

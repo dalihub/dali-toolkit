@@ -19,7 +19,7 @@
 #include "tool-bar-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/renderable-actor.h>
+#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
@@ -76,7 +76,7 @@ void ToolBar::SetBackground( Actor background )
   background.SetAnchorPoint( Dali::AnchorPoint::TOP_CENTER );
   background.SetSize( Vector2( mToolBarSize.width, mToolBarSize.height ) );
 
-  RenderableActor renderableActor = RenderableActor::DownCast( background );
+  ImageActor renderableActor = ImageActor::DownCast( background );
   if ( renderableActor )
   {
     renderableActor.SetSortModifier( 1.f );

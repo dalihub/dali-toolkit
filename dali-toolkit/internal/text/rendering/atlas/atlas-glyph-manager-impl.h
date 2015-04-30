@@ -77,13 +77,13 @@ public:
    */
   void GenerateMeshData( uint32_t imageId,
                          const Vector2& position,
-                         MeshData& meshData );
+                         Toolkit::AtlasManager::Mesh2D& mesh );
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::StitchMesh
    */
-  void StitchMesh( MeshData& first,
-                   const MeshData& second );
+  void StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
+                   const Toolkit::AtlasManager::Mesh2D& second );
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::Cached
@@ -108,12 +108,17 @@ public:
   void Remove( uint32_t imageId );
 
   /**
-   * @copydoc toolkit::AtlasGlyphManager::GetPixelFormat
+   * @copydoc Toolkit::AtlasGlyphManager::GetPixelFormat
    */
   Pixel::Format GetPixelFormat( uint32_t atlasId );
 
   /**
-   * @copydoc toolkit::AtlasGlyphManager::GetMetrics
+   * @copydoc Toolkit::AtlasGlyphManager::GetMaterial
+   */
+  Material GetMaterial( uint32_t atlasId ) const;
+
+  /**
+   * @copydoc Toolkit::AtlasGlyphManager::GetMetrics
    */
   const Toolkit::AtlasGlyphManager::Metrics& GetMetrics();
 

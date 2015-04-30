@@ -69,23 +69,23 @@ bool AtlasManager::Remove( ImageId id )
 
 void AtlasManager::GenerateMeshData( ImageId id,
                                      const Vector2& position,
-                                     MeshData& meshData)
+                                     Mesh2D& mesh )
 {
   GetImplementation(*this).GenerateMeshData( id,
                                              position,
-                                             meshData );
+                                             mesh );
 }
 
-void AtlasManager::StitchMesh( MeshData& first,
-                               const MeshData& second,
+void AtlasManager::StitchMesh( Mesh2D& first,
+                               const Mesh2D& second,
                                bool optimize )
 {
   GetImplementation(*this).StitchMesh( first, second, optimize );
 }
 
-void AtlasManager::StitchMesh( const MeshData& first,
-                               const MeshData& second,
-                               MeshData& out,
+void AtlasManager::StitchMesh( const Mesh2D& first,
+                               const Mesh2D& second,
+                               Mesh2D& out,
                                bool optimize )
 {
   GetImplementation(*this).StitchMesh( first, second, out, optimize );
@@ -128,7 +128,12 @@ Pixel::Format AtlasManager::GetPixelFormat( AtlasId atlas )
 
 void AtlasManager::GetMetrics( Metrics& metrics )
 {
-  return GetImplementation(*this).GetMetrics( metrics );
+  GetImplementation(*this).GetMetrics( metrics );
+}
+
+Material AtlasManager::GetMaterial( AtlasId atlas ) const
+{
+  return GetImplementation(*this).GetMaterial( atlas );
 }
 
 } // namespace Toolkit

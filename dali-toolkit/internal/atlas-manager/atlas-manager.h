@@ -20,9 +20,9 @@
 // EXTERNAL INCLUDES
 #include <stdint.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/geometry/mesh-data.h>
 #include <dali/public-api/images/atlas.h>
 #include <dali/public-api/images/buffer-image.h>
+#include <dali/public-api/shader-effects/material.h>
 
 namespace Dali
 {
@@ -187,6 +187,18 @@ public:
     Dali::Vector< AtlasMetricsEntry > mAtlasMetrics;    // container of atlas information
   };
 
+  struct Vertex2D
+  {
+    Vector2 mPosition;
+    Vector2 mTexCoords;
+  };
+
+  struct Mesh2D
+  {
+    Vector< Vertex2D > mVertices;
+    Vector< unsigned short> mIndices;
+  };
+
   /**
    * Create an AtlasManager handle; this can be initialised with AtlasManager::New()
    * Calling member functions with an uninitialised handle is not allowed.
@@ -277,7 +289,7 @@ public:
    */
   void GenerateMeshData( ImageId id,
                          const Vector2& position,
-                         MeshData& mesh );
+                         Mesh2D& mesh );
 
   /**
    * @brief Append second mesh to the first mesh
@@ -286,8 +298,8 @@ public:
    * @param[in] second Second mesh
    * @param[in] optimize should we optimize vertex data
    */
-  void StitchMesh( MeshData& first,
-                   const MeshData& second,
+  void StitchMesh( Mesh2D& first,
+                   const Mesh2D& second,
                    bool optimize = false );
 
   /**
@@ -298,9 +310,9 @@ public:
    * @param[in] optimize should we optimize vertex data
    * @param[out] out resulting mesh
    */
-  void StitchMesh( const MeshData& first,
-                   const MeshData& second,
-                   MeshData& out,
+  void StitchMesh( const Mesh2D& first,
+                   const Mesh2D& second,
+                   Mesh2D& out,
                    bool optimize = false );
 
   /**
@@ -369,6 +381,15 @@ public:
    * @param[in] metrics metrics structure to be filled
    */
   void GetMetrics( Metrics& metrics );
+
+  /**
+   * @brief Get Material used by atlas
+   *
+   * @param atlas[in] atlas AtlasId
+   *
+   * @return Material used by atlas
+   */
+  Material GetMaterial( AtlasId atlas ) const;
 
 private:
 

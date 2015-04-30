@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <iostream>
 #include <cstring>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/stage.h>
@@ -81,8 +82,9 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextField, Toolkit::Control, Create );
 
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "rendering-backend",                    INTEGER,   RENDERING_BACKEND                    )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder-text",                     STRING,    PLACEHOLDER_TEXT                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "text",                                 STRING,    TEXT                                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder-text",                     STRING,    PLACEHOLDER_TEXT                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder-text-focused",             STRING,    PLACEHOLDER_TEXT_FOCUSED             )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "font-family",                          STRING,    FONT_FAMILY                          )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "font-style",                           STRING,    FONT_STYLE                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "point-size",                           FLOAT,     POINT_SIZE                           )
@@ -91,6 +93,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "exceed-policy",                
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "horizontal-alignment",                 STRING,    HORIZONTAL_ALIGNMENT                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "vertical-alignment",                   STRING,    VERTICAL_ALIGNMENT                   )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "text-color",                           VECTOR4,   TEXT_COLOR                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder-text-color",               VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadow-offset",                        VECTOR2,   SHADOW_OFFSET                        )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadow-color",                         VECTOR4,   SHADOW_COLOR                         )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "primary-cursor-color",                 VECTOR4,   PRIMARY_CURSOR_COLOR                 )
@@ -151,19 +154,27 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::TextField::Property::PLACEHOLDER_TEXT:
-      {
-        if( impl.mController )
-        {
-          //impl.mController->SetPlaceholderText( value.Get< std::string >() ); TODO
-        }
-        break;
-      }
       case Toolkit::TextField::Property::TEXT:
       {
         if( impl.mController )
         {
           impl.mController->SetText( value.Get< std::string >() );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::PLACEHOLDER_TEXT:
+      {
+        if( impl.mController )
+        {
+          impl.mController->SetPlaceholderText( PLACEHOLDER_TYPE_INACTIVE, value.Get< std::string >() );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::PLACEHOLDER_TEXT_FOCUSED:
+      {
+        if( impl.mController )
+        {
+          impl.mController->SetPlaceholderText( PLACEHOLDER_TYPE_ACTIVE, value.Get< std::string >() );
         }
         break;
       }
@@ -250,6 +261,19 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           if ( impl.mController->GetTextColor() != textColor )
           {
             impl.mController->SetTextColor( textColor );
+            impl.RequestTextRelayout();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::PLACEHOLDER_TEXT_COLOR:
+      {
+        if ( impl.mController )
+        {
+          Vector4 textColor = value.Get< Vector4 >();
+          if ( impl.mController->GetPlaceholderTextColor() != textColor )
+          {
+            impl.mController->SetPlaceholderTextColor( textColor );
             impl.RequestTextRelayout();
           }
         }
@@ -448,22 +472,32 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         value = impl.mRenderingBackend;
         break;
       }
-      case Toolkit::TextField::Property::PLACEHOLDER_TEXT:
-      {
-        if( impl.mController )
-        {
-          std::string text;
-          impl.mController->GetPlaceholderText( text );
-          value = text;
-        }
-        break;
-      }
       case Toolkit::TextField::Property::TEXT:
       {
         if( impl.mController )
         {
           std::string text;
           impl.mController->GetText( text );
+          value = text;
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::PLACEHOLDER_TEXT:
+      {
+        if( impl.mController )
+        {
+          std::string text;
+          impl.mController->GetPlaceholderText( PLACEHOLDER_TYPE_INACTIVE, text );
+          value = text;
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::PLACEHOLDER_TEXT_FOCUSED:
+      {
+        if( impl.mController )
+        {
+          std::string text;
+          impl.mController->GetPlaceholderText( PLACEHOLDER_TYPE_ACTIVE, text );
           value = text;
         }
         break;
@@ -498,6 +532,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if ( impl.mController )
         {
           value = impl.mController->GetTextColor();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::PLACEHOLDER_TEXT_COLOR:
+      {
+        if ( impl.mController )
+        {
+          value = impl.mController->GetPlaceholderTextColor();
         }
         break;
       }
@@ -756,7 +798,7 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
 
-    RenderableActor renderableActor;
+    Actor renderableActor;
     if( mRenderer )
     {
       renderableActor = mRenderer->Render( mController->GetView() );
@@ -840,9 +882,10 @@ void TextField::OnTap( const TapGesture& gesture )
     VirtualKeyboard::Show();
   }
 
-  SetKeyInputFocus();
-
+  // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
   mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x, gesture.localPoint.y );
+
+  SetKeyInputFocus();
 }
 
 void TextField::OnPan( const PanGesture& gesture )
@@ -852,9 +895,11 @@ void TextField::OnPan( const PanGesture& gesture )
 
 bool TextField::OnKeyEvent( const KeyEvent& event )
 {
-  if( Dali::DALI_KEY_ESCAPE == event.keyCode )
+  if( Dali::DALI_KEY_ESCAPE == event.keyCode ||
+      "Return" == event.keyPressedName ) // Make a Dali key code for this
   {
     ClearKeyInputFocus();
+    return true;
   }
 
   return mController->KeyEvent( event );
@@ -862,24 +907,54 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
 
 ImfManager::ImfCallbackData TextField::OnImfEvent( Dali::ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
 {
+  bool update( false );
+
+  std::string text;
+  unsigned int cursorPosition( 0 );
+
   switch ( imfEvent.eventName )
   {
     case ImfManager::COMMIT:
     {
-      KeyEvent event( "", imfEvent.predictiveString, 0, 0, 0, KeyEvent::Down );
-      mController->KeyEvent( event );
+      mController->InsertText( imfEvent.predictiveString, Text::Controller::COMMIT );
       break;
     }
-    case ImfManager::PREEDIT: // fall through
+    case ImfManager::PREEDIT:
+    {
+      mController->InsertText( imfEvent.predictiveString, Text::Controller::PRE_EDIT );
+      update = true;
+      break;
+    }
     case ImfManager::DELETESURROUNDING:
+    {
+      mController->RemoveText( imfEvent.cursorOffset, imfEvent.numberOfChars );
+      break;
+    }
     case ImfManager::GETSURROUNDING:
+    {
+      mController->GetText( text );
+      cursorPosition = mController->GetLogicalCursorPosition();
+
+      imfManager.SetSurroundingText( text );
+      imfManager.SetCursorPosition( cursorPosition );
+      break;
+    }
     case ImfManager::VOID:
     {
       // do nothing
+      break;
     }
   } // end switch
 
-  return ImfManager::ImfCallbackData();
+  if( ImfManager::GETSURROUNDING != imfEvent.eventName )
+  {
+    mController->GetText( text );
+    cursorPosition = mController->GetLogicalCursorPosition();
+  }
+
+  ImfManager::ImfCallbackData callbackData( update, cursorPosition, text, false );
+
+  return callbackData;
 }
 
 void TextField::RequestTextRelayout()

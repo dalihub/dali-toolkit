@@ -17,6 +17,7 @@
 
 // INTERNAL HEADERS
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
 
 namespace Dali
 {

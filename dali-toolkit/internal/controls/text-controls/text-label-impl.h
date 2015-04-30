@@ -124,7 +124,7 @@ private: // Data
 
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
-  RenderableActor mRenderableActor;
+  Actor mRenderableActor;
 
   int mRenderingBackend;
 };

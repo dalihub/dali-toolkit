@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/renderable-actor.h>
+#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 
 namespace Dali
@@ -77,7 +77,7 @@ public:
    * @param renderable actor to apply the effect to
    * @return A handle to a newly allocated Dali resource.
    */
-  static MotionBlurEffect Apply( RenderableActor renderable );
+  static MotionBlurEffect Apply( ImageActor renderable );
 
   /**
    * Create an initialized MotionBlurEffect

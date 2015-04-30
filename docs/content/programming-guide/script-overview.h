@@ -33,7 +33,7 @@
  *
  * The property system has non animatable properties that can be used by the scripting runtime to set actor attributes.
  *
- * Custom controls can register properties for scripting access. The custom control is notified of a non animatable property value change.
+ * Custom controls can register properties for scripting access.
  *
  *
  * <h2 class="pg">A Javascript example</h2>
@@ -51,7 +51,6 @@
  *
  * // Property access
  * // This line finds a property called "alpha" and Sets with SetProperty(index, Property::Value(2.0))
- * // If the property is non animatable it calls OnPropertySet(Property::Value(2.0))
  * custom.alpha = 2.0;
  *
  * // NB: non animatable properties can be strings

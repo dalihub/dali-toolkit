@@ -23,10 +23,8 @@
 #include <limits>
 #include <stack>
 #include <dali/public-api/actors/image-actor.h>
-#include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/geometry/mesh.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/scripting/scripting.h>
@@ -49,9 +47,9 @@ namespace Toolkit
 namespace
 {
 
-#if defined(DEBUG_ENABLED)
-Integration::Log::Filter* gLogFilter  = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_CONTROL");
-#endif
+//#if defined(DEBUG_ENABLED)
+//Integration::Log::Filter* gLogFilter  = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_CONTROL");
+//#endif
 
 const float MAX_FLOAT_VALUE( std::numeric_limits<float>::max() );
 const Vector3 MAX_SIZE( MAX_FLOAT_VALUE, MAX_FLOAT_VALUE, MAX_FLOAT_VALUE );
@@ -100,10 +98,10 @@ struct Background
 /**
  * Creates a white coloured Mesh.
  */
-Mesh CreateMesh()
+Vector3 CreateMesh()
 {
   Vector3 white( Color::WHITE );
-
+  /*
   MeshData meshData;
 
   // Create vertices with a white color (actual color is set by actor color)
@@ -124,8 +122,9 @@ Mesh CreateMesh()
   meshData.SetVertices( vertices );
   meshData.SetFaceIndices( faces );
   meshData.SetHasColor( true );
-
-  return Mesh::New( meshData );
+  */
+  return white;
+  //return Mesh::New( meshData );
 }
 
 /**
@@ -553,6 +552,7 @@ void Control::SetBackgroundColor( const Vector4& color )
     // Just set the actor color
     background.actor.SetColor( color );
   }
+  /*
   else
   {
     // Create Mesh Actor
@@ -564,6 +564,7 @@ void Control::SetBackgroundColor( const Vector4& color )
     background.actor = meshActor;
     Self().Add( meshActor );
   }
+  */
 
   background.color = color;
 }
@@ -588,12 +589,14 @@ void Control::SetBackgroundImage( Image image )
     background.actor.Reset();
   }
 
+  /*
   ImageActor imageActor = ImageActor::New( image );
-  SetupBackgroundActor( imageActor, background.color );
+  SetupBackgroundActor( imageActor, Actor::Property::SIZE, background.color );
 
   // Set the background actor before adding so that we do not inform derived classes
   background.actor = imageActor;
   Self().Add( imageActor );
+  */
 }
 
 void Control::ClearBackground()

@@ -453,7 +453,7 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
 
-    RenderableActor renderableActor;
+    Actor renderableActor;
     if( mRenderer )
     {
       renderableActor = mRenderer->Render( mController->GetView() );

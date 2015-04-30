@@ -20,9 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <math.h>
-#include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/animation/constraint.h>
-#include <dali/public-api/geometry/animatable-mesh.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/public-api/math/vector3.h>
 

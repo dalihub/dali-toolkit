@@ -88,7 +88,7 @@ public:
    */
   void GenerateMeshData( uint32_t imageId,
                          const Vector2& position,
-                         MeshData& meshData );
+                         Toolkit::AtlasManager::Mesh2D& mesh );
 
   /**
    * @brief Stitch Two Meshes together
@@ -96,8 +96,8 @@ public:
    * @param[in] first first mesh
    * @param[in] second second mesh
    */
-  void StitchMesh( MeshData& first,
-                   const MeshData& second );
+  void StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
+                   const Toolkit::AtlasManager::Mesh2D& second );
 
   /**
    * @brief Check to see if a glyph is being cached
@@ -144,6 +144,15 @@ public:
    * @return The pixel format of the atlas
    */
   Pixel::Format GetPixelFormat( uint32_t atlasId );
+
+  /**
+   * @brief Get the material used by an atlas
+   *
+   * @param[in] atlasId Id of an atlas
+   *
+   * @return The material used by the atlas
+   */
+  Material GetMaterial( uint32_t atlasId ) const;
 
   /**
    * @brief Get Glyph Manager metrics

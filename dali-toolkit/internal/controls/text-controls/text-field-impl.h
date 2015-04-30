@@ -199,7 +199,7 @@ private: // Data
   Text::DecoratorPtr mDecorator;
   Text::ClipperPtr mClipper; ///< For EXCEED_POLICY_CLIP
 
-  RenderableActor mRenderableActor;
+  Actor mRenderableActor;
 
   int mRenderingBackend;
   int mExceedPolicy;

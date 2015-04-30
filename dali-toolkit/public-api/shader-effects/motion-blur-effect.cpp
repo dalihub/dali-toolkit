@@ -80,7 +80,7 @@ MotionBlurEffect::~MotionBlurEffect()
 {
 }
 
-MotionBlurEffect MotionBlurEffect::Apply( RenderableActor renderable )
+MotionBlurEffect MotionBlurEffect::Apply( ImageActor renderable )
 {
   MotionBlurEffect newEffect = New( MOTION_BLUR_NUM_SAMPLES );
   renderable.SetShaderEffect( newEffect );

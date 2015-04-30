@@ -14,7 +14,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/builder/replacement.cpp \
    $(toolkit_src_dir)/controls/alignment/alignment-impl.cpp \
    $(toolkit_src_dir)/controls/bloom-view/bloom-view-impl.cpp \
-   $(toolkit_src_dir)/controls/bubble-effect/bubble-emitter-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/check-box-button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/push-button-impl.cpp \
@@ -36,7 +35,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/scroll-bar/scroll-bar-impl.cpp \
    $(toolkit_src_dir)/controls/scroll-component/scroll-bar-internal-impl.cpp \
    $(toolkit_src_dir)/controls/scroll-component/scroll-bar-internal.cpp \
-   $(toolkit_src_dir)/controls/scrollable/bouncing-effect-actor.cpp \
    $(toolkit_src_dir)/controls/scrollable/item-view/item-view-impl.cpp \
    $(toolkit_src_dir)/controls/scrollable/scrollable-impl.cpp \
    $(toolkit_src_dir)/controls/scrollable/scroll-connector-impl.cpp \
@@ -94,7 +92,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager-impl.cpp \
    $(toolkit_src_dir)/text/rendering/basic/text-basic-renderer.cpp \
    $(toolkit_src_dir)/text/rendering/shaders/text-basic-shader.cpp \
-   $(toolkit_src_dir)/text/rendering/shaders/text-basic-shadow-shader.cpp \
    $(toolkit_src_dir)/text/rendering/shaders/text-bgra-shader.cpp \
    $(toolkit_src_dir)/text/rendering/text-backend-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-effect-impl.cpp \

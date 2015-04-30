@@ -94,7 +94,7 @@ MotionStretchEffect::~MotionStretchEffect()
 {
 }
 
-MotionStretchEffect MotionStretchEffect::Apply( RenderableActor renderable )
+MotionStretchEffect MotionStretchEffect::Apply( ImageActor renderable )
 {
   MotionStretchEffect newEffect = New();
   renderable.SetShaderEffect( newEffect );

@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/renderable-actor.h>
+#include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
 
@@ -54,7 +54,7 @@ public:
    * @param[in] view The interface to a view.
    * @return The Renderable actor used to position the text.
    */
-  virtual RenderableActor Render( ViewInterface& view ) = 0;
+  virtual Actor Render( ViewInterface& view ) = 0;
 
 protected:
 

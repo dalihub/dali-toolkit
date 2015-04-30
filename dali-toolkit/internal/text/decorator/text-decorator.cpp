@@ -24,7 +24,6 @@
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/stage.h>
@@ -32,8 +31,6 @@
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pan-gesture-detector.h>
-#include <dali/public-api/geometry/mesh.h>
-#include <dali/public-api/geometry/mesh-data.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
@@ -170,7 +167,7 @@ struct Decorator::Impl : public ConnectionTracker
   struct CursorImpl
   {
     CursorImpl()
-    : color( Dali::Color::WHITE ),
+    : color( Dali::Color::BLACK ),
       position(),
       cursorHeight( 0.0f ),
       lineHeight( 0.0f )
@@ -237,6 +234,7 @@ struct Decorator::Impl : public ConnectionTracker
     // TODO - Remove this if nothing is active
     CreateActiveLayer();
 
+    /*
     // Show or hide the cursors
     CreateCursors();
     if( mPrimaryCursor )
@@ -276,7 +274,7 @@ struct Decorator::Impl : public ConnectionTracker
       }
       mSecondaryCursor.SetVisible( mSecondaryCursorVisible );
     }
-
+    */
     // Show or hide the grab handle
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
     if( grabHandle.active )
@@ -335,7 +333,7 @@ struct Decorator::Impl : public ConnectionTracker
     {
       UnparentAndReset( primary.actor );
       UnparentAndReset( secondary.actor );
-      UnparentAndReset( mHighlightMeshActor );
+      //UnparentAndReset( mHighlightMeshActor );
     }
 
     if ( mActiveCopyPastePopup )
@@ -398,6 +396,7 @@ struct Decorator::Impl : public ConnectionTracker
   // Add or Remove cursor(s) from parent
   void CreateCursors()
   {
+    /*
     if( mActiveCursor == ACTIVE_CURSOR_NONE )
     {
       UnparentAndReset( mPrimaryCursor );
@@ -405,7 +404,7 @@ struct Decorator::Impl : public ConnectionTracker
     }
     else
     {
-      /* Create Primary and or Secondary Cursor(s) if active and add to parent */
+      // Create Primary and or Secondary Cursor(s) if active and add to parent
       if ( mActiveCursor == ACTIVE_CURSOR_PRIMARY ||
            mActiveCursor == ACTIVE_CURSOR_BOTH )
       {
@@ -435,10 +434,12 @@ struct Decorator::Impl : public ConnectionTracker
         UnparentAndReset( mSecondaryCursor );
       }
     }
+    */
   }
 
   bool OnCursorBlinkTimerTick()
   {
+    /*
     // Cursor blinking
     if ( mPrimaryCursor )
     {
@@ -450,7 +451,7 @@ struct Decorator::Impl : public ConnectionTracker
     }
 
     mCursorBlinkStatus = !mCursorBlinkStatus;
-
+    */
     return true;
   }
 
@@ -606,6 +607,7 @@ struct Decorator::Impl : public ConnectionTracker
 
   void CreateHighlight()
   {
+    /*
     if ( !mHighlightMeshActor )
     {
       mHighlightMaterial = Material::New( "HighlightMaterial" );
@@ -626,6 +628,7 @@ struct Decorator::Impl : public ConnectionTracker
       Actor parent = mTextControlParent.Self();
       parent.Add( mHighlightMeshActor );
     }
+    */
   }
 
   void UpdateHighlight()
@@ -655,6 +658,7 @@ struct Decorator::Impl : public ConnectionTracker
     //  9*    *7
     //
 
+    /*
     if ( mHighlightMesh && mHighlightMaterial && !mHighlightQuadList.empty() )
     {
       MeshData::VertexContainer vertices;
@@ -718,6 +722,7 @@ struct Decorator::Impl : public ConnectionTracker
       mHighlightMeshData.SetData( vertices, faceIndices, bones, mHighlightMaterial );
       mHighlightMesh.UpdateMeshData( mHighlightMeshData );
     }
+    */
   }
 
   void OnTap( Actor actor, const TapGesture& tap )
@@ -822,12 +827,13 @@ struct Decorator::Impl : public ConnectionTracker
   {
     float alternativePosition=0.0f;;
 
+    /*
     if ( mPrimaryCursor ) // Secondary cursor not used for paste
     {
       Cursor cursor = PRIMARY_CURSOR;
       alternativePosition = mCursor[cursor].position.y;
     }
-
+    */
     const float popupHeight = 120.0f; // todo Set as a MaxSize Property in Control or retrieve from CopyPastePopup class.
 
     if( mHandle[GRAB_HANDLE].active )
@@ -986,16 +992,16 @@ struct Decorator::Impl : public ConnectionTracker
   Timer               mScrollTimer;               ///< Timer used to scroll the text when the grab handle is moved close to the edges.
 
   Layer               mActiveLayer;               ///< Layer for active handles and alike that ensures they are above all else.
-  ImageActor          mPrimaryCursor;
-  ImageActor          mSecondaryCursor;
-  MeshActor           mHighlightMeshActor;        ///< Mesh Actor to display highlight
+  //ImageActor          mPrimaryCursor;
+  //ImageActor          mSecondaryCursor;
+  //MeshActor           mHighlightMeshActor;        ///< Mesh Actor to display highlight
   TextSelectionPopup  mCopyPastePopup;
 
   Image               mHandleImages[HANDLE_TYPE_COUNT][HANDLE_IMAGE_TYPE_COUNT];
   Image               mCursorImage;
-  Mesh                mHighlightMesh;             ///< Mesh for highlight
-  MeshData            mHighlightMeshData;         ///< Mesh Data for highlight
-  Material            mHighlightMaterial;         ///< Material used for highlight
+  //Mesh                mHighlightMesh;             ///< Mesh for highlight
+  //MeshData            mHighlightMeshData;         ///< Mesh Data for highlight
+  //Material            mHighlightMaterial;         ///< Material used for highlight
 
   CursorImpl          mCursor[CURSOR_COUNT];
   HandleImpl          mHandle[HANDLE_TYPE_COUNT];
