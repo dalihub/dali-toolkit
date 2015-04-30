@@ -67,6 +67,7 @@ public:
     BufferImage mFilledPixelImage;                                      // Image used by atlas for operations such as underline
     PixelBuffer* mStripBuffer;                                          // Blank image buffer used to pad upload
     Material mMaterial;                                                 // material used for atlas texture
+    Sampler mSampler;                                                   // sampler used for atlas texture
     SizeType mNextFreeBlock;                                            // next free block will be placed here ( actually +1 )
     Dali::Vector< SizeType > mFreeBlocksList;                           // unless there are any previously freed blocks
   };
@@ -182,6 +183,11 @@ public:
    * @copydoc Toolkit::AtlasManager::GetMaterial
    */
   Material GetMaterial( AtlasId atlas ) const;
+
+/**
+   * @copydoc Toolkit::AtlasManager::GetSampler
+   */
+  Sampler GetSampler( AtlasId atlas ) const;
 
 private:
 

@@ -123,10 +123,16 @@ Material AtlasGlyphManager::GetMaterial( uint32_t atlasId ) const
   return GetImplementation(*this).GetMaterial( atlasId );
 }
 
+Sampler AtlasGlyphManager::GetSampler( uint32_t atlasId ) const
+{
+  return GetImplementation(*this).GetSampler( atlasId );
+}
+
 const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
 {
   return GetImplementation(*this).GetMetrics();
 }
+
 
 } // namespace Toolkit
 

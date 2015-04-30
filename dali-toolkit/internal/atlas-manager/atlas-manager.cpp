@@ -136,6 +136,11 @@ Material AtlasManager::GetMaterial( AtlasId atlas ) const
   return GetImplementation(*this).GetMaterial( atlas );
 }
 
+Sampler AtlasManager::GetSampler( AtlasId atlas ) const
+{
+  return GetImplementation(*this).GetSampler( atlas );
+}
+
 } // namespace Toolkit
 
 } // namespace Dali

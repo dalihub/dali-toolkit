@@ -118,6 +118,11 @@ public:
   Material GetMaterial( uint32_t atlasId ) const;
 
   /**
+   * @copydoc Toolkit::AtlasGlyphManager::GetMaterial
+   */
+  Sampler GetSampler( uint32_t atlasId ) const;
+
+  /**
    * @copydoc Toolkit::AtlasGlyphManager::GetMetrics
    */
   const Toolkit::AtlasGlyphManager::Metrics& GetMetrics();

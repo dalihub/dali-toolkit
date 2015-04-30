@@ -149,6 +149,11 @@ Material AtlasGlyphManager::GetMaterial( uint32_t atlasId ) const
   return mAtlasManager.GetMaterial( atlasId );
 }
 
+Sampler AtlasGlyphManager::GetSampler( uint32_t atlasId ) const
+{
+  return mAtlasManager.GetSampler( atlasId );
+}
+
 const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
 {
   mMetrics.mGlyphCount = mGlyphRecords.Size();

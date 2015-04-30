@@ -361,9 +361,9 @@ struct AtlasRenderer::Impl : public ConnectionTracker
   Actor CreateMeshActor( const MeshRecord& meshRecord )
   {
     PropertyBuffer quadVertices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadVertexFormat, meshRecord.mMesh.mVertices.Size() );
-    PropertyBuffer quadIndices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadIndexFormat, meshRecord.mMesh.mIndices.Size() >> 1 );
+    PropertyBuffer quadIndices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadIndexFormat, meshRecord.mMesh.mIndices.Size() );
     quadVertices.SetData( const_cast< AtlasManager::Vertex2D* >( &meshRecord.mMesh.mVertices[ 0 ] ) );
-    quadIndices.SetData( const_cast< unsigned short* >( &meshRecord.mMesh.mIndices[ 0 ] ) );
+    quadIndices.SetData( const_cast< unsigned int* >( &meshRecord.mMesh.mIndices[ 0 ] ) );
 
     Geometry quadGeometry = Geometry::New();
     quadGeometry.AddVertexBuffer( quadVertices );
@@ -639,9 +639,9 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     meshRecord.mBuffer = FrameBufferImage::New( width, height );
 
     // We will render a quad into this buffer
-    unsigned short indices[ 6 ] = { 1, 0, 2, 2, 3, 1 };
+    unsigned int indices[ 6 ] = { 1, 0, 2, 2, 3, 1 };
     PropertyBuffer quadVertices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadVertexFormat, 4u );
-    PropertyBuffer quadIndices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadIndexFormat, 3u );
+    PropertyBuffer quadIndices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadIndexFormat, sizeof(indices)/sizeof(indices[0]) );
 
     AtlasManager::Vertex2D vertices[ 4 ] = {
     { Vector2( tlx + shadowOffset.x, tly + shadowOffset.y ), Vector2( ZERO, ZERO ) },
@@ -661,14 +661,13 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     material.AddSampler( sampler );
 
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
-    renderer.SetDepthIndex( 0.1f );
+    renderer.SetDepthIndex( 1.0f );
     Actor actor = Actor::New();
     actor.AddRenderer( renderer );
     actor.SetSize( 1.0f, 1.0f );
 
     // Create a sub actor to render the source with normalized vertex positions
     Vector< AtlasManager::Vertex2D > normVertexList;
-    Vector< unsigned short > normIndexList;
     for ( uint32_t i = 0; i < verts.Size(); ++i )
     {
       AtlasManager::Vertex2D vertex = verts[ i ];
@@ -677,26 +676,18 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       normVertexList.PushBack( vertex );
     }
 
-    // Reverse winding
-    for ( uint32_t i = 0; i < meshRecord.mMesh.mIndices.Size() / 3; ++i )
-    {
-      uint32_t index = i * 3;
-      normIndexList.PushBack( meshRecord.mMesh.mIndices[ index + 2 ] );
-      normIndexList.PushBack( meshRecord.mMesh.mIndices[ index + 1 ] );
-      normIndexList.PushBack( meshRecord.mMesh.mIndices[ index ] );
-    }
-
     PropertyBuffer normVertices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadVertexFormat, normVertexList.Size() );
-    PropertyBuffer normIndices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadIndexFormat, normIndexList.Size() >> 1 );
+    PropertyBuffer normIndices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadIndexFormat, meshRecord.mMesh.mIndices.Size() );
     normVertices.SetData( const_cast< AtlasManager::Vertex2D* >( &normVertexList[ 0 ] ) );
-    normIndices.SetData( const_cast< unsigned short* >( &normIndexList[ 0 ] ) );
+    normIndices.SetData( const_cast< unsigned int* >( &meshRecord.mMesh.mIndices[ 0 ] ) );
 
     Geometry normGeometry = Geometry::New();
     normGeometry.AddVertexBuffer( normVertices );
     normGeometry.SetIndexBuffer( normIndices );
 
-    Material normMaterial = mGlyphManager.GetMaterial( meshRecord.mAtlasId );
-    normMaterial.SetShader( mShadowShader );
+    Material normMaterial = Material::New( mShadowShader );
+    Sampler normSampler =  mGlyphManager.GetSampler( meshRecord.mAtlasId );
+    normMaterial.AddSampler( normSampler );
     Dali::Renderer normRenderer = Dali::Renderer::New( normGeometry, normMaterial );
     Actor subActor = Actor::New();
     subActor.AddRenderer( normRenderer );
@@ -709,12 +700,12 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     task.SetTargetFrameBuffer( meshRecord.mBuffer );
     task.SetSourceActor( subActor );
     task.SetClearEnabled( true );
-    task.SetClearColor( Vector4( 0.0f, 0.0f, 0.0f, 1.0f ) );
-    //task.SetClearColor( Color::BLUE );
+    task.SetClearColor( Vector4::ZERO );
     task.SetExclusive( true );
     task.SetRefreshRate( RenderTask::REFRESH_ONCE );
     task.FinishedSignal().Connect( this, &AtlasRenderer::Impl::RenderComplete );
     actor.Add( subActor );
+
     return actor;
   }
 

@@ -155,6 +155,15 @@ public:
   Material GetMaterial( uint32_t atlasId ) const;
 
   /**
+   * @brief Get the sampler used by an atlas
+   *
+   * @param[in] atlasId Id of an atlas
+   *
+   * @return The sampler used by the atlas
+   */
+  Sampler GetSampler( uint32_t atlasId ) const;
+
+  /**
    * @brief Get Glyph Manager metrics
    *
    * @return const reference to glyph manager metrics
