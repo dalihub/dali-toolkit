@@ -292,10 +292,7 @@ OptionalString Replacement::IsString( const TreeNode& node ) const
       }
       else
       {
-        if( Property::STRING == value.GetType() )
-        {
-          ret = v; // sets the unexpanded. Expansion may occur later in processing with include files
-        }
+        ret = v; // sets the unexpanded. Expansion may occur later in processing with include files
       }
     }
   }

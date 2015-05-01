@@ -12,6 +12,7 @@
  * - \link fundamentals Dali Fundamentals \endlink
  * - \link dali-application Dali Application and Adaptor \endlink
  * - \link hello-world Hello World - explained \endlink
+ * - \link handle-body-idiom Handle – body idiom \endlink
  *
  * \section Actors Actors
  * - \link image-mesh-actor Image and Mesh actors \endlink
@@ -53,8 +54,7 @@
  * - \link script-overview Overview \endlink
  * - \link script-howto How to Add a Custom Control \endlink
  * - \link script-hello Hello World in script \endlink
- *
- * - \link handle-body-idiom Handle – body idiom \endlink
+ * - \link script-json-specification.html JSON Specification\endlink
  *
  * \section Rendering
  * - \link viewing-modes Viewing modes \endlink
