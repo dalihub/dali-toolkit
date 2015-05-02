@@ -455,44 +455,33 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
 
 void Controller::Impl::OnTapEvent( const Event& event )
 {
-  if( NULL == mEventData )
+  if( NULL != mEventData )
   {
-    // Nothing to do if there is no text input.
-    return;
-  }
+    const unsigned int tapCount = event.p1.mUint;
 
-  const unsigned int tapCount = event.p1.mUint;
-
-  if( 1u == tapCount )
-  {
-    // Grab handle is not shown until a tap is received whilst EDITING
-    if( EventData::EDITING == mEventData->mState &&
-        !IsShowingPlaceholderText() )
+    if( 1u == tapCount )
     {
-      if( mEventData->mGrabHandleEnabled )
+      if( ! IsShowingPlaceholderText() )
       {
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
+        const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
+
+        mEventData->mPrimaryCursorPosition = GetClosestCursorIndex( xPosition,
+                                                                    yPosition );
       }
-      mEventData->mDecorator->SetPopupActive( false );
+      else
+      {
+        mEventData->mPrimaryCursorPosition = 0u;
+      }
+
+      mEventData->mUpdateCursorPosition = true;
+      mEventData->mScrollAfterUpdateCursorPosition = true;
     }
-
-    ChangeState( EventData::EDITING );
-
-    const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
-    const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
-
-    mEventData->mPrimaryCursorPosition = GetClosestCursorIndex( xPosition,
-                                                                yPosition );
-
-    mEventData->mUpdateCursorPosition = true;
-    mEventData->mScrollAfterUpdateCursorPosition = true;
-  }
-  else if( mEventData->mSelectionEnabled &&
-           ( 2u == tapCount ) )
-  {
-    ChangeState( EventData::SELECTING );
-
-    RepositionSelectionHandles( event.p2.mFloat, event.p3.mFloat );
+    else if( mEventData->mSelectionEnabled &&
+             ( 2u == tapCount ) )
+    {
+      RepositionSelectionHandles( event.p2.mFloat, event.p3.mFloat );
+    }
   }
 }
 

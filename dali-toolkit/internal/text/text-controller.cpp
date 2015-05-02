@@ -1122,6 +1122,37 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected TapEvent" );
 
+  if( NULL != mImpl->mEventData )
+  {
+    if( 1u == tapCount )
+    {
+      bool tapDuringEditMode( EventData::EDITING == mImpl->mEventData->mState );
+
+      mImpl->ChangeState( EventData::EDITING );
+
+      if( mImpl->IsShowingPlaceholderText() )
+      {
+        // Alternative placeholder-text is used when editing
+        ShowPlaceholderText();
+      }
+      else if( EventData::EDITING == mImpl->mEventData->mState )
+      {
+        // Grab handle is not shown until a tap is received whilst EDITING
+        if( tapDuringEditMode )
+        {
+          mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        }
+        mImpl->mEventData->mDecorator->SetPopupActive( false );
+      }
+    }
+    else if( mImpl->mEventData->mSelectionEnabled &&
+             ( 2u == tapCount ) )
+    {
+      mImpl->ChangeState( EventData::SELECTING );
+    }
+  }
+
+  // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
   if( mImpl->mEventData )
   {
     Event event( Event::TAP_EVENT );
@@ -1213,6 +1244,9 @@ void Controller::ShowPlaceholderText()
     DALI_ASSERT_DEBUG( mImpl->mEventData && "No placeholder text available" );
 
     mImpl->mEventData->mIsShowingPlaceholderText = true;
+
+    // Cancel previously queued inserts etc.
+    mImpl->mModifyEvents.clear();
 
     // Disable handles when showing place-holder text
     mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );

@@ -307,7 +307,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     }
 #if defined(DEBUG_ENABLED)
     Toolkit::AtlasGlyphManager::Metrics metrics = mGlyphManager.GetMetrics();
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "TextAtlasRenderer::GlyphManager::GlyphCount: %i, AtlasCount: %i, TextureMemoryUse: %iK\n",
+    DALI_LOG_INFO( gLogFilter, Debug::General, "TextAtlasRenderer::GlyphManager::GlyphCount: %i, AtlasCount: %i, TextureMemoryUse: %iK\n",
                                                 metrics.mGlyphCount,
                                                 metrics.mAtlasMetrics.mAtlasCount,
                                                 metrics.mAtlasMetrics.mTextureMemoryUsed / 1024 );
