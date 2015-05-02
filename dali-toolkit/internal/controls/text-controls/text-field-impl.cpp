@@ -987,7 +987,7 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
 
 ImfManager::ImfCallbackData TextField::OnImfEvent( Dali::ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnImfEvent %p eventName %d\n", imfEvent.eventName );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnImfEvent %p eventName %d\n", mController.Get(), imfEvent.eventName );
 
   bool update( false );
 
@@ -1080,7 +1080,7 @@ void TextField::EnableClipping( bool clipping, const Vector2& size )
 
 void TextField::KeyboardStatusChanged(bool keyboardShown)
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::KeyboardStatusChanged %p keyboardShown %d\n", keyboardShown );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::KeyboardStatusChanged %p keyboardShown %d\n", mController.Get(), keyboardShown );
 
   // Just hide the grab handle when keyboard is hidden.
   if (!keyboardShown )
