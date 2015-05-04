@@ -661,7 +661,21 @@ void PushButton::ConfigureSizeNegotiation()
 
   if( label )
   {
-    label.SetPadding( Padding( TEXT_PADDING, TEXT_PADDING, TEXT_PADDING, TEXT_PADDING) );
+    Padding padding;
+
+    if( label.GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::USE_NATURAL_SIZE )
+    {
+      padding.left = TEXT_PADDING;
+      padding.right = TEXT_PADDING;
+    }
+
+    if( label.GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::USE_NATURAL_SIZE )
+    {
+      padding.top = TEXT_PADDING;
+      padding.bottom = TEXT_PADDING;
+    }
+
+    label.SetPadding( padding );
   }
 }
 
