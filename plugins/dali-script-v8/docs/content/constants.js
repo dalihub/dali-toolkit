@@ -1,6 +1,6 @@
 /**
  *
-<h3> Dali Constants </h3>
+### Dali Constants
 
 Constants accessible under the dali global object.
   
@@ -148,7 +148,6 @@ Constants accessible under the dali global object.
 | PIXEL_FORMAT_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC            | integer value  |
 | PIXEL_FORMAT_COMPRESSED_RGB8_ETC1                        | integer value  |
 | PIXEL_FORMAT_COMPRESSED_RGB_PVRTC_4BPPV1                 | integer value  |
-</table>
 
  * @class Constants
  */

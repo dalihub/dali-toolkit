@@ -22,7 +22,8 @@ dali.stage.add( imageActor );
 dali.stage.remove( imageActor );
 ```
 
-<img src="../assets/img/stage.png"/>
+![ ](../assets/img/stage.png)
+
 
 ### Key Events
 

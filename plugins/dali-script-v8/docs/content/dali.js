@@ -25,8 +25,7 @@ the OpenGL API from developers and provides a clean cross-platform JavaScript fr
 + Runs all animations in a seperate thread. This helps maintain 60 FPS even if JavaScript is performing a long operation ( e.g. Garbage Collection ).
 + Provides keyboard / touch / mouse handling
   
-  
-<img src="../assets/img/shared/screenshot.png">
+![Screen shots](../assets/img/screen-shot.png)
 
 ## Running JavaScript from DALi C++ API
 ```
@@ -52,7 +51,7 @@ The following example shows how to connect a new actor to the stage:
 The Stage has a 2D size, which matches the size of the application window.  The default coordinate system in DALi has the origin at the top-left corner, with positive X to right, and position Y going
 downwards.  This is intended to be convenient when laying-out 2D views.
 
-<img src="../assets/img/shared/coordinate-system-and-stage.png">
+![Screen shots](../assets/img/coordinate-system-and-stage.png)
 
 
  * @module DALi
