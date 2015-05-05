@@ -245,7 +245,7 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
   Vector<Character>& utf32Characters = mLogicalModel->mText;
 
-  const Length numberOfCharacters = mLogicalModel->GetNumberOfCharacters();
+  const Length numberOfCharacters = utf32Characters.Count();
 
   Vector<LineBreakInfo>& lineBreakInfo = mLogicalModel->mLineBreakInfo;
   if( GET_LINE_BREAKS & operations )

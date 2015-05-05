@@ -128,12 +128,7 @@ void Controller::GetText( std::string& text ) const
 
     if( 0u != utf32Characters.Count() )
     {
-      uint32_t numberOfBytes = GetNumberOfUtf8Bytes( &utf32Characters[0], utf32Characters.Count() );
-
-      text.resize( numberOfBytes );
-
-      // This is a bit horrible but std::string returns a (signed) char*
-      Utf32ToUtf8( &utf32Characters[0], utf32Characters.Count(), reinterpret_cast<uint8_t*>(&text[0]) );
+      Utf32ToUtf8( &utf32Characters[0], utf32Characters.Count(), text );
     }
   }
   else
@@ -464,6 +459,8 @@ Vector3 Controller::GetNaturalSize()
 
   if( mImpl->mRecalculateNaturalSize )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::GetNaturalSize\n" );
+
     // Operations that can be done only once until the text changes.
     const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |
                                                                            GET_SCRIPTS       |
@@ -497,10 +494,14 @@ Vector3 Controller::GetNaturalSize()
     mImpl->mVisualModel->SetNaturalSize( naturalSize.GetVectorXY() );
 
     mImpl->mRecalculateNaturalSize = false;
+
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetNaturalSize calculated %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z );
   }
   else
   {
     naturalSize = mImpl->mVisualModel->GetNaturalSize();
+
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::GetNaturalSize cached %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z );
   }
 
   return naturalSize;
@@ -552,7 +553,7 @@ float Controller::GetHeightForWidth( float width )
 
 bool Controller::Relayout( const Size& size )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::Relayout %p --> size %f,%f\n", this, size.width, size.height );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f\n", this, size.width, size.height );
 
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
@@ -563,7 +564,7 @@ bool Controller::Relayout( const Size& size )
       glyphsRemoved = true;
     }
     // Not worth to relayout if width or height is equal to zero.
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::Relayout <-- (skipped)\n" );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout (skipped)\n" );
     return glyphsRemoved;
   }
 
@@ -602,7 +603,7 @@ bool Controller::Relayout( const Size& size )
     updated = mImpl->ProcessInputEvents() || updated;
   }
 
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::Relayout <--\n" );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout\n" );
   return updated;
 }
 
