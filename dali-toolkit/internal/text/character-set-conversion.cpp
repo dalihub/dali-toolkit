@@ -24,6 +24,9 @@ namespace Dali
 namespace Toolkit
 {
 
+namespace Text
+{
+
 namespace
 {
   const static uint8_t U1 = 1u;
@@ -221,6 +224,8 @@ void Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, std:
   // This is a bit horrible but std::string returns a (signed) char*
   Utf32ToUtf8( utf32, numberOfCharacters, reinterpret_cast<uint8_t*>(&utf8[0]) );
 }
+
+} // namespace Text
 
 } // namespace Toolkit
 
