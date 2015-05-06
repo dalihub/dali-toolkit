@@ -229,7 +229,7 @@ void LoadAtlasImages()
 
 ## Atlas creation tips
 
-- Compress the atlas  - \link Texture_Compression Compressing Textures \endlink
+- Compress the atlas  - \link texturecompression Compressing Textures \endlink
 - Avoid adding large images to the Atlas.
 - E.g. don't add background images to it. Medium to large images should be kept seperate.
   

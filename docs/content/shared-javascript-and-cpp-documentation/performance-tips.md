@@ -1,7 +1,7 @@
 /**
  *
 
-# Performance Tips  {#performancetips}
+# Performance Tips {#performancetips}
 
 ## High CPU occupancy
 
@@ -14,14 +14,21 @@
 
   - Reduce visible actor count ( == less draw calls)
   - For 2D UI graphics which require no z sorting you can use
-~~~{.cpp}
-  // In this mode depth testing is turned off and order is determined by the hierachy (depth-first search order).
-  // Not always recommended if there is going to be a lot of overdraw ( if lots of actors are on top of each other)
 
-  Actor::SetDrawMode( DrawMode::OVERLAY ); // C++
-~~~~
+~~~{.cpp}
+// C++
+// In this mode depth testing is turned off and order is determined by the hierachy (depth-first search order).
+// Not always recommended if there is going to be a lot of overdraw ( if lots of actors are on top of each other)
+
+Actor::SetDrawMode( DrawMode::OVERLAY ); // C++
+~~~
+
 ~~~{.js}
-  actor.drawMode = dali.DRAW_MODE_OVERLAY; // JavaScript
+// JavaScript
+// In this mode depth testing is turned off and order is determined by the hierachy (depth-first search order).
+// Not always recommended if there is going to be a lot of overdraw ( if lots of actors are on top of each other)
+
+actor.drawMode = dali.DRAW_MODE_OVERLAY;
 ~~~
   - Use TextureAtlases ( reduces state changes in the GPU)
   - Use compressed textures
@@ -33,6 +40,7 @@
 
 
 @class _Guide_Performance_Tips
+
 */
 
 

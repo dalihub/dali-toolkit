@@ -109,5 +109,5 @@ to get access to the Dali object.
 Each wrapped object registers with Dali garbage collector so they can be deleted
 when Dali shuts down
 
-@class _Guide_JavaScript_Wrapping`
+@class _Guide_JavaScript_Wrapping
 */

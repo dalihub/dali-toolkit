@@ -143,14 +143,28 @@ where the first and last positions are braces.
 The template section supports the creation of actor instances. The
 template name can be used in code to create an actor tree.
 
+~~~{.js}
+// JavaScript
+
+var builder = new dali.Builder();
+builder.loadFromFile( "my-app.json");
+var userActorTree = builder.create( { template:"basic-text"} );
 ~~~
+
+~~~{.cpp}
+// C++
+
+Builder builder = Builder::New();
+std::string jsonData = loadFile("my-app.json");
+builder.LoadFromString( jsonData );
+
 actorTree = builder.Create("basic-text");
 ~~~
 
 Templates consist of a name, multiple property-value configurations and
 an optional actor sub hierarchy.
 
-~~~
+~~~{.json}
    {                                    //
    "templates":                         //  Template library section
    {                                    //
@@ -189,15 +203,26 @@ styles to apply when creating using the template.
 The styles section supports a named set of properties that can be
 applied to an actor or actor tree.
 
-~~~
+~~~{.cpp}
+// C++
+
 Builder.ApplyStyle("light-theme", myActor);
 ~~~
 
+~~~{.js}
+// JavaScript
+
+builder.applyStyle("light-theme", myActor);
+~~~
+
+
 The styles can also be applied as an animation.
 
-~~~
+~~~{.cpp}
 Builder.AnimateTo("light-theme", myActor, TimePeriod(0, 10));
 ~~~
+
+
 
 ~~~
    {                                   //
@@ -285,7 +310,7 @@ instead of a single final value.
 Paths are defined in a top level path section and referenced by the
 animation property.
 
-~~~~
+~~~
     {                                    //
     "paths":                             // Path library
      {                                   //
@@ -329,7 +354,7 @@ animation property.
                                          // animation.
     },                                   //
     }                                    //
-~~~~
+~~~
 
 ## Shaders {#shaders}
 
@@ -345,7 +370,7 @@ instance.
 Similarly one named shader instance can be set to several actors and can
 be animated by one animation.
 
-~~~~
+~~~
     {                                             //
     "shader-effects":                             // Shader Effect section
     {                                             //
@@ -375,7 +400,7 @@ be animated by one animation.
      ...
     }]
     }
-~~~~
+~~~
 
 At least one of the vertex or fragment fields is mandatory. All
 other fields are optional will use internal defaults.
@@ -395,7 +420,7 @@ The actor property names and shader uniform names must not clash for the
 uniform to animate correctly. The convention in DALi is to prepend
 uniforms with 'u'.
 
-~~~~
+~~~
     {                                    \\
     "animations":                        \\ Animation library
     {                                    \\
@@ -431,7 +456,7 @@ uniforms with 'u'.
      }
      ]
     },
-~~~~
+~~~
 
 ## Stage {#stage}
 
@@ -441,11 +466,18 @@ the JSON is loaded.
 The stage is a tree of actors that can be added to Dali's stage object.
 
 ~~~
+// C++
 builder = Dali.Builder();
 json_text = load("layout.json");
 builder.Load(json\_text);
 stage = Dali.Stage.GetCurrent();
 builder.AddActors( stage.GetRootLayer()); // Add actors to the stage root layer
+~~~
+
+~~~{.js}
+// JavaScript
+
+builder.addActors( dali.stage.getRootLayer() );
 ~~~
 
 ~~~
@@ -480,5 +512,5 @@ UI Control Specification".
 Please refer to the above document for further information about specific
 controls.
 
-@class ScriptJsonSpecification
+@class _Guide_JSON_Specification
 */

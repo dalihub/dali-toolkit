@@ -32,7 +32,7 @@ the OpenGL API from developers and provides a clean cross-platform C++ & JavaScr
 - \link handle-body-idiom Handle – body idiom \endlink
 
 ## Actors
- - \link image-mesh-actor Image, Text and Mesh actors \endlink
+ - \link image-mesh-actor Image and Mesh actors \endlink
  - \link event-system Event Handling \endlink
  - \link custom-actor Custom Actor \endlink
 
@@ -52,6 +52,7 @@ the OpenGL API from developers and provides a clean cross-platform C++ & JavaScr
  - \link size-negotiation Size Negotiation \endlink
 
  ## UI Controls
+ - \link text-label Text Label\endlink
  - \link scroll-view Scroll View \endlink
  - \link size-negotiation-controls Size Negotiation for Controls \endlink
  - \link type-registration Type Registration \endlink
@@ -66,28 +67,28 @@ the OpenGL API from developers and provides a clean cross-platform C++ & JavaScr
  - \link dynamics-collisions Collision Detection and Filtering\endlink
 
  ## Scripting
- - \link scriptoverview.html JSON and JavaScript Overview \endlink
- - \link javascriptwrapping.html JavaScript Wrapping Guide for DALi developers\endlink
- - \link script-hello Hello World in script \endlink
+ - \link scriptoverview JSON and JavaScript Overview \endlink
  - \link script-json-specification JSON Specification\endlink
+ - \link script-hello Hello World in script \endlink
+ - \link javascriptwrapping JavaScript Wrapping Guide for DALi developers\endlink
 
  ## Rendering
  - \link viewing-modes Viewing modes \endlink
 
  ## Profiling
- - \link performanceprofiling.html Performance Profiling \endlink
- - \link resourcetracking.html Resource Tracking \endlink
+ - \link performanceprofiling Performance Profiling \endlink
+ - \link resourcetracking Resource Tracking \endlink
 
  ## Performance
- - \link performancetips.html Performance Tips \endlink
- - \link textureatlases.html Texture Atlases  \endlink
- - \link texturecompression.html Compressing Textures \endlink
+ - \link performancetips Performance Tips \endlink
+ - \link textureatlases Texture Atlases  \endlink
+ - \link texturecompression Compressing Textures \endlink
 
 ## Testing
  See [Automated Tests](@ref auto_testing) for instructions.
 
 
 ## Modifying this documentation
-- \link documentationguide.html Modifying this documentation \endlink
+- \link documentationguide Modifying this documentation \endlink
 
 
