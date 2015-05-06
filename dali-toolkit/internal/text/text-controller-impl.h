@@ -42,8 +42,6 @@ struct Event
   // Used to queue input events until DoRelayout()
   enum Type
   {
-    KEYBOARD_FOCUS_GAIN_EVENT,
-    KEYBOARD_FOCUS_LOST_EVENT,
     CURSOR_KEY_EVENT,
     TAP_EVENT,
     PAN_EVENT,
@@ -295,8 +293,6 @@ struct Controller::Impl
    * @param[in] numberOfCharacters The number of characters in the logical model.
    */
   void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters );
-
-  void OnKeyboardFocus( bool hasFocus );
 
   void OnCursorKeyEvent( const Event& event );
 

@@ -946,8 +946,13 @@ void Controller::KeyboardFocusGainEvent()
 
   if( mImpl->mEventData )
   {
-    Event event( Event::KEYBOARD_FOCUS_GAIN_EVENT );
-    mImpl->mEventData->mEventQueue.push_back( event );
+    mImpl->ChangeState( EventData::EDITING );
+
+    if( mImpl->IsShowingPlaceholderText() )
+    {
+      // Show alternative placeholder-text when editing
+      ShowPlaceholderText();
+    }
 
     mImpl->RequestRelayout();
   }
@@ -959,8 +964,13 @@ void Controller::KeyboardFocusLostEvent()
 
   if( mImpl->mEventData )
   {
-    Event event( Event::KEYBOARD_FOCUS_LOST_EVENT );
-    mImpl->mEventData->mEventQueue.push_back( event );
+    mImpl->ChangeState( EventData::INACTIVE );
+
+    if( mImpl->IsShowingPlaceholderText() )
+    {
+      // Revert to regular placeholder-text when not editing
+      ShowPlaceholderText();
+    }
 
     mImpl->RequestRelayout();
   }
@@ -1135,14 +1145,8 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
     {
       bool tapDuringEditMode( EventData::EDITING == mImpl->mEventData->mState );
 
-      mImpl->ChangeState( EventData::EDITING );
-
-      if( mImpl->IsShowingPlaceholderText() )
-      {
-        // Alternative placeholder-text is used when editing
-        ShowPlaceholderText();
-      }
-      else if( EventData::EDITING == mImpl->mEventData->mState )
+      if( ! mImpl->IsShowingPlaceholderText() &&
+          EventData::EDITING == mImpl->mEventData->mState )
       {
         // Grab handle is not shown until a tap is received whilst EDITING
         if( tapDuringEditMode )
@@ -1151,6 +1155,8 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
         }
         mImpl->mEventData->mDecorator->SetPopupActive( false );
       }
+
+      mImpl->ChangeState( EventData::EDITING );
     }
     else if( mImpl->mEventData->mSelectionEnabled &&
              ( 2u == tapCount ) )

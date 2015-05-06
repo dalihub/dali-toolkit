@@ -151,8 +151,6 @@ bool Controller::Impl::ProcessInputEvents()
     return false;
   }
 
-  mEventData->mDecoratorUpdated = false;
-
   if( mEventData->mDecorator )
   {
     for( std::vector<Event>::iterator iter = mEventData->mEventQueue.begin();
@@ -161,16 +159,6 @@ bool Controller::Impl::ProcessInputEvents()
     {
       switch( iter->type )
       {
-      case Event::KEYBOARD_FOCUS_GAIN_EVENT:
-      {
-        OnKeyboardFocus( true );
-        break;
-      }
-      case Event::KEYBOARD_FOCUS_LOST_EVENT:
-      {
-        OnKeyboardFocus( false );
-        break;
-      }
       case Event::CURSOR_KEY_EVENT:
       {
         OnCursorKeyEvent( *iter );
@@ -243,7 +231,10 @@ bool Controller::Impl::ProcessInputEvents()
   mEventData->mEventQueue.clear();
 
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::ProcessInputEvents\n" );
-  return mEventData->mDecoratorUpdated;
+
+  bool decoratorUpdated = mEventData->mDecoratorUpdated;
+  mEventData->mDecoratorUpdated = false;
+  return decoratorUpdated;
 }
 
 void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
@@ -403,24 +394,6 @@ void Controller::Impl::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfC
     fontRun.isDefault = true;
 
     fonts.PushBack( fontRun );
-  }
-}
-
-void Controller::Impl::OnKeyboardFocus( bool hasFocus )
-{
-  if( NULL == mEventData )
-  {
-    // Nothing to do if there is no text input.
-    return;
-  }
-
-  if( !hasFocus )
-  {
-    ChangeState( EventData::INACTIVE );
-  }
-  else
-  {
-    ChangeState( EventData::EDITING );
   }
 }
 
