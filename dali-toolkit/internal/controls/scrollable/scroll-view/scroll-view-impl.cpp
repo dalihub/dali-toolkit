@@ -214,13 +214,14 @@ DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-pre-position
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "overshoot-x",           FLOAT,   OVERSHOOT_X           )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "overshoot-y",           FLOAT,   OVERSHOOT_Y           )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-final",          VECTOR3, SCROLL_FINAL          )
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, ScrollView, "scroll-final-x", SCROLL_FINAL_X, SCROLL_FINAL,0)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, ScrollView, "scroll-final-y", SCROLL_FINAL_Y, SCROLL_FINAL,1)
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "wrap",                  BOOLEAN, WRAP                  )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "panning",               BOOLEAN, PANNING               )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrolling",             BOOLEAN, SCROLLING             )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-domain-offset",  VECTOR3, SCROLL_DOMAIN_OFFSET  )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-position-delta", VECTOR3, SCROLL_POSITION_DELTA )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "start-page-position",   VECTOR3, START_PAGE_POSITION   )
-
 DALI_SIGNAL_REGISTRATION( Toolkit, ScrollView, "value-changed", SIGNAL_SNAP_STARTED )
 
 DALI_TYPE_REGISTRATION_END()

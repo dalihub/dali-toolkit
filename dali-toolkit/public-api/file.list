@@ -33,9 +33,7 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-cube-effect.cpp \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-depth-effect.cpp \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-effect.cpp \
-  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-page-carousel-effect.cpp \
-  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-page-cube-effect.cpp \
-  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-page-spiral-effect.cpp \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-page-path-effect.cpp \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect.cpp \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view.cpp \
   $(public_api_src_dir)/controls/scrollable/scroll-connector.cpp \
@@ -176,9 +174,7 @@ public_api_scroll_view_header_files = \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-cube-effect.h \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-depth-effect.h \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-effect.h \
-  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-page-carousel-effect.h \
-  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-page-cube-effect.h \
-  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-page-spiral-effect.h \
+  $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-page-path-effect.h \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect.h \
   $(public_api_src_dir)/controls/scrollable/scroll-view/scroll-view.h
 

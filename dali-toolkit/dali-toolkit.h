@@ -59,9 +59,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-cube-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-depth-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-carousel-effect.h>
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-cube-effect.h>
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-spiral-effect.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-path-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-wobble-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
