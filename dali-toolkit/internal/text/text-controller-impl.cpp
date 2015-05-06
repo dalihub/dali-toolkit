@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/key.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
@@ -34,6 +35,10 @@
 
 namespace
 {
+
+#if defined(DEBUG_ENABLED)
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
+#endif
 
 /**
  * @brief Some characters can be shaped in more than one glyph.
@@ -138,9 +143,11 @@ EventData::~EventData()
 
 bool Controller::Impl::ProcessInputEvents()
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::ProcessInputEvents\n" );
   if( NULL == mEventData )
   {
     // Nothing to do if there is no text input.
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::ProcessInputEvents no event data\n" );
     return false;
   }
 
@@ -235,6 +242,7 @@ bool Controller::Impl::ProcessInputEvents()
 
   mEventData->mEventQueue.clear();
 
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::ProcessInputEvents\n" );
   return mEventData->mDecoratorUpdated;
 }
 
@@ -1052,9 +1060,11 @@ CharacterIndex Controller::Impl::CalculateNewCursorIndex( CharacterIndex index )
 
 void Controller::Impl::UpdateCursorPosition()
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::UpdateCursorPosition %p\n", this );
   if( NULL == mEventData )
   {
     // Nothing to do if there is no text input.
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::UpdateCursorPosition no event data\n" );
     return;
   }
 
@@ -1071,6 +1081,7 @@ void Controller::Impl::UpdateCursorPosition()
                                        cursorPosition.y,
                                        cursorInfo.primaryCursorHeight,
                                        cursorInfo.lineHeight );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Primary cursor position: %f,%f\n", cursorPosition.x, cursorPosition.y );
 
   // Sets the grab handle position.
   mEventData->mDecorator->SetPosition( GRAB_HANDLE,
@@ -1086,11 +1097,13 @@ void Controller::Impl::UpdateCursorPosition()
                                          cursorInfo.secondaryPosition.y + offset.y,
                                          cursorInfo.secondaryCursorHeight,
                                          cursorInfo.lineHeight );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Secondary cursor position: %f,%f\n", cursorInfo.secondaryPosition.x + offset.x, cursorInfo.secondaryPosition.y + offset.y );
   }
   else
   {
     mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
   }
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::UpdateCursorPosition\n" );
 }
 
 void Controller::Impl::UpdateSelectionHandle( HandleType handleType )

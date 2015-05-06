@@ -452,6 +452,7 @@ const Vector2& Controller::GetAlignmentOffset() const
 
 Vector3 Controller::GetNaturalSize()
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::GetNaturalSize\n" );
   Vector3 naturalSize;
 
   // Make sure the model is up-to-date before layouting
@@ -459,8 +460,6 @@ Vector3 Controller::GetNaturalSize()
 
   if( mImpl->mRecalculateNaturalSize )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::GetNaturalSize\n" );
-
     // Operations that can be done only once until the text changes.
     const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |
                                                                            GET_SCRIPTS       |
@@ -501,7 +500,7 @@ Vector3 Controller::GetNaturalSize()
   {
     naturalSize = mImpl->mVisualModel->GetNaturalSize();
 
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::GetNaturalSize cached %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetNaturalSize cached %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z );
   }
 
   return naturalSize;
@@ -509,6 +508,7 @@ Vector3 Controller::GetNaturalSize()
 
 float Controller::GetHeightForWidth( float width )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::GetHeightForWidth %p width %f\n", this, width );
   // Make sure the model is up-to-date before layouting
   ProcessModifyEvents();
 
@@ -542,10 +542,12 @@ float Controller::GetHeightForWidth( float width )
 
     // Do the size related operations again.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | sizeOperations );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth calculated %f\n", layoutSize.height );
   }
   else
   {
     layoutSize = mImpl->mVisualModel->GetActualSize();
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth cached %f\n", layoutSize.height );
   }
 
   return layoutSize.height;
@@ -727,6 +729,7 @@ bool Controller::DoRelayout( const Size& size,
                              OperationsMask operationsRequired,
                              Size& layoutSize )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::DoRelayout %p size %f,%f\n", this, size.width, size.height );
   bool viewUpdated( false );
 
   // Calculate the operations to be done.
@@ -743,6 +746,7 @@ bool Controller::DoRelayout( const Size& size,
     if( 0u == numberOfGlyphs )
     {
       // Nothing else to do if there is no glyphs.
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout no glyphs, view updated true\n" );
       return true;
     }
 
@@ -858,6 +862,7 @@ bool Controller::DoRelayout( const Size& size,
     layoutSize = mImpl->mVisualModel->GetActualSize();
   }
 
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout no glyphs, view updated %s\n", ( viewUpdated ? "true" : "false" ) );
   return viewUpdated;
 }
 
@@ -996,6 +1001,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
         if( 0u == mImpl->mLogicalModel->mText.Count() )
         {
           ShowPlaceholderText();
+          mImpl->mEventData->mUpdateCursorPosition = true;
         }
         else
         {
