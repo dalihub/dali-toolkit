@@ -98,21 +98,21 @@ private:
    *
    * @param[in] position The current scroll position
    */
-  void OnScrollStart( const Vector3& position );
+  void OnScrollStart( const Vector2& position );
 
   /**
    * Signal handler, called when the ScrollView is moving
    *
    * @param[in] position The current scroll position
    */
-  void OnScrollUpdate( const Vector3& position );
+  void OnScrollUpdate( const Vector2& position );
 
   /**
    * Signal handler, called when the ScrollView has completed movement
    *
    * @param[in] position The current scroll position
    */
-  void OnScrollComplete( const Vector3& position );
+  void OnScrollComplete( const Vector2& position );
 
   /**
    * Signal handler, called when the Wobble Effect animation has completed.

@@ -21,13 +21,13 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/animation/animation.h>
+#include <dali/public-api/common/map-wrapper.h>
 #include <dali/public-api/object/property-notification.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
-#include <dali-toolkit/public-api/controls/scrollable/scroll-connector.h>
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 
@@ -59,11 +59,6 @@ public:
    * @return A public handle to the newly allocated ItemView.
    */
   static Dali::Toolkit::ItemView New(ItemFactory& factory);
-
-  /**
-   * @copydoc Toolkit::ItemView::GetScrollConnector
-   */
-  Dali::Toolkit::ScrollConnector GetScrollConnector() const;
 
   /**
    * @copydoc Toolkit::ItemView::GetLayoutCount
@@ -218,12 +213,12 @@ public:
   /**
    * @copydoc Toolkit::Scrollable::GetDomainSize
    */
-  Vector3 GetDomainSize() const;
+  Vector2 GetDomainSize() const;
 
   /**
    * @copydoc Toolkit::Scrollable::GetCurrentScrollPosition
    */
-  Vector3 GetCurrentScrollPosition() const;
+  Vector2 GetCurrentScrollPosition() const;
 
   /**
    * @copydoc Toolkit::Scrollable::AddOverlay()
@@ -236,9 +231,9 @@ public:
   void RemoveOverlay(Actor actor);
 
   /**
-   * @copydoc Toolkit::Scrollable::ScrollTo(const Vector3& position, float duration)
+   * @copydoc Toolkit::Scrollable::ScrollTo(const Vector2& position, float duration)
    */
-  void ScrollTo(const Vector3& position, float duration);
+  void ScrollTo(const Vector2& position, float duration);
 
   /**
    * @copydoc Toolkit::Internal::Scrollable::SetOvershootEffectColor
@@ -494,9 +489,9 @@ private:
   void RemoveAnimation(Animation& animation);
 
   /**
-   * @copydoc Toolkit::Internal::Scrollable::SetOvershootEnabled
+   * @copydoc Toolkit::Internal::Scrollable::EnableScrollOvershoot
    */
-  virtual void SetOvershootEnabled( bool enable );
+  virtual void EnableScrollOvershoot( bool enable );
 
   /**
    * Helper to calculate the scroll overshoot according to the pan gesture displacement.
@@ -541,7 +536,7 @@ private:
   void OnRefreshNotification(PropertyNotification& source);
 
   /**
-   * This is called when scroll position has been changed by ScrollConnector::SetScrollPosition.
+   * This is called when the change of scroll position is notified by ScrollBar.
    * @param[in] position The new scroll position
    */
   void OnScrollPositionChanged( float position );
@@ -592,14 +587,7 @@ private:
 
   Actor mOvershootOverlay;           ///< The overlay actor for overshoot effect
 
-  Dali::Toolkit::ScrollConnector mScrollConnector; ///< Connects ItemView with scrollable components e.g. scroll bars
-  Handle   mScrollPositionObject;     ///< From mScrollConnector
-
   bool mAddingItems;
-
-  Property::Index mPropertyPosition; ///< The physical position of the first item within the layout
-  Property::Index mPropertyMinimumLayoutPosition; ///< The minimum valid layout position in the layout.
-  Property::Index mPropertyScrollSpeed; ///< The current scroll speed of item view
 
   bool mRefreshEnabled; ///< Whether to refresh the cache automatically
 

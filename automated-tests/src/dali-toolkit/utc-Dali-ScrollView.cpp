@@ -57,7 +57,7 @@ const int CLAMP_STEP_0_CHECK_NOTCLAMPED = 0;                    ///< FSM: "First
 const int CLAMP_STEP_1_CHECK_CLAMPED_WEST = 1;                  ///< FSM: "Next check that scrollview clamps against left side"
 const int CLAMP_STEP_2_CHECK_CLAMPED_SOUTH_WEST = 2;            ///< FSM: "Then check that scrollview clamps against bottom-left side"
 const int CLAMP_STEP_3_SUCCESS = 3;                             ///< FSM: "Finished (Success)"
-const Vector3 CLAMP_START_SCROLL_POSITION(30.0f, 100.0f, 0.0f); ///< Scroll start position for the Clamping tests.
+const Vector2 CLAMP_START_SCROLL_POSITION(30.0f, 100.0f);       ///< Scroll start position for the Clamping tests.
 const Vector2 CLAMP_TOUCH_START( 100.0f, 100.0f );              ///< Start point to touch from for the Clamping tests.
 const Vector2 CLAMP_TOUCH_MOVEMENT( 5.0f, -5.0f );              ///< Amount to move touch for each frame for the Clamping tests.
 const int CLAMP_GESTURE_FRAMES = 100;                           ///< Number of Frames to synthesize a gesture for the Clamping tests.
@@ -65,14 +65,17 @@ const Vector3 TEST_ACTOR_POSITION(100.0f, 100.0f, 0.0f);        ///< A Test acto
 const Vector3 TEST_CONSTRAINT_OFFSET(1.0f, 2.0f, 0.0f);         ///< A Test constraint offset (arbitrary value to test effects)
 const float TEST_RATIO_TOLERANCE = 0.05;                        ///< +/-5% tolerance for ratio comparisons.
 
-const int MAX_FRAMES_TO_TEST_OVERSHOOT = 600;                         ///< 10 seconds (at 60 frames per second).
-const Vector3 OVERSHOOT_START_SCROLL_POSITION(100.0f, 100.0f, 0.0f);  ///< Scroll start position for the Overshoot tests.
-const float SCROLL_ANIMATION_DURATION(0.33f);                   ///< Duration of scroll animation in Overshoot tests (i.e. 100 pixels of overshoot in the speed of 500 pixels per 100 frames, 100/(500/(60/100)) = 0.33)
-const Vector3 SNAP_POSITION_WITH_DECELERATED_VELOCITY(74.0f, 74.0f, 0.0f);  ///< the snap position for Overshoot tests with the decelerated velocity (i.e. Decelerated from 500 pixels per 100 frames).
-const float TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION = 0.05f;             ///< a Test duration
-const float TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION = 1.5f;              ///< another Test duration
+const float DEFAULT_SNAP_OVERSHOOT_DURATION(0.5f);                  ///< Default overshoot snapping animation time.
+const float DEFAULT_MAX_OVERSHOOT(100.0f);                          ///< Default maximum allowed overshoot in pixels
+
+const int MAX_FRAMES_TO_TEST_OVERSHOOT = 600;                       ///< 10 seconds (at 60 frames per second).
+const Vector2 OVERSHOOT_START_SCROLL_POSITION(100.0f, 100.0f);       ///< Scroll start position for the Overshoot tests.
+const float SCROLL_ANIMATION_DURATION(0.33f);                       ///< Duration of scroll animation in Overshoot tests (i.e. 100 pixels of overshoot in the speed of 500 pixels per 100 frames, 100/(500/(100/60)) = 0.33)
+const Vector2 SNAP_POSITION_WITH_DECELERATED_VELOCITY(74.0f, 74.0f); ///< the snap position for Overshoot tests with the decelerated velocity (i.e. Decelerated from 500 pixels per 100 frames).
+const float TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION = 0.05f;           ///< a Test duration
+const float TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION = 1.5f;            ///< another Test duration
 const float TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION = TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION * 0.5f; // Same as above, but different alpha function.
-const float TIME_TOLERANCE = 0.05f;                                   ///< Allow testing tolerance between a 10th of second (+/- 3 frames)
+const float TIME_TOLERANCE = 0.05f;                                 ///< Allow testing tolerance between a 10th of second (+/- 3 frames)
 
 
 // Generate a PanGestureEvent to send to Core
@@ -154,7 +157,7 @@ static Vector3 gConstraintResult;                       ///< Result from constra
  *
  * @param[in] position The current scroll position.
  */
-static void OnScrollStart( const Vector3& position )
+static void OnScrollStart( const Vector2& position )
 {
   gOnScrollStartCalled = true;
 }
@@ -164,7 +167,7 @@ static void OnScrollStart( const Vector3& position )
  *
  * @param[in] position The current scroll position.
  */
-static void OnScrollUpdate( const Vector3& position )
+static void OnScrollUpdate( const Vector2& position )
 {
   gOnScrollUpdateCalled = true;
 }
@@ -174,7 +177,7 @@ static void OnScrollUpdate( const Vector3& position )
  *
  * @param[in] position The current scroll position.
  */
-static void OnScrollComplete( const Vector3& position )
+static void OnScrollComplete( const Vector2& position )
 {
   gOnScrollCompleteCalled = true;
 }
@@ -214,7 +217,7 @@ struct TestSumConstraint
    */
   void operator()( Vector3& current, const PropertyInputContainer& inputs )
   {
-    gConstraintResult = current + inputs[0]->GetVector3() + mOffset;
+    gConstraintResult = current + Vector3(inputs[0]->GetVector2()) + mOffset;
     current = gConstraintResult;
   }
 
@@ -315,8 +318,8 @@ int UtcDaliScrollViewScrollToPosition(void)
   ScrollView scrollView = ScrollView::New();
   Stage::GetCurrent().Add( scrollView );
 
-  const Vector3 target = Vector3(100.0f, 200.0f, 0.0f);
-  const Vector3 target2 = Vector3(300.0f, 100.0f, 0.0f);
+  const Vector2 target = Vector2(100.0f, 200.0f);
+  const Vector2 target2 = Vector2(300.0f, 100.0f);
 
   scrollView.ScrollTo( target, 0.0f );
   Wait(application);
@@ -346,29 +349,29 @@ int UtcDaliScrollViewScrollToPage(void)
 
   scrollView.ScrollTo( 1, 0.0f );
   Wait(application);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector3(100.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(100.0f, 0.0f), TEST_LOCATION );
 
   scrollView.ScrollTo( 5, 0.0f );
   Wait(application);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector3(500.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(500.0f, 0.0f), TEST_LOCATION );
 
   scrollView.ScrollTo( 10, 0.0f );
   Wait(application);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector3(200.0f, 100.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(200.0f, 100.0f), TEST_LOCATION );
 
   scrollView.ScrollTo( 15, 0.0f );
   Wait(application);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector3(700.0f, 100.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(700.0f, 100.0f), TEST_LOCATION );
   DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 15, TEST_LOCATION );
 
   scrollView.ScrollTo( 3 );
   Wait(application, RENDER_DELAY_SCROLL);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector3(300.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(300.0f, 0.0f), TEST_LOCATION );
   DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 3, TEST_LOCATION );
 
   scrollView.ScrollTo( 9 );
   Wait(application, RENDER_DELAY_SCROLL);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector3(100.0f, 100.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(100.0f, 100.0f), TEST_LOCATION );
   DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 9, TEST_LOCATION );
 
   // Apply DefaultRulers instead and see what happens.
@@ -383,7 +386,7 @@ int UtcDaliScrollViewScrollToPage(void)
   // This time should always scroll to origin (0.0f, 0.0f)
   scrollView.ScrollTo( 1, 0.0f );
   Wait(application);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(0.0f, 0.0f), TEST_LOCATION );
   DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 0, TEST_LOCATION );
 
   Wait(application);
@@ -412,20 +415,20 @@ int UtcDaliScrollViewScrollToActor(void)
 
   scrollView.ScrollTo(actorA, 0.0f);
   Wait(application);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), positionA, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), positionA.GetVectorXY(), TEST_LOCATION );
 
   Wait(application);
   scrollView.ScrollTo(actorB, 0.0f);
   Wait(application);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), positionB, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), positionB.GetVectorXY(), TEST_LOCATION );
 
   scrollView.ScrollTo(actorA);
   Wait(application, RENDER_DELAY_SCROLL);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), positionA, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), positionA.GetVectorXY(), TEST_LOCATION );
 
   scrollView.ScrollTo(actorB);
   Wait(application, RENDER_DELAY_SCROLL);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), positionB, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), positionB.GetVectorXY(), TEST_LOCATION );
   END_TEST;
 }
 
@@ -444,14 +447,14 @@ int UtcDaliScrollViewScrollToSnapPoint(void)
   scrollView.SetRulerX( rulerX );
   scrollView.SetRulerY( rulerY );
 
-  scrollView.ScrollTo( Vector3(120.0f, 190.0f, 0.0f), 0.0f );
+  scrollView.ScrollTo( Vector2(120.0f, 190.0f), 0.0f );
   Wait(application);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector3(120.0f, 190.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(120.0f, 190.0f), TEST_LOCATION );
 
   scrollView.ScrollToSnapPoint();
 
   Wait(application, RENDER_DELAY_SCROLL);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector3(100.0f, 200.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(100.0f, 200.0f), TEST_LOCATION );
   END_TEST;
 }
 
@@ -488,7 +491,7 @@ int UtcDaliScrollViewWrapMode(void)
   scrollView.SetRulerY(rulerY);
 
   scrollView.SetWrapMode(false);
-  scrollView.ScrollTo(Vector3(225.0f, 125.0f, 0.0f), 0.0f); // 5th (1st) page across, and 3rd (3rd) page down. (wrapped)
+  scrollView.ScrollTo(Vector2(225.0f, 125.0f), 0.0f); // 5th (1st) page across, and 3rd (3rd) page down. (wrapped)
   Wait(application);
   DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 17, TEST_LOCATION );
   scrollView.SetWrapMode(true);
@@ -523,7 +526,7 @@ int UtcDaliScrollViewActorAutoSnap(void)
   b.SetPosition(bPosition);
 
   // Goto a random position, and execute snap (should not move)
-  Vector3 targetScroll = Vector3(500.0f, 500.0f, 0.0f);
+  Vector2 targetScroll = Vector2(500.0f, 500.0f);
   scrollView.ScrollTo(targetScroll, 0.0f);
   Wait(application);
   scrollView.ScrollToSnapPoint();
@@ -534,13 +537,13 @@ int UtcDaliScrollViewActorAutoSnap(void)
   scrollView.SetActorAutoSnap(true);
   scrollView.ScrollToSnapPoint();
   Wait(application, RENDER_DELAY_SCROLL);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), bPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), bPosition.GetVectorXY(), TEST_LOCATION );
 
-  scrollView.ScrollTo(Vector3(0.0f, 0.0f, 0.0f), 0.0f);
+  scrollView.ScrollTo(Vector2(0.0f, 0.0f), 0.0f);
   Wait(application);
   scrollView.ScrollToSnapPoint();
   Wait(application, RENDER_DELAY_SCROLL);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), aPosition, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), aPosition.GetVectorXY(), TEST_LOCATION );
   END_TEST;
 }
 
@@ -565,7 +568,7 @@ int UtcDaliScrollViewSignalsStartComplete(void)
   scrollView.ScrollStartedSignal().Connect( &OnScrollStart );
   scrollView.ScrollUpdatedSignal().Connect( &OnScrollUpdate );
   scrollView.ScrollCompletedSignal().Connect( &OnScrollComplete );
-  scrollView.ScrollTo( Vector3(100.0f, 100.0f, 0.0f) );
+  scrollView.ScrollTo( Vector2(100.0f, 100.0f) );
   Wait(application, RENDER_DELAY_SCROLL);
 
   DALI_TEST_CHECK(gOnScrollStartCalled);
@@ -734,20 +737,20 @@ int UtcDaliScrollViewAxisAutoLock(void)
   scrollView.ScrollCompletedSignal().Connect( &OnScrollComplete );
 
   // Normal
-  scrollView.ScrollTo(Vector3(100.0f, 100.0f, 0.0f), 0.0f); // move in a little.
+  scrollView.ScrollTo(Vector2(100.0f, 100.0f), 0.0f); // move in a little.
   Wait(application);
-  Vector3 startPosition = scrollView.GetCurrentScrollPosition();
+  Vector2 startPosition = scrollView.GetCurrentScrollPosition();
   PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, Vector2(5.0f, 1.0f), 50, true); // mostly horizontal
-  const Vector3 positionAfterNormal = scrollView.GetCurrentScrollPosition();
+  const Vector2 positionAfterNormal = scrollView.GetCurrentScrollPosition();
 
   // Autolock
   scrollView.SetAxisAutoLock(true);
   DALI_TEST_CHECK(scrollView.GetAxisAutoLock());
 
-  scrollView.ScrollTo(Vector3(100.0f, 100.0f, 0.0f), 0.0f); // move in a little.
+  scrollView.ScrollTo(Vector2(100.0f, 100.0f), 0.0f); // move in a little.
   Wait(application);
   PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, Vector2(5.0f, 1.0f), 50, true); // mostly horizontal
-  const Vector3 positionAfterAutoLock = scrollView.GetCurrentScrollPosition();
+  const Vector2 positionAfterAutoLock = scrollView.GetCurrentScrollPosition();
 
   // compare how much the Y position has deviated for normal and autolock.
   const float devianceNormal = fabsf(startPosition.y - positionAfterNormal.y);
@@ -1018,10 +1021,10 @@ int UtcDaliScrollViewOvershoot(void)
   currentPos = PerformGestureDiagonalSwipe(application, currentPos, Vector2(5.0f, 5.0f), 100, false);
   float overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
   float overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
-  Vector3 positionValue = scrollView.GetProperty<Vector3>(ScrollView::Property::SCROLL_POSITION);
+  Vector2 positionValue = scrollView.GetProperty<Vector2>(ScrollView::Property::SCROLL_POSITION);
   DALI_TEST_EQUALS(overshootXValue, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(overshootYValue, 1.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(positionValue, Vector3::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(positionValue, Vector2::ZERO, TEST_LOCATION);
 
   float timeToReachOrigin;
 
@@ -1029,8 +1032,8 @@ int UtcDaliScrollViewOvershoot(void)
   SendPan(application, Gesture::Finished, currentPos);
   timeToReachOrigin = TestOvershootSnapDuration(application, scrollView);
 
-  float minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + Toolkit::ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
-  float maxTimeToReachOrigin = SCROLL_ANIMATION_DURATION + Toolkit::ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) + TIME_TOLERANCE;
+  float minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + DEFAULT_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
+  float maxTimeToReachOrigin = SCROLL_ANIMATION_DURATION + DEFAULT_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / DEFAULT_MAX_OVERSHOOT) + TIME_TOLERANCE;
 
   DALI_TEST_CHECK( (timeToReachOrigin > minTimeToReachOrigin) &&
                    (timeToReachOrigin < maxTimeToReachOrigin) );
@@ -1043,8 +1046,8 @@ int UtcDaliScrollViewOvershoot(void)
   SendPan(application, Gesture::Finished, currentPos);
   timeToReachOrigin = TestOvershootSnapDuration(application, scrollView);
 
-  minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
-  maxTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) + TIME_TOLERANCE;
+  minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
+  maxTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / DEFAULT_MAX_OVERSHOOT) + TIME_TOLERANCE;
 
   DALI_TEST_CHECK( (timeToReachOrigin > minTimeToReachOrigin) &&
                    (timeToReachOrigin < maxTimeToReachOrigin) );
@@ -1057,8 +1060,8 @@ int UtcDaliScrollViewOvershoot(void)
   SendPan(application, Gesture::Finished, currentPos);
   timeToReachOrigin = TestOvershootSnapDuration(application, scrollView);
 
-  minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
-  maxTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) + TIME_TOLERANCE;
+  minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
+  maxTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / DEFAULT_MAX_OVERSHOOT) + TIME_TOLERANCE;
 
   DALI_TEST_CHECK( (timeToReachOrigin > minTimeToReachOrigin) &&
                    (timeToReachOrigin < maxTimeToReachOrigin) );
@@ -1072,8 +1075,8 @@ int UtcDaliScrollViewOvershoot(void)
   SendPan(application, Gesture::Finished, currentPos);
   timeToReachOrigin = TestOvershootSnapDuration(application, scrollView);
 
-  minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
-  maxTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT) + TIME_TOLERANCE;
+  minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
+  maxTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / DEFAULT_MAX_OVERSHOOT) + TIME_TOLERANCE;
 
   DALI_TEST_CHECK( (timeToReachOrigin > minTimeToReachOrigin) &&
                    (timeToReachOrigin < maxTimeToReachOrigin) );

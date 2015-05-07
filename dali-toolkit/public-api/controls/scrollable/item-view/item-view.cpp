@@ -64,11 +64,6 @@ ItemView ItemView::DownCast( BaseHandle handle )
   return Control::DownCast<ItemView, Internal::ItemView>(handle);
 }
 
-ScrollConnector ItemView::GetScrollConnector() const
-{
-  return GetImpl(*this).GetScrollConnector();
-}
-
 ItemView::~ItemView()
 {
 }

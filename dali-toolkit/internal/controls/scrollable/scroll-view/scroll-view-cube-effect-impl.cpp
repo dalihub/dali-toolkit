@@ -73,7 +73,7 @@ public:
   void RotationConstraint( Quaternion& current, const PropertyInputContainer& inputs )
   {
     const Vector3& pagePosition = inputs[0]->GetVector3();
-    const Vector3& scrollPosition = inputs[1]->GetVector3();
+    const Vector3& scrollPosition = Vector3(inputs[1]->GetVector2());
 
     // Get position of page.
     Vector3 position = pagePosition + scrollPosition;
@@ -89,8 +89,8 @@ public:
 
     if(wrap)
     {
-      const Vector3& min = inputs[2]->GetVector3();
-      const Vector3& max = inputs[3]->GetVector3();
+      const Vector2& min = inputs[2]->GetVector2();
+      const Vector2& max = inputs[3]->GetVector2();
 
       if(fabsf(min.x - max.x) > Math::MACHINE_EPSILON_1)
       {
@@ -136,7 +136,7 @@ public:
   void ColorConstraint( Vector4& current, const PropertyInputContainer& inputs )
   {
     const Vector3& pagePosition = inputs[0]->GetVector3();
-    const Vector3& scrollPosition = inputs[1]->GetVector3();
+    const Vector3& scrollPosition = Vector3(inputs[1]->GetVector2());
 
     // Get position of page.
     Vector3 position = pagePosition + scrollPosition;
@@ -152,8 +152,8 @@ public:
 
     if(wrap)
     {
-      const Vector3& min = inputs[2]->GetVector3();
-      const Vector3& max = inputs[3]->GetVector3();
+      const Vector2& min = inputs[2]->GetVector2();
+      const Vector2& max = inputs[3]->GetVector2();
 
       if(fabsf(min.x - max.x) > Math::MACHINE_EPSILON_1)
       {
@@ -203,7 +203,7 @@ public:
   void PositionConstraint( Vector3& current, const PropertyInputContainer& inputs )
   {
     const Vector3& pagePosition = inputs[0]->GetVector3();
-    const Vector3& scrollPosition = inputs[1]->GetVector3();
+    const Vector3& scrollPosition = Vector3(inputs[1]->GetVector2());
 
     // Get position of page.
     Vector3 relativePosition = pagePosition + scrollPosition;
@@ -211,7 +211,8 @@ public:
     // short circuit: for orthognal view.
     if( (fabsf(relativePosition.x) < Math::MACHINE_EPSILON_1) && (fabsf(relativePosition.y) < Math::MACHINE_EPSILON_1) )
     {
-      current += scrollPosition;
+      current.x += scrollPosition.x;
+      current.y += scrollPosition.y;
       return;
     }
 
@@ -220,8 +221,8 @@ public:
 
     if(wrap)
     {
-      const Vector3& min = inputs[2]->GetVector3();
-      const Vector3& max = inputs[3]->GetVector3();
+      const Vector2& min = inputs[2]->GetVector2();
+      const Vector2& max = inputs[3]->GetVector2();
 
       if(fabsf(min.x - max.x) > Math::MACHINE_EPSILON_1)
       {
@@ -247,7 +248,6 @@ public:
 
     relativePosition.x /= pageSize.x;
     relativePosition.y /= pageSize.y;
-    relativePosition.z = 0.0f;
 
     Vector3 angle( Clamp(relativePosition.x, -1.0f,1.0f) * mAngleSwing.x,
                    Clamp(relativePosition.y, -1.0f,1.0f) * mAngleSwing.y,

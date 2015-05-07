@@ -368,10 +368,9 @@ public:
    * @param[in] actor The actor to constrain.
    * @param[in] itemId The ID of the item represented by the actor.
    * @param[in] durationSeconds The time taken to fully constrain the actors.
-   * @param[in] scrollPositionObject The object which provides the layout position property.
    * @param[in] itemViewActor The item view instance which requests the application of constraints.
    */
-  DALI_IMPORT_API virtual void ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, Handle scrollPositionObject, const Actor& itemViewActor );
+  DALI_IMPORT_API virtual void ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, const Actor& itemViewActor );
 
   /**
    * @brief Gets the position of a given item

@@ -111,7 +111,7 @@ static void ResetScrollCallbackResults()
  *
  * @param[in] position The current scroll position.
  */
-static void OnScrollStart( const Vector3& position )
+static void OnScrollStart( const Vector2& position )
 {
   gOnScrollStartCalled = true;
 }
@@ -121,7 +121,7 @@ static void OnScrollStart( const Vector3& position )
  *
  * @param[in] position The current scroll position.
  */
-static void OnScrollUpdate( const Vector3& position )
+static void OnScrollUpdate( const Vector2& position )
 {
   gOnScrollUpdateCalled = true;
 }
@@ -131,7 +131,7 @@ static void OnScrollUpdate( const Vector3& position )
  *
  * @param[in] position The current scroll position.
  */
-static void OnScrollComplete( const Vector3& position )
+static void OnScrollComplete( const Vector2& position )
 {
   gOnScrollCompleteCalled = true;
 }
@@ -336,7 +336,7 @@ int UtcDaliScrollViewCarouselEffectTest(void)
 
   effect.ApplyToActor( actor, Vector2(1.2f, 1.2f) );
 
-  scrollView.ScrollTo(Vector3(size.x, 0.0f, 0.0f), 0.5f, DirectionBiasNone, DirectionBiasNone);
+  scrollView.ScrollTo(Vector2(size.x, 0.0f), 0.5f, DirectionBiasNone, DirectionBiasNone);
   while(!gOnScrollCompleteCalled)
   {
     Wait(application);

@@ -77,8 +77,8 @@ struct ScrollViewWobbleEffectConstraint
    * @param[in,out] wobbleEffect Reference to wobbleEffect instance
    */
   ScrollViewWobbleEffectConstraint(ScrollViewWobbleEffect& wobbleEffect)
-  : mChase(Vector3::ZERO),
-    mVelocity(Vector3::ZERO),
+  : mChase(Vector2::ZERO),
+    mVelocity(Vector2::ZERO),
     mTime(0.0f),
     mStabilityTimeCounter(0),
     mStabilized(true),
@@ -109,8 +109,8 @@ struct ScrollViewWobbleEffectConstraint
     else
     {
       // not stable (i.e. wobbling)
-      Vector3 offset(inputs[2]->GetFloat(), inputs[3]->GetFloat(), 0.0f);
-      const Vector3& position = inputs[1]->GetVector3() - offset;
+      Vector2 offset(inputs[2]->GetFloat(), inputs[3]->GetFloat());
+      const Vector2& position = inputs[1]->GetVector2() - offset;
       const float time = inputs[0]->GetFloat();
       const float timePassed = time - mTime;
 
@@ -118,7 +118,7 @@ struct ScrollViewWobbleEffectConstraint
 
       if(timePassed>0)
       {
-        const Vector3 delta = position - mChase;
+        const Vector2 delta = position - mChase;
 
         // Check to see if wobble has stabilized.
         if( (fabsf(delta.x) < STABILITY_DELTA_THRESHOLD) &&
@@ -159,8 +159,8 @@ struct ScrollViewWobbleEffectConstraint
     } // end else
   }
 
-  Vector3 mChase;                                 ///< Chaser position
-  Vector3 mVelocity;                              ///< Velocity of Chaser
+  Vector2 mChase;                                 ///< Chaser position
+  Vector2 mVelocity;                              ///< Velocity of Chaser
   float mTime;                                    ///< Current time.
   float mStabilityTimeCounter;                    ///< Time in seconds that stable for.
   bool mStabilized;                               ///< Stabilized flag.
@@ -266,7 +266,7 @@ void ScrollViewWobbleEffect::ContinueAnimation(float endTime)
 
 }
 
-void ScrollViewWobbleEffect::OnScrollStart( const Vector3& position )
+void ScrollViewWobbleEffect::OnScrollStart( const Vector2& position )
 {
   // When animation starts, all constraints all unstable,
   // and we change the animation cycle id.
@@ -278,12 +278,12 @@ void ScrollViewWobbleEffect::OnScrollStart( const Vector3& position )
   ContinueAnimation(WOBBLEEFFECT_ANIMATION_MAX_TIME);
 }
 
-void ScrollViewWobbleEffect::OnScrollUpdate( const Vector3& position )
+void ScrollViewWobbleEffect::OnScrollUpdate( const Vector2& position )
 {
   // nothing to do
 }
 
-void ScrollViewWobbleEffect::OnScrollComplete( const Vector3& position )
+void ScrollViewWobbleEffect::OnScrollComplete( const Vector2& position )
 {
   // nothing to do
 }

@@ -22,7 +22,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
-#include <dali-toolkit/internal/controls/scroll-component/scroll-bar-internal-impl.h>
 
 using namespace Dali;
 
@@ -50,12 +49,15 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Scrollable, Toolkit::Control, Create );
 DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshoot-effect-color",    VECTOR4, OVERSHOOT_EFFECT_COLOR    )
 DALI_PROPERTY_REGISTRATION( Toolkit, Scrollable, "overshoot-animation-speed", FLOAT,   OVERSHOOT_ANIMATION_SPEED )
 
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-relative-position", VECTOR3, SCROLL_RELATIVE_POSITION )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-position-min",      VECTOR3, SCROLL_POSITION_MIN      )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-position-max",      VECTOR3, SCROLL_POSITION_MAX      )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-direction",         VECTOR3, SCROLL_DIRECTION         )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "can-scroll-vertical",      BOOLEAN, CAN_SCROLL_VERTICAL      )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "can-scroll-horizontal",    BOOLEAN, CAN_SCROLL_HORIZONTAL    )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-relative-position", VECTOR2, SCROLL_RELATIVE_POSITION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-position-min",      VECTOR2, SCROLL_POSITION_MIN)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scroll-position-min-x", SCROLL_POSITION_MIN_X, SCROLL_POSITION_MIN, 0)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scroll-position-min-y", SCROLL_POSITION_MIN_Y, SCROLL_POSITION_MIN, 1)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "scroll-position-max",      VECTOR2, SCROLL_POSITION_MAX)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scroll-position-max-x", SCROLL_POSITION_MAX_X, SCROLL_POSITION_MAX, 0)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, Scrollable, "scroll-position-max-y", SCROLL_POSITION_MAX_Y, SCROLL_POSITION_MAX, 1)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "can-scroll-vertical",      BOOLEAN, CAN_SCROLL_VERTICAL)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, Scrollable, "can-scroll-horizontal",    BOOLEAN, CAN_SCROLL_HORIZONTAL)
 
 DALI_SIGNAL_REGISTRATION(              Toolkit, Scrollable, "scroll-started",                    SIGNAL_SCROLL_STARTED    )
 DALI_SIGNAL_REGISTRATION(              Toolkit, Scrollable, "scroll-completed",                  SIGNAL_SCROLL_COMPLETED  )
@@ -92,65 +94,17 @@ Scrollable::Scrollable( ControlBehaviour behaviourFlags )
 
 Scrollable::~Scrollable()
 {
-  // Clear scroll components, forces their destruction before Scrollable is destroyed.
-  mComponents.clear();
 }
 
-bool Scrollable::IsScrollComponentEnabled(Toolkit::Scrollable::ScrollComponentType type) const
+bool Scrollable::IsOvershootEnabled() const
 {
-  if(type == Toolkit::Scrollable::OvershootIndicator)
-  {
-    return mOvershootEnabled;
-  }
-  return (mComponents.find(type) != mComponents.end());
+  return mOvershootEnabled;
 }
 
-void Scrollable::EnableScrollComponent(Toolkit::Scrollable::ScrollComponentType type)
+void Scrollable::SetOvershootEnabled(bool enable)
 {
-  if(type == Toolkit::Scrollable::OvershootIndicator)
-  {
-    if( !mOvershootEnabled )
-    {
-      SetOvershootEnabled(true);
-      mOvershootEnabled = true;
-    }
-    return;
-  }
-  if( mComponents.find(type) == mComponents.end() )
-  {
-    // Create ScrollComponent
-    Toolkit::Scrollable scrollable = Toolkit::Scrollable::DownCast(Self());
-    Toolkit::ScrollComponent scrollComponent = NewScrollComponent(scrollable, type);
-    Toolkit::ScrollComponentImpl& component = static_cast<Toolkit::ScrollComponentImpl&>(scrollComponent.GetImplementation());
-    ScrollComponentPtr componentPtr(&component);
-
-    mComponents[type] = componentPtr;
-  }
-}
-
-void Scrollable::DisableScrollComponent(Toolkit::Scrollable::ScrollComponentType type)
-{
-  if(type == Toolkit::Scrollable::OvershootIndicator)
-  {
-    if( mOvershootEnabled )
-    {
-      SetOvershootEnabled(false);
-      mOvershootEnabled = false;
-    }
-    return;
-  }
-  ComponentIter pair = mComponents.find( type );
-
-  if( mComponents.end() != pair )
-  {
-    ScrollComponentPtr component = pair->second;
-
-    // Disconnect the scroll component first.
-    component->OnDisconnect();
-
-    // Destroy ScrollComponent.
-    mComponents.erase( type );
-  }
+  EnableScrollOvershoot(enable);
+  mOvershootEnabled = enable;
 }
 
 Vector4 Scrollable::GetOvershootEffectColor() const
@@ -259,32 +213,6 @@ Property::Value Scrollable::GetProperty( BaseObject* object, Property::Index ind
   }
 
   return value;
-}
-
-Toolkit::ScrollComponent Scrollable::NewScrollComponent(Toolkit::Scrollable& scrollable, Toolkit::Scrollable::ScrollComponentType type)
-{
-  Toolkit::ScrollComponent instance;
-
-  switch(type)
-  {
-    case Toolkit::Scrollable::VerticalScrollBar:
-    {
-      instance = static_cast<Toolkit::ScrollComponent>(Toolkit::ScrollBarInternal::New(scrollable, true));
-      break;
-    }
-    case Toolkit::Scrollable::HorizontalScrollBar:
-    {
-      instance = static_cast<Toolkit::ScrollComponent>(Toolkit::ScrollBarInternal::New(scrollable, false));
-      break;
-    }
-    case Toolkit::Scrollable::OvershootIndicator:
-    {
-      DALI_ASSERT_ALWAYS(!"Unrecognized component type");
-      break;
-    }
-  }
-
-  return instance;
 }
 
 } // namespace Internal

@@ -340,55 +340,55 @@ public:
   /**
    * @copydoc Toolkit::ScrollView::GetCurrentScrollPosition
    */
-  Vector3 GetCurrentScrollPosition() const;
+  Vector2 GetCurrentScrollPosition() const;
 
   /**
    * @copydoc Toolkit::ScrollView::SetScrollPosition
    */
-  void SetScrollPosition(const Vector3& position);
+  void SetScrollPosition(const Vector2& position);
 
   /**
    * @copydoc Toolkit::Scrollable::GetDomainSize
    */
-  Vector3 GetDomainSize() const;
+  Vector2 GetDomainSize() const;
 
   /**
-   * @copydoc ScrollTo(const Vector3&)
+   * @copydoc ScrollTo(const Vector2&)
    */
-  void TransformTo(const Vector3& position,
+  void TransformTo(const Vector2& position,
                    DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone);
 
   /**
-   * @copydoc ScrollTo(const Vector3&, float, AlhpaFunction, DirectionBias, DirectionBias)
+   * @copydoc ScrollTo(const Vector2&, float, AlhpaFunction, DirectionBias, DirectionBias)
    */
-  void TransformTo(const Vector3& position, float duration, AlphaFunction alpha,
+  void TransformTo(const Vector2& position, float duration, AlphaFunction alpha,
                    DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone);
 
   /**
-   * @copydoc Toolkit::ScrollView::ScrollTo(const Vector3 &position)
+   * @copydoc Toolkit::ScrollView::ScrollTo(const Vector2 &position)
    */
-  void ScrollTo(const Vector3 &position);
+  void ScrollTo(const Vector2 &position);
 
   /**
-   * @copydoc Toolkit::Scrollable::ScrollTo(const Vector3& position, float duration)
+   * @copydoc Toolkit::Scrollable::ScrollTo(const Vector2& position, float duration)
    */
-  void ScrollTo(const Vector3& position, float duration);
+  void ScrollTo(const Vector2& position, float duration);
 
   /**
-   * @copydoc Toolkit::Scrollable::ScrollTo(const Vector3& position, float duration, AlphaFunction alpha)
+   * @copydoc Toolkit::Scrollable::ScrollTo(const Vector2& position, float duration, AlphaFunction alpha)
    */
-  void ScrollTo(const Vector3& position, float duration, AlphaFunction alpha);
+  void ScrollTo(const Vector2& position, float duration, AlphaFunction alpha);
 
   /**
-   * @copydoc Toolkit::ScrollView::ScrollTo(const Vector3 &position, float duration, DirectionBias horizontalBias, DirectionBias verticalBias)
+   * @copydoc Toolkit::ScrollView::ScrollTo(const Vector2 &position, float duration, DirectionBias horizontalBias, DirectionBias verticalBias)
    */
-  void ScrollTo(const Vector3& position, float duration,
+  void ScrollTo(const Vector2& position, float duration,
                 DirectionBias horizontalBias, DirectionBias verticalBias);
 
   /**
-   * @copydoc Toolkit::ScrollView::ScrollTo(const Vector3 &position, float duration, AlphaFunction alpha, DirectionBias horizontalBias, DirectionBias verticalBias)
+   * @copydoc Toolkit::ScrollView::ScrollTo(const Vector2 &position, float duration, AlphaFunction alpha, DirectionBias horizontalBias, DirectionBias verticalBias)
    */
-  void ScrollTo(const Vector3& position, float duration, AlphaFunction alpha,
+  void ScrollTo(const Vector2& position, float duration, AlphaFunction alpha,
                 DirectionBias horizontalBias, DirectionBias verticalBias);
 
   /**
@@ -467,7 +467,7 @@ public:
    * @param[in] verticalBias (optional) Whether to bias animation to top or bottom (or no biasing)
    * @return True if animation necessary and taking place to reach desired transform.
    */
-  bool AnimateTo(const Vector3& position, const Vector3& positionDuration,
+  bool AnimateTo(const Vector2& position, const Vector2& positionDuration,
                              AlphaFunction alpha, bool findShortcuts = true,
                              DirectionBias horizontalBias = DirectionBiasNone, DirectionBias verticalBias = DirectionBiasNone,
                              SnapType snapType = Snap);
@@ -567,9 +567,9 @@ private: // private overriden functions from CustomActorImpl and Controls
   virtual bool OnAccessibilityPan(PanGesture gesture);
 
   /**
-   * @copydoc Toolkit::Scrollable::SetOvershootEnabled()
+   * @copydoc Toolkit::Scrollable::EnableScrollOvershoot()
    */
-  virtual void SetOvershootEnabled(bool enable);
+  virtual void EnableScrollOvershoot(bool enable);
 
 private:
 
@@ -717,14 +717,14 @@ private:
    *
    * @param[in] position The position for which you wish to obtain overshoot vector
    */
-  Vector3 GetOvershoot(Vector3& position) const;
+  Vector2 GetOvershoot(Vector2& position) const;
 
   /**
    * Clamps position within the domain set up by X/Y Rulers
    *
    * @param[in,out] position The position you wish to clamp
    */
-  void ClampPosition(Vector3& position) const;
+  void ClampPosition(Vector2& position) const;
 
   /**
    * Clamps position within the domain set up by X/Y Rulers
@@ -732,7 +732,7 @@ private:
    * @param[in,out] position The position you wish to clamp
    * @param[out] clamped The results of the clamping.
    */
-  void ClampPosition(Vector3& position, ClampState3D &clamped) const;
+  void ClampPosition(Vector2& position, ClampState2D &clamped) const;
 
   /**
    * Wraps position within the domain set up by X/Y Rulers
@@ -742,7 +742,7 @@ private:
    *
    * @param[in,out] position The position you wish to wrap
    */
-  void WrapPosition(Vector3& position) const;
+  void WrapPosition(Vector2& position) const;
 
   /**
    * Updates the main internal scroll constraints with new ruler and domain
@@ -791,14 +791,14 @@ private:
    *
    * @return The current position
    */
-  Vector3 GetPropertyPrePosition() const;
+  Vector2 GetPropertyPrePosition() const;
 
   /**
    * Gets position property.
    *
    * @return The current position
    */
-  Vector3 GetPropertyPosition() const;
+  Vector2 GetPropertyPosition() const;
 
   /**
    * Handles a Stopped animation. Its position properties need to be saved, and the animation flag
@@ -838,22 +838,22 @@ private:
 
   int mGestureStackDepth;               ///< How many gestures are currently occuring.
   Vector2 mPanStartPosition;            ///< Where the pan gesture's touch down occured
-  Vector3 mPanDelta;                    ///< Amount currently panned.
+  Vector2 mPanDelta;                    ///< Amount currently panned.
 
   unsigned int mScrollStateFlags;       ///< flags indicating current state of scrolling
   // Scroll delegate pre and post position properties...
-  Vector3 mScrollPrePosition;           ///< Wrapped scroll position, but not clamped
-  Vector3 mScrollPostPosition;          ///< Wrapped and clamped, this is the final scroll position used
-  Vector3 mScrollTargetPosition;        ///< Final target position for an animated scroll
-  Vector3 mDomainOffset;                ///< Domain offset (this keeps track of the domain boundaries that scroll positions traverses)
+  Vector2 mScrollPrePosition;           ///< Wrapped scroll position, but not clamped
+  Vector2 mScrollPostPosition;          ///< Wrapped and clamped, this is the final scroll position used
+  Vector2 mScrollTargetPosition;        ///< Final target position for an animated scroll
+  Vector2 mDomainOffset;                ///< Domain offset (this keeps track of the domain boundaries that scroll positions traverses)
 
   // Rulers for each axes...
   RulerPtr mRulerX;
   RulerPtr mRulerY;
 
   // Last property values set to ScrollView
-  Vector3 mMinScroll;
-  Vector3 mMaxScroll;
+  Vector2 mMinScroll;
+  Vector2 mMaxScroll;
 
   Animation mInternalXAnimation;        ///< Animates mPropertyX to a snap position or application requested scroll position
   Animation mInternalYAnimation;        ///< Animates mPropertyY to a snap position or application requested scroll position
@@ -874,7 +874,7 @@ private:
 
   Vector2   mMaxOvershoot;                      ///< Number of scrollable pixels that will take overshoot from 0.0f to 1.0f
   Vector2   mUserMaxOvershoot;                  ///< Set by user, allows overriding of default max overshoot for the scroll indicator
-  float     mSnapOvershootDuration;             ///< Duration for overshoot snapping back to Vector3::ZERO
+  float     mSnapOvershootDuration;             ///< Duration for overshoot snapping back to Vector2::ZERO
   AlphaFunction mSnapOvershootAlphaFunction;    ///< AlphaFunction to be used for this overshoot.
 
   float mSnapDuration;                          ///< Time for the snap animation to take (in seconds).
@@ -900,6 +900,8 @@ private:
   Constraint mScrollMainInternalDeltaConstraint;
   Constraint mScrollMainInternalFinalConstraint;
   Constraint mScrollMainInternalRelativeConstraint;
+  Constraint mScrollMainInternalDomainConstraint;
+  Constraint mScrollMainInternalPrePositionMaxConstraint;
 
   ScrollOvershootIndicatorPtr mOvershootIndicator;
 

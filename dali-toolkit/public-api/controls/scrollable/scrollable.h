@@ -50,16 +50,6 @@ class DALI_IMPORT_API Scrollable : public Control
 public:
 
   /**
-   * @brief Scroll component types
-   */
-  enum ScrollComponentType
-  {
-    HorizontalScrollBar,
-    VerticalScrollBar,
-    OvershootIndicator,
-  };
-
-  /**
    * @brief The start and end property ranges for this control.
    */
   enum PropertyRange
@@ -83,35 +73,23 @@ public:
       OVERSHOOT_ANIMATION_SPEED,                     ///< Property, name "overshoot-animation-speed", @see SetOvershootAnimationSpeed(), type float
 
       // Animatable properties
-      SCROLL_RELATIVE_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scroll-relative-position", type Vector3
-      SCROLL_POSITION_MIN,                                        ///< Property, name "scroll-position-min",      type Vector3
-      SCROLL_POSITION_MAX,                                        ///< Property, name "scroll-position-max",      type Vector3
-      SCROLL_DIRECTION,                                           ///< Property, name "scroll-direction",         type Vector2
+      SCROLL_RELATIVE_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scroll-relative-position", type Vector2
+      SCROLL_POSITION_MIN,                                        ///< Property, name "scroll-position-min",      type Vector2
+      SCROLL_POSITION_MIN_X,                                      ///< Property, name "scroll-position-min-x",    type float
+      SCROLL_POSITION_MIN_Y,                                      ///< Property, name "scroll-position-min-y",    type float
+      SCROLL_POSITION_MAX,                                        ///< Property, name "scroll-position-max",      type Vector2
+      SCROLL_POSITION_MAX_X,                                      ///< Property, name "scroll-position-max-x",    type float
+      SCROLL_POSITION_MAX_Y,                                      ///< Property, name "scroll-position-max-y",    type float
       CAN_SCROLL_VERTICAL,                                        ///< Property, name "can-scroll-vertical",      type bool
       CAN_SCROLL_HORIZONTAL                                       ///< Property, name "can-scroll-horizontal",    type bool
     };
   };
 
-public:
+  // Typedefs
 
-  typedef Signal< void ( const Vector3& ) > ScrollStartedSignalType;   ///< ScrollStarted signal type
-  typedef Signal< void ( const Vector3& ) > ScrollCompletedSignalType; ///< ScrollCompleted signal type
-  typedef Signal< void ( const Vector3& ) > ScrollUpdatedSignalType;   ///< Scroll updated signal type
-
-  /**
-   * @brief Signal emitted when the Scrollable has moved (whether by touch or animation).
-   */
-  ScrollStartedSignalType& ScrollStartedSignal();
-
-  /**
-   * @brief Signal emitted when the Scrollable has moved (whether by touch or animation).
-   */
-  ScrollUpdatedSignalType& ScrollUpdatedSignal();
-
-  /**
-   * @brief Signal emitted when the Scrollable has completed movement (whether by touch or animation).
-   */
-  ScrollCompletedSignalType& ScrollCompletedSignal();
+  typedef Signal< void ( const Vector2& ) > ScrollStartedSignalType;   ///< ScrollStarted signal type
+  typedef Signal< void ( const Vector2& ) > ScrollCompletedSignalType; ///< ScrollCompleted signal type
+  typedef Signal< void ( const Vector2& ) > ScrollUpdatedSignalType;   ///< Scroll updated signal type
 
 public:
 
@@ -157,26 +135,18 @@ public:
   static Scrollable DownCast( BaseHandle handle );
 
   /**
-   * @brief Checks if a ScrollComponent has been enabled or not.
+   * @brief Checks if scroll overshoot has been enabled or not.
    *
-   * @param[in] type The Scroll Component Type to check
-   * @return True (if Enabled)
+   * @return Whether the scroll obvershoot is enabled
    */
-  bool IsScrollComponentEnabled(Scrollable::ScrollComponentType type) const;
+  bool IsOvershootEnabled() const;
 
   /**
-   * @brief Enables a ScrollComponent.
+   * @brief Sets whether to enables or disable scroll overshoot.
    *
-   * @param[in] type The Scroll Component Type to enable
+   * @param[in] enable Whether to enable the scroll obvershoot or not
    */
-  void EnableScrollComponent(Scrollable::ScrollComponentType type);
-
-  /**
-   * @brief Disables a ScrollComponent.
-   *
-   * @param[in] type The Scroll Component Type to disable
-   */
-  void DisableScrollComponent(Scrollable::ScrollComponentType type);
+  void SetOvershootEnabled(bool enable);
 
   /**
    * @brief Set the color of the overshoot effect.
@@ -203,6 +173,44 @@ public:
    * @return The speed of the overshoot animation.
    */
   float GetOvershootAnimationSpeed() const;
+
+public: // Signals
+
+  /**
+   * @brief Signal emitted when the Scrollable has moved (whether by touch or animation).
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName(const Vector2& currentScrollPosition);
+   * @endcode
+   * @pre The Object has been initialized.
+   * @return The signal to connect to.
+   */
+  ScrollStartedSignalType& ScrollStartedSignal();
+
+  /**
+   * @brief Signal emitted when the Scrollable has moved (whether by touch or animation).
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName(const Vector2& currentScrollPosition);
+   * @endcode
+   * @pre The Object has been initialized.
+   * @return The signal to connect to.
+   */
+  ScrollUpdatedSignalType& ScrollUpdatedSignal();
+
+  /**
+   * @brief Signal emitted when the Scrollable has completed movement (whether by touch or animation).
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName(const Vector2& currentScrollPosition);
+   * @endcode
+   * @pre The Object has been initialized.
+   * @return The signal to connect to.
+   */
+  ScrollCompletedSignalType& ScrollCompletedSignal();
 
 public: // Not intended for application developers
 

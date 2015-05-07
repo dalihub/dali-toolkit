@@ -230,16 +230,13 @@ float ItemLayout::GetFlickSpeedFactor() const
   return GetScrollSpeedFactor();
 }
 
-void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, Handle scrollPositionObject, const Actor& itemViewActor )
+void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, const Actor& itemViewActor )
 {
   // This just implements the default behaviour of constraint application.
   // Custom layouts can override this function to apply their custom constraints.
-  Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast( itemViewActor );
-  if(itemView && scrollPositionObject)
+  Toolkit::ItemView itemView = Toolkit::ItemView::DownCast( itemViewActor );
+  if(itemView)
   {
-    Property::Index scrollSpeedProperty = itemView.GetPropertyIndex("item-view-scroll-speed");
-    Property::Index scrollPositionProperty = scrollPositionObject.GetPropertyIndex("scroll-position");
-
     // We want to animate the layout in so use a weight object to do this
     if ( !mWeightObject )
     {
@@ -251,8 +248,8 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
     {
       WrappedVector3Constraint wrapped(positionConstraint, itemId);
       Constraint constraint = Constraint::New<Vector3>( actor, Actor::Property::POSITION, wrapped );
-      constraint.AddSource( Source( scrollPositionObject, scrollPositionProperty ) );
-      constraint.AddSource( ParentSource( scrollSpeedProperty ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_SPEED ) );
       constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
       constraint.AddSource( Source( mWeightObject, WeightObject::WEIGHT ) );
       constraint.Apply();
@@ -264,8 +261,8 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
       WrappedQuaternionConstraint wrapped(rotationConstraint, itemId);
 
       Constraint constraint = Constraint::New<Quaternion>( actor, Actor::Property::ORIENTATION, wrapped );
-      constraint.AddSource( Source( scrollPositionObject, scrollPositionProperty ) );
-      constraint.AddSource( ParentSource( scrollSpeedProperty ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_SPEED ) );
       constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
       constraint.AddSource( Source( mWeightObject, WeightObject::WEIGHT ) );
       constraint.Apply();
@@ -277,8 +274,8 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
       WrappedVector3Constraint wrapped(scaleConstraint, itemId);
 
       Constraint constraint = Constraint::New<Vector3>( actor, Actor::Property::SCALE, wrapped );
-      constraint.AddSource( Source( scrollPositionObject, scrollPositionProperty ) );
-      constraint.AddSource( ParentSource( scrollSpeedProperty ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_SPEED ) );
       constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
       constraint.AddSource( Source( mWeightObject, WeightObject::WEIGHT ) );
       constraint.Apply();
@@ -290,8 +287,8 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
       WrappedVector4Constraint wrapped(colorConstraint, itemId);
 
       Constraint constraint = Constraint::New<Vector4>( actor, Actor::Property::COLOR, wrapped );
-      constraint.AddSource( Source( scrollPositionObject, scrollPositionProperty ) );
-      constraint.AddSource( ParentSource( scrollSpeedProperty ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_SPEED ) );
       constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
       constraint.AddSource( Source( mWeightObject, WeightObject::WEIGHT ) );
       constraint.SetRemoveAction(Dali::Constraint::Discard);
@@ -304,8 +301,8 @@ void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float d
       WrappedBoolConstraint wrapped(visibilityConstraint, itemId);
 
       Constraint constraint = Constraint::New<bool>( actor, Actor::Property::VISIBLE, wrapped );
-      constraint.AddSource( Source( scrollPositionObject, scrollPositionProperty ) );
-      constraint.AddSource( ParentSource( scrollSpeedProperty ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
+      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_SPEED ) );
       constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
       constraint.AddSource( Source( mWeightObject, WeightObject::WEIGHT ) );
 

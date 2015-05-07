@@ -89,7 +89,7 @@ public:
   void VisibilityConstraint( bool& current, const PropertyInputContainer& inputs )
   {
     const Vector2& anchor(AnchorPoint::CENTER.GetVectorXY());
-    Vector2 position( inputs[0]->GetVector3() + inputs[3]->GetVector3());
+    Vector2 position( inputs[0]->GetVector3().GetVectorXY() + inputs[3]->GetVector2());
     Vector2 scaledSize( inputs[2]->GetVector3() * inputs[1]->GetVector3());
 
     Vector2 domain( inputs[4]->GetVector3() );
@@ -124,7 +124,7 @@ public:
     }
 
     const Vector2& anchor(AnchorPoint::CENTER.GetVectorXY());
-    Vector2 position(inputs[0]->GetVector3() + inputs[3]->GetVector3());
+    Vector2 position( inputs[0]->GetVector3().GetVectorXY() + inputs[3]->GetVector2());
     Vector2 scaledSize(inputs[2]->GetVector3() * inputs[1]->GetVector3());
     Vector2 domain(inputs[4]->GetVector3());
 
@@ -168,7 +168,7 @@ public:
       return;
     }
 
-    position += inputs[2]->GetVector3();
+    position.GetVectorXY() += inputs[2]->GetVector2();
 
     const Vector2& anchor(AnchorPoint::CENTER.GetVectorXY());
     Vector2 scaledSize(inputs[1]->GetVector3() * inputs[0]->GetVector3());

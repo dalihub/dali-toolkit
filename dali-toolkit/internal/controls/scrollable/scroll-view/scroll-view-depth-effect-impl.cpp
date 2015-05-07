@@ -104,10 +104,10 @@ struct ScrollDepthScaleConstraint
   {
     const Vector3& currentPosition = inputs[0]->GetVector3();
     const Vector3& pagePosition = inputs[1]->GetVector3();
-    const Vector3& scrollPosition = inputs[2]->GetVector3();
+    const Vector2& scrollPosition = inputs[2]->GetVector2();
 
     // Get position of page.
-    Vector3 position = pagePosition + scrollPosition;
+    Vector2 position = pagePosition.GetVectorXY() + scrollPosition;
 
     // short circuit: for orthognal view.
     if( (fabsf(position.x) < Math::MACHINE_EPSILON_1) && (fabsf(position.y) < Math::MACHINE_EPSILON_1) )
@@ -119,8 +119,8 @@ struct ScrollDepthScaleConstraint
 
     // Don't have enough parameters, to provide Wrap mode (need a way of having 'uniforms' instead of scrollWrap.GetBoolean())
 
-    const Vector3& min = inputs[3]->GetVector3();
-    const Vector3& max = inputs[4]->GetVector3();
+    const Vector2& min = inputs[3]->GetVector2();
+    const Vector2& max = inputs[4]->GetVector2();
 
     if(fabsf(min.x - max.x) > Math::MACHINE_EPSILON_1)
     {
@@ -223,15 +223,15 @@ struct ScrollDepthPositionConstraint
   void operator()( Vector3& currentPosition, const PropertyInputContainer& inputs )
   {
     const Vector3& pagePosition = inputs[0]->GetVector3();
-    const Vector3& scrollPosition = inputs[1]->GetVector3();
+    const Vector2& scrollPosition = inputs[1]->GetVector2();
 
     // Get position of page.
-    Vector3 position = pagePosition + scrollPosition;
+    Vector2 position = pagePosition.GetVectorXY() + scrollPosition;
 
     // short circuit: for orthognal view.
     if( (fabsf(position.x) < Math::MACHINE_EPSILON_1) && (fabsf(position.y) < Math::MACHINE_EPSILON_1) )
     {
-      currentPosition += scrollPosition;
+      currentPosition.GetVectorXY() += scrollPosition;
       return;
     }
 
@@ -240,8 +240,8 @@ struct ScrollDepthPositionConstraint
 
     if(wrap)
     {
-      const Vector3& min = inputs[2]->GetVector3();
-      const Vector3& max = inputs[3]->GetVector3();
+      const Vector2& min = inputs[2]->GetVector2();
+      const Vector2& max = inputs[3]->GetVector2();
 
       if(fabsf(min.x - max.x) > Math::MACHINE_EPSILON_1)
       {
@@ -261,7 +261,7 @@ struct ScrollDepthPositionConstraint
     {
       // position actors at: scrollposition (Property) + pagePosition (Parent) + current (this)
       // they will be invisible so doesn't have to be precise, just away from stage.
-      currentPosition += scrollPosition;
+      currentPosition.GetVectorXY() += scrollPosition;
       return;
     }
 
@@ -293,7 +293,7 @@ struct ScrollDepthPositionConstraint
     position.y = RampFunction(position.y, mOffsetExtent.y + extent.y);
 
     currentPosition -= pagePosition;
-    currentPosition += pageSize * position;
+    currentPosition += pageSize * Vector3(position);
   }
 
   const Vector2 mPositionExtent;                                ///< Determines how much of the Actor's X and Y position affects exponent value.
