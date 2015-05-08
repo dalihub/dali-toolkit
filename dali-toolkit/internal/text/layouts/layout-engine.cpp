@@ -22,6 +22,7 @@
 #include <limits>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/text-abstraction/font-client.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
@@ -39,6 +40,10 @@ namespace Text
 namespace
 {
 
+#if defined(DEBUG_ENABLED)
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_LAYOUT");
+#endif
+
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 const bool RTL = true;
 
@@ -52,8 +57,8 @@ struct LineLayout
   LineLayout()
   : glyphIndex( 0u ),
     characterIndex( 0u ),
-    numberOfCharacters( 0u ),
     numberOfGlyphs( 0u ),
+    numberOfCharacters( 0u ),
     length( 0.f ),
     widthAdvanceDiff( 0.f ),
     wsLengthEndOfLine( 0.f ),
@@ -68,8 +73,8 @@ struct LineLayout
   {
     glyphIndex = 0u;
     characterIndex = 0u;
-    numberOfCharacters = 0u;
     numberOfGlyphs = 0u;
+    numberOfCharacters = 0u;
     length = 0.f;
     widthAdvanceDiff = 0.f;
     wsLengthEndOfLine = 0.f;
@@ -79,8 +84,8 @@ struct LineLayout
 
   GlyphIndex     glyphIndex;         ///< Index of the first glyph to be laid-out.
   CharacterIndex characterIndex;     ///< Index of the first character to be laid-out.
-  Length         numberOfCharacters; ///< The number of characters which fit in one line.
   Length         numberOfGlyphs;     ///< The number of glyph which fit in one line.
+  Length         numberOfCharacters; ///< The number of characters which fit in one line.
   float          length;             ///< The length of the glyphs which fit in one line.
   float          widthAdvanceDiff;   ///< The difference between the xBearing + width and the advance of the last glyph.
   float          wsLengthEndOfLine;  ///< The length of the white spaces at the end of the line.
@@ -164,6 +169,8 @@ struct LayoutEngine::Impl
   void GetLineLayoutForBox( const LayoutParameters& parameters,
                             LineLayout& lineLayout )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->GetLineLayoutForBox\n" );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  initial glyph index : %d\n", lineLayout.glyphIndex );
     // Stores temporary line layout which has not been added to the final line layout.
     LineLayout tmpLineLayout;
 
@@ -209,6 +216,7 @@ struct LayoutEngine::Impl
          glyphIndex < parameters.totalNumberOfGlyphs;
          ++glyphIndex )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  glyph index : %d\n", glyphIndex );
       const bool isLastGlyph = glyphIndex == lastGlyphIndex;
 
       // Get the glyph info.
@@ -237,6 +245,10 @@ struct LayoutEngine::Impl
       const Character character = *( parameters.textBuffer + characterFirstIndex );
       const bool isWhiteSpace = TextAbstraction::IsWhiteSpace( character );
 
+      // Used to restore the temporal line layout when a single word does not fit in the control's width and is split by character.
+      const float previousTmpLineLength = tmpLineLayout.length;
+      const float previousTmpWidthAdvanceDiff = tmpLineLayout.widthAdvanceDiff;
+
       // Increase the accumulated length.
       if( isWhiteSpace )
       {
@@ -261,10 +273,31 @@ struct LayoutEngine::Impl
       }
 
       // Check if the accumulated length fits in the width of the box.
-      if( isMultiline && oneWordLaidOut && !isWhiteSpace &&
+      if( isMultiline && !isWhiteSpace &&
           ( lineLayout.length + lineLayout.wsLengthEndOfLine + tmpLineLayout.length + tmpLineLayout.widthAdvanceDiff > boundingBoxWidth ) )
       {
         // Current word does not fit in the box's width.
+        if( !oneWordLaidOut )
+        {
+          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  Break the word by character\n" );
+
+          // The word's with doesn't fit in the control's with. It needs to be split by character.
+          if( tmpLineLayout.numberOfGlyphs > 1u )
+          {
+            tmpLineLayout.numberOfCharacters -= charactersPerGlyph;
+            --tmpLineLayout.numberOfGlyphs;
+            tmpLineLayout.length = previousTmpLineLength;
+            tmpLineLayout.widthAdvanceDiff = previousTmpWidthAdvanceDiff;
+          }
+
+          // Add part of the word to the line layout.
+          MergeLineLayout( lineLayout, tmpLineLayout );
+        }
+        else
+        {
+          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  Current word does not fit.\n" );
+        }
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--GetLineLayoutForBox\n" );
         return;
       }
 
@@ -274,16 +307,16 @@ struct LayoutEngine::Impl
         // Must break the line. Update the line layout and return.
         MergeLineLayout( lineLayout, tmpLineLayout );
 
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  Must break\n" );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--GetLineLayoutForBox\n" );
         return;
       }
 
       if( isMultiline &&
           ( TextAbstraction::WORD_BREAK == wordBreakInfo ) )
       {
-        if( !oneWordLaidOut && !isWhiteSpace )
-        {
-          oneWordLaidOut = true;
-        }
+        oneWordLaidOut = true;
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  One word laid out\n" );
 
         // Current glyph is the last one of the current word.
         // Add the temporal layout to the current one.
@@ -300,6 +333,7 @@ struct LayoutEngine::Impl
         lastFontId = glyphInfo.fontId;
       }
     }
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--GetLineLayoutForBox\n" );
   }
 
   bool LayoutText( const LayoutParameters& layoutParameters,
@@ -307,6 +341,7 @@ struct LayoutEngine::Impl
                    Vector<LineRun>& lines,
                    Size& actualSize )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->LayoutText\n" );
     Vector2* glyphPositionsBuffer = glyphPositions.Begin();
 
     float penY = 0.f;
@@ -318,9 +353,16 @@ struct LayoutEngine::Impl
       GetLineLayoutForBox( layoutParameters,
                            layout );
 
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "           glyph index %d\n", layout.glyphIndex );
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "       character index %d\n", layout.characterIndex );
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "      number of glyphs %d\n", layout.numberOfGlyphs );
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  number of characters %d\n", layout.numberOfCharacters );
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "                length %f\n", layout.length );
+
       if( 0u == layout.numberOfGlyphs )
       {
         // The width is too small and no characters are laid-out.
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--LayoutText width too small!\n\n" );
         return false;
       }
 
@@ -377,6 +419,7 @@ struct LayoutEngine::Impl
       index += layout.numberOfGlyphs;
     }
 
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--LayoutText\n\n" );
     return true;
   }
 
