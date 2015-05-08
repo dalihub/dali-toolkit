@@ -42,8 +42,6 @@ struct Event
   // Used to queue input events until DoRelayout()
   enum Type
   {
-    KEYBOARD_FOCUS_GAIN_EVENT,
-    KEYBOARD_FOCUS_LOST_EVENT,
     CURSOR_KEY_EVENT,
     TAP_EVENT,
     PAN_EVENT,
@@ -154,9 +152,8 @@ struct ModifyEvent
 {
   enum Type
   {
-    PLACEHOLDER_TEXT, ///< Show the placeholder text if necessary
     TEXT_REPLACED,    ///< The entire text was replaced
-    TEXT_INSERTED,      ///< Insert characters at the current cursor position
+    TEXT_INSERTED,    ///< Insert characters at the current cursor position
     TEXT_DELETED      ///< Characters were deleted
   };
 
@@ -263,17 +260,6 @@ struct Controller::Impl
     return ( mEventData && mEventData->mIsShowingPlaceholderText );
   }
 
-  void ShowPlaceholderText()
-  {
-    if( IsPlaceholderAvailable() )
-    {
-      mEventData->mIsShowingPlaceholderText = true;
-
-      // Placeholder-text is dependent on focus state i.e. replace after event processing
-      QueueModifyEvent( ModifyEvent::PLACEHOLDER_TEXT );
-    }
-  }
-
   /**
    * @brief Called when placeholder-text is hidden
    */
@@ -298,11 +284,6 @@ struct Controller::Impl
     }
   }
 
-  /**
-   * @brief Called when placeholder-text is shown
-   */
-  void ReplaceTextWithPlaceholder();
-
   void UpdateModel( OperationsMask operationsRequired );
 
   /**
@@ -312,8 +293,6 @@ struct Controller::Impl
    * @param[in] numberOfCharacters The number of characters in the logical model.
    */
   void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters );
-
-  void OnKeyboardFocus( bool hasFocus );
 
   void OnCursorKeyEvent( const Event& event );
 

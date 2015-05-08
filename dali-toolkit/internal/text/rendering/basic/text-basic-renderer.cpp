@@ -18,12 +18,15 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/text/rendering/basic/text-basic-renderer.h>
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/text-abstraction/font-client.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/images/atlas.h>
 #include <dali/public-api/geometry/mesh.h>
+#include <dali/integration-api/debug.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/shaders/text-basic-shader.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-bgra-shader.h>
 
@@ -34,6 +37,10 @@ using namespace Dali::Toolkit::Text;
 
 namespace
 {
+
+#if defined(DEBUG_ENABLED)
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_RENDERING");
+#endif
 
 const std::size_t PADDING = 2; //< To avoid GL filtering artefacts
 
@@ -330,6 +337,8 @@ struct BasicRenderer::Impl
 
 Text::RendererPtr BasicRenderer::New()
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Text::BasicRenderer::New()\n" );
+
   return Text::RendererPtr( new BasicRenderer() );
 }
 

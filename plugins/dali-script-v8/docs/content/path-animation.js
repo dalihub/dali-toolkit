@@ -4,7 +4,7 @@
 
 Paths can be used to animate position and orientation of actors.
 
-<img src="../assets/img/path.png"/>
+![ ](../assets/img/path/path.png)
   
 Example
 

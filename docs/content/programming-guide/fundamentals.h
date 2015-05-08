@@ -18,7 +18,7 @@ Stage::GetCurrent().Add(actor);
 The Stage has a 2D size, which matches the size of the application window.  The default coordinate system in Dali has the origin at the top-left corner, with positive X to right, and position Y going
 downwards.  This is intended to be convenient when laying-out 2D views.
 
-\image html coordinate-system-and-stage.png
+![ ](../assets/img/coordinate-system-and-stage.png)
 
 <h2 class="pg">Positioning Actors</h2>
 
@@ -26,19 +26,19 @@ An actor inherits its parent's position.  The relative position between the acto
 
 1) ParentOrigin.  This Vector3 property defines a point within the parent actor's area.
 
-\image html parent-origin.png
+![ ](../assets/img/parent-origin.png)
 
 The default is "top-left", which can be visualized in 2D as (0, 0), but is actually Vector3(0, 0, 0.5) in the 3D Dali world.  The actor's position is relative to this point.
 
 2) AnchorPoint.  This Vector3 property defines a point within the child actor's area.
 
-\image html anchor-point.png
+![ ](../assets/img/anchor-point.png)
 
 The default is "center", which can be visualized in 2D as (0.5, 0.5), but is actually Vector3(0.5, 0.5, 0.5) in the 3D Dali world.  The actor's position is also relative to this point.
 
 3) Position.  This is the position vector between the parent-origin and anchor-point.
 
-\image html actor-position.png
+![ ](../assets/img/actor-position.png)
 
 Therefore by default, an actors position is the distance between its center and the top-left corner of its parent.
 

@@ -58,8 +58,9 @@ The API supports functionality such as:
 + {{#crossLink "ShaderEffect/setUniform:method"}}{{/crossLink}}
 
 ### Example of using a custom uniform to brighten an Image (Fragment Shader)
-
-<img src="../assets/img/fragment-shader-color.png">
+  
+![ ](../assets/img/shaders/fragment-shader-color.png)
+  
 ```
 createColorEffect = function()
 {
@@ -118,8 +119,9 @@ Like all animatable properties we can also use keyframes to animate the value.
 ### Example of animating a custom uniform to perform a mask operation (Fragment Shader)
 
 In this example we are using the OpenGL discard function to draw an image with a circular mask.
-
-<img src="../assets/img/fragment-shader-reveal.png">
+  
+![ ](../assets/img/shaders/fragment-shader-reveal.png)
+  
 ```
 createRevealEffect = function()
 {
@@ -177,8 +179,9 @@ shaderAnim.play();
 ```
 * * *
 ### Example of paper twisting in the wind with color (Vertex + Fragment Shader)
-
-<img src="../assets/img/vertex-shader.png"><br>
+  
+![ ](../assets/img/shaders/vertex-shader.png)
+  
 
 The example does the following:
 
@@ -188,9 +191,9 @@ The example does the following:
 
 An ImageActor normally only has 4 vertices ( quad ). To allow the image to twist and bend we need it to have more
 vertices. To do this we can break the image into a grid using the gridX and gridY geometry hints.
-
-<img src="../assets/img/shader-grid-hint.png">
-
+  
+![ ](../assets/img/shaders/shader-grid-hint.png)
+  
 ```
 createTwistEffect = function()
 {

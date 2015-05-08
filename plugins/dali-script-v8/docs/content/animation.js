@@ -118,7 +118,8 @@ The example below does the following with a single animation object:
  - rotates the image actor
  - magnifies and color shifts the image using a fragment shader
   
-<img src="../assets/img/shader-animation.png">
+![ ](../assets/img/shaders/shader-animation.png)
+
   
 
 ```

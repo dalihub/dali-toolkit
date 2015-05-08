@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <stdint.h>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -75,6 +76,15 @@ uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length, uint32_t* utf3
  * @return The number of bytes.
  */
 uint32_t Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, uint8_t* utf8 );
+
+/**
+ * @brief Converts a text array encoded in UTF32 into a text array encoded in UTF8.
+ *
+ * @param[in] utf32 The pointer to the UTF32 array.
+ * @param[in] numberOfCharacters The number of characters of the UTF32 array.
+ * @param[out] utf8 The UTF8 characters will be stored here.
+ */
+void Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, std::string& utf8 );
 
 } // namespace Toolkit
 

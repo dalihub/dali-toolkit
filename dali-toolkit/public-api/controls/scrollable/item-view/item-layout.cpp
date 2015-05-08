@@ -29,11 +29,11 @@
 namespace
 {
 
-// Lerps between current and target using the progress
+// Lerps between initial and target using the progress
 template< typename Type >
-void Lerp( Type& current, const Type& target, float progress )
+void Lerp( Type& current, const Type& initial, const Type& target, float progress )
 {
-  current += ((target - current) * progress);
+  current = initial + ((target - initial) * progress);
 }
 
 // Functors which wrap constraint functions with stored item IDs
@@ -41,7 +41,8 @@ struct WrappedQuaternionConstraint
 {
   WrappedQuaternionConstraint( Dali::Toolkit::ItemLayout::QuaternionFunction wrapMe, unsigned int itemId )
   :mWrapMe(wrapMe),
-   mItemId(itemId)
+   mItemId(itemId),
+   mInitialised( false )
   {
   }
 
@@ -50,18 +51,28 @@ struct WrappedQuaternionConstraint
     float offsetLayoutPosition = inputs[0]->GetFloat() + static_cast<float>(mItemId);
     float weight = inputs[3]->GetFloat();
 
-    current = Dali::Quaternion::Slerp( current, mWrapMe( current, offsetLayoutPosition, inputs[1]->GetFloat(), inputs[2]->GetVector3() ), weight );
+    if( !mInitialised )
+    {
+      mInitialised = true;
+      mInitial = current;
+    }
+
+    current = Dali::Quaternion::Slerp( mInitial, mWrapMe( current, offsetLayoutPosition, inputs[1]->GetFloat(), inputs[2]->GetVector3() ), weight );
   }
 
   Dali::Toolkit::ItemLayout::QuaternionFunction mWrapMe;
   unsigned int mItemId;
+  Dali::Quaternion mInitial;
+  bool mInitialised:1;
 };
 
 struct WrappedVector3Constraint
 {
   WrappedVector3Constraint( Dali::Toolkit::ItemLayout::Vector3Function wrapMe, unsigned int itemId )
   : mWrapMe(wrapMe),
-    mItemId(itemId)
+    mItemId(itemId),
+    mInitial(),
+    mInitialised( false )
   {
   }
 
@@ -70,18 +81,28 @@ struct WrappedVector3Constraint
     float offsetLayoutPosition = inputs[0]->GetFloat() + static_cast<float>(mItemId);
     float weight = inputs[3]->GetFloat();
 
-    Lerp( current, mWrapMe( current, offsetLayoutPosition, inputs[1]->GetFloat(), inputs[2]->GetVector3() ), weight );
+    if( !mInitialised )
+    {
+      mInitialised = true;
+      mInitial = current;
+    }
+
+    Lerp( current, mInitial, mWrapMe( current, offsetLayoutPosition, inputs[1]->GetFloat(), inputs[2]->GetVector3() ), weight );
   }
 
   Dali::Toolkit::ItemLayout::Vector3Function mWrapMe;
   unsigned int mItemId;
+  Dali::Vector3 mInitial;
+  bool mInitialised:1;
 };
 
 struct WrappedVector4Constraint
 {
   WrappedVector4Constraint( Dali::Toolkit::ItemLayout::Vector4Function wrapMe, unsigned int itemId )
   : mWrapMe(wrapMe),
-    mItemId(itemId)
+    mItemId(itemId),
+    mInitial(),
+    mInitialised( false )
   {
   }
 
@@ -90,11 +111,19 @@ struct WrappedVector4Constraint
     float offsetLayoutPosition = inputs[0]->GetFloat() + static_cast<float>(mItemId);
     float weight = inputs[3]->GetFloat();
 
-    Lerp( current, mWrapMe( current, offsetLayoutPosition, inputs[1]->GetFloat(), inputs[2]->GetVector3() ), weight );
+    if( !mInitialised )
+    {
+      mInitialised = true;
+      mInitial = current;
+    }
+
+    Lerp( current, mInitial, mWrapMe( current, offsetLayoutPosition, inputs[1]->GetFloat(), inputs[2]->GetVector3() ), weight );
   }
 
   Dali::Toolkit::ItemLayout::Vector4Function mWrapMe;
   unsigned int mItemId;
+  Dali::Vector4 mInitial;
+  bool mInitialised:1;
 };
 
 struct WrappedBoolConstraint

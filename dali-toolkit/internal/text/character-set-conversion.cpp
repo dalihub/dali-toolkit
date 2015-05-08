@@ -211,6 +211,17 @@ uint32_t Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, 
   return utf8 - utf8Begin;
 }
 
+void Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, std::string& utf8 )
+{
+  utf8.clear();
+
+  uint32_t numberOfBytes = GetNumberOfUtf8Bytes( &utf32[0], numberOfCharacters );
+  utf8.resize( numberOfBytes );
+
+  // This is a bit horrible but std::string returns a (signed) char*
+  Utf32ToUtf8( utf32, numberOfCharacters, reinterpret_cast<uint8_t*>(&utf8[0]) );
+}
+
 } // namespace Toolkit
 
 } // namespace Dali

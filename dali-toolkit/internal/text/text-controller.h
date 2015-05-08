@@ -110,6 +110,14 @@ public:
   static ControllerPtr New( ControlInterface& controlInterface );
 
   /**
+   * @brief Called to enable text input.
+   *
+   * @note Selectable or editable controls should call this once after Controller::New().
+   * @param[in] decorator Used to create cursor, selection handle decorations etc.
+   */
+  void EnableTextInput( DecoratorPtr decorator );
+
+  /**
    * @brief Replaces any text previously set.
    *
    * @note This will be converted into UTF-32 when stored in the text model.
@@ -311,14 +319,6 @@ public:
   float GetUnderlineHeight() const;
 
   /**
-   * @brief Called to enable text input.
-   *
-   * @note Only selectable or editable controls should calls this.
-   * @param[in] decorator Used to create cursor, selection handle decorations etc.
-   */
-  void EnableTextInput( DecoratorPtr decorator );
-
-  /**
    * @brief Called to enable/disable cursor blink.
    *
    * @note Only editable controls should calls this.
@@ -482,6 +482,21 @@ protected:
   virtual ~Controller();
 
 private:
+
+  /**
+   * @brief Helper to clear font-specific data.
+   */
+  void ShowPlaceholderText();
+
+  /**
+   * @brief Helper to clear all the model data except for LogicalModel::mText.
+   */
+  void ClearModelData();
+
+  /**
+   * @brief Helper to clear font-specific data (only).
+   */
+  void ClearFontData();
 
   /**
    * @brief Private constructor.

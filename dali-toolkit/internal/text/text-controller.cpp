@@ -22,6 +22,7 @@
 #include <limits>
 #include <iostream>
 #include <dali/public-api/adaptor-framework/key.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
@@ -37,6 +38,10 @@
 
 namespace
 {
+
+#if defined(DEBUG_ENABLED)
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
+#endif
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 
@@ -56,6 +61,14 @@ namespace Text
 ControllerPtr Controller::New( ControlInterface& controlInterface )
 {
   return ControllerPtr( new Controller( controlInterface ) );
+}
+
+void Controller::EnableTextInput( DecoratorPtr decorator )
+{
+  if( !mImpl->mEventData )
+  {
+    mImpl->mEventData = new EventData( decorator );
+  }
 }
 
 void Controller::SetText( const std::string& text )
@@ -80,6 +93,9 @@ void Controller::SetText( const std::string& text )
     Length characterCount = Utf8ToUtf32( utf8, text.size(), utf32Characters.Begin() );
     utf32Characters.Resize( characterCount );
 
+    DALI_ASSERT_DEBUG( text.size() >= characterCount && "Invalid UTF32 conversion length" );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText %p UTF8 size %d, UTF32 size %d\n", this, text.size(), mImpl->mLogicalModel->mText.Count() );
+
     // Reset the cursor position
     if( mImpl->mEventData )
     {
@@ -91,7 +107,7 @@ void Controller::SetText( const std::string& text )
   }
   else
   {
-    mImpl->ShowPlaceholderText();
+    ShowPlaceholderText();
   }
 
   if( mImpl->mEventData )
@@ -112,13 +128,12 @@ void Controller::GetText( std::string& text ) const
 
     if( 0u != utf32Characters.Count() )
     {
-      uint32_t numberOfBytes = GetNumberOfUtf8Bytes( &utf32Characters[0], utf32Characters.Count() );
-
-      text.resize( numberOfBytes );
-
-      // This is a bit horrible but std::string returns a (signed) char*
-      Utf32ToUtf8( &utf32Characters[0], utf32Characters.Count(), reinterpret_cast<uint8_t*>(&text[0]) );
+      Utf32ToUtf8( &utf32Characters[0], utf32Characters.Count(), text );
     }
+  }
+  else
+  {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::GetText %p empty (but showing placeholder)\n", this );
   }
 }
 
@@ -145,7 +160,7 @@ void Controller::SetPlaceholderText( PlaceholderType type, const std::string& te
       mImpl->mEventData->mPlaceholderTextActive = text;
     }
 
-    mImpl->ShowPlaceholderText();
+    ShowPlaceholderText();
   }
 }
 
@@ -185,20 +200,12 @@ void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
   }
 
   mImpl->mFontDefaults->mDefaultFontFamily = defaultFontFamily;
-  mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-  mImpl->mRecalculateNaturalSize = true;
 
   // Clear the font-specific data
-  mImpl->mLogicalModel->mFontRuns.Clear();
-  mImpl->mVisualModel->mGlyphs.Clear();
-  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
-  mImpl->mVisualModel->mCharactersToGlyph.Clear();
-  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
-  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
-  mImpl->mVisualModel->mGlyphPositions.Clear();
-  mImpl->mVisualModel->mLines.Clear();
-  mImpl->mVisualModel->ClearCaches();
+  ClearFontData();
+
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  mImpl->mRecalculateNaturalSize = true;
 
   mImpl->RequestRelayout();
 }
@@ -221,20 +228,12 @@ void Controller::SetDefaultFontStyle( const std::string& defaultFontStyle )
   }
 
   mImpl->mFontDefaults->mDefaultFontStyle = defaultFontStyle;
-  mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-  mImpl->mRecalculateNaturalSize = true;
 
   // Clear the font-specific data
-  mImpl->mLogicalModel->mFontRuns.Clear();
-  mImpl->mVisualModel->mGlyphs.Clear();
-  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
-  mImpl->mVisualModel->mCharactersToGlyph.Clear();
-  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
-  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
-  mImpl->mVisualModel->mGlyphPositions.Clear();
-  mImpl->mVisualModel->mLines.Clear();
-  mImpl->mVisualModel->ClearCaches();
+  ClearFontData();
+
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  mImpl->mRecalculateNaturalSize = true;
 
   mImpl->RequestRelayout();
 }
@@ -257,20 +256,12 @@ void Controller::SetDefaultPointSize( float pointSize )
   }
 
   mImpl->mFontDefaults->mDefaultPointSize = pointSize;
-  mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
-  mImpl->mOperationsPending = ALL_OPERATIONS;
-  mImpl->mRecalculateNaturalSize = true;
 
   // Clear the font-specific data
-  mImpl->mLogicalModel->mFontRuns.Clear();
-  mImpl->mVisualModel->mGlyphs.Clear();
-  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
-  mImpl->mVisualModel->mCharactersToGlyph.Clear();
-  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
-  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
-  mImpl->mVisualModel->mGlyphPositions.Clear();
-  mImpl->mVisualModel->mLines.Clear();
-  mImpl->mVisualModel->ClearCaches();
+  ClearFontData();
+
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+  mImpl->mRecalculateNaturalSize = true;
 
   mImpl->RequestRelayout();
 }
@@ -304,6 +295,9 @@ bool Controller::RemoveText( int cursorOffset, int numberOfChars )
 {
   bool removed( false );
 
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p mText.Count() %d cursor %d cursorOffset %d numberOfChars %d\n",
+                 this, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition, cursorOffset, numberOfChars );
+
   if( ! mImpl->IsShowingPlaceholderText() )
   {
     // Delete at current cursor position
@@ -313,7 +307,7 @@ bool Controller::RemoveText( int cursorOffset, int numberOfChars )
     CharacterIndex cursorIndex = oldCursorIndex;
 
     // Validate the cursor position & number of characters
-    if( std::abs( cursorOffset ) <= cursorIndex )
+    if( static_cast< CharacterIndex >( std::abs( cursorOffset ) ) <= cursorIndex )
     {
       cursorIndex = oldCursorIndex + cursorOffset;
     }
@@ -334,6 +328,7 @@ bool Controller::RemoveText( int cursorOffset, int numberOfChars )
       // Cursor position retreat
       oldCursorIndex = cursorIndex;
 
+      DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p removed %d\n", this, numberOfChars );
       removed = true;
     }
   }
@@ -414,14 +409,6 @@ float Controller::GetUnderlineHeight() const
   return mImpl->mVisualModel->GetUnderlineHeight();
 }
 
-void Controller::EnableTextInput( DecoratorPtr decorator )
-{
-  if( !mImpl->mEventData )
-  {
-    mImpl->mEventData = new EventData( decorator );
-  }
-}
-
 void Controller::SetEnableCursorBlink( bool enable )
 {
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "TextInput disabled" );
@@ -465,6 +452,7 @@ const Vector2& Controller::GetAlignmentOffset() const
 
 Vector3 Controller::GetNaturalSize()
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::GetNaturalSize\n" );
   Vector3 naturalSize;
 
   // Make sure the model is up-to-date before layouting
@@ -505,10 +493,14 @@ Vector3 Controller::GetNaturalSize()
     mImpl->mVisualModel->SetNaturalSize( naturalSize.GetVectorXY() );
 
     mImpl->mRecalculateNaturalSize = false;
+
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetNaturalSize calculated %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z );
   }
   else
   {
     naturalSize = mImpl->mVisualModel->GetNaturalSize();
+
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetNaturalSize cached %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z );
   }
 
   return naturalSize;
@@ -516,6 +508,7 @@ Vector3 Controller::GetNaturalSize()
 
 float Controller::GetHeightForWidth( float width )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::GetHeightForWidth %p width %f\n", this, width );
   // Make sure the model is up-to-date before layouting
   ProcessModifyEvents();
 
@@ -549,10 +542,12 @@ float Controller::GetHeightForWidth( float width )
 
     // Do the size related operations again.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | sizeOperations );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth calculated %f\n", layoutSize.height );
   }
   else
   {
     layoutSize = mImpl->mVisualModel->GetActualSize();
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetHeightForWidth cached %f\n", layoutSize.height );
   }
 
   return layoutSize.height;
@@ -560,6 +555,8 @@ float Controller::GetHeightForWidth( float width )
 
 bool Controller::Relayout( const Size& size )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f\n", this, size.width, size.height );
+
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
     bool glyphsRemoved( false );
@@ -569,11 +566,14 @@ bool Controller::Relayout( const Size& size )
       glyphsRemoved = true;
     }
     // Not worth to relayout if width or height is equal to zero.
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout (skipped)\n" );
     return glyphsRemoved;
   }
 
   if( size != mImpl->mControlSize )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "new size (previous size %f,%f)\n", mImpl->mControlSize.width, mImpl->mControlSize.height );
+
     // Operations that need to be done if the size changes.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                              LAYOUT                    |
@@ -605,6 +605,7 @@ bool Controller::Relayout( const Size& size )
     updated = mImpl->ProcessInputEvents() || updated;
   }
 
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::Relayout\n" );
   return updated;
 }
 
@@ -614,16 +615,7 @@ void Controller::ProcessModifyEvents()
 
   for( unsigned int i=0; i<events.size(); ++i )
   {
-    if( ModifyEvent::PLACEHOLDER_TEXT == events[0].type )
-    {
-      // Use placeholder if text is empty
-      if( 0u == mImpl->mLogicalModel->mText.Count() &&
-          mImpl->IsShowingPlaceholderText() )
-      {
-        mImpl->ReplaceTextWithPlaceholder();
-      }
-    }
-    else if( ModifyEvent::TEXT_REPLACED == events[0].type )
+    if( ModifyEvent::TEXT_REPLACED == events[0].type )
     {
       // A (single) replace event should come first, otherwise we wasted time processing NOOP events
       DALI_ASSERT_DEBUG( 0 == i && "Unexpected TEXT_REPLACED event" );
@@ -652,23 +644,7 @@ void Controller::ResetText()
 {
   // Reset buffers.
   mImpl->mLogicalModel->mText.Clear();
-  mImpl->mLogicalModel->mScriptRuns.Clear();
-  mImpl->mLogicalModel->mFontRuns.Clear();
-  mImpl->mLogicalModel->mLineBreakInfo.Clear();
-  mImpl->mLogicalModel->mWordBreakInfo.Clear();
-  mImpl->mLogicalModel->mBidirectionalParagraphInfo.Clear();
-  mImpl->mLogicalModel->mCharacterDirections.Clear();
-  mImpl->mLogicalModel->mBidirectionalLineInfo.Clear();
-  mImpl->mLogicalModel->mLogicalToVisualMap.Clear();
-  mImpl->mLogicalModel->mVisualToLogicalMap.Clear();
-  mImpl->mVisualModel->mGlyphs.Clear();
-  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
-  mImpl->mVisualModel->mCharactersToGlyph.Clear();
-  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
-  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
-  mImpl->mVisualModel->mGlyphPositions.Clear();
-  mImpl->mVisualModel->mLines.Clear();
-  mImpl->mVisualModel->ClearCaches();
+  ClearModelData();
 
   // Reset the cursor position
   if( mImpl->mEventData )
@@ -689,23 +665,7 @@ void Controller::ResetText()
 void Controller::TextReplacedEvent()
 {
   // Reset buffers.
-  mImpl->mLogicalModel->mScriptRuns.Clear();
-  mImpl->mLogicalModel->mFontRuns.Clear();
-  mImpl->mLogicalModel->mLineBreakInfo.Clear();
-  mImpl->mLogicalModel->mWordBreakInfo.Clear();
-  mImpl->mLogicalModel->mBidirectionalParagraphInfo.Clear();
-  mImpl->mLogicalModel->mCharacterDirections.Clear();
-  mImpl->mLogicalModel->mBidirectionalLineInfo.Clear();
-  mImpl->mLogicalModel->mLogicalToVisualMap.Clear();
-  mImpl->mLogicalModel->mVisualToLogicalMap.Clear();
-  mImpl->mVisualModel->mGlyphs.Clear();
-  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
-  mImpl->mVisualModel->mCharactersToGlyph.Clear();
-  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
-  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
-  mImpl->mVisualModel->mGlyphPositions.Clear();
-  mImpl->mVisualModel->mLines.Clear();
-  mImpl->mVisualModel->ClearCaches();
+  ClearModelData();
 
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
@@ -724,23 +684,7 @@ void Controller::TextInsertedEvent()
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected TextInsertedEvent" );
 
   // TODO - Optimize this
-  mImpl->mLogicalModel->mScriptRuns.Clear();
-  mImpl->mLogicalModel->mFontRuns.Clear();
-  mImpl->mLogicalModel->mLineBreakInfo.Clear();
-  mImpl->mLogicalModel->mWordBreakInfo.Clear();
-  mImpl->mLogicalModel->mBidirectionalParagraphInfo.Clear();
-  mImpl->mLogicalModel->mCharacterDirections.Clear();
-  mImpl->mLogicalModel->mBidirectionalLineInfo.Clear();
-  mImpl->mLogicalModel->mLogicalToVisualMap.Clear();
-  mImpl->mLogicalModel->mVisualToLogicalMap.Clear();
-  mImpl->mVisualModel->mGlyphs.Clear();
-  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
-  mImpl->mVisualModel->mCharactersToGlyph.Clear();
-  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
-  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
-  mImpl->mVisualModel->mGlyphPositions.Clear();
-  mImpl->mVisualModel->mLines.Clear();
-  mImpl->mVisualModel->ClearCaches();
+  ClearModelData();
 
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
@@ -763,23 +707,7 @@ void Controller::TextDeletedEvent()
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected TextDeletedEvent" );
 
   // TODO - Optimize this
-  mImpl->mLogicalModel->mScriptRuns.Clear();
-  mImpl->mLogicalModel->mFontRuns.Clear();
-  mImpl->mLogicalModel->mLineBreakInfo.Clear();
-  mImpl->mLogicalModel->mWordBreakInfo.Clear();
-  mImpl->mLogicalModel->mBidirectionalParagraphInfo.Clear();
-  mImpl->mLogicalModel->mCharacterDirections.Clear();
-  mImpl->mLogicalModel->mBidirectionalLineInfo.Clear();
-  mImpl->mLogicalModel->mLogicalToVisualMap.Clear();
-  mImpl->mLogicalModel->mVisualToLogicalMap.Clear();
-  mImpl->mVisualModel->mGlyphs.Clear();
-  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
-  mImpl->mVisualModel->mCharactersToGlyph.Clear();
-  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
-  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
-  mImpl->mVisualModel->mGlyphPositions.Clear();
-  mImpl->mVisualModel->mLines.Clear();
-  mImpl->mVisualModel->ClearCaches();
+  ClearModelData();
 
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
@@ -801,6 +729,7 @@ bool Controller::DoRelayout( const Size& size,
                              OperationsMask operationsRequired,
                              Size& layoutSize )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::DoRelayout %p size %f,%f\n", this, size.width, size.height );
   bool viewUpdated( false );
 
   // Calculate the operations to be done.
@@ -817,6 +746,7 @@ bool Controller::DoRelayout( const Size& size,
     if( 0u == numberOfGlyphs )
     {
       // Nothing else to do if there is no glyphs.
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout no glyphs, view updated true\n" );
       return true;
     }
 
@@ -932,6 +862,7 @@ bool Controller::DoRelayout( const Size& size,
     layoutSize = mImpl->mVisualModel->GetActualSize();
   }
 
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout no glyphs, view updated %s\n", ( viewUpdated ? "true" : "false" ) );
   return viewUpdated;
 }
 
@@ -1015,8 +946,13 @@ void Controller::KeyboardFocusGainEvent()
 
   if( mImpl->mEventData )
   {
-    Event event( Event::KEYBOARD_FOCUS_GAIN_EVENT );
-    mImpl->mEventData->mEventQueue.push_back( event );
+    mImpl->ChangeState( EventData::EDITING );
+
+    if( mImpl->IsShowingPlaceholderText() )
+    {
+      // Show alternative placeholder-text when editing
+      ShowPlaceholderText();
+    }
 
     mImpl->RequestRelayout();
   }
@@ -1028,8 +964,13 @@ void Controller::KeyboardFocusLostEvent()
 
   if( mImpl->mEventData )
   {
-    Event event( Event::KEYBOARD_FOCUS_LOST_EVENT );
-    mImpl->mEventData->mEventQueue.push_back( event );
+    mImpl->ChangeState( EventData::INACTIVE );
+
+    if( mImpl->IsShowingPlaceholderText() )
+    {
+      // Revert to regular placeholder-text when not editing
+      ShowPlaceholderText();
+    }
 
     mImpl->RequestRelayout();
   }
@@ -1069,7 +1010,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       {
         if( 0u == mImpl->mLogicalModel->mText.Count() )
         {
-          mImpl->ShowPlaceholderText();
+          ShowPlaceholderText();
+          mImpl->mEventData->mUpdateCursorPosition = true;
         }
         else
         {
@@ -1094,6 +1036,10 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 {
   bool removedPreEdit( false );
   bool maxLengthReached( false );
+
+  DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected InsertText" )
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::InsertText %p %s (%s) mPreEditFlag %d cursor %d\n",
+                 this, text.c_str(), (COMMIT == type ? "COMMIT" : "PRE_EDIT"), mImpl->mEventData->mPreEditFlag, mImpl->mEventData->mPrimaryCursorPosition );
 
   if( ! text.empty() )
   {
@@ -1123,6 +1069,8 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
         // Record the start of the pre-edit text
         mImpl->mEventData->mPreEditStartPosition = mImpl->mEventData->mPrimaryCursorPosition;
         mImpl->mEventData->mPreEditLength = text.size();
+
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "mPreEditStartPosition %d mPreEditLength %d\n", mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength );
       }
 
       mImpl->mEventData->mPreEditFlag = true;
@@ -1142,6 +1090,9 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     // It returns the actual number of characters.
     Length characterCount = Utf8ToUtf32( utf8, text.size(), utf32Characters.Begin() );
     utf32Characters.Resize( characterCount );
+
+    DALI_ASSERT_DEBUG( text.size() >= utf32Characters.Count() && "Invalid UTF32 conversion length" );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "UTF8 size %d, UTF32 size %d\n", text.size(), utf32Characters.Count() );
 
     const Length numberOfCharactersInModel = mImpl->mLogicalModel->GetNumberOfCharacters();
 
@@ -1164,6 +1115,8 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     }
 
     cursorIndex += maxSizeOfNewText;
+
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Inserted %d characters, new size %d new cursor %d\n", maxSizeOfNewText, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition );
   }
 
   if( removedPreEdit || !text.empty() )
@@ -1174,6 +1127,8 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
   if( maxLengthReached )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "MaxLengthReached (%d)\n", mImpl->mLogicalModel->mText.Count() );
+
     mImpl->mControlInterface.MaxLengthReached();
 
     mImpl->PreEditReset();
@@ -1184,6 +1139,33 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected TapEvent" );
 
+  if( NULL != mImpl->mEventData )
+  {
+    if( 1u == tapCount )
+    {
+      bool tapDuringEditMode( EventData::EDITING == mImpl->mEventData->mState );
+
+      if( ! mImpl->IsShowingPlaceholderText() &&
+          EventData::EDITING == mImpl->mEventData->mState )
+      {
+        // Grab handle is not shown until a tap is received whilst EDITING
+        if( tapDuringEditMode )
+        {
+          mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        }
+        mImpl->mEventData->mDecorator->SetPopupActive( false );
+      }
+
+      mImpl->ChangeState( EventData::EDITING );
+    }
+    else if( mImpl->mEventData->mSelectionEnabled &&
+             ( 2u == tapCount ) )
+    {
+      mImpl->ChangeState( EventData::SELECTING );
+    }
+  }
+
+  // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
   if( mImpl->mEventData )
   {
     Event event( Event::TAP_EVENT );
@@ -1266,6 +1248,103 @@ void Controller::HandleEvent( HandleType handleType, HandleState state, float x,
 Controller::~Controller()
 {
   delete mImpl;
+}
+
+void Controller::ShowPlaceholderText()
+{
+  if( mImpl->IsPlaceholderAvailable() )
+  {
+    DALI_ASSERT_DEBUG( mImpl->mEventData && "No placeholder text available" );
+
+    mImpl->mEventData->mIsShowingPlaceholderText = true;
+
+    // Cancel previously queued inserts etc.
+    mImpl->mModifyEvents.clear();
+
+    // Disable handles when showing place-holder text
+    mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+    mImpl->mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+    mImpl->mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+
+    const char* text( NULL );
+    size_t size( 0 );
+
+    // TODO - Switch placeholder text styles when changing state
+    if( EventData::INACTIVE != mImpl->mEventData->mState &&
+        0u != mImpl->mEventData->mPlaceholderTextActive.c_str() )
+    {
+      text = mImpl->mEventData->mPlaceholderTextActive.c_str();
+      size = mImpl->mEventData->mPlaceholderTextActive.size();
+    }
+    else
+    {
+      text = mImpl->mEventData->mPlaceholderTextInactive.c_str();
+      size = mImpl->mEventData->mPlaceholderTextInactive.size();
+    }
+
+    // Reset model for showing placeholder.
+    mImpl->mLogicalModel->mText.Clear();
+    ClearModelData();
+    mImpl->mVisualModel->SetTextColor( mImpl->mEventData->mPlaceholderTextColor );
+
+    // Convert text into UTF-32
+    Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
+    utf32Characters.Resize( size );
+
+    // This is a bit horrible but std::string returns a (signed) char*
+    const uint8_t* utf8 = reinterpret_cast<const uint8_t*>( text );
+
+    // Transform a text array encoded in utf8 into an array encoded in utf32.
+    // It returns the actual number of characters.
+    Length characterCount = Utf8ToUtf32( utf8, size, utf32Characters.Begin() );
+    utf32Characters.Resize( characterCount );
+
+    // Reset the cursor position
+    mImpl->mEventData->mPrimaryCursorPosition = 0;
+
+    // The natural size needs to be re-calculated.
+    mImpl->mRecalculateNaturalSize = true;
+
+    // Apply modifications to the model
+    mImpl->mOperationsPending = ALL_OPERATIONS;
+    mImpl->QueueModifyEvent( ModifyEvent::TEXT_REPLACED );
+  }
+}
+
+void Controller::ClearModelData()
+{
+  // n.b. This does not Clear the mText from mLogicalModel
+  mImpl->mLogicalModel->mScriptRuns.Clear();
+  mImpl->mLogicalModel->mFontRuns.Clear();
+  mImpl->mLogicalModel->mLineBreakInfo.Clear();
+  mImpl->mLogicalModel->mWordBreakInfo.Clear();
+  mImpl->mLogicalModel->mBidirectionalParagraphInfo.Clear();
+  mImpl->mLogicalModel->mCharacterDirections.Clear();
+  mImpl->mLogicalModel->mBidirectionalLineInfo.Clear();
+  mImpl->mLogicalModel->mLogicalToVisualMap.Clear();
+  mImpl->mLogicalModel->mVisualToLogicalMap.Clear();
+  mImpl->mVisualModel->mGlyphs.Clear();
+  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
+  mImpl->mVisualModel->mCharactersToGlyph.Clear();
+  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
+  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
+  mImpl->mVisualModel->mGlyphPositions.Clear();
+  mImpl->mVisualModel->mLines.Clear();
+  mImpl->mVisualModel->ClearCaches();
+}
+
+void Controller::ClearFontData()
+{
+  mImpl->mFontDefaults->mFontId = 0u; // Remove old font ID
+  mImpl->mLogicalModel->mFontRuns.Clear();
+  mImpl->mVisualModel->mGlyphs.Clear();
+  mImpl->mVisualModel->mGlyphsToCharacters.Clear();
+  mImpl->mVisualModel->mCharactersToGlyph.Clear();
+  mImpl->mVisualModel->mCharactersPerGlyph.Clear();
+  mImpl->mVisualModel->mGlyphsPerCharacter.Clear();
+  mImpl->mVisualModel->mGlyphPositions.Clear();
+  mImpl->mVisualModel->mLines.Clear();
+  mImpl->mVisualModel->ClearCaches();
 }
 
 Controller::Controller( ControlInterface& controlInterface )

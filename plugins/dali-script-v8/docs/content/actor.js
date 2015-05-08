@@ -16,7 +16,7 @@ var camera = new dali.CameraActor();
 var layer = new dali.Layer();
 ```
 
-### Hello world example </h3>
+### Hello world example
 ```
 var myActor = new dali.TextActor("hello-world");
 
@@ -40,7 +40,8 @@ An actor inherits its parent's position.  The relative position between the acto
 
 1) ParentOrigin.  This Vector3 property defines a point within the parent actor's area.
 
-<img src="../assets/img/shared/parent-origin.png">
+![ ](../assets/img/parent-origin.png)
+
 
 The default is "top-left", which can be visualized in 2D as (0, 0), but is actually Vector3(0, 0, 0.5) in the 3D DALi world.  The actor's position is relative to this point.
 ```
@@ -50,7 +51,7 @@ myActor.parentOrigin = [0.5, 0.5, 0.5];
 
 2) AnchorPoint.  This Vector3 property defines a point within the child actor's area.
 
-<img src="../assets/img/shared/anchor-point.png">
+![ ](../assets/img/anchor-point.png)
 
 The default is "center", which can be visualized in 2D as (0.5, 0.5), but is actually Vector3(0.5, 0.5, 0.5) in the 3D DALi world.  The actor's position is also relative to this point.
 ```
@@ -60,7 +61,7 @@ myActor.anchorPoint = [0.5, 0.5, 0.5];
 
 3) Position.  This is the position vector between the parent-origin and anchor-point.
 
-<img src="../assets/img/shared/actor-position.png">
+![ ](../assets/img/actor-position.png)
 
 Therefore by default, an actors position is the distance between its center and the top-left corner of its parent.
 
@@ -119,7 +120,7 @@ function OnPressed( actor, touchEvent )
   
   var anim = new dali.Animation( 4 );
   var rotation = new dali.Rotation( 90, 0, 0 ); // pitch, yaw, roll
-  anim.animateBy( actor, "orientation", rotation );
+  anim.animateBy( actor, "rotation", rotation );
   anim.play();
   return true;
 }
@@ -196,8 +197,8 @@ See
  worldPositionX         |FLOAT       | &#10008;     | &#10008;
  worldPositionY         |FLOAT       | &#10008;     | &#10008;
  worldPositionZ         |FLOAT       | &#10008;     | &#10008;
- orientation            |ROTATION    | &#10004;     | &#10004;
- worldOrientation       |ROTATION    | &#10008;     | &#10008;
+ rotation               |ROTATION    | &#10004;     | &#10004;
+ worldRotation          |ROTATION    | &#10008;     | &#10008;
  scale                  |VECTOR3     | &#10004;     | &#10004;
  scaleX                 |FLOAT       | &#10004;     | &#10004;
  scaleY                 |FLOAT       | &#10004;     | &#10004;
@@ -214,7 +215,7 @@ See
  name                   |STRING      | &#10004;     | &#10008;
  sensitive              |BOOLEAN     | &#10004;     | &#10008;
  leaveRequired          |BOOLEAN     | &#10004;     | &#10008;
- inheritOrientation     |BOOLEAN     | &#10004;     | &#10008;
+ inheritRotation        |BOOLEAN     | &#10004;     | &#10008;
  inheritScale           |BOOLEAN     | &#10004;     | &#10008;
  colorMode              |NUMBER      | &#10004;     | &#10008;
  positionInheritance    |NUMBER      | &#10004;     | &#10008;
@@ -381,19 +382,19 @@ WORLD_POSITION_Z
 
 
 /**
- * Actors orientation
- * @property orientation
- * @type dali orientation object
+ * Actors rotation
+ * @property rotation
+ * @type dali Rotation object
  */
-ORIENTATION
+ROTATION
 
 
 /**
- * Actors world-orientation
- * @property worldOrientation
- * @type dali Orientation object ( read only)
+ * Actors world-rotation
+ * @property worldRotation
+ * @type dali Rotation object ( read only)
  */
-WORLD_ORIENTATION
+WORLD_ROTATION
 
 /**
  * Actors scale
@@ -521,10 +522,10 @@ LEAVE_REQUIRED
 /**
  * Set whether a child actor inherits it's parent's orientation.
  * @type Boolean
- * @property inheritOrientation
+ * @property inheritRotation
  * @default true
  */
-INHERIT_ORIENTATION,
+INHERIT_ROTATION,
 
 
 /**

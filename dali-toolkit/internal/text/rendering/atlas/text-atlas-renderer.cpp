@@ -29,9 +29,6 @@
 #include <dali-toolkit/internal/text/rendering/shaders/text-basic-shader.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-bgra-shader.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-basic-shadow-shader.h>
-#if defined(DEBUG_ENABLED)
-Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_ATLAS_RENDERER");
-#endif
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -39,6 +36,10 @@ using namespace Dali::Toolkit::Text;
 
 namespace
 {
+#if defined(DEBUG_ENABLED)
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_RENDERING");
+#endif
+
   const float ZERO( 0.0f );
   const float HALF( 0.5f );
   const float ONE( 1.0f );
@@ -307,7 +308,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     }
 #if defined(DEBUG_ENABLED)
     Toolkit::AtlasGlyphManager::Metrics metrics = mGlyphManager.GetMetrics();
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "TextAtlasRenderer::GlyphManager::GlyphCount: %i, AtlasCount: %i, TextureMemoryUse: %iK\n",
+    DALI_LOG_INFO( gLogFilter, Debug::General, "TextAtlasRenderer::GlyphManager::GlyphCount: %i, AtlasCount: %i, TextureMemoryUse: %iK\n",
                                                 metrics.mGlyphCount,
                                                 metrics.mAtlasMetrics.mAtlasCount,
                                                 metrics.mAtlasMetrics.mTextureMemoryUsed / 1024 );
@@ -684,6 +685,8 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
 Text::RendererPtr AtlasRenderer::New()
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Text::AtlasRenderer::New()\n" );
+
   return Text::RendererPtr( new AtlasRenderer() );
 }
 
