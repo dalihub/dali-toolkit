@@ -98,7 +98,8 @@ struct LayoutEngine::Impl
   Impl()
   : mLayout( LayoutEngine::SINGLE_LINE_BOX ),
     mHorizontalAlignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN ),
-    mVerticalAlignment( LayoutEngine::VERTICAL_ALIGN_TOP )
+    mVerticalAlignment( LayoutEngine::VERTICAL_ALIGN_TOP ),
+    mEllipsisEnabled( false )
   {
     mFontClient = TextAbstraction::FontClient::Get();
   }
@@ -165,9 +166,14 @@ struct LayoutEngine::Impl
 
   /**
    * Retrieves the line layout for a given box width.
+   *
+   * @param[in] parameters The layout parameters.
+   * @param[out] lineLayout The line layout.
+   * @param[in] completelyFill Whether to completely fill the line ( even if the last word exceeds the boundaries ).
    */
   void GetLineLayoutForBox( const LayoutParameters& parameters,
-                            LineLayout& lineLayout )
+                            LineLayout& lineLayout,
+                            bool completelyFill )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->GetLineLayoutForBox\n" );
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  initial glyph index : %d\n", lineLayout.glyphIndex );
@@ -273,16 +279,16 @@ struct LayoutEngine::Impl
       }
 
       // Check if the accumulated length fits in the width of the box.
-      if( isMultiline && !isWhiteSpace &&
+      if( ( completelyFill || isMultiline ) && !isWhiteSpace &&
           ( lineLayout.length + lineLayout.wsLengthEndOfLine + tmpLineLayout.length + tmpLineLayout.widthAdvanceDiff > boundingBoxWidth ) )
       {
         // Current word does not fit in the box's width.
-        if( !oneWordLaidOut )
+        if( !oneWordLaidOut || completelyFill )
         {
           DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  Break the word by character\n" );
 
           // The word's with doesn't fit in the control's with. It needs to be split by character.
-          if( tmpLineLayout.numberOfGlyphs > 1u )
+          if( tmpLineLayout.numberOfGlyphs > 0u )
           {
             tmpLineLayout.numberOfCharacters -= charactersPerGlyph;
             --tmpLineLayout.numberOfGlyphs;
@@ -336,13 +342,43 @@ struct LayoutEngine::Impl
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--GetLineLayoutForBox\n" );
   }
 
+  void SetGlyphPositions( const GlyphInfo* const glyphsBuffer,
+                          Length numberOfGlyphs,
+                          float penY,
+                          Vector2* glyphPositionsBuffer )
+  {
+    // Traverse the glyphs and set the positions.
+
+    // Check if the x bearing of the first character is negative.
+    // If it has a negative x bearing, it will exceed the boundaries of the actor,
+    // so the penX position needs to be moved to the right.
+    float penX = 0.f;
+
+    const GlyphInfo& glyph = *glyphsBuffer;
+    if( 0.f > glyph.xBearing )
+    {
+      penX = -glyph.xBearing;
+    }
+
+    for( GlyphIndex i = 0u; i < numberOfGlyphs; ++i )
+    {
+      const GlyphInfo& glyph = *( glyphsBuffer + i );
+      Vector2& position = *( glyphPositionsBuffer + i );
+
+      position.x = penX + glyph.xBearing;
+      position.y = penY - glyph.yBearing;
+
+      penX += glyph.advance;
+    }
+  }
+
   bool LayoutText( const LayoutParameters& layoutParameters,
                    Vector<Vector2>& glyphPositions,
                    Vector<LineRun>& lines,
                    Size& actualSize )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->LayoutText\n" );
-    Vector2* glyphPositionsBuffer = glyphPositions.Begin();
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  box size %f, %f\n", layoutParameters.boundingBox.width, layoutParameters.boundingBox.height );
 
     float penY = 0.f;
     for( GlyphIndex index = 0u; index < layoutParameters.totalNumberOfGlyphs; )
@@ -351,7 +387,8 @@ struct LayoutEngine::Impl
       LineLayout layout;
       layout.glyphIndex = index;
       GetLineLayoutForBox( layoutParameters,
-                           layout );
+                           layout,
+                           false );
 
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "           glyph index %d\n", layout.glyphIndex );
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "       character index %d\n", layout.characterIndex );
@@ -366,57 +403,108 @@ struct LayoutEngine::Impl
         return false;
       }
 
-      LineRun lineRun;
-      lineRun.glyphIndex = index;
-      lineRun.numberOfGlyphs = layout.numberOfGlyphs;
-      lineRun.characterRun.characterIndex = layout.characterIndex;
-      lineRun.characterRun.numberOfCharacters = layout.numberOfCharacters;
-      lineRun.width = layout.length + layout.widthAdvanceDiff;
-      lineRun.ascender = layout.ascender;
-      lineRun.descender = layout.descender;
-      lineRun.extraLength = layout.wsLengthEndOfLine > 0.f ? layout.wsLengthEndOfLine - layout.widthAdvanceDiff : 0.f;
-      lineRun.direction = false;
-
-      lines.PushBack( lineRun );
-
-      // Update the actual size.
-      if( lineRun.width > actualSize.width )
-      {
-        actualSize.width = lineRun.width;
-      }
-
-      actualSize.height += ( lineRun.ascender + -lineRun.descender );
-
-      // Traverse the glyphs and set the positions.
-
+      // Set the line position. Discard if ellipsis is enabled and the position exceeds the boundaries
+      // of the box.
       penY += layout.ascender;
 
-      // Check if the x bearing of the first character is negative.
-      // If it has a negative x bearing, it will exceed the boundaries of the actor,
-      // so the penX position needs to be moved to the right.
-      float penX = 0.f;
-
-      const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + index );
-      if( 0.f > glyph.xBearing )
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  pen y %f\n", penY );
+      if( mEllipsisEnabled &&
+          ( ( penY - layout.descender > layoutParameters.boundingBox.height ) ||
+            ( ( mLayout == SINGLE_LINE_BOX ) &&
+              ( layout.length + layout.widthAdvanceDiff > layoutParameters.boundingBox.width ) ) ) )
       {
-        penX = -glyph.xBearing;
-      }
+        // Do not layout more lines if ellipsis is enabled.
 
-      for( GlyphIndex i = index; i < index + layout.numberOfGlyphs; ++i )
+        // The last line needs to be completely filled with characters.
+        // Part of a word may be used.
+
+        const Length numberOfLines = lines.Count();
+
+        LineRun lineRun;
+        LineLayout ellipsisLayout;
+        if( 0u != numberOfLines )
+        {
+          // Get the last line and layout it again with the 'completelyFill' flag to true.
+          lineRun = *( lines.Begin() + ( numberOfLines - 1u ) );
+
+          penY -= layout.ascender - lineRun.descender;
+
+          ellipsisLayout.glyphIndex = lineRun.glyphIndex;
+        }
+        else
+        {
+          lineRun.glyphIndex = 0u;
+          ellipsisLayout.glyphIndex = 0u;
+        }
+
+        GetLineLayoutForBox( layoutParameters,
+                             ellipsisLayout,
+                             true );
+
+        lineRun.numberOfGlyphs = ellipsisLayout.numberOfGlyphs;
+        lineRun.characterRun.characterIndex = ellipsisLayout.characterIndex;
+        lineRun.characterRun.numberOfCharacters = ellipsisLayout.numberOfCharacters;
+        lineRun.width = layoutParameters.boundingBox.width;
+        lineRun.ascender = ellipsisLayout.ascender;
+        lineRun.descender = ellipsisLayout.descender;
+        lineRun.extraLength = ellipsisLayout.wsLengthEndOfLine > 0.f ? ellipsisLayout.wsLengthEndOfLine - ellipsisLayout.widthAdvanceDiff : 0.f;
+        lineRun.ellipsis = true;
+
+        actualSize.width = layoutParameters.boundingBox.width;
+        actualSize.height += ( lineRun.ascender + -lineRun.descender );
+
+        SetGlyphPositions( layoutParameters.glyphsBuffer + lineRun.glyphIndex,
+                           ellipsisLayout.numberOfGlyphs,
+                           penY,
+                           glyphPositions.Begin() + lineRun.glyphIndex );
+
+        if( 0u != numberOfLines )
+        {
+          // Set the last line with the ellipsis layout.
+          *( lines.Begin() + ( numberOfLines - 1u ) ) = lineRun;
+        }
+        else
+        {
+          // Push the line.
+          lines.PushBack( lineRun );
+        }
+
+        break;
+      }
+      else
       {
-        const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + i );
-        Vector2& position = *( glyphPositionsBuffer + i );
+        LineRun lineRun;
+        lineRun.glyphIndex = index;
+        lineRun.numberOfGlyphs = layout.numberOfGlyphs;
+        lineRun.characterRun.characterIndex = layout.characterIndex;
+        lineRun.characterRun.numberOfCharacters = layout.numberOfCharacters;
+        lineRun.width = layout.length + layout.widthAdvanceDiff;
+        lineRun.ascender = layout.ascender;
+        lineRun.descender = layout.descender;
+        lineRun.extraLength = layout.wsLengthEndOfLine > 0.f ? layout.wsLengthEndOfLine - layout.widthAdvanceDiff : 0.f;
+        lineRun.direction = false;
+        lineRun.ellipsis = false;
 
-        position.x = penX + glyph.xBearing;
-        position.y = penY - glyph.yBearing;
+        lines.PushBack( lineRun );
 
-        penX += glyph.advance;
+        // Update the actual size.
+        if( lineRun.width > actualSize.width )
+        {
+          actualSize.width = lineRun.width;
+        }
+
+        actualSize.height += ( lineRun.ascender + -lineRun.descender );
+
+        SetGlyphPositions( layoutParameters.glyphsBuffer + index,
+                           layout.numberOfGlyphs,
+                           penY,
+                           glyphPositions.Begin() + index );
+
+        penY += -layout.descender;
+
+        // Increase the glyph index.
+        index += layout.numberOfGlyphs;
       }
-
-      penY += -layout.descender;
-
-      // Increase the glyph index.
-      index += layout.numberOfGlyphs;
     }
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--LayoutText\n\n" );
@@ -584,6 +672,8 @@ struct LayoutEngine::Impl
   LayoutEngine::VerticalAlignment mVerticalAlignment;
 
   TextAbstraction::FontClient mFontClient;
+
+  bool mEllipsisEnabled:1;
 };
 
 LayoutEngine::LayoutEngine()
@@ -605,6 +695,16 @@ void LayoutEngine::SetLayout( Layout layout )
 unsigned int LayoutEngine::GetLayout() const
 {
   return mImpl->mLayout;
+}
+
+void LayoutEngine::SetTextEllipsisEnabled( bool enabled )
+{
+  mImpl->mEllipsisEnabled = enabled;
+}
+
+bool LayoutEngine::GetTextEllipsisEnabled() const
+{
+  return mImpl->mEllipsisEnabled;
 }
 
 void LayoutEngine::SetHorizontalAlignment( HorizontalAlignment alignment )

@@ -426,6 +426,10 @@ void TextLabel::OnInitialize()
   // Use height-for-width negotiation by default
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
   self.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
+
+  // Enable the text ellipsis.
+  LayoutEngine& engine = mController->GetLayoutEngine();
+  engine.SetTextEllipsisEnabled( true );
 }
 
 void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )

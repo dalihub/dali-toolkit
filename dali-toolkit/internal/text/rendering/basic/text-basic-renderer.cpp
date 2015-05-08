@@ -27,6 +27,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-basic-shader.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-bgra-shader.h>
 
@@ -347,18 +348,23 @@ RenderableActor BasicRenderer::Render( Text::ViewInterface& view )
   // Remove the previous text
   UnparentAndReset( mImpl->mActor );
 
-  Text::Length numberOfGlyphs = view.GetNumberOfGlyphs();
+  Length numberOfGlyphs = view.GetNumberOfGlyphs();
 
-  if( numberOfGlyphs > 0 )
+  if( numberOfGlyphs > 0u )
   {
     Vector<GlyphInfo> glyphs;
     glyphs.Resize( numberOfGlyphs );
 
-    view.GetGlyphs( &glyphs[0], 0, numberOfGlyphs );
-
     std::vector<Vector2> positions;
     positions.resize( numberOfGlyphs );
-    view.GetGlyphPositions( &positions[0], 0, numberOfGlyphs );
+
+    numberOfGlyphs = view.GetGlyphs( glyphs.Begin(),
+                                     &positions[0],
+                                     0u,
+                                     numberOfGlyphs );
+
+    glyphs.Resize( numberOfGlyphs );
+    positions.resize( numberOfGlyphs );
 
     mImpl->CreateAtlases( glyphs );
 
