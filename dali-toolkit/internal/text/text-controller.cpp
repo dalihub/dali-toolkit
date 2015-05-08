@@ -117,7 +117,7 @@ void Controller::SetText( const std::string& text )
   }
 
   // Reset keyboard as text changed
-  mImpl->PreEditReset();
+  mImpl->ResetImfManager();
 }
 
 void Controller::GetText( std::string& text ) const
@@ -1003,6 +1003,11 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     }
     else if( Dali::DALI_KEY_BACKSPACE == keyCode )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p DALI_KEY_BACKSPACE\n", this );
+
+      // IMF manager is no longer handling key-events
+      mImpl->ClearPreEditFlag();
+
       // Remove the character before the current cursor position
       bool removed = RemoveText( -1, 1 );
 
@@ -1021,6 +1026,11 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     }
     else
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p keyString %s\n", this, keyString.c_str() );
+
+      // IMF manager is no longer handling key-events
+      mImpl->ClearPreEditFlag();
+
       InsertText( keyString, COMMIT );
     }
 
@@ -1038,49 +1048,22 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   bool maxLengthReached( false );
 
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected InsertText" )
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::InsertText %p %s (%s) mPreEditFlag %d cursor %d\n",
-                 this, text.c_str(), (COMMIT == type ? "COMMIT" : "PRE_EDIT"), mImpl->mEventData->mPreEditFlag, mImpl->mEventData->mPrimaryCursorPosition );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::InsertText %p %s (%s) mPrimaryCursorPosition %d mPreEditFlag %d mPreEditStartPosition %d mPreEditLength %d\n",
+                 this, text.c_str(), (COMMIT == type ? "COMMIT" : "PRE_EDIT"),
+                 mImpl->mEventData->mPrimaryCursorPosition, mImpl->mEventData->mPreEditFlag, mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength );
+
+  Vector<Character> utf32Characters;
+  Length characterCount( 0u );
 
   if( ! text.empty() )
   {
+    // The placeholder text is no longer needed
     if( mImpl->IsShowingPlaceholderText() )
     {
       ResetText();
     }
-  }
 
-  if( mImpl->mEventData )
-  {
-    if( COMMIT == type )
-    {
-      mImpl->mEventData->mPreEditFlag = false;
-    }
-    else // PRE_EDIT
-    {
-      if( mImpl->mEventData->mPreEditFlag &&
-          0 != mImpl->mEventData->mPreEditLength )
-      {
-        // Remove previous pre-edit text
-        mImpl->mEventData->mPrimaryCursorPosition = mImpl->mEventData->mPreEditStartPosition;
-        removedPreEdit = RemoveText( -1, mImpl->mEventData->mPreEditLength );
-      }
-      else
-      {
-        // Record the start of the pre-edit text
-        mImpl->mEventData->mPreEditStartPosition = mImpl->mEventData->mPrimaryCursorPosition;
-        mImpl->mEventData->mPreEditLength = text.size();
-
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "mPreEditStartPosition %d mPreEditLength %d\n", mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength );
-      }
-
-      mImpl->mEventData->mPreEditFlag = true;
-    }
-  }
-
-  if( ! text.empty() )
-  {
     //  Convert text into UTF-32
-    Vector<Character> utf32Characters;
     utf32Characters.Resize( text.size() );
 
     // This is a bit horrible but std::string returns a (signed) char*
@@ -1088,11 +1071,50 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
     // Transform a text array encoded in utf8 into an array encoded in utf32.
     // It returns the actual number of characters.
-    Length characterCount = Utf8ToUtf32( utf8, text.size(), utf32Characters.Begin() );
+    characterCount = Utf8ToUtf32( utf8, text.size(), utf32Characters.Begin() );
     utf32Characters.Resize( characterCount );
 
     DALI_ASSERT_DEBUG( text.size() >= utf32Characters.Count() && "Invalid UTF32 conversion length" );
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "UTF8 size %d, UTF32 size %d\n", text.size(), utf32Characters.Count() );
+  }
+
+  if( 0u != utf32Characters.Count() )
+  {
+    // Handle the IMF (predicitive text) state changes
+    if( mImpl->mEventData )
+    {
+      if( mImpl->mEventData->mPreEditFlag &&
+          0 != mImpl->mEventData->mPreEditLength )
+      {
+        // Remove previous pre-edit text
+        CharacterIndex offset = mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition;
+        removedPreEdit = RemoveText( -static_cast<int>(offset), mImpl->mEventData->mPreEditLength );
+
+        mImpl->mEventData->mPrimaryCursorPosition = mImpl->mEventData->mPreEditStartPosition;
+        mImpl->mEventData->mPreEditLength = 0;
+      }
+
+      if( COMMIT == type )
+      {
+        // IMF manager is no longer handling key-events
+        mImpl->ClearPreEditFlag();
+      }
+      else // PRE_EDIT
+      {
+        if( ! mImpl->mEventData->mPreEditFlag )
+        {
+          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Entered PreEdit state" );
+
+          // Record the start of the pre-edit text
+          mImpl->mEventData->mPreEditStartPosition = mImpl->mEventData->mPrimaryCursorPosition;
+        }
+
+        mImpl->mEventData->mPreEditLength = utf32Characters.Count();
+        mImpl->mEventData->mPreEditFlag = true;
+
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "mPreEditStartPosition %d mPreEditLength %d\n", mImpl->mEventData->mPreEditStartPosition, mImpl->mEventData->mPreEditLength );
+      }
+    }
 
     const Length numberOfCharactersInModel = mImpl->mLogicalModel->GetNumberOfCharacters();
 
@@ -1119,7 +1141,8 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Inserted %d characters, new size %d new cursor %d\n", maxSizeOfNewText, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition );
   }
 
-  if( removedPreEdit || !text.empty() )
+  if( removedPreEdit ||
+      0 != utf32Characters.Count() )
   {
     // Queue an inserted event
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_INSERTED );
@@ -1131,7 +1154,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
     mImpl->mControlInterface.MaxLengthReached();
 
-    mImpl->PreEditReset();
+    mImpl->ResetImfManager();
   }
 }
 
@@ -1178,7 +1201,7 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
   }
 
   // Reset keyboard as tap event has occurred.
-  mImpl->PreEditReset();
+  mImpl->ResetImfManager();
 }
 
 void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
