@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/text-abstraction/font-client.h>
-#include <dali/public-api/adaptor-framework/imf-manager.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/devel-api/adaptor-framework/imf-manager.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>

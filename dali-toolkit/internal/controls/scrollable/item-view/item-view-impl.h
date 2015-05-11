@@ -21,8 +21,8 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/animation/animation.h>
-#include <dali/public-api/common/map-wrapper.h>
 #include <dali/public-api/object/property-notification.h>
+#include <dali/devel-api/common/map-wrapper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>

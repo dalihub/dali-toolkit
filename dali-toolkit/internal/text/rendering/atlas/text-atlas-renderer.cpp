@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/dali.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/text-abstraction/text-abstraction.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/atlas-manager/atlas-manager.h>

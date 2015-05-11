@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/text/rendering/basic/text-basic-renderer.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/text-abstraction/font-client.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/images/atlas.h>

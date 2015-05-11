@@ -21,9 +21,9 @@
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/adaptor-framework/accessibility-manager.h>
-#include <dali/public-api/adaptor-framework/sound-player.h>
-#include <dali/public-api/adaptor-framework/tts-player.h>
+#include <dali/devel-api/adaptor-framework/accessibility-manager.h>
+#include <dali/devel-api/adaptor-framework/sound-player.h>
+#include <dali/devel-api/adaptor-framework/tts-player.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/events/hit-test-algorithm.h>
 #include <dali/public-api/images/resource-image.h>

@@ -28,7 +28,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/scripting/scripting.h>
-#include <dali/public-api/adaptor-framework/virtual-keyboard.h>
+#include <dali/devel-api/adaptor-framework/virtual-keyboard.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES

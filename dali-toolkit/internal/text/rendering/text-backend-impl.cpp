@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/text/rendering/text-backend-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/adaptor-framework/singleton-service.h>
+#include <dali/devel-api/adaptor-framework/singleton-service.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES

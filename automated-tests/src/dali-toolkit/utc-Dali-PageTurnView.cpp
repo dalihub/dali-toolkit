@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sstream>
-
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/integration-api/events/pan-gesture-event.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
