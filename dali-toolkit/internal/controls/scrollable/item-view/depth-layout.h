@@ -27,6 +27,9 @@ namespace Dali
 namespace Toolkit
 {
 
+namespace Internal
+{
+
 class DepthLayout;
 
 typedef IntrusivePtr<DepthLayout> DepthLayoutPtr;
@@ -34,18 +37,9 @@ typedef IntrusivePtr<DepthLayout> DepthLayoutPtr;
 /**
  * This layout arranges items in a grid, which scrolls along the Z-Axis.
  */
-class DALI_IMPORT_API DepthLayout : public ItemLayout
+class DepthLayout : public ItemLayout
 {
 public:
-
-  typedef boost::function<Vector3 (unsigned int numberOfColumns, float layoutWidth)> ItemSizeFunction;
-
-  typedef boost::function<float (float layoutHeight)> BottomMarginFunction;
-
-  typedef boost::function<float (unsigned int numberOfColumns,
-                                 unsigned int columnNumber,
-                                 const Vector3& itemSize,
-                                 float layoutWidth)> ColumnPositionFunction;
 
   /**
    * Create a new spiral layout
@@ -107,30 +101,6 @@ public:
   Degree GetTiltAngle() const;
 
   /**
-   * Set the function used to calculate the item-size, for a given layout-size.
-   * @param[in] function The item-size function.
-   */
-  void SetItemSizeFunction(ItemSizeFunction function);
-
-  /**
-   * Get the function used to calculate the item-size.
-   * @return The item-size function.
-   */
-  ItemSizeFunction GetItemSizeFunction() const;
-
-  /**
-   * Set the function used to calculate the margin in the bottom of the layout, for a given layout-size.
-   * @param[in] function The bottom margin function.
-   */
-  void SetBottomMarginFunction(BottomMarginFunction function);
-
-  /**
-   * Get the function used to calculate the margin in the bottom of the layout.
-   * @return The bottom margin function.
-   */
-  BottomMarginFunction GetBottomMarginFunction() const;
-
-  /**
    * Set the tilt angle of the individual items in the layout.
    * @param[in] angle The item tilt angle in degrees.
    */
@@ -141,18 +111,6 @@ public:
    * @return The item tilt angle in degrees.
    */
   Degree GetItemTiltAngle() const;
-
-  /**
-   * Set the function used to calculate the horizontal position of each column, for a given column, item-size & layout-size.
-   * @param[in] function The column-position function.
-   */
-  void SetColumnPositionFunction(ColumnPositionFunction function);
-
-  /**
-   * Get the function used to calculate the horizontal position of each column
-   * @return The column-position function.
-   */
-  ColumnPositionFunction GetColumnPositionFunction() const;
 
   /**
    * Set the factor used to customise the scroll speed while dragging and swiping the layout.
@@ -228,9 +186,9 @@ private:
   virtual unsigned int GetReserveItemCount(Vector3 layoutSize) const;
 
   /**
-   * @copydoc ItemLayout::GetItemSize()
+   * @copydoc ItemLayout::GetDefaultItemSize()
    */
-  virtual bool GetItemSize(unsigned int itemId, Vector3 layoutSize, Vector3& itemSize) const;
+  virtual void GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const;
 
   /**
    * @copydoc ItemLayout::GetResizeAnimation()
@@ -238,34 +196,19 @@ private:
   virtual void GetResizeAnimation(Animation& animation, Actor actor, Vector3 size, float durationSeconds) const;
 
   /**
-   * @copydoc ItemLayout::GetPositionConstraint()
-   */
-  virtual bool GetPositionConstraint(unsigned int itemId, ItemLayout::Vector3Function& constraint) const;
-
-  /**
-   * @copydoc ItemLayout::GetRotationConstraint()
-   */
-  virtual bool GetRotationConstraint(unsigned int itemId, ItemLayout::QuaternionFunction& constraint) const;
-
-  /**
-   * @copydoc ItemLayout::GetScaleConstraint()
-   */
-  virtual bool GetScaleConstraint(unsigned int itemId, ItemLayout::Vector3Function& constraint) const;
-
-  /**
-   * @copydoc ItemLayout::GetColorConstraint()
-   */
-  virtual bool GetColorConstraint(unsigned int itemId, ItemLayout::Vector4Function& constraint) const;
-
-  /**
-   * @copydoc ItemLayout::GetVisibilityConstraint()
-   */
-  virtual bool GetVisibilityConstraint(unsigned int itemId, ItemLayout::BoolFunction& constraint) const;
-
-  /**
    * @copydoc ItemLayout::GetScrollDirection()
    */
   virtual Degree GetScrollDirection() const;
+
+  /**
+   * @copydoc ItemLayout::ApplyConstraints()
+   */
+  virtual void ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor );
+
+  /**
+   * @copydoc ItemLayout::GetItemPosition()
+   */
+  virtual Vector3 GetItemPosition( int itemID, float currentLayoutPosition, const Vector3& layoutSize ) const;
 
 protected:
 
@@ -279,6 +222,8 @@ private:
   struct Impl;
   Impl* mImpl;
 };
+
+} // namespace Internal
 
 } // namespace Toolkit
 

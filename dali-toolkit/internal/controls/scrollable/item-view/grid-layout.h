@@ -28,6 +28,9 @@ namespace Dali
 namespace Toolkit
 {
 
+namespace Internal
+{
+
 class GridLayout;
 
 typedef IntrusivePtr<GridLayout> GridLayoutPtr; ///< Pointer to a Dali::Toolkit::GridLayout object
@@ -35,16 +38,9 @@ typedef IntrusivePtr<GridLayout> GridLayoutPtr; ///< Pointer to a Dali::Toolkit:
 /**
  * @brief An ItemView layout which arranges items in a grid.
  */
-class DALI_IMPORT_API GridLayout : public ItemLayout
+class GridLayout : public ItemLayout
 {
 public:
-
-  /**
-   * @brief Function signature for a method to calculate the item size.
-   *
-   * @see SetItemSizeFunction()
-   */
-  typedef boost::function<Vector3 (unsigned int numberOfColumns, float layoutWidth, float sideMargin, float columnSpacing)> ItemSizeFunction;
 
   /**
    * @brief Create a new grid layout.
@@ -155,20 +151,6 @@ public:
   float GetZGap() const;
 
   /**
-   * @brief Set the function used to calculate the item-size, for a given layout-size.
-   *
-   * @param[in] function The item-size function.
-   */
-  void SetItemSizeFunction(ItemSizeFunction function);
-
-  /**
-   * @brief Get the function used to calculate the item-size.
-   *
-   * @return The item-size function.
-   */
-  ItemSizeFunction GetItemSizeFunction() const;
-
-  /**
    * @brief Set the factor used to customise the scroll speed while dragging and swiping the layout.
    *
    * @param[in] scrollSpeed The scroll speed factor.
@@ -247,9 +229,9 @@ private:
   virtual unsigned int GetReserveItemCount(Vector3 layoutSize) const;
 
   /**
-   * @copydoc ItemLayout::GetItemSize()
+   * @copydoc ItemLayout::GetDefaultItemSize()
    */
-  virtual bool GetItemSize(unsigned int itemId, Vector3 layoutSize, Vector3& itemSize) const;
+  virtual void GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const;
 
   /**
    * @copydoc ItemLayout::GetResizeAnimation()
@@ -257,34 +239,19 @@ private:
   virtual void GetResizeAnimation(Animation& animation, Actor actor, Vector3 size, float durationSeconds) const;
 
   /**
-   * @copydoc ItemLayout::GetPositionConstraint()
-   */
-  virtual bool GetPositionConstraint(unsigned int itemId, ItemLayout::Vector3Function& constraint) const;
-
-  /**
-   * @copydoc ItemLayout::GetRotationConstraint()
-   */
-  virtual bool GetRotationConstraint(unsigned int itemId, ItemLayout::QuaternionFunction& constraint) const;
-
-  /**
-   * @copydoc ItemLayout::GetScaleConstraint()
-   */
-  virtual bool GetScaleConstraint(unsigned int itemId, ItemLayout::Vector3Function& constraint) const;
-
-  /**
-   * @copydoc ItemLayout::GetColorConstraint()
-   */
-  virtual bool GetColorConstraint(unsigned int itemId, ItemLayout::Vector4Function& constraint) const;
-
-  /**
-   * @copydoc ItemLayout::GetVisibilityConstraint()
-   */
-  virtual bool GetVisibilityConstraint(unsigned int itemId, ItemLayout::BoolFunction& constraint) const;
-
-  /**
    * @copydoc ItemLayout::GetScrollDirection()
    */
   virtual Degree GetScrollDirection() const;
+
+  /**
+   * @copydoc ItemLayout::ApplyConstraints()
+   */
+  virtual void ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor );
+
+  /**
+   * @copydoc ItemLayout::GetItemPosition()
+   */
+  virtual Vector3 GetItemPosition( int itemID, float currentLayoutPosition, const Vector3& layoutSize ) const;
 
 protected:
 
@@ -298,6 +265,8 @@ private:
   struct Impl;
   Impl* mImpl;
 };
+
+} // namespace Internal
 
 } // namespace Toolkit
 

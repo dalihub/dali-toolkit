@@ -28,6 +28,9 @@ namespace Dali
 namespace Toolkit
 {
 
+namespace Internal
+{
+
 class SpiralLayout;
 
 typedef IntrusivePtr<SpiralLayout> SpiralLayoutPtr;
@@ -35,12 +38,9 @@ typedef IntrusivePtr<SpiralLayout> SpiralLayoutPtr;
 /**
  * An ItemView layout which arranges items in a spiral.
  */
-class DALI_IMPORT_API SpiralLayout : public ItemLayout
+class SpiralLayout : public ItemLayout
 {
 public:
-
-  typedef boost::function<Vector3 (const Vector3& layoutSize)> ItemSizeFunction;
-  typedef boost::function<float   (const Vector3& layoutSize)> SpiralRadiusFunction;
 
   /**
    * Create a new spiral layout
@@ -51,18 +51,6 @@ public:
    * Virtual destructor.
    */
   virtual ~SpiralLayout();
-
-  /**
-   * Set the function used to calculate the item-size, for a given layout-size.
-   * @param[in] function The item-size function.
-   */
-  void SetItemSizeFunction(ItemSizeFunction function);
-
-  /**
-   * Get the function used to calculate the item-size
-   * @return The item-size function.
-   */
-  ItemSizeFunction GetItemSizeFunction() const;
 
   /**
    * Set spacing angle between items.
@@ -87,18 +75,6 @@ public:
    * @return The revolution distance.
    */
   float GetRevolutionDistance() const;
-
-  /**
-   * Set the function used to calculate the spiral radius, for a given layout-size.
-   * @param[in] function The spiral-radius function.
-   */
-  void SetSpiralRadiusFunction(SpiralRadiusFunction function);
-
-  /**
-   * Get the function used to calculate the spiral radius.
-   * @return The spiral-radius function.
-   */
-  SpiralRadiusFunction GetSpiralRadiusFunction() const;
 
   /**
    * Set the alignment of the top-item, when at the beginning of the spiral (with a first-item layout-position of zero).
@@ -183,9 +159,9 @@ private:
   virtual unsigned int GetReserveItemCount(Vector3 layoutSize) const;
 
   /**
-   * @copydoc ItemLayout::GetItemSize()
+   * @copydoc ItemLayout::GetDefaultItemSize()
    */
-  virtual bool GetItemSize(unsigned int itemId, Vector3 layoutSize, Vector3& itemSize) const;
+  virtual void GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const;
 
   /**
    * @copydoc ItemLayout::GetResizeAnimation()
@@ -193,34 +169,19 @@ private:
   virtual void GetResizeAnimation(Animation& animation, Actor actor, Vector3 size, float durationSeconds) const;
 
   /**
-   * @copydoc ItemLayout::GetPositionConstraint()
-   */
-  virtual bool GetPositionConstraint(unsigned int itemId, ItemLayout::Vector3Function& constraint) const;
-
-  /**
-   * @copydoc ItemLayout::GetRotationConstraint()
-   */
-  virtual bool GetRotationConstraint(unsigned int itemId, ItemLayout::QuaternionFunction& constraint) const;
-
-  /**
-   * @copydoc ItemLayout::GetScaleConstraint()
-   */
-  virtual bool GetScaleConstraint(unsigned int itemId, ItemLayout::Vector3Function& constraint) const;
-
-  /**
-   * @copydoc ItemLayout::GetColorConstraint()
-   */
-  virtual bool GetColorConstraint(unsigned int itemId, ItemLayout::Vector4Function& constraint) const;
-
-  /**
-   * @copydoc ItemLayout::GetVisibilityConstraint()
-   */
-  virtual bool GetVisibilityConstraint(unsigned int itemId, ItemLayout::BoolFunction& constraint) const;
-
-  /**
    * @copydoc ItemLayout::GetScrollDirection()
    */
   virtual Degree GetScrollDirection() const;
+
+  /**
+   * @copydoc ItemLayout::ApplyConstraints()
+   */
+  virtual void ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor );
+
+  /**
+   * @copydoc ItemLayout::GetItemPosition()
+   */
+  virtual Vector3 GetItemPosition( int itemID, float currentLayoutPosition, const Vector3& layoutSize ) const;
 
 protected:
 
@@ -234,6 +195,8 @@ private:
   struct Impl;
   Impl* mImpl;
 };
+
+} // namespace Internal
 
 } // namespace Toolkit
 

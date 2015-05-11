@@ -45,12 +45,10 @@
 #include <dali-toolkit/public-api/controls/page-turn-view/page-turn-portrait-view.h>
 #include <dali-toolkit/public-api/controls/popup/popup.h>
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
-#include <dali-toolkit/public-api/controls/scrollable/item-view/depth-layout.h>
-#include <dali-toolkit/public-api/controls/scrollable/item-view/grid-layout.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
-#include <dali-toolkit/public-api/controls/scrollable/item-view/spiral-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-carousel-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-cube-effect.h>

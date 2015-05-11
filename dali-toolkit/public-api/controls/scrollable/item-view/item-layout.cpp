@@ -26,156 +26,55 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
 
-namespace
-{
-
-// Lerps between initial and target using the progress
-template< typename Type >
-void Lerp( Type& current, const Type& initial, const Type& target, float progress )
-{
-  current = initial + ((target - initial) * progress);
-}
-
-// Functors which wrap constraint functions with stored item IDs
-struct WrappedQuaternionConstraint
-{
-  WrappedQuaternionConstraint( Dali::Toolkit::ItemLayout::QuaternionFunction wrapMe, unsigned int itemId )
-  :mWrapMe(wrapMe),
-   mItemId(itemId),
-   mInitialised( false )
-  {
-  }
-
-  void operator()( Dali::Quaternion& current, const Dali::PropertyInputContainer& inputs )
-  {
-    float offsetLayoutPosition = inputs[0]->GetFloat() + static_cast<float>(mItemId);
-    float weight = inputs[3]->GetFloat();
-
-    if( !mInitialised )
-    {
-      mInitialised = true;
-      mInitial = current;
-    }
-
-    current = Dali::Quaternion::Slerp( mInitial, mWrapMe( current, offsetLayoutPosition, inputs[1]->GetFloat(), inputs[2]->GetVector3() ), weight );
-  }
-
-  Dali::Toolkit::ItemLayout::QuaternionFunction mWrapMe;
-  unsigned int mItemId;
-  Dali::Quaternion mInitial;
-  bool mInitialised:1;
-};
-
-struct WrappedVector3Constraint
-{
-  WrappedVector3Constraint( Dali::Toolkit::ItemLayout::Vector3Function wrapMe, unsigned int itemId )
-  : mWrapMe(wrapMe),
-    mItemId(itemId),
-    mInitial(),
-    mInitialised( false )
-  {
-  }
-
-  void operator()( Dali::Vector3& current, const Dali::PropertyInputContainer& inputs )
-  {
-    float offsetLayoutPosition = inputs[0]->GetFloat() + static_cast<float>(mItemId);
-    float weight = inputs[3]->GetFloat();
-
-    if( !mInitialised )
-    {
-      mInitialised = true;
-      mInitial = current;
-    }
-
-    Lerp( current, mInitial, mWrapMe( current, offsetLayoutPosition, inputs[1]->GetFloat(), inputs[2]->GetVector3() ), weight );
-  }
-
-  Dali::Toolkit::ItemLayout::Vector3Function mWrapMe;
-  unsigned int mItemId;
-  Dali::Vector3 mInitial;
-  bool mInitialised:1;
-};
-
-struct WrappedVector4Constraint
-{
-  WrappedVector4Constraint( Dali::Toolkit::ItemLayout::Vector4Function wrapMe, unsigned int itemId )
-  : mWrapMe(wrapMe),
-    mItemId(itemId),
-    mInitial(),
-    mInitialised( false )
-  {
-  }
-
-  void operator()( Dali::Vector4& current, const Dali::PropertyInputContainer& inputs )
-  {
-    float offsetLayoutPosition = inputs[0]->GetFloat() + static_cast<float>(mItemId);
-    float weight = inputs[3]->GetFloat();
-
-    if( !mInitialised )
-    {
-      mInitialised = true;
-      mInitial = current;
-    }
-
-    Lerp( current, mInitial, mWrapMe( current, offsetLayoutPosition, inputs[1]->GetFloat(), inputs[2]->GetVector3() ), weight );
-  }
-
-  Dali::Toolkit::ItemLayout::Vector4Function mWrapMe;
-  unsigned int mItemId;
-  Dali::Vector4 mInitial;
-  bool mInitialised:1;
-};
-
-struct WrappedBoolConstraint
-{
-  WrappedBoolConstraint( Dali::Toolkit::ItemLayout::BoolFunction wrapMe, unsigned int itemId )
-  : mWrapMe(wrapMe),
-    mItemId(itemId)
-  {
-  }
-
-  void operator()( bool& current, const Dali::PropertyInputContainer& inputs )
-  {
-    float weight = inputs[3]->GetFloat();
-
-    if ( weight >= 1.0f )
-    {
-      float offsetLayoutPosition = inputs[0]->GetFloat() + static_cast<float>(mItemId);
-      current = mWrapMe( current, offsetLayoutPosition, inputs[1]->GetFloat(), inputs[2]->GetVector3() );
-    }
-  }
-
-  Dali::Toolkit::ItemLayout::BoolFunction mWrapMe;
-  unsigned int mItemId;
-};
-
-}  //Unnamed namespace
-
 namespace Dali
 {
 
 namespace Toolkit
 {
 
-ItemLayout::ItemLayout()
-: mOrientation( ControlOrientation::Up ),
-  mAlphaFunction( AlphaFunction::LINEAR ),
-  mWeightObject()
+struct ItemLayout::Impl
 {
+  Vector3 mItemSize;                              ///< The size of an item in the layout
+  ControlOrientation::Type mOrientation;          ///< the orientation of the layout.
+};
+
+ItemLayout::ItemLayout()
+: mImpl( new Impl )
+{
+  mImpl->mOrientation = ControlOrientation::Up;
 }
 
 ItemLayout::~ItemLayout()
 {
+  delete mImpl;
 }
 
 void ItemLayout::SetOrientation(ControlOrientation::Type orientation)
 {
-  mOrientation = orientation;
+  mImpl->mOrientation = orientation;
 }
 
 ControlOrientation::Type ItemLayout::GetOrientation() const
 {
-  return mOrientation;
+  return mImpl->mOrientation;
+}
+
+void ItemLayout::GetItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const
+{
+  // If item-size has not been set then get the default size
+  if ( mImpl->mItemSize == Vector3::ZERO )
+  {
+    GetDefaultItemSize( itemId, layoutSize, itemSize );
+  }
+  else
+  {
+    itemSize = mImpl->mItemSize;
+  }
+}
+
+void ItemLayout::SetItemSize( const Vector3& itemSize )
+{
+  mImpl->mItemSize = itemSize;
 }
 
 float ItemLayout::GetClosestOnScreenLayoutPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize)
@@ -229,122 +128,6 @@ float ItemLayout::GetFlickSpeedFactor() const
   // By default, the speed factor while dragging and swiping is the same.
   return GetScrollSpeedFactor();
 }
-
-void ItemLayout::ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, const Actor& itemViewActor )
-{
-  // This just implements the default behaviour of constraint application.
-  // Custom layouts can override this function to apply their custom constraints.
-  Toolkit::ItemView itemView = Toolkit::ItemView::DownCast( itemViewActor );
-  if(itemView)
-  {
-    // We want to animate the layout in so use a weight object to do this
-    if ( !mWeightObject )
-    {
-      mWeightObject = WeightObject::New();
-    }
-
-    ItemLayout::Vector3Function positionConstraint;
-    if (GetPositionConstraint(itemId, positionConstraint))
-    {
-      WrappedVector3Constraint wrapped(positionConstraint, itemId);
-      Constraint constraint = Constraint::New<Vector3>( actor, Actor::Property::POSITION, wrapped );
-      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
-      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_SPEED ) );
-      constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-      constraint.AddSource( Source( mWeightObject, WeightObject::WEIGHT ) );
-      constraint.Apply();
-    }
-
-    ItemLayout::QuaternionFunction rotationConstraint;
-    if (GetRotationConstraint(itemId, rotationConstraint))
-    {
-      WrappedQuaternionConstraint wrapped(rotationConstraint, itemId);
-
-      Constraint constraint = Constraint::New<Quaternion>( actor, Actor::Property::ORIENTATION, wrapped );
-      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
-      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_SPEED ) );
-      constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-      constraint.AddSource( Source( mWeightObject, WeightObject::WEIGHT ) );
-      constraint.Apply();
-    }
-
-    ItemLayout::Vector3Function scaleConstraint;
-    if (GetScaleConstraint(itemId, scaleConstraint))
-    {
-      WrappedVector3Constraint wrapped(scaleConstraint, itemId);
-
-      Constraint constraint = Constraint::New<Vector3>( actor, Actor::Property::SCALE, wrapped );
-      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
-      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_SPEED ) );
-      constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-      constraint.AddSource( Source( mWeightObject, WeightObject::WEIGHT ) );
-      constraint.Apply();
-    }
-
-    ItemLayout::Vector4Function colorConstraint;
-    if (GetColorConstraint(itemId, colorConstraint))
-    {
-      WrappedVector4Constraint wrapped(colorConstraint, itemId);
-
-      Constraint constraint = Constraint::New<Vector4>( actor, Actor::Property::COLOR, wrapped );
-      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
-      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_SPEED ) );
-      constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-      constraint.AddSource( Source( mWeightObject, WeightObject::WEIGHT ) );
-      constraint.SetRemoveAction(Dali::Constraint::Discard);
-      constraint.Apply();
-    }
-
-    ItemLayout::BoolFunction visibilityConstraint;
-    if (GetVisibilityConstraint(itemId, visibilityConstraint))
-    {
-      WrappedBoolConstraint wrapped(visibilityConstraint, itemId);
-
-      Constraint constraint = Constraint::New<bool>( actor, Actor::Property::VISIBLE, wrapped );
-      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::LAYOUT_POSITION ) );
-      constraint.AddSource( ParentSource( Toolkit::ItemView::Property::SCROLL_SPEED ) );
-      constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-      constraint.AddSource( Source( mWeightObject, WeightObject::WEIGHT ) );
-
-      // Release visibility constraints the same time as the color constraint
-      constraint.SetRemoveAction(Dali::Constraint::Discard);
-
-      constraint.Apply();
-    }
-
-    KeyFrames keyFrames = KeyFrames::New();
-    keyFrames.Add( 0.0f, 0.0f );
-    keyFrames.Add( 1.0f, 1.0f );
-
-    Animation applyAnimation = Dali::Animation::New( durationSeconds );
-    applyAnimation.AnimateBetween( Property( mWeightObject, WeightObject::WEIGHT ), keyFrames, mAlphaFunction, TimePeriod(durationSeconds) );
-    applyAnimation.Play();
-  }
-}
-
-Vector3 ItemLayout::GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const
-{
-  Vector3 itemPosition = Vector3::ZERO;
-
-  ItemLayout::Vector3Function positionConstraint;
-  if (GetPositionConstraint(itemID, positionConstraint))
-  {
-    itemPosition = positionConstraint(Vector3::ZERO, currentLayoutPosition + itemID, 0.0f, layoutSize);
-  }
-
-  return itemPosition;
-}
-
-void ItemLayout::SetAlphaFunction(AlphaFunction func)
-{
-  mAlphaFunction = func;
-}
-
-AlphaFunction ItemLayout::GetAlphaFunction() const
-{
-  return mAlphaFunction;
-}
-
 
 } // namespace Toolkit
 

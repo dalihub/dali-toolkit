@@ -302,23 +302,23 @@ private:
   /**
    * Add a range of Actors, if they are not already in the ItemPool.
    * @param[in] range The range of Item IDs to associate with the new actors.
-   * @param[in] durationSeconds The time taken to fully constrain the newly added actor.
+   * @param[in] layoutSize The layout-size.
    */
-  void AddActorsWithinRange( ItemRange range, float durationSeconds );
+  void AddActorsWithinRange( ItemRange range, const Vector3& layoutSize );
 
   /**
    * Add a new Actor, if not already in the ItemPool.
    * @param[in] item The ID for the new item.
-   * @param[in] durationSeconds The time taken to fully constrain the new actor.
+   * @param[in] layoutSize The layout-size.
    */
-  void AddNewActor( ItemId item, float durationSeconds );
+  void AddNewActor( ItemId item, const Vector3& layoutSize );
 
   /**
    * Apply the constraints etc. that are required for ItemView children.
    * @param[in] item The item to setup.
-   * @param[in] durationSeconds The time taken to fully constrain the actor.
+   * @param[in] layoutSize The layout-size.
    */
-  void SetupActor( Item item, float durationSeconds );
+  void SetupActor( Item item, const Vector3& layoutSize );
 
   /**
    * Remove the Actor from the ItemPool and notify the ItemFactory the actor has been released by ItemView.
@@ -396,7 +396,7 @@ private:
    * Helper to re-apply all the constraints after items have been inserted, removed etc.
    * @param[in] durationSeconds The time taken to fully constrain the actors.
    */
-  void ReapplyAllConstraints( float durationSeconds );
+  void ReapplyAllConstraints();
 
   /**
    * Helper to relayout after item(s) are removed.
