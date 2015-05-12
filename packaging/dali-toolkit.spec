@@ -13,7 +13,6 @@ Requires:       dali
 # Do NOT put an adaptor here - it is an application choice which adaptor to use
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
-BuildRequires:  boost-devel
 BuildRequires:  pkgconfig(dali)
 BuildRequires:  pkgconfig(dali-core)
 
@@ -28,7 +27,6 @@ user interface functionality.
 Summary:    Application development package for the OpenGLES Canvas toolkit
 Group:      Development/Building
 Requires:   %{name} = %{version}-%{release}
-Requires:   boost-devel
 
 %description devel
 Application development package for the OpenGLES Canvas toolkit - headers and package config
