@@ -600,16 +600,13 @@ void ScrollBar::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::ScrollBar::Property::SCROLL_POSITION_INTERVALS:
       {
-        Property::Array propertyArray;
-        value.Get(propertyArray);
-
         Dali::Vector<float> positions;
-        size_t positionCount = propertyArray.size();
+        size_t positionCount = value.GetSize();
         positions.Resize( positionCount );
 
         for( size_t i = 0; i != positionCount; ++i )
         {
-          propertyArray[i].Get( positions[i]);
+          value.GetItem(i).Get( positions[i] );
         }
 
         scrollBarImpl.SetScrollPositionIntervals(positions);

@@ -40,17 +40,13 @@ ScrollViewPagePathEffect::ScrollViewPagePathEffect(Path path, const Vector3& for
   mPathConstrainer.SetProperty( PathConstrainer::Property::FORWARD, forward );
 
   Dali::Property::Value pointsProperty = path.GetProperty(Path::Property::POINTS);
-  Property::Array points;
-  pointsProperty.Get(points);
-  mPathConstrainer.SetProperty( PathConstrainer::Property::POINTS, points );
+  mPathConstrainer.SetProperty( PathConstrainer::Property::POINTS, pointsProperty );
 
   pointsProperty = path.GetProperty(Path::Property::CONTROL_POINTS);
-  pointsProperty.Get(points);
-  mPathConstrainer.SetProperty( PathConstrainer::Property::CONTROL_POINTS, points );
+  mPathConstrainer.SetProperty( PathConstrainer::Property::CONTROL_POINTS, pointsProperty );
 
   //Create linear constrainer
-  Property::Array pointsLinearConstrainer;
-  pointsProperty = Property::Value(pointsLinearConstrainer);
+  pointsProperty = Property::Value(Property::ARRAY);
   pointsProperty.AppendItem(0.0f);
   pointsProperty.AppendItem(1.0f);
   pointsProperty.AppendItem(0.0f);
