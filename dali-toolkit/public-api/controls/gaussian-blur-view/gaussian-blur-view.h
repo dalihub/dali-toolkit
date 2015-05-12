@@ -181,7 +181,6 @@ public:
    * @param [in] child The child.
    * @post The child will be referenced by its parent. This means that the child will be kept alive,
    * even if the handle passed into this method is reset or destroyed.
-   * @post This may invalidate ActorContainer iterators.
    */
   void Add(Actor child);
 
@@ -191,7 +190,6 @@ public:
    * @pre This Actor (the parent) has been initialized.
    * @pre The child actor is not the same as the parent actor.
    * @param [in] child The child.
-   * @post This may invalidate ActorContainer iterators.
    */
   void Remove(Actor child);
 

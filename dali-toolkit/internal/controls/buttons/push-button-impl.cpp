@@ -641,7 +641,7 @@ void PushButton::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type d
 
 void PushButton::ConfigureSizeNegotiation()
 {
-  ActorContainer images;
+  std::vector< Actor > images;
   images.reserve( 7 );
 
   images.push_back( GetButtonImage() );
@@ -679,7 +679,7 @@ void PushButton::ConfigureSizeNegotiation()
   }
 }
 
-void PushButton::ConfigureSizeNegotiationDimension( Dimension::Type dimension, const ActorContainer& images, Actor& label )
+void PushButton::ConfigureSizeNegotiationDimension( Dimension::Type dimension, const std::vector< Actor >& images, Actor& label )
 {
   ResizePolicy::Type imageResizePolicy = ResizePolicy::FILL_TO_PARENT;
   ResizePolicy::Type labelResizePolicy = ResizePolicy::FILL_TO_PARENT;
@@ -714,7 +714,7 @@ void PushButton::ConfigureSizeNegotiationDimension( Dimension::Type dimension, c
     label.SetResizePolicy( labelResizePolicy, dimension );
   }
 
-  for( ActorConstIter it = images.begin(), itEnd = images.end(); it != itEnd; ++it )
+  for( std::vector< Actor >::const_iterator it = images.begin(), itEnd = images.end(); it != itEnd; ++it )
   {
     Actor actor = *it;
     if( actor )

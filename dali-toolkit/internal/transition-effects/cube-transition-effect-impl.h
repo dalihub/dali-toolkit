@@ -303,7 +303,7 @@ protected:
   unsigned int               mNumRows;
   unsigned int               mNumColumns;
   Size                       mViewAreaSize;
-  ActorContainer             mBoxes;
+  std::vector< Actor >       mBoxes;
   std::vector< ImageActor >  mTiles[2];
   int                        mRotateIndex;
   Size                       mTileSize;

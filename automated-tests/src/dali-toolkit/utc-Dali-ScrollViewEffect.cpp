@@ -96,7 +96,8 @@ static bool gOnScrollUpdateCalled;                      ///< Whether the OnScrol
 static bool gOnScrollCompleteCalled;                    ///< Whether the OnScrollComplete signal was invoked.
 static Vector3 gConstraintResult;                       ///< Result from constraint.
 
-static ActorContainer gPages;                                ///< Keeps track of all the pages for applying effects.
+static std::vector< Actor > gPages;                                ///< Keeps track of all the pages for applying effects.
+typedef std::vector< Actor >::iterator ActorIter;
 
 static void ResetScrollCallbackResults()
 {

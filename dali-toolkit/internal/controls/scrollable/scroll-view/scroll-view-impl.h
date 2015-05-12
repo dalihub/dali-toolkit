@@ -90,6 +90,11 @@ public:
   static const unsigned int SCROLL_ANIMATION_FLAGS = AnimatingInternalX | AnimatingInternalY;
   static const unsigned int SNAP_ANIMATION_FLAGS = SnappingInternalX | SnappingInternalY;
 
+private:
+
+  typedef std::vector<Dali::Toolkit::ScrollViewEffect> ScrollViewEffectContainer; ///< Container of Dali::Toolkit::ScrollViewEffect
+  typedef ScrollViewEffectContainer::iterator ScrollViewEffectIter; ///< Iterator for Dali::Toolkit::ScrollViewEffectContainer
+
 public:
 
   /**

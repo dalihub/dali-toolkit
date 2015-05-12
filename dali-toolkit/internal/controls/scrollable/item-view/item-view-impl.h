@@ -556,7 +556,7 @@ private:
 
   ItemPool mItemPool;
 
-  ItemLayoutContainer mLayouts;
+  std::vector< ItemLayoutPtr >  mLayouts;  ///<  Container of Dali::Toolkit::ItemLayout objects
   ItemLayout* mActiveLayout;
   Vector3 mActiveLayoutTargetSize;
 

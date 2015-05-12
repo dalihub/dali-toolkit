@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <boost/function.hpp>
 #include <dali/public-api/animation/alpha-function.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/enums.h>
@@ -36,11 +35,6 @@ namespace Toolkit
 class ItemLayout;
 
 typedef IntrusivePtr<ItemLayout> ItemLayoutPtr; ///< Pointer to a Dali::Toolkit::ItemLayout object
-
-typedef std::vector<ItemLayoutPtr>          ItemLayoutContainer; ///< Container of Dali::Toolkit::ItemLayout objects
-typedef ItemLayoutContainer::iterator       ItemLayoutIter;      ///< Iterator for Dali::Toolkit::ItemLayoutContainer
-typedef ItemLayoutContainer::const_iterator ItemLayoutConstIter; ///< Const Iterator for Dali::Toolkit::ItemLayoutContainer
-
 
 /**
  * @brief A support class for managing ranges of items.
