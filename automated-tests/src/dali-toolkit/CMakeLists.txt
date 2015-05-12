@@ -22,9 +22,7 @@ SET(TC_SOURCES
    utc-Dali-GaussianBlurView.cpp
    utc-Dali-JsonParser.cpp
    utc-Dali-KeyInputFocusManager.cpp
-   utc-Dali-NavigationControl.cpp
    utc-Dali-OverlayEffect.cpp
-   utc-Dali-Page.cpp
    utc-Dali-PageTurnEffect.cpp
    utc-Dali-PageTurnView.cpp
    utc-Dali-ScrollView.cpp

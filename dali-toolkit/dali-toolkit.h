@@ -39,8 +39,6 @@
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
 #include <dali-toolkit/public-api/controls/image-view/masked-image-view.h>
 #include <dali-toolkit/public-api/controls/magnifier/magnifier.h>
-#include <dali-toolkit/public-api/controls/navigation-frame/navigation-control.h>
-#include <dali-toolkit/public-api/controls/navigation-frame/page.h>
 #include <dali-toolkit/public-api/controls/page-turn-view/page-factory.h>
 #include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
 #include <dali-toolkit/public-api/controls/page-turn-view/page-turn-landscape-view.h>
