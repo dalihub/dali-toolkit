@@ -15,8 +15,6 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/default-controls/check-button-factory.cpp \
   $(public_api_src_dir)/controls/default-controls/push-button-factory.cpp \
   $(public_api_src_dir)/controls/default-controls/solid-color-actor.cpp \
-  $(public_api_src_dir)/controls/navigation-frame/navigation-control.cpp \
-  $(public_api_src_dir)/controls/navigation-frame/page.cpp \
   $(public_api_src_dir)/controls/magnifier/magnifier.cpp \
   $(public_api_src_dir)/controls/page-turn-view/page-factory.cpp \
   $(public_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.cpp \
@@ -203,11 +201,6 @@ public_api_text_controls_header_files = \
 
 public_api_tool_bar_header_files = \
   $(public_api_src_dir)/controls/tool-bar/tool-bar.h
-
-public_api_navigation_frame_header_files = \
-  $(public_api_src_dir)/controls/navigation-frame/navigation-bar-style.h \
-  $(public_api_src_dir)/controls/navigation-frame/navigation-control.h \
-  $(public_api_src_dir)/controls/navigation-frame/page.h
 
 public_api_focus_manager_header_files = \
   $(public_api_src_dir)/focus-manager/focus-manager.h \
