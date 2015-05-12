@@ -3,3 +3,7 @@
    text-align: left;
    margin-left: 50px;
 }
+
+div.image img {
+  max-width: 50em;
+}
