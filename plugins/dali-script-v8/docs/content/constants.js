@@ -87,11 +87,6 @@ Constants accessible under the dali global object.
 |BLENDING_AUTO                             | integer value |
 |BLENDING_ON                               | integer value |
 
-|**actor.SetBlendEquation()  ** | |
-|BLEND_EQUATION_ADD                         | integer value  |
-|BLEND_EQUATION_SUBTRACT                    | integer value  |
-|BLEND_EQUATION_REVERSE_SUBTRACT            | integer value  |
-
 |**actor.SetCullFace()** | |
 |CULL_FACE_DISABLE          | integer value  |
 |CULL_FRONT_FACE           | integer value  |

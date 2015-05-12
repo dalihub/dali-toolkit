@@ -190,34 +190,6 @@ void RenderableActorApi::GetBlendMode( const v8::FunctionCallbackInfo<v8::Value>
 
 }
 
-// 2 function definitions, as Dali uses 2 functions.
-// JavaScript can't overload but we can document it twice with different params
-/**
- * @for RenderableActor
- * @method setBlendFunc
- * @param {Number} SourceBlending RGBA
- * @param {Number} DestinationBlending RGBA
- * @example
- *      blending constants
-      dali.BLEND_FACTOR_ZERO
-      dali.BLEND_FACTOR_ONE
-      dali.BLEND_FACTOR_SRC_COLOR
-      dali.BLEND_FACTOR_ONE_MINUS_SRC_COLOR
-      dali.BLEND_FACTOR_SRC_ALPHA
-      dali.BLEND_FACTOR_ONE_MINUS_SRC_ALPHA
-      dali.BLEND_FACTOR_DST_ALPHA
-      dali.BLEND_FACTOR_ONE_MINUS_DST_ALPHA
-      dali.BLEND_FACTOR_DST_COLOR
-      dali.BLEND_FACTOR_ONE_MINUS_DST_COLOR
-      dali.BLEND_FACTOR_SRC_ALPHA_SATURATE
-      dali.BLEND_FACTOR_CONSTANT_COLOR
-      dali.BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR
-      dali.BLEND_FACTOR_CONSTANT_ALPHA
-      dali.BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA
-
-      actor.setBlendFunc( dali.BLEND_FACTOR_ONE_MINUS_SRC_COLOR, dali.BLEND_FACTOR_ONE_MINUS_DST_COLOR);
- */
-
 /**
  * @for RenderableActor
  * @method setBlendFunc
@@ -255,39 +227,20 @@ void RenderableActorApi::SetBlendFunc( const v8::FunctionCallbackInfo< v8::Value
   RenderableActor actor =  GetRenderableActor( isolate, args );
 
   int params[4];
-  if( args.Length() == 2 )
+  bool foundAllParams(false);
+  V8Utils::ReadIntegerArguments( foundAllParams, &params[0], 4, args,0 );
+  if( foundAllParams )
   {
-    bool foundAllParams(false);
-    V8Utils::ReadIntegerArguments( foundAllParams, &params[0], 2, args,0 );
-    if( foundAllParams )
-    {
-      actor.SetBlendFunc(  static_cast< Dali::BlendingFactor::Type>(params[0]),
-                           static_cast< Dali::BlendingFactor::Type>(params[1]) );
-    }
-    else
-    {
-      DALI_SCRIPT_EXCEPTION( isolate, "invalid BlendMode parameter");
-      return;
-    }
+    actor.SetBlendFunc(  static_cast< Dali::BlendingFactor::Type>(params[0]),
+                         static_cast< Dali::BlendingFactor::Type>(params[1]),
+                         static_cast< Dali::BlendingFactor::Type>(params[2]),
+                         static_cast< Dali::BlendingFactor::Type>(params[3]));
   }
-  else if ( args.Length() == 4)
+  else
   {
-    bool foundAllParams(false);
-    V8Utils::ReadIntegerArguments( foundAllParams, &params[0], 4, args,0 );
-    if( foundAllParams )
-    {
-      actor.SetBlendFunc(  static_cast< Dali::BlendingFactor::Type>(params[0]),
-                           static_cast< Dali::BlendingFactor::Type>(params[1]),
-                           static_cast< Dali::BlendingFactor::Type>(params[2]),
-                           static_cast< Dali::BlendingFactor::Type>(params[3]));
-    }
-    else
-    {
-      DALI_SCRIPT_EXCEPTION( isolate, "invalid BlendMode parameter");
-      return;
-    }
+    DALI_SCRIPT_EXCEPTION( isolate, "invalid BlendMode parameter");
+    return;
   }
-
 }
 
 /**
@@ -323,148 +276,6 @@ void RenderableActorApi::GetBlendFunc( const v8::FunctionCallbackInfo< v8::Value
   args.GetReturnValue().Set( blendInfo );
 
 }
-// 2 function definitions, as Dali uses 2 functions.
-// JavaScript can't overload but we can document it twice with different params
-/**
- * @for RenderableActor
- * @method setBlendEquation
- * @param {Number } BlendEquation for RGBA
- * @example
- *
- *      //blending equation constants
-      dali.BLEND_EQUATION_ADD
-      dali.BLEND_EQUATION_SUBTRACT
-      dali.BLEND_EQUATION_REVERSE_SUBTRACT
-      actor.setBlendEquation( dali.BLEND_EQUATION_ADD );
-
- */
-
-/**
- * @for RenderableActor
- * @method setBlendEquation
- * @param {Number } BlendEquation for RGB
- * @param {Number } BlendEquation for Alpha
- * @example
- *
- *      //blending equation constants
-      dali.BLEND_EQUATION_ADD
-      dali.BLEND_EQUATION_SUBTRACT
-      dali.BLEND_EQUATION_REVERSE_SUBTRACT
-      actor.setBlendEquationSeparate( dali.BLEND_EQUATION_ADD, dali.BLEND_EQUATION_SUBTRACT  );
-
- */
-void RenderableActorApi::SetBlendEquation( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  RenderableActor actor = GetRenderableActor( isolate, args );
-
-  int params[2];
-  if( args.Length() == 1 )
-  {
-    bool foundAllParams( false );
-    V8Utils::ReadIntegerArguments( foundAllParams, &params[0], 1, args, 0 );
-    if( foundAllParams )
-    {
-      actor.SetBlendEquation( static_cast<Dali::BlendingEquation::Type>( params[0] ) );
-    }
-    else
-    {
-      DALI_SCRIPT_EXCEPTION( isolate, "invalid BlendEquation parameter" );
-      return;
-    }
-  }
-  else if( args.Length() == 2 )
-  {
-    bool foundAllParams( false );
-    V8Utils::ReadIntegerArguments( foundAllParams, &params[0], 2, args, 0 );
-    if( foundAllParams )
-    {
-      actor.SetBlendEquation( static_cast<Dali::BlendingEquation::Type>( params[0] ), static_cast<Dali::BlendingEquation::Type>( params[1] ) );
-    }
-    else
-    {
-      DALI_SCRIPT_EXCEPTION( isolate, "invalid BlendEquation parameter" );
-      return;
-    }
-  }
-}
-
-/**
- * @for RenderableActor
- * @method getBlendEquation
- * @return {Object} equationProperties
- * @example equation properties object has 2 fields
- *
- *      equationProperties.equationRgb    // rbg blend equation
- *      equationProperties.equationAlpha  // alpha blend equation
- */
-void RenderableActorApi::GetBlendEquation( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  RenderableActor actor = GetRenderableActor( isolate, args );
-
-  BlendingEquation::Type equationRgb, equationAlpha;
-  actor.GetBlendEquation( equationRgb, equationAlpha );
-
-  v8::Local<v8::Object> object = v8::Object::New( isolate );
-
-  object->Set( v8::String::NewFromUtf8( isolate, "equationRgb" ),   v8::Integer::New( isolate, equationRgb) );
-  object->Set( v8::String::NewFromUtf8( isolate, "equationAlpha" ), v8::Integer::New( isolate, equationAlpha ) );
-
-  args.GetReturnValue().Set( object );
-}
-
-/**
- * @for RenderableActor
- * @method setBlendColor
- * @param {Vector4} Color
- * @example
- *
- *        actor.SetBlendColor( dali.COLOR_RED );
- */
-void RenderableActorApi::SetBlendColor( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  RenderableActor actor = GetRenderableActor( isolate, args );
-
-  Dali::Vector4 color;
-
-  bool foundAllArguments( false );
-
-  V8Utils::ReadFloatArguments( foundAllArguments, color.AsFloat(), 4, args, 1.f ); // read the parameters
-  if( !foundAllArguments )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "invalid color parameter, should red,green,blue,alpha" );
-    return;
-  }
-  actor.SetBlendColor( color );
-
-}
-
-/**
- * @for RenderableActor
- * @method getBlendColor
- * @return {Object} Dali vector 4 object
- */
-void RenderableActorApi::GetBlendColor( const v8::FunctionCallbackInfo< v8::Value >& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  RenderableActor actor = GetRenderableActor( isolate, args );
-
-  Dali::Vector4 color = actor.GetBlendColor();
-
-  Dali::Property::Value value( color );
-
-  v8::Local<v8::Object> object = PropertyValueWrapper::WrapDaliProperty( isolate, value );
-
-  args.GetReturnValue().Set( object );
-
-}
-
 
 /**
  * @for RenderableActor
