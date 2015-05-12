@@ -90,7 +90,7 @@ public:
   /**
    * @copydoc Toolkit::ScrollBar::SetPositionNotifications()
    */
-  void SetPositionNotifications( const std::vector<float>& positions );
+  void SetPositionNotifications( const Dali::Vector<float>& positions );
 
   /**
    * @copydoc Toolkit::ScrollBar::SetIndicatorHeightPolicy()

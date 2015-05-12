@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scroll-component.h>
@@ -158,7 +158,7 @@ public:
    *
    * @param[in] positions List of values to receive notifications for when the current scroll position crosses them
    */
-  void SetPositionNotifications( const std::vector<float>& positions );
+  void SetPositionNotifications( const Dali::Vector<float>& positions );
 
   /**
    * @brief Sets the height policy of scroll indicator to have either variable or fixed height.

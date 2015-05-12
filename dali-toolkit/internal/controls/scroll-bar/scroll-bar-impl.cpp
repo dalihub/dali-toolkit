@@ -219,7 +219,7 @@ void ScrollBar::ApplyConstraints()
   }
 }
 
-void ScrollBar::SetPositionNotifications( const std::vector<float>& positions )
+void ScrollBar::SetPositionNotifications( const Dali::Vector<float>& positions )
 {
   if(mScrollPositionObject)
   {
