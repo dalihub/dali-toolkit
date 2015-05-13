@@ -464,6 +464,8 @@ public:
       OVERSHOOT_X,                                       ///< Property, name "overshoot-x",           type float
       OVERSHOOT_Y,                                       ///< Property, name "overshoot-y",           type float
       SCROLL_FINAL,                                      ///< Property, name "scroll-final",          type Vector3
+      SCROLL_FINAL_X,
+      SCROLL_FINAL_Y,
       WRAP,                                              ///< Property, name "wrap",                  type bool
       PANNING,                                           ///< Property, name "panning",               type bool
       SCROLLING,                                         ///< Property, name "scrolling",             type bool
