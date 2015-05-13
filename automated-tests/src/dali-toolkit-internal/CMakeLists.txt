@@ -10,6 +10,7 @@ SET(TC_SOURCES
  utc-Dali-PushButton.cpp
  utc-Dali-Text-CharacterSetConversion.cpp
  utc-Dali-Text-Segmentation.cpp
+ utc-Dali-Text-MultiLanguage.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)
