@@ -143,14 +143,13 @@ ScrollOvershootEffectRipple::ScrollOvershootEffectRipple( bool vertical, Scrolla
     mOvershoot(0.0f),
     mAnimationStateFlags(0)
 {
-  /*
   mOvershootOverlay = CreateBouncingEffectActor(mEffectOvershootProperty);
   mOvershootOverlay.SetColor(mAttachedScrollView.GetOvershootEffectColor());
   mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
   mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
   mOvershootOverlay.SetDrawMode(DrawMode::OVERLAY);
   mOvershootOverlay.SetVisible(false);
-  */
+
 }
 
 void ScrollOvershootEffectRipple::Apply()
@@ -159,16 +158,16 @@ void ScrollOvershootEffectRipple::Apply()
   mOvershootProperty = IsVertical() ? Toolkit::ScrollView::Property::OVERSHOOT_Y : Toolkit::ScrollView::Property::OVERSHOOT_X;
 
   // make sure height is set, since we only create a constraint for image width
-  //mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.width, OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height);
+  mOvershootOverlay.SetSize(OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.width, OVERSHOOT_BOUNCE_ACTOR_DEFAULT_SIZE.height);
 
-  //mAttachedScrollView.AddOverlay(mOvershootOverlay);
+  mAttachedScrollView.AddOverlay(mOvershootOverlay);
 
   UpdatePropertyNotifications();
 }
 
 void ScrollOvershootEffectRipple::Remove( Scrollable& scrollable )
 {
-//  if(mOvershootOverlay)
+  if(mOvershootOverlay)
   {
     if(mOvershootIncreaseNotification)
     {
@@ -180,14 +179,14 @@ void ScrollOvershootEffectRipple::Remove( Scrollable& scrollable )
       scrollable.Self().RemovePropertyNotification(mOvershootDecreaseNotification);
       mOvershootDecreaseNotification.Reset();
     }
-    //scrollable.RemoveOverlay(mOvershootOverlay);
+    scrollable.RemoveOverlay(mOvershootOverlay);
   }
 }
 
 void ScrollOvershootEffectRipple::Reset()
 {
-//  mOvershootOverlay.SetVisible(false);
-//  mOvershootOverlay.SetProperty( mEffectOvershootProperty, 0.f);
+  mOvershootOverlay.SetVisible(false);
+  mOvershootOverlay.SetProperty( mEffectOvershootProperty, 0.f);
 }
 
 void ScrollOvershootEffectRipple::UpdatePropertyNotifications()
@@ -234,10 +233,59 @@ void ScrollOvershootEffectRipple::UpdatePropertyNotifications()
 
 void ScrollOvershootEffectRipple::SetOvershootEffectColor( const Vector4& color )
 {
+  if(mOvershootOverlay)
+  {
+    mOvershootOverlay.SetColor(color);
+  }
 }
 
 void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
 {
+  mOvershootOverlay.SetVisible(visible);
+  // make sure overshoot image is correctly placed
+  if( visible )
+  {
+    Actor self = mAttachedScrollView.Self();
+    if(mOvershoot > 0.0f)
+    {
+      // positive overshoot
+      const Vector3 size = mOvershootOverlay.GetCurrentSize();
+      Vector3 relativeOffset;
+      const Vector3 parentSize = self.GetCurrentSize();
+      if(IsVertical())
+      {
+        mOvershootOverlay.SetOrientation( Quaternion( Radian( 0.0f ), Vector3::ZAXIS ) );
+        mOvershootOverlay.SetSize(parentSize.width, GetBounceActorHeight(parentSize.width), size.depth);
+      }
+      else
+      {
+        mOvershootOverlay.SetOrientation( Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS ) );
+        mOvershootOverlay.SetSize(parentSize.height, GetBounceActorHeight(parentSize.height), size.depth);
+        relativeOffset = Vector3(0.0f, 1.0f, 0.0f);
+      }
+      mOvershootOverlay.SetPosition(relativeOffset * parentSize);
+    }
+    else
+    {
+      // negative overshoot
+      const Vector3 size = mOvershootOverlay.GetCurrentSize();
+      Vector3 relativeOffset;
+      const Vector3 parentSize = self.GetCurrentSize();
+      if(IsVertical())
+      {
+        mOvershootOverlay.SetOrientation( Quaternion( Radian( Math::PI ), Vector3::ZAXIS ) );
+        mOvershootOverlay.SetSize(parentSize.width, GetBounceActorHeight(parentSize.width), size.depth);
+        relativeOffset = Vector3(1.0f, 1.0f, 0.0f);
+      }
+      else
+      {
+        mOvershootOverlay.SetOrientation( Quaternion( Radian( 0.5f * Math::PI ), Vector3::ZAXIS ) );
+        mOvershootOverlay.SetSize(parentSize.height, GetBounceActorHeight(parentSize.height), size.depth);
+        relativeOffset = Vector3(1.0f, 0.0f, 0.0f);
+      }
+      mOvershootOverlay.SetPosition(relativeOffset * parentSize);
+    }
+  }
 }
 
 void ScrollOvershootEffectRipple::OnOvershootNotification(PropertyNotification& source)
@@ -282,8 +330,8 @@ void ScrollOvershootEffectRipple::SetOvershoot(float amount, bool animate)
 
   if( animate && overshootAnimationSpeed > Math::MACHINE_EPSILON_0 )
   {
-    //float currentOvershoot = 0.0f;//fabsf( mOvershootOverlay.GetProperty( mEffectOvershootProperty ).Get<float>() );
-    float duration = 0.05f;//mOvershootOverlay.GetCurrentSize().height * (animatingOn ? (1.0f - currentOvershoot) : currentOvershoot) / overshootAnimationSpeed;
+    float currentOvershoot = fabsf( mOvershootOverlay.GetProperty( mEffectOvershootProperty ).Get<float>() );
+    float duration = mOvershootOverlay.GetCurrentSize().height * (animatingOn ? (1.0f - currentOvershoot) : currentOvershoot) / overshootAnimationSpeed;
 
     if( duration > Math::MACHINE_EPSILON_0 )
     {
@@ -295,14 +343,14 @@ void ScrollOvershootEffectRipple::SetOvershoot(float amount, bool animate)
       }
       mScrollOvershootAnimation = Animation::New(duration);
       mScrollOvershootAnimation.FinishedSignal().Connect( this, &ScrollOvershootEffectRipple::OnOvershootAnimFinished );
-      //mScrollOvershootAnimation.AnimateTo( Property(mOvershootOverlay, mEffectOvershootProperty), amount, TimePeriod(duration) );
+      mScrollOvershootAnimation.AnimateTo( Property(mOvershootOverlay, mEffectOvershootProperty), amount, TimePeriod(duration) );
       mScrollOvershootAnimation.Play();
       mAnimationStateFlags = animatingOn ? AnimatingIn : AnimatingOut;
     }
   }
   else
   {
-    //mOvershootOverlay.SetProperty( mEffectOvershootProperty, amount);
+    mOvershootOverlay.SetProperty( mEffectOvershootProperty, amount);
   }
 }
 
@@ -312,7 +360,7 @@ void ScrollOvershootEffectRipple::OnOvershootAnimFinished(Animation& animation)
   if( mAnimationStateFlags & AnimatingOut )
   {
     // should now be offscreen
-    //mOvershootOverlay.SetVisible(false);
+    mOvershootOverlay.SetVisible(false);
   }
   if( (mAnimationStateFlags & AnimateBack) )
   {
