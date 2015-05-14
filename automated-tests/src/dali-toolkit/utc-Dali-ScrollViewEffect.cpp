@@ -440,14 +440,14 @@ int UtcDaliScrollViewPagePathEffectTest(void)
 
   Dali::Path path = Dali::Path::New();
   Dali::Property::Array points;
-  points.resize(3);
+  points.Resize(3);
   points[0] = Vector3( xHalfSize, 0.0f,  -xHalfSize);
   points[1] = Vector3( 0.0f, 0.0f, 0.0f );
   points[2] = Vector3( -xHalfSize, 0.0f,  -xHalfSize);
   path.SetProperty( Path::Property::POINTS, points );
 
   Dali::Property::Array controlPoints;
-  controlPoints.resize(4);
+  controlPoints.Resize(4);
   controlPoints[0] = Vector3( xHalfSize, 0.0f, 0.0f );
   controlPoints[1] = Vector3( xHalfSize, 0.0f, 0.0f );
   controlPoints[2] = Vector3(-xHalfSize, 0.0f, 0.0f );

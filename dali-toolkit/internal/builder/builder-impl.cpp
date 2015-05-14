@@ -25,6 +25,7 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/object/type-info.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/property-array.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/camera-actor.h>
@@ -167,7 +168,7 @@ std::string PropertyValueToString( const Property::Value& value )
     }
     case Property::ARRAY:
     {
-      ret = std::string("Array Size=") + ToString( value.Get<Property::Array>().size() );
+      ret = std::string("Array Size=") + ToString( value.Get<Property::Array>().Size() );
       break;
     }
     case Property::MAP:
