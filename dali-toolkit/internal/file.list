@@ -38,12 +38,8 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-base-impl.cpp \
    $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.cpp \
    $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-view-effect-impl.cpp \
-   $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-view-carousel-effect-impl.cpp \
-   $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-view-cube-effect-impl.cpp \
-   $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-view-depth-effect-impl.cpp \
    $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-view-impl.cpp \
    $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-view-page-path-effect-impl.cpp \
-   $(toolkit_src_dir)/controls/scrollable/scroll-view/scroll-view-wobble-effect-impl.cpp \
    $(toolkit_src_dir)/controls/shadow-view/shadow-view-impl.cpp \
    $(toolkit_src_dir)/controls/slider/slider-impl.cpp \
    $(toolkit_src_dir)/controls/super-blur-view/super-blur-view-impl.cpp \

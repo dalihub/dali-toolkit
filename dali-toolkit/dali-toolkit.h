@@ -49,13 +49,9 @@
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view.h>
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-carousel-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-cube-effect.h>
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-depth-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-path-effect.h>
-#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-wobble-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
 #include <dali-toolkit/public-api/controls/shadow-view/shadow-view.h>
