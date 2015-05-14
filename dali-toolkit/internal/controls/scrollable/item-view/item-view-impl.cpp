@@ -281,7 +281,7 @@ ItemView::ItemView(ItemFactory& factory)
   mActiveLayout(NULL),
   mAnimatingOvershootOn(false),
   mAnimateOvershootOff(false),
-  mAnchoringEnabled(true),
+  mAnchoringEnabled(false),
   mAnchoringDuration(DEFAULT_ANCHORING_DURATION),
   mRefreshIntervalLayoutPositions(0.0f),
   mRefreshOrderHint(true/*Refresh item 0 first*/),
@@ -1260,7 +1260,7 @@ Animation ItemView::DoAnchoring()
     float anchorPosition = mActiveLayout->GetClosestAnchorPosition( GetCurrentLayoutPosition(0) );
 
     anchoringAnimation = Animation::New(mAnchoringDuration);
-    anchoringAnimation.AnimateTo( Property(self, Toolkit::ItemView::Property::LAYOUT_POSITION), -anchorPosition, AlphaFunction::EASE_OUT );
+    anchoringAnimation.AnimateTo( Property(self, Toolkit::ItemView::Property::LAYOUT_POSITION), anchorPosition, AlphaFunction::EASE_OUT );
     anchoringAnimation.AnimateTo( Property(self, Toolkit::ItemView::Property::SCROLL_SPEED), 0.0f, AlphaFunction::EASE_OUT );
     if(!mIsFlicking)
     {
