@@ -57,6 +57,8 @@ class DALI_IMPORT_API Control : public CustomActorImpl, public ConnectionTracker
 {
 public:
 
+  class Extension; ///< Forward declare future extension interface
+
   // Creation & Destruction
 
   /**
@@ -621,6 +623,16 @@ private:
    * @copydoc ConnectionTrackerInterface::SignalDisconnected
    */
   virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback );
+
+  /**
+   * Retrieve the extension for this control
+   *
+   * @return The extension if available, NULL otherwise
+   */
+  virtual Extension* GetExtension()
+  {
+    return NULL;
+  }
 
 private:
 
