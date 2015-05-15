@@ -149,6 +149,16 @@ Path Builder::GetPath( const std::string &name )
   return GetImpl(*this).GetPath( name );
 }
 
+PathConstrainer Builder::GetPathConstrainer( const std::string& pathConstrainerName )
+{
+  return GetImpl(*this).GetPathConstrainer( pathConstrainerName );
+}
+
+LinearConstrainer Builder::GetLinearConstrainer( const std::string& linearConstrainerName )
+{
+  return GetImpl(*this).GetLinearConstrainer( linearConstrainerName );
+}
+
 Builder::BuilderSignalType& Builder::QuitSignal()
 {
   return GetImpl( *this ).QuitSignal();
