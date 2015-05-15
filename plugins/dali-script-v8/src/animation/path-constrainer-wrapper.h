@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/animation/path-constrainer.h>
+#include <dali/devel-api/animation/path-constrainer.h>
 #include <v8.h>
 
 // INTERNAL INCLUDES

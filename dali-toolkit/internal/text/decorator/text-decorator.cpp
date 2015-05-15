@@ -24,7 +24,7 @@
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/actors/mesh-actor.h>
+#include <dali/devel-api/actors/mesh-actor.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/stage.h>
@@ -32,8 +32,8 @@
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pan-gesture-detector.h>
-#include <dali/public-api/geometry/mesh.h>
-#include <dali/public-api/geometry/mesh-data.h>
+#include <dali/devel-api/geometry/mesh.h>
+#include <dali/devel-api/geometry/mesh-data.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>

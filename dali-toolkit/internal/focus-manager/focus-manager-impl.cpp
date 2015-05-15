@@ -25,7 +25,7 @@
 #include <dali/devel-api/adaptor-framework/sound-player.h>
 #include <dali/devel-api/adaptor-framework/tts-player.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/events/hit-test-algorithm.h>
+#include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/integration-api/debug.h>
 

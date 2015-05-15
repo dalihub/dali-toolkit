@@ -21,9 +21,9 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/public-api/actors/image-actor.h>
-#include <dali/public-api/actors/mesh-actor.h>
-#include <dali/public-api/images/atlas.h>
-#include <dali/public-api/geometry/mesh.h>
+#include <dali/devel-api/actors/mesh-actor.h>
+#include <dali/devel-api/images/atlas.h>
+#include <dali/devel-api/geometry/mesh.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES

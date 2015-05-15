@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/linear-constrainer.h>
-#include <dali/public-api/animation/path-constrainer.h>
+#include <dali/devel-api/animation/path-constrainer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>

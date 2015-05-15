@@ -24,7 +24,7 @@
 #include <limits>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES

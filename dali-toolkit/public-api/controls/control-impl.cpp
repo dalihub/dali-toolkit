@@ -23,13 +23,13 @@
 #include <limits>
 #include <stack>
 #include <dali/public-api/actors/image-actor.h>
-#include <dali/public-api/actors/mesh-actor.h>
+#include <dali/devel-api/actors/mesh-actor.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/geometry/mesh.h>
+#include <dali/devel-api/geometry/mesh.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/scripting/scripting.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/debug.h>
 

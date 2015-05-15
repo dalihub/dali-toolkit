@@ -22,6 +22,9 @@
 #include <dali/dali.h>
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/devel-api/actors/mesh-actor.h>
+#include <dali/devel-api/geometry/mesh.h>
+
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/atlas-manager/atlas-manager.h>

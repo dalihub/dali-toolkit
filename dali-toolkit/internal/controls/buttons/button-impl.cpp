@@ -22,9 +22,9 @@
 #include <cstring> // for strcmp
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/actors/image-actor.h>
-#include <dali/public-api/scripting/scripting.h>
+#include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>

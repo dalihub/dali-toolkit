@@ -29,7 +29,7 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/camera-actor.h>
-#include <dali/public-api/scripting/scripting.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES

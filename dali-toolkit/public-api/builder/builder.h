@@ -22,7 +22,7 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/linear-constrainer.h>
-#include <dali/public-api/animation/path-constrainer.h>
+#include <dali/devel-api/animation/path-constrainer.h>
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 
