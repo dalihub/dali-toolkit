@@ -8,8 +8,6 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/buttons/check-box-button.cpp \
   $(public_api_src_dir)/controls/buttons/push-button.cpp \
   $(public_api_src_dir)/controls/buttons/radio-button.cpp \
-  $(public_api_src_dir)/controls/default-controls/check-button-factory.cpp \
-  $(public_api_src_dir)/controls/default-controls/push-button-factory.cpp \
   $(public_api_src_dir)/controls/default-controls/solid-color-actor.cpp \
   $(public_api_src_dir)/controls/scroll-bar/scroll-bar.cpp \
   $(public_api_src_dir)/controls/scrollable/item-view/default-item-layout.cpp \
@@ -53,8 +51,6 @@ public_api_buttons_header_files = \
   $(public_api_src_dir)/controls/buttons/radio-button.h
 
 public_api_default_controls_header_files = \
-  $(public_api_src_dir)/controls/default-controls/check-button-factory.h \
-  $(public_api_src_dir)/controls/default-controls/push-button-factory.h \
   $(public_api_src_dir)/controls/default-controls/solid-color-actor.h
 
 public_api_gaussian_blur_view_header_files = \
