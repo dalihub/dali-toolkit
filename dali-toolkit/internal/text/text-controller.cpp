@@ -862,7 +862,7 @@ bool Controller::DoRelayout( const Size& size,
     layoutSize = mImpl->mVisualModel->GetActualSize();
   }
 
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout no glyphs, view updated %s\n", ( viewUpdated ? "true" : "false" ) );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout, view updated %s\n", ( viewUpdated ? "true" : "false" ) );
   return viewUpdated;
 }
 
