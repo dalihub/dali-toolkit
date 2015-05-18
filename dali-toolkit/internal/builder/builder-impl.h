@@ -30,8 +30,8 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/builder/json-parser.h>
-#include <dali-toolkit/public-api/builder/builder.h>
+#include <dali-toolkit/devel-api/builder/json-parser.h>
+#include <dali-toolkit/devel-api/builder/builder.h>
 #include <dali-toolkit/internal/builder/builder-declarations.h>
 
 // Warning messages usually displayed

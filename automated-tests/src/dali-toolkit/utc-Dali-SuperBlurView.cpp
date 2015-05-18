@@ -24,6 +24,7 @@
 
 #include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/super-blur-view/super-blur-view.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;

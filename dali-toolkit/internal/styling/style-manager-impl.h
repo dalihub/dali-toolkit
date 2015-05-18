@@ -27,8 +27,8 @@
 #include <dali/public-api/signals/connection-tracker.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/styling/style-manager.h>
-#include <dali-toolkit/public-api/builder/builder.h>
+#include <dali-toolkit/devel-api/styling/style-manager.h>
+#include <dali-toolkit/devel-api/builder/builder.h>
 
 namespace Dali
 {

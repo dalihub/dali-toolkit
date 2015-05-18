@@ -24,7 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/radio-button.h>
-#include <dali-toolkit/public-api/controls/table-view/table-view.h>
+#include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include "button-impl.h"
 
 namespace Dali

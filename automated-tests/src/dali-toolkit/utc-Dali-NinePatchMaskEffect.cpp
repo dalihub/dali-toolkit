@@ -24,6 +24,7 @@
 
 #include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/shader-effects/nine-patch-mask-effect.h>
 
 using namespace Dali;
 

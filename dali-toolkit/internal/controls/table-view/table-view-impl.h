@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/table-view/table-view.h>
+#include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 #include "array-2d.h"
 
 namespace Dali

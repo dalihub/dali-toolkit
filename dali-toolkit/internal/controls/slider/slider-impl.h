@@ -25,7 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/slider/slider.h>
+#include <dali-toolkit/devel-api/controls/slider/slider.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 namespace Dali

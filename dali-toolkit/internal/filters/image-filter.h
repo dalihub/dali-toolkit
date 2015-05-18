@@ -22,7 +22,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/effects-view/effects-view.h>
+#include <dali-toolkit/devel-api/controls/effects-view/effects-view.h>
 
 namespace Dali
 {

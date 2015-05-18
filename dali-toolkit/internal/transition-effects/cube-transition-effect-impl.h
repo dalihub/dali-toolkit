@@ -28,7 +28,7 @@
 #include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/transition-effects/cube-transition-effect.h>
+#include <dali-toolkit/devel-api/transition-effects/cube-transition-effect.h>
 
 namespace Dali
 {

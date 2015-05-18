@@ -23,7 +23,7 @@
 #include <iomanip>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/shader-effects/water-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/water-effect.h>
 
 namespace Dali
 {

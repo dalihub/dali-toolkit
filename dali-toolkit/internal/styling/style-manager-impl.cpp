@@ -29,7 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/devel-api/styling/style-manager.h>
 
 namespace
 {

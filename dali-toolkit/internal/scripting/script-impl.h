@@ -21,8 +21,8 @@
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/scripting/script.h>
-#include <dali-toolkit/public-api/scripting/script-plugin.h>
+#include <dali-toolkit/devel-api/scripting/script.h>
+#include <dali-toolkit/devel-api/scripting/script-plugin.h>
 
 
 namespace Dali

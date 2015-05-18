@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/public-api/builder/json-parser.h>
+#include <dali-toolkit/devel-api/builder/json-parser.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;

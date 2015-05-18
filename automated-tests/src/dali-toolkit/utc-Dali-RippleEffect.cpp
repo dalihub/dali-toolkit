@@ -24,6 +24,8 @@
 
 #include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/shader-effects/ripple-effect.h>
+
 
 using namespace Dali;
 

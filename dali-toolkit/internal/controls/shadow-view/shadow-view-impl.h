@@ -27,7 +27,7 @@
 #include <dali/public-api/shader-effects/shader-effect.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/shadow-view/shadow-view.h>
+#include <dali-toolkit/devel-api/controls/shadow-view/shadow-view.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
 

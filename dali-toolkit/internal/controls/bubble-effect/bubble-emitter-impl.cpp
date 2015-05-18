@@ -25,7 +25,7 @@
 #include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/shader-effects/bubble-effect/color-adjuster.h>
+#include <dali-toolkit/devel-api/shader-effects/bubble-effect/color-adjuster.h>
 
 namespace Dali
 {

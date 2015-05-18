@@ -27,12 +27,12 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
 #include <dali-toolkit/internal/shader-effects/page-turn-effect-impl.h>
-#include <dali-toolkit/public-api/shader-effects/page-turn-effect.h>
-#include <dali-toolkit/public-api/shader-effects/page-turn-book-spine-effect.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-factory.h>
-#include <dali-toolkit/public-api/controls/shadow-view/shadow-view.h>
+#include <dali-toolkit/devel-api/shader-effects/page-turn-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/page-turn-book-spine-effect.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
+#include <dali-toolkit/devel-api/controls/shadow-view/shadow-view.h>
 
 namespace Dali
 {

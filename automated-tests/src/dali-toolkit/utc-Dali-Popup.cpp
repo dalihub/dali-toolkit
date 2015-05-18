@@ -25,6 +25,7 @@
 #include <dali.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/popup/popup.h>
 
 using namespace Dali;
 using namespace Toolkit;

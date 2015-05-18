@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/transition-effects/cube-transition-wave-effect.h>
+#include <dali-toolkit/devel-api/transition-effects/cube-transition-wave-effect.h>
 #include <dali-toolkit/internal/transition-effects/cube-transition-effect-impl.h>
 
 namespace Dali
