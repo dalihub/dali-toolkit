@@ -19,13 +19,44 @@
 #include "bubble-emitter-impl.h"
 
 // EXTERNAL INCLUDES
-#include <cmath>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/shader-effects/bubble-effect/color-adjuster.h>
+#include <dali-toolkit/internal/controls/bubble-effect/bubble-actor.h>
+#include <dali-toolkit/internal/controls/bubble-effect/color-adjuster.h>
+#include <dali-toolkit/internal/controls/bubble-effect/bubble-effect.h>
+
+namespace
+{
+struct Vertex
+{
+  float index;
+  Dali::Vector2 position;
+  Dali::Vector2 textureCoord;
+
+  Vertex()
+  {}
+
+  Vertex( float index, const Dali::Vector2& position, const Dali::Vector2& textureCoord )
+  : index( index ), position( position ), textureCoord( textureCoord )
+  {}
+};
+
+/**
+ * Return a random value between the given interval.
+ * @param[in] f0 The low bound
+ * @param[in] f1 The up bound
+ * @return A random value between the given interval
+ */
+float RandomRange(float f0, float f1)
+{
+  return f0 + (rand() & 0xfff) * (f1-f0) * (1.0f/4095.0f);
+}
+
+}
 
 namespace Dali
 {
@@ -40,24 +71,30 @@ BubbleEmitter::BubbleEmitter( const Vector2& movementArea,
                               unsigned int maximumNumberOfBubble,
                               const Vector2& bubbleSizeRange )
 : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),
-  mMovementArea( movementArea ),
   mShapeImage( shapeImage ),
-  mTotalNumOfBubble( maximumNumberOfBubble ),
-  mRenderTaskRunning(false),
+  mMovementArea( movementArea ),
   mBubbleSizeRange( bubbleSizeRange ),
-  mCurrentUniform( 0 ),
-  mDensity( 5 )
+  mDensity( 5 ),
+  mTotalNumOfBubble( maximumNumberOfBubble ),
+  mCurrentBubble( 0 ),
+  mRenderTaskRunning(false)
 {
-  // Calculate how many BubbleEffect shaders are required
+  // Calculate how many shaders are required
   if( mTotalNumOfBubble>100 )
   {
-    mNumBubblePerShader = 100;
-    mNumShader = mTotalNumOfBubble / 100;
+    mNumBubblePerActor = 100;
+    mNumActor = mTotalNumOfBubble / 100;
+    if( mNumActor*mNumBubblePerActor < mTotalNumOfBubble )
+    {
+      mNumActor++;
+      mNumBubblePerActor =  mTotalNumOfBubble / mNumActor+1;
+      mTotalNumOfBubble = mNumActor * mNumBubblePerActor;
+    }
   }
   else
   {
-    mNumBubblePerShader = mTotalNumOfBubble;
-    mNumShader = 1;
+    mNumBubblePerActor = mTotalNumOfBubble;
+    mNumActor = 1;
   }
 }
 
@@ -92,38 +129,26 @@ void BubbleEmitter::OnInitialize()
   // Prepare the frame buffer to store the color adjusted background image
   mEffectImage = FrameBufferImage::New( mMovementArea.width/4.f, mMovementArea.height/4.f, Pixel::RGBA8888, Dali::Image::UNUSED );
 
-  // Generate the material object, which is used by all meshActors
-  GenMaterial();
+  // Generate the samplers and geometry, which is used by all bubbleActors
+  mSamplerBackground = Sampler::New( mEffectImage, "sBackground" );
+  mSamplerBubbleShape = Sampler::New( mShapeImage, "sBubbleShape" );
+  mMeshGeometry =  CreateGeometry( mNumBubblePerActor*mDensity );
 
-  mMesh.resize( mNumShader );
-  mMeshActor.resize( mNumShader );
-  mEffect.resize( mNumShader );
+  Shader bubbleShader = CreateBubbleShader (mNumBubblePerActor );
+
+  mMaterial = Material::New( bubbleShader );
+  mMaterial.AddSampler( mSamplerBackground );
+  mMaterial.AddSampler( mSamplerBubbleShape );
+
+  mBubbleActors.resize( mNumActor );
 
   // Create the meshActor group and bubbleEffect group to emit bubbles following the given track, such as finger touch track.
-  MeshData meshData;
-  ConstructBubbleMesh( meshData, mNumBubblePerShader*mDensity);
-  for(unsigned int i=0; i < mNumShader; i++ )
+  for(unsigned int i=0; i < mNumActor; i++ )
   {
-    mMesh[i] = Mesh::New( meshData );
-    mMeshActor[i] = MeshActor::New( mMesh[i] );
-    mMeshActor[i].SetParentOrigin(ParentOrigin::TOP_LEFT);
-    mEffect[i] = BubbleEffect::New( mNumBubblePerShader );
-    mEffect[i].SetEffectImage( mEffectImage );
-    mEffect[i].SetMovementArea( mMovementArea );
-    mMeshActor[i].SetShaderEffect( mEffect[i] );
-    mBubbleRoot.Add( mMeshActor[i] );
+    mBubbleActors[i] = new BubbleActor( mNumBubblePerActor, mMovementArea );
+    (mBubbleActors[i])->MakeRenderable( mMeshGeometry, mMaterial );
+    mBubbleRoot.Add( (mBubbleActors[i])->GetMeshActor() );
   }
-
-  // Create the extra meshActor and bubbleEffect to emit bubbles in totally random angle.
-  MeshData meshDataForNoise;
-  ConstructBubbleMesh( meshDataForNoise, mNumBubblePerShader);
-  mMeshActorForNoise = MeshActor::New( Mesh::New(meshDataForNoise) );
-  mMeshActorForNoise.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  mEffectForNoise = BubbleEffect::New( mNumBubblePerShader );
-  mEffectForNoise.SetMovementArea( mMovementArea );
-  mEffectForNoise.SetEffectImage( mEffectImage );
-  mMeshActorForNoise.SetShaderEffect( mEffectForNoise );
-  mBubbleRoot.Add( mMeshActorForNoise );
 
   // Create a cameraActor for the off screen render task.
   mCameraActor = CameraActor::New(mMovementArea);
@@ -150,7 +175,7 @@ void BubbleEmitter::SetBackground( Image bgImage, const Vector3& hsvDelta )
   sourceActor.SetParentOrigin(ParentOrigin::CENTER);
   Stage::GetCurrent().Add( sourceActor );
 
-  ColorAdjuster colorAdjuster = ColorAdjuster::New( hsvDelta, true /*ignore alpha to make bubble color always*/ );
+  ShaderEffect colorAdjuster = CreateColorAdjuster( hsvDelta, true /*ignore alpha to make bubble color always*/ );
   sourceActor.SetShaderEffect( colorAdjuster );
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
@@ -167,16 +192,15 @@ void BubbleEmitter::SetBackground( Image bgImage, const Vector3& hsvDelta )
 
 void BubbleEmitter::SetShapeImage( Image shapeImage )
 {
-  mCustomMaterial.SetDiffuseTexture( shapeImage );
+  mSamplerBubbleShape.SetImage( shapeImage );
 }
 
 void BubbleEmitter::SetBubbleScale( float scale )
 {
-  for(unsigned int i=0; i < mNumShader; i++ )
+  for(unsigned int i=0; i < mNumActor; i++ )
   {
-    mEffect[i].SetDynamicScale( scale );
+    (mBubbleActors[i])->SetDynamicScale( scale );
   }
-  mEffectForNoise.SetDynamicScale( scale );
 }
 
 void BubbleEmitter::SetBubbleDensity( unsigned int density )
@@ -190,12 +214,27 @@ void BubbleEmitter::SetBubbleDensity( unsigned int density )
   else
   {
     mDensity = density;
-    MeshData meshData;
-    ConstructBubbleMesh( meshData, mNumBubblePerShader*mDensity);
-    for(unsigned int i=0; i < mNumShader; i++ )
+    mMeshGeometry =  CreateGeometry( mNumBubblePerActor*mDensity );
+    for(unsigned int i=0; i < mNumActor; i++ )
     {
-      mMesh[i].UpdateMeshData(meshData);
+      (mBubbleActors[i])->SetGeometry( mMeshGeometry );
     }
+  }
+}
+
+void BubbleEmitter::SetBlendMode( bool enable )
+{
+  if(enable)
+  {
+    // linear overlay
+    mMaterial.SetBlendFunc(BlendingFactor::SRC_ALPHA, BlendingFactor::ONE,
+                           BlendingFactor::ZERO, BlendingFactor::ONE);
+  }
+  else
+  {
+    // using default blend func
+    mMaterial.SetBlendFunc( BlendingFactor::SRC_ALPHA,   BlendingFactor::ONE_MINUS_SRC_ALPHA,
+                            BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA );
   }
 }
 
@@ -206,7 +245,7 @@ void BubbleEmitter::OnRenderFinished(RenderTask& source)
   Actor sourceActor = source.GetSourceActor();
   if( sourceActor )
   {
-    RenderableActor renderable = RenderableActor::DownCast( sourceActor );
+    ImageActor renderable = ImageActor::DownCast( sourceActor );
     if( renderable )
     {
       renderable.RemoveShaderEffect();
@@ -228,152 +267,74 @@ void BubbleEmitter::OnContextRegained()
   }
 }
 
-void BubbleEmitter::SetBlendMode( bool enable )
-{
-  if(enable)
-  {
-    for(unsigned int i=0; i < mNumShader; i++ )
-    {
-      // linear overlay
-      // TODO: if BlendColor would be public api from renderable actor, then can optimize the constant color
-      mMeshActor[i].SetBlendFunc(BlendingFactor::SRC_ALPHA, BlendingFactor::ONE,
-                                 BlendingFactor::ZERO, BlendingFactor::ONE);
-    }
-    mMeshActorForNoise.SetBlendFunc(BlendingFactor::SRC_ALPHA, BlendingFactor::ONE,
-                                    BlendingFactor::ZERO, BlendingFactor::ONE);
-  }
-  else
-  {
-    for(unsigned int i=0; i < mNumShader; i++ )
-    {
-      // using default blend func
-      mMeshActor[i].SetBlendFunc( BlendingFactor::SRC_ALPHA,   BlendingFactor::ONE_MINUS_SRC_ALPHA,
-                                  BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA );
-    }
-    mMeshActorForNoise.SetBlendFunc( BlendingFactor::SRC_ALPHA,   BlendingFactor::ONE_MINUS_SRC_ALPHA,
-                                     BlendingFactor::ONE, BlendingFactor::ONE_MINUS_SRC_ALPHA );
-  }
-}
-
 void BubbleEmitter::EmitBubble( Animation& animation, const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement )
 {
-  unsigned int curUniform = mCurrentUniform  % mNumBubblePerShader;
-  unsigned int groupIdx = mCurrentUniform / mNumBubblePerShader;
-  SetBubbleParameter( mEffect[groupIdx], curUniform, emitPosition, direction, displacement);
-  animation.AnimateTo( Property( mEffect[groupIdx], mEffect[groupIdx].GetPercentagePropertyName(curUniform) ),
+  unsigned int curUniform = mCurrentBubble  % mNumBubblePerActor;
+  unsigned int groupIdx = mCurrentBubble / mNumBubblePerActor;
+  SetBubbleParameter( mBubbleActors[groupIdx], curUniform, emitPosition, direction, displacement);
+  animation.AnimateTo( (mBubbleActors[groupIdx])->GetPercentageProperty(curUniform),
                        1.f, AlphaFunction::LINEAR );
 
-  if( mCurrentUniform % mNumShader == 0 )
-  {
-    unsigned int uniform = mCurrentUniform / mNumShader;
-    SetBubbleParameter(mEffectForNoise, uniform, emitPosition, displacement);
-    animation.AnimateTo( Property( mEffectForNoise, mEffectForNoise.GetPercentagePropertyName(uniform) ),
-                         1.f, AlphaFunction::LINEAR );
-  }
-
-  mCurrentUniform = (mCurrentUniform + 1) % mTotalNumOfBubble;
-}
-
-void BubbleEmitter::StartExplosion( float duration, float multiple )
-{
-  Animation animation = Animation::New( duration );
-  for(unsigned int i=0; i < mNumShader; i++ )
-  {
-    animation.AnimateTo( Property( mEffect[i], mEffect[i].GetMagnificationPropertyName() ),
-                         multiple, AlphaFunction::EASE_OUT);
-  }
-  animation.AnimateTo( Property( mEffectForNoise, mEffectForNoise.GetMagnificationPropertyName() ),
-                       multiple, AlphaFunction::EASE_OUT);
-  animation.Play();
-
-  animation.FinishedSignal().Connect(this, &BubbleEmitter::OnExplosionFinished);
+  mCurrentBubble = (mCurrentBubble + 1) % mTotalNumOfBubble;
 }
 
 void BubbleEmitter::Restore()
 {
-  for(unsigned int i=0; i < mNumShader; i++ )
+  for(unsigned int i=0; i < mNumActor; i++ )
   {
-    mEffect[i].ResetParameters();
+    (mBubbleActors[i])->ResetProperties();
   }
-  mEffectForNoise.ResetParameters();
 }
 
-void BubbleEmitter::GenMaterial()
+Geometry BubbleEmitter::CreateGeometry( unsigned int numOfPatch )
 {
-  mCustomMaterial = Material::New("CustomMaterial");
-  mCustomMaterial.SetOpacity(1.0f);
-  mCustomMaterial.SetDiffuseColor(Color::WHITE);
-  mCustomMaterial.SetAmbientColor(Vector4(0.0, 0.1, 0.1, 1.0));
-  mCustomMaterial.SetMapU( Material::MAPPING_MODE_WRAP );
-  mCustomMaterial.SetMapV( Material::MAPPING_MODE_WRAP );
-  mCustomMaterial.SetDiffuseTexture( mShapeImage );
-}
+  unsigned int numVertex = numOfPatch*4u;
+  std::vector<Vertex> vertexData;
+  vertexData.reserve( numVertex );
 
-void BubbleEmitter::AddVertex(MeshData::VertexContainer& vertices, Vector3 XYZ, Vector2 UV)
-{
-  MeshData::Vertex meshVertex;
-  meshVertex.x = XYZ.x;
-  meshVertex.y = XYZ.y;
-  meshVertex.z = XYZ.z;
-  meshVertex.u = UV.x;
-  meshVertex.v = UV.y;
-  vertices.push_back(meshVertex);
-}
+  unsigned int numIndex = numOfPatch*6u;
+  Vector<unsigned int> indexData;
+  indexData.Reserve( numIndex );
 
-void BubbleEmitter::AddTriangle(MeshData::FaceIndices& faces,
-size_t v0, size_t v1, size_t v2)
-{
-  faces.push_back(v0);
-  faces.push_back(v1);
-  faces.push_back(v2);
-}
-
-void BubbleEmitter::ConstructBubbleMesh( MeshData& meshData, unsigned int numOfBubble)
-{
-  MeshData::VertexContainer    vertices;
-  MeshData::FaceIndices        faces;
-  BoneContainer                bones(0);
-
-  for(unsigned int index = 0; index < numOfBubble; index ++)
+  for(unsigned int i = 0; i < numOfPatch; i++)
   {
     float curSize = RandomRange(mBubbleSizeRange.x, mBubbleSizeRange.y);
-    if(rand()%100 < 1)
-    {
-      curSize *= 2.f;
-    }
-    float depth = static_cast<float>( index );
-    AddVertex( vertices, Vector3(0.f,0.f,depth), Vector2(0.f,0.f) );
-    AddVertex( vertices, Vector3(0.f,curSize,depth), Vector2( 0.f,1.f ));
-    AddVertex( vertices, Vector3(curSize,curSize,depth), Vector2(1.f,1.f) );
-    AddVertex( vertices, Vector3(curSize,0.f,depth), Vector2(1.f,0.f) );
+
+    float index = static_cast<float>( i );
+    vertexData.push_back( Vertex( index, Vector2(0.f,0.f),         Vector2(0.f,0.f) ) );
+    vertexData.push_back( Vertex( index, Vector2(0.f,curSize),     Vector2(0.f,1.f)  ) );
+    vertexData.push_back( Vertex( index, Vector2(curSize,curSize), Vector2(1.f,1.f)  ) );
+    vertexData.push_back( Vertex( index, Vector2(curSize,0.f),     Vector2(1.f,0.f)  ) );
 
     unsigned int idx = index * 4;
-    AddTriangle( faces, idx, idx+1, idx+2);
-    AddTriangle( faces, idx, idx+2, idx+3);
+    indexData.PushBack( idx );
+    indexData.PushBack( idx+1 );
+    indexData.PushBack( idx+2 );
+    indexData.PushBack( idx );
+    indexData.PushBack( idx+2 );
+    indexData.PushBack( idx+3 );
   }
 
-  meshData.SetData(vertices, faces, bones, mCustomMaterial);
-  meshData.SetHasColor(false);
-  meshData.SetHasTextureCoords(true);
+  Property::Map vertexFormat;
+  vertexFormat["aIndex"] = Property::FLOAT;
+  vertexFormat["aPosition"] = Property::VECTOR2;
+  vertexFormat["aTexCoord"] = Property::VECTOR2;
+  PropertyBuffer vertices = PropertyBuffer::New( PropertyBuffer::STATIC, vertexFormat, numVertex  );
+  vertices.SetData( &vertexData[0] );
+
+  Property::Map indexFormat;
+  indexFormat["indices"] = Property::UNSIGNED_INTEGER;
+  PropertyBuffer indices = PropertyBuffer::New( PropertyBuffer::STATIC, indexFormat, numIndex  );
+  indices.SetData( &indexData[0] );
+
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer( vertices );
+  geometry.SetIndexBuffer( indices );
+
+  return geometry;
 }
 
-void BubbleEmitter::SetBubbleParameter( BubbleEffect& effect, unsigned int curUniform,
-                                        const Vector2& emitPosition, const Vector2& displacement )
-{
-  int halfRange = displacement.x / 2;
-  Vector2 randomVec(rand()%static_cast<int>(displacement.x) - halfRange, rand()%static_cast<int>(displacement.y) - halfRange);
-  if(randomVec.y > 0.0f)
-  {
-    randomVec.y *= 0.33f;
-  }
-
-  Vector4 startAndEndPos( emitPosition.x, emitPosition.y, emitPosition.x+randomVec.x, emitPosition.y+randomVec.y );
-  effect.SetStartAndEndPosition( curUniform, startAndEndPos );
-
-  effect.SetPercentage( curUniform, 0.f);
-}
-
-void BubbleEmitter::SetBubbleParameter( BubbleEffect& effect, unsigned int curUniform,
+void BubbleEmitter::SetBubbleParameter( BubbleActorPtr bubbleActor, unsigned int curUniform,
                                         const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement )
 {
   Vector2 dir(direction);
@@ -390,19 +351,9 @@ void BubbleEmitter::SetBubbleParameter( BubbleEffect& effect, unsigned int curUn
     randomVec.y *= 0.33f;
   }
   Vector4 startAndEndPos( emitPosition.x, emitPosition.y, emitPosition.x+randomVec.x, emitPosition.y+randomVec.y );
-  effect.SetStartAndEndPosition( curUniform, startAndEndPos );
+  bubbleActor->SetStartAndEndPosition( curUniform, startAndEndPos );
 
-  effect.SetPercentage( curUniform, 0.f);
-}
-
-void BubbleEmitter::OnExplosionFinished( Animation& source )
-{
-  Restore();
-}
-
-float BubbleEmitter::RandomRange(float f0, float f1)
-{
-  return f0 + (rand() & 0xfff) * (f1-f0) * (1.0f/4095.0f);
+  bubbleActor->SetPercentage( curUniform, 0.f);
 }
 
 } // namespace Internal

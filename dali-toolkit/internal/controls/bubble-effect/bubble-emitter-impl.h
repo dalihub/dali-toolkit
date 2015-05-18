@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_BUBBLE_EMITTER_IMPL_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,15 @@
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/common/stage.h>
+#include <dali/public-api/geometry/geometry.h>
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/render-tasks/render-task.h>
+#include <dali/public-api/shader-effects/sampler.h>
+#include <dali/public-api/shader-effects/material.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/bubble-effect/bubble-emitter.h>
-#include <dali-toolkit/public-api/shader-effects/bubble-effect/bubble-effect.h>
 
 namespace Dali
 {
@@ -38,6 +40,9 @@ namespace Toolkit
 
 namespace Internal
 {
+
+class BubbleActor;
+typedef IntrusivePtr<BubbleActor> BubbleActorPtr;
 
 /**
  * BubbleEmitter implementation class.
@@ -95,11 +100,6 @@ public:
   void EmitBubble( Animation& animation, const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement );
 
   /**
-   * @copydoc Toolkit::BubbleEmitter::StartExplosion
-   */
-  void StartExplosion( float duration, float multiple );
-
-  /**
    * @copydoc Toolkit::BubbleEmitter::Restore
    */
   void Restore();
@@ -125,6 +125,13 @@ private:
   void OnInitialize();
 
   /**
+   * Create the geometry of a mesh.
+   * @param[in] numOfPatch The triangle number in the mesh is 2*numOfPatch; two triangles for each bubble.
+   * @return The mesh geometry.
+   */
+  Geometry CreateGeometry( unsigned int numOfPatch );
+
+  /**
    * Callback function of the finished signal of off-screen render task.
    * @param[in] source The render task used to create the color adjusted background image.
    */
@@ -136,98 +143,41 @@ private:
   void OnContextRegained();
 
   /**
-   * Generate the material object which is attached to the meshActor to describe its color, texture, texture mapping mode etc.
-   */
-  void GenMaterial();
-
-  /**
-   * Add a vertex to the mesh data.
-   * @param[in] vertices The collection of vertices.
-   * @param[in] XYZ The vertex position coordinates.
-   * @param[in] UV The vertex texture coordinate.
-   */
-  void AddVertex(MeshData::VertexContainer& vertices, Vector3 XYZ, Vector2 UV);
-
-  /**
-   * Add a triangle to the mesh data.
-   * @param[in] faces The collection od FaceIndex items.
-   * @param[in] v0 The index of the first point of the triangle.
-   * @param[in] v1 The index of the second point of the triangle.
-   * @param[in] v3 The index of the first point of the triangle.
-   */
-  void AddTriangle(MeshData::FaceIndices& faces,size_t v0, size_t v1, size_t v2);
-
-  /**
-   * Create a new mesh.
-   * @param[in] meshData The MeshData object which encompasses all the data required to describe and render the 3D mesh.
-   * @param[in] numberOfBubble The triangle number in the meshData is 2*numOfBubble; two triangles for each bubble
-   */
-  void ConstructBubbleMesh( MeshData& meshData, unsigned int numOfBubble);
-
-  /**
    * Set the uniform values to the shader effect to emit a bubble
-   * @param[in] effect The BubbleEffect to render the current bubble
-   * @param[in] curUniform The index of the uniform array in the shader
-   * @param[in] emitPosition The start position of the bubble movement.
-   * @param[in] displacement The displacement used to bound the moving distance of the bubble.
-   */
-  void SetBubbleParameter( BubbleEffect& effect, unsigned int curUniform,
-                           const Vector2& emitPosition, const Vector2& displacement );
-
-  /**
-   * Set the uniform values to the shader effect to emit a bubble
-   * @param[in] effect The BubbleEffect to render the current bubble
+   * @param[in] bubbleActor The BubbleActor to render the current bubble
    * @param[in] curUniform The index of the uniform array in the shader
    * @param[in] emitPosition The start position of the bubble movement.
    * @param[in] direction The direction used to constrain the bubble to move in an adjacent direction around it.
    * @param[in] displacement The displacement used to bound the moving distance of the bubble.
    */
-  void SetBubbleParameter( BubbleEffect& effect, unsigned int curUniform,
+  void SetBubbleParameter( BubbleActorPtr bubbleActor, unsigned int curUniform,
                            const Vector2& emitPosition, const Vector2& direction, const Vector2& displacement );
-
-  /**
-   * Callback function of the explosion animation finished signal to reset the shader parameters
-   * @param[in] source The explosion animation.
-   */
-  void OnExplosionFinished( Animation& source );
-
-  /**
-   * Return a random value between the given interval.
-   * @param[in] f0 The low bound
-   * @param[in] f1 The up bound
-   * @return A random value between the given interval
-   */
-  float RandomRange(float f0, float f1);
 
 private:
 
-  Vector2                     mMovementArea;        ///< The size of the bubble moving area, usually the same size as the background image actor.
-  Image                       mShapeImage;          ///< The alpha channnel of this texture defines the bubble shape.
   Actor                       mBubbleRoot;          ///<The bubble root actor. Need to add it to stage to get the bubbles rendered.
-
-  unsigned int                mNumBubblePerShader;  ///< How many bubbles for each BubbleEffect shader.
-  unsigned int                mNumShader;           ///< How many BubbleEffect shaders are used.
-  unsigned int                mTotalNumOfBubble;    ///< mNumBubblePerShader*mNumShader.
-  bool                        mRenderTaskRunning;   ///< If the background render task is currently running
-
-  Vector2                     mBubbleSizeRange;     ///< The bubble size range.
-
-  std::vector<Mesh>           mMesh;                ///< The mesh vector, each mesh is used to create a meshActor which applies a BubbleEffect.
-  std::vector<MeshActor>      mMeshActor;           ///< The meshActor vector, its size is mNumShader.
-  MeshActor                   mMeshActorForNoise;   ///< An Extra mesh data to emit bubbles which emit bubble in totally random angle.
-  Material                    mCustomMaterial;      ///< The material object which is attached to the meshActor to describe its color, texture, texture mapping mode etc.
-
-  std::vector<BubbleEffect>   mEffect;              ///< The bubbleEffect vector, corresponding to the mMeshActoe vector.
-  BubbleEffect                mEffectForNoise;      ///< The extra bubbleEffect, corresponding to the mMeshActorForNoise.
-
-  unsigned int                mCurrentUniform;      ///< Keep track of the uniform index for the newly emitted bubble
-
-  Vector3                     mHSVDelta;            ///< The HSV difference used to adjust the background image color.
+  Image                       mShapeImage;          ///< The alpha channnel of this texture defines the bubble shape.
   Image                       mBackgroundImage;     ///< The original background image
   FrameBufferImage            mEffectImage;         ///< The image stores the adjusted color of the background image.The bubbles pick color from this image.
   CameraActor                 mCameraActor;         ///< The render task views the scene from the perspective of this actor.
 
+  Sampler                     mSamplerBackground;    ///< The sampler which provides the background image to material
+  Sampler                     mSamplerBubbleShape;   ///< The sampler which provides the bubble shape image to material
+  Geometry                    mMeshGeometry;         ///< The mesh geometry which contains the vertices and indices data
+  Material                    mMaterial;             ///< The material which controls the bubble display
+  std::vector<BubbleActorPtr> mBubbleActors;         ///< The meshActor vector, its size is mNumShader.
+
+  Vector2                     mMovementArea;        ///< The size of the bubble moving area, usually the same size as the background image actor.
+  Vector2                     mBubbleSizeRange;     ///< The size range of the bubbles; x component is the low bound, and y component is the up bound.
+  Vector3                     mHSVDelta;            ///< The HSV difference used to adjust the background image color.
+
+  unsigned int                mNumBubblePerActor;   ///< How many bubbles for each BubbleActor.
+  unsigned int                mNumActor;            ///< How many BubbleActors are used.
   unsigned int                mDensity;             ///< How many bubbles will emit at each time, they are controlled by same uniforms in the shader.
+  unsigned int                mTotalNumOfBubble;    ///< mNumBubblePerShader*mNumShader.
+  unsigned int                mCurrentBubble;       ///< Keep track of the index for the newly emitted bubble
+
+  bool                        mRenderTaskRunning;   ///< If the background render task is currently running
 
 };
 
