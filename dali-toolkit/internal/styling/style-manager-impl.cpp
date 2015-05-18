@@ -101,12 +101,11 @@ Toolkit::StyleManager StyleManager::Get()
 
 StyleManager::StyleManager()
 : mOrientationDegrees( 0 ),  // Portrait
-  mDefaultFontSize( -1 )
+  mDefaultFontSize( -1 ),
+  mThemeFile( DEFAULT_THEME )
 {
   // Add theme builder constants
   mThemeBuilderConstants[ PACKAGE_PATH_KEY ] = DEFAULT_PACKAGE_PATH;
-
-  RequestDefaultTheme();
 
   StyleMonitor styleMonitor( StyleMonitor::Get() );
   if( styleMonitor )
@@ -399,6 +398,20 @@ void StyleManager::StyleMonitorChange( StyleMonitor styleMonitor, StyleChange st
   if( styleChange.defaultFontSizeChange )
   {
     mDefaultFontSize = styleMonitor.GetDefaultFontSize();
+  }
+
+  if( styleChange.themeChange )
+  {
+    if( ! styleChange.themeFilePath.empty() )
+    {
+      mThemeFile = styleChange.themeFilePath;
+    }
+    else
+    {
+      mThemeFile = DEFAULT_THEME;
+    }
+
+    SetTheme();
   }
 
   mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), styleChange );
