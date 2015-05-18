@@ -28,66 +28,45 @@ namespace Toolkit
 {
 
 /**
- * @brief Ripple2DEffect is a custom shader effect to achieve 2d ripple effects on Image actors.
+ * @brief Creates a new Ripple2DEffect
+ *
+ * Ripple2DEffect is a custom shader effect to achieve 2d ripple effects on Image actors.
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uTime"       - The time duration for the 2d ripple
+ *  "uAmplitude"  - The amplitude of the 2d ripple
+ *
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API Ripple2DEffect : public ShaderEffect
+inline ShaderEffect CreateRipple2DEffect()
 {
-public:
+  // append the default version
+  std::string fragmentShader(
+      "precision mediump float;\n"
+      "uniform float uAmplitude;\n"
+      "uniform float uTime;\n"
+      "void main()\n"
+      "{\n"
+      "  highp vec2 textureSize = sTextureRect.zw - sTextureRect.xy;\n"
+      "  highp vec2 pos = -1.0 + 2.0 * vTexCoord.st/textureSize;\n"
+      "  highp float len = length(pos);\n"
+      "  highp vec2 texCoord = vTexCoord.st/textureSize + pos/len * sin( len * 12.0 - uTime * 4.0 ) * uAmplitude;\n"
+      "  gl_FragColor = texture2D(sTexture, texCoord) * uColor;\n"
+      "}" );
 
-  /**
-   * @brief Create an uninitialized Ripple2DEffect; this can be initialized with Ripple2DEffect::New().
-   *
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  Ripple2DEffect();
+  Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
+      "", fragmentShader,
+      Dali::GeometryType( GEOMETRY_TYPE_IMAGE ),
+      ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID ));
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~Ripple2DEffect();
 
-  /**
-   * @brief Create an initialized Ripple2DEffect.
-   *
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static Ripple2DEffect New();
 
-  /**
-   * @brief Set the amplitude of the 2d ripple.
-   *
-   * @param[in] amplitude The amplitude in float.
-   */
-  void SetAmplitude(float amplitude);
+  shaderEffect.SetUniform( "uTextureSize", Vector2(0.0f, 0.0f) ); //@note: Is this needed?
+  shaderEffect.SetUniform( "uAmplitude", 0.0f );
+  shaderEffect.SetUniform( "uTime", 0.0f );
 
-  /**
-   * @brief Set the time duration for the 2d ripple.
-   *
-   * @param[in] time The time duration in float.
-   */
-  void SetTime(float time);
-
-  /**
-   * @brief Get the name for the amplitude property.
-   *
-   * @return A std::string containing the property name
-   */
-  const std::string& GetAmplitudePropertyName() const;
-
-  /**
-   * @brief Get the name for the time property.
-   *
-   * which can be used in Animation API's
-   * @return A std::string containing the property name
-   */
-  const std::string& GetTimePropertyName() const;
-
-private:
-  DALI_INTERNAL Ripple2DEffect(ShaderEffect handle);
-
-};
+  return shaderEffect;
+}
 
 } // namespace Toolkit
 

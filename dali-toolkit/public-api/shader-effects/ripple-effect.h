@@ -28,81 +28,70 @@ namespace Toolkit
 {
 
 /**
- * @brief RippleEffect is a custom shader effect to achieve ripple effects on Image actors.
+ * @brief Creates a new RippleEffect
+ *
+ * RippleEffect is a custom shader effect to achieve ripple effects on Image actors.
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uAmplitude"  - The amplitude of the effect
+ *  "uCenter"     - The center point of the effect as screen coordinates
+ *  "uTime"       - The time duration for the ripple
+ *
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API RippleEffect : public ShaderEffect
+inline ShaderEffect CreateRippleEffect()
 {
-public:
+  std::string vertexShader(
+      "precision mediump float;\n"
+      "uniform mediump   vec2  uCenter;\n"
+      "uniform mediump   float uTime;\n"
+      "uniform mediump   float uAmplitude;\n"
+      "varying mediump   float vLight;\n"
+      "varying mediump   float vShade;\n"
+      "void main()\n"
+      "{\n"
+      "float lighting = uAmplitude * 0.02;\n"
+      "float waveLength = uAmplitude * 0.0016;\n"
+      "vec4 world = uModelView * vec4(aPosition,1.0);\n"
+      "vec2 d = vec2(world.x - uCenter.x, world.y - uCenter.y);\n"
+      "float dist = length(d);\n"
+      "float amplitude = cos(uTime - dist*waveLength);\n"
+      "float slope     = sin(uTime - dist*waveLength);\n"
+      "world.z += amplitude * uAmplitude;\n"
+      "gl_Position = uProjection * world;\n"
+      "vec2 lightDirection = vec2(-0.707,0.707);\n"
+      "float dot = 0.0;\n"
+      "if(dist > 0.0)\n"
+      "{\n"
+      "  dot = dot(normalize(d),lightDirection) * lighting;\n"
+      "}\n"
+      "vShade = 1.0 - (dot * slope);\n"
+      "vLight = max(0.0, dot * -slope);\n"
+      "vTexCoord = aTexCoord;\n"
+      "}" );
 
-  /**
-   * @brief Create an uninitialized RippleEffect; this can be initialized with RippleEffect::New().
-   *
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  RippleEffect();
+  // append the default version
+  std::string imageFragmentShader(
+      "precision mediump float;\n"
+      "varying mediump float  vLight;\n"
+      "varying mediump float  vShade;\n"
+      "void main()\n"
+      "{\n"
+      "  gl_FragColor = texture2D(sTexture, vTexCoord) * uColor * vec4(vShade,vShade,vShade,1.0) + vec4(vLight, vLight, vLight,0.0);\n"
+      "}" );
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~RippleEffect();
 
-  /**
-   * @brief Create an initialized RippleEffect.
-   *
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static RippleEffect New();
+  Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
+      vertexShader, imageFragmentShader,
+      GeometryType(GEOMETRY_TYPE_IMAGE), ShaderEffect::GeometryHints(ShaderEffect::HINT_GRID) );
 
-  /**
-   * @brief Set the amplitude of the effect.
-   *
-   * @param [in] amplitude The new amplitude.
-   */
-  void SetAmplitude(float amplitude);
 
-  /**
-   * @brief Set the center point of the effect as screen coordinates.
-   *
-   * @param [in] center The new center point.
-   */
-  void SetCenter(const Vector2& center);
+  shaderEffect.SetUniform( "uAmplitude", 0.0f );
+  shaderEffect.SetUniform( "uCenter", Vector2(0.0f, 0.0f));
+  shaderEffect.SetUniform( "uTime", 0.0f );
 
-  /**
-   * @brief Set the time duration for the ripple.
-   *
-   * @param[in] time The time duration in float.
-   */
-  void SetTime(float time);
-
-  /**
-   * @brief Get the name for the amplitude property.
-   *
-   * @return A std::string containing the property name
-   */
-  const std::string& GetAmplitudePropertyName() const;
-
-  /**
-   * @brief Get the name for the center property.
-   *
-   * which can be used in Animation API's
-   * @return A std::string containing the property name
-   */
-  const std::string& GetCenterPropertyName() const;
-
-  /**
-   * @brief Get the name for the time property.
-   *
-   * which can be used in Animation API's
-   * @return A std::string containing the property name
-   */
-  const std::string& GetTimePropertyName() const;
-
-private:
-  DALI_INTERNAL RippleEffect(ShaderEffect handle);
-
-};
+  return shaderEffect;
+}
 
 } // namespace Toolkit
 

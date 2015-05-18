@@ -28,48 +28,48 @@ namespace Toolkit
 {
 
 /**
- * BlindEffect is a custom shader effect to achieve blind effects in Image actors
+ * @brief BlindEffect is a custom shader effect to achieve blind effects in Image actors
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uStep" - The step of the blind effect.
+ *
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API BlindEffect : public ShaderEffect
+
+inline ShaderEffect CreateBlindEffect()
 {
-public:
+  std::string fragmentShader(
+      "uniform mediump float uStep;                                                        \n"
+      "void main()                                                                         \n"
+      "{                                                                                   \n"
+      "    mediump vec4 alphaColor;                                                        \n"
+      "    mediump vec4 baseColor;                                                         \n"
+      "    baseColor = texture2D( sTexture, vTexCoord);                                    \n"
+      "    alphaColor = vec4(0.1,0.1,0.1,1.0);                                             \n"
+      "    lowp float index = 0.0;                                                         \n"
+      "    index = floor(vTexCoord.y/0.1);                                                 \n"
+      "    if((vTexCoord.y < (index * 0.1 + uStep * 0.005)) && (vTexCoord.y > index * 0.1))\n"
+      "    {                                                                               \n"
+      "      gl_FragColor = alphaColor;                                                    \n"
+      "    }                                                                               \n"
+      "    else                                                                            \n"
+      "    {                                                                               \n"
+      "      gl_FragColor = baseColor;                                                     \n"
+      "    }                                                                               \n"
+      "    gl_FragColor*=uColor;                                                           \n"
+      "}                                                                                   \n"
+  );
 
-  /**
-   * Create an uninitialized BlindEffect; this can be initialized with BlindEffect::New()
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  BlindEffect();
+  Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
+      "",
+      fragmentShader,
+      GeometryType( GEOMETRY_TYPE_IMAGE ),
+      ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID ));
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~BlindEffect();
+  shaderEffect.SetUniform( "uStep", 0.0f );
 
-  /**
-   * Create an initialized ~BlindEffect.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static BlindEffect New();
-
-
-  /**
-   * Set the step of the blind effect.
-   * @param [in] step The step
-   */
-  void SetStep(float step);
-
-  /**
-   * Get the name for the step property
-   * which can be used in Animation API's
-   * @return A std::string containing the property name
-   */
-  const std::string& GetStepPropertyName() const;
-
-private: // Not intended for application developers
-  DALI_INTERNAL BlindEffect(ShaderEffect handle);
-};
+  return shaderEffect;
+}
 
 } // namespace Toolkit
 

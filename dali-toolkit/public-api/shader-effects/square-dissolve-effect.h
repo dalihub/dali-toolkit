@@ -28,86 +28,54 @@ namespace Toolkit
 {
 
 /**
+ * @brief Creates a new SquareDissolveEffect
+ *
  * SquareDissolveEffect is a custom shader effect to achieve square effects in Image actors
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uStep"       - The step of the square effect
+ *  "uRows"       - The rows of the square dissolve effect
+ *  "uColumns"    - The columns of the square dissolve effect
+ *  "uTextureSize"- The texture size of the square dissolve
+ *
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API SquareDissolveEffect : public ShaderEffect
+inline ShaderEffect CreateSquareDissolveEffect()
 {
-public:
+  // variable "uStep" range scope : [0.0, 1.0]
+  std::string fragmentShader(
+      "uniform  mediump vec2   uTextureSize;\n"
+      "uniform  mediump float  uStep;\n"
+      "uniform  mediump float  uRows;\n"
+      "uniform  mediump float  uColumns;\n"
+      "void main()\n"
+      "{\n"
+      "  mediump vec2 mosaicSize = vec2(1.0 / uRows, 1.0 / uColumns);                               \n"
+      "  mediump vec2 intXY = vec2(vTexCoord.x * uTextureSize.x, vTexCoord.y * uTextureSize.y);               \n"
+      "  mediump vec2 XYMosaic = vec2(floor(intXY.x / mosaicSize.x) * mosaicSize.x, floor(intXY.y / mosaicSize.y) * mosaicSize.y); \n"
+      "  mediump vec2 UVMosaic = vec2(XYMosaic.x /uTextureSize.x, XYMosaic.y / uTextureSize.y);               \n"
+      "  mediump vec4 noiseVec = texture2D(sEffect, UVMosaic);                                      \n"
+      "  mediump float intensity = (noiseVec[0] + noiseVec[1] + noiseVec[2] + noiseVec[3]) / 4.0;   \n"
+      "  if(intensity < uStep)                                                              \n"
+      "    gl_FragColor = vec4(0.1, 0.1, 0.1, 1.0);                                         \n"
+      "  else                                                                               \n"
+      "    gl_FragColor = texture2D(sTexture, vTexCoord);                                   \n"
+      "  gl_FragColor *= uColor;                                                            \n"
+      "}                                                                                    \n" );
 
-  /**
-   * Create an uninitialized SquareDissolveEffect; this can be initialized with BendyEffect::New()
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  SquareDissolveEffect();
+  Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
+      "",
+      fragmentShader,
+      GeometryType( GEOMETRY_TYPE_IMAGE ),
+      ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID ));
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~SquareDissolveEffect();
+  shaderEffect.SetUniform( "uTextureSize", Vector2(1.0f, 1.0f) );//COORDINATE_TYPE_DEFAULT
+  shaderEffect.SetUniform( "uStep", 0.1f);
+  shaderEffect.SetUniform( "uRows", 25.0f);
+  shaderEffect.SetUniform( "uColumns", 25.0f);
 
-  /**
-   * Create an initialized SquareDissolveEffect.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static SquareDissolveEffect New();
-
-  /**
-   * Set the step of the square effect.
-   * @param [in] step the new step.
-   */
-  void SetStep(float step);
-
-  /**
-   * Set the rows of the square dissolve effect.
-   * @param [in] rows the new rows value.
-   */
-  void SetRows(float rows);
-
-  /**
-   * Set the columns of the square dissolve effect.
-   * @param [in] columns the new columns value.
-   */
-  void SetColumns(float columns);
-
-  /**
-   * Set the texture size of the square dissolve.
-   * @param[in] textureSize The texture size in Vector2.
-   */
-  void SetTextureSize(const Vector2& textureSize);
-
-  /**
-   * Get the name for the step property
-   * which can be used in Animation API's
-   * @return A std::string containing the property name
-   */
-  const std::string& GetStepPropertyName() const;
-
-  /**
-   * Get the name for the rows property
-   * which can be used in Animation API's
-   * @return A std::string containing the property name
-   */
-  const std::string& GetRowsPropertyName() const;
-
-  /**
-   * Get the name for the columns property
-   * which can be used in Animation API's
-   * @return A std::string containing the property name
-   */
-  const std::string& GetColumnsPropertyName() const;
-
-  /**
-   * Get the name for the texSize property
-   * which can be used in Animation API's
-   * @return A std::string containing the property name
-   */
-  const std::string& GetTexSizePropertyName() const;
-
-private: // Not intended for application developers
-  DALI_INTERNAL SquareDissolveEffect(ShaderEffect handle);
-};
+  return shaderEffect;
+}
 
 } // namespace Toolkit
 

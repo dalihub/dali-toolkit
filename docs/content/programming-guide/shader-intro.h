@@ -6,10 +6,18 @@
 The shader effects allow the developer to apply visual deformations on the actors.
 They can affect the geometry, the colors and textures of the actor.
 
-There are some built-in shader effects in Dali Toolkit:
-- \ref Dali::Toolkit::BendyEffect "Bendy", bends the geometry around a point, useful to do a page turn effect,
-- \ref Dali::Toolkit::DissolveEffect "Dissolve", does a dissolve effect on the actor texture,
-- \ref Dali::Toolkit::RippleEffect "Ripple", does a concentric wave effect on the actor texture.
+There are some utility functions in Dali::Toolkit to create some useful shader effects:
+@code
+//Bendy effect bends the geometry around a point, useful to do a page turn effect
+Dali::ShaderEffect bendyEffect = Dali::Toolkit::CreateBendyEffect();
+
+//Dissolve effect does a dissolve effect on the actor texture
+Dali::ShaderEffect dissolveEffect = Dali::Toolkit::CreateDissolveEffect();
+
+//Ripple effect does a concentric wave effect on the actor texture
+Dali::ShaderEffect rippleEffect = Dali::Toolkit::CreateRippleEffect();
+
+@endcode
 
 @image html shader-effect-ripple.png "Ripple Effect"
 
@@ -20,17 +28,15 @@ Here is an example on how to use a shader effect, using the RippleEffect.
 
 First create the shader effect.
 @code
-Dali::RippleEffect effect = Dali::RippleEffect::New();
+Dali::ShaderEffect effect = Dali::Toolkit::CreateRippleEffect();
 @endcode
 
 Then set the values of the uniforms.
 @code
-// Set the radius of the bending
-effect.SetAmplitude( 45.0f );
-// Set the point around which the geometry will bend
-effect.SetCenter( Vector2() );
-// Set the direction of the bending
-effect.SetDirection( Vector2( 1.0f, 0.0f ) );
+// Set the amplitude
+effect.SetUniform("uAmplitude", 45.0f );
+// Set the center
+effect.SetUniform("uCenter", Vector2() );
 @endcode
 
 Finally apply the shader effect to an actor:

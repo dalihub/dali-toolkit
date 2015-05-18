@@ -87,16 +87,11 @@
 #include <dali-toolkit/public-api/shader-effects/soft-button-effect.h>
 #include <dali-toolkit/public-api/shader-effects/spot-effect.h>
 #include <dali-toolkit/public-api/shader-effects/square-dissolve-effect.h>
-#include <dali-toolkit/public-api/shader-effects/water-effect.h>
-#include <dali-toolkit/public-api/shader-effects/bubble-effect/bubble-effect.h>
-#include <dali-toolkit/public-api/shader-effects/bubble-effect/color-adjuster.h>
 #include <dali-toolkit/public-api/shader-effects/dissolve-effect.h>
 #include <dali-toolkit/public-api/shader-effects/image-region-effect.h>
 #include <dali-toolkit/public-api/shader-effects/iris-effect.h>
 #include <dali-toolkit/public-api/shader-effects/mask-effect.h>
 #include <dali-toolkit/public-api/shader-effects/nine-patch-mask-effect.h>
-#include <dali-toolkit/public-api/shader-effects/page-turn-book-spine-effect.h>
-#include <dali-toolkit/public-api/shader-effects/page-turn-effect.h>
 #include <dali-toolkit/public-api/shader-effects/quadratic-bezier.h>
 #include <dali-toolkit/public-api/shader-effects/ripple-effect.h>
 #include <dali-toolkit/public-api/shader-effects/ripple2d-effect.h>

@@ -28,6 +28,8 @@ namespace Toolkit
 {
 
 /**
+ * @brief Creates a new Carousel effect
+ *
  * CarouselEffect is a custom shader effect to achieve Carousel effects in actors
  *
  * A Carousel has a Radius property which can be +ve (appear as if viewing from the outside of
@@ -39,80 +41,51 @@ namespace Toolkit
  *
  * Finally, the carousel's center position can be specified as a Screen coordinate (top-left being
  * the origin).
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uRadius"       - The radius of the Carousel effect. A positive Radius will bend toward the camera,
+ *                    while a negative Radius will bend away from the camera.
+ *  "uAnglePerUnit" - The angle deviation of Carousel in degrees per geometric unit for each axis
+                      For example if you wish for the horizontal angle deviation to vary from +/- 10
+                      degrees, then a Value of 20.0f / stageWidth for the X component should be specified.
+ *  "uCenter"       - The center point of the carousel (in screen coordinates) this is where the peek of the carousel should appear.
+ *                    Defaults value is top-left corner (0.0f, 0.0f).
+ *
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API CarouselEffect : public ShaderEffect
+inline ShaderEffect CreateCarouselEffect()
 {
-public:
+  // append the default version
+    std::string vertexShader(
+                "uniform float uRadius;\n"
+                "uniform mediump vec2 uCenter;\n"
+                "uniform mediump vec2 uAnglePerUnit;\n"
+                "\n"
+                "void main()\n"
+                "{\n"
+                "    mediump vec4 world = uModelView * vec4(aPosition,1.0);\n"
+                "    mediump vec2 d = (world.xy - uCenter) * uAnglePerUnit;\n"
+                "    mediump float a = length(d);\n"
+                "    mediump float cs = cos(radians(a));\n"
+                "    world.z -= cs * uRadius;\n"
+                "    gl_Position = uProjection * world;\n"
+                "    \n"
+                "    vTexCoord = aTexCoord;\n"
+                "}\n");
 
-  /**
-   * Create an uninitialized CarouselEffect; this can be initialized with CarouselEffect::New()
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  CarouselEffect();
-
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~CarouselEffect();
-
-  /**
-   * Create an initialized CarouselEffect.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static CarouselEffect New();
-
-  /**
-   * Set the radius of the Carousel effect.
-   * A positive Radius will bend toward the camera,
-   * while a negative Radius will bend away from the camera.
-   * @param[in] radius The new radius.
-   */
-  void SetRadius( float radius);
-
-  /**
-   * Sets the center point of the carousel (in screen coordinates)
-   * this is where the peek of the carousel should appear.
-   * this defaults to top-left corner (0.0f, 0.0f).
-   *
-   * @param[in] center The center point.
-   */
-  void SetCenter( const Vector2& center );
-
-  /**
-   * Set the angle deviation of Carousel in degrees per
-   * geometric unit for each axis. For example if you
-   * wish for the horizontal angle deviation to vary from +/- 10
-   * degrees, then a Value of 20.0f / stageWidth for the X
-   * component should be specified.
-   *
-   * @param[in] angle the Angle Spread in X and Y axes.
-   */
-  void SetAnglePerUnit( const Vector2& angle );
-
-  /**
-   * Get the name for the radius property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetRadiusPropertyName() const;
-
-  /**
-   * Get the name for the center property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetCenterPropertyName() const;
-
-  /**
-   * Get the name for the angle spread property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetAnglePerUnitPropertyName() const;
+    ShaderEffect shaderEffect = ShaderEffect::New(
+        vertexShader,
+        "",
+        GeometryType( GEOMETRY_TYPE_IMAGE ),
+        ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_DEPTH_BUFFER ));
 
 
-private: // Not intended for application developers
-  DALI_INTERNAL CarouselEffect(ShaderEffect handle);
-};
+    shaderEffect.SetUniform( "uRadius", 0.0f );
+    shaderEffect.SetUniform( "uCenter", Vector2( 0.0f, 0.0f ) );
+    shaderEffect.SetUniform( "uAnglePerUnit", Vector2( 0.0f, 0.0f ) );
+
+    return shaderEffect;
+}
 
 } // namespace Toolkit
 

@@ -29,185 +29,211 @@ namespace Toolkit
 {
 
 /**
+ * @brief Create a new MotionBlurEffect
  *
- * Class for motion blur shader that works on a per object basis. Objects will
+ * Motion blur shader works on a per object basis. Objects will
  * blur when they move, or if the camera moves. Can be applied to ImageActor or
  * TextActor only.
  *
  * Usage example:-
  *
  * // Create shader used for doing motion blur\n
- * MotionBlurEffect MotionBlurEffect = MotionBlurEffect::New();
+ * ShaderEffect MotionBlurEffect = CreateMotionBlurEffect();
  *
  * // set actor shader to the blur one\n
- * Actor Actor = Actor::New( ... );\n
- * Actor.SetShaderEffect( MotionBlurEffect );
+ * Actor actor = Actor::New( ... );\n
+ * actor.SetShaderEffect( MotionBlurEffect );
  *
+ * // Constrain "uModelLastFrame" to be the same as the actor's world matrix\n
+ * Dali::Property::Index uModelProperty = MotionBlurEffect.GetPropertyIndex( "uModelLastFrame" );
+ * Constraint constraint = Constraint::New<Matrix>( MotionBlurEffect, uModelProperty, EqualToConstraint() );\n
+ * constraint.AddSource( Source( actor , Actor::Property::WORLD_MATRIX ) );\n
+ * constraint.Apply();\n
+ *
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uBlurTexCoordScale"      - This scales the offset for texture samples along the motion velocity vector.
+ *                              A smaller value means the samples will be spaced closer, larger value further
+ *                              apart. User should use this to get the blur to look contiguous, i.e. the blur
+ *                              texels should not be too widely spread, with gaps in between. Default 0.125.
+ *  "uGeometryStretchFactor"  - This scales the amount the geometry stretches backwards along the motion velocity
+ *                              vector. A smaller value means the geometry stretches less, larger it stretches more.
+ *                              User should use this to get the blur to 'bleed' into areas outside the physical
+ *                              bounds of the actor. We need this as the blur is only applied inside the bounds of
+ *                              the actor, but you would expect motion blur trails where the actor was previously
+ *                              but is there no longer. Default 0.05.
+ *  "uSpeedScalingFactor"     - This takes the magnitude of the motion velocity vector and scales it to produce a
+ *                              value which is used to fade the blur in / out with the speed that the actor is moving.
+ *                              As the blur fades in, more of the blur is visible and less of the original actor, and
+ *                              viceversa. This value is also used to control how much to fade the actor near the
+ *                              edges, based on the speed the actor is moving. When the actor is at rest this is not applied.
+ *                              Default 0.5.
+ *  "uObjectFadeStart"        - The displacement from the centre of the actor that the actor will start to fade towards its
+ *                              edges. This is used to prevent an unsightly hard edge between the blurred actor and the scene.
+ *                              Depends on the values of the vertices in the vertex stream. When the actor is at rest this is
+ *                              not applied. Default 0.25, which is half way towards the edge for an ImageRenderer::QUAD.
+ *  "uObjectFadeEnd"          - The displacement from the centre of the actor that the actor will finish fading towards its
+ *                              edges. This is used to prevent an unsightly hard edge between the blurred actor and the scene.
+ *                              Depends on the values of the vertices in the vertex stream. When the actor is at rest this is
+ *                              not applied.Default 0.5, which is all the way towards the edge for an ImageRenderer::QUAD.
+ *  "uAlphaScale"             - Global scaler applied to the alpha of the actor. Used to make the blurred actor a bit more subtle
+ *                              (helps to hide discontinuities due to limited number of texture samples) and reveal a bit of the
+ *                              background behind it as it moves. When the actor is at rest this is not applied. Default 0.75.
+ *  "uNumSamples"             - The number of texture samples to be taken. Increasing the number of samples provides better quality
+ *                              at the cost of performance.
+ *  "uModelLastFrame"         - The model to world space transformation matrix of the actor in the previous frame.
+ *
+ * @param numBlurSamples Number of samples used by the shader
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API MotionBlurEffect : public ShaderEffect
+inline ShaderEffect CreateMotionBlurEffect( unsigned int numBlurSamples = 8 )
 {
+  // Dali vertexSource prefix for reference:
+  // precision highp float;
+  // attribute vec3  aPosition;
+  // attribute vec2  aTexCoord;
+  // uniform   mat4  uMvpMatrix;
+  // uniform   mat4  uModelView;
+  // uniform   mat3  uNormalMatrix;
+  // uniform   mat4  uProjection;
+  // uniform   vec4  uColor;
+  // varying   vec2  vTexCoord;
+  std::string vertexSource;
+  vertexSource =
+      "precision mediump float;\n"
+      "uniform mat4 uModelLastFrame;\n"
+      "uniform float uTimeDelta;\n"
 
-public:
+      "uniform float uGeometryStretchFactor;\n"
+      "uniform float uSpeedScalingFactor;\n"
 
-  /**
-   * Create an uninitialized MotionBlurEffect; this can be initialized with MotionBlurEffect::New()
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  MotionBlurEffect();
+      // outputs
+      "varying vec2 vModelSpaceCenterToPos;\n"
+      "varying vec2 vScreenSpaceVelocityVector;\n"
+      "varying float vSpeed;\n"
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~MotionBlurEffect();
+      "void main()\n"
+      "{\n"
+      // get view space position of vertex this frame and last frame
+      " vec4 vertex = vec4(aPosition, 1.0);\n"
+      " vec4 viewSpaceVertex = uModelView * vertex;\n"
+      " vec4 viewSpaceVertexLastFrame = (uViewMatrix * uModelLastFrame) * vertex;\n"
+      " float reciprocalTimeDelta = 1.0 / ((uTimeDelta > 0.0) ? uTimeDelta : 0.01);\n"
 
-  /**
-   * Create an initialized MotionBlurEffect
-   * The number of texture samples taken along the motion velocity vector of the
-   * actor, producing the blur, is set to a default of 8.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static MotionBlurEffect New();
+      // work out vertex's last movement in view space
+      " vec3 viewSpacePosDelta = viewSpaceVertex.xyz - viewSpaceVertexLastFrame.xyz;\n"
 
-  /**
-   * Create a  MotionBlurEffect and attach it to the specified actor
-   * The number of texture samples taken along the motion velocity vector of the
-   * actor, producing the blur, is set to a default of 8.
-   * @param renderable actor to apply the effect to
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static MotionBlurEffect Apply( ImageActor renderable );
+      // get clip space position of vertex this frame and last frame
+      " vec4 clipSpaceVertex = uMvpMatrix * vertex;\n"
+      " vec4 clipSpaceVertexLastFrame = uProjection * viewSpaceVertexLastFrame;\n"
 
-  /**
-   * Create an initialized MotionBlurEffect
-   * @param numBlurSamples The number of texture samples taken along the motion
-   * velocity vector of the actor, producing the blur. A higher number gives a
-   * smoother blur but costs more in terms of performance.
-   * @param numBlurSamples to have
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static MotionBlurEffect New( unsigned int numBlurSamples );
+      // decide how much this vertex is 'trailing', i.e. at the back of the object relative to its direction of motion. We do this
+      // by assuming the objects model space origin is at its center and taking the dot product of the vector from center to vertex with the motion direction
+      " float t = 0.0;\n"
+      " float posDeltaLength = length(viewSpacePosDelta);\n"
+      " if(posDeltaLength > 0.001)\n" // avoid div by 0 if object has barely moved
+      " {\n"
+      "   vec4 viewSpaceCenterToPos = uModelView * vec4(aPosition, 0.0);\n"
+      "   float centerToVertexDist = length(viewSpaceCenterToPos);\n"
+      "   if(centerToVertexDist > 0.001)\n" // avoid div by 0 if object has vertex at model space origin
+      "   {\n"
+      "     vec3 viewSpacePosDeltaNormalised = viewSpacePosDelta / posDeltaLength;\n"
+      "     vec3 viewSpaceCenterToPosNormalised = viewSpaceCenterToPos.xyz / centerToVertexDist;\n"
+      "     t = (dot(viewSpacePosDeltaNormalised, viewSpaceCenterToPosNormalised) * 0.5 ) + 0.5;\n" // scale and bias from [-1..1] to [0..1]
+      "   }\n"
+      " }\n"
+      // output vertex position lerped with its last position, based on how much it is trailing,
+      // this stretches the geom back along where it has just been, giving a warping effect
+      // Note: we must take account of time delta to convert position delta into a velocity, so changes are smooth (take into account frame time correctly)
+      " gl_Position = mix(clipSpaceVertexLastFrame, clipSpaceVertex, t * uGeometryStretchFactor * reciprocalTimeDelta);\n"
 
-  /**
-   * Set texcoord scale property. This scales the offset for texture samples
-   * along the motion velocity vector. A smaller value means the samples will
-   * be spaced closer, larger value further apart. User should use this to get
-   * the blur to look contiguous, i.e. the blur texels should not be too widely
-   * spread, with gaps in between. Default 0.125.
-   * @param texcoordScale The scaling factor that multiplies the motion velocity vector for texture lookups.
-   */
-  void SetTexcoordScale( float texcoordScale );
+      // work out vertex's last movement in normalised device coordinates [-1..1] space, i.e. perspective divide
+      " vec2 ndcVertex = clipSpaceVertex.xy / clipSpaceVertex.w;\n"
+      " vec2 ndcVertexLastFrame = clipSpaceVertexLastFrame.xy / clipSpaceVertexLastFrame.w;\n"
+      // scale and bias so that a value of 1.0 corresponds to screen size (NDC is [-1..1] = 2)
+      " vScreenSpaceVelocityVector = ((ndcVertex - ndcVertexLastFrame) * 0.5 * reciprocalTimeDelta);\n"
+      " vScreenSpaceVelocityVector.y = -vScreenSpaceVelocityVector.y;\n" // TODO negated due to y being inverted in our coordinate system?
+      // calculate a scaling factor proportional to velocity, which we can use to tweak how things look
+      " vSpeed = length(vScreenSpaceVelocityVector) * uSpeedScalingFactor;\n"
+      " vSpeed = clamp(vSpeed, 0.0, 1.0);\n"
 
-  /**
-   * Set geometry stretch factor property. This scales the amount the
-   * geometry stretches backwards along the motion velocity vector. A smaller
-   * value means the geometry stretches less, larger it stretches more. User
-   * should use this to get the blur to 'bleed' into areas outside the physical
-   * bounds of the actor. We need this as the blur is only applied inside the
-   * bounds of the actor, but you would expect motion blur trails where the
-   * actor was previously but is there no longer. Default 0.05.
-   * @param scalingFactor The scaling factor that extrudes the geometry backwards along the motion velocity vector.
-   */
-  void SetGeometryStretchFactor( float scalingFactor );
+      // provide fragment shader with vector from center of object to pixel (assumes the objects model space origin is at its center and verts have same z)
+      " vModelSpaceCenterToPos = aPosition.xy;\n"
 
-  /**
-   * Set speed scaling factor property. This takes the magnitude of the motion
-   * velocity vector and scales it to produce a value which is used to fade the
-   * blur in / out with the speed that the actor is moving. As the blur fades
-   * in, more of the blur is visible and less of the original actor, and vice
-   * versa.
-   * This value is also used to control how much to fade the actor near the
-   * edges, based on the speed the actor is moving. When the actor is at rest
-   * this is not applied. Default 0.5.
-   * @param scalingFactor The scaling factor that controls the edge fade / blur fade of the actor.
-   */
-  void SetSpeedScalingFactor( float scalingFactor );
+      " vTexCoord = aTexCoord;\n"
+      "}\n";
 
-  /**
-   * Set the displacement from the centre of the actor that the actor will start
-   * to fade towards its edges. This is used to prevent an unsightly hard edge
-   * between the blurred actor and the scene. Depends on the values of the
-   * vertices in the vertex stream. When the actor is at rest this is not applied.
-   * Default 0.25, which is half way towards the edge for an ImageRenderer::QUAD.
-   * @param displacement The displacement from the centre of the actor that the actor will start to edge fade.
-   */
-  void SetObjectFadeStart( Vector2 displacement );
 
-  /**
-   * Set the displacement from the centre of the actor that the actor will
-   * finish fading towards its edges. This is used to prevent an unsightly hard
-   * edge between the blurred actor and the scene. Depends on the values of the
-   * vertices in the vertex stream. When the actor is at rest this is not applied.
-   * Default 0.5, which is all the way towards the edge for an ImageRenderer::QUAD.
-   * @param displacement The displacement from the centre of the actor that the actor will finish edge fading.
-   */
-  void SetObjectFadeEnd( Vector2 displacement );
+  // Dali fragmentSource prefix for reference:
+  // precision highp     float;
+  // uniform   sampler2D sTexture;
+  // uniform   sampler2D sEffect;
+  // uniform   vec4      uColor;
+  // varying   vec2      vTexCoord;
+  std::string fragmentSource;
+  fragmentSource =
+      "precision mediump float;\n"
+      "uniform vec2 uObjectFadeStart;\n"
+      "uniform vec2 uObjectFadeEnd;\n"
+      "uniform float uAlphaScale;\n"
+      "uniform float uBlurTexCoordScale;\n"
+      "uniform float uNumSamples;\n"
+      "uniform float uRecipNumSamples;\n"
+      "uniform float uRecipNumSamplesMinusOne;\n"
+      // inputs
+      "varying vec2 vModelSpaceCenterToPos;\n"
+      "varying vec2 vScreenSpaceVelocityVector;\n"
+      "varying float vSpeed;\n"
 
-  /**
-   * Set a global scaler applied to the alpha of the actor. Used to make the
-   * blurred actor a bit more subtle (helps to hide discontinuities due to
-   * limited number of texture samples) and reveal a bit of the background
-   * behind it as it moves. When the actor is at rest this is not applied. Default 0.75.
-   * @param alphaScale The scaling factor which multiplies the alpha of each pixel of the actor.
-   */
-  void SetAlphaScale( float alphaScale );
+      "void main()\n"
+      "{\n"
+      // calculate an alpha value that will fade the object towards its extremities, we need this to avoid an unsightly hard edge between color values of
+      // the blurred object and the unblurred background. Use smoothstep also to hide any hard edges (discontinuities) in rate of change of this alpha gradient
+      " vec2 centerToPixel = abs(vModelSpaceCenterToPos);\n"
+      " vec2 fadeToEdges = smoothstep(0.0, 1.0, 1.0 - ((centerToPixel - uObjectFadeStart) / (uObjectFadeEnd - uObjectFadeStart)));\n"
+      " float fadeToEdgesScale = fadeToEdges.x * fadeToEdges.y * uAlphaScale;\n" // apply global scaler
+      " fadeToEdgesScale = mix(1.0, fadeToEdgesScale, vSpeed);\n" // fade proportional to speed, so opaque when at rest
 
-  /**
-   * Set the number of texture samples to be taken. Increasing the number of
-   * samples provides better quality at the cost of performance.
-   * @param numSamples The number of texture samples to be taken. Default is 8.
-   */
-  void SetNumSamples( int numSamples );
+      // scale velocity vector by user requirements
+      " vec2 velocity = vScreenSpaceVelocityVector * uBlurTexCoordScale;\n"
 
-  /**
-   * Get the name for the texcoord scale property. Useful for animation.
-   * @return A std::string containing the property name
-   */
-  const std::string& GetTexcoordScalePropertyName() const;
+      // standard actor texel
+      " vec4 colActor = texture2D(sTexture, vTexCoord);\n"
 
-  /**
-   * Get the name for the geometry stretching property. Useful for animation.
-   * @return A std::string containing the property name
-   */
-  const std::string& GetGeometryStretchFactorPropertyName() const;
+      // blurred actor - gather texture samples from the actor texture in the direction of motion
+      " vec4 col = colActor * uRecipNumSamples;\n"
+      " for(float i = 1.0; i < uNumSamples; i += 1.0)\n"
+      " {\n"
+      "   float t = i * uRecipNumSamplesMinusOne;\n"
+      "   col += texture2D(sTexture, vTexCoord + (velocity * t)) * uRecipNumSamples;\n"
+      " }\n"
+      " gl_FragColor = mix(colActor, col, vSpeed);\n" // lerp blurred and non-blurred actor based on speed of motion
+      " gl_FragColor.a = colActor.a * fadeToEdgesScale;\n" // fade blurred actor to its edges based on speed of motion
+      " gl_FragColor *= uColor;\n"
+      "}\n";
 
-  /**
-   * Get the name for the speed scaling property. Useful for animation.
-   * @return A std::string containing the property name
-   */
-  const std::string& GetSpeedScalingFactorPropertyName() const;
+  // NOTE: we must turn on alpha blending for the actor (HINT_BLENDING)
+  ShaderEffect shader = ShaderEffect::New( vertexSource, fragmentSource,
+                                           GeometryType(GEOMETRY_TYPE_IMAGE),
+                                           ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID) );
 
-  /**
-   * Get the name for the fade start property. Useful for animation.
-   * @return A std::string containing the property name
-   */
-  const std::string& GetObjectFadeStartPropertyName() const;
+  //////////////////////////////////////
+  // Register uniform properties
+  //
+  //
+  shader.SetUniform( "uBlurTexCoordScale", 0.125f );
+  shader.SetUniform( "uGeometryStretchFactor", 0.05f );
+  shader.SetUniform( "uSpeedScalingFactor", 0.5f );
+  shader.SetUniform( "uObjectFadeStart", Vector2( 0.25f, 0.25f ) );
+  shader.SetUniform( "uObjectFadeEnd", Vector2( 0.5f, 0.5f ) );
+  shader.SetUniform( "uAlphaScale", 0.75f );
+  shader.SetUniform( "uNumSamples", static_cast<float>( numBlurSamples ) );
+  shader.SetUniform( "uRecipNumSamples", 1.0f / static_cast<float>( numBlurSamples ) );
+  shader.SetUniform( "uRecipNumSamplesMinusOne", 1.0f / static_cast<float>( numBlurSamples - 1.0f ) );
+  shader.SetUniform( "uModelLastFrame", Matrix::IDENTITY );
 
-  /**
-   * Get the name for the fade end property. Useful for animation.
-   * @return A std::string containing the property name
-   */
-  const std::string& GetObjectFadeEndPropertyName() const;
-
-  /**
-   * Get the name for the alpha scale property. Useful for animation.
-   * @return A std::string containing the property name
-   */
-  const std::string& GetAlphaScalePropertyName() const;
-
-  /**
-   * Downcast an ShaderEffect handle to MotionBlurEffect handle. If handle points to a MotionBlurEffect object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
-   * @param[in] handle to a ShaderEffect
-   * @return handle to a MotionBlurEffect object or an uninitialized handle
-   */
-  static MotionBlurEffect DownCast( ShaderEffect handle );
-
-private:
-  // Not intended for application developers
-  DALI_INTERNAL MotionBlurEffect( ShaderEffect handle );
-};
+  return shader;
+}
 
 }
 

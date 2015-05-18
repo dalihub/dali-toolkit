@@ -27,7 +27,9 @@ namespace Dali
 namespace Toolkit
 {
 /**
- * @brief QuadraticBezier is a custom shader to render quadratic bezier curves and bounded regions.
+ * @brief Creates a new QuadraticBezier shader effect
+ *
+ * QuadraticBezier is a custom shader to render quadratic bezier curves and bounded regions.
  *
  * Implementation based on the paper "Resolution Independent Curve Rendering using Programmable Graphics Hardware"
  * by Charles Loop and Jim Blinn.
@@ -36,84 +38,91 @@ namespace Toolkit
  * aNormal attribute is used to pass the coefficients of each control point (xy coordinates) as well as the vertex ID (z coordinate).
  * A quadratic curve should have as normal for the first control point (0.0,0.0), (0.5,0.0) for the second and (1.0,1.0) for the third.
  * Triangles that do not contain curves should have coordinates (0.0,1.0) for each control point in order to be filled properly.
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uPoint"      - Position coordinates for the points in the curve
+ *  "uColor"      - The color of the curve or bounded region
+ *  "uLineWidth"  - The width of the path. Only for not filled curves
+ *
+ * @param[in] pointCount The maximum number of vertices
+ * @param[in] filled Specify whether the the bounded region should be filled or not
+ * @return A handle to a newly allocated ShaderEffect
  */
-
-class DALI_IMPORT_API QuadraticBezier : public ShaderEffect
+inline ShaderEffect CreateQuadraticBezier(unsigned int pointCount, bool filled)
 {
-public:
+  std::string vertexShader = DALI_COMPOSE_SHADER
+      (
+          uniform mediump vec3 uPoint[MAX_POINT_COUNT];\n
+          varying highp vec2 vCoefficient;
+          void main()\n
+              {\n
+            int vertexId = int(aNormal.z);\n
+            gl_Position = uMvpMatrix * vec4(uPoint[vertexId], 1.0);\n
+            vCoefficient = aNormal.xy;\n
+              }\n
+      );
 
-  /**
-   * @brief Create an uninitialized QuadraticBezier; this can be initialized with QuadraticBezier::New().
-   *
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  QuadraticBezier();
+  std::string fragmentShader;
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~QuadraticBezier();
+  if( filled )
+  {
+    fragmentShader = DALI_COMPOSE_SHADER
+        (
+            varying highp vec2 vCoefficient;\n
 
-  /**
-   * @brief Create an initialized QuadraticBezier.
-   *
-   * @param[in] pointCount The maximum number of vertices
-   * @param[in] filled Specify whether the the bounded region should be filled or not
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static QuadraticBezier New(unsigned int pointCount, bool filled );
+            void main()\n
+            {\n
+              highp float C = (vCoefficient.x*vCoefficient.x-vCoefficient.y);\n
+              highp float Cdx = dFdx(C);\n
+              highp float Cdy = dFdy(C);\n
 
-  /**
-   * @brief Set position coordinates for a point in the curve
-   *
-   * @param[in] index The index of the vertex
-   * @param[in] position The new position
-   */
-  void SetPoint( unsigned int index, const Vector3& position );
+              highp float distance = float(C / sqrt(Cdx*Cdx + Cdy*Cdy));\n
 
-  /**
-   * @brief Set the width of the pathThis is only for not filled curves
-   *
-   * @param[in] width Width of the line in pixels
-   */
-  void SetLineWidth( float width );
+              gl_FragColor = uColor;\n
+              highp float alpha = 0.5 - distance;\n
+              if( alpha < 0.0 )\n
+              discard;\n
 
-  /**
-   * @brief Sets the color of the curve
-   *
-   * @param[in] color The new color
-   */
-  void SetColor( const Vector4& color );
+              gl_FragColor.w = alpha;\n
+            }\n
+        );
+  }
+  else
+  {
+    fragmentShader = DALI_COMPOSE_SHADER
+        (
+            varying highp vec2 vCoefficient;\n
+            uniform lowp float uLineWidth;\n
 
-  /**
-   * @brief Get the name of a the point property given its index
-   *
-   * @param[in] index Index of the vertex
-   * @return A std::string containing the property name
-   */
-  std::string GetPointPropertyName( unsigned int index ) const;
+            void main()\n
+            {\n
+              highp float C = (vCoefficient.x*vCoefficient.x-vCoefficient.y);\n
+              highp float Cdx = dFdx(C);\n
+              highp float Cdy = dFdy(C);\n
+              highp float distance = abs(float(C / sqrt(Cdx*Cdx + Cdy*Cdy)));\n
+              gl_FragColor = uColor*(uLineWidth-distance);\n
+            }\n
+        );
+  }
 
-  /**
-   * @brief Get the name of the line width property
-   *
-   * @return A std::string containing the property name
-   */
-  std::string GetLineWidthPropertyName( ) const;
+  std::ostringstream vertexShaderPrefix;
+  vertexShaderPrefix << "#define MAX_POINT_COUNT "<< pointCount << "\n";
 
-  /**
-   * @brief Get the name of the color property
-   *
-   * @return A std::string containing the property name
-   */
-  std::string GetColorPropertyName( ) const;
+  Dali::ShaderEffect shaderEffect = Dali::ShaderEffect::NewWithPrefix(
+      vertexShaderPrefix.str(),vertexShader,
+      "#extension GL_OES_standard_derivatives:enable\n", fragmentShader,
+      GeometryType(GEOMETRY_TYPE_UNTEXTURED_MESH) );
 
-private: // Not intended for application developers
+  //Set default uniform values
+  shaderEffect.SetUniform( "uColor", Vector4(1.0f,1.0f,1.0f,1.0f) );
+  if( !filled )
+  {
+    //Set default line widht to 1 pixel
+    shaderEffect.SetUniform( "uLineWidth", 1.0f );
+  }
 
-  DALI_INTERNAL QuadraticBezier(ShaderEffect handle);
-
-};
+  return shaderEffect;
+}
 
 } // namespace Toolkit
 

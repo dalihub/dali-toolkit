@@ -29,44 +29,40 @@ namespace Toolkit
 {
 
 /**
- * @brief MaskEffect is used to control which parts of an image are visible, using the alpha channel of a separate mask image.
+ * @brief Creates a new MaskEffect
+ *
+ * MaskEffect is used to control which parts of an image are visible, using the alpha channel of a separate mask image.
  *
  * Typically mask images should be the same size as the main image being viewed, but this isn't essential.
  *
  * Usage example:
  *
  *   ImageActor actor = ImageActor::New( Image( EXAMPLE_IMAGE_PATH ) );
- *   MaskEffect maskEffect = MaskEffect::New( Image::New( MASK_IMAGE_PATH ) );
+ *   ShaderEffect maskEffect = CreateMaskEffect( Image::New( MASK_IMAGE_PATH ) );
  *   actor.SetShaderEffect( maskEffect );
+ *
+ * @param[in] maskImage The image to use as a mask
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API MaskEffect : public ShaderEffect
+inline ShaderEffect CreateMaskEffect(Image maskImage)
 {
-public:
+  const char* ALPHA_MASK_FRAGMENT_SHADER_SOURCE =
+      "void main()                                                                    \n"
+      "{                                                                              \n"
+      "  highp vec4 mask = texture2D(sEffect, vTexCoord);                             \n"
+      "  gl_FragColor = texture2D(sTexture, vTexCoord) * uColor * vec4(1,1,1,mask.a); \n"
+      "}                                                                              \n";
 
-  /**
-   * @brief Create an empty MaskEffect handle.
-   */
-  MaskEffect();
+  ShaderEffect shaderEffect = ShaderEffect::New(
+      "", // Use default
+      ALPHA_MASK_FRAGMENT_SHADER_SOURCE,
+      GeometryType( GEOMETRY_TYPE_IMAGE ),
+      ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ) );
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~MaskEffect();
+  shaderEffect.SetEffectImage( maskImage );
 
-  /**
-   * @brief Create a MaskEffect.
-   *
-   * @param[in] maskImage The image to use as a mask
-   * @return A handle to a newly allocated MaskEffect.
-   */
-  static MaskEffect New( Image maskImage );
-
-private: // Not intended for application developers
-
-  DALI_INTERNAL MaskEffect( ShaderEffect handle );
-};
+  return shaderEffect;
+}
 
 } // namespace Toolkit
 
