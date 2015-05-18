@@ -754,7 +754,7 @@ struct Decorator::Impl : public ConnectionTracker
         mHandleScrolling = type;
         StartScrollTimer();
       }
-      else if( x > mTextControlParent.GetControlSize().width - mScrollThreshold )
+      else if( x > mTextControlParent.Self().GetTargetSize().width - mScrollThreshold )
       {
         mScrollDirection = SCROLL_LEFT;
         mHandleScrolling = type;

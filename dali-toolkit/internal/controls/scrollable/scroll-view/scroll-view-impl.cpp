@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -654,8 +654,7 @@ void ScrollView::OnInitialize()
   self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL, mCanScrollVertical);
   self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_HORIZONTAL, mCanScrollHorizontal);
 
-  Vector3 size = GetControlSize();
-  UpdatePropertyDomain(size);
+  UpdatePropertyDomain();
   SetInternalConstraints();
 }
 
@@ -813,8 +812,7 @@ void ScrollView::SetRulerX(RulerPtr ruler)
 {
   mRulerX = ruler;
 
-  Vector3 size = GetControlSize();
-  UpdatePropertyDomain(size);
+  UpdatePropertyDomain();
   UpdateMainInternalConstraint();
 }
 
@@ -822,14 +820,14 @@ void ScrollView::SetRulerY(RulerPtr ruler)
 {
   mRulerY = ruler;
 
-  Vector3 size = GetControlSize();
-  UpdatePropertyDomain(size);
+  UpdatePropertyDomain();
   UpdateMainInternalConstraint();
 }
 
-void ScrollView::UpdatePropertyDomain(const Vector3& size)
+void ScrollView::UpdatePropertyDomain()
 {
   Actor self = Self();
+  Vector3 size = self.GetTargetSize();
   Vector2 min = mMinScroll;
   Vector2 max = mMaxScroll;
   bool scrollPositionChanged = false;
@@ -1872,7 +1870,7 @@ bool ScrollView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
 void ScrollView::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
 {
   // need to update domain properties for new size
-  UpdatePropertyDomain(targetSize);
+  UpdatePropertyDomain();
 }
 
 void ScrollView::OnControlSizeSet( const Vector3& size )
@@ -1887,7 +1885,7 @@ void ScrollView::OnControlSizeSet( const Vector3& size )
       mMaxOvershoot = mUserMaxOvershoot;
     }
   }
-  UpdatePropertyDomain(size);
+  UpdatePropertyDomain();
   UpdateMainInternalConstraint();
   if( IsOvershootEnabled() )
   {

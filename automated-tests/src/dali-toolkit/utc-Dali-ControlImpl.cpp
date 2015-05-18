@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -437,7 +437,7 @@ int UtcDaliControlImplStageConnection(void)
   END_TEST;
 }
 
-int UtcDaliControlImplSizeSet(void)
+int UtcDaliControlImplSizeSetP(void)
 {
   ToolkitTestApplication application;
 
@@ -449,22 +449,28 @@ int UtcDaliControlImplSizeSet(void)
     application.Render();
     application.SendNotification();
 
-    DALI_TEST_EQUALS( dummyImpl.sizeSetCalled, true, TEST_LOCATION ); // Called from size negotiation
+    DALI_TEST_EQUALS( dummyImpl.sizeSetCalled, false, TEST_LOCATION ); // Size not set, no onSizeSet called
     Vector2 size(100.0f, 200.0f);
-    dummy.SetSize(size);
+    dummy.SetSize( size );
 
-    application.Render();
+    DALI_TEST_EQUALS( dummyImpl.sizeSetCalled, false, TEST_LOCATION ); // Size is going to get negotiated, no onSizeSet called
+
     application.SendNotification();
     application.Render();
-    application.SendNotification();
 
-    DALI_TEST_EQUALS(size, dummy.GetCurrentSize().GetVectorXY(), TEST_LOCATION);
+    DALI_TEST_EQUALS( size, dummy.GetCurrentSize().GetVectorXY(), TEST_LOCATION );
     DALI_TEST_EQUALS( dummyImpl.sizeSetCalled, true, TEST_LOCATION );
 
     Stage::GetCurrent().Remove(dummy);
   }
 
-  // Ensure full code coverage
+  END_TEST;
+}
+
+int UtcDaliControlImplSizeSet2P(void)
+{
+  ToolkitTestApplication application;
+
   {
     DummyControl dummy = DummyControl::New();
     Stage::GetCurrent().Add(dummy);
@@ -472,15 +478,13 @@ int UtcDaliControlImplSizeSet(void)
     Vector2 size(100.0f, 200.0f);
     DALI_TEST_CHECK( size != dummy.GetCurrentSize().GetVectorXY() );
 
-    application.Render();
     application.SendNotification();
+    application.Render();
 
     dummy.SetSize(size);
 
-    application.Render();
     application.SendNotification();
     application.Render();
-    application.SendNotification();
 
     DALI_TEST_EQUALS(size, dummy.GetCurrentSize().GetVectorXY(), TEST_LOCATION);
 
@@ -488,6 +492,7 @@ int UtcDaliControlImplSizeSet(void)
   }
   END_TEST;
 }
+
 
 int UtcDaliControlImplSizeAnimation(void)
 {

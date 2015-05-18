@@ -85,23 +85,9 @@ public:
   virtual float GetWidthForHeight( float height );
 
   /**
-   * @copydoc Toolkit::Control::GetNaturalSize()
+   * @copydoc Toolkit::CustomActorImpl::GetNaturalSize()
    */
   virtual Vector3 GetNaturalSize();
-
-  /**
-   * @brief Retrieves the current Control's size.
-   *
-   * @return The control's size.
-   */
-  const Vector3& GetControlSize() const;
-
-  /**
-   * @brief Retrieves the Control's size set by the Application / Control.
-   *
-   * @return The control's size.
-   */
-  const Vector3& GetSizeSet() const;
 
   // Key Input
 
@@ -605,51 +591,22 @@ private:
   virtual void OnStageConnection();
 
   /**
-   * @brief Calls OnControlStageDisconnection() to notify derived classed.
-   *
-   * @see Dali::CustomActorImpl::OnStageDisconnection()
+   * @copydoc Dali::CustomActorImpl::OnStageDisconnection()
    */
   virtual void OnStageDisconnection();
 
   /**
-   * @brief Sends a request to relayout this control.
-   *
-   * The control will be relaid out after the
-   * Dali::Stage::SignalMessageQueueFlushed() signal is emitted.  It
-   * calls OnControlChildAdd() to notify derived classes.
-   *
-   * @note This method shouldn't be overridden by derived classes.
-   *
-   * @param[in] child The added actor.
-   *
-   * @see Dali::CustomActorImpl::OnChildAdd(Actor&)
+   * @copydoc Dali::CustomActorImpl::OnChildAdd(Actor&)
    */
   virtual void OnChildAdd(Actor& child);
 
   /**
-   * @brief Sends a request to relayout this control.
-   *
-   * The control will be relaid out after the
-   * Dali::Stage::SignalMessageQueueFlushed() signal is emitted.  It
-   * calls OnControlChildRemove() to notify derived classes.
-   *
-   * @note This method shouldn't be overridden by derived classes.
-   *
-   * @param[in] child The removed actor.
-   *
-   * @see Dali::CustomActorImpl::OnChildRemove(Actor&)
+   * @copydoc Dali::CustomActorImpl::OnChildRemove(Actor&)
    */
   virtual void OnChildRemove(Actor& child);
 
   /**
-   * @brief It stores the size set by size negotiation and relayout.
-   *
-   * It also keeps a backup of the size set through the Actor's API used in the size negotiation.
-   * It calls the OnControlSizeSet() to notify derived classes.
-   *
-   * @param[in] targetSize The new size.
-   *
-   * @see Dali::CustomActorImpl::OnSizeSet(const Vector3&)
+   * @copydoc Dali::CustomActorImpl::OnSizeSet(const Vector3&)
    */
   virtual void OnSizeSet(const Vector3& targetSize);
 

@@ -49,12 +49,6 @@ namespace Toolkit
 namespace
 {
 
-#if defined(DEBUG_ENABLED)
-Integration::Log::Filter* gLogFilter  = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_CONTROL");
-#endif
-
-const float MAX_FLOAT_VALUE( std::numeric_limits<float>::max() );
-const Vector3 MAX_SIZE( MAX_FLOAT_VALUE, MAX_FLOAT_VALUE, MAX_FLOAT_VALUE );
 const float BACKGROUND_ACTOR_Z_POSITION( -0.1f );
 
 BaseHandle Create()
@@ -173,16 +167,6 @@ class Control::Impl : public ConnectionTracker
 {
 public:
 
-  /**
-   * Size indices for mMinMaxSize array
-   */
-  enum
-  {
-    MIN_SIZE_INDEX = 0,
-    MAX_SIZE_INDEX = 1
-  };
-
-public:
   // Construction & Destruction
   Impl(Control& controlImpl)
   : mControlImpl( controlImpl ),
@@ -194,8 +178,6 @@ public:
     mPanGestureDetector(),
     mTapGestureDetector(),
     mLongPressGestureDetector(),
-    mCurrentSize(),
-    mNaturalSize(),
     mFlags( Control::ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
     mIsKeyboardNavigationSupported( false ),
     mIsKeyboardFocusGroup( false ),
@@ -390,9 +372,6 @@ public:
   PanGestureDetector mPanGestureDetector;
   TapGestureDetector mTapGestureDetector;
   LongPressGestureDetector mLongPressGestureDetector;
-  // @todo change all these to Vector2 when we have a chance to sanitize the public API as well
-  Vector3 mCurrentSize; ///< Stores the current control's size, this is the negotiated size
-  Vector3 mNaturalSize; ///< Stores the size set through the Actor's API. This is size the actor wants to be. Useful when reset to the initial size is needed.
 
   ControlBehaviour mFlags :CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
@@ -434,51 +413,41 @@ Control::~Control()
 
 Vector3 Control::GetNaturalSize()
 {
-  // could be overridden in derived classes.
-  return mImpl->mNaturalSize;
-}
-
-float Control::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
-{
-  // Could be overridden in derived classes.
-  return CalculateChildSizeBase( child, dimension );
-}
-
-bool Control::RelayoutDependentOnChildren( Dimension::Type dimension )
-{
-  return RelayoutDependentOnChildrenBase( dimension );
+  if( mImpl->mBackground )
+  {
+    Actor actor = mImpl->mBackground->actor;
+    if( actor )
+    {
+      return actor.GetNaturalSize();
+    }
+  }
+  return Vector3();
 }
 
 float Control::GetHeightForWidth( float width )
 {
-  // could be overridden in derived classes.
-  float height( 0.0f );
-  if ( mImpl->mNaturalSize.width > 0.0f )
+  if( mImpl->mBackground )
   {
-    height = mImpl->mNaturalSize.height * width / mImpl->mNaturalSize.width;
+    Actor actor = mImpl->mBackground->actor;
+    if( actor )
+    {
+      return actor.GetHeightForWidth( width );
+    }
   }
-  return height;
+  return GetHeightForWidthBase( width );
 }
 
 float Control::GetWidthForHeight( float height )
 {
-  // could be overridden in derived classes.
-  float width( 0.0f );
-  if ( mImpl->mNaturalSize.height > 0.0f )
+  if( mImpl->mBackground )
   {
-    width = mImpl->mNaturalSize.width * height / mImpl->mNaturalSize.height;
+    Actor actor = mImpl->mBackground->actor;
+    if( actor )
+    {
+      return actor.GetWidthForHeight( height );
+    }
   }
-  return width;
-}
-
-const Vector3& Control::GetControlSize() const
-{
-  return mImpl->mCurrentSize;
-}
-
-const Vector3& Control::GetSizeSet() const
-{
-  return mImpl->mNaturalSize;
+  return GetWidthForHeightBase( height );
 }
 
 void Control::SetKeyInputFocus()
@@ -951,6 +920,16 @@ void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dime
 {
 }
 
+float Control::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
+{
+  return CalculateChildSizeBase( child, dimension );
+}
+
+bool Control::RelayoutDependentOnChildren( Dimension::Type dimension )
+{
+  return RelayoutDependentOnChildrenBase( dimension );
+}
+
 void Control::EmitKeyInputFocusSignal( bool focusGained )
 {
   Dali::Toolkit::Control handle( GetOwner() );
@@ -1046,20 +1025,10 @@ void Control::OnChildRemove(Actor& child)
 
 void Control::OnSizeSet(const Vector3& targetSize)
 {
-  if( targetSize != mImpl->mNaturalSize )
-  {
-    // Only updates size if set through Actor's API
-    mImpl->mNaturalSize = targetSize;
-  }
+  // Background is resized through size negotiation
 
-  if( targetSize != mImpl->mCurrentSize )
-  {
-    // Update control size.
-    mImpl->mCurrentSize = targetSize;
-
-    // Notify derived classes.
-    OnControlSizeSet( targetSize );
-  }
+  // Notify derived classes.
+  OnControlSizeSet( targetSize );
 }
 
 void Control::SignalConnected( SlotObserver* slotObserver, CallbackBase* callback )
