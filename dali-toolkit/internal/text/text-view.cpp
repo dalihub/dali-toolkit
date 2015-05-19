@@ -193,7 +193,7 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
             {
               GlyphInfo& glyphInfo = *( glyphs + index );
               Vector2& position = *( glyphPositions + index );
-              position.x -= glyphInfo.xBearing;
+              position.x -= ( 0.f > glyphInfo.xBearing ) ? glyphInfo.xBearing : 0.f;
 
               // Replace the glyph by the ellipsis glyph.
               glyphInfo = ellipsisGlyph;
