@@ -38,14 +38,14 @@ namespace
 // Bouncing effect is presented by stacked three layers with same color and opacity
 const size_t NUM_LAYERS( 3 );
 const Vector3 LAYER_HEIGHTS( 1.f, 27.f/42.f, 13.f/42.f);
-
+/*
 // use the actor color to paint every layer
 const char* MESH_FRAGMENT_SHADER =
 "void main()\n"
 "{\n"
 "  gl_FragColor = uColor;\n"
 "}\n";
-
+*/
 // Constraint to move the vertices vertically
 struct VertexPositionConstraint
 {
@@ -68,6 +68,8 @@ struct VertexPositionConstraint
 
 Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
 {
+  Actor meshActor;
+/*
   Dali::AnimatableMesh             mesh;
   Dali::MeshActor                  meshActor;
 
@@ -110,7 +112,7 @@ Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
     constraint = Constraint::New<Vector3>( mesh, mesh.GetPropertyIndex(j+3,  AnimatableVertex::Property::POSITION), VertexPositionConstraint(-0.5f, LAYER_HEIGHTS[i]) );
     constraint.AddSource( Source(meshActor, bouncePropertyIndex) );
     constraint.Apply();
-  }
+  }*/
 
   return meshActor;
 }

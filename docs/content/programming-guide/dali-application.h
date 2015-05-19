@@ -149,7 +149,7 @@ void OrientationChanged(const Orientation& orientation)
 int main(int argc, char **argv)
 {
   Application app = Application::New(&argc, &argv);
-  app.GetOrientation().SignalChanged().Connect(&OrientationChanged);
+  app.GetWindow().GetOrientation().SignalChanged().Connect(&OrientationChanged);
 }
 @endcode
 

@@ -35,6 +35,8 @@ namespace Toolkit
 namespace Text
 {
 
+struct LineRun;
+
 /**
  * @brief Abstract interface to provide the information necessary displaying text.
  *
@@ -65,28 +67,22 @@ public:
   virtual Length GetNumberOfGlyphs() const = 0;
 
   /**
-   * @brief Retrieves glyphs in the given buffer.
+   * @brief Retrieves glyphs and positions in the given buffers.
    *
-   * The size of the @p glyphs buffer needs to be big enough to copy the @p numberOfGlyphs.
+   * @note The size of the @p glyphs and @p glyphPositions buffers need to be big enough to copy the @p numberOfGlyphs glyphs and positions.
+   * @note The returned number of glyphs may be less than @p numberOfGlyphs if a line has ellipsis.
+   *
    * @param[out] glyphs Pointer to a buffer where the glyphs are copied.
+   * @param[out] glyphPositions Pointer to a buffer where the glyph positions are copied.
    * @param[in] glyphIndex Index to the first glyph.
    * @param[in] numberOfGlyphs Number of glyphs to be copied.
-   */
-  virtual void GetGlyphs( GlyphInfo* glyphs,
-                          GlyphIndex glyphIndex,
-                          Length numberOfGlyphs ) const = 0;
-
-  /**
-   * @brief Retrieves the glyph positions.
    *
-   * @pre The size of the @p positions buffer needs to be big enough to copy the @p numberOfGlyphs positions.
-   * @param[out] glyphPositions Pointer to a buffer where the glyph positions are copied.
-   * @param[in] glyphIndex Index to the first glyph position.
-   * @param[in] numberOfGlyphs The number of positions to be copied.
+   * @return The number of glyphs.
    */
-  virtual void GetGlyphPositions( Vector2* glyphPositions,
-                                  GlyphIndex glyphIndex,
-                                  Length numberOfGlyphs ) const = 0;
+  virtual Length GetGlyphs( GlyphInfo* glyphs,
+                            Vector2* glyphPositions,
+                            GlyphIndex glyphIndex,
+                            Length numberOfGlyphs ) const = 0;
 
   /**
    * @brief Retrieves the text color

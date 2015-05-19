@@ -21,6 +21,8 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/animation/animation.h>
+#include <dali/public-api/animation/linear-constrainer.h>
+#include <dali/devel-api/animation/path-constrainer.h>
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 
@@ -407,6 +409,30 @@ class DALI_IMPORT_API Builder : public BaseHandle
    * @return A handle to a Path if found, otherwise empty
    */
   Path GetPath( const std::string &name );
+
+  /**
+   * Get or create a PathConstrainer from the set of known PathConstrainers
+   * e.g.
+   *   PathConstrainer a = builder.GetPathConstrainer( "my-path-constrainer");
+   *
+   * @pre The Builder has been initialized.
+   * @pre The pathConstrainerName exists in the Constrainers section of the data representation
+   * @param pathConstrainerName The name of the PathConstrainer
+   * @returns A handle to a PathConstrainer if found, otherwise empty
+   */
+  PathConstrainer GetPathConstrainer( const std::string& pathConstrainerName );
+
+  /**
+   * Get or create a LinearConstrainer from the set of known LinearConstrainers
+   * e.g.
+   *   LinearConstrainer a = builder.GetLinearConstrainer( "my-linear-constrainer");
+   *
+   * @pre The Builder has been initialized.
+   * @pre The linearConstrainerName exists in the Constrainers section of the data representation
+   * @param linearConstrainerName The name of the LinearConstrainer
+   * @returns A handle to a LinearConstrainer if found, otherwise empty
+   */
+  LinearConstrainer GetLinearConstrainer( const std::string& linearConstrainerName );
 
   // Signals
 

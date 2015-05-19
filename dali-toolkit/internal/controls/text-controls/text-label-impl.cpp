@@ -20,8 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/scripting/scripting.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -426,6 +426,10 @@ void TextLabel::OnInitialize()
   // Use height-for-width negotiation by default
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
   self.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
+
+  // Enable the text ellipsis.
+  LayoutEngine& engine = mController->GetLayoutEngine();
+  engine.SetTextEllipsisEnabled( true );
 }
 
 void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )

@@ -83,7 +83,7 @@ int UtcDaliItemLayoutSetAndGetOrientation(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // Set the orientation of the layout to be horizontal from left to right

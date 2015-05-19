@@ -641,7 +641,7 @@ void PushButton::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type d
 
 void PushButton::ConfigureSizeNegotiation()
 {
-  ActorContainer images;
+  std::vector< Actor > images;
   images.reserve( 7 );
 
   images.push_back( GetButtonImage() );
@@ -661,11 +661,25 @@ void PushButton::ConfigureSizeNegotiation()
 
   if( label )
   {
-    label.SetPadding( Padding( TEXT_PADDING, TEXT_PADDING, TEXT_PADDING, TEXT_PADDING) );
+    Padding padding;
+
+    if( label.GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::USE_NATURAL_SIZE )
+    {
+      padding.left = TEXT_PADDING;
+      padding.right = TEXT_PADDING;
+    }
+
+    if( label.GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::USE_NATURAL_SIZE )
+    {
+      padding.top = TEXT_PADDING;
+      padding.bottom = TEXT_PADDING;
+    }
+
+    label.SetPadding( padding );
   }
 }
 
-void PushButton::ConfigureSizeNegotiationDimension( Dimension::Type dimension, const ActorContainer& images, Actor& label )
+void PushButton::ConfigureSizeNegotiationDimension( Dimension::Type dimension, const std::vector< Actor >& images, Actor& label )
 {
   ResizePolicy::Type imageResizePolicy = ResizePolicy::FILL_TO_PARENT;
   ResizePolicy::Type labelResizePolicy = ResizePolicy::FILL_TO_PARENT;
@@ -700,7 +714,7 @@ void PushButton::ConfigureSizeNegotiationDimension( Dimension::Type dimension, c
     label.SetResizePolicy( labelResizePolicy, dimension );
   }
 
-  for( ActorConstIter it = images.begin(), itEnd = images.end(); it != itEnd; ++it )
+  for( std::vector< Actor >::const_iterator it = images.begin(), itEnd = images.end(); it != itEnd; ++it )
   {
     Actor actor = *it;
     if( actor )

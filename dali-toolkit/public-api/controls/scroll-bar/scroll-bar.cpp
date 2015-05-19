@@ -32,18 +32,18 @@ ScrollBar::ScrollBar()
 }
 
 ScrollBar::ScrollBar(Internal::ScrollBar& implementation)
-: ScrollComponent( implementation )
+: Control( implementation )
 {
 }
 
 ScrollBar::ScrollBar( Dali::Internal::CustomActor* internal )
-: ScrollComponent( internal )
+: Control( internal )
 {
   VerifyCustomActorPointer<Internal::ScrollBar>(internal);
 }
 
-ScrollBar::ScrollBar( const ScrollBar& scrollBar )
-: ScrollComponent( scrollBar )
+ScrollBar::ScrollBar( const ScrollBar& handle )
+: Control( handle )
 {
 }
 
@@ -56,9 +56,9 @@ ScrollBar& ScrollBar::operator=( const ScrollBar& scrollBar )
   return *this;
 }
 
-ScrollBar ScrollBar::New()
+ScrollBar ScrollBar::New(ScrollBar::Direction direction)
 {
-  return Internal::ScrollBar::New();
+  return Internal::ScrollBar::New(direction);
 }
 
 ScrollBar ScrollBar::DownCast( BaseHandle handle )
@@ -70,9 +70,14 @@ ScrollBar::~ScrollBar()
 {
 }
 
-void ScrollBar::SetIndicatorImage( Image image )
+void ScrollBar::SetScrollPropertySource( Handle handle, Dali::Property::Index propertyScrollPosition, Dali::Property::Index propertyMinScrollPosition, Dali::Property::Index propertyMaxScrollPosition, Dali::Property::Index propertyScrollContentSize )
 {
-  GetImpl(*this).SetIndicatorImage(image);
+  GetImpl(*this).SetScrollPropertySource(handle, propertyScrollPosition, propertyMinScrollPosition, propertyMaxScrollPosition, propertyScrollContentSize);
+}
+
+void ScrollBar::SetScrollIndicator( Actor indicator )
+{
+  GetImpl(*this).SetScrollIndicator(indicator);
 }
 
 Actor ScrollBar::GetScrollIndicator()
@@ -80,9 +85,24 @@ Actor ScrollBar::GetScrollIndicator()
   return GetImpl(*this).GetScrollIndicator();
 }
 
-void ScrollBar::SetPositionNotifications( const std::vector<float>& positions )
+void ScrollBar::SetScrollPositionIntervals( const Dali::Vector<float>& positions )
 {
-  GetImpl(*this).SetPositionNotifications(positions);
+  GetImpl(*this).SetScrollPositionIntervals(positions);
+}
+
+Dali::Vector<float> ScrollBar::GetScrollPositionIntervals() const
+{
+  return GetImpl(*this).GetScrollPositionIntervals();
+}
+
+void ScrollBar::SetScrollDirection( ScrollBar::Direction direction )
+{
+  GetImpl(*this).SetScrollDirection(direction);
+}
+
+ScrollBar::Direction ScrollBar::GetScrollDirection() const
+{
+  return GetImpl(*this).GetScrollDirection();
 }
 
 void ScrollBar::SetIndicatorHeightPolicy( ScrollBar::IndicatorHeightPolicy policy )
@@ -90,7 +110,7 @@ void ScrollBar::SetIndicatorHeightPolicy( ScrollBar::IndicatorHeightPolicy polic
   GetImpl(*this).SetIndicatorHeightPolicy(policy);
 }
 
-ScrollBar::IndicatorHeightPolicy ScrollBar::GetIndicatorHeightPolicy()
+ScrollBar::IndicatorHeightPolicy ScrollBar::GetIndicatorHeightPolicy() const
 {
   return GetImpl(*this).GetIndicatorHeightPolicy();
 }
@@ -100,7 +120,7 @@ void ScrollBar::SetIndicatorFixedHeight( float height )
   GetImpl(*this).SetIndicatorFixedHeight(height);
 }
 
-float ScrollBar::GetIndicatorFixedHeight()
+float ScrollBar::GetIndicatorFixedHeight() const
 {
   return GetImpl(*this).GetIndicatorFixedHeight();
 }
@@ -110,7 +130,7 @@ void ScrollBar::SetIndicatorShowDuration( float durationSeconds )
   GetImpl(*this).SetIndicatorShowDuration(durationSeconds);
 }
 
-float ScrollBar::GetIndicatorShowDuration()
+float ScrollBar::GetIndicatorShowDuration() const
 {
   return GetImpl(*this).GetIndicatorShowDuration();
 }
@@ -120,24 +140,29 @@ void ScrollBar::SetIndicatorHideDuration( float durationSeconds )
   GetImpl(*this).SetIndicatorHideDuration(durationSeconds);
 }
 
-float ScrollBar::GetIndicatorHideDuration()
+float ScrollBar::GetIndicatorHideDuration() const
 {
   return GetImpl(*this).GetIndicatorHideDuration();
 }
 
-void ScrollBar::Show()
+void ScrollBar::ShowIndicator()
 {
-  GetImpl(*this).Show();
+  GetImpl(*this).ShowIndicator();
 }
 
-void ScrollBar::Hide()
+void ScrollBar::HideIndicator()
 {
-  GetImpl(*this).Hide();
+  GetImpl(*this).HideIndicator();
 }
 
-ScrollBar::ScrollPositionNotifiedSignalType& ScrollBar::ScrollPositionNotifiedSignal()
+ScrollBar::PanFinishedSignalType& ScrollBar::PanFinishedSignal()
 {
-  return GetImpl(*this).ScrollPositionNotifiedSignal();
+  return GetImpl(*this).PanFinishedSignal();
+}
+
+ScrollBar::ScrollPositionIntervalReachedSignalType& ScrollBar::ScrollPositionIntervalReachedSignal()
+{
+  return GetImpl(*this).ScrollPositionIntervalReachedSignal();
 }
 
 } // namespace Toolkit

@@ -18,7 +18,7 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/scripting/scripting.h>
+#include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/builder/replacement.h>

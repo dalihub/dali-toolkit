@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <v8.h>
-#include <dali/public-api/actors/mesh-actor.h>
+#include <dali/devel-api/actors/mesh-actor.h>
 
 namespace Dali
 {

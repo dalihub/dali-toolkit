@@ -19,9 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <boost/function.hpp>
 #include <dali/public-api/animation/alpha-function.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/enums.h>
@@ -36,11 +34,6 @@ namespace Toolkit
 class ItemLayout;
 
 typedef IntrusivePtr<ItemLayout> ItemLayoutPtr; ///< Pointer to a Dali::Toolkit::ItemLayout object
-
-typedef std::vector<ItemLayoutPtr>          ItemLayoutContainer; ///< Container of Dali::Toolkit::ItemLayout objects
-typedef ItemLayoutContainer::iterator       ItemLayoutIter;      ///< Iterator for Dali::Toolkit::ItemLayoutContainer
-typedef ItemLayoutContainer::const_iterator ItemLayoutConstIter; ///< Const Iterator for Dali::Toolkit::ItemLayoutContainer
-
 
 /**
  * @brief A support class for managing ranges of items.
@@ -133,17 +126,7 @@ class DALI_IMPORT_API ItemLayout : public RefObject
 {
 public:
 
-  /// @brief Function signature of a boolean constraint
-  typedef boost::function<bool       (const bool&       current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)> BoolFunction;
-
-  /// @brief Function signature of a Vector3 constraint
-  typedef boost::function<Vector3    (const Vector3&    current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)> Vector3Function;
-
-  /// @brief Function signature of a Vector4 constraint
-  typedef boost::function<Vector4    (const Vector4&    current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)> Vector4Function;
-
-  /// @brief Function signature of a Quaternion constraint
-  typedef boost::function<Quaternion (const Quaternion& current, const float& layoutPosition, const float& scrollSpeed, const Vector3& layoutSize)> QuaternionFunction;
+  class Extension; ///< Forward declare future extension interface
 
   /**
    * @brief Virtual destructor.
@@ -163,6 +146,26 @@ public:
    * @return the orientation of the layout.
    */
   DALI_IMPORT_API ControlOrientation::Type GetOrientation() const;
+
+  /**
+   * @brief Retrieve the target size of an item in the layout.
+   *
+   * This will return the default size for the layout unless overridden by calling SetItemSize().
+   *
+   * @note layout-position is not provided as a parameter, since applying size constraints is not recommended.
+   * Animating to target-sizes is preferable, since this allows controls to perform layouting without constraints.
+   * @param[in] itemId The ID of an item in the layout.
+   * @param[in] layoutSize The layout size
+   * @param[out] itemSize The target size of an item.
+   */
+  DALI_IMPORT_API void GetItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const;
+
+  /**
+   * @brief Overrides the default size for the layout.
+   *
+   * @param[in] itemSize The size of each item.
+   */
+  DALI_IMPORT_API void SetItemSize( const Vector3& itemSize );
 
   /**
    * @brief Query the minimum valid layout position; this is a negative value.
@@ -230,16 +233,15 @@ public:
   virtual unsigned int GetReserveItemCount(Vector3 layoutSize) const = 0;
 
   /**
-   * @brief Retrieve the target size of an item in the layout.
+   * @brief Retrieve the default size of an item in the layout.
    *
    * @note layout-position is not provided as a parameter, since applying size constraints is not recommended.
    * Animating to target-sizes is preferable, since this allows controls to perform layouting without constraints.
    * @param[in] itemId The ID of an item in the layout.
    * @param[in] layoutSize The layout size
-   * @param[out] itemSize The target size of an item, or an uninitialized value.
-   * @return Whether the item size is available or not
+   * @param[out] itemSize The target size of an item.
    */
-  virtual bool GetItemSize(unsigned int itemId, Vector3 layoutSize, Vector3& itemSize) const = 0;
+  virtual void GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const = 0;
 
   /**
    * @brief Retrieve the resize animation in the layout.
@@ -251,56 +253,6 @@ public:
    * @param [in] durationSeconds The duration of the resizing.
    */
   virtual void GetResizeAnimation(Animation& animation, Actor actor, Vector3 size, float durationSeconds) const = 0;
-
-  /**
-   * @brief Retrieve the position constraint function of an item in the layout.
-   *
-   * The constraint will be applied when the item is created or the layout is activated.
-   * @param[in] itemId The ID of an item in the layout.
-   * @param[out] constraint The position constraint function of an item, or an uninitialized function pointer.
-   * @return Whether the position constraint function of an item is available or not
-   */
-  virtual bool GetPositionConstraint(unsigned int itemId, Vector3Function& constraint) const = 0;
-
-  /**
-   * @brief Retrieve the rotation constraint function of an item in the layout.
-   *
-   * The constraint will be applied when the item is created or the layout is activated.
-   * @param[in] itemId The ID of an item in the layout.
-   * @param[out] constraint The rotation constraint function of an item, or an uninitialized function pointer.
-   * @return Whether the rotation constraint function of an item is available or not
-   */
-  virtual bool GetRotationConstraint(unsigned int itemId, QuaternionFunction& constraint) const = 0;
-
-  /**
-   * @brief Retrieve the scale constraint function of an item in the layout.
-   *
-   * The constraint will be applied when the item is created or the layout is activated.
-   * @param[in] itemId The ID of an item in the layout.
-   * @param[out] constraint The scale constraint function of an item, or an uninitialized function pointer.
-   * @return Whether the scale constraint function of an item is available or not
-   */
-  virtual bool GetScaleConstraint(unsigned int itemId, Vector3Function& constraint) const = 0;
-
-  /**
-   * @brief Retrieve the color constraint function of an item in the layout.
-   *
-   * The constraint will be applied when the item is created or the layout is activated.
-   * @param[in] itemId The ID of an item in the layout.
-   * @param[out] constraint The color constraint function of an item, or an uninitialized function pointer.
-   * @return Whether the color constraint function of an item is available or not
-   */
-  virtual bool GetColorConstraint(unsigned int itemId, Vector4Function& constraint) const = 0;
-
-  /**
-   * @brief Retrieve the visibility constraint function of an item in the layout.
-   *
-   * The constraint will be applied when the item is created or the layout is activated.
-   * @param[in] itemId The ID of an item in the layout.
-   * @param[out] constraint The visibility constraint function of an item, or an uninitialized function pointer.
-   * @return Whether the visibility constraint function of an item is available or not
-   */
-  virtual bool GetVisibilityConstraint(unsigned int itemId, BoolFunction& constraint) const = 0;
 
   /**
    * @brief Query the scroll direction of the layout.
@@ -373,11 +325,10 @@ public:
    *
    * @param[in] actor The actor to constrain.
    * @param[in] itemId The ID of the item represented by the actor.
-   * @param[in] durationSeconds The time taken to fully constrain the actors.
-   * @param[in] scrollPositionObject The object which provides the layout position property.
+   * @param[in] layoutSize the current size of the item view instance.
    * @param[in] itemViewActor The item view instance which requests the application of constraints.
    */
-  DALI_IMPORT_API virtual void ApplyConstraints( Actor& actor, const int itemId, const float durationSeconds, Handle scrollPositionObject, const Actor& itemViewActor );
+  DALI_IMPORT_API virtual void ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor ) = 0;
 
   /**
    * @brief Gets the position of a given item
@@ -387,21 +338,17 @@ public:
    * @param[in] layoutSize the current size of the item view instance
    * @return The item position (x,y,z)
    */
-  DALI_IMPORT_API virtual Vector3 GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const;
+  DALI_IMPORT_API virtual Vector3 GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const = 0;
 
   /**
-   * @brief Set the alpha function used when applying constraints
+   * Retrieve the extension for this layout.
    *
-   * @param[in] func The alpha function to use.
+   * @return The extension if available, NULL otherwise
    */
-  DALI_IMPORT_API void SetAlphaFunction(AlphaFunction func);
-
-  /**
-   * @brief Retrieve the alpha function used when applying constraints
-   *
-   * @return The alpha function.
-   */
-  DALI_IMPORT_API AlphaFunction GetAlphaFunction() const;
+  virtual Extension* GetExtension()
+  {
+    return NULL;
+  }
 
 protected:
 
@@ -412,9 +359,8 @@ protected:
 
 protected:
 
-  ControlOrientation::Type mOrientation;   ///< the orientation of the layout.
-  AlphaFunction            mAlphaFunction; ///< Alpha function to be applied when removing/adding constraints
-  Handle                   mWeightObject;  ///< Weight object gets created to apply the constraints over a certain time
+  struct Impl;
+  Impl* mImpl;
 };
 
 } // namespace Toolkit

@@ -25,10 +25,11 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/object/type-info.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/property-array.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/camera-actor.h>
-#include <dali/public-api/scripting/scripting.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -167,7 +168,7 @@ std::string PropertyValueToString( const Property::Value& value )
     }
     case Property::ARRAY:
     {
-      ret = std::string("Array Size=") + ToString( value.Get<Property::Array>().size() );
+      ret = std::string("Array Size=") + ToString( value.Get<Property::Array>().Size() );
       break;
     }
     case Property::MAP:
@@ -812,6 +813,212 @@ Path Builder::GetPath( const std::string& name )
   }
 
   return ret;
+}
+
+PathConstrainer Builder::GetPathConstrainer( const std::string& name )
+{
+  DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
+
+  //Search the pathConstrainer in the LUT
+  size_t count( mPathConstrainerLut.size() );
+  for( size_t i(0); i!=count; ++i )
+  {
+    if( mPathConstrainerLut[i].name == name )
+    {
+      //PathConstrainer has already been created
+      return mPathConstrainerLut[i].pathConstrainer;
+    }
+  }
+
+  //Create a new PathConstrainer
+  PathConstrainer ret;
+  if( OptionalChild constrainers = IsChild( *mParser.GetRoot(), "constrainers") )
+  {
+    if( OptionalChild pathConstrainer = IsChild( *constrainers, name ) )
+    {
+      OptionalString constrainerType(IsString(IsChild(*pathConstrainer, "type")));
+      if(!constrainerType)
+      {
+        DALI_SCRIPT_WARNING("Constrainer type not specified for constrainer '%s'\n", name.c_str() );
+      }
+      else if( *constrainerType == "PathConstrainer")
+      {
+        //points property
+        if( OptionalChild pointsProperty = IsChild( *pathConstrainer, "points") )
+        {
+          Dali::Property::Value points(Property::ARRAY);
+          if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
+          {
+            ret = PathConstrainer::New();
+            ret.SetProperty( PathConstrainer::Property::POINTS, points);
+
+            //control-points property
+            if( OptionalChild pointsProperty = IsChild( *pathConstrainer, "control-points") )
+            {
+              Dali::Property::Value points(Property::ARRAY);
+              if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
+              {
+                ret.SetProperty( PathConstrainer::Property::CONTROL_POINTS, points);
+              }
+
+              //Forward vector
+              OptionalVector3 forward( IsVector3( IsChild(*pathConstrainer, "forward" ) ) );
+              if( forward )
+              {
+                ret.SetProperty( PathConstrainer::Property::FORWARD, *forward);
+              }
+
+              //Add the new constrainer to the vector of PathConstrainer
+              PathConstrainerEntry entry = {name,ret};
+              mPathConstrainerLut.push_back( entry );
+            }
+            else
+            {
+              //Control points not specified
+              DALI_SCRIPT_WARNING("Control points not specified for pathConstrainer '%s'\n", name.c_str() );
+            }
+          }
+        }
+        else
+        {
+          //Interpolation points not specified
+          DALI_SCRIPT_WARNING("Interpolation points not specified for pathConstrainer '%s'\n", name.c_str() );
+        }
+      }
+      else
+      {
+        DALI_SCRIPT_WARNING("Constrainer '%s' is not a PathConstrainer\n", name.c_str() );
+      }
+    }
+  }
+
+  return ret;
+}
+
+bool Builder::IsPathConstrainer( const std::string& name )
+{
+  size_t count( mPathConstrainerLut.size() );
+  for( size_t i(0); i!=count; ++i )
+  {
+    if( mPathConstrainerLut[i].name == name )
+    {
+      return true;
+    }
+  }
+
+  if( OptionalChild constrainers = IsChild( *mParser.GetRoot(), "constrainers") )
+  {
+    if( OptionalChild constrainer = IsChild( *constrainers, name ) )
+    {
+      OptionalString constrainerType(IsString(IsChild(*constrainer, "type")));
+      if(!constrainerType)
+      {
+        return false;
+      }
+      else
+      {
+         return *constrainerType == "PathConstrainer";
+      }
+    }
+  }
+  return false;
+}
+
+Dali::LinearConstrainer Builder::GetLinearConstrainer( const std::string& name )
+{
+  DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
+
+  //Search the LinearConstrainer in the LUT
+  size_t count( mLinearConstrainerLut.size() );
+  for( size_t i(0); i!=count; ++i )
+  {
+    if( mLinearConstrainerLut[i].name == name )
+    {
+      //LinearConstrainer has already been created
+      return mLinearConstrainerLut[i].linearConstrainer;
+    }
+  }
+
+  //Create a new LinearConstrainer
+  LinearConstrainer ret;
+  if( OptionalChild constrainers = IsChild( *mParser.GetRoot(), "constrainers") )
+  {
+    if( OptionalChild linearConstrainer = IsChild( *constrainers, name ) )
+    {
+      OptionalString constrainerType(IsString(IsChild(*linearConstrainer, "type")));
+      if(!constrainerType)
+      {
+        DALI_SCRIPT_WARNING("Constrainer type not specified for constrainer '%s'\n", name.c_str() );
+      }
+      else if( *constrainerType == "LinearConstrainer")
+      {
+        //points property
+        if( OptionalChild pointsProperty = IsChild( *linearConstrainer, "value") )
+        {
+          Dali::Property::Value points(Property::ARRAY);
+          if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
+          {
+            ret = Dali::LinearConstrainer::New();
+            ret.SetProperty( LinearConstrainer::Property::VALUE, points);
+
+            //control-points property
+            if( OptionalChild pointsProperty = IsChild( *linearConstrainer, "progress") )
+            {
+              Dali::Property::Value points(Property::ARRAY);
+              if( SetPropertyFromNode( *pointsProperty, Property::ARRAY, points ) )
+              {
+                ret.SetProperty( LinearConstrainer::Property::PROGRESS, points);
+              }
+            }
+            //Add the new constrainer to vector of LinearConstrainer
+            LinearConstrainerEntry entry = {name,ret};
+            mLinearConstrainerLut.push_back( entry );
+          }
+        }
+        else
+        {
+          //Interpolation points not specified
+          DALI_SCRIPT_WARNING("Values not specified for LinearConstrainer '%s'\n", name.c_str() );
+        }
+      }
+      else
+      {
+        DALI_SCRIPT_WARNING("Constrainer '%s' is not a LinearConstrainer\n", name.c_str() );
+      }
+    }
+  }
+
+  return ret;
+}
+
+bool Builder::IsLinearConstrainer( const std::string& name )
+{
+  //Search the LinearConstrainer in the LUT
+  size_t count( mLinearConstrainerLut.size() );
+  for( size_t i(0); i!=count; ++i )
+  {
+    if( mLinearConstrainerLut[i].name == name )
+    {
+      return true;
+    }
+  }
+
+  if( OptionalChild constrainers = IsChild( *mParser.GetRoot(), "constrainers") )
+  {
+    if( OptionalChild constrainer = IsChild( *constrainers, name ) )
+    {
+      OptionalString constrainerType(IsString(IsChild(*constrainer, "type")));
+      if(!constrainerType)
+      {
+        return false;
+      }
+      else
+      {
+         return *constrainerType == "LinearConstrainer";
+      }
+    }
+  }
+  return false;
 }
 
 Toolkit::Builder::BuilderSignalType& Builder::QuitSignal()

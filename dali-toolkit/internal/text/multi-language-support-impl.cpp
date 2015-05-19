@@ -21,9 +21,9 @@
 // EXTERNAL INCLUDES
 #include <memory.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/adaptor-framework/singleton-service.h>
-#include <dali/public-api/text-abstraction/font-client.h>
-#include <dali/public-api/text-abstraction/script.h>
+#include <dali/devel-api/adaptor-framework/singleton-service.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/devel-api/text-abstraction/script.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/logical-model-impl.h>
@@ -454,6 +454,9 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
         if( NULL == validateFontsPerScript )
         {
           validateFontsPerScript = new ValidateFontsPerScript();
+
+          mValidFontsPerScriptCache.PushBack( validateFontsPerScript );
+          validFontsPerScriptCacheBuffer = mValidFontsPerScriptCache.Begin();
         }
 
         if( NULL != validateFontsPerScript )

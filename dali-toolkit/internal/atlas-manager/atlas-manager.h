@@ -20,7 +20,7 @@
 // EXTERNAL INCLUDES
 #include <stdint.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/images/atlas.h>
+#include <dali/devel-api/images/atlas.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/shader-effects/material.h>
 

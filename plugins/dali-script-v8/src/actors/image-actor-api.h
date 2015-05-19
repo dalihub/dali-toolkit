@@ -42,8 +42,6 @@ namespace ImageActorApi
    */
   void SetImage( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetImage( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void IsPixelAreaSet( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void ClearPixelArea( const v8::FunctionCallbackInfo< v8::Value >& args );
 }; // namespace ImageActorApi
 
 } // namespace V8Plugin

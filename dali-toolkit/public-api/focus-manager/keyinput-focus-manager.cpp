@@ -19,7 +19,7 @@
 #include "keyinput-focus-manager.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/adaptor-framework/singleton-service.h>
+#include <dali/devel-api/adaptor-framework/singleton-service.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/focus-manager/keyinput-focus-manager-impl.h>

@@ -44,10 +44,6 @@ namespace RenderableActorApi
   void GetBlendMode( const v8::FunctionCallbackInfo< v8::Value >& args );
   void SetBlendFunc( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetBlendFunc( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void SetBlendEquation( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void GetBlendEquation( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void SetBlendColor( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void GetBlendColor( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetShaderEffect( const v8::FunctionCallbackInfo< v8::Value >& args );
   void SetShaderEffect( const v8::FunctionCallbackInfo< v8::Value >& args );
   void RemoveShaderEffect( const v8::FunctionCallbackInfo< v8::Value >& args );

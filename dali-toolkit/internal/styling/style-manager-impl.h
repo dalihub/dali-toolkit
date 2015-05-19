@@ -20,8 +20,8 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <list>
-#include <dali/public-api/adaptor-framework/style-monitor.h>
-#include <dali/public-api/common/map-wrapper.h>
+#include <dali/devel-api/common/map-wrapper.h>
+#include <dali/devel-api/adaptor-framework/style-monitor.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/signals/connection-tracker.h>

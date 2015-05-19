@@ -208,8 +208,8 @@ int UtcDaliSuperBlurViewGetBlurredImage(void)
   DALI_TEST_CHECK( image1 );
 
   Image image2 = blurView.GetBlurredImage( 2 );
-  DALI_TEST_EQUALS( image2.GetWidth(), 25, TEST_LOCATION );
-  DALI_TEST_EQUALS( image2.GetHeight(), 25, TEST_LOCATION );
+  DALI_TEST_EQUALS( image2.GetWidth(), 25u, TEST_LOCATION );
+  DALI_TEST_EQUALS( image2.GetHeight(), 25u, TEST_LOCATION );
 
   Image image3 = blurView.GetBlurredImage( 3 );
   DALI_TEST_CHECK( FrameBufferImage::DownCast( image2 ) );

@@ -19,7 +19,26 @@
 #include <dali-toolkit/internal/text/segmentation.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/text-abstraction/segmentation.h>
+#include <dali/devel-api/text-abstraction/segmentation.h>
+#ifdef DEBUG_ENABLED
+#include <string>
+#include <dali/integration-api/debug.h>
+#endif
+
+// INTERNAL INCLUDES
+#ifdef DEBUG_ENABLED
+#include <dali-toolkit/internal/text/character-set-conversion.h>
+#endif
+
+namespace
+{
+
+#if defined(DEBUG_ENABLED)
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_SEGMENTATION");
+#endif
+
+} // namespace
+
 
 namespace Dali
 {
@@ -46,6 +65,23 @@ void SetLineBreakInfo( const Vector<Character>& text,
   TextAbstraction::Segmentation::Get().GetLineBreakPositions( text.Begin(),
                                                               numberOfCharacters,
                                                               lineBreakInfo.Begin() );
+#ifdef DEBUG_ENABLED
+  if( gLogFilter->IsEnabledFor(Debug::Verbose) )
+  {
+    std::string utf8;
+    Utf32ToUtf8( text.Begin(), numberOfCharacters, utf8 );
+
+    std::string info;
+    info.reserve( numberOfCharacters );
+    for( unsigned int i=0; i<lineBreakInfo.Count(); ++i )
+    {
+      info.push_back( static_cast<char>('0' + lineBreakInfo[i]) );
+    }
+
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "SetLineBreakInfo Characters: %s\n", utf8.c_str() );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "SetLineBreakInfo Break info: %s\n", info.c_str() );
+  }
+#endif
 }
 
 void ReplaceLineBreakInfo( LogicalModel& model,
@@ -71,6 +107,23 @@ void SetWordBreakInfo( const Vector<Character>& text,
   TextAbstraction::Segmentation::Get().GetWordBreakPositions( text.Begin(),
                                                               numberOfCharacters,
                                                               wordBreakInfo.Begin() );
+#ifdef DEBUG_ENABLED
+  if( gLogFilter->IsEnabledFor(Debug::Verbose) )
+  {
+    std::string utf8;
+    Utf32ToUtf8( text.Begin(), numberOfCharacters, utf8 );
+
+    std::string info;
+    info.reserve( numberOfCharacters );
+    for( unsigned int i=0; i<wordBreakInfo.Count(); ++i )
+    {
+      info.push_back( static_cast<char>('0' + wordBreakInfo[i]) );
+    }
+
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "SetWordBreakInfo Characters: %s\n", utf8.c_str() );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "SetWordBreakInfo Break info: %s\n", info.c_str() );
+  }
+#endif
 }
 
 void ReplaceWordBreakInfo( LogicalModel& model,

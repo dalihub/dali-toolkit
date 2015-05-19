@@ -321,7 +321,7 @@ private:
   Actor mBottomBg;                        ///< bottom button bar background. ImageActor is replaced with Actor due to hidden image.
   Actor mTailImage;                       ///< Stores the tail image
 
-  ActorContainer mButtons;                ///< Keeps track of the buttons added to this popup.
+  std::vector< Actor > mButtons;          ///< Keeps track of the buttons added to this popup.
   Toolkit::Popup::PopupState mState;      ///< Popup current state.
   Animation mAnimation;                   ///< The animation instance managing state changing.
   bool mAlterAddedChild;                  ///< Flag used to control whether children are reparented or not.

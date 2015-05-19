@@ -126,6 +126,6 @@ void LoadAtlasImages()
 //
 
 ATLAS_IMAGE_LIST : [
-{% for sprite in allSprites %} { name: "{{sprite.trimmedName}}", x: {{sprite.frameRect.x}}, y:{{sprite.frameRect.y}}, w:{{sprite.frameRect.width}}, h:{{sprite.frameRect.height}}, {%if sprite.isSolid %}dali.BLENDING_OFF{% else%}dali.BLENDING_ON{% endif %}  }{% if not forloop.last %},{% endif %}
+{% for sprite in allSprites %} { name: "{{sprite.trimmedName}}", x: {{sprite.frameRect.x}}, y:{{sprite.frameRect.y}}, w:{{sprite.frameRect.width}}, h:{{sprite.frameRect.height}}, blendMode:{%if sprite.isSolid %}dali.BLENDING_OFF{% else%}dali.BLENDING_ON{% endif %}  }{% if not forloop.last %},{% endif %}
 {% endfor %}
 ]

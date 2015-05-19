@@ -21,16 +21,16 @@
 // EXTERNAL INCLUDES
 #include <dali/dali.h>
 #include <dali/integration-api/debug.h>
-//#include <dali/public-api/actors/renderer.h>
-#include <dali/public-api/text-abstraction/text-abstraction.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
+
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/atlas-manager/atlas-manager.h>
+#include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-basic-shader.h>
-#if defined(DEBUG_ENABLED)
-Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_ATLAS_RENDERER");
-#endif
+#include <dali-toolkit/internal/text/rendering/shaders/text-bgra-shader.h>
+//#include <dali-toolkit/internal/text/rendering/shaders/text-basic-shadow-shader.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -38,6 +38,10 @@ using namespace Dali::Toolkit::Text;
 
 namespace
 {
+#if defined(DEBUG_ENABLED)
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_RENDERING");
+#endif
+
   const float ZERO( 0.0f );
   const float HALF( 0.5f );
   const float ONE( 1.0f );
@@ -188,9 +192,9 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
     CalculateBlocksSize( glyphs );
 
-    for ( uint32_t i = 0; i < glyphs.Size(); ++i )
+    for( uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i )
     {
-      GlyphInfo glyph = glyphs[ i ];
+      const GlyphInfo& glyph = glyphs[ i ];
 
       // No operation for white space
       if ( glyph.width && glyph.height )
@@ -231,7 +235,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
           }
         }
 
-        Vector2 position = positions[ i ];
+        const Vector2& position = positions[ i ];
         AtlasManager::Mesh2D newMesh;
         mGlyphManager.Cached( glyph.fontId, glyph.index, slot );
 
@@ -262,36 +266,38 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
           // Create a new image for the glyph
           BufferImage bitmap = mFontClient.CreateBitmap( glyph.fontId, glyph.index );
-
-          // Ensure that the next image will fit into the current block size
-          bool setSize = false;
-          if ( bitmap.GetWidth() > mBlockSizes[ currentBlockSize ].mNeededBlockWidth )
+          if ( bitmap )
           {
-            setSize = true;
-            mBlockSizes[ currentBlockSize ].mNeededBlockWidth = bitmap.GetWidth();
-          }
-          if ( bitmap.GetHeight() > mBlockSizes[ currentBlockSize ].mNeededBlockHeight )
-          {
-            setSize = true;
-            mBlockSizes[ currentBlockSize ].mNeededBlockHeight = bitmap.GetHeight();
-          }
+            // Ensure that the next image will fit into the current block size
+            bool setSize = false;
+            if ( bitmap.GetWidth() > mBlockSizes[ currentBlockSize ].mNeededBlockWidth )
+            {
+              setSize = true;
+              mBlockSizes[ currentBlockSize ].mNeededBlockWidth = bitmap.GetWidth();
+            }
+            if ( bitmap.GetHeight() > mBlockSizes[ currentBlockSize ].mNeededBlockHeight )
+            {
+              setSize = true;
+              mBlockSizes[ currentBlockSize ].mNeededBlockHeight = bitmap.GetHeight();
+            }
 
-          if ( setSize )
-          {
-            mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
-                                           DEFAULT_ATLAS_HEIGHT,
-                                           mBlockSizes[ currentBlockSize ].mNeededBlockWidth,
-                                           mBlockSizes[ currentBlockSize ].mNeededBlockHeight );
-          }
+            if ( setSize )
+            {
+              mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
+                                             DEFAULT_ATLAS_HEIGHT,
+                                             mBlockSizes[ currentBlockSize ].mNeededBlockWidth,
+                                             mBlockSizes[ currentBlockSize ].mNeededBlockHeight );
+            }
 
-          // Locate a new slot for our glyph
-          mGlyphManager.Add( glyph, bitmap, slot );
+            // Locate a new slot for our glyph
+            mGlyphManager.Add( glyph, bitmap, slot );
 
-          // Generate mesh data for this quad, plugging in our supplied position
-          if ( slot.mImageId )
-          {
-            mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
-            mImageIds.PushBack( slot.mImageId );
+            // Generate mesh data for this quad, plugging in our supplied position
+            if ( slot.mImageId )
+            {
+              mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
+              mImageIds.PushBack( slot.mImageId );
+            }
           }
         }
         // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
@@ -339,7 +345,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     }
 #if defined(DEBUG_ENABLED)
     Toolkit::AtlasGlyphManager::Metrics metrics = mGlyphManager.GetMetrics();
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "TextAtlasRenderer::GlyphManager::GlyphCount: %i, AtlasCount: %i, TextureMemoryUse: %iK\n",
+    DALI_LOG_INFO( gLogFilter, Debug::General, "TextAtlasRenderer::GlyphManager::GlyphCount: %i, AtlasCount: %i, TextureMemoryUse: %iK\n",
                                                 metrics.mGlyphCount,
                                                 metrics.mAtlasMetrics.mAtlasCount,
                                                 metrics.mAtlasMetrics.mTextureMemoryUsed / 1024 );
@@ -741,26 +747,32 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
 Text::RendererPtr AtlasRenderer::New()
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Text::AtlasRenderer::New()\n" );
+
   return Text::RendererPtr( new AtlasRenderer() );
 }
 
 Actor AtlasRenderer::Render( Text::ViewInterface& view )
 {
-
   UnparentAndReset( mImpl->mActor );
 
-  Text::Length numberOfGlyphs = view.GetNumberOfGlyphs();
+  Length numberOfGlyphs = view.GetNumberOfGlyphs();
 
-  if( numberOfGlyphs > 0 )
+  if( numberOfGlyphs > 0u )
   {
     Vector<GlyphInfo> glyphs;
     glyphs.Resize( numberOfGlyphs );
 
-    view.GetGlyphs( &glyphs[0], 0, numberOfGlyphs );
-
     std::vector<Vector2> positions;
     positions.resize( numberOfGlyphs );
-    view.GetGlyphPositions( &positions[0], 0, numberOfGlyphs );
+
+    numberOfGlyphs = view.GetGlyphs( glyphs.Begin(),
+                                     &positions[0],
+                                     0u,
+                                     numberOfGlyphs );
+    glyphs.Resize( numberOfGlyphs );
+    positions.resize( numberOfGlyphs );
+
     mImpl->AddGlyphs( positions,
                       glyphs,
                       view.GetTextColor(),
@@ -770,6 +782,7 @@ Actor AtlasRenderer::Render( Text::ViewInterface& view )
                       view.GetUnderlineColor(),
                       view.GetUnderlineHeight() );
   }
+
   return mImpl->mActor;
 }
 

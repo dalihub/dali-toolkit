@@ -79,19 +79,14 @@ Scrollable::ScrollCompletedSignalType& Scrollable::ScrollCompletedSignal()
   return GetImpl(*this).ScrollCompletedSignal();
 }
 
-bool Scrollable::IsScrollComponentEnabled(Scrollable::ScrollComponentType indicator) const
+bool Scrollable::IsOvershootEnabled() const
 {
-  return GetImpl(*this).IsScrollComponentEnabled(indicator);
+  return GetImpl(*this).IsOvershootEnabled();
 }
 
-void Scrollable::EnableScrollComponent(Scrollable::ScrollComponentType indicator)
+void Scrollable::SetOvershootEnabled(bool enable)
 {
-  GetImpl(*this).EnableScrollComponent(indicator);
-}
-
-void Scrollable::DisableScrollComponent(Scrollable::ScrollComponentType indicator)
-{
-  GetImpl(*this).DisableScrollComponent(indicator);
+  GetImpl(*this).SetOvershootEnabled(enable);
 }
 
 void Scrollable::SetOvershootEffectColor( const Vector4& color )

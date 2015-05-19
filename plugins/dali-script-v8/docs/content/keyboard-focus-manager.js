@@ -11,7 +11,7 @@ It also allows you to set an actor that is used to high light the focused actor.
 
 The application is required to help the manager when moving focus.
 
-<img src="../assets/img/focus-manager.png">
+![ Focus Manager ](../assets/img/focus-manager/focus-manager.png)
 
 ### keyboard-pre-focus-change
 

@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/text-abstraction/font-client.h>
-#include <dali/public-api/adaptor-framework/imf-manager.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/devel-api/adaptor-framework/imf-manager.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
@@ -42,8 +42,6 @@ struct Event
   // Used to queue input events until DoRelayout()
   enum Type
   {
-    KEYBOARD_FOCUS_GAIN_EVENT,
-    KEYBOARD_FOCUS_LOST_EVENT,
     CURSOR_KEY_EVENT,
     TAP_EVENT,
     PAN_EVENT,
@@ -154,9 +152,8 @@ struct ModifyEvent
 {
   enum Type
   {
-    PLACEHOLDER_TEXT, ///< Show the placeholder text if necessary
     TEXT_REPLACED,    ///< The entire text was replaced
-    TEXT_INSERTED,      ///< Insert characters at the current cursor position
+    TEXT_INSERTED,    ///< Insert characters at the current cursor position
     TEXT_DELETED      ///< Characters were deleted
   };
 
@@ -263,17 +260,6 @@ struct Controller::Impl
     return ( mEventData && mEventData->mIsShowingPlaceholderText );
   }
 
-  void ShowPlaceholderText()
-  {
-    if( IsPlaceholderAvailable() )
-    {
-      mEventData->mIsShowingPlaceholderText = true;
-
-      // Placeholder-text is dependent on focus state i.e. replace after event processing
-      QueueModifyEvent( ModifyEvent::PLACEHOLDER_TEXT );
-    }
-  }
-
   /**
    * @brief Called when placeholder-text is hidden
    */
@@ -288,7 +274,17 @@ struct Controller::Impl
     }
   }
 
-  void PreEditReset()
+  void ClearPreEditFlag()
+  {
+    if( mEventData )
+    {
+      mEventData->mPreEditFlag = false;
+      mEventData->mPreEditStartPosition = 0;
+      mEventData->mPreEditLength = 0;
+    }
+  }
+
+  void ResetImfManager()
   {
     // Reset incase we are in a pre-edit state.
     ImfManager imfManager = ImfManager::Get();
@@ -296,12 +292,9 @@ struct Controller::Impl
     {
       imfManager.Reset(); // Will trigger a commit message
     }
-  }
 
-  /**
-   * @brief Called when placeholder-text is shown
-   */
-  void ReplaceTextWithPlaceholder();
+    ClearPreEditFlag();
+  }
 
   void UpdateModel( OperationsMask operationsRequired );
 
@@ -312,8 +305,6 @@ struct Controller::Impl
    * @param[in] numberOfCharacters The number of characters in the logical model.
    */
   void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters );
-
-  void OnKeyboardFocus( bool hasFocus );
 
   void OnCursorKeyEvent( const Event& event );
 

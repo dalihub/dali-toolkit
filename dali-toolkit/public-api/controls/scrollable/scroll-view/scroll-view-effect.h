@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-handle.h>
 
 namespace Dali
@@ -41,10 +40,6 @@ class ScrollViewWobbleEffect;
 
 class ScrollView;
 class ScrollViewEffect;
-
-typedef std::vector<ScrollViewEffect> ScrollViewEffectContainer; ///< Container of Dali::Toolkit::ScrollViewEffect%s
-typedef ScrollViewEffectContainer::iterator ScrollViewEffectIter; ///< Iterator for Dali::Toolkit::ScrollViewEffectContainer
-typedef ScrollViewEffectContainer::const_iterator ScrollViewEffectConstIter; ///< Const Iterator for Dali::Toolkit::ScrollViewEffectContainer
 
 /**
  * @brief ScrollView Effect base class, used to apply custom effects to a

@@ -21,10 +21,10 @@
 // EXTERNAL INCLUDES
 #include <stdint.h>
 #include <cstring>
-#include <dali/public-api/images/image-operations.h>
+#include <dali/devel-api/images/image-operations.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/set-wrapper.h>
+#include <dali/devel-api/common/set-wrapper.h>
 #include <dali/integration-api/platform-abstraction.h>
 
 #include "test-trace-call-stack.h"

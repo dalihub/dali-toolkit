@@ -21,14 +21,14 @@
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
 #include <dali/public-api/adaptor-framework/key.h>
-#include <dali/public-api/adaptor-framework/physical-keyboard.h>
+#include <dali/devel-api/adaptor-framework/physical-keyboard.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/debug.h>
 
@@ -646,7 +646,7 @@ void Popup::OnRelayout( const Vector2& size, RelayoutContainer& container )
   mBackgroundImage.SetVisible( !( mButtons.empty() && mPopupLayout.GetChildCount() == 0 ) );
 
   // Relayout All buttons
-  if ( !mButtons.empty() )
+  if( !mButtons.empty() )
   {
     // All buttons should be the same size and fill the button area. The button spacing needs to be accounted for as well.
     Vector2 buttonSize( ( ( size.width - mPopupStyle->buttonSpacing * ( mButtons.size() + 1 ) ) / mButtons.size() ),
@@ -654,7 +654,7 @@ void Popup::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
     Vector3 buttonPosition( mPopupStyle->buttonSpacing, 0.0f, 0.0f );
 
-    for ( ActorIter iter = mButtons.begin(), endIter = mButtons.end();
+    for( std::vector< Actor >::iterator iter = mButtons.begin(), endIter = mButtons.end();
           iter != endIter;
           ++iter, buttonPosition.x += mPopupStyle->buttonSpacing + buttonSize.width )
     {
@@ -832,7 +832,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::C
   else
   {
     // Rebuild the focus chain because button or content can be added or removed dynamically
-    ActorContainer focusableActors;
+    std::vector< Actor > focusableActors;
     if( mContent && mContent.IsKeyboardFocusable() )
     {
       focusableActors.push_back(mContent);
@@ -846,7 +846,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::C
       }
     }
 
-    for ( ActorContainer::iterator iter = focusableActors.begin(), end = focusableActors.end(); iter != end; ++iter )
+    for( std::vector< Actor >::iterator iter = focusableActors.begin(), end = focusableActors.end(); iter != end; ++iter )
     {
       if ( currentFocusedActor == *iter )
       {

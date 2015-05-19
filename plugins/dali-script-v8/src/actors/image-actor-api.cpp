@@ -150,40 +150,6 @@ void ImageActorApi::GetImage( const v8::FunctionCallbackInfo<v8::Value>& args )
   args.GetReturnValue().Set( localObject );
 }
 
-/**
- * Query whether a pixel area has been set.
- * @for ImageActor
- * @method isPixelAreaSet
- * @return {Boolean} True if a pixel area has been set.
- */
-void ImageActorApi::IsPixelAreaSet( const v8::FunctionCallbackInfo<v8::Value>& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  ImageActor imageActor = GetImageActor( isolate, args );
-
-  args.GetReturnValue().Set( v8::Boolean::New( isolate, imageActor.IsPixelAreaSet() ) );
-}
-
-/**
- * Remove any pixel areas specified with SetPixelArea; the entire image will be displayed.
- *
- * The actor size will change to that of the Image unless a custom size was set, e.g. via
- * actor.size
- * @for ImageActor
- * @method clearPixelArea
- */
-void ImageActorApi::ClearPixelArea( const v8::FunctionCallbackInfo<v8::Value>& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  ImageActor imageActor = GetImageActor( isolate, args );
-
-  imageActor.ClearPixelArea();
-}
-
-
-
 } // namespace V8Plugin
 
 } // namespace Dali

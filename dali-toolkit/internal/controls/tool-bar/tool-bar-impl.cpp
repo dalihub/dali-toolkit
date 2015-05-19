@@ -22,7 +22,7 @@
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>

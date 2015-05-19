@@ -143,21 +143,21 @@ int UtcDaliItemViewAddAndGetLayout(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // As we have added one layout, check the number of layout is now 1
   DALI_TEST_CHECK(view.GetLayoutCount() == 1);
 
   // Create a depth layout and add it to ItemView
-  DepthLayoutPtr depthLayout = DepthLayout::New();
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
   view.AddLayout(*depthLayout);
 
   // As we have added another layout, check the number of layout is now 2
   DALI_TEST_CHECK(view.GetLayoutCount() == 2);
 
   // Create a spiral layout and add it to ItemView
-  SpiralLayoutPtr spiralLayout = SpiralLayout::New();
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
   view.AddLayout(*spiralLayout);
 
   // As we have added another layout, check the number of layout is now 3
@@ -179,14 +179,14 @@ int UtcDaliItemViewAddAndRemoveLayout(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // As we have added one layout, check the number of layout is now 1
   DALI_TEST_CHECK(view.GetLayoutCount() == 1);
 
   // Create a depth layout and add it to ItemView
-  DepthLayoutPtr depthLayout = DepthLayout::New();
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
   view.AddLayout(*depthLayout);
 
   // As we have added another layout, check the number of layout is now 2
@@ -222,15 +222,15 @@ int UtcDaliItemViewActivateLayoutAndGetActiveLayout(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // Create a depth layout and add it to ItemView
-  DepthLayoutPtr depthLayout = DepthLayout::New();
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
   view.AddLayout(*depthLayout);
 
   // Create a spiral layout and add it to ItemView
-  SpiralLayoutPtr spiralLayout = SpiralLayout::New();
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
   view.AddLayout(*spiralLayout);
 
   // As we have added three layouts, check the number of layout is now 3
@@ -269,7 +269,7 @@ int UtcDaliItemViewDeactivateCurrentLayout(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // Check there is no active layout at the moment
@@ -299,7 +299,7 @@ int UtcDaliItemViewGetItemAndGetItemId(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -323,7 +323,7 @@ int UtcDaliItemViewRemoveItem(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -356,7 +356,7 @@ int UtcDaliItemViewGetCurrentLayoutPosition(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -456,7 +456,7 @@ int UtcDaliItemViewScrollToItem(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
   Vector3 vec(480.0f, 800.0f, 0.0f);
-  GridLayoutPtr layout = GridLayout::New();
+  ItemLayoutPtr layout = DefaultItemLayout::New( DefaultItemLayout::GRID );
 
   view.SetName("view actor");
   view.AddLayout(*layout);

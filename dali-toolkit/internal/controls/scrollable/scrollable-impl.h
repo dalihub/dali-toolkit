@@ -18,13 +18,9 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/common/map-wrapper.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
-#include <dali-toolkit/public-api/controls/scrollable/scroll-component-impl.h>
 
 namespace Dali
 {
@@ -46,25 +42,20 @@ class Scrollable : public Control
 public:
 
   /**
-   * @copydoc Dali::Toolkit::Scrollable::IsScrollComponentEnabled(Scrollable::ScrollComponentType type)
+   * @copydoc Dali::Toolkit::Scrollable::IsOvershootEnabled
    */
-  bool IsScrollComponentEnabled(Toolkit::Scrollable::ScrollComponentType type) const;
+  bool IsOvershootEnabled() const;
 
   /**
-   * @copydoc Dali::Toolkit::Scrollable::EnableScrollComponent(Scrollable::ScrollComponentType type)
+   * @copydoc Dali::Toolkit::Scrollable::SetOvershootEnabled
    */
-  void EnableScrollComponent(Toolkit::Scrollable::ScrollComponentType type);
-
-  /**
-   * @copydoc Dali::Toolkit::Scrollable::DisableScrollComponent(Scrollable::ScrollComponentType type)
-   */
-  void DisableScrollComponent(Toolkit::Scrollable::ScrollComponentType type);
+  void SetOvershootEnabled(bool enable);
 
   /**
    * Gets the size of the domain (minimum/maximum extents for each axis to scroll to)
    * @return the domain size
    */
-  virtual Vector3 GetDomainSize() const = 0;
+  virtual Vector2 GetDomainSize() const = 0;
 
   /**
    * Adds actor as an Overlay to Scrollable
@@ -86,7 +77,7 @@ public:
    * Retrieves current scroll position.
    * @returns The current scroll position.
    */
-  virtual Vector3 GetCurrentScrollPosition() const = 0;
+  virtual Vector2 GetCurrentScrollPosition() const = 0;
 
   /**
    * Scrolls Scrollable to position specified (contents will scroll to this position)
@@ -95,7 +86,7 @@ public:
    * @param[in] position The position to scroll to.
    * @param[in] duration The duration of the animation in seconds
    */
-  virtual void ScrollTo(const Vector3 &position, float duration) = 0;
+  virtual void ScrollTo(const Vector2 &position, float duration) = 0;
 
   /**
    * Set the color of the overshoot effect.
@@ -122,11 +113,11 @@ public:
 private:
 
   /**
-   * Temporary function to override EnableScrollComponent functionality for overshoot
+   * Temporary function to override EnableScrollOvershoot functionality for overshoot
    * Only ScrollView needs to override this as HQ has not requested disable functionality in ItemView
    * @param[in] enable true to enable, false to disable overshoot indicator
    */
-  virtual void SetOvershootEnabled(bool enable) {}
+  virtual void EnableScrollOvershoot(bool enable) {}
 
 public: //Signals
 
@@ -200,7 +191,7 @@ private:
    *
    * @return The current position
    */
-  Vector3 GetPropertyPosition() const;
+  Vector2 GetPropertyPosition() const;
 
 private:
 
@@ -210,20 +201,10 @@ private:
   // Undefined
   Scrollable& operator=(const Scrollable& rhs);
 
-  /**
-   * Helper to create an initialized ScrollComponent
-   * @param[in] scrollable reference to ScrollView implementation
-   * @param[in] type the type of scroll component to create.
-   * @return A pointer to the created ScrollComponent.
-   */
-  Toolkit::ScrollComponent NewScrollComponent(Toolkit::Scrollable& scrollable, Toolkit::Scrollable::ScrollComponentType type);
-
 protected:
 
   Vector4         mOvershootEffectColor;    ///<The color of the overshoot bouncing effect
   float           mOvershootAnimationSpeed; ///<The speed of the overshoot animation (pixels per second)
-
-  std::map<Toolkit::Scrollable::ScrollComponentType, ScrollComponentPtr> mComponent;  ///< ScrollComponent (such as a scrollbar/page indicator/status)
 
   Toolkit::Scrollable::ScrollStartedSignalType mScrollStartedSignal;
   Toolkit::Scrollable::ScrollUpdatedSignalType mScrollUpdatedSignal;
@@ -231,10 +212,6 @@ protected:
 
 private:
 
-  typedef std::map<Toolkit::Scrollable::ScrollComponentType, ScrollComponentPtr> ComponentContainer;
-  typedef ComponentContainer::iterator ComponentIter;
-
-  ComponentContainer mComponents;  ///< ScrollComponent (such as a scrollbar/page indicator/status)
   bool mOvershootEnabled:1;
 };
 

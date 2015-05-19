@@ -46,13 +46,12 @@ enum ClampState
 };
 
 /**
- * @brief A 3 dimensional clamp
+ * @brief A 2 dimensional clamp
  */
-struct ClampState3D
+struct ClampState2D
 {
   ClampState x; ///< The clamp state of the x axis
   ClampState y; ///< The clamp state of the y axis
-  ClampState z; ///< The clamp state of the z axis
 };
 
 /**
@@ -132,6 +131,9 @@ public:
 
 };
 
+// Forward declare future extension interface
+class RulerExtension;
+
 /**
  * @brief Abstract class to define scroll axes.
  *
@@ -200,6 +202,13 @@ public:
    * @return The number of pages in the Ruler.
    */
   virtual unsigned int GetTotalPages() const = 0;
+
+  /**
+   * @brief Gets the extension interface of the Ruler.
+   *
+   * @return The extension interface of the Ruler
+   */
+  virtual RulerExtension* GetExtension() { return NULL; }
 
 public:
 
@@ -407,19 +416,6 @@ class ScrollView;
  */
 class DALI_IMPORT_API ScrollView : public Scrollable
 {
-public:
-
-  // Default settings
-
-  static const float DEFAULT_SLOW_SNAP_ANIMATION_DURATION;              ///< Default Drag-Release animation time.
-  static const float DEFAULT_FAST_SNAP_ANIMATION_DURATION;              ///< Default Drag-Flick animation time.
-  static const float DEFAULT_SNAP_OVERSHOOT_DURATION;                   ///< Default Overshoot snapping animation time.
-  static const float DEFAULT_MAX_OVERSHOOT;                             ///< Default maximum allowed overshoot
-
-  static const float DEFAULT_AXIS_AUTO_LOCK_GRADIENT;                   ///< Default Axis-AutoLock gradient threshold. default is 0.36:1 (20 degrees)
-  static const float DEFAULT_FRICTION_COEFFICIENT;                      ///< Default Friction Co-efficient. (in stage diagonals per second)
-  static const float DEFAULT_FLICK_SPEED_COEFFICIENT;                   ///< Default Flick speed coefficient (multiples input touch velocity)
-  static const float DEFAULT_MAX_FLICK_SPEED;                           ///< Default Maximum flick speed. (in stage diagonals per second)
 
 public:
 
@@ -428,8 +424,8 @@ public:
    */
   struct ClampEvent
   {
-    ClampState3D scale;       ///< Clamp information for scale axes
-    ClampState3D position;    ///< Clamp information for position axes
+    ClampState2D scale;       ///< Clamp information for scale axes
+    ClampState2D position;    ///< Clamp information for position axes
     ClampState   rotation;    ///< Clamp information for rotation
   };
 
@@ -439,7 +435,7 @@ public:
   struct SnapEvent
   {
     SnapType type;    ///< Current snap commencing
-    Vector3 position; ///< Target snap position
+    Vector2 position; ///< Target snap position
     float duration;   ///< Duration of snap animation.
   };
 
@@ -459,27 +455,33 @@ public:
   {
     enum
     {
-      SCROLL_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scroll-position",       type Vector3
-      SCROLL_PRE_POSITION,                               ///< Property, name "scroll-pre-position",   type Vector3
-      OVERSHOOT_X,                                       ///< Property, name "overshoot-x",           type float
-      OVERSHOOT_Y,                                       ///< Property, name "overshoot-y",           type float
-      SCROLL_FINAL,                                      ///< Property, name "scroll-final",          type Vector3
-      WRAP,                                              ///< Property, name "wrap",                  type bool
-      PANNING,                                           ///< Property, name "panning",               type bool
-      SCROLLING,                                         ///< Property, name "scrolling",             type bool
-      SCROLL_DOMAIN_OFFSET,                              ///< Property, name "scroll-domain-offset"   type Vector3
-      SCROLL_POSITION_DELTA,                             ///< Property, name "scroll-position-delta"  type Vector3
-      START_PAGE_POSITION                                ///< Property, name "start-page-position"    type Vector3
+      SCROLL_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scroll-position",           type Vector2
+      SCROLL_PRE_POSITION,                               ///< Property, name "scroll-pre-position",       type Vector2
+      SCROLL_PRE_POSITION_X,                             ///< Property, name "scroll-pre-position-x",     type float
+      SCROLL_PRE_POSITION_Y,                             ///< Property, name "scroll-pre-position-y",     type float
+      SCROLL_PRE_POSITION_MAX,                           ///< Property, name "scroll-pre-position-max",   type Vector2
+      SCROLL_PRE_POSITION_MAX_X,                         ///< Property, name "scroll-pre-position-max-x", type float
+      SCROLL_PRE_POSITION_MAX_Y,                         ///< Property, name "scroll-pre-position-max-y", type float
+      OVERSHOOT_X,                                       ///< Property, name "overshoot-x",               type float
+      OVERSHOOT_Y,                                       ///< Property, name "overshoot-y",               type float
+      SCROLL_FINAL,                                      ///< Property, name "scroll-final",              type Vector2
+      SCROLL_FINAL_X,                                    ///< Property, name "scroll-final-x",            type float
+      SCROLL_FINAL_Y,                                    ///< Property, name "scroll-final-y",            type float
+      WRAP,                                              ///< Property, name "wrap",                      type bool
+      PANNING,                                           ///< Property, name "panning",                   type bool
+      SCROLLING,                                         ///< Property, name "scrolling",                 type bool
+      SCROLL_DOMAIN_SIZE,                                ///< Property, name "scroll-domain-size"         type Vector2
+      SCROLL_DOMAIN_SIZE_X,                              ///< Property, name "scroll-domain-size-x"       type float
+      SCROLL_DOMAIN_SIZE_Y,                              ///< Property, name "scroll-domain-size-y"       type float
+      SCROLL_DOMAIN_OFFSET,                              ///< Property, name "scroll-domain-offset"       type Vector2
+      SCROLL_POSITION_DELTA,                             ///< Property, name "scroll-position-delta"      type Vector2
+      START_PAGE_POSITION                                ///< Property, name "start-page-position"        type Vector3
     };
   };
 
-  typedef Signal< void ( const SnapEvent& ) > SnapStartedSignalType; ///< SnapStarted signal type
+  // Typedefs
 
-  /**
-   * @brief Signal emitted when the ScrollView has started to snap or flick (it tells the target
-   * position, scale, rotation for the snap or flick)
-   */
-  SnapStartedSignalType& SnapStartedSignal();
+  typedef Signal< void ( const SnapEvent& ) > SnapStartedSignalType; ///< SnapStarted signal type
 
 public:
 
@@ -862,7 +864,7 @@ public:
    *
    * @returns The current scroll position.
    */
-  Vector3 GetCurrentScrollPosition() const;
+  Vector2 GetCurrentScrollPosition() const;
 
   /**
    * @brief Sets the current scroll position, overriding current scroll animations. If panning is currently taking place
@@ -870,7 +872,7 @@ public:
    *
    * @param[in] position The new scroll position to set.
    */
-  void SetScrollPosition(const Vector3& position);
+  void SetScrollPosition(const Vector2& position);
 
   /**
    * @brief Retrieves current scroll page based on ScrollView
@@ -895,7 +897,7 @@ public:
    *
    * @param[in] position The position to scroll to.
    */
-  void ScrollTo(const Vector3 &position);
+  void ScrollTo(const Vector2& position);
 
   /**
    * @brief Scrolls View to position specified (contents will scroll to this position).
@@ -909,7 +911,7 @@ public:
    * @param[in] position The position to scroll to.
    * @param[in] duration The duration of the animation in seconds
    */
-  void ScrollTo(const Vector3 &position, float duration);
+  void ScrollTo(const Vector2& position, float duration);
 
   /**
    * @brief Scrolls View to position specified (contents will scroll to this position)
@@ -924,7 +926,7 @@ public:
    * @param[in] duration The duration of the animation in seconds
    * @param[in] alpha The alpha function to use
    */
-  void ScrollTo(const Vector3 &position, float duration, AlphaFunction alpha);
+  void ScrollTo(const Vector2& position, float duration, AlphaFunction alpha);
 
   /**
    * @brief Scrolls View to position specified (contents will scroll to this position).
@@ -943,7 +945,7 @@ public:
    * @param[in] horizontalBias Whether to bias scrolling to left or right.
    * @param[in] verticalBias Whether to bias scrolling to top or bottom.
    */
-  void ScrollTo(const Vector3 &position, float duration,
+  void ScrollTo(const Vector2& position, float duration,
                 DirectionBias horizontalBias, DirectionBias verticalBias);
 
   /**
@@ -964,7 +966,7 @@ public:
    * @param[in] verticalBias Whether to bias scrolling to top or bottom.
    * @param[in] alpha Alpha function to use
    */
-  void ScrollTo(const Vector3 &position, float duration, AlphaFunction alpha,
+  void ScrollTo(const Vector2& position, float duration, AlphaFunction alpha,
                 DirectionBias horizontalBias, DirectionBias verticalBias);
 
   /**
@@ -1109,6 +1111,21 @@ public:
    *                      Usually will be PanGestureDetector::DIRECTION_VERTICAL or PanGestureDetector::DIRECTION_HORIZONTAL (but can be any other angle if desired).
    */
   void RemoveScrollingDirection( Radian direction );
+
+public: // Signals
+
+  /**
+   * @brief Signal emitted when the ScrollView has started to snap or flick (it tells the target
+   * position, scale, rotation for the snap or flick)
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName(const SnapEvent& event);
+   * @endcode
+   * @pre The Object has been initialized.
+   * @return The signal to connect to.
+   */
+  SnapStartedSignalType& SnapStartedSignal();
 
 public: // Not intended for application developers
 

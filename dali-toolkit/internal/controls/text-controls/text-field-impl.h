@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/adaptor-framework/imf-manager.h>
+#include <dali/devel-api/adaptor-framework/imf-manager.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>

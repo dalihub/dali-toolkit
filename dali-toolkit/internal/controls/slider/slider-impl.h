@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/public-api/object/property-array.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>

@@ -20,9 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <string>
-#include <dali/public-api/adaptor-framework/accessibility-action-handler.h>
-#include <dali/public-api/adaptor-framework/accessibility-gesture-handler.h>
-#include <dali/public-api/common/map-wrapper.h>
+#include <dali/devel-api/common/map-wrapper.h>
+#include <dali/devel-api/adaptor-framework/accessibility-action-handler.h>
+#include <dali/devel-api/adaptor-framework/accessibility-gesture-handler.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
 

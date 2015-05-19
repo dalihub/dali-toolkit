@@ -1,6 +1,6 @@
 /**
  *
-<h3> Dali Constants </h3>
+### Dali Constants
 
 Constants accessible under the dali global object.
   
@@ -87,11 +87,6 @@ Constants accessible under the dali global object.
 |BLENDING_AUTO                             | integer value |
 |BLENDING_ON                               | integer value |
 
-|**actor.SetBlendEquation()  ** | |
-|BLEND_EQUATION_ADD                         | integer value  |
-|BLEND_EQUATION_SUBTRACT                    | integer value  |
-|BLEND_EQUATION_REVERSE_SUBTRACT            | integer value  |
-
 |**actor.SetCullFace()** | |
 |CULL_FACE_DISABLE          | integer value  |
 |CULL_FRONT_FACE           | integer value  |
@@ -148,7 +143,6 @@ Constants accessible under the dali global object.
 | PIXEL_FORMAT_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC            | integer value  |
 | PIXEL_FORMAT_COMPRESSED_RGB8_ETC1                        | integer value  |
 | PIXEL_FORMAT_COMPRESSED_RGB_PVRTC_4BPPV1                 | integer value  |
-</table>
 
  * @class Constants
  */

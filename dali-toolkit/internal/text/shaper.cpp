@@ -19,8 +19,8 @@
 #include <dali-toolkit/internal/text/shaper.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/text-abstraction/script.h>
-#include <dali/public-api/text-abstraction/shaping.h>
+#include <dali/devel-api/text-abstraction/script.h>
+#include <dali/devel-api/text-abstraction/shaping.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/font-run.h>

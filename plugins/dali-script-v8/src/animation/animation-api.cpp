@@ -1030,7 +1030,7 @@ void AnimationApi::AnimateTo( const v8::FunctionCallbackInfo< v8::Value >& args 
  *
  *  create some keyframes to move an actor around a square, and return to the start
  * </br >
- *  <img src="../assets/img/keyframe-animation.png">
+ *  <img src="../assets/img/animation/keyframe-animation.png">
  *
  *
  *     var keyframes = [

@@ -18,10 +18,14 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/text/rendering/basic/text-basic-renderer.h>
 
-// INTERNAL INCLUDES
-#include <dali/public-api/text-abstraction/font-client.h>
+// EXTERNAL INCLUDES
+#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/public-api/actors/image-actor.h>
-#include <dali/public-api/images/atlas.h>
+#include <dali/devel-api/images/atlas.h>
+#include <dali/integration-api/debug.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-basic-shader.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-bgra-shader.h>
 
@@ -32,6 +36,10 @@ using namespace Dali::Toolkit::Text;
 
 namespace
 {
+
+#if defined(DEBUG_ENABLED)
+  Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_RENDERING");
+#endif
 
 const std::size_t PADDING = 2; //< To avoid GL filtering artefacts
 
@@ -329,6 +337,8 @@ struct BasicRenderer::Impl
 
 Text::RendererPtr BasicRenderer::New()
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Text::BasicRenderer::New()\n" );
+
   return Text::RendererPtr( new BasicRenderer() );
 }
 
@@ -337,18 +347,23 @@ Actor BasicRenderer::Render( Text::ViewInterface& view )
   // Remove the previous text
   UnparentAndReset( mImpl->mActor );
 
-  Text::Length numberOfGlyphs = view.GetNumberOfGlyphs();
+  Length numberOfGlyphs = view.GetNumberOfGlyphs();
 
-  if( numberOfGlyphs > 0 )
+  if( numberOfGlyphs > 0u )
   {
     Vector<GlyphInfo> glyphs;
     glyphs.Resize( numberOfGlyphs );
 
-    view.GetGlyphs( &glyphs[0], 0, numberOfGlyphs );
-
     std::vector<Vector2> positions;
     positions.resize( numberOfGlyphs );
-    view.GetGlyphPositions( &positions[0], 0, numberOfGlyphs );
+
+    numberOfGlyphs = view.GetGlyphs( glyphs.Begin(),
+                                     &positions[0],
+                                     0u,
+                                     numberOfGlyphs );
+
+    glyphs.Resize( numberOfGlyphs );
+    positions.resize( numberOfGlyphs );
 
     mImpl->CreateAtlases( glyphs );
 

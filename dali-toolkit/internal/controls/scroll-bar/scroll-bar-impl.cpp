@@ -20,10 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
+#include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
@@ -44,15 +45,33 @@ const float DEFAULT_PAN_GESTURE_PROCESS_TIME(16.7f); // 16.7 milliseconds, i.e. 
 const float DEFAULT_INDICATOR_FIXED_HEIGHT(80.0f);
 
 /**
+ * Indicator size constraint
  * Indicator size depends on both indicator's parent size and the scroll content size
  */
-Vector3 IndicatorSize( const Vector3& parentSize, float contentSize)
+struct IndicatorSizeConstraint
 {
-  float height = contentSize > parentSize.height ?
-                 parentSize.height * ( parentSize.height / contentSize ) :
-                 parentSize.height * ( (parentSize.height - contentSize * 0.5f) / parentSize.height);
-  return Vector3( parentSize.width, std::max(MINIMUM_INDICATOR_HEIGHT, height), parentSize.depth );
-}
+  IndicatorSizeConstraint()
+  {
+  }
+
+  /**
+   * Constraint operator
+   * @param[in] current The current indicator size
+   * @param[in] parentSizeProperty The parent size of scroll indicator.
+   * @return The new scroll indicator size.
+   */
+  void operator()(Vector3& current, const PropertyInputContainer& inputs )
+  {
+    const Vector3& parentSize = inputs[0]->GetVector3();
+    const float contentSize = inputs[1]->GetFloat();
+
+    float height = contentSize > parentSize.height ?
+                   parentSize.height * ( parentSize.height / contentSize ) :
+                   parentSize.height * ( (parentSize.height - contentSize * 0.5f) / parentSize.height);
+
+    current.y = std::max(MINIMUM_INDICATOR_HEIGHT, height);
+  }
+};
 
 /**
  * Indicator position constraint
@@ -64,9 +83,7 @@ struct IndicatorPositionConstraint
    * @param[in] minPosition The minimum limit of scroll position
    * @param[in] maxPosition the maximum limit of scroll position
    */
-  IndicatorPositionConstraint(float minPosition, float maxPosition)
-  : mMinPosition(minPosition),
-    mMaxPosition(maxPosition)
+  IndicatorPositionConstraint()
   {
   }
 
@@ -80,17 +97,14 @@ struct IndicatorPositionConstraint
   {
     const Vector3& indicatorSize = inputs[0]->GetVector3();
     const Vector3& parentSize = inputs[1]->GetVector3();
-    float scrollPosition = inputs[2]->GetFloat();
+    const float scrollPosition = -inputs[2]->GetFloat();
+    const float minScrollPosition = inputs[3]->GetFloat();
+    const float maxScrollPosition = inputs[4]->GetFloat();
 
-    const float domainSize = fabs(mMaxPosition - mMinPosition);
-    float relativePosition = (mMaxPosition - scrollPosition) / domainSize;
-
-    current.y = relativePosition * ( parentSize.height - indicatorSize.height );
+    float relativePosition = std::max( 0.0f, std::min( 1.0f, (scrollPosition - minScrollPosition) / (maxScrollPosition - minScrollPosition) ) );
+    current.y = ( parentSize.height - indicatorSize.height ) * relativePosition;
     current.z = DEFAULT_SLIDER_DEPTH;
   }
-
-  float mMinPosition;  ///< The minimum scroll position
-  float mMaxPosition;  ///< The maximum scroll position
 };
 
 } // unnamed namespace
@@ -115,30 +129,40 @@ BaseHandle Create()
 }
 
 // Setup properties, signals and actions using the type-registry.
-DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ScrollBar, Toolkit::ScrollComponent, Create );
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ScrollBar, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-height-policy", STRING, INDICATOR_HEIGHT_POLICY         )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-fixed-height",  FLOAT,  INDICATOR_FIXED_HEIGHT          )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-show-duration", FLOAT,  INDICATOR_SHOW_DURATION         )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-hide-duration", FLOAT,  INDICATOR_HIDE_DURATION         )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "scroll-direction",                  STRING, SCROLL_DIRECTION          )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-height-policy",           STRING, INDICATOR_HEIGHT_POLICY   )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-fixed-height",            FLOAT,  INDICATOR_FIXED_HEIGHT    )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-show-duration",           FLOAT,  INDICATOR_SHOW_DURATION   )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicator-hide-duration",           FLOAT,  INDICATOR_HIDE_DURATION   )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "scroll-position-intervals",         ARRAY,  SCROLL_POSITION_INTERVALS )
 
-DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "scroll-position-notified",        SCROLL_POSITION_NOTIFIED_SIGNAL )
+DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "pan-finished",                      PAN_FINISHED_SIGNAL )
+DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "scroll-position-interval-reached",  SCROLL_POSITION_INTERVAL_REACHED_SIGNAL )
 
 DALI_TYPE_REGISTRATION_END()
 
+const char* SCROLL_DIRECTION_NAME[] = {"Vertical", "Horizontal"};
 const char* INDICATOR_HEIGHT_POLICY_NAME[] = {"Variable", "Fixed"};
 
 }
 
-ScrollBar::ScrollBar()
-: mIndicatorShowDuration(DEFAULT_INDICATOR_SHOW_DURATION),
+ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+  mDirection(direction),
+  mScrollableObject(Handle()),
+  mPropertyScrollPosition(Property::INVALID_INDEX),
+  mPropertyMinScrollPosition(Property::INVALID_INDEX),
+  mPropertyMaxScrollPosition(Property::INVALID_INDEX),
+  mPropertyScrollContentSize(Property::INVALID_INDEX),
+  mIndicatorShowDuration(DEFAULT_INDICATOR_SHOW_DURATION),
   mIndicatorHideDuration(DEFAULT_INDICATOR_HIDE_DURATION),
   mScrollStart(0.0f),
   mIsPanning(false),
   mCurrentScrollPosition(0.0f),
   mIndicatorHeightPolicy(Toolkit::ScrollBar::Variable),
-  mIndicatorFixedHeight(DEFAULT_INDICATOR_FIXED_HEIGHT),
-  mPropertyIndicatorPosition(Property::INVALID_INDEX)
+  mIndicatorFixedHeight(DEFAULT_INDICATOR_FIXED_HEIGHT)
 {
 }
 
@@ -148,43 +172,77 @@ ScrollBar::~ScrollBar()
 
 void ScrollBar::OnInitialize()
 {
-  Actor self = Self();
-
-  Image indicatorImage = ResourceImage::New( DEFAULT_INDICATOR_IMAGE_PATH );
-  mIndicator = ImageActor::New( indicatorImage );
-  mIndicator.SetNinePatchBorder( DEFAULT_INDICATOR_NINE_PATCH_BORDER );
-  mIndicator.SetStyle( ImageActor::STYLE_NINE_PATCH );
-  mIndicator.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  mIndicator.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  self.Add(mIndicator);
-
-  self.SetDrawMode(DrawMode::OVERLAY);
-
-  // Enable the pan gesture which is attached to the control
-  EnableGestureDetection(Gesture::Type(Gesture::Pan));
+  CreateDefaultIndicatorActor();
 }
 
-void ScrollBar::OnScrollConnectorSet( Toolkit::ScrollConnector oldConnector )
+void ScrollBar::SetScrollPropertySource( Handle handle, Property::Index propertyScrollPosition, Property::Index propertyMinScrollPosition, Property::Index propertyMaxScrollPosition, Property::Index propertyScrollContentSize )
 {
-  if( oldConnector )
+  if( handle
+      && propertyScrollPosition != Property::INVALID_INDEX
+      && propertyMinScrollPosition != Property::INVALID_INDEX
+      && propertyMaxScrollPosition != Property::INVALID_INDEX
+      && propertyScrollContentSize != Property::INVALID_INDEX )
   {
-    oldConnector.DomainChangedSignal().Disconnect(this, &ScrollBar::OnScrollDomainChanged);
-
-    mScrollPositionObject.Reset();
-  }
-
-  if( mScrollConnector )
-  {
-    mScrollPositionObject = mScrollConnector.GetScrollPositionObject();
+    mScrollableObject = handle;
+    mPropertyScrollPosition = propertyScrollPosition;
+    mPropertyMinScrollPosition = propertyMinScrollPosition;
+    mPropertyMaxScrollPosition = propertyMaxScrollPosition;
+    mPropertyScrollContentSize = propertyScrollContentSize;
 
     ApplyConstraints();
-    mScrollConnector.DomainChangedSignal().Connect(this, &ScrollBar::OnScrollDomainChanged);
+  }
+  else
+  {
+    DALI_LOG_ERROR("Can not set empty handle of source object or invalid source property index\n");
   }
 }
 
-void ScrollBar::SetIndicatorImage( Image image )
+void ScrollBar::CreateDefaultIndicatorActor()
 {
-  mIndicator.SetImage(image);
+  Image indicatorImage = ResourceImage::New( DEFAULT_INDICATOR_IMAGE_PATH );
+  ImageActor indicator = ImageActor::New( indicatorImage );
+  indicator.SetNinePatchBorder( DEFAULT_INDICATOR_NINE_PATCH_BORDER );
+  indicator.SetStyle( ImageActor::STYLE_NINE_PATCH );
+  indicator.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  indicator.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  SetScrollIndicator(indicator);
+}
+
+void ScrollBar::SetScrollIndicator( Actor indicator )
+{
+  // Don't allow empty handle
+  if( indicator )
+  {
+    mIndicator = indicator;
+
+    Actor self = Self();
+    self.Add(mIndicator);
+    self.SetDrawMode(DrawMode::OVERLAY);
+
+    if( !mPanGestureDetector )
+    {
+      mPanGestureDetector = PanGestureDetector::New();
+      mPanGestureDetector.DetectedSignal().Connect(this, &ScrollBar::OnPan);
+    }
+
+    mPanGestureDetector.DetachAll();
+    mPanGestureDetector.Attach( mIndicator );
+
+    unsigned int childCount = mIndicator.GetChildCount();
+    for ( unsigned int index = 0; index < childCount; index++ )
+    {
+      Actor child = mIndicator.GetChildAt( index );
+      if ( child )
+      {
+        mPanGestureDetector.Attach( child );
+      }
+    }
+  }
+  else
+  {
+    DALI_LOG_ERROR("Empty handle of scroll indicator\n");
+  }
 }
 
 Actor ScrollBar::GetScrollIndicator()
@@ -194,8 +252,13 @@ Actor ScrollBar::GetScrollIndicator()
 
 void ScrollBar::ApplyConstraints()
 {
-  if( mScrollConnector )
+  if( mScrollableObject )
   {
+    if(mIndicatorSizeConstraint)
+    {
+      mIndicatorSizeConstraint.Remove();
+    }
+
     // Set indicator height according to the indicator's height policy
     if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
     {
@@ -203,7 +266,10 @@ void ScrollBar::ApplyConstraints()
     }
     else
     {
-      mIndicator.SetSize( IndicatorSize( Self().GetCurrentSize(), mScrollConnector.GetContentLength() ) );
+      mIndicatorSizeConstraint = Constraint::New<Vector3>( mIndicator, Actor::Property::SIZE, IndicatorSizeConstraint() );
+      mIndicatorSizeConstraint.AddSource( ParentSource( Actor::Property::SIZE ) );
+      mIndicatorSizeConstraint.AddSource( Source( mScrollableObject, mPropertyScrollContentSize ) );
+      mIndicatorSizeConstraint.Apply();
     }
 
     if(mIndicatorPositionConstraint)
@@ -211,37 +277,48 @@ void ScrollBar::ApplyConstraints()
       mIndicatorPositionConstraint.Remove();
     }
 
-    mIndicatorPositionConstraint = Constraint::New<Vector3>( mIndicator, Actor::Property::POSITION, IndicatorPositionConstraint( mScrollConnector.GetMinLimit(), mScrollConnector.GetMaxLimit() ) );
+    mIndicatorPositionConstraint = Constraint::New<Vector3>( mIndicator, Actor::Property::POSITION, IndicatorPositionConstraint() );
     mIndicatorPositionConstraint.AddSource( LocalSource( Actor::Property::SIZE ) );
     mIndicatorPositionConstraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-    mIndicatorPositionConstraint.AddSource( Source( mScrollPositionObject, Toolkit::ScrollConnector::SCROLL_POSITION ) );
+    mIndicatorPositionConstraint.AddSource( Source( mScrollableObject, mPropertyScrollPosition ) );
+    mIndicatorPositionConstraint.AddSource( Source( mScrollableObject, mPropertyMinScrollPosition ) );
+    mIndicatorPositionConstraint.AddSource( Source( mScrollableObject, mPropertyMaxScrollPosition ) );
     mIndicatorPositionConstraint.Apply();
   }
 }
 
-void ScrollBar::SetPositionNotifications( const std::vector<float>& positions )
+void ScrollBar::SetScrollPositionIntervals( const Dali::Vector<float>& positions )
 {
-  if(mScrollPositionObject)
+  mScrollPositionIntervals = positions;
+
+  if( mScrollableObject )
   {
-    if(mPositionNotification)
+    if( mPositionNotification )
     {
-      mScrollPositionObject.RemovePropertyNotification(mPositionNotification);
+      mScrollableObject.RemovePropertyNotification(mPositionNotification);
     }
-    mPositionNotification = mScrollPositionObject.AddPropertyNotification( Toolkit::ScrollConnector::SCROLL_POSITION, VariableStepCondition(positions) );
-    mPositionNotification.NotifySignal().Connect( this, &ScrollBar::OnScrollPositionNotified );
+
+    mPositionNotification = mScrollableObject.AddPropertyNotification( mPropertyScrollPosition, VariableStepCondition(mScrollPositionIntervals) );
+    mPositionNotification.NotifySignal().Connect( this, &ScrollBar::OnScrollPositionIntervalReached );
   }
 }
 
-void ScrollBar::OnScrollPositionNotified(PropertyNotification& source)
+Dali::Vector<float> ScrollBar::GetScrollPositionIntervals() const
 {
-  // Emit the signal to notify the scroll position crossing
-  mScrollPositionNotifiedSignal.Emit(mScrollConnector.GetScrollPosition());
+  return mScrollPositionIntervals;
 }
 
-void ScrollBar::Show()
+void ScrollBar::OnScrollPositionIntervalReached(PropertyNotification& source)
 {
-  Actor self = Self();
+  // Emit the signal to notify the scroll position crossing
+  if(mScrollableObject)
+  {
+    mScrollPositionIntervalReachedSignal.Emit(mScrollableObject.GetProperty<float>(mPropertyScrollPosition));
+  }
+}
 
+void ScrollBar::ShowIndicator()
+{
   // Cancel any animation
   if(mAnimation)
   {
@@ -252,19 +329,17 @@ void ScrollBar::Show()
   if(mIndicatorShowDuration > 0.0f)
   {
     mAnimation = Animation::New( mIndicatorShowDuration );
-    mAnimation.AnimateTo( Property( self, Actor::Property::COLOR_ALPHA ), 1.0f, AlphaFunction::EASE_IN );
+    mAnimation.AnimateTo( Property( mIndicator, Actor::Property::COLOR_ALPHA ), 1.0f, AlphaFunction::EASE_IN );
     mAnimation.Play();
   }
   else
   {
-    self.SetOpacity(1.0f);
+    mIndicator.SetOpacity(1.0f);
   }
 }
 
-void ScrollBar::Hide()
+void ScrollBar::HideIndicator()
 {
-  Actor self = Self();
-
   // Cancel any animation
   if(mAnimation)
   {
@@ -275,46 +350,46 @@ void ScrollBar::Hide()
   if(mIndicatorHideDuration > 0.0f)
   {
     mAnimation = Animation::New( mIndicatorHideDuration );
-    mAnimation.AnimateTo( Property( self, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunction::EASE_IN );
+    mAnimation.AnimateTo( Property( mIndicator, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunction::EASE_IN );
     mAnimation.Play();
   }
   else
   {
-    self.SetOpacity(0.0f);
+    mIndicator.SetOpacity(0.0f);
   }
 }
 
 bool ScrollBar::OnPanGestureProcessTick()
 {
   // Update the scroll position property.
-  if( mScrollConnector )
+  if( mScrollableObject )
   {
-    mScrollConnector.SetScrollPosition(mCurrentScrollPosition);
+    mScrollableObject.SetProperty(mPropertyScrollPosition, mCurrentScrollPosition);
   }
 
   return true;
 }
 
-void ScrollBar::OnPan( PanGesture gesture )
+void ScrollBar::OnPan( Actor source, const PanGesture& gesture )
 {
-  if(mScrollConnector)
+  if(mScrollableObject)
   {
-    Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(Self().GetParent());
+    Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::DownCast(mScrollableObject);
 
     switch(gesture.state)
     {
       case Gesture::Started:
       {
-        if( !mTimer )
+        if( !mPanProcessTimer )
         {
           // Make sure the pan gesture is only being processed once per frame.
-          mTimer = Timer::New( DEFAULT_PAN_GESTURE_PROCESS_TIME );
-          mTimer.TickSignal().Connect( this, &ScrollBar::OnPanGestureProcessTick );
-          mTimer.Start();
+          mPanProcessTimer = Timer::New( DEFAULT_PAN_GESTURE_PROCESS_TIME );
+          mPanProcessTimer.TickSignal().Connect( this, &ScrollBar::OnPanGestureProcessTick );
+          mPanProcessTimer.Start();
         }
 
-        Show();
-        mScrollStart = mScrollConnector.GetScrollPosition();
+        ShowIndicator();
+        mScrollStart = mScrollableObject.GetProperty<float>(mPropertyScrollPosition);
         mGestureDisplacement = Vector3::ZERO;
         mIsPanning = true;
 
@@ -326,9 +401,12 @@ void ScrollBar::OnPan( PanGesture gesture )
         mGestureDisplacement+=delta;
 
         Vector3 span = Self().GetCurrentSize() - mIndicator.GetCurrentSize();
-        const float domainSize = fabs(mScrollConnector.GetMaxLimit() - mScrollConnector.GetMinLimit());
+        float minScrollPosition = mScrollableObject.GetProperty<float>(mPropertyMinScrollPosition);
+        float maxScrollPosition = mScrollableObject.GetProperty<float>(mPropertyMaxScrollPosition);
+        float domainSize = maxScrollPosition - minScrollPosition;
+
         mCurrentScrollPosition = mScrollStart - mGestureDisplacement.y * domainSize / span.y;
-        mCurrentScrollPosition = std::min(mScrollConnector.GetMaxLimit(), std::max(mCurrentScrollPosition, mScrollConnector.GetMinLimit()));
+        mCurrentScrollPosition = 0.0f - std::min(maxScrollPosition, std::max(-mCurrentScrollPosition, minScrollPosition));
 
         break;
       }
@@ -336,12 +414,12 @@ void ScrollBar::OnPan( PanGesture gesture )
       {
         mIsPanning = false;
 
-        if( mTimer )
+        if( mPanProcessTimer )
         {
           // Destroy the timer when pan gesture is finished.
-          mTimer.Stop();
-          mTimer.TickSignal().Disconnect( this, &ScrollBar::OnPanGestureProcessTick );
-          mTimer.Reset();
+          mPanProcessTimer.Stop();
+          mPanProcessTimer.TickSignal().Disconnect( this, &ScrollBar::OnPanGestureProcessTick );
+          mPanProcessTimer.Reset();
         }
 
         if(itemView)
@@ -350,6 +428,8 @@ void ScrollBar::OnPan( PanGesture gesture )
           GetImpl(itemView).DoRefresh(mCurrentScrollPosition, true);
         }
 
+        mPanFinishedSignal.Emit();
+
         break;
       }
     }
@@ -357,23 +437,27 @@ void ScrollBar::OnPan( PanGesture gesture )
     if(itemView)
     {
       // Disable automatic refresh in ItemView during fast scrolling
-      GetImpl(itemView).SetRefreshEnabled(!mIsPanning);
+      GetImpl(itemView).SetRefreshEnabled(true);//!mIsPanning);
     }
   }
 }
 
 void ScrollBar::OnControlSizeSet( const Vector3& size )
 {
-  if(mIndicatorHeightPolicy != Toolkit::ScrollBar::Fixed && mScrollConnector)
+  if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
   {
-    mIndicator.SetSize( IndicatorSize( size, mScrollConnector.GetContentLength() ) );
+    mIndicator.SetSize(Self().GetCurrentSize().width, mIndicatorFixedHeight);
   }
 }
 
-void ScrollBar::OnScrollDomainChanged(float minPosition, float maxPosition, float contentSize)
+void ScrollBar::SetScrollDirection( Toolkit::ScrollBar::Direction direction )
 {
-  // Reapply constraints when the scroll domain is changed
-  ApplyConstraints();
+  mDirection = direction;
+}
+
+Toolkit::ScrollBar::Direction ScrollBar::GetScrollDirection() const
+{
+  return mDirection;
 }
 
 void ScrollBar::SetIndicatorHeightPolicy( Toolkit::ScrollBar::IndicatorHeightPolicy policy )
@@ -382,7 +466,7 @@ void ScrollBar::SetIndicatorHeightPolicy( Toolkit::ScrollBar::IndicatorHeightPol
   ApplyConstraints();
 }
 
-Toolkit::ScrollBar::IndicatorHeightPolicy ScrollBar::GetIndicatorHeightPolicy()
+Toolkit::ScrollBar::IndicatorHeightPolicy ScrollBar::GetIndicatorHeightPolicy() const
 {
   return mIndicatorHeightPolicy;
 }
@@ -390,10 +474,14 @@ Toolkit::ScrollBar::IndicatorHeightPolicy ScrollBar::GetIndicatorHeightPolicy()
 void ScrollBar::SetIndicatorFixedHeight( float height )
 {
   mIndicatorFixedHeight = height;
-  ApplyConstraints();
+
+  if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
+  {
+    mIndicator.SetSize(Self().GetCurrentSize().width, mIndicatorFixedHeight);
+  }
 }
 
-float ScrollBar::GetIndicatorFixedHeight()
+float ScrollBar::GetIndicatorFixedHeight() const
 {
   return mIndicatorFixedHeight;
 }
@@ -403,7 +491,7 @@ void ScrollBar::SetIndicatorShowDuration( float durationSeconds )
   mIndicatorShowDuration = durationSeconds;
 }
 
-float ScrollBar::GetIndicatorShowDuration()
+float ScrollBar::GetIndicatorShowDuration() const
 {
   return mIndicatorShowDuration;
 }
@@ -413,9 +501,26 @@ void ScrollBar::SetIndicatorHideDuration( float durationSeconds )
   mIndicatorHideDuration = durationSeconds;
 }
 
-float ScrollBar::GetIndicatorHideDuration()
+float ScrollBar::GetIndicatorHideDuration() const
 {
   return mIndicatorHideDuration;
+}
+
+void ScrollBar::OnScrollDirectionPropertySet( Property::Value propertyValue )
+{
+  std::string directionName( propertyValue.Get<std::string>() );
+  if(directionName == "Vertical")
+  {
+    SetScrollDirection(Toolkit::ScrollBar::Vertical);
+  }
+  else if(directionName == "Horizontal")
+  {
+    SetScrollDirection(Toolkit::ScrollBar::Horizontal);
+  }
+  else
+  {
+    DALI_ASSERT_ALWAYS( !"ScrollBar::OnScrollDirectionPropertySet(). Invalid Property value." );
+  }
 }
 
 void ScrollBar::OnIndicatorHeightPolicyPropertySet( Property::Value propertyValue )
@@ -442,9 +547,13 @@ bool ScrollBar::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   bool connected( true );
   Toolkit::ScrollBar scrollBar = Toolkit::ScrollBar::DownCast( handle );
 
-  if( 0 == strcmp( signalName.c_str(), SCROLL_POSITION_NOTIFIED_SIGNAL ) )
+  if( 0 == strcmp( signalName.c_str(), PAN_FINISHED_SIGNAL ) )
   {
-    scrollBar.ScrollPositionNotifiedSignal().Connect( tracker, functor );
+    scrollBar.PanFinishedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SCROLL_POSITION_INTERVAL_REACHED_SIGNAL ) )
+  {
+    scrollBar.ScrollPositionIntervalReachedSignal().Connect( tracker, functor );
   }
   else
   {
@@ -464,6 +573,11 @@ void ScrollBar::SetProperty( BaseObject* object, Property::Index index, const Pr
     ScrollBar& scrollBarImpl( GetImpl( scrollBar ) );
     switch( index )
     {
+      case Toolkit::ScrollBar::Property::SCROLL_DIRECTION:
+      {
+        scrollBarImpl.OnScrollDirectionPropertySet( value );
+        break;
+      }
       case Toolkit::ScrollBar::Property::INDICATOR_HEIGHT_POLICY:
       {
         scrollBarImpl.OnIndicatorHeightPolicyPropertySet( value );
@@ -484,6 +598,20 @@ void ScrollBar::SetProperty( BaseObject* object, Property::Index index, const Pr
         scrollBarImpl.SetIndicatorHideDuration(value.Get<float>());
         break;
       }
+      case Toolkit::ScrollBar::Property::SCROLL_POSITION_INTERVALS:
+      {
+        Dali::Vector<float> positions;
+        size_t positionCount = value.GetSize();
+        positions.Resize( positionCount );
+
+        for( size_t i = 0; i != positionCount; ++i )
+        {
+          value.GetItem(i).Get( positions[i] );
+        }
+
+        scrollBarImpl.SetScrollPositionIntervals(positions);
+        break;
+      }
     }
   }
 }
@@ -499,6 +627,11 @@ Property::Value ScrollBar::GetProperty( BaseObject* object, Property::Index inde
     ScrollBar& scrollBarImpl( GetImpl( scrollBar ) );
     switch( index )
     {
+      case Toolkit::ScrollBar::Property::SCROLL_DIRECTION:
+      {
+        value = SCROLL_DIRECTION_NAME[ scrollBarImpl.GetScrollDirection() ];
+        break;
+      }
       case Toolkit::ScrollBar::Property::INDICATOR_HEIGHT_POLICY:
       {
         value = INDICATOR_HEIGHT_POLICY_NAME[ scrollBarImpl.GetIndicatorHeightPolicy() ];
@@ -519,15 +652,26 @@ Property::Value ScrollBar::GetProperty( BaseObject* object, Property::Index inde
         value = scrollBarImpl.GetIndicatorHideDuration();
         break;
       }
+      case Toolkit::ScrollBar::Property::SCROLL_POSITION_INTERVALS:
+      {
+        Property::Value value;
+        Dali::Vector<float> positions = scrollBarImpl.GetScrollPositionIntervals();
+        size_t positionCount( positions.Size() );
+        for( size_t i( 0 ); i != positionCount; ++i )
+        {
+          value.AppendItem( positions[i] );
+        }
+        break;
+      }
     }
   }
   return value;
 }
 
-Toolkit::ScrollBar ScrollBar::New()
+Toolkit::ScrollBar ScrollBar::New(Toolkit::ScrollBar::Direction direction)
 {
   // Create the implementation, temporarily owned by this handle on stack
-  IntrusivePtr< ScrollBar > impl = new ScrollBar();
+  IntrusivePtr< ScrollBar > impl = new ScrollBar(direction);
 
   // Pass ownership to CustomActor handle
   Toolkit::ScrollBar handle( *impl );

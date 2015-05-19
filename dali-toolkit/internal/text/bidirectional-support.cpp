@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <memory.h>
-#include <dali/public-api/text-abstraction/bidirectional-support.h>
+#include <dali/devel-api/text-abstraction/bidirectional-support.h>
 
 namespace Dali
 {
