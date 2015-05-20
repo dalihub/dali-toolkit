@@ -18,9 +18,6 @@
 #include "style-manager-impl.h"
 
 // EXTERNAL INCLUDES
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <dali/devel-api/adaptor-framework/singleton-service.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
@@ -38,7 +35,7 @@ const char* LANDSCAPE_QUALIFIER = "landscape";
 const char* PORTRAIT_QUALIFIER  = "portrait";
 const char* FONT_SIZE_QUALIFIER = "font-size-";
 
-const char* DEFAULT_THEME = DALI_STYLE_DIR "tizen-default-theme.json";
+const char* DEFAULT_THEME = DALI_STYLE_DIR "dali-toolkit-default-theme.json";
 
 const char* PACKAGE_PATH_KEY = "PACKAGE_PATH";
 const char* DEFAULT_PACKAGE_PATH = DALI_DATA_READ_ONLY_DIR "/toolkit/";
@@ -107,12 +104,12 @@ StyleManager::StyleManager()
   // Add theme builder constants
   mThemeBuilderConstants[ PACKAGE_PATH_KEY ] = DEFAULT_PACKAGE_PATH;
 
-  StyleMonitor styleMonitor( StyleMonitor::Get() );
-  if( styleMonitor )
+  mStyleMonitor = StyleMonitor::Get();
+  if( mStyleMonitor )
   {
-    styleMonitor.StyleChangeSignal().Connect( this, &StyleManager::StyleMonitorChange );
+    mStyleMonitor.StyleChangeSignal().Connect( this, &StyleManager::StyleMonitorChange );
 
-    mDefaultFontSize = styleMonitor.GetDefaultFontSize();
+    mDefaultFontSize = mStyleMonitor.GetDefaultFontSize();
   }
 }
 
@@ -328,17 +325,11 @@ bool StyleManager::LoadFile( const std::string& filename, std::string& stringOut
 {
   DALI_ASSERT_DEBUG( 0 != filename.length());
 
-  std::ifstream in( filename.c_str(), std::ios::in );
-  if( in )
+  // as toolkit is platform agnostic, it cannot load files from filesystem
+  // ask style monitor to load the style sheet
+  if( mStyleMonitor )
   {
-    std::stringstream buffer;
-    buffer << in.rdbuf();
-
-    stringOut = buffer.str();
-
-    in.close();
-
-    return true;
+    return mStyleMonitor.LoadThemeFile( filename, stringOut );
   }
 
   return false;

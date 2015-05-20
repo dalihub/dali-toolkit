@@ -19,7 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
-#include <list>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/adaptor-framework/style-monitor.h>
 #include <dali/public-api/object/base-object.h>
@@ -140,7 +140,7 @@ public:
 
 private:
 
-  typedef std::list<std::string> StringList;
+  typedef std::vector<std::string> StringList;
 
   /**
    * @brief Internal helper method to read a file from file system.
@@ -237,6 +237,7 @@ private:
   typedef std::map< std::string, Toolkit::Builder > BuilderMap;
 
   Toolkit::Builder mThemeBuilder;     ///< Builder for all default theme properties
+  StyleMonitor mStyleMonitor;         ///< Style monitor handle
 
   Orientation mOrientation;           ///< Handle to application orientation object
   int mOrientationDegrees;            ///< Directly set value of orientation
