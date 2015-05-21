@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/devel-api/controls/table-view/table-view.h>
+#include <dali-toolkit/public-api/controls/table-view/table-view.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/table-view/table-view-impl.h>

@@ -94,15 +94,14 @@ develapipageturnviewdir =       $(develapicontrolsdir)/page-turn-view
 develapisliderdir =             $(develapicontrolsdir)/slider
 develapishadowviewdir =         $(develapicontrolsdir)/shadow-view
 develapisuperblurviewdir =      $(develapicontrolsdir)/super-blur-view
-develapitableviewdir =          $(develapicontrolsdir)/table-view
 develapiscriptingdir =          $(develapidir)/scripting
 develapibubbleeffectdir =       $(develapidir)/shader-effects/bubble-effect
 develapishadereffectsdir =      $(develapidir)/shader-effects
 develapitransitioneffectsdir =  $(develapidir)/transition-effects
 develapistylingdir =            $(develapidir)/styling
 develapitoolbardir =            $(develapicontrolsdir)/tool-bar
-# devel headers
 
+# devel headers
 develapibloomview_HEADERS =         $(devel_api_bloom_view_header_files)
 develapibubbleemitter_HEADERS =     $(devel_api_bubble_emitter_header_files)
 develapibubbleeffect_HEADERS =      $(devel_api_bubble_effect_header_files)
@@ -117,12 +116,10 @@ develapishadereffects_HEADERS =     $(devel_api_shader_effects_header_files)
 develapislider_HEADERS =            $(devel_api_slider_header_files)
 develapistyling_HEADERS =           $(devel_api_styling_header_files)
 develapisuperblurview_HEADERS =     $(devel_api_super_blur_view_header_files)
-develapitableview_HEADERS =         $(devel_api_table_view_header_files)
 develapitoolbar_HEADERS =           $(devel_api_tool_bar_header_files)
 develapitransitioneffects_HEADERS = $(devel_api_transition_effects_header_files)
 
 # public api source
-
 publicapidir =                  $(topleveldir)/public-api
 publicapicontrolsdir =          $(publicapidir)/controls
 publicapialignmentdir =         $(publicapicontrolsdir)/alignment
@@ -134,6 +131,7 @@ publicapiscrollbardir =         $(publicapicontrolsdir)/scroll-bar
 publicapiscrollabledir =        $(publicapicontrolsdir)/scrollable
 publicapiscrollviewdir =        $(publicapicontrolsdir)/scrollable/scroll-view
 publicapiitemviewdir =          $(publicapicontrolsdir)/scrollable/item-view
+publicapitableviewdir =         $(publicapicontrolsdir)/table-view
 publicapitextcontrolsdir =      $(publicapicontrolsdir)/text-controls
 publicapifocusmanagerdir =      $(publicapidir)/focus-manager
 publicapirenderingbackenddir =  $(publicapidir)/text
@@ -150,6 +148,7 @@ publicapiitemview_HEADERS =         $(public_api_item_view_header_files)
 publicapiscrollbar_HEADERS =        $(public_api_scroll_bar_header_files)
 publicapiscrollable_HEADERS =       $(public_api_scrollable_header_files)
 publicapiscrollview_HEADERS =       $(public_api_scroll_view_header_files)
+publicapitableview_HEADERS =        $(public_api_table_view_header_files)
 publicapitextcontrols_HEADERS =     $(public_api_text_controls_header_files)
 publicapifocusmanager_HEADERS =     $(public_api_focus_manager_header_files)
 publicapirenderingbackend_HEADERS = $(public_api_rendering_backend_header_files)
