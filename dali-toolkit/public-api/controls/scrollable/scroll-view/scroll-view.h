@@ -867,14 +867,6 @@ public:
   Vector2 GetCurrentScrollPosition() const;
 
   /**
-   * @brief Sets the current scroll position, overriding current scroll animations. If panning is currently taking place
-   *        SetScrollPosition will have no effect. Try to ensure panning has stopped before calling this function.
-   *
-   * @param[in] position The new scroll position to set.
-   */
-  void SetScrollPosition(const Vector2& position);
-
-  /**
    * @brief Retrieves current scroll page based on ScrollView
    * dimensions being the size of one page, and all pages laid out in
    * a grid fashion, increasing from left to right until the end of

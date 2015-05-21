@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -265,10 +265,56 @@ float TestAlphaFunction(float progress)
 } // unnamed namespace
 
 
-int UtcDaliScrollViewNew(void)
+int UtcDaliToolkitScrollViewConstructorP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewNew");
+
+  ScrollView scrollView;
+  DALI_TEST_CHECK( !scrollView );
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewCopyConstructorP(void)
+{
+  ToolkitTestApplication application;
+
+  ScrollView scrollView = ScrollView::New();
+  scrollView.SetProperty( ScrollView::Property::SCROLL_POSITION, Vector2(10.0f, 10.0f) );
+
+  ScrollView copy( scrollView );
+  DALI_TEST_CHECK( copy );
+  DALI_TEST_CHECK( copy.GetProperty<Vector2>( ScrollView::Property::SCROLL_POSITION ) == scrollView.GetProperty<Vector2>( ScrollView::Property::SCROLL_POSITION ) );
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewAssignmentOperatorP(void)
+{
+  ToolkitTestApplication application;
+
+  ScrollView scrollView = ScrollView::New();
+  scrollView.SetProperty( ScrollView::Property::SCROLL_POSITION, Vector2(10.0f, 10.0f) );
+
+  ScrollView copy = scrollView;
+  DALI_TEST_CHECK( copy );
+  DALI_TEST_CHECK( copy.GetProperty<Vector2>( ScrollView::Property::SCROLL_POSITION ) == scrollView.GetProperty<Vector2>( ScrollView::Property::SCROLL_POSITION ) );
+  END_TEST;
+}
+
+int UtcDaliScrollViewDestructorP(void)
+{
+  ToolkitTestApplication application;
+
+  ScrollView* scrollView = new ScrollView();
+  delete scrollView;
+
+  DALI_TEST_CHECK( true );
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewNewP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewNewP");
 
   ScrollView scrollView;
 
@@ -295,10 +341,10 @@ int UtcDaliScrollViewNew(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewDownCast(void)
+int UtcDaliToolkitScrollViewDownCastP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewDownCast");
+  tet_infoline(" UtcDaliToolkitScrollViewDownCastP");
 
   ScrollView scrollView = ScrollView::New();
   BaseHandle handle(scrollView);
@@ -309,10 +355,10 @@ int UtcDaliScrollViewDownCast(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewScrollToPosition(void)
+int UtcDaliToolkitScrollViewScrollToPositionP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewScrollToPosition");
+  tet_infoline(" UtcDaliToolkitScrollViewScrollToPositionP");
 
   // Create the ScrollView actor
   ScrollView scrollView = ScrollView::New();
@@ -328,14 +374,130 @@ int UtcDaliScrollViewScrollToPosition(void)
   Wait(application, RENDER_DELAY_SCROLL);
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
 
-  Wait(application);
   END_TEST;
 }
 
-int UtcDaliScrollViewScrollToPage(void)
+int UtcDaliToolkitScrollViewScrollToPositionWithDirectionBiasP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewScrollToPage");
+  tet_infoline(" UtcDaliToolkitScrollViewScrollToPositionWithDirectionBiasP");
+
+  ScrollView scrollView = ScrollView::New();
+  Stage::GetCurrent().Add( scrollView );
+  RulerPtr rulerX = new FixedRuler( 100.0f );
+  rulerX->SetDomain( RulerDomain(0.0f, 200.0f, true) );
+  RulerPtr rulerY = new FixedRuler( 100.0f );
+  rulerY->SetDomain( RulerDomain(0.0f, 200.0f, true) );
+
+  scrollView.SetRulerX( rulerX );
+  scrollView.SetRulerY( rulerY );
+
+  scrollView.SetWrapMode(true);
+
+  const Vector2 target = Vector2(50.0f, 50.0f);
+  const Vector2 target2 = Vector2(150.0f, 150.0f);
+
+  scrollView.ScrollTo( target, 0.0f );
+  Wait(application, RENDER_DELAY_SCROLL);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target, TEST_LOCATION );
+
+  scrollView.ScrollTo( target2, 0.25f, Dali::Toolkit::DirectionBiasLeft, Dali::Toolkit::DirectionBiasLeft );
+  Wait(application, RENDER_DELAY_SCROLL);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2::ZERO, TEST_LOCATION );
+
+  scrollView.ScrollTo( target, 0.0f );
+  Wait(application, RENDER_DELAY_SCROLL);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target, TEST_LOCATION );
+
+  scrollView.ScrollTo( target2, 0.25f, Dali::Toolkit::DirectionBiasRight, Dali::Toolkit::DirectionBiasRight );
+  Wait(application, RENDER_DELAY_SCROLL);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewScrollToPositionWithAlphaFunctionP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewScrollToPositionWithAlphaFunctionP");
+
+  // Create the ScrollView actor
+  ScrollView scrollView = ScrollView::New();
+  Stage::GetCurrent().Add( scrollView );
+
+  const Vector2 target = Vector2(100.0f, 200.0f);
+  const Vector2 target2 = Vector2(300.0f, 100.0f);
+
+  scrollView.ScrollTo( target, 0.5f, TestAlphaFunction );
+  Wait(application, 250);
+  // Check that the scroll animation should finish within just half of the specified duration with the above alpha function
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target, TEST_LOCATION );
+
+  scrollView.ScrollTo( target2, 0.5f, AlphaFunction::LINEAR );
+  Wait(application, 250);
+  // Check that the scroll animation has not finished within half of the specified duration with the linear alpha function
+  DALI_TEST_CHECK( scrollView.GetCurrentScrollPosition() != target2 );
+
+  // Wait till the end of the specified duration
+  Wait(application, 250);
+  // Check that the scroll animation has finished
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewScrollToPositionWithAlphaFunctionAndDirectionBiasP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewScrollToPositionWithAlphaFunctionAndDirectionBiasP");
+
+  ScrollView scrollView = ScrollView::New();
+  Stage::GetCurrent().Add( scrollView );
+  RulerPtr rulerX = new FixedRuler( 100.0f );
+  rulerX->SetDomain( RulerDomain(0.0f, 200.0f, true) );
+  RulerPtr rulerY = new FixedRuler( 100.0f );
+  rulerY->SetDomain( RulerDomain(0.0f, 200.0f, true) );
+
+  scrollView.SetRulerX( rulerX );
+  scrollView.SetRulerY( rulerY );
+
+  scrollView.SetWrapMode(true);
+
+  const Vector2 target = Vector2(50.0f, 50.0f);
+  const Vector2 target2 = Vector2(150.0f, 150.0f);
+
+  scrollView.ScrollTo( target, 0.0f );
+  Wait(application, RENDER_DELAY_SCROLL);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target, TEST_LOCATION );
+
+  scrollView.ScrollTo( target2, 0.25f, AlphaFunction::LINEAR, Dali::Toolkit::DirectionBiasLeft, Dali::Toolkit::DirectionBiasLeft );
+  Wait(application, RENDER_DELAY_SCROLL);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2::ZERO, TEST_LOCATION );
+
+  scrollView.ScrollTo( target, 0.0f );
+  Wait(application, RENDER_DELAY_SCROLL);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target, TEST_LOCATION );
+
+  scrollView.ScrollTo( target2, 0.25f, AlphaFunction::LINEAR, Dali::Toolkit::DirectionBiasRight, Dali::Toolkit::DirectionBiasRight );
+  Wait(application, RENDER_DELAY_SCROLL);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
+
+  scrollView.ScrollTo( target, 0.0f );
+  Wait(application, RENDER_DELAY_SCROLL);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target, TEST_LOCATION );
+
+  scrollView.ScrollTo( target2, 0.25f, TestAlphaFunction, Dali::Toolkit::DirectionBiasRight, Dali::Toolkit::DirectionBiasRight );
+  Wait(application, 125);
+  // Check that the scroll animation should finish within just half of the specified duration with the above alpha function
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), target2, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewScrollToPageP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewScrollToPageP");
 
   ScrollView scrollView = ScrollView::New();
   Stage::GetCurrent().Add( scrollView );
@@ -389,14 +551,55 @@ int UtcDaliScrollViewScrollToPage(void)
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(0.0f, 0.0f), TEST_LOCATION );
   DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 0, TEST_LOCATION );
 
-  Wait(application);
   END_TEST;
 }
 
-int UtcDaliScrollViewScrollToActor(void)
+int UtcDaliToolkitScrollViewScrollToPageWithDirectionBiasP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewScrollToActor");
+  tet_infoline(" UtcDaliToolkitScrollViewScrollToPageWithDirectionBiasP");
+
+  ScrollView scrollView = ScrollView::New();
+  Stage::GetCurrent().Add( scrollView );
+  RulerPtr rulerX = new FixedRuler( 100.0f );
+  rulerX->SetDomain( RulerDomain(0.0f, 200.0f, true) );
+  RulerPtr rulerY = new FixedRuler( 100.0f );
+  rulerY->SetDomain( RulerDomain(0.0f, 200.0f, true) );
+
+  scrollView.SetRulerX( rulerX );
+  scrollView.SetRulerY( rulerY );
+
+  scrollView.SetWrapMode(true);
+
+  scrollView.ScrollTo( 0, 0.25, Dali::Toolkit::DirectionBiasLeft );
+
+  Wait(application, RENDER_FRAME_INTERVAL); // Wait for one frame
+  // Check that the scroll position remains the same
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(0.0f, 0.0f), TEST_LOCATION );
+
+  Wait(application, RENDER_DELAY_SCROLL); // Wait for one second
+  // Check that it stays at the same page (i.e. the same scroll position)
+  DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(0.0f, 0.0f), TEST_LOCATION );
+
+  scrollView.ScrollTo( 0, 0.25, Dali::Toolkit::DirectionBiasRight );
+
+  Wait(application, RENDER_FRAME_INTERVAL); // Wait for one frame
+  // Check that it scrolls towards the right
+  DALI_TEST_CHECK( scrollView.GetCurrentScrollPosition().x > 0.0f );
+
+  Wait(application, RENDER_DELAY_SCROLL); // Wait for one second
+  // Check that it scrolls back to the same page (i.e. the same scroll position)
+  DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(0.0f, 0.0f), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewScrollToActorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewScrollToActorP");
 
   ScrollView scrollView = ScrollView::New();
   Stage::GetCurrent().Add( scrollView );
@@ -432,10 +635,10 @@ int UtcDaliScrollViewScrollToActor(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewScrollToSnapPoint(void)
+int UtcDaliToolkitScrollViewScrollToSnapPointP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewScrollToSnapPoint");
+  tet_infoline(" UtcDaliToolkitScrollViewScrollToSnapPointP");
 
   ScrollView scrollView = ScrollView::New();
   Stage::GetCurrent().Add( scrollView );
@@ -458,10 +661,10 @@ int UtcDaliScrollViewScrollToSnapPoint(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewSetScrollUpdateDistance(void)
+int UtcDaliToolkitScrollViewSetScrollUpdateDistanceP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewRefreshInterval");
+  tet_infoline(" UtcDaliToolkitScrollViewSetScrollUpdateDistanceP");
 
   ScrollView scrollView = ScrollView::New();
 
@@ -474,10 +677,10 @@ int UtcDaliScrollViewSetScrollUpdateDistance(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewWrapMode(void)
+int UtcDaliToolkitScrollViewSetWrapModeP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewWrapMode");
+  tet_infoline(" UtcDaliToolkitScrollViewSetWrapModeP");
 
   ScrollView scrollView = ScrollView::New();
   Stage::GetCurrent().Add( scrollView );
@@ -499,10 +702,10 @@ int UtcDaliScrollViewWrapMode(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewActorAutoSnap(void)
+int UtcDaliToolkitScrollViewActorAutoSnap(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewActorAutoSnap");
+  tet_infoline(" UtcDaliToolkitScrollViewActorAutoSnap");
 
   ScrollView scrollView = ScrollView::New();
   Stage::GetCurrent().Add( scrollView );
@@ -547,10 +750,10 @@ int UtcDaliScrollViewActorAutoSnap(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewSignalsStartComplete(void)
+int UtcDaliToolkitScrollViewSignalsStartComplete(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewSignalsStartComplete");
+  tet_infoline(" UtcDaliToolkitScrollViewSignalsStartComplete");
 
   gOnScrollStartCalled = false;
   gOnScrollCompleteCalled = false;
@@ -576,10 +779,10 @@ int UtcDaliScrollViewSignalsStartComplete(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewSignalsUpdate(void)
+int UtcDaliToolkitScrollViewSignalsUpdate(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewSignalsUpdate");
+  tet_infoline(" UtcDaliToolkitScrollViewSignalsUpdate");
 
   gOnScrollStartCalled = false;
   gOnScrollUpdateCalled = false;
@@ -666,10 +869,10 @@ static Vector2 PerformGestureDiagonalSwipe(ToolkitTestApplication& application, 
   return pos;
 }
 
-int UtcDaliScrollViewScrollSensitive(void)
+int UtcDaliToolkitScrollViewScrollSensitive(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewScrollSensitive");
+  tet_infoline(" UtcDaliToolkitScrollViewScrollSensitive");
 
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
@@ -712,10 +915,10 @@ int UtcDaliScrollViewScrollSensitive(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewAxisAutoLock(void)
+int UtcDaliToolkitScrollViewAxisAutoLock(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewAxisAutoLock");
+  tet_infoline(" UtcDaliToolkitScrollViewAxisAutoLock");
 
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
@@ -764,10 +967,10 @@ int UtcDaliScrollViewAxisAutoLock(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewAxisAutoLockGradient(void)
+int UtcDaliToolkitScrollViewAxisAutoLockGradient(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewAxisAutoLockGradient");
+  tet_infoline(" UtcDaliToolkitScrollViewAxisAutoLockGradient");
 
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
@@ -778,10 +981,10 @@ int UtcDaliScrollViewAxisAutoLockGradient(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewConstraints(void)
+int UtcDaliToolkitScrollViewConstraints(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewConstraints");
+  tet_infoline(" UtcDaliToolkitScrollViewConstraints");
 
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
@@ -823,10 +1026,10 @@ int UtcDaliScrollViewConstraints(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewBind(void)
+int UtcDaliToolkitScrollViewBind(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewBind");
+  tet_infoline(" UtcDaliToolkitScrollViewBind");
 
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
@@ -877,122 +1080,10 @@ int UtcDaliScrollViewBind(void)
   END_TEST;
 }
 
-int UtcDaliRulerEnableDisable(void)
+int UtcDaliToolkitScrollViewOvershoot(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliRulerEnableDisable");
-
-  RulerPtr ruler = new DefaultRuler();
-
-  DALI_TEST_CHECK( ruler->IsEnabled() );
-  ruler->Disable();
-  DALI_TEST_CHECK( !ruler->IsEnabled() );
-  ruler->Enable();
-  DALI_TEST_CHECK( ruler->IsEnabled() );
-  END_TEST;
-}
-
-int UtcDaliRulerDomainEnableDisable(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliRulerDomainEnableDisable");
-
-  RulerPtr ruler = new DefaultRuler();
-  DALI_TEST_EQUALS( ruler->GetDomain().GetSize(), 1.0f, TEST_LOCATION );
-
-
-  ruler->SetDomain( RulerDomain(0.0f, 100.0f, true) );
-  DALI_TEST_EQUALS( ruler->GetDomain().GetSize(), 100.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( ruler->Clamp(-200.0f), 0.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( ruler->Clamp(200.0f), 100.0f, TEST_LOCATION );
-
-  ruler->DisableDomain();
-  DALI_TEST_EQUALS( ruler->GetDomain().GetSize(), 1.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( ruler->Clamp(-200.0f), -200.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( ruler->Clamp(200.0f), 200.0f, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliRulerSnapAndClamp(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliRulerSnapAndClamp");
-
-  RulerPtr ruler = new FixedRuler( 50.0f );
-  ruler->SetDomain( RulerDomain(0.0f, 400.0f, true) );
-
-  // default testing. (snap and clamp)
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(50.0f), 50.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(30.0f), 50.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(10.0f), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(-40.0f), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(390.0f), 400.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(430.0f), 400.0f, TEST_LOCATION);
-
-  // bias testing.
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(40.0f, 0.0f), 0.0f, TEST_LOCATION); // Flick Left
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(40.0f, 0.5f), 50.0f, TEST_LOCATION); // No Flick
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(40.0f, 1.0f), 50.0f, TEST_LOCATION); // Flick Right
-
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(20.0f, 0.0f), 0.0f, TEST_LOCATION); // Flick Left
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(20.0f, 0.5f), 0.0f, TEST_LOCATION); // No Flick
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(20.0f, 1.0f), 50.0f, TEST_LOCATION); // Flick Right
-
-  // length testing.
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(-10.0f, 0.5f, 10.0f), 0.0f, TEST_LOCATION); // 10 units long (over left boundary)
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(-5.0f, 0.5f, 10.0f), 0.0f, TEST_LOCATION); // 10 units long (slightly ovr left boundary)
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(300.0f, 0.5f, 10.0f), 300.0f, TEST_LOCATION); // 10 units long (not over a boundary)
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(395.0f, 0.5f, 10.0f), 390.0f, TEST_LOCATION); // 10 units long (slightly over right boundary)
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(500.0f, 0.5f, 10.0f), 390.0f, TEST_LOCATION); // 10 units long (over right boundary)
-
-  // scale testing.
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(-100.0f, 0.5f, 0.0f, 2.0f), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(50.0f, 0.5f, 0.0f, 2.0f), 50.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(700.0f, 0.5f, 0.0f, 2.0f), 700.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(850.0f, 0.5f, 0.0f, 2.0f), 800.0f, TEST_LOCATION);
-
-  // clamp state testing.
-  ClampState clamped;
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(50.0f, 0.5f, 0.0f, 1.0f, clamped), 50.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, NotClamped, TEST_LOCATION );
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(30.0f, 0.5f, 0.0f, 1.0f, clamped), 50.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, NotClamped, TEST_LOCATION );
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(10.0f, 0.5f, 0.0f, 1.0f, clamped), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, NotClamped, TEST_LOCATION );
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(-40.0f, 0.5f, 0.0f, 1.0f, clamped), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, ClampedToMin, TEST_LOCATION );
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(390.0f, 0.5f, 0.0f, 1.0f, clamped), 400.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, NotClamped, TEST_LOCATION );
-  DALI_TEST_EQUALS( ruler->SnapAndClamp(430.0f, 0.5f, 0.0f, 1.0f, clamped), 400.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS( clamped, ClampedToMax, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliRulerFixedRulerSpacing(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliRulerFixedRulerSpacing");
-
-  RulerPtr rulerNormal = new FixedRuler( 25.0f );
-  rulerNormal->SetDomain( RulerDomain(10.0f, 90.0f, true) );
-
-  unsigned int volume;
-  float position;
-
-  position = rulerNormal->GetPositionFromPage(1, volume, true);
-  DALI_TEST_EQUALS( position, 35.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( volume, 0u, TEST_LOCATION );
-
-  position = rulerNormal->GetPositionFromPage(2, volume, true);
-  DALI_TEST_EQUALS( position, 60.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( volume, 0u, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliScrollViewOvershoot(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewOvershoot");
+  tet_infoline(" UtcDaliToolkitScrollViewOvershoot");
 
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
@@ -1083,10 +1174,10 @@ int UtcDaliScrollViewOvershoot(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewSnapAlphaFunction(void)
+int UtcDaliToolkitScrollViewSnapAlphaFunction(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewSnapAlphaFunction");
+  tet_infoline(" UtcDaliToolkitScrollViewSnapAlphaFunction");
 
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
@@ -1101,10 +1192,10 @@ int UtcDaliScrollViewSnapAlphaFunction(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewSnapDuration(void)
+int UtcDaliToolkitScrollViewSnapDuration(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewSnapDuration");
+  tet_infoline(" UtcDaliToolkitScrollViewSnapDuration");
 
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
@@ -1120,10 +1211,10 @@ int UtcDaliScrollViewSnapDuration(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewSignalsSnapStart(void)
+int UtcDaliToolkitScrollViewSnapStartedSignalP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewSignalsSnapStart");
+  tet_infoline(" UtcDaliToolkitScrollViewSnapStartedSignalP");
 
   // Set up a scrollView...
   ScrollView scrollView = ScrollView::New();
@@ -1159,11 +1250,265 @@ int UtcDaliScrollViewSignalsSnapStart(void)
   END_TEST;
 }
 
-
-int UtcDaliScrollViewSetMouseWheelScrollDistanceStep(void)
+int UtcDaliToolkitScrollViewGetCurrentPageP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewSetMouseWheelScrollDistanceStep");
+  tet_infoline(" UtcDaliToolkitScrollViewGetCurrentPageP");
+
+  ScrollView scrollView = ScrollView::New();
+  Stage::GetCurrent().Add( scrollView );
+  RulerPtr rulerX = new FixedRuler( 100.0f );
+  rulerX->SetDomain( RulerDomain(0.0f, 800.0f, true) );
+  RulerPtr rulerY = new FixedRuler( 100.0f );
+  rulerY->SetDomain( RulerDomain(0.0f, 400.0f, true) );
+
+  scrollView.SetRulerX( rulerX );
+  scrollView.SetRulerY( rulerY );
+
+  scrollView.ScrollTo( 15 );
+  Wait(application, RENDER_DELAY_SCROLL);
+  DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 15, TEST_LOCATION );
+
+  scrollView.ScrollTo( 3 );
+  Wait(application, RENDER_DELAY_SCROLL);
+  DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 3, TEST_LOCATION );
+
+  scrollView.ScrollTo( 9 );
+  Wait(application, RENDER_DELAY_SCROLL);
+  DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 9, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewSetMaxOvershootP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewSetMaxOvershootP");
+
+  // Set up a scrollView...
+  ScrollView scrollView = ScrollView::New();
+  Stage::GetCurrent().Add( scrollView );
+  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  scrollView.SetSize(stageSize);
+  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
+  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+
+  // Position rulers.
+  RulerPtr rulerX = new DefaultRuler();
+  RulerPtr rulerY = new DefaultRuler();
+  rulerX->SetDomain( RulerDomain(0.0f, stageSize.width + CLAMP_EXCESS_WIDTH, true) );
+  rulerY->SetDomain( RulerDomain(0.0f, stageSize.height + CLAMP_EXCESS_HEIGHT, true) );
+  scrollView.SetRulerX(rulerX);
+  scrollView.SetRulerY(rulerY);
+
+  // Set the max overshoot to be 50 pixels in both X axis and Y axis
+  scrollView.SetMaxOvershoot(50.0f, 50.0f);
+
+  scrollView.ScrollTo(OVERSHOOT_START_SCROLL_POSITION, 0.0f); // move in a little.
+  Wait(application);
+
+  // Scroll page in NW (-20,-20 pixels), then check that overshoot should be 0. (don't release touch)
+  Vector2 currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 20, false);
+  float overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
+  float overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
+  DALI_TEST_EQUALS(overshootXValue, 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(overshootYValue, 0.0f, TEST_LOCATION);
+
+  // Scroll page further in NW (-105,-105 pixels), then check that overshoot should be around 0.5. (don't release touch)
+  currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 105, false);
+  overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
+  overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
+  DALI_TEST_CHECK(overshootXValue > 0.49f && overshootXValue < 0.51f);
+  DALI_TEST_CHECK(overshootYValue > 0.49f && overshootYValue < 0.51f);
+
+  // Scroll page further in NW (-30,-30 pixels), then check that overshoot should be now 1.0. (don't release touch)
+  currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 30, false);
+  overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
+  overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
+  DALI_TEST_EQUALS(overshootXValue, 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(overshootYValue, 1.0f, TEST_LOCATION);
+
+  // Change the max overshoot to be 100 pixels in both X axis and Y axis
+  scrollView.SetMaxOvershoot(100.0f, 100.0f);
+  Wait(application);
+
+  // Check that overshoot should be now around 0.8.
+  overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
+  overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
+  DALI_TEST_CHECK(overshootXValue > 0.79f && overshootXValue < 0.81f);
+  DALI_TEST_CHECK(overshootYValue > 0.79f && overshootYValue < 0.81f);
+
+  // Scroll page further in NW (-30,-30 pixels), then check that overshoot should be now 1.0. (don't release touch)
+  currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 30, false);
+  overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
+  overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
+  DALI_TEST_EQUALS(overshootXValue, 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(overshootYValue, 1.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewSetScrollingDirectionP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewSetScrollingDirectionP");
+
+  // Set up a scrollView...
+  ScrollView scrollView = ScrollView::New();
+  Stage::GetCurrent().Add( scrollView );
+  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  scrollView.SetSize(stageSize);
+  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
+  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+
+  Vector2 START_POSITION = Vector2(10.0f, 10.0f);
+
+  scrollView.ScrollTo(START_POSITION, 0.0f);
+  Wait(application);
+  // Try a vertical swipe.
+  PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(10.0f, -50.0f), TEST_LOCATION );
+
+  scrollView.SetScrollingDirection(Dali::PanGestureDetector::DIRECTION_VERTICAL);
+
+  scrollView.ScrollTo(START_POSITION, 0.0f);
+  Wait(application);
+  // Try a vertical swipe.
+  PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), START_POSITION, TEST_LOCATION );
+
+  scrollView.RemoveScrollingDirection(Dali::PanGestureDetector::DIRECTION_VERTICAL);
+
+  scrollView.ScrollTo(Vector2(10.0f, 10.0f), 0.0f);
+  Wait(application);
+  // Try a vertical swipe.
+  PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(10.0f, -50.0f), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewRemoveScrollingDirectionP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewRemoveScrollingDirectionP");
+
+  // Set up a scrollView...
+  ScrollView scrollView = ScrollView::New();
+  Stage::GetCurrent().Add( scrollView );
+  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  scrollView.SetSize(stageSize);
+  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
+  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+
+  Vector2 START_POSITION = Vector2(10.0f, 10.0f);
+
+  scrollView.SetScrollingDirection(Dali::PanGestureDetector::DIRECTION_VERTICAL);
+
+  scrollView.ScrollTo(START_POSITION, 0.0f);
+  Wait(application);
+  // Try a vertical swipe.
+  PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), START_POSITION, TEST_LOCATION );
+
+  scrollView.RemoveScrollingDirection(Dali::PanGestureDetector::DIRECTION_VERTICAL);
+
+  scrollView.ScrollTo(Vector2(10.0f, 10.0f), 0.0f);
+  Wait(application);
+  // Try a vertical swipe.
+  PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(10.0f, -50.0f), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewSetRulerXP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewSetRulerXP");
+
+  ScrollView scrollView = ScrollView::New();
+  Stage::GetCurrent().Add( scrollView );
+  RulerPtr rulerX = new FixedRuler( 100.0f );
+  rulerX->SetDomain( RulerDomain(0.0f, 800.0f, true) );
+
+  scrollView.SetRulerX( rulerX );
+
+  scrollView.ScrollTo( 1, 0.0f );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(100.0f, 0.0f), TEST_LOCATION );
+
+  RulerPtr newRulerX = new FixedRuler( 200.0f );
+  newRulerX->SetDomain( RulerDomain(0.0f, 800.0f, true) );
+
+  scrollView.SetRulerX( newRulerX );
+
+  scrollView.ScrollTo( 1, 0.0f );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(200.0f, 0.0f), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewSetRulerYP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewSetRulerYP");
+
+  ScrollView scrollView = ScrollView::New();
+  Stage::GetCurrent().Add( scrollView );
+
+  RulerPtr rulerY = new FixedRuler( 200.0f );
+  rulerY->SetDomain( RulerDomain(0.0f, 400.0f, true) );
+
+  scrollView.SetRulerY( rulerY );
+
+  scrollView.ScrollTo( Vector2(0.0f, 350.0f), 0.0f );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(0.0f, 350.0f), TEST_LOCATION );
+
+  RulerPtr newRulerY = new FixedRuler( 100.0f );
+  newRulerY->SetDomain( RulerDomain(0.0f, 200.0f, true) );
+  scrollView.SetRulerY( newRulerY );
+
+  scrollView.ScrollTo( Vector2(0.0f, 350.0f), 0.0f );
+  Wait(application);
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(0.0f, 200.0f), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewSetMinimumSpeedForFlickP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewSetMinimumSpeedForFlickP");
+
+  ScrollView scrollView = ScrollView::New();
+  scrollView.SetMinimumSpeedForFlick(25.0f);
+  DALI_TEST_EQUALS( scrollView.GetMinimumSpeedForFlick(), 25.0f, TEST_LOCATION );
+  scrollView.SetMinimumSpeedForFlick(60.0f);
+  DALI_TEST_EQUALS( scrollView.GetMinimumSpeedForFlick(), 60.0f, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewSetMinimumDistanceForFlickP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewSetMinimumDistanceForFlick");
+
+  ScrollView scrollView = ScrollView::New();
+
+  scrollView.SetMinimumDistanceForFlick(Vector2(30.0f, 15.0f));
+  DALI_TEST_EQUALS( scrollView.GetMinimumDistanceForFlick(), Vector2(30.0f, 15.0f), TEST_LOCATION );
+  scrollView.SetMinimumDistanceForFlick(Vector2(60.0f, 30.0f));
+  DALI_TEST_EQUALS( scrollView.GetMinimumDistanceForFlick(), Vector2(60.0f, 30.0f), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewSetMouseWheelScrollDistanceStepP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewSetMouseWheelScrollDistanceStepP");
 
   ScrollView scrollView = ScrollView::New();
   // Disable Refresh signal (TET environment cannot use adaptor's Timer)
@@ -1174,12 +1519,176 @@ int UtcDaliScrollViewSetMouseWheelScrollDistanceStep(void)
   END_TEST;
 }
 
-int UtcDaliScrollViewGetSet(void)
+int UtcDaliToolkitScrollViewApplyEffectP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliScrollViewGetSet");
+  tet_infoline(" UtcDaliToolkitScrollViewApplyEffectP");
+
+  // Create a ScrollView
   ScrollView scrollView = ScrollView::New();
-  scrollView.SetMaxOvershoot(50.0f, 50.0f);
+
+  // Create two scroll view effects
+  Dali::Path path = Dali::Path::New();
+  ScrollViewEffect effect = ScrollViewPagePathEffect::New(path, Vector3(-1.0f, 0.0f, 0.0f), Toolkit::ScrollView::Property::SCROLL_FINAL_X, Vector3(100.0f, 100.0f, 0.0f), 2);
+  ScrollViewEffect newEffect = ScrollViewPagePathEffect::New(path, Vector3(-1.0f, 1.0f, 1.0f), Toolkit::ScrollView::Property::SCROLL_FINAL_X, Vector3(200.0f, 150.0f, 0.0f), 5);
+
+  // Apply both effects
+  scrollView.ApplyEffect(effect);
+  scrollView.ApplyEffect(newEffect);
+
+  DALI_TEST_CHECK( true );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewApplyEffectN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewApplyEffectN");
+
+  // Create a ScrollView
+  ScrollView scrollView = ScrollView::New();
+
+  // Create two scroll view effects
+  Dali::Path path = Dali::Path::New();
+  ScrollViewEffect effect = ScrollViewPagePathEffect::New(path, Vector3(-1.0f, 0.0f, 0.0f), Toolkit::ScrollView::Property::SCROLL_FINAL_X, Vector3(100.0f, 100.0f, 0.0f), 2);
+  ScrollViewEffect newEffect = ScrollViewPagePathEffect::New(path, Vector3(-1.0f, 1.0f, 1.0f), Toolkit::ScrollView::Property::SCROLL_FINAL_X, Vector3(200.0f, 150.0f, 0.0f), 5);
+
+  // Apply both effects
+  scrollView.ApplyEffect(effect);
+  scrollView.ApplyEffect(newEffect);
+
+  // Attempt to apply the same effect again
+  try
+  {
+    scrollView.ApplyEffect(newEffect);
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "!effectAlreadyExistsInScrollView", TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewRemoveEffectP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewRemoveEffectP");
+
+  // Create a ScrollView
+  ScrollView scrollView = ScrollView::New();
+
+  // Create two scroll view effects
+  Dali::Path path = Dali::Path::New();
+  ScrollViewEffect effect = ScrollViewPagePathEffect::New(path, Vector3(-1.0f, 0.0f, 0.0f), Toolkit::ScrollView::Property::SCROLL_FINAL_X, Vector3(100.0f, 100.0f, 0.0f), 2);
+  ScrollViewEffect newEffect = ScrollViewPagePathEffect::New(path, Vector3(-1.0f, 1.0f, 1.0f), Toolkit::ScrollView::Property::SCROLL_FINAL_X, Vector3(200.0f, 150.0f, 0.0f), 5);
+
+  // Apply both effects
+  scrollView.ApplyEffect(effect);
+  scrollView.ApplyEffect(newEffect);
+
+  // Remove both effects
+  scrollView.RemoveEffect(effect);
+  scrollView.RemoveEffect(newEffect);
+
+  DALI_TEST_CHECK( true );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewRemoveEffectN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewRemoveEffectN");
+
+  // Create a ScrollView
+  ScrollView scrollView = ScrollView::New();
+
+  // Create two scroll view effects
+  Dali::Path path = Dali::Path::New();
+  ScrollViewEffect effect = ScrollViewPagePathEffect::New(path, Vector3(-1.0f, 0.0f, 0.0f), Toolkit::ScrollView::Property::SCROLL_FINAL_X, Vector3(100.0f, 100.0f, 0.0f), 2);
+  ScrollViewEffect newEffect = ScrollViewPagePathEffect::New(path, Vector3(-1.0f, 1.0f, 1.0f), Toolkit::ScrollView::Property::SCROLL_FINAL_X, Vector3(200.0f, 150.0f, 0.0f), 5);
+
+  // Apply the first effect
+  scrollView.ApplyEffect(effect);
+
+  // Attempt to remove the second effect which has not been applied to scroll view
+  try
+  {
+    scrollView.RemoveEffect(newEffect);
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "effectExistedInScrollView", TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewRemoveAllEffectsP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewRemoveAllEffectsP");
+
+  // Create a ScrollView
+  ScrollView scrollView = ScrollView::New();
+
+  // Create two scroll view effects
+  Dali::Path path = Dali::Path::New();
+  ScrollViewEffect effect = ScrollViewPagePathEffect::New(path, Vector3(-1.0f, 0.0f, 0.0f), Toolkit::ScrollView::Property::SCROLL_FINAL_X, Vector3(100.0f, 100.0f, 0.0f), 2);
+  ScrollViewEffect newEffect = ScrollViewPagePathEffect::New(path, Vector3(-1.0f, 1.0f, 1.0f), Toolkit::ScrollView::Property::SCROLL_FINAL_X, Vector3(200.0f, 150.0f, 0.0f), 5);
+
+  // Apply both effects
+  scrollView.ApplyEffect(effect);
+  scrollView.ApplyEffect(newEffect);
+
+  // Attempt to apply the same first effect again
+  try
+  {
+    scrollView.ApplyEffect(effect);
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "!effectAlreadyExistsInScrollView", TEST_LOCATION );
+  }
+
+  // Remove both effects
+  scrollView.RemoveAllEffects();
+
+  // Apply both effects again
+  scrollView.ApplyEffect(effect);
+  scrollView.ApplyEffect(newEffect);
+
+  DALI_TEST_CHECK( true );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewRemoveAllEffectsN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewRemoveAllEffectsN");
+
+  // Create a ScrollView
+  ScrollView scrollView = ScrollView::New();
+
+  // Remove effects when there is no effect applied previously
+  scrollView.RemoveAllEffects();
+
+  DALI_TEST_CHECK( true );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewGetSet(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewGetSet");
+  ScrollView scrollView = ScrollView::New();
   scrollView.SetMaxFlickSpeed(0.5f);
   DALI_TEST_EQUALS(scrollView.GetMaxFlickSpeed(), 0.5f, Math::MACHINE_EPSILON_0, TEST_LOCATION);
   scrollView.SetFrictionCoefficient(0.6f);
@@ -1188,3 +1697,395 @@ int UtcDaliScrollViewGetSet(void)
   DALI_TEST_EQUALS(scrollView.GetFlickSpeedCoefficient(), 0.7f, Math::MACHINE_EPSILON_0, TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliToolkitScrollViewRulerDomainConstructorP(void)
+{
+  ToolkitTestApplication application;
+
+  RulerDomain domainX = RulerDomain(0.0f, 200.0f, true);
+  DALI_TEST_EQUALS( domainX.min, 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( domainX.max, 200.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( domainX.enabled, true, TEST_LOCATION);
+
+  RulerDomain domainY = RulerDomain(100.0f, 500.0f, false);
+  DALI_TEST_EQUALS( domainY.min, 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( domainY.max, 500.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( domainY.enabled, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewRulerDomainGetSizeP(void)
+{
+  ToolkitTestApplication application;
+
+  RulerDomain domainX = RulerDomain(0.0f, 200.0f, true);
+  DALI_TEST_EQUALS( domainX.GetSize(), 200.0f, TEST_LOCATION);
+
+  RulerDomain domainY = RulerDomain(100.0f, 500.0f, false);
+  DALI_TEST_EQUALS( domainY.GetSize(), 400.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewRulerDomainClampP(void)
+{
+  ToolkitTestApplication application;
+
+  RulerDomain domainX = RulerDomain(0.0f, 200.0f, true);
+
+  float value = domainX.Clamp(50.0f, 100.0f, 1.0f);
+  DALI_TEST_EQUALS( value, 50.0f, TEST_LOCATION);
+
+  value = domainX.Clamp(300.0f, 20.0f, 1.0f);
+  DALI_TEST_EQUALS( value, 180.0f, TEST_LOCATION);
+
+  value = domainX.Clamp(300.0f, 20.0f, 0.5f);
+  DALI_TEST_EQUALS( value, 80.0f, TEST_LOCATION);
+
+  value = domainX.Clamp(250.0f, 200.0f, 2.0f);
+  DALI_TEST_EQUALS( value, 200.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewRulerDomainClampWithStateP(void)
+{
+  ToolkitTestApplication application;
+
+  RulerDomain domainX = RulerDomain(0.0f, 200.0f, true);
+
+  ClampState clamped;
+  float value = domainX.Clamp(50.0f, 100.0f, 1.0f, clamped);
+  DALI_TEST_EQUALS( value, 50.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( clamped, Dali::Toolkit::NotClamped, TEST_LOCATION);
+
+  value = domainX.Clamp(-100.0f, 200.0f, 1.0f, clamped);
+  DALI_TEST_EQUALS( value, 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( clamped, Dali::Toolkit::ClampedToMin, TEST_LOCATION);
+
+  value = domainX.Clamp(300.0f, 20.0f, 1.0f, clamped);
+  DALI_TEST_EQUALS( value, 180.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( clamped, Dali::Toolkit::ClampedToMax, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewDefaultRulerConstructorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewDefaultRulerConstructorP");
+
+  RulerPtr defaultRuler = new DefaultRuler();
+  DALI_TEST_CHECK( defaultRuler );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewDefaultRulerDestructorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewDefaultRulerDestructorP");
+
+  RulerPtr defaultRuler = new DefaultRuler();
+
+  DALI_TEST_CHECK( true );
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewFixedRulerConstructorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewFixedRulerConstructorP");
+
+  RulerPtr fixedRuler = new FixedRuler( 100.0f );
+  DALI_TEST_CHECK( fixedRuler );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewFixedRulerDestructorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewFixedRulerDestructorP");
+
+  RulerPtr fixedRuler = new FixedRuler( 100.0f );
+
+  DALI_TEST_CHECK( true );
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewRulerGetTypeP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewRulerGetTypeP");
+
+  RulerPtr defaultRuler = new DefaultRuler();
+  DALI_TEST_CHECK( defaultRuler );
+  DALI_TEST_EQUALS( defaultRuler->GetType(), Dali::Toolkit::Ruler::Free, TEST_LOCATION);
+
+  RulerPtr fixedRuler = new FixedRuler( 100.0f );
+  DALI_TEST_CHECK( fixedRuler );
+  DALI_TEST_EQUALS( fixedRuler->GetType(), Dali::Toolkit::Ruler::Fixed, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewRulerEnableDisable(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewRulerEnableDisable");
+
+  RulerPtr ruler = new DefaultRuler();
+
+  DALI_TEST_CHECK( ruler->IsEnabled() );
+  ruler->Disable();
+  DALI_TEST_CHECK( !ruler->IsEnabled() );
+  ruler->Enable();
+  DALI_TEST_CHECK( ruler->IsEnabled() );
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewRulerDomainEnableDisable(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewRulerDomainEnableDisable");
+
+  RulerPtr ruler = new DefaultRuler();
+  DALI_TEST_EQUALS( ruler->GetDomain().GetSize(), 1.0f, TEST_LOCATION );
+
+  ruler->SetDomain( RulerDomain(0.0f, 100.0f, true) );
+  DALI_TEST_EQUALS( ruler->GetDomain().GetSize(), 100.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( ruler->Clamp(-200.0f), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( ruler->Clamp(200.0f), 100.0f, TEST_LOCATION );
+
+  ruler->DisableDomain();
+  DALI_TEST_EQUALS( ruler->GetDomain().GetSize(), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( ruler->Clamp(-200.0f), -200.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( ruler->Clamp(200.0f), 200.0f, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewRulerSnapAndClamp(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewRulerSnapAndClamp");
+
+  RulerPtr ruler = new FixedRuler( 50.0f );
+  ruler->SetDomain( RulerDomain(0.0f, 400.0f, true) );
+
+  // default testing. (snap and clamp)
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(50.0f), 50.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(30.0f), 50.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(10.0f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(-40.0f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(390.0f), 400.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(430.0f), 400.0f, TEST_LOCATION);
+
+  // bias testing.
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(40.0f, 0.0f), 0.0f, TEST_LOCATION); // Flick Left
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(40.0f, 0.5f), 50.0f, TEST_LOCATION); // No Flick
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(40.0f, 1.0f), 50.0f, TEST_LOCATION); // Flick Right
+
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(20.0f, 0.0f), 0.0f, TEST_LOCATION); // Flick Left
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(20.0f, 0.5f), 0.0f, TEST_LOCATION); // No Flick
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(20.0f, 1.0f), 50.0f, TEST_LOCATION); // Flick Right
+
+  // length testing.
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(-10.0f, 0.5f, 10.0f), 0.0f, TEST_LOCATION); // 10 units long (over left boundary)
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(-5.0f, 0.5f, 10.0f), 0.0f, TEST_LOCATION); // 10 units long (slightly ovr left boundary)
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(300.0f, 0.5f, 10.0f), 300.0f, TEST_LOCATION); // 10 units long (not over a boundary)
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(395.0f, 0.5f, 10.0f), 390.0f, TEST_LOCATION); // 10 units long (slightly over right boundary)
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(500.0f, 0.5f, 10.0f), 390.0f, TEST_LOCATION); // 10 units long (over right boundary)
+
+  // scale testing.
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(-100.0f, 0.5f, 0.0f, 2.0f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(50.0f, 0.5f, 0.0f, 2.0f), 50.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(700.0f, 0.5f, 0.0f, 2.0f), 700.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(850.0f, 0.5f, 0.0f, 2.0f), 800.0f, TEST_LOCATION);
+
+  // clamp state testing.
+  ClampState clamped;
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(50.0f, 0.5f, 0.0f, 1.0f, clamped), 50.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( clamped, NotClamped, TEST_LOCATION );
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(30.0f, 0.5f, 0.0f, 1.0f, clamped), 50.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( clamped, NotClamped, TEST_LOCATION );
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(10.0f, 0.5f, 0.0f, 1.0f, clamped), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( clamped, NotClamped, TEST_LOCATION );
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(-40.0f, 0.5f, 0.0f, 1.0f, clamped), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( clamped, ClampedToMin, TEST_LOCATION );
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(390.0f, 0.5f, 0.0f, 1.0f, clamped), 400.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( clamped, NotClamped, TEST_LOCATION );
+  DALI_TEST_EQUALS( ruler->SnapAndClamp(430.0f, 0.5f, 0.0f, 1.0f, clamped), 400.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( clamped, ClampedToMax, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewFixedRulerGetPositionFromPageP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewFixedRulerGetPositionFromPageP");
+
+  RulerPtr rulerNormal = new FixedRuler( 25.0f );
+  rulerNormal->SetDomain( RulerDomain(10.0f, 90.0f, true) );
+
+  unsigned int volume;
+  float position;
+
+  position = rulerNormal->GetPositionFromPage(1, volume, true);
+  DALI_TEST_EQUALS( position, 35.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( volume, 0u, TEST_LOCATION );
+
+  position = rulerNormal->GetPositionFromPage(2, volume, true);
+  DALI_TEST_EQUALS( position, 60.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( volume, 0u, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewDefaultRulerGetTotalPagesP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewDefaultRulerGetTotalPagesP");
+
+  RulerPtr defaultRuler = new DefaultRuler();
+  DALI_TEST_CHECK( defaultRuler );
+  DALI_TEST_EQUALS( defaultRuler->GetTotalPages(), 1u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewDefaultRulerGetPageFromPositionP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewDefaultRulerGetPageFromPositionP");
+
+  RulerPtr defaultRuler = new DefaultRuler();
+  DALI_TEST_CHECK( defaultRuler );
+  DALI_TEST_EQUALS( defaultRuler->GetPageFromPosition(100.0f, true), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS( defaultRuler->GetPageFromPosition(-300.0f, false), 0u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewDefaultRulerGetPositionFromPageP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewDefaultRulerGetPositionFromPageP");
+
+  RulerPtr defaultRuler = new DefaultRuler();
+  DALI_TEST_CHECK( defaultRuler );
+
+  unsigned int volume;
+  DALI_TEST_EQUALS( defaultRuler->GetPositionFromPage(0, volume, true), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( volume, 0u, TEST_LOCATION);
+
+  DALI_TEST_EQUALS( defaultRuler->GetPositionFromPage(3, volume, false), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( volume, 0u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewDefaultRulerSnapP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewDefaultRulerSnapP");
+
+  RulerPtr defaultRuler = new DefaultRuler();
+  DALI_TEST_CHECK( defaultRuler );
+
+  DALI_TEST_EQUALS( defaultRuler->Snap(50.0f, 0.5f), 50.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( defaultRuler->Snap(-120.0f, 1.0f), -120.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewFixedRulerGetTotalPagesP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewFixedRulerGetTotalPagesP");
+
+  RulerPtr fixedRuler = new FixedRuler( 100.0f );
+  fixedRuler->SetDomain( RulerDomain(0.0f, 400.0f, true) );
+
+  fixedRuler->Enable();
+  DALI_TEST_EQUALS( fixedRuler->GetTotalPages(), 4u, TEST_LOCATION);
+
+  fixedRuler->Disable();
+  DALI_TEST_EQUALS( fixedRuler->GetTotalPages(), 1u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewFixedRulerGetPageFromPositionP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewFixedRulerGetPageFromPositionP");
+
+  RulerPtr fixedRuler = new FixedRuler( 100.0f );
+  fixedRuler->SetDomain( RulerDomain(0.0f, 400.0f, true) );
+
+  fixedRuler->Enable();
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(250.0f, true), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(250.0f, false), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(-350.0f, true), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(-350.0f, false), 0u, TEST_LOCATION);
+
+  fixedRuler->Disable();
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(250.0f, true), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(250.0f, false), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(-350.0f, true), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(-350.0f, false), 0u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewFixedRulerSnapP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewFixedRulerSnapP");
+
+  RulerPtr fixedRuler = new FixedRuler( 100.0f );
+  fixedRuler->SetDomain( RulerDomain(0.0f, 400.0f, true) );
+
+  DALI_TEST_EQUALS( fixedRuler->Snap(-30.0f, 0.0f), -100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(-70.0f, 0.0f), -100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(-120.0f, 0.0f), -200.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(-480.0f, 0.0f), -500.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(20.0f, 0.0f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(50.0f, 0.0f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(80.0f, 0.0f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(100.0f, 0.0f), 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(120.0f, 0.0f), 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(250.0f, 0.0f), 200.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(620.0f, 0.0f), 600.0f, TEST_LOCATION);
+
+  DALI_TEST_EQUALS( fixedRuler->Snap(-30.0f, 0.5f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(-70.0f, 0.5f), -100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(-120.0f, 0.5f), -100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(-480.0f, 0.5f), -500.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(20.0f, 0.5f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(50.0f, 0.5f), 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(80.0f, 0.5f), 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(100.0f, 0.5f), 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(120.0f, 0.5f), 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(250.0f, 0.5f), 300.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(620.0f, 0.5f), 600.0f, TEST_LOCATION);
+
+  DALI_TEST_EQUALS( fixedRuler->Snap(-30.0f, 1.0f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(-70.0f, 1.0f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(-120.0f, 1.0f), -100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(-480.0f, 1.0f), -400.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(20.0f, 1.0f), 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(50.0f, 1.0f), 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(80.0f, 1.0f), 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(100.0f, 1.0f), 200.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(120.0f, 1.0f), 200.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(250.0f, 1.0f), 300.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->Snap(620.0f, 1.0f), 700.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+
+
+

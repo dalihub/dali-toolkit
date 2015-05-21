@@ -343,11 +343,6 @@ public:
   Vector2 GetCurrentScrollPosition() const;
 
   /**
-   * @copydoc Toolkit::ScrollView::SetScrollPosition
-   */
-  void SetScrollPosition(const Vector2& position);
-
-  /**
    * @copydoc Toolkit::Scrollable::GetDomainSize
    */
   Vector2 GetDomainSize() const;

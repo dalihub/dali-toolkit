@@ -248,7 +248,7 @@ unsigned int FixedRuler::GetPageFromPosition(float position, bool wrap) const
     {
       position = WrapInDomain(position, mDomain.min, mDomain.max);
     }
-    page = floor((position - mDomain.min) / mSpacing + 0.5f);
+    page = std::max(static_cast<double>(0.0f), floor((position - mDomain.min) / mSpacing + 0.5f));
 
     if(wrap)
     {
@@ -499,11 +499,6 @@ void ScrollView::SetMouseWheelScrollDistanceStep(Vector2 step)
 Vector2 ScrollView::GetCurrentScrollPosition() const
 {
   return GetImpl(*this).GetCurrentScrollPosition();
-}
-
-void ScrollView::SetScrollPosition(const Vector2& position)
-{
-  GetImpl(*this).SetScrollPosition(position);
 }
 
 unsigned int ScrollView::GetCurrentPage() const

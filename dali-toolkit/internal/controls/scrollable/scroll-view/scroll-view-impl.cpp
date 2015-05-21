@@ -1116,11 +1116,6 @@ Vector2 ScrollView::GetCurrentScrollPosition() const
   return -GetPropertyPosition();
 }
 
-void ScrollView::SetScrollPosition(const Vector2& position)
-{
-  mScrollPrePosition = position;
-}
-
 Vector2 ScrollView::GetDomainSize() const
 {
   Vector3 size = Self().GetCurrentSize();
