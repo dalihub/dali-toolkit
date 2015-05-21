@@ -19,7 +19,6 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/controls/table-view/table-view.h>
 
 using namespace Dali;
 using namespace Toolkit;

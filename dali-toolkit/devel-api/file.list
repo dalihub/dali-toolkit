@@ -16,7 +16,6 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.cpp \
   $(devel_api_src_dir)/controls/slider/slider.cpp \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.cpp \
-  $(devel_api_src_dir)/controls/table-view/table-view.cpp \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \
   $(devel_api_src_dir)/styling/style-manager.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
@@ -132,10 +131,6 @@ devel_api_shader_effects_header_files = \
 
 devel_api_super_blur_view_header_files = \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.h
-
-
-devel_api_table_view_header_files = \
-  $(devel_api_src_dir)/controls/table-view/table-view.h
 
 devel_api_tool_bar_header_files = \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.h
