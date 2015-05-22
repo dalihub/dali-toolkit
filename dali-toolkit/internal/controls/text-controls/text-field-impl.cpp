@@ -117,6 +117,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-right", STRING,    SELECTION_HANDLE_PRESSED_IMAGE_RIGHT )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-highlight-color",            STRING,    SELECTION_HIGHLIGHT_COLOR            )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decoration-bounding-box",              RECTANGLE, DECORATION_BOUNDING_BOX              )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "input-method-settings",                MAP,       INPUT_METHOD_SETTINGS                )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "max-length-reached", SIGNAL_MAX_LENGTH_REACHED )
 
@@ -518,6 +519,12 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 
           impl.mController->SetMaximumNumberOfCharacters( max );
         }
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_METHOD_SETTINGS:
+      {
+        // Empty implementation for now.
+
         break;
       }
     } // switch
