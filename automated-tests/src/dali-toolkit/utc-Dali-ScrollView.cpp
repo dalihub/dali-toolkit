@@ -1684,6 +1684,54 @@ int UtcDaliToolkitScrollViewRemoveAllEffectsN(void)
   END_TEST;
 }
 
+int UtcDaliToolkitScrollViewSetOvershootEnabledP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewSetOvershootEnabledP");
+
+  ScrollView scrollView = ScrollView::New();
+
+  scrollView.SetOvershootEnabled(true);
+  DALI_TEST_CHECK(scrollView.IsOvershootEnabled());
+
+  scrollView.SetOvershootEnabled(false);
+  DALI_TEST_CHECK(!scrollView.IsOvershootEnabled());
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewSetOvershootEffectColorP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewSetOvershootEffectColorP");
+
+  ScrollView scrollView = ScrollView::New();
+
+  scrollView.SetOvershootEffectColor(Dali::Color::RED);
+  DALI_TEST_EQUALS(scrollView.GetOvershootEffectColor(), Dali::Color::RED, TEST_LOCATION);
+
+  scrollView.SetOvershootEffectColor(Dali::Color::YELLOW);
+  DALI_TEST_EQUALS(scrollView.GetOvershootEffectColor(), Dali::Color::YELLOW, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewSetOvershootAnimationSpeedP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewSetOvershootAnimationSpeedP");
+
+  ScrollView scrollView = ScrollView::New();
+
+  scrollView.SetOvershootAnimationSpeed(55.0f);
+  DALI_TEST_EQUALS(scrollView.GetOvershootAnimationSpeed(), 55.0f, TEST_LOCATION);
+
+  scrollView.SetOvershootAnimationSpeed(120.0f);
+  DALI_TEST_EQUALS(scrollView.GetOvershootAnimationSpeed(), 120.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliToolkitScrollViewGetSet(void)
 {
   ToolkitTestApplication application;
@@ -1801,6 +1849,9 @@ int UtcDaliToolkitScrollViewFixedRulerConstructorP(void)
   RulerPtr fixedRuler = new FixedRuler( 100.0f );
   DALI_TEST_CHECK( fixedRuler );
 
+  fixedRuler = new FixedRuler( 0.0f );
+  DALI_TEST_CHECK( fixedRuler );
+
   END_TEST;
 }
 
@@ -1827,6 +1878,22 @@ int UtcDaliToolkitScrollViewRulerGetTypeP(void)
   RulerPtr fixedRuler = new FixedRuler( 100.0f );
   DALI_TEST_CHECK( fixedRuler );
   DALI_TEST_EQUALS( fixedRuler->GetType(), Dali::Toolkit::Ruler::Fixed, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollViewRulerGetExtensionP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitScrollViewRulerGetExtensionP");
+
+  RulerPtr defaultRuler = new DefaultRuler();
+  DALI_TEST_CHECK( defaultRuler );
+  DALI_TEST_CHECK( !defaultRuler->GetExtension() );
+
+  RulerPtr fixedRuler = new FixedRuler( 100.0f );
+  DALI_TEST_CHECK( fixedRuler );
+  DALI_TEST_CHECK( !fixedRuler->GetExtension() );
 
   END_TEST;
 }
