@@ -18,7 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/adaptor-framework/orientation.h>
+#include <dali/devel-api/adaptor-framework/orientation.h>
 #include <dali/public-api/adaptor-framework/style-change.h>
 
 // INTERNAL INCLUDES
@@ -51,7 +51,7 @@ class StyleManager;
  *   void OnInit(Application& app)
  *   {
  *      Toolkit::StyleManager::Get().RequestThemeChange( CUSTOM_THEME );
- *      Toolkit::StyleManager::Get().SetOrientation( app.GetWindow().GetOrientation() );
+ *      Toolkit::StyleManager::Get().SetOrientation( ... );
  *      ...
  *   }
  * @endcode
