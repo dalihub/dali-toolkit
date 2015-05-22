@@ -160,7 +160,12 @@ void Controller::SetPlaceholderText( PlaceholderType type, const std::string& te
       mImpl->mEventData->mPlaceholderTextActive = text;
     }
 
-    ShowPlaceholderText();
+    // Update placeholder if there is no text
+    if( mImpl->IsShowingPlaceholderText() ||
+        0u == mImpl->mLogicalModel->mText.Count() )
+    {
+      ShowPlaceholderText();
+    }
   }
 }
 
