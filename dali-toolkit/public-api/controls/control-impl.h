@@ -416,7 +416,7 @@ private:
    * @param[in] styleManager  The StyleManager object.
    * @param[in] change  Information denoting what has changed.
    */
-  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
+  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
 
   /**
    * @brief Called whenever a pinch gesture is detected on this control.

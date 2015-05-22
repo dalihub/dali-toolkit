@@ -838,7 +838,7 @@ void TextField::OnInitialize()
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
 }
 
-void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
+void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
 }

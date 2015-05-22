@@ -358,9 +358,7 @@ void StyleManager::SetTheme()
   mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
   if ( LoadJSON( mThemeBuilder, mThemeFile ) )
   {
-    StyleChange change;
-    change.themeChange = true;
-    mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), change );
+    mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), StyleChange::THEME_CHANGE );
   }
   else
   {
@@ -384,25 +382,36 @@ void StyleManager::CacheBuilder( Toolkit::Builder builder, const std::string& ke
   mBuilderCache[ key ] = builder;
 }
 
-void StyleManager::StyleMonitorChange( StyleMonitor styleMonitor, StyleChange styleChange )
+void StyleManager::StyleMonitorChange( StyleMonitor styleMonitor, StyleChange::Type styleChange )
 {
-  if( styleChange.defaultFontSizeChange )
+  switch ( styleChange )
   {
-    mDefaultFontSize = styleMonitor.GetDefaultFontSize();
-  }
-
-  if( styleChange.themeChange )
-  {
-    if( ! styleChange.themeFilePath.empty() )
+    case StyleChange::DEFAULT_FONT_CHANGE:
     {
-      mThemeFile = styleChange.themeFilePath;
-    }
-    else
-    {
-      mThemeFile = DEFAULT_THEME;
+      break;
     }
 
-    SetTheme();
+    case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
+    {
+      mDefaultFontSize = styleMonitor.GetDefaultFontSize();
+      break;
+    }
+
+    case StyleChange::THEME_CHANGE:
+    {
+      const std::string& newTheme = styleMonitor.GetTheme();
+      if( ! newTheme.empty() )
+      {
+        mThemeFile = newTheme;
+      }
+      else
+      {
+        mThemeFile = DEFAULT_THEME;
+      }
+
+      SetTheme();
+      break;
+    }
   }
 
   mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), styleChange );

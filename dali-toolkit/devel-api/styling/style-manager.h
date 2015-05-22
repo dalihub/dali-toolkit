@@ -64,7 +64,7 @@ class DALI_IMPORT_API StyleManager : public BaseHandle
 public:
 
   // Signals
-  typedef Signal< void ( StyleManager, StyleChange ) >  StyleChangeSignalType;
+  typedef Signal< void ( StyleManager, StyleChange::Type ) >  StyleChangeSignalType;
 
   /**
    * @brief Create a StyleManager handle; this can be initialised with StyleManager::Get()

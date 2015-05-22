@@ -843,10 +843,10 @@ void Control::OnActivated()
 {
 }
 
-void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
+void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   // By default the control is only interested in theme (not font) changes
-  if( change.themeChange )
+  if( change == StyleChange::THEME_CHANGE )
   {
     GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
   }

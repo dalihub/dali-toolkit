@@ -432,7 +432,7 @@ void TextLabel::OnInitialize()
   engine.SetTextEllipsisEnabled( true );
 }
 
-void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
+void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
 }

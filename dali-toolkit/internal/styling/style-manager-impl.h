@@ -222,9 +222,9 @@ private:
    * Callback for when style monitor raises a signal
    *
    * @param[in] styleMonitor The style monitor object
-   * @param[in] styleChange The style change data
+   * @param[in] styleChange The style change type
    */
-  void StyleMonitorChange( StyleMonitor styleMonitor, StyleChange styleChange );
+  void StyleMonitorChange( StyleMonitor styleMonitor, StyleChange::Type styleChange );
 
   // Undefined
   StyleManager(const StyleManager&);
