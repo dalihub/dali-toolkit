@@ -35,6 +35,7 @@ SET(TC_SOURCES
    utc-Dali-TableView.cpp
    utc-Dali-TextField.cpp
    utc-Dali-TextLabel.cpp
+   utc-Dali-TextSelectionPopup.cpp
    utc-Dali-ToolBar.cpp
    utc-Dali-WaterEffect.cpp
    utc-Dali-Button.cpp
