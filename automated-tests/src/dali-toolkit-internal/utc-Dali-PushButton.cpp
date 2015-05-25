@@ -313,6 +313,22 @@ static bool TestCallback(Actor actor, const TouchEvent& event)
 
 //////////////////////////////////////////////////////////
 
+int UtcDaliPushButtonDownCast(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliPushButtonDownCast");
+
+  TETButton tetButton= Toolkit::TETButton::New();
+
+  BaseHandle object(tetButton);
+
+  TETButton tetButton2 = TETButton::DownCast( object );
+  DALI_TEST_CHECK(tetButton2);
+
+  TETButton tetButton3 = DownCast< TETButton >(object);
+  DALI_TEST_CHECK(tetButton3);
+  END_TEST;
+}
 
 int UtcDaliPushButtonInterruptEventWhenInsensitive(void)
 {
