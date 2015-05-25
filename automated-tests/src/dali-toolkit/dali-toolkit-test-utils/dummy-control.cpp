@@ -64,7 +64,7 @@ DummyControl DummyControlImpl::New()
 }
 
 DummyControlImpl::DummyControlImpl()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_HOVER_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mCustomSlot1Called(false)
 {
 }
@@ -86,6 +86,7 @@ DummyControl DummyControlImplOverride::New()
 DummyControlImplOverride::DummyControlImplOverride()
 : DummyControlImpl(),
   initializeCalled(false),
+  activatedCalled(false),
   themeChangeCalled( false ),
   fontChangeCalled( false ),
   pinchCalled(false),
@@ -99,6 +100,7 @@ DummyControlImplOverride::DummyControlImplOverride()
   sizeSetCalled(false),
   sizeAnimationCalled(false),
   touchEventCalled(false),
+  hoverEventCalled(false),
   mouseWheelEventCalled(false),
   keyEventCalled(false),
   keyInputFocusGained(false),
@@ -110,6 +112,7 @@ DummyControlImplOverride::~DummyControlImplOverride() { }
 
 
 void DummyControlImplOverride::OnInitialize() { initializeCalled = true; }
+void DummyControlImplOverride::OnActivated() { activatedCalled = true; }
 void DummyControlImplOverride::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   themeChangeCalled = change == StyleChange::THEME_CHANGE;
@@ -126,6 +129,7 @@ void DummyControlImplOverride::OnChildRemove(Actor& child) { childRemoveCalled =
 void DummyControlImplOverride::OnSizeSet(const Vector3& targetSize) { sizeSetCalled = true; }
 void DummyControlImplOverride::OnSizeAnimation(Animation& animation, const Vector3& targetSize) { sizeAnimationCalled = true; }
 bool DummyControlImplOverride::OnTouchEvent(const TouchEvent& event) { touchEventCalled = true; return false; }
+bool DummyControlImplOverride::OnHoverEvent(const HoverEvent& event) { hoverEventCalled = true; return false; }
 bool DummyControlImplOverride::OnMouseWheelEvent(const MouseWheelEvent& event) { mouseWheelEventCalled = true; return false; }
 bool DummyControlImplOverride::OnKeyEvent(const KeyEvent& event) { keyEventCalled = true; return false;}
 void DummyControlImplOverride::OnKeyInputFocusGained() { keyInputFocusGained = true; }

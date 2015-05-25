@@ -32,6 +32,7 @@
 #include <dali/integration-api/events/pan-gesture-event.h>
 #include <dali/integration-api/events/tap-gesture-event.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/hover-event-integ.h>
 
 #include "dummy-control.h"
 
@@ -591,6 +592,56 @@ int UtcDaliControlImplTouchEvent(void)
   END_TEST;
 }
 
+int UtcDaliControlImplHoverEvent(void)
+{
+  ToolkitTestApplication application;
+
+  {
+    DummyControl dummy = DummyControl::New( true );
+    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+
+    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    Stage::GetCurrent().Add(dummy);
+
+    application.Render();
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+
+    DALI_TEST_EQUALS( dummyImpl.hoverEventCalled, false, TEST_LOCATION );
+    Integration::HoverEvent event(1);
+    TouchPoint point( 1, TouchPoint::Motion, 20.0f, 20.0f );
+    event.AddPoint( point );
+    application.ProcessEvent( event );
+    DALI_TEST_EQUALS( dummyImpl.hoverEventCalled, true, TEST_LOCATION );
+
+    Stage::GetCurrent().Remove(dummy);
+  }
+
+  // Ensure full code coverage
+  {
+    DummyControl dummy = DummyControl::New();
+
+    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    Stage::GetCurrent().Add(dummy);
+
+    application.Render();
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+
+    Integration::HoverEvent event(1);
+    TouchPoint point( 1, TouchPoint::Motion, 20.0f, 20.0f );
+    event.AddPoint( point );
+    application.ProcessEvent( event );
+
+    Stage::GetCurrent().Remove(dummy);
+  }
+  END_TEST;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -782,6 +833,27 @@ int UtcDaliControlImplMouseWheelEvent(void)
     Vector2 screenCoordinates( 20.0f, 20.0f );
     Integration::MouseWheelEvent event(0, 0u, screenCoordinates, 1, 1000u);
     application.ProcessEvent(event);
+
+    Stage::GetCurrent().Remove(dummy);
+  }
+  END_TEST;
+}
+
+int UtcDaliControlImplSetStyleName(void)
+{
+  ToolkitTestApplication application;
+
+  {
+    DummyControl dummy = DummyControl::New( true );
+    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+
+    dummy.SetSize( Vector2( 100.0f, 100.0f ) );
+    dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    Stage::GetCurrent().Add(dummy);
+
+    dummy.SetStyleName("TestStyle");
+
+    DALI_TEST_CHECK( dummy.GetStyleName() == "TestStyle" );
 
     Stage::GetCurrent().Remove(dummy);
   }

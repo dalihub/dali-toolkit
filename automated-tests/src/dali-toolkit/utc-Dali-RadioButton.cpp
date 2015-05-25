@@ -47,10 +47,45 @@ static void TestCallback(BaseHandle handle)
 
 }
 
-int UtcDaliRadioButtonNew(void)
+int UtcDaliRadioButtonConstructorP(void)
+{
+  TestApplication application;
+
+  RadioButton button;
+
+  DALI_TEST_CHECK( !button );
+  END_TEST;
+}
+
+int UtcDaliRadioButtonCopyConstructorP(void)
+{
+  TestApplication application;
+
+  // Initialize an object, ref count == 1
+  RadioButton button = RadioButton::New();
+
+  RadioButton copy( button );
+  DALI_TEST_CHECK( copy );
+  END_TEST;
+}
+
+int UtcDaliRadioButtonAssignmentOperatorP(void)
+{
+  TestApplication application;
+
+  RadioButton button = RadioButton::New();
+
+  RadioButton copy( button );
+  DALI_TEST_CHECK( copy );
+
+  DALI_TEST_CHECK( button == copy );
+  END_TEST;
+}
+
+int UtcDaliRadioButtonNewP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliRadioButtonNew");
+  tet_infoline(" UtcDaliRadioButtonNewP");
 
   // Create the Slider actor
   RadioButton radioButton;
@@ -78,7 +113,7 @@ int UtcDaliRadioButtonNew(void)
   END_TEST;
 }
 
-int UtcDaliRadioButtonDestructor(void)
+int UtcDaliRadioButtonDestructorP(void)
 {
   ToolkitTestApplication application;
 

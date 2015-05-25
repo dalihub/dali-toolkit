@@ -88,9 +88,50 @@ int UtcDaliItemLayoutSetAndGetOrientation(void)
 
   // Set the orientation of the layout to be horizontal from left to right
   ItemLayoutPtr layout = view.GetLayout(0);
+
+  DALI_TEST_CHECK(gridLayout == layout);
+
   layout->SetOrientation(ControlOrientation::Left);
 
   // Check the orientation of the layout is horizontal from left to right
   DALI_TEST_CHECK(layout->GetOrientation() == ControlOrientation::Left);
+
+  Vector3 itemSize(100.0f, 100.0f, 100.0f);
+  layout->SetItemSize(itemSize);
+
+  Vector3 itemSize1;
+  layout->GetItemSize(0u, Vector3(Stage::GetCurrent().GetSize()), itemSize1);
+
+  DALI_TEST_CHECK(itemSize == itemSize1);
+
+  float position = layout->GetClosestOnScreenLayoutPosition(0, 0.0f, Vector3(Stage::GetCurrent().GetSize()));
+
+  DALI_TEST_EQUALS(position, 0.0f, TEST_LOCATION);
+
+  int focusItem = layout->GetNextFocusItemID(0, TOTAL_ITEM_NUMBER, Control::Left, true);
+
+  DALI_TEST_CHECK(focusItem != 0);
+
+  float flickSpeedFactor = layout->GetFlickSpeedFactor();
+
+  DALI_TEST_CHECK(flickSpeedFactor != 0.0f);
+
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
+  view.AddLayout(*depthLayout);
+
+  layout = view.GetLayout(1);
+  DALI_TEST_CHECK(depthLayout == layout);
+
+  ItemLayoutPtr listLayout = DefaultItemLayout::New( DefaultItemLayout::LIST );
+  view.AddLayout(*listLayout);
+
+  layout = view.GetLayout(2);
+  DALI_TEST_CHECK(listLayout == layout);
+
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
+  view.AddLayout(*spiralLayout);
+
+  layout = view.GetLayout(3);
+  DALI_TEST_CHECK(spiralLayout == layout);
   END_TEST;
 }
