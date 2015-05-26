@@ -446,7 +446,7 @@ void ScrollBar::OnControlSizeSet( const Vector3& size )
 {
   if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
   {
-    mIndicator.SetSize(Self().GetCurrentSize().width, mIndicatorFixedHeight);
+    mIndicator.SetSize(size.width, mIndicatorFixedHeight);
   }
 }
 
