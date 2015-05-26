@@ -685,6 +685,9 @@ int UtcDaliToolkitScrollViewSetWrapModeP(void)
   ScrollView scrollView = ScrollView::New();
   Stage::GetCurrent().Add( scrollView );
 
+  Actor actor = Actor::New();
+  scrollView.Add( actor );
+
   // Position rulers. 4x4 grid.
   RulerPtr rulerX = new FixedRuler(50.0f);
   RulerPtr rulerY = new FixedRuler(50.0f);
@@ -697,7 +700,10 @@ int UtcDaliToolkitScrollViewSetWrapModeP(void)
   scrollView.ScrollTo(Vector2(225.0f, 125.0f), 0.0f); // 5th (1st) page across, and 3rd (3rd) page down. (wrapped)
   Wait(application);
   DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 17, TEST_LOCATION );
+
   scrollView.SetWrapMode(true);
+  scrollView.ScrollTo(Vector2(230.0f, 130.0f), 0.0f); // 5th (1st) page across, and 3rd (3rd) page down. (wrapped)
+  Wait(application);
   DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 13, TEST_LOCATION );
   END_TEST;
 }
@@ -2006,6 +2012,18 @@ int UtcDaliToolkitScrollViewFixedRulerGetPositionFromPageP(void)
   position = rulerNormal->GetPositionFromPage(2, volume, true);
   DALI_TEST_EQUALS( position, 60.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( volume, 0u, TEST_LOCATION );
+
+  // Disable the ruler
+  rulerNormal->Disable();
+
+  position = rulerNormal->GetPositionFromPage(1, volume, true);
+  DALI_TEST_EQUALS( position, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( volume, 1u, TEST_LOCATION );
+
+  position = rulerNormal->GetPositionFromPage(2, volume, true);
+  DALI_TEST_EQUALS( position, 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( volume, 2u, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -2095,6 +2113,21 @@ int UtcDaliToolkitScrollViewFixedRulerGetPageFromPositionP(void)
   DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(250.0f, true), 3u, TEST_LOCATION);
   DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(250.0f, false), 3u, TEST_LOCATION);
   DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(-350.0f, true), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(-350.0f, false), 0u, TEST_LOCATION);
+
+  fixedRuler->Disable();
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(250.0f, true), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(250.0f, false), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(-350.0f, true), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(-350.0f, false), 0u, TEST_LOCATION);
+
+  // Set domain size to be smaller than the ruler space
+  fixedRuler->SetDomain( RulerDomain(0.0f, 50.0f, true) );
+
+  fixedRuler->Enable();
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(250.0f, true), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(250.0f, false), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(-350.0f, true), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS( fixedRuler->GetPageFromPosition(-350.0f, false), 0u, TEST_LOCATION);
 
   fixedRuler->Disable();
