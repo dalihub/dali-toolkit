@@ -524,7 +524,8 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::INPUT_METHOD_SETTINGS:
       {
         // Empty implementation for now.
-
+        Property::Map map = value.Get<Property::Map>();
+        VirtualKeyboard::ApplySettings( map );
         break;
       }
     } // switch
@@ -783,6 +784,10 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         {
           value = impl.mController->GetMaximumNumberOfCharacters();
         }
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_METHOD_SETTINGS:
+      {
         break;
       }
     } //switch
