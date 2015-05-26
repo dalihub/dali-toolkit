@@ -21,7 +21,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/buttons/radio-button-impl.cpp \
    $(toolkit_src_dir)/controls/effects-view/effects-view-impl.cpp \
    $(toolkit_src_dir)/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp \
-   $(toolkit_src_dir)/controls/image-view/masked-image-view-impl.cpp \
    $(toolkit_src_dir)/controls/magnifier/magnifier-impl.cpp \
    $(toolkit_src_dir)/controls/popup/popup-impl.cpp \
    $(toolkit_src_dir)/controls/popup/popup-style-impl.cpp \

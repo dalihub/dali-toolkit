@@ -24,7 +24,6 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/text-controls/text-field.cpp \
   $(public_api_src_dir)/controls/text-controls/text-selection-popup.cpp \
   $(public_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.cpp \
-  $(public_api_src_dir)/controls/image-view/masked-image-view.cpp \
   $(public_api_src_dir)/focus-manager/focus-manager.cpp \
   $(public_api_src_dir)/focus-manager/keyboard-focus-manager.cpp \
   $(public_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
@@ -55,9 +54,6 @@ public_api_default_controls_header_files = \
 
 public_api_gaussian_blur_view_header_files = \
   $(public_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.h
-
-public_api_image_view_header_files = \
-  $(public_api_src_dir)/controls/image-view/masked-image-view.h
 
 public_api_item_view_header_files = \
   $(public_api_src_dir)/controls/scrollable/item-view/default-item-layout.h \
