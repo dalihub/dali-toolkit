@@ -2,7 +2,7 @@
  *
 # Dali Fundamentals  {#fundamentals}
 
-## Actors and the Stage
+## Actors and the Stage {#actors-and-stage}
 
 A Dali application uses a hierachy of Dali::Actor objects to position visible content.  An actor inherits a position relative to its parent, and can be moved relative to this point.  UI controls can be built by combining multiple actors.
   
@@ -20,7 +20,7 @@ var actor = new dali.Actor();
 dali.stage.add( actor );
 ~~~
 
-## The Coordinate System
+## The Coordinate System {#coordinate-system}
 
 The Stage has a 2D size, which matches the size of the application window.  The default coordinate system in Dali has the origin at the top-left corner, with positive X to right, and position Y going
 downwards.  This is intended to be convenient when laying-out 2D views.
@@ -28,7 +28,7 @@ downwards.  This is intended to be convenient when laying-out 2D views.
 ![ ](../assets/img/coordinate-system-and-stage.png)
 ![ ](coordinate-system-and-stage.png)
 
-## Positioning Actors
+## Positioning Actors {#positioning-actors}
 
 An actor inherits its parent's position.  The relative position between the actor & parent is determined by 3 properties:
 1) ParentOrigin.  This Vector3 property defines a point within the parent actor's area.

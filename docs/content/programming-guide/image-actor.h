@@ -1,12 +1,11 @@
-/*! \page image-mesh-actor Image and Mesh actors
+/*! \page image-actor Image Actors
  *
  *
  * <h1 class="pg">Overview</h1>
- * The Dali::ImageActor & Dali::MeshActor are inherited from Dali::Actor and provide means to display resources like Images and Geometries (Triangle meshes) on the stage.
+ * The Dali::ImageActor inherits from Dali::Actor and provide means to display resources like Images on the stage.
  * All the Dali::Actor methods can be called on them.<br>
  *
  * - <b>ImageActor:</b> An actor for displaying Images. It allows the developer to display a Dali::Image object on the stage.<br>
- * - <b>MeshActor:</b>  An actor for displaying one or more mesh geometries. It may have children, which may be plain actors or other mesh actors.<br>
  *
  * <h1 class="pg">Image Actor</h1>
  *
@@ -92,42 +91,6 @@
  * @code
  * myImageActor.SetImage( newImage );
  * @endcode
- *
- * <h2 class="pg">Fade in</h2>
- * It's possible to fade in the image gradually when first rendered.
- * @code
- * if (!myImageActor.GetFadeIn())
- * {
- *   myImageActor.SetFadeIn(true);
- * }
- *
- * // default : 1 Second
- * myImageActor.SetFadeInDuration(seconds);
- * @endcode
- *
- *
- * <h1 class="pg">Mesh Actor</h1>
- *
- * <h2 class="pg">Construction</h2>
- * The mesh actor is created by passing a reference to Dali::Mesh object
- *
- * @code
- * Dali::Mesh mesh = Dali::Mesh::New();
- * Dali::MeshActor myMeshActor = Dali::MeshActor::New(mesh);
- * @endcode
-
- *
- * <h2 class="pg">Modifying material</h2>
- * The developer can change the material of mesh actor using the material entity name.
- *
- * @code
- * Dali::Image image = Dali::Image::New(myTextureFile);
- * myCustomMaterial = Dali::Material::New("CustomMaterial");
- * myCustomMaterial.SetDiffuseTexture(image);
- * Dali::MeshActor::SetMaterial(myMeshActor, materialEntityNameInModel, 0, myCustomMaterial);
- *
- * @endcode
- *
  *
  */
 
