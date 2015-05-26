@@ -35,6 +35,8 @@ class ItemFactory
 {
 public:
 
+  class Extension; ///< Forward declare future extension interface
+
   /**
    * @brief Virtual destructor.
    */
@@ -63,6 +65,16 @@ public:
    * @param[in] actor The actor that represents the released item.
    */
   virtual void ItemReleased(unsigned int itemId, Actor actor) {};
+
+  /**
+   * Retrieve the extension for this control
+   *
+   * @return The extension if available, NULL otherwise
+   */
+  virtual Extension* GetExtension()
+  {
+    return NULL;
+  }
 };
 
 } // namespace Toolkit
