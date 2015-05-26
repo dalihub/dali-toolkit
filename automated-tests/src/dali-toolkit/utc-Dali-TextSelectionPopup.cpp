@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 
 using namespace Dali;
 using namespace Toolkit;

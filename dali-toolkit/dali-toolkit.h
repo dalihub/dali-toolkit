@@ -43,7 +43,6 @@
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>
