@@ -36,8 +36,8 @@ Control::Control()
 {
 }
 
-Control::Control(const Control& uiControl)
-: CustomActor( uiControl ? static_cast< const Internal::Control& >( uiControl.GetImplementation() ).GetOwner() : NULL)
+Control::Control( const Control& uiControl )
+: CustomActor( uiControl  )
 {
 }
 
@@ -59,99 +59,84 @@ Control Control::DownCast( BaseHandle handle )
   return DownCast< Control, Internal::Control >(handle);
 }
 
-Internal::Control& Control::GetImplementation()
-{
-  return static_cast<Internal::Control&>(CustomActor::GetImplementation());
-}
-
-const Internal::Control& Control::GetImplementation() const
-{
-  return static_cast<const Internal::Control&>(CustomActor::GetImplementation());
-}
-
 void Control::SetKeyInputFocus()
 {
-  GetImplementation().SetKeyInputFocus();
+  Internal::GetImplementation(*this).SetKeyInputFocus();
 }
 
 bool Control::HasKeyInputFocus()
 {
-  return GetImplementation().HasKeyInputFocus();
+  return Internal::GetImplementation(*this).HasKeyInputFocus();
 }
 
 void Control::ClearKeyInputFocus()
 {
-  GetImplementation().ClearKeyInputFocus();
+  Internal::GetImplementation(*this).ClearKeyInputFocus();
 }
 
 PinchGestureDetector Control::GetPinchGestureDetector() const
 {
-  return GetImplementation().GetPinchGestureDetector();
+  return Internal::GetImplementation(*this).GetPinchGestureDetector();
 }
 
 PanGestureDetector Control::GetPanGestureDetector() const
 {
-  return GetImplementation().GetPanGestureDetector();
+  return Internal::GetImplementation(*this).GetPanGestureDetector();
 }
 
 TapGestureDetector Control::GetTapGestureDetector() const
 {
-  return GetImplementation().GetTapGestureDetector();
+  return Internal::GetImplementation(*this).GetTapGestureDetector();
 }
 
 LongPressGestureDetector Control::GetLongPressGestureDetector() const
 {
-  return GetImplementation().GetLongPressGestureDetector();
+  return Internal::GetImplementation(*this).GetLongPressGestureDetector();
 }
 
 void Control::SetStyleName( const std::string& styleName )
 {
-  GetImplementation().SetStyleName( styleName );
+  Internal::GetImplementation(*this).SetStyleName( styleName );
 }
 
 const std::string& Control::GetStyleName() const
 {
-  return GetImplementation().GetStyleName();
+  return Internal::GetImplementation(*this).GetStyleName();
 }
 
 void Control::SetBackgroundColor( const Vector4& color )
 {
-  GetImplementation().SetBackgroundColor( color );
+  Internal::GetImplementation(*this).SetBackgroundColor( color );
 }
 
 Vector4 Control::GetBackgroundColor() const
 {
-  return GetImplementation().GetBackgroundColor();
+  return Internal::GetImplementation(*this).GetBackgroundColor();
 }
 
 void Control::SetBackgroundImage( Image image )
 {
-  GetImplementation().SetBackgroundImage( image );
+  Internal::GetImplementation(*this).SetBackgroundImage( image );
 }
 
 void Control::ClearBackground()
 {
-  GetImplementation().ClearBackground();
-}
-
-Actor Control::GetBackgroundActor() const
-{
-  return GetImplementation().GetBackgroundActor();
+  Internal::GetImplementation(*this).ClearBackground();
 }
 
 Control::KeyEventSignalType& Control::KeyEventSignal()
 {
-  return GetImplementation().KeyEventSignal();
+  return Internal::GetImplementation(*this).KeyEventSignal();
 }
 
 Control::KeyInputFocusSignalType& Control::KeyInputFocusGainedSignal()
 {
-  return GetImplementation().KeyInputFocusGainedSignal();
+  return Internal::GetImplementation(*this).KeyInputFocusGainedSignal();
 }
 
 Control::KeyInputFocusSignalType& Control::KeyInputFocusLostSignal()
 {
-  return GetImplementation().KeyInputFocusLostSignal();
+  return Internal::GetImplementation(*this).KeyInputFocusLostSignal();
 }
 
 Control::Control(Internal::Control& implementation)

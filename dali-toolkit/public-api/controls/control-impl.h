@@ -35,16 +35,13 @@ namespace Dali
 
 namespace Toolkit
 {
-
 class StyleManager;
-
-namespace Internal DALI_INTERNAL
-{
-class KeyInputFocusManager;
-}
 
 namespace Internal
 {
+class FocusManager;
+class KeyboardFocusManager;
+class KeyInputFocusManager;
 
 /**
  * @brief This is the internal base class for all controls.
@@ -73,23 +70,6 @@ public:
    * @brief Virtual destructor.
    */
   virtual ~Control();
-
-  // Size negotiation
-
-  /**
-   * @copydoc Dali::CustomActorImpl::GetHeightForWidth()
-   */
-  virtual float GetHeightForWidth( float width );
-
-  /**
-   * @copydoc Dali::CustomActorImpl::GetWidthForHeight()
-   */
-  virtual float GetWidthForHeight( float height );
-
-  /**
-   * @copydoc Toolkit::CustomActorImpl::GetNaturalSize()
-   */
-  virtual Vector3 GetNaturalSize();
 
   // Key Input
 
@@ -154,7 +134,7 @@ public:
    */
   LongPressGestureDetector GetLongPressGestureDetector() const;
 
-  // Background
+  // Styling
 
   /**
    * @copydoc Dali::Toolkit::Control::SetStyleName
@@ -165,6 +145,8 @@ public:
    * @copydoc Dali::Toolkit::Control::GetStyleName
    */
   const std::string& GetStyleName() const;
+
+  // Background
 
   /**
    * @copydoc Dali::Toolkit::Control::SetBackgroundColor
@@ -185,11 +167,6 @@ public:
    * @copydoc Dali::Toolkit::Control::ClearBackground
    */
   void ClearBackground();
-
-  /**
-   * @copydoc Dali::Toolkit::Control::GetBackgroundActor
-   */
-  Actor GetBackgroundActor() const;
 
   // Keyboard Navigation
 
@@ -217,33 +194,6 @@ public:
    */
   DALI_INTERNAL void Activate();
 
-  /**
-   * @brief This method should be overridden by deriving classes when they wish to respond the accessibility
-   * pan gesture.
-   *
-   * @param[in] gesture The pan gesture.
-   * @return true if the pan gesture has been consumed by this control
-   */
-  virtual bool OnAccessibilityPan(PanGesture gesture);
-
-  /**
-   * @brief This method should be overridden by deriving classes when they wish to respond the accessibility
-   * touch event.
-   *
-   * @param[in] touchEvent The touch event.
-   * @return true if the touch event has been consumed by this control
-   */
-  virtual bool OnAccessibilityTouch(const TouchEvent& touchEvent);
-
-  /**
-   * @brief This method should be overridden by deriving classes when they wish to respond
-   * the accessibility up and down action (i.e. value change of slider control).
-   *
-   * @param[in] isIncrease Whether the value should be increased or decreased
-   * @return true if the value changed action has been consumed by this control
-   */
-  virtual bool OnAccessibilityValueChange(bool isIncrease);
-
   // Keyboard Focus
 
   /**
@@ -261,27 +211,6 @@ public:
    * @return true if this control is set as a focus group for keyboard navigation.
    */
   bool IsKeyboardFocusGroup();
-
-  /**
-   * @brief Gets the next keyboard focusable actor in this control towards the given direction.
-   *
-   * A control needs to override this function in order to support two dimensional keyboard navigation.
-   * @param[in] currentFocusedActor The current focused actor.
-   * @param[in] direction The direction to move the focus towards.
-   * @param[in] loopEnabled Whether the focus movement should be looped within the control.
-   * @return the next keyboard focusable actor in this control or an empty handle if no actor can be focused.
-   */
-  virtual Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
-
-  /**
-   * @brief Informs this control that its chosen focusable actor will be focused.
-   *
-   * This allows the application to preform any actions if wishes
-   * before the focus is actually moved to the chosen actor.
-   *
-   * @param[in] commitedFocusableActor The commited focusable actor.
-   */
-  virtual void OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor);
 
   /**
    * @brief Emits KeyInputFocusGained signal if true else emits KeyInputFocusLost signal
@@ -338,7 +267,104 @@ public:
    */
   DALI_INTERNAL bool EmitKeyEventSignal(const KeyEvent& event);
 
-protected:
+protected: // From CustomActorImpl, not to be used by application developers
+
+  /**
+   * @copydoc CustomActorImpl::OnStageConnection()
+   */
+  virtual void OnStageConnection();
+
+  /**
+   * @copydoc CustomActorImpl::OnStageDisconnection()
+   */
+  virtual void OnStageDisconnection();
+
+  /**
+   * @copydoc CustomActorImpl::OnChildAdd()
+   */
+  virtual void OnChildAdd(Actor& child);
+
+  /**
+   * @copydoc CustomActorImpl::OnChildRemove()
+   */
+  virtual void OnChildRemove(Actor& child);
+
+  /**
+   * @copydoc CustomActorImpl::OnSizeSet()
+   */
+  virtual void OnSizeSet(const Vector3& targetSize);
+
+  /**
+   * @copydoc CustomActorImpl::OnSizeAnimation()
+   */
+  virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
+
+  /**
+   * @copydoc CustomActorImpl::OnTouchEvent()
+   */
+  virtual bool OnTouchEvent(const TouchEvent& event);
+
+  /**
+   * @copydoc CustomActorImpl::OnHoverEvent()
+   */
+  virtual bool OnHoverEvent(const HoverEvent& event);
+
+  /**
+   * @copydoc CustomActorImpl::OnKeyEvent()
+   */
+  virtual bool OnKeyEvent(const KeyEvent& event);
+
+  /**
+   * @copydoc CustomActorImpl::OnMouseWheelEvent()
+   */
+  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event);
+
+  /**
+   * @copydoc CustomActorImpl::OnRelayout()
+   */
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+
+  /**
+   * @copydoc CustomActorImpl::OnSetResizePolicy()
+   */
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
+
+  /**
+   * @copydoc CustomActorImpl::GetNaturalSize()
+   */
+  virtual Vector3 GetNaturalSize();
+
+  /**
+   * @copydoc CustomActorImpl::CalculateChildSize()
+   */
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension );
+
+  /**
+   * @copydoc CustomActorImpl::GetHeightForWidth()
+   */
+  virtual float GetHeightForWidth( float width );
+
+  /**
+   * @copydoc CustomActorImpl::GetWidthForHeight()
+   */
+  virtual float GetWidthForHeight( float height );
+
+  /**
+   * @copydoc CustomActorImpl::RelayoutDependentOnChildren()
+   */
+  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
+
+  /**
+   * @copydoc CustomActorImpl::OnCalculateRelayoutSize()
+   */
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension );
+
+  /**
+   * @copydoc CustomActorImpl::OnLayoutNegotiated()
+   */
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension );
+
+protected: // Helpers for deriving classes
 
   // Construction
 
@@ -354,11 +380,11 @@ protected:
   static const int CONTROL_BEHAVIOUR_FLAG_COUNT = Log< LAST_CONTROL_BEHAVIOUR_FLAG - 1 >::value + 1;      ///< Total count of flags
 
   /**
-   * @brief Create a Control.
+   * @brief Control constructor
    *
    * @param[in] behaviourFlags Behavioural flags from ControlBehaviour enum
    */
-  Control(ControlBehaviour behaviourFlags);
+  Control( ControlBehaviour behaviourFlags );
 
   /**
    * @brief Second phase initialization.
@@ -376,7 +402,7 @@ protected:
    * @endcode
    * @param[in]  type  The gesture type(s) to enable.
    */
-  void EnableGestureDetection(Gesture::Type type);
+  void EnableGestureDetection( Gesture::Type type );
 
   /**
    * @brief Allows deriving classes to disable any of the gesture detectors.
@@ -385,16 +411,11 @@ protected:
    * @param[in]  type  The gesture type(s) to disable.
    * @see EnableGetureDetection
    */
-  void DisableGestureDetection(Gesture::Type type);
+  void DisableGestureDetection( Gesture::Type type );
 
-  /**
-   * @copydoc Dali::CustomActorImpl::RelayoutDependentOnChildren()
-   */
-  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
+public: // API for derived classes to override
 
-private:
-
-  // For derived classes to override
+  // Lifecycle
 
   /**
    * @brief This method is called after the Control has been initialized.
@@ -404,11 +425,38 @@ private:
   virtual void OnInitialize();
 
   /**
-   * @brief This method is called when the control is activated.
+   * @brief Called whenever the control is added to the stage.
    *
-   * Derived classes should override this if they wish to be notified when they are activated.
+   * Could be overridden by derived classes.
    */
-  virtual void OnActivated();
+  virtual void OnControlStageConnection();
+
+  /**
+   * @brief Called whenever the control is removed from the stage.
+   *
+   * Could be overridden by derived classes.
+   */
+  virtual void OnControlStageDisconnection();
+
+  /**
+   * @brief Called whenever an Actor is added to the control.
+   *
+   * Could be overridden by derived classes.
+   *
+   * @param[in] child The added actor.
+   */
+  virtual void OnControlChildAdd( Actor& child );
+
+  /**
+   * @brief Called whenever an Actor is removed from the control.
+   *
+   * Could be overridden by derived classes.
+   *
+   * @param[in] child The removed actor.
+   */
+  virtual void OnControlChildRemove( Actor& child );
+
+  // Styling
 
   /**
    * @brief This method should be overridden by deriving classes requiring notifications when the style changes.
@@ -417,6 +465,90 @@ private:
    * @param[in] change  Information denoting what has changed.
    */
   virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
+
+  // Size negotiation
+
+  /**
+   * @brief Called whenever the Control's size is set.
+   *
+   * @param[in] size The new size.
+   */
+  virtual void OnControlSizeSet( const Vector3& size );
+
+  // Accessibility
+
+  /**
+   * @brief This method is called when the control is accessibility activated.
+   *
+   * Derived classes should override this to perform custom accessibility activation.
+   */
+  virtual void OnAccessibilityActivated();
+
+  /**
+   * @brief This method should be overridden by deriving classes when they wish to respond the accessibility
+   * pan gesture.
+   *
+   * @param[in] gesture The pan gesture.
+   * @return true if the pan gesture has been consumed by this control
+   */
+  virtual bool OnAccessibilityPan(PanGesture gesture);
+
+  /**
+   * @brief This method should be overridden by deriving classes when they wish to respond the accessibility
+   * touch event.
+   *
+   * @param[in] touchEvent The touch event.
+   * @return true if the touch event has been consumed by this control
+   */
+  virtual bool OnAccessibilityTouch(const TouchEvent& touchEvent);
+
+  /**
+   * @brief This method should be overridden by deriving classes when they wish to respond
+   * the accessibility up and down action (i.e. value change of slider control).
+   *
+   * @param[in] isIncrease Whether the value should be increased or decreased
+   * @return true if the value changed action has been consumed by this control
+   */
+  virtual bool OnAccessibilityValueChange(bool isIncrease);
+
+  // Keyboard focus
+
+  /**
+   * @brief Called when the control gains key input focus.
+   *
+   * Should be overridden by derived classes if they need to customize what happens when focus is gained.
+   */
+  virtual void OnKeyInputFocusGained();
+
+  /**
+   * @brief Called when the control loses key input focus.
+   *
+   * Should be overridden by derived classes if they need to customize what happens when focus is lost.
+   */
+  virtual void OnKeyInputFocusLost();
+
+  /**
+   * @brief Gets the next keyboard focusable actor in this control towards the given direction.
+   *
+   * A control needs to override this function in order to support two dimensional keyboard navigation.
+   * @param[in] currentFocusedActor The current focused actor.
+   * @param[in] direction The direction to move the focus towards.
+   * @param[in] loopEnabled Whether the focus movement should be looped within the control.
+   * @return the next keyboard focusable actor in this control or an empty handle if no actor can be focused.
+   */
+  virtual Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
+
+  /**
+   * @brief Informs this control that its chosen focusable actor will be focused.
+   *
+   * This allows the application to preform any actions if wishes
+   * before the focus is actually moved to the chosen actor.
+   *
+   * @param[in] commitedFocusableActor The commited focusable actor.
+   */
+  virtual void OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor);
+
+  // Gestures
 
   /**
    * @brief Called whenever a pinch gesture is detected on this control.
@@ -471,147 +603,6 @@ private:
    */
   virtual void OnLongPress( const LongPressGesture& longPress );
 
-  /**
-   * @brief Called whenever the control is added to the stage.
-   *
-   * Could be overridden by derived classes.
-   */
-  virtual void OnControlStageConnection();
-
-  /**
-   * @brief Called whenever the control is removed from the stage.
-   *
-   * Could be overridden by derived classes.
-   */
-  virtual void OnControlStageDisconnection();
-
-  /**
-   * @brief Called whenever an Actor is added to the control.
-   *
-   * Could be overridden by derived classes.
-   *
-   * @param[in] child The added actor.
-   */
-  virtual void OnControlChildAdd( Actor& child );
-
-  /**
-   * @brief Called whenever an Actor is removed from the control.
-   *
-   * Could be overridden by derived classes.
-   *
-   * @param[in] child The removed actor.
-   */
-  virtual void OnControlChildRemove( Actor& child );
-
-  /**
-   * @brief Called whenever the Control's size is set.
-   *
-   * Could be overridden by derived classes.
-   *
-   * @param[in] size The new size.
-   */
-  virtual void OnControlSizeSet( const Vector3& size );
-
-  /**
-   * @brief Called when the control gains key input focus.
-   *
-   * Should be overridden by derived classes if they need to customize what happens when focus is gained.
-   */
-  virtual void OnKeyInputFocusGained();
-
-  /**
-   * @brief Called when the control loses key input focus.
-   *
-   * Should be overridden by derived classes if they need to customize what happens when focus is lost.
-   */
-  virtual void OnKeyInputFocusLost();
-
-  // From CustomActorImpl, derived classes can override these.
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnSizeAnimation(Animation&, const Vector3&)
-   */
-  virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnTouchEvent(const TouchEvent&)
-   */
-  virtual bool OnTouchEvent(const TouchEvent& event);
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnHoverEvent(const HoverEvent&)
-   */
-  virtual bool OnHoverEvent(const HoverEvent& event);
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnKeyEvent(const KeyEvent&)
-   */
-  virtual bool OnKeyEvent(const KeyEvent& event);
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnMouseWheelEvent(const MouseWheelEvent&)
-   */
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event);
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnCalculateRelayoutSize()
-   */
-  virtual void OnCalculateRelayoutSize( Dimension::Type dimension );
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnLayoutNegotiated()
-   */
-  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension );
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnRelayout()
-   */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnSetResizePolicy()
-   */
-  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
-
-  /**
-   * @copydoc Dali::CustomActorImpl::CalculateChildSize()
-   */
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension );
-
-  // From CustomActorImpl, derived classes should NOT override these.
-
-  /**
-   * @brief Sends a request to relayout this control.
-   *
-   * The control will be relaid out after the
-   * Dali::Stage::SignalMessageQueueFlushed() signal is emitted.
-   *
-   * It calls OnControlStageConnection() to notify derived classes.
-   *
-   * @see Dali::CustomActorImpl::OnStageConnection()
-   */
-  virtual void OnStageConnection();
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnStageDisconnection()
-   */
-  virtual void OnStageDisconnection();
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnChildAdd(Actor&)
-   */
-  virtual void OnChildAdd(Actor& child);
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnChildRemove(Actor&)
-   */
-  virtual void OnChildRemove(Actor& child);
-
-  /**
-   * @copydoc Dali::CustomActorImpl::OnSizeSet(const Vector3&)
-   */
-  virtual void OnSizeSet(const Vector3& targetSize);
-
   // From ConnectionTrackerInterface
 
   /**
@@ -629,7 +620,7 @@ private:
    *
    * @return The extension if available, NULL otherwise
    */
-  virtual Extension* GetExtension()
+  virtual Extension* GetControlExtension()
   {
     return NULL;
   }
@@ -643,8 +634,25 @@ private:
   class Impl;
   Impl* mImpl;
 
-  friend class Internal::KeyInputFocusManager;     ///< KeyInputFocusManager needs to call several methods which are private. // TODO: Remove
 };
+
+/**
+ * @brief Get implementation from the handle
+ *
+ * @pre handle is initialized and points to a control
+ * @param handle
+ * @return implementation
+ */
+Internal::Control& GetImplementation( Dali::Toolkit::Control& handle );
+
+/**
+ * @brief Get implementation from the handle
+ *
+ * @pre handle is initialized and points to a control
+ * @param handle
+ * @return implementation
+ */
+const Internal::Control& GetImplementation( const Dali::Toolkit::Control& handle );
 
 } // namespace Internal
 

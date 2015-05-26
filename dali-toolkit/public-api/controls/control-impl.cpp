@@ -180,8 +180,7 @@ public:
     mLongPressGestureDetector(),
     mFlags( Control::ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
     mIsKeyboardNavigationSupported( false ),
-    mIsKeyboardFocusGroup( false ),
-    mInitialized( false )
+    mIsKeyboardFocusGroup( false )
   {
   }
 
@@ -243,7 +242,7 @@ public:
 
     if ( control )
     {
-      Control& controlImpl( control.GetImplementation() );
+      Control& controlImpl( GetImplementation( control ) );
 
       switch ( index )
       {
@@ -309,7 +308,7 @@ public:
 
     if ( control )
     {
-      Control& controlImpl( control.GetImplementation() );
+      Control& controlImpl( GetImplementation( control ) );
 
       switch ( index )
       {
@@ -329,10 +328,10 @@ public:
         {
           Property::Map map;
 
-          Actor actor = controlImpl.GetBackgroundActor();
-          if ( actor )
+          Background* back = controlImpl.mImpl->mBackground;
+          if( back )
           {
-            ImageActor imageActor = ImageActor::DownCast( actor );
+            ImageActor imageActor = ImageActor::DownCast( back->actor );
             if ( imageActor )
             {
               Image image = imageActor.GetImage();
@@ -376,7 +375,6 @@ public:
   ControlBehaviour mFlags :CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
-  bool mInitialized :1;
 
   // Properties - these need to be members of Internal::Control::Impl as they need to function within this class.
   static PropertyRegistration PROPERTY_1;
@@ -409,45 +407,6 @@ Toolkit::Control Control::New()
 Control::~Control()
 {
   delete mImpl;
-}
-
-Vector3 Control::GetNaturalSize()
-{
-  if( mImpl->mBackground )
-  {
-    Actor actor = mImpl->mBackground->actor;
-    if( actor )
-    {
-      return actor.GetNaturalSize();
-    }
-  }
-  return Vector3();
-}
-
-float Control::GetHeightForWidth( float width )
-{
-  if( mImpl->mBackground )
-  {
-    Actor actor = mImpl->mBackground->actor;
-    if( actor )
-    {
-      return actor.GetHeightForWidth( width );
-    }
-  }
-  return GetHeightForWidthBase( width );
-}
-
-float Control::GetWidthForHeight( float height )
-{
-  if( mImpl->mBackground )
-  {
-    Actor actor = mImpl->mBackground->actor;
-    if( actor )
-    {
-      return actor.GetWidthForHeight( height );
-    }
-  }
-  return GetWidthForHeightBase( height );
 }
 
 void Control::SetKeyInputFocus()
@@ -577,16 +536,6 @@ void Control::ClearBackground()
   }
 }
 
-Actor Control::GetBackgroundActor() const
-{
-  if ( mImpl->mBackground )
-  {
-    return mImpl->mBackground->actor;
-  }
-
-  return Actor();
-}
-
 void Control::SetKeyboardNavigationSupport(bool isSupported)
 {
   mImpl->mIsKeyboardNavigationSupported = isSupported;
@@ -600,7 +549,11 @@ bool Control::IsKeyboardNavigationSupported()
 void Control::Activate()
 {
   // Inform deriving classes
-  OnActivated();
+  OnAccessibilityActivated();
+}
+
+void Control::OnAccessibilityActivated()
+{
 }
 
 bool Control::OnAccessibilityPan(PanGesture gesture)
@@ -650,7 +603,7 @@ bool Control::DoAction(BaseObject* object, const std::string& actionName, const 
     if( control )
     {
       // if cast succeeds there is an implementation so no need to check
-      control.GetImplementation().OnActivated();
+      GetImplementation( control ).OnAccessibilityActivated();
     }
   }
 
@@ -665,7 +618,7 @@ bool Control::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* t
   Toolkit::Control control = Toolkit::Control::DownCast( handle );
   if ( control )
   {
-    Control& controlImpl( control.GetImplementation() );
+    Control& controlImpl( GetImplementation( control ) );
     connected = true;
 
     if ( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_EVENT ) )
@@ -755,9 +708,6 @@ Control::Control( ControlBehaviour behaviourFlags )
 
 void Control::Initialize()
 {
-  // Calling deriving classes
-  OnInitialize();
-
   if( mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS )
   {
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
@@ -774,7 +724,8 @@ void Control::Initialize()
     SetKeyboardNavigationSupport( true );
   }
 
-  mImpl->mInitialized = true;
+  // Calling deriving classes
+  OnInitialize();
 }
 
 void Control::EnableGestureDetection(Gesture::Type type)
@@ -839,7 +790,19 @@ void Control::OnInitialize()
 {
 }
 
-void Control::OnActivated()
+void Control::OnControlStageConnection()
+{
+}
+
+void Control::OnControlStageDisconnection()
+{
+}
+
+void Control::OnControlChildAdd( Actor& child )
+{
+}
+
+void Control::OnControlChildRemove( Actor& child )
 {
 }
 
@@ -880,54 +843,8 @@ void Control::OnLongPress( const LongPressGesture& longPress )
 {
 }
 
-void Control::OnControlStageConnection()
-{
-}
-
-void Control::OnControlStageDisconnection()
-{
-}
-
-void Control::OnControlChildAdd( Actor& child )
-{
-}
-
-void Control::OnControlChildRemove( Actor& child )
-{
-}
-
 void Control::OnControlSizeSet( const Vector3& size )
 {
-}
-
-void Control::OnCalculateRelayoutSize( Dimension::Type dimension )
-{
-}
-
-void Control::OnLayoutNegotiated( float size, Dimension::Type dimension )
-{
-}
-
-void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
-{
-  for( unsigned int i = 0, numChildren = Self().GetChildCount(); i < numChildren; ++i )
-  {
-    container.Add( Self().GetChildAt( i ), size );
-  }
-}
-
-void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
-{
-}
-
-float Control::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
-{
-  return CalculateChildSizeBase( child, dimension );
-}
-
-bool Control::RelayoutDependentOnChildren( Dimension::Type dimension )
-{
-  return RelayoutDependentOnChildrenBase( dimension );
 }
 
 void Control::EmitKeyInputFocusSignal( bool focusGained )
@@ -960,31 +877,6 @@ void Control::OnKeyInputFocusGained()
 void Control::OnKeyInputFocusLost()
 {
   EmitKeyInputFocusSignal( false );
-}
-
-void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
-{
-  // @todo consider animating negotiated child sizes to target size
-}
-
-bool Control::OnTouchEvent(const TouchEvent& event)
-{
-  return false; // Do not consume
-}
-
-bool Control::OnHoverEvent(const HoverEvent& event)
-{
-  return false; // Do not consume
-}
-
-bool Control::OnKeyEvent(const KeyEvent& event)
-{
-  return false; // Do not consume
-}
-
-bool Control::OnMouseWheelEvent(const MouseWheelEvent& event)
-{
-  return false; // Do not consume
 }
 
 void Control::OnStageConnection()
@@ -1031,6 +923,100 @@ void Control::OnSizeSet(const Vector3& targetSize)
   OnControlSizeSet( targetSize );
 }
 
+void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
+{
+  // @todo size negotiate background to new size, animate as well?
+}
+
+bool Control::OnTouchEvent(const TouchEvent& event)
+{
+  return false; // Do not consume
+}
+
+bool Control::OnHoverEvent(const HoverEvent& event)
+{
+  return false; // Do not consume
+}
+
+bool Control::OnKeyEvent(const KeyEvent& event)
+{
+  return false; // Do not consume
+}
+
+bool Control::OnMouseWheelEvent(const MouseWheelEvent& event)
+{
+  return false; // Do not consume
+}
+
+void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
+{
+  for( unsigned int i = 0, numChildren = Self().GetChildCount(); i < numChildren; ++i )
+  {
+    container.Add( Self().GetChildAt( i ), size );
+  }
+}
+
+void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
+{
+}
+
+Vector3 Control::GetNaturalSize()
+{
+  if( mImpl->mBackground )
+  {
+    Actor actor = mImpl->mBackground->actor;
+    if( actor )
+    {
+      return actor.GetNaturalSize();
+    }
+  }
+  return Vector3();
+}
+
+float Control::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
+{
+  return CalculateChildSizeBase( child, dimension );
+}
+
+float Control::GetHeightForWidth( float width )
+{
+  if( mImpl->mBackground )
+  {
+    Actor actor = mImpl->mBackground->actor;
+    if( actor )
+    {
+      return actor.GetHeightForWidth( width );
+    }
+  }
+  return GetHeightForWidthBase( width );
+}
+
+float Control::GetWidthForHeight( float height )
+{
+  if( mImpl->mBackground )
+  {
+    Actor actor = mImpl->mBackground->actor;
+    if( actor )
+    {
+      return actor.GetWidthForHeight( height );
+    }
+  }
+  return GetWidthForHeightBase( height );
+}
+
+bool Control::RelayoutDependentOnChildren( Dimension::Type dimension )
+{
+  return RelayoutDependentOnChildrenBase( dimension );
+}
+
+void Control::OnCalculateRelayoutSize( Dimension::Type dimension )
+{
+}
+
+void Control::OnLayoutNegotiated( float size, Dimension::Type dimension )
+{
+}
+
 void Control::SignalConnected( SlotObserver* slotObserver, CallbackBase* callback )
 {
   mImpl->SignalConnected( slotObserver, callback );
@@ -1039,6 +1025,22 @@ void Control::SignalConnected( SlotObserver* slotObserver, CallbackBase* callbac
 void Control::SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback )
 {
   mImpl->SignalDisconnected( slotObserver, callback );
+}
+
+Control& GetImplementation( Dali::Toolkit::Control& handle )
+{
+  CustomActorImpl& customInterface = handle.GetImplementation();
+  // downcast to control
+  Control& impl = dynamic_cast< Internal::Control& >( customInterface );
+  return impl;
+}
+
+const Control& GetImplementation( const Dali::Toolkit::Control& handle )
+{
+  const CustomActorImpl& customInterface = handle.GetImplementation();
+  // downcast to control
+  const Control& impl = dynamic_cast< const Internal::Control& >( customInterface );
+  return impl;
 }
 
 } // namespace Internal
