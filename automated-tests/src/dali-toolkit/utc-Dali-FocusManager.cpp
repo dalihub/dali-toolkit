@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,6 +112,20 @@ public:
   bool& mSignalVerified;
   Actor mCurrentFocusedActor;
   Toolkit::FocusManager::FocusOvershotDirection mFocusOvershotDirection;
+};
+
+// Functor to test whether focused actor activated signal is emitted.
+class FocusedActorActivatedCallback : public Dali::ConnectionTracker
+{
+public:
+  FocusedActorActivatedCallback()
+  {
+  }
+
+  void Callback(Actor activatedActor)
+  {
+    tet_infoline("Verifying FocusedActorActivatedCallback()");
+  }
 };
 
 } // namespace
@@ -1049,5 +1063,21 @@ int UtcDaliFocusManagerSignalFocusOvershot(void)
   DALI_TEST_CHECK(manager.MoveFocusBackward() == false);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
   DALI_TEST_CHECK(signalVerified);
+  END_TEST;
+}
+
+int UtcDaliFocusManagerSignalFocusedActorActivated(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" UtcDaliFocusManagerSignalFocusedActorActivated");
+
+  FocusManager manager = FocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  FocusedActorActivatedCallback callback;
+  manager.FocusedActorActivatedSignal().Connect(&callback, &FocusedActorActivatedCallback::Callback);
+  DALI_TEST_CHECK(true);
+
   END_TEST;
 }
