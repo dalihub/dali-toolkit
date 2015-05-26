@@ -438,6 +438,10 @@ int UtcDaliTableViewCells(void)
   tableView.AddChild(actor1, TableView::CellPosition(110, 110, 5, 5));
   DALI_TEST_CHECK( tableView.GetRows() == 115 && tableView.GetColumns() == 115 );
 
+  // Set the alignment of the cell
+  tableView.SetCellAlignment( TableView::CellPosition(100, 100, 1, 1), HorizontalAlignment::CENTER, VerticalAlignment::CENTER );
+  tableView.SetCellAlignment( TableView::CellPosition(110, 110, 5, 5), HorizontalAlignment::LEFT, VerticalAlignment::TOP );
+
   DALI_TEST_CHECK( true );
   END_TEST;
 }
