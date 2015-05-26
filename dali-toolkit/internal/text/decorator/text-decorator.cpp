@@ -47,7 +47,7 @@
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-selection-popup.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 
 #ifdef DEBUG_ENABLED
 #define DECORATOR_DEBUG

@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/public-api/controls/text-controls/text-selection-popup.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/text-controls/text-selection-popup-impl.h>
