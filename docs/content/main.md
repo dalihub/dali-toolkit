@@ -79,7 +79,7 @@
  + [Resource Tracking](@ref resourcetracking)
  + Logging
  + GUI Builder
- + Stagehand
+ + [Stagehand - DALi Visual Debugger](@ref stagehand)
 
 ### Viewing Modes
  + [Overview](@ref viewing-modes)
