@@ -40,7 +40,7 @@ public:
   /**
    * @brief Virtual destructor.
    */
-  DALI_EXPORT_API virtual ~ItemFactory() = 0;
+  DALI_EXPORT_API virtual ~ItemFactory() {};
 
   /**
    * @brief Query the number of items available from the factory.
