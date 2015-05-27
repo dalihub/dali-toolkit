@@ -508,9 +508,9 @@ private: // private overriden functions from CustomActorImpl and Controls
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
 
   /**
-   * @copydoc Dali::Control::OnControlSizeSet(const Vector3&)
+   * @copydoc CustomActorImpl::OnSizeSet(const Vector3&)
    */
-  virtual void OnControlSizeSet( const Vector3& size );
+  virtual void OnSizeSet( const Vector3& size );
 
   /**
    * From CustomActorImpl; called after a child has been added to the owning actor.
@@ -547,14 +547,14 @@ private: // private overriden functions from CustomActorImpl and Controls
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::Control::OnControlStageConnection()
+   * @copydoc CustomActorImpl::OnStageConnection()
    */
-  virtual void OnControlStageConnection();
+  virtual void OnStageConnection();
 
   /**
-   * @copydoc Toolkit::Control::OnControlStageConnection()
+   * @copydoc CustomActorImpl::OnStageDisconnection()
    */
-  virtual void OnControlStageDisconnection();
+  virtual void OnStageDisconnection();
 
   /**
    * @copydoc Toolkit::Control::OnAccessibilityPan()

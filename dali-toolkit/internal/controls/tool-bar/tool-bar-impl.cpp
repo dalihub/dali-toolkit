@@ -66,25 +66,6 @@ Toolkit::ToolBar ToolBar::New()
   return toolBar;
 }
 
-void ToolBar::SetBackground( Actor background )
-{
-  Lock lock( mInitializing );
-
-  // ToolBar image
-  background.SetParentOrigin( Dali::ParentOrigin::TOP_CENTER );
-  background.SetAnchorPoint( Dali::AnchorPoint::TOP_CENTER );
-  background.SetSize( Vector2( mToolBarSize.width, mToolBarSize.height ) );
-
-  RenderableActor renderableActor = RenderableActor::DownCast( background );
-  if ( renderableActor )
-  {
-    renderableActor.SetSortModifier( 1.f );
-  }
-
-  Self().Add( background );
-  mBackground = background;
-}
-
 void ToolBar::AddControl( Actor control, float relativeSize, Toolkit::Alignment::Type alignment, const Toolkit::Alignment::Padding& padding )
 {
   // Work out index and update bases and offsets for further insertions.
@@ -353,12 +334,6 @@ void ToolBar::OnControlChildAdd(Actor& child)
   // No OnControlChildRemove method required because Actors are added to the mLayout table view, so if an
   // actor is removed using the Actor::RemoveChild method it will not remove anything because the
   // actor is in mLayout not in Self().
-}
-
-void ToolBar::OnControlSizeSet( const Vector3& targetSize )
-{
-  mToolBarSize = targetSize;
-  mBackground.SetSize( Vector2( mToolBarSize.width, mToolBarSize.height ) );
 }
 
 } // namespace Internal

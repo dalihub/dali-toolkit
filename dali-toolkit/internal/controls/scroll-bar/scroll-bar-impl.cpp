@@ -442,7 +442,7 @@ void ScrollBar::OnPan( Actor source, const PanGesture& gesture )
   }
 }
 
-void ScrollBar::OnControlSizeSet( const Vector3& size )
+void ScrollBar::OnSizeSet( const Vector3& size )
 {
   if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
   {

@@ -289,7 +289,7 @@ void BloomView::OnInitialize()
   SetupProperties();
 }
 
-void BloomView::OnControlSizeSet(const Vector3& targetSize)
+void BloomView::OnSizeSet(const Vector3& targetSize)
 {
   mTargetSize = Vector2(targetSize);
   mChildrenRoot.SetSize(targetSize);
@@ -427,20 +427,6 @@ void BloomView::RemoveRenderTasks()
   GetImpl(mGaussianBlurView).RemoveRenderTasks();
 
   taskList.RemoveTask(mCompositeTask);
-}
-
-void BloomView::OnStageDisconnection()
-{
-  // TODO: can't call this here, since SetImage() calls fails similarly to above
-  // Need to fix the stage connection so this callback can be used arbitrarily. At that point we  can simplify the API by removing the need for Activate() / Deactivate()
-  //Deactivate();
-}
-
-void BloomView::OnControlStageConnection()
-{
-  // TODO: can't call this here, since SetImage() calls fail to connect images to stage, since parent chain not fully on stage yet
-  // Need to fix the stage connection so this callback can be used arbitrarily. At that point we  can simplify the API by removing the need for Activate() / Deactivate()
-  //Activate();
 }
 
 void BloomView::Activate()

@@ -88,12 +88,6 @@ public:
   static ToolBar DownCast( BaseHandle handle );
 
   /**
-   * Sets a background image.
-   * @param background Actor with the tool bar background.
-   */
-  void SetBackground( Actor background );
-
-  /**
    * Adds an additional control to the tool bar.
    * @pre The tool bar needs to be initialized.
    * @pre The alignment needs to be horizontal.

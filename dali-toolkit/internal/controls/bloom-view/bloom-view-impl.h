@@ -87,10 +87,7 @@ public:
 private:
 
   virtual void OnInitialize();
-  virtual void OnControlSizeSet(const Vector3& targetSize);
-  virtual void OnStageDisconnection();
-
-  virtual void OnControlStageConnection();
+  virtual void OnSizeSet(const Vector3& targetSize);
 
   void AllocateResources();
   void CreateRenderTasks();

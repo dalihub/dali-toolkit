@@ -81,32 +81,6 @@ int UtcDaliToolBarNew(void)
   END_TEST;
 }
 
-int UtcDaliToolBarSetBackground(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolBarSetBackground");
-
-  try
-  {
-    ImageActor toolBarBackground = CreateSolidColorActor( Color::RED );
-
-    ToolBar toolbar = ToolBar::New();
-    toolbar.SetBackground( toolBarBackground );
-
-    Stage::GetCurrent().Add( toolbar );
-  }
-  catch( ... )
-  {
-    tet_result(TET_FAIL);
-  }
-
-  tet_result(TET_PASS);
-
-  application.SendNotification(); // VCC To be removed!!
-  application.Render();     // VCC To be removed!!
-  END_TEST;
-}
-
 int UtcDaliToolBarAddControl01(void)
 {
   ToolkitTestApplication application;

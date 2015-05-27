@@ -71,24 +71,61 @@ public:
    */
   virtual ~Control();
 
-  // Key Input
+  // Styling
 
   /**
-   * @copydoc Toolkit::Control::SetKeyInputFocus()
+   * @copydoc Dali::Toolkit::Control::SetStyleName
    */
-  void SetKeyInputFocus();
+  void SetStyleName( const std::string& styleName );
 
   /**
-   * @copydoc Toolkit::Control::HasKeyInputFocus()
+   * @copydoc Dali::Toolkit::Control::GetStyleName
    */
-  bool HasKeyInputFocus();
+  const std::string& GetStyleName() const;
+
+  // Background
 
   /**
-   * @copydoc Toolkit::Control::ClearKeyInputFocus()
+   * @copydoc Dali::Toolkit::Control::SetBackgroundColor
    */
-  void ClearKeyInputFocus();
+  void SetBackgroundColor( const Vector4& color );
+
+  /**
+   * @copydoc Dali::Toolkit::Control::GetBackgroundColor
+   */
+  Vector4 GetBackgroundColor() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Control::SetBackgroundImage
+   */
+  void SetBackgroundImage( Image image );
+
+  /**
+   * @copydoc Dali::Toolkit::Control::ClearBackground
+   */
+  void ClearBackground();
 
   // Gesture Detection
+
+  /**
+   * @brief Allows deriving classes to enable any of the gesture detectors that are available.
+   *
+   * Gesture detection can be enabled one at a time or in bitwise format as shown:
+   * @code
+   * EnableGestureDetection(Gesture::Type(Gesture::Pinch | Gesture::Tap | Gesture::Pan));
+   * @endcode
+   * @param[in]  type  The gesture type(s) to enable.
+   */
+  void EnableGestureDetection( Gesture::Type type );
+
+  /**
+   * @brief Allows deriving classes to disable any of the gesture detectors.
+   *
+   * Like EnableGestureDetection, this can also be called using bitwise or.
+   * @param[in]  type  The gesture type(s) to disable.
+   * @see EnableGetureDetection
+   */
+  void DisableGestureDetection( Gesture::Type type );
 
   /**
    * @brief If deriving classes wish to fine tune pinch gesture
@@ -134,40 +171,6 @@ public:
    */
   LongPressGestureDetector GetLongPressGestureDetector() const;
 
-  // Styling
-
-  /**
-   * @copydoc Dali::Toolkit::Control::SetStyleName
-   */
-  void SetStyleName( const std::string& styleName );
-
-  /**
-   * @copydoc Dali::Toolkit::Control::GetStyleName
-   */
-  const std::string& GetStyleName() const;
-
-  // Background
-
-  /**
-   * @copydoc Dali::Toolkit::Control::SetBackgroundColor
-   */
-  void SetBackgroundColor( const Vector4& color );
-
-  /**
-   * @copydoc Dali::Toolkit::Control::GetBackgroundColor
-   */
-  Vector4 GetBackgroundColor() const;
-
-  /**
-   * @copydoc Dali::Toolkit::Control::SetBackgroundImage
-   */
-  void SetBackgroundImage( Image image );
-
-  /**
-   * @copydoc Dali::Toolkit::Control::ClearBackground
-   */
-  void ClearBackground();
-
   // Keyboard Navigation
 
   /**
@@ -178,7 +181,7 @@ public:
    * The control doesn't support it by default.
    * @param[in] isSupported Whether this control supports two dimensional keyboard navigation.
    */
-  void SetKeyboardNavigationSupport(bool isSupported);
+  void SetKeyboardNavigationSupport( bool isSupported );
 
   /**
    * @brief Gets whether this control supports two dimensional keyboard navigation.
@@ -187,12 +190,22 @@ public:
    */
   bool IsKeyboardNavigationSupported();
 
-  // Called by Focus Managers
+  // Key Input
 
   /**
-   * @brief Called by the focus manager and keyboard focus manager to Activate the Control
+   * @copydoc Toolkit::Control::SetKeyInputFocus()
    */
-  DALI_INTERNAL void Activate();
+  void SetKeyInputFocus();
+
+  /**
+   * @copydoc Toolkit::Control::HasKeyInputFocus()
+   */
+  bool HasKeyInputFocus();
+
+  /**
+   * @copydoc Toolkit::Control::ClearKeyInputFocus()
+   */
+  void ClearKeyInputFocus();
 
   // Keyboard Focus
 
@@ -203,7 +216,7 @@ public:
    * can be limitied to its child actors). The control is not a focus group by default.
    * @param[in] isFocusGroup Whether this control is set as a focus group for keyboard navigation.
    */
-  void SetAsKeyboardFocusGroup(bool isFocusGroup);
+  void SetAsKeyboardFocusGroup( bool isFocusGroup );
 
   /**
    * @brief Gets whether this control is a focus group for keyboard navigation.
@@ -212,37 +225,14 @@ public:
    */
   bool IsKeyboardFocusGroup();
 
-  /**
-   * @brief Emits KeyInputFocusGained signal if true else emits KeyInputFocusLost signal
-   *
-   * Should be called last by the control after it acts on the Input Focus change.
-   *
-   * @param[in] focusGained True if gained, False if lost
-   */
-  void EmitKeyInputFocusSignal( bool focusGained );
-
-  // Actions & Signals
+  // Called by Focus Manager
 
   /**
-   * @brief Performs actions as requested using the action name.
-   *
-   * @param[in] object The object on which to perform the action.
-   * @param[in] actionName The action to perform.
-   * @param[in] attributes The attributes with which to perfrom this action.
-   * @return true if action has been accepted by this control
+   * @brief Called by the focus manager and keyboard focus manager to Activate the Control
    */
-  static bool DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes);
+  DALI_INTERNAL void AccessibilityActivate();
 
-  /**
-   * Connects a callback function with the object's signals.
-   * @param[in] object The object providing the signal.
-   * @param[in] tracker Used to disconnect the signal.
-   * @param[in] signalName The signal to connect to.
-   * @param[in] functor A newly allocated FunctorDelegate.
-   * @return True if the signal was connected.
-   * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
-   */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  // Signals
 
   /**
    * @copydoc Dali::Toolkit::Control::KeyEventSignal()
@@ -265,7 +255,18 @@ public:
    * @param[in] event The key event.
    * @return True if the event was consumed.
    */
-  DALI_INTERNAL bool EmitKeyEventSignal(const KeyEvent& event);
+  DALI_INTERNAL bool EmitKeyEventSignal( const KeyEvent& event );
+
+protected: // For derived classes to call
+
+  /**
+   * @brief Emits KeyInputFocusGained signal if true else emits KeyInputFocusLost signal
+   *
+   * Should be called last by the control after it acts on the Input Focus change.
+   *
+   * @param[in] focusGained True if gained, False if lost
+   */
+  void EmitKeyInputFocusSignal( bool focusGained );
 
 protected: // From CustomActorImpl, not to be used by application developers
 
@@ -282,42 +283,42 @@ protected: // From CustomActorImpl, not to be used by application developers
   /**
    * @copydoc CustomActorImpl::OnChildAdd()
    */
-  virtual void OnChildAdd(Actor& child);
+  virtual void OnChildAdd( Actor& child );
 
   /**
    * @copydoc CustomActorImpl::OnChildRemove()
    */
-  virtual void OnChildRemove(Actor& child);
+  virtual void OnChildRemove( Actor& child );
 
   /**
    * @copydoc CustomActorImpl::OnSizeSet()
    */
-  virtual void OnSizeSet(const Vector3& targetSize);
+  virtual void OnSizeSet( const Vector3& targetSize );
 
   /**
    * @copydoc CustomActorImpl::OnSizeAnimation()
    */
-  virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
+  virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize );
 
   /**
    * @copydoc CustomActorImpl::OnTouchEvent()
    */
-  virtual bool OnTouchEvent(const TouchEvent& event);
+  virtual bool OnTouchEvent( const TouchEvent& event );
 
   /**
    * @copydoc CustomActorImpl::OnHoverEvent()
    */
-  virtual bool OnHoverEvent(const HoverEvent& event);
+  virtual bool OnHoverEvent( const HoverEvent& event );
 
   /**
    * @copydoc CustomActorImpl::OnKeyEvent()
    */
-  virtual bool OnKeyEvent(const KeyEvent& event);
+  virtual bool OnKeyEvent( const KeyEvent& event );
 
   /**
    * @copydoc CustomActorImpl::OnMouseWheelEvent()
    */
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event);
+  virtual bool OnMouseWheelEvent( const MouseWheelEvent& event );
 
   /**
    * @copydoc CustomActorImpl::OnRelayout()
@@ -391,28 +392,6 @@ protected: // Helpers for deriving classes
    */
   void Initialize();
 
-  // Gesture Detection
-
-  /**
-   * @brief Allows deriving classes to enable any of the gesture detectors that are available.
-   *
-   * Gesture detection can be enabled one at a time or in bitwise format as shown:
-   * @code
-   * EnableGestureDetection(Gesture::Type(Gesture::Pinch | Gesture::Tap | Gesture::Pan));
-   * @endcode
-   * @param[in]  type  The gesture type(s) to enable.
-   */
-  void EnableGestureDetection( Gesture::Type type );
-
-  /**
-   * @brief Allows deriving classes to disable any of the gesture detectors.
-   *
-   * Like EnableGestureDetection, this can also be called using bitwise or.
-   * @param[in]  type  The gesture type(s) to disable.
-   * @see EnableGetureDetection
-   */
-  void DisableGestureDetection( Gesture::Type type );
-
 public: // API for derived classes to override
 
   // Lifecycle
@@ -423,20 +402,6 @@ public: // API for derived classes to override
    * Derived classes should do any second phase initialization by overriding this method.
    */
   virtual void OnInitialize();
-
-  /**
-   * @brief Called whenever the control is added to the stage.
-   *
-   * Could be overridden by derived classes.
-   */
-  virtual void OnControlStageConnection();
-
-  /**
-   * @brief Called whenever the control is removed from the stage.
-   *
-   * Could be overridden by derived classes.
-   */
-  virtual void OnControlStageDisconnection();
 
   /**
    * @brief Called whenever an Actor is added to the control.
@@ -466,15 +431,6 @@ public: // API for derived classes to override
    */
   virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
 
-  // Size negotiation
-
-  /**
-   * @brief Called whenever the Control's size is set.
-   *
-   * @param[in] size The new size.
-   */
-  virtual void OnControlSizeSet( const Vector3& size );
-
   // Accessibility
 
   /**
@@ -491,7 +447,7 @@ public: // API for derived classes to override
    * @param[in] gesture The pan gesture.
    * @return true if the pan gesture has been consumed by this control
    */
-  virtual bool OnAccessibilityPan(PanGesture gesture);
+  virtual bool OnAccessibilityPan( PanGesture gesture );
 
   /**
    * @brief This method should be overridden by deriving classes when they wish to respond the accessibility
@@ -500,7 +456,7 @@ public: // API for derived classes to override
    * @param[in] touchEvent The touch event.
    * @return true if the touch event has been consumed by this control
    */
-  virtual bool OnAccessibilityTouch(const TouchEvent& touchEvent);
+  virtual bool OnAccessibilityTouch( const TouchEvent& touchEvent );
 
   /**
    * @brief This method should be overridden by deriving classes when they wish to respond
@@ -509,7 +465,7 @@ public: // API for derived classes to override
    * @param[in] isIncrease Whether the value should be increased or decreased
    * @return true if the value changed action has been consumed by this control
    */
-  virtual bool OnAccessibilityValueChange(bool isIncrease);
+  virtual bool OnAccessibilityValueChange( bool isIncrease );
 
   // Keyboard focus
 
@@ -536,7 +492,7 @@ public: // API for derived classes to override
    * @param[in] loopEnabled Whether the focus movement should be looped within the control.
    * @return the next keyboard focusable actor in this control or an empty handle if no actor can be focused.
    */
-  virtual Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
+  virtual Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled );
 
   /**
    * @brief Informs this control that its chosen focusable actor will be focused.
@@ -546,7 +502,7 @@ public: // API for derived classes to override
    *
    * @param[in] commitedFocusableActor The commited focusable actor.
    */
-  virtual void OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor);
+  virtual void OnKeyboardFocusChangeCommitted( Actor commitedFocusableActor );
 
   // Gestures
 
@@ -562,7 +518,7 @@ public: // API for derived classes to override
    * @param[in]  pinch  The pinch gesture.
    * @see EnableGestureDetection
    */
-  virtual void OnPinch(const PinchGesture& pinch);
+  virtual void OnPinch( const PinchGesture& pinch );
 
   /**
    * @brief Called whenever a pan gesture is detected on this control.
@@ -628,8 +584,8 @@ public: // API for derived classes to override
 private:
 
   // Undefined
-  DALI_INTERNAL Control(const Control&);
-  DALI_INTERNAL Control& operator=(const Control&);
+  DALI_INTERNAL Control( const Control& );
+  DALI_INTERNAL Control& operator=( const Control& );
 
   class Impl;
   Impl* mImpl;

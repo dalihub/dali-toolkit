@@ -132,14 +132,14 @@ private: // From Button
 private: // From Control
 
   /**
-   * @copydoc Toolkit::Control::OnControlSizeSet( const Vector3& targetSize )
+   * @copydoc CustomActorImpl::OnSizeSet( const Vector3& targetSize )
    */
-  virtual void OnControlSizeSet( const Vector3& targetSize );
+  virtual void OnSizeSet( const Vector3& targetSize );
 
   /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
-  Vector3 GetNaturalSize();
+  virtual Vector3 GetNaturalSize();
 
   /**
    * @copydoc Toolkit::Control::OnSetResizePolicy

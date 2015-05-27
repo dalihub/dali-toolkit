@@ -288,9 +288,9 @@ protected:
   virtual ~Slider();
 
   /**
-   * @copydoc Control::OnControlSizeSet( const Vector3& size )
+   * @copydoc CustomActorImpl::OnSizeSet( const Vector3& size )
    */
-  virtual void OnControlSizeSet( const Vector3& size );
+  virtual void OnSizeSet( const Vector3& size );
 
 private:
 

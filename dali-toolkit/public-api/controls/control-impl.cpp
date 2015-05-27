@@ -51,9 +51,105 @@ namespace
 
 const float BACKGROUND_ACTOR_Z_POSITION( -0.1f );
 
+/**
+ * Creates control through type registry
+ */
 BaseHandle Create()
 {
   return Internal::Control::New();
+}
+
+/**
+ * Performs actions as requested using the action name.
+ * @param[in] object The object on which to perform the action.
+ * @param[in] actionName The action to perform.
+ * @param[in] attributes The attributes with which to perfrom this action.
+ * @return true if action has been accepted by this control
+ */
+const char* ACTION_CONTROL_ACTIVATED = "control-activated";
+static bool DoAction( BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes )
+{
+  bool ret = false;
+
+  if( object && ( 0 == strcmp( actionName.c_str(), ACTION_CONTROL_ACTIVATED ) ) )
+  {
+    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
+    if( control )
+    {
+      // if cast succeeds there is an implementation so no need to check
+      Internal::GetImplementation( control ).OnAccessibilityActivated();
+    }
+  }
+
+  return ret;
+}
+
+/**
+ * Connects a callback function with the object's signals.
+ * @param[in] object The object providing the signal.
+ * @param[in] tracker Used to disconnect the signal.
+ * @param[in] signalName The signal to connect to.
+ * @param[in] functor A newly allocated FunctorDelegate.
+ * @return True if the signal was connected.
+ * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
+ */
+const char* SIGNAL_KEY_EVENT = "key-event";
+const char* SIGNAL_KEY_INPUT_FOCUS_GAINED = "key-input-focus-gained";
+const char* SIGNAL_KEY_INPUT_FOCUS_LOST = "key-input-focus-lost";
+const char* SIGNAL_TAPPED = "tapped";
+const char* SIGNAL_PANNED = "panned";
+const char* SIGNAL_PINCHED = "pinched";
+const char* SIGNAL_LONG_PRESSED = "long-pressed";
+static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+{
+  Dali::BaseHandle handle( object );
+
+  bool connected( false );
+  Toolkit::Control control = Toolkit::Control::DownCast( handle );
+  if ( control )
+  {
+    Internal::Control& controlImpl( Internal::GetImplementation( control ) );
+    connected = true;
+
+    if ( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_EVENT ) )
+    {
+      controlImpl.KeyEventSignal().Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_GAINED ) )
+    {
+      controlImpl.KeyInputFocusGainedSignal().Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_LOST ) )
+    {
+      controlImpl.KeyInputFocusLostSignal().Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_TAPPED ) )
+    {
+      controlImpl.EnableGestureDetection( Gesture::Tap );
+      controlImpl.GetTapGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_PANNED ) )
+    {
+      controlImpl.EnableGestureDetection( Gesture::Pan );
+      controlImpl.GetPanGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_PINCHED ) )
+    {
+      controlImpl.EnableGestureDetection( Gesture::Pinch );
+      controlImpl.GetPinchGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_LONG_PRESSED ) )
+    {
+      controlImpl.EnableGestureDetection( Gesture::LongPress );
+      controlImpl.GetLongPressGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else
+    {
+      // signalName does not match any signal
+      connected = false;
+    }
+  }
+  return connected;
 }
 
 // Setup signals and actions using the type-registry.
@@ -61,15 +157,15 @@ DALI_TYPE_REGISTRATION_BEGIN( Control, CustomActor, Create );
 
 // Note: Properties are registered separately below.
 
-DALI_SIGNAL_REGISTRATION( Toolkit, Control, "key-event",              SIGNAL_KEY_EVENT              )
-DALI_SIGNAL_REGISTRATION( Toolkit, Control, "key-input-focus-gained", SIGNAL_KEY_INPUT_FOCUS_GAINED )
-DALI_SIGNAL_REGISTRATION( Toolkit, Control, "key-input-focus-lost",   SIGNAL_KEY_INPUT_FOCUS_LOST   )
-DALI_SIGNAL_REGISTRATION( Toolkit, Control, "tapped",                 SIGNAL_TAPPED                 )
-DALI_SIGNAL_REGISTRATION( Toolkit, Control, "panned",                 SIGNAL_PANNED                 )
-DALI_SIGNAL_REGISTRATION( Toolkit, Control, "pinched",                SIGNAL_PINCHED                )
-DALI_SIGNAL_REGISTRATION( Toolkit, Control, "long-pressed",           SIGNAL_LONG_PRESSED           )
+SignalConnectorType registerSignal1( typeRegistration, SIGNAL_KEY_EVENT, &DoConnectSignal );
+SignalConnectorType registerSignal2( typeRegistration, SIGNAL_KEY_INPUT_FOCUS_GAINED, &DoConnectSignal );
+SignalConnectorType registerSignal3( typeRegistration, SIGNAL_KEY_INPUT_FOCUS_LOST, &DoConnectSignal );
+SignalConnectorType registerSignal4( typeRegistration, SIGNAL_TAPPED, &DoConnectSignal );
+SignalConnectorType registerSignal5( typeRegistration, SIGNAL_PANNED, &DoConnectSignal );
+SignalConnectorType registerSignal6( typeRegistration, SIGNAL_PINCHED, &DoConnectSignal );
+SignalConnectorType registerSignal7( typeRegistration, SIGNAL_LONG_PRESSED, &DoConnectSignal );
 
-DALI_ACTION_REGISTRATION( Toolkit, Control, "control-activated",      ACTION_CONTROL_ACTIVATED      )
+TypeAction registerAction( typeRegistration, ACTION_CONTROL_ACTIVATED, &DoAction );
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -409,52 +505,6 @@ Control::~Control()
   delete mImpl;
 }
 
-void Control::SetKeyInputFocus()
-{
-  if( Self().OnStage() )
-  {
-    Toolkit::KeyInputFocusManager::Get().SetFocus(Toolkit::Control::DownCast(Self()));
-  }
-}
-
-bool Control::HasKeyInputFocus()
-{
-  bool result = false;
-  if( Self().OnStage() )
-  {
-    result = Toolkit::KeyInputFocusManager::Get().IsKeyboardListener(Toolkit::Control::DownCast(Self()));
-  }
-  return result;
-}
-
-void Control::ClearKeyInputFocus()
-{
-  if( Self().OnStage() )
-  {
-    Toolkit::KeyInputFocusManager::Get().RemoveFocus(Toolkit::Control::DownCast(Self()));
-  }
-}
-
-PinchGestureDetector Control::GetPinchGestureDetector() const
-{
-  return mImpl->mPinchGestureDetector;
-}
-
-PanGestureDetector Control::GetPanGestureDetector() const
-{
-  return mImpl->mPanGestureDetector;
-}
-
-TapGestureDetector Control::GetTapGestureDetector() const
-{
-  return mImpl->mTapGestureDetector;
-}
-
-LongPressGestureDetector Control::GetLongPressGestureDetector() const
-{
-  return mImpl->mLongPressGestureDetector;
-}
-
 void Control::SetStyleName( const std::string& styleName )
 {
   if( styleName != mImpl->mStyleName )
@@ -536,6 +586,84 @@ void Control::ClearBackground()
   }
 }
 
+void Control::EnableGestureDetection(Gesture::Type type)
+{
+  if ( (type & Gesture::Pinch) && !mImpl->mPinchGestureDetector )
+  {
+    mImpl->mPinchGestureDetector = PinchGestureDetector::New();
+    mImpl->mPinchGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PinchDetected);
+    mImpl->mPinchGestureDetector.Attach(Self());
+  }
+
+  if ( (type & Gesture::Pan) && !mImpl->mPanGestureDetector )
+  {
+    mImpl->mPanGestureDetector = PanGestureDetector::New();
+    mImpl->mPanGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PanDetected);
+    mImpl->mPanGestureDetector.Attach(Self());
+  }
+
+  if ( (type & Gesture::Tap) && !mImpl->mTapGestureDetector )
+  {
+    mImpl->mTapGestureDetector = TapGestureDetector::New();
+    mImpl->mTapGestureDetector.DetectedSignal().Connect(mImpl, &Impl::TapDetected);
+    mImpl->mTapGestureDetector.Attach(Self());
+  }
+
+  if ( (type & Gesture::LongPress) && !mImpl->mLongPressGestureDetector )
+  {
+    mImpl->mLongPressGestureDetector = LongPressGestureDetector::New();
+    mImpl->mLongPressGestureDetector.DetectedSignal().Connect(mImpl, &Impl::LongPressDetected);
+    mImpl->mLongPressGestureDetector.Attach(Self());
+  }
+}
+
+void Control::DisableGestureDetection(Gesture::Type type)
+{
+  if ( (type & Gesture::Pinch) && mImpl->mPinchGestureDetector )
+  {
+    mImpl->mPinchGestureDetector.Detach(Self());
+    mImpl->mPinchGestureDetector.Reset();
+  }
+
+  if ( (type & Gesture::Pan) && mImpl->mPanGestureDetector )
+  {
+    mImpl->mPanGestureDetector.Detach(Self());
+    mImpl->mPanGestureDetector.Reset();
+  }
+
+  if ( (type & Gesture::Tap) && mImpl->mTapGestureDetector )
+  {
+    mImpl->mTapGestureDetector.Detach(Self());
+    mImpl->mTapGestureDetector.Reset();
+  }
+
+  if ( (type & Gesture::LongPress) && mImpl->mLongPressGestureDetector)
+  {
+    mImpl->mLongPressGestureDetector.Detach(Self());
+    mImpl->mLongPressGestureDetector.Reset();
+  }
+}
+
+PinchGestureDetector Control::GetPinchGestureDetector() const
+{
+  return mImpl->mPinchGestureDetector;
+}
+
+PanGestureDetector Control::GetPanGestureDetector() const
+{
+  return mImpl->mPanGestureDetector;
+}
+
+TapGestureDetector Control::GetTapGestureDetector() const
+{
+  return mImpl->mTapGestureDetector;
+}
+
+LongPressGestureDetector Control::GetLongPressGestureDetector() const
+{
+  return mImpl->mLongPressGestureDetector;
+}
+
 void Control::SetKeyboardNavigationSupport(bool isSupported)
 {
   mImpl->mIsKeyboardNavigationSupported = isSupported;
@@ -546,7 +674,46 @@ bool Control::IsKeyboardNavigationSupported()
   return mImpl->mIsKeyboardNavigationSupported;
 }
 
-void Control::Activate()
+void Control::SetKeyInputFocus()
+{
+  if( Self().OnStage() )
+  {
+    Toolkit::KeyInputFocusManager::Get().SetFocus(Toolkit::Control::DownCast(Self()));
+  }
+}
+
+bool Control::HasKeyInputFocus()
+{
+  bool result = false;
+  if( Self().OnStage() )
+  {
+    result = Toolkit::KeyInputFocusManager::Get().IsKeyboardListener(Toolkit::Control::DownCast(Self()));
+  }
+  return result;
+}
+
+void Control::ClearKeyInputFocus()
+{
+  if( Self().OnStage() )
+  {
+    Toolkit::KeyInputFocusManager::Get().RemoveFocus(Toolkit::Control::DownCast(Self()));
+  }
+}
+
+void Control::SetAsKeyboardFocusGroup(bool isFocusGroup)
+{
+  mImpl->mIsKeyboardFocusGroup = isFocusGroup;
+
+  // The following line will be removed when the deprecated API in KeyboardFocusManager is deleted
+  Toolkit::KeyboardFocusManager::Get().SetAsFocusGroup(Self(), isFocusGroup);
+}
+
+bool Control::IsKeyboardFocusGroup()
+{
+  return Toolkit::KeyboardFocusManager::Get().IsFocusGroup(Self());
+}
+
+void Control::AccessibilityActivate()
 {
   // Inform deriving classes
   OnAccessibilityActivated();
@@ -571,19 +738,6 @@ bool Control::OnAccessibilityValueChange(bool isIncrease)
   return false; // Accessibility value change action is not handled by default
 }
 
-void Control::SetAsKeyboardFocusGroup(bool isFocusGroup)
-{
-  mImpl->mIsKeyboardFocusGroup = isFocusGroup;
-
-  // The following line will be removed when the deprecated API in KeyboardFocusManager is deleted
-  Toolkit::KeyboardFocusManager::Get().SetAsFocusGroup(Self(), isFocusGroup);
-}
-
-bool Control::IsKeyboardFocusGroup()
-{
-  return Toolkit::KeyboardFocusManager::Get().IsFocusGroup(Self());
-}
-
 Actor Control::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
 {
   return Actor();
@@ -591,75 +745,6 @@ Actor Control::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit:
 
 void Control::OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
 {
-}
-
-bool Control::DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes)
-{
-  bool ret = false;
-
-  if( object && ( 0 == strcmp( actionName.c_str(), ACTION_CONTROL_ACTIVATED ) ) )
-  {
-    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
-    if( control )
-    {
-      // if cast succeeds there is an implementation so no need to check
-      GetImplementation( control ).OnAccessibilityActivated();
-    }
-  }
-
-  return ret;
-}
-
-bool Control::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
-{
-  Dali::BaseHandle handle( object );
-
-  bool connected( false );
-  Toolkit::Control control = Toolkit::Control::DownCast( handle );
-  if ( control )
-  {
-    Control& controlImpl( GetImplementation( control ) );
-    connected = true;
-
-    if ( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_EVENT ) )
-    {
-      controlImpl.KeyEventSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_GAINED ) )
-    {
-      controlImpl.KeyInputFocusGainedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_LOST ) )
-    {
-      controlImpl.KeyInputFocusLostSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_TAPPED ) )
-    {
-      controlImpl.EnableGestureDetection( Gesture::Tap );
-      controlImpl.GetTapGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_PANNED ) )
-    {
-      controlImpl.EnableGestureDetection( Gesture::Pan );
-      controlImpl.GetPanGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_PINCHED ) )
-    {
-      controlImpl.EnableGestureDetection( Gesture::Pinch );
-      controlImpl.GetPinchGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_LONG_PRESSED ) )
-    {
-      controlImpl.EnableGestureDetection( Gesture::LongPress );
-      controlImpl.GetLongPressGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else
-    {
-      // signalName does not match any signal
-      connected = false;
-    }
-  }
-  return connected;
 }
 
 Toolkit::Control::KeyEventSignalType& Control::KeyEventSignal()
@@ -728,73 +813,7 @@ void Control::Initialize()
   OnInitialize();
 }
 
-void Control::EnableGestureDetection(Gesture::Type type)
-{
-  if ( (type & Gesture::Pinch) && !mImpl->mPinchGestureDetector )
-  {
-    mImpl->mPinchGestureDetector = PinchGestureDetector::New();
-    mImpl->mPinchGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PinchDetected);
-    mImpl->mPinchGestureDetector.Attach(Self());
-  }
-
-  if ( (type & Gesture::Pan) && !mImpl->mPanGestureDetector )
-  {
-    mImpl->mPanGestureDetector = PanGestureDetector::New();
-    mImpl->mPanGestureDetector.DetectedSignal().Connect(mImpl, &Impl::PanDetected);
-    mImpl->mPanGestureDetector.Attach(Self());
-  }
-
-  if ( (type & Gesture::Tap) && !mImpl->mTapGestureDetector )
-  {
-    mImpl->mTapGestureDetector = TapGestureDetector::New();
-    mImpl->mTapGestureDetector.DetectedSignal().Connect(mImpl, &Impl::TapDetected);
-    mImpl->mTapGestureDetector.Attach(Self());
-  }
-
-  if ( (type & Gesture::LongPress) && !mImpl->mLongPressGestureDetector )
-  {
-    mImpl->mLongPressGestureDetector = LongPressGestureDetector::New();
-    mImpl->mLongPressGestureDetector.DetectedSignal().Connect(mImpl, &Impl::LongPressDetected);
-    mImpl->mLongPressGestureDetector.Attach(Self());
-  }
-}
-
-void Control::DisableGestureDetection(Gesture::Type type)
-{
-  if ( (type & Gesture::Pinch) && mImpl->mPinchGestureDetector )
-  {
-    mImpl->mPinchGestureDetector.Detach(Self());
-    mImpl->mPinchGestureDetector.Reset();
-  }
-
-  if ( (type & Gesture::Pan) && mImpl->mPanGestureDetector )
-  {
-    mImpl->mPanGestureDetector.Detach(Self());
-    mImpl->mPanGestureDetector.Reset();
-  }
-
-  if ( (type & Gesture::Tap) && mImpl->mTapGestureDetector )
-  {
-    mImpl->mTapGestureDetector.Detach(Self());
-    mImpl->mTapGestureDetector.Reset();
-  }
-
-  if ( (type & Gesture::LongPress) && mImpl->mLongPressGestureDetector)
-  {
-    mImpl->mLongPressGestureDetector.Detach(Self());
-    mImpl->mLongPressGestureDetector.Reset();
-  }
-}
-
 void Control::OnInitialize()
-{
-}
-
-void Control::OnControlStageConnection()
-{
-}
-
-void Control::OnControlStageDisconnection()
 {
 }
 
@@ -843,10 +862,6 @@ void Control::OnLongPress( const LongPressGesture& longPress )
 {
 }
 
-void Control::OnControlSizeSet( const Vector3& size )
-{
-}
-
 void Control::EmitKeyInputFocusSignal( bool focusGained )
 {
   Dali::Toolkit::Control handle( GetOwner() );
@@ -869,6 +884,14 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
   }
 }
 
+void Control::OnStageConnection()
+{
+}
+
+void Control::OnStageDisconnection()
+{
+}
+
 void Control::OnKeyInputFocusGained()
 {
   EmitKeyInputFocusSignal( true );
@@ -877,18 +900,6 @@ void Control::OnKeyInputFocusGained()
 void Control::OnKeyInputFocusLost()
 {
   EmitKeyInputFocusSignal( false );
-}
-
-void Control::OnStageConnection()
-{
-  // Notify derived classes.
-  OnControlStageConnection();
-}
-
-void Control::OnStageDisconnection()
-{
-  // Notify derived classes
-  OnControlStageDisconnection();
 }
 
 void Control::OnChildAdd(Actor& child)
@@ -918,9 +929,6 @@ void Control::OnChildRemove(Actor& child)
 void Control::OnSizeSet(const Vector3& targetSize)
 {
   // Background is resized through size negotiation
-
-  // Notify derived classes.
-  OnControlSizeSet( targetSize );
 }
 
 void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
