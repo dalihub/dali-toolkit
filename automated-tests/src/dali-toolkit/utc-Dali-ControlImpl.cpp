@@ -34,6 +34,8 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 
+#include <dali-toolkit/devel-api/styling/style-manager.h>
+
 #include "dummy-control.h"
 
 using namespace Dali;
@@ -845,7 +847,6 @@ int UtcDaliControlImplSetStyleName(void)
 
   {
     DummyControl dummy = DummyControl::New( true );
-    DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
@@ -859,3 +860,60 @@ int UtcDaliControlImplSetStyleName(void)
   }
   END_TEST;
 }
+
+int UtcDaliControlImplOnStyleChangeP(void)
+{
+  ToolkitTestApplication application;
+  DummyControl dummy = DummyControl::New( true );
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( dummy );
+
+  Dali::Toolkit::StyleManager styleManager;
+  controlImpl.OnStyleChange( styleManager, StyleChange::THEME_CHANGE );
+
+  // unfortunately OnStyleChange does not return anything
+  DALI_TEST_CHECK( true );
+
+  END_TEST;
+}
+
+
+int UtcDaliControlImplOnAccessibilityPanP(void)
+{
+  ToolkitTestApplication application;
+  DummyControl dummy = DummyControl::New( true );
+  DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+  PanGesture pan;
+  DALI_TEST_EQUALS( false, dummyImpl.OnAccessibilityPan( pan ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlImplOnAccessibilityTouchP(void)
+{
+  ToolkitTestApplication application;
+  DummyControl dummy = DummyControl::New( true );
+  DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+  TouchEvent touch;
+  DALI_TEST_EQUALS( false, dummyImpl.OnAccessibilityTouch( touch ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliControlImplGetNextKeyboardFocusableActorP(void)
+{
+  ToolkitTestApplication application;
+  DummyControl dummy = DummyControl::New( true );
+  DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+
+  Actor currentFocusedActor;
+  Actor result = dummyImpl.GetNextKeyboardFocusableActor( currentFocusedActor, Control::Left, false );
+
+  DALI_TEST_EQUALS( result, currentFocusedActor, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+
+

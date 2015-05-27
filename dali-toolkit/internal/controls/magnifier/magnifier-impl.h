@@ -117,7 +117,7 @@ private:
 
 private:
 
-  virtual void OnControlSizeSet(const Vector3& targetSize);
+  virtual void OnSizeSet(const Vector3& targetSize);
 
 private:
 

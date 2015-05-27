@@ -423,13 +423,13 @@ void PageTurnView::SetupShadowView()
   mShadowView.Activate();
 }
 
-void PageTurnView::OnControlStageConnection()
+void PageTurnView::OnStageConnection()
 {
   SetupShadowView();
   mTurningPageLayer.RaiseToTop();
 }
 
-void PageTurnView::OnControlStageDisconnection()
+void PageTurnView::OnStageDisconnection()
 {
   if(mShadowView)
   {
@@ -451,10 +451,6 @@ void PageTurnView::OnControlStageDisconnection()
 
     SetSpineEffect( mPanActor, mIsTurnBack[mPanActor] );
   }
-}
-
-void PageTurnView::OnControlSizeSet( const Vector3& size )
-{
 }
 
 void PageTurnView::SetSpineShadowParameter( const Vector2& spineShadowParameter )

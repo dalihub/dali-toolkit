@@ -66,11 +66,6 @@ ToolBar ToolBar::DownCast( BaseHandle handle )
   return Control::DownCast<ToolBar, Internal::ToolBar>(handle);
 }
 
-void ToolBar::SetBackground( Actor background )
-{
-  GetImpl( *this ).SetBackground( background );
-}
-
 void ToolBar::AddControl( Actor control, float relativeSize, Toolkit::Alignment::Type alignment, const Toolkit::Alignment::Padding& padding )
 {
   GetImpl( *this ).AddControl( control, relativeSize, alignment, padding );

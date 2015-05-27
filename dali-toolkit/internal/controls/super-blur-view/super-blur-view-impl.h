@@ -115,9 +115,9 @@ private: // from Control
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::Control::OnControlSizeSet
+   * @copydoc CustomActorImpl::OnSizeSet()
    */
-  virtual void OnControlSizeSet(const Vector3& targetSize);
+  virtual void OnSizeSet(const Vector3& targetSize);
 
 private:
 

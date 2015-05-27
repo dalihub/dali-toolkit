@@ -351,7 +351,7 @@ void KeyboardFocusManager::DoActivate(Actor actor)
     if(control)
     {
       // Notify the control that it is activated
-      GetImplementation( control ).Activate();
+      GetImplementation( control ).AccessibilityActivate();
     }
 
     // Send notification for the activation of focused actor

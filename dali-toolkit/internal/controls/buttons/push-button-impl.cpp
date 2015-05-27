@@ -538,7 +538,7 @@ void PushButton::StopAllAnimations()
   StopTransitionAnimation();
 }
 
-void PushButton::OnControlSizeSet( const Vector3& targetSize )
+void PushButton::OnSizeSet( const Vector3& targetSize )
 {
   if( targetSize != mSize )
   {

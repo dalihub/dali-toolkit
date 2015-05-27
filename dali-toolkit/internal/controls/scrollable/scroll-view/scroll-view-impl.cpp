@@ -658,7 +658,7 @@ void ScrollView::OnInitialize()
   SetInternalConstraints();
 }
 
-void ScrollView::OnControlStageConnection()
+void ScrollView::OnStageConnection()
 {
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 
@@ -674,7 +674,7 @@ void ScrollView::OnControlStageConnection()
   }
 }
 
-void ScrollView::OnControlStageDisconnection()
+void ScrollView::OnStageDisconnection()
 {
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 
@@ -1868,7 +1868,7 @@ void ScrollView::OnSizeAnimation(Animation& animation, const Vector3& targetSize
   UpdatePropertyDomain();
 }
 
-void ScrollView::OnControlSizeSet( const Vector3& size )
+void ScrollView::OnSizeSet( const Vector3& size )
 {
   // need to update domain properties for new size
   if( mDefaultMaxOvershoot )

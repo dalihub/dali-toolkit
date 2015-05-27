@@ -199,19 +199,14 @@ private: // from Control
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::Control::OnControlStageConncection
+   * @copydoc CustomActorImpl::OnStageConnection()
    */
-  virtual void OnControlStageConnection();
+  virtual void OnStageConnection();
 
   /**
-   * @copydoc Toolkit::Control::OnControlStageDisConnection
+   * @copydoc CustomActorImpl::OnStageDisconnection()
    */
-  virtual void OnControlStageDisconnection();
-
-  /**
-   * @copydoc Toolkit::Control::OnControlSizeSet
-   */
-  virtual void OnControlSizeSet( const Vector3& size );
+  virtual void OnStageDisconnection();
 
 private: // implemented differently by PageTurnLandscapeView and PageTurnPortraitView
 
