@@ -763,3 +763,11 @@ int UtcDaliItemViewSetItemsParentOriginP(void)
   DALI_TEST_CHECK(view.GetItem(0).GetCurrentParentOrigin() == parentOrigin);
   END_TEST;
 }
+
+int UtcDaliItemFactoryGetExtention(void)
+{
+  ToolkitTestApplication application;
+  TestItemFactory factory;
+  DALI_TEST_CHECK( factory.GetExtension() == NULL );
+  END_TEST;
+}
