@@ -38,6 +38,7 @@
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/focus-manager/focus-manager.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
+#include <dali-toolkit/internal/controls/buttons/button-impl.h>
 
 using namespace Dali;
 
@@ -675,8 +676,8 @@ void Popup::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
       button.SetPosition( buttonPosition );
 
-      button.PropagateRelayoutFlags();    // Reset relayout flags for relayout
-      container.Add( button, buttonSize );
+     //Todo: Use the size negotiation pass instead of SetSize directly
+     button.SetSize( buttonSize );
     }
   }
 }

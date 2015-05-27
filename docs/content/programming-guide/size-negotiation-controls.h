@@ -74,23 +74,9 @@ A table view is added to the popup to specify layout. It will fill to the width 
 mPopupLayout.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 mPopupLayout.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
 @endcode
-Override the OnRelayout method to position and resize the buttons. The trick to this is that the buttons do not know they are part of a popup and are
-about to be resized so could already have had their sizes negotiated. The call to PropagateRelayoutFlags on the button will ensure that it and all
-its child dependents are ready for a new size negotiation pass. The container.Add call will add the button to the relayout queue to be processed this frame.
-The buttonSize parameter is the desired size for the button. The desired size will only be set if the size policy of the button has already been changed to
-ResizePolicy::USE_ASSIGNED_SIZE, which is what happens when a button is added to the popup.
+Override the OnRelayout method to position and resize the buttons.
 @code
-void Popup::AddButton( Toolkit::Button button )
-...
-button.SetResizePolicy( ResizePolicy::USE_ASSIGNED_SIZE, Dimension::ALL_DIMENSIONS );
-...
-
 void Popup::OnRelayout( const Vector2& size, RelayoutContainer& container )
-...
-button.SetPosition( buttonPosition );
-
-button.PropagateRelayoutFlags();    // Reset relayout flags for relayout
-container.Add( button, buttonSize );
 ...
 @endcode
 Another aspect to the popup is that depending which resize policies are active on it then the inner table view requires different resize policies itself.
