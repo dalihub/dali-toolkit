@@ -906,6 +906,26 @@ int UtcDaliControlImplOnAccessibilityTouchP(void)
   END_TEST;
 }
 
+int UtcDaliControlImplOnAccessibilityActivatedP(void)
+{
+  ToolkitTestApplication application;
+
+  Control dummy = Control::New();
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( dummy );
+  DALI_TEST_EQUALS( false, controlImpl.OnAccessibilityActivated(), TEST_LOCATION );
+
+  // Invoke the control's activate action
+  TypeInfo type = TypeRegistry::Get().GetTypeInfo( "Control" );
+  DALI_TEST_CHECK( type );
+
+  BaseHandle handle = type.CreateInstance();
+  DALI_TEST_CHECK( handle );
+
+  std::vector<Property::Value> attributes;
+  DALI_TEST_EQUALS( false, handle.DoAction("control-activated", attributes), TEST_LOCATION );
+
+  END_TEST;
+}
 
 int UtcDaliControlImplGetNextKeyboardFocusableActorP(void)
 {
