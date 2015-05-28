@@ -77,7 +77,7 @@ static bool DoAction( BaseObject* object, const std::string& actionName, const P
     if( control )
     {
       // if cast succeeds there is an implementation so no need to check
-      Internal::GetImplementation( control ).OnAccessibilityActivated();
+      ret = Internal::GetImplementation( control ).OnAccessibilityActivated();
     }
   }
 
@@ -142,11 +142,6 @@ static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
     {
       controlImpl.EnableGestureDetection( Gesture::LongPress );
       controlImpl.GetLongPressGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else
-    {
-      // signalName does not match any signal
-      connected = false;
     }
   }
   return connected;
@@ -719,8 +714,9 @@ void Control::AccessibilityActivate()
   OnAccessibilityActivated();
 }
 
-void Control::OnAccessibilityActivated()
+bool Control::OnAccessibilityActivated()
 {
+  return false; // Accessibility activation is not handled by default
 }
 
 bool Control::OnAccessibilityPan(PanGesture gesture)

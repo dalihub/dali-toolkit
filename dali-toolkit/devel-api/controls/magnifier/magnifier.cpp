@@ -76,6 +76,11 @@ Magnifier::~Magnifier()
 {
 }
 
+Magnifier Magnifier::DownCast( BaseHandle handle )
+{
+  return Control::DownCast<Magnifier, Internal::Magnifier>(handle);
+}
+
 void Magnifier::SetSourceActor(Actor actor)
 {
   GetImpl(*this).SetSourceActor( actor );
