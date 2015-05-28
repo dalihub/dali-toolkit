@@ -398,20 +398,20 @@ label1.underlineHeight = 1;
 
  Name (JavaScript)   |  Name (C++)         |  Type        | Writable     | Animatable
 ---------------------|---------------------|--------------|--------------|-----------
- renderingBackend    | RENDERING_BACKEND   |  INTEGER     | &#10004;     | &#10008;
- text                | TEXT                |  STRING      | &#10004;     | &#10008;
- fontFamily          | FONT_FAMILY         |  STRING      | &#10004;     | &#10008;
- fontStyle           | FONT_STYLE          |  STRING      | &#10004;     | &#10008;
- pointSize           | POINT_SIZE          |  FLOAT       | &#10004;     | &#10008;
- multiLine           | MULTI_LINE          |  BOOLEAN     | &#10004;     | &#10008;
- horizontalAlignment | HORIZONTAL_ALIGNMENT|  STRING      | &#10004;     | &#10008;
- verticalAlignment   | VERTICAL_ALIGNMENT  |  STRING      | &#10004;     | &#10008;
- textColor           | TEXT_COLOR          |  VECTOR4     | &#10004;     | &#10008;
- shadowOffset        | SHADOW_OFFSET       |  VECTOR2     | &#10004;     | &#10008;
- shadowColor         | SHADOW_COLOR        |  VECTOR4     | &#10004;     | &#10008;
- underlineEnabled    | UNDERLINE_ENABLED   |  BOOLEAN     | &#10004;     | &#10008;
- underlineColor      | UNDERLINE_COLOR     |  VECTOR4     | &#10004;     | &#10008;
- underlineHeight     | UNDERLINE_HEIGHT    |  FLOAT       | &#10004;     | &#10008;
+ renderingBackend    | RENDERING_BACKEND   |  INTEGER     | O            | X
+ text                | TEXT                |  STRING      | O            | X
+ fontFamily          | FONT_FAMILY         |  STRING      | O            | X
+ fontStyle           | FONT_STYLE          |  STRING      | O            | X
+ pointSize           | POINT_SIZE          |  FLOAT       | O            | X
+ multiLine           | MULTI_LINE          |  BOOLEAN     | O            | X
+ horizontalAlignment | HORIZONTAL_ALIGNMENT|  STRING      | O            | X
+ verticalAlignment   | VERTICAL_ALIGNMENT  |  STRING      | O            | X
+ textColor           | TEXT_COLOR          |  VECTOR4     | O            | X
+ shadowOffset        | SHADOW_OFFSET       |  VECTOR2     | O            | X
+ shadowColor         | SHADOW_COLOR        |  VECTOR4     | O            | X
+ underlineEnabled    | UNDERLINE_ENABLED   |  BOOLEAN     | O            | X
+ underlineColor      | UNDERLINE_COLOR     |  VECTOR4     | O            | X
+ underlineHeight     | UNDERLINE_HEIGHT    |  FLOAT       | O            | X
 
 
 

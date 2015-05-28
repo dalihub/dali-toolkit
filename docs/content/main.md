@@ -58,7 +58,7 @@
 
 ### UI Controls
  + [Text Label](@ref text-label)
- + TextEntry
+ + [Text Field](@ref text-field)
  + Buttons
  + TableView
  + [Scroll View](@ref scroll-view)
