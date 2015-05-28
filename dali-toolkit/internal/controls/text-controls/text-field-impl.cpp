@@ -838,6 +838,8 @@ void TextField::OnInitialize()
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
   EnableGestureDetection(Gesture::Pan);
 
+  self.TouchedSignal().Connect( this, &TextField::OnTouched );
+
   // Set BoundingBox to stage size if not already set.
   if ( mDecorator->GetBoundingBox().IsEmpty() )
   {
@@ -1099,6 +1101,11 @@ void TextField::KeyboardStatusChanged(bool keyboardShown)
   {
     mController->KeyboardFocusLostEvent();
   }
+}
+
+bool TextField::OnTouched( Actor actor, const TouchEvent& event )
+{
+  return true;
 }
 
 TextField::TextField()
