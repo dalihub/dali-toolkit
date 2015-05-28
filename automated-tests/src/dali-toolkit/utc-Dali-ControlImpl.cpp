@@ -861,17 +861,23 @@ int UtcDaliControlImplSetStyleName(void)
   END_TEST;
 }
 
-int UtcDaliControlImplOnStyleChangeP(void)
+int UtcDaliControlImplOnStyleChangeN(void)
 {
   ToolkitTestApplication application;
-  DummyControl dummy = DummyControl::New( true );
+  Control dummy = Control::New();
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( dummy );
 
-  Dali::Toolkit::StyleManager styleManager;
-  controlImpl.OnStyleChange( styleManager, StyleChange::THEME_CHANGE );
-
-  // unfortunately OnStyleChange does not return anything
-  DALI_TEST_CHECK( true );
+  // test that style manager is being used, passing an empty handle throws exception
+  try
+  {
+    Dali::Toolkit::StyleManager styleManager;
+    controlImpl.OnStyleChange( styleManager, StyleChange::THEME_CHANGE );
+    tet_result(TET_FAIL);
+  }
+  catch (DaliException &exception)
+  {
+    tet_result(TET_PASS);
+  }
 
   END_TEST;
 }
@@ -880,10 +886,11 @@ int UtcDaliControlImplOnStyleChangeP(void)
 int UtcDaliControlImplOnAccessibilityPanP(void)
 {
   ToolkitTestApplication application;
-  DummyControl dummy = DummyControl::New( true );
-  DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+  Control dummy = Control::New();
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( dummy );
+
   PanGesture pan;
-  DALI_TEST_EQUALS( false, dummyImpl.OnAccessibilityPan( pan ), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, controlImpl.OnAccessibilityPan( pan ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -891,10 +898,10 @@ int UtcDaliControlImplOnAccessibilityPanP(void)
 int UtcDaliControlImplOnAccessibilityTouchP(void)
 {
   ToolkitTestApplication application;
-  DummyControl dummy = DummyControl::New( true );
-  DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+  Control dummy = Control::New();
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( dummy );
   TouchEvent touch;
-  DALI_TEST_EQUALS( false, dummyImpl.OnAccessibilityTouch( touch ), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, controlImpl.OnAccessibilityTouch( touch ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -903,11 +910,11 @@ int UtcDaliControlImplOnAccessibilityTouchP(void)
 int UtcDaliControlImplGetNextKeyboardFocusableActorP(void)
 {
   ToolkitTestApplication application;
-  DummyControl dummy = DummyControl::New( true );
-  DummyControlImplOverride& dummyImpl = static_cast<DummyControlImplOverride&>(dummy.GetImplementation());
+  Control dummy = Control::New();
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( dummy );
 
   Actor currentFocusedActor;
-  Actor result = dummyImpl.GetNextKeyboardFocusableActor( currentFocusedActor, Control::Left, false );
+  Actor result = controlImpl.GetNextKeyboardFocusableActor( currentFocusedActor, Control::Left, false );
 
   DALI_TEST_EQUALS( result, currentFocusedActor, TEST_LOCATION );
 
