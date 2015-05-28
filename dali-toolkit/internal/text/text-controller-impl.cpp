@@ -1089,6 +1089,25 @@ void Controller::Impl::UpdateCursorPosition()
       }
     }
 
+    switch( mLayoutEngine.GetVerticalAlignment() )
+    {
+      case LayoutEngine::VERTICAL_ALIGN_TOP:
+      {
+        cursorPosition.y = 0.f;
+        break;
+      }
+      case LayoutEngine::VERTICAL_ALIGN_CENTER:
+      {
+        cursorPosition.y = floorf( 0.5f * ( mControlSize.height - lineHeight ) );
+        break;
+      }
+      case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
+      {
+        cursorPosition.y = mControlSize.height - lineHeight;
+        break;
+      }
+    }
+
     mEventData->mDecorator->SetPosition( PRIMARY_CURSOR,
                                          cursorPosition.x,
                                          cursorPosition.y,
