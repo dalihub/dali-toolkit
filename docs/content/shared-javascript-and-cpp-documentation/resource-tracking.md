@@ -1,17 +1,18 @@
-/**
- *
+<!--
+/**-->
+
 # Resource Tracking {#resourcetracking}
 
 ## Enable Logging
 
-Setting DALI_ENABLE_LOG environment variable to RESOURCE_LOG will enable resource usage logging in Dali applications.
+Setting DALI_ENABLE_LOG environment variable to RESOURCE_LOG will enable resource usage logging in DALi applications.
 On target resource logging utilizes dlog, but this can also be used on desktop by redirecting stderr to a file.
 The generated information includes any image files that are loaded with their dimensions,
 GPU memory consumption, CPU RAM used and details of texture atlases created.
 
 ## Viewing Resource Logs
 
-dalireslog.sh is installed as part of the dali-adaptor package and can be found in the adaptors/tizen/scripts folder.
+dalireslog.sh is installed as part of the DALi Adaptor package and can be found in the adaptors/tizen/scripts folder.
 The script shows a summary of memory used by resources.
 USAGE:
 ./dalireslog.sh [FILE]

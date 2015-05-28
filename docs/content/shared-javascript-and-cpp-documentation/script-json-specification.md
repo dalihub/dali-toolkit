@@ -1,12 +1,13 @@
-/**
- *
+<!--
+/**-->
+
 [TOC]
 
 # DALi JSON Specification  {#script-json-specification}
 
 ## Overview {#overview}
 
-This document describes the Dali JSON specification.
+This document describes the DALi JSON specification.
 The format is not yet formally versioned within the JSON.
 
 # General format {#format}
@@ -26,10 +27,10 @@ The JSON format supports
 
 
 Concrete Actors and Controls can be created from types registered in the
-Dali Type Registry.
+DALi Type Registry.
 
 Template, style and scene sections all configure Actors and Controls via
-the Dali property system.
+the DALi property system.
 
 The JSON format deviates from the formal JSON specification and allows C style comments.
 
@@ -70,7 +71,7 @@ The JSON format deviates from the formal JSON specification and allows C style c
       "stage":                               // Stage section
       [                                      //
        {                                     // Actors|Controls to create on JSON file load
-       "type": "basic-text",                 // A Dali Control or a template name
+       "type": "basic-text",                 // A DALi Control or a template name
        "styles":["base-theme","light-theme"] // Style list to apply to this instance
        }                                     //
       ]                                      //
@@ -120,7 +121,7 @@ The constants section supports sub-string and full property replacement.
     },                                  //
     ...                                 //
     {                                   //
-      "type":"ImageActor"               // An Dali type or a template name
+      "type":"ImageActor"               // An DALi type or a template name
       "image":                          //
       {                                 //
         "filename":"{IMAGES}b.jpg"      // Image filename substring replacement
@@ -170,7 +171,7 @@ an optional actor sub hierarchy.
    {                                    //
    "basic-text":                        //  The template name
    {                                    //
-     "type":"ImageActor",               //  Concrete Dali Type/Class to create
+     "type":"ImageActor",               //  Concrete DALi Type/Class to create
      "styles":["base-style"],           //  Style list to apply
      "name":"image",                    //  }
      "image":                           //  } property name : value
@@ -193,7 +194,7 @@ an optional actor sub hierarchy.
 ~~~
 
 A template has a special 'type' property which must contain a concrete
-Dali Actor or Control type name.
+DALi Actor or Control type name.
 
 A template has a special 'styles' property which contains a list of
 styles to apply when creating using the template.
@@ -256,7 +257,7 @@ Builder.AnimateTo("light-theme", myActor, TimePeriod(0, 10));
 When applied to an actor tree the actors are referenced by name. Names
 are not unique in Dali.
 
-When a style is applied in code Dali will perform a depth first search
+When a style is applied in code DALi will perform a depth first search
 stopping with the first matching name.
 
 Typically an application developer will apply the style to the template
@@ -493,7 +494,7 @@ builder.addActors( dali.stage.getRootLayer() );
      {
      "type": "TextView",
                                          \\  The Type to create; this can be a
-     ...                                 \\ concrete Dali type (actor/control)
+     ...                                 \\ concrete DALi type (actor/control)
                                          \\ or a template name.
      "styles": ["base-style"]
                                          \\  A list of styles to apply to the

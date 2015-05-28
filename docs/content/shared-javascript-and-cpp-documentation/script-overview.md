@@ -1,8 +1,9 @@
-/**
- *
+<!--
+/**-->
+
 # Scripting Overview  {#scriptoverview}
 
-Dali has:
+DALi has:
 - JSON to support:
  - layouting
  - theme / styling
@@ -17,7 +18,7 @@ Dali has:
 
 JSON support is built in to DALi.
 
-JavaScript support is via a plugin held in dali-toolkit, which builds automatically if Google's V8 engine is installed. 
+JavaScript support is via a plugin held in DALi Toolkit, which builds automatically if Google's V8 engine is installed. 
 The V8 version required by DALi can be built and installed using dali-core/scripts/dali_env script.
 
 Files can be loaded inside any DALi application, or from command line using the launcher ( part of dali-demo).

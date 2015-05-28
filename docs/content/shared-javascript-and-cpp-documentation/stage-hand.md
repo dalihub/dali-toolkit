@@ -1,5 +1,6 @@
-/**
- *
+<!--
+/**-->
+
 # Stagehand Visual Debugger for DALi {#stagehand}
 
 ![ ](../assets/img/stage-hand/blocks.png)

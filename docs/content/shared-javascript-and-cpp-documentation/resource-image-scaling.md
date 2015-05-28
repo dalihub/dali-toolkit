@@ -1,5 +1,6 @@
-/**
- *
+<!--
+/**-->
+
 [TOC]
 
 # Resource Image Scaling {#resourceimagescaling}

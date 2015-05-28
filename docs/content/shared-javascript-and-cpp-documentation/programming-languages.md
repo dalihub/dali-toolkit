@@ -1,5 +1,6 @@
-/**
- *
+<!--
+/**-->
+
 # Programming Languages {#programming-languages}
 
 DALi applications can be written in several different programming languages.

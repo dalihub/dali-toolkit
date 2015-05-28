@@ -9,7 +9,7 @@
  + [DALi Fundamentals](@ref fundamentals)
   + [Actors & Stage](@ref actors-and-stage)
   + [Coordinate System](@ref coordinate-system)
-  + Units & the Default Camera (default unit 1 is 1 pixel with default camera)
+  + [Scene Graph](@ref scene-graph)
   + [Handle / Body Idiom](@ref handle-body-idiom)
   + Signals
   + [Properties](@ref properties)
