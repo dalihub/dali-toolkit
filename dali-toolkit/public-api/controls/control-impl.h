@@ -437,8 +437,9 @@ public: // API for derived classes to override
    * @brief This method is called when the control is accessibility activated.
    *
    * Derived classes should override this to perform custom accessibility activation.
+   * @return true if this control can perform accessibility activation.
    */
-  virtual void OnAccessibilityActivated();
+  virtual bool OnAccessibilityActivated();
 
   /**
    * @brief This method should be overridden by deriving classes when they wish to respond the accessibility
