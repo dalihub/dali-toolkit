@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <stdint.h>
 #include <cstring>
-#include <dali/devel-api/images/image-operations.h>
+#include <dali/public-api/images/image-operations.h>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/set-wrapper.h>
