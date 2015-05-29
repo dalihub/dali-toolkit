@@ -121,14 +121,14 @@ public:
   float GetMinimumSwipeDistance() const;
 
   /**
-   * @copydoc Toolkit::ItemView::SetMouseWheelScrollDistanceStep
+   * @copydoc Toolkit::ItemView::SetWheelScrollDistanceStep
    */
-  void SetMouseWheelScrollDistanceStep(float step);
+  void SetWheelScrollDistanceStep(float step);
 
   /**
-   * @copydoc Toolkit::ItemView::GetMouseWheelScrollDistanceStep
+   * @copydoc Toolkit::ItemView::GetWheelScrollDistanceStep
    */
-  float GetMouseWheelScrollDistanceStep() const;
+  float GetWheelScrollDistanceStep() const;
 
   /**
    * @copydoc Toolkit::ItemView::SetAnchoring
@@ -343,11 +343,11 @@ private: // From CustomActorImpl
   virtual bool OnTouchEvent(const TouchEvent& event);
 
   /**
-   * From CustomActorImpl; called after a mouse-wheel-event is received by the owning actor.
-   * @param[in] event The mouse wheel event.
+   * From CustomActorImpl; called after a wheel-event is received by the owning actor.
+   * @param[in] event The wheel event.
    * @return True if the event should be consumed.
    */
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event);
+  virtual bool OnWheelEvent(const WheelEvent& event);
 
 private: // From Control
 
@@ -477,10 +477,10 @@ private:
   void OnOvershootOnFinished(Animation& animation);
 
   /**
-   * This is called after a timeout when no new mouse wheel event is received for a certain period of time.
+   * This is called after a timeout when no new wheel event is received for a certain period of time.
    * @return will return false; one-shot timer.
    */
-  bool OnMouseWheelEventFinished();
+  bool OnWheelEventFinished();
 
   /**
    * Stops and removes animation if exists.
@@ -572,7 +572,7 @@ private:
 
   float mMinimumSwipeSpeed;
   float mMinimumSwipeDistance;
-  float mMouseWheelScrollDistanceStep; ///< The step of scroll distance in actor coordinates for each mouse wheel event received.
+  float mWheelScrollDistanceStep; ///< The step of scroll distance in actor coordinates for each wheel event received.
 
   float mScrollDistance;
   float mScrollSpeed;
@@ -581,7 +581,7 @@ private:
   float mScrollOvershoot;
   bool mIsFlicking;
 
-  Timer mMouseWheelEventFinishedTimer; ///< The timer to determine whether there is no mouse wheel event received for a certain period of time.
+  Timer mWheelEventFinishedTimer; ///< The timer to determine whether there is no wheel event received for a certain period of time.
 
   Dali::Gesture::State mGestureState;
 

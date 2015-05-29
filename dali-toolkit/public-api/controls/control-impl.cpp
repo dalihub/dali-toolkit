@@ -947,7 +947,7 @@ bool Control::OnKeyEvent(const KeyEvent& event)
   return false; // Do not consume
 }
 
-bool Control::OnMouseWheelEvent(const MouseWheelEvent& event)
+bool Control::OnWheelEvent(const WheelEvent& event)
 {
   return false; // Do not consume
 }

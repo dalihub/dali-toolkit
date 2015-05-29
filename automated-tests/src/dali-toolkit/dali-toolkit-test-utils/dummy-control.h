@@ -119,7 +119,7 @@ private: // From CustomActorImpl
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
   virtual bool OnTouchEvent(const TouchEvent& event);
   virtual bool OnHoverEvent(const HoverEvent& event);
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event);
+  virtual bool OnWheelEvent(const WheelEvent& event);
   virtual bool OnKeyEvent(const KeyEvent& event);
   virtual void OnKeyInputFocusGained();
   virtual void OnKeyInputFocusLost();
@@ -142,7 +142,7 @@ public:
   bool sizeAnimationCalled;
   bool touchEventCalled;
   bool hoverEventCalled;
-  bool mouseWheelEventCalled;
+  bool wheelEventCalled;
   bool keyEventCalled;
   bool keyInputFocusGained;
   bool keyInputFocusLost;

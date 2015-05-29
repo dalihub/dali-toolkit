@@ -423,7 +423,7 @@ void Popup::CreateBacking()
   mLayer.Add( mBacking );
   mBacking.SetOpacity(0.0f);
   mBacking.TouchedSignal().Connect( this, &Popup::OnBackingTouched );
-  mBacking.MouseWheelEventSignal().Connect(this, &Popup::OnBackingMouseWheelEvent);
+  mBacking.WheelEventSignal().Connect(this, &Popup::OnBackingWheelEvent);
 }
 
 void Popup::CreateDialog()
@@ -611,9 +611,9 @@ bool Popup::OnBackingTouched(Actor actor, const TouchEvent& event)
   return true;
 }
 
-bool Popup::OnBackingMouseWheelEvent(Actor actor, const MouseWheelEvent& event)
+bool Popup::OnBackingWheelEvent(Actor actor, const WheelEvent& event)
 {
-  // consume mouse wheel event in dimmed backing actor
+  // consume wheel event in dimmed backing actor
   return true;
 }
 

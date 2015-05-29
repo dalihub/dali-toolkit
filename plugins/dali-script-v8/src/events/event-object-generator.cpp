@@ -231,22 +231,27 @@ v8::Handle<v8::Object> EventObjectGenerator::CreateHoverEvent( v8::Isolate* isol
   return handleScope.Escape( hoverObject );
 }
 
-v8::Handle<v8::Object> EventObjectGenerator::CreateMouseWheelEvent( v8::Isolate* isolate, const MouseWheelEvent& wheelEvent)
+v8::Handle<v8::Object> EventObjectGenerator::CreateWheelEvent( v8::Isolate* isolate, const WheelEvent& wheelEvent)
 {
-  //  we are creating a mouse wheel event object that looks like this
+  //  we are creating a wheel event object that looks like this
   //
+  //  event.type = "mouseWheel" or "customWheel" type of the wheel event
   //  event.direction = "vertical" or "horizontal" direction the wheel is being rolled
   //  event.shiftPressed       = boolean, shift key is held
   //  event.ctrlPressed        = boolean, ctrl key is held
   //  event.altPressed     = boolean, alt key is held
   //  event.keyModifiers = bitmask of keys pressed
   //  event.point {x,y}    = The co-ordinates of the mouse cursor relative to the top-left of the screen when the wheel is being rolled.
-  //  event.rolled          = offset of mouse wheel rolling, positive = rolling down, negative = rolling up
+  //  event.rolled          = offset of wheel rolling, positive = rolling down or clockwise, negative = rolling up or counter-clockwise
   //  event.timestamp    = The time (in ms) that the touch event occurred
 
   v8::EscapableHandleScope handleScope( isolate );
 
   v8::Local<v8::Object> wheelObject = v8::Object::New( isolate );
+
+  // Set the type
+  std::string type = wheelEvent.type ? "mouseWheel" : "customWheel";
+  wheelObject->Set( v8::String::NewFromUtf8( isolate, "type" ), v8::String::NewFromUtf8( isolate, type.c_str() ) );
 
   // Set the direction
   std::string direction = wheelEvent.direction ? "vertical" : "horizontal";

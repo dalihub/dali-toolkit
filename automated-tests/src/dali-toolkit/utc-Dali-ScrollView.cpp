@@ -1511,17 +1511,17 @@ int UtcDaliToolkitScrollViewSetMinimumDistanceForFlickP(void)
   END_TEST;
 }
 
-int UtcDaliToolkitScrollViewSetMouseWheelScrollDistanceStepP(void)
+int UtcDaliToolkitScrollViewSetWheelScrollDistanceStepP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitScrollViewSetMouseWheelScrollDistanceStepP");
+  tet_infoline(" UtcDaliToolkitScrollViewSetWheelScrollDistanceStepP");
 
   ScrollView scrollView = ScrollView::New();
   // Disable Refresh signal (TET environment cannot use adaptor's Timer)
-  scrollView.SetMouseWheelScrollDistanceStep(Vector2(30.0f, 15.0f));
-  DALI_TEST_EQUALS( scrollView.GetMouseWheelScrollDistanceStep(), Vector2(30.0f, 15.0f), TEST_LOCATION );
-  scrollView.SetMouseWheelScrollDistanceStep(Vector2(60.0f, 30.0f));
-  DALI_TEST_EQUALS( scrollView.GetMouseWheelScrollDistanceStep(), Vector2(60.0f, 30.0f), TEST_LOCATION);
+  scrollView.SetWheelScrollDistanceStep(Vector2(30.0f, 15.0f));
+  DALI_TEST_EQUALS( scrollView.GetWheelScrollDistanceStep(), Vector2(30.0f, 15.0f), TEST_LOCATION );
+  scrollView.SetWheelScrollDistanceStep(Vector2(60.0f, 30.0f));
+  DALI_TEST_EQUALS( scrollView.GetWheelScrollDistanceStep(), Vector2(60.0f, 30.0f), TEST_LOCATION);
   END_TEST;
 }
 

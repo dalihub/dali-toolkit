@@ -486,14 +486,14 @@ void ScrollView::SetMaxFlickSpeed(float speed)
   GetImpl(*this).SetMaxFlickSpeed(speed);
 }
 
-Vector2 ScrollView::GetMouseWheelScrollDistanceStep() const
+Vector2 ScrollView::GetWheelScrollDistanceStep() const
 {
-  return GetImpl(*this).GetMouseWheelScrollDistanceStep();
+  return GetImpl(*this).GetWheelScrollDistanceStep();
 }
 
-void ScrollView::SetMouseWheelScrollDistanceStep(Vector2 step)
+void ScrollView::SetWheelScrollDistanceStep(Vector2 step)
 {
-  GetImpl(*this).SetMouseWheelScrollDistanceStep(step);
+  GetImpl(*this).SetWheelScrollDistanceStep(step);
 }
 
 Vector2 ScrollView::GetCurrentScrollPosition() const

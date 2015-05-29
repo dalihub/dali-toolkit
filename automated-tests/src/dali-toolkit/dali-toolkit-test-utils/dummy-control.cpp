@@ -101,7 +101,7 @@ DummyControlImplOverride::DummyControlImplOverride()
   sizeAnimationCalled(false),
   touchEventCalled(false),
   hoverEventCalled(false),
-  mouseWheelEventCalled(false),
+  wheelEventCalled(false),
   keyEventCalled(false),
   keyInputFocusGained(false),
   keyInputFocusLost(false)
@@ -130,7 +130,7 @@ void DummyControlImplOverride::OnSizeSet(const Vector3& targetSize) { sizeSetCal
 void DummyControlImplOverride::OnSizeAnimation(Animation& animation, const Vector3& targetSize) { sizeAnimationCalled = true; }
 bool DummyControlImplOverride::OnTouchEvent(const TouchEvent& event) { touchEventCalled = true; return false; }
 bool DummyControlImplOverride::OnHoverEvent(const HoverEvent& event) { hoverEventCalled = true; return false; }
-bool DummyControlImplOverride::OnMouseWheelEvent(const MouseWheelEvent& event) { mouseWheelEventCalled = true; return false; }
+bool DummyControlImplOverride::OnWheelEvent(const WheelEvent& event) { wheelEventCalled = true; return false; }
 bool DummyControlImplOverride::OnKeyEvent(const KeyEvent& event) { keyEventCalled = true; return false;}
 void DummyControlImplOverride::OnKeyInputFocusGained() { keyInputFocusGained = true; }
 void DummyControlImplOverride::OnKeyInputFocusLost() { keyInputFocusLost = true; }

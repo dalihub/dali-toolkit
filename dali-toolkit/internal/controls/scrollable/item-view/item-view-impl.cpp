@@ -25,7 +25,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/devel-api/common/set-wrapper.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/events/mouse-wheel-event.h>
+#include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
@@ -57,13 +57,13 @@ DALI_TYPE_REGISTRATION_END()
 
 const float DEFAULT_MINIMUM_SWIPE_SPEED = 1.0f;
 const float DEFAULT_MINIMUM_SWIPE_DISTANCE = 3.0f;
-const float DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION = 0.1f;
+const float DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION = 0.1f;
 
 const float DEFAULT_MINIMUM_SWIPE_DURATION = 0.45f;
 const float DEFAULT_MAXIMUM_SWIPE_DURATION = 2.6f;
 
 const float DEFAULT_REFRESH_INTERVAL_LAYOUT_POSITIONS = 20.0f; // 1 updates per 20 items
-const int MOUSE_WHEEL_EVENT_FINISHED_TIME_OUT = 500;  // 0.5 second
+const int WHEEL_EVENT_FINISHED_TIME_OUT = 500;  // 0.5 second
 
 const float DEFAULT_ANCHORING_DURATION = 1.0f;  // 1 second
 
@@ -276,7 +276,7 @@ Dali::Toolkit::ItemView ItemView::New(ItemFactory& factory)
 }
 
 ItemView::ItemView(ItemFactory& factory)
-: Scrollable( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | REQUIRES_MOUSE_WHEEL_EVENTS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT ) ),
+: Scrollable( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | REQUIRES_WHEEL_EVENTS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT ) ),
   mItemFactory(factory),
   mActiveLayout(NULL),
   mAnimatingOvershootOn(false),
@@ -287,7 +287,7 @@ ItemView::ItemView(ItemFactory& factory)
   mRefreshOrderHint(true/*Refresh item 0 first*/),
   mMinimumSwipeSpeed(DEFAULT_MINIMUM_SWIPE_SPEED),
   mMinimumSwipeDistance(DEFAULT_MINIMUM_SWIPE_DISTANCE),
-  mMouseWheelScrollDistanceStep(0.0f),
+  mWheelScrollDistanceStep(0.0f),
   mScrollDistance(0.0f),
   mScrollSpeed(0.0f),
   mTotalPanDisplacement(Vector2::ZERO),
@@ -308,12 +308,12 @@ void ItemView::OnInitialize()
   SetOvershootEnabled(true);
 
   Vector2 stageSize = Stage::GetCurrent().GetSize();
-  mMouseWheelScrollDistanceStep = stageSize.y * DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
+  mWheelScrollDistanceStep = stageSize.y * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
 
   EnableGestureDetection(Gesture::Type(Gesture::Pan));
 
-  mMouseWheelEventFinishedTimer = Timer::New( MOUSE_WHEEL_EVENT_FINISHED_TIME_OUT );
-  mMouseWheelEventFinishedTimer.TickSignal().Connect( this, &ItemView::OnMouseWheelEventFinished );
+  mWheelEventFinishedTimer = Timer::New( WHEEL_EVENT_FINISHED_TIME_OUT );
+  mWheelEventFinishedTimer.TickSignal().Connect( this, &ItemView::OnWheelEventFinished );
 
   SetRefreshInterval(DEFAULT_REFRESH_INTERVAL_LAYOUT_POSITIONS);
 }
@@ -500,14 +500,14 @@ float ItemView::GetMinimumSwipeDistance() const
   return mMinimumSwipeDistance;
 }
 
-void ItemView::SetMouseWheelScrollDistanceStep(float step)
+void ItemView::SetWheelScrollDistanceStep(float step)
 {
-  mMouseWheelScrollDistanceStep = step;
+  mWheelScrollDistanceStep = step;
 }
 
-float ItemView::GetMouseWheelScrollDistanceStep() const
+float ItemView::GetWheelScrollDistanceStep() const
 {
-  return mMouseWheelScrollDistanceStep;
+  return mWheelScrollDistanceStep;
 }
 
 void ItemView::SetAnchoring(bool enabled)
@@ -986,14 +986,14 @@ bool ItemView::OnTouchEvent(const TouchEvent& event)
   return true; // consume since we're potentially scrolling
 }
 
-bool ItemView::OnMouseWheelEvent(const MouseWheelEvent& event)
+bool ItemView::OnWheelEvent(const WheelEvent& event)
 {
-  // Respond the mouse wheel event to scroll
+  // Respond the wheel event to scroll
   if (mActiveLayout)
   {
     Actor self = Self();
     const Vector3 layoutSize = Self().GetCurrentSize();
-    float layoutPositionDelta = GetCurrentLayoutPosition(0) - (event.z * mMouseWheelScrollDistanceStep * mActiveLayout->GetScrollSpeedFactor());
+    float layoutPositionDelta = GetCurrentLayoutPosition(0) - (event.z * mWheelScrollDistanceStep * mActiveLayout->GetScrollSpeedFactor());
     float firstItemScrollPosition = ClampFirstItemPosition(layoutPositionDelta, layoutSize, *mActiveLayout);
 
     self.SetProperty(Toolkit::ItemView::Property::LAYOUT_POSITION, firstItemScrollPosition );
@@ -1002,23 +1002,23 @@ bool ItemView::OnMouseWheelEvent(const MouseWheelEvent& event)
     mRefreshEnabled = true;
   }
 
-  if (mMouseWheelEventFinishedTimer.IsRunning())
+  if (mWheelEventFinishedTimer.IsRunning())
   {
-    mMouseWheelEventFinishedTimer.Stop();
+    mWheelEventFinishedTimer.Stop();
   }
 
-  mMouseWheelEventFinishedTimer.Start();
+  mWheelEventFinishedTimer.Start();
 
   return true;
 }
 
-bool ItemView::OnMouseWheelEventFinished()
+bool ItemView::OnWheelEventFinished()
 {
   if (mActiveLayout)
   {
     RemoveAnimation(mScrollAnimation);
 
-    // No more mouse wheel events coming. Do the anchoring if enabled.
+    // No more wheel events coming. Do the anchoring if enabled.
     mScrollAnimation = DoAnchoring();
     if (mScrollAnimation)
     {

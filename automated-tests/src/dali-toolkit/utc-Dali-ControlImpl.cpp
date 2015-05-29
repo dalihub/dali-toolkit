@@ -26,7 +26,7 @@
 #include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/key-event-integ.h>
-#include <dali/integration-api/events/mouse-wheel-event-integ.h>
+#include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/integration-api/events/long-press-gesture-event.h>
 #include <dali/integration-api/events/pinch-gesture-event.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
@@ -780,13 +780,13 @@ int UtcDaliControlImplTypeRegistry(void)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 namespace
 {
-static bool MouseWheelEventCallback(Actor actor, const MouseWheelEvent& event)
+static bool WheelEventCallback(Actor actor, const WheelEvent& event)
 {
   return false;
 }
 }
 
-int UtcDaliControlImplMouseWheelEvent(void)
+int UtcDaliControlImplWheelEvent(void)
 {
   ToolkitTestApplication application;
 
@@ -798,20 +798,20 @@ int UtcDaliControlImplMouseWheelEvent(void)
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
-    dummy.MouseWheelEventSignal().Connect(&MouseWheelEventCallback);
+    dummy.WheelEventSignal().Connect(&WheelEventCallback);
 
     application.Render();
     application.SendNotification();
     application.Render();
     application.SendNotification();
 
-    DALI_TEST_EQUALS( dummyImpl.mouseWheelEventCalled, false, TEST_LOCATION );
+    DALI_TEST_EQUALS( dummyImpl.wheelEventCalled, false, TEST_LOCATION );
 
-    // simulate a mouse wheel event
+    // simulate a wheel event
     Vector2 screenCoordinates( 10.0f, 10.0f );
-    Integration::MouseWheelEvent event(0, 0u, screenCoordinates, 1, 1000u);
-    application.ProcessEvent(event);
-    DALI_TEST_EQUALS( dummyImpl.mouseWheelEventCalled, true, TEST_LOCATION );
+    Integration::WheelEvent event( Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, screenCoordinates, 1, 1000u );
+    application.ProcessEvent( event );
+    DALI_TEST_EQUALS( dummyImpl.wheelEventCalled, true, TEST_LOCATION );
 
     Stage::GetCurrent().Remove(dummy);
   }
@@ -824,17 +824,17 @@ int UtcDaliControlImplMouseWheelEvent(void)
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
-    dummy.MouseWheelEventSignal().Connect(&MouseWheelEventCallback);
+    dummy.WheelEventSignal().Connect(&WheelEventCallback);
 
     application.Render();
     application.SendNotification();
     application.Render();
     application.SendNotification();
 
-    // simulate a mouse wheel event
+    // simulate a wheel event
     Vector2 screenCoordinates( 20.0f, 20.0f );
-    Integration::MouseWheelEvent event(0, 0u, screenCoordinates, 1, 1000u);
-    application.ProcessEvent(event);
+    Integration::WheelEvent event( Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, screenCoordinates, 1, 1000u );
+    application.ProcessEvent( event );
 
     Stage::GetCurrent().Remove(dummy);
   }

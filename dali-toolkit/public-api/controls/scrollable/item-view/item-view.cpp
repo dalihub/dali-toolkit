@@ -128,14 +128,14 @@ float ItemView::GetMinimumSwipeDistance() const
   return GetImpl(*this).GetMinimumSwipeDistance();
 }
 
-void ItemView::SetMouseWheelScrollDistanceStep(float step)
+void ItemView::SetWheelScrollDistanceStep(float step)
 {
-  GetImpl(*this).SetMouseWheelScrollDistanceStep(step);
+  GetImpl(*this).SetWheelScrollDistanceStep(step);
 }
 
-float ItemView::GetMouseWheelScrollDistanceStep() const
+float ItemView::GetWheelScrollDistanceStep() const
 {
-  return GetImpl(*this).GetMouseWheelScrollDistanceStep();
+  return GetImpl(*this).GetWheelScrollDistanceStep();
 }
 
 void ItemView::SetAnchoring(bool enabled)

@@ -316,9 +316,9 @@ protected: // From CustomActorImpl, not to be used by application developers
   virtual bool OnKeyEvent( const KeyEvent& event );
 
   /**
-   * @copydoc CustomActorImpl::OnMouseWheelEvent()
+   * @copydoc CustomActorImpl::OnWheelEvent()
    */
-  virtual bool OnMouseWheelEvent( const MouseWheelEvent& event );
+  virtual bool OnWheelEvent( const WheelEvent& event );
 
   /**
    * @copydoc CustomActorImpl::OnRelayout()

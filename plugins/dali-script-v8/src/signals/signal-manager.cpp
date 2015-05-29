@@ -27,7 +27,7 @@
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/hover-event.h>
-#include <dali/public-api/events/mouse-wheel-event.h>
+#include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/pan-gesture.h>
 
@@ -55,7 +55,7 @@ namespace // un-named namespace
 {
 const char* const SIGNAL_TOUCHED = "touched";
 const char* const SIGNAL_HOVERED = "hovered";
-const char* const SIGNAL_MOUSE_WHEEL_EVENT = "mouse-wheel-event";
+const char* const SIGNAL_WHEEL_EVENT = "wheel-event";
 const char* const SIGNAL_ON_STAGE = "on-stage";
 const char* const SIGNAL_OFF_STAGE = "off-stage";
 const char* const ANIMATION_SIGNAL_FINISHED = "finished";
@@ -205,7 +205,7 @@ public:
     returnValue.Get(ret);
     return ret;
   }
-  bool OnMouseWheel( Actor actor, const MouseWheelEvent& event)
+  bool OnWheel( Actor actor, const WheelEvent& event)
   {
     std::vector< Dali::Any > arguments;
     Dali::Any returnValue(false);
@@ -390,9 +390,9 @@ void ActorConnection( v8::Isolate* isolate,
   {
     actor.HoveredSignal().Connect( callback, &ActorCallback::OnHover );
   }
-  else if ( strcmp( signalName.c_str(), SIGNAL_MOUSE_WHEEL_EVENT ) == 0 )
+  else if ( strcmp( signalName.c_str(), SIGNAL_WHEEL_EVENT ) == 0 )
   {
-    actor.MouseWheelEventSignal().Connect( callback, &ActorCallback::OnMouseWheel );
+    actor.WheelEventSignal().Connect( callback, &ActorCallback::OnWheel );
   }
   else if ( strcmp( signalName.c_str(), SIGNAL_ON_STAGE ) == 0 )
   {

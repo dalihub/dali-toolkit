@@ -323,14 +323,14 @@ public:
   void SetMaxFlickSpeed(float speed);
 
   /**
-   * @copydoc Toolkit::ScrollView::GetMouseWheelScrollDistanceStep
+   * @copydoc Toolkit::ScrollView::GetWheelScrollDistanceStep
    */
-  Vector2 GetMouseWheelScrollDistanceStep() const;
+  Vector2 GetWheelScrollDistanceStep() const;
 
   /**
-   * @copydoc Toolkit::ScrollView::SetMouseWheelScrollDistanceStep
+   * @copydoc Toolkit::ScrollView::SetWheelScrollDistanceStep
    */
-  void SetMouseWheelScrollDistanceStep(Vector2 step);
+  void SetWheelScrollDistanceStep(Vector2 step);
 
   /**
    * @copydoc Toolkit::ScrollView::GetCurrentPage
@@ -535,11 +535,11 @@ private: // private overriden functions from CustomActorImpl and Controls
   virtual bool OnTouchEvent(const TouchEvent& event);
 
   /**
-   * From CustomActorImpl; called after a mouse-wheel-event is received by the owning actor.
-   * @param[in] event The mouse wheel event.
+   * From CustomActorImpl; called after a wheel-event is received by the owning actor.
+   * @param[in] event The wheel event.
    * @return True if the event should be consumed.
    */
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event);
+  virtual bool OnWheelEvent(const WheelEvent& event);
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()
@@ -883,7 +883,7 @@ private:
   float mFlickSpeedCoefficient;                 ///< Flick velocity coefficient. Input touch velocity is multiplied by this.
   float mMaxFlickSpeed;                         ///< Maximum flick speed. Maximum speed of flick in stage.lengths/sec.
 
-  Vector2 mMouseWheelScrollDistanceStep;        ///< The step of scroll distance in actor coordinates in X and Y axes for each mouse wheel event received.
+  Vector2 mWheelScrollDistanceStep;        ///< The step of scroll distance in actor coordinates in X and Y axes for each wheel event received.
 
   //ScrollInternalConstraintsPtr mScrollInternalConstraints;
   Constraint mScrollMainInternalPrePositionConstraint;
