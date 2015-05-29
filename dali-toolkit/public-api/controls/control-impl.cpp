@@ -49,8 +49,6 @@ namespace Toolkit
 namespace
 {
 
-const float BACKGROUND_ACTOR_Z_POSITION( -0.1f );
-
 /**
  * Creates control through type registry
  */
@@ -67,7 +65,7 @@ BaseHandle Create()
  * @return true if action has been accepted by this control
  */
 const char* ACTION_CONTROL_ACTIVATED = "control-activated";
-  static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
+static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
 {
   bool ret = false;
 
@@ -224,7 +222,6 @@ void SetupBackgroundActor( Actor actor, const Vector4& color )
   actor.SetColor( color );
   actor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
   actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
-  actor.SetZ( BACKGROUND_ACTOR_Z_POSITION );
   actor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 }
 
@@ -240,7 +237,6 @@ void SetupBackgroundActorConstrained( Actor actor, Property::Index constrainingI
   actor.SetColor( color );
   actor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
   actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
-  actor.SetZ( BACKGROUND_ACTOR_Z_POSITION );
 
   Constraint constraint = Constraint::New<Vector3>( actor,
                                                     constrainingIndex,
@@ -271,7 +267,8 @@ public:
     mLongPressGestureDetector(),
     mFlags( Control::ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
     mIsKeyboardNavigationSupported( false ),
-    mIsKeyboardFocusGroup( false )
+    mIsKeyboardFocusGroup( false ),
+    mAddRemoveBackgroundChild( false )
   {
   }
 
@@ -466,6 +463,7 @@ public:
   ControlBehaviour mFlags :CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
+  bool mAddRemoveBackgroundChild:1;        ///< Flag to know when we are adding or removing our own actor to avoid call to OnControlChildAdd
 
   // Properties - these need to be members of Internal::Control::Impl as they need to function within this class.
   static PropertyRegistration PROPERTY_1;
@@ -533,9 +531,12 @@ void Control::SetBackgroundColor( const Vector4& color )
 
     SetupBackgroundActorConstrained( meshActor, Actor::Property::SCALE, color );
 
-    // Set the background actor before adding so that we do not inform deriving classes
     background.actor = meshActor;
-    Self().Add( meshActor );
+    // Set the flag to avoid notifying children
+    mImpl->mAddRemoveBackgroundChild = true;
+    // use insert to guarantee its the first child (so that OVERLAY mode works)
+    Self().Insert( 0, meshActor );
+    mImpl->mAddRemoveBackgroundChild = false;
   }
 
   background.color = color;
@@ -556,8 +557,10 @@ void Control::SetBackgroundImage( Image image )
 
   if ( background.actor )
   {
-    // Remove Current actor, unset AFTER removal so that we do not inform deriving classes
+    // Remove Current actor, unset AFTER removal
+    mImpl->mAddRemoveBackgroundChild = true;
     Self().Remove( background.actor );
+    mImpl->mAddRemoveBackgroundChild = false;
     background.actor.Reset();
   }
 
@@ -566,7 +569,10 @@ void Control::SetBackgroundImage( Image image )
 
   // Set the background actor before adding so that we do not inform derived classes
   background.actor = imageActor;
-  Self().Add( imageActor );
+  mImpl->mAddRemoveBackgroundChild = true;
+  // use insert to guarantee its the first child (so that OVERLAY mode works)
+  Self().Insert( 0, imageActor );
+  mImpl->mAddRemoveBackgroundChild = false;
 }
 
 void Control::ClearBackground()
@@ -574,7 +580,9 @@ void Control::ClearBackground()
   if ( mImpl->mBackground )
   {
     Background& background( mImpl->GetBackground() );
+    mImpl->mAddRemoveBackgroundChild = true;
     Self().Remove( background.actor );
+    mImpl->mAddRemoveBackgroundChild = false;
 
     delete mImpl->mBackground;
     mImpl->mBackground = NULL;
@@ -900,8 +908,8 @@ void Control::OnKeyInputFocusLost()
 
 void Control::OnChildAdd(Actor& child)
 {
-  // If this is the background actor, then we do not want to relayout or inform deriving classes
-  if ( mImpl->mBackground && ( child == mImpl->mBackground->actor ) )
+  // If this is the background actor, then we do not want to inform deriving classes
+  if ( mImpl->mAddRemoveBackgroundChild )
   {
     return;
   }
@@ -912,8 +920,8 @@ void Control::OnChildAdd(Actor& child)
 
 void Control::OnChildRemove(Actor& child)
 {
-  // If this is the background actor, then we do not want to relayout or inform deriving classes
-  if ( mImpl->mBackground && ( child == mImpl->mBackground->actor ) )
+  // If this is the background actor, then we do not want to inform deriving classes
+  if ( mImpl->mAddRemoveBackgroundChild )
   {
     return;
   }
