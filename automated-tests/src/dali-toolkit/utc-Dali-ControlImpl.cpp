@@ -934,7 +934,7 @@ int UtcDaliControlImplGetNextKeyboardFocusableActorP(void)
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( dummy );
 
   Actor currentFocusedActor;
-  Actor result = controlImpl.GetNextKeyboardFocusableActor( currentFocusedActor, Control::Left, false );
+  Actor result = controlImpl.GetNextKeyboardFocusableActor( currentFocusedActor, Control::KeyboardFocus::LEFT, false );
 
   DALI_TEST_EQUALS( result, currentFocusedActor, TEST_LOCATION );
 

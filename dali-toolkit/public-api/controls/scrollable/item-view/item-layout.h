@@ -304,7 +304,7 @@ public:
    * @param[in] loopEnabled Whether the KeyboardFocusManager is set to wrap around between first and last item
    * @return The next item ID.
    */
-  DALI_IMPORT_API virtual int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
+  DALI_IMPORT_API virtual int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled);
 
   /**
    * @brief Query the flick speed factor of the layout while swipping.

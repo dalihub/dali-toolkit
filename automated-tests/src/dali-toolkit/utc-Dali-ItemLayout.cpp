@@ -295,7 +295,7 @@ int UtcDaliItemLayoutSetAndGetOrientation(void)
 
   DALI_TEST_EQUALS(position, 0.0f, TEST_LOCATION);
 
-  int focusItem = layout->GetNextFocusItemID(0, TOTAL_ITEM_NUMBER, Control::Left, true);
+  int focusItem = layout->GetNextFocusItemID(0, TOTAL_ITEM_NUMBER, Control::KeyboardFocus::LEFT, true);
 
   DALI_TEST_CHECK(focusItem != 0);
 
@@ -352,8 +352,8 @@ int UtcDaliItemLayoutGetNextFocusItemID(void)
 
   TestItemLayoutPtr layout = TestItemLayout::New();
   DALI_TEST_CHECK( layout );
-  DALI_TEST_EQUALS(layout->GetNextFocusItemID(0, 100, Control::Left, true), 99, TEST_LOCATION );
-  DALI_TEST_EQUALS(layout->GetNextFocusItemID(110, 100, Control::Right, true), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS(layout->GetNextFocusItemID(0, 100, Control::KeyboardFocus::LEFT, true), 99, TEST_LOCATION );
+  DALI_TEST_EQUALS(layout->GetNextFocusItemID(110, 100, Control::KeyboardFocus::RIGHT, true), 0, TEST_LOCATION );
 
   END_TEST;
 }

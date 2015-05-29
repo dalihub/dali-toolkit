@@ -109,26 +109,26 @@ v8::Local<v8::ObjectTemplate> KeyboardFocusManagerWrapper::GetKeyboardFocusManag
 }
 
 
-std::string KeyboardFocusManagerWrapper::GetDirectionName(  Toolkit::Control::KeyboardFocusNavigationDirection dir )
+std::string KeyboardFocusManagerWrapper::GetDirectionName(  Toolkit::Control::KeyboardFocus::Direction dir )
 {
   switch( dir )
   {
-    case Dali::Toolkit::Control::Left:
+    case Dali::Toolkit::Control::KeyboardFocus::LEFT:
     {
       return "left";
       break;
     }
-    case Dali::Toolkit::Control::Right:
+    case Dali::Toolkit::Control::KeyboardFocus::RIGHT:
     {
       return "right";
       break;
     }
-    case Dali::Toolkit::Control::Up:
+    case Dali::Toolkit::Control::KeyboardFocus::UP:
     {
       return "up";
       break;
     }
-    case Dali::Toolkit::Control::Down:
+    case Dali::Toolkit::Control::KeyboardFocus::DOWN:
     {
       return "down";
       break;

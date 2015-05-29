@@ -312,7 +312,7 @@ public:
 
   Actor PreFocusChangeSignal(Actor currentFocusedActor,
                              Actor proposedActorToFocus,
-                             Toolkit::Control::KeyboardFocusNavigationDirection direction  )
+                             Toolkit::Control::KeyboardFocus::Direction direction  )
   {
     std::vector< Dali::Any > arguments;
     Dali::Any returnValue = Actor();  // we want an actor as a return value
