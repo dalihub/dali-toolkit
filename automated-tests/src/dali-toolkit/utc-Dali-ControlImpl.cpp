@@ -199,17 +199,17 @@ int UtcDaliControlImplDisableGestureDetector(void)
     TapGestureDetector tap = dummyImpl.GetTapGestureDetector();
     LongPressGestureDetector longPress = dummyImpl.GetLongPressGestureDetector();
 
-    DALI_TEST_EQUALS( pinch.GetAttachedActors().empty(), false, TEST_LOCATION );
-    DALI_TEST_EQUALS( pan.GetAttachedActors().empty(), false, TEST_LOCATION );
-    DALI_TEST_EQUALS( tap.GetAttachedActors().empty(), false, TEST_LOCATION );
-    DALI_TEST_EQUALS( longPress.GetAttachedActors().empty(), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == pinch.GetAttachedActorCount(), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == pan.GetAttachedActorCount(), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == tap.GetAttachedActorCount(), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == longPress.GetAttachedActorCount(), false, TEST_LOCATION );
 
     dummyImpl.DisableGestureDetection( Gesture::Type(Gesture::Pinch | Gesture::Pan | Gesture::Tap | Gesture::LongPress) );
 
-    DALI_TEST_EQUALS( pinch.GetAttachedActors().empty(), true, TEST_LOCATION );
-    DALI_TEST_EQUALS( pan.GetAttachedActors().empty(), true, TEST_LOCATION );
-    DALI_TEST_EQUALS( tap.GetAttachedActors().empty(), true, TEST_LOCATION );
-    DALI_TEST_EQUALS( longPress.GetAttachedActors().empty(), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == pinch.GetAttachedActorCount(), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == pan.GetAttachedActorCount(), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == tap.GetAttachedActorCount(), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == longPress.GetAttachedActorCount(), true, TEST_LOCATION );
   }
   END_TEST;
 }
@@ -921,7 +921,7 @@ int UtcDaliControlImplOnAccessibilityActivatedP(void)
   BaseHandle handle = type.CreateInstance();
   DALI_TEST_CHECK( handle );
 
-  std::vector<Property::Value> attributes;
+  Property::Map attributes;
   DALI_TEST_EQUALS( false, handle.DoAction("control-activated", attributes), TEST_LOCATION );
 
   END_TEST;

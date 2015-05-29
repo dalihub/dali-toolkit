@@ -54,7 +54,7 @@ struct ChildActorAction
   std::string actorName;
   std::string actionName;
   std::string childName;
-  PropertyValueContainer parameters;
+  Property::Map parameters;
 
   void operator()(void)
   {
@@ -115,7 +115,7 @@ struct GenericAction
 {
   std::string actorName;
   std::string actionName;
-  PropertyValueContainer parameters;
+  Property::Map parameters;
 
   void operator()(void)
   {
@@ -376,25 +376,17 @@ Property::Value GetPropertyValue(const TreeNode &child)
  * Gets Parmeter list from child
  * params is be cleared before insertion
  */
-void GetParameters(const TreeNode& child, PropertyValueContainer& params)
+void GetParameters(const TreeNode& child, Property::Map& params)
 {
   if( OptionalChild c = IsChild(child, "parameters") )
   {
     const TreeNode& node = *c;
 
-    if(0 == node.Size())
-    {
-      GetPropertyValue(node);
-    }
-    else
-    {
-      params.clear();
-      params.reserve(node.Size());
+    params.Clear();
 
-      for(TreeNode::ConstIterator iter(node.CBegin()); iter != node.CEnd(); ++iter)
-      {
-        params.push_back( GetPropertyValue( (*iter).second ) );
-      }
+    for(TreeNode::ConstIterator iter(node.CBegin()); iter != node.CEnd(); ++iter)
+    {
+      params[ (*iter).first ] = GetPropertyValue( (*iter).second );
     }
   }
 }

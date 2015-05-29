@@ -905,7 +905,7 @@ Actor& Button::GetDisabledBackgroundImage()
   return mDisabledBackgroundContent;
 }
 
-bool Button::DoAction( BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes )
+  bool Button::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
 {
   bool ret = false;
 
@@ -924,7 +924,7 @@ bool Button::DoAction( BaseObject* object, const std::string& actionName, const 
   return ret;
 }
 
-void Button::DoClickAction( const PropertyValueContainer& attributes )
+  void Button::DoClickAction( const Property::Map& attributes )
 {
   // Prevents the button signals from doing a recursive loop by sending an action
   // and re-emitting the signals.
@@ -1210,7 +1210,7 @@ void Button::OnInitialize()
 void Button::OnActivated()
 {
   // When the button is activated, it performs the click action
-  PropertyValueContainer attributes;
+  Property::Map attributes;
   DoClickAction( attributes );
 }
 
