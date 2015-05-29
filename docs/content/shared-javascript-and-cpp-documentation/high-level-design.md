@@ -1,5 +1,5 @@
-/**
- *
+<!--
+/**-->
 
 # High Level Design {#dali-hld}
 
@@ -10,6 +10,7 @@
  + **DALi Platform Abstraction:** Resource loading & decoding in multiple threads (part of dali-adaptor)
  + **DALi Toolkit:** Reusable UI Controls, Effects & Scripting Support
 
+![ ](../assets/img/architecture.png)
 ![ ](architecture.png)
 
 ## Main, Update & Render Threads {#dali-threads}
@@ -21,6 +22,7 @@ DALi uses a multithreaded architecture in order to provide the best performance 
  + **Render Thread:** OpenGL drawing, texture and geometry uploading etc.
  + **Resource Threads:** Loads images and decodes into bitmaps etc.
 
+![ ](../assets/img/dali-threads.png)
 ![ ](dali-threads.png)
 
 */

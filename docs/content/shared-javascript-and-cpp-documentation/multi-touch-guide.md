@@ -1,5 +1,5 @@
-/**
- *
+<!--
+/**-->
 
 Multi-Touch Events
 ==================
@@ -144,5 +144,5 @@ Hit Priority of above Actor tree (all overlays): 1 - Lowest. 6 - Highest.
      touch signals are also emitted from the touch-down actor with an "Interrupted" state.
 
 @class MultiTouch
-*
+
 */

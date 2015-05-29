@@ -1,5 +1,6 @@
-/**
- *
+<!--
+/**-->
+
 # JavaScript wrapping guide  {#javascriptwrapping}
 
 This guide outlines what files to modify when the DALi C++ public API changes.
@@ -104,10 +105,11 @@ v8 will detect myActor is a wrapped object, and call getId() on that wrapped obj
 The wrapped object, then forwards the command to the real DALi object.
   
 Whenever we want to access functions / properties of that wrapped object, we unwrap it
-to get access to the Dali object.
+to get access to the DALi object.
   
-Each wrapped object registers with Dali garbage collector so they can be deleted
-when Dali shuts down
+Each wrapped object registers with DALi garbage collector so they can be deleted
+when DALi shuts down
 
 @class _Guide_JavaScript_Wrapping
+
 */

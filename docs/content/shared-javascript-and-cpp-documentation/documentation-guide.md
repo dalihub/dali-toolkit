@@ -1,5 +1,5 @@
-/**
- *
+<!--
+/**-->
 
 # Writing documentation for the DALi programing guide  {#documentationguide}
 

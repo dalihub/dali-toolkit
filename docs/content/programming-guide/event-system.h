@@ -1,10 +1,10 @@
 /*! \page event-system Event Handling
 
-Dali emits several signals to an application to inform it of user actions.
+DALi emits several signals to an application to inform it of user actions.
 
 <h2 class="pg">Touch Events</h2>
 
-An application can be notified when a user interacts with the touch screen on the device by connecting to the touch signal provided by Dali::Actor.  This signal will be emitted by Dali whenever the touch occurs within the connected actor's bounds.
+An application can be notified when a user interacts with the touch screen on the device by connecting to the touch signal provided by Dali::Actor.  This signal will be emitted by DALi whenever the touch occurs within the connected actor's bounds.
 
 Each point on the screen that is currently being touched or where touch has stopped is represented by a Dali::TouchPoint.  This object stores information about the state of the touch point (down, up, motion etc.) and the co-ordinates of the touch.
 

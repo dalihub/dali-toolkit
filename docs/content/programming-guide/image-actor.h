@@ -23,7 +23,7 @@
  * <h3 class="pg">Resizing at Load Time</h3>
  * An application loading images from an external source will often want to
  * display those images at a lower resolution than their native ones.
- * To support this, %Dali can resize an image at load time so that its
+ * To support this, DALi can resize an image at load time so that its
  * in-memory copy uses less space and its visual quality benefits from being
  * prefiltered.
  * There are four algorithms which can be used to fit an image to a desired
