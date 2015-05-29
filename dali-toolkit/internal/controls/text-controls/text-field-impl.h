@@ -176,6 +176,14 @@ private: // Implementation
   void KeyboardStatusChanged( bool keyboardShown );
 
   /**
+   * @brief Callback when Textfield is touched
+   *
+   * @param[in] actor TextField touched
+   * @param[in] event TouchEvent information
+   */
+  bool OnTouched( Actor actor, const TouchEvent& event );
+
+  /**
    * Construct a new TextField.
    */
   TextField();
