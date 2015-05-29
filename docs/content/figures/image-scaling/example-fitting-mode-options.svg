@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1052.3622"
+   height="744.09448"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="example-fitting-mode-options.svg"
+   inkscape:export-filename="/tmp/1.png"
+   inkscape:export-xdpi="89.269394"
+   inkscape:export-ydpi="89.269394">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient5404"
+       osb:paint="gradient">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop5406" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop5408" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.63456256"
+     inkscape:cx="704.49723"
+     inkscape:cy="501.75416"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:window-width="1920"
+     inkscape:window-height="1158"
+     inkscape:window-x="1200"
+     inkscape:window-y="418"
+     inkscape:window-maximized="1"
+     objecttolerance="4"
+     gridtolerance="4">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3181"
+       empspacing="4"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true"
+       spacingx="32px"
+       spacingy="32px" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-308.2677)">
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/door.jpg"
+       xlink:href="door.jpg"
+       inkscape:export-ydpi="89.269394"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       width="256"
+       height="256"
+       id="image6106"
+       x="32"
+       y="92.362183" />
+    <g
+       id="g6199"
+       transform="matrix(0.75,0,0,0.75,158.83024,-448.90946)"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394">
+      <image
+         sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/door.jpg"
+         xlink:href="door.jpg"
+         inkscape:export-ydpi="89.269394"
+         inkscape:export-xdpi="89.269394"
+         inkscape:export-filename="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/shared-javascript-and-cpp-documentation/door-scale-to-fill2.png"
+         y="764.36218"
+         x="512"
+         id="image6106-0"
+         height="256"
+         width="256" />
+      <rect
+         y="764.36218"
+         x="719.81006"
+         height="258.6265"
+         width="51.309372"
+         id="rect6179"
+         style="fill:#ffffff;fill-opacity:1;stroke:none"
+         inkscape:export-filename="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/shared-javascript-and-cpp-documentation/door-scale-to-fill.png"
+         inkscape:export-xdpi="89.269394"
+         inkscape:export-ydpi="89.269394" />
+      <rect
+         y="764.36218"
+         x="512"
+         height="259.15176"
+         width="48.189934"
+         id="rect6179-2"
+         style="fill:#ffffff;fill-opacity:1;stroke:none"
+         inkscape:export-filename="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/shared-javascript-and-cpp-documentation/door-scale-to-fill.png"
+         inkscape:export-xdpi="89.269394"
+         inkscape:export-ydpi="89.269394" />
+      <rect
+         inkscape:export-ydpi="89.269394"
+         inkscape:export-xdpi="89.269394"
+         inkscape:export-filename="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/shared-javascript-and-cpp-documentation/door-scale-to-fill2.png"
+         y="764.36218"
+         x="560"
+         height="256.00003"
+         width="160"
+         id="rect3183-1-9-1-6"
+         style="fill:none;stroke:#ff0000;stroke-width:4.28426027;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:3.21319532;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1"
+       width="120"
+       height="192.00003"
+       x="356"
+       y="124.36218"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/door.jpg"
+       xlink:href="door.jpg"
+       inkscape:export-ydpi="89.269394"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       width="120"
+       height="135.85014"
+       id="image6106-5"
+       x="804"
+       y="152.43707" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:3.21319532;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-4"
+       width="120"
+       height="192.00003"
+       x="804"
+       y="124.36212"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/door.jpg"
+       xlink:href="door.jpg"
+       inkscape:export-ydpi="89.269394"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       width="120"
+       height="135.85014"
+       id="image6106-5-3"
+       x="1030.3395"
+       y="152.43707" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:3.21319532;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-4-1"
+       width="120"
+       height="192.00003"
+       x="1030.3395"
+       y="124.36212"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/door.jpg"
+       xlink:href="door.jpg"
+       inkscape:export-ydpi="89.269394"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       width="192"
+       height="192"
+       id="image6106-4"
+       x="1218.3396"
+       y="124.36218" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:3.21319532;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-3"
+       width="120"
+       height="192.00003"
+       x="1254.3396"
+       y="124.36218"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/dog.jpg"
+       xlink:href="dog.jpg"
+       inkscape:export-ydpi="89.269394"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       width="256"
+       height="256"
+       id="image6359"
+       x="32"
+       y="412.36218" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:3.31857371;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-0"
+       width="128.00003"
+       height="192"
+       x="-604.36218"
+       y="320"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"
+       transform="matrix(0,-1,1,0,0,0)" />
+    <g
+       id="g6476"
+       transform="translate(-7.128906e-7,-384.82965)"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394">
+      <image
+         sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/dog.jpg"
+         xlink:href="dog.jpg"
+         y="829.19183"
+         x="544"
+         id="image6359-2"
+         height="192"
+         width="192" />
+      <rect
+         transform="translate(0,308.2677)"
+         y="520.09448"
+         x="544"
+         height="32"
+         width="192"
+         id="rect6470"
+         style="fill:#ffffff;fill-opacity:1;stroke:none" />
+      <rect
+         transform="translate(0,308.2677)"
+         y="680.09448"
+         x="541.66046"
+         height="33.94965"
+         width="196.67912"
+         id="rect6474"
+         style="fill:#ffffff;fill-opacity:1;stroke:none" />
+      <rect
+         transform="matrix(0,-1,1,0,0,0)"
+         inkscape:export-ydpi="89.269394"
+         inkscape:export-xdpi="89.269394"
+         inkscape:export-filename="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/shared-javascript-and-cpp-documentation/example-scale-to-fill-sequence.png"
+         y="544"
+         x="-989.19183"
+         height="192"
+         width="128.00003"
+         id="rect3183-1-9-1-0-2"
+         style="fill:none;stroke:#ff0000;stroke-width:3.31857371;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/dog.jpg"
+       xlink:href="dog.jpg"
+       inkscape:export-ydpi="89.269394"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       width="192"
+       height="192"
+       id="image6359-2-2"
+       x="994.33954"
+       y="445.19183" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:3.31857371;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-0-4"
+       width="128.00003"
+       height="192"
+       x="-605.19183"
+       y="994.33954"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"
+       transform="matrix(0,-1,1,0,0,0)" />
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/dog.jpg"
+       xlink:href="dog.jpg"
+       inkscape:export-ydpi="89.269394"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       width="128"
+       height="128"
+       id="image6359-2-2-2"
+       x="1250.3396"
+       y="477.19183" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:3.31857371;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-0-0"
+       width="128.00003"
+       height="192"
+       x="-605.19183"
+       y="1218.3396"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"
+       transform="matrix(0,-1,1,0,0,0)" />
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/dog.jpg"
+       xlink:href="dog.jpg"
+       inkscape:export-ydpi="89.269394"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       width="128"
+       height="128"
+       id="image6359-2-2-2-1"
+       x="800"
+       y="476.36218" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:3.31857371;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-0-0-6"
+       width="128.00003"
+       height="192"
+       x="-604.36218"
+       y="768"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"
+       transform="matrix(0,-1,1,0,0,0)" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3024"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(0,244.2677)"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion3026"><rect
+           id="rect3028"
+           width="256.29398"
+           height="127.03266"
+           x="33.429649"
+           y="746.32312" /></flowRegion><flowPara
+         id="flowPara3030">Raw Image</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3032"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(0,244.2677)"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion3034"><rect
+           id="rect3036"
+           width="192.25842"
+           height="96.91716"
+           x="318.32953"
+           y="744.09448" /></flowRegion><flowPara
+         id="flowPara3038">Fitting Target</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3040"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(0,244.2677)"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion3042"><rect
+           id="rect3044"
+           width="192.25842"
+           height="91.40155"
+           x="542.89368"
+           y="744.88245" /></flowRegion><flowPara
+         id="flowPara3046">SCALE_TO_FILL</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3048"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(0,244.2677)"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion3050"><rect
+           id="rect3052"
+           width="193.83432"
+           height="96.91716"
+           x="767.45782"
+           y="744.09448" /></flowRegion><flowPara
+         id="flowPara3054">SHRINK_TO_FIT</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3056"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(0,244.2677)"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion3058"><rect
+           id="rect3060"
+           width="193.83432"
+           height="126.85905"
+           x="990.44611"
+           y="745.67035" /></flowRegion><flowPara
+         id="flowPara3062">FIT_WIDTH</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3064"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(0,244.2677)"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion3066"><rect
+           id="rect3068"
+           width="193.04637"
+           height="100.06894"
+           x="1215.7982"
+           y="744.88245" /></flowRegion><flowPara
+         id="flowPara3070">FIT_HEIGHT</flowPara></flowRoot>    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/liberty.jpg"
+       xlink:href="liberty.jpg"
+       inkscape:export-ydpi="89.269394"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       width="256"
+       height="256"
+       id="image3239"
+       x="32"
+       y="700.36218" />
+    <g
+       id="g4034"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394">
+      <rect
+         y="764.36218"
+         x="352"
+         height="128"
+         width="128"
+         id="rect3244"
+         style="fill:none;stroke:#ff0000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         inkscape:export-filename="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/shared-javascript-and-cpp-documentation/fitting-mode-options.png"
+         inkscape:export-xdpi="89.269394"
+         inkscape:export-ydpi="89.269394" />
+    </g>
+    <g
+       transform="translate(224,-1.9531262e-7)"
+       id="g4034-5"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394">
+      <image
+         sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/liberty.jpg"
+         xlink:href="liberty.jpg"
+         y="764.36218"
+         x="352"
+         id="image3239-9-8"
+         height="128"
+         width="128" />
+      <rect
+         y="764.36218"
+         x="352"
+         height="128"
+         width="128"
+         id="rect3244-5"
+         style="fill:none;stroke:#ff0000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <g
+       transform="translate(448,-1.9531262e-7)"
+       id="g4034-4"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394">
+      <image
+         sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/liberty.jpg"
+         xlink:href="liberty.jpg"
+         y="764.36218"
+         x="352"
+         id="image3239-9-88"
+         height="128"
+         width="128" />
+      <rect
+         y="764.36218"
+         x="352"
+         height="128"
+         width="128"
+         id="rect3244-9"
+         style="fill:none;stroke:#ff0000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <g
+       transform="translate(672,-1.9531262e-7)"
+       id="g4034-3"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394">
+      <image
+         sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/liberty.jpg"
+         xlink:href="liberty.jpg"
+         y="764.36218"
+         x="352"
+         id="image3239-9-85"
+         height="128"
+         width="128" />
+      <rect
+         y="764.36218"
+         x="352"
+         height="128"
+         width="128"
+         id="rect3244-8"
+         style="fill:none;stroke:#ff0000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <g
+       transform="translate(896,-1.9531262e-7)"
+       id="g4034-2"
+       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394">
+      <image
+         sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/liberty.jpg"
+         xlink:href="liberty.jpg"
+         y="764.36218"
+         x="352"
+         id="image3239-9-7"
+         height="128"
+         width="128" />
+      <rect
+         y="764.36218"
+         x="352"
+         height="128"
+         width="128"
+         id="rect3244-95"
+         style="fill:none;stroke:#ff0000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+  </g>
+</svg>

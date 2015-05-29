@@ -97,6 +97,7 @@
 ### Application Optimization Guide
  + [Texture Atlases](@ref textureatlases)
  + [Texture Compression](@ref texturecompression)
+ + [Rescaling Images](@ref resourceimagescaling)
  + Performance & Debugging
  + [Performance Tips](@ref performancetips)
  + [Performance Profiling](@ref performanceprofiling)
