@@ -1201,7 +1201,7 @@ bool ItemView::OnAccessibilityPan(PanGesture gesture)
   return true;
 }
 
-Actor ItemView::GetNextKeyboardFocusableActor(Actor actor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
+Actor ItemView::GetNextKeyboardFocusableActor(Actor actor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
 {
   Actor nextFocusActor;
   if(mActiveLayout)

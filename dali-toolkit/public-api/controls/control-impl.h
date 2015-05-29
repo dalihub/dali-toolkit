@@ -493,7 +493,7 @@ public: // API for derived classes to override
    * @param[in] loopEnabled Whether the focus movement should be looped within the control.
    * @return the next keyboard focusable actor in this control or an empty handle if no actor can be focused.
    */
-  virtual Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled );
+  virtual Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled );
 
   /**
    * @brief Informs this control that its chosen focusable actor will be focused.

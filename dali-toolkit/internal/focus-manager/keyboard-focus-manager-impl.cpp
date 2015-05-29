@@ -216,7 +216,7 @@ Toolkit::Control KeyboardFocusManager::GetParentLayoutControl(Actor actor) const
   return Toolkit::Control::DownCast(parent);
 }
 
-bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocusNavigationDirection direction)
+bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction direction)
 {
   Actor currentFocusActor = GetCurrentFocusActor();
 
@@ -257,7 +257,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocusNavigationDi
   return succeed;
 }
 
-bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control control, Actor actor, Toolkit::Control::KeyboardFocusNavigationDirection direction)
+bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control control, Actor actor, Toolkit::Control::KeyboardFocus::Direction direction)
 {
   // Ask the control for the next actor to focus
   Actor nextFocusableActor = GetImplementation( control ).GetNextKeyboardFocusableActor(actor, direction, mFocusGroupLoopEnabled);
@@ -329,7 +329,7 @@ bool KeyboardFocusManager::DoMoveFocusToNextFocusGroup(bool forward)
   {
     // If the current focus group has a parent layout control, we can probably automatically
     // move the focus to the next focus group in the forward or backward direction.
-    Toolkit::Control::KeyboardFocusNavigationDirection direction = forward ? Toolkit::Control::Right : Toolkit::Control::Left;
+    Toolkit::Control::KeyboardFocus::Direction direction = forward ? Toolkit::Control::KeyboardFocus::RIGHT : Toolkit::Control::KeyboardFocus::LEFT;
     succeed = DoMoveFocusWithinLayoutControl(parentLayoutControl, GetCurrentFocusActor(), direction);
     parentLayoutControl = GetParentLayoutControl(parentLayoutControl);
   }
@@ -542,7 +542,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
         else
         {
           // Move the focus towards left
-          MoveFocus(Toolkit::Control::Left);
+          MoveFocus(Toolkit::Control::KeyboardFocus::LEFT);
         }
 
         isFocusStartableKey = true;
@@ -565,7 +565,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
         else
         {
           // Move the focus towards right
-          MoveFocus(Toolkit::Control::Right);
+          MoveFocus(Toolkit::Control::KeyboardFocus::RIGHT);
         }
       }
       else
@@ -586,7 +586,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       else
       {
         // Move the focus towards up
-        MoveFocus(Toolkit::Control::Up);
+        MoveFocus(Toolkit::Control::KeyboardFocus::UP);
       }
 
       isFocusStartableKey = true;
@@ -601,7 +601,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       else
       {
         // Move the focus towards down
-        MoveFocus(Toolkit::Control::Down);
+        MoveFocus(Toolkit::Control::KeyboardFocus::DOWN);
       }
 
       isFocusStartableKey = true;
@@ -687,7 +687,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     {
       // No actor is focused but keyboard focus is activated by the key press
       // Let's try to move the initial focus
-      MoveFocus(Toolkit::Control::Right);
+      MoveFocus(Toolkit::Control::KeyboardFocus::RIGHT);
     }
     else if(mFocusIndicatorActor)
     {

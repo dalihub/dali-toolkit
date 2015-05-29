@@ -810,7 +810,7 @@ float Popup::GetWidthForHeight( float height )
   return GetNaturalSize().width;
 }
 
-Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
+Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
 {
   Actor nextFocusableActor( currentFocusedActor );
 
@@ -853,7 +853,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::C
       {
         switch ( direction )
         {
-          case Toolkit::Control::Left:
+          case Toolkit::Control::KeyboardFocus::LEFT:
           {
             if ( iter == focusableActors.begin() )
             {
@@ -865,7 +865,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::C
             }
             break;
           }
-          case Toolkit::Control::Right:
+          case Toolkit::Control::KeyboardFocus::RIGHT:
           {
             if ( iter == focusableActors.end() - 1 )
             {
@@ -878,7 +878,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::C
             break;
           }
 
-          case Toolkit::Control::Up:
+          case Toolkit::Control::KeyboardFocus::UP:
           {
             if ( *iter == mContent )
             {
@@ -905,7 +905,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::C
             break;
           }
 
-          case Toolkit::Control::Down:
+          case Toolkit::Control::KeyboardFocus::DOWN:
           {
             if ( mContent && mContent.IsKeyboardFocusable() )
             {

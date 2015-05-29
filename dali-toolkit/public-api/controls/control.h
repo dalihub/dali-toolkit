@@ -94,12 +94,15 @@ public:
   /**
    * @brief Describes the direction to move the keyboard focus towards.
    */
-  enum KeyboardFocusNavigationDirection
+  struct KeyboardFocus
   {
-    Left,   ///< Move keyboard focus towards the left direction
-    Right,  ///< Move keyboard focus towards the right direction
-    Up,     ///< Move keyboard focus towards the up direction
-    Down    ///< Move keyboard focus towards the down direction
+    enum Direction
+    {
+      LEFT,   ///< Move keyboard focus towards the left direction
+      RIGHT,  ///< Move keyboard focus towards the right direction
+      UP,     ///< Move keyboard focus towards the up direction
+      DOWN    ///< Move keyboard focus towards the down direction
+    };
   };
 
   // Typedefs

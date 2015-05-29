@@ -364,7 +364,7 @@ private: // From Control
   /**
    * @copydoc Toolkit::Control::GetNextKeyboardFocusableActor()
    */
-  virtual Actor GetNextKeyboardFocusableActor(Actor actor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
+  virtual Actor GetNextKeyboardFocusableActor(Actor actor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled);
 
   /**
    * @copydoc Toolkit::Control::OnKeyboardFocusChangeCommitted()
