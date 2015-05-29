@@ -67,7 +67,7 @@ BaseHandle Create()
  * @return true if action has been accepted by this control
  */
 const char* ACTION_CONTROL_ACTIVATED = "control-activated";
-static bool DoAction( BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes )
+  static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
 {
   bool ret = false;
 
