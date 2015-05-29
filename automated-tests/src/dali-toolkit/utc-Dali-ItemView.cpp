@@ -143,21 +143,21 @@ int UtcDaliItemViewAddAndGetLayout(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // As we have added one layout, check the number of layout is now 1
   DALI_TEST_CHECK(view.GetLayoutCount() == 1);
 
   // Create a depth layout and add it to ItemView
-  DepthLayoutPtr depthLayout = DepthLayout::New();
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
   view.AddLayout(*depthLayout);
 
   // As we have added another layout, check the number of layout is now 2
   DALI_TEST_CHECK(view.GetLayoutCount() == 2);
 
   // Create a spiral layout and add it to ItemView
-  SpiralLayoutPtr spiralLayout = SpiralLayout::New();
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
   view.AddLayout(*spiralLayout);
 
   // As we have added another layout, check the number of layout is now 3
@@ -179,14 +179,14 @@ int UtcDaliItemViewAddAndRemoveLayout(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // As we have added one layout, check the number of layout is now 1
   DALI_TEST_CHECK(view.GetLayoutCount() == 1);
 
   // Create a depth layout and add it to ItemView
-  DepthLayoutPtr depthLayout = DepthLayout::New();
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
   view.AddLayout(*depthLayout);
 
   // As we have added another layout, check the number of layout is now 2
@@ -222,15 +222,15 @@ int UtcDaliItemViewActivateLayoutAndGetActiveLayout(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // Create a depth layout and add it to ItemView
-  DepthLayoutPtr depthLayout = DepthLayout::New();
+  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
   view.AddLayout(*depthLayout);
 
   // Create a spiral layout and add it to ItemView
-  SpiralLayoutPtr spiralLayout = SpiralLayout::New();
+  ItemLayoutPtr spiralLayout = DefaultItemLayout::New( DefaultItemLayout::SPIRAL );
   view.AddLayout(*spiralLayout);
 
   // As we have added three layouts, check the number of layout is now 3
@@ -269,7 +269,7 @@ int UtcDaliItemViewDeactivateCurrentLayout(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // Check there is no active layout at the moment
@@ -299,7 +299,7 @@ int UtcDaliItemViewGetItemAndGetItemId(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -323,7 +323,7 @@ int UtcDaliItemViewRemoveItem(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -356,7 +356,7 @@ int UtcDaliItemViewGetCurrentLayoutPosition(void)
   ItemView view = ItemView::New(factory);
 
   // Create a grid layout and add it to ItemView
-  GridLayoutPtr gridLayout = GridLayout::New();
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
   view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
@@ -443,6 +443,8 @@ int UtcDaliItemViewSetAndGetRefreshInterval(void)
   // Set the interval between refreshes to be 20
   view.SetRefreshInterval(20);
 
+  view.Refresh();
+
   // Check the interval between refreshes is 20
   DALI_TEST_CHECK(view.GetRefreshInterval() == 20);
   END_TEST;
@@ -456,7 +458,7 @@ int UtcDaliItemViewScrollToItem(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
   Vector3 vec(480.0f, 800.0f, 0.0f);
-  GridLayoutPtr layout = GridLayout::New();
+  ItemLayoutPtr layout = DefaultItemLayout::New( DefaultItemLayout::GRID );
 
   view.SetName("view actor");
   view.AddLayout(*layout);
@@ -536,5 +538,236 @@ int UtcDaliItemViewSetAndGetMouseWheelScrollDistanceStep(void)
 
   // Check the scroll distance step is 100.0f
   DALI_TEST_EQUALS(view.GetMouseWheelScrollDistanceStep(), 100.0f, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliItemViewInsertItemP(void)
+{
+  ToolkitTestApplication application;
+
+  // Create the ItemView actor
+  TestItemFactory factory;
+  ItemView view = ItemView::New(factory);
+
+  // Create a grid layout and add it to ItemView
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  view.AddLayout(*gridLayout);
+
+  // Activate the grid layout so that the items will be created and added to ItemView
+  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  view.ActivateLayout(0, stageSize, 0.5f);
+
+  // Get the item given the item ID
+  Actor itemActor = view.GetItem(2);
+
+  ItemId id = view.GetItemId( itemActor );
+
+  // Check we are getting the correct Item ID given the specified actor
+  DALI_TEST_CHECK(view.GetItemId(itemActor) == 2);
+
+  Actor newActor = Actor::New();
+
+  view.InsertItem(Item(id, newActor), 0.5f);
+
+  DALI_TEST_CHECK(view.GetItem(2) == newActor);
+  END_TEST;
+}
+
+int UtcDaliItemViewInsertItemsP(void)
+{
+  ToolkitTestApplication application;
+
+  // Create the ItemView actor
+  TestItemFactory factory;
+  ItemView view = ItemView::New(factory);
+
+  // Create a grid layout and add it to ItemView
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  view.AddLayout(*gridLayout);
+
+  // Activate the grid layout so that the items will be created and added to ItemView
+  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  view.ActivateLayout(0, stageSize, 0.5f);
+
+  unsigned int itemCount = view.GetChildCount();
+
+  ItemContainer insertList;
+
+  for( unsigned int i = 0u; i < 10; ++i )
+  {
+    Actor child = view.GetChildAt( i );
+    Actor newActor = Actor::New();
+    newActor.SetName("Inserted");
+    insertList.push_back( Item( view.GetItemId(child), newActor ) );
+  }
+
+  if( !insertList.empty() )
+  {
+    view.InsertItems( insertList, 0.5f );
+  }
+
+  DALI_TEST_CHECK(view.GetChildCount() == itemCount + 10);
+
+  ItemIdContainer removeList;
+
+  for( unsigned int i = 0u; i < view.GetChildCount(); ++i )
+  {
+    Actor child = view.GetChildAt( i );
+
+    if( child.GetName() == "Inserted" )
+    {
+      removeList.push_back( view.GetItemId(child) );
+    }
+  }
+
+  if( ! removeList.empty() )
+  {
+    view.RemoveItems( removeList, 0.5f );
+  }
+
+  DALI_TEST_CHECK(view.GetChildCount() == itemCount);
+  END_TEST;
+}
+
+int UtcDaliItemViewReplaceItemP(void)
+{
+  ToolkitTestApplication application;
+
+  // Create the ItemView actor
+  TestItemFactory factory;
+  ItemView view = ItemView::New(factory);
+
+  // Create a grid layout and add it to ItemView
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  view.AddLayout(*gridLayout);
+
+  // Activate the grid layout so that the items will be created and added to ItemView
+  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  view.ActivateLayout(0, stageSize, 0.5f);
+
+  Actor newActor = Actor::New();
+
+  view.ReplaceItem( Item( 0, newActor ), 0.5f );
+
+  DALI_TEST_CHECK(view.GetItem(0) == newActor);
+  END_TEST;
+}
+
+int UtcDaliItemViewReplaceItemsP(void)
+{
+  ToolkitTestApplication application;
+
+  // Create the ItemView actor
+  TestItemFactory factory;
+  ItemView view = ItemView::New(factory);
+
+  // Create a grid layout and add it to ItemView
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  view.AddLayout(*gridLayout);
+
+  // Activate the grid layout so that the items will be created and added to ItemView
+  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  view.ActivateLayout(0, stageSize, 0.5f);
+
+  ItemContainer replaceList;
+
+  for( unsigned int i = 0u; i < 10; ++i )
+  {
+    Actor child = view.GetChildAt( i );
+    Actor newActor = Actor::New();
+    newActor.SetName("Replaced");
+
+    replaceList.push_back( Item( view.GetItemId(child), newActor ) );
+  }
+
+  if( !replaceList.empty() )
+  {
+    view.ReplaceItems( replaceList, 0.5f );
+  }
+
+  DALI_TEST_CHECK(view.GetItem(0).GetName() == "Replaced");
+  DALI_TEST_CHECK(view.GetItem(8).GetName() == "Replaced");
+  END_TEST;
+}
+
+int UtcDaliItemViewGetItemsRangeP(void)
+{
+  ToolkitTestApplication application;
+
+  // Create the ItemView actor
+  TestItemFactory factory;
+  ItemView view = ItemView::New(factory);
+
+  // Create a grid layout and add it to ItemView
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  view.AddLayout(*gridLayout);
+
+  // Activate the grid layout so that the items will be created and added to ItemView
+  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  view.ActivateLayout(0, stageSize, 0.5f);
+
+  ItemRange itemRange(0, 0);
+
+  view.GetItemsRange(itemRange);
+
+  DALI_TEST_CHECK(itemRange.Within(0));
+  END_TEST;
+}
+
+int UtcDaliItemViewSetItemsAnchorPointP(void)
+{
+  ToolkitTestApplication application;
+
+  // Create the ItemView actor
+  TestItemFactory factory;
+  ItemView view = ItemView::New(factory);
+
+  // Create a grid layout and add it to ItemView
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  view.AddLayout(*gridLayout);
+
+  // Activate the grid layout so that the items will be created and added to ItemView
+  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  view.ActivateLayout(0, stageSize, 0.5f);
+
+  Vector3 anchorPoint(10.0f, 10.0f, 0.0f);
+
+  view.SetItemsAnchorPoint(anchorPoint);
+
+  DALI_TEST_CHECK(view.GetItemsAnchorPoint() == anchorPoint);
+  DALI_TEST_CHECK(view.GetItem(0).GetCurrentAnchorPoint() == anchorPoint);
+  END_TEST;
+}
+
+int UtcDaliItemViewSetItemsParentOriginP(void)
+{
+  ToolkitTestApplication application;
+
+  // Create the ItemView actor
+  TestItemFactory factory;
+  ItemView view = ItemView::New(factory);
+
+  // Create a grid layout and add it to ItemView
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  view.AddLayout(*gridLayout);
+
+  // Activate the grid layout so that the items will be created and added to ItemView
+  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  view.ActivateLayout(0, stageSize, 0.5f);
+
+  Vector3 parentOrigin(10.0f, 10.0f, 0.0f);
+
+  view.SetItemsParentOrigin(parentOrigin);
+
+  DALI_TEST_CHECK(view.GetItemsParentOrigin() == parentOrigin);
+  DALI_TEST_CHECK(view.GetItem(0).GetCurrentParentOrigin() == parentOrigin);
+  END_TEST;
+}
+
+int UtcDaliItemFactoryGetExtention(void)
+{
+  ToolkitTestApplication application;
+  TestItemFactory factory;
+  DALI_TEST_CHECK( factory.GetExtension() == NULL );
   END_TEST;
 }

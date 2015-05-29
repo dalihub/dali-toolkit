@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-common.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/builder/tree-node.h>
+#include <dali-toolkit/devel-api/builder/tree-node.h>
 
 #include <dali-toolkit/internal/builder/tree-node-manipulator.h>
 

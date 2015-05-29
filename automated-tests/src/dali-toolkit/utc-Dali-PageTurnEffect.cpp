@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-
+#include <dali-toolkit/devel-api/shader-effects/page-turn-effect.h>
 
 using namespace Dali;
 

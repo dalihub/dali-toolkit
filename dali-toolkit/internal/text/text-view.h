@@ -65,16 +65,10 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetGlyphs()
    */
-  virtual void GetGlyphs( GlyphInfo* glyphs,
-                          GlyphIndex glyphIndex,
-                          Length numberOfGlyphs ) const;
-
-  /**
-   * @copydoc Dali::Toolkit::Text::ViewInterface::GetGlyphPositions()
-   */
-  virtual void GetGlyphPositions( Vector2* glyphPositions,
-                                  GlyphIndex glyphIndex,
-                                  Length numberOfGlyphs ) const;
+  virtual Length GetGlyphs( GlyphInfo* glyphs,
+                            Vector2* glyphPositions,
+                            GlyphIndex glyphIndex,
+                            Length numberOfGlyphs ) const;
 
   /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetTextColor()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,11 @@
 #include <dali/public-api/events/mouse-wheel-event.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/scrollable/scroll-component-impl.h>
+#include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
@@ -54,16 +54,27 @@ using namespace Dali;
 
 namespace
 {
+const float DEFAULT_SLOW_SNAP_ANIMATION_DURATION(0.5f);             ///< Default Drag-Release animation time.
+const float DEFAULT_FAST_SNAP_ANIMATION_DURATION(0.25f);            ///< Default Drag-Flick animation time.
+const float DEFAULT_SNAP_OVERSHOOT_DURATION(0.5f);                  ///< Default Overshoot snapping animation time.
+const float DEFAULT_MAX_OVERSHOOT(100.0f);                          ///< Default maximum allowed overshoot in pixels
 
-const Vector2 DEFAULT_MIN_FLICK_DISTANCE(30.0f, 30.0f);                                   ///< minimum distance for pan before flick allowed
-const float DEFAULT_MIN_FLICK_SPEED_THRESHOLD(500.0f);                          ///< Minimum pan speed required for flick in pixels/s
-const float FREE_FLICK_SPEED_THRESHOLD = 200.0f;                                          ///< Free-Flick threshold in pixels/ms
-const float AUTOLOCK_AXIS_MINIMUM_DISTANCE2 = 100.0f;                                     ///< Auto-lock axis after minimum distance squared.
-const float FLICK_ORTHO_ANGLE_RANGE = 75.0f;                                              ///< degrees. (if >45, then supports diagonal flicking)
+const float DEFAULT_AXIS_AUTO_LOCK_GRADIENT(0.36f);                 ///< Default Axis-AutoLock gradient threshold. default is 0.36:1 (20 degrees)
+const float DEFAULT_FRICTION_COEFFICIENT(1.0f);                     ///< Default Friction Co-efficient. (in stage diagonals per second)
+const float DEFAULT_FLICK_SPEED_COEFFICIENT(1.0f);                  ///< Default Flick speed coefficient (multiples input touch velocity)
+const float DEFAULT_MAX_FLICK_SPEED(3.0f);                          ///< Default Maximum flick speed. (in stage diagonals per second)
+
+const Vector2 DEFAULT_MIN_FLICK_DISTANCE(30.0f, 30.0f);              ///< minimum distance for pan before flick allowed
+const float DEFAULT_MIN_FLICK_SPEED_THRESHOLD(500.0f);              ///< Minimum pan speed required for flick in pixels/s
+const float FREE_FLICK_SPEED_THRESHOLD = 200.0f;                    ///< Free-Flick threshold in pixels/ms
+const float AUTOLOCK_AXIS_MINIMUM_DISTANCE2 = 100.0f;               ///< Auto-lock axis after minimum distance squared.
+const float FLICK_ORTHO_ANGLE_RANGE = 75.0f;                        ///< degrees. (if >45, then supports diagonal flicking)
 const Vector2 DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION = Vector2(0.17f, 0.1f); ///< The step of horizontal scroll distance in the proportion of stage size for each mouse wheel event received.
 const unsigned long MINIMUM_TIME_BETWEEN_DOWN_AND_UP_FOR_RESET( 150u );
 const float TOUCH_DOWN_TIMER_INTERVAL = 100.0f;
-const float DEFAULT_SCROLL_UPDATE_DISTANCE( 30.0f );                               ///< Default distance to travel in pixels for scroll update signal
+const float DEFAULT_SCROLL_UPDATE_DISTANCE( 30.0f );                ///< Default distance to travel in pixels for scroll update signal
+
+const std::string INTERNAL_MAX_POSITION_PROPERTY_NAME( "internal-max-position" );
 
 // Helpers ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -170,21 +181,45 @@ float ConstantDecelerationAlphaFunction(float progress)
  * scroll domain. This is a value from 0.0f to 1.0f in each
  * scroll position axis.
  */
-void InternalRelativePositionConstraint( Vector3& relativePosition, const PropertyInputContainer& inputs)
+void InternalRelativePositionConstraint( Vector2& relativePosition, const PropertyInputContainer& inputs)
 {
-  Vector3 position = -inputs[0]->GetVector3();
-  const Vector3& min = inputs[1]->GetVector3();
-  const Vector3& max = inputs[2]->GetVector3();
+  Vector2 position = -inputs[0]->GetVector2();
+  const Vector2& min = inputs[1]->GetVector2();
+  const Vector2& max = inputs[2]->GetVector2();
   const Vector3& size = inputs[3]->GetVector3();
 
   position.x = WrapInDomain(position.x, min.x, max.x);
   position.y = WrapInDomain(position.y, min.y, max.y);
 
-  Vector3 domainSize = (max - min) - size;
+  Vector2 domainSize = (max - min) - size.GetVectorXY();
 
   relativePosition.x = domainSize.x > Math::MACHINE_EPSILON_1 ? fabsf((position.x - min.x) / domainSize.x) : 0.0f;
   relativePosition.y = domainSize.y > Math::MACHINE_EPSILON_1 ? fabsf((position.y - min.y) / domainSize.y) : 0.0f;
-  relativePosition.z = 0.0f;
+}
+
+/**
+ * Internal scroll domain Constraint
+ * Generates the scroll domain of the scroll view.
+ */
+void InternalScrollDomainConstraint( Vector2& scrollDomain, const PropertyInputContainer& inputs)
+{
+  const Vector2& min = inputs[0]->GetVector2();
+  const Vector2& max = inputs[1]->GetVector2();
+  const Vector3& size = inputs[2]->GetVector3();
+
+  scrollDomain = (max - min) - size.GetVectorXY();
+}
+
+/**
+ * Internal maximum scroll position Constraint
+ * Generates the maximum scroll position of the scroll view.
+ */
+void InternalPrePositionMaxConstraint( Vector2& scrollMax, const PropertyInputContainer& inputs)
+{
+  const Vector2& max = inputs[0]->GetVector2();
+  const Vector3& size = inputs[1]->GetVector3();
+
+  scrollMax = max - size.GetVectorXY();
 }
 
 } // unnamed namespace
@@ -209,17 +244,27 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ScrollView, Toolkit::Scrollable, Create )
 
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-position",       VECTOR3, SCROLL_POSITION       )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-pre-position",   VECTOR3, SCROLL_PRE_POSITION   )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "overshoot-x",           FLOAT,   OVERSHOOT_X           )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "overshoot-y",           FLOAT,   OVERSHOOT_Y           )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-final",          VECTOR3, SCROLL_FINAL          )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "wrap",                  BOOLEAN, WRAP                  )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "panning",               BOOLEAN, PANNING               )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrolling",             BOOLEAN, SCROLLING             )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-domain-offset",  VECTOR3, SCROLL_DOMAIN_OFFSET  )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-position-delta", VECTOR3, SCROLL_POSITION_DELTA )
-DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "start-page-position",   VECTOR3, START_PAGE_POSITION   )
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-position", VECTOR2, SCROLL_POSITION)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-pre-position", VECTOR2, SCROLL_PRE_POSITION)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, ScrollView, "scroll-pre-position-x", SCROLL_PRE_POSITION_X, SCROLL_PRE_POSITION, 0)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, ScrollView, "scroll-pre-position-y", SCROLL_PRE_POSITION_Y, SCROLL_PRE_POSITION, 1)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-pre-position-max", VECTOR2, SCROLL_PRE_POSITION_MAX)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, ScrollView, "scroll-pre-position-max-x", SCROLL_PRE_POSITION_MAX_X, SCROLL_PRE_POSITION_MAX, 0)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, ScrollView, "scroll-pre-position-max-y", SCROLL_PRE_POSITION_MAX_Y, SCROLL_PRE_POSITION_MAX, 1)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "overshoot-x", FLOAT, OVERSHOOT_X)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "overshoot-y", FLOAT, OVERSHOOT_Y)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-final", VECTOR2, SCROLL_FINAL)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, ScrollView, "scroll-final-x", SCROLL_FINAL_X, SCROLL_FINAL,0)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, ScrollView, "scroll-final-y", SCROLL_FINAL_Y, SCROLL_FINAL,1)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "wrap", BOOLEAN, WRAP)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "panning", BOOLEAN, PANNING)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrolling", BOOLEAN, SCROLLING)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-domain-size", VECTOR2, SCROLL_DOMAIN_SIZE)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, ScrollView, "scroll-domain-size-x", SCROLL_DOMAIN_SIZE_X, SCROLL_DOMAIN_SIZE, 0)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, ScrollView, "scroll-domain-size-y", SCROLL_DOMAIN_SIZE_Y, SCROLL_DOMAIN_SIZE, 1)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-domain-offset", VECTOR2, SCROLL_DOMAIN_OFFSET)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scroll-position-delta", VECTOR2, SCROLL_POSITION_DELTA)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "start-page-position", VECTOR3, START_PAGE_POSITION)
 
 DALI_SIGNAL_REGISTRATION( Toolkit, ScrollView, "value-changed", SIGNAL_SNAP_STARTED )
 
@@ -289,7 +334,7 @@ struct InternalPrePositionConstraint
   {
   }
 
-  void operator()( Vector3& scrollPostPosition, const PropertyInputContainer& inputs )
+  void operator()( Vector2& scrollPostPosition, const PropertyInputContainer& inputs )
   {
     const Vector2& panPosition = inputs[0]->GetVector2();
 
@@ -324,7 +369,7 @@ struct InternalPrePositionConstraint
 
     // Perform Position transform based on input deltas...
     scrollPostPosition = mPrePosition;
-    scrollPostPosition.GetVectorXY() += panDelta;
+    scrollPostPosition += panDelta;
 
     // if no wrapping then clamp preposition to maximum overshoot amount
     const Vector3& size = inputs[1]->GetVector3();
@@ -352,7 +397,7 @@ struct InternalPrePositionConstraint
     }
   }
 
-  Vector3 mPrePosition;
+  Vector2 mPrePosition;
   Vector2 mLocalStart;
   Vector2 mInitialPanMask;              ///< Initial pan mask (based on ruler settings)
   Vector2 mCurrentPanMask;              ///< Current pan mask that can be altered by axis lock mode.
@@ -387,12 +432,12 @@ struct InternalPositionConstraint
   {
   }
 
-  void operator()( Vector3& position, const PropertyInputContainer& inputs )
+  void operator()( Vector2& position, const PropertyInputContainer& inputs )
   {
-    position = inputs[0]->GetVector3();
+    position = inputs[0]->GetVector2();
     const Vector2& size = inputs[3]->GetVector3().GetVectorXY();
-    const Vector3& min = inputs[1]->GetVector3();
-    const Vector3& max = inputs[2]->GetVector3();
+    const Vector2& min = inputs[1]->GetVector2();
+    const Vector2& max = inputs[2]->GetVector2();
 
     if( mWrap )
     {
@@ -427,8 +472,8 @@ struct OvershootXConstraint
   {
     if( inputs[2]->GetBoolean() )
     {
-      const Vector3& scrollPrePosition = inputs[0]->GetVector3();
-      const Vector3& scrollPostPosition = inputs[1]->GetVector3();
+      const Vector2& scrollPrePosition = inputs[0]->GetVector2();
+      const Vector2& scrollPostPosition = inputs[1]->GetVector2();
       float newOvershoot = scrollPrePosition.x - scrollPostPosition.x;
       current = (newOvershoot > 0.0f ? std::min(newOvershoot, mMaxOvershoot) : std::max(newOvershoot, -mMaxOvershoot)) / mMaxOvershoot;
     }
@@ -453,8 +498,8 @@ struct OvershootYConstraint
   {
     if( inputs[2]->GetBoolean() )
     {
-      const Vector3& scrollPrePosition = inputs[0]->GetVector3();
-      const Vector3& scrollPostPosition = inputs[1]->GetVector3();
+      const Vector2& scrollPrePosition = inputs[0]->GetVector2();
+      const Vector2& scrollPostPosition = inputs[1]->GetVector2();
       float newOvershoot = scrollPrePosition.y - scrollPostPosition.y;
       current = (newOvershoot > 0.0f ? std::min(newOvershoot, mMaxOvershoot) : std::max(newOvershoot, -mMaxOvershoot)) / mMaxOvershoot;
     }
@@ -472,10 +517,10 @@ struct OvershootYConstraint
  *
  * Generates position-delta property based on scroll-position + scroll-offset properties.
  */
-void InternalPositionDeltaConstraint( Vector3& current, const PropertyInputContainer& inputs )
+void InternalPositionDeltaConstraint( Vector2& current, const PropertyInputContainer& inputs )
 {
-  const Vector3& scrollPosition = inputs[0]->GetVector3();
-  const Vector3& scrollOffset = inputs[1]->GetVector3();
+  const Vector2& scrollPosition = inputs[0]->GetVector2();
+  const Vector2& scrollOffset = inputs[1]->GetVector2();
 
   current = scrollPosition + scrollOffset;
 }
@@ -496,15 +541,14 @@ struct InternalFinalConstraint
   {
   }
 
-  void operator()( Vector3& current, const PropertyInputContainer& inputs )
+  void operator()( Vector2& current, const PropertyInputContainer& inputs )
   {
     const float& overshootx = inputs[1]->GetFloat();
     const float& overshooty = inputs[2]->GetFloat();
-    Vector3 offset( mFunctionX(overshootx),
-                    mFunctionY(overshooty),
-                    0.0f);
+    Vector2 offset( mFunctionX(overshootx),
+                    mFunctionY(overshooty) );
 
-    current = inputs[0]->GetVector3() - offset;
+    current = inputs[0]->GetVector2() - offset;
   }
 
   AlphaFunctionPrototype mFunctionX;
@@ -540,20 +584,21 @@ ScrollView::ScrollView()
   mScrollStateFlags(0),
   mLockAxis(LockPossible),
   mScrollUpdateDistance(DEFAULT_SCROLL_UPDATE_DISTANCE),
-  mMaxOvershoot(Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT, Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT),
-  mUserMaxOvershoot(Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT, Toolkit::ScrollView::DEFAULT_MAX_OVERSHOOT),
-  mSnapOvershootDuration(Toolkit::ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION),
+  mMaxOvershoot(DEFAULT_MAX_OVERSHOOT, DEFAULT_MAX_OVERSHOOT),
+  mUserMaxOvershoot(DEFAULT_MAX_OVERSHOOT, DEFAULT_MAX_OVERSHOOT),
+  mSnapOvershootDuration(DEFAULT_SNAP_OVERSHOOT_DURATION),
   mSnapOvershootAlphaFunction(AlphaFunction::EASE_OUT),
-  mSnapDuration(Toolkit::ScrollView::DEFAULT_SLOW_SNAP_ANIMATION_DURATION),
+  mSnapDuration(DEFAULT_SLOW_SNAP_ANIMATION_DURATION),
   mSnapAlphaFunction(AlphaFunction::EASE_OUT),
   mMinFlickDistance(DEFAULT_MIN_FLICK_DISTANCE),
   mFlickSpeedThreshold(DEFAULT_MIN_FLICK_SPEED_THRESHOLD),
-  mFlickDuration(Toolkit::ScrollView::DEFAULT_FAST_SNAP_ANIMATION_DURATION),
+  mFlickDuration(DEFAULT_FAST_SNAP_ANIMATION_DURATION),
   mFlickAlphaFunction(AlphaFunction::EASE_OUT),
-  mAxisAutoLockGradient(Toolkit::ScrollView::DEFAULT_AXIS_AUTO_LOCK_GRADIENT),
-  mFrictionCoefficient(Toolkit::ScrollView::DEFAULT_FRICTION_COEFFICIENT),
-  mFlickSpeedCoefficient(Toolkit::ScrollView::DEFAULT_FLICK_SPEED_COEFFICIENT),
-  mMaxFlickSpeed(Toolkit::ScrollView::DEFAULT_MAX_FLICK_SPEED),
+  mAxisAutoLockGradient(DEFAULT_AXIS_AUTO_LOCK_GRADIENT),
+  mFrictionCoefficient(DEFAULT_FRICTION_COEFFICIENT),
+  mFlickSpeedCoefficient(DEFAULT_FLICK_SPEED_COEFFICIENT),
+  mMaxFlickSpeed(DEFAULT_MAX_FLICK_SPEED),
+  mMouseWheelScrollDistanceStep(Vector2::ZERO),
   mInAccessibilityPan(false),
   mInitialized(false),
   mScrolling(false),
@@ -581,15 +626,14 @@ void ScrollView::OnInitialize()
   mInternalActor = Actor::New();
   mInternalActor.SetDrawMode(DrawMode::OVERLAY);
   self.Add(mInternalActor);
-  Constraint constraint = Constraint::New<Vector3>( mInternalActor, Actor::Property::SIZE, EqualToConstraint() );
-  constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
-  constraint.Apply();
+
   mInternalActor.SetParentOrigin(ParentOrigin::CENTER);
   mInternalActor.SetAnchorPoint(AnchorPoint::CENTER);
+  mInternalActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   mAlterChild = true;
 
-  mScrollPostPosition = mScrollPrePosition = Vector3::ZERO;
+  mScrollPostPosition = mScrollPrePosition = Vector2::ZERO;
 
   mMouseWheelScrollDistanceStep = Stage::GetCurrent().GetSize() * DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
 
@@ -605,17 +649,16 @@ void ScrollView::OnInitialize()
   mRulerX = ruler;
   mRulerY = ruler;
 
-  EnableScrollComponent(Toolkit::Scrollable::OvershootIndicator);
+  SetOvershootEnabled(true);
 
   self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL, mCanScrollVertical);
   self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_HORIZONTAL, mCanScrollHorizontal);
 
-  Vector3 size = GetControlSize();
-  UpdatePropertyDomain(size);
+  UpdatePropertyDomain();
   SetInternalConstraints();
 }
 
-void ScrollView::OnControlStageConnection()
+void ScrollView::OnStageConnection()
 {
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 
@@ -624,14 +667,14 @@ void ScrollView::OnControlStageConnection()
     SetScrollSensitive( false );
     SetScrollSensitive( true );
   }
-  if(IsScrollComponentEnabled(Toolkit::Scrollable::OvershootIndicator))
+  if(IsOvershootEnabled())
   {
     // try and make sure property notifications are set
-    EnableScrollComponent(Toolkit::Scrollable::OvershootIndicator);
+    EnableScrollOvershoot(true);
   }
 }
 
-void ScrollView::OnControlStageDisconnection()
+void ScrollView::OnStageDisconnection()
 {
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 
@@ -769,8 +812,7 @@ void ScrollView::SetRulerX(RulerPtr ruler)
 {
   mRulerX = ruler;
 
-  Vector3 size = GetControlSize();
-  UpdatePropertyDomain(size);
+  UpdatePropertyDomain();
   UpdateMainInternalConstraint();
 }
 
@@ -778,16 +820,16 @@ void ScrollView::SetRulerY(RulerPtr ruler)
 {
   mRulerY = ruler;
 
-  Vector3 size = GetControlSize();
-  UpdatePropertyDomain(size);
+  UpdatePropertyDomain();
   UpdateMainInternalConstraint();
 }
 
-void ScrollView::UpdatePropertyDomain(const Vector3& size)
+void ScrollView::UpdatePropertyDomain()
 {
   Actor self = Self();
-  Vector3 min = mMinScroll;
-  Vector3 max = mMaxScroll;
+  Vector3 size = self.GetTargetSize();
+  Vector2 min = mMinScroll;
+  Vector2 max = mMaxScroll;
   bool scrollPositionChanged = false;
   bool domainChanged = false;
 
@@ -1054,7 +1096,7 @@ Vector2 ScrollView::GetMouseWheelScrollDistanceStep() const
 unsigned int ScrollView::GetCurrentPage() const
 {
   // in case animation is currently taking place.
-  Vector3 position = GetPropertyPosition();
+  Vector2 position = GetPropertyPosition();
 
   Actor self = Self();
   unsigned int page = 0;
@@ -1069,34 +1111,31 @@ unsigned int ScrollView::GetCurrentPage() const
   return volume * pagesPerVolume + page;
 }
 
-Vector3 ScrollView::GetCurrentScrollPosition() const
+Vector2 ScrollView::GetCurrentScrollPosition() const
 {
   return -GetPropertyPosition();
 }
 
-void ScrollView::SetScrollPosition(const Vector3& position)
-{
-  mScrollPrePosition = position;
-}
-
-Vector3 ScrollView::GetDomainSize() const
+Vector2 ScrollView::GetDomainSize() const
 {
   Vector3 size = Self().GetCurrentSize();
 
   const RulerDomain& xDomain = GetRulerX()->GetDomain();
   const RulerDomain& yDomain = GetRulerY()->GetDomain();
 
-  Vector3 domainSize = Vector3( xDomain.max - xDomain.min, yDomain.max - yDomain.min, 0.0f ) - size;
+  Vector2 domainSize;
+  domainSize.x = xDomain.max - xDomain.min - size.x;
+  domainSize.y = yDomain.max - yDomain.min - size.y;
   return domainSize;
 }
 
-void ScrollView::TransformTo(const Vector3& position,
+void ScrollView::TransformTo(const Vector2& position,
                              DirectionBias horizontalBias, DirectionBias verticalBias)
 {
   TransformTo(position, mSnapDuration, mSnapAlphaFunction, horizontalBias, verticalBias);
 }
 
-void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunction alpha,
+void ScrollView::TransformTo(const Vector2& position, float duration, AlphaFunction alpha,
                              DirectionBias horizontalBias, DirectionBias verticalBias)
 {
   // If this is called while the timer is running, then cancel it
@@ -1111,8 +1150,8 @@ void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunct
   DALI_LOG_SCROLL_STATE("[0x%X] pos[%.2f,%.2f], duration[%.2f] bias[%d, %d]",
     this, position.x, position.y, duration, int(horizontalBias), int(verticalBias));
 
-  Vector3 currentScrollPosition = GetCurrentScrollPosition();
-  self.SetProperty( Toolkit::ScrollView::Property::START_PAGE_POSITION, currentScrollPosition );
+  Vector2 currentScrollPosition = GetCurrentScrollPosition();
+  self.SetProperty( Toolkit::ScrollView::Property::START_PAGE_POSITION, Vector3(currentScrollPosition) );
 
   if( mScrolling ) // are we interrupting a current scroll?
   {
@@ -1141,7 +1180,7 @@ void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunct
   DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignal 1 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
   mScrollStartedSignal.Emit( currentScrollPosition );
   bool animating = AnimateTo(-position,
-                             Vector3::ONE * duration,
+                             Vector2::ONE * duration,
                              alpha,
                              true,
                              horizontalBias,
@@ -1156,7 +1195,7 @@ void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunct
 
     // If we have no duration, then in the next update frame, we will be at the position specified as we just set.
     // In this scenario, we cannot return the currentScrollPosition as this is out-of-date and should instead return the requested final position
-    Vector3 completedPosition( currentScrollPosition );
+    Vector2 completedPosition( currentScrollPosition );
     if( duration <= Math::MACHINE_EPSILON_10 )
     {
       completedPosition = position;
@@ -1168,28 +1207,28 @@ void ScrollView::TransformTo(const Vector3& position, float duration, AlphaFunct
   }
 }
 
-void ScrollView::ScrollTo(const Vector3& position)
+void ScrollView::ScrollTo(const Vector2& position)
 {
   ScrollTo(position, mSnapDuration );
 }
 
-void ScrollView::ScrollTo(const Vector3& position, float duration)
+void ScrollView::ScrollTo(const Vector2& position, float duration)
 {
   ScrollTo(position, duration, DirectionBiasNone, DirectionBiasNone);
 }
 
-void ScrollView::ScrollTo(const Vector3& position, float duration, AlphaFunction alpha)
+void ScrollView::ScrollTo(const Vector2& position, float duration, AlphaFunction alpha)
 {
   ScrollTo(position, duration, alpha, DirectionBiasNone, DirectionBiasNone);
 }
 
-void ScrollView::ScrollTo(const Vector3& position, float duration,
+void ScrollView::ScrollTo(const Vector2& position, float duration,
                           DirectionBias horizontalBias, DirectionBias verticalBias)
 {
   ScrollTo(position, duration, mSnapAlphaFunction, horizontalBias, verticalBias);
 }
 
-void ScrollView::ScrollTo(const Vector3& position, float duration, AlphaFunction alpha,
+void ScrollView::ScrollTo(const Vector2& position, float duration, AlphaFunction alpha,
                 DirectionBias horizontalBias, DirectionBias verticalBias)
 {
   DALI_LOG_SCROLL_STATE("[0x%X] position[%.2f, %.2f] duration[%.2f], bias[%d, %d]", this, position.x, position.y, duration, int(horizontalBias), int(verticalBias));
@@ -1203,7 +1242,7 @@ void ScrollView::ScrollTo(unsigned int page)
 
 void ScrollView::ScrollTo(unsigned int page, float duration, DirectionBias bias)
 {
-  Vector3 position;
+  Vector2 position;
   unsigned int volume;
   unsigned int libraries;
 
@@ -1231,9 +1270,10 @@ void ScrollView::ScrollTo(Actor &actor, float duration)
   Actor self = Self();
   Vector3 size = self.GetCurrentSize();
   Vector3 position = actor.GetCurrentPosition();
-  position -= GetPropertyPrePosition();
+  Vector2 prePosition = GetPropertyPrePosition();
+  position.GetVectorXY() -= prePosition;
 
-  ScrollTo(Vector3(position.x - size.width * 0.5f, position.y - size.height * 0.5f, 0.0f), duration);
+  ScrollTo(Vector2(position.x - size.width * 0.5f, position.y - size.height * 0.5f), duration);
 }
 
 Actor ScrollView::FindClosestActor()
@@ -1354,7 +1394,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
   float angle = atan2(velocity.y, velocity.x);
   float speed2 = velocity.LengthSquared();
   AlphaFunction alphaFunction = mSnapAlphaFunction;
-  Vector3 positionDuration = Vector3::ONE * mSnapDuration;
+  Vector2 positionDuration = Vector2::ONE * mSnapDuration;
   float biasX = 0.5f;
   float biasY = 0.5f;
   FindDirection horizontal = None;
@@ -1366,7 +1406,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
   const float orthoAngleRange = FLICK_ORTHO_ANGLE_RANGE * M_PI / 180.0f;
   const float flickSpeedThreshold2 = mFlickSpeedThreshold * mFlickSpeedThreshold;
 
-  Vector3 positionSnap = mScrollPrePosition;
+  Vector2 positionSnap = mScrollPrePosition;
 
   // Flick logic X Axis
 
@@ -1423,7 +1463,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
 
   if(isFlick || isFreeFlick)
   {
-    positionDuration = Vector3::ONE * mFlickDuration;
+    positionDuration = Vector2::ONE * mFlickDuration;
     alphaFunction = mFlickAlphaFunction;
   }
 
@@ -1443,7 +1483,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
 
     if(child)
     {
-      Vector3 position = Self().GetProperty<Vector3>(Toolkit::ScrollView::Property::SCROLL_POSITION);
+      Vector2 position = Self().GetProperty<Vector2>(Toolkit::ScrollView::Property::SCROLL_POSITION);
 
       // Get center-point of the Actor.
       Vector3 childPosition = GetPositionOfAnchor(child, AnchorPoint::CENTER);
@@ -1459,11 +1499,11 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
     }
   }
 
-  Vector3 startPosition = positionSnap;
+  Vector2 startPosition = positionSnap;
   positionSnap.x = -mRulerX->Snap(-positionSnap.x, biasX);  // NOTE: X & Y rulers think in -ve coordinate system.
   positionSnap.y = -mRulerY->Snap(-positionSnap.y, biasY);  // That is scrolling RIGHT (e.g. 100.0, 0.0) means moving LEFT.
 
-  Vector3 clampDelta(Vector3::ZERO);
+  Vector2 clampDelta(Vector2::ZERO);
   ClampPosition(positionSnap);
 
   if( (mRulerX->GetType() == Ruler::Free || mRulerY->GetType() == Ruler::Free)
@@ -1509,7 +1549,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
     }
     else
     {
-      clampDelta = Vector3::ZERO;
+      clampDelta = Vector2::ZERO;
     }
 
     // If Axis is Free and has velocity, then calculate time taken
@@ -1543,7 +1583,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
     }
   }
 
-  if(IsScrollComponentEnabled(Toolkit::Scrollable::OvershootIndicator))
+  if(IsOvershootEnabled())
   {
     // Scroll to the end of the overshoot only when overshoot is enabled.
     positionSnap += clampDelta;
@@ -1576,7 +1616,7 @@ void ScrollView::StopAnimation(Animation& animation)
   }
 }
 
-bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDuration,
+bool ScrollView::AnimateTo(const Vector2& position, const Vector2& positionDuration,
                            AlphaFunction alpha, bool findShortcuts,
                            DirectionBias horizontalBias, DirectionBias verticalBias,
                            SnapType snapType)
@@ -1640,7 +1680,7 @@ bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDurat
     }
 
     DALI_LOG_SCROLL_STATE("[0x%X] position-changed, mScrollTargetPosition[%.2f, %.2f], mScrollPrePosition[%.2f, %.2f], mScrollPostPosition[%.2f, %.2f]", this, mScrollTargetPosition.x, mScrollTargetPosition.y, mScrollPrePosition.x, mScrollPrePosition.y, mScrollPostPosition.x, mScrollPostPosition.y );
-    DALI_LOG_SCROLL_STATE("[0x%X] SCROLL_PRE_POSITION[%.2f, %.2f], SCROLL_POSITION[%.2f, %.2f]", this, self.GetProperty( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get<Vector3>().x, self.GetProperty( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get<Vector3>().y, self.GetProperty( Toolkit::ScrollView::Property::SCROLL_POSITION ).Get<Vector3>().x, self.GetProperty( Toolkit::ScrollView::Property::SCROLL_POSITION ).Get<Vector3>().y );
+    DALI_LOG_SCROLL_STATE("[0x%X] SCROLL_PRE_POSITION[%.2f, %.2f], SCROLL_POSITION[%.2f, %.2f]", this, self.GetProperty( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get<Vector2>().x, self.GetProperty( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get<Vector2>().y, self.GetProperty( Toolkit::ScrollView::Property::SCROLL_POSITION ).Get<Vector2>().x, self.GetProperty( Toolkit::ScrollView::Property::SCROLL_POSITION ).Get<Vector2>().y );
   }
 
   SetScrollUpdateNotification(true);
@@ -1657,13 +1697,13 @@ bool ScrollView::AnimateTo(const Vector3& position, const Vector3& positionDurat
   return (mScrollStateFlags & SCROLL_ANIMATION_FLAGS) != 0;
 }
 
-void ScrollView::SetOvershootEnabled(bool enabled)
+void ScrollView::EnableScrollOvershoot(bool enable)
 {
-  if(enabled && !mOvershootIndicator)
+  if(enable && !mOvershootIndicator)
   {
     mOvershootIndicator = ScrollOvershootIndicator::New();
   }
-  if( enabled )
+  if( enable )
   {
     mOvershootIndicator->AttachToScrollable(*this);
   }
@@ -1719,16 +1759,16 @@ void ScrollView::FindAndUnbindActor(Actor child)
   UnbindActor(child);
 }
 
-Vector3 ScrollView::GetPropertyPrePosition() const
+Vector2 ScrollView::GetPropertyPrePosition() const
 {
-  Vector3 position = Self().GetProperty<Vector3>(Toolkit::ScrollView::Property::SCROLL_PRE_POSITION);
+  Vector2 position = Self().GetProperty<Vector2>(Toolkit::ScrollView::Property::SCROLL_PRE_POSITION);
   WrapPosition(position);
   return position;
 }
 
-Vector3 ScrollView::GetPropertyPosition() const
+Vector2 ScrollView::GetPropertyPosition() const
 {
-  Vector3 position = Self().GetProperty<Vector3>(Toolkit::ScrollView::Property::SCROLL_POSITION);
+  Vector2 position = Self().GetProperty<Vector2>(Toolkit::ScrollView::Property::SCROLL_POSITION);
   WrapPosition(position);
 
   return position;
@@ -1746,14 +1786,14 @@ void ScrollView::HandleSnapAnimationFinished()
   Actor self = Self();
   self.SetProperty(Toolkit::ScrollView::Property::SCROLLING, false);
 
-  Vector3 deltaPosition(mScrollPrePosition);
+  Vector2 deltaPosition(mScrollPrePosition);
 
   UpdateLocalScrollProperties();
   WrapPosition(mScrollPrePosition);
   DALI_LOG_SCROLL_STATE("[0x%X] Setting SCROLL_PRE_POSITION To[%.2f, %.2f]", this, mScrollPrePosition.x, mScrollPrePosition.y );
   self.SetProperty(Toolkit::ScrollView::Property::SCROLL_PRE_POSITION, mScrollPrePosition);
 
-  Vector3 currentScrollPosition = GetCurrentScrollPosition();
+  Vector2 currentScrollPosition = GetCurrentScrollPosition();
   DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 3 current[%.2f, %.2f], mScrollTargetPosition[%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y, -mScrollTargetPosition.x, -mScrollTargetPosition.y );
   mScrollCompletedSignal.Emit( currentScrollPosition );
 
@@ -1798,7 +1838,7 @@ void ScrollView::OnScrollUpdateNotification(Dali::PropertyNotification& source)
   // Guard against destruction during signal emission
   Toolkit::ScrollView handle( GetOwner() );
 
-  Vector3 currentScrollPosition = GetCurrentScrollPosition();
+  Vector2 currentScrollPosition = GetCurrentScrollPosition();
   mScrollUpdatedSignal.Emit( currentScrollPosition );
 }
 
@@ -1825,24 +1865,24 @@ bool ScrollView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
 void ScrollView::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
 {
   // need to update domain properties for new size
-  UpdatePropertyDomain(targetSize);
+  UpdatePropertyDomain();
 }
 
-void ScrollView::OnControlSizeSet( const Vector3& size )
+void ScrollView::OnSizeSet( const Vector3& size )
 {
   // need to update domain properties for new size
   if( mDefaultMaxOvershoot )
   {
     mUserMaxOvershoot.x = size.x * 0.5f;
     mUserMaxOvershoot.y = size.y * 0.5f;
-    if( !IsScrollComponentEnabled(Toolkit::Scrollable::OvershootIndicator) )
+    if( !IsOvershootEnabled() )
     {
       mMaxOvershoot = mUserMaxOvershoot;
     }
   }
-  UpdatePropertyDomain(size);
+  UpdatePropertyDomain();
   UpdateMainInternalConstraint();
-  if( IsScrollComponentEnabled(Toolkit::Scrollable::OvershootIndicator) )
+  if( IsOvershootEnabled() )
   {
     mOvershootIndicator->Reset();
   }
@@ -1850,7 +1890,28 @@ void ScrollView::OnControlSizeSet( const Vector3& size )
 
 void ScrollView::OnChildAdd(Actor& child)
 {
-  if(mAlterChild)
+  Dali::Toolkit::ScrollBar scrollBar = Dali::Toolkit::ScrollBar::DownCast(child);
+  if(scrollBar)
+  {
+    mInternalActor.Add(scrollBar);
+    if(scrollBar.GetScrollDirection() == Toolkit::ScrollBar::Horizontal)
+    {
+      scrollBar.SetScrollPropertySource(Self(),
+                                        Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_X,
+                                        Toolkit::Scrollable::Property::SCROLL_POSITION_MIN_X,
+                                        Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_MAX_X,
+                                        Toolkit::ScrollView::Property::SCROLL_DOMAIN_SIZE_X);
+    }
+    else
+    {
+      scrollBar.SetScrollPropertySource(Self(),
+                                        Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_Y,
+                                        Toolkit::Scrollable::Property::SCROLL_POSITION_MIN_Y,
+                                        Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_MAX_Y,
+                                        Toolkit::ScrollView::Property::SCROLL_DOMAIN_SIZE_Y);
+    }
+  }
+  else if(mAlterChild)
   {
     BindActor(child);
   }
@@ -1899,11 +1960,11 @@ bool ScrollView::OnTouchDownTimeout()
 
       mScrollInterrupted = true;
       // reset domain offset as scrolling from original plane.
-      mDomainOffset = Vector3::ZERO;
-      Self().SetProperty(Toolkit::ScrollView::Property::SCROLL_DOMAIN_OFFSET, Vector3::ZERO);
+      mDomainOffset = Vector2::ZERO;
+      Self().SetProperty(Toolkit::ScrollView::Property::SCROLL_DOMAIN_OFFSET, Vector2::ZERO);
 
       UpdateLocalScrollProperties();
-      Vector3 currentScrollPosition = GetCurrentScrollPosition();
+      Vector2 currentScrollPosition = GetCurrentScrollPosition();
       DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 4 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
       mScrollCompletedSignal.Emit( currentScrollPosition );
     }
@@ -1989,7 +2050,7 @@ bool ScrollView::OnMouseWheelEvent(const MouseWheelEvent& event)
     return false;
   }
 
-  Vector3 targetScrollPosition = GetPropertyPosition();
+  Vector2 targetScrollPosition = GetPropertyPosition();
 
   if(mRulerX->IsEnabled() && !mRulerY->IsEnabled())
   {
@@ -2052,7 +2113,7 @@ void ScrollView::PreAnimatedScrollSetup()
 
   Actor self = Self();
 
-  Vector3 deltaPosition(mScrollPostPosition);
+  Vector2 deltaPosition(mScrollPostPosition);
   WrapPosition(mScrollPostPosition);
   mDomainOffset += deltaPosition - mScrollPostPosition;
   Self().SetProperty(Toolkit::ScrollView::Property::SCROLL_DOMAIN_OFFSET, mDomainOffset);
@@ -2086,7 +2147,7 @@ void ScrollView::AnimateInternalXTo( float position, float duration, AlphaFuncti
   if( duration > Math::MACHINE_EPSILON_10 )
   {
     Actor self = Self();
-    DALI_LOG_SCROLL_STATE("[0x%X], Animating from[%.2f] to[%.2f]", this, self.GetProperty(Toolkit::ScrollView::Property::SCROLL_PRE_POSITION).Get<Vector3>().x, position );
+    DALI_LOG_SCROLL_STATE("[0x%X], Animating from[%.2f] to[%.2f]", this, self.GetProperty(Toolkit::ScrollView::Property::SCROLL_PRE_POSITION).Get<Vector2>().x, position );
     mInternalXAnimation = Animation::New(duration);
     DALI_LOG_SCROLL_STATE("[0x%X], mInternalXAnimation[0x%X]", this, mInternalXAnimation.GetObjectPtr() );
     mInternalXAnimation.FinishedSignal().Connect(this, &ScrollView::OnScrollAnimationFinished);
@@ -2107,7 +2168,7 @@ void ScrollView::AnimateInternalYTo( float position, float duration, AlphaFuncti
   if( duration > Math::MACHINE_EPSILON_10 )
   {
     Actor self = Self();
-    DALI_LOG_SCROLL_STATE("[0x%X], Animating from[%.2f] to[%.2f]", this, self.GetProperty(Toolkit::ScrollView::Property::SCROLL_PRE_POSITION).Get<Vector3>().y, position );
+    DALI_LOG_SCROLL_STATE("[0x%X], Animating from[%.2f] to[%.2f]", this, self.GetProperty(Toolkit::ScrollView::Property::SCROLL_PRE_POSITION).Get<Vector2>().y, position );
     mInternalYAnimation = Animation::New(duration);
     DALI_LOG_SCROLL_STATE("[0x%X], mInternalYAnimation[0x%X]", this, mInternalYAnimation.GetObjectPtr() );
     mInternalYAnimation.FinishedSignal().Connect(this, &ScrollView::OnScrollAnimationFinished);
@@ -2134,7 +2195,7 @@ void ScrollView::OnScrollAnimationFinished( Animation& source )
 
   if( source == mInternalXAnimation )
   {
-    DALI_LOG_SCROLL_STATE("[0x%X] mInternalXAnimation[0x%X], expected[%.2f], actual[%.2f], post[%.2f]", this, mInternalXAnimation.GetObjectPtr(), mScrollTargetPosition.x, Self().GetProperty(SCROLL_PRE_POSITION).Get<Vector3>().x, mScrollPostPosition.x );
+    DALI_LOG_SCROLL_STATE("[0x%X] mInternalXAnimation[0x%X], expected[%.2f], actual[%.2f], post[%.2f]", this, mInternalXAnimation.GetObjectPtr(), mScrollTargetPosition.x, Self().GetProperty(SCROLL_PRE_POSITION).Get<Vector2>().x, mScrollPostPosition.x );
 
     if( !(mScrollStateFlags & AnimatingInternalY) )
     {
@@ -2154,7 +2215,7 @@ void ScrollView::OnScrollAnimationFinished( Animation& source )
 
   if( source == mInternalYAnimation )
   {
-    DALI_LOG_SCROLL_STATE("[0x%X] mInternalYAnimation[0x%X], expected[%.2f], actual[%.2f], post[%.2f]", this, mInternalYAnimation.GetObjectPtr(), mScrollTargetPosition.y, Self().GetProperty(SCROLL_PRE_POSITION).Get<Vector3>().y, mScrollPostPosition.y );
+    DALI_LOG_SCROLL_STATE("[0x%X] mInternalYAnimation[0x%X], expected[%.2f], actual[%.2f], post[%.2f]", this, mInternalYAnimation.GetObjectPtr(), mScrollTargetPosition.y, Self().GetProperty(SCROLL_PRE_POSITION).Get<Vector2>().y, mScrollPostPosition.y );
 
     if( !(mScrollStateFlags & AnimatingInternalX) )
     {
@@ -2265,8 +2326,8 @@ void ScrollView::GestureStarted()
     Actor self = Self();
     StopTouchDownTimer();
     StopAnimation();
-    mPanDelta = Vector3::ZERO;
-    mLastVelocity = Vector2(0.0f, 0.0f);
+    mPanDelta = Vector2::ZERO;
+    mLastVelocity = Vector2::ZERO;
     if( !mScrolling )
     {
       mLockAxis = LockPossible;
@@ -2308,7 +2369,7 @@ void ScrollView::GestureContinuing(const Vector2& panDelta)
   // appears mostly horizontal or mostly vertical respectively.
   if(mAxisAutoLock)
   {
-    mLockAxis = GetLockAxis(mPanDelta.GetVectorXY(), mLockAxis, mAxisAutoLockGradient);
+    mLockAxis = GetLockAxis(mPanDelta, mLockAxis, mAxisAutoLockGradient);
   } // end if mAxisAutoLock
 }
 
@@ -2410,7 +2471,7 @@ void ScrollView::OnGestureEx(Gesture::State state)
 
   if(state == Gesture::Started)
   {
-    Vector3 currentScrollPosition = GetCurrentScrollPosition();
+    Vector2 currentScrollPosition = GetCurrentScrollPosition();
     Self().SetProperty(Toolkit::ScrollView::Property::SCROLLING, true);
     mScrolling = true;
     DALI_LOG_SCROLL_STATE("[0x%X] mScrollStartedSignal 2 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
@@ -2467,16 +2528,16 @@ void ScrollView::FinishTransform()
     {
       SnapInternalYTo(mScrollTargetPosition.y);
     }
-    Vector3 currentScrollPosition = GetCurrentScrollPosition();
+    Vector2 currentScrollPosition = GetCurrentScrollPosition();
     DALI_LOG_SCROLL_STATE("[0x%X] mScrollCompletedSignal 6 [%.2f, %.2f]", this, currentScrollPosition.x, currentScrollPosition.y);
     mScrollCompletedSignal.Emit( currentScrollPosition );
   }
 }
 
-Vector3 ScrollView::GetOvershoot(Vector3& position) const
+Vector2 ScrollView::GetOvershoot(Vector2& position) const
 {
   Vector3 size = Self().GetCurrentSize();
-  Vector3 overshoot;
+  Vector2 overshoot;
 
   const RulerDomain rulerDomainX = mRulerX->GetDomain();
   const RulerDomain rulerDomainY = mRulerY->GetDomain();
@@ -2522,23 +2583,21 @@ bool ScrollView::OnAccessibilityPan(PanGesture gesture)
   return true;
 }
 
-void ScrollView::ClampPosition(Vector3& position) const
+void ScrollView::ClampPosition(Vector2& position) const
 {
-  ClampState3D clamped;
+  ClampState2D clamped;
   ClampPosition(position, clamped);
 }
 
-void ScrollView::ClampPosition(Vector3& position, ClampState3D &clamped) const
+void ScrollView::ClampPosition(Vector2& position, ClampState2D &clamped) const
 {
   Vector3 size = Self().GetCurrentSize();
 
   position.x = -mRulerX->Clamp(-position.x, size.width, 1.0f, clamped.x);    // NOTE: X & Y rulers think in -ve coordinate system.
   position.y = -mRulerY->Clamp(-position.y, size.height, 1.0f, clamped.y);   // That is scrolling RIGHT (e.g. 100.0, 0.0) means moving LEFT.
-
-  clamped.z = NotClamped;
 }
 
-void ScrollView::WrapPosition(Vector3& position) const
+void ScrollView::WrapPosition(Vector2& position) const
 {
   if(mWrapMode)
   {
@@ -2570,6 +2629,8 @@ void ScrollView::UpdateMainInternalConstraint()
     mScrollMainInternalDeltaConstraint.Remove();
     mScrollMainInternalFinalConstraint.Remove();
     mScrollMainInternalRelativeConstraint.Remove();
+    mScrollMainInternalDomainConstraint.Remove();
+    mScrollMainInternalPrePositionMaxConstraint.Remove();
   }
   if( mScrollMainInternalPrePositionConstraint )
   {
@@ -2593,7 +2654,7 @@ void ScrollView::UpdateMainInternalConstraint()
 
   if( mPanning )
   {
-    mScrollMainInternalPrePositionConstraint = Constraint::New<Vector3>( self,
+    mScrollMainInternalPrePositionConstraint = Constraint::New<Vector2>( self,
                                                                          Toolkit::ScrollView::Property::SCROLL_PRE_POSITION,
                                                                          InternalPrePositionConstraint( mPanStartPosition,
                                                                                                         initialPanMask,
@@ -2609,7 +2670,7 @@ void ScrollView::UpdateMainInternalConstraint()
   }
 
   // 2. Second calculate the clamped position (actual position)
-  mScrollMainInternalPositionConstraint = Constraint::New<Vector3>( self,
+  mScrollMainInternalPositionConstraint = Constraint::New<Vector2>( self,
                                                                     Toolkit::ScrollView::Property::SCROLL_POSITION,
                                                                     InternalPositionConstraint( mRulerX->GetDomain(),
                                                                                                 mRulerY->GetDomain(),
@@ -2620,25 +2681,36 @@ void ScrollView::UpdateMainInternalConstraint()
   mScrollMainInternalPositionConstraint.AddSource( Source( self, Actor::Property::SIZE ) );
   mScrollMainInternalPositionConstraint.Apply();
 
-  mScrollMainInternalDeltaConstraint = Constraint::New<Vector3>( self, Toolkit::ScrollView::Property::SCROLL_POSITION_DELTA, InternalPositionDeltaConstraint );
+  mScrollMainInternalDeltaConstraint = Constraint::New<Vector2>( self, Toolkit::ScrollView::Property::SCROLL_POSITION_DELTA, InternalPositionDeltaConstraint );
   mScrollMainInternalDeltaConstraint.AddSource( LocalSource( Toolkit::ScrollView::Property::SCROLL_POSITION ) );
   mScrollMainInternalDeltaConstraint.AddSource( LocalSource( Toolkit::ScrollView::Property::SCROLL_DOMAIN_OFFSET ) );
   mScrollMainInternalDeltaConstraint.Apply();
 
-  mScrollMainInternalFinalConstraint = Constraint::New<Vector3>( self, Toolkit::ScrollView::Property::SCROLL_FINAL,
+  mScrollMainInternalFinalConstraint = Constraint::New<Vector2>( self, Toolkit::ScrollView::Property::SCROLL_FINAL,
                                                                  InternalFinalConstraint( FinalDefaultAlphaFunction,
                                                                                           FinalDefaultAlphaFunction ) );
-  mScrollMainInternalFinalConstraint .AddSource( LocalSource( Toolkit::ScrollView::Property::SCROLL_POSITION ) );
-  mScrollMainInternalFinalConstraint .AddSource( LocalSource( Toolkit::ScrollView::Property::OVERSHOOT_X ) );
-  mScrollMainInternalFinalConstraint .AddSource( LocalSource( Toolkit::ScrollView::Property::OVERSHOOT_Y ) );
+  mScrollMainInternalFinalConstraint.AddSource( LocalSource( Toolkit::ScrollView::Property::SCROLL_POSITION ) );
+  mScrollMainInternalFinalConstraint.AddSource( LocalSource( Toolkit::ScrollView::Property::OVERSHOOT_X ) );
+  mScrollMainInternalFinalConstraint.AddSource( LocalSource( Toolkit::ScrollView::Property::OVERSHOOT_Y ) );
   mScrollMainInternalFinalConstraint.Apply();
 
-  mScrollMainInternalRelativeConstraint = Constraint::New<Vector3>( self, Toolkit::Scrollable::Property::SCROLL_RELATIVE_POSITION, InternalRelativePositionConstraint );
+  mScrollMainInternalRelativeConstraint = Constraint::New<Vector2>( self, Toolkit::Scrollable::Property::SCROLL_RELATIVE_POSITION, InternalRelativePositionConstraint );
   mScrollMainInternalRelativeConstraint.AddSource( LocalSource( Toolkit::ScrollView::Property::SCROLL_POSITION ) );
   mScrollMainInternalRelativeConstraint.AddSource( LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
   mScrollMainInternalRelativeConstraint.AddSource( LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
   mScrollMainInternalRelativeConstraint.AddSource( LocalSource( Actor::Property::SIZE ) );
   mScrollMainInternalRelativeConstraint.Apply();
+
+  mScrollMainInternalDomainConstraint = Constraint::New<Vector2>( self, Toolkit::ScrollView::Property::SCROLL_DOMAIN_SIZE, InternalScrollDomainConstraint );
+  mScrollMainInternalDomainConstraint.AddSource( LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MIN ) );
+  mScrollMainInternalDomainConstraint.AddSource( LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
+  mScrollMainInternalDomainConstraint.AddSource( LocalSource( Actor::Property::SIZE ) );
+  mScrollMainInternalDomainConstraint.Apply();
+
+  mScrollMainInternalPrePositionMaxConstraint = Constraint::New<Vector2>( self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_MAX, InternalPrePositionMaxConstraint );
+  mScrollMainInternalPrePositionMaxConstraint.AddSource( LocalSource( Toolkit::Scrollable::Property::SCROLL_POSITION_MAX ) );
+  mScrollMainInternalPrePositionMaxConstraint.AddSource( LocalSource( Actor::Property::SIZE ) );
+  mScrollMainInternalPrePositionMaxConstraint.Apply();
 
   // When panning we want to make sure overshoot values are affected by pre position and post position
   SetOvershootConstraintsEnabled(!mWrapMode);

@@ -24,7 +24,7 @@
 #include <limits>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
@@ -209,7 +209,7 @@ void Slider::OnInitialize()
   self.SetSize( DEFAULT_HIT_REGION.x, DEFAULT_HIT_REGION.y );
 }
 
-void Slider::OnControlSizeSet( const Vector3& size )
+void Slider::OnSizeSet( const Vector3& size )
 {
   // Factor in handle overshoot into size of backing
   SetHitRegion( Vector2( size.x, GetHitRegion().y ) );
@@ -355,14 +355,7 @@ void Slider::DisplayValue( float value, bool raiseSignals )
 
 void Slider::SetMarks( const MarkList& marks )
 {
-  float value;
-  for( MarkList::const_iterator it = marks.begin(), itEnd = marks.end(); it != itEnd; ++it )
-  {
-    const Property::Value& propertyValue = *it;
-    propertyValue.Get( value );
-
-    mMarks.push_back( value );
-  }
+  mMarks = marks;
 }
 
 const Slider::MarkList& Slider::GetMarks() const
@@ -732,9 +725,9 @@ float Slider::MarkFilter( float value )
   const float MARK_TOLERANCE = GetMarkTolerance();
 
   float mark;
-  for( MarkList::iterator it = mMarks.begin(), itEnd = mMarks.end(); it != itEnd; ++it )
+  for( std::size_t i = 0; i < mMarks.Size(); ++i)
   {
-    const Property::Value& propertyValue = *it;
+    const Property::Value& propertyValue = mMarks[i];
     propertyValue.Get( mark );
     mark = MapValuePercentage( mark );
 
@@ -754,9 +747,9 @@ float Slider::SnapToMark( float value )
   float closestDist = std::numeric_limits<float>::max();
 
   float mark;
-  for( MarkList::iterator it = mMarks.begin(), itEnd = mMarks.end(); it != itEnd; ++it )
+  for( std::size_t i = 0; i < mMarks.Size(); ++i)
   {
-    const Property::Value& propertyValue = *it;
+    const Property::Value& propertyValue = mMarks[i];
     propertyValue.Get( mark );
     mark = MapValuePercentage( mark );
 
@@ -777,7 +770,7 @@ bool Slider::MarkReached( float value, int& outIndex )
 
   // Binary search
   int head = 0,
-      tail = mMarks.size() - 1;
+      tail = mMarks.Size() - 1;
   int current;
   float mark;
 

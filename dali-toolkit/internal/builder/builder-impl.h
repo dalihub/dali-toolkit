@@ -30,8 +30,8 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/builder/json-parser.h>
-#include <dali-toolkit/public-api/builder/builder.h>
+#include <dali-toolkit/devel-api/builder/json-parser.h>
+#include <dali-toolkit/devel-api/builder/builder.h>
 #include <dali-toolkit/internal/builder/builder-declarations.h>
 
 // Warning messages usually displayed
@@ -186,6 +186,33 @@ public:
    * @copydoc Toolkit::Builder::GetPath
    */
   Path GetPath( const std::string &name );
+
+  /**
+   * @copydoc Toolkit::Builder::GetPathConstrainer
+   */
+  Dali::PathConstrainer GetPathConstrainer( const std::string& name );
+
+  /*
+   * Check if a given constrainer is of type PathConstrainer
+   * @param[in] name The name of the constrainer
+   * @return True if constainer is of type PathConstrainer, False otherwise
+   *
+   */
+  bool IsPathConstrainer( const std::string& name );
+
+  /**
+   * @copydoc Toolkit::Builder::GetLinearConstrainer
+   */
+  Dali::LinearConstrainer GetLinearConstrainer( const std::string& name );
+
+  /*
+   * Check if a given constrainer is of type LinearConstrainer
+   * @param[in] name The name of the constrainer
+   * @return True if constainer is of type LinearConstrainer, False otherwise
+   *
+   */
+  bool IsLinearConstrainer( const std::string& name );
+
   /**
    * @copydoc Toolkit::Builder::QuitSignal
    */
@@ -218,6 +245,14 @@ private:
 
   typedef std::map<const std::string, Path> PathLut;
   PathLut mPathLut;
+
+  typedef struct{ std::string name; Dali::PathConstrainer pathConstrainer; } PathConstrainerEntry;
+  typedef std::vector<PathConstrainerEntry> PathConstrainerLut;
+  PathConstrainerLut mPathConstrainerLut;
+
+  typedef struct{ std::string name; Dali::LinearConstrainer linearConstrainer; } LinearConstrainerEntry;
+  typedef std::vector<LinearConstrainerEntry> LinearConstrainerLut;
+  LinearConstrainerLut mLinearConstrainerLut;
 
   SlotDelegate<Builder> mSlotDelegate;
 

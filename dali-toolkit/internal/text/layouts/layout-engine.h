@@ -90,6 +90,18 @@ public:
   unsigned int GetLayout() const;
 
   /**
+   * @brief Enable or disable the text ellipsis.
+   *
+   * @param[in] enabled Whether to enable the text ellipsis.
+   */
+  void SetTextEllipsisEnabled( bool enabled );
+
+  /**
+   * @return Whether the text ellipsis is enabled.
+   */
+  bool GetTextEllipsisEnabled() const;
+
+  /**
    * @brief Choose the required text horizontal alignment.
    *
    * @param[in] alignment The required alignment.

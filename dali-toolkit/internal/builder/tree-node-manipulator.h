@@ -27,7 +27,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/builder/tree-node.h>
+#include <dali-toolkit/devel-api/builder/tree-node.h>
 
 namespace Dali
 {

@@ -21,11 +21,11 @@
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/adaptor-framework/accessibility-manager.h>
-#include <dali/public-api/adaptor-framework/sound-player.h>
-#include <dali/public-api/adaptor-framework/tts-player.h>
+#include <dali/devel-api/adaptor-framework/accessibility-manager.h>
+#include <dali/devel-api/adaptor-framework/sound-player.h>
+#include <dali/devel-api/adaptor-framework/tts-player.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/events/hit-test-algorithm.h>
+#include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/integration-api/debug.h>
 
@@ -467,7 +467,7 @@ void FocusManager::DoActivate(Actor actor)
     if(control)
     {
       // Notify the control that it is activated
-      control.GetImplementation().Activate();
+      GetImplementation( control ).AccessibilityActivate();
     }
 
     // Send notification for the activation of focused actor
@@ -815,7 +815,7 @@ bool FocusManager::AccessibilityActionUp()
       if(control)
       {
         // Notify the control that it is activated
-        ret = control.GetImplementation().OnAccessibilityValueChange(true);
+        ret = GetImplementation( control ).OnAccessibilityValueChange(true);
       }
     }
   }
@@ -836,7 +836,7 @@ bool FocusManager::AccessibilityActionDown()
       if(control)
       {
         // Notify the control that it is activated
-        ret = control.GetImplementation().OnAccessibilityValueChange(false);
+        ret = GetImplementation( control ).OnAccessibilityValueChange(false);
       }
     }
   }
@@ -873,7 +873,7 @@ bool FocusManager::AccessibilityActionTouch(const TouchEvent& touchEvent)
   Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(GetCurrentFocusActor());
   if(control)
   {
-    handled = control.GetImplementation().OnAccessibilityTouch(touchEvent);
+    handled = GetImplementation( control ).OnAccessibilityTouch(touchEvent);
   }
 
   return handled;
@@ -933,7 +933,7 @@ bool FocusManager::HandlePanGesture(const Integration::PanGestureEvent& panEvent
       pan.velocity.x = pan.displacement.x / panEvent.timeDelta;
       pan.velocity.y = pan.displacement.y / panEvent.timeDelta;
 
-      handled = control.GetImplementation().OnAccessibilityPan(pan);
+      handled = GetImplementation( control ).OnAccessibilityPan(pan);
     }
 
     // If the gesture is not handled by the control, check its parent

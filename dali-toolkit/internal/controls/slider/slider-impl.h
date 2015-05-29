@@ -21,10 +21,11 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/public-api/object/property-array.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/slider/slider.h>
+#include <dali-toolkit/devel-api/controls/slider/slider.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 namespace Dali
@@ -287,9 +288,9 @@ protected:
   virtual ~Slider();
 
   /**
-   * @copydoc Control::OnControlSizeSet( const Vector3& size )
+   * @copydoc CustomActorImpl::OnSizeSet( const Vector3& size )
    */
-  virtual void OnControlSizeSet( const Vector3& size );
+  virtual void OnSizeSet( const Vector3& size );
 
 private:
 

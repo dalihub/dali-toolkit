@@ -22,7 +22,7 @@
 #include <dali/public-api/animation/constraint.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/shader-effects/page-turn-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/page-turn-effect.h>
 
 namespace Dali
 {

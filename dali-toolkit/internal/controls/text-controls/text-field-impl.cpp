@@ -26,9 +26,9 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/scripting/scripting.h>
-#include <dali/public-api/adaptor-framework/virtual-keyboard.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/adaptor-framework/virtual-keyboard.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -117,6 +117,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-right", STRING,    SELECTION_HANDLE_PRESSED_IMAGE_RIGHT )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-highlight-color",            STRING,    SELECTION_HIGHLIGHT_COLOR            )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decoration-bounding-box",              RECTANGLE, DECORATION_BOUNDING_BOX              )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "input-method-settings",                MAP,       INPUT_METHOD_SETTINGS                )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "max-length-reached", SIGNAL_MAX_LENGTH_REACHED )
 
@@ -520,6 +521,13 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::TextField::Property::INPUT_METHOD_SETTINGS:
+      {
+        // Empty implementation for now.
+        Property::Map map = value.Get<Property::Map>();
+        VirtualKeyboard::ApplySettings( map );
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -778,6 +786,10 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::TextField::Property::INPUT_METHOD_SETTINGS:
+      {
+        break;
+      }
     } //switch
   }
 
@@ -838,7 +850,7 @@ void TextField::OnInitialize()
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
 }
 
-void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
+void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
 }

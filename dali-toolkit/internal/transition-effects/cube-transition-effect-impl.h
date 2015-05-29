@@ -28,7 +28,7 @@
 #include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/transition-effects/cube-transition-effect.h>
+#include <dali-toolkit/devel-api/transition-effects/cube-transition-effect.h>
 
 namespace Dali
 {
@@ -303,7 +303,7 @@ protected:
   unsigned int               mNumRows;
   unsigned int               mNumColumns;
   Size                       mViewAreaSize;
-  ActorContainer             mBoxes;
+  std::vector< Actor >       mBoxes;
   std::vector< ImageActor >  mTiles[2];
   int                        mRotateIndex;
   Size                       mTileSize;

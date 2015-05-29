@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-selection-popup.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>

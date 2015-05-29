@@ -32,7 +32,7 @@ namespace Toolkit
 
 void MoveActorConstraint( Vector3& current, const PropertyInputContainer& inputs )
 {
-  current += inputs[0]->GetVector3();
+  current += Vector3(inputs[0]->GetVector2());
 }
 
 void WrapActorConstraint( Vector3& position, const PropertyInputContainer& inputs )
@@ -41,8 +41,8 @@ void WrapActorConstraint( Vector3& position, const PropertyInputContainer& input
 
   if(wrap)
   {
-    const Vector3& min = inputs[3]->GetVector3();
-    const Vector3& max = inputs[4]->GetVector3();
+    const Vector2& min = inputs[3]->GetVector2();
+    const Vector2& max = inputs[4]->GetVector2();
 
     const Vector3& anchor = inputs[1]->GetVector3();
     const Vector3 scale = inputs[0]->GetVector3();

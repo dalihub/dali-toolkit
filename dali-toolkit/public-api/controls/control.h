@@ -166,20 +166,6 @@ public:
    */
   static Control DownCast( BaseHandle handle );
 
-  /**
-   * @brief Retrieve the Control implementation.
-   *
-   * @return The implementation.
-   */
-  Internal::Control& GetImplementation();
-
-  /**
-   * @brief Retrieve the Control implementation.
-   *
-   * @return The implementation.
-   */
-  const Internal::Control& GetImplementation() const;
-
   // Key Input
 
   /**
@@ -248,7 +234,7 @@ public:
    */
   LongPressGestureDetector GetLongPressGestureDetector() const;
 
-  // Background
+  // Styling
 
   /**
    * @brief Sets the name of the style to be applied to the control.
@@ -295,13 +281,6 @@ public:
    * @brief Clears the background.
    */
   void ClearBackground();
-
-  /**
-   * @brief Retrieves the actor used as the background for this control.
-   *
-   * @return The actor that used as the background for this control.
-   */
-  Actor GetBackgroundActor() const;
 
   // Signals
 

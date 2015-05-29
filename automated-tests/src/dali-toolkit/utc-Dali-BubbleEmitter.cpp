@@ -24,6 +24,9 @@
 
 #include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/actors/mesh-actor.h>
+#include <dali/devel-api/modeling/material.h>
+#include <dali-toolkit/devel-api/controls/bubble-effect/bubble-emitter.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;

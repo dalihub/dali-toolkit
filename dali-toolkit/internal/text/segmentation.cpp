@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/text/segmentation.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/text-abstraction/segmentation.h>
+#include <dali/devel-api/text-abstraction/segmentation.h>
 #ifdef DEBUG_ENABLED
 #include <string>
 #include <dali/integration-api/debug.h>

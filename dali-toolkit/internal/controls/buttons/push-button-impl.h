@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
@@ -132,14 +132,14 @@ private: // From Button
 private: // From Control
 
   /**
-   * @copydoc Toolkit::Control::OnControlSizeSet( const Vector3& targetSize )
+   * @copydoc CustomActorImpl::OnSizeSet( const Vector3& targetSize )
    */
-  virtual void OnControlSizeSet( const Vector3& targetSize );
+  virtual void OnSizeSet( const Vector3& targetSize );
 
   /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
-  Vector3 GetNaturalSize();
+  virtual Vector3 GetNaturalSize();
 
   /**
    * @copydoc Toolkit::Control::OnSetResizePolicy
@@ -189,7 +189,7 @@ private:
    * @param[in] images The list of images to configure
    * @param[in] label The text label to configure
    */
-  void ConfigureSizeNegotiationDimension( Dimension::Type dimension, const ActorContainer& images, Actor& label );
+  void ConfigureSizeNegotiationDimension( Dimension::Type dimension, const std::vector< Actor >& images, Actor& label );
 
   // slots
 

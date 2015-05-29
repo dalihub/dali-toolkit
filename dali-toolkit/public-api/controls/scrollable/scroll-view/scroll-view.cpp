@@ -248,7 +248,7 @@ unsigned int FixedRuler::GetPageFromPosition(float position, bool wrap) const
     {
       position = WrapInDomain(position, mDomain.min, mDomain.max);
     }
-    page = floor((position - mDomain.min) / mSpacing + 0.5f);
+    page = std::max(static_cast<double>(0.0f), floor((position - mDomain.min) / mSpacing + 0.5f));
 
     if(wrap)
     {
@@ -282,16 +282,6 @@ unsigned int FixedRuler::GetTotalPages() const
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // ScrollView
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-const float ScrollView::DEFAULT_SLOW_SNAP_ANIMATION_DURATION(0.5f);
-const float ScrollView::DEFAULT_FAST_SNAP_ANIMATION_DURATION(0.25f);
-const float ScrollView::DEFAULT_SNAP_OVERSHOOT_DURATION(0.5f);
-const float ScrollView::DEFAULT_MAX_OVERSHOOT(100.0f);  // 100 pixels
-
-const float ScrollView::DEFAULT_AXIS_AUTO_LOCK_GRADIENT(0.36f);
-const float ScrollView::DEFAULT_FRICTION_COEFFICIENT(1.0f);
-const float ScrollView::DEFAULT_FLICK_SPEED_COEFFICIENT(1.0f);
-const float ScrollView::DEFAULT_MAX_FLICK_SPEED(3.0f);
 
 ScrollView::ScrollView()
 {
@@ -506,14 +496,9 @@ void ScrollView::SetMouseWheelScrollDistanceStep(Vector2 step)
   GetImpl(*this).SetMouseWheelScrollDistanceStep(step);
 }
 
-Vector3 ScrollView::GetCurrentScrollPosition() const
+Vector2 ScrollView::GetCurrentScrollPosition() const
 {
   return GetImpl(*this).GetCurrentScrollPosition();
-}
-
-void ScrollView::SetScrollPosition(const Vector3& position)
-{
-  GetImpl(*this).SetScrollPosition(position);
 }
 
 unsigned int ScrollView::GetCurrentPage() const
@@ -521,28 +506,28 @@ unsigned int ScrollView::GetCurrentPage() const
   return GetImpl(*this).GetCurrentPage();
 }
 
-void ScrollView::ScrollTo(const Vector3 &position)
+void ScrollView::ScrollTo(const Vector2 &position)
 {
   GetImpl(*this).ScrollTo(position);
 }
 
-void ScrollView::ScrollTo(const Vector3 &position, float duration)
+void ScrollView::ScrollTo(const Vector2 &position, float duration)
 {
   GetImpl(*this).ScrollTo(position, duration);
 }
 
-void ScrollView::ScrollTo(const Vector3 &position, float duration, AlphaFunction alpha)
+void ScrollView::ScrollTo(const Vector2 &position, float duration, AlphaFunction alpha)
 {
   GetImpl(*this).ScrollTo(position, duration, alpha);
 }
 
-void ScrollView::ScrollTo(const Vector3 &position, float duration,
+void ScrollView::ScrollTo(const Vector2 &position, float duration,
                           DirectionBias horizontalBias, DirectionBias verticalBias)
 {
   GetImpl(*this).ScrollTo(position, duration, horizontalBias, verticalBias);
 }
 
-void ScrollView::ScrollTo(const Vector3 &position, float duration, AlphaFunction alpha,
+void ScrollView::ScrollTo(const Vector2 &position, float duration, AlphaFunction alpha,
                           DirectionBias horizontalBias, DirectionBias verticalBias)
 {
   GetImpl(*this).ScrollTo(position, duration, alpha, horizontalBias, verticalBias);

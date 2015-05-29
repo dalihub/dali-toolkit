@@ -35,7 +35,6 @@ namespace Internal DALI_INTERNAL
 class ItemView;
 }
 
-class ScrollConnector;
 class ItemFactory;
 class ItemLayout;
 struct ItemRange;
@@ -50,6 +49,30 @@ typedef IntrusivePtr<ItemLayout> ItemLayoutPtr;
  */
 class DALI_IMPORT_API ItemView : public Scrollable
 {
+public:
+
+  enum PropertyRange
+  {
+    ANIMATABLE_PROPERTY_START_INDEX = Toolkit::Scrollable::ANIMATABLE_PROPERTY_END_INDEX + 1,
+    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_START_INDEX + 1000                   ///< Reserve animatable property indices
+  };
+
+  /**
+   * @brief An enumeration of properties belonging to the ScrollView class.
+   */
+  struct Property
+  {
+    enum
+    {
+      LAYOUT_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "layout-position",       type float
+      SCROLL_SPEED,                                      ///< Property, name "scroll-speed",          type float
+      OVERSHOOT,                                         ///< Property, name "overshoot",             type float
+      SCROLL_DIRECTION,                                  ///< Property, name "scroll-direction",      type Vector2
+      LAYOUT_ORIENTATION,                                ///< Property, name "layout-orientation",    type integer
+      SCROLL_CONTENT_SIZE                                ///< Property, name "scroll-content-size",   type float
+    };
+  };
+
 public:
 
   /**
@@ -94,13 +117,6 @@ public:
    * @return handle to a ItemView or an uninitialized handle
    */
   static ItemView DownCast( BaseHandle handle );
-
-  /**
-   * @brief Retrieve a scroll-connector; this can be used to connect scroll components e.g. scroll bars.
-   *
-   * @return The connector.
-   */
-  ScrollConnector GetScrollConnector() const;
 
   /**
    * @brief Query the number of layouts.

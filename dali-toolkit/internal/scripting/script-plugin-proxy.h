@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali-toolkit/public-api/scripting/script-plugin.h>
+#include <dali-toolkit/devel-api/scripting/script-plugin.h>
 
 namespace Dali
 {

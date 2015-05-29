@@ -25,10 +25,10 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/popup/popup.h>
-#include <dali-toolkit/internal/controls/popup/popup-style-impl.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
+#include <dali-toolkit/devel-api/controls/popup/popup.h>
+#include <dali-toolkit/internal/controls/popup/popup-style-impl.h>
 
 namespace Dali
 {
@@ -321,7 +321,7 @@ private:
   Actor mBottomBg;                        ///< bottom button bar background. ImageActor is replaced with Actor due to hidden image.
   Actor mTailImage;                       ///< Stores the tail image
 
-  ActorContainer mButtons;                ///< Keeps track of the buttons added to this popup.
+  std::vector< Actor > mButtons;          ///< Keeps track of the buttons added to this popup.
   Toolkit::Popup::PopupState mState;      ///< Popup current state.
   Animation mAnimation;                   ///< The animation instance managing state changing.
   bool mAlterAddedChild;                  ///< Flag used to control whether children are reparented or not.

@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/super-blur-view/super-blur-view.h>
+#include <dali-toolkit/devel-api/controls/super-blur-view/super-blur-view.h>
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
 
 namespace Dali
@@ -115,9 +115,9 @@ private: // from Control
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::Control::OnControlSizeSet
+   * @copydoc CustomActorImpl::OnSizeSet()
    */
-  virtual void OnControlSizeSet(const Vector3& targetSize);
+  virtual void OnSizeSet(const Vector3& targetSize);
 
 private:
 

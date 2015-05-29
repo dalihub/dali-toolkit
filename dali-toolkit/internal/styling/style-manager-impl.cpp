@@ -18,18 +18,15 @@
 #include "style-manager-impl.h"
 
 // EXTERNAL INCLUDES
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <dali/public-api/adaptor-framework/singleton-service.h>
+#include <dali/devel-api/adaptor-framework/singleton-service.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/devel-api/styling/style-manager.h>
 
 namespace
 {
@@ -38,7 +35,7 @@ const char* LANDSCAPE_QUALIFIER = "landscape";
 const char* PORTRAIT_QUALIFIER  = "portrait";
 const char* FONT_SIZE_QUALIFIER = "font-size-";
 
-const char* DEFAULT_THEME = DALI_STYLE_DIR "tizen-default-theme.json";
+const char* DEFAULT_THEME = DALI_STYLE_DIR "dali-toolkit-default-theme.json";
 
 const char* PACKAGE_PATH_KEY = "PACKAGE_PATH";
 const char* DEFAULT_PACKAGE_PATH = DALI_DATA_READ_ONLY_DIR "/toolkit/";
@@ -101,19 +98,18 @@ Toolkit::StyleManager StyleManager::Get()
 
 StyleManager::StyleManager()
 : mOrientationDegrees( 0 ),  // Portrait
-  mDefaultFontSize( -1 )
+  mDefaultFontSize( -1 ),
+  mThemeFile( DEFAULT_THEME )
 {
   // Add theme builder constants
   mThemeBuilderConstants[ PACKAGE_PATH_KEY ] = DEFAULT_PACKAGE_PATH;
 
-  RequestDefaultTheme();
-
-  StyleMonitor styleMonitor( StyleMonitor::Get() );
-  if( styleMonitor )
+  mStyleMonitor = StyleMonitor::Get();
+  if( mStyleMonitor )
   {
-    styleMonitor.StyleChangeSignal().Connect( this, &StyleManager::StyleMonitorChange );
+    mStyleMonitor.StyleChangeSignal().Connect( this, &StyleManager::StyleMonitorChange );
 
-    mDefaultFontSize = styleMonitor.GetDefaultFontSize();
+    mDefaultFontSize = mStyleMonitor.GetDefaultFontSize();
   }
 }
 
@@ -329,17 +325,11 @@ bool StyleManager::LoadFile( const std::string& filename, std::string& stringOut
 {
   DALI_ASSERT_DEBUG( 0 != filename.length());
 
-  std::ifstream in( filename.c_str(), std::ios::in );
-  if( in )
+  // as toolkit is platform agnostic, it cannot load files from filesystem
+  // ask style monitor to load the style sheet
+  if( mStyleMonitor )
   {
-    std::stringstream buffer;
-    buffer << in.rdbuf();
-
-    stringOut = buffer.str();
-
-    in.close();
-
-    return true;
+    return mStyleMonitor.LoadThemeFile( filename, stringOut );
   }
 
   return false;
@@ -368,9 +358,7 @@ void StyleManager::SetTheme()
   mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
   if ( LoadJSON( mThemeBuilder, mThemeFile ) )
   {
-    StyleChange change;
-    change.themeChange = true;
-    mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), change );
+    mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), StyleChange::THEME_CHANGE );
   }
   else
   {
@@ -394,11 +382,36 @@ void StyleManager::CacheBuilder( Toolkit::Builder builder, const std::string& ke
   mBuilderCache[ key ] = builder;
 }
 
-void StyleManager::StyleMonitorChange( StyleMonitor styleMonitor, StyleChange styleChange )
+void StyleManager::StyleMonitorChange( StyleMonitor styleMonitor, StyleChange::Type styleChange )
 {
-  if( styleChange.defaultFontSizeChange )
+  switch ( styleChange )
   {
-    mDefaultFontSize = styleMonitor.GetDefaultFontSize();
+    case StyleChange::DEFAULT_FONT_CHANGE:
+    {
+      break;
+    }
+
+    case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
+    {
+      mDefaultFontSize = styleMonitor.GetDefaultFontSize();
+      break;
+    }
+
+    case StyleChange::THEME_CHANGE:
+    {
+      const std::string& newTheme = styleMonitor.GetTheme();
+      if( ! newTheme.empty() )
+      {
+        mThemeFile = newTheme;
+      }
+      else
+      {
+        mThemeFile = DEFAULT_THEME;
+      }
+
+      SetTheme();
+      break;
+    }
   }
 
   mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), styleChange );

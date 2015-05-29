@@ -138,7 +138,7 @@ Actor userActorTree = builder.Create("users");
 #### JavaScript example
 
 ~~~{.js}
-builder.applyStyle = builder.create( "live-tv-focus", tvIcon );
+builder.applyStyle( "live-tv-focus", tvIcon );
 ~~~
 
 #### C++ example
@@ -184,12 +184,14 @@ builder.ApplyStyle( "live-tv-focus", tvIcon );
 #### JavaScript example
 
 ~~~{.js}
+// JavaScript
+
 var anim = builder.createAnimation( { animation:"animate-show", actor: myActor } );
 ~~~
 
-#### C++ example
-
 ~~~{.cpp}
+// C+++
+
 Animation anim = builder.createAnimation( "animate-show", propertyMap );
 ~~~
 

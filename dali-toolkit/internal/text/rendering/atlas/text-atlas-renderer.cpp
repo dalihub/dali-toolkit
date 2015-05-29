@@ -21,10 +21,14 @@
 // EXTERNAL INCLUDES
 #include <dali/dali.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/text-abstraction/text-abstraction.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/devel-api/actors/mesh-actor.h>
+#include <dali/devel-api/geometry/mesh.h>
+
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/atlas-manager/atlas-manager.h>
+#include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-basic-shader.h>
 #include <dali-toolkit/internal/text/rendering/shaders/text-bgra-shader.h>
@@ -134,9 +138,9 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
     CalculateBlocksSize( glyphs );
 
-    for ( uint32_t i = 0; i < glyphs.Size(); ++i )
+    for( uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i )
     {
-      GlyphInfo glyph = glyphs[ i ];
+      const GlyphInfo& glyph = glyphs[ i ];
 
       // No operation for white space
       if ( glyph.width && glyph.height )
@@ -177,7 +181,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
           }
         }
 
-        Vector2 position = positions[ i ];
+        const Vector2& position = positions[ i ];
         MeshData newMeshData;
         mGlyphManager.Cached( glyph.fontId, glyph.index, slot );
 
@@ -692,21 +696,25 @@ Text::RendererPtr AtlasRenderer::New()
 
 RenderableActor AtlasRenderer::Render( Text::ViewInterface& view )
 {
-
   UnparentAndReset( mImpl->mActor );
 
-  Text::Length numberOfGlyphs = view.GetNumberOfGlyphs();
+  Length numberOfGlyphs = view.GetNumberOfGlyphs();
 
-  if( numberOfGlyphs > 0 )
+  if( numberOfGlyphs > 0u )
   {
     Vector<GlyphInfo> glyphs;
     glyphs.Resize( numberOfGlyphs );
 
-    view.GetGlyphs( &glyphs[0], 0, numberOfGlyphs );
-
     std::vector<Vector2> positions;
     positions.resize( numberOfGlyphs );
-    view.GetGlyphPositions( &positions[0], 0, numberOfGlyphs );
+
+    numberOfGlyphs = view.GetGlyphs( glyphs.Begin(),
+                                     &positions[0],
+                                     0u,
+                                     numberOfGlyphs );
+    glyphs.Resize( numberOfGlyphs );
+    positions.resize( numberOfGlyphs );
+
     mImpl->AddGlyphs( positions,
                       glyphs,
                       view.GetTextColor(),
@@ -716,6 +724,7 @@ RenderableActor AtlasRenderer::Render( Text::ViewInterface& view )
                       view.GetUnderlineColor(),
                       view.GetUnderlineHeight() );
   }
+
   return mImpl->mActor;
 }
 

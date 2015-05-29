@@ -19,7 +19,7 @@
 #include "resource-image-api.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/images/image-operations.h>
+#include <dali/devel-api/images/image-operations.h>
 
 // INTERNAL INCLUDES
 #include <v8-utils.h>

@@ -24,7 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
-#include <dali-toolkit/public-api/shader-effects/image-region-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/image-region-effect.h>
 
 #include "button-impl.h"
 

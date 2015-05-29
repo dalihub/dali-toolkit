@@ -20,7 +20,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-
+#include <dali-toolkit/devel-api/controls/slider/slider.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -134,7 +134,7 @@ int UtcDaliSliderSignals(void)
   Property::Array marks;
   for( int i = 0; i < NUM_MARKS; ++i )
   {
-    marks.push_back( MIN_BOUND + ( static_cast<float>(i) / ( NUM_MARKS - 1) ) * ( MAX_BOUND - MIN_BOUND ) );
+    marks.PushBack( MIN_BOUND + ( static_cast<float>(i) / ( NUM_MARKS - 1) ) * ( MAX_BOUND - MIN_BOUND ) );
   }
   slider.SetProperty( Slider::Property::MARKS, marks );
   slider.SetProperty( Slider::Property::MARK_TOLERANCE, 0.1f );

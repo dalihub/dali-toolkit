@@ -23,8 +23,8 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/scripting/scripting.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
 namespace //Unnamed namespace
@@ -252,7 +252,7 @@ void SuperBlurView::ClearBlurResource()
   }
 }
 
-void SuperBlurView::OnControlSizeSet( const Vector3& targetSize )
+void SuperBlurView::OnSizeSet( const Vector3& targetSize )
 {
   if( mTargetSize != Vector2(targetSize) )
   {

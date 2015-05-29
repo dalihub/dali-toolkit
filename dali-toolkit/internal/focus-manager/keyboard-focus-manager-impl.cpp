@@ -21,13 +21,13 @@
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/adaptor-framework/accessibility-manager.h>
-#include <dali/public-api/adaptor-framework/singleton-service.h>
+#include <dali/devel-api/adaptor-framework/accessibility-manager.h>
+#include <dali/devel-api/adaptor-framework/singleton-service.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/integration-api/debug.h>
 
@@ -195,7 +195,7 @@ Actor KeyboardFocusManager::GetCurrentFocusGroup()
 bool KeyboardFocusManager::IsLayoutControl(Actor actor) const
 {
   Toolkit::Control control = Toolkit::Control::DownCast(actor);
-  return control && control.GetImplementation().IsKeyboardNavigationSupported();
+  return control && GetImplementation( control ).IsKeyboardNavigationSupported();
 }
 
 Toolkit::Control KeyboardFocusManager::GetParentLayoutControl(Actor actor) const
@@ -260,7 +260,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocusNavigationDi
 bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control control, Actor actor, Toolkit::Control::KeyboardFocusNavigationDirection direction)
 {
   // Ask the control for the next actor to focus
-  Actor nextFocusableActor = control.GetImplementation().GetNextKeyboardFocusableActor(actor, direction, mFocusGroupLoopEnabled);
+  Actor nextFocusableActor = GetImplementation( control ).GetNextKeyboardFocusableActor(actor, direction, mFocusGroupLoopEnabled);
   if(nextFocusableActor)
   {
     if(!nextFocusableActor.IsKeyboardFocusable())
@@ -299,7 +299,7 @@ bool KeyboardFocusManager::DoMoveFocusWithinLayoutControl(Toolkit::Control contr
             // If the application hasn't changed our proposed actor, we informs the layout control we will
             // move the focus to what the control returns. The control might wish to perform some actions
             // before the focus is actually moved.
-            control.GetImplementation().OnKeyboardFocusChangeCommitted(committedFocusActor);
+            GetImplementation( control ).OnKeyboardFocusChangeCommitted( committedFocusActor );
           }
 
           return SetCurrentFocusActor(committedFocusActor);
@@ -351,7 +351,7 @@ void KeyboardFocusManager::DoActivate(Actor actor)
     if(control)
     {
       // Notify the control that it is activated
-      control.GetImplementation().Activate();
+      GetImplementation( control ).AccessibilityActivate();
     }
 
     // Send notification for the activation of focused actor

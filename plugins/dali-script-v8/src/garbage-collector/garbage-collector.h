@@ -21,7 +21,7 @@
 
 // INTERNAL INCLUDES
 #include <interfaces/garbage-collector-interface.h>
-#include <dali/public-api/common/set-wrapper.h>
+#include <dali/devel-api/common/set-wrapper.h>
 
 
 namespace Dali

@@ -18,9 +18,11 @@
 // EXTERNAL INCLUDES
 #include <boost/function.hpp>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/type-info.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/integration-api/debug.h>
+#include <limits>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/builder/builder-impl.h>
@@ -140,6 +142,182 @@ struct DelayedAnimationPlay
       anim.Play();
     }
   };
+};
+
+// Delay a pathConstrainer apply
+struct DelayedConstrainerApply
+{
+  std::string     constrainerName;
+
+  std::vector<std::string> targetActorNames;
+  std::vector<std::string> sourceActorNames;
+  std::vector<std::string> targetPropertyNames;
+  std::vector<std::string> sourcePropertyNames;
+  std::vector<Vector2>  ranges;
+  std::vector<Vector2>  wrapRanges;
+
+  Dali::IntrusivePtr<Dali::Toolkit::Internal::Builder>  builder;
+
+  /*
+   * Helper function to get the parameters to apply each constraint
+   * @param[in] i i-essim element
+   * @param[out] tagetActor Target actor for the constraint
+   * @param[out] tagetPropertyIndex Target property index for the constraint
+   * @param[out] sourceActor Source actor for the constraint
+   * @param[out] sourcePropertyIndex Source property index for the constraint
+   */
+  bool GetApplyParameters( size_t i,
+                           Actor& targetActor, Property::Index& targetPropertyIndex,
+                           Actor& sourceActor, Property::Index& sourcePropertyIndex)
+  {
+
+    targetActor = Stage::GetCurrent().GetRootLayer().FindChildByName(targetActorNames[i]);
+    targetPropertyIndex = Property::INVALID_INDEX;
+    if(targetActor)
+    {
+      targetPropertyIndex = targetActor.GetPropertyIndex(targetPropertyNames[i]);
+      if( targetPropertyIndex ==  Property::INVALID_INDEX )
+      {
+        DALI_SCRIPT_WARNING("Property '%s' not founded in actor '%s'\n", targetPropertyNames[i].c_str(), targetActorNames[i].c_str() );
+        return false;
+      }
+    }
+    else
+    {
+      DALI_SCRIPT_WARNING("Actor '%s' not founded\n", targetActorNames[i].c_str() );
+      return false;
+    }
+
+
+    sourceActor = Stage::GetCurrent().GetRootLayer().FindChildByName(sourceActorNames[i]);
+    sourcePropertyIndex = Property::INVALID_INDEX;
+    if(sourceActor)
+    {
+      sourcePropertyIndex = sourceActor.GetPropertyIndex(sourcePropertyNames[i]);
+      if( sourcePropertyIndex ==  Property::INVALID_INDEX )
+      {
+        DALI_SCRIPT_WARNING("Property '%s' not founded in actor '%s'\n", sourcePropertyNames[i].c_str(), sourceActorNames[i].c_str() );
+        return false;
+      }
+    }
+    else
+    {
+      DALI_SCRIPT_WARNING("Actor '%s' not founded\n", targetActorNames[i].c_str() );
+      return false;
+    }
+    return true;
+  }
+
+  void operator()(void)
+  {
+    Actor sourceActor, targetActor;
+    Property::Index targetPropertyIndex(Property::INVALID_INDEX);
+    Property::Index sourcePropertyIndex(Property::INVALID_INDEX);
+    size_t actorCount( targetActorNames.size() );
+    if( builder.Get()->IsPathConstrainer( constrainerName ))
+    {
+      PathConstrainer constrainer = builder.Get()->GetPathConstrainer(constrainerName);
+      if( constrainer )
+      {
+        for(size_t i(0); i<actorCount; ++i )
+        {
+
+          if( GetApplyParameters( i, targetActor, targetPropertyIndex, sourceActor, sourcePropertyIndex ) )
+          {
+            constrainer.Apply( Property(targetActor,targetPropertyIndex),
+                               Property(sourceActor,sourcePropertyIndex),
+                               ranges[i],
+                               wrapRanges[i]);
+          }
+        }
+      }
+      else
+      {
+        DALI_SCRIPT_WARNING("Constrainer %s not found\n", constrainerName.c_str());
+      }
+    }
+    else if( builder.Get()->IsLinearConstrainer( constrainerName ) )
+    {
+      Dali::LinearConstrainer constrainer( builder.Get()->GetLinearConstrainer(constrainerName));
+      if( constrainer )
+      {
+        for(size_t i(0); i<actorCount; ++i )
+        {
+
+          if( GetApplyParameters( i, targetActor, targetPropertyIndex, sourceActor, sourcePropertyIndex ) )
+          {
+            constrainer.Apply( Property(targetActor,targetPropertyIndex),
+                               Property(sourceActor,sourcePropertyIndex),
+                               ranges[i],
+                               wrapRanges[i]);
+          }
+        }
+      }
+      else
+      {
+        DALI_SCRIPT_WARNING("Constrainer %s not found\n", constrainerName.c_str());
+      }
+    }
+    else
+    {
+      DALI_SCRIPT_WARNING("Constrainer %s is not of a valid type\n", constrainerName.c_str());
+    }
+  }
+};
+
+// Delay a pathConstrainer remove
+struct DelayedConstrainerRemove
+{
+  std::string     constrainerName;
+  std::vector<std::string> targetActorNames;
+  Dali::IntrusivePtr<Dali::Toolkit::Internal::Builder>  builder;
+
+  void operator()(void)
+  {
+    size_t actorCount( targetActorNames.size() );
+    if( builder.Get()->IsPathConstrainer( constrainerName ))
+    {
+      PathConstrainer constrainer = builder.Get()->GetPathConstrainer(constrainerName);
+      if( constrainer )
+      {
+        for(size_t i(0); i<actorCount; ++i )
+        {
+          Actor targetActor = Stage::GetCurrent().GetRootLayer().FindChildByName(targetActorNames[i]);
+          if(targetActor)
+          {
+            constrainer.Remove( targetActor );
+          }
+        }
+      }
+      else
+      {
+        DALI_SCRIPT_WARNING("Constrainer %s not found\n", constrainerName.c_str());
+      }
+    }
+    else if(builder.Get()->IsLinearConstrainer( constrainerName ))
+    {
+      LinearConstrainer constrainer = builder.Get()->GetLinearConstrainer(constrainerName);
+      if( constrainer )
+      {
+        for(size_t i(0); i<actorCount; ++i )
+        {
+          Actor targetActor = Stage::GetCurrent().GetRootLayer().FindChildByName(targetActorNames[i]);
+          if(targetActor)
+          {
+            constrainer.Remove( targetActor );
+          }
+        }
+      }
+      else
+      {
+        DALI_SCRIPT_WARNING("Constrainer %s not found\n", constrainerName.c_str());
+      }
+    }
+    else
+    {
+      DALI_SCRIPT_WARNING("Constrainer %s is not of a valid type\n", constrainerName.c_str());
+    }
+  }
 };
 
 /*
@@ -296,6 +474,115 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
     else
     {
       DALI_SCRIPT_WARNING("Cannot find animations section\n");
+    }
+  }
+  else if("applyConstraint" == *actionName )
+  {
+    OptionalString constrainerName = IsString( IsChild(child, "constrainer") );
+    if( !constrainerName )
+    {
+      DALI_SCRIPT_WARNING("Need to specify a constrainer\n");
+    }
+    else
+    {
+      DelayedConstrainerApply action;
+      action.constrainerName = *constrainerName;
+      action.builder = builder;
+      OptionalChild propertiesNode = IsChild(child, "properties");
+      if(propertiesNode)
+      {
+        const TreeNode::ConstIterator endIter = (*propertiesNode).CEnd();
+        for( TreeNode::ConstIterator iter = (*propertiesNode).CBegin(); endIter != iter; ++iter )
+        {
+          const TreeNode::KeyNodePair& pKeyChild = *iter;
+          OptionalString sourceActorName(IsString(IsChild(pKeyChild.second, "source")));
+          if(!sourceActorName)
+          {
+            DALI_SCRIPT_WARNING("Need to specify source actor to apply the constraint\n");
+            continue;
+          }
+          OptionalString sourcePropertyName( IsString( IsChild(pKeyChild.second, "sourceProperty" ) ) );
+          if(!sourcePropertyName)
+          {
+            DALI_SCRIPT_WARNING("Need to specify source property to apply the constraint\n");
+            continue;
+          }
+
+          OptionalString targetActorName(IsString(IsChild(pKeyChild.second, "target")));
+          if(!targetActorName)
+          {
+            DALI_SCRIPT_WARNING("Need to specify target actor to apply the constraint\n");
+            continue;
+          }
+
+          OptionalString targetPropertyName( IsString( IsChild(pKeyChild.second, "targetProperty" ) ) );
+          if(!targetPropertyName)
+          {
+            DALI_SCRIPT_WARNING("Need to specify target property name to apply the constraint\n");
+            continue;
+          }
+
+          OptionalVector2 range(IsVector2(IsChild(pKeyChild.second, "range")));
+          if(!range)
+          {
+            DALI_SCRIPT_WARNING("Constrainer range not specified\n");
+            continue;
+          }
+
+          Vector2 wrap(-std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+          OptionalVector2 wrapRange(IsVector2(IsChild(pKeyChild.second, "wrap")));
+          if(wrapRange)
+          {
+            wrap = *wrapRange;
+          }
+
+          action.sourceActorNames.push_back(*sourceActorName);
+          action.sourcePropertyNames.push_back(*sourcePropertyName);
+          action.targetActorNames.push_back(*targetActorName);
+          action.targetPropertyNames.push_back(*targetPropertyName);
+          action.ranges.push_back(*range);
+          action.wrapRanges.push_back(wrap);
+        }
+
+        callback = action;
+      }
+    }
+
+
+  }
+  else if("removeConstraints" == *actionName )
+  {
+    OptionalString constrainerName = IsString( IsChild(child, "constrainer") );
+    if( !constrainerName )
+    {
+      DALI_SCRIPT_WARNING("Need to specify a constrainer\n");
+    }
+    else
+    {
+
+      DelayedConstrainerRemove action;
+      action.constrainerName = *constrainerName;
+      action.builder = builder;
+      OptionalChild propertiesNode = IsChild(child, "properties");
+      if(propertiesNode)
+      {
+        const TreeNode::ConstIterator endIter = (*propertiesNode).CEnd();
+        for( TreeNode::ConstIterator iter = (*propertiesNode).CBegin(); endIter != iter; ++iter )
+        {
+          const TreeNode::KeyNodePair& pKeyChild = *iter;
+          OptionalString targetActorName(IsString(IsChild(pKeyChild.second, "target")));
+          if(targetActorName)
+          {
+            action.targetActorNames.push_back(*targetActorName);
+          }
+          else
+          {
+            DALI_SCRIPT_WARNING("Need to specify target actor to remove the constraint\n");
+            continue;
+          }
+        }
+      }
+      callback = action;
     }
   }
   else

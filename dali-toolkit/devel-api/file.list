@@ -1,0 +1,147 @@
+# Add local source files here
+
+devel_api_src_files = \
+  $(devel_api_src_dir)/builder/builder.cpp \
+  $(devel_api_src_dir)/builder/json-parser.cpp \
+  $(devel_api_src_dir)/builder/tree-node.cpp \
+  $(devel_api_src_dir)/controls/bloom-view/bloom-view.cpp \
+  $(devel_api_src_dir)/controls/bubble-effect/bubble-emitter.cpp \
+  $(devel_api_src_dir)/controls/effects-view/effects-view.cpp \
+  $(devel_api_src_dir)/controls/magnifier/magnifier.cpp \
+  $(devel_api_src_dir)/controls/page-turn-view/page-factory.cpp \
+  $(devel_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.cpp \
+  $(devel_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.cpp \
+  $(devel_api_src_dir)/controls/page-turn-view/page-turn-view.cpp \
+  $(devel_api_src_dir)/controls/popup/popup.cpp \
+  $(devel_api_src_dir)/controls/shadow-view/shadow-view.cpp \
+  $(devel_api_src_dir)/controls/slider/slider.cpp \
+  $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.cpp \
+  $(devel_api_src_dir)/controls/text-controls/text-selection-popup.cpp \
+  $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \
+  $(devel_api_src_dir)/styling/style-manager.cpp \
+  $(devel_api_src_dir)/scripting/script.cpp \
+  $(devel_api_src_dir)/shader-effects/bubble-effect/bubble-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/bubble-effect/color-adjuster.cpp \
+  $(devel_api_src_dir)/shader-effects/alpha-discard-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/bendy-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/blind-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/bouncing-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/carousel-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/displacement-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/dissolve-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/dissolve-local-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/distance-field-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/image-region-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/iris-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/mask-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/mirror-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/motion-blur-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/motion-stretch-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/nine-patch-mask-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/overlay-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/page-turn-book-spine-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/page-turn-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/quadratic-bezier.cpp \
+  $(devel_api_src_dir)/shader-effects/ripple-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/ripple2d-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/shear-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/soft-button-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/spot-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/square-dissolve-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/swirl-effect.cpp \
+  $(devel_api_src_dir)/shader-effects/water-effect.cpp \
+  $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
+  $(devel_api_src_dir)/transition-effects/cube-transition-effect.cpp \
+  $(devel_api_src_dir)/transition-effects/cube-transition-fold-effect.cpp \
+  $(devel_api_src_dir)/transition-effects/cube-transition-wave-effect.cpp
+
+# Add devel header files here
+
+devel_api_bloom_view_header_files = \
+  $(devel_api_src_dir)/controls/bloom-view/bloom-view.h
+
+devel_api_bubble_effect_header_files =  \
+  $(devel_api_src_dir)/shader-effects/bubble-effect/bubble-effect.h \
+  $(devel_api_src_dir)/shader-effects/bubble-effect/color-adjuster.h
+
+devel_api_bubble_emitter_header_files = \
+  $(devel_api_src_dir)/controls/bubble-effect/bubble-emitter.h
+
+devel_api_builder_header_files = \
+  $(devel_api_src_dir)/builder/builder.h \
+  $(devel_api_src_dir)/builder/json-parser.h \
+  $(devel_api_src_dir)/builder/tree-node.h
+
+devel_api_effects_view_header_files = \
+  $(devel_api_src_dir)/controls/effects-view/effects-view.h
+
+devel_api_magnifier_header_files = \
+  $(devel_api_src_dir)/controls/magnifier/magnifier.h
+
+devel_api_page_turn_view_header_files = \
+  $(devel_api_src_dir)/controls/page-turn-view/page-factory.h \
+  $(devel_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.h \
+  $(devel_api_src_dir)/controls/page-turn-view/page-turn-portrait-view.h \
+  $(devel_api_src_dir)/controls/page-turn-view/page-turn-view.h
+
+devel_api_popup_header_files = \
+  $(devel_api_src_dir)/controls/popup/popup.h
+
+devel_api_shadow_view_header_files = \
+  $(devel_api_src_dir)/controls/shadow-view/shadow-view.h
+
+devel_api_slider_header_files = \
+  $(devel_api_src_dir)/controls/slider/slider.h
+
+devel_api_styling_header_files = \
+  $(devel_api_src_dir)/styling/style-manager.h
+
+devel_api_scripting_header_files = \
+  $(devel_api_src_dir)/scripting/script.h \
+  $(devel_api_src_dir)/scripting/script-plugin.h
+
+devel_api_shader_effects_header_files = \
+  $(devel_api_src_dir)/shader-effects/alpha-discard-effect.h \
+  $(devel_api_src_dir)/shader-effects/bendy-effect.h \
+  $(devel_api_src_dir)/shader-effects/blind-effect.h \
+  $(devel_api_src_dir)/shader-effects/bouncing-effect.h \
+  $(devel_api_src_dir)/shader-effects/carousel-effect.h \
+  $(devel_api_src_dir)/shader-effects/displacement-effect.h \
+  $(devel_api_src_dir)/shader-effects/dissolve-effect.h \
+  $(devel_api_src_dir)/shader-effects/dissolve-local-effect.h \
+  $(devel_api_src_dir)/shader-effects/distance-field-effect.h \
+  $(devel_api_src_dir)/shader-effects/image-region-effect.h \
+  $(devel_api_src_dir)/shader-effects/iris-effect.h \
+  $(devel_api_src_dir)/shader-effects/mask-effect.h \
+  $(devel_api_src_dir)/shader-effects/mirror-effect.h \
+  $(devel_api_src_dir)/shader-effects/motion-blur-effect.h \
+  $(devel_api_src_dir)/shader-effects/motion-stretch-effect.h \
+  $(devel_api_src_dir)/shader-effects/nine-patch-mask-effect.h \
+  $(devel_api_src_dir)/shader-effects/overlay-effect.h \
+  $(devel_api_src_dir)/shader-effects/page-turn-book-spine-effect.h \
+  $(devel_api_src_dir)/shader-effects/page-turn-effect.h \
+  $(devel_api_src_dir)/shader-effects/quadratic-bezier.h \
+  $(devel_api_src_dir)/shader-effects/ripple-effect.h \
+  $(devel_api_src_dir)/shader-effects/ripple2d-effect.h \
+  $(devel_api_src_dir)/shader-effects/shear-effect.h \
+  $(devel_api_src_dir)/shader-effects/soft-button-effect.h \
+  $(devel_api_src_dir)/shader-effects/spot-effect.h \
+  $(devel_api_src_dir)/shader-effects/square-dissolve-effect.h \
+  $(devel_api_src_dir)/shader-effects/swirl-effect.h \
+  $(devel_api_src_dir)/shader-effects/water-effect.h
+
+devel_api_super_blur_view_header_files = \
+  $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.h
+
+devel_api_text_selection_popup_header_files = \
+  $(devel_api_src_dir)/controls/text-controls/text-selection-popup.h
+
+devel_api_tool_bar_header_files = \
+  $(devel_api_src_dir)/controls/tool-bar/tool-bar.h
+
+devel_api_transition_effects_header_files = \
+  $(devel_api_src_dir)/transition-effects/cube-transition-effect.h \
+  $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.h \
+  $(devel_api_src_dir)/transition-effects/cube-transition-fold-effect.h \
+  $(devel_api_src_dir)/transition-effects/cube-transition-wave-effect.h
+

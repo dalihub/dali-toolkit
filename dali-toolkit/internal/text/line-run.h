@@ -45,7 +45,8 @@ struct LineRun
   float              ascender;       ///< The line's ascender.
   float              descender;      ///< The line's descender.
   float              extraLength;    ///< The length of the white spaces at the end of the line.
-  CharacterDirection direction;      ///< Direction of the first character of the paragraph.
+  CharacterDirection direction : 1;  ///< Direction of the first character of the paragraph.
+  bool               ellipsis  : 1;  ///< Wheter ellipsis is added to the line.
 };
 
 } // namespace Text

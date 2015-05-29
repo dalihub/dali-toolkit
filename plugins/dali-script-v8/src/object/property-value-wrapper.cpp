@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/object/property-array.h>
 
 // INTERNAL INCLUDES
 #include <v8-utils.h>
@@ -89,7 +90,7 @@ void SetY( Dali::Property::Value &value, S& v)
 {
   T tmp = value.Get<T>();
   tmp.y = v;
-  value = tmp ;
+  value = tmp;
 }
 
 template <typename T, typename S>
@@ -97,7 +98,7 @@ void SetZ( Dali::Property::Value &value, S& v)
 {
   T tmp = value.Get<T>();
   tmp.z = v;
-  value = tmp ;
+  value = tmp;
 }
 
 template <typename T, typename S>
@@ -105,14 +106,14 @@ void SetW( Dali::Property::Value &value, S& v)
 {
   T tmp = value.Get<T>();
   tmp.w = v;
-  value = tmp ;
+  value = tmp;
 }
 template <typename T, typename S>
 void SetWidth( Dali::Property::Value &value, S& v)
 {
   T tmp = value.Get<T>();
   tmp.width = v;
-  value = tmp ;
+  value = tmp;
 }
 
 template <typename T, typename S>
@@ -120,7 +121,7 @@ void SetHeight( Dali::Property::Value &value, S& v)
 {
   T tmp = value.Get<T>();
   tmp.height = v;
-  value = tmp ;
+  value = tmp;
 }
 
 v8::Handle< v8::Value > GetV8ValueFrom( v8::Isolate* isolate,
@@ -142,13 +143,13 @@ v8::Handle< v8::Value > GetV8ValueFrom( v8::Isolate* isolate,
 
       if( field == "x" || field == "width" )
       {
-        Dali::Vector2 v2 = value.Get<Dali::Vector2>() ;
-        ret = v8::Number::New( isolate, v2.x) ;
+        Dali::Vector2 v2 = value.Get<Dali::Vector2>();
+        ret = v8::Number::New( isolate, v2.x);
       }
       else if(field == "y" || field == "height")
       {
-        Dali::Vector2 v2 = value.Get<Dali::Vector2>() ;
-        ret = v8::Number::New( isolate, v2.y) ;
+        Dali::Vector2 v2 = value.Get<Dali::Vector2>();
+        ret = v8::Number::New( isolate, v2.y);
       }
 
       break;
@@ -159,18 +160,18 @@ v8::Handle< v8::Value > GetV8ValueFrom( v8::Isolate* isolate,
 
       if(field == "x" || field == "width" || field == "r")
       {
-        Dali::Vector3 v3 = value.Get<Dali::Vector3>() ;
-        ret = v8::Number::New( isolate, v3.x) ;
+        Dali::Vector3 v3 = value.Get<Dali::Vector3>();
+        ret = v8::Number::New( isolate, v3.x);
       }
       else if(field == "y" || field == "height" || field == "g")
       {
-        Dali::Vector3 v3 = value.Get<Dali::Vector3>() ;
-        ret = v8::Number::New( isolate, v3.y) ;
+        Dali::Vector3 v3 = value.Get<Dali::Vector3>();
+        ret = v8::Number::New( isolate, v3.y);
       }
       else if(field == "z" || field == "depth" || field == "b")
       {
-        Dali::Vector3 v3 = value.Get<Dali::Vector3>() ;
-        ret = v8::Number::New( isolate, v3.z) ;
+        Dali::Vector3 v3 = value.Get<Dali::Vector3>();
+        ret = v8::Number::New( isolate, v3.z);
       }
       break;
     }
@@ -180,23 +181,23 @@ v8::Handle< v8::Value > GetV8ValueFrom( v8::Isolate* isolate,
 
       if(field == "x" || field == "s" || field == "r")
       {
-        Dali::Vector4 v4 = value.Get<Dali::Vector4>() ;
-        ret = v8::Number::New( isolate, v4.x) ;
+        Dali::Vector4 v4 = value.Get<Dali::Vector4>();
+        ret = v8::Number::New( isolate, v4.x);
       }
       else if(field == "y" || field == "g" || field == "t")
       {
-        Dali::Vector4 v4 = value.Get<Dali::Vector4>() ;
-        ret = v8::Number::New( isolate, v4.y) ;
+        Dali::Vector4 v4 = value.Get<Dali::Vector4>();
+        ret = v8::Number::New( isolate, v4.y);
       }
       else if(field == "z" || field == "r" || field == "b")
       {
-        Dali::Vector4 v4 = value.Get<Dali::Vector4>() ;
-        ret = v8::Number::New( isolate, v4.z) ;
+        Dali::Vector4 v4 = value.Get<Dali::Vector4>();
+        ret = v8::Number::New( isolate, v4.z);
       }
       else if(field == "w" || field == "a" || field == "q")
       {
-        Dali::Vector4 v4 = value.Get<Dali::Vector4>() ;
-        ret = v8::Number::New( isolate, v4.w) ;
+        Dali::Vector4 v4 = value.Get<Dali::Vector4>();
+        ret = v8::Number::New( isolate, v4.w);
       }
 
       break;
@@ -208,17 +209,17 @@ v8::Handle< v8::Value > GetV8ValueFrom( v8::Isolate* isolate,
       if(field == "roll")
       {
         Dali::Vector4 v4 = value.Get<Dali::Quaternion>().EulerAngles();
-        ret = v8::Number::New( isolate, v4.z) ;
+        ret = v8::Number::New( isolate, v4.z);
       }
       else if(field == "pitch")
       {
         Dali::Vector4 v4 = value.Get<Dali::Quaternion>().EulerAngles();
-        ret = v8::Number::New( isolate, v4.x) ;
+        ret = v8::Number::New( isolate, v4.x);
       }
       else if(field == "yaw")
       {
         Dali::Vector4 v4 = value.Get<Dali::Quaternion>().EulerAngles();
-        ret = v8::Number::New( isolate, v4.y) ;
+        ret = v8::Number::New( isolate, v4.y);
       }
 
        else if(field == "axis")
@@ -243,23 +244,23 @@ v8::Handle< v8::Value > GetV8ValueFrom( v8::Isolate* isolate,
 
       if(field == "x")
       {
-        Dali::Rect<int> r = value.Get<Dali::Rect<int> >() ;
-        ret = v8::Number::New( isolate, r.x) ;
+        Dali::Rect<int> r = value.Get<Dali::Rect<int> >();
+        ret = v8::Number::New( isolate, r.x);
       }
       else if(field == "y")
       {
-        Dali::Rect<int> r = value.Get<Dali::Rect<int> >() ;
-        ret = v8::Number::New( isolate, r.y) ;
+        Dali::Rect<int> r = value.Get<Dali::Rect<int> >();
+        ret = v8::Number::New( isolate, r.y);
       }
       else if(field == "width")
       {
-        Dali::Rect<int> r = value.Get<Dali::Rect<int> >() ;
-        ret = v8::Number::New( isolate, r.width) ;
+        Dali::Rect<int> r = value.Get<Dali::Rect<int> >();
+        ret = v8::Number::New( isolate, r.width);
       }
       else if(field == "height")
       {
-        Dali::Rect<int> r = value.Get<Dali::Rect<int> >() ;
-        ret = v8::Number::New( isolate, r.height) ;
+        Dali::Rect<int> r = value.Get<Dali::Rect<int> >();
+        ret = v8::Number::New( isolate, r.height);
       }
       break;
     }
@@ -319,11 +320,11 @@ void SetFromV8Value(v8::Isolate* isolate,
     {
       if(field == "x" || field == "width")
       {
-        SetX<Dali::Vector2>(value, asFloat) ;
+        SetX<Dali::Vector2>(value, asFloat);
       }
       else if(field == "y" || field == "height")
       {
-        SetY<Dali::Vector2>(value, asFloat) ;
+        SetY<Dali::Vector2>(value, asFloat);
       }
       else
       {
@@ -336,15 +337,15 @@ void SetFromV8Value(v8::Isolate* isolate,
     {
       if(field == "x" || field == "width" || field == "r")
       {
-        SetX<Dali::Vector3>(value, asFloat) ;
+        SetX<Dali::Vector3>(value, asFloat);
       }
       else if(field == "y" || field == "height" || field == "g")
       {
-        SetY<Dali::Vector3>(value, asFloat) ;
+        SetY<Dali::Vector3>(value, asFloat);
       }
       else if(field == "z" || field == "depth" || field == "b")
       {
-        SetZ<Dali::Vector3>(value, asFloat) ;
+        SetZ<Dali::Vector3>(value, asFloat);
       }
       else
       {
@@ -357,19 +358,19 @@ void SetFromV8Value(v8::Isolate* isolate,
     {
       if(field == "x" || field == "s" || field == "r")
       {
-        SetX<Dali::Vector4>(value, asFloat) ;
+        SetX<Dali::Vector4>(value, asFloat);
       }
       else if(field == "y" || field == "g" || field == "t")
       {
-        SetY<Dali::Vector4>(value, asFloat) ;
+        SetY<Dali::Vector4>(value, asFloat);
       }
       else if(field == "z" || field == "r" || field == "b")
       {
-        SetZ<Dali::Vector4>(value, asFloat) ;
+        SetZ<Dali::Vector4>(value, asFloat);
       }
       else if(field == "w" || field == "a" || field == "q")
       {
-        SetW<Dali::Vector4>(value, asFloat) ;
+        SetW<Dali::Vector4>(value, asFloat);
       }
       else
       {
@@ -441,15 +442,15 @@ void SetFromV8Value(v8::Isolate* isolate,
     {
       if(field == "x")
       {
-        SetX<Dali::Rect<int> >(value, asInt) ;
+        SetX<Dali::Rect<int> >(value, asInt);
       }
       else if(field == "y")
       {
-        SetY<Dali::Rect<int> >(value, asInt) ;
+        SetY<Dali::Rect<int> >(value, asInt);
       }
       else if(field == "width")
       {
-        SetWidth<Dali::Rect<int> >(value, asInt) ;
+        SetWidth<Dali::Rect<int> >(value, asInt);
       }
       else if(field == "height")
       {
@@ -496,7 +497,7 @@ v8::Local<v8::Object> CreateJavaScriptPrimitive( v8::Isolate* isolate, const Dal
 {
   v8::EscapableHandleScope handleScope( isolate );
 
-  v8::Local<v8::Value> v8Value ;
+  v8::Local<v8::Value> v8Value;
 
   switch( value.GetType() )
    {
@@ -605,12 +606,13 @@ Dali::Property::Value PropertyValueWrapper::ArrayFromV8Array( v8::Isolate* isola
   //Cast v8::Value to v8::Array
   v8::Local<v8::Array> v8Array = v8::Local<v8::Array>::Cast( v8Value );
   uint32_t elementCount = v8Array->Length();
-  Dali::Property::Array data( elementCount );
+  Dali::Property::Array data;
+  data.Reserve( elementCount );
   bool bFound(false);
   for( uint32_t i(0); i<elementCount; ++i )
   {
     //Get Property::Value for each element in the array
-    data[i] = V8Utils::GetPropertyValueFromObject( bFound, isolate, v8Array->Get(i) );
+    data.PushBack( V8Utils::GetPropertyValueFromObject( bFound, isolate, v8Array->Get(i) ) );
   }
 
   //return the Property::Value
@@ -789,7 +791,7 @@ void PropertyValueWrapper::NewRotation( const v8::FunctionCallbackInfo< v8::Valu
   }
   v8::Local<v8::Object > object;
 
-  float v[4] = {0.f,0.f,0.f,0.f} ;
+  float v[4] = {0.f,0.f,0.f,0.f};
 
   bool foundAllArguments(false);
   V8Utils::ReadFloatArguments( foundAllArguments, v, 4, args, 0.f );

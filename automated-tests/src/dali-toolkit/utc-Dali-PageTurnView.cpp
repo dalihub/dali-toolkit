@@ -19,9 +19,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sstream>
-
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/integration-api/events/pan-gesture-event.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-landscape-view.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-portrait-view.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
+
+
 
 using namespace Dali;
 using namespace Dali::Toolkit;

@@ -19,20 +19,20 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/actors/camera-actor.h>
-#include <dali/public-api/common/map-wrapper.h>
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
 #include <dali-toolkit/internal/shader-effects/page-turn-effect-impl.h>
-#include <dali-toolkit/public-api/shader-effects/page-turn-effect.h>
-#include <dali-toolkit/public-api/shader-effects/page-turn-book-spine-effect.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-factory.h>
-#include <dali-toolkit/public-api/controls/shadow-view/shadow-view.h>
+#include <dali-toolkit/devel-api/shader-effects/page-turn-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/page-turn-book-spine-effect.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
+#include <dali-toolkit/devel-api/controls/shadow-view/shadow-view.h>
 
 namespace Dali
 {
@@ -199,19 +199,14 @@ private: // from Control
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::Control::OnControlStageConncection
+   * @copydoc CustomActorImpl::OnStageConnection()
    */
-  virtual void OnControlStageConnection();
+  virtual void OnStageConnection();
 
   /**
-   * @copydoc Toolkit::Control::OnControlStageDisConnection
+   * @copydoc CustomActorImpl::OnStageDisconnection()
    */
-  virtual void OnControlStageDisconnection();
-
-  /**
-   * @copydoc Toolkit::Control::OnControlSizeSet
-   */
-  virtual void OnControlSizeSet( const Vector3& size );
+  virtual void OnStageDisconnection();
 
 private: // implemented differently by PageTurnLandscapeView and PageTurnPortraitView
 

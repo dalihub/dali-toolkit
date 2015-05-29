@@ -75,7 +75,7 @@ private: // From Control
   /**
    * @copydoc Control::OnStyleChange()
    */
-  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
+  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
 
   /**
    * @copydoc Control::OnRelayout()

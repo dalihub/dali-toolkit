@@ -42,11 +42,11 @@ void utc_dali_toolkit_button_cleanup(void)
 
 namespace
 {
-static bool gButtonClicked = false;
+static bool gIsCalledButtonCallback = false;
 
-static bool ButtonClicked( Button button )
+static bool ButtonCallback( Button button )
 {
-  gButtonClicked = true;
+  gIsCalledButtonCallback = true;
   return false;
 }
 
@@ -60,32 +60,458 @@ const Dali::TouchPoint pointUpOutside( 0, TouchPoint::Up, 10, 10 );
 static float ANIMATION_TIME( 0.5f );
 } // namespace
 
+int UtcDaliButtonConstructorP(void)
+{
+  TestApplication application;
 
+  Button button;
 
-// Positive test case for a method
-int UtcDaliButtonNew(void)
+  DALI_TEST_CHECK( !button );
+  END_TEST;
+}
+
+int UtcDaliButtonCopyConstructorP(void)
+{
+  TestApplication application;
+
+  // Initialize an object, ref count == 1
+  Button button = PushButton::New();
+
+  Button copy( button );
+  DALI_TEST_CHECK( copy );
+  END_TEST;
+}
+
+int UtcDaliButtonAssignmentOperatorP(void)
+{
+  TestApplication application;
+
+  Button button = PushButton::New();
+
+  Button copy( button );
+  DALI_TEST_CHECK( copy );
+
+  DALI_TEST_CHECK( button == copy );
+  END_TEST;
+}
+
+int UtcDaliButtonDownCastP(void)
+{
+  TestApplication application;
+
+  Button button = PushButton::New();
+
+  BaseHandle object(button);
+
+  Button button2 = Button::DownCast( object );
+  DALI_TEST_CHECK(button2);
+
+  Button button3 = DownCast< Button >(object);
+  DALI_TEST_CHECK(button3);
+  END_TEST;
+}
+
+int UtcDaliButtonDownCastN(void)
+{
+  TestApplication application;
+
+  BaseHandle unInitializedObject;
+
+  Button button1 = Button::DownCast( unInitializedObject );
+  DALI_TEST_CHECK( !button1 );
+
+  Button button2 = DownCast< Button >( unInitializedObject );
+  DALI_TEST_CHECK( !button2 );
+  END_TEST;
+}
+
+int UtcDaliButtonSetDisabledP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliButtonNew");
 
-  PushButton pushButton = PushButton::New();
+  Button button = PushButton::New();
 
-  DALI_TEST_CHECK( pushButton );
+  button.SetDisabled( true );
 
-  PushButton pushButton2( pushButton );
+  DALI_TEST_CHECK( button.IsDisabled() );
 
-  DALI_TEST_CHECK( pushButton2 );
+  button.SetDisabled( false );
 
-  pushButton2.Reset();
+  DALI_TEST_CHECK( !button.IsDisabled() );
 
-  // Test down cast
-  Handle handleButton;
-  handleButton = pushButton;
-  Button downCastPushButton = Button::DownCast( handleButton );
-  DALI_TEST_CHECK( downCastPushButton );
-  PushButton downCastPushButton2 = PushButton::DownCast( handleButton );
-  DALI_TEST_CHECK( downCastPushButton2 );
+  button.SetDisabled( true );
 
+  DALI_TEST_CHECK( button.IsDisabled() );
+
+  button.SetDisabled( false );
+
+  DALI_TEST_CHECK( !button.IsDisabled() );
+  END_TEST;
+}
+
+int UtcDaliButtonIsDisabledP(void)
+{
+  ToolkitTestApplication application;
+
+  Button button = PushButton::New();
+
+  button.SetDisabled( true );
+
+  DALI_TEST_CHECK( button.IsDisabled() );
+
+  button.SetDisabled( false );
+
+  DALI_TEST_CHECK( !button.IsDisabled() );
+  END_TEST;
+}
+
+int UtcDaliButtonSetAutoRepeatingP(void)
+{
+  ToolkitTestApplication application;
+
+  Button button = PushButton::New();
+
+  button.SetAutoRepeating( true );
+
+  DALI_TEST_CHECK( button.IsAutoRepeating() );
+
+  button.SetAutoRepeating( false );
+
+  DALI_TEST_CHECK( !button.IsAutoRepeating() );
+
+  button.SetAutoRepeating( true );
+
+  DALI_TEST_CHECK( button.IsAutoRepeating() );
+
+  button.SetAutoRepeating( false );
+
+  DALI_TEST_CHECK( !button.IsAutoRepeating() );
+  END_TEST;
+}
+
+int UtcDaliButtonIsAutoRepeatingP(void)
+{
+  ToolkitTestApplication application;
+
+  Button button = PushButton::New();
+
+  button.SetAutoRepeating( true );
+
+  DALI_TEST_CHECK( button.IsAutoRepeating() );
+
+  button.SetAutoRepeating( false );
+
+  DALI_TEST_CHECK( !button.IsAutoRepeating() );
+  END_TEST;
+}
+
+int UtcDaliButtonSetInitialAutoRepeatingDelayP(void)
+{
+  ToolkitTestApplication application;
+
+  Button button = PushButton::New();
+
+  button.SetInitialAutoRepeatingDelay( 0.5f );
+
+  DALI_TEST_EQUALS( button.GetInitialAutoRepeatingDelay(), 0.5f, TEST_LOCATION );
+
+  button.SetInitialAutoRepeatingDelay( 0.2f );
+
+  DALI_TEST_EQUALS( button.GetInitialAutoRepeatingDelay(), 0.2f, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliButtonSetNextAutoRepeatingDelayP(void)
+{
+  ToolkitTestApplication application;
+
+  Button button = PushButton::New();
+
+  button.SetNextAutoRepeatingDelay( 0.5f );
+
+  DALI_TEST_EQUALS( button.GetNextAutoRepeatingDelay(), 0.5f, TEST_LOCATION );
+
+  button.SetNextAutoRepeatingDelay( 0.2f );
+
+  DALI_TEST_EQUALS( button.GetNextAutoRepeatingDelay(), 0.2f, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliButtonSetTogglableButtonP(void)
+{
+  ToolkitTestApplication application;
+
+  Button button = PushButton::New();
+
+  button.SetTogglableButton( true );
+
+  DALI_TEST_CHECK( button.IsTogglableButton() );
+
+  button.SetTogglableButton( false );
+
+  DALI_TEST_CHECK( !button.IsTogglableButton() );
+  END_TEST;
+}
+
+int UtcDaliButtonSetSelectedP(void)
+{
+  ToolkitTestApplication application;
+
+  Button button = PushButton::New();
+  button.SetTogglableButton( true );
+
+  button.SetSelected( true );
+
+  DALI_TEST_CHECK( button.IsSelected() );
+
+  button.SetSelected( false );
+
+  DALI_TEST_CHECK( !button.IsSelected() );
+  END_TEST;
+}
+
+int UtcDaliButtonSetAnimationTimeP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliButtonSetAnimationTimeP");
+
+  Button button = PushButton::New();
+
+  button.SetAnimationTime( ANIMATION_TIME );
+
+  DALI_TEST_EQUALS( button.GetAnimationTime(), ANIMATION_TIME, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliButtonSetLabelStringP(void)
+{
+  ToolkitTestApplication application;
+
+  Button button = PushButton::New();
+
+  button.SetLabel( "Button Label" );
+
+  DALI_TEST_CHECK( button.GetLabel() );
+  END_TEST;
+}
+
+int UtcDaliButtonSetLabelActorP(void)
+{
+  ToolkitTestApplication application;
+
+  Button button = PushButton::New();
+
+  TextLabel textLabel = TextLabel::New( "Button Label" );
+  button.SetLabel( textLabel );
+
+  DALI_TEST_CHECK( button.GetLabel() );
+  END_TEST;
+}
+
+int UtcDaliButtonPressedSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliButtonPressedSignalP");
+
+  Button button = PushButton::New();
+  button.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  button.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  button.SetPosition( 240, 400 );
+  button.SetSize( 100, 100 );
+
+  Stage::GetCurrent().Add( button );
+
+  application.SendNotification();
+  application.Render();
+
+  // connect to its touch signal
+  button.PressedSignal().Connect( &ButtonCallback );
+  button.ReleasedSignal().Connect( &ButtonCallback );
+
+  Dali::Integration::TouchEvent event;
+
+  // Test1. Touch point down and up inside the button.
+
+  gIsCalledButtonCallback = false;
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointDownInside );
+  application.ProcessEvent( event );
+
+  DALI_TEST_CHECK( gIsCalledButtonCallback );
+
+  gIsCalledButtonCallback = false;
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointUpInside );
+  application.ProcessEvent( event );
+
+  DALI_TEST_CHECK( gIsCalledButtonCallback );
+
+  // Test2. Touch point down and up outside the button.
+
+  gIsCalledButtonCallback = false;
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointDownOutside );
+  application.ProcessEvent( event );
+
+  DALI_TEST_CHECK( !gIsCalledButtonCallback );
+
+  gIsCalledButtonCallback = false;
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointUpOutside );
+  application.ProcessEvent( event );
+
+  DALI_TEST_CHECK( !gIsCalledButtonCallback );
+
+  // Test3. Touch point down inside and up outside the button.
+
+  gIsCalledButtonCallback = false;
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointDownInside );
+  application.ProcessEvent( event );
+
+  DALI_TEST_CHECK( gIsCalledButtonCallback );
+
+  gIsCalledButtonCallback = false;
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointLeave );
+  application.ProcessEvent( event );
+
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointUpOutside );
+  application.ProcessEvent( event );
+
+  DALI_TEST_CHECK( gIsCalledButtonCallback );
+
+  // Test4. Touch point down outside and up inside the button.
+
+  gIsCalledButtonCallback = false;
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointDownOutside );
+  application.ProcessEvent( event );
+
+  DALI_TEST_CHECK( !gIsCalledButtonCallback );
+
+  gIsCalledButtonCallback = false;
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointEnter );
+  application.ProcessEvent( event );
+
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointUpInside );
+  application.ProcessEvent( event );
+
+  DALI_TEST_CHECK( !gIsCalledButtonCallback );
+  END_TEST;
+}
+
+int UtcDaliButtonClickedSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliButtonClickedSignalP");
+
+  Button button = PushButton::New();
+  button.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  button.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  button.SetPosition( 240, 400 );
+  button.SetSize( 100, 100 );
+
+  Stage::GetCurrent().Add( button );
+
+  application.SendNotification();
+  application.Render();
+
+  // connect to its touch signal
+  button.ClickedSignal().Connect( &ButtonCallback );
+
+  Dali::Integration::TouchEvent event;
+
+  // Test1. Touch point down and up inside the button.
+
+  gIsCalledButtonCallback = false;
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointDownInside );
+  application.ProcessEvent( event );
+
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointUpInside );
+  application.ProcessEvent( event );
+
+  DALI_TEST_CHECK( gIsCalledButtonCallback );
+
+  // Test2. Touch point down and up outside the button.
+
+  gIsCalledButtonCallback = false;
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointDownOutside );
+  application.ProcessEvent( event );
+
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointUpOutside );
+  application.ProcessEvent( event );
+
+  DALI_TEST_CHECK( !gIsCalledButtonCallback );
+
+  // Test3. Touch point down inside and up outside the button.
+
+  gIsCalledButtonCallback = false;
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointDownInside );
+  application.ProcessEvent( event );
+
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointLeave );
+  application.ProcessEvent( event );
+
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointUpOutside );
+  application.ProcessEvent( event );
+
+  DALI_TEST_CHECK( !gIsCalledButtonCallback );
+
+  // Test4. Touch point down outside and up inside the button.
+
+  gIsCalledButtonCallback = false;
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointDownOutside );
+  application.ProcessEvent( event );
+
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointEnter );
+  application.ProcessEvent( event );
+
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointUpInside );
+  application.ProcessEvent( event );
+
+  DALI_TEST_CHECK( !gIsCalledButtonCallback );
+  END_TEST;
+}
+
+int UtcDaliButtonStateChangedSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliButtonStateChangedSignalP");
+
+  Button button = PushButton::New();
+  button.SetTogglableButton( true );
+
+  Stage::GetCurrent().Add( button );
+
+  application.SendNotification();
+  application.Render();
+
+  // connect to its signal
+  button.StateChangedSignal().Connect( &ButtonCallback );
+
+  gIsCalledButtonCallback = false;
+  button.SetSelected( true );
+
+  DALI_TEST_CHECK( gIsCalledButtonCallback );
+
+  gIsCalledButtonCallback = false;
+  button.SetSelected( false );
+
+  DALI_TEST_CHECK( gIsCalledButtonCallback );
   END_TEST;
 }
 
@@ -100,31 +526,6 @@ int UtcDaliButtonSetProperty(void)
   DALI_TEST_CHECK( false == pushButton.IsDisabled() );
   pushButton.SetProperty(pushButton.GetPropertyIndex("disabled"), true);
   DALI_TEST_CHECK( true == pushButton.IsDisabled() );
-  END_TEST;
-}
-
-int UtcDaliButtonSetGetDimmed(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliButtonSetGetDimmed");
-
-  PushButton pushButton = PushButton::New();
-
-  pushButton.SetDisabled( true );
-
-  DALI_TEST_CHECK( pushButton.IsDisabled() );
-
-  pushButton.SetDisabled( false );
-
-  DALI_TEST_CHECK( !pushButton.IsDisabled() );
-
-  pushButton.SetDisabled( true );
-
-  DALI_TEST_CHECK( pushButton.IsDisabled() );
-
-  pushButton.SetDisabled( false );
-
-  DALI_TEST_CHECK( !pushButton.IsDisabled() );
   END_TEST;
 }
 
@@ -156,160 +557,5 @@ int UtcDaliButtonSize(void)
 
   DALI_TEST_EQUALS( size.width, 10.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 10.f, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliButtonClicked(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliButtonClicked");
-
-  PushButton pushButton = PushButton::New();
-  pushButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  pushButton.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  pushButton.SetPosition( 240, 400 );
-  pushButton.SetSize( 100, 100 );
-
-  Stage::GetCurrent().Add( pushButton );
-
-  application.SendNotification();
-  application.Render();
-
-  // connect to its touch signal
-  pushButton.ClickedSignal().Connect( &ButtonClicked );
-
-  Dali::Integration::TouchEvent event;
-
-  // Test1. Touch point down and up inside the button.
-
-  gButtonClicked = false;
-  event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownInside );
-  application.ProcessEvent( event );
-
-  event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpInside );
-  application.ProcessEvent( event );
-
-  DALI_TEST_CHECK( gButtonClicked );
-
-  // Test2. Touch point down and up outside the button.
-
-  gButtonClicked = false;
-  event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownOutside );
-  application.ProcessEvent( event );
-
-  event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpOutside );
-  application.ProcessEvent( event );
-
-  DALI_TEST_CHECK( !gButtonClicked );
-
-  // Test3. Touch point down inside and up outside the button.
-
-  gButtonClicked = false;
-  event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownInside );
-  application.ProcessEvent( event );
-
-  event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointLeave );
-  application.ProcessEvent( event );
-
-  event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpOutside );
-  application.ProcessEvent( event );
-
-  DALI_TEST_CHECK( !gButtonClicked );
-
-  // Test4. Touch point down outside and up inside the button.
-
-  gButtonClicked = false;
-  event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownOutside );
-  application.ProcessEvent( event );
-
-  event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointEnter );
-  application.ProcessEvent( event );
-
-  event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpInside );
-  application.ProcessEvent( event );
-
-  DALI_TEST_CHECK( !gButtonClicked );
-  END_TEST;
-}
-
-namespace
-{
-
-static bool gClickedCallBackCalled;
-
-static bool TestClickedCallback(Button button)
-{
-  gClickedCallBackCalled = true;
-  return true;
-}
-
-} // namespace
-
-int UtcDaliButtonConnectSignal(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliButtonConnectSignal()");
-
-  gClickedCallBackCalled = false;
-
-  PushButton pushButton = PushButton::New();
-  pushButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  pushButton.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  pushButton.SetPosition( 240, 400 );
-  pushButton.SetSize( 100, 100 );
-
-  Stage::GetCurrent().Add( pushButton );
-
-  application.SendNotification();
-  application.Render();
-
-  // connect to its clicked signal
-  pushButton.ClickedSignal().Connect(TestClickedCallback);
-
-  Dali::Integration::TouchEvent event;
-
-  // Touch point down and up inside the button.
-
-  event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointDownInside );
-  application.ProcessEvent( event );
-
-  event = Dali::Integration::TouchEvent();
-  event.AddPoint( pointUpInside );
-  application.ProcessEvent( event );
-
-  DALI_TEST_CHECK( gClickedCallBackCalled == true );
-
-  gClickedCallBackCalled = false;
-  pushButton.ClickedSignal().Disconnect(TestClickedCallback);
-
-  // simulate another touch event
-  application.ProcessEvent( event );
-
-  DALI_TEST_CHECK( gClickedCallBackCalled == false );
-  END_TEST;
-}
-
-int UtcDaliButtonSetGetAnimationTime(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliButtonSetGetAnimationTime");
-
-  PushButton pushButton = PushButton::New();
-
-  pushButton.SetAnimationTime( ANIMATION_TIME );
-
-  DALI_TEST_EQUALS( pushButton.GetAnimationTime(), ANIMATION_TIME, TEST_LOCATION );
-
   END_TEST;
 }

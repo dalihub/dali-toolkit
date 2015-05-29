@@ -197,8 +197,6 @@ const ActorFunctions ActorFunctionTable[]=
     { "FindChildById",     ActorApi::FindChildById,    ACTOR_API },
     { "GetParent" ,        ActorApi::GetParent,        ACTOR_API },
     { "GetActorType" ,     ActorApi::GetActorType,     ACTOR_API }, // custom for javascript
-    { "ApplyPathConstraint",  ActorApi::ApplyPathConstraint,  ACTOR_API }, // custom for javascript
-    { "RemovePathConstraint", ActorApi::RemovePathConstraint, ACTOR_API }, // custom for javascript
 
     // ignore. SetParentOrigin() use Actor.parentOrigin
     // ignore. GetCurrentParentOrigin()  use Actor.parentOrigin
@@ -258,10 +256,6 @@ const ActorFunctions ActorFunctionTable[]=
     { "GetBlendMode",       RenderableActorApi::GetBlendMode,      RENDERABLE_ACTOR_API  },
     { "SetBlendFunc",       RenderableActorApi::SetBlendFunc,      RENDERABLE_ACTOR_API  },
     { "GetBlendFunc",       RenderableActorApi::GetBlendFunc,      RENDERABLE_ACTOR_API  },
-    { "SetBlendEquation",   RenderableActorApi::SetBlendEquation,  RENDERABLE_ACTOR_API  },
-    { "GetBlendEquation",   RenderableActorApi::GetBlendEquation,  RENDERABLE_ACTOR_API  },
-    { "SetBlendColor",      RenderableActorApi::SetBlendColor,     RENDERABLE_ACTOR_API  },
-    { "GetBlendColor",      RenderableActorApi::GetBlendColor,     RENDERABLE_ACTOR_API  },
     { "SetShaderEffect",    RenderableActorApi::SetShaderEffect,   RENDERABLE_ACTOR_API  },
     { "GetShaderEffect",    RenderableActorApi::GetShaderEffect,   RENDERABLE_ACTOR_API  },
     { "RemoveShaderEffect", RenderableActorApi::RemoveShaderEffect,RENDERABLE_ACTOR_API  },
@@ -296,8 +290,6 @@ const ActorFunctions ActorFunctionTable[]=
     { "GetImage",           ImageActorApi::GetImage,              IMAGE_ACTOR_API },
     // ignore SetPixelArea, use imageActor.pixelArea
     // ignore GetPixelArea, use imageActor.pixelArea
-    { "IsPixelAreaSet",     ImageActorApi::IsPixelAreaSet,        IMAGE_ACTOR_API },
-    { "ClearPixelArea",     ImageActorApi::ClearPixelArea,        IMAGE_ACTOR_API },
     // ignore SetStyle, use imageActor.style
     // ignore GetStyle, use imageActor.style
     // ignore SetNinePatchBorder use imageActor.border

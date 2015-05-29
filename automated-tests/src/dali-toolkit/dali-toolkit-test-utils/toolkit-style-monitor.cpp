@@ -48,7 +48,7 @@ public: // Style Information
 public: // Signals
   Dali::StyleMonitor::StyleChangeSignalType& StyleChangeSignal();
 
-  void EmitStyleChangeSignal(StyleChange styleChange)
+  void EmitStyleChangeSignal(StyleChange::Type styleChange)
   {
     mStyleChangeSignal.Emit(Dali::StyleMonitor(this), styleChange);
   }
@@ -96,11 +96,8 @@ const std::string& StyleMonitor::GetTheme() const
 
 void StyleMonitor::SetTheme(std::string path)
 {
-  StyleChange styleChange;
-  styleChange.themeChange = true;
-  styleChange.themeFilePath = path;
   mTheme = path;
-  EmitStyleChangeSignal(styleChange);
+  EmitStyleChangeSignal( StyleChange::THEME_CHANGE );
 }
 
 Dali::StyleMonitor::StyleChangeSignalType& StyleMonitor::StyleChangeSignal()
@@ -170,7 +167,7 @@ StyleMonitor::StyleChangeSignalType& StyleMonitor::StyleChangeSignal()
   return GetImplementation(*this).StyleChangeSignal();
 }
 
-void StyleMonitor::EmitStyleChangeSignal(StyleChange styleChange)
+void StyleMonitor::EmitStyleChangeSignal(StyleChange::Type styleChange)
 {
   GetImplementation(*this).EmitStyleChangeSignal(styleChange);
 }

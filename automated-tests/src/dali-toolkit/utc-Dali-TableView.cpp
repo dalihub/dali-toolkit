@@ -41,6 +41,7 @@ const char* const PROPERTY_NAME_COLUMNS = "columns";
 const char* const PROPERTY_NAME_CELL_PADDING = "cell-padding";
 const char* const PROPERTY_NAME_LAYOUT_ROWS = "layout-rows";
 const char* const PROPERTY_NAME_LAYOUT_COLUMNS = "layout-columns";
+const Vector2 CELL_SIZE( 10, 10 );
 
 static bool gObjectCreatedCallBackCalled;
 
@@ -77,9 +78,9 @@ static void SetupTableViewAndActors(TableView& tableView, Actor& actor1, Actor& 
   actor2 = Actor::New();
   actor3 = Actor::New();
 
-  actor1.SetSize( Dali::Vector2( 10, 10 ) );
-  actor2.SetSize( Dali::Vector2( 10, 10 ) );
-  actor3.SetSize( Dali::Vector2( 10, 10 ) );
+  actor1.SetSize( CELL_SIZE );
+  actor2.SetSize( CELL_SIZE );
+  actor3.SetSize( CELL_SIZE );
 
   tableView.AddChild( actor1, TableView::CellPosition( 0, 0 ) );
   tableView.AddChild( actor2, TableView::CellPosition( 0, 1 ) );
@@ -87,6 +88,17 @@ static void SetupTableViewAndActors(TableView& tableView, Actor& actor1, Actor& 
 }
 
 } // namespace
+
+int UtcDaliTableViewCtorCopyP(void)
+{
+  TestApplication application;
+
+  TableView actor1 = TableView::New(10,10);
+  TableView actor2( actor1 );
+
+  DALI_TEST_EQUALS( actor1, actor2, TEST_LOCATION );
+  END_TEST;
+}
 
 int UtcDaliTableViewNew(void)
 {
@@ -139,6 +151,42 @@ int UtcDaliTableViewMetricsPadding(void)
 
   DALI_TEST_EQUALS( tableView.GetCellPadding(), Size(5.0f, 10.0f), TEST_LOCATION );
   DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(5.0f, 10.0f, 0.0f), TEST_LOCATION );
+  END_TEST;
+}
+
+// Test adjusting the metric values for the cell.
+int UtcDaliTableViewMetricsFit(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("UtcDaliTableViewMetricsFit");
+
+  TableView tableView;
+  Actor actor1;
+  Actor actor2;
+  Actor actor3;
+
+  SetupTableViewAndActors(tableView, actor1, actor2, actor3);
+  application.SendNotification();
+  application.Render();
+
+  // 1. check that with no fixed width/heights, actors are in default position.
+  DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentPosition(), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetCurrentPosition(), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
+
+  // 2. check that with a fixed width & height, actors to the right and below are offsetted.
+  tableView.SetFitHeight(0);
+  tableView.SetFitWidth(0);
+  DALI_TEST_EQUALS( tableView.IsFitHeight(0), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( tableView.IsFitWidth(0), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentPosition(), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetCurrentPosition(), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
   END_TEST;
 }
 
@@ -389,6 +437,10 @@ int UtcDaliTableViewCells(void)
   // Add child outside table size, forcing a resize.
   tableView.AddChild(actor1, TableView::CellPosition(110, 110, 5, 5));
   DALI_TEST_CHECK( tableView.GetRows() == 115 && tableView.GetColumns() == 115 );
+
+  // Set the alignment of the cell
+  tableView.SetCellAlignment( TableView::CellPosition(100, 100, 1, 1), HorizontalAlignment::CENTER, VerticalAlignment::CENTER );
+  tableView.SetCellAlignment( TableView::CellPosition(110, 110, 5, 5), HorizontalAlignment::LEFT, VerticalAlignment::TOP );
 
   DALI_TEST_CHECK( true );
   END_TEST;

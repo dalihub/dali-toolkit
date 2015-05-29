@@ -90,7 +90,8 @@ public:
       SELECTION_HANDLE_PRESSED_IMAGE_LEFT,      ///< name "selection-handle-pressed-image-left"  The image to display when the left selection handle is pressed,           type STRING
       SELECTION_HANDLE_PRESSED_IMAGE_RIGHT,     ///< name "selection-handle-pressed-image-right" The image to display when the right selection handle is pressed,          type STRING
       SELECTION_HIGHLIGHT_COLOR,                ///< name "selection-highlight-color"            The color of the selection highlight,                                     type VECTOR4
-      DECORATION_BOUNDING_BOX                   ///< name "decoration-bounding-box"              The decorations (handles etc) will positioned within this area on-screen, type RECTANGLE
+      DECORATION_BOUNDING_BOX,                  ///< name "decoration-bounding-box"              The decorations (handles etc) will positioned within this area on-screen, type RECTANGLE
+      INPUT_METHOD_SETTINGS                     ///< name "input-method-settings"                The settings to relating to the System's Input Method, Key and Value      type MAP
     };
   };
 

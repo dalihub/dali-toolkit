@@ -502,7 +502,7 @@ void LogicalModel::SetVisualToLogicalMap( const BidirectionalLineInfoRun* const 
       if( bidirectionalParagraph &&
           ( bidirectionalParagraph->characterRun.characterIndex == index ) )
       {
-        isRightToLeftParagraph = true;
+        isRightToLeftParagraph = *( modelCharacterDirections + index );
       }
 
       if( 0u == index )

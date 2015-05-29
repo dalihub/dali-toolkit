@@ -17,8 +17,10 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <dali/integration-api/events/key-event-integ.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/styling/style-manager.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -52,6 +54,15 @@ const char* const PROPERTY_NAME_GRAB_HANDLE_IMAGE       = "grab-handle-image";
 const char* const PROPERTY_NAME_DECORATION_BOUNDING_BOX = "decoration-bounding-box";
 const char* const PROPERTY_NAME_HORIZONTAL_ALIGNMENT    = "horizontal-alignment";
 const char* const PROPERTY_NAME_VERTICAL_ALIGNMENT      = "vertical-alignment";
+
+static bool gMaxCharactersCallBackCalled;
+
+static void TestMaxLengthReachedCallback( TextField control )
+{
+  tet_infoline(" TestMaxLengthReachedCallbackCallback");
+
+  gMaxCharactersCallBackCalled = true;
+}
 
 } // namespace
 
@@ -321,3 +332,71 @@ int utcDaliTextFieldAtlasRenderP(void)
   END_TEST;
 }
 
+// Positive test for Max Characters reached signal.
+int utcDaliTextFieldMaxCharactersReachedP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldMaxCharactersReachedP");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  Stage::GetCurrent().Add(field);
+
+  const int maxNumberOfCharacters = 1;
+  field.SetProperty( TextField::Property::MAX_LENGTH, maxNumberOfCharacters );
+
+  field.SetKeyInputFocus();
+
+  gMaxCharactersCallBackCalled = false;
+  field.MaxLengthReachedSignal().Connect(&TestMaxLengthReachedCallback);
+
+  Dali::Integration::KeyEvent keyevent;
+  keyevent.keyName = "a";
+  keyevent.keyString = "a";
+  keyevent.keyCode = 0;
+  keyevent.keyModifier = 0;
+  keyevent.time = 0;
+  keyevent.state = Integration::KeyEvent::Down;
+
+  application.ProcessEvent( keyevent );
+
+  application.ProcessEvent( keyevent );
+
+  DALI_TEST_CHECK( gMaxCharactersCallBackCalled );
+
+  END_TEST;
+}
+
+// Negative test for Max Characters reached signal.
+int utcDaliTextFieldMaxCharactersReachedN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldMaxCharactersReachedN");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  Stage::GetCurrent().Add(field);
+
+  const int maxNumberOfCharacters = 3;
+  field.SetProperty( TextField::Property::MAX_LENGTH, maxNumberOfCharacters );
+
+  field.SetKeyInputFocus();
+
+  gMaxCharactersCallBackCalled = false;
+  field.MaxLengthReachedSignal().Connect(&TestMaxLengthReachedCallback);
+
+  Dali::Integration::KeyEvent keyevent;
+  keyevent.keyName = "a";
+  keyevent.keyString = "a";
+  keyevent.keyCode = 0;
+  keyevent.keyModifier = 0;
+  keyevent.time = 0;
+  keyevent.state = Integration::KeyEvent::Down;
+
+  application.ProcessEvent( keyevent );
+  application.ProcessEvent( keyevent );
+
+  DALI_TEST_CHECK( !gMaxCharactersCallBackCalled );
+
+  END_TEST;
+}

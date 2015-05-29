@@ -16,28 +16,26 @@ SET(TC_SOURCES
    utc-Dali-CarouselEffect.cpp
    utc-Dali-CheckBoxButton.cpp
    utc-Dali-CubeTransitionEffect.cpp
-   utc-Dali-DepthLayout.cpp
    utc-Dali-DisplacementEffect.cpp
    utc-Dali-DistanceFieldEffect.cpp
    utc-Dali-GaussianBlurView.cpp
    utc-Dali-JsonParser.cpp
    utc-Dali-KeyInputFocusManager.cpp
-   utc-Dali-NavigationControl.cpp
    utc-Dali-OverlayEffect.cpp
-   utc-Dali-Page.cpp
    utc-Dali-PageTurnEffect.cpp
    utc-Dali-PageTurnView.cpp
+   utc-Dali-ScrollBar.cpp
    utc-Dali-ScrollView.cpp
    utc-Dali-ShadowView.cpp
    utc-Dali-ShearEffect.cpp
    utc-Dali-Slider.cpp
    utc-Dali-SoftButtonEffect.cpp
-   utc-Dali-SpiralLayout.cpp
    utc-Dali-SpotEffect.cpp
    utc-Dali-SquareDissolveEffect.cpp
    utc-Dali-TableView.cpp
    utc-Dali-TextField.cpp
    utc-Dali-TextLabel.cpp
+   utc-Dali-TextSelectionPopup.cpp
    utc-Dali-ToolBar.cpp
    utc-Dali-WaterEffect.cpp
    utc-Dali-Button.cpp
@@ -46,7 +44,6 @@ SET(TC_SOURCES
    utc-Dali-DefaultControls.cpp
    utc-Dali-DissolveEffect.cpp
    utc-Dali-FocusManager.cpp
-   utc-Dali-GridLayout.cpp
    utc-Dali-IrisEffect.cpp
    utc-Dali-ItemLayout.cpp
    utc-Dali-ItemView.cpp
@@ -101,6 +98,7 @@ FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
 ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
 
 INCLUDE_DIRECTORIES(
+    ../../../
     ${${CAPI_LIB}_INCLUDE_DIRS}
     dali-toolkit-test-utils
 )
