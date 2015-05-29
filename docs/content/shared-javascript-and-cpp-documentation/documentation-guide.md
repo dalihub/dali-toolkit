@@ -29,10 +29,26 @@ The space between the brackets is the alternative text. This means you will neve
 ~~~
   
 ## Example
-![ ](../assets/img/example-documentation/example-code.png)
-![ ](example-code.png)
 
+Please have a look at the numerous markdown files to see the header and footer requirements.
 
+You can add tags to your headings as follows:
+~~~{.md}
+# MyChapter {#my-chapter}
+~~~
+Which will allow you to link to this section as follows:
+~~~{.md}
+[Go To MyChapter](@ref my-chapter)
+~~~
+
+Code blocks can be enclosed within 2 blocks of 3 tildas(~).
+
+You can even specify your language type, for example:
+~~~{.md}
+~~~{.cpp}
+...
+~~~{.js}
+~~~
 
 #### Why use GitHub flavoured markdown?
  - Table support is good and language specific code blocks are easier to define ( javascript/C++).

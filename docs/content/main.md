@@ -11,14 +11,14 @@
   + [Coordinate System](@ref coordinate-system)
   + [Scene Graph](@ref scene-graph)
   + [Handle / Body Idiom](@ref handle-body-idiom)
-  + Signals
+  + [Signals](@ref signals)
   + [Properties](@ref properties)
-  + Actions
+  + [Actions](@ref actions)
  + Tutorial
   + [Hello World](@ref hello-world)
 
 ### Getting Started
- + How to build DALi on Ubuntu Desktop
+ + [How to build DALi on Ubuntu Desktop](@ref build-ubuntu)
 
 ### Programming Guide
  + [Programming Languages:](@ref programming-languages)
@@ -31,10 +31,9 @@
   + [Event Handling](@ref event-system)
   + [Layouting](@ref size-negotiation)
   + [Image Actor](@ref image-actor)
- + Animation
-  + AnimateTo
-  + AnimateBy
-  + Key Frame Animations
+ + [Animation](@ref animation)
+  + [Basic Framework](@ref animation-basics)
+  + [Key Frame Animations](@ref animation-key-frame)
   + Path Animations
   + [Constraints](@ref constraints)
    + Equal To Constraint
@@ -43,8 +42,6 @@
    + Path Constrainer
   + [Multi-threading Notes](@ref animation-multi-threading-notes)
   + [Shader Animation](@ref animation-shader)
-  + [Example and Usage](@ref animation-example)
-  + [Rotation with quaternions](@ref animation-rotation)
 
 ### Resources
  + Resource Image
