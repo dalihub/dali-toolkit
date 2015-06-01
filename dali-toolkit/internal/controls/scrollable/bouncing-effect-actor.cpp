@@ -97,13 +97,13 @@ Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
   Property::Map vertexFormat;
   vertexFormat["aPosition1"] = Property::VECTOR3;
   vertexFormat["aPosition2"] = Property::VECTOR3;
-  PropertyBuffer vertices = PropertyBuffer::New( PropertyBuffer::STATIC, vertexFormat, 12u );
+  PropertyBuffer vertices = PropertyBuffer::New( vertexFormat, 12u );
   vertices.SetData( vertexData );
 
   unsigned int indexData[18] = { 0,3,1,0,2,3,4,7,5,4,6,7,8,11,9,8,10,11 };
   Property::Map indexFormat;
   indexFormat["indices"] = Property::UNSIGNED_INTEGER;
-  PropertyBuffer indices = PropertyBuffer::New( PropertyBuffer::STATIC, indexFormat, 18u );
+  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 18u );
   indices.SetData( indexData );
 
   Geometry meshGeometry = Geometry::New();

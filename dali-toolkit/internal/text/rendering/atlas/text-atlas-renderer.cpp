@@ -366,8 +366,8 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
   Actor CreateMeshActor( const MeshRecord& meshRecord )
   {
-    PropertyBuffer quadVertices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadVertexFormat, meshRecord.mMesh.mVertices.Size() );
-    PropertyBuffer quadIndices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadIndexFormat, meshRecord.mMesh.mIndices.Size() );
+    PropertyBuffer quadVertices = PropertyBuffer::New( mQuadVertexFormat, meshRecord.mMesh.mVertices.Size() );
+    PropertyBuffer quadIndices = PropertyBuffer::New( mQuadIndexFormat, meshRecord.mMesh.mIndices.Size() );
     quadVertices.SetData( const_cast< AtlasManager::Vertex2D* >( &meshRecord.mMesh.mVertices[ 0 ] ) );
     quadIndices.SetData( const_cast< unsigned int* >( &meshRecord.mMesh.mIndices[ 0 ] ) );
 
@@ -646,8 +646,8 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
     // We will render a quad into this buffer
     unsigned int indices[ 6 ] = { 1, 0, 2, 2, 3, 1 };
-    PropertyBuffer quadVertices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadVertexFormat, 4u );
-    PropertyBuffer quadIndices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadIndexFormat, sizeof(indices)/sizeof(indices[0]) );
+    PropertyBuffer quadVertices = PropertyBuffer::New( mQuadVertexFormat, 4u );
+    PropertyBuffer quadIndices = PropertyBuffer::New( mQuadIndexFormat, sizeof(indices)/sizeof(indices[0]) );
 
     AtlasManager::Vertex2D vertices[ 4 ] = {
     { Vector2( tlx + shadowOffset.x, tly + shadowOffset.y ), Vector2( ZERO, ZERO ) },
@@ -682,8 +682,8 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       normVertexList.PushBack( vertex );
     }
 
-    PropertyBuffer normVertices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadVertexFormat, normVertexList.Size() );
-    PropertyBuffer normIndices = PropertyBuffer::New( PropertyBuffer::STATIC, mQuadIndexFormat, meshRecord.mMesh.mIndices.Size() );
+    PropertyBuffer normVertices = PropertyBuffer::New( mQuadVertexFormat, normVertexList.Size() );
+    PropertyBuffer normIndices = PropertyBuffer::New( mQuadIndexFormat, meshRecord.mMesh.mIndices.Size() );
     normVertices.SetData( const_cast< AtlasManager::Vertex2D* >( &normVertexList[ 0 ] ) );
     normIndices.SetData( const_cast< unsigned int* >( &meshRecord.mMesh.mIndices[ 0 ] ) );
 
