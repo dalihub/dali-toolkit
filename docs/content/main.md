@@ -14,8 +14,7 @@
   + [Signals](@ref signals)
   + [Properties](@ref properties)
   + [Actions](@ref actions)
- + Tutorial
-  + [Hello World](@ref hello-world)
+ + [Tutorial: Hello World](@ref hello-world)
 
 ### Getting Started
  + [How to build DALi on Ubuntu Desktop](@ref build-ubuntu)
@@ -26,7 +25,7 @@
   + [JavaScript](@ref java-script-support)
   + [JSON](@ref json-support)
  + [Application](@ref dali-application)
- + Actors
+ + [Actors](@ref actors-and-stage)
   + [Positioning](@ref positioning-actors)
   + [Event Handling](@ref event-system)
   + [Layouting](@ref size-negotiation)
@@ -34,12 +33,10 @@
  + [Animation](@ref animation)
   + [Basic Framework](@ref animation-basics)
   + [Key Frame Animations](@ref animation-key-frame)
-  + Path Animations
+  + [Path Animations](@ref animation-paths)
   + [Constraints](@ref constraints)
-   + Equal To Constraint
-   + Relative To Constraint
-   + Linear Constrainer
-   + Path Constrainer
+   + [Equal To Constraint](@ref constraints-equal-to)
+   + [Relative To Constraint](@ref constraints-relative-to)
   + [Multi-threading Notes](@ref animation-multi-threading-notes)
   + [Shader Animation](@ref animation-shader)
 
@@ -53,7 +50,7 @@
  + Keyboard Focus
  + Accessibility
 
-### UI Controls
+### UI Components
  + [Text Label](@ref text-label)
  + [Text Field](@ref text-field)
  + Buttons
@@ -75,7 +72,6 @@
  + Environment Variables
  + [Resource Tracking](@ref resourcetracking)
  + Logging
- + GUI Builder
  + [Stagehand - DALi Visual Debugger](@ref stagehand)
 
 ### Viewing Modes
@@ -83,7 +79,7 @@
 
 ### Extending DALi
  + Control Base Class Services
- + How to write Custom UI Controls
+ + How to write Custom UI Components
   + [Size Negotiation for Controls](@ref size-negotiation-controls)
   + [Type Registration](@ref type-registration)
   + How to make Controls Scriptable

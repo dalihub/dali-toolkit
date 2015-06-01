@@ -228,5 +228,24 @@ actor.RemoveConstraints(); // Removes ALL constraints applied to an actor
 actor.RemoveConstraint( tag ); // All constraints with the tag are removed from the actor (tag can be set using SetTag)
 @endcode
 
+\section constraints-equal-to Equal To Constraint
+
+The built in Dali::EqualToConstraint can be used if all that is required is setting a property equal to another property:
+@code
+Dali::Constraint constraint = Dali::Constraint::New< Vector3 >( actor, Dali::Actor::Property::POSITION, Dali::EqualToConstraint() );
+constraint.AddSource( Dali::Source( anotherActor, Dali::Actor::Property::POSITION ) );
+constraint.Apply();
+@endcode
+Here actor's position is set to equal the position of anotherActor.
+
+\section constraints-relative-to Relative To Constraint
+
+The built in Dali::RelativeToConstraint and Dali::RelativeToConstraintFloat can be used if all that is required is setting a property relative to another property:
+@code
+Dali::Constraint constraint = Dali::Constraint::New< Vector3 >( actor, Dali::Actor::Property::POSITION, Dali::RelativeToConstraint( 2.0f ) );
+constraint.AddSource( Dali::Source( anotherActor, Dali::Actor::Property::POSITION ) );
+constraint.Apply();
+@endcode
+Here actor's position is relative to the position of anotherActor, i.e., if anotherActor is at (10.0f, 20.0f, 30.0f), actor will be at (20.0f, 40.0f, 60.0f).
 *
 */

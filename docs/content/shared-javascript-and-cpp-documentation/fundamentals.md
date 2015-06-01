@@ -5,10 +5,14 @@
 
 ## Actors and the Stage {#actors-and-stage}
 
-A DALi application uses a hierachy of Dali::Actor objects to position visible content.  An actor inherits a position relative to its parent, and can be moved relative to this point.  UI controls can be built by combining multiple actors.
-  
-To display the contents of an actor, it must be connected to the Dali::Stage.  This provides an invisible root (top-level) actor, to which all other actors are added.  A direct or indirect child of the root actor is considered "on-stage".  Multi-touch events are received through signals emitted by on-stage actors.
-  
+Actor is the primary object with which DALi applications interact.
+A DALi application uses a hierachy of Dali::Actor objects to position visible content.
+An actor inherits a position relative to its parent, and can be moved relative to this point.
+UI controls can be built by combining multiple actors.
+
+The Stage is a top-level object used for displaying a tree of Actors.
+To display the contents of an actor, it must be added to the Dali::Stage,
+
 The following example shows how to connect a new actor to the stage:
 
 ~~~{.cpp}
