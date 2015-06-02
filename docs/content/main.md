@@ -41,9 +41,9 @@
   + [Shader Animation](@ref animation-shader)
 
 ### Resources
- + Resource Image
- + 9 Patch Image
- + Buffer Image
+ + [Resource Image](@ref resource-image)
+ + [9 Patch Image](@ref resource-9-patch)
+ + [Buffer Image](@ref resource-buffer)
 
 ### Control Base Class
  + [Background Feature](@ref background)
