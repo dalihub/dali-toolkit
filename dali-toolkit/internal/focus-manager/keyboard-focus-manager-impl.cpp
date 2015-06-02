@@ -34,8 +34,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/focus-manager/focus-manager.h>
-#include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>
+#include <dali-toolkit/public-api/focus-manager/accessibility-focus-manager.h>
+#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 
 namespace Dali
 {
@@ -167,10 +167,6 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor(const unsigned int actorID)
 
       // Save the current focused actor
       mCurrentFocusActor = actorID;
-
-      // Move the accessibility focus to the same actor
-//      Toolkit::FocusManager focusManager = Toolkit::FocusManager::Get();
-//      focusManager.SetCurrentFocusActor(actor);
 
       DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] SUCCEED\n", __FUNCTION__, __LINE__);
       return true;
@@ -522,7 +518,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
   AccessibilityManager accessibilityManager = AccessibilityManager::Get();
   bool isAccessibilityEnabled = accessibilityManager.IsEnabled();
 
-  Toolkit::FocusManager accessibilityFocusManager = Toolkit::FocusManager::Get();
+  Toolkit::AccessibilityFocusManager accessibilityFocusManager = Toolkit::AccessibilityFocusManager::Get();
 
   std::string keyName = event.keyPressedName;
 

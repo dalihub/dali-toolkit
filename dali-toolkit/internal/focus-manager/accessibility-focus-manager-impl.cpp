@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "focus-manager-impl.h"
+#include "accessibility-focus-manager-impl.h"
 
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
@@ -107,7 +107,7 @@ bool IsActorFocusableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType 
 
 }
 
-FocusManager::FocusManager()
+AccessibilityFocusManager::AccessibilityFocusManager()
 : mIsWrapped(false),
   mIsFocusWithinGroup(false),
   mIsEndcapFeedbackEnabled(false),
@@ -127,11 +127,11 @@ FocusManager::FocusManager()
   ChangeAccessibilityStatus();
 }
 
-FocusManager::~FocusManager()
+AccessibilityFocusManager::~AccessibilityFocusManager()
 {
 }
 
-FocusManager::ActorAdditionalInfo FocusManager::GetActorAdditionalInfo(const unsigned int actorID) const
+AccessibilityFocusManager::ActorAdditionalInfo AccessibilityFocusManager::GetActorAdditionalInfo(const unsigned int actorID) const
 {
   ActorAdditionalInfo data;
   IDAdditionalInfoConstIter iter = mIDAdditionalInfoContainer.find(actorID);
@@ -143,7 +143,7 @@ FocusManager::ActorAdditionalInfo FocusManager::GetActorAdditionalInfo(const uns
   return data;
 }
 
-void FocusManager::SynchronizeActorAdditionalInfo(const unsigned int actorID, const unsigned int order)
+void AccessibilityFocusManager::SynchronizeActorAdditionalInfo(const unsigned int actorID, const unsigned int order)
 {
   ActorAdditionalInfo actorInfo = GetActorAdditionalInfo(actorID);
   actorInfo.mFocusOrder = order;
@@ -151,7 +151,7 @@ void FocusManager::SynchronizeActorAdditionalInfo(const unsigned int actorID, co
   mIDAdditionalInfoContainer.insert(IDAdditionalInfoPair(actorID, actorInfo));
 }
 
-void FocusManager::SetAccessibilityAttribute(Actor actor, Toolkit::FocusManager::AccessibilityAttribute type, const std::string& text)
+void AccessibilityFocusManager::SetAccessibilityAttribute(Actor actor, Toolkit::AccessibilityFocusManager::AccessibilityAttribute type, const std::string& text)
 {
   if(actor)
   {
@@ -165,7 +165,7 @@ void FocusManager::SetAccessibilityAttribute(Actor actor, Toolkit::FocusManager:
   }
 }
 
-std::string FocusManager::GetAccessibilityAttribute(Actor actor, Toolkit::FocusManager::AccessibilityAttribute type) const
+std::string AccessibilityFocusManager::GetAccessibilityAttribute(Actor actor, Toolkit::AccessibilityFocusManager::AccessibilityAttribute type) const
 {
   std::string text;
 
@@ -178,7 +178,7 @@ std::string FocusManager::GetAccessibilityAttribute(Actor actor, Toolkit::FocusM
   return text;
 }
 
-void FocusManager::SetFocusOrder(Actor actor, const unsigned int order)
+void AccessibilityFocusManager::SetFocusOrder(Actor actor, const unsigned int order)
 {
   // Do nothing if the focus order of the actor is not changed.
   if(actor && GetFocusOrder(actor) != order)
@@ -245,7 +245,7 @@ void FocusManager::SetFocusOrder(Actor actor, const unsigned int order)
   }
 }
 
-unsigned int FocusManager::GetFocusOrder(Actor actor) const
+unsigned int AccessibilityFocusManager::GetFocusOrder(Actor actor) const
 {
   unsigned int focusOrder = 0;
 
@@ -258,7 +258,7 @@ unsigned int FocusManager::GetFocusOrder(Actor actor) const
   return focusOrder;
 }
 
-unsigned int FocusManager::GenerateNewFocusOrder() const
+unsigned int AccessibilityFocusManager::GenerateNewFocusOrder() const
 {
   unsigned int order = 1;
   FocusIDContainer::const_reverse_iterator iter = mFocusIDContainer.rbegin();
@@ -271,7 +271,7 @@ unsigned int FocusManager::GenerateNewFocusOrder() const
   return order;
 }
 
-Actor FocusManager::GetActorByFocusOrder(const unsigned int order)
+Actor AccessibilityFocusManager::GetActorByFocusOrder(const unsigned int order)
 {
   Actor actor = Actor();
 
@@ -285,7 +285,7 @@ Actor FocusManager::GetActorByFocusOrder(const unsigned int order)
   return actor;
 }
 
-bool FocusManager::SetCurrentFocusActor(Actor actor)
+bool AccessibilityFocusManager::SetCurrentFocusActor(Actor actor)
 {
   if(actor)
   {
@@ -295,7 +295,7 @@ bool FocusManager::SetCurrentFocusActor(Actor actor)
   return false;
 }
 
-bool FocusManager::DoSetCurrentFocusActor(const unsigned int actorID)
+bool AccessibilityFocusManager::DoSetCurrentFocusActor(const unsigned int actorID)
 {
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
 
@@ -364,7 +364,7 @@ bool FocusManager::DoSetCurrentFocusActor(const unsigned int actorID)
 
         // Combine attribute texts to one text
         std::string informationText;
-        for(int i = 0; i < Toolkit::FocusManager::ACCESSIBILITY_ATTRIBUTE_NUM; i++)
+        for(int i = 0; i < Toolkit::AccessibilityFocusManager::ACCESSIBILITY_ATTRIBUTE_NUM; i++)
         {
           if(!GetActorAdditionalInfo(actorID).mAccessibilityAttributes[i].empty())
           {
@@ -386,23 +386,23 @@ bool FocusManager::DoSetCurrentFocusActor(const unsigned int actorID)
   return false;
 }
 
-Actor FocusManager::GetCurrentFocusActor()
+Actor AccessibilityFocusManager::GetCurrentFocusActor()
 {
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
   return rootActor.FindChildById(mCurrentFocusActor.second);
 }
 
-Actor FocusManager::GetCurrentFocusGroup()
+Actor AccessibilityFocusManager::GetCurrentFocusGroup()
 {
   return GetFocusGroup(GetCurrentFocusActor());
 }
 
-unsigned int FocusManager::GetCurrentFocusOrder()
+unsigned int AccessibilityFocusManager::GetCurrentFocusOrder()
 {
   return mCurrentFocusActor.first;
 }
 
-bool FocusManager::MoveFocusForward()
+bool AccessibilityFocusManager::MoveFocusForward()
 {
   bool ret = false;
   mRecursiveFocusMoveCounter = 0;
@@ -430,7 +430,7 @@ bool FocusManager::MoveFocusForward()
   return ret;
 }
 
-bool FocusManager::MoveFocusBackward()
+bool AccessibilityFocusManager::MoveFocusBackward()
 {
   bool ret = false;
   mRecursiveFocusMoveCounter = 0;
@@ -459,7 +459,7 @@ bool FocusManager::MoveFocusBackward()
   return ret;
 }
 
-void FocusManager::DoActivate(Actor actor)
+void AccessibilityFocusManager::DoActivate(Actor actor)
 {
   if(actor)
   {
@@ -475,7 +475,7 @@ void FocusManager::DoActivate(Actor actor)
   }
 }
 
-void FocusManager::ClearFocus()
+void AccessibilityFocusManager::ClearFocus()
 {
   Actor actor = GetCurrentFocusActor();
   if(actor)
@@ -496,14 +496,14 @@ void FocusManager::ClearFocus()
   }
 }
 
-void FocusManager::Reset()
+void AccessibilityFocusManager::Reset()
 {
   ClearFocus();
   mFocusIDContainer.clear();
   mIDAdditionalInfoContainer.clear();
 }
 
-void FocusManager::SetFocusGroup(Actor actor, bool isFocusGroup)
+void AccessibilityFocusManager::SetFocusGroup(Actor actor, bool isFocusGroup)
 {
   if(actor)
   {
@@ -520,7 +520,7 @@ void FocusManager::SetFocusGroup(Actor actor, bool isFocusGroup)
   }
 }
 
-bool FocusManager::IsFocusGroup(Actor actor) const
+bool AccessibilityFocusManager::IsFocusGroup(Actor actor) const
 {
   // Check whether the actor is a focus group
   bool isFocusGroup = false;
@@ -537,7 +537,7 @@ bool FocusManager::IsFocusGroup(Actor actor) const
   return isFocusGroup;
 }
 
-Actor FocusManager::GetFocusGroup(Actor actor)
+Actor AccessibilityFocusManager::GetFocusGroup(Actor actor)
 {
   // Go through the actor's hierarchy to check which focus group the actor belongs to
   while (actor && !IsFocusGroup(actor))
@@ -548,37 +548,37 @@ Actor FocusManager::GetFocusGroup(Actor actor)
   return actor;
 }
 
-void FocusManager::SetGroupMode(bool enabled)
+void AccessibilityFocusManager::SetGroupMode(bool enabled)
 {
   mIsFocusWithinGroup = enabled;
 }
 
-bool FocusManager::GetGroupMode() const
+bool AccessibilityFocusManager::GetGroupMode() const
 {
   return mIsFocusWithinGroup;
 }
 
-void FocusManager::SetWrapMode(bool wrapped)
+void AccessibilityFocusManager::SetWrapMode(bool wrapped)
 {
   mIsWrapped = wrapped;
 }
 
-bool FocusManager::GetWrapMode() const
+bool AccessibilityFocusManager::GetWrapMode() const
 {
   return mIsWrapped;
 }
 
-void FocusManager::SetFocusIndicatorActor(Actor indicator)
+void AccessibilityFocusManager::SetFocusIndicatorActor(Actor indicator)
 {
   mFocusIndicatorActor = indicator;
 }
 
-Actor FocusManager::GetFocusIndicatorActor()
+Actor AccessibilityFocusManager::GetFocusIndicatorActor()
 {
   return mFocusIndicatorActor;
 }
 
-bool FocusManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapped)
+bool AccessibilityFocusManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapped)
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] %d focusable actors\n", __FUNCTION__, __LINE__, mFocusIDContainer.size());
   DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] focus order : %d\n", __FUNCTION__, __LINE__, (*focusIDIter).first);
@@ -619,7 +619,7 @@ bool FocusManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapp
     {
       DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Overshot\n", __FUNCTION__, __LINE__);
       // Send notification for handling overshooted situation
-      mFocusOvershotSignal.Emit(GetCurrentFocusActor(), forward ? Toolkit::FocusManager::OVERSHOT_NEXT : Toolkit::FocusManager::OVERSHOT_PREVIOUS);
+      mFocusOvershotSignal.Emit(GetCurrentFocusActor(), forward ? Toolkit::AccessibilityFocusManager::OVERSHOT_NEXT : Toolkit::AccessibilityFocusManager::OVERSHOT_PREVIOUS);
 
       return false; // Try to move the focus out of the scope
     }
@@ -646,7 +646,7 @@ bool FocusManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapp
   return true;
 }
 
-void FocusManager::SetFocusable(Actor actor, bool focusable)
+void AccessibilityFocusManager::SetFocusable(Actor actor, bool focusable)
 {
   if(actor)
   {
@@ -663,7 +663,7 @@ void FocusManager::SetFocusable(Actor actor, bool focusable)
   }
 }
 
-void FocusManager::CreateDefaultFocusIndicatorActor()
+void AccessibilityFocusManager::CreateDefaultFocusIndicatorActor()
 {
   // Create a focus indicator actor shared by all the focusable actors
   Image borderImage = ResourceImage::New(FOCUS_BORDER_IMAGE_PATH);
@@ -680,7 +680,7 @@ void FocusManager::CreateDefaultFocusIndicatorActor()
   SetFocusIndicatorActor(focusIndicator);
 }
 
-bool FocusManager::ChangeAccessibilityStatus()
+bool AccessibilityFocusManager::ChangeAccessibilityStatus()
 {
   AccessibilityManager manager = AccessibilityManager::Get();
   mIsAccessibilityTtsEnabled = manager.IsEnabled();
@@ -712,7 +712,7 @@ bool FocusManager::ChangeAccessibilityStatus()
   return true;
 }
 
-bool FocusManager::AccessibilityActionNext(bool allowEndFeedback)
+bool AccessibilityFocusManager::AccessibilityActionNext(bool allowEndFeedback)
 {
   if(mIsAccessibilityTtsEnabled)
   {
@@ -725,7 +725,7 @@ bool FocusManager::AccessibilityActionNext(bool allowEndFeedback)
   }
 }
 
-bool FocusManager::AccessibilityActionPrevious(bool allowEndFeedback)
+bool AccessibilityFocusManager::AccessibilityActionPrevious(bool allowEndFeedback)
 {
   if(mIsAccessibilityTtsEnabled)
   {
@@ -738,7 +738,7 @@ bool FocusManager::AccessibilityActionPrevious(bool allowEndFeedback)
   }
 }
 
-bool FocusManager::AccessibilityActionActivate()
+bool AccessibilityFocusManager::AccessibilityActionActivate()
 {
   bool ret = false;
 
@@ -752,7 +752,7 @@ bool FocusManager::AccessibilityActionActivate()
   return ret;
 }
 
-bool FocusManager::AccessibilityActionRead(bool allowReadAgain)
+bool AccessibilityFocusManager::AccessibilityActionRead(bool allowReadAgain)
 {
   bool ret = false;
 
@@ -778,7 +778,7 @@ bool FocusManager::AccessibilityActionRead(bool allowReadAgain)
   return ret;
 }
 
-bool FocusManager::AccessibilityActionReadNext(bool allowEndFeedback)
+bool AccessibilityFocusManager::AccessibilityActionReadNext(bool allowEndFeedback)
 {
   if(mIsAccessibilityTtsEnabled)
   {
@@ -790,7 +790,7 @@ bool FocusManager::AccessibilityActionReadNext(bool allowEndFeedback)
   }
 }
 
-bool FocusManager::AccessibilityActionReadPrevious(bool allowEndFeedback)
+bool AccessibilityFocusManager::AccessibilityActionReadPrevious(bool allowEndFeedback)
 {
   if(mIsAccessibilityTtsEnabled)
   {
@@ -802,7 +802,7 @@ bool FocusManager::AccessibilityActionReadPrevious(bool allowEndFeedback)
   }
 }
 
-bool FocusManager::AccessibilityActionUp()
+bool AccessibilityFocusManager::AccessibilityActionUp()
 {
   bool ret = false;
 
@@ -823,7 +823,7 @@ bool FocusManager::AccessibilityActionUp()
   return ret;
 }
 
-bool FocusManager::AccessibilityActionDown()
+bool AccessibilityFocusManager::AccessibilityActionDown()
 {
   bool ret = false;
 
@@ -844,7 +844,7 @@ bool FocusManager::AccessibilityActionDown()
   return ret;
 }
 
-bool FocusManager::ClearAccessibilityFocus()
+bool AccessibilityFocusManager::ClearAccessibilityFocus()
 {
   if(mIsAccessibilityTtsEnabled)
   {
@@ -857,14 +857,14 @@ bool FocusManager::ClearAccessibilityFocus()
   }
 }
 
-bool FocusManager::AccessibilityActionBack()
+bool AccessibilityFocusManager::AccessibilityActionBack()
 {
   // TODO: Back to previous view
 
   return mIsAccessibilityTtsEnabled;
 }
 
-bool FocusManager::AccessibilityActionTouch(const TouchEvent& touchEvent)
+bool AccessibilityFocusManager::AccessibilityActionTouch(const TouchEvent& touchEvent)
 {
   bool handled = false;
 
@@ -879,7 +879,7 @@ bool FocusManager::AccessibilityActionTouch(const TouchEvent& touchEvent)
   return handled;
 }
 
-bool FocusManager::HandlePanGesture(const Integration::PanGestureEvent& panEvent)
+bool AccessibilityFocusManager::HandlePanGesture(const Integration::PanGestureEvent& panEvent)
 {
   bool handled = false;
 
@@ -956,27 +956,27 @@ bool FocusManager::HandlePanGesture(const Integration::PanGestureEvent& panEvent
   return handled;
 }
 
-Toolkit::FocusManager::FocusChangedSignalType& FocusManager::FocusChangedSignal()
+Toolkit::AccessibilityFocusManager::FocusChangedSignalType& AccessibilityFocusManager::FocusChangedSignal()
 {
   return mFocusChangedSignal;
 }
 
-Toolkit::FocusManager::FocusOvershotSignalType& FocusManager::FocusOvershotSignal()
+Toolkit::AccessibilityFocusManager::FocusOvershotSignalType& AccessibilityFocusManager::FocusOvershotSignal()
 {
   return mFocusOvershotSignal;
 }
 
-Toolkit::FocusManager::FocusedActorActivatedSignalType& FocusManager::FocusedActorActivatedSignal()
+Toolkit::AccessibilityFocusManager::FocusedActorActivatedSignalType& AccessibilityFocusManager::FocusedActorActivatedSignal()
 {
   return mFocusedActorActivatedSignal;
 }
 
-bool FocusManager::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool AccessibilityFocusManager::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::BaseHandle handle( object );
 
   bool connected( true );
-  FocusManager* manager = dynamic_cast<FocusManager*>( object );
+  AccessibilityFocusManager* manager = dynamic_cast<AccessibilityFocusManager*>( object );
 
   if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_CHANGED ) )
   {

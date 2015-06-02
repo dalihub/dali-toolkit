@@ -39,9 +39,6 @@ class StyleManager;
 
 namespace Internal
 {
-class FocusManager;
-class KeyboardFocusManager;
-class KeyInputFocusManager;
 
 /**
  * @brief This is the internal base class for all controls.
@@ -228,7 +225,7 @@ public:
   // Called by Focus Manager
 
   /**
-   * @brief Called by the focus manager and keyboard focus manager to Activate the Control
+   * @brief Called by the accessibility focus manager and keyboard focus manager to activate the Control
    */
   DALI_INTERNAL void AccessibilityActivate();
 

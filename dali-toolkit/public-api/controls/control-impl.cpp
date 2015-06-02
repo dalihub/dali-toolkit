@@ -34,7 +34,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>
+#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/styling/style-manager.h>
