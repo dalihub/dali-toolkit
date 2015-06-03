@@ -667,7 +667,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     material.AddSampler( sampler );
 
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
-    renderer.SetDepthIndex( 1.0f );
+    renderer.SetDepthIndex( -1 );
     Actor actor = Actor::New();
     actor.AddRenderer( renderer );
     actor.SetSize( 1.0f, 1.0f );
