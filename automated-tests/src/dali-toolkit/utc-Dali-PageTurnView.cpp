@@ -371,7 +371,6 @@ int UtcDaliPageTurnViewEnterLeaveEditMode(void)
   factory.EnableOffscreenRendering( );
 
   PageTurnView pageTurnView = PageTurnLandscapeView::New( factory, PAGE_SIZE );
-  pageTurnView.SetRelayoutEnabled( false );
   pageTurnView.SetPositionInheritanceMode( USE_PARENT_POSITION );
   Stage::GetCurrent().Add( pageTurnView );
 
@@ -423,7 +422,6 @@ int UtcDaliPageTurnViewGetHitActor(void)
   factory.EnableOffscreenRendering( );
 
   PageTurnView pageTurnView = PageTurnPortraitView::New( factory, PAGE_SIZE );
-  pageTurnView.SetRelayoutEnabled( false );
   pageTurnView.SetParentOrigin( ParentOrigin::TOP_LEFT );
   pageTurnView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( pageTurnView );
@@ -460,7 +458,6 @@ int UtcDaliPageTurnViewRefresh(void)
   TestPageFactory factory(application);
   factory.EnableOffscreenRendering( );
   PageTurnView pageTurnView = PageTurnPortraitView::New( factory, PAGE_SIZE );
-  pageTurnView.SetRelayoutEnabled( false );
   pageTurnView.SetParentOrigin( ParentOrigin::TOP_LEFT );
   pageTurnView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( pageTurnView );
@@ -501,7 +498,6 @@ int UtcDaliPageTurnViewSignals(void)
   TestPageFactory factory(application);
   Vector2 size = Stage::GetCurrent().GetSize();
   PageTurnView portraitView = PageTurnPortraitView::New( factory, size );
-  portraitView.SetRelayoutEnabled( false );
   portraitView.SetPositionInheritanceMode( USE_PARENT_POSITION );
   Stage::GetCurrent().Add( portraitView );
 
