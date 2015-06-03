@@ -1,7 +1,8 @@
 .image
 {
    text-align: left;
-   margin-left: 50px;
+   margin-left: 20px;
+   margin-right: 20px;
 }
 
 div.image img {
