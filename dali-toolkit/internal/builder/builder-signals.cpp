@@ -16,11 +16,11 @@
  */
 
 // EXTERNAL INCLUDES
-#include <boost/function.hpp>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/type-info.h>
 #include <dali/public-api/object/property-notification.h>
+
 #include <dali/integration-api/debug.h>
 #include <limits>
 
@@ -126,6 +126,16 @@ struct GenericAction
     }
 
   };
+};
+
+struct QuitAction
+{
+  Dali::IntrusivePtr<Dali::Toolkit::Internal::Builder> builder;
+
+  void operator()(void)
+  {
+    builder->EmitQuitSignal();
+  }
 };
 
 // Delay an animation play; ie wait as its not on stage yet
@@ -391,12 +401,63 @@ void GetParameters(const TreeNode& child, Property::Map& params)
   }
 }
 
-void DoNothing(void) {};
+// Shim for the property notifcation signal
+template <typename T>
+struct PropertyNotifcationSignalShim
+{
+  T mFunctor;
+
+  PropertyNotifcationSignalShim(T& functor) : mFunctor(functor) {}
+
+  void operator()(PropertyNotification& /* source */)
+  {
+    mFunctor();
+  }
+};
+
+// Specializations for the different signal connection calls between actor & PropertyNotification
+template <typename T>
+struct SignalConnector {};
+
+// Actor specialization
+template <>
+struct SignalConnector<Actor> {
+  Actor& mActor;
+  ConnectionTracker* mTracker;
+  const std::string& mName;
+
+  SignalConnector<Actor>(ConnectionTracker* tracker, Actor& actor, const std::string& name)
+  : mActor(actor), mTracker(tracker), mName(name) {}
+
+  template <typename T>
+  void Connect(T& functor)
+  {
+    mActor.ConnectSignal( mTracker, mName, functor);
+  }
+};
+
+// PropertyNotification specialization
+template <>
+struct SignalConnector<PropertyNotification>
+{
+  PropertyNotification& mNotification;
+  ConnectionTracker* mTracker;
+
+  SignalConnector<PropertyNotification>(ConnectionTracker* tracker, PropertyNotification &notification)
+  : mNotification(notification), mTracker(tracker) {}
+
+  template <typename T>
+  void Connect(T& functor)
+  {
+    mNotification.NotifySignal().Connect( mTracker, PropertyNotifcationSignalShim<T>(functor) );
+  }
+};
 
 /**
- * Get an action as boost function callback
+ * Set an action functor on a signal
  */
-boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction, Dali::Toolkit::Internal::Builder* const builder)
+template <typename T>
+void SetActionOnSignal(const TreeNode &root, const TreeNode &child, Actor actor, Dali::Toolkit::Internal::Builder* const builder, SignalConnector<T>& connector)
 {
   OptionalString childActorName(IsString( IsChild(&child, "child-actor")) );
   OptionalString actorName(IsString( IsChild(&child, "actor")) );
@@ -406,8 +467,6 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
   OptionalString actionName = IsString( IsChild(&child, "action") );
   DALI_ASSERT_ALWAYS(actionName && "Signal must have an action");
 
-  boost::function<void(void)> callback = DoNothing;
-
   if(childActorName)
   {
     ChildActorAction action;
@@ -415,7 +474,7 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
     action.childName       = *childActorName;
     action.actionName      = *actionName;
     GetParameters(child, action.parameters);
-    callback = action;
+    connector.Connect( action );
   }
   else if(actorName)
   {
@@ -429,7 +488,7 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
       {
         DALI_SCRIPT_WARNING("Cannot set property for set property action\n");
       }
-      callback = action;
+      connector.Connect( action );
     }
     else
     {
@@ -437,12 +496,14 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
       action.actorName       = *actorName;
       action.actionName      = *actionName;
       GetParameters(child, action.parameters);
-      callback = action;
+      connector.Connect( action );
     }
   }
   else if("quit" == *actionName)
   {
-    callback = quitAction;
+    QuitAction action;
+    action.builder = builder;
+    connector.Connect( action );
   }
   else if("play" == *actionName)
   {
@@ -456,7 +517,7 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
         action.animNode = animNode;
         action.builder = builder;
         // @todo; put constants into the map
-        callback = action;
+        connector.Connect( action );
       }
       else
       {
@@ -535,12 +596,9 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
           action.ranges.push_back(*range);
           action.wrapRanges.push_back(wrap);
         }
-
-        callback = action;
+        connector.Connect(action);
       }
     }
-
-
   }
   else if("removeConstraints" == *actionName )
   {
@@ -574,7 +632,7 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
           }
         }
       }
-      callback = action;
+      connector.Connect(action);
     }
   }
   else
@@ -584,10 +642,8 @@ boost::function<void (void)> GetAction(const TreeNode &root, const TreeNode &chi
     action.actorName       = actor.GetName();
     action.actionName      = *actionName;
     GetParameters(child, action.parameters);
-    callback = action;
+    connector.Connect( action );
   }
-
-  return callback;
 }
 
 
@@ -646,7 +702,7 @@ Actor SetupPropertyNotification(const TreeNode &child, Actor actor, Dali::Toolki
 /**
  * Setup signals and actions on an actor
  */
-Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction, Dali::Toolkit::Internal::Builder* const builder )
+Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, Dali::Toolkit::Internal::Builder* const builder )
 {
   DALI_ASSERT_ALWAYS(actor);
 
@@ -663,9 +719,8 @@ Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const 
       OptionalString name( IsString( IsChild( key_child.second, "name")) );
       DALI_ASSERT_ALWAYS(name && "Signal must have a name");
 
-      boost::function<void (void)> callback = GetAction(root, key_child.second, actor, quitAction, builder );
-
-      actor.ConnectSignal(tracker, *name, callback);
+      SignalConnector<Actor> connector(tracker, actor, *name);
+      SetActionOnSignal(root, key_child.second, actor, builder, connector);
     }
   }
 
@@ -675,7 +730,7 @@ Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const 
 /**
  * Setup Property notifications for an actor
  */
-Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction, Dali::Toolkit::Internal::Builder* const builder )
+Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, Dali::Toolkit::Internal::Builder* const builder )
 {
   DALI_ASSERT_ALWAYS(actor);
 
@@ -686,10 +741,6 @@ Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root
     for( TreeNode::ConstIterator iter = notificationsNode.CBegin(); endIter != iter; ++iter )
     {
       const TreeNode::KeyNodePair& key_child = *iter;
-
-      // Actor actions reference by pointer because of circular reference actor->signal
-      // So this callback should only go onto the actor maintained list.
-      boost::function<void (void)> callback = GetAction(root, key_child.second, actor, quitAction, builder );
 
       OptionalString prop(IsString( IsChild(key_child.second, "property")) );
       DALI_ASSERT_ALWAYS(prop && "Notification signal must specify a property");
@@ -704,33 +755,38 @@ Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root
       {
         PropertyNotification notification = actor.AddPropertyNotification( actor.GetPropertyIndex(*prop),
                                                                            LessThanCondition(1.f) );
-        notification.NotifySignal().Connect( tracker, FunctorDelegate::New(callback) );
+        SignalConnector<PropertyNotification> connector(tracker, notification);
+        SetActionOnSignal(root, key_child.second, actor, builder, connector);
       }
       else if("LessThan" == *cond)
       {
         PropertyNotification notification = actor.AddPropertyNotification( actor.GetPropertyIndex(*prop),
                                                                            LessThanCondition(GetConditionArg0(key_child.second)) );
-        notification.NotifySignal().Connect( tracker, FunctorDelegate::New(callback) );
+        SignalConnector<PropertyNotification> connector(tracker, notification);
+        SetActionOnSignal(root, key_child.second, actor, builder, connector);
       }
       else if("GreaterThan" == *cond)
       {
         PropertyNotification notification = actor.AddPropertyNotification( actor.GetPropertyIndex(*prop),
                                                                            GreaterThanCondition(GetConditionArg0(key_child.second)) );
-        notification.NotifySignal().Connect( tracker, FunctorDelegate::New(callback) );
+        SignalConnector<PropertyNotification> connector(tracker, notification);
+        SetActionOnSignal(root, key_child.second, actor, builder, connector);
       }
       else if("Inside" == *cond)
       {
         PropertyNotification notification = actor.AddPropertyNotification( actor.GetPropertyIndex(*prop),
                                                                            InsideCondition(GetConditionArg0(key_child.second),
                                                                            GetConditionArg1(key_child.second)) );
-        notification.NotifySignal().Connect( tracker, FunctorDelegate::New(callback) );
+        SignalConnector<PropertyNotification> connector(tracker, notification);
+        SetActionOnSignal(root, key_child.second, actor, builder, connector);
       }
       else if("Outside" == *cond)
       {
         PropertyNotification notification = actor.AddPropertyNotification( actor.GetPropertyIndex(*prop),
                                                                            OutsideCondition(GetConditionArg0(key_child.second),
                                                                            GetConditionArg1(key_child.second)) );
-        notification.NotifySignal().Connect( tracker, FunctorDelegate::New(callback) );
+        SignalConnector<PropertyNotification> connector(tracker, notification);
+        SetActionOnSignal(root, key_child.second, actor, builder, connector);
       }
       else
       {
