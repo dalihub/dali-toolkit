@@ -658,7 +658,7 @@ void ScrollView::OnInitialize()
   SetInternalConstraints();
 }
 
-void ScrollView::OnStageConnection()
+void ScrollView::OnStageConnection( unsigned int depth )
 {
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 

@@ -198,7 +198,7 @@ private: // from Control
   /**
    * @copydoc CustomActorImpl::OnStageConnection()
    */
-  virtual void OnStageConnection();
+  virtual void OnStageConnection( unsigned int depth );
 
   /**
    * @copydoc CustomActorImpl::OnStageDisconnection()

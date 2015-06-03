@@ -891,7 +891,7 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
   }
 }
 
-void Control::OnStageConnection()
+void Control::OnStageConnection( unsigned int depth )
 {
 }
 

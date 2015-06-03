@@ -425,7 +425,7 @@ void PageTurnView::SetupShadowView()
   mShadowView.Activate();
 }
 
-void PageTurnView::OnStageConnection()
+void PageTurnView::OnStageConnection( unsigned int depth )
 {
   SetupShadowView();
   mTurningPageLayer.RaiseToTop();

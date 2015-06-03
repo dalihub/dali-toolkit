@@ -122,7 +122,7 @@ void DummyControlImplOverride::OnPinch(const PinchGesture& pinch) { pinchCalled 
 void DummyControlImplOverride::OnPan(const PanGesture& pan) { panCalled = true; }
 void DummyControlImplOverride::OnTap(const TapGesture& tap) { tapCalled = true; }
 void DummyControlImplOverride::OnLongPress(const LongPressGesture& longPress) { longPressCalled = true; }
-void DummyControlImplOverride::OnStageConnection() { stageConnectionCalled = true; }
+void DummyControlImplOverride::OnStageConnection( unsigned int depth ) { stageConnectionCalled = true; }
 void DummyControlImplOverride::OnStageDisconnection() { stageDisconnectionCalled = true; }
 void DummyControlImplOverride::OnChildAdd(Actor& child) { childAddCalled = true; }
 void DummyControlImplOverride::OnChildRemove(Actor& child) { childRemoveCalled = true; }
