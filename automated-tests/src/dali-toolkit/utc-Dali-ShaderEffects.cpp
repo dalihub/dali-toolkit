@@ -1,0 +1,335 @@
+/*
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+#include <iostream>
+#include <stdlib.h>
+#include <dali-toolkit-test-suite-utils.h>
+#include <dali-toolkit/dali-toolkit.h>
+
+using namespace Dali;
+
+int UtcDaliCreateAlphaDiscardEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateAlphaDiscardEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateBendyEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateBendyEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateBlindEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateBlindEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateBouncingEffect(void)
+{
+  ToolkitTestApplication application;
+
+  Vector4 color(1.0f,1.0f,1.0f,1.0f);
+
+  ShaderEffect effect = Toolkit::CreateBouncingEffect(color);
+  DALI_TEST_CHECK( effect );
+
+  Property::Value value = effect.GetProperty( effect.GetPropertyIndex("uAssignedColor"));
+  DALI_TEST_EQUALS( value.Get<Vector4>(), color, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliCreateCarouselEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateCarouselEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateDisplacementEffectDisplaced(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateDisplacementEffect(Toolkit::DISPLACEMENT_EFFECT_DISPLACED);
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateDisplacementEffectFixed(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateDisplacementEffect(Toolkit::DISPLACEMENT_EFFECT_FIXED);
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateDissolveEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateDissolveEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateDissolveEffectMediumPrecision(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateDissolveEffect(false);
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateDissolveLocalEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateDissolveLocalEffect(0);
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateDistanceFieldEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateDistanceFieldEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateImageRegionEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateImageRegionEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateIrisEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateIrisEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateMaskEffect(void)
+{
+  ToolkitTestApplication application;
+
+  BufferImage image = CreateBufferImage();
+  ShaderEffect effect = Toolkit::CreateMaskEffect(image);
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateMirrorEffect(void)
+{
+  ToolkitTestApplication application;
+
+  BufferImage image = CreateBufferImage();
+  ShaderEffect effect = Toolkit::CreateMirrorEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateMotionBlurEffect(void)
+{
+  ToolkitTestApplication application;
+
+  unsigned int sampleCount(4);
+  ShaderEffect effect = Toolkit::CreateMotionBlurEffect(sampleCount);
+  DALI_TEST_CHECK( effect );
+
+  Property::Value value = effect.GetProperty( effect.GetPropertyIndex("uNumSamples"));
+  DALI_TEST_EQUALS( value.Get<float>(), (float)sampleCount, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliCreateMotionStretchEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateMotionStretchEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateOverlayEffect(void)
+{
+  ToolkitTestApplication application;
+
+  BufferImage image = CreateBufferImage();
+  ShaderEffect effect = Toolkit::CreateOverlayEffect(image);
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateQuadraticBezier(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateQuadraticBezier(3,false);
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateQuadraticBezierFilled(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateQuadraticBezier(3,true);
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateRipple2DEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateRipple2DEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateRippleEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateRippleEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateShearEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateShearEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliSoftButtonEffectElliptical(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateSoftButtonEffect(Toolkit::SOFT_BUTTON_ELLIPTICAL);
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliSoftButtonEffectRectangular(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateSoftButtonEffect(Toolkit::SOFT_BUTTON_RECTANGULAR);
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliSoftButtonEffectFixed(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateSoftButtonEffect(Toolkit::SOFT_BUTTON_FIXED);
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateSpotEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateSpotEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliCreateSquareDissolveEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateSquareDissolveEffect();
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliSwirlEffect(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateSwirlEffect(false);
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}
+
+int UtcDaliSwirlEffectWrap(void)
+{
+  ToolkitTestApplication application;
+
+  ShaderEffect effect = Toolkit::CreateSwirlEffect(true);
+  DALI_TEST_CHECK( effect );
+
+  END_TEST;
+}

@@ -27,6 +27,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/popup/popup-impl.cpp \
    $(toolkit_src_dir)/controls/popup/popup-style-impl.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-portrait-view-impl.cpp \
+   $(toolkit_src_dir)/controls/page-turn-view/page-turn-effect.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-landscape-view-impl.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-view-impl.cpp \
    $(toolkit_src_dir)/controls/scroll-bar/scroll-bar-impl.cpp \
@@ -56,8 +57,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/filters/emboss-filter.cpp \
    $(toolkit_src_dir)/filters/image-filter.cpp \
    $(toolkit_src_dir)/filters/spread-filter.cpp \
-   $(toolkit_src_dir)/shader-effects/page-turn-effect-impl.cpp \
-   $(toolkit_src_dir)/shader-effects/water-effect-impl.cpp \
    $(toolkit_src_dir)/styling/style-manager-impl.cpp \
    $(toolkit_src_dir)/text/bidirectional-support.cpp \
    $(toolkit_src_dir)/text/character-set-conversion.cpp \

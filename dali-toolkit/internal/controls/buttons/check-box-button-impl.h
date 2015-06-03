@@ -21,10 +21,11 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/animation/animation.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
+
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
-#include <dali-toolkit/public-api/shader-effects/image-region-effect.h>
 
 #include "button-impl.h"
 
@@ -124,7 +125,7 @@ private:
 
 private:
   Animation                 mTransitionAnimation;  ///< Animation used in the state transitions.
-  ImageRegionEffect         mTickUVEffect;         ///< ImageRegionEffect to expand the tick across
+  ShaderEffect              mTickUVEffect;         ///< ImageRegionEffect to expand the tick across
 };
 
 } // namespace Internal

@@ -28,73 +28,73 @@ namespace Toolkit
 {
 
 /**
+ * Creates a new Bendy effect
+ *
  * BendyEffect is a custom shader effect to achieve bendy effects in Image actors
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uCenter"    - The center point of the bendy effect
+ *  "uDirection" - The direction of the bendy effect
+ *  "uRadius"    - The radius of the bendy effect
+ *
+ * @return A handle to a newly allocated ShaderEffect.
  */
-class DALI_IMPORT_API BendyEffect : public ShaderEffect
+inline ShaderEffect CreateBendyEffect()
 {
-public:
+  // append the default version
+  std::string vertextShader(
+      "uniform mediump   vec2  uCenter;\n"
+      "uniform mediump   vec2  uDirection;\n"
+      "uniform mediump   float uRadius;\n"
+      "\n"
+      "varying mediump   float vShade;\n"
+      "\n"
+      "void main()\n"
+      "{\n"
+      " mediump float lighting = 0.25;\n"
+      " mediump vec4 position = uModelView * vec4(aPosition,1.0);\n"
+      "\n"
+      " mediump vec2 d = position.xy - uCenter;\n"
+      " mediump float dist = max( 0.0, dot(d,uDirection) );\n"
+      " mediump float radius = max(0.0, uRadius - dist * 0.01);\n"
+      "\n"
+      " mediump float cs = cos(dist / radius / 2.0);\n"
+      " mediump float sn = sin(dist / radius / 2.0);\n"
+      "\n"
+      "position.xy = position.xy - uDirection * dist;\n"
+      "\n"
+      "position.xy += uDirection * sn * radius;\n"
+      "position.z += (1.0 - cs) * radius;\n"
+      "\n"
+      "gl_Position = uProjection * position;\n"
+      "\n"
+      "vShade = 1.0 - abs(sn) * lighting;\n"
+      "\n"
+      "vTexCoord = aTexCoord;\n"
+      "}" );
 
-  /**
-   * Create an uninitialized BendyEffect; this can be initialized with BendyEffect::New()
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  BendyEffect();
+  std::string fragmentShader(
+      "varying mediump float  vShade;\n"
+      "\n"
+      "void main()\n"
+      "{\n"
+      "  gl_FragColor = texture2D(sTexture, vTexCoord) * uColor * vec4(vShade,vShade,vShade,1.0);\n"
+      "}" );
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~BendyEffect();
+  // Create the implementation, temporarily owned on stack,
+  Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
+      vertextShader,
+      fragmentShader,
+      GeometryType( GEOMETRY_TYPE_IMAGE ),
+      ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_DEPTH_BUFFER ));
 
-  /**
-   * Create an initialized BendyEffect.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static BendyEffect New();
-
-  /**
-   * Set the center point of the bendy effect.
-   * @param [in] center The new center point.
-   */
-  void SetCenter(const Vector2& center);
-
-  /**
-   * Set the direction of the bendy effect.
-   * @param [in] direction The new direction.
-   */
-  void SetDirection(const Vector2& direction);
-
-  /**
-   * Set the radius of the bendy effect.
-   * @param [in] radius The new radius.
-   */
-  void SetRadius(float radius);
-
-  /**
-   * Get the name for the center property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetCenterPropertyName() const;
-
-  /**
-   * Get the name for the direction property
-   * which can be used in Animation API's
-   * @return A std::string containing the property name
-   */
-  const std::string& GetDirectionPropertyName() const;
-
-  /**
-   * Get the name for the radius property
-   * which can be used in Animation API's
-   * @return A std::string containing the property name
-   */
-  const std::string& GetRadiusPropertyName() const;
+  shaderEffect.SetUniform( "uCenter", Vector2(0.0f, 0.0f), ShaderEffect::COORDINATE_TYPE_VIEWPORT_POSITION );
+  shaderEffect.SetUniform( "uDirection", Vector2(0.0f, 0.0f), ShaderEffect::COORDINATE_TYPE_VIEWPORT_DIRECTION );
+  shaderEffect.SetUniform( "uRadius", 0.0f );
 
 
-private: // Not intended for application developers
-  DALI_INTERNAL BendyEffect(ShaderEffect handle);
-};
+  return shaderEffect;
+}
 
 } // namespace Toolkit
 

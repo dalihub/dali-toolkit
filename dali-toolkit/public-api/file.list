@@ -46,36 +46,6 @@ public_api_src_files = \
   $(public_api_src_dir)/focus-manager/focus-manager.cpp \
   $(public_api_src_dir)/focus-manager/keyboard-focus-manager.cpp \
   $(public_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
-  $(public_api_src_dir)/shader-effects/bubble-effect/bubble-effect.cpp \
-  $(public_api_src_dir)/shader-effects/bubble-effect/color-adjuster.cpp \
-  $(public_api_src_dir)/shader-effects/alpha-discard-effect.cpp \
-  $(public_api_src_dir)/shader-effects/bendy-effect.cpp \
-  $(public_api_src_dir)/shader-effects/blind-effect.cpp \
-  $(public_api_src_dir)/shader-effects/bouncing-effect.cpp \
-  $(public_api_src_dir)/shader-effects/carousel-effect.cpp \
-  $(public_api_src_dir)/shader-effects/displacement-effect.cpp \
-  $(public_api_src_dir)/shader-effects/dissolve-effect.cpp \
-  $(public_api_src_dir)/shader-effects/dissolve-local-effect.cpp \
-  $(public_api_src_dir)/shader-effects/distance-field-effect.cpp \
-  $(public_api_src_dir)/shader-effects/image-region-effect.cpp \
-  $(public_api_src_dir)/shader-effects/iris-effect.cpp \
-  $(public_api_src_dir)/shader-effects/mask-effect.cpp \
-  $(public_api_src_dir)/shader-effects/mirror-effect.cpp \
-  $(public_api_src_dir)/shader-effects/motion-blur-effect.cpp \
-  $(public_api_src_dir)/shader-effects/motion-stretch-effect.cpp \
-  $(public_api_src_dir)/shader-effects/nine-patch-mask-effect.cpp \
-  $(public_api_src_dir)/shader-effects/overlay-effect.cpp \
-  $(public_api_src_dir)/shader-effects/page-turn-book-spine-effect.cpp \
-  $(public_api_src_dir)/shader-effects/page-turn-effect.cpp \
-  $(public_api_src_dir)/shader-effects/quadratic-bezier.cpp \
-  $(public_api_src_dir)/shader-effects/ripple-effect.cpp \
-  $(public_api_src_dir)/shader-effects/ripple2d-effect.cpp \
-  $(public_api_src_dir)/shader-effects/shear-effect.cpp \
-  $(public_api_src_dir)/shader-effects/soft-button-effect.cpp \
-  $(public_api_src_dir)/shader-effects/spot-effect.cpp \
-  $(public_api_src_dir)/shader-effects/square-dissolve-effect.cpp \
-  $(public_api_src_dir)/shader-effects/swirl-effect.cpp \
-  $(public_api_src_dir)/shader-effects/water-effect.cpp \
   $(public_api_src_dir)/styling/style-manager.cpp \
   $(public_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
   $(public_api_src_dir)/transition-effects/cube-transition-effect.cpp \
@@ -203,8 +173,6 @@ public_api_shader_effects_header_files = \
   $(public_api_src_dir)/shader-effects/motion-stretch-effect.h \
   $(public_api_src_dir)/shader-effects/nine-patch-mask-effect.h \
   $(public_api_src_dir)/shader-effects/overlay-effect.h \
-  $(public_api_src_dir)/shader-effects/page-turn-book-spine-effect.h \
-  $(public_api_src_dir)/shader-effects/page-turn-effect.h \
   $(public_api_src_dir)/shader-effects/quadratic-bezier.h \
   $(public_api_src_dir)/shader-effects/ripple-effect.h \
   $(public_api_src_dir)/shader-effects/ripple2d-effect.h \
@@ -212,12 +180,7 @@ public_api_shader_effects_header_files = \
   $(public_api_src_dir)/shader-effects/soft-button-effect.h \
   $(public_api_src_dir)/shader-effects/spot-effect.h \
   $(public_api_src_dir)/shader-effects/square-dissolve-effect.h \
-  $(public_api_src_dir)/shader-effects/swirl-effect.h \
-  $(public_api_src_dir)/shader-effects/water-effect.h
-
-public_api_bubble_effect_header_files =  \
-  $(public_api_src_dir)/shader-effects/bubble-effect/bubble-effect.h \
-  $(public_api_src_dir)/shader-effects/bubble-effect/color-adjuster.h
+  $(public_api_src_dir)/shader-effects/swirl-effect.h
 
 public_api_styling_header_files = \
   $(public_api_src_dir)/styling/style-manager.h

@@ -29,41 +29,48 @@ namespace Toolkit
 {
 
 /**
+ * @brief Creates a new OverlayEffect
+ *
  * OverlayEffect is used to apply an overlay image to the actor.
  * Typically overlay images should be the same size as the main image being viewed, but this isn't essential.
  *
  * Usage example:
  *
  *   ImageActor actor = ImageActor::New( Image( EXAMPLE_IMAGE_PATH ) );
- *   OverlayEffect overlayEffect = OverlayEffect::New( Image::New( OVERLAY_IMAGE_PATH ) );
+ *   ShaderEffect overlayEffect = CreateOverlayEffect( Image::New( OVERLAY_IMAGE_PATH ) );
  *   actor.SetShaderEffect( overlayEffect );
+ *
+ *   @param[in] overlayImage The image to overlay on top of the actor
+ *   @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API OverlayEffect : public ShaderEffect
+inline ShaderEffect CreateOverlayEffect(Image overlayImage)
 {
-public:
+  // (Target > 0.5) * (1 - (1-2*(Target-0.5)) * (1-Blend)) + (Target <= 0.5) * ((2*Target) * Blend)
+  const char* OVERLAY_FRAGMENT_SHADER_SOURCE =
+      "void main()\n"
+      "{\n"
+      "  lowp vec4 target = texture2D(sTexture, vTexCoord);\n"
+      "  lowp vec4 overlay = texture2D(sEffect, vTexCoord);\n"
+      "  if ( length( target.rgb ) > 0.5 )\n"
+      "  {\n"
+      "    gl_FragColor = vec4( mix( target.rgb, 1.0 - ( 1.0 - 2.0 * ( target.rgb - 0.5 ) )  * ( 1.0 - overlay.rgb ), overlay.a ), min( 1.0, target.a + overlay.a ) );\n"
+      "  }\n"
+      "  else\n"
+      "  {\n"
+      "    gl_FragColor = vec4( mix( target.rgb, 2.0 * target.rgb * overlay.rgb, overlay.a ), target.a + overlay.a );\n"
+      "  }\n"
+      "}\n";
 
-  /**
-   * Create an empty OverlayEffect handle.
-   */
-  OverlayEffect();
+  ShaderEffect shaderEffect = ShaderEffect::New(
+      "", // Use default
+      OVERLAY_FRAGMENT_SHADER_SOURCE,
+      GeometryType( GEOMETRY_TYPE_IMAGE ),
+      ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ) );
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~OverlayEffect();
+  shaderEffect.SetEffectImage( overlayImage );
 
-  /**
-   * Create a OverlayEffect.
-   * @return A handle to a newly allocated OverlayEffect.
-   */
-  static OverlayEffect New( Image overlayImage );
-
-private: // Not intended for application developers
-
-  DALI_INTERNAL OverlayEffect( ShaderEffect handle );
-};
+  return shaderEffect;
+}
 
 } // namespace Toolkit
 

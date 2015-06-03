@@ -28,6 +28,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
+#include <dali-toolkit/internal/controls/page-turn-view/page-turn-effect.h>
+#include <dali-toolkit/internal/controls/page-turn-view/page-turn-book-spine-effect.h>
 
 using namespace Dali;
 
@@ -295,26 +297,26 @@ PageTurnView::~PageTurnView()
 void PageTurnView::OnInitialize()
 {
    // create the two book spine effect for static images, left and right side pages respectively
-  mSpineEffectFront = PageTurnBookSpineEffect::New();
-  mSpineEffectFront.SetIsBackImageVisible( false );
-  mSpineEffectFront.SetPageWidth( mPageSize.width );
-  mSpineEffectFront.SetShadowWidth( 0.f );
-  mSpineEffectFront.SetSpineShadowParameter( mSpineShadowParameter );
+  mSpineEffectFront = CreatePageTurnBookSpineEffect();
+  mSpineEffectFront.SetUniform("uIsBackImageVisible", false );
+  mSpineEffectFront.SetUniform("uPageWidth", mPageSize.width );
+  mSpineEffectFront.SetUniform("uShadowWidth", 0.f );
+  mSpineEffectFront.SetUniform("uSpineShadowParameter", mSpineShadowParameter );
 
-  mSpineEffectBack = PageTurnBookSpineEffect::New();
-  mSpineEffectBack.SetIsBackImageVisible( true );
-  mSpineEffectBack.SetPageWidth( mPageSize.width );
-  mSpineEffectBack.SetShadowWidth( 0.f );
-  mSpineEffectBack.SetSpineShadowParameter( mSpineShadowParameter );
+  mSpineEffectBack = CreatePageTurnBookSpineEffect();
+  mSpineEffectBack.SetUniform("uIsBackImageVisible", true );
+  mSpineEffectBack.SetUniform("uPageWidth", mPageSize.width );
+  mSpineEffectBack.SetUniform("uShadowWidth", 0.f );
+  mSpineEffectBack.SetUniform("uSpineShadowParameter", mSpineShadowParameter );
 
   // create the page turn effect objects
   for( int i = 0; i < MAXIMUM_TURNING_NUM; i++ )
   {
-    mTurnEffect[i] = Toolkit::PageTurnEffect::New( false );
+    mTurnEffect[i] = CreatePageTurnEffect( false );
     mTurnEffect[i].SetProperty( ShaderEffect::Property::GRID_DENSITY, Property::Value( DEFAULT_GRID_DENSITY ) );
-    mTurnEffect[i].SetPageSize( mPageSize );
-    mTurnEffect[i].SetShadowWidth(0.f);
-    mTurnEffect[i].SetSpineShadowParameter( mSpineShadowParameter );
+    mTurnEffect[i].SetUniform( "uPageSize", mPageSize );
+    mTurnEffect[i].SetUniform( "uShadowWidth", 0.f);
+    mTurnEffect[i].SetUniform( "uSpineShadowParameter", mSpineShadowParameter );
     mIsAnimating[i] = false;
     mIsSliding[i] = false;
     mPropertyPanDisplacement[i] = Self().RegisterProperty("PAN_DISPLACEMENT_PROPERTY_"+i, 0.0f);
@@ -464,11 +466,11 @@ void PageTurnView::SetSpineShadowParameter( const Vector2& spineShadowParameter 
   mSpineShadowParameter = spineShadowParameter;
 
   // set spine shadow parameter to all the shader effects
-  mSpineEffectFront.SetSpineShadowParameter( mSpineShadowParameter );
-  mSpineEffectBack.SetSpineShadowParameter( mSpineShadowParameter );
+  mSpineEffectFront.SetUniform("uSpineShadowParameter", mSpineShadowParameter );
+  mSpineEffectBack.SetUniform("uSpineShadowParameter", mSpineShadowParameter );
   for( int i = 0; i < MAXIMUM_TURNING_NUM; i++ )
   {
-    mTurnEffect[i].SetSpineShadowParameter( mSpineShadowParameter );
+    mTurnEffect[i].SetUniform("uSpineShadowParameter", mSpineShadowParameter );
   }
 }
 
@@ -754,7 +756,7 @@ void PageTurnView::PanStarted( const Vector2& gesturePosition )
   }
 
   mOriginalCenter = gesturePosition;
-  mTurnEffect[mIndex].SetIsTurningBack( mIsTurnBack[ mPanActor] );
+  mTurnEffect[mIndex].SetUniform("uIsTurningBack", mIsTurnBack[ mPanActor] );
   mPress = false;
   mPageUpdated = false;
 
@@ -791,9 +793,9 @@ void PageTurnView::PanContinuing( const Vector2& gesturePosition )
       mDistanceBottomCorner = ( mOriginalCenter - Vector2( 0.0f, mPageSize.height ) ).Length();
       mShadowView.Add( mPanActor );
       SetShaderEffect( mPanActor, mTurnEffect[mIndex] );
-      mTurnEffect[mIndex].SetOriginalCenter( mOriginalCenter );
+      mTurnEffect[mIndex].SetUniform("uOriginalCenter", mOriginalCenter );
       mCurrentCenter = mOriginalCenter;
-      mTurnEffect[mIndex].SetCurrentCenter( mCurrentCenter );
+      mTurnEffect[mIndex].SetUniform("uCurrentCenter", mCurrentCenter );
       mPanDisplacement = 0.f;
       mConstraints = true;
       mPress = true;
@@ -806,8 +808,8 @@ void PageTurnView::PanContinuing( const Vector2& gesturePosition )
       self.SetProperty( mPropertyPanDisplacement[mIndex], 0.f );
 
       Constraint shadowBlurStrengthConstraint = Constraint::New<float>( mShadowView, mShadowView.GetBlurStrengthPropertyIndex(), ShadowBlurStrengthConstraint( mPageSize.width*PAGE_TURN_OVER_THRESHOLD_RATIO ) );
-      shadowBlurStrengthConstraint.AddSource( Source(mTurnEffect[mIndex],  mTurnEffect[mIndex].GetPropertyIndex(mTurnEffect[mIndex].PageTurnEffect::GetCurrentCenterPropertyName())) );
-      shadowBlurStrengthConstraint.AddSource( Source(mTurnEffect[mIndex],  mTurnEffect[mIndex].GetPropertyIndex(mTurnEffect[mIndex].PageTurnEffect::GetOriginalCenterPropertyName())) );
+      shadowBlurStrengthConstraint.AddSource( Source(mTurnEffect[mIndex],  mTurnEffect[mIndex].GetPropertyIndex("uCurrentCenter")) );
+      shadowBlurStrengthConstraint.AddSource( Source(mTurnEffect[mIndex],  mTurnEffect[mIndex].GetPropertyIndex("uOriginalCenter")) );
       shadowBlurStrengthConstraint.AddSource( Source( self, mPropertyPanDisplacement[mIndex] ) );
       shadowBlurStrengthConstraint.Apply();
     }
@@ -872,18 +874,18 @@ void PageTurnView::PanContinuing( const Vector2& gesturePosition )
         offset *= k;
         Actor self = Self();
 
-        Property::Index shaderOriginalCenterPropertyIndex = mTurnEffect[mIndex].GetPropertyIndex(mTurnEffect[mIndex].PageTurnEffect::GetOriginalCenterPropertyName());
+        Property::Index shaderOriginalCenterPropertyIndex = mTurnEffect[mIndex].GetPropertyIndex("uOriginalCenter");
         Constraint originalCenterConstraint = Constraint::New<Vector2>( mTurnEffect[mIndex], shaderOriginalCenterPropertyIndex, OriginalCenterConstraint( mOriginalCenter, offset ));
         originalCenterConstraint.AddSource( Source( self, mPropertyPanDisplacement[mIndex] ) );
         originalCenterConstraint.Apply();
 
-        Property::Index shaderCurrentCenterPropertyIndex = mTurnEffect[mIndex].GetPropertyIndex(mTurnEffect[mIndex].PageTurnEffect::GetCurrentCenterPropertyName());
+        Property::Index shaderCurrentCenterPropertyIndex = mTurnEffect[mIndex].GetPropertyIndex("uCurrentCenter");
         Constraint currentCenterConstraint = Constraint::New<Vector2>( mTurnEffect[mIndex], shaderCurrentCenterPropertyIndex, CurrentCenterConstraint(mPageSize.width));
         currentCenterConstraint.AddSource( Source(self, mPropertyCurrentCenter[mIndex]) );
         currentCenterConstraint.AddSource( Source(mTurnEffect[mIndex], shaderOriginalCenterPropertyIndex) );
         currentCenterConstraint.Apply();
 
-        GetImpl( mTurnEffect[mIndex] ).ApplyInternalConstraint();
+        PageTurnApplyInternalConstraint(mTurnEffect[mIndex]);
 
         float distance = offset.Length();
         Constraint rotationConstraint = Constraint::New<Quaternion>( mPanActor, Actor::Property::ORIENTATION, RotationConstraint(distance, mPageSize.width, mIsTurnBack[mPanActor]));
@@ -899,14 +901,14 @@ void PageTurnView::PanContinuing( const Vector2& gesturePosition )
       {
         mPanActor.RemoveConstraints();
         mTurnEffect[mIndex].RemoveConstraints();
-        mTurnEffect[mIndex].SetOriginalCenter( mOriginalCenter );
+        mTurnEffect[mIndex].SetUniform("uOriginalCenter",mOriginalCenter );
         mConstraints = true;
         mPanDisplacement = 0.f;
       }
 
-      mTurnEffect[mIndex].SetCurrentCenter( currentCenter );
+      mTurnEffect[mIndex].SetUniform("uCurrentCenter", currentCenter );
       mCurrentCenter = currentCenter;
-      GetImpl( mTurnEffect[mIndex] ).ApplyInternalConstraint();
+      PageTurnApplyInternalConstraint(mTurnEffect[mIndex]);
     }
   }
 }
@@ -964,7 +966,7 @@ void PageTurnView::PanFinished( const Vector2& gesturePosition, float gestureSpe
     else // the pan finished position is far away from the spine, set up an animation to slide the page back instead of turning over
     {
       Animation animation= Animation::New( PAGE_SLIDE_BACK_ANIMATION_DURATION * (mOriginalCenter.x - mCurrentCenter.x) / mPageSize.width / PAGE_TURN_OVER_THRESHOLD_RATIO );
-      animation.AnimateTo( Property( mTurnEffect[mIndex], mTurnEffect[mIndex].PageTurnEffect::GetCurrentCenterPropertyName() ),
+      animation.AnimateTo( Property( mTurnEffect[mIndex], "uCurrentCenter" ),
                            mOriginalCenter, AlphaFunction::LINEAR );
       mAnimationActorPair[animation] = actor;
       mAnimationIndexPair[animation] = mIndex;
