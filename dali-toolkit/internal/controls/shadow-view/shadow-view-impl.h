@@ -125,8 +125,6 @@ private:
 
   virtual void OnInitialize();
   virtual void OnSizeSet(const Vector3& targetSize);
-  virtual void OnStageConnection();
-  virtual void OnStageDisconnection();
 
   /**
    * Constrain the camera actor to the position of the point light, pointing

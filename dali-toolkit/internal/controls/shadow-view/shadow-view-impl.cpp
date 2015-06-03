@@ -281,20 +281,6 @@ void ShadowView::OnSizeSet(const Vector3& targetSize)
 {
 }
 
-void ShadowView::OnStageConnection()
-{
-  // TODO: can't call this here, since SetImage() calls fail to connect images to stage, since parent chain not fully on stage yet
-  // Need to fix the stage connection so this callback can be used arbitrarily. At that point we  can simplify the API by removing the need for Activate() / Deactivate()
-  //Activate();
-}
-
-void ShadowView::OnStageDisconnection()
-{
-  // TODO: can't call this here, since SetImage() calls fails similarly to above
-  // Need to fix the stage connection so this callback can be used arbitrarily. At that point we  can simplify the API by removing the need for Activate() / Deactivate()
-  //Deactivate();
-}
-
 void ShadowView::ConstrainCamera()
 {
   if( mPointLight && mShadowPlane )
