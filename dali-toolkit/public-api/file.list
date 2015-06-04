@@ -22,9 +22,8 @@ public_api_src_files = \
   $(public_api_src_dir)/controls/text-controls/text-label.cpp \
   $(public_api_src_dir)/controls/text-controls/text-field.cpp \
   $(public_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.cpp \
-  $(public_api_src_dir)/focus-manager/focus-manager.cpp \
+  $(public_api_src_dir)/focus-manager/accessibility-focus-manager.cpp \
   $(public_api_src_dir)/focus-manager/keyboard-focus-manager.cpp \
-  $(public_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
   $(public_api_src_dir)/dali-toolkit-version.cpp \
   $(public_api_src_dir)/enums.cpp
 
@@ -77,12 +76,11 @@ public_api_table_view_header_files = \
 
 public_api_text_controls_header_files = \
   $(public_api_src_dir)/controls/text-controls/text-label.h \
-  $(public_api_src_dir)/controls/text-controls/text-field.h 
+  $(public_api_src_dir)/controls/text-controls/text-field.h
 
 public_api_focus_manager_header_files = \
-  $(public_api_src_dir)/focus-manager/focus-manager.h \
-  $(public_api_src_dir)/focus-manager/keyboard-focus-manager.h \
-  $(public_api_src_dir)/focus-manager/keyinput-focus-manager.h
+  $(public_api_src_dir)/focus-manager/accessibility-focus-manager.h \
+  $(public_api_src_dir)/focus-manager/keyboard-focus-manager.h
 
 public_api_rendering_backend_header_files = \
   $(public_api_src_dir)/text/rendering-backend.h

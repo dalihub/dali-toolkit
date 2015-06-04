@@ -567,11 +567,11 @@ float DepthLayout::GetClosestOnScreenLayoutPosition(int itemID, float currentLay
   return scrollTo;
 }
 
-int DepthLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
+int DepthLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
 {
   switch( direction )
   {
-    case Toolkit::Control::Left:
+    case Toolkit::Control::KeyboardFocus::LEFT:
     {
       itemID--;
       if( itemID < 0 )
@@ -580,7 +580,7 @@ int DepthLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Con
       }
       break;
     }
-    case Toolkit::Control::Up:
+    case Toolkit::Control::KeyboardFocus::UP:
     {
       itemID += mImpl->mNumberOfColumns;
       if( itemID >= maxItems )
@@ -589,7 +589,7 @@ int DepthLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Con
       }
       break;
     }
-    case Toolkit::Control::Right:
+    case Toolkit::Control::KeyboardFocus::RIGHT:
     {
       itemID++;
       if( itemID >= maxItems )
@@ -598,7 +598,7 @@ int DepthLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Con
       }
       break;
     }
-    case Toolkit::Control::Down:
+    case Toolkit::Control::KeyboardFocus::DOWN:
     {
       itemID -= mImpl->mNumberOfColumns;
       if( itemID < 0 )

@@ -1,5 +1,6 @@
-/**
- *
+<!--
+/**-->
+
 # DALi 3D ( Dynamic Animation Library ) {#dali-introduction}
 
 DALi is a quick and easy way of allowing developers to create Rich UI Applications like:

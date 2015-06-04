@@ -1,7 +1,7 @@
 /*! \page constraints Constraints
  *
 
-<h2 class="pg">Introduction</h2>
+<h1 class="pg">Introduction</h1>
 
 Constraints are used to modify the property of an actor, based on other properties of the same actor; properties of the actor's parent; or properties of another actor altogether, when the modification needs to be at run-time.
 Custom functions or functors can be supplied, where the desired value of the property can be calculated.
@@ -15,7 +15,7 @@ This means that Constraints override the values set by Animations.
 
 Not all properties can be used as a constraint input, please see Dali::Handle::IsPropertyAConstraintInput() for more details.
 
-<h2 class="pg">When to use a Constraint</h2>
+<h1 class="pg">When to use a Constraint</h1>
 
 Constraints are designed as a way of modifying properties that cannot be modified by any existing built in functionality; Like Animations, Size negotiation or Parent anchor, origin settings.
 As they provide the ability for the application developer to execute their own code within the update thread, DALi can no-longer guarantee the timeliness of this code, or how optimised it may be.
@@ -60,13 +60,13 @@ Consider the following use cases as an example of when and when not to use a con
 
 For most general cases, the position and size requirements of a child or parent actor (from it's child or parent) can be calculated with Size Negotiation.
 
-<h2 class="pg">Constraint Sources</h2>
+<h1 class="pg">Constraint Sources</h1>
 
 These are properties of this (or another actor) that are used as inputs into the constraint.
 The constraint will take these values, optionally perform a calculation on them (if using a custom functor) and write the result to the specified property of the target actor.
 The source actor is specified as either the same actor, it's parent or another actor.
 
-<h3 class="pg">Local Source</h3>
+<h2 class="pg">Local Source</h2>
 
 A local source is based on the local properties (i.e. size, position, scale, orientation, color) of an actor.
 For example, the actor's orientation could be used as a constraint input source.
@@ -75,7 +75,7 @@ For example, the actor's orientation could be used as a constraint input source.
 Dali::ConstraintSource source( Dali::LocalSource( Dali::Actor::Property::ORIENTATION ) );
 @endcode
 
-<h3 class="pg">Parent Source</h3>
+<h2 class="pg">Parent Source</h2>
 
 A parent source is based on properties of the actor's parent.
 For example, a parent's position can be used as a constraint input source.
@@ -84,7 +84,7 @@ For example, a parent's position can be used as a constraint input source.
 Dali::ConstraintSource source( Dali::ParentSource( Dali::Actor::Property::POSITION ) );
 @endcode
 
-<h3 class="pg">Source</h3>
+<h2 class="pg">Source</h2>
 
 Finally, you can base your source on the properties of another handle altogether.
 For example, a sibling actor's color could be used as a constraint input source.
@@ -93,7 +93,7 @@ For example, a sibling actor's color could be used as a constraint input source.
 Dali::ConstraintSource source( Dali::Source( anotherHandle, Dali::Actor::Property::COLOR ) );
 @endcode
 
-<h2 class="pg">The Constraint Function</h2>
+<h1 class="pg">The Constraint Function</h1>
 
 The signature of the constraint function is:
 
@@ -124,9 +124,9 @@ const Dali::Vector3& parentPosition( inputs[2]->GetVector3() );
 const Dali::Vector3& parentSize( inputs[3]->GetVector3() );
 @endcode
 
-<h2 class="pg">Creating a Constraint</h2>
+<h1 class="pg">Creating a Constraint</h1>
 
-<h3 class="pg">Using C Functions</h3>
+<h2 class="pg">Using C Functions</h2>
 
 If you do not have any data that is changed at runtime, then C functions should be used.
 For example, the color of an actor could be changed based on its position along the x-axis till a preset distance of 100, beyond which it is transparent.
@@ -163,7 +163,7 @@ void MyConstraintFunction( Dali::Vector4& current, const Dali::PropertyInputCont
 
 Please have a look at Dali::Constraint::New() for more details.
 
-<h3 class="pg">Using Functors</h3>
+<h2 class="pg">Using Functors</h2>
 
 If you need to store some data in a struct/class, then a functor can be used.
 Reusing the last example, the color of an actor is changed based on its position along the x-axis, but the distance when it is transparent is different for each applied constraint.
@@ -216,9 +216,9 @@ MyFunctor could then be used with another constraint with a different distance.
 Please have a look at Dali::Constraint::New(Handle, Property::Index, const T&) for more details.
 
 Instead of using the default functor, another method can be declared in the class or struct and used as the constraint function.
-Please have a look at appropriate Dali::Constraint::New() method for more details.
+Please have a look at the appropriate Dali::Constraint::New() method for more details.
 
-<h2 class="pg">Removing Constraints</h2>
+<h1 class="pg">Removing Constraints</h1>
 
 The actor's constraints can later be removed in several ways:
 
@@ -228,5 +228,24 @@ actor.RemoveConstraints(); // Removes ALL constraints applied to an actor
 actor.RemoveConstraint( tag ); // All constraints with the tag are removed from the actor (tag can be set using SetTag)
 @endcode
 
+\section constraints-equal-to Equal To Constraint
+
+The built in Dali::EqualToConstraint can be used if all that is required is setting a property equal to another property:
+@code
+Dali::Constraint constraint = Dali::Constraint::New< Vector3 >( actor, Dali::Actor::Property::POSITION, Dali::EqualToConstraint() );
+constraint.AddSource( Dali::Source( anotherActor, Dali::Actor::Property::POSITION ) );
+constraint.Apply();
+@endcode
+Here actor's position is set to equal the position of anotherActor.
+
+\section constraints-relative-to Relative To Constraint
+
+The built in Dali::RelativeToConstraint and Dali::RelativeToConstraintFloat can be used if all that is required is setting a property relative to another property:
+@code
+Dali::Constraint constraint = Dali::Constraint::New< Vector3 >( actor, Dali::Actor::Property::POSITION, Dali::RelativeToConstraint( 2.0f ) );
+constraint.AddSource( Dali::Source( anotherActor, Dali::Actor::Property::POSITION ) );
+constraint.Apply();
+@endcode
+Here actor's position is relative to the position of anotherActor, i.e., if anotherActor is at (10.0f, 20.0f, 30.0f), actor will be at (20.0f, 40.0f, 60.0f).
 *
 */

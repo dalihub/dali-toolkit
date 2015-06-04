@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <dali/devel-api/adaptor-framework/imf-manager.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/events/gesture.h>
@@ -31,6 +32,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/font-run.h>
+#include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-view.h>
 
@@ -405,6 +407,38 @@ public:
                    Size& layoutSize );
 
   /**
+   * @brief Whether to enable the multi-line layout.
+   *
+   * @param[in] enable \e true enables the multi-line (by default)
+   */
+  void SetMultiLineEnabled( bool enable );
+
+  /**
+   * @return Whether the multi-line layout is enabled.
+   */
+  bool IsMultiLineEnabled() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::LayoutEngine::SetHorizontalAlignment()
+   */
+  void SetHorizontalAlignment( LayoutEngine::HorizontalAlignment alignment );
+
+  /**
+   * @copydoc Dali::Toolkit::Text::LayoutEngine::GetHorizontalAlignment()
+   */
+  LayoutEngine::HorizontalAlignment GetHorizontalAlignment() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::LayoutEngine::SetVerticalAlignment()
+   */
+  void SetVerticalAlignment( LayoutEngine::VerticalAlignment alignment );
+
+  /**
+   * @copydoc Dali::Toolkit::Text::LayoutEngine::GetVerticalAlignment()
+   */
+  LayoutEngine::VerticalAlignment GetVerticalAlignment() const;
+
+  /**
    * @brief Calulates the alignment of the whole text inside the bounding box.
    *
    * @param[in] size The size of the bounding box.
@@ -473,6 +507,15 @@ public:
    * @copydoc Dali::Toolkit::Text::Decorator::Observer::HandleEvent()
    */
   virtual void HandleEvent( HandleType handle, HandleState state, float x, float y );
+
+  /**
+   * @brief Event received from IMF manager
+   *
+   * @param[in] imfManager The IMF manager.
+   * @param[in] imfEvent The event received.
+   * @return A data struture indicating if update is needed, cursor position and current text.
+   */
+  ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
 
 protected:
 

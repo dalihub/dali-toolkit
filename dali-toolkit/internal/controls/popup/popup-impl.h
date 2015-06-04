@@ -215,12 +215,12 @@ private:
   bool OnBackingTouched(Actor actor, const TouchEvent& event);
 
   /**
-   * Signal occurs when the mouse wheel event is occured on dimmed backing for the Popup.
-   * @param[in] actor The Actor got mouse wheel
-   * @param[in] event The Mouse Wheel Event.
+   * Signal occurs when the wheel event is occured on dimmed backing for the Popup.
+   * @param[in] actor The Actor got wheel
+   * @param[in] event The Wheel Event.
    * @return Whether to consume event or not.
    */
-  bool OnBackingMouseWheelEvent(Actor actor, const MouseWheelEvent& event);
+  bool OnBackingWheelEvent(Actor actor, const WheelEvent& event);
 
   /**
    * Signal occurs when the dialog has been touched.
@@ -279,7 +279,7 @@ private:
   /**
    * @copydoc Control::GetNextKeyboardFocusableActor()
    */
-  Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
+  Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled);
 
   /**
    * Create the root actor for the footer

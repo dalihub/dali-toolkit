@@ -3,9 +3,9 @@
 
 <h2 class="pg">Multi-threaded Architecture</h2>
 
-Dali animations and rendering occur in a dedicated rendering thread.  This allows animations to run smoothly, regardless of the time taken to process inputs events etc. in application code.
+DALi animations and rendering occur in a dedicated rendering thread.  This allows animations to run smoothly, regardless of the time taken to process inputs events etc. in application code.
 
-Internally Dali contains a scene-graph, which mirrors the Actor hierachy.  The scene-graph objects perform the actual animation & rendering, whilst Actors provide thread-safe access.
+Internally DALi contains a scene-graph, which mirrors the Actor hierachy.  The scene-graph objects perform the actual animation & rendering, whilst Actors provide thread-safe access.
 
 An example actor hierachy is shown below, in which one of the actors is being animated.  The objects in green are created by the application code, whilst the private objects in blue are used in the dedicated rendering thread.
 

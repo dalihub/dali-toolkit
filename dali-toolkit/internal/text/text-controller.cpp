@@ -79,7 +79,7 @@ void Controller::SetText( const std::string& text )
   // Remove the previously set text
   ResetText();
 
-  if( ! text.empty() )
+  if( !text.empty() )
   {
     //  Convert text into UTF-32
     Vector<Character>& utf32Characters = mImpl->mLogicalModel->mText;
@@ -104,11 +104,19 @@ void Controller::SetText( const std::string& text )
 
     // Update the rest of the model during size negotiation
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_REPLACED );
+
+    // The natural size needs to be re-calculated.
+    mImpl->mRecalculateNaturalSize = true;
+
+    // Apply modifications to the model
+    mImpl->mOperationsPending = ALL_OPERATIONS;
   }
   else
   {
     ShowPlaceholderText();
   }
+
+  mImpl->RequestRelayout();
 
   if( mImpl->mEventData )
   {
@@ -285,9 +293,11 @@ void Controller::SetTextColor( const Vector4& textColor )
 {
   mImpl->mTextColor = textColor;
 
-  if( ! mImpl->IsShowingPlaceholderText() )
+  if( !mImpl->IsShowingPlaceholderText() )
   {
     mImpl->mVisualModel->SetTextColor( textColor );
+
+    mImpl->RequestRelayout();
   }
 }
 
@@ -351,6 +361,7 @@ void Controller::SetPlaceholderTextColor( const Vector4& textColor )
   if( mImpl->IsShowingPlaceholderText() )
   {
     mImpl->mVisualModel->SetTextColor( textColor );
+    mImpl->RequestRelayout();
   }
 }
 
@@ -367,6 +378,8 @@ const Vector4& Controller::GetPlaceholderTextColor() const
 void Controller::SetShadowOffset( const Vector2& shadowOffset )
 {
   mImpl->mVisualModel->SetShadowOffset( shadowOffset );
+
+  mImpl->RequestRelayout();
 }
 
 const Vector2& Controller::GetShadowOffset() const
@@ -377,6 +390,8 @@ const Vector2& Controller::GetShadowOffset() const
 void Controller::SetShadowColor( const Vector4& shadowColor )
 {
   mImpl->mVisualModel->SetShadowColor( shadowColor );
+
+  mImpl->RequestRelayout();
 }
 
 const Vector4& Controller::GetShadowColor() const
@@ -387,6 +402,8 @@ const Vector4& Controller::GetShadowColor() const
 void Controller::SetUnderlineColor( const Vector4& color )
 {
   mImpl->mVisualModel->SetUnderlineColor( color );
+
+  mImpl->RequestRelayout();
 }
 
 const Vector4& Controller::GetUnderlineColor() const
@@ -397,6 +414,8 @@ const Vector4& Controller::GetUnderlineColor() const
 void Controller::SetUnderlineEnabled( bool enabled )
 {
   mImpl->mVisualModel->SetUnderlineEnabled( enabled );
+
+  mImpl->RequestRelayout();
 }
 
 bool Controller::IsUnderlineEnabled() const
@@ -407,6 +426,8 @@ bool Controller::IsUnderlineEnabled() const
 void Controller::SetUnderlineHeight( float height )
 {
   mImpl->mVisualModel->SetUnderlineHeight( height );
+
+  mImpl->RequestRelayout();
 }
 
 float Controller::GetUnderlineHeight() const
@@ -847,6 +868,9 @@ bool Controller::DoRelayout( const Size& size,
         }
       } // REORDER
 
+      // TODO: I'm working on a patch that changes the LayoutEngine::Align() method.
+      //       The layoutParameters is not needed and this call can be moved outside the if().
+      //       Then there is no need to do the layout again to change the alignment.
       if( ALIGN & operations )
       {
         mImpl->mLayoutEngine.Align( layoutParameters,
@@ -869,6 +893,86 @@ bool Controller::DoRelayout( const Size& size,
 
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout, view updated %s\n", ( viewUpdated ? "true" : "false" ) );
   return viewUpdated;
+}
+
+void Controller::SetMultiLineEnabled( bool enable )
+{
+  const LayoutEngine::Layout layout = enable ? LayoutEngine::MULTI_LINE_BOX : LayoutEngine::SINGLE_LINE_BOX;
+
+  if( layout != mImpl->mLayoutEngine.GetLayout() )
+  {
+    // Set the layout type.
+    mImpl->mLayoutEngine.SetLayout( layout );
+
+    // Set the flags to redo the layout operations
+    const OperationsMask layoutOperations =  static_cast<OperationsMask>( LAYOUT             |
+                                                                          UPDATE_ACTUAL_SIZE |
+                                                                          ALIGN              |
+                                                                          REORDER );
+
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | layoutOperations );
+
+    mImpl->RequestRelayout();
+  }
+}
+
+bool Controller::IsMultiLineEnabled() const
+{
+  return LayoutEngine::MULTI_LINE_BOX == mImpl->mLayoutEngine.GetLayout();
+}
+
+void Controller::SetHorizontalAlignment( LayoutEngine::HorizontalAlignment alignment )
+{
+  if( alignment != mImpl->mLayoutEngine.GetHorizontalAlignment() )
+  {
+    // Set the alignment.
+    mImpl->mLayoutEngine.SetHorizontalAlignment( alignment );
+
+    // Set the flag to redo the alignment operation.
+    // TODO : Is not needed re-layout and reorder again but with the current implementation it is.
+    //        Im working on a different patch to fix an issue with the alignment. When that patch
+    //        is in, this issue can be fixed.
+    const OperationsMask layoutOperations =  static_cast<OperationsMask>( LAYOUT             |
+                                                                          UPDATE_ACTUAL_SIZE |
+                                                                          ALIGN              |
+                                                                          REORDER );
+
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | layoutOperations );
+
+    mImpl->RequestRelayout();
+  }
+}
+
+LayoutEngine::HorizontalAlignment Controller::GetHorizontalAlignment() const
+{
+  return mImpl->mLayoutEngine.GetHorizontalAlignment();
+}
+
+void Controller::SetVerticalAlignment( LayoutEngine::VerticalAlignment alignment )
+{
+  if( alignment != mImpl->mLayoutEngine.GetVerticalAlignment() )
+  {
+    // Set the alignment.
+    mImpl->mLayoutEngine.SetVerticalAlignment( alignment );
+
+    // Set the flag to redo the alignment operation.
+    // TODO : Is not needed re-layout and reorder again but with the current implementation it is.
+    //        Im working on a different patch to fix an issue with the alignment. When that patch
+    //        is in, this issue can be fixed.
+    const OperationsMask layoutOperations =  static_cast<OperationsMask>( LAYOUT             |
+                                                                          UPDATE_ACTUAL_SIZE |
+                                                                          ALIGN              |
+                                                                          REORDER );
+
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | layoutOperations );
+
+    mImpl->RequestRelayout();
+  }
+}
+
+LayoutEngine::VerticalAlignment Controller::GetVerticalAlignment() const
+{
+  return mImpl->mLayoutEngine.GetVerticalAlignment();
 }
 
 void Controller::CalculateTextAlignment( const Size& size )
@@ -1273,6 +1377,69 @@ void Controller::HandleEvent( HandleType handleType, HandleState state, float x,
   }
 }
 
+ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
+{
+  bool update( false );
+  bool requestRelayout = false;
+
+  std::string text;
+  unsigned int cursorPosition( 0 );
+
+  switch ( imfEvent.eventName )
+  {
+    case ImfManager::COMMIT:
+    {
+      InsertText( imfEvent.predictiveString, Text::Controller::COMMIT );
+      requestRelayout = true;
+      break;
+    }
+    case ImfManager::PREEDIT:
+    {
+      InsertText( imfEvent.predictiveString, Text::Controller::PRE_EDIT );
+      update = true;
+      requestRelayout = true;
+      break;
+    }
+    case ImfManager::DELETESURROUNDING:
+    {
+      RemoveText( imfEvent.cursorOffset, imfEvent.numberOfChars );
+      requestRelayout = true;
+      break;
+    }
+    case ImfManager::GETSURROUNDING:
+    {
+      GetText( text );
+      cursorPosition = GetLogicalCursorPosition();
+
+      imfManager.SetSurroundingText( text );
+      imfManager.SetCursorPosition( cursorPosition );
+      break;
+    }
+    case ImfManager::VOID:
+    {
+      // do nothing
+      break;
+    }
+  } // end switch
+
+  if( ImfManager::GETSURROUNDING != imfEvent.eventName )
+  {
+    GetText( text );
+    cursorPosition = GetLogicalCursorPosition();
+  }
+
+  if( requestRelayout )
+  {
+    mImpl->mOperationsPending = ALL_OPERATIONS;
+    mImpl->RequestRelayout();
+  }
+
+  ImfManager::ImfCallbackData callbackData( update, cursorPosition, text, false );
+
+  return callbackData;
+}
+
+
 Controller::~Controller()
 {
   delete mImpl;
@@ -1335,6 +1502,8 @@ void Controller::ShowPlaceholderText()
 
     // Apply modifications to the model
     mImpl->mOperationsPending = ALL_OPERATIONS;
+
+    // Update the rest of the model during size negotiation
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_REPLACED );
   }
 }

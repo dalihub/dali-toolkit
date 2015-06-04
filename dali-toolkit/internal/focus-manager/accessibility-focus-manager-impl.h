@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_FOCUS_MANAGER_H__
-#define __DALI_TOOLKIT_INTERNAL_FOCUS_MANAGER_H__
+#ifndef __DALI_TOOLKIT_INTERNAL_ACCESSIBILITY_FOCUS_MANAGER_H__
+#define __DALI_TOOLKIT_INTERNAL_ACCESSIBILITY_FOCUS_MANAGER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 #include <dali/integration-api/events/pan-gesture-event.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/focus-manager/focus-manager.h>
+#include <dali-toolkit/public-api/focus-manager/accessibility-focus-manager.h>
 
 namespace Dali
 {
@@ -38,12 +38,12 @@ namespace Toolkit
 namespace Internal
 {
 
-class FocusManager;
+class AccessibilityFocusManager;
 
 /**
- * @copydoc Toolkit::FocusManager
+ * @copydoc Toolkit::AccessibilityFocusManager
  */
-class FocusManager : public Dali::BaseObject, Dali::AccessibilityActionHandler, Dali::AccessibilityGestureHandler
+class AccessibilityFocusManager : public Dali::BaseObject, Dali::AccessibilityActionHandler, Dali::AccessibilityGestureHandler
 {
 public:
 
@@ -56,7 +56,7 @@ public:
 
     unsigned int mFocusOrder; ///< The focus order of the actor. It is undefined by default.
 
-    std::string mAccessibilityAttributes[Toolkit::FocusManager::ACCESSIBILITY_ATTRIBUTE_NUM]; ///< The array of attribute texts
+    std::string mAccessibilityAttributes[Toolkit::AccessibilityFocusManager::ACCESSIBILITY_ATTRIBUTE_NUM]; ///< The array of attribute texts
   };
 
   typedef std::pair<unsigned int, unsigned int>        FocusIDPair;
@@ -70,141 +70,141 @@ public:
   typedef IDAdditionalInfoContainer::const_iterator    IDAdditionalInfoConstIter;
 
   /**
-   * Construct a new FocusManager.
+   * Construct a new AccessibilityFocusManager.
    */
-  FocusManager();
+  AccessibilityFocusManager();
 
   /**
-   * @copydoc Toolkit::FocusManager::SetAccessibilityAttribute
+   * @copydoc Toolkit::AccessibilityFocusManager::SetAccessibilityAttribute
    */
-  void SetAccessibilityAttribute(Actor actor, Toolkit::FocusManager::AccessibilityAttribute type, const std::string& text);
+  void SetAccessibilityAttribute(Actor actor, Toolkit::AccessibilityFocusManager::AccessibilityAttribute type, const std::string& text);
 
   /**
-   * @copydoc Toolkit::FocusManager::GetAccessibilityAttribute
+   * @copydoc Toolkit::AccessibilityFocusManager::GetAccessibilityAttribute
    */
-  std::string GetAccessibilityAttribute(Actor actor, Toolkit::FocusManager::AccessibilityAttribute type) const;
+  std::string GetAccessibilityAttribute(Actor actor, Toolkit::AccessibilityFocusManager::AccessibilityAttribute type) const;
 
   /**
-   * @copydoc Toolkit::FocusManager::SetFocusOrder
+   * @copydoc Toolkit::AccessibilityFocusManager::SetFocusOrder
    */
   void SetFocusOrder(Actor actor, const unsigned int order);
 
   /**
-   * @copydoc Toolkit::FocusManager::GetFocusOrder
+   * @copydoc Toolkit::AccessibilityFocusManager::GetFocusOrder
    */
   unsigned int GetFocusOrder(Actor actor) const;
 
   /**
-   * @copydoc Toolkit::FocusManager::GenerateNewFocusOrder
+   * @copydoc Toolkit::AccessibilityFocusManager::GenerateNewFocusOrder
    */
   unsigned int GenerateNewFocusOrder() const;
 
   /**
-   * @copydoc Toolkit::FocusManager::GetActorByFocusOrder
+   * @copydoc Toolkit::AccessibilityFocusManager::GetActorByFocusOrder
    */
   Actor GetActorByFocusOrder(const unsigned int order);
 
   /**
-   * @copydoc Toolkit::FocusManager::SetCurrentFocusActor
+   * @copydoc Toolkit::AccessibilityFocusManager::SetCurrentFocusActor
    */
   bool SetCurrentFocusActor(Actor actor);
 
   /**
-   * @copydoc Toolkit::FocusManager::GetCurrentFocusActor
+   * @copydoc Toolkit::AccessibilityFocusManager::GetCurrentFocusActor
    */
   Actor GetCurrentFocusActor();
 
   /**
-   * @copydoc Toolkit::FocusManager::GetCurrentFocusGroup
+   * @copydoc Toolkit::AccessibilityFocusManager::GetCurrentFocusGroup
    */
   Actor GetCurrentFocusGroup();
 
   /**
-   * @copydoc Toolkit::FocusManager::GetCurrentFocusOrder
+   * @copydoc Toolkit::AccessibilityFocusManager::GetCurrentFocusOrder
    */
   unsigned int GetCurrentFocusOrder();
 
   /**
-   * @copydoc Toolkit::FocusManager::MoveFocusForward
+   * @copydoc Toolkit::AccessibilityFocusManager::MoveFocusForward
    */
   bool MoveFocusForward();
 
   /**
-   * @copydoc Toolkit::FocusManager::MoveFocusBackward
+   * @copydoc Toolkit::AccessibilityFocusManager::MoveFocusBackward
    */
   bool MoveFocusBackward();
 
   /**
-   * @copydoc Toolkit::FocusManager::ClearFocus
+   * @copydoc Toolkit::AccessibilityFocusManager::ClearFocus
    */
   void ClearFocus();
 
   /**
-   * @copydoc Toolkit::FocusManager::Reset
+   * @copydoc Toolkit::AccessibilityFocusManager::Reset
    */
   void Reset();
 
   /**
-   * @copydoc Toolkit::FocusManager::SetFocusGroup
+   * @copydoc Toolkit::AccessibilityFocusManager::SetFocusGroup
    */
   void SetFocusGroup(Actor actor, bool isFocusGroup);
 
   /**
-   * @copydoc Toolkit::FocusManager::IsFocusGroup
+   * @copydoc Toolkit::AccessibilityFocusManager::IsFocusGroup
    */
   bool IsFocusGroup(Actor actor) const;
 
   /**
-   * @copydoc Toolkit::FocusManager::SetGroupMode
+   * @copydoc Toolkit::AccessibilityFocusManager::SetGroupMode
    */
   void SetGroupMode(bool enabled);
 
   /**
-   * @copydoc Toolkit::FocusManager::GetGroupMode
+   * @copydoc Toolkit::AccessibilityFocusManager::GetGroupMode
    */
   bool GetGroupMode() const;
 
   /**
-   * @copydoc Toolkit::FocusManager::SetWrapMode
+   * @copydoc Toolkit::AccessibilityFocusManager::SetWrapMode
    */
   void SetWrapMode(bool wrapped);
 
   /**
-   * @copydoc Toolkit::FocusManager::GetWrapMode
+   * @copydoc Toolkit::AccessibilityFocusManager::GetWrapMode
    */
   bool GetWrapMode() const;
 
   /**
-   * @copydoc Toolkit::FocusManager::SetFocusIndicatorActor
+   * @copydoc Toolkit::AccessibilityFocusManager::SetFocusIndicatorActor
    */
   void SetFocusIndicatorActor(Actor indicator);
 
   /**
-   * @copydoc Toolkit::FocusManager::GetFocusIndicatorActor
+   * @copydoc Toolkit::AccessibilityFocusManager::GetFocusIndicatorActor
    */
   Actor GetFocusIndicatorActor();
 
   /**
-   * @copydoc Toolkit::FocusManager::GetFocusGroup
+   * @copydoc Toolkit::AccessibilityFocusManager::GetFocusGroup
    */
   Actor GetFocusGroup(Actor actor);
 
 public:
 
   /**
-   * @copydoc Toolkit::FocusManager::FocusChangedSignal()
+   * @copydoc Toolkit::AccessibilityFocusManager::FocusChangedSignal()
    */
-  Toolkit::FocusManager::FocusChangedSignalType& FocusChangedSignal();
+  Toolkit::AccessibilityFocusManager::FocusChangedSignalType& FocusChangedSignal();
 
   /**
-   * @copydoc Toolkit::FocusManager::FocusOvershotSignal()
+   * @copydoc Toolkit::AccessibilityFocusManager::FocusOvershotSignal()
    */
-  Toolkit::FocusManager::FocusOvershotSignalType& FocusOvershotSignal();
+  Toolkit::AccessibilityFocusManager::FocusOvershotSignalType& FocusOvershotSignal();
 
   /**
-   * @copydoc Toolkit::FocusManager::FocusedActorActivatedSignal()
+   * @copydoc Toolkit::AccessibilityFocusManager::FocusedActorActivatedSignal()
    */
-  Toolkit::FocusManager::FocusedActorActivatedSignalType& FocusedActorActivatedSignal();
+  Toolkit::AccessibilityFocusManager::FocusedActorActivatedSignalType& FocusedActorActivatedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -222,7 +222,7 @@ protected:
   /**
    * Destructor
    */
-  virtual ~FocusManager();
+  virtual ~AccessibilityFocusManager();
 
 private:
 
@@ -368,15 +368,15 @@ private:
 private:
 
   // Undefined
-  FocusManager(const FocusManager&);
+  AccessibilityFocusManager(const AccessibilityFocusManager&);
 
-  FocusManager& operator=(const FocusManager& rhs);
+  AccessibilityFocusManager& operator=(const AccessibilityFocusManager& rhs);
 
 private:
 
-  Toolkit::FocusManager::FocusChangedSignalType mFocusChangedSignal; ///< The signal to notify the focus change
-  Toolkit::FocusManager::FocusOvershotSignalType mFocusOvershotSignal; ///< The signal to notify the focus overshooted
-  Toolkit::FocusManager::FocusedActorActivatedSignalType mFocusedActorActivatedSignal; ///< The signal to notify the activation of focused actor
+  Toolkit::AccessibilityFocusManager::FocusChangedSignalType mFocusChangedSignal; ///< The signal to notify the focus change
+  Toolkit::AccessibilityFocusManager::FocusOvershotSignalType mFocusOvershotSignal; ///< The signal to notify the focus overshooted
+  Toolkit::AccessibilityFocusManager::FocusedActorActivatedSignalType mFocusedActorActivatedSignal; ///< The signal to notify the activation of focused actor
 
   bool mIsWrapped; ///< Whether the focus movement is wrapped around or not
   bool mIsFocusWithinGroup; ///< Whether the focus movement is limited to the current focus group or not
@@ -403,26 +403,26 @@ private:
 
 } // namespace Internal
 
-inline Internal::FocusManager& GetImpl(Dali::Toolkit::FocusManager& obj)
+inline Internal::AccessibilityFocusManager& GetImpl(Dali::Toolkit::AccessibilityFocusManager& obj)
 {
   DALI_ASSERT_ALWAYS(obj);
 
   Dali::BaseObject& handle = obj.GetBaseObject();
 
-  return static_cast<Internal::FocusManager&>(handle);
+  return static_cast<Internal::AccessibilityFocusManager&>(handle);
 }
 
-inline const Internal::FocusManager& GetImpl(const Dali::Toolkit::FocusManager& obj)
+inline const Internal::AccessibilityFocusManager& GetImpl(const Dali::Toolkit::AccessibilityFocusManager& obj)
 {
   DALI_ASSERT_ALWAYS(obj);
 
   const Dali::BaseObject& handle = obj.GetBaseObject();
 
-  return static_cast<const Internal::FocusManager&>(handle);
+  return static_cast<const Internal::AccessibilityFocusManager&>(handle);
 }
 
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_FOCUS_MANAGER_H__
+#endif // __DALI_TOOLKIT_INTERNAL_ACCESSIBILITY_FOCUS_MANAGER_H__

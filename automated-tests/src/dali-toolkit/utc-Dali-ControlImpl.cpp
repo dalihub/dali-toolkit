@@ -26,7 +26,7 @@
 #include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/key-event-integ.h>
-#include <dali/integration-api/events/mouse-wheel-event-integ.h>
+#include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/integration-api/events/long-press-gesture-event.h>
 #include <dali/integration-api/events/pinch-gesture-event.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
@@ -199,17 +199,17 @@ int UtcDaliControlImplDisableGestureDetector(void)
     TapGestureDetector tap = dummyImpl.GetTapGestureDetector();
     LongPressGestureDetector longPress = dummyImpl.GetLongPressGestureDetector();
 
-    DALI_TEST_EQUALS( pinch.GetAttachedActors().empty(), false, TEST_LOCATION );
-    DALI_TEST_EQUALS( pan.GetAttachedActors().empty(), false, TEST_LOCATION );
-    DALI_TEST_EQUALS( tap.GetAttachedActors().empty(), false, TEST_LOCATION );
-    DALI_TEST_EQUALS( longPress.GetAttachedActors().empty(), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == pinch.GetAttachedActorCount(), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == pan.GetAttachedActorCount(), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == tap.GetAttachedActorCount(), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == longPress.GetAttachedActorCount(), false, TEST_LOCATION );
 
     dummyImpl.DisableGestureDetection( Gesture::Type(Gesture::Pinch | Gesture::Pan | Gesture::Tap | Gesture::LongPress) );
 
-    DALI_TEST_EQUALS( pinch.GetAttachedActors().empty(), true, TEST_LOCATION );
-    DALI_TEST_EQUALS( pan.GetAttachedActors().empty(), true, TEST_LOCATION );
-    DALI_TEST_EQUALS( tap.GetAttachedActors().empty(), true, TEST_LOCATION );
-    DALI_TEST_EQUALS( longPress.GetAttachedActors().empty(), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == pinch.GetAttachedActorCount(), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == pan.GetAttachedActorCount(), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == tap.GetAttachedActorCount(), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( 0 == longPress.GetAttachedActorCount(), true, TEST_LOCATION );
   }
   END_TEST;
 }
@@ -780,13 +780,13 @@ int UtcDaliControlImplTypeRegistry(void)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 namespace
 {
-static bool MouseWheelEventCallback(Actor actor, const MouseWheelEvent& event)
+static bool WheelEventCallback(Actor actor, const WheelEvent& event)
 {
   return false;
 }
 }
 
-int UtcDaliControlImplMouseWheelEvent(void)
+int UtcDaliControlImplWheelEvent(void)
 {
   ToolkitTestApplication application;
 
@@ -798,20 +798,20 @@ int UtcDaliControlImplMouseWheelEvent(void)
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
-    dummy.MouseWheelEventSignal().Connect(&MouseWheelEventCallback);
+    dummy.WheelEventSignal().Connect(&WheelEventCallback);
 
     application.Render();
     application.SendNotification();
     application.Render();
     application.SendNotification();
 
-    DALI_TEST_EQUALS( dummyImpl.mouseWheelEventCalled, false, TEST_LOCATION );
+    DALI_TEST_EQUALS( dummyImpl.wheelEventCalled, false, TEST_LOCATION );
 
-    // simulate a mouse wheel event
+    // simulate a wheel event
     Vector2 screenCoordinates( 10.0f, 10.0f );
-    Integration::MouseWheelEvent event(0, 0u, screenCoordinates, 1, 1000u);
-    application.ProcessEvent(event);
-    DALI_TEST_EQUALS( dummyImpl.mouseWheelEventCalled, true, TEST_LOCATION );
+    Integration::WheelEvent event( Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, screenCoordinates, 1, 1000u );
+    application.ProcessEvent( event );
+    DALI_TEST_EQUALS( dummyImpl.wheelEventCalled, true, TEST_LOCATION );
 
     Stage::GetCurrent().Remove(dummy);
   }
@@ -824,17 +824,17 @@ int UtcDaliControlImplMouseWheelEvent(void)
     dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
-    dummy.MouseWheelEventSignal().Connect(&MouseWheelEventCallback);
+    dummy.WheelEventSignal().Connect(&WheelEventCallback);
 
     application.Render();
     application.SendNotification();
     application.Render();
     application.SendNotification();
 
-    // simulate a mouse wheel event
+    // simulate a wheel event
     Vector2 screenCoordinates( 20.0f, 20.0f );
-    Integration::MouseWheelEvent event(0, 0u, screenCoordinates, 1, 1000u);
-    application.ProcessEvent(event);
+    Integration::WheelEvent event( Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, screenCoordinates, 1, 1000u );
+    application.ProcessEvent( event );
 
     Stage::GetCurrent().Remove(dummy);
   }
@@ -921,7 +921,7 @@ int UtcDaliControlImplOnAccessibilityActivatedP(void)
   BaseHandle handle = type.CreateInstance();
   DALI_TEST_CHECK( handle );
 
-  std::vector<Property::Value> attributes;
+  Property::Map attributes;
   DALI_TEST_EQUALS( false, handle.DoAction("control-activated", attributes), TEST_LOCATION );
 
   END_TEST;
@@ -934,7 +934,7 @@ int UtcDaliControlImplGetNextKeyboardFocusableActorP(void)
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( dummy );
 
   Actor currentFocusedActor;
-  Actor result = controlImpl.GetNextKeyboardFocusableActor( currentFocusedActor, Control::Left, false );
+  Actor result = controlImpl.GetNextKeyboardFocusableActor( currentFocusedActor, Control::KeyboardFocus::LEFT, false );
 
   DALI_TEST_EQUALS( result, currentFocusedActor, TEST_LOCATION );
 

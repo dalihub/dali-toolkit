@@ -20,6 +20,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/key-event-integ.h>
+#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 
 #include "dummy-control.h"
 

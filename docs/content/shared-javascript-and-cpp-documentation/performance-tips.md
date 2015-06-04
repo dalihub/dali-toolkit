@@ -1,5 +1,5 @@
-/**
- *
+<!--
+/**-->
 
 # Performance Tips {#performancetips}
 

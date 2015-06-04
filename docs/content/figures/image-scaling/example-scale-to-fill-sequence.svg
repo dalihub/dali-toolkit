@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1052.3622"
+   height="744.09448"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="example-scale-to-fill-sequence.svg"
+   inkscape:export-filename="/tmp/example-scale-to-fill-problem.png"
+   inkscape:export-xdpi="89.269394"
+   inkscape:export-ydpi="89.269394">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient5404"
+       osb:paint="gradient">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop5406" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop5408" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.94173902"
+     inkscape:cx="676.6218"
+     inkscape:cy="430.48889"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:window-width="1920"
+     inkscape:window-height="1158"
+     inkscape:window-x="1200"
+     inkscape:window-y="418"
+     inkscape:window-maximized="1"
+     objecttolerance="4"
+     gridtolerance="4">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3181"
+       empspacing="4"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true"
+       spacingx="32px"
+       spacingy="32px" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-308.2677)">
+    <rect
+       style="fill:none;fill-opacity:1;stroke:#ff0000;stroke-width:4.19999980999999956;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3957"
+       width="512"
+       height="512"
+       x="32"
+       y="200.09448"
+       transform="translate(0,308.2677)"
+       ry="0"
+       inkscape:export-filename="/tmp/rect3957.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/gallery-large-12.jpg"
+       xlink:href="gallery-large-12.jpg"
+       inkscape:export-ydpi="89.269394"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-filename="/tmp/rect3957.png"
+       width="512"
+       height="512"
+       id="image3178"
+       x="32"
+       y="508.36218" />
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/gallery-large-12.jpg"
+       xlink:href="gallery-large-12.jpg"
+       inkscape:export-ydpi="89.269394"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-filename="/tmp/rect3957.png"
+       width="256"
+       height="256"
+       id="image3178-6"
+       x="640"
+       y="636.36218" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect5513"
+       width="256"
+       height="256"
+       x="640"
+       y="636.36218"
+       inkscape:export-filename="/tmp/rect3957.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/gallery-large-12.jpg"
+       xlink:href="gallery-large-12.jpg"
+       inkscape:export-ydpi="89.269394"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-filename="/tmp/rect3957.png"
+       width="256"
+       height="256"
+       id="image3178-6-5"
+       x="992"
+       y="636.36218" />
+    <rect
+       style="fill:#000000;fill-opacity:0.74666664;stroke:none"
+       id="rect5554"
+       width="50.182735"
+       height="256"
+       x="992"
+       y="328.09448"
+       transform="translate(0,308.2677)"
+       inkscape:export-filename="/tmp/rect3957.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <rect
+       style="fill:#000000;fill-opacity:0.74666628;stroke:none"
+       id="rect5554-1"
+       width="50.182735"
+       height="256"
+       x="1197.8173"
+       y="636.36218"
+       inkscape:export-filename="/tmp/rect3957.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <rect
+       style="fill:none;fill-opacity:1;stroke:#ff0000;stroke-width:4.19999980999999956;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9"
+       width="154.95831"
+       height="254.03409"
+       x="1043.3221"
+       y="637.48846"
+       inkscape:export-filename="/tmp/rect3957.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+  </g>
+</svg>

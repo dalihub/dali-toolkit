@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_FOCUS_MANAGER_H__
-#define __DALI_TOOLKIT_FOCUS_MANAGER_H__
+#ifndef __DALI_TOOLKIT_ACCESSIBILITY_FOCUS_MANAGER_H__
+#define __DALI_TOOLKIT_ACCESSIBILITY_FOCUS_MANAGER_H__
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -30,12 +30,12 @@ namespace Toolkit
 
 namespace Internal DALI_INTERNAL
 {
-class FocusManager;
+class AccessibilityFocusManager;
 }
 
 /**
- * @brief Manages registration of actors in a focus chain and changing the focused
- * actor within that chain.
+ * @brief Manages registration of actors in a accessibility focus chain and changing the
+ * focused actor within that chain.
  *
  * This class provides the functionality of registering the focus order and description
  * of actors and maintaining the focus chain.
@@ -51,7 +51,7 @@ class FocusManager;
  * | focus-overshot          | @ref FocusOvershotSignal()         |
  * | focused-actor-activated | @ref FocusedActorActivatedSignal() |
  */
-class DALI_IMPORT_API FocusManager : public BaseHandle
+class DALI_IMPORT_API AccessibilityFocusManager : public BaseHandle
 {
 public:
 
@@ -90,30 +90,30 @@ public:
   typedef Signal< void ( Actor ) > FocusedActorActivatedSignalType;
 
   /**
-   * @brief Create a FocusManager handle; this can be initialised with FocusManager::New().
+   * @brief Create a AccessibilityFocusManager handle; this can be initialised with AccessibilityFocusManager::New().
    *
    * Calling member functions with an uninitialised handle is not allowed.
    */
-  FocusManager();
+  AccessibilityFocusManager();
 
   /**
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  ~FocusManager();
+  ~AccessibilityFocusManager();
 
   /**
-   * @brief Get the singleton of FocusManager object.
+   * @brief Get the singleton of AccessibilityFocusManager object.
    *
-   * @return A handle to the FocusManager control.
+   * @return A handle to the AccessibilityFocusManager control.
    */
-  static FocusManager Get();
+  static AccessibilityFocusManager Get();
 
   /**
    * @brief Set the information of the specified actor's accessibility attribute.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @pre The Actor has been initialized.
    * @param actor The actor the text to be set with
    * @param type The attribute type the text to be set with
@@ -124,7 +124,7 @@ public:
   /**
    * @brief Get the text of the specified actor's accessibility attribute.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @pre The Actor has been initialized.
    * @param actor The actor to be queried
    * @param type The attribute type to be queried
@@ -145,7 +145,7 @@ public:
    * description but with no focus order being set yet) and therefore
    * that actor is not focusable.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @pre The Actor has been initialized.
    * @param actor The actor the focus order to be set with
    * @param order The focus order of the actor
@@ -158,7 +158,7 @@ public:
    * When the focus order is 0, it means the focus order of the actor
    * is undefined.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @pre The Actor has been initialized.
    * @param actor The actor to be queried
    * @return The focus order of the actor
@@ -176,7 +176,7 @@ public:
    * 1 where FOLast is the focus order of the very last control in the
    * focus chain.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @return The focus order of the actor
    */
   unsigned int GenerateNewFocusOrder() const;
@@ -187,7 +187,7 @@ public:
    * It will return an empty handle if the actor is not in the stage
    * or has a focus order of 0.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @param order The focus order of the actor
    *
    * @return The actor that has the specified focus order or an empty
@@ -202,7 +202,7 @@ public:
    * have a defined focus order and must be focusable, visible and in
    * the stage.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @pre The Actor has been initialized.
    * @param actor The actor to be focused
    * @return Whether the focus is successful or not
@@ -212,7 +212,7 @@ public:
   /**
    * @brief Get the current focused actor.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @return A handle to the current focused actor or an empty handle if no actor is focused.
    */
   Actor GetCurrentFocusActor();
@@ -220,7 +220,7 @@ public:
   /**
    * @brief Get the focus group of current focused actor.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    *
    * @return A handle to the immediate parent of the current focused
    * actor which is also a focus group, or an empty handle if no actor
@@ -230,7 +230,7 @@ public:
 
   /**
    * @brief Get the focus order of currently focused actor.
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    *
    * @return The focus order of the currently focused actor or 0 if no
    * actor is in focus.
@@ -244,7 +244,7 @@ public:
    * When the focus movement is wrapped around, the focus will be moved
    * to the first focusable actor when it reaches the end of the focus chain.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @return true if the moving was successful
    */
   bool MoveFocusForward();
@@ -257,7 +257,7 @@ public:
    * moved to the last focusable actor when it reaches the beginning
    * of the focus chain.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @return true if the moving was successful
    */
   bool MoveFocusBackward();
@@ -267,13 +267,13 @@ public:
    * that no actor is focused in the focus chain.
    *
    * It will emit focus changed signal without current focused actor
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    */
   void ClearFocus();
 
   /**
    * @brief Clear the every registered focusable actor from focus-manager.
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    */
   void Reset();
 
@@ -281,7 +281,7 @@ public:
    * @brief Set whether an actor is a focus group that can limit the
    * scope of focus movement to its child actors in the focus chain.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @pre The Actor has been initialized.
    * @param actor The actor to be set as a focus group.
    * @param isFocusGroup Whether to set the actor to be a focus group or not.
@@ -291,7 +291,7 @@ public:
   /**
    * @brief Check whether the actor is set as a focus group or not.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @pre The Actor has been initialized.
    * @param actor The actor to be checked.
    * @return Whether the actor is set as a focus group.
@@ -304,7 +304,7 @@ public:
    * When the group mode is enabled, the focus movement will be limited to the child actors
    * of the current focus group including the current focus group itself. The current focus
    * group is the closest ancestor of the current focused actor that set as a focus group.
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @param enabled Whether the group mode is enabled or not
    */
   void SetGroupMode(bool enabled);
@@ -312,7 +312,7 @@ public:
   /**
    * @brief Get whether the group mode is enabled or not.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @return Whether the group mode is enabled or not.
    */
   bool GetGroupMode() const;
@@ -323,7 +323,7 @@ public:
    *
    * When both the wrap mode and the group mode are enabled, focus will be
    * wrapped within the current focus group. Focus will not be wrapped in default.
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @param wrapped Whether the focus movement is wrapped around or not
    */
   void SetWrapMode(bool wrapped);
@@ -331,7 +331,7 @@ public:
   /**
    * @brief Get whether the wrap mode is enabled or not.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @return Whether the wrap mode is enabled or not.
    */
   bool GetWrapMode() const;
@@ -340,10 +340,10 @@ public:
    * @brief Set the focus indicator actor.
    *
    * This will replace the default focus indicator actor in
-   * FocusManager and will be added to the focused actor as a
+   * AccessibilityFocusManager and will be added to the focused actor as a
    * highlight.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @pre The indicator actor has been initialized.
    * @param indicator The indicator actor to be added
    */
@@ -352,7 +352,7 @@ public:
   /**
    * @brief Get the focus indicator actor.
    *
-   * @pre The FocusManager has been initialized.
+   * @pre The AccessibilityFocusManager has been initialized.
    * @return A handle to the focus indicator actor
    */
   Actor GetFocusIndicatorActor();
@@ -405,9 +405,9 @@ public:
 
 private:
 
-  explicit DALI_INTERNAL FocusManager(Internal::FocusManager *impl);
+  explicit DALI_INTERNAL AccessibilityFocusManager(Internal::AccessibilityFocusManager *impl);
 
-}; // class FocusManager
+}; // class AccessibilityFocusManager
 
 } // namespace Toolkit
 

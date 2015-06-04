@@ -525,7 +525,7 @@ int UtcDaliItemViewScrollToItem(void)
   END_TEST;
 }
 
-int UtcDaliItemViewSetAndGetMouseWheelScrollDistanceStep(void)
+int UtcDaliItemViewSetAndGetWheelScrollDistanceStep(void)
 {
   ToolkitTestApplication application;
 
@@ -533,11 +533,11 @@ int UtcDaliItemViewSetAndGetMouseWheelScrollDistanceStep(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Set the scroll distance step for the mouse wheel event to be 100.0f
-  view.SetMouseWheelScrollDistanceStep(100.0f);
+  // Set the scroll distance step for the wheel event to be 100.0f
+  view.SetWheelScrollDistanceStep(100.0f);
 
   // Check the scroll distance step is 100.0f
-  DALI_TEST_EQUALS(view.GetMouseWheelScrollDistanceStep(), 100.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS(view.GetWheelScrollDistanceStep(), 100.0f, TEST_LOCATION );
   END_TEST;
 }
 

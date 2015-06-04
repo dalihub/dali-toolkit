@@ -156,7 +156,7 @@ public:
   /**
    * @copydoc ItemLayout::GetNextFocusItemID()
    */
-  virtual int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled);
+  virtual int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled);
 
 private:
 

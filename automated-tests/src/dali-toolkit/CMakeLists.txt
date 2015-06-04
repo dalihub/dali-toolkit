@@ -43,7 +43,7 @@ SET(TC_SOURCES
    utc-Dali-ControlImpl.cpp
    utc-Dali-DefaultControls.cpp
    utc-Dali-DissolveEffect.cpp
-   utc-Dali-FocusManager.cpp
+   utc-Dali-AccessibilityFocusManager.cpp
    utc-Dali-IrisEffect.cpp
    utc-Dali-ItemLayout.cpp
    utc-Dali-ItemView.cpp

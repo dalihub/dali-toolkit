@@ -74,9 +74,9 @@ v8::Local<v8::Value> DaliAnyConverter::ConvertToJavaScriptObject(v8::Isolate* is
   {
     returnValue = EventObjectGenerator::CreateHoverEvent( isolate, value.Get<HoverEvent>() );
   }
-  else if(  typeInfo == typeid( Dali::MouseWheelEvent ) )
+  else if(  typeInfo == typeid( Dali::WheelEvent ) )
   {
-    returnValue = EventObjectGenerator::CreateMouseWheelEvent( isolate, value.Get<MouseWheelEvent>() );
+    returnValue = EventObjectGenerator::CreateWheelEvent( isolate, value.Get<WheelEvent>() );
   }
   else if(  typeInfo == typeid( Dali::KeyEvent ) )
   {

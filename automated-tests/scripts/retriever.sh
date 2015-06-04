@@ -182,8 +182,8 @@ elif [[ $# == 2 && -f $DIR/$2 ]] ; then
     FILE=$2
 fi
 
-#Debug needs to be output on stderr ( calling script redirects stdout to file )
 #echo "Dir: $DIR  File: $FILE" >& 2
+
 
 # populate $TC_FILES with files declared in CMakeLists.txt
 if [[ -z $FILE ]]; then

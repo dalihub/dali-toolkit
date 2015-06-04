@@ -39,9 +39,6 @@ class StyleManager;
 
 namespace Internal
 {
-class FocusManager;
-class KeyboardFocusManager;
-class KeyInputFocusManager;
 
 /**
  * @brief This is the internal base class for all controls.
@@ -228,7 +225,7 @@ public:
   // Called by Focus Manager
 
   /**
-   * @brief Called by the focus manager and keyboard focus manager to Activate the Control
+   * @brief Called by the accessibility focus manager and keyboard focus manager to activate the Control
    */
   DALI_INTERNAL void AccessibilityActivate();
 
@@ -316,9 +313,9 @@ protected: // From CustomActorImpl, not to be used by application developers
   virtual bool OnKeyEvent( const KeyEvent& event );
 
   /**
-   * @copydoc CustomActorImpl::OnMouseWheelEvent()
+   * @copydoc CustomActorImpl::OnWheelEvent()
    */
-  virtual bool OnMouseWheelEvent( const MouseWheelEvent& event );
+  virtual bool OnWheelEvent( const WheelEvent& event );
 
   /**
    * @copydoc CustomActorImpl::OnRelayout()
@@ -493,7 +490,7 @@ public: // API for derived classes to override
    * @param[in] loopEnabled Whether the focus movement should be looped within the control.
    * @return the next keyboard focusable actor in this control or an empty handle if no actor can be focused.
    */
-  virtual Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled );
+  virtual Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled );
 
   /**
    * @brief Informs this control that its chosen focusable actor will be focused.

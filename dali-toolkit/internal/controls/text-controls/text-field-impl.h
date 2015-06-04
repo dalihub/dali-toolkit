@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/imf-manager.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
@@ -140,11 +137,7 @@ private: // From Control
   virtual bool OnKeyEvent(const KeyEvent& event);
 
   /**
-   * @brief Event received from IMF manager
-   *
-   * @param[in] imfManager The IMF manager.
-   * @param[in] imfEvent The event received.
-   * @return A data struture indicating if update is needed, cursor position and current text.
+   * @copydoc Dali::Toolkit::Text::Controller::(ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent)
    */
   ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
 
@@ -174,6 +167,14 @@ private: // Implementation
    * @param[in] keyboardShown True if keyboard is shown.
    */
   void KeyboardStatusChanged( bool keyboardShown );
+
+  /**
+   * @brief Callback when Textfield is touched
+   *
+   * @param[in] actor TextField touched
+   * @param[in] event TouchEvent information
+   */
+  bool OnTouched( Actor actor, const TouchEvent& event );
 
   /**
    * Construct a new TextField.

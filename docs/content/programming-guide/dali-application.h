@@ -2,7 +2,7 @@
  *
 <h2 class="pg">Creating an Application</h2>
 
-The Adaptor framework provides provides a Dali::Application class which initialises and sets up Dali appropriately so that the application writer does not have to.
+The Adaptor framework provides provides a Dali::Application class which initialises and sets up DALi appropriately so that the application writer does not have to.
 This provides many platform related services.
 
 Several signals can be connected to so that the application writer is informed when certain platform related activities occur.
@@ -13,7 +13,7 @@ The following example shows how to create a Dali::Application instance and conne
 @code
 void CreateProgram(Application& app)
 {
-  // Create Dali components...
+  // Create DALi components...
   Dali::Actor actor = Actor::New();
   ...
 }
