@@ -38,6 +38,7 @@ class TextField;
  *  * Signals
  * | %Signal Name           | Method                                              |
  * |------------------------|-----------------------------------------------------|
+ * | text-changed           | @ref TextChangedSignal()                            |
  * | max-length-reached     | @ref MaxLengthReachedSignal()                       |
  *
  */
@@ -109,6 +110,7 @@ public:
   // Type Defs
 
   /// @brief Max Characters Exceed signal type;
+  typedef Signal<void ( TextField ) > TextChangedSignalType;
   typedef Signal<void ( TextField ) > MaxLengthReachedSignalType;
 
   /**
@@ -156,6 +158,17 @@ public:
   static TextField DownCast( BaseHandle handle );
 
   // Signals
+
+  /**
+   * @brief This signal is emitted when the text changes.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName( TextField textField );
+   * @endcode
+   * @return The signal to connect to.
+   */
+  TextChangedSignalType& TextChangedSignal();
 
   /**
    * @brief This signal is emitted when inserted text exceeds the maximum character limit.
