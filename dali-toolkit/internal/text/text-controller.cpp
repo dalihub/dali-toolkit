@@ -73,9 +73,6 @@ void Controller::EnableTextInput( DecoratorPtr decorator )
 
 void Controller::SetText( const std::string& text )
 {
-  // Cancel previously queued inserts etc.
-  mImpl->mModifyEvents.clear();
-
   // Remove the previously set text
   ResetText();
 
@@ -126,6 +123,9 @@ void Controller::SetText( const std::string& text )
 
   // Reset keyboard as text changed
   mImpl->ResetImfManager();
+
+  // Do this last since it provides callbacks into application code
+  mImpl->mControlInterface.TextChanged();
 }
 
 void Controller::GetText( std::string& text ) const
@@ -1089,6 +1089,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected KeyEvent" );
 
+  bool textChanged( false );
+
   if( mImpl->mEventData &&
       keyEvent.state == KeyEvent::Down )
   {
@@ -1131,6 +1133,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
         {
           mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
         }
+
+        textChanged = true;
       }
     }
     else
@@ -1141,11 +1145,19 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       mImpl->ClearPreEditFlag();
 
       InsertText( keyString, COMMIT );
+
+      textChanged = true;
     }
 
     mImpl->ChangeState( EventData::EDITING ); // todo Confirm this is the best place to change the state of
 
     mImpl->RequestRelayout();
+  }
+
+  if( textChanged )
+  {
+    // Do this last since it provides callbacks into application code
+    mImpl->mControlInterface.TextChanged();
   }
 
   return false;
@@ -1261,9 +1273,10 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "MaxLengthReached (%d)\n", mImpl->mLogicalModel->mText.Count() );
 
-    mImpl->mControlInterface.MaxLengthReached();
-
     mImpl->ResetImfManager();
+
+    // Do this last since it provides callbacks into application code
+    mImpl->mControlInterface.MaxLengthReached();
   }
 }
 
@@ -1432,6 +1445,9 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
   {
     mImpl->mOperationsPending = ALL_OPERATIONS;
     mImpl->RequestRelayout();
+
+    // Do this last since it provides callbacks into application code
+    mImpl->mControlInterface.TextChanged();
   }
 
   ImfManager::ImfCallbackData callbackData( update, cursorPosition, text, false );
@@ -1452,9 +1468,6 @@ void Controller::ShowPlaceholderText()
     DALI_ASSERT_DEBUG( mImpl->mEventData && "No placeholder text available" );
 
     mImpl->mEventData->mIsShowingPlaceholderText = true;
-
-    // Cancel previously queued inserts etc.
-    mImpl->mModifyEvents.clear();
 
     // Disable handles when showing place-holder text
     mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );

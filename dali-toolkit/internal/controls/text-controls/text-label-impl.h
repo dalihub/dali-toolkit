@@ -98,6 +98,11 @@ private: // From Control
   virtual void RequestTextRelayout();
 
   /**
+   * @copydoc Text::ControlInterface::TextChanged()
+   */
+  virtual void TextChanged();
+
+  /**
    * @copydoc Text::ControlInterface::MaxLengthReached()
    */
   virtual void MaxLengthReached();

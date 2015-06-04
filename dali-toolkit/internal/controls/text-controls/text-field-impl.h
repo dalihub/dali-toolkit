@@ -80,6 +80,11 @@ public:
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
   /**
+   * @copydoc TextField::TextChangedSignal()
+   */
+  Toolkit::TextField::TextChangedSignalType&  TextChangedSignal();
+
+  /**
    * @copydoc TextField::MaxLengthReachedSignal()
    */
   Toolkit::TextField::MaxLengthReachedSignalType&  MaxLengthReachedSignal();
@@ -147,6 +152,11 @@ private: // From Control
   virtual void RequestTextRelayout();
 
   /**
+   * @copydoc Text::ControlInterface::TextChanged()
+   */
+  virtual void TextChanged();
+
+  /**
    * @copydoc Text::ControlInterface::MaxLengthReached()
    */
   virtual void MaxLengthReached();
@@ -193,6 +203,7 @@ private: // Implementation
 private: // Data
 
   // Signals
+  Toolkit::TextField::TextChangedSignalType mTextChangedSignal;
   Toolkit::TextField::MaxLengthReachedSignalType mMaxLengthReachedSignal;
 
   Text::ControllerPtr mController;

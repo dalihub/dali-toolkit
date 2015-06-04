@@ -494,6 +494,11 @@ void TextLabel::RequestTextRelayout()
   RelayoutRequest();
 }
 
+void TextLabel::TextChanged()
+{
+  // TextLabel does not provide a signal for this
+}
+
 void TextLabel::MaxLengthReached()
 {
   // Pure Virtual from TextController Interface, only needed when inputting text
