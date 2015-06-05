@@ -24,7 +24,6 @@
 #include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/shader-effects/bubble-effect/color-adjuster.h>
 #include <dali-toolkit/internal/controls/bubble-effect/bubble-actor.h>
 #include <dali-toolkit/internal/controls/bubble-effect/color-adjuster.h>
 #include <dali-toolkit/internal/controls/bubble-effect/bubble-effect.h>
