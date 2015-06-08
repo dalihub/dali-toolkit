@@ -797,6 +797,9 @@ Control::Control( ControlBehaviour behaviourFlags )
 
 void Control::Initialize()
 {
+  // Call deriving classes so initialised before styling is applied to them.
+  OnInitialize();
+
   if( mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS )
   {
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
@@ -804,7 +807,7 @@ void Control::Initialize()
     // Register for style changes
     styleManager.StyleChangeSignal().Connect( this, &Control::OnStyleChange );
 
-    // SetTheme
+    // Apply the current style
     GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
   }
 
@@ -812,9 +815,6 @@ void Control::Initialize()
   {
     SetKeyboardNavigationSupport( true );
   }
-
-  // Calling deriving classes
-  OnInitialize();
 }
 
 void Control::OnInitialize()
