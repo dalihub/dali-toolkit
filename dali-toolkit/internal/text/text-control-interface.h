@@ -21,6 +21,8 @@
 namespace Dali
 {
 
+class Actor;
+
 namespace Toolkit
 {
 
@@ -43,6 +45,13 @@ public:
    * @brief Virtual destructor.
    */
   virtual ~ControlInterface();
+
+  /**
+   * @brief Add a decoration.
+   *
+   * @param[in] decoration The actor displaying a decoration.
+   */
+  virtual void AddDecoration( Actor& actor ) = 0;
 
   /**
    * @brief Called to request a text relayout.

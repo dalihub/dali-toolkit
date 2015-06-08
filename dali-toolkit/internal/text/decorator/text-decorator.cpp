@@ -209,9 +209,8 @@ struct Decorator::Impl : public ConnectionTracker
     bool flipped : 1;
   };
 
-  Impl( Dali::Toolkit::Internal::Control& parent, Observer& observer )
-  : mTextControlParent( parent ),
-    mObserver( observer ),
+  Impl( ControllerInterface& controller )
+  : mController( controller ),
     mBoundingBox( Rect<int>() ),
     mHighlightColor( LIGHT_BLUE ),
     mActiveCursor( ACTIVE_CURSOR_NONE ),
@@ -474,8 +473,6 @@ struct Decorator::Impl : public ConnectionTracker
   {
     if( !mActiveLayer )
     {
-      Actor parent = mTextControlParent.Self();
-
       mActiveLayer = Layer::New();
 #ifdef DECORATOR_DEBUG
       mActiveLayer.SetName ( "ActiveLayerActor" );
@@ -485,7 +482,7 @@ struct Decorator::Impl : public ConnectionTracker
       mActiveLayer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
       mActiveLayer.SetPositionInheritanceMode( USE_PARENT_POSITION );
 
-      parent.Add( mActiveLayer );
+      mController.AddDecoration( mActiveLayer );
     }
 
     mActiveLayer.RaiseToTop();
@@ -625,8 +622,7 @@ struct Decorator::Impl : public ConnectionTracker
       mHighlightMeshActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
       mHighlightMeshActor.SetPosition( 0.0f, 0.0f, DISPLAYED_HIGHLIGHT_Z_OFFSET );
 
-      Actor parent = mTextControlParent.Self();
-      parent.Add( mHighlightMeshActor );
+      mController.AddDecoration( mHighlightMeshActor );
     }
   }
 
@@ -746,13 +742,16 @@ struct Decorator::Impl : public ConnectionTracker
     if( Gesture::Started    == gesture.state ||
         Gesture::Continuing == gesture.state )
     {
+      Vector2 targetSize;
+      mController.GetTargetSize( targetSize );
+
       if( x < mScrollThreshold )
       {
         mScrollDirection = SCROLL_RIGHT;
         mHandleScrolling = type;
         StartScrollTimer();
       }
-      else if( x > mTextControlParent.Self().GetTargetSize().width - mScrollThreshold )
+      else if( x > targetSize.width - mScrollThreshold )
       {
         mScrollDirection = SCROLL_LEFT;
         mHandleScrolling = type;
@@ -762,7 +761,7 @@ struct Decorator::Impl : public ConnectionTracker
       {
         mHandleScrolling = HANDLE_TYPE_COUNT;
         StopScrollTimer();
-        mObserver.HandleEvent( type, HANDLE_PRESSED, x, y );
+        mController.DecorationEvent( type, HANDLE_PRESSED, x, y );
       }
     }
     else if( Gesture::Finished  == gesture.state ||
@@ -772,11 +771,11 @@ struct Decorator::Impl : public ConnectionTracker
       {
         mHandleScrolling = HANDLE_TYPE_COUNT;
         StopScrollTimer();
-        mObserver.HandleEvent( type, HANDLE_STOP_SCROLLING, x, y );
+        mController.DecorationEvent( type, HANDLE_STOP_SCROLLING, x, y );
       }
       else
       {
-        mObserver.HandleEvent( type, HANDLE_RELEASED, x, y );
+        mController.DecorationEvent( type, HANDLE_RELEASED, x, y );
       }
       handle.actor.SetImage( mHandleImages[type][HANDLE_IMAGE_RELEASED] );
     }
@@ -992,17 +991,16 @@ struct Decorator::Impl : public ConnectionTracker
   {
     if( HANDLE_TYPE_COUNT != mHandleScrolling )
     {
-      mObserver.HandleEvent( mHandleScrolling,
-                             HANDLE_SCROLLING,
-                             mScrollDirection == SCROLL_RIGHT ? mScrollDistance : -mScrollDistance,
-                             0.f );
+      mController.DecorationEvent( mHandleScrolling,
+                               HANDLE_SCROLLING,
+                               mScrollDirection == SCROLL_RIGHT ? mScrollDistance : -mScrollDistance,
+                               0.f );
     }
 
     return true;
   }
 
-  Internal::Control&  mTextControlParent;
-  Observer&           mObserver;
+  ControllerInterface& mController;
 
   TapGestureDetector  mTapDetector;
   PanGestureDetector  mPanGestureDetector;
@@ -1044,9 +1042,9 @@ struct Decorator::Impl : public ConnectionTracker
   bool                mSecondaryCursorVisible : 1; ///< Whether the secondary cursor is visible.
 };
 
-DecoratorPtr Decorator::New( Internal::Control& parent, Observer& observer )
+DecoratorPtr Decorator::New( ControllerInterface& controller )
 {
-  return DecoratorPtr( new Decorator(parent, observer) );
+  return DecoratorPtr( new Decorator(controller) );
 }
 
 void Decorator::SetBoundingBox( const Rect<int>& boundingBox )
@@ -1255,10 +1253,10 @@ Decorator::~Decorator()
   delete mImpl;
 }
 
-Decorator::Decorator( Dali::Toolkit::Internal::Control& parent, Observer& observer )
+Decorator::Decorator( ControllerInterface& controller )
 : mImpl( NULL )
 {
-  mImpl = new Decorator::Impl( parent, observer );
+  mImpl = new Decorator::Impl( controller );
 }
 
 } // namespace Text

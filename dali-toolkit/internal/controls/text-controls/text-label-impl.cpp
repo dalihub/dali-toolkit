@@ -489,6 +489,11 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
   }
 }
 
+void TextLabel::AddDecoration( Actor& actor )
+{
+  // TextLabel does not show decorations
+}
+
 void TextLabel::RequestTextRelayout()
 {
   RelayoutRequest();
