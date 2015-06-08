@@ -1342,9 +1342,19 @@ void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
   }
 }
 
-void Controller::HandleEvent( HandleType handleType, HandleState state, float x, float y )
+void Controller::GetTargetSize( Vector2& targetSize )
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Controller::HandleEvent. Unexpected HandleEvent" );
+  targetSize = mImpl->mControlSize;
+}
+
+void Controller::AddDecoration( Actor& actor )
+{
+  mImpl->mControlInterface.AddDecoration( actor );
+}
+
+void Controller::DecorationEvent( HandleType handleType, HandleState state, float x, float y )
+{
+  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected DecorationEvent" );
 
   if( mImpl->mEventData )
   {
