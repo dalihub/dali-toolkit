@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <cstring> // for strcmp
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/events/mouse-wheel-event.h>
+#include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
@@ -69,7 +69,7 @@ const float DEFAULT_MIN_FLICK_SPEED_THRESHOLD(500.0f);              ///< Minimum
 const float FREE_FLICK_SPEED_THRESHOLD = 200.0f;                    ///< Free-Flick threshold in pixels/ms
 const float AUTOLOCK_AXIS_MINIMUM_DISTANCE2 = 100.0f;               ///< Auto-lock axis after minimum distance squared.
 const float FLICK_ORTHO_ANGLE_RANGE = 75.0f;                        ///< degrees. (if >45, then supports diagonal flicking)
-const Vector2 DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION = Vector2(0.17f, 0.1f); ///< The step of horizontal scroll distance in the proportion of stage size for each mouse wheel event received.
+const Vector2 DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION = Vector2(0.17f, 0.1f); ///< The step of horizontal scroll distance in the proportion of stage size for each wheel event received.
 const unsigned long MINIMUM_TIME_BETWEEN_DOWN_AND_UP_FOR_RESET( 150u );
 const float TOUCH_DOWN_TIMER_INTERVAL = 100.0f;
 const float DEFAULT_SCROLL_UPDATE_DISTANCE( 30.0f );                ///< Default distance to travel in pixels for scroll update signal
@@ -578,7 +578,7 @@ Dali::Toolkit::ScrollView ScrollView::New()
 }
 
 ScrollView::ScrollView()
-: ScrollBase( ControlBehaviour( REQUIRES_MOUSE_WHEEL_EVENTS ) ),   // Enable size negotiation
+: ScrollBase( ControlBehaviour( REQUIRES_WHEEL_EVENTS ) ),   // Enable size negotiation
   mTouchDownTime(0u),
   mGestureStackDepth(0),
   mScrollStateFlags(0),
@@ -598,7 +598,7 @@ ScrollView::ScrollView()
   mFrictionCoefficient(DEFAULT_FRICTION_COEFFICIENT),
   mFlickSpeedCoefficient(DEFAULT_FLICK_SPEED_COEFFICIENT),
   mMaxFlickSpeed(DEFAULT_MAX_FLICK_SPEED),
-  mMouseWheelScrollDistanceStep(Vector2::ZERO),
+  mWheelScrollDistanceStep(Vector2::ZERO),
   mInAccessibilityPan(false),
   mInitialized(false),
   mScrolling(false),
@@ -635,7 +635,7 @@ void ScrollView::OnInitialize()
 
   mScrollPostPosition = mScrollPrePosition = Vector2::ZERO;
 
-  mMouseWheelScrollDistanceStep = Stage::GetCurrent().GetSize() * DEFAULT_MOUSE_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
+  mWheelScrollDistanceStep = Stage::GetCurrent().GetSize() * DEFAULT_WHEEL_SCROLL_DISTANCE_STEP_PROPORTION;
 
   mInitialized = true;
 
@@ -654,12 +654,11 @@ void ScrollView::OnInitialize()
   self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_VERTICAL, mCanScrollVertical);
   self.SetProperty(Toolkit::Scrollable::Property::CAN_SCROLL_HORIZONTAL, mCanScrollHorizontal);
 
-  Vector3 size = GetControlSize();
-  UpdatePropertyDomain(size);
+  UpdatePropertyDomain();
   SetInternalConstraints();
 }
 
-void ScrollView::OnControlStageConnection()
+void ScrollView::OnStageConnection()
 {
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 
@@ -675,7 +674,7 @@ void ScrollView::OnControlStageConnection()
   }
 }
 
-void ScrollView::OnControlStageDisconnection()
+void ScrollView::OnStageDisconnection()
 {
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 
@@ -813,8 +812,7 @@ void ScrollView::SetRulerX(RulerPtr ruler)
 {
   mRulerX = ruler;
 
-  Vector3 size = GetControlSize();
-  UpdatePropertyDomain(size);
+  UpdatePropertyDomain();
   UpdateMainInternalConstraint();
 }
 
@@ -822,14 +820,14 @@ void ScrollView::SetRulerY(RulerPtr ruler)
 {
   mRulerY = ruler;
 
-  Vector3 size = GetControlSize();
-  UpdatePropertyDomain(size);
+  UpdatePropertyDomain();
   UpdateMainInternalConstraint();
 }
 
-void ScrollView::UpdatePropertyDomain(const Vector3& size)
+void ScrollView::UpdatePropertyDomain()
 {
   Actor self = Self();
+  Vector3 size = self.GetTargetSize();
   Vector2 min = mMinScroll;
   Vector2 max = mMaxScroll;
   bool scrollPositionChanged = false;
@@ -1085,14 +1083,14 @@ void ScrollView::SetMaxFlickSpeed(float speed)
   mMaxFlickSpeed = speed;
 }
 
-void ScrollView::SetMouseWheelScrollDistanceStep(Vector2 step)
+void ScrollView::SetWheelScrollDistanceStep(Vector2 step)
 {
-  mMouseWheelScrollDistanceStep = step;
+  mWheelScrollDistanceStep = step;
 }
 
-Vector2 ScrollView::GetMouseWheelScrollDistanceStep() const
+Vector2 ScrollView::GetWheelScrollDistanceStep() const
 {
-  return mMouseWheelScrollDistanceStep;
+  return mWheelScrollDistanceStep;
 }
 
 unsigned int ScrollView::GetCurrentPage() const
@@ -1116,11 +1114,6 @@ unsigned int ScrollView::GetCurrentPage() const
 Vector2 ScrollView::GetCurrentScrollPosition() const
 {
   return -GetPropertyPosition();
-}
-
-void ScrollView::SetScrollPosition(const Vector2& position)
-{
-  mScrollPrePosition = position;
 }
 
 Vector2 ScrollView::GetDomainSize() const
@@ -1872,10 +1865,10 @@ bool ScrollView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
 void ScrollView::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
 {
   // need to update domain properties for new size
-  UpdatePropertyDomain(targetSize);
+  UpdatePropertyDomain();
 }
 
-void ScrollView::OnControlSizeSet( const Vector3& size )
+void ScrollView::OnSizeSet( const Vector3& size )
 {
   // need to update domain properties for new size
   if( mDefaultMaxOvershoot )
@@ -1887,7 +1880,7 @@ void ScrollView::OnControlSizeSet( const Vector3& size )
       mMaxOvershoot = mUserMaxOvershoot;
     }
   }
-  UpdatePropertyDomain(size);
+  UpdatePropertyDomain();
   UpdateMainInternalConstraint();
   if( IsOvershootEnabled() )
   {
@@ -2049,11 +2042,11 @@ bool ScrollView::OnTouchEvent(const TouchEvent& event)
   return true;
 }
 
-bool ScrollView::OnMouseWheelEvent(const MouseWheelEvent& event)
+bool ScrollView::OnWheelEvent(const WheelEvent& event)
 {
   if(!mSensitive)
   {
-    // Ignore this mouse wheel event, if scrollview is insensitive.
+    // Ignore this wheel event, if scrollview is insensitive.
     return false;
   }
 
@@ -2065,7 +2058,7 @@ bool ScrollView::OnMouseWheelEvent(const MouseWheelEvent& event)
     if(mRulerX->GetType() == Ruler::Free)
     {
       // Free panning mode
-      targetScrollPosition.x += event.z * mMouseWheelScrollDistanceStep.x;
+      targetScrollPosition.x += event.z * mWheelScrollDistanceStep.x;
       ClampPosition(targetScrollPosition);
       ScrollTo(-targetScrollPosition);
     }
@@ -2081,7 +2074,7 @@ bool ScrollView::OnMouseWheelEvent(const MouseWheelEvent& event)
     if(mRulerY->GetType() == Ruler::Free)
     {
       // Free panning mode
-      targetScrollPosition.y += event.z * mMouseWheelScrollDistanceStep.y;
+      targetScrollPosition.y += event.z * mWheelScrollDistanceStep.y;
       ClampPosition(targetScrollPosition);
       ScrollTo(-targetScrollPosition);
     }

@@ -50,6 +50,11 @@ public:
   virtual void RequestTextRelayout() = 0;
 
   /**
+   * @brief Called to signal that text has been inserted or deleted.
+   */
+  virtual void TextChanged() = 0;
+
+  /**
    * @brief Called when the number of characters to be inserted exceeds the maximum limit
    */
   virtual void MaxLengthReached() = 0;

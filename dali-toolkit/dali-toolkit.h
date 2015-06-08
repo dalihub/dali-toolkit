@@ -21,29 +21,15 @@
 #include <dali/dali.h>
 
 // Toolkit
-#include <dali-toolkit/public-api/builder/builder.h>
-#include <dali-toolkit/public-api/builder/tree-node.h>
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
-#include <dali-toolkit/public-api/controls/bloom-view/bloom-view.h>
-#include <dali-toolkit/public-api/controls/bubble-effect/bubble-emitter.h>
 #include <dali-toolkit/public-api/controls/buttons/button.h>
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/buttons/radio-button.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
-#include <dali-toolkit/public-api/controls/default-controls/check-button-factory.h>
-#include <dali-toolkit/public-api/controls/default-controls/push-button-factory.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
-#include <dali-toolkit/public-api/controls/effects-view/effects-view.h>
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
-#include <dali-toolkit/public-api/controls/image-view/masked-image-view.h>
-#include <dali-toolkit/public-api/controls/magnifier/magnifier.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-factory.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-landscape-view.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-portrait-view.h>
-#include <dali-toolkit/public-api/controls/popup/popup.h>
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
@@ -54,56 +40,12 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-page-path-effect.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scrollable.h>
-#include <dali-toolkit/public-api/controls/shadow-view/shadow-view.h>
-#include <dali-toolkit/public-api/controls/slider/slider.h>
-#include <dali-toolkit/public-api/controls/super-blur-view/super-blur-view.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
-#include <dali-toolkit/public-api/controls/tool-bar/tool-bar.h>
-
-#include <dali-toolkit/public-api/focus-manager/focus-manager.h>
+#include <dali-toolkit/public-api/focus-manager/accessibility-focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
-#include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>
-
-#include <dali-toolkit/public-api/scripting/script.h>
-#include <dali-toolkit/public-api/scripting/script-plugin.h>
-
 #include <dali-toolkit/public-api/text/rendering-backend.h>
-
-#include <dali-toolkit/public-api/shader-effects/alpha-discard-effect.h>
-#include <dali-toolkit/public-api/shader-effects/bendy-effect.h>
-#include <dali-toolkit/public-api/shader-effects/blind-effect.h>
-#include <dali-toolkit/public-api/shader-effects/bouncing-effect.h>
-#include <dali-toolkit/public-api/shader-effects/carousel-effect.h>
-#include <dali-toolkit/public-api/shader-effects/displacement-effect.h>
-#include <dali-toolkit/public-api/shader-effects/dissolve-local-effect.h>
-#include <dali-toolkit/public-api/shader-effects/distance-field-effect.h>
-#include <dali-toolkit/public-api/shader-effects/mirror-effect.h>
-#include <dali-toolkit/public-api/shader-effects/motion-blur-effect.h>
-#include <dali-toolkit/public-api/shader-effects/motion-stretch-effect.h>
-#include <dali-toolkit/public-api/shader-effects/overlay-effect.h>
-#include <dali-toolkit/public-api/shader-effects/shear-effect.h>
-#include <dali-toolkit/public-api/shader-effects/soft-button-effect.h>
-#include <dali-toolkit/public-api/shader-effects/spot-effect.h>
-#include <dali-toolkit/public-api/shader-effects/square-dissolve-effect.h>
-#include <dali-toolkit/public-api/shader-effects/dissolve-effect.h>
-#include <dali-toolkit/public-api/shader-effects/image-region-effect.h>
-#include <dali-toolkit/public-api/shader-effects/iris-effect.h>
-#include <dali-toolkit/public-api/shader-effects/mask-effect.h>
-#include <dali-toolkit/public-api/shader-effects/nine-patch-mask-effect.h>
-#include <dali-toolkit/public-api/shader-effects/quadratic-bezier.h>
-#include <dali-toolkit/public-api/shader-effects/ripple-effect.h>
-#include <dali-toolkit/public-api/shader-effects/ripple2d-effect.h>
-#include <dali-toolkit/public-api/shader-effects/swirl-effect.h>
-
-#include <dali-toolkit/public-api/styling/style-manager.h>
-
-#include <dali-toolkit/public-api/transition-effects/cube-transition-effect.h>
-#include <dali-toolkit/public-api/transition-effects/cube-transition-wave-effect.h>
-#include <dali-toolkit/public-api/transition-effects/cube-transition-cross-effect.h>
-#include <dali-toolkit/public-api/transition-effects/cube-transition-fold-effect.h>
-
 #include <dali-toolkit/public-api/dali-toolkit-version.h>
 #include <dali-toolkit/public-api/enums.h>
 

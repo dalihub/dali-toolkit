@@ -27,9 +27,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
-#include <dali-toolkit/public-api/controls/page-turn-view/page-factory.h>
-#include <dali-toolkit/public-api/controls/shadow-view/shadow-view.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
+#include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
+#include <dali-toolkit/devel-api/controls/shadow-view/shadow-view.h>
 
 namespace Dali
 {
@@ -196,19 +196,14 @@ private: // from Control
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::Control::OnControlStageConncection
+   * @copydoc CustomActorImpl::OnStageConnection()
    */
-  virtual void OnControlStageConnection();
+  virtual void OnStageConnection();
 
   /**
-   * @copydoc Toolkit::Control::OnControlStageDisConnection
+   * @copydoc CustomActorImpl::OnStageDisconnection()
    */
-  virtual void OnControlStageDisconnection();
-
-  /**
-   * @copydoc Toolkit::Control::OnControlSizeSet
-   */
-  virtual void OnControlSizeSet( const Vector3& size );
+  virtual void OnStageDisconnection();
 
 private: // implemented differently by PageTurnLandscapeView and PageTurnPortraitView
 

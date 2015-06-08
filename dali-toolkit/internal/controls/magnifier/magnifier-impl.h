@@ -26,7 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/magnifier/magnifier.h>
+#include <dali-toolkit/devel-api/controls/magnifier/magnifier.h>
 
 namespace Dali
 {
@@ -117,7 +117,7 @@ private:
 
 private:
 
-  virtual void OnControlSizeSet(const Vector3& targetSize);
+  virtual void OnSizeSet(const Vector3& targetSize);
 
 private:
 

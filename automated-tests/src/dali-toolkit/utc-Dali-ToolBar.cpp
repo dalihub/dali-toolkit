@@ -20,6 +20,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali-toolkit/devel-api/controls/tool-bar/tool-bar.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -77,32 +78,6 @@ int UtcDaliToolBarNew(void)
   toolbar == ToolBar::DownCast( actor );
 
   DALI_TEST_CHECK( toolbar );
-  END_TEST;
-}
-
-int UtcDaliToolBarSetBackground(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolBarSetBackground");
-
-  try
-  {
-    ImageActor toolBarBackground = CreateSolidColorActor( Color::RED );
-
-    ToolBar toolbar = ToolBar::New();
-    toolbar.SetBackground( toolBarBackground );
-
-    Stage::GetCurrent().Add( toolbar );
-  }
-  catch( ... )
-  {
-    tet_result(TET_FAIL);
-  }
-
-  tet_result(TET_PASS);
-
-  application.SendNotification(); // VCC To be removed!!
-  application.Render();     // VCC To be removed!!
   END_TEST;
 }
 

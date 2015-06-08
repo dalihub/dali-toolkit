@@ -88,13 +88,13 @@ void KeyInputFocusManager::SetFocus( Toolkit::Control control )
   if( previousFocusControl )
   {
     // Notify the control that it has lost key input focus
-    previousFocusControl.GetImplementation().OnKeyInputFocusLost();
+    GetImplementation( previousFocusControl ).OnKeyInputFocusLost();
   }
 
   mFocusStack.PushBack( &control.GetBaseObject() );
 
   // Tell the new actor that it has gained focus.
-  control.GetImplementation().OnKeyInputFocusGained();
+  GetImplementation( control ).OnKeyInputFocusGained();
 
   // Emit the signal to inform focus change to the application.
   if ( !mKeyInputFocusChangedSignal.Empty() )
@@ -113,7 +113,7 @@ void KeyInputFocusManager::RemoveFocus( Toolkit::Control control )
       control.OffStageSignal().Disconnect( mSlotDelegate, &KeyInputFocusManager::OnFocusControlStageDisconnection );
 
       // Notify the control that it has lost key input focus
-      control.GetImplementation().OnKeyInputFocusLost();
+      GetImplementation( control ).OnKeyInputFocusLost();
 
       // If this is the top-most actor, pop it and change focus to the previous control
       if( pos == mFocusStack.End() - 1 )
@@ -124,7 +124,7 @@ void KeyInputFocusManager::RemoveFocus( Toolkit::Control control )
         if( previouslyFocusedControl )
         {
           // Tell the control that it has gained focus.
-          previouslyFocusedControl.GetImplementation().OnKeyInputFocusGained();
+          GetImplementation( previouslyFocusedControl ).OnKeyInputFocusGained();
         }
       }
       else
@@ -194,7 +194,7 @@ void KeyInputFocusManager::OnKeyEvent( const KeyEvent& event )
       if( control )
       {
         // Notify the control about the key event
-        consumed = control.GetImplementation().EmitKeyEventSignal( event );
+        consumed = GetImplementation( control ).EmitKeyEventSignal( event );
       }
     }
   }

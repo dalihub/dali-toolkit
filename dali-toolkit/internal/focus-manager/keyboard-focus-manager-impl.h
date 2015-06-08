@@ -65,7 +65,7 @@ public:
   /**
    * @copydoc Toolkit::KeyboardFocusManager::MoveFocus
    */
-  bool MoveFocus(Toolkit::Control::KeyboardFocusNavigationDirection direction);
+  bool MoveFocus(Toolkit::Control::KeyboardFocus::Direction direction);
 
   /**
    * @copydoc Toolkit::KeyboardFocusManager::ClearFocus
@@ -171,7 +171,7 @@ private:
    * @param direction The direction of focus movement
    * @return Whether the focus is successful or not
    */
-  bool DoMoveFocusWithinLayoutControl(Toolkit::Control control, Actor actor, Toolkit::Control::KeyboardFocusNavigationDirection direction);
+  bool DoMoveFocusWithinLayoutControl(Toolkit::Control control, Actor actor, Toolkit::Control::KeyboardFocus::Direction direction);
 
   /**
    * Move the focus to the first focusable actor in the next focus group in the forward

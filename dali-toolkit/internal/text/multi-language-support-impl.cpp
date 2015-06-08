@@ -455,8 +455,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
         {
           validateFontsPerScript = new ValidateFontsPerScript();
 
-          mValidFontsPerScriptCache.PushBack( validateFontsPerScript );
-          validFontsPerScriptCacheBuffer = mValidFontsPerScriptCache.Begin();
+          *( validFontsPerScriptCacheBuffer + script ) = validateFontsPerScript;
         }
 
         if( NULL != validateFontsPerScript )

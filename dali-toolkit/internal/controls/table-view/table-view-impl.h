@@ -261,7 +261,7 @@ private: // From Control
   /**
    * @copydoc Control::GetNextKeyboardFocusableActor
    */
-  virtual Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled );
+  virtual Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled );
 
   /**
    * @copydoc Control::GetNaturalSize()

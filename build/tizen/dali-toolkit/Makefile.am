@@ -20,6 +20,7 @@ toolkit_images_dir = ../../../dali-toolkit/images
 toolkit_sounds_dir = ../../../dali-toolkit/sounds
 toolkit_src_dir    = ../../../dali-toolkit/internal
 public_api_src_dir = ../../../dali-toolkit/public-api
+devel_api_src_dir  = ../../../dali-toolkit/devel-api
 
 if MOBILE_PROFILE
 toolkit_styles_dir = ../../../dali-toolkit/styles/mobile
@@ -32,6 +33,7 @@ include ../../../dali-toolkit/sounds/file.list
 include ../../../dali-toolkit/styles/file.list
 include ../../../dali-toolkit/internal/file.list
 include ../../../dali-toolkit/public-api/file.list
+include ../../../dali-toolkit/devel-api/file.list
 
 resources_dir = ../../../resources
 daliimagedir = ${dataReadOnlyDir}/toolkit/images/
@@ -45,7 +47,8 @@ lib_LTLIBRARIES = libdali-toolkit.la
 
 libdali_toolkit_la_SOURCES = \
                      $(toolkit_src_files) \
-                     $(public_api_src_files)
+                     $(public_api_src_files) \
+                     $(devel_api_src_files)
 
 dalistyledir = ${dataReadOnlyDir}/toolkit/styles/
 dalistyle_DATA = ${dali_toolkit_style_files}
@@ -78,78 +81,73 @@ libdali_toolkit_la_LIBADD = \
 topleveldir = $(devincludepath)/dali-toolkit
 toplevel_HEADERS = ../../../dali-toolkit/dali-toolkit.h
 
-publicapidir = $(topleveldir)/public-api
+# devel api
+develapidir =                   $(topleveldir)/devel-api
+develapibuilderdir =            $(develapidir)/builder
+develapicontrolsdir =           $(develapidir)/controls
+develapibloomviewdir =          $(develapicontrolsdir)/bloom-view
+develapibubbleemitterdir =      $(develapicontrolsdir)/bubble-effect
+develapieffectsviewdir =        $(develapicontrolsdir)/effects-view
+develapimagnifierdir =          $(develapicontrolsdir)/magnifier
+develapipopupdir =              $(develapicontrolsdir)/popup
+develapipageturnviewdir =       $(develapicontrolsdir)/page-turn-view
+develapisliderdir =             $(develapicontrolsdir)/slider
+develapishadowviewdir =         $(develapicontrolsdir)/shadow-view
+develapisuperblurviewdir =      $(develapicontrolsdir)/super-blur-view
+develapifocusmanagerdir =       $(develapidir)/focus-manager
+develapiscriptingdir =          $(develapidir)/scripting
+develapishadereffectsdir =      $(develapidir)/shader-effects
+develapitransitioneffectsdir =  $(develapidir)/transition-effects
+develapistylingdir =            $(develapidir)/styling
+develapitoolbardir =            $(develapicontrolsdir)/tool-bar
 
-publicapicontrolsdir = $(publicapidir)/controls
-publicapialignmentdir = $(publicapicontrolsdir)/alignment
-publicapibloomviewdir = $(publicapicontrolsdir)/bloom-view
-publicapibubbleemitterdir = $(publicapicontrolsdir)/bubble-effect
-publicapibuttonsdir = $(publicapicontrolsdir)/buttons
-publicapiclusterdir = $(publicapicontrolsdir)/cluster
-publicapidefaultcontrolsdir = $(publicapicontrolsdir)/default-controls
-publicapieffectsviewdir = $(publicapicontrolsdir)/effects-view
-publicapigaussianblurviewdir = $(publicapicontrolsdir)/gaussian-blur-view
-publicapiimageviewdir = $(publicapicontrolsdir)/image-view
-publicapiitemviewdir = $(publicapicontrolsdir)/scrollable/item-view
-publicapimagnifierdir = $(publicapicontrolsdir)/magnifier
-publicapinavigationframedir = $(publicapicontrolsdir)/navigation-frame
-publicapipageturnviewdir = $(publicapicontrolsdir)/page-turn-view
-publicapipopupdir = $(publicapicontrolsdir)/popup
-publicapiscrollbardir = $(publicapicontrolsdir)/scroll-bar
-publicapiscrollcomponentdir = $(publicapicontrolsdir)/scroll-component
-publicapiscrollabledir = $(publicapicontrolsdir)/scrollable
-publicapiscrollviewdir = $(publicapicontrolsdir)/scrollable/scroll-view
-publicapiselectorsdir = $(publicapicontrolsdir)/selectors
-publicapishadowviewdir = $(publicapicontrolsdir)/shadow-view
-publicapisliderdir = $(publicapicontrolsdir)/slider
-publicapisuperblurviewdir = $(publicapicontrolsdir)/super-blur-view
-publicapitableviewdir = $(publicapicontrolsdir)/table-view
-publicapitextcontrolsdir = $(publicapidir)/controls/text-controls
-publicapitoolbardir = $(publicapicontrolsdir)/tool-bar
-publicapiviewdir = $(publicapicontrolsdir)/view
-publicapibuilderdir = $(publicapidir)/builder
-publicapifocusmanagerdir = $(publicapidir)/focus-manager
-publicapishadereffectsdir = $(publicapidir)/shader-effects
-publicapibubbleeffectdir = $(publicapidir)/shader-effects/bubble-effect
-publicapistylingdir = $(publicapidir)/styling
-publicapitransitioneffectsdir = $(publicapidir)/transition-effects
-publicapiscriptingdir = $(publicapidir)/scripting
-publicapirenderingbackenddir = $(publicapidir)/text
+# devel headers
+develapibloomview_HEADERS =         $(devel_api_bloom_view_header_files)
+develapibubbleemitter_HEADERS =     $(devel_api_bubble_emitter_header_files)
+develapibuilder_HEADERS =           $(devel_api_builder_header_files)
+develapieffectsview_HEADERS =       $(devel_api_effects_view_header_files)
+develapifocusmanager_HEADERS =      $(devel_api_focus_manager_header_files)
+develapimagnifier_HEADERS =         $(devel_api_magnifier_header_files)
+develapipageturnview_HEADERS =      $(devel_api_page_turn_view_header_files)
+develapipopup_HEADERS =             $(devel_api_popup_header_files)
+develapiscripting_HEADERS =         $(devel_api_scripting_header_files)
+develapishadowview_HEADERS =        $(devel_api_shadow_view_header_files)
+develapishadereffects_HEADERS =     $(devel_api_shader_effects_header_files)
+develapislider_HEADERS =            $(devel_api_slider_header_files)
+develapistyling_HEADERS =           $(devel_api_styling_header_files)
+develapisuperblurview_HEADERS =     $(devel_api_super_blur_view_header_files)
+develapitoolbar_HEADERS =           $(devel_api_tool_bar_header_files)
+develapitransitioneffects_HEADERS = $(devel_api_transition_effects_header_files)
 
-publicapi_HEADERS = $(public_api_header_files)
-publicapicontrols_HEADERS = $(public_api_controls_header_files)
-publicapialignment_HEADERS = $(public_api_alignment_header_files)
-publicapibloomview_HEADERS = $(public_api_bloom_view_header_files)
-publicapibubbleemitter_HEADERS = $(public_api_bubble_emitter_header_files)
-publicapibuttons_HEADERS = $(public_api_buttons_header_files)
-publicapicluster_HEADERS = $(public_api_cluster_header_files)
-publicapidefaultcontrols_HEADERS = $(public_api_default_controls_header_files)
-publicapieffectsview_HEADERS = $(public_api_effects_view_header_files)
+# public api source
+publicapidir =                  $(topleveldir)/public-api
+publicapicontrolsdir =          $(publicapidir)/controls
+publicapialignmentdir =         $(publicapicontrolsdir)/alignment
+publicapibuttonsdir =           $(publicapicontrolsdir)/buttons
+publicapidefaultcontrolsdir =   $(publicapicontrolsdir)/default-controls
+publicapigaussianblurviewdir =  $(publicapicontrolsdir)/gaussian-blur-view
+publicapiscrollbardir =         $(publicapicontrolsdir)/scroll-bar
+publicapiscrollabledir =        $(publicapicontrolsdir)/scrollable
+publicapiscrollviewdir =        $(publicapicontrolsdir)/scrollable/scroll-view
+publicapiitemviewdir =          $(publicapicontrolsdir)/scrollable/item-view
+publicapitableviewdir =         $(publicapicontrolsdir)/table-view
+publicapitextcontrolsdir =      $(publicapicontrolsdir)/text-controls
+publicapifocusmanagerdir =      $(publicapidir)/focus-manager
+publicapirenderingbackenddir =  $(publicapidir)/text
+
+# public api headers
+publicapi_HEADERS =                 $(public_api_header_files)
+publicapicontrols_HEADERS =         $(public_api_controls_header_files)
+publicapialignment_HEADERS =        $(public_api_alignment_header_files)
+publicapibuttons_HEADERS =          $(public_api_buttons_header_files)
+publicapidefaultcontrols_HEADERS =  $(public_api_default_controls_header_files)
 publicapigaussianblurview_HEADERS = $(public_api_gaussian_blur_view_header_files)
-publicapiimageview_HEADERS = $(public_api_image_view_header_files)
-publicapiitemview_HEADERS = $(public_api_item_view_header_files)
-publicapimagnifier_HEADERS = $(public_api_magnifier_header_files)
-publicapinavigationframe_HEADERS = $(public_api_navigation_frame_header_files)
-publicapipageturnview_HEADERS = $(public_api_page_turn_view_header_files)
-publicapipopup_HEADERS = $(public_api_popup_header_files)
-publicapiscrollbar_HEADERS = $(public_api_scroll_bar_header_files)
-
-publicapiscrollcomponent_HEADERS = $(public_api_scroll_component_header_files)
-publicapiscrollable_HEADERS = $(public_api_scrollable_header_files)
-publicapiscrollview_HEADERS = $(public_api_scroll_view_header_files)
-publicapiselectors_HEADERS = $(public_api_selectors_header_files)
-publicapishadowview_HEADERS = $(public_api_shadow_view_header_files)
-publicapislider_HEADERS = $(public_api_slider_header_files)
-publicapisuperblurview_HEADERS = $(public_api_super_blur_view_header_files)
-publicapitableview_HEADERS = $(public_api_table_view_header_files)
-publicapitextcontrols_HEADERS = $(public_api_text_controls_header_files)
-publicapitoolbar_HEADERS = $(public_api_tool_bar_header_files)
-publicapiview_HEADERS = $(public_api_view_header_files)
-publicapibuilder_HEADERS = $(public_api_builder_header_files)
-publicapifocusmanager_HEADERS = $(public_api_focus_manager_header_files)
-publicapishadereffects_HEADERS = $(public_api_shader_effects_header_files)
-publicapistyling_HEADERS = $(public_api_styling_header_files)
-publicapitransitioneffects_HEADERS = $(public_api_transition_effects_header_files)
-publicapiscripting_HEADERS = $(public_api_scripting_header_files)
+publicapiitemview_HEADERS =         $(public_api_item_view_header_files)
+publicapiscrollbar_HEADERS =        $(public_api_scroll_bar_header_files)
+publicapiscrollable_HEADERS =       $(public_api_scrollable_header_files)
+publicapiscrollview_HEADERS =       $(public_api_scroll_view_header_files)
+publicapitableview_HEADERS =        $(public_api_table_view_header_files)
+publicapitextcontrols_HEADERS =     $(public_api_text_controls_header_files)
+publicapifocusmanager_HEADERS =     $(public_api_focus_manager_header_files)
 publicapirenderingbackend_HEADERS = $(public_api_rendering_backend_header_files)
 

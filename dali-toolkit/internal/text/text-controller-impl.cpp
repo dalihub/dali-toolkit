@@ -1041,40 +1041,116 @@ void Controller::Impl::UpdateCursorPosition()
     return;
   }
 
-  CursorInfo cursorInfo;
-  GetCursorPosition( mEventData->mPrimaryCursorPosition,
-                     cursorInfo );
-
-  const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
-  const Vector2 cursorPosition = cursorInfo.primaryPosition + offset;
-
-  // Sets the cursor position.
-  mEventData->mDecorator->SetPosition( PRIMARY_CURSOR,
-                                       cursorPosition.x,
-                                       cursorPosition.y,
-                                       cursorInfo.primaryCursorHeight,
-                                       cursorInfo.lineHeight );
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Primary cursor position: %f,%f\n", cursorPosition.x, cursorPosition.y );
-
-  // Sets the grab handle position.
-  mEventData->mDecorator->SetPosition( GRAB_HANDLE,
-                                       cursorPosition.x,
-                                       cursorPosition.y,
-                                       cursorInfo.lineHeight );
-
-  if( cursorInfo.isSecondaryCursor )
+  if( IsShowingPlaceholderText() )
   {
-    mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_BOTH );
-    mEventData->mDecorator->SetPosition( SECONDARY_CURSOR,
-                                         cursorInfo.secondaryPosition.x + offset.x,
-                                         cursorInfo.secondaryPosition.y + offset.y,
-                                         cursorInfo.secondaryCursorHeight,
-                                         cursorInfo.lineHeight );
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Secondary cursor position: %f,%f\n", cursorInfo.secondaryPosition.x + offset.x, cursorInfo.secondaryPosition.y + offset.y );
+    // Do not want to use the place-holder text to set the cursor position.
+
+    // Use the line's height of the font's family set to set the cursor's size.
+    // If there is no font's family set, use the default font.
+    // Use the current alignment to place the cursor at the beginning, center or end of the box.
+
+    float lineHeight = 0.f;
+
+    FontId defaultFontId = 0u;
+    if( NULL == mFontDefaults )
+    {
+      defaultFontId = mFontClient.GetFontId( EMPTY_STRING,
+                                             EMPTY_STRING );
+    }
+    else
+    {
+      defaultFontId = mFontDefaults->GetFontId( mFontClient );
+    }
+
+    Text::FontMetrics fontMetrics;
+    mFontClient.GetFontMetrics( defaultFontId, fontMetrics );
+
+    lineHeight = fontMetrics.ascender - fontMetrics.descender;
+
+
+    Vector2 cursorPosition;
+
+    switch( mLayoutEngine.GetHorizontalAlignment() )
+    {
+      case LayoutEngine::HORIZONTAL_ALIGN_BEGIN:
+      {
+        cursorPosition.x = 1.f;
+        break;
+      }
+      case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
+      {
+        cursorPosition.x = floor( 0.5f * mControlSize.width );
+        break;
+      }
+      case LayoutEngine::HORIZONTAL_ALIGN_END:
+      {
+        cursorPosition.x = mControlSize.width;
+        break;
+      }
+    }
+
+    switch( mLayoutEngine.GetVerticalAlignment() )
+    {
+      case LayoutEngine::VERTICAL_ALIGN_TOP:
+      {
+        cursorPosition.y = 0.f;
+        break;
+      }
+      case LayoutEngine::VERTICAL_ALIGN_CENTER:
+      {
+        cursorPosition.y = floorf( 0.5f * ( mControlSize.height - lineHeight ) );
+        break;
+      }
+      case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
+      {
+        cursorPosition.y = mControlSize.height - lineHeight;
+        break;
+      }
+    }
+
+    mEventData->mDecorator->SetPosition( PRIMARY_CURSOR,
+                                         cursorPosition.x,
+                                         cursorPosition.y,
+                                         lineHeight,
+                                         lineHeight );
   }
   else
   {
-    mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+    CursorInfo cursorInfo;
+    GetCursorPosition( mEventData->mPrimaryCursorPosition,
+                       cursorInfo );
+
+    const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
+    const Vector2 cursorPosition = cursorInfo.primaryPosition + offset;
+
+    // Sets the cursor position.
+    mEventData->mDecorator->SetPosition( PRIMARY_CURSOR,
+                                         cursorPosition.x,
+                                         cursorPosition.y,
+                                         cursorInfo.primaryCursorHeight,
+                                         cursorInfo.lineHeight );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Primary cursor position: %f,%f\n", cursorPosition.x, cursorPosition.y );
+
+    // Sets the grab handle position.
+    mEventData->mDecorator->SetPosition( GRAB_HANDLE,
+                                         cursorPosition.x,
+                                         cursorPosition.y,
+                                         cursorInfo.lineHeight );
+
+    if( cursorInfo.isSecondaryCursor )
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_BOTH );
+      mEventData->mDecorator->SetPosition( SECONDARY_CURSOR,
+                                           cursorInfo.secondaryPosition.x + offset.x,
+                                           cursorInfo.secondaryPosition.y + offset.y,
+                                           cursorInfo.secondaryCursorHeight,
+                                           cursorInfo.lineHeight );
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Secondary cursor position: %f,%f\n", cursorInfo.secondaryPosition.x + offset.x, cursorInfo.secondaryPosition.y + offset.y );
+    }
+    else
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+    }
   }
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::UpdateCursorPosition\n" );
 }

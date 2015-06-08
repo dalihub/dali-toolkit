@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,17 +204,16 @@ int UtcDaliControlKeyInputFocus(void)
   END_TEST;
 }
 
-int UtcDaliControlGetImplementation(void)
+int UtcDaliControlGetImplementationN(void)
 {
   ToolkitTestApplication application;
-
   DummyControl control;
 
   // Get Empty
   {
     try
     {
-      Toolkit::Internal::Control& controlImpl = control.GetImplementation();
+      Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( control );
       (void)controlImpl; // Avoid unused warning
       tet_result(TET_FAIL);
     }
@@ -223,13 +222,20 @@ int UtcDaliControlGetImplementation(void)
       tet_result(TET_PASS);
     }
   }
+  END_TEST;
+}
+
+int UtcDaliControlGetImplementationConstN(void)
+{
+  ToolkitTestApplication application;
+  DummyControl control;
 
   // Get Const Empty
   {
     try
     {
       const DummyControl constControl(control);
-      const Toolkit::Internal::Control& controlImpl = constControl.GetImplementation();
+      const Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( constControl );
       (void)controlImpl; // Avoid unused warning
       tet_result(TET_FAIL);
     }
@@ -238,14 +244,19 @@ int UtcDaliControlGetImplementation(void)
       tet_result(TET_PASS);
     }
   }
+  END_TEST;
+}
 
-  control = DummyControl::New();
+int UtcDaliControlGetImplementationP(void)
+{
+  ToolkitTestApplication application;
+  DummyControl control = DummyControl::New();
 
   // Get
   {
     try
     {
-      Toolkit::Internal::Control& controlImpl = control.GetImplementation();
+      Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( control );
       (void)controlImpl; // Avoid unused warning
       tet_result(TET_PASS);
     }
@@ -254,13 +265,19 @@ int UtcDaliControlGetImplementation(void)
       tet_result(TET_FAIL);
     }
   }
+  END_TEST;
+}
 
+int UtcDaliControlGetImplementationConstP(void)
+{
+  ToolkitTestApplication application;
+  DummyControl control = DummyControl::New();
   // Get Const
   {
     try
     {
       const DummyControl constControl(control);
-      const Toolkit::Internal::Control& controlImpl = constControl.GetImplementation();
+      const Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( constControl );
       (void)controlImpl; // Avoid unused warning
       tet_result(TET_PASS);
     }
@@ -281,7 +298,7 @@ int UtcDaliControlSignalConnectDisconnect(void)
 
     Actor actor = Actor::New();
     DALI_TEST_EQUALS( actor.OnStageSignal().GetConnectionCount(), 0u, TEST_LOCATION );
-    Toolkit::Internal::Control& control = dummy.GetImplementation();
+    Toolkit::Internal::Control& control = Toolkit::Internal::GetImplementation( dummy );
     DummyControlImpl* dummyImpl = dynamic_cast<DummyControlImpl*>(&control);
     DALI_TEST_CHECK( dummyImpl );
 
@@ -310,7 +327,7 @@ int UtcDaliControlSignalAutomaticDisconnect(void)
 
   {
     DummyControl dummy = DummyControlImpl::New();
-    Toolkit::Internal::Control& control = dummy.GetImplementation();
+    Toolkit::Internal::Control& control = Toolkit::Internal::GetImplementation( dummy );
     DummyControlImpl* dummyImpl = dynamic_cast<DummyControlImpl*>(&control);
     DALI_TEST_CHECK( dummyImpl );
 
@@ -345,7 +362,8 @@ int UtcDaliControlTestParameters(void)
 
   float width = 640.0f;
   float height = test.GetHeightForWidth( width );
-  DALI_TEST_CHECK( test.GetWidthForHeight( height ) == width );
+  DALI_TEST_EQUALS( 640.0f, height, TEST_LOCATION );
+  DALI_TEST_EQUALS( 640.0f, test.GetWidthForHeight( height ), TEST_LOCATION );
 
   test.KeyEventSignal();
 
@@ -361,11 +379,9 @@ int UtcDaliControlBackgroundColor(void)
   ToolkitTestApplication application;
   Control control = Control::New();
 
-  DALI_TEST_CHECK( !control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
 
   control.SetBackgroundColor( Color::RED );
-  DALI_TEST_CHECK( control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::RED, TEST_LOCATION );
 
   END_TEST;
@@ -376,24 +392,20 @@ int UtcDaliControlBackgroundImage(void)
   ToolkitTestApplication application;
   Control control = Control::New();
 
-  DALI_TEST_CHECK( !control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
 
   Image image = ResourceImage::New("TestImage");
   control.SetBackgroundImage( image );
-  DALI_TEST_CHECK( control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::WHITE, TEST_LOCATION );
 
   control.SetBackgroundColor( Color::GREEN );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::GREEN, TEST_LOCATION );
 
   control.ClearBackground();
-  DALI_TEST_CHECK( !control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
 
   control.SetBackgroundColor( Color::YELLOW );
   control.SetBackgroundImage( image );
-  DALI_TEST_CHECK( control.GetBackgroundActor() );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::YELLOW, TEST_LOCATION );
 
   END_TEST;
@@ -404,13 +416,13 @@ int UtcDaliControlBackgroundProperties(void)
   ToolkitTestApplication application;
   Control control = Control::New();
 
-  DALI_TEST_CHECK( !control.GetBackgroundActor() );
+  DALI_TEST_CHECK( control.GetChildCount() == 0 );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
   DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::TRANSPARENT, TEST_LOCATION );
   DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND_IMAGE ).Get< Property::Map >().Empty() );
 
   control.SetProperty( Control::Property::BACKGROUND_COLOR, Color::RED );
-  DALI_TEST_CHECK( control.GetBackgroundActor() );
+  DALI_TEST_CHECK( control.GetChildCount() > 0 );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::RED, TEST_LOCATION );
   DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::RED, TEST_LOCATION );
 
@@ -419,7 +431,7 @@ int UtcDaliControlBackgroundProperties(void)
   Property::Map map;
   map[ "image" ] = imageMap;
   control.SetProperty( Control::Property::BACKGROUND_IMAGE, map );
-  DALI_TEST_CHECK( control.GetBackgroundActor() );
+  DALI_TEST_CHECK( control.GetChildCount() > 0 );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::RED, TEST_LOCATION );
   DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::RED, TEST_LOCATION );
 
@@ -430,7 +442,7 @@ int UtcDaliControlBackgroundProperties(void)
 
   Property::Map emptyMap;
   control.SetProperty( Control::Property::BACKGROUND_IMAGE, emptyMap );
-  DALI_TEST_CHECK( !control.GetBackgroundActor() );
+  DALI_TEST_CHECK( control.GetChildCount() == 0 );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::TRANSPARENT, TEST_LOCATION );
   DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::TRANSPARENT, TEST_LOCATION );
   DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND_IMAGE ).Get< Property::Map >().Empty() );
@@ -527,6 +539,18 @@ int UtcDaliControlImplKeyInputFocusLostSignal(void)
   control.ClearKeyInputFocus();
 
   DALI_TEST_CHECK( gKeyInputFocusCallBackCalled );
+
+  END_TEST;
+}
+
+int UtcDaliControlImplGetControlExtensionP(void)
+{
+  ToolkitTestApplication application;
+  Control control = Control::New();
+
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( control );
+
+  DALI_TEST_CHECK( NULL == controlImpl.GetControlExtension() );
 
   END_TEST;
 }

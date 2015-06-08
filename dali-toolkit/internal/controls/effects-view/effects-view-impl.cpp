@@ -315,7 +315,7 @@ void EffectsView::OnInitialize()
   SetupProperties();
 }
 
-void EffectsView::OnControlSizeSet(const Vector3& targetSize)
+void EffectsView::OnSizeSet(const Vector3& targetSize)
 {
   mTargetSize = Vector2(targetSize);
 

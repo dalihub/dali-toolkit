@@ -75,7 +75,7 @@ private: // From Control
   /**
    * @copydoc Control::OnStyleChange()
    */
-  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
+  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
 
   /**
    * @copydoc Control::OnRelayout()
@@ -96,6 +96,11 @@ private: // From Control
    * @copydoc Text::ControlInterface::RequestTextRelayout()
    */
   virtual void RequestTextRelayout();
+
+  /**
+   * @copydoc Text::ControlInterface::TextChanged()
+   */
+  virtual void TextChanged();
 
   /**
    * @copydoc Text::ControlInterface::MaxLengthReached()

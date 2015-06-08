@@ -840,24 +840,24 @@ public:
 
   /**
    * @brief Gets the step of scroll distance in actor coordinates for
-   * each mouse wheel event received in free panning mode.
+   * each wheel event received in free panning mode.
    *
    * @return The step of scroll distance(pixel) in X and Y axes.
    */
-  Vector2 GetMouseWheelScrollDistanceStep() const;
+  Vector2 GetWheelScrollDistanceStep() const;
 
   /**
    * @brief Sets the step of scroll distance in actor coordinates for
-   * each mouse wheel event received in free panning mode.
+   * each wheel event received in free panning mode.
    *
    * @param[in] step The step of scroll distance(pixel) in X and Y axes.
    *
    * @note: If snap points are defined in the rulers, it will always
    * scroll to the next snap point towards the scroll direction while
-   * receiving the mouse wheel events.
+   * receiving the wheel events.
    *
    */
-  void SetMouseWheelScrollDistanceStep(Vector2 step);
+  void SetWheelScrollDistanceStep(Vector2 step);
 
   /**
    * @brief Retrieves current scroll position.
@@ -865,14 +865,6 @@ public:
    * @returns The current scroll position.
    */
   Vector2 GetCurrentScrollPosition() const;
-
-  /**
-   * @brief Sets the current scroll position, overriding current scroll animations. If panning is currently taking place
-   *        SetScrollPosition will have no effect. Try to ensure panning has stopped before calling this function.
-   *
-   * @param[in] position The new scroll position to set.
-   */
-  void SetScrollPosition(const Vector2& position);
 
   /**
    * @brief Retrieves current scroll page based on ScrollView

@@ -25,12 +25,13 @@ SET(TC_SOURCES
    utc-Dali-TableView.cpp
    utc-Dali-TextField.cpp
    utc-Dali-TextLabel.cpp
+   utc-Dali-TextSelectionPopup.cpp
    utc-Dali-ToolBar.cpp
    utc-Dali-Button.cpp
    utc-Dali-Control.cpp
    utc-Dali-ControlImpl.cpp
    utc-Dali-DefaultControls.cpp
-   utc-Dali-FocusManager.cpp
+   utc-Dali-AccessibilityFocusManager.cpp
    utc-Dali-ItemLayout.cpp
    utc-Dali-ItemView.cpp
    utc-Dali-KeyboardFocusManager.cpp
@@ -80,6 +81,7 @@ FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
 ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
 
 INCLUDE_DIRECTORIES(
+    ../../../
     ${${CAPI_LIB}_INCLUDE_DIRS}
     dali-toolkit-test-utils
 )

@@ -1,7 +1,7 @@
 /*! \page handle-body-idiom Handle – body
 <h2 class="pg">What is the Handle/Body (Pimpl) pattern?</h2>
 It is a technique for hiding implementation details in the header file.
-Dali achieves it by using "handles" in the public API. These handles internally contain a reference counted pointer to the concrete implementation.
+DALi achieves it by using "handles" in the public API. These handles internally contain a reference counted pointer to the concrete implementation.
 
 <h2 class="pg">Why does Dali::Object use the Handle/Body (Pimpl) pattern?</h2>
 It provides:
@@ -13,15 +13,15 @@ Implementation details are hidden, only the required API is visible for the appl
 This way the danger of API/ABI breaks is also reduced since the implementation of a class can change without modifying the public API.
 
 \par Easier memory management
-Dali objects have implicit smart-pointer semantics.
-Each Dali::Object contains a single reference counted object which can be intitialized with the static "New" methods in the Dali API.
+DALi objects have implicit smart-pointer semantics.
+Each Dali::Object contains a single reference counted object which can be intitialized with the static "New" methods in the DALi API.
 This means that C++ new/delete operators do not have to be used (or paired) in the user code (RAII idiom).
 Of course there's no way of stopping users from allocating heap memory, but calls to the new operator can be minimised.
 
 <h2 class="pg">What does 'implicit smart-pointer semantics' mean in the case of Dali?</h2>
 
-Since Dali objects are just handles, they can be copied by value. When a Dali object is copied, both the copy and original will point to the same Dali resource.
-The internal Dali resources are reference counted; copying a Dali object will increase the reference count. A resource will not be deleted until all its Dali::Object handles are destroyed, or reset.
+Since DALi objects are just handles, they can be copied by value. When a DALi object is copied, both the copy and original will point to the same DALi resource.
+The internal DALi resources are reference counted; copying a DALi object will increase the reference count. A resource will not be deleted until all its Dali::Object handles are destroyed, or reset.
 
 \code
 class AnimationTest

@@ -23,8 +23,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/tool-bar/tool-bar.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
+#include <dali-toolkit/devel-api/controls/tool-bar/tool-bar.h>
 
 namespace Dali
 {
@@ -52,11 +52,6 @@ public:
   static Toolkit::ToolBar New();
 
   /**
-   * @copydoc Dali::Toolkit::ToolBar::SetBackground()
-   */
-  void SetBackground( Actor background );
-
-  /**
    * @copydoc Dali::Toolkit::ToolBar::AddControl()
    */
   void AddControl( Dali::Actor control, float relativeSize, Toolkit::Alignment::Type alignment, const Toolkit::Alignment::Padding& padding );
@@ -80,12 +75,6 @@ private: // From Control
    * @see Control::OnControlChildAdd()
    */
   virtual void OnControlChildAdd(Actor& child);
-
-  /**
-   *
-   * @copydoc Toolkit::Control::OnControlSizeSet( const Vector3& targetSize )
-   */
-  virtual void OnControlSizeSet( const Vector3& targetSize );
 
 private:
   /**
@@ -135,8 +124,6 @@ private:
   float              mRightRelativeSpace;       ///< Relative space between center and right groups of controls.
   float              mAccumulatedRelativeSpace; ///< Stores the total percentage space used by controls.
   bool               mInitializing;             ///< Allows the use of Actor's API to add controls.
-  Vector3            mToolBarSize;              ///< The size of tool bar
-  Actor              mBackground;               ///< The background of the tool bar
 
   std::map<Actor/*control*/,Toolkit::Alignment> mControls; ///< Stores a relationship between controls and their alignments used to place them inside the table view.
 };

@@ -19,7 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
-#include <list>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/adaptor-framework/style-monitor.h>
 #include <dali/public-api/object/base-object.h>
@@ -27,8 +27,8 @@
 #include <dali/public-api/signals/connection-tracker.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/styling/style-manager.h>
-#include <dali-toolkit/public-api/builder/builder.h>
+#include <dali-toolkit/devel-api/styling/style-manager.h>
+#include <dali-toolkit/devel-api/builder/builder.h>
 
 namespace Dali
 {
@@ -140,7 +140,7 @@ public:
 
 private:
 
-  typedef std::list<std::string> StringList;
+  typedef std::vector<std::string> StringList;
 
   /**
    * @brief Internal helper method to read a file from file system.
@@ -222,9 +222,9 @@ private:
    * Callback for when style monitor raises a signal
    *
    * @param[in] styleMonitor The style monitor object
-   * @param[in] styleChange The style change data
+   * @param[in] styleChange The style change type
    */
-  void StyleMonitorChange( StyleMonitor styleMonitor, StyleChange styleChange );
+  void StyleMonitorChange( StyleMonitor styleMonitor, StyleChange::Type styleChange );
 
   // Undefined
   StyleManager(const StyleManager&);
@@ -237,6 +237,7 @@ private:
   typedef std::map< std::string, Toolkit::Builder > BuilderMap;
 
   Toolkit::Builder mThemeBuilder;     ///< Builder for all default theme properties
+  StyleMonitor mStyleMonitor;         ///< Style monitor handle
 
   Orientation mOrientation;           ///< Handle to application orientation object
   int mOrientationDegrees;            ///< Directly set value of orientation

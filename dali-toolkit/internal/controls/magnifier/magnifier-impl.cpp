@@ -268,7 +268,7 @@ void Magnifier::SetFrameVisibility(bool visible)
   }
 }
 
-void Magnifier::OnControlSizeSet(const Vector3& targetSize)
+void Magnifier::OnSizeSet(const Vector3& targetSize)
 {
   // TODO: Once Camera/CameraActor properties function as proper animatable properties
   // this code can disappear.

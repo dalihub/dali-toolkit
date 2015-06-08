@@ -676,11 +676,11 @@ Vector3 GridLayout::GetItemPosition(int itemID, float currentLayoutPosition, con
   return itemPosition;
 }
 
-int GridLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
+int GridLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
 {
   switch( direction )
   {
-    case Toolkit::Control::Left:
+    case Toolkit::Control::KeyboardFocus::LEFT:
     {
       itemID--;
       if( itemID < 0 )
@@ -689,7 +689,7 @@ int GridLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Cont
       }
       break;
     }
-    case Toolkit::Control::Up:
+    case Toolkit::Control::KeyboardFocus::UP:
     {
       itemID -= mImpl->mNumberOfColumns;
       if( itemID < 0 )
@@ -698,7 +698,7 @@ int GridLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Cont
       }
       break;
     }
-    case Toolkit::Control::Right:
+    case Toolkit::Control::KeyboardFocus::RIGHT:
     {
       itemID++;
       if( itemID >= maxItems )
@@ -707,7 +707,7 @@ int GridLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Cont
       }
       break;
     }
-    case Toolkit::Control::Down:
+    case Toolkit::Control::KeyboardFocus::DOWN:
     {
       itemID += mImpl->mNumberOfColumns;
       if( itemID >= maxItems )

@@ -29,6 +29,7 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
+#include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pan-gesture-detector.h>
 #include <dali/public-api/images/resource-image.h>
@@ -44,7 +45,7 @@
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-selection-popup.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 
 #ifdef DEBUG_ENABLED
 #define DECORATOR_DEBUG
@@ -531,6 +532,7 @@ struct Decorator::Impl : public ConnectionTracker
       grabHandle.grabArea.SetSizeModeFactor( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE );
       grabHandle.actor.Add( grabHandle.grabArea );
 
+      grabHandle.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnGrabHandleTouched );
       mTapDetector.Attach( grabHandle.grabArea );
       mPanGestureDetector.Attach( grabHandle.grabArea );
 
@@ -738,10 +740,6 @@ struct Decorator::Impl : public ConnectionTracker
     if( Gesture::Started == gesture.state )
     {
       handle.grabDisplacementX = handle.grabDisplacementY = 0;
-      if( mHandleImages[type][HANDLE_IMAGE_PRESSED] )
-      {
-        handle.actor.SetImage( mHandleImages[type][HANDLE_IMAGE_PRESSED] );
-      }
     }
 
     handle.grabDisplacementX += gesture.displacement.x;
@@ -759,7 +757,7 @@ struct Decorator::Impl : public ConnectionTracker
         mHandleScrolling = type;
         StartScrollTimer();
       }
-      else if( x > mTextControlParent.GetControlSize().width - mScrollThreshold )
+      else if( x > mTextControlParent.Self().GetTargetSize().width - mScrollThreshold )
       {
         mScrollDirection = SCROLL_LEFT;
         mHandleScrolling = type;
@@ -809,16 +807,42 @@ struct Decorator::Impl : public ConnectionTracker
     }
   }
 
+  bool OnGrabHandleTouched( Actor actor, const TouchEvent& event )
+  {
+    // Switch between pressed/release grab-handle images
+    if( event.GetPointCount() > 0 &&
+        mHandle[GRAB_HANDLE].actor )
+    {
+      const TouchPoint& point = event.GetPoint(0);
+
+      if( TouchPoint::Down == point.state &&
+          mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_PRESSED] )
+      {
+        mHandle[GRAB_HANDLE].actor.SetImage( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_PRESSED] );
+      }
+      else if( TouchPoint::Up == point.state &&
+               mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] )
+      {
+        mHandle[GRAB_HANDLE].actor.SetImage( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] );
+      }
+    }
+
+    // Consume to avoid pop-ups accidentally closing, when handle is outside of pop-up area
+    return true;
+  }
+
   bool OnHandleOneTouched( Actor actor, const TouchEvent& touch )
   {
     // TODO
-    return false;
+    // Consume to avoid pop-ups accidentally closing, when handle is outside of pop-up area
+    return true;
   }
 
   bool OnHandleTwoTouched( Actor actor, const TouchEvent& touch )
   {
     // TODO
-    return false;
+    // Consume to avoid pop-ups accidentally closing, when handle is outside of pop-up area
+    return true;
   }
 
   // Popup

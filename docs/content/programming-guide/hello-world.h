@@ -2,11 +2,11 @@
 
 The following steps are required for displaying the sentence 'Hello World' with Dali:
 
-- initialize the Dali library
+- initialize the DALi library
 - create an Actor showing text
 - add it to the Stage
 
-To understand the basic building blocks of the UI make sure to read the chapter on \link fundamentals Dali Fundamentals\endlink first.
+To understand the basic building blocks of the UI make sure to read the chapter on \link fundamentals DALi Fundamentals\endlink first.
 
 Let's take a look at the code for this test application.
 
@@ -85,8 +85,8 @@ int main( int argc, char **argv )
 
  There are a couple of steps which are very important to understand.
 
- <h2 class="pg"> Initializing Dali </h2>
- The application should not use the Dali library until it has sent the init complete signal!
+ <h2 class="pg"> Initializing DALi </h2>
+ The application should not use the DALi library until it has sent the init complete signal!
  That's why we connect our ExampleApp::Create callback to Dali::Application's SignalInit signal:
  \code
    ...
@@ -96,7 +96,7 @@ int main( int argc, char **argv )
 
  <h2 class="pg"> Reference counting </h2>
  The application should store Actors' and resources' handles.
- Dali objects are reference counted, which makes sure they exist only as long as they are needed.
+ DALi objects are reference counted, which makes sure they exist only as long as they are needed.
  That's why we store the Actor's handle:
  \code
    ...

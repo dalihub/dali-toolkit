@@ -95,12 +95,12 @@ float ItemLayout::GetClosestOnScreenLayoutPosition(int itemID, float currentLayo
   return currentLayoutPosition;
 }
 
-int ItemLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
+int ItemLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
 {
   switch( direction )
   {
-    case Control::Left:
-    case Control::Up:
+    case Control::KeyboardFocus::LEFT:
+    case Control::KeyboardFocus::UP:
     {
       itemID--;
       if( itemID < 0 )
@@ -109,8 +109,8 @@ int ItemLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Cont
       }
       break;
     }
-    case Control::Right:
-    case Control::Down:
+    case Control::KeyboardFocus::RIGHT:
+    case Control::KeyboardFocus::DOWN:
     {
       itemID++;
       if( itemID >= maxItems )

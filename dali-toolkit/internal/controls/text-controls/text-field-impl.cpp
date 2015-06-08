@@ -117,7 +117,9 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-right", STRING,    SELECTION_HANDLE_PRESSED_IMAGE_RIGHT )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-highlight-color",            STRING,    SELECTION_HIGHLIGHT_COLOR            )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decoration-bounding-box",              RECTANGLE, DECORATION_BOUNDING_BOX              )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "input-method-settings",                MAP,       INPUT_METHOD_SETTINGS                )
 
+DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "text-changed",       SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "max-length-reached", SIGNAL_MAX_LENGTH_REACHED )
 
 DALI_TYPE_REGISTRATION_END()
@@ -158,6 +160,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         {
           impl.mRenderingBackend = backend;
           impl.mRenderer.Reset();
+          impl.RequestTextRelayout();
         }
         break;
       }
@@ -165,7 +168,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          std::string text = value.Get< std::string >();
+          const std::string text = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p TEXT %s\n", impl.mController.Get(), text.c_str() );
 
           impl.mController->SetText( text );
@@ -176,7 +179,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          std::string text = value.Get< std::string >();
+          const std::string text = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PLACEHOLDER_TEXT %s\n", impl.mController.Get(), text.c_str() );
 
           impl.mController->SetPlaceholderText( PLACEHOLDER_TYPE_INACTIVE, text );
@@ -187,7 +190,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          std::string text = value.Get< std::string >();
+          const std::string text = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PLACEHOLDER_TEXT_FOCUSED %s\n", impl.mController.Get(), text.c_str() );
 
           impl.mController->SetPlaceholderText( PLACEHOLDER_TYPE_ACTIVE, text );
@@ -198,13 +201,12 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          std::string fontFamily = value.Get< std::string >();
+          const std::string fontFamily = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p FONT_FAMILY %s\n", impl.mController.Get(), fontFamily.c_str() );
 
           if( impl.mController->GetDefaultFontFamily() != fontFamily )
           {
             impl.mController->SetDefaultFontFamily( fontFamily );
-            impl.RequestTextRelayout();
           }
         }
         break;
@@ -213,13 +215,12 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          std::string fontStyle = value.Get< std::string >();
+          const std::string fontStyle = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p FONT_STYLE %s\n", impl.mController.Get(), fontStyle.c_str() );
 
           if( impl.mController->GetDefaultFontStyle() != fontStyle )
           {
             impl.mController->SetDefaultFontStyle( fontStyle );
-            impl.RequestTextRelayout();
           }
         }
         break;
@@ -228,13 +229,12 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          float pointSize = value.Get< float >();
+          const float pointSize = value.Get< float >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p FONT_STYLE %f\n", impl.mController.Get(), pointSize );
 
           if( !Equals( impl.mController->GetDefaultPointSize(), pointSize ) )
           {
             impl.mController->SetDefaultPointSize( pointSize );
-            impl.RequestTextRelayout();
           }
         }
         break;
@@ -248,19 +248,14 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          std::string alignStr = value.Get< std::string >();
+          const std::string alignStr = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p HORIZONTAL_ALIGNMENT %f\n", impl.mController.Get(), alignStr.c_str() );
 
-          LayoutEngine& engine = impl.mController->GetLayoutEngine();
-          LayoutEngine::HorizontalAlignment alignment = Scripting::GetEnumeration< LayoutEngine::HorizontalAlignment >( alignStr.c_str(),
+          const LayoutEngine::HorizontalAlignment alignment = Scripting::GetEnumeration< LayoutEngine::HorizontalAlignment >( alignStr.c_str(),
                                                                                                                         HORIZONTAL_ALIGNMENT_STRING_TABLE,
                                                                                                                         HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
 
-          if( engine.GetHorizontalAlignment() != alignment )
-          {
-            engine.SetHorizontalAlignment( alignment );
-            impl.RequestTextRelayout();
-          }
+          impl.mController->SetHorizontalAlignment( alignment );
         }
         break;
       }
@@ -268,48 +263,43 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          std::string alignStr = value.Get< std::string >();
+          const std::string alignStr = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p VERTICAL_ALIGNMENT %f\n", impl.mController.Get(), alignStr.c_str() );
 
-          LayoutEngine& engine = impl.mController->GetLayoutEngine();
           LayoutEngine::VerticalAlignment alignment = Scripting::GetEnumeration< LayoutEngine::VerticalAlignment >( alignStr.c_str(),
                                                                                                                     VERTICAL_ALIGNMENT_STRING_TABLE,
                                                                                                                     VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
 
-          if( engine.GetVerticalAlignment() != alignment )
-          {
-            engine.SetVerticalAlignment( alignment );
-            impl.RequestTextRelayout();
-          }
+          impl.mController->SetVerticalAlignment( alignment );
         }
         break;
       }
       case Toolkit::TextField::Property::TEXT_COLOR:
       {
-        if ( impl.mController )
+        if( impl.mController )
         {
-          Vector4 textColor = value.Get< Vector4 >();
+          const Vector4 textColor = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p TEXT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), textColor.r, textColor.g, textColor.b, textColor.a );
 
-          if ( impl.mController->GetTextColor() != textColor )
+          if( impl.mController->GetTextColor() != textColor )
           {
             impl.mController->SetTextColor( textColor );
-            impl.RequestTextRelayout();
+            impl.mRenderer.Reset();
           }
         }
         break;
       }
       case Toolkit::TextField::Property::PLACEHOLDER_TEXT_COLOR:
       {
-        if ( impl.mController )
+        if( impl.mController )
         {
-          Vector4 textColor = value.Get< Vector4 >();
+          const Vector4 textColor = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PLACEHOLDER_TEXT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), textColor.r, textColor.g, textColor.b, textColor.a );
 
-          if ( impl.mController->GetPlaceholderTextColor() != textColor )
+          if( impl.mController->GetPlaceholderTextColor() != textColor )
           {
             impl.mController->SetPlaceholderTextColor( textColor );
-            impl.RequestTextRelayout();
+            impl.mRenderer.Reset();
           }
         }
         break;
@@ -318,13 +308,13 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          Vector2 shadowOffset = value.Get< Vector2 >();
+          const Vector2 shadowOffset = value.Get< Vector2 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SHADOW_OFFSET %f,%f\n", impl.mController.Get(), shadowOffset.x, shadowOffset.y );
 
           if ( impl.mController->GetShadowOffset() != shadowOffset )
           {
             impl.mController->SetShadowOffset( shadowOffset );
-            impl.RequestTextRelayout();
+            impl.mRenderer.Reset();
           }
         }
         break;
@@ -333,13 +323,13 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          Vector4 shadowColor = value.Get< Vector4 >();
+          const Vector4 shadowColor = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SHADOW_COLOR %f,%f,%f,%f\n", impl.mController.Get(), shadowColor.r, shadowColor.g, shadowColor.b, shadowColor.a );
 
           if ( impl.mController->GetShadowColor() != shadowColor )
           {
             impl.mController->SetShadowColor( shadowColor );
-            impl.RequestTextRelayout();
+            impl.mRenderer.Reset();
           }
         }
         break;
@@ -348,10 +338,11 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mDecorator )
         {
-          Vector4 color = value.Get< Vector4 >();
+          const Vector4 color = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PRIMARY_CURSOR_COLOR %f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
           impl.mDecorator->SetColor( PRIMARY_CURSOR, color );
+          impl.RequestTextRelayout();
         }
         break;
       }
@@ -359,10 +350,11 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mDecorator )
         {
-          Vector4 color = value.Get< Vector4 >();
+          const Vector4 color = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SECONDARY_CURSOR_COLOR %f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
           impl.mDecorator->SetColor( SECONDARY_CURSOR, color );
+          impl.RequestTextRelayout();
         }
         break;
       }
@@ -370,10 +362,11 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          bool enable = value.Get< bool >();
+          const bool enable = value.Get< bool >();
           DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p ENABLE_CURSOR_BLINK %d\n", impl.mController.Get(), enable );
 
           impl.mController->SetEnableCursorBlink( enable );
+          impl.RequestTextRelayout();
         }
         break;
       }
@@ -381,7 +374,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mDecorator )
         {
-          float interval = value.Get< float >();
+          const float interval = value.Get< float >();
           DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p CURSOR_BLINK_INTERVAL %f\n", impl.mController.Get(), interval );
 
           impl.mDecorator->SetCursorBlinkInterval( interval );
@@ -392,7 +385,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mDecorator )
         {
-          float duration = value.Get< float >();
+          const float duration = value.Get< float >();
           DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p CURSOR_BLINK_INTERVAL %f\n", impl.mController.Get(), duration );
 
           impl.mDecorator->SetCursorBlinkDuration( duration );
@@ -401,29 +394,31 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::Property::GRAB_HANDLE_IMAGE:
       {
-        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
+        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p GRAB_HANDLE_IMAGE %s\n", impl.mController.Get(), image.GetUrl().c_str() );
 
         if( impl.mDecorator )
         {
           impl.mDecorator->SetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_RELEASED, image );
+          impl.RequestTextRelayout();
         }
         break;
       }
       case Toolkit::TextField::Property::GRAB_HANDLE_PRESSED_IMAGE:
       {
-        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
+        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p GRAB_HANDLE_PRESSED_IMAGE %s\n", impl.mController.Get(), image.GetUrl().c_str() );
 
         if( impl.mDecorator )
         {
           impl.mDecorator->SetHandleImage( GRAB_HANDLE, HANDLE_IMAGE_PRESSED, image );
+          impl.RequestTextRelayout();
         }
         break;
       }
       case Toolkit::TextField::Property::SCROLL_THRESHOLD:
       {
-        float threshold = value.Get< float >();
+        const float threshold = value.Get< float >();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SCROLL_THRESHOLD %f\n", impl.mController.Get(), threshold );
 
         if( impl.mDecorator )
@@ -434,7 +429,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::Property::SCROLL_SPEED:
       {
-        float speed = value.Get< float >();
+        const float speed = value.Get< float >();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SCROLL_SPEED %f\n", impl.mController.Get(), speed );
 
         if( impl.mDecorator )
@@ -445,56 +440,61 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_LEFT:
       {
-        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
+        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_IMAGE_LEFT %f\n", impl.mController.Get(), image.GetUrl().c_str() );
 
         if( impl.mDecorator )
         {
           impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED, image );
+          impl.RequestTextRelayout();
         }
         break;
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT:
       {
-        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
+        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_IMAGE_RIGHT %f\n", impl.mController.Get(), image.GetUrl().c_str() );
 
         if( impl.mDecorator )
         {
           impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED, image );
+          impl.RequestTextRelayout();
         }
         break;
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT:
       {
-        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
+        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_PRESSED_IMAGE_LEFT %f\n", impl.mController.Get(), image.GetUrl().c_str() );
 
         if( impl.mDecorator )
         {
           impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, image );
+          impl.RequestTextRelayout();
         }
         break;
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT:
       {
-        ResourceImage image = ResourceImage::New( value.Get< std::string >() );
+        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_PRESSED_IMAGE_RIGHT %f\n", impl.mController.Get(), image.GetUrl().c_str() );
 
         if( impl.mDecorator )
         {
           impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, image );
+          impl.RequestTextRelayout();
         }
         break;
       }
       case Toolkit::TextField::Property::SELECTION_HIGHLIGHT_COLOR:
       {
-        Vector4 color = value.Get< Vector4 >();
+        const Vector4 color = value.Get< Vector4 >();
         DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SELECTION_HIGHLIGHT_COLOR %f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
         if( impl.mDecorator )
         {
           impl.mDecorator->SetHighlightColor( color );
+          impl.RequestTextRelayout();
         }
         break;
       }
@@ -502,10 +502,11 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mDecorator )
         {
-          Rect<int> box = value.Get< Rect<int> >();
+          const Rect<int> box = value.Get< Rect<int> >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p DECORATION_BOUNDING_BOX %d,%d %dx%d\n", impl.mController.Get(), box.x, box.y, box.width, box.height );
 
           impl.mDecorator->SetBoundingBox( box );
+          impl.RequestTextRelayout();
         }
         break;
       }
@@ -513,11 +514,17 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          int max = value.Get< int >();
+          const int max = value.Get< int >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p MAX_LENGTH %d\n", impl.mController.Get(), max );
 
           impl.mController->SetMaximumNumberOfCharacters( max );
         }
+        break;
+      }
+      case Toolkit::TextField::Property::INPUT_METHOD_SETTINGS:
+      {
+        const Property::Map map = value.Get<Property::Map>();
+        VirtualKeyboard::ApplySettings( map );
         break;
       }
     } // switch
@@ -569,6 +576,30 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
           std::string text;
           impl.mController->GetPlaceholderText( PLACEHOLDER_TYPE_ACTIVE, text );
           value = text;
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::FONT_FAMILY:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultFontFamily();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::FONT_STYLE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultFontStyle();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::POINT_SIZE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultPointSize();
         }
         break;
       }
@@ -778,6 +809,10 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::TextField::Property::INPUT_METHOD_SETTINGS:
+      {
+        break;
+      }
     } //switch
   }
 
@@ -791,7 +826,11 @@ bool TextField::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   bool connected( true );
   Toolkit::TextField field = Toolkit::TextField::DownCast( handle );
 
-  if( 0 == strcmp( signalName.c_str(), SIGNAL_MAX_LENGTH_REACHED ) )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_TEXT_CHANGED ) )
+  {
+    field.TextChangedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_MAX_LENGTH_REACHED ) )
   {
     field.MaxLengthReachedSignal().Connect( tracker, functor );
   }
@@ -802,6 +841,11 @@ bool TextField::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   }
 
   return connected;
+}
+
+Toolkit::TextField::TextChangedSignalType& TextField::TextChangedSignal()
+{
+  return mTextChangedSignal;
 }
 
 Toolkit::TextField::MaxLengthReachedSignalType& TextField::MaxLengthReachedSignal()
@@ -826,6 +870,8 @@ void TextField::OnInitialize()
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
   EnableGestureDetection(Gesture::Pan);
 
+  self.TouchedSignal().Connect( this, &TextField::OnTouched );
+
   // Set BoundingBox to stage size if not already set.
   if ( mDecorator->GetBoundingBox().IsEmpty() )
   {
@@ -838,7 +884,7 @@ void TextField::OnInitialize()
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
 }
 
-void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
+void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
 }
@@ -988,60 +1034,18 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
 ImfManager::ImfCallbackData TextField::OnImfEvent( Dali::ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnImfEvent %p eventName %d\n", mController.Get(), imfEvent.eventName );
-
-  bool update( false );
-
-  std::string text;
-  unsigned int cursorPosition( 0 );
-
-  switch ( imfEvent.eventName )
-  {
-    case ImfManager::COMMIT:
-    {
-      mController->InsertText( imfEvent.predictiveString, Text::Controller::COMMIT );
-      break;
-    }
-    case ImfManager::PREEDIT:
-    {
-      mController->InsertText( imfEvent.predictiveString, Text::Controller::PRE_EDIT );
-      update = true;
-      break;
-    }
-    case ImfManager::DELETESURROUNDING:
-    {
-      mController->RemoveText( imfEvent.cursorOffset, imfEvent.numberOfChars );
-      break;
-    }
-    case ImfManager::GETSURROUNDING:
-    {
-      mController->GetText( text );
-      cursorPosition = mController->GetLogicalCursorPosition();
-
-      imfManager.SetSurroundingText( text );
-      imfManager.SetCursorPosition( cursorPosition );
-      break;
-    }
-    case ImfManager::VOID:
-    {
-      // do nothing
-      break;
-    }
-  } // end switch
-
-  if( ImfManager::GETSURROUNDING != imfEvent.eventName )
-  {
-    mController->GetText( text );
-    cursorPosition = mController->GetLogicalCursorPosition();
-  }
-
-  ImfManager::ImfCallbackData callbackData( update, cursorPosition, text, false );
-
-  return callbackData;
+  return mController->OnImfEvent( imfManager, imfEvent );
 }
 
 void TextField::RequestTextRelayout()
 {
   RelayoutRequest();
+}
+
+void TextField::TextChanged()
+{
+  Dali::Toolkit::TextField handle( GetOwner() );
+  mTextChangedSignal.Emit( handle );
 }
 
 void TextField::MaxLengthReached()
@@ -1087,6 +1091,11 @@ void TextField::KeyboardStatusChanged(bool keyboardShown)
   {
     mController->KeyboardFocusLostEvent();
   }
+}
+
+bool TextField::OnTouched( Actor actor, const TouchEvent& event )
+{
+  return true;
 }
 
 TextField::TextField()

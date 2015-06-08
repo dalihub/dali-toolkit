@@ -18,7 +18,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
-#include <dali-toolkit/public-api/builder/builder.h>
+#include <dali-toolkit/devel-api/builder/builder.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 
 using namespace Dali;

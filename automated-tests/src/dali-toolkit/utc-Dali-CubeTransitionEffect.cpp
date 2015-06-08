@@ -19,6 +19,12 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/transition-effects/cube-transition-effect.h>
+#include <dali-toolkit/devel-api/transition-effects/cube-transition-cross-effect.h>
+#include <dali-toolkit/devel-api/transition-effects/cube-transition-fold-effect.h>
+#include <dali-toolkit/devel-api/transition-effects/cube-transition-wave-effect.h>
+
+
 
 using namespace Dali;
 using namespace Dali::Toolkit;

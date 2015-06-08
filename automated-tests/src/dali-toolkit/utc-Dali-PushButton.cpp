@@ -96,6 +96,224 @@ Image CreateSolidColorImage( const Vector4& color, unsigned int width, unsigned 
 
 } //namespace
 
+int UtcDaliPushButtonConstructorP(void)
+{
+  TestApplication application;
+
+  PushButton button;
+
+  DALI_TEST_CHECK( !button );
+  END_TEST;
+}
+
+int UtcDaliPushButtonCopyConstructorP(void)
+{
+  TestApplication application;
+
+  // Initialize an object, ref count == 1
+  PushButton button = PushButton::New();
+
+  PushButton copy( button );
+  DALI_TEST_CHECK( copy );
+  END_TEST;
+}
+
+int UtcDaliPushButtonAssignmentOperatorP(void)
+{
+  TestApplication application;
+
+  PushButton button = PushButton::New();
+
+  PushButton copy( button );
+  DALI_TEST_CHECK( copy );
+
+  DALI_TEST_CHECK( button == copy );
+  END_TEST;
+}
+
+int UtcDaliPushButtonNewP(void)
+{
+  TestApplication application;
+
+  PushButton button = PushButton::New();
+
+  DALI_TEST_CHECK( button );
+  END_TEST;
+}
+
+int UtcDaliPushButtonDownCastP(void)
+{
+  TestApplication application;
+
+  PushButton button = PushButton::New();
+
+  BaseHandle object(button);
+
+  PushButton button2 = PushButton::DownCast( object );
+  DALI_TEST_CHECK(button2);
+
+  PushButton button3 = DownCast< PushButton >(object);
+  DALI_TEST_CHECK(button3);
+  END_TEST;
+}
+
+int UtcDaliPushButtonDownCastN(void)
+{
+  TestApplication application;
+
+  BaseHandle unInitializedObject;
+
+  PushButton button1 = PushButton::DownCast( unInitializedObject );
+  DALI_TEST_CHECK( !button1 );
+
+  PushButton button2 = DownCast< PushButton >( unInitializedObject );
+  DALI_TEST_CHECK( !button2 );
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetButtonImage(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliPushButtonSetButtonImage");
+
+  Image image = CreateSolidColorImage( Color::RED, 10, 10 );
+  ImageActor imageActor = CreateSolidColorActor( Color::RED );
+  imageActor.SetSize( 20, 20 );
+
+  PushButton pushButton = PushButton::New();
+  Stage::GetCurrent().Add( pushButton );
+
+  application.SendNotification();
+  application.Render();
+
+  pushButton.SetSize( Vector2( 20.0f, 20.0f ) );
+  pushButton.SetButtonImage( image );
+
+  DALI_TEST_CHECK( pushButton.GetButtonImage() );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 size = pushButton.GetCurrentSize();
+
+  DALI_TEST_EQUALS( size.width, 20.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( size.height, 20.f, TEST_LOCATION );
+
+  pushButton.SetButtonImage( imageActor );
+
+  DALI_TEST_CHECK( pushButton.GetButtonImage() );
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetBackgroundImageP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliPushButtonSetBackgroundImageP");
+
+  Image image = CreateSolidColorImage( Color::RED, 10, 10 );
+  ImageActor imageActor = CreateSolidColorActor( Color::RED );
+  imageActor.SetSize( 20, 20 );
+
+  PushButton pushButton = PushButton::New();
+
+  pushButton.SetBackgroundImage( image );
+
+  DALI_TEST_CHECK( pushButton.GetBackgroundImage() );
+
+  pushButton.SetBackgroundImage( imageActor );
+
+  DALI_TEST_CHECK( pushButton.GetBackgroundImage() );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetSelectedImageP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliPushButtonSetSelectedImageP");
+
+  Image image = CreateSolidColorImage( Color::RED, 10, 10 );
+  ImageActor imageActor = CreateSolidColorActor( Color::RED );
+  imageActor.SetSize( 20, 20 );
+
+  PushButton pushButton = PushButton::New();
+
+  pushButton.SetSelectedImage( image );
+
+  DALI_TEST_CHECK( pushButton.GetSelectedImage() );
+
+  pushButton.SetSelectedImage( imageActor );
+
+  DALI_TEST_CHECK( pushButton.GetSelectedImage() );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetSelectedBackgroundImageP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliPushButtonSetSelectedBackgroundImageP");
+
+  Image image = CreateSolidColorImage( Color::RED, 10, 10 );
+  ImageActor imageActor = CreateSolidColorActor( Color::RED );
+  imageActor.SetSize( 20, 20 );
+
+  PushButton pushButton = PushButton::New();
+
+  pushButton.SetSelectedBackgroundImage( image );
+
+  DALI_TEST_CHECK( pushButton.GetSelectedBackgroundImage() );
+
+  pushButton.SetSelectedBackgroundImage( imageActor );
+
+  DALI_TEST_CHECK( pushButton.GetSelectedBackgroundImage() );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledBackgroundImageP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliPushButtonSetDisabledBackgroundImageP");
+
+  Image image = CreateSolidColorImage( Color::RED, 10, 10 );
+  ImageActor imageActor = CreateSolidColorActor( Color::RED );
+  imageActor.SetSize( 20, 20 );
+
+  PushButton pushButton = PushButton::New();
+
+  pushButton.SetDisabledBackgroundImage( image );
+
+  DALI_TEST_CHECK( pushButton.GetDisabledBackgroundImage() );
+
+  pushButton.SetDisabledBackgroundImage( imageActor );
+
+  DALI_TEST_CHECK( pushButton.GetDisabledBackgroundImage() );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledImageP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliPushButtonSetDisabledImageP");
+
+  Image image = CreateSolidColorImage( Color::RED, 10, 10 );
+  ImageActor imageActor = CreateSolidColorActor( Color::RED );
+  imageActor.SetSize( 20, 20 );
+
+  PushButton pushButton = PushButton::New();
+
+  pushButton.SetDisabledImage( image );
+
+  DALI_TEST_CHECK( pushButton.GetDisabledImage() );
+
+  pushButton.SetDisabledImage( imageActor );
+
+  DALI_TEST_CHECK( pushButton.GetDisabledImage() );
+
+  END_TEST;
+}
 
 int UtcDaliPushButtonSetGetAutoRepeating(void)
 {
@@ -268,33 +486,6 @@ int UtcDaliPushButtonSetGetAutorepeatingDelayValues02(void)
   }
 
   DALI_TEST_CHECK( assert1 && assert2 );
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetImages(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliPushButtonSetImages");
-
-  Actor imageActor;
-
-  Image image01 = CreateSolidColorImage( Color::RED, 10, 10 );
-
-  Vector3 size;
-  PushButton pushButton = PushButton::New();
-  Stage::GetCurrent().Add( pushButton );
-
-  application.SendNotification();
-  application.Render();
-
-  pushButton.SetSize( Vector2( 20.0f, 20.0f ) );
-  pushButton.SetButtonImage( image01 );
-
-  application.SendNotification();
-  application.Render();
-
-  size = pushButton.GetCurrentSize();
-
   END_TEST;
 }
 

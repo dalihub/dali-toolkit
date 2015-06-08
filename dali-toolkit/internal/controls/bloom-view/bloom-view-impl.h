@@ -29,7 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/gaussian-blur-view/gaussian-blur-view.h>
-#include <dali-toolkit/public-api/controls/bloom-view/bloom-view.h>
+#include <dali-toolkit/devel-api/controls/bloom-view/bloom-view.h>
 
 namespace Dali
 {
@@ -87,10 +87,7 @@ public:
 private:
 
   virtual void OnInitialize();
-  virtual void OnControlSizeSet(const Vector3& targetSize);
-  virtual void OnStageDisconnection();
-
-  virtual void OnControlStageConnection();
+  virtual void OnSizeSet(const Vector3& targetSize);
 
   void AllocateResources();
   void CreateRenderTasks();
