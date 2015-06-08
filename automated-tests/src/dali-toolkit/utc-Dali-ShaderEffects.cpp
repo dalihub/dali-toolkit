@@ -20,6 +20,32 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 
+#include <dali-toolkit/devel-api/shader-effects/alpha-discard-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/bendy-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/blind-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/bouncing-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/carousel-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/displacement-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/dissolve-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/dissolve-local-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/distance-field-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/image-region-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/iris-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/mask-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/mirror-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/motion-blur-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/motion-stretch-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/nine-patch-mask-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/overlay-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/quadratic-bezier.h>
+#include <dali-toolkit/devel-api/shader-effects/ripple-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/ripple2d-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/shear-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/soft-button-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/spot-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/square-dissolve-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/swirl-effect.h>
+
 using namespace Dali;
 
 int UtcDaliCreateAlphaDiscardEffect(void)
