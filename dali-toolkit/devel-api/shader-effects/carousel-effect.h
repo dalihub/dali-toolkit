@@ -76,7 +76,6 @@ inline ShaderEffect CreateCarouselEffect()
     ShaderEffect shaderEffect = ShaderEffect::New(
         vertexShader,
         "",
-        GeometryType( GEOMETRY_TYPE_IMAGE ),
         ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_DEPTH_BUFFER ));
 
 

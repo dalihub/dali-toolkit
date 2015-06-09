@@ -158,7 +158,6 @@ inline ShaderEffect CreateDistanceFieldEffect()
   Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::NewWithPrefix(
       "", "",
       fragmentShaderPrefix, fragmentShader,
-      GeometryType( GEOMETRY_TYPE_IMAGE ),
       ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING));
 
   shaderEffect.SetUniform("uSmoothing",0.5f);

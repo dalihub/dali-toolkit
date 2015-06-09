@@ -83,7 +83,7 @@ inline ShaderEffect CreateRippleEffect()
 
   Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
       vertexShader, imageFragmentShader,
-      GeometryType(GEOMETRY_TYPE_IMAGE), ShaderEffect::GeometryHints(ShaderEffect::HINT_GRID) );
+      ShaderEffect::GeometryHints(ShaderEffect::HINT_GRID) );
 
 
   shaderEffect.SetUniform( "uAmplitude", 0.0f );

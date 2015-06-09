@@ -63,7 +63,6 @@ inline ShaderEffect CreateBlindEffect()
   Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
       "",
       fragmentShader,
-      GeometryType( GEOMETRY_TYPE_IMAGE ),
       ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID ));
 
   shaderEffect.SetUniform( "uStep", 0.0f );

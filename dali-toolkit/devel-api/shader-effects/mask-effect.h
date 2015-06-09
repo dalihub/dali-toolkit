@@ -56,7 +56,6 @@ inline ShaderEffect CreateMaskEffect(Image maskImage)
   ShaderEffect shaderEffect = ShaderEffect::New(
       "", // Use default
       ALPHA_MASK_FRAGMENT_SHADER_SOURCE,
-      GeometryType( GEOMETRY_TYPE_IMAGE ),
       ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ) );
 
   shaderEffect.SetEffectImage( maskImage );

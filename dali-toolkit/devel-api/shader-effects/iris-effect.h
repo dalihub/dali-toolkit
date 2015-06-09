@@ -78,7 +78,6 @@ inline ShaderEffect CreateIrisEffect()
   Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
       vertexShader,
       fragmentShader,
-      GeometryType( GEOMETRY_TYPE_IMAGE ),
       ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ));
 
   shaderEffect.SetUniform( "uRadius", 0.0f );

@@ -166,14 +166,12 @@ inline ShaderEffect CreateDissolveEffect(bool useHighPrecision = true)
     {
       shaderEffect =  Dali::ShaderEffect::New(
           prefixHighPrecision+vertexShader, prefixHighPrecision + fragmentShader,
-          GeometryType( GEOMETRY_TYPE_IMAGE),
           ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_BLENDING ) );
     }
     else
     {
       shaderEffect =  Dali::ShaderEffect::New(
           prefixMediumPrecision+vertexShader, prefixMediumPrecision + fragmentShader,
-          GeometryType( GEOMETRY_TYPE_IMAGE),
           ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_BLENDING ) );
     }
 

@@ -93,7 +93,6 @@ inline void DoApply( ImageActor actor, const std::string& maskImage, const Vecto
   ShaderEffect maskEffect = ShaderEffect::New(
     ALPHA_MASK_VERTEX_SHADER_SOURCE,
     ALPHA_MASK_FRAGMENT_SHADER_SOURCE,
-    GeometryType( GEOMETRY_TYPE_IMAGE ),
     ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ) );
 
   maskEffect.SetEffectImage( ResourceImage::New( maskImage ) );

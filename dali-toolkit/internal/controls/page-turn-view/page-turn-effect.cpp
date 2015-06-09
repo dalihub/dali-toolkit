@@ -332,14 +332,14 @@ ShaderEffect Dali::Toolkit::Internal::CreatePageTurnEffect(bool enableBlending)
   {
     vertexShaderStringStream<< vertexShader << vertexShaderWithFakedShadow << vertexShaderEnd;
     fragmentShaderStringStream<< fragmentShaderPartOne << fragmentShaderWithFakedShadow << fragmentShaderPartTwo;
-    shaderEffectCustom = Dali::ShaderEffect::New( vertexShaderStringStream.str(), fragmentShaderStringStream.str(), GeometryType( GEOMETRY_TYPE_IMAGE ),
+    shaderEffectCustom = Dali::ShaderEffect::New( vertexShaderStringStream.str(), fragmentShaderStringStream.str(),
                                                   ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_DEPTH_BUFFER | ShaderEffect::HINT_BLENDING) );
   }
   else
   {
     vertexShaderStringStream<< vertexShader << vertexShaderEnd;
     fragmentShaderStringStream<< fragmentShaderPartOne << fragmentShaderPartTwo;
-    shaderEffectCustom = Dali::ShaderEffect::New( vertexShaderStringStream.str(), fragmentShaderStringStream.str(), GeometryType( GEOMETRY_TYPE_IMAGE ),
+    shaderEffectCustom = Dali::ShaderEffect::New( vertexShaderStringStream.str(), fragmentShaderStringStream.str(),
                                                   ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_DEPTH_BUFFER ) );
   }
 

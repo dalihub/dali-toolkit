@@ -110,8 +110,7 @@ inline ShaderEffect CreateQuadraticBezier(unsigned int pointCount, bool filled)
 
   Dali::ShaderEffect shaderEffect = Dali::ShaderEffect::NewWithPrefix(
       vertexShaderPrefix.str(),vertexShader,
-      "#extension GL_OES_standard_derivatives:enable\n", fragmentShader,
-      GeometryType(GEOMETRY_TYPE_UNTEXTURED_MESH) );
+      "#extension GL_OES_standard_derivatives:enable\n", fragmentShader );
 
   //Set default uniform values
   shaderEffect.SetUniform( "uColor", Vector4(1.0f,1.0f,1.0f,1.0f) );

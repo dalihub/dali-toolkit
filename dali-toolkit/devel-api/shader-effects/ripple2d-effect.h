@@ -56,7 +56,6 @@ inline ShaderEffect CreateRipple2DEffect()
 
   Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
       "", fragmentShader,
-      Dali::GeometryType( GEOMETRY_TYPE_IMAGE ),
       ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID ));
 
 

@@ -85,7 +85,6 @@ inline ShaderEffect CreateBendyEffect()
   Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
       vertextShader,
       fragmentShader,
-      GeometryType( GEOMETRY_TYPE_IMAGE ),
       ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_DEPTH_BUFFER ));
 
   shaderEffect.SetUniform( "uCenter", Vector2(0.0f, 0.0f), ShaderEffect::COORDINATE_TYPE_VIEWPORT_POSITION );

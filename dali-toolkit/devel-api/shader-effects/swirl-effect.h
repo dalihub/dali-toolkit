@@ -80,7 +80,6 @@ inline ShaderEffect CreateSwirlEffect( bool warp )
   Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
       "",
       fragmentShader,
-      Dali::GeometryType( GEOMETRY_TYPE_IMAGE ),
       ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID ));
 
   shaderEffect.SetUniform( "uAngle", 0.0f );

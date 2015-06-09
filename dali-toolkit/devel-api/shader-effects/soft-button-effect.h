@@ -343,16 +343,16 @@ inline ShaderEffect CreateSoftButtonEffect(SoftButtonEffectType type)
   switch(type)
   {
     case SOFT_BUTTON_RECTANGULAR:
-      shader = ShaderEffect::New( vertexSource, fragmentSourceRectangular, GeometryType( GEOMETRY_TYPE_IMAGE ), ShaderEffect::GeometryHints( ShaderEffect::HINT_NONE ));
+      shader = ShaderEffect::New( vertexSource, fragmentSourceRectangular, ShaderEffect::GeometryHints( ShaderEffect::HINT_NONE ));
       break;
 
     case SOFT_BUTTON_ELLIPTICAL:
-      shader = ShaderEffect::New( vertexSource, fragmentSourceElliptical, GeometryType( GEOMETRY_TYPE_IMAGE ), ShaderEffect::GeometryHints( ShaderEffect::HINT_NONE ));
+      shader = ShaderEffect::New( vertexSource, fragmentSourceElliptical, ShaderEffect::GeometryHints( ShaderEffect::HINT_NONE ));
       break;
 
     case SOFT_BUTTON_FIXED:
     default:
-      shader = ShaderEffect::New( vertexSource, fragmentSourceFixed, GeometryType( GEOMETRY_TYPE_IMAGE ), ShaderEffect::GeometryHints( ShaderEffect::HINT_NONE ));
+      shader = ShaderEffect::New( vertexSource, fragmentSourceFixed, ShaderEffect::GeometryHints( ShaderEffect::HINT_NONE ));
       break;
   }
 

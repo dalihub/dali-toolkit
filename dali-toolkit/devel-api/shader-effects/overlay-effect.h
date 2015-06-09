@@ -64,7 +64,6 @@ inline ShaderEffect CreateOverlayEffect(Image overlayImage)
   ShaderEffect shaderEffect = ShaderEffect::New(
       "", // Use default
       OVERLAY_FRAGMENT_SHADER_SOURCE,
-      GeometryType( GEOMETRY_TYPE_IMAGE ),
       ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ) );
 
   shaderEffect.SetEffectImage( overlayImage );

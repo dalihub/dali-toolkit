@@ -93,7 +93,6 @@ inline ShaderEffect CreateBouncingEffect(const Vector4& color)
 
   ShaderEffect shaderEffect;
   shaderEffect = ShaderEffect::New( "", fragmentShader,
-                                    GeometryType( GEOMETRY_TYPE_IMAGE),
                                     ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ) );
 
   shaderEffect.SetUniform( "uAssignedColor", color );

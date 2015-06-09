@@ -87,7 +87,6 @@ inline ShaderEffect CreateDissolveLocalEffect( unsigned int numberOfDimples )
 
   ShaderEffect shaderEffect = ShaderEffect::New(
       vertexShaderStringStream.str(), fragmentShader,
-      GeometryType( GEOMETRY_TYPE_IMAGE),
       ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_BLENDING ) );
 
   //Register uniform properties

@@ -70,7 +70,6 @@ inline ShaderEffect CreateSpotEffect()
 
   Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
       vertexShader, fragmentShader,
-      Dali::GeometryType( GEOMETRY_TYPE_IMAGE ),
       ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID ));
 
   shaderEffect.SetUniform( "uCenter", Vector2(0.0f, 0.0f) );

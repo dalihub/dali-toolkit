@@ -66,7 +66,6 @@ inline ShaderEffect CreateSquareDissolveEffect()
   Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
       "",
       fragmentShader,
-      GeometryType( GEOMETRY_TYPE_IMAGE ),
       ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID ));
 
   shaderEffect.SetUniform( "uTextureSize", Vector2(1.0f, 1.0f) );//COORDINATE_TYPE_DEFAULT

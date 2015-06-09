@@ -63,7 +63,6 @@ inline ShaderEffect CreateShearEffect()
   ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
       vertexShader,
       "",
-      Dali::GeometryType( GEOMETRY_TYPE_IMAGE ),
       ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID ));
 
 

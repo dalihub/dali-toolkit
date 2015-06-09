@@ -186,7 +186,7 @@ inline ShaderEffect CreateMotionStretchEffect()
 
   // NOTE: we must turn on alpha blending for the actor (HINT_BLENDING)
   ShaderEffect shaderEffect = ShaderEffect::New(
-      vertexSource, fragmentSource, GeometryType( GEOMETRY_TYPE_IMAGE ),
+      vertexSource, fragmentSource,
       ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING | ShaderEffect::HINT_GRID ) );
 
 
