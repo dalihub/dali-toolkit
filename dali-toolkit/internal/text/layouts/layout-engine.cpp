@@ -508,6 +508,7 @@ struct LayoutEngine::Impl
     }
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--LayoutText\n\n" );
+
     return true;
   }
 
@@ -556,76 +557,36 @@ struct LayoutEngine::Impl
     }
   }
 
-  void Align( const LayoutParameters& layoutParameters,
-              const Size& layoutSize,
-              const Vector<LineRun>& lines,
-              Vector<Vector2>& glyphPositions )
+  void Align( const Size& layoutSize,
+              Vector<LineRun>& lines )
   {
-    Vector2* glyphPositionsBuffer = glyphPositions.Begin();
-
     // Traverse all lines and align the glyphs.
-    // LayoutParameters contains bidirectional info for those lines with
-    // right to left text, this info includes the paragraph's direction.
 
-    LineIndex bidiLineIndex = 0u;
-    for( Vector<LineRun>::ConstIterator it = lines.Begin(), endIt = lines.End();
+    for( Vector<LineRun>::Iterator it = lines.Begin(), endIt = lines.End();
          it != endIt;
          ++it )
     {
-      const LineRun& line = *it;
+      LineRun& line = *it;
+      const bool isLastLine = lines.End() == it + 1u;
 
-      // 1) Get the paragrap's direction.
-      bool paragraphDirection = false;
-
-      // Check if there is any right to left line.
-      if( ( NULL != layoutParameters.lineBidirectionalInfoRunsBuffer ) &&
-          ( bidiLineIndex < layoutParameters.numberOfBidirectionalInfoRuns ) )
-      {
-        const BidirectionalLineInfoRun* bidiLine = layoutParameters.lineBidirectionalInfoRunsBuffer + bidiLineIndex;
-
-        // Get the right to left line that match with current line.
-        while( ( line.characterRun.characterIndex > bidiLine->characterRun.characterIndex ) &&
-               ( bidiLineIndex < layoutParameters.numberOfBidirectionalInfoRuns ) )
-        {
-          ++bidiLineIndex;
-          bidiLine = layoutParameters.lineBidirectionalInfoRunsBuffer + bidiLineIndex;
-        }
-
-        if( line.characterRun.characterIndex == bidiLine->characterRun.characterIndex )
-        {
-          paragraphDirection = bidiLine->direction;
-        }
-      }
-
-      // 2) Calculate the alignment offset accordingly with the align option,
-      //    the box width, line length, and the paragraphs direction.
-      float alignOffset = CalculateHorizontalAlignment( layoutSize.width,
-                                                        line.width,
-                                                        line.extraLength,
-                                                        paragraphDirection );
-
-      // 3) Traverse all glyphs and update the 'x' position.
-      for( GlyphIndex index = line.glyphIndex,
-             endIndex = line.glyphIndex + line.numberOfGlyphs;
-           index < endIndex;
-           ++index )
-      {
-        Vector2& position = *( glyphPositionsBuffer + index );
-
-        position.x += alignOffset;
-      }
+      // Calculate the alignment offset accordingly with the align option,
+      // the box width, line length, and the paragraphs direction.
+      CalculateHorizontalAlignment( layoutSize.width,
+                                    line,
+                                    isLastLine );
     }
   }
 
-  float CalculateHorizontalAlignment( float boxWidth,
-                                      float lineLength,
-                                      float extraLength,
-                                      bool paragraphDirection )
+  void CalculateHorizontalAlignment( float boxWidth,
+                                     LineRun& line,
+                                     bool isLastLine )
   {
-    float offset = 0.f;
+    line.alignmentOffset = 0.f;
+    const bool isRTL = RTL == line.direction;
+    float lineLength = line.width;
 
     HorizontalAlignment alignment = mHorizontalAlignment;
-    if( paragraphDirection &&
+    if( isRTL &&
         ( HORIZONTAL_ALIGN_CENTER != alignment ) )
     {
       if( HORIZONTAL_ALIGN_BEGIN == alignment )
@@ -642,29 +603,25 @@ struct LayoutEngine::Impl
     {
       case HORIZONTAL_ALIGN_BEGIN:
       {
-        offset = 0.f;
+        line.alignmentOffset = 0.f;
         break;
       }
       case HORIZONTAL_ALIGN_CENTER:
       {
-        offset = 0.5f * ( boxWidth - lineLength );
-        const int intOffset = static_cast<int>( offset ); // try to avoid pixel alignment.
-        offset = static_cast<float>( intOffset );
+        line.alignmentOffset = floorf( 0.5f * ( boxWidth - lineLength ) ); // try to avoid pixel alignment.
         break;
       }
       case HORIZONTAL_ALIGN_END:
       {
-        offset = boxWidth - lineLength;
+        line.alignmentOffset = boxWidth - lineLength;
         break;
       }
     }
 
-    if( paragraphDirection )
+    if( isRTL )
     {
-      offset -= extraLength;
+      line.alignmentOffset -= line.extraLength;
     }
-
-    return offset;
   }
 
   LayoutEngine::Layout mLayout;
@@ -745,15 +702,11 @@ void LayoutEngine::ReLayoutRightToLeftLines( const LayoutParameters& layoutParam
                                    glyphPositions );
 }
 
-void LayoutEngine::Align( const LayoutParameters& layoutParameters,
-                          const Size& layoutSize,
-                          const Vector<LineRun>& lines,
-                          Vector<Vector2>& glyphPositions )
+void LayoutEngine::Align( const Size& layoutSize,
+                          Vector<LineRun>& lines )
 {
-  mImpl->Align( layoutParameters,
-                layoutSize,
-                lines,
-                glyphPositions );
+  mImpl->Align( layoutSize,
+                lines );
 }
 
 } // namespace Text

@@ -893,17 +893,6 @@ bool Controller::DoRelayout( const Size& size,
         }
       } // REORDER
 
-      // TODO: I'm working on a patch that changes the LayoutEngine::Align() method.
-      //       The layoutParameters is not needed and this call can be moved outside the if().
-      //       Then there is no need to do the layout again to change the alignment.
-      if( ALIGN & operations )
-      {
-        mImpl->mLayoutEngine.Align( layoutParameters,
-                                    layoutSize,
-                                    lines,
-                                    glyphPositions );
-      }
-
       // Sets the actual size.
       if( UPDATE_ACTUAL_SIZE & operations )
       {
@@ -914,6 +903,17 @@ bool Controller::DoRelayout( const Size& size,
   else
   {
     layoutSize = mImpl->mVisualModel->GetActualSize();
+  }
+
+  if( ALIGN & operations )
+  {
+    // The laid-out lines.
+    Vector<LineRun>& lines = mImpl->mVisualModel->mLines;
+
+    mImpl->mLayoutEngine.Align( layoutSize,
+                                lines );
+
+    viewUpdated = true;
   }
 
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout, view updated %s\n", ( viewUpdated ? "true" : "false" ) );
@@ -954,15 +954,7 @@ void Controller::SetHorizontalAlignment( LayoutEngine::HorizontalAlignment align
     mImpl->mLayoutEngine.SetHorizontalAlignment( alignment );
 
     // Set the flag to redo the alignment operation.
-    // TODO : Is not needed re-layout and reorder again but with the current implementation it is.
-    //        Im working on a different patch to fix an issue with the alignment. When that patch
-    //        is in, this issue can be fixed.
-    const OperationsMask layoutOperations =  static_cast<OperationsMask>( LAYOUT             |
-                                                                          UPDATE_ACTUAL_SIZE |
-                                                                          ALIGN              |
-                                                                          REORDER );
-
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | layoutOperations );
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | ALIGN );
 
     mImpl->RequestRelayout();
   }

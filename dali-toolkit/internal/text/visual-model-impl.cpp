@@ -36,9 +36,9 @@ VisualModelPtr VisualModel::New()
   return VisualModelPtr( new VisualModel() );
 }
 
-void VisualModel::SetGlyphs( const GlyphInfo* glyphs,
-                             const CharacterIndex* characterIndices,
-                             const Length* charactersPerGlyph,
+void VisualModel::SetGlyphs( const GlyphInfo* const glyphs,
+                             const CharacterIndex* const characterIndices,
+                             const Length* const charactersPerGlyph,
                              Length numberOfGlyphs )
 {
   if( 0u == numberOfGlyphs )
@@ -225,7 +225,7 @@ void VisualModel::GetGlyphsPerCharacterMap( Length* glyphsPerCharacter,
   memcpy( glyphsPerCharacter, mGlyphsPerCharacter.Begin() + characterIndex, numberOfCharacters * sizeof( Length ) );
 }
 
-void VisualModel::SetGlyphPositions( const Vector2* glyphPositions,
+void VisualModel::SetGlyphPositions( const Vector2* const glyphPositions,
                                      Length numberOfGlyphs )
 {
   if( 0u == numberOfGlyphs )
