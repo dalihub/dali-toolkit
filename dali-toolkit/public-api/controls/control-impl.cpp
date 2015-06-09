@@ -23,15 +23,20 @@
 #include <limits>
 #include <stack>
 #include <dali/public-api/actors/image-actor.h>
+#include <dali/public-api/actors/renderer.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/public-api/geometry/geometry.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/public-api/shader-effects/shader.h>
+#include <dali/public-api/shader-effects/material.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
@@ -165,7 +170,7 @@ DALI_TYPE_REGISTRATION_END()
  */
 struct Background
 {
-  Actor actor;   ///< Either a MeshActor or an ImageActor
+  Actor actor;   ///< Background actor
   Vector4 color; ///< The color of the actor.
 
   /**
@@ -178,70 +183,147 @@ struct Background
   }
 };
 
-/**
- * Creates a white coloured Mesh.
- */
-Vector3 CreateMesh()
+unsigned int gQuadIndex[6] = { 0, 2, 1, 1, 2, 3 };
+
+Vector2 gQuad[] = {
+                   Vector2( -0.5f, -0.5f ),
+                   Vector2(  0.5f, -0.5f ),
+                   Vector2( -0.5f,  0.5f ),
+                   Vector2(  0.5f,  0.5f )
+};
+
+struct VertexWithTexture
 {
-  Vector3 white( Color::WHITE );
-  /*
-  MeshData meshData;
+  Vector2 position;
+  Vector2 texCoord;
+};
 
-  // Create vertices with a white color (actual color is set by actor color)
-  MeshData::VertexContainer vertices(4);
-  vertices[ 0 ] = MeshData::Vertex( Vector3( -0.5f, -0.5f, 0.0f ), Vector2::ZERO, white );
-  vertices[ 1 ] = MeshData::Vertex( Vector3(  0.5f, -0.5f, 0.0f ), Vector2::ZERO, white );
-  vertices[ 2 ] = MeshData::Vertex( Vector3( -0.5f,  0.5f, 0.0f ), Vector2::ZERO, white );
-  vertices[ 3 ] = MeshData::Vertex( Vector3(  0.5f,  0.5f, 0.0f ), Vector2::ZERO, white );
+VertexWithTexture gQuadWithTexture[] = {
+                                        { Vector2( -0.5f, -0.5f ), Vector2( 0.0f, 0.0f ) },
+                                        { Vector2(  0.5f, -0.5f ), Vector2( 1.0f, 0.0f ) },
+                                        { Vector2( -0.5f,  0.5f ), Vector2( 0.0f, 1.0f ) },
+                                        { Vector2(  0.5f,  0.5f ), Vector2( 1.0f, 1.0f ) }
+};
 
-  // Specify all the faces
-  MeshData::FaceIndices faces;
-  faces.reserve( 6 ); // 2 triangles in Quad
-  faces.push_back( 0 ); faces.push_back( 3 ); faces.push_back( 1 );
-  faces.push_back( 0 ); faces.push_back( 2 ); faces.push_back( 3 );
+const char* VERTEX_SHADER_COLOR = DALI_COMPOSE_SHADER(
+    attribute mediump vec2 aPosition;\n
+    uniform mediump mat4 uMvpMatrix;\n
+    void main()\n
+    {\n
+      gl_Position = uMvpMatrix * vec4( aPosition, 0.0, 1.0 );\n
+    }\n
+);
 
-  // Create the mesh data from the vertices and faces
-  meshData.SetMaterial( Material::New( "ControlMaterial" ) );
-  meshData.SetVertices( vertices );
-  meshData.SetFaceIndices( faces );
-  meshData.SetHasColor( true );
-  */
-  return white;
-  //return Mesh::New( meshData );
-}
+const char* FRAGMENT_SHADER_COLOR = DALI_COMPOSE_SHADER(
+    uniform lowp vec4 uBackgroundColor;\n
+    uniform lowp vec4 uColor;\n
+    void main()\n
+    {\n
+      gl_FragColor = uBackgroundColor * uColor;\n
+    }\n
+);
+
+const char* VERTEX_SHADER_TEXTURE = DALI_COMPOSE_SHADER(
+    attribute mediump vec2 aPosition;\n
+    attribute mediump vec2 aTexCoord;\n
+    uniform mediump mat4 uMvpMatrix;\n
+    varying mediump vec2 vTexCoord;\n
+    void main()\n
+    {\n
+      gl_Position = uMvpMatrix * vec4( aPosition, 0.0, 1.0 );\n
+      vTexCoord = aTexCoord;\n
+    }\n
+);
+
+const char* FRAGMENT_SHADER_TEXTURE = DALI_COMPOSE_SHADER(
+    uniform lowp vec4 uBackgroundColor;\n
+    uniform lowp vec4 uColor;\n
+    uniform sampler2D sTexture;\n
+    varying mediump vec2 vTexCoord;\n
+
+    void main()\n
+    {\n
+      gl_FragColor = texture2D( sTexture, vTexCoord ) * uBackgroundColor * uColor;\n
+    }\n
+);
 
 /**
- * Sets all the required properties for the background actor.
+ * @brief Create the background actor for the control.
  *
- * @param[in]  actor              The actor to set the properties on.
- * @param[in]  color              The required color of the actor.
- */
-void SetupBackgroundActor( Actor actor, const Vector4& color )
-{
-  actor.SetColor( color );
-  actor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
-  actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
-  actor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-}
-
-/**
- * Sets all the required properties for the background actor.
+ * @param[in] actor The parent actor of the background
+ * @param[in] color The background color
+ * @param[in] image If a valid image is supplied this will be the texture used by the background
  *
- * @param[in]  actor              The actor to set the properties on.
- * @param[in]  constrainingIndex  The property index to constrain the parent's size on.
- * @param[in]  color              The required color of the actor.
+ * @return An actor which will render the background
+ *
  */
-void SetupBackgroundActorConstrained( Actor actor, Property::Index constrainingIndex, const Vector4& color )
+Actor CreateBackground( Actor parent, const Vector4& color, Image image = Image() )
 {
-  actor.SetColor( color );
-  actor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
-  actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+  PropertyBuffer vertexBuffer;
+  Shader shader;
+  Material material;
+  if( image )
+  {
+    Property::Map vertexFormat;
+    vertexFormat["aPosition"] = Property::VECTOR2;
+    vertexFormat["aTexCoord"] = Property::VECTOR2;
 
-  Constraint constraint = Constraint::New<Vector3>( actor,
-                                                    constrainingIndex,
+    //Create a vertex buffer for vertex positions and texture coordinates
+    vertexBuffer = PropertyBuffer::New( vertexFormat, 4u );
+    vertexBuffer.SetData( gQuadWithTexture );
+
+    shader = Shader::New( VERTEX_SHADER_TEXTURE, FRAGMENT_SHADER_TEXTURE );
+    Sampler textureSampler = Sampler::New( image, "sTexture" );
+    material = Material::New( shader );
+    material.AddSampler(textureSampler);
+  }
+  else
+  {
+    Property::Map vertexFormat;
+    vertexFormat["aPosition"] = Property::VECTOR2;
+
+    //Create a vertex buffer for vertex positions
+    vertexBuffer = PropertyBuffer::New( vertexFormat, 4u );
+    vertexBuffer.SetData( gQuad );
+
+    shader = Shader::New( VERTEX_SHADER_COLOR, FRAGMENT_SHADER_COLOR );
+    material = Material::New( shader );
+  }
+
+  //Create the index buffer
+  Property::Map indexFormat;
+  indexFormat["indices"] = Property::UNSIGNED_INTEGER;
+  PropertyBuffer indexBuffer = PropertyBuffer::New( indexFormat, 6u );
+  indexBuffer.SetData(gQuadIndex);
+
+  //Create the geometry
+  Geometry mesh = Geometry::New();
+  mesh.AddVertexBuffer( vertexBuffer );
+  mesh.SetIndexBuffer( indexBuffer );
+
+  //Add uniforms to the shader
+  Property::Index backgroundColorIndex = shader.RegisterProperty( "uBackgroundColor", color );
+  shader.AddUniformMapping( backgroundColorIndex, "uBackgroundColor" );
+
+  //Create the renderer
+  Renderer renderer = Renderer::New( mesh, material );
+  renderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+
+  //Create the actor
+  Actor meshActor = Actor::New();
+  meshActor.SetSize( Vector3::ONE );
+  meshActor.AddRenderer( renderer );
+  meshActor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
+  meshActor.SetColorMode( USE_PARENT_COLOR );
+
+  //Constraint scale of the mesh actor to the size of the control
+  Constraint constraint = Constraint::New<Vector3>( meshActor,
+                                                    Actor::Property::SCALE,
                                                     EqualToConstraint() );
   constraint.AddSource( ParentSource( Actor::Property::SIZE ) );
   constraint.Apply();
+
+  return meshActor;
 }
 
 } // unnamed namespace
@@ -255,21 +337,21 @@ public:
 
   // Construction & Destruction
   Impl(Control& controlImpl)
-  : mControlImpl( controlImpl ),
-    mStyleName(""),
-    mBackground( NULL ),
-    mStartingPinchScale( NULL ),
-    mKeyEventSignal(),
-    mPinchGestureDetector(),
-    mPanGestureDetector(),
-    mTapGestureDetector(),
-    mLongPressGestureDetector(),
-    mFlags( Control::ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
-    mIsKeyboardNavigationSupported( false ),
-    mIsKeyboardFocusGroup( false ),
-    mAddRemoveBackgroundChild( false )
-  {
-  }
+: mControlImpl( controlImpl ),
+  mStyleName(""),
+  mBackground( NULL ),
+  mStartingPinchScale( NULL ),
+  mKeyEventSignal(),
+  mPinchGestureDetector(),
+  mPanGestureDetector(),
+  mTapGestureDetector(),
+  mLongPressGestureDetector(),
+  mFlags( Control::ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
+  mIsKeyboardNavigationSupported( false ),
+  mIsKeyboardFocusGroup( false ),
+  mAddRemoveBackgroundChild( false )
+{
+}
 
   ~Impl()
   {
@@ -416,12 +498,11 @@ public:
           Property::Map map;
 
           Background* back = controlImpl.mImpl->mBackground;
-          if( back )
+          if ( back && back->actor && back->actor.GetRendererAt(0).GetMaterial().GetNumberOfSamplers() > 0)
           {
-            ImageActor imageActor = ImageActor::DownCast( back->actor );
-            if ( imageActor )
+            Image image = back->actor.GetRendererAt(0).GetMaterial().GetSamplerAt(0).GetImage();
+            if ( image )
             {
-              Image image = imageActor.GetImage();
               Property::Map imageMap;
               Scripting::CreatePropertyMap( image, imageMap );
               map[ "image" ] = imageMap;
@@ -520,25 +601,19 @@ void Control::SetBackgroundColor( const Vector4& color )
 
   if ( background.actor )
   {
-    // Just set the actor color
-    background.actor.SetColor( color );
+    Shader shader = background.actor.GetRendererAt(0).GetMaterial().GetShader();
+    shader.SetProperty( shader.GetPropertyIndex("uBackgroundColor"), color );
   }
-  /*
   else
   {
     // Create Mesh Actor
-    MeshActor meshActor = MeshActor::New( CreateMesh() );
-
-    SetupBackgroundActorConstrained( meshActor, Actor::Property::SCALE, color );
-
-    background.actor = meshActor;
-    // Set the flag to avoid notifying children
+    Actor actor = CreateBackground(Self(), color );
+    background.actor = actor;
     mImpl->mAddRemoveBackgroundChild = true;
     // use insert to guarantee its the first child (so that OVERLAY mode works)
-    Self().Insert( 0, meshActor );
+    Self().Insert( 0, actor );
     mImpl->mAddRemoveBackgroundChild = false;
   }
-  */
 
   background.color = color;
 }
@@ -555,27 +630,31 @@ Vector4 Control::GetBackgroundColor() const
 void Control::SetBackgroundImage( Image image )
 {
   Background& background( mImpl->GetBackground() );
-
-  if ( background.actor )
+  if( !background.actor || background.actor.GetRendererAt(0).GetMaterial().GetNumberOfSamplers() == 0)
   {
-    // Remove Current actor, unset AFTER removal
+    // Remove current actor as it has not texture coordinates
+    if( background.actor )
+    {
+      mImpl->mAddRemoveBackgroundChild = true;
+      Self().Remove( background.actor );
+      mImpl->mAddRemoveBackgroundChild = false;
+      background.actor.Reset();
+    }
+
+    //Create a new actor with texture coordinates
+    Actor actor = CreateBackground(Self(), background.color, image);
     mImpl->mAddRemoveBackgroundChild = true;
-    Self().Remove( background.actor );
+    // use insert to guarantee its the first child (so that OVERLAY mode works)
+    Self().Insert( 0, actor );
     mImpl->mAddRemoveBackgroundChild = false;
-    background.actor.Reset();
+    background.actor = actor;
   }
-
-  /*
-  ImageActor imageActor = ImageActor::New( image );
-  SetupBackgroundActor( imageActor, background.color );
-
-  // Set the background actor before adding so that we do not inform derived classes
-  background.actor = imageActor;
-  mImpl->mAddRemoveBackgroundChild = true;
-  // use insert to guarantee its the first child (so that OVERLAY mode works)
-  Self().Insert( 0, imageActor );
-  mImpl->mAddRemoveBackgroundChild = false;
-  */
+  else
+  {
+    //Change sampler image
+    Sampler sampler =  background.actor.GetRendererAt(0).GetMaterial().GetSamplerAt(0);
+    sampler.SetImage(image);
+  }
 }
 
 void Control::ClearBackground()
@@ -875,11 +954,11 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
 
   if ( focusGained )
   {
-     // signals are allocated dynamically when someone connects
-     if ( !mImpl->mKeyInputFocusGainedSignal.Empty() )
-     {
+    // signals are allocated dynamically when someone connects
+    if ( !mImpl->mKeyInputFocusGainedSignal.Empty() )
+    {
       mImpl->mKeyInputFocusGainedSignal.Emit( handle );
-     }
+    }
   }
   else
   {
@@ -893,6 +972,24 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
 
 void Control::OnStageConnection( unsigned int depth )
 {
+  unsigned int controlRendererCount = Self().GetRendererCount();
+  for( unsigned int i(0); i<controlRendererCount; ++i )
+  {
+    Renderer controlRenderer = Self().GetRendererAt(i);
+    if( controlRenderer )
+    {
+      controlRenderer.SetDepthIndex( CONTENT_DEPTH_INDEX+depth );
+    }
+  }
+
+  if( mImpl->mBackground )
+  {
+    Renderer backgroundRenderer = mImpl->mBackground->actor.GetRendererAt( 0 );
+    if(backgroundRenderer)
+    {
+      backgroundRenderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX+depth );
+    }
+  }
 }
 
 void Control::OnStageDisconnection()
