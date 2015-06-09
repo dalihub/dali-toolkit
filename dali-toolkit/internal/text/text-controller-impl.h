@@ -100,7 +100,9 @@ struct EventData
     INACTIVE,
     SELECTING,
     EDITING,
-    EDITING_WITH_POPUP
+    EDITING_WITH_POPUP,
+    GRAB_HANDLE_PANNING,
+    SELECTION_HANDLE_PANNING
   };
 
   EventData( DecoratorPtr decorator );

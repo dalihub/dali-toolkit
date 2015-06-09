@@ -17,6 +17,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/slider/slider.cpp \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.cpp \
   $(devel_api_src_dir)/controls/text-controls/text-selection-popup.cpp \
+  $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.cpp \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
   $(devel_api_src_dir)/styling/style-manager.cpp \
@@ -137,8 +138,9 @@ devel_api_shader_effects_header_files = \
 devel_api_super_blur_view_header_files = \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.h
 
-devel_api_text_selection_popup_header_files = \
-  $(devel_api_src_dir)/controls/text-controls/text-selection-popup.h
+devel_api_text_controls_header_files = \
+  $(devel_api_src_dir)/controls/text-controls/text-selection-popup.h \
+  $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.h
 
 devel_api_tool_bar_header_files = \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.h
