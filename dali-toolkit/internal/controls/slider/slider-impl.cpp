@@ -209,7 +209,7 @@ void Slider::OnInitialize()
   self.SetSize( DEFAULT_HIT_REGION.x, DEFAULT_HIT_REGION.y );
 }
 
-void Slider::OnControlSizeSet( const Vector3& size )
+void Slider::OnSizeSet( const Vector3& size )
 {
   // Factor in handle overshoot into size of backing
   SetHitRegion( Vector2( size.x, GetHitRegion().y ) );

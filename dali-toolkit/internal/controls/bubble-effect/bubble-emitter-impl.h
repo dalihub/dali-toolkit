@@ -30,7 +30,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/bubble-effect/bubble-emitter.h>
+#include <dali-toolkit/devel-api/controls/bubble-effect/bubble-emitter.h>
 
 namespace Dali
 {

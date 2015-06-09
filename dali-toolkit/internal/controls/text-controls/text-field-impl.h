@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/imf-manager.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
@@ -83,6 +80,11 @@ public:
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
   /**
+   * @copydoc TextField::TextChangedSignal()
+   */
+  Toolkit::TextField::TextChangedSignalType&  TextChangedSignal();
+
+  /**
    * @copydoc TextField::MaxLengthReachedSignal()
    */
   Toolkit::TextField::MaxLengthReachedSignalType&  MaxLengthReachedSignal();
@@ -97,7 +99,7 @@ private: // From Control
   /**
    * @copydoc Control::OnStyleChange()
    */
-  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
+  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
 
   /**
    * @copydoc Control::GetNaturalSize()
@@ -140,11 +142,7 @@ private: // From Control
   virtual bool OnKeyEvent(const KeyEvent& event);
 
   /**
-   * @brief Event received from IMF manager
-   *
-   * @param[in] imfManager The IMF manager.
-   * @param[in] imfEvent The event received.
-   * @return A data struture indicating if update is needed, cursor position and current text.
+   * @copydoc Dali::Toolkit::Text::Controller::(ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent)
    */
   ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
 
@@ -152,6 +150,11 @@ private: // From Control
    * @copydoc Text::ControlInterface::RequestTextRelayout()
    */
   virtual void RequestTextRelayout();
+
+  /**
+   * @copydoc Text::ControlInterface::TextChanged()
+   */
+  virtual void TextChanged();
 
   /**
    * @copydoc Text::ControlInterface::MaxLengthReached()
@@ -176,6 +179,14 @@ private: // Implementation
   void KeyboardStatusChanged( bool keyboardShown );
 
   /**
+   * @brief Callback when Textfield is touched
+   *
+   * @param[in] actor TextField touched
+   * @param[in] event TouchEvent information
+   */
+  bool OnTouched( Actor actor, const TouchEvent& event );
+
+  /**
    * Construct a new TextField.
    */
   TextField();
@@ -192,6 +203,7 @@ private: // Implementation
 private: // Data
 
   // Signals
+  Toolkit::TextField::TextChangedSignalType mTextChangedSignal;
   Toolkit::TextField::MaxLengthReachedSignalType mMaxLengthReachedSignal;
 
   Text::ControllerPtr mController;

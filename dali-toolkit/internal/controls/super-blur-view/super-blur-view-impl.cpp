@@ -252,7 +252,7 @@ void SuperBlurView::ClearBlurResource()
   }
 }
 
-void SuperBlurView::OnControlSizeSet( const Vector3& targetSize )
+void SuperBlurView::OnSizeSet( const Vector3& targetSize )
 {
   if( mTargetSize != Vector2(targetSize) )
   {

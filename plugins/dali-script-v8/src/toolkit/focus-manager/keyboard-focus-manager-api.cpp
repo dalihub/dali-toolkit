@@ -34,29 +34,29 @@ namespace // un named namespace
 {
 
 
-Toolkit::Control::KeyboardFocusNavigationDirection  GetDirection( std::string name,  v8::Isolate* isolate )
+Toolkit::Control::KeyboardFocus::Direction  GetDirection( std::string name,  v8::Isolate* isolate )
 {
   if( name == "left")
   {
-    return Dali::Toolkit::Control::Left;
+    return Dali::Toolkit::Control::KeyboardFocus::LEFT;
   }
   if( name == "right")
   {
-    return  Dali::Toolkit::Control::Right;
+    return  Dali::Toolkit::Control::KeyboardFocus::RIGHT;
   }
   if( name == "up")
   {
-    return  Dali::Toolkit::Control::Up;
+    return  Dali::Toolkit::Control::KeyboardFocus::UP;
   }
   if( name == "down")
   {
-    return  Dali::Toolkit::Control::Down;
+    return  Dali::Toolkit::Control::KeyboardFocus::DOWN;
   }
 
   DALI_SCRIPT_EXCEPTION( isolate,  "direction not found ( wanted left,right,up,down)" );
 
 
-  return Dali::Toolkit::Control::Up;
+  return Dali::Toolkit::Control::KeyboardFocus::UP;
 
 }
 }; //un-named namespace
@@ -124,7 +124,7 @@ void KeyboardFocusManagerApi::MoveFocus( const v8::FunctionCallbackInfo< v8::Val
     return;
   }
 
-  Toolkit::Control::KeyboardFocusNavigationDirection dir = GetDirection( direction, isolate );
+  Toolkit::Control::KeyboardFocus::Direction dir = GetDirection( direction, isolate );
 
   Toolkit::KeyboardFocusManager::Get().MoveFocus( dir );
 }

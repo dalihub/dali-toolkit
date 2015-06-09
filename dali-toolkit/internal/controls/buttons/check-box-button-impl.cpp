@@ -23,7 +23,7 @@
 #include <dali/public-api/object/type-registry.h>
 
 //INTERNAL INCLUDES
-#include <dali-toolkit/public-api/shader-effects/image-region-effect.h>
+#include <dali-toolkit/devel-api/shader-effects/image-region-effect.h>
 
 namespace Dali
 {

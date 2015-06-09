@@ -3,7 +3,7 @@
 @section what-is-a-property What is a property?
 
 A property is a value used by an object that can be modified or read externally to that object.
-This could be from within Dali or externally by an application.
+This could be from within DALi or externally by an application.
 
 <h2 class="pg">What is a property used for?</h2>
 

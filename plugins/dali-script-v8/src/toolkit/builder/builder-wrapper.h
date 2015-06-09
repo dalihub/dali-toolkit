@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <v8.h>
-#include <dali-toolkit/public-api/builder/builder.h>
+#include <dali-toolkit/devel-api/builder/builder.h>
 
 // INTERNAL INCLUDES
 #include <shared/base-wrapped-object.h>

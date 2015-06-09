@@ -41,7 +41,7 @@ class StyleMonitor;
 class StyleMonitor : public BaseHandle
 {
 public: // Typedefs
-  typedef Signal< void (StyleMonitor, StyleChange) > StyleChangeSignalType;
+  typedef Signal< void (StyleMonitor, StyleChange::Type) > StyleChangeSignalType;
   static const std::string DEFAULT_FONT_FAMILY;
   static const float       DEFAULT_FONT_SIZE;
 
@@ -60,7 +60,7 @@ public: // Style Information
 
 public: // Signals
   StyleChangeSignalType& StyleChangeSignal();
-  void EmitStyleChangeSignal(StyleChange handle);
+  void EmitStyleChangeSignal(StyleChange::Type handle);
 
 public: // Operators
   StyleMonitor& operator=(const StyleMonitor& monitor);

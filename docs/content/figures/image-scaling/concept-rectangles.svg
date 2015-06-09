@@ -1,0 +1,909 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1052.3622"
+   height="744.09448"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="concept-rectangles.svg"
+   inkscape:export-filename="/tmp/page.png"
+   inkscape:export-xdpi="89.269394"
+   inkscape:export-ydpi="89.269394">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="DotL"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="DotL"
+       style="overflow:visible">
+      <path
+         id="path4335"
+         d="M -2.5,-1.0 C -2.5,1.7600000 -4.7400000,4.0 -7.5,4.0 C -10.260000,4.0 -12.5,1.7600000 -12.5,-1.0 C -12.5,-3.7600000 -10.260000,-6.0 -7.5,-6.0 C -4.7400000,-6.0 -2.5,-3.7600000 -2.5,-1.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt"
+         transform="scale(0.8) translate(7.4, 1)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Mend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow2Mend"
+       style="overflow:visible;">
+      <path
+         id="path4301"
+         style="fill-rule:evenodd;stroke-width:0.62500000;stroke-linejoin:round;"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="scale(0.6) rotate(180) translate(0,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow2Lend"
+       style="overflow:visible;">
+      <path
+         id="path4295"
+         style="fill-rule:evenodd;stroke-width:0.62500000;stroke-linejoin:round;"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="scale(1.1) rotate(180) translate(1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Lend"
+       style="overflow:visible;">
+      <path
+         id="path4277"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;"
+         transform="scale(0.8) rotate(180) translate(12.5,0)" />
+    </marker>
+    <linearGradient
+       id="linearGradient5404"
+       osb:paint="gradient">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop5406" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop5408" />
+    </linearGradient>
+    <marker
+       inkscape:stockid="Arrow2Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Mend-0"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4301-1"
+         style="fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="scale(-0.6,-0.6)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Mend-1"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4301-7"
+         style="fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="scale(-0.6,-0.6)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Mend-2"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4301-75"
+         style="fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="scale(-0.6,-0.6)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Mend-08"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4301-71"
+         style="fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="scale(-0.6,-0.6)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Mend-5"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4301-6"
+         style="fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="scale(-0.6,-0.6)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.45254834"
+     inkscape:cx="743.41974"
+     inkscape:cy="837.71772"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:window-width="1920"
+     inkscape:window-height="1158"
+     inkscape:window-x="1200"
+     inkscape:window-y="418"
+     inkscape:window-maximized="1"
+     objecttolerance="4"
+     gridtolerance="4">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3181"
+       empspacing="4"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true"
+       spacingx="32px"
+       spacingy="32px" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-308.2677)">
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/image-scaling/cards.jpg"
+       xlink:href="cards.jpg"
+       y="-387.63782"
+       x="160"
+       id="image4157"
+       height="256"
+       width="256"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-30"
+       width="128"
+       height="192.00003"
+       x="128"
+       y="636.36212"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-30-3"
+       width="1.0498172e-05"
+       height="192"
+       x="191.99998"
+       y="188.36218"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:3.63730645;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-30-0"
+       width="96.000015"
+       height="1.7800441e-05"
+       x="143.99998"
+       y="508.36218"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-30-31"
+       width="192"
+       height="192"
+       x="512"
+       y="188.36212"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:3.14999795;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-30-34"
+       width="95.999939"
+       height="95.999954"
+       x="560"
+       y="460.36221"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-30-4"
+       width="128"
+       height="192.00003"
+       x="544"
+       y="636.36212"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.27617979;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Mend)"
+       d="m 224,284.36215 c 256,0 256,0 256,0"
+       id="path4268"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Mend)"
+       d="m 288,732.36221 c 224,0 224,0 224,0"
+       id="path4268-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Mend)"
+       d="m 280.67645,508.36215 c 224,0 247.40075,3e-5 247.40075,3e-5"
+       id="path4268-4"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.19999981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-mid:none;marker-end:none"
+       d="m 352,-99.6378 c 0,159.99998 0,383.99998 0,383.99998"
+       id="path5307"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.19999981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-mid:url(#DotL)"
+       d="m 320,-99.6378 0,607.99998"
+       id="path5879"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Mend)"
+       d="m 688.3995,508.36218 c 224,0 239.6005,0 239.6005,0"
+       id="path4268-4-4"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.19999981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 704,732.36218 96,0 0,-224"
+       id="path6099"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.19999981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 736,284.36218 64,0 0,224 0,0 0,0"
+       id="path6101"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-30-4-1"
+       width="96"
+       height="96"
+       x="960"
+       y="460.32184"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-30-31-3"
+       width="256"
+       height="256"
+       x="160"
+       y="-387.63782"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.19999981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 864,508.36218 c 0,-511.9999802 0,-735.99998 0,-735.99998 l -416,0"
+       id="path6157"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/image-scaling/cards.jpg"
+       xlink:href="cards.jpg"
+       y="636.36243"
+       x="1423.9999"
+       id="image4157-4-5"
+       height="96.000244"
+       width="96.000244"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.19999981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Mend)"
+       d="m 1088,508.36218 c 72.8302,0 192,0 192,0"
+       id="path4268-4-4-9"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot6201"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(128,1044.2677)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion6203"><rect
+           id="rect6205"
+           width="132.37465"
+           height="33.093662"
+           x="1085.7874"
+           y="-436.24619" /></flowRegion><flowPara
+         id="flowPara6207" /></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot6415"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(128,1044.2677)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion6417"><rect
+           id="rect6419"
+           width="129.22287"
+           height="96.129211"
+           x="-3.1517775"
+           y="-119.49255" /></flowRegion><flowPara
+         id="flowPara6421" /></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot6423"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(128,1044.2677)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion6425"><rect
+           id="rect6427"
+           width="129.22287"
+           height="111.8881"
+           x="0"
+           y="-117.91666" /></flowRegion><flowPara
+         id="flowPara6429"
+         style="font-weight:normal">Requested Size</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot6431"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(-44.87499,5.9402098)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion6433"><rect
+           id="rect6435"
+           width="168.25861"
+           height="49.914528"
+           x="193.83432"
+           y="-119.49255" /></flowRegion><flowPara
+         id="flowPara6437">Raw size (e.)</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot6439"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(128,1044.2677)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion6441"><rect
+           id="rect6443"
+           width="256"
+           height="89.944725"
+           x="352"
+           y="-119.90552"
+           ry="0" /></flowRegion><flowPara
+         id="flowPara6445">Target for fitting</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot6447"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(114.89062,696.48284)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion6449"><rect
+           id="rect6451"
+           width="130.3277"
+           height="34.676437"
+           x="830.49335"
+           y="-116.34077" /></flowRegion><flowPara
+         id="flowPara6453">Fitted Size</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot6455"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(285.45703,886.12794)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion6457"><rect
+           id="rect6459"
+           width="192"
+           height="52.511868"
+           x="1090.3438"
+           y="-113.69655" /></flowRegion><flowPara
+         id="flowPara6461">Scaled Pixels</flowPara></flowRoot>    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:6.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-30-3-0"
+       width="1.4271966"
+       height="8.0063074e-11"
+       x="192"
+       y="-3.6378176"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3183-1-9-1-30-31-3-4"
+       width="256"
+       height="256"
+       x="480"
+       y="-131.63782"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:0.35555581;stroke-dasharray:4.19999981, 12.59999943;stroke-dashoffset:0"
+       id="rect6501-6"
+       width="320"
+       height="1184"
+       x="448"
+       y="-163.63782"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:4.2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:0.35555581000000003;stroke-dasharray:4.2,12.6;stroke-dashoffset:0"
+       id="rect6501"
+       width="192"
+       height="1024"
+       x="96"
+       y="-35.637817"
+       ry="0"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot6521"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(128,1044.2677)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion6523"><rect
+           id="rect6525"
+           width="16.714825"
+           height="34.543972"
+           x="603.96234"
+           y="-92.761055" /></flowRegion><flowPara
+         id="flowPara6527" /></flowRoot>    <path
+       style="fill:none;stroke:#000000;stroke-width:4.27617979;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Mend)"
+       d="m 224,-3.6378202 c 192,0 199.26801,0 199.26801,0"
+       id="path4268-1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.19999981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-mid:none;marker-end:none"
+       d="m 384,-99.63782 c 0,95.9999998 0,95.9999998 0,95.9999998"
+       id="path5307-3"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.19999981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 800,284.36218 c 0,-287.9999802 0,-287.9999802 0,-287.9999802 l -32,0"
+       id="path6571"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.19999981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-mid:none;marker-end:none"
+       d="m 448,-291.6378 c 832,0 736,-2e-5 736,-2e-5 l 0,800"
+       id="path6573"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/image-scaling/cards.jpg"
+       xlink:href="cards.jpg"
+       y="444.36243"
+       x="1407.9999"
+       id="image4157-0"
+       height="128.00024"
+       width="128.00024"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <image
+       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/image-scaling/cards.jpg"
+       xlink:href="cards.jpg"
+       y="124.36218"
+       x="1344"
+       id="image4157-4"
+       height="256"
+       width="256"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot7007"
+       style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Sans;font-style:normal;font-weight:normal;font-size:24px;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;text-align:center"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion7009"><rect
+           id="rect7011"
+           width="14.182999"
+           height="64.611435"
+           x="1279.6217"
+           y="594.38507" /></flowRegion><flowPara
+         id="flowPara7013" /></flowRoot>    <rect
+       style="fill:none;stroke:#000000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:0.35555581;stroke-dasharray:4.2, 12.6;stroke-dashoffset:0"
+       id="rect6501-6-0"
+       width="320"
+       height="736.00024"
+       x="1312"
+       y="92.362183"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot7035"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(-34.212099,300.28395)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion7037"><rect
+           id="rect7039"
+           width="128.02527"
+           height="133.95055"
+           x="1151.9747"
+           y="361.1535" /></flowRegion><flowPara
+         id="flowPara7041">SamplingMode</flowPara></flowRoot>    <path
+       style="fill:none;stroke:#000000;stroke-width:4.2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 1184,328.09448 c 0,-128 0,-128 0,-128"
+       id="path7439"
+       inkscape:connector-curvature="0"
+       transform="translate(0,308.2677)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot7035-9"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(-351.98437,301.85984)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><flowRegion
+         id="flowRegion7037-2"><rect
+           id="rect7039-7"
+           width="128.02527"
+           height="133.95055"
+           x="1151.9747"
+           y="361.1535" /></flowRegion><flowPara
+         id="flowPara7041-2">Fitting Mode</flowPara></flowRoot>    <path
+       style="fill:none;stroke:#000000;stroke-width:4.19999981;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 864,636.36218 c 0,-128 0,-128 0,-128"
+       id="path7439-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:0.35555576;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect7524"
+       width="88.249771"
+       height="73.972183"
+       x="821.03802"
+       y="350.12228"
+       transform="translate(0,308.2677)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"
+       ry="20.057787" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:0.3555557;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect7526"
+       width="128"
+       height="77.123962"
+       x="1120"
+       y="346.97052"
+       transform="translate(0,308.2677)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"
+       ry="23.400755" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="1482.6659"
+       y="403.63452"
+       id="text7530"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><tspan
+         sodipodi:role="line"
+         id="tspan7532"
+         x="1482.6659"
+         y="403.63452">k.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="1472"
+       y="604.36218"
+       id="text7534"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><tspan
+         sodipodi:role="line"
+         id="tspan7536"
+         x="1472"
+         y="604.36218">l.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="1472"
+       y="753.48798"
+       id="text7538"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><tspan
+         sodipodi:role="line"
+         id="tspan7540"
+         x="1472"
+         y="753.48798">m.</tspan></text>
+    <path
+       sodipodi:type="arc"
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       id="path7542"
+       sodipodi:cx="1424"
+       sodipodi:cy="-327.90552"
+       sodipodi:rx="16"
+       sodipodi:ry="16"
+       d="m 1440,-327.90552 c 0,8.83656 -7.1634,16 -16,16 -8.8366,0 -16,-7.16344 -16,-16 0,-8.83655 7.1634,-16 16,-16 8.8366,0 16,7.16345 16,16 z"
+       transform="matrix(0.5,0,0,0.5,472,672.43994)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       id="path7542-2"
+       sodipodi:cx="1424"
+       sodipodi:cy="-327.90552"
+       sodipodi:rx="16"
+       sodipodi:ry="16"
+       d="m 1440,-327.90552 c 0,8.83656 -7.1634,16 -16,16 -8.8366,0 -16,-7.16344 -16,-16 0,-8.83655 7.1634,-16 16,-16 8.8366,0 16,7.16345 16,16 z"
+       transform="matrix(0.5,0,0,0.5,152,672.43994)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       id="path7542-1"
+       sodipodi:cx="1424"
+       sodipodi:cy="-327.90552"
+       sodipodi:rx="16"
+       sodipodi:ry="16"
+       d="m 1440,-327.90552 c 0,8.83656 -7.1634,16 -16,16 -8.8366,0 -16,-7.16344 -16,-16 0,-8.83655 7.1634,-16 16,-16 8.8366,0 16,7.16345 16,16 z"
+       transform="matrix(0.5,0,0,0.5,88,672.51025)"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="192"
+       y="34.160557"
+       id="text7530-8"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><tspan
+         sodipodi:role="line"
+         id="tspan7532-7"
+         x="192"
+         y="34.160557">a.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="192"
+       y="414.78287"
+       id="text7530-8-1"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><tspan
+         sodipodi:role="line"
+         id="tspan7532-7-2"
+         x="192"
+         y="414.78287">b.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="192"
+       y="546.16058"
+       id="text7530-8-6"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><tspan
+         sodipodi:role="line"
+         id="tspan7532-7-9"
+         x="192"
+         y="546.16058">c.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="192"
+       y="866.16058"
+       id="text7530-8-7"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><tspan
+         sodipodi:role="line"
+         id="tspan7532-7-4"
+         x="192"
+         y="866.16058">d.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="608"
+       y="162.16058"
+       id="text7530-8-3"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><tspan
+         sodipodi:role="line"
+         id="tspan7532-7-6"
+         x="608"
+         y="162.16058">f.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="608"
+       y="418.16058"
+       id="text7530-8-33"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><tspan
+         sodipodi:role="line"
+         id="tspan7532-7-48"
+         x="608"
+         y="418.16058">g.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="608"
+       y="596.53143"
+       id="text7530-8-0"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><tspan
+         sodipodi:role="line"
+         id="tspan7532-7-0"
+         x="608"
+         y="596.53143">h.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="608"
+       y="866.16058"
+       id="text7530-8-68"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><tspan
+         sodipodi:role="line"
+         id="tspan7532-7-66"
+         x="608"
+         y="866.16058">i.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="1003.7878"
+       y="632.43921"
+       id="text7530-8-2"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/tmp/concept-rectangles.png"
+       inkscape:export-xdpi="89.269394"
+       inkscape:export-ydpi="89.269394"><tspan
+         sodipodi:role="line"
+         id="tspan7532-7-68"
+         x="1003.7878"
+         y="632.43921">j.</tspan></text>
+  </g>
+</svg>

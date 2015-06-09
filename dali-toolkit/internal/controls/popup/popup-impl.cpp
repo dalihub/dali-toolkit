@@ -36,8 +36,9 @@
 #include <dali-toolkit/public-api/controls/buttons/button.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
-#include <dali-toolkit/public-api/focus-manager/focus-manager.h>
+#include <dali-toolkit/public-api/focus-manager/accessibility-focus-manager.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
+#include <dali-toolkit/internal/controls/buttons/button-impl.h>
 
 using namespace Dali;
 
@@ -422,7 +423,7 @@ void Popup::CreateBacking()
   mLayer.Add( mBacking );
   mBacking.SetOpacity(0.0f);
   mBacking.TouchedSignal().Connect( this, &Popup::OnBackingTouched );
-  mBacking.MouseWheelEventSignal().Connect(this, &Popup::OnBackingMouseWheelEvent);
+  mBacking.WheelEventSignal().Connect(this, &Popup::OnBackingWheelEvent);
 }
 
 void Popup::CreateDialog()
@@ -610,9 +611,9 @@ bool Popup::OnBackingTouched(Actor actor, const TouchEvent& event)
   return true;
 }
 
-bool Popup::OnBackingMouseWheelEvent(Actor actor, const MouseWheelEvent& event)
+bool Popup::OnBackingWheelEvent(Actor actor, const WheelEvent& event)
 {
-  // consume mouse wheel event in dimmed backing actor
+  // consume wheel event in dimmed backing actor
   return true;
 }
 
@@ -675,8 +676,8 @@ void Popup::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
       button.SetPosition( buttonPosition );
 
-      button.PropagateRelayoutFlags();    // Reset relayout flags for relayout
-      container.Add( button, buttonSize );
+     //Todo: Use the size negotiation pass instead of SetSize directly
+     button.SetSize( buttonSize );
     }
   }
 }
@@ -809,7 +810,7 @@ float Popup::GetWidthForHeight( float height )
   return GetNaturalSize().width;
 }
 
-Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
+Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
 {
   Actor nextFocusableActor( currentFocusedActor );
 
@@ -852,7 +853,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::C
       {
         switch ( direction )
         {
-          case Toolkit::Control::Left:
+          case Toolkit::Control::KeyboardFocus::LEFT:
           {
             if ( iter == focusableActors.begin() )
             {
@@ -864,7 +865,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::C
             }
             break;
           }
-          case Toolkit::Control::Right:
+          case Toolkit::Control::KeyboardFocus::RIGHT:
           {
             if ( iter == focusableActors.end() - 1 )
             {
@@ -877,7 +878,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::C
             break;
           }
 
-          case Toolkit::Control::Up:
+          case Toolkit::Control::KeyboardFocus::UP:
           {
             if ( *iter == mContent )
             {
@@ -904,7 +905,7 @@ Actor Popup::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::C
             break;
           }
 
-          case Toolkit::Control::Down:
+          case Toolkit::Control::KeyboardFocus::DOWN:
           {
             if ( mContent && mContent.IsKeyboardFocusable() )
             {

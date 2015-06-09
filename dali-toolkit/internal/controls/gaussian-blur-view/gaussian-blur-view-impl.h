@@ -95,10 +95,7 @@ public:
 private:
 
   virtual void OnInitialize();
-  virtual void OnControlSizeSet(const Vector3& targetSize);
-  virtual void OnStageDisconnection();
-
-  virtual void OnControlStageConnection();
+  virtual void OnSizeSet(const Vector3& targetSize);
 
   void SetBlurBellCurveWidth(float blurBellCurveWidth);
   float CalcGaussianWeight(float x);

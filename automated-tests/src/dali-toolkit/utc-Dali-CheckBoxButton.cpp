@@ -33,8 +33,6 @@ bool CheckBoxButtonClicked( Button button )
   return true;
 }
 
-
-
 Image CreateSolidColorImage( const Vector4& color, unsigned int width, unsigned int height )
 {
   BufferImage imageData = BufferImage::New( width, height, Pixel::RGBA8888 );
@@ -58,7 +56,6 @@ Image CreateSolidColorImage( const Vector4& color, unsigned int width, unsigned 
 
 } // namespace
 
-
 void checkbox_button_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -67,6 +64,169 @@ void checkbox_button_startup(void)
 void checkbox_button_cleanup(void)
 {
   test_return_value = TET_PASS;
+}
+
+int UtcDaliCheckBoxButtonConstructorP(void)
+{
+  TestApplication application;
+
+  CheckBoxButton checkBox;
+
+  DALI_TEST_CHECK( !checkBox );
+  END_TEST;
+}
+
+int UtcDaliCheckBoxButtonCopyConstructorP(void)
+{
+  TestApplication application;
+
+  // Initialize an object, ref count == 1
+  CheckBoxButton checkBox = CheckBoxButton::New();
+
+  CheckBoxButton copy( checkBox );
+  DALI_TEST_CHECK( copy );
+  END_TEST;
+}
+
+int UtcDaliCheckBoxButtonAssignmentOperatorP(void)
+{
+  TestApplication application;
+
+  CheckBoxButton checkBox = CheckBoxButton::New();
+
+  CheckBoxButton copy( checkBox );
+  DALI_TEST_CHECK( copy );
+
+  DALI_TEST_CHECK( checkBox == copy );
+  END_TEST;
+}
+
+int UtcDaliCheckBoxButtonNewP(void)
+{
+  TestApplication application;
+
+  CheckBoxButton checkBox = CheckBoxButton::New();
+
+  DALI_TEST_CHECK( checkBox );
+  END_TEST;
+}
+
+int UtcDaliCheckBoxButtonDownCastP(void)
+{
+  TestApplication application;
+
+  CheckBoxButton checkBox = CheckBoxButton::New();
+
+  BaseHandle object(checkBox);
+
+  CheckBoxButton checkBox2 = CheckBoxButton::DownCast( object );
+  DALI_TEST_CHECK(checkBox2);
+
+  CheckBoxButton checkBox3 = DownCast< CheckBoxButton >(object);
+  DALI_TEST_CHECK(checkBox3);
+  END_TEST;
+}
+
+int UtcDaliCheckBoxButtonDownCastN(void)
+{
+  TestApplication application;
+
+  BaseHandle unInitializedObject;
+
+  CheckBoxButton checkBox1 = CheckBoxButton::DownCast( unInitializedObject );
+  DALI_TEST_CHECK( !checkBox1 );
+
+  CheckBoxButton checkBox2 = DownCast< CheckBoxButton >( unInitializedObject );
+  DALI_TEST_CHECK( !checkBox2 );
+  END_TEST;
+}
+
+int UtcDaliCheckBoxButtonSetBackgroundImageP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliCheckBoxButtonSetBackgroundImageP");
+
+  Image image = CreateSolidColorImage( Color::RED, 10, 10 );
+  ImageActor imageActor = CreateSolidColorActor( Color::RED );
+  imageActor.SetSize( 20, 20 );
+
+  CheckBoxButton checkBoxButton = CheckBoxButton::New();
+
+  checkBoxButton.SetBackgroundImage( image );
+
+  DALI_TEST_CHECK( checkBoxButton.GetBackgroundImage() );
+
+  checkBoxButton.SetBackgroundImage( imageActor );
+
+  DALI_TEST_CHECK( checkBoxButton.GetBackgroundImage() );
+
+  END_TEST;
+}
+
+int UtcDaliCheckBoxButtonSetSelectedImageP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliCheckBoxButtonSetSelectedImageP");
+
+  Image image = CreateSolidColorImage( Color::RED, 10, 10 );
+  ImageActor imageActor = CreateSolidColorActor( Color::RED );
+  imageActor.SetSize( 20, 20 );
+
+  CheckBoxButton checkBoxButton = CheckBoxButton::New();
+
+  checkBoxButton.SetSelectedImage( image );
+
+  DALI_TEST_CHECK( checkBoxButton.GetSelectedImage() );
+
+  checkBoxButton.SetSelectedImage( imageActor );
+
+  DALI_TEST_CHECK( checkBoxButton.GetSelectedImage() );
+
+  END_TEST;
+}
+
+int UtcDaliCheckBoxButtonSetDisabledBackgroundImageP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliCheckBoxButtonSetDisabledBackgroundImageP");
+
+  Image image = CreateSolidColorImage( Color::RED, 10, 10 );
+  ImageActor imageActor = CreateSolidColorActor( Color::RED );
+  imageActor.SetSize( 20, 20 );
+
+  CheckBoxButton checkBoxButton = CheckBoxButton::New();
+
+  checkBoxButton.SetDisabledBackgroundImage( image );
+
+  DALI_TEST_CHECK( checkBoxButton.GetDisabledBackgroundImage() );
+
+  checkBoxButton.SetDisabledBackgroundImage( imageActor );
+
+  DALI_TEST_CHECK( checkBoxButton.GetDisabledBackgroundImage() );
+
+  END_TEST;
+}
+
+int UtcDaliCheckBoxButtonSetDisabledSelectedImageP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliCheckBoxButtonSetDisabledSelectedImageP");
+
+  Image image = CreateSolidColorImage( Color::RED, 10, 10 );
+  ImageActor imageActor = CreateSolidColorActor( Color::RED );
+  imageActor.SetSize( 20, 20 );
+
+  CheckBoxButton checkBoxButton = CheckBoxButton::New();
+
+  checkBoxButton.SetDisabledSelectedImage( image );
+
+  DALI_TEST_CHECK( checkBoxButton.GetDisabledSelectedImage() );
+
+  checkBoxButton.SetDisabledSelectedImage( imageActor );
+
+  DALI_TEST_CHECK( checkBoxButton.GetDisabledSelectedImage() );
+
+  END_TEST;
 }
 
 int UtcDaliCheckBoxButtonSetGetSelected(void)

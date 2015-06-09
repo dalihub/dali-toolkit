@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali-toolkit/public-api/scripting/script-plugin.h>
+#include <dali-toolkit/devel-api/scripting/script-plugin.h>
 #include <dali/public-api/common/dali-common.h>
 
 namespace Dali DALI_IMPORT_API

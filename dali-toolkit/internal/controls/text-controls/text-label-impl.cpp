@@ -120,7 +120,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
     {
       case Toolkit::TextLabel::Property::RENDERING_BACKEND:
       {
-        int backend = value.Get< int >();
+        const int backend = value.Get< int >();
 
         if( impl.mRenderingBackend != backend )
         {
@@ -135,7 +135,6 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mController )
         {
           impl.mController->SetText( value.Get< std::string >() );
-          impl.RequestTextRelayout();
         }
         break;
       }
@@ -143,12 +142,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          std::string fontFamily = value.Get< std::string >();
+          const std::string fontFamily = value.Get< std::string >();
 
           if( impl.mController->GetDefaultFontFamily() != fontFamily )
           {
             impl.mController->SetDefaultFontFamily( fontFamily );
-            impl.RequestTextRelayout();
           }
         }
         break;
@@ -157,12 +155,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          std::string fontStyle = value.Get< std::string >();
+          const std::string fontStyle = value.Get< std::string >();
 
           if( impl.mController->GetDefaultFontStyle() != fontStyle )
           {
             impl.mController->SetDefaultFontStyle( fontStyle );
-            impl.RequestTextRelayout();
           }
         }
         break;
@@ -171,12 +168,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          float pointSize = value.Get< float >();
+          const float pointSize = value.Get< float >();
 
           if( !Equals( impl.mController->GetDefaultPointSize(), pointSize ) )
           {
             impl.mController->SetDefaultPointSize( pointSize );
-            impl.RequestTextRelayout();
           }
         }
         break;
@@ -185,55 +181,44 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          LayoutEngine& engine = impl.mController->GetLayoutEngine();
-          LayoutEngine::Layout layout = value.Get< bool >() ? LayoutEngine::MULTI_LINE_BOX : LayoutEngine::SINGLE_LINE_BOX;
-
-          if( engine.GetLayout() != layout )
-          {
-            engine.SetLayout( layout );
-            impl.RequestTextRelayout();
-          }
+          impl.mController->SetMultiLineEnabled( value.Get< bool >() );
         }
         break;
       }
       case Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT:
       {
-        LayoutEngine& engine = impl.mController->GetLayoutEngine();
-        const LayoutEngine::HorizontalAlignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::HorizontalAlignment >( value.Get< std::string >().c_str(),
-                                                                                                                                           HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                                           HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
-
-        if( engine.GetHorizontalAlignment() != alignment )
+        if( impl.mController )
         {
-          engine.SetHorizontalAlignment( alignment );
-          impl.RequestTextRelayout();
+          const LayoutEngine::HorizontalAlignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::HorizontalAlignment >( value.Get< std::string >().c_str(),
+                                                                                                                                             HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                                                                             HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
+
+          impl.mController->SetHorizontalAlignment( alignment );
         }
         break;
       }
       case Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT:
       {
-        LayoutEngine& engine = impl.mController->GetLayoutEngine();
-        const LayoutEngine::VerticalAlignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::VerticalAlignment >( value.Get< std::string >().c_str(),
-                                                                                                                                       VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                                       VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
-
-        if( engine.GetVerticalAlignment() != alignment )
+        if( impl.mController )
         {
-          engine.SetVerticalAlignment( alignment );
-          impl.RequestTextRelayout();
+          const LayoutEngine::VerticalAlignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::VerticalAlignment >( value.Get< std::string >().c_str(),
+                                                                                                                                         VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                                                                                         VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
+
+          impl.mController->SetVerticalAlignment( alignment );
         }
         break;
       }
 
       case Toolkit::TextLabel::Property::TEXT_COLOR:
       {
-        if ( impl.mController )
+        if( impl.mController )
         {
-          Vector4 textColor = value.Get< Vector4 >();
-          if ( impl.mController->GetTextColor() != textColor )
+          const Vector4 textColor = value.Get< Vector4 >();
+          if( impl.mController->GetTextColor() != textColor )
           {
             impl.mController->SetTextColor( textColor );
-            impl.RequestTextRelayout();
+            impl.mRenderer.Reset();
           }
         }
         break;
@@ -243,11 +228,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          Vector2 shadowOffset = value.Get< Vector2 >();
+          const Vector2 shadowOffset = value.Get< Vector2 >();
           if ( impl.mController->GetShadowOffset() != shadowOffset )
           {
             impl.mController->SetShadowOffset( shadowOffset );
-            impl.RequestTextRelayout();
+            impl.mRenderer.Reset();
           }
         }
         break;
@@ -256,11 +241,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          Vector4 shadowColor = value.Get< Vector4 >();
+          const Vector4 shadowColor = value.Get< Vector4 >();
           if ( impl.mController->GetShadowColor() != shadowColor )
           {
             impl.mController->SetShadowColor( shadowColor );
-            impl.RequestTextRelayout();
+            impl.mRenderer.Reset();
           }
         }
         break;
@@ -269,11 +254,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          Vector4 color = value.Get< Vector4 >();
+          const Vector4 color = value.Get< Vector4 >();
           if ( impl.mController->GetUnderlineColor() != color )
           {
             impl.mController->SetUnderlineColor( color );
-            impl.RequestTextRelayout();
+            impl.mRenderer.Reset();
           }
         }
         break;
@@ -282,11 +267,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          bool enabled = value.Get< bool >();
+          const bool enabled = value.Get< bool >();
           if ( impl.mController->IsUnderlineEnabled() != enabled )
           {
             impl.mController->SetUnderlineEnabled( enabled );
-            impl.RequestTextRelayout();
+            impl.mRenderer.Reset();
           }
         }
         break;
@@ -300,7 +285,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
           if ( impl.mController->GetUnderlineHeight() != height )
           {
             impl.mController->SetUnderlineHeight( height );
-            impl.RequestTextRelayout();
+            impl.mRenderer.Reset();
           }
         }
         break;
@@ -335,11 +320,35 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::TextLabel::Property::FONT_FAMILY:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultFontFamily();
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::FONT_STYLE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultFontStyle();
+        }
+        break;
+      }
+      case Toolkit::TextLabel::Property::POINT_SIZE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultPointSize();
+        }
+        break;
+      }
       case Toolkit::TextLabel::Property::MULTI_LINE:
       {
         if( impl.mController )
         {
-          value = static_cast<bool>( LayoutEngine::MULTI_LINE_BOX == impl.mController->GetLayoutEngine().GetLayout() );
+          value = impl.mController->IsMultiLineEnabled();
         }
         break;
       }
@@ -347,7 +356,7 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::HorizontalAlignment >( impl.mController->GetLayoutEngine().GetHorizontalAlignment(),
+          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::HorizontalAlignment >( impl.mController->GetHorizontalAlignment(),
                                                                                                                   HORIZONTAL_ALIGNMENT_STRING_TABLE,
                                                                                                                   HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT ) );
         }
@@ -357,7 +366,7 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::VerticalAlignment >( impl.mController->GetLayoutEngine().GetVerticalAlignment(),
+          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::VerticalAlignment >( impl.mController->GetVerticalAlignment(),
                                                                                                                 VERTICAL_ALIGNMENT_STRING_TABLE,
                                                                                                                 VERTICAL_ALIGNMENT_STRING_TABLE_COUNT ) );
         }
@@ -432,7 +441,7 @@ void TextLabel::OnInitialize()
   engine.SetTextEllipsisEnabled( true );
 }
 
-void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
+void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
 }
@@ -483,6 +492,11 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
 void TextLabel::RequestTextRelayout()
 {
   RelayoutRequest();
+}
+
+void TextLabel::TextChanged()
+{
+  // TextLabel does not provide a signal for this
 }
 
 void TextLabel::MaxLengthReached()

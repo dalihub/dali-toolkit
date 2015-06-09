@@ -32,10 +32,10 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>
+#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
-#include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/devel-api/styling/style-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 
 namespace Dali
@@ -47,17 +47,100 @@ namespace Toolkit
 namespace
 {
 
-//#if defined(DEBUG_ENABLED)
-//Integration::Log::Filter* gLogFilter  = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_CONTROL");
-//#endif
-
-const float MAX_FLOAT_VALUE( std::numeric_limits<float>::max() );
-const Vector3 MAX_SIZE( MAX_FLOAT_VALUE, MAX_FLOAT_VALUE, MAX_FLOAT_VALUE );
-const float BACKGROUND_ACTOR_Z_POSITION( -0.1f );
-
+/**
+ * Creates control through type registry
+ */
 BaseHandle Create()
 {
   return Internal::Control::New();
+}
+
+/**
+ * Performs actions as requested using the action name.
+ * @param[in] object The object on which to perform the action.
+ * @param[in] actionName The action to perform.
+ * @param[in] attributes The attributes with which to perfrom this action.
+ * @return true if action has been accepted by this control
+ */
+const char* ACTION_CONTROL_ACTIVATED = "control-activated";
+static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
+{
+  bool ret = false;
+
+  if( object && ( 0 == strcmp( actionName.c_str(), ACTION_CONTROL_ACTIVATED ) ) )
+  {
+    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
+    if( control )
+    {
+      // if cast succeeds there is an implementation so no need to check
+      ret = Internal::GetImplementation( control ).OnAccessibilityActivated();
+    }
+  }
+
+  return ret;
+}
+
+/**
+ * Connects a callback function with the object's signals.
+ * @param[in] object The object providing the signal.
+ * @param[in] tracker Used to disconnect the signal.
+ * @param[in] signalName The signal to connect to.
+ * @param[in] functor A newly allocated FunctorDelegate.
+ * @return True if the signal was connected.
+ * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
+ */
+const char* SIGNAL_KEY_EVENT = "key-event";
+const char* SIGNAL_KEY_INPUT_FOCUS_GAINED = "key-input-focus-gained";
+const char* SIGNAL_KEY_INPUT_FOCUS_LOST = "key-input-focus-lost";
+const char* SIGNAL_TAPPED = "tapped";
+const char* SIGNAL_PANNED = "panned";
+const char* SIGNAL_PINCHED = "pinched";
+const char* SIGNAL_LONG_PRESSED = "long-pressed";
+static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+{
+  Dali::BaseHandle handle( object );
+
+  bool connected( false );
+  Toolkit::Control control = Toolkit::Control::DownCast( handle );
+  if ( control )
+  {
+    Internal::Control& controlImpl( Internal::GetImplementation( control ) );
+    connected = true;
+
+    if ( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_EVENT ) )
+    {
+      controlImpl.KeyEventSignal().Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_GAINED ) )
+    {
+      controlImpl.KeyInputFocusGainedSignal().Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_LOST ) )
+    {
+      controlImpl.KeyInputFocusLostSignal().Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_TAPPED ) )
+    {
+      controlImpl.EnableGestureDetection( Gesture::Tap );
+      controlImpl.GetTapGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_PANNED ) )
+    {
+      controlImpl.EnableGestureDetection( Gesture::Pan );
+      controlImpl.GetPanGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_PINCHED ) )
+    {
+      controlImpl.EnableGestureDetection( Gesture::Pinch );
+      controlImpl.GetPinchGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+    else if( 0 == strcmp( signalName.c_str(), SIGNAL_LONG_PRESSED ) )
+    {
+      controlImpl.EnableGestureDetection( Gesture::LongPress );
+      controlImpl.GetLongPressGestureDetector().DetectedSignal().Connect( tracker, functor );
+    }
+  }
+  return connected;
 }
 
 // Setup signals and actions using the type-registry.
@@ -65,15 +148,15 @@ DALI_TYPE_REGISTRATION_BEGIN( Control, CustomActor, Create );
 
 // Note: Properties are registered separately below.
 
-DALI_SIGNAL_REGISTRATION( Toolkit, Control, "key-event",              SIGNAL_KEY_EVENT              )
-DALI_SIGNAL_REGISTRATION( Toolkit, Control, "key-input-focus-gained", SIGNAL_KEY_INPUT_FOCUS_GAINED )
-DALI_SIGNAL_REGISTRATION( Toolkit, Control, "key-input-focus-lost",   SIGNAL_KEY_INPUT_FOCUS_LOST   )
-DALI_SIGNAL_REGISTRATION( Toolkit, Control, "tapped",                 SIGNAL_TAPPED                 )
-DALI_SIGNAL_REGISTRATION( Toolkit, Control, "panned",                 SIGNAL_PANNED                 )
-DALI_SIGNAL_REGISTRATION( Toolkit, Control, "pinched",                SIGNAL_PINCHED                )
-DALI_SIGNAL_REGISTRATION( Toolkit, Control, "long-pressed",           SIGNAL_LONG_PRESSED           )
+SignalConnectorType registerSignal1( typeRegistration, SIGNAL_KEY_EVENT, &DoConnectSignal );
+SignalConnectorType registerSignal2( typeRegistration, SIGNAL_KEY_INPUT_FOCUS_GAINED, &DoConnectSignal );
+SignalConnectorType registerSignal3( typeRegistration, SIGNAL_KEY_INPUT_FOCUS_LOST, &DoConnectSignal );
+SignalConnectorType registerSignal4( typeRegistration, SIGNAL_TAPPED, &DoConnectSignal );
+SignalConnectorType registerSignal5( typeRegistration, SIGNAL_PANNED, &DoConnectSignal );
+SignalConnectorType registerSignal6( typeRegistration, SIGNAL_PINCHED, &DoConnectSignal );
+SignalConnectorType registerSignal7( typeRegistration, SIGNAL_LONG_PRESSED, &DoConnectSignal );
 
-DALI_ACTION_REGISTRATION( Toolkit, Control, "control-activated",      ACTION_CONTROL_ACTIVATED      )
+TypeAction registerAction( typeRegistration, ACTION_CONTROL_ACTIVATED, &DoAction );
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -138,7 +221,6 @@ void SetupBackgroundActor( Actor actor, const Vector4& color )
   actor.SetColor( color );
   actor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
   actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
-  actor.SetZ( BACKGROUND_ACTOR_Z_POSITION );
   actor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 }
 
@@ -154,7 +236,6 @@ void SetupBackgroundActorConstrained( Actor actor, Property::Index constrainingI
   actor.SetColor( color );
   actor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
   actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
-  actor.SetZ( BACKGROUND_ACTOR_Z_POSITION );
 
   Constraint constraint = Constraint::New<Vector3>( actor,
                                                     constrainingIndex,
@@ -172,16 +253,6 @@ class Control::Impl : public ConnectionTracker
 {
 public:
 
-  /**
-   * Size indices for mMinMaxSize array
-   */
-  enum
-  {
-    MIN_SIZE_INDEX = 0,
-    MAX_SIZE_INDEX = 1
-  };
-
-public:
   // Construction & Destruction
   Impl(Control& controlImpl)
   : mControlImpl( controlImpl ),
@@ -193,12 +264,10 @@ public:
     mPanGestureDetector(),
     mTapGestureDetector(),
     mLongPressGestureDetector(),
-    mCurrentSize(),
-    mNaturalSize(),
     mFlags( Control::ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),
     mIsKeyboardNavigationSupported( false ),
     mIsKeyboardFocusGroup( false ),
-    mInitialized( false )
+    mAddRemoveBackgroundChild( false )
   {
   }
 
@@ -260,7 +329,7 @@ public:
 
     if ( control )
     {
-      Control& controlImpl( control.GetImplementation() );
+      Control& controlImpl( GetImplementation( control ) );
 
       switch ( index )
       {
@@ -326,7 +395,7 @@ public:
 
     if ( control )
     {
-      Control& controlImpl( control.GetImplementation() );
+      Control& controlImpl( GetImplementation( control ) );
 
       switch ( index )
       {
@@ -346,10 +415,10 @@ public:
         {
           Property::Map map;
 
-          Actor actor = controlImpl.GetBackgroundActor();
-          if ( actor )
+          Background* back = controlImpl.mImpl->mBackground;
+          if( back )
           {
-            ImageActor imageActor = ImageActor::DownCast( actor );
+            ImageActor imageActor = ImageActor::DownCast( back->actor );
             if ( imageActor )
             {
               Image image = imageActor.GetImage();
@@ -389,14 +458,11 @@ public:
   PanGestureDetector mPanGestureDetector;
   TapGestureDetector mTapGestureDetector;
   LongPressGestureDetector mLongPressGestureDetector;
-  // @todo change all these to Vector2 when we have a chance to sanitize the public API as well
-  Vector3 mCurrentSize; ///< Stores the current control's size, this is the negotiated size
-  Vector3 mNaturalSize; ///< Stores the size set through the Actor's API. This is size the actor wants to be. Useful when reset to the initial size is needed.
 
   ControlBehaviour mFlags :CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
-  bool mInitialized :1;
+  bool mAddRemoveBackgroundChild:1;        ///< Flag to know when we are adding or removing our own actor to avoid call to OnControlChildAdd
 
   // Properties - these need to be members of Internal::Control::Impl as they need to function within this class.
   static PropertyRegistration PROPERTY_1;
@@ -429,101 +495,6 @@ Toolkit::Control Control::New()
 Control::~Control()
 {
   delete mImpl;
-}
-
-Vector3 Control::GetNaturalSize()
-{
-  // could be overridden in derived classes.
-  return mImpl->mNaturalSize;
-}
-
-float Control::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
-{
-  // Could be overridden in derived classes.
-  return CalculateChildSizeBase( child, dimension );
-}
-
-bool Control::RelayoutDependentOnChildren( Dimension::Type dimension )
-{
-  return RelayoutDependentOnChildrenBase( dimension );
-}
-
-float Control::GetHeightForWidth( float width )
-{
-  // could be overridden in derived classes.
-  float height( 0.0f );
-  if ( mImpl->mNaturalSize.width > 0.0f )
-  {
-    height = mImpl->mNaturalSize.height * width / mImpl->mNaturalSize.width;
-  }
-  return height;
-}
-
-float Control::GetWidthForHeight( float height )
-{
-  // could be overridden in derived classes.
-  float width( 0.0f );
-  if ( mImpl->mNaturalSize.height > 0.0f )
-  {
-    width = mImpl->mNaturalSize.width * height / mImpl->mNaturalSize.height;
-  }
-  return width;
-}
-
-const Vector3& Control::GetControlSize() const
-{
-  return mImpl->mCurrentSize;
-}
-
-const Vector3& Control::GetSizeSet() const
-{
-  return mImpl->mNaturalSize;
-}
-
-void Control::SetKeyInputFocus()
-{
-  if( Self().OnStage() )
-  {
-    Toolkit::KeyInputFocusManager::Get().SetFocus(Toolkit::Control::DownCast(Self()));
-  }
-}
-
-bool Control::HasKeyInputFocus()
-{
-  bool result = false;
-  if( Self().OnStage() )
-  {
-    result = Toolkit::KeyInputFocusManager::Get().IsKeyboardListener(Toolkit::Control::DownCast(Self()));
-  }
-  return result;
-}
-
-void Control::ClearKeyInputFocus()
-{
-  if( Self().OnStage() )
-  {
-    Toolkit::KeyInputFocusManager::Get().RemoveFocus(Toolkit::Control::DownCast(Self()));
-  }
-}
-
-PinchGestureDetector Control::GetPinchGestureDetector() const
-{
-  return mImpl->mPinchGestureDetector;
-}
-
-PanGestureDetector Control::GetPanGestureDetector() const
-{
-  return mImpl->mPanGestureDetector;
-}
-
-TapGestureDetector Control::GetTapGestureDetector() const
-{
-  return mImpl->mTapGestureDetector;
-}
-
-LongPressGestureDetector Control::GetLongPressGestureDetector() const
-{
-  return mImpl->mLongPressGestureDetector;
 }
 
 void Control::SetStyleName( const std::string& styleName )
@@ -560,9 +531,12 @@ void Control::SetBackgroundColor( const Vector4& color )
 
     SetupBackgroundActorConstrained( meshActor, Actor::Property::SCALE, color );
 
-    // Set the background actor before adding so that we do not inform deriving classes
     background.actor = meshActor;
-    Self().Add( meshActor );
+    // Set the flag to avoid notifying children
+    mImpl->mAddRemoveBackgroundChild = true;
+    // use insert to guarantee its the first child (so that OVERLAY mode works)
+    Self().Insert( 0, meshActor );
+    mImpl->mAddRemoveBackgroundChild = false;
   }
   */
 
@@ -584,18 +558,23 @@ void Control::SetBackgroundImage( Image image )
 
   if ( background.actor )
   {
-    // Remove Current actor, unset AFTER removal so that we do not inform deriving classes
+    // Remove Current actor, unset AFTER removal
+    mImpl->mAddRemoveBackgroundChild = true;
     Self().Remove( background.actor );
+    mImpl->mAddRemoveBackgroundChild = false;
     background.actor.Reset();
   }
 
   /*
   ImageActor imageActor = ImageActor::New( image );
-  SetupBackgroundActor( imageActor, Actor::Property::SIZE, background.color );
+  SetupBackgroundActor( imageActor, background.color );
 
   // Set the background actor before adding so that we do not inform derived classes
   background.actor = imageActor;
-  Self().Add( imageActor );
+  mImpl->mAddRemoveBackgroundChild = true;
+  // use insert to guarantee its the first child (so that OVERLAY mode works)
+  Self().Insert( 0, imageActor );
+  mImpl->mAddRemoveBackgroundChild = false;
   */
 }
 
@@ -604,211 +583,13 @@ void Control::ClearBackground()
   if ( mImpl->mBackground )
   {
     Background& background( mImpl->GetBackground() );
+    mImpl->mAddRemoveBackgroundChild = true;
     Self().Remove( background.actor );
+    mImpl->mAddRemoveBackgroundChild = false;
 
     delete mImpl->mBackground;
     mImpl->mBackground = NULL;
   }
-}
-
-Actor Control::GetBackgroundActor() const
-{
-  if ( mImpl->mBackground )
-  {
-    return mImpl->mBackground->actor;
-  }
-
-  return Actor();
-}
-
-void Control::SetKeyboardNavigationSupport(bool isSupported)
-{
-  mImpl->mIsKeyboardNavigationSupported = isSupported;
-}
-
-bool Control::IsKeyboardNavigationSupported()
-{
-  return mImpl->mIsKeyboardNavigationSupported;
-}
-
-void Control::Activate()
-{
-  // Inform deriving classes
-  OnActivated();
-}
-
-bool Control::OnAccessibilityPan(PanGesture gesture)
-{
-  return false; // Accessibility pan gesture is not handled by default
-}
-
-bool Control::OnAccessibilityTouch(const TouchEvent& touchEvent)
-{
-  return false; // Accessibility touch event is not handled by default
-}
-
-bool Control::OnAccessibilityValueChange(bool isIncrease)
-{
-  return false; // Accessibility value change action is not handled by default
-}
-
-void Control::SetAsKeyboardFocusGroup(bool isFocusGroup)
-{
-  mImpl->mIsKeyboardFocusGroup = isFocusGroup;
-
-  // The following line will be removed when the deprecated API in KeyboardFocusManager is deleted
-  Toolkit::KeyboardFocusManager::Get().SetAsFocusGroup(Self(), isFocusGroup);
-}
-
-bool Control::IsKeyboardFocusGroup()
-{
-  return Toolkit::KeyboardFocusManager::Get().IsFocusGroup(Self());
-}
-
-Actor Control::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
-{
-  return Actor();
-}
-
-void Control::OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
-{
-}
-
-bool Control::DoAction(BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes)
-{
-  bool ret = false;
-
-  if( object && ( 0 == strcmp( actionName.c_str(), ACTION_CONTROL_ACTIVATED ) ) )
-  {
-    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
-    if( control )
-    {
-      // if cast succeeds there is an implementation so no need to check
-      control.GetImplementation().OnActivated();
-    }
-  }
-
-  return ret;
-}
-
-bool Control::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
-{
-  Dali::BaseHandle handle( object );
-
-  bool connected( false );
-  Toolkit::Control control = Toolkit::Control::DownCast( handle );
-  if ( control )
-  {
-    Control& controlImpl( control.GetImplementation() );
-    connected = true;
-
-    if ( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_EVENT ) )
-    {
-      controlImpl.KeyEventSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_GAINED ) )
-    {
-      controlImpl.KeyInputFocusGainedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_LOST ) )
-    {
-      controlImpl.KeyInputFocusLostSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_TAPPED ) )
-    {
-      controlImpl.EnableGestureDetection( Gesture::Tap );
-      controlImpl.GetTapGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_PANNED ) )
-    {
-      controlImpl.EnableGestureDetection( Gesture::Pan );
-      controlImpl.GetPanGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_PINCHED ) )
-    {
-      controlImpl.EnableGestureDetection( Gesture::Pinch );
-      controlImpl.GetPinchGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_LONG_PRESSED ) )
-    {
-      controlImpl.EnableGestureDetection( Gesture::LongPress );
-      controlImpl.GetLongPressGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else
-    {
-      // signalName does not match any signal
-      connected = false;
-    }
-  }
-  return connected;
-}
-
-Toolkit::Control::KeyEventSignalType& Control::KeyEventSignal()
-{
-  return mImpl->mKeyEventSignal;
-}
-
-Toolkit::Control::KeyInputFocusSignalType& Control:: KeyInputFocusGainedSignal()
-{
-  return mImpl->mKeyInputFocusGainedSignal;
-}
-
-Toolkit::Control::KeyInputFocusSignalType& Control:: KeyInputFocusLostSignal()
-{
-  return mImpl->mKeyInputFocusLostSignal;
-}
-
-bool Control::EmitKeyEventSignal( const KeyEvent& event )
-{
-  // Guard against destruction during signal emission
-  Dali::Toolkit::Control handle( GetOwner() );
-
-  bool consumed = false;
-
-  // signals are allocated dynamically when someone connects
-  if ( !mImpl->mKeyEventSignal.Empty() )
-  {
-    consumed = mImpl->mKeyEventSignal.Emit( handle, event );
-  }
-
-  if (!consumed)
-  {
-    // Notification for derived classes
-    consumed = OnKeyEvent(event);
-  }
-
-  return consumed;
-}
-
-Control::Control( ControlBehaviour behaviourFlags )
-: CustomActorImpl( static_cast< ActorFlags >( behaviourFlags ) ),
-  mImpl(new Impl(*this))
-{
-  mImpl->mFlags = behaviourFlags;
-}
-
-void Control::Initialize()
-{
-  // Calling deriving classes
-  OnInitialize();
-
-  if( mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS )
-  {
-    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
-
-    // Register for style changes
-    styleManager.StyleChangeSignal().Connect( this, &Control::OnStyleChange );
-
-    // SetTheme
-    GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
-  }
-
-  if( mImpl->mFlags & REQUIRES_KEYBOARD_NAVIGATION_SUPPORT )
-  {
-    SetKeyboardNavigationSupport( true );
-  }
-
-  mImpl->mInitialized = true;
 }
 
 void Control::EnableGestureDetection(Gesture::Type type)
@@ -869,18 +650,192 @@ void Control::DisableGestureDetection(Gesture::Type type)
   }
 }
 
+PinchGestureDetector Control::GetPinchGestureDetector() const
+{
+  return mImpl->mPinchGestureDetector;
+}
+
+PanGestureDetector Control::GetPanGestureDetector() const
+{
+  return mImpl->mPanGestureDetector;
+}
+
+TapGestureDetector Control::GetTapGestureDetector() const
+{
+  return mImpl->mTapGestureDetector;
+}
+
+LongPressGestureDetector Control::GetLongPressGestureDetector() const
+{
+  return mImpl->mLongPressGestureDetector;
+}
+
+void Control::SetKeyboardNavigationSupport(bool isSupported)
+{
+  mImpl->mIsKeyboardNavigationSupported = isSupported;
+}
+
+bool Control::IsKeyboardNavigationSupported()
+{
+  return mImpl->mIsKeyboardNavigationSupported;
+}
+
+void Control::SetKeyInputFocus()
+{
+  if( Self().OnStage() )
+  {
+    Toolkit::KeyInputFocusManager::Get().SetFocus(Toolkit::Control::DownCast(Self()));
+  }
+}
+
+bool Control::HasKeyInputFocus()
+{
+  bool result = false;
+  if( Self().OnStage() )
+  {
+    result = Toolkit::KeyInputFocusManager::Get().IsKeyboardListener(Toolkit::Control::DownCast(Self()));
+  }
+  return result;
+}
+
+void Control::ClearKeyInputFocus()
+{
+  if( Self().OnStage() )
+  {
+    Toolkit::KeyInputFocusManager::Get().RemoveFocus(Toolkit::Control::DownCast(Self()));
+  }
+}
+
+void Control::SetAsKeyboardFocusGroup(bool isFocusGroup)
+{
+  mImpl->mIsKeyboardFocusGroup = isFocusGroup;
+
+  // The following line will be removed when the deprecated API in KeyboardFocusManager is deleted
+  Toolkit::KeyboardFocusManager::Get().SetAsFocusGroup(Self(), isFocusGroup);
+}
+
+bool Control::IsKeyboardFocusGroup()
+{
+  return Toolkit::KeyboardFocusManager::Get().IsFocusGroup(Self());
+}
+
+void Control::AccessibilityActivate()
+{
+  // Inform deriving classes
+  OnAccessibilityActivated();
+}
+
+bool Control::OnAccessibilityActivated()
+{
+  return false; // Accessibility activation is not handled by default
+}
+
+bool Control::OnAccessibilityPan(PanGesture gesture)
+{
+  return false; // Accessibility pan gesture is not handled by default
+}
+
+bool Control::OnAccessibilityTouch(const TouchEvent& touchEvent)
+{
+  return false; // Accessibility touch event is not handled by default
+}
+
+bool Control::OnAccessibilityValueChange(bool isIncrease)
+{
+  return false; // Accessibility value change action is not handled by default
+}
+
+Actor Control::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
+{
+  return Actor();
+}
+
+void Control::OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
+{
+}
+
+Toolkit::Control::KeyEventSignalType& Control::KeyEventSignal()
+{
+  return mImpl->mKeyEventSignal;
+}
+
+Toolkit::Control::KeyInputFocusSignalType& Control:: KeyInputFocusGainedSignal()
+{
+  return mImpl->mKeyInputFocusGainedSignal;
+}
+
+Toolkit::Control::KeyInputFocusSignalType& Control:: KeyInputFocusLostSignal()
+{
+  return mImpl->mKeyInputFocusLostSignal;
+}
+
+bool Control::EmitKeyEventSignal( const KeyEvent& event )
+{
+  // Guard against destruction during signal emission
+  Dali::Toolkit::Control handle( GetOwner() );
+
+  bool consumed = false;
+
+  // signals are allocated dynamically when someone connects
+  if ( !mImpl->mKeyEventSignal.Empty() )
+  {
+    consumed = mImpl->mKeyEventSignal.Emit( handle, event );
+  }
+
+  if (!consumed)
+  {
+    // Notification for derived classes
+    consumed = OnKeyEvent(event);
+  }
+
+  return consumed;
+}
+
+Control::Control( ControlBehaviour behaviourFlags )
+: CustomActorImpl( static_cast< ActorFlags >( behaviourFlags ) ),
+  mImpl(new Impl(*this))
+{
+  mImpl->mFlags = behaviourFlags;
+}
+
+void Control::Initialize()
+{
+  if( mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS )
+  {
+    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+
+    // Register for style changes
+    styleManager.StyleChangeSignal().Connect( this, &Control::OnStyleChange );
+
+    // SetTheme
+    GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+  }
+
+  if( mImpl->mFlags & REQUIRES_KEYBOARD_NAVIGATION_SUPPORT )
+  {
+    SetKeyboardNavigationSupport( true );
+  }
+
+  // Calling deriving classes
+  OnInitialize();
+}
+
 void Control::OnInitialize()
 {
 }
 
-void Control::OnActivated()
+void Control::OnControlChildAdd( Actor& child )
 {
 }
 
-void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change )
+void Control::OnControlChildRemove( Actor& child )
+{
+}
+
+void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   // By default the control is only interested in theme (not font) changes
-  if( change.themeChange )
+  if( change == StyleChange::THEME_CHANGE )
   {
     GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
   }
@@ -914,46 +869,6 @@ void Control::OnLongPress( const LongPressGesture& longPress )
 {
 }
 
-void Control::OnControlStageConnection()
-{
-}
-
-void Control::OnControlStageDisconnection()
-{
-}
-
-void Control::OnControlChildAdd( Actor& child )
-{
-}
-
-void Control::OnControlChildRemove( Actor& child )
-{
-}
-
-void Control::OnControlSizeSet( const Vector3& size )
-{
-}
-
-void Control::OnCalculateRelayoutSize( Dimension::Type dimension )
-{
-}
-
-void Control::OnLayoutNegotiated( float size, Dimension::Type dimension )
-{
-}
-
-void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
-{
-  for( unsigned int i = 0, numChildren = Self().GetChildCount(); i < numChildren; ++i )
-  {
-    container.Add( Self().GetChildAt( i ), size );
-  }
-}
-
-void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
-{
-}
-
 void Control::EmitKeyInputFocusSignal( bool focusGained )
 {
   Dali::Toolkit::Control handle( GetOwner() );
@@ -976,6 +891,14 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
   }
 }
 
+void Control::OnStageConnection()
+{
+}
+
+void Control::OnStageDisconnection()
+{
+}
+
 void Control::OnKeyInputFocusGained()
 {
   EmitKeyInputFocusSignal( true );
@@ -986,9 +909,38 @@ void Control::OnKeyInputFocusLost()
   EmitKeyInputFocusSignal( false );
 }
 
+void Control::OnChildAdd(Actor& child)
+{
+  // If this is the background actor, then we do not want to inform deriving classes
+  if ( mImpl->mAddRemoveBackgroundChild )
+  {
+    return;
+  }
+
+  // Notify derived classes.
+  OnControlChildAdd( child );
+}
+
+void Control::OnChildRemove(Actor& child)
+{
+  // If this is the background actor, then we do not want to inform deriving classes
+  if ( mImpl->mAddRemoveBackgroundChild )
+  {
+    return;
+  }
+
+  // Notify derived classes.
+  OnControlChildRemove( child );
+}
+
+void Control::OnSizeSet(const Vector3& targetSize)
+{
+  // Background is resized through size negotiation
+}
+
 void Control::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
 {
-  // @todo consider animating negotiated child sizes to target size
+  // @todo size negotiate background to new size, animate as well?
 }
 
 bool Control::OnTouchEvent(const TouchEvent& event)
@@ -1006,63 +958,78 @@ bool Control::OnKeyEvent(const KeyEvent& event)
   return false; // Do not consume
 }
 
-bool Control::OnMouseWheelEvent(const MouseWheelEvent& event)
+bool Control::OnWheelEvent(const WheelEvent& event)
 {
   return false; // Do not consume
 }
 
-void Control::OnStageConnection()
+void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
-  // Notify derived classes.
-  OnControlStageConnection();
+  for( unsigned int i = 0, numChildren = Self().GetChildCount(); i < numChildren; ++i )
+  {
+    container.Add( Self().GetChildAt( i ), size );
+  }
 }
 
-void Control::OnStageDisconnection()
+void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
 {
-  // Notify derived classes
-  OnControlStageDisconnection();
 }
 
-void Control::OnChildAdd(Actor& child)
+Vector3 Control::GetNaturalSize()
 {
-  // If this is the background actor, then we do not want to relayout or inform deriving classes
-  if ( mImpl->mBackground && ( child == mImpl->mBackground->actor ) )
+  if( mImpl->mBackground )
   {
-    return;
+    Actor actor = mImpl->mBackground->actor;
+    if( actor )
+    {
+      return actor.GetNaturalSize();
+    }
   }
-
-  // Notify derived classes.
-  OnControlChildAdd( child );
+  return Vector3();
 }
 
-void Control::OnChildRemove(Actor& child)
+float Control::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
 {
-  // If this is the background actor, then we do not want to relayout or inform deriving classes
-  if ( mImpl->mBackground && ( child == mImpl->mBackground->actor ) )
-  {
-    return;
-  }
-
-  // Notify derived classes.
-  OnControlChildRemove( child );
+  return CalculateChildSizeBase( child, dimension );
 }
 
-void Control::OnSizeSet(const Vector3& targetSize)
+float Control::GetHeightForWidth( float width )
 {
-  if( targetSize != mImpl->mNaturalSize )
+  if( mImpl->mBackground )
   {
-    // Only updates size if set through Actor's API
-    mImpl->mNaturalSize = targetSize;
+    Actor actor = mImpl->mBackground->actor;
+    if( actor )
+    {
+      return actor.GetHeightForWidth( width );
+    }
   }
+  return GetHeightForWidthBase( width );
+}
 
-  if( targetSize != mImpl->mCurrentSize )
+float Control::GetWidthForHeight( float height )
+{
+  if( mImpl->mBackground )
   {
-    // Update control size.
-    mImpl->mCurrentSize = targetSize;
-
-    // Notify derived classes.
-    OnControlSizeSet( targetSize );
+    Actor actor = mImpl->mBackground->actor;
+    if( actor )
+    {
+      return actor.GetWidthForHeight( height );
+    }
   }
+  return GetWidthForHeightBase( height );
+}
+
+bool Control::RelayoutDependentOnChildren( Dimension::Type dimension )
+{
+  return RelayoutDependentOnChildrenBase( dimension );
+}
+
+void Control::OnCalculateRelayoutSize( Dimension::Type dimension )
+{
+}
+
+void Control::OnLayoutNegotiated( float size, Dimension::Type dimension )
+{
 }
 
 void Control::SignalConnected( SlotObserver* slotObserver, CallbackBase* callback )
@@ -1073,6 +1040,22 @@ void Control::SignalConnected( SlotObserver* slotObserver, CallbackBase* callbac
 void Control::SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback )
 {
   mImpl->SignalDisconnected( slotObserver, callback );
+}
+
+Control& GetImplementation( Dali::Toolkit::Control& handle )
+{
+  CustomActorImpl& customInterface = handle.GetImplementation();
+  // downcast to control
+  Control& impl = dynamic_cast< Internal::Control& >( customInterface );
+  return impl;
+}
+
+const Control& GetImplementation( const Dali::Toolkit::Control& handle )
+{
+  const CustomActorImpl& customInterface = handle.GetImplementation();
+  // downcast to control
+  const Control& impl = dynamic_cast< const Internal::Control& >( customInterface );
+  return impl;
 }
 
 } // namespace Internal

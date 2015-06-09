@@ -39,6 +39,7 @@ libdali_script_plugin_v8_la_SOURCES = \
 libdali_script_plugin_v8_la_DEPENDENCIES =
 
 libdali_script_plugin_v8_la_CXXFLAGS = -DDALI_COMPILATION \
+                            -I../../../ \
                             $(V8_CFLAGS) \
                             $(DALI_TOOLKIT_CFLAGS) \
                             $(DALICORE_CFLAGS) \

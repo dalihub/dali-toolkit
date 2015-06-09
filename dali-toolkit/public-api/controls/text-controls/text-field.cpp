@@ -59,6 +59,11 @@ TextField TextField::DownCast( BaseHandle handle )
   return Control::DownCast<TextField, Internal::TextField>(handle);
 }
 
+TextField::TextChangedSignalType& TextField::TextChangedSignal()
+{
+  return Dali::Toolkit::GetImpl( *this ).TextChangedSignal();
+}
+
 TextField::MaxLengthReachedSignalType& TextField::MaxLengthReachedSignal()
 {
   return Dali::Toolkit::GetImpl( *this ).MaxLengthReachedSignal();

@@ -55,7 +55,7 @@ class DALI_IMPORT_API KeyboardFocusManager : public BaseHandle
 public:
 
   /// @brief Pre focus change signal
-  typedef Signal< Actor ( Actor, Actor, Control::KeyboardFocusNavigationDirection ) > PreFocusChangeSignalType;
+  typedef Signal< Actor ( Actor, Actor, Control::KeyboardFocus::Direction ) > PreFocusChangeSignalType;
 
   /// @brief Focus changed signal
   typedef Signal< void ( Actor, Actor ) > FocusChangedSignalType;
@@ -117,7 +117,7 @@ public:
    * @param direction The direction of focus movement
    * @return true if the movement was successful
    */
-  bool MoveFocus(Control::KeyboardFocusNavigationDirection direction);
+  bool MoveFocus(Control::KeyboardFocus::Direction direction);
 
   /**
    * @brief Clear the focus from the current focused actor if any, so
@@ -214,7 +214,7 @@ public: // Signals
    *
    * A callback of the following type may be connected:
    * @code
-   *   Actor YourCallbackName(Actor currentFocusedActor, Actor proposedActorToFocus, Control::KeyboardFocusNavigationDirection direction);
+   *   Actor YourCallbackName(Actor currentFocusedActor, Actor proposedActorToFocus, Control::KeyboardFocus::Direction direction);
    * @endcode
    * @pre The Object has been initialized.
    * @return The signal to connect to.

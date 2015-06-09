@@ -1,5 +1,5 @@
-/**
- *
+<!--
+/**-->
 
 # Performance Profiling  {#performanceprofiling}
 
@@ -8,7 +8,7 @@ DALi has many mechanisms for analysing performance including kernel, system and 
 
 
 ## Background
-The Dali rendering pipeline has 2 stages.
+The DALi rendering pipeline has 2 stages.
 
 Each stage is typically run once per frame.
 
@@ -42,7 +42,7 @@ To run at a solid 60 FPS (16 milliseconds per frame), it is recommended to stay 
 This will leave enough time for the output to be composited (if the system uses a compositor) and to avoid using
 too much CPU power.
   
-The main Dali application thread which deals with event processing is independent of the update / render threads.
+The main DALi application thread which deals with event processing is independent of the update / render threads.
 This means animations won't stop if the main thread decides to do a long operation like downloading a file from the internet.
   
 
@@ -93,13 +93,13 @@ INFO: DALI: 1134155.533672 (seconds), V_SYNC
 
 | Marker | Description
 |--------|-------------
-| V_SYNC.| The heart beat which represents Dali should start creating a new frame if anything has changed. Runs at display refresh rate, typically 60Hz |
-| UPDATE_START | Dali update task has started |
-| UPDATE_START | Dali update task has finished |
-| RENDER_START | Dali render task has started |
-| RENDER_END | Dali render task has finished |
-| PROCESS_EVENT_START | Dali main thread processing events (e.g. in response to a touch event or a timer) |
-| PROCESS_EVENT_START | Dali main thread processing events finished |
+| V_SYNC.| The heart beat which represents DALi should start creating a new frame if anything has changed. Runs at display refresh rate, typically 60Hz |
+| UPDATE_START | DALi update task has started |
+| UPDATE_START | DALi update task has finished |
+| RENDER_START | DALi render task has started |
+| RENDER_END | DALi render task has finished |
+| PROCESS_EVENT_START | DALi main thread processing events (e.g. in response to a touch event or a timer) |
+| PROCESS_EVENT_START | DALi main thread processing events finished |
 | SWAP_START | glSwapBuffers started (todo) |
 | SWAP_END | glSwapBuffers end  (todo) |
 | PAUSE  | Application paused |
@@ -120,7 +120,7 @@ logger.AddMarker(PerformanceLogger::END_EVENT);
 
 ## Statistics logging
 
-Statistics logging uses Dali log output which on Tizen is dlog, but this can also be used on desktop by redirecting stderr to a file.
+Statistics logging uses DALi log output which on Tizen is dlog, but this can also be used on desktop by redirecting stderr to a file.
 
 Setting DALI_LOG_PERFORMANCE_STATS environment variable will enable time stamps.
 
@@ -144,7 +144,7 @@ $ dali-demo
  TableViewInit, min 76.55 ms, max 76.55 ms, total (0.1 secs), avg 76.55 ms, std dev 0.00 ms
 ~~~
 
-If nothing is animating Dali will enter a paused state to save power. At this
+If nothing is animating DALi will enter a paused state to save power. At this
 point nothing will be logged.
 
 ### Custom statistics for application developers
@@ -162,7 +162,7 @@ logger.AddMarker(PerformanceLogger::END_EVENT);
 
 ## Application profiling
 
- The main application thread in Dali is used to process and respond to events such as touch, key, mouse, gestures and timers.
+ The main application thread in DALi is used to process and respond to events such as touch, key, mouse, gestures and timers.
 
 Example:
 ~~~
@@ -193,10 +193,10 @@ DALI_PERFORMANCE_TIMESTAMP_OUTPUT=2 dali-demo
 ~~~
 
 Ftrace is a kernel tracer designed to help developers find out what is going on inside the kernel.
-It can be used for analysing how long Dali takes to perform different tasks and
-what Dali is doing in relation to other system processes / interrupts.
+It can be used for analysing how long DALi takes to perform different tasks and
+what DALi is doing in relation to other system processes / interrupts.
   
-On Tizen if the kernel has been built with ftrace enabled, then Dali can log out to ftrace.
+On Tizen if the kernel has been built with ftrace enabled, then DALi can log out to ftrace.
 This gives exact time stamps of the main events in Dali.
 Current markers that are logged:
 
@@ -226,7 +226,7 @@ $ cat trace
 If the message did not get added to the trace, then check the write permissions on trace_marker file. E.g.
 $ chmod ugoa+w trace_marker
 ~~~
-To view Dali markers in trace file
+To view DALi markers in trace file
 
 ~~~
 $ export DALI_LOG_PERFORMANCE=2

@@ -1,0 +1,10 @@
+.image
+{
+   text-align: left;
+   margin-left: 20px;
+   margin-right: 20px;
+}
+
+div.image img {
+  max-width: 50em;
+}

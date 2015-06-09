@@ -260,7 +260,7 @@ public:
    * @param[in] attributes The attributes with which to perfrom this action.
    * @return true if action has been accepted by this control
    */
-  static bool DoAction( BaseObject* object, const std::string& actionName, const PropertyValueContainer& attributes );
+  static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes );
 
 protected:
 
@@ -280,7 +280,7 @@ private:
    * Perform the click action to click the button.
    * @param[in] attributes The attributes to perfrom this action.
    */
-  void DoClickAction( const PropertyValueContainer& attributes );
+  void DoClickAction( const Property::Map& attributes );
 
   /**
    * This method is called after the button initialization.

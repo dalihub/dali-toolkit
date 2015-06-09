@@ -27,7 +27,7 @@
 #include <dali/public-api/math/matrix3.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/builder/tree-node.h>
+#include <dali-toolkit/devel-api/builder/tree-node.h>
 #include <dali-toolkit/internal/builder/optional-value.h>
 
 typedef Dali::Toolkit::TreeNode TreeNode;

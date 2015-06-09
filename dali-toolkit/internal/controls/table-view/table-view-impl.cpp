@@ -1142,7 +1142,7 @@ TableView::~TableView()
   // nothing to do
 }
 
-Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocusNavigationDirection direction, bool loopEnabled)
+Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
 {
   Actor nextFocusableActor;
 
@@ -1165,7 +1165,7 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolki
 
       switch ( direction )
       {
-        case Toolkit::Control::Left:
+        case Toolkit::Control::KeyboardFocus::LEFT:
         {
           if(--currentColumn < 0)
           {
@@ -1178,7 +1178,7 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolki
           }
           break;
         }
-        case Toolkit::Control::Right:
+        case Toolkit::Control::KeyboardFocus::RIGHT:
         {
           if(++currentColumn > numberOfColumns - 1)
           {
@@ -1191,7 +1191,7 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolki
           }
           break;
         }
-        case Toolkit::Control::Up:
+        case Toolkit::Control::KeyboardFocus::UP:
         {
           if(--currentRow < 0)
           {
@@ -1200,7 +1200,7 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolki
           }
           break;
         }
-        case Toolkit::Control::Down:
+        case Toolkit::Control::KeyboardFocus::DOWN:
 
         {
           if(++currentRow > numberOfRows - 1)

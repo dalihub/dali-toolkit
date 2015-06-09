@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <sys/stat.h>
-#include <boost/function.hpp>
 #include <sstream>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/object/type-info.h>
@@ -30,11 +29,12 @@
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/public-api/signals/functor-delegate.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
-#include <dali-toolkit/public-api/builder/json-parser.h>
+#include <dali-toolkit/devel-api/builder/json-parser.h>
 
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
 #include <dali-toolkit/internal/builder/builder-filesystem.h>
@@ -56,8 +56,8 @@ extern bool SetPropertyFromNode( const TreeNode& node, Property::Value& value );
 extern bool SetPropertyFromNode( const TreeNode& node, Property::Value& value, const Replacement& replacements );
 extern bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value );
 extern bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::Value& value, const Replacement& replacements );
-extern Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction, Dali::Toolkit::Internal::Builder* const builder);
-extern Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, boost::function<void (void)> quitAction, Dali::Toolkit::Internal::Builder* const builder);
+extern Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, Dali::Toolkit::Internal::Builder* const builder);
+extern Actor SetupPropertyNotification(ConnectionTracker* tracker, const TreeNode &root, const TreeNode &child, Actor actor, Dali::Toolkit::Internal::Builder* const builder);
 extern Actor SetupActor( const TreeNode& node, Actor& actor, const Replacement& constant );
 
 #if defined(DEBUG_ENABLED)
@@ -217,22 +217,6 @@ void CollectAllStyles( const TreeNode& stylesCollection, const TreeNode& style, 
   }
 }
 
-struct QuitAction
-{
-public:
-  QuitAction( Builder& builder )
-  : mBuilder( builder )
-  {
-  }
-
-  void operator()(void)
-  {
-    mBuilder.EmitQuitSignal();
-  }
-
-private:
-  Builder& mBuilder;
-};
 
 } // namespace anon
 
@@ -361,9 +345,8 @@ void Builder::ApplyProperties( const TreeNode& root, const TreeNode& node,
       SetupActor( node, actor, constant );
 
       // add signals
-      QuitAction quitAction( *this );
-      SetupSignalAction( mSlotDelegate.GetConnectionTracker(), root, node, actor, quitAction, this );
-      SetupPropertyNotification( mSlotDelegate.GetConnectionTracker(), root, node, actor, quitAction, this );
+      SetupSignalAction( mSlotDelegate.GetConnectionTracker(), root, node, actor, this );
+      SetupPropertyNotification( mSlotDelegate.GetConnectionTracker(), root, node, actor, this );
    }
   }
   else

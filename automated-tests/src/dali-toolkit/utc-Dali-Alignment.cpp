@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -924,7 +924,7 @@ int UtcDaliAlignmentChildAddAndRemove(void)
   END_TEST;
 }
 
-int UtcDaliAlignmentOnSizeSet(void)
+int UtcDaliAlignmentSizeSetP(void)
 {
   ToolkitTestApplication application;
 
@@ -942,7 +942,7 @@ int UtcDaliAlignmentOnSizeSet(void)
   application.Render();
   application.SendNotification();
 
-  DALI_TEST_EQUALS(size, alignment.GetImplementation().GetControlSize().GetVectorXY(), TEST_LOCATION);
+  DALI_TEST_EQUALS(size, alignment.GetTargetSize().GetVectorXY(), TEST_LOCATION);
 
   Stage::GetCurrent().Remove(alignment);
   END_TEST;

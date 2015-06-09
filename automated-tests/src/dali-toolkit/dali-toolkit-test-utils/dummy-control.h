@@ -102,7 +102,8 @@ private:
 private: // From Internal::Control
 
   virtual void OnInitialize();
-  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change );
+  virtual void OnActivated();
+  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
   virtual void OnPinch(const PinchGesture& pinch);
   virtual void OnPan(const PanGesture& pan);
   virtual void OnTap(const TapGesture& tap);
@@ -117,7 +118,8 @@ private: // From CustomActorImpl
   virtual void OnSizeSet(const Vector3& targetSize);
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
   virtual bool OnTouchEvent(const TouchEvent& event);
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event);
+  virtual bool OnHoverEvent(const HoverEvent& event);
+  virtual bool OnWheelEvent(const WheelEvent& event);
   virtual bool OnKeyEvent(const KeyEvent& event);
   virtual void OnKeyInputFocusGained();
   virtual void OnKeyInputFocusLost();
@@ -125,6 +127,7 @@ private: // From CustomActorImpl
 public:
 
   bool initializeCalled;
+  bool activatedCalled;
   bool themeChangeCalled;
   bool fontChangeCalled;
   bool pinchCalled;
@@ -138,7 +141,8 @@ public:
   bool sizeSetCalled;
   bool sizeAnimationCalled;
   bool touchEventCalled;
-  bool mouseWheelEventCalled;
+  bool hoverEventCalled;
+  bool wheelEventCalled;
   bool keyEventCalled;
   bool keyInputFocusGained;
   bool keyInputFocusLost;

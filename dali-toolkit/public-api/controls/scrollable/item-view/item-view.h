@@ -217,18 +217,18 @@ public:
   float GetMinimumSwipeDistance() const;
 
   /**
-   * @brief Set the step of scroll distance in actor coordinates for each mouse wheel event received.
+   * @brief Set the step of scroll distance in actor coordinates for each wheel event received.
    *
    * @param[in] step The step of scroll distance(pixel).
    */
-  void SetMouseWheelScrollDistanceStep(float step);
+  void SetWheelScrollDistanceStep(float step);
 
   /**
-   * @brief Get the step of scroll distance in actor coordinates for each mouse wheel event received.
+   * @brief Get the step of scroll distance in actor coordinates for each wheel event received.
    *
    * @return The step of scroll distance(pixel)
    */
-  float GetMouseWheelScrollDistanceStep() const;
+  float GetWheelScrollDistanceStep() const;
 
   /**
    * @brief Set whether to enable the animation for the layout to

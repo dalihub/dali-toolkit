@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_SCROLL_VIEW_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -323,14 +323,14 @@ public:
   void SetMaxFlickSpeed(float speed);
 
   /**
-   * @copydoc Toolkit::ScrollView::GetMouseWheelScrollDistanceStep
+   * @copydoc Toolkit::ScrollView::GetWheelScrollDistanceStep
    */
-  Vector2 GetMouseWheelScrollDistanceStep() const;
+  Vector2 GetWheelScrollDistanceStep() const;
 
   /**
-   * @copydoc Toolkit::ScrollView::SetMouseWheelScrollDistanceStep
+   * @copydoc Toolkit::ScrollView::SetWheelScrollDistanceStep
    */
-  void SetMouseWheelScrollDistanceStep(Vector2 step);
+  void SetWheelScrollDistanceStep(Vector2 step);
 
   /**
    * @copydoc Toolkit::ScrollView::GetCurrentPage
@@ -341,11 +341,6 @@ public:
    * @copydoc Toolkit::ScrollView::GetCurrentScrollPosition
    */
   Vector2 GetCurrentScrollPosition() const;
-
-  /**
-   * @copydoc Toolkit::ScrollView::SetScrollPosition
-   */
-  void SetScrollPosition(const Vector2& position);
 
   /**
    * @copydoc Toolkit::Scrollable::GetDomainSize
@@ -513,9 +508,9 @@ private: // private overriden functions from CustomActorImpl and Controls
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
 
   /**
-   * @copydoc Dali::Control::OnControlSizeSet(const Vector3&)
+   * @copydoc CustomActorImpl::OnSizeSet(const Vector3&)
    */
-  virtual void OnControlSizeSet( const Vector3& size );
+  virtual void OnSizeSet( const Vector3& size );
 
   /**
    * From CustomActorImpl; called after a child has been added to the owning actor.
@@ -540,11 +535,11 @@ private: // private overriden functions from CustomActorImpl and Controls
   virtual bool OnTouchEvent(const TouchEvent& event);
 
   /**
-   * From CustomActorImpl; called after a mouse-wheel-event is received by the owning actor.
-   * @param[in] event The mouse wheel event.
+   * From CustomActorImpl; called after a wheel-event is received by the owning actor.
+   * @param[in] event The wheel event.
    * @return True if the event should be consumed.
    */
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event);
+  virtual bool OnWheelEvent(const WheelEvent& event);
 
   /**
    * @copydoc Toolkit::Control::OnInitialize()
@@ -552,14 +547,14 @@ private: // private overriden functions from CustomActorImpl and Controls
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::Control::OnControlStageConnection()
+   * @copydoc CustomActorImpl::OnStageConnection()
    */
-  virtual void OnControlStageConnection();
+  virtual void OnStageConnection();
 
   /**
-   * @copydoc Toolkit::Control::OnControlStageConnection()
+   * @copydoc CustomActorImpl::OnStageDisconnection()
    */
-  virtual void OnControlStageDisconnection();
+  virtual void OnStageDisconnection();
 
   /**
    * @copydoc Toolkit::Control::OnAccessibilityPan()
@@ -660,10 +655,8 @@ private:
    * This is called internally whenever the Scroll Rulers are
    * modified. This will update the properties: 'scroll-position-min'
    * and 'scroll-position-max' to reflect the changes.
-   *
-   * @param[in] size size of the visible scroll area (ScrollView control size)
    */
-  void UpdatePropertyDomain(const Vector3& size);
+  void UpdatePropertyDomain();
 
   /**
    * Called when the gesture starts.
@@ -890,7 +883,7 @@ private:
   float mFlickSpeedCoefficient;                 ///< Flick velocity coefficient. Input touch velocity is multiplied by this.
   float mMaxFlickSpeed;                         ///< Maximum flick speed. Maximum speed of flick in stage.lengths/sec.
 
-  Vector2 mMouseWheelScrollDistanceStep;        ///< The step of scroll distance in actor coordinates in X and Y axes for each mouse wheel event received.
+  Vector2 mWheelScrollDistanceStep;        ///< The step of scroll distance in actor coordinates in X and Y axes for each wheel event received.
 
   //ScrollInternalConstraintsPtr mScrollInternalConstraints;
   Constraint mScrollMainInternalPrePositionConstraint;

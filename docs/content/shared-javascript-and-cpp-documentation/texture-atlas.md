@@ -1,5 +1,6 @@
-/**
- *
+<!--
+/**-->
+
 # Texture Atlases {#textureatlases}
 
 ## Example demo application
@@ -245,5 +246,4 @@ Alternatively Texture packer has the option to split atlases ( search help for M
 
 @class _Guide_TextureAtlases
 
-*
 */

@@ -20,6 +20,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali-toolkit/devel-api/controls/slider/slider.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;

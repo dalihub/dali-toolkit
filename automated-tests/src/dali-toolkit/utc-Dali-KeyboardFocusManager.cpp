@@ -25,6 +25,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/key-event-integ.h>
 
+
 using namespace Dali;
 using namespace Dali::Toolkit;
 
@@ -50,11 +51,11 @@ public:
   : mSignalVerified(signalReceived),
     mCurrentFocusedActor(),
     mProposedActorToFocus(),
-    mDirection(Control::Left)
+    mDirection(Control::KeyboardFocus::LEFT)
   {
   }
 
-  Actor Callback(Actor currentFocusedActor, Actor proposedActorToFocus, Control::KeyboardFocusNavigationDirection direction)
+  Actor Callback(Actor currentFocusedActor, Actor proposedActorToFocus, Control::KeyboardFocus::Direction direction)
   {
     tet_infoline("Verifying PreFocusChangeCallback()");
 
@@ -72,13 +73,13 @@ public:
     mSignalVerified = false;
     mCurrentFocusedActor = Actor();
     mProposedActorToFocus = Actor();
-    mDirection = Control::Left;
+    mDirection = Control::KeyboardFocus::LEFT;
   }
 
   bool& mSignalVerified;
   Actor mCurrentFocusedActor;
   Actor mProposedActorToFocus;
-  Control::KeyboardFocusNavigationDirection mDirection;
+  Control::KeyboardFocus::Direction mDirection;
 };
 
 // Functors to test whether focus changed signal is emitted when the keyboard focus is changed
@@ -294,13 +295,13 @@ int UtcDaliKeyboardFocusManagerMoveFocus(void)
   Stage::GetCurrent().Add(second);
 
   // Move the focus to the right
-  DALI_TEST_CHECK(manager.MoveFocus(Control::Right) == false);
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == false);
 
   // Because no layout control in the stage and no actor is focused, it should emit the PreFocusChange signal
   DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
   DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == Actor());
   DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == Actor());
-  DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::Right);
+  DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::KeyboardFocus::RIGHT);
   preFocusChangeCallback.Reset();
 
   // Check that the focus is set on the first actor
@@ -312,13 +313,13 @@ int UtcDaliKeyboardFocusManagerMoveFocus(void)
   focusChangedCallback.Reset();
 
   // Move the focus towards right
-  DALI_TEST_CHECK(manager.MoveFocus(Control::Right) == false);
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == false);
 
   // Because no layout control in the stage and the first actor is focused, it should emit the PreFocusChange signal
   DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
   DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == first);
   DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == Actor());
-  DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::Right);
+  DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::KeyboardFocus::RIGHT);
   preFocusChangeCallback.Reset();
 
   // Check that the focus is set on the second actor
@@ -330,13 +331,13 @@ int UtcDaliKeyboardFocusManagerMoveFocus(void)
   focusChangedCallback.Reset();
 
   // Move the focus towards up
-  DALI_TEST_CHECK(manager.MoveFocus(Control::Up) == false);
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::UP) == false);
 
   // Because no layout control in the stage and no actor is focused, it should emit the PreFocusChange signal
   DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
   DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == second);
   DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == Actor());
-  DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::Up);
+  DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::KeyboardFocus::UP);
   preFocusChangeCallback.Reset();
   DALI_TEST_CHECK(!focusChangedCallback.mSignalVerified);
 
@@ -367,7 +368,7 @@ int UtcDaliKeyboardFocusManagerMoveFocus(void)
   focusChangedCallback.Reset();
 
   // Move the focus towards right
-  DALI_TEST_CHECK(manager.MoveFocus(Control::Right) == true);
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::RIGHT) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == first);
@@ -375,7 +376,7 @@ int UtcDaliKeyboardFocusManagerMoveFocus(void)
   focusChangedCallback.Reset();
 
   // Move the focus towards down
-  DALI_TEST_CHECK(manager.MoveFocus(Control::Down) == true);
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::DOWN) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == fourth);
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == second);
@@ -383,7 +384,7 @@ int UtcDaliKeyboardFocusManagerMoveFocus(void)
   focusChangedCallback.Reset();
 
   // Move the focus towards left
-  DALI_TEST_CHECK(manager.MoveFocus(Control::Left) == true);
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::LEFT) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == fourth);
@@ -391,7 +392,7 @@ int UtcDaliKeyboardFocusManagerMoveFocus(void)
   focusChangedCallback.Reset();
 
   // Move the focus towards up
-  DALI_TEST_CHECK(manager.MoveFocus(Control::Up) == true);
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::UP) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == third);
@@ -399,12 +400,12 @@ int UtcDaliKeyboardFocusManagerMoveFocus(void)
   focusChangedCallback.Reset();
 
   // Move the focus towards left. The focus move will fail as no way to move it upwards
-  DALI_TEST_CHECK(manager.MoveFocus(Control::Left) == false);
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::LEFT) == false);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
   DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
   DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == first);
   DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == Actor());
-  DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::Left);
+  DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::KeyboardFocus::LEFT);
   preFocusChangeCallback.Reset();
   DALI_TEST_CHECK(!focusChangedCallback.mSignalVerified);
 
@@ -413,7 +414,7 @@ int UtcDaliKeyboardFocusManagerMoveFocus(void)
   DALI_TEST_CHECK(manager.GetFocusGroupLoop() == true);
 
   // Move the focus towards left again. The focus should move to the fourth actor.
-  DALI_TEST_CHECK(manager.MoveFocus(Control::Left) == true);
+  DALI_TEST_CHECK(manager.MoveFocus(Control::KeyboardFocus::LEFT) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == fourth);
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == first);

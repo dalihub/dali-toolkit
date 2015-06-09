@@ -17,7 +17,7 @@
 
 #include "dummy-control.h"
 
-#include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/devel-api/styling/style-manager.h>
 
 namespace Dali
 {
@@ -64,7 +64,7 @@ DummyControl DummyControlImpl::New()
 }
 
 DummyControlImpl::DummyControlImpl()
-: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
+: Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_HOVER_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mCustomSlot1Called(false)
 {
 }
@@ -86,6 +86,7 @@ DummyControl DummyControlImplOverride::New()
 DummyControlImplOverride::DummyControlImplOverride()
 : DummyControlImpl(),
   initializeCalled(false),
+  activatedCalled(false),
   themeChangeCalled( false ),
   fontChangeCalled( false ),
   pinchCalled(false),
@@ -99,7 +100,8 @@ DummyControlImplOverride::DummyControlImplOverride()
   sizeSetCalled(false),
   sizeAnimationCalled(false),
   touchEventCalled(false),
-  mouseWheelEventCalled(false),
+  hoverEventCalled(false),
+  wheelEventCalled(false),
   keyEventCalled(false),
   keyInputFocusGained(false),
   keyInputFocusLost(false)
@@ -110,7 +112,12 @@ DummyControlImplOverride::~DummyControlImplOverride() { }
 
 
 void DummyControlImplOverride::OnInitialize() { initializeCalled = true; }
-void DummyControlImplOverride::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange change ) { themeChangeCalled = change.themeChange; fontChangeCalled = change.defaultFontSizeChange; }
+void DummyControlImplOverride::OnActivated() { activatedCalled = true; }
+void DummyControlImplOverride::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
+{
+  themeChangeCalled = change == StyleChange::THEME_CHANGE;
+  fontChangeCalled = change == StyleChange::DEFAULT_FONT_SIZE_CHANGE;
+}
 void DummyControlImplOverride::OnPinch(const PinchGesture& pinch) { pinchCalled = true; }
 void DummyControlImplOverride::OnPan(const PanGesture& pan) { panCalled = true; }
 void DummyControlImplOverride::OnTap(const TapGesture& tap) { tapCalled = true; }
@@ -122,7 +129,8 @@ void DummyControlImplOverride::OnChildRemove(Actor& child) { childRemoveCalled =
 void DummyControlImplOverride::OnSizeSet(const Vector3& targetSize) { sizeSetCalled = true; }
 void DummyControlImplOverride::OnSizeAnimation(Animation& animation, const Vector3& targetSize) { sizeAnimationCalled = true; }
 bool DummyControlImplOverride::OnTouchEvent(const TouchEvent& event) { touchEventCalled = true; return false; }
-bool DummyControlImplOverride::OnMouseWheelEvent(const MouseWheelEvent& event) { mouseWheelEventCalled = true; return false; }
+bool DummyControlImplOverride::OnHoverEvent(const HoverEvent& event) { hoverEventCalled = true; return false; }
+bool DummyControlImplOverride::OnWheelEvent(const WheelEvent& event) { wheelEventCalled = true; return false; }
 bool DummyControlImplOverride::OnKeyEvent(const KeyEvent& event) { keyEventCalled = true; return false;}
 void DummyControlImplOverride::OnKeyInputFocusGained() { keyInputFocusGained = true; }
 void DummyControlImplOverride::OnKeyInputFocusLost() { keyInputFocusLost = true; }

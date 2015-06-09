@@ -1,4 +1,4 @@
-Deep internal documentation for Dali Toolkit.
+Deep internal documentation for DALi Toolkit.
 
 Generate the documentation here as follows:
 
@@ -7,7 +7,7 @@ Generate the documentation here as follows:
     # Start doxygen:
     ./build.sh
 
-Note, the doxfile assumes you have your Dali repositories checked-out
+Note, the doxfile assumes you have your DALi repositories checked-out
 side by side with the following structure:
 
     .

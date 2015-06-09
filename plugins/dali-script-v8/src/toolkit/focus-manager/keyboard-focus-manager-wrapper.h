@@ -66,7 +66,7 @@ public:
 
   virtual SignalManager* GetSignalManager() { return &mSignalManager;}
 
-  static std::string GetDirectionName(  Toolkit::Control::KeyboardFocusNavigationDirection dir );
+  static std::string GetDirectionName(  Toolkit::Control::KeyboardFocus::Direction dir );
 
 private:
 

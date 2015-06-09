@@ -22,7 +22,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/buttons/radio-button-impl.cpp \
    $(toolkit_src_dir)/controls/effects-view/effects-view-impl.cpp \
    $(toolkit_src_dir)/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp \
-   $(toolkit_src_dir)/controls/image-view/masked-image-view-impl.cpp \
    $(toolkit_src_dir)/controls/magnifier/magnifier-impl.cpp \
    $(toolkit_src_dir)/controls/popup/popup-impl.cpp \
    $(toolkit_src_dir)/controls/popup/popup-style-impl.cpp \
@@ -50,7 +49,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/text-controls/text-label-impl.cpp \
    $(toolkit_src_dir)/controls/text-controls/text-selection-popup-impl.cpp \
    $(toolkit_src_dir)/controls/tool-bar/tool-bar-impl.cpp \
-   $(toolkit_src_dir)/focus-manager/focus-manager-impl.cpp \
+   $(toolkit_src_dir)/focus-manager/accessibility-focus-manager-impl.cpp \
    $(toolkit_src_dir)/focus-manager/keyboard-focus-manager-impl.cpp \
    $(toolkit_src_dir)/focus-manager/keyinput-focus-manager-impl.cpp \
    $(toolkit_src_dir)/filters/blur-two-pass-filter.cpp \

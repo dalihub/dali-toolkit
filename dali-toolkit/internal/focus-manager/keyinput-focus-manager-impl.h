@@ -24,7 +24,7 @@
 #include <dali/public-api/object/object-registry.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/focus-manager/keyinput-focus-manager.h>
+#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali
