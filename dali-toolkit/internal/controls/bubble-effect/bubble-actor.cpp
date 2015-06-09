@@ -24,30 +24,6 @@
 
 // INTERNAL INCLUDES
 
-namespace
-{
-
-/**
- * Register a property and map it as uniform.
- * @param[in] handle The handle to register new property.
- * @param[in] propertyName The name of the property.
- * @param[in] unifoemName The name of the uniform.
- * @param[in] value The initial value of the property.
- * @return The index of theproperty
- */
-Dali::Property::Index RegisterUniform( Dali::Handle& handle,
-                                       const std::string& propertyName,
-                                       const std::string& uniformName,
-                                       Dali::Property::Value value)
-{
-  Dali::Property::Index propertyIndex = handle.RegisterProperty( propertyName, value );
-  handle.AddUniformMapping( propertyIndex, uniformName );
-
-  return propertyIndex;
-}
-
-}// end LOCAL_STUFF
-
 namespace Dali
 {
 
@@ -80,23 +56,23 @@ void BubbleActor::MakeRenderable( Geometry geometry, Material material  )
   mActor.SetParentOrigin(ParentOrigin::TOP_LEFT);
 
   // register uniforms
-  mIndexGravity = RegisterUniform( mActor, "gravity", "uGravity", 50.f );
-  mIndexDynamicScale = RegisterUniform( mActor, "dynamic-scale", "uDynamicScale", 1.f );
+  mIndexGravity = mActor.RegisterProperty( "uGravity", 50.f );
+  mIndexDynamicScale = mActor.RegisterProperty( "uDynamicScale", 1.f );
 
-  mIndexInvertedMovementArea = RegisterUniform( mActor, "inverted-movement-area", "uInvertedMovementArea", Vector2(1.f,1.f) / mMovementArea );
+  mIndexInvertedMovementArea = mActor.RegisterProperty( "uInvertedMovementArea", Vector2(1.f,1.f) / mMovementArea );
 
   srand(time(NULL));
   mIndicesOffset.resize(9);
   int offset = mMovementArea.Length() / 10.f;
-  mIndicesOffset[0] = RegisterUniform(mActor, "offset-0", "offset[0]", Vector2(0.f,0.f));
-  mIndicesOffset[1] = RegisterUniform(mActor, "offset-1", "offset[1]", Vector2(rand()%offset,rand()%offset) );
-  mIndicesOffset[2] = RegisterUniform(mActor, "offset-2", "offset[2]", Vector2(rand()%offset,-rand()%offset) );
-  mIndicesOffset[3] = RegisterUniform(mActor, "offset-3", "offset[3]", Vector2(-rand()%offset,rand()%offset) );
-  mIndicesOffset[4] = RegisterUniform(mActor, "offset-4", "offset[4]", Vector2(-rand()%offset,-rand()%offset) );
-  mIndicesOffset[5] = RegisterUniform(mActor, "offset-5", "offset[5]", Vector2(rand()%offset,0.f));
-  mIndicesOffset[6] = RegisterUniform(mActor, "offset-6", "offset[6]", Vector2(-rand()%offset,0.f));
-  mIndicesOffset[7] = RegisterUniform(mActor, "offset-7", "offset[7]", Vector2(0.f,rand()%offset));
-  mIndicesOffset[8] = RegisterUniform(mActor, "offset-8", "offset[8]", Vector2(0.f,-rand()%offset));
+  mIndicesOffset[0] = mActor.RegisterProperty( "uOffset[0]", Vector2(0.f,0.f));
+  mIndicesOffset[1] = mActor.RegisterProperty( "uOffset[1]", Vector2(rand()%offset,rand()%offset) );
+  mIndicesOffset[2] = mActor.RegisterProperty( "uOffset[2]", Vector2(rand()%offset,-rand()%offset) );
+  mIndicesOffset[3] = mActor.RegisterProperty( "uOffset[3]", Vector2(-rand()%offset,rand()%offset) );
+  mIndicesOffset[4] = mActor.RegisterProperty( "uOffset[4]", Vector2(-rand()%offset,-rand()%offset) );
+  mIndicesOffset[5] = mActor.RegisterProperty( "uOffset[5]", Vector2(rand()%offset,0.f));
+  mIndicesOffset[6] = mActor.RegisterProperty( "uOffset[6]", Vector2(-rand()%offset,0.f));
+  mIndicesOffset[7] = mActor.RegisterProperty( "uOffset[7]", Vector2(0.f,rand()%offset));
+  mIndicesOffset[8] = mActor.RegisterProperty( "uOffset[8]", Vector2(0.f,-rand()%offset));
 
   Vector4 zeroVector;
   mIndiceStartEndPos.resize( mNumBubble );
@@ -104,18 +80,12 @@ void BubbleActor::MakeRenderable( Geometry geometry, Material material  )
   for( unsigned int i=0; i<mNumBubble; i++ )
   {
     std::ostringstream ossProperty;
-    ossProperty<< "start-end-position-"<< i;
-
-    std::ostringstream ossUniform;
-    ossUniform<< "uStartAndEndPos["<< i << "]";
-    mIndiceStartEndPos[i] = RegisterUniform( mActor, ossProperty.str(), ossUniform.str(), zeroVector );
+    ossProperty<< "uStartEndPosition["<< i << "]";
+    mIndiceStartEndPos[i] = mActor.RegisterProperty( ossProperty.str(), zeroVector );
 
     ossProperty.str("");
-    ossProperty<< "percentage-"<< i;
-
-    ossUniform.str("");
-    ossUniform<< "uPercentage["<< i << "]";
-    mIndicesPercentage[i] = RegisterUniform( mActor, ossProperty.str(), ossUniform.str(), 0.f );
+    ossProperty<< "uPercentage["<< i << "]";
+    mIndicesPercentage[i] = mActor.RegisterProperty( ossProperty.str(), 0.f );
   }
 }
 

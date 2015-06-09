@@ -48,14 +48,14 @@ inline Shader CreateBubbleShader( unsigned int numBubble )
   uniform mediump float uGravity;\n
   // xy: the emit position of the bubble; zw: the destination of the bubble.
   // The bubble is moving from (xy) to (zw plus the y drop influenced by gravity).
-  uniform vec4 uStartAndEndPos[NUMBER_OF_BUBBLE];\n
+  uniform vec4 uStartEndPosition[NUMBER_OF_BUBBLE];\n
   // The undergoing percentage of the bubble movement. 0.0: start from emit position, 1.0: reach the destination
   uniform float uPercentage[NUMBER_OF_BUBBLE];\n
   uniform vec2 uInvertedMovementArea;\n
   // The bubble number is restricted by the available uniform num.
-  // To increase the displayed bubble, every uStartAndEndPos and uPercentage uniform is applied to a small bunch of bubbles (9 here)
+  // To increase the displayed bubble, every uStartEndPosition and uPercentage uniform is applied to a small bunch of bubbles (9 here)
   // The offset defines the random offset between bubbles within the bunch.
-  uniform vec2 offset[9];\n
+  uniform vec2 uOffset[9];\n
   // This uniform is used to change the bubble size during running time
   uniform float uDynamicScale;\n
   varying float vPercentage;\n
@@ -67,7 +67,7 @@ inline Shader CreateBubbleShader( unsigned int numBubble )
     int index = int(aIndex); \n
     //for some i between 0 ~ NUMBER_OF_BUBBLE-1: i,i+NUMBER_OF_BUBBLE, i+NUMBER_OF_BUBBLE*2, ... (up to i+NUMBER_OF_BUBBLE*8) belongs to the same bunch.
     int groupIdx = index / NUMBER_OF_BUBBLE;\n
-    // The bubbles within the same bunch applies the same uniforms uStartAndEndPos[idx] & uPercentage[idx]
+    // The bubbles within the same bunch applies the same uniforms uStartEndPosition[idx] & uPercentage[idx]
     int idx = index - groupIdx*NUMBER_OF_BUBBLE;\n
     float percentage = uPercentage[idx];
     // early out if uPercentage is (zero || one) setting position to zero (zero sized triangles)
@@ -76,9 +76,9 @@ inline Shader CreateBubbleShader( unsigned int numBubble )
       gl_Position = vec4(0.0);\n
       return;\n
     }\n
-    vec4 startAndEnd = uStartAndEndPos[idx];\n
+    vec4 startAndEnd = uStartEndPosition[idx];\n
     // The final position is added up different offset for bubbles
-    startAndEnd.zw += offset[groupIdx];\n
+    startAndEnd.zw += uOffset[groupIdx];\n
     \n
     // increase the bubble size from 0% to 100% during the first 1/5 of movement & apply the dynamic scale
     // the new xy value containes both the new scale and new bubble position

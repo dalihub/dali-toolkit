@@ -122,8 +122,7 @@ Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
   meshActor.AddRenderer( renderer );
 
   // Register property
-  bouncePropertyIndex = meshActor.RegisterProperty("bounce-coefficient", 0.f);
-  meshActor.AddUniformMapping( bouncePropertyIndex, "uBounceCoefficient" );
+  bouncePropertyIndex = meshActor.RegisterProperty("uBounceCoefficient", 0.f);
 
   return meshActor;
 }

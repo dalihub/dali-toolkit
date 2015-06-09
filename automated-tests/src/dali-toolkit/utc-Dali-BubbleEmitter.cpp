@@ -325,8 +325,8 @@ int UtcDaliBubbleEmitterEmitBubble(void)
   Stage::GetCurrent().Add( root );
   DALI_TEST_CHECK( bubbleMesh );
 
-  Property::Index propertyIndex0 = bubbleMesh.GetPropertyIndex( "percentage-0" );
-  Property::Index propertyIndex1 = bubbleMesh.GetPropertyIndex( "percentage-1" );
+  Property::Index propertyIndex0 = bubbleMesh.GetPropertyIndex( "uPercentage[0]" );
+  Property::Index propertyIndex1 = bubbleMesh.GetPropertyIndex( "uPercentage[1]" );
   float value0, value1;
 
   Animation animation = Animation::New( 0.5f );
@@ -340,8 +340,8 @@ int UtcDaliBubbleEmitterEmitBubble(void)
   animation.Play();
 
   Wait(application, 300);
-  propertyIndex0 = bubbleMesh.GetPropertyIndex( "percentage-0" );
-  propertyIndex1 = bubbleMesh.GetPropertyIndex( "percentage-1" );
+  propertyIndex0 = bubbleMesh.GetPropertyIndex( "uPercentage[0]" );
+  propertyIndex1 = bubbleMesh.GetPropertyIndex( "uPercentage[1]" );
   (bubbleMesh.GetProperty(propertyIndex0)).Get( value0 );
   (bubbleMesh.GetProperty(propertyIndex1)).Get( value1 );
   DALI_TEST_CHECK( value0 >= 0.6f );
@@ -382,7 +382,7 @@ int UtcDaliBubbleEmitterRestore(void)
   DALI_TEST_CHECK( gl.GetUniformValue<float>( "uPercentage[0]", percentageValue ) );
   DALI_TEST_EQUALS( percentageValue, 0.f, TEST_LOCATION );
 
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uStartAndEndPos[0]", startEndPosValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uStartEndPosition[0]", startEndPosValue ) );
   DALI_TEST_EQUALS( startEndPosValue.x, 40.f, TEST_LOCATION );
   DALI_TEST_EQUALS( startEndPosValue.y, 40.f, TEST_LOCATION );
 
@@ -393,7 +393,7 @@ int UtcDaliBubbleEmitterRestore(void)
   DALI_TEST_CHECK( gl.GetUniformValue<float>( "uPercentage[0]", percentageValue ) );
   DALI_TEST_CHECK( percentageValue < 0.5f && percentageValue >= 0.4);
 
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uStartAndEndPos[0]", startEndPosValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uStartEndPosition[0]", startEndPosValue ) );
   DALI_TEST_EQUALS( startEndPosValue.x, 40.f, TEST_LOCATION );
   DALI_TEST_EQUALS( startEndPosValue.y, 40.f, TEST_LOCATION );
 
@@ -404,7 +404,7 @@ int UtcDaliBubbleEmitterRestore(void)
   DALI_TEST_CHECK( gl.GetUniformValue<float>( "uPercentage[0]", percentageValue ) );
   DALI_TEST_EQUALS( percentageValue, 0.f, TEST_LOCATION );
 
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uStartAndEndPos[0]", startEndPosValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uStartEndPosition[0]", startEndPosValue ) );
   DALI_TEST_EQUALS( startEndPosValue,  Vector4::ZERO, TEST_LOCATION );
   END_TEST;
 }

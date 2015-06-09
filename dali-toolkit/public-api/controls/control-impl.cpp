@@ -302,8 +302,7 @@ Actor CreateBackground( Actor parent, const Vector4& color, Image image = Image(
   mesh.SetIndexBuffer( indexBuffer );
 
   //Add uniforms to the shader
-  Property::Index backgroundColorIndex = shader.RegisterProperty( "uBackgroundColor", color );
-  shader.AddUniformMapping( backgroundColorIndex, "uBackgroundColor" );
+  shader.RegisterProperty( "uBackgroundColor", color );
 
   //Create the renderer
   Renderer renderer = Renderer::New( mesh, material );
