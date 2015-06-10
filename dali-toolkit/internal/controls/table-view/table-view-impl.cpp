@@ -49,7 +49,9 @@ bool FitToChild( Actor actor, Dimension::Type dimension )
 
 #define TABLEVIEW_TAG "DALI Toolkit::TableView "
 #define TV_LOG(fmt, args...) Debug::LogMessage(Debug::DebugInfo, TABLEVIEW_TAG fmt, ## args)
+//#define TABLEVIEW_DEBUG 1
 
+#if defined(TABLEVIEW_DEBUG)
 void PrintArray( Array2d<Dali::Toolkit::Internal::TableView::CellData>& array )
 {
   TV_LOG( "Array2d<CellData> size [%d,%d] \n", array.GetRows(), array.GetColumns() );
@@ -101,6 +103,7 @@ void PrintVector( std::vector<float>& array )
   }
   TV_LOG( "\n" );
 }
+#endif // defined(TABLEVIEW_DEBUG)
 #endif // defined(DEBUG_ENABLED)
 
 } // namespace
