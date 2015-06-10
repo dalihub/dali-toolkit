@@ -76,6 +76,8 @@ void Controller::SetText( const std::string& text )
   // Remove the previously set text
   ResetText();
 
+  CharacterIndex lastCursorIndex = 0u;
+
   if( !text.empty() )
   {
     //  Convert text into UTF-32
@@ -93,11 +95,8 @@ void Controller::SetText( const std::string& text )
     DALI_ASSERT_DEBUG( text.size() >= characterCount && "Invalid UTF32 conversion length" );
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText %p UTF8 size %d, UTF32 size %d\n", this, text.size(), mImpl->mLogicalModel->mText.Count() );
 
-    // Reset the cursor position
-    if( mImpl->mEventData )
-    {
-      mImpl->mEventData->mPrimaryCursorPosition = characterCount;
-    }
+    // To reset the cursor position
+    lastCursorIndex = characterCount;
 
     // Update the rest of the model during size negotiation
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_REPLACED );
@@ -112,6 +111,12 @@ void Controller::SetText( const std::string& text )
   {
     ShowPlaceholderText();
   }
+
+  // Resets the cursor position.
+  ResetCursorPosition( lastCursorIndex );
+
+  // Scrolls the text to make the cursor visible.
+  ResetScrollPosition();
 
   mImpl->RequestRelayout();
 
@@ -672,12 +677,6 @@ void Controller::ResetText()
   mImpl->mLogicalModel->mText.Clear();
   ClearModelData();
 
-  // Reset the cursor position
-  if( mImpl->mEventData )
-  {
-    mImpl->mEventData->mPrimaryCursorPosition = 0;
-  }
-
   // We have cleared everything including the placeholder-text
   mImpl->PlaceholderCleared();
 
@@ -686,6 +685,32 @@ void Controller::ResetText()
 
   // Apply modifications to the model
   mImpl->mOperationsPending = ALL_OPERATIONS;
+}
+
+void Controller::ResetCursorPosition( CharacterIndex cursorIndex )
+{
+  // Reset the cursor position
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mPrimaryCursorPosition = cursorIndex;
+
+    // Update the cursor if it's in editing mode.
+    if( ( EventData::EDITING == mImpl->mEventData->mState ) ||
+        ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) )
+    {
+      mImpl->mEventData->mUpdateCursorPosition = true;
+    }
+  }
+}
+
+void Controller::ResetScrollPosition()
+{
+  if( NULL != mImpl->mEventData )
+  {
+    // Reset the scroll position.
+    mImpl->mEventData->mScrollPosition = Vector2::ZERO;
+    mImpl->mEventData->mScrollAfterUpdateCursorPosition = true;
+  }
 }
 
 void Controller::TextReplacedEvent()

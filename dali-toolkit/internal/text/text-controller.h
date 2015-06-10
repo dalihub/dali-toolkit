@@ -379,6 +379,18 @@ public:
   void ResetText();
 
   /**
+   * @brief Used to reset the cursor position after setting a new text.
+   *
+   * @param[in] cursorIndex Where to place the cursor.
+   */
+  void ResetCursorPosition( CharacterIndex cursorIndex );
+
+  /**
+   * @brief Used to reset the scroll position after setting a new text.
+   */
+  void ResetScrollPosition();
+
+  /**
    * @brief Used to process an event queued from SetText()
    */
   void TextReplacedEvent();
