@@ -71,11 +71,13 @@ public:
   /**
    * @brief Ask Atlas Manager to add a glyph
    *
+   * @param[in] fontId fontId glyph comes from
    * @param[in] glyph glyph to add to an atlas
    * @param[in] bitmap bitmap to use for glyph addition
    * @param[out] slot information returned by atlas manager for addition
    */
-  void Add( const Text::GlyphInfo& glyph,
+  void Add( Text::FontId fontId,
+            const Text::GlyphInfo& glyph,
             const BufferImage& bitmap,
             AtlasManager::AtlasSlot& slot );
 
@@ -105,8 +107,10 @@ public:
    * @param[in] fontId The font that this glyph comes from
    * @param[in] index The GlyphIndex of this glyph
    * @param[out] slot container holding information about the glyph( mImage = 0 indicates not being cached )
+   *
+   * @return Whether glyph is cached or not ?
    */
-  void Cached( Text::FontId fontId,
+  bool Cached( Text::FontId fontId,
                Text::GlyphIndex index,
                AtlasManager::AtlasSlot& slot );
 
@@ -130,13 +134,6 @@ public:
   void SetNewAtlasSize( uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight );
 
   /**
-   * @brief Unreference an image from the atlas and remove from cache if no longer needed
-   *
-   * @param[in] imageId ID of the image
-   */
-  void Remove( uint32_t imageId );
-
-  /**
    * @brief Get the Pixel Format used by an atlas
    *
    * @param[in] atlasId Id of atlas to check
@@ -151,6 +148,15 @@ public:
    * @return const reference to glyph manager metrics
    */
   const Metrics& GetMetrics();
+
+  /**
+   * @brief Adjust the reference count for an imageId and remove cache entry if it becomes free
+   *
+   * @param[in] fontId the font this image came from
+   * @param[in] imageId The imageId
+   * @param[in] delta adjustment to make to reference count
+   */
+  void AdjustReferenceCount( Text::FontId fontId, uint32_t imageId, int32_t delta );
 
 private:
 
