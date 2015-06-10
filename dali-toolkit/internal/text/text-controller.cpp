@@ -772,8 +772,7 @@ void Controller::TextDeletedEvent()
                                                            REORDER );
 
   // Queue a cursor reposition event; this must wait until after DoRelayout()
-  mImpl->mEventData->mUpdateCursorPosition = true;
-  mImpl->mEventData->mScrollAfterUpdateCursorPosition = true;
+  mImpl->mEventData->mScrollAfterDelete = true;
 }
 
 bool Controller::DoRelayout( const Size& size,
@@ -1113,6 +1112,9 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
   {
     int keyCode = keyEvent.keyCode;
     const std::string& keyString = keyEvent.keyPressed;
+
+    // Hide the grab handle.
+    mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
 
     // Pre-process to separate modifying events from non-modifying input events.
     if( Dali::DALI_KEY_ESCAPE == keyCode )
