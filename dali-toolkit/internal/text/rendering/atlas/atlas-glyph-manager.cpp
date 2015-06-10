@@ -69,11 +69,12 @@ AtlasGlyphManager::AtlasGlyphManager(Internal::AtlasGlyphManager *impl)
 {
 }
 
-void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
+void AtlasGlyphManager::Add( Text::FontId fontId,
+                             const Text::GlyphInfo& glyph,
                              const BufferImage& bitmap,
                              AtlasManager::AtlasSlot& slot )
 {
-  GetImplementation(*this).Add( glyph, bitmap, slot );
+  GetImplementation(*this).Add( fontId, glyph, bitmap, slot );
 }
 
 void AtlasGlyphManager::GenerateMeshData( uint32_t imageId,
@@ -91,11 +92,11 @@ void AtlasGlyphManager::StitchMesh( MeshData& first,
   GetImplementation(*this).StitchMesh( first, second );
 }
 
-void AtlasGlyphManager::Cached( Text::FontId fontId,
+bool AtlasGlyphManager::Cached( Text::FontId fontId,
                                 Text::GlyphIndex index,
                                 AtlasManager::AtlasSlot& slot )
 {
-  GetImplementation(*this).Cached( fontId, index, slot );
+  return GetImplementation(*this).Cached( fontId, index, slot );
 }
 
 void AtlasGlyphManager::SetNewAtlasSize( uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight )
@@ -108,11 +109,6 @@ Vector2 AtlasGlyphManager::GetAtlasSize( uint32_t atlasId )
   return GetImplementation(*this).GetAtlasSize( atlasId );
 }
 
-void AtlasGlyphManager::Remove( uint32_t imageId )
-{
-  GetImplementation(*this).Remove( imageId );
-}
-
 Pixel::Format AtlasGlyphManager::GetPixelFormat( uint32_t atlasId )
 {
   return GetImplementation(*this).GetPixelFormat( atlasId );
@@ -121,6 +117,11 @@ Pixel::Format AtlasGlyphManager::GetPixelFormat( uint32_t atlasId )
 const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
 {
   return GetImplementation(*this).GetMetrics();
+}
+
+void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, uint32_t imageId, int32_t delta )
+{
+  GetImplementation(*this).AdjustReferenceCount( fontId, imageId, delta );
 }
 
 } // namespace Toolkit
