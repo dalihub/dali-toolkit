@@ -708,7 +708,7 @@ void Controller::ResetScrollPosition()
   {
     // Reset the scroll position.
     mImpl->mEventData->mScrollPosition = Vector2::ZERO;
-    mImpl->mEventData->mScrollAfterUpdateCursorPosition = true;
+    mImpl->mEventData->mScrollAfterUpdatePosition = true;
   }
 }
 
@@ -749,7 +749,7 @@ void Controller::TextInsertedEvent()
 
   // Queue a cursor reposition event; this must wait until after DoRelayout()
   mImpl->mEventData->mUpdateCursorPosition = true;
-  mImpl->mEventData->mScrollAfterUpdateCursorPosition = true;
+  mImpl->mEventData->mScrollAfterUpdatePosition = true;
 }
 
 void Controller::TextDeletedEvent()
@@ -1305,12 +1305,12 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 
   if( NULL != mImpl->mEventData )
   {
+    const bool isShowingPlaceholderText = mImpl->IsShowingPlaceholderText();
     if( 1u == tapCount )
     {
       bool tapDuringEditMode( EventData::EDITING == mImpl->mEventData->mState );
 
-      if( ! mImpl->IsShowingPlaceholderText() &&
-          EventData::EDITING == mImpl->mEventData->mState )
+      if( !isShowingPlaceholderText && tapDuringEditMode )
       {
         // Grab handle is not shown until a tap is received whilst EDITING
         if( tapDuringEditMode )
@@ -1322,7 +1322,8 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 
       mImpl->ChangeState( EventData::EDITING );
     }
-    else if( mImpl->mEventData->mSelectionEnabled &&
+    else if( !isShowingPlaceholderText &&
+             mImpl->mEventData->mSelectionEnabled &&
              ( 2u == tapCount ) )
     {
       mImpl->ChangeState( EventData::SELECTING );
@@ -1366,9 +1367,9 @@ void Controller::GetTargetSize( Vector2& targetSize )
   targetSize = mImpl->mControlSize;
 }
 
-void Controller::AddDecoration( Actor& actor )
+void Controller::AddDecoration( Actor& actor, bool needsClipping )
 {
-  mImpl->mControlInterface.AddDecoration( actor );
+  mImpl->mControlInterface.AddDecoration( actor, needsClipping );
 }
 
 void Controller::DecorationEvent( HandleType handleType, HandleState state, float x, float y )

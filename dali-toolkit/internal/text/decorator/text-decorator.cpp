@@ -81,7 +81,7 @@ const char* DEFAULT_SELECTION_HANDLE_TWO( DALI_IMAGE_DIR "text-input-selection-h
 const Dali::Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE( 1.5f, 2.0f, 1.0f );
 const Dali::Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.5f, 1.5f, 1.0f );
 
-const Dali::Vector4 LIGHT_BLUE( 0.07f, 0.41f, 0.59f, 1.0f ); // The text highlight color.
+const Dali::Vector4 LIGHT_BLUE( (0xb2 / 255.0f), (0xeb / 255.0f), (0xf2 / 255.0f), 0.5f ); // The text highlight color.
 
 const unsigned int CURSOR_BLINK_INTERVAL = 500u; // Cursor blink interval
 const float TO_MILLISECONDS = 1000.f;
@@ -224,7 +224,8 @@ struct Decorator::Impl : public ConnectionTracker
     mActiveCopyPastePopup( false ),
     mCursorBlinkStatus( true ),
     mPrimaryCursorVisible( false ),
-    mSecondaryCursorVisible( false )
+    mSecondaryCursorVisible( false ),
+    mSwapSelectionHandles( false )
   {
   }
 
@@ -318,15 +319,65 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& secondary = mHandle[ RIGHT_SELECTION_HANDLE ];
     if( primary.active || secondary.active )
     {
-      SetupTouchEvents();
+      Vector2 primaryPosition = primary.position;
+      Vector2 secondaryPosition = secondary.position;
 
-      CreateSelectionHandles();
+      if( LEFT_SELECTION_HANDLE == mHandleScrolling )
+      {
+        if( mScrollDirection == SCROLL_RIGHT )
+        {
+          primaryPosition.x = 0.f;
+        }
+        else
+        {
+          primaryPosition.x = size.width;
+        }
+      }
+      else if( RIGHT_SELECTION_HANDLE == mHandleScrolling )
+      {
+        if( mScrollDirection == SCROLL_RIGHT )
+        {
+          secondaryPosition.x = 0.f;
+        }
+        else
+        {
+          secondaryPosition.x = size.width;
+        }
+      }
 
-      primary.actor.SetPosition( primary.position.x,
-                                 primary.position.y + primary.lineHeight );
+      const bool isPrimaryVisible = ( primaryPosition.x <= size.width ) && ( primaryPosition.x >= 0.f );
+      const bool isSecondaryVisible = ( secondaryPosition.x <= size.width ) && ( secondaryPosition.x >= 0.f );
 
-      secondary.actor.SetPosition( secondary.position.x,
-                                   secondary.position.y + secondary.lineHeight );
+      if( isPrimaryVisible || isSecondaryVisible )
+      {
+        SetupTouchEvents();
+
+        CreateSelectionHandles();
+
+        if( isPrimaryVisible )
+        {
+          primary.actor.SetPosition( primaryPosition.x,
+                                     primaryPosition.y + primary.lineHeight );
+
+          const bool flip = mSwapSelectionHandles ^ primary.flipped;
+          primary.actor.SetImage( flip ? mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] : mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
+
+          primary.actor.SetAnchorPoint( flip ? AnchorPoint::TOP_LEFT : AnchorPoint::TOP_RIGHT );
+        }
+
+        if( isSecondaryVisible )
+        {
+          secondary.actor.SetPosition( secondaryPosition.x,
+                                       secondaryPosition.y + secondary.lineHeight );
+
+          const bool flip = mSwapSelectionHandles ^ secondary.flipped;
+
+          secondary.actor.SetImage( ( mSwapSelectionHandles ^ secondary.flipped ) ? mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] : mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
+          secondary.actor.SetAnchorPoint( flip ? AnchorPoint::TOP_RIGHT : AnchorPoint::TOP_LEFT );
+        }
+      }
+      primary.actor.SetVisible( isPrimaryVisible );
+      secondary.actor.SetVisible( isSecondaryVisible );
 
       CreateHighlight();
       UpdateHighlight();
@@ -367,8 +418,7 @@ struct Decorator::Impl : public ConnectionTracker
     mHandle[ GRAB_HANDLE ].position += scrollOffset;
     mHandle[ LEFT_SELECTION_HANDLE ].position += scrollOffset;
     mHandle[ RIGHT_SELECTION_HANDLE ].position += scrollOffset;
-
-    // TODO Highlight box??
+    mHighlightPosition += scrollOffset;
   }
 
   void PopUpRelayoutComplete( Actor actor )
@@ -482,7 +532,8 @@ struct Decorator::Impl : public ConnectionTracker
       mActiveLayer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
       mActiveLayer.SetPositionInheritanceMode( USE_PARENT_POSITION );
 
-      mController.AddDecoration( mActiveLayer );
+      // Add the active layer telling the controller it doesn't need clipping.
+      mController.AddDecoration( mActiveLayer, false );
     }
 
     mActiveLayer.RaiseToTop();
@@ -620,10 +671,12 @@ struct Decorator::Impl : public ConnectionTracker
       mHighlightMeshActor.SetName( "HighlightMeshActor" );
 #endif
       mHighlightMeshActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-      mHighlightMeshActor.SetPosition( 0.0f, 0.0f, DISPLAYED_HIGHLIGHT_Z_OFFSET );
 
-      mController.AddDecoration( mHighlightMeshActor );
+      // Add the highlight box telling the controller it needs clipping.
+      mController.AddDecoration( mHighlightMeshActor, true );
     }
+
+    mHighlightMeshActor.SetPosition( mHighlightPosition.x, mHighlightPosition.y, DISPLAYED_HIGHLIGHT_Z_OFFSET );
   }
 
   void UpdateHighlight()
@@ -992,9 +1045,9 @@ struct Decorator::Impl : public ConnectionTracker
     if( HANDLE_TYPE_COUNT != mHandleScrolling )
     {
       mController.DecorationEvent( mHandleScrolling,
-                               HANDLE_SCROLLING,
-                               mScrollDirection == SCROLL_RIGHT ? mScrollDistance : -mScrollDistance,
-                               0.f );
+                                   HANDLE_SCROLLING,
+                                   mScrollDirection == SCROLL_RIGHT ? mScrollDistance : -mScrollDistance,
+                                   0.f );
     }
 
     return true;
@@ -1022,6 +1075,7 @@ struct Decorator::Impl : public ConnectionTracker
   CursorImpl          mCursor[CURSOR_COUNT];
   HandleImpl          mHandle[HANDLE_TYPE_COUNT];
   QuadContainer       mHighlightQuadList;         ///< Sub-selections that combine to create the complete selection highlight
+  Vector2             mHighlightPosition;         ///< The position of the highlight actor.
 
   Rect<int>           mBoundingBox;
   Vector4             mHighlightColor;            ///< Color of the highlight
@@ -1040,6 +1094,7 @@ struct Decorator::Impl : public ConnectionTracker
   bool                mCursorBlinkStatus      : 1; ///< Flag to switch between blink on and blink off.
   bool                mPrimaryCursorVisible   : 1; ///< Whether the primary cursor is visible.
   bool                mSecondaryCursorVisible : 1; ///< Whether the secondary cursor is visible.
+  bool                mSwapSelectionHandles   : 1; ///< Whether to swap the selection handle images.
 };
 
 DecoratorPtr Decorator::New( ControllerInterface& controller )
@@ -1196,6 +1251,16 @@ void Decorator::GetPosition( HandleType handleType, float& x, float& y, float& h
   height = handle.lineHeight;
 }
 
+const Vector2& Decorator::GetPosition( HandleType handleType ) const
+{
+  return mImpl->mHandle[handleType].position;
+}
+
+void Decorator::SwapSelectionHandlesEnabled( bool enable )
+{
+  mImpl->mSwapSelectionHandles = enable;
+}
+
 void Decorator::AddHighlight( float x1, float y1, float x2, float y2 )
 {
   mImpl->mHighlightQuadList.push_back( QuadCoordinates(x1, y1, x2, y2) );
@@ -1204,6 +1269,7 @@ void Decorator::AddHighlight( float x1, float y1, float x2, float y2 )
 void Decorator::ClearHighlights()
 {
   mImpl->mHighlightQuadList.clear();
+  mImpl->mHighlightPosition = Vector2::ZERO;
 }
 
 void Decorator::SetHighlightColor( const Vector4& color )

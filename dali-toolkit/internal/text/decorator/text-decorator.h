@@ -132,7 +132,7 @@ public:
      *
      * @param[in] decoration The actor displaying a decoration.
      */
-    virtual void AddDecoration( Actor& actor ) = 0;
+    virtual void AddDecoration( Actor& actor, bool needsClipping ) = 0;
 
     /**
      * @brief An input event from one of the handles.
@@ -353,6 +353,23 @@ public:
    * @param[out] lineHeight The logical line height at this position.
    */
   void GetPosition( HandleType handleType, float& x, float& y, float& lineHeight ) const;
+
+  /**
+   * @brief Retrieves the position of a selection handle.
+   *
+   * @param[in] handleType The handle to get.
+   *
+   * @return The position of the selection handle relative to the top-left of the parent control.
+   */
+  const Vector2& GetPosition( HandleType handleType ) const;
+
+  /**
+   * @brief Swaps the selection handle's images.
+   *
+   * This method is called by the text controller to swap the handles
+   * when the start index is bigger than the end one.
+   */
+  void SwapSelectionHandlesEnabled( bool enable );
 
   /**
    * @brief Adds a quad to the existing selection highlights.

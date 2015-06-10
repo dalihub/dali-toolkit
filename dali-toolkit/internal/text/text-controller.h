@@ -532,7 +532,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::AddDecoration()
    */
-  virtual void AddDecoration( Actor& actor );
+  virtual void AddDecoration( Actor& actor, bool needsClipping );
 
   /**
    * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::DecorationEvent()

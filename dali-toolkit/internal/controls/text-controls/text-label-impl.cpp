@@ -503,7 +503,7 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
   }
 }
 
-void TextLabel::AddDecoration( Actor& actor )
+void TextLabel::AddDecoration( Actor& actor, bool needsClipping )
 {
   // TextLabel does not show decorations
 }

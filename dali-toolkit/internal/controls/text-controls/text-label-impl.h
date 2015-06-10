@@ -95,7 +95,7 @@ private: // From Control
   /**
    * @copydoc Text::ControlInterface::AddDecoration()
    */
-  virtual void AddDecoration( Actor& actor );
+  virtual void AddDecoration( Actor& actor, bool needsClipping );
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
