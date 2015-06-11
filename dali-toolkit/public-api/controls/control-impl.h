@@ -597,7 +597,7 @@ private:
  * @param handle
  * @return implementation
  */
-Internal::Control& GetImplementation( Dali::Toolkit::Control& handle );
+DALI_IMPORT_API Internal::Control& GetImplementation( Dali::Toolkit::Control& handle );
 
 /**
  * @brief Get implementation from the handle
@@ -606,7 +606,7 @@ Internal::Control& GetImplementation( Dali::Toolkit::Control& handle );
  * @param handle
  * @return implementation
  */
-const Internal::Control& GetImplementation( const Dali::Toolkit::Control& handle );
+DALI_IMPORT_API const Internal::Control& GetImplementation( const Dali::Toolkit::Control& handle );
 
 } // namespace Internal
 
