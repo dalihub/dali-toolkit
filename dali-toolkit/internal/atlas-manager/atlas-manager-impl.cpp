@@ -651,7 +651,8 @@ void AtlasManager::UploadImage( const BufferImage& image,
 
 void AtlasManager::GenerateMeshData( ImageId id,
                                      const Vector2& position,
-                                     MeshData& meshData )
+                                     MeshData& meshData,
+                                     bool addReference )
 {
   // Read the atlas Id to use for this image
   SizeType imageId = id - 1u;
@@ -672,8 +673,11 @@ void AtlasManager::GenerateMeshData( ImageId id,
 
   CreateMesh( atlas, width, height, position, widthInBlocks, heightInBlocks, meshData, mImageList[ imageId ] );
 
-  // Mesh created so increase the reference count
-  mImageList[ imageId ].mCount++;
+  // Mesh created so increase the reference count, if we're asked to
+  if ( addReference )
+  {
+    mImageList[ imageId ].mCount++;
+  }
 }
 
 Dali::Atlas AtlasManager::GetAtlasContainer( AtlasId atlas ) const
@@ -825,7 +829,6 @@ void AtlasManager::GetMetrics( Toolkit::AtlasManager::Metrics& metrics )
   }
   metrics.mTextureMemoryUsed = textureMemoryUsed;
 }
-
 
 } // namespace Internal
 

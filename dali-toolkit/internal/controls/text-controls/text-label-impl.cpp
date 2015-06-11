@@ -489,9 +489,19 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
   }
 }
 
+void TextLabel::AddDecoration( Actor& actor )
+{
+  // TextLabel does not show decorations
+}
+
 void TextLabel::RequestTextRelayout()
 {
   RelayoutRequest();
+}
+
+void TextLabel::TextChanged()
+{
+  // TextLabel does not provide a signal for this
 }
 
 void TextLabel::MaxLengthReached()

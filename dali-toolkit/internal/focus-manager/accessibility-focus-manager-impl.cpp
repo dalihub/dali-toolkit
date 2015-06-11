@@ -190,7 +190,7 @@ void AccessibilityFocusManager::SetFocusOrder(Actor actor, const unsigned int or
     Property::Index propertyActorFocusable = actor.GetPropertyIndex(ACTOR_FOCUSABLE);
     if(propertyActorFocusable == Property::INVALID_INDEX)
     {
-      propertyActorFocusable = actor.RegisterProperty(ACTOR_FOCUSABLE, true);
+      propertyActorFocusable = actor.RegisterProperty( ACTOR_FOCUSABLE, true, Property::READ_WRITE );
     }
 
     if(order == 0)
@@ -511,7 +511,7 @@ void AccessibilityFocusManager::SetFocusGroup(Actor actor, bool isFocusGroup)
     Property::Index propertyIsFocusGroup = actor.GetPropertyIndex(IS_FOCUS_GROUP);
     if(propertyIsFocusGroup == Property::INVALID_INDEX)
     {
-      actor.RegisterProperty(IS_FOCUS_GROUP, isFocusGroup);
+      actor.RegisterProperty( IS_FOCUS_GROUP, isFocusGroup, Property::READ_WRITE );
     }
     else
     {
@@ -654,7 +654,7 @@ void AccessibilityFocusManager::SetFocusable(Actor actor, bool focusable)
     Property::Index propertyActorFocusable = actor.GetPropertyIndex(ACTOR_FOCUSABLE);
     if(propertyActorFocusable == Property::INVALID_INDEX)
     {
-      actor.RegisterProperty(ACTOR_FOCUSABLE, focusable);
+      actor.RegisterProperty( ACTOR_FOCUSABLE, focusable, Property::READ_WRITE );
     }
     else
     {

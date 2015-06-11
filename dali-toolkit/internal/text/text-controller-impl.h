@@ -231,6 +231,12 @@ struct Controller::Impl
    */
   void QueueModifyEvent( ModifyEvent::Type type )
   {
+    if( ModifyEvent::TEXT_REPLACED == type)
+    {
+      // Cancel previously queued inserts etc.
+      mModifyEvents.clear();
+    }
+
     ModifyEvent event;
     event.type = type;
     mModifyEvents.push_back( event );

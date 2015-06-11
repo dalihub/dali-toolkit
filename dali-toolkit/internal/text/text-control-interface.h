@@ -21,6 +21,8 @@
 namespace Dali
 {
 
+class Actor;
+
 namespace Toolkit
 {
 
@@ -45,9 +47,21 @@ public:
   virtual ~ControlInterface();
 
   /**
+   * @brief Add a decoration.
+   *
+   * @param[in] decoration The actor displaying a decoration.
+   */
+  virtual void AddDecoration( Actor& actor ) = 0;
+
+  /**
    * @brief Called to request a text relayout.
    */
   virtual void RequestTextRelayout() = 0;
+
+  /**
+   * @brief Called to signal that text has been inserted or deleted.
+   */
+  virtual void TextChanged() = 0;
 
   /**
    * @brief Called when the number of characters to be inserted exceeds the maximum limit

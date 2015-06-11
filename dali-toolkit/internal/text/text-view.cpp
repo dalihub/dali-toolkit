@@ -116,55 +116,61 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
         {
           const GlyphInfo& glyphToRemove = *( glyphs + index );
 
-          // Need to reshape the glyph as the font may be different in size.
-          const GlyphInfo& ellipsisGlyph = mImpl->mFontClient.GetEllipsisGlyph( mImpl->mFontClient.GetPointSize( glyphToRemove.fontId ) );
-
-          if( !firstPenSet )
+          if( 0u != glyphToRemove.fontId )
           {
-            const Vector2& position = *( glyphPositions + index );
+            // i.e. The font id of the glyph shaped from the '\n' character is zero.
 
-            // Calculates the penY of the current line. It will be used to position the ellipsis glyph.
-            penY = position.y + glyphToRemove.yBearing;
+            // Need to reshape the glyph as the font may be different in size.
+            const GlyphInfo& ellipsisGlyph = mImpl->mFontClient.GetEllipsisGlyph( mImpl->mFontClient.GetPointSize( glyphToRemove.fontId ) );
 
-            // Calculates the first penX which will be used if rtl text is elided.
-            firstPenX = position.x - glyphToRemove.xBearing;
-            if( firstPenX < -ellipsisGlyph.xBearing )
+            if( !firstPenSet )
             {
-              // Avoids to exceed the bounding box when rtl text is elided.
-              firstPenX = -ellipsisGlyph.xBearing;
+              const Vector2& position = *( glyphPositions + index );
+
+              // Calculates the penY of the current line. It will be used to position the ellipsis glyph.
+              penY = position.y + glyphToRemove.yBearing;
+
+              // Calculates the first penX which will be used if rtl text is elided.
+              firstPenX = position.x - glyphToRemove.xBearing;
+              if( firstPenX < -ellipsisGlyph.xBearing )
+              {
+                // Avoids to exceed the bounding box when rtl text is elided.
+                firstPenX = -ellipsisGlyph.xBearing;
+              }
+
+              removedGlypsWidth = -ellipsisGlyph.xBearing;
+
+              firstPenSet = true;
             }
 
-            removedGlypsWidth = -ellipsisGlyph.xBearing;
+            removedGlypsWidth += std::min( glyphToRemove.advance, ( glyphToRemove.xBearing + glyphToRemove.width ) );
 
-            firstPenSet = true;
-          }
-
-          removedGlypsWidth += std::min( glyphToRemove.advance, ( glyphToRemove.xBearing + glyphToRemove.width ) );
-
-          // Calculate the width of the ellipsis glyph and check if it fits.
-          const float ellipsisGlyphWidth = ellipsisGlyph.width + ellipsisGlyph.xBearing;
-          if( ellipsisGlyphWidth < removedGlypsWidth )
-          {
-            GlyphInfo& glyphInfo = *( glyphs + index );
-            Vector2& position = *( glyphPositions + index );
-            position.x -= glyphInfo.xBearing;
-
-            // Replace the glyph by the ellipsis glyph.
-            glyphInfo = ellipsisGlyph;
-
-            // Change the 'x' and 'y' position of the ellipsis glyph.
-
-            if( position.x > firstPenX )
+            // Calculate the width of the ellipsis glyph and check if it fits.
+            const float ellipsisGlyphWidth = ellipsisGlyph.width + ellipsisGlyph.xBearing;
+            if( ellipsisGlyphWidth < removedGlypsWidth )
             {
-              position.x = firstPenX + removedGlypsWidth - ellipsisGlyphWidth;
+              GlyphInfo& glyphInfo = *( glyphs + index );
+              Vector2& position = *( glyphPositions + index );
+              position.x -= glyphInfo.xBearing;
+
+              // Replace the glyph by the ellipsis glyph.
+              glyphInfo = ellipsisGlyph;
+
+              // Change the 'x' and 'y' position of the ellipsis glyph.
+
+              if( position.x > firstPenX )
+              {
+                position.x = firstPenX + removedGlypsWidth - ellipsisGlyphWidth;
+              }
+
+              position.x += ellipsisGlyph.xBearing;
+              position.y = penY - ellipsisGlyph.yBearing;
+
+              inserted = true;
             }
-
-            position.x += ellipsisGlyph.xBearing;
-            position.y = penY - ellipsisGlyph.yBearing;
-
-            inserted = true;
           }
-          else
+
+          if( !inserted )
           {
             if( index > 0u )
             {

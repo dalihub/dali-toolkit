@@ -80,6 +80,11 @@ public:
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
   /**
+   * @copydoc TextField::TextChangedSignal()
+   */
+  Toolkit::TextField::TextChangedSignalType&  TextChangedSignal();
+
+  /**
    * @copydoc TextField::MaxLengthReachedSignal()
    */
   Toolkit::TextField::MaxLengthReachedSignalType&  MaxLengthReachedSignal();
@@ -137,9 +142,9 @@ private: // From Control
   virtual bool OnKeyEvent(const KeyEvent& event);
 
   /**
-   * @copydoc Dali::Toolkit::Text::Controller::(ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent)
+   * @copydoc Text::ControlInterface::AddDecoration()
    */
-  ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
+  virtual void AddDecoration( Actor& actor );
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
@@ -147,9 +152,19 @@ private: // From Control
   virtual void RequestTextRelayout();
 
   /**
+   * @copydoc Text::ControlInterface::TextChanged()
+   */
+  virtual void TextChanged();
+
+  /**
    * @copydoc Text::ControlInterface::MaxLengthReached()
    */
   virtual void MaxLengthReached();
+
+  /**
+   * @copydoc Dali::Toolkit::Text::Controller::(ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent)
+   */
+  ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
 
 private: // Implementation
 
@@ -193,6 +208,7 @@ private: // Implementation
 private: // Data
 
   // Signals
+  Toolkit::TextField::TextChangedSignalType mTextChangedSignal;
   Toolkit::TextField::MaxLengthReachedSignalType mMaxLengthReachedSignal;
 
   Text::ControllerPtr mController;

@@ -111,7 +111,8 @@ public:
    */
   void GenerateMeshData( ImageId id,
                          const Vector2& position,
-                         MeshData& mesh );
+                         MeshData& mesh,
+                         bool addReference );
 
   /**
    * @copydoc Toolkit::AtlasManager::StitchMesh

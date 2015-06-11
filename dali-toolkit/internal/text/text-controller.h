@@ -67,9 +67,9 @@ enum PlaceholderType
  * It provides a view of the text that can be used by rendering back-ends.
  *
  * For selectable/editable UI controls, the controller handles input events from the UI control
- * and decorations (grab handles etc) via an observer interface.
+ * and decorations (grab handles etc) via an interface.
  */
-class Controller : public RefObject, public Decorator::Observer
+class Controller : public RefObject, public Decorator::ControllerInterface
 {
 public:
 
@@ -379,6 +379,18 @@ public:
   void ResetText();
 
   /**
+   * @brief Used to reset the cursor position after setting a new text.
+   *
+   * @param[in] cursorIndex Where to place the cursor.
+   */
+  void ResetCursorPosition( CharacterIndex cursorIndex );
+
+  /**
+   * @brief Used to reset the scroll position after setting a new text.
+   */
+  void ResetScrollPosition();
+
+  /**
    * @brief Used to process an event queued from SetText()
    */
   void TextReplacedEvent();
@@ -504,11 +516,6 @@ public:
   void PanEvent( Gesture::State state, const Vector2& displacement );
 
   /**
-   * @copydoc Dali::Toolkit::Text::Decorator::Observer::HandleEvent()
-   */
-  virtual void HandleEvent( HandleType handle, HandleState state, float x, float y );
-
-  /**
    * @brief Event received from IMF manager
    *
    * @param[in] imfManager The IMF manager.
@@ -516,6 +523,21 @@ public:
    * @return A data struture indicating if update is needed, cursor position and current text.
    */
   ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
+
+  /**
+   * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::GetTargetSize()
+   */
+  virtual void GetTargetSize( Vector2& targetSize );
+
+  /**
+   * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::AddDecoration()
+   */
+  virtual void AddDecoration( Actor& actor );
+
+  /**
+   * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::DecorationEvent()
+   */
+  virtual void DecorationEvent( HandleType handle, HandleState state, float x, float y );
 
 protected:
 

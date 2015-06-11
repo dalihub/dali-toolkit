@@ -27,6 +27,7 @@
 namespace Dali
 {
 
+class Actor;
 class Image;
 class Vector2;
 class Vector4;
@@ -98,26 +99,40 @@ enum HandleType
  *
  * Selection handles will be flipped around to ensure they do not exceed the Decoration Bounding Box. ( Stay visible ).
  *
- * Decorator components forward input events to a controller class through an observer interface.
+ * Decorator components forward input events to a controller class through an interface.
  * The controller is responsible for selecting which components are active.
  */
 class Decorator : public RefObject
 {
 public:
 
-  class Observer
+  class ControllerInterface
   {
   public:
 
     /**
      * @brief Constructor.
      */
-    Observer() {};
+    ControllerInterface() {};
 
     /**
      * @brief Virtual destructor.
      */
-    virtual ~Observer() {};
+    virtual ~ControllerInterface() {};
+
+    /**
+     * @brief An input event from one of the handles.
+     *
+     * @param[out] targetSize The Size of the UI control the decorator is adding it's decorations to.
+     */
+    virtual void GetTargetSize( Vector2& targetSize ) = 0;
+
+    /**
+     * @brief Add a decoration to the parent UI control.
+     *
+     * @param[in] decoration The actor displaying a decoration.
+     */
+    virtual void AddDecoration( Actor& actor ) = 0;
 
     /**
      * @brief An input event from one of the handles.
@@ -127,17 +142,16 @@ public:
      * @param[in] x The x position relative to the top-left of the parent control.
      * @param[in] y The y position relative to the top-left of the parent control.
      */
-    virtual void HandleEvent( HandleType handleType, HandleState state, float x, float y ) = 0;
+    virtual void DecorationEvent( HandleType handleType, HandleState state, float x, float y ) = 0;
   };
 
   /**
    * @brief Create a new instance of a Decorator.
    *
-   * @param[in] parent Decorations will be added to this parent control.
-   * @param[in] observer A class which receives input events from Decorator components.
+   * @param[in] controller The controller which receives input events from Decorator components.
    * @return A pointer to a new Decorator.
    */
-  static DecoratorPtr New( Dali::Toolkit::Internal::Control& parent, Observer& observer );
+  static DecoratorPtr New( ControllerInterface& controller );
 
   /**
    * @brief Set the bounding box which handles, popup and similar decorations will not exceed.
@@ -440,10 +454,9 @@ private:
 
   /**
    * @brief Private constructor.
-   * @param[in] parent Decorations will be added to this parent control.
-   * @param[in] observer A class which receives input events from Decorator components.
+   * @param[in] controller The controller which receives input events from Decorator components.
    */
-  Decorator(Dali::Toolkit::Internal::Control& parent, Observer& observer );
+  Decorator( ControllerInterface& controller );
 
   // Undefined
   Decorator( const Decorator& handle );

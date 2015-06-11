@@ -119,6 +119,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-highlight-color",    
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decoration-bounding-box",              RECTANGLE, DECORATION_BOUNDING_BOX              )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "input-method-settings",                MAP,       INPUT_METHOD_SETTINGS                )
 
+DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "text-changed",       SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "max-length-reached", SIGNAL_MAX_LENGTH_REACHED )
 
 DALI_TYPE_REGISTRATION_END()
@@ -825,7 +826,11 @@ bool TextField::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   bool connected( true );
   Toolkit::TextField field = Toolkit::TextField::DownCast( handle );
 
-  if( 0 == strcmp( signalName.c_str(), SIGNAL_MAX_LENGTH_REACHED ) )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_TEXT_CHANGED ) )
+  {
+    field.TextChangedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_MAX_LENGTH_REACHED ) )
   {
     field.MaxLengthReachedSignal().Connect( tracker, functor );
   }
@@ -836,6 +841,11 @@ bool TextField::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   }
 
   return connected;
+}
+
+Toolkit::TextField::TextChangedSignalType& TextField::TextChangedSignal()
+{
+  return mTextChangedSignal;
 }
 
 Toolkit::TextField::MaxLengthReachedSignalType& TextField::MaxLengthReachedSignal()
@@ -849,7 +859,7 @@ void TextField::OnInitialize()
 
   mController = Text::Controller::New( *this );
 
-  mDecorator = Text::Decorator::New( *this, *mController );
+  mDecorator = Text::Decorator::New( *mController );
 
   mController->GetLayoutEngine().SetLayout( LayoutEngine::SINGLE_LINE_BOX );
 
@@ -1021,10 +1031,12 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
   return mController->KeyEvent( event );
 }
 
-ImfManager::ImfCallbackData TextField::OnImfEvent( Dali::ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
+void TextField::AddDecoration( Actor& actor )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnImfEvent %p eventName %d\n", mController.Get(), imfEvent.eventName );
-  return mController->OnImfEvent( imfManager, imfEvent );
+  if( actor )
+  {
+    Self().Add( actor );
+  }
 }
 
 void TextField::RequestTextRelayout()
@@ -1032,10 +1044,22 @@ void TextField::RequestTextRelayout()
   RelayoutRequest();
 }
 
+void TextField::TextChanged()
+{
+  Dali::Toolkit::TextField handle( GetOwner() );
+  mTextChangedSignal.Emit( handle );
+}
+
 void TextField::MaxLengthReached()
 {
   Dali::Toolkit::TextField handle( GetOwner() );
   mMaxLengthReachedSignal.Emit( handle );
+}
+
+ImfManager::ImfCallbackData TextField::OnImfEvent( Dali::ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnImfEvent %p eventName %d\n", mController.Get(), imfEvent.eventName );
+  return mController->OnImfEvent( imfManager, imfEvent );
 }
 
 void TextField::EnableClipping( bool clipping, const Vector2& size )

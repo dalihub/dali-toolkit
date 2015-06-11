@@ -73,11 +73,10 @@ void Controller::EnableTextInput( DecoratorPtr decorator )
 
 void Controller::SetText( const std::string& text )
 {
-  // Cancel previously queued inserts etc.
-  mImpl->mModifyEvents.clear();
-
   // Remove the previously set text
   ResetText();
+
+  CharacterIndex lastCursorIndex = 0u;
 
   if( !text.empty() )
   {
@@ -96,11 +95,8 @@ void Controller::SetText( const std::string& text )
     DALI_ASSERT_DEBUG( text.size() >= characterCount && "Invalid UTF32 conversion length" );
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText %p UTF8 size %d, UTF32 size %d\n", this, text.size(), mImpl->mLogicalModel->mText.Count() );
 
-    // Reset the cursor position
-    if( mImpl->mEventData )
-    {
-      mImpl->mEventData->mPrimaryCursorPosition = characterCount;
-    }
+    // To reset the cursor position
+    lastCursorIndex = characterCount;
 
     // Update the rest of the model during size negotiation
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_REPLACED );
@@ -116,6 +112,12 @@ void Controller::SetText( const std::string& text )
     ShowPlaceholderText();
   }
 
+  // Resets the cursor position.
+  ResetCursorPosition( lastCursorIndex );
+
+  // Scrolls the text to make the cursor visible.
+  ResetScrollPosition();
+
   mImpl->RequestRelayout();
 
   if( mImpl->mEventData )
@@ -126,6 +128,9 @@ void Controller::SetText( const std::string& text )
 
   // Reset keyboard as text changed
   mImpl->ResetImfManager();
+
+  // Do this last since it provides callbacks into application code
+  mImpl->mControlInterface.TextChanged();
 }
 
 void Controller::GetText( std::string& text ) const
@@ -672,12 +677,6 @@ void Controller::ResetText()
   mImpl->mLogicalModel->mText.Clear();
   ClearModelData();
 
-  // Reset the cursor position
-  if( mImpl->mEventData )
-  {
-    mImpl->mEventData->mPrimaryCursorPosition = 0;
-  }
-
   // We have cleared everything including the placeholder-text
   mImpl->PlaceholderCleared();
 
@@ -686,6 +685,32 @@ void Controller::ResetText()
 
   // Apply modifications to the model
   mImpl->mOperationsPending = ALL_OPERATIONS;
+}
+
+void Controller::ResetCursorPosition( CharacterIndex cursorIndex )
+{
+  // Reset the cursor position
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mPrimaryCursorPosition = cursorIndex;
+
+    // Update the cursor if it's in editing mode.
+    if( ( EventData::EDITING == mImpl->mEventData->mState ) ||
+        ( EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState ) )
+    {
+      mImpl->mEventData->mUpdateCursorPosition = true;
+    }
+  }
+}
+
+void Controller::ResetScrollPosition()
+{
+  if( NULL != mImpl->mEventData )
+  {
+    // Reset the scroll position.
+    mImpl->mEventData->mScrollPosition = Vector2::ZERO;
+    mImpl->mEventData->mScrollAfterUpdateCursorPosition = true;
+  }
 }
 
 void Controller::TextReplacedEvent()
@@ -1089,6 +1114,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected KeyEvent" );
 
+  bool textChanged( false );
+
   if( mImpl->mEventData &&
       keyEvent.state == KeyEvent::Down )
   {
@@ -1131,6 +1158,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
         {
           mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
         }
+
+        textChanged = true;
       }
     }
     else
@@ -1141,11 +1170,19 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       mImpl->ClearPreEditFlag();
 
       InsertText( keyString, COMMIT );
+
+      textChanged = true;
     }
 
     mImpl->ChangeState( EventData::EDITING ); // todo Confirm this is the best place to change the state of
 
     mImpl->RequestRelayout();
+  }
+
+  if( textChanged )
+  {
+    // Do this last since it provides callbacks into application code
+    mImpl->mControlInterface.TextChanged();
   }
 
   return false;
@@ -1261,9 +1298,10 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "MaxLengthReached (%d)\n", mImpl->mLogicalModel->mText.Count() );
 
-    mImpl->mControlInterface.MaxLengthReached();
-
     mImpl->ResetImfManager();
+
+    // Do this last since it provides callbacks into application code
+    mImpl->mControlInterface.MaxLengthReached();
   }
 }
 
@@ -1329,9 +1367,19 @@ void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
   }
 }
 
-void Controller::HandleEvent( HandleType handleType, HandleState state, float x, float y )
+void Controller::GetTargetSize( Vector2& targetSize )
 {
-  DALI_ASSERT_DEBUG( mImpl->mEventData && "Controller::HandleEvent. Unexpected HandleEvent" );
+  targetSize = mImpl->mControlSize;
+}
+
+void Controller::AddDecoration( Actor& actor )
+{
+  mImpl->mControlInterface.AddDecoration( actor );
+}
+
+void Controller::DecorationEvent( HandleType handleType, HandleState state, float x, float y )
+{
+  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected DecorationEvent" );
 
   if( mImpl->mEventData )
   {
@@ -1432,6 +1480,9 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
   {
     mImpl->mOperationsPending = ALL_OPERATIONS;
     mImpl->RequestRelayout();
+
+    // Do this last since it provides callbacks into application code
+    mImpl->mControlInterface.TextChanged();
   }
 
   ImfManager::ImfCallbackData callbackData( update, cursorPosition, text, false );
@@ -1452,9 +1503,6 @@ void Controller::ShowPlaceholderText()
     DALI_ASSERT_DEBUG( mImpl->mEventData && "No placeholder text available" );
 
     mImpl->mEventData->mIsShowingPlaceholderText = true;
-
-    // Cancel previously queued inserts etc.
-    mImpl->mModifyEvents.clear();
 
     // Disable handles when showing place-holder text
     mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
