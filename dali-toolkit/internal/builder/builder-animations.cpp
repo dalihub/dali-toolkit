@@ -134,7 +134,7 @@ AlphaFunction GetAlphaFunction( const std::string& alphaFunction )
   }
   else
   {
-    DALI_ASSERT_ALWAYS( iter != alphaFunctionLut.end() && "Unknown Anchor Constant" );
+    DALI_ASSERT_ALWAYS( iter != alphaFunctionLut.end() && "Unknown Alpha Constant" );
     return Dali::AlphaFunction::DEFAULT;
   }
 }
