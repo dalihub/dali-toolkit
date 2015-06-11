@@ -60,7 +60,8 @@ struct LineLayout
     numberOfGlyphs( 0u ),
     numberOfCharacters( 0u ),
     length( 0.f ),
-    widthAdvanceDiff( 0.f ),
+    extraBearing( 0.f ),
+    extraWidth( 0.f ),
     wsLengthEndOfLine( 0.f ),
     ascender( 0.f ),
     descender( MAX_FLOAT )
@@ -76,7 +77,8 @@ struct LineLayout
     numberOfGlyphs = 0u;
     numberOfCharacters = 0u;
     length = 0.f;
-    widthAdvanceDiff = 0.f;
+    extraBearing = 0.f;
+    extraWidth = 0.f;
     wsLengthEndOfLine = 0.f;
     ascender = 0.f;
     descender = MAX_FLOAT;
@@ -86,8 +88,9 @@ struct LineLayout
   CharacterIndex characterIndex;     ///< Index of the first character to be laid-out.
   Length         numberOfGlyphs;     ///< The number of glyph which fit in one line.
   Length         numberOfCharacters; ///< The number of characters which fit in one line.
-  float          length;             ///< The length of the glyphs which fit in one line.
-  float          widthAdvanceDiff;   ///< The difference between the xBearing + width and the advance of the last glyph.
+  float          length;             ///< The addition of the advance metric of all the glyphs which fit in one line.
+  float          extraBearing;       ///< The extra width to be added to the line's length when the bearing of the first glyph is negative.
+  float          extraWidth;         ///< The extra width to be added to the line's length when the bearing + width of the last glyph is greater than the advance.
   float          wsLengthEndOfLine;  ///< The length of the white spaces at the end of the line.
   float          ascender;           ///< The maximum ascender of all fonts in the line.
   float          descender;          ///< The minimum descender of all fonts in the line.
@@ -146,7 +149,6 @@ struct LayoutEngine::Impl
       lineLayout.length += lineLayout.wsLengthEndOfLine;
 
       lineLayout.wsLengthEndOfLine = tmpLineLayout.wsLengthEndOfLine;
-      lineLayout.widthAdvanceDiff = tmpLineLayout.widthAdvanceDiff;
     }
     else
     {
@@ -167,12 +169,23 @@ struct LayoutEngine::Impl
   /**
    * Retrieves the line layout for a given box width.
    *
+   * @note This method lais out text as it were left to right. At this point is not possible to reorder the line
+   *       because the number of characters of the line is not known (one of the responsabilities of this method
+   *       is calculate that). Due to glyph's 'x' bearing, width and advance, when right to left or mixed right to left
+   *       and left to right text is laid out, it can be small differences in the line length. One solution is to
+   *       reorder and re-lay out the text after this method and add or remove one extra glyph if needed. However,
+   *       this method calculates which are the first and last glyphs of the line (the ones that causes the
+   *       differences). This is a good point to check if there is problems with the text exceeding the boundaries
+   *       of the control when there is right to left text.
+   *
    * @param[in] parameters The layout parameters.
    * @param[out] lineLayout The line layout.
+   * @param[in,out] paragraphDirection in: the current paragraph's direction, out: the next paragraph's direction. Is set after a must break.
    * @param[in] completelyFill Whether to completely fill the line ( even if the last word exceeds the boundaries ).
    */
   void GetLineLayoutForBox( const LayoutParameters& parameters,
                             LineLayout& lineLayout,
+                            CharacterDirection& paragraphDirection,
                             bool completelyFill )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->GetLineLayoutForBox\n" );
@@ -184,37 +197,25 @@ struct LayoutEngine::Impl
     const GlyphIndex lastGlyphIndex = parameters.totalNumberOfGlyphs - 1u;
 
     // If the first glyph has a negative bearing its absolute value needs to be added to the line length.
-    // In the case the line starts with a right to left character the bearing needs to be substracted to the line length.
+    // In the case the line starts with a right to left character, if the width is longer than the advance,
+    // the difference needs to be added to the line length.
     const GlyphInfo& glyphInfo = *( parameters.glyphsBuffer + lineLayout.glyphIndex );
-    float initialHorizontalBearing = glyphInfo.xBearing;
 
+    // Set the direction of the first character of the line.
     lineLayout.characterIndex = *( parameters.glyphsToCharactersBuffer + lineLayout.glyphIndex );
     const CharacterDirection firstCharacterDirection = ( NULL == parameters.characterDirectionBuffer ) ? false : *( parameters.characterDirectionBuffer + lineLayout.characterIndex );
+    CharacterDirection previousCharacterDirection = firstCharacterDirection;
 
-    if( RTL == firstCharacterDirection )
-    {
-      initialHorizontalBearing = -initialHorizontalBearing;
+    const float extraWidth = glyphInfo.xBearing + glyphInfo.width - glyphInfo.advance;
+    float tmpExtraWidth = ( 0.f < extraWidth ) ? extraWidth : 0.f;
 
-      if( 0.f < glyphInfo.xBearing )
-      {
-        tmpLineLayout.length = glyphInfo.xBearing;
-        initialHorizontalBearing = 0.f;
-      }
-    }
-    else
-    {
-      if( 0.f > glyphInfo.xBearing )
-      {
-        tmpLineLayout.length = -glyphInfo.xBearing;
-        initialHorizontalBearing = 0.f;
-      }
-    }
+    float tmpExtraBearing = ( 0.f > glyphInfo.xBearing ) ? -glyphInfo.xBearing : 0.f;
+
+    tmpLineLayout.length += 1.f; // Added one unit to give some space to the cursor.
 
     // Calculate the line height if there is no characters.
     FontId lastFontId = glyphInfo.fontId;
     UpdateLineHeight( lastFontId, tmpLineLayout );
-
-    const float boundingBoxWidth = parameters.boundingBox.width - initialHorizontalBearing;
 
     bool oneWordLaidOut = false;
 
@@ -253,7 +254,11 @@ struct LayoutEngine::Impl
 
       // Used to restore the temporal line layout when a single word does not fit in the control's width and is split by character.
       const float previousTmpLineLength = tmpLineLayout.length;
-      const float previousTmpWidthAdvanceDiff = tmpLineLayout.widthAdvanceDiff;
+      const float previousTmpExtraBearing = tmpExtraBearing;
+      const float previousTmpExtraWidth = tmpExtraWidth;
+
+      // Get the character's direction.
+      const CharacterDirection characterDirection = ( NULL == parameters.characterDirectionBuffer ) ? false : *( parameters.characterDirectionBuffer + characterFirstIndex );
 
       // Increase the accumulated length.
       if( isWhiteSpace )
@@ -265,13 +270,82 @@ struct LayoutEngine::Impl
       {
         // Add as well any previous white space length.
         tmpLineLayout.length += tmpLineLayout.wsLengthEndOfLine + glyphInfo.advance;
-        if( RTL == firstCharacterDirection )
+
+        // An extra space may be added to the line for the first and last glyph of the line.
+        // If the bearing of the first glyph is negative, its positive value needs to be added.
+        // If the bearing plus the width of the last glyph is greater than the advance, the difference
+        // needs to be added.
+
+        if( characterDirection == paragraphDirection )
         {
-          tmpLineLayout.widthAdvanceDiff = -glyphInfo.xBearing;
+          if( RTL == characterDirection )
+          {
+            //       <--
+            // |   Rrrrr|
+            // or
+            // |  Rllrrr|
+            // or
+            // |lllrrrrr|
+            // |     Rll|
+            //
+
+            tmpExtraBearing = ( 0.f > glyphInfo.xBearing ) ? -glyphInfo.xBearing : 0.f;
+          }
+          else // LTR
+          {
+            //  -->
+            // |lllL    |
+            // or
+            // |llrrL   |
+            // or
+            // |lllllrrr|
+            // |rrL     |
+            //
+
+            const float extraWidth = glyphInfo.xBearing + glyphInfo.width - glyphInfo.advance;
+            tmpExtraWidth = ( 0.f < extraWidth ) ? extraWidth : 0.f;
+          }
         }
         else
         {
-          tmpLineLayout.widthAdvanceDiff = glyphInfo.xBearing + glyphInfo.width - glyphInfo.advance;
+          if( characterDirection != previousCharacterDirection )
+          {
+            if( RTL == characterDirection )
+            {
+              //  -->
+              // |lllR    |
+
+              const float extraWidth = glyphInfo.xBearing + glyphInfo.width - glyphInfo.advance;
+              tmpExtraWidth = ( 0.f < extraWidth ) ? extraWidth : 0.f;
+            }
+            else // LTR
+            {
+              //       <--
+              // |   Lrrrr|
+
+              tmpExtraBearing = ( 0.f > glyphInfo.xBearing ) ? -glyphInfo.xBearing : 0.f;
+            }
+          }
+          else if( characterDirection == firstCharacterDirection )
+          {
+            if( RTL == characterDirection )
+            {
+              //  -->
+              // |llllllrr|
+              // |Rr      |
+
+              tmpExtraBearing = ( 0.f > glyphInfo.xBearing ) ? -glyphInfo.xBearing : 0.f;
+            }
+            else // LTR
+            {
+              //       <--
+              // |llllrrrr|
+              // |     llL|
+
+              const float extraWidth = glyphInfo.xBearing + glyphInfo.width - glyphInfo.advance;
+              tmpExtraWidth = ( 0.f < extraWidth ) ? extraWidth : 0.f;
+            }
+          }
         }
 
         // Clear the white space length at the end of the line.
@@ -280,7 +354,7 @@ struct LayoutEngine::Impl
 
       // Check if the accumulated length fits in the width of the box.
       if( ( completelyFill || isMultiline ) && !isWhiteSpace &&
-          ( lineLayout.length + lineLayout.wsLengthEndOfLine + tmpLineLayout.length + tmpLineLayout.widthAdvanceDiff > boundingBoxWidth ) )
+          ( tmpExtraBearing + lineLayout.length + lineLayout.wsLengthEndOfLine + tmpLineLayout.length + tmpExtraWidth > parameters.boundingBox.width ) )
       {
         // Current word does not fit in the box's width.
         if( !oneWordLaidOut || completelyFill )
@@ -293,7 +367,8 @@ struct LayoutEngine::Impl
             tmpLineLayout.numberOfCharacters -= charactersPerGlyph;
             --tmpLineLayout.numberOfGlyphs;
             tmpLineLayout.length = previousTmpLineLength;
-            tmpLineLayout.widthAdvanceDiff = previousTmpWidthAdvanceDiff;
+            tmpExtraBearing = previousTmpExtraBearing;
+            tmpExtraWidth = previousTmpExtraWidth;
           }
 
           // Add part of the word to the line layout.
@@ -303,7 +378,12 @@ struct LayoutEngine::Impl
         {
           DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  Current word does not fit.\n" );
         }
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--GetLineLayoutForBox\n" );
+
+        lineLayout.extraBearing = tmpExtraBearing;
+        lineLayout.extraWidth = tmpExtraWidth;
+
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--GetLineLayoutForBox.\n" );
+
         return;
       }
 
@@ -312,6 +392,16 @@ struct LayoutEngine::Impl
       {
         // Must break the line. Update the line layout and return.
         MergeLineLayout( lineLayout, tmpLineLayout );
+
+        // Set the next paragraph's direction.
+        if( !isLastGlyph &&
+            ( NULL != parameters.characterDirectionBuffer ) )
+        {
+          paragraphDirection = *( parameters.characterDirectionBuffer + 1u + characterLastIndex );
+        }
+
+        lineLayout.extraBearing = tmpExtraBearing;
+        lineLayout.extraWidth = tmpExtraWidth;
 
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  Must break\n" );
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--GetLineLayoutForBox\n" );
@@ -338,7 +428,13 @@ struct LayoutEngine::Impl
         UpdateLineHeight( glyphInfo.fontId, tmpLineLayout );
         lastFontId = glyphInfo.fontId;
       }
+
+      previousCharacterDirection = characterDirection;
     }
+
+    lineLayout.extraBearing = tmpExtraBearing;
+    lineLayout.extraWidth = tmpExtraWidth;
+
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--GetLineLayoutForBox\n" );
   }
 
@@ -352,13 +448,10 @@ struct LayoutEngine::Impl
     // Check if the x bearing of the first character is negative.
     // If it has a negative x bearing, it will exceed the boundaries of the actor,
     // so the penX position needs to be moved to the right.
-    float penX = 0.f;
 
     const GlyphInfo& glyph = *glyphsBuffer;
-    if( 0.f > glyph.xBearing )
-    {
-      penX = -glyph.xBearing;
-    }
+    float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing : 0.f;
+    penX += 1.f; // Added one unit to give some space to the cursor.
 
     for( GlyphIndex i = 0u; i < numberOfGlyphs; ++i )
     {
@@ -380,14 +473,20 @@ struct LayoutEngine::Impl
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->LayoutText\n" );
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  box size %f, %f\n", layoutParameters.boundingBox.width, layoutParameters.boundingBox.height );
 
+    // Set the first paragraph's direction.
+    CharacterDirection paragraphDirection = ( NULL != layoutParameters.characterDirectionBuffer ) ? *layoutParameters.characterDirectionBuffer : !RTL;
+
     float penY = 0.f;
     for( GlyphIndex index = 0u; index < layoutParameters.totalNumberOfGlyphs; )
     {
+      CharacterDirection currentParagraphDirection = paragraphDirection;
+
       // Get the layout for the line.
       LineLayout layout;
       layout.glyphIndex = index;
       GetLineLayoutForBox( layoutParameters,
                            layout,
+                           paragraphDirection,
                            false );
 
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "           glyph index %d\n", layout.glyphIndex );
@@ -411,7 +510,7 @@ struct LayoutEngine::Impl
       if( mEllipsisEnabled &&
           ( ( penY - layout.descender > layoutParameters.boundingBox.height ) ||
             ( ( mLayout == SINGLE_LINE_BOX ) &&
-              ( layout.length + layout.widthAdvanceDiff > layoutParameters.boundingBox.width ) ) ) )
+              ( layout.extraBearing + layout.length + layout.extraWidth > layoutParameters.boundingBox.width ) ) ) )
       {
         // Do not layout more lines if ellipsis is enabled.
 
@@ -439,15 +538,16 @@ struct LayoutEngine::Impl
 
         GetLineLayoutForBox( layoutParameters,
                              ellipsisLayout,
+                             currentParagraphDirection,
                              true );
 
         lineRun.numberOfGlyphs = ellipsisLayout.numberOfGlyphs;
         lineRun.characterRun.characterIndex = ellipsisLayout.characterIndex;
         lineRun.characterRun.numberOfCharacters = ellipsisLayout.numberOfCharacters;
-        lineRun.width = layoutParameters.boundingBox.width;
+        lineRun.width = ellipsisLayout.length;
+        lineRun.extraLength =  ( ellipsisLayout.wsLengthEndOfLine > 0.f ) ? ellipsisLayout.wsLengthEndOfLine - ellipsisLayout.extraWidth : 0.f;
         lineRun.ascender = ellipsisLayout.ascender;
         lineRun.descender = ellipsisLayout.descender;
-        lineRun.extraLength = ellipsisLayout.wsLengthEndOfLine > 0.f ? ellipsisLayout.wsLengthEndOfLine - ellipsisLayout.widthAdvanceDiff : 0.f;
         lineRun.ellipsis = true;
 
         actualSize.width = layoutParameters.boundingBox.width;
@@ -473,15 +573,34 @@ struct LayoutEngine::Impl
       }
       else
       {
+        const bool isLastLine = index + layout.numberOfGlyphs == layoutParameters.totalNumberOfGlyphs;
+
         LineRun lineRun;
         lineRun.glyphIndex = index;
         lineRun.numberOfGlyphs = layout.numberOfGlyphs;
         lineRun.characterRun.characterIndex = layout.characterIndex;
         lineRun.characterRun.numberOfCharacters = layout.numberOfCharacters;
-        lineRun.width = layout.length + layout.widthAdvanceDiff;
+        if( isLastLine )
+        {
+          const float width = layout.extraBearing + layout.length + layout.extraWidth + layout.wsLengthEndOfLine;
+          if( MULTI_LINE_BOX == mLayout )
+          {
+            lineRun.width = ( width > layoutParameters.boundingBox.width ) ? layoutParameters.boundingBox.width : width;
+          }
+          else
+          {
+            lineRun.width = width;
+          }
+
+          lineRun.extraLength = 0.f;
+        }
+        else
+        {
+          lineRun.width = layout.extraBearing + layout.length + layout.extraWidth;
+          lineRun.extraLength = ( layout.wsLengthEndOfLine > 0.f ) ? layout.wsLengthEndOfLine - layout.extraWidth : 0.f;
+        }
         lineRun.ascender = layout.ascender;
         lineRun.descender = layout.descender;
-        lineRun.extraLength = layout.wsLengthEndOfLine > 0.f ? layout.wsLengthEndOfLine - layout.widthAdvanceDiff : 0.f;
         lineRun.direction = false;
         lineRun.ellipsis = false;
 
@@ -520,12 +639,11 @@ struct LayoutEngine::Impl
     {
       const BidirectionalLineInfoRun& bidiLine = *( layoutParameters.lineBidirectionalInfoRunsBuffer + lineIndex );
 
-      float penX = 0.f;
-
       const CharacterIndex characterVisualIndex = bidiLine.characterRun.characterIndex + *bidiLine.visualToLogicalMap;
       const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + *( layoutParameters.charactersToGlyphsBuffer + characterVisualIndex ) );
 
-      penX = -glyph.xBearing;
+      float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing : 0.f;
+      penX += 1.f; // Added one unit to give some space to the cursor.
 
       Vector2* glyphPositionsBuffer = glyphPositions.Begin();
 
@@ -604,23 +722,67 @@ struct LayoutEngine::Impl
       case HORIZONTAL_ALIGN_BEGIN:
       {
         line.alignmentOffset = 0.f;
+
+        if( isRTL )
+        {
+          // 'Remove' the white spaces at the end of the line (which are at the beginning in visual order)
+          line.alignmentOffset -= line.extraLength;
+
+          if( isLastLine )
+          {
+            line.alignmentOffset += std::min( line.extraLength, boxWidth - lineLength );
+          }
+        }
         break;
       }
       case HORIZONTAL_ALIGN_CENTER:
       {
-        line.alignmentOffset = floorf( 0.5f * ( boxWidth - lineLength ) ); // try to avoid pixel alignment.
+        if( isLastLine && !isRTL )
+        {
+          lineLength += line.extraLength;
+          if( lineLength > boxWidth )
+          {
+            lineLength = boxWidth;
+            line.alignmentOffset = 0.f;
+            break;
+          }
+        }
+
+        line.alignmentOffset = 0.5f * ( boxWidth - lineLength );
+
+        if( isRTL )
+        {
+          line.alignmentOffset -= line.extraLength;
+
+          if( isLastLine )
+          {
+            line.alignmentOffset += 0.5f * std::min( line.extraLength, boxWidth - lineLength );
+          }
+        }
+
+        line.alignmentOffset = floorf( line.alignmentOffset ); // try to avoid pixel alignment.
         break;
       }
       case HORIZONTAL_ALIGN_END:
       {
+        if( isLastLine && !isRTL )
+        {
+          lineLength += line.extraLength;
+          if( lineLength > boxWidth )
+          {
+            line.alignmentOffset = 0.f;
+            break;
+          }
+        }
+
+        if( isRTL )
+        {
+          lineLength += line.extraLength;
+        }
+
         line.alignmentOffset = boxWidth - lineLength;
         break;
       }
-    }
-
-    if( isRTL )
-    {
-      line.alignmentOffset -= line.extraLength;
     }
   }
 
