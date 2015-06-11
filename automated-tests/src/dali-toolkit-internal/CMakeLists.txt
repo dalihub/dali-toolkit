@@ -8,6 +8,8 @@ SET(CAPI_LIB "dali-toolkit-internal")
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
  utc-Dali-PushButton.cpp
+ utc-Dali-Text-CharacterSetConversion.cpp
+ utc-Dali-Text-Segmentation.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)
