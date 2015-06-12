@@ -689,53 +689,5 @@ int UtcDaliPushButtonProperties(void)
   DALI_TEST_CHECK( button.IsSelected() ) ;
   DALI_TEST_CHECK( button.GetProperty< bool >( Button::Property::SELECTED ) );
 
-  //  Button::PROPERTY_NORMAL_STATE_ACTOR
-  {
-    button.SetButtonImage( ResourceImage::New( "IMAGE_PATH_1") );
-    DALI_TEST_EQUALS( "IMAGE_PATH_1", button.GetProperty( Button::Property::NORMAL_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
-
-    Property::Map map;
-    map[ "type" ] = "ImageActor";
-
-    button.SetProperty( Button::Property::NORMAL_STATE_ACTOR, map );
-    DALI_TEST_EQUALS( "ImageActor", button.GetProperty( Button::Property::NORMAL_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
-  }
-
-  //  Button::PROPERTY_SELECTED_STATE_ACTOR
-  {
-    button.SetSelectedImage( ResourceImage::New( "IMAGE_PATH_2") );
-    DALI_TEST_EQUALS( "IMAGE_PATH_2", button.GetProperty( Button::Property::SELECTED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
-
-    Property::Map map;
-    map[ "type" ] = "Actor";
-
-    button.SetProperty( Button::Property::SELECTED_STATE_ACTOR, map );
-    DALI_TEST_EQUALS( "Actor", button.GetProperty( Button::Property::SELECTED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
-    DALI_TEST_CHECK( "ImageActor" != button.GetProperty( Button::Property::SELECTED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >() );
-  }
-
-  //  Button::PROPERTY_DISABLED_STATE_ACTOR
-  {
-    button.SetDisabledImage( ResourceImage::New( "IMAGE_PATH_3") );
-    DALI_TEST_EQUALS( "IMAGE_PATH_3", button.GetProperty( Button::Property::DISABLED_STATE_ACTOR ).GetValue( "image" ).GetValue( "filename" ).Get< std::string >(), TEST_LOCATION );
-
-    Property::Map map;
-    map[ "type" ] = "Actor";
-
-    button.SetProperty( Button::Property::DISABLED_STATE_ACTOR, map );
-    DALI_TEST_EQUALS( "Actor", button.GetProperty( Button::Property::DISABLED_STATE_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
-  }
-
-  //  Button::PROPERTY_LABEL_ACTOR
-  {
-    button.SetLabel( "LABEL_TEXT_CUSTOM" );
-    DALI_TEST_EQUALS( "TextLabel", button.GetProperty( Button::Property::LABEL_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
-
-    Property::Map map;
-    map[ "type" ] = "Actor";
-
-    button.SetProperty( Button::Property::LABEL_ACTOR, map );
-    DALI_TEST_EQUALS( "Actor", button.GetProperty( Button::Property::LABEL_ACTOR ).GetValue( "type" ).Get< std::string >(), TEST_LOCATION );
-  }
   END_TEST;
 }

@@ -125,33 +125,6 @@ int UtcDaliToolkitTextLabelAssignmentOperatorP(void)
   END_TEST;
 }
 
-int UtcDaliToolkitTextLabelGetPropertyN(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitTextLabelGetPropertyN");
-  TextLabel label = TextLabel::New("Test Text");
-  DALI_TEST_CHECK( label );
-
-  bool assert = false;
-  try
-  {
-    Property::Value value = label.GetProperty<bool>( 0 );
-  }
-  catch ( ... )
-  {
-    assert = true;
-  }
-  if ( assert )
-  {
-    tet_result(TET_PASS);
-  }
-  else
-  {
-    tet_result(TET_FAIL);
-  }
-  END_TEST;
-}
-
 // Positive test case for a method
 int UtcDaliToolkitTextLabelGetPropertyP(void)
 {
@@ -183,33 +156,6 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::SHADOW_COLOR ), Color::BLACK, TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty<bool>( TextLabel::Property::UNDERLINE_ENABLED ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::UNDERLINE_HEIGHT ), 0.0f, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliToolkitTextLabelSetPropertyN(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitTextLabelSetPropertyN");
-  TextLabel label = TextLabel::New("Test Text");
-  DALI_TEST_CHECK( label );
-
-  bool assert = false;
-  try
-  {
-    label.SetProperty( 0, true );
-  }
-  catch ( ... )
-  {
-    assert = true;
-  }
-  if ( assert )
-  {
-    tet_result(TET_PASS);
-  }
-  else
-  {
-    tet_result(TET_FAIL);
-  }
   END_TEST;
 }
 

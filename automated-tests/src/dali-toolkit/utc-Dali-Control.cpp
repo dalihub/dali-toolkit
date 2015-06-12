@@ -428,17 +428,15 @@ int UtcDaliControlBackgroundProperties(void)
 
   Property::Map imageMap;
   imageMap[ "filename" ] = "TestImage";
-  Property::Map map;
-  map[ "image" ] = imageMap;
-  control.SetProperty( Control::Property::BACKGROUND_IMAGE, map );
+  control.SetProperty( Control::Property::BACKGROUND_IMAGE, imageMap );
   DALI_TEST_CHECK( control.GetChildCount() > 0 );
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::RED, TEST_LOCATION );
   DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::RED, TEST_LOCATION );
 
   Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND_IMAGE );
-  DALI_TEST_CHECK( propValue.HasKey( "image" ) );
-  DALI_TEST_CHECK( propValue.GetValue( "image" ).HasKey( "filename" ) );
-  DALI_TEST_CHECK( propValue.GetValue( "image" ).GetValue( "filename" ).Get< std::string>() == "TestImage" );
+  Property::Map* resultMap = propValue.GetMap();
+  DALI_TEST_CHECK( resultMap->Find( "filename" ) );
+  DALI_TEST_CHECK( resultMap->Find( "filename" )->Get< std::string>() == "TestImage" );
 
   Property::Map emptyMap;
   control.SetProperty( Control::Property::BACKGROUND_IMAGE, emptyMap );
