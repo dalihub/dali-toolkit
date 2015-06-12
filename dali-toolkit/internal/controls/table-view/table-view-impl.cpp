@@ -137,7 +137,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layout-columns", MAP,          
 
 DALI_TYPE_REGISTRATION_END()
 
-const Scripting::StringEnum< Toolkit::TableView::LayoutPolicy > LAYOUT_POLICY_STRING_TABLE[] =
+const Scripting::StringEnum LAYOUT_POLICY_STRING_TABLE[] =
 {
  { "fixed",    Toolkit::TableView::FIXED    },
  { "relative", Toolkit::TableView::RELATIVE },
@@ -1050,27 +1050,38 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
                                          void(TableView::*funcRelative)(unsigned int, float),
                                          const Property::Value& value )
 {
-  if( Property::MAP == value.GetType() )
+  Property::Map* map = value.GetMap();
+  if( map )
   {
-    Property::Map map = value.Get<Property::Map>();
     unsigned int rowIndex(0);
-    for ( unsigned int i = 0, count = map.Count(); i < count; ++i )
+    for ( unsigned int i = 0, count = map->Count(); i < count; ++i )
     {
-      Property::Value& item = map.GetValue(i);
+      Property::Value& item = map->GetValue(i);
+      Property::Map* childMap = item.GetMap();
 
-      if( std::istringstream(map.GetKey(i)) >> rowIndex  // the key is a number
-          && Property::MAP == item.GetType())
+      std::istringstream( map->GetKey(i) ) >> rowIndex;
+      if( childMap )
       {
-        if( item.HasKey( "policy" ) && item.HasKey( "value" ) )
+        Property::Value* policy = childMap->Find( "policy" );
+        Property::Value* value = childMap->Find( "value" );
+        if( policy && value )
         {
-          Toolkit::TableView::LayoutPolicy policy = Scripting::GetEnumeration< Toolkit::TableView::LayoutPolicy >( item.GetValue("policy").Get<std::string>().c_str(), LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT );
-          if( policy == Toolkit::TableView::FIXED )
+          std::string policyValue;
+          policy->Get( policyValue );
+          Toolkit::TableView::LayoutPolicy policy;
+          if( Scripting::GetEnumeration< Toolkit::TableView::LayoutPolicy >( policyValue.c_str(),
+                                                                             LAYOUT_POLICY_STRING_TABLE,
+                                                                             LAYOUT_POLICY_STRING_TABLE_COUNT,
+                                                                             policy ) )
           {
-            (tableViewImpl.*funcFixed)( rowIndex, item.GetValue("value").Get<float>() );
-          }
-          else if( policy == Toolkit::TableView::RELATIVE )
-          {
-            (tableViewImpl.*funcRelative)( rowIndex, item.GetValue("value").Get<float>() );
+            if( policy == Toolkit::TableView::FIXED )
+            {
+              (tableViewImpl.*funcFixed)( rowIndex, value->Get<float>() );
+            }
+            else if( policy == Toolkit::TableView::RELATIVE )
+            {
+              (tableViewImpl.*funcRelative)( rowIndex, value->Get<float>() );
+            }
           }
         }
       }
@@ -1094,8 +1105,22 @@ Property::Value TableView::GetColumnWidthsPropertyValue()
 
 void TableView::GetMapPropertyValue( const RowColumnArray& data, Property::Map& map )
 {
-  std::string fixedPolicy( Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::FIXED, LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT ) );
-  std::string relativePolicy( Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::RELATIVE, LAYOUT_POLICY_STRING_TABLE, LAYOUT_POLICY_STRING_TABLE_COUNT ) );
+  const char* name = Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::FIXED,
+                                                                                        LAYOUT_POLICY_STRING_TABLE,
+                                                                                        LAYOUT_POLICY_STRING_TABLE_COUNT );
+  std::string fixedPolicy;
+  if( name )
+  {
+    fixedPolicy = name;
+  }
+  name = Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::RELATIVE,
+                                                                            LAYOUT_POLICY_STRING_TABLE,
+                                                                            LAYOUT_POLICY_STRING_TABLE_COUNT );
+  std::string relativePolicy;
+  if( name )
+  {
+    relativePolicy = name;
+  }
 
   const RowColumnArray::SizeType count = data.Size();
   for( RowColumnArray::SizeType i = 0; i < count; i++ )

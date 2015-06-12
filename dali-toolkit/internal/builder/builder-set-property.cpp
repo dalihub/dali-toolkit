@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 
 // EXTERNAL INCLUDES
 #include <sstream>
+#include <dali/public-api/object/property-array.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/devel-api/adaptor-framework/color-controller.h>
 
 // INTERNAL INCLUDES
@@ -352,18 +354,19 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
       else if(node.Size())
       {
         value = Property::Value(Property::ARRAY);
+        Property::Array* array = value.GetArray();
         unsigned int i = 0;
         TreeNode::ConstIterator iter(node.CBegin());
         for( ; i < node.Size(); ++i, ++iter)
         {
-          Property::Value v;
-          if( SetPropertyFromNode( (*iter).second, v, replacer ) )
+          Property::Value childValue;
+          if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
           {
-            value.AppendItem(v);
+            array->PushBack( childValue );
           }
         }
 
-        if( value.GetSize() == static_cast<int>(node.Size()) )
+        if( array->Count() == node.Size() )
         {
           done = true;
         }
@@ -383,18 +386,19 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
       else if(node.Size())
       {
         value = Property::Value(Property::MAP);
+        Property::Map* map = value.GetMap();
         unsigned int i = 0;
         TreeNode::ConstIterator iter(node.CBegin());
         for( ; i < node.Size(); ++i, ++iter)
         {
-          Property::Value v;
-          if( SetPropertyFromNode( (*iter).second, v, replacer ) )
+          Property::Value childValue;
+          if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
           {
-            value.SetValue( (*iter).first, v );
+            map->Insert( (*iter).first, childValue );
           }
         }
 
-        if( value.GetSize() == static_cast<int>(node.Size()) )
+        if( map->Count() == node.Size() )
         {
           done = true;
         }
@@ -490,13 +494,14 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Value& value,
         else
         {
           value = Property::Value(Property::ARRAY);
-          Property::Value v;
+          Property::Array* array = value.GetArray();
 
           for(TreeConstIter iter = node.CBegin(); iter != node.CEnd(); ++iter)
           {
-            if( SetPropertyFromNode( (*iter).second, v, replacer ) )
+            Property::Value childValue;
+            if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
             {
-              value.AppendItem(v);
+              array->PushBack( childValue );
               done = true;
             }
           }
@@ -514,12 +519,13 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Value& value,
         if( ((*iter).first) == 0 )
         {
           value = Property::Value(Property::ARRAY);
-          Property::Value v;
+          Property::Array* array = value.GetArray();
           for(unsigned int i = 0; i < node.Size(); ++i, ++iter)
           {
-            if( SetPropertyFromNode( (*iter).second, v, replacer ) )
+            Property::Value childValue;
+            if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
             {
-              value.AppendItem(v);
+              array->PushBack( childValue );
               done = true;
             }
           }
@@ -527,12 +533,13 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Value& value,
         else
         {
           value = Property::Value(Property::MAP);
-          Property::Value v;
+          Property::Map* map = value.GetMap();
           for(unsigned int i = 0; i < node.Size(); ++i, ++iter)
           {
-            if( SetPropertyFromNode( (*iter).second, v, replacer ) )
+            Property::Value childValue;
+            if( SetPropertyFromNode( (*iter).second, childValue, replacer ) )
             {
-              value.SetValue((*iter).first, v);
+              map->Insert( (*iter).first, childValue );
               done = true;
             }
           }

@@ -18,7 +18,10 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-page-path-effect-impl.h>
 
-//INTERNAL INCLUDES
+// EXTERNAL INCLUDES
+#include <dali/public-api/object/property-array.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 
 namespace Dali
@@ -47,9 +50,10 @@ ScrollViewPagePathEffect::ScrollViewPagePathEffect(Path path, const Vector3& for
 
   //Create linear constrainer
   pointsProperty = Property::Value(Property::ARRAY);
-  pointsProperty.AppendItem(0.0f);
-  pointsProperty.AppendItem(1.0f);
-  pointsProperty.AppendItem(0.0f);
+  Property::Array* array = pointsProperty.GetArray();
+  array->PushBack(0.0f);
+  array->PushBack(1.0f);
+  array->PushBack(0.0f);
   mLinearConstrainer = Dali::LinearConstrainer::New();
   mLinearConstrainer.SetProperty( LinearConstrainer::Property::VALUE, pointsProperty );
 }
