@@ -28,12 +28,12 @@ using namespace Dali;
 using namespace Toolkit;
 
 
-void utc_dali_toolkit_accessibility_focus_manager_startup(void)
+void utc_dali_toolkit_accessibility_manager_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void utc_dali_toolkit_accessibility_focus_manager_cleanup(void)
+void utc_dali_toolkit_accessibility_manager_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
@@ -90,11 +90,11 @@ public:
   FocusOvershotCallback(bool& signalReceived)
   : mSignalVerified(signalReceived),
     mCurrentFocusedActor(),
-    mFocusOvershotDirection(Toolkit::AccessibilityFocusManager::OVERSHOT_NEXT)
+    mFocusOvershotDirection(Toolkit::AccessibilityManager::OVERSHOT_NEXT)
   {
   }
 
-  void Callback(Actor currentFocusedActor, Toolkit::AccessibilityFocusManager::FocusOvershotDirection direction)
+  void Callback(Actor currentFocusedActor, Toolkit::AccessibilityManager::FocusOvershotDirection direction)
   {
     tet_infoline("Verifying FocusOvershotCallback()");
 
@@ -111,7 +111,7 @@ public:
 
   bool& mSignalVerified;
   Actor mCurrentFocusedActor;
-  Toolkit::AccessibilityFocusManager::FocusOvershotDirection mFocusOvershotDirection;
+  Toolkit::AccessibilityManager::FocusOvershotDirection mFocusOvershotDirection;
 };
 
 // Functor to test whether focused actor activated signal is emitted.
@@ -131,13 +131,13 @@ public:
 } // namespace
 
 
-int UtcDaliAccessibilityFocusManagerGet(void)
+int UtcDaliAccessibilityManagerGet(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerGet");
+  tet_infoline(" UtcDaliAccessibilityManagerGet");
 
-  AccessibilityFocusManager manager;
+  AccessibilityManager manager;
 
   //Ensure object is created by checking if it's registered
   ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
@@ -146,46 +146,46 @@ int UtcDaliAccessibilityFocusManagerGet(void)
   gObjectCreatedCallBackCalled = false;
   registry.ObjectCreatedSignal().Connect( &TestCallback );
   {
-    manager = AccessibilityFocusManager::Get();
+    manager = AccessibilityManager::Get();
     DALI_TEST_CHECK(manager);
   }
   DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
 
-  AccessibilityFocusManager newManager = AccessibilityFocusManager::Get();
+  AccessibilityManager newManager = AccessibilityManager::Get();
   DALI_TEST_CHECK(newManager);
 
-  // Check that focus manager is a singleton
+  // Check that accessibility manager is a singleton
   DALI_TEST_CHECK(manager == newManager);
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerSetAndGetAccessibilityAttribute(void)
+int UtcDaliAccessibilityManagerSetAndGetAccessibilityAttribute(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerSetAndGetAccessibilityAttribute");
+  tet_infoline(" UtcDaliAccessibilityManagerSetAndGetAccessibilityAttribute");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(actor, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(actor, AccessibilityManager::ACCESSIBILITY_LABEL) == "");
 
-  manager.SetAccessibilityAttribute(actor, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "Description");
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(actor, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "Description");
+  manager.SetAccessibilityAttribute(actor, AccessibilityManager::ACCESSIBILITY_LABEL, "Description");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(actor, AccessibilityManager::ACCESSIBILITY_LABEL) == "Description");
 
-  manager.SetAccessibilityAttribute(actor, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "New description");
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(actor, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "New description");
+  manager.SetAccessibilityAttribute(actor, AccessibilityManager::ACCESSIBILITY_LABEL, "New description");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(actor, AccessibilityManager::ACCESSIBILITY_LABEL) == "New description");
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerSetAndGetFocusOrder(void)
+int UtcDaliAccessibilityManagerSetAndGetFocusOrder(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerSetAndGetFocusOrder");
+  tet_infoline(" UtcDaliAccessibilityManagerSetAndGetFocusOrder");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   Actor first = Actor::New();
@@ -195,59 +195,59 @@ int UtcDaliAccessibilityFocusManagerSetAndGetFocusOrder(void)
 
   // Set the focus order and description for the first actor
   manager.SetFocusOrder(first, 1);
-  manager.SetAccessibilityAttribute(first, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "first");
+  manager.SetAccessibilityAttribute(first, AccessibilityManager::ACCESSIBILITY_LABEL, "first");
   DALI_TEST_CHECK(manager.GetFocusOrder(first) == 1);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(first, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "first");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(first, AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
 
   // Set the focus order and description for the second actor
   manager.SetFocusOrder(second, 2);
-  manager.SetAccessibilityAttribute(second, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "second");
+  manager.SetAccessibilityAttribute(second, AccessibilityManager::ACCESSIBILITY_LABEL, "second");
   DALI_TEST_CHECK(manager.GetFocusOrder(second) == 2);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "second");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityManager::ACCESSIBILITY_LABEL) == "second");
 
   // check that the focus order of the first actor is changed
   manager.SetFocusOrder(first, 2);
   DALI_TEST_CHECK(manager.GetFocusOrder(first) == 2);
   // make sure the change of focus order doesn't affect the actor's description
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(first, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "first");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(first, AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
 
   // check that the focus order of the second actor is increased to 3
   DALI_TEST_CHECK(manager.GetFocusOrder(second) == 3);
   // make sure the change of focus order doesn't affect the actor's description
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "second");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityManager::ACCESSIBILITY_LABEL) == "second");
 
   // check that the focus order of the second actor is changed to 1
   manager.SetFocusOrder(second, 1);
   DALI_TEST_CHECK(manager.GetFocusOrder(second) == 1);
   // make sure the change of focus order doesn't affect the actor's description
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "second");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityManager::ACCESSIBILITY_LABEL) == "second");
 
   // Set the focus order and description for the third actor
   Actor third = Actor::New();
   manager.SetFocusOrder(third, 1);
-  manager.SetAccessibilityAttribute(third, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "third");
+  manager.SetAccessibilityAttribute(third, AccessibilityManager::ACCESSIBILITY_LABEL, "third");
   DALI_TEST_CHECK(manager.GetFocusOrder(third) == 1);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(third, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "third");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(third, AccessibilityManager::ACCESSIBILITY_LABEL) == "third");
 
   // check that the focus order of the second actor is increased to 2.
   DALI_TEST_CHECK(manager.GetFocusOrder(second) == 2);
   // make sure the change of focus order doesn't affect the actor's description
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "second");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityManager::ACCESSIBILITY_LABEL) == "second");
 
   // check that the focus order of the first actor is increased to 3.
   DALI_TEST_CHECK(manager.GetFocusOrder(first) == 3);
   // make sure the change of focus order doesn't affect the actor's description
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(first, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "first");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(first, AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerGenerateNewFocusOrder(void)
+int UtcDaliAccessibilityManagerGenerateNewFocusOrder(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerGenerateNewFocusOrder");
+  tet_infoline(" UtcDaliAccessibilityManagerGenerateNewFocusOrder");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   DALI_TEST_CHECK(1 == manager.GenerateNewFocusOrder());
@@ -258,7 +258,7 @@ int UtcDaliAccessibilityFocusManagerGenerateNewFocusOrder(void)
 
   // Set the focus order for the first actor
   manager.SetFocusOrder(first, 1);
-  manager.SetAccessibilityAttribute(first, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "first");
+  manager.SetAccessibilityAttribute(first, AccessibilityManager::ACCESSIBILITY_LABEL, "first");
   DALI_TEST_CHECK(manager.GetFocusOrder(first) == 1);
 
   //Test for new focus order
@@ -266,18 +266,18 @@ int UtcDaliAccessibilityFocusManagerGenerateNewFocusOrder(void)
 
   // Set the focus order for the first actor
   manager.SetFocusOrder(second, 2);
-  manager.SetAccessibilityAttribute(second, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "first");
+  manager.SetAccessibilityAttribute(second, AccessibilityManager::ACCESSIBILITY_LABEL, "first");
   DALI_TEST_CHECK(manager.GetFocusOrder(second) == 2);
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerGetActorByFocusOrder(void)
+int UtcDaliAccessibilityManagerGetActorByFocusOrder(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerGetActorByFocusOrder");
+  tet_infoline(" UtcDaliAccessibilityManagerGetActorByFocusOrder");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   // Create the actors and set their focus orders
@@ -321,13 +321,13 @@ int UtcDaliAccessibilityFocusManagerGetActorByFocusOrder(void)
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerSetAndGetCurrentFocusActor(void)
+int UtcDaliAccessibilityManagerSetAndGetCurrentFocusActor(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerSetAndGetCurrentFocusActor");
+  tet_infoline(" UtcDaliAccessibilityManagerSetAndGetCurrentFocusActor");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   // Create the first actor and add it to the stage
@@ -412,13 +412,13 @@ int UtcDaliAccessibilityFocusManagerSetAndGetCurrentFocusActor(void)
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerGetCurrentFocusGroup(void)
+int UtcDaliAccessibilityManagerGetCurrentFocusGroup(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerGetCurrentFocusGroup");
+  tet_infoline(" UtcDaliAccessibilityManagerGetCurrentFocusGroup");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   // Create an actor with two child actors and add it to the stage
@@ -479,13 +479,13 @@ int UtcDaliAccessibilityFocusManagerGetCurrentFocusGroup(void)
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerGetCurrentFocusOrder(void)
+int UtcDaliAccessibilityManagerGetCurrentFocusOrder(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerGetCurrentFocusOrder");
+  tet_infoline(" UtcDaliAccessibilityManagerGetCurrentFocusOrder");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   Actor first = Actor::New();
@@ -499,21 +499,21 @@ int UtcDaliAccessibilityFocusManagerGetCurrentFocusOrder(void)
 
   // Set the focus order and description for the first actor
   manager.SetFocusOrder(first, 1);
-  manager.SetAccessibilityAttribute(first, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "first");
+  manager.SetAccessibilityAttribute(first, AccessibilityManager::ACCESSIBILITY_LABEL, "first");
   DALI_TEST_CHECK(manager.GetFocusOrder(first) == 1);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(first, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "first");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(first, AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
 
   // Set the focus order and description for the second actor
   manager.SetFocusOrder(second, 2);
-  manager.SetAccessibilityAttribute(second, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "second");
+  manager.SetAccessibilityAttribute(second, AccessibilityManager::ACCESSIBILITY_LABEL, "second");
   DALI_TEST_CHECK(manager.GetFocusOrder(second) == 2);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "second");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityManager::ACCESSIBILITY_LABEL) == "second");
 
   // Set the focus order and description for the second actor
   manager.SetFocusOrder(third, 3);
-  manager.SetAccessibilityAttribute(third, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "third");
+  manager.SetAccessibilityAttribute(third, AccessibilityManager::ACCESSIBILITY_LABEL, "third");
   DALI_TEST_CHECK(manager.GetFocusOrder(third) == 3);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(third, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "third");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(third, AccessibilityManager::ACCESSIBILITY_LABEL) == "third");
 
   // Check that no actor is being focused yet.
   DALI_TEST_CHECK(manager.GetCurrentFocusOrder() == 0);
@@ -536,13 +536,13 @@ int UtcDaliAccessibilityFocusManagerGetCurrentFocusOrder(void)
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerMoveFocusForward(void)
+int UtcDaliAccessibilityManagerMoveFocusForward(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerMoveFocusForward");
+  tet_infoline(" UtcDaliAccessibilityManagerMoveFocusForward");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   Actor first = Actor::New();
@@ -556,21 +556,21 @@ int UtcDaliAccessibilityFocusManagerMoveFocusForward(void)
 
   // Set the focus order and description for the first actor
   manager.SetFocusOrder(first, 1);
-  manager.SetAccessibilityAttribute(first, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "first");
+  manager.SetAccessibilityAttribute(first, AccessibilityManager::ACCESSIBILITY_LABEL, "first");
   DALI_TEST_CHECK(manager.GetFocusOrder(first) == 1);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(first, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "first");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(first, AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
 
   // Set the focus order and description for the second actor
   manager.SetFocusOrder(second, 2);
-  manager.SetAccessibilityAttribute(second, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "second");
+  manager.SetAccessibilityAttribute(second, AccessibilityManager::ACCESSIBILITY_LABEL, "second");
   DALI_TEST_CHECK(manager.GetFocusOrder(second) == 2);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "second");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityManager::ACCESSIBILITY_LABEL) == "second");
 
   // Set the focus order and description for the second actor
   manager.SetFocusOrder(third, 3);
-  manager.SetAccessibilityAttribute(third, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "third");
+  manager.SetAccessibilityAttribute(third, AccessibilityManager::ACCESSIBILITY_LABEL, "third");
   DALI_TEST_CHECK(manager.GetFocusOrder(third) == 3);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(third, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "third");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(third, AccessibilityManager::ACCESSIBILITY_LABEL) == "third");
 
   // Check that no actor is being focused yet.
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
@@ -578,7 +578,7 @@ int UtcDaliAccessibilityFocusManagerMoveFocusForward(void)
   // Set the focus on the first actor
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "first");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
 
   // Test the non-wrapped move first
   manager.SetWrapMode(false);
@@ -587,19 +587,19 @@ int UtcDaliAccessibilityFocusManagerMoveFocusForward(void)
   // Move the focus forward to the second actor
   manager.MoveFocusForward();
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "second");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "second");
 
   // Move the focus forward to the third actor
   manager.MoveFocusForward();
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "third");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "third");
 
   // Check that it will fail to move the focus forward again as the third actor is the last
   // focusable actor in the focus chain
   manager.MoveFocusForward();
   // The focus should still be set on the third actor
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "third");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "third");
 
   // Now test the wrapped move
   manager.SetWrapMode(true);
@@ -608,7 +608,7 @@ int UtcDaliAccessibilityFocusManagerMoveFocusForward(void)
   // Move the focus forward recursively and this time the first actor should be focused
   manager.MoveFocusForward();
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "first");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
 
   // Make the second actor not focusable
   Property::Index propertyActorFocusable = second.GetPropertyIndex("focusable");
@@ -621,7 +621,7 @@ int UtcDaliAccessibilityFocusManagerMoveFocusForward(void)
   // the third actor should be focused now.
   manager.MoveFocusForward();
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "third");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "third");
 
   // Make the first actor invisible
   first.SetVisible(false);
@@ -634,7 +634,7 @@ int UtcDaliAccessibilityFocusManagerMoveFocusForward(void)
   // so the focus will still be on the third actor
   manager.MoveFocusForward();
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "third");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "third");
 
   // Make the third actor invisible so that no actor can be focused.
   third.SetVisible(false);
@@ -645,17 +645,17 @@ int UtcDaliAccessibilityFocusManagerMoveFocusForward(void)
   // Check that the focus move is failed as all the three actors can not be focused
   manager.MoveFocusForward();
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "third");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "third");
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerMoveFocusBackward(void)
+int UtcDaliAccessibilityManagerMoveFocusBackward(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerMoveFocusBackward");
+  tet_infoline(" UtcDaliAccessibilityManagerMoveFocusBackward");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   Actor first = Actor::New();
@@ -669,21 +669,21 @@ int UtcDaliAccessibilityFocusManagerMoveFocusBackward(void)
 
   // Set the focus order and description for the first actor
   manager.SetFocusOrder(first, 1);
-  manager.SetAccessibilityAttribute(first, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "first");
+  manager.SetAccessibilityAttribute(first, AccessibilityManager::ACCESSIBILITY_LABEL, "first");
   DALI_TEST_CHECK(manager.GetFocusOrder(first) == 1);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(first, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "first");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(first, AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
 
   // Set the focus order and description for the second actor
   manager.SetFocusOrder(second, 2);
-  manager.SetAccessibilityAttribute(second, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "second");
+  manager.SetAccessibilityAttribute(second, AccessibilityManager::ACCESSIBILITY_LABEL, "second");
   DALI_TEST_CHECK(manager.GetFocusOrder(second) == 2);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "second");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(second, AccessibilityManager::ACCESSIBILITY_LABEL) == "second");
 
   // Set the focus order and description for the second actor
   manager.SetFocusOrder(third, 3);
-  manager.SetAccessibilityAttribute(third, AccessibilityFocusManager::ACCESSIBILITY_LABEL, "third");
+  manager.SetAccessibilityAttribute(third, AccessibilityManager::ACCESSIBILITY_LABEL, "third");
   DALI_TEST_CHECK(manager.GetFocusOrder(third) == 3);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(third, AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "third");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(third, AccessibilityManager::ACCESSIBILITY_LABEL) == "third");
 
   // Check that no actor is being focused yet.
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
@@ -691,7 +691,7 @@ int UtcDaliAccessibilityFocusManagerMoveFocusBackward(void)
   // Set the focus on the third actor
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(third) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "third");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "third");
 
   // Test the non-wrapped move first
   manager.SetWrapMode(false);
@@ -700,19 +700,19 @@ int UtcDaliAccessibilityFocusManagerMoveFocusBackward(void)
   // Move the focus backward to the second actor
   manager.MoveFocusBackward();
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "second");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "second");
 
   // Move the focus backward to the first actor
   manager.MoveFocusBackward();
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "first");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
 
   // Check that it will fail to move the focus backward again as the first actor is the first
   // focusable actor in the focus chain
   manager.MoveFocusBackward();
   // The focus should still be set on the first actor
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "first");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
 
   // Now test the wrapped move
   manager.SetWrapMode(true);
@@ -721,7 +721,7 @@ int UtcDaliAccessibilityFocusManagerMoveFocusBackward(void)
   // Move the focus backward recursively and this time the third actor should be focused
   manager.MoveFocusBackward();
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "third");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "third");
 
   // Make the second actor not focusable
   Property::Index propertyActorFocusable = second.GetPropertyIndex("focusable");
@@ -734,7 +734,7 @@ int UtcDaliAccessibilityFocusManagerMoveFocusBackward(void)
   // the first actor should be focused now.
   manager.MoveFocusBackward();
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "first");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
 
   // Make the third actor invisible
   third.SetVisible(false);
@@ -747,7 +747,7 @@ int UtcDaliAccessibilityFocusManagerMoveFocusBackward(void)
   // so the focus will still be on the first actor
   manager.MoveFocusBackward();
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "first");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
 
   // Make the first actor invisible so that no actor can be focused.
   first.SetVisible(false);
@@ -758,17 +758,17 @@ int UtcDaliAccessibilityFocusManagerMoveFocusBackward(void)
   // Check that the focus move is failed as all the three actors can not be focused
   manager.MoveFocusBackward();
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
-  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityFocusManager::ACCESSIBILITY_LABEL) == "first");
+  DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerClearFocus(void)
+int UtcDaliAccessibilityManagerClearFocus(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerClearFocus");
+  tet_infoline(" UtcDaliAccessibilityManagerClearFocus");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   // Create the first actor and add it to the stage
@@ -800,13 +800,13 @@ int UtcDaliAccessibilityFocusManagerClearFocus(void)
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerReset(void)
+int UtcDaliAccessibilityManagerReset(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerReset");
+  tet_infoline(" UtcDaliAccessibilityManagerReset");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   // Create the first actor and add it to the stage
@@ -840,13 +840,13 @@ int UtcDaliAccessibilityFocusManagerReset(void)
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerFocusGroup(void)
+int UtcDaliAccessibilityManagerFocusGroup(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerFocusGroup");
+  tet_infoline(" UtcDaliAccessibilityManagerFocusGroup");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   // Create an actor with two child actors and add it to the stage
@@ -937,13 +937,13 @@ int UtcDaliAccessibilityFocusManagerFocusGroup(void)
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerSetAndGetFocusIndicator(void)
+int UtcDaliAccessibilityManagerSetAndGetFocusIndicator(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerSetAndGetFocusIndicator");
+  tet_infoline(" UtcDaliAccessibilityManagerSetAndGetFocusIndicator");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   Actor defaultFocusIndicatorActor = manager.GetFocusIndicatorActor();
@@ -955,13 +955,13 @@ int UtcDaliAccessibilityFocusManagerSetAndGetFocusIndicator(void)
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerSignalFocusChanged(void)
+int UtcDaliAccessibilityManagerSignalFocusChanged(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerSignalFocusChanged");
+  tet_infoline(" UtcDaliAccessibilityManagerSignalFocusChanged");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   bool signalVerified = false;
@@ -1002,13 +1002,13 @@ int UtcDaliAccessibilityFocusManagerSignalFocusChanged(void)
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerSignalFocusOvershot(void)
+int UtcDaliAccessibilityManagerSignalFocusOvershot(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerSignalFocusOvershot");
+  tet_infoline(" UtcDaliAccessibilityManagerSignalFocusOvershot");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   bool signalVerified = false;
@@ -1038,7 +1038,7 @@ int UtcDaliAccessibilityFocusManagerSignalFocusOvershot(void)
 
   // Check that the forward focus movement is overshot.
   callback.mCurrentFocusedActor = second;
-  callback.mFocusOvershotDirection = Toolkit::AccessibilityFocusManager::OVERSHOT_NEXT;
+  callback.mFocusOvershotDirection = Toolkit::AccessibilityManager::OVERSHOT_NEXT;
   DALI_TEST_CHECK(manager.MoveFocusForward() == false);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
   DALI_TEST_CHECK(signalVerified);
@@ -1059,20 +1059,20 @@ int UtcDaliAccessibilityFocusManagerSignalFocusOvershot(void)
 
   // Check that the backward focus movement is overshot.
   callback.mCurrentFocusedActor = first;
-  callback.mFocusOvershotDirection = Toolkit::AccessibilityFocusManager::OVERSHOT_PREVIOUS;
+  callback.mFocusOvershotDirection = Toolkit::AccessibilityManager::OVERSHOT_PREVIOUS;
   DALI_TEST_CHECK(manager.MoveFocusBackward() == false);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
   DALI_TEST_CHECK(signalVerified);
   END_TEST;
 }
 
-int UtcDaliAccessibilityFocusManagerSignalFocusedActorActivated(void)
+int UtcDaliAccessibilityManagerSignalFocusedActorActivated(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliAccessibilityFocusManagerSignalFocusedActorActivated");
+  tet_infoline(" UtcDaliAccessibilityManagerSignalFocusedActorActivated");
 
-  AccessibilityFocusManager manager = AccessibilityFocusManager::Get();
+  AccessibilityManager manager = AccessibilityManager::Get();
   DALI_TEST_CHECK(manager);
 
   FocusedActorActivatedCallback callback;

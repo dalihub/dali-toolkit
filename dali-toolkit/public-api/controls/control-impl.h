@@ -465,6 +465,14 @@ public: // API for derived classes to override
    */
   virtual bool OnAccessibilityValueChange( bool isIncrease );
 
+  /**
+   * @brief This method should be overridden by deriving classes when they wish to respond
+   * the accessibility zoom action
+   *
+   * @return true if the zoom action has been consumed by this control
+   */
+  virtual bool OnAccessibilityZoom();
+
   // Keyboard focus
 
   /**

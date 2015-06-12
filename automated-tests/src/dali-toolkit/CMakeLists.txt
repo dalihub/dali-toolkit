@@ -44,7 +44,7 @@ SET(TC_SOURCES
    utc-Dali-ControlImpl.cpp
    utc-Dali-DefaultControls.cpp
    utc-Dali-DissolveEffect.cpp
-   utc-Dali-AccessibilityFocusManager.cpp
+   utc-Dali-AccessibilityManager.cpp
    utc-Dali-IrisEffect.cpp
    utc-Dali-ItemLayout.cpp
    utc-Dali-ItemView.cpp
@@ -65,7 +65,7 @@ SET(TC_SOURCES
 # Append list of test harness files (Won't get parsed for test cases)
 LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/test-harness.cpp
-   dali-toolkit-test-utils/toolkit-accessibility-manager.cpp
+   dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
    dali-toolkit-test-utils/toolkit-application.cpp
    dali-toolkit-test-utils/toolkit-clipboard.cpp
    dali-toolkit-test-utils/toolkit-imf-manager.cpp
@@ -74,6 +74,7 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-singleton-service.cpp
    dali-toolkit-test-utils/toolkit-timer.cpp
    dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
+   dali-toolkit-test-utils/toolkit-tts-player.cpp
    dali-toolkit-test-utils/dummy-control.cpp
    dali-toolkit-test-utils/dali-test-suite-utils.cpp
    dali-toolkit-test-utils/test-application.cpp

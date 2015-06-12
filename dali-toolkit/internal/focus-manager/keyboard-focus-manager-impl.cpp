@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
 #include <dali/public-api/actors/layer.h>
-#include <dali/devel-api/adaptor-framework/accessibility-manager.h>
+#include <dali/devel-api/adaptor-framework/accessibility-adaptor.h>
 #include <dali/devel-api/adaptor-framework/singleton-service.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
@@ -34,7 +34,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/focus-manager/accessibility-focus-manager.h>
+#include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 
 namespace Dali
@@ -515,10 +515,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     return;
   }
 
-  AccessibilityManager accessibilityManager = AccessibilityManager::Get();
-  bool isAccessibilityEnabled = accessibilityManager.IsEnabled();
+  AccessibilityAdaptor accessibilityAdaptor = AccessibilityAdaptor::Get();
+  bool isAccessibilityEnabled = accessibilityAdaptor.IsEnabled();
 
-  Toolkit::AccessibilityFocusManager accessibilityFocusManager = Toolkit::AccessibilityFocusManager::Get();
+  Toolkit::AccessibilityManager accessibilityManager = Toolkit::AccessibilityManager::Get();
 
   std::string keyName = event.keyPressedName;
 
@@ -546,7 +546,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       else
       {
         // Move the accessibility focus backward
-        accessibilityFocusManager.MoveFocusBackward();
+        accessibilityManager.MoveFocusBackward();
       }
     }
     else if (keyName == "Right")
@@ -567,7 +567,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       else
       {
         // Move the accessibility focus forward
-        accessibilityFocusManager.MoveFocusForward();
+        accessibilityManager.MoveFocusForward();
       }
 
       isFocusStartableKey = true;
@@ -663,7 +663,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
         }
         else
         {
-          actor = accessibilityFocusManager.GetCurrentFocusActor();
+          actor = accessibilityManager.GetCurrentFocusActor();
         }
 
         if(actor)
