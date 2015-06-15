@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-toolbar.h>
@@ -55,21 +56,10 @@ class TextSelectionPopup : public Control
 {
 public:
 
-  enum Buttons
-  {
-    CUT,
-    COPY,
-    PASTE,
-    SELECT,
-    SELECT_ALL,
-    CLIPBOARD,
-    ENUM_END
-  };
-
   struct ButtonRequirement
   {
     ButtonRequirement()
-    : id( ENUM_END ),
+    : id( Toolkit::TextSelectionPopup::NONE ),
       priority( 0u ),
       name(),
       caption(),
@@ -77,7 +67,7 @@ public:
       enabled( false )
     {}
 
-    ButtonRequirement( Buttons buttonId,
+    ButtonRequirement( Toolkit::TextSelectionPopup::Buttons buttonId,
                        std::size_t buttonPriority,
                        const std::string& buttonName,
                        const std::string& buttonCaption,
@@ -91,7 +81,7 @@ public:
       enabled( buttonEnabled )
     {}
 
-    Buttons id;
+    Toolkit::TextSelectionPopup::Buttons id;
     std::size_t priority;
     std::string name;
     std::string caption;
@@ -110,6 +100,13 @@ public:
    * @copydoc Dali::Toollkit::TextSelectionPopup::New()
    */
   static Toolkit::TextSelectionPopup New();
+
+  /**
+   * @brief New constructor with provided buttons to enable.
+   * @param[in] buttonsToEnable bit mask of buttons to enable
+   * @return A handle to the TextSelectionPopup control.
+   */
+  static Toolkit::TextSelectionPopup New( Toolkit::TextSelectionPopup::Buttons buttonsToEnable );
 
   // Properties
 
@@ -140,6 +137,13 @@ private: // From Control
 private: // Implementation
 
   /**
+   * @brief When a popup button is pressed
+   * @param[in] button the button pressed
+   * @return bool
+   */
+  bool OnButtonPressed( Toolkit::Button button );
+
+  /**
    * @brief Method to set the dimension or dimension constraint on certain aspects of the Popup.
    *
    * @param[in] settingToCustomise The setting for the PopupCustomisations enum that can be customised
@@ -160,7 +164,7 @@ private: // Implementation
    * @param[in] button  The button the image should be used for from the Buttons Enum.
    * @param[in] image The image to use.
    */
- void SetButtonImage( Buttons button, Dali::Image image );
+ void SetButtonImage( Toolkit::TextSelectionPopup::Buttons button, Dali::Image image );
 
   /**
    * @brief Retrieves the image of the given button used by the popup
@@ -168,7 +172,7 @@ private: // Implementation
    * @param[in] button The button to get the image from
    * @return The image used for that button.
    */
-  Dali::Image GetButtonImage( Buttons button );
+  Dali::Image GetButtonImage( Toolkit::TextSelectionPopup::Buttons button );
 
   void CreateOrderedListOfPopupOptions();
 
@@ -220,6 +224,8 @@ private: // Data
 
   std::vector<ButtonRequirement> mOrderListOfButtons; // List of buttons in the order to be displayed and a flag to indicate if needed.
 
+  Toolkit::TextSelectionPopup::Buttons mEnabledButtons; // stores enabled buttons
+
   Vector4 mLineColor;                   // Color of the line around the text input popup
   Vector4 mIconColor;                   // Color of the popup icon.
   Vector4 mIconPressedColor;            // Color of the popup icon when pressed.
@@ -232,8 +238,8 @@ private: // Data
   std::size_t mPasteOptionPriority;     // Position of Paste button
   std::size_t mClipboardOptionPriority; // Position of Clipboard button
 
-  bool mShowIcons; // Flag to show icons
-  bool mShowCaptions; // Flag to show text captions
+  bool mShowIcons:1; // Flag to show icons
+  bool mShowCaptions:1; // Flag to show text captions
 
 };
 

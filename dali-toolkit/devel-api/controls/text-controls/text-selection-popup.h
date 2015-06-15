@@ -46,6 +46,17 @@ class DALI_IMPORT_API TextSelectionPopup : public Control
 {
 public:
 
+  enum Buttons
+  {
+    CUT = 1u << 0,
+    COPY = 1u << 1,
+    PASTE = 1u << 2,
+    SELECT = 1u << 3,
+    SELECT_ALL = 1u << 4,
+    CLIPBOARD = 1u << 5,
+    NONE = 1u << 6,
+  };
+
   /**
    * @brief The start and end property ranges for this control.
    */
@@ -62,12 +73,11 @@ public:
   {
     enum
     {
-
-      POPUP_MAX_SIZE =  PROPERTY_START_INDEX,   ///< name "popup-max-size",                The maximum size the Popup can be,              type VECTOR2
-      POPUP_MIN_SIZE,                           ///< name "popup-min-size",                The minimum size the Popup can be,              type VECTOR2
-      OPTION_MAX_SIZE,                          ///< name "option-max-size",               The maximum size an option can be,              type VECTOR2
-      OPTION_MIN_SIZE,                          ///< name "option-min-size",               The minimum size an option can be,              type VECTOR2
-      OPTION_DIVIDER_SIZE,                      ///< name "option-divider-size",           The size of the divider between options         type VECTOR2
+      POPUP_MAX_SIZE =  PROPERTY_START_INDEX,   ///< name "popup-max-size",                maximum size the Popup can be,                  type VECTOR2
+      POPUP_MIN_SIZE,                           ///< name "popup-min-size",                minimum size the Popup can be,                  type VECTOR2
+      OPTION_MAX_SIZE,                          ///< name "option-max-size",               maximum size an option can be,                  type VECTOR2
+      OPTION_MIN_SIZE,                          ///< name "option-min-size",               minimum size an option can be,                  type VECTOR2
+      OPTION_DIVIDER_SIZE,                      ///< name "option-divider-size",           size of the divider between options             type VECTOR2
       POPUP_CLIPBOARD_BUTTON_ICON_IMAGE,        ///< name "popup-clipboard-button-image",  The image to use as the popup clipboard icon,   type STRING
       POPUP_CUT_BUTTON_ICON_IMAGE,              ///< name "popup-cut-button-image",        The image to use as the popup cut icon,         type STRING
       POPUP_COPY_BUTTON_ICON_IMAGE,             ///< name "popup-copy-button-image",       The image to use as the popup copy icon,        type STRING
@@ -82,6 +92,13 @@ public:
    * @return A handle to the TextSelectionPopup control.
    */
   static TextSelectionPopup New();
+
+  /**
+   * Create the TextSelectionPopup control with the given set of buttons.
+   * @param[in] enabledButtons The given set of buttons to enable
+   * @return A handle to the TextSelectionPopup control.
+   */
+  static TextSelectionPopup New( Buttons enabledButtons );
 
   /**
    * @brief Creates an empty handle.
