@@ -26,8 +26,6 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/devel-api/object/type-registry-helper.h>
-#include <iostream>
-#include <libintl.h>
 #include <cfloat>
 
 namespace Dali
@@ -120,6 +118,13 @@ void TextSelectionToolbar::OnInitialize()
   SetUp();
 }
 
+void TextSelectionToolbar::OnRelayout( const Vector2& size, RelayoutContainer& container )
+{
+  float width = std::max ( mTableOfButtons.GetNaturalSize().width, size.width );
+  mRulerX->SetDomain( RulerDomain( 0.0, width, true ) );
+  mScrollView.SetRulerX( mRulerX );
+}
+
 void TextSelectionToolbar::SetPopupMaxSize( const Size& maxSize )
 {
   mMaxSize = maxSize;
@@ -130,16 +135,35 @@ const Dali::Vector2& TextSelectionToolbar::GetPopupMaxSize() const
   return mMaxSize;
 }
 
+void TextSelectionToolbar::SetUpScrollView( Toolkit::ScrollView& scrollView )
+{
+  scrollView.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+  scrollView.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+  scrollView.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  scrollView.SetMaximumSize( mMaxSize );
+
+  scrollView.SetScrollingDirection( PanGestureDetector::DIRECTION_HORIZONTAL, Degree( 40.0f ) );
+  scrollView.SetAxisAutoLock( true );
+  scrollView.ScrollStartedSignal().Connect( this, &TextSelectionToolbar::OnScrollStarted );
+  scrollView.ScrollCompletedSignal().Connect( this, &TextSelectionToolbar::OnScrollCompleted );
+
+  mRulerX = new DefaultRuler();  // IntrusivePtr which is unreferenced when ScrollView is destroyed.
+
+  RulerPtr rulerY = new DefaultRuler();  // IntrusivePtr which is unreferenced when ScrollView is destroyed.
+  rulerY->Disable();
+  scrollView.SetRulerY( rulerY );
+}
+
 void TextSelectionToolbar::SetUp()
 {
   Actor self = Self();
   self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
 
-  // Create Layer and Stencil.
-  mStencilLayer = Layer::New();
-  mStencilLayer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
-  mStencilLayer.SetParentOrigin( ParentOrigin::CENTER );
-  mStencilLayer.SetMaximumSize( mMaxSize );
+  // Create Layer and Stencil.  Layer enable's clipping when content exceed maximum defined width.
+  Layer stencilLayer = Layer::New();
+  stencilLayer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+  stencilLayer.SetParentOrigin( ParentOrigin::CENTER );
+  stencilLayer.SetMaximumSize( mMaxSize );
 
   ImageActor stencil = CreateSolidColorActor( Color::RED );
   stencil.SetDrawMode( DrawMode::STENCIL );
@@ -147,21 +171,32 @@ void TextSelectionToolbar::SetUp()
   stencil.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   stencil.SetParentOrigin( ParentOrigin::CENTER );
 
-  Actor scrollview = Actor::New(); //todo make a scrollview
-  scrollview.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
-  scrollview.SetParentOrigin( ParentOrigin::CENTER );
+  mScrollView  = Toolkit::ScrollView::New();
+  SetUpScrollView( mScrollView );
 
-  // Toolbar needs at least one option, adding further options with increase it's size
+  // Toolbar must start with at least one option, adding further options with increase it's size
   mTableOfButtons = Dali::Toolkit::TableView::New( 1, 1 );
   mTableOfButtons.SetFitHeight( 0 );
-  mTableOfButtons.SetParentOrigin( ParentOrigin::CENTER );
+  mTableOfButtons.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+  mTableOfButtons.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
 
-  mStencilLayer.Add( stencil );
-  mStencilLayer.Add( scrollview );
-  scrollview.Add( mTableOfButtons );
-  self.Add( mStencilLayer );
 
-  mStencilLayer.RaiseToTop();
+  stencilLayer.Add( stencil );
+  stencilLayer.Add( mScrollView );
+  mScrollView.Add( mTableOfButtons );
+  self.Add( stencilLayer );
+
+  stencilLayer.RaiseToTop();
+}
+
+void TextSelectionToolbar::OnScrollStarted( const Vector2& position )
+{
+  mTableOfButtons.SetSensitive( false );
+}
+
+void TextSelectionToolbar::OnScrollCompleted( const Vector2& position )
+{
+  mTableOfButtons.SetSensitive( true );
 }
 
 void TextSelectionToolbar::AddOption( Actor& option )
@@ -197,6 +232,7 @@ TextSelectionToolbar::TextSelectionToolbar()
 
 TextSelectionToolbar::~TextSelectionToolbar()
 {
+  mRulerX.Reset();
 }
 
 
