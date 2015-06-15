@@ -1073,15 +1073,23 @@ void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dime
 
 Vector3 Control::GetNaturalSize()
 {
+  //Control's natural size is the size of its background image if it has been set, or ZERO otherwise
+  Vector3 naturalSize = Vector3::ZERO;
   if( mImpl->mBackground )
   {
-    Actor actor = mImpl->mBackground->actor;
-    if( actor )
+    Material backgroundMaterial = mImpl->mBackground->actor.GetRendererAt(0).GetMaterial();
+    if( backgroundMaterial.GetNumberOfSamplers() > 0 )
     {
-      return actor.GetNaturalSize();
+      Image backgroundImage =  backgroundMaterial.GetSamplerAt(0).GetImage();
+      if( backgroundImage )
+      {
+        naturalSize.x = backgroundImage.GetWidth();
+        naturalSize.y = backgroundImage.GetHeight();
+      }
     }
   }
-  return Vector3();
+
+  return naturalSize;
 }
 
 float Control::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
