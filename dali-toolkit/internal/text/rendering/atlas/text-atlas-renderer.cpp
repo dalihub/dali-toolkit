@@ -157,7 +157,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     mQuadIndexFormat[ "indices" ] = Property::UNSIGNED_INTEGER;
 
     mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    mShadowShader = Shader::New( VERTEX_SHADER_SHADOW, FRAGMENT_SHADER_SHADOW );
+    mShadowShader = Shader::New( VERTEX_SHADER_SHADOW, FRAGMENT_SHADER_SHADOW, Dali::Shader::HINT_MODIFIES_GEOMETRY );
   }
 
   void AddGlyphs( const std::vector<Vector2>& positions,
