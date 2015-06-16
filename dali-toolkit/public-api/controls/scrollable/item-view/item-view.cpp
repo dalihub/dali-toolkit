@@ -243,6 +243,11 @@ void ItemView::GetItemsRange(ItemRange& range)
   GetImpl(*this).GetItemsRange(range);
 }
 
+ItemView::LayoutActivatedSignalType& ItemView::LayoutActivatedSignal()
+{
+  return GetImpl(*this).LayoutActivatedSignal();
+}
+
 } // namespace Toolkit
 
 } // namespace Dali
