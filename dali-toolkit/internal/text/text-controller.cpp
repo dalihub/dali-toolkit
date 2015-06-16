@@ -1143,14 +1143,15 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 
       if( removed )
       {
-        if( 0u == mImpl->mLogicalModel->mText.Count() )
+        if( 0u != mImpl->mLogicalModel->mText.Count() ||
+            !mImpl->IsPlaceholderAvailable() )
         {
-          ShowPlaceholderText();
-          mImpl->mEventData->mUpdateCursorPosition = true;
+          mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
         }
         else
         {
-          mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
+          ShowPlaceholderText();
+          mImpl->mEventData->mUpdateCursorPosition = true;
         }
 
         textChanged = true;
