@@ -769,7 +769,6 @@ Dali::Property::Value PropertyValueWrapper::ExtractPropertyValue( v8::Isolate* i
       break;
     }
     case Dali::Property::NONE:
-    case Dali::Property::TYPE_COUNT:
     default:
     {
       break;

@@ -409,7 +409,6 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
       }
       break;
     }
-    case Property::TYPE_COUNT:
     case Property::NONE:
     {
       break;

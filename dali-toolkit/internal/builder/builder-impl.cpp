@@ -176,11 +176,6 @@ std::string PropertyValueToString( const Property::Value& value )
       ret = std::string("Map Size=") + ToString( value.Get<Property::Map>().Count() );
       break;
     }
-    case Property::TYPE_COUNT:
-    {
-      ret = "";
-      break;
-    }
   }
 
   return ret;
