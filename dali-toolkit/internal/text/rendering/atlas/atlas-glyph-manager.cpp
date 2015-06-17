@@ -133,6 +133,15 @@ const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
   return GetImplementation(*this).GetMetrics();
 }
 
+Shader AtlasGlyphManager::GetEffectBufferShader() const
+{
+  return GetImplementation(*this).GetEffectBufferShader();
+}
+
+Shader AtlasGlyphManager::GetGlyphShadowShader() const
+{
+  return GetImplementation(*this).GetGlyphShadowShader();
+}
 
 } // namespace Toolkit
 

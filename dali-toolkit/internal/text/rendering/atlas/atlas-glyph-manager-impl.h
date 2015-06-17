@@ -127,12 +127,29 @@ public:
    */
   const Toolkit::AtlasGlyphManager::Metrics& GetMetrics();
 
+  /**
+   * @copydoc Toolkit::AtlasGlyphManager::GetEffectBufferShader
+   */
+  Shader GetEffectBufferShader() const
+  {
+    return mEffectBufferShader;
+  }
+
+  /**
+   * @copydoc Toolkit::AtlasGlyphManager::GetGlyphShadowShader
+   */
+  Shader GetGlyphShadowShader() const
+  {
+    return mShadowShader;
+  }
+
 private:
 
-  Dali::Toolkit::AtlasManager mAtlasManager;
-  Vector< GlyphRecord > mGlyphRecords;
-  uint32_t mCount;
-  Toolkit::AtlasGlyphManager::Metrics mMetrics;
+  Dali::Toolkit::AtlasManager mAtlasManager;          ///> Atlas Manager created by GlyphManager
+  Vector< GlyphRecord > mGlyphRecords;                ///> Cached glyph information
+  Toolkit::AtlasGlyphManager::Metrics mMetrics;       ///> Metrics to pass back on GlyphManager status
+  Shader mEffectBufferShader;                         ///> Shader used to render drop shadow buffer textures
+  Shader mShadowShader;                               ///> Shader used to render drop shadow into buffer
 };
 
 } // namespace Internal

@@ -170,6 +170,20 @@ public:
    */
   const Metrics& GetMetrics();
 
+  /**
+   * @brief Get Shader used for rendering glyph effect buffers
+   *
+   * @return Handle of shader needed
+   */
+  Shader GetEffectBufferShader() const;
+
+  /**
+   * @brief Get Shader used rendering Glyph Shadows
+   *
+   * @return Handle of shader needed
+   */
+  Shader GetGlyphShadowShader() const;
+
 private:
 
   explicit DALI_INTERNAL AtlasGlyphManager(Internal::AtlasGlyphManager *impl);

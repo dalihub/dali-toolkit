@@ -42,70 +42,13 @@ namespace
   Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_RENDERING");
 #endif
 
-  const float ZERO( 0.0f );
-  const float HALF( 0.5f );
-  const float ONE( 1.0f );
-  const float TWO( 2.0f );
-  const uint32_t DEFAULT_ATLAS_WIDTH = 512u;
-  const uint32_t DEFAULT_ATLAS_HEIGHT = 512u;
-
-  #define MAKE_SHADER(A)#A
-
-  const char* VERTEX_SHADER = MAKE_SHADER(
-  attribute mediump vec2    aPosition;
-  attribute mediump vec2    aTexCoord;
-  uniform   mediump mat4    uMvpMatrix;
-  uniform   mediump vec3    uSize;
-  varying   mediump vec2    vTexCoord;
-
-  void main()
-  {
-    mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
-    position.xyz *= uSize;
-    gl_Position = uMvpMatrix * position;
-    vTexCoord = aTexCoord;
-  }
-  );
-
-  const char* FRAGMENT_SHADER = MAKE_SHADER(
-  uniform         sampler2D sTexture;
-  varying mediump vec2      vTexCoord;
-
-  void main()
-  {
-    //gl_FragColor = vec4( 1.0 );
-    gl_FragColor = texture2D( sTexture, vTexCoord );
-  }
-  );
-
-  const char* VERTEX_SHADER_SHADOW = MAKE_SHADER(
-  attribute mediump vec2    aPosition;
-  attribute mediump vec2    aTexCoord;
-  uniform   mediump vec3    uSize;
-  varying   mediump vec2    vTexCoord;
-
-  void main()
-  {
-    mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
-    position.xyz *= uSize;
-    gl_Position = position;
-    vTexCoord = aTexCoord;
-  }
-  );
-
-  const char* FRAGMENT_SHADER_SHADOW = MAKE_SHADER(
-  uniform         sampler2D sTexture;
-  uniform lowp    vec4      uColor;
-  varying mediump vec2      vTexCoord;
-
-  void main()
-  {
-    mediump vec4 color = texture2D( sTexture, vTexCoord );
-    gl_FragColor = vec4(uColor.rgb, uColor.a*color.r);
-  }
-  );
+const float ZERO( 0.0f );
+const float HALF( 0.5f );
+const float ONE( 1.0f );
+const float TWO( 2.0f );
+const uint32_t DEFAULT_ATLAS_WIDTH = 512u;
+const uint32_t DEFAULT_ATLAS_HEIGHT = 512u;
 }
-
 struct AtlasRenderer::Impl : public ConnectionTracker
 {
 
@@ -155,9 +98,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
     mQuadVertexFormat[ "aTexCoord" ] = Property::VECTOR2;
     mQuadIndexFormat[ "indices" ] = Property::UNSIGNED_INTEGER;
-
-    mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    mShadowShader = Shader::New( VERTEX_SHADER_SHADOW, FRAGMENT_SHADER_SHADOW, Dali::Shader::HINT_MODIFIES_GEOMETRY );
   }
 
   void AddGlyphs( const std::vector<Vector2>& positions,
@@ -663,7 +603,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     quadGeometry.SetIndexBuffer( quadIndices );
 
     Sampler sampler = Sampler::New( meshRecord.mBuffer, "sTexture" );
-    Material material = Material::New( mShader );
+    Material material = Material::New( mGlyphManager.GetEffectBufferShader() );
     material.AddSampler( sampler );
 
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
@@ -691,7 +631,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     normGeometry.AddVertexBuffer( normVertices );
     normGeometry.SetIndexBuffer( normIndices );
 
-    Material normMaterial = Material::New( mShadowShader );
+    Material normMaterial = Material::New( mGlyphManager.GetGlyphShadowShader() );
     Sampler normSampler =  mGlyphManager.GetSampler( meshRecord.mAtlasId );
     normMaterial.AddSampler( normSampler );
     Dali::Renderer normRenderer = Dali::Renderer::New( normGeometry, normMaterial );
@@ -737,8 +677,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
   AtlasGlyphManager mGlyphManager;                    ///< Glyph Manager to handle upload and caching
   Vector< uint32_t > mImageIds;                       ///< A list of imageIDs used by the renderer
   TextAbstraction::FontClient mFontClient;            ///> The font client used to supply glyph information
-  Shader mShader;                                     ///> Shader used to render drop shadow buffer textures
-  Shader mShadowShader;                               ///> Shader used to render drop shadow into buffer
   std::vector< MaxBlockSize > mBlockSizes;            ///> Maximum size needed to contain a glyph in a block within a new atlas
   std::vector< uint32_t > mFace;                      ///> Face indices for a quad
   Property::Map mQuadVertexFormat;
