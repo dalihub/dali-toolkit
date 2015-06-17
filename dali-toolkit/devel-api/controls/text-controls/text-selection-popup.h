@@ -56,15 +56,18 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the TextLabel class.
+   * @brief An enumeration of properties belonging to the TextSelectionPopup class.
    */
   struct Property
   {
     enum
     {
 
-      POPUP_MAX_SIZE,                           ///< name "popup-max-size",                The max size the Popup can be,                  type VECTOR2
-      POPUP_BACKGROUND_IMAGE,                   ///< name "popup-background-image",        The image to display for popup background       type STRING
+      POPUP_MAX_SIZE =  PROPERTY_START_INDEX,   ///< name "popup-max-size",                The maximum size the Popup can be,              type VECTOR2
+      POPUP_MIN_SIZE,                           ///< name "popup-min-size",                The minimum size the Popup can be,              type VECTOR2
+      OPTION_MAX_SIZE,                          ///< name "option-max-size",               The maximum size an option can be,              type VECTOR2
+      OPTION_MIN_SIZE,                          ///< name "option-min-size",               The minimum size an option can be,              type VECTOR2
+      OPTION_DIVIDER_SIZE,                      ///< name "option-divider-size",           The size of the divider between options         type VECTOR2
       POPUP_CLIPBOARD_BUTTON_ICON_IMAGE,        ///< name "popup-clipboard-button-image",  The image to use as the popup clipboard icon,   type STRING
       POPUP_CUT_BUTTON_ICON_IMAGE,              ///< name "popup-cut-button-image",        The image to use as the popup cut icon,         type STRING
       POPUP_COPY_BUTTON_ICON_IMAGE,             ///< name "popup-copy-button-image",       The image to use as the popup copy icon,        type STRING
@@ -138,6 +141,6 @@ public: // Not intended for application developers
 
 } // namespace Toolkit
 
-} // namepsace Dali
+} // namespace Dali
 
 #endif // __DALI_TOOLKIT_TEXT_SELECTION_POPUP_H__

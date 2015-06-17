@@ -37,6 +37,12 @@ distributing this software or its derivatives.
       "font-style":"Regular",
       "point-size":18
     },
+    "textselectionpopup":
+    {
+      "popup-max-size":[400,100],
+      "popup-min-size":[100,65],
+      "background-color":[0.0,0.0,0.0,1.0]
+    },
     "textfield":
     {
       "font-family":"HelveticaNeue",
