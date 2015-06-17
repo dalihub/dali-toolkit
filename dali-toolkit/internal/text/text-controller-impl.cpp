@@ -769,6 +769,11 @@ LineIndex Controller::Impl::GetClosestLine( float y ) const
     }
   }
 
+  if( lineIndex == 0 )
+  {
+    return 0;
+  }
+
   return lineIndex-1;
 }
 
