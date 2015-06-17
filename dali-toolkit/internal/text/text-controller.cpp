@@ -337,8 +337,7 @@ bool Controller::RemoveText( int cursorOffset, int numberOfChars )
       numberOfChars = currentText.Count() - cursorIndex;
     }
 
-    if( cursorIndex >= 0 &&
-        (cursorIndex + numberOfChars) <= currentText.Count() )
+    if( (cursorIndex + numberOfChars) <= currentText.Count() )
     {
       Vector<Character>::Iterator first = currentText.Begin() + cursorIndex;
       Vector<Character>::Iterator last  = first + numberOfChars;

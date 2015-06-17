@@ -212,11 +212,8 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
     {
       if( OptionalUnsignedInt v = replacer.IsUnsignedInteger( node) )
       {
-        if( *v >= 0 ) // with a loss of resolution....
-        {
-          value = *v;
-          done = true;
-        }
+        value = *v;
+        done = true;
       }
       break;
     }
