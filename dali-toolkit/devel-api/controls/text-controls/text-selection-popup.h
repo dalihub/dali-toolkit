@@ -27,6 +27,8 @@ namespace Dali
 namespace Toolkit
 {
 
+class TextSelectionPopupCallbackInterface;
+
 namespace Internal DALI_INTERNAL
 {
 class TextSelectionPopup;
@@ -90,9 +92,11 @@ public:
   /**
    * Create the TextSelectionPopup control with the given set of buttons.
    * @param[in] enabledButtons The given set of buttons to enable
+   * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
    * @return A handle to the TextSelectionPopup control.
    */
-  static TextSelectionPopup New( Buttons enabledButtons );
+  static TextSelectionPopup New( Buttons enabledButtons,
+                                 TextSelectionPopupCallbackInterface* callbackInterface );
 
   /**
    * @brief Creates an empty handle.

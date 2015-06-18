@@ -99,9 +99,11 @@ public:
   /**
    * @brief New constructor with provided buttons to enable.
    * @param[in] buttonsToEnable bit mask of buttons to enable
+   * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
    * @return A handle to the TextSelectionPopup control.
    */
-  static Toolkit::TextSelectionPopup New( Toolkit::TextSelectionPopup::Buttons buttonsToEnable );
+  static Toolkit::TextSelectionPopup New( Toolkit::TextSelectionPopup::Buttons buttonsToEnable,
+                                          TextSelectionPopupCallbackInterface* callbackInterface );
 
   // Properties
 
@@ -132,11 +134,46 @@ private: // From Control
 private: // Implementation
 
   /**
-   * @brief When a popup button is pressed
+   * @brief When the cut button is pressed.
    * @param[in] button the button pressed
-   * @return bool
+   * @return @e true to consume the event.
    */
-  bool OnButtonPressed( Toolkit::Button button );
+  bool OnCutButtonPressed( Toolkit::Button button );
+
+  /**
+   * @brief When the copy button is pressed.
+   * @param[in] button the button pressed
+   * @return @e true to consume the event.
+   */
+  bool OnCopyButtonPressed( Toolkit::Button button );
+
+  /**
+   * @brief When the paste button is pressed.
+   * @param[in] button the button pressed
+   * @return @e true to consume the event.
+   */
+  bool OnPasteButtonPressed( Toolkit::Button button );
+
+  /**
+   * @brief When the select button is pressed.
+   * @param[in] button the button pressed
+   * @return @e true to consume the event.
+   */
+  bool OnSelectButtonPressed( Toolkit::Button button );
+
+  /**
+   * @brief When the select all button is pressed.
+   * @param[in] button the button pressed
+   * @return @e true to consume the event.
+   */
+  bool OnSelectAllButtonPressed( Toolkit::Button button );
+
+  /**
+   * @brief When the clipboard button is pressed.
+   * @param[in] button the button pressed
+   * @return @e true to consume the event.
+   */
+  bool OnClipboardButtonPressed( Toolkit::Button button );
 
   /**
    * @brief Method to set the dimension or dimension constraint on certain aspects of the Popup.
@@ -171,7 +208,7 @@ private: // Implementation
 
   void CreateOrderedListOfPopupOptions();
 
-  void AddOption( const std::string& name, const std::string& caption, const Image iconImage, bool showDivider, bool showIcons, bool showCaption );
+  void AddOption( const ButtonRequirement& button, bool showDivider, bool showIcons, bool showCaption );
 
   std::size_t GetNumberOfEnabledOptions();
 
@@ -182,7 +219,7 @@ private: // Implementation
   /**
    * Construct a new TextField.
    */
-  TextSelectionPopup();
+  TextSelectionPopup( TextSelectionPopupCallbackInterface* callbackInterface );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -220,6 +257,7 @@ private: // Data
   std::vector<ButtonRequirement> mOrderListOfButtons; // List of buttons in the order to be displayed and a flag to indicate if needed.
 
   Toolkit::TextSelectionPopup::Buttons mEnabledButtons; // stores enabled buttons
+  Toolkit::TextSelectionPopupCallbackInterface* mCallbackInterface;
 
   Vector4 mLineColor;                   // Color of the line around the text input popup
   Vector4 mIconColor;                   // Color of the popup icon.

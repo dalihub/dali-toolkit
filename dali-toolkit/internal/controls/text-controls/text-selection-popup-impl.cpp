@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/text-controls/text-selection-popup-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
@@ -88,7 +89,7 @@ const char* const OPTION_CLIPBOARD("option-clipboard");                         
 
 BaseHandle Create()
 {
-  return Toolkit::TextSelectionPopup::New( Toolkit::TextSelectionPopup::NONE );
+  return Toolkit::TextSelectionPopup::New( Toolkit::TextSelectionPopup::NONE, NULL );
 }
 
 // Setup properties, signals and actions using the type-registry.
@@ -112,10 +113,11 @@ DALI_TYPE_REGISTRATION_END()
 } // namespace
 
 
-Dali::Toolkit::TextSelectionPopup TextSelectionPopup::New( Toolkit::TextSelectionPopup::Buttons buttonsToEnable )
+Dali::Toolkit::TextSelectionPopup TextSelectionPopup::New( Toolkit::TextSelectionPopup::Buttons buttonsToEnable,
+                                                           TextSelectionPopupCallbackInterface* callbackInterface )
 {
    // Create the implementation, temporarily owned by this handle on stack
-  IntrusivePtr< TextSelectionPopup > impl = new TextSelectionPopup();
+  IntrusivePtr< TextSelectionPopup > impl = new TextSelectionPopup( callbackInterface );
 
   // Pass ownership to CustomActor handle
   Dali::Toolkit::TextSelectionPopup handle( *impl );
@@ -128,6 +130,7 @@ Dali::Toolkit::TextSelectionPopup TextSelectionPopup::New( Toolkit::TextSelectio
 
   return handle;
 }
+
 void TextSelectionPopup::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
 {
   Toolkit::TextSelectionPopup selectionPopup = Toolkit::TextSelectionPopup::DownCast( Dali::BaseHandle( object ) );
@@ -299,8 +302,63 @@ void TextSelectionPopup::OnInitialize()
   CreatePopup();
 }
 
-bool TextSelectionPopup::OnButtonPressed( Toolkit::Button button )
+bool TextSelectionPopup::OnCutButtonPressed( Toolkit::Button button )
 {
+  if( mCallbackInterface )
+  {
+    mCallbackInterface->TextPopupButtonTouched( Toolkit::TextSelectionPopup::CUT );
+  }
+
+  return true;
+}
+
+bool TextSelectionPopup::OnCopyButtonPressed( Toolkit::Button button )
+{
+  if( mCallbackInterface )
+  {
+    mCallbackInterface->TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::COPY );
+  }
+
+  return true;
+}
+
+bool TextSelectionPopup::OnPasteButtonPressed( Toolkit::Button button )
+{
+  if( mCallbackInterface )
+  {
+    mCallbackInterface->TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::PASTE );
+  }
+
+  return true;
+}
+
+bool TextSelectionPopup::OnSelectButtonPressed( Toolkit::Button button )
+{
+  if( mCallbackInterface )
+  {
+    mCallbackInterface->TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::SELECT );
+  }
+
+  return true;
+}
+
+bool TextSelectionPopup::OnSelectAllButtonPressed( Toolkit::Button button )
+{
+  if( mCallbackInterface )
+  {
+    mCallbackInterface->TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::SELECT_ALL );
+  }
+
+  return true;
+}
+
+bool TextSelectionPopup::OnClipboardButtonPressed( Toolkit::Button button )
+{
+  if( mCallbackInterface )
+  {
+    mCallbackInterface->TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::CLIPBOARD );
+  }
+
   return true;
 }
 
@@ -507,8 +565,13 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
    std::sort( mOrderListOfButtons.begin(), mOrderListOfButtons.end(), TextSelectionPopup::ButtonPriorityCompare() );
  }
 
- void TextSelectionPopup::AddOption( const std::string& name, const std::string& caption, const Image iconImage, bool showDivider, bool showIcons, bool showCaption  )
+ void TextSelectionPopup::AddOption( const ButtonRequirement& button, bool showDivider, bool showIcons, bool showCaption  )
  {
+
+   const std::string& name = button.name;
+   const std::string& caption = button.caption;
+   Image iconImage = button.icon;
+
    // 1. Create the backgrounds for the popup option both normal and pressed.
    // Both containers will be added to a button.
 
@@ -581,7 +644,45 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
    option.SetName( name );
    option.SetAnimationTime( 0.0f );
    option.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
-   option.ClickedSignal().Connect( this, &TextSelectionPopup::OnButtonPressed );
+
+   switch( button.id )
+   {
+     case Toolkit::TextSelectionPopup::CUT:
+     {
+       option.ClickedSignal().Connect( this, &TextSelectionPopup::OnCutButtonPressed );
+       break;
+     }
+     case Toolkit::TextSelectionPopup::COPY:
+     {
+       option.ClickedSignal().Connect( this, &TextSelectionPopup::OnCopyButtonPressed );
+       break;
+     }
+     case Toolkit::TextSelectionPopup::PASTE:
+     {
+       option.ClickedSignal().Connect( this, &TextSelectionPopup::OnPasteButtonPressed );
+       break;
+     }
+     case Toolkit::TextSelectionPopup::SELECT:
+     {
+       option.ClickedSignal().Connect( this, &TextSelectionPopup::OnSelectButtonPressed );
+       break;
+     }
+     case Toolkit::TextSelectionPopup::SELECT_ALL:
+     {
+       option.ClickedSignal().Connect( this, &TextSelectionPopup::OnSelectAllButtonPressed );
+       break;
+     }
+     case Toolkit::TextSelectionPopup::CLIPBOARD:
+     {
+       option.ClickedSignal().Connect( this, &TextSelectionPopup::OnClipboardButtonPressed );
+       break;
+     }
+     case Toolkit::TextSelectionPopup::NONE:
+     {
+       // Nothing to do:
+       break;
+     }
+   }
 
    // 5. Set the normal option image.
    option.SetButtonImage( optionContainer );
@@ -631,7 +732,7 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
      if ( button.enabled )
      {
        numberOfOptionsAdded++;
-       AddOption(  button.name, button.caption, button.icon, ( numberOfOptionsAdded < numberOfOptionsRequired ) , showIcons, showCaptions );
+       AddOption(  button, ( numberOfOptionsAdded < numberOfOptionsRequired ) , showIcons, showCaptions );
      }
    }
  }
@@ -653,13 +754,14 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
    }
  }
 
-TextSelectionPopup::TextSelectionPopup()
+TextSelectionPopup::TextSelectionPopup( TextSelectionPopupCallbackInterface* callbackInterface )
 : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mToolbar(),
   mMaxSize(),
   mMinSize(),
   mOptionDividerSize( Size( 2.0f, 0.0f) ),
   mEnabledButtons( Toolkit::TextSelectionPopup::NONE ),
+  mCallbackInterface( callbackInterface ),
   mLineColor( DEFAULT_POPUP_LINE_COLOR ),
   mIconColor( DEFAULT_OPTION_ICON ),
   mPressedColor( DEFAULT_OPTION_ICON_PRESSED ),

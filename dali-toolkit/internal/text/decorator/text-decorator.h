@@ -38,6 +38,8 @@ class Vector4;
 namespace Toolkit
 {
 
+class TextSelectionPopupCallbackInterface;
+
 namespace Internal
 {
 class Control;
@@ -152,9 +154,12 @@ public:
    * @brief Create a new instance of a Decorator.
    *
    * @param[in] controller The controller which receives input events from Decorator components.
+   * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
+   *
    * @return A pointer to a new Decorator.
    */
-  static DecoratorPtr New( ControllerInterface& controller );
+  static DecoratorPtr New( ControllerInterface& controller,
+                           TextSelectionPopupCallbackInterface& callbackInterface );
 
   /**
    * @brief Set the bounding box which handles, popup and similar decorations will not exceed.
@@ -487,8 +492,10 @@ private:
   /**
    * @brief Private constructor.
    * @param[in] controller The controller which receives input events from Decorator components.
+   * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
    */
-  Decorator( ControllerInterface& controller );
+  Decorator( ControllerInterface& controller,
+             TextSelectionPopupCallbackInterface& callbackInterface );
 
   // Undefined
   Decorator( const Decorator& handle );

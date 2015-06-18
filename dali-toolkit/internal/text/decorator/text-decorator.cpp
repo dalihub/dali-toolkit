@@ -228,9 +228,11 @@ struct Decorator::Impl : public ConnectionTracker
     int offset;
   };
 
-  Impl( ControllerInterface& controller )
+  Impl( ControllerInterface& controller,
+        TextSelectionPopupCallbackInterface& callbackInterface )
   : mController( controller ),
     mEnabledPopupButtons( TextSelectionPopup::NONE ),
+    mTextSelectionPopupCallbackInterface( callbackInterface ),
     mBoundingBox( Rect<int>() ),
     mHighlightColor( LIGHT_BLUE ),
     mActiveCursor( ACTIVE_CURSOR_NONE ),
@@ -405,7 +407,7 @@ struct Decorator::Impl : public ConnectionTracker
       UnparentAndReset( mCopyPastePopup.actor );
       if ( !mCopyPastePopup.actor )
       {
-        mCopyPastePopup.actor = TextSelectionPopup::New( mEnabledPopupButtons );
+        mCopyPastePopup.actor = TextSelectionPopup::New( mEnabledPopupButtons, &mTextSelectionPopupCallbackInterface );
 #ifdef DECORATOR_DEBUG
         mCopyPastePopup.actor.SetName("mCopyPastePopup");
 #endif
@@ -1213,6 +1215,7 @@ struct Decorator::Impl : public ConnectionTracker
 
   PopupImpl           mCopyPastePopup;
   TextSelectionPopup::Buttons mEnabledPopupButtons; /// Bit mask of currently enabled Popup buttons
+  TextSelectionPopupCallbackInterface& mTextSelectionPopupCallbackInterface;
 
   Image               mHandleImages[HANDLE_TYPE_COUNT][HANDLE_IMAGE_TYPE_COUNT];
   Image               mCursorImage;
@@ -1245,9 +1248,11 @@ struct Decorator::Impl : public ConnectionTracker
   bool                mSwapSelectionHandles   : 1; ///< Whether to swap the selection handle images.
 };
 
-DecoratorPtr Decorator::New( ControllerInterface& controller )
+DecoratorPtr Decorator::New( ControllerInterface& controller,
+                             TextSelectionPopupCallbackInterface& callbackInterface )
 {
-  return DecoratorPtr( new Decorator(controller) );
+  return DecoratorPtr( new Decorator( controller,
+                                      callbackInterface ) );
 }
 
 void Decorator::SetBoundingBox( const Rect<int>& boundingBox )
@@ -1479,10 +1484,11 @@ Decorator::~Decorator()
   delete mImpl;
 }
 
-Decorator::Decorator( ControllerInterface& controller )
+Decorator::Decorator( ControllerInterface& controller,
+                      TextSelectionPopupCallbackInterface& callbackInterface )
 : mImpl( NULL )
 {
-  mImpl = new Decorator::Impl( controller );
+  mImpl = new Decorator::Impl( controller, callbackInterface );
 }
 
 } // namespace Text

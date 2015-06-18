@@ -873,7 +873,8 @@ void TextField::OnInitialize()
 
   mController = Text::Controller::New( *this );
 
-  mDecorator = Text::Decorator::New( *mController );
+  mDecorator = Text::Decorator::New( *mController,
+                                     *mController );
 
   mController->GetLayoutEngine().SetLayout( LayoutEngine::SINGLE_LINE_BOX );
 

@@ -1432,6 +1432,10 @@ void Controller::DecorationEvent( HandleType handleType, HandleState state, floa
   }
 }
 
+void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button )
+{
+}
+
 ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
 {
   bool update( false );

@@ -30,6 +30,7 @@
 #include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
@@ -67,9 +68,11 @@ enum PlaceholderType
  * It provides a view of the text that can be used by rendering back-ends.
  *
  * For selectable/editable UI controls, the controller handles input events from the UI control
- * and decorations (grab handles etc) via an interface.
+ * and decorations (grab handles etc) via the Decorator::ControllerInterface interface.
+ *
+ * The text selection popup button callbacks are as well handled via the TextSelectionPopupCallbackInterface interface.
  */
-class Controller : public RefObject, public Decorator::ControllerInterface
+class Controller : public RefObject, public Decorator::ControllerInterface, public TextSelectionPopupCallbackInterface
 {
 public:
 
@@ -538,6 +541,11 @@ public:
    * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::DecorationEvent()
    */
   virtual void DecorationEvent( HandleType handle, HandleState state, float x, float y );
+
+  /**
+   * @copydoc Dali::Toolkit::TextSelectionPopup::TextPopupButtonCallbackInterface::TextPopupButtonTouched()
+   */
+  virtual void TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button );
 
 protected:
 
