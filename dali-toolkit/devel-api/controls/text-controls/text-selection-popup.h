@@ -88,12 +88,6 @@ public:
   };
 
   /**
-   * Create the TextSelectionPopup control.
-   * @return A handle to the TextSelectionPopup control.
-   */
-  static TextSelectionPopup New();
-
-  /**
    * Create the TextSelectionPopup control with the given set of buttons.
    * @param[in] enabledButtons The given set of buttons to enable
    * @return A handle to the TextSelectionPopup control.

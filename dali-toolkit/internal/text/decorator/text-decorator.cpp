@@ -80,6 +80,8 @@ const char* DEFAULT_SELECTION_HANDLE_ONE_PRESSED( DALI_IMAGE_DIR "text-input-sel
 const char* DEFAULT_SELECTION_HANDLE_TWO_RELEASED( DALI_IMAGE_DIR "text-input-selection-handle-right.png" );
 const char* DEFAULT_SELECTION_HANDLE_TWO_PRESSED( DALI_IMAGE_DIR "text-input-selection-handle-right-press.png" );
 
+const int DEFAULT_POPUP_OFFSET( -100.0f ); // Vertical offset of Popup from cursor or handles position.
+
 const Dali::Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE( 1.5f, 2.0f, 1.0f );
 const Dali::Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.5f, 1.5f, 1.0f );
 
@@ -211,6 +213,19 @@ struct Decorator::Impl : public ConnectionTracker
     bool visible : 1;
     bool pressed : 1;
     bool flipped : 1;
+  };
+
+  struct PopupImpl
+  {
+    PopupImpl()
+    : position(),
+      offset( DEFAULT_POPUP_OFFSET )
+    {
+    }
+
+    TextSelectionPopup actor;
+    Vector3 position;
+    int offset;
   };
 
   Impl( ControllerInterface& controller )
@@ -386,22 +401,24 @@ struct Decorator::Impl : public ConnectionTracker
 
     if ( mActiveCopyPastePopup )
     {
-      if ( !mCopyPastePopup )
+      // todo Swap UnparentAndReset for DeterminePositionPopup() if mCopyPastePopup.actor valid Once the issue with the labels disappearing is fixed.
+      UnparentAndReset( mCopyPastePopup.actor );
+      if ( !mCopyPastePopup.actor )
       {
-        mCopyPastePopup = TextSelectionPopup::New( mEnabledPopupButtons );
+        mCopyPastePopup.actor = TextSelectionPopup::New( mEnabledPopupButtons );
 #ifdef DECORATOR_DEBUG
-        mCopyPastePopup.SetName("mCopyPastePopup");
+        mCopyPastePopup.actor.SetName("mCopyPastePopup");
 #endif
-        mCopyPastePopup.SetAnchorPoint( AnchorPoint::CENTER );
-        mCopyPastePopup.OnRelayoutSignal().Connect( this,  &Decorator::Impl::PopUpRelayoutComplete  ); // Position popup after size negotiation
-        mActiveLayer.Add ( mCopyPastePopup );
+        mCopyPastePopup.actor.SetAnchorPoint( AnchorPoint::CENTER );
+        mCopyPastePopup.actor.OnRelayoutSignal().Connect( this,  &Decorator::Impl::PopupRelayoutComplete  ); // Position popup after size negotiation
+        mActiveLayer.Add ( mCopyPastePopup.actor );
       }
     }
     else
     {
-     if ( mCopyPastePopup )
+     if ( mCopyPastePopup.actor )
      {
-       UnparentAndReset( mCopyPastePopup );
+       UnparentAndReset( mCopyPastePopup.actor );
      }
     }
   }
@@ -416,21 +433,43 @@ struct Decorator::Impl : public ConnectionTracker
     mHighlightPosition += scrollOffset;
   }
 
-  void PopUpRelayoutComplete( Actor actor )
+  void DeterminePositionPopup()
+  {
+    if ( !mActiveCopyPastePopup )
+    {
+      return;
+    }
+
+    if ( mHandle[LEFT_SELECTION_HANDLE].active || mHandle[RIGHT_SELECTION_HANDLE].active )
+    {
+      float minHandleXPosition = std::min (  mHandle[LEFT_SELECTION_HANDLE].position.x, mHandle[RIGHT_SELECTION_HANDLE].position.x );
+      float maxHandleXPosition = std::max (  mHandle[LEFT_SELECTION_HANDLE].position.x, mHandle[RIGHT_SELECTION_HANDLE].position.x );
+
+      float minHandleYPosition = std::min (  mHandle[LEFT_SELECTION_HANDLE].position.y, mHandle[RIGHT_SELECTION_HANDLE].position.y );
+
+      mCopyPastePopup.position.x = minHandleXPosition + ( ( maxHandleXPosition - minHandleXPosition ) *0.5f );
+      mCopyPastePopup.position.y = minHandleYPosition + mCopyPastePopup.offset;
+    }
+    else
+    {
+      mCopyPastePopup.position = Vector3( mCursor[PRIMARY_CURSOR].position.x, mCursor[PRIMARY_CURSOR].position.y -100.0f , 0.0f ); //todo 100 to be an offset Property
+    }
+
+    Vector3 popupSize = Vector3( mCopyPastePopup.actor.GetRelayoutSize( Dimension::WIDTH ), mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT ), 0.0f );
+
+    GetConstrainedPopupPosition( mCopyPastePopup.position, popupSize, AnchorPoint::CENTER, mActiveLayer, mBoundingBox );
+
+    SetUpPopupPositionNotifications();
+
+    mCopyPastePopup.actor.SetPosition( mCopyPastePopup.position );
+  }
+
+  void PopupRelayoutComplete( Actor actor )
   {
     // Size negotiation for CopyPastePopup complete so can get the size and constrain position within bounding box.
+    mCopyPastePopup.actor.OnRelayoutSignal().Disconnect( this, &Decorator::Impl::PopupRelayoutComplete  );
 
-    mCopyPastePopup.OnRelayoutSignal().Disconnect( this, &Decorator::Impl::PopUpRelayoutComplete  );
-
-    Vector3 popupPosition( mCursor[PRIMARY_CURSOR].position.x, mCursor[PRIMARY_CURSOR].position.y -100.0f , 0.0f); //todo 100 to be an offset Property
-
-    Vector3 popupSize = Vector3( mCopyPastePopup.GetRelayoutSize( Dimension::WIDTH ), mCopyPastePopup.GetRelayoutSize( Dimension::HEIGHT ), 0.0f );
-
-    GetConstrainedPopupPosition( popupPosition, popupSize, AnchorPoint::CENTER, mActiveLayer, mBoundingBox );
-
-    SetUpPopUpPositionNotifications();
-
-    mCopyPastePopup.SetPosition( popupPosition ); //todo grabhandle(cursor) or selection handle positions to be used
+    DeterminePositionPopup();
   }
 
   void CreateCursor( ImageActor& cursor, const Vector4& color )
@@ -1007,11 +1046,11 @@ struct Decorator::Impl : public ConnectionTracker
     // if can't be positioned above, then position below row.
     alternativeYPosition = AlternatePopUpPositionRelativeToCursor();
 
-    mCopyPastePopup.SetY( alternativeYPosition );
+    mCopyPastePopup.actor.SetY( alternativeYPosition );
   }
 
 
-  void SetUpPopUpPositionNotifications( )
+  void SetUpPopupPositionNotifications( )
   {
     // Note Property notifications ignore any set anchor point so conditions must allow for this.  Default is Top Left.
 
@@ -1020,11 +1059,11 @@ struct Decorator::Impl : public ConnectionTracker
     Vector4 worldCoordinatesBoundingBox;
     LocalToWorldCoordinatesBoundingBox( mBoundingBox, worldCoordinatesBoundingBox );
 
-    float popupHeight = mCopyPastePopup.GetRelayoutSize( Dimension::HEIGHT);
+    float popupHeight = mCopyPastePopup.actor.GetRelayoutSize( Dimension::HEIGHT);
 
-    PropertyNotification verticalExceedNotification = mCopyPastePopup.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
-                                                      OutsideCondition( worldCoordinatesBoundingBox.y + popupHeight/2,
-                                                                        worldCoordinatesBoundingBox.w - popupHeight/2 ) );
+    PropertyNotification verticalExceedNotification = mCopyPastePopup.actor.AddPropertyNotification( Actor::Property::WORLD_POSITION_Y,
+                                                      OutsideCondition( worldCoordinatesBoundingBox.y + popupHeight * 0.5f,
+                                                                        worldCoordinatesBoundingBox.w - popupHeight * 0.5f ) );
 
     verticalExceedNotification.NotifySignal().Connect( this, &Decorator::Impl::PopUpLeavesVerticalBoundary );
   }
@@ -1061,6 +1100,11 @@ struct Decorator::Impl : public ConnectionTracker
     }
 
     requiredPopupPosition.x = requiredPopupPosition.x + xOffSetToKeepWithinBounds;
+
+    // Prevent pixel mis-alignment by rounding down.
+    requiredPopupPosition.x = static_cast<int>( requiredPopupPosition.x );
+    requiredPopupPosition.y = static_cast<int>( requiredPopupPosition.y );
+
   }
 
   void FlipSelectionHandleImages()
@@ -1166,7 +1210,8 @@ struct Decorator::Impl : public ConnectionTracker
   ImageActor          mPrimaryCursor;
   ImageActor          mSecondaryCursor;
   MeshActor           mHighlightMeshActor;        ///< Mesh Actor to display highlight
-  TextSelectionPopup  mCopyPastePopup;
+
+  PopupImpl           mCopyPastePopup;
   TextSelectionPopup::Buttons mEnabledPopupButtons; /// Bit mask of currently enabled Popup buttons
 
   Image               mHandleImages[HANDLE_TYPE_COUNT][HANDLE_IMAGE_TYPE_COUNT];

@@ -97,11 +97,6 @@ public:
   };
 
   /**
-   * @copydoc Dali::Toollkit::TextSelectionPopup::New()
-   */
-  static Toolkit::TextSelectionPopup New();
-
-  /**
    * @brief New constructor with provided buttons to enable.
    * @param[in] buttonsToEnable bit mask of buttons to enable
    * @return A handle to the TextSelectionPopup control.
@@ -228,7 +223,7 @@ private: // Data
 
   Vector4 mLineColor;                   // Color of the line around the text input popup
   Vector4 mIconColor;                   // Color of the popup icon.
-  Vector4 mIconPressedColor;            // Color of the popup icon when pressed.
+  Vector4 mPressedColor;                // Color of the popup option when pressed.
 
   // Priority of Options/Buttons in the Cut and Paste pop-up, higher priority buttons are displayed first, left to right.
   std::size_t mSelectOptionPriority;    // Position of Select Button

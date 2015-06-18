@@ -47,7 +47,7 @@ namespace
 
 const Dali::Vector4 DEFAULT_POPUP_LINE_COLOR( Dali::Vector4( 0.69f, 0.93f, 0.93f, 1.0f ) );
 const Dali::Vector4 DEFAULT_OPTION_ICON( Dali::Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
-const Dali::Vector4 DEFAULT_OPTION_ICON_PRESSED( Dali::Vector4( 0.5f, 1.0f, 1.0f, 1.0f ) );
+const Dali::Vector4 DEFAULT_OPTION_ICON_PRESSED( Dali::Vector4( 0.12f, 0.56f, 1.0f, 1.0f ) );
 
 const std::string DEFAULT_POPUP_BACKGROUND_IMAGE( DALI_IMAGE_DIR "selection-popup-bg#.png" );
 const std::string OPTION_ICON_CLIPBOARD( DALI_IMAGE_DIR "copy_paste_icon_clipboard.png" );
@@ -88,7 +88,7 @@ const char* const OPTION_CLIPBOARD("option-clipboard");                         
 
 BaseHandle Create()
 {
-  return Toolkit::TextSelectionPopup::New();
+  return Toolkit::TextSelectionPopup::New( Toolkit::TextSelectionPopup::NONE );
 }
 
 // Setup properties, signals and actions using the type-registry.
@@ -111,20 +111,6 @@ DALI_TYPE_REGISTRATION_END()
 
 } // namespace
 
-Dali::Toolkit::TextSelectionPopup TextSelectionPopup::New()
-{
-  // Create the implementation, temporarily owned by this handle on stack
-  IntrusivePtr< TextSelectionPopup > impl = new TextSelectionPopup();
-
-  // Pass ownership to CustomActor handle
-  Dali::Toolkit::TextSelectionPopup handle( *impl );
-
-  // Second-phase init of the implementation
-  // This can only be done after the CustomActor connection has been made...
-  impl->Initialize();
-
-  return handle;
-}
 
 Dali::Toolkit::TextSelectionPopup TextSelectionPopup::New( Toolkit::TextSelectionPopup::Buttons buttonsToEnable )
 {
@@ -535,7 +521,7 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
    optionPressedContainer.SetDrawMode( DrawMode::OVERLAY );
    optionPressedContainer.SetFitHeight( 0 );
    optionPressedContainer.SetFitWidth( 0 );
-   optionPressedContainer.SetBackgroundColor(Color::RED); //todo member variable
+   optionPressedContainer.SetBackgroundColor( mPressedColor );
 
 #ifdef DECORATOR_DEBUG
    optionContainer.SetName("optionContainer");
@@ -556,7 +542,7 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
      Padding padding;
      padding.left = 24.0f;
      padding.right = 24.0f;
-     padding.top = 13.0f;
+     padding.top = 14.0f;
      padding.bottom = 14.0f;
      captionTextLabel.SetPadding( padding );
      pressedCaptionTextLabel.SetPadding( padding );
@@ -574,7 +560,6 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
      icon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
      pressedIcon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
      icon.SetColor( mIconColor );
-     pressedIcon.SetColor( mIconPressedColor );
 
      if ( showCaption & showIcons )
      {
@@ -677,7 +662,7 @@ TextSelectionPopup::TextSelectionPopup()
   mEnabledButtons( Toolkit::TextSelectionPopup::NONE ),
   mLineColor( DEFAULT_POPUP_LINE_COLOR ),
   mIconColor( DEFAULT_OPTION_ICON ),
-  mIconPressedColor( DEFAULT_OPTION_ICON_PRESSED ),
+  mPressedColor( DEFAULT_OPTION_ICON_PRESSED ),
   mSelectOptionPriority( 1 ),
   mSelectAllOptionPriority ( 2 ),
   mCutOptionPriority ( 3 ),

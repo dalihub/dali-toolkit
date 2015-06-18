@@ -847,7 +847,17 @@ void Controller::Impl::ChangeState( EventData::State newState )
       mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
       if( mEventData->mGrabHandlePopupEnabled )
       {
-        TextSelectionPopup::Buttons selectedButtons = TextSelectionPopup::Buttons( TextSelectionPopup::COPY );
+        TextSelectionPopup::Buttons selectedButtons = TextSelectionPopup::Buttons(  TextSelectionPopup::CUT | TextSelectionPopup::COPY );
+        mEventData->mDecorator->SetEnabledPopupButtons( selectedButtons );
+        mEventData->mDecorator->SetPopupActive( true );
+      }
+      mEventData->mDecoratorUpdated = true;
+    }
+    else if ( EventData::SELECTION_CHANGED  == mEventData->mState )
+    {
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
+        TextSelectionPopup::Buttons selectedButtons = TextSelectionPopup::Buttons( TextSelectionPopup::CUT | TextSelectionPopup::COPY );
         mEventData->mDecorator->SetEnabledPopupButtons( selectedButtons );
         mEventData->mDecorator->SetPopupActive( true );
       }

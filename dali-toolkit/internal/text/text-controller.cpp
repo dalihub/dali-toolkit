@@ -47,6 +47,12 @@ const float MAX_FLOAT = std::numeric_limits<float>::max();
 
 const std::string EMPTY_STRING("");
 
+float ConvertToEven( float value )
+{
+  int intValue(static_cast<int>( value ));
+  return static_cast<float>(intValue % 2 == 0) ? intValue : (intValue + 1);
+}
+
 } // namespace
 
 namespace Dali
@@ -532,6 +538,9 @@ Vector3 Controller::GetNaturalSize()
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::GetNaturalSize cached %f,%f,%f\n", naturalSize.x, naturalSize.y, naturalSize.z );
   }
+
+  naturalSize.x = ConvertToEven( naturalSize.x );
+  naturalSize.y = ConvertToEven( naturalSize.y );
 
   return naturalSize;
 }
@@ -1312,11 +1321,7 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
 
       if( !isShowingPlaceholderText && tapDuringEditMode )
       {
-        // Grab handle is not shown until a tap is received whilst EDITING
-        if( tapDuringEditMode )
-        {
-          mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
-        }
+        mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
         mImpl->mEventData->mDecorator->SetPopupActive( false );
       }
 
@@ -1326,7 +1331,14 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
              mImpl->mEventData->mSelectionEnabled &&
              ( 2u == tapCount ) )
     {
-      mImpl->ChangeState( EventData::SELECTING );
+      if ( mImpl->mEventData->mState == EventData::SELECTING )
+      {
+        mImpl->ChangeState( EventData::SELECTION_CHANGED );
+      }
+      else
+      {
+        mImpl->ChangeState( EventData::SELECTING );
+      }
     }
   }
 

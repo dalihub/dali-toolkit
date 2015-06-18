@@ -43,8 +43,6 @@ namespace
 {
 const Dali::Vector2 DEFAULT_MAX_SIZE( 400.0f, 65.0f ); ///< The maximum size of the Toolbar.
 
-} // namespace
-
 BaseHandle Create()
 {
   return Toolkit::TextSelectionToolbar::New();
@@ -57,6 +55,8 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextSelectionToolbar, Toolkit::Control, C
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "max-size", VECTOR2, MAX_SIZE )
 
 DALI_TYPE_REGISTRATION_END()
+
+} // namespace
 
 Dali::Toolkit::TextSelectionToolbar TextSelectionToolbar::New()
 {
