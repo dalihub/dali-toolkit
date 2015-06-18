@@ -75,8 +75,10 @@ namespace
 
 const char* DEFAULT_GRAB_HANDLE_IMAGE_RELEASED( DALI_IMAGE_DIR "insertpoint-icon.png" );
 const char* DEFAULT_GRAB_HANDLE_IMAGE_PRESSED( DALI_IMAGE_DIR "insertpoint-icon-pressed.png" );
-const char* DEFAULT_SELECTION_HANDLE_ONE( DALI_IMAGE_DIR "text-input-selection-handle-left.png" );
-const char* DEFAULT_SELECTION_HANDLE_TWO( DALI_IMAGE_DIR "text-input-selection-handle-right.png" );
+const char* DEFAULT_SELECTION_HANDLE_ONE_RELEASED( DALI_IMAGE_DIR "text-input-selection-handle-left.png" );
+const char* DEFAULT_SELECTION_HANDLE_ONE_PRESSED( DALI_IMAGE_DIR "text-input-selection-handle-left-press.png" );
+const char* DEFAULT_SELECTION_HANDLE_TWO_RELEASED( DALI_IMAGE_DIR "text-input-selection-handle-right.png" );
+const char* DEFAULT_SELECTION_HANDLE_TWO_PRESSED( DALI_IMAGE_DIR "text-input-selection-handle-right-press.png" );
 
 const Dali::Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE( 1.5f, 2.0f, 1.0f );
 const Dali::Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.5f, 1.5f, 1.0f );
@@ -193,6 +195,7 @@ struct Decorator::Impl : public ConnectionTracker
       grabDisplacementY( 0.f ),
       active( false ),
       visible( false ),
+      pressed( false ),
       flipped( false )
     {
     }
@@ -206,6 +209,7 @@ struct Decorator::Impl : public ConnectionTracker
     float grabDisplacementY;
     bool active  : 1;
     bool visible : 1;
+    bool pressed : 1;
     bool flipped : 1;
   };
 
@@ -359,22 +363,12 @@ struct Decorator::Impl : public ConnectionTracker
         {
           primary.actor.SetPosition( primaryPosition.x,
                                      primaryPosition.y + primary.lineHeight );
-
-          const bool flip = mSwapSelectionHandles ^ primary.flipped;
-          primary.actor.SetImage( flip ? mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] : mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
-
-          primary.actor.SetAnchorPoint( flip ? AnchorPoint::TOP_LEFT : AnchorPoint::TOP_RIGHT );
         }
 
         if( isSecondaryVisible )
         {
           secondary.actor.SetPosition( secondaryPosition.x,
                                        secondaryPosition.y + secondary.lineHeight );
-
-          const bool flip = mSwapSelectionHandles ^ secondary.flipped;
-
-          secondary.actor.SetImage( ( mSwapSelectionHandles ^ secondary.flipped ) ? mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] : mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
-          secondary.actor.SetAnchorPoint( flip ? AnchorPoint::TOP_RIGHT : AnchorPoint::TOP_LEFT );
         }
       }
       primary.actor.SetVisible( isPrimaryVisible );
@@ -595,7 +589,11 @@ struct Decorator::Impl : public ConnectionTracker
     {
       if( !mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] )
       {
-        mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE );
+        mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE_RELEASED );
+      }
+      if( !mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED] )
+      {
+        mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED] = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE_PRESSED );
       }
 
       primary.actor = ImageActor::New( mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
@@ -627,7 +625,11 @@ struct Decorator::Impl : public ConnectionTracker
     {
       if( !mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] )
       {
-        mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO );
+        mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO_RELEASED );
+      }
+      if( !mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED] )
+      {
+        mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED] = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO_PRESSED );
       }
 
       secondary.actor = ImageActor::New( mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
@@ -831,7 +833,23 @@ struct Decorator::Impl : public ConnectionTracker
       {
         mController.DecorationEvent( type, HANDLE_RELEASED, x, y );
       }
-      handle.actor.SetImage( mHandleImages[type][HANDLE_IMAGE_RELEASED] );
+
+      if( GRAB_HANDLE == type )
+      {
+        handle.actor.SetImage( mHandleImages[type][HANDLE_IMAGE_RELEASED] );
+      }
+      else
+      {
+        HandleType selectionHandleType = type;
+
+        if( mSwapSelectionHandles != handle.flipped )
+        {
+          selectionHandleType = ( LEFT_SELECTION_HANDLE == type ) ? RIGHT_SELECTION_HANDLE : LEFT_SELECTION_HANDLE;
+        }
+
+        handle.actor.SetImage( mHandleImages[selectionHandleType][HANDLE_IMAGE_RELEASED] );
+      }
+      handle.pressed = false;
     }
   }
 
@@ -863,15 +881,23 @@ struct Decorator::Impl : public ConnectionTracker
     {
       const TouchPoint& point = event.GetPoint(0);
 
-      if( TouchPoint::Down == point.state &&
-          mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_PRESSED] )
+      if( TouchPoint::Down == point.state )
       {
-        mHandle[GRAB_HANDLE].actor.SetImage( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_PRESSED] );
+        mHandle[GRAB_HANDLE].pressed = true;
+        Image imagePressed = mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_PRESSED];
+        if( imagePressed )
+        {
+          mHandle[GRAB_HANDLE].actor.SetImage( imagePressed );
+        }
       }
-      else if( TouchPoint::Up == point.state &&
-               mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] )
+      else if( TouchPoint::Up == point.state )
       {
-        mHandle[GRAB_HANDLE].actor.SetImage( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] );
+        mHandle[GRAB_HANDLE].pressed = false;
+        Image imageReleased = mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED];
+        if( imageReleased )
+        {
+          mHandle[GRAB_HANDLE].actor.SetImage( imageReleased );
+        }
       }
     }
 
@@ -879,16 +905,68 @@ struct Decorator::Impl : public ConnectionTracker
     return true;
   }
 
-  bool OnHandleOneTouched( Actor actor, const TouchEvent& touch )
+  bool OnHandleOneTouched( Actor actor, const TouchEvent& event )
   {
-    // TODO
+    // Switch between pressed/release selection handle images
+    if( event.GetPointCount() > 0 &&
+        mHandle[LEFT_SELECTION_HANDLE].actor )
+    {
+      const TouchPoint& point = event.GetPoint(0);
+
+      const bool flip = mSwapSelectionHandles != mHandle[LEFT_SELECTION_HANDLE].flipped;
+      if( TouchPoint::Down == point.state )
+      {
+        mHandle[LEFT_SELECTION_HANDLE].pressed = true;
+        Image imagePressed = mHandleImages[flip ? RIGHT_SELECTION_HANDLE : LEFT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED];
+        if( imagePressed )
+        {
+          mHandle[LEFT_SELECTION_HANDLE].actor.SetImage( imagePressed );
+        }
+      }
+      else if( TouchPoint::Up == point.state )
+      {
+        mHandle[LEFT_SELECTION_HANDLE].pressed = false;
+        Image imageReleased = mHandleImages[flip ? RIGHT_SELECTION_HANDLE : LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED];
+        if( imageReleased )
+        {
+          mHandle[LEFT_SELECTION_HANDLE].actor.SetImage( imageReleased );
+        }
+      }
+    }
+
     // Consume to avoid pop-ups accidentally closing, when handle is outside of pop-up area
     return true;
   }
 
-  bool OnHandleTwoTouched( Actor actor, const TouchEvent& touch )
+  bool OnHandleTwoTouched( Actor actor, const TouchEvent& event )
   {
-    // TODO
+    // Switch between pressed/release selection handle images
+    if( event.GetPointCount() > 0 &&
+        mHandle[RIGHT_SELECTION_HANDLE].actor )
+    {
+      const TouchPoint& point = event.GetPoint(0);
+
+      const bool flip = mSwapSelectionHandles != mHandle[RIGHT_SELECTION_HANDLE].flipped;
+      if( TouchPoint::Down == point.state )
+      {
+        Image imagePressed = mHandleImages[flip ? LEFT_SELECTION_HANDLE : RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED];
+        mHandle[RIGHT_SELECTION_HANDLE].pressed = true;
+        if( imagePressed )
+        {
+          mHandle[RIGHT_SELECTION_HANDLE].actor.SetImage( imagePressed );
+        }
+      }
+      else if( TouchPoint::Up == point.state )
+      {
+        Image imageReleased = mHandleImages[flip ? LEFT_SELECTION_HANDLE : RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED];
+        mHandle[RIGHT_SELECTION_HANDLE].pressed = false;
+        if( imageReleased )
+        {
+          mHandle[RIGHT_SELECTION_HANDLE].actor.SetImage( imageReleased );
+        }
+      }
+    }
+
     // Consume to avoid pop-ups accidentally closing, when handle is outside of pop-up area
     return true;
   }
@@ -983,6 +1061,29 @@ struct Decorator::Impl : public ConnectionTracker
     }
 
     requiredPopupPosition.x = requiredPopupPosition.x + xOffSetToKeepWithinBounds;
+  }
+
+  void FlipSelectionHandleImages()
+  {
+    SetupTouchEvents();
+
+    CreateSelectionHandles();
+
+    HandleImpl& leftHandle = mHandle[LEFT_SELECTION_HANDLE];
+    HandleImpl& rightHandle = mHandle[RIGHT_SELECTION_HANDLE];
+
+    const HandleImageType leftImageType = leftHandle.pressed ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED;
+    const HandleImageType rightImageType = rightHandle.pressed ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED;
+    const bool leftFlipped = mSwapSelectionHandles != leftHandle.flipped;
+    const bool rightFlipped = mSwapSelectionHandles != rightHandle.flipped;
+
+    leftHandle.actor.SetImage( leftFlipped ? mHandleImages[RIGHT_SELECTION_HANDLE][leftImageType] : mHandleImages[LEFT_SELECTION_HANDLE][leftImageType] );
+
+    leftHandle.actor.SetAnchorPoint( leftFlipped ? AnchorPoint::TOP_LEFT : AnchorPoint::TOP_RIGHT );
+
+    rightHandle.actor.SetImage( rightFlipped ? mHandleImages[LEFT_SELECTION_HANDLE][rightImageType] : mHandleImages[RIGHT_SELECTION_HANDLE][rightImageType] );
+
+    rightHandle.actor.SetAnchorPoint( rightFlipped ? AnchorPoint::TOP_RIGHT : AnchorPoint::TOP_LEFT );
   }
 
   void SetScrollThreshold( float threshold )
@@ -1261,6 +1362,8 @@ const Vector2& Decorator::GetPosition( HandleType handleType ) const
 void Decorator::SwapSelectionHandlesEnabled( bool enable )
 {
   mImpl->mSwapSelectionHandles = enable;
+
+  mImpl->FlipSelectionHandleImages();
 }
 
 void Decorator::AddHighlight( float x1, float y1, float x2, float y2 )

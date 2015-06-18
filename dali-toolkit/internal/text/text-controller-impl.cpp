@@ -713,6 +713,12 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
 void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart, CharacterIndex selectionEnd )
 {
+  if( selectionStart == selectionEnd )
+  {
+    // Nothing to select if handles are in the same place.
+    return;
+  }
+
   mEventData->mDecorator->ClearHighlights();
 
   mEventData->mLeftSelectionPosition = selectionStart;
@@ -727,9 +733,10 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   // TODO: Multi-line.
 
   const Vector<LineRun>& lines = mVisualModel->mLines;
-  const float height = lines[0].ascender + -lines[0].descender;
+  const LineRun& firstLine = *lines.Begin();
+  const float height = firstLine.ascender + -firstLine.descender;
 
-  const bool indicesSwapped = selectionStart > selectionEnd;
+  const bool indicesSwapped = ( selectionStart > selectionEnd );
   if( indicesSwapped )
   {
     std::swap( selectionStart, selectionEnd );
@@ -738,7 +745,7 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   GlyphIndex glyphStart = *( charactersToGlyphBuffer + selectionStart );
   GlyphIndex glyphEnd = *( charactersToGlyphBuffer + ( selectionEnd - 1u ) ) + *( glyphsPerCharacterBuffer + ( selectionEnd - 1u ) ) - 1u;
 
-  mEventData->mDecorator->SwapSelectionHandlesEnabled( indicesSwapped );
+  mEventData->mDecorator->SwapSelectionHandlesEnabled( firstLine.direction != indicesSwapped );
 
   const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
 
