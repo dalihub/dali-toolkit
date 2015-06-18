@@ -41,6 +41,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
@@ -390,6 +391,7 @@ struct Decorator::Impl : public ConnectionTracker
   void CreateCursor( ImageActor& cursor, const Vector4& color )
   {
     cursor = CreateSolidColorActor( color );
+    cursor.SetDepthIndex( DECORATION_DEPTH_INDEX );
     cursor.SetParentOrigin( ParentOrigin::TOP_LEFT ); // Need to set the default parent origin as CreateSolidColorActor() sets a different one.
     cursor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
   }
@@ -507,8 +509,8 @@ struct Decorator::Impl : public ConnectionTracker
       }
 
       grabHandle.actor = ImageActor::New( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] );
+      grabHandle.actor.SetDepthIndex( DECORATION_DEPTH_INDEX );
       grabHandle.actor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
-      grabHandle.actor.SetDrawMode( DrawMode::OVERLAY );
       // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
       grabHandle.actor.SetName( "GrabHandleActor" );
@@ -555,7 +557,7 @@ struct Decorator::Impl : public ConnectionTracker
       primary.actor.SetName("SelectionHandleOne");
 #endif
       primary.actor.SetAnchorPoint( AnchorPoint::TOP_RIGHT ); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
-      primary.actor.SetDrawMode( DrawMode::OVERLAY ); // ensure grab handle above text
+      primary.actor.SetDepthIndex( DECORATION_DEPTH_INDEX );
       primary.flipped = false;
 
       primary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
@@ -587,7 +589,7 @@ struct Decorator::Impl : public ConnectionTracker
       secondary.actor.SetName("SelectionHandleTwo");
 #endif
       secondary.actor.SetAnchorPoint( AnchorPoint::TOP_LEFT ); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
-      secondary.actor.SetDrawMode( DrawMode::OVERLAY ); // ensure grab handle above text
+      secondary.actor.SetDepthIndex( DECORATION_DEPTH_INDEX );
       secondary.flipped = false;
 
       secondary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move

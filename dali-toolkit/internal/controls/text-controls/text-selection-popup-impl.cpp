@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
+#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
@@ -423,13 +424,11 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
    // Both containers will be added to a button.
 
    Toolkit::TableView optionContainer = Toolkit::TableView::New( (showIcons)?2:1 , 1 );
-   optionContainer.SetDrawMode( DrawMode::OVERLAY );
    optionContainer.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
    optionContainer.SetMinimumSize( Vector2( OPTION_MIN_WIDTH, 0 ) );
    optionContainer.SetFitWidth( 0 );
 
    Toolkit::TableView  optionPressedContainer = Toolkit::TableView::New( (showIcons)?2:1 , 1 );
-   optionPressedContainer.SetDrawMode( DrawMode::OVERLAY );
    optionPressedContainer.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
    optionPressedContainer.SetMinimumSize( Vector2( OPTION_MIN_WIDTH, 0 ) );
    optionPressedContainer.SetFitWidth( 0 );
@@ -464,6 +463,8 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
      // 3. Create the icons
      ImageActor pressedIcon = ImageActor::New(  iconImage );
      ImageActor icon = ImageActor::New(  iconImage );
+     icon.SetDepthIndex( DECORATION_DEPTH_INDEX - 1 );
+     pressedIcon.SetDepthIndex( DECORATION_DEPTH_INDEX - 1 );
      icon.SetName("image-icon-2014");
      icon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
      pressedIcon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );

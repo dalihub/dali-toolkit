@@ -25,12 +25,8 @@
 
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/atlas-manager/atlas-manager.h>
-#include <dali-toolkit/internal/text/line-run.h>
+#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
-#include <dali-toolkit/internal/text/rendering/shaders/text-basic-shader.h>
-#include <dali-toolkit/internal/text/rendering/shaders/text-bgra-shader.h>
-//#include <dali-toolkit/internal/text/rendering/shaders/text-basic-shadow-shader.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -377,7 +373,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
     Material material = mGlyphManager.GetMaterial( meshRecord.mAtlasId );
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
-    renderer.SetDepthIndex( 0 );
     Actor actor = Actor::New();
     actor.AddRenderer( renderer );
     actor.SetSize( 1.0f, 1.0f );
@@ -667,7 +662,9 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     material.AddSampler( sampler );
 
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
-    renderer.SetDepthIndex( -1 );
+
+    // Ensure shadow is behind the text...
+    renderer.SetDepthIndex( CONTENT_DEPTH_INDEX - 1 );
     Actor actor = Actor::New();
     actor.AddRenderer( renderer );
     actor.SetSize( 1.0f, 1.0f );
