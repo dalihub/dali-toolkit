@@ -53,6 +53,8 @@ DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scroll-direction",   
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layout-orientation",  INTEGER,  LAYOUT_ORIENTATION)
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "scroll-content-size", FLOAT,    SCROLL_CONTENT_SIZE)
 
+DALI_SIGNAL_REGISTRATION(              Toolkit, ItemView, "layout-activated",    LAYOUT_ACTIVATED_SIGNAL )
+
 DALI_TYPE_REGISTRATION_END()
 
 const float DEFAULT_MINIMUM_SWIPE_SPEED = 1.0f;
@@ -421,6 +423,11 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
     mScrollAnimation.AnimateTo( Property(self, Toolkit::ItemView::Property::LAYOUT_POSITION), firstItemScrollPosition, AlphaFunction::EASE_OUT );
     mScrollAnimation.FinishedSignal().Connect(this, &ItemView::OnLayoutActivationScrollFinished);
     mScrollAnimation.Play();
+  }
+  else
+  {
+    // Emit the layout activated signal
+    mLayoutActivatedSignal.Emit();
   }
 
   AnimateScrollOvershoot(0.0f);
@@ -1298,6 +1305,9 @@ void ItemView::OnLayoutActivationScrollFinished(Animation& source)
   RemoveAnimation(mScrollAnimation);
   mRefreshEnabled = true;
   DoRefresh(GetCurrentLayoutPosition(0), true);
+
+  // Emit the layout activated signal
+  mLayoutActivatedSignal.Emit();
 }
 
 void ItemView::OnOvershootOnFinished(Animation& animation)
@@ -1623,6 +1633,26 @@ void ItemView::OnScrollPositionChanged( float position )
 
   // Refresh the cache immediately when the scroll position is changed.
   DoRefresh(position, false); // No need to cache extra items.
+}
+
+bool ItemView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+{
+  Dali::BaseHandle handle( object );
+
+  bool connected( true );
+  Toolkit::ItemView itemView = Toolkit::ItemView::DownCast( handle );
+
+  if( 0 == strcmp( signalName.c_str(), LAYOUT_ACTIVATED_SIGNAL ) )
+  {
+    itemView.LayoutActivatedSignal().Connect( tracker, functor );
+  }
+  else
+  {
+    // signalName does not match any signal
+    connected = false;
+  }
+
+  return connected;
 }
 
 } // namespace Internal

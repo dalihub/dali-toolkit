@@ -46,6 +46,11 @@ ImageActor CreateSolidColorActor( const Vector4& color, bool border, const Vecto
 
   // Create the image
   PixelBuffer* pixbuf = imageData.GetBuffer();
+  if( !pixbuf )
+  {
+    return image;
+  }
+
   Vector4 outerColor = color;
   if ( border )
   {

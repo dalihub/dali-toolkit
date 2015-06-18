@@ -40,16 +40,47 @@ void utc_dali_toolkit_item_view_cleanup(void)
 
 namespace
 {
+
 const unsigned int TOTAL_ITEM_NUMBER = 100;
 const char* TEST_IMAGE_FILE_NAME = "gallery_image_01.jpg";
 
+const int RENDER_FRAME_INTERVAL = 16;                     ///< Duration of each frame in ms. (at approx 60FPS)
+
 static bool gObjectCreatedCallBackCalled;
+static bool gOnLayoutActivatedCalled;                     ///< Whether the LayoutActivated signal was invoked.
 
 static void TestCallback(BaseHandle handle)
 {
   gObjectCreatedCallBackCalled = true;
 }
 
+static void OnLayoutActivated()
+{
+  gOnLayoutActivatedCalled = true;
+}
+
+/*
+ * Simulate time passed by.
+ *
+ * @note this will always process at least 1 frame (1/60 sec)
+ *
+ * @param application Test application instance
+ * @param duration Time to pass in milliseconds.
+ * @return The actual time passed in milliseconds
+ */
+int Wait(ToolkitTestApplication& application, int duration = 0)
+{
+  int time = 0;
+
+  for(int i = 0; i <= ( duration / RENDER_FRAME_INTERVAL); i++)
+  {
+    application.SendNotification();
+    application.Render(RENDER_FRAME_INTERVAL);
+    time += RENDER_FRAME_INTERVAL;
+  }
+
+  return time;
+}
 
 // Implementation of ItemFactory for providing actors to ItemView
 class TestItemFactory : public ItemFactory
@@ -769,5 +800,40 @@ int UtcDaliItemFactoryGetExtention(void)
   ToolkitTestApplication application;
   TestItemFactory factory;
   DALI_TEST_CHECK( factory.GetExtension() == NULL );
+  END_TEST;
+}
+
+int UtcDaliItemViewLayoutActivatedSignalP(void)
+{
+  ToolkitTestApplication application;
+
+  // Create the ItemView actor
+  TestItemFactory factory;
+  ItemView view = ItemView::New(factory);
+
+  // Create a grid layout and add it to ItemView
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID );
+  view.AddLayout(*gridLayout);
+
+  Stage::GetCurrent().Add( view );
+
+  // Connect the layout activated signal
+  view.LayoutActivatedSignal().Connect( &OnLayoutActivated );
+
+  gOnLayoutActivatedCalled = false;
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Activate the grid layout so that the items will be created and added to ItemView
+  Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
+  view.ActivateLayout(0, stageSize, 0.1f);
+
+  // Wait for 0.1 second
+  Wait(application, 100);
+
+  DALI_TEST_EQUALS( gOnLayoutActivatedCalled, true, TEST_LOCATION );
+
   END_TEST;
 }

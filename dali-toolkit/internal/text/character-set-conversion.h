@@ -31,6 +31,9 @@ namespace Dali
 namespace Toolkit
 {
 
+namespace Text
+{
+
 /**
  * @brief Retrieves the number of characters of the text array encoded in UTF8
  *
@@ -85,6 +88,8 @@ uint32_t Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, 
  * @param[out] utf8 The UTF8 characters will be stored here.
  */
 void Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, std::string& utf8 );
+
+} // namespace Text
 
 } // namespace Toolkit
 

@@ -17,8 +17,6 @@
 
 #include <dali-toolkit/devel-api/shader-effects/distance-field-effect.h>
 
-#define STRINGIFY(...) #__VA_ARGS__
-
 namespace Dali
 {
 

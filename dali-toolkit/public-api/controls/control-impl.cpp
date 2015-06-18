@@ -348,17 +348,12 @@ public:
 
         case Toolkit::Control::Property::BACKGROUND_IMAGE:
         {
-          if ( value.HasKey( "image" ) )
+          Image image = Scripting::NewImage( value );
+          if ( image )
           {
-            Property::Map imageMap = value.GetValue( "image" ).Get< Property::Map >();
-            Image image = Scripting::NewImage( imageMap );
-
-            if ( image )
-            {
-              controlImpl.SetBackgroundImage( image );
-            }
+            controlImpl.SetBackgroundImage( image );
           }
-          else if ( value.Get< Property::Map >().Empty() )
+          else
           {
             // An empty map means the background is no longer required
             controlImpl.ClearBackground();
@@ -423,9 +418,7 @@ public:
             if ( imageActor )
             {
               Image image = imageActor.GetImage();
-              Property::Map imageMap;
-              Scripting::CreatePropertyMap( image, imageMap );
-              map[ "image" ] = imageMap;
+              Scripting::CreatePropertyMap( image, map );
             }
           }
 

@@ -176,11 +176,6 @@ std::string PropertyValueToString( const Property::Value& value )
       ret = std::string("Map Size=") + ToString( value.Get<Property::Map>().Count() );
       break;
     }
-    case Property::TYPE_COUNT:
-    {
-      ret = "";
-      break;
-    }
   }
 
   return ret;
@@ -721,11 +716,12 @@ FrameBufferImage Builder::GetFrameBufferImage( const std::string &name, const Re
     {
       if( OptionalChild image = IsChild( *images, name ) )
       {
-        Dali::Property::Value propertyMap(Property::MAP);
-        if( SetPropertyFromNode( *image, Property::MAP, propertyMap, constant ) )
+        Dali::Property::Value property(Property::MAP);
+        if( SetPropertyFromNode( *image, Property::MAP, property, constant ) )
         {
-          propertyMap.SetValue(KEYNAME_TYPE, Property::Value(std::string("FrameBufferImage")));
-          ret = FrameBufferImage::DownCast( Dali::Scripting::NewImage( propertyMap ) );
+          Property::Map* map = property.GetMap();
+          (*map)[ KEYNAME_TYPE ] = Property::Value(std::string("FrameBufferImage") );
+          ret = FrameBufferImage::DownCast( Dali::Scripting::NewImage( property ) );
           mFrameBufferImageLut[ name ] = ret;
         }
       }

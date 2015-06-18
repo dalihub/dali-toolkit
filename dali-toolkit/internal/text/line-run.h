@@ -38,15 +38,16 @@ namespace Text
  */
 struct LineRun
 {
-  GlyphIndex         glyphIndex;     ///< The initial glyph index.
-  Length             numberOfGlyphs; ///< The number of glyphs of the run.
-  CharacterRun       characterRun;   ///< The initial character and the number of characters.
-  float              width;          ///< The line's width.
-  float              ascender;       ///< The line's ascender.
-  float              descender;      ///< The line's descender.
-  float              extraLength;    ///< The length of the white spaces at the end of the line.
-  CharacterDirection direction : 1;  ///< Direction of the first character of the paragraph.
-  bool               ellipsis  : 1;  ///< Wheter ellipsis is added to the line.
+  GlyphIndex         glyphIndex;      ///< The initial glyph index.
+  Length             numberOfGlyphs;  ///< The number of glyphs of the run.
+  CharacterRun       characterRun;    ///< The initial character and the number of characters.
+  float              width;           ///< The line's width.
+  float              ascender;        ///< The line's ascender.
+  float              descender;       ///< The line's descender.
+  float              extraLength;     ///< The length of the white spaces at the end of the line.
+  float              alignmentOffset; ///< The horizontal alignment offset.
+  CharacterDirection direction : 1;   ///< Direction of the first character of the paragraph.
+  bool               ellipsis  : 1;   ///< Wheter ellipsis is added to the line.
 };
 
 } // namespace Text

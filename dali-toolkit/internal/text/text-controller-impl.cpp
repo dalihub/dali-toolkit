@@ -128,14 +128,15 @@ EventData::EventData( DecoratorPtr decorator )
   mDecoratorUpdated( false ),
   mCursorBlinkEnabled( true ),
   mGrabHandleEnabled( true ),
-  mGrabHandlePopupEnabled( false ),
+  mGrabHandlePopupEnabled( true ),
   mSelectionEnabled( false ),
   mHorizontalScrollingEnabled( true ),
   mVerticalScrollingEnabled( false ),
   mUpdateCursorPosition( false ),
   mUpdateLeftSelectionPosition( false ),
   mUpdateRightSelectionPosition( false ),
-  mScrollAfterUpdateCursorPosition( false )
+  mScrollAfterUpdateCursorPosition( false ),
+  mScrollAfterDelete( false )
 {}
 
 EventData::~EventData()
@@ -200,6 +201,12 @@ bool Controller::Impl::ProcessInputEvents()
 
     mEventData->mDecoratorUpdated = true;
     mEventData->mUpdateCursorPosition = false;
+  }
+  else if( mEventData->mScrollAfterDelete )
+  {
+    ScrollTextToMatchCursor();
+    mEventData->mDecoratorUpdated = true;
+    mEventData->mScrollAfterDelete = false;
   }
   else if( mEventData->mUpdateLeftSelectionPosition )
   {
@@ -525,7 +532,7 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
     if( Event::GRAB_HANDLE_EVENT == event.type )
     {
-      ChangeState ( EventData::EDITING );
+      ChangeState ( EventData::GRAB_HANDLE_PANNING );
 
       if( handleNewPosition != mEventData->mPrimaryCursorPosition )
       {
@@ -535,6 +542,8 @@ void Controller::Impl::OnHandleEvent( const Event& event )
     }
     else if( Event::LEFT_SELECTION_HANDLE_EVENT == event.type )
     {
+      ChangeState ( EventData::SELECTION_HANDLE_PANNING );
+
       if( handleNewPosition != mEventData->mLeftSelectionPosition )
       {
         mEventData->mLeftSelectionPosition = handleNewPosition;
@@ -543,6 +552,8 @@ void Controller::Impl::OnHandleEvent( const Event& event )
     }
     else if( Event::RIGHT_SELECTION_HANDLE_EVENT == event.type )
     {
+      ChangeState ( EventData::SELECTION_HANDLE_PANNING );
+
       if( handleNewPosition != mEventData->mRightSelectionPosition )
       {
         mEventData->mRightSelectionPosition = handleNewPosition;
@@ -553,13 +564,11 @@ void Controller::Impl::OnHandleEvent( const Event& event )
   else if( ( HANDLE_RELEASED == state ) ||
            ( HANDLE_STOP_SCROLLING == state ) )
   {
-    if( mEventData->mGrabHandlePopupEnabled )
-    {
-      ChangeState( EventData::EDITING_WITH_POPUP );
-    }
     if( Event::GRAB_HANDLE_EVENT == event.type )
     {
       mEventData->mUpdateCursorPosition = true;
+
+      ChangeState( EventData::EDITING_WITH_POPUP );
 
       if( HANDLE_STOP_SCROLLING == state )
       {
@@ -572,6 +581,10 @@ void Controller::Impl::OnHandleEvent( const Event& event )
         mEventData->mScrollAfterUpdateCursorPosition = true;
       }
     }
+    else if( Event::LEFT_SELECTION_HANDLE_EVENT == event.type || Event::RIGHT_SELECTION_HANDLE_EVENT )
+    {
+      ChangeState( EventData::SELECTING );
+    }
     mEventData->mDecoratorUpdated = true;
   }
   else if( HANDLE_SCROLLING == state )
@@ -583,7 +596,16 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
     ClampHorizontalScroll( actualSize );
 
-   mEventData->mDecoratorUpdated = true;
+    if( Event::GRAB_HANDLE_EVENT == event.type )
+    {
+      ChangeState( EventData::GRAB_HANDLE_PANNING );
+    }
+    else if( Event::LEFT_SELECTION_HANDLE_EVENT == event.type || Event::RIGHT_SELECTION_HANDLE_EVENT )
+    {
+      ChangeState( EventData::SELECTION_HANDLE_PANNING );
+    }
+
+    mEventData->mDecoratorUpdated = true;
   }
 }
 
@@ -652,6 +674,10 @@ void Controller::Impl::ChangeState( EventData::State newState )
       mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
       mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
       mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
+        mEventData->mDecorator->SetPopupActive( true );
+      }
       mEventData->mDecoratorUpdated = true;
     }
     else if( EventData::EDITING == mEventData->mState )
@@ -665,6 +691,10 @@ void Controller::Impl::ChangeState( EventData::State newState )
       mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
       mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
       mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
+        mEventData->mDecorator->SetPopupActive( false );
+      }
       mEventData->mDecoratorUpdated = true;
     }
     else if( EventData::EDITING_WITH_POPUP == mEventData->mState )
@@ -674,15 +704,47 @@ void Controller::Impl::ChangeState( EventData::State newState )
       {
         mEventData->mDecorator->StartCursorBlink();
       }
-      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
       if( mEventData->mSelectionEnabled )
       {
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      }
+      else
+      {
+        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
       }
       if( mEventData->mGrabHandlePopupEnabled )
       {
         mEventData->mDecorator->SetPopupActive( true );
+      }
+      mEventData->mDecoratorUpdated = true;
+    }
+    else if ( EventData::SELECTION_HANDLE_PANNING == mEventData->mState )
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
+      mEventData->mDecorator->StopCursorBlink();
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
+        mEventData->mDecorator->SetPopupActive( false );
+      }
+      mEventData->mDecoratorUpdated = true;
+    }
+    else if ( EventData::GRAB_HANDLE_PANNING == mEventData->mState )
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+      if( mEventData->mCursorBlinkEnabled )
+      {
+        mEventData->mDecorator->StartCursorBlink();
+      }
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
+        mEventData->mDecorator->SetPopupActive( false );
       }
       mEventData->mDecoratorUpdated = true;
     }
@@ -705,6 +767,11 @@ LineIndex Controller::Impl::GetClosestLine( float y ) const
     {
       return lineIndex;
     }
+  }
+
+  if( lineIndex == 0 )
+  {
+    return 0;
   }
 
   return lineIndex-1;
@@ -1245,6 +1312,57 @@ void Controller::Impl::ScrollToMakeCursorVisible()
   }
 
   // TODO : calculate the vertical scroll.
+}
+
+void Controller::Impl::ScrollTextToMatchCursor()
+{
+  // Get the current cursor position in decorator coords.
+  const Vector2& currentCursorPosition = mEventData->mDecorator->GetPosition( PRIMARY_CURSOR );
+
+  // Calculate the new cursor position.
+  CursorInfo cursorInfo;
+  GetCursorPosition( mEventData->mPrimaryCursorPosition,
+                     cursorInfo );
+
+  // Calculate the offset to match the cursor position before the character was deleted.
+  mEventData->mScrollPosition.x = currentCursorPosition.x - cursorInfo.primaryPosition.x - mAlignmentOffset.x;
+
+  ClampHorizontalScroll( mVisualModel->GetActualSize() );
+  bool updateCursorPosition = true;
+
+  const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
+  const Vector2 cursorPosition = cursorInfo.primaryPosition + offset;
+
+  if( updateCursorPosition )
+  {
+    // Sets the cursor position.
+    mEventData->mDecorator->SetPosition( PRIMARY_CURSOR,
+                                         cursorPosition.x,
+                                         cursorPosition.y,
+                                         cursorInfo.primaryCursorHeight,
+                                         cursorInfo.lineHeight );
+
+    // Sets the grab handle position.
+    mEventData->mDecorator->SetPosition( GRAB_HANDLE,
+                                         cursorPosition.x,
+                                         cursorPosition.y,
+                                         cursorInfo.lineHeight );
+
+    if( cursorInfo.isSecondaryCursor )
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_BOTH );
+      mEventData->mDecorator->SetPosition( SECONDARY_CURSOR,
+                                           cursorInfo.secondaryPosition.x + offset.x,
+                                           cursorInfo.secondaryPosition.y + offset.y,
+                                           cursorInfo.secondaryCursorHeight,
+                                           cursorInfo.lineHeight );
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Secondary cursor position: %f,%f\n", cursorInfo.secondaryPosition.x + offset.x, cursorInfo.secondaryPosition.y + offset.y );
+    }
+    else
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+    }
+  }
 }
 
 void Controller::Impl::RequestRelayout()

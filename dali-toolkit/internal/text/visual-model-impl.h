@@ -73,9 +73,9 @@ public:
    * @param[in] charactersPerGlyph An array containing the number of characters per glyph.
    * @param[in] numberOfGlyphs The number of glyphs.
    */
-  void SetGlyphs( const GlyphInfo* glyphs,
-                  const CharacterIndex* characterIndices,
-                  const Length* charactersPerGlyph,
+  void SetGlyphs( const GlyphInfo* const glyphs,
+                  const CharacterIndex* const characterIndices,
+                  const Length* const charactersPerGlyph,
                   Length numberOfGlyphs );
 
   /**
@@ -228,7 +228,7 @@ public:
    * @param[in] glyphPositions An array of visual positions for each glyph.
    * @param[in] numberOfGlyphs The number of positions.
    */
-  void SetGlyphPositions( const Vector2* glyphPositions,
+  void SetGlyphPositions( const Vector2* const glyphPositions,
                           Length numberOfGlyphs );
 
   /**

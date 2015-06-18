@@ -100,7 +100,9 @@ struct EventData
     INACTIVE,
     SELECTING,
     EDITING,
-    EDITING_WITH_POPUP
+    EDITING_WITH_POPUP,
+    GRAB_HANDLE_PANNING,
+    SELECTION_HANDLE_PANNING
   };
 
   EventData( DecoratorPtr decorator );
@@ -146,6 +148,7 @@ struct EventData
   bool mUpdateLeftSelectionPosition        : 1;   ///< True if the visual position of the left selection handle must be recalculated.
   bool mUpdateRightSelectionPosition       : 1;   ///< True if the visual position of the right selection handle must be recalculated.
   bool mScrollAfterUpdateCursorPosition    : 1;   ///< Whether to scroll after the cursor position is updated.
+  bool mScrollAfterDelete                  : 1;   ///< Whether to scroll after delete characters.
 };
 
 struct ModifyEvent
@@ -394,9 +397,16 @@ struct Controller::Impl
   /**
    * @brief Scrolls the text to make the cursor visible.
    *
-   * This method is called after inserting, deleting or moving the cursor with the keypad.
+   * This method is called after inserting text or moving the cursor with the keypad.
    */
   void ScrollToMakeCursorVisible();
+
+  /**
+   * @brief Scrolls the text to make the cursor visible.
+   *
+   * This method is called after deleting text.
+   */
+  void ScrollTextToMatchCursor();
 
   ControlInterface& mControlInterface;     ///< Reference to the text controller.
   LogicalModelPtr mLogicalModel;           ///< Pointer to the logical model.

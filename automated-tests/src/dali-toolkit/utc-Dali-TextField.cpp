@@ -155,33 +155,6 @@ int UtcDaliTextFieldNewP(void)
   END_TEST;
 }
 
-int UtcDaliTextFieldGetPropertyN(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitTextFieldGetPropertyN");
-  TextField field = TextField::New();
-  DALI_TEST_CHECK( field );
-
-  bool assert = false;
-  try
-  {
-    Property::Value value = field.GetProperty<bool>( 0 );
-  }
-  catch ( ... )
-  {
-    assert = true;
-  }
-  if ( assert )
-  {
-    tet_result(TET_PASS);
-  }
-  else
-  {
-    tet_result(TET_FAIL);
-  }
-  END_TEST;
-}
-
 // Positive test case for a method
 int UtcDaliTextFieldGetPropertyP(void)
 {
@@ -260,34 +233,6 @@ int UtcDaliTextFieldSetPropertyP(void)
   field.SetProperty( TextField::Property::MAX_LENGTH, maxNumberOfCharacters );
   DALI_TEST_EQUALS( field.GetProperty<int>( TextField::Property::MAX_LENGTH ), maxNumberOfCharacters, TEST_LOCATION );
 
-  END_TEST;
-}
-
-// Negative test case for a method
-int UtcDaliTextFieldSetPropertyN(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitTextFieldSetPropertyN");
-  TextField field = TextField::New();
-  DALI_TEST_CHECK( field );
-
-  bool assert = false;
-  try
-  {
-    field.SetProperty( 0, true );
-  }
-  catch ( ... )
-  {
-    assert = true;
-  }
-  if ( assert )
-  {
-    tet_result(TET_PASS);
-  }
-  else
-  {
-    tet_result(TET_FAIL);
-  }
   END_TEST;
 }
 

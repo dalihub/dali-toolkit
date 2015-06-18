@@ -20,12 +20,14 @@
 
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
-#include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/property-array.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/integration-api/debug.h>
+
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
@@ -600,16 +602,19 @@ void ScrollBar::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::ScrollBar::Property::SCROLL_POSITION_INTERVALS:
       {
-        Dali::Vector<float> positions;
-        size_t positionCount = value.GetSize();
-        positions.Resize( positionCount );
-
-        for( size_t i = 0; i != positionCount; ++i )
+        Property::Array* array = value.GetArray();
+        if( array )
         {
-          value.GetItem(i).Get( positions[i] );
-        }
+          Dali::Vector<float> positions;
+          size_t positionCount = array->Count();
+          positions.Resize( positionCount );
+          for( size_t i = 0; i != positionCount; ++i )
+          {
+            array->GetElementAt( i ).Get( positions[i] );
+          }
 
-        scrollBarImpl.SetScrollPositionIntervals(positions);
+          scrollBarImpl.SetScrollPositionIntervals(positions);
+        }
         break;
       }
     }
@@ -654,12 +659,13 @@ Property::Value ScrollBar::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::ScrollBar::Property::SCROLL_POSITION_INTERVALS:
       {
-        Property::Value value;
+        Property::Value value( Property::ARRAY );
+        Property::Array* array = value.GetArray();
         Dali::Vector<float> positions = scrollBarImpl.GetScrollPositionIntervals();
-        size_t positionCount( positions.Size() );
+        size_t positionCount( array->Count() );
         for( size_t i( 0 ); i != positionCount; ++i )
         {
-          value.AppendItem( positions[i] );
+          array->PushBack( positions[i] );
         }
         break;
       }

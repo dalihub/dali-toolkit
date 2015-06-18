@@ -92,6 +92,48 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
                                               glyphIndex,
                                               numberOfLaidOutGlyphs );
 
+      // Get the lines for the given range of glyphs.
+      // The lines contain the alignment offset which needs to be added to the glyph's position.
+      LineIndex firstLine = 0u;
+      Length numberOfLines = 0u;
+      mImpl->mVisualModel->GetNumberOfLines( glyphIndex,
+                                             numberOfLaidOutGlyphs,
+                                             firstLine,
+                                             numberOfLines );
+
+      Vector<LineRun> lines;
+      lines.Resize( numberOfLines );
+      LineRun* lineBuffer = lines.Begin();
+
+      mImpl->mVisualModel->GetLinesOfGlyphRange( lineBuffer,
+                                                 glyphIndex,
+                                                 numberOfLaidOutGlyphs );
+
+      // Get the first line for the given glyph range.
+      LineIndex lineIndex = firstLine;
+      LineRun* line = lineBuffer + lineIndex;
+
+      // Index of the last glyph of the line.
+      GlyphIndex lastGlyphIndexOfLine = line->glyphIndex + line->numberOfGlyphs - 1u;
+
+      // Add the alignment offset to the glyph's position.
+      for( Length index = 0u; index < numberOfLaidOutGlyphs; ++index )
+      {
+        ( *( glyphPositions + index ) ).x += line->alignmentOffset;
+
+        if( lastGlyphIndexOfLine == index )
+        {
+          // Get the next line.
+          ++lineIndex;
+
+          if( lineIndex < numberOfLines )
+          {
+            line = lineBuffer + lineIndex;
+            lastGlyphIndexOfLine = line->glyphIndex + line->numberOfGlyphs - 1u;
+          }
+        }
+      }
+
       if( 1u == numberOfLaidOutGlyphs )
       {
         // not a point try to do ellipsis with only one laid out character.
@@ -151,7 +193,7 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
             {
               GlyphInfo& glyphInfo = *( glyphs + index );
               Vector2& position = *( glyphPositions + index );
-              position.x -= glyphInfo.xBearing;
+              position.x -= ( 0.f > glyphInfo.xBearing ) ? glyphInfo.xBearing : 0.f;
 
               // Replace the glyph by the ellipsis glyph.
               glyphInfo = ellipsisGlyph;

@@ -62,7 +62,7 @@ namespace // unnamed namespace
 namespace
 {
 
-const Scripting::StringEnum< Toolkit::Text::LayoutEngine::HorizontalAlignment > HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
+const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 {
   { "BEGIN",  Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_BEGIN  },
   { "CENTER", Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_CENTER },
@@ -70,7 +70,7 @@ const Scripting::StringEnum< Toolkit::Text::LayoutEngine::HorizontalAlignment > 
 };
 const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
 
-const Scripting::StringEnum< Toolkit::Text::LayoutEngine::VerticalAlignment > VERTICAL_ALIGNMENT_STRING_TABLE[] =
+const Scripting::StringEnum VERTICAL_ALIGNMENT_STRING_TABLE[] =
 {
   { "TOP",    Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_TOP    },
   { "CENTER", Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_CENTER },
@@ -251,11 +251,14 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           const std::string alignStr = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p HORIZONTAL_ALIGNMENT %f\n", impl.mController.Get(), alignStr.c_str() );
 
-          const LayoutEngine::HorizontalAlignment alignment = Scripting::GetEnumeration< LayoutEngine::HorizontalAlignment >( alignStr.c_str(),
-                                                                                                                        HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                        HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
-
-          impl.mController->SetHorizontalAlignment( alignment );
+          LayoutEngine::HorizontalAlignment alignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN );
+          if( Scripting::GetEnumeration< LayoutEngine::HorizontalAlignment >( alignStr.c_str(),
+                                                                              HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                              HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                                              alignment ) )
+          {
+            impl.mController->SetHorizontalAlignment( alignment );
+          }
         }
         break;
       }
@@ -266,11 +269,14 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           const std::string alignStr = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p VERTICAL_ALIGNMENT %f\n", impl.mController.Get(), alignStr.c_str() );
 
-          LayoutEngine::VerticalAlignment alignment = Scripting::GetEnumeration< LayoutEngine::VerticalAlignment >( alignStr.c_str(),
-                                                                                                                    VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                    VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
-
-          impl.mController->SetVerticalAlignment( alignment );
+          LayoutEngine::VerticalAlignment alignment( LayoutEngine::VERTICAL_ALIGN_BOTTOM );
+          if( Scripting::GetEnumeration< LayoutEngine::VerticalAlignment >( alignStr.c_str(),
+                                                                            VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                            VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                                            alignment ) )
+          {
+            impl.mController->SetVerticalAlignment( alignment );
+          }
         }
         break;
       }
@@ -612,9 +618,13 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::HorizontalAlignment >( impl.mController->GetLayoutEngine().GetHorizontalAlignment(),
-                                                                                                                  HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                  HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT ) );
+          const char* name = Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::HorizontalAlignment >( impl.mController->GetLayoutEngine().GetHorizontalAlignment(),
+                                                                                                                HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                                                HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
+          if( name )
+          {
+            value = std::string( name );
+          }
         }
         break;
       }
@@ -622,9 +632,13 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::VerticalAlignment >( impl.mController->GetLayoutEngine().GetVerticalAlignment(),
-                                                                                                                  VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                  VERTICAL_ALIGNMENT_STRING_TABLE_COUNT ) );
+          const char* name = Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::VerticalAlignment >( impl.mController->GetLayoutEngine().GetVerticalAlignment(),
+                                                                                                              VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                                                              VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
+          if( name )
+          {
+            value = std::string( name );
+          }
         }
         break;
       }
