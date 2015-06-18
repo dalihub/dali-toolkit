@@ -34,6 +34,11 @@ TextSelectionPopup TextSelectionPopup::New()
   return Internal::TextSelectionPopup::New();
 }
 
+TextSelectionPopup TextSelectionPopup::New( Buttons enabledButtons )
+{
+  return Internal::TextSelectionPopup::New( enabledButtons );
+}
+
 TextSelectionPopup::TextSelectionPopup()
 {
 }

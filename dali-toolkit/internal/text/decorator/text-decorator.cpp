@@ -211,6 +211,7 @@ struct Decorator::Impl : public ConnectionTracker
 
   Impl( ControllerInterface& controller )
   : mController( controller ),
+    mEnabledPopupButtons( TextSelectionPopup::NONE ),
     mBoundingBox( Rect<int>() ),
     mHighlightColor( LIGHT_BLUE ),
     mActiveCursor( ACTIVE_CURSOR_NONE ),
@@ -393,7 +394,7 @@ struct Decorator::Impl : public ConnectionTracker
     {
       if ( !mCopyPastePopup )
       {
-        mCopyPastePopup = TextSelectionPopup::New();
+        mCopyPastePopup = TextSelectionPopup::New( mEnabledPopupButtons );
 #ifdef DECORATOR_DEBUG
         mCopyPastePopup.SetName("mCopyPastePopup");
 #endif
@@ -1065,6 +1066,7 @@ struct Decorator::Impl : public ConnectionTracker
   ImageActor          mSecondaryCursor;
   MeshActor           mHighlightMeshActor;        ///< Mesh Actor to display highlight
   TextSelectionPopup  mCopyPastePopup;
+  TextSelectionPopup::Buttons mEnabledPopupButtons; /// Bit mask of currently enabled Popup buttons
 
   Image               mHandleImages[HANDLE_TYPE_COUNT][HANDLE_IMAGE_TYPE_COUNT];
   Image               mCursorImage;
@@ -1290,6 +1292,16 @@ void Decorator::SetPopupActive( bool active )
 bool Decorator::IsPopupActive() const
 {
   return mImpl->mActiveCopyPastePopup ;
+}
+
+void Decorator::SetEnabledPopupButtons( TextSelectionPopup::Buttons& enabledButtonsBitMask )
+{
+   mImpl->mEnabledPopupButtons = enabledButtonsBitMask;
+}
+
+TextSelectionPopup::Buttons& Decorator::GetEnabledPopupButtons()
+{
+  return mImpl->mEnabledPopupButtons;
 }
 
 /** Scroll **/

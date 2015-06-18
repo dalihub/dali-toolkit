@@ -24,6 +24,9 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
+
 namespace Dali
 {
 
@@ -412,6 +415,18 @@ public:
    * @return True if the Selection Popup should be active.
    */
   bool IsPopupActive() const;
+
+  /**
+   * @brief Set a bit mask of the buttons to be shown by Popup
+   * @param[in] enabledButtonsBitMask from TextSelectionPopup::Buttons enum
+   */
+  void SetEnabledPopupButtons( TextSelectionPopup::Buttons& enabledButtonsBitMask );
+
+  /**
+   * @brief Get the current bit mask of buttons to be shown by Popup
+   * @return bitmask of TextSelectionPopup::Buttons
+   */
+  TextSelectionPopup::Buttons& GetEnabledPopupButtons();
 
   /**
    * @brief Sets the scroll threshold.
