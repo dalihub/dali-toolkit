@@ -62,27 +62,30 @@ public:
   void SetSourceActor(Actor actor);
 
   /**
-   * @copydoc Toolkit::ImageView::SetSourcePosition
-   */
-  void SetSourcePosition(const Vector3& position);
-
-  /**
-   * @copydoc Toolkit::ImageView::GetFrameVisibility
+   * Returns whether the frame is visible or not.
+   * @return true if frame is visible, false if not.
    */
   bool GetFrameVisibility() const;
 
   /**
-   * @copydoc Toolkit::ImageView::SetFrameVisibility
+   * Sets whether the frame part of the magnifier should be visible or not.
+   * @param[in] visible true to display frame, false to hide frame.
    */
   void SetFrameVisibility(bool visible);
 
   /**
-   * @copydoc Toolkit::ImageView::GetMagnificationFactor
+   * Get the magnification factor of the magnifier
+   * The larger the value the larger the contents magnified.
+   * A value of 1.0f indications 1x magnification.
+   * @return Magnification factor is returned
    */
   float GetMagnificationFactor() const;
 
   /**
-   * @copydoc Toolkit::ImageView::SetMagnificationFactor
+   * Set the magnification factor of the magnifier
+   * The larger the value the larger the contents magnified.
+   * A value of 1.0f indications 1x magnification.
+   * @param[in] value Magnification factor.
    */
   void SetMagnificationFactor(float value);
 
@@ -90,6 +93,24 @@ public:
    * Update magnification
    */
   void Update();
+
+  // Properties
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
 protected:
 
@@ -132,7 +153,6 @@ private:
   RenderTask mTask;                             ///< Render Task to render the source actor contents.
   CameraActor mCameraActor;                     ///< CameraActor attached to RenderTask
   ImageActor mFrame;                            ///< The Magnifier Frame
-  Property::Index mPropertySourcePosition;      ///< Source Position ("source-position")
   Actor mSourceActor;                           ///< Source Delegate Actor represents the source position to read.
   float mDefaultCameraDistance;                 ///< Default RenderTask's camera distance from target.
   Vector3 mActorSize;                           ///< The Actor size
