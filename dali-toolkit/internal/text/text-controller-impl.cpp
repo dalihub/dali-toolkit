@@ -160,31 +160,42 @@ bool Controller::Impl::ProcessInputEvents()
     {
       switch( iter->type )
       {
-      case Event::CURSOR_KEY_EVENT:
-      {
-        OnCursorKeyEvent( *iter );
-        break;
-      }
-      case Event::TAP_EVENT:
-      {
-        OnTapEvent( *iter );
-        break;
-      }
-      case Event::PAN_EVENT:
-      {
-        OnPanEvent( *iter );
-        break;
-      }
-      case Event::GRAB_HANDLE_EVENT:
-      case Event::LEFT_SELECTION_HANDLE_EVENT:
-      case Event::RIGHT_SELECTION_HANDLE_EVENT: // Fall through
-      {
-        OnHandleEvent( *iter );
-        break;
-      }
+        case Event::CURSOR_KEY_EVENT:
+        {
+          OnCursorKeyEvent( *iter );
+          break;
+        }
+        case Event::TAP_EVENT:
+        {
+          OnTapEvent( *iter );
+          break;
+        }
+        case Event::PAN_EVENT:
+        {
+          OnPanEvent( *iter );
+          break;
+        }
+        case Event::GRAB_HANDLE_EVENT:
+        case Event::LEFT_SELECTION_HANDLE_EVENT:
+        case Event::RIGHT_SELECTION_HANDLE_EVENT: // Fall through
+        {
+          OnHandleEvent( *iter );
+          break;
+        }
+        case Event::SELECT:
+        {
+          OnSelectEvent( *iter );
+          break;
+        }
+        case Event::SELECT_ALL:
+        {
+          OnSelectAllEvent();
+          break;
+        }
       }
     }
   }
+
 
   // The cursor must also be repositioned after inserts into the model
   if( mEventData->mUpdateCursorPosition )
@@ -484,20 +495,6 @@ void Controller::Impl::OnTapEvent( const Event& event )
       mEventData->mUpdateCursorPosition = true;
       mEventData->mScrollAfterUpdatePosition = true;
     }
-    else if( mEventData->mSelectionEnabled &&
-             ( 2u == tapCount ) )
-    {
-      // The event.p2 and event.p3 are in decorator coords. Need to transforms to text coords.
-      const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
-      const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
-
-      RepositionSelectionHandles( xPosition,
-                                  yPosition );
-
-      mEventData->mScrollAfterUpdatePosition = true;
-      mEventData->mUpdateLeftSelectionPosition = true;
-      mEventData->mUpdateRightSelectionPosition = true;
-    }
   }
 }
 
@@ -709,6 +706,48 @@ void Controller::Impl::OnHandleEvent( const Event& event )
     }
     mEventData->mDecoratorUpdated = true;
   } // end ( HANDLE_SCROLLING == state )
+}
+
+void Controller::Impl::OnSelectEvent( const Event& event )
+{
+  if( NULL == mEventData )
+  {
+    // Nothing to do if there is no text.
+    return;
+  }
+
+  if( mEventData->mSelectionEnabled )
+  {
+    // The event.p2 and event.p3 are in decorator coords. Need to transforms to text coords.
+    const float xPosition = event.p2.mFloat - mEventData->mScrollPosition.x - mAlignmentOffset.x;
+    const float yPosition = event.p3.mFloat - mEventData->mScrollPosition.y - mAlignmentOffset.y;
+
+    RepositionSelectionHandles( xPosition,
+                                yPosition );
+
+    mEventData->mScrollAfterUpdatePosition = true;
+    mEventData->mUpdateLeftSelectionPosition = true;
+    mEventData->mUpdateRightSelectionPosition = true;
+  }
+}
+
+void Controller::Impl::OnSelectAllEvent()
+{
+  if( NULL == mEventData )
+  {
+    // Nothing to do if there is no text.
+    return;
+  }
+
+  if( mEventData->mSelectionEnabled )
+  {
+    RepositionSelectionHandles( 0u,
+                                mLogicalModel->mText.Count() );
+
+    mEventData->mScrollAfterUpdatePosition = true;
+    mEventData->mUpdateLeftSelectionPosition = true;
+    mEventData->mUpdateRightSelectionPosition = true;
+  }
 }
 
 void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart, CharacterIndex selectionEnd )

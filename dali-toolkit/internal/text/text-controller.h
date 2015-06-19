@@ -477,17 +477,17 @@ public:
   // Text-input Event Queuing
 
   /**
-   * @brief Caller by editable UI controls when keyboard focus is gained.
+   * @brief Called by editable UI controls when keyboard focus is gained.
    */
   void KeyboardFocusGainEvent();
 
   /**
-   * @brief Caller by editable UI controls when focus is lost.
+   * @brief Called by editable UI controls when focus is lost.
    */
   void KeyboardFocusLostEvent();
 
   /**
-   * @brief Caller by editable UI controls when key events are received.
+   * @brief Called by editable UI controls when key events are received.
    *
    * @param[in] event The key event.
    * @param[in] type Used to distinguish between regular key events and IMF events.
@@ -495,7 +495,7 @@ public:
   bool KeyEvent( const Dali::KeyEvent& event );
 
   /**
-   * @brief Caller by editable UI controls when key events are received.
+   * @brief Called by editable UI controls when key events are received.
    *
    * @param[in] text The text to insert.
    * @param[in] type Used to distinguish between regular key events and IMF events.
@@ -503,7 +503,7 @@ public:
   void InsertText( const std::string& text, InsertType type );
 
   /**
-   * @brief Caller by editable UI controls when a tap gesture occurs.
+   * @brief Called by editable UI controls when a tap gesture occurs.
    * @param[in] tapCount The number of taps.
    * @param[in] x The x position relative to the top-left of the parent control.
    * @param[in] y The y position relative to the top-left of the parent control.
@@ -511,12 +511,23 @@ public:
   void TapEvent( unsigned int tapCount, float x, float y );
 
   /**
-   * @brief Caller by editable UI controls when a pan gesture occurs.
+   * @brief Called by editable UI controls when a pan gesture occurs.
    *
    * @param[in] state The state of the gesture.
    * @param[in] displacement This distance panned since the last pan gesture.
    */
   void PanEvent( Gesture::State state, const Vector2& displacement );
+
+  /**
+   * @brief Creates a selection event.
+   *
+   * It could be called from the TapEvent (double tap) or when the text selection popup's sellect all button is pressed.
+   *
+   * @param[in] x The x position relative to the top-left of the parent control.
+   * @param[in] y The y position relative to the top-left of the parent control.
+   * @param[in] selectAll Whether the whole text is selected.
+   */
+  void SelectEvent( float x, float y, bool selectAll );
 
   /**
    * @brief Event received from IMF manager

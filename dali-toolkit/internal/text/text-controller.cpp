@@ -1326,32 +1326,25 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
       }
 
       mImpl->ChangeState( EventData::EDITING );
+
+      // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
+      if( mImpl->mEventData )
+      {
+        Event event( Event::TAP_EVENT );
+        event.p1.mUint = tapCount;
+        event.p2.mFloat = x;
+        event.p3.mFloat = y;
+        mImpl->mEventData->mEventQueue.push_back( event );
+
+        mImpl->RequestRelayout();
+      }
     }
     else if( !isShowingPlaceholderText &&
              mImpl->mEventData->mSelectionEnabled &&
              ( 2u == tapCount ) )
     {
-      if ( mImpl->mEventData->mState == EventData::SELECTING )
-      {
-        mImpl->ChangeState( EventData::SELECTION_CHANGED );
-      }
-      else
-      {
-        mImpl->ChangeState( EventData::SELECTING );
-      }
+      SelectEvent( x, y, false );
     }
-  }
-
-  // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
-  if( mImpl->mEventData )
-  {
-    Event event( Event::TAP_EVENT );
-    event.p1.mUint = tapCount;
-    event.p2.mFloat = x;
-    event.p3.mFloat = y;
-    mImpl->mEventData->mEventQueue.push_back( event );
-
-    mImpl->RequestRelayout();
   }
 
   // Reset keyboard as tap event has occurred.
@@ -1369,6 +1362,36 @@ void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
     event.p2.mFloat = displacement.x;
     event.p3.mFloat = displacement.y;
     mImpl->mEventData->mEventQueue.push_back( event );
+
+    mImpl->RequestRelayout();
+  }
+}
+
+void Controller::SelectEvent( float x, float y, bool selectAll )
+{
+  if( mImpl->mEventData )
+  {
+    if ( mImpl->mEventData->mState == EventData::SELECTING )
+    {
+      mImpl->ChangeState( EventData::SELECTION_CHANGED );
+    }
+    else
+    {
+      mImpl->ChangeState( EventData::SELECTING );
+    }
+
+    if( selectAll )
+    {
+      Event event( Event::SELECT_ALL );
+      mImpl->mEventData->mEventQueue.push_back( event );
+    }
+    else
+    {
+      Event event( Event::SELECT );
+      event.p2.mFloat = x;
+      event.p3.mFloat = y;
+      mImpl->mEventData->mEventQueue.push_back( event );
+    }
 
     mImpl->RequestRelayout();
   }
@@ -1434,6 +1457,52 @@ void Controller::DecorationEvent( HandleType handleType, HandleState state, floa
 
 void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button )
 {
+  if( NULL == mImpl->mEventData )
+  {
+    return;
+  }
+
+  switch( button )
+  {
+    case Toolkit::TextSelectionPopup::CUT:
+    {
+      break;
+    }
+    case Toolkit::TextSelectionPopup::COPY:
+    {
+      break;
+    }
+    case Toolkit::TextSelectionPopup::PASTE:
+    {
+      break;
+    }
+    case Toolkit::TextSelectionPopup::SELECT:
+    {
+      const Vector2& currentCursorPosition = mImpl->mEventData->mDecorator->GetPosition( PRIMARY_CURSOR );
+
+      if( mImpl->mEventData->mSelectionEnabled  )
+      {
+        // Creates a SELECT event.
+        SelectEvent( currentCursorPosition.x, currentCursorPosition.y, false );
+      }
+      break;
+    }
+    case Toolkit::TextSelectionPopup::SELECT_ALL:
+    {
+      // Creates a SELECT_ALL event
+      SelectEvent( 0.f, 0.f, true );
+      break;
+    }
+    case Toolkit::TextSelectionPopup::CLIPBOARD:
+    {
+      break;
+    }
+    case Toolkit::TextSelectionPopup::NONE:
+    {
+      // Nothing to do.
+      break;
+    }
+  }
 }
 
 ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )

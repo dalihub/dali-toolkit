@@ -48,7 +48,9 @@ struct Event
     PAN_EVENT,
     GRAB_HANDLE_EVENT,
     LEFT_SELECTION_HANDLE_EVENT,
-    RIGHT_SELECTION_HANDLE_EVENT
+    RIGHT_SELECTION_HANDLE_EVENT,
+    SELECT,
+    SELECT_ALL
   };
 
   union Param
@@ -332,6 +334,10 @@ struct Controller::Impl
   void OnPanEvent( const Event& event );
 
   void OnHandleEvent( const Event& event );
+
+  void OnSelectEvent( const Event& event );
+
+  void OnSelectAllEvent();
 
   void RepositionSelectionHandles( CharacterIndex selectionStart, CharacterIndex selectionEnd );
   void RepositionSelectionHandles( float visualX, float visualY );
