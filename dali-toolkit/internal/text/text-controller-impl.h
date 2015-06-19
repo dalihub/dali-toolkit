@@ -19,8 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/devel-api/adaptor-framework/imf-manager.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
@@ -198,6 +199,7 @@ struct Controller::Impl
     mFontDefaults( NULL ),
     mEventData( NULL ),
     mFontClient(),
+    mClipboard(),
     mView(),
     mLayoutEngine(),
     mModifyEvents(),
@@ -212,6 +214,7 @@ struct Controller::Impl
     mVisualModel  = VisualModel::New();
 
     mFontClient = TextAbstraction::FontClient::Get();
+    mClipboard = Clipboard::Get();
 
     mView.SetVisualModel( mVisualModel );
 
@@ -304,6 +307,12 @@ struct Controller::Impl
     }
 
     ClearPreEditFlag();
+  }
+
+  bool IsClipboardEmpty()
+  {
+    bool result( mClipboard && mClipboard.NumberOfItems() );
+    return !result; // // If NumberOfItems greater than 0, return false
   }
 
   void UpdateModel( OperationsMask operationsRequired );
@@ -423,6 +432,7 @@ struct Controller::Impl
   FontDefaults* mFontDefaults;             ///< Avoid allocating this when the user does not specify a font.
   EventData* mEventData;                   ///< Avoid allocating everything for text input until EnableTextInput().
   TextAbstraction::FontClient mFontClient; ///< Handle to the font client.
+  Clipboard mClipboard;                   ///< Handle to the system clipboard
   View mView;                              ///< The view interface to the rendering back-end.
   LayoutEngine mLayoutEngine;              ///< The layout engine.
   std::vector<ModifyEvent> mModifyEvents;  ///< Temporary stores the text set until the next relayout.

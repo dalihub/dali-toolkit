@@ -847,8 +847,13 @@ void Controller::Impl::ChangeState( EventData::State newState )
       mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
       if( mEventData->mGrabHandlePopupEnabled )
       {
-        TextSelectionPopup::Buttons selectedButtons = TextSelectionPopup::Buttons(  TextSelectionPopup::CUT | TextSelectionPopup::COPY );
-        mEventData->mDecorator->SetEnabledPopupButtons( selectedButtons );
+        TextSelectionPopup::Buttons buttonsToShow = TextSelectionPopup::Buttons(  TextSelectionPopup::CUT | TextSelectionPopup::COPY );
+        if ( !IsClipboardEmpty() )
+        {
+          buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+        }
+
+        mEventData->mDecorator->SetEnabledPopupButtons( buttonsToShow );
         mEventData->mDecorator->SetPopupActive( true );
       }
       mEventData->mDecoratorUpdated = true;
@@ -857,8 +862,12 @@ void Controller::Impl::ChangeState( EventData::State newState )
     {
       if( mEventData->mGrabHandlePopupEnabled )
       {
-        TextSelectionPopup::Buttons selectedButtons = TextSelectionPopup::Buttons( TextSelectionPopup::CUT | TextSelectionPopup::COPY );
-        mEventData->mDecorator->SetEnabledPopupButtons( selectedButtons );
+        TextSelectionPopup::Buttons buttonsToShow = TextSelectionPopup::Buttons(  TextSelectionPopup::CUT | TextSelectionPopup::COPY );
+        if (  !IsClipboardEmpty() )
+        {
+          buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+        }
+        mEventData->mDecorator->SetEnabledPopupButtons( buttonsToShow );
         mEventData->mDecorator->SetPopupActive( true );
       }
       mEventData->mDecoratorUpdated = true;
@@ -898,8 +907,14 @@ void Controller::Impl::ChangeState( EventData::State newState )
       }
       if( mEventData->mGrabHandlePopupEnabled )
       {
-        TextSelectionPopup::Buttons selectionButtons = TextSelectionPopup::Buttons( TextSelectionPopup::SELECT | TextSelectionPopup::SELECT_ALL );
-        mEventData->mDecorator->SetEnabledPopupButtons( selectionButtons );
+        TextSelectionPopup::Buttons buttonsToShow = TextSelectionPopup::Buttons( TextSelectionPopup::SELECT | TextSelectionPopup::SELECT_ALL );
+
+        if ( !IsClipboardEmpty() )
+        {
+          buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+        }
+
+        mEventData->mDecorator->SetEnabledPopupButtons( buttonsToShow );
         mEventData->mDecorator->SetPopupActive( true );
       }
       mEventData->mDecoratorUpdated = true;
