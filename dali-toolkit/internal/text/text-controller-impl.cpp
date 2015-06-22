@@ -196,7 +196,6 @@ bool Controller::Impl::ProcessInputEvents()
     }
   }
 
-
   // The cursor must also be repositioned after inserts into the model
   if( mEventData->mUpdateCursorPosition )
   {
@@ -750,6 +749,61 @@ void Controller::Impl::OnSelectAllEvent()
   }
 }
 
+void Controller::Impl::RetreiveSelection( std::string& selectedText, bool deleteAfterRetreival )
+{
+  if( mEventData->mLeftSelectionPosition ==  mEventData->mRightSelectionPosition )
+  {
+    // Nothing to select if handles are in the same place.
+    selectedText="";
+    return;
+  }
+
+  //Get start and end position of selection
+  uint32_t startOfSelectedText = mEventData->mLeftSelectionPosition;
+  uint32_t lengthOfSelectedText =  mEventData->mRightSelectionPosition - startOfSelectedText;
+
+  // Validate the start and end selection points
+  if( ( startOfSelectedText >= 0 ) && (  ( startOfSelectedText + lengthOfSelectedText ) <=  mLogicalModel->mText.Count() ) )
+  {
+    //Get text as a UTF8 string
+    Vector<Character>& utf32Characters = mLogicalModel->mText;
+
+    Utf32ToUtf8( &utf32Characters[startOfSelectedText], lengthOfSelectedText, selectedText );
+
+    if ( deleteAfterRetreival  ) // Only delete text if copied successfully
+    {
+      // Delete text between handles
+      Vector<Character>& currentText = mLogicalModel->mText;
+
+      Vector<Character>::Iterator first = currentText.Begin() + startOfSelectedText;
+      Vector<Character>::Iterator last  = first + lengthOfSelectedText;
+      currentText.Erase( first, last );
+    }
+    mEventData->mPrimaryCursorPosition = mEventData->mLeftSelectionPosition;
+    mEventData->mScrollAfterDelete = true;
+    mEventData->mDecoratorUpdated = true;
+  }
+}
+
+bool Controller::Impl::CopyStringToClipboard( std::string& source )
+{
+  //Send string to clipboard
+  return ( mClipboard && mClipboard.SetItem( source ) );
+}
+
+void Controller::Impl::SendSelectionToClipboard( bool deleteAfterSending )
+{
+  std::string selectedText;
+  RetreiveSelection( selectedText, deleteAfterSending );
+  CopyStringToClipboard( selectedText );
+  ChangeState( EventData::EDITING );
+}
+
+void Controller::Impl::PasteTextFromClipboard()
+{
+  // Not supported
+}
+
 void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart, CharacterIndex selectionEnd )
 {
   if( selectionStart == selectionEnd )
@@ -906,6 +960,7 @@ void Controller::Impl::ChangeState( EventData::State newState )
         {
           buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
         }
+        mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
         mEventData->mDecorator->SetEnabledPopupButtons( buttonsToShow );
         mEventData->mDecorator->SetPopupActive( true );
       }

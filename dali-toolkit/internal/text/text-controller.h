@@ -138,7 +138,7 @@ public:
   void GetText( std::string& text ) const;
 
   /**
-   * @brief Replaces any placeholder text previously set.
+   * @brief Remove a given number of characters
    *
    * @param[in] cursorOffset Start position from the current cursor position to start deleting characters.
    * @param[in] numberOfChars The number of characters to delete from the cursorOffset.

@@ -339,6 +339,14 @@ struct Controller::Impl
 
   void OnSelectAllEvent();
 
+  void RetreiveSelection( std::string& selectedText, bool deleteAfterRetreival );
+
+  bool CopyStringToClipboard( std::string& source );
+
+  void SendSelectionToClipboard( bool deleteAfterSending );
+
+  void PasteTextFromClipboard();
+
   void RepositionSelectionHandles( CharacterIndex selectionStart, CharacterIndex selectionEnd );
   void RepositionSelectionHandles( float visualX, float visualY );
 

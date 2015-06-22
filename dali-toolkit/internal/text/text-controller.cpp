@@ -1466,14 +1466,31 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
   {
     case Toolkit::TextSelectionPopup::CUT:
     {
+      mImpl->SendSelectionToClipboard( true ); // Synchronous call to modify text
+      mImpl->mOperationsPending = ALL_OPERATIONS;
+      if( 0u != mImpl->mLogicalModel->mText.Count() ||
+          !mImpl->IsPlaceholderAvailable() )
+      {
+        mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
+      }
+      else
+      {
+        ShowPlaceholderText();
+        mImpl->mEventData->mUpdateCursorPosition = true;
+      }
+      mImpl->RequestRelayout();
+      mImpl->mControlInterface.TextChanged();
       break;
     }
     case Toolkit::TextSelectionPopup::COPY:
     {
+      mImpl->SendSelectionToClipboard( false ); // Text not modified
+      mImpl->RequestRelayout(); // Handles, Selection Highlight, Popup
       break;
     }
     case Toolkit::TextSelectionPopup::PASTE:
     {
+      mImpl->PasteTextFromClipboard();
       break;
     }
     case Toolkit::TextSelectionPopup::SELECT:
