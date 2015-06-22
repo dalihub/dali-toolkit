@@ -599,9 +599,9 @@ bool Controller::Relayout( const Size& size )
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
     bool glyphsRemoved( false );
-    if( 0u != mImpl->mVisualModel->GetNumberOfGlyphPositions() )
+    if( 0u != mImpl->mVisualModel->mGlyphPositions.Count() )
     {
-      mImpl->mVisualModel->SetGlyphPositions( NULL, 0u );
+      mImpl->mVisualModel->mGlyphPositions.Clear();
       glyphsRemoved = true;
     }
     // Not worth to relayout if width or height is equal to zero.
@@ -799,7 +799,7 @@ bool Controller::DoRelayout( const Size& size,
     // after the first time the text has been laid out.
     // Fill the vectors again.
 
-    Length numberOfGlyphs = mImpl->mVisualModel->GetNumberOfGlyphs();
+    Length numberOfGlyphs = mImpl->mVisualModel->mGlyphs.Count();
 
     if( 0u == numberOfGlyphs )
     {
@@ -859,7 +859,7 @@ bool Controller::DoRelayout( const Size& size,
         if( 0u != bidirectionalInfo.Count() )
         {
           // Get the lines
-          const Length numberOfLines = mImpl->mVisualModel->GetNumberOfLines();
+          const Length numberOfLines = mImpl->mVisualModel->mLines.Count();
 
           // Reorder the lines.
           Vector<BidirectionalLineInfoRun> lineBidirectionalInfoRuns;
@@ -1265,7 +1265,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
       }
     }
 
-    const Length numberOfCharactersInModel = mImpl->mLogicalModel->GetNumberOfCharacters();
+    const Length numberOfCharactersInModel = mImpl->mLogicalModel->mText.Count();
 
     // Restrict new text to fit within Maximum characters setting
     Length maxSizeOfNewText = std::min ( ( mImpl->mMaximumNumberOfCharacters - numberOfCharactersInModel ), characterCount );

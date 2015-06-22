@@ -453,7 +453,7 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
   }
   else if( Dali::DALI_KEY_CURSOR_RIGHT == keyCode )
   {
-    if( mLogicalModel->GetNumberOfCharacters() > mEventData->mPrimaryCursorPosition )
+    if( mLogicalModel->mText.Count() > mEventData->mPrimaryCursorPosition )
     {
       mEventData->mPrimaryCursorPosition = CalculateNewCursorIndex( mEventData->mPrimaryCursorPosition );
     }
@@ -1150,7 +1150,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
 
   // Check if the logical position is the first or the last one of the text.
   const bool isFirstPosition = 0u == logical;
-  const bool isLastPosition = mLogicalModel->GetNumberOfCharacters() == logical;
+  const bool isLastPosition = mLogicalModel->mText.Count() == logical;
 
   if( isFirstPosition && isLastPosition )
   {

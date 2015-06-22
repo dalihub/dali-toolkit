@@ -332,17 +332,17 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
 
   // Add remaining characters into the last script.
   currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
-  if( 0u != currentScriptRun.characterRun.numberOfCharacters )
-  {
-    if( TextAbstraction::UNKNOWN == currentScriptRun.script )
-    {
-      // There are only white spaces in the last script. Set the latin script.
-      currentScriptRun.script = TextAbstraction::LATIN;
-    }
 
-    // Store the last run.
-    scripts.PushBack( currentScriptRun );
+  DALI_ASSERT_DEBUG( ( 0u != currentScriptRun.characterRun.numberOfCharacters ) && "MultilanguageSupport::SetScripts() Trying to insert a script run with zero characters." );
+
+  if( TextAbstraction::UNKNOWN == currentScriptRun.script )
+  {
+    // There are only white spaces in the last script. Set the latin script.
+    currentScriptRun.script = TextAbstraction::LATIN;
   }
+
+  // Store the last run.
+  scripts.PushBack( currentScriptRun );
 }
 
 void MultilanguageSupport::ReplaceScripts( LogicalModel& model,
