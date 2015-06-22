@@ -236,6 +236,9 @@ int UtcDaliToolkitTextlabelBasicRenderP(void)
   TextLabel label = TextLabel::New("Test Text");
   DALI_TEST_CHECK( label );
 
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
   Stage::GetCurrent().Add( label );
 
   label.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "BEGIN" );
@@ -261,6 +264,11 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
   tet_infoline(" UtcDaliToolkitTextLabelAtlasRenderP");
   TextLabel label = TextLabel::New("Test Text");
   DALI_TEST_CHECK( label );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  Stage::GetCurrent().Add( label );
 
   // Turn on all the effects
   label.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
@@ -297,7 +305,8 @@ int UtcDaliToolkitTextLabelLanguagesP(void)
                              "բարեւ աշխարհը, მსოფლიოში, 안녕하세요, 你好世界, ひらがな, カタカナ, "
                              "ওহে বিশ্ব, မင်္ဂလာပါကမ္ဘာလောက, हैलो वर्ल्ड, હેલો વર્લ્ડ, ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਦੁਨਿਆ, ಹಲೋ ವರ್ಲ್ಡ್, "
                              "ഹലോ വേൾഡ്, ଓଡ଼ିଆ, හෙලෝ වර්ල්ඩ්, ஹலோ உலகம், హలో వరల్డ్, "
-                             "ສະບາຍດີໂລກ, สวัสดีโลก, ជំរាបសួរពិភពលោក." );
+                             "ສະບາຍດີໂລກ, สวัสดีโลก, ជំរាបសួរពិភពលោក, "
+                             "\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84." ); // these characters on the last line are emojis.
 
   label.SetProperty( TextLabel::Property::TEXT, scripts );
   DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::TEXT ), scripts, TEST_LOCATION );

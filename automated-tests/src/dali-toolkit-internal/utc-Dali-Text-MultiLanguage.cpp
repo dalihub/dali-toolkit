@@ -217,27 +217,6 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   END_TEST;
 }
 
-int UtcDaliTextMultiLanguageReplaceScripts(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliTextMultiLanguageReplaceScripts");
-
-  MultilanguageSupport multilanguageSupport = MultilanguageSupport::Get();
-
-  LogicalModelPtr model = LogicalModel::New();
-  CharacterIndex characterIndex = 0u;
-  Length numberOfCharactersToRemove = 0u;
-  Length numberOfCharactersToInsert = 0u;
-
-  multilanguageSupport.ReplaceScripts( *model,
-                                       characterIndex,
-                                       numberOfCharactersToRemove,
-                                       numberOfCharactersToInsert );
-
-  tet_result(TET_PASS);
-  END_TEST;
-}
-
 int UtcDaliTextMultiLanguageValidateFonts01(void)
 {
   ToolkitTestApplication application;
@@ -263,27 +242,6 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       tet_result(TET_FAIL);
     }
   }
-
-  tet_result(TET_PASS);
-  END_TEST;
-}
-
-int UtcDaliTextMultiLanguageValidateFonts02(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliTextMultiLanguageValidateFonts");
-
-  MultilanguageSupport multilanguageSupport = MultilanguageSupport::Get();
-
-  LogicalModelPtr model = LogicalModel::New();
-  CharacterIndex characterIndex = 0u;
-  Length numberOfCharactersToRemove = 0u;
-  Length numberOfCharactersToInsert = 0u;
-
-  multilanguageSupport.ValidateFonts( *model,
-                                      characterIndex,
-                                      numberOfCharactersToRemove,
-                                      numberOfCharactersToInsert );
 
   tet_result(TET_PASS);
   END_TEST;

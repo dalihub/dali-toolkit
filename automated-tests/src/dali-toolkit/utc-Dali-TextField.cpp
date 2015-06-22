@@ -18,6 +18,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include <dali/integration-api/events/key-event-integ.h>
+#include <dali/integration-api/events/tap-gesture-event.h>
+#include <dali/devel-api/actors/mesh-actor.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/styling/style-manager.h>
@@ -97,6 +99,38 @@ static void TestMaxLengthReachedCallback( TextField control )
   tet_infoline(" TestMaxLengthReachedCallback");
 
   gMaxCharactersCallBackCalled = true;
+}
+
+// Generate a TapGestureEvent to send to Core.
+Integration::TapGestureEvent GenerateTap(
+    Gesture::State state,
+    unsigned int numberOfTaps,
+    unsigned int numberOfTouches,
+    Vector2 point)
+{
+  Integration::TapGestureEvent tap( state );
+
+  tap.numberOfTaps = numberOfTaps;
+  tap.numberOfTouches = numberOfTouches;
+  tap.point = point;
+
+  return tap;
+}
+
+// Generate a KeyEvent to send to Core.
+Integration::KeyEvent GenerateKey( const std::string& keyName,
+                                   const std::string& keyString,
+                                   int keyCode,
+                                   int keyModifier,
+                                   unsigned long timeStamp,
+                                   const Integration::KeyEvent::State& keyState )
+{
+  return Integration::KeyEvent( keyName,
+                                keyString,
+                                keyCode,
+                                keyModifier,
+                                timeStamp,
+                                keyState );
 }
 
 } // namespace
@@ -363,6 +397,10 @@ int utcDaliTextFieldBasicRenderP(void)
 
   field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "BEGIN" );
 
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  Stage::GetCurrent().Add( field );
+
   try
   {
     // Render some text with the basic backend
@@ -388,6 +426,11 @@ int utcDaliTextFieldAtlasRenderP(void)
   DALI_TEST_CHECK( field );
 
   field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
+
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  Stage::GetCurrent().Add( field );
+
   try
   {
     // Render some text with the shared atlas backend
@@ -422,16 +465,8 @@ int utcDaliTextFieldTextChangedP(void)
 
   field.SetKeyInputFocus();
 
-  Dali::Integration::KeyEvent keyevent;
-  keyevent.keyName = "D";
-  keyevent.keyString = "D";
-  keyevent.keyCode = 0;
-  keyevent.keyModifier = 0;
-  keyevent.time = 0;
-  keyevent.state = Integration::KeyEvent::Down;
-
   gTextChangedCallBackCalled = false;
-  application.ProcessEvent( keyevent );
+  application.ProcessEvent( GenerateKey( "D", "D", 0, 0, 0, Integration::KeyEvent::Down ) );
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
 
   END_TEST;
@@ -474,17 +509,8 @@ int utcDaliTextFieldMaxCharactersReachedP(void)
   gMaxCharactersCallBackCalled = false;
   field.MaxLengthReachedSignal().Connect(&TestMaxLengthReachedCallback);
 
-  Dali::Integration::KeyEvent keyevent;
-  keyevent.keyName = "a";
-  keyevent.keyString = "a";
-  keyevent.keyCode = 0;
-  keyevent.keyModifier = 0;
-  keyevent.time = 0;
-  keyevent.state = Integration::KeyEvent::Down;
-
-  application.ProcessEvent( keyevent );
-
-  application.ProcessEvent( keyevent );
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
 
   DALI_TEST_CHECK( gMaxCharactersCallBackCalled );
 
@@ -509,18 +535,294 @@ int utcDaliTextFieldMaxCharactersReachedN(void)
   gMaxCharactersCallBackCalled = false;
   field.MaxLengthReachedSignal().Connect(&TestMaxLengthReachedCallback);
 
-  Dali::Integration::KeyEvent keyevent;
-  keyevent.keyName = "a";
-  keyevent.keyString = "a";
-  keyevent.keyCode = 0;
-  keyevent.keyModifier = 0;
-  keyevent.time = 0;
-  keyevent.state = Integration::KeyEvent::Down;
-
-  application.ProcessEvent( keyevent );
-  application.ProcessEvent( keyevent );
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
 
   DALI_TEST_CHECK( !gMaxCharactersCallBackCalled );
+
+  END_TEST;
+}
+
+int utcDaliTextFieldEvent01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldEvent01");
+
+  // Creates a tap event. After creating a tap event the text field should
+  // have the focus and add text with key events should be possible.
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  Stage::GetCurrent().Add( field );
+
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Add a key event but as the text field has not the focus it should do nothing.
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), std::string(""), TEST_LOCATION );
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Now the text field has the focus, so it can handle the key events.
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), std::string("aa"), TEST_LOCATION );
+
+  // Create a second text field and send key events to it.
+  TextField field2 = TextField::New();
+
+  field2.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field2.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field2.SetSize( 100.f, 100.f );
+  field2.SetPosition( 100.f, 100.f );
+
+  Stage::GetCurrent().Add( field2 );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Create a tap event on the second text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 125.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 125.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // The second text field has the focus. It should handle the key events.
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check the text has been added to the second text field.
+  DALI_TEST_EQUALS( field2.GetProperty<std::string>( TextField::Property::TEXT ), std::string("aa"), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliTextFieldEvent02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldEvent02");
+
+  // Checks if the right number of actors are created.
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  Stage::GetCurrent().Add( field );
+
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check there are the expected number of children ( active layer, offscreen root actor, and the offscreen image actor
+  DALI_TEST_EQUALS( field.GetChildCount(), 3u, TEST_LOCATION );
+
+  Actor layer = field.GetChildAt( 0u );
+  DALI_TEST_CHECK( layer.IsLayer() );
+
+  Actor offscreenRoot = field.GetChildAt( 1u );
+  DALI_TEST_CHECK( offscreenRoot.IsLayer() );
+  DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor.
+
+  Actor offscreenImage = field.GetChildAt( 2u );
+  ImageActor imageActor = ImageActor::DownCast( offscreenImage );
+  DALI_TEST_CHECK( imageActor );
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( layer.GetChildCount(), 1u, TEST_LOCATION ); // The cursor.
+  DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor.
+
+  // Now the text field has the focus, so it can handle the key events.
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Checks the cursor and the renderer have been created.
+  DALI_TEST_EQUALS( layer.GetChildCount(), 1u, TEST_LOCATION ); // The cursor.
+  DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 2u, TEST_LOCATION ); // The camera actor and the renderer
+
+  ImageActor cursor = ImageActor::DownCast( layer.GetChildAt( 0u ) );
+  DALI_TEST_CHECK( cursor );
+
+  CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
+  DALI_TEST_CHECK( camera );
+
+  RenderableActor renderer = RenderableActor::DownCast( offscreenRoot.GetChildAt( 1u ) );
+  DALI_TEST_CHECK( renderer );
+
+  // Move the cursor and check the position changes.
+  Vector3 position1 = cursor.GetCurrentPosition();
+
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Vector3 position2 = cursor.GetCurrentPosition();
+
+  DALI_TEST_CHECK( position2.x < position1.x );
+
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Vector3 position3 = cursor.GetCurrentPosition();
+
+  DALI_TEST_EQUALS( position1, position3, TEST_LOCATION ); // Should be in the same position1.
+
+  // Send some taps and check the cursor positions.
+
+  // Try to tap at the beginning.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Cursor position should be the same than position1.
+  Vector3 position4 = cursor.GetCurrentPosition();
+
+  DALI_TEST_EQUALS( position2, position4, TEST_LOCATION ); // Should be in the same position2.
+
+  // Try to tap at the end.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 13.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 13.0f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Cursor position should be the same than position1.
+  Vector3 position5 = cursor.GetCurrentPosition();
+
+  DALI_TEST_EQUALS( position1, position5, TEST_LOCATION ); // Should be in the same position1.
+
+  // Remove some text.
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Cursor position should be the same than position2.
+  Vector3 position6 = cursor.GetCurrentPosition();
+
+  DALI_TEST_EQUALS( Vector3( 0.f, position2.y, position2.z ), position6, TEST_LOCATION ); // TODO Should be in the same position2.
+
+  // Should not be renderer.
+  DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor only.
+
+  END_TEST;
+}
+
+int utcDaliTextFieldEvent03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldEvent03");
+
+  // Checks if the highlight actor is created.
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  Stage::GetCurrent().Add( field );
+
+  field.SetProperty( TextField::Property::TEXT, "This is a long text for the size of the text-field." );
+  field.SetSize( 30.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap first to get the focus.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Double tap to select a word.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 3.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 3.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // The offscreen root actor should have three actors: the camera, a renderer and the highlight actor.
+  Actor offscreenRoot = field.GetChildAt( 1u );
+  DALI_TEST_CHECK( offscreenRoot.IsLayer() );
+
+  CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
+  DALI_TEST_CHECK( camera );
+
+  RenderableActor renderer = RenderableActor::DownCast( offscreenRoot.GetChildAt( 1u ) );
+  DALI_TEST_CHECK( renderer );
+
+  MeshActor highlight = MeshActor::DownCast( offscreenRoot.GetChildAt( 2u ) );
+  DALI_TEST_CHECK( highlight );
 
   END_TEST;
 }

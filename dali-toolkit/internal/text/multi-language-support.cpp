@@ -57,17 +57,6 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
                                          scripts );
 }
 
-void MultilanguageSupport::ReplaceScripts( LogicalModel& model,
-                                           CharacterIndex characterIndex,
-                                           Length numberOfCharactersToRemove,
-                                           Length numberOfCharactersToInsert )
-{
-  GetImplementation( *this ).ReplaceScripts( model,
-                                             characterIndex,
-                                             numberOfCharactersToRemove,
-                                             numberOfCharactersToInsert );
-}
-
 void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                                           const Vector<ScriptRun>& scripts,
                                           Vector<FontRun>& fonts )
@@ -75,17 +64,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   GetImplementation( *this ).ValidateFonts( text,
                                             scripts,
                                             fonts );
-}
-
-void MultilanguageSupport::ValidateFonts( LogicalModel& model,
-                                          CharacterIndex characterIndex,
-                                          Length numberOfCharactersToRemove,
-                                          Length numberOfCharactersToInsert )
-{
-  GetImplementation( *this ).ValidateFonts( model,
-                                            characterIndex,
-                                            numberOfCharactersToRemove,
-                                            numberOfCharactersToInsert );
 }
 
 } // namespace Text
