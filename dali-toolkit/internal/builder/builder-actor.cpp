@@ -87,7 +87,7 @@ Actor SetupActor( const TreeNode& child, Actor& actor, const Replacement& consta
       {
         if( Property::INVALID_INDEX == index )
         {
-          actor.RegisterProperty( key, value );
+          actor.RegisterProperty( key, value, Property::READ_WRITE );
         }
         else
         {
