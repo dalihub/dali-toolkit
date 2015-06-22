@@ -82,8 +82,8 @@ const char* DEFAULT_SELECTION_HANDLE_TWO_PRESSED( DALI_IMAGE_DIR "text-input-sel
 
 const int DEFAULT_POPUP_OFFSET( -100.0f ); // Vertical offset of Popup from cursor or handles position.
 
-const Dali::Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE( 1.5f, 2.0f, 1.0f );
-const Dali::Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.5f, 1.5f, 1.0f );
+const Dali::Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE( 1.25f, 1.5f, 1.0f );
+const Dali::Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.25f, 1.5f, 1.0f );
 
 const Dali::Vector4 LIGHT_BLUE( (0xb2 / 255.0f), (0xeb / 255.0f), (0xf2 / 255.0f), 0.5f ); // The text highlight color.
 
@@ -650,8 +650,9 @@ struct Decorator::Impl : public ConnectionTracker
       primary.grabArea.SetName("SelectionHandleOneGrabArea");
 #endif
       primary.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
+      primary.grabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
+      primary.grabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
       primary.grabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
-      primary.grabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
       mTapDetector.Attach( primary.grabArea );
       mPanGestureDetector.Attach( primary.grabArea );
@@ -686,8 +687,9 @@ struct Decorator::Impl : public ConnectionTracker
       secondary.grabArea.SetName("SelectionHandleTwoGrabArea");
 #endif
       secondary.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
+      secondary.grabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
+      secondary.grabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
       secondary.grabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
-      secondary.grabArea.SetPositionInheritanceMode( Dali::USE_PARENT_POSITION );
 
       mTapDetector.Attach( secondary.grabArea );
       mPanGestureDetector.Attach( secondary.grabArea );
