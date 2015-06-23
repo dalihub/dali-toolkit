@@ -1227,7 +1227,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "UTF8 size %d, UTF32 size %d\n", text.size(), utf32Characters.Count() );
   }
 
-  if( 0u != utf32Characters.Count() )
+  if( 0u != utf32Characters.Count() ) // Check if Utf8ToUtf32 conversion succeeded
   {
     // Handle the IMF (predicitive text) state changes
     if( mImpl->mEventData )
@@ -1490,7 +1490,11 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
     }
     case Toolkit::TextSelectionPopup::PASTE:
     {
-      mImpl->PasteTextFromClipboard();
+      std::string stringToPaste("");
+      mImpl->GetTextFromClipboard( 0, stringToPaste ); // Paste latest item from system clipboard
+      InsertText( stringToPaste, Text::Controller::CLIPBOARD );
+      mImpl->ChangeState( EventData::EDITING );
+      mImpl->RequestRelayout();
       break;
     }
     case Toolkit::TextSelectionPopup::SELECT:

@@ -799,9 +799,12 @@ void Controller::Impl::SendSelectionToClipboard( bool deleteAfterSending )
   ChangeState( EventData::EDITING );
 }
 
-void Controller::Impl::PasteTextFromClipboard()
+void Controller::Impl::GetTextFromClipboard( unsigned int itemIndex, std::string& retreivedString )
 {
-  // Not supported
+  if ( mClipboard )
+  {
+    retreivedString =  mClipboard.GetItem( itemIndex );
+  }
 }
 
 void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart, CharacterIndex selectionEnd )

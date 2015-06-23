@@ -345,7 +345,7 @@ struct Controller::Impl
 
   void SendSelectionToClipboard( bool deleteAfterSending );
 
-  void PasteTextFromClipboard();
+  void GetTextFromClipboard( unsigned int itemIndex, std::string& retreivedString );
 
   void RepositionSelectionHandles( CharacterIndex selectionStart, CharacterIndex selectionEnd );
   void RepositionSelectionHandles( float visualX, float visualY );

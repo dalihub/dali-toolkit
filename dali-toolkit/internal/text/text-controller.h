@@ -103,7 +103,8 @@ public:
   enum InsertType
   {
     COMMIT,
-    PRE_EDIT
+    PRE_EDIT,
+    CLIPBOARD
   };
 
   /**
