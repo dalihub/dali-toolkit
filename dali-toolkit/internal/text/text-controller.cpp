@@ -1204,14 +1204,20 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   Vector<Character> utf32Characters;
   Length characterCount( 0u );
 
+  // Remove the previous IMF pre-edit (predicitive text)
+  if( mImpl->mEventData &&
+      mImpl->mEventData->mPreEditFlag &&
+      0 != mImpl->mEventData->mPreEditLength )
+  {
+    CharacterIndex offset = mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition;
+    removedPreEdit = RemoveText( -static_cast<int>(offset), mImpl->mEventData->mPreEditLength );
+
+    mImpl->mEventData->mPrimaryCursorPosition = mImpl->mEventData->mPreEditStartPosition;
+    mImpl->mEventData->mPreEditLength = 0;
+  }
+
   if( ! text.empty() )
   {
-    // The placeholder text is no longer needed
-    if( mImpl->IsShowingPlaceholderText() )
-    {
-      ResetText();
-    }
-
     //  Convert text into UTF-32
     utf32Characters.Resize( text.size() );
 
@@ -1229,20 +1235,15 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
   if( 0u != utf32Characters.Count() ) // Check if Utf8ToUtf32 conversion succeeded
   {
+    // The placeholder text is no longer needed
+    if( mImpl->IsShowingPlaceholderText() )
+    {
+      ResetText();
+    }
+
     // Handle the IMF (predicitive text) state changes
     if( mImpl->mEventData )
     {
-      if( mImpl->mEventData->mPreEditFlag &&
-          0 != mImpl->mEventData->mPreEditLength )
-      {
-        // Remove previous pre-edit text
-        CharacterIndex offset = mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition;
-        removedPreEdit = RemoveText( -static_cast<int>(offset), mImpl->mEventData->mPreEditLength );
-
-        mImpl->mEventData->mPrimaryCursorPosition = mImpl->mEventData->mPreEditStartPosition;
-        mImpl->mEventData->mPreEditLength = 0;
-      }
-
       if( COMMIT == type )
       {
         // IMF manager is no longer handling key-events
@@ -1290,8 +1291,16 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Inserted %d characters, new size %d new cursor %d\n", maxSizeOfNewText, mImpl->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition );
   }
 
-  if( removedPreEdit ||
-      0 != utf32Characters.Count() )
+  if( 0u == mImpl->mLogicalModel->mText.Count() &&
+      mImpl->IsPlaceholderAvailable() )
+  {
+    // Show place-holder if empty after removing the pre-edit text
+    ShowPlaceholderText();
+    mImpl->mEventData->mUpdateCursorPosition = true;
+    mImpl->ClearPreEditFlag();
+  }
+  else if( removedPreEdit ||
+           0 != utf32Characters.Count() )
   {
     // Queue an inserted event
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_INSERTED );
