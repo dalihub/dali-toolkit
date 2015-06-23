@@ -224,6 +224,9 @@ private:
 
   void OnUpload( Image image );
 
+  Shader mShaderL8;
+  Shader mShaderRgba;
+
 };
 
 } // namespace Internal

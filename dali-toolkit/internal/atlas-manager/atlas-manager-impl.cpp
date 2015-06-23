@@ -74,7 +74,7 @@ namespace
   }
   );
 
-  const char* FRAGMENT_SHADER_BGRA = MAKE_SHADER(
+  const char* FRAGMENT_SHADER_RGBA = MAKE_SHADER(
   uniform         sampler2D sTexture;
   varying mediump vec2      vTexCoord;
 
@@ -94,6 +94,8 @@ AtlasManager::AtlasManager()
   mNewAtlasSize.mHeight = DEFAULT_ATLAS_HEIGHT;
   mNewAtlasSize.mBlockWidth = DEFAULT_BLOCK_WIDTH;
   mNewAtlasSize.mBlockHeight = DEFAULT_BLOCK_HEIGHT;
+  mShaderL8 = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_L8 );
+  mShaderRgba = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_RGBA );
 }
 
 AtlasManagerPtr AtlasManager::New()
@@ -173,16 +175,7 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( const Toolkit::AtlasMa
 
   Sampler sampler = Sampler::New( atlas, "sTexture" );
   sampler.SetProperty( Sampler::Property::AFFECTS_TRANSPARENCY, true );
-  Shader shader;
-  if ( pixelformat == Pixel::BGRA8888 )
-  {
-    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_BGRA );
-  }
-  else
-  {
-    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_L8 );
-  }
-  atlasDescriptor.mMaterial = Material::New( shader );
+  atlasDescriptor.mMaterial = Material::New( pixelformat == Pixel::L8 ? mShaderL8 : mShaderRgba );
   atlasDescriptor.mMaterial.AddSampler( sampler );
   atlasDescriptor.mSampler = sampler;
   atlasDescriptor.mMaterial.SetBlendMode( BlendingMode::ON );
