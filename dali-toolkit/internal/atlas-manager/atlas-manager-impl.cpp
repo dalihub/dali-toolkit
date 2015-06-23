@@ -511,8 +511,10 @@ void AtlasManager::OptimizeMesh( const Toolkit::AtlasManager::Mesh2D& in,
     Toolkit::AtlasManager::Vertex2D v = in.mVertices[ in.mIndices[ i ] ];
     for ( SizeType j = 0; j < out.mVertices.Size(); ++j )
     {
-      if ( v.mPosition.x == out.mVertices[ j ].mPosition.x && v.mPosition.y == out.mVertices[ j ].mPosition.y &&
-           v.mTexCoords.x == out.mVertices[ j ].mTexCoords.x && v.mTexCoords.y == out.mVertices[ j ].mTexCoords.y )
+      if ( ( fabsf( v.mPosition.x - out.mVertices[ j ].mPosition.x ) < Math::MACHINE_EPSILON_1000 ) &&
+           ( fabsf( v.mPosition.y - out.mVertices[ j ].mPosition.y ) < Math::MACHINE_EPSILON_1000 ) &&
+           ( fabsf( v.mTexCoords.x - out.mVertices[ j ].mTexCoords.x ) < Math::MACHINE_EPSILON_1000 ) &&
+           ( fabsf( v.mTexCoords.y - out.mVertices[ j ].mTexCoords.y ) < Math::MACHINE_EPSILON_1000 ) )
       {
         // Yes, so store this down as the vertex to use
         out.mIndices.PushBack( j );

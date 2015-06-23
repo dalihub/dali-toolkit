@@ -43,6 +43,13 @@ public:
    */
   struct Metrics
   {
+    Metrics()
+    : mGlyphCount( 0u )
+    {}
+
+    ~Metrics()
+    {}
+
     uint32_t mGlyphCount;                   // number of glyphs being managed
     AtlasManager::Metrics mAtlasMetrics;    // metrics from the Atlas Manager
   };
