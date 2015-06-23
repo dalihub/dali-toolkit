@@ -66,7 +66,7 @@ void TestPlatformAbstraction::Resume()
 
 ImageDimensions TestPlatformAbstraction::GetClosestImageSize( const std::string& filename,
                                                               ImageDimensions size,
-                                                              FittingMode::Type scalingMode,
+                                                              FittingMode::Type fittingMode,
                                                               SamplingMode::Type samplingMode,
                                                               bool orientationCorrection )
 {
@@ -77,7 +77,7 @@ ImageDimensions TestPlatformAbstraction::GetClosestImageSize( const std::string&
 
 ImageDimensions TestPlatformAbstraction::GetClosestImageSize( Integration::ResourcePointer resourceBuffer,
                                                    ImageDimensions size,
-                                                   FittingMode::Type scalingMode,
+                                                   FittingMode::Type fittingMode,
                                                    SamplingMode::Type samplingMode,
                                                    bool orientationCorrection )
 {
@@ -92,7 +92,7 @@ ImageDimensions TestPlatformAbstraction::GetClosestImageSize( Integration::Resou
 void TestPlatformAbstraction::LoadResource(const Integration::ResourceRequest& request)
 {
   std::ostringstream out;
-  out << "Type:" << request.GetType()->id << ", Path: " << request.GetPath() << std::endl;
+  out << "Type:" << request.GetType()->id << ", Path: " << request.GetPath() << std::endl ;
 
   mTrace.PushCall("LoadResource", out.str());
   if(mRequest != NULL)
@@ -193,7 +193,7 @@ void TestPlatformAbstraction::SetDpi (unsigned int dpiHorizontal, unsigned int d
 /**
  * @copydoc PlatformAbstraction::LoadFile()
  */
-bool TestPlatformAbstraction::LoadFile( const std::string& filename, std::vector< unsigned char >& buffer ) const
+bool TestPlatformAbstraction::LoadFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const
 {
   mTrace.PushCall("LoadFile", "");
   if( mLoadFileResult.loadResult )
@@ -205,11 +205,11 @@ bool TestPlatformAbstraction::LoadFile( const std::string& filename, std::vector
 }
 
 /**
- * @copydoc PlatformAbstraction::LoadShaderBinFile()
+ * @copydoc PlatformAbstraction::LoadShaderBinaryFile()
  */
-bool TestPlatformAbstraction::LoadShaderBinFile( const std::string& filename, std::vector< unsigned char >& buffer ) const
+bool TestPlatformAbstraction::LoadShaderBinaryFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const
 {
-  mTrace.PushCall("LoadShaderBinFile", "");
+  mTrace.PushCall("LoadShaderBinaryFile", "");
   if( mLoadFileResult.loadResult )
   {
     buffer = mLoadFileResult.buffer;
@@ -221,7 +221,7 @@ bool TestPlatformAbstraction::LoadShaderBinFile( const std::string& filename, st
 /**
  * @copydoc PlatformAbstraction::SaveFile()
  */
-bool TestPlatformAbstraction::SaveFile(const std::string& filename, std::vector< unsigned char >& buffer) const
+bool TestPlatformAbstraction::SaveFile(const std::string& filename, const unsigned char * buffer, unsigned int numBytes) const
 {
   mTrace.PushCall("SaveFile", "");
   return false;
@@ -260,7 +260,8 @@ bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
     case LoadResourceFunc:                    return mTrace.FindMethod("LoadResource");
     case SaveResourceFunc:                    return mTrace.FindMethod("SaveResource");
     case LoadFileFunc:                        return mTrace.FindMethod("LoadFile");
-    case LoadShaderBinFileFunc:               return mTrace.FindMethod("LoadShaderBinFile");
+    case LoadShaderBinaryFileFunc:            return mTrace.FindMethod("LoadShaderBinaryFile");
+    case SaveShaderBinaryFileFunc:            return mTrace.FindMethod("SaveShaderBinaryFile");
     case SaveFileFunc:                        return mTrace.FindMethod("SaveFile");
     case CancelLoadFunc:                      return mTrace.FindMethod("CancelLoad");
     case GetResourcesFunc:                    return mTrace.FindMethod("GetResources");
@@ -346,7 +347,7 @@ void TestPlatformAbstraction::SetClosestImageSize(const Vector2& size)
   mClosestSize = size;
 }
 
-void TestPlatformAbstraction::SetLoadFileResult( bool result, std::vector< unsigned char >& buffer )
+void TestPlatformAbstraction::SetLoadFileResult( bool result, Dali::Vector< unsigned char >& buffer )
 {
   mLoadFileResult.loadResult = result;
   if( result )
