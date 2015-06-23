@@ -20,8 +20,8 @@
 // EXTERNAL INCLUDE
 #include <iostream>
 #include <string.h>
-#include <dali/public-api/shader-effects/sampler.h>
-#include <dali/public-api/shader-effects/shader.h>
+#include <dali/devel-api/rendering/sampler.h>
+#include <dali/devel-api/rendering/shader.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali

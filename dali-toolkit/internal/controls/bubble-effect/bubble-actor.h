@@ -19,10 +19,8 @@
  */
 
 #include <dali/public-api/actors/actor.h>
-#include <dali/public-api/actors/renderer.h>
-#include <dali/public-api/object/property-buffer.h>
 #include <dali/public-api/object/property-map.h>
-#include <dali/public-api/shader-effects/material.h>
+#include <dali/devel-api/rendering/renderer.h>
 
 namespace Dali
 {

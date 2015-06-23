@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <sstream>
-#include <dali/public-api/shader-effects/shader.h>
+#include <dali/devel-api/rendering/shader.h>
 
 namespace Dali
 {

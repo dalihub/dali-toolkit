@@ -20,9 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <dali/dali.h>
-#include <dali/integration-api/debug.h>
+#include <dali/devel-api/object/property-buffer.h>
+#include <dali/devel-api/rendering/geometry.h>
+#include <dali/devel-api/rendering/renderer.h>
+#include <dali/devel-api/rendering/sampler.h>
+#include <dali/devel-api/rendering/shader.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
-
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>

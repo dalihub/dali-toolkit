@@ -23,6 +23,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 
 #include <dali.h>
+#include <dali/devel-api/rendering/renderer.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/bubble-effect/bubble-emitter.h>
 

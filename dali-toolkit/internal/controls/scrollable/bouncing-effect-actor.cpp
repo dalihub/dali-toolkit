@@ -19,13 +19,13 @@
 #include <dali-toolkit/internal/controls/scrollable/bouncing-effect-actor.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/renderer.h>
-#include <dali/public-api/geometry/geometry.h>
 #include <dali/public-api/math/vector3.h>
-#include <dali/public-api/object/property-buffer.h>
 #include <dali/public-api/object/property-map.h>
-#include <dali/public-api/shader-effects/material.h>
-#include <dali/public-api/shader-effects/shader.h>
+#include <dali/devel-api/object/property-buffer.h>
+#include <dali/devel-api/rendering/geometry.h>
+#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/renderer.h>
+#include <dali/devel-api/rendering/shader.h>
 
 namespace Dali
 {

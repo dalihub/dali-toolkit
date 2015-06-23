@@ -23,16 +23,13 @@
 #include <limits>
 #include <stack>
 #include <dali/public-api/actors/image-actor.h>
-#include <dali/public-api/actors/renderer.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/geometry/geometry.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/object/type-registry-helper.h>
-#include <dali/devel-api/scripting/scripting.h>
-#include <dali/public-api/shader-effects/shader.h>
-#include <dali/public-api/shader-effects/material.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/rendering/renderer.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES

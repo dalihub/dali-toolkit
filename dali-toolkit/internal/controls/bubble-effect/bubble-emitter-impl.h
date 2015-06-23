@@ -22,11 +22,13 @@
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/geometry/geometry.h>
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali/public-api/shader-effects/sampler.h>
-#include <dali/public-api/shader-effects/material.h>
+#include <dali/devel-api/object/property-buffer.h>
+#include <dali/devel-api/rendering/geometry.h>
+#include <dali/devel-api/rendering/renderer.h>
+#include <dali/devel-api/rendering/sampler.h>
+#include <dali/devel-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
