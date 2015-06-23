@@ -504,6 +504,12 @@ public:
   void InsertText( const std::string& text, InsertType type );
 
   /**
+   * @brief Checks if text is selected and if so removes it.
+   * @return true if text was removed
+   */
+  bool RemoveSelectedText();
+
+  /**
    * @brief Called by editable UI controls when a tap gesture occurs.
    * @param[in] tapCount The number of taps.
    * @param[in] x The x position relative to the top-left of the parent control.

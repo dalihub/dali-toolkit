@@ -339,7 +339,7 @@ struct Controller::Impl
 
   void OnSelectAllEvent();
 
-  void RetreiveSelection( std::string& selectedText, bool deleteAfterRetreival );
+  void RetrieveSelection( std::string& selectedText, bool deleteAfterRetreival );
 
   bool CopyStringToClipboard( std::string& source );
 

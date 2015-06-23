@@ -787,7 +787,7 @@ void Controller::Impl::OnSelectAllEvent()
   }
 }
 
-void Controller::Impl::RetreiveSelection( std::string& selectedText, bool deleteAfterRetreival )
+void Controller::Impl::RetrieveSelection( std::string& selectedText, bool deleteAfterRetreival )
 {
   if( mEventData->mLeftSelectionPosition ==  mEventData->mRightSelectionPosition )
   {
@@ -832,7 +832,7 @@ bool Controller::Impl::CopyStringToClipboard( std::string& source )
 void Controller::Impl::SendSelectionToClipboard( bool deleteAfterSending )
 {
   std::string selectedText;
-  RetreiveSelection( selectedText, deleteAfterSending );
+  RetrieveSelection( selectedText, deleteAfterSending );
   CopyStringToClipboard( selectedText );
   ChangeState( EventData::EDITING );
 }

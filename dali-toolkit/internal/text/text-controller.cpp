@@ -1121,9 +1121,6 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     int keyCode = keyEvent.keyCode;
     const std::string& keyString = keyEvent.keyPressed;
 
-    // Hide the grab handle.
-    mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-
     // Pre-process to separate modifying events from non-modifying input events.
     if( Dali::DALI_KEY_ESCAPE == keyCode )
     {
@@ -1146,8 +1143,18 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // IMF manager is no longer handling key-events
       mImpl->ClearPreEditFlag();
 
-      // Remove the character before the current cursor position
-      bool removed = RemoveText( -1, 1 );
+      bool removed( false );
+
+      if ( EventData::SELECTING         == mImpl->mEventData->mState ||
+           EventData::SELECTION_CHANGED == mImpl->mEventData->mState )
+      {
+        removed = RemoveSelectedText();
+      }
+      else
+      {
+        // Remove the character before the current cursor position
+        removed = RemoveText( -1, 1 );
+      }
 
       if( removed )
       {
@@ -1173,7 +1180,6 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       mImpl->ClearPreEditFlag();
 
       InsertText( keyString, COMMIT );
-
       textChanged = true;
     }
 
@@ -1193,7 +1199,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 
 void Controller::InsertText( const std::string& text, Controller::InsertType type )
 {
-  bool removedPreEdit( false );
+  bool removedPrevious( false );
   bool maxLengthReached( false );
 
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected InsertText" )
@@ -1210,10 +1216,15 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
       0 != mImpl->mEventData->mPreEditLength )
   {
     CharacterIndex offset = mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition;
-    removedPreEdit = RemoveText( -static_cast<int>(offset), mImpl->mEventData->mPreEditLength );
+    removedPrevious = RemoveText( -static_cast<int>(offset), mImpl->mEventData->mPreEditLength );
 
     mImpl->mEventData->mPrimaryCursorPosition = mImpl->mEventData->mPreEditStartPosition;
     mImpl->mEventData->mPreEditLength = 0;
+  }
+  else
+  {
+    // Remove the previous Selection
+    removedPrevious = RemoveSelectedText();
   }
 
   if( ! text.empty() )
@@ -1299,7 +1310,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     mImpl->mEventData->mUpdateCursorPosition = true;
     mImpl->ClearPreEditFlag();
   }
-  else if( removedPreEdit ||
+  else if( removedPrevious ||
            0 != utf32Characters.Count() )
   {
     // Queue an inserted event
@@ -1315,6 +1326,26 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     // Do this last since it provides callbacks into application code
     mImpl->mControlInterface.MaxLengthReached();
   }
+}
+
+bool Controller::RemoveSelectedText()
+{
+  bool textRemoved( false );
+
+  if ( EventData::SELECTING         == mImpl->mEventData->mState ||
+       EventData::SELECTION_CHANGED == mImpl->mEventData->mState )
+  {
+    std::string removedString;
+    mImpl->RetrieveSelection( removedString, true );
+
+    if( !removedString.empty() )
+    {
+      textRemoved = true;
+      mImpl->ChangeState( EventData::EDITING );
+    }
+  }
+
+  return textRemoved;
 }
 
 void Controller::TapEvent( unsigned int tapCount, float x, float y )
