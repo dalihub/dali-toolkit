@@ -25,6 +25,7 @@ SET(TC_SOURCES
    utc-Dali-OverlayEffect.cpp
    utc-Dali-PageTurnEffect.cpp
    utc-Dali-PageTurnView.cpp
+   utc-Dali-Script.cpp
    utc-Dali-ScrollBar.cpp
    utc-Dali-ScrollView.cpp
    utc-Dali-ShadowView.cpp

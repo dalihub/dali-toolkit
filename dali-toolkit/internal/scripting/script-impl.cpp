@@ -36,14 +36,6 @@ namespace
 const char* PLUGIN_FILE = "libdali-script-plugin-v8.so";
 }
 
-void Script::ExecuteFile( const std::string& filename )
-{
-  if( mPlugin )
-  {
-    mPlugin->ExecuteFile(filename);
-  }
-}
-
 Script::Script(void) : mPlugin(NULL)
 {
   ScriptPluginProxy *plugin = new ScriptPluginProxy( PLUGIN_FILE );
@@ -64,6 +56,15 @@ Script::Script(void) : mPlugin(NULL)
     delete plugin;
   }
 
+}
+
+bool Script::ExecuteFile( const std::string& filename )
+{
+  if( mPlugin )
+  {
+    return mPlugin->ExecuteFile(filename);
+  }
+  return false;
 }
 
 Script::~Script()
