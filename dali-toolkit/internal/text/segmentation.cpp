@@ -84,13 +84,6 @@ void SetLineBreakInfo( const Vector<Character>& text,
 #endif
 }
 
-void ReplaceLineBreakInfo( LogicalModel& model,
-                           CharacterIndex characterIndex,
-                           Length numberOfCharactersToRemove,
-                           Length numberOfCharactersToInsert )
-{
-}
-
 void SetWordBreakInfo( const Vector<Character>& text,
                        Vector<WordBreakInfo>& wordBreakInfo )
 {
@@ -124,13 +117,6 @@ void SetWordBreakInfo( const Vector<Character>& text,
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "SetWordBreakInfo Break info: %s\n", info.c_str() );
   }
 #endif
-}
-
-void ReplaceWordBreakInfo( LogicalModel& model,
-                           CharacterIndex characterIndex,
-                           Length numberOfCharactersToRemove,
-                           Length numberOfCharactersToInsert )
-{
 }
 
 } // namespace Text
