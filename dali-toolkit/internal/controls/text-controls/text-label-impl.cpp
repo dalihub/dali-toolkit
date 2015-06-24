@@ -469,7 +469,7 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
     Actor renderableActor;
     if( mRenderer )
     {
-      renderableActor = mRenderer->Render( mController->GetView() );
+      renderableActor = mRenderer->Render( mController->GetView(), mDepth );
     }
 
     if( renderableActor != mRenderableActor )
@@ -494,6 +494,11 @@ void TextLabel::RequestTextRelayout()
   RelayoutRequest();
 }
 
+void TextLabel::OnStageConnection( unsigned int depth )
+{
+  mDepth = depth;
+}
+
 void TextLabel::TextChanged()
 {
   // TextLabel does not provide a signal for this
@@ -506,7 +511,8 @@ void TextLabel::MaxLengthReached()
 
 TextLabel::TextLabel()
 : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
-  mRenderingBackend( DEFAULT_RENDERING_BACKEND )
+  mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
+  mDepth( 0 )
 {
 }
 

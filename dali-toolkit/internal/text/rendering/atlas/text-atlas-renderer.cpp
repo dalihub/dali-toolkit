@@ -27,7 +27,6 @@
 #include <dali/devel-api/rendering/shader.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
@@ -107,11 +106,13 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                   const Vector4& shadowColor,
                   bool underlineEnabled,
                   const Vector4& underlineColor,
-                  float underlineHeight )
+                  float underlineHeight,
+                  unsigned int depth )
   {
     AtlasManager::AtlasSlot slot;
     std::vector< MeshRecord > meshContainer;
     Vector< Extent > extents;
+    mDepth = static_cast< int >( depth );
 
     float currentUnderlinePosition = ZERO;
     float currentUnderlineThickness = underlineHeight;
@@ -317,6 +318,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
     Material material = mGlyphManager.GetMaterial( meshRecord.mAtlasId );
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
+    renderer.SetDepthIndex( mDepth );
     Actor actor = Actor::New();
     actor.AddRenderer( renderer );
     actor.SetSize( 1.0f, 1.0f );
@@ -608,7 +610,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
 
     // Ensure shadow is behind the text...
-    renderer.SetDepthIndex( CONTENT_DEPTH_INDEX - 1 );
+    renderer.SetDepthIndex( mDepth + CONTENT_DEPTH_INDEX - 1 );
     Actor actor = Actor::New();
     actor.AddRenderer( renderer );
     actor.SetSize( 1.0f, 1.0f );
@@ -682,6 +684,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
   std::vector< uint32_t > mFace;                      ///> Face indices for a quad
   Property::Map mQuadVertexFormat;
   Property::Map mQuadIndexFormat;
+  int mDepth;
 };
 
 Text::RendererPtr AtlasRenderer::New()
@@ -691,7 +694,7 @@ Text::RendererPtr AtlasRenderer::New()
   return Text::RendererPtr( new AtlasRenderer() );
 }
 
-Actor AtlasRenderer::Render( Text::ViewInterface& view )
+Actor AtlasRenderer::Render( Text::ViewInterface& view, unsigned int depth )
 {
   UnparentAndReset( mImpl->mActor );
 
@@ -719,7 +722,8 @@ Actor AtlasRenderer::Render( Text::ViewInterface& view )
                       view.GetShadowColor(),
                       view.IsUnderlineEnabled(),
                       view.GetUnderlineColor(),
-                      view.GetUnderlineHeight() );
+                      view.GetUnderlineHeight(),
+                      depth );
   }
 
   return mImpl->mActor;

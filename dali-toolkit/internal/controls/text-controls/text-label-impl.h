@@ -93,6 +93,11 @@ private: // From Control
   virtual float GetHeightForWidth( float width );
 
   /**
+   * @copydoc Control::OnStageConnection()
+   */
+  virtual void OnStageConnection( unsigned int depth );
+
+  /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
    */
   virtual void RequestTextRelayout();
@@ -130,8 +135,8 @@ private: // Data
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
   Actor mRenderableActor;
-
   int mRenderingBackend;
+  unsigned int mDepth;
 };
 
 } // namespace Internal

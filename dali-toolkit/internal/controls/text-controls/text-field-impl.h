@@ -137,6 +137,11 @@ private: // From Control
   virtual void OnPan( const PanGesture& gesture );
 
   /**
+   * @copydoc Control::OnStageConnection()
+   */
+  virtual void OnStageConnection( unsigned int depth );
+
+  /**
    * @copydoc Dali::CustomActorImpl::OnKeyEvent(const KeyEvent&)
    */
   virtual bool OnKeyEvent(const KeyEvent& event);
@@ -215,6 +220,7 @@ private: // Data
 
   int mRenderingBackend;
   int mExceedPolicy;
+  unsigned int mDepth;
 };
 
 } // namespace Internal

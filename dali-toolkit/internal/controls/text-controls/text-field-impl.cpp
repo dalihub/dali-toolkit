@@ -919,7 +919,7 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
     Actor renderableActor;
     if( mRenderer )
     {
-      renderableActor = mRenderer->Render( mController->GetView() );
+      renderableActor = mRenderer->Render( mController->GetView(), mDepth );
     }
 
     EnableClipping( (Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy), size );
@@ -1093,6 +1093,11 @@ void TextField::KeyboardStatusChanged(bool keyboardShown)
   }
 }
 
+void TextField::OnStageConnection( unsigned int depth )
+{
+  mDepth = depth;
+}
+
 bool TextField::OnTouched( Actor actor, const TouchEvent& event )
 {
   return true;
@@ -1101,7 +1106,8 @@ bool TextField::OnTouched( Actor actor, const TouchEvent& event )
 TextField::TextField()
 : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
-  mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP )
+  mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP ),
+  mDepth( 0 )
 {
 }
 

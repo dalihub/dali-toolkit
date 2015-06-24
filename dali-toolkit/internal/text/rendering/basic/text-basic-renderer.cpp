@@ -342,7 +342,7 @@ Text::RendererPtr BasicRenderer::New()
   return Text::RendererPtr( new BasicRenderer() );
 }
 
-Actor BasicRenderer::Render( Text::ViewInterface& view )
+Actor BasicRenderer::Render( Text::ViewInterface& view, unsigned int depth )
 {
   // Remove the previous text
   UnparentAndReset( mImpl->mActor );
