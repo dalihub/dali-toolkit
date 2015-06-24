@@ -575,6 +575,13 @@ protected:
 private:
 
   /**
+   * @brief Helper to KeyEvent() to handle the backspace case.
+   *
+   * @return True if a character was deleted.
+   */
+  bool BackspaceKeyEvent();
+
+  /**
    * @brief Helper to clear font-specific data.
    */
   void ShowPlaceholderText();

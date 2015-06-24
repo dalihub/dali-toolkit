@@ -1138,39 +1138,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     }
     else if( Dali::DALI_KEY_BACKSPACE == keyCode )
     {
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p DALI_KEY_BACKSPACE\n", this );
-
-      // IMF manager is no longer handling key-events
-      mImpl->ClearPreEditFlag();
-
-      bool removed( false );
-
-      if ( EventData::SELECTING         == mImpl->mEventData->mState ||
-           EventData::SELECTION_CHANGED == mImpl->mEventData->mState )
-      {
-        removed = RemoveSelectedText();
-      }
-      else
-      {
-        // Remove the character before the current cursor position
-        removed = RemoveText( -1, 1 );
-      }
-
-      if( removed )
-      {
-        if( 0u != mImpl->mLogicalModel->mText.Count() ||
-            !mImpl->IsPlaceholderAvailable() )
-        {
-          mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
-        }
-        else
-        {
-          ShowPlaceholderText();
-          mImpl->mEventData->mUpdateCursorPosition = true;
-        }
-
-        textChanged = true;
-      }
+      textChanged = BackspaceKeyEvent();
     }
     else
     {
@@ -1635,6 +1603,43 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
 Controller::~Controller()
 {
   delete mImpl;
+}
+
+bool Controller::BackspaceKeyEvent()
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p DALI_KEY_BACKSPACE\n", this );
+
+  // IMF manager is no longer handling key-events
+  mImpl->ClearPreEditFlag();
+
+  bool removed( false );
+
+  if ( EventData::SELECTING         == mImpl->mEventData->mState ||
+       EventData::SELECTION_CHANGED == mImpl->mEventData->mState )
+  {
+    removed = RemoveSelectedText();
+  }
+  else if( mImpl->mEventData->mPrimaryCursorPosition > 0 )
+  {
+    // Remove the character before the current cursor position
+    removed = RemoveText( -1, 1 );
+  }
+
+  if( removed )
+  {
+    if( 0u != mImpl->mLogicalModel->mText.Count() ||
+        !mImpl->IsPlaceholderAvailable() )
+    {
+      mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
+    }
+    else
+    {
+      ShowPlaceholderText();
+      mImpl->mEventData->mUpdateCursorPosition = true;
+    }
+  }
+
+  return removed;
 }
 
 void Controller::ShowPlaceholderText()
