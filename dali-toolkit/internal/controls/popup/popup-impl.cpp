@@ -226,7 +226,7 @@ void Popup::SetBackgroundImage( Actor image )
 
   if ( ImageActor imageActor = DownCast< ImageActor >( image ) )
   {
-    imageActor.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+    imageActor.SetSortModifier( BACKGROUND_DEPTH_INDEX );
   }
 
   Vector3 border( mPopupStyle->backgroundOuterBorder.x, mPopupStyle->backgroundOuterBorder.z, 0.0f );
@@ -251,7 +251,7 @@ void Popup::SetButtonAreaImage( Actor image )
 
   if ( ImageActor imageActor = DownCast< ImageActor >( image ) )
   {
-    imageActor.SetDepthIndex( BACKGROUND_DEPTH_INDEX + 1 );
+    imageActor.SetSortModifier( BACKGROUND_DEPTH_INDEX + 1 );
   }
 
   // OnDialogTouched only consume the event. It prevents the touch event to be caught by the backing.
@@ -427,7 +427,7 @@ void Popup::CreateBacking()
 {
   mBacking = Dali::Toolkit::CreateSolidColorActor( mPopupStyle->backingColor );
   mBacking.SetName( "POPUP_BACKING" );
-  mBacking.SetDepthIndex( BACKGROUND_DEPTH_INDEX - 1 );
+  mBacking.SetSortModifier( BACKGROUND_DEPTH_INDEX - 1 );
   mBacking.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   mBacking.SetSensitive(true);
 

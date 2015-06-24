@@ -463,8 +463,8 @@ Dali::Image TextSelectionPopup::GetPopupImage( PopupParts part )
      // 3. Create the icons
      ImageActor pressedIcon = ImageActor::New(  iconImage );
      ImageActor icon = ImageActor::New(  iconImage );
-     icon.SetDepthIndex( DECORATION_DEPTH_INDEX - 1 );
-     pressedIcon.SetDepthIndex( DECORATION_DEPTH_INDEX - 1 );
+     icon.SetSortModifier( DECORATION_DEPTH_INDEX - 1 );
+     pressedIcon.SetSortModifier( DECORATION_DEPTH_INDEX - 1 );
      icon.SetName("image-icon-2014");
      icon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
      pressedIcon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
