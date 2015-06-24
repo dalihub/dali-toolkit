@@ -235,6 +235,7 @@ struct Decorator::Impl : public ConnectionTracker
     mTextSelectionPopupCallbackInterface( callbackInterface ),
     mBoundingBox( Rect<int>() ),
     mHighlightColor( LIGHT_BLUE ),
+    mHighlightPosition( Vector2::ZERO ),
     mActiveCursor( ACTIVE_CURSOR_NONE ),
     mCursorBlinkInterval( CURSOR_BLINK_INTERVAL ),
     mCursorBlinkDuration( 0.0f ),
@@ -247,7 +248,8 @@ struct Decorator::Impl : public ConnectionTracker
     mCursorBlinkStatus( true ),
     mPrimaryCursorVisible( false ),
     mSecondaryCursorVisible( false ),
-    mSwapSelectionHandles( false )
+    mSwapSelectionHandles( false ),
+    mNotifyEndOfScroll( false )
   {
   }
 
@@ -269,17 +271,6 @@ struct Decorator::Impl : public ConnectionTracker
       if( mPrimaryCursorVisible )
       {
         Vector2 position = cursor.position;
-        if( GRAB_HANDLE == mHandleScrolling )
-        {
-          if( mScrollDirection == SCROLL_RIGHT )
-          {
-            position.x = 0.f;
-          }
-          else
-          {
-            position.x = size.width;
-          }
-        }
 
         mPrimaryCursor.SetPosition( position.x,
                                     position.y );
@@ -306,18 +297,6 @@ struct Decorator::Impl : public ConnectionTracker
     {
       Vector2 position = grabHandle.position;
 
-      if( GRAB_HANDLE == mHandleScrolling )
-      {
-        if( mScrollDirection == SCROLL_RIGHT )
-        {
-          position.x = 0.f;
-        }
-        else
-        {
-          position.x = size.width;
-        }
-      }
-
       const bool isVisible = ( position.x <= size.width ) && ( position.x >= 0.f );
 
       if( isVisible )
@@ -343,29 +322,6 @@ struct Decorator::Impl : public ConnectionTracker
     {
       Vector2 primaryPosition = primary.position;
       Vector2 secondaryPosition = secondary.position;
-
-      if( LEFT_SELECTION_HANDLE == mHandleScrolling )
-      {
-        if( mScrollDirection == SCROLL_RIGHT )
-        {
-          primaryPosition.x = 0.f;
-        }
-        else
-        {
-          primaryPosition.x = size.width;
-        }
-      }
-      else if( RIGHT_SELECTION_HANDLE == mHandleScrolling )
-      {
-        if( mScrollDirection == SCROLL_RIGHT )
-        {
-          secondaryPosition.x = 0.f;
-        }
-        else
-        {
-          secondaryPosition.x = size.width;
-        }
-      }
 
       const bool isPrimaryVisible = ( primaryPosition.x <= size.width ) && ( primaryPosition.x >= 0.f );
       const bool isSecondaryVisible = ( secondaryPosition.x <= size.width ) && ( secondaryPosition.x >= 0.f );
@@ -866,8 +822,10 @@ struct Decorator::Impl : public ConnectionTracker
     else if( Gesture::Finished  == gesture.state ||
              Gesture::Cancelled == gesture.state )
     {
-      if( mScrollTimer && mScrollTimer.IsRunning() )
+      if( mScrollTimer &&
+          ( mScrollTimer.IsRunning() || mNotifyEndOfScroll ) )
       {
+        mNotifyEndOfScroll = false;
         mHandleScrolling = HANDLE_TYPE_COUNT;
         StopScrollTimer();
         mController.DecorationEvent( type, HANDLE_STOP_SCROLLING, x, y );
@@ -1155,6 +1113,16 @@ struct Decorator::Impl : public ConnectionTracker
     return mScrollSpeed;
   }
 
+  void NotifyEndOfScroll()
+  {
+    StopScrollTimer();
+
+    if( mScrollTimer )
+    {
+      mNotifyEndOfScroll = true;
+    }
+  }
+
   /**
    * Creates and starts a timer to scroll the text when handles are close to the edges of the text.
    *
@@ -1228,10 +1196,10 @@ struct Decorator::Impl : public ConnectionTracker
   CursorImpl          mCursor[CURSOR_COUNT];
   HandleImpl          mHandle[HANDLE_TYPE_COUNT];
   QuadContainer       mHighlightQuadList;         ///< Sub-selections that combine to create the complete selection highlight
-  Vector2             mHighlightPosition;         ///< The position of the highlight actor.
 
   Rect<int>           mBoundingBox;
   Vector4             mHighlightColor;            ///< Color of the highlight
+  Vector2             mHighlightPosition;         ///< The position of the highlight actor.
 
   unsigned int        mActiveCursor;
   unsigned int        mCursorBlinkInterval;
@@ -1241,13 +1209,13 @@ struct Decorator::Impl : public ConnectionTracker
   float               mScrollThreshold;         ///< Defines a square area inside the control, close to the edge. A cursor entering this area will trigger scroll events.
   float               mScrollSpeed;             ///< The scroll speed in pixels per second.
   float               mScrollDistance;          ///< Distance the text scrolls during a scroll interval.
-  unsigned int        mScrollInterval;          ///< Time in milliseconds of a scroll interval.
 
   bool                mActiveCopyPastePopup   : 1;
   bool                mCursorBlinkStatus      : 1; ///< Flag to switch between blink on and blink off.
   bool                mPrimaryCursorVisible   : 1; ///< Whether the primary cursor is visible.
   bool                mSecondaryCursorVisible : 1; ///< Whether the secondary cursor is visible.
   bool                mSwapSelectionHandles   : 1; ///< Whether to swap the selection handle images.
+  bool                mNotifyEndOfScroll      : 1; ///< Whether to notify the end of the scroll.
 };
 
 DecoratorPtr Decorator::New( ControllerInterface& controller,
@@ -1479,6 +1447,11 @@ void Decorator::SetScrollSpeed( float speed )
 float Decorator::GetScrollSpeed() const
 {
   return mImpl->GetScrollSpeed();
+}
+
+void Decorator::NotifyEndOfScroll()
+{
+  mImpl->NotifyEndOfScroll();
 }
 
 Decorator::~Decorator()
