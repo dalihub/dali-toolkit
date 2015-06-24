@@ -1500,7 +1500,7 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
     {
       std::string stringToPaste("");
       mImpl->GetTextFromClipboard( 0, stringToPaste ); // Paste latest item from system clipboard
-      InsertText( stringToPaste, Text::Controller::CLIPBOARD );
+      InsertText( stringToPaste, Text::Controller::COMMIT );
       mImpl->ChangeState( EventData::EDITING );
       mImpl->RequestRelayout();
       break;
