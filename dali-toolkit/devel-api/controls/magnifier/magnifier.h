@@ -45,9 +45,33 @@ class DALI_IMPORT_API Magnifier : public Control
 {
 public:
 
-  // Custom properties
+  /**
+   * @brief The start and end property ranges for this control.
+   */
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,             ///< Reserve property indices
 
-  static const std::string SOURCE_POSITION_PROPERTY_NAME;                   ///< Property, name "source-position",              type Vector3
+    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,
+    ANIMATABLE_PROPERTY_END_INDEX =   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000              ///< Reserve animatable property indices
+  };
+
+  /**
+   * @brief An enumeration of properties belonging to the Magnifier class.
+   */
+  struct Property
+  {
+    enum
+    {
+      // Event side properties
+      FRAME_VISIBILITY = PROPERTY_START_INDEX,           ///< name "frame-visibility",      Whether a frame is visible or not,         type boolean
+      MAGNIFICATION_FACTOR,                              ///< name "magnification-factor",  Larger value means greater magnification,  type float
+
+      // Animatable properties
+      SOURCE_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< name "source-position", The position of the source,  type Vector3
+    };
+  };
 
 public:
 
@@ -95,41 +119,6 @@ public:
    * @param[in] actor This actor and its children will be rendered.
    */
   void SetSourceActor(Actor actor);
-
-  /**
-   * Set the source camera position to render in magnifier
-   * @param[in] position The target position from which to render source.
-   */
-  void SetSourcePosition(Vector3 position);
-
-  /**
-   * Returns whether the frame is visible or not.
-   * @return true if frame is visible, false if not.
-   */
-  bool GetFrameVisibility() const;
-
-  /**
-   * Sets whether the frame part of the magnifier should be visible
-   * or not.
-   * @param[in] visible true to display frame, false to hide frame.
-   */
-  void SetFrameVisibility(bool visible);
-
-  /**
-   * Get the magnification factor of the magnifier
-   * The larger the value the larger the contents magnified.
-   * A value of 1.0f indications 1x magnification.
-   * @return Magnification factor is returned
-   */
-  float GetMagnificationFactor() const;
-
-  /**
-   * Set the magnification factor of the magnifier
-   * The larger the value the larger the contents magnified.
-   * A value of 1.0f indications 1x magnification.
-   * @param[in] value Magnification factor.
-   */
-  void SetMagnificationFactor(float value);
 
 public: // Not intended for application developers
 

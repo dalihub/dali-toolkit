@@ -332,24 +332,17 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
 
   // Add remaining characters into the last script.
   currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
-  if( 0u != currentScriptRun.characterRun.numberOfCharacters )
+
+  DALI_ASSERT_DEBUG( ( 0u != currentScriptRun.characterRun.numberOfCharacters ) && "MultilanguageSupport::SetScripts() Trying to insert a script run with zero characters." );
+
+  if( TextAbstraction::UNKNOWN == currentScriptRun.script )
   {
-    if( TextAbstraction::UNKNOWN == currentScriptRun.script )
-    {
-      // There are only white spaces in the last script. Set the latin script.
-      currentScriptRun.script = TextAbstraction::LATIN;
-    }
-
-    // Store the last run.
-    scripts.PushBack( currentScriptRun );
+    // There are only white spaces in the last script. Set the latin script.
+    currentScriptRun.script = TextAbstraction::LATIN;
   }
-}
 
-void MultilanguageSupport::ReplaceScripts( LogicalModel& model,
-                                           CharacterIndex characterIndex,
-                                           Length numberOfCharactersToRemove,
-                                           Length numberOfCharactersToInsert )
-{
+  // Store the last run.
+  scripts.PushBack( currentScriptRun );
 }
 
 void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
@@ -591,13 +584,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     fonts.PushBack( currentFontRun );
   }
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--MultilanguageSupport::ValidateFonts\n" );
-}
-
-void MultilanguageSupport::ValidateFonts( LogicalModel& model,
-                                          CharacterIndex characterIndex,
-                                          Length numberOfCharactersToRemove,
-                                          Length numberOfCharactersToInsert )
-{
 }
 
 } // namespace Internal

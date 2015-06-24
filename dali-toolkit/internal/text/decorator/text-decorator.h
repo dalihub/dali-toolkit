@@ -24,6 +24,9 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
+
 namespace Dali
 {
 
@@ -34,6 +37,8 @@ class Vector4;
 
 namespace Toolkit
 {
+
+class TextSelectionPopupCallbackInterface;
 
 namespace Internal
 {
@@ -132,7 +137,7 @@ public:
      *
      * @param[in] decoration The actor displaying a decoration.
      */
-    virtual void AddDecoration( Actor& actor ) = 0;
+    virtual void AddDecoration( Actor& actor, bool needsClipping ) = 0;
 
     /**
      * @brief An input event from one of the handles.
@@ -149,9 +154,12 @@ public:
    * @brief Create a new instance of a Decorator.
    *
    * @param[in] controller The controller which receives input events from Decorator components.
+   * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
+   *
    * @return A pointer to a new Decorator.
    */
-  static DecoratorPtr New( ControllerInterface& controller );
+  static DecoratorPtr New( ControllerInterface& controller,
+                           TextSelectionPopupCallbackInterface& callbackInterface );
 
   /**
    * @brief Set the bounding box which handles, popup and similar decorations will not exceed.
@@ -355,6 +363,23 @@ public:
   void GetPosition( HandleType handleType, float& x, float& y, float& lineHeight ) const;
 
   /**
+   * @brief Retrieves the position of a selection handle.
+   *
+   * @param[in] handleType The handle to get.
+   *
+   * @return The position of the selection handle relative to the top-left of the parent control.
+   */
+  const Vector2& GetPosition( HandleType handleType ) const;
+
+  /**
+   * @brief Swaps the selection handle's images.
+   *
+   * This method is called by the text controller to swap the handles
+   * when the start index is bigger than the end one.
+   */
+  void SwapSelectionHandlesEnabled( bool enable );
+
+  /**
    * @brief Adds a quad to the existing selection highlights.
    *
    * @param[in] x1 The top-left x position.
@@ -395,6 +420,18 @@ public:
    * @return True if the Selection Popup should be active.
    */
   bool IsPopupActive() const;
+
+  /**
+   * @brief Set a bit mask of the buttons to be shown by Popup
+   * @param[in] enabledButtonsBitMask from TextSelectionPopup::Buttons enum
+   */
+  void SetEnabledPopupButtons( TextSelectionPopup::Buttons& enabledButtonsBitMask );
+
+  /**
+   * @brief Get the current bit mask of buttons to be shown by Popup
+   * @return bitmask of TextSelectionPopup::Buttons
+   */
+  TextSelectionPopup::Buttons& GetEnabledPopupButtons();
 
   /**
    * @brief Sets the scroll threshold.
@@ -455,8 +492,10 @@ private:
   /**
    * @brief Private constructor.
    * @param[in] controller The controller which receives input events from Decorator components.
+   * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
    */
-  Decorator( ControllerInterface& controller );
+  Decorator( ControllerInterface& controller,
+             TextSelectionPopupCallbackInterface& callbackInterface );
 
   // Undefined
   Decorator( const Decorator& handle );

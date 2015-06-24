@@ -45,331 +45,67 @@ BaseHandle Create()
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::Alignment, Toolkit::Control, Create )
 DALI_TYPE_REGISTRATION_END()
 
-struct ScaleToFillConstraint
-{
-  /**
-   * @param padding to be added.
-   */
-  ScaleToFillConstraint( const Toolkit::Alignment::Padding& padding )
-  : mPadding( padding )
-  {}
-
-  /**
-   * Called by render thread
-   */
-  Vector3 operator()( const Vector3& currentSize,
-                      const PropertyInput& parentSizeProperty )
-  {
-    const Vector3& parentSize( parentSizeProperty.GetVector3() );
-    return GetSize( currentSize, parentSize );
-  }
-
-  inline Vector3 GetSize( const Vector3& currentSize, const Vector3& parentSize )
-  {
-    const float parentSizeWidth = parentSize.width - ( mPadding.left + mPadding.right );
-    const float parentSizeHeight = parentSize.height - ( mPadding.top + mPadding.bottom );
-
-    // prevent ridiculous sizes if parent is really small or if we don't have a proper size for the actor
-    if( ( parentSizeWidth < Math::MACHINE_EPSILON_1000 ) || ( parentSizeHeight < Math::MACHINE_EPSILON_1000 ) )
-    {
-      // no point trying to squeeze actors into this small size
-      return Vector3::ZERO;
-    }
-    return  Vector3( parentSizeWidth, parentSizeHeight, parentSize.depth );
-  }
-
-  const Toolkit::Alignment::Padding mPadding;
-};
-
-struct ScaleToFitKeepAspectConstraint
-{
-  /**
-   * @param padding to be added.
-   */
-  ScaleToFitKeepAspectConstraint( const Toolkit::Alignment::Padding& padding )
-  : mPadding( padding ),
-    mSizeStored( false ),
-    mOriginalSize()
-  {}
-
-  /**
-   * Called by render thread
-   */
-  Vector3 operator()( const Vector3& currentSize,
-                      const PropertyInput& parentSizeProperty )
-  {
-    const Vector3& parentSize( parentSizeProperty.GetVector3() );
-    return GetSize( currentSize, parentSize );
-  }
-
-  inline Vector3 GetSize( const Vector3& currentSize, const Vector3& parentSize )
-  {
-    if( ( !mSizeStored ) && ( Vector3::ZERO != currentSize ) )
-    {
-      mOriginalSize = currentSize;
-      mSizeStored = true;
-    }
-
-    const float parentSizeWidth = parentSize.width - ( mPadding.left + mPadding.right );
-    const float parentSizeHeight = parentSize.height - ( mPadding.top + mPadding.bottom );
-
-    // prevent ridiculous sizes if parent is really small or if we don't have a proper size for the actor
-    if( ( parentSizeWidth < Math::MACHINE_EPSILON_1000 ) || ( parentSizeHeight < Math::MACHINE_EPSILON_1000 )||
-        ( mOriginalSize.width < Math::MACHINE_EPSILON_1000 ) || ( mOriginalSize.height < Math::MACHINE_EPSILON_1000 ) )
-    {
-      // no point trying to squeeze actors into this small size
-      return Vector3::ZERO;
-    }
-
-    return mOriginalSize * std::min( ( parentSizeWidth / mOriginalSize.width ), ( parentSizeHeight / mOriginalSize.height ) );
-  }
-
-  const Toolkit::Alignment::Padding mPadding;
-        bool                        mSizeStored;
-        Vector3                     mOriginalSize;
-};
-
-struct ScaleToFillKeepAspectConstraint
-{
-  /**
-   * @param padding to be added.
-   */
-  ScaleToFillKeepAspectConstraint( const Toolkit::Alignment::Padding& padding )
-  : mPadding( padding ),
-    mSizeStored( false ),
-    mOriginalSize()
-  { }
-
-  /**
-   * Called by render thread
-   */
-  Vector3 operator()( const Vector3& currentSize,
-                      const PropertyInput& parentSizeProperty )
-  {
-    const Vector3& parentSize( parentSizeProperty.GetVector3() );
-    return GetSize( currentSize, parentSize );
-  }
-
-  Vector3 GetSize( const Vector3& currentSize, const Vector3& parentSize )
-  {
-    if( ( !mSizeStored ) && ( Vector3::ZERO != currentSize ) )
-    {
-      mOriginalSize = currentSize;
-      mSizeStored = true;
-    }
-
-    const float parentSizeWidth = parentSize.width - ( mPadding.left + mPadding.right );
-    const float parentSizeHeight = parentSize.height - ( mPadding.top + mPadding.bottom );
-
-    // prevent ridiculous sizes if parent is really small or if we don't have a proper size for the actor
-    if( ( parentSizeWidth < Math::MACHINE_EPSILON_1000 ) || ( parentSizeHeight < Math::MACHINE_EPSILON_1000 )||
-        ( mOriginalSize.width < Math::MACHINE_EPSILON_1000 ) || ( mOriginalSize.height < Math::MACHINE_EPSILON_1000 ) )
-    {
-      // no point trying to squeeze actors into this small size
-      return Vector3::ZERO;
-    }
-
-    return mOriginalSize * std::max( ( parentSizeWidth / mOriginalSize.width ), ( parentSizeHeight / mOriginalSize.height ) );
-  }
-
-  const Toolkit::Alignment::Padding mPadding;
-        bool                        mSizeStored;
-        Vector3                     mOriginalSize;
-};
-
-struct ShrinkToFitConstraint
-{
-  /**
-   * @param padding to be added.
-   */
-  ShrinkToFitConstraint( const Toolkit::Alignment::Padding& padding )
-  : mPadding( padding ),
-    mSizeStored( false ),
-    mOriginalSize()
-  {}
-
-  /**
-   * Called by render thread
-   */
-  Vector3 operator()( const Vector3& currentSize,
-                      const PropertyInput& parentSizeProperty )
-  {
-    const Vector3& parentSize( parentSizeProperty.GetVector3() );
-    return GetSize( currentSize, parentSize );
-  }
-
-  Vector3 GetSize( const Vector3& currentSize, const Vector3& parentSize )
-  {
-    if( ( !mSizeStored ) && ( Vector3::ZERO != currentSize ) )
-    {
-      mOriginalSize = currentSize;
-      mSizeStored = true;
-    }
-
-    const float parentSizeWidth = parentSize.width - ( mPadding.left + mPadding.right );
-    const float parentSizeHeight = parentSize.height - ( mPadding.top + mPadding.bottom );
-
-    // prevent ridiculous sizes if parent is really small or if we don't have a proper size for the actor
-    if( ( parentSizeWidth < Math::MACHINE_EPSILON_1000 ) || ( parentSizeHeight < Math::MACHINE_EPSILON_1000 )||
-        ( mOriginalSize.width < Math::MACHINE_EPSILON_1000 ) || ( mOriginalSize.height < Math::MACHINE_EPSILON_1000 ) )
-    {
-      // no point trying to squeeze actors into this small size
-      return Vector3::ZERO;
-    }
-
-    return Vector3( std::min( parentSizeWidth, mOriginalSize.width ), std::min( parentSizeHeight, mOriginalSize.height ), std::min( parentSize.depth, mOriginalSize.depth ) );
-  }
-
-  const Toolkit::Alignment::Padding mPadding;
-        bool                        mSizeStored;
-        Vector3                     mOriginalSize;
-};
-
 /**
- * Constraint that uses naturalSize if it fits inside parent and parent size if not. It also adds some padding pixels
+ * @param padding The padding value
+ * @param horizontalAlignment The horizontal alignment.
+ * @param verticalAlignment The vertical alignment.
+ * @param currentSize of the object
+ * @param parentSize
  */
-struct ShrinkToFitKeepAspectConstraint
+inline Vector3 GetPosition( const Toolkit::Alignment::Padding& padding, Toolkit::Alignment::Type horizontalAlignment, Toolkit::Alignment::Type verticalAlignment,
+                            const Vector2& currentSize, const Vector2& parentSize )
 {
-  /**
-   * @param padding to be added.
-   */
-  ShrinkToFitKeepAspectConstraint( const Toolkit::Alignment::Padding& padding )
-  : mPadding( padding ),
-    mSizeStored( false ),
-    mOriginalSize()
-  {}
+  Vector3 position( 0.f, 0.f, 0.f );
 
-  /**
-   * Called by render thread
-   */
-  Vector3 operator()( const Vector3& currentSize,
-                      const PropertyInput& parentSizeProperty )
+  switch( horizontalAlignment )
   {
-    const Vector3& parentSize( parentSizeProperty.GetVector3() );
-    return GetSize( currentSize, parentSize );
-  }
-
-  inline Vector3 GetSize( const Vector3& currentSize, const Vector3& parentSize )
-  {
-    if( ( !mSizeStored ) && ( Vector3::ZERO != currentSize ) )
-    {
-      mOriginalSize = currentSize;
-      mSizeStored = true;
-    }
-
-    const float parentSizeWidth = parentSize.width - ( mPadding.left + mPadding.right );
-    const float parentSizeHeight = parentSize.height - ( mPadding.top + mPadding.bottom );
-
-    // prevent ridiculous sizes if parent is really small or if we don't have a proper size for the actor
-    if( ( parentSizeWidth < Math::MACHINE_EPSILON_1000 ) || ( parentSizeHeight < Math::MACHINE_EPSILON_1000 )||
-        ( mOriginalSize.width < Math::MACHINE_EPSILON_1000 ) || ( mOriginalSize.height < Math::MACHINE_EPSILON_1000 ) )
-    {
-      // no point trying to squeeze actors into this small size
-      return Vector3::ZERO;
-    }
-
-    return Vector3( ShrinkInside( Vector2( parentSizeWidth, parentSizeHeight ), Vector2( mOriginalSize ) ) );
-  }
-
-  const Toolkit::Alignment::Padding mPadding;
-        bool                        mSizeStored;
-        Vector3                     mOriginalSize;
-};
-
-/**
- * Constraint that modifies the contained actor taking into account the padding value.
- */
-struct PositionConstraint
-{
-  /**
-   * @param padding The padding value
-   * @param horizontalAlignment The horizontal alignment.
-   * @param verticalAlignment The vertical alignment.
-   */
-  PositionConstraint( const Toolkit::Alignment::Padding& padding, Toolkit::Alignment::Type horizontalAlignment, Toolkit::Alignment::Type verticalAlignment )
-  : mPadding( padding ),
-    mHorizontalAlignment( horizontalAlignment ),
-    mVerticalAlignment( verticalAlignment )
-  {}
-
-  /**
-   * Called by render thread.
-   */
-  Vector3 operator()( const Vector3& currentPosition,
-                      const PropertyInput& currentSizeProperty,
-                      const PropertyInput& parentSizeProperty )
-  {
-    const Vector3& currentSize( currentSizeProperty.GetVector3() );
-    const Vector3& parentSize( parentSizeProperty.GetVector3() );
-
-    return GetPosition( currentSize, parentSize );
-  }
-
-  inline Vector3 GetPosition( const Vector3& currentSize, const Vector3& parentSize )
-  {
-    Vector3 position( 0.f, 0.f, 0.f );
-
-    switch( mHorizontalAlignment )
-    {
     case Dali::Toolkit::Alignment::HorizontalLeft:
     {
-      position.x += mPadding.left;
-      break;
-    }
-    case Dali::Toolkit::Alignment::HorizontalCenter:
-    {
-      if( currentSize.width + mPadding.left + mPadding.right >= parentSize.width )
-      {
-        position.x += 0.5f * ( mPadding.left - mPadding.right );
-      }
+      position.x += padding.left;
       break;
     }
     case Dali::Toolkit::Alignment::HorizontalRight:
     {
-      position.x -= mPadding.right;
+      position.x -= padding.right;
       break;
     }
-    default:
+    case Dali::Toolkit::Alignment::HorizontalCenter: // FALLTHROUGH
+    default: // use center as default
     {
-      DALI_ASSERT_ALWAYS( !"Wrong horizontal alignment value" );
+      if( currentSize.width + padding.left + padding.right >= parentSize.width )
+      {
+        position.x += 0.5f * ( padding.left - padding.right );
+      }
       break;
     }
-    }
+  }
 
-    switch( mVerticalAlignment )
-    {
+  switch( verticalAlignment )
+  {
     case Dali::Toolkit::Alignment::VerticalTop:
     {
-      position.y += mPadding.top;
-      break;
-    }
-    case Dali::Toolkit::Alignment::VerticalCenter:
-    {
-      if( currentSize.height + mPadding.top + mPadding.bottom >= parentSize.height )
-      {
-        position.y += 0.5f * ( mPadding.top - mPadding.bottom );
-      }
+      position.y += padding.top;
       break;
     }
     case Dali::Toolkit::Alignment::VerticalBottom:
     {
-      position.y -= mPadding.bottom;
+      position.y -= padding.bottom;
       break;
     }
-    default:
+    case Dali::Toolkit::Alignment::VerticalCenter: // FALLTHROUGH
+    default: // use center as default
     {
-      DALI_ASSERT_ALWAYS( !"Wrong vertical alignment value" );
+      if( currentSize.height + padding.top + padding.bottom >= parentSize.height )
+      {
+        position.y += 0.5f * ( padding.top - padding.bottom );
+      }
       break;
     }
-    }
-
-    return position;
   }
 
-  const Toolkit::Alignment::Padding mPadding;
-  const Toolkit::Alignment::Type mHorizontalAlignment;
-  const Toolkit::Alignment::Type mVerticalAlignment;
-};
+  return position;
+}
+
 } // namespace
 
 Toolkit::Alignment Alignment::New( Toolkit::Alignment::Type horizontal, Toolkit::Alignment::Type vertical )
@@ -482,67 +218,73 @@ void Alignment::OnRelayout( const Vector2& size, RelayoutContainer& container )
     child.SetAnchorPoint( anchorPointAndParentOrigin );
     child.SetParentOrigin( anchorPointAndParentOrigin );
 
-    Vector3 currentChildSize( child.GetTargetSize() );
-    if( currentChildSize == Vector3::ZERO )
+    Vector2 currentChildSize( child.GetTargetSize().GetVectorXY() );
+    if( currentChildSize == Vector2::ZERO )
     {
       currentChildSize = child.GetNaturalSize();
     }
 
     bool renegotiate = true;
-    Vector3 newChildSize;
+    Vector2 newChildSize;
+    newChildSize.width  = size.width - ( mPadding.left + mPadding.right );
+    newChildSize.height = size.height- (  mPadding.top + mPadding.bottom );
 
-    switch( mScaling )
+    // prevent ridiculous sizes if parent is really small or if we don't have a proper size for the actor
+    if( ( newChildSize.width > Math::MACHINE_EPSILON_1000 ) && ( newChildSize.height > Math::MACHINE_EPSILON_1000 ) &&
+        ( currentChildSize.width > Math::MACHINE_EPSILON_1000 ) && ( currentChildSize.height > Math::MACHINE_EPSILON_1000 ) )
     {
-      case Toolkit::Alignment::ScaleNone:
+      // no point trying to squeeze actors into too small size
+      switch( mScaling )
       {
-        // Nothing to do but needed just to not to jump to the default.
-        newChildSize = currentChildSize;
-        renegotiate = false;
-        break;
-      }
-      case Toolkit::Alignment::ScaleToFill:
-      {
-        ScaleToFillConstraint constraint( mPadding );
-        newChildSize = constraint.GetSize( currentChildSize, Vector3(size) ) ;
-        break;
-      }
-      case Toolkit::Alignment::ScaleToFitKeepAspect:
-      {
-        ScaleToFitKeepAspectConstraint constraint( mPadding );
-        newChildSize = constraint.GetSize( currentChildSize, Vector3(size) ) ;
-        break;
-      }
-      case Toolkit::Alignment::ScaleToFillKeepAspect:
-      {
-        ScaleToFillKeepAspectConstraint constraint( mPadding );
-        newChildSize = constraint.GetSize( currentChildSize, Vector3(size) );
-        break;
-      }
-      case Toolkit::Alignment::ShrinkToFit:
-      {
-        ShrinkToFitConstraint constraint( mPadding );
-        newChildSize = constraint.GetSize( currentChildSize, Vector3(size) );
-        break;
-      }
-      case Toolkit::Alignment::ShrinkToFitKeepAspect:
-      {
-        ShrinkToFitKeepAspectConstraint constraint( mPadding );
-        newChildSize = constraint.GetSize( currentChildSize, Vector3(size) );
-        break;
-      }
-      default:
-      {
-        DALI_ASSERT_ALWAYS( !"Invalid Alignment::mGeometryScaling value" );
-        break;
+        case Toolkit::Alignment::ScaleNone:
+        {
+          // Nothing to do
+          renegotiate = false;
+          break;
+        }
+        case Toolkit::Alignment::ScaleToFill:
+        {
+          // Nothing to do, newChildSize is already full size minus padding
+          break;
+        }
+        case Toolkit::Alignment::ScaleToFitKeepAspect:
+        {
+          newChildSize = currentChildSize * std::min( ( newChildSize.width / currentChildSize.width ), ( newChildSize.height / currentChildSize.height ) );
+          break;
+        }
+        case Toolkit::Alignment::ScaleToFillKeepAspect:
+        {
+          newChildSize = currentChildSize * std::max( ( newChildSize.width / currentChildSize.width ), ( newChildSize.height / currentChildSize.height ) );
+          break;
+        }
+        case Toolkit::Alignment::ShrinkToFit:
+        {
+          newChildSize = Vector2( std::min( newChildSize.width, currentChildSize.width ), std::min( newChildSize.height, currentChildSize.height ) );
+          break;
+        }
+        case Toolkit::Alignment::ShrinkToFitKeepAspect:
+        {
+          // check source size vs target size to see if we need to shrink
+          float widthScale = ( newChildSize.width < currentChildSize.width ) ? (newChildSize.width / currentChildSize.width) : 1.f;
+          float heightScale = ( newChildSize.height < currentChildSize.height ) ? (newChildSize.height / currentChildSize.height) : 1.0f;
+          // use smaller of the scales
+          float scale = std::min( widthScale, heightScale );
+          // check if we need to scale
+          if( scale < 1.0f )
+          {
+            // scale natural size to fit inside
+            newChildSize *= scale;
+          }
+          break;
+        }
       }
     }
 
-    PositionConstraint positionConstraint(mPadding, mHorizontal, mVertical);
-    child.SetPosition( positionConstraint.GetPosition(newChildSize, currentChildSize) );
+    child.SetPosition( GetPosition( mPadding, mHorizontal, mVertical , newChildSize, currentChildSize ) );
 
     if( renegotiate )
     {
-      container.Add( child, Vector2(newChildSize) );
+      container.Add( child, newChildSize );
     }
   }
 }

@@ -36,8 +36,6 @@ namespace Toolkit
 // Magnifier
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-const std::string Magnifier::SOURCE_POSITION_PROPERTY_NAME( "source-position" );
-
 Magnifier::Magnifier()
 {
 }
@@ -85,32 +83,6 @@ void Magnifier::SetSourceActor(Actor actor)
 {
   GetImpl(*this).SetSourceActor( actor );
 }
-
-void Magnifier::SetSourcePosition(Vector3 position)
-{
-  GetImpl(*this).SetSourcePosition( position );
-}
-
-bool Magnifier::GetFrameVisibility() const
-{
-  return GetImpl(*this).GetFrameVisibility();
-}
-
-void Magnifier::SetFrameVisibility(bool visible)
-{
-  GetImpl(*this).SetFrameVisibility(visible);
-}
-
-float Magnifier::GetMagnificationFactor() const
-{
-  return GetImpl(*this).GetMagnificationFactor();
-}
-
-void Magnifier::SetMagnificationFactor(float value)
-{
-  GetImpl(*this).SetMagnificationFactor( value );
-}
-
 
 } // namespace Toolkit
 

@@ -51,6 +51,8 @@ const char* const PROPERTY_NAME_UNDERLINE_ENABLED = "underline-enabled";
 const char* const PROPERTY_NAME_UNDERLINE_COLOR = "underline-color";
 const char* const PROPERTY_NAME_UNDERLINE_HEIGHT = "underline-height";
 
+const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
+
 } // namespace
 
 int UtcDaliToolkitTextLabelConstructorP(void)
@@ -149,13 +151,6 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_COLOR ) == TextLabel::Property::UNDERLINE_COLOR );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_HEIGHT) == TextLabel::Property::UNDERLINE_HEIGHT );
 
-  // Check label defaults are correct
-  DALI_TEST_EQUALS( label.GetProperty<int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ), Color::BLACK, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty<Vector2>( TextLabel::Property::SHADOW_OFFSET ), Vector2::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::SHADOW_COLOR ), Color::BLACK, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty<bool>( TextLabel::Property::UNDERLINE_ENABLED ), false, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::UNDERLINE_HEIGHT ), 0.0f, TEST_LOCATION );
   END_TEST;
 }
 
@@ -163,18 +158,55 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitTextLabelSetPropertyP");
-  TextLabel label = TextLabel::New("Test Text");
+  TextLabel label = TextLabel::New();
   DALI_TEST_CHECK( label );
+
+  // Check defaults
+  DALI_TEST_EQUALS( label.GetProperty<unsigned int>( TextLabel::Property::RENDERING_BACKEND ), DEFAULT_RENDERING_BACKEND, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::TEXT ), std::string(""), TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_FAMILY ), std::string(""), TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_STYLE ), std::string(""), TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::POINT_SIZE ), 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<bool>( TextLabel::Property::MULTI_LINE ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::HORIZONTAL_ALIGNMENT ), "BEGIN", TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::VERTICAL_ALIGNMENT ), "TOP", TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ), Color::BLACK, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<Vector2>( TextLabel::Property::SHADOW_OFFSET ), Vector2::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::SHADOW_COLOR ), Color::BLACK, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<bool>( TextLabel::Property::UNDERLINE_ENABLED ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::UNDERLINE_COLOR ), Color::BLACK, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::UNDERLINE_HEIGHT ), 0.0f, TEST_LOCATION );
+
+  label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_BASIC );
+  DALI_TEST_EQUALS( label.GetProperty<unsigned int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_BASIC, TEST_LOCATION );
 
   // Check that text can be correctly reset
   label.SetProperty( TextLabel::Property::TEXT, "Setting Text" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::TEXT ), "Setting Text", TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::TEXT ), std::string("Setting Text"), TEST_LOCATION );
+
+  // Check font properties.
+  label.SetProperty( TextLabel::Property::FONT_FAMILY, "Setting font family" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_FAMILY ), std::string("Setting font family"), TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::FONT_STYLE, "Setting font style" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_STYLE ), std::string("Setting font style"), TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::POINT_SIZE, 10.f );
+  DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::POINT_SIZE ), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Toggle multi-line
+  label.SetProperty( TextLabel::Property::MULTI_LINE, true );
+  DALI_TEST_EQUALS( label.GetProperty<bool>( TextLabel::Property::MULTI_LINE ), true, TEST_LOCATION );
 
   // Check that the Alignment properties can be correctly set
-  label.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "BEGIN" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::HORIZONTAL_ALIGNMENT ), "BEGIN", TEST_LOCATION );
-  label.SetProperty( TextLabel::Property::VERTICAL_ALIGNMENT, "TOP" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::VERTICAL_ALIGNMENT ), "TOP", TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::HORIZONTAL_ALIGNMENT ), "CENTER", TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::VERTICAL_ALIGNMENT ), "CENTER", TEST_LOCATION );
+
+  // Check that text color can be properly set
+  label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::BLUE );
+  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ), Color::BLUE, TEST_LOCATION );
+  // The underline color is changed as well.
+  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::UNDERLINE_COLOR ), Color::BLUE, TEST_LOCATION );
 
   // Check that shadow parameters can be correctly set
   label.SetProperty( TextLabel::Property::SHADOW_OFFSET, Vector2( 3.0f, 3.0f ) );
@@ -190,13 +222,10 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   label.SetProperty( TextLabel::Property::UNDERLINE_HEIGHT, 1.0f );
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::UNDERLINE_HEIGHT ), 1.0f, TEST_LOCATION );
 
-  // Check that text color can be properly set
-  label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::BLUE );
-  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ), Color::BLUE, TEST_LOCATION );
+  TextLabel label2 = TextLabel::New( "New text" );
+  DALI_TEST_CHECK( label2 );
+  DALI_TEST_EQUALS( label2.GetProperty<std::string>( TextLabel::Property::TEXT ), std::string("New text"), TEST_LOCATION );
 
-  // Toggle multi-line
-  label.SetProperty( TextLabel::Property::MULTI_LINE, true );
-  DALI_TEST_EQUALS( label.GetProperty<bool>( TextLabel::Property::MULTI_LINE ), true, TEST_LOCATION );
   END_TEST;
 }
 
@@ -206,6 +235,11 @@ int UtcDaliToolkitTextlabelBasicRenderP(void)
   tet_infoline(" UtcDaliToolkitTextLabelBasicRenderP");
   TextLabel label = TextLabel::New("Test Text");
   DALI_TEST_CHECK( label );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  Stage::GetCurrent().Add( label );
 
   label.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "BEGIN" );
   label.SetProperty( TextLabel::Property::MULTI_LINE, true );
@@ -231,6 +265,11 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
   TextLabel label = TextLabel::New("Test Text");
   DALI_TEST_CHECK( label );
 
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  Stage::GetCurrent().Add( label );
+
   // Turn on all the effects
   label.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
   label.SetProperty( TextLabel::Property::MULTI_LINE, true );
@@ -238,6 +277,7 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
   label.SetProperty( TextLabel::Property::UNDERLINE_COLOR, Color::RED );
   label.SetProperty( TextLabel::Property::SHADOW_OFFSET, Vector2( 1.0f, 1.0f ) );
   label.SetProperty( TextLabel::Property::SHADOW_COLOR, Color::BLUE );
+
   try
   {
     // Render some text with the shared atlas backend
@@ -252,3 +292,27 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextLabelLanguagesP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelLanguagesP");
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK( label );
+
+  Stage::GetCurrent().Add( label );
+
+  const std::string scripts( " привет мир, γειά σου Κόσμε, Hello world, مرحبا بالعالم, שלום עולם, "
+                             "բարեւ աշխարհը, მსოფლიოში, 안녕하세요, 你好世界, ひらがな, カタカナ, "
+                             "ওহে বিশ্ব, မင်္ဂလာပါကမ္ဘာလောက, हैलो वर्ल्ड, હેલો વર્લ્ડ, ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਦੁਨਿਆ, ಹಲೋ ವರ್ಲ್ಡ್, "
+                             "ഹലോ വേൾഡ്, ଓଡ଼ିଆ, හෙලෝ වර්ල්ඩ්, ஹலோ உலகம், హలో వరల్డ్, "
+                             "ສະບາຍດີໂລກ, สวัสดีโลก, ជំរាបសួរពិភពលោក, "
+                             "\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84." ); // these characters on the last line are emojis.
+
+  label.SetProperty( TextLabel::Property::TEXT, scripts );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::TEXT ), scripts, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}

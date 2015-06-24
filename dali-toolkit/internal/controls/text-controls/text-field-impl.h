@@ -144,7 +144,7 @@ private: // From Control
   /**
    * @copydoc Text::ControlInterface::AddDecoration()
    */
-  virtual void AddDecoration( Actor& actor );
+  virtual void AddDecoration( Actor& actor, bool needsClipping );
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
@@ -215,6 +215,7 @@ private: // Data
   Text::RendererPtr mRenderer;
   Text::DecoratorPtr mDecorator;
   Text::ClipperPtr mClipper; ///< For EXCEED_POLICY_CLIP
+  std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
   RenderableActor mRenderableActor;
 

@@ -79,6 +79,8 @@ void Clipper::Refresh( const Vector2& size )
                                                                offscreenSize.height,
                                                                Pixel::RGBA8888 );
 
+    mOffscreenRootActor.SetSize( size );
+
     mImageActor.SetSize( offscreenSize );
     mImageActor.SetImage( frameBufferImage );
     mRenderTask.SetTargetFrameBuffer( frameBufferImage );

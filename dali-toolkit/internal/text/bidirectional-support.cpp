@@ -162,13 +162,6 @@ void SetBidirectionalInfo( const Vector<Character>& text,
   }
 }
 
-void ReplaceBidirectionalInfo( LogicalModel& model,
-                               CharacterIndex characterIndex,
-                               Length numberOfCharactersToRemove,
-                               Length numberOfCharactersToInsert )
-{
-}
-
 void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
                    Vector<LineRun>& lineRuns,
                    Vector<BidirectionalLineInfoRun>& lineInfoRuns )
@@ -232,14 +225,6 @@ void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInf
       lineInfoRuns.PushBack( lineInfoRun );
     }
   }
-}
-
-void ReorderLines( LogicalModel& logicalModel,
-                   const VisualModel& visualModel,
-                   CharacterIndex characterIndex,
-                   Length numberOfCharactersToRemove,
-                   Length numberOfCharactersToInsert )
-{
 }
 
 bool GetMirroredText( const Vector<Character>& text,

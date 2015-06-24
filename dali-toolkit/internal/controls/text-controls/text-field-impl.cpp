@@ -873,7 +873,8 @@ void TextField::OnInitialize()
 
   mController = Text::Controller::New( *this );
 
-  mDecorator = Text::Decorator::New( *mController );
+  mDecorator = Text::Decorator::New( *mController,
+                                     *mController );
 
   mController->GetLayoutEngine().SetLayout( LayoutEngine::SINGLE_LINE_BOX );
 
@@ -960,6 +961,24 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
         Self().Add( mRenderableActor );
       }
     }
+
+    for( std::vector<Actor>::const_iterator it = mClippingDecorationActors.begin(),
+           endIt = mClippingDecorationActors.end();
+         it != endIt;
+         ++it )
+    {
+      Actor actor = *it;
+
+      if( mClipper )
+      {
+        mClipper->GetRootActor().Add( actor );
+      }
+      else
+      {
+        Self().Add( actor );
+      }
+    }
+    mClippingDecorationActors.clear();
   }
 }
 
@@ -1045,11 +1064,18 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
   return mController->KeyEvent( event );
 }
 
-void TextField::AddDecoration( Actor& actor )
+void TextField::AddDecoration( Actor& actor, bool needsClipping )
 {
   if( actor )
   {
-    Self().Add( actor );
+    if( needsClipping )
+    {
+      mClippingDecorationActors.push_back( actor );
+    }
+    else
+    {
+      Self().Add( actor );
+    }
   }
 }
 
