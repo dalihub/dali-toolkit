@@ -1325,9 +1325,8 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
     const bool isShowingPlaceholderText = mImpl->IsShowingPlaceholderText();
     if( 1u == tapCount )
     {
-      bool tapDuringEditMode( EventData::EDITING == mImpl->mEventData->mState );
-
-      if( !isShowingPlaceholderText && tapDuringEditMode )
+      if( !isShowingPlaceholderText &&
+          ( EventData::EDITING == mImpl->mEventData->mState ) )
       {
         mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
         mImpl->mEventData->mDecorator->SetPopupActive( false );
