@@ -77,7 +77,7 @@ private: // From Button
   /**
    * @copydoc Toolkit::Internal::Button::OnSelected()
    */
-  virtual bool OnSelected();
+  virtual void OnSelected();
 
   /**
    * @copydoc Toolkit::Internal::Button::OnLabelSet()

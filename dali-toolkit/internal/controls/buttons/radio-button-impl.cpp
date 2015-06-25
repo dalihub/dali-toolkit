@@ -44,6 +44,8 @@ TypeRegistration typeRegistration( typeid( Toolkit::RadioButton ), typeid( Toolk
 
 const char* const UNSELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-unselected.png";
 const char* const SELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-selected.png";
+const char* const DISABLED_UNSELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-unselected-disabled.png";
+const char* const DISABLED_SELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "radio-button-selected-disabled.png";
 
 const float DISTANCE_BETWEEN_IMAGE_AND_LABEL( 5.0f );
 }
@@ -79,11 +81,15 @@ void RadioButton::OnButtonInitialize()
   // Wrap size of radio button around all its children
   self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
 
-  Image buttonImage = Dali::ResourceImage::New( UNSELECTED_BUTTON_IMAGE_DIR );
-  Image selectedImage = Dali::ResourceImage::New( SELECTED_BUTTON_IMAGE_DIR );
+  Image buttonImage = Dali::ResourceImage::New( UNSELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
+  Image selectedImage = Dali::ResourceImage::New( SELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
+  Image disabledImage = Dali::ResourceImage::New( DISABLED_UNSELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
+  Image disabledSelectedImage = Dali::ResourceImage::New( DISABLED_SELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
 
   SetButtonImage( ImageActor::New( buttonImage ) );
   SetSelectedImage( ImageActor::New( selectedImage ) );
+  SetDisabledImage( ImageActor::New( disabledImage ) );
+  SetDisabledSelectedImage( ImageActor::New( disabledSelectedImage ) );
 
   RelayoutRequest();
 }
@@ -115,25 +121,26 @@ void RadioButton::OnLabelSet()
       label.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::WIDTH );
     }
 
-    if( IsSelected() )
+    if( IsSelected() && GetSelectedImage() )
     {
       label.SetX( GetSelectedImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
-    else
+    else if( GetButtonImage() )
     {
       label.SetX( GetButtonImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+    }
+    else
+    {
+      label.SetX( DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
   }
 }
 
-bool RadioButton::OnSelected()
+void RadioButton::OnSelected()
 {
-  Actor& buttonImage = GetButtonImage();
-  Actor& selectedImage = GetSelectedImage();
   Actor& label = GetLabel();
 
   PaintState paintState = GetPaintState();
-
   switch( paintState )
   {
     case UnselectedState:
@@ -151,9 +158,8 @@ bool RadioButton::OnSelected()
         }
       }
 
-      RemoveChild( buttonImage );
-
-      if( label )
+      Actor& selectedImage = GetSelectedImage();
+      if( label && selectedImage )
       {
         label.SetX( selectedImage.GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
       }
@@ -161,9 +167,8 @@ bool RadioButton::OnSelected()
     }
     case SelectedState:
     {
-      RemoveChild( selectedImage );
-
-      if( label )
+      Actor& buttonImage = GetButtonImage();
+      if( label && buttonImage )
       {
         label.SetX( buttonImage.GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
       }
@@ -174,9 +179,6 @@ bool RadioButton::OnSelected()
       break;
     }
   }
-
-  // there is no animation
-  return false;
 }
 
 } // namespace Internal
