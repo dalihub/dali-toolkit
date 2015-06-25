@@ -735,6 +735,11 @@ bool Control::OnAccessibilityValueChange(bool isIncrease)
   return false; // Accessibility value change action is not handled by default
 }
 
+bool Control::OnAccessibilityZoom()
+{
+  return false; // Accessibility zoom action is not handled by default
+}
+
 Actor Control::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled)
 {
   return Actor();

@@ -1,11 +1,11 @@
-// Prevent normal accessibility manager declaration from loading
-#define __DALI_ACCESSIBILITY_MANAGER_H__
+// Prevent normal accessibility adaptor declaration from loading
+#define __DALI_ACCESSIBILITY_ADAPTOR_H__
 
-#ifndef __DALI_TOOLKIT_ACCESSIBILITY_MANAGER_H__
-#define __DALI_TOOLKIT_ACCESSIBILITY_MANAGER_H__
+#ifndef __DALI_TOOLKIT_ACCESSIBILITY_ADAPTOR_H__
+#define __DALI_TOOLKIT_ACCESSIBILITY_ADAPTOR_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/signals/dali-signal.h>
 #include <dali/public-api/events/touch-point.h>
 
 namespace Dali
@@ -33,7 +32,7 @@ namespace Internal
 {
 namespace Adaptor
 {
-class AccessibilityManager;
+class AccessibilityAdaptor;
 }
 }
 class AccessibilityActionHandler;
@@ -41,19 +40,16 @@ class AccessibilityGestureHandler;
 class TouchPoint;
 
 /**
- * This creates a stubbed AccessibilityManager so that internal Toolkit Adaptor calls work.
+ * This creates a stubbed AccessibilityAdaptor so that internal Toolkit Adaptor calls work.
  */
-class AccessibilityManager : public BaseHandle
+class AccessibilityAdaptor : public BaseHandle
 {
-public: // Typedefs
-  typedef Signal< bool ( AccessibilityManager& ) > AccessibilityActionSignalType;
-
 public: // Construction & Destruction
-  AccessibilityManager();
-  ~AccessibilityManager();
+  AccessibilityAdaptor();
+  ~AccessibilityAdaptor();
 
 public: // Getters
-  static AccessibilityManager Get();
+  static AccessibilityAdaptor Get();
   Vector2 GetReadPosition() const;
   bool IsEnabled() const;
   void SetActionHandler(AccessibilityActionHandler& handler);
@@ -71,24 +67,24 @@ public: // Getters
   bool HandleActionBackEvent();
   void HandleActionEnableEvent();
   void HandleActionDisableEvent();
+  bool HandleActionScrollUpEvent();
+  bool HandleActionScrollDownEvent();
+  bool HandleActionPageLeftEvent();
+  bool HandleActionPageRightEvent();
+  bool HandleActionPageUpEvent();
+  bool HandleActionPageDownEvent();
+  bool HandleActionMoveToFirstEvent();
+  bool HandleActionMoveToLastEvent();
+  bool HandleActionReadFromTopEvent();
+  bool HandleActionReadFromNextEvent();
+  bool HandleActionZoomEvent();
+  bool HandleActionReadIndicatorInformationEvent();
+  bool HandleActionReadPauseResumeEvent();
+  bool HandleActionStartStopEvent();
 
-public:  // Signals
-  AccessibilityActionSignalType& StatusChangedSignal();
-  AccessibilityActionSignalType& ActionNextSignal();
-  AccessibilityActionSignalType& ActionPreviousSignal();
-  AccessibilityActionSignalType& ActionActivateSignal();
-  AccessibilityActionSignalType& ActionReadSignal();
-  AccessibilityActionSignalType& ActionOverSignal();
-  AccessibilityActionSignalType& ActionReadNextSignal();
-  AccessibilityActionSignalType& ActionReadPreviousSignal();
-  AccessibilityActionSignalType& ActionUpSignal();
-  AccessibilityActionSignalType& ActionDownSignal();
-  AccessibilityActionSignalType& ActionClearFocusSignal();
-  AccessibilityActionSignalType& ActionBackSignal();
-
-  AccessibilityManager( Internal::Adaptor::AccessibilityManager* manager );
+  AccessibilityAdaptor( Internal::Adaptor::AccessibilityAdaptor* adaptor );
 };
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_ACCESSIBILITY_MANAGER_H__
+#endif // __DALI_TOOLKIT_ACCESSIBILITY_ADAPTOR_H__
