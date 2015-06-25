@@ -84,6 +84,17 @@ void Controller::SetText( const std::string& text )
 
   CharacterIndex lastCursorIndex = 0u;
 
+  if( mImpl->mEventData )
+  {
+    // If popup shown then hide it by switching to Editing state
+    if ( EventData::SELECTING == mImpl->mEventData->mState ||
+         EventData::SELECTION_CHANGED == mImpl->mEventData->mState ||
+         EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState )
+    {
+      mImpl->ChangeState( EventData::EDITING );
+    }
+  }
+
   if( !text.empty() )
   {
     //  Convert text into UTF-32
@@ -1219,6 +1230,8 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     {
       ResetText();
     }
+
+    mImpl->ChangeState( EventData::EDITING );
 
     // Handle the IMF (predicitive text) state changes
     if( mImpl->mEventData )
