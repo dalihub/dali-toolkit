@@ -882,6 +882,7 @@ void TextField::OnInitialize()
   // Fill-parent area by default
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
+  self.OnStageSignal().Connect( this, &TextField::OnStageConnect );
 }
 
 void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
@@ -916,35 +917,39 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
 
-    Actor renderableActor;
-    if( mRenderer )
-    {
-      renderableActor = mRenderer->Render( mController->GetView(), mDepth );
-    }
-
+    RenderText();
     EnableClipping( (Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy), size );
+  }
+}
 
-    if( renderableActor != mRenderableActor )
+void TextField::RenderText()
+{
+  Actor renderableActor;
+  if( mRenderer )
+  {
+    renderableActor = mRenderer->Render( mController->GetView(), mDepth );
+  }
+
+  if( renderableActor != mRenderableActor )
+  {
+    UnparentAndReset( mRenderableActor );
+    mRenderableActor = renderableActor;
+  }
+
+  if( mRenderableActor )
+  {
+    const Vector2 offset = mController->GetScrollPosition() + mController->GetAlignmentOffset();
+
+    mRenderableActor.SetPosition( offset.x, offset.y );
+
+    // Make sure the actor is parented correctly with/without clipping
+    if( mClipper )
     {
-      UnparentAndReset( mRenderableActor );
-      mRenderableActor = renderableActor;
+      mClipper->GetRootActor().Add( mRenderableActor );
     }
-
-    if( mRenderableActor )
+    else
     {
-      const Vector2 offset = mController->GetScrollPosition() + mController->GetAlignmentOffset();
-
-      mRenderableActor.SetPosition( offset.x, offset.y );
-
-      // Make sure the actor is parented correctly with/without clipping
-      if( mClipper )
-      {
-        mClipper->GetRootActor().Add( mRenderableActor );
-      }
-      else
-      {
-        Self().Add( mRenderableActor );
-      }
+      Self().Add( mRenderableActor );
     }
   }
 }
@@ -1048,6 +1053,18 @@ void TextField::TextChanged()
   mTextChangedSignal.Emit( handle );
 }
 
+void TextField::OnStageConnect( Dali::Actor actor )
+{
+  if ( mHasBeenStaged )
+  {
+    RenderText();
+  }
+  else
+  {
+    mHasBeenStaged = true;
+  }
+}
+
 void TextField::MaxLengthReached()
 {
   Dali::Toolkit::TextField handle( GetOwner() );
@@ -1107,7 +1124,8 @@ TextField::TextField()
 : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP ),
-  mDepth( 0 )
+  mDepth( 0 ),
+  mHasBeenStaged( false )
 {
 }
 

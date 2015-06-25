@@ -439,6 +439,7 @@ void TextLabel::OnInitialize()
   // Enable the text ellipsis.
   LayoutEngine& engine = mController->GetLayoutEngine();
   engine.SetTextEllipsisEnabled( true );
+  self.OnStageSignal().Connect( this, &TextLabel::OnStageConnect );
 }
 
 void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
@@ -465,33 +466,48 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
     {
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
-
-    Actor renderableActor;
-    if( mRenderer )
-    {
-      renderableActor = mRenderer->Render( mController->GetView(), mDepth );
-    }
-
-    if( renderableActor != mRenderableActor )
-    {
-      UnparentAndReset( mRenderableActor );
-
-      if( renderableActor )
-      {
-        const Vector2& alignmentOffset = mController->GetAlignmentOffset();
-        renderableActor.SetPosition( alignmentOffset.x, alignmentOffset.y );
-
-        Self().Add( renderableActor );
-      }
-
-      mRenderableActor = renderableActor;
-    }
+    RenderText();
   }
 }
 
 void TextLabel::RequestTextRelayout()
 {
   RelayoutRequest();
+}
+
+void TextLabel::RenderText()
+{
+  Actor renderableActor;
+  if( mRenderer )
+  {
+    renderableActor = mRenderer->Render( mController->GetView(), mDepth );
+  }
+
+  if( renderableActor != mRenderableActor )
+  {
+    UnparentAndReset( mRenderableActor );
+
+    if( renderableActor )
+    {
+      const Vector2& alignmentOffset = mController->GetAlignmentOffset();
+      renderableActor.SetPosition( alignmentOffset.x, alignmentOffset.y );
+
+      Self().Add( renderableActor );
+    }
+    mRenderableActor = renderableActor;
+  }
+}
+
+void TextLabel::OnStageConnect( Dali::Actor actor )
+{
+  if ( mHasBeenStaged )
+  {
+    RenderText();
+  }
+  else
+  {
+    mHasBeenStaged = true;
+  }
 }
 
 void TextLabel::OnStageConnection( unsigned int depth )
@@ -512,7 +528,8 @@ void TextLabel::MaxLengthReached()
 TextLabel::TextLabel()
 : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
-  mDepth( 0 )
+  mDepth( 0 ),
+  mHasBeenStaged( false )
 {
 }
 
