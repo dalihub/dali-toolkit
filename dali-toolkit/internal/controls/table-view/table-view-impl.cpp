@@ -31,12 +31,25 @@ using namespace Dali;
 
 namespace
 {
+/*
+ * Custom properties for where to put the actor.
+ *
+ * When an actor is add to the tableView through Actor::Add() instead of TableView::AddChild,
+ * the following custom properties of the actor are checked to decide the actor position inside the table
+ *
+ * These non-animatable properties should be registered to the child which would be added to the table
+ */
+const char * const CELL_INDEX_PROPERTY_NAME("cell-index");
+const char * const ROW_SPAN_PROPERTY_NAME("row-span");
+const char * const COLUMN_SPAN_PROPERTY_NAME("column-span");
+const char * const CELL_HORIZONTAL_ALIGNMENT_PROPERTY_NAME("cell-horizontal-alignment");
+const char * const CELL_VERTICAL_ALIGNMENT_PROPERTY_NAME("cell-vertical-alignment");
 
 /**
  * @brief Should the tableview fit around the given actor
  *
  * @param[in] actor The child actor to test against
- * @param[dimension] The dimnesion to test against
+ * @param[dimension] The dimension to test against
  */
 bool FitToChild( Actor actor, Dimension::Type dimension )
 {
@@ -141,10 +154,26 @@ const Scripting::StringEnum LAYOUT_POLICY_STRING_TABLE[] =
 {
  { "fixed",    Toolkit::TableView::FIXED    },
  { "relative", Toolkit::TableView::RELATIVE },
- { "fill",     Toolkit::TableView::FILL     }
+ { "fill",     Toolkit::TableView::FILL     },
+ { "fit",      Toolkit::TableView::FIT      }
 };
-
 const unsigned int LAYOUT_POLICY_STRING_TABLE_COUNT = sizeof(LAYOUT_POLICY_STRING_TABLE) / sizeof( LAYOUT_POLICY_STRING_TABLE[0] );
+
+const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
+{
+  {"left",   HorizontalAlignment::LEFT},
+  {"center", HorizontalAlignment::CENTER},
+  {"right",  HorizontalAlignment::RIGHT}
+};
+const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof(HORIZONTAL_ALIGNMENT_STRING_TABLE) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
+
+const Scripting::StringEnum VERTICAL_ALIGNMENT_STRING_TABLE[] =
+{
+  {"top",    VerticalAlignment::TOP},
+  {"center", VerticalAlignment::CENTER},
+  {"bottom", VerticalAlignment::BOTTOM}
+};
+const unsigned int VERTICAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof(VERTICAL_ALIGNMENT_STRING_TABLE) / sizeof( VERTICAL_ALIGNMENT_STRING_TABLE[0] );
 
 } // Unnamed namespace
 
@@ -169,10 +198,7 @@ bool TableView::AddChild( Actor& child, const Toolkit::TableView::CellPosition& 
   DALI_ASSERT_ALWAYS( child );
 
   // if child is already parented, we adopt it
-  if( child.GetParent() )
-  {
-    child.GetParent().Remove( child );
-  }
+  child.Unparent();
 
   // check if we need to expand our data array
   if( position.rowIndex >= mCellData.GetRows() )
@@ -544,44 +570,44 @@ Size TableView::GetCellPadding()
   return mPadding;
 }
 
-void TableView::SetRowPolicy( unsigned int rowIndex, CellSizePolicy policy )
+void TableView::SetFitHeight( unsigned int rowIndex )
 {
   DALI_ASSERT_ALWAYS( rowIndex < mRowData.Size() );
 
-  if( mRowData[ rowIndex ].sizePolicy != policy )
+  if( mRowData[ rowIndex ].sizePolicy != Toolkit::TableView::FIT )
   {
-    mRowData[ rowIndex ].sizePolicy = policy;
+    mRowData[ rowIndex ].sizePolicy = Toolkit::TableView::FIT;
 
     mRowColumnDirty = true;
     RelayoutRequest();
   }
 }
 
-TableView::CellSizePolicy TableView::GetRowPolicy( unsigned int rowIndex ) const
+bool TableView::IsFitHeight( unsigned int rowIndex ) const
 {
   DALI_ASSERT_ALWAYS( rowIndex < mRowData.Size() );
 
-  return mRowData[ rowIndex ].sizePolicy;
+  return mRowData[ rowIndex ].sizePolicy == Toolkit::TableView::FIT;
 }
 
-void TableView::SetColumnPolicy( unsigned int columnIndex, CellSizePolicy policy )
+void TableView::SetFitWidth( unsigned int columnIndex )
 {
   DALI_ASSERT_ALWAYS( columnIndex < mColumnData.Size() );
 
-  if( mColumnData[ columnIndex ].sizePolicy != policy )
+  if( mColumnData[ columnIndex ].sizePolicy != Toolkit::TableView::FIT )
   {
-    mColumnData[ columnIndex ].sizePolicy = policy;
+    mColumnData[ columnIndex ].sizePolicy = Toolkit::TableView::FIT;
 
     mRowColumnDirty = true;
     RelayoutRequest();
   }
 }
 
-TableView::CellSizePolicy TableView::GetColumnPolicy( unsigned int columnIndex ) const
+bool TableView::IsFitWidth( unsigned int columnIndex ) const
 {
   DALI_ASSERT_ALWAYS( columnIndex < mColumnData.Size() );
 
-  return mColumnData[ columnIndex ].sizePolicy;
+  return mColumnData[ columnIndex ].sizePolicy == Toolkit::TableView::FIT;
 }
 
 void TableView::SetFixedHeight( unsigned int rowIndex, float height )
@@ -590,7 +616,7 @@ void TableView::SetFixedHeight( unsigned int rowIndex, float height )
 
   RowColumnData& data = mRowData[ rowIndex ];
   data.size = height;
-  data.sizePolicy = FIXED;
+  data.sizePolicy = Toolkit::TableView::FIXED;
 
   mRowColumnDirty = true;
   RelayoutRequest();
@@ -609,7 +635,7 @@ void TableView::SetFixedWidth( unsigned int columnIndex, float width )
 
   RowColumnData& data = mColumnData[ columnIndex ];
   data.size = width;
-  data.sizePolicy = FIXED;
+  data.sizePolicy = Toolkit::TableView::FIXED;
 
   mRowColumnDirty = true;
   RelayoutRequest();
@@ -628,8 +654,7 @@ void TableView::SetRelativeHeight( unsigned int rowIndex, float heightPercentage
 
   RowColumnData& data = mRowData[ rowIndex ];
   data.fillRatio = heightPercentage;
-  data.userFillRatio = true;
-  data.sizePolicy = FILL;
+  data.sizePolicy = Toolkit::TableView::RELATIVE;
 
   mRowColumnDirty = true;
   RelayoutRequest();
@@ -648,8 +673,7 @@ void TableView::SetRelativeWidth( unsigned int columnIndex, float widthPercentag
 
   RowColumnData& data = mColumnData[ columnIndex ];
   data.fillRatio = widthPercentage;
-  data.userFillRatio = true;
-  data.sizePolicy = FILL;
+  data.sizePolicy = Toolkit::TableView::RELATIVE;
 
   mRowColumnDirty = true;
   RelayoutRequest();
@@ -723,45 +747,89 @@ void TableView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   CalculateRowColumnData();
 
-  // Go through the layout data
-  float cumulatedHeight = 0.0f;
-
-  const unsigned int rowCount = mCellData.GetRows();
+  // update every column position in ColumnData array
+  float cumulatedWidth = 0.0f;
   const unsigned int columnCount = mCellData.GetColumns();
+  for( unsigned int column = 0; column < columnCount; ++column )
+  {
+    mColumnData[column].position = cumulatedWidth;
+    cumulatedWidth += mColumnData[ column ].size;
+  }
 
+  // update every row position in RowData array
+  float cumulatedHeight = 0.0f;
+  const unsigned int rowCount = mCellData.GetRows();
   for( unsigned int row = 0; row < rowCount; ++row )
   {
-    float cumulatedWidth = 0.0f;
+    mRowData[row].position = cumulatedHeight;
+    cumulatedHeight += mRowData[ row ].size;
+  }
 
+  // Go through the layout data
+  for( unsigned int row = 0; row < rowCount; ++row )
+  {
     for( unsigned int column = 0; column < columnCount; ++column )
     {
-      Actor& actor = mCellData[ row ][ column ].actor;
-      const Toolkit::TableView::CellPosition position = mCellData[ row ][ column ].position;
+      CellData& cellData= mCellData[ row ][ column ];
+      Actor& actor = cellData.actor;
+      const Toolkit::TableView::CellPosition position = cellData.position;
 
       // If there is an actor and this is the main cell of the actor.
-      // An actor can be in multiple cells if its row or columnspan is more than 1.
+      // An actor can be in multiple cells if its row or column span is more than 1.
       // We however must lay out each actor only once.
-      if( actor && ( position.rowIndex == row ) && ( position.columnIndex == column ) )
+      if( actor &&  position.rowIndex == row && position.columnIndex == column )
       {
-        // Anchor actor to top left of table view
+        // Anchor actor to top left of the cell
         actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
         actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+
+        Vector2( actor.GetRelayoutSize( Dimension::WIDTH ), actor.GetRelayoutSize( Dimension::HEIGHT ) );
 
         Padding padding;
         actor.GetPadding( padding );
 
-        Vector3 actorPosition( cumulatedWidth + mPadding.width + padding.left,       // Left padding
-                               cumulatedHeight + mPadding.height + padding.top,      // Top padding
-                               0.0f );
-        actor.SetPosition( actorPosition );
+        if( cellData.horizontalAlignment == HorizontalAlignment::LEFT )
+        {
+          actor.SetX( mColumnData[column].position + mPadding.width + padding.left );
+        }
+        else
+        {
+          float cellRightPosition = column+position.columnSpan < columnCount ? mColumnData[column+position.columnSpan].position : cumulatedWidth;
+
+          if( cellData.horizontalAlignment ==  HorizontalAlignment::RIGHT )
+          {
+            actor.SetX( cellRightPosition - mPadding.width - padding.right - actor.GetRelayoutSize( Dimension::WIDTH ) );
+          }
+          else //if( cellData.horizontalAlignment ==  HorizontalAlignment::CENTER )
+          {
+            actor.SetX( (mColumnData[column].position + cellRightPosition
+                       + padding.left - padding.right
+                       - actor.GetRelayoutSize( Dimension::WIDTH )) * 0.5f );
+          }
+        }
+
+        if( cellData.verticalAlignment == VerticalAlignment::TOP )
+        {
+          actor.SetY( mRowData[row].position + mPadding.height + padding.top );
+        }
+        else
+        {
+          float cellBottomPosition = row+position.rowSpan < rowCount ? mRowData[row+position.rowSpan].position : cumulatedHeight;
+
+          if( cellData.verticalAlignment == VerticalAlignment::BOTTOM )
+
+          {
+            actor.SetY( cellBottomPosition - mPadding.height - padding.bottom -  actor.GetRelayoutSize( Dimension::HEIGHT ) );
+          }
+          else //if( cellData.verticalAlignment = VerticalAlignment::CENTER )
+          {
+            actor.SetY( (mRowData[row].position + cellBottomPosition
+                       + padding.top - padding.bottom
+                       - actor.GetRelayoutSize( Dimension::HEIGHT )) * 0.5f );
+          }
+        }
       }
-
-      DALI_ASSERT_DEBUG( column < mColumnData.Size() );
-      cumulatedWidth += mColumnData[ column ].size;
     }
-
-    DALI_ASSERT_DEBUG( row < mRowData.Size() );
-    cumulatedHeight += mRowData[ row ].size;
   }
 }
 
@@ -807,12 +875,12 @@ void TableView::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TableView::Property::LAYOUT_ROWS:
       {
-        SetHeightOrWidthProperty( tableViewImpl, &TableView::SetFixedHeight, &TableView::SetRelativeHeight, value );
+        SetHeightOrWidthProperty( tableViewImpl, &TableView::SetFixedHeight, &TableView::SetRelativeHeight, &TableView::SetFitHeight, value );
         break;
       }
       case Toolkit::TableView::Property::LAYOUT_COLUMNS:
       {
-        SetHeightOrWidthProperty( tableViewImpl, &TableView::SetFixedWidth, &TableView::SetRelativeWidth, value );
+        SetHeightOrWidthProperty( tableViewImpl, &TableView::SetFixedWidth, &TableView::SetRelativeWidth, &TableView::SetFitWidth, value );
         break;
       }
     }
@@ -869,29 +937,49 @@ void TableView::OnControlChildAdd( Actor& child )
     return;
   }
 
-  RelayoutRequest();
-
   // Test properties on actor
+  HorizontalAlignment::Type horizontalAlignment = HorizontalAlignment::LEFT;
+  VerticalAlignment::Type verticalAlignment = VerticalAlignment::TOP;
+  if( child.GetPropertyIndex( CELL_HORIZONTAL_ALIGNMENT_PROPERTY_NAME ) != Property::INVALID_INDEX )
+  {
+    std::string value = child.GetProperty( child.GetPropertyIndex(CELL_HORIZONTAL_ALIGNMENT_PROPERTY_NAME) ).Get<std::string >();
+    Scripting::GetEnumeration< HorizontalAlignment::Type >( value.c_str(),
+                                                            HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                            HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                            horizontalAlignment );
+  }
+  if( child.GetPropertyIndex( CELL_VERTICAL_ALIGNMENT_PROPERTY_NAME ) != Property::INVALID_INDEX )
+  {
+    std::string value = child.GetProperty( child.GetPropertyIndex(CELL_VERTICAL_ALIGNMENT_PROPERTY_NAME) ).Get<std::string >();
+    Scripting::GetEnumeration< VerticalAlignment::Type >( value.c_str(),
+                                                          VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                          VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                          verticalAlignment );
+  }
+
+
   Toolkit::TableView::CellPosition cellPosition;
-  if( child.GetPropertyIndex(Toolkit::TableView::ROW_SPAN_PROPERTY_NAME) != Property::INVALID_INDEX )
+  if( child.GetPropertyIndex(ROW_SPAN_PROPERTY_NAME) != Property::INVALID_INDEX )
   {
-    cellPosition.rowSpan = static_cast<unsigned int>( child.GetProperty( child.GetPropertyIndex(Toolkit::TableView::ROW_SPAN_PROPERTY_NAME) ).Get<float>() );
+    cellPosition.rowSpan = static_cast<unsigned int>( child.GetProperty( child.GetPropertyIndex(ROW_SPAN_PROPERTY_NAME) ).Get<float>() );
   }
 
-  if( child.GetPropertyIndex(Toolkit::TableView::COLUMN_SPAN_PROPERTY_NAME) != Property::INVALID_INDEX )
+  if( child.GetPropertyIndex(COLUMN_SPAN_PROPERTY_NAME) != Property::INVALID_INDEX )
   {
-    cellPosition.columnSpan = static_cast<unsigned int>( child.GetProperty( child.GetPropertyIndex(Toolkit::TableView::COLUMN_SPAN_PROPERTY_NAME) ).Get<float>() );
+    cellPosition.columnSpan = static_cast<unsigned int>( child.GetProperty( child.GetPropertyIndex(COLUMN_SPAN_PROPERTY_NAME) ).Get<float>() );
   }
 
-  if( child.GetPropertyIndex(Toolkit::TableView::CELL_INDICES_PROPERTY_NAME) != Property::INVALID_INDEX )
+  if( child.GetPropertyIndex(CELL_INDEX_PROPERTY_NAME) != Property::INVALID_INDEX )
   {
-    Vector2 indices = child.GetProperty( child.GetPropertyIndex(Toolkit::TableView::CELL_INDICES_PROPERTY_NAME) ).Get<Vector2 >();
+    Vector2 indices = child.GetProperty( child.GetPropertyIndex(CELL_INDEX_PROPERTY_NAME) ).Get<Vector2 >();
     cellPosition.rowIndex = static_cast<unsigned int>( indices.x );
     cellPosition.columnIndex = static_cast<unsigned int>( indices.y );
 
     AddChild( child, cellPosition );
+    SetCellAlignment(cellPosition, horizontalAlignment, verticalAlignment);
 
     // Do not continue
+    RelayoutRequest();
     return;
   }
 
@@ -909,9 +997,12 @@ void TableView::OnControlChildAdd( Actor& child )
         data.actor = child;
         data.position.columnIndex = column;
         data.position.rowIndex = row;
+        data.horizontalAlignment = horizontalAlignment;
+        data.verticalAlignment = verticalAlignment;
         mCellData[ row ][ column ] = data;
 
         // Don't continue
+        RelayoutRequest();
         return;
       }
     }
@@ -926,7 +1017,10 @@ void TableView::OnControlChildAdd( Actor& child )
   data.actor = child;
   data.position.rowIndex = rowCount;
   data.position.columnIndex = 0;
+  data.horizontalAlignment = horizontalAlignment;
+  data.verticalAlignment = verticalAlignment;
   mCellData[ rowCount ][ 0 ] = data;
+  RelayoutRequest();
 }
 
 void TableView::OnControlChildRemove( Actor& child )
@@ -1048,18 +1142,19 @@ bool TableView::RemoveAllInstances( const Actor& child )
 void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
                                          void(TableView::*funcFixed)(unsigned int, float),
                                          void(TableView::*funcRelative)(unsigned int, float),
+                                         void(TableView::*funcFit)(unsigned int),
                                          const Property::Value& value )
 {
   Property::Map* map = value.GetMap();
   if( map )
   {
-    unsigned int rowIndex(0);
+    unsigned int index(0);
     for ( unsigned int i = 0, count = map->Count(); i < count; ++i )
     {
       Property::Value& item = map->GetValue(i);
       Property::Map* childMap = item.GetMap();
 
-      std::istringstream( map->GetKey(i) ) >> rowIndex;
+      std::istringstream( map->GetKey(i) ) >> index;
       if( childMap )
       {
         Property::Value* policy = childMap->Find( "policy" );
@@ -1074,14 +1169,19 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
                                                                              LAYOUT_POLICY_STRING_TABLE_COUNT,
                                                                              policy ) )
           {
-            if( policy == Toolkit::TableView::FIXED )
+            if( policy == Toolkit::TableView::FIXED  )
             {
-              (tableViewImpl.*funcFixed)( rowIndex, value->Get<float>() );
+              (tableViewImpl.*funcFixed)( index, value->Get<float>() );
             }
             else if( policy == Toolkit::TableView::RELATIVE )
             {
-              (tableViewImpl.*funcRelative)( rowIndex, value->Get<float>() );
+              (tableViewImpl.*funcRelative)( index, value->Get<float>() );
             }
+            else if( policy == Toolkit::TableView::FIT )
+            {
+              (tableViewImpl.*funcFit)( index );
+            }
+            // do nothing for FILL policy
           }
         }
       }
@@ -1105,63 +1205,56 @@ Property::Value TableView::GetColumnWidthsPropertyValue()
 
 void TableView::GetMapPropertyValue( const RowColumnArray& data, Property::Map& map )
 {
-  const char* name = Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::FIXED,
-                                                                                        LAYOUT_POLICY_STRING_TABLE,
-                                                                                        LAYOUT_POLICY_STRING_TABLE_COUNT );
-  std::string fixedPolicy;
-  if( name )
-  {
-    fixedPolicy = name;
-  }
-  name = Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::RELATIVE,
-                                                                            LAYOUT_POLICY_STRING_TABLE,
-                                                                            LAYOUT_POLICY_STRING_TABLE_COUNT );
-  std::string relativePolicy;
-  if( name )
-  {
-    relativePolicy = name;
-  }
+  const char* fixedPolicy = Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::FIXED,
+                                                                                               LAYOUT_POLICY_STRING_TABLE,
+                                                                                               LAYOUT_POLICY_STRING_TABLE_COUNT );
+  const char* relativePolicy = Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::RELATIVE,
+                                                                                                  LAYOUT_POLICY_STRING_TABLE,
+                                                                                                  LAYOUT_POLICY_STRING_TABLE_COUNT );
+  const char* fillPolicy = Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::FILL,
+                                                                                              LAYOUT_POLICY_STRING_TABLE,
+                                                                                              LAYOUT_POLICY_STRING_TABLE_COUNT );
+  const char* fitPolicy = Scripting::GetEnumerationName< Toolkit::TableView::LayoutPolicy >( Toolkit::TableView::FIT,
+                                                                                             LAYOUT_POLICY_STRING_TABLE,
+                                                                                             LAYOUT_POLICY_STRING_TABLE_COUNT );
 
   const RowColumnArray::SizeType count = data.Size();
   for( RowColumnArray::SizeType i = 0; i < count; i++ )
   {
     const RowColumnData& dataInstance = data[ i ];
 
+    Property::Map item;
     switch( dataInstance.sizePolicy )
     {
-      case FIXED:
+      case Toolkit::TableView::FIXED:
       {
-        Property::Map item;
         item[ "policy" ] = fixedPolicy;
         item[ "value" ] = dataInstance.size;
-
-        std::ostringstream ss;
-        ss << i;
-
-        map[ ss.str() ] = item;
-
         break;
       }
-
-      case FILL:
+      case Toolkit::TableView::RELATIVE:
       {
-        Property::Map item;
         item[ "policy" ] = relativePolicy;
         item[ "value" ] = dataInstance.fillRatio;
-
-        std::ostringstream ss;
-        ss << i;
-
-        map[ ss.str() ] = item;
-
         break;
       }
-
+      case Toolkit::TableView::FIT:
+      {
+        item[ "policy" ] = fitPolicy;
+        item[ "value" ] = 0.f;
+        break;
+      }
+      case Toolkit::TableView::FILL:
       default:
       {
+        item[ "policy" ] = fillPolicy;
+        item[ "value" ] = 0.f;
         break;
       }
     }
+    std::ostringstream ss;
+    ss << i;
+    map[ ss.str() ] = item;
   }
 }
 
@@ -1319,7 +1412,7 @@ float TableView::CalculateChildSize( const Actor& child, Dimension::Type dimensi
               }
 
               // Apply padding
-              cellSize -= mPadding.width * 2.0f;
+              cellSize -= mPadding.height * 2.0f;
               if( cellSize < 0.0f )
               {
                 cellSize = 0.0f;
@@ -1384,16 +1477,13 @@ void TableView::ComputeRelativeSizes( RowColumnArray& data )
   {
     RowColumnData& dataInstance = data[ i ];
 
-    if( dataInstance.sizePolicy == FILL )
+    if( dataInstance.sizePolicy == Toolkit::TableView::RELATIVE )
     {
-      if( dataInstance.userFillRatio )
-      {
-        relativeTotal += dataInstance.fillRatio;
-      }
-      else
-      {
-        fillData.PushBack( &dataInstance );
-      }
+      relativeTotal += dataInstance.fillRatio;
+    }
+    else if(dataInstance.sizePolicy == Toolkit::TableView::FILL)
+    {
+      fillData.PushBack( &dataInstance );
     }
   }
 
@@ -1427,8 +1517,9 @@ float TableView::CalculateTotalFixedSize( const RowColumnArray& data )
 
     switch( dataInstance.sizePolicy )
     {
-      case FIXED:
-      case FIT:
+      // we have absolute size to FIXED and FIT column/row and relative size for RELATIVE and FILL column/row
+      case Toolkit::TableView::FIXED:
+      case Toolkit::TableView::FIT:
       {
         totalSize += dataInstance.size;
         break;
@@ -1475,7 +1566,7 @@ void TableView::CalculateFixedSizes( RowColumnArray& data, Dimension::Type dimen
   {
     RowColumnData& dataInstance = data[ i ];
 
-    if( dataInstance.sizePolicy == FIT )
+    if( dataInstance.sizePolicy == Toolkit::TableView::FIT )
     {
       // Find the size of the biggest actor in the row or column
       float maxActorHeight = 0.0f;
@@ -1513,7 +1604,7 @@ void TableView::CalculateRelativeSizes( RowColumnArray& data, float size )
   {
     RowColumnData& dataInstance = data[ i ];
 
-    if( dataInstance.sizePolicy == FILL )
+    if( dataInstance.sizePolicy == Toolkit::TableView::FILL ||  dataInstance.sizePolicy == Toolkit::TableView::RELATIVE)
     {
       dataInstance.size = dataInstance.fillRatio * size;
     }
@@ -1524,7 +1615,7 @@ bool TableView::FindFit( const RowColumnArray& data )
 {
   for( unsigned int i = 0, count = data.Size(); i < count; ++i )
   {
-    if( data[ i ].sizePolicy == FIT )
+    if( data[ i ].sizePolicy == Toolkit::TableView::FIT )
     {
       return true;
     }
