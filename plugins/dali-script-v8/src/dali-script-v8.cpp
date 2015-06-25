@@ -56,16 +56,14 @@ void DaliScriptV8::SetFlags(const std::string& s)
   DaliWrapper::Get().SetFlagsFromString(s);
 }
 
-void DaliScriptV8::ExecuteBuffer(const std::string& buffer, const std::string& filename)
+bool DaliScriptV8::ExecuteBuffer(const std::string& buffer, const std::string& filename)
 {
-  DaliWrapper::Get().ExecuteBuffer(buffer, filename);
+  return DaliWrapper::Get().ExecuteBuffer(buffer, filename);
 }
 
-void DaliScriptV8::ExecuteFile(const std::string& filename)
+bool DaliScriptV8::ExecuteFile(const std::string& filename)
 {
-
-
-  DaliWrapper::Get().ExecuteFile( filename );
+  return DaliWrapper::Get().ExecuteFile( filename );
 }
 
 }  // namespace V8Plugin

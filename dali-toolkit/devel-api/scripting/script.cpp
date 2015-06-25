@@ -46,9 +46,9 @@ Script::Script(Internal::Script *impl)
 {
 }
 
-void Script::ExecuteFile( const std::string &filename )
+bool Script::ExecuteFile( const std::string &filename )
 {
-  GetImpl(*this).ExecuteFile( filename );
+  return GetImpl(*this).ExecuteFile( filename );
 }
 
 } // namespace Toolkit

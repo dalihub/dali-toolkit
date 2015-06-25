@@ -55,12 +55,12 @@ public: // ScriptV8Plugin overrides
   /**
    * @copydoc Dali::Toolkit::ScriptPlugin::ExecuteBuffer()
    */
-  virtual void ExecuteBuffer(const std::string& buffer, const std::string& filename);
+  virtual bool ExecuteBuffer(const std::string& buffer, const std::string& filename);
 
   /**
    * @copydoc Dali::Toolkit::ScriptPlugin::ExecuteFile()
    */
-  virtual void ExecuteFile(const std::string& fileName);
+  virtual bool ExecuteFile(const std::string& fileName);
 
 
 };
