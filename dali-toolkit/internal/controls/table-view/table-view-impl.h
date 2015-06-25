@@ -41,16 +41,6 @@ class TableView : public Control
 public:
 
   /**
-   * Enum for the size policies of rows and columns
-   */
-  enum CellSizePolicy
-  {
-    FILL,       ///< Fill up available space, may have a ratio associated with it
-    FIXED,      ///< A specific fixed width or height
-    FIT         ///< Fit around actors in the row or column
-  };
-
-  /**
    * Create a new TableView.
    * @return A smart-pointer to the newly allocated TableView.
    */
@@ -127,36 +117,24 @@ public:
   Size GetCellPadding();
 
   /**
-   * @brief Set a row policy
-   *
-   * @param[in] rowIndex The row to set the policy for
-   * @param[in] policy The policy to set
+   * @copydoc Toolkit::TableView::SetFitHeight
    */
-  void SetRowPolicy( unsigned int rowIndex, CellSizePolicy policy );
+  void SetFitHeight( unsigned int rowIndex );
 
   /**
-   * @brief Querry a row policy
-   *
-   * @param[in] rowIndex The row to querry
-   * @return Return the policy
+   * @copydoc Toolkit::TableView::IsFitHeight
    */
-  CellSizePolicy GetRowPolicy( unsigned int rowIndex ) const;
+  bool IsFitHeight( unsigned int rowIndex ) const;
 
   /**
-   * @brief Set a column policy
-   *
-   * @param[in] columnIndex The column to set the policy for
-   * @param[in] policy The policy to set
+   * @copydoc Toolkit::TableView::SetFitWidth
    */
-  void SetColumnPolicy( unsigned int columnIndex, CellSizePolicy policy );
+  void SetFitWidth( unsigned int columnIndex );
 
   /**
-   * @brief Querry a column policy
-   *
-   * @param[in] columnIndex The column to querry
-   * @return Return the policy
+   * @copydoc Toolkit::TableView::IsFitWidth
    */
-  CellSizePolicy GetColumnPolicy( unsigned int columnIndex ) const;
+  bool IsFitWidth( unsigned int columnIndex ) const;
 
   /**
    * @copydoc Toolkit::TableView::SetFixedWidth
@@ -299,8 +277,8 @@ private: // Implementation
     RowColumnData()
     : size( 0.0f ),
       fillRatio( 0.0f ),
-      sizePolicy( FILL ),
-      userFillRatio( false )
+      position(0.0f),
+      sizePolicy( Toolkit::TableView::FILL )
     {
     }
 
@@ -310,18 +288,18 @@ private: // Implementation
      * @param[in] newSize The size to set for this data
      * @param[in] newSizePolicy The policy used to interpret the size value
      */
-    RowColumnData( float newSize, float newFillRatio, CellSizePolicy newSizePolicy, bool newUserFillRatio )
+    RowColumnData( float newSize, float newFillRatio, Toolkit::TableView::LayoutPolicy newSizePolicy )
     : size( newSize ),
       fillRatio( newFillRatio ),
-      sizePolicy( newSizePolicy ),
-      userFillRatio( newUserFillRatio )
+      position(0.0f),
+      sizePolicy( newSizePolicy )
     {
     }
 
-    float size;                       ///< Set or calculated size
-    float fillRatio;                  ///< Ratio to fill remaining space
-    CellSizePolicy sizePolicy;        ///< The size policy used to interpret the size value
-    bool userFillRatio : 1;           ///< FillRatio was set by user
+    float size;                                  ///< Set or calculated size
+    float fillRatio;                             ///< Ratio to fill remaining space, only valid with RELATIVE or FILL policy
+    float position;                              ///< Position of the row/column, this value is updated during every Relayout round
+    Toolkit::TableView::LayoutPolicy sizePolicy; ///< The size policy used to interpret the size value
   };
 
   typedef Dali::Vector<RowColumnData> RowColumnArray;
@@ -447,13 +425,15 @@ private: // scripting support
   /**
    * Called to set the heights/widths property.
    * @param[in] tableViewImpl The object whose property is set.
-   * @param[in] funcFixed The set function to call, it can be SetFixedHeight or SetFixedWidths.
-   * @param[in] funcRelative The set function to call, it can be SetRelativeHeight or SetRelativeWidths.
+   * @param[in] funcFixed The set function to call, it can be SetFixedHeight or SetFixedWidth.
+   * @param[in] funcRelative The set function to call, it can be SetRelativeHeight or SetRelativeWidth.
+   * @param[in] funcFit The set function to call, it can be SetFitHeight or SetFiltWidth.
    * @param[in] value The new property value.
    */
   static void SetHeightOrWidthProperty( TableView& tableViewImpl,
                                         void(TableView::*funcFixed)(unsigned int, float),
                                         void(TableView::*funcRelative)(unsigned int, float),
+                                        void(TableView::*funcFit)(unsigned int),
                                         const Property::Value& map );
 
   /**
@@ -518,7 +498,7 @@ private:
 
 private: // Data
 
-  Array2d<CellData> mCellData;                ///< Data for each cell: Actor, alignment settings etc
+  Array2d<CellData> mCellData;   ///< Data for each cell: Actor, alignment settings etc
 
   RowColumnArray mRowData;       ///< Data for each row
   RowColumnArray mColumnData;    ///< Data for each column
@@ -526,7 +506,7 @@ private: // Data
 
   Size mPadding;                 ///< Padding to apply to each cell
   bool mLayoutingChild;          ///< Can't be a bitfield due to Relayouting lock
-  bool mRowColumnDirty : 1;       ///< Flag to indicate the row column data is dirty
+  bool mRowColumnDirty : 1;      ///< Flag to indicate the row column data is dirty
 };
 
 } // namespace Internal

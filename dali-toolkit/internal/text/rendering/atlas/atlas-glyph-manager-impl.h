@@ -49,11 +49,17 @@ class AtlasGlyphManager : public Dali::BaseObject
 {
 public:
 
-  struct GlyphRecord
+  struct GlyphRecordEntry
   {
-    Text::FontId mFontId;
     Text::GlyphIndex mIndex;
     uint32_t mImageId;
+    int32_t mCount;
+  };
+
+  struct FontGlyphRecord
+  {
+    Text::FontId mFontId;
+    Vector< GlyphRecordEntry > mGlyphRecords;
   };
 
   AtlasGlyphManager();
@@ -68,7 +74,8 @@ public:
   /**
    * @copydoc Toolkit::AtlasGlyphManager::Add
    */
-  void Add( const Text::GlyphInfo& glyph,
+  void Add( Text::FontId fontId,
+            const Text::GlyphInfo& glyph,
             const BufferImage& bitmap,
             Dali::Toolkit::AtlasManager::AtlasSlot& slot );
 
@@ -88,7 +95,7 @@ public:
   /**
    * @copydoc Toolkit::AtlasGlyphManager::Cached
    */
-  void Cached( Text::FontId fontId,
+  bool Cached( Text::FontId fontId,
                Text::GlyphIndex index,
                Dali::Toolkit::AtlasManager::AtlasSlot& slot );
 
@@ -103,14 +110,14 @@ public:
   void SetNewAtlasSize( uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight );
 
   /**
-   * @copydoc Toolkit::AtlasGlyphManager::Remove
-   */
-  void Remove( uint32_t imageId );
-
-  /**
    * @copydoc Toolkit::AtlasGlyphManager::GetPixelFormat
    */
   Pixel::Format GetPixelFormat( uint32_t atlasId );
+
+  /**
+   * @copydoc toolkit::AtlasGlyphManager::AdjustReferenceCount
+   */
+  void AdjustReferenceCount( Text::FontId fontId, uint32_t imageId, int32_t delta );
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::GetMaterial
@@ -146,7 +153,7 @@ public:
 private:
 
   Dali::Toolkit::AtlasManager mAtlasManager;          ///> Atlas Manager created by GlyphManager
-  Vector< GlyphRecord > mGlyphRecords;                ///> Cached glyph information
+  std::vector< FontGlyphRecord > mFontGlyphRecords;
   Toolkit::AtlasGlyphManager::Metrics mMetrics;       ///> Metrics to pass back on GlyphManager status
   Shader mEffectBufferShader;                         ///> Shader used to render drop shadow buffer textures
   Shader mShadowShader;                               ///> Shader used to render drop shadow into buffer

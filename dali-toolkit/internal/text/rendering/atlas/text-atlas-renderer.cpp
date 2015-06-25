@@ -76,17 +76,24 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     uint32_t mMeshRecordIndex;
   };
 
-  struct AtlasRecord
-  {
-    uint32_t mImageId;
-    Text::GlyphIndex mIndex;
-  };
-
   struct MaxBlockSize
   {
     FontId mFontId;
     uint32_t mNeededBlockWidth;
     uint32_t mNeededBlockHeight;
+  };
+
+  struct CheckEntry
+  {
+    FontId mFontId;
+    Text::GlyphIndex mIndex;
+  };
+
+  struct TextCacheEntry
+  {
+    FontId mFontId;
+    Text::GlyphIndex mIndex;
+    uint32_t mImageId;
   };
 
   Impl()
@@ -112,6 +119,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     AtlasManager::AtlasSlot slot;
     std::vector< MeshRecord > meshContainer;
     Vector< Extent > extents;
+    TextCacheEntry textCacheEntry;
     mDepth = static_cast< int >( depth );
 
     float currentUnderlinePosition = ZERO;
@@ -125,10 +133,10 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       style = STYLE_DROP_SHADOW;
     }
 
-    if ( mImageIds.Size() )
+    if ( mTextCache.Size() )
     {
-      // Unreference any currently used glyphs
-      RemoveText();
+      // Update the glyph cache with any changes to current text
+      RemoveText( glyphs );
     }
 
     CalculateBlocksSize( glyphs );
@@ -178,17 +186,9 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
         const Vector2& position = positions[ i ];
         AtlasManager::Mesh2D newMesh;
-        mGlyphManager.Cached( glyph.fontId, glyph.index, slot );
 
-        if ( slot.mImageId )
+        if ( !mGlyphManager.Cached( glyph.fontId, glyph.index, slot ) )
         {
-          // This glyph already exists so generate mesh data plugging in our supplied position
-          mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
-          mImageIds.PushBack( slot.mImageId );
-        }
-        else
-        {
-
           // Select correct size for new atlas if needed....?
           if ( lastFontId != glyph.fontId )
           {
@@ -231,16 +231,17 @@ struct AtlasRenderer::Impl : public ConnectionTracker
             }
 
             // Locate a new slot for our glyph
-            mGlyphManager.Add( glyph, bitmap, slot );
-
-            // Generate mesh data for this quad, plugging in our supplied position
-            if ( slot.mImageId )
-            {
-              mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
-              mImageIds.PushBack( slot.mImageId );
-            }
+            mGlyphManager.Add( glyph.fontId, glyph, bitmap, slot );
           }
         }
+
+        // Generate mesh data for this quad, plugging in our supplied position
+        mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
+        textCacheEntry.mFontId = glyph.fontId;
+        textCacheEntry.mImageId = slot.mImageId;
+        textCacheEntry.mIndex = glyph.index;
+        mTextCache.PushBack( textCacheEntry );
+
         // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
         StitchTextMesh( meshContainer,
                         newMesh,
@@ -282,7 +283,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
           mActor = actor;
         }
       }
-      mActor.OffStageSignal().Connect( this, &AtlasRenderer::Impl::OffStageDisconnect );
     }
 #if defined(DEBUG_ENABLED)
     Toolkit::AtlasGlyphManager::Metrics metrics = mGlyphManager.GetMetrics();
@@ -437,19 +437,56 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     }
   }
 
-  // Unreference any glyphs that were used with this actor
-  void OffStageDisconnect( Dali::Actor actor )
+  void RemoveText( const Vector<GlyphInfo>& glyphs )
   {
-    RemoveText();
-  }
+    Vector< CheckEntry > checked;
+    CheckEntry checkEntry;
 
-  void RemoveText()
-  {
-    for ( uint32_t i = 0; i < mImageIds.Size(); ++i )
+    for ( Vector< TextCacheEntry >::Iterator tCit = mTextCache.Begin(); tCit != mTextCache.End(); ++tCit )
     {
-      mGlyphManager.Remove( mImageIds[ i ] );
+      uint32_t index = tCit->mIndex;
+      uint32_t fontId = tCit->mFontId;
+
+      // Check that this character has not already been checked...
+      bool wasChecked = false;
+      for ( Vector< CheckEntry >::Iterator cEit = checked.Begin(); cEit != checked.End(); ++cEit )
+      {
+        if ( fontId == cEit->mFontId && index == cEit->mIndex )
+        {
+          wasChecked = true;
+        }
+      }
+
+      if ( !wasChecked )
+      {
+
+        int32_t newCount = 0;
+        int32_t oldCount = 0;
+
+        // How many times does this character occur in the old text ?
+        for ( Vector< TextCacheEntry >::Iterator oTcit = mTextCache.Begin(); oTcit != mTextCache.End(); ++oTcit )
+        {
+          if ( fontId == oTcit->mFontId && index == oTcit->mIndex )
+          {
+            oldCount++;
+          }
+        }
+
+        // And how many times in the new ?
+        for ( Vector< GlyphInfo >::Iterator cGit = glyphs.Begin(); cGit != glyphs.End(); ++cGit )
+        {
+          if ( fontId == cGit->fontId && index == cGit->index )
+          {
+            newCount++;
+          }
+        }
+        mGlyphManager.AdjustReferenceCount( fontId, tCit->mImageId, newCount - oldCount );
+        checkEntry.mIndex = index;
+        checkEntry.mFontId = fontId;
+        checked.PushBack( checkEntry );
+      }
     }
-    mImageIds.Resize( 0 );
+    mTextCache.Resize( 0 );
   }
 
   void CalculateBlocksSize( const Vector<GlyphInfo>& glyphs )
@@ -678,10 +715,10 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
   Actor mActor;                                       ///< The actor parent which renders the text
   AtlasGlyphManager mGlyphManager;                    ///< Glyph Manager to handle upload and caching
-  Vector< uint32_t > mImageIds;                       ///< A list of imageIDs used by the renderer
   TextAbstraction::FontClient mFontClient;            ///> The font client used to supply glyph information
   std::vector< MaxBlockSize > mBlockSizes;            ///> Maximum size needed to contain a glyph in a block within a new atlas
   std::vector< uint32_t > mFace;                      ///> Face indices for a quad
+  Vector< TextCacheEntry > mTextCache;
   Property::Map mQuadVertexFormat;
   Property::Map mQuadIndexFormat;
   int mDepth;
@@ -737,5 +774,7 @@ AtlasRenderer::AtlasRenderer()
 
 AtlasRenderer::~AtlasRenderer()
 {
+  Vector< GlyphInfo > emptyGlyphs;
+  mImpl->RemoveText( emptyGlyphs );
   delete mImpl;
 }

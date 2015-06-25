@@ -24,15 +24,21 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
+
 namespace Dali
 {
 
+class Actor;
 class Image;
 class Vector2;
 class Vector4;
 
 namespace Toolkit
 {
+
+class TextSelectionPopupCallbackInterface;
 
 namespace Internal
 {
@@ -98,26 +104,40 @@ enum HandleType
  *
  * Selection handles will be flipped around to ensure they do not exceed the Decoration Bounding Box. ( Stay visible ).
  *
- * Decorator components forward input events to a controller class through an observer interface.
+ * Decorator components forward input events to a controller class through an interface.
  * The controller is responsible for selecting which components are active.
  */
 class Decorator : public RefObject
 {
 public:
 
-  class Observer
+  class ControllerInterface
   {
   public:
 
     /**
      * @brief Constructor.
      */
-    Observer() {};
+    ControllerInterface() {};
 
     /**
      * @brief Virtual destructor.
      */
-    virtual ~Observer() {};
+    virtual ~ControllerInterface() {};
+
+    /**
+     * @brief An input event from one of the handles.
+     *
+     * @param[out] targetSize The Size of the UI control the decorator is adding it's decorations to.
+     */
+    virtual void GetTargetSize( Vector2& targetSize ) = 0;
+
+    /**
+     * @brief Add a decoration to the parent UI control.
+     *
+     * @param[in] decoration The actor displaying a decoration.
+     */
+    virtual void AddDecoration( Actor& actor, bool needsClipping ) = 0;
 
     /**
      * @brief An input event from one of the handles.
@@ -127,17 +147,19 @@ public:
      * @param[in] x The x position relative to the top-left of the parent control.
      * @param[in] y The y position relative to the top-left of the parent control.
      */
-    virtual void HandleEvent( HandleType handleType, HandleState state, float x, float y ) = 0;
+    virtual void DecorationEvent( HandleType handleType, HandleState state, float x, float y ) = 0;
   };
 
   /**
    * @brief Create a new instance of a Decorator.
    *
-   * @param[in] parent Decorations will be added to this parent control.
-   * @param[in] observer A class which receives input events from Decorator components.
+   * @param[in] controller The controller which receives input events from Decorator components.
+   * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
+   *
    * @return A pointer to a new Decorator.
    */
-  static DecoratorPtr New( Dali::Toolkit::Internal::Control& parent, Observer& observer );
+  static DecoratorPtr New( ControllerInterface& controller,
+                           TextSelectionPopupCallbackInterface& callbackInterface );
 
   /**
    * @brief Set the bounding box which handles, popup and similar decorations will not exceed.
@@ -341,6 +363,23 @@ public:
   void GetPosition( HandleType handleType, float& x, float& y, float& lineHeight ) const;
 
   /**
+   * @brief Retrieves the position of a selection handle.
+   *
+   * @param[in] handleType The handle to get.
+   *
+   * @return The position of the selection handle relative to the top-left of the parent control.
+   */
+  const Vector2& GetPosition( HandleType handleType ) const;
+
+  /**
+   * @brief Swaps the selection handle's images.
+   *
+   * This method is called by the text controller to swap the handles
+   * when the start index is bigger than the end one.
+   */
+  void SwapSelectionHandlesEnabled( bool enable );
+
+  /**
    * @brief Adds a quad to the existing selection highlights.
    *
    * @param[in] x1 The top-left x position.
@@ -383,6 +422,18 @@ public:
   bool IsPopupActive() const;
 
   /**
+   * @brief Set a bit mask of the buttons to be shown by Popup
+   * @param[in] enabledButtonsBitMask from TextSelectionPopup::Buttons enum
+   */
+  void SetEnabledPopupButtons( TextSelectionPopup::Buttons& enabledButtonsBitMask );
+
+  /**
+   * @brief Get the current bit mask of buttons to be shown by Popup
+   * @return bitmask of TextSelectionPopup::Buttons
+   */
+  TextSelectionPopup::Buttons& GetEnabledPopupButtons();
+
+  /**
    * @brief Sets the scroll threshold.
    *
    * It defines a square area inside the control, close to the edge.
@@ -416,18 +467,9 @@ public:
   float GetScrollSpeed() const;
 
   /**
-   * @brief Sets the scroll interval.
-   *
-   * @param[in] seconds The scroll interval in seconds.
+   * @brief Notifies the decorator the whole text has been scrolled.
    */
-  void SetScrollTickInterval( float seconds );
-
-  /**
-   * @brief Retrieves the scroll interval.
-   *
-   * @return The scroll interval.
-   */
-  float GetScrollTickInterval() const;
+  void NotifyEndOfScroll();
 
 protected:
 
@@ -440,10 +482,11 @@ private:
 
   /**
    * @brief Private constructor.
-   * @param[in] parent Decorations will be added to this parent control.
-   * @param[in] observer A class which receives input events from Decorator components.
+   * @param[in] controller The controller which receives input events from Decorator components.
+   * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
    */
-  Decorator(Dali::Toolkit::Internal::Control& parent, Observer& observer );
+  Decorator( ControllerInterface& controller,
+             TextSelectionPopupCallbackInterface& callbackInterface );
 
   // Undefined
   Decorator( const Decorator& handle );

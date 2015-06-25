@@ -13,6 +13,7 @@ SET(TC_SOURCES
    utc-Dali-Builder.cpp
    utc-Dali-CheckBoxButton.cpp
    utc-Dali-CubeTransitionEffect.cpp
+   utc-Dali-EffectsView.cpp
    utc-Dali-GaussianBlurView.cpp
    utc-Dali-JsonParser.cpp
    utc-Dali-KeyInputFocusManager.cpp
@@ -35,6 +36,7 @@ SET(TC_SOURCES
    utc-Dali-ItemLayout.cpp
    utc-Dali-ItemView.cpp
    utc-Dali-KeyboardFocusManager.cpp
+   utc-Dali-Magnifier.cpp
    utc-Dali-NinePatchMaskEffect.cpp
    utc-Dali-Popup.cpp
    utc-Dali-PushButton.cpp

@@ -425,17 +425,12 @@ public:
 
         case Toolkit::Control::Property::BACKGROUND_IMAGE:
         {
-          if ( value.HasKey( "image" ) )
+          Image image = Scripting::NewImage( value );
+          if ( image )
           {
-            Property::Map imageMap = value.GetValue( "image" ).Get< Property::Map >();
-            Image image = Scripting::NewImage( imageMap );
-
-            if ( image )
-            {
-              controlImpl.SetBackgroundImage( image );
-            }
+            controlImpl.SetBackgroundImage( image );
           }
-          else if ( value.Get< Property::Map >().Empty() )
+          else
           {
             // An empty map means the background is no longer required
             controlImpl.ClearBackground();
@@ -499,9 +494,7 @@ public:
             Image image = back->actor.GetRendererAt(0).GetMaterial().GetSamplerAt(0).GetImage();
             if ( image )
             {
-              Property::Map imageMap;
-              Scripting::CreatePropertyMap( image, imageMap );
-              map[ "image" ] = imageMap;
+              Scripting::CreatePropertyMap( image, map );
             }
           }
 
@@ -875,6 +868,9 @@ Control::Control( ControlBehaviour behaviourFlags )
 
 void Control::Initialize()
 {
+  // Call deriving classes so initialised before styling is applied to them.
+  OnInitialize();
+
   if( mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS )
   {
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
@@ -882,7 +878,7 @@ void Control::Initialize()
     // Register for style changes
     styleManager.StyleChangeSignal().Connect( this, &Control::OnStyleChange );
 
-    // SetTheme
+    // Apply the current style
     GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
   }
 
@@ -890,9 +886,6 @@ void Control::Initialize()
   {
     SetKeyboardNavigationSupport( true );
   }
-
-  // Calling deriving classes
-  OnInitialize();
 }
 
 void Control::OnInitialize()

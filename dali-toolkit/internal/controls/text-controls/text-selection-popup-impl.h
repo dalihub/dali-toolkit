@@ -20,8 +20,10 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-selection-toolbar.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
@@ -38,15 +40,14 @@ namespace Internal
 
 namespace
 {
-enum PopupParts
+
+enum PopupCustomisations
 {
-  POPUP_BACKGROUND,
-  POPUP_CLIPBOARD_BUTTON,
-  POPUP_CUT_BUTTON_ICON,
-  POPUP_COPY_BUTTON_ICON,
-  POPUP_PASTE_BUTTON_ICON,
-  POPUP_SELECT_BUTTON_ICON,
-  POPUP_SELECT_ALL_BUTTON_ICON,
+  POPUP_MAXIMUM_SIZE,
+  POPUP_MINIMUM_SIZE,
+  OPTION_MAXIMUM_SIZE,
+  OPTION_MINIMUM_SIZE,
+  OPTION_DIVIDER_SIZE
 };
 
 } // namespace
@@ -55,21 +56,10 @@ class TextSelectionPopup : public Control
 {
 public:
 
-  enum Buttons
-  {
-    ButtonsCut,
-    ButtonsCopy,
-    ButtonsPaste,
-    ButtonsSelect,
-    ButtonsSelectAll,
-    ButtonsClipboard,
-    ButtonsEnumEnd
-  };
-
   struct ButtonRequirement
   {
     ButtonRequirement()
-    : id( ButtonsEnumEnd ),
+    : id( Toolkit::TextSelectionPopup::NONE ),
       priority( 0u ),
       name(),
       caption(),
@@ -77,7 +67,7 @@ public:
       enabled( false )
     {}
 
-    ButtonRequirement( Buttons buttonId,
+    ButtonRequirement( Toolkit::TextSelectionPopup::Buttons buttonId,
                        std::size_t buttonPriority,
                        const std::string& buttonName,
                        const std::string& buttonCaption,
@@ -91,7 +81,7 @@ public:
       enabled( buttonEnabled )
     {}
 
-    Buttons id;
+    Toolkit::TextSelectionPopup::Buttons id;
     std::size_t priority;
     std::string name;
     std::string caption;
@@ -106,15 +96,14 @@ public:
       }
   };
 
-//  static inline bool ButtonPriorityCompare( ButtonRequirement a, ButtonRequirement b )
-//  {
-//    return a.priority < b.priority ? true : false;
-//  }
-
   /**
-   * @copydoc Dali::Toollkit::TextSelectionPopup::New()
+   * @brief New constructor with provided buttons to enable.
+   * @param[in] buttonsToEnable bit mask of buttons to enable
+   * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
+   * @return A handle to the TextSelectionPopup control.
    */
-  static Toolkit::TextSelectionPopup New();
+  static Toolkit::TextSelectionPopup New( Toolkit::TextSelectionPopup::Buttons buttonsToEnable,
+                                          TextSelectionPopupCallbackInterface* callbackInterface );
 
   // Properties
 
@@ -135,86 +124,102 @@ public:
    */
   static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
-  void CreatePopup();
-
-  void DestroyPopup();
-
 private: // From Control
 
   /**
    * @copydoc Control::OnInitialize()
    */
- virtual void OnInitialize();
-
-//  /**
-//   * @copydoc Control::GetNaturalSize()
-//   */
-//  virtual Vector3 GetNaturalSize();
-//
-//  /**
-//   * @copydoc Control::GetHeightForWidth()
-//   */
-//  virtual float GetHeightForWidth( float width );
-
-  /**
-   * @copydoc Control::OnInitialize()
-   */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
-//
-//  /**
-//   * Received for single & double taps
-//   */
-//  virtual void OnTap( const TapGesture& tap );
-//
-//  /**
-//   * @copydoc Text::ControlInterface::RequestTextRelayout()
-//   */
-//  virtual void RequestTextRelayout();
-
-  /**
-   * Set max size of Popup
-   * @param[in] maxSize Size (Vector2)
-   */
-  void SetPopupMaxSize( const Size& maxSize );
-
-  /**
-   * Get Max size of Popup
-   * @return Vector2 the max size of the Popup
-   */
-  const Dali::Vector2& GetPopupMaxSize() const;
-
-  /**
-   * @brief Sets the image for the given part of the Popup.
-   *
-   * @param[in] part  The part of the pop from the Enum PopupParts
-   * @param[in] image The image to use.
-   */
- void SetPopupImage( PopupParts part, Dali::Image image );
-
-  /**
-   * @brief Retrieves the image of the given part used by the popup
-   *
-   * @param[in] part The part of the popup
-   * @return The image used for that part.
-   */
-  Dali::Image GetPopupImage( PopupParts part );
-
-  void CreateOrderedListOfPopupOptions();
-
-  void CreateBackground();
-
-  void AddOption( Dali::Toolkit::TableView& parent, const std::string& name, const std::string& caption, const Image iconImage, bool finalOption, bool showIcons, bool showCaption, std::size_t& indexInTable  );
-
-  void SetUpPopup();
-
-  void AddPopupOptions( bool createTail, bool showIcons, bool showCaptions );
+  virtual void OnInitialize();
 
 private: // Implementation
 
   /**
+   * @brief When the cut button is pressed.
+   * @param[in] button the button pressed
+   * @return @e true to consume the event.
+   */
+  bool OnCutButtonPressed( Toolkit::Button button );
+
+  /**
+   * @brief When the copy button is pressed.
+   * @param[in] button the button pressed
+   * @return @e true to consume the event.
+   */
+  bool OnCopyButtonPressed( Toolkit::Button button );
+
+  /**
+   * @brief When the paste button is pressed.
+   * @param[in] button the button pressed
+   * @return @e true to consume the event.
+   */
+  bool OnPasteButtonPressed( Toolkit::Button button );
+
+  /**
+   * @brief When the select button is pressed.
+   * @param[in] button the button pressed
+   * @return @e true to consume the event.
+   */
+  bool OnSelectButtonPressed( Toolkit::Button button );
+
+  /**
+   * @brief When the select all button is pressed.
+   * @param[in] button the button pressed
+   * @return @e true to consume the event.
+   */
+  bool OnSelectAllButtonPressed( Toolkit::Button button );
+
+  /**
+   * @brief When the clipboard button is pressed.
+   * @param[in] button the button pressed
+   * @return @e true to consume the event.
+   */
+  bool OnClipboardButtonPressed( Toolkit::Button button );
+
+  /**
+   * @brief Method to set the dimension or dimension constraint on certain aspects of the Popup.
+   *
+   * @param[in] settingToCustomise The setting for the PopupCustomisations enum that can be customised
+   * @param[in] dimension The size to customise with
+   */
+  void SetDimensionToCustomise( const PopupCustomisations& settingToCustomise, const Size& dimension );
+
+  /**
+   * @brief Method to get the dimension or dimension constraint on certain aspects of the Popup that was previously customised
+   *
+   * @param[in] setting The setting from the PopupCustomisations enum
+   */
+  Size GetDimensionToCustomise( const PopupCustomisations& setting );
+
+  /**
+   * @brief Sets the image for the given button of the Popup.
+   *
+   * @param[in] button  The button the image should be used for from the Buttons Enum.
+   * @param[in] image The image to use.
+   */
+ void SetButtonImage( Toolkit::TextSelectionPopup::Buttons button, Dali::Image image );
+
+  /**
+   * @brief Retrieves the image of the given button used by the popup
+   *
+   * @param[in] button The button to get the image from
+   * @return The image used for that button.
+   */
+  Dali::Image GetButtonImage( Toolkit::TextSelectionPopup::Buttons button );
+
+  void CreateOrderedListOfPopupOptions();
+
+  void AddOption( const ButtonRequirement& button, bool showDivider, bool showIcons, bool showCaption );
+
+  std::size_t GetNumberOfEnabledOptions();
+
+  void AddPopupOptionsToToolbar(  bool showIcons, bool showCaptions );
+
+  void CreatePopup();
+
+  /**
    * Construct a new TextField.
    */
-  TextSelectionPopup();
+  TextSelectionPopup( TextSelectionPopupCallbackInterface* callbackInterface );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -229,11 +234,12 @@ private:
 
 private: // Data
 
-  Dali::Toolkit::TableView mTableOfButtons;                          // Actor which holds all the buttons, sensitivity can be set on buttons via this actor
-  Layer mStencilLayer;                                // Layer to enable clipping when buttons exceed popup
 
-  // Images to be used by the Popup
-  Image mBackgroundImage;
+  Dali::Toolkit::TextSelectionToolbar mToolbar;
+
+  Dali::Toolkit::TableView mTableOfButtons;           // Actor which holds all the buttons, sensitivity can be set on buttons via this actor
+
+  // Images to be used by the Popup buttons
   Image mCutIconImage;
   Image mCopyIconImage;
   Image mPasteIconImage;
@@ -241,29 +247,21 @@ private: // Data
   Image mSelectIconImage;
   Image mSelectAllIconImage;
 
-  ImageActor mBackground;                             // The background popup panel
-  ImageActor mTail;                                   // The tail for the popup
-  ImageActor mTailEffect;   //todo remove                          // the tail effect
-  ImageActor mTailLine;     //todo remove                          // The border/outline around the tail
+  Size mMaxSize;                       // Maximum size of the Popup
+  Size mMinSize;                       // Minimum size of the Popup
 
-  Size mMaxSize;                                      // Max size of the Popup
-  Size mVisiblePopUpSize;                             // Visible Size of popup excluding content that needs scrolling.
-  Size mRequiredPopUpSize;                            // Total size of popup including any invisible margin
-
-  Vector4 mNinePatchMargins;                          // Margins between the edge of the cropped image and the nine patch rect (left, right, top, bottom).
-
-  Size mContentSize;                                  // Size of Content (i.e. Buttons)
-  //Animation mAnimation;                               // Popup Hide/Show animation.
+  Size mOptionMaxSize;                 // Maximum size of an Option button
+  Size mOptionMinSize;                 // Minimum size of an Option button
+  Size mOptionDividerSize;             // Size of divider line
 
   std::vector<ButtonRequirement> mOrderListOfButtons; // List of buttons in the order to be displayed and a flag to indicate if needed.
 
-  Vector4 mBackgroundColor;             // Color of the background of the text input popup
-  Vector4 mBackgroundPressedColor;      // Color of the option background.
+  Toolkit::TextSelectionPopup::Buttons mEnabledButtons; // stores enabled buttons
+  Toolkit::TextSelectionPopupCallbackInterface* mCallbackInterface;
+
   Vector4 mLineColor;                   // Color of the line around the text input popup
   Vector4 mIconColor;                   // Color of the popup icon.
-  Vector4 mIconPressedColor;            // Color of the popup icon when pressed.
-  Vector4 mTextColor;                   // Color of the popup text.
-  Vector4 mTextPressedColor;            // Color of the popup text when pressed.
+  Vector4 mPressedColor;                // Color of the popup option when pressed.
 
   // Priority of Options/Buttons in the Cut and Paste pop-up, higher priority buttons are displayed first, left to right.
   std::size_t mSelectOptionPriority;    // Position of Select Button
@@ -273,8 +271,8 @@ private: // Data
   std::size_t mPasteOptionPriority;     // Position of Paste button
   std::size_t mClipboardOptionPriority; // Position of Clipboard button
 
-  bool mShowIcons; // Flag to show icons
-  bool mShowCaptions; // Flag to show text captions
+  bool mShowIcons:1; // Flag to show icons
+  bool mShowCaptions:1; // Flag to show text captions
 
 };
 
@@ -305,3 +303,4 @@ inline const Toolkit::Internal::TextSelectionPopup& GetImpl( const Toolkit::Text
 } // namespace Dali
 
 #endif // __DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_POPUP_H__
+

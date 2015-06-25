@@ -397,7 +397,7 @@ void KeyboardFocusManager::SetAsFocusGroup(Actor actor, bool isFocusGroup)
     Property::Index propertyIsFocusGroup = actor.GetPropertyIndex(IS_FOCUS_GROUP_PROPERTY_NAME);
     if(propertyIsFocusGroup == Property::INVALID_INDEX)
     {
-      actor.RegisterProperty(IS_FOCUS_GROUP_PROPERTY_NAME, isFocusGroup);
+      actor.RegisterProperty(IS_FOCUS_GROUP_PROPERTY_NAME, isFocusGroup, Property::READ_WRITE );
     }
     else
     {

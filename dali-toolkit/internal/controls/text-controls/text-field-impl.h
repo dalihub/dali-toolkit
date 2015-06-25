@@ -147,9 +147,9 @@ private: // From Control
   virtual bool OnKeyEvent(const KeyEvent& event);
 
   /**
-   * @copydoc Dali::Toolkit::Text::Controller::(ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent)
+   * @copydoc Text::ControlInterface::AddDecoration()
    */
-  ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
+  virtual void AddDecoration( Actor& actor, bool needsClipping );
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
@@ -165,6 +165,11 @@ private: // From Control
    * @copydoc Text::ControlInterface::MaxLengthReached()
    */
   virtual void MaxLengthReached();
+
+  /**
+   * @copydoc Dali::Toolkit::Text::Controller::(ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent)
+   */
+  ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
 
 private: // Implementation
 
@@ -223,6 +228,7 @@ private: // Data
   Text::RendererPtr mRenderer;
   Text::DecoratorPtr mDecorator;
   Text::ClipperPtr mClipper; ///< For EXCEED_POLICY_CLIP
+  std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
   Actor mRenderableActor;
 

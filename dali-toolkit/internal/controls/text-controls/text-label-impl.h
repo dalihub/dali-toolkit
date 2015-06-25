@@ -93,6 +93,11 @@ private: // From Control
   virtual float GetHeightForWidth( float width );
 
   /**
+   * @copydoc Text::ControlInterface::AddDecoration()
+   */
+  virtual void AddDecoration( Actor& actor, bool needsClipping );
+
+  /**
    * @copydoc Control::OnStageConnection()
    */
   virtual void OnStageConnection( unsigned int depth );

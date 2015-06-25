@@ -66,12 +66,12 @@ public:
   {
     enum
     {
-      SCROLL_DIRECTION = PROPERTY_START_INDEX,        ///< name "scroll-direction",        @see SetScrollDirection(),       type std::string
-      INDICATOR_HEIGHT_POLICY,                        ///< name "indicator-height-policy", @see SetIndicatorHeightPolicy(), type std::string
-      INDICATOR_FIXED_HEIGHT,                         ///< name "indicator-fixed-height",  @see SetIndicatorFixedHeight(),  type float
-      INDICATOR_SHOW_DURATION,                        ///< name "indicator-show-duration", @see SetIndicatorShowDuration(), type float
-      INDICATOR_HIDE_DURATION,                        ///< name "indicator-hide-duration", @see SetIndicatorHideDuration(), type float
-      SCROLL_POSITION_INTERVALS                       ///< name "scroll-position-intervals",                                type float
+      SCROLL_DIRECTION = PROPERTY_START_INDEX, ///< name "scroll-direction",         @see SetScrollDirection(),        type std::string
+      INDICATOR_HEIGHT_POLICY,                 ///< name "indicator-height-policy",  @see SetIndicatorHeightPolicy(),  type std::string
+      INDICATOR_FIXED_HEIGHT,                  ///< name "indicator-fixed-height",   @see SetIndicatorFixedHeight(),   type float
+      INDICATOR_SHOW_DURATION,                 ///< name "indicator-show-duration",  @see SetIndicatorShowDuration(),  type float
+      INDICATOR_HIDE_DURATION,                 ///< name "indicator-hide-duration",  @see SetIndicatorHideDuration(),  type float
+      SCROLL_POSITION_INTERVALS                ///< name "scroll-position-intervals",@see SetScrollPositionIntervals() type Property::Array
     };
   };
 

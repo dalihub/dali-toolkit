@@ -215,8 +215,12 @@ int UtcDaliBubbleEmitterSetBubbleScale(void)
 
   Image shapeImage = CreateSolidColorImage( application, Color::GREEN, 5, 5 );
   BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 150, Vector2( 5.f, 10.f ));
+  DALI_TEST_CHECK(emitter);
   Actor root = emitter.GetRootActor();
   Stage::GetCurrent().Add( root );
+  root.SetPosition( Vector3::ZERO );
+  root.SetParentOrigin( ParentOrigin::CENTER );
+  root.SetAnchorPoint( AnchorPoint::CENTER );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -235,6 +239,7 @@ int UtcDaliBubbleEmitterSetBubbleScale(void)
   Wait(application);
   DALI_TEST_CHECK( gl.GetUniformValue<float>( "uDynamicScale", scaleValue ) );
   DALI_TEST_EQUALS( scaleValue, 0.5f, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -286,8 +291,12 @@ int UtcDaliBubbleEmitterSetBlendMode(void)
 
   Image shapeImage = CreateSolidColorImage( application, Color::GREEN, 5, 5 );
   BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 150, Vector2( 5.f, 10.f ));
+  DALI_TEST_CHECK(emitter);
   Actor root = emitter.GetRootActor();
   Stage::GetCurrent().Add( root );
+  root.SetPosition( Vector3::ZERO );
+  root.SetParentOrigin( ParentOrigin::CENTER );
+  root.SetAnchorPoint( AnchorPoint::CENTER );
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   Wait(application);
@@ -365,6 +374,9 @@ int UtcDaliBubbleEmitterRestore(void)
   BubbleEmitter emitter = BubbleEmitter::New( Vector2(50.f,50.f),shapeImage, 90, Vector2( 5.f, 10.f ));
   Actor root = emitter.GetRootActor();
   Stage::GetCurrent().Add( root );
+  root.SetPosition( Vector3::ZERO );
+  root.SetParentOrigin( ParentOrigin::CENTER );
+  root.SetAnchorPoint( AnchorPoint::CENTER );
 
   Actor bubbleMesh = root.GetChildAt( 0 );
   Renderer renderer = bubbleMesh.GetRendererAt( 0 );
@@ -407,5 +419,6 @@ int UtcDaliBubbleEmitterRestore(void)
 
   DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uStartEndPosition[0]", startEndPosValue ) );
   DALI_TEST_EQUALS( startEndPosValue,  Vector4::ZERO, TEST_LOCATION );
+
   END_TEST;
 }

@@ -99,24 +99,6 @@ public:
                    Vector<ScriptRun>& scripts );
 
   /**
-   * Replaces the scrips of the given range of characters.
-   *
-   * @pre The @p model needs to have a text set.
-   *
-   * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
-   * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
-   *
-   * @param[in,out] model The text's logical model.
-   * @param[in] characterIndex Index to the first character.
-   * @param[in] numberOfCharactersToRemove The number of characters removed from the text.
-   * @param[in] numberOfCharactersToInsert The number of characters inserted in the text.
-   */
-  void ReplaceScripts( LogicalModel& model,
-                       CharacterIndex characterIndex,
-                       Length numberOfCharactersToRemove,
-                       Length numberOfCharactersToInsert );
-
-  /**
    * @brief Validates the character's font of the whole text.
    *
    * It may update fonts set by application developers.
@@ -136,28 +118,6 @@ public:
   void ValidateFonts( const Vector<Character>& text,
                       const Vector<ScriptRun>& scripts,
                       Vector<FontRun>& fonts );
-
-  /**
-   * Validates the character's font of the given range of characters.
-   *
-   * It may update fonts set by the mark-up processor.
-   * It sets default fonts based on the script to those characters without a font set.
-   *
-   * @pre The @p model needs to have a text set.
-   * @pre The @p model needs to have the scripts set.
-   *
-   * If the @p numberOfCharactersToRemove is zero, this operation is like an insert.
-   * If the @p numberOfCharactersToInsert is zero, this operation is like a remove.
-   *
-   * @param[in,out] model The text's logical model.
-   * @param[in] characterIndex Index to the first character.
-   * @param[in] numberOfCharactersToRemove The number of characters removed from the text.
-   * @param[in] numberOfCharactersToInsert The number of characters inserted in the text.
-   */
-  void ValidateFonts( LogicalModel& model,
-                      CharacterIndex characterIndex,
-                      Length numberOfCharactersToRemove,
-                      Length numberOfCharactersToInsert );
 };
 
 } // namespace Text

@@ -41,6 +41,38 @@ class TableView;
  * TableView constrains the x and y position and width and height of the child actors.
  * z position and depth are left intact so that 3D model actors can also be laid out
  * in a grid without loosing their depth scaling.
+ *
+ * @nosubgrouping
+ *
+ * Per-child Custom properties for script supporting.
+ *
+ * When an actor is add to the tableView through Actor::Add() instead of TableView::AddChild,
+ * the following custom properties of the actor are checked to decide the actor position inside the table
+ *
+ * These properties are registered dynamically to the child and is non-animatable.
+ *
+ * | %Property Name            | Type               |
+ * |---------------------------|--------------------|
+ * | cell-index                | Vector2            |
+ * | row-span                  | float              | // type float (Currently builder is unable to differentiate integer and float from Json string)
+ * | column-span               | float              | // type float (Currently builder is unable to differentiate integer and float from Json string)
+ * | cell-horizontal-alignment | string             | // available values: left, center, right
+ * | cell-vertical-alignment   | string             | // available values: top, center, bottom
+ *
+ * @code
+ * "name":"gallery-1",
+ * "type":"ImageActor",
+ * "image": {
+ *    "filename": "{DALI_IMAGE_DIR}gallery-small-1.jpg"
+ *  },
+ *  "custom-properties": {
+ *     "cell-index":[1,1],  // property to specify the top-left cell this child occupies, if not set, the first available cell is used
+ *     "row-span":3,        // property to specify how many rows this child occupies, if not set, default value is 1
+ *     "column-span": 2,    // property to specify how many columns this child occupies, if nor set, default value is 1
+ *     "cell-horizontal-alignment": "left", // property to specify how to align horizontally inside the cells, if not set, default value is 'left'
+ *     "cell-vertical-alignment": "center"  // property to specify how to align vertically inside the cells, if not set, default value is 'top'
+ *   }
+ * @endcode
  */
 class DALI_IMPORT_API TableView : public Control
 {
@@ -64,7 +96,8 @@ public:
    * "layout-rows":
       {
         "0": { "policy": "fixed", "value": 40 },       //@see SetFixedHight
-        "2": { "policy": "relative", "value": 0.33 }   //@see SetRelativeHeight
+        "2": { "policy": "relative", "value": 0.33 },  //@see SetRelativeHeight
+        "3": { "policy": "fit", "value":0.0 }          //@see SetFitHeight, the value is not used, its height is decided by the children in this row
       }
    * @endcode
    *
@@ -74,6 +107,7 @@ public:
    * "layout-columns":
       {
         "0": { "policy": "fixed", "value": 40 },       //@see SetFixedWidth
+        "1": { "policy": "fit", "value":0.0 }          //@see SetFitHeight, the value is not used, its width is decided by the children in this column
         "2": { "policy": "relative", "value": 0.33 }   //@see SetRelativeWidth
       }
    * @endcode
@@ -90,11 +124,6 @@ public:
     };
   };
 
-  // Custom properties for where to put the actor, these properties should be registered to the child which would be added to the table
-  static const std::string CELL_INDICES_PROPERTY_NAME;           ///< Property, name "cell-indices", type Vector2
-  static const std::string ROW_SPAN_PROPERTY_NAME;               ///< Property, name "row-span",     type float (Currently builder is unable to differentiate integer and float from Json string)
-  static const std::string COLUMN_SPAN_PROPERTY_NAME;            ///< Property, name "column-span",  type float (Currently builder is unable to differentiate integer and float from Json string)
-
   /**
    * @brief Describes how the size of a row / column been set
    */
@@ -102,7 +131,8 @@ public:
   {
     FIXED,      ///< Fixed with the given value.
     RELATIVE,   ///< Calculated as percentage of the remainder after subtracting Padding and Fixed height/width
-    FILL        ///< Get the remainder of the 100% (after subtracting Padding, Fixed and Relative height/ width) divided evenly between 'fill' rows/columns
+    FILL,       ///< Default policy, get the remainder of the 100% (after subtracting Padding, Fixed and Relative height/ width) divided evenly between 'fill' rows/columns
+    FIT         ///< Fit around its children.
   };
 
   /**
@@ -382,11 +412,13 @@ public:
   unsigned int GetColumns();
 
   /**
-   * @brief Set the alignment on a cell
+   * @brief Set the alignment on a cell.
    *
-   * @param[in] position The cell to set alignment on
-   * @param[in] horizontal The horizontal alignment
-   * @param[in] vertical The vertical alignment
+   * Cells without calling this function have the default values of LEFT and TOP respectively.
+   *
+   * @param[in] position The cell to set alignment on.
+   * @param[in] horizontal The horizontal alignment.
+   * @param[in] vertical The vertical alignment.
    */
   void SetCellAlignment( CellPosition position, HorizontalAlignment::Type horizontal, VerticalAlignment::Type vertical );
 

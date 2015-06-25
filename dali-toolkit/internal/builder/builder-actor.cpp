@@ -49,11 +49,11 @@ Actor SetupActor( const TreeNode& child, Actor& actor, const Replacement& consta
   // this has already been set as a generic property.
   if( !IsVector3( child, "parent-origin") )
   {
-    if( OptionalVector3 v = IsVector3(child, "parent-origin") )
+    if( OptionalVector3 v = constant.IsVector3( IsChild(child, "parent-origin") ) )
     {
       actor.SetParentOrigin( *v );
     }
-    else if( OptionalString origin = IsString(child, "parent-origin") )
+    else if( OptionalString origin = constant.IsString( IsChild(child, "parent-origin") ) )
     {
       actor.SetParentOrigin( GetAnchorConstant(*origin) );
     }
@@ -61,11 +61,11 @@ Actor SetupActor( const TreeNode& child, Actor& actor, const Replacement& consta
 
   if( !IsVector3(child, "anchor-point") )
   {
-    if( OptionalVector3 v = IsVector3(child, "anchor-point") )
+    if( OptionalVector3 v = constant.IsVector3( IsChild(child, "anchor-point") ) )
     {
       actor.SetAnchorPoint( *v );
     }
-    else if( OptionalString anchor = IsString(child, "anchor-point") )
+    else if( OptionalString anchor = constant.IsString( IsChild(child, "anchor-point") ) )
     {
       actor.SetAnchorPoint( GetAnchorConstant(*anchor) );
     }
@@ -87,7 +87,7 @@ Actor SetupActor( const TreeNode& child, Actor& actor, const Replacement& consta
       {
         if( Property::INVALID_INDEX == index )
         {
-          actor.RegisterProperty( key, value );
+          actor.RegisterProperty( key, value, Property::READ_WRITE );
         }
         else
         {

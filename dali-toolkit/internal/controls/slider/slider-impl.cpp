@@ -724,7 +724,7 @@ float Slider::MarkFilter( float value )
   const float MARK_TOLERANCE = GetMarkTolerance();
 
   float mark;
-  for( std::size_t i = 0; i < mMarks.Size(); ++i)
+  for( MarkList::SizeType i = 0; i < mMarks.Count(); ++i)
   {
     const Property::Value& propertyValue = mMarks[i];
     propertyValue.Get( mark );
@@ -746,7 +746,7 @@ float Slider::SnapToMark( float value )
   float closestDist = std::numeric_limits<float>::max();
 
   float mark;
-  for( std::size_t i = 0; i < mMarks.Size(); ++i)
+  for( MarkList::SizeType  i = 0; i < mMarks.Count(); ++i)
   {
     const Property::Value& propertyValue = mMarks[i];
     propertyValue.Get( mark );

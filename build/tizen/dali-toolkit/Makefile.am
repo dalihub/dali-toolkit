@@ -100,6 +100,7 @@ develapishadereffectsdir =      $(develapidir)/shader-effects
 develapitransitioneffectsdir =  $(develapidir)/transition-effects
 develapistylingdir =            $(develapidir)/styling
 develapitoolbardir =            $(develapicontrolsdir)/tool-bar
+develapitextselectionpopupdir = $(develapicontrolsdir)/text-controls
 
 # devel headers
 develapibloomview_HEADERS =         $(devel_api_bloom_view_header_files)
@@ -118,6 +119,7 @@ develapistyling_HEADERS =           $(devel_api_styling_header_files)
 develapisuperblurview_HEADERS =     $(devel_api_super_blur_view_header_files)
 develapitoolbar_HEADERS =           $(devel_api_tool_bar_header_files)
 develapitransitioneffects_HEADERS = $(devel_api_transition_effects_header_files)
+develapitextselectionpopup_HEADERS = $(devel_api_text_selection_popup_header_files)
 
 # public api source
 publicapidir =                  $(topleveldir)/public-api

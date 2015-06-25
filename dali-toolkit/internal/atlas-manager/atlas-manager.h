@@ -286,10 +286,12 @@ public:
    * @param[in] id Image Id returned in the AtlasSlot from the add operation
    * @param[in] position position of the resulting mesh in model space
    * @param[out] mesh Mesh Data Object to populate with mesh data
+   * @param[in] addReference Whether to increase the internal reference count for image or not
    */
   void GenerateMeshData( ImageId id,
                          const Vector2& position,
-                         Mesh2D& mesh );
+                         Mesh2D& mesh,
+                         bool addReference = true );
 
   /**
    * @brief Append second mesh to the first mesh

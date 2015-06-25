@@ -164,3 +164,63 @@ int UtcDaliBloomActivateDeactivate(void)
   DALI_TEST_CHECK( 1u == taskList3.GetTaskCount() );
   END_TEST;
 }
+
+int UtcDaliBloomCopyAndAssignment(void)
+{
+  ToolkitTestApplication application;
+
+  BloomView view = Toolkit::BloomView::New();
+  DALI_TEST_CHECK( view );
+
+  BloomView copy( view );
+  DALI_TEST_CHECK( view == copy );
+
+  BloomView assign;
+  DALI_TEST_CHECK( ! assign );
+
+  assign = copy;
+  DALI_TEST_CHECK( assign == view );
+
+  END_TEST;
+}
+
+int UtcDaliBloomTypeRegistry(void)
+{
+  ToolkitTestApplication application;
+
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+  DALI_TEST_CHECK( typeRegistry );
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "BloomView" );
+  DALI_TEST_CHECK( typeInfo );
+
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+
+  BloomView view = BloomView::DownCast( handle );
+  DALI_TEST_CHECK( view );
+
+  END_TEST;
+}
+
+int UtcDaliBloomOnSizeSet(void)
+{
+  ToolkitTestApplication application;
+
+  BloomView view = Toolkit::BloomView::New();
+
+  Stage::GetCurrent().Add( view );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 size( 200.0f, 300.0f, 200.0f );
+  view.SetSize( size );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( view.GetCurrentSize(), size, TEST_LOCATION );
+
+  END_TEST;
+}

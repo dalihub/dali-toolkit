@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <sstream>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 
@@ -645,12 +646,14 @@ int UtcDaliTableViewSetGetProperty(void)
   Property::Map layoutRowsGet = tableView.GetProperty(TableView::Property::LAYOUT_ROWS).Get<Property::Map>();
 
   DALI_TEST_EQUALS( layoutRowsGet.GetKey(1).compare(layoutRows.GetKey(0)), 0, TEST_LOCATION );
-  DALI_TEST_CHECK( layoutRowsGet.GetValue(1).GetValue( "policy" ).Get<std::string>().compare(layoutRows.GetValue(0).GetValue( "policy" ).Get<std::string>()) == 0 );
-  DALI_TEST_EQUALS( layoutRowsGet.GetValue(1).GetValue( "value" ).Get<float>(), layoutRows.GetValue(0).GetValue( "value" ).Get<float>(), TEST_LOCATION );
+  Property::Map* childMap =layoutRowsGet.GetValue(1).GetMap();
+  DALI_TEST_CHECK( childMap->Find( "policy" )->Get<std::string>().compare("fixed") == 0 );
+  DALI_TEST_EQUALS( childMap->Find( "value" )->Get<float>(), 30.f, TEST_LOCATION );
 
+  childMap =layoutRowsGet.GetValue(3).GetMap();
   DALI_TEST_CHECK( layoutRowsGet.GetKey(3).compare(layoutRows.GetKey(1)) == 0 );
-  DALI_TEST_CHECK( layoutRowsGet.GetValue(3).GetValue( "policy" ).Get<std::string>().compare(layoutRows.GetValue(1).GetValue( "policy" ).Get<std::string>()) == 0 );
-  DALI_TEST_EQUALS( layoutRowsGet.GetValue(3).GetValue( "value" ).Get<float>(), layoutRows.GetValue(1).GetValue( "value" ).Get<float>(), TEST_LOCATION );
+  DALI_TEST_CHECK( childMap->Find( "policy" )->Get<std::string>().compare("relative") == 0 );
+  DALI_TEST_EQUALS( childMap->Find( "value" )->Get<float>(), 0.2f, TEST_LOCATION );
 
   // Test "layout-columns" property
   DALI_TEST_CHECK( tableView.GetPropertyIndex( PROPERTY_NAME_LAYOUT_COLUMNS ) == TableView::Property::LAYOUT_COLUMNS );
@@ -672,12 +675,13 @@ int UtcDaliTableViewSetGetProperty(void)
 
   Property::Map layoutColumnsGet = tableView.GetProperty(TableView::Property::LAYOUT_COLUMNS).Get<Property::Map>();
   DALI_TEST_CHECK( layoutColumnsGet.GetKey(2).compare(layoutColumns.GetKey(0)) == 0 );
-  DALI_TEST_CHECK( layoutColumnsGet.GetValue(2).GetValue( "policy" ).Get<std::string>().compare(layoutColumns.GetValue(0).GetValue( "policy" ).Get<std::string>()) == 0 );
-  DALI_TEST_EQUALS( layoutColumnsGet.GetValue(2).GetValue( "value" ).Get<float>(),layoutColumns.GetValue(0).GetValue( "value" ).Get<float>(), TEST_LOCATION );
-
+  childMap =layoutColumnsGet.GetValue(2).GetMap();
+  DALI_TEST_CHECK( childMap->Find( "policy" )->Get<std::string>().compare("relative") == 0 );
+  DALI_TEST_EQUALS( childMap->Find( "value" )->Get<float>(), 0.2f, TEST_LOCATION );
+  childMap =layoutColumnsGet.GetValue(3).GetMap();
   DALI_TEST_CHECK( layoutColumnsGet.GetKey(3).compare(layoutColumns.GetKey(1)) == 0 );
-  DALI_TEST_CHECK( layoutColumnsGet.GetValue(3).GetValue( "policy" ).Get<std::string>().compare(layoutColumns.GetValue(1).GetValue( "policy" ).Get<std::string>()) == 0 );
-  DALI_TEST_EQUALS( layoutColumnsGet.GetValue(3).GetValue( "value" ).Get<float>(),layoutColumns.GetValue(1).GetValue( "value" ).Get<float>(), TEST_LOCATION );
+  DALI_TEST_CHECK( childMap->Find( "policy" )->Get<std::string>().compare("fixed") == 0 );
+  DALI_TEST_EQUALS( childMap->Find( "value" )->Get<float>(),30.f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -689,13 +693,14 @@ int UtcDaliTableViewCustomProperties(void)
 
   // Create a 10x10 table-view
   TableView tableView = TableView::New(10,10);
-  Constraint constraint = Constraint::New<Vector3>( tableView, Actor::Property::SIZE, Constraint100() );
-  constraint.Apply();
+  Stage::GetCurrent().Add( tableView );
+  tableView.SetSize( Dali::Vector2( 100.0f, 100.0f ) );
+
   DALI_TEST_CHECK( tableView );
 
   // Create a child actor with the custom properties
   Actor child1 = Actor::New();
-  child1.RegisterProperty( TableView::CELL_INDICES_PROPERTY_NAME, Vector2( 3, 4 ) );
+  child1.RegisterProperty( "cell-index", Vector2( 3, 4 ), Property::READ_WRITE );
   tableView.Add( child1 );
   // Check for actors at actual positions.
   DALI_TEST_CHECK( tableView.GetChildAt(TableView::CellPosition(3,4)) == child1);
@@ -704,9 +709,9 @@ int UtcDaliTableViewCustomProperties(void)
   Actor child2 = Actor::New();
   float rowSpan = 3.f;
   float columnSpan = 2.f;
-  child2.RegisterProperty( TableView::CELL_INDICES_PROPERTY_NAME, Vector2( 6, 1 ) );
-  child2.RegisterProperty( TableView::ROW_SPAN_PROPERTY_NAME, rowSpan );
-  child2.RegisterProperty( TableView::COLUMN_SPAN_PROPERTY_NAME, columnSpan );
+  child2.RegisterProperty( "cell-index", Vector2( 6, 1 ), Property::READ_WRITE );
+  child2.RegisterProperty( "row-span", rowSpan, Property::READ_WRITE );
+  child2.RegisterProperty( "column-span", columnSpan, Property::READ_WRITE );
   tableView.Add( child2 );
   // Check for actors at actual positions.
   for( int i=0; i<rowSpan; i++ )
@@ -716,6 +721,197 @@ int UtcDaliTableViewCustomProperties(void)
       DALI_TEST_CHECK( tableView.GetChildAt(TableView::CellPosition(6+i,1+j)) == child2);
     }
   }
+
+  // Create a third child actor with the cell alignment properties
+  Actor child3 = Actor::New();
+  child3.SetSize( 5.f,5.f );
+  child3.RegisterProperty( "cell-horizontal-alignment", "center", Property::READ_WRITE );
+  child3.RegisterProperty( "cell-vertical-alignment", "bottom", Property::READ_WRITE );
+  tableView.Add( child3 );
+
+  // store the actor in the first available cell
+  DALI_TEST_CHECK( tableView.GetChildAt(TableView::CellPosition(0,0)) == child3)
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( child3.GetCurrentAnchorPoint(), AnchorPoint::TOP_LEFT, TEST_LOCATION );
+  DALI_TEST_EQUALS( child3.GetCurrentParentOrigin(), ParentOrigin::TOP_LEFT, TEST_LOCATION );
+  DALI_TEST_EQUALS( child3.GetCurrentPosition(), Vector3(2.5f, 5.0f, 0.0f), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTableViewGetChildAtN(void)
+{
+  ToolkitTestApplication application;
+
+  TableView tableView = TableView::New(10,10);
+
+  Actor actor = tableView.GetChildAt( TableView::CellPosition( 200, 200 ) );
+  DALI_TEST_CHECK( !actor );
+
+  END_TEST;
+}
+
+int UtcDaliTableViewAddChildN(void)
+{
+  ToolkitTestApplication application;
+
+  TableView tableView = TableView::New(10,10);
+  DALI_TEST_CHECK( tableView.AddChild( Actor::New(), TableView::CellPosition( 0, 0 ) ) );
+  DALI_TEST_CHECK( ! tableView.AddChild( Actor::New(), TableView::CellPosition( 0, 0 ) ) );
+
+  END_TEST;
+}
+
+int UtcDaliTableViewInsertRowAtZero(void)
+{
+  ToolkitTestApplication application;
+
+  TableView tableView = TableView::New(10,10);
+  DALI_TEST_CHECK( tableView.AddChild( Actor::New(), TableView::CellPosition( 0, 0 , 10, 10 ) ) );
+  tableView.InsertRow(0);
+
+  DALI_TEST_CHECK( tableView.GetRows() == 11 );
+
+  END_TEST;
+}
+
+int UtcDaliTableViewDeleteRowAtZero(void)
+{
+  ToolkitTestApplication application;
+
+  TableView tableView = TableView::New(10,10);
+  DALI_TEST_CHECK( tableView.AddChild( Actor::New(), TableView::CellPosition( 0, 0 , 10, 10 ) ) );
+  tableView.DeleteRow(0);
+
+  DALI_TEST_CHECK( tableView.GetRows() == 9 );
+
+  END_TEST;
+}
+
+int UtcDaliTableViewInsertColumnAtZero(void)
+{
+  ToolkitTestApplication application;
+
+  TableView tableView = TableView::New(10,10);
+  DALI_TEST_CHECK( tableView.AddChild( Actor::New(), TableView::CellPosition( 0, 0 , 10, 10 ) ) );
+  tableView.InsertColumn(0);
+
+  DALI_TEST_CHECK( tableView.GetColumns() == 11 );
+
+  END_TEST;
+}
+
+int UtcDaliTableViewDeleteColumnAtZero(void)
+{
+  ToolkitTestApplication application;
+
+  TableView tableView = TableView::New(10,10);
+  DALI_TEST_CHECK( tableView.AddChild( Actor::New(), TableView::CellPosition( 0, 0 , 10, 10 ) ) );
+  tableView.DeleteColumn(0);
+
+  DALI_TEST_CHECK( tableView.GetColumns() == 9 );
+
+  END_TEST;
+}
+
+int UtcDaliTableViewTypeRegistry(void)
+{
+  ToolkitTestApplication application;
+
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+  DALI_TEST_CHECK( typeRegistry );
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "TableView" );
+  DALI_TEST_CHECK( typeInfo );
+
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+
+  TableView view = TableView::DownCast( handle );
+  DALI_TEST_CHECK( view );
+
+  END_TEST;
+}
+
+int UtcDaliTableViewKeyboardFocus(void)
+{
+  ToolkitTestApplication application;
+
+  TableView tableView = TableView::New(4,4);
+  tableView.SetKeyboardFocusable( true );
+  tableView.SetName( "TableView");
+
+  for ( int row = 0; row < 4; ++row )
+  {
+    for ( int col = 0; col < 4; ++col )
+    {
+      Control control = Control::New();
+      std::ostringstream str;
+      str << row << "-" << col;
+      control.SetName( str.str() );
+      control.SetKeyboardFocusable( true );
+      tableView.AddChild( control, TableView::CellPosition( row, col ) );
+    }
+  }
+
+  Stage::GetCurrent().Add( tableView );
+
+  application.SendNotification();
+  application.Render();
+
+  Actor firstFocusActor = Toolkit::Internal::GetImplementation( tableView ).GetNextKeyboardFocusableActor( Actor(), Control::KeyboardFocus::RIGHT, true );
+  DALI_TEST_CHECK( firstFocusActor );
+  DALI_TEST_CHECK( firstFocusActor.GetName() == "0-0" );
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  manager.SetFocusGroupLoop( true );
+  manager.SetCurrentFocusActor( firstFocusActor );
+
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-0" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-2" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-3" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-0" );
+
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-3" );
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-2" );
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-0" );
+  manager.MoveFocus( Control::KeyboardFocus::LEFT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "3-3" );
+
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-0" );
+  manager.MoveFocus( Control::KeyboardFocus::RIGHT );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+
+  manager.MoveFocus( Control::KeyboardFocus::DOWN );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1" );
+  manager.MoveFocus( Control::KeyboardFocus::DOWN );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-1" );
+  manager.MoveFocus( Control::KeyboardFocus::DOWN );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "3-1" );
+  manager.MoveFocus( Control::KeyboardFocus::DOWN );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+
+  manager.MoveFocus( Control::KeyboardFocus::UP );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "3-1" );
+  manager.MoveFocus( Control::KeyboardFocus::UP );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-1" );
+  manager.MoveFocus( Control::KeyboardFocus::UP );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1" );
+  manager.MoveFocus( Control::KeyboardFocus::UP );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
 
   END_TEST;
 }

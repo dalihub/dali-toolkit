@@ -45,6 +45,12 @@ AC_ARG_ENABLE([debug],
               [enable_debug=$enableval],
               [enable_debug=no])
 
+AC_ARG_ENABLE([i18n],
+              [AC_HELP_STRING([--enable-i18n],
+                              [Turns on internationalisation])],
+              [enable_i18n=$enableval],
+              [enable_i18n=no])
+
 # option to build JavaScript plugin
 # configure settings and output
 # --enable-javascript        // enable_javascript = yes
@@ -67,8 +73,9 @@ if test "x$enable_debug" = "xno" -a "x$enable_exportall" = "xno"; then
   DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -fvisibility=hidden -DHIDE_DALI_INTERNALS"
 fi
 
-
-
+if test "x$enable_i18n" = "xyes"; then
+  DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDGETTEXT_ENABLED "
+fi
 
 # Tizen Profile options
 AC_ARG_ENABLE([profile],

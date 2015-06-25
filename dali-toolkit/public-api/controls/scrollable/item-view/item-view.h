@@ -46,7 +46,13 @@ typedef IntrusivePtr<ItemLayout> ItemLayoutPtr;
  *
  * Multiple ItemLayouts may be provided, to determine the logical position of each item a layout.
  * Actors are provided from an external ItemFactory, to display the currently visible items.
+ *
+ * Signals
+ * | %Signal Name                     | Method                                     |
+ * |----------------------------------|--------------------------------------------|
+ * | layout-activated                 | @ref LayoutActivatedSignal()               |
  */
+
 class DALI_IMPORT_API ItemView : public Scrollable
 {
 public:
@@ -72,6 +78,10 @@ public:
       SCROLL_CONTENT_SIZE                                ///< Property, name "scroll-content-size",   type float
     };
   };
+
+  // Signals
+
+  typedef Signal< void () > LayoutActivatedSignalType;
 
 public:
 
@@ -420,6 +430,20 @@ public:
    * @param[out] range The range of items.
    */
   void GetItemsRange(ItemRange& range);
+
+public: // Signals
+
+  /**
+   * @brief Signal emitted when layout activation is finished.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName();
+   * @endcode
+   * @pre The Object has been initialized.
+   * @return The signal to connect to.
+   */
+  ItemView::LayoutActivatedSignalType& LayoutActivatedSignal();
 
 public: // Not intended for application developers
 

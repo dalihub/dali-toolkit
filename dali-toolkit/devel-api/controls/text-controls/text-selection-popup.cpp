@@ -29,9 +29,11 @@ namespace Dali
 namespace Toolkit
 {
 
-TextSelectionPopup TextSelectionPopup::New()
+TextSelectionPopup TextSelectionPopup::New( Buttons enabledButtons,
+                                            TextSelectionPopupCallbackInterface* callbackInterface )
 {
-  return Internal::TextSelectionPopup::New();
+  return Internal::TextSelectionPopup::New( enabledButtons,
+                                            callbackInterface );
 }
 
 TextSelectionPopup::TextSelectionPopup()

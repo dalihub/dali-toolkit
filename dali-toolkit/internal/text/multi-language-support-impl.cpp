@@ -126,24 +126,6 @@ Script GetScript( Length index,
   return script;
 }
 
-/**
- * @brief Whether the character is valid for all scripts. i.e. the white space.
- *
- * @param[in] character The character.
- *
- * @return @e true if the character is valid for all scripts.
- */
-bool IsValidForAllScripts( Character character )
-{
-  return ( TextAbstraction::IsWhiteSpace( character )         ||
-           TextAbstraction::IsZeroWidthNonJoiner( character ) ||
-           TextAbstraction::IsZeroWidthJoiner( character )    ||
-           TextAbstraction::IsZeroWidthSpace( character )     ||
-           TextAbstraction::IsLeftToRightMark( character )    ||
-           TextAbstraction::IsRightToLeftMark( character )    ||
-           TextAbstraction::IsThinSpace( character ) );
-}
-
 bool ValidateFontsPerScript::FindValidFont( FontId fontId ) const
 {
   for( Vector<FontId>::ConstIterator it = mValidFonts.Begin(),
@@ -262,7 +244,7 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
     // Skip those characters valid for many scripts like white spaces or '\n'.
     bool endOfText = index == numberOfCharacters;
     while( !endOfText &&
-           IsValidForAllScripts( character ) )
+           TextAbstraction::IsCommonScript( character ) )
     {
       // Count all these characters to be added into a script.
       ++numberOfAllScriptCharacters;
@@ -350,34 +332,29 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
 
   // Add remaining characters into the last script.
   currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
-  if( 0u != currentScriptRun.characterRun.numberOfCharacters )
+
+  DALI_ASSERT_DEBUG( ( 0u != currentScriptRun.characterRun.numberOfCharacters ) && "MultilanguageSupport::SetScripts() Trying to insert a script run with zero characters." );
+
+  if( TextAbstraction::UNKNOWN == currentScriptRun.script )
   {
-    if( TextAbstraction::UNKNOWN == currentScriptRun.script )
-    {
-      // There are only white spaces in the last script. Set the latin script.
-      currentScriptRun.script = TextAbstraction::LATIN;
-    }
-
-    // Store the last run.
-    scripts.PushBack( currentScriptRun );
+    // There are only white spaces in the last script. Set the latin script.
+    currentScriptRun.script = TextAbstraction::LATIN;
   }
-}
 
-void MultilanguageSupport::ReplaceScripts( LogicalModel& model,
-                                           CharacterIndex characterIndex,
-                                           Length numberOfCharactersToRemove,
-                                           Length numberOfCharactersToInsert )
-{
+  // Store the last run.
+  scripts.PushBack( currentScriptRun );
 }
 
 void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                                           const Vector<ScriptRun>& scripts,
                                           Vector<FontRun>& fonts )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->MultilanguageSupport::ValidateFonts\n" );
   const Length numberOfCharacters = text.Count();
 
   if( 0u == numberOfCharacters )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--MultilanguageSupport::ValidateFonts\n" );
     // Nothing to do if there are no characters.
     return;
   }
@@ -427,6 +404,20 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                                scriptRunIt,
                                scriptRunEndIt );
 
+#ifdef DEBUG_ENABLED
+    {
+      Dali::TextAbstraction::FontDescription description;
+      fontClient.GetDescription( fontId, description );
+
+      DALI_LOG_INFO( gLogFilter,
+                     Debug::Verbose,
+                     "  Initial font set\n  Character : %x, Script : %s, Font : %s \n",
+                     character,
+                     Dali::TextAbstraction::ScriptName[script],
+                     description.path.c_str() );
+    }
+#endif
+
     if( TextAbstraction::UNKNOWN == script )
     {
       DALI_LOG_WARNING( "MultilanguageSupport::ValidateFonts. Unknown script!" );
@@ -435,6 +426,11 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 
     // Whether the font being validated is a default one not set by the user.
     const bool isDefault = ( 0u == fontId );
+
+    DALI_LOG_INFO( gLogFilter,
+                   Debug::Verbose,
+                   "  Is a default font : %s\n",
+                   ( isDefault ? "true" : "false" ) );
 
     // The default font point size.
     PointSize26Dot6 pointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
@@ -488,6 +484,26 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
             else
             {
               // Add the font to the valid font cache.
+
+              //   At this point the validated font supports the given character. However, characters
+              // common for all scripts, like white spaces or new paragraph characters, need to be
+              // processed differently.
+              //
+              //   i.e. A white space can have assigned a DEVANAGARI script but the font assigned may not
+              // support none of the DEVANAGARI glyphs. This font can't be added to the cache as a valid
+              // font for the DEVANAGARI script but the COMMON one.
+              if( TextAbstraction::IsCommonScript( character ) )
+              {
+                validateFontsPerScript = *( validFontsPerScriptCacheBuffer + TextAbstraction::COMMON );
+
+                if( NULL == validateFontsPerScript )
+                {
+                  validateFontsPerScript = new ValidateFontsPerScript();
+
+                  *( validFontsPerScriptCacheBuffer + TextAbstraction::COMMON ) = validateFontsPerScript;
+                }
+              }
+
               validateFontsPerScript->mValidFonts.PushBack( fontId );
             }
           }
@@ -520,15 +536,23 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
           fontId = fontClient.FindDefaultFont( UTF32_A, pointSize );
         }
 
-#ifdef DEBUG_ENABLED
-        Dali::TextAbstraction::FontDescription description;
-        fontClient.GetDescription( fontId, description );
-        DALI_LOG_INFO( gLogFilter, Debug::Concise, "Script: %s; Selected font: %s\n", Dali::TextAbstraction::ScriptName[script], description.path.c_str() );
-#endif
         // Cache the font.
         *( defaultFontPerScriptCacheBuffer + script ) = fontId;
       }
     }
+
+#ifdef DEBUG_ENABLED
+    {
+      Dali::TextAbstraction::FontDescription description;
+      fontClient.GetDescription( fontId, description );
+      DALI_LOG_INFO( gLogFilter,
+                     Debug::Verbose,
+                     "  Validated font set\n  Character : %x, Script : %s, Font : %s \n",
+                     character,
+                     Dali::TextAbstraction::ScriptName[script],
+                     description.path.c_str() );
+    }
+#endif
 
     // The font is now validated.
 
@@ -559,13 +583,7 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     // Store the last run.
     fonts.PushBack( currentFontRun );
   }
-}
-
-void MultilanguageSupport::ValidateFonts( LogicalModel& model,
-                                          CharacterIndex characterIndex,
-                                          Length numberOfCharactersToRemove,
-                                          Length numberOfCharactersToInsert )
-{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--MultilanguageSupport::ValidateFonts\n" );
 }
 
 } // namespace Internal

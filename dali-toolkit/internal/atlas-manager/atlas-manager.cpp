@@ -69,11 +69,13 @@ bool AtlasManager::Remove( ImageId id )
 
 void AtlasManager::GenerateMeshData( ImageId id,
                                      const Vector2& position,
-                                     Mesh2D& mesh )
+                                     Mesh2D& mesh,
+                                     bool addReference )
 {
   GetImplementation(*this).GenerateMeshData( id,
                                              position,
-                                             mesh );
+                                             mesh,
+                                             addReference );
 }
 
 void AtlasManager::StitchMesh( Mesh2D& first,

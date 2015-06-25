@@ -50,7 +50,7 @@ namespace
 namespace
 {
 
-const Scripting::StringEnum< Toolkit::Text::LayoutEngine::HorizontalAlignment > HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
+const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 {
   { "BEGIN",  Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_BEGIN  },
   { "CENTER", Toolkit::Text::LayoutEngine::HORIZONTAL_ALIGN_CENTER },
@@ -58,7 +58,7 @@ const Scripting::StringEnum< Toolkit::Text::LayoutEngine::HorizontalAlignment > 
 };
 const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
 
-const Scripting::StringEnum< Toolkit::Text::LayoutEngine::VerticalAlignment > VERTICAL_ALIGNMENT_STRING_TABLE[] =
+const Scripting::StringEnum VERTICAL_ALIGNMENT_STRING_TABLE[] =
 {
   { "TOP",    Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_TOP    },
   { "CENTER", Toolkit::Text::LayoutEngine::VERTICAL_ALIGN_CENTER },
@@ -189,11 +189,14 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const LayoutEngine::HorizontalAlignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::HorizontalAlignment >( value.Get< std::string >().c_str(),
-                                                                                                                                             HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                                             HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
-
-          impl.mController->SetHorizontalAlignment( alignment );
+          LayoutEngine::HorizontalAlignment alignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN );
+          if( Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::HorizontalAlignment >( value.Get< std::string >().c_str(),
+                                                                                             HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                             HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                                                             alignment ) )
+          {
+            impl.mController->SetHorizontalAlignment( alignment );
+          }
         }
         break;
       }
@@ -201,11 +204,14 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const LayoutEngine::VerticalAlignment alignment = Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::VerticalAlignment >( value.Get< std::string >().c_str(),
-                                                                                                                                         VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                                         VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
-
-          impl.mController->SetVerticalAlignment( alignment );
+          LayoutEngine::VerticalAlignment alignment( LayoutEngine::VERTICAL_ALIGN_BOTTOM );
+          if( Scripting::GetEnumeration< Toolkit::Text::LayoutEngine::VerticalAlignment >( value.Get< std::string >().c_str(),
+                                                                                           VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                                           VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
+                                                                                           alignment ) )
+          {
+            impl.mController->SetVerticalAlignment( alignment );
+          }
         }
         break;
       }
@@ -356,9 +362,13 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::HorizontalAlignment >( impl.mController->GetHorizontalAlignment(),
-                                                                                                                  HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                  HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT ) );
+          const char* name = Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::HorizontalAlignment >( impl.mController->GetHorizontalAlignment(),
+                                                                                                                HORIZONTAL_ALIGNMENT_STRING_TABLE,
+                                                                                                                HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
+          if( name )
+          {
+            value = std::string( name );
+          }
         }
         break;
       }
@@ -366,9 +376,13 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          value = std::string( Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::VerticalAlignment >( impl.mController->GetVerticalAlignment(),
-                                                                                                                VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                                                VERTICAL_ALIGNMENT_STRING_TABLE_COUNT ) );
+          const char* name = Scripting::GetEnumerationName< Toolkit::Text::LayoutEngine::VerticalAlignment >( impl.mController->GetVerticalAlignment(),
+                                                                                                              VERTICAL_ALIGNMENT_STRING_TABLE,
+                                                                                                              VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
+          if( name )
+          {
+            value = std::string( name );
+          }
         }
         break;
       }
@@ -508,6 +522,11 @@ void TextLabel::OnStageConnect( Dali::Actor actor )
   {
     mHasBeenStaged = true;
   }
+}
+
+void TextLabel::AddDecoration( Actor& actor, bool needsClipping )
+{
+  // TextLabel does not show decorations
 }
 
 void TextLabel::OnStageConnection( unsigned int depth )
