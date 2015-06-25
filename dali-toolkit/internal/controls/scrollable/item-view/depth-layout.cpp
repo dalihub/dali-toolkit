@@ -418,14 +418,6 @@ void DepthLayout::GetDefaultItemSize( unsigned int itemId, const Vector3& layout
   itemSize.width = itemSize.height = itemSize.depth = ( IsVertical( GetOrientation() ) ? layoutSize.width : layoutSize.height ) / static_cast<float>( mImpl->mNumberOfColumns + 1 );
 }
 
-void DepthLayout::GetResizeAnimation(Animation& animation, Actor actor, Vector3 size, float durationSeconds) const
-{
-  if(animation)
-  {
-    animation.AnimateTo( Property( actor, Actor::Property::SIZE ), size );
-  }
-}
-
 Degree DepthLayout::GetScrollDirection() const
 {
   Degree scrollDirection(0.0f);
