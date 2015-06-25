@@ -1139,6 +1139,10 @@ void TextField::KeyboardStatusChanged(bool keyboardShown)
   {
     mController->KeyboardFocusLostEvent();
   }
+  else
+  {
+    mController->KeyboardFocusGainEvent();
+  }
 }
 
 bool TextField::OnTouched( Actor actor, const TouchEvent& event )
