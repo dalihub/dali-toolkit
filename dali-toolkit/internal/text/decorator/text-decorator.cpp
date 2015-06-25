@@ -39,6 +39,12 @@
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/signals/connection-tracker.h>
 
+#include <dali/devel-api/object/property-buffer.h>
+#include <dali/devel-api/rendering/geometry.h>
+#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/renderer.h>
+#include <dali/devel-api/rendering/shader.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
@@ -52,6 +58,33 @@
 #define DECORATOR_DEBUG
 
 #endif
+
+#define MAKE_SHADER(A)#A
+
+namespace
+{
+const char* VERTEX_SHADER = MAKE_SHADER(
+attribute mediump vec2    aPosition;
+uniform   mediump mat4    uMvpMatrix;
+uniform   mediump vec3    uSize;
+
+void main()
+{
+  mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
+  position.xyz *= uSize;
+  gl_Position = uMvpMatrix * position;
+}
+);
+
+const char* FRAGMENT_SHADER = MAKE_SHADER(
+uniform      lowp vec4 uColor;
+
+void main()
+{
+  gl_FragColor = uColor;
+}
+);
+}
 
 namespace Dali
 {
@@ -249,6 +282,9 @@ struct Decorator::Impl : public ConnectionTracker
     mSwapSelectionHandles( false ),
     mNotifyEndOfScroll( false )
   {
+    mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
+    mQuadIndexFormat[ "indices" ] = Property::UNSIGNED_INTEGER;
+    mHighlightMaterial = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER ) );
   }
 
   /**
@@ -346,6 +382,9 @@ struct Decorator::Impl : public ConnectionTracker
       primary.actor.SetVisible( isPrimaryVisible );
       secondary.actor.SetVisible( isSecondaryVisible );
 
+      // Shouldn't be needed......
+      UnparentAndReset( mHighlightActor );
+
       CreateHighlight();
       UpdateHighlight();
     }
@@ -353,7 +392,7 @@ struct Decorator::Impl : public ConnectionTracker
     {
       UnparentAndReset( primary.actor );
       UnparentAndReset( secondary.actor );
-      //UnparentAndReset( mHighlightMeshActor );
+      UnparentAndReset( mHighlightActor );
     }
 
     if ( mActiveCopyPastePopup )
@@ -661,123 +700,93 @@ struct Decorator::Impl : public ConnectionTracker
 
   void CreateHighlight()
   {
-    /*
-    if ( !mHighlightMeshActor )
+    if ( !mHighlightActor )
     {
-      mHighlightMaterial = Material::New( "HighlightMaterial" );
-      mHighlightMaterial.SetDiffuseColor( mHighlightColor );
+      mHighlightActor = Actor::New();
 
-      mHighlightMeshData.SetMaterial( mHighlightMaterial );
-      mHighlightMeshData.SetHasNormals( true );
-
-      mHighlightMesh = Mesh::New( mHighlightMeshData );
-
-      mHighlightMeshActor = MeshActor::New( mHighlightMesh );
 #ifdef DECORATOR_DEBUG
-      mHighlightMeshActor.SetName( "HighlightMeshActor" );
+      mHighlightActor.SetName( "HighlightActor" );
 #endif
-      mHighlightMeshActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      mHighlightActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      mHighlightActor.SetPosition( 0.0f, 0.0f, DISPLAYED_HIGHLIGHT_Z_OFFSET );
+      mHighlightActor.SetSize( 1.0f, 1.0f );
+      mHighlightActor.SetColor( mHighlightColor );
+      mHighlightActor.SetColorMode( USE_OWN_COLOR );
 
       // Add the highlight box telling the controller it needs clipping.
-      mController.AddDecoration( mHighlightMeshActor, true );
+      mController.AddDecoration( mHighlightActor, true );
     }
-
-    mHighlightMeshActor.SetPosition( mHighlightPosition.x, mHighlightPosition.y, DISPLAYED_HIGHLIGHT_Z_OFFSET );
-    */
   }
 
   void UpdateHighlight()
   {
-    //  Construct a Mesh with a texture to be used as the highlight 'box' for selected text
-    //
-    //  Example scenarios where mesh is made from 3, 1, 2, 2 ,3 or 3 quads.
-    //
-    //   [ TOP   ]  [ TOP ]      [TOP ]  [ TOP    ]      [ TOP  ]      [ TOP  ]
-    //  [ MIDDLE ]             [BOTTOM]  [BOTTOM]      [ MIDDLE ]   [ MIDDLE  ]
-    //  [ BOTTOM]                                      [ MIDDLE ]   [ MIDDLE  ]
-    //                                                 [BOTTOM]     [ MIDDLE  ]
-    //                                                              [BOTTOM]
-    //
-    //  Each quad is created as 2 triangles.
-    //  Middle is just 1 quad regardless of its size.
-    //
-    //  (0,0)         (0,0)
-    //     0*    *2     0*       *2
-    //     TOP          TOP
-    //     3*    *1     3*       *1
-    //  4*       *1     4*     *6
-    //     MIDDLE         BOTTOM
-    //  6*       *5     7*     *5
-    //  6*    *8
-    //   BOTTOM
-    //  9*    *7
-    //
 
-    /*
-    if ( mHighlightMesh && mHighlightMaterial && !mHighlightQuadList.empty() )
+    if ( mHighlightActor && !mHighlightQuadList.empty() )
     {
-      MeshData::VertexContainer vertices;
-      Dali::MeshData::FaceIndices faceIndices;
+      Vector< Vector2 > vertices;
+      Vector< unsigned int> indices;
+      Vector2 vertex;
 
       std::vector<QuadCoordinates>::iterator iter = mHighlightQuadList.begin();
       std::vector<QuadCoordinates>::iterator endIter = mHighlightQuadList.end();
 
-      // vertex position defaults to (0 0 0)
-      MeshData::Vertex vertex;
-      // set normal for all vertices as (0 0 1) pointing outward from TextInput Actor.
-      vertex.nZ = 1.0f;
-
       for(std::size_t v = 0; iter != endIter; ++iter,v+=4 )
       {
-        // Add each quad geometry (a sub-selection) to the mesh data.
-
-        // 0-----1
-        // |\    |
-        // | \ A |
-        // |  \  |
-        // | B \ |
-        // |    \|
-        // 2-----3
 
         QuadCoordinates& quad = *iter;
+
         // top-left (v+0)
         vertex.x = quad.min.x;
         vertex.y = quad.min.y;
-        vertices.push_back( vertex );
+        vertices.PushBack( vertex );
 
         // top-right (v+1)
         vertex.x = quad.max.x;
         vertex.y = quad.min.y;
-        vertices.push_back( vertex );
+        vertices.PushBack( vertex );
 
         // bottom-left (v+2)
         vertex.x = quad.min.x;
         vertex.y = quad.max.y;
-        vertices.push_back( vertex );
+        vertices.PushBack( vertex );
 
         // bottom-right (v+3)
         vertex.x = quad.max.x;
         vertex.y = quad.max.y;
-        vertices.push_back( vertex );
+        vertices.PushBack( vertex );
 
         // triangle A (3, 1, 0)
-        faceIndices.push_back( v + 3 );
-        faceIndices.push_back( v + 1 );
-        faceIndices.push_back( v );
+        indices.PushBack( v + 3 );
+        indices.PushBack( v + 1 );
+        indices.PushBack( v );
 
         // triangle B (0, 2, 3)
-        faceIndices.push_back( v );
-        faceIndices.push_back( v + 2 );
-        faceIndices.push_back( v + 3 );
-
-        mHighlightMeshData.SetFaceIndices( faceIndices );
+        indices.PushBack( v );
+        indices.PushBack( v + 2 );
+        indices.PushBack( v + 3 );
       }
 
-      BoneContainer bones(0); // passed empty as bones not required
-      mHighlightMeshData.SetData( vertices, faceIndices, bones, mHighlightMaterial );
-      mHighlightMesh.UpdateMeshData( mHighlightMeshData );
+      PropertyBuffer quadVertices = PropertyBuffer::New( mQuadVertexFormat, vertices.Size() );
+      PropertyBuffer quadIndices = PropertyBuffer::New( mQuadIndexFormat, indices.Size() );
+
+      quadVertices.SetData( &vertices[ 0 ] );
+      quadIndices.SetData( &indices[ 0 ] );
+
+      Geometry quadGeometry = Geometry::New();
+      quadGeometry.AddVertexBuffer( quadVertices );
+      quadGeometry.SetIndexBuffer( quadIndices );
+
+ //     if ( mHighlightRenderer )
+ //     {
+ //       mHighlightRenderer.SetGeometry( quadGeometry );
+ //     }
+ //     else
+ //     {
+        mHighlightRenderer = Dali::Renderer::New( quadGeometry, mHighlightMaterial );
+        mHighlightRenderer.SetDepthIndex( DECORATION_DEPTH_INDEX - 1 );
+ //     }
+      mHighlightActor.AddRenderer( mHighlightRenderer );
     }
-    */
   }
 
   void OnTap( Actor actor, const TapGesture& tap )
@@ -1187,19 +1196,18 @@ struct Decorator::Impl : public ConnectionTracker
   Timer               mScrollTimer;               ///< Timer used to scroll the text when the grab handle is moved close to the edges.
 
   Layer               mActiveLayer;               ///< Layer for active handles and alike that ensures they are above all else.
-  //ImageActor          mPrimaryCursor;
-  //ImageActor          mSecondaryCursor;
-  //MeshActor           mHighlightMeshActor;        ///< Mesh Actor to display highlight
 
+  Actor               mHighlightActor;        ///< Actor to display highlight
+  Renderer            mHighlightRenderer;
+  Material            mHighlightMaterial;         ///< Material used for highlight
+  Property::Map       mQuadVertexFormat;
+  Property::Map       mQuadIndexFormat;
   PopupImpl           mCopyPastePopup;
   TextSelectionPopup::Buttons mEnabledPopupButtons; /// Bit mask of currently enabled Popup buttons
   TextSelectionPopupCallbackInterface& mTextSelectionPopupCallbackInterface;
 
   Image               mHandleImages[HANDLE_TYPE_COUNT][HANDLE_IMAGE_TYPE_COUNT];
   Image               mCursorImage;
-  //Mesh                mHighlightMesh;             ///< Mesh for highlight
-  //MeshData            mHighlightMeshData;         ///< Mesh Data for highlight
-  //Material            mHighlightMaterial;         ///< Material used for highlight
 
   CursorImpl          mCursor[CURSOR_COUNT];
   HandleImpl          mHandle[HANDLE_TYPE_COUNT];
