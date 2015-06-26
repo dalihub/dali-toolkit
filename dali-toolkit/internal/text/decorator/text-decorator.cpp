@@ -296,7 +296,6 @@ struct Decorator::Impl : public ConnectionTracker
     // TODO - Remove this if nothing is active
     CreateActiveLayer();
 
-    /*
     // Show or hide the cursors
     CreateCursors();
     if( mPrimaryCursor )
@@ -325,7 +324,7 @@ struct Decorator::Impl : public ConnectionTracker
       }
       mSecondaryCursor.SetVisible( mSecondaryCursorVisible );
     }
-    */
+
     // Show or hide the grab handle
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
     if( grabHandle.active )
@@ -479,7 +478,6 @@ struct Decorator::Impl : public ConnectionTracker
   // Add or Remove cursor(s) from parent
   void CreateCursors()
   {
-    /*
     if( mActiveCursor == ACTIVE_CURSOR_NONE )
     {
       UnparentAndReset( mPrimaryCursor );
@@ -517,12 +515,10 @@ struct Decorator::Impl : public ConnectionTracker
         UnparentAndReset( mSecondaryCursor );
       }
     }
-    */
   }
 
   bool OnCursorBlinkTimerTick()
   {
-    /*
     // Cursor blinking
     if ( mPrimaryCursor )
     {
@@ -534,7 +530,7 @@ struct Decorator::Impl : public ConnectionTracker
     }
 
     mCursorBlinkStatus = !mCursorBlinkStatus;
-    */
+
     return true;
   }
 
@@ -994,13 +990,12 @@ struct Decorator::Impl : public ConnectionTracker
   {
     float alternativePosition=0.0f;;
 
-    /*
     if ( mPrimaryCursor ) // Secondary cursor not used for paste
     {
       Cursor cursor = PRIMARY_CURSOR;
       alternativePosition = mCursor[cursor].position.y;
     }
-    */
+
     const float popupHeight = 120.0f; // todo Set as a MaxSize Property in Control or retrieve from CopyPastePopup class.
 
     if( mHandle[GRAB_HANDLE].active )
@@ -1196,6 +1191,8 @@ struct Decorator::Impl : public ConnectionTracker
   Timer               mScrollTimer;               ///< Timer used to scroll the text when the grab handle is moved close to the edges.
 
   Layer               mActiveLayer;               ///< Layer for active handles and alike that ensures they are above all else.
+  ImageActor          mPrimaryCursor;
+  ImageActor          mSecondaryCursor;
 
   Actor               mHighlightActor;        ///< Actor to display highlight
   Renderer            mHighlightRenderer;
