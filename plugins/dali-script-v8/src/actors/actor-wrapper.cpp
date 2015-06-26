@@ -39,7 +39,6 @@ v8::Persistent<v8::ObjectTemplate> ActorWrapper::mActorTemplate;
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mImageActorTemplate;
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mCameraActorTemplate;
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mLayerActorTemplate;
-v8::Persistent<v8::ObjectTemplate> ActorWrapper::mTextLabelTemplate;
 
 namespace
 {
@@ -61,8 +60,7 @@ const ActorTemplate ActorTemplateLookup[]=
     { &ActorWrapper::mActorTemplate },        // ACTOR
     { &ActorWrapper::mImageActorTemplate },   // IMAGE_ACTOR
     { &ActorWrapper::mLayerActorTemplate },   // LAYER_ACTOR
-    { &ActorWrapper::mCameraActorTemplate},   // CAMERA_ACTOR
-    { &ActorWrapper::mTextLabelTemplate }
+    { &ActorWrapper::mCameraActorTemplate}    // CAMERA_ACTOR
 };
 
 /**
@@ -89,6 +87,7 @@ struct ActorApiStruct
 
 /**
  * Lookup table to match a actor type with a constructor and supported API's.
+ * HandleWrapper::ActorType is used to index this table
  */
 const ActorApiStruct ActorApiLookup[]=
 {
@@ -96,8 +95,6 @@ const ActorApiStruct ActorApiLookup[]=
   {"ImageActor", ActorWrapper::IMAGE_ACTOR,  ImageActorApi::New,  ACTOR_API | IMAGE_ACTOR_API   },
   {"Layer",      ActorWrapper::LAYER_ACTOR,  LayerApi::New,       ACTOR_API | LAYER_API                                },
   {"CameraActor",ActorWrapper::CAMERA_ACTOR, CameraActorApi::New, ACTOR_API | CAMERA_ACTOR_API                         },
-  {"TextLabel",  ActorWrapper::TEXT_LABEL,   TextLabelApi::New,   ACTOR_API },
-
 };
 
 const unsigned int ActorApiLookupCount = sizeof(ActorApiLookup)/sizeof(ActorApiLookup[0]);
@@ -118,20 +115,8 @@ Actor CreateActor( const v8::FunctionCallbackInfo< v8::Value >& args,
   // if we don't currently support the actor type, then use type registry to create it
   if( actorType == ActorWrapper::UNKNOWN_ACTOR )
   {
-    Dali::TypeInfo typeInfo = Dali::TypeRegistry::Get().GetTypeInfo( typeName );
-    if( typeInfo ) // handle, check if it has a value
-    {
-      Dali::BaseHandle handle = typeInfo.CreateInstance();
-      if( handle )
-      {
-        actor = Actor::DownCast( handle );
-      }
-    }
-    else
-    {
-      DALI_SCRIPT_EXCEPTION(args.GetIsolate(),"Unknown actor type");
+      DALI_SCRIPT_EXCEPTION( args.GetIsolate(), "Unknown actor type" );
       return Actor();
-    }
   }
   else
   {
@@ -439,6 +424,42 @@ void ActorWrapper::NewActor( const v8::FunctionCallbackInfo< v8::Value >& args)
 
   args.GetReturnValue().Set( localObject );
 }
+
+void ActorWrapper::NewControl( const v8::FunctionCallbackInfo< v8::Value >& args)
+{
+  v8::Isolate* isolate = args.GetIsolate();
+  v8::HandleScope handleScope( isolate );
+
+  if( !args.IsConstructCall() )
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "constructor called without 'new" );
+    return;
+  }
+
+  bool found( false );
+  std::string controlName = V8Utils::GetStringParameter( PARAMETER_0, found, isolate,  args );
+
+  if( !found )
+  {
+    DALI_SCRIPT_EXCEPTION( isolate, "missing control name" );
+    return;
+  }
+  Actor control;
+  Dali::TypeInfo typeInfo = Dali::TypeRegistry::Get().GetTypeInfo( controlName );
+  if( typeInfo ) // handle, check if it has a value
+  {
+    Dali::BaseHandle handle = typeInfo.CreateInstance();
+    if( handle )
+    {
+      control = Actor::DownCast( handle );
+    }
+  }
+
+  v8::Local<v8::Object> localObject = WrapActor( isolate, control, ACTOR );
+
+  args.GetReturnValue().Set( localObject );
+}
+
 
 /**
  * given an actor type name, e.g. ImageActor returns the type, e.g. ActorWrapper::IMAGE_ACTOR

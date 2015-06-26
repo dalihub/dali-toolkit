@@ -64,18 +64,21 @@ class ModuleLoader
 public:
 
   /**
-   * Constructor
+   * @brief Constructor
+   * @param[in] isolate v8 isolate
+   * @param[in] daliObject dali exports object, used when developer does require('dali');
    */
   ModuleLoader();
 
   /**
-   * non virtual destructor, not intended as a base class
+   * @brief non virtual destructor, not intended as a base class
    */
   ~ModuleLoader();
 
 
   /**
-   * Execute a script from a file
+   * @brief Execute a script from a file
+   * @param[in] isolate v8 isolate
    * @param[in] fileName file name
    * @return true on success, false on failure
    *
@@ -84,7 +87,8 @@ public:
 
 
   /**
-   * Execute a script
+   * @brief Execute a script
+   * @param[in] isolate v8 isolate
    * @param[in] sourceCode source code to run
    * @param[in] sourceFileName source file name
    * @return true on success, false on failure
@@ -95,9 +99,21 @@ public:
 
 
   /**
-   * Implements JavaScript Require functionality
+   * @brief Implements JavaScript Require functionality
+   * @param[in] args arguments passed to require. The return value is set using   args.GetReturnValue().Set(
    */
-  void Require(const v8::FunctionCallbackInfo< v8::Value >& args, v8::Persistent<v8::ObjectTemplate>& globalObjectTemplate );
+  void Require( const v8::FunctionCallbackInfo< v8::Value >& args );
+
+  /**
+   * @brief
+   * Stores a pre compiled object as a module.
+   * Currently used for storing the Dali object, so the developer can
+   * perform  var dali = require('dali');
+   * @param[in] isolate v8 isolate
+   * @param[in] exportObject export object
+   * @param[in] name module name, used for the require('name') lookup
+   */
+  void StorePreBuiltModule( v8::Isolate* isolate, v8::Local<v8::Object>& exportObject, const std::string& name );
 
 private:
 
@@ -111,13 +127,13 @@ private:
                      const std::string& sourceFileName );
 
   /**
-   * Store information about the current script
+   * @brief Store information about the current script
    * @param[in] sourceFileName source file name
    */
   void StoreScriptInfo( const std::string& sourceFileName );
 
   /**
-   * Store module information
+   * @brief Store module information
    * @param[in] sourceFileName source file name
    * @return module object
    */
@@ -128,7 +144,7 @@ private:
                     v8::Local<v8::Object>& moduleExportsObject );
 
   /**
-   * Find a module
+   * @brief Find a module
    * @param[in] moduleName module name
    * @return module
    */

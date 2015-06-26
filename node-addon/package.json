@@ -1,0 +1,25 @@
+{
+  "name": "dali",
+  "version": "0.0.0",
+  "description": "DALi 3D Engine addon",
+  "main": "index.js",
+  "gypfile": "true",
+  "scripts": {
+     "preinstall" : "./configure",
+     "install" : "make && make install",
+    "test" : "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "review.tizen.org:29418/platform/core/uifw/dali-core"
+  },
+  "keywords": [
+    "dali",
+    "3D",
+    "engine",
+    "OpenGL",
+    "user interface"
+  ],
+  "author": "Samsung",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0"
+}

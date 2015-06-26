@@ -41,17 +41,17 @@ class ActorWrapper : public HandleWrapper
 public:
 
   /**
-   * Actor type used an index
+   * Actor type used an index.
+   * These enums are used to index the ActorApiLookup table in actor-wrapper.cpp.
+   * Any changes made must be reflected in the ActorApiLookup otherwise it may segfault when creating an actor
    */
   enum ActorType
   {
     UNKNOWN_ACTOR = -1,
-    ACTOR       = 0,
-    IMAGE_ACTOR  =1,
-    MESH_ACTOR   =2,
-    LAYER_ACTOR  =3,
-    CAMERA_ACTOR =4,
-    TEXT_LABEL   =5
+    ACTOR        = 0,
+    IMAGE_ACTOR  = 1,
+    LAYER_ACTOR  = 2,
+    CAMERA_ACTOR = 3
   };
 
   /**
@@ -77,6 +77,13 @@ public:
   static void NewActor( const v8::FunctionCallbackInfo< v8::Value >& args);
 
   /**
+   * @brief Creates a new Control wrapped inside a Javascript Object.
+   * @note: the control type is passed as a parameter e.g. 'TextField'
+   * @param[in] args v8 function call arguments interpreted
+   */
+  static void NewControl( const v8::FunctionCallbackInfo< v8::Value >& args);
+
+  /**
    * @brief Wraps an actor of a given type
    */
   static v8::Handle<v8::Object> WrapActor(v8::Isolate* isolate, Dali::Actor actor,ActorType actorType);
@@ -89,10 +96,8 @@ public:
   // The Actor ObjectTemplates.
   static v8::Persistent<v8::ObjectTemplate> mActorTemplate;
   static v8::Persistent<v8::ObjectTemplate> mImageActorTemplate;
-  static v8::Persistent<v8::ObjectTemplate> mMeshActorTemplate;
   static v8::Persistent<v8::ObjectTemplate> mCameraActorTemplate;
   static v8::Persistent<v8::ObjectTemplate> mLayerActorTemplate;
-  static v8::Persistent<v8::ObjectTemplate> mTextLabelTemplate;
 
   /**
    * @return the wrapped actor

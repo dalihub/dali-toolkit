@@ -64,7 +64,7 @@ void Log(const v8::FunctionCallbackInfo< v8::Value >& args)
       std::cout << " ";
     }
     v8::String::Utf8Value utf8_value( args[i] );
-    std::cout << *utf8_value;
+    std::cout << *utf8_value << "\n";
   }
 }
 
@@ -85,6 +85,7 @@ void LogError(const v8::FunctionCallbackInfo< v8::Value >& args)
     }
     v8::String::Utf8Value utf8_value( args[i] );
     output += *utf8_value;
+    output +="\n";
   }
   DALI_LOG_ERROR_NOFN( "JavaScript: %s",output.c_str() );
 }

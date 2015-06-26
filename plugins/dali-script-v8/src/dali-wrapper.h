@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <garbage-collector/garbage-collector.h>
+
 #include <module-loader/module-loader.h>
 
 namespace Dali
@@ -65,12 +66,25 @@ namespace V8Plugin
  */
 class DALI_INTERNAL DaliWrapper
 {
+
 public:
 
   /**
-   * Constructor
+   * @brief whether the wrapper is running in standalone using V8,
+   * or inside Node.JS using V8
    */
-  DaliWrapper();
+  enum RunMode
+  {
+    RUNNING_STANDALONE,
+    RUNNING_IN_NODE_JS
+  };
+
+  /**
+   * @brief Constructor
+   * @param[in] runMode whether the wrapper is running standalone or inside Node.JS
+   * @param[in] isolate v8 isolate ( can be null if running standalone )
+   */
+  DaliWrapper( RunMode runMode, v8::Isolate* isolate );
 
   /**
    * non virtual destructor, not intended as a base class
@@ -83,6 +97,12 @@ public:
    * @return the wrapper
    */
   static DaliWrapper& Get();
+
+  /**
+   * Intialize DaliWrapper for running inside NodeJS
+   */
+  static v8::Local<v8::Object> CreateWrapperForNodeJS( v8::Isolate* isolate);
+
 
   /**
    * Set V8 engine configuration flags
@@ -124,14 +144,21 @@ public:
 private:
 
   /**
-   * Create V8 context
+   * @brief Apply global objects like console.log and require() to the context
    */
-  void CreateContext();
+  void ApplyGlobalObjectsToContext( v8::Local<v8::Context> context );
 
   /**
-   * Initialize DaliWrapper
+   * @brief Initialize DaliWrapper for running standalone
+   * Creates a new isolate
+   *
    */
-  void Initialize();
+  void InitializeStandAlone();
+
+  /**
+   * @brief create dali namespace/object
+   */
+  v8::Local<v8::Object> CreateDaliObject();
 
   /**
    * Create Dali ObjectTemplate
@@ -150,9 +177,8 @@ private:
   GarbageCollector mGarbageCollector;                           ///< DALi garbage collector
   ModuleLoader mModuleLoader;                                   ///< Module loader
   v8::Persistent<v8::Context> mContext;                         ///< A sandboxed execution context with its own set of built-in objects and functions.
-  v8::Persistent<v8::ObjectTemplate> mGlobalObjectTemplate;     ///< Global object template for storing things like dali global object
   v8::Isolate* mIsolate;                                        ///< represents an isolated instance of the V8 engine.
-
+  RunMode mRunMode;
 };
 
 
