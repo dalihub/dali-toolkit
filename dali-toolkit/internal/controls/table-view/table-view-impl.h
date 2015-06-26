@@ -267,7 +267,7 @@ private: // Implementation
    * Struct to hold data for rows and columns
    *
    * If sizePolicy is FIXED then size is the absolute size to use.
-   * If sizePolicy is FIT or FILL then size is the calculated value of size.
+   * If sizePolicy is FIT, RELATIVE or FILL then size is the calculated value of size.
    */
   struct RowColumnData
   {
@@ -277,7 +277,7 @@ private: // Implementation
     RowColumnData()
     : size( 0.0f ),
       fillRatio( 0.0f ),
-      position(0.0f),
+      position( 0.0f ),
       sizePolicy( Toolkit::TableView::FILL )
     {
     }
@@ -291,7 +291,7 @@ private: // Implementation
     RowColumnData( float newSize, float newFillRatio, Toolkit::TableView::LayoutPolicy newSizePolicy )
     : size( newSize ),
       fillRatio( newFillRatio ),
-      position(0.0f),
+      position( 0.0f ),
       sizePolicy( newSizePolicy )
     {
     }
@@ -365,11 +365,11 @@ private:
   bool RemoveAllInstances( const Actor& child );
 
   /**
-   * @brief Compute relative sizes for an array
+   * @brief Calculate the ratio of FILL rows/columns
    *
    * @param[in] data The RowColumn data to compute the relative sizes for
    */
-  void ComputeRelativeSizes( RowColumnArray& data );
+  void CalculateFillSizes( RowColumnArray& data );
 
   /**
    * @brief Calculate the total fixed sizes for a row or column
@@ -379,20 +379,12 @@ private:
   float CalculateTotalFixedSize( const RowColumnArray& data );
 
   /**
-   * @brief Calculate the fixed sizes for a row or column
+   * @brief Calculate the sizes of FIT rows/columns
    *
    * @param[in] data The row or column data to process
    * @param[in] dimension The dimension being calculated: row == Dimension::HEIGHT, column == Dimension::WIDTH
    */
-  void CalculateFixedSizes( RowColumnArray& data, Dimension::Type dimension );
-
-  /**
-   * @brief Calculate the value of the relative sizes
-   *
-   * @param[in] data The row or column data to process
-   * @param[in] size The size of the table view in that dimension
-   */
-  void CalculateRelativeSizes( RowColumnArray& data, float size );
+  void CalculateFitSizes( RowColumnArray& data, Dimension::Type dimension );
 
   /**
    * @brief Search for a FIT cell in the array
@@ -401,11 +393,6 @@ private:
    * @return Return if a FIT cell was found or not
    */
   bool FindFit( const RowColumnArray& data );
-
-  /**
-   * @brief Calculate row and column data when it is dirty
-   */
-  void CalculateRowColumnData();
 
   /**
    * @brief Return the cell padding for a given dimension
@@ -506,7 +493,8 @@ private: // Data
 
   Size mPadding;                 ///< Padding to apply to each cell
   bool mLayoutingChild;          ///< Can't be a bitfield due to Relayouting lock
-  bool mRowColumnDirty : 1;      ///< Flag to indicate the row column data is dirty
+  bool mRowDirty : 1;            ///< Flag to indicate the row data is dirty
+  bool mColumnDirty : 1;         ///< Flag to indicate the column data is dirty
 };
 
 } // namespace Internal

@@ -37,27 +37,31 @@ class TableView;
 }
 
 /**
- * TableView is a layout container for aligning child actors in a grid like layout.
+ * @brief TableView is a layout container for aligning child actors in a grid like layout.
+ *
  * TableView constrains the x and y position and width and height of the child actors.
  * z position and depth are left intact so that 3D model actors can also be laid out
  * in a grid without loosing their depth scaling.
  *
  * @nosubgrouping
- *
- * Per-child Custom properties for script supporting.
+ * <h3>Per-child Custom properties for script supporting:</h3>
  *
  * When an actor is add to the tableView through Actor::Add() instead of TableView::AddChild,
- * the following custom properties of the actor are checked to decide the actor position inside the table
+ * the following custom properties of the actor are checked to decide the actor position inside the table.
  *
  * These properties are registered dynamically to the child and is non-animatable.
  *
- * | %Property Name            | Type               |
- * |---------------------------|--------------------|
- * | cell-index                | Vector2            |
- * | row-span                  | float              | // type float (Currently builder is unable to differentiate integer and float from Json string)
- * | column-span               | float              | // type float (Currently builder is unable to differentiate integer and float from Json string)
- * | cell-horizontal-alignment | string             | // available values: left, center, right
- * | cell-vertical-alignment   | string             | // available values: top, center, bottom
+ * | %Property Name            | Type        |
+ * |---------------------------|-------------|
+ * | cell-index                | Vector2     |
+ * | row-span                  | float       |
+ * | column-span               | float       |
+ * | cell-horizontal-alignment | string      |
+ * | cell-vertical-alignment   | string      |
+ *
+ * The row-span or column span has integer value, but its type is float here due to the limitation of the builder's ability to differentiate integer and float from Json string.
+ * The available values for cell-horizontal-alignment are: left, center, right.
+ * The available values for cell-vertical-alignment are: top, center, bottom.
  *
  * @code
  * "name":"gallery-1",
@@ -131,7 +135,7 @@ public:
   {
     FIXED,      ///< Fixed with the given value.
     RELATIVE,   ///< Calculated as percentage of the remainder after subtracting Padding and Fixed height/width
-    FILL,       ///< Default policy, get the remainder of the 100% (after subtracting Padding, Fixed and Relative height/ width) divided evenly between 'fill' rows/columns
+    FILL,       ///< Default policy, get the remainder of the 100% (after subtracting Fixed, Fit and Relative height/ width) divided evenly between 'fill' rows/columns
     FIT         ///< Fit around its children.
   };
 
