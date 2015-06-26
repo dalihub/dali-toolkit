@@ -56,18 +56,21 @@ public:
   virtual void SetFlags( const std::string& flags );
 
   /**
-   *  @brief Exececute the buffer contents as a script
+   * @brief Exececute the buffer contents as a script
    * @param [in] buffer script file contents
    * @param [in] filename a nominal name for the buffer contents.
-   * (NB filename extension may be used to disambiguate script language)
+   * @note filename extension may be used to disambiguate script language
+   * @return true on success, false on failure
+   *
    */
-  virtual void ExecuteBuffer( const std::string& buffer, const std::string& filename );
+  virtual bool ExecuteBuffer( const std::string& buffer, const std::string& filename );
 
   /**
    * @brief  execture the file as a script
    * @param [in] filename the filename to read and execute
+   * @return true on success, false on failure
    */
-  virtual void ExecuteFile( const std::string& fileName );
+  virtual bool ExecuteFile( const std::string& fileName );
 
   /**
    * @brief check if the plugin is initialized

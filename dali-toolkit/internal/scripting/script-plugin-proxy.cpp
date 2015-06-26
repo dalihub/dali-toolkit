@@ -57,27 +57,28 @@ void ScriptPluginProxy::SetFlags(const std::string& flags)
   }
 }
 
-void ScriptPluginProxy::ExecuteBuffer(const std::string &buffer, const std::string &filename)
+bool ScriptPluginProxy::ExecuteBuffer(const std::string &buffer, const std::string &filename)
 {
   if( mIsInitialized )
   {
-    mScriptingPlugin->ExecuteBuffer( buffer, filename );
+    return mScriptingPlugin->ExecuteBuffer( buffer, filename );
   }
+  return false;
 }
 
-void ScriptPluginProxy::ExecuteFile(const std::string &filename)
+bool ScriptPluginProxy::ExecuteFile(const std::string &filename)
 {
   if( mIsInitialized )
   {
-    mScriptingPlugin->ExecuteFile( filename );
+    return mScriptingPlugin->ExecuteFile( filename );
   }
+  return false;
 }
 
 bool ScriptPluginProxy::IsInitialized() const
 {
   return mIsInitialized;
 };
-
 
 void ScriptPluginProxy::Initialize()
 {

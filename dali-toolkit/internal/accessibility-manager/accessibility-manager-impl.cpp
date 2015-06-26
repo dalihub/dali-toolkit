@@ -16,14 +16,13 @@
  */
 
 // CLASS HEADER
-#include "accessibility-focus-manager-impl.h"
+#include "accessibility-manager-impl.h"
 
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
 #include <dali/public-api/actors/layer.h>
-#include <dali/devel-api/adaptor-framework/accessibility-manager.h>
+#include <dali/devel-api/adaptor-framework/accessibility-adaptor.h>
 #include <dali/devel-api/adaptor-framework/sound-player.h>
-#include <dali/public-api/adaptor-framework/tts-player.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/public-api/images/resource-image.h>
@@ -107,31 +106,37 @@ bool IsActorFocusableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType 
 
 }
 
-AccessibilityFocusManager::AccessibilityFocusManager()
-: mIsWrapped(false),
+AccessibilityManager::AccessibilityManager()
+: mCurrentFocusActor(FocusIDPair(0, 0)),
+  mFocusIndicatorActor(Actor()),
+  mRecursiveFocusMoveCounter(0),
+  mIsWrapped(false),
   mIsFocusWithinGroup(false),
   mIsEndcapFeedbackEnabled(false),
   mIsEndcapFeedbackPlayed(false),
-  mCurrentFocusActor(FocusIDPair(0, 0)),
-  mFocusIndicatorActor(Actor()),
-  mRecursiveFocusMoveCounter(0),
   mIsAccessibilityTtsEnabled(false),
-  mIsFocusIndicatorEnabled(false)
+  mTtsCreated(false),
+  mIsFocusIndicatorEnabled(false),
+  mContinuousPlayMode(false)
+{
+}
+
+AccessibilityManager::~AccessibilityManager()
+{
+}
+
+void AccessibilityManager::Initialise()
 {
   CreateDefaultFocusIndicatorActor();
 
-  AccessibilityManager manager = AccessibilityManager::Get();
-  manager.SetActionHandler(*this);
-  manager.SetGestureHandler(*this);
+  AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
+  adaptor.SetActionHandler(*this);
+  adaptor.SetGestureHandler(*this);
 
   ChangeAccessibilityStatus();
 }
 
-AccessibilityFocusManager::~AccessibilityFocusManager()
-{
-}
-
-AccessibilityFocusManager::ActorAdditionalInfo AccessibilityFocusManager::GetActorAdditionalInfo(const unsigned int actorID) const
+AccessibilityManager::ActorAdditionalInfo AccessibilityManager::GetActorAdditionalInfo(const unsigned int actorID) const
 {
   ActorAdditionalInfo data;
   IDAdditionalInfoConstIter iter = mIDAdditionalInfoContainer.find(actorID);
@@ -143,7 +148,7 @@ AccessibilityFocusManager::ActorAdditionalInfo AccessibilityFocusManager::GetAct
   return data;
 }
 
-void AccessibilityFocusManager::SynchronizeActorAdditionalInfo(const unsigned int actorID, const unsigned int order)
+void AccessibilityManager::SynchronizeActorAdditionalInfo(const unsigned int actorID, const unsigned int order)
 {
   ActorAdditionalInfo actorInfo = GetActorAdditionalInfo(actorID);
   actorInfo.mFocusOrder = order;
@@ -151,7 +156,7 @@ void AccessibilityFocusManager::SynchronizeActorAdditionalInfo(const unsigned in
   mIDAdditionalInfoContainer.insert(IDAdditionalInfoPair(actorID, actorInfo));
 }
 
-void AccessibilityFocusManager::SetAccessibilityAttribute(Actor actor, Toolkit::AccessibilityFocusManager::AccessibilityAttribute type, const std::string& text)
+void AccessibilityManager::SetAccessibilityAttribute(Actor actor, Toolkit::AccessibilityManager::AccessibilityAttribute type, const std::string& text)
 {
   if(actor)
   {
@@ -165,7 +170,7 @@ void AccessibilityFocusManager::SetAccessibilityAttribute(Actor actor, Toolkit::
   }
 }
 
-std::string AccessibilityFocusManager::GetAccessibilityAttribute(Actor actor, Toolkit::AccessibilityFocusManager::AccessibilityAttribute type) const
+std::string AccessibilityManager::GetAccessibilityAttribute(Actor actor, Toolkit::AccessibilityManager::AccessibilityAttribute type) const
 {
   std::string text;
 
@@ -178,7 +183,7 @@ std::string AccessibilityFocusManager::GetAccessibilityAttribute(Actor actor, To
   return text;
 }
 
-void AccessibilityFocusManager::SetFocusOrder(Actor actor, const unsigned int order)
+void AccessibilityManager::SetFocusOrder(Actor actor, const unsigned int order)
 {
   // Do nothing if the focus order of the actor is not changed.
   if(actor && GetFocusOrder(actor) != order)
@@ -245,7 +250,7 @@ void AccessibilityFocusManager::SetFocusOrder(Actor actor, const unsigned int or
   }
 }
 
-unsigned int AccessibilityFocusManager::GetFocusOrder(Actor actor) const
+unsigned int AccessibilityManager::GetFocusOrder(Actor actor) const
 {
   unsigned int focusOrder = 0;
 
@@ -258,7 +263,7 @@ unsigned int AccessibilityFocusManager::GetFocusOrder(Actor actor) const
   return focusOrder;
 }
 
-unsigned int AccessibilityFocusManager::GenerateNewFocusOrder() const
+unsigned int AccessibilityManager::GenerateNewFocusOrder() const
 {
   unsigned int order = 1;
   FocusIDContainer::const_reverse_iterator iter = mFocusIDContainer.rbegin();
@@ -271,7 +276,7 @@ unsigned int AccessibilityFocusManager::GenerateNewFocusOrder() const
   return order;
 }
 
-Actor AccessibilityFocusManager::GetActorByFocusOrder(const unsigned int order)
+Actor AccessibilityManager::GetActorByFocusOrder(const unsigned int order)
 {
   Actor actor = Actor();
 
@@ -285,7 +290,7 @@ Actor AccessibilityFocusManager::GetActorByFocusOrder(const unsigned int order)
   return actor;
 }
 
-bool AccessibilityFocusManager::SetCurrentFocusActor(Actor actor)
+bool AccessibilityManager::SetCurrentFocusActor(Actor actor)
 {
   if(actor)
   {
@@ -295,7 +300,7 @@ bool AccessibilityFocusManager::SetCurrentFocusActor(Actor actor)
   return false;
 }
 
-bool AccessibilityFocusManager::DoSetCurrentFocusActor(const unsigned int actorID)
+bool AccessibilityManager::DoSetCurrentFocusActor(const unsigned int actorID)
 {
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
 
@@ -364,7 +369,7 @@ bool AccessibilityFocusManager::DoSetCurrentFocusActor(const unsigned int actorI
 
         // Combine attribute texts to one text
         std::string informationText;
-        for(int i = 0; i < Toolkit::AccessibilityFocusManager::ACCESSIBILITY_ATTRIBUTE_NUM; i++)
+        for(int i = 0; i < Toolkit::AccessibilityManager::ACCESSIBILITY_ATTRIBUTE_NUM; i++)
         {
           if(!GetActorAdditionalInfo(actorID).mAccessibilityAttributes[i].empty())
           {
@@ -386,23 +391,23 @@ bool AccessibilityFocusManager::DoSetCurrentFocusActor(const unsigned int actorI
   return false;
 }
 
-Actor AccessibilityFocusManager::GetCurrentFocusActor()
+Actor AccessibilityManager::GetCurrentFocusActor()
 {
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
   return rootActor.FindChildById(mCurrentFocusActor.second);
 }
 
-Actor AccessibilityFocusManager::GetCurrentFocusGroup()
+Actor AccessibilityManager::GetCurrentFocusGroup()
 {
   return GetFocusGroup(GetCurrentFocusActor());
 }
 
-unsigned int AccessibilityFocusManager::GetCurrentFocusOrder()
+unsigned int AccessibilityManager::GetCurrentFocusOrder()
 {
   return mCurrentFocusActor.first;
 }
 
-bool AccessibilityFocusManager::MoveFocusForward()
+bool AccessibilityManager::MoveFocusForward()
 {
   bool ret = false;
   mRecursiveFocusMoveCounter = 0;
@@ -430,7 +435,7 @@ bool AccessibilityFocusManager::MoveFocusForward()
   return ret;
 }
 
-bool AccessibilityFocusManager::MoveFocusBackward()
+bool AccessibilityManager::MoveFocusBackward()
 {
   bool ret = false;
   mRecursiveFocusMoveCounter = 0;
@@ -459,7 +464,7 @@ bool AccessibilityFocusManager::MoveFocusBackward()
   return ret;
 }
 
-void AccessibilityFocusManager::DoActivate(Actor actor)
+void AccessibilityManager::DoActivate(Actor actor)
 {
   if(actor)
   {
@@ -475,7 +480,7 @@ void AccessibilityFocusManager::DoActivate(Actor actor)
   }
 }
 
-void AccessibilityFocusManager::ClearFocus()
+void AccessibilityManager::ClearFocus()
 {
   Actor actor = GetCurrentFocusActor();
   if(actor)
@@ -496,14 +501,14 @@ void AccessibilityFocusManager::ClearFocus()
   }
 }
 
-void AccessibilityFocusManager::Reset()
+void AccessibilityManager::Reset()
 {
   ClearFocus();
   mFocusIDContainer.clear();
   mIDAdditionalInfoContainer.clear();
 }
 
-void AccessibilityFocusManager::SetFocusGroup(Actor actor, bool isFocusGroup)
+void AccessibilityManager::SetFocusGroup(Actor actor, bool isFocusGroup)
 {
   if(actor)
   {
@@ -520,7 +525,7 @@ void AccessibilityFocusManager::SetFocusGroup(Actor actor, bool isFocusGroup)
   }
 }
 
-bool AccessibilityFocusManager::IsFocusGroup(Actor actor) const
+bool AccessibilityManager::IsFocusGroup(Actor actor) const
 {
   // Check whether the actor is a focus group
   bool isFocusGroup = false;
@@ -537,7 +542,7 @@ bool AccessibilityFocusManager::IsFocusGroup(Actor actor) const
   return isFocusGroup;
 }
 
-Actor AccessibilityFocusManager::GetFocusGroup(Actor actor)
+Actor AccessibilityManager::GetFocusGroup(Actor actor)
 {
   // Go through the actor's hierarchy to check which focus group the actor belongs to
   while (actor && !IsFocusGroup(actor))
@@ -548,37 +553,37 @@ Actor AccessibilityFocusManager::GetFocusGroup(Actor actor)
   return actor;
 }
 
-void AccessibilityFocusManager::SetGroupMode(bool enabled)
+void AccessibilityManager::SetGroupMode(bool enabled)
 {
   mIsFocusWithinGroup = enabled;
 }
 
-bool AccessibilityFocusManager::GetGroupMode() const
+bool AccessibilityManager::GetGroupMode() const
 {
   return mIsFocusWithinGroup;
 }
 
-void AccessibilityFocusManager::SetWrapMode(bool wrapped)
+void AccessibilityManager::SetWrapMode(bool wrapped)
 {
   mIsWrapped = wrapped;
 }
 
-bool AccessibilityFocusManager::GetWrapMode() const
+bool AccessibilityManager::GetWrapMode() const
 {
   return mIsWrapped;
 }
 
-void AccessibilityFocusManager::SetFocusIndicatorActor(Actor indicator)
+void AccessibilityManager::SetFocusIndicatorActor(Actor indicator)
 {
   mFocusIndicatorActor = indicator;
 }
 
-Actor AccessibilityFocusManager::GetFocusIndicatorActor()
+Actor AccessibilityManager::GetFocusIndicatorActor()
 {
   return mFocusIndicatorActor;
 }
 
-bool AccessibilityFocusManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapped)
+bool AccessibilityManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapped)
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] %d focusable actors\n", __FUNCTION__, __LINE__, mFocusIDContainer.size());
   DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] focus order : %d\n", __FUNCTION__, __LINE__, (*focusIDIter).first);
@@ -619,20 +624,26 @@ bool AccessibilityFocusManager::DoMoveFocus(FocusIDIter focusIDIter, bool forwar
     {
       DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Overshot\n", __FUNCTION__, __LINE__);
       // Send notification for handling overshooted situation
-      mFocusOvershotSignal.Emit(GetCurrentFocusActor(), forward ? Toolkit::AccessibilityFocusManager::OVERSHOT_NEXT : Toolkit::AccessibilityFocusManager::OVERSHOT_PREVIOUS);
+      mFocusOvershotSignal.Emit(GetCurrentFocusActor(), forward ? Toolkit::AccessibilityManager::OVERSHOT_NEXT : Toolkit::AccessibilityManager::OVERSHOT_PREVIOUS);
 
       return false; // Try to move the focus out of the scope
     }
   }
 
-  if((focusIDIter != mFocusIDContainer.end()) && !DoSetCurrentFocusActor((*focusIDIter).second))
+  // Invalid focus.
+  if( focusIDIter == mFocusIDContainer.end() )
+  {
+    return false;
+  }
+
+  // Note: This function performs the focus change.
+  if( !DoSetCurrentFocusActor( (*focusIDIter).second ) )
   {
     mRecursiveFocusMoveCounter++;
     if(mRecursiveFocusMoveCounter > mFocusIDContainer.size())
     {
       // We've attempted to focus all the actors in the whole focus chain and no actor
       // can be focused successfully.
-
       DALI_LOG_WARNING("[%s] There is no more focusable actor in %d focus chains\n", __FUNCTION__, mRecursiveFocusMoveCounter);
 
       return false;
@@ -646,7 +657,7 @@ bool AccessibilityFocusManager::DoMoveFocus(FocusIDIter focusIDIter, bool forwar
   return true;
 }
 
-void AccessibilityFocusManager::SetFocusable(Actor actor, bool focusable)
+void AccessibilityManager::SetFocusable(Actor actor, bool focusable)
 {
   if(actor)
   {
@@ -663,7 +674,7 @@ void AccessibilityFocusManager::SetFocusable(Actor actor, bool focusable)
   }
 }
 
-void AccessibilityFocusManager::CreateDefaultFocusIndicatorActor()
+void AccessibilityManager::CreateDefaultFocusIndicatorActor()
 {
   // Create a focus indicator actor shared by all the focusable actors
   Image borderImage = ResourceImage::New(FOCUS_BORDER_IMAGE_PATH);
@@ -680,10 +691,11 @@ void AccessibilityFocusManager::CreateDefaultFocusIndicatorActor()
   SetFocusIndicatorActor(focusIndicator);
 }
 
-bool AccessibilityFocusManager::ChangeAccessibilityStatus()
+bool AccessibilityManager::ChangeAccessibilityStatus()
 {
-  AccessibilityManager manager = AccessibilityManager::Get();
-  mIsAccessibilityTtsEnabled = manager.IsEnabled();
+  AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
+  mIsAccessibilityTtsEnabled = adaptor.IsEnabled();
+  Dali::Toolkit::AccessibilityManager handle( this );
 
   if(mIsAccessibilityTtsEnabled)
   {
@@ -697,6 +709,11 @@ bool AccessibilityFocusManager::ChangeAccessibilityStatus()
       }
     }
     mIsFocusIndicatorEnabled = true;
+
+    // Connect a signal to the TTS player to implement continuous reading mode.
+    Dali::TtsPlayer player = Dali::TtsPlayer::Get( Dali::TtsPlayer::SCREEN_READER );
+    player.StateChangedSignal().Connect( this, &AccessibilityManager::TtsStateChanged );
+    mTtsCreated = true;
   }
   else
   {
@@ -707,13 +724,29 @@ bool AccessibilityFocusManager::ChangeAccessibilityStatus()
       actor.Remove(mFocusIndicatorActor);
     }
     mIsFocusIndicatorEnabled = false;
+
+    if( mTtsCreated )
+    {
+      // Disconnect the TTS state change signal.
+      Dali::TtsPlayer player = Dali::TtsPlayer::Get( Dali::TtsPlayer::SCREEN_READER );
+      player.StateChangedSignal().Disconnect( this, &AccessibilityManager::TtsStateChanged );
+      mTtsCreated = true;
+    }
   }
+
+  mStatusChangedSignal.Emit( handle );
 
   return true;
 }
 
-bool AccessibilityFocusManager::AccessibilityActionNext(bool allowEndFeedback)
+bool AccessibilityManager::AccessibilityActionNext(bool allowEndFeedback)
 {
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionNextSignal.Empty() )
+  {
+    mActionNextSignal.Emit( handle );
+  }
+
   if(mIsAccessibilityTtsEnabled)
   {
     mIsEndcapFeedbackEnabled = allowEndFeedback;
@@ -725,8 +758,14 @@ bool AccessibilityFocusManager::AccessibilityActionNext(bool allowEndFeedback)
   }
 }
 
-bool AccessibilityFocusManager::AccessibilityActionPrevious(bool allowEndFeedback)
+bool AccessibilityManager::AccessibilityActionPrevious(bool allowEndFeedback)
 {
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionPreviousSignal.Empty() )
+  {
+    mActionPreviousSignal.Emit( handle );
+  }
+
   if(mIsAccessibilityTtsEnabled)
   {
     mIsEndcapFeedbackEnabled = allowEndFeedback;
@@ -738,8 +777,14 @@ bool AccessibilityFocusManager::AccessibilityActionPrevious(bool allowEndFeedbac
   }
 }
 
-bool AccessibilityFocusManager::AccessibilityActionActivate()
+bool AccessibilityManager::AccessibilityActionActivate()
 {
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionActivateSignal.Empty() )
+  {
+    mActionActivateSignal.Emit( handle );
+  }
+
   bool ret = false;
 
   Actor actor = GetCurrentFocusActor();
@@ -752,16 +797,33 @@ bool AccessibilityFocusManager::AccessibilityActionActivate()
   return ret;
 }
 
-bool AccessibilityFocusManager::AccessibilityActionRead(bool allowReadAgain)
+bool AccessibilityManager::AccessibilityActionRead(bool allowReadAgain)
 {
+  Dali::Toolkit::AccessibilityManager handle( this );
+
+  if( allowReadAgain )
+  {
+    if ( !mActionReadSignal.Empty() )
+    {
+      mActionReadSignal.Emit( handle );
+    }
+  }
+  else
+  {
+    if ( !mActionOverSignal.Empty() )
+    {
+      mActionOverSignal.Emit( handle );
+    }
+  }
+
   bool ret = false;
 
   if(mIsAccessibilityTtsEnabled)
   {
     // Find the focusable actor at the read position
-    AccessibilityManager manager = AccessibilityManager::Get();
+    AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
     Dali::HitTestAlgorithm::Results results;
-    Dali::HitTestAlgorithm::HitTest( Stage::GetCurrent(), manager.GetReadPosition(), results, IsActorFocusableFunction );
+    Dali::HitTestAlgorithm::HitTest( Stage::GetCurrent(), adaptor.GetReadPosition(), results, IsActorFocusableFunction );
 
     FocusIDIter focusIDIter = mFocusIDContainer.find(GetFocusOrder(results.actor));
     if(focusIDIter != mFocusIDContainer.end())
@@ -778,8 +840,14 @@ bool AccessibilityFocusManager::AccessibilityActionRead(bool allowReadAgain)
   return ret;
 }
 
-bool AccessibilityFocusManager::AccessibilityActionReadNext(bool allowEndFeedback)
+bool AccessibilityManager::AccessibilityActionReadNext(bool allowEndFeedback)
 {
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionReadNextSignal.Empty() )
+  {
+    mActionReadNextSignal.Emit( handle );
+  }
+
   if(mIsAccessibilityTtsEnabled)
   {
     return MoveFocusForward();
@@ -790,8 +858,14 @@ bool AccessibilityFocusManager::AccessibilityActionReadNext(bool allowEndFeedbac
   }
 }
 
-bool AccessibilityFocusManager::AccessibilityActionReadPrevious(bool allowEndFeedback)
+bool AccessibilityManager::AccessibilityActionReadPrevious(bool allowEndFeedback)
 {
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionReadPreviousSignal.Empty() )
+  {
+    mActionReadPreviousSignal.Emit( handle );
+  }
+
   if(mIsAccessibilityTtsEnabled)
   {
     return MoveFocusBackward();
@@ -802,8 +876,14 @@ bool AccessibilityFocusManager::AccessibilityActionReadPrevious(bool allowEndFee
   }
 }
 
-bool AccessibilityFocusManager::AccessibilityActionUp()
+bool AccessibilityManager::AccessibilityActionUp()
 {
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionUpSignal.Empty() )
+  {
+    mActionUpSignal.Emit( handle );
+  }
+
   bool ret = false;
 
   if(mIsAccessibilityTtsEnabled)
@@ -823,8 +903,14 @@ bool AccessibilityFocusManager::AccessibilityActionUp()
   return ret;
 }
 
-bool AccessibilityFocusManager::AccessibilityActionDown()
+bool AccessibilityManager::AccessibilityActionDown()
 {
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionDownSignal.Empty() )
+  {
+    mActionDownSignal.Emit( handle );
+  }
+
   bool ret = false;
 
   if(mIsAccessibilityTtsEnabled)
@@ -844,8 +930,14 @@ bool AccessibilityFocusManager::AccessibilityActionDown()
   return ret;
 }
 
-bool AccessibilityFocusManager::ClearAccessibilityFocus()
+bool AccessibilityManager::ClearAccessibilityFocus()
 {
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionClearFocusSignal.Empty() )
+  {
+    mActionClearFocusSignal.Emit( handle );
+  }
+
   if(mIsAccessibilityTtsEnabled)
   {
     ClearFocus();
@@ -857,14 +949,359 @@ bool AccessibilityFocusManager::ClearAccessibilityFocus()
   }
 }
 
-bool AccessibilityFocusManager::AccessibilityActionBack()
+bool AccessibilityManager::AccessibilityActionScroll( Dali::TouchEvent& touchEvent )
 {
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionScrollSignal.Empty() )
+  {
+    mActionScrollSignal.Emit( handle, touchEvent );
+  }
+
+  return true;
+}
+
+bool AccessibilityManager::AccessibilityActionBack()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionBackSignal.Empty() )
+  {
+    mActionBackSignal.Emit( handle );
+  }
+
   // TODO: Back to previous view
 
   return mIsAccessibilityTtsEnabled;
 }
 
-bool AccessibilityFocusManager::AccessibilityActionTouch(const TouchEvent& touchEvent)
+bool AccessibilityManager::AccessibilityActionScrollUp()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionScrollUpSignal.Empty() )
+  {
+    mActionScrollUpSignal.Emit( handle );
+  }
+
+  bool ret = false;
+
+  if(mIsAccessibilityTtsEnabled)
+  {
+    Actor actor = GetCurrentFocusActor();
+    if(actor)
+    {
+      Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
+      if(control)
+      {
+        // TODO: Notify the control to scroll up. Should control handle this?
+//        ret = GetImplementation( control ).OnAccessibilityScroll(Direction::UP);
+      }
+    }
+  }
+
+  return ret;
+}
+
+bool AccessibilityManager::AccessibilityActionScrollDown()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionScrollDownSignal.Empty() )
+  {
+    mActionScrollDownSignal.Emit( handle );
+  }
+
+  bool ret = false;
+
+  if(mIsAccessibilityTtsEnabled)
+  {
+    Actor actor = GetCurrentFocusActor();
+    if(actor)
+    {
+      Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
+      if(control)
+      {
+        // TODO: Notify the control to scroll down. Should control handle this?
+//        ret = GetImplementation( control ).OnAccessibilityScrollDown(Direction::DOWN);
+      }
+    }
+  }
+
+  return ret;
+}
+
+bool AccessibilityManager::AccessibilityActionPageLeft()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionPageLeftSignal.Empty() )
+  {
+    mActionPageLeftSignal.Emit( handle );
+  }
+
+  bool ret = false;
+
+  if(mIsAccessibilityTtsEnabled)
+  {
+    Actor actor = GetCurrentFocusActor();
+    if(actor)
+    {
+      Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
+      if(control)
+      {
+        // TODO: Notify the control to scroll left to the previous page. Should control handle this?
+//        ret = GetImplementation( control ).OnAccessibilityScrollToPage(Direction::LEFT);
+      }
+    }
+  }
+
+  return ret;
+}
+
+bool AccessibilityManager::AccessibilityActionPageRight()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionPageRightSignal.Empty() )
+  {
+    mActionPageRightSignal.Emit( handle );
+  }
+
+  bool ret = false;
+
+  if(mIsAccessibilityTtsEnabled)
+  {
+    Actor actor = GetCurrentFocusActor();
+    if(actor)
+    {
+      Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
+      if(control)
+      {
+        // TODO: Notify the control to scroll right to the next page. Should control handle this?
+//        ret = GetImplementation( control ).OnAccessibilityScrollToPage(Direction::RIGHT);
+      }
+    }
+  }
+
+  return ret;
+}
+
+bool AccessibilityManager::AccessibilityActionPageUp()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionPageUpSignal.Empty() )
+  {
+    mActionPageUpSignal.Emit( handle );
+  }
+
+  bool ret = false;
+
+  if(mIsAccessibilityTtsEnabled)
+  {
+    Actor actor = GetCurrentFocusActor();
+    if(actor)
+    {
+      Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
+      if(control)
+      {
+        // TODO: Notify the control to scroll up to the previous page. Should control handle this?
+//        ret = GetImplementation( control ).OnAccessibilityScrollToPage(Direction::UP);
+      }
+    }
+  }
+
+  return ret;
+}
+
+bool AccessibilityManager::AccessibilityActionPageDown()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionPageDownSignal.Empty() )
+  {
+    mActionPageDownSignal.Emit( handle );
+  }
+
+  bool ret = false;
+
+  if(mIsAccessibilityTtsEnabled)
+  {
+    Actor actor = GetCurrentFocusActor();
+    if(actor)
+    {
+      Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
+      if(control)
+      {
+        // TODO: Notify the control to scroll down to the next page. Should control handle this?
+//        ret = GetImplementation( control ).OnAccessibilityScrollToPage(Direction::DOWN);
+      }
+    }
+  }
+
+  return ret;
+}
+
+bool AccessibilityManager::AccessibilityActionMoveToFirst()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionMoveToFirstSignal.Empty() )
+  {
+    mActionMoveToFirstSignal.Emit( handle );
+  }
+
+  // TODO: Move to the first item on screen
+
+  return mIsAccessibilityTtsEnabled;
+}
+
+bool AccessibilityManager::AccessibilityActionMoveToLast()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionMoveToLastSignal.Empty() )
+  {
+    mActionMoveToLastSignal.Emit( handle );
+  }
+
+  // TODO: Move to the last item on screen
+
+  return mIsAccessibilityTtsEnabled;
+}
+
+bool AccessibilityManager::AccessibilityActionReadFromTop()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionReadFromTopSignal.Empty() )
+  {
+    mActionReadFromTopSignal.Emit( handle );
+  }
+
+  // TODO: Move to the top item on screen and read from the item continuously
+
+  return mIsAccessibilityTtsEnabled;
+}
+
+bool AccessibilityManager::AccessibilityActionReadFromNext()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+
+  if( !mActionReadFromNextSignal.Empty() )
+  {
+    mActionReadFromNextSignal.Emit( handle );
+  }
+
+  if( mIsAccessibilityTtsEnabled )
+  {
+    // Mark that we are in continuous play mode, so TTS signals can move focus.
+    mContinuousPlayMode = true;
+
+    // Attempt to move to the next item and read from the item continuously.
+    MoveFocusForward();
+  }
+
+  return mIsAccessibilityTtsEnabled;
+}
+
+void AccessibilityManager::TtsStateChanged( const Dali::TtsPlayer::State previousState, const Dali::TtsPlayer::State currentState )
+{
+  if( mContinuousPlayMode )
+  {
+    // If we were playing and now we have stopped, attempt to play the next item.
+    if( ( previousState == Dali::TtsPlayer::PLAYING ) && ( currentState == Dali::TtsPlayer::READY ) )
+    {
+      // Attempt to move the focus forward and play.
+      // If we can't cancel continuous play mode.
+      if( !MoveFocusForward() )
+      {
+        // We are done, exit continuous play mode.
+        mContinuousPlayMode = false;
+      }
+    }
+    else
+    {
+      // Unexpected play state change, exit continuous play mode.
+      mContinuousPlayMode = false;
+    }
+  }
+}
+
+bool AccessibilityManager::AccessibilityActionZoom()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionZoomSignal.Empty() )
+  {
+    mActionZoomSignal.Emit( handle );
+  }
+
+  bool ret = false;
+
+  if(mIsAccessibilityTtsEnabled)
+  {
+    Actor actor = GetCurrentFocusActor();
+    if(actor)
+    {
+      Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
+      if(control)
+      {
+        // Notify the control to zoom
+        ret = GetImplementation( control ).OnAccessibilityZoom();
+      }
+    }
+  }
+
+  return ret;
+}
+
+bool AccessibilityManager::AccessibilityActionReadIndicatorInformation()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionReadIndicatorInformationSignal.Empty() )
+  {
+    mActionReadIndicatorInformationSignal.Emit( handle );
+  }
+
+  // TODO: Read the information in the indicator
+
+  return mIsAccessibilityTtsEnabled;
+}
+
+bool AccessibilityManager::AccessibilityActionReadPauseResume()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionReadPauseResumeSignal.Empty() )
+  {
+    mActionReadPauseResumeSignal.Emit( handle );
+  }
+
+  bool ret = false;
+
+  if(mIsAccessibilityTtsEnabled)
+  {
+    // Pause or resume the TTS player
+    Dali::TtsPlayer player = Dali::TtsPlayer::Get(Dali::TtsPlayer::SCREEN_READER);
+    Dali::TtsPlayer::State state = player.GetState();
+    if(state == Dali::TtsPlayer::PLAYING)
+    {
+      player.Pause();
+      ret = true;
+    }
+    else if(state == Dali::TtsPlayer::PAUSED)
+    {
+      player.Resume();
+      ret = true;
+    }
+  }
+
+  return ret;
+}
+
+bool AccessibilityManager::AccessibilityActionStartStop()
+{
+  Dali::Toolkit::AccessibilityManager handle( this );
+  if( !mActionStartStopSignal.Empty() )
+  {
+    mActionStartStopSignal.Emit( handle );
+  }
+
+  // TODO: Start/stop the current action
+
+  return mIsAccessibilityTtsEnabled;
+}
+
+bool AccessibilityManager::AccessibilityActionTouch(const TouchEvent& touchEvent)
 {
   bool handled = false;
 
@@ -879,7 +1316,7 @@ bool AccessibilityFocusManager::AccessibilityActionTouch(const TouchEvent& touch
   return handled;
 }
 
-bool AccessibilityFocusManager::HandlePanGesture(const Integration::PanGestureEvent& panEvent)
+bool AccessibilityManager::HandlePanGesture(const Integration::PanGestureEvent& panEvent)
 {
   bool handled = false;
 
@@ -887,7 +1324,7 @@ bool AccessibilityFocusManager::HandlePanGesture(const Integration::PanGestureEv
   {
     // Find the focusable actor at the event position
     Dali::HitTestAlgorithm::Results results;
-    AccessibilityManager manager = AccessibilityManager::Get();
+    AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
 
     Dali::HitTestAlgorithm::HitTest( Stage::GetCurrent(), panEvent.currentPosition, results, IsActorFocusableFunction );
     mCurrentGesturedActor = results.actor;
@@ -956,27 +1393,27 @@ bool AccessibilityFocusManager::HandlePanGesture(const Integration::PanGestureEv
   return handled;
 }
 
-Toolkit::AccessibilityFocusManager::FocusChangedSignalType& AccessibilityFocusManager::FocusChangedSignal()
+Toolkit::AccessibilityManager::FocusChangedSignalType& AccessibilityManager::FocusChangedSignal()
 {
   return mFocusChangedSignal;
 }
 
-Toolkit::AccessibilityFocusManager::FocusOvershotSignalType& AccessibilityFocusManager::FocusOvershotSignal()
+Toolkit::AccessibilityManager::FocusOvershotSignalType& AccessibilityManager::FocusOvershotSignal()
 {
   return mFocusOvershotSignal;
 }
 
-Toolkit::AccessibilityFocusManager::FocusedActorActivatedSignalType& AccessibilityFocusManager::FocusedActorActivatedSignal()
+Toolkit::AccessibilityManager::FocusedActorActivatedSignalType& AccessibilityManager::FocusedActorActivatedSignal()
 {
   return mFocusedActorActivatedSignal;
 }
 
-bool AccessibilityFocusManager::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+bool AccessibilityManager::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::BaseHandle handle( object );
 
   bool connected( true );
-  AccessibilityFocusManager* manager = dynamic_cast<AccessibilityFocusManager*>( object );
+  AccessibilityManager* manager = dynamic_cast<AccessibilityManager*>( object );
 
   if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUS_CHANGED ) )
   {

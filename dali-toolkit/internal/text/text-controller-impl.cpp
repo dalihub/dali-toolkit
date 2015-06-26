@@ -1269,7 +1269,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     cursorInfo.lineHeight = fontMetrics.ascender - fontMetrics.descender;
     cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
 
-    cursorInfo.primaryPosition.x = 0.f;
+    cursorInfo.primaryPosition.x = 1.f;
     cursorInfo.primaryPosition.y = 0.f;
 
     // Nothing else to do.
@@ -1693,40 +1693,36 @@ void Controller::Impl::ScrollTextToMatchCursor()
   mEventData->mScrollPosition.x = currentCursorPosition.x - cursorInfo.primaryPosition.x - mAlignmentOffset.x;
 
   ClampHorizontalScroll( mVisualModel->GetActualSize() );
-  bool updateCursorPosition = true;
 
   const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
   const Vector2 cursorPosition = cursorInfo.primaryPosition + offset;
 
-  if( updateCursorPosition )
+  // Sets the cursor position.
+  mEventData->mDecorator->SetPosition( PRIMARY_CURSOR,
+                                       cursorPosition.x,
+                                       cursorPosition.y,
+                                       cursorInfo.primaryCursorHeight,
+                                       cursorInfo.lineHeight );
+
+  // Sets the grab handle position.
+  mEventData->mDecorator->SetPosition( GRAB_HANDLE,
+                                       cursorPosition.x,
+                                       cursorPosition.y,
+                                       cursorInfo.lineHeight );
+
+  if( cursorInfo.isSecondaryCursor )
   {
-    // Sets the cursor position.
-    mEventData->mDecorator->SetPosition( PRIMARY_CURSOR,
-                                         cursorPosition.x,
-                                         cursorPosition.y,
-                                         cursorInfo.primaryCursorHeight,
+    mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_BOTH );
+    mEventData->mDecorator->SetPosition( SECONDARY_CURSOR,
+                                         cursorInfo.secondaryPosition.x + offset.x,
+                                         cursorInfo.secondaryPosition.y + offset.y,
+                                         cursorInfo.secondaryCursorHeight,
                                          cursorInfo.lineHeight );
-
-    // Sets the grab handle position.
-    mEventData->mDecorator->SetPosition( GRAB_HANDLE,
-                                         cursorPosition.x,
-                                         cursorPosition.y,
-                                         cursorInfo.lineHeight );
-
-    if( cursorInfo.isSecondaryCursor )
-    {
-      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_BOTH );
-      mEventData->mDecorator->SetPosition( SECONDARY_CURSOR,
-                                           cursorInfo.secondaryPosition.x + offset.x,
-                                           cursorInfo.secondaryPosition.y + offset.y,
-                                           cursorInfo.secondaryCursorHeight,
-                                           cursorInfo.lineHeight );
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Secondary cursor position: %f,%f\n", cursorInfo.secondaryPosition.x + offset.x, cursorInfo.secondaryPosition.y + offset.y );
-    }
-    else
-    {
-      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
-    }
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Secondary cursor position: %f,%f\n", cursorInfo.secondaryPosition.x + offset.x, cursorInfo.secondaryPosition.y + offset.y );
+  }
+  else
+  {
+    mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
   }
 }
 

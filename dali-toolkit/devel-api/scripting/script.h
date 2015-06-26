@@ -75,8 +75,10 @@ public:
    * Executes the contents of filename in a scripted environment.
    * @pre A Dali Application object exists
    * @param filename A filename of a script file to execute
+   * @return true on success, false on failure
+   *
    */
-  void ExecuteFile( const std::string& filename );
+  bool ExecuteFile( const std::string& filename );
 
 private:
 

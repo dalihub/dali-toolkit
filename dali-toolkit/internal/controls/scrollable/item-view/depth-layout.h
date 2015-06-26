@@ -191,11 +191,6 @@ private:
   virtual void GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const;
 
   /**
-   * @copydoc ItemLayout::GetResizeAnimation()
-   */
-  virtual void GetResizeAnimation(Animation& animation, Actor actor, Vector3 size, float durationSeconds) const;
-
-  /**
    * @copydoc ItemLayout::GetScrollDirection()
    */
   virtual Degree GetScrollDirection() const;

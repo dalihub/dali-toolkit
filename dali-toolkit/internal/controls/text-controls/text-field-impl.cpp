@@ -1156,6 +1156,10 @@ void TextField::KeyboardStatusChanged(bool keyboardShown)
   {
     mController->KeyboardFocusLostEvent();
   }
+  else
+  {
+    mController->KeyboardFocusGainEvent();
+  }
 }
 
 void TextField::OnStageConnection( unsigned int depth )

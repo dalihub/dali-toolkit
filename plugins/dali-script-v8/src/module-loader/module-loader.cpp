@@ -97,6 +97,11 @@ bool ModuleLoader::ExecuteScriptFromFile( v8::Isolate* isolate,
 
   V8Utils::GetFileContents( fileName, contents );
 
+  if( contents.empty() )
+  {
+    return false;
+  }
+
   return ExecuteScript( isolate, contents, fileName );
 }
 

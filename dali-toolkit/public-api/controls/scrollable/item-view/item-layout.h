@@ -244,17 +244,6 @@ public:
   virtual void GetDefaultItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const = 0;
 
   /**
-   * @brief Retrieve the resize animation in the layout.
-   *
-   * @note This allows the layout to provide its own resize animation.
-   * @param[in] animation The resize animation, not owned by the layout
-   * @param[in] actor The actor to animate
-   * @param [in] size The target size.
-   * @param [in] durationSeconds The duration of the resizing.
-   */
-  virtual void GetResizeAnimation(Animation& animation, Actor actor, Vector3 size, float durationSeconds) const = 0;
-
-  /**
    * @brief Query the scroll direction of the layout.
    *
    * When an input gesture follows this direction, the layout-position of items will be increased.
