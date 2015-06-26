@@ -147,7 +147,6 @@ ScrollOvershootEffectRipple::ScrollOvershootEffectRipple( bool vertical, Scrolla
   mOvershootOverlay.SetColor(mAttachedScrollView.GetOvershootEffectColor());
   mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
   mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  mOvershootOverlay.SetDrawMode(DrawMode::OVERLAY);
   mOvershootOverlay.SetVisible(false);
 
 }

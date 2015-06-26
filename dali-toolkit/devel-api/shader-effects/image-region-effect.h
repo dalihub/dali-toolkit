@@ -28,67 +28,43 @@ namespace Toolkit
 {
 
 /**
- * @brief ImageRegionEffect is a custom shader effect to show only a region of an Image actor.
+ * @brief Creates a new ImageRegionEffect
+ *
+ * ImageRegionEffect is a custom shader effect to show only a region of an Image actor.
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uTopLeft"      - The top-left corner of the image region. The coordinates are in percentage,
+ *                    (0,0) being the top-left and (1,1) the bottom right of the original image
+ *  "uBottomRight"  - The bottom-right corner of the image region. The coordinates are in percentage,
+ *                    (0,0) being the top-left and (1,1) the bottom right of the original image
+ *
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API ImageRegionEffect : public ShaderEffect
+inline ShaderEffect CreateImageRegionEffect()
 {
-public:
+  std::string vertexShader(
+      "uniform mediump vec2 uTopLeft;\n"
+      "uniform mediump vec2 uBottomRight;\n"
+      "void main()\n"
+      "{\n"
+      "  mediump vec4 position = vec4(aPosition,1.0);\n"
+      "  gl_Position = uMvpMatrix * position;\n"
+      // The line below is doing the same as the following commented lines:
+      //"  vec2 imageSize = sTextureRect.zw - sTextureRect.xy;\n"
+      //"  vec2 topLeft = sTextureRect.xy + uTopLeft * imageSize;\n"
+      //"  vec2 bottomRight = sTextureRect.xy + uBottomRight * imageSize;\n"
+      //"  vec2 texCoord = (aTexCoord - sTextureRect.xy) / imageSize;\n"
+      //"  vTexCoord = topLeft + texCoord * ( bottomRight - topLeft );\n"
+      "  vTexCoord = sTextureRect.xy + uTopLeft * ( sTextureRect.zw - sTextureRect.xy ) + ( aTexCoord - sTextureRect.xy ) * ( uBottomRight - uTopLeft );\n"
+      "}\n"
+  );
 
-  /**
-   * @brief Create an uninitialized ImageRegionEffect; this can be initialized with ImageRegionEffect::New().
-   *
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  ImageRegionEffect();
+  Dali::ShaderEffect shaderEffect = Dali::ShaderEffect::New( vertexShader, "" );
+  shaderEffect.SetUniform( "uTopLeft", Vector2( 0.f, 0.f ) );
+  shaderEffect.SetUniform( "uBottomRight", Vector2( 1.f, 1.f ) );
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~ImageRegionEffect();
-
-  /**
-   * @brief Create an initialized ImageRegionEffect.
-   *
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static ImageRegionEffect New();
-
-  /**
-   * @brief Set the top-left corner of the image region.
-   *
-   * The coordinates are in percentage, (0,0) being the top-left and (1,1) the bottom right of the original image.
-   * @param [in] point The top-left corner of the region.
-   */
-  void SetTopLeft(const Vector2& point);
-
-  /**
-   * @brief Set the bottom-right corner of the image region.
-   *
-   * The coordinates are in percentage, (0,0) being the top-left and (1,1) the bottom right of the original image.
-   * @param [in] point The bottom-right corner of the region.
-   */
-  void SetBottomRight(const Vector2& point);
-
-  /**
-   * @brief Get the name for the top-left point property.
-   *
-   * which can be used in Animation API's
-   * @return A std::string containing the property name
-   */
-  const std::string& GetTopLeftPropertyName() const;
-
-  /**
-   * @brief Get the name for the bottom-right point property which can be used in Animation APIs.
-   *
-   * @return A std::string containing the property name
-   */
-  const std::string& GetBottomRightPropertyName() const;
-
-private: // Not intended for application developers
-  DALI_INTERNAL ImageRegionEffect(ShaderEffect handle);
-};
+  return shaderEffect;
+}
 
 } // namespace Toolkit
 

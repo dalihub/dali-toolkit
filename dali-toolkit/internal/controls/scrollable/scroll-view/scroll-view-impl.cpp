@@ -624,7 +624,6 @@ void ScrollView::OnInitialize()
   // Internal Actor, used to hide actors from enumerations.
   // Also actors added to Internal actor appear as overlays e.g. ScrollBar components.
   mInternalActor = Actor::New();
-  mInternalActor.SetDrawMode(DrawMode::OVERLAY);
   self.Add(mInternalActor);
 
   mInternalActor.SetParentOrigin(ParentOrigin::CENTER);
@@ -658,7 +657,7 @@ void ScrollView::OnInitialize()
   SetInternalConstraints();
 }
 
-void ScrollView::OnStageConnection()
+void ScrollView::OnStageConnection( unsigned int depth )
 {
   DALI_LOG_SCROLL_STATE("[0x%X]", this);
 

@@ -22,6 +22,9 @@
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/object/type-registry.h>
 
+//INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/shader-effects/image-region-effect.h>
+
 namespace Dali
 {
 
@@ -230,13 +233,13 @@ void CheckBoxButton::StartTransitionAnimation( Actor& actor )
     if( !mTickUVEffect )
     {
       ImageActor imageActor = ImageActor::DownCast( actor );
-      mTickUVEffect = ImageRegionEffect::New();
+      mTickUVEffect = CreateImageRegionEffect();
       imageActor.SetShaderEffect( mTickUVEffect );
     }
 
     actor.SetScale( Vector3( 0.0f, 1.0f, 1.0f ) );
 
-    mTickUVEffect.SetBottomRight( Vector2( 0.0f, 1.0f ) );
+    mTickUVEffect.SetUniform("uBottomRight", Vector2( 0.0f, 1.0f ) );
 
     if( !mTransitionAnimation )
     {
@@ -244,7 +247,7 @@ void CheckBoxButton::StartTransitionAnimation( Actor& actor )
     }
 
     // UV anim
-    mTransitionAnimation.AnimateTo( Property( mTickUVEffect, mTickUVEffect.GetBottomRightPropertyName() ), Vector2( 1.0f, 1.0f ) );
+    mTransitionAnimation.AnimateTo( Property( mTickUVEffect, "uBottomRight" ), Vector2( 1.0f, 1.0f ) );
 
     // Actor size anim
     mTransitionAnimation.AnimateTo( Property( actor, Actor::Property::SCALE_X ), 1.0f );

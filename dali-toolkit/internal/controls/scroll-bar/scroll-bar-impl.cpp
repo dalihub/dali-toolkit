@@ -220,7 +220,6 @@ void ScrollBar::SetScrollIndicator( Actor indicator )
 
     Actor self = Self();
     self.Add(mIndicator);
-    self.SetDrawMode(DrawMode::OVERLAY);
 
     if( !mPanGestureDetector )
     {

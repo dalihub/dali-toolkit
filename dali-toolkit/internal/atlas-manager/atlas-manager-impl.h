@@ -46,7 +46,7 @@ typedef Dali::Vector< Toolkit::AtlasManager::AtlasSlot > slotContainer;
 class AtlasManager;
 typedef IntrusivePtr<AtlasManager> AtlasManagerPtr;
 
-class AtlasManager : public Dali::BaseObject
+class AtlasManager : public Dali::BaseObject, public ConnectionTracker
 {
 public:
 
@@ -67,6 +67,7 @@ public:
     BufferImage mFilledPixelImage;                                      // Image used by atlas for operations such as underline
     PixelBuffer* mStripBuffer;                                          // Blank image buffer used to pad upload
     Material mMaterial;                                                 // material used for atlas texture
+    Sampler mSampler;                                                   // sampler used for atlas texture
     SizeType mNextFreeBlock;                                            // next free block will be placed here ( actually +1 )
     Dali::Vector< SizeType > mFreeBlocksList;                           // unless there are any previously freed blocks
   };
@@ -111,22 +112,23 @@ public:
    */
   void GenerateMeshData( ImageId id,
                          const Vector2& position,
-                         MeshData& mesh,
+                         Toolkit::AtlasManager::Mesh2D& mesh,
                          bool addReference );
 
   /**
    * @copydoc Toolkit::AtlasManager::StitchMesh
    */
-  void StitchMesh( MeshData& first,
-                   const MeshData& second,
+  void StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
+                   const Toolkit::AtlasManager::Mesh2D& second,
                    bool optimize );
 
   /**
    * @copydoc Toolkit::AtlasManager::StitchMesh
    */
-  void StitchMesh( const MeshData& first,
-                   const MeshData& second,
-                   MeshData& out, bool optimize );
+  void StitchMesh(  const Toolkit::AtlasManager::Mesh2D& first,
+                    const Toolkit::AtlasManager::Mesh2D& second,
+                    Toolkit::AtlasManager::Mesh2D& out,
+                    bool optimize );
 
   /**
    * @copydoc Toolkit::AtlasManager::Remove
@@ -178,10 +180,24 @@ public:
    */
   void GetMetrics( Toolkit::AtlasManager::Metrics& metrics );
 
+  /**
+   * @copydoc Toolkit::AtlasManager::GetMaterial
+   */
+  Material GetMaterial( AtlasId atlas ) const;
+
+/**
+   * @copydoc Toolkit::AtlasManager::GetSampler
+   */
+  Sampler GetSampler( AtlasId atlas ) const;
+
 private:
 
-  std::vector< AtlasDescriptor > mAtlasList;        // List of atlases created
-  std::vector< AtlasSlotDescriptor > mImageList;  // List of bitmaps store in atlases
+  std::vector< AtlasDescriptor > mAtlasList;            // List of atlases created
+  std::vector< AtlasSlotDescriptor > mImageList;        // List of bitmaps store in atlases
+  Vector< PixelBuffer* > mUploadedImages;               // List of PixelBuffers passed to UploadedSignal
+  Toolkit::AtlasManager::AtlasSize mNewAtlasSize;       // Atlas size to use in next creation
+  Toolkit::AtlasManager::AddFailPolicy mAddFailPolicy;  // Policy for faling to add an Image
+  SizeType mFilledPixel;                                // 32Bit pixel image for underlining
 
   SizeType CheckAtlas( SizeType atlas,
                        SizeType width,
@@ -196,21 +212,22 @@ private:
                    const Vector2& position,
                    SizeType widthInBlocks,
                    SizeType heightInBlocks,
-                   Dali::MeshData& meshData,
+                   Toolkit::AtlasManager::Mesh2D& mesh,
                    AtlasSlotDescriptor& desc );
 
-  void OptimizeVertices( const MeshData::VertexContainer& in,
-                         MeshData::FaceIndices& faces,
-                         MeshData::VertexContainer& out );
+  void OptimizeMesh( const Toolkit::AtlasManager::Mesh2D& in,
+                     Toolkit::AtlasManager::Mesh2D& out );
 
   void UploadImage( const BufferImage& image,
                     const AtlasSlotDescriptor& desc );
 
-  void PrintMeshData( const MeshData& meshData );
+  void PrintMeshData( const Toolkit::AtlasManager::Mesh2D& mesh );
 
-  Toolkit::AtlasManager::AtlasSize mNewAtlasSize;
-  Toolkit::AtlasManager::AddFailPolicy mAddFailPolicy;
-  uint32_t mFilledPixel;
+  void OnUpload( Image image );
+
+  Shader mShaderL8;
+  Shader mShaderRgba;
+
 };
 
 } // namespace Internal

@@ -1203,7 +1203,6 @@ void Button::OnInitialize()
 
   OnButtonInitialize();
 
-  self.SetDrawMode( DrawMode::OVERLAY );
   self.SetKeyboardFocusable( true );
 }
 

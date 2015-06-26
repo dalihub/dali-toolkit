@@ -84,13 +84,13 @@ public:
    */
   void GenerateMeshData( uint32_t imageId,
                          const Vector2& position,
-                         MeshData& meshData );
+                         Toolkit::AtlasManager::Mesh2D& mesh );
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::StitchMesh
    */
-  void StitchMesh( MeshData& first,
-                   const MeshData& second );
+  void StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
+                   const Toolkit::AtlasManager::Mesh2D& second );
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::Cached
@@ -110,26 +110,53 @@ public:
   void SetNewAtlasSize( uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight );
 
   /**
-   * @copydoc toolkit::AtlasGlyphManager::GetPixelFormat
+   * @copydoc Toolkit::AtlasGlyphManager::GetPixelFormat
    */
   Pixel::Format GetPixelFormat( uint32_t atlasId );
-
-  /**
-   * @copydoc toolkit::AtlasGlyphManager::GetMetrics
-   */
-  const Toolkit::AtlasGlyphManager::Metrics& GetMetrics();
 
   /**
    * @copydoc toolkit::AtlasGlyphManager::AdjustReferenceCount
    */
   void AdjustReferenceCount( Text::FontId fontId, uint32_t imageId, int32_t delta );
 
+  /**
+   * @copydoc Toolkit::AtlasGlyphManager::GetMaterial
+   */
+  Material GetMaterial( uint32_t atlasId ) const;
+
+  /**
+   * @copydoc Toolkit::AtlasGlyphManager::GetMaterial
+   */
+  Sampler GetSampler( uint32_t atlasId ) const;
+
+  /**
+   * @copydoc Toolkit::AtlasGlyphManager::GetMetrics
+   */
+  const Toolkit::AtlasGlyphManager::Metrics& GetMetrics();
+
+  /**
+   * @copydoc Toolkit::AtlasGlyphManager::GetEffectBufferShader
+   */
+  Shader GetEffectBufferShader() const
+  {
+    return mEffectBufferShader;
+  }
+
+  /**
+   * @copydoc Toolkit::AtlasGlyphManager::GetGlyphShadowShader
+   */
+  Shader GetGlyphShadowShader() const
+  {
+    return mShadowShader;
+  }
+
 private:
 
-  Dali::Toolkit::AtlasManager mAtlasManager;
+  Dali::Toolkit::AtlasManager mAtlasManager;          ///> Atlas Manager created by GlyphManager
   std::vector< FontGlyphRecord > mFontGlyphRecords;
-  uint32_t mCount;
-  Toolkit::AtlasGlyphManager::Metrics mMetrics;
+  Toolkit::AtlasGlyphManager::Metrics mMetrics;       ///> Metrics to pass back on GlyphManager status
+  Shader mEffectBufferShader;                         ///> Shader used to render drop shadow buffer textures
+  Shader mShadowShader;                               ///> Shader used to render drop shadow into buffer
 };
 
 } // namespace Internal

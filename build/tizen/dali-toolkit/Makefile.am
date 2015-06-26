@@ -96,7 +96,6 @@ develapishadowviewdir =         $(develapicontrolsdir)/shadow-view
 develapisuperblurviewdir =      $(develapicontrolsdir)/super-blur-view
 develapifocusmanagerdir =       $(develapidir)/focus-manager
 develapiscriptingdir =          $(develapidir)/scripting
-develapibubbleeffectdir =       $(develapidir)/shader-effects/bubble-effect
 develapishadereffectsdir =      $(develapidir)/shader-effects
 develapitransitioneffectsdir =  $(develapidir)/transition-effects
 develapistylingdir =            $(develapidir)/styling
@@ -106,7 +105,6 @@ develapitextselectionpopupdir = $(develapicontrolsdir)/text-controls
 # devel headers
 develapibloomview_HEADERS =         $(devel_api_bloom_view_header_files)
 develapibubbleemitter_HEADERS =     $(devel_api_bubble_emitter_header_files)
-develapibubbleeffect_HEADERS =      $(devel_api_bubble_effect_header_files)
 develapibuilder_HEADERS =           $(devel_api_builder_header_files)
 develapieffectsview_HEADERS =       $(devel_api_effects_view_header_files)
 develapifocusmanager_HEADERS =      $(devel_api_focus_manager_header_files)

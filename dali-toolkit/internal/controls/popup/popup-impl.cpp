@@ -35,6 +35,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/button.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
@@ -128,10 +129,10 @@ void Popup::OnInitialize()
   // Create Layer
   mLayer = Layer::New();
   mLayer.SetName( "POPUP_LAYER" );
+  mLayer.SetDepthTestDisabled( true );
   mLayer.SetParentOrigin(ParentOrigin::CENTER);
   mLayer.SetAnchorPoint(AnchorPoint::CENTER);
   mLayer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-  mLayer.SetDrawMode( DrawMode::OVERLAY );
 
   // Any content after this point which is added to Self() will be reparented to
   // mContent.
@@ -223,6 +224,11 @@ void Popup::SetBackgroundImage( Actor image )
   mBackgroundImage.SetAnchorPoint( AnchorPoint::CENTER );
   mBackgroundImage.SetParentOrigin( ParentOrigin::CENTER );
 
+  if ( ImageActor imageActor = DownCast< ImageActor >( image ) )
+  {
+    imageActor.SetSortModifier( BACKGROUND_DEPTH_INDEX );
+  }
+
   Vector3 border( mPopupStyle->backgroundOuterBorder.x, mPopupStyle->backgroundOuterBorder.z, 0.0f );
   mBackgroundImage.SetSizeModeFactor( border );
 
@@ -242,6 +248,11 @@ void Popup::SetButtonAreaImage( Actor image )
 
   // Adds new area image to the dialog.
   mButtonAreaImage = image;
+
+  if ( ImageActor imageActor = DownCast< ImageActor >( image ) )
+  {
+    imageActor.SetSortModifier( BACKGROUND_DEPTH_INDEX + 1 );
+  }
 
   // OnDialogTouched only consume the event. It prevents the touch event to be caught by the backing.
   mButtonAreaImage.TouchedSignal().Connect( this, &Popup::OnDialogTouched );
@@ -416,7 +427,7 @@ void Popup::CreateBacking()
 {
   mBacking = Dali::Toolkit::CreateSolidColorActor( mPopupStyle->backingColor );
   mBacking.SetName( "POPUP_BACKING" );
-
+  mBacking.SetSortModifier( BACKGROUND_DEPTH_INDEX - 1 );
   mBacking.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   mBacking.SetSensitive(true);
 

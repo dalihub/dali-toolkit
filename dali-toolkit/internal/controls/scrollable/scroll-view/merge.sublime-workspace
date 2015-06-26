@@ -1,0 +1,1282 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"Set",
+				"SetBlendMode"
+			],
+			[
+				"STYLE_",
+				"STYLE_DROP_SHADOW"
+			],
+			[
+				"nom",
+				"normIndices"
+			],
+			[
+				"norm",
+				"normVerts"
+			],
+			[
+				"nomr",
+				"normVerts"
+			],
+			[
+				"shadow",
+				"shadowOffset"
+			],
+			[
+				"mesh",
+				"meshRecord"
+			],
+			[
+				"Text",
+				"TextLabel"
+			],
+			[
+				"FRAGMENT_SHADER_",
+				"FRAGMENT_SHADER_BGRA"
+			],
+			[
+				"complete",
+				"completeCount"
+			],
+			[
+				"mV",
+				"mVertices"
+			],
+			[
+				"print",
+				"PrintMeshData"
+			],
+			[
+				"vetex",
+				"vertexBuffer"
+			],
+			[
+				"inde",
+				"indexBuffer"
+			],
+			[
+				"ind",
+				"indexCount"
+			],
+			[
+				"ver",
+				"vertexBuffer"
+			],
+			[
+				"quad",
+				"quadData"
+			],
+			[
+				"qua",
+				"quadData"
+			],
+			[
+				"q",
+				"quadData"
+			],
+			[
+				"C",
+				"Count"
+			],
+			[
+				"gl",
+				"gl_FragColor"
+			],
+			[
+				"mAtlas",
+				"mAtlasId"
+			],
+			[
+				"mAtl",
+				"mAtlasId"
+			],
+			[
+				"texturedQuad",
+				"texturedQuadGeometry"
+			],
+			[
+				"Mesh",
+				"MeshRecord"
+			],
+			[
+				"Atlas",
+				"AtlasGlyphManager"
+			],
+			[
+				"Property",
+				"PropertyBuffer"
+			],
+			[
+				"atlas",
+				"atlasDescriptor"
+			],
+			[
+				"op",
+				"optimizedMesh"
+			],
+			[
+				"vertex",
+				"vertexCount"
+			],
+			[
+				"Atl",
+				"AtlasSlotDescriptor"
+			],
+			[
+				"he",
+				"heightInBlocks"
+			],
+			[
+				"wid",
+				"widthInBlocks"
+			],
+			[
+				"imag",
+				"imageHeight"
+			],
+			[
+				"image",
+				"imageWidth"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/builder/builder-animations.cpp",
+			"settings":
+			{
+				"buffer_size": 13752,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "scroll-overshoot-indicator-impl.h",
+			"settings":
+			{
+				"buffer_size": 8339,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/text-controls/text-field-impl.cpp",
+			"settings":
+			{
+				"buffer_size": 33180,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/text-controls/text-field-impl.h",
+			"settings":
+			{
+				"buffer_size": 6419,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/text-controls/text-label-impl.h",
+			"settings":
+			{
+				"buffer_size": 3898,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/text-controls/text-label-impl.cpp",
+			"settings":
+			{
+				"buffer_size": 16273,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/public-api/controls/control-impl.cpp",
+			"settings":
+			{
+				"buffer_size": 29679,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/public-api/controls/control-impl.h",
+			"settings":
+			{
+				"buffer_size": 21305,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/public-api/controls/control.h",
+			"settings":
+			{
+				"buffer_size": 13810,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/public-api/file.list",
+			"settings":
+			{
+				"buffer_size": 14166,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/file.list",
+			"settings":
+			{
+				"buffer_size": 6651,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/view/view-impl.cpp",
+			"settings":
+			{
+				"buffer_size": 9817,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/dali-toolkit.h",
+			"settings":
+			{
+				"buffer_size": 7449,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Searching 483 files for \"controlbehaviour\"\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/alignment/alignment-impl.cpp:\n  549  \n  550  Alignment::Alignment( Toolkit::Alignment::Type horizontal, Toolkit::Alignment::Type vertical )\n  551: : Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),\n  552    mHorizontal( horizontal ),\n  553    mVertical( vertical ),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/bloom-view/bloom-view-impl.cpp:\n  127  \n  128  BloomView::BloomView()\n  129:   : Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) )\n  130    , mBlurNumSamples(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_NUM_SAMPLES)\n  131    , mBlurBellCurveWidth(BLOOM_GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_BELL_CURVE_WIDTH)\n  ...\n  149  BloomView::BloomView( const unsigned int blurNumSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,\n  150                                      const float downsampleWidthScale, const float downsampleHeightScale)\n  151:   : Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) )\n  152    , mBlurNumSamples(blurNumSamples)\n  153    , mBlurBellCurveWidth(blurBellCurveWidth)\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/bubble-effect/bubble-emitter-impl.cpp:\n   40                                unsigned int maximumNumberOfBubble,\n   41                                const Vector2& bubbleSizeRange )\n   42: : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),\n   43    mMovementArea( movementArea ),\n   44    mShapeImage( shapeImage ),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/bubble-effect/bubble-emitter-impl.cpp.orig:\n   40                                unsigned int maximumNumberOfBubble,\n   41                                const Vector2& bubbleSizeRange )\n   42: : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),\n   43    mMovementArea( movementArea ),\n   44    mShapeImage( shapeImage ),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/buttons/button-impl.cpp:\n  101  \n  102  Button::Button()\n  103: : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),\n  104    mAutoRepeatingTimer(),\n  105    mDisabled( false ),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/effects-view/effects-view-impl.cpp:\n  113  \n  114  EffectsView::EffectsView()\n  115: : Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),\n  116    mEffectType( Toolkit::EffectsView::INVALID_TYPE ),\n  117    mPixelFormat( EFFECTS_VIEW_DEFAULT_PIXEL_FORMAT ),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp:\n  117  \n  118  GaussianBlurView::GaussianBlurView()\n  119:   : Control( ControlBehaviour( DISABLE_SIZE_NEGOTIATION ) )\n  120    , mNumSamples(GAUSSIAN_BLUR_VIEW_DEFAULT_NUM_SAMPLES)\n  121    , mBlurBellCurveWidth( 0.001f )\n  ...\n  139                                      const float downsampleWidthScale, const float downsampleHeightScale,\n  140                                      bool blurUserImage)\n  141:   : Control( ControlBehaviour( DISABLE_SIZE_NEGOTIATION ) )\n  142    , mNumSamples(numSamples)\n  143    , mBlurBellCurveWidth( 0.001f )\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/image-view/masked-image-view-impl.cpp:\n  476  \n  477  MaskedImageView::MaskedImageView()\n  478: : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),\n  479    mEditMode( Dali::Toolkit::MaskedImageView::EDIT_DISABLED ),\n  480    mSelfPropertySetting( false ),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/magnifier/magnifier-impl.cpp:\n  124  \n  125  Magnifier::Magnifier()\n  126: : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),\n  127    mPropertySourcePosition(Property::INVALID_INDEX),\n  128    mDefaultCameraDistance(1000.f),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/navigation-frame/navigation-control-impl.cpp:\n   61  \n   62  NavigationControl::NavigationControl()\n   63: : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),\n   64    mToolBar(NULL),\n   65    mTitleBar(NULL),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/navigation-frame/page-impl.cpp:\n   48  \n   49  Page::Page()\n   50: : Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),\n   51    mTitle(\"\"),\n   52    mSubTitle(\"\")\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/page-turn-view/page-turn-view-impl.cpp:\n  260  \n  261  PageTurnView::PageTurnView( PageFactory& pageFactory, const Vector2& pageSize )\n  262: : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS ) ),\n  263    mPageFactory( pageFactory ),\n  264    mPageSize( pageSize ),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/popup/popup-impl.cpp:\n  105  \n  106  Popup::Popup(PopupStyle& style)\n  107: : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),\n  108    mShowing(false),\n  109    mState(Toolkit::Popup::POPUP_NONE), // Initially, the popup state should not be set, it's set in OnInitialize\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.cpp:\n  293  \n  294  ItemView::ItemView(ItemFactory& factory)\n  295: : Scrollable( ControlBehaviour( DISABLE_SIZE_NEGOTIATION | REQUIRES_MOUSE_WHEEL_EVENTS | REQUIRES_KEYBOARD_NAVIGATION_SUPPORT ) ),\n  296    mItemFactory(factory),\n  297    mActiveLayout(NULL),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/scrollable/scroll-view/scroll-base-impl.cpp:\n   41  }\n   42  \n   43: ScrollBase::ScrollBase( ControlBehaviour behaviourFlags )\n   44  : Scrollable( behaviourFlags ),\n   45    mParent(NULL),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/scrollable/scroll-view/scroll-base-impl.h:\n  197     * @param[in] behaviourFlags Flags to enable\n  198     */\n  199:   ScrollBase( ControlBehaviour behaviourFlags );\n  200  \n  201  protected:\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-impl.cpp:\n  535  \n  536  ScrollView::ScrollView()\n  537: : ScrollBase( ControlBehaviour( REQUIRES_MOUSE_WHEEL_EVENTS ) ),   // Enable size negotiation\n  538    mTouchDownTime(0u),\n  539    mGestureStackDepth(0),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/scrollable/scrollable-impl.cpp:\n   76  // we dont want size negotiation while scrolling if we can avoid it\n   77  Scrollable::Scrollable()\n   78: : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | DISABLE_SIZE_NEGOTIATION ) ),\n   79    mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),\n   80    mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),\n   ..\n   83  }\n   84  \n   85: Scrollable::Scrollable( ControlBehaviour behaviourFlags )\n   86: : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS | behaviourFlags ) ),\n   87    mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),\n   88    mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/scrollable/scrollable-impl.h:\n  187     * @param[in] behaviourFlags Flags to enable\n  188     */\n  189:   Scrollable( ControlBehaviour behaviourFlags );\n  190  \n  191    /**\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/shadow-view/shadow-view-impl.cpp:\n  109  \n  110  ShadowView::ShadowView( float downsampleWidthScale, float downsampleHeightScale )\n  111: : Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),\n  112    mChildrenRoot(Actor::New()),\n  113    mCachedShadowColor(DEFAULT_SHADOW_COLOR),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/slider/slider-impl.cpp:\n  148  \n  149  Slider::Slider()\n  150: : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),\n  151    mState( NORMAL ),\n  152    mDisableColor( 0.0f, 0.0f, 0.0f, 0.0f ),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/super-blur-view/super-blur-view-impl.cpp:\n  105  \n  106  SuperBlurView::SuperBlurView( unsigned int blurLevels )\n  107: : Control( ControlBehaviour( DISABLE_SIZE_NEGOTIATION ) ),\n  108    mBlurLevels( blurLevels ),\n  109    mBlurStrengthPropertyIndex(Property::INVALID_INDEX),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/table-view/table-view-impl.cpp:\n  941  \n  942  TableView::TableView( unsigned int initialRows, unsigned int initialColumns )\n  943: : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) ),\n  944    mCellData( initialRows, initialColumns ),\n  945    mLayoutingChild( false ),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/text-controls/text-field-impl.cpp:\n 1007  \n 1008  TextField::TextField()\n 1009: : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),\n 1010    mRenderingBackend( DEFAULT_RENDERING_BACKEND ),\n 1011    mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP )\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/text-controls/text-label-impl.cpp:\n  488  \n  489  TextLabel::TextLabel()\n  490: : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),\n  491    mRenderingBackend( DEFAULT_RENDERING_BACKEND )\n  492  {\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/text-controls/text-selection-popup-impl.cpp:\n  589  \n  590  TextSelectionPopup::TextSelectionPopup()\n  591: : Control( ControlBehaviour( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ) ),\n  592    mMaxSize ( DEFAULT_POPUP_MAX_SIZE ),\n  593    mVisiblePopUpSize( DEFAULT_POPUP_MAX_SIZE ),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/tool-bar/tool-bar-impl.cpp:\n  297  \n  298  ToolBar::ToolBar()\n  299: : Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),\n  300    mLayout(),\n  301    mLeftOffset( 0 ),\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/public-api/controls/control-impl.cpp:\n  196      mCurrentSize(),\n  197      mNaturalSize(),\n  198:     mFlags( Control::ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),\n  199      mIsKeyboardNavigationSupported( false ),\n  200      mIsKeyboardFocusGroup( false ),\n  ...\n  394    Vector3 mNaturalSize; ///< Stores the size set through the Actor's API. This is size the actor wants to be. Useful when reset to the initial size is needed.\n  395  \n  396:   ControlBehaviour mFlags :CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.\n  397    bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.\n  398    bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.\n  ...\n  415  {\n  416    // Create the implementation, temporarily owned on stack\n  417:   IntrusivePtr<Control> controlImpl = new Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) );\n  418  \n  419    // Pass ownership to handle\n  ...\n  781  }\n  782  \n  783: Control::Control( ControlBehaviour behaviourFlags )\n  784  : CustomActorImpl( static_cast< ActorFlags >( behaviourFlags ) ),\n  785    mImpl(new Impl(*this))\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/public-api/controls/control-impl.cpp.orig:\n  170      mCurrentSize(),\n  171      mNaturalSize(),\n  172:     mFlags( Control::ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ),\n  173      mIsKeyboardNavigationSupported( false ),\n  174      mIsKeyboardFocusGroup( false ),\n  ...\n  368    Vector3 mNaturalSize; ///< Stores the size set through the Actor's API. This is size the actor wants to be. Useful when reset to the initial size is needed.\n  369  \n  370:   ControlBehaviour mFlags :CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.\n  371    bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.\n  372    bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.\n  ...\n  389  {\n  390    // Create the implementation, temporarily owned on stack\n  391:   IntrusivePtr<Control> controlImpl = new Control( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) );\n  392  \n  393    // Pass ownership to handle\n  ...\n  754  }\n  755  \n  756: Control::Control( ControlBehaviour behaviourFlags )\n  757  : CustomActorImpl( static_cast< ActorFlags >( behaviourFlags ) ),\n  758    mImpl(new Impl(*this))\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/public-api/controls/control-impl.h:\n  357  \n  358    // Flags for the constructor\n  359:   enum ControlBehaviour\n  360    {\n  361      REQUIRES_STYLE_CHANGE_SIGNALS        = 1 << ( CustomActorImpl::ACTOR_FLAG_COUNT + 0 ),     ///< True if needs to monitor style change signals such as theme/font change\n  ...\n  370     * @brief Create a Control.\n  371     *\n  372:    * @param[in] behaviourFlags Behavioural flags from ControlBehaviour enum\n  373     */\n  374:   Control(ControlBehaviour behaviourFlags);\n  375  \n  376    /**\n\n/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/public-api/controls/scrollable/scroll-component-impl.cpp:\n   59  \n   60  ScrollComponentImpl::ScrollComponentImpl()\n   61: : Control( ControlBehaviour( REQUIRES_TOUCH_EVENTS | REQUIRES_STYLE_CHANGE_SIGNALS ) )\n   62  {\n   63  }\n\n44 matches across 31 files\n",
+			"settings":
+			{
+				"buffer_size": 13597,
+				"line_ending": "Unix",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "/homeSERILOCALr.underhill/dev/new/dali-demo/demo/dali-demo.cpp",
+			"settings":
+			{
+				"buffer_size": 3296,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 375.0,
+		"last_filter": "Package Control: ",
+		"selected_items":
+		[
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Cont",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 462.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/homeSERILOCALr.underhill/dev/new",
+		"/homeSERILOCALr.underhill/dev/new/dali-demo",
+		"/homeSERILOCALr.underhill/dev/new/dali-demo/demo",
+		"/homeSERILOCALr.underhill/dev/new/dali-demo/examples",
+		"/homeSERILOCALr.underhill/dev/new/dali-demo/examples/atlas",
+		"/homeSERILOCALr.underhill/dev/new/dali-demo/shared",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/builder",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/scrollable",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/scrollable/scroll-view",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/text-controls",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/text-view",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/view",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/public-api",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/public-api/controls"
+	],
+	"file_history":
+	[
+		"/homeSERILOCALr.underhill/dev/new/dali-demo/shared/view.h",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/public-api/controls/control-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/text-controls/text-label-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/builder/builder-animations.cpp",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/file.list",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/shadow-view/shadow-view-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/magnifier/magnifier-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/bubble-effect/bubble-emitter-impl.h",
+		"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/builder/builder-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/clash/dali-toolkit/dali-toolkit/internal/controls/text-controls/text-label-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/mesh-merge/dali-toolkit/dali-toolkit/internal/builder/builder-animations.cpp",
+		"/homeSERILOCALr.underhill/dev/mesh-merge/dali-core/dali/public-api/animation/alpha-function.cpp",
+		"/homeSERILOCALr.underhill/dev/mesh-merge/dali-core/dali/internal/event/animation/animation-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/mesh-merge/dali-core/automated-tests/src/dali/utc-Dali-AlphaFunction.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/builder/builder-signals.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/atlas-manager/atlas-manager-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/controls/tool-bar/tool-bar-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/public-api/file.list",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/text/decorator/text-decorator.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/text/text-view.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-core/dali/public-api/shader-effects/material.h",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-core/dali/public-api/shader-effects/sampler.h",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-core/dali/public-api/shader-effects/shader.h",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/atlas-manager/atlas-manager.h",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/builder/builder-impl.h",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/public-api/builder/builder.h",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/builder/builder-animations.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/controls/text-controls/text-label-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/atlas-manager/atlas-manager.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager-impl.h",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/atlas-manager/atlas-manager-impl.h",
+		"/homeSERILOCALr.underhill/dev/apr28/dali-demo/build/tizen/examples/out",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-core/dali/internal/update/effects/scene-graph-material.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/controls/bubble-effect/bubble-emitter-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/demo/dali-table-view.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/shared/view.h",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/builder/builder-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/file.list",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-core/dali/public-api/actors/renderer.h",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-core/dali/public-api/object/property-buffer.h",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-core/dali/public-api/geometry/geometry.h",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-core/dali/internal/update/geometry/scene-graph-geometry.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/text-label-multi-language/text-label-multi-language-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/text-label/text-label-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/text-label-emojis/text-label-emojis.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/text/rendering/shaders/text-basic-shadow-shader.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/internal/text/rendering/atlas/text-atlas-renderer.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/point-mesh/point-mesh-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-core/dali/internal/update/resources/complete-status-manager.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-core/dali/internal/update/node-attachments/scene-graph-renderer-attachment.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-core/dali/internal/event/images/atlas-impl.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/mesh-morph/mesh-morph-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/atlas/atlas-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/text-view/text-view-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/size-negotiation/size-negotiation-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/shadow-bone-lighting/shadow-bone-lighting-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/scroll-view/scroll-view-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/motion-stretch/motion-stretch-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/motion-blur/motion-blur-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/logging/logging-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/item-view/item-view-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/image-scaling-irregular-grid/image-scaling-irregular-grid-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/dissolve-effect/dissolve-effect-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/cube-transition-effect/cube-transition-effect-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/cluster/cluster-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/buttons/buttons-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/builder/examples.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/blocks/blocks-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples/textured-mesh/textured-mesh-example.cpp",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/docs/generated/html/font_8h_source.html",
+		"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/build/tizen/dali-toolkit/Makefile.in",
+		"/homeSERILOCALr.underhill/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/homeSERILOCALr.underhill/dev/test/dali-core/dali/public-api/object/any.h",
+		"/homeSERILOCALr.underhill/.config/sublime-text-3/Packages/User/trailing_spaces.sublime-settings",
+		"/homeSERILOCALr.underhill/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+		"/homeSERILOCALr.underhill/.config/sublime-text-3/Packages/TrailingSpaces/trailing_spaces.sublime-settings",
+		"/homeSERILOCALr.underhill/.scripts/nmgrab",
+		"/homeSERILOCALr.underhill/dev/test/dali-core/dali/public-api/object/any.cpp",
+		"/homeSERILOCALr.underhill/.ssh/id_rsa.pub",
+		"/homeSERILOCALr.underhill/.config/sublime-text-3/Packages/Package Control/Package Control.sublime-settings"
+	],
+	"find":
+	{
+		"height": 37.0
+	},
+	"find_in_files":
+	{
+		"height": 95.0,
+		"where_history":
+		[
+			"/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit",
+			"/homeSERILOCALr.underhill/dev/mesh-merge/",
+			"/homeSERILOCALr.underhill/dev/mesh-merge/dali-core/dali",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-core/dali",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-core/dali",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit/",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/demo",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-demo/examples",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-core",
+			"/homeSERILOCALr.underhill/dev/new_mesh",
+			"/homeSERILOCALr.underhill/dev/check/dali-toolkit",
+			"/homeSERILOCALr.underhill/dev/check/dali-adaptor",
+			"/homeSERILOCALr.underhill/dev/check/dali-core/dali",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-core/dali",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit",
+			"/homeSERILOCALr.underhill/dev/new_mesh",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/",
+			"/homeSERILOCALr.underhill/dev/new_mesh/dali-toolkit/dali-toolkit"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"controlbehaviour",
+			"CONTROL_BEHAVIOUR",
+			"view",
+			"style_na",
+			"setsty",
+			"scrollovershooteffectr",
+			"EaseOutQuint50",
+			"alphafunction",
+			"alphafunctions",
+			"alphafunction",
+			"stage.add",
+			"mrenderable",
+			"mrenderableactor",
+			"blend",
+			"textab",
+			"invalid write",
+			"atlas",
+			"textabstraction",
+			"text",
+			"uniformmap",
+			"setsortmodifier",
+			"fragment_shader_b",
+			"mface",
+			"blendfunc",
+			"blendingfunc",
+			"blendingmode",
+			"blend",
+			"mface",
+			"createme",
+			"createmes",
+			"remove",
+			"index",
+			"createmes",
+			"texturedq",
+			"createmes",
+			"createmeshac",
+			"createmesh",
+			"createmes",
+			"createan",
+			"createanim",
+			"CreateAni",
+			"createani",
+			"createanimation",
+			"CreateBouncingEffect",
+			"createbou",
+			"setrelayout",
+			"setresizepolicy",
+			"SetResizePolicy",
+			"TextView",
+			"textview",
+			"font",
+			"font_parameters",
+			"default_font_parameters",
+			"default_font",
+			"defaul",
+			"DEFAULT_FONT_PARAMETERS",
+			"default_font_parameters",
+			"default_font_paramters",
+			"defaultfontparameter",
+			"filterscript",
+			"text-view",
+			"text-label",
+			"text-view",
+			"text-view.cpp",
+			"text-view",
+			"public-api/controls/text-view/",
+			"text-view",
+			"textview",
+			"textvie",
+			"text-view",
+			"fragment",
+			"optimize",
+			"optimizemesh",
+			"mesh"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"TextLabel"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 12,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/builder/builder-animations.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 13752,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8968,
+								8968
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3705.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 14,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "scroll-overshoot-indicator-impl.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8339,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7228,
+								7228
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": -0.0,
+						"translation.y": 2940.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/text-controls/text-field-impl.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 33180,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								27892,
+								27892
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 11715.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/text-controls/text-field-impl.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6419,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5679,
+								5679
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": -0.0,
+						"translation.y": 2475.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/text-controls/text-label-impl.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3898,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3179,
+								3179
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": -0.0,
+						"translation.y": 1290.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/text-controls/text-label-impl.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 16273,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15457,
+								15457
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 6390.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/public-api/controls/control-impl.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 29679,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								9233,
+								9233
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3459.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/public-api/controls/control-impl.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 21305,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1440.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/public-api/controls/control.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 13810,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								12233,
+								12233
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1646.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/public-api/file.list",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14166,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10429,
+								10429
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2490.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/file.list",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6651,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5037,
+								5037
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 3,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 495.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/internal/controls/view/view-impl.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9817,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8636,
+								8636
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3915.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "/homeSERILOCALr.underhill/dev/new/dali-toolkit/dali-toolkit/dali-toolkit.h",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 7449,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": -0.0,
+						"translation.y": 765.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 13597,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										280,
+										296
+									],
+									[
+										561,
+										577
+									],
+									[
+										1043,
+										1059
+									],
+									[
+										1459,
+										1475
+									],
+									[
+										1864,
+										1880
+									],
+									[
+										2139,
+										2155
+									],
+									[
+										2452,
+										2468
+									],
+									[
+										2815,
+										2831
+									],
+									[
+										3167,
+										3183
+									],
+									[
+										3476,
+										3492
+									],
+									[
+										3827,
+										3843
+									],
+									[
+										4169,
+										4185
+									],
+									[
+										4422,
+										4438
+									],
+									[
+										4742,
+										4758
+									],
+									[
+										5023,
+										5039
+									],
+									[
+										5442,
+										5458
+									],
+									[
+										5793,
+										5809
+									],
+									[
+										6100,
+										6116
+									],
+									[
+										6346,
+										6362
+									],
+									[
+										6723,
+										6739
+									],
+									[
+										7015,
+										7031
+									],
+									[
+										7067,
+										7083
+									],
+									[
+										7492,
+										7508
+									],
+									[
+										7776,
+										7792
+									],
+									[
+										8062,
+										8078
+									],
+									[
+										8426,
+										8442
+									],
+									[
+										8794,
+										8810
+									],
+									[
+										9127,
+										9143
+									],
+									[
+										9478,
+										9494
+									],
+									[
+										9794,
+										9810
+									],
+									[
+										9812,
+										9828
+									],
+									[
+										10117,
+										10133
+									],
+									[
+										10389,
+										10405
+									],
+									[
+										10717,
+										10733
+									],
+									[
+										11172,
+										11188
+									],
+									[
+										11309,
+										11325
+									],
+									[
+										11634,
+										11650
+									],
+									[
+										11962,
+										11978
+									],
+									[
+										12417,
+										12433
+									],
+									[
+										12554,
+										12570
+									],
+									[
+										12850,
+										12866
+									],
+									[
+										13173,
+										13189
+									],
+									[
+										13225,
+										13241
+									],
+									[
+										13475,
+										13491
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								280,
+								320
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "/homeSERILOCALr.underhill/dev/new/dali-demo/demo/dali-demo.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3296,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								984,
+								984
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "merge.sublime-project",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"~/dev/newmesh.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 503.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

@@ -28,71 +28,50 @@ namespace Toolkit
 {
 
 /**
+ * @brief Creates a new ShearEffect
+ *
  * ShearEffect is a custom shader effect to achieve shear effects in Image actors
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uCenter"     - The center point of the shear effect in screen coordinates
+ *  "uAngleXAxis" - The angle of the shear effect in the X axis
+ *  "uAngleYAxis" - The angle of the shear effect in the Y axis
+ *
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API ShearEffect : public ShaderEffect
+inline ShaderEffect CreateShearEffect()
 {
-public:
+  // append the default version
+  std::string vertexShader(
+      "uniform mediump  vec2  uCenter;\n"
+      "uniform mediump  float uAngleXAxis;\n"
+      "uniform mediump  float uAngleYAxis;\n"
+      "\n"
+      "void main()\n"
+      "{\n"
+      "mediump vec4 world = uModelView * vec4(aPosition,1.0);\n"
+      "\n"
+      "world.x = world.x + tan(radians(uAngleXAxis)) * (world.y - uCenter.y * world.w);\n"
+      "world.y = world.y + tan(radians(uAngleYAxis)) * (world.x - uCenter.x * world.w);\n"
+      "\n"
+      "gl_Position = uProjection * world;\n"
+      "\n"
+      "vTexCoord = aTexCoord;\n"
+      "}" );
 
-  /**
-   * Create an uninitialized ShearEffect; this can be initialized with ShearEffect::New()
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  ShearEffect();
-
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~ShearEffect();
-
-  /**
-   * Create an initialized ShearEffect.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static ShearEffect New();
-
-  /**
-   * Set the center point of the shear effect in screen coordinates.
-   * @param [in] center The new center point.
-   */
-  void SetCenter(const Vector2& center);
-
-  /**
-   * Set the angle of the shear effect in the X axis.
-   * @param [in] angle The new angle.
-   */
-  void SetAngleXAxis(float angle);
-
-  /**
-   * Set the angle of the shear effect in the Y axis.
-   * @param [in] angle The new angle.
-   */
-  void SetAngleYAxis(float angle);
-
-  /**
-   * Get the name for the center property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetCenterPropertyName() const;
-
-  /**
-   * Get the name for the X axis property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetAngleXAxisPropertyName() const;
-
-  /**
-   * Get the name for the Y axis property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetAngleYAxisPropertyName() const;
+  // Create the implementation, temporarily owned on stack,
+  ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
+      vertexShader,
+      "",
+      ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID ));
 
 
-private: // Not intended for application developers
-  DALI_INTERNAL ShearEffect(ShaderEffect handle);
-};
+  shaderEffect.SetUniform( "uCenter", Vector2(0.0f, 0.0f), ShaderEffect::COORDINATE_TYPE_VIEWPORT_POSITION );
+  shaderEffect.SetUniform( "uAngleXAxis", 0.0f);
+  shaderEffect.SetUniform( "uAngleYAxis", 0.0f);
+
+  return shaderEffect;
+}
 
 } // namespace Toolkit
 

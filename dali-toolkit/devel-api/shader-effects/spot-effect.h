@@ -28,58 +28,55 @@ namespace Toolkit
 {
 
 /**
- * SpotEffect2D is a custom shader effect to achieve spot effects on Image actors
+ * @brief Creates a new SpotEffect
+ *
+ * SpotEffect is a custom shader effect to achieve spot effects on Image actors
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uCenter" - The center of the spot. Default value (0.0,0.0)
+ *  "uRadius" - The radius of the spot. Default value 0.0
+ *
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API SpotEffect : public ShaderEffect
+inline ShaderEffect CreateSpotEffect()
 {
-public:
+  // append the default version
+  std::string vertexShader(
+      "uniform mediump   vec2  uCenter;\n"
+      "uniform mediump   float  uRadius;\n"
+      "varying mediump   float  vRange;\n"
+      "\n"
+      "void main()\n"
+      "{\n"
+      "  mediump vec4 world = vec4(aPosition, 1.0);\n"
+      "  \n"
+      "  mediump vec2 d = vec2(world.xy - uCenter);\n"
+      "  mediump float dist = length(d);\n"
+      "  \n"
+      "  mediump float range = (uRadius - dist) / (uRadius);\n"
+      "  vRange = max(0.1, range);\n"
+      "  \n"
+      "  gl_Position = uMvpMatrix * world;\n"
+      "  vTexCoord = aTexCoord;\n"
+      "}");
 
-  /**
-   * Create an uninitialized SpotEffect; this can be initialized with SpotEffect::New()
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  SpotEffect();
+  std::string fragmentShader(
+      "varying mediump   float  vRange;\n"
+      "\n"
+      "void main()\n"
+      "{\n"
+      "  gl_FragColor = texture2D(sTexture, vTexCoord) * vec4(vRange, vRange, vRange, 1.0) * uColor;\n"
+      "}" );
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~SpotEffect();
+  Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
+      vertexShader, fragmentShader,
+      ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID ));
 
-  /**
-   * Create an initialized SpotEffect.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static SpotEffect New();
+  shaderEffect.SetUniform( "uCenter", Vector2(0.0f, 0.0f) );
+  shaderEffect.SetUniform( "uRadius", 0.0f );
 
-  /**
-   * Set the center of the spot.
-   * @param[in] center The center in Vector2.
-   */
-  void SetCenter(const Vector2& center);
-
-  /**
-   * Set the radius of the spot.
-   * @param[in] radius The radius in float.
-   */
-  void SetRadius(float radius);
-
-  /**
-   * Get the name for the center property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetCenterPropertyName() const;
-
-  /**
-   * Get the name for the radius property
-   * @return A std::string containing the property name
-   */
-  const std::string& GetRadiusPropertyName() const;
-
-private:
-  DALI_INTERNAL SpotEffect(ShaderEffect handle);
-};
+  return shaderEffect;
+}
 
 } // namespace Toolkit
 

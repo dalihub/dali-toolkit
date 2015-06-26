@@ -137,6 +137,11 @@ private: // From Control
   virtual void OnPan( const PanGesture& gesture );
 
   /**
+   * @copydoc Control::OnStageConnection()
+   */
+  virtual void OnStageConnection( unsigned int depth );
+
+  /**
    * @copydoc Dali::CustomActorImpl::OnKeyEvent(const KeyEvent&)
    */
   virtual bool OnKeyEvent(const KeyEvent& event);
@@ -205,6 +210,14 @@ private: // Implementation
   TextField(const TextField&);
   TextField& operator=(const TextField& rhs);
 
+  /**
+   * @brief Render view, create and attach actor(s) to this Text Field.
+   */
+  void RenderText();
+
+  // Connection needed to re-render text, when a Text Field returns to the stage.
+  void OnStageConnect( Dali::Actor actor );
+
 private: // Data
 
   // Signals
@@ -217,10 +230,12 @@ private: // Data
   Text::ClipperPtr mClipper; ///< For EXCEED_POLICY_CLIP
   std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
-  RenderableActor mRenderableActor;
+  Actor mRenderableActor;
 
   int mRenderingBackend;
   int mExceedPolicy;
+  unsigned int mDepth;
+  bool mHasBeenStaged:1;
 };
 
 } // namespace Internal

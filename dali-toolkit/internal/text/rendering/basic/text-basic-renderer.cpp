@@ -21,9 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/public-api/actors/image-actor.h>
-#include <dali/devel-api/actors/mesh-actor.h>
 #include <dali/devel-api/images/atlas.h>
-#include <dali/devel-api/geometry/mesh.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -274,6 +272,7 @@ struct BasicRenderer::Impl
    * @param[in] positions The 2D positions of the glyphs.
    * @param[in] image The material uses this as a diffuse texture.
    */
+  /*
   Mesh CreateMesh( const Vector<GlyphInfo>& glyphs, const std::vector<Vector2>& positions, Pixel::Format format, Image image )
   {
     MeshData::VertexContainer vertices( 4 * glyphs.Count() ); // 1 quad per glyph
@@ -319,8 +318,8 @@ struct BasicRenderer::Impl
     Dali::Mesh mesh = Mesh::New( meshData );
     return mesh;
   }
-
-  RenderableActor mActor; ///< The actor which renders the text
+  */
+  Actor mActor; ///< The actor which renders the text
 
   Atlas mAtlasL8;
   unsigned int mWidthL8;
@@ -343,7 +342,7 @@ Text::RendererPtr BasicRenderer::New()
   return Text::RendererPtr( new BasicRenderer() );
 }
 
-RenderableActor BasicRenderer::Render( Text::ViewInterface& view )
+Actor BasicRenderer::Render( Text::ViewInterface& view, unsigned int depth )
 {
   // Remove the previous text
   UnparentAndReset( mImpl->mActor );
@@ -368,24 +367,24 @@ RenderableActor BasicRenderer::Render( Text::ViewInterface& view )
 
     mImpl->CreateAtlases( glyphs );
 
-    MeshActor actorL8;
+    Actor actorL8;
     if( mImpl->mAtlasL8 )
     {
-      actorL8 = MeshActor::New( mImpl->CreateMesh( glyphs, positions, Pixel::L8, mImpl->mAtlasL8 ) );
+      //actorL8 = MeshActor::New( mImpl->CreateMesh( glyphs, positions, Pixel::L8, mImpl->mAtlasL8 ) );
       actorL8.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
 
       ShaderEffect shader = BasicShader::New();
-      actorL8.SetShaderEffect( shader );
+      //actorL8.SetShaderEffect( shader );
     }
 
-    MeshActor actorBGRA8888;
+    Actor actorBGRA8888;
     if( mImpl->mAtlasBGRA8888 )
     {
-      actorBGRA8888 = MeshActor::New( mImpl->CreateMesh( glyphs, positions, Pixel::BGRA8888, mImpl->mAtlasBGRA8888 ) );
+      //actorBGRA8888 = MeshActor::New( mImpl->CreateMesh( glyphs, positions, Pixel::BGRA8888, mImpl->mAtlasBGRA8888 ) );
       actorBGRA8888.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
 
       ShaderEffect shader = BgraShader::New();
-      actorBGRA8888.SetShaderEffect( shader );
+      //actorBGRA8888.SetShaderEffect( shader );
     }
 
     // If we have both monochrome & color glyphs, two mesh actors are returned in a container

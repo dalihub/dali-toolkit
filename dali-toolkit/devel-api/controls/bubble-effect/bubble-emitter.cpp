@@ -109,11 +109,6 @@ void BubbleEmitter::EmitBubble( Animation& animation, const Vector2& emitPositio
   GetImpl(*this).EmitBubble( animation, emitPosition, direction, displacement );
 }
 
-void BubbleEmitter::StartExplosion( float duration, float multiple )
-{
-  GetImpl(*this).StartExplosion( duration, multiple );
-}
-
 void BubbleEmitter::Restore()
 {
   GetImpl(*this).Restore();

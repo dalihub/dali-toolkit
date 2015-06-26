@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
+#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
@@ -576,12 +577,10 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
    // Both containers will be added to a button.
 
    Toolkit::TableView optionContainer = Toolkit::TableView::New( (showIcons&showCaption)?2:1 , 1 );
-   optionContainer.SetDrawMode( DrawMode::OVERLAY );
    optionContainer.SetFitHeight( 0 );
    optionContainer.SetFitWidth( 0 );
 
    Toolkit::TableView  optionPressedContainer = Toolkit::TableView::New( (showIcons&showCaption)?2:1 , 1 );
-   optionPressedContainer.SetDrawMode( DrawMode::OVERLAY );
    optionPressedContainer.SetFitHeight( 0 );
    optionPressedContainer.SetFitWidth( 0 );
    optionPressedContainer.SetBackgroundColor( mPressedColor );
@@ -619,6 +618,8 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
    {
      ImageActor pressedIcon = ImageActor::New(  iconImage );
      ImageActor icon = ImageActor::New(  iconImage );
+     icon.SetSortModifier( DECORATION_DEPTH_INDEX - 1 );
+     pressedIcon.SetSortModifier( DECORATION_DEPTH_INDEX - 1 );
 
      icon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
      pressedIcon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
