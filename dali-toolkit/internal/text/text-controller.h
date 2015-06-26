@@ -545,6 +545,17 @@ public:
   ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
 
   /**
+   * @brief Paste given string into Text model
+   * @param[in] stringToPaste this string will be inserted into the text model
+   */
+  void PasteText( const std::string& stringToPaste );
+
+  /**
+   * @brief Event from Clipboard notifying an Item has been selected for pasting
+   */
+  void PasteClipboardItemEvent();
+
+  /**
    * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::GetTargetSize()
    */
   virtual void GetTargetSize( Vector2& targetSize );

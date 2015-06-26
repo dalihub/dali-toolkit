@@ -1006,6 +1006,13 @@ void TextField::OnKeyInputFocusGained()
     imfManager.SetRestoreAfterFocusLost( true );
   }
 
+   ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
+
+   if ( notifier )
+   {
+      notifier.ContentSelectedSignal().Connect( this, &TextField::OnClipboardTextSelected );
+   }
+
   mController->KeyboardFocusGainEvent();
 
   EmitKeyInputFocusSignal( true ); // Calls back into the Control hence done last.
@@ -1027,6 +1034,13 @@ void TextField::OnKeyInputFocusLost()
     imfManager.Deactivate();
 
     imfManager.EventReceivedSignal().Disconnect( this, &TextField::OnImfEvent );
+  }
+
+  ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
+
+  if ( notifier )
+  {
+    notifier.ContentSelectedSignal().Disconnect( this, &TextField::OnClipboardTextSelected );
   }
 
   mController->KeyboardFocusLostEvent();
@@ -1145,6 +1159,11 @@ void TextField::EnableClipping( bool clipping, const Vector2& size )
     // Note - this will automatically remove the root & image actors
     mClipper.Reset();
   }
+}
+
+void TextField::OnClipboardTextSelected( ClipboardEventNotifier& clipboard )
+{
+  mController->PasteClipboardItemEvent();
 }
 
 void TextField::KeyboardStatusChanged(bool keyboardShown)

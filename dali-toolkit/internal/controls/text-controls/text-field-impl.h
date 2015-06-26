@@ -27,6 +27,9 @@
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
+
 namespace Dali
 {
 
@@ -170,6 +173,12 @@ private: // From Control
    * @copydoc Dali::Toolkit::Text::Controller::(ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent)
    */
   ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
+
+  /**
+   * @brief Callback when Clipboard signals an item should be pasted
+   * @param[in] clipboard handle to Clipboard Event Notifier
+   */
+  void OnClipboardTextSelected( ClipboardEventNotifier& clipboard );
 
 private: // Implementation
 

@@ -341,6 +341,10 @@ struct Controller::Impl
 
   void RetrieveSelection( std::string& selectedText, bool deleteAfterRetreival );
 
+  void ShowClipboard();
+
+  void HideClipboard();
+
   bool CopyStringToClipboard( std::string& source );
 
   void SendSelectionToClipboard( bool deleteAfterSending );
