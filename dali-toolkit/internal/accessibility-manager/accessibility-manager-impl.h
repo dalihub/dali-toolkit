@@ -485,7 +485,7 @@ private:
   bool DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapped);
 
   /**
-   * Activate the actor. If the actor is control, call OnActivated virtual function.
+   * Activate the actor. If the actor is control, call OnAccessibilityActivated virtual function.
    * This function will emit FocusedActorActivatedSignal.
    * @param actor The actor to activate
    */

@@ -102,7 +102,7 @@ private:
 private: // From Internal::Control
 
   virtual void OnInitialize();
-  virtual void OnActivated();
+  virtual bool OnAccessibilityActivated();
   virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
   virtual void OnPinch(const PinchGesture& pinch);
   virtual void OnPan(const PanGesture& pan);

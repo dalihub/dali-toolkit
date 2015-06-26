@@ -64,12 +64,12 @@ BaseHandle Create()
  * @param[in] attributes The attributes with which to perfrom this action.
  * @return true if action has been accepted by this control
  */
-const char* ACTION_CONTROL_ACTIVATED = "control-activated";
+const char* ACTION_ACCESSIBILITY_ACTIVATED = "accessibility-activated";
 static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
 {
   bool ret = false;
 
-  if( object && ( 0 == strcmp( actionName.c_str(), ACTION_CONTROL_ACTIVATED ) ) )
+  if( object && ( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_ACTIVATED ) ) )
   {
     Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
     if( control )
@@ -158,7 +158,7 @@ SignalConnectorType registerSignal5( typeRegistration, SIGNAL_PANNED, &DoConnect
 SignalConnectorType registerSignal6( typeRegistration, SIGNAL_PINCHED, &DoConnectSignal );
 SignalConnectorType registerSignal7( typeRegistration, SIGNAL_LONG_PRESSED, &DoConnectSignal );
 
-TypeAction registerAction( typeRegistration, ACTION_CONTROL_ACTIVATED, &DoAction );
+TypeAction registerAction( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &DoAction );
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -767,9 +767,20 @@ void Control::AccessibilityActivate()
   OnAccessibilityActivated();
 }
 
+void Control::KeyboardEnter()
+{
+  // Inform deriving classes
+  OnKeyboardEnter();
+}
+
 bool Control::OnAccessibilityActivated()
 {
   return false; // Accessibility activation is not handled by default
+}
+
+bool Control::OnKeyboardEnter()
+{
+  return false; // Keyboard enter is not handled by default
 }
 
 bool Control::OnAccessibilityPan(PanGesture gesture)

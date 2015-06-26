@@ -112,7 +112,7 @@ DummyControlImplOverride::~DummyControlImplOverride() { }
 
 
 void DummyControlImplOverride::OnInitialize() { initializeCalled = true; }
-void DummyControlImplOverride::OnActivated() { activatedCalled = true; }
+bool DummyControlImplOverride::OnAccessibilityActivated() { activatedCalled = true; return true; }
 void DummyControlImplOverride::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   themeChangeCalled = change == StyleChange::THEME_CHANGE;

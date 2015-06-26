@@ -81,7 +81,7 @@ DALI_TYPE_REGISTRATION_BEGIN_CREATE( Toolkit::KeyboardFocusManager, Dali::BaseHa
 DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-pre-focus-change",        SIGNAL_PRE_FOCUS_CHANGE        )
 DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-focus-changed",           SIGNAL_FOCUS_CHANGED           )
 DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-focus-group-changed",     SIGNAL_FOCUS_GROUP_CHANGED     )
-DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-focused-actor-activated", SIGNAL_FOCUSED_ACTOR_ACTIVATED )
+DALI_SIGNAL_REGISTRATION( Toolkit, KeyboardFocusManager, "keyboard-focused-actor-enter-key", SIGNAL_FOCUSED_ACTOR_ENTER_KEY )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -339,21 +339,21 @@ bool KeyboardFocusManager::DoMoveFocusToNextFocusGroup(bool forward)
   return succeed;
 }
 
-void KeyboardFocusManager::DoActivate(Actor actor)
+void KeyboardFocusManager::DoKeyboardEnter(Actor actor)
 {
-  if(actor)
+  if( actor )
   {
-    Toolkit::Control control = Toolkit::Control::DownCast(actor);
-    if(control)
+    Toolkit::Control control = Toolkit::Control::DownCast( actor );
+    if( control )
     {
-      // Notify the control that it is activated
-      GetImplementation( control ).AccessibilityActivate();
+      // Notify the control that enter has been pressed on it.
+      GetImplementation( control ).KeyboardEnter();
     }
 
-    // Send notification for the activation of focused actor
-    if( !mFocusedActorActivatedSignal.Empty() )
+    // Send a notification for the actor.
+    if( !mFocusedActorEnterKeySignal.Empty() )
     {
-      mFocusedActorActivatedSignal.Emit(actor);
+      mFocusedActorEnterKeySignal.Emit( actor );
     }
   }
 }
@@ -655,9 +655,9 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       }
       else
       {
-        // Activate the focused actor
+        // The focused actor has enter pressed on it
         Actor actor;
-        if(!isAccessibilityEnabled)
+        if( !isAccessibilityEnabled )
         {
           actor = GetCurrentFocusActor();
         }
@@ -666,9 +666,9 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
           actor = accessibilityManager.GetCurrentFocusActor();
         }
 
-        if(actor)
+        if( actor )
         {
-          DoActivate(actor);
+          DoKeyboardEnter( actor );
         }
       }
 
@@ -714,9 +714,9 @@ Toolkit::KeyboardFocusManager::FocusGroupChangedSignalType& KeyboardFocusManager
   return mFocusGroupChangedSignal;
 }
 
-Toolkit::KeyboardFocusManager::FocusedActorActivatedSignalType& KeyboardFocusManager::FocusedActorActivatedSignal()
+Toolkit::KeyboardFocusManager::FocusedActorEnterKeySignalType& KeyboardFocusManager::FocusedActorEnterKeySignal()
 {
-  return mFocusedActorActivatedSignal;
+  return mFocusedActorEnterKeySignal;
 }
 
 bool KeyboardFocusManager::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -738,9 +738,9 @@ bool KeyboardFocusManager::DoConnectSignal( BaseObject* object, ConnectionTracke
   {
     manager->FocusGroupChangedSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUSED_ACTOR_ACTIVATED ) )
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_FOCUSED_ACTOR_ENTER_KEY ) )
   {
-    manager->FocusedActorActivatedSignal().Connect( tracker, functor );
+    manager->FocusedActorEnterKeySignal().Connect( tracker, functor );
   }
   else
   {

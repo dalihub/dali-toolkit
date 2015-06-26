@@ -905,7 +905,7 @@ Actor& Button::GetDisabledBackgroundImage()
   return mDisabledBackgroundContent;
 }
 
-  bool Button::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
+bool Button::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
 {
   bool ret = false;
 
@@ -917,14 +917,13 @@ Actor& Button::GetDisabledBackgroundImage()
 
   if( 0 == strcmp( actionName.c_str(), ACTION_BUTTON_CLICK ) )
   {
-    GetImplementation( button ).DoClickAction( attributes );
-    ret = true;
+    ret = GetImplementation( button ).DoClickAction( attributes );
   }
 
   return ret;
 }
 
-  void Button::DoClickAction( const Property::Map& attributes )
+bool Button::DoClickAction( const Property::Map& attributes )
 {
   // Prevents the button signals from doing a recursive loop by sending an action
   // and re-emitting the signals.
@@ -935,7 +934,11 @@ Actor& Button::GetDisabledBackgroundImage()
     mState = ButtonDown;
     OnButtonUp();
     mClickActionPerforming = false;
+
+    return true;
   }
+
+  return false;
 }
 
 void Button::UpdatePaintTransitionState()
@@ -1206,11 +1209,18 @@ void Button::OnInitialize()
   self.SetKeyboardFocusable( true );
 }
 
-void Button::OnActivated()
+bool Button::OnAccessibilityActivated()
 {
-  // When the button is activated, it performs the click action
+  return OnKeyboardEnter();
+}
+
+bool Button::OnKeyboardEnter()
+{
+  // When the enter key is pressed, or button is activated, the click action is performed.
   Property::Map attributes;
-  DoClickAction( attributes );
+  bool ret = DoClickAction( attributes );
+
+  return ret;
 }
 
 void Button::OnControlStageDisconnection()
