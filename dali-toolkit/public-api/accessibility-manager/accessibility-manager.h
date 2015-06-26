@@ -375,6 +375,12 @@ public:
    */
   Actor GetFocusGroup(Actor actor);
 
+  /**
+   * @brief Returns the current position of the read action.
+   * @return The current event position.
+   */
+  Vector2 GetReadPosition() const;
+
  public: // Signals
 
   /**
