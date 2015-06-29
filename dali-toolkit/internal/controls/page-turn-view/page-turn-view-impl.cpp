@@ -298,13 +298,13 @@ void PageTurnView::OnInitialize()
 {
    // create the two book spine effect for static images, left and right side pages respectively
   mSpineEffectFront = CreatePageTurnBookSpineEffect();
-  mSpineEffectFront.SetUniform("uIsBackImageVisible", false );
+  mSpineEffectFront.SetUniform("uIsBackImageVisible", -1.f );
   mSpineEffectFront.SetUniform("uPageWidth", mPageSize.width );
   mSpineEffectFront.SetUniform("uShadowWidth", 0.f );
   mSpineEffectFront.SetUniform("uSpineShadowParameter", mSpineShadowParameter );
 
   mSpineEffectBack = CreatePageTurnBookSpineEffect();
-  mSpineEffectBack.SetUniform("uIsBackImageVisible", true );
+  mSpineEffectBack.SetUniform("uIsBackImageVisible", 1.f );
   mSpineEffectBack.SetUniform("uPageWidth", mPageSize.width );
   mSpineEffectBack.SetUniform("uShadowWidth", 0.f );
   mSpineEffectBack.SetUniform("uSpineShadowParameter", mSpineShadowParameter );
@@ -347,7 +347,7 @@ void PageTurnView::OnInitialize()
     AddPage( i );
     if(mPageActors[i])
     {
-      mPageActors[i].SetZ( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
+      mPageActors[i].SetSortModifier( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
     }
   }
 
@@ -750,7 +750,7 @@ void PageTurnView::PanStarted( const Vector2& gesturePosition )
   }
 
   mOriginalCenter = gesturePosition;
-  mTurnEffect[mIndex].SetUniform("uIsTurningBack", mIsTurnBack[ mPanActor] );
+  mTurnEffect[mIndex].SetUniform("uIsTurningBack", mIsTurnBack[ mPanActor] ? 1.f : -1.f);
   mPress = false;
   mPageUpdated = false;
 
@@ -1023,11 +1023,11 @@ void PageTurnView::OrganizePageDepth()
   {
     if(mCurrentPageIndex+i < mTotalPageCount)
     {
-      mPageActors[( mCurrentPageIndex+i )%NUMBER_OF_CACHED_PAGES].SetZ( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
+      mPageActors[( mCurrentPageIndex+i )%NUMBER_OF_CACHED_PAGES].SetSortModifier( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
     }
     if( mCurrentPageIndex >= i + 1 )
     {
-      mPageActors[( mCurrentPageIndex-i-1 )%NUMBER_OF_CACHED_PAGES].SetZ( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
+      mPageActors[( mCurrentPageIndex-i-1 )%NUMBER_OF_CACHED_PAGES].SetSortModifier( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
     }
   }
 }
