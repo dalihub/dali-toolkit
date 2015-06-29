@@ -1152,6 +1152,11 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     {
       textChanged = BackspaceKeyEvent();
     }
+    else if ( IsKey( keyEvent,  Dali::DALI_KEY_POWER ) || IsKey( keyEvent, Dali::DALI_KEY_MENU ) )
+    {
+      // Do nothing when the Power or Menu Key is pressed.
+      // It avoids call the InsertText() method and delete the selected text.
+    }
     else
     {
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p keyString %s\n", this, keyString.c_str() );
