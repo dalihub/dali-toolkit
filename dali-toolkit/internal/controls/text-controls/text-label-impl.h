@@ -100,7 +100,7 @@ private: // From Control
   /**
    * @copydoc Control::OnStageConnection()
    */
-  virtual void OnStageConnection( unsigned int depth );
+  virtual void OnStageConnection( int depth );
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()

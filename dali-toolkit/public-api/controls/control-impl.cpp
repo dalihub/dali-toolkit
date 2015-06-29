@@ -253,7 +253,7 @@ Actor CreateBackground( Actor parent, const Vector4& color, Image image = Image(
 
     //Create the renderer
     Renderer renderer = Renderer::New( mesh, material );
-    renderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+    renderer.SetDepthIndex( parent.GetHierarchyDepth() + BACKGROUND_DEPTH_INDEX );
 
     //Create the actor
     Actor meshActor = Actor::New();
@@ -278,6 +278,7 @@ Actor CreateBackground( Actor parent, const Vector4& color, Image image = Image(
     imageActor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
     imageActor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
     imageActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    imageActor.SetSortModifier( parent.GetHierarchyDepth() + BACKGROUND_DEPTH_INDEX );
 
     return imageActor;
   }
@@ -949,7 +950,7 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
   }
 }
 
-void Control::OnStageConnection( unsigned int depth )
+void Control::OnStageConnection( int depth )
 {
   unsigned int controlRendererCount = Self().GetRendererCount();
   for( unsigned int i(0); i<controlRendererCount; ++i )

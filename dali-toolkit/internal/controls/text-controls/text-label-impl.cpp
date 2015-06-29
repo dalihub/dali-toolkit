@@ -529,7 +529,7 @@ void TextLabel::AddDecoration( Actor& actor, bool needsClipping )
   // TextLabel does not show decorations
 }
 
-void TextLabel::OnStageConnection( unsigned int depth )
+void TextLabel::OnStageConnection( int depth )
 {
   mDepth = depth;
 }
