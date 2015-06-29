@@ -62,7 +62,7 @@ AC_ARG_ENABLE([javascript],
               [AC_HELP_STRING([--enable-javascript],
                [Enable JavaScript plugin])] ,
                [enable_javascript=$enableval],
-               [enable_javascript=no])
+               [enable_javascript=automatic])
 
 
 if test "x$enable_debug" = "xyes"; then
