@@ -136,7 +136,8 @@ EventData::EventData( DecoratorPtr decorator )
   mUpdateLeftSelectionPosition( false ),
   mUpdateRightSelectionPosition( false ),
   mScrollAfterUpdatePosition( false ),
-  mScrollAfterDelete( false )
+  mScrollAfterDelete( false ),
+  mAllTextSelected( false )
 {}
 
 EventData::~EventData()
@@ -237,6 +238,7 @@ bool Controller::Impl::ProcessInputEvents()
         leftScroll = true;
       }
 
+      SetPopupButtons();
       mEventData->mDecoratorUpdated = true;
       mEventData->mUpdateLeftSelectionPosition = false;
     }
@@ -253,6 +255,7 @@ bool Controller::Impl::ProcessInputEvents()
         rightScroll = true;
       }
 
+      SetPopupButtons();
       mEventData->mDecoratorUpdated = true;
       mEventData->mUpdateRightSelectionPosition = false;
     }
@@ -966,6 +969,47 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY 
   RepositionSelectionHandles( selectionStart, selectionEnd );
 }
 
+void Controller::Impl::SetPopupButtons()
+{
+  /**
+   *  Sets the Popup buttons to be shown depending on State.
+   *
+   *  If SELECTING :  CUT & COPY + ( PASTE & CLIPBOARD if content available to paste )
+   *
+   *  If EDITING_WITH_POPUP : SELECT & SELECT_ALL
+   */
+
+  TextSelectionPopup::Buttons buttonsToShow = TextSelectionPopup::NONE;
+
+  if ( ( EventData::SELECTING == mEventData->mState ) || ( EventData::SELECTION_CHANGED == mEventData->mState ) )
+  {
+    buttonsToShow = TextSelectionPopup::Buttons(  TextSelectionPopup::CUT | TextSelectionPopup::COPY );
+
+    if ( !IsClipboardEmpty() )
+    {
+      buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+      buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::CLIPBOARD ) );
+    }
+
+    if ( !mEventData->mAllTextSelected )
+    {
+      buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::SELECT_ALL ) );
+    }
+  }
+  else if  ( EventData::EDITING_WITH_POPUP == mEventData->mState )
+  {
+    buttonsToShow = TextSelectionPopup::Buttons( TextSelectionPopup::SELECT | TextSelectionPopup::SELECT_ALL );
+
+    if ( !IsClipboardEmpty() )
+    {
+      buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+      buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::CLIPBOARD ) );
+    }
+  }
+
+  mEventData->mDecorator->SetEnabledPopupButtons( buttonsToShow );
+}
+
 void Controller::Impl::ChangeState( EventData::State newState )
 {
   if( NULL == mEventData )
@@ -998,14 +1042,7 @@ void Controller::Impl::ChangeState( EventData::State newState )
       mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
       if( mEventData->mGrabHandlePopupEnabled )
       {
-        TextSelectionPopup::Buttons buttonsToShow = TextSelectionPopup::Buttons(  TextSelectionPopup::CUT | TextSelectionPopup::COPY );
-        if ( !IsClipboardEmpty() )
-        {
-          buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
-          buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::CLIPBOARD ) );
-        }
-
-        mEventData->mDecorator->SetEnabledPopupButtons( buttonsToShow );
+        SetPopupButtons();
         mEventData->mDecorator->SetPopupActive( true );
       }
       mEventData->mDecoratorUpdated = true;
@@ -1014,14 +1051,8 @@ void Controller::Impl::ChangeState( EventData::State newState )
     {
       if( mEventData->mGrabHandlePopupEnabled )
       {
-        TextSelectionPopup::Buttons buttonsToShow = TextSelectionPopup::Buttons(  TextSelectionPopup::CUT | TextSelectionPopup::COPY );
-        if (  !IsClipboardEmpty() )
-        {
-          buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
-          buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::CLIPBOARD ) );
-        }
+        SetPopupButtons();
         mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
-        mEventData->mDecorator->SetEnabledPopupButtons( buttonsToShow );
         mEventData->mDecorator->SetPopupActive( true );
       }
       mEventData->mDecoratorUpdated = true;
@@ -1062,15 +1093,7 @@ void Controller::Impl::ChangeState( EventData::State newState )
       }
       if( mEventData->mGrabHandlePopupEnabled )
       {
-        TextSelectionPopup::Buttons buttonsToShow = TextSelectionPopup::Buttons( TextSelectionPopup::SELECT | TextSelectionPopup::SELECT_ALL );
-
-        if ( !IsClipboardEmpty() )
-        {
-          buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
-          buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::CLIPBOARD ) );
-        }
-
-        mEventData->mDecorator->SetEnabledPopupButtons( buttonsToShow );
+        SetPopupButtons();
         mEventData->mDecorator->SetPopupActive( true );
       }
       HideClipboard();
@@ -1640,6 +1663,11 @@ void Controller::Impl::UpdateSelectionHandle( HandleType handleType )
                                        cursorPosition.x,
                                        cursorPosition.y,
                                        cursorInfo.lineHeight );
+
+  // If selection handle at start of the text and other at end of the text then all text is selected.
+  const CharacterIndex startOfSelection = std::min( mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition );
+  const CharacterIndex endOfSelection = std::max ( mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition );
+  mEventData->mAllTextSelected = ( startOfSelection == 0 ) && ( endOfSelection == mLogicalModel->mText.Count() );
 }
 
 void Controller::Impl::ClampHorizontalScroll( const Vector2& actualSize )
