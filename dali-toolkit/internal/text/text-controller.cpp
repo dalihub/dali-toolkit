@@ -23,6 +23,7 @@
 #include <iostream>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
@@ -1475,6 +1476,20 @@ void Controller::DecorationEvent( HandleType handleType, HandleState state, floa
   }
 }
 
+void Controller::PasteText( const std::string& stringToPaste )
+{
+  InsertText( stringToPaste, Text::Controller::COMMIT );
+  mImpl->ChangeState( EventData::EDITING );
+  mImpl->RequestRelayout();
+}
+
+void Controller::PasteClipboardItemEvent()
+{
+  ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
+  std::string stringToPaste( notifier.GetContent() );
+  PasteText( stringToPaste );
+}
+
 void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button )
 {
   if( NULL == mImpl->mEventData )
@@ -1512,9 +1527,7 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
     {
       std::string stringToPaste("");
       mImpl->GetTextFromClipboard( 0, stringToPaste ); // Paste latest item from system clipboard
-      InsertText( stringToPaste, Text::Controller::COMMIT );
-      mImpl->ChangeState( EventData::EDITING );
-      mImpl->RequestRelayout();
+      PasteText( stringToPaste );
       break;
     }
     case Toolkit::TextSelectionPopup::SELECT:
@@ -1536,6 +1549,7 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
     }
     case Toolkit::TextSelectionPopup::CLIPBOARD:
     {
+      mImpl->ShowClipboard();
       break;
     }
     case Toolkit::TextSelectionPopup::NONE:
@@ -1610,7 +1624,6 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
 
   return callbackData;
 }
-
 
 Controller::~Controller()
 {

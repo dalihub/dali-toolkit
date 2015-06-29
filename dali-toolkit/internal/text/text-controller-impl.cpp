@@ -823,6 +823,22 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
   }
 }
 
+void Controller::Impl::ShowClipboard()
+{
+  if ( mClipboard )
+  {
+    mClipboard.ShowClipboard();
+  }
+}
+
+void Controller::Impl::HideClipboard()
+{
+  if ( mClipboard )
+  {
+    mClipboard.HideClipboard();
+  }
+}
+
 bool Controller::Impl::CopyStringToClipboard( std::string& source )
 {
   //Send string to clipboard
@@ -971,6 +987,7 @@ void Controller::Impl::ChangeState( EventData::State newState )
       mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
       mEventData->mDecorator->SetPopupActive( false );
       mEventData->mDecoratorUpdated = true;
+      HideClipboard();
     }
     else if ( EventData::SELECTING == mEventData->mState )
     {
@@ -985,6 +1002,7 @@ void Controller::Impl::ChangeState( EventData::State newState )
         if ( !IsClipboardEmpty() )
         {
           buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+          buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::CLIPBOARD ) );
         }
 
         mEventData->mDecorator->SetEnabledPopupButtons( buttonsToShow );
@@ -1000,6 +1018,7 @@ void Controller::Impl::ChangeState( EventData::State newState )
         if (  !IsClipboardEmpty() )
         {
           buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+          buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::CLIPBOARD ) );
         }
         mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
         mEventData->mDecorator->SetEnabledPopupButtons( buttonsToShow );
@@ -1023,6 +1042,7 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetPopupActive( false );
       }
       mEventData->mDecoratorUpdated = true;
+      HideClipboard();
     }
     else if( EventData::EDITING_WITH_POPUP == mEventData->mState )
     {
@@ -1047,11 +1067,13 @@ void Controller::Impl::ChangeState( EventData::State newState )
         if ( !IsClipboardEmpty() )
         {
           buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::PASTE ) );
+          buttonsToShow = TextSelectionPopup::Buttons ( ( buttonsToShow | TextSelectionPopup::CLIPBOARD ) );
         }
 
         mEventData->mDecorator->SetEnabledPopupButtons( buttonsToShow );
         mEventData->mDecorator->SetPopupActive( true );
       }
+      HideClipboard();
       mEventData->mDecoratorUpdated = true;
     }
     else if ( EventData::SELECTION_HANDLE_PANNING == mEventData->mState )
