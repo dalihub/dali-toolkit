@@ -903,7 +903,8 @@ struct Decorator::Impl : public ConnectionTracker
           mHandle[GRAB_HANDLE].actor.SetImage( imagePressed );
         }
       }
-      else if( TouchPoint::Up == point.state )
+      else if( ( TouchPoint::Up == point.state ) ||
+               ( TouchPoint::Interrupted == point.state ) )
       {
         mHandle[GRAB_HANDLE].pressed = false;
         Image imageReleased = mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED];
@@ -936,7 +937,8 @@ struct Decorator::Impl : public ConnectionTracker
           mHandle[LEFT_SELECTION_HANDLE].actor.SetImage( imagePressed );
         }
       }
-      else if( TouchPoint::Up == point.state )
+      else if( ( TouchPoint::Up == point.state ) ||
+               ( TouchPoint::Interrupted == point.state ) )
       {
         mHandle[LEFT_SELECTION_HANDLE].pressed = false;
         Image imageReleased = mHandleImages[flip ? RIGHT_SELECTION_HANDLE : LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED];
@@ -969,7 +971,8 @@ struct Decorator::Impl : public ConnectionTracker
           mHandle[RIGHT_SELECTION_HANDLE].actor.SetImage( imagePressed );
         }
       }
-      else if( TouchPoint::Up == point.state )
+      else if( ( TouchPoint::Up == point.state ) ||
+               ( TouchPoint::Interrupted == point.state ) )
       {
         Image imageReleased = mHandleImages[flip ? LEFT_SELECTION_HANDLE : RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED];
         mHandle[RIGHT_SELECTION_HANDLE].pressed = false;
@@ -1348,6 +1351,20 @@ float Decorator::GetCursorBlinkDuration() const
 void Decorator::SetHandleActive( HandleType handleType, bool active )
 {
   mImpl->mHandle[handleType].active = active;
+
+  if( !active )
+  {
+    // TODO: this is a work-around.
+    // The problem is the handle actor does not receive the touch event with the Interrupt
+    // state when the power button is pressed and the application goes to background.
+    mImpl->mHandle[handleType].pressed = false;
+    Image imageReleased = mImpl->mHandleImages[handleType][HANDLE_IMAGE_RELEASED];
+    ImageActor imageActor = mImpl->mHandle[handleType].actor;
+    if( imageReleased && imageActor )
+    {
+       imageActor.SetImage( imageReleased );
+    }
+  }
 }
 
 bool Decorator::IsHandleActive( HandleType handleType ) const
