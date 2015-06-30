@@ -1351,11 +1351,11 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
         mImpl->mEventData->mDecorator->SetPopupActive( false );
       }
 
-      mImpl->ChangeState( EventData::EDITING );
-
       // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
       if( mImpl->mEventData )
       {
+        mImpl->ChangeState( EventData::EDITING );
+
         Event event( Event::TAP_EVENT );
         event.p1.mUint = tapCount;
         event.p2.mFloat = x;

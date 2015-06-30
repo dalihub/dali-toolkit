@@ -1762,7 +1762,6 @@ void Controller::Impl::ScrollTextToMatchCursor()
 
   if( cursorInfo.isSecondaryCursor )
   {
-    mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_BOTH );
     mEventData->mDecorator->SetPosition( SECONDARY_CURSOR,
                                          cursorInfo.secondaryPosition.x + offset.x,
                                          cursorInfo.secondaryPosition.y + offset.y,
@@ -1770,9 +1769,24 @@ void Controller::Impl::ScrollTextToMatchCursor()
                                          cursorInfo.lineHeight );
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Secondary cursor position: %f,%f\n", cursorInfo.secondaryPosition.x + offset.x, cursorInfo.secondaryPosition.y + offset.y );
   }
+
+  // Set which cursors are active according the state.
+  if( ( EventData::EDITING == mEventData->mState ) ||
+      ( EventData::EDITING_WITH_POPUP == mEventData->mState ) ||
+      ( EventData::GRAB_HANDLE_PANNING == mEventData->mState ) )
+  {
+    if( cursorInfo.isSecondaryCursor )
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_BOTH );
+    }
+    else
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+    }
+  }
   else
   {
-    mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+    mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
   }
 }
 
