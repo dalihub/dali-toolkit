@@ -293,8 +293,8 @@ int UtcDaliTextFieldSetPropertyP(void)
   DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::SELECTION_HIGHLIGHT_COLOR ), LIGHT_BLUE, TEST_LOCATION );
 
   // Check the render backend property.
-  field.SetProperty( TextField::Property::RENDERING_BACKEND, Text::RENDERING_BASIC );
-  DALI_TEST_EQUALS( field.GetProperty<unsigned int>( TextField::Property::RENDERING_BACKEND ), Text::RENDERING_BASIC, TEST_LOCATION );
+  field.SetProperty( TextField::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
+  DALI_TEST_EQUALS( field.GetProperty<unsigned int>( TextField::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
 
   // Check text property.
   field.SetProperty( TextField::Property::TEXT, "Setting Text" );
@@ -387,34 +387,6 @@ int UtcDaliTextFieldSetPropertyP(void)
   END_TEST;
 }
 
-// Positive Basic Text Renderer test
-int utcDaliTextFieldBasicRenderP(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliToolkitTextFieldBasicRenderP");
-  TextField field = TextField::New();
-  DALI_TEST_CHECK( field );
-
-  field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "BEGIN" );
-
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-
-  Stage::GetCurrent().Add( field );
-
-  try
-  {
-    // Render some text with the basic backend
-    field.SetProperty( TextField::Property::RENDERING_BACKEND, Text::RENDERING_BASIC );
-    application.SendNotification();
-    application.Render();
-  }
-  catch( ... )
-  {
-    tet_result(TET_FAIL);
-  }
-  END_TEST;
-}
-
 // Positive Atlas Text Renderer test
 int utcDaliTextFieldAtlasRenderP(void)
 {
@@ -452,7 +424,7 @@ int utcDaliTextFieldTextChangedP(void)
   tet_infoline(" utcDaliTextFieldTextChangedP");
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-/*
+
   Stage::GetCurrent().Add( field );
 
   field.TextChangedSignal().Connect(&TestTextChangedCallback);
@@ -468,7 +440,7 @@ int utcDaliTextFieldTextChangedP(void)
   gTextChangedCallBackCalled = false;
   application.ProcessEvent( GenerateKey( "D", "D", 0, 0, 0, Integration::KeyEvent::Down ) );
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
-*/
+
   END_TEST;
 }
 
@@ -509,10 +481,10 @@ int utcDaliTextFieldMaxCharactersReachedP(void)
   gMaxCharactersCallBackCalled = false;
   field.MaxLengthReachedSignal().Connect(&TestMaxLengthReachedCallback);
 
-  //application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
-  //application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
 
-  //DALI_TEST_CHECK( gMaxCharactersCallBackCalled );
+  DALI_TEST_CHECK( gMaxCharactersCallBackCalled );
 
   END_TEST;
 }
@@ -535,10 +507,10 @@ int utcDaliTextFieldMaxCharactersReachedN(void)
   gMaxCharactersCallBackCalled = false;
   field.MaxLengthReachedSignal().Connect(&TestMaxLengthReachedCallback);
 
-  //application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
-  //application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
 
-  //DALI_TEST_CHECK( !gMaxCharactersCallBackCalled );
+  DALI_TEST_CHECK( !gMaxCharactersCallBackCalled );
 
   END_TEST;
 }
@@ -639,7 +611,7 @@ int utcDaliTextFieldEvent02(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-/*
+
   Stage::GetCurrent().Add( field );
 
   field.SetSize( 300.f, 50.f );
@@ -696,7 +668,7 @@ int utcDaliTextFieldEvent02(void)
   CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
   DALI_TEST_CHECK( camera );
 
-  RenderableActor renderer = RenderableActor::DownCast( offscreenRoot.GetChildAt( 1u ) );
+  Renderer renderer = offscreenRoot.GetChildAt( 1u ).GetRendererAt( 0u );
   DALI_TEST_CHECK( renderer );
 
   // Move the cursor and check the position changes.
@@ -767,7 +739,7 @@ int utcDaliTextFieldEvent02(void)
 
   // Should not be renderer.
   DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor only.
-*/
+
   END_TEST;
 }
 
@@ -818,8 +790,8 @@ int utcDaliTextFieldEvent03(void)
   CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
   DALI_TEST_CHECK( camera );
 
-  //RenderableActor renderer = RenderableActor::DownCast( offscreenRoot.GetChildAt( 1u ) );
-  //DALI_TEST_CHECK( renderer );
+  Renderer renderer = offscreenRoot.GetChildAt( 1u ).GetRendererAt( 0u );
+  DALI_TEST_CHECK( renderer );
 
   Renderer highlight = offscreenRoot.GetChildAt( 2u ).GetRendererAt( 0u );
   DALI_TEST_CHECK( highlight );
