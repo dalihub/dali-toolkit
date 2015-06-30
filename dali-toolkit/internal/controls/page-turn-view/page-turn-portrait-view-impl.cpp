@@ -144,7 +144,7 @@ void PageTurnPortraitView::OnPossibleOutwardsFlick( const Vector2& panPosition, 
     actor.SetShaderEffect( mTurnEffect[mIndex] );
     PageTurnApplyInternalConstraint(mTurnEffect[mIndex]);
     mIsAnimating[mIndex] = true;
-    mTurnEffect[mIndex].SetUniform("uIsTurningBack", true );
+    mTurnEffect[mIndex].SetUniform("uIsTurningBack", 1.f );
     Vector2 originalCenter( mPageSize.width*1.5f, 0.5f*mPageSize.height );
     mTurnEffect[mIndex].SetUniform("uOriginalCenter", originalCenter );
     mTurnEffect[mIndex].SetUniform("uCurrentCenter", Vector2( mPageSize.width*0.5f, mPageSize.height*0.5f ) );
