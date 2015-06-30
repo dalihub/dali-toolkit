@@ -11,7 +11,6 @@
 var actor = new dali.Actor();
 var imageActor = new dali.ImageActor();
 var textActor = new dali.TextActor("hello world");
-var meshActor = new dali.MeshActor();
 var camera = new dali.CameraActor();
 var layer = new dali.Layer();
 ```

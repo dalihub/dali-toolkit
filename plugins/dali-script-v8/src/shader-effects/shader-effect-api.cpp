@@ -37,22 +37,6 @@ namespace // un named namespace
 
 typedef  std::vector< std::string > HintsArray;
 
-
-struct GeometryTypePair
-{
-  const char* name;
-  GeometryType type;
-};
-
-const GeometryTypePair GeometryTypeTable[]=
-{
-    {"image",         GEOMETRY_TYPE_IMAGE },
-    {"mesh",          GEOMETRY_TYPE_UNTEXTURED_MESH  },
-    {"textured-mesh", GEOMETRY_TYPE_TEXTURED_MESH },
-};
-
-const unsigned int GeometryTypeTableCount = sizeof(GeometryTypeTable)/sizeof(GeometryTypeTable[0]);
-
 struct GeometryHintPair
 {
   const char* name;
@@ -77,22 +61,8 @@ const unsigned int GeometryHintTableCount = sizeof(GeometryHintTable)/sizeof(Geo
 struct ShaderParameters
 {
   ShaderParameters()
-      : mType( GEOMETRY_TYPE_IMAGE),
-        mHints( ShaderEffect::HINT_NONE )
+      : mHints( ShaderEffect::HINT_NONE )
   {
-  }
-
-  void SetGeometryType( v8::Isolate* isolate, const std::string& typeName )
-  {
-     for( unsigned int i = 0; i < GeometryTypeTableCount; ++i )
-     {
-       if( typeName == GeometryTypeTable[i].name )
-       {
-         mType = GeometryTypeTable[i].type;
-         return;
-       }
-     }
-     DALI_SCRIPT_EXCEPTION( isolate, "Geometry type not found\n");
   }
 
   ShaderEffect::GeometryHints GetGeometryHint( const std::string& hint )
@@ -115,22 +85,18 @@ struct ShaderParameters
     }
   }
 
-
-
   ShaderEffect NewShader()
   {
     return ShaderEffect::NewWithPrefix( mVertexPrefix ,
                               mVertex,
                               mFragmentPrefix,
                               mFragment,
-                              mType,
                               mHints);
   }
   std::string mVertexPrefix;
   std::string mVertex;
   std::string mFragmentPrefix;
   std::string mFragment;
-  GeometryType mType;
   ShaderEffect::GeometryHints mHints;
 };
 
@@ -196,14 +162,6 @@ ShaderEffect ShaderEffectApi::New(  v8::Isolate* isolate, const v8::FunctionCall
     ShaderParameters shaderParams;
 
     v8::Local<v8::Object > obj = args[0]->ToObject();
-
-    v8::Local<v8::Value> geometryTypeValue = obj->Get(v8::String::NewFromUtf8( isolate, "geometryType"));
-    if( geometryTypeValue->IsString() )
-    {
-      std::string geometryTypeName = V8Utils::v8StringToStdString( geometryTypeValue );
-     // printf(" geometry type found %s \n", geometryTypeName.c_str() );
-      shaderParams.SetGeometryType( isolate, geometryTypeName );
-    }
 
     v8::Local<v8::Value> vertexPrefixValue = obj->Get(v8::String::NewFromUtf8( isolate, "vertexShaderPrefix"));
     if( vertexPrefixValue->IsString() )

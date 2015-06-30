@@ -25,9 +25,7 @@
 #include <actors/layer-api.h>
 #include <actors/actor-api.h>
 #include <actors/image-actor-api.h>
-#include <actors/mesh-actor-api.h>
 #include <actors/camera-actor-api.h>
-#include <actors/renderable-actor-api.h>
 #include <v8-utils.h>
 #include <dali-wrapper.h>
 
@@ -39,7 +37,6 @@ namespace V8Plugin
 
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mActorTemplate;
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mImageActorTemplate;
-v8::Persistent<v8::ObjectTemplate> ActorWrapper::mMeshActorTemplate;
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mCameraActorTemplate;
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mLayerActorTemplate;
 v8::Persistent<v8::ObjectTemplate> ActorWrapper::mTextLabelTemplate;
@@ -63,7 +60,6 @@ const ActorTemplate ActorTemplateLookup[]=
 {
     { &ActorWrapper::mActorTemplate },        // ACTOR
     { &ActorWrapper::mImageActorTemplate },   // IMAGE_ACTOR
-    { &ActorWrapper::mMeshActorTemplate  },   // MESH_ACTOR
     { &ActorWrapper::mLayerActorTemplate },   // LAYER_ACTOR
     { &ActorWrapper::mCameraActorTemplate},   // CAMERA_ACTOR
     { &ActorWrapper::mTextLabelTemplate }
@@ -75,11 +71,9 @@ const ActorTemplate ActorTemplateLookup[]=
 enum ActorApiBitMask
 {
   ACTOR_API              = 1 << 0,
-  RENDERABLE_ACTOR_API   = 1 << 1,
-  IMAGE_ACTOR_API        = 1 << 2,
-  MESH_ACTOR_API         = 1 << 3,
-  LAYER_API              = 1 << 4,
-  CAMERA_ACTOR_API       = 1 << 5,
+  IMAGE_ACTOR_API        = 1 << 1,
+  LAYER_API              = 1 << 2,
+  CAMERA_ACTOR_API       = 1 << 3,
 };
 
 /**
@@ -99,8 +93,7 @@ struct ActorApiStruct
 const ActorApiStruct ActorApiLookup[]=
 {
   {"Actor",      ActorWrapper::ACTOR,        ActorApi::New,       ACTOR_API },
-  {"ImageActor", ActorWrapper::IMAGE_ACTOR,  ImageActorApi::New,  ACTOR_API | RENDERABLE_ACTOR_API | IMAGE_ACTOR_API   },
-  {"MeshActor",  ActorWrapper::MESH_ACTOR,   MeshActorApi::New,   ACTOR_API | RENDERABLE_ACTOR_API | MESH_ACTOR_API    },
+  {"ImageActor", ActorWrapper::IMAGE_ACTOR,  ImageActorApi::New,  ACTOR_API | IMAGE_ACTOR_API   },
   {"Layer",      ActorWrapper::LAYER_ACTOR,  LayerApi::New,       ACTOR_API | LAYER_API                                },
   {"CameraActor",ActorWrapper::CAMERA_ACTOR, CameraActorApi::New, ACTOR_API | CAMERA_ACTOR_API                         },
   {"TextLabel",  ActorWrapper::TEXT_LABEL,   TextLabelApi::New,   ACTOR_API },
@@ -172,7 +165,7 @@ struct ActorFunctions
 
 /**
  * Contains a list of all functions that can be called an
- * actor / image-actor / mesh-actor/ layer / camera-actor
+ * actor / image-actor / layer / camera-actor
  */
 const ActorFunctions ActorFunctionTable[]=
 {
@@ -246,24 +239,6 @@ const ActorFunctions ActorFunctionTable[]=
     { "IsKeyboardFocusable" , ActorApi::IsKeyboardFocusable,   ACTOR_API }, //-- should this be a property???
 
     /**************************************
-     * Renderable Actor API (in order of renderable-actor.h)
-     **************************************/
-    { "SetSortModifier",    RenderableActorApi::SetSortModifier,   RENDERABLE_ACTOR_API  },
-    { "GetSortModifier",    RenderableActorApi::GetSortModifier,   RENDERABLE_ACTOR_API  },
-    { "SetCullFace",        RenderableActorApi::SetCullFace,       RENDERABLE_ACTOR_API  },
-    { "GetCullFace",        RenderableActorApi::GetCullFace,       RENDERABLE_ACTOR_API  },
-    { "SetBlendMode",       RenderableActorApi::SetBlendMode,      RENDERABLE_ACTOR_API  },
-    { "GetBlendMode",       RenderableActorApi::GetBlendMode,      RENDERABLE_ACTOR_API  },
-    { "SetBlendFunc",       RenderableActorApi::SetBlendFunc,      RENDERABLE_ACTOR_API  },
-    { "GetBlendFunc",       RenderableActorApi::GetBlendFunc,      RENDERABLE_ACTOR_API  },
-    { "SetShaderEffect",    RenderableActorApi::SetShaderEffect,   RENDERABLE_ACTOR_API  },
-    { "GetShaderEffect",    RenderableActorApi::GetShaderEffect,   RENDERABLE_ACTOR_API  },
-    { "RemoveShaderEffect", RenderableActorApi::RemoveShaderEffect,RENDERABLE_ACTOR_API  },
-
-
-
-
-    /**************************************
      * Layer  API (in order of layer.h)
      **************************************/
     { "GetDepth",           LayerApi::GetDepth,                 LAYER_API  },
@@ -294,6 +269,17 @@ const ActorFunctions ActorFunctionTable[]=
     // ignore GetStyle, use imageActor.style
     // ignore SetNinePatchBorder use imageActor.border
     // ignore GetNinePatchBorder use imageActor.border
+    { "SetSortModifier",    ImageActorApi::SetSortModifier,   IMAGE_ACTOR_API  },
+    { "GetSortModifier",    ImageActorApi::GetSortModifier,   IMAGE_ACTOR_API  },
+    { "SetCullFace",        ImageActorApi::SetCullFace,       IMAGE_ACTOR_API  },
+    { "GetCullFace",        ImageActorApi::GetCullFace,       IMAGE_ACTOR_API  },
+    { "SetBlendMode",       ImageActorApi::SetBlendMode,      IMAGE_ACTOR_API  },
+    { "GetBlendMode",       ImageActorApi::GetBlendMode,      IMAGE_ACTOR_API  },
+    { "SetBlendFunc",       ImageActorApi::SetBlendFunc,      IMAGE_ACTOR_API  },
+    { "GetBlendFunc",       ImageActorApi::GetBlendFunc,      IMAGE_ACTOR_API  },
+    { "SetShaderEffect",    ImageActorApi::SetShaderEffect,   IMAGE_ACTOR_API  },
+    { "GetShaderEffect",    ImageActorApi::GetShaderEffect,   IMAGE_ACTOR_API  },
+    { "RemoveShaderEffect", ImageActorApi::RemoveShaderEffect,IMAGE_ACTOR_API  },
     // ignore SetFadeIn use imageActor.fadeIn
     // ignore GetFadeIn use imageActor.fadeIn
     // ignore SetFadeInDuration use imageActor.fadeInDuration

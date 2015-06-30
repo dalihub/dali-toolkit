@@ -14,8 +14,6 @@ script_v8_plugin_src_files = \
    $(v8_plugin_dir)/actors/layer-api.cpp \
    $(v8_plugin_dir)/actors/image-actor-api.cpp \
    $(v8_plugin_dir)/actors/camera-actor-api.cpp \
-   $(v8_plugin_dir)/actors/mesh-actor-api.cpp \
-   $(v8_plugin_dir)/actors/renderable-actor-api.cpp \
    $(v8_plugin_dir)/constants/constants-wrapper.cpp \
    $(v8_plugin_dir)/animation/animation-api.cpp \
    $(v8_plugin_dir)/animation/animation-wrapper.cpp \
