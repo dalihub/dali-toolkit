@@ -222,12 +222,15 @@ public:
    */
   bool IsKeyboardFocusGroup();
 
-  // Called by Focus Manager
-
   /**
-   * @brief Called by the accessibility focus manager and keyboard focus manager to activate the Control
+   * @brief Called by the AccessibilityManager to activate the Control.
    */
   DALI_INTERNAL void AccessibilityActivate();
+
+  /**
+   * @brief Called by the KeyboardFocusManager.
+   */
+  DALI_INTERNAL void KeyboardEnter();
 
   // Signals
 
@@ -509,6 +512,14 @@ public: // API for derived classes to override
    * @param[in] commitedFocusableActor The commited focusable actor.
    */
   virtual void OnKeyboardFocusChangeCommitted( Actor commitedFocusableActor );
+
+  /**
+   * @brief This method is called when the control has enter pressed on it.
+   *
+   * Derived classes should override this to perform custom actions.
+   * @return true if this control supported this action.
+   */
+  virtual bool OnKeyboardEnter();
 
   // Gestures
 

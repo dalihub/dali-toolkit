@@ -122,9 +122,9 @@ KeyboardFocusManager::FocusGroupChangedSignalType& KeyboardFocusManager::FocusGr
   return GetImpl(*this).FocusGroupChangedSignal();
 }
 
-KeyboardFocusManager::FocusedActorActivatedSignalType& KeyboardFocusManager::FocusedActorActivatedSignal()
+KeyboardFocusManager::FocusedActorEnterKeySignalType& KeyboardFocusManager::FocusedActorEnterKeySignal()
 {
-  return GetImpl(*this).FocusedActorActivatedSignal();
+  return GetImpl(*this).FocusedActorEnterKeySignal();
 }
 
 } // namespace Toolkit
