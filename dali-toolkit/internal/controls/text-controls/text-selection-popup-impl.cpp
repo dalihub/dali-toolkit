@@ -298,9 +298,25 @@ Property::Value TextSelectionPopup::GetProperty( BaseObject* object, Property::I
   return value;
 }
 
+void TextSelectionPopup::RaiseAbove( Layer target )
+{
+  if( mToolbar )
+  {
+    mToolbar.RaiseAbove( target );
+  }
+}
+
 void TextSelectionPopup::OnInitialize()
 {
   CreatePopup();
+}
+
+void TextSelectionPopup::OnStageConnection( int depth )
+{
+  // Call the Control::OnStageConnection() to set the depth of the background.
+  Control::OnStageConnection( depth );
+
+  // TextSelectionToolbar::OnStageConnection() will set the depths of all the popup's components.
 }
 
 bool TextSelectionPopup::OnCutButtonPressed( Toolkit::Button button )
@@ -526,6 +542,7 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
  void TextSelectionPopup::CreateOrderedListOfPopupOptions()
  {
    mOrderListOfButtons.clear();
+   mOrderListOfButtons.reserve( 8u );
 
    // Create button for each possible option using Option priority
    if ( !mCutIconImage )
@@ -568,7 +585,6 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
 
  void TextSelectionPopup::AddOption( const ButtonRequirement& button, bool showDivider, bool showIcons, bool showCaption  )
  {
-
    const std::string& name = button.name;
    const std::string& caption = button.caption;
    Image iconImage = button.icon;
@@ -613,13 +629,14 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
      optionPressedContainer.AddChild( pressedCaptionTextLabel, Toolkit::TableView::CellPosition(( showIcons&showCaption)?1:0, 0 ) );
    }
 
+   int depth = Self().GetHierarchyDepth();
    // 3. Create the icons
    if ( showIcons )
    {
      ImageActor pressedIcon = ImageActor::New(  iconImage );
      ImageActor icon = ImageActor::New(  iconImage );
-     icon.SetSortModifier( DECORATION_DEPTH_INDEX - 1 );
-     pressedIcon.SetSortModifier( DECORATION_DEPTH_INDEX - 1 );
+     icon.SetSortModifier( DECORATION_DEPTH_INDEX + depth - 1 );
+     pressedIcon.SetSortModifier( DECORATION_DEPTH_INDEX + depth - 1 );
 
      icon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
      pressedIcon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
@@ -700,9 +717,13 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
      const Size size( mOptionDividerSize.width, 0.0f ); // Height FILL_TO_PARENT
 
      ImageActor divider = Toolkit::CreateSolidColorActor( Color::WHITE );
+#ifdef DECORATOR_DEBUG
+     divider.SetName("Text's popup divider");
+#endif
      divider.SetSize( size );
      divider.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
      divider.SetColor( mDividerColor );
+     divider.SetSortModifier( DECORATION_DEPTH_INDEX + depth );
      mToolbar.AddDivider( divider );
    }
  }
@@ -745,7 +766,7 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
    self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
    SetBackgroundImage( NinePatchImage::New( DEFAULT_POPUP_BACKGROUND_IMAGE ) );
 
-   if ( !mToolbar )
+   if( !mToolbar )
    {
      mToolbar = Toolkit::TextSelectionToolbar::New();
      mToolbar.SetParentOrigin( ParentOrigin::CENTER );

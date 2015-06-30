@@ -72,6 +72,11 @@ void TextSelectionToolbar::ResizeDividers( Size& size )
   GetImpl(*this).ResizeDividers( size );
 }
 
+void TextSelectionToolbar::RaiseAbove( Layer target )
+{
+  GetImpl(*this).RaiseAbove( target );
+}
+
 TextSelectionToolbar TextSelectionToolbar::DownCast( BaseHandle handle )
 {
   return Control::DownCast<TextSelectionToolbar, Internal::TextSelectionToolbar>(handle);

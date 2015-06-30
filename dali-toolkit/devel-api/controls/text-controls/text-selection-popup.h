@@ -136,6 +136,13 @@ public:
    */
   static TextSelectionPopup DownCast( BaseHandle handle );
 
+  /**
+   * @brief Raises the toolbar's layer above the given @e target layer.
+   *
+   * @param[in] target The layer to get above of.
+   */
+  void RaiseAbove( Layer target );
+
 public: // Not intended for application developers
 
   /**

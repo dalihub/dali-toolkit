@@ -938,10 +938,11 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
 void TextField::RenderText()
 {
+  Actor self = Self();
   Actor renderableActor;
   if( mRenderer )
   {
-    renderableActor = mRenderer->Render( mController->GetView(), mDepth );
+    renderableActor = mRenderer->Render( mController->GetView(), self.GetHierarchyDepth() );
   }
 
   if( renderableActor != mRenderableActor )
@@ -956,14 +957,10 @@ void TextField::RenderText()
 
     mRenderableActor.SetPosition( offset.x, offset.y );
 
-    // Make sure the actor is parented correctly with/without clipping
+    Actor clipRootActor;
     if( mClipper )
     {
-      mClipper->GetRootActor().Add( mRenderableActor );
-    }
-    else
-    {
-      Self().Add( mRenderableActor );
+      clipRootActor = mClipper->GetRootActor();
     }
 
     for( std::vector<Actor>::const_iterator it = mClippingDecorationActors.begin(),
@@ -973,16 +970,26 @@ void TextField::RenderText()
     {
       Actor actor = *it;
 
-      if( mClipper )
+      if( clipRootActor )
       {
-        mClipper->GetRootActor().Add( actor );
+        clipRootActor.Add( actor );
       }
       else
       {
-        Self().Add( actor );
+        self.Add( actor );
       }
     }
     mClippingDecorationActors.clear();
+
+    // Make sure the actor is parented correctly with/without clipping
+    if( clipRootActor )
+    {
+      clipRootActor.Add( mRenderableActor );
+    }
+    else
+    {
+      self.Add( mRenderableActor );
+    }
   }
 }
 
@@ -1187,7 +1194,13 @@ void TextField::KeyboardStatusChanged(bool keyboardShown)
 
 void TextField::OnStageConnection( int depth )
 {
-  mDepth = depth;
+  // Call the Control::OnStageConnection() to set the depth of the background.
+  Control::OnStageConnection( depth );
+
+  // Sets the depth to the renderers inside the text's decorator.
+  mDecorator->SetTextDepth( depth );
+
+  // The depth of the text renderer is set in the RenderText() called from OnRelayout().
 }
 
 bool TextField::OnTouched( Actor actor, const TouchEvent& event )
@@ -1199,7 +1212,6 @@ TextField::TextField()
 : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP ),
-  mDepth( 0 ),
   mHasBeenStaged( false )
 {
 }

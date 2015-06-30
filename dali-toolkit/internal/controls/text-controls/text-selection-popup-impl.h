@@ -124,12 +124,22 @@ public:
    */
   static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
+  /**
+   * @copydoc Toolkit::TextSelectionPopup::RaiseAbove()
+   */
+  void RaiseAbove( Layer target );
+
 private: // From Control
 
   /**
    * @copydoc Control::OnInitialize()
    */
   virtual void OnInitialize();
+
+  /**
+   * @copydoc Control::OnStageConnection()
+   */
+  virtual void OnStageConnection( int depth );
 
 private: // Implementation
 

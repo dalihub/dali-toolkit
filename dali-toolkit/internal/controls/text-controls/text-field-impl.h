@@ -248,7 +248,6 @@ private: // Data
 
   int mRenderingBackend;
   int mExceedPolicy;
-  unsigned int mDepth;
   bool mHasBeenStaged:1;
 };
 

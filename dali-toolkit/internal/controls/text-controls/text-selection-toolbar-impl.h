@@ -70,19 +70,24 @@ public:
   static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
   /**
-   *  @copydoc TextSelectionToolbar::AddOption
+   *  @copydoc Toolkit::TextSelectionToolbar::AddOption()
    */
   void AddOption( Actor& option );
 
   /**
-   *  @copydoc TextSelectionToolbar::AddDivider
+   *  @copydoc Toolkit::TextSelectionToolbar::AddDivider()
    */
   void AddDivider( Actor& divider );
 
   /**
-   * @copydoc ResizeDividers
+   * @copydoc Toolkit::TextSelectionToolbar::ResizeDividers()
    */
   void ResizeDividers( Size& size );
+
+  /**
+   * @copydoc Toolkit::TextSelectionToolbar::RaiseAbove()
+   */
+  void RaiseAbove( Layer target );
 
 private: // From Control
 
@@ -95,6 +100,12 @@ private: // From Control
   * @copydoc Control::OnRelayout()
   */
   virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+
+  /**
+   * @copydoc Control::OnStageConnection()
+   */
+  virtual void OnStageConnection( int depth );
+
   /**
    * @brief Set max size of Popup
    * @param[in] maxSize Size (Vector2)
@@ -150,12 +161,13 @@ private:
 
 private: // Data
 
-  Toolkit::TableView mTableOfButtons;                 // Actor which holds all the buttons, sensitivity can be set on buttons via this actor
-  Toolkit::ScrollView mScrollView;                    // Provides scrolling of Toolbar when content does not fit.
-  RulerPtr mRulerX;                                   // Ruler to clamp horizontal scrolling. Updates on Relayout
-  Size mMaxSize;                                      // Max size of the Toolbar
-  unsigned int mIndexInTable;                         // Index in table to add option
-  Dali::Vector< unsigned int > mDividerIndexes;       // Vector of indexes in the Toolbar that contain dividers.
+  Layer mStencilLayer;                                ///< The stencil layer
+  Toolkit::TableView mTableOfButtons;                 ///< Actor which holds all the buttons, sensitivity can be set on buttons via this actor
+  Toolkit::ScrollView mScrollView;                    ///< Provides scrolling of Toolbar when content does not fit.
+  RulerPtr mRulerX;                                   ///< Ruler to clamp horizontal scrolling. Updates on Relayout
+  Size mMaxSize;                                      ///< Max size of the Toolbar
+  unsigned int mIndexInTable;                         ///< Index in table to add option
+  Dali::Vector< unsigned int > mDividerIndexes;       ///< Vector of indexes in the Toolbar that contain dividers.
 
 };
 

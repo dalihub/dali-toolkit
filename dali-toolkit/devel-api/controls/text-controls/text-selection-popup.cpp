@@ -63,6 +63,11 @@ TextSelectionPopup TextSelectionPopup::DownCast( BaseHandle handle )
   return Control::DownCast<TextSelectionPopup, Internal::TextSelectionPopup>(handle);
 }
 
+void TextSelectionPopup::RaiseAbove( Layer target )
+{
+  GetImpl(*this).RaiseAbove( target );
+}
+
 TextSelectionPopup::TextSelectionPopup( Internal::TextSelectionPopup& implementation )
 : Control(implementation)
 {
