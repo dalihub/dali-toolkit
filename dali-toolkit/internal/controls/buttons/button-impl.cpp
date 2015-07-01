@@ -32,7 +32,7 @@
 /**
  * Button states and contents
  *                                         (3) mSelectedContent
- *  (2) mButtonContent                     (2) mSelectedBackgroundContent
+ *  (2) mUnselectedContent                 (2) mSelectedBackgroundContent
  *  (1) mBackgroundContent                 (1) mBackgroundContent
  * < unselected > ----------------------- < selected >
  *       |                OnSelect()            |
@@ -45,7 +45,7 @@
  * The drawing order of child actors is as follows.
  *
  *  Top      mLabel
- *   |       mButtonContent / mSelectedContent / mDisabledContent / mDisabledSelectedContent
+ *   |       mUnselectedContent / mSelectedContent / mDisabledContent / mDisabledSelectedContent
  *   |       mSelectedBackgroundContent
  * Bottom    mBackgroundContent / mDisabledBackgroundContent
  *
@@ -117,252 +117,109 @@ Button::Button()
 
 Button::~Button()
 {
-  if( mAutoRepeatingTimer )
-  {
-    mAutoRepeatingTimer.Reset();
-  }
 }
 
 void Button::SetDisabled( bool disabled )
 {
-  if( disabled != mDisabled )
+  if( disabled == mDisabled )
   {
-    unsigned int backgroundIndex;
-    unsigned int buttonIndex;
+    return;
+  }
 
-    bool animationStarted = false;
+  StopTransitionAnimation();
 
-    mDisabled = disabled;
+  mDisabled = disabled;
 
-    switch( mPaintState )
+  // Notifies the derived class the button has been disabled.
+  OnDisabled();
+
+  switch( mPaintState )
+  {
+    case UnselectedState:
     {
-      case UnselectedState:
-      {
-        buttonIndex = FindChildIndex( mLabel );
-        InsertChild( buttonIndex, mDisabledContent );
+      //Layer Order
+      //(3) mDisabledContent (Inserted)
+      //(4) mUnselectedContent
+      //(2) mDisabledBackgroundContent (Inserted)
+      //(1) mBackgroundContent
 
-        if( mBackgroundContent )
-        {
-          backgroundIndex = 1;
-        }
-        else
-        {
-          backgroundIndex = 0;
-        }
+      TransitionInBetween( mUnselectedContent, mLabel, mDisabledContent );
+      TransitionInAbove( mBackgroundContent, mDisabledBackgroundContent );
 
-        InsertChild( backgroundIndex, mDisabledBackgroundContent );
+      TransitionOut( mUnselectedContent );
+      TransitionOut( mSelectedContent );
+      TransitionOut( mBackgroundContent );
+      TransitionOut( mSelectedBackgroundContent );
+      TransitionOut( mDisabledSelectedContent );
 
-        animationStarted = OnDisabled();
+      mPaintState = DisabledUnselectedState;
+      break;
+    }
+    case SelectedState:
+    {
+      //Layer Order
+      //(5) mDisabledSelectedContent (Inserted)
+      //(4) mSelectedContent
+      //(3) mDisabledBackgroundContent (Inserted)
+      //(2) mSelectedBackgroundContent
+      //(1) mBackgroundContent
 
-        if( animationStarted )
-        {
-          mPaintState = UnselectedDisabledTransition;
-        }
-        else
-        {
-          mPaintState = DisabledUnselectedState;
-        }
-        break;
-      }
-      case SelectedState:
-      {
-        buttonIndex = FindChildIndex( mLabel );
-        InsertChild( buttonIndex, mDisabledSelectedContent );
+      TransitionInBetween( mSelectedContent, mLabel, mDisabledSelectedContent );
+      TransitionInAbove( mSelectedBackgroundContent, mDisabledBackgroundContent );
 
-        if( mBackgroundContent )
-        {
-          backgroundIndex = 1;
-        }
-        else
-        {
-          backgroundIndex = 0;
-        }
+      TransitionOut( mUnselectedContent );
+      TransitionOut( mSelectedContent );
+      TransitionOut( mBackgroundContent );
+      TransitionOut( mSelectedBackgroundContent );
+      TransitionOut( mDisabledContent );
 
-        InsertChild( backgroundIndex, mDisabledBackgroundContent );
+      mPaintState = DisabledSelectedState;
+      break;
+    }
+    case DisabledUnselectedState:
+    {
+      //Layer Order
+      //(3) mUnselectedContent (Inserted)
+      //(4) mDisabledContent
+      //(2) mBackgroundContent (Inserted)
+      //(1) mDisabledBackgroundContent
 
-        animationStarted = OnDisabled();
+      TransitionInBetween( mDisabledContent, mLabel, mUnselectedContent );
+      TransitionInAbove( mDisabledBackgroundContent, mBackgroundContent );
 
-        if( animationStarted )
-        {
-          mPaintState = SelectedDisabledTransition;
-        }
-        else
-        {
-          mPaintState = DisabledSelectedState;
-        }
-        break;
-      }
-      case DisabledUnselectedState:
-      {
-        buttonIndex = FindChildIndex( mLabel );
-        InsertChild( buttonIndex, mButtonContent );
+      TransitionOut( mSelectedContent );
+      TransitionOut( mSelectedBackgroundContent );
+      TransitionOut( mDisabledContent );
+      TransitionOut( mDisabledSelectedContent );
+      TransitionOut( mDisabledBackgroundContent );
 
-        if( mDisabledBackgroundContent )
-        {
-          backgroundIndex = 1;
-        }
-        else
-        {
-          backgroundIndex = 0;
-        }
+      mPaintState = UnselectedState;
+      break;
+    }
+    case DisabledSelectedState:
+    {
+      //Layer Order
+      //(4) mSelectedContent (Inserted)
+      //(5) mDisabledSelectedContent
+      //(3) mSelectedBackgroundContent (Inserted)
+      //(2) mBackgroundContent (Inserted)
+      //(1) mDisabledBackgroundContent
 
-        InsertChild( backgroundIndex, mBackgroundContent );
+      TransitionInBetween( mDisabledSelectedContent, mLabel, mSelectedContent );
+      TransitionInAbove( mDisabledBackgroundContent, mSelectedBackgroundContent );
+      TransitionInAbove( mDisabledBackgroundContent, mBackgroundContent );
 
-        animationStarted = OnDisabled();
+      TransitionOut( mUnselectedContent );
+      TransitionOut( mDisabledContent );
+      TransitionOut( mDisabledSelectedContent );
+      TransitionOut( mDisabledBackgroundContent );
 
-        if( animationStarted )
-        {
-          mPaintState = DisabledUnselectedTransition;
-        }
-        else
-        {
-          mPaintState = UnselectedState;
-        }
-        break;
-      }
-      case DisabledSelectedState:
-      {
-        buttonIndex = FindChildIndex( mLabel );
-        InsertChild( buttonIndex, mSelectedContent );
-
-        if( mDisabledBackgroundContent )
-        {
-          backgroundIndex = 1;
-        }
-        else
-        {
-          backgroundIndex = 0;
-        }
-
-        InsertChild( backgroundIndex, mSelectedBackgroundContent );
-        InsertChild( backgroundIndex, mBackgroundContent );
-
-        animationStarted = OnDisabled();
-
-        if( animationStarted )
-        {
-          mPaintState = DisabledSelectedTransition;
-        }
-        else
-        {
-          mPaintState = SelectedState;
-        }
-        break;
-      }
-      case UnselectedSelectedTransition:
-      {
-        buttonIndex = FindChildIndex( mLabel );
-        InsertChild( buttonIndex, mDisabledSelectedContent );
-
-        if( mBackgroundContent )
-        {
-          backgroundIndex = 1;
-        }
-        else
-        {
-          backgroundIndex = 0;
-        }
-
-        InsertChild( backgroundIndex, mDisabledBackgroundContent );
-
-        animationStarted = OnDisabled();
-
-        if( animationStarted )
-        {
-          mPaintState = SelectedDisabledTransition;
-        }
-        else
-        {
-          mPaintState = DisabledSelectedState;
-        }
-        break;
-      }
-      case SelectedUnselectedTransition:
-      {
-        buttonIndex = FindChildIndex( mLabel );
-        InsertChild( buttonIndex, mDisabledContent );
-
-        if( mBackgroundContent )
-        {
-          backgroundIndex = 1;
-        }
-        else
-        {
-          backgroundIndex = 0;
-        }
-
-        InsertChild( backgroundIndex, mDisabledBackgroundContent );
-
-        animationStarted = OnDisabled();
-
-        if( animationStarted )
-        {
-          mPaintState = UnselectedDisabledTransition;
-        }
-        else
-        {
-          mPaintState = DisabledUnselectedState;
-        }
-        break;
-      }
-      case UnselectedDisabledTransition:
-      {
-        animationStarted = OnDisabled();
-
-        if( animationStarted )
-        {
-          mPaintState = DisabledUnselectedTransition;
-        }
-        else
-        {
-          mPaintState = UnselectedState;
-        }
-        break;
-      }
-      case DisabledUnselectedTransition:
-      {
-        animationStarted = OnDisabled();
-
-        if( animationStarted )
-        {
-          mPaintState = UnselectedDisabledTransition;
-        }
-        else
-        {
-          mPaintState = DisabledUnselectedState;
-        }
-        break;
-      }
-      case SelectedDisabledTransition:
-      {
-        animationStarted = OnDisabled();
-
-        if( animationStarted )
-        {
-          mPaintState = DisabledSelectedTransition;
-        }
-        else
-        {
-          mPaintState = SelectedState;
-        }
-        break;
-      }
-      case DisabledSelectedTransition:
-      {
-        animationStarted = OnDisabled();
-
-        if( animationStarted )
-        {
-          mPaintState = SelectedDisabledTransition;
-        }
-        else
-        {
-          mPaintState = DisabledSelectedState;
-        }
-        break;
-      }
+      mPaintState = SelectedState;
+      break;
     }
   }
+
+  StartTransitionAnimation();
 }
 
 bool Button::IsDisabled() const
@@ -440,153 +297,63 @@ void Button::SetSelected( bool selected )
 
 void Button::SetSelected( bool selected, bool emitSignal )
 {
-  unsigned int buttonIndex, backgroundIndex;
-  bool animationStarted = false;
+  StopTransitionAnimation();
 
   mSelected = selected;
+
+  // Notifies the derived class the button has been selected.
+  OnSelected();
 
   switch( mPaintState )
   {
     case UnselectedState:
     {
-      buttonIndex = FindChildIndex( mLabel );
-      InsertChild( buttonIndex, mSelectedContent );
+      //Layer Order
+      //(3) mSelectedContent (Inserted)
+      //(4) mUnselectedContent
+      //(2) mSelectedBackgroundContent (Inserted)
+      //(1) mBackgroundContent
 
-      if( mBackgroundContent )
-      {
-        backgroundIndex = 1;
-      }
-      else
-      {
-        backgroundIndex = 0;
-      }
+      TransitionInBetween( mUnselectedContent, mLabel, mSelectedContent );
+      TransitionInAbove( mBackgroundContent, mSelectedBackgroundContent );
+      TransitionInAtIndex( 0, mBackgroundContent );
 
-      InsertChild( backgroundIndex, mSelectedBackgroundContent );
+      TransitionOut( mUnselectedContent );
+      TransitionOut( mDisabledContent );
+      TransitionOut( mDisabledSelectedContent );
+      TransitionOut( mDisabledBackgroundContent );
 
-      // Notifies the derived class the button has been selected.
-      animationStarted = OnSelected();
-
-      if( animationStarted )
-      {
-        mPaintState = UnselectedSelectedTransition;
-      }
-      else
-      {
-        mPaintState = SelectedState;
-      }
+      mPaintState = SelectedState;
       break;
     }
     case SelectedState:
     {
-      buttonIndex = FindChildIndex( mLabel );
-      InsertChild( buttonIndex, mButtonContent );
+      //Layer Order
+      //(3) mUnselectedContent (Inserted)
+      //(2) mSelectedContent
+      //(1) mBackgroundContent
 
-      // Notifies the derived class the button has been selected.
-      animationStarted = OnSelected();
+      TransitionInBetween( mSelectedContent, mLabel, mUnselectedContent );
+      TransitionInAtIndex( 0, mBackgroundContent );
 
-      if( animationStarted )
-      {
-        mPaintState = SelectedUnselectedTransition;
-      }
-      else
-      {
-        mPaintState = UnselectedState;
-      }
+      TransitionOut( mSelectedContent );
+      TransitionOut( mSelectedBackgroundContent );
+      TransitionOut( mDisabledContent );
+      TransitionOut( mDisabledSelectedContent );
+      TransitionOut( mDisabledBackgroundContent );
+
+      mPaintState = UnselectedState;
       break;
     }
-    case UnselectedSelectedTransition:
+    case DisabledUnselectedState:
+    case DisabledSelectedState:
     {
-      // Notifies the derived class the button has been selected.
-      animationStarted = OnSelected();
-
-      if( animationStarted )
-      {
-        mPaintState = SelectedUnselectedTransition;
-      }
-      else
-      {
-        mPaintState = UnselectedState;
-      }
-      break;
-    }
-    case SelectedUnselectedTransition:
-    {
-      // Notifies the derived class the button has been selected.
-      animationStarted = OnSelected();
-
-      if( animationStarted )
-      {
-        mPaintState = UnselectedSelectedTransition;
-      }
-      else
-      {
-        mPaintState = SelectedState;
-      }
-      break;
-    }
-    case DisabledUnselectedTransition:
-    {
-      buttonIndex = FindChildIndex( mLabel );
-      InsertChild( buttonIndex, mSelectedContent );
-
-      if( mDisabledBackgroundContent )
-      {
-        if(  mBackgroundContent )
-        {
-          backgroundIndex = 2;
-        }
-        else
-        {
-          backgroundIndex = 1;
-        }
-      }
-      else if( mBackgroundContent )
-      {
-        backgroundIndex = 1;
-      }
-      else
-      {
-        backgroundIndex = 0;
-      }
-
-      InsertChild( backgroundIndex, mSelectedBackgroundContent );
-
-      // Notifies the derived class the button has been selected.
-      animationStarted = OnSelected();
-
-      if( animationStarted )
-      {
-        mPaintState = UnselectedSelectedTransition;
-      }
-      else
-      {
-        mPaintState = SelectedState;
-      }
-      break;
-    }
-    case DisabledSelectedTransition:
-    {
-      buttonIndex = FindChildIndex( mLabel );
-      InsertChild( buttonIndex, mButtonContent );
-
-      // Notifies the derived class the button has been selected.
-      animationStarted = OnSelected();
-
-      if( animationStarted )
-      {
-        mPaintState = SelectedUnselectedTransition;
-      }
-      else
-      {
-        mPaintState = UnselectedState;
-      }
-      break;
-    }
-    default:
-    {
+      DALI_ASSERT_DEBUG( 0 && "Shouldn't be able to change paint state if the button is disabled." );
       break;
     }
   }
+
+  StartTransitionAnimation();
 
   if( emitSignal )
   {
@@ -653,26 +420,21 @@ Actor& Button::GetLabel()
 
 void Button::SetButtonImage( Actor image )
 {
-  StopAllAnimations();
+  StopTransitionAnimation();
 
-  if( mButtonContent && mButtonContent.GetParent() )
+  if( mUnselectedContent && mUnselectedContent.GetParent() )
   {
-    Self().Remove( mButtonContent );
+    Self().Remove( mUnselectedContent );
   }
 
-  mButtonContent = image;
-
-  mButtonContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  mButtonContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  mButtonContent.SetPosition( 0.f, 0.f );
-
-  if( mPaintState == UnselectedState )
+  mUnselectedContent = image;
+  if( mUnselectedContent )
   {
-    unsigned int index = FindChildIndex( mLabel );
-
-    Self().Insert( index, mButtonContent );
+    mUnselectedContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+    mUnselectedContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    mUnselectedContent.SetPosition( 0.f, 0.f );
   }
-
+  ResetImageLayers();
   OnButtonImageSet();
 
   RelayoutRequest();
@@ -680,17 +442,17 @@ void Button::SetButtonImage( Actor image )
 
 Actor Button::GetButtonImage() const
 {
-  return mButtonContent;
+  return mUnselectedContent;
 }
 
 Actor& Button::GetButtonImage()
 {
-  return mButtonContent;
+  return mUnselectedContent;
 }
 
 void Button::SetSelectedImage( Actor image )
 {
-  StopAllAnimations();
+  StopTransitionAnimation();
 
   if( mSelectedContent && mSelectedContent.GetParent() )
   {
@@ -698,18 +460,13 @@ void Button::SetSelectedImage( Actor image )
   }
 
   mSelectedContent = image;
-
-  mSelectedContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  mSelectedContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  mSelectedContent.SetPosition( 0.f, 0.f );
-
-  if( mPaintState == SelectedState )
+  if( mSelectedContent )
   {
-    unsigned int index = FindChildIndex( mLabel );
-
-    Self().Insert( index, mSelectedContent );
+    mSelectedContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+    mSelectedContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    mSelectedContent.SetPosition( 0.f, 0.f );
   }
-
+  ResetImageLayers();
   OnSelectedImageSet();
 
   RelayoutRequest();
@@ -727,7 +484,7 @@ Actor& Button::GetSelectedImage()
 
 void Button::SetBackgroundImage( Actor image )
 {
-  StopAllAnimations();
+  StopTransitionAnimation();
 
   if( mBackgroundContent && mBackgroundContent.GetParent() )
   {
@@ -735,16 +492,13 @@ void Button::SetBackgroundImage( Actor image )
   }
 
   mBackgroundContent = image;
-
-  mBackgroundContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  mBackgroundContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  mBackgroundContent.SetPosition( 0.f, 0.f );
-
-  if( mPaintState == UnselectedState || mPaintState == SelectedState )
+  if( mBackgroundContent )
   {
-    Self().Insert( 0, mBackgroundContent );
+    mBackgroundContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+    mBackgroundContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    mBackgroundContent.SetPosition( 0.f, 0.f );
   }
-
+  ResetImageLayers();
   OnBackgroundImageSet();
 
   RelayoutRequest();
@@ -762,7 +516,7 @@ Actor& Button::GetBackgroundImage()
 
 void Button::SetSelectedBackgroundImage( Actor image )
 {
-  StopAllAnimations();
+  StopTransitionAnimation();
 
   if( mSelectedBackgroundContent && mSelectedBackgroundContent.GetParent() )
   {
@@ -770,23 +524,13 @@ void Button::SetSelectedBackgroundImage( Actor image )
   }
 
   mSelectedBackgroundContent = image;
-
-  mSelectedBackgroundContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  mSelectedBackgroundContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  mSelectedBackgroundContent.SetPosition( 0.f, 0.f );
-
-  if( mPaintState == SelectedState )
+  if( mSelectedBackgroundContent )
   {
-    if( mBackgroundContent )
-    {
-      Self().Insert( 1, mSelectedBackgroundContent );
-    }
-    else
-    {
-      Self().Insert( 0, mSelectedBackgroundContent );
-    }
+    mSelectedBackgroundContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+    mSelectedBackgroundContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    mSelectedBackgroundContent.SetPosition( 0.f, 0.f );
   }
-
+  ResetImageLayers();
   OnSelectedBackgroundImageSet();
 
   RelayoutRequest();
@@ -804,7 +548,7 @@ Actor& Button::GetSelectedBackgroundImage()
 
 void Button::SetDisabledImage( Actor image )
 {
-  StopAllAnimations();
+  StopTransitionAnimation();
 
   if( mDisabledContent && mDisabledContent.GetParent() )
   {
@@ -812,18 +556,14 @@ void Button::SetDisabledImage( Actor image )
   }
 
   mDisabledContent = image;
-
-  mDisabledContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  mDisabledContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  mDisabledContent.SetPosition( 0.f, 0.f );
-
-  if( mPaintState == DisabledUnselectedState || mPaintState == DisabledSelectedState )
+  if( mDisabledContent )
   {
-    unsigned int index = FindChildIndex( mLabel );
-
-    Self().Insert( index, mDisabledContent );
+    mDisabledContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+    mDisabledContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    mDisabledContent.SetPosition( 0.f, 0.f );
   }
 
+  ResetImageLayers();
   OnDisabledImageSet();
 }
 
@@ -839,7 +579,7 @@ Actor& Button::GetDisabledImage()
 
 void Button::SetDisabledSelectedImage( Actor image )
 {
-  StopAllAnimations();
+  StopTransitionAnimation();
 
   if( mDisabledSelectedContent && mDisabledSelectedContent.GetParent() )
   {
@@ -847,18 +587,14 @@ void Button::SetDisabledSelectedImage( Actor image )
   }
 
   mDisabledSelectedContent = image;
-
-  mDisabledSelectedContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  mDisabledSelectedContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  mDisabledSelectedContent.SetPosition( 0.f, 0.f );
-
-  if( mPaintState == DisabledSelectedState )
+  if( mDisabledSelectedContent )
   {
-    unsigned int index = FindChildIndex( mLabel );
-
-    Self().Insert( index, mDisabledSelectedContent );
+    mDisabledSelectedContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+    mDisabledSelectedContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    mDisabledSelectedContent.SetPosition( 0.f, 0.f );
   }
 
+  ResetImageLayers();
   OnDisabledSelectedImageSet();
 }
 
@@ -874,7 +610,7 @@ Actor& Button::GetDisabledSelectedImage()
 
 void Button::SetDisabledBackgroundImage( Actor image )
 {
-  StopAllAnimations();
+  StopTransitionAnimation();
 
   if( mDisabledBackgroundContent && mDisabledBackgroundContent.GetParent() )
   {
@@ -882,16 +618,13 @@ void Button::SetDisabledBackgroundImage( Actor image )
   }
 
   mDisabledBackgroundContent = image;
-
-  mDisabledBackgroundContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  mDisabledBackgroundContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  mDisabledBackgroundContent.SetPosition( 0.f, 0.f );
-
-  if( mPaintState == DisabledUnselectedState || mPaintState == DisabledSelectedState )
+  if( mDisabledBackgroundContent )
   {
-    Self().Insert( 0, mDisabledBackgroundContent );
+    mDisabledBackgroundContent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+    mDisabledBackgroundContent.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    mDisabledBackgroundContent.SetPosition( 0.f, 0.f );
   }
-
+  ResetImageLayers();
   OnDisabledBackgroundImageSet();
 }
 
@@ -939,59 +672,6 @@ bool Button::DoClickAction( const Property::Map& attributes )
   }
 
   return false;
-}
-
-void Button::UpdatePaintTransitionState()
-{
-  switch( mPaintState )
-  {
-    case UnselectedSelectedTransition:
-    {
-      RemoveChild( mButtonContent );
-      mPaintState = SelectedState;
-      break;
-    }
-    case SelectedUnselectedTransition:
-    {
-      RemoveChild( mSelectedBackgroundContent );
-      RemoveChild( mSelectedContent );
-      mPaintState = UnselectedState;
-      break;
-    }
-    case UnselectedDisabledTransition:
-    {
-      RemoveChild( mBackgroundContent );
-      RemoveChild( mButtonContent );
-      mPaintState = DisabledUnselectedState;
-      break;
-    }
-    case DisabledUnselectedTransition:
-    {
-      RemoveChild( mDisabledBackgroundContent );
-      RemoveChild( mDisabledContent );
-      mPaintState = UnselectedState;
-      break;
-    }
-    case SelectedDisabledTransition:
-    {
-      RemoveChild( mBackgroundContent );
-      RemoveChild( mSelectedBackgroundContent );
-      RemoveChild( mSelectedContent );
-      mPaintState = DisabledSelectedState;
-      break;
-    }
-    case DisabledSelectedTransition:
-    {
-      RemoveChild( mDisabledBackgroundContent );
-      RemoveChild( mDisabledSelectedContent );
-      mPaintState = SelectedState;
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
 }
 
 void Button::OnButtonStageDisconnection()
@@ -1264,162 +944,60 @@ bool Button::AutoRepeatingSlot()
 
 void Button::Pressed()
 {
-  unsigned int buttonIndex, backgroundIndex;
-  bool animationStarted = false;
-
-  switch( mPaintState )
+  if( mPaintState == UnselectedState )
   {
-    case UnselectedState:
-    {
-      buttonIndex = FindChildIndex( mLabel );
-      InsertChild( buttonIndex, mSelectedContent );
+    StopTransitionAnimation();
 
-      if( mBackgroundContent )
-      {
-        backgroundIndex = 1;
-      }
-      else
-      {
-        backgroundIndex = 0;
-      }
+    // Notifies the derived class the button has been pressed.
+     OnPressed();
 
-      InsertChild( backgroundIndex, mSelectedBackgroundContent );
+     //Layer Order
+    //(4) mSelectedContent (Inserted)
+    //(3) mUnselectedContent
+    //(2) mSelectedBackgroundContent (Inserted)
+    //(1) mBackgroundContent
 
-      // Notifies the derived class the button has been pressed.
-      animationStarted = OnPressed();
+    TransitionInBetween( mUnselectedContent, mLabel, mSelectedContent );
+    TransitionInAbove( mBackgroundContent, mSelectedBackgroundContent );
+    TransitionInAtIndex( 0, mBackgroundContent );
 
-      if( animationStarted )
-      {
-        mPaintState = UnselectedSelectedTransition;
-      }
-      else
-      {
-        mPaintState = SelectedState;
-      }
-      break;
-    }
-    case SelectedUnselectedTransition:
-    {
-      // Notifies the derived class the button has been pressed.
-      animationStarted = OnPressed();
+    TransitionOut( mUnselectedContent );
+    TransitionOut( mDisabledContent );
+    TransitionOut( mDisabledSelectedContent );
+    TransitionOut( mDisabledBackgroundContent );
 
-      if( animationStarted )
-      {
-        mPaintState = UnselectedSelectedTransition;
-      }
-      else
-      {
-        mPaintState = SelectedState;
-      }
-      break;
-    }
-    case DisabledUnselectedTransition:
-    {
-      buttonIndex = FindChildIndex( mLabel );
-      InsertChild( buttonIndex, mSelectedContent );
+    mPaintState = SelectedState;
 
-      if( mDisabledBackgroundContent )
-      {
-        if(  mBackgroundContent )
-        {
-          backgroundIndex = 2;
-        }
-        else
-        {
-          backgroundIndex = 1;
-        }
-      }
-      else if( mBackgroundContent )
-      {
-        backgroundIndex = 1;
-      }
-      else
-      {
-        backgroundIndex = 0;
-      }
-
-      InsertChild( backgroundIndex, mSelectedBackgroundContent );
-
-      // Notifies the derived class the button has been pressed.
-      animationStarted = OnPressed();
-
-      if( animationStarted )
-      {
-        mPaintState = UnselectedSelectedTransition;
-      }
-      else
-      {
-        mPaintState = SelectedState;
-      }
-      break;
-    }
-    default:
-      break;
+    StartTransitionAnimation();
   }
 }
 
 void Button::Released()
 {
-  unsigned int buttonIndex;
-  bool animationStarted = false;
-
-  switch( mPaintState )
+  if( mPaintState == SelectedState )
   {
-    case SelectedState:
-    {
-      buttonIndex = FindChildIndex( mLabel );
-      InsertChild( buttonIndex, mButtonContent );
+    StopTransitionAnimation();
 
-      // Notifies the derived class the button has been released.
-      animationStarted = OnReleased();
+    // Notifies the derived class the button has been released.
+    OnReleased();
 
-      if( animationStarted )
-      {
-        mPaintState = SelectedUnselectedTransition;
-      }
-      else
-      {
-        mPaintState = UnselectedState;
-      }
-      break;
-    }
-    case UnselectedSelectedTransition:
-    {
-      // Notifies the derived class the button has been released.
-      animationStarted = OnReleased();
+    //Layer Order
+    //(3) mUnselectedContent (Inserted)
+    //(2) mSelectedContent
+    //(1) mBackgroundContent
 
-      if( animationStarted )
-      {
-        mPaintState = SelectedUnselectedTransition;
-      }
-      else
-      {
-        mPaintState = UnselectedState;
-      }
-      break;
-    }
-    case DisabledSelectedTransition:
-    {
-      buttonIndex = FindChildIndex( mLabel );
-      InsertChild( buttonIndex, mButtonContent );
+    TransitionInBetween( mSelectedContent, mLabel, mUnselectedContent );
+    TransitionInAtIndex( 0, mBackgroundContent );
 
-      // Notifies the derived class the button has been released.
-      animationStarted = OnReleased();
+    TransitionOut( mSelectedContent );
+    TransitionOut( mSelectedBackgroundContent );
+    TransitionOut( mDisabledContent );
+    TransitionOut( mDisabledSelectedContent );
+    TransitionOut( mDisabledBackgroundContent );
 
-      if( animationStarted )
-      {
-        mPaintState = SelectedUnselectedTransition;
-      }
-      else
-      {
-        mPaintState = UnselectedState;
-      }
-      break;
-    }
-    default:
-    {
-      break;
-    }
+    mPaintState = UnselectedState;
+
+    StartTransitionAnimation();
   }
 }
 
@@ -1433,19 +1011,27 @@ Button::PaintState Button::GetPaintState()
   return mPaintState;
 }
 
-void Button::InsertChild( unsigned int index, Actor& actor )
+bool Button::InsertButtonImage( unsigned int index, Actor& actor )
 {
   if( actor )
   {
-    Self().Insert( index, actor);
+    Self().Insert( index, actor );
+    PrepareForTranstionOut( actor );
+    return true;
   }
+
+  return false;
 }
 
-void Button::RemoveChild( Actor& actor )
+void Button::RemoveButtonImage( Actor& actor )
 {
-  if( actor && actor.GetParent() )
+  if( actor )
   {
-    Self().Remove( actor );
+    if( actor.GetParent() )
+    {
+      Self().Remove( actor );
+    }
+    PrepareForTranstionIn( actor );
   }
 }
 
@@ -1466,6 +1052,191 @@ unsigned int Button::FindChildIndex( Actor& actor )
   return childrenNum;
 }
 
+void Button::TransitionInBetween(  Actor childLower, Actor childUpper, Actor actor )
+{
+  unsigned int index = childLower ? FindChildIndex( childLower ) + 1 : FindChildIndex( childUpper );
+  TransitionInAtIndex( index, actor );
+}
+
+void Button::TransitionInAbove( Actor child, Actor actor )
+{
+  unsigned int index = child ? FindChildIndex( child ) + 1 : 0;
+  TransitionInAtIndex( index, actor );
+}
+
+void Button::TransitionInAtIndex( unsigned int index, Actor actor )
+{
+  if( actor )
+  {
+    if( !actor.GetParent() )
+    {
+      Self().Insert( index, actor );
+    }
+
+    OnTransitionIn( actor );
+  }
+}
+
+void Button::TransitionOut( Actor actor )
+{
+  OnTransitionOut( actor );
+}
+
+void Button::ResetImageLayers()
+{
+  //ensure that all layers are in the correct order and state according to the paint state
+
+  int index = 0;
+  switch( mPaintState )
+  {
+    case UnselectedState:
+    {
+      //Layer Order
+      //(2) mUnselectedContent
+      //(1) mBackgroundContent
+
+      RemoveButtonImage( mSelectedContent );
+      RemoveButtonImage( mSelectedBackgroundContent );
+      RemoveButtonImage( mDisabledContent );
+      RemoveButtonImage( mDisabledSelectedContent );
+      RemoveButtonImage( mDisabledBackgroundContent );
+
+      if( InsertButtonImage( index, mBackgroundContent ) )
+      {
+        ++index;
+      }
+      if( InsertButtonImage( index, mUnselectedContent ) )
+      {
+        ++index;
+      }
+      break;
+    }
+    case SelectedState:
+    {
+      //Layer Order
+      //(3) mSelectedContent
+      //(2) mSelectedBackgroundContent
+      //(1) mBackgroundContent
+
+      RemoveButtonImage( mUnselectedContent );
+      RemoveButtonImage( mDisabledContent );
+      RemoveButtonImage( mDisabledSelectedContent );
+      RemoveButtonImage( mDisabledBackgroundContent );
+
+      if( InsertButtonImage( index, mBackgroundContent ) )
+      {
+        ++index;
+      }
+      if( InsertButtonImage( index, mSelectedBackgroundContent ) )
+      {
+        ++index;
+      }
+      if( InsertButtonImage( index, mSelectedContent ) )
+      {
+        ++index;
+      }
+      break;
+    }
+    case DisabledUnselectedState:
+    {
+      //Layer Order
+      //(2) mDisabledContent
+      //(1) mDisabledBackgroundContent
+
+      RemoveButtonImage( mUnselectedContent );
+      RemoveButtonImage( mBackgroundContent );
+      RemoveButtonImage( mSelectedContent );
+      RemoveButtonImage( mDisabledSelectedContent );
+      RemoveButtonImage( mSelectedBackgroundContent );
+
+      if( InsertButtonImage( index, mDisabledBackgroundContent ? mDisabledBackgroundContent : mBackgroundContent ) )
+      {
+        ++index;
+      }
+      if( InsertButtonImage( index, mDisabledContent ? mDisabledContent : mUnselectedContent ) )
+      {
+        ++index;
+      }
+      break;
+    }
+    case DisabledSelectedState:
+    {
+      //Layer Order
+      // (2) mDisabledSelectedContent
+      // (1) mDisabledBackgroundContent
+
+      RemoveButtonImage( mUnselectedContent );
+      RemoveButtonImage( mSelectedContent );
+      RemoveButtonImage( mBackgroundContent );
+      RemoveButtonImage( mSelectedBackgroundContent );
+      RemoveButtonImage( mDisabledContent );
+
+      if( mDisabledBackgroundContent )
+      {
+        if( InsertButtonImage( index, mDisabledBackgroundContent) )
+        {
+          ++index;
+        }
+      }
+      else
+      {
+        if( InsertButtonImage( index, mBackgroundContent ) )
+        {
+          ++index;
+        }
+        if( InsertButtonImage( index, mSelectedBackgroundContent ) )
+        {
+          ++index;
+        }
+      }
+
+      if( InsertButtonImage( index, mDisabledSelectedContent ? mDisabledSelectedContent : mSelectedContent) )
+      {
+        ++index;
+      }
+      break;
+    }
+  }
+}
+
+void Button::StartTransitionAnimation()
+{
+  if( mTransitionAnimation )
+  {
+    mTransitionAnimation.Play();
+  }
+  else
+  {
+    ResetImageLayers();
+  }
+}
+
+void Button::StopTransitionAnimation()
+{
+  if( mTransitionAnimation )
+  {
+    mTransitionAnimation.Clear();
+    mTransitionAnimation.Reset();
+  }
+}
+
+Dali::Animation Button::GetTransitionAnimation()
+{
+  if( !mTransitionAnimation )
+  {
+    mTransitionAnimation = Dali::Animation::New( GetAnimationTime() );
+    mTransitionAnimation.FinishedSignal().Connect( this, &Button::TransitionAnimationFinished );
+  }
+
+  return mTransitionAnimation;
+}
+
+void Button::TransitionAnimationFinished( Dali::Animation& source )
+{
+  StopTransitionAnimation();
+  ResetImageLayers();
+}
+
 void Button::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
 {
   Toolkit::Button button = Toolkit::Button::DownCast( Dali::BaseHandle( object ) );
@@ -1476,7 +1247,7 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
     {
       case Toolkit::Button::Property::DISABLED:
       {
-        GetImplementation( button ).SetDisabled( value.Get<bool>() );
+        GetImplementation( button ).SetDisabled( value.Get< bool >() );
         break;
       }
 
@@ -1586,7 +1357,7 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
       case Toolkit::Button::Property::NORMAL_STATE_ACTOR:
       {
         Property::Map map;
-        Scripting::CreatePropertyMap( GetImplementation( button ).mButtonContent, map );
+        Scripting::CreatePropertyMap( GetImplementation( button ).mUnselectedContent, map );
         value = map;
         break;
       }

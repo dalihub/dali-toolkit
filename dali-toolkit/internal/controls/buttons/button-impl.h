@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/button.h>
@@ -269,11 +270,6 @@ protected:
    */
   Actor& GetLabel();
 
-  /**
-   * It changes the transition state of the push button.
-   */
-  void UpdatePaintTransitionState();
-
 private:
 
   /**
@@ -362,32 +358,23 @@ private:
 
   /**
    * This method is called when the \e selected property is changed.
-   * @return true if the transition animation is started.
    */
-  virtual bool OnSelected() { return false; }
+  virtual void OnSelected() {}
 
   /**
    * This method is called when the \e disabled property is changed.
-   * @return true if the transition animation is started.
    */
-  virtual bool OnDisabled() { return false; }
+  virtual void OnDisabled() {}
 
   /**
    * This method is called when the button is pressed.
-   * @return true if the transition animation is started.
    */
-  virtual bool OnPressed() { return false; }
+  virtual void OnPressed() {}
 
   /**
    * This method is called when the button is released.
-   * @return true if the transition animation is started.
    */
-  virtual bool OnReleased() { return false; }
-
-  /**
-   * This method stops all animations
-   */
-  virtual void StopAllAnimations() {}
+  virtual void OnReleased() {}
 
 public:
 
@@ -527,26 +514,102 @@ protected:
     SelectedState,                ///< The button is selected.
     DisabledUnselectedState,      ///< The button is disabled and unselected.
     DisabledSelectedState,        ///< The button is disabled and selected.
-    UnselectedSelectedTransition, ///< The button is in transition from unselected to selected.
-    SelectedUnselectedTransition, ///< The button is in transition from selected to unselected.
-    UnselectedDisabledTransition, ///< The button is in transition from unselected to disabled.
-    DisabledUnselectedTransition, ///< The button is in transition from disabled to unselected.
-    SelectedDisabledTransition,   ///< The button is in transition from selected to disabled.
-    DisabledSelectedTransition    ///< The button is in transition from disabled to selected.
   };
 
   ButtonState GetState();
   PaintState GetPaintState();
 
   /**
-   * Inserts the actor to the button.
+   * Returns the animation to be used for transitioning creating the animation if needed.
+   * @return The initialised transition animation.
    */
-  void InsertChild( unsigned int index, Actor& actor );
+  Dali::Animation GetTransitionAnimation();
 
   /**
-   * Removes the actor from the button.
+   * Prepares the actor to be transitioned in.
+   * @param[in]  actor  The actor that will be transitioned in.
    */
-  void RemoveChild( Actor& actor );
+  virtual void PrepareForTranstionIn( Actor actor ) {}
+
+  /**
+   * Prepares the actor to be transitioned in.
+   * @param[in]  actor  The actor that will be transitioned out.
+   */
+  virtual void PrepareForTranstionOut( Actor actor ) {}
+
+  /**
+   * Transitions the actor in, allowing derived classes to configure
+   * the GetTransitionAnimation() animation ready.
+   * Button is in charge of calling Dali::Animation::Play and so derived classes
+   * only need to add the animation.
+   */
+  virtual void OnTransitionIn( Actor actor ) {}
+
+  /**
+   * Transitions the actor out, allowing derived classes to configure
+   * the GetTransitionAnimation() animation ready.
+   * Button is in charge of calling Dali::Animation::Play and so derived classes
+   * only need to add the animation.
+   */
+  virtual void OnTransitionOut( Actor actor ) {}
+
+private:
+  /**
+   * Starts the transition animation.
+   * Button::TransitionFinished is called when the animation finishes.
+   */
+  void StartTransitionAnimation();
+
+  /**
+   * This method stops all transition animations
+   */
+  void StopTransitionAnimation();
+
+  /**
+   * Called when the transition animation finishes.
+   */
+  void TransitionAnimationFinished( Dali::Animation& source );
+
+  /**
+   * Resets the Button to the base state for the current paint state.
+   * Any additionally inserted images needed for transitions that are
+   * no longer needed and the removed.
+   */
+  void ResetImageLayers();
+
+  /**
+   * Transitions in the actor, inserting the actor above childLower below the childUpper.
+   * Will not insert the actor if it is already attached to a parent (and so will not reorder the actor)
+   */
+  void TransitionInBetween( Actor childLower, Actor childUpper, Actor actor );
+
+  /**
+   * Transitions in the actor, inserting the actor above the child if the child exists or at the bottom otherwise
+   * Will not insert the actor if it is already attached to a parent (and so will not reorder the actor)
+   */
+  void TransitionInAbove( Actor child, Actor actor );
+
+  /**
+   * Transitions in the actor, inserting the actor at the index
+   * Will not insert the actor if it is already attached to a parent (and so will not reorder the actor)
+   */
+  void TransitionInAtIndex( unsigned int index, Actor actor );
+
+  /**
+   * Transitions out the actor
+   */
+  void TransitionOut( Actor actor );
+
+  /**
+   * Inserts the actor to the button and prepares it to be transitioned out
+   * @return true if the child was inserted, false otherwise
+   */
+  bool InsertButtonImage( unsigned int index, Actor& actor );
+
+  /**
+   * Removes the actor from the button and prepares it to be transitioned out
+   */
+  void RemoveButtonImage( Actor& actor );
 
   /**
    * Finds the index of the actor.
@@ -554,7 +617,6 @@ protected:
    */
   unsigned int FindChildIndex( Actor& actor );
 
-private:
 
   // Undefined
   Button( const Button& );
@@ -574,13 +636,15 @@ private:
 
   Actor mLabel;                                ///< Stores the button label.
 
-  Actor mButtonContent;                        ///< Stores the unselected content.
+  Actor mUnselectedContent;                    ///< Stores the unselected content.
   Actor mSelectedContent;                      ///< Stores the selected content.
   Actor mBackgroundContent;                    ///< Stores the background content.
   Actor mSelectedBackgroundContent;            ///< Stores the selected background content.
   Actor mDisabledContent;                      ///< Stores the disabled content.
   Actor mDisabledSelectedContent;              ///< Stores the disabled selected content.
   Actor mDisabledBackgroundContent;            ///< Stores the disabled background content.
+
+  Animation        mTransitionAnimation;       ///< Animation used in the state transitions.
 
   TapGestureDetector mTapDetector;
 
@@ -590,6 +654,7 @@ private:
   bool             mSelected;                  ///< Stores the selected state.
   float            mInitialAutoRepeatingDelay; ///< Stores the initial autorepeating delay in seconds.
   float            mNextAutoRepeatingDelay;    ///< Stores the next autorepeating delay in seconds.
+
   float            mAnimationTime;             ///< The animation time.
 
   // Actions

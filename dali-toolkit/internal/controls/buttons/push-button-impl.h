@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
@@ -100,34 +99,34 @@ private: // From Button
   virtual void OnDisabledImageSet();
 
   /**
+   * @copydoc Toolkit::Internal::Button::OnDisabledSelectedImageSet()
+   */
+  virtual void OnDisabledSelectedImageSet();
+
+  /**
    * @copydoc Toolkit::Internal::Button::OnDisabledBackgroundImageSet()
    */
   virtual void OnDisabledBackgroundImageSet();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnSelected()
+   * @copydoc Toolkit::Internal::Button::PrepareForTranstionIn( Actor actor )
    */
-  virtual bool OnSelected();
+  virtual void PrepareForTranstionIn( Actor actor );
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnDisabled()
+   * @copydoc Toolkit::Internal::Button::PrepareForTranstionOut( Actor actor )
    */
-  virtual bool OnDisabled();
+  virtual void PrepareForTranstionOut( Actor actor );
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnPressed()
+   * @copydoc Toolkit::Internal::Button::OnTransitionIn( Actor actor )
    */
-  virtual bool OnPressed();
+  virtual void OnTransitionIn( Actor actor );
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnReleased()
+   * @copydoc Toolkit::Internal::Button::OnTransitionOut( Actor actor )
    */
-  virtual bool OnReleased();
-
-  /**
-   * @copydoc Toolkit::Internal::Button::StopAllAnimations()
-   */
-  virtual void StopAllAnimations();
+  virtual void OnTransitionOut( Actor actor );
 
 private: // From Control
 
@@ -149,33 +148,11 @@ private: // From Control
 private:
 
   /**
-   * Starts the transition animation.
-   * PushButton::TransitionAnimationFinished slot is called when the animation finishes.
-   */
-  void StartTransitionAnimation();
-
-  /**
-   * Stops the transition animation.
-   * @param[in] remove If true, removes the fadeout actor from root.
-   */
-  void StopTransitionAnimation( bool remove = true );
-
-  /**
    * It adds the actor to the root actor and to the fade in animation.
-   * @param[inout] image The actor.
-   * @param[in] opacity The initial opacity.
-   * @param[in] scale The initial scale.
+   * @param[inout] actor The actor.
+   * @param[in] opacity The opacity to fade to
    */
-  void FadeInImage( Actor& image, float opacity = 0.f, Vector3 scale = Vector3( 1.f, 1.f, 1.f ) );
-
-  /**
-   * It adds the actor fade out animation and stores it to be removed when the animation finishes.
-   * @param[in] layer Defines if the actor is going to be stored in the mFadeOutBackgroundImage or mFadeOutCheckedImage member.
-   * @param[inout] image The actor.
-   * @param[in] opacity The initial opacity.
-   * @param[in] scale The initial scale.
-   */
-  void FadeOutImage( Actor& image, float opacity = 1.f, Vector3 scale = Vector3( 1.f, 1.f, 1.f ) );
+  void FadeImageTo( Actor actor, float opacity );
 
   /**
    * @brief Custom configuration for size negotiation
@@ -191,13 +168,6 @@ private:
    */
   void ConfigureSizeNegotiationDimension( Dimension::Type dimension, const std::vector< Actor >& images, Actor& label );
 
-  // slots
-
-  /**
-   * Called when the transition animation finishes.
-   */
-  void TransitionAnimationFinished( Dali::Animation& source );
-
 private:
 
   // Undefined
@@ -208,7 +178,6 @@ private:
 
 private:
 
-  Animation             mTransitionAnimation;       ///< Animation used in the state transitions.
   Vector3               mSize;                      ///< The button's size.
 };
 
