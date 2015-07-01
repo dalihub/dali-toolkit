@@ -1393,6 +1393,26 @@ void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
   }
 }
 
+void Controller::LongPressEvent( Gesture::State state, float x, float y  )
+{
+  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected PanEvent" );
+
+  if  ( mImpl->IsShowingPlaceholderText() || mImpl->mLogicalModel->mText.Count() == 0u )
+  {
+    if ( mImpl->mEventData )
+    {
+      Event event( Event::LONG_PRESS_EVENT );
+      event.p1.mInt = state;
+      mImpl->mEventData->mEventQueue.push_back( event );
+      mImpl->RequestRelayout();
+    }
+  }
+  else if( mImpl->mEventData )
+  {
+    SelectEvent( x, y, false );
+  }
+}
+
 void Controller::SelectEvent( float x, float y, bool selectAll )
 {
   if( mImpl->mEventData )

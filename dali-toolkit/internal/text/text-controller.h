@@ -525,6 +525,15 @@ public:
   void PanEvent( Gesture::State state, const Vector2& displacement );
 
   /**
+   * @brief Called by editable UI controls when a long press gesture occurs.
+   *
+   * @param[in] state The state of the gesture.
+   * @param[in] x The x position relative to the top-left of the parent control.
+   * @param[in] y The y position relative to the top-left of the parent control.
+   */
+  void LongPressEvent( Gesture::State state, float x, float y );
+
+  /**
    * @brief Creates a selection event.
    *
    * It could be called from the TapEvent (double tap) or when the text selection popup's sellect all button is pressed.

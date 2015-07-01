@@ -171,6 +171,11 @@ bool Controller::Impl::ProcessInputEvents()
           OnTapEvent( *iter );
           break;
         }
+        case Event::LONG_PRESS_EVENT:
+        {
+          OnLongPressEvent( *iter );
+          break;
+        }
         case Event::PAN_EVENT:
         {
           OnPanEvent( *iter );
@@ -536,6 +541,15 @@ void Controller::Impl::OnPanEvent( const Event& event )
     {
       mEventData->mDecorator->UpdatePositions( mEventData->mScrollPosition - currentScroll );
     }
+  }
+}
+
+void Controller::Impl::OnLongPressEvent( const Event& event )
+{
+  if  ( EventData::EDITING == mEventData->mState )
+  {
+    ChangeState ( EventData::EDITING_WITH_POPUP );
+    mEventData->mDecoratorUpdated = true;
   }
 }
 
@@ -998,7 +1012,10 @@ void Controller::Impl::SetPopupButtons()
   }
   else if  ( EventData::EDITING_WITH_POPUP == mEventData->mState )
   {
-    buttonsToShow = TextSelectionPopup::Buttons( TextSelectionPopup::SELECT | TextSelectionPopup::SELECT_ALL );
+    if ( mLogicalModel->mText.Count() && !IsShowingPlaceholderText())
+    {
+      buttonsToShow = TextSelectionPopup::Buttons( TextSelectionPopup::SELECT | TextSelectionPopup::SELECT_ALL );
+    }
 
     if ( !IsClipboardEmpty() )
     {
