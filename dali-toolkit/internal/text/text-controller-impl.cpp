@@ -1228,6 +1228,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
 
   // Get the glyphs per character table.
   const Length* const glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
+  const Length* const charactersPerGlyphBuffer = mVisualModel->mCharactersPerGlyph.Begin();
 
   // If the vector is void, there is no right to left characters.
   const bool hasRightToLeftCharacters = NULL != visualToLogicalBuffer;
@@ -1246,9 +1247,11 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
     // The character in logical order.
     const CharacterIndex characterLogicalOrderIndex = hasRightToLeftCharacters ? *( visualToLogicalBuffer + visualIndex ) : visualIndex;
 
+    // Get the script of the character.
+    const Script script = mLogicalModel->GetScript( characterLogicalOrderIndex );
+
     // The first glyph for that character in logical order.
     const GlyphIndex glyphLogicalOrderIndex = *( charactersToGlyphBuffer + characterLogicalOrderIndex );
-
     // The number of glyphs for that character
     const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + characterLogicalOrderIndex );
 
@@ -1262,12 +1265,25 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
 
     const Vector2& position = *( positionsBuffer + glyphLogicalOrderIndex );
 
-    // Find the mid-point of the area containing the glyph
-    const float glyphCenter = -glyphMetrics.xBearing + position.x + 0.5f * glyphMetrics.advance;
+    // Prevents to jump the whole Latin ligatures like fi, ff, ...
+    const Length numberOfCharactersInLigature = ( TextAbstraction::LATIN == script ) ? *( charactersPerGlyphBuffer + glyphLogicalOrderIndex ) : 1u;
+    const float glyphAdvance = glyphMetrics.advance / static_cast<float>( numberOfCharactersInLigature );
 
-    if( visualX < glyphCenter )
+    for( GlyphIndex index = 0u; !matched && ( index < numberOfCharactersInLigature ); ++index )
     {
-      matched = true;
+      // Find the mid-point of the area containing the glyph
+      const float glyphCenter = -glyphMetrics.xBearing + position.x + ( static_cast<float>( index ) + 0.5f ) * glyphAdvance;
+
+      if( visualX < glyphCenter )
+      {
+        visualIndex += index;
+        matched = true;
+        break;
+      }
+    }
+
+    if( matched )
+    {
       break;
     }
   }
@@ -1281,6 +1297,7 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
 
   logicalIndex = hasRightToLeftCharacters ? *( visualToLogicalCursorBuffer + visualIndex ) : visualIndex;
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "%p closest visualIndex %d logicalIndex %d\n", this, visualIndex, logicalIndex );
+
   return logicalIndex;
 }
 
