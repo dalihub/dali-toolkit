@@ -30,7 +30,6 @@ namespace Text
 // The type of text renderer required
 enum RenderingType
 {
-  RENDERING_BASIC,       ///< A bitmap-based reference implementation
   RENDERING_SHARED_ATLAS ///< A bitmap-based solution where renderers can share a texture atlas
 };
 

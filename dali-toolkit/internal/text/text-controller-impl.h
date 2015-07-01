@@ -153,6 +153,7 @@ struct EventData
   bool mUpdateRightSelectionPosition    : 1;   ///< True if the visual position of the right selection handle must be recalculated.
   bool mScrollAfterUpdatePosition       : 1;   ///< Whether to scroll after the cursor position is updated.
   bool mScrollAfterDelete               : 1;   ///< Whether to scroll after delete characters.
+  bool mAllTextSelected                 : 1;   ///< True if the selection handles are selecting all the text
 };
 
 struct ModifyEvent
@@ -339,7 +340,11 @@ struct Controller::Impl
 
   void OnSelectAllEvent();
 
-  void RetreiveSelection( std::string& selectedText, bool deleteAfterRetreival );
+  void RetrieveSelection( std::string& selectedText, bool deleteAfterRetreival );
+
+  void ShowClipboard();
+
+  void HideClipboard();
 
   bool CopyStringToClipboard( std::string& source );
 
@@ -350,8 +355,9 @@ struct Controller::Impl
   void RepositionSelectionHandles( CharacterIndex selectionStart, CharacterIndex selectionEnd );
   void RepositionSelectionHandles( float visualX, float visualY );
 
-  void ChangeState( EventData::State newState );
+  void SetPopupButtons();
 
+  void ChangeState( EventData::State newState );
   LineIndex GetClosestLine( float y ) const;
 
   void FindSelectionIndices( float visualX, float visualY, CharacterIndex& startIndex, CharacterIndex& endIndex );

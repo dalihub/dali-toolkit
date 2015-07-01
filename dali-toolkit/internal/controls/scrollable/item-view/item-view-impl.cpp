@@ -1477,7 +1477,6 @@ void ItemView::EnableScrollOvershoot( bool enable )
     mOvershootOverlay.SetColor(mOvershootEffectColor);
     mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
     mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-    mOvershootOverlay.SetDrawMode(DrawMode::OVERLAY);
     self.Add(mOvershootOverlay);
 
     Constraint constraint = Constraint::New<Vector3>( mOvershootOverlay, Actor::Property::SIZE, OvershootOverlaySizeConstraint );

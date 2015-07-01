@@ -23,6 +23,7 @@
 #include <iostream>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
@@ -83,6 +84,17 @@ void Controller::SetText( const std::string& text )
   ResetText();
 
   CharacterIndex lastCursorIndex = 0u;
+
+  if( mImpl->mEventData )
+  {
+    // If popup shown then hide it by switching to Editing state
+    if ( EventData::SELECTING == mImpl->mEventData->mState ||
+         EventData::SELECTION_CHANGED == mImpl->mEventData->mState ||
+         EventData::EDITING_WITH_POPUP == mImpl->mEventData->mState )
+    {
+      mImpl->ChangeState( EventData::EDITING );
+    }
+  }
 
   if( !text.empty() )
   {
@@ -1121,9 +1133,6 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     int keyCode = keyEvent.keyCode;
     const std::string& keyString = keyEvent.keyPressed;
 
-    // Hide the grab handle.
-    mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-
     // Pre-process to separate modifying events from non-modifying input events.
     if( Dali::DALI_KEY_ESCAPE == keyCode )
     {
@@ -1141,29 +1150,12 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     }
     else if( Dali::DALI_KEY_BACKSPACE == keyCode )
     {
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p DALI_KEY_BACKSPACE\n", this );
-
-      // IMF manager is no longer handling key-events
-      mImpl->ClearPreEditFlag();
-
-      // Remove the character before the current cursor position
-      bool removed = RemoveText( -1, 1 );
-
-      if( removed )
-      {
-        if( 0u != mImpl->mLogicalModel->mText.Count() ||
-            !mImpl->IsPlaceholderAvailable() )
-        {
-          mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
-        }
-        else
-        {
-          ShowPlaceholderText();
-          mImpl->mEventData->mUpdateCursorPosition = true;
-        }
-
-        textChanged = true;
-      }
+      textChanged = BackspaceKeyEvent();
+    }
+    else if ( IsKey( keyEvent,  Dali::DALI_KEY_POWER ) || IsKey( keyEvent, Dali::DALI_KEY_MENU ) )
+    {
+      // Do nothing when the Power or Menu Key is pressed.
+      // It avoids call the InsertText() method and delete the selected text.
     }
     else
     {
@@ -1173,7 +1165,6 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       mImpl->ClearPreEditFlag();
 
       InsertText( keyString, COMMIT );
-
       textChanged = true;
     }
 
@@ -1193,7 +1184,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 
 void Controller::InsertText( const std::string& text, Controller::InsertType type )
 {
-  bool removedPreEdit( false );
+  bool removedPrevious( false );
   bool maxLengthReached( false );
 
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected InsertText" )
@@ -1210,10 +1201,15 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
       0 != mImpl->mEventData->mPreEditLength )
   {
     CharacterIndex offset = mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition;
-    removedPreEdit = RemoveText( -static_cast<int>(offset), mImpl->mEventData->mPreEditLength );
+    removedPrevious = RemoveText( -static_cast<int>(offset), mImpl->mEventData->mPreEditLength );
 
     mImpl->mEventData->mPrimaryCursorPosition = mImpl->mEventData->mPreEditStartPosition;
     mImpl->mEventData->mPreEditLength = 0;
+  }
+  else
+  {
+    // Remove the previous Selection
+    removedPrevious = RemoveSelectedText();
   }
 
   if( ! text.empty() )
@@ -1240,6 +1236,8 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     {
       ResetText();
     }
+
+    mImpl->ChangeState( EventData::EDITING );
 
     // Handle the IMF (predicitive text) state changes
     if( mImpl->mEventData )
@@ -1299,7 +1297,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     mImpl->mEventData->mUpdateCursorPosition = true;
     mImpl->ClearPreEditFlag();
   }
-  else if( removedPreEdit ||
+  else if( removedPrevious ||
            0 != utf32Characters.Count() )
   {
     // Queue an inserted event
@@ -1317,6 +1315,26 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   }
 }
 
+bool Controller::RemoveSelectedText()
+{
+  bool textRemoved( false );
+
+  if ( EventData::SELECTING         == mImpl->mEventData->mState ||
+       EventData::SELECTION_CHANGED == mImpl->mEventData->mState )
+  {
+    std::string removedString;
+    mImpl->RetrieveSelection( removedString, true );
+
+    if( !removedString.empty() )
+    {
+      textRemoved = true;
+      mImpl->ChangeState( EventData::EDITING );
+    }
+  }
+
+  return textRemoved;
+}
+
 void Controller::TapEvent( unsigned int tapCount, float x, float y )
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected TapEvent" );
@@ -1326,9 +1344,8 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
     const bool isShowingPlaceholderText = mImpl->IsShowingPlaceholderText();
     if( 1u == tapCount )
     {
-      bool tapDuringEditMode( EventData::EDITING == mImpl->mEventData->mState );
-
-      if( !isShowingPlaceholderText && tapDuringEditMode )
+      if( !isShowingPlaceholderText &&
+          ( EventData::EDITING == mImpl->mEventData->mState ) )
       {
         mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
         mImpl->mEventData->mDecorator->SetPopupActive( false );
@@ -1464,6 +1481,20 @@ void Controller::DecorationEvent( HandleType handleType, HandleState state, floa
   }
 }
 
+void Controller::PasteText( const std::string& stringToPaste )
+{
+  InsertText( stringToPaste, Text::Controller::COMMIT );
+  mImpl->ChangeState( EventData::EDITING );
+  mImpl->RequestRelayout();
+}
+
+void Controller::PasteClipboardItemEvent()
+{
+  ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
+  std::string stringToPaste( notifier.GetContent() );
+  PasteText( stringToPaste );
+}
+
 void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button )
 {
   if( NULL == mImpl->mEventData )
@@ -1501,9 +1532,7 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
     {
       std::string stringToPaste("");
       mImpl->GetTextFromClipboard( 0, stringToPaste ); // Paste latest item from system clipboard
-      InsertText( stringToPaste, Text::Controller::CLIPBOARD );
-      mImpl->ChangeState( EventData::EDITING );
-      mImpl->RequestRelayout();
+      PasteText( stringToPaste );
       break;
     }
     case Toolkit::TextSelectionPopup::SELECT:
@@ -1525,6 +1554,7 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
     }
     case Toolkit::TextSelectionPopup::CLIPBOARD:
     {
+      mImpl->ShowClipboard();
       break;
     }
     case Toolkit::TextSelectionPopup::NONE:
@@ -1600,10 +1630,46 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
   return callbackData;
 }
 
-
 Controller::~Controller()
 {
   delete mImpl;
+}
+
+bool Controller::BackspaceKeyEvent()
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p DALI_KEY_BACKSPACE\n", this );
+
+  // IMF manager is no longer handling key-events
+  mImpl->ClearPreEditFlag();
+
+  bool removed( false );
+
+  if ( EventData::SELECTING         == mImpl->mEventData->mState ||
+       EventData::SELECTION_CHANGED == mImpl->mEventData->mState )
+  {
+    removed = RemoveSelectedText();
+  }
+  else if( mImpl->mEventData->mPrimaryCursorPosition > 0 )
+  {
+    // Remove the character before the current cursor position
+    removed = RemoveText( -1, 1 );
+  }
+
+  if( removed )
+  {
+    if( 0u != mImpl->mLogicalModel->mText.Count() ||
+        !mImpl->IsPlaceholderAvailable() )
+    {
+      mImpl->QueueModifyEvent( ModifyEvent::TEXT_DELETED );
+    }
+    else
+    {
+      ShowPlaceholderText();
+      mImpl->mEventData->mUpdateCursorPosition = true;
+    }
+  }
+
+  return removed;
 }
 
 void Controller::ShowPlaceholderText()

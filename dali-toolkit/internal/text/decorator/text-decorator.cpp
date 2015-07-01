@@ -24,7 +24,6 @@
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/devel-api/actors/mesh-actor.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/stage.h>
@@ -33,8 +32,6 @@
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pan-gesture-detector.h>
-#include <dali/devel-api/geometry/mesh.h>
-#include <dali/devel-api/geometry/mesh-data.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
@@ -42,8 +39,15 @@
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/signals/connection-tracker.h>
 
+#include <dali/devel-api/object/property-buffer.h>
+#include <dali/devel-api/rendering/geometry.h>
+#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/renderer.h>
+#include <dali/devel-api/rendering/shader.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
@@ -54,6 +58,33 @@
 #define DECORATOR_DEBUG
 
 #endif
+
+#define MAKE_SHADER(A)#A
+
+namespace
+{
+const char* VERTEX_SHADER = MAKE_SHADER(
+attribute mediump vec2    aPosition;
+uniform   mediump mat4    uMvpMatrix;
+uniform   mediump vec3    uSize;
+
+void main()
+{
+  mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
+  position.xyz *= uSize;
+  gl_Position = uMvpMatrix * position;
+}
+);
+
+const char* FRAGMENT_SHADER = MAKE_SHADER(
+uniform      lowp vec4 uColor;
+
+void main()
+{
+  gl_FragColor = uColor;
+}
+);
+}
 
 namespace Dali
 {
@@ -235,6 +266,7 @@ struct Decorator::Impl : public ConnectionTracker
     mTextSelectionPopupCallbackInterface( callbackInterface ),
     mBoundingBox( Rect<int>() ),
     mHighlightColor( LIGHT_BLUE ),
+    mHighlightPosition( Vector2::ZERO ),
     mActiveCursor( ACTIVE_CURSOR_NONE ),
     mCursorBlinkInterval( CURSOR_BLINK_INTERVAL ),
     mCursorBlinkDuration( 0.0f ),
@@ -247,8 +279,12 @@ struct Decorator::Impl : public ConnectionTracker
     mCursorBlinkStatus( true ),
     mPrimaryCursorVisible( false ),
     mSecondaryCursorVisible( false ),
-    mSwapSelectionHandles( false )
+    mSwapSelectionHandles( false ),
+    mNotifyEndOfScroll( false )
   {
+    mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
+    mQuadIndexFormat[ "indices" ] = Property::UNSIGNED_INTEGER;
+    mHighlightMaterial = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER ) );
   }
 
   /**
@@ -269,17 +305,6 @@ struct Decorator::Impl : public ConnectionTracker
       if( mPrimaryCursorVisible )
       {
         Vector2 position = cursor.position;
-        if( GRAB_HANDLE == mHandleScrolling )
-        {
-          if( mScrollDirection == SCROLL_RIGHT )
-          {
-            position.x = 0.f;
-          }
-          else
-          {
-            position.x = size.width;
-          }
-        }
 
         mPrimaryCursor.SetPosition( position.x,
                                     position.y );
@@ -305,18 +330,6 @@ struct Decorator::Impl : public ConnectionTracker
     if( grabHandle.active )
     {
       Vector2 position = grabHandle.position;
-
-      if( GRAB_HANDLE == mHandleScrolling )
-      {
-        if( mScrollDirection == SCROLL_RIGHT )
-        {
-          position.x = 0.f;
-        }
-        else
-        {
-          position.x = size.width;
-        }
-      }
 
       const bool isVisible = ( position.x <= size.width ) && ( position.x >= 0.f );
 
@@ -344,29 +357,6 @@ struct Decorator::Impl : public ConnectionTracker
       Vector2 primaryPosition = primary.position;
       Vector2 secondaryPosition = secondary.position;
 
-      if( LEFT_SELECTION_HANDLE == mHandleScrolling )
-      {
-        if( mScrollDirection == SCROLL_RIGHT )
-        {
-          primaryPosition.x = 0.f;
-        }
-        else
-        {
-          primaryPosition.x = size.width;
-        }
-      }
-      else if( RIGHT_SELECTION_HANDLE == mHandleScrolling )
-      {
-        if( mScrollDirection == SCROLL_RIGHT )
-        {
-          secondaryPosition.x = 0.f;
-        }
-        else
-        {
-          secondaryPosition.x = size.width;
-        }
-      }
-
       const bool isPrimaryVisible = ( primaryPosition.x <= size.width ) && ( primaryPosition.x >= 0.f );
       const bool isSecondaryVisible = ( secondaryPosition.x <= size.width ) && ( secondaryPosition.x >= 0.f );
 
@@ -391,6 +381,9 @@ struct Decorator::Impl : public ConnectionTracker
       primary.actor.SetVisible( isPrimaryVisible );
       secondary.actor.SetVisible( isSecondaryVisible );
 
+      // Shouldn't be needed......
+      UnparentAndReset( mHighlightActor );
+
       CreateHighlight();
       UpdateHighlight();
     }
@@ -398,7 +391,7 @@ struct Decorator::Impl : public ConnectionTracker
     {
       UnparentAndReset( primary.actor );
       UnparentAndReset( secondary.actor );
-      UnparentAndReset( mHighlightMeshActor );
+      UnparentAndReset( mHighlightActor );
     }
 
     if ( mActiveCopyPastePopup )
@@ -477,6 +470,7 @@ struct Decorator::Impl : public ConnectionTracker
   void CreateCursor( ImageActor& cursor, const Vector4& color )
   {
     cursor = CreateSolidColorActor( color );
+    cursor.SetSortModifier( DECORATION_DEPTH_INDEX );
     cursor.SetParentOrigin( ParentOrigin::TOP_LEFT ); // Need to set the default parent origin as CreateSolidColorActor() sets a different one.
     cursor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
   }
@@ -491,7 +485,7 @@ struct Decorator::Impl : public ConnectionTracker
     }
     else
     {
-      /* Create Primary and or Secondary Cursor(s) if active and add to parent */
+      // Create Primary and or Secondary Cursor(s) if active and add to parent
       if ( mActiveCursor == ACTIVE_CURSOR_PRIMARY ||
            mActiveCursor == ACTIVE_CURSOR_BOTH )
       {
@@ -590,8 +584,8 @@ struct Decorator::Impl : public ConnectionTracker
       }
 
       grabHandle.actor = ImageActor::New( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] );
+      grabHandle.actor.SetSortModifier( DECORATION_DEPTH_INDEX );
       grabHandle.actor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
-      grabHandle.actor.SetDrawMode( DrawMode::OVERLAY );
       // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
       grabHandle.actor.SetName( "GrabHandleActor" );
@@ -642,7 +636,7 @@ struct Decorator::Impl : public ConnectionTracker
       primary.actor.SetName("SelectionHandleOne");
 #endif
       primary.actor.SetAnchorPoint( AnchorPoint::TOP_RIGHT ); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
-      primary.actor.SetDrawMode( DrawMode::OVERLAY ); // ensure grab handle above text
+      primary.actor.SetSortModifier( DECORATION_DEPTH_INDEX );
       primary.flipped = false;
 
       primary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
@@ -679,7 +673,7 @@ struct Decorator::Impl : public ConnectionTracker
       secondary.actor.SetName("SelectionHandleTwo");
 #endif
       secondary.actor.SetAnchorPoint( AnchorPoint::TOP_LEFT ); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
-      secondary.actor.SetDrawMode( DrawMode::OVERLAY ); // ensure grab handle above text
+      secondary.actor.SetSortModifier( DECORATION_DEPTH_INDEX );
       secondary.flipped = false;
 
       secondary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
@@ -702,118 +696,92 @@ struct Decorator::Impl : public ConnectionTracker
 
   void CreateHighlight()
   {
-    if ( !mHighlightMeshActor )
+    if ( !mHighlightActor )
     {
-      mHighlightMaterial = Material::New( "HighlightMaterial" );
-      mHighlightMaterial.SetDiffuseColor( mHighlightColor );
+      mHighlightActor = Actor::New();
 
-      mHighlightMeshData.SetMaterial( mHighlightMaterial );
-      mHighlightMeshData.SetHasNormals( true );
-
-      mHighlightMesh = Mesh::New( mHighlightMeshData );
-
-      mHighlightMeshActor = MeshActor::New( mHighlightMesh );
 #ifdef DECORATOR_DEBUG
-      mHighlightMeshActor.SetName( "HighlightMeshActor" );
+      mHighlightActor.SetName( "HighlightActor" );
 #endif
-      mHighlightMeshActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      mHighlightActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      mHighlightActor.SetPosition( 0.0f, 0.0f, DISPLAYED_HIGHLIGHT_Z_OFFSET );
+      mHighlightActor.SetSize( 1.0f, 1.0f );
+      mHighlightActor.SetColor( mHighlightColor );
+      mHighlightActor.SetColorMode( USE_OWN_COLOR );
 
       // Add the highlight box telling the controller it needs clipping.
-      mController.AddDecoration( mHighlightMeshActor, true );
+      mController.AddDecoration( mHighlightActor, true );
     }
-
-    mHighlightMeshActor.SetPosition( mHighlightPosition.x, mHighlightPosition.y, DISPLAYED_HIGHLIGHT_Z_OFFSET );
   }
 
   void UpdateHighlight()
   {
-    //  Construct a Mesh with a texture to be used as the highlight 'box' for selected text
-    //
-    //  Example scenarios where mesh is made from 3, 1, 2, 2 ,3 or 3 quads.
-    //
-    //   [ TOP   ]  [ TOP ]      [TOP ]  [ TOP    ]      [ TOP  ]      [ TOP  ]
-    //  [ MIDDLE ]             [BOTTOM]  [BOTTOM]      [ MIDDLE ]   [ MIDDLE  ]
-    //  [ BOTTOM]                                      [ MIDDLE ]   [ MIDDLE  ]
-    //                                                 [BOTTOM]     [ MIDDLE  ]
-    //                                                              [BOTTOM]
-    //
-    //  Each quad is created as 2 triangles.
-    //  Middle is just 1 quad regardless of its size.
-    //
-    //  (0,0)         (0,0)
-    //     0*    *2     0*       *2
-    //     TOP          TOP
-    //     3*    *1     3*       *1
-    //  4*       *1     4*     *6
-    //     MIDDLE         BOTTOM
-    //  6*       *5     7*     *5
-    //  6*    *8
-    //   BOTTOM
-    //  9*    *7
-    //
 
-    if ( mHighlightMesh && mHighlightMaterial && !mHighlightQuadList.empty() )
+    if ( mHighlightActor && !mHighlightQuadList.empty() )
     {
-      MeshData::VertexContainer vertices;
-      Dali::MeshData::FaceIndices faceIndices;
+      Vector< Vector2 > vertices;
+      Vector< unsigned int> indices;
+      Vector2 vertex;
 
       std::vector<QuadCoordinates>::iterator iter = mHighlightQuadList.begin();
       std::vector<QuadCoordinates>::iterator endIter = mHighlightQuadList.end();
 
-      // vertex position defaults to (0 0 0)
-      MeshData::Vertex vertex;
-      // set normal for all vertices as (0 0 1) pointing outward from TextInput Actor.
-      vertex.nZ = 1.0f;
-
       for(std::size_t v = 0; iter != endIter; ++iter,v+=4 )
       {
-        // Add each quad geometry (a sub-selection) to the mesh data.
-
-        // 0-----1
-        // |\    |
-        // | \ A |
-        // |  \  |
-        // | B \ |
-        // |    \|
-        // 2-----3
 
         QuadCoordinates& quad = *iter;
+
         // top-left (v+0)
         vertex.x = quad.min.x;
         vertex.y = quad.min.y;
-        vertices.push_back( vertex );
+        vertices.PushBack( vertex );
 
         // top-right (v+1)
         vertex.x = quad.max.x;
         vertex.y = quad.min.y;
-        vertices.push_back( vertex );
+        vertices.PushBack( vertex );
 
         // bottom-left (v+2)
         vertex.x = quad.min.x;
         vertex.y = quad.max.y;
-        vertices.push_back( vertex );
+        vertices.PushBack( vertex );
 
         // bottom-right (v+3)
         vertex.x = quad.max.x;
         vertex.y = quad.max.y;
-        vertices.push_back( vertex );
+        vertices.PushBack( vertex );
 
         // triangle A (3, 1, 0)
-        faceIndices.push_back( v + 3 );
-        faceIndices.push_back( v + 1 );
-        faceIndices.push_back( v );
+        indices.PushBack( v + 3 );
+        indices.PushBack( v + 1 );
+        indices.PushBack( v );
 
         // triangle B (0, 2, 3)
-        faceIndices.push_back( v );
-        faceIndices.push_back( v + 2 );
-        faceIndices.push_back( v + 3 );
-
-        mHighlightMeshData.SetFaceIndices( faceIndices );
+        indices.PushBack( v );
+        indices.PushBack( v + 2 );
+        indices.PushBack( v + 3 );
       }
 
-      BoneContainer bones(0); // passed empty as bones not required
-      mHighlightMeshData.SetData( vertices, faceIndices, bones, mHighlightMaterial );
-      mHighlightMesh.UpdateMeshData( mHighlightMeshData );
+      PropertyBuffer quadVertices = PropertyBuffer::New( mQuadVertexFormat, vertices.Size() );
+      PropertyBuffer quadIndices = PropertyBuffer::New( mQuadIndexFormat, indices.Size() );
+
+      quadVertices.SetData( &vertices[ 0 ] );
+      quadIndices.SetData( &indices[ 0 ] );
+
+      Geometry quadGeometry = Geometry::New();
+      quadGeometry.AddVertexBuffer( quadVertices );
+      quadGeometry.SetIndexBuffer( quadIndices );
+
+ //     if ( mHighlightRenderer )
+ //     {
+ //       mHighlightRenderer.SetGeometry( quadGeometry );
+ //     }
+ //     else
+ //     {
+        mHighlightRenderer = Dali::Renderer::New( quadGeometry, mHighlightMaterial );
+        mHighlightRenderer.SetDepthIndex( DECORATION_DEPTH_INDEX - 1 );
+ //     }
+      mHighlightActor.AddRenderer( mHighlightRenderer );
     }
   }
 
@@ -866,8 +834,10 @@ struct Decorator::Impl : public ConnectionTracker
     else if( Gesture::Finished  == gesture.state ||
              Gesture::Cancelled == gesture.state )
     {
-      if( mScrollTimer && mScrollTimer.IsRunning() )
+      if( mScrollTimer &&
+          ( mScrollTimer.IsRunning() || mNotifyEndOfScroll ) )
       {
+        mNotifyEndOfScroll = false;
         mHandleScrolling = HANDLE_TYPE_COUNT;
         StopScrollTimer();
         mController.DecorationEvent( type, HANDLE_STOP_SCROLLING, x, y );
@@ -933,7 +903,8 @@ struct Decorator::Impl : public ConnectionTracker
           mHandle[GRAB_HANDLE].actor.SetImage( imagePressed );
         }
       }
-      else if( TouchPoint::Up == point.state )
+      else if( ( TouchPoint::Up == point.state ) ||
+               ( TouchPoint::Interrupted == point.state ) )
       {
         mHandle[GRAB_HANDLE].pressed = false;
         Image imageReleased = mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED];
@@ -966,7 +937,8 @@ struct Decorator::Impl : public ConnectionTracker
           mHandle[LEFT_SELECTION_HANDLE].actor.SetImage( imagePressed );
         }
       }
-      else if( TouchPoint::Up == point.state )
+      else if( ( TouchPoint::Up == point.state ) ||
+               ( TouchPoint::Interrupted == point.state ) )
       {
         mHandle[LEFT_SELECTION_HANDLE].pressed = false;
         Image imageReleased = mHandleImages[flip ? RIGHT_SELECTION_HANDLE : LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED];
@@ -999,7 +971,8 @@ struct Decorator::Impl : public ConnectionTracker
           mHandle[RIGHT_SELECTION_HANDLE].actor.SetImage( imagePressed );
         }
       }
-      else if( TouchPoint::Up == point.state )
+      else if( ( TouchPoint::Up == point.state ) ||
+               ( TouchPoint::Interrupted == point.state ) )
       {
         Image imageReleased = mHandleImages[flip ? LEFT_SELECTION_HANDLE : RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED];
         mHandle[RIGHT_SELECTION_HANDLE].pressed = false;
@@ -1155,6 +1128,16 @@ struct Decorator::Impl : public ConnectionTracker
     return mScrollSpeed;
   }
 
+  void NotifyEndOfScroll()
+  {
+    StopScrollTimer();
+
+    if( mScrollTimer )
+    {
+      mNotifyEndOfScroll = true;
+    }
+  }
+
   /**
    * Creates and starts a timer to scroll the text when handles are close to the edges of the text.
    *
@@ -1213,25 +1196,26 @@ struct Decorator::Impl : public ConnectionTracker
   Layer               mActiveLayer;               ///< Layer for active handles and alike that ensures they are above all else.
   ImageActor          mPrimaryCursor;
   ImageActor          mSecondaryCursor;
-  MeshActor           mHighlightMeshActor;        ///< Mesh Actor to display highlight
 
+  Actor               mHighlightActor;        ///< Actor to display highlight
+  Renderer            mHighlightRenderer;
+  Material            mHighlightMaterial;         ///< Material used for highlight
+  Property::Map       mQuadVertexFormat;
+  Property::Map       mQuadIndexFormat;
   PopupImpl           mCopyPastePopup;
   TextSelectionPopup::Buttons mEnabledPopupButtons; /// Bit mask of currently enabled Popup buttons
   TextSelectionPopupCallbackInterface& mTextSelectionPopupCallbackInterface;
 
   Image               mHandleImages[HANDLE_TYPE_COUNT][HANDLE_IMAGE_TYPE_COUNT];
   Image               mCursorImage;
-  Mesh                mHighlightMesh;             ///< Mesh for highlight
-  MeshData            mHighlightMeshData;         ///< Mesh Data for highlight
-  Material            mHighlightMaterial;         ///< Material used for highlight
 
   CursorImpl          mCursor[CURSOR_COUNT];
   HandleImpl          mHandle[HANDLE_TYPE_COUNT];
   QuadContainer       mHighlightQuadList;         ///< Sub-selections that combine to create the complete selection highlight
-  Vector2             mHighlightPosition;         ///< The position of the highlight actor.
 
   Rect<int>           mBoundingBox;
   Vector4             mHighlightColor;            ///< Color of the highlight
+  Vector2             mHighlightPosition;         ///< The position of the highlight actor.
 
   unsigned int        mActiveCursor;
   unsigned int        mCursorBlinkInterval;
@@ -1241,13 +1225,13 @@ struct Decorator::Impl : public ConnectionTracker
   float               mScrollThreshold;         ///< Defines a square area inside the control, close to the edge. A cursor entering this area will trigger scroll events.
   float               mScrollSpeed;             ///< The scroll speed in pixels per second.
   float               mScrollDistance;          ///< Distance the text scrolls during a scroll interval.
-  unsigned int        mScrollInterval;          ///< Time in milliseconds of a scroll interval.
 
   bool                mActiveCopyPastePopup   : 1;
   bool                mCursorBlinkStatus      : 1; ///< Flag to switch between blink on and blink off.
   bool                mPrimaryCursorVisible   : 1; ///< Whether the primary cursor is visible.
   bool                mSecondaryCursorVisible : 1; ///< Whether the secondary cursor is visible.
   bool                mSwapSelectionHandles   : 1; ///< Whether to swap the selection handle images.
+  bool                mNotifyEndOfScroll      : 1; ///< Whether to notify the end of the scroll.
 };
 
 DecoratorPtr Decorator::New( ControllerInterface& controller,
@@ -1367,6 +1351,20 @@ float Decorator::GetCursorBlinkDuration() const
 void Decorator::SetHandleActive( HandleType handleType, bool active )
 {
   mImpl->mHandle[handleType].active = active;
+
+  if( !active )
+  {
+    // TODO: this is a work-around.
+    // The problem is the handle actor does not receive the touch event with the Interrupt
+    // state when the power button is pressed and the application goes to background.
+    mImpl->mHandle[handleType].pressed = false;
+    Image imageReleased = mImpl->mHandleImages[handleType][HANDLE_IMAGE_RELEASED];
+    ImageActor imageActor = mImpl->mHandle[handleType].actor;
+    if( imageReleased && imageActor )
+    {
+       imageActor.SetImage( imageReleased );
+    }
+  }
 }
 
 bool Decorator::IsHandleActive( HandleType handleType ) const
@@ -1479,6 +1477,11 @@ void Decorator::SetScrollSpeed( float speed )
 float Decorator::GetScrollSpeed() const
 {
   return mImpl->GetScrollSpeed();
+}
+
+void Decorator::NotifyEndOfScroll()
+{
+  mImpl->NotifyEndOfScroll();
 }
 
 Decorator::~Decorator()

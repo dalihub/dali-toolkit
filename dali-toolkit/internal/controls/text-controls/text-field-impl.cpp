@@ -897,6 +897,7 @@ void TextField::OnInitialize()
   // Fill-parent area by default
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
+  self.OnStageSignal().Connect( this, &TextField::OnStageConnect );
 }
 
 void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
@@ -931,35 +932,39 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
       mRenderer = Backend::Get().NewRenderer( mRenderingBackend );
     }
 
-    RenderableActor renderableActor;
-    if( mRenderer )
-    {
-      renderableActor = mRenderer->Render( mController->GetView() );
-    }
-
+    RenderText();
     EnableClipping( (Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy), size );
+  }
+}
 
-    if( renderableActor != mRenderableActor )
+void TextField::RenderText()
+{
+  Actor renderableActor;
+  if( mRenderer )
+  {
+    renderableActor = mRenderer->Render( mController->GetView(), mDepth );
+  }
+
+  if( renderableActor != mRenderableActor )
+  {
+    UnparentAndReset( mRenderableActor );
+    mRenderableActor = renderableActor;
+  }
+
+  if( mRenderableActor )
+  {
+    const Vector2 offset = mController->GetScrollPosition() + mController->GetAlignmentOffset();
+
+    mRenderableActor.SetPosition( offset.x, offset.y );
+
+    // Make sure the actor is parented correctly with/without clipping
+    if( mClipper )
     {
-      UnparentAndReset( mRenderableActor );
-      mRenderableActor = renderableActor;
+      mClipper->GetRootActor().Add( mRenderableActor );
     }
-
-    if( mRenderableActor )
+    else
     {
-      const Vector2 offset = mController->GetScrollPosition() + mController->GetAlignmentOffset();
-
-      mRenderableActor.SetPosition( offset.x, offset.y );
-
-      // Make sure the actor is parented correctly with/without clipping
-      if( mClipper )
-      {
-        mClipper->GetRootActor().Add( mRenderableActor );
-      }
-      else
-      {
-        Self().Add( mRenderableActor );
-      }
+      Self().Add( mRenderableActor );
     }
 
     for( std::vector<Actor>::const_iterator it = mClippingDecorationActors.begin(),
@@ -1001,6 +1006,13 @@ void TextField::OnKeyInputFocusGained()
     imfManager.SetRestoreAfterFocusLost( true );
   }
 
+   ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
+
+   if ( notifier )
+   {
+      notifier.ContentSelectedSignal().Connect( this, &TextField::OnClipboardTextSelected );
+   }
+
   mController->KeyboardFocusGainEvent();
 
   EmitKeyInputFocusSignal( true ); // Calls back into the Control hence done last.
@@ -1022,6 +1034,13 @@ void TextField::OnKeyInputFocusLost()
     imfManager.Deactivate();
 
     imfManager.EventReceivedSignal().Disconnect( this, &TextField::OnImfEvent );
+  }
+
+  ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
+
+  if ( notifier )
+  {
+    notifier.ContentSelectedSignal().Disconnect( this, &TextField::OnClipboardTextSelected );
   }
 
   mController->KeyboardFocusLostEvent();
@@ -1090,6 +1109,18 @@ void TextField::TextChanged()
   mTextChangedSignal.Emit( handle );
 }
 
+void TextField::OnStageConnect( Dali::Actor actor )
+{
+  if ( mHasBeenStaged )
+  {
+    RenderText();
+  }
+  else
+  {
+    mHasBeenStaged = true;
+  }
+}
+
 void TextField::MaxLengthReached()
 {
   Dali::Toolkit::TextField handle( GetOwner() );
@@ -1130,6 +1161,11 @@ void TextField::EnableClipping( bool clipping, const Vector2& size )
   }
 }
 
+void TextField::OnClipboardTextSelected( ClipboardEventNotifier& clipboard )
+{
+  mController->PasteClipboardItemEvent();
+}
+
 void TextField::KeyboardStatusChanged(bool keyboardShown)
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::KeyboardStatusChanged %p keyboardShown %d\n", mController.Get(), keyboardShown );
@@ -1139,6 +1175,15 @@ void TextField::KeyboardStatusChanged(bool keyboardShown)
   {
     mController->KeyboardFocusLostEvent();
   }
+  else
+  {
+    mController->KeyboardFocusGainEvent();
+  }
+}
+
+void TextField::OnStageConnection( unsigned int depth )
+{
+  mDepth = depth;
 }
 
 bool TextField::OnTouched( Actor actor, const TouchEvent& event )
@@ -1149,7 +1194,9 @@ bool TextField::OnTouched( Actor actor, const TouchEvent& event )
 TextField::TextField()
 : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
-  mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP )
+  mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP ),
+  mDepth( 0 ),
+  mHasBeenStaged( false )
 {
 }
 

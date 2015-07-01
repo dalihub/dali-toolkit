@@ -28,90 +28,64 @@ namespace Toolkit
 {
 
 /**
- * @brief IrisEffect is a custom shader effect to achieve iris effects in Image actors
+ * @brief Creates a new IrisEffect
+ *
+ * IrisEffect is a custom shader effect to achieve iris effects in Image actors
+ *
+ * Animatable/Constrainable uniforms:
+ *
+ *  "uRadius"       - The radius of the iris effect in texture coordinate distance,
+ *                    i.e. 0.0 (no circle) to 1.0 (complete circle), to > 1.0 (extending outside of texture).
+ *                    @note For Atlas Textures results may be unpredictable.
+ *
+ *  "uBlendFactor"  - The blend factor of the iris effect. The lower the value, the larger the blending portion
+ *                    (between Opaque & Transparent). Blending will account for 1 / blendFactor of the radius
+ *                    of the texture.
+ *
+ *  "uCenter"       - The center point of the iris (in texture coordinates)
+ *
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API IrisEffect : public ShaderEffect
+inline ShaderEffect CreateIrisEffect()
 {
+  // append the default version
+  std::string vertexShader(
+      "uniform mediump vec2 uCenter;\n"
+      "varying mediump vec2 vRelativePosition;\n"
+      "\n"
+      "void main()\n"
+      "{\n"
+      "    mediump vec4 world = uModelView * vec4(aPosition,1.0);\n"
+      "    gl_Position = uProjection * world;\n"
+      "    \n"
+      "    vTexCoord = aTexCoord;\n"
+      "    vRelativePosition = aTexCoord - uCenter;\n"
+      "}\n");
 
-public:
+  std::string fragmentShader(
+      "uniform mediump float uRadius;                                                           \n"
+      "uniform mediump float uBlendFactor;                                                      \n"
+      "varying mediump vec2 vRelativePosition;                                                  \n"
+      "void main()                                                                      \n"
+      "{                                                                                \n"
+      "   mediump float delta = (length(vRelativePosition) - uRadius);                          \n"
+      "   delta = clamp(0.0 - delta * uBlendFactor, 0.0, 1.0);                          \n"
+      "   gl_FragColor = texture2D(sTexture, vTexCoord) * uColor;                       \n"
+      "   gl_FragColor.a *= delta;                                                      \n"
+      "}                                                                                \n"
+  );
 
-  /**
-   * @brief Create an uninitialized IrisEffect; this can be initialized with IrisEffect::New().
-   *
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  IrisEffect();
+  Dali::ShaderEffect shaderEffect =  Dali::ShaderEffect::New(
+      vertexShader,
+      fragmentShader,
+      ShaderEffect::GeometryHints( ShaderEffect::HINT_BLENDING ));
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~IrisEffect();
+  shaderEffect.SetUniform( "uRadius", 0.0f );
+  shaderEffect.SetUniform( "uBlendFactor", 100.0f );
+  shaderEffect.SetUniform( "uCenter", Vector2(0.5f, 0.5f) );
 
-  /**
-   * @brief Create an initialized IrisEffect.
-   *
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static IrisEffect New();
-
-  /**
-   * @brief Set the radius of the iris effect in texture coordinate distance,
-   * i.e. 0.0 (no circle) to 1.0 (complete circle), to > 1.0 (extending
-   * outside of texture).
-   *
-   * @note For Atlas Textures results may be unpredictable.
-   *
-   * @param [in] radius The new radius.
-   */
-  void SetRadius(float radius);
-
-  /**
-   * @brief Set the blend factor of the iris effect.
-   *
-   * The lower the value, the larger the blending portion
-   * (between Opaque & Transparent)
-   *
-   * Blending will account for 1 / blendFactor of the radius
-   * of the texture.
-   *
-   * @param [in] value The new blend Factor.
-   */
-  void SetBlendFactor(float value);
-
-  /**
-   * @brief Sets the center point of the iris (in texture coordinates).
-   *
-   * @param[in] center The center point.
-   */
-  void SetCenter( const Vector2& center );
-
-  /**
-   * @brief Get the name for the radius property which can be used in Animation APIs.
-   *
-   * @return A std::string containing the property name
-   */
-  const std::string& GetRadiusPropertyName() const;
-
-  /**
-   * @brief Get the name for the blend factor property.
-   *
-   * @return A std::string containing the property name
-   */
-  const std::string& GetBlendFactorPropertyName() const;
-
-  /**
-   * @brief Get the name for the center property.
-   *
-   * @return A std::string containing the property name
-   */
-  const std::string& GetCenterPropertyName() const;
-
-
-private: // Not intended for application developers
-  DALI_INTERNAL IrisEffect(ShaderEffect handle);
-};
+  return shaderEffect;
+}
 
 }
 }

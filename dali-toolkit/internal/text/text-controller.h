@@ -103,8 +103,7 @@ public:
   enum InsertType
   {
     COMMIT,
-    PRE_EDIT,
-    CLIPBOARD
+    PRE_EDIT
   };
 
   /**
@@ -504,6 +503,12 @@ public:
   void InsertText( const std::string& text, InsertType type );
 
   /**
+   * @brief Checks if text is selected and if so removes it.
+   * @return true if text was removed
+   */
+  bool RemoveSelectedText();
+
+  /**
    * @brief Called by editable UI controls when a tap gesture occurs.
    * @param[in] tapCount The number of taps.
    * @param[in] x The x position relative to the top-left of the parent control.
@@ -540,6 +545,17 @@ public:
   ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
 
   /**
+   * @brief Paste given string into Text model
+   * @param[in] stringToPaste this string will be inserted into the text model
+   */
+  void PasteText( const std::string& stringToPaste );
+
+  /**
+   * @brief Event from Clipboard notifying an Item has been selected for pasting
+   */
+  void PasteClipboardItemEvent();
+
+  /**
    * @copydoc Dali::Toolkit::Text::Decorator::ControllerInterface::GetTargetSize()
    */
   virtual void GetTargetSize( Vector2& targetSize );
@@ -567,6 +583,13 @@ protected:
   virtual ~Controller();
 
 private:
+
+  /**
+   * @brief Helper to KeyEvent() to handle the backspace case.
+   *
+   * @return True if a character was deleted.
+   */
+  bool BackspaceKeyEvent();
 
   /**
    * @brief Helper to clear font-specific data.

@@ -102,7 +102,7 @@ private:
 private: // From Internal::Control
 
   virtual void OnInitialize();
-  virtual void OnActivated();
+  virtual bool OnAccessibilityActivated();
   virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
   virtual void OnPinch(const PinchGesture& pinch);
   virtual void OnPan(const PanGesture& pan);
@@ -111,7 +111,7 @@ private: // From Internal::Control
 
 private: // From CustomActorImpl
 
-  virtual void OnStageConnection();
+  virtual void OnStageConnection( unsigned int depth );
   virtual void OnStageDisconnection();
   virtual void OnChildAdd(Actor& child);
   virtual void OnChildRemove(Actor& child);

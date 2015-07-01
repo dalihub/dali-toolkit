@@ -101,16 +101,18 @@ public:
    *
    * @param[in] sourceCode The buffer containing javascript to execute
    * @param[in] sourceFileName Filename associated with the buffer (for error tracing)
+   * @return true on success, false on failure
    */
-  void ExecuteBuffer(const std::string &sourceCode, const std::string &sourceFileName);
+  bool ExecuteBuffer(const std::string &sourceCode, const std::string &sourceFileName);
 
 
   /**
    * Excute the buffer in the v8 context
    *
    * @param[in] sourceFileName Filename associated with the buffer (for error tracing)
+   * @return true on success, false on failure
    */
-  void ExecuteFile( const std::string& sourceFileName);
+  bool ExecuteFile( const std::string& sourceFileName);
 
 
   /**

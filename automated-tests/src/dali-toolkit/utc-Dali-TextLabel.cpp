@@ -177,8 +177,8 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::UNDERLINE_COLOR ), Color::BLACK, TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::UNDERLINE_HEIGHT ), 0.0f, TEST_LOCATION );
 
-  label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_BASIC );
-  DALI_TEST_EQUALS( label.GetProperty<unsigned int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_BASIC, TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
+  DALI_TEST_EQUALS( label.GetProperty<unsigned int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
 
   // Check that text can be correctly reset
   label.SetProperty( TextLabel::Property::TEXT, "Setting Text" );
@@ -229,35 +229,6 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   END_TEST;
 }
 
-int UtcDaliToolkitTextlabelBasicRenderP(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliToolkitTextLabelBasicRenderP");
-  TextLabel label = TextLabel::New("Test Text");
-  DALI_TEST_CHECK( label );
-
-  // Avoid a crash when core load gl resources.
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-
-  Stage::GetCurrent().Add( label );
-
-  label.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "BEGIN" );
-  label.SetProperty( TextLabel::Property::MULTI_LINE, true );
-
-  try
-  {
-    // Render some text with the basic backend
-    label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_BASIC );
-    application.SendNotification();
-    application.Render();
-  }
-  catch( ... )
-  {
-    tet_result(TET_FAIL);
-  }
-  END_TEST;
-}
-
 int UtcDaliToolkitTextlabelAtlasRenderP(void)
 {
   ToolkitTestApplication application;
@@ -289,6 +260,7 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
   {
     tet_result(TET_FAIL);
   }
+
   END_TEST;
 }
 

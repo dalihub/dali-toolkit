@@ -279,8 +279,9 @@ private:
   /**
    * Perform the click action to click the button.
    * @param[in] attributes The attributes to perfrom this action.
+   * @return true if this control can perform action.
    */
-  void DoClickAction( const Property::Map& attributes );
+  bool DoClickAction( const Property::Map& attributes );
 
   /**
    * This method is called after the button initialization.
@@ -454,9 +455,14 @@ private: // From Control
   virtual void OnInitialize();
 
   /**
-   * @copydoc Toolkit::Control::OnActivated()
+   * @copydoc Toolkit::Control::OnAccessibilityActivated()
    */
-  virtual void OnActivated();
+  virtual bool OnAccessibilityActivated();
+
+  /**
+   * @copydoc Toolkit::Control::OnKeyboardEnter()
+   */
+  virtual bool OnKeyboardEnter();
 
   /**
    * Callback received when the button is disconnected from the stage.

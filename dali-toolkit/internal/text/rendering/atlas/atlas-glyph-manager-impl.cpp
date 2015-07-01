@@ -21,6 +21,64 @@
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/common/stage.h>
 
+#define MAKE_SHADER(A)#A
+
+namespace
+{
+const char* VERTEX_SHADER = MAKE_SHADER(
+attribute mediump vec2    aPosition;
+attribute mediump vec2    aTexCoord;
+uniform   mediump mat4    uMvpMatrix;
+uniform   mediump vec3    uSize;
+varying   mediump vec2    vTexCoord;
+
+void main()
+{
+  mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
+  position.xyz *= uSize;
+  gl_Position = uMvpMatrix * position;
+  vTexCoord = aTexCoord;
+}
+);
+
+const char* FRAGMENT_SHADER = MAKE_SHADER(
+uniform         sampler2D sTexture;
+varying mediump vec2      vTexCoord;
+
+void main()
+{
+  gl_FragColor = texture2D( sTexture, vTexCoord );
+}
+);
+
+const char* VERTEX_SHADER_SHADOW = MAKE_SHADER(
+attribute mediump vec2    aPosition;
+attribute mediump vec2    aTexCoord;
+uniform   mediump vec3    uSize;
+varying   mediump vec2    vTexCoord;
+
+void main()
+{
+  mediump vec4 position = vec4( aPosition, 0.0, 1.0 );
+  position.xyz *= uSize;
+  gl_Position = position;
+  vTexCoord = aTexCoord;
+}
+);
+
+const char* FRAGMENT_SHADER_SHADOW = MAKE_SHADER(
+uniform         sampler2D sTexture;
+uniform lowp    vec4      uColor;
+varying mediump vec2      vTexCoord;
+
+void main()
+{
+  mediump vec4 color = texture2D( sTexture, vTexCoord );
+  gl_FragColor = vec4(uColor.rgb, uColor.a*color.r);
+}
+);
+}
+
 namespace Dali
 {
 
@@ -30,12 +88,11 @@ namespace Toolkit
 namespace Internal
 {
 
-//#define DISPLAY_ATLAS
-
 AtlasGlyphManager::AtlasGlyphManager()
-: mCount( 0 )
 {
   mAtlasManager = Dali::Toolkit::AtlasManager::New();
+  mEffectBufferShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+  mShadowShader = Shader::New( VERTEX_SHADER_SHADOW, FRAGMENT_SHADER_SHADOW, Dali::Shader::HINT_MODIFIES_GEOMETRY );
 }
 
 AtlasGlyphManager::~AtlasGlyphManager()
@@ -93,36 +150,18 @@ void AtlasGlyphManager::Add( Text::FontId fontId,
     fontGlyphRecord.mGlyphRecords.PushBack( record );
     mFontGlyphRecords.push_back( fontGlyphRecord );
   }
-
-#ifdef DISPLAY_ATLAS
-  {
-    uint32_t atlasCount = mAtlasManager.GetAtlasCount();
-    if ( atlasCount > mCount )
-    {
-      for ( uint32_t i = 0; i < atlasCount; ++i )
-      {
-        ImageActor actor = ImageActor::New( mAtlasManager.GetAtlasContainer( i + 1u ) );
-        actor.SetParentOrigin( Vector3( 0.5f, 0.25f + ( static_cast< float >( i ) * 0.25f ), 0.5f ) );
-        actor.SetAnchorPoint( AnchorPoint::CENTER );
-        actor.SetSize( 256.0f, 256.0f );
-        Stage::GetCurrent().Add( actor );
-      }
-    }
-    mCount = atlasCount;
-  }
-#endif
 }
 
 void AtlasGlyphManager::GenerateMeshData( uint32_t imageId,
                                           const Vector2& position,
-                                          MeshData& meshData )
+                                          Toolkit::AtlasManager::Mesh2D& mesh )
 {
   // Generate mesh data and tell Atlas Manager not to handle reference counting ( we'll do it )
-  mAtlasManager.GenerateMeshData( imageId, position, meshData, false );
+  mAtlasManager.GenerateMeshData( imageId, position, mesh, false );
 }
 
-void AtlasGlyphManager::StitchMesh( MeshData& first,
-                                    const MeshData& second )
+void AtlasGlyphManager::StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
+                                    const Toolkit::AtlasManager::Mesh2D& second )
 {
   mAtlasManager.StitchMesh( first, second );
 }
@@ -207,6 +246,16 @@ void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, uint32_t imag
       }
     }
   }
+}
+
+Material AtlasGlyphManager::GetMaterial( uint32_t atlasId ) const
+{
+  return mAtlasManager.GetMaterial( atlasId );
+}
+
+Sampler AtlasGlyphManager::GetSampler( uint32_t atlasId ) const
+{
+  return mAtlasManager.GetSampler( atlasId );
 }
 
 } // namespace Internal

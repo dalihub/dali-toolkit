@@ -42,6 +42,17 @@ namespace ImageActorApi
    */
   void SetImage( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetImage( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void SetSortModifier( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void GetSortModifier( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void SetCullFace( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void GetCullFace( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void SetBlendMode( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void GetBlendMode( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void SetBlendFunc( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void GetBlendFunc( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void GetShaderEffect( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void SetShaderEffect( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void RemoveShaderEffect( const v8::FunctionCallbackInfo< v8::Value >& args );
 }; // namespace ImageActorApi
 
 } // namespace V8Plugin

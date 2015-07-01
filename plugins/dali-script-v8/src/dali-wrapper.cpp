@@ -143,16 +143,16 @@ void DaliWrapper::Shutdown()
   }
 }
 
-void DaliWrapper::ExecuteBuffer(const std::string &sourceCode, const std::string &sourceFileName)
+bool DaliWrapper::ExecuteBuffer(const std::string &sourceCode, const std::string &sourceFileName)
 {
-  mModuleLoader.ExecuteScript( mIsolate,  sourceCode, sourceFileName );
+  return mModuleLoader.ExecuteScript( mIsolate,  sourceCode, sourceFileName );
 }
 
-void DaliWrapper::ExecuteFile( const std::string& sourceFileName )
+bool DaliWrapper::ExecuteFile( const std::string& sourceFileName )
 {
   DALI_LOG_INFO( gLogExecuteFilter, Debug::Verbose, "Executing source file %s \n",sourceFileName.c_str() );
 
-  mModuleLoader.ExecuteScriptFromFile( mIsolate,  sourceFileName );
+  return mModuleLoader.ExecuteScriptFromFile( mIsolate,  sourceFileName );
 }
 
 GarbageCollectorInterface& DaliWrapper::GetDaliGarbageCollector()

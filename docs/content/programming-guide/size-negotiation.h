@@ -244,7 +244,7 @@ PushButton, OKAY_BUTTON - Pos: [185, 0, 0.1] Size: [165, 76, 76], Dirty: (FALSE,
 
 The format is as follows:
 
-[Actor type], [Actor name] – Pos:[X, Y, Z] Size[Dimension::WIDTH, Dimension::HEIGHT, DEPTH], Dirty:(Dimension::WIDTH, Dimension::HEIGHT), Negotiated: (Dimension::WIDTH, Dimension::HEIGHT), Enabled: BOOLEAN, (Object address)
+[Actor type], [Actor name] ? Pos:[X, Y, Z] Size[Dimension::WIDTH, Dimension::HEIGHT, DEPTH], Dirty:(Dimension::WIDTH, Dimension::HEIGHT), Negotiated: (Dimension::WIDTH, Dimension::HEIGHT), Enabled: BOOLEAN, (Object address)
 - <i>Actor type</i>: The type name of the actor E.g. PushButton
 - <i>Actor name</i>: The name set on the actor with SetName(). Useful for debugging.
 - <i>Pos</i>: The position of the actor

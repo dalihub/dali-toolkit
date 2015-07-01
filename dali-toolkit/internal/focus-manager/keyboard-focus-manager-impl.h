@@ -125,9 +125,9 @@ public:
   Toolkit::KeyboardFocusManager::FocusGroupChangedSignalType& FocusGroupChangedSignal();
 
   /**
-   * @copydoc Toolkit::KeyboardFocusManager::FocusedActorActivatedSignal()
+   * @copydoc Toolkit::KeyboardFocusManager::FocusedActorEnterKeySignal()
    */
-  Toolkit::KeyboardFocusManager::FocusedActorActivatedSignalType& FocusedActorActivatedSignal();
+  Toolkit::KeyboardFocusManager::FocusedActorEnterKeySignalType& FocusedActorEnterKeySignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -183,11 +183,11 @@ private:
   bool DoMoveFocusToNextFocusGroup(bool forward);
 
   /**
-   * Activate the actor. If the actor is control, call OnActivated virtual function.
-   * This function will emit FocusedActorActivatedSignal.
-   * @param actor The actor to activate
+   * Enter has been pressed on the actor. If the actor is control, call the OnKeybaordEnter virtual function.
+   * This function will emit FocusedActorEnterKeySignal.
+   * @param actor The actor to notify
    */
-  void DoActivate(Actor actor);
+  void DoKeyboardEnter( Actor actor );
 
   /**
    * Create the default indicator actor to highlight the focused actor.
@@ -243,7 +243,7 @@ private:
   Toolkit::KeyboardFocusManager::PreFocusChangeSignalType mPreFocusChangeSignal; ///< The signal to notify the focus will be changed
   Toolkit::KeyboardFocusManager::FocusChangedSignalType mFocusChangedSignal; ///< The signal to notify the focus change
   Toolkit::KeyboardFocusManager::FocusGroupChangedSignalType mFocusGroupChangedSignal; ///< The signal to notify the focus group change
-  Toolkit::KeyboardFocusManager::FocusedActorActivatedSignalType mFocusedActorActivatedSignal; ///< The signal to notify the activation of focused actor
+  Toolkit::KeyboardFocusManager::FocusedActorEnterKeySignalType mFocusedActorEnterKeySignal; ///< The signal to notify that enter has been pressed on the focused actor
 
   unsigned int mCurrentFocusActor; ///< The actor ID of current focused actor
 

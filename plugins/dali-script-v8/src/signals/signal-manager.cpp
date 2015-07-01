@@ -70,7 +70,7 @@ const char* const SIGNAL_IMAGE_UPLOADED = "uploaded";
 const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_PRE_FOCUS_CHANGE = "keyboard-pre-focus-change";
 const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUS_CHANGED = "keyboard-focus-changed";
 const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUS_GROUP_CHANGED = "keyboard-focus-group-changed";
-const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUSED_ACTOR_ACTIVATED = "keyboard-focused-actor-activated";
+const char* const KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUSED_ACTOR_ENTER_KEY = "keyboard-focused-actor-enter-key";
 const unsigned int MAX_SIGNAL_NAME_LENGTH = 64;
 
 } // un-named name space
@@ -345,11 +345,11 @@ public:
     arguments.push_back( forward );
     CallJavaScript( returnValue, arguments );
   }
-  void FocusedActorSignal( Actor activatedActor )
+  void EnterKeyPressedActorSignal( Actor enterKeyPressedActor )
   {
     std::vector< Dali::Any > arguments;
     Dali::Any returnValue;   //no return
-    arguments.push_back( activatedActor );
+    arguments.push_back( enterKeyPressedActor );
     CallJavaScript( returnValue, arguments );
   }
 };
@@ -517,9 +517,9 @@ void KeyboardFocusManagerConnection( v8::Isolate* isolate,
   {
     keyboardFocusManager.FocusGroupChangedSignal().Connect( callback, &KeyboardFocusCallback::FocusGroupSignal );
   }
-  else if ( strcmp( signalName.c_str(), KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUSED_ACTOR_ACTIVATED ) == 0 )
+  else if ( strcmp( signalName.c_str(), KEYBOARD_FOCUS_MANAGER_SIGNAL_FOCUSED_ACTOR_ENTER_KEY ) == 0 )
   {
-    keyboardFocusManager.FocusedActorActivatedSignal().Connect( callback, &KeyboardFocusCallback::FocusedActorSignal );
+    keyboardFocusManager.FocusedActorEnterKeySignal().Connect( callback, &KeyboardFocusCallback::EnterKeyPressedActorSignal );
   }
   else
   {

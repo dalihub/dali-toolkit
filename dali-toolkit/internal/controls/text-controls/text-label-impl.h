@@ -98,6 +98,11 @@ private: // From Control
   virtual void AddDecoration( Actor& actor, bool needsClipping );
 
   /**
+   * @copydoc Control::OnStageConnection()
+   */
+  virtual void OnStageConnection( unsigned int depth );
+
+  /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
    */
   virtual void RequestTextRelayout();
@@ -130,13 +135,22 @@ private:
   TextLabel(const TextLabel&);
   TextLabel& operator=(const TextLabel& rhs);
 
+  // Connection needed to re-render text, when a Text Label returns to the stage
+  void OnStageConnect( Dali::Actor actor );
+
+  /**
+   * @brief Render view, create and attach actor(s) to this Text Label
+   */
+  void RenderText();
+
 private: // Data
 
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
-  RenderableActor mRenderableActor;
-
+  Actor mRenderableActor;
   int mRenderingBackend;
+  unsigned int mDepth;
+  bool mHasBeenStaged:1;
 };
 
 } // namespace Internal

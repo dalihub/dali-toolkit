@@ -17,9 +17,9 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <dali/devel-api/rendering/renderer.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/tap-gesture-event.h>
-#include <dali/devel-api/actors/mesh-actor.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/styling/style-manager.h>
@@ -293,8 +293,8 @@ int UtcDaliTextFieldSetPropertyP(void)
   DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::SELECTION_HIGHLIGHT_COLOR ), LIGHT_BLUE, TEST_LOCATION );
 
   // Check the render backend property.
-  field.SetProperty( TextField::Property::RENDERING_BACKEND, Text::RENDERING_BASIC );
-  DALI_TEST_EQUALS( field.GetProperty<unsigned int>( TextField::Property::RENDERING_BACKEND ), Text::RENDERING_BASIC, TEST_LOCATION );
+  field.SetProperty( TextField::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
+  DALI_TEST_EQUALS( field.GetProperty<unsigned int>( TextField::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
 
   // Check text property.
   field.SetProperty( TextField::Property::TEXT, "Setting Text" );
@@ -384,34 +384,6 @@ int UtcDaliTextFieldSetPropertyP(void)
   field.SetProperty( TextField::Property::DECORATION_BOUNDING_BOX, Rect<int>( 0, 0, 1, 1 ) );
   DALI_TEST_EQUALS( field.GetProperty<Rect <int > >( TextField::Property::DECORATION_BOUNDING_BOX ), Rect<int>( 0, 0, 1, 1 ), TEST_LOCATION );
 
-  END_TEST;
-}
-
-// Positive Basic Text Renderer test
-int utcDaliTextFieldBasicRenderP(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliToolkitTextFieldBasicRenderP");
-  TextField field = TextField::New();
-  DALI_TEST_CHECK( field );
-
-  field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "BEGIN" );
-
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-
-  Stage::GetCurrent().Add( field );
-
-  try
-  {
-    // Render some text with the basic backend
-    field.SetProperty( TextField::Property::RENDERING_BACKEND, Text::RENDERING_BASIC );
-    application.SendNotification();
-    application.Render();
-  }
-  catch( ... )
-  {
-    tet_result(TET_FAIL);
-  }
   END_TEST;
 }
 
@@ -696,7 +668,7 @@ int utcDaliTextFieldEvent02(void)
   CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
   DALI_TEST_CHECK( camera );
 
-  RenderableActor renderer = RenderableActor::DownCast( offscreenRoot.GetChildAt( 1u ) );
+  Renderer renderer = offscreenRoot.GetChildAt( 1u ).GetRendererAt( 0u );
   DALI_TEST_CHECK( renderer );
 
   // Move the cursor and check the position changes.
@@ -763,7 +735,7 @@ int utcDaliTextFieldEvent02(void)
   // Cursor position should be the same than position2.
   Vector3 position6 = cursor.GetCurrentPosition();
 
-  DALI_TEST_EQUALS( Vector3( 0.f, position2.y, position2.z ), position6, TEST_LOCATION ); // TODO Should be in the same position2.
+  DALI_TEST_EQUALS( position2, position6, TEST_LOCATION );// Should be in the same position2.
 
   // Should not be renderer.
   DALI_TEST_EQUALS( offscreenRoot.GetChildCount(), 1u, TEST_LOCATION ); // The camera actor only.
@@ -818,10 +790,10 @@ int utcDaliTextFieldEvent03(void)
   CameraActor camera = CameraActor::DownCast( offscreenRoot.GetChildAt( 0u ) );
   DALI_TEST_CHECK( camera );
 
-  RenderableActor renderer = RenderableActor::DownCast( offscreenRoot.GetChildAt( 1u ) );
+  Renderer renderer = offscreenRoot.GetChildAt( 1u ).GetRendererAt( 0u );
   DALI_TEST_CHECK( renderer );
 
-  MeshActor highlight = MeshActor::DownCast( offscreenRoot.GetChildAt( 2u ) );
+  Renderer highlight = offscreenRoot.GetChildAt( 2u ).GetRendererAt( 0u );
   DALI_TEST_CHECK( highlight );
 
   END_TEST;

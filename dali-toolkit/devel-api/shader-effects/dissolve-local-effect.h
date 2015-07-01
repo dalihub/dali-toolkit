@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
+#include <sstream>
 
 namespace Dali
 {
@@ -28,102 +29,88 @@ namespace Toolkit
 {
 
 /**
+ * @brief Create a new DissolveLocalEffect
+ *
  * DissolveLocalEffect is a custom shader effect to achieve Dissolve effects in multiple small areas of Image actors
+ *
+ * Animatable/Constrainable uniforms:
+ *  "uTransparency"
+ *  "uCenter"     - The center positions of each dimples
+ *  "uRadius"     - The propagation radius of each dimple
+ *  "uPercentage" - The distortion applied to the effect texture. A value of zero means no distortion
+ *
+ * @param[in] numberOfDimples The number of dimples
+ * @return A handle to a newly allocated ShaderEffect
  */
-class DALI_IMPORT_API DissolveLocalEffect : public ShaderEffect
+inline ShaderEffect CreateDissolveLocalEffect( unsigned int numberOfDimples )
 {
-public:
+  std::ostringstream vertexShaderStringStream;
+  vertexShaderStringStream << "#define NUMBER_OF_DIMPLE "<< numberOfDimples << "\n";
+  std::string vertexShader(
+      "precision highp float;\n"
+      "uniform vec2 uCenter[ NUMBER_OF_DIMPLE ];\n"
+      "uniform float uRadius[ NUMBER_OF_DIMPLE ]; \n"
+      "uniform float uPercentage[ NUMBER_OF_DIMPLE ]; \n"
+      "varying float vPercentage;\n"
+      "void main()\n"
+      "{\n"
+      "  vec4 position = uModelView * vec4( aPosition, 1.0 );\n"
+      "  float percentage = 0.0;\n"
+      "  for( int i=0; i<NUMBER_OF_DIMPLE; ++i )\n"
+      "  {\n"
+      "    float distance = distance(uCenter[i], position.xy);\n"
+      "    percentage = max(percentage, uPercentage[i] * cos(clamp( distance/uRadius[i], 0.0, 1.0 )*1.57) );"
+      "  }\n"
+      "  vPercentage = clamp( percentage, 0.0, 1.0 );\n"
+      "  gl_Position = uProjection * position;\n"
+      "  vTexCoord = aTexCoord;\n"
+      "}\n");
+  vertexShaderStringStream << vertexShader;
 
-  /**
-   * Create an uninitialized DissolveLocalEffect; this can be initialized with DissolveLocalEffect::New()
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
-   */
-  DissolveLocalEffect();
+  std::string fragmentShader(
+      "precision highp float;\n"
+      "uniform float uTransparency;\n"
+      "varying float vPercentage;\n"
+      "float rand(vec2 co) \n"
+      "{\n"
+      "  return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); \n"
+      "}\n"
+      "void main()\n"
+      "{\n"
+      //Calculate the randomness
+      "  float offsetS = rand( vTexCoord * vPercentage ); \n"
+      "  float offsetT = rand( vec2(vTexCoord.t*vPercentage, vTexCoord.s * vPercentage) ); \n"
+      "  vec2 lookupCoord = vTexCoord + vec2(offsetS, offsetT) * vPercentage; \n"
+      "  gl_FragColor = texture2D( sTexture, lookupCoord ) * uColor; \n"
+      "  gl_FragColor.a *= 1.0 - uTransparency*vPercentage; \n"
+      "}\n");
 
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~DissolveLocalEffect();
+  ShaderEffect shaderEffect = ShaderEffect::New(
+      vertexShaderStringStream.str(), fragmentShader,
+      ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_BLENDING ) );
 
-  /**
-   * Create an initialized DissolveLocalEffect.
-   * @param[in] numberOfDimples The number of dimples
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static DissolveLocalEffect New( unsigned int numberOfDimples );
+  //Register uniform properties
+  std::ostringstream oss;
+  for( unsigned int i = 0; i < numberOfDimples; i++ )
+  {
+    oss.str("");
+    oss<< "uCenter["<< i << "]";
+    shaderEffect.SetUniform(oss.str(), Vector2(0.f,0.f));
 
-  /**
-   * Get the number of dimples the shader supports.
-   * @return The number of dimples in the shader.
-   */
-  unsigned int GetNumberOfDimples() const;
+    oss.str("");
+    oss<< "uRadius["<< i << "]";
+    shaderEffect.SetUniform(oss.str(), 0.f);
 
-  /**
-  * Set the transparency of the drifted pixels.
-  * @param[in] transparency The transparency of the drifted pixels.
-  */
-  void SetTransparency( float transparency);
+    oss.str("");
+    oss<< "uPercentage["<< i << "]";
+    shaderEffect.SetUniform( oss.str(), 0.f );
+  }
 
-  /**
-   * Set the certer position of a dimple.
-   * @param[in] index The index of the dimple to change.
-   * @param[in] center The center position of the dimple.
-   * @pre index has to be between 0 and GetNumberOfDimples() - 1
-   */
-  void SetCenter( unsigned int index, const Vector2& center );
+  shaderEffect.SetProperty( ShaderEffect::Property::GRID_DENSITY, Dali::Property::Value(5.f) );
+  shaderEffect.SetUniform( "uTransparency", 0.5f );
 
-  /**
-   * Set the propogation radius of a dimple.
-   * @param[in] index The index of the dimple to change.
-   * @param[in] radius The propagation radius of the dimple.
-   * @pre index has to be between 0 and GetNumberOfDimples() - 1
-   */
-  void SetRadius( unsigned int index, float radius );
-
-  /**
-   * Sets the distortion applied to the effect texture.
-   * This value is proportional to the distortion applied; a value of zero means no distortion.
-   * @param[in] index The index of the dimple to change.
-   * @param[in] distortion The distortion value.
-   * @pre index has to be between 0 and GetNumberOfDimples() - 1
-   */
-  void SetDistortion( unsigned int index, float distortion );
-
-  /**
-   * Get the name of the center property of a dimple.
-   * @param[in] index The index of the dimple.
-   * @return A std::string containing the property name.
-   * @pre index has to be between 0 and GetNumberOfDimples() - 1
-   */
-  std::string GetCenterPropertyName( unsigned int index ) const;
-
-  /**
-   * Get the name of the radius property of a dimple.
-   * @param[in] index The index of the dimple.
-   * @return A std::string containing the property name
-   * @pre index has to be between 0 and GetNumberOfDimples() - 1
-   */
-  std::string GetRadiusPropertyName( unsigned int index ) const;
-
-  /**
-   * Get the name for the distortion property of a dimple
-   * @param[in] index the index of a dimple.
-   * @return A std::string containing the property name
-   * @pre index has to be between 0 and GetNumberOfDimples() - 1
-   */
-  std::string GetDistortionPropertyName( unsigned int index ) const;
-
-private: // Not intended for application developers
-
-  DALI_INTERNAL DissolveLocalEffect( ShaderEffect handle );
-
-private:
-
-  unsigned int mNumberOfDimples;  ///< The number of dimples the shader supports
-
-};
+  return shaderEffect;
+}
 
 } // namespace Toolkit
 

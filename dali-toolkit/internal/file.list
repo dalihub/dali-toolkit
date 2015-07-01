@@ -15,6 +15,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/alignment/alignment-impl.cpp \
    $(toolkit_src_dir)/controls/bloom-view/bloom-view-impl.cpp \
    $(toolkit_src_dir)/controls/bubble-effect/bubble-emitter-impl.cpp \
+   $(toolkit_src_dir)/controls/bubble-effect/bubble-actor.cpp \
    $(toolkit_src_dir)/controls/buttons/button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/check-box-button-impl.cpp \
    $(toolkit_src_dir)/controls/buttons/push-button-impl.cpp \
@@ -25,6 +26,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/popup/popup-impl.cpp \
    $(toolkit_src_dir)/controls/popup/popup-style-impl.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-portrait-view-impl.cpp \
+   $(toolkit_src_dir)/controls/page-turn-view/page-turn-effect.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-landscape-view-impl.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-view-impl.cpp \
    $(toolkit_src_dir)/controls/scroll-bar/scroll-bar-impl.cpp \
@@ -48,15 +50,13 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/text-controls/text-selection-popup-impl.cpp \
    $(toolkit_src_dir)/controls/text-controls/text-selection-toolbar-impl.cpp \
    $(toolkit_src_dir)/controls/tool-bar/tool-bar-impl.cpp \
-   $(toolkit_src_dir)/focus-manager/accessibility-focus-manager-impl.cpp \
+   $(toolkit_src_dir)/accessibility-manager/accessibility-manager-impl.cpp \
    $(toolkit_src_dir)/focus-manager/keyboard-focus-manager-impl.cpp \
    $(toolkit_src_dir)/focus-manager/keyinput-focus-manager-impl.cpp \
    $(toolkit_src_dir)/filters/blur-two-pass-filter.cpp \
    $(toolkit_src_dir)/filters/emboss-filter.cpp \
    $(toolkit_src_dir)/filters/image-filter.cpp \
    $(toolkit_src_dir)/filters/spread-filter.cpp \
-   $(toolkit_src_dir)/shader-effects/page-turn-effect-impl.cpp \
-   $(toolkit_src_dir)/shader-effects/water-effect-impl.cpp \
    $(toolkit_src_dir)/styling/style-manager-impl.cpp \
    $(toolkit_src_dir)/text/bidirectional-support.cpp \
    $(toolkit_src_dir)/text/character-set-conversion.cpp \
@@ -80,7 +80,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/rendering/atlas/text-atlas-renderer.cpp \
    $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager.cpp \
    $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager-impl.cpp \
-   $(toolkit_src_dir)/text/rendering/basic/text-basic-renderer.cpp \
    $(toolkit_src_dir)/text/rendering/shaders/text-basic-shader.cpp \
    $(toolkit_src_dir)/text/rendering/shaders/text-basic-shadow-shader.cpp \
    $(toolkit_src_dir)/text/rendering/shaders/text-bgra-shader.cpp \

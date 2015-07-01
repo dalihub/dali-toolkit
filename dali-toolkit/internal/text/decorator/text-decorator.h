@@ -467,18 +467,9 @@ public:
   float GetScrollSpeed() const;
 
   /**
-   * @brief Sets the scroll interval.
-   *
-   * @param[in] seconds The scroll interval in seconds.
+   * @brief Notifies the decorator the whole text has been scrolled.
    */
-  void SetScrollTickInterval( float seconds );
-
-  /**
-   * @brief Retrieves the scroll interval.
-   *
-   * @return The scroll interval.
-   */
-  float GetScrollTickInterval() const;
+  void NotifyEndOfScroll();
 
 protected:
 

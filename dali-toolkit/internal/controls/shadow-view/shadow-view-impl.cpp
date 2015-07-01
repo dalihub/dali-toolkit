@@ -240,7 +240,6 @@ void ShadowView::OnInitialize()
   mCameraActor.SetPosition(DEFAULT_LIGHT_POSITION);
 
   mShadowRenderShader = ShaderEffect::New( RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE,
-                                           Dali::GeometryType( GEOMETRY_TYPE_IMAGE ),
                                            ShaderEffect::GeometryHints( ShaderEffect::HINT_GRID | ShaderEffect::HINT_BLENDING ));
 
   // Create render targets needed for rendering from light's point of view

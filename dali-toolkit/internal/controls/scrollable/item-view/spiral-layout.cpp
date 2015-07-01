@@ -397,14 +397,6 @@ void SpiralLayout::GetDefaultItemSize( unsigned int itemId, const Vector3& layou
   itemSize.height = itemSize.depth = ( itemSize.width / 4.0f ) * 3.0f;
 }
 
-void SpiralLayout::GetResizeAnimation(Animation& animation, Actor actor, Vector3 size, float durationSeconds) const
-{
-  if(animation)
-  {
-    animation.AnimateTo( Property( actor, Actor::Property::SIZE ), size );
-  }
-}
-
 Degree SpiralLayout::GetScrollDirection() const
 {
   Degree scrollDirection(0);

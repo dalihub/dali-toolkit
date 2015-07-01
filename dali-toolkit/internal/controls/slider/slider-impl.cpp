@@ -570,7 +570,6 @@ void Slider::CreateHandleValueDisplay()
     mHandleValueTextLabel.SetAnchorPoint( AnchorPoint::CENTER );
     mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
     mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
-    mHandleValueTextLabel.SetDrawMode( DrawMode::OVERLAY );
     mHandle.Add( mHandleValueTextLabel );
   }
 }

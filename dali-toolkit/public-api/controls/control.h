@@ -59,9 +59,9 @@ class Control;
  * | long-pressed           | @ref GetLongPressGestureDetector().DetectedSignal() |
  *
  * Actions
- * | %Action Name      | %Control method called                              |
- * |-------------------|-----------------------------------------------------|
- * | control-activated | %OnActivated()                                      |
+ * | %Action Name            | %Control method called                             |
+ * |-------------------------|----------------------------------------------------|
+ * | accessibility-activated | %OnAccessibilityActivated()                        |
  */
 class DALI_IMPORT_API Control : public CustomActor
 {

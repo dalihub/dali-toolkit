@@ -28,9 +28,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
-#include <dali-toolkit/internal/shader-effects/page-turn-effect-impl.h>
-#include <dali-toolkit/devel-api/shader-effects/page-turn-effect.h>
-#include <dali-toolkit/devel-api/shader-effects/page-turn-book-spine-effect.h>
 #include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
 #include <dali-toolkit/devel-api/controls/shadow-view/shadow-view.h>
 
@@ -201,7 +198,7 @@ private: // from Control
   /**
    * @copydoc CustomActorImpl::OnStageConnection()
    */
-  virtual void OnStageConnection();
+  virtual void OnStageConnection( unsigned int depth );
 
   /**
    * @copydoc CustomActorImpl::OnStageDisconnection()
@@ -319,9 +316,9 @@ protected:
   CameraActor                    mCameraActor;             ///< The camera actor attached to the off screen tasks
   bool                           mPanning;                 ///< The boolean to indicate whether the pan gesture is continuing
 
-  std::vector<Toolkit::PageTurnEffect>    mTurnEffect;     ///< The group of PageTurnEffects
-  PageTurnBookSpineEffect        mSpineEffectFront;        ///< The book spine shader effect without flipping image content
-  PageTurnBookSpineEffect        mSpineEffectBack;         ///< The book spine shader effect with image content flipped
+  std::vector<ShaderEffect>      mTurnEffect;              ///< The group of PageTurnEffects
+  ShaderEffect                   mSpineEffectFront;        ///< The book spine shader effect without flipping image content
+  ShaderEffect                   mSpineEffectBack;         ///< The book spine shader effect with image content flipped
   Vector2                        mSpineShadowParameter;    ///< The spine shadow parameter for all the above shader effects
   Vector2                        mOriginalCenter;          ///< The original center set to the PageTurnEffect
   Vector2                        mCurrentCenter;           ///< The current center set to the PageTurnEffect

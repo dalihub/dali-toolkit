@@ -47,7 +47,7 @@ class KeyboardFocusManager;
  * | keyboard-pre-focus-change        | @ref PreFocusChangeSignal()        |
  * | keyboard-focus-changed           | @ref FocusChangedSignal()          |
  * | keyboard-focus-group-changed     | @ref FocusGroupChangedSignal()     |
- * | keyboard-focused-actor-activated | @ref FocusedActorActivatedSignal() |
+ * | keyboard-focused-actor-enter-key | @ref FocusedActorEnterKeySignal()  |
  */
 class DALI_IMPORT_API KeyboardFocusManager : public BaseHandle
 {
@@ -63,8 +63,8 @@ public:
   /// @brief Focus group changed signal
   typedef Signal< void ( Actor, bool ) > FocusGroupChangedSignalType;
 
-  /// @brief Focused actor activated signal
-  typedef Signal< void ( Actor ) > FocusedActorActivatedSignalType;
+  /// @brief Focused actor has the enter key pressed signal
+  typedef Signal< void ( Actor ) > FocusedActorEnterKeySignalType;
 
   /**
    * @brief Create a KeyboardFocusManager handle; this can be initialised with KeyboardFocusManager::New().
@@ -251,16 +251,16 @@ public: // Signals
   FocusGroupChangedSignalType& FocusGroupChangedSignal();
 
   /**
-   * @brief This signal is emitted when the current focused actor is activated.
+   * @brief This signal is emitted when the current focused actor has the enter key pressed on it.
    *
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName(Actor activatedActor);
+   *   void YourCallbackName(Actor enterPressedActor);
    * @endcode
    * @pre The Object has been initialized.
    * @return The signal to connect to.
    */
-  FocusedActorActivatedSignalType& FocusedActorActivatedSignal();
+  FocusedActorEnterKeySignalType& FocusedActorEnterKeySignal();
 
   // Not intended for application developers
 

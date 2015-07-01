@@ -28,41 +28,35 @@ namespace Toolkit
 {
 
 /**
+ * @brief Creates a new Alpha discard effect
+ *
  * Alpha discard effect is used to discard fragments when the alpha colour value is below a threshold.
  * This is useful for stenciling.
  *
  * Usage example:
  *
  *   ImageActor actor = ImageActor::New( Image( EXAMPLE_IMAGE_PATH ) );
- *   AlphaDiscardEffect alphaDiscardEffect = AlphaDiscardEffect::New();
+ *   ShaderEffect alphaDiscardEffect = CreateAlphaDiscardEffect();
  *   actor.SetShaderEffect( alphaDiscardEffect );
+ *
+ * @return A handle to a newly allocated ShaderEffect.
  */
-class DALI_IMPORT_API AlphaDiscardEffect : public ShaderEffect
+inline ShaderEffect CreateAlphaDiscardEffect()
 {
-public:
+  const char* ALPHA_DISCARD_FRAGMENT_SHADER_SOURCE =
+      "void main()                                                    \n"
+      "{                                                              \n"
+      "  mediump vec4 color = texture2D( sTexture, vTexCoord );       \n"
+      "  if(color.a <= 0.0001)                                        \n"
+      "  {                                                            \n"
+      "    discard;                                                   \n"
+      "  }                                                            \n"
+      "  gl_FragColor = color * uColor;                               \n"
+      "}                                                              \n";
 
-  /**
-   * Create an empty AlphaDiscardEffect handle.
-   */
-  AlphaDiscardEffect();
-
-  /**
-   * @brief Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
-   */
-  ~AlphaDiscardEffect();
-
-  /**
-   * Create a AlphaDiscardEffect.
-   * @return A handle to a newly allocated AlphaDiscardEffect.
-   */
-  static AlphaDiscardEffect New();
-
-private: // Not intended for application developers
-
-  DALI_INTERNAL AlphaDiscardEffect( ShaderEffect handle );
-};
+  return ShaderEffect::New( "", // Use default
+                            ALPHA_DISCARD_FRAGMENT_SHADER_SOURCE );
+}
 
 } // namespace Toolkit
 

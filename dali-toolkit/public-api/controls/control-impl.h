@@ -222,12 +222,15 @@ public:
    */
   bool IsKeyboardFocusGroup();
 
-  // Called by Focus Manager
-
   /**
-   * @brief Called by the accessibility focus manager and keyboard focus manager to activate the Control
+   * @brief Called by the AccessibilityManager to activate the Control.
    */
   DALI_INTERNAL void AccessibilityActivate();
+
+  /**
+   * @brief Called by the KeyboardFocusManager.
+   */
+  DALI_INTERNAL void KeyboardEnter();
 
   // Signals
 
@@ -270,7 +273,7 @@ protected: // From CustomActorImpl, not to be used by application developers
   /**
    * @copydoc CustomActorImpl::OnStageConnection()
    */
-  virtual void OnStageConnection();
+  virtual void OnStageConnection( unsigned int depth );
 
   /**
    * @copydoc CustomActorImpl::OnStageDisconnection()
@@ -465,6 +468,14 @@ public: // API for derived classes to override
    */
   virtual bool OnAccessibilityValueChange( bool isIncrease );
 
+  /**
+   * @brief This method should be overridden by deriving classes when they wish to respond
+   * the accessibility zoom action
+   *
+   * @return true if the zoom action has been consumed by this control
+   */
+  virtual bool OnAccessibilityZoom();
+
   // Keyboard focus
 
   /**
@@ -501,6 +512,14 @@ public: // API for derived classes to override
    * @param[in] commitedFocusableActor The commited focusable actor.
    */
   virtual void OnKeyboardFocusChangeCommitted( Actor commitedFocusableActor );
+
+  /**
+   * @brief This method is called when the control has enter pressed on it.
+   *
+   * Derived classes should override this to perform custom actions.
+   * @return true if this control supported this action.
+   */
+  virtual bool OnKeyboardEnter();
 
   // Gestures
 

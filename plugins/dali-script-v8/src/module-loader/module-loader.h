@@ -77,6 +77,8 @@ public:
   /**
    * Execute a script from a file
    * @param[in] fileName file name
+   * @return true on success, false on failure
+   *
    */
   bool ExecuteScriptFromFile( v8::Isolate* isolate, const std::string& fileName );
 
@@ -85,6 +87,7 @@ public:
    * Execute a script
    * @param[in] sourceCode source code to run
    * @param[in] sourceFileName source file name
+   * @return true on success, false on failure
    */
   bool ExecuteScript( v8::Isolate* isolate,
                       const std::string& sourceCode,

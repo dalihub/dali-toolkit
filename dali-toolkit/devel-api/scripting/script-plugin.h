@@ -66,15 +66,18 @@ public:
    * Exec buffer contents as a script
    * @param buffer script file contents
    * @param filename a nominal name for the buffer contents.
-   * (NB filename extension may be used to disambiguate script language)
+   * filename extension may be used to disambiguate script language
+   * @return true on success, false on failure
+   *
    */
-  virtual void ExecuteBuffer(const std::string& buffer, const std::string& filename) = 0;
+  virtual bool ExecuteBuffer(const std::string& buffer, const std::string& filename) = 0;
 
   /**
    * Exec file as a script
    * @param filename the filename to read and execute
+   * @return true on success, false on failure
    */
-  virtual void ExecuteFile(const std::string& filename) = 0;
+  virtual bool ExecuteFile(const std::string& filename) = 0;
 
 }; // class ScriptPlugin
 

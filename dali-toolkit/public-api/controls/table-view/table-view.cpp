@@ -29,10 +29,6 @@ namespace Dali
 namespace Toolkit
 {
 
-const std::string TableView::CELL_INDICES_PROPERTY_NAME("cell-indices");
-const std::string TableView::ROW_SPAN_PROPERTY_NAME("row-span");
-const std::string TableView::COLUMN_SPAN_PROPERTY_NAME("column-span");
-
 TableView::TableView()
 {
 }
@@ -137,22 +133,22 @@ Size TableView::GetCellPadding()
 
 void TableView::SetFitHeight( unsigned int rowIndex )
 {
-  GetImpl(*this).SetRowPolicy( rowIndex, Internal::TableView::FIT );
+  GetImpl(*this).SetFitHeight( rowIndex );
 }
 
 bool TableView::IsFitHeight( unsigned int rowIndex ) const
 {
-  return ( GetImpl(*this).GetRowPolicy( rowIndex ) == Internal::TableView::FIT );
+  return GetImpl(*this).IsFitHeight( rowIndex );
 }
 
 void TableView::SetFitWidth( unsigned int columnIndex )
 {
-  GetImpl(*this).SetColumnPolicy( columnIndex, Internal::TableView::FIT );
+  GetImpl(*this).SetFitWidth( columnIndex );
 }
 
 bool TableView::IsFitWidth( unsigned int columnIndex ) const
 {
-  return ( GetImpl(*this).GetColumnPolicy( columnIndex ) == Internal::TableView::FIT );
+  return GetImpl(*this).IsFitWidth( columnIndex );
 }
 
 void TableView::SetFixedHeight( unsigned int rowIndex, float height )
