@@ -140,6 +140,11 @@ private: // From Control
   virtual void OnPan( const PanGesture& gesture );
 
   /**
+   * @copydoc Control::OnLongPress()
+   */
+  virtual void OnLongPress( const LongPressGesture& gesture );
+
+  /**
    * @copydoc Control::OnStageConnection()
    */
   virtual void OnStageConnection( unsigned int depth );

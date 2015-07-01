@@ -46,6 +46,7 @@ struct Event
     CURSOR_KEY_EVENT,
     TAP_EVENT,
     PAN_EVENT,
+    LONG_PRESS_EVENT,
     GRAB_HANDLE_EVENT,
     LEFT_SELECTION_HANDLE_EVENT,
     RIGHT_SELECTION_HANDLE_EVENT,
@@ -333,6 +334,8 @@ struct Controller::Impl
   void OnTapEvent( const Event& event );
 
   void OnPanEvent( const Event& event );
+
+  void OnLongPressEvent( const Event& event );
 
   void OnHandleEvent( const Event& event );
 

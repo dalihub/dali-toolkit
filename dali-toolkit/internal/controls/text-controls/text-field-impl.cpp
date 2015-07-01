@@ -881,9 +881,8 @@ void TextField::OnInitialize()
   mController->EnableTextInput( mDecorator );
 
   // Forward input events to controller
-  EnableGestureDetection(Gesture::Tap);
+  EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan |Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
-  EnableGestureDetection(Gesture::Pan);
 
   self.TouchedSignal().Connect( this, &TextField::OnTouched );
 
@@ -1067,6 +1066,11 @@ void TextField::OnTap( const TapGesture& gesture )
 void TextField::OnPan( const PanGesture& gesture )
 {
   mController->PanEvent( gesture.state, gesture.displacement );
+}
+
+void TextField::OnLongPress( const LongPressGesture& gesture )
+{
+  mController->LongPressEvent( gesture.state, gesture.localPoint.x, gesture.localPoint.y );
 }
 
 bool TextField::OnKeyEvent( const KeyEvent& event )
