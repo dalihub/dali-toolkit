@@ -273,7 +273,7 @@ protected: // From CustomActorImpl, not to be used by application developers
   /**
    * @copydoc CustomActorImpl::OnStageConnection()
    */
-  virtual void OnStageConnection( unsigned int depth );
+  virtual void OnStageConnection( int depth );
 
   /**
    * @copydoc CustomActorImpl::OnStageDisconnection()

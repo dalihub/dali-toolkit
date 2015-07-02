@@ -147,7 +147,7 @@ private: // From Control
   /**
    * @copydoc Control::OnStageConnection()
    */
-  virtual void OnStageConnection( unsigned int depth );
+  virtual void OnStageConnection( int depth );
 
   /**
    * @copydoc Dali::CustomActorImpl::OnKeyEvent(const KeyEvent&)

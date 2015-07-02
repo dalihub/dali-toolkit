@@ -1185,7 +1185,7 @@ void TextField::KeyboardStatusChanged(bool keyboardShown)
   }
 }
 
-void TextField::OnStageConnection( unsigned int depth )
+void TextField::OnStageConnection( int depth )
 {
   mDepth = depth;
 }
