@@ -102,6 +102,7 @@ struct EventData
   enum State
   {
     INACTIVE,
+    INTERRUPTED,
     SELECTING,
     SELECTION_CHANGED,
     EDITING,

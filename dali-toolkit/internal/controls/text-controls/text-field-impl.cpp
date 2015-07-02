@@ -1012,7 +1012,7 @@ void TextField::OnKeyInputFocusGained()
       notifier.ContentSelectedSignal().Connect( this, &TextField::OnClipboardTextSelected );
    }
 
-  mController->KeyboardFocusGainEvent();
+  mController->KeyboardFocusGainEvent(); // Called in the case of no virtual keyboard to trigger this event
 
   EmitKeyInputFocusSignal( true ); // Calls back into the Control hence done last.
 }
@@ -1181,7 +1181,7 @@ void TextField::KeyboardStatusChanged(bool keyboardShown)
   }
   else
   {
-    mController->KeyboardFocusGainEvent();
+    mController->KeyboardFocusGainEvent(); // Initially called by OnKeyInputFocusGained
   }
 }
 

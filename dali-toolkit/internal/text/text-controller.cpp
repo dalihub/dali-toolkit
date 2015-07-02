@@ -1109,16 +1109,18 @@ void Controller::KeyboardFocusLostEvent()
 
   if( mImpl->mEventData )
   {
-    mImpl->ChangeState( EventData::INACTIVE );
-
-    if( mImpl->IsShowingPlaceholderText() )
+    if ( EventData::INTERRUPTED != mImpl->mEventData->mState )
     {
-      // Revert to regular placeholder-text when not editing
-      ShowPlaceholderText();
-    }
+      mImpl->ChangeState( EventData::INACTIVE );
 
-    mImpl->RequestRelayout();
+      if( mImpl->IsShowingPlaceholderText() )
+      {
+        // Revert to regular placeholder-text when not editing
+        ShowPlaceholderText();
+      }
+    }
   }
+  mImpl->RequestRelayout();
 }
 
 bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
@@ -1152,10 +1154,16 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     {
       textChanged = BackspaceKeyEvent();
     }
-    else if ( IsKey( keyEvent,  Dali::DALI_KEY_POWER ) || IsKey( keyEvent, Dali::DALI_KEY_MENU ) )
+    else if ( IsKey( keyEvent,  Dali::DALI_KEY_POWER ) )
     {
-      // Do nothing when the Power or Menu Key is pressed.
-      // It avoids call the InsertText() method and delete the selected text.
+      mImpl->ChangeState( EventData::INTERRUPTED ); // State is not INACTIVE as expect to return to edit mode.
+      // Avoids calling the InsertText() method which can delete selected text
+    }
+    else if ( IsKey( keyEvent, Dali::DALI_KEY_MENU ) )
+    {
+      mImpl->ChangeState( EventData::INACTIVE );
+      // Menu key behaviour does not allow edit to resume like Power key
+      // Avoids calling the InsertText() method which can delete selected text
     }
     else
     {
@@ -1168,7 +1176,10 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       textChanged = true;
     }
 
-    mImpl->ChangeState( EventData::EDITING ); // todo Confirm this is the best place to change the state of
+    if ( mImpl->mEventData->mState != EventData::INTERRUPTED &&  mImpl->mEventData->mState != EventData::INACTIVE )
+    {
+      mImpl->ChangeState( EventData::EDITING );
+    }
 
     mImpl->RequestRelayout();
   }

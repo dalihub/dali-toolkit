@@ -1050,6 +1050,15 @@ void Controller::Impl::ChangeState( EventData::State newState )
       mEventData->mDecoratorUpdated = true;
       HideClipboard();
     }
+    else if ( EventData::INTERRUPTED  == mEventData->mState)
+    {
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetPopupActive( false );
+      mEventData->mDecoratorUpdated = true;
+      HideClipboard();
+    }
     else if ( EventData::SELECTING == mEventData->mState )
     {
       mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
