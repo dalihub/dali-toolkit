@@ -1159,10 +1159,11 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       mImpl->ChangeState( EventData::INTERRUPTED ); // State is not INACTIVE as expect to return to edit mode.
       // Avoids calling the InsertText() method which can delete selected text
     }
-    else if ( IsKey( keyEvent, Dali::DALI_KEY_MENU ) )
+    else if ( IsKey( keyEvent, Dali::DALI_KEY_MENU ) ||
+              IsKey( keyEvent, Dali::DALI_KEY_HOME ) )
     {
       mImpl->ChangeState( EventData::INACTIVE );
-      // Menu key behaviour does not allow edit to resume like Power key
+      // Menu/Home key behaviour does not allow edit mode to resume like Power key
       // Avoids calling the InsertText() method which can delete selected text
     }
     else
