@@ -186,6 +186,11 @@ Actor AccessibilityManager::GetFocusGroup(Actor actor)
   return GetImpl(*this).GetFocusGroup(actor);
 }
 
+Vector2 AccessibilityManager::GetReadPosition() const
+{
+  return GetImpl(*this).GetReadPosition();
+}
+
 AccessibilityManager::FocusChangedSignalType& AccessibilityManager::FocusChangedSignal()
 {
   return GetImpl(*this).FocusChangedSignal();

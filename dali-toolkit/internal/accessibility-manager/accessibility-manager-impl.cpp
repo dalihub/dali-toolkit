@@ -553,6 +553,12 @@ Actor AccessibilityManager::GetFocusGroup(Actor actor)
   return actor;
 }
 
+Vector2 AccessibilityManager::GetReadPosition() const
+{
+  AccessibilityAdaptor adaptor = AccessibilityAdaptor::Get();
+  return adaptor.GetReadPosition();
+}
+
 void AccessibilityManager::SetGroupMode(bool enabled)
 {
   mIsFocusWithinGroup = enabled;
