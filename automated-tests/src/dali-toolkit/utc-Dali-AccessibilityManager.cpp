@@ -21,6 +21,7 @@
 // Need to override adaptor classes for toolkit test harness, so include
 // test harness headers before dali headers.
 #include <dali-toolkit-test-suite-utils.h>
+#include <toolkit-accessibility-adaptor.h>
 
 #include <dali-toolkit/dali-toolkit.h>
 
@@ -1078,6 +1079,1067 @@ int UtcDaliAccessibilityManagerSignalFocusedActorActivated(void)
   FocusedActorActivatedCallback callback;
   manager.FocusedActorActivatedSignal().Connect(&callback, &FocusedActorActivatedCallback::Callback);
   DALI_TEST_CHECK(true);
+
+  END_TEST;
+}
+
+// Note: No negative test for GetReadPosition as it will always return something.
+int UtcDaliAccessibilityManagerGetReadPositionP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliAccessibilityManagerGetReadPositionP");
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  Vector2 position( 1.0f, 2.0f );
+  accessibilityAdaptor.MockSetReadPosition( position );
+
+  DALI_TEST_EQUALS( manager.GetReadPosition(), position, TEST_LOCATION );
+
+  END_TEST;
+}
+
+// Functor to test if an accessibility signal has been called.
+class AccessibilityManagerSignalHandler : public Dali::ConnectionTracker
+{
+public:
+  AccessibilityManagerSignalHandler() :
+    mCalls( 0 )
+  {
+  }
+
+  bool Callback( AccessibilityManager& accessibilityManager )
+  {
+    mCalls++;
+    tet_infoline( "Signal called" );
+    return true;
+  }
+
+  unsigned int GetCalls() const
+  {
+    return mCalls;
+  }
+
+private:
+  unsigned int mCalls;  ///< Keeps track of how many times the signal has been called.
+};
+
+int UtcDaliAccessibilityManagerStatusChangedSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerStatusChangedSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.StatusChangedSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  // Cause a state change.
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionEnableEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerStatusChangedSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerStatusChangedSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.StatusChangedSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionNextSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionNextSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionNextSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionNextEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionNextSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionNextSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionNextSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionPreviousSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionPreviousSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionPreviousSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionPreviousEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionPreviousSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionPreviousSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionPreviousSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionActivateSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionActivateSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionActivateSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionActivateEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionActivateSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionActivateSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionActivateSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionReadSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionReadSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionReadSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionReadEvent( 100.0f, 200.0f, true );
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionReadSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionReadSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionReadSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionOverSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionOverSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionOverSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  // Note that the ActionOverSignal is provoked by a read even when "allow read again" is set to false.
+  accessibilityAdaptor.HandleActionReadEvent( 100.0f, 200.0f, false );
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionOverSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionOverSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionOverSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionReadNextSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionReadNextSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionReadNextSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionReadNextEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionReadNextSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionReadNextSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionReadNextSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionReadPreviousSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionReadPreviousSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionReadPreviousSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionReadPreviousEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionReadPreviousSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionReadPreviousSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionReadPreviousSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionUpSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionUpSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionUpSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionUpEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionUpSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionUpSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionUpSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionDownSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionDownSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionDownSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionDownEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionDownSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionDownSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionDownSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionClearFocusSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionClearFocusSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionClearFocusSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionClearFocusEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionClearFocusSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionClearFocusSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionClearFocusSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionBackSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionBackSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionBackSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionBackEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionBackSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionBackSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionBackSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionScrollUpSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionScrollUpSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionScrollUpSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionScrollUpEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionScrollUpSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionScrollUpSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionScrollUpSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionScrollDownSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionScrollDownSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionScrollDownSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionScrollDownEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionScrollDownSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionScrollDownSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionScrollDownSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionPageLeftSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionPageLeftSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionPageLeftSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionPageLeftEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionPageLeftSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionPageLeftSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionPageLeftSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionPageRightSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionPageRightSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionPageRightSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionPageRightEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionPageRightSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionPageRightSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionPageRightSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionPageUpSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionPageUpSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionPageUpSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionPageUpEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionPageUpSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionPageUpSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionPageUpSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionPageDownSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionPageDownSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionPageDownSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionPageDownEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionPageDownSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionPageDownSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionPageDownSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionMoveToFirstSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionMoveToFirstSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionMoveToFirstSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionMoveToFirstEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionMoveToFirstSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionMoveToFirstSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionMoveToFirstSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionMoveToLastSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionMoveToLastSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionMoveToLastSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionMoveToLastEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionMoveToLastSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionMoveToLastSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionMoveToLastSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionReadFromTopSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionReadFromTopSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionReadFromTopSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionReadFromTopEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionReadFromTopSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionReadFromTopSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionReadFromTopSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionReadFromNextSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionReadFromNextSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionReadFromNextSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionReadFromNextEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionReadFromNextSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionReadFromNextSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionReadFromNextSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionZoomSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionZoomSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionZoomSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionZoomEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionZoomSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionZoomSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionZoomSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionReadIndicatorInformationSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionReadIndicatorInformationSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionReadIndicatorInformationSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionReadIndicatorInformationEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionReadIndicatorInformationSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionReadIndicatorInformationSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionReadIndicatorInformationSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionReadPauseResumeSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionReadPauseResumeSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionReadPauseResumeSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionReadPauseResumeEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionReadPauseResumeSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionReadPauseResumeSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionReadPauseResumeSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionStartStopSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionStartStopSignalP" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionStartStopSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+  accessibilityAdaptor.HandleActionStartStopEvent();
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionStartStopSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionStartStopSignalN" );
+
+  AccessibilityManagerSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionStartStopSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+// Functor to test if a accessibility scroll signal has been called.
+class AccessibilityManagerScrollSignalHandler : public Dali::ConnectionTracker
+{
+public:
+  AccessibilityManagerScrollSignalHandler() :
+    mCalls( 0 )
+  {
+  }
+
+  bool Callback( AccessibilityManager& accessibilityManager, const Dali::TouchEvent& touchEvent )
+  {
+    mCalls++;
+    mTouchEvent = touchEvent;
+    tet_infoline( "Signal called" );
+    return true;
+  }
+
+  unsigned int GetCalls() const
+  {
+    return mCalls;
+  }
+
+  const Dali::TouchEvent& GetTouchEvent() const
+  {
+    return mTouchEvent;
+  }
+
+private:
+  unsigned int mCalls;         ///< Keeps track of how many times the signal has been called.
+  Dali::TouchEvent mTouchEvent; ///< Stores the last touch event received.
+};
+
+int UtcDaliAccessibilityManagerActionScrollSignalP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionScrollSignalP" );
+
+  AccessibilityManagerScrollSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionScrollSignal().Connect( &callback, &AccessibilityManagerScrollSignalHandler::Callback );
+
+  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
+
+  TouchPoint point( 0, TouchPoint::Started, 100.0f, 200.0f );
+  accessibilityAdaptor.HandleActionScrollEvent( point, 0u );
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
+
+  const TouchEvent& signalTouchEvent = callback.GetTouchEvent();
+  DALI_TEST_EQUALS( signalTouchEvent.GetPointCount(), 1u, TEST_LOCATION );
+
+  const TouchPoint& signalTouchPoint = signalTouchEvent.GetPoint( 0u );
+
+  DALI_TEST_EQUALS( signalTouchPoint.state, TouchPoint::Started, TEST_LOCATION );
+  DALI_TEST_EQUALS( signalTouchPoint.screen.x, 100.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( signalTouchPoint.screen.y, 200.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAccessibilityManagerActionScrollSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliAccessibilityManagerActionScrollSignalN" );
+
+  AccessibilityManagerScrollSignalHandler callback;
+
+  AccessibilityManager manager = AccessibilityManager::Get();
+  DALI_TEST_CHECK( manager );
+
+  manager.ActionScrollSignal().Connect( &callback, &AccessibilityManagerScrollSignalHandler::Callback );
+
+  DALI_TEST_EQUALS( callback.GetCalls(), 0u, TEST_LOCATION );
 
   END_TEST;
 }

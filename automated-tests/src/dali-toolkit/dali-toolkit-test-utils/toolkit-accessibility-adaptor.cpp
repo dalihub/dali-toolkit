@@ -18,6 +18,8 @@
 #include "toolkit-accessibility-adaptor.h"
 
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/base-object.h>
+#include <dali/devel-api/adaptor-framework/accessibility-action-handler.h>
 
 namespace Dali
 {
@@ -42,9 +44,45 @@ public: // Creation & Destruction
 
 public:
 
+  // Functions to modify mock returns:
+
+  void MockSetReadPosition( Vector2& position );
+
+public:
+
   bool IsEnabled() const;
   void SetActionHandler(Dali::AccessibilityActionHandler& handler);
   void SetGestureHandler(Dali::AccessibilityGestureHandler& handler);
+
+  Vector2 GetReadPosition() const;
+
+  bool HandleActionNextEvent();
+  bool HandleActionPreviousEvent();
+  bool HandleActionActivateEvent();
+  bool HandleActionReadEvent(unsigned int x, unsigned int y, bool allowReadAgain);
+  bool HandleActionReadNextEvent();
+  bool HandleActionReadPreviousEvent();
+  bool HandleActionUpEvent();
+  bool HandleActionDownEvent();
+  bool HandleActionClearFocusEvent();
+  bool HandleActionScrollEvent(TouchPoint& point, unsigned long timeStamp);
+  bool HandleActionBackEvent();
+  bool HandleActionEnableEvent();
+  bool HandleActionDisableEvent();
+  bool HandleActionScrollUpEvent();
+  bool HandleActionScrollDownEvent();
+  bool HandleActionPageLeftEvent();
+  bool HandleActionPageRightEvent();
+  bool HandleActionPageUpEvent();
+  bool HandleActionPageDownEvent();
+  bool HandleActionMoveToFirstEvent();
+  bool HandleActionMoveToLastEvent();
+  bool HandleActionReadFromTopEvent();
+  bool HandleActionReadFromNextEvent();
+  bool HandleActionZoomEvent();
+  bool HandleActionReadIndicatorInformationEvent();
+  bool HandleActionReadPauseResumeEvent();
+  bool HandleActionStartStopEvent();
 
 public: // Signals
 
@@ -53,6 +91,7 @@ private:
   bool mIsEnabled;
   Dali::AccessibilityActionHandler* mActionHandler;
   Dali::AccessibilityGestureHandler* mGestureHandler;
+  Vector2 mReadPosition;
 
   static Dali::AccessibilityAdaptor mToolkitAccessibilityAdaptor;
 };
@@ -62,7 +101,7 @@ Dali::AccessibilityAdaptor AccessibilityAdaptor::mToolkitAccessibilityAdaptor;
 
 Dali::AccessibilityAdaptor AccessibilityAdaptor::Get()
 {
-  if( ! mToolkitAccessibilityAdaptor )
+  if( !mToolkitAccessibilityAdaptor )
   {
     mToolkitAccessibilityAdaptor = Dali::AccessibilityAdaptor( new Dali::Internal::Adaptor::AccessibilityAdaptor() );
   }
@@ -70,12 +109,23 @@ Dali::AccessibilityAdaptor AccessibilityAdaptor::Get()
 }
 
 AccessibilityAdaptor::AccessibilityAdaptor()
-: mIsEnabled(false)
+: mIsEnabled(false),
+  mReadPosition( 0.0f, 0.0f )
 {
 }
 
 AccessibilityAdaptor::~AccessibilityAdaptor()
 {
+}
+
+Vector2 AccessibilityAdaptor::GetReadPosition() const
+{
+  return mReadPosition;
+}
+
+void AccessibilityAdaptor::MockSetReadPosition( Vector2& position )
+{
+  mReadPosition = position;
 }
 
 bool AccessibilityAdaptor::IsEnabled() const
@@ -91,6 +141,251 @@ void AccessibilityAdaptor::SetActionHandler(Dali::AccessibilityActionHandler& ha
 void AccessibilityAdaptor::SetGestureHandler(Dali::AccessibilityGestureHandler& handler)
 {
   mGestureHandler = &handler;
+}
+
+bool AccessibilityAdaptor::HandleActionNextEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionNext( true );
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionPreviousEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionPrevious( true );
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionActivateEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionActivate();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionReadEvent(unsigned int x, unsigned int y,  bool allowReadAgain)
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionRead( allowReadAgain );
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionReadNextEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionReadNext( true );
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionReadPreviousEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionReadPrevious( true );
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionUpEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionUp();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionDownEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionDown();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionClearFocusEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->ClearAccessibilityFocus();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionScrollEvent(TouchPoint& point, unsigned long timeStamp)
+{
+  if( mActionHandler )
+  {
+    Dali::TouchEvent touchEvent;
+    touchEvent.points.push_back( point );
+    return mActionHandler->AccessibilityActionScroll( touchEvent );
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionBackEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionBack();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionEnableEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->ChangeAccessibilityStatus();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionDisableEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->ChangeAccessibilityStatus();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionScrollUpEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionScrollUp();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionScrollDownEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionScrollDown();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionPageLeftEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionPageLeft();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionPageRightEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionPageRight();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionPageUpEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionPageUp();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionPageDownEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionPageDown();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionMoveToFirstEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionMoveToFirst();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionMoveToLastEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionMoveToLast();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionReadFromTopEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionReadFromTop();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionReadFromNextEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionReadFromNext();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionZoomEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionZoom();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionReadIndicatorInformationEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionReadIndicatorInformation();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionReadPauseResumeEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionReadPauseResume();
+  }
+  return false;
+}
+
+bool AccessibilityAdaptor::HandleActionStartStopEvent()
+{
+  if( mActionHandler )
+  {
+    return mActionHandler->AccessibilityActionStartStop();
+  }
+  return false;
 }
 
 static Internal::Adaptor::AccessibilityAdaptor& GetImplementation(Dali::AccessibilityAdaptor& adaptor)
@@ -118,10 +413,18 @@ AccessibilityAdaptor::~AccessibilityAdaptor()
 {
 }
 
-Vector2 AccessibilityAdaptor::GetReadPosition() const
+// Mock setup:
+
+void AccessibilityAdaptor::MockSetReadPosition( Vector2& position )
 {
-  //return Internal::Adaptor::GetImplementation(*this).GetReadPosition();
-  return Vector2::ZERO;
+  Internal::Adaptor::GetImplementation(*this).MockSetReadPosition( position );
+}
+
+// Methods:
+
+Vector2 AccessibilityAdaptor::GetReadPosition()
+{
+  return Internal::Adaptor::GetImplementation(*this).GetReadPosition();
 }
 
 bool AccessibilityAdaptor::IsEnabled() const
@@ -142,137 +445,137 @@ void AccessibilityAdaptor::SetGestureHandler(AccessibilityGestureHandler& handle
 
 bool AccessibilityAdaptor::HandleActionNextEvent()
 {
-  return true; //Internal::Adaptor::GetImplementation(*this).HandleActionNextEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionNextEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionPreviousEvent()
 {
-  return true; //Internal::Adaptor::GetImplementation(*this).HandleActionPreviousEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionPreviousEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionActivateEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionActivateEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionActivateEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionReadEvent(unsigned int x, unsigned int y,  bool allowReadAgain)
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionReadEvent(x, y, allowReadAgain);
+  return Internal::Adaptor::GetImplementation(*this).HandleActionReadEvent( x, y, allowReadAgain );
 }
 
 bool AccessibilityAdaptor::HandleActionReadNextEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionReadNextEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionReadNextEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionReadPreviousEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionReadPreviousEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionReadPreviousEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionUpEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionUpEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionUpEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionDownEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionDownEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionDownEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionClearFocusEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionClearFocusEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionClearFocusEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionScrollEvent(TouchPoint& point, unsigned long timeStamp)
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionScrollEvent(point, timeStamp);
+  return Internal::Adaptor::GetImplementation(*this).HandleActionScrollEvent(point, timeStamp);
 }
 
 bool AccessibilityAdaptor::HandleActionBackEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionBackEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionBackEvent();
 }
 
 void AccessibilityAdaptor::HandleActionEnableEvent()
 {
-  //Internal::Adaptor::GetImplementation(*this).HandleActionEnableEvent();
+  Internal::Adaptor::GetImplementation(*this).HandleActionEnableEvent();
 }
 
 void AccessibilityAdaptor::HandleActionDisableEvent()
 {
-  //Internal::Adaptor::GetImplementation(*this).HandleActionDisableEvent();
+  Internal::Adaptor::GetImplementation(*this).HandleActionDisableEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionScrollUpEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionScrollUpEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionScrollUpEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionScrollDownEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionScrollDownEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionScrollDownEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionPageLeftEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionPageLeftEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionPageLeftEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionPageRightEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionPageRightEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionPageRightEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionPageUpEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionPageUpEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionPageUpEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionPageDownEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionPageDownEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionPageDownEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionMoveToFirstEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionMoveToFirstEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionMoveToFirstEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionMoveToLastEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionMoveToLastEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionMoveToLastEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionReadFromTopEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionReadFromTopEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionReadFromTopEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionReadFromNextEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionReadFromNextEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionReadFromNextEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionZoomEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionZoomEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionZoomEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionReadIndicatorInformationEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionReadIndicatorInformationEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionReadIndicatorInformationEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionReadPauseResumeEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionReadPauseResumeEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionReadPauseResumeEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionStartStopEvent()
 {
-  return true;//Internal::Adaptor::GetImplementation(*this).HandleActionStartStopEvent();
+  return Internal::Adaptor::GetImplementation(*this).HandleActionStartStopEvent();
 }
 
 AccessibilityAdaptor::AccessibilityAdaptor( Internal::Adaptor::AccessibilityAdaptor* adaptor )
