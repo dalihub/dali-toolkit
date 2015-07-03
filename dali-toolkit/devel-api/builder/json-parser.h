@@ -81,9 +81,9 @@ public:
    * Parse the source and construct a node tree.
    * Subsequent calls to this function will merge the trees.
    * @param source The json source to parse
-   * @return zero if parsed okay, otherwise an error.
+   * @return true if parsed okay, otherwise an error.
    */
-  int Parse(const std::string& source);
+  bool Parse(const std::string& source);
 
   /*
    * Optimize memory usage by packing strings

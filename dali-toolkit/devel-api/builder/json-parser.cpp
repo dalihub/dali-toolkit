@@ -59,7 +59,7 @@ JsonParser DownCast( BaseHandle handle )
   return JsonParser( dynamic_cast<Internal::JsonParser*>(handle.GetObjectPtr()) );
 }
 
-int JsonParser::Parse(const std::string& source)
+bool JsonParser::Parse(const std::string& source)
 {
   return GetImplementation(*this).Parse(source);
 }

@@ -51,6 +51,9 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/text-controls/text-selection-toolbar-impl.cpp \
    $(toolkit_src_dir)/controls/tool-bar/tool-bar-impl.cpp \
    $(toolkit_src_dir)/accessibility-manager/accessibility-manager-impl.cpp \
+   \
+   $(toolkit_src_dir)/feedback/feedback-style.cpp \
+   \
    $(toolkit_src_dir)/focus-manager/keyboard-focus-manager-impl.cpp \
    $(toolkit_src_dir)/focus-manager/keyinput-focus-manager-impl.cpp \
    $(toolkit_src_dir)/filters/blur-two-pass-filter.cpp \

@@ -875,7 +875,7 @@ void Control::Initialize()
       styleManager.StyleChangeSignal().Connect( this, &Control::OnStyleChange );
 
       // Apply the current style
-      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      GetImpl( styleManager ).ApplyThemeStyleAtInit( Toolkit::Control( GetOwner() ) );
     }
   }
 
