@@ -104,12 +104,9 @@ Integration::Log::Filter* gLogFilter( Integration::Log::Filter::New(Debug::NoLog
 namespace
 {
 
-const char* DEFAULT_GRAB_HANDLE_IMAGE_RELEASED( DALI_IMAGE_DIR "insertpoint-icon.png" );
-const char* DEFAULT_GRAB_HANDLE_IMAGE_PRESSED( DALI_IMAGE_DIR "insertpoint-icon-pressed.png" );
-const char* DEFAULT_SELECTION_HANDLE_ONE_RELEASED( DALI_IMAGE_DIR "text-input-selection-handle-left.png" );
-const char* DEFAULT_SELECTION_HANDLE_ONE_PRESSED( DALI_IMAGE_DIR "text-input-selection-handle-left-press.png" );
-const char* DEFAULT_SELECTION_HANDLE_TWO_RELEASED( DALI_IMAGE_DIR "text-input-selection-handle-right.png" );
-const char* DEFAULT_SELECTION_HANDLE_TWO_PRESSED( DALI_IMAGE_DIR "text-input-selection-handle-right-press.png" );
+const char* DEFAULT_GRAB_HANDLE_IMAGE_RELEASED( DALI_IMAGE_DIR "cursor_handler_center.png" );
+const char* DEFAULT_SELECTION_HANDLE_ONE_RELEASED( DALI_IMAGE_DIR "selection_handle_left.png" );
+const char* DEFAULT_SELECTION_HANDLE_TWO_RELEASED( DALI_IMAGE_DIR "selection_handle_right.png" );
 
 const int DEFAULT_POPUP_OFFSET( -100.0f ); // Vertical offset of Popup from cursor or handles position.
 
@@ -117,6 +114,8 @@ const Dali::Vector3 DEFAULT_GRAB_HANDLE_RELATIVE_SIZE( 1.25f, 1.5f, 1.0f );
 const Dali::Vector3 DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE( 1.25f, 1.5f, 1.0f );
 
 const Dali::Vector4 LIGHT_BLUE( (0xb2 / 255.0f), (0xeb / 255.0f), (0xf2 / 255.0f), 0.5f ); // The text highlight color.
+
+const Dali::Vector4 HANDLE_COLOR( 0.0f, (183.0f / 255.0f), (229.0f / 255.0f), 1.0f  );
 
 const unsigned int CURSOR_BLINK_INTERVAL = 500u; // Cursor blink interval
 const float TO_MILLISECONDS = 1000.f;
@@ -264,6 +263,7 @@ struct Decorator::Impl : public ConnectionTracker
   : mController( controller ),
     mEnabledPopupButtons( TextSelectionPopup::NONE ),
     mTextSelectionPopupCallbackInterface( callbackInterface ),
+    mHandleColor( HANDLE_COLOR ),
     mBoundingBox( Rect<int>() ),
     mHighlightColor( LIGHT_BLUE ),
     mHighlightPosition( Vector2::ZERO ),
@@ -578,10 +578,6 @@ struct Decorator::Impl : public ConnectionTracker
       {
         mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] = ResourceImage::New( DEFAULT_GRAB_HANDLE_IMAGE_RELEASED );
       }
-      if( !mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_PRESSED] )
-      {
-        mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_PRESSED] = ResourceImage::New( DEFAULT_GRAB_HANDLE_IMAGE_PRESSED );
-      }
 
       grabHandle.actor = ImageActor::New( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] );
       grabHandle.actor.SetSortModifier( DECORATION_DEPTH_INDEX );
@@ -608,6 +604,7 @@ struct Decorator::Impl : public ConnectionTracker
       grabHandle.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
       grabHandle.grabArea.SetSizeModeFactor( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE );
       grabHandle.actor.Add( grabHandle.grabArea );
+      grabHandle.actor.SetColor( mHandleColor );
 
       grabHandle.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnGrabHandleTouched );
       mTapDetector.Attach( grabHandle.grabArea );
@@ -626,10 +623,6 @@ struct Decorator::Impl : public ConnectionTracker
       {
         mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE_RELEASED );
       }
-      if( !mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED] )
-      {
-        mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED] = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE_PRESSED );
-      }
 
       primary.actor = ImageActor::New( mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
 #ifdef DECORATOR_DEBUG
@@ -638,6 +631,7 @@ struct Decorator::Impl : public ConnectionTracker
       primary.actor.SetAnchorPoint( AnchorPoint::TOP_RIGHT ); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
       primary.actor.SetSortModifier( DECORATION_DEPTH_INDEX );
       primary.flipped = false;
+      primary.actor.SetColor( mHandleColor );
 
       primary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
@@ -663,10 +657,6 @@ struct Decorator::Impl : public ConnectionTracker
       {
         mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO_RELEASED );
       }
-      if( !mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED] )
-      {
-        mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED] = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO_PRESSED );
-      }
 
       secondary.actor = ImageActor::New( mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
 #ifdef DECORATOR_DEBUG
@@ -675,6 +665,7 @@ struct Decorator::Impl : public ConnectionTracker
       secondary.actor.SetAnchorPoint( AnchorPoint::TOP_LEFT ); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
       secondary.actor.SetSortModifier( DECORATION_DEPTH_INDEX );
       secondary.flipped = false;
+      secondary.actor.SetColor( mHandleColor );
 
       secondary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
@@ -1093,8 +1084,10 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& leftHandle = mHandle[LEFT_SELECTION_HANDLE];
     HandleImpl& rightHandle = mHandle[RIGHT_SELECTION_HANDLE];
 
-    const HandleImageType leftImageType = leftHandle.pressed ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED;
-    const HandleImageType rightImageType = rightHandle.pressed ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED;
+    // If handle pressed and pressed image exists then use pressed image else stick with released image
+    const HandleImageType leftImageType = ( leftHandle.pressed && mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED] ) ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED;
+    const HandleImageType rightImageType = ( rightHandle.pressed && mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_PRESSED] ) ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED;
+
     const bool leftFlipped = mSwapSelectionHandles != leftHandle.flipped;
     const bool rightFlipped = mSwapSelectionHandles != rightHandle.flipped;
 
@@ -1207,7 +1200,7 @@ struct Decorator::Impl : public ConnectionTracker
   TextSelectionPopupCallbackInterface& mTextSelectionPopupCallbackInterface;
 
   Image               mHandleImages[HANDLE_TYPE_COUNT][HANDLE_IMAGE_TYPE_COUNT];
-  Image               mCursorImage;
+  Vector4             mHandleColor;
 
   CursorImpl          mCursor[CURSOR_COUNT];
   HandleImpl          mHandle[HANDLE_TYPE_COUNT];
@@ -1294,7 +1287,7 @@ const Vector2& Decorator::GetPosition( Cursor cursor ) const
   return mImpl->mCursor[cursor].position;
 }
 
-void Decorator::SetColor( Cursor cursor, const Dali::Vector4& color )
+void Decorator::SetCursorColor( Cursor cursor, const Dali::Vector4& color )
 {
   mImpl->mCursor[cursor].color = color;
 }
@@ -1380,6 +1373,16 @@ void Decorator::SetHandleImage( HandleType handleType, HandleImageType handleIma
 Dali::Image Decorator::GetHandleImage( HandleType handleType, HandleImageType handleImageType ) const
 {
   return mImpl->mHandleImages[handleType][handleImageType];
+}
+
+void Decorator::SetHandleColor( const Vector4& color )
+{
+  mImpl->mHandleColor = color;
+}
+
+const Vector4& Decorator::GetHandleColor() const
+{
+  return mImpl->mHandleColor;
 }
 
 void Decorator::SetPosition( HandleType handleType, float x, float y, float height )

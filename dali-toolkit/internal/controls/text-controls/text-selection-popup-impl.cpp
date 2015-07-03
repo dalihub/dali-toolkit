@@ -47,9 +47,9 @@ namespace
 // todo Move this to adaptor??
 #define GET_LOCALE_TEXT(string) dgettext("elementary", string)
 
-const Dali::Vector4 DEFAULT_POPUP_LINE_COLOR( Dali::Vector4( 0.69f, 0.93f, 0.93f, 1.0f ) );
+const Dali::Vector4 DEFAULT_POPUP_DIVIDER_COLOR( Dali::Vector4( 0.23f, 0.72f, 0.8f, 0.11f ) );
 const Dali::Vector4 DEFAULT_OPTION_ICON( Dali::Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
-const Dali::Vector4 DEFAULT_OPTION_ICON_PRESSED( Dali::Vector4( 0.12f, 0.56f, 1.0f, 1.0f ) );
+const Dali::Vector4 DEFAULT_OPTION_PRESSED_COLOR( Dali::Vector4( 0.24f, 0.72f, 0.8f, 0.11f ) );
 
 const std::string DEFAULT_POPUP_BACKGROUND_IMAGE( DALI_IMAGE_DIR "selection-popup-bg#.png" );
 const std::string OPTION_ICON_CLIPBOARD( DALI_IMAGE_DIR "copy_paste_icon_clipboard.png" );
@@ -702,7 +702,7 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
      ImageActor divider = Toolkit::CreateSolidColorActor( Color::WHITE );
      divider.SetSize( size );
      divider.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
-     divider.SetColor( mLineColor );
+     divider.SetColor( mDividerColor );
      mToolbar.AddDivider( divider );
    }
  }
@@ -763,9 +763,9 @@ TextSelectionPopup::TextSelectionPopup( TextSelectionPopupCallbackInterface* cal
   mOptionDividerSize( Size( 2.0f, 0.0f) ),
   mEnabledButtons( Toolkit::TextSelectionPopup::NONE ),
   mCallbackInterface( callbackInterface ),
-  mLineColor( DEFAULT_POPUP_LINE_COLOR ),
+  mDividerColor( DEFAULT_POPUP_DIVIDER_COLOR ),
   mIconColor( DEFAULT_OPTION_ICON ),
-  mPressedColor( DEFAULT_OPTION_ICON_PRESSED ),
+  mPressedColor( DEFAULT_OPTION_PRESSED_COLOR ),
   mSelectOptionPriority( 1 ),
   mSelectAllOptionPriority ( 2 ),
   mCutOptionPriority ( 4 ),

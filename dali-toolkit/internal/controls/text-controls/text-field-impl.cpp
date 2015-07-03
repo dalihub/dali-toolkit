@@ -108,7 +108,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enable-cursor-blink",          
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-blink-interval",                FLOAT,     CURSOR_BLINK_INTERVAL                )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-blink-duration",                FLOAT,     CURSOR_BLINK_DURATION                )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-image",                    STRING,    GRAB_HANDLE_IMAGE                    )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-pressed-image",            VECTOR4,   GRAB_HANDLE_PRESSED_IMAGE            )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-pressed-image",            STRING,    GRAB_HANDLE_PRESSED_IMAGE            )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scroll-threshold",                     FLOAT,     SCROLL_THRESHOLD                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scroll-speed",                         FLOAT,     SCROLL_SPEED                         )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-left",          STRING,    SELECTION_HANDLE_IMAGE_LEFT          )
@@ -347,7 +347,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           const Vector4 color = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PRIMARY_CURSOR_COLOR %f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
-          impl.mDecorator->SetColor( PRIMARY_CURSOR, color );
+          impl.mDecorator->SetCursorColor( PRIMARY_CURSOR, color );
           impl.RequestTextRelayout();
         }
         break;
@@ -359,7 +359,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           const Vector4 color = value.Get< Vector4 >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SECONDARY_CURSOR_COLOR %f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
-          impl.mDecorator->SetColor( SECONDARY_CURSOR, color );
+          impl.mDecorator->SetCursorColor( SECONDARY_CURSOR, color );
           impl.RequestTextRelayout();
         }
         break;
