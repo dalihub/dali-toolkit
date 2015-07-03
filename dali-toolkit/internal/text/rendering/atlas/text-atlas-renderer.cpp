@@ -231,7 +231,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
             }
 
             // Locate a new slot for our glyph
-            mGlyphManager.Add( glyph.fontId, glyph, bitmap, slot );
+            mGlyphManager.Add( glyph, bitmap, slot );
           }
         }
 
@@ -251,7 +251,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                         currentUnderlinePosition,
                         currentUnderlineThickness,
                         slot );
-       lastFontId = glyph.fontId;
+        lastFontId = glyph.fontId;
       }
     }
 
@@ -274,8 +274,9 @@ struct AtlasRenderer::Impl : public ConnectionTracker
           actor.Add( GenerateShadow( *mIt, shadowOffset, shadowColor ) );
         }
 
-        if ( mActor )
+        if( mActor )
         {
+          actor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
           mActor.Add( actor );
         }
         else
