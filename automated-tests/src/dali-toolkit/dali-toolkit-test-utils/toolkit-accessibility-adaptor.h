@@ -48,12 +48,19 @@ public: // Construction & Destruction
   AccessibilityAdaptor();
   ~AccessibilityAdaptor();
 
+public: // Mock object setup.
+
+  void MockSetReadPosition( Vector2& position );
+
 public: // Getters
+
   static AccessibilityAdaptor Get();
-  Vector2 GetReadPosition() const;
+
+  Vector2 GetReadPosition();
   bool IsEnabled() const;
   void SetActionHandler(AccessibilityActionHandler& handler);
   void SetGestureHandler(AccessibilityGestureHandler& handler);
+
   bool HandleActionNextEvent();
   bool HandleActionPreviousEvent();
   bool HandleActionActivateEvent();
