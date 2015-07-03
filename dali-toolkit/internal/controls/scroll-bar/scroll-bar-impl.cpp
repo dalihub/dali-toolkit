@@ -434,7 +434,7 @@ void ScrollBar::OnPan( const PanGesture& gesture )
     if(itemView)
     {
       // Disable automatic refresh in ItemView during fast scrolling
-      GetImpl(itemView).SetRefreshEnabled(true);//!mIsPanning);
+      GetImpl(itemView).SetRefreshEnabled(!mIsPanning);
     }
   }
 }
