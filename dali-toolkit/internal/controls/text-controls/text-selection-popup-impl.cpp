@@ -47,9 +47,13 @@ namespace
 // todo Move this to adaptor??
 #define GET_LOCALE_TEXT(string) dgettext("elementary", string)
 
+const std::string TEXT_SELECTION_POPUP_LABEL = "textselectionpopuplabel";
+
 const Dali::Vector4 DEFAULT_POPUP_DIVIDER_COLOR( Dali::Vector4( 0.23f, 0.72f, 0.8f, 0.11f ) );
 const Dali::Vector4 DEFAULT_OPTION_ICON( Dali::Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
 const Dali::Vector4 DEFAULT_OPTION_PRESSED_COLOR( Dali::Vector4( 0.24f, 0.72f, 0.8f, 0.11f ) );
+
+const float DEFAULT_CAPTION_POINT_SIZE = 8.0f; // todo This should be from the style sheet not fixed.
 
 const std::string DEFAULT_POPUP_BACKGROUND_IMAGE( DALI_IMAGE_DIR "selection-popup-bg#.png" );
 const std::string OPTION_ICON_CLIPBOARD( DALI_IMAGE_DIR "copy_paste_icon_clipboard.png" );
@@ -124,7 +128,6 @@ Dali::Toolkit::TextSelectionPopup TextSelectionPopup::New( Toolkit::TextSelectio
   Dali::Toolkit::TextSelectionPopup handle( *impl );
 
   impl->mEnabledButtons = buttonsToEnable;
-
   // Second-phase init of the implementation
   // This can only be done after the CustomActor connection has been made...
   impl->Initialize();
@@ -610,11 +613,15 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
    if ( showCaption )
    {
      Toolkit::TextLabel captionTextLabel = Toolkit::TextLabel::New();
+     captionTextLabel.SetStyleName( TEXT_SELECTION_POPUP_LABEL );
      captionTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, caption );
+     captionTextLabel.SetProperty( Toolkit::TextLabel::Property::POINT_SIZE, DEFAULT_CAPTION_POINT_SIZE );
      captionTextLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
      Toolkit::TextLabel pressedCaptionTextLabel = Toolkit::TextLabel::New();
+     pressedCaptionTextLabel.SetStyleName( TEXT_SELECTION_POPUP_LABEL );
      pressedCaptionTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, caption );
+     pressedCaptionTextLabel.SetProperty( Toolkit::TextLabel::Property::POINT_SIZE, DEFAULT_CAPTION_POINT_SIZE );
      pressedCaptionTextLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
      Padding padding;

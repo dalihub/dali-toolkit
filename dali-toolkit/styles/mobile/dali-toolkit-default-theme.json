@@ -90,11 +90,14 @@ distributing this software or its derivatives.
     {
       "point-size":10
     },
+    "textselectionpopuplabel":
+    {
+      "point-size":8
+    },
     "textselectionpopup":
     {
       "popup-max-size":[400,100],
-      "popup-min-size":[100,65],
-      "background-color":[0.0,0.0,0.0,1.0]
+      "popup-min-size":[100,65]
     },
     "scrollview":
     {
