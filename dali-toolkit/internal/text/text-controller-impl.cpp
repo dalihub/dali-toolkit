@@ -441,6 +441,25 @@ void Controller::Impl::GetDefaultFonts( Vector<FontRun>& fonts, Length numberOfC
   }
 }
 
+float Controller::Impl::GetDefaultFontLineHeight()
+{
+  FontId defaultFontId = 0u;
+  if( NULL == mFontDefaults )
+  {
+    defaultFontId = mFontClient.GetFontId( EMPTY_STRING,
+                                           EMPTY_STRING );
+  }
+  else
+  {
+    defaultFontId = mFontDefaults->GetFontId( mFontClient );
+  }
+
+  Text::FontMetrics fontMetrics;
+  mFontClient.GetFontMetrics( defaultFontId, fontMetrics );
+
+  return( fontMetrics.ascender - fontMetrics.descender );
+}
+
 void Controller::Impl::OnCursorKeyEvent( const Event& event )
 {
   if( NULL == mEventData )
@@ -1338,23 +1357,8 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
 
   if( isFirstPosition && isLastPosition )
   {
-    // There is zero characters. Get the default font.
-
-    FontId defaultFontId = 0u;
-    if( NULL == mFontDefaults )
-    {
-      defaultFontId = mFontClient.GetFontId( EMPTY_STRING,
-                                             EMPTY_STRING );
-    }
-    else
-    {
-      defaultFontId = mFontDefaults->GetFontId( mFontClient );
-    }
-
-    Text::FontMetrics fontMetrics;
-    mFontClient.GetFontMetrics( defaultFontId, fontMetrics );
-
-    cursorInfo.lineHeight = fontMetrics.ascender - fontMetrics.descender;
+    // There is zero characters. Get the default font's line height.
+    cursorInfo.lineHeight = GetDefaultFontLineHeight();
     cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
 
     cursorInfo.primaryPosition.x = 1.f;

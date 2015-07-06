@@ -330,6 +330,11 @@ struct Controller::Impl
    */
   void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters );
 
+  /**
+   * @brief Retrieve the line height of the default font.
+   */
+  float GetDefaultFontLineHeight();
+
   void OnCursorKeyEvent( const Event& event );
 
   void OnTapEvent( const Event& event );
