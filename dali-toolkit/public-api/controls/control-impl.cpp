@@ -548,9 +548,12 @@ void Control::SetStyleName( const std::string& styleName )
   {
     mImpl->mStyleName = styleName;
 
-    // Apply new style
+    // Apply new style, if stylemanager is available
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
-    GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+    if( styleManager )
+    {
+      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+    }
   }
 }
 
@@ -865,12 +868,15 @@ void Control::Initialize()
   if( mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS )
   {
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+    // if stylemanager is available
+    if( styleManager )
+    {
+      // Register for style changes
+      styleManager.StyleChangeSignal().Connect( this, &Control::OnStyleChange );
 
-    // Register for style changes
-    styleManager.StyleChangeSignal().Connect( this, &Control::OnStyleChange );
-
-    // Apply the current style
-    GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      // Apply the current style
+      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+    }
   }
 
   if( mImpl->mFlags & REQUIRES_KEYBOARD_NAVIGATION_SUPPORT )
