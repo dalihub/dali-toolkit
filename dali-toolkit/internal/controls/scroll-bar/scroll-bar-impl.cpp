@@ -175,6 +175,7 @@ ScrollBar::~ScrollBar()
 void ScrollBar::OnInitialize()
 {
   CreateDefaultIndicatorActor();
+  Self().SetDrawMode(DrawMode::OVERLAY);
 }
 
 void ScrollBar::SetScrollPropertySource( Handle handle, Property::Index propertyScrollPosition, Property::Index propertyMinScrollPosition, Property::Index propertyMaxScrollPosition, Property::Index propertyScrollContentSize )
@@ -217,9 +218,7 @@ void ScrollBar::SetScrollIndicator( Actor indicator )
   if( indicator )
   {
     mIndicator = indicator;
-
-    Actor self = Self();
-    self.Add(mIndicator);
+    Self().Add(mIndicator);
 
     if( !mPanGestureDetector )
     {
