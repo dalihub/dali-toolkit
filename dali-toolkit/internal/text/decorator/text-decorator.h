@@ -423,6 +423,13 @@ public:
   const Vector4& GetHighlightColor() const;
 
   /**
+   * @brief Sets into the decorator the depth used to render the text.
+   *
+   * @param[in] depth The text's depth.
+   */
+  void SetTextDepth( int textDepth );
+
+  /**
    * @brief Set the Selection Popup to show or hide via the active flaf
    * @param[in] active true to show, false to hide
    */

@@ -149,7 +149,6 @@ private: // Data
   Text::RendererPtr mRenderer;
   Actor mRenderableActor;
   int mRenderingBackend;
-  unsigned int mDepth;
   bool mHasBeenStaged:1;
 };
 
