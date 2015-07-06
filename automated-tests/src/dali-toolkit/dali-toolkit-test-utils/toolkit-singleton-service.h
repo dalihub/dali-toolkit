@@ -41,9 +41,11 @@ class SingletonService : public BaseHandle
 {
 public:
   SingletonService();
+  static Dali::SingletonService New();
   static SingletonService Get();
   ~SingletonService();
   void Register( const std::type_info& info, BaseHandle singleton );
+  void UnregisterAll();
   BaseHandle GetSingleton( const std::type_info& info ) const;
 
 public: // Not intended for application developers
