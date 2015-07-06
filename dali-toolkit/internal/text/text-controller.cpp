@@ -1016,7 +1016,12 @@ void Controller::CalculateTextAlignment( const Size& size )
   // Get the direction of the first character.
   const CharacterDirection firstParagraphDirection = mImpl->mLogicalModel->GetCharacterDirection( 0u );
 
-  const Size& actualSize = mImpl->mVisualModel->GetActualSize();
+  Size actualSize = mImpl->mVisualModel->GetActualSize();
+  if( fabsf( actualSize.height ) < Math::MACHINE_EPSILON_1000 )
+  {
+    // Get the line height of the default font.
+    actualSize.height = mImpl->GetDefaultFontLineHeight();
+  }
 
   // If the first paragraph is right to left swap ALIGN_BEGIN and ALIGN_END;
   LayoutEngine::HorizontalAlignment horizontalAlignment = mImpl->mLayoutEngine.GetHorizontalAlignment();
