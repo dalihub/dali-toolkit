@@ -97,6 +97,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
   };
 
   Impl()
+  : mDepth( 0 )
   {
     mGlyphManager = AtlasGlyphManager::Get();
     mFontClient = TextAbstraction::FontClient::Get();
