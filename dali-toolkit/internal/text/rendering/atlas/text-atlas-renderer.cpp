@@ -134,13 +134,10 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       style = STYLE_DROP_SHADOW;
     }
 
-    if ( mTextCache.Size() )
-    {
-      // Update the glyph cache with any changes to current text
-      RemoveText( glyphs );
-    }
-
     CalculateBlocksSize( glyphs );
+
+    // Avoid emptying mTextCache (& removing references) until after incremented references for the new text
+    Vector< TextCacheEntry > newTextCache;
 
     for( uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i )
     {
@@ -235,13 +232,18 @@ struct AtlasRenderer::Impl : public ConnectionTracker
             mGlyphManager.Add( glyph, bitmap, slot );
           }
         }
+        else
+        {
+          // We have 2+ copies of the same glyph
+          mGlyphManager.AdjustReferenceCount( glyph.fontId, glyph.index, 1/*increment*/ );
+        }
 
         // Generate mesh data for this quad, plugging in our supplied position
         mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
         textCacheEntry.mFontId = glyph.fontId;
         textCacheEntry.mImageId = slot.mImageId;
         textCacheEntry.mIndex = glyph.index;
-        mTextCache.PushBack( textCacheEntry );
+        newTextCache.PushBack( textCacheEntry );
 
         // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
         StitchTextMesh( meshContainer,
@@ -255,6 +257,10 @@ struct AtlasRenderer::Impl : public ConnectionTracker
         lastFontId = glyph.fontId;
       }
     }
+
+    // Now remove references for the old text
+    RemoveText();
+    mTextCache.Swap( newTextCache );
 
     if ( underlineEnabled )
     {
@@ -292,9 +298,12 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                                                 metrics.mGlyphCount,
                                                 metrics.mAtlasMetrics.mAtlasCount,
                                                 metrics.mAtlasMetrics.mTextureMemoryUsed / 1024 );
+
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "%s\n", metrics.mVerboseGlyphCounts.c_str() );
+
     for ( uint32_t i = 0; i < metrics.mAtlasMetrics.mAtlasCount; ++i )
     {
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Atlas [%i] %sPixels: %s Size: %ix%i, BlockSize: %ix%i, BlocksUsed: %i/%i\n",
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "   Atlas [%i] %sPixels: %s Size: %ix%i, BlockSize: %ix%i, BlocksUsed: %i/%i\n",
                                                  i + 1, i > 8 ? "" : " ",
                                                  metrics.mAtlasMetrics.mAtlasMetrics[ i ].mPixelFormat == Pixel::L8 ? "L8  " : "BGRA",
                                                  metrics.mAtlasMetrics.mAtlasMetrics[ i ].mSize.mWidth,
@@ -305,6 +314,15 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                                                  metrics.mAtlasMetrics.mAtlasMetrics[ i ].mTotalBlocks );
     }
 #endif
+  }
+
+  void RemoveText()
+  {
+    for ( Vector< TextCacheEntry >::Iterator oldTextIter = mTextCache.Begin(); oldTextIter != mTextCache.End(); ++oldTextIter )
+    {
+      mGlyphManager.AdjustReferenceCount( oldTextIter->mFontId, oldTextIter->mIndex, -1/*decrement*/ );
+    }
+    mTextCache.Resize( 0 );
   }
 
   Actor CreateMeshActor( const MeshRecord& meshRecord )
@@ -440,58 +458,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       extent.mMeshRecordIndex = index;
       extents.PushBack( extent );
     }
-  }
-
-  void RemoveText( const Vector<GlyphInfo>& glyphs )
-  {
-    Vector< CheckEntry > checked;
-    CheckEntry checkEntry;
-
-    for ( Vector< TextCacheEntry >::Iterator tCit = mTextCache.Begin(); tCit != mTextCache.End(); ++tCit )
-    {
-      uint32_t index = tCit->mIndex;
-      uint32_t fontId = tCit->mFontId;
-
-      // Check that this character has not already been checked...
-      bool wasChecked = false;
-      for ( Vector< CheckEntry >::Iterator cEit = checked.Begin(); cEit != checked.End(); ++cEit )
-      {
-        if ( fontId == cEit->mFontId && index == cEit->mIndex )
-        {
-          wasChecked = true;
-        }
-      }
-
-      if ( !wasChecked )
-      {
-
-        int32_t newCount = 0;
-        int32_t oldCount = 0;
-
-        // How many times does this character occur in the old text ?
-        for ( Vector< TextCacheEntry >::Iterator oTcit = mTextCache.Begin(); oTcit != mTextCache.End(); ++oTcit )
-        {
-          if ( fontId == oTcit->mFontId && index == oTcit->mIndex )
-          {
-            oldCount++;
-          }
-        }
-
-        // And how many times in the new ?
-        for ( Vector< GlyphInfo >::Iterator cGit = glyphs.Begin(); cGit != glyphs.End(); ++cGit )
-        {
-          if ( fontId == cGit->fontId && index == cGit->index )
-          {
-            newCount++;
-          }
-        }
-        mGlyphManager.AdjustReferenceCount( fontId, tCit->mImageId, newCount - oldCount );
-        checkEntry.mIndex = index;
-        checkEntry.mFontId = fontId;
-        checked.PushBack( checkEntry );
-      }
-    }
-    mTextCache.Resize( 0 );
   }
 
   void CalculateBlocksSize( const Vector<GlyphInfo>& glyphs )
@@ -779,7 +745,6 @@ AtlasRenderer::AtlasRenderer()
 
 AtlasRenderer::~AtlasRenderer()
 {
-  Vector< GlyphInfo > emptyGlyphs;
-  mImpl->RemoveText( emptyGlyphs );
+  mImpl->RemoveText();
   delete mImpl;
 }
