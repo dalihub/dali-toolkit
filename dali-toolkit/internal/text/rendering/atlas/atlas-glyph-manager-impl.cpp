@@ -117,8 +117,7 @@ AtlasGlyphManagerPtr AtlasGlyphManager::New()
   return internal;
 }
 
-void AtlasGlyphManager::Add( Text::FontId fontId,
-                             const Text::GlyphInfo& glyph,
+void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
                              const BufferImage& bitmap,
                              Dali::Toolkit::AtlasManager::AtlasSlot& slot )
 {
@@ -134,7 +133,7 @@ void AtlasGlyphManager::Add( Text::FontId fontId,
   for ( std::vector< FontGlyphRecord >::iterator fontGlyphRecordIt = mFontGlyphRecords.begin();
         fontGlyphRecordIt != mFontGlyphRecords.end(); ++fontGlyphRecordIt )
   {
-    if ( fontGlyphRecordIt->mFontId == fontId )
+    if ( fontGlyphRecordIt->mFontId == glyph.fontId )
     {
       fontGlyphRecordIt->mGlyphRecords.PushBack( record );
       foundGlyph = true;
@@ -146,7 +145,7 @@ void AtlasGlyphManager::Add( Text::FontId fontId,
   {
     // We need to add a new font entry
     FontGlyphRecord fontGlyphRecord;
-    fontGlyphRecord.mFontId = fontId;
+    fontGlyphRecord.mFontId = glyph.fontId;
     fontGlyphRecord.mGlyphRecords.PushBack( record );
     mFontGlyphRecords.push_back( fontGlyphRecord );
   }
@@ -216,7 +215,13 @@ Pixel::Format AtlasGlyphManager::GetPixelFormat( uint32_t atlasId )
 
 const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
 {
-  mMetrics.mGlyphCount = mFontGlyphRecords.size();
+  mMetrics.mGlyphCount = 0u;
+  for ( std::vector< FontGlyphRecord >::iterator fontGlyphRecordIt = mFontGlyphRecords.begin();
+        fontGlyphRecordIt != mFontGlyphRecords.end();
+        ++fontGlyphRecordIt )
+  {
+    mMetrics.mGlyphCount += fontGlyphRecordIt->mGlyphRecords.Size();
+  }
   mAtlasManager.GetMetrics( mMetrics.mAtlasMetrics );
   return mMetrics;
 }
