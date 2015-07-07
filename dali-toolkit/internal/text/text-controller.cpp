@@ -1364,23 +1364,21 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
       if( !isShowingPlaceholderText &&
           ( EventData::EDITING == mImpl->mEventData->mState ) )
       {
-        mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
-        mImpl->mEventData->mDecorator->SetPopupActive( false );
+        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
       }
-
-      // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
-      if( mImpl->mEventData )
+      else if( EventData::EDITING_WITH_GRAB_HANDLE != mImpl->mEventData->mState  )
       {
+        // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
         mImpl->ChangeState( EventData::EDITING );
-
-        Event event( Event::TAP_EVENT );
-        event.p1.mUint = tapCount;
-        event.p2.mFloat = x;
-        event.p3.mFloat = y;
-        mImpl->mEventData->mEventQueue.push_back( event );
-
-        mImpl->RequestRelayout();
       }
+
+      Event event( Event::TAP_EVENT );
+      event.p1.mUint = tapCount;
+      event.p2.mFloat = x;
+      event.p3.mFloat = y;
+      mImpl->mEventData->mEventQueue.push_back( event );
+
+      mImpl->RequestRelayout();
     }
     else if( !isShowingPlaceholderText &&
              mImpl->mEventData->mSelectionEnabled &&

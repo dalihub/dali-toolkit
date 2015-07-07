@@ -1144,6 +1144,24 @@ void Controller::Impl::ChangeState( EventData::State newState )
       HideClipboard();
       mEventData->mDecoratorUpdated = true;
     }
+    else if( EventData::EDITING_WITH_GRAB_HANDLE == mEventData->mState )
+    {
+      mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_PRIMARY );
+      if( mEventData->mCursorBlinkEnabled )
+      {
+        mEventData->mDecorator->StartCursorBlink();
+      }
+      // Grab handle is not shown until a tap is received whilst EDITING
+      mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+      mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
+      mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
+        mEventData->mDecorator->SetPopupActive( false );
+      }
+      mEventData->mDecoratorUpdated = true;
+      HideClipboard();
+    }
     else if ( EventData::SELECTION_HANDLE_PANNING == mEventData->mState )
     {
       mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
