@@ -61,7 +61,7 @@ distributing this software or its derivatives.
     "textfield":
     {
       "font-family":"SamsungSans",
-      "font-style":"Regular"
+      "font-style":"Regular",
       "primary-cursor-color":[1.0,0.71,0.9,1.0],
       "secondary-cursor-color":[1.0,0.71,0.9,1.0],
       "selection-highlight-color":[0.75,0.96,1.0,1.0],
