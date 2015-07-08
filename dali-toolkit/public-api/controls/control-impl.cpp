@@ -239,7 +239,7 @@ Actor CreateBackground( Actor parent, const Vector4& color, Image image = Image(
 
     //Create the index buffer
     Property::Map indexFormat;
-    indexFormat["indices"] = Property::UNSIGNED_INTEGER;
+    indexFormat["indices"] = Property::INTEGER;
     PropertyBuffer indexBuffer = PropertyBuffer::New( indexFormat, 6u );
     indexBuffer.SetData(gQuadIndex);
 
@@ -900,7 +900,7 @@ void Control::OnControlChildRemove( Actor& child )
 void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   // By default the control is only interested in theme (not font) changes
-  if( change == StyleChange::THEME_CHANGE )
+  if( styleManager && change == StyleChange::THEME_CHANGE )
   {
     GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
   }

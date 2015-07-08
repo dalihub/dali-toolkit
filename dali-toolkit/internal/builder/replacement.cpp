@@ -321,27 +321,6 @@ OptionalInteger Replacement::IsInteger( const TreeNode & node ) const
   return ret;
 }
 
-OptionalUnsignedInt Replacement::IsUnsignedInteger( const TreeNode & node ) const
-{
-  OptionalUnsignedInt ret;
-  if( OptionalString replace = HasFullReplacement( node ) )
-  {
-    Property::Value value = GetFullReplacement( *replace );
-    if( Property::UNSIGNED_INTEGER == value.GetType() )
-    {
-      ret = value.Get<unsigned int>();
-    }
-  }
-  else
-  {
-    if ( OptionalInteger i = ::IsInteger( node ) )
-    {
-      ret = OptionalUnsignedInt(static_cast<unsigned int>(*i) );
-    }
-  }
-  return ret;
-}
-
 OptionalVector2 Replacement::IsVector2( const TreeNode & node ) const
 {
   OptionalVector2 ret;

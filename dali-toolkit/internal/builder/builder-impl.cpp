@@ -124,11 +124,6 @@ std::string PropertyValueToString( const Property::Value& value )
       ret = ToString( value.Get<int>() );
       break;
     }
-    case Property::UNSIGNED_INTEGER:
-    {
-      ret = ToString( value.Get<unsigned int>() );
-      break;
-    }
     case Property::VECTOR2:
     {
       ret = ToString( value.Get<Vector2>() );

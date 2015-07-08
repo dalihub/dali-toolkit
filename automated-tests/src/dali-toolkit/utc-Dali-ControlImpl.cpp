@@ -867,17 +867,11 @@ int UtcDaliControlImplOnStyleChangeN(void)
   Control dummy = Control::New();
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( dummy );
 
-  // test that style manager is being used, passing an empty handle throws exception
-  try
-  {
-    Dali::Toolkit::StyleManager styleManager;
-    controlImpl.OnStyleChange( styleManager, StyleChange::THEME_CHANGE );
-    tet_result(TET_FAIL);
-  }
-  catch (DaliException &exception)
-  {
-    tet_result(TET_PASS);
-  }
+  // test that style manager is being used, passing an empty handle does nothing but does not crash either
+  Dali::Toolkit::StyleManager styleManager;
+  controlImpl.OnStyleChange( styleManager, StyleChange::THEME_CHANGE );
+  // no crash so test passes
+  tet_result(TET_PASS);
 
   END_TEST;
 }

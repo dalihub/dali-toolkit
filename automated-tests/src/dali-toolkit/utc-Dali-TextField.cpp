@@ -72,7 +72,7 @@ const char* const PROPERTY_NAME_SELECTION_HIGHLIGHT_COLOR            = "selectio
 const char* const PROPERTY_NAME_DECORATION_BOUNDING_BOX              = "decoration-bounding-box";
 const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS                = "input-method-settings";
 
-const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
+const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
 const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
@@ -268,7 +268,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   DALI_TEST_CHECK( field );
 
   // Check defaults.
-  DALI_TEST_EQUALS( field.GetProperty<unsigned int>( TextField::Property::RENDERING_BACKEND ), DEFAULT_RENDERING_BACKEND, TEST_LOCATION );
+  DALI_TEST_EQUALS( field.GetProperty<int>( TextField::Property::RENDERING_BACKEND ), DEFAULT_RENDERING_BACKEND, TEST_LOCATION );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), std::string(""), TEST_LOCATION );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::PLACEHOLDER_TEXT ), std::string(""), TEST_LOCATION );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::PLACEHOLDER_TEXT_FOCUSED ), std::string(""), TEST_LOCATION );
@@ -294,7 +294,7 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   // Check the render backend property.
   field.SetProperty( TextField::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
-  DALI_TEST_EQUALS( field.GetProperty<unsigned int>( TextField::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
+  DALI_TEST_EQUALS( field.GetProperty<int>( TextField::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
 
   // Check text property.
   field.SetProperty( TextField::Property::TEXT, "Setting Text" );

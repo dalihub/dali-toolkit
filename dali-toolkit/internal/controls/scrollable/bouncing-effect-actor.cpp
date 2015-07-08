@@ -102,7 +102,7 @@ Actor CreateBouncingEffectActor( Property::Index& bouncePropertyIndex )
 
   unsigned int indexData[18] = { 0,3,1,0,2,3,4,7,5,4,6,7,8,11,9,8,10,11 };
   Property::Map indexFormat;
-  indexFormat["indices"] = Property::UNSIGNED_INTEGER;
+  indexFormat["indices"] = Property::INTEGER;
   PropertyBuffer indices = PropertyBuffer::New( indexFormat, 18u );
   indices.SetData( indexData );
 

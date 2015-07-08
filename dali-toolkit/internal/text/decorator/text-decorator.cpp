@@ -281,7 +281,7 @@ struct Decorator::Impl : public ConnectionTracker
     mNotifyEndOfScroll( false )
   {
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
-    mQuadIndexFormat[ "indices" ] = Property::UNSIGNED_INTEGER;
+    mQuadIndexFormat[ "indices" ] = Property::INTEGER;
     mHighlightMaterial = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER ) );
   }
 
