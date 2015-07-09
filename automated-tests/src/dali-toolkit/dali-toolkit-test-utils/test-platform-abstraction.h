@@ -177,8 +177,6 @@ public:
 
   virtual void JoinLoaderThreads();
 
-  virtual Integration::DynamicsFactory* GetDynamicsFactory();
-
 public: // TEST FUNCTIONS
 
   // Enumeration of Platform Abstraction methods
@@ -196,8 +194,7 @@ public: // TEST FUNCTIONS
     GetResourcesFunc,
     IsLoadingFunc,
     SetDpiFunc,
-    JoinLoaderThreadsFunc,
-    GetDynamicsFactoryFunc,
+    JoinLoaderThreadsFunc
   } TestFuncEnum;
 
   /** Call this every test */
