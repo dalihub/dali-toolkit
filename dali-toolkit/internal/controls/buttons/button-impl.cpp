@@ -694,18 +694,17 @@ void Button::OnButtonDown()
 {
   if( !mTogglableButton )
   {
-    Toolkit::Button handle( GetOwner() );
-
     Pressed();
 
     if( mAutoRepeating )
     {
       SetUpTimer( mInitialAutoRepeatingDelay );
     }
-
-    //Emit signal.
-    mPressedSignal.Emit( handle );
   }
+
+  // The pressed signal should be emitted regardless of toggle mode.
+  Toolkit::Button handle( GetOwner() );
+  mPressedSignal.Emit( handle );
 }
 
 void Button::OnButtonUp()
@@ -724,13 +723,12 @@ void Button::OnButtonUp()
       {
         mAutoRepeatingTimer.Reset();
       }
-
-      Toolkit::Button handle( GetOwner() );
-
-      //Emit signal.
-      mReleasedSignal.Emit( handle );
-      mClickedSignal.Emit( handle );
     }
+
+    // The clicked and released signals should be emitted regardless of toggle mode.
+    Toolkit::Button handle( GetOwner() );
+    mReleasedSignal.Emit( handle );
+    mClickedSignal.Emit( handle );
   }
 }
 
@@ -740,18 +738,17 @@ void Button::OnTouchPointLeave()
   {
     if( !mTogglableButton )
     {
-      Toolkit::Button handle( GetOwner() );
-
       Released();
 
       if( mAutoRepeating )
       {
         mAutoRepeatingTimer.Reset();
       }
-
-      //Emit signal.
-      mReleasedSignal.Emit( handle );
     }
+
+    // The released signal should be emitted regardless of toggle mode.
+    Toolkit::Button handle( GetOwner() );
+    mReleasedSignal.Emit( handle );
   }
 }
 
