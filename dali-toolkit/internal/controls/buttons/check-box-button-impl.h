@@ -20,9 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/animation/animation.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
-
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/buttons/check-box-button.h>
@@ -80,41 +78,24 @@ private: // From Button
   virtual void OnLabelSet();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnSelected()
-   */
-  virtual bool OnSelected();
-
-  /**
    * @copydoc Toolkit::Internal::Button::OnDisabled()
    */
-  virtual bool OnDisabled();
+  virtual void OnDisabled();
 
   /**
-   * @copydoc Toolkit::Internal::Button::StopAllAnimations()
+   * @copydoc Toolkit::Internal::Button::PrepareForTranstionIn( Actor actor )
    */
-  virtual void StopAllAnimations();
-
-private:
+  virtual void PrepareForTranstionIn( Actor actor );
 
   /**
-   * Adds the actor to the transition animation.
-   * It creates a transition animation if needed and starts the animation.
-   * @param[in] actor The actor.
+   * @copydoc Toolkit::Internal::Button::PrepareForTranstionOut( Actor actor )
    */
-  void StartTransitionAnimation( Actor& actor );
+  virtual void PrepareForTranstionOut( Actor actor );
 
   /**
-   * Stops the transition animation.
-   * @param[in] remove If true, removes the fadeout actor from root.
+   * @copydoc Toolkit::Internal::Button::OnTransitionInImage( Actor actor )
    */
-  void StopTransitionAnimation( bool remove = true );
-
-  // slots
-
-  /**
-   * Called when the transition animation finishes.
-   */
-  void TransitionAnimationFinished( Dali::Animation& source );
+  virtual void OnTransitionIn( Actor actor );
 
 private:
 
@@ -125,7 +106,6 @@ private:
   CheckBoxButton& operator=( const CheckBoxButton& );
 
 private:
-  Animation                 mTransitionAnimation;  ///< Animation used in the state transitions.
   ShaderEffect              mTickUVEffect;         ///< ImageRegionEffect to expand the tick across
 };
 

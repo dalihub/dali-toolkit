@@ -253,7 +253,7 @@ Actor CreateBackground( Actor parent, const Vector4& color, Image image = Image(
 
     //Create the renderer
     Renderer renderer = Renderer::New( mesh, material );
-    renderer.SetDepthIndex( BACKGROUND_DEPTH_INDEX );
+    renderer.SetDepthIndex( parent.GetHierarchyDepth() + BACKGROUND_DEPTH_INDEX );
 
     //Create the actor
     Actor meshActor = Actor::New();
@@ -278,6 +278,7 @@ Actor CreateBackground( Actor parent, const Vector4& color, Image image = Image(
     imageActor.SetPositionInheritanceMode( USE_PARENT_POSITION_PLUS_LOCAL_POSITION );
     imageActor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
     imageActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    imageActor.SetSortModifier( parent.GetHierarchyDepth() + BACKGROUND_DEPTH_INDEX );
 
     return imageActor;
   }
@@ -547,9 +548,12 @@ void Control::SetStyleName( const std::string& styleName )
   {
     mImpl->mStyleName = styleName;
 
-    // Apply new style
+    // Apply new style, if stylemanager is available
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
-    GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+    if( styleManager )
+    {
+      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+    }
   }
 }
 
@@ -864,12 +868,15 @@ void Control::Initialize()
   if( mImpl->mFlags & REQUIRES_STYLE_CHANGE_SIGNALS )
   {
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+    // if stylemanager is available
+    if( styleManager )
+    {
+      // Register for style changes
+      styleManager.StyleChangeSignal().Connect( this, &Control::OnStyleChange );
 
-    // Register for style changes
-    styleManager.StyleChangeSignal().Connect( this, &Control::OnStyleChange );
-
-    // Apply the current style
-    GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      // Apply the current style
+      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+    }
   }
 
   if( mImpl->mFlags & REQUIRES_KEYBOARD_NAVIGATION_SUPPORT )
@@ -949,7 +956,7 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
   }
 }
 
-void Control::OnStageConnection( unsigned int depth )
+void Control::OnStageConnection( int depth )
 {
   unsigned int controlRendererCount = Self().GetRendererCount();
   for( unsigned int i(0); i<controlRendererCount; ++i )

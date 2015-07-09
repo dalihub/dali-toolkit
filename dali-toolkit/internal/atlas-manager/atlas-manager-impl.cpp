@@ -148,11 +148,14 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( const Toolkit::AtlasMa
   }
 
   Dali::Atlas atlas = Dali::Atlas::New( width, height, pixelformat );
+  atlas.Clear( Vector4::ZERO );
+  mUploadedImages.PushBack( NULL );
   AtlasDescriptor atlasDescriptor;
   atlasDescriptor.mAtlas = atlas;
   atlasDescriptor.mSize = size;
   atlasDescriptor.mPixelFormat = pixelformat;
-  atlasDescriptor.mNextFreeBlock = 1u; // indicate next free block will be the first ( +1 )
+  atlasDescriptor.mTotalBlocks = ( width / blockWidth ) * ( height / blockHeight );
+  atlasDescriptor.mAvailableBlocks = atlasDescriptor.mTotalBlocks - 1u;
   atlas.UploadedSignal().Connect( this, &AtlasManager::OnUpload );
 
   // What size do we need for this atlas' strip buffer ( assume 32bit pixel format )?
@@ -198,7 +201,6 @@ void AtlasManager::Add( const BufferImage& image,
   SizeType width = image.GetWidth();
   SizeType height = image.GetHeight();
   SizeType blockArea = 0;
-  SizeType totalBlocks = 0;
   SizeType foundAtlas = 0;
   SizeType index = 0;
   slot.mImageId = 0;
@@ -208,14 +210,13 @@ void AtlasManager::Add( const BufferImage& image,
   // If there is a preferred atlas then check for room in that first
   if ( atlas-- )
   {
-    foundAtlas = CheckAtlas( atlas, width, height, pixelFormat, blockArea, totalBlocks );
+    foundAtlas = CheckAtlas( atlas, width, height, pixelFormat, blockArea );
   }
 
   // Search current atlases to see if there is a good match
-
   while( !foundAtlas && index < mAtlasList.size() )
   {
-    foundAtlas = CheckAtlas( index, width, height, pixelFormat, blockArea, totalBlocks );
+    foundAtlas = CheckAtlas( index, width, height, pixelFormat, blockArea );
     ++index;
   }
 
@@ -231,11 +232,11 @@ void AtlasManager::Add( const BufferImage& image,
       }
       else
       {
-        foundAtlas = CheckAtlas( newAtlas, width, height, pixelFormat, blockArea, totalBlocks );
+        foundAtlas = CheckAtlas( newAtlas, width, height, pixelFormat, blockArea );
       }
     }
 
-    if ( Toolkit::AtlasManager::FAIL_ON_ADD_FAILS == mAddFailPolicy || !foundAtlas-- )
+    if ( !foundAtlas-- || Toolkit::AtlasManager::FAIL_ON_ADD_FAILS == mAddFailPolicy )
     {
       // Haven't found an atlas for this image!!!!!!
       return;
@@ -246,21 +247,10 @@ void AtlasManager::Add( const BufferImage& image,
   for ( SizeType i = 0; i < blockArea; ++i )
   {
     // Is there currently a next free block available ?
-    if ( mAtlasList[ foundAtlas ].mNextFreeBlock )
+    if ( mAtlasList[ foundAtlas ].mAvailableBlocks )
     {
-      // Yes, so use this for our next block
-      SizeType selectedBlock = mAtlasList[ foundAtlas ].mNextFreeBlock - 1u;
-      desc.mBlocksList.PushBack( selectedBlock );
-
-      // Any blocks going to be available after this one (adjust to store +1 )?
-      selectedBlock++;
-      selectedBlock++;
-      if ( selectedBlock > totalBlocks )
-      {
-        // No so start trying to use free blocks list
-        selectedBlock = 0;
-      }
-      mAtlasList[ foundAtlas ].mNextFreeBlock = selectedBlock;
+      // Yes, so select our next block
+      desc.mBlocksList.PushBack( mAtlasList[ foundAtlas ].mTotalBlocks - mAtlasList[ foundAtlas ].mAvailableBlocks-- );
     }
     else
     {
@@ -276,8 +266,8 @@ void AtlasManager::Add( const BufferImage& image,
   desc.mCount = 1u;
 
   // See if there's a previously freed image ID that we can assign to this new image
-  uint32_t imageId = 0;
-  for ( uint32_t i = 0; i < mImageList.size(); ++i )
+  uint32_t imageId = 0u;
+  for ( uint32_t i = 0u; i < mImageList.size(); ++i )
   {
     if ( !mImageList[ i ].mCount )
     {
@@ -303,29 +293,20 @@ AtlasManager::SizeType AtlasManager::CheckAtlas( SizeType atlas,
                                                  SizeType width,
                                                  SizeType height,
                                                  Pixel::Format pixelFormat,
-                                                 SizeType& blockArea,
-                                                 SizeType& totalBlocks )
+                                                 SizeType& blockArea )
 {
   if ( pixelFormat == mAtlasList[ atlas ].mPixelFormat )
   {
-    // Check to see if there are any unused blocks in this atlas to accomodate our image
-    SizeType blocksInX = mAtlasList[ atlas ].mSize.mWidth / mAtlasList[ atlas ].mSize.mBlockWidth;
-    SizeType blocksInY = mAtlasList[ atlas ].mSize.mHeight / mAtlasList[ atlas ].mSize.mBlockHeight;
-    totalBlocks = blocksInX * blocksInY;
-    SizeType blocksFree = mAtlasList[ atlas ].mNextFreeBlock ?
-                          totalBlocks - mAtlasList[ atlas ].mNextFreeBlock + 1u :
-                          mAtlasList[ atlas ].mFreeBlocksList.Size();
-
     // Check to see if the image will fit in these blocks, if not we'll need to create a new atlas
-    if ( blocksFree
-         && width + DOUBLE_PIXEL_PADDING <= mAtlasList[ atlas ].mSize.mBlockWidth
-         && height + DOUBLE_PIXEL_PADDING <= mAtlasList[ atlas ].mSize.mBlockHeight )
+    if ( ( mAtlasList[ atlas ].mAvailableBlocks + mAtlasList[ atlas ].mFreeBlocksList.Size() )
+           && width + DOUBLE_PIXEL_PADDING <= mAtlasList[ atlas ].mSize.mBlockWidth
+           && height + DOUBLE_PIXEL_PADDING <= mAtlasList[ atlas ].mSize.mBlockHeight )
     {
       blockArea = 1u;
       return ( atlas + 1u );
     }
   }
-  return 0;
+  return 0u;
 }
 
 void AtlasManager::CreateMesh( SizeType atlas,
@@ -337,7 +318,6 @@ void AtlasManager::CreateMesh( SizeType atlas,
                                Toolkit::AtlasManager::Mesh2D& mesh,
                                AtlasSlotDescriptor& desc )
 {
-
   Toolkit::AtlasManager::Vertex2D vertex;
   uint32_t faceIndex = 0;       // TODO change to unsigned short when property type is available
 
@@ -359,6 +339,9 @@ void AtlasManager::CreateMesh( SizeType atlas,
   float texelX = 1.0f / static_cast< float >( width );
   float texelY = 1.0f / static_cast< float >( height );
 
+  float halfTexelX = texelX * 0.5f;
+  float halfTexelY = texelY * 0.5f;
+
   // Get the normalized size of a block in texels
   float texelBlockWidth = texelX * vertexBlockWidth;
   float texelBlockHeight = texelY * vertexBlockHeight;
@@ -368,8 +351,14 @@ void AtlasManager::CreateMesh( SizeType atlas,
   float vertexEdgeHeight = static_cast< float >( imageHeight % blockHeight );
 
   // And in texels
-  float texelEdgeWidth = vertexEdgeWidth * texelX;
-  float texelEdgeHeight = vertexEdgeHeight * texelY;
+  float texelEdgeWidth = texelX * vertexEdgeWidth;
+  float texelEdgeHeight = texelY * vertexEdgeHeight;
+
+  // We're going to 'blit' half a pixel more on each edge
+  vertexBlockWidth++;
+  vertexEdgeWidth++;
+  vertexBlockHeight++;
+  vertexEdgeHeight++;
 
    // Block by block create the two triangles for the quad
   SizeType blockIndex = 0;
@@ -378,7 +367,8 @@ void AtlasManager::CreateMesh( SizeType atlas,
   float ndcVWidth;
   float ndcVHeight;
 
-  Vector2 topLeft = position;
+  // Move back half a pixel
+  Vector2 topLeft = Vector2( position.x - 0.5f, position.y - 0.5f );
 
   for ( SizeType y = 0; y < heightInBlocks; ++y )
   {
@@ -387,12 +377,12 @@ void AtlasManager::CreateMesh( SizeType atlas,
 
     if ( ( heightInBlocks - 1u ) == y && vertexEdgeHeight > 0.0f )
     {
-      ndcHeight = texelEdgeHeight;
+      ndcHeight = texelEdgeHeight + texelY;
       ndcVHeight = vertexEdgeHeight;
     }
     else
     {
-      ndcHeight = texelBlockHeight;
+      ndcHeight = texelBlockHeight + texelY;
       ndcVHeight = vertexBlockHeight;
     }
 
@@ -404,17 +394,17 @@ void AtlasManager::CreateMesh( SizeType atlas,
       float fBlockY = texelBlockHeight * static_cast< float >( block / atlasWidthInBlocks );
 
       // Add on texture filtering compensation
-      fBlockX += texelX;
-      fBlockY += texelY;
+      fBlockX += halfTexelX;
+      fBlockY += halfTexelY;
 
       if (  ( widthInBlocks - 1u ) == x && vertexEdgeWidth > 0.0f )
       {
-        ndcWidth = texelEdgeWidth;
+        ndcWidth = texelEdgeWidth + texelX;
         ndcVWidth = vertexEdgeWidth;
       }
       else
       {
-        ndcWidth = texelBlockWidth;
+        ndcWidth = texelBlockWidth + texelX;
         ndcVWidth = vertexBlockWidth;
       }
 
@@ -472,7 +462,6 @@ void AtlasManager::CreateMesh( SizeType atlas,
     Toolkit::AtlasManager::Mesh2D optimizedMesh;
     OptimizeMesh( mesh, optimizedMesh );
   }
-  //PrintMeshData( mesh );
 }
 
 void AtlasManager::PrintMeshData( const Toolkit::AtlasManager::Mesh2D& mesh )
@@ -511,8 +500,10 @@ void AtlasManager::OptimizeMesh( const Toolkit::AtlasManager::Mesh2D& in,
     Toolkit::AtlasManager::Vertex2D v = in.mVertices[ in.mIndices[ i ] ];
     for ( SizeType j = 0; j < out.mVertices.Size(); ++j )
     {
-      if ( v.mPosition.x == out.mVertices[ j ].mPosition.x && v.mPosition.y == out.mVertices[ j ].mPosition.y &&
-           v.mTexCoords.x == out.mVertices[ j ].mTexCoords.x && v.mTexCoords.y == out.mVertices[ j ].mTexCoords.y )
+      if ( ( fabsf( v.mPosition.x - out.mVertices[ j ].mPosition.x ) < Math::MACHINE_EPSILON_1000 ) &&
+           ( fabsf( v.mPosition.y - out.mVertices[ j ].mPosition.y ) < Math::MACHINE_EPSILON_1000 ) &&
+           ( fabsf( v.mTexCoords.x - out.mVertices[ j ].mTexCoords.x ) < Math::MACHINE_EPSILON_1000 ) &&
+           ( fabsf( v.mTexCoords.y - out.mVertices[ j ].mTexCoords.y ) < Math::MACHINE_EPSILON_1000 ) )
       {
         // Yes, so store this down as the vertex to use
         out.mIndices.PushBack( j );
@@ -628,33 +619,28 @@ void AtlasManager::UploadImage( const BufferImage& image,
      mUploadedImages.PushBack( const_cast< BufferImage& >( image ).GetBuffer() );
   }
 
-  // If this is the first block then we need to keep the first pixel free for underline texture
-  if ( block )
+  // Blit top strip
+  if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mHorizontalStrip,
+                                           blockOffsetX,
+                                           blockOffsetY ) )
   {
+    DALI_LOG_ERROR("Uploading top strip to Atlas Failed!\n");
+  }
+  else
+  {
+    mUploadedImages.PushBack( NULL );
+  }
 
-    // Blit top strip
-    if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mHorizontalStrip,
-                                             blockOffsetX,
-                                             blockOffsetY ) )
-    {
-      DALI_LOG_ERROR("Uploading top strip to Atlas Failed!\n");
-    }
-    else
-    {
-      mUploadedImages.PushBack( NULL );
-    }
-
-    // Blit left strip
-    if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mVerticalStrip,
-                                             blockOffsetX,
-                                             blockOffsetY + SINGLE_PIXEL_PADDING ) )
-    {
-      DALI_LOG_ERROR("Uploading left strip to Atlas Failed!\n");
-    }
-    else
-    {
-      mUploadedImages.PushBack( NULL );
-    }
+  // Blit left strip
+  if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mVerticalStrip,
+                                           blockOffsetX,
+                                           blockOffsetY + SINGLE_PIXEL_PADDING ) )
+  {
+    DALI_LOG_ERROR("Uploading left strip to Atlas Failed!\n");
+  }
+  else
+  {
+    mUploadedImages.PushBack( NULL );
   }
 
   // Blit bottom strip
@@ -794,28 +780,9 @@ const Toolkit::AtlasManager::AtlasSize& AtlasManager::GetAtlasSize( AtlasId atla
 
 AtlasManager::SizeType AtlasManager::GetFreeBlocks( AtlasId atlas ) const
 {
-  if ( atlas && atlas <= mAtlasList.size() )
+  if ( atlas && atlas-- <= mAtlasList.size() )
   {
-    uint32_t index = atlas - 1u;
-    uint32_t width = mAtlasList[ index ].mSize.mWidth;
-    uint32_t height = mAtlasList[ index ].mSize.mHeight;
-    uint32_t blockWidth = mAtlasList[ index ].mSize.mBlockWidth;
-    uint32_t blockHeight = mAtlasList[ index ].mSize.mBlockHeight;
-
-    SizeType widthInBlocks = width / blockWidth;
-    SizeType heightInBlocks = height / blockHeight;
-    uint32_t blockCount = widthInBlocks * heightInBlocks;
-
-    // Check free previously unallocated blocks and any free blocks
-    if ( mAtlasList[ index ].mNextFreeBlock )
-    {
-      blockCount -= mAtlasList[ index ].mNextFreeBlock -1u - mAtlasList[ index ].mFreeBlocksList.Size();
-    }
-    else
-    {
-      blockCount = mAtlasList[ index ].mFreeBlocksList.Size();
-    }
-    return blockCount;
+    return ( mAtlasList[ atlas ].mAvailableBlocks + mAtlasList[ atlas ].mFreeBlocksList.Size() );
   }
   else
   {
@@ -836,7 +803,7 @@ Pixel::Format AtlasManager::GetPixelFormat( AtlasId atlas )
     DALI_LOG_ERROR("Cannot get Atlas from AtlasID ( doesn't exist ).\n");
     return Pixel::L8;
   }
-  return mAtlasList[ atlas -1u ].mPixelFormat;
+  return mAtlasList[ --atlas].mPixelFormat;
 }
 
 void AtlasManager::GetMetrics( Toolkit::AtlasManager::Metrics& metrics )
@@ -850,12 +817,11 @@ void AtlasManager::GetMetrics( Toolkit::AtlasManager::Metrics& metrics )
   for ( uint32_t i = 0; i < atlasCount; ++i )
   {
     entry.mSize = mAtlasList[ i ].mSize;
-    entry.mTotalBlocks = ( entry.mSize.mWidth / entry.mSize.mBlockWidth ) * ( entry.mSize.mHeight / entry.mSize.mBlockHeight );
-    uint32_t reuseBlocks = mAtlasList[ i ].mFreeBlocksList.Size();
-    entry.mBlocksUsed = mAtlasList[ i ].mNextFreeBlock ? mAtlasList[ i ].mNextFreeBlock - reuseBlocks - 1u: entry.mTotalBlocks - reuseBlocks;
+    entry.mTotalBlocks = mAtlasList[ i ].mTotalBlocks;
+    entry.mBlocksUsed = entry.mTotalBlocks - mAtlasList[ i ].mAvailableBlocks + mAtlasList[ i ].mFreeBlocksList.Size();
     entry.mPixelFormat = GetPixelFormat( i + 1 );
 
-      metrics.mAtlasMetrics.PushBack( entry );
+    metrics.mAtlasMetrics.PushBack( entry );
 
     uint32_t size = entry.mSize.mWidth * entry.mSize.mHeight;
     if ( entry.mPixelFormat == Pixel::BGRA8888 )
@@ -871,9 +837,9 @@ void AtlasManager::GetMetrics( Toolkit::AtlasManager::Metrics& metrics )
 
 Material AtlasManager::GetMaterial( AtlasId atlas ) const
 {
-  if ( atlas && atlas <= mAtlasList.size() )
+  if ( atlas && atlas-- <= mAtlasList.size() )
   {
-    return mAtlasList[ atlas -1u ].mMaterial;
+    return mAtlasList[ atlas ].mMaterial;
   }
   Material null;
   return null;
@@ -881,9 +847,9 @@ Material AtlasManager::GetMaterial( AtlasId atlas ) const
 
 Sampler AtlasManager::GetSampler( AtlasId atlas ) const
 {
-  if ( atlas && atlas <= mAtlasList.size() )
+  if ( atlas && atlas-- <= mAtlasList.size() )
   {
-    return mAtlasList[ atlas -1u ].mSampler;
+    return mAtlasList[ atlas ].mSampler;
   }
   Sampler null;
   return null;

@@ -97,6 +97,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
   };
 
   Impl()
+  : mDepth( 0 )
   {
     mGlyphManager = AtlasGlyphManager::Get();
     mFontClient = TextAbstraction::FontClient::Get();
@@ -114,13 +115,13 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                   bool underlineEnabled,
                   const Vector4& underlineColor,
                   float underlineHeight,
-                  unsigned int depth )
+                  int depth )
   {
     AtlasManager::AtlasSlot slot;
     std::vector< MeshRecord > meshContainer;
     Vector< Extent > extents;
     TextCacheEntry textCacheEntry;
-    mDepth = static_cast< int >( depth );
+    mDepth = depth;
 
     float currentUnderlinePosition = ZERO;
     float currentUnderlineThickness = underlineHeight;
@@ -231,7 +232,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
             }
 
             // Locate a new slot for our glyph
-            mGlyphManager.Add( glyph.fontId, glyph, bitmap, slot );
+            mGlyphManager.Add( glyph, bitmap, slot );
           }
         }
 
@@ -251,7 +252,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                         currentUnderlinePosition,
                         currentUnderlineThickness,
                         slot );
-       lastFontId = glyph.fontId;
+        lastFontId = glyph.fontId;
       }
     }
 
@@ -274,8 +275,9 @@ struct AtlasRenderer::Impl : public ConnectionTracker
           actor.Add( GenerateShadow( *mIt, shadowOffset, shadowColor ) );
         }
 
-        if ( mActor )
+        if( mActor )
         {
+          actor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
           mActor.Add( actor );
         }
         else
@@ -318,8 +320,11 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
     Material material = mGlyphManager.GetMaterial( meshRecord.mAtlasId );
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
-    renderer.SetDepthIndex( mDepth );
+    renderer.SetDepthIndex( CONTENT_DEPTH_INDEX + mDepth );
     Actor actor = Actor::New();
+#if defined(DEBUG_ENABLED)
+    actor.SetName( "Text renderable actor" );
+#endif
     actor.AddRenderer( renderer );
     actor.SetSize( 1.0f, 1.0f );
     actor.SetColor( meshRecord.mColor );
@@ -647,7 +652,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
 
     // Ensure shadow is behind the text...
-    renderer.SetDepthIndex( mDepth + CONTENT_DEPTH_INDEX - 1 );
+    renderer.SetDepthIndex( CONTENT_DEPTH_INDEX + mDepth - 1 );
     Actor actor = Actor::New();
     actor.AddRenderer( renderer );
     actor.SetSize( 1.0f, 1.0f );
@@ -731,7 +736,7 @@ Text::RendererPtr AtlasRenderer::New()
   return Text::RendererPtr( new AtlasRenderer() );
 }
 
-Actor AtlasRenderer::Render( Text::ViewInterface& view, unsigned int depth )
+Actor AtlasRenderer::Render( Text::ViewInterface& view, int depth )
 {
   UnparentAndReset( mImpl->mActor );
 

@@ -1,6 +1,6 @@
 Name:       dali-toolkit
 Summary:    The OpenGLES Canvas Core Library Toolkit
-Version:    1.0.47
+Version:    1.0.48
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0
@@ -15,6 +15,17 @@ BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(dali)
 BuildRequires:  pkgconfig(dali-core)
+
+#############################
+# profile setup
+#############################
+
+%define dali_toolkit_profile MOBILE
+
+# Further resource locations profiles can be provided here otherwise MOBILE will be used
+%if "%{tizen_profile_name}" == "mobile"
+  %define dali_toolkit_profile MOBILE
+%endif
 
 %description
 The OpenGLES Canvas Core Library Toolkit - a set of controls that provide
@@ -56,7 +67,7 @@ cd %{_builddir}/dali-toolkit-%{version}/build/tizen
 autoreconf --install
 DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
 DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
-%configure
+%configure --enable-profile=%{dali_toolkit_profile}
 make %{?jobs:-j%jobs}
 
 ##############################

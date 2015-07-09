@@ -124,12 +124,22 @@ public:
    */
   static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
+  /**
+   * @copydoc Toolkit::TextSelectionPopup::RaiseAbove()
+   */
+  void RaiseAbove( Layer target );
+
 private: // From Control
 
   /**
    * @copydoc Control::OnInitialize()
    */
   virtual void OnInitialize();
+
+  /**
+   * @copydoc Control::OnStageConnection()
+   */
+  virtual void OnStageConnection( int depth );
 
 private: // Implementation
 
@@ -259,7 +269,7 @@ private: // Data
   Toolkit::TextSelectionPopup::Buttons mEnabledButtons; // stores enabled buttons
   Toolkit::TextSelectionPopupCallbackInterface* mCallbackInterface;
 
-  Vector4 mLineColor;                   // Color of the line around the text input popup
+  Vector4 mDividerColor;                // Color of the divider between buttons
   Vector4 mIconColor;                   // Color of the popup icon.
   Vector4 mPressedColor;                // Color of the popup option when pressed.
 

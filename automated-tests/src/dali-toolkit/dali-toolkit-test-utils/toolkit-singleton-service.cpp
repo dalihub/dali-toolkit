@@ -40,6 +40,7 @@ public:
   static Dali::SingletonService New();
   static Dali::SingletonService Get();
   void Register( const std::type_info& info, BaseHandle singleton );
+  void UnregisterAll();
   BaseHandle GetSingleton( const std::type_info& info ) const;
 
 private:
@@ -83,6 +84,11 @@ void SingletonService::Register( const std::type_info& info, BaseHandle singleto
   {
     mSingletonContainer.insert( SingletonPair( info.name(), singleton ) );
   }
+}
+
+void SingletonService::UnregisterAll()
+{
+  mSingletonContainer.clear();
 }
 
 BaseHandle SingletonService::GetSingleton( const std::type_info& info ) const
@@ -134,6 +140,11 @@ SingletonService::SingletonService()
 {
 }
 
+SingletonService SingletonService::New()
+{
+  return Internal::Adaptor::SingletonService::New();
+}
+
 SingletonService SingletonService::Get()
 {
   return Internal::Adaptor::SingletonService::Get();
@@ -146,6 +157,11 @@ SingletonService::~SingletonService()
 void SingletonService::Register( const std::type_info& info, BaseHandle singleton )
 {
   GetImplementation( *this ).Register( info, singleton );
+}
+
+void SingletonService::UnregisterAll()
+{
+  GetImplementation( *this ).UnregisterAll();
 }
 
 BaseHandle SingletonService::GetSingleton( const std::type_info& info ) const

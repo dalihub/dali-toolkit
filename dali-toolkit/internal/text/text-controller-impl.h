@@ -46,6 +46,7 @@ struct Event
     CURSOR_KEY_EVENT,
     TAP_EVENT,
     PAN_EVENT,
+    LONG_PRESS_EVENT,
     GRAB_HANDLE_EVENT,
     LEFT_SELECTION_HANDLE_EVENT,
     RIGHT_SELECTION_HANDLE_EVENT,
@@ -101,10 +102,12 @@ struct EventData
   enum State
   {
     INACTIVE,
+    INTERRUPTED,
     SELECTING,
     SELECTION_CHANGED,
     EDITING,
     EDITING_WITH_POPUP,
+    EDITING_WITH_GRAB_HANDLE,
     GRAB_HANDLE_PANNING,
     SELECTION_HANDLE_PANNING
   };
@@ -328,11 +331,18 @@ struct Controller::Impl
    */
   void GetDefaultFonts( Dali::Vector<FontRun>& fonts, Length numberOfCharacters );
 
+  /**
+   * @brief Retrieve the line height of the default font.
+   */
+  float GetDefaultFontLineHeight();
+
   void OnCursorKeyEvent( const Event& event );
 
   void OnTapEvent( const Event& event );
 
   void OnPanEvent( const Event& event );
+
+  void OnLongPressEvent( const Event& event );
 
   void OnHandleEvent( const Event& event );
 

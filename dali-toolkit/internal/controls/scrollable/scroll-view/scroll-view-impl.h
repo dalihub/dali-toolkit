@@ -549,7 +549,7 @@ private: // private overriden functions from CustomActorImpl and Controls
   /**
    * @copydoc CustomActorImpl::OnStageConnection()
    */
-  virtual void OnStageConnection( unsigned int depth );
+  virtual void OnStageConnection( int depth );
 
   /**
    * @copydoc CustomActorImpl::OnStageDisconnection()

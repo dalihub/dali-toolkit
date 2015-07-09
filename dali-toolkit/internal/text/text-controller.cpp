@@ -1016,7 +1016,12 @@ void Controller::CalculateTextAlignment( const Size& size )
   // Get the direction of the first character.
   const CharacterDirection firstParagraphDirection = mImpl->mLogicalModel->GetCharacterDirection( 0u );
 
-  const Size& actualSize = mImpl->mVisualModel->GetActualSize();
+  Size actualSize = mImpl->mVisualModel->GetActualSize();
+  if( fabsf( actualSize.height ) < Math::MACHINE_EPSILON_1000 )
+  {
+    // Get the line height of the default font.
+    actualSize.height = mImpl->GetDefaultFontLineHeight();
+  }
 
   // If the first paragraph is right to left swap ALIGN_BEGIN and ALIGN_END;
   LayoutEngine::HorizontalAlignment horizontalAlignment = mImpl->mLayoutEngine.GetHorizontalAlignment();
@@ -1109,16 +1114,18 @@ void Controller::KeyboardFocusLostEvent()
 
   if( mImpl->mEventData )
   {
-    mImpl->ChangeState( EventData::INACTIVE );
-
-    if( mImpl->IsShowingPlaceholderText() )
+    if ( EventData::INTERRUPTED != mImpl->mEventData->mState )
     {
-      // Revert to regular placeholder-text when not editing
-      ShowPlaceholderText();
-    }
+      mImpl->ChangeState( EventData::INACTIVE );
 
-    mImpl->RequestRelayout();
+      if( mImpl->IsShowingPlaceholderText() )
+      {
+        // Revert to regular placeholder-text when not editing
+        ShowPlaceholderText();
+      }
+    }
   }
+  mImpl->RequestRelayout();
 }
 
 bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
@@ -1152,10 +1159,17 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     {
       textChanged = BackspaceKeyEvent();
     }
-    else if ( IsKey( keyEvent,  Dali::DALI_KEY_POWER ) || IsKey( keyEvent, Dali::DALI_KEY_MENU ) )
+    else if ( IsKey( keyEvent,  Dali::DALI_KEY_POWER ) )
     {
-      // Do nothing when the Power or Menu Key is pressed.
-      // It avoids call the InsertText() method and delete the selected text.
+      mImpl->ChangeState( EventData::INTERRUPTED ); // State is not INACTIVE as expect to return to edit mode.
+      // Avoids calling the InsertText() method which can delete selected text
+    }
+    else if ( IsKey( keyEvent, Dali::DALI_KEY_MENU ) ||
+              IsKey( keyEvent, Dali::DALI_KEY_HOME ) )
+    {
+      mImpl->ChangeState( EventData::INACTIVE );
+      // Menu/Home key behaviour does not allow edit mode to resume like Power key
+      // Avoids calling the InsertText() method which can delete selected text
     }
     else
     {
@@ -1168,7 +1182,10 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       textChanged = true;
     }
 
-    mImpl->ChangeState( EventData::EDITING ); // todo Confirm this is the best place to change the state of
+    if ( mImpl->mEventData->mState != EventData::INTERRUPTED &&  mImpl->mEventData->mState != EventData::INACTIVE )
+    {
+      mImpl->ChangeState( EventData::EDITING );
+    }
 
     mImpl->RequestRelayout();
   }
@@ -1347,23 +1364,21 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
       if( !isShowingPlaceholderText &&
           ( EventData::EDITING == mImpl->mEventData->mState ) )
       {
-        mImpl->mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
-        mImpl->mEventData->mDecorator->SetPopupActive( false );
+        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
       }
-
-      mImpl->ChangeState( EventData::EDITING );
-
-      // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
-      if( mImpl->mEventData )
+      else if( EventData::EDITING_WITH_GRAB_HANDLE != mImpl->mEventData->mState  )
       {
-        Event event( Event::TAP_EVENT );
-        event.p1.mUint = tapCount;
-        event.p2.mFloat = x;
-        event.p3.mFloat = y;
-        mImpl->mEventData->mEventQueue.push_back( event );
-
-        mImpl->RequestRelayout();
+        // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
+        mImpl->ChangeState( EventData::EDITING );
       }
+
+      Event event( Event::TAP_EVENT );
+      event.p1.mUint = tapCount;
+      event.p2.mFloat = x;
+      event.p3.mFloat = y;
+      mImpl->mEventData->mEventQueue.push_back( event );
+
+      mImpl->RequestRelayout();
     }
     else if( !isShowingPlaceholderText &&
              mImpl->mEventData->mSelectionEnabled &&
@@ -1390,6 +1405,26 @@ void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
     mImpl->mEventData->mEventQueue.push_back( event );
 
     mImpl->RequestRelayout();
+  }
+}
+
+void Controller::LongPressEvent( Gesture::State state, float x, float y  )
+{
+  DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected PanEvent" );
+
+  if  ( mImpl->IsShowingPlaceholderText() || mImpl->mLogicalModel->mText.Count() == 0u )
+  {
+    if ( mImpl->mEventData )
+    {
+      Event event( Event::LONG_PRESS_EVENT );
+      event.p1.mInt = state;
+      mImpl->mEventData->mEventQueue.push_back( event );
+      mImpl->RequestRelayout();
+    }
+  }
+  else if( mImpl->mEventData )
+  {
+    SelectEvent( x, y, false );
   }
 }
 

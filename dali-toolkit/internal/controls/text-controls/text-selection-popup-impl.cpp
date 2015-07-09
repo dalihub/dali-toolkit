@@ -47,9 +47,13 @@ namespace
 // todo Move this to adaptor??
 #define GET_LOCALE_TEXT(string) dgettext("elementary", string)
 
-const Dali::Vector4 DEFAULT_POPUP_LINE_COLOR( Dali::Vector4( 0.69f, 0.93f, 0.93f, 1.0f ) );
+const std::string TEXT_SELECTION_POPUP_LABEL = "textselectionpopuplabel";
+
+const Dali::Vector4 DEFAULT_POPUP_DIVIDER_COLOR( Dali::Vector4( 0.23f, 0.72f, 0.8f, 0.11f ) );
 const Dali::Vector4 DEFAULT_OPTION_ICON( Dali::Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
-const Dali::Vector4 DEFAULT_OPTION_ICON_PRESSED( Dali::Vector4( 0.12f, 0.56f, 1.0f, 1.0f ) );
+const Dali::Vector4 DEFAULT_OPTION_PRESSED_COLOR( Dali::Vector4( 0.24f, 0.72f, 0.8f, 0.11f ) );
+
+const float DEFAULT_CAPTION_POINT_SIZE = 8.0f; // todo This should be from the style sheet not fixed.
 
 const std::string DEFAULT_POPUP_BACKGROUND_IMAGE( DALI_IMAGE_DIR "selection-popup-bg#.png" );
 const std::string OPTION_ICON_CLIPBOARD( DALI_IMAGE_DIR "copy_paste_icon_clipboard.png" );
@@ -124,7 +128,6 @@ Dali::Toolkit::TextSelectionPopup TextSelectionPopup::New( Toolkit::TextSelectio
   Dali::Toolkit::TextSelectionPopup handle( *impl );
 
   impl->mEnabledButtons = buttonsToEnable;
-
   // Second-phase init of the implementation
   // This can only be done after the CustomActor connection has been made...
   impl->Initialize();
@@ -298,9 +301,25 @@ Property::Value TextSelectionPopup::GetProperty( BaseObject* object, Property::I
   return value;
 }
 
+void TextSelectionPopup::RaiseAbove( Layer target )
+{
+  if( mToolbar )
+  {
+    mToolbar.RaiseAbove( target );
+  }
+}
+
 void TextSelectionPopup::OnInitialize()
 {
   CreatePopup();
+}
+
+void TextSelectionPopup::OnStageConnection( int depth )
+{
+  // Call the Control::OnStageConnection() to set the depth of the background.
+  Control::OnStageConnection( depth );
+
+  // TextSelectionToolbar::OnStageConnection() will set the depths of all the popup's components.
 }
 
 bool TextSelectionPopup::OnCutButtonPressed( Toolkit::Button button )
@@ -526,6 +545,7 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
  void TextSelectionPopup::CreateOrderedListOfPopupOptions()
  {
    mOrderListOfButtons.clear();
+   mOrderListOfButtons.reserve( 8u );
 
    // Create button for each possible option using Option priority
    if ( !mCutIconImage )
@@ -568,7 +588,6 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
 
  void TextSelectionPopup::AddOption( const ButtonRequirement& button, bool showDivider, bool showIcons, bool showCaption  )
  {
-
    const std::string& name = button.name;
    const std::string& caption = button.caption;
    Image iconImage = button.icon;
@@ -594,11 +613,15 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
    if ( showCaption )
    {
      Toolkit::TextLabel captionTextLabel = Toolkit::TextLabel::New();
+     captionTextLabel.SetStyleName( TEXT_SELECTION_POPUP_LABEL );
      captionTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, caption );
+     captionTextLabel.SetProperty( Toolkit::TextLabel::Property::POINT_SIZE, DEFAULT_CAPTION_POINT_SIZE );
      captionTextLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
      Toolkit::TextLabel pressedCaptionTextLabel = Toolkit::TextLabel::New();
+     pressedCaptionTextLabel.SetStyleName( TEXT_SELECTION_POPUP_LABEL );
      pressedCaptionTextLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, caption );
+     pressedCaptionTextLabel.SetProperty( Toolkit::TextLabel::Property::POINT_SIZE, DEFAULT_CAPTION_POINT_SIZE );
      pressedCaptionTextLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
      Padding padding;
@@ -613,13 +636,14 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
      optionPressedContainer.AddChild( pressedCaptionTextLabel, Toolkit::TableView::CellPosition(( showIcons&showCaption)?1:0, 0 ) );
    }
 
+   int depth = Self().GetHierarchyDepth();
    // 3. Create the icons
    if ( showIcons )
    {
      ImageActor pressedIcon = ImageActor::New(  iconImage );
      ImageActor icon = ImageActor::New(  iconImage );
-     icon.SetSortModifier( DECORATION_DEPTH_INDEX - 1 );
-     pressedIcon.SetSortModifier( DECORATION_DEPTH_INDEX - 1 );
+     icon.SetSortModifier( DECORATION_DEPTH_INDEX + depth - 1 );
+     pressedIcon.SetSortModifier( DECORATION_DEPTH_INDEX + depth - 1 );
 
      icon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
      pressedIcon.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
@@ -700,9 +724,13 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
      const Size size( mOptionDividerSize.width, 0.0f ); // Height FILL_TO_PARENT
 
      ImageActor divider = Toolkit::CreateSolidColorActor( Color::WHITE );
+#ifdef DECORATOR_DEBUG
+     divider.SetName("Text's popup divider");
+#endif
      divider.SetSize( size );
      divider.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
-     divider.SetColor( mLineColor );
+     divider.SetColor( mDividerColor );
+     divider.SetSortModifier( DECORATION_DEPTH_INDEX + depth );
      mToolbar.AddDivider( divider );
    }
  }
@@ -745,7 +773,7 @@ Dali::Image TextSelectionPopup::GetButtonImage( Toolkit::TextSelectionPopup::But
    self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
    SetBackgroundImage( NinePatchImage::New( DEFAULT_POPUP_BACKGROUND_IMAGE ) );
 
-   if ( !mToolbar )
+   if( !mToolbar )
    {
      mToolbar = Toolkit::TextSelectionToolbar::New();
      mToolbar.SetParentOrigin( ParentOrigin::CENTER );
@@ -763,9 +791,9 @@ TextSelectionPopup::TextSelectionPopup( TextSelectionPopupCallbackInterface* cal
   mOptionDividerSize( Size( 2.0f, 0.0f) ),
   mEnabledButtons( Toolkit::TextSelectionPopup::NONE ),
   mCallbackInterface( callbackInterface ),
-  mLineColor( DEFAULT_POPUP_LINE_COLOR ),
+  mDividerColor( DEFAULT_POPUP_DIVIDER_COLOR ),
   mIconColor( DEFAULT_OPTION_ICON ),
-  mPressedColor( DEFAULT_OPTION_ICON_PRESSED ),
+  mPressedColor( DEFAULT_OPTION_PRESSED_COLOR ),
   mSelectOptionPriority( 1 ),
   mSelectAllOptionPriority ( 2 ),
   mCutOptionPriority ( 4 ),

@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
@@ -46,6 +47,11 @@ BaseHandle Create()
 }
 
 TypeRegistration typeRegistration( typeid(Toolkit::PushButton), typeid(Toolkit::Button), Create );
+
+const char* const UNSELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "button-up.9.png";
+const char* const SELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "button-down.9.png";
+const char* const DISABLED_UNSELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "button-disabled.9.png";
+const char* const DISABLED_SELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "button-down-disabled.9.png";
 
 } // unnamed namespace
 
@@ -103,6 +109,16 @@ void PushButton::OnButtonInitialize()
 
   // Set resize policy to natural size so that buttons will resize to background images
   self.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+
+  Image buttonImage = Dali::ResourceImage::New( UNSELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
+  Image selectedImage = Dali::ResourceImage::New( SELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
+  Image disabledImage = Dali::ResourceImage::New( DISABLED_UNSELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
+  Image disabledSelectedImage = Dali::ResourceImage::New( DISABLED_SELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
+
+  SetButtonImage( ImageActor::New( buttonImage ) );
+  SetSelectedImage( ImageActor::New( selectedImage ) );
+  SetDisabledImage( ImageActor::New( disabledImage ) );
+  SetDisabledSelectedImage( ImageActor::New( disabledSelectedImage ) );
 }
 
 void PushButton::OnLabelSet()
@@ -156,386 +172,16 @@ void PushButton::OnDisabledImageSet()
   RelayoutRequest();
 }
 
-void PushButton::OnDisabledBackgroundImageSet()
+void PushButton::OnDisabledSelectedImageSet()
 {
   ConfigureSizeNegotiation();
   RelayoutRequest();
 }
 
-bool PushButton::OnSelected()
+void PushButton::OnDisabledBackgroundImageSet()
 {
-  Actor& buttonImage = GetButtonImage();
-  Actor& selectedImage = GetSelectedImage();
-  Actor& selectedBackgroundImage = GetSelectedBackgroundImage();
-
-  PaintState paintState = GetPaintState();
-
-  switch( paintState )
-  {
-    case UnselectedState:
-    {
-      FadeOutImage( buttonImage );
-      FadeInImage( selectedBackgroundImage );
-      FadeInImage( selectedImage );
-      StartTransitionAnimation();
-      break;
-    }
-    case SelectedState:
-    {
-      FadeOutImage( selectedBackgroundImage );
-      FadeOutImage( selectedImage );
-      FadeInImage( buttonImage );
-      StartTransitionAnimation();
-      break;
-    }
-    case UnselectedSelectedTransition:
-    {
-      float opacity = 1.f;
-      if( selectedImage )
-      {
-        opacity = selectedImage.GetCurrentOpacity();
-      }
-
-      StopTransitionAnimation( false );
-      FadeOutImage( selectedBackgroundImage, opacity );
-      FadeOutImage( selectedImage, opacity );
-      FadeInImage( buttonImage, 1.f - opacity );
-      StartTransitionAnimation();
-      break;
-    }
-    case SelectedUnselectedTransition:
-    {
-      float opacity = 0.f;
-      if( selectedImage )
-      {
-        opacity = selectedImage.GetCurrentOpacity();
-      }
-
-      StopTransitionAnimation( false );
-      FadeOutImage( buttonImage, 1.f - opacity );
-      FadeInImage( selectedBackgroundImage, opacity );
-      FadeInImage( selectedImage, opacity );
-      StartTransitionAnimation();
-      break;
-    }
-    case DisabledUnselectedTransition:
-    {
-      StopTransitionAnimation();
-      FadeOutImage( buttonImage );
-      FadeInImage( selectedBackgroundImage );
-      FadeInImage( selectedImage );
-      StartTransitionAnimation();
-      break;
-    }
-    case DisabledSelectedTransition:
-    {
-      StopTransitionAnimation();
-      FadeOutImage( selectedBackgroundImage );
-      FadeOutImage( selectedImage );
-      FadeInImage( buttonImage );
-      StartTransitionAnimation();
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
-
-  if( mTransitionAnimation )
-  {
-    return true;
-  }
-
-  return false;
-}
-
-bool PushButton::OnDisabled()
-{
-  Actor& buttonImage = GetButtonImage();
-  Actor& selectedImage = GetSelectedImage();
-  Actor& selectedBackgroundImage = GetSelectedBackgroundImage();
-  Actor& backgroundImage = GetBackgroundImage();
-  Actor& disabledImage = GetDisabledImage();
-  Actor& disabledSelectedImage = GetDisabledSelectedImage();
-  Actor& disabledBackgroundImage = GetDisabledBackgroundImage();
-
-  PaintState paintState = GetPaintState();
-
-  switch( paintState )
-  {
-    case UnselectedState:
-    {
-      FadeOutImage( backgroundImage );
-      FadeOutImage( buttonImage );
-      FadeInImage( disabledBackgroundImage );
-      FadeInImage( disabledImage );
-      StartTransitionAnimation();
-      break;
-    }
-    case SelectedState:
-    {
-      FadeOutImage( backgroundImage );
-      FadeOutImage( selectedBackgroundImage );
-      FadeOutImage( selectedImage );
-      FadeInImage( disabledBackgroundImage );
-      FadeInImage( disabledSelectedImage );
-      StartTransitionAnimation();
-      break;
-    }
-    case DisabledUnselectedState:
-    {
-      FadeOutImage( disabledBackgroundImage );
-      FadeOutImage( disabledImage );
-      FadeInImage( backgroundImage );
-      FadeInImage( buttonImage );
-      StartTransitionAnimation();
-      break;
-    }
-    case DisabledSelectedState:
-    {
-      FadeOutImage( disabledBackgroundImage );
-      FadeOutImage( disabledSelectedImage );
-      FadeInImage( backgroundImage );
-      FadeInImage( selectedBackgroundImage );
-      FadeInImage( selectedImage );
-      StartTransitionAnimation();
-      break;
-    }
-    case UnselectedSelectedTransition:
-    {
-      float opacity = 1.f;
-      if( selectedImage )
-      {
-        opacity = selectedImage.GetCurrentOpacity();
-      }
-
-      StopTransitionAnimation();
-      FadeOutImage( backgroundImage );
-      FadeOutImage( selectedBackgroundImage, opacity );
-      FadeOutImage( selectedImage, opacity );
-      FadeInImage( disabledBackgroundImage );
-      FadeInImage( disabledSelectedImage );
-      StartTransitionAnimation();
-      break;
-    }
-    case SelectedUnselectedTransition:
-    {
-      float opacity = 1.f;
-      if( buttonImage )
-      {
-        opacity = buttonImage.GetCurrentOpacity();
-      }
-
-      StopTransitionAnimation();
-      FadeOutImage( backgroundImage );
-      FadeOutImage( buttonImage, opacity );
-      FadeInImage( disabledBackgroundImage );
-      FadeInImage( disabledImage );
-      StartTransitionAnimation();
-      break;
-    }
-    case UnselectedDisabledTransition:
-    {
-      float opacity = 1.f;
-      if( disabledImage )
-      {
-        opacity = disabledImage.GetCurrentOpacity();
-      }
-
-      StopTransitionAnimation( false );
-      FadeOutImage( disabledBackgroundImage, opacity );
-      FadeOutImage( disabledImage, opacity );
-      FadeInImage( backgroundImage, 1.f - opacity );
-      FadeInImage( buttonImage, 1.f - opacity );
-      StartTransitionAnimation();
-      break;
-    }
-    case DisabledUnselectedTransition:
-    {
-      float opacity = 1.f;
-      if( buttonImage )
-      {
-        opacity = buttonImage.GetCurrentOpacity();
-      }
-
-      StopTransitionAnimation( false );
-      FadeOutImage( backgroundImage, opacity );
-      FadeOutImage( buttonImage, opacity );
-      FadeInImage( disabledBackgroundImage, 1.f - opacity );
-      FadeInImage( disabledImage, 1.f - opacity );
-      StartTransitionAnimation();
-      break;
-    }
-    case SelectedDisabledTransition:
-    {
-      float opacity = 1.f;
-      if( disabledSelectedImage )
-      {
-        opacity = disabledSelectedImage.GetCurrentOpacity();
-      }
-
-      StopTransitionAnimation( false );
-      FadeOutImage( disabledBackgroundImage, opacity );
-      FadeOutImage( disabledSelectedImage, opacity );
-      FadeInImage( backgroundImage, 1.f - opacity );
-      FadeInImage( selectedBackgroundImage, 1.f - opacity );
-      FadeInImage( selectedImage, 1.f - opacity );
-      StartTransitionAnimation();
-      break;
-    }
-    case DisabledSelectedTransition:
-    {
-      float opacity = 1.f;
-      if( selectedImage )
-      {
-        opacity = selectedImage.GetCurrentOpacity();
-      }
-
-      StopTransitionAnimation( false );
-      FadeOutImage( backgroundImage, opacity );
-      FadeOutImage( selectedBackgroundImage, opacity );
-      FadeOutImage( selectedImage, opacity );
-      FadeInImage( disabledBackgroundImage, 1.f - opacity );
-      FadeInImage( disabledSelectedImage, 1.f - opacity );
-      StartTransitionAnimation();
-      break;
-    }
-  }
-
-  if( mTransitionAnimation )
-  {
-    return true;
-  }
-
-  return false;
-}
-
-bool PushButton::OnPressed()
-{
-  Actor& buttonImage = GetButtonImage();
-  Actor& selectedImage = GetSelectedImage();
-  Actor& selectedBackgroundImage = GetSelectedBackgroundImage();
-
-  PaintState paintState = GetPaintState();
-
-  switch( paintState )
-  {
-    case UnselectedState:
-    {
-      FadeOutImage( buttonImage );
-      FadeInImage( selectedBackgroundImage );
-      FadeInImage( selectedImage );
-      StartTransitionAnimation();
-      break;
-    }
-    case SelectedUnselectedTransition:
-    {
-      float opacity = 1.f;
-      if( buttonImage )
-      {
-        opacity = buttonImage.GetCurrentOpacity();
-      }
-
-      StopTransitionAnimation( false );
-      FadeOutImage( buttonImage, opacity );
-      FadeInImage( selectedBackgroundImage, 1.f - opacity );
-      FadeInImage( selectedImage, 1.f - opacity );
-      StartTransitionAnimation();
-      break;
-    }
-    case DisabledUnselectedTransition:
-    {
-      float opacity = 1.f;
-      if( buttonImage )
-      {
-        opacity = buttonImage.GetCurrentOpacity();
-      }
-
-      StopTransitionAnimation();
-      FadeOutImage( buttonImage, opacity );
-      FadeInImage( selectedBackgroundImage );
-      FadeInImage( selectedImage );
-      StartTransitionAnimation();
-      break;
-    }
-    default:
-      break;
-  }
-
-  if( mTransitionAnimation )
-  {
-    return true;
-  }
-
-  return false;
-}
-
-bool PushButton::OnReleased()
-{
-  Actor& buttonImage = GetButtonImage();
-  Actor& selectedImage = GetSelectedImage();
-  Actor& selectedBackgroundImage = GetSelectedBackgroundImage();
-
-  PaintState paintState = GetPaintState();
-
-  switch( paintState )
-  {
-    case SelectedState:
-    {
-      FadeOutImage( selectedBackgroundImage );
-      FadeOutImage( selectedImage );
-      FadeInImage( buttonImage );
-      StartTransitionAnimation();
-      break;
-    }
-    case UnselectedSelectedTransition:
-    {
-      float opacity = 1.f;
-      if( selectedImage )
-      {
-        opacity = selectedImage.GetCurrentOpacity();
-      }
-
-      StopTransitionAnimation( false );
-      FadeOutImage( selectedBackgroundImage, opacity );
-      FadeOutImage( selectedImage, opacity );
-      FadeInImage( buttonImage, 1.f - opacity );
-      StartTransitionAnimation();
-      break;
-    }
-    case DisabledSelectedTransition:
-    {
-      float opacity = 1.f;
-      if( selectedImage )
-      {
-        opacity = selectedImage.GetCurrentOpacity();
-      }
-
-      StopTransitionAnimation();
-      FadeOutImage( selectedBackgroundImage, opacity );
-      FadeOutImage( selectedImage, opacity );
-      FadeInImage( buttonImage );
-      StartTransitionAnimation();
-      break;
-    }
-    default:
-    {
-      break;
-    }
-  }
-
-  if( mTransitionAnimation )
-  {
-    return true;
-  }
-
-  return false;
-}
-
-void PushButton::StopAllAnimations()
-{
-  StopTransitionAnimation();
+  ConfigureSizeNegotiation();
+  RelayoutRequest();
 }
 
 void PushButton::OnSizeSet( const Vector3& targetSize )
@@ -553,64 +199,38 @@ void PushButton::OnSizeSet( const Vector3& targetSize )
   }
 }
 
-void PushButton::StartTransitionAnimation()
+void PushButton::PrepareForTranstionIn( Actor actor )
 {
-  if( mTransitionAnimation )
-  {
-    mTransitionAnimation.FinishedSignal().Connect( this, &PushButton::TransitionAnimationFinished );
-    mTransitionAnimation.Play();
-  }
+  actor.SetOpacity( 0.0f );
 }
 
-void PushButton::StopTransitionAnimation( bool remove )
+void PushButton::PrepareForTranstionOut( Actor actor )
 {
-  if( mTransitionAnimation )
-  {
-    mTransitionAnimation.Clear();
-    mTransitionAnimation.Reset();
-  }
-
-  if( remove )
-  {
-    UpdatePaintTransitionState();
-  }
+  actor.SetOpacity( 1.0f );
 }
 
-void PushButton::FadeInImage( Actor& image, float opacity, Vector3 scale )
+void PushButton::OnTransitionIn( Actor actor )
 {
-  if( image )
-  {
-    image.SetOpacity( opacity );
-    image.SetScale( scale );
+  FadeImageTo( actor, 1.f );
+}
 
-    if( !mTransitionAnimation )
+void PushButton::OnTransitionOut( Actor actor )
+{
+  FadeImageTo( actor, 0.0f );
+}
+
+void PushButton::FadeImageTo( Actor actor, float opacity )
+{
+  if( actor )
+  {
+    Dali::Animation transitionAnimation = GetTransitionAnimation();
+    DALI_ASSERT_DEBUG( transitionAnimation );
+
+    if( transitionAnimation )
     {
-      mTransitionAnimation = Dali::Animation::New( GetAnimationTime() );
+      transitionAnimation.AnimateTo( Property( actor, Actor::Property::COLOR_ALPHA ), opacity );
     }
-
-    mTransitionAnimation.AnimateTo( Property( image, Actor::Property::COLOR_ALPHA ), 1.f );
   }
-}
-
-void PushButton::FadeOutImage( Actor& image, float opacity, Vector3 scale )
-{
-  if( image )
-  {
-    image.SetOpacity( opacity );
-    image.SetScale( scale );
-
-    if( !mTransitionAnimation )
-    {
-      mTransitionAnimation = Dali::Animation::New( GetAnimationTime() );
-    }
-
-    mTransitionAnimation.AnimateTo( Property( image, Actor::Property::COLOR_ALPHA ), 0.f );
-  }
-}
-
-void PushButton::TransitionAnimationFinished( Dali::Animation& source )
-{
-  StopTransitionAnimation();
 }
 
 Vector3 PushButton::GetNaturalSize()

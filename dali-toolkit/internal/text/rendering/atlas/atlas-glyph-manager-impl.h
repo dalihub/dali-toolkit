@@ -74,8 +74,7 @@ public:
   /**
    * @copydoc Toolkit::AtlasGlyphManager::Add
    */
-  void Add( Text::FontId fontId,
-            const Text::GlyphInfo& glyph,
+  void Add( const Text::GlyphInfo& glyph,
             const BufferImage& bitmap,
             Dali::Toolkit::AtlasManager::AtlasSlot& slot );
 

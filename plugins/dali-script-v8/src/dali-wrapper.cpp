@@ -68,7 +68,7 @@ const ApiFunction ConstructorFunctionTable[]=
     { "MeshActor",          ActorWrapper::NewActor },
     { "CameraActor",        ActorWrapper::NewActor },
     { "Layer",              ActorWrapper::NewActor },
-    { "TextView",           ActorWrapper::NewActor },
+    { "Control",            ActorWrapper::NewControl },
     { "ResourceImage",      ImageWrapper::NewImage },
     { "BufferImage",        ImageWrapper::NewImage },
     { "NinePatchImage",     ImageWrapper::NewImage },
@@ -99,8 +99,9 @@ Integration::Log::Filter* gLogExecuteFilter( Integration::Log::Filter::New(Debug
 bool DaliWrapper::mInstanceCreated = false;
 DaliWrapper* DaliWrapper::mWrapper = NULL;
 
-DaliWrapper::DaliWrapper()
-:mIsolate( NULL )
+DaliWrapper::DaliWrapper( RunMode runMode, v8::Isolate* isolate )
+:mIsolate( isolate ),
+ mRunMode(runMode)
 {
 }
 
@@ -111,19 +112,59 @@ DaliWrapper::~DaliWrapper()
 
 DaliWrapper& DaliWrapper::Get()
 {
-  if(!mInstanceCreated)
+  if( !mInstanceCreated )
   {
-    mWrapper = new DaliWrapper();
+    mWrapper = new DaliWrapper( RUNNING_STANDALONE, NULL );
+
     mInstanceCreated = true;
 
-    if(mWrapper)
-    {
-      mWrapper->Initialize();
-    }
-  }
+    mWrapper->InitializeStandAlone();
 
+  }
   return *mWrapper;
 }
+
+v8::Local<v8::Object> DaliWrapper::CreateWrapperForNodeJS( v8::Isolate* isolate )
+{
+  v8::EscapableHandleScope handleScope( isolate);
+
+  mInstanceCreated = true;
+
+  mWrapper = new DaliWrapper( RUNNING_IN_NODE_JS, isolate );
+
+  v8::Local<v8::Object> dali = mWrapper->CreateDaliObject();
+
+  // As we running inside node, we already have an isolate and context
+  return handleScope.Escape( dali );
+}
+
+v8::Local<v8::Object>  DaliWrapper::CreateDaliObject()
+{
+  v8::EscapableHandleScope handleScope( mIsolate  );
+
+  // Create dali object used for creating objects, and accessing constant values
+  // e.g. var x =  new dali.Actor(), or var col = dali.COLOR_RED;
+
+  v8::Local<v8::ObjectTemplate> daliObjectTemplate = NewDaliObjectTemplate( mIsolate );
+
+  // add dali.staqe
+  v8::Local<v8::Object> stageObject = StageWrapper::WrapStage( mIsolate, Stage::GetCurrent() );
+  daliObjectTemplate->Set( v8::String::NewFromUtf8( mIsolate, "stage") , stageObject );
+
+  v8::Local<v8::Object> keyboardObject = KeyboardFocusManagerWrapper::WrapKeyboardFocusManager( mIsolate,Toolkit::KeyboardFocusManager::Get() );
+  daliObjectTemplate->Set( v8::String::NewFromUtf8( mIsolate, "keyboardFocusManager") , keyboardObject );
+
+
+  //create an instance of the template
+  v8::Local<v8::Object> daliObject = daliObjectTemplate->NewInstance();
+
+  ConstantsWrapper::AddDaliConstants( mIsolate, daliObject);
+
+  daliObject->Set( v8::String::NewFromUtf8( mIsolate,  "V8_VERSION") ,v8::String::NewFromUtf8( mIsolate, v8::V8::GetVersion() ));
+
+  return handleScope.Escape( daliObject  );
+}
+
 
 void DaliWrapper::SetFlagsFromString(const std::string &flags)
 {
@@ -132,6 +173,12 @@ void DaliWrapper::SetFlagsFromString(const std::string &flags)
 
 void DaliWrapper::Shutdown()
 {
+  // if we're running inside node then we don't have ownership of the context
+  if( mRunMode == RUNNING_IN_NODE_JS )
+  {
+    return;
+  }
+
   DALI_LOG_WARNING("Destroying V8 DALi context\n");
 
   if( !mContext.IsEmpty())
@@ -160,35 +207,33 @@ GarbageCollectorInterface& DaliWrapper::GetDaliGarbageCollector()
   return mGarbageCollector;
 }
 
-void DaliWrapper::CreateContext( )
+void DaliWrapper::ApplyGlobalObjectsToContext( v8::Local<v8::Context> context )
 {
   v8::HandleScope handleScope( mIsolate );
 
-  // Create a  global JavaScript object so we can set built-in global functions, like Log.
-  v8::Handle<v8::ObjectTemplate> global = v8::ObjectTemplate::New( mIsolate );
+  // Add global objects ( functions/ values ) e.g. log function
+  // create a console.log and console.error functions
+  v8::Local<v8::ObjectTemplate> consoleObjectTemplate = v8::ObjectTemplate::New( mIsolate );
+  consoleObjectTemplate->Set( v8::String::NewFromUtf8( mIsolate, "log"),   v8::FunctionTemplate::New( mIsolate, V8Utils::Log));
+  consoleObjectTemplate->Set( v8::String::NewFromUtf8( mIsolate, "error"), v8::FunctionTemplate::New( mIsolate, V8Utils::LogError));
 
-  // Add global objects ( functions/ values ) e.g. log function and V8_VERSION
-  global->Set( v8::String::NewFromUtf8( mIsolate,  "log"),        v8::FunctionTemplate::New( mIsolate, V8Utils::Log) );
-  global->Set( v8::String::NewFromUtf8( mIsolate,  "logError"),   v8::FunctionTemplate::New( mIsolate, V8Utils::LogError) );
-  global->Set( v8::String::NewFromUtf8( mIsolate,  "require"),    v8::FunctionTemplate::New( mIsolate, DaliWrapper::Require));
-  global->Set( v8::String::NewFromUtf8( mIsolate,  "V8_VERSION") ,v8::String::NewFromUtf8( mIsolate, v8::V8::GetVersion() ));
+  context->Global()->Set( v8::String::NewFromUtf8( mIsolate, "console"), consoleObjectTemplate->NewInstance() );
 
-   // add the dali object to it, assume it won't be garbage collected until global is deleted
-  global->Set(v8::String::NewFromUtf8( mIsolate, DALI_API_NAME) ,  NewDaliObjectTemplate( mIsolate ));
+  // add require functionality
+  context->Global()->Set( v8::String::NewFromUtf8( mIsolate, "require"), v8::FunctionTemplate::New( mIsolate, DaliWrapper::Require)->GetFunction());
 
+  // Create the Dali object
+  // @todo consider forcing developers to perform require('dali') if we want to avoid polluting the global namespace
+  v8::Local<v8::Object> daliObject = CreateDaliObject();
 
-  // create a new context.
-  // Isolate = isolated copy of the V8 including a heap manager, a garbage collector
-  // Only 1 thread can access a single Isolate at a given time. However, multiple Isolates can be run in parallel.
-  // Context = multiple contexts can exist in a given Isolate, and share data between contexts
-  v8::Handle<v8::Context> context  = v8::Context::New( mIsolate, NULL, global);
+  // allow developers to require('dali'); // this is to maintain compatibility with node.js where dali is not part of the global namespace
+  mModuleLoader.StorePreBuiltModule( mIsolate, daliObject, DALI_API_NAME );
 
-  mGlobalObjectTemplate.Reset( mIsolate,  global);
+  context->Global()->Set( v8::String::NewFromUtf8( mIsolate, DALI_API_NAME),daliObject );
 
-  mContext.Reset( mIsolate, context);
 }
 
-void DaliWrapper::Initialize()
+void DaliWrapper::InitializeStandAlone()
 {
   if( !mIsolate )
   {
@@ -198,37 +243,34 @@ void DaliWrapper::Initialize()
 
     // default isolate removed from V8 version 3.27.1 and beyond.
     mIsolate = v8::Isolate::New();
+
     mIsolate->Enter();
 
     v8::V8::SetFatalErrorHandler( FatalErrorCallback );
-
   }
+
   // if context is null, create it and add dali object to the global object.
   if( mContext.IsEmpty())
   {
      v8::HandleScope handleScope( mIsolate );
-     CreateContext();
-     v8::Local<v8::Context> context = v8::Local<v8::Context>::New(mIsolate, mContext);
+
+     // create a new context.
+     // Isolate = isolated copy of the V8 including a heap manager, a garbage collector
+     // Only 1 thread can access a single Isolate at a given time. However, multiple Isolates can be run in parallel.
+     // Context = multiple contexts can exist in a given Isolate, and share data between contexts
+     v8::Local<v8::Context> context  = v8::Context::New( mIsolate );
 
      context->Enter();
 
-     // Add the dali global object. Used for creating objects, and accessing constant values
-     // e.g. var x =  new dali.ImageActor(), or var col = dali.COLOR_RED;
+     // Apply global objects like dali and console to the context
+     ApplyGlobalObjectsToContext(context);
 
-     v8::Local<v8::Object> daliObject = v8::Local<v8::Object>::Cast( context->Global()->Get( v8::String::NewFromUtf8( mIsolate, DALI_API_NAME)));
-
-     v8::Local<v8::Object> stageObject = StageWrapper::WrapStage( mIsolate, Stage::GetCurrent() );
-     daliObject->Set( v8::String::NewFromUtf8( mIsolate, "stage") , stageObject );
-
-     // keyboard focus manager is a singleton
-     v8::Local<v8::Object> keyboardObject = KeyboardFocusManagerWrapper::WrapKeyboardFocusManager( mIsolate,Toolkit::KeyboardFocusManager::Get() );
-     daliObject->Set( v8::String::NewFromUtf8( mIsolate, "keyboardFocusManager") , keyboardObject );
-
-     ConstantsWrapper::AddDaliConstants( mIsolate, daliObject);
-
+     mContext.Reset( mIsolate, context);
   }
+
   DALI_LOG_INFO( gLogExecuteFilter, Debug::Verbose, "V8 Library %s loaded \n", v8::V8::GetVersion() );
 }
+
 
 v8::Handle<v8::ObjectTemplate> DaliWrapper::NewDaliObjectTemplate( v8::Isolate* isolate )
 {
@@ -241,11 +283,11 @@ v8::Handle<v8::ObjectTemplate> DaliWrapper::NewDaliObjectTemplate( v8::Isolate* 
   objTemplate->Set( v8::String::NewFromUtf8( isolate, "BUILD"),
                     v8::String::NewFromUtf8( isolate, "Dali binary built on:" __DATE__ ", at " __TIME__));
 
-
+#ifdef DALI_DATA_READ_ONLY_DIR
   // add the data data directory,
   objTemplate->Set( v8::String::NewFromUtf8( isolate, "DALI_DATA_DIRECTORY"),
-                      v8::String::NewFromUtf8( isolate, DALI_DATA_READ_ONLY_DIR));
-
+                    v8::String::NewFromUtf8( isolate, DALI_DATA_READ_ONLY_DIR));
+#endif
   // add our constructor functions
   ObjectTemplateHelper::InstallFunctions( isolate,
                                           objTemplate,
@@ -259,10 +301,8 @@ v8::Handle<v8::ObjectTemplate> DaliWrapper::NewDaliObjectTemplate( v8::Isolate* 
 void DaliWrapper::Require(const v8::FunctionCallbackInfo< v8::Value >& args)
 {
   DaliWrapper& wrapper( DaliWrapper::Get() );
-  wrapper.mModuleLoader.Require( args, wrapper.mGlobalObjectTemplate );
+  wrapper.mModuleLoader.Require( args );
 }
-
-
 
 
 } // namespace V8Plugin

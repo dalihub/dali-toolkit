@@ -51,7 +51,7 @@ public:
    * @param[in] depth The depth in the tree of the parent.
    * @return The Renderable actor used to position the text.
    */
-  virtual Actor Render( ViewInterface& view, unsigned int depth );
+  virtual Actor Render( ViewInterface& view, int depth );
 
 protected:
 

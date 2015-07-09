@@ -100,7 +100,7 @@ private: // From Control
   /**
    * @copydoc Control::OnStageConnection()
    */
-  virtual void OnStageConnection( unsigned int depth );
+  virtual void OnStageConnection( int depth );
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
@@ -149,7 +149,6 @@ private: // Data
   Text::RendererPtr mRenderer;
   Actor mRenderableActor;
   int mRenderingBackend;
-  unsigned int mDepth;
   bool mHasBeenStaged:1;
 };
 

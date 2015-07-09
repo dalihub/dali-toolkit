@@ -75,7 +75,7 @@ const char* const PROPERTY_NAME_INPUT_METHOD_SETTINGS                = "input-me
 const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
-const Dali::Vector4 LIGHT_BLUE( (0xb2 / 255.0f), (0xeb / 255.0f), (0xf2 / 255.0f), 0.5f ); // The text highlight color.
+const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
 
 const unsigned int CURSOR_BLINK_INTERVAL = 500u; // Cursor blink interval
 const float TO_MILLISECONDS = 1000.f;

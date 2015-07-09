@@ -68,7 +68,8 @@ public:
     PixelBuffer* mStripBuffer;                                          // Blank image buffer used to pad upload
     Material mMaterial;                                                 // material used for atlas texture
     Sampler mSampler;                                                   // sampler used for atlas texture
-    SizeType mNextFreeBlock;                                            // next free block will be placed here ( actually +1 )
+    SizeType mTotalBlocks;                                              // total number of blocks in atlas
+    SizeType mAvailableBlocks;                                          // number of blocks available in atlas
     Dali::Vector< SizeType > mFreeBlocksList;                           // unless there are any previously freed blocks
   };
 
@@ -203,8 +204,7 @@ private:
                        SizeType width,
                        SizeType height,
                        Pixel::Format pixelFormat,
-                       SizeType& blockArea,
-                       SizeType& totalBlocks );
+                       SizeType& blockArea );
 
   void CreateMesh( SizeType atlas,
                    SizeType imageWidth,

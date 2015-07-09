@@ -67,6 +67,8 @@ Integration::Log::Filter* gFilterScript  = Integration::Log::Filter::New(Debug::
 namespace
 {
 
+#define TOKEN_STRING(x) #x
+
 const std::string KEYNAME_STYLES    = "styles";
 const std::string KEYNAME_TYPE      = "type";
 const std::string KEYNAME_ACTORS    = "actors";
@@ -1357,6 +1359,13 @@ Builder::Builder()
 : mSlotDelegate( this )
 {
   mParser = Dali::Toolkit::JsonParser::New();
+
+  Property::Map defaultDirs;
+  defaultDirs[ TOKEN_STRING(DALI_IMAGE_DIR) ]  = DALI_IMAGE_DIR;
+  defaultDirs[ TOKEN_STRING(DALI_SOUND_DIR) ]  = DALI_SOUND_DIR;
+  defaultDirs[ TOKEN_STRING(DALI_STYLE_DIR) ] = DALI_STYLE_DIR;
+
+  AddConstants( defaultDirs );
 }
 
 Builder::~Builder()

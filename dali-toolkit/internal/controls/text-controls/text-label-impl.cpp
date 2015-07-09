@@ -491,10 +491,11 @@ void TextLabel::RequestTextRelayout()
 
 void TextLabel::RenderText()
 {
+  Actor self = Self();
   Actor renderableActor;
   if( mRenderer )
   {
-    renderableActor = mRenderer->Render( mController->GetView(), mDepth );
+    renderableActor = mRenderer->Render( mController->GetView(), self.GetHierarchyDepth() );
   }
 
   if( renderableActor != mRenderableActor )
@@ -506,7 +507,7 @@ void TextLabel::RenderText()
       const Vector2& alignmentOffset = mController->GetAlignmentOffset();
       renderableActor.SetPosition( alignmentOffset.x, alignmentOffset.y );
 
-      Self().Add( renderableActor );
+      self.Add( renderableActor );
     }
     mRenderableActor = renderableActor;
   }
@@ -529,9 +530,12 @@ void TextLabel::AddDecoration( Actor& actor, bool needsClipping )
   // TextLabel does not show decorations
 }
 
-void TextLabel::OnStageConnection( unsigned int depth )
+void TextLabel::OnStageConnection( int depth )
 {
-  mDepth = depth;
+  // Call the Control::OnStageConnection() to set the depth of the background.
+  Control::OnStageConnection( depth );
+
+  // The depth of the text renderer is set in the RenderText() called from OnRelayout().
 }
 
 void TextLabel::TextChanged()
@@ -547,7 +551,6 @@ void TextLabel::MaxLengthReached()
 TextLabel::TextLabel()
 : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
-  mDepth( 0 ),
   mHasBeenStaged( false )
 {
 }

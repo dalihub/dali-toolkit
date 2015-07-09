@@ -119,6 +119,13 @@ public:
   void ResizeDividers( Size& size );
 
   /**
+   * @brief Raises the layer above the given @e target layer.
+   *
+   * @param[in] target The layer to get above of.
+   */
+  void RaiseAbove( Layer target );
+
+  /**
    * @brief Downcast a handle to TextSelectionToolbar.
    *
    * If the BaseHandle points is a TextSelectionToolbar the downcast returns a valid handle.

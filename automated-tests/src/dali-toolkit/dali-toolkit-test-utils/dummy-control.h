@@ -111,7 +111,7 @@ private: // From Internal::Control
 
 private: // From CustomActorImpl
 
-  virtual void OnStageConnection( unsigned int depth );
+  virtual void OnStageConnection( int depth );
   virtual void OnStageDisconnection();
   virtual void OnChildAdd(Actor& child);
   virtual void OnChildRemove(Actor& child);

@@ -43,6 +43,13 @@ public:
    */
   struct Metrics
   {
+    Metrics()
+    : mGlyphCount( 0u )
+    {}
+
+    ~Metrics()
+    {}
+
     uint32_t mGlyphCount;                   // number of glyphs being managed
     AtlasManager::Metrics mAtlasMetrics;    // metrics from the Atlas Manager
   };
@@ -71,13 +78,11 @@ public:
   /**
    * @brief Ask Atlas Manager to add a glyph
    *
-   * @param[in] fontId fontId glyph comes from
    * @param[in] glyph glyph to add to an atlas
    * @param[in] bitmap bitmap to use for glyph addition
    * @param[out] slot information returned by atlas manager for addition
    */
-  void Add( Text::FontId fontId,
-            const Text::GlyphInfo& glyph,
+  void Add( const Text::GlyphInfo& glyph,
             const BufferImage& bitmap,
             AtlasManager::AtlasSlot& slot );
 

@@ -140,9 +140,14 @@ private: // From Control
   virtual void OnPan( const PanGesture& gesture );
 
   /**
+   * @copydoc Control::OnLongPress()
+   */
+  virtual void OnLongPress( const LongPressGesture& gesture );
+
+  /**
    * @copydoc Control::OnStageConnection()
    */
-  virtual void OnStageConnection( unsigned int depth );
+  virtual void OnStageConnection( int depth );
 
   /**
    * @copydoc Dali::CustomActorImpl::OnKeyEvent(const KeyEvent&)
@@ -243,7 +248,6 @@ private: // Data
 
   int mRenderingBackend;
   int mExceedPolicy;
-  unsigned int mDepth;
   bool mHasBeenStaged:1;
 };
 

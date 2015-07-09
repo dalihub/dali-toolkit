@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/controls/text-controls/text-selection-toolbar-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
 
 // EXTERNAL INCLUDES
@@ -125,6 +126,31 @@ void TextSelectionToolbar::OnRelayout( const Vector2& size, RelayoutContainer& c
   mScrollView.SetRulerX( mRulerX );
 }
 
+void TextSelectionToolbar::OnStageConnection( int depth )
+{
+  // Call the Control::OnStageConnection() to set the depth of the background.
+  Control::OnStageConnection( depth );
+
+  // Traverse the dividers and set the depth.
+  for( unsigned int i = 0; i < mDividerIndexes.Count(); ++i )
+  {
+    Actor divider = mTableOfButtons.GetChildAt( Toolkit::TableView::CellPosition( 0, mDividerIndexes[ i ] ) );
+
+    ImageActor dividerImageActor = ImageActor::DownCast( divider );
+    if( dividerImageActor )
+    {
+      dividerImageActor.SetSortModifier( DECORATION_DEPTH_INDEX + depth );
+    }
+    else
+    {
+      // TODO at the moment divider are image actors.
+    }
+  }
+
+  // Texts are controls, they have their own OnStageConnection() implementation.
+  // Icons are inside a TableView. It has it's own OnStageConnection() implementation.
+}
+
 void TextSelectionToolbar::SetPopupMaxSize( const Size& maxSize )
 {
   mMaxSize = maxSize;
@@ -160,10 +186,10 @@ void TextSelectionToolbar::SetUp()
   self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
 
   // Create Layer and Stencil.  Layer enable's clipping when content exceed maximum defined width.
-  Layer stencilLayer = Layer::New();
-  stencilLayer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
-  stencilLayer.SetParentOrigin( ParentOrigin::CENTER );
-  stencilLayer.SetMaximumSize( mMaxSize );
+  mStencilLayer = Layer::New();
+  mStencilLayer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+  mStencilLayer.SetParentOrigin( ParentOrigin::CENTER );
+  mStencilLayer.SetMaximumSize( mMaxSize );
 
   ImageActor stencil = CreateSolidColorActor( Color::RED );
   stencil.SetDrawMode( DrawMode::STENCIL );
@@ -181,12 +207,10 @@ void TextSelectionToolbar::SetUp()
   mTableOfButtons.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
 
 
-  stencilLayer.Add( stencil );
-  stencilLayer.Add( mScrollView );
+  mStencilLayer.Add( stencil );
+  mStencilLayer.Add( mScrollView );
   mScrollView.Add( mTableOfButtons );
-  self.Add( stencilLayer );
-
-  stencilLayer.RaiseToTop();
+  self.Add( mStencilLayer );
 }
 
 void TextSelectionToolbar::OnScrollStarted( const Vector2& position )
@@ -209,7 +233,7 @@ void TextSelectionToolbar::AddOption( Actor& option )
 void TextSelectionToolbar::AddDivider( Actor& divider )
 {
   AddOption( divider );
-  mDividerIndexes.PushBack( mIndexInTable );
+  mDividerIndexes.PushBack( mIndexInTable - 1u );
 }
 
 void TextSelectionToolbar::ResizeDividers( Size& size )
@@ -220,6 +244,11 @@ void TextSelectionToolbar::ResizeDividers( Size& size )
     divider.SetSize( size );
   }
   RelayoutRequest();
+}
+
+void TextSelectionToolbar::RaiseAbove( Layer target )
+{
+  mStencilLayer.RaiseAbove( target );
 }
 
 TextSelectionToolbar::TextSelectionToolbar()
@@ -234,7 +263,6 @@ TextSelectionToolbar::~TextSelectionToolbar()
 {
   mRulerX.Reset();
 }
-
 
 } // namespace Internal
 

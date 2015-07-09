@@ -257,7 +257,7 @@ public:
    * @param[in] cursor Whether this color is for the primary or secondary cursor.
    * @param[in] color The color to use.
    */
-  void SetColor( Cursor cursor, const Dali::Vector4& color );
+  void SetCursorColor( Cursor cursor, const Dali::Vector4& color );
 
   /**
    * @brief Retrieves the color for a cursor.
@@ -343,6 +343,20 @@ public:
   Dali::Image GetHandleImage( HandleType handleType, HandleImageType handleImageType ) const;
 
   /**
+   * @brief Sets the color of the handles
+   *
+   * @param[in] color The color to use.
+   */
+  void SetHandleColor( const Vector4& color );
+
+  /**
+   * @brief Retrieves the handles color.
+   *
+   * @return The color of the handles.
+   */
+  const Vector4& GetHandleColor() const;
+
+  /**
    * @brief Sets the position of a selection handle.
    *
    * @param[in] handleType The handle to set.
@@ -397,16 +411,23 @@ public:
   /**
    * @brief Sets the selection highlight color.
    *
-   * @param[in] image The image to use.
+   * @param[in] color The color to use.
    */
   void SetHighlightColor( const Vector4& color );
 
   /**
    * @brief Retrieves the selection highlight color.
    *
-   * @return The image.
+   * @return The color of the highlight
    */
   const Vector4& GetHighlightColor() const;
+
+  /**
+   * @brief Sets into the decorator the depth used to render the text.
+   *
+   * @param[in] depth The text's depth.
+   */
+  void SetTextDepth( int textDepth );
 
   /**
    * @brief Set the Selection Popup to show or hide via the active flaf

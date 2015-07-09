@@ -79,10 +79,15 @@ fi
 
 # Tizen Profile options
 AC_ARG_ENABLE([profile],
-              [AC_HELP_STRING([--enable-profile=COMMON,MOBILE,WEARABLE,TV],
+              [AC_HELP_STRING([--enable-profile=UBUNTU,MOBILE,WEARABLE,TV],
                             [Select the variant of tizen])],
               [dali_profile=$enableval],
-              [dali_profile=COMMON])
+              [dali_profile=UBUNTU])
+
+# Ensure valid profile selected
+if test "x$dali_profile" != "xUBUNTU" -a "x$dali_profile" != "xMOBILE" -a "x$dali_profile" != "xWEARABLE" -a "x$dali_profile" != "xTV" ; then
+  AC_MSG_ERROR([$enable_profile is an invalid profile])
+fi
 
 if test x$DALI_DATA_RW_DIR != x; then
   dataReadWriteDir=${DALI_DATA_RW_DIR}/
@@ -96,9 +101,18 @@ else
   dataReadOnlyDir=${prefix}/share/dali/
 fi
 
-DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDALI_PROFILE_${enable_profile}"
-AM_CONDITIONAL([COMMON_PROFILE], [test x$enable_profile = xCOMMON])
-AM_CONDITIONAL([MOBILE_PROFILE], [test x$enable_profile = xMOBILE])
+DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDALI_PROFILE_${dali_profile}"
+
+# Style paths
+if test "x$dali_profile" = "xUBUNTU"; then
+  STYLE_DIR=../../../dali-toolkit/styles
+fi
+
+if test "x$dali_profile" = "xMOBILE"; then
+  STYLE_DIR=../../../dali-toolkit/styles/mobile
+fi
+
+AC_SUBST(STYLE_DIR)
 
 # v8 version 4+ requires c++11
 PKG_CHECK_MODULES(V8, v8 = 3.32.7, [ pkg_check_v8=yes ],  [ pkg_check_v8=no  ] )

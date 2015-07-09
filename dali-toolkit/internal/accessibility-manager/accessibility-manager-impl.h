@@ -198,6 +198,11 @@ public:
    */
   Actor GetFocusGroup(Actor actor);
 
+  /**
+   * @copydoc Toolkit::AccessibilityManager::GetReadPosition
+   */
+  Vector2 GetReadPosition() const;
+
 public:
 
   /**
