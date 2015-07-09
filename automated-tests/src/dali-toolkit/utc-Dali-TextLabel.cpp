@@ -51,7 +51,7 @@ const char* const PROPERTY_NAME_UNDERLINE_ENABLED = "underline-enabled";
 const char* const PROPERTY_NAME_UNDERLINE_COLOR = "underline-color";
 const char* const PROPERTY_NAME_UNDERLINE_HEIGHT = "underline-height";
 
-const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
+const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
 } // namespace
 
@@ -162,7 +162,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_CHECK( label );
 
   // Check defaults
-  DALI_TEST_EQUALS( label.GetProperty<unsigned int>( TextLabel::Property::RENDERING_BACKEND ), DEFAULT_RENDERING_BACKEND, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<int>( TextLabel::Property::RENDERING_BACKEND ), DEFAULT_RENDERING_BACKEND, TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::TEXT ), std::string(""), TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_FAMILY ), std::string(""), TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::FONT_STYLE ), std::string(""), TEST_LOCATION );
@@ -178,7 +178,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::UNDERLINE_HEIGHT ), 0.0f, TEST_LOCATION );
 
   label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
-  DALI_TEST_EQUALS( label.GetProperty<unsigned int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty<int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
 
   // Check that text can be correctly reset
   label.SetProperty( TextLabel::Property::TEXT, "Setting Text" );

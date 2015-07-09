@@ -104,7 +104,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
     mQuadVertexFormat[ "aTexCoord" ] = Property::VECTOR2;
-    mQuadIndexFormat[ "indices" ] = Property::UNSIGNED_INTEGER;
+    mQuadIndexFormat[ "indices" ] = Property::INTEGER;
   }
 
   void AddGlyphs( const std::vector<Vector2>& positions,

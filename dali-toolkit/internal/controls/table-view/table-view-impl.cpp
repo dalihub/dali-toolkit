@@ -142,11 +142,11 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TableView, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "rows",           UNSIGNED_INTEGER, ROWS           )
-DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "columns",        UNSIGNED_INTEGER, COLUMNS        )
-DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "cell-padding",   VECTOR2,          CELL_PADDING   )
-DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layout-rows",    MAP,              LAYOUT_ROWS    )
-DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layout-columns", MAP,              LAYOUT_COLUMNS )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "rows",           INTEGER, ROWS           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "columns",        INTEGER, COLUMNS        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "cell-padding",   VECTOR2, CELL_PADDING   )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layout-rows",    MAP,     LAYOUT_ROWS    )
+DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layout-columns", MAP,     LAYOUT_COLUMNS )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -877,17 +877,25 @@ void TableView::SetProperty( BaseObject* object, Property::Index index, const Pr
     {
       case Toolkit::TableView::Property::ROWS:
       {
-        if( value.Get<unsigned int>() != tableViewImpl.GetRows() )
+        int rows = 0;
+        if( value.Get( rows ) && rows >= 0 )
         {
-          tableViewImpl.Resize( value.Get<unsigned int>(), tableViewImpl.GetColumns() );
+          if( static_cast<unsigned int>(rows) != tableViewImpl.GetRows() )
+          {
+            tableViewImpl.Resize( rows, tableViewImpl.GetColumns() );
+          }
         }
         break;
       }
       case Toolkit::TableView::Property::COLUMNS:
       {
-        if( value.Get<unsigned int>() != tableViewImpl.GetColumns() )
+        int columns = 0;
+        if( value.Get( columns ) && columns >= 0 )
         {
-          tableViewImpl.Resize( tableViewImpl.GetRows(), value.Get<unsigned int>() );
+          if( static_cast<unsigned int>( columns ) != tableViewImpl.GetColumns() )
+          {
+            tableViewImpl.Resize( tableViewImpl.GetRows(), value.Get<int>() );
+          }
         }
         break;
       }
@@ -923,12 +931,12 @@ Property::Value TableView::GetProperty( BaseObject* object, Property::Index inde
     {
       case Toolkit::TableView::Property::ROWS:
       {
-        value = tableViewImpl.GetRows();
+        value = static_cast<int>( tableViewImpl.GetRows() );
         break;
       }
       case Toolkit::TableView::Property::COLUMNS:
       {
-        value = tableViewImpl.GetColumns();
+        value = static_cast<int>( tableViewImpl.GetColumns() );
         break;
       }
       case Toolkit::TableView::Property::CELL_PADDING:
