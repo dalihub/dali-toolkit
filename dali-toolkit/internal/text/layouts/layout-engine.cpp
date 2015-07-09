@@ -229,6 +229,14 @@ struct LayoutEngine::Impl
       // Get the glyph info.
       const GlyphInfo& glyphInfo = *( parameters.glyphsBuffer + glyphIndex );
 
+      // Check if the font of the current glyph is the same of the previous one.
+      // If it's different the ascender and descender need to be updated.
+      if( lastFontId != glyphInfo.fontId )
+      {
+        UpdateLineHeight( glyphInfo.fontId, tmpLineLayout );
+        lastFontId = glyphInfo.fontId;
+      }
+
       // Get the character indices for the current glyph. The last character index is needed
       // because there are glyphs formed by more than one character but their break info is
       // given only for the last character.
@@ -419,14 +427,6 @@ struct LayoutEngine::Impl
         MergeLineLayout( lineLayout, tmpLineLayout );
 
         tmpLineLayout.Clear();
-      }
-
-      // Check if the font of the current glyph is the same of the previous one.
-      // If it's different the ascender and descender need to be updated.
-      if( lastFontId != glyphInfo.fontId )
-      {
-        UpdateLineHeight( glyphInfo.fontId, tmpLineLayout );
-        lastFontId = glyphInfo.fontId;
       }
 
       previousCharacterDirection = characterDirection;
