@@ -296,6 +296,7 @@ struct Decorator::Impl : public ConnectionTracker
 
     // Show or hide the cursors
     CreateCursors();
+
     if( mPrimaryCursor )
     {
       const CursorImpl& cursor = mCursor[PRIMARY_CURSOR];
@@ -367,13 +368,13 @@ struct Decorator::Impl : public ConnectionTracker
         if( isPrimaryVisible )
         {
           primary.actor.SetPosition( primaryPosition.x,
-                                     primaryPosition.y + primary.lineHeight );
+                                     primary.lineHeight ); // TODO : Fix for multiline.
         }
 
         if( isSecondaryVisible )
         {
           secondary.actor.SetPosition( secondaryPosition.x,
-                                       secondaryPosition.y + secondary.lineHeight );
+                                       secondary.lineHeight ); // TODO : Fix for multiline.
         }
       }
       primary.actor.SetVisible( isPrimaryVisible );

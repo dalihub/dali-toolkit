@@ -81,8 +81,8 @@ namespace Text
  * @param[in] glyphIndex The index to the first glyph.
  * @param[in] numberOfGlyphs The number of glyphs.
  * @param[out] glyphMetrics Some glyph metrics (font height, advance, ascender and x bearing).
- * @param[in]
- * @param[in]
+ * @param[in] visualModel The visual model.
+ * @param[in] fontClient The font client.
  */
 void GetGlyphsMetrics( GlyphIndex glyphIndex,
                        Length numberOfGlyphs,
@@ -663,7 +663,7 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       if( handleStopScrolling )
       {
-        mEventData->mUpdateLeftSelectionPosition = ( mEventData->mLeftSelectionPosition != handlePosition ) && ( mEventData->mRightSelectionPosition != handlePosition);
+        mEventData->mUpdateLeftSelectionPosition = ( mEventData->mRightSelectionPosition != handlePosition );
         mEventData->mScrollAfterUpdatePosition = mEventData->mUpdateLeftSelectionPosition;
 
         if( mEventData->mUpdateLeftSelectionPosition )
@@ -681,9 +681,8 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       if( handleStopScrolling )
       {
-        mEventData->mUpdateRightSelectionPosition = ( mEventData->mRightSelectionPosition != handlePosition ) && ( mEventData->mLeftSelectionPosition != handlePosition );
+        mEventData->mUpdateRightSelectionPosition = ( mEventData->mLeftSelectionPosition != handlePosition );
         mEventData->mScrollAfterUpdatePosition = mEventData->mUpdateRightSelectionPosition;
-
         if( mEventData->mUpdateRightSelectionPosition )
         {
           mEventData->mRightSelectionPosition = handlePosition;
@@ -705,74 +704,84 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
     ClampHorizontalScroll( actualSize );
 
+    bool endOfScroll = false;
     if( Vector2::ZERO == ( currentScrollPosition - mEventData->mScrollPosition ) )
     {
       // Notify the decorator there is no more text to scroll.
       // The decorator won't send more scroll events.
       mEventData->mDecorator->NotifyEndOfScroll();
+      // Still need to set the position of the handle.
+      endOfScroll = true;
     }
-    else
+
+    // Set the position of the handle.
+    const bool scrollRightDirection = xSpeed > 0.f;
+    const bool leftSelectionHandleEvent = Event::LEFT_SELECTION_HANDLE_EVENT == event.type;
+    const bool rightSelectionHandleEvent = Event::RIGHT_SELECTION_HANDLE_EVENT == event.type;
+
+    if( Event::GRAB_HANDLE_EVENT == event.type )
     {
-      const bool scrollRightDirection = xSpeed > 0.f;
-      const bool leftSelectionHandleEvent = Event::LEFT_SELECTION_HANDLE_EVENT == event.type;
-      const bool rightSelectionHandleEvent = Event::RIGHT_SELECTION_HANDLE_EVENT == event.type;
+      ChangeState( EventData::GRAB_HANDLE_PANNING );
 
-      if( Event::GRAB_HANDLE_EVENT == event.type )
+      Vector2 position = mEventData->mDecorator->GetPosition( GRAB_HANDLE );
+
+      // Position the grag handle close to either the left or right edge.
+      position.x = scrollRightDirection ? 0.f : mControlSize.width;
+
+      // Get the new handle position.
+      // The grab handle's position is in decorator coords. Need to transforms to text coords.
+      const CharacterIndex handlePosition = GetClosestCursorIndex( position.x - mEventData->mScrollPosition.x - mAlignmentOffset.x,
+                                                                   position.y - mEventData->mScrollPosition.y - mAlignmentOffset.y );
+
+      mEventData->mUpdateCursorPosition = mEventData->mPrimaryCursorPosition != handlePosition;
+      mEventData->mScrollAfterUpdatePosition = mEventData->mUpdateCursorPosition;
+      mEventData->mPrimaryCursorPosition = handlePosition;
+    }
+    else if( leftSelectionHandleEvent || rightSelectionHandleEvent )
+    {
+      // TODO: This is recalculating the selection box every time the text is scrolled with the selection handles.
+      //       Think if something can be done to save power.
+
+      ChangeState( EventData::SELECTION_HANDLE_PANNING );
+
+      Vector2 position = mEventData->mDecorator->GetPosition( leftSelectionHandleEvent ? Text::LEFT_SELECTION_HANDLE : Text::RIGHT_SELECTION_HANDLE );
+
+      // Position the selection handle close to either the left or right edge.
+      position.x = scrollRightDirection ? 0.f : mControlSize.width;
+
+      // Get the new handle position.
+      // The selection handle's position is in decorator coords. Need to transforms to text coords.
+      const CharacterIndex handlePosition = GetClosestCursorIndex( position.x - mEventData->mScrollPosition.x - mAlignmentOffset.x,
+                                                                   position.y - mEventData->mScrollPosition.y - mAlignmentOffset.y );
+
+      if( leftSelectionHandleEvent )
       {
-        ChangeState( EventData::GRAB_HANDLE_PANNING );
-
-        Vector2 position = mEventData->mDecorator->GetPosition( GRAB_HANDLE );
-
-        // Position the grag handle close to either the left or right edge.
-        position.x = scrollRightDirection ? 0.f : mControlSize.width;
-
-        // Get the new handle position.
-        // The grab handle's position is in decorator coords. Need to transforms to text coords.
-        const CharacterIndex handlePosition = GetClosestCursorIndex( position.x - mEventData->mScrollPosition.x - mAlignmentOffset.x,
-                                                                     position.y - mEventData->mScrollPosition.y - mAlignmentOffset.y );
-
-        mEventData->mUpdateCursorPosition = mEventData->mPrimaryCursorPosition != handlePosition;
-        mEventData->mScrollAfterUpdatePosition = mEventData->mUpdateCursorPosition;
-        mEventData->mPrimaryCursorPosition = handlePosition;
-      }
-      else if( leftSelectionHandleEvent || rightSelectionHandleEvent )
-      {
-        // TODO: This is recalculating the selection box every time the text is scrolled with the selection handles.
-        //       Think if something can be done to save power.
-
-        ChangeState( EventData::SELECTION_HANDLE_PANNING );
-
-        Vector2 position = mEventData->mDecorator->GetPosition( leftSelectionHandleEvent ? Text::LEFT_SELECTION_HANDLE : Text::RIGHT_SELECTION_HANDLE );
-
-        // Position the selection handle close to either the left or right edge.
-        position.x = scrollRightDirection ? 0.f : mControlSize.width;
-
-        // Get the new handle position.
-        // The selection handle's position is in decorator coords. Need to transforms to text coords.
-        const CharacterIndex handlePosition = GetClosestCursorIndex( position.x - mEventData->mScrollPosition.x - mAlignmentOffset.x,
-                                                                     position.y - mEventData->mScrollPosition.y - mAlignmentOffset.y );
-
-        if( leftSelectionHandleEvent )
+        const bool differentHandles = ( mEventData->mLeftSelectionPosition != handlePosition ) && ( mEventData->mRightSelectionPosition != handlePosition );
+        mEventData->mUpdateLeftSelectionPosition = endOfScroll || differentHandles;
+        if( differentHandles )
         {
-          mEventData->mUpdateLeftSelectionPosition = handlePosition != mEventData->mLeftSelectionPosition;
           mEventData->mLeftSelectionPosition = handlePosition;
         }
-        else
+      }
+      else
+      {
+        const bool differentHandles = ( mEventData->mRightSelectionPosition != handlePosition ) && ( mEventData->mLeftSelectionPosition != handlePosition );
+        mEventData->mUpdateRightSelectionPosition = endOfScroll || differentHandles;
+        if( differentHandles )
         {
-          mEventData->mUpdateRightSelectionPosition = handlePosition != mEventData->mRightSelectionPosition;
           mEventData->mRightSelectionPosition = handlePosition;
         }
-
-        if( mEventData->mUpdateLeftSelectionPosition || mEventData->mUpdateRightSelectionPosition )
-        {
-          RepositionSelectionHandles( mEventData->mLeftSelectionPosition,
-                                      mEventData->mRightSelectionPosition );
-
-          mEventData->mScrollAfterUpdatePosition = true;
-        }
       }
-      mEventData->mDecoratorUpdated = true;
+
+      if( mEventData->mUpdateLeftSelectionPosition || mEventData->mUpdateRightSelectionPosition )
+      {
+        RepositionSelectionHandles( mEventData->mLeftSelectionPosition,
+                                    mEventData->mRightSelectionPosition );
+
+        mEventData->mScrollAfterUpdatePosition = true;
+      }
     }
+    mEventData->mDecoratorUpdated = true;
   } // end ( HANDLE_SCROLLING == state )
 }
 
@@ -928,8 +937,9 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
     std::swap( selectionStart, selectionEnd );
   }
 
-  GlyphIndex glyphStart = *( charactersToGlyphBuffer + selectionStart );
-  GlyphIndex glyphEnd = *( charactersToGlyphBuffer + ( selectionEnd - 1u ) ) + *( glyphsPerCharacterBuffer + ( selectionEnd - 1u ) ) - 1u;
+  const GlyphIndex glyphStart = *( charactersToGlyphBuffer + selectionStart );
+  const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + ( selectionEnd - 1u ) );
+  const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + ( selectionEnd - 1u ) ) + ( ( numberOfGlyphs > 0 ) ? numberOfGlyphs - 1u : 0u );
 
   mEventData->mDecorator->SwapSelectionHandlesEnabled( firstLine.direction != indicesSwapped );
 
@@ -937,6 +947,7 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
 
   for( GlyphIndex index = glyphStart; index <= glyphEnd; ++index )
   {
+    // TODO: Fix the LATIN ligatures. i.e ff, fi, etc...
     const GlyphInfo& glyph = *( glyphsBuffer + index );
     const Vector2& position = *( positionsBuffer + index );
 
