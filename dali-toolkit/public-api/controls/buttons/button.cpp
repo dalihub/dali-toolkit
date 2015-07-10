@@ -23,6 +23,9 @@
 
 #include <dali-toolkit/internal/controls/buttons/button-impl.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/actors/image-actor.h>
+
 namespace Dali
 {
 
@@ -138,6 +141,51 @@ void Button::SetLabel( Actor label )
 Actor Button::GetLabel() const
 {
   return Dali::Toolkit::GetImplementation( *this ).GetLabel();
+}
+
+void Button::SetButtonImage( Image image )
+{
+  Actor imageActor = ImageActor::New( image );
+  Dali::Toolkit::GetImplementation( *this ).SetButtonImage( imageActor );
+}
+
+void Button::SetBackgroundImage( Image image )
+{
+  Actor imageActor = ImageActor::New( image );
+  Dali::Toolkit::GetImplementation( *this ).SetBackgroundImage( imageActor );
+}
+
+void Button::SetSelectedImage( Image image )
+{
+  Actor imageActor = ImageActor::New( image );
+  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( imageActor );
+}
+
+void Button::SetSelectedBackgroundImage( Image image )
+{
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedBackgroundImage( ImageActor::New( image ) );
+}
+
+void Button::SetDisabledBackgroundImage( Image image )
+{
+  Actor imageActor = ImageActor::New( image );
+  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( imageActor );
+}
+
+void Button::SetDisabledImage( Image image )
+{
+  Actor imageActor = ImageActor::New( image );
+  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledImage( imageActor );
+}
+
+void Button::SetDisabledSelectedImage( Image image )
+{
+  Actor imageActor = ImageActor::New( image );
+  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledSelectedImage( imageActor );
 }
 
 Button::ButtonSignalType& Button::PressedSignal()

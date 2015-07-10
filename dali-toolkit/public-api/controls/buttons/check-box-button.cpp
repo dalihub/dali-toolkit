@@ -22,7 +22,6 @@
 // INTERNAL INCLUDES
 
 #include <dali-toolkit/internal/controls/buttons/check-box-button-impl.h>
-#include <dali/public-api/actors/image-actor.h>
 
 namespace Dali
 {
@@ -61,66 +60,6 @@ CheckBoxButton CheckBoxButton::New()
 CheckBoxButton CheckBoxButton::DownCast( BaseHandle handle )
 {
   return Control::DownCast<CheckBoxButton, Internal::CheckBoxButton>(handle);
-}
-
-void CheckBoxButton::SetBackgroundImage( Image image )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetBackgroundImage( ImageActor::New( image ) );
-}
-
-void CheckBoxButton::SetBackgroundImage( Actor image )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetBackgroundImage( image );
-}
-
-Actor CheckBoxButton::GetBackgroundImage() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).GetBackgroundImage();
-}
-
-void CheckBoxButton::SetSelectedImage( Image image )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( ImageActor::New( image ) );
-}
-
-void CheckBoxButton::SetSelectedImage( Actor image )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( image );
-}
-
-Actor CheckBoxButton::GetSelectedImage() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).GetSelectedImage();
-}
-
-void CheckBoxButton::SetDisabledBackgroundImage( Image image )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( ImageActor::New( image ) );
-}
-
-void CheckBoxButton::SetDisabledBackgroundImage( Actor image )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( image );
-}
-
-Actor CheckBoxButton::GetDisabledBackgroundImage() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).GetDisabledBackgroundImage();
-}
-
-void CheckBoxButton::SetDisabledSelectedImage( Image image )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledSelectedImage( ImageActor::New( image ) );
-}
-
-void CheckBoxButton::SetDisabledSelectedImage( Actor image )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledSelectedImage( image );
-}
-
-Actor CheckBoxButton::GetDisabledSelectedImage() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).GetDisabledSelectedImage();
 }
 
 CheckBoxButton::CheckBoxButton( Internal::CheckBoxButton& implementation )

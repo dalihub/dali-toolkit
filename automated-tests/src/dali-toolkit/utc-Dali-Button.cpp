@@ -50,6 +50,27 @@ static bool ButtonCallback( Button button )
   return false;
 }
 
+Image CreateSolidColorImage( const Vector4& color, unsigned int width, unsigned int height )
+{
+  BufferImage imageData = BufferImage::New( width, height, Pixel::RGBA8888 );
+
+  // Create the image
+  PixelBuffer* pixbuf = imageData.GetBuffer();
+  unsigned int size = width * height;
+
+  for( size_t i = 0; i < size; i++ )
+    {
+      pixbuf[i*4+0] = 0xFF * color.r;
+      pixbuf[i*4+1] = 0xFF * color.g;
+      pixbuf[i*4+2] = 0xFF * color.b;
+      pixbuf[i*4+3] = 0xFF * color.a;
+    }
+
+  imageData.Update();
+
+  return imageData;
+}
+
 const Dali::TouchPoint pointDownInside( 0, TouchPoint::Down, 240, 400 );
 const Dali::TouchPoint pointUpInside( 0, TouchPoint::Up, 240, 400 );
 const Dali::TouchPoint pointLeave( 0, TouchPoint::Leave, 240, 400 );
@@ -305,6 +326,60 @@ int UtcDaliButtonSetLabelActorP(void)
   button.SetLabel( textLabel );
 
   DALI_TEST_CHECK( button.GetLabel() );
+  END_TEST;
+}
+
+int UtcDaliButtonSetButtonImage(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliButtonSetButtonImage");
+
+  Image image = CreateSolidColorImage( Color::RED, 10, 10 );
+
+  PushButton pushButton = PushButton::New();
+  Stage::GetCurrent().Add( pushButton );
+
+  application.SendNotification();
+  application.Render();
+
+  pushButton.SetSize( Vector2( 20.0f, 20.0f ) );
+  pushButton.SetButtonImage( image );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 size = pushButton.GetCurrentSize();
+
+  DALI_TEST_EQUALS( size.width, 20.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( size.height, 20.f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliButtonSetSelectedImageP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliButtonSetButtonImage");
+
+  Image image = CreateSolidColorImage( Color::RED, 10, 10 );
+
+  PushButton pushButton = PushButton::New();
+  Stage::GetCurrent().Add( pushButton );
+
+  application.SendNotification();
+  application.Render();
+
+  pushButton.SetSize( Vector2( 20.0f, 20.0f ) );
+  pushButton.SetSelectedImage( image );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 size = pushButton.GetCurrentSize();
+
+  DALI_TEST_EQUALS( size.width, 20.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( size.height, 20.f, TEST_LOCATION );
+
   END_TEST;
 }
 

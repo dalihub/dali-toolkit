@@ -121,12 +121,7 @@ public:
    */
   static PushButton DownCast( BaseHandle handle );
 
-  /**
-   * @brief Sets the button image.
-   *
-   * @param[in] image The button image.
-   */
-  void SetButtonImage( Image image );
+  using Button::SetButtonImage;
 
   /**
    * @brief SetButtonImage
@@ -145,12 +140,7 @@ public:
    */
   Actor GetButtonImage() const;
 
-  /**
-   * @brief Sets the background image.
-   *
-   * @param[in] image The background image.
-   */
-  void SetBackgroundImage( Image image );
+  using Button::SetBackgroundImage;
 
   /**
    * @brief SetBackgroundImage
@@ -169,12 +159,7 @@ public:
    */
   Actor GetBackgroundImage() const;
 
-  /**
-   * @brief Sets the selected image.
-   *
-   * @param[in] image The selected image.
-   */
-  void SetSelectedImage( Image image );
+  using Button::SetSelectedImage;
 
   /**
    * @copydoc SetSelectedImage( Image image )
@@ -188,12 +173,7 @@ public:
    */
   Actor GetSelectedImage() const;
 
-  /**
-   * @brief Sets the selected background image.
-   *
-   * @param[in] image The selected background image.
-   */
-  void SetSelectedBackgroundImage( Image image );
+  using Button::SetSelectedBackgroundImage;
 
   /**
    * @copydoc SetSelectedBackgroundImage( Image image )
@@ -207,12 +187,7 @@ public:
    */
   Actor GetSelectedBackgroundImage() const;
 
-  /**
-   * @brief Sets the disabled background image.
-   *
-   * @param[in] image The disabled background image.
-   */
-  void SetDisabledBackgroundImage( Image image );
+  using Button::SetDisabledBackgroundImage;
 
   /**
    * @copydoc SetDisabledBackgroundImage( Image image )
@@ -226,12 +201,7 @@ public:
    */
   Actor GetDisabledBackgroundImage() const;
 
-  /**
-   * @brief Sets the disabled button image.
-   *
-   * @param[in] image The disabled button image.
-   */
-  void SetDisabledImage( Image image );
+  using Button::SetDisabledImage;
 
   /**
    * @copydoc SetDisabledImage( Image image )
