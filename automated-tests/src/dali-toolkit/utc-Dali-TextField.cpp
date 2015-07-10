@@ -267,30 +267,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
 
-  // Check defaults.
-  DALI_TEST_EQUALS( field.GetProperty<int>( TextField::Property::RENDERING_BACKEND ), DEFAULT_RENDERING_BACKEND, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), std::string(""), TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::PLACEHOLDER_TEXT ), std::string(""), TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::PLACEHOLDER_TEXT_FOCUSED ), std::string(""), TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_FAMILY ), std::string(""), TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::FONT_STYLE ), std::string(""), TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::POINT_SIZE ), 0.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<int>( TextField::Property::MAX_LENGTH ), 50u, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<int>( TextField::Property::EXCEED_POLICY ), TextField::EXCEED_POLICY_CLIP, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::HORIZONTAL_ALIGNMENT ), "BEGIN", TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::VERTICAL_ALIGNMENT ), "TOP", TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::TEXT_COLOR ), Color::BLACK, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<Vector2>( TextField::Property::SHADOW_OFFSET ), Vector2::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::PLACEHOLDER_TEXT_COLOR ), PLACEHOLDER_TEXT_COLOR, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::SHADOW_COLOR ), Color::BLACK, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::PRIMARY_CURSOR_COLOR ), Color::BLACK, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::SECONDARY_CURSOR_COLOR ), Color::BLACK, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<bool>( TextField::Property::ENABLE_CURSOR_BLINK ), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::CURSOR_BLINK_INTERVAL ), CURSOR_BLINK_INTERVAL * TO_SECONDS, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::CURSOR_BLINK_DURATION ), 0.f, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::SCROLL_THRESHOLD ), SCROLL_THRESHOLD, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::SCROLL_SPEED ), SCROLL_SPEED, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::SELECTION_HIGHLIGHT_COLOR ), LIGHT_BLUE, TEST_LOCATION );
+  // Note - we can't check the defaults since the stylesheets are platform-specific
 
   // Check the render backend property.
   field.SetProperty( TextField::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
@@ -610,6 +587,7 @@ int utcDaliTextFieldEvent02(void)
   // Checks if the right number of actors are created.
 
   TextField field = TextField::New();
+  field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   DALI_TEST_CHECK( field );
 
   Stage::GetCurrent().Add( field );
@@ -711,7 +689,7 @@ int utcDaliTextFieldEvent02(void)
 
   DALI_TEST_EQUALS( position2, position4, TEST_LOCATION ); // Should be in the same position2.
 
-  // Try to tap at the end.
+  // Tap away from the start position.
   application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 13.f, 25.0f ) ) );
   application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 13.0f, 25.0f ) ) );
 
@@ -719,14 +697,14 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  // Cursor position should be the same than position1.
   Vector3 position5 = cursor.GetCurrentPosition();
 
-  DALI_TEST_EQUALS( position1, position5, TEST_LOCATION ); // Should be in the same position1.
+  DALI_TEST_CHECK( position5.x > position4.x );
 
-  // Remove some text.
+  // Remove all the text.
   application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
   application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
+  field.SetProperty( TextField::Property::TEXT, "" );
 
   // Render and notify
   application.SendNotification();
@@ -756,6 +734,7 @@ int utcDaliTextFieldEvent03(void)
   Stage::GetCurrent().Add( field );
 
   field.SetProperty( TextField::Property::TEXT, "This is a long text for the size of the text-field." );
+  field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   field.SetSize( 30.f, 50.f );
   field.SetParentOrigin( ParentOrigin::TOP_LEFT );
   field.SetAnchorPoint( AnchorPoint::TOP_LEFT );

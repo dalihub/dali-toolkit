@@ -282,6 +282,11 @@ void StyleManager::ApplyStyle( Toolkit::Builder builder, Toolkit::Control contro
 
 void StyleManager::ApplyThemeStyle( Toolkit::Control control )
 {
+  if( !mThemeBuilder )
+  {
+    RequestDefaultTheme();
+  }
+
   if( mThemeBuilder )
   {
     ApplyStyle( mThemeBuilder, control );
