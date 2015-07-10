@@ -46,9 +46,15 @@ void TestGlAbstraction::Initialize()
   mVertexAttribArrayChanged = false;
 
   mCheckFramebufferStatusResult = 0;
-  mNumBinaryFormats = 1;
-  mBinaryFormats = 1;
+  mFramebufferStatus = 0;
+  mFramebufferColorAttached = 0;
+  mFramebufferDepthAttached = 0;
+  mFramebufferStencilAttached = 0;
+
+  mNumBinaryFormats = 0;
+  mBinaryFormats = 0;
   mProgramBinaryLength = 0;
+  mGetProgramBinaryCalled = false;
 
   mLastAutoTextureIdUsed = 0;
 
@@ -56,6 +62,8 @@ void TestGlAbstraction::Initialize()
   mLastProgramIdUsed = 0;
   mLastUniformIdUsed = 0;
   mLastShaderCompiled = 0;
+  mLastClearBitMask = 0;
+  mClearCount = 0;
 
   mLastBlendEquationRgb   = 0;
   mLastBlendEquationAlpha = 0;
