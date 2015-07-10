@@ -232,12 +232,6 @@ void TestPlatformAbstraction::JoinLoaderThreads()
   mTrace.PushCall("JoinLoaderThreads", "");
 }
 
-Integration::DynamicsFactory* TestPlatformAbstraction::GetDynamicsFactory()
-{
-  mTrace.PushCall("GetDynamicsFactory", "");
-  return NULL;
-}
-
 /** Call this every test */
 void TestPlatformAbstraction::Initialize()
 {
@@ -273,7 +267,6 @@ bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
     case IsLoadingFunc:                       return mTrace.FindMethod("IsLoading");
     case SetDpiFunc:                          return mTrace.FindMethod("SetDpi");
     case JoinLoaderThreadsFunc:               return mTrace.FindMethod("JoinLoaderThreads");
-    case GetDynamicsFactoryFunc:              return mTrace.FindMethod("GetDynamicsFactory");
   }
   return false;
 }
