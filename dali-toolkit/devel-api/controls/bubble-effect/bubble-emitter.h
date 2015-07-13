@@ -142,7 +142,7 @@ public:
   /**
    * @brief Enable different blending mode for rendering.
    *
-   * @param[in] enable If false, the default blending function for RenderableActor is used.
+   * @param[in] enable If false, the default blending function if ImageActor is used.
    */
   void SetBlendMode( bool enable );
 

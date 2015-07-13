@@ -257,8 +257,6 @@ const ActorFunctions ActorFunctionTable[]=
     // ignore GetNinePatchBorder use imageActor.border
     { "SetSortModifier",    ImageActorApi::SetSortModifier,   IMAGE_ACTOR_API  },
     { "GetSortModifier",    ImageActorApi::GetSortModifier,   IMAGE_ACTOR_API  },
-    { "SetCullFace",        ImageActorApi::SetCullFace,       IMAGE_ACTOR_API  },
-    { "GetCullFace",        ImageActorApi::GetCullFace,       IMAGE_ACTOR_API  },
     { "SetBlendMode",       ImageActorApi::SetBlendMode,      IMAGE_ACTOR_API  },
     { "GetBlendMode",       ImageActorApi::GetBlendMode,      IMAGE_ACTOR_API  },
     { "SetBlendFunc",       ImageActorApi::SetBlendFunc,      IMAGE_ACTOR_API  },
