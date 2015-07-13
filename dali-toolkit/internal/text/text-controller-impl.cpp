@@ -396,8 +396,7 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       // There is no right to left characters. Clear the directions vector.
       mLogicalModel->mCharacterDirections.Clear();
     }
-
-   }
+  }
 
   Vector<GlyphInfo>& glyphs = mVisualModel->mGlyphs;
   Vector<CharacterIndex>& glyphsToCharactersMap = mVisualModel->mGlyphsToCharacters;
@@ -923,33 +922,102 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
   const Length* const glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
   const GlyphInfo* const glyphsBuffer = mVisualModel->mGlyphs.Begin();
   const Vector2* const positionsBuffer = mVisualModel->mGlyphPositions.Begin();
+  const Length* const charactersPerGlyphBuffer = mVisualModel->mCharactersPerGlyph.Begin();
+  const CharacterIndex* const glyphToCharacterBuffer = mVisualModel->mGlyphsToCharacters.Begin();
+  const CharacterDirection* const modelCharacterDirectionsBuffer = ( 0u != mLogicalModel->mCharacterDirections.Count() ) ? mLogicalModel->mCharacterDirections.Begin() : NULL;
 
   // TODO: Better algorithm to create the highlight box.
   // TODO: Multi-line.
 
+  // Get the height of the line.
   const Vector<LineRun>& lines = mVisualModel->mLines;
   const LineRun& firstLine = *lines.Begin();
   const float height = firstLine.ascender + -firstLine.descender;
 
+  // Swap the indices if the start is greater than the end.
   const bool indicesSwapped = ( selectionStart > selectionEnd );
   if( indicesSwapped )
   {
     std::swap( selectionStart, selectionEnd );
   }
 
+  // Get the indices to the first and last selected glyphs.
+  const CharacterIndex selectionEndMinusOne = selectionEnd - 1u;
   const GlyphIndex glyphStart = *( charactersToGlyphBuffer + selectionStart );
-  const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + ( selectionEnd - 1u ) );
-  const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + ( selectionEnd - 1u ) ) + ( ( numberOfGlyphs > 0 ) ? numberOfGlyphs - 1u : 0u );
+  const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + selectionEndMinusOne );
+  const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + selectionEndMinusOne ) + ( ( numberOfGlyphs > 0 ) ? numberOfGlyphs - 1u : 0u );
 
+  // Check if the first glyph is a ligature that must be broken like Latin ff, fi, or Arabic ﻻ, etc which needs special code.
+  const Length numberOfCharactersStart = *( charactersPerGlyphBuffer + glyphStart );
+  bool splitStartGlyph = ( numberOfCharactersStart > 1u ) && HasLigatureMustBreak( mLogicalModel->GetScript( selectionStart ) );
+
+  // Check if the last glyph is a ligature that must be broken like Latin ff, fi, or Arabic ﻻ, etc which needs special code.
+  const Length numberOfCharactersEnd = *( charactersPerGlyphBuffer + glyphEnd );
+  bool splitEndGlyph = ( glyphStart != glyphEnd ) && ( numberOfCharactersEnd > 1u ) && HasLigatureMustBreak( mLogicalModel->GetScript( selectionEndMinusOne ) );
+
+  // Tell the decorator to swap the selection handles if needed.
   mEventData->mDecorator->SwapSelectionHandlesEnabled( firstLine.direction != indicesSwapped );
 
   const Vector2 offset = mEventData->mScrollPosition + mAlignmentOffset;
 
+  // Traverse the glyphs.
   for( GlyphIndex index = glyphStart; index <= glyphEnd; ++index )
   {
-    // TODO: Fix the LATIN ligatures. i.e ff, fi, etc...
     const GlyphInfo& glyph = *( glyphsBuffer + index );
     const Vector2& position = *( positionsBuffer + index );
+
+    if( splitStartGlyph )
+    {
+      // If the first glyph is a ligature that must be broken it may be needed to add only part of the glyph to the highlight box.
+
+      const float glyphAdvance = glyph.advance / static_cast<float>( numberOfCharactersStart );
+      const CharacterIndex interGlyphIndex = selectionStart - *( glyphToCharacterBuffer + glyphStart );
+      // Get the direction of the character.
+      CharacterDirection isCurrentRightToLeft = false;
+      if( NULL != modelCharacterDirectionsBuffer ) // If modelCharacterDirectionsBuffer is NULL, it means the whole text is left to right.
+      {
+        isCurrentRightToLeft = *( modelCharacterDirectionsBuffer + selectionStart );
+      }
+
+      // The end point could be in the middle of the ligature.
+      // Calculate the number of characters selected.
+      const Length numberOfCharacters = ( glyphStart == glyphEnd ) ? ( selectionEnd - selectionStart ) : ( numberOfCharactersStart - interGlyphIndex );
+
+      const float xPosition = position.x - glyph.xBearing + offset.x + glyphAdvance * static_cast<float>( isCurrentRightToLeft ? ( numberOfCharactersStart - interGlyphIndex - numberOfCharacters ) : interGlyphIndex );
+
+      mEventData->mDecorator->AddHighlight( xPosition,
+                                            offset.y,
+                                            xPosition + static_cast<float>( numberOfCharacters ) * glyphAdvance,
+                                            height );
+
+      splitStartGlyph = false;
+      continue;
+    }
+
+    if( splitEndGlyph && ( index == glyphEnd ) )
+    {
+      // Equally, if the last glyph is a ligature that must be broken it may be needed to add only part of the glyph to the highlight box.
+
+      const float glyphAdvance = glyph.advance / static_cast<float>( numberOfCharactersEnd );
+      const CharacterIndex interGlyphIndex = selectionEnd - *( glyphToCharacterBuffer + glyphEnd );
+      // Get the direction of the character.
+      CharacterDirection isCurrentRightToLeft = false;
+      if( NULL != modelCharacterDirectionsBuffer ) // If modelCharacterDirectionsBuffer is NULL, it means the whole text is left to right.
+      {
+        isCurrentRightToLeft = *( modelCharacterDirectionsBuffer + selectionEnd );
+      }
+
+      const Length numberOfCharacters = numberOfCharactersEnd - interGlyphIndex;
+
+      const float xPosition = position.x - glyph.xBearing + offset.x + ( isCurrentRightToLeft ? ( glyphAdvance * static_cast<float>( numberOfCharacters ) ) : 0.f );
+      mEventData->mDecorator->AddHighlight( xPosition,
+                                            offset.y,
+                                            xPosition + static_cast<float>( interGlyphIndex ) * glyphAdvance,
+                                            height );
+
+      splitEndGlyph = false;
+      continue;
+    }
 
     const float xPosition = position.x - glyph.xBearing + offset.x;
     mEventData->mDecorator->AddHighlight( xPosition, offset.y, xPosition + glyph.advance, height );
@@ -1339,8 +1407,8 @@ CharacterIndex Controller::Impl::GetClosestCursorIndex( float visualX,
 
     const Vector2& position = *( positionsBuffer + glyphLogicalOrderIndex );
 
-    // Prevents to jump the whole Latin ligatures like fi, ff, ...
-    const Length numberOfCharactersInLigature = ( TextAbstraction::LATIN == script ) ? *( charactersPerGlyphBuffer + glyphLogicalOrderIndex ) : 1u;
+    // Prevents to jump the whole Latin ligatures like fi, ff, or Arabic ﻻ...
+    const Length numberOfCharactersInLigature = HasLigatureMustBreak( script ) ? *( charactersPerGlyphBuffer + glyphLogicalOrderIndex ) : 1u;
     const float glyphAdvance = glyphMetrics.advance / static_cast<float>( numberOfCharactersInLigature );
 
     for( GlyphIndex index = 0u; !matched && ( index < numberOfCharactersInLigature ); ++index )
@@ -1414,7 +1482,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
   }
 
   // Get the line where the character is laid-out.
-  const LineRun* modelLines = mVisualModel->mLines.Begin();
+  const LineRun* const modelLines = mVisualModel->mLines.Begin();
 
   const LineIndex lineIndex = mVisualModel->GetLineOfCharacter( characterIndex );
   const LineRun& line = *( modelLines + lineIndex );
@@ -1455,10 +1523,16 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     }
   }
 
+  const GlyphIndex* const charactersToGlyphBuffer = mVisualModel->mCharactersToGlyph.Begin();
+  const Length* const glyphsPerCharacterBuffer = mVisualModel->mGlyphsPerCharacter.Begin();
+  const Length* const charactersPerGlyphBuffer = mVisualModel->mCharactersPerGlyph.Begin();
+  const CharacterIndex* const glyphsToCharactersBuffer = mVisualModel->mGlyphsToCharacters.Begin();
+  const Vector2* const glyphPositionsBuffer = mVisualModel->mGlyphPositions.Begin();
+
   // Convert the cursor position into the glyph position.
-  const GlyphIndex primaryGlyphIndex = *( mVisualModel->mCharactersToGlyph.Begin() + index );
-  const Length primaryNumberOfGlyphs = *( mVisualModel->mGlyphsPerCharacter.Begin() + index );
-  const Length primaryNumberOfCharacters = *( mVisualModel->mCharactersPerGlyph.Begin() + primaryGlyphIndex );
+  const GlyphIndex primaryGlyphIndex = *( charactersToGlyphBuffer + index );
+  const Length primaryNumberOfGlyphs = *( glyphsPerCharacterBuffer + index );
+  const Length primaryNumberOfCharacters = *( charactersPerGlyphBuffer + primaryGlyphIndex );
 
   // Get the metrics for the group of glyphs.
   GlyphMetrics glyphMetrics;
@@ -1468,33 +1542,70 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
                     mVisualModel,
                     mFontClient );
 
-  float glyphAdvance = 0.f;
+  // Whether to add the glyph's advance to the cursor position.
+  // i.e if the paragraph is left to right and the logical cursor is zero, the position is the position of the first glyph and the advance is not added,
+  //     if the logical cursor is one, the position is the position of the first glyph and the advance is added.
+  // A 'truth table' was build and an online Karnaugh map tool was used to simplify the logic.
+  //
+  // FLCP A
+  // ------
+  // 0000 1
+  // 0001 1
+  // 0010 0
+  // 0011 0
+  // 0100 1
+  // 0101 0
+  // 0110 1
+  // 0111 0
+  // 1000 0
+  // 1001 x
+  // 1010 x
+  // 1011 1
+  // 1100 x
+  // 1101 x
+  // 1110 x
+  // 1111 x
+  //
+  // Where F -> isFirstPosition
+  //       L -> isLastPosition
+  //       C -> isCurrentRightToLeft
+  //       P -> isRightToLeftParagraph
+  //       A -> Whether to add the glyph's advance.
+
+  const bool addGlyphAdvance = ( ( isLastPosition && !isRightToLeftParagraph ) ||
+                                 ( isFirstPosition && isRightToLeftParagraph ) ||
+                                 ( !isFirstPosition && !isLastPosition && !isCurrentRightToLeft ) );
+
+  float glyphAdvance = addGlyphAdvance ? glyphMetrics.advance : 0.f;
+
   if( !isLastPosition &&
       ( primaryNumberOfCharacters > 1u ) )
   {
-    const CharacterIndex firstIndex = *( mVisualModel->mGlyphsToCharacters.Begin() + primaryGlyphIndex );
-    glyphAdvance = static_cast<float>( 1u + characterIndex - firstIndex ) * glyphMetrics.advance / static_cast<float>( primaryNumberOfCharacters );
-  }
-  else
-  {
-    glyphAdvance = glyphMetrics.advance;
+    const CharacterIndex firstIndex = *( glyphsToCharactersBuffer + primaryGlyphIndex );
+
+    bool isCurrentRightToLeft = false;
+    if( NULL != modelCharacterDirectionsBuffer ) // If modelCharacterDirectionsBuffer is NULL, it means the whole text is left to right.
+    {
+      isCurrentRightToLeft = *( modelCharacterDirectionsBuffer + index );
+    }
+
+    Length numberOfGlyphAdvance = ( isFirstPosition ? 0u : 1u ) + characterIndex - firstIndex;
+    if( isCurrentRightToLeft )
+    {
+      numberOfGlyphAdvance = primaryNumberOfCharacters - numberOfGlyphAdvance;
+    }
+
+    glyphAdvance = static_cast<float>( numberOfGlyphAdvance ) * glyphMetrics.advance / static_cast<float>( primaryNumberOfCharacters );
   }
 
   // Get the glyph position and x bearing.
-  const Vector2& primaryPosition = *( mVisualModel->mGlyphPositions.Begin() + primaryGlyphIndex );
+  const Vector2& primaryPosition = *( glyphPositionsBuffer + primaryGlyphIndex );
 
   // Set the primary cursor's height.
   cursorInfo.primaryCursorHeight = cursorInfo.isSecondaryCursor ? 0.5f * glyphMetrics.fontHeight : glyphMetrics.fontHeight;
 
   // Set the primary cursor's position.
-  if( isLastPosition )
-  {
-    cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + primaryPosition.x + ( isRightToLeftParagraph ? 0.f : glyphMetrics.advance );
-  }
-  else
-  {
-    cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + primaryPosition.x + ( ( ( isFirstPosition && !isCurrentRightToLeft ) || ( !isFirstPosition && isCurrentRightToLeft ) ) ? 0.f : glyphAdvance );
-  }
+  cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + primaryPosition.x + glyphAdvance;
   cursorInfo.primaryPosition.y = line.ascender - glyphMetrics.ascender;
 
   // Calculate the secondary cursor.
@@ -1510,10 +1621,10 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
       index = ( isRightToLeftParagraph == isCurrentRightToLeft ) ? nextCharacterIndex : characterIndex;
     }
 
-    const GlyphIndex secondaryGlyphIndex = *( mVisualModel->mCharactersToGlyph.Begin() + index );
-    const Length secondaryNumberOfGlyphs = *( mVisualModel->mGlyphsPerCharacter.Begin() + index );
+    const GlyphIndex secondaryGlyphIndex = *( charactersToGlyphBuffer + index );
+    const Length secondaryNumberOfGlyphs = *( glyphsPerCharacterBuffer + index );
 
-    const Vector2& secondaryPosition = *( mVisualModel->mGlyphPositions.Begin() + index );
+    const Vector2& secondaryPosition = *( glyphPositionsBuffer + secondaryGlyphIndex );
 
     GetGlyphsMetrics( secondaryGlyphIndex,
                       secondaryNumberOfGlyphs,
@@ -1537,25 +1648,27 @@ CharacterIndex Controller::Impl::CalculateNewCursorIndex( CharacterIndex index )
 
   CharacterIndex cursorIndex = mEventData->mPrimaryCursorPosition;
 
-  const Script script = mLogicalModel->GetScript( index );
-  const GlyphIndex* charactersToGlyphBuffer = mVisualModel->mCharactersToGlyph.Begin();
-  const Length* charactersPerGlyphBuffer = mVisualModel->mCharactersPerGlyph.Begin();
+  const GlyphIndex* const charactersToGlyphBuffer = mVisualModel->mCharactersToGlyph.Begin();
+  const Length* const charactersPerGlyphBuffer = mVisualModel->mCharactersPerGlyph.Begin();
 
-  Length numberOfCharacters = 0u;
-  if( TextAbstraction::LATIN == script )
+  GlyphIndex glyphIndex = *( charactersToGlyphBuffer + index );
+  Length numberOfCharacters = *( charactersPerGlyphBuffer + glyphIndex );
+
+  if( numberOfCharacters > 1u )
   {
-    // Prevents to jump the whole Latin ligatures like fi, ff, ...
-    numberOfCharacters = 1u;
+    const Script script = mLogicalModel->GetScript( index );
+    if( HasLigatureMustBreak( script ) )
+    {
+      // Prevents to jump the whole Latin ligatures like fi, ff, or Arabic ﻻ,  ...
+      numberOfCharacters = 1u;
+    }
   }
   else
   {
-    GlyphIndex glyphIndex = *( charactersToGlyphBuffer + index );
-    numberOfCharacters = *( charactersPerGlyphBuffer + glyphIndex );
-
     while( 0u == numberOfCharacters )
     {
-      numberOfCharacters = *( charactersPerGlyphBuffer + glyphIndex );
       ++glyphIndex;
+      numberOfCharacters = *( charactersPerGlyphBuffer + glyphIndex );
     }
   }
 
