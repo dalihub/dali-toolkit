@@ -154,7 +154,7 @@ const IntegerPair EnumTable[] =
     { "POSITION_INHERITANCE_DONT_INHERIT_POSITION",                      DONT_INHERIT_POSITION                      },
 
     { "DRAW_MODE_NORMAL",                                   DrawMode::NORMAL     },
-    { "DRAW_MODE_OVERLAY",                                  DrawMode::OVERLAY    },
+    { "DRAW_MODE_OVERLAY_2D",                               DrawMode::OVERLAY_2D },
     { "DRAW_MODE_STENCIL",                                  DrawMode::STENCIL    },
 
     { "IMAGE_LOAD_POLICY_IMMEDIATE",                        ResourceImage::IMMEDIATE },

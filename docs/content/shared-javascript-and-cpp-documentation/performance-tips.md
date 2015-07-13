@@ -20,7 +20,7 @@
 // In this mode depth testing is turned off and order is determined by the hierachy (depth-first search order).
 // Not always recommended if there is going to be a lot of overdraw ( if lots of actors are on top of each other)
 
-Actor::SetDrawMode( DrawMode::OVERLAY ); // C++
+Actor::SetDrawMode( DrawMode::OVERLAY_2D ); // C++
 ~~~
 
 ~~~{.js}
@@ -28,7 +28,7 @@ Actor::SetDrawMode( DrawMode::OVERLAY ); // C++
 // In this mode depth testing is turned off and order is determined by the hierachy (depth-first search order).
 // Not always recommended if there is going to be a lot of overdraw ( if lots of actors are on top of each other)
 
-actor.drawMode = dali.DRAW_MODE_OVERLAY;
+actor.drawMode = dali.DRAW_MODE_OVERLAY_2D;
 ~~~
   - Use TextureAtlases ( reduces state changes in the GPU)
   - Use compressed textures

@@ -175,7 +175,7 @@ ScrollBar::~ScrollBar()
 void ScrollBar::OnInitialize()
 {
   CreateDefaultIndicatorActor();
-  Self().SetDrawMode(DrawMode::OVERLAY);
+  Self().SetDrawMode(DrawMode::OVERLAY_2D);
 }
 
 void ScrollBar::SetScrollPropertySource( Handle handle, Property::Index propertyScrollPosition, Property::Index propertyMinScrollPosition, Property::Index propertyMaxScrollPosition, Property::Index propertyScrollContentSize )
