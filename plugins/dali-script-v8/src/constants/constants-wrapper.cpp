@@ -204,12 +204,6 @@ const IntegerPair EnumTable[] =
     { "BLEND_EQUATION_SUBTRACT",                           BlendingEquation::SUBTRACT         },
     { "BLEND_EQUATION_REVERSE_SUBTRACT",                   BlendingEquation::REVERSE_SUBTRACT },
 
-
-    { "CULL_FACE_DISABLE",                                  CullNone  },
-    { "CULL_FRONT_FACE",                                    CullFront },
-    { "CULL_BACK_FACE",                                     CullBack  },
-    { "CULL_FRONT_AND_BACK_FACE",                           CullFrontAndBack },
-
     { "CAMERA_FREE_LOOK"             ,      Camera::FREE_LOOK                   },
     { "CAMERA_LOOK_AT_TARGET"        ,      Camera::LOOK_AT_TARGET              },
     { "CAMERA_PERSPECTIVE_PROJECTION" ,     Camera::PERSPECTIVE_PROJECTION      },

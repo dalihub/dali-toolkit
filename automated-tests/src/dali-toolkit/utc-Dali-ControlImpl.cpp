@@ -354,7 +354,7 @@ int UtcDaliControlImplChildAddAndRemove(void)
 
     DALI_TEST_EQUALS( dummyImpl.childAddCalled, false, TEST_LOCATION );
     DALI_TEST_EQUALS( dummy.GetChildCount(), 0u, TEST_LOCATION );
-    Actor actor = RenderableActor::New();
+    Actor actor = Actor::New();
     dummy.Add(actor);
     DALI_TEST_EQUALS( dummyImpl.childAddCalled, true, TEST_LOCATION );
     DALI_TEST_EQUALS( dummy.GetChildCount(), 1u, TEST_LOCATION );
@@ -382,7 +382,7 @@ int UtcDaliControlImplChildAddAndRemove(void)
     application.SendNotification();
 
     DALI_TEST_EQUALS( dummy.GetChildCount(), 0u, TEST_LOCATION );
-    Actor actor = RenderableActor::New();
+    Actor actor = Actor::New();
     dummy.Add(actor);
     DALI_TEST_EQUALS( dummy.GetChildCount(), 1u, TEST_LOCATION );
 

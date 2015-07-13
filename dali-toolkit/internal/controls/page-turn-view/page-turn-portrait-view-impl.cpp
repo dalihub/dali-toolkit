@@ -22,6 +22,7 @@
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/rendering/cull-face.h>
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-effect.h>
@@ -159,14 +160,23 @@ void PageTurnPortraitView::OnPossibleOutwardsFlick( const Vector2& panPosition, 
                          AlphaFunction::EASE_OUT, TimePeriod(PAGE_TURN_OVER_ANIMATION_DURATION*0.75f) );
     animation.AnimateBy( Property( actor, Actor::Property::ORIENTATION ), AngleAxis( Degree( 180.0f ), Vector3::YAXIS ) ,AlphaFunction::EASE_OUT );
     animation.Play();
-    ImageActor::DownCast(actor).SetCullFace( CullBack );
+
+    ImageActor imageActor = ImageActor::DownCast(actor);
+    if( imageActor )
+    {
+      SetCullFace( imageActor, CullBack );
+    }
     animation.FinishedSignal().Connect( this, &PageTurnPortraitView::OnTurnedOver );
   }
 }
 
 void PageTurnPortraitView::OnTurnedOver( Animation& animation )
 {
-  ImageActor::DownCast(mAnimationActorPair[animation]).SetCullFace( CullNone );
+  ImageActor imageActor = ImageActor::DownCast( mAnimationActorPair[ animation ] );
+  if( imageActor )
+  {
+    SetCullFace( imageActor, CullNone );
+  }
   TurnedOver( animation );
 }
 
