@@ -338,7 +338,7 @@ struct Decorator::Impl : public ConnectionTracker
         CreateGrabHandle();
 
         grabHandle.actor.SetPosition( position.x,
-                                      position.y + grabHandle.lineHeight );
+                                      grabHandle.lineHeight ); // TODO : Fix for multiline.
       }
       grabHandle.actor.SetVisible( isVisible );
     }
