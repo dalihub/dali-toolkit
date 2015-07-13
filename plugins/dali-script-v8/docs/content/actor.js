@@ -543,7 +543,7 @@ INHERIT_SCALE,
  * By default a renderable actor will be drawn as a 3D object. It will be depth-tested against
  * other objects in the world i.e. it may be obscured if other objects are in front.
  *
- * If OVERLAY is used, the actor and its children will be drawn as a 2D overlay.
+ * If OVERLAY_2D is used, the actor and its children will be drawn as a 2D overlay.
  * Overlay actors are drawn in a separate pass, after all non-overlay actors within the Layer.
  * For overlay actors, the drawing order is determined by the hierachy (depth-first search order),
  * and depth-testing will not be used.
@@ -554,9 +554,9 @@ INHERIT_SCALE,
  *
  * @example
  *
- *      var actor.drawMode = dali.DRAW_MODE_NORMAL;  // binary 00. The default draw-mode
- *      var actor.drawMode = dali.DRAW_MODE_OVERLAY; // binary 01. Draw the actor and its children as an overlay
- *      var actor.drawMode = dali.DRAW_MODE_STENCIL ;// binary 11. Draw the actor and its children into the stencil buffer
+ *      var actor.drawMode = dali.DRAW_MODE_NORMAL;     // binary 00. The default draw-mode
+ *      var actor.drawMode = dali.DRAW_MODE_OVERLAY_2D; // binary 01. Draw the actor and its children as an overlay
+ *      var actor.drawMode = dali.DRAW_MODE_STENCIL ;   // binary 11. Draw the actor and its children into the stencil buffer
  *
  *
  * @type Number

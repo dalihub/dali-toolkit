@@ -584,7 +584,7 @@ void Control::SetBackgroundColor( const Vector4& color )
     Actor actor = CreateBackground(Self(), color );
     background.actor = actor;
     mImpl->mAddRemoveBackgroundChild = true;
-    // use insert to guarantee its the first child (so that OVERLAY mode works)
+    // use insert to guarantee its the first child (so that OVERLAY_2D mode works)
     Self().Insert( 0, actor );
     mImpl->mAddRemoveBackgroundChild = false;
   }
@@ -619,7 +619,7 @@ void Control::SetBackgroundImage( Image image )
    // Set the background actor before adding so that we do not inform derived classes
    background.actor = actor;
    mImpl->mAddRemoveBackgroundChild = true;
-   // use insert to guarantee its the first child (so that OVERLAY mode works)
+   // use insert to guarantee its the first child (so that OVERLAY_2D mode works)
    Self().Insert( 0, actor );
    mImpl->mAddRemoveBackgroundChild = false;
 }
