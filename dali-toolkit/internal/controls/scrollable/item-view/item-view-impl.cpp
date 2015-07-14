@@ -1628,7 +1628,10 @@ void ItemView::GetItemsRange(ItemRange& range)
 void ItemView::OnScrollPositionChanged( float position )
 {
   // Cancel scroll animation to prevent any fighting of setting the scroll position property.
-  RemoveAnimation(mScrollAnimation);
+  if(!mRefreshEnabled)
+  {
+    RemoveAnimation(mScrollAnimation);
+  }
 
   // Refresh the cache immediately when the scroll position is changed.
   DoRefresh(position, false); // No need to cache extra items.
