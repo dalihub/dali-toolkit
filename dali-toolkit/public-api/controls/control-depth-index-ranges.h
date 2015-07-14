@@ -18,15 +18,16 @@
  *
  */
 
+#include <dali/public-api/actors/layer.h>
 namespace Dali
 {
 namespace Toolkit
 {
 enum ControlDepthIndexRanges
 {
-    BACKGROUND_DEPTH_INDEX    = -10000000,
-    CONTENT_DEPTH_INDEX       =  0,
-    DECORATION_DEPTH_INDEX    =  10000000
+    BACKGROUND_DEPTH_INDEX    = static_cast<int>( -Dali::Layer::TREE_DEPTH_MULTIPLIER * 0.1f ),
+    CONTENT_DEPTH_INDEX       = 0,
+    DECORATION_DEPTH_INDEX    = static_cast<int>( Dali::Layer::TREE_DEPTH_MULTIPLIER * 0.1f )
 };
 
 }
