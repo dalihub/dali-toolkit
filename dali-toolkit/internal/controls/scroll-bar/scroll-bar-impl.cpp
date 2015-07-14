@@ -220,14 +220,11 @@ void ScrollBar::SetScrollIndicator( Actor indicator )
     mIndicator = indicator;
     Self().Add(mIndicator);
 
-    if( !mPanGestureDetector )
-    {
-      mPanGestureDetector = PanGestureDetector::New();
-      mPanGestureDetector.DetectedSignal().Connect(this, &ScrollBar::OnPan);
-    }
+    EnableGestureDetection(Gesture::Type(Gesture::Pan));
 
-    mPanGestureDetector.DetachAll();
-    mPanGestureDetector.Attach( mIndicator );
+    PanGestureDetector detector( GetPanGestureDetector() );
+    detector.DetachAll();
+    detector.Attach( mIndicator );
 
     unsigned int childCount = mIndicator.GetChildCount();
     for ( unsigned int index = 0; index < childCount; index++ )
@@ -235,7 +232,7 @@ void ScrollBar::SetScrollIndicator( Actor indicator )
       Actor child = mIndicator.GetChildAt( index );
       if ( child )
       {
-        mPanGestureDetector.Attach( child );
+        detector.Attach( child );
       }
     }
   }
@@ -370,7 +367,7 @@ bool ScrollBar::OnPanGestureProcessTick()
   return true;
 }
 
-void ScrollBar::OnPan( Actor source, const PanGesture& gesture )
+void ScrollBar::OnPan( const PanGesture& gesture )
 {
   if(mScrollableObject)
   {
