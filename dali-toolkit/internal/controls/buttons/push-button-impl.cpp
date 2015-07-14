@@ -241,8 +241,11 @@ Vector3 PushButton::GetNaturalSize()
   Toolkit::TextLabel label = Toolkit::TextLabel::DownCast( GetLabel() );
   if( label )
   {
-    size.width  = std::max( size.width,  label.GetRelayoutSize( Dimension::WIDTH ) );
-    size.height = std::max( size.height, label.GetRelayoutSize( Dimension::HEIGHT ) );
+    Padding padding( 0.0f, 0.0f, 0.0f, 0.0f );
+    label.GetPadding( padding );
+    size = label.GetNaturalSize();
+    size.width += padding.x + padding.width;
+    size.height += padding.y + padding.height;
   }
   else
   {
