@@ -1,0 +1,20 @@
+//******************************************************************************
+//
+// Default feedback theme for dali-toolkit
+//
+//******************************************************************************
+{
+  "style":
+  {
+    "PushButton":
+    {
+      "signals":
+      [
+        {
+          "type": "clicked",
+          "sound-feedback-pattern": "FEEDBACK_PATTERN_TAP"
+        }
+      ]
+    }
+  }
+}

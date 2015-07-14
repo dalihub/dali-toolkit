@@ -27,6 +27,7 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/styling/style-manager.h>
+#include <dali-toolkit/internal/feedback/feedback-style.h>
 
 namespace
 {
@@ -99,7 +100,8 @@ Toolkit::StyleManager StyleManager::Get()
 StyleManager::StyleManager()
 : mOrientationDegrees( 0 ),  // Portrait
   mDefaultFontSize( -1 ),
-  mThemeFile( DEFAULT_THEME )
+  mThemeFile( DEFAULT_THEME ),
+  mFeedbackStyle( NULL )
 {
   // Add theme builder constants
   mThemeBuilderConstants[ PACKAGE_PATH_KEY ] = DEFAULT_PACKAGE_PATH;
@@ -111,10 +113,15 @@ StyleManager::StyleManager()
 
     mDefaultFontSize = mStyleMonitor.GetDefaultFontSize();
   }
+
+  // Sound & haptic style
+  mFeedbackStyle = new FeedbackStyle();
+
 }
 
 StyleManager::~StyleManager()
 {
+  delete mFeedbackStyle;
 }
 
 void StyleManager::SetOrientationValue( int orientation )
@@ -245,6 +252,7 @@ void StyleManager::BuildQualifiedStyleName( const std::string& styleName, const 
 void StyleManager::ApplyStyle( Toolkit::Builder builder, Toolkit::Control control )
 {
   std::string styleName = control.GetStyleName();
+
   if( styleName.empty() )
   {
     // Convert control name to lower case
@@ -290,6 +298,19 @@ void StyleManager::ApplyThemeStyle( Toolkit::Control control )
   if( mThemeBuilder )
   {
     ApplyStyle( mThemeBuilder, control );
+  }
+}
+
+void StyleManager::ApplyThemeStyleAtInit( Toolkit::Control control )
+{
+  if( mThemeBuilder )
+  {
+    ApplyStyle( mThemeBuilder, control );
+  }
+
+  if(mFeedbackStyle)
+  {
+    mFeedbackStyle->ObjectCreated( control );
   }
 }
 
@@ -361,8 +382,14 @@ void StyleManager::RequestDefaultTheme()
 void StyleManager::SetTheme()
 {
   mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
-  if ( LoadJSON( mThemeBuilder, mThemeFile ) )
+
+  if( LoadJSON( mThemeBuilder, mThemeFile ) )
   {
+    if(mFeedbackStyle)
+    {
+      mFeedbackStyle->StyleChanged( mThemeFile, StyleChange::THEME_CHANGE );
+    }
+
     mStyleChangeSignal.Emit( Toolkit::StyleManager::Get(), StyleChange::THEME_CHANGE );
   }
   else

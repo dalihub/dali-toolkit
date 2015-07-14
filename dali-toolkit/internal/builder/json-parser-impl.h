@@ -62,7 +62,7 @@ public:
   /*
    * @copydoc Toolkit::JsonParser::Parse()
    */
-  int Parse(const std::string& source);
+  bool Parse(const std::string& source);
 
   /*
    * @copydoc Toolkit::JsonParser::Pack()

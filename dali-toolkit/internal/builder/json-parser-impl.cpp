@@ -96,7 +96,7 @@ JsonParser::~JsonParser()
   }
 }
 
-int JsonParser::Parse(const std::string& source)
+bool JsonParser::Parse(const std::string& source)
 {
   mSources.push_back( VectorChar(source.begin(), source.end()) );
 
