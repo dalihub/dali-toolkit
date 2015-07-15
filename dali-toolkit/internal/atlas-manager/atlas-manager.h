@@ -162,10 +162,10 @@ public:
 
   struct AtlasSize
   {
-    SizeType mWidth;              // width of the atlas in pixels
-    SizeType mHeight;             // height of the atlas in pixels
-    SizeType mBlockWidth;         // width of a block in pixels
-    SizeType mBlockHeight;        // height of a block in pixels
+    SizeType mWidth;              ///< width of the atlas in pixels
+    SizeType mHeight;             ///< height of the atlas in pixels
+    SizeType mBlockWidth;         ///< width of a block in pixels
+    SizeType mBlockHeight;        ///< height of a block in pixels
   };
 
   /**
@@ -174,17 +174,25 @@ public:
    */
   struct AtlasMetricsEntry
   {
-    AtlasSize mSize;                 // size of atlas and blocks
-    SizeType mBlocksUsed;            // number of blocks used in the atlas
-    SizeType mTotalBlocks;           // total blocks used by atlas
-    Pixel::Format mPixelFormat;      // pixel format of the atlas
+    AtlasSize mSize;                 ///< size of atlas and blocks
+    SizeType mBlocksUsed;            ///< number of blocks used in the atlas
+    SizeType mTotalBlocks;           ///< total blocks used by atlas
+    Pixel::Format mPixelFormat;      ///< pixel format of the atlas
   };
 
   struct Metrics
   {
-    SizeType mAtlasCount;                               // number of atlases
-    SizeType mTextureMemoryUsed;                        // texture memory used by atlases
-    Dali::Vector< AtlasMetricsEntry > mAtlasMetrics;    // container of atlas information
+    Metrics()
+    : mAtlasCount( 0u ),
+      mTextureMemoryUsed( 0u )
+    {}
+
+    ~Metrics()
+    {}
+
+    SizeType mAtlasCount;                               ///< number of atlases
+    SizeType mTextureMemoryUsed;                        ///< texture memory used by atlases
+    Dali::Vector< AtlasMetricsEntry > mAtlasMetrics;    ///< container of atlas information
   };
 
   struct Vertex2D
@@ -233,8 +241,8 @@ public:
    */
   struct AtlasSlot
   {
-    ImageId mImageId;                           // Id of stored Image
-    AtlasId mAtlasId;                           // Id of Atlas containing this slot
+    ImageId mImageId;                           ///< Id of stored Image
+    AtlasId mAtlasId;                           ///< Id of Atlas containing this slot
   };
 
   typedef Dali::Vector< AtlasManager::AtlasSlot > slotContainer;

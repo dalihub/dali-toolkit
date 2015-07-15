@@ -50,9 +50,9 @@ public:
     ~Metrics()
     {}
 
-    uint32_t mGlyphCount;                   // number of glyphs being managed
-    std::string mVerboseGlyphCounts;         // a verbose list of the glyphs + ref counts
-    AtlasManager::Metrics mAtlasMetrics;    // metrics from the Atlas Manager
+    uint32_t mGlyphCount;                   ///< number of glyphs being managed
+    std::string mVerboseGlyphCounts;        ///< a verbose list of the glyphs + ref counts
+    AtlasManager::Metrics mAtlasMetrics;    ///< metrics from the Atlas Manager
   };
 
   /**

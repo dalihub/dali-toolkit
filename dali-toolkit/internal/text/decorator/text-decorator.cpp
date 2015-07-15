@@ -273,6 +273,7 @@ struct Decorator::Impl : public ConnectionTracker
     mScrollThreshold( SCROLL_THRESHOLD ),
     mScrollSpeed( SCROLL_SPEED ),
     mScrollDistance( SCROLL_DISTANCE ),
+    mTextDepth( 0u ),
     mActiveCopyPastePopup( false ),
     mCursorBlinkStatus( true ),
     mPrimaryCursorVisible( false ),
