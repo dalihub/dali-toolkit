@@ -1527,6 +1527,7 @@ void Decorator::SetEnabledPopupButtons( TextSelectionPopup::Buttons& enabledButt
    if( mImpl->mActiveLayer )
    {
      mImpl->mActiveLayer.Add( mImpl->mCopyPastePopup.actor );
+     mImpl->mCopyPastePopup.actor.ShowPopup();
    }
 }
 

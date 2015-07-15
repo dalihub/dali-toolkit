@@ -154,6 +154,11 @@ void TextSelectionToolbar::OnStageConnection( int depth )
 void TextSelectionToolbar::SetPopupMaxSize( const Size& maxSize )
 {
   mMaxSize = maxSize;
+  if (mScrollView && mStencilLayer )
+  {
+    mScrollView.SetMaximumSize( mMaxSize );
+    mStencilLayer.SetMaximumSize( mMaxSize );
+  }
 }
 
 const Dali::Vector2& TextSelectionToolbar::GetPopupMaxSize() const
@@ -166,7 +171,6 @@ void TextSelectionToolbar::SetUpScrollView( Toolkit::ScrollView& scrollView )
   scrollView.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
   scrollView.SetParentOrigin( ParentOrigin::CENTER_LEFT );
   scrollView.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
-  scrollView.SetMaximumSize( mMaxSize );
 
   scrollView.SetScrollingDirection( PanGestureDetector::DIRECTION_HORIZONTAL, Degree( 40.0f ) );
   scrollView.SetAxisAutoLock( true );
@@ -189,7 +193,6 @@ void TextSelectionToolbar::SetUp()
   mStencilLayer = Layer::New();
   mStencilLayer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
   mStencilLayer.SetParentOrigin( ParentOrigin::CENTER );
-  mStencilLayer.SetMaximumSize( mMaxSize );
 
   ImageActor stencil = CreateSolidColorActor( Color::RED );
   stencil.SetDrawMode( DrawMode::STENCIL );
@@ -253,7 +256,7 @@ void TextSelectionToolbar::RaiseAbove( Layer target )
 
 TextSelectionToolbar::TextSelectionToolbar()
 : Control( ControlBehaviour( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ) ),
-  mMaxSize ( DEFAULT_MAX_SIZE ),
+  mMaxSize (),
   mIndexInTable( 0 ),
   mDividerIndexes()
 {

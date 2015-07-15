@@ -86,6 +86,9 @@ public:
       POPUP_PASTE_BUTTON_ICON_IMAGE,            ///< name "popup-paste-button-image",      The image to use as the popup paste icon,       type STRING
       POPUP_SELECT_BUTTON_ICON_IMAGE,           ///< name "popup-select-button-image",     The image to use as the popup select icon,      type STRING
       POPUP_SELECT_ALL_BUTTON_ICON_IMAGE,       ///< name "popup-select-all-button-image", The image to use as the popup select all icon,  type STRING
+      DIVIDER_COLOR,                            ///< name "popup-divider-color", VECTOR4,  The color of the divider between options,       type VECTOR4
+      ICON_COLOR,                               ///< name "popup-icon-color", VECTOR4,     The color of the icons (if supplied),           type VECTOR4
+      PRESSED_COLOR                             ///< name "popup-pressed-color", VECTOR4,  The color of the option when pressed,           type VECTOR4
     };
   };
 
@@ -142,6 +145,11 @@ public:
    * @param[in] target The layer to get above of.
    */
   void RaiseAbove( Layer target );
+
+  /**
+   * @brief Show the Popup
+   */
+  void ShowPopup();
 
 public: // Not intended for application developers
 
