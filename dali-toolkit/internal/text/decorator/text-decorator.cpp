@@ -805,23 +805,24 @@ struct Decorator::Impl : public ConnectionTracker
         mQuadVertices.SetData( &vertices[ 0 ] );
         mQuadIndices.SetData( &indices[ 0 ] );
 
-        mQuadGeometry = Geometry::New();
-        mQuadGeometry.AddVertexBuffer( mQuadVertices );
+        if( !mQuadGeometry )
+        {
+          mQuadGeometry = Geometry::New();
+          mQuadGeometry.AddVertexBuffer( mQuadVertices );
+        }
         mQuadGeometry.SetIndexBuffer( mQuadIndices );
 
-        if( mHighlightRenderer )
-        {
-          mHighlightRenderer.SetGeometry( mQuadGeometry );
-        }
-        else
+        if( !mHighlightRenderer )
         {
           mHighlightRenderer = Dali::Renderer::New( mQuadGeometry, mHighlightMaterial );
           mHighlightActor.AddRenderer( mHighlightRenderer );
         }
-
-        mHighlightActor.SetPosition( mHighlightPosition.x,
-                                     mHighlightPosition.y );
       }
+
+      mHighlightActor.SetPosition( mHighlightPosition.x,
+                                   mHighlightPosition.y );
+
+      mHighlightQuadList.clear();
 
       mHighlightRenderer.SetDepthIndex( mTextDepth - 2u ); // text is rendered at mTextDepth and text's shadow at mTextDepth -1u.
     }
