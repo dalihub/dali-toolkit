@@ -47,16 +47,14 @@ const std::string XHTML_SHADOW_TAG("shadow");
 const std::string XHTML_GLOW_TAG("glow");
 const std::string XHTML_OUTLINE_TAG("outline");
 
-const char LESS_THAN         = '<';
-const char GREATER_THAN      = '>';
-const char EQUAL             = '=';
-const char QUOTATION_MARK    = '\'';
-const char LINE_SEPARATOR_CR = 0x0D; // Carriage return character  CR
-const char LINE_SEPARATOR_LF = 0x0A; // New line character         LF
-const char SLASH             = '/';
-const char BACK_SLASH        = '\\';
+const char LESS_THAN      = '<';
+const char GREATER_THAN   = '>';
+const char EQUAL          = '=';
+const char QUOTATION_MARK = '\'';
+const char SLASH          = '/';
+const char BACK_SLASH     = '\\';
 
-const char WHITE_SPACE       = 0x20; // ASCII value of the white space.
+const char WHITE_SPACE    = 0x20; // ASCII value of the white space.
 
 const unsigned int MAX_NUM_OF_ATTRIBUTES =  5u; ///< The font tag has the 'family', 'size' 'weight', 'width' and 'slant' attrubutes.
 const unsigned int DEFAULT_VECTOR_SIZE   = 16u; ///< Default size of run vectors.
@@ -558,15 +556,6 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
         if( ( LESS_THAN == nextCharacter ) || ( GREATER_THAN == nextCharacter ) )
         {
           character = nextCharacter;
-          ++markupStringBuffer;
-        }
-      }
-      else if( ( LINE_SEPARATOR_CR == character ) && ( markupStringBuffer + 1u < markupStringEndBuffer ) )
-      {
-        // Replacing CR+LF end line by LF.
-        if( LINE_SEPARATOR_LF == *( markupStringBuffer + 1u ) )
-        {
-          character = LINE_SEPARATOR_LF;
           ++markupStringBuffer;
         }
       }

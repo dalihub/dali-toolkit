@@ -69,6 +69,9 @@ namespace
     U0, U0, U0, U0,                         // Non valid.
     U0, U0, U0, U0,                         // Non valid.
   };
+
+  const uint8_t CR = 0xd;
+  const uint8_t LF = 0xa;
 } // namespace
 
 uint8_t GetUtf8Length( uint8_t utf8LeadByte )
@@ -135,8 +138,26 @@ uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length, uint32_t* utf3
     {
       case U1:
       {
-        *utf32++ = leadByte;
-        begin++;
+        if( CR == leadByte )
+        {
+          // Replace CR+LF or CR by LF
+          *utf32++ = LF;
+
+          // Look ahead if the next one is a LF.
+          ++begin;
+          if( begin < end )
+          {
+            if( LF == *begin )
+            {
+              ++begin;
+            }
+          }
+        }
+        else
+        {
+          *utf32++ = leadByte;
+          begin++;
+        }
         break;
       }
 

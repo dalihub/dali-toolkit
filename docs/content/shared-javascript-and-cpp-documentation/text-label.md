@@ -12,6 +12,8 @@ Text labels are lightweight, non-editable and do not respond to user input.
 
 To display a TextLabel the TEXT property must be set using a UTF-8 string.
 
+Note *CR+LF* new line characters are replaced by a *LF* one.
+
 ~~~{.cpp}
 // C++
 
