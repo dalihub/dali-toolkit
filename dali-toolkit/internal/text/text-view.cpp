@@ -55,6 +55,16 @@ void View::SetVisualModel( VisualModelPtr visualModel )
   mImpl->mVisualModel = visualModel;
 }
 
+const Vector2& View::GetControlSize() const
+{
+  if ( mImpl->mVisualModel )
+  {
+    return mImpl->mVisualModel->mControlSize;
+  }
+
+  return Vector2::ZERO;
+}
+
 Length View::GetGlyphs( GlyphInfo* glyphs,
                         Vector2* glyphPositions,
                         GlyphIndex glyphIndex,

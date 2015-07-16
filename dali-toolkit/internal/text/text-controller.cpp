@@ -564,7 +564,7 @@ float Controller::GetHeightForWidth( float width )
   ProcessModifyEvents();
 
   Size layoutSize;
-  if( width != mImpl->mControlSize.width )
+  if( width != mImpl->mVisualModel->mControlSize.width )
   {
     // Operations that can be done only once until the text changes.
     const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |
@@ -621,9 +621,9 @@ bool Controller::Relayout( const Size& size )
     return glyphsRemoved;
   }
 
-  if( size != mImpl->mControlSize )
+  if( size != mImpl->mVisualModel->mControlSize )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "new size (previous size %f,%f)\n", mImpl->mControlSize.width, mImpl->mControlSize.height );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "new size (previous size %f,%f)\n", mImpl->mVisualModel->mControlSize.width, mImpl->mVisualModel->mControlSize.height );
 
     // Operations that need to be done if the size changes.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
@@ -632,7 +632,7 @@ bool Controller::Relayout( const Size& size )
                                                              UPDATE_ACTUAL_SIZE        |
                                                              REORDER );
 
-    mImpl->mControlSize = size;
+    mImpl->mVisualModel->mControlSize = size;
   }
 
   // Make sure the model is up-to-date before layouting
@@ -640,7 +640,7 @@ bool Controller::Relayout( const Size& size )
   mImpl->UpdateModel( mImpl->mOperationsPending );
 
   Size layoutSize;
-  bool updated = DoRelayout( mImpl->mControlSize,
+  bool updated = DoRelayout( mImpl->mVisualModel->mControlSize,
                              mImpl->mOperationsPending,
                              layoutSize );
 
@@ -1460,7 +1460,7 @@ void Controller::SelectEvent( float x, float y, bool selectAll )
 
 void Controller::GetTargetSize( Vector2& targetSize )
 {
-  targetSize = mImpl->mControlSize;
+  targetSize = mImpl->mVisualModel->mControlSize;
 }
 
 void Controller::AddDecoration( Actor& actor, bool needsClipping )

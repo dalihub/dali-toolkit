@@ -58,6 +58,11 @@ public:
   void SetVisualModel( VisualModelPtr visualModel );
 
   /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetControlSize()
+   */
+  virtual const Vector2& GetControlSize() const;
+
+  /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetNumberOfGlyphs()
    */
   virtual Length GetNumberOfGlyphs() const;
