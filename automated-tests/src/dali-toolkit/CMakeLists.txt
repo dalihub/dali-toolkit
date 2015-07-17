@@ -15,6 +15,7 @@ SET(TC_SOURCES
    utc-Dali-CubeTransitionEffect.cpp
    utc-Dali-EffectsView.cpp
    utc-Dali-GaussianBlurView.cpp
+   utc-Dali-ImageView.cpp
    utc-Dali-JsonParser.cpp
    utc-Dali-KeyInputFocusManager.cpp
    utc-Dali-PageTurnView.cpp
