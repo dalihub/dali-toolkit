@@ -726,7 +726,7 @@ void Controller::Impl::OnHandleEvent( const Event& event )
       Vector2 position = mEventData->mDecorator->GetPosition( GRAB_HANDLE );
 
       // Position the grag handle close to either the left or right edge.
-      position.x = scrollRightDirection ? 0.f : mControlSize.width;
+      position.x = scrollRightDirection ? 0.f : mVisualModel->mControlSize.width;
 
       // Get the new handle position.
       // The grab handle's position is in decorator coords. Need to transforms to text coords.
@@ -747,7 +747,7 @@ void Controller::Impl::OnHandleEvent( const Event& event )
       Vector2 position = mEventData->mDecorator->GetPosition( leftSelectionHandleEvent ? Text::LEFT_SELECTION_HANDLE : Text::RIGHT_SELECTION_HANDLE );
 
       // Position the selection handle close to either the left or right edge.
-      position.x = scrollRightDirection ? 0.f : mControlSize.width;
+      position.x = scrollRightDirection ? 0.f : mVisualModel->mControlSize.width;
 
       // Get the new handle position.
       // The selection handle's position is in decorator coords. Need to transforms to text coords.
@@ -1619,12 +1619,12 @@ void Controller::Impl::UpdateCursorPosition()
       }
       case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
       {
-        cursorPosition.x = floor( 0.5f * mControlSize.width );
+        cursorPosition.x = floor( 0.5f * mVisualModel->mControlSize.width );
         break;
       }
       case LayoutEngine::HORIZONTAL_ALIGN_END:
       {
-        cursorPosition.x = mControlSize.width;
+        cursorPosition.x = mVisualModel->mControlSize.width;
         break;
       }
     }
@@ -1638,12 +1638,12 @@ void Controller::Impl::UpdateCursorPosition()
       }
       case LayoutEngine::VERTICAL_ALIGN_CENTER:
       {
-        cursorPosition.y = floorf( 0.5f * ( mControlSize.height - lineHeight ) );
+        cursorPosition.y = floorf( 0.5f * ( mVisualModel->mControlSize.height - lineHeight ) );
         break;
       }
       case LayoutEngine::VERTICAL_ALIGN_BOTTOM:
       {
-        cursorPosition.y = mControlSize.height - lineHeight;
+        cursorPosition.y = mVisualModel->mControlSize.height - lineHeight;
         break;
       }
     }
@@ -1728,9 +1728,9 @@ void Controller::Impl::UpdateSelectionHandle( HandleType handleType )
 void Controller::Impl::ClampHorizontalScroll( const Vector2& actualSize )
 {
   // Clamp between -space & 0 (and the text alignment).
-  if( actualSize.width > mControlSize.width )
+  if( actualSize.width > mVisualModel->mControlSize.width )
   {
-    const float space = ( actualSize.width - mControlSize.width ) + mAlignmentOffset.x;
+    const float space = ( actualSize.width - mVisualModel->mControlSize.width ) + mAlignmentOffset.x;
     mEventData->mScrollPosition.x = ( mEventData->mScrollPosition.x < -space ) ? -space : mEventData->mScrollPosition.x;
     mEventData->mScrollPosition.x = ( mEventData->mScrollPosition.x > -mAlignmentOffset.x ) ? -mAlignmentOffset.x : mEventData->mScrollPosition.x;
 
@@ -1745,9 +1745,9 @@ void Controller::Impl::ClampHorizontalScroll( const Vector2& actualSize )
 void Controller::Impl::ClampVerticalScroll( const Vector2& actualSize )
 {
   // Clamp between -space & 0 (and the text alignment).
-  if( actualSize.height > mControlSize.height )
+  if( actualSize.height > mVisualModel->mControlSize.height )
   {
-    const float space = ( actualSize.height - mControlSize.height ) + mAlignmentOffset.y;
+    const float space = ( actualSize.height - mVisualModel->mControlSize.height ) + mAlignmentOffset.y;
     mEventData->mScrollPosition.y = ( mEventData->mScrollPosition.y < -space ) ? -space : mEventData->mScrollPosition.y;
     mEventData->mScrollPosition.y = ( mEventData->mScrollPosition.y > -mAlignmentOffset.y ) ? -mAlignmentOffset.y : mEventData->mScrollPosition.y;
 
@@ -1769,9 +1769,9 @@ void Controller::Impl::ScrollToMakePositionVisible( const Vector2& position )
     mEventData->mScrollPosition.x += offset.x;
     updateDecorator = true;
   }
-  else if( position.x > mControlSize.width )
+  else if( position.x > mVisualModel->mControlSize.width )
   {
-    offset.x = mControlSize.width - position.x;
+    offset.x = mVisualModel->mControlSize.width - position.x;
     mEventData->mScrollPosition.x += offset.x;
     updateDecorator = true;
   }

@@ -126,9 +126,9 @@ public:
     virtual ~ControllerInterface() {};
 
     /**
-     * @brief An input event from one of the handles.
+     * @brief Query the target size of the UI control.
      *
-     * @param[out] targetSize The Size of the UI control the decorator is adding it's decorations to.
+     * @param[out] targetSize The size of the UI control the decorator is adding it's decorations to.
      */
     virtual void GetTargetSize( Vector2& targetSize ) = 0;
 

@@ -303,13 +303,12 @@ public:
   Vector<Vector2>        mGlyphPositions;       ///< For each glyph, the position.
   Vector<LineRun>        mLines;                ///< The laid out lines.
 
+  Vector2                mControlSize;           ///< The size of the UI control the decorator is adding it's decorations to.
   Vector4                mTextColor;            ///< The text color
   Vector4                mShadowColor;          ///< Color of drop shadow
   Vector4                mUnderlineColor;       ///< Color of underline
   Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
   float                  mUnderlineHeight;      ///< Fixed height for underline to override font metrics.
-
-
 
 private:
 
