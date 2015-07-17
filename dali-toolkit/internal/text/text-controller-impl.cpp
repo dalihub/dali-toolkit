@@ -81,8 +81,8 @@ namespace Text
  * @param[in] glyphIndex The index to the first glyph.
  * @param[in] numberOfGlyphs The number of glyphs.
  * @param[out] glyphMetrics Some glyph metrics (font height, advance, ascender and x bearing).
- * @param[in]
- * @param[in]
+ * @param[in] visualModel The visual model.
+ * @param[in] fontClient The font client.
  */
 void GetGlyphsMetrics( GlyphIndex glyphIndex,
                        Length numberOfGlyphs,
@@ -663,7 +663,7 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       if( handleStopScrolling )
       {
-        mEventData->mUpdateLeftSelectionPosition = ( mEventData->mLeftSelectionPosition != handlePosition ) && ( mEventData->mRightSelectionPosition != handlePosition);
+        mEventData->mUpdateLeftSelectionPosition = ( mEventData->mRightSelectionPosition != handlePosition );
         mEventData->mScrollAfterUpdatePosition = mEventData->mUpdateLeftSelectionPosition;
 
         if( mEventData->mUpdateLeftSelectionPosition )
@@ -681,9 +681,8 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       if( handleStopScrolling )
       {
-        mEventData->mUpdateRightSelectionPosition = ( mEventData->mRightSelectionPosition != handlePosition ) && ( mEventData->mLeftSelectionPosition != handlePosition );
+        mEventData->mUpdateRightSelectionPosition = ( mEventData->mLeftSelectionPosition != handlePosition );
         mEventData->mScrollAfterUpdatePosition = mEventData->mUpdateRightSelectionPosition;
-
         if( mEventData->mUpdateRightSelectionPosition )
         {
           mEventData->mRightSelectionPosition = handlePosition;
@@ -705,74 +704,84 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
     ClampHorizontalScroll( actualSize );
 
+    bool endOfScroll = false;
     if( Vector2::ZERO == ( currentScrollPosition - mEventData->mScrollPosition ) )
     {
       // Notify the decorator there is no more text to scroll.
       // The decorator won't send more scroll events.
       mEventData->mDecorator->NotifyEndOfScroll();
+      // Still need to set the position of the handle.
+      endOfScroll = true;
     }
-    else
+
+    // Set the position of the handle.
+    const bool scrollRightDirection = xSpeed > 0.f;
+    const bool leftSelectionHandleEvent = Event::LEFT_SELECTION_HANDLE_EVENT == event.type;
+    const bool rightSelectionHandleEvent = Event::RIGHT_SELECTION_HANDLE_EVENT == event.type;
+
+    if( Event::GRAB_HANDLE_EVENT == event.type )
     {
-      const bool scrollRightDirection = xSpeed > 0.f;
-      const bool leftSelectionHandleEvent = Event::LEFT_SELECTION_HANDLE_EVENT == event.type;
-      const bool rightSelectionHandleEvent = Event::RIGHT_SELECTION_HANDLE_EVENT == event.type;
+      ChangeState( EventData::GRAB_HANDLE_PANNING );
 
-      if( Event::GRAB_HANDLE_EVENT == event.type )
+      Vector2 position = mEventData->mDecorator->GetPosition( GRAB_HANDLE );
+
+      // Position the grag handle close to either the left or right edge.
+      position.x = scrollRightDirection ? 0.f : mControlSize.width;
+
+      // Get the new handle position.
+      // The grab handle's position is in decorator coords. Need to transforms to text coords.
+      const CharacterIndex handlePosition = GetClosestCursorIndex( position.x - mEventData->mScrollPosition.x - mAlignmentOffset.x,
+                                                                   position.y - mEventData->mScrollPosition.y - mAlignmentOffset.y );
+
+      mEventData->mUpdateCursorPosition = mEventData->mPrimaryCursorPosition != handlePosition;
+      mEventData->mScrollAfterUpdatePosition = mEventData->mUpdateCursorPosition;
+      mEventData->mPrimaryCursorPosition = handlePosition;
+    }
+    else if( leftSelectionHandleEvent || rightSelectionHandleEvent )
+    {
+      // TODO: This is recalculating the selection box every time the text is scrolled with the selection handles.
+      //       Think if something can be done to save power.
+
+      ChangeState( EventData::SELECTION_HANDLE_PANNING );
+
+      Vector2 position = mEventData->mDecorator->GetPosition( leftSelectionHandleEvent ? Text::LEFT_SELECTION_HANDLE : Text::RIGHT_SELECTION_HANDLE );
+
+      // Position the selection handle close to either the left or right edge.
+      position.x = scrollRightDirection ? 0.f : mControlSize.width;
+
+      // Get the new handle position.
+      // The selection handle's position is in decorator coords. Need to transforms to text coords.
+      const CharacterIndex handlePosition = GetClosestCursorIndex( position.x - mEventData->mScrollPosition.x - mAlignmentOffset.x,
+                                                                   position.y - mEventData->mScrollPosition.y - mAlignmentOffset.y );
+
+      if( leftSelectionHandleEvent )
       {
-        ChangeState( EventData::GRAB_HANDLE_PANNING );
-
-        Vector2 position = mEventData->mDecorator->GetPosition( GRAB_HANDLE );
-
-        // Position the grag handle close to either the left or right edge.
-        position.x = scrollRightDirection ? 0.f : mControlSize.width;
-
-        // Get the new handle position.
-        // The grab handle's position is in decorator coords. Need to transforms to text coords.
-        const CharacterIndex handlePosition = GetClosestCursorIndex( position.x - mEventData->mScrollPosition.x - mAlignmentOffset.x,
-                                                                     position.y - mEventData->mScrollPosition.y - mAlignmentOffset.y );
-
-        mEventData->mUpdateCursorPosition = mEventData->mPrimaryCursorPosition != handlePosition;
-        mEventData->mScrollAfterUpdatePosition = mEventData->mUpdateCursorPosition;
-        mEventData->mPrimaryCursorPosition = handlePosition;
-      }
-      else if( leftSelectionHandleEvent || rightSelectionHandleEvent )
-      {
-        // TODO: This is recalculating the selection box every time the text is scrolled with the selection handles.
-        //       Think if something can be done to save power.
-
-        ChangeState( EventData::SELECTION_HANDLE_PANNING );
-
-        Vector2 position = mEventData->mDecorator->GetPosition( leftSelectionHandleEvent ? Text::LEFT_SELECTION_HANDLE : Text::RIGHT_SELECTION_HANDLE );
-
-        // Position the selection handle close to either the left or right edge.
-        position.x = scrollRightDirection ? 0.f : mControlSize.width;
-
-        // Get the new handle position.
-        // The selection handle's position is in decorator coords. Need to transforms to text coords.
-        const CharacterIndex handlePosition = GetClosestCursorIndex( position.x - mEventData->mScrollPosition.x - mAlignmentOffset.x,
-                                                                     position.y - mEventData->mScrollPosition.y - mAlignmentOffset.y );
-
-        if( leftSelectionHandleEvent )
+        const bool differentHandles = ( mEventData->mLeftSelectionPosition != handlePosition ) && ( mEventData->mRightSelectionPosition != handlePosition );
+        mEventData->mUpdateLeftSelectionPosition = endOfScroll || differentHandles;
+        if( differentHandles )
         {
-          mEventData->mUpdateLeftSelectionPosition = handlePosition != mEventData->mLeftSelectionPosition;
           mEventData->mLeftSelectionPosition = handlePosition;
         }
-        else
+      }
+      else
+      {
+        const bool differentHandles = ( mEventData->mRightSelectionPosition != handlePosition ) && ( mEventData->mLeftSelectionPosition != handlePosition );
+        mEventData->mUpdateRightSelectionPosition = endOfScroll || differentHandles;
+        if( differentHandles )
         {
-          mEventData->mUpdateRightSelectionPosition = handlePosition != mEventData->mRightSelectionPosition;
           mEventData->mRightSelectionPosition = handlePosition;
         }
-
-        if( mEventData->mUpdateLeftSelectionPosition || mEventData->mUpdateRightSelectionPosition )
-        {
-          RepositionSelectionHandles( mEventData->mLeftSelectionPosition,
-                                      mEventData->mRightSelectionPosition );
-
-          mEventData->mScrollAfterUpdatePosition = true;
-        }
       }
-      mEventData->mDecoratorUpdated = true;
+
+      if( mEventData->mUpdateLeftSelectionPosition || mEventData->mUpdateRightSelectionPosition )
+      {
+        RepositionSelectionHandles( mEventData->mLeftSelectionPosition,
+                                    mEventData->mRightSelectionPosition );
+
+        mEventData->mScrollAfterUpdatePosition = true;
+      }
     }
+    mEventData->mDecoratorUpdated = true;
   } // end ( HANDLE_SCROLLING == state )
 }
 
@@ -928,8 +937,9 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
     std::swap( selectionStart, selectionEnd );
   }
 
-  GlyphIndex glyphStart = *( charactersToGlyphBuffer + selectionStart );
-  GlyphIndex glyphEnd = *( charactersToGlyphBuffer + ( selectionEnd - 1u ) ) + *( glyphsPerCharacterBuffer + ( selectionEnd - 1u ) ) - 1u;
+  const GlyphIndex glyphStart = *( charactersToGlyphBuffer + selectionStart );
+  const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + ( selectionEnd - 1u ) );
+  const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + ( selectionEnd - 1u ) ) + ( ( numberOfGlyphs > 0 ) ? numberOfGlyphs - 1u : 0u );
 
   mEventData->mDecorator->SwapSelectionHandlesEnabled( firstLine.direction != indicesSwapped );
 
@@ -937,6 +947,7 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
 
   for( GlyphIndex index = glyphStart; index <= glyphEnd; ++index )
   {
+    // TODO: Fix the LATIN ligatures. i.e ff, fi, etc...
     const GlyphInfo& glyph = *( glyphsBuffer + index );
     const Vector2& position = *( positionsBuffer + index );
 
@@ -1386,30 +1397,26 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     return;
   }
 
-  // Get the previous logical index.
-  const CharacterIndex previousLogical = isFirstPosition ? 0u : logical - 1u;
+  // 'logical' is the logical 'cursor' index.
+  // Get the next and current logical 'character' index.
+  const CharacterIndex nextCharacterIndex = logical;
+  const CharacterIndex characterIndex = isFirstPosition ? logical : logical - 1u;
 
-  // Decrease the logical index if it's the last one.
-  if( isLastPosition )
-  {
-    --logical;
-  }
-
-  // Get the direction of the character and the previous one.
+  // Get the direction of the character and the next one.
   const CharacterDirection* const modelCharacterDirectionsBuffer = ( 0u != mLogicalModel->mCharacterDirections.Count() ) ? mLogicalModel->mCharacterDirections.Begin() : NULL;
 
   CharacterDirection isCurrentRightToLeft = false;
-  CharacterDirection isPreviousRightToLeft = false;
+  CharacterDirection isNextRightToLeft = false;
   if( NULL != modelCharacterDirectionsBuffer ) // If modelCharacterDirectionsBuffer is NULL, it means the whole text is left to right.
   {
-    isCurrentRightToLeft = *( modelCharacterDirectionsBuffer + logical );
-    isPreviousRightToLeft = *( modelCharacterDirectionsBuffer + previousLogical );
+    isCurrentRightToLeft = *( modelCharacterDirectionsBuffer + characterIndex );
+    isNextRightToLeft = *( modelCharacterDirectionsBuffer + nextCharacterIndex );
   }
 
   // Get the line where the character is laid-out.
   const LineRun* modelLines = mVisualModel->mLines.Begin();
 
-  const LineIndex lineIndex = mVisualModel->GetLineOfCharacter( logical );
+  const LineIndex lineIndex = mVisualModel->GetLineOfCharacter( characterIndex );
   const LineRun& line = *( modelLines + lineIndex );
 
   // Get the paragraph's direction.
@@ -1417,123 +1424,106 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
 
   // Check whether there is an alternative position:
 
-  cursorInfo.isSecondaryCursor = ( isCurrentRightToLeft != isPreviousRightToLeft ) ||
-    ( isLastPosition && ( isRightToLeftParagraph != isCurrentRightToLeft ) );
+  cursorInfo.isSecondaryCursor = ( !isLastPosition && ( isCurrentRightToLeft != isNextRightToLeft ) ) ||
+                                 ( isLastPosition && ( isRightToLeftParagraph != isCurrentRightToLeft ) );
 
   // Set the line height.
   cursorInfo.lineHeight = line.ascender + -line.descender;
 
-  // Convert the cursor position into the glyph position.
-  CharacterIndex characterIndex = logical;
-  if( cursorInfo.isSecondaryCursor &&
-      ( isRightToLeftParagraph != isCurrentRightToLeft ) )
+  // Calculate the primary cursor.
+
+  CharacterIndex index = characterIndex;
+  if( cursorInfo.isSecondaryCursor )
   {
-    characterIndex = previousLogical;
-  }
+    // If there is a secondary position, the primary cursor may be in a different place than the logical index.
 
-  const GlyphIndex currentGlyphIndex = *( mVisualModel->mCharactersToGlyph.Begin() + characterIndex );
-  const Length numberOfGlyphs = *( mVisualModel->mGlyphsPerCharacter.Begin() + characterIndex );
-  const Length numberOfCharacters = *( mVisualModel->mCharactersPerGlyph.Begin() +currentGlyphIndex );
-
-  // Get the metrics for the group of glyphs.
-  GlyphMetrics glyphMetrics;
-  GetGlyphsMetrics( currentGlyphIndex,
-                    numberOfGlyphs,
-                    glyphMetrics,
-                    mVisualModel,
-                    mFontClient );
-
-  float interGlyphAdvance = 0.f;
-  if( !isLastPosition &&
-      ( numberOfCharacters > 1u ) )
-  {
-    const CharacterIndex firstIndex = *( mVisualModel->mGlyphsToCharacters.Begin() + currentGlyphIndex );
-    interGlyphAdvance = static_cast<float>( characterIndex - firstIndex ) * glyphMetrics.advance / static_cast<float>( numberOfCharacters );
-  }
-
-  // Get the glyph position and x bearing.
-  const Vector2& currentPosition = *( mVisualModel->mGlyphPositions.Begin() + currentGlyphIndex );
-
-  // Set the cursor's height.
-  cursorInfo.primaryCursorHeight = glyphMetrics.fontHeight;
-
-  // Set the position.
-  cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + currentPosition.x + ( isCurrentRightToLeft ? glyphMetrics.advance : interGlyphAdvance );
-  cursorInfo.primaryPosition.y = line.ascender - glyphMetrics.ascender;
-
-  if( isLastPosition )
-  {
-    // The position of the cursor after the last character needs special
-    // care depending on its direction and the direction of the paragraph.
-
-    if( cursorInfo.isSecondaryCursor )
+    if( isLastPosition )
     {
+      // The position of the cursor after the last character needs special
+      // care depending on its direction and the direction of the paragraph.
+
       // Need to find the first character after the last character with the paragraph's direction.
       // i.e l0 l1 l2 r0 r1 should find r0.
 
       // TODO: check for more than one line!
-      characterIndex = isRightToLeftParagraph ? line.characterRun.characterIndex : line.characterRun.characterIndex + line.characterRun.numberOfCharacters - 1u;
-      characterIndex = mLogicalModel->GetLogicalCharacterIndex( characterIndex );
-
-      const GlyphIndex glyphIndex = *( mVisualModel->mCharactersToGlyph.Begin() + characterIndex );
-      const Length numberOfGlyphs = *( mVisualModel->mGlyphsPerCharacter.Begin() + characterIndex );
-
-      const Vector2& position = *( mVisualModel->mGlyphPositions.Begin() + glyphIndex );
-
-      // Get the metrics for the group of glyphs.
-      GlyphMetrics glyphMetrics;
-      GetGlyphsMetrics( glyphIndex,
-                        numberOfGlyphs,
-                        glyphMetrics,
-                        mVisualModel,
-                        mFontClient );
-
-      cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + position.x + ( isRightToLeftParagraph ? 0.f : glyphMetrics.advance );
-
-      cursorInfo.primaryPosition.y = line.ascender - glyphMetrics.ascender;
+      index = isRightToLeftParagraph ? line.characterRun.characterIndex : line.characterRun.characterIndex + line.characterRun.numberOfCharacters - 1u;
+      index = mLogicalModel->GetLogicalCharacterIndex( index );
     }
     else
     {
-      if( !isCurrentRightToLeft )
-      {
-        cursorInfo.primaryPosition.x += glyphMetrics.advance;
-      }
-      else
-      {
-        cursorInfo.primaryPosition.x -= glyphMetrics.advance;
-      }
+      index = ( isRightToLeftParagraph == isCurrentRightToLeft ) ? characterIndex : nextCharacterIndex;
     }
   }
 
-  // Set the alternative cursor position.
+  // Convert the cursor position into the glyph position.
+  const GlyphIndex primaryGlyphIndex = *( mVisualModel->mCharactersToGlyph.Begin() + index );
+  const Length primaryNumberOfGlyphs = *( mVisualModel->mGlyphsPerCharacter.Begin() + index );
+  const Length primaryNumberOfCharacters = *( mVisualModel->mCharactersPerGlyph.Begin() + primaryGlyphIndex );
+
+  // Get the metrics for the group of glyphs.
+  GlyphMetrics glyphMetrics;
+  GetGlyphsMetrics( primaryGlyphIndex,
+                    primaryNumberOfGlyphs,
+                    glyphMetrics,
+                    mVisualModel,
+                    mFontClient );
+
+  float glyphAdvance = 0.f;
+  if( !isLastPosition &&
+      ( primaryNumberOfCharacters > 1u ) )
+  {
+    const CharacterIndex firstIndex = *( mVisualModel->mGlyphsToCharacters.Begin() + primaryGlyphIndex );
+    glyphAdvance = static_cast<float>( 1u + characterIndex - firstIndex ) * glyphMetrics.advance / static_cast<float>( primaryNumberOfCharacters );
+  }
+  else
+  {
+    glyphAdvance = glyphMetrics.advance;
+  }
+
+  // Get the glyph position and x bearing.
+  const Vector2& primaryPosition = *( mVisualModel->mGlyphPositions.Begin() + primaryGlyphIndex );
+
+  // Set the primary cursor's height.
+  cursorInfo.primaryCursorHeight = cursorInfo.isSecondaryCursor ? 0.5f * glyphMetrics.fontHeight : glyphMetrics.fontHeight;
+
+  // Set the primary cursor's position.
+  if( isLastPosition )
+  {
+    cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + primaryPosition.x + ( isRightToLeftParagraph ? 0.f : glyphMetrics.advance );
+  }
+  else
+  {
+    cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + primaryPosition.x + ( ( ( isFirstPosition && !isCurrentRightToLeft ) || ( !isFirstPosition && isCurrentRightToLeft ) ) ? 0.f : glyphAdvance );
+  }
+  cursorInfo.primaryPosition.y = line.ascender - glyphMetrics.ascender;
+
+  // Calculate the secondary cursor.
+
   if( cursorInfo.isSecondaryCursor )
   {
-    // Convert the cursor position into the glyph position.
-    const CharacterIndex previousCharacterIndex = ( ( isRightToLeftParagraph != isCurrentRightToLeft ) ? logical : previousLogical );
-    const GlyphIndex previousGlyphIndex = *( mVisualModel->mCharactersToGlyph.Begin() + previousCharacterIndex );
-    const Length numberOfGlyphs = *( mVisualModel->mGlyphsPerCharacter.Begin() + previousCharacterIndex );
+    // Set the secondary cursor's height.
+    cursorInfo.secondaryCursorHeight = 0.5f * glyphMetrics.fontHeight;
 
-    // Get the glyph position.
-    const Vector2& previousPosition = *( mVisualModel->mGlyphPositions.Begin() + previousGlyphIndex );
+    CharacterIndex index = characterIndex;
+    if( !isLastPosition )
+    {
+      index = ( isRightToLeftParagraph == isCurrentRightToLeft ) ? nextCharacterIndex : characterIndex;
+    }
 
-    // Get the metrics for the group of glyphs.
-    GlyphMetrics glyphMetrics;
-    GetGlyphsMetrics( previousGlyphIndex,
-                      numberOfGlyphs,
+    const GlyphIndex secondaryGlyphIndex = *( mVisualModel->mCharactersToGlyph.Begin() + index );
+    const Length secondaryNumberOfGlyphs = *( mVisualModel->mGlyphsPerCharacter.Begin() + index );
+
+    const Vector2& secondaryPosition = *( mVisualModel->mGlyphPositions.Begin() + index );
+
+    GetGlyphsMetrics( secondaryGlyphIndex,
+                      secondaryNumberOfGlyphs,
                       glyphMetrics,
                       mVisualModel,
                       mFontClient );
 
-    // Set the cursor position and height.
-    cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + previousPosition.x + ( ( ( isLastPosition && !isCurrentRightToLeft ) ||
-                                                                                       ( !isLastPosition && isCurrentRightToLeft )    ) ? glyphMetrics.advance : 0.f );
-
-    cursorInfo.secondaryCursorHeight = 0.5f * glyphMetrics.fontHeight;
-
+    // Set the secondary cursor's position.
+    cursorInfo.secondaryPosition.x = -glyphMetrics.xBearing + secondaryPosition.x + ( isCurrentRightToLeft ? 0.f : glyphMetrics.advance );
     cursorInfo.secondaryPosition.y = cursorInfo.lineHeight - cursorInfo.secondaryCursorHeight - line.descender - ( glyphMetrics.fontHeight - glyphMetrics.ascender );
-
-    // Update the primary cursor height as well.
-    cursorInfo.primaryCursorHeight *= 0.5f;
   }
 }
 

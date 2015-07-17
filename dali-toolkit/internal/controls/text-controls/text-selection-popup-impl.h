@@ -44,7 +44,6 @@ namespace
 enum PopupCustomisations
 {
   POPUP_MAXIMUM_SIZE,
-  POPUP_MINIMUM_SIZE,
   OPTION_MAXIMUM_SIZE,
   OPTION_MINIMUM_SIZE,
   OPTION_DIVIDER_SIZE
@@ -128,6 +127,11 @@ public:
    * @copydoc Toolkit::TextSelectionPopup::RaiseAbove()
    */
   void RaiseAbove( Layer target );
+
+  /**
+   * @copydoc Toolkit::TextSelectionPopup::ShowPopup()
+   */
+  void ShowPopup();
 
 private: // From Control
 
@@ -256,9 +260,6 @@ private: // Data
   Image mClipboardIconImage;
   Image mSelectIconImage;
   Image mSelectAllIconImage;
-
-  Size mMaxSize;                       // Maximum size of the Popup
-  Size mMinSize;                       // Minimum size of the Popup
 
   Size mOptionMaxSize;                 // Maximum size of an Option button
   Size mOptionMinSize;                 // Minimum size of an Option button

@@ -192,59 +192,6 @@ void ImageActorApi::GetSortModifier( const v8::FunctionCallbackInfo<v8::Value>& 
 }
 
 /**
- * Set the face-culling mode for this actor.
- * @for ImageActor
- * @method setCullFace
- * @param {Number} cullMode
- * @example
- *      // cull mode should be one of the following constants
- *      dali.CULL_FACE_DISABLE        // Face culling disabled
- *      dali.CULL_FRONT_FACE          // Cull front facing polygons
- *      dali.CULL_BACK_FACE           // Cull back facing polygons
- *      dali.CULL_FRONT_AND_BACK_FACE // Cull front and back facing polygons
- *      actor.SetCullFace( dali.CULL_FRONT_FACE );
- */
-void ImageActorApi::SetCullFace( const v8::FunctionCallbackInfo<v8::Value>& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  ImageActor imageActor = GetImageActor( isolate, args );
-
-  bool found( false );
-  int cullMode = V8Utils::GetIntegerParameter( PARAMETER_0, found, isolate, args, 0 );
-  if( !found )
-  {
-    DALI_SCRIPT_EXCEPTION( isolate, "bad parameter" );
-    return;
-  }
-
-  imageActor.SetCullFace(  static_cast<Dali::CullFaceMode>( cullMode ) );
-
-}
-
-/**
- * Retrieve the face-culling mode for this actor.
- * @for ImageActor
- * @method getCullFace
- * @return {Number} cullMode
- * @example
- *      // cull mode is one of the following
- *      dali.CULL_FACE_DISABLE        // Face culling disabled
- *      dali.CULL_FRONT_FACE          // Cull front facing polygons
- *      dali.CULL_BACK_FACE           // Cull back facing polygons
- *      dali.CULL_FRONT_AND_BACK_FACE // Cull front and back facing polygon
- */
-void ImageActorApi::GetCullFace( const v8::FunctionCallbackInfo<v8::Value>& args )
-{
-  v8::Isolate* isolate = args.GetIsolate();
-  v8::HandleScope handleScope( isolate );
-  ImageActor imageActor = GetImageActor( isolate, args );
-
-  args.GetReturnValue().Set( v8::Integer::New( isolate, imageActor.GetCullFace() ) );
-
-}
-
-/**
  * Sets the blending mode.
  *
  * If blending is disabled (BLENDING_OFF) fade in and fade out animations do not work.

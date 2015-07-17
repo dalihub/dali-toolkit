@@ -208,15 +208,6 @@ bool SetPropertyFromNode( const TreeNode& node, Property::Type type, Property::V
       }
       break;
     }
-    case Property::UNSIGNED_INTEGER:
-    {
-      if( OptionalUnsignedInt v = replacer.IsUnsignedInteger( node) )
-      {
-        value = *v;
-        done = true;
-      }
-      break;
-    }
     case Property::VECTOR2:
     {
       if( OptionalVector2 v = replacer.IsVector2(node) )

@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
+#include <dali-toolkit/public-api/controls/control.h>
 
 // INTERNAL INCLUDES
 #include <actors/layer-api.h>
@@ -256,8 +257,6 @@ const ActorFunctions ActorFunctionTable[]=
     // ignore GetNinePatchBorder use imageActor.border
     { "SetSortModifier",    ImageActorApi::SetSortModifier,   IMAGE_ACTOR_API  },
     { "GetSortModifier",    ImageActorApi::GetSortModifier,   IMAGE_ACTOR_API  },
-    { "SetCullFace",        ImageActorApi::SetCullFace,       IMAGE_ACTOR_API  },
-    { "GetCullFace",        ImageActorApi::GetCullFace,       IMAGE_ACTOR_API  },
     { "SetBlendMode",       ImageActorApi::SetBlendMode,      IMAGE_ACTOR_API  },
     { "GetBlendMode",       ImageActorApi::GetBlendMode,      IMAGE_ACTOR_API  },
     { "SetBlendFunc",       ImageActorApi::SetBlendFunc,      IMAGE_ACTOR_API  },
@@ -318,7 +317,10 @@ ActorWrapper::ActorWrapper( Actor actor,
 v8::Handle<v8::Object> ActorWrapper::WrapActor(v8::Isolate* isolate, Actor actor )
 {
   v8::EscapableHandleScope handleScope( isolate );
-  v8::Local<v8::Object> object = WrapActor( isolate, actor, GetActorType( actor.GetTypeName() ) );
+
+  // Check whether the actor is a Control
+  ActorWrapper::ActorType type = Toolkit::Control::DownCast(actor) ? ACTOR : GetActorType( actor.GetTypeName() );
+  v8::Local<v8::Object> object = WrapActor( isolate, actor, type );
 
   return handleScope.Escape( object );
 }

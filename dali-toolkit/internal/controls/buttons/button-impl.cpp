@@ -143,8 +143,11 @@ void Button::SetDisabled( bool disabled )
       //(2) mDisabledBackgroundContent (Inserted)
       //(1) mBackgroundContent
 
-      TransitionInBetween( mUnselectedContent, mLabel, mDisabledContent );
-      TransitionInAbove( mBackgroundContent, mDisabledBackgroundContent );
+      AddButtonImage( mBackgroundContent );
+      TransitionButtonImage( mDisabledBackgroundContent );
+      AddButtonImage( mUnselectedContent );
+      TransitionButtonImage( mDisabledContent );
+      ReAddLabel();
 
       TransitionOut( mUnselectedContent );
       TransitionOut( mSelectedContent );
@@ -164,8 +167,12 @@ void Button::SetDisabled( bool disabled )
       //(2) mSelectedBackgroundContent
       //(1) mBackgroundContent
 
-      TransitionInBetween( mSelectedContent, mLabel, mDisabledSelectedContent );
-      TransitionInAbove( mSelectedBackgroundContent, mDisabledBackgroundContent );
+      AddButtonImage( mBackgroundContent );
+      AddButtonImage( mSelectedBackgroundContent );
+      TransitionButtonImage( mDisabledBackgroundContent );
+      AddButtonImage( mSelectedContent );
+      TransitionButtonImage( mDisabledSelectedContent );
+      ReAddLabel();
 
       TransitionOut( mUnselectedContent );
       TransitionOut( mSelectedContent );
@@ -184,8 +191,11 @@ void Button::SetDisabled( bool disabled )
       //(2) mBackgroundContent (Inserted)
       //(1) mDisabledBackgroundContent
 
-      TransitionInBetween( mDisabledContent, mLabel, mUnselectedContent );
-      TransitionInAbove( mDisabledBackgroundContent, mBackgroundContent );
+      AddButtonImage( mDisabledBackgroundContent );
+      TransitionButtonImage( mBackgroundContent );
+      AddButtonImage( mDisabledContent );
+      TransitionButtonImage( mUnselectedContent );
+      ReAddLabel();
 
       TransitionOut( mSelectedContent );
       TransitionOut( mSelectedBackgroundContent );
@@ -205,9 +215,12 @@ void Button::SetDisabled( bool disabled )
       //(2) mBackgroundContent (Inserted)
       //(1) mDisabledBackgroundContent
 
-      TransitionInBetween( mDisabledSelectedContent, mLabel, mSelectedContent );
-      TransitionInAbove( mDisabledBackgroundContent, mSelectedBackgroundContent );
-      TransitionInAbove( mDisabledBackgroundContent, mBackgroundContent );
+      AddButtonImage( mDisabledBackgroundContent );
+      TransitionButtonImage( mBackgroundContent );
+      TransitionButtonImage( mSelectedBackgroundContent );
+      AddButtonImage( mDisabledSelectedContent );
+      TransitionButtonImage( mSelectedContent );
+      ReAddLabel();
 
       TransitionOut( mUnselectedContent );
       TransitionOut( mDisabledContent );
@@ -314,9 +327,11 @@ void Button::SetSelected( bool selected, bool emitSignal )
       //(2) mSelectedBackgroundContent (Inserted)
       //(1) mBackgroundContent
 
-      TransitionInBetween( mUnselectedContent, mLabel, mSelectedContent );
-      TransitionInAbove( mBackgroundContent, mSelectedBackgroundContent );
-      TransitionInAtIndex( 0, mBackgroundContent );
+      AddButtonImage( mBackgroundContent );
+      TransitionButtonImage( mSelectedBackgroundContent );
+      AddButtonImage( mUnselectedContent );
+      TransitionButtonImage( mSelectedContent );
+      ReAddLabel();
 
       TransitionOut( mUnselectedContent );
       TransitionOut( mDisabledContent );
@@ -333,8 +348,10 @@ void Button::SetSelected( bool selected, bool emitSignal )
       //(2) mSelectedContent
       //(1) mBackgroundContent
 
-      TransitionInBetween( mSelectedContent, mLabel, mUnselectedContent );
-      TransitionInAtIndex( 0, mBackgroundContent );
+      AddButtonImage( mBackgroundContent );
+      AddButtonImage( mSelectedContent );
+      TransitionButtonImage( mUnselectedContent );
+      ReAddLabel();
 
       TransitionOut( mSelectedContent );
       TransitionOut( mSelectedBackgroundContent );
@@ -694,18 +711,17 @@ void Button::OnButtonDown()
 {
   if( !mTogglableButton )
   {
-    Toolkit::Button handle( GetOwner() );
-
     Pressed();
 
     if( mAutoRepeating )
     {
       SetUpTimer( mInitialAutoRepeatingDelay );
     }
-
-    //Emit signal.
-    mPressedSignal.Emit( handle );
   }
+
+  // The pressed signal should be emitted regardless of toggle mode.
+  Toolkit::Button handle( GetOwner() );
+  mPressedSignal.Emit( handle );
 }
 
 void Button::OnButtonUp()
@@ -724,13 +740,12 @@ void Button::OnButtonUp()
       {
         mAutoRepeatingTimer.Reset();
       }
-
-      Toolkit::Button handle( GetOwner() );
-
-      //Emit signal.
-      mReleasedSignal.Emit( handle );
-      mClickedSignal.Emit( handle );
     }
+
+    // The clicked and released signals should be emitted regardless of toggle mode.
+    Toolkit::Button handle( GetOwner() );
+    mReleasedSignal.Emit( handle );
+    mClickedSignal.Emit( handle );
   }
 }
 
@@ -740,18 +755,17 @@ void Button::OnTouchPointLeave()
   {
     if( !mTogglableButton )
     {
-      Toolkit::Button handle( GetOwner() );
-
       Released();
 
       if( mAutoRepeating )
       {
         mAutoRepeatingTimer.Reset();
       }
-
-      //Emit signal.
-      mReleasedSignal.Emit( handle );
     }
+
+    // The released signal should be emitted regardless of toggle mode.
+    Toolkit::Button handle( GetOwner() );
+    mReleasedSignal.Emit( handle );
   }
 }
 
@@ -957,9 +971,11 @@ void Button::Pressed()
     //(2) mSelectedBackgroundContent (Inserted)
     //(1) mBackgroundContent
 
-    TransitionInBetween( mUnselectedContent, mLabel, mSelectedContent );
-    TransitionInAbove( mBackgroundContent, mSelectedBackgroundContent );
-    TransitionInAtIndex( 0, mBackgroundContent );
+    AddButtonImage( mBackgroundContent );
+    TransitionButtonImage( mSelectedBackgroundContent );
+    AddButtonImage( mUnselectedContent );
+    TransitionButtonImage( mSelectedContent );
+    ReAddLabel();
 
     TransitionOut( mUnselectedContent );
     TransitionOut( mDisabledContent );
@@ -986,8 +1002,10 @@ void Button::Released()
     //(2) mSelectedContent
     //(1) mBackgroundContent
 
-    TransitionInBetween( mSelectedContent, mLabel, mUnselectedContent );
-    TransitionInAtIndex( 0, mBackgroundContent );
+    AddButtonImage( mBackgroundContent );
+    AddButtonImage( mSelectedContent );
+    TransitionButtonImage( mUnselectedContent );
+    ReAddLabel();
 
     TransitionOut( mSelectedContent );
     TransitionOut( mSelectedBackgroundContent );
@@ -1011,16 +1029,44 @@ Button::PaintState Button::GetPaintState()
   return mPaintState;
 }
 
-bool Button::InsertButtonImage( unsigned int index, Actor& actor )
+void Button::PrepareAddButtonImage( Actor& actor )
 {
   if( actor )
   {
-    Self().Insert( index, actor );
+    actor.Unparent();
+    Self().Add( actor );
     PrepareForTranstionOut( actor );
-    return true;
   }
+}
 
-  return false;
+void Button::TransitionButtonImage( Actor& actor )
+{
+  if( actor )
+  {
+    if( !actor.GetParent() )
+    {
+      Self().Add( actor );
+    }
+
+    OnTransitionIn( actor );
+  }
+}
+
+void Button::AddButtonImage( Actor& actor )
+{
+  if( actor )
+  {
+    Self().Add( actor );
+  }
+}
+
+void Button::ReAddLabel()
+{
+  if( mLabel )
+  {
+    mLabel.Unparent();
+    Self().Add( mLabel );
+  }
 }
 
 void Button::RemoveButtonImage( Actor& actor )
@@ -1052,31 +1098,6 @@ unsigned int Button::FindChildIndex( Actor& actor )
   return childrenNum;
 }
 
-void Button::TransitionInBetween(  Actor childLower, Actor childUpper, Actor actor )
-{
-  unsigned int index = childLower ? FindChildIndex( childLower ) + 1 : FindChildIndex( childUpper );
-  TransitionInAtIndex( index, actor );
-}
-
-void Button::TransitionInAbove( Actor child, Actor actor )
-{
-  unsigned int index = child ? FindChildIndex( child ) + 1 : 0;
-  TransitionInAtIndex( index, actor );
-}
-
-void Button::TransitionInAtIndex( unsigned int index, Actor actor )
-{
-  if( actor )
-  {
-    if( !actor.GetParent() )
-    {
-      Self().Insert( index, actor );
-    }
-
-    OnTransitionIn( actor );
-  }
-}
-
 void Button::TransitionOut( Actor actor )
 {
   OnTransitionOut( actor );
@@ -1084,9 +1105,8 @@ void Button::TransitionOut( Actor actor )
 
 void Button::ResetImageLayers()
 {
-  //ensure that all layers are in the correct order and state according to the paint state
+  // Ensure that all layers are in the correct order and state according to the paint state
 
-  int index = 0;
   switch( mPaintState )
   {
     case UnselectedState:
@@ -1101,14 +1121,8 @@ void Button::ResetImageLayers()
       RemoveButtonImage( mDisabledSelectedContent );
       RemoveButtonImage( mDisabledBackgroundContent );
 
-      if( InsertButtonImage( index, mBackgroundContent ) )
-      {
-        ++index;
-      }
-      if( InsertButtonImage( index, mUnselectedContent ) )
-      {
-        ++index;
-      }
+      PrepareAddButtonImage( mBackgroundContent );
+      PrepareAddButtonImage( mUnselectedContent );
       break;
     }
     case SelectedState:
@@ -1123,18 +1137,10 @@ void Button::ResetImageLayers()
       RemoveButtonImage( mDisabledSelectedContent );
       RemoveButtonImage( mDisabledBackgroundContent );
 
-      if( InsertButtonImage( index, mBackgroundContent ) )
-      {
-        ++index;
-      }
-      if( InsertButtonImage( index, mSelectedBackgroundContent ) )
-      {
-        ++index;
-      }
-      if( InsertButtonImage( index, mSelectedContent ) )
-      {
-        ++index;
-      }
+      PrepareAddButtonImage( mBackgroundContent );
+      PrepareAddButtonImage( mSelectedBackgroundContent );
+      PrepareAddButtonImage( mSelectedContent );
+      ReAddLabel();
       break;
     }
     case DisabledUnselectedState:
@@ -1149,14 +1155,9 @@ void Button::ResetImageLayers()
       RemoveButtonImage( mDisabledSelectedContent );
       RemoveButtonImage( mSelectedBackgroundContent );
 
-      if( InsertButtonImage( index, mDisabledBackgroundContent ? mDisabledBackgroundContent : mBackgroundContent ) )
-      {
-        ++index;
-      }
-      if( InsertButtonImage( index, mDisabledContent ? mDisabledContent : mUnselectedContent ) )
-      {
-        ++index;
-      }
+      PrepareAddButtonImage( mDisabledBackgroundContent ? mDisabledBackgroundContent : mBackgroundContent );
+      PrepareAddButtonImage( mDisabledContent ? mDisabledContent : mUnselectedContent );
+      ReAddLabel();
       break;
     }
     case DisabledSelectedState:
@@ -1173,27 +1174,16 @@ void Button::ResetImageLayers()
 
       if( mDisabledBackgroundContent )
       {
-        if( InsertButtonImage( index, mDisabledBackgroundContent) )
-        {
-          ++index;
-        }
+        PrepareAddButtonImage( mDisabledBackgroundContent );
       }
       else
       {
-        if( InsertButtonImage( index, mBackgroundContent ) )
-        {
-          ++index;
-        }
-        if( InsertButtonImage( index, mSelectedBackgroundContent ) )
-        {
-          ++index;
-        }
+        PrepareAddButtonImage( mBackgroundContent );
+        PrepareAddButtonImage( mSelectedBackgroundContent );
       }
 
-      if( InsertButtonImage( index, mDisabledSelectedContent ? mDisabledSelectedContent : mSelectedContent) )
-      {
-        ++index;
-      }
+      PrepareAddButtonImage( mDisabledSelectedContent ? mDisabledSelectedContent : mSelectedContent );
+      ReAddLabel();
       break;
     }
   }

@@ -175,6 +175,7 @@ ScrollBar::~ScrollBar()
 void ScrollBar::OnInitialize()
 {
   CreateDefaultIndicatorActor();
+  Self().SetDrawMode(DrawMode::OVERLAY_2D);
 }
 
 void ScrollBar::SetScrollPropertySource( Handle handle, Property::Index propertyScrollPosition, Property::Index propertyMinScrollPosition, Property::Index propertyMaxScrollPosition, Property::Index propertyScrollContentSize )
@@ -217,18 +218,13 @@ void ScrollBar::SetScrollIndicator( Actor indicator )
   if( indicator )
   {
     mIndicator = indicator;
+    Self().Add(mIndicator);
 
-    Actor self = Self();
-    self.Add(mIndicator);
+    EnableGestureDetection(Gesture::Type(Gesture::Pan));
 
-    if( !mPanGestureDetector )
-    {
-      mPanGestureDetector = PanGestureDetector::New();
-      mPanGestureDetector.DetectedSignal().Connect(this, &ScrollBar::OnPan);
-    }
-
-    mPanGestureDetector.DetachAll();
-    mPanGestureDetector.Attach( mIndicator );
+    PanGestureDetector detector( GetPanGestureDetector() );
+    detector.DetachAll();
+    detector.Attach( mIndicator );
 
     unsigned int childCount = mIndicator.GetChildCount();
     for ( unsigned int index = 0; index < childCount; index++ )
@@ -236,7 +232,7 @@ void ScrollBar::SetScrollIndicator( Actor indicator )
       Actor child = mIndicator.GetChildAt( index );
       if ( child )
       {
-        mPanGestureDetector.Attach( child );
+        detector.Attach( child );
       }
     }
   }
@@ -371,7 +367,7 @@ bool ScrollBar::OnPanGestureProcessTick()
   return true;
 }
 
-void ScrollBar::OnPan( Actor source, const PanGesture& gesture )
+void ScrollBar::OnPan( const PanGesture& gesture )
 {
   if(mScrollableObject)
   {
@@ -438,7 +434,7 @@ void ScrollBar::OnPan( Actor source, const PanGesture& gesture )
     if(itemView)
     {
       // Disable automatic refresh in ItemView during fast scrolling
-      GetImpl(itemView).SetRefreshEnabled(true);//!mIsPanning);
+      GetImpl(itemView).SetRefreshEnabled(!mIsPanning);
     }
   }
 }

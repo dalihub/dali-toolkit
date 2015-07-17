@@ -62,14 +62,10 @@ public:
     Vector< GlyphRecordEntry > mGlyphRecords;
   };
 
-  AtlasGlyphManager();
-
-  virtual ~AtlasGlyphManager();
-
-/**
-   * Create a new AtlasGlyphManager
+  /**
+   * @brief Constructor
    */
-  static AtlasGlyphManagerPtr New();
+  AtlasGlyphManager();
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::Add
@@ -116,7 +112,7 @@ public:
   /**
    * @copydoc toolkit::AtlasGlyphManager::AdjustReferenceCount
    */
-  void AdjustReferenceCount( Text::FontId fontId, uint32_t imageId, int32_t delta );
+  void AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, int32_t delta );
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::GetMaterial
@@ -148,6 +144,13 @@ public:
   {
     return mShadowShader;
   }
+
+protected:
+
+  /**
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~AtlasGlyphManager();
 
 private:
 

@@ -239,7 +239,7 @@ Actor CreateBackground( Actor parent, const Vector4& color, Image image = Image(
 
     //Create the index buffer
     Property::Map indexFormat;
-    indexFormat["indices"] = Property::UNSIGNED_INTEGER;
+    indexFormat["indices"] = Property::INTEGER;
     PropertyBuffer indexBuffer = PropertyBuffer::New( indexFormat, 6u );
     indexBuffer.SetData(gQuadIndex);
 
@@ -584,8 +584,8 @@ void Control::SetBackgroundColor( const Vector4& color )
     Actor actor = CreateBackground(Self(), color );
     background.actor = actor;
     mImpl->mAddRemoveBackgroundChild = true;
-    // use insert to guarantee its the first child (so that OVERLAY mode works)
-    Self().Insert( 0, actor );
+    // The actor does not need to be inserted to guarantee order.
+    Self().Add( actor );
     mImpl->mAddRemoveBackgroundChild = false;
   }
 
@@ -619,8 +619,8 @@ void Control::SetBackgroundImage( Image image )
    // Set the background actor before adding so that we do not inform derived classes
    background.actor = actor;
    mImpl->mAddRemoveBackgroundChild = true;
-   // use insert to guarantee its the first child (so that OVERLAY mode works)
-   Self().Insert( 0, actor );
+   // The actor does not need to be inserted to guarantee order.
+   Self().Add( actor );
    mImpl->mAddRemoveBackgroundChild = false;
 }
 
@@ -875,7 +875,7 @@ void Control::Initialize()
       styleManager.StyleChangeSignal().Connect( this, &Control::OnStyleChange );
 
       // Apply the current style
-      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      GetImpl( styleManager ).ApplyThemeStyleAtInit( Toolkit::Control( GetOwner() ) );
     }
   }
 
@@ -900,7 +900,7 @@ void Control::OnControlChildRemove( Actor& child )
 void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
   // By default the control is only interested in theme (not font) changes
-  if( change == StyleChange::THEME_CHANGE )
+  if( styleManager && change == StyleChange::THEME_CHANGE )
   {
     GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
   }

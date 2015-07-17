@@ -68,6 +68,11 @@ void TextSelectionPopup::RaiseAbove( Layer target )
   GetImpl(*this).RaiseAbove( target );
 }
 
+void TextSelectionPopup::ShowPopup()
+{
+  GetImpl(*this).ShowPopup();
+}
+
 TextSelectionPopup::TextSelectionPopup( Internal::TextSelectionPopup& implementation )
 : Control(implementation)
 {

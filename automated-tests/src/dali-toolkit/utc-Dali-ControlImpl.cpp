@@ -354,7 +354,7 @@ int UtcDaliControlImplChildAddAndRemove(void)
 
     DALI_TEST_EQUALS( dummyImpl.childAddCalled, false, TEST_LOCATION );
     DALI_TEST_EQUALS( dummy.GetChildCount(), 0u, TEST_LOCATION );
-    Actor actor = RenderableActor::New();
+    Actor actor = Actor::New();
     dummy.Add(actor);
     DALI_TEST_EQUALS( dummyImpl.childAddCalled, true, TEST_LOCATION );
     DALI_TEST_EQUALS( dummy.GetChildCount(), 1u, TEST_LOCATION );
@@ -382,7 +382,7 @@ int UtcDaliControlImplChildAddAndRemove(void)
     application.SendNotification();
 
     DALI_TEST_EQUALS( dummy.GetChildCount(), 0u, TEST_LOCATION );
-    Actor actor = RenderableActor::New();
+    Actor actor = Actor::New();
     dummy.Add(actor);
     DALI_TEST_EQUALS( dummy.GetChildCount(), 1u, TEST_LOCATION );
 
@@ -867,17 +867,11 @@ int UtcDaliControlImplOnStyleChangeN(void)
   Control dummy = Control::New();
   Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( dummy );
 
-  // test that style manager is being used, passing an empty handle throws exception
-  try
-  {
-    Dali::Toolkit::StyleManager styleManager;
-    controlImpl.OnStyleChange( styleManager, StyleChange::THEME_CHANGE );
-    tet_result(TET_FAIL);
-  }
-  catch (DaliException &exception)
-  {
-    tet_result(TET_PASS);
-  }
+  // test that style manager is being used, passing an empty handle does nothing but does not crash either
+  Dali::Toolkit::StyleManager styleManager;
+  controlImpl.OnStyleChange( styleManager, StyleChange::THEME_CHANGE );
+  // no crash so test passes
+  tet_result(TET_PASS);
 
   END_TEST;
 }

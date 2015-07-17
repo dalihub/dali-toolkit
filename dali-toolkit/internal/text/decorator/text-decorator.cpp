@@ -273,6 +273,7 @@ struct Decorator::Impl : public ConnectionTracker
     mScrollThreshold( SCROLL_THRESHOLD ),
     mScrollSpeed( SCROLL_SPEED ),
     mScrollDistance( SCROLL_DISTANCE ),
+    mTextDepth( 0u ),
     mActiveCopyPastePopup( false ),
     mCursorBlinkStatus( true ),
     mPrimaryCursorVisible( false ),
@@ -281,7 +282,7 @@ struct Decorator::Impl : public ConnectionTracker
     mNotifyEndOfScroll( false )
   {
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
-    mQuadIndexFormat[ "indices" ] = Property::UNSIGNED_INTEGER;
+    mQuadIndexFormat[ "indices" ] = Property::INTEGER;
     mHighlightMaterial = Material::New( Shader::New( VERTEX_SHADER, FRAGMENT_SHADER ) );
   }
 
@@ -296,6 +297,7 @@ struct Decorator::Impl : public ConnectionTracker
 
     // Show or hide the cursors
     CreateCursors();
+
     if( mPrimaryCursor )
     {
       const CursorImpl& cursor = mCursor[PRIMARY_CURSOR];
@@ -338,7 +340,7 @@ struct Decorator::Impl : public ConnectionTracker
         CreateGrabHandle();
 
         grabHandle.actor.SetPosition( position.x,
-                                      position.y + grabHandle.lineHeight );
+                                      grabHandle.lineHeight ); // TODO : Fix for multiline.
       }
       grabHandle.actor.SetVisible( isVisible );
     }
@@ -367,13 +369,13 @@ struct Decorator::Impl : public ConnectionTracker
         if( isPrimaryVisible )
         {
           primary.actor.SetPosition( primaryPosition.x,
-                                     primaryPosition.y + primary.lineHeight );
+                                     primary.lineHeight ); // TODO : Fix for multiline.
         }
 
         if( isSecondaryVisible )
         {
           secondary.actor.SetPosition( secondaryPosition.x,
-                                       secondaryPosition.y + secondary.lineHeight );
+                                       secondary.lineHeight ); // TODO : Fix for multiline.
         }
       }
       primary.actor.SetVisible( isPrimaryVisible );
@@ -803,23 +805,24 @@ struct Decorator::Impl : public ConnectionTracker
         mQuadVertices.SetData( &vertices[ 0 ] );
         mQuadIndices.SetData( &indices[ 0 ] );
 
-        mQuadGeometry = Geometry::New();
-        mQuadGeometry.AddVertexBuffer( mQuadVertices );
+        if( !mQuadGeometry )
+        {
+          mQuadGeometry = Geometry::New();
+          mQuadGeometry.AddVertexBuffer( mQuadVertices );
+        }
         mQuadGeometry.SetIndexBuffer( mQuadIndices );
 
-        if( mHighlightRenderer )
-        {
-          mHighlightRenderer.SetGeometry( mQuadGeometry );
-        }
-        else
+        if( !mHighlightRenderer )
         {
           mHighlightRenderer = Dali::Renderer::New( mQuadGeometry, mHighlightMaterial );
           mHighlightActor.AddRenderer( mHighlightRenderer );
         }
-
-        mHighlightActor.SetPosition( mHighlightPosition.x,
-                                     mHighlightPosition.y );
       }
+
+      mHighlightActor.SetPosition( mHighlightPosition.x,
+                                   mHighlightPosition.y );
+
+      mHighlightQuadList.clear();
 
       mHighlightRenderer.SetDepthIndex( mTextDepth - 2u ); // text is rendered at mTextDepth and text's shadow at mTextDepth -1u.
     }
@@ -1525,6 +1528,7 @@ void Decorator::SetEnabledPopupButtons( TextSelectionPopup::Buttons& enabledButt
    if( mImpl->mActiveLayer )
    {
      mImpl->mActiveLayer.Add( mImpl->mCopyPastePopup.actor );
+     mImpl->mCopyPastePopup.actor.ShowPopup();
    }
 }
 

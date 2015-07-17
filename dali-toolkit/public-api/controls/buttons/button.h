@@ -248,6 +248,55 @@ public:
    */
   Actor GetLabel() const;
 
+  /**
+   * @brief Sets the button image.
+   *
+   * @param[in] image The button image.
+   */
+  void SetButtonImage( Image image );
+
+  /**
+   * @brief Sets the background image.
+   *
+   * @param[in] image The background image.
+   */
+  void SetBackgroundImage( Image image );
+
+  /**
+   * @brief Sets the selected image.
+   *
+   * @param[in] image The selected image.
+   */
+  void SetSelectedImage( Image image );
+
+  /**
+   * @brief Sets the selected background image.
+   *
+   * @param[in] image The selected background image.
+   */
+  void SetSelectedBackgroundImage( Image image );
+
+  /**
+   * @brief Sets the disabled background image.
+   *
+   * @param[in] image The disabled background image.
+   */
+  void SetDisabledBackgroundImage( Image image );
+
+  /**
+   * @brief Sets the disabled button image.
+   *
+   * @param[in] image The disabled button image.
+   */
+  void SetDisabledImage( Image image );
+
+  /**
+   * @brief Sets the disabled selected button image.
+   *
+   * @param[in] image The disabled selected button image.
+   */
+  void SetDisabledSelectedImage( Image image );
+
 public: //Signals
 
   /**

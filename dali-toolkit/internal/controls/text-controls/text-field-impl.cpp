@@ -115,7 +115,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-left",  
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-right",         STRING,    SELECTION_HANDLE_IMAGE_RIGHT         )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-left",  STRING,    SELECTION_HANDLE_PRESSED_IMAGE_LEFT  )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-right", STRING,    SELECTION_HANDLE_PRESSED_IMAGE_RIGHT )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-highlight-color",            STRING,    SELECTION_HIGHLIGHT_COLOR            )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-highlight-color",            VECTOR4,   SELECTION_HIGHLIGHT_COLOR            )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decoration-bounding-box",              RECTANGLE, DECORATION_BOUNDING_BOX              )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "input-method-settings",                MAP,       INPUT_METHOD_SETTINGS                )
 

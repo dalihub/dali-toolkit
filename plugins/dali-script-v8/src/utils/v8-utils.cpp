@@ -422,17 +422,11 @@ Property::Value GetPropertyValueFromObject( bool& found, v8::Isolate* isolate, c
     v8::Local<v8::Number> v = value->ToNumber();
     return Dali::Property::Value(static_cast<float>(v->Value()));
   }
-  else if( value->IsInt32() )
+  else if( value->IsInt32() || value->IsUint32() )
   {
     found = true;
     v8::Local<v8::Int32> v = value->ToInt32();
     return Dali::Property::Value(static_cast<int>(v->Value()));
-  }
-  else if ( value->IsUint32() )
-  {
-    found = true;
-    v8::Local<v8::Uint32> v = value->ToUint32();
-    return Dali::Property::Value(static_cast<unsigned int>(v->Value()));
   }
   return daliPropertyValue;
 
@@ -892,11 +886,6 @@ void CreatePropertyMap( v8::Isolate* isolate, const Property::Map& map, v8::Loca
       case Dali::Property::INTEGER:
       {
         v8Value = v8::Integer::New( isolate, value.Get<int>());
-        break;
-      }
-      case Dali::Property::UNSIGNED_INTEGER:
-      {
-        v8Value = v8::Integer::New( isolate, value.Get<unsigned int>());
         break;
       }
       case Dali::Property::STRING:

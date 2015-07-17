@@ -578,33 +578,9 @@ private:
   void ResetImageLayers();
 
   /**
-   * Transitions in the actor, inserting the actor above childLower below the childUpper.
-   * Will not insert the actor if it is already attached to a parent (and so will not reorder the actor)
-   */
-  void TransitionInBetween( Actor childLower, Actor childUpper, Actor actor );
-
-  /**
-   * Transitions in the actor, inserting the actor above the child if the child exists or at the bottom otherwise
-   * Will not insert the actor if it is already attached to a parent (and so will not reorder the actor)
-   */
-  void TransitionInAbove( Actor child, Actor actor );
-
-  /**
-   * Transitions in the actor, inserting the actor at the index
-   * Will not insert the actor if it is already attached to a parent (and so will not reorder the actor)
-   */
-  void TransitionInAtIndex( unsigned int index, Actor actor );
-
-  /**
    * Transitions out the actor
    */
   void TransitionOut( Actor actor );
-
-  /**
-   * Inserts the actor to the button and prepares it to be transitioned out
-   * @return true if the child was inserted, false otherwise
-   */
-  bool InsertButtonImage( unsigned int index, Actor& actor );
 
   /**
    * Removes the actor from the button and prepares it to be transitioned out
@@ -617,6 +593,28 @@ private:
    */
   unsigned int FindChildIndex( Actor& actor );
 
+  /**
+   * Adds an actor to the hierarchy and prepares it to be transitioned.
+   * @param[in] actor The actor to add
+   */
+  void PrepareAddButtonImage( Actor& actor );
+
+  /**
+   * Adds an actor to the hierarchy and marks it to be transitioned.
+   * @param[in] actor The actor to add
+   */
+  void TransitionButtonImage( Actor& actor );
+
+  /**
+   * Adds an actor to the hierarchy.
+   * @param[in] actor The actor to add
+   */
+  void AddButtonImage( Actor& actor );
+
+  /**
+   * (Re)Adds the label (if exists) to the hierarchy (so it is always on top).
+   */
+  void ReAddLabel();
 
   // Undefined
   Button( const Button& );

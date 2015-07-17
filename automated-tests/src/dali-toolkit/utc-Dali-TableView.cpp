@@ -595,18 +595,18 @@ int UtcDaliTableViewSetGetProperty(void)
   // Test "rows" property
   DALI_TEST_CHECK( tableView.GetPropertyIndex( PROPERTY_NAME_ROWS ) == TableView::Property::ROWS );
 
-  tableView.SetProperty( TableView::Property::ROWS, 4u );
+  tableView.SetProperty( TableView::Property::ROWS, 4 );
 
   DALI_TEST_CHECK( tableView.GetRows() == 4u );
-  DALI_TEST_CHECK( tableView.GetProperty(TableView::Property::ROWS).Get<unsigned int>() == 4u );
+  DALI_TEST_CHECK( tableView.GetProperty(TableView::Property::ROWS).Get<int>() == 4 );
 
   // Test "columns" property
   DALI_TEST_CHECK( tableView.GetPropertyIndex( PROPERTY_NAME_COLUMNS ) == TableView::Property::COLUMNS );
 
-  tableView.SetProperty( TableView::Property::COLUMNS, 5u );
+  tableView.SetProperty( TableView::Property::COLUMNS, 5 );
 
   DALI_TEST_CHECK( tableView.GetColumns() == 5u );
-  DALI_TEST_CHECK( tableView.GetProperty(TableView::Property::COLUMNS).Get<unsigned int>() == 5u );
+  DALI_TEST_CHECK( tableView.GetProperty(TableView::Property::COLUMNS).Get<int>() == 5 );
 
   // Test "cell-padding" property
   DALI_TEST_CHECK( tableView.GetPropertyIndex( PROPERTY_NAME_CELL_PADDING ) == TableView::Property::CELL_PADDING );

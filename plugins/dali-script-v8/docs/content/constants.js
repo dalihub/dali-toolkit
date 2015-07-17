@@ -58,7 +58,7 @@ Constants accessible under the dali global object.
 
 |**actor.drawMode  **| |
 |DRAW_MODE_NORMAL                         | integer value |
-|DRAW_MODE_OVERLAY                        | integer value |
+|DRAW_MODE_OVERLAY_2D                     | integer value |
 |DRAW_MODE_STENCIL                        | integer value |
 
 |**Image load policy  **| |

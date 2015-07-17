@@ -74,12 +74,6 @@ PushButton PushButton::DownCast( BaseHandle handle )
   return Control::DownCast<PushButton, Internal::PushButton>(handle);
 }
 
-void PushButton::SetButtonImage( Image image )
-{
-  Actor imageActor = ImageActor::New( image );
-  Dali::Toolkit::GetImplementation( *this ).SetButtonImage( imageActor );
-}
-
 void PushButton::SetButtonImage( Actor image )
 {
   Dali::Toolkit::GetImplementation( *this ).SetButtonImage( image );
@@ -88,12 +82,6 @@ void PushButton::SetButtonImage( Actor image )
 Actor PushButton::GetButtonImage() const
 {
   return Dali::Toolkit::GetImplementation( *this ).GetButtonImage();
-}
-
-void PushButton::SetBackgroundImage( Image image )
-{
-  Actor imageActor = ImageActor::New( image );
-  Dali::Toolkit::GetImplementation( *this ).SetBackgroundImage( imageActor );
 }
 
 void PushButton::SetBackgroundImage( Actor image )
@@ -106,13 +94,6 @@ Actor PushButton::GetBackgroundImage() const
   return Dali::Toolkit::GetImplementation( *this ).GetBackgroundImage();
 }
 
-void PushButton::SetSelectedImage( Image image )
-{
-  Actor imageActor = ImageActor::New( image );
-  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( imageActor );
-}
-
 void PushButton::SetSelectedImage( Actor image )
 {
   Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( image );
@@ -121,11 +102,6 @@ void PushButton::SetSelectedImage( Actor image )
 Actor PushButton::GetSelectedImage() const
 {
   return Dali::Toolkit::GetImplementation( *this ).GetSelectedImage();
-}
-
-void PushButton::SetSelectedBackgroundImage( Image image )
-{
-  Dali::Toolkit::GetImplementation( *this ).SetSelectedBackgroundImage( ImageActor::New( image ) );
 }
 
 void PushButton::SetSelectedBackgroundImage( Actor image )
@@ -138,13 +114,6 @@ Actor PushButton::GetSelectedBackgroundImage() const
   return Dali::Toolkit::GetImplementation( *this ).GetSelectedBackgroundImage();
 }
 
-void PushButton::SetDisabledBackgroundImage( Image image )
-{
-  Actor imageActor = ImageActor::New( image );
-  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( imageActor );
-}
-
 void PushButton::SetDisabledBackgroundImage( Actor image )
 {
   Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( image );
@@ -153,13 +122,6 @@ void PushButton::SetDisabledBackgroundImage( Actor image )
 Actor PushButton::GetDisabledBackgroundImage() const
 {
   return Dali::Toolkit::GetImplementation( *this ).GetDisabledBackgroundImage();
-}
-
-void PushButton::SetDisabledImage( Image image )
-{
-  Actor imageActor = ImageActor::New( image );
-  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledImage( imageActor );
 }
 
 void PushButton::SetDisabledImage( Actor image )

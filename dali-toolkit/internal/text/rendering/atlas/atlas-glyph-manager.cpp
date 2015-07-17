@@ -128,9 +128,9 @@ const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
   return GetImplementation(*this).GetMetrics();
 }
 
-void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, uint32_t imageId, int32_t delta )
+void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, int32_t delta )
 {
-  GetImplementation(*this).AdjustReferenceCount( fontId, imageId, delta );
+  GetImplementation(*this).AdjustReferenceCount( fontId, index, delta );
 }
 
 Shader AtlasGlyphManager::GetEffectBufferShader() const

@@ -50,8 +50,9 @@ public:
     ~Metrics()
     {}
 
-    uint32_t mGlyphCount;                   // number of glyphs being managed
-    AtlasManager::Metrics mAtlasMetrics;    // metrics from the Atlas Manager
+    uint32_t mGlyphCount;                   ///< number of glyphs being managed
+    std::string mVerboseGlyphCounts;        ///< a verbose list of the glyphs + ref counts
+    AtlasManager::Metrics mAtlasMetrics;    ///< metrics from the Atlas Manager
   };
 
   /**
@@ -173,13 +174,13 @@ public:
   const Metrics& GetMetrics();
 
   /**
-   * @brief Adjust the reference count for an imageId and remove cache entry if it becomes free
+   * @brief Adjust the reference count for glyph
    *
-   * @param[in] fontId the font this image came from
-   * @param[in] imageId The imageId
-   * @param[in] delta adjustment to make to reference count
+   * @param[in] fontId The font this image came from
+   * @param[in] index The index of the glyph
+   * @param[in] delta The adjustment to make to the reference count
    */
-  void AdjustReferenceCount( Text::FontId fontId, uint32_t imageId, int32_t delta );
+  void AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, int32_t delta );
 
   /**
    * @brief Get Shader used for rendering glyph effect buffers

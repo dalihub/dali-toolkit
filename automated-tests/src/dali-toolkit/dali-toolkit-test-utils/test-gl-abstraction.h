@@ -19,11 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstdio>  // fprintf
 #include <sstream>
 #include <string>
-#include <cstring> // for strcpy, strncpy
 #include <map>
+#include <cstdio>
+#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
@@ -85,6 +85,8 @@ public:
 
   inline void BindFramebuffer( GLenum target, GLuint framebuffer )
   {
+    //Add 010 bit;
+    mFramebufferStatus |= 2;
   }
 
   inline void BindRenderbuffer( GLenum target, GLuint renderbuffer )
@@ -214,19 +216,45 @@ public:
 
   inline void BufferData(GLenum target, GLsizeiptr size, const void* data, GLenum usage)
   {
+     mBufferDataCalls.push_back(size);
   }
 
   inline void BufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const void* data)
   {
+     mBufferSubDataCalls.push_back(size);
   }
 
   inline GLenum CheckFramebufferStatus(GLenum target)
   {
+    //If it has the three last bits set to 1 - 111, then the three minimum functions to create a
+    //Framebuffer texture have been called
+    if( mFramebufferStatus == 7 )
+    {
+      return GL_FRAMEBUFFER_COMPLETE;
+    }
+
     return mCheckFramebufferStatusResult;
+  }
+
+  inline GLenum CheckFramebufferColorAttachment()
+  {
+    return mFramebufferColorAttached;
+  }
+
+  inline GLenum CheckFramebufferDepthAttachment()
+  {
+    return mFramebufferDepthAttached;
+  }
+
+  inline GLenum CheckFramebufferStencilAttachment()
+  {
+    return mFramebufferStencilAttached;
   }
 
   inline void Clear(GLbitfield mask)
   {
+    mClearCount++;
+    mLastClearBitMask = mask;
   }
 
   inline void ClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
@@ -425,10 +453,26 @@ public:
 
   inline void FramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer)
   {
+    if (attachment == GL_DEPTH_ATTACHMENT)
+    {
+      mFramebufferDepthAttached = true;
+    }
+    else if (attachment == GL_STENCIL_ATTACHMENT)
+    {
+      mFramebufferStencilAttached = true;
+    }
   }
 
   inline void FramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
   {
+    //Add 100 bit;
+    mFramebufferStatus |= 4;
+
+    //We check 4 attachment colors
+    if ((attachment == GL_COLOR_ATTACHMENT0) || (attachment == GL_COLOR_ATTACHMENT1) || (attachment == GL_COLOR_ATTACHMENT2)  || (attachment == GL_COLOR_ATTACHMENT4))
+    {
+      mFramebufferColorAttached = true;
+    }
   }
 
   inline void FrontFace(GLenum mode)
@@ -447,10 +491,21 @@ public:
 
   inline void GenFramebuffers(GLsizei n, GLuint* framebuffers)
   {
+    for( int i = 0; i < n; i++ )
+    {
+      framebuffers[i] = i + 1;
+    }
+
+    //Add 001 bit, this function needs to be called the first one in the chain
+    mFramebufferStatus = 1;
   }
 
   inline void GenRenderbuffers(GLsizei n, GLuint* renderbuffers)
   {
+    for( int i = 0; i < n; i++ )
+    {
+      renderbuffers[i] = i + 1;
+    }
   }
 
   /**
@@ -491,7 +546,7 @@ public:
         out << ", ";
       }
     }
-    mTextureTrace.PushCall("GenTexture", out.str());
+    mTextureTrace.PushCall("GenTextures", out.str());
   }
 
   inline void GetActiveAttrib(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name)
@@ -1462,6 +1517,7 @@ public:
 
   inline void GetProgramBinary(GLuint program, GLsizei bufSize, GLsizei* length, GLenum* binaryFormat, GLvoid* binary)
   {
+    mGetProgramBinaryCalled = true;
   }
 
   inline void ProgramBinary(GLuint program, GLenum binaryFormat, const GLvoid* binary, GLsizei length)
@@ -1596,7 +1652,7 @@ public: // TEST FUNCTIONS
       }
     }
 
-    fprintf(stderr, "Not found, printing possible values:" );
+    fprintf(stderr, "Not found, printing possible values:\n" );
     for( ProgramUniformMap::const_iterator program_it = mUniforms.begin();
           program_it != mUniforms.end();
           ++program_it )
@@ -1616,7 +1672,7 @@ public: // TEST FUNCTIONS
         {
           std::stringstream out;
           out << uniform_it->first << ": " << origValue;
-          fprintf(stderr, "%s", out.str().c_str() );
+          fprintf(stderr, "%s\n", out.str().c_str() );
         }
       }
     }
@@ -1661,6 +1717,11 @@ public: // TEST FUNCTIONS
     return mLastProgramIdUsed;
   }
 
+  inline GLbitfield GetLastClearMask() const
+  {
+    return mLastClearBitMask;
+  }
+
   enum AttribType
   {
     ATTRIB_UNKNOWN = -1,
@@ -1686,9 +1747,23 @@ public: // TEST FUNCTIONS
   // Methods to check scissor tests
   inline const ScissorParams& GetScissorParams() const { return mScissorParams; }
 
+  inline bool GetProgramBinaryCalled() const { return mGetProgramBinaryCalled; }
+
+  inline unsigned int GetClearCountCalled() const { return mClearCount; }
+
+  typedef std::vector<size_t> BufferDataCalls;
+  inline const BufferDataCalls& GetBufferDataCalls() const { return mBufferDataCalls; }
+  inline void ResetBufferDataCalls() { mBufferDataCalls.clear(); }
+
+  typedef std::vector<size_t> BufferSubDataCalls;
+  inline const BufferSubDataCalls& GetBufferSubDataCalls() const { return mBufferSubDataCalls; }
+  inline void ResetBufferSubDataCalls() { mBufferSubDataCalls.clear(); }
+
 private:
   GLuint     mCurrentProgram;
   GLuint     mCompileStatus;
+  BufferDataCalls mBufferDataCalls;
+  BufferSubDataCalls mBufferSubDataCalls;
   GLuint     mLinkStatus;
   GLint      mGetAttribLocationResult;
   GLenum     mGetErrorResult;
@@ -1702,14 +1777,21 @@ private:
   GLboolean  mIsTextureResult;
   GLenum     mActiveTextureUnit;
   GLenum     mCheckFramebufferStatusResult;
+  GLint      mFramebufferStatus;
+  GLenum     mFramebufferColorAttached;
+  GLenum     mFramebufferDepthAttached;
+  GLenum     mFramebufferStencilAttached;
   GLint      mNumBinaryFormats;
   GLint      mBinaryFormats;
   GLint      mProgramBinaryLength;
   bool       mVertexAttribArrayState[MAX_ATTRIBUTE_CACHE_SIZE];
   bool       mVertexAttribArrayChanged;                            // whether the vertex attrib array has been changed
+  bool       mGetProgramBinaryCalled;
   typedef std::map< GLuint, std::string> ShaderSourceMap;
   ShaderSourceMap mShaderSources;
   GLuint     mLastShaderCompiled;
+  GLbitfield mLastClearBitMask;
+  unsigned int mClearCount;
 
   Vector4 mLastBlendColor;
   GLenum  mLastBlendEquationRgb;

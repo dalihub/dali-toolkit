@@ -481,7 +481,6 @@ bool IsPrimitive( const Dali::Property::Value &value )
   {
     case Dali::Property::BOOLEAN:
     case Dali::Property::INTEGER:
-    case Dali::Property::UNSIGNED_INTEGER:
     case Dali::Property::STRING:
     case Dali::Property::FLOAT:
     {
@@ -514,11 +513,6 @@ v8::Local<v8::Object> CreateJavaScriptPrimitive( v8::Isolate* isolate, const Dal
      case Dali::Property::INTEGER:
      {
        v8Value = v8::Integer::New( isolate, value.Get<int>());
-       break;
-     }
-     case Dali::Property::UNSIGNED_INTEGER:
-     {
-       v8Value = v8::Integer::New( isolate, value.Get<unsigned int>());
        break;
      }
      case Dali::Property::STRING:
@@ -680,14 +674,6 @@ Dali::Property::Value PropertyValueWrapper::ExtractPropertyValue( v8::Isolate* i
       if( v8Value->IsInt32() )
       {
         daliPropertyValue = Dali::Property::Value(  v8Value->Int32Value()  ) ;//static_cast<int>( V8Utils::GetNumberValue( isolate, v8Value) ));
-      }
-      break;
-    }
-    case Dali::Property::UNSIGNED_INTEGER:
-    {
-      if( v8Value->IsUint32() )
-      {
-        daliPropertyValue = Dali::Property::Value(  v8Value->Uint32Value() );//static_cast<unsigned int>( V8Utils::GetNumberValue( isolate, v8Value) ));
       }
       break;
     }

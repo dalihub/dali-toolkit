@@ -44,8 +44,6 @@ namespace ImageActorApi
   void GetImage( const v8::FunctionCallbackInfo< v8::Value >& args );
   void SetSortModifier( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetSortModifier( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void SetCullFace( const v8::FunctionCallbackInfo< v8::Value >& args );
-  void GetCullFace( const v8::FunctionCallbackInfo< v8::Value >& args );
   void SetBlendMode( const v8::FunctionCallbackInfo< v8::Value >& args );
   void GetBlendMode( const v8::FunctionCallbackInfo< v8::Value >& args );
   void SetBlendFunc( const v8::FunctionCallbackInfo< v8::Value >& args );
