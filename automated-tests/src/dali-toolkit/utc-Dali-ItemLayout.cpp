@@ -346,3 +346,24 @@ int UtcDaliItemLayoutGetNextFocusItemID(void)
   END_TEST;
 }
 
+int UtcDaliItemRangeIntersection(void)
+{
+  ToolkitTestApplication application;
+
+  unsigned int uBeginItemFirst = 100u, uEndItemFirst = 300u;
+  unsigned int uBeginItemSecond = 290u, uEndItemSecond = 400;
+  unsigned int uInterBeginCheck=290u , uInterEndCheck=301u;
+  bool bIsInThisRange = false, bOutOfThisRange = false;
+
+  Toolkit::ItemRange objItemRangeFirst(uBeginItemFirst, uEndItemFirst);
+  Toolkit::ItemRange objItemRangeSecond(uBeginItemSecond, uEndItemSecond);
+  ItemRange itmInterSect = objItemRangeFirst.Intersection(objItemRangeSecond);
+
+  bIsInThisRange = itmInterSect.Within(uInterBeginCheck);
+  DALI_TEST_EQUALS(bIsInThisRange, true, TEST_LOCATION );
+
+  bOutOfThisRange = itmInterSect.Within(uInterEndCheck);
+  DALI_TEST_EQUALS(bOutOfThisRange, false, TEST_LOCATION );
+
+  END_TEST;
+}
