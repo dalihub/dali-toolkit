@@ -22,9 +22,6 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/camera-actor.h>
-#include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/math/vector2.h>
-#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
 namespace Dali

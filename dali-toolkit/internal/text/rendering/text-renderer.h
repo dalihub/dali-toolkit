@@ -23,9 +23,6 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/text-view-interface.h>
-
 namespace Dali
 {
 
@@ -37,6 +34,8 @@ namespace Text
 
 class Renderer;
 typedef IntrusivePtr<Renderer> RendererPtr;
+
+class ViewInterface;
 
 /**
  * @brief Abstract base class for Text renderers.

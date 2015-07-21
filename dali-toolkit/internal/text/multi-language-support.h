@@ -42,8 +42,6 @@ class MultilanguageSupport;
 
 } // Internal
 
-class LogicalModel;
-
 /**
  * @brief Sets the character's scripts to the model and validates the fonts set by the user or assigns default ones.
  */

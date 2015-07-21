@@ -18,8 +18,6 @@
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/actors/image-actor.h>
-#include <dali/public-api/common/stage.h>
 #include <dali/integration-api/debug.h>
 
 #define MAKE_SHADER(A)#A

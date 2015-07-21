@@ -25,13 +25,9 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
-#include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
-#include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
-#include <dali-toolkit/internal/text/text-io.h>
-#include <dali-toolkit/internal/text/text-view.h>
 
 namespace
 {

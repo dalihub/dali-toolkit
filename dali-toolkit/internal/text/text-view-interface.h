@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/math/vector4.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-definitions.h>
 
@@ -28,14 +25,13 @@ namespace Dali
 {
 
 struct Vector2;
+struct Vector4;
 
 namespace Toolkit
 {
 
 namespace Text
 {
-
-struct LineRun;
 
 /**
  * @brief Abstract interface to provide the information necessary displaying text.

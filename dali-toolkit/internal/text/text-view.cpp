@@ -65,6 +65,23 @@ const Vector2& View::GetControlSize() const
   return Vector2::ZERO;
 }
 
+Length View::GetNumberOfGlyphs() const
+{
+  if( mImpl->mVisualModel )
+  {
+    const VisualModel& model = *mImpl->mVisualModel;
+
+    const Length glyphCount = model.mGlyphs.Count();
+    const Length positionCount = model.mGlyphPositions.Count();
+
+    DALI_ASSERT_DEBUG( positionCount <= glyphCount && "Invalid glyph positions in Model" );
+
+    return (positionCount < glyphCount) ? positionCount : glyphCount;
+  }
+
+  return 0;
+}
+
 Length View::GetGlyphs( GlyphInfo* glyphs,
                         Vector2* glyphPositions,
                         GlyphIndex glyphIndex,
@@ -248,80 +265,58 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
 
 const Vector4& View::GetTextColor() const
 {
-  if ( mImpl->mVisualModel )
+  if( mImpl->mVisualModel )
   {
-    VisualModel& model = *mImpl->mVisualModel;
-    return model.GetTextColor();
+    return mImpl->mVisualModel->GetTextColor();
   }
   return Vector4::ZERO;
 }
 
 const Vector2& View::GetShadowOffset() const
 {
-  if ( mImpl->mVisualModel )
+  if( mImpl->mVisualModel )
   {
-    VisualModel& model = *mImpl->mVisualModel;
-    return model.GetShadowOffset();
+    return mImpl->mVisualModel->GetShadowOffset();
   }
   return Vector2::ZERO;
 }
 
 const Vector4& View::GetShadowColor() const
 {
-  if ( mImpl->mVisualModel )
+  if( mImpl->mVisualModel )
   {
-    VisualModel& model = *mImpl->mVisualModel;
-    return model.GetShadowColor();
+    return mImpl->mVisualModel->GetShadowColor();
   }
   return Vector4::ZERO;
 }
 
 const Vector4& View::GetUnderlineColor() const
 {
-  if ( mImpl->mVisualModel )
+  if( mImpl->mVisualModel )
   {
-    VisualModel& model = *mImpl->mVisualModel;
-    return model.GetUnderlineColor();
+    return mImpl->mVisualModel->GetUnderlineColor();
   }
   return Vector4::ZERO;
 }
 
 bool View::IsUnderlineEnabled() const
 {
-  if ( mImpl->mVisualModel )
+  if( mImpl->mVisualModel )
   {
-    VisualModel& model = *mImpl->mVisualModel;
-    return model.IsUnderlineEnabled();
+    return mImpl->mVisualModel->IsUnderlineEnabled();
   }
   return false;
 }
 
 float View::GetUnderlineHeight() const
 {
-  if ( mImpl->mVisualModel )
+  if( mImpl->mVisualModel )
   {
-    VisualModel& model = *mImpl->mVisualModel;
-    return model.GetUnderlineHeight();
+    return mImpl->mVisualModel->GetUnderlineHeight();
   }
   return 0.0f;
 }
 
-Length View::GetNumberOfGlyphs() const
-{
-  if( mImpl->mVisualModel )
-  {
-    VisualModel& model = *mImpl->mVisualModel;
-
-    const Length glyphCount = model.mGlyphs.Count();
-    const Length positionCount = model.mGlyphPositions.Count();
-
-    DALI_ASSERT_DEBUG( positionCount <= glyphCount && "Invalid glyph positions in Model" );
-
-    return (positionCount < glyphCount) ? positionCount : glyphCount;
-  }
-
-  return 0;
-}
 
 } // namespace Text
 

@@ -22,7 +22,6 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/math/rect.h>
-#include <dali/public-api/math/vector2.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
@@ -30,20 +29,11 @@
 namespace Dali
 {
 
-class Actor;
-class Image;
-class Vector2;
-class Vector4;
+struct Vector2;
+struct Vector4;
 
 namespace Toolkit
 {
-
-class TextSelectionPopupCallbackInterface;
-
-namespace Internal
-{
-class Control;
-}
 
 namespace Text
 {

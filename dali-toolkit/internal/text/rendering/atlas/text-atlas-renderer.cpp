@@ -19,17 +19,19 @@
 #include <dali-toolkit/internal/text/rendering/atlas/text-atlas-renderer.h>
 
 // EXTERNAL INCLUDES
-#include <dali/dali.h>
-#include <dali/devel-api/object/property-buffer.h>
-#include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/sampler.h>
-#include <dali/devel-api/rendering/shader.h>
-#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/images/frame-buffer-image.h>
+#include <dali/public-api/render-tasks/render-task.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
+#include <dali/devel-api/rendering/renderer.h>
+#include <dali/devel-api/rendering/geometry.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
+#include <dali-toolkit/internal/text/text-view.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -176,10 +178,11 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
     // Avoid emptying mTextCache (& removing references) until after incremented references for the new text
     Vector< TextCacheEntry > newTextCache;
+    const GlyphInfo* const glyphsBuffer = glyphs.Begin();
 
     for( uint32_t i = 0, glyphSize = glyphs.Size(); i < glyphSize; ++i )
     {
-      const GlyphInfo& glyph = glyphs[ i ];
+      const GlyphInfo& glyph = *( glyphsBuffer + i );
 
       // No operation for white space
       if ( glyph.width && glyph.height )
@@ -191,7 +194,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
           FontMetrics fontMetrics;
           mFontClient.GetFontMetrics( glyph.fontId, fontMetrics );
           currentUnderlinePosition = ceil( fabsf( fontMetrics.underlinePosition ) );
-          float descender = ceil( fabsf( fontMetrics.descender ) );
+          const float descender = ceil( fabsf( fontMetrics.descender ) );
 
           if ( underlineHeight == ZERO )
           {
@@ -295,7 +298,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                         slot );
         lastFontId = glyph.fontId;
       }
-    }
+    } // glyphs
 
     // Now remove references for the old text
     RemoveText();
@@ -404,7 +407,10 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
       // Check to see if there's a mesh data object that references the same atlas ?
       uint32_t index = 0;
-      for ( std::vector< MeshRecord >::iterator mIt = meshContainer.begin(); mIt != meshContainer.end(); ++mIt, ++index )
+      for ( std::vector< MeshRecord >::iterator mIt = meshContainer.begin(),
+              mEndIt = meshContainer.end();
+            mIt != mEndIt;
+            ++mIt, ++index )
       {
         if ( slot.mAtlasId == mIt->mAtlasId && color == mIt->mColor )
         {
@@ -452,7 +458,10 @@ struct AtlasRenderer::Impl : public ConnectionTracker
                       float underlineThickness )
   {
     bool foundExtent = false;
-    for ( Vector< Extent >::Iterator eIt = extents.Begin(); eIt != extents.End(); ++eIt )
+    for ( Vector< Extent >::Iterator eIt = extents.Begin(),
+            eEndIt = extents.End();
+          eIt != eEndIt;
+          ++eIt )
     {
       if ( Equals( baseLine, eIt->mBaseLine ) )
       {
@@ -515,14 +524,17 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     }
   }
 
-  void GenerateUnderlines( std::vector< MeshRecord>& meshRecords,
+  void GenerateUnderlines( std::vector< MeshRecord >& meshRecords,
                            Vector< Extent >& extents,
                            const Vector4& underlineColor,
                            const Vector4& textColor )
   {
     AtlasManager::Mesh2D newMesh;
     unsigned short faceIndex = 0;
-    for ( Vector< Extent >::ConstIterator eIt = extents.Begin(); eIt != extents.End(); ++eIt )
+    for ( Vector< Extent >::ConstIterator eIt = extents.Begin(),
+            eEndIt = extents.End();
+          eIt != eEndIt;
+          ++eIt )
     {
       AtlasManager::Vertex2D vert;
       uint32_t index = eIt->mMeshRecordIndex;

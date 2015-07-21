@@ -36,9 +36,6 @@ namespace Toolkit
 namespace Text
 {
 
-class LogicalModel;
-class VisualModel;
-
 /**
  * Sets the bidirectional info into the logical model.
  *

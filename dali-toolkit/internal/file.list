@@ -84,9 +84,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/text/rendering/atlas/text-atlas-renderer.cpp \
    $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager.cpp \
    $(toolkit_src_dir)/text/rendering/atlas/atlas-glyph-manager-impl.cpp \
-   $(toolkit_src_dir)/text/rendering/shaders/text-basic-shader.cpp \
-   $(toolkit_src_dir)/text/rendering/shaders/text-basic-shadow-shader.cpp \
-   $(toolkit_src_dir)/text/rendering/shaders/text-bgra-shader.cpp \
    $(toolkit_src_dir)/text/rendering/text-backend-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-effect-impl.cpp \
    $(toolkit_src_dir)/transition-effects/cube-transition-cross-effect-impl.cpp \

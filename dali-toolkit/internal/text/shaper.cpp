@@ -19,14 +19,7 @@
 #include <dali-toolkit/internal/text/shaper.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/text-abstraction/script.h>
 #include <dali/devel-api/text-abstraction/shaping.h>
-
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/font-run.h>
-#include <dali-toolkit/internal/text/logical-model-impl.h>
-#include <dali-toolkit/internal/text/script-run.h>
-#include <dali-toolkit/internal/text/visual-model-impl.h>
 
 namespace Dali
 {
