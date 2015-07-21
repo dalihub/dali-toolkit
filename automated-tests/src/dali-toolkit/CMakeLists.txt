@@ -46,6 +46,7 @@ SET(TC_SOURCES
    utc-Dali-ScrollViewEffect.cpp
    utc-Dali-StyleManager.cpp
    utc-Dali-SuperBlurView.cpp
+   utc-Dali-Toolkit.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)
