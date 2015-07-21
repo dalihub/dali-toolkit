@@ -21,9 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 
-// EXTERNAL INCLUDES
-#include <dali/devel-api/rendering/renderer.h>
-
 namespace Dali
 {
 
