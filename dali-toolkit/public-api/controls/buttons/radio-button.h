@@ -97,15 +97,6 @@ class DALI_IMPORT_API RadioButton: public Button
   static RadioButton New( const std::string& label );
 
   /**
-   * @brief Create an initialized RadioButton with existing Actor.
-   *
-   * @param[in] label An Actor with the label.
-   *
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static RadioButton New( Actor label );
-
-  /**
    * @brief Downcast an Object handle to RadioButton.
    *
    * If handle points to a RadioButton the downcast produces valid

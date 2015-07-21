@@ -74,14 +74,11 @@ PushButton PushButton::DownCast( BaseHandle handle )
   return Control::DownCast<PushButton, Internal::PushButton>(handle);
 }
 
+// Deprecated API
+
 void PushButton::SetButtonImage( Actor image )
 {
   Dali::Toolkit::GetImplementation( *this ).SetButtonImage( image );
-}
-
-Actor PushButton::GetButtonImage() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).GetButtonImage();
 }
 
 void PushButton::SetBackgroundImage( Actor image )
@@ -89,19 +86,9 @@ void PushButton::SetBackgroundImage( Actor image )
   Dali::Toolkit::GetImplementation( *this ).SetBackgroundImage( image );
 }
 
-Actor PushButton::GetBackgroundImage() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).GetBackgroundImage();
-}
-
 void PushButton::SetSelectedImage( Actor image )
 {
   Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( image );
-}
-
-Actor PushButton::GetSelectedImage() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).GetSelectedImage();
 }
 
 void PushButton::SetSelectedBackgroundImage( Actor image )
@@ -109,19 +96,9 @@ void PushButton::SetSelectedBackgroundImage( Actor image )
   Dali::Toolkit::GetImplementation( *this ).SetSelectedBackgroundImage( image );
 }
 
-Actor PushButton::GetSelectedBackgroundImage() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).GetSelectedBackgroundImage();
-}
-
 void PushButton::SetDisabledBackgroundImage( Actor image )
 {
   Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( image );
-}
-
-Actor PushButton::GetDisabledBackgroundImage() const
-{
-  return Dali::Toolkit::GetImplementation( *this ).GetDisabledBackgroundImage();
 }
 
 void PushButton::SetDisabledImage( Actor image )
@@ -129,9 +106,9 @@ void PushButton::SetDisabledImage( Actor image )
   Dali::Toolkit::GetImplementation( *this ).SetDisabledImage( image );
 }
 
-Actor PushButton::GetDisabledImage() const
+void PushButton::SetDisabledSelectedImage( Actor image )
 {
-  return Dali::Toolkit::GetImplementation( *this ).GetDisabledImage();
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledSelectedImage( image );
 }
 
 } // namespace Toolkit

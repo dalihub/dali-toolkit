@@ -310,9 +310,9 @@ int UtcDaliButtonSetLabelStringP(void)
 
   Button button = PushButton::New();
 
-  button.SetLabel( "Button Label" );
+  button.SetLabelText( "Button Label" );
 
-  DALI_TEST_CHECK( button.GetLabel() );
+  DALI_TEST_EQUALS( button.GetLabelText(), "Button Label", TEST_LOCATION );
   END_TEST;
 }
 
@@ -322,19 +322,16 @@ int UtcDaliButtonSetLabelActorP(void)
 
   Button button = PushButton::New();
 
-  TextLabel textLabel = TextLabel::New( "Button Label" );
-  button.SetLabel( textLabel );
+  button.SetLabelText( "Button Label" );
 
-  DALI_TEST_CHECK( button.GetLabel() );
+  DALI_TEST_EQUALS( button.GetLabelText(), "Button Label", TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliButtonSetButtonImage(void)
+int UtcDaliButtonSetUnselectedImageP(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliButtonSetButtonImage");
-
-  Image image = CreateSolidColorImage( Color::RED, 10, 10 );
+  tet_infoline(" UtcDaliButtonSetUnselectedImageP");
 
   PushButton pushButton = PushButton::New();
   Stage::GetCurrent().Add( pushButton );
@@ -343,12 +340,13 @@ int UtcDaliButtonSetButtonImage(void)
   application.Render();
 
   pushButton.SetSize( Vector2( 20.0f, 20.0f ) );
-  pushButton.SetButtonImage( image );
+  pushButton.SetUnselectedImage( "Image.jpg" );
 
   application.SendNotification();
   application.Render();
 
   Vector3 size = pushButton.GetCurrentSize();
+  tet_printf( "todor: size: %f,%f", size.width, size.height );
 
   DALI_TEST_EQUALS( size.width, 20.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 20.f, TEST_LOCATION );
@@ -361,8 +359,6 @@ int UtcDaliButtonSetSelectedImageP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliButtonSetButtonImage");
 
-  Image image = CreateSolidColorImage( Color::RED, 10, 10 );
-
   PushButton pushButton = PushButton::New();
   Stage::GetCurrent().Add( pushButton );
 
@@ -370,7 +366,7 @@ int UtcDaliButtonSetSelectedImageP(void)
   application.Render();
 
   pushButton.SetSize( Vector2( 20.0f, 20.0f ) );
-  pushButton.SetSelectedImage( image );
+  pushButton.SetSelectedImage( "Image.jpg" );
 
   application.SendNotification();
   application.Render();
@@ -599,8 +595,10 @@ int UtcDaliButtonSetProperty(void)
 
   pushButton.SetProperty(pushButton.GetPropertyIndex("disabled"), false);
   DALI_TEST_CHECK( false == pushButton.IsDisabled() );
+
   pushButton.SetProperty(pushButton.GetPropertyIndex("disabled"), true);
   DALI_TEST_CHECK( true == pushButton.IsDisabled() );
+
   END_TEST;
 }
 
@@ -609,26 +607,17 @@ int UtcDaliButtonSize(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliButtonSize");
 
-  ImageActor image01 = ImageActor::New(CreateBufferImage());
-  image01.SetSize( 100, 50 );
-
-  PushButton pushButton;
-
-  Vector3 size;
-
-  // Test1 Size is set through Actor API
-
   // First an image is set, then SetSize is called.
-  pushButton = PushButton::New();
+  PushButton pushButton = PushButton::New();
   Stage::GetCurrent().Add( pushButton );
 
-  pushButton.SetBackgroundImage( image01 );
+  pushButton.SetBackgroundImage( "Image.jpg" );
   pushButton.SetSize( 10.f, 10.f );
 
   application.SendNotification();
   application.Render();
 
-  size = pushButton.GetCurrentSize();
+  Vector3 size = pushButton.GetCurrentSize();
 
   DALI_TEST_EQUALS( size.width, 10.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 10.f, TEST_LOCATION );

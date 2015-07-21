@@ -61,6 +61,38 @@ protected:
    */
   virtual ~PushButton();
 
+public:
+
+  // Properties
+
+  /**
+   * Enum for the alignment modes of the icon.
+   */
+  enum IconAlignment
+  {
+    LEFT,
+    RIGHT,
+    TOP,
+    BOTTOM,
+    DEFAULT = RIGHT
+  };
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
+
 private: // From Button
 
   /**
@@ -168,6 +200,64 @@ private:
    */
   void ConfigureSizeNegotiationDimension( Dimension::Type dimension, const std::vector< Actor >& images, Actor& label );
 
+  /**
+   * @brief Sets either the selected or unselected icon.
+   *
+   * @param[in] state The icon state to set
+   * @param[in] iconFilename The filename of the icon
+   */
+  void SetIcon( DecorationState state, const std::string iconFilename );
+
+  /**
+   * @brief Gets either the selected or unselected icon.
+   *
+   * @param[in] state The icon state to get
+   * @return    The filename of the icon
+   */
+  std::string& GetIcon( DecorationState state );
+
+  /**
+   * @brief Sets the alignment mode to use to align the icon to the label.
+   *
+   * @param[in] iconAlignment The alignment mode to use
+   */
+  void SetIconAlignment( const PushButton::IconAlignment iconAlignment );
+
+  /**
+   * @brief Gets the alignment mode used to align the icon to the label.
+   *
+   * @return The alignment mode in use
+   */
+  const PushButton::IconAlignment GetIconAlignment() const;
+
+  /**
+   * @brief Sets the padding for the label.
+   *
+   * @param[in] padding The padding to set
+   */
+  void SetLabelPadding( const Vector4& padding );
+
+  /**
+   * @brief Gets the padding for the label.
+   *
+   * @return The label padding
+   */
+  Vector4 GetLabelPadding();
+
+  /**
+   * @brief Sets the padding for the icon.
+   *
+   * @param[in] padding The padding to set
+   */
+  void SetIconPadding( const Vector4& padding );
+
+  /**
+   * @brief Gets the padding for the icon.
+   *
+   * @return The icon padding
+   */
+  Vector4 GetIconPadding();
+
 private:
 
   // Undefined
@@ -178,7 +268,11 @@ private:
 
 private:
 
-  Vector3               mSize;                      ///< The button's size.
+  std::string    mIconName[ DECORATION_STATES ]; ///< The original filenames for the icons.
+  Padding        mLabelPadding;                  ///< The padding around the label (if present).
+  Padding        mIconPadding;                   ///< The padding around the icon (if present).
+  IconAlignment  mIconAlignment;                 ///< The alignment of the icon against the label.
+  Vector3        mSize;                          ///< The button's size.
 };
 
 } // namespace Internal

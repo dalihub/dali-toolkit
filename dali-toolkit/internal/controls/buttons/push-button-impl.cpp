@@ -21,7 +21,9 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
@@ -38,15 +40,36 @@ namespace Internal
 namespace
 {
 
-const float TEXT_PADDING = 12.0f;
-const float ANIMATION_TIME( 0.2f );
+const float   ANIMATION_TIME( 0.2f );
+const Padding DEFAULT_LABEL_PADDING( 12.0f, 12.0f, 12.0f, 12.0f );
+const Padding DEFAULT_ICON_PADDING( 12.0f, 12.0f, 12.0f, 12.0f );
 
 BaseHandle Create()
 {
   return Toolkit::PushButton::New();
 }
 
-TypeRegistration typeRegistration( typeid(Toolkit::PushButton), typeid(Toolkit::Button), Create );
+// Properties
+
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::PushButton, Toolkit::Button, Create )
+
+DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "unselected-icon", STRING, UNSELECTED_ICON )
+DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "selected-icon", STRING, SELECTED_ICON )
+DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "icon-alignment", STRING, ICON_ALIGNMENT )
+DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "label-padding", STRING, LABEL_PADDING )
+DALI_PROPERTY_REGISTRATION( Toolkit, PushButton, "icon-padding", STRING, ICON_PADDING )
+
+DALI_TYPE_REGISTRATION_END()
+
+/*
+ * Table to define Text-to-enum conversions for IconAlignment.
+ */
+const Dali::Scripting::StringEnum IconAlignmentTable[] = {
+  { "LEFT",   Toolkit::Internal::PushButton::LEFT },
+  { "RIGHT",  Toolkit::Internal::PushButton::RIGHT },
+  { "TOP",    Toolkit::Internal::PushButton::TOP },
+  { "BOTTOM", Toolkit::Internal::PushButton::BOTTOM },
+}; const unsigned int IconAlignmentTableCount = sizeof( IconAlignmentTable ) / sizeof( IconAlignmentTable[0] );
 
 const char* const UNSELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "button-up.9.png";
 const char* const SELECTED_BUTTON_IMAGE_DIR = DALI_IMAGE_DIR "button-down.9.png";
@@ -92,6 +115,9 @@ Dali::Toolkit::PushButton PushButton::New()
 
 PushButton::PushButton()
 : Button(),
+  mLabelPadding( DEFAULT_LABEL_PADDING ),
+  mIconPadding( DEFAULT_ICON_PADDING ),
+  mIconAlignment( RIGHT ),
   mSize()
 {
   SetAnimationTime( ANIMATION_TIME );
@@ -110,78 +136,191 @@ void PushButton::OnButtonInitialize()
   // Set resize policy to natural size so that buttons will resize to background images
   self.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
-  Image buttonImage = Dali::ResourceImage::New( UNSELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
-  Image selectedImage = Dali::ResourceImage::New( SELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
-  Image disabledImage = Dali::ResourceImage::New( DISABLED_UNSELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
-  Image disabledSelectedImage = Dali::ResourceImage::New( DISABLED_SELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
+  SetUnselectedImage( UNSELECTED_BUTTON_IMAGE_DIR );
+  SetSelectedImage( SELECTED_BUTTON_IMAGE_DIR );
+  SetDisabledImage( DISABLED_UNSELECTED_BUTTON_IMAGE_DIR );
+  SetDisabledSelectedImage( DISABLED_SELECTED_BUTTON_IMAGE_DIR );
+}
 
-  SetButtonImage( ImageActor::New( buttonImage ) );
-  SetSelectedImage( ImageActor::New( selectedImage ) );
-  SetDisabledImage( ImageActor::New( disabledImage ) );
-  SetDisabledSelectedImage( ImageActor::New( disabledSelectedImage ) );
+void PushButton::SetIcon( DecorationState state, const std::string iconFilename )
+{
+  mIconName[ state ] = iconFilename;
+  SetDecoration( state, ImageActor::New( Dali::ResourceImage::New( iconFilename ) ) );
+  ConfigureSizeNegotiation();
+}
+
+std::string& PushButton::GetIcon( DecorationState state )
+{
+  return mIconName[ state ];
+}
+
+void PushButton::SetIconAlignment( const PushButton::IconAlignment iconAlignment )
+{
+  mIconAlignment = iconAlignment;
+  ConfigureSizeNegotiation();
+}
+
+const PushButton::IconAlignment PushButton::GetIconAlignment() const
+{
+  return mIconAlignment;
+}
+
+void PushButton::SetLabelPadding( const Vector4& padding )
+{
+  mLabelPadding = Padding( padding.x, padding.y, padding.z, padding.w );
+  ConfigureSizeNegotiation();
+}
+
+Vector4 PushButton::GetLabelPadding()
+{
+  return Vector4( mLabelPadding.left, mLabelPadding.right, mLabelPadding.top, mLabelPadding.bottom );
+}
+
+void PushButton::SetIconPadding( const Vector4& padding )
+{
+  mIconPadding = Padding( padding.x, padding.y, padding.z, padding.w );
+  ConfigureSizeNegotiation();
+}
+
+Vector4 PushButton::GetIconPadding()
+{
+  return Vector4( mIconPadding.left, mIconPadding.right, mIconPadding.top, mIconPadding.bottom );
+}
+
+void PushButton::SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )
+{
+  Toolkit::PushButton pushButton = Toolkit::PushButton::DownCast( Dali::BaseHandle( object ) );
+
+  if ( pushButton )
+  {
+    PushButton& pushButtonImpl( GetImplementation( pushButton ) );
+
+    switch ( propertyIndex )
+    {
+      case Toolkit::PushButton::Property::UNSELECTED_ICON:
+      {
+        pushButtonImpl.SetIcon( UNSELECTED_DECORATION, value.Get< std::string >() );
+        break;
+      }
+      case Toolkit::PushButton::Property::SELECTED_ICON:
+      {
+        pushButtonImpl.SetIcon( SELECTED_DECORATION, value.Get< std::string >() );
+        break;
+      }
+      case Toolkit::PushButton::Property::ICON_ALIGNMENT:
+      {
+        IconAlignment iconAlignment;
+        if( Scripting::GetEnumeration< IconAlignment >( value.Get< std::string >().c_str(), IconAlignmentTable, IconAlignmentTableCount, iconAlignment ) )
+        {
+          pushButtonImpl.SetIconAlignment( iconAlignment );
+        }
+        break;
+      }
+      case Toolkit::PushButton::Property::LABEL_PADDING:
+      {
+        pushButtonImpl.SetLabelPadding( value.Get< Vector4 >() );
+        break;
+      }
+      case Toolkit::PushButton::Property::ICON_PADDING:
+      {
+        pushButtonImpl.SetIconPadding( value.Get< Vector4 >() );
+        break;
+      }
+    }
+  }
+}
+
+Property::Value PushButton::GetProperty( BaseObject* object, Property::Index propertyIndex )
+{
+  Property::Value value;
+
+  Toolkit::PushButton pushButton = Toolkit::PushButton::DownCast( Dali::BaseHandle( object ) );
+
+  if ( pushButton )
+  {
+    PushButton& pushButtonImpl( GetImplementation( pushButton ) );
+
+    switch ( propertyIndex )
+    {
+      case Toolkit::PushButton::Property::UNSELECTED_ICON:
+      {
+        value = pushButtonImpl.GetIcon( UNSELECTED_DECORATION );
+        break;
+      }
+      case Toolkit::PushButton::Property::SELECTED_ICON:
+      {
+        value = pushButtonImpl.GetIcon( UNSELECTED_DECORATION );
+        break;
+      }
+      case Toolkit::PushButton::Property::ICON_ALIGNMENT:
+      {
+        value = Scripting::GetLinearEnumerationName< IconAlignment >( pushButtonImpl.GetIconAlignment(), IconAlignmentTable, IconAlignmentTableCount );
+        break;
+      }
+      case Toolkit::PushButton::Property::LABEL_PADDING:
+      {
+        value = pushButtonImpl.GetLabelPadding();
+        break;
+      }
+      case Toolkit::PushButton::Property::ICON_PADDING:
+      {
+        value = pushButtonImpl.GetIconPadding();
+        break;
+      }
+    }
+  }
+
+  return value;
 }
 
 void PushButton::OnLabelSet()
 {
-  Actor& label = GetLabel();
+  Actor& label = GetLabelActor();
 
   if( label )
   {
-    label.SetAnchorPoint( AnchorPoint::CENTER );
-    label.SetParentOrigin( ParentOrigin::CENTER );
-
     Toolkit::TextLabel textLabel = Toolkit::TextLabel::DownCast( label );
     if( textLabel )
     {
-      textLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
-      textLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
-      textLabel.SetProperty( Toolkit::TextLabel::Property::MULTI_LINE, true );
+      textLabel.SetProperty( Toolkit::TextLabel::Property::MULTI_LINE, false );
     }
-
-    ConfigureSizeNegotiation();
   }
+  ConfigureSizeNegotiation();
 }
 
 void PushButton::OnButtonImageSet()
 {
   ConfigureSizeNegotiation();
-  RelayoutRequest();
 }
 
 void PushButton::OnSelectedImageSet()
 {
   ConfigureSizeNegotiation();
-  RelayoutRequest();
 }
 
 void PushButton::OnBackgroundImageSet()
 {
   ConfigureSizeNegotiation();
-  RelayoutRequest();
 }
 
 void PushButton::OnSelectedBackgroundImageSet()
 {
   ConfigureSizeNegotiation();
-  RelayoutRequest();
 }
 
 void PushButton::OnDisabledImageSet()
 {
   ConfigureSizeNegotiation();
-  RelayoutRequest();
 }
 
 void PushButton::OnDisabledSelectedImageSet()
 {
   ConfigureSizeNegotiation();
-  RelayoutRequest();
 }
 
 void PushButton::OnDisabledBackgroundImageSet()
 {
   ConfigureSizeNegotiation();
-  RelayoutRequest();
 }
 
 void PushButton::OnSizeSet( const Vector3& targetSize )
@@ -190,7 +329,7 @@ void PushButton::OnSizeSet( const Vector3& targetSize )
   {
     mSize = targetSize;
 
-    Actor& label = GetLabel();
+    Actor& label = GetLabelActor();
 
     if( label )
     {
@@ -238,19 +377,56 @@ Vector3 PushButton::GetNaturalSize()
   Vector3 size;
 
   // If label, test against it's size
-  Toolkit::TextLabel label = Toolkit::TextLabel::DownCast( GetLabel() );
-  if( label )
+  Toolkit::TextLabel label = Toolkit::TextLabel::DownCast( GetLabelActor() );
+
+  Actor icon = GetDecoration( UNSELECTED_DECORATION );
+  if( label || icon )
   {
-    Padding padding( 0.0f, 0.0f, 0.0f, 0.0f );
-    label.GetPadding( padding );
-    size = label.GetNaturalSize();
-    size.width += padding.x + padding.width;
-    size.height += padding.y + padding.height;
+    Vector3 labelSize( Vector3::ZERO );
+    Vector3 iconSize( Vector3::ZERO );
+
+    if( label )
+    {
+      Vector3 labelNaturalSize = label.GetNaturalSize();
+      labelSize.width = labelNaturalSize.width + mLabelPadding.left + mLabelPadding.right;
+      labelSize.height = labelNaturalSize.height + mLabelPadding.top + mLabelPadding.bottom;
+    }
+
+    if( icon )
+    {
+      Vector3 iconNaturalSize = icon.GetNaturalSize();
+      iconSize.width = iconNaturalSize.width + mIconPadding.left + mIconPadding.right;
+      iconSize.height = iconNaturalSize.height + mIconPadding.top + mIconPadding.bottom;
+
+      switch( mIconAlignment )
+      {
+        case LEFT:
+        case RIGHT:
+        {
+          size.width = labelSize.width + iconSize.width;
+          size.height = std::max( labelSize.height, iconSize.height );
+          break;
+        }
+        case TOP:
+        case BOTTOM:
+        {
+          size.width = std::max( labelSize.width, iconSize.width );
+          size.height = labelSize.height + iconSize.height;
+          break;
+        }
+      }
+    }
+    else
+    {
+      // No icon, so size is the same as label size.
+      // (If there is no label this is zero).
+      size = labelSize;
+    }
   }
   else
   {
     // Check Image and Background image and use the largest size as the control's Natural size.
-    SizeOfActorIfLarger( GetButtonImage(), size );
+    SizeOfActorIfLarger( GetUnselectedImage(), size );
     SizeOfActorIfLarger( GetBackgroundImage(), size );
   }
 
@@ -267,7 +443,7 @@ void PushButton::ConfigureSizeNegotiation()
   std::vector< Actor > images;
   images.reserve( 7 );
 
-  images.push_back( GetButtonImage() );
+  images.push_back( GetUnselectedImage() );
   images.push_back( GetSelectedImage() );
   images.push_back( GetSelectedBackgroundImage() );
   images.push_back( GetBackgroundImage() );
@@ -275,31 +451,110 @@ void PushButton::ConfigureSizeNegotiation()
   images.push_back( GetDisabledSelectedImage() );
   images.push_back( GetDisabledBackgroundImage() );
 
-  Actor label = GetLabel();
+  Actor label = GetLabelActor();
 
   for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     ConfigureSizeNegotiationDimension( static_cast< Dimension::Type >( 1 << i ), images, label );
   }
 
+  // Add any vertical padding directly to the actors.
+  Actor icon = GetDecoration( UNSELECTED_DECORATION );
+  Actor selectedIcon = GetDecoration( SELECTED_DECORATION );
+  bool iconExists = icon || selectedIcon;
+
   if( label )
   {
-    Padding padding;
-
-    if( label.GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::USE_NATURAL_SIZE )
-    {
-      padding.left = TEXT_PADDING;
-      padding.right = TEXT_PADDING;
-    }
-
-    if( label.GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::USE_NATURAL_SIZE )
-    {
-      padding.top = TEXT_PADDING;
-      padding.bottom = TEXT_PADDING;
-    }
-
-    label.SetPadding( padding );
+    label.SetPadding( mLabelPadding );
   }
+  if( icon )
+  {
+    icon.SetPadding( mIconPadding );
+  }
+  if( selectedIcon )
+  {
+    selectedIcon.SetPadding( mIconPadding );
+  }
+
+  // Calculate and apply horizontal alignments and offsets
+  // to text and icon (depending on existence).
+  Vector3 iconPosition( Vector3::ZERO );
+  Vector3 labelPosition( Vector3::ZERO );
+  Vector3 iconAnchoring( AnchorPoint::CENTER );
+  Vector3 labelAnchoring( AnchorPoint::CENTER );
+  std::string horizontalLabelAlignment = "CENTER";
+  std::string verticalLabelAlignment = "CENTER";
+
+  if( iconExists && label )
+  {
+    // There is an icon and a label to lay out.
+    switch( mIconAlignment )
+    {
+      case LEFT:
+      {
+        iconPosition.x = mIconPadding.left;
+        labelPosition.x = -mLabelPadding.right;
+        iconAnchoring = AnchorPoint::CENTER_LEFT;
+        labelAnchoring = AnchorPoint::CENTER_RIGHT;
+        horizontalLabelAlignment = "END";
+        break;
+      }
+      case RIGHT:
+      {
+        iconPosition.x = -mIconPadding.right;
+        labelPosition.x = mLabelPadding.left;
+        iconAnchoring = AnchorPoint::CENTER_RIGHT;
+        labelAnchoring = AnchorPoint::CENTER_LEFT;
+        horizontalLabelAlignment = "BEGIN";
+        break;
+      }
+      case TOP:
+      {
+        iconPosition.y = mIconPadding.top;
+        labelPosition.y = -mLabelPadding.bottom;
+        iconAnchoring = AnchorPoint::TOP_CENTER;
+        labelAnchoring = AnchorPoint::BOTTOM_CENTER;
+        verticalLabelAlignment = "BOTTOM";
+        break;
+      }
+      case BOTTOM:
+      {
+        iconPosition.y = -mIconPadding.bottom;
+        labelPosition.y = mLabelPadding.top;
+        iconAnchoring = AnchorPoint::BOTTOM_CENTER;
+        labelAnchoring = AnchorPoint::TOP_CENTER;
+        verticalLabelAlignment = "TOP";
+        break;
+      }
+    }
+  }
+
+  // Note: If there is only an icon, or only a label, the default values are now correct.
+  // Setup the icon(s) with the precalculated values.
+  if( icon )
+  {
+    icon.SetPosition( iconPosition );
+    icon.SetParentOrigin( iconAnchoring );
+    icon.SetAnchorPoint( iconAnchoring );
+  }
+  if( selectedIcon )
+  {
+    selectedIcon.SetPosition( iconPosition );
+    selectedIcon.SetParentOrigin( iconAnchoring );
+    selectedIcon.SetAnchorPoint( iconAnchoring );
+  }
+
+  // Setup the label.
+  if( label )
+  {
+    label.SetPosition( labelPosition );
+    label.SetParentOrigin( labelAnchoring );
+    label.SetAnchorPoint( labelAnchoring );
+    label.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, horizontalLabelAlignment );
+    label.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, verticalLabelAlignment );
+  }
+
+  RelayoutRequest();
 }
 
 void PushButton::ConfigureSizeNegotiationDimension( Dimension::Type dimension, const std::vector< Actor >& images, Actor& label )
@@ -307,28 +562,17 @@ void PushButton::ConfigureSizeNegotiationDimension( Dimension::Type dimension, c
   ResizePolicy::Type imageResizePolicy = ResizePolicy::FILL_TO_PARENT;
   ResizePolicy::Type labelResizePolicy = ResizePolicy::FILL_TO_PARENT;
 
-  switch( Self().GetResizePolicy( dimension ) )
+  ResizePolicy::Type resizePolicy = Self().GetResizePolicy( dimension );
+
+  if( resizePolicy == ResizePolicy::FIT_TO_CHILDREN || resizePolicy == ResizePolicy::USE_NATURAL_SIZE )
   {
-    case ResizePolicy::FIT_TO_CHILDREN:
+    if( label )
     {
-      imageResizePolicy = labelResizePolicy = ResizePolicy::USE_NATURAL_SIZE;
-      break;
+      labelResizePolicy = ResizePolicy::USE_NATURAL_SIZE;
     }
-    case ResizePolicy::USE_NATURAL_SIZE:
+    else
     {
-      if( label )
-      {
-        labelResizePolicy = ResizePolicy::USE_NATURAL_SIZE;
-      }
-      else
-      {
-        imageResizePolicy = ResizePolicy::USE_NATURAL_SIZE;
-      }
-      break;
-    }
-    default:
-    {
-      break;
+      imageResizePolicy = ResizePolicy::USE_NATURAL_SIZE;
     }
   }
 
@@ -346,6 +590,7 @@ void PushButton::ConfigureSizeNegotiationDimension( Dimension::Type dimension, c
     }
   }
 }
+
 
 } // namespace Internal
 
