@@ -36,7 +36,7 @@ const char* VERTEX_SHADER = MAKE_SHADER(
   void main()
   {
     mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);
-    // TODO scale by the actor size when we are using RendererFactor generated renderers with a shared unit sized mesh: vertexPosition.xyz *= uSize;
+    vertexPosition.xyz *= uSize;
     vertexPosition = uMvpMatrix * vertexPosition;
 
     vTexCoord = aTexCoord;
@@ -59,8 +59,8 @@ const char* FRAGMENT_SHADER = MAKE_SHADER(
 Geometry CreateGeometry( int width, int height )
 {
   // Create vertices
-  const float halfWidth = width * .5f;
-  const float halfHeight = height * .5f;
+  const float halfWidth = 0.5f;
+  const float halfHeight = 0.5f;
   struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
     TexturedQuadVertex texturedQuadVertexData[4] = { { Vector2(-halfWidth, -halfHeight), Vector2(0.f, 0.f) },
                                                      { Vector2( halfWidth, -halfHeight), Vector2(1.f, 0.f) },
@@ -74,6 +74,7 @@ Geometry CreateGeometry( int width, int height )
   texturedQuadVertices.SetData(texturedQuadVertexData);
 
   // Create indices
+  //TODO: replace with triangle strip when Geometry supports it
   unsigned int indexData[6] = { 0, 3, 1, 0, 2, 3 };
   Property::Map indexFormat;
   indexFormat["indices"] = Property::INTEGER;
