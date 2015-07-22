@@ -329,7 +329,6 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     {
       // Retrieves the scripts used in the text.
       multilanguageSupport.SetScripts( utf32Characters,
-                                       lineBreakInfo,
                                        scripts );
     }
 
@@ -352,12 +351,11 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
   Vector<Character> mirroredUtf32Characters;
   bool textMirrored = false;
+  Length numberOfParagraphs = 0u;
   if( BIDI_INFO & operations )
   {
     // Count the number of LINE_NO_BREAK to reserve some space for the vector of paragraph's
     // bidirectional info.
-
-    Length numberOfParagraphs = 0u;
 
     const TextAbstraction::LineBreakInfo* lineBreakInfoBuffer = lineBreakInfo.Begin();
     for( Length index = 0u; index < numberOfCharacters; ++index )
@@ -382,7 +380,9 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       // This paragraph has right to left text. Some characters may need to be mirrored.
       // TODO: consider if the mirrored string can be stored as well.
 
-      textMirrored = GetMirroredText( utf32Characters, mirroredUtf32Characters );
+      textMirrored = GetMirroredText( utf32Characters,
+                                      mirroredUtf32Characters,
+                                      bidirectionalInfo );
 
       // Only set the character directions if there is right to left characters.
       Vector<CharacterDirection>& directions = mLogicalModel->mCharacterDirections;
@@ -401,6 +401,9 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   Vector<GlyphInfo>& glyphs = mVisualModel->mGlyphs;
   Vector<CharacterIndex>& glyphsToCharactersMap = mVisualModel->mGlyphsToCharacters;
   Vector<Length>& charactersPerGlyph = mVisualModel->mCharactersPerGlyph;
+  Vector<GlyphIndex> newParagraphGlyphs;
+  newParagraphGlyphs.Reserve( numberOfParagraphs );
+
   if( SHAPE_TEXT & operations )
   {
     const Vector<Character>& textToShape = textMirrored ? mirroredUtf32Characters : utf32Characters;
@@ -411,7 +414,8 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
                validFonts,
                glyphs,
                glyphsToCharactersMap,
-               charactersPerGlyph );
+               charactersPerGlyph,
+               newParagraphGlyphs );
 
     // Create the 'number of glyphs' per character and the glyph to character conversion tables.
     mVisualModel->CreateGlyphsPerCharacterTable( numberOfCharacters );
@@ -422,7 +426,19 @@ void Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
   if( GET_GLYPH_METRICS & operations )
   {
-    mFontClient.GetGlyphMetrics( glyphs.Begin(), numberOfGlyphs );
+    GlyphInfo* glyphsBuffer = glyphs.Begin();
+    mFontClient.GetGlyphMetrics( glyphsBuffer, numberOfGlyphs );
+
+    // Update the width and advance of all new paragraph characters.
+    for( Vector<GlyphIndex>::ConstIterator it = newParagraphGlyphs.Begin(), endIt = newParagraphGlyphs.End(); it != endIt; ++it )
+    {
+      const GlyphIndex index = *it;
+      GlyphInfo& glyph = *( glyphsBuffer + index );
+
+      glyph.xBearing = 0.f;
+      glyph.width = 0.f;
+      glyph.advance = 0.f;
+    }
   }
 }
 

@@ -811,7 +811,7 @@ bool Controller::DoRelayout( const Size& size,
     // after the first time the text has been laid out.
     // Fill the vectors again.
 
-    Length numberOfGlyphs = mImpl->mVisualModel->mGlyphs.Count();
+    const Length numberOfGlyphs = mImpl->mVisualModel->mGlyphs.Count();
 
     if( 0u == numberOfGlyphs )
     {
@@ -820,16 +820,17 @@ bool Controller::DoRelayout( const Size& size,
       return true;
     }
 
-    Vector<LineBreakInfo>& lineBreakInfo = mImpl->mLogicalModel->mLineBreakInfo;
-    Vector<WordBreakInfo>& wordBreakInfo = mImpl->mLogicalModel->mWordBreakInfo;
-    Vector<CharacterDirection>& characterDirection = mImpl->mLogicalModel->mCharacterDirections;
-    Vector<GlyphInfo>& glyphs = mImpl->mVisualModel->mGlyphs;
-    Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mVisualModel->mGlyphsToCharacters;
-    Vector<Length>& charactersPerGlyph = mImpl->mVisualModel->mCharactersPerGlyph;
+    const Vector<LineBreakInfo>& lineBreakInfo = mImpl->mLogicalModel->mLineBreakInfo;
+    const Vector<WordBreakInfo>& wordBreakInfo = mImpl->mLogicalModel->mWordBreakInfo;
+    const Vector<CharacterDirection>& characterDirection = mImpl->mLogicalModel->mCharacterDirections;
+    const Vector<GlyphInfo>& glyphs = mImpl->mVisualModel->mGlyphs;
+    const Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mVisualModel->mGlyphsToCharacters;
+    const Vector<Length>& charactersPerGlyph = mImpl->mVisualModel->mCharactersPerGlyph;
+    const Character* const textBuffer = mImpl->mLogicalModel->mText.Begin();
 
     // Set the layout parameters.
     LayoutParameters layoutParameters( size,
-                                       mImpl->mLogicalModel->mText.Begin(),
+                                       textBuffer,
                                        lineBreakInfo.Begin(),
                                        wordBreakInfo.Begin(),
                                        ( 0u != characterDirection.Count() ) ? characterDirection.Begin() : NULL,
@@ -853,6 +854,9 @@ bool Controller::DoRelayout( const Size& size,
     // Resize the vector of positions to have the same size than the vector of glyphs.
     Vector<Vector2>& glyphPositions = mImpl->mVisualModel->mGlyphPositions;
     glyphPositions.Resize( numberOfGlyphs );
+
+    // Whether the last character is a new paragraph character.
+    layoutParameters.isLastNewParagraph = TextAbstraction::IsNewParagraph( *( textBuffer + ( mImpl->mLogicalModel->mText.Count() - 1u ) ) );
 
     // Update the visual model.
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
@@ -991,16 +995,7 @@ void Controller::SetVerticalAlignment( LayoutEngine::VerticalAlignment alignment
     // Set the alignment.
     mImpl->mLayoutEngine.SetVerticalAlignment( alignment );
 
-    // Set the flag to redo the alignment operation.
-    // TODO : Is not needed re-layout and reorder again but with the current implementation it is.
-    //        Im working on a different patch to fix an issue with the alignment. When that patch
-    //        is in, this issue can be fixed.
-    const OperationsMask layoutOperations =  static_cast<OperationsMask>( LAYOUT             |
-                                                                          UPDATE_ACTUAL_SIZE |
-                                                                          ALIGN              |
-                                                                          REORDER );
-
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | layoutOperations );
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | ALIGN );
 
     mImpl->RequestRelayout();
   }

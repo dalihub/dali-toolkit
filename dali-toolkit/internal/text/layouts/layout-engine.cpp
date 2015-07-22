@@ -580,7 +580,7 @@ struct LayoutEngine::Impl
         lineRun.numberOfGlyphs = layout.numberOfGlyphs;
         lineRun.characterRun.characterIndex = layout.characterIndex;
         lineRun.characterRun.numberOfCharacters = layout.numberOfCharacters;
-        if( isLastLine )
+        if( isLastLine && !layoutParameters.isLastNewParagraph )
         {
           const float width = layout.extraBearing + layout.length + layout.extraWidth + layout.wsLengthEndOfLine;
           if( MULTI_LINE_BOX == mLayout )
@@ -623,8 +623,36 @@ struct LayoutEngine::Impl
 
         // Increase the glyph index.
         index += layout.numberOfGlyphs;
+
+        if( isLastLine &&
+            layoutParameters.isLastNewParagraph &&
+            ( mLayout == MULTI_LINE_BOX ) )
+        {
+          // Need to add a new line with no characters but with height to increase the actualSize.height
+          const GlyphInfo& glyphInfo = *( layoutParameters.glyphsBuffer + layoutParameters.totalNumberOfGlyphs - 1u );
+
+          Text::FontMetrics fontMetrics;
+          mFontClient.GetFontMetrics( glyphInfo.fontId, fontMetrics );
+
+          LineRun lineRun;
+          lineRun.glyphIndex = 0u;
+          lineRun.numberOfGlyphs = 0u;
+          lineRun.characterRun.characterIndex = 0u;
+          lineRun.characterRun.numberOfCharacters = 0u;
+          lineRun.width = 0.f;
+          lineRun.ascender = fontMetrics.ascender;
+          lineRun.descender = fontMetrics.descender;
+          lineRun.extraLength = 0.f;
+          lineRun.alignmentOffset = 0.f;
+          lineRun.direction = !RTL;
+          lineRun.ellipsis = false;
+
+          actualSize.height += ( lineRun.ascender + -lineRun.descender );
+
+          lines.PushBack( lineRun );
+        }
       }
-    }
+    } // end for() traversing glyphs.
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--LayoutText\n\n" );
 

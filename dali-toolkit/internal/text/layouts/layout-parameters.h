@@ -73,7 +73,8 @@ struct LayoutParameters
     charactersToGlyphsBuffer( NULL ),
     glyphsPerCharacterBuffer( NULL ),
     lineBidirectionalInfoRunsBuffer( NULL ),
-    numberOfBidirectionalInfoRuns( 0u )
+    numberOfBidirectionalInfoRuns( 0u ),
+    isLastNewParagraph( false )
   {}
 
   Vector2                         boundingBox;
@@ -89,6 +90,7 @@ struct LayoutParameters
   Length*                         glyphsPerCharacterBuffer;        ///< The number of glyphs per character.
   BidirectionalLineInfoRun*       lineBidirectionalInfoRunsBuffer; ///< Bidirectional conversion tables per line.
   Length                          numberOfBidirectionalInfoRuns;   ///< The number of lines with bidirectional info.
+  bool                            isLastNewParagraph;              ///< Whether the last character is a new paragraph character.
 };
 
 } // namespace Text
