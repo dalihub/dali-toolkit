@@ -33,6 +33,10 @@ namespace Internal DALI_INTERNAL
 
 class ScrollBar;
 }
+/**
+ * @addtogroup dali-toolkit-controls-scroll-bar
+ * @{
+ */
 
 /**
  * ScrollBar is a UI component that can be linked to the scrollable objects
@@ -323,11 +327,11 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL ScrollBar( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali
 
-/**
- * @}
- */
 #endif // __DALI_TOOLKIT_SCROLL_BAR_H__

@@ -35,11 +35,15 @@ namespace Dali
 
 namespace Toolkit
 {
+/**
+ * @addtogroup dali-toolkit-controls
+ * @{
+ */
+
 class StyleManager;
 
 namespace Internal
 {
-
 /**
  * @brief This is the internal base class for all controls.
  *
@@ -629,6 +633,9 @@ DALI_IMPORT_API const Internal::Control& GetImplementation( const Dali::Toolkit:
 
 } // namespace Internal
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

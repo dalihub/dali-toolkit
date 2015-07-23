@@ -30,6 +30,10 @@ namespace Dali
 
 namespace Toolkit
 {
+/**
+ * @addtogroup dali-toolkit-controls-item-view
+ * @{
+ */
 
 class ItemLayout;
 
@@ -364,6 +368,9 @@ protected:
   Impl* mImpl;
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

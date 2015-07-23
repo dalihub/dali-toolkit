@@ -31,6 +31,10 @@ namespace Internal DALI_INTERNAL
 {
 class TextField;
 }
+/**
+ * @addtogroup dali-toolkit-controls-text-controls
+ * @{
+ */
 
 /**
  * @brief A control which provides a single-line editable text field.
@@ -201,6 +205,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL TextField( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

@@ -31,6 +31,10 @@ namespace Internal DALI_INTERNAL
 {
 class KeyboardFocusManager;
 }
+/**
+ * @addtogroup dali-toolkit-focus-manager
+ * @{
+ */
 
 /**
  * @brief Provides the functionality of handling keyboard navigation
@@ -273,6 +277,9 @@ public: // Signals
 
 }; // class KeyboardFocusManager
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

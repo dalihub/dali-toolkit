@@ -31,6 +31,10 @@ namespace Internal DALI_INTERNAL
 {
 class TextLabel;
 }
+/**
+ * @addtogroup dali-toolkit-controls-text-controls
+ * @{
+ */
 
 /**
  * @brief A control which renders a short text string.
@@ -144,6 +148,9 @@ public: // Not intended for application developers
   explicit DALI_INTERNAL TextLabel( Dali::Internal::CustomActor* internal );
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali
