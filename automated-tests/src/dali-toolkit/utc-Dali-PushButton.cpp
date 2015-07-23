@@ -357,10 +357,9 @@ int UtcDaliPushButtonSetLabelText(void)
   application.SendNotification();
   application.Render();
 
-  pushButton.SetLabel( STR );
+  pushButton.SetLabelText( STR );
 
-  TextLabel label = TextLabel::DownCast( pushButton.GetLabel() );
-  DALI_TEST_CHECK( STR == label.GetProperty<std::string>( TextLabel::Property::TEXT ) );
+  DALI_TEST_EQUALS( pushButton.GetLabelText(), STR, TEST_LOCATION );
 
   END_TEST;
 }
@@ -586,5 +585,223 @@ int UtcDaliPushButtonSelected(void)
   application.ProcessEvent( event );
 
   DALI_TEST_CHECK( !gPushButtonSelectedState );
+  END_TEST;
+}
+
+int UtcDaliPushButtonPropertySetIconAlignment(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliPushButtonPropertySetIconAlignment");
+
+  PushButton pushButton = PushButton::New();
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "TOP" );
+  DALI_TEST_EQUALS( pushButton.GetProperty<std::string>( Toolkit::PushButton::Property::ICON_ALIGNMENT ), "TOP", TEST_LOCATION );
+
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "RIGHT" );
+  DALI_TEST_EQUALS( pushButton.GetProperty<std::string>( Toolkit::PushButton::Property::ICON_ALIGNMENT ), "RIGHT", TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonPropertySetLabelPadding(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliPushButtonPropertySetLabelPadding");
+
+  PushButton pushButton = PushButton::New();
+  pushButton.SetProperty( Toolkit::PushButton::Property::LABEL_PADDING, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
+  DALI_TEST_EQUALS( pushButton.GetProperty<Vector4>( Toolkit::PushButton::Property::LABEL_PADDING ), Vector4( 1.0f, 1.0f, 1.0f, 1.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  pushButton.SetProperty( Toolkit::PushButton::Property::LABEL_PADDING, Vector4( 10.0f, 10.0f, 10.0f, 10.0f ) );
+  DALI_TEST_EQUALS( pushButton.GetProperty<Vector4>( Toolkit::PushButton::Property::LABEL_PADDING ), Vector4( 10.0f, 10.0f, 10.0f, 10.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonPropertySetIconPadding(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliPushButtonPropertySetIconPadding");
+
+  PushButton pushButton = PushButton::New();
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_PADDING, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );
+  DALI_TEST_EQUALS( pushButton.GetProperty<Vector4>( Toolkit::PushButton::Property::ICON_PADDING ), Vector4( 1.0f, 1.0f, 1.0f, 1.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_PADDING, Vector4( 10.0f, 10.0f, 10.0f, 10.0f ) );
+  DALI_TEST_EQUALS( pushButton.GetProperty<Vector4>( Toolkit::PushButton::Property::ICON_PADDING ), Vector4( 10.0f, 10.0f, 10.0f, 10.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonPaddingLayout(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliPushButtonPaddingLayout");
+
+  // This test creates padding for an icon and a label.
+  // The icon and label are each enabled and disabled to confirm the correct padding is used.
+  PushButton pushButton = PushButton::New();
+
+  pushButton.SetProperty( Toolkit::PushButton::Property::LABEL_PADDING, Vector4( 10.0f, 10.0f, 10.0f, 10.0f ) );
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_PADDING, Vector4( 20.0f, 20.0f, 20.0f, 20.0f ) );
+
+  pushButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  pushButton.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  pushButton.SetPosition( 0.0f, 0.0f );
+  pushButton.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+
+  Stage::GetCurrent().Add( pushButton );
+
+  application.SendNotification();
+  application.Render();
+
+  // First test the size is zero.
+  // No padding should be added as there is no label or icon.
+  Vector2 size( Vector2::ZERO );
+  size.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
+  size.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
+
+  DALI_TEST_EQUALS( size, Vector2::ZERO, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Check label only padding.
+  pushButton.SetLabelText( "Label" );
+
+  application.SendNotification();
+  application.Render();
+
+  size.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
+  size.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
+
+  // We should not test against the exact label size, we just make sure it is larger than our label padding so we know the padding has been applied.
+  DALI_TEST_GREATER( size.width, 20.0f, TEST_LOCATION );
+  DALI_TEST_GREATER( size.height, 20.0f, TEST_LOCATION );
+
+  // Re-initialise the button so we can setup icon-only padding.
+  pushButton.Unparent();
+  pushButton = PushButton::New();
+
+  pushButton.SetProperty( Toolkit::PushButton::Property::LABEL_PADDING, Vector4( 10.0f, 10.0f, 10.0f, 10.0f ) );
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_PADDING, Vector4( 20.0f, 20.0f, 20.0f, 20.0f ) );
+
+  pushButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  pushButton.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  pushButton.SetPosition( 0.0f, 0.0f );
+  pushButton.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+
+  Stage::GetCurrent().Add( pushButton );
+
+  const char* INVALID_IMAGE_FILE_NAME = "invalid-image.jpg";
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "RIGHT" );
+  pushButton.SetProperty( Toolkit::PushButton::Property::UNSELECTED_ICON, INVALID_IMAGE_FILE_NAME );
+  pushButton.SetProperty( Toolkit::PushButton::Property::SELECTED_ICON, INVALID_IMAGE_FILE_NAME );
+
+  application.SendNotification();
+  application.Render();
+
+  size.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
+  size.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
+
+  DALI_TEST_EQUALS( size, Vector2( 40.0f, 40.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Now test padding for both label and icon simultaneously.
+  pushButton.SetLabelText( "Label" );
+
+  application.SendNotification();
+  application.Render();
+
+  size.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
+  size.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
+
+  // We should not test against the exact label size, we just make sure it is larger than our label padding so we know the padding has been applied.
+  // Note we only test the width as we are horizontally aligned and the label my be less high than the icon.
+  // Full directional alignment tests are done in UtcDaliPushButtonAlignmentLayout.
+  DALI_TEST_GREATER( size.width, 60.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonAlignmentLayout(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliPushButtonAlignmentLayout");
+
+  // This test checks different alignments for the icon against the label.
+  // The icon is then moved around the label in each of it's alignments.
+  // The final relayed out size is checked to confirm the layout has been done correctly.
+  PushButton pushButton = PushButton::New();
+
+  pushButton.SetProperty( Toolkit::PushButton::Property::LABEL_PADDING, Vector4( 30.0f, 30.0f, 30.0f, 30.0f ) );
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_PADDING, Vector4( 75.0f, 75.0f, 75.0f, 75.0f ) );
+
+  pushButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  pushButton.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  pushButton.SetPosition( 0.0f, 0.0f );
+  pushButton.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+
+  Stage::GetCurrent().Add( pushButton );
+
+  const char* INVALID_IMAGE_FILE_NAME = "invalid-image.jpg";
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "RIGHT" );
+  pushButton.SetProperty( Toolkit::PushButton::Property::UNSELECTED_ICON, INVALID_IMAGE_FILE_NAME );
+  pushButton.SetProperty( Toolkit::PushButton::Property::SELECTED_ICON, INVALID_IMAGE_FILE_NAME );
+
+  application.SendNotification();
+  application.Render();
+
+  // First get the base size (without label).
+  Vector2 baseSize( Vector2::ZERO );
+  baseSize.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
+  baseSize.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
+
+  DALI_TEST_EQUALS( baseSize, Vector2( 150.0f, 150.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Add a label to cause size to be modified in the direction of alignment.
+  pushButton.SetLabelText( "Label" );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector2 size( Vector2::ZERO );
+  size.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
+  size.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
+
+  DALI_TEST_GREATER( size.width, 150.0f + 60.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( size.height, 150.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Now test left alignment matches right for size.
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "LEFT" );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector2 compareSize( Vector2::ZERO );
+  compareSize.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
+  compareSize.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
+
+  DALI_TEST_EQUALS( size, compareSize, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Test top alignment.
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "TOP" );
+
+  application.SendNotification();
+  application.Render();
+
+  compareSize.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
+  compareSize.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
+
+  DALI_TEST_EQUALS( compareSize.width, 150.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_GREATER( compareSize.height, 150.0f + 60.0f, TEST_LOCATION );
+
+  // Test bottom alignment.
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "BOTTOM" );
+
+  application.SendNotification();
+  application.Render();
+
+  size.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
+  size.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
+
+  DALI_TEST_EQUALS( size, compareSize, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
   END_TEST;
 }

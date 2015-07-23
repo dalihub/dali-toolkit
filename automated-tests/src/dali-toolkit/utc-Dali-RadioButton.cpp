@@ -140,14 +140,14 @@ int UtcDaliRadioButtonLabelActor(void)
 {
   ToolkitTestApplication application;
 
-  TextLabel actor1 = TextLabel::New( "test actor 1" );
+  std::string labelText = "test actor 1";
 
-  RadioButton radioButton = RadioButton::New( actor1 );
-  DALI_TEST_CHECK( actor1 == radioButton.GetLabel() );
+  RadioButton radioButton = RadioButton::New( labelText );
+  DALI_TEST_EQUALS( radioButton.GetLabelText(), labelText, TEST_LOCATION );
 
-  TextLabel actor2 = TextLabel::New( "test actor 2" );
-  radioButton.SetLabel( actor2 );
-  DALI_TEST_CHECK( actor2 == radioButton.GetLabel() );
+  std::string labelText2 = "test actor 2";
+  radioButton.SetLabelText( labelText2 );
+  DALI_TEST_EQUALS( radioButton.GetLabelText(), labelText2, TEST_LOCATION );
 
   END_TEST;
 }

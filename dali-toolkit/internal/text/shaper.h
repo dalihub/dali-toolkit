@@ -47,6 +47,7 @@ class VisualModel;
  * @param[out] glyphs Vector of glyphs in the visual order.
  * @param[out] glyphToCharacterMap Vector containing the first character in the logical model that each glyph relates to.
  * @param[out] charactersPerGlyph Vector containing the number of characters per glyph.
+ * @param[out] newParagraphGlyphs Vector containing the indices to the new paragraph glyphs.
  */
 void ShapeText( const Vector<Character>& text,
                 const Vector<LineBreakInfo>& lineBreakInfo,
@@ -54,7 +55,8 @@ void ShapeText( const Vector<Character>& text,
                 const Vector<FontRun>& fonts,
                 Vector<GlyphInfo>& glyphs,
                 Vector<CharacterIndex>& glyphToCharacterMap,
-                Vector<Length>& charactersPerGlyph );
+                Vector<Length>& charactersPerGlyph,
+                Vector<GlyphIndex>& newParagraphGlyphs );
 
 } // namespace Text
 

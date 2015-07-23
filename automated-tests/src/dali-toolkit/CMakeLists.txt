@@ -15,6 +15,7 @@ SET(TC_SOURCES
    utc-Dali-CubeTransitionEffect.cpp
    utc-Dali-EffectsView.cpp
    utc-Dali-GaussianBlurView.cpp
+   utc-Dali-ImageView.cpp
    utc-Dali-JsonParser.cpp
    utc-Dali-KeyInputFocusManager.cpp
    utc-Dali-PageTurnView.cpp
@@ -45,6 +46,7 @@ SET(TC_SOURCES
    utc-Dali-ScrollViewEffect.cpp
    utc-Dali-StyleManager.cpp
    utc-Dali-SuperBlurView.cpp
+   utc-Dali-Toolkit.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)

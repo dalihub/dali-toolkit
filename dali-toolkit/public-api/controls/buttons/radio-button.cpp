@@ -71,14 +71,7 @@ RadioButton RadioButton::New()
 RadioButton RadioButton::New( const std::string& label )
 {
   RadioButton radioButton = Internal::RadioButton::New();
-  radioButton.SetLabel( label );
-  return radioButton;
-}
-
-RadioButton RadioButton::New( Actor label )
-{
-  RadioButton radioButton = Internal::RadioButton::New();
-  radioButton.SetLabel( label );
+  radioButton.SetLabelText( label );
   return radioButton;
 }
 

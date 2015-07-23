@@ -209,7 +209,6 @@ struct Controller::Impl
     mView(),
     mLayoutEngine(),
     mModifyEvents(),
-    mControlSize(),
     mTextColor( Color::BLACK ),
     mAlignmentOffset(),
     mOperationsPending( NO_OPERATION ),
@@ -466,7 +465,6 @@ struct Controller::Impl
   View mView;                              ///< The view interface to the rendering back-end.
   LayoutEngine mLayoutEngine;              ///< The layout engine.
   std::vector<ModifyEvent> mModifyEvents;  ///< Temporary stores the text set until the next relayout.
-  Size mControlSize;                       ///< The size of the control.
   Vector4 mTextColor;                      ///< The regular text color
   Vector2 mAlignmentOffset;                ///< Vertical and horizontal offset of the whole text inside the control due to alignment.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.

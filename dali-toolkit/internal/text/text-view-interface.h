@@ -60,6 +60,13 @@ public:
   virtual ~ViewInterface();
 
   /**
+   * @brief Retrieves the target size of the UI control.
+   *
+   * @return The text's size.
+   */
+  virtual const Vector2& GetControlSize() const = 0;
+
+  /**
    * Retrieves the number of glyphs.
    *
    * @return The number of glyphs.

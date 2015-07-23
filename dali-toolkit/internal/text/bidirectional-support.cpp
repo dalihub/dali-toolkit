@@ -231,15 +231,33 @@ void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInf
 }
 
 bool GetMirroredText( const Vector<Character>& text,
-                      Vector<Character>& mirroredText )
+                      Vector<Character>& mirroredText,
+                      const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo )
 {
+  bool hasTextMirrored = false;
+
   // Handle to the bidirectional info module in text-abstraction.
   TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
 
   mirroredText = text;
 
-  return bidirectionalSupport.GetMirroredText( mirroredText.Begin(),
-                                               mirroredText.Count() );
+  Character* mirroredTextBuffer = mirroredText.Begin();
+
+  // Traverse the paragraphs and mirror the right to left ones.
+  for( Vector<BidirectionalParagraphInfoRun>::ConstIterator it = bidirectionalInfo.Begin(),
+         endIt = bidirectionalInfo.End();
+       it != endIt;
+       ++it )
+  {
+    const BidirectionalParagraphInfoRun& run = *it;
+
+    const bool tmpMirrored = bidirectionalSupport.GetMirroredText( mirroredTextBuffer + run.characterRun.characterIndex,
+                                                                   run.characterRun.numberOfCharacters );
+
+    hasTextMirrored = hasTextMirrored || tmpMirrored;
+  }
+
+  return hasTextMirrored;
 }
 
 void GetCharactersDirection( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,

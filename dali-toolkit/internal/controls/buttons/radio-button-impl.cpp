@@ -81,15 +81,10 @@ void RadioButton::OnButtonInitialize()
   // Wrap size of radio button around all its children
   self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
 
-  Image buttonImage = Dali::ResourceImage::New( UNSELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
-  Image selectedImage = Dali::ResourceImage::New( SELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
-  Image disabledImage = Dali::ResourceImage::New( DISABLED_UNSELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
-  Image disabledSelectedImage = Dali::ResourceImage::New( DISABLED_SELECTED_BUTTON_IMAGE_DIR, ResourceImage::ON_DEMAND, ResourceImage::NEVER );
-
-  SetButtonImage( ImageActor::New( buttonImage ) );
-  SetSelectedImage( ImageActor::New( selectedImage ) );
-  SetDisabledImage( ImageActor::New( disabledImage ) );
-  SetDisabledSelectedImage( ImageActor::New( disabledSelectedImage ) );
+  SetUnselectedImage( UNSELECTED_BUTTON_IMAGE_DIR );
+  SetSelectedImage( SELECTED_BUTTON_IMAGE_DIR );
+  SetDisabledImage( DISABLED_UNSELECTED_BUTTON_IMAGE_DIR );
+  SetDisabledSelectedImage( DISABLED_SELECTED_BUTTON_IMAGE_DIR );
 
   RelayoutRequest();
 }
@@ -108,7 +103,7 @@ void RadioButton::OnButtonUp()
 
 void RadioButton::OnLabelSet()
 {
-  Actor& label = GetLabel();
+  Actor& label = GetLabelActor();
 
   if( label )
   {
@@ -125,9 +120,9 @@ void RadioButton::OnLabelSet()
     {
       label.SetX( GetSelectedImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
-    else if( GetButtonImage() )
+    else if( GetUnselectedImage() )
     {
-      label.SetX( GetButtonImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
+      label.SetX( GetUnselectedImage().GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );
     }
     else
     {
@@ -138,7 +133,7 @@ void RadioButton::OnLabelSet()
 
 void RadioButton::OnSelected()
 {
-  Actor& label = GetLabel();
+  Actor& label = GetLabelActor();
 
   PaintState paintState = GetPaintState();
   switch( paintState )
@@ -167,7 +162,7 @@ void RadioButton::OnSelected()
     }
     case SelectedState:
     {
-      Actor& buttonImage = GetButtonImage();
+      Actor& buttonImage = GetUnselectedImage();
       if( label && buttonImage )
       {
         label.SetX( buttonImage.GetNaturalSize().width + DISTANCE_BETWEEN_IMAGE_AND_LABEL );

@@ -86,9 +86,10 @@ public:
       POPUP_PASTE_BUTTON_ICON_IMAGE,            ///< name "popup-paste-button-image",      The image to use as the popup paste icon,       type STRING
       POPUP_SELECT_BUTTON_ICON_IMAGE,           ///< name "popup-select-button-image",     The image to use as the popup select icon,      type STRING
       POPUP_SELECT_ALL_BUTTON_ICON_IMAGE,       ///< name "popup-select-all-button-image", The image to use as the popup select all icon,  type STRING
-      DIVIDER_COLOR,                            ///< name "popup-divider-color", VECTOR4,  The color of the divider between options,       type VECTOR4
-      ICON_COLOR,                               ///< name "popup-icon-color", VECTOR4,     The color of the icons (if supplied),           type VECTOR4
-      PRESSED_COLOR                             ///< name "popup-pressed-color", VECTOR4,  The color of the option when pressed,           type VECTOR4
+      POPUP_DIVIDER_COLOR,                      ///< name "popup-divider-color",           The color of the divider between options,       type VECTOR4
+      POPUP_ICON_COLOR,                         ///< name "popup-icon-color",              The color of the icons (if supplied),           type VECTOR4
+      POPUP_PRESSED_COLOR,                      ///< name "popup-pressed-color",           The color of the option when pressed,           type VECTOR4
+      POPUP_PRESSED_IMAGE                       ///< name "popup-pressed-image",           The image to use for the option when pressed,   type STRING
     };
   };
 

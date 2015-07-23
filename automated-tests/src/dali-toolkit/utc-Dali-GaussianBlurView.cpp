@@ -38,7 +38,28 @@ void utc_gaussian_blur_view_cleanup(void)
   test_return_value = TET_PASS;
 }
 
+class TestCallback : public ConnectionTracker
+{
+public:
+  TestCallback( Dali::Toolkit::GaussianBlurView& blurView )
+  : mBlurView( blurView )
+  {
+    mFinished = false;
+  }
 
+  void Connect()
+  {
+    mBlurView.FinishedSignal().Connect( this, &TestCallback::OnFinished );
+  }
+
+  void OnFinished( Dali::Toolkit::GaussianBlurView source )
+  {
+    mFinished = true;
+  }
+
+  bool mFinished;
+  Dali::Toolkit::GaussianBlurView& mBlurView;
+};
 
 // Negative test case for a method
 int UtcDaliGaussianBlurViewUninitialized(void)
@@ -197,5 +218,57 @@ int UtcDaliGaussianBlurViewSetGetRenderTarget(void)
   FrameBufferImage renderTarget = FrameBufferImage::New( 480.0f, 800.0f, Pixel::RGB888 );
   view.SetUserImageAndOutputRenderTarget(ResourceImage::New(TEST_IMAGE_FILE_NAME), renderTarget);
   DALI_TEST_CHECK( view.GetBlurredRenderTarget() == renderTarget );
+  END_TEST;
+}
+
+int UtcDaliGaussianBlurViewActivateOnce(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliGaussianBlurActivateOnce");
+
+  Toolkit::GaussianBlurView view = Toolkit::GaussianBlurView::New(5, 1.5f, Pixel::RGB888, 0.5f, 0.5f, true);
+  DALI_TEST_CHECK( view );
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
+
+  view.SetParentOrigin(ParentOrigin::CENTER);
+  view.SetSize(Stage::GetCurrent().GetSize());
+  view.Add(Actor::New());
+  Stage::GetCurrent().Add(view);
+  view.ActivateOnce();
+
+  RenderTaskList taskList2 = Stage::GetCurrent().GetRenderTaskList();
+  DALI_TEST_CHECK( 1u != taskList2.GetTaskCount() );
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliGaussianBlurViewFinishedSignalN(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliGaussianBlurViewSetGetRenderTarget");
+
+  Toolkit::GaussianBlurView view = Toolkit::GaussianBlurView::New(5, 1.5f, Pixel::RGB888, 0.5f, 0.5f, true);
+  DALI_TEST_CHECK( view );
+
+  view.SetParentOrigin(ParentOrigin::CENTER);
+  view.SetSize(Stage::GetCurrent().GetSize());
+  view.Add(Actor::New());
+  Stage::GetCurrent().Add(view);
+  view.Activate();
+
+  TestCallback callback( view );
+  DALI_TEST_CHECK( callback.mFinished == false );
+
+  callback.Connect();
+
+  view.Deactivate();
+  application.SendNotification();
+
+  // FinishedSignal is only for ActivateOnce()
+  DALI_TEST_CHECK( callback.mFinished == false );
+
   END_TEST;
 }

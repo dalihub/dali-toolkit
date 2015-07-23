@@ -68,23 +68,17 @@ bool ScriptsTest( const ScriptsData& data )
                                                    &utf32[0u] );
   utf32.Resize( numberOfCharacters );
 
-  // 2) Set the line break info.
-  Vector<LineBreakInfo> lineBreakInfo;
-  lineBreakInfo.Resize( numberOfCharacters );
-
-  SetLineBreakInfo( utf32, lineBreakInfo );
-
-  // 3) Set the script info.
+  // 2) Set the script info.
   Vector<ScriptRun> scripts;
   multilanguageSupport.SetScripts( utf32,
-                                   lineBreakInfo,
                                    scripts );
 
-  // 4) Compare the results.
+  // 3) Compare the results.
 
+  tet_printf( "Testing %s\n", data.description.c_str() );
   if( scripts.Count() != data.scriptRuns.Count() )
   {
-    tet_infoline("ScriptsTest: different number of scripts.");
+    tet_printf("ScriptsTest FAIL: different number of scripts. %d, should be %d\n", scripts.Count(), data.scriptRuns.Count() );
     return false;
   }
 
@@ -95,19 +89,19 @@ bool ScriptsTest( const ScriptsData& data )
 
     if( scriptRun1.characterRun.characterIndex != scriptRun2.characterRun.characterIndex )
     {
-      tet_infoline("ScriptsTest: different character index.");
+      tet_printf("ScriptsTest FAIL: different character index. %d, should be %d\n", scriptRun1.characterRun.characterIndex, scriptRun2.characterRun.characterIndex );
       return false;
     }
 
     if( scriptRun1.characterRun.numberOfCharacters != scriptRun2.characterRun.numberOfCharacters )
     {
-      tet_infoline("ScriptsTest: different number of characters.");
+      tet_printf("ScriptsTest FAIL: different number of characters. %d, should be %d\n", scriptRun1.characterRun.numberOfCharacters, scriptRun2.characterRun.numberOfCharacters );
       return false;
     }
 
     if( scriptRun1.script != scriptRun2.script )
     {
-      tet_infoline("ScriptsTest: different script.");
+      tet_printf("ScriptsTest FAIL: different script. %s, should be %s\n", TextAbstraction::ScriptName[scriptRun1.script], TextAbstraction::ScriptName[scriptRun2.script] );
       return false;
     }
   }
@@ -128,20 +122,13 @@ bool ValidateFontTest( const ValidateFontsData& data )
                                                    &utf32[0u] );
   utf32.Resize( numberOfCharacters );
 
-  // 2) Set the line break info.
-  Vector<LineBreakInfo> lineBreakInfo;
-  lineBreakInfo.Resize( numberOfCharacters );
-
-  SetLineBreakInfo( utf32, lineBreakInfo );
-
-  // 3) Set the script info.
+  // 2) Set the script info.
   Vector<ScriptRun> scripts;
   multilanguageSupport.SetScripts( utf32,
-                                   lineBreakInfo,
                                    scripts );
 
   Vector<FontRun> fonts;
-  // 4) Validate the fonts
+  // 3) Validate the fonts
   multilanguageSupport.ValidateFonts( utf32,
                                       scripts,
                                       fonts );
@@ -190,6 +177,249 @@ int UtcDaliTextMultiLanguageSetScripts(void)
   };
   scriptRuns01.PushBack( scriptRun0100 );
 
+  // Mix of LTR '\n'and RTL
+  Vector<ScriptRun> scriptRuns02;
+  ScriptRun scriptRun0200 =
+  {
+    0u,
+    12u,
+    TextAbstraction::LATIN
+  };
+  ScriptRun scriptRun0201 =
+  {
+    12u,
+    13u,
+    TextAbstraction::ARABIC
+  };
+  scriptRuns02.PushBack( scriptRun0200 );
+  scriptRuns02.PushBack( scriptRun0201 );
+
+  // Mix of RTL '\n'and LTR
+  Vector<ScriptRun> scriptRuns03;
+  ScriptRun scriptRun0300 =
+  {
+    0u,
+    14u,
+    TextAbstraction::ARABIC
+  };
+  ScriptRun scriptRun0301 =
+  {
+    14u,
+    11u,
+    TextAbstraction::LATIN
+  };
+  scriptRuns03.PushBack( scriptRun0300 );
+  scriptRuns03.PushBack( scriptRun0301 );
+
+  // White spaces. At the beginning of the text.
+  Vector<ScriptRun> scriptRuns04;
+  ScriptRun scriptRun0400 =
+  {
+    0u,
+    16u,
+    TextAbstraction::LATIN
+  };
+  scriptRuns04.PushBack( scriptRun0400 );
+
+  // White spaces. At the end of the text.
+  Vector<ScriptRun> scriptRuns05;
+  ScriptRun scriptRun0500 =
+  {
+    0u,
+    16u,
+    TextAbstraction::LATIN
+  };
+  scriptRuns05.PushBack( scriptRun0500 );
+
+  // White spaces. At the middle of the text.
+  Vector<ScriptRun> scriptRuns06;
+  ScriptRun scriptRun0600 =
+  {
+    0u,
+    16u,
+    TextAbstraction::LATIN
+  };
+  scriptRuns06.PushBack( scriptRun0600 );
+
+  // White spaces between different scripts.
+  Vector<ScriptRun> scriptRuns07;
+  ScriptRun scriptRun0700 =
+  {
+    0u,
+    8u,
+    TextAbstraction::LATIN
+  };
+  ScriptRun scriptRun0701 =
+  {
+    8u,
+    5u,
+    TextAbstraction::HANGUL
+  };
+  scriptRuns07.PushBack( scriptRun0700 );
+  scriptRuns07.PushBack( scriptRun0701 );
+
+  // White spaces between different scripts and differetn directions. Starting LTR.
+  Vector<ScriptRun> scriptRuns08;
+  ScriptRun scriptRun0800 =
+  {
+    0u,
+    18u,
+    TextAbstraction::LATIN
+  };
+  ScriptRun scriptRun0801 =
+  {
+    18u,
+    14u,
+    TextAbstraction::ARABIC
+  };
+  ScriptRun scriptRun0802 =
+  {
+    32u,
+    18u,
+    TextAbstraction::HANGUL
+  };
+  scriptRuns08.PushBack( scriptRun0800 );
+  scriptRuns08.PushBack( scriptRun0801 );
+  scriptRuns08.PushBack( scriptRun0802 );
+
+  // White spaces between different scripts and differetn directions. Starting RTL.
+  Vector<ScriptRun> scriptRuns09;
+  ScriptRun scriptRun0900 =
+  {
+    0u,
+    21u,
+    TextAbstraction::ARABIC
+  };
+  ScriptRun scriptRun0901 =
+  {
+    21u,
+    16u,
+    TextAbstraction::LATIN
+  };
+  ScriptRun scriptRun0902 =
+  {
+    37u,
+    10u,
+    TextAbstraction::HANGUL
+  };
+  ScriptRun scriptRun0903 =
+  {
+    47u,
+    20u,
+    TextAbstraction::ARABIC
+  };
+  scriptRuns09.PushBack( scriptRun0900 );
+  scriptRuns09.PushBack( scriptRun0901 );
+  scriptRuns09.PushBack( scriptRun0902 );
+  scriptRuns09.PushBack( scriptRun0903 );
+
+  // Paragraphs with different directions.
+  Vector<ScriptRun> scriptRuns10;
+  ScriptRun scriptRun1000 =
+  {
+    0u,
+    20u,
+    TextAbstraction::ARABIC
+  };
+  ScriptRun scriptRun1001 =
+  {
+    20u,
+    12u,
+    TextAbstraction::HEBREW
+  };
+  ScriptRun scriptRun1002 =
+  {
+    32u,
+    17u,
+    TextAbstraction::ARABIC
+  };
+  ScriptRun scriptRun1003 =
+  {
+    49u,
+    18u,
+    TextAbstraction::LATIN
+  };
+  ScriptRun scriptRun1004 =
+  {
+    67u,
+    14u,
+    TextAbstraction::HANGUL
+  };
+  ScriptRun scriptRun1005 =
+  {
+    81u,
+    19u,
+    TextAbstraction::ARABIC
+  };
+  ScriptRun scriptRun1006 =
+  {
+    100u,
+    13u,
+    TextAbstraction::LATIN
+  };
+  ScriptRun scriptRun1007 =
+  {
+    113u,
+    16u,
+    TextAbstraction::HEBREW
+  };
+  ScriptRun scriptRun1008 =
+  {
+    129u,
+    20u,
+    TextAbstraction::LATIN
+  };
+  ScriptRun scriptRun1009 =
+  {
+    149u,
+    14u,
+    TextAbstraction::ARABIC
+  };
+  ScriptRun scriptRun1010 =
+  {
+    163u,
+    35u,
+    TextAbstraction::HANGUL
+  };
+  scriptRuns10.PushBack( scriptRun1000 );
+  scriptRuns10.PushBack( scriptRun1001 );
+  scriptRuns10.PushBack( scriptRun1002 );
+  scriptRuns10.PushBack( scriptRun1003 );
+  scriptRuns10.PushBack( scriptRun1004 );
+  scriptRuns10.PushBack( scriptRun1005 );
+  scriptRuns10.PushBack( scriptRun1006 );
+  scriptRuns10.PushBack( scriptRun1007 );
+  scriptRuns10.PushBack( scriptRun1008 );
+  scriptRuns10.PushBack( scriptRun1009 );
+  scriptRuns10.PushBack( scriptRun1010 );
+
+  // Paragraphs with no scripts mixed with paragraphs with scripts.
+  Vector<ScriptRun> scriptRuns11;
+  ScriptRun scriptRun1100 =
+  {
+    0u,
+    31u,
+    TextAbstraction::LATIN
+  };
+  ScriptRun scriptRun1101 =
+  {
+    31u,
+    21u,
+    TextAbstraction::HEBREW
+  };
+  scriptRuns11.PushBack( scriptRun1100 );
+  scriptRuns11.PushBack( scriptRun1101 );
+
+  // Paragraphs with no scripts.
+  Vector<ScriptRun> scriptRuns12;
+  ScriptRun scriptRun1200 =
+  {
+    0u,
+    11u,
+    TextAbstraction::LATIN
+  };
+  scriptRuns12.PushBack( scriptRun1200 );
+
   const ScriptsData data[] =
   {
     {
@@ -202,8 +432,67 @@ int UtcDaliTextMultiLanguageSetScripts(void)
       "Hello world",
       scriptRuns01,
     },
+    {
+      "Mix of LTR '\\n'and RTL",
+      "Hello world\nمرحبا بالعالم",
+      scriptRuns02,
+    },
+    {
+      "Mix of RTL '\\n'and LTR",
+      "مرحبا بالعالم\nHello world",
+      scriptRuns03,
+    },
+    {
+      "White spaces. At the beginning of the text.",
+      "    Hello world.",
+      scriptRuns04,
+    },
+    {
+      "White spaces. At the end of the text.",
+      "Hello world.    ",
+      scriptRuns05,
+    },
+    {
+      "White spaces. At the middle of the text.",
+      "Hello     world.",
+      scriptRuns06,
+    },
+    {
+      "White spaces between different scripts.",
+      "  Hel   세계   ",
+      scriptRuns07,
+    },
+    {
+      "White spaces between different scripts and differetn directions. Starting LTR.",
+      "  Hello   world   مرحبا  بالعالم     안녕하세요   세계   ",
+      scriptRuns08,
+    },
+    {
+      "White spaces between different scripts and differetn directions. Starting RTL.",
+      "   مرحبا  بالعالم    Hello   world   안녕하세요   세계   مرحبا  بالعالم   ",
+      scriptRuns09
+    },
+    {
+      "Paragraphs with different directions.",
+      "   مرحبا  بالعالم   שלום עולם   مرحبا  بالعالم  \n "
+      " Hello   world   안녕하세요   세계   \n "
+      "  مرحبا  بالعالم  Hello   world    שלום עולם  \n  "
+      " Hello   world    مرحبا  بالعالم    안녕하세요   세계   \n "
+      "   안녕하세요   세계   ",
+      scriptRuns10
+    },
+    {
+      "Paragraphs with no scripts mixed with paragraphs with scripts.",
+      "  \n  \n   Hello   world  \n  \n  \n   שלום עולם  \n \n \n  ",
+      scriptRuns11
+    },
+    {
+      "Paragraphs with no scripts.",
+      "  \n  \n  \n  ",
+      scriptRuns12
+    }
   };
-  const unsigned int numberOfTests = 2u;
+  const unsigned int numberOfTests = 13u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {

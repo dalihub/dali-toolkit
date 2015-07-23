@@ -564,7 +564,7 @@ float Controller::GetHeightForWidth( float width )
   ProcessModifyEvents();
 
   Size layoutSize;
-  if( width != mImpl->mControlSize.width )
+  if( width != mImpl->mVisualModel->mControlSize.width )
   {
     // Operations that can be done only once until the text changes.
     const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |
@@ -621,9 +621,9 @@ bool Controller::Relayout( const Size& size )
     return glyphsRemoved;
   }
 
-  if( size != mImpl->mControlSize )
+  if( size != mImpl->mVisualModel->mControlSize )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "new size (previous size %f,%f)\n", mImpl->mControlSize.width, mImpl->mControlSize.height );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "new size (previous size %f,%f)\n", mImpl->mVisualModel->mControlSize.width, mImpl->mVisualModel->mControlSize.height );
 
     // Operations that need to be done if the size changes.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
@@ -632,7 +632,7 @@ bool Controller::Relayout( const Size& size )
                                                              UPDATE_ACTUAL_SIZE        |
                                                              REORDER );
 
-    mImpl->mControlSize = size;
+    mImpl->mVisualModel->mControlSize = size;
   }
 
   // Make sure the model is up-to-date before layouting
@@ -640,7 +640,7 @@ bool Controller::Relayout( const Size& size )
   mImpl->UpdateModel( mImpl->mOperationsPending );
 
   Size layoutSize;
-  bool updated = DoRelayout( mImpl->mControlSize,
+  bool updated = DoRelayout( mImpl->mVisualModel->mControlSize,
                              mImpl->mOperationsPending,
                              layoutSize );
 
@@ -811,7 +811,7 @@ bool Controller::DoRelayout( const Size& size,
     // after the first time the text has been laid out.
     // Fill the vectors again.
 
-    Length numberOfGlyphs = mImpl->mVisualModel->mGlyphs.Count();
+    const Length numberOfGlyphs = mImpl->mVisualModel->mGlyphs.Count();
 
     if( 0u == numberOfGlyphs )
     {
@@ -820,16 +820,17 @@ bool Controller::DoRelayout( const Size& size,
       return true;
     }
 
-    Vector<LineBreakInfo>& lineBreakInfo = mImpl->mLogicalModel->mLineBreakInfo;
-    Vector<WordBreakInfo>& wordBreakInfo = mImpl->mLogicalModel->mWordBreakInfo;
-    Vector<CharacterDirection>& characterDirection = mImpl->mLogicalModel->mCharacterDirections;
-    Vector<GlyphInfo>& glyphs = mImpl->mVisualModel->mGlyphs;
-    Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mVisualModel->mGlyphsToCharacters;
-    Vector<Length>& charactersPerGlyph = mImpl->mVisualModel->mCharactersPerGlyph;
+    const Vector<LineBreakInfo>& lineBreakInfo = mImpl->mLogicalModel->mLineBreakInfo;
+    const Vector<WordBreakInfo>& wordBreakInfo = mImpl->mLogicalModel->mWordBreakInfo;
+    const Vector<CharacterDirection>& characterDirection = mImpl->mLogicalModel->mCharacterDirections;
+    const Vector<GlyphInfo>& glyphs = mImpl->mVisualModel->mGlyphs;
+    const Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mVisualModel->mGlyphsToCharacters;
+    const Vector<Length>& charactersPerGlyph = mImpl->mVisualModel->mCharactersPerGlyph;
+    const Character* const textBuffer = mImpl->mLogicalModel->mText.Begin();
 
     // Set the layout parameters.
     LayoutParameters layoutParameters( size,
-                                       mImpl->mLogicalModel->mText.Begin(),
+                                       textBuffer,
                                        lineBreakInfo.Begin(),
                                        wordBreakInfo.Begin(),
                                        ( 0u != characterDirection.Count() ) ? characterDirection.Begin() : NULL,
@@ -853,6 +854,9 @@ bool Controller::DoRelayout( const Size& size,
     // Resize the vector of positions to have the same size than the vector of glyphs.
     Vector<Vector2>& glyphPositions = mImpl->mVisualModel->mGlyphPositions;
     glyphPositions.Resize( numberOfGlyphs );
+
+    // Whether the last character is a new paragraph character.
+    layoutParameters.isLastNewParagraph = TextAbstraction::IsNewParagraph( *( textBuffer + ( mImpl->mLogicalModel->mText.Count() - 1u ) ) );
 
     // Update the visual model.
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
@@ -991,16 +995,7 @@ void Controller::SetVerticalAlignment( LayoutEngine::VerticalAlignment alignment
     // Set the alignment.
     mImpl->mLayoutEngine.SetVerticalAlignment( alignment );
 
-    // Set the flag to redo the alignment operation.
-    // TODO : Is not needed re-layout and reorder again but with the current implementation it is.
-    //        Im working on a different patch to fix an issue with the alignment. When that patch
-    //        is in, this issue can be fixed.
-    const OperationsMask layoutOperations =  static_cast<OperationsMask>( LAYOUT             |
-                                                                          UPDATE_ACTUAL_SIZE |
-                                                                          ALIGN              |
-                                                                          REORDER );
-
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | layoutOperations );
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | ALIGN );
 
     mImpl->RequestRelayout();
   }
@@ -1460,7 +1455,7 @@ void Controller::SelectEvent( float x, float y, bool selectAll )
 
 void Controller::GetTargetSize( Vector2& targetSize )
 {
-  targetSize = mImpl->mControlSize;
+  targetSize = mImpl->mVisualModel->mControlSize;
 }
 
 void Controller::AddDecoration( Actor& actor, bool needsClipping )

@@ -128,64 +128,49 @@ float Button::GetAnimationTime() const
   return Dali::Toolkit::GetImplementation( *this ).GetAnimationTime();
 }
 
-void Button::SetLabel( const std::string& label )
+void Button::SetLabelText( const std::string& label )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetLabel( label );
+  Dali::Toolkit::GetImplementation( *this ).SetLabelText( label );
 }
 
-void Button::SetLabel( Actor label )
+std::string Button::GetLabelText() const
 {
-  Dali::Toolkit::GetImplementation( *this ).SetLabel( label );
+  return Dali::Toolkit::GetImplementation( *this ).GetLabelText();
 }
 
-Actor Button::GetLabel() const
+void Button::SetUnselectedImage( const std::string& filename )
 {
-  return Dali::Toolkit::GetImplementation( *this ).GetLabel();
+  Dali::Toolkit::GetImplementation( *this ).SetUnselectedImage( filename );
 }
 
-void Button::SetButtonImage( Image image )
+void Button::SetBackgroundImage( const std::string& filename )
 {
-  Actor imageActor = ImageActor::New( image );
-  Dali::Toolkit::GetImplementation( *this ).SetButtonImage( imageActor );
+  Dali::Toolkit::GetImplementation( *this ).SetBackgroundImage( filename );
 }
 
-void Button::SetBackgroundImage( Image image )
+void Button::SetSelectedImage( const std::string& filename )
 {
-  Actor imageActor = ImageActor::New( image );
-  Dali::Toolkit::GetImplementation( *this ).SetBackgroundImage( imageActor );
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( filename );
 }
 
-void Button::SetSelectedImage( Image image )
+void Button::SetSelectedBackgroundImage( const std::string& filename )
 {
-  Actor imageActor = ImageActor::New( image );
-  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( imageActor );
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedBackgroundImage( filename );
 }
 
-void Button::SetSelectedBackgroundImage( Image image )
+void Button::SetDisabledBackgroundImage( const std::string& filename )
 {
-  Dali::Toolkit::GetImplementation( *this ).SetSelectedBackgroundImage( ImageActor::New( image ) );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( filename );
 }
 
-void Button::SetDisabledBackgroundImage( Image image )
+void Button::SetDisabledImage( const std::string& filename )
 {
-  Actor imageActor = ImageActor::New( image );
-  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledBackgroundImage( imageActor );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledImage( filename );
 }
 
-void Button::SetDisabledImage( Image image )
+void Button::SetDisabledSelectedImage( const std::string& filename )
 {
-  Actor imageActor = ImageActor::New( image );
-  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledImage( imageActor );
-}
-
-void Button::SetDisabledSelectedImage( Image image )
-{
-  Actor imageActor = ImageActor::New( image );
-  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-  Dali::Toolkit::GetImplementation( *this ).SetDisabledSelectedImage( imageActor );
+  Dali::Toolkit::GetImplementation( *this ).SetDisabledSelectedImage( filename );
 }
 
 Button::ButtonSignalType& Button::PressedSignal()
@@ -207,6 +192,38 @@ Button::ButtonSignalType& Button::StateChangedSignal()
 {
   return Dali::Toolkit::GetImplementation( *this ).StateChangedSignal();
 }
+
+// Deprecated API
+
+void Button::SetLabel( Actor label )
+{
+  Dali::Toolkit::GetImplementation( *this ).SetLabel( label );
+}
+
+void Button::SetButtonImage( Image image )
+{
+  Actor imageActor = ImageActor::New( image );
+  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+  Dali::Toolkit::GetImplementation( *this ).SetButtonImage( imageActor );
+}
+
+void Button::SetSelectedImage( Image image )
+{
+  Actor imageActor = ImageActor::New( image );
+  imageActor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+  Dali::Toolkit::GetImplementation( *this ).SetSelectedImage( imageActor );
+}
+
+Actor Button::GetButtonImage() const
+{
+  return Dali::Toolkit::GetImplementation( *this ).GetButtonImage();
+}
+
+Actor Button::GetSelectedImage() const
+{
+  return Dali::Toolkit::GetImplementation( *this ).GetSelectedImage();
+}
+
 
 Button::Button( Internal::Button& implementation )
 : Control( implementation )
