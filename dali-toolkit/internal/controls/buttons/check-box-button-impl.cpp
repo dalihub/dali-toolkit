@@ -92,7 +92,7 @@ void CheckBoxButton::OnButtonInitialize()
   SetDisabledSelectedImage( DISABLED_SELECTED_BUTTON_IMAGE_DIR );
 }
 
-void CheckBoxButton::OnLabelSet()
+void CheckBoxButton::OnLabelSet( bool noPadding )
 {
   Actor& label = GetLabelActor();
 

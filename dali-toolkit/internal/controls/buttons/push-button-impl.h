@@ -96,47 +96,47 @@ public:
 private: // From Button
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnButtonInitialize()
+   * @copydoc Toolkit::Internal::Button::OnButtonInitialize
    */
   virtual void OnButtonInitialize();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnLabelSet()
+   * @copydoc Toolkit::Internal::Button::OnLabelSet
    */
-  virtual void OnLabelSet();
+  virtual void OnLabelSet( bool noPadding );
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnButtonImageSet()
+   * @copydoc Toolkit::Internal::Button::OnButtonImageSet
    */
   virtual void OnButtonImageSet();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnSelectedImageSet()
+   * @copydoc Toolkit::Internal::Button::OnSelectedImageSet
    */
   virtual void OnSelectedImageSet();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnBackgroundImage()
+   * @copydoc Toolkit::Internal::Button::OnBackgroundImage
    */
   virtual void OnBackgroundImageSet();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnSelectedBackgroundImageSet()
+   * @copydoc Toolkit::Internal::Button::OnSelectedBackgroundImageSet
    */
   virtual void OnSelectedBackgroundImageSet();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnDisabledImageSet()
+   * @copydoc Toolkit::Internal::Button::OnDisabledImageSet
    */
   virtual void OnDisabledImageSet();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnDisabledSelectedImageSet()
+   * @copydoc Toolkit::Internal::Button::OnDisabledSelectedImageSet
    */
   virtual void OnDisabledSelectedImageSet();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnDisabledBackgroundImageSet()
+   * @copydoc Toolkit::Internal::Button::OnDisabledBackgroundImageSet
    */
   virtual void OnDisabledBackgroundImageSet();
 
