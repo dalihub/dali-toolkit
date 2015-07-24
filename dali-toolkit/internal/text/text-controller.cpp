@@ -1099,6 +1099,7 @@ void Controller::KeyboardFocusGainEvent()
       ShowPlaceholderText();
     }
 
+    mImpl->mEventData->mUpdateCursorPosition = true; //If editing started without tap event, cursor update must be triggered.
     mImpl->RequestRelayout();
   }
 }
