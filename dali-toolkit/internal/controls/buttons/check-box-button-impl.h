@@ -68,17 +68,17 @@ private: // From Button
 
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnButtonInitialize()
+   * @copydoc Toolkit::Internal::Button::OnButtonInitialize
    */
   virtual void OnButtonInitialize();
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnLabelSet()
+   * @copydoc Toolkit::Internal::Button::OnLabelSet
    */
-  virtual void OnLabelSet();
+  virtual void OnLabelSet( bool noPadding );
 
   /**
-   * @copydoc Toolkit::Internal::Button::OnDisabled()
+   * @copydoc Toolkit::Internal::Button::OnDisabled
    */
   virtual void OnDisabled();
 

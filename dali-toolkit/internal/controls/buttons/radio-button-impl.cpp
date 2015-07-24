@@ -101,7 +101,7 @@ void RadioButton::OnButtonUp()
   }
 }
 
-void RadioButton::OnLabelSet()
+void RadioButton::OnLabelSet( bool noPadding )
 {
   Actor& label = GetLabelActor();
 

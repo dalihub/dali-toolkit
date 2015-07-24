@@ -445,7 +445,7 @@ void Button::SetLabelText( const std::string& label )
       Self().Add( mLabel );
     }
 
-    OnLabelSet();
+    OnLabelSet( false );
 
     RelayoutRequest();
   }
@@ -1577,7 +1577,8 @@ void Button::SetLabel( Actor label )
     // label should be the top of the button
     Self().Add( mLabel );
 
-    OnLabelSet();
+    ResetImageLayers();
+    OnLabelSet( true );
 
     RelayoutRequest();
   }
