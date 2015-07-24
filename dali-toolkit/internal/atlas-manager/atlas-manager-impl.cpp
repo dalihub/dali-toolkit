@@ -85,8 +85,7 @@ namespace
 }
 
 AtlasManager::AtlasManager()
-: mAddFailPolicy( Toolkit::AtlasManager::FAIL_ON_ADD_CREATES ),
-  mFilledPixel( FILLED_PIXEL )
+: mAddFailPolicy( Toolkit::AtlasManager::FAIL_ON_ADD_CREATES )
 {
   mNewAtlasSize.mWidth = DEFAULT_ATLAS_WIDTH;
   mNewAtlasSize.mHeight = DEFAULT_ATLAS_HEIGHT;
@@ -104,30 +103,6 @@ AtlasManagerPtr AtlasManager::New()
 
 AtlasManager::~AtlasManager()
 {
-  for ( SizeType i = 0; i < mAtlasList.size(); ++i )
-  {
-    mAtlasList[ i ].mAtlas.UploadedSignal().Disconnect( this, &AtlasManager::OnUpload );
-    delete[] mAtlasList[ i ].mStripBuffer;
-  }
-
-  // Are there any upload signals pending? Free up those buffer images now.
-  for ( SizeType i = 0; i < mUploadedImages.Size(); ++i )
-  {
-    delete[] mUploadedImages[ i ];
-  }
-}
-
-void AtlasManager::OnUpload( Image image )
-{
-  if ( mUploadedImages.Size() )
-  {
-    delete[] mUploadedImages[ 0 ];
-    mUploadedImages.Erase( mUploadedImages.Begin() );
-  }
-  else
-  {
-    DALI_LOG_ERROR("Atlas Image Upload List should not be empty\n");
-  }
 }
 
 Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( const Toolkit::AtlasManager::AtlasSize& size, Pixel::Format pixelformat )
@@ -147,32 +122,22 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( const Toolkit::AtlasMa
 
   Dali::Atlas atlas = Dali::Atlas::New( width, height, pixelformat );
   atlas.Clear( Vector4::ZERO );
-  mUploadedImages.PushBack( NULL );
   AtlasDescriptor atlasDescriptor;
   atlasDescriptor.mAtlas = atlas;
   atlasDescriptor.mSize = size;
   atlasDescriptor.mPixelFormat = pixelformat;
   atlasDescriptor.mTotalBlocks = ( width / blockWidth ) * ( height / blockHeight );
   atlasDescriptor.mAvailableBlocks = atlasDescriptor.mTotalBlocks - 1u;
-  atlas.UploadedSignal().Connect( this, &AtlasManager::OnUpload );
 
-  // What size do we need for this atlas' strip buffer ( assume 32bit pixel format )?
-  SizeType neededStripSize =( blockWidth > blockHeight - DOUBLE_PIXEL_PADDING ? blockWidth : blockHeight - DOUBLE_PIXEL_PADDING ) << 2;
-  atlasDescriptor.mStripBuffer = new PixelBuffer[ neededStripSize ];
-  memset( atlasDescriptor.mStripBuffer, 0, neededStripSize );
+  atlasDescriptor.mHorizontalStrip = BufferImage::New( blockWidth, SINGLE_PIXEL_PADDING, pixelformat );
+  atlasDescriptor.mVerticalStrip = BufferImage::New( SINGLE_PIXEL_PADDING, blockHeight - DOUBLE_PIXEL_PADDING, pixelformat );
 
-  atlasDescriptor.mHorizontalStrip = BufferImage::New( atlasDescriptor.mStripBuffer,
-                                                       blockWidth,
-                                                       SINGLE_PIXEL_PADDING,
-                                                       pixelformat );
+  memset( atlasDescriptor.mHorizontalStrip.GetBuffer(), 0, atlasDescriptor.mHorizontalStrip.GetBufferSize() );
+  memset( atlasDescriptor.mVerticalStrip.GetBuffer(), 0, atlasDescriptor.mHorizontalStrip.GetBufferSize() );
 
-  atlasDescriptor.mVerticalStrip = BufferImage::New( atlasDescriptor.mStripBuffer,
-                                                     SINGLE_PIXEL_PADDING,
-                                                     blockHeight - DOUBLE_PIXEL_PADDING,
-                                                     pixelformat );
-  mUploadedImages.PushBack( NULL );
-  atlasDescriptor.mFilledPixelImage = BufferImage::New( reinterpret_cast< PixelBuffer* >( &mFilledPixel ), 1, 1, pixelformat );
-  atlas.Upload( atlasDescriptor.mFilledPixelImage, 0, 0 );
+  BufferImage filledPixelImage = BufferImage::New( 1u, 1u, pixelformat );
+  memset( filledPixelImage.GetBuffer(), 0xFF, filledPixelImage.GetBufferSize() );
+  atlas.Upload( filledPixelImage, 0, 0 );
 
   Sampler sampler = Sampler::New( atlas, "sTexture" );
   sampler.SetProperty( Sampler::Property::AFFECTS_TRANSPARENCY, true );
@@ -612,10 +577,6 @@ void AtlasManager::UploadImage( const BufferImage& image,
   {
     DALI_LOG_ERROR("Uploading image to Atlas Failed!.\n");
   }
-  else
-  {
-     mUploadedImages.PushBack( const_cast< BufferImage& >( image ).GetBuffer() );
-  }
 
   // Blit top strip
   if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mHorizontalStrip,
@@ -624,10 +585,6 @@ void AtlasManager::UploadImage( const BufferImage& image,
   {
     DALI_LOG_ERROR("Uploading top strip to Atlas Failed!\n");
   }
-  else
-  {
-    mUploadedImages.PushBack( NULL );
-  }
 
   // Blit left strip
   if ( !mAtlasList[ atlas ].mAtlas.Upload( mAtlasList[ atlas ].mVerticalStrip,
@@ -635,10 +592,6 @@ void AtlasManager::UploadImage( const BufferImage& image,
                                            blockOffsetY + SINGLE_PIXEL_PADDING ) )
   {
     DALI_LOG_ERROR("Uploading left strip to Atlas Failed!\n");
-  }
-  else
-  {
-    mUploadedImages.PushBack( NULL );
   }
 
   // Blit bottom strip
@@ -650,10 +603,6 @@ void AtlasManager::UploadImage( const BufferImage& image,
     {
       DALI_LOG_ERROR("Uploading bottom strip to Atlas Failed!.\n");
     }
-    else
-    {
-     mUploadedImages.PushBack( NULL );
-    }
   }
 
   // Blit right strip
@@ -664,10 +613,6 @@ void AtlasManager::UploadImage( const BufferImage& image,
                                              blockOffsetY + SINGLE_PIXEL_PADDING ) )
     {
       DALI_LOG_ERROR("Uploading right strip to Atlas Failed!.\n");
-    }
-    else
-    {
-      mUploadedImages.PushBack( NULL );
     }
   }
 }
