@@ -303,10 +303,7 @@ void StyleManager::ApplyThemeStyle( Toolkit::Control control )
 
 void StyleManager::ApplyThemeStyleAtInit( Toolkit::Control control )
 {
-  if( mThemeBuilder )
-  {
-    ApplyStyle( mThemeBuilder, control );
-  }
+  ApplyThemeStyle( control );
 
   if(mFeedbackStyle)
   {
