@@ -50,7 +50,6 @@ const uint32_t DEFAULT_ATLAS_HEIGHT = 512u;
 }
 struct AtlasRenderer::Impl : public ConnectionTracker
 {
-
   enum Style
   {
     STYLE_NORMAL,
@@ -59,15 +58,30 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
   struct MeshRecord
   {
+    MeshRecord()
+    : mColor( Color::BLACK ),
+      mAtlasId( 0 )
+    {
+    }
+
     Vector4 mColor;
     uint32_t mAtlasId;
     AtlasManager::Mesh2D mMesh;
     FrameBufferImage mBuffer;
-    bool mIsUnderline;
   };
 
   struct Extent
   {
+    Extent()
+    : mBaseLine( 0.0f ),
+      mLeft( 0.0f ),
+      mRight( 0.0f ),
+      mUnderlinePosition( 0.0f ),
+      mUnderlineThickness( 0.0f ),
+      mMeshRecordIndex( 0 )
+    {
+    }
+
     float mBaseLine;
     float mLeft;
     float mRight;
@@ -78,6 +92,13 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
   struct MaxBlockSize
   {
+    MaxBlockSize()
+    : mFontId( 0 ),
+      mNeededBlockWidth( 0 ),
+      mNeededBlockHeight( 0 )
+    {
+    }
+
     FontId mFontId;
     uint32_t mNeededBlockWidth;
     uint32_t mNeededBlockHeight;
@@ -85,12 +106,25 @@ struct AtlasRenderer::Impl : public ConnectionTracker
 
   struct CheckEntry
   {
+    CheckEntry()
+    : mFontId( 0 ),
+      mIndex( 0 )
+    {
+    }
+
     FontId mFontId;
     Text::GlyphIndex mIndex;
   };
 
   struct TextCacheEntry
   {
+    TextCacheEntry()
+    : mFontId( 0 ),
+      mIndex( 0 ),
+      mImageId( 0 )
+    {
+    }
+
     FontId mFontId;
     Text::GlyphIndex mIndex;
     uint32_t mImageId;
@@ -351,15 +385,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     actor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
     actor.SetSize( actorSize );
     actor.SetColor( meshRecord.mColor );
-
-    if ( meshRecord.mIsUnderline )
-    {
-      actor.SetColorMode( USE_OWN_COLOR );
-    }
-    else
-    {
-      actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
-    }
     return actor;
   }
 
@@ -402,7 +427,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
       meshRecord.mAtlasId = slot.mAtlasId;
       meshRecord.mMesh = newMesh;
       meshRecord.mColor = color;
-      meshRecord.mIsUnderline = false;
       meshContainer.push_back( meshRecord );
 
       // Adjust extents for this new meshrecord
@@ -553,7 +577,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
         record.mMesh = newMesh;
         record.mAtlasId = meshRecords[ index ].mAtlasId;
         record.mColor = underlineColor;
-        record.mIsUnderline = true;
         meshRecords.push_back( record );
       }
     }
