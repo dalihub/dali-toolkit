@@ -346,7 +346,6 @@ int UtcDaliButtonSetUnselectedImageP(void)
   application.Render();
 
   Vector3 size = pushButton.GetCurrentSize();
-  tet_printf( "todor: size: %f,%f", size.width, size.height );
 
   DALI_TEST_EQUALS( size.width, 20.f, TEST_LOCATION );
   DALI_TEST_EQUALS( size.height, 20.f, TEST_LOCATION );

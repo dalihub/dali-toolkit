@@ -12,6 +12,7 @@ SET(TC_SOURCES
    utc-Dali-BubbleEmitter.cpp
    utc-Dali-Builder.cpp
    utc-Dali-CheckBoxButton.cpp
+   utc-Dali-ConfirmationPopup.cpp
    utc-Dali-CubeTransitionEffect.cpp
    utc-Dali-EffectsView.cpp
    utc-Dali-GaussianBlurView.cpp

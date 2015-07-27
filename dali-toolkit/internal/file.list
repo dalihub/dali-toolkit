@@ -24,8 +24,8 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp \
    $(toolkit_src_dir)/controls/image-view/image-view-impl.cpp \
    $(toolkit_src_dir)/controls/magnifier/magnifier-impl.cpp \
+   $(toolkit_src_dir)/controls/popup/confirmation-popup-impl.cpp \
    $(toolkit_src_dir)/controls/popup/popup-impl.cpp \
-   $(toolkit_src_dir)/controls/popup/popup-style-impl.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-portrait-view-impl.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-effect.cpp \
    $(toolkit_src_dir)/controls/page-turn-view/page-turn-landscape-view-impl.cpp \
