@@ -548,6 +548,7 @@ struct LayoutEngine::Impl
         lineRun.extraLength =  ( ellipsisLayout.wsLengthEndOfLine > 0.f ) ? ellipsisLayout.wsLengthEndOfLine - ellipsisLayout.extraWidth : 0.f;
         lineRun.ascender = ellipsisLayout.ascender;
         lineRun.descender = ellipsisLayout.descender;
+        lineRun.direction = !RTL;
         lineRun.ellipsis = true;
 
         actualSize.width = layoutParameters.boundingBox.width;
@@ -601,7 +602,7 @@ struct LayoutEngine::Impl
         }
         lineRun.ascender = layout.ascender;
         lineRun.descender = layout.descender;
-        lineRun.direction = false;
+        lineRun.direction = !RTL;
         lineRun.ellipsis = false;
 
         lines.PushBack( lineRun );
