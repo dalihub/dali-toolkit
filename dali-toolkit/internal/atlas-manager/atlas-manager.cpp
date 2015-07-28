@@ -85,14 +85,6 @@ void AtlasManager::StitchMesh( Mesh2D& first,
   GetImplementation(*this).StitchMesh( first, second, optimize );
 }
 
-void AtlasManager::StitchMesh( const Mesh2D& first,
-                               const Mesh2D& second,
-                               Mesh2D& out,
-                               bool optimize )
-{
-  GetImplementation(*this).StitchMesh( first, second, out, optimize );
-}
-
 Dali::Atlas AtlasManager::GetAtlasContainer( AtlasId atlas ) const
 {
   return GetImplementation(*this).GetAtlasContainer( atlas );

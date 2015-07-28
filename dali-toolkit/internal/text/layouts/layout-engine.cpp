@@ -527,11 +527,11 @@ struct LayoutEngine::Impl
 
           penY -= layout.ascender - lineRun.descender;
 
-          ellipsisLayout.glyphIndex = lineRun.glyphIndex;
+          ellipsisLayout.glyphIndex = lineRun.glyphRun.glyphIndex;
         }
         else
         {
-          lineRun.glyphIndex = 0u;
+          lineRun.glyphRun.glyphIndex = 0u;
           ellipsisLayout.glyphIndex = 0u;
         }
 
@@ -540,7 +540,7 @@ struct LayoutEngine::Impl
                              currentParagraphDirection,
                              true );
 
-        lineRun.numberOfGlyphs = ellipsisLayout.numberOfGlyphs;
+        lineRun.glyphRun.numberOfGlyphs = ellipsisLayout.numberOfGlyphs;
         lineRun.characterRun.characterIndex = ellipsisLayout.characterIndex;
         lineRun.characterRun.numberOfCharacters = ellipsisLayout.numberOfCharacters;
         lineRun.width = ellipsisLayout.length;
@@ -553,10 +553,10 @@ struct LayoutEngine::Impl
         actualSize.width = layoutParameters.boundingBox.width;
         actualSize.height += ( lineRun.ascender + -lineRun.descender );
 
-        SetGlyphPositions( layoutParameters.glyphsBuffer + lineRun.glyphIndex,
+        SetGlyphPositions( layoutParameters.glyphsBuffer + lineRun.glyphRun.glyphIndex,
                            ellipsisLayout.numberOfGlyphs,
                            penY,
-                           glyphPositions.Begin() + lineRun.glyphIndex );
+                           glyphPositions.Begin() + lineRun.glyphRun.glyphIndex );
 
         if( 0u != numberOfLines )
         {
@@ -576,8 +576,8 @@ struct LayoutEngine::Impl
         const bool isLastLine = index + layout.numberOfGlyphs == layoutParameters.totalNumberOfGlyphs;
 
         LineRun lineRun;
-        lineRun.glyphIndex = index;
-        lineRun.numberOfGlyphs = layout.numberOfGlyphs;
+        lineRun.glyphRun.glyphIndex = index;
+        lineRun.glyphRun.numberOfGlyphs = layout.numberOfGlyphs;
         lineRun.characterRun.characterIndex = layout.characterIndex;
         lineRun.characterRun.numberOfCharacters = layout.numberOfCharacters;
         if( isLastLine && !layoutParameters.isLastNewParagraph )
@@ -635,8 +635,8 @@ struct LayoutEngine::Impl
           mFontClient.GetFontMetrics( glyphInfo.fontId, fontMetrics );
 
           LineRun lineRun;
-          lineRun.glyphIndex = 0u;
-          lineRun.numberOfGlyphs = 0u;
+          lineRun.glyphRun.glyphIndex = 0u;
+          lineRun.glyphRun.numberOfGlyphs = 0u;
           lineRun.characterRun.characterIndex = 0u;
           lineRun.characterRun.numberOfCharacters = 0u;
           lineRun.width = 0.f;

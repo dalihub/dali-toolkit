@@ -103,6 +103,18 @@ public:
    */
   virtual float GetUnderlineHeight() const;
 
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetNumberOfUnderlineRuns()
+   */
+  virtual Length GetNumberOfUnderlineRuns() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetUnderlineRuns()
+   */
+  virtual void GetUnderlineRuns( GlyphRun* underlineRuns,
+                                 UnderlineRunIndex index,
+                                 Length numberOfRuns ) const;
+
 private:
 
   // Undefined
