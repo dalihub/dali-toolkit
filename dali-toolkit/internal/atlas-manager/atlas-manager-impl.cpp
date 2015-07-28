@@ -133,7 +133,7 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( const Toolkit::AtlasMa
   atlasDescriptor.mVerticalStrip = BufferImage::New( SINGLE_PIXEL_PADDING, blockHeight - DOUBLE_PIXEL_PADDING, pixelformat );
 
   memset( atlasDescriptor.mHorizontalStrip.GetBuffer(), 0, atlasDescriptor.mHorizontalStrip.GetBufferSize() );
-  memset( atlasDescriptor.mVerticalStrip.GetBuffer(), 0, atlasDescriptor.mHorizontalStrip.GetBufferSize() );
+  memset( atlasDescriptor.mVerticalStrip.GetBuffer(), 0, atlasDescriptor.mVerticalStrip.GetBufferSize() );
 
   BufferImage filledPixelImage = BufferImage::New( 1u, 1u, pixelformat );
   memset( filledPixelImage.GetBuffer(), 0xFF, filledPixelImage.GetBufferSize() );
