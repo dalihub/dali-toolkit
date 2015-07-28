@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <limits>
-#include <iostream>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
@@ -29,13 +28,7 @@
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
-#include <dali-toolkit/internal/text/multi-language-support.h>
-#include <dali-toolkit/internal/text/script-run.h>
-#include <dali-toolkit/internal/text/segmentation.h>
-#include <dali-toolkit/internal/text/shaper.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
-#include <dali-toolkit/internal/text/text-io.h>
-#include <dali-toolkit/internal/text/text-view.h>
 
 namespace
 {

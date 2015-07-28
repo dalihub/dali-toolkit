@@ -20,9 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <limits>
-#include <dali/public-api/math/vector2.h>
-#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>

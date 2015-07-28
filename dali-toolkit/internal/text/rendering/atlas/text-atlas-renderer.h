@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
-#include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali
 {

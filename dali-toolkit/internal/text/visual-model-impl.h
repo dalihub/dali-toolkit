@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/ref-object.h>
 
@@ -30,15 +31,12 @@
 namespace Dali
 {
 
-struct Vector2;
-
 namespace Toolkit
 {
 
 namespace Text
 {
 
-struct LineRun;
 class VisualModel;
 typedef IntrusivePtr<VisualModel> VisualModelPtr;
 

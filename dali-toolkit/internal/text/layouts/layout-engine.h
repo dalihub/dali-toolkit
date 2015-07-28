@@ -28,8 +28,6 @@
 namespace Dali
 {
 
-struct Vector2;
-
 namespace Toolkit
 {
 

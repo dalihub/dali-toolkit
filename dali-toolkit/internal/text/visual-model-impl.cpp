@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <memory.h>
-#include <dali/public-api/math/vector2.h>
 
 namespace Dali
 {

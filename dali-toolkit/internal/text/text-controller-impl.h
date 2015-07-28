@@ -20,13 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/clipboard.h>
-#include <dali/devel-api/adaptor-framework/imf-manager.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
 
 namespace Dali

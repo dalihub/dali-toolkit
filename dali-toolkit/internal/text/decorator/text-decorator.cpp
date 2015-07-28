@@ -20,39 +20,21 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/actors/actor.h>
+
 #include <dali/public-api/adaptor-framework/timer.h>
-#include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/animation/constraint.h>
-#include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/events/tap-gesture.h>
-#include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/pan-gesture.h>
-#include <dali/public-api/events/pan-gesture-detector.h>
 #include <dali/public-api/images/resource-image.h>
-#include <dali/public-api/math/rect.h>
-#include <dali/public-api/math/vector2.h>
-#include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-notification.h>
-#include <dali/public-api/signals/connection-tracker.h>
 
-#include <dali/devel-api/object/property-buffer.h>
 #include <dali/devel-api/rendering/geometry.h>
-#include <dali/devel-api/rendering/material.h>
 #include <dali/devel-api/rendering/renderer.h>
-#include <dali/devel-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/public-api/controls/buttons/push-button.h>
 #include <dali-toolkit/public-api/controls/default-controls/solid-color-actor.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 
 #ifdef DEBUG_ENABLED
 #define DECORATOR_DEBUG

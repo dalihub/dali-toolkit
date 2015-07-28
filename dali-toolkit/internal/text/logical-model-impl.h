@@ -38,12 +38,8 @@ namespace Toolkit
 namespace Text
 {
 
-struct BidirectionalLineInfoRun;
-struct BidirectionalParagraphInfoRun;
-struct FontRun;
 class LogicalModel;
 typedef IntrusivePtr<LogicalModel> LogicalModelPtr;
-struct ScriptRun;
 
 /**
  * @brief A logical text model contains layout independent information.

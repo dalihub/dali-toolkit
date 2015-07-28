@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/math/vector2.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-run.h>
 

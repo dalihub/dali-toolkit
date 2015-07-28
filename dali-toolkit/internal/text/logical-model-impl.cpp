@@ -18,9 +18,6 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 
-// EXTERNAL INCLUDES
-#include <memory.h>
-
 namespace Dali
 {
 

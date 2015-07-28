@@ -28,6 +28,7 @@
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
+#include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 
 using Dali::Toolkit::Text::LayoutEngine;
