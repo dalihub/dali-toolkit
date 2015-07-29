@@ -230,6 +230,7 @@ struct Controller::Impl
 
   ~Impl()
   {
+    delete mFontDefaults;
     delete mEventData;
   }
 
