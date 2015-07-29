@@ -21,6 +21,12 @@ BuildRequires:  pkgconfig(dali-core)
 #############################
 
 %define dali_toolkit_profile MOBILE
+%define dali_style_folder 720x1280
+# dali_style to be provided by build system as with dali_toolkit_profile or by passing --define 'dali_style 470x800' to the rpm build command
+
+%if "%{?dali_style}"
+  %define dali_style_folder %{dali_style}
+%endif
 
 # Further resource locations profiles can be provided here otherwise MOBILE will be used
 %if "%{tizen_profile_name}" == "mobile"
@@ -67,7 +73,7 @@ cd %{_builddir}/dali-toolkit-%{version}/build/tizen
 autoreconf --install
 DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
 DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
-%configure --enable-profile=%{dali_toolkit_profile}
+%configure --enable-profile=%{dali_toolkit_profile} --with-style=%{dali_style_folder}
 make %{?jobs:-j%jobs}
 
 ##############################

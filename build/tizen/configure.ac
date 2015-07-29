@@ -84,6 +84,13 @@ AC_ARG_ENABLE([profile],
               [dali_profile=$enableval],
               [dali_profile=UBUNTU])
 
+# Tizen Style Folder
+AC_ARG_WITH(style,
+              [AC_HELP_STRING([--with-style],
+                            [Select the style folder to use])],
+              [dali_style=$withval],
+              [dali_style=480x800])
+
 # Ensure valid profile selected
 if test "x$dali_profile" != "xUBUNTU" -a "x$dali_profile" != "xMOBILE" -a "x$dali_profile" != "xWEARABLE" -a "x$dali_profile" != "xTV" ; then
   AC_MSG_ERROR([$enable_profile is an invalid profile])
@@ -103,14 +110,9 @@ fi
 
 DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDALI_PROFILE_${dali_profile}"
 
-# Style paths
-if test "x$dali_profile" = "xUBUNTU"; then
-  STYLE_DIR=../../../dali-toolkit/styles
-fi
-
-if test "x$dali_profile" = "xMOBILE"; then
-  STYLE_DIR=../../../dali-toolkit/styles/mobile
-fi
+# Style folder
+STYLE_DIR=../../../dali-toolkit/styles
+STYLE_DIR=$STYLE_DIR/$dali_style
 
 AC_SUBST(STYLE_DIR)
 
@@ -177,4 +179,6 @@ Configuration
   Profile:                          $dali_profile
   Data Dir (Read/Write):            $dataReadWriteDir
   Data Dir (Read Only):             $dataReadOnlyDir
+  Style Dir                         $STYLE_DIR
+  Style                             $dali_style
 "
