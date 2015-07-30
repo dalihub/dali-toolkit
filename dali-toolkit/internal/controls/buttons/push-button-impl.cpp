@@ -273,12 +273,17 @@ Property::Value PushButton::GetProperty( BaseObject* object, Property::Index pro
   return value;
 }
 
-void PushButton::OnLabelSet()
+void PushButton::OnLabelSet( bool noPadding )
 {
   Actor& label = GetLabelActor();
 
   if( label )
   {
+    if( noPadding )
+    {
+      mLabelPadding = Padding( 0.0f, 0.0f, 0.0f, 0.0f );
+    }
+
     Toolkit::TextLabel textLabel = Toolkit::TextLabel::DownCast( label );
     if( textLabel )
     {
@@ -556,6 +561,7 @@ void PushButton::ConfigureSizeNegotiation()
 
   RelayoutRequest();
 }
+
 
 void PushButton::ConfigureSizeNegotiationDimension( Dimension::Type dimension, const std::vector< Actor >& images, Actor& label )
 {

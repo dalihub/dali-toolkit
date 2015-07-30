@@ -19,23 +19,14 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <dali/devel-api/adaptor-framework/imf-manager.h>
-#include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/events/gesture.h>
-#include <dali/public-api/events/key-event.h>
-#include <dali/public-api/math/vector3.h>
-#include <dali/public-api/math/vector2.h>
-#include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
-#include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
-#include <dali-toolkit/internal/text/text-view.h>
 
 namespace Dali
 {
@@ -47,7 +38,7 @@ namespace Text
 {
 
 class Controller;
-class LayoutEngine;
+class View;
 
 typedef IntrusivePtr<Controller> ControllerPtr;
 typedef Dali::Toolkit::Text::ControlInterface ControlInterface;

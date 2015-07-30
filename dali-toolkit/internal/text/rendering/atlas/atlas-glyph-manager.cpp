@@ -22,7 +22,6 @@
 #include <dali/devel-api/adaptor-framework/singleton-service.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/atlas-manager/atlas-manager-impl.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager-impl.h>
 
 namespace Dali

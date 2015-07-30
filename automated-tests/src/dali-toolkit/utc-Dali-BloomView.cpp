@@ -214,7 +214,7 @@ int UtcDaliBloomOnSizeSet(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 size( 200.0f, 300.0f, 200.0f );
+  Vector3 size( 200.0f, 300.0f, 0.0f );
   view.SetSize( size );
 
   application.SendNotification();

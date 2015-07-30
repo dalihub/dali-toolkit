@@ -46,7 +46,7 @@ typedef Dali::Vector< Toolkit::AtlasManager::AtlasSlot > slotContainer;
 class AtlasManager;
 typedef IntrusivePtr<AtlasManager> AtlasManagerPtr;
 
-class AtlasManager : public Dali::BaseObject, public ConnectionTracker
+class AtlasManager : public Dali::BaseObject
 {
 public:
 
@@ -64,8 +64,6 @@ public:
     Pixel::Format mPixelFormat;                                         // pixel format used by atlas
     BufferImage mHorizontalStrip;                                       // Image used to pad upload
     BufferImage mVerticalStrip;                                         // Image used to pad upload
-    BufferImage mFilledPixelImage;                                      // Image used by atlas for operations such as underline
-    PixelBuffer* mStripBuffer;                                          // Blank image buffer used to pad upload
     Material mMaterial;                                                 // material used for atlas texture
     Sampler mSampler;                                                   // sampler used for atlas texture
     SizeType mTotalBlocks;                                              // total number of blocks in atlas
@@ -195,10 +193,8 @@ private:
 
   std::vector< AtlasDescriptor > mAtlasList;            // List of atlases created
   std::vector< AtlasSlotDescriptor > mImageList;        // List of bitmaps store in atlases
-  Vector< PixelBuffer* > mUploadedImages;               // List of PixelBuffers passed to UploadedSignal
   Toolkit::AtlasManager::AtlasSize mNewAtlasSize;       // Atlas size to use in next creation
   Toolkit::AtlasManager::AddFailPolicy mAddFailPolicy;  // Policy for faling to add an Image
-  SizeType mFilledPixel;                                // 32Bit pixel image for underlining
 
   SizeType CheckAtlas( SizeType atlas,
                        SizeType width,
@@ -222,8 +218,6 @@ private:
                     const AtlasSlotDescriptor& desc );
 
   void PrintMeshData( const Toolkit::AtlasManager::Mesh2D& mesh );
-
-  void OnUpload( Image image );
 
   Shader mShaderL8;
   Shader mShaderRgba;

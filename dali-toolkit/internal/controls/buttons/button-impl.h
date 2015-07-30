@@ -334,8 +334,9 @@ private:
 
   /**
    * This method is called when the label is set.
+   * @param[in] noPadding Used to bypass padding if the label is to be treated generically.
    */
-  virtual void OnLabelSet() {}
+  virtual void OnLabelSet( bool noPadding ) {}
 
   /**
    * This method is called when the unselected button image is set

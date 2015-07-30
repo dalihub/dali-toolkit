@@ -19,17 +19,9 @@
 #include <dali-toolkit/internal/text/multi-language-support-impl.h>
 
 // EXTERNAL INCLUDES
-#include <memory.h>
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/adaptor-framework/singleton-service.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
-#include <dali/devel-api/text-abstraction/script.h>
-
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/logical-model-impl.h>
-#include <dali-toolkit/internal/text/font-run.h>
-#include <dali-toolkit/internal/text/script-run.h>
-#include <dali-toolkit/internal/text/text-io.h>
 
 namespace Dali
 {

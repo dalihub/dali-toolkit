@@ -20,9 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <limits>
-#include <dali/public-api/math/vector2.h>
-#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
@@ -548,6 +547,7 @@ struct LayoutEngine::Impl
         lineRun.extraLength =  ( ellipsisLayout.wsLengthEndOfLine > 0.f ) ? ellipsisLayout.wsLengthEndOfLine - ellipsisLayout.extraWidth : 0.f;
         lineRun.ascender = ellipsisLayout.ascender;
         lineRun.descender = ellipsisLayout.descender;
+        lineRun.direction = !RTL;
         lineRun.ellipsis = true;
 
         actualSize.width = layoutParameters.boundingBox.width;
@@ -601,7 +601,7 @@ struct LayoutEngine::Impl
         }
         lineRun.ascender = layout.ascender;
         lineRun.descender = layout.descender;
-        lineRun.direction = false;
+        lineRun.direction = !RTL;
         lineRun.ellipsis = false;
 
         lines.PushBack( lineRun );
