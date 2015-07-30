@@ -89,18 +89,18 @@ public:
       POPUP_DIVIDER_COLOR,                      ///< name "popup-divider-color",           The color of the divider between options,       type VECTOR4
       POPUP_ICON_COLOR,                         ///< name "popup-icon-color",              The color of the icons (if supplied),           type VECTOR4
       POPUP_PRESSED_COLOR,                      ///< name "popup-pressed-color",           The color of the option when pressed,           type VECTOR4
-      POPUP_PRESSED_IMAGE                       ///< name "popup-pressed-image",           The image to use for the option when pressed,   type STRING
+      POPUP_PRESSED_IMAGE,                      ///< name "popup-pressed-image",           The image to use for the option when pressed,   type STRING
+      POPUP_FADE_IN_DURATION,                   ///< name "popup-fade-in-duration",        The duration of the fade-in animation,          type FLOAT
+      POPUP_FADE_OUT_DURATION,                  ///< name "popup-fade-out-duration",       The duration of the fade-out animation,         type FLOAT
     };
   };
 
   /**
-   * Create the TextSelectionPopup control with the given set of buttons.
-   * @param[in] enabledButtons The given set of buttons to enable
+   * Create the TextSelectionPopup control.
    * @param[in] callbackInterface The text popup callback interface which receives the button click callbacks.
    * @return A handle to the TextSelectionPopup control.
    */
-  static TextSelectionPopup New( Buttons enabledButtons,
-                                 TextSelectionPopupCallbackInterface* callbackInterface );
+  static TextSelectionPopup New( TextSelectionPopupCallbackInterface* callbackInterface );
 
   /**
    * @brief Creates an empty handle.
@@ -141,6 +141,12 @@ public:
   static TextSelectionPopup DownCast( BaseHandle handle );
 
   /**
+   * @brief Specify which buttons to show in Popup
+   * @param[in] buttonsToEnable Buttons to enable
+   */
+  void EnableButtons( Toolkit::TextSelectionPopup::Buttons buttonsToEnable );
+
+  /**
    * @brief Raises the toolbar's layer above the given @e target layer.
    *
    * @param[in] target The layer to get above of.
@@ -148,9 +154,14 @@ public:
   void RaiseAbove( Layer target );
 
   /**
-   * @brief Show the Popup
+   * @brief Show the Popup if not being shown
    */
   void ShowPopup();
+
+  /**
+   * @brief Hide the Popup if shown
+   */
+  void HidePopup();
 
 public: // Not intended for application developers
 

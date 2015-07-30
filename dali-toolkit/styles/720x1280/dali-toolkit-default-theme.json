@@ -98,7 +98,9 @@ distributing this software or its derivatives.
       "popup-pressed-color":[0.24,0.72,0.8,0.11],
       "background-image": {
         "filename": "{DALI_IMAGE_DIR}selection-popup-bg.9.png"
-        }
+        },
+      "popup-fade-in-duration":0.25,
+      "popup-fade-out-duration":0.25
     },
     "scrollview":
     {

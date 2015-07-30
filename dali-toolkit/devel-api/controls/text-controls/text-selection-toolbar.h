@@ -62,7 +62,7 @@ public:
   {
     enum
     {
-      MAX_SIZE =  PROPERTY_START_INDEX   ///< name "popup-max-size",                The maximum size the Popup can be,              type VECTOR2
+      MAX_SIZE =  PROPERTY_START_INDEX   ///< name "max-size",                The maximum size the Popup can be,              type VECTOR2
     };
   };
 
