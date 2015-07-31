@@ -23,8 +23,9 @@ distributing this software or its derivatives.
 
 //******************************************************************************
 //
-// Default style theme for Tizen dark theme, The values should come from
-// UX design document.
+// Default Reference style theme for a 720x1280 resolution, The values determined by UX design specification.
+// This file can be copied to a new folder within the styles/ directory and amended with new default values.
+// Can be overriden if StyleManager applies another style sheet.
 //
 //******************************************************************************
 
@@ -33,8 +34,7 @@ distributing this software or its derivatives.
   {
     "textlabel":
     {
-      "font-family":"SamsungSans",
-      "font-style":"Regular"
+      "point-size":18
     },
 
     "textlabel-font-size-0":
@@ -58,11 +58,9 @@ distributing this software or its derivatives.
       "point-size":25
     },
 
-
     "textfield":
     {
-      "font-family":"SamsungSans",
-      "font-style":"Regular",
+      "point-size":28,
       "primary-cursor-color":[1.0,0.71,0.9,1.0],
       "secondary-cursor-color":[1.0,0.71,0.9,1.0],
       "selection-highlight-color":[0.75,0.96,1.0,1.0],
@@ -91,13 +89,9 @@ distributing this software or its derivatives.
     {
       "point-size":10
     },
-    "textselectionpopuplabel":
-    {
-      "point-size":8
-    },
     "textselectionpopup":
     {
-      "popup-max-size":[400,100],
+      "popup-max-size":[656,72],
       "option-divider-size":[2,0],
       "popup-divider-color":[0.23,0.72,0.8,0.11],
       "popup-icon-color":[1.0,1.0,1.0,1.0],
