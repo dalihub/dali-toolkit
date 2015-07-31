@@ -365,7 +365,9 @@ struct AtlasRenderer::Impl : public ConnectionTracker
         // Create an effect if necessary
         if ( style == STYLE_DROP_SHADOW )
         {
-          actor.Add( GenerateShadow( *mIt, actorSize, shadowOffset, shadowColor ) );
+          Actor shadowActor = GenerateShadow( *mIt, actorSize, shadowOffset, shadowColor );
+          shadowActor.Add( actor );
+          actor = shadowActor;
         }
 
         if( mActor )
@@ -712,7 +714,7 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, material );
 
     // Ensure shadow is behind the text...
-    renderer.SetDepthIndex( CONTENT_DEPTH_INDEX + mDepth - 1 );
+    renderer.SetDepthIndex( CONTENT_DEPTH_INDEX + mDepth );
     Actor actor = Actor::New();
     actor.AddRenderer( renderer );
     actor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
@@ -745,7 +747,6 @@ struct AtlasRenderer::Impl : public ConnectionTracker
     subActor.AddRenderer( normRenderer );
     subActor.SetParentOrigin( ParentOrigin::CENTER ); // Keep all of the origins aligned
     subActor.SetSize( actorSize );
-    subActor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
     subActor.SetColor( shadowColor );
 
     // Create a render task to render the effect
