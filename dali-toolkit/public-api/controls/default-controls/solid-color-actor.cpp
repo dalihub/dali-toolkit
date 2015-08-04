@@ -42,7 +42,16 @@ ImageActor CreateSolidColorActor( const Vector4& color, bool border, const Vecto
   }
 
   const unsigned int bitmapWidth = borderSize * 2 + 2;
-  BufferImage imageData = BufferImage::New( bitmapWidth, bitmapWidth, Pixel::RGBA8888 );
+  bool needAlphaChannel = (color.a < 1.0f) || ( border && borderColor.a < 1.0f );
+  BufferImage imageData;
+  if( needAlphaChannel )
+  {
+    imageData = BufferImage::New( bitmapWidth, bitmapWidth, Pixel::RGBA8888 );
+  }
+  else
+  {
+    imageData = BufferImage::New( bitmapWidth, bitmapWidth, Pixel::RGB888 );
+  }
 
   // Create the image
   PixelBuffer* pixbuf = imageData.GetBuffer();
@@ -65,24 +74,48 @@ ImageActor CreateSolidColorActor( const Vector4& color, bool border, const Vecto
   const unsigned int bottomLeft = bitmapWidth * (borderSize + 1) + borderSize;
   const unsigned int bottomRight = bottomLeft + 1;
 
-  for( size_t i = 0; i < bitmapSize; ++i )
+  if( needAlphaChannel )
   {
-    if( i == topLeft ||
-        i == topRight ||
-        i == bottomLeft ||
-        i == bottomRight )
+    for( size_t i = 0; i < bitmapSize; ++i )
     {
-      pixbuf[i*4+0] = 0xFF * color.r;
-      pixbuf[i*4+1] = 0xFF * color.g;
-      pixbuf[i*4+2] = 0xFF * color.b;
-      pixbuf[i*4+3] = 0xFF * color.a;
+      if( i == topLeft ||
+          i == topRight ||
+          i == bottomLeft ||
+          i == bottomRight )
+      {
+        pixbuf[i*4+0] = 0xFF * color.r;
+        pixbuf[i*4+1] = 0xFF * color.g;
+        pixbuf[i*4+2] = 0xFF * color.b;
+        pixbuf[i*4+3] = 0xFF * color.a;
+      }
+      else
+      {
+        pixbuf[i*4+0] = 0xFF * outerColor.r;
+        pixbuf[i*4+1] = 0xFF * outerColor.g;
+        pixbuf[i*4+2] = 0xFF * outerColor.b;
+        pixbuf[i*4+3] = 0xFF * outerColor.a;
+      }
     }
-    else
+  }
+  else
+  {
+    for( size_t i = 0; i < bitmapSize; ++i )
     {
-      pixbuf[i*4+0] = 0xFF * outerColor.r;
-      pixbuf[i*4+1] = 0xFF * outerColor.g;
-      pixbuf[i*4+2] = 0xFF * outerColor.b;
-      pixbuf[i*4+3] = 0xFF * outerColor.a;
+      if( i == topLeft ||
+          i == topRight ||
+          i == bottomLeft ||
+          i == bottomRight )
+      {
+        pixbuf[i*3+0] = 0xFF * color.r;
+        pixbuf[i*3+1] = 0xFF * color.g;
+        pixbuf[i*3+2] = 0xFF * color.b;
+      }
+      else
+      {
+        pixbuf[i*3+0] = 0xFF * outerColor.r;
+        pixbuf[i*3+1] = 0xFF * outerColor.g;
+        pixbuf[i*3+2] = 0xFF * outerColor.b;
+      }
     }
   }
 
