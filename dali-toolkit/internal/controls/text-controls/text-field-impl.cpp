@@ -240,6 +240,17 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::TextField::Property::MAX_LENGTH:
+      {
+        if( impl.mController )
+        {
+          const int max = value.Get< int >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p MAX_LENGTH %d\n", impl.mController.Get(), max );
+
+          impl.mController->SetMaximumNumberOfCharacters( max );
+        }
+        break;
+      }
       case Toolkit::TextField::Property::EXCEED_POLICY:
       {
         // TODO
@@ -250,7 +261,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mController )
         {
           const std::string alignStr = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p HORIZONTAL_ALIGNMENT %f\n", impl.mController.Get(), alignStr.c_str() );
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p HORIZONTAL_ALIGNMENT %s\n", impl.mController.Get(), alignStr.c_str() );
 
           LayoutEngine::HorizontalAlignment alignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN );
           if( Scripting::GetEnumeration< LayoutEngine::HorizontalAlignment >( alignStr.c_str(),
@@ -268,7 +279,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mController )
         {
           const std::string alignStr = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p VERTICAL_ALIGNMENT %f\n", impl.mController.Get(), alignStr.c_str() );
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p VERTICAL_ALIGNMENT %s\n", impl.mController.Get(), alignStr.c_str() );
 
           LayoutEngine::VerticalAlignment alignment( LayoutEngine::VERTICAL_ALIGN_BOTTOM );
           if( Scripting::GetEnumeration< LayoutEngine::VerticalAlignment >( alignStr.c_str(),
@@ -346,7 +357,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mDecorator )
         {
           const Vector4 color = value.Get< Vector4 >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PRIMARY_CURSOR_COLOR %f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PRIMARY_CURSOR_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
           impl.mDecorator->SetCursorColor( PRIMARY_CURSOR, color );
           impl.RequestTextRelayout();
@@ -358,7 +369,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mDecorator )
         {
           const Vector4 color = value.Get< Vector4 >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SECONDARY_CURSOR_COLOR %f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SECONDARY_CURSOR_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
           impl.mDecorator->SetCursorColor( SECONDARY_CURSOR, color );
           impl.RequestTextRelayout();
@@ -393,7 +404,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mDecorator )
         {
           const float duration = value.Get< float >();
-          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p CURSOR_BLINK_INTERVAL %f\n", impl.mController.Get(), duration );
+          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p CURSOR_BLINK_DURATION %f\n", impl.mController.Get(), duration );
 
           impl.mDecorator->SetCursorBlinkDuration( duration );
         }
@@ -448,7 +459,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_LEFT:
       {
         const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_IMAGE_LEFT %f\n", impl.mController.Get(), image.GetUrl().c_str() );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_IMAGE_LEFT %s\n", impl.mController.Get(), image.GetUrl().c_str() );
 
         if( impl.mDecorator )
         {
@@ -460,7 +471,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT:
       {
         const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_IMAGE_RIGHT %f\n", impl.mController.Get(), image.GetUrl().c_str() );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_IMAGE_RIGHT %s\n", impl.mController.Get(), image.GetUrl().c_str() );
 
         if( impl.mDecorator )
         {
@@ -472,7 +483,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT:
       {
         const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_PRESSED_IMAGE_LEFT %f\n", impl.mController.Get(), image.GetUrl().c_str() );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_PRESSED_IMAGE_LEFT %s\n", impl.mController.Get(), image.GetUrl().c_str() );
 
         if( impl.mDecorator )
         {
@@ -484,7 +495,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT:
       {
         const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_PRESSED_IMAGE_RIGHT %f\n", impl.mController.Get(), image.GetUrl().c_str() );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_PRESSED_IMAGE_RIGHT %s\n", impl.mController.Get(), image.GetUrl().c_str() );
 
         if( impl.mDecorator )
         {
@@ -496,7 +507,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::TextField::Property::SELECTION_HIGHLIGHT_COLOR:
       {
         const Vector4 color = value.Get< Vector4 >();
-        DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SELECTION_HIGHLIGHT_COLOR %f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SELECTION_HIGHLIGHT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), color.r, color.g, color.b, color.a );
 
         if( impl.mDecorator )
         {
@@ -514,17 +525,6 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
 
           impl.mDecorator->SetBoundingBox( box );
           impl.RequestTextRelayout();
-        }
-        break;
-      }
-      case Toolkit::TextField::Property::MAX_LENGTH:
-      {
-        if( impl.mController )
-        {
-          const int max = value.Get< int >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p MAX_LENGTH %d\n", impl.mController.Get(), max );
-
-          impl.mController->SetMaximumNumberOfCharacters( max );
         }
         break;
       }
@@ -607,6 +607,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mController )
         {
           value = impl.mController->GetDefaultPointSize();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::MAX_LENGTH:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetMaximumNumberOfCharacters();
         }
         break;
       }
@@ -813,14 +821,6 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mDecorator )
         {
           value = impl.mDecorator->GetBoundingBox();
-        }
-        break;
-      }
-      case Toolkit::TextField::Property::MAX_LENGTH:
-      {
-        if( impl.mController )
-        {
-          value = impl.mController->GetMaximumNumberOfCharacters();
         }
         break;
       }
