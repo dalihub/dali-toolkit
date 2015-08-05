@@ -30,6 +30,7 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 
 #include <libintl.h>
@@ -49,7 +50,7 @@ namespace
 // todo Move this to adaptor??
 #define GET_LOCALE_TEXT(string) dgettext("elementary", string)
 
-const std::string TEXT_SELECTION_POPUP_LABEL( "textselectionpopuplabel" );
+const std::string TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME( "textselectionpopupbutton" );
 const Dali::Vector4 DEFAULT_OPTION_PRESSED_COLOR( Dali::Vector4( 0.24f, 0.72f, 0.8f, 1.0f ) );
 
 #ifdef DGETTEXT_ENABLED
@@ -688,8 +689,13 @@ std::string TextSelectionPopup::GetPressedImage() const
    // 2. Set the options contents.
    if( showCaption )
    {
+     // PushButton layout properties.
      option.SetProperty( Toolkit::PushButton::Property::LABEL_PADDING, Vector4( 24.0f, 24.0f, 14.0f, 14.0f ) );
-     option.SetLabelText( button.caption );
+
+     // Label properties.
+     Property::Map buttonLabelProperties;
+     buttonLabelProperties.Insert( "text", button.caption );
+     option.SetProperty( Toolkit::Button::Property::LABEL, buttonLabelProperties );
    }
    if( showIcons )
    {
@@ -708,6 +714,7 @@ std::string TextSelectionPopup::GetPressedImage() const
    // The image can be blank, the color can be used regardless.
    option.SetSelectedImage( mPressedImage );
    option.SetProperty( Toolkit::Button::Property::SELECTED_COLOR, mPressedColor );
+   option.SetProperty( Toolkit::Control::Property::STYLE_NAME, TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME );
 
    // 5 Add option to tool bar
    mToolbar.AddOption( option );

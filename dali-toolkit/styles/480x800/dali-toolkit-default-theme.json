@@ -102,6 +102,13 @@ distributing this software or its derivatives.
       "popup-fade-in-duration":0.25,
       "popup-fade-out-duration":0.25
     },
+    "textselectionpopupbutton":
+    {
+      "label":
+      {
+        "point-size":8
+      }
+    },
     "scrollview":
     {
       "overshoot-effect-color":"B018"
