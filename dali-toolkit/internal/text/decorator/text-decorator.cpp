@@ -322,7 +322,7 @@ struct Decorator::Impl : public ConnectionTracker
         CreateGrabHandle();
 
         grabHandle.actor.SetPosition( position.x,
-                                      grabHandle.lineHeight ); // TODO : Fix for multiline.
+                                      position.y + grabHandle.lineHeight ); // TODO : Fix for multiline.
       }
       grabHandle.actor.SetVisible( isVisible );
     }
@@ -351,13 +351,13 @@ struct Decorator::Impl : public ConnectionTracker
         if( isPrimaryVisible )
         {
           primary.actor.SetPosition( primaryPosition.x,
-                                     primary.lineHeight ); // TODO : Fix for multiline.
+                                     primaryPosition.y + primary.lineHeight ); // TODO : Fix for multiline.
         }
 
         if( isSecondaryVisible )
         {
           secondary.actor.SetPosition( secondaryPosition.x,
-                                       secondary.lineHeight ); // TODO : Fix for multiline.
+                                       secondaryPosition.y + secondary.lineHeight ); // TODO : Fix for multiline.
         }
       }
       primary.actor.SetVisible( isPrimaryVisible );

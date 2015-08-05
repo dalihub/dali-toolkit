@@ -1000,7 +1000,7 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
       mEventData->mDecorator->AddHighlight( xPosition,
                                             offset.y,
                                             xPosition + static_cast<float>( numberOfCharacters ) * glyphAdvance,
-                                            height );
+                                            offset.y + height );
 
       splitStartGlyph = false;
       continue;
@@ -1025,14 +1025,17 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
       mEventData->mDecorator->AddHighlight( xPosition,
                                             offset.y,
                                             xPosition + static_cast<float>( interGlyphIndex ) * glyphAdvance,
-                                            height );
+                                            offset.y + height );
 
       splitEndGlyph = false;
       continue;
     }
 
     const float xPosition = position.x - glyph.xBearing + offset.x;
-    mEventData->mDecorator->AddHighlight( xPosition, offset.y, xPosition + glyph.advance, height );
+    mEventData->mDecorator->AddHighlight( xPosition,
+                                          offset.y,
+                                          xPosition + glyph.advance,
+                                          offset.y + height );
   }
 
   CursorInfo primaryCursorInfo;
