@@ -87,8 +87,6 @@ namespace
 {
 
 const char* DEFAULT_GRAB_HANDLE_IMAGE_RELEASED( DALI_IMAGE_DIR "cursor_handler_center.png" );
-const char* DEFAULT_SELECTION_HANDLE_ONE_RELEASED( DALI_IMAGE_DIR "selection_handle_left.png" );
-const char* DEFAULT_SELECTION_HANDLE_TWO_RELEASED( DALI_IMAGE_DIR "selection_handle_right.png" );
 
 const int DEFAULT_POPUP_OFFSET( -100.0f ); // Vertical offset of Popup from cursor or handles position.
 
@@ -214,6 +212,7 @@ struct Decorator::Impl : public ConnectionTracker
 
     ImageActor actor;
     Actor grabArea;
+    ImageActor markerActor;
 
     Vector2 position;
     float lineHeight; ///< Not the handle height
@@ -352,12 +351,16 @@ struct Decorator::Impl : public ConnectionTracker
         {
           primary.actor.SetPosition( primaryPosition.x,
                                      primaryPosition.y + primary.lineHeight ); // TODO : Fix for multiline.
+
+          SetSelectionHandleMarkerSize( primary );
         }
 
         if( isSecondaryVisible )
         {
           secondary.actor.SetPosition( secondaryPosition.x,
                                        secondaryPosition.y + secondary.lineHeight ); // TODO : Fix for multiline.
+
+          SetSelectionHandleMarkerSize( secondary );
         }
       }
       primary.actor.SetVisible( isPrimaryVisible );
@@ -579,6 +582,15 @@ struct Decorator::Impl : public ConnectionTracker
     mActiveLayer.RaiseToTop();
   }
 
+  void SetSelectionHandleMarkerSize( HandleImpl& handle )
+  {
+    if ( handle.markerActor )
+    {
+      handle.markerActor.SetResizePolicy ( ResizePolicy::FIXED, Dimension::HEIGHT );
+      handle.markerActor.SetSize( 0, handle.lineHeight );
+    }
+  }
+
   void CreateGrabHandle()
   {
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
@@ -629,16 +641,32 @@ struct Decorator::Impl : public ConnectionTracker
     }
   }
 
+  void CreateHandleMarker( HandleImpl& handle, Image& image, HandleType handleType )
+  {
+    if ( image)
+    {
+      handle.markerActor = ImageActor::New( image );
+      handle.markerActor.SetColor( mHandleColor );
+      handle.actor.Add( handle.markerActor );
+
+      if ( LEFT_SELECTION_HANDLE == handleType )
+      {
+        handle.markerActor.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
+        handle.markerActor.SetParentOrigin( ParentOrigin::TOP_RIGHT );
+      }
+      else if ( RIGHT_SELECTION_HANDLE == handleType )
+      {
+        handle.markerActor.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
+        handle.markerActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+      }
+    }
+  }
+
   void CreateSelectionHandles()
   {
     HandleImpl& primary = mHandle[ LEFT_SELECTION_HANDLE ];
     if( !primary.actor )
     {
-      if( !mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] )
-      {
-        mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] = ResourceImage::New( DEFAULT_SELECTION_HANDLE_ONE_RELEASED );
-      }
-
       primary.actor = ImageActor::New( mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
 #ifdef DECORATOR_DEBUG
       primary.actor.SetName("SelectionHandleOne");
@@ -662,6 +690,8 @@ struct Decorator::Impl : public ConnectionTracker
       primary.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnHandleOneTouched );
 
       primary.actor.Add( primary.grabArea );
+
+      CreateHandleMarker( primary, mHandleImages[LEFT_SELECTION_HANDLE_MARKER][HANDLE_IMAGE_RELEASED], LEFT_SELECTION_HANDLE );
     }
 
     if( !primary.actor.GetParent() )
@@ -672,11 +702,6 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& secondary = mHandle[ RIGHT_SELECTION_HANDLE ];
     if( !secondary.actor )
     {
-      if( !mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] )
-      {
-        mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] = ResourceImage::New( DEFAULT_SELECTION_HANDLE_TWO_RELEASED );
-      }
-
       secondary.actor = ImageActor::New( mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
 #ifdef DECORATOR_DEBUG
       secondary.actor.SetName("SelectionHandleTwo");
@@ -700,6 +725,8 @@ struct Decorator::Impl : public ConnectionTracker
       secondary.grabArea.TouchedSignal().Connect( this, &Decorator::Impl::OnHandleTwoTouched );
 
       secondary.actor.Add( secondary.grabArea );
+
+      CreateHandleMarker( secondary, mHandleImages[RIGHT_SELECTION_HANDLE_MARKER][HANDLE_IMAGE_RELEASED], RIGHT_SELECTION_HANDLE  );
     }
 
     if( !secondary.actor.GetParent() )
@@ -1142,6 +1169,15 @@ struct Decorator::Impl : public ConnectionTracker
     rightHandle.actor.SetImage( rightFlipped ? mHandleImages[LEFT_SELECTION_HANDLE][rightImageType] : mHandleImages[RIGHT_SELECTION_HANDLE][rightImageType] );
 
     rightHandle.actor.SetAnchorPoint( rightFlipped ? AnchorPoint::TOP_RIGHT : AnchorPoint::TOP_LEFT );
+
+    if ( leftHandle.markerActor )
+    {
+      leftHandle.markerActor.SetImage( leftFlipped ? mHandleImages[RIGHT_SELECTION_HANDLE_MARKER][leftImageType] : mHandleImages[LEFT_SELECTION_HANDLE_MARKER][leftImageType] );
+    }
+    if ( rightHandle.markerActor )
+    {
+      rightHandle.markerActor.SetImage( rightFlipped ? mHandleImages[LEFT_SELECTION_HANDLE_MARKER][rightImageType] : mHandleImages[RIGHT_SELECTION_HANDLE_MARKER][rightImageType] );
+    }
   }
 
   void SetScrollThreshold( float threshold )

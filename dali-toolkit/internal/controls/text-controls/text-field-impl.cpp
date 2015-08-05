@@ -112,10 +112,12 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-image",            
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-pressed-image",            STRING,    GRAB_HANDLE_PRESSED_IMAGE            )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scroll-threshold",                     FLOAT,     SCROLL_THRESHOLD                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scroll-speed",                         FLOAT,     SCROLL_SPEED                         )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-left",          STRING,    SELECTION_HANDLE_IMAGE_LEFT          )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-right",         STRING,    SELECTION_HANDLE_IMAGE_RIGHT         )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-left",  STRING,    SELECTION_HANDLE_PRESSED_IMAGE_LEFT  )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-right", STRING,    SELECTION_HANDLE_PRESSED_IMAGE_RIGHT )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-left",          MAP,       SELECTION_HANDLE_IMAGE_LEFT          )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-image-right",         MAP,       SELECTION_HANDLE_IMAGE_RIGHT         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-left",  MAP,       SELECTION_HANDLE_PRESSED_IMAGE_LEFT  )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-pressed-image-right", MAP,       SELECTION_HANDLE_PRESSED_IMAGE_RIGHT )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-marker-image-left",   MAP,       SELECTION_HANDLE_MARKER_IMAGE_LEFT   )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-handle-marker-image-right",  MAP,       SELECTION_HANDLE_MARKER_IMAGE_RIGHT  )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "selection-highlight-color",            VECTOR4,   SELECTION_HIGHLIGHT_COLOR            )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "decoration-bounding-box",              RECTANGLE, DECORATION_BOUNDING_BOX              )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "input-method-settings",                MAP,       INPUT_METHOD_SETTINGS                )
@@ -458,8 +460,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_LEFT:
       {
-        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_IMAGE_LEFT %s\n", impl.mController.Get(), image.GetUrl().c_str() );
+        const Image image = Scripting::NewImage( value );
 
         if( impl.mDecorator )
         {
@@ -470,8 +471,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT:
       {
-        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_IMAGE_RIGHT %s\n", impl.mController.Get(), image.GetUrl().c_str() );
+        const Image image = Scripting::NewImage( value );
 
         if( impl.mDecorator )
         {
@@ -482,8 +482,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT:
       {
-        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_PRESSED_IMAGE_LEFT %s\n", impl.mController.Get(), image.GetUrl().c_str() );
+        const Image image = Scripting::NewImage( value );
 
         if( impl.mDecorator )
         {
@@ -494,12 +493,31 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT:
       {
-        const ResourceImage image = ResourceImage::New( value.Get< std::string >() );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p SELECTION_HANDLE_PRESSED_IMAGE_RIGHT %s\n", impl.mController.Get(), image.GetUrl().c_str() );
+        const Image image = Scripting::NewImage( value );
 
         if( impl.mDecorator )
         {
           impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED, image );
+          impl.RequestTextRelayout();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_LEFT:
+      {
+        const Image image = Scripting::NewImage( value );
+        if( impl.mDecorator )
+        {
+          impl.mDecorator->SetHandleImage( LEFT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED, image );
+          impl.RequestTextRelayout();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_RIGHT:
+      {
+        const Image image = Scripting::NewImage( value );
+        if( impl.mDecorator )
+        {
+          impl.mDecorator->SetHandleImage( RIGHT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED, image );
           impl.RequestTextRelayout();
         }
         break;
@@ -762,50 +780,32 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_LEFT:
       {
-        if( impl.mDecorator )
-        {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED ) );
-          if( image )
-          {
-            value = image.GetUrl();
-          }
-        }
+        impl.GetHandleImagePropertyValue( value, LEFT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED );
         break;
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT:
       {
-        if( impl.mDecorator )
-        {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED ) );
-          if( image )
-          {
-            value = image.GetUrl();
-          }
-        }
+        impl.GetHandleImagePropertyValue( value, RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_RELEASED ) ;
         break;
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT:
       {
-        if( impl.mDecorator )
-        {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( LEFT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED ) );
-          if( image )
-          {
-            value = image.GetUrl();
-          }
-        }
+        impl.GetHandleImagePropertyValue( value, LEFT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED );
         break;
       }
       case Toolkit::TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT:
       {
-        if( impl.mDecorator )
-        {
-          ResourceImage image = ResourceImage::DownCast( impl.mDecorator->GetHandleImage( RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED ) );
-          if( image )
-          {
-            value = image.GetUrl();
-          }
-        }
+        impl.GetHandleImagePropertyValue( value, RIGHT_SELECTION_HANDLE, HANDLE_IMAGE_PRESSED );
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_LEFT:
+      {
+        impl.GetHandleImagePropertyValue( value, LEFT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED );
+        break;
+      }
+      case Toolkit::TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_RIGHT:
+      {
+        impl.GetHandleImagePropertyValue( value, RIGHT_SELECTION_HANDLE_MARKER, HANDLE_IMAGE_RELEASED );
         break;
       }
       case Toolkit::TextField::Property::SELECTION_HIGHLIGHT_COLOR:
@@ -1143,6 +1143,21 @@ ImfManager::ImfCallbackData TextField::OnImfEvent( Dali::ImfManager& imfManager,
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnImfEvent %p eventName %d\n", mController.Get(), imfEvent.eventName );
   return mController->OnImfEvent( imfManager, imfEvent );
+}
+
+void TextField::GetHandleImagePropertyValue(  Property::Value& value, Text::HandleType handleType, Text::HandleImageType handleImageType )
+{
+  if( mDecorator )
+  {
+    ResourceImage image = ResourceImage::DownCast( mDecorator->GetHandleImage( handleType, handleImageType ) );
+
+    if ( image )
+    {
+      Property::Map map;
+      Scripting::CreatePropertyMap( image, map );
+      value = map;
+    }
+  }
 }
 
 void TextField::EnableClipping( bool clipping, const Vector2& size )

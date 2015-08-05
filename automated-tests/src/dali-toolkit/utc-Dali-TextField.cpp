@@ -259,6 +259,24 @@ int UtcDaliTextFieldGetPropertyP(void)
   END_TEST;
 }
 
+bool SetPropertyMapRetreived( TextField& field, const Property::Index property, const std::string mapKey, const std::string mapValue )
+{
+  bool result = false;
+  Property::Map imageMap;
+  imageMap[mapKey] =mapValue;
+
+  field.SetProperty( property , imageMap );
+  Property::Value propValue = field.GetProperty( property );
+  Property::Map* resultMap = propValue.GetMap();
+
+  if ( resultMap->Find( mapKey )->Get< std::string>() == mapValue )
+  {
+    result = true;
+  }
+
+  return result;
+}
+
 // Positive test case for a method
 int UtcDaliTextFieldSetPropertyP(void)
 {
@@ -266,6 +284,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   tet_infoline(" UtcDaliToolkitTextFieldSetPropertyP");
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
+  Stage::GetCurrent().Add( field );
 
   // Note - we can't check the defaults since the stylesheets are platform-specific
 
@@ -345,13 +364,14 @@ int UtcDaliTextFieldSetPropertyP(void)
   field.SetProperty( TextField::Property::GRAB_HANDLE_PRESSED_IMAGE, "image2" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::GRAB_HANDLE_PRESSED_IMAGE ), "image2", TEST_LOCATION );
   field.SetProperty( TextField::Property::SELECTION_HANDLE_IMAGE_LEFT, "image3" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::SELECTION_HANDLE_IMAGE_LEFT ), "image3", TEST_LOCATION );
-  field.SetProperty( TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT, "image4" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT ), "image4", TEST_LOCATION );
-  field.SetProperty( TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT, "image5" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT ), "image5", TEST_LOCATION );
-  field.SetProperty( TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT, "image6" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT ), "image6", TEST_LOCATION );
+
+  // Check handle images
+  DALI_TEST_CHECK( SetPropertyMapRetreived( field, TextField::Property::SELECTION_HANDLE_IMAGE_LEFT, "filename", "leftHandleImage" )  );
+  DALI_TEST_CHECK( SetPropertyMapRetreived( field, TextField::Property::SELECTION_HANDLE_IMAGE_RIGHT, "filename", "rightHandleImage" )  );
+  DALI_TEST_CHECK( SetPropertyMapRetreived( field, TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT, "filename", "leftHandleImagePressed" )  );
+  DALI_TEST_CHECK( SetPropertyMapRetreived( field, TextField::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT, "filename", "rightHandleImagePressed" )  );
+  DALI_TEST_CHECK( SetPropertyMapRetreived( field, TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_LEFT, "filename", "leftHandleMarkerImage" )  );
+  DALI_TEST_CHECK( SetPropertyMapRetreived( field, TextField::Property::SELECTION_HANDLE_MARKER_IMAGE_RIGHT, "filename", "rightHandleMarkerImage" )  );
 
   // Check the highlight color
   field.SetProperty( TextField::Property::SELECTION_HIGHLIGHT_COLOR, Color::GREEN );
