@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_POPUP_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/animation/animation.h>
+#include <dali/devel-api/animation/animation-data.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
-#include <dali-toolkit/internal/controls/popup/popup-style-impl.h>
 
 namespace Dali
 {
@@ -36,16 +36,12 @@ namespace Dali
 namespace Toolkit
 {
 
-class Button;
-
 namespace Internal
 {
 
 class Popup;
-class PopupStyle;
 
-typedef IntrusivePtr<Popup>    PopupPtr;
-typedef IntrusivePtr<PopupStyle> PopupStylePtr;
+typedef IntrusivePtr< Popup > PopupPtr;
 
 /**
  * @copydoc Toolkit::Popup
@@ -63,81 +59,197 @@ public:
 public:
 
   /**
-   * Returns number of buttons added to Popup
-   *
-   * @return Number of buttons
+   * @copydoc Toolkit::Popup::SetPopupBackgroundImage
    */
-  size_t GetButtonCount() const;
+  void SetPopupBackgroundImage( Actor image );
 
   /**
-   * @copydoc Toolkit::Popup::SetBackgroundImage
+   * @copydoc Toolkit::Popup::GetPopupBackgroundImage
    */
-  void SetBackgroundImage( Actor image );
+  Actor GetPopupBackgroundImage() const;
 
   /**
-   * @copydoc Toolkit::Popup::SetButtonAreaImage
+   * @copydoc Toolkit::Popup::SetTitle( Actor titleActor )
    */
-  void SetButtonAreaImage( Actor image );
-
-  /**
-   * @copydoc Toolkit::Popup::SetTitle( const std::string& text );
-   */
-  void SetTitle( const std::string& text );
+  void SetTitle( Actor titleActor );
 
   /**
    * @copydoc Toolkit::Popup::GetTitle
    */
-  std::string GetTitle() const;
+  Actor GetTitle() const;
 
   /**
-   * @copydoc Toolkit::Popup::AddButton
+   * @copydoc Toolkit::Popup::SetContent
    */
-  void AddButton( Toolkit::Button button );
+  void SetContent( Actor content );
 
   /**
-   * @copydoc Toolkit::Popup::SetState( PopupState state )
+   * @copydoc Toolkit::Popup::GetContent
    */
-  void SetState( Toolkit::Popup::PopupState state );
+  Actor GetContent() const;
 
   /**
-   * @copydoc Toolkit::Popup::SetState( PopupState state, float duration )
+   * @copydoc Toolkit::Popup::SetFooter
    */
-  void SetState( Toolkit::Popup::PopupState state, float duration );
+  void SetFooter( Actor control );
 
   /**
-   * @copydoc Toolkit::Popup::GetState( )
+   * @copydoc Toolkit::Popup::GetFooter
    */
-  Toolkit::Popup::PopupState GetState() const;
+  Actor GetFooter() const;
 
   /**
-   * @copydoc Toolkit::Popup::ShowTail
+   * @copydoc Toolkit::Popup::SetDisplayState
    */
-  void ShowTail(const Vector3& position);
+  void SetDisplayState( Toolkit::Popup::DisplayState displayState );
 
   /**
-   * @copydoc Toolkit::Popup::HideTail
+   * @copydoc Toolkit::Popup::GetDisplayState
    */
-  void HideTail();
+  Toolkit::Popup::DisplayState GetDisplayState() const;
 
   /**
-   * Sets the style of the popup
-   * @param[in] style The style of the popup
+   * @copydoc Toolkit::Popup::SetTailVisibility
    */
-  void SetStyle(PopupStyle& style);
+  void SetTailVisibility( bool visible );
 
   /**
-   * Gets the style of the popup
-   * @return style of the popup
+   * @copydoc Toolkit::Popup::IsTailVisible
    */
-  PopupStylePtr GetStyle() const;
+  const bool IsTailVisible() const;
+
+  /**
+   * @copydoc Toolkit::Popup::SetTailPosition
+   */
+  void SetTailPosition( Vector3 position );
+
+  /**
+   * @copydoc Toolkit::Popup::GetTailPosition
+   */
+  const Vector3& GetTailPosition() const;
+
+  /**
+   * @copydoc Toolkit::Popup::SetContextualMode
+   */
+  void SetContextualMode( Toolkit::Popup::ContextualMode mode );
+
+  /**
+   * @copydoc Toolkit::Popup::GetContextualMode
+   */
+  Toolkit::Popup::ContextualMode GetContextualMode() const;
+
+  /**
+   * @copydoc Toolkit::Popup::SetAnimationDuration
+   */
+  void SetAnimationDuration( float duration );
+
+  /**
+   * @copydoc Toolkit::Popup::GetAnimationDuration
+   */
+  float GetAnimationDuration() const;
+
+  /**
+   * @copydoc Toolkit::Popup::SetAnimationMode
+   */
+  void SetAnimationMode( Toolkit::Popup::AnimationMode animationMode );
+
+  /**
+   * @copydoc Toolkit::Popup::GetAnimationMode
+   */
+  Toolkit::Popup::AnimationMode GetAnimationMode() const;
+
+  /**
+   * @copydoc Toolkit::Popup::SetAutoHideDelay
+   */
+  void SetAutoHideDelay( int delay );
+
+  /**
+   * @copydoc Toolkit::Popup::GetAutoHideDelay
+   */
+  int GetAutoHideDelay() const;
+
+  /**
+   * @copydoc Toolkit::Popup::SetBackingEnabled
+   */
+  void SetBackingEnabled( bool enabled );
+
+  /**
+   * @copydoc Toolkit::Popup::IsBackingEnabled
+   */
+  const bool IsBackingEnabled() const;
+
+  /**
+   * @copydoc Toolkit::Popup::SetBackingColor
+   */
+  void SetBackingColor( Vector4 color );
+
+  /**
+   * @copydoc Toolkit::Popup::GetBackingColor
+   */
+  const Vector4& GetBackingColor() const;
+
+  /**
+   * @copydoc Toolkit::Popup::SetTailUpImage
+   */
+  void SetTailUpImage( std::string image );
+
+  /**
+   * @copydoc Toolkit::Popup::GetTailUpImage
+   */
+  const std::string& GetTailUpImage() const;
+
+  /**
+   * @copydoc Toolkit::Popup::SetTailDownImage
+   */
+  void SetTailDownImage( std::string image );
+
+  /**
+   * @copydoc Toolkit::Popup::GetTailDownImage
+   */
+  const std::string& GetTailDownImage() const;
+
+  /**
+   * @copydoc Toolkit::Popup::SetTailLeftImage
+   */
+  void SetTailLeftImage( std::string image );
+
+  /**
+   * @copydoc Toolkit::Popup::GetTailLeftImage
+   */
+  const std::string& GetTailLeftImage() const;
+
+  /**
+   * @copydoc Toolkit::Popup::SetTailRightImage
+   */
+  void SetTailRightImage( std::string image );
+
+  /**
+   * @copydoc Toolkit::Popup::GetTailRightImage
+   */
+  const std::string& GetTailRightImage() const;
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] propertyIndex The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value );
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] propertyIndex The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
 
 protected:
 
   /**
    * Construct a new Popup.
-   * @param[in] style of the popup
    */
-  Popup(PopupStyle& style);
+  Popup();
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -147,33 +259,94 @@ protected:
 private:
 
   /**
-   * Creates and applies the default background image.
+   * @brief Creates the layout of the popup, to be done just before showing for the first time.
+   * Also calls OnLayoutSetup() to allow derived classes to perform layout at this stage.
    */
-  void SetDefaultBackgroundImage();
+  void LayoutPopup();
 
   /**
-   * Create Dim Backing
-   * (covers all content behind the dialog)
+   * @brief Creates or destroys the popup tail based on the current TAIL_DISPLAYED property.
+   * Also uses the TAIL_POSITION property to position it.
    */
-  void CreateBacking();
+  void LayoutTail();
 
   /**
-   * Create Dialog
-   * (dialog content resides inside this - buttons, title etc.)
+   * @brief Performs any relative positioning required based on the current contextual mode, if set.
+   * If contextual mode is not enabled, this method has no effect.
+   * @param[in] size The Popups current size (can be accessed from within the OnRelayout() method).
    */
-  void CreateDialog();
+  void LayoutContext( const Vector2& size );
 
   /**
-   * Animate Popup by scaling uniformally from 0 to 100% and vice versa (default behaviour)
-   * @param[in] state The desired state to change into.
-   * @param[in] duration The time for this animation to take.
+   * @brief All transition-in animation setup and layout is done here.
+   * Different types of animation mode require different layouts to work,
+   * this function encapsulates anything animation-mode specific.
+   * This is called once for multiple displays/hides of the pops.
+   * It is only re-called when the layout becomes dirty.
    */
-  void HandleStateChange( Toolkit::Popup::PopupState state, float duration );
+  void LayoutAnimation();
 
   /**
-   * Invoked once StateChange has completed.
+   * @brief Initiates a transition-in or transition-out animation based
+   * on the current animation settings.
+   * @param[in] transitionIn True to perform a transition-in, false for transition out.
+   * @param[in] instantaneous Optional - If set to true will override the duration to provide an instant animation.
    */
-  void HandleStateChangeComplete();
+  void StartTransitionAnimation( bool transitionIn, bool instantaneous = false );
+
+  /**
+   * @brief Invoked once a display state change has completed.
+   */
+  void DisplayStateChangeComplete();
+
+  /**
+   * @brief This is called when the auto-hide timer finishes.
+   * It performs a display-state change to HIDDEN.
+   * @return True as signal is consumed.
+   */
+  bool OnAutoHideTimeReached();
+
+  /**
+   * @brief Create Dimmed Backing (covers all content behind the dialog).
+   *
+   * @return The backing actor.
+   */
+  ImageActor CreateBacking();
+
+  /**
+   * @brief Creates the lower area within the popup.
+   */
+  void CreateFooter();
+
+  /**
+   * @brief Sets if the popup allows touch events to pass through or not.
+   *
+   * @param[in] enabled Set to true to make the popup touch-transparent.
+   */
+  void SetTouchTransparent( bool enabled );
+
+  /**
+   * @brief Returns if the popup allows touch events to pass through or not.
+   *
+   * @return True if the popup is touch-transparent.
+   */
+  const bool IsTouchTransparent() const;
+
+  /**
+   * @brief Allows the popup entry animation to be setup from a Property::Map that could
+   * originate, for example, from a JSON file.
+   *
+   * @param[in] map A Property::Map containing a description of an animation
+   */
+  void SetEntryAnimationData( const Property::Map& map );
+
+  /**
+   * @brief Allows the popup exit animation to be setup from a Property::Map that could
+   * originate, for example, from a JSON file.
+   *
+   * @param[in] map A Property::Map containing a description of an animation
+   */
+  void SetExitAnimationData( const Property::Map& map );
 
 public: // Signals
 
@@ -183,9 +356,24 @@ public: // Signals
   Toolkit::Popup::TouchedOutsideSignalType& OutsideTouchedSignal();
 
   /**
+   * @copydoc Dali::Toolkit::Popup::ShowingSignal()
+   */
+  Toolkit::Popup::DisplayStateChangeSignalType& ShowingSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::Popup::ShownSignal()
+   */
+  Toolkit::Popup::DisplayStateChangeSignalType& ShownSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::Popup::HidingSignal()
+   */
+  Toolkit::Popup::DisplayStateChangeSignalType& HidingSignal();
+
+  /**
    * @copydoc Dali::Toolkit::Popup::HiddenSignal()
    */
-  Toolkit::Popup::HiddenSignalType& HiddenSignal();
+  Toolkit::Popup::DisplayStateChangeSignalType& HiddenSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -201,10 +389,10 @@ public: // Signals
 private:
 
   /**
-   * Signal occurs when the State animation (transition from hide<->show) finishes
+   * Signal occurs when the State animation (transition from hide <-> show) finishes.
    * @param[in] source The animation that just finished.
    */
-  void OnStateAnimationFinished( Animation& source );
+  void OnDisplayChangeAnimationFinished( Animation& source );
 
   /**
    * Signal occurs when the dimmed backing for the Popup is touched.
@@ -215,8 +403,8 @@ private:
   bool OnBackingTouched(Actor actor, const TouchEvent& event);
 
   /**
-   * Signal occurs when the wheel event is occured on dimmed backing for the Popup.
-   * @param[in] actor The Actor got wheel
+   * Signal occurs when a mouse wheel event occurs on the dimmed backing.
+   * @param[in] actor The Actor that got the wheel event.
    * @param[in] event The Wheel Event.
    * @return Whether to consume event or not.
    */
@@ -236,9 +424,16 @@ private:
   virtual void OnInitialize();
 
   /**
-   * @copydoc Dali::CustomActorImpl::OnPropertySet()
+   * Called whenever the popup layout is re-set up.
+   * Normally due to a change in contents.
+   * Note: This is only done when the popup is shown.
    */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
+  virtual void OnLayoutSetup() {}
+
+  /**
+   * Called when the popup is directly or indirectly parented to the stage.
+   */
+  virtual void OnControlStageConnection();
 
   /**
    * From Control; called after a child has been added to the owning actor.
@@ -257,11 +452,6 @@ private:
   virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
 
   /**
-   * @copydoc Control::OnKeyEvent()
-   */
-  virtual bool OnKeyEvent(const KeyEvent& event);
-
-  /**
    * @copydoc Control::GetNaturalSize()
    */
   virtual Vector3 GetNaturalSize();
@@ -269,93 +459,99 @@ private:
   /**
    * @copydoc Control::GetHeightForWidth()
    */
-  float GetHeightForWidth( float width );
+  virtual float GetHeightForWidth( float width );
 
   /**
    * @copydoc Control::GetWidthForHeight()
    */
-  float GetWidthForHeight( float height );
+  virtual float GetWidthForHeight( float height );
+
+  /**
+   * @copydoc Control::OnKeyEvent()
+   */
+  virtual bool OnKeyEvent( const KeyEvent& event );
 
   /**
    * @copydoc Control::GetNextKeyboardFocusableActor()
    */
-  Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled);
-
-  /**
-   * Create the root actor for the footer
-   */
-  void CreateFooter();
+  Actor GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled );
 
 private:
 
-  // Undefined
+  // Undefined.
   Popup(const Popup&);
 
-  // Undefined
+  // Undefined.
   Popup& operator=(const Popup& rhs);
 
 private:
 
-  struct LayoutInfo
-  {
-    Vector3 mTitleSize;
-    Vector3 mContentSize;
-    Vector3 mButtonBgSize;
-    std::vector<Vector3> mButtonSize;
-  };
+  Toolkit::Popup::TouchedOutsideSignalType     mTouchedOutsideSignal;
+  Toolkit::Popup::DisplayStateChangeSignalType mShowingSignal;
+  Toolkit::Popup::DisplayStateChangeSignalType mShownSignal;
+  Toolkit::Popup::DisplayStateChangeSignalType mHidingSignal;
+  Toolkit::Popup::DisplayStateChangeSignalType mHiddenSignal;
 
-private:
+  Layer mLayer;                                      ///< Popup Layer (i.e. Dim backing and PopupBg reside in this).
+  Toolkit::TableView mPopupLayout;                   ///< Popup Background (i.e. dialog reside in this).
+  ImageActor mBacking;                               ///< Backing actor (dim effect).
+  Actor mPreviousFocusedActor;                       ///< Store the previous focused actor to restore the focus when popup hide.
+  Actor mTailImage;                                  ///< Stores the tail image.
+  Actor mPopupContainer;                             ///< This actor is used to house the background image and the main popup layout.
+  Animation mAnimation;                              ///< The current animation in use used to manage display state changing.
+  bool mAlterAddedChild;                             ///< Flag used to control whether children are reparented or not.
+  bool mLayoutDirty;                                 ///< Set to true whenever any property that would require a layout update is modified.
+  Timer mAutoHideTimer;                              ///< Used to perform an auto-hide of the popup if desired.
+  bool mTouchTransparent;                            ///< Allows all events to pass through the popup.
 
-  bool mShowing;                          ///< Popup is showing or not
+  // Main Content related properties:
+  Actor mTitle;                                      ///< Stores the text title.
+  Actor mContent;                                    ///< Stores the unselected content.
+  Actor mFooter;                                     ///< Stores the footer content (typically controls).
 
-  Layer mLayer;                           ///< Popup Layer (i.e. Dim backing and PopupBg reside in this)
-  Toolkit::TableView mPopupLayout;        ///< Popup layout (i.e. dialog reside in this)
-  ImageActor mBacking;                    ///< Backing actor (dim effect)
+  // Display related properties.
+  Toolkit::Popup::DisplayState mDisplayState;        ///< The current display state of the popup.
+  bool mTailVisible;                                 ///< True if the popup tail should be visible.
+  Vector3 mTailPosition;                             ///< The position of the tail.
+  Toolkit::Popup::ContextualMode mContextualMode;    ///< Allows the popup to be layed out adjacent to its parent in different directions.
+  float mAnimationDuration;                          ///< The duration of the transition in and out animations.
+  Toolkit::Popup::AnimationMode mAnimationMode;      ///< The animation to use to transition in and out.
+  Dali::AnimationData mEntryAnimationData;           ///< Stores description data that can be used for generating a custom entry animation.
+  Dali::AnimationData mExitAnimationData;            ///< Stores description data that can be used for generating a custom exit animation.
+  unsigned int mAutoHideDelay;                       ///< If set, will auto-hide the popup after a specified amount of time.
 
-  Actor mPreviousFocusedActor;            ///< Store the previous focused actor to restore the focus when popup hide
-
-  Actor mBackgroundImage;                 ///< Stores the background image.
-  Actor mButtonAreaImage;                 ///< Stores the button background image.
-  Toolkit::TextLabel mTitle;               ///< Stores the text title.
-  Actor mContent;                         ///< Stores popup's content.
-  Actor mBottomBg;                        ///< bottom button bar background. ImageActor is replaced with Actor due to hidden image.
-  Actor mTailImage;                       ///< Stores the tail image
-
-  std::vector< Actor > mButtons;          ///< Keeps track of the buttons added to this popup.
-  Toolkit::Popup::PopupState mState;      ///< Popup current state.
-  Animation mAnimation;                   ///< The animation instance managing state changing.
-  bool mAlterAddedChild;                  ///< Flag used to control whether children are reparented or not.
-  PopupStylePtr mPopupStyle;              ///< The style to be used for this popup.
-
-  LayoutInfo mLayoutInfo;                 ///< Stores sizes of all popup components.
-
-  Toolkit::Popup::TouchedOutsideSignalType mTouchedOutsideSignal;
-  Toolkit::Popup::HiddenSignalType mHiddenSignal;
-
-  Property::Index mPropertyTitle;         ///< Property index for Title.
-  Property::Index mPropertyState;         ///< Property index for popup state.
+  // Style related properties:
+  bool mBackingEnabled;                              ///< True if a dimmed backing will be used.
+  Vector4 mBackingColor;                             ///< The color of the backing.
+  Actor mPopupBackgroundImage;                       ///< Stores the background image.
+  Vector4 mBackgroundOuterBorder;                    ///< Background external border margin size
+  float mMargin;                                     ///< Internal margin for popup contents.
+  std::string mTailUpImage;                          ///< Image used for the tail for the up direction.
+  std::string mTailDownImage;                        ///< Image used for the tail for the down direction.
+  std::string mTailLeftImage;                        ///< Image used for the tail for the left direction.
+  std::string mTailRightImage;                       ///< Image used for the tail for the right direction.
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
 
-inline Toolkit::Internal::Popup& GetImpl(Toolkit::Popup& pub)
+inline Toolkit::Internal::Popup& GetImpl( Toolkit::Popup& publicObject )
 {
-  DALI_ASSERT_ALWAYS(pub);
+  DALI_ASSERT_ALWAYS( publicObject );
 
-  Dali::RefObject& handle = pub.GetImplementation();
+  Dali::RefObject& handle = publicObject.GetImplementation();
 
-  return static_cast<Toolkit::Internal::Popup&>(handle);
+  return static_cast<Toolkit::Internal::Popup&>( handle );
 }
 
-inline const Toolkit::Internal::Popup& GetImpl(const Toolkit::Popup& pub)
+inline const Toolkit::Internal::Popup& GetImpl( const Toolkit::Popup& publicObject )
 {
-  DALI_ASSERT_ALWAYS(pub);
+  DALI_ASSERT_ALWAYS( publicObject );
 
-  const Dali::RefObject& handle = pub.GetImplementation();
+  const Dali::RefObject& handle = publicObject.GetImplementation();
 
-  return static_cast<const Toolkit::Internal::Popup&>(handle);
+  return static_cast<const Toolkit::Internal::Popup&>( handle );
 }
 
 } // namespace Toolkit

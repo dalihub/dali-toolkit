@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,11 +34,16 @@ class Timer;
 
 typedef IntrusivePtr<Timer> TimerPtr;
 
+Dali::Timer::TimerSignalType gTickSignal;
+
 /**
  * Implementation of the timer
  */
 class Timer : public BaseObject
 {
+public:
+  void MockEmitSignal();
+
 public:
   static TimerPtr New( unsigned int milliSec );
   Timer( unsigned int milliSec );
@@ -63,7 +68,6 @@ private: // Implementation
 
 private: // Data
 
-  Dali::Timer::TimerSignalType mTickSignal;
   unsigned int mInterval;
 };
 
@@ -87,7 +91,7 @@ inline const Timer& GetImplementation(const Dali::Timer& timer)
 
 TimerPtr Timer::New( unsigned int milliSec )
 {
-  TimerPtr timerImpl = new Timer(10);
+  TimerPtr timerImpl = new Timer( milliSec );
   return timerImpl;
 }
 
@@ -130,8 +134,16 @@ bool Timer::Tick()
 
 Dali::Timer::TimerSignalType& Timer::TickSignal()
 {
-  return mTickSignal;
+  return gTickSignal;
 }
+
+// Mock setup functions:
+
+void Timer::MockEmitSignal()
+{
+  gTickSignal.Emit();
+}
+
 
 } // namespace Adaptor
 
@@ -204,6 +216,13 @@ Timer::TimerSignalType& Timer::TickSignal()
 Timer::Timer(Internal::Adaptor::Timer* timer)
 : BaseHandle(timer)
 {
+}
+
+// Mock setup functions:
+
+void Timer::MockEmitSignal()
+{
+  Internal::Adaptor::GetImplementation( *this ).MockEmitSignal();
 }
 
 } // namespace Dali
