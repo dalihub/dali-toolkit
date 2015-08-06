@@ -325,10 +325,10 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
         // Adds white spaces between characters.
         currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
         numberOfAllScriptCharacters = 0u;
-
-        // Add one more character to the run.
-        ++currentScriptRun.characterRun.numberOfCharacters;
       }
+
+      // Add one more character to the run.
+      ++currentScriptRun.characterRun.numberOfCharacters;
     }
   }
 
