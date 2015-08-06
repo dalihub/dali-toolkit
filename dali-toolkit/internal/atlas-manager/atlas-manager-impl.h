@@ -122,14 +122,6 @@ public:
                    bool optimize );
 
   /**
-   * @copydoc Toolkit::AtlasManager::StitchMesh
-   */
-  void StitchMesh(  const Toolkit::AtlasManager::Mesh2D& first,
-                    const Toolkit::AtlasManager::Mesh2D& second,
-                    Toolkit::AtlasManager::Mesh2D& out,
-                    bool optimize );
-
-  /**
    * @copydoc Toolkit::AtlasManager::Remove
    */
   bool Remove( ImageId id );

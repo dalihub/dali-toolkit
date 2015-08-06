@@ -61,7 +61,6 @@ void TextSelectionToolbar::AddOption( Actor& option )
   GetImpl(*this).AddOption(option);
 }
 
-
 void TextSelectionToolbar::AddDivider( Actor& divider )
 {
   GetImpl(*this).AddDivider( divider );

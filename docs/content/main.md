@@ -51,12 +51,13 @@
  + [Accessibility](@ref accessibility)
 
 ### UI Components
- + [Text Label](@ref text-label)
- + [Text Field](@ref text-field)
  + Buttons
- + TableView
- + [Scroll View](@ref scroll-view)
  + [ItemView](@ref item-view)
+ + [Popup](@ref popup)
+ + [Scroll View](@ref scroll-view)
+ + TableView
+ + [Text Field](@ref text-field)
+ + [Text Label](@ref text-label)
 
 ### RenderTasks
 

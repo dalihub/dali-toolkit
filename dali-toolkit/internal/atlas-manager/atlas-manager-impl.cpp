@@ -489,16 +489,22 @@ void AtlasManager::StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
                                const Toolkit::AtlasManager::Mesh2D& second,
                                bool optimize )
 {
-  uint32_t vc = first.mVertices.Size();
+  const uint32_t verticesCount = first.mVertices.Size();
+  first.mVertices.Insert( first.mVertices.End(),
+                          second.mVertices.Begin(),
+                          second.mVertices.End() );
 
-  for ( uint32_t v = 0; v < second.mVertices.Size(); ++v )
-  {
-    first.mVertices.PushBack( second.mVertices[ v ] );
-  }
+  const uint32_t indicesCount = first.mIndices.Size();
+  first.mIndices.Insert( first.mIndices.End(),
+                         second.mIndices.Begin(),
+                         second.mIndices.End() );
 
-  for ( uint32_t i = 0; i < second.mIndices.Size(); ++i )
+  for( Vector<unsigned int>::Iterator it = first.mIndices.Begin() + indicesCount,
+         endIt = first.mIndices.End();
+       it != endIt;
+       ++it )
   {
-    first.mIndices.PushBack( second.mIndices[ i ] + vc );
+    *it += verticesCount;
   }
 
   if ( optimize )
@@ -506,41 +512,6 @@ void AtlasManager::StitchMesh( Toolkit::AtlasManager::Mesh2D& first,
     Toolkit::AtlasManager::Mesh2D optimizedMesh;
     OptimizeMesh( first, optimizedMesh );
     first = optimizedMesh;
-  }
-}
-
-void AtlasManager::StitchMesh( const Toolkit::AtlasManager::Mesh2D& first,
-                               const Toolkit::AtlasManager::Mesh2D& second,
-                               Toolkit::AtlasManager::Mesh2D& out,
-                               bool optimize )
-{
-  uint32_t vc = first.mVertices.Size();
-
-  for ( uint32_t v = 0; v < vc; ++v )
-  {
-    out.mVertices.PushBack( first.mVertices[ v ] );
-  }
-
-  for ( uint32_t v = 0; v < second.mVertices.Size(); ++v )
-  {
-    out.mVertices.PushBack( second.mVertices[ v ] );
-  }
-
-  for ( uint32_t i = 0; i < first.mIndices.Size(); ++i )
-  {
-    out.mIndices.PushBack( first.mIndices[ i ] );
-  }
-
-  for ( uint32_t i = 0; i < second.mIndices.Size(); ++i )
-  {
-    out.mIndices.PushBack( second.mIndices[ i ] + vc );
-  }
-
-  if ( optimize )
-  {
-    Toolkit::AtlasManager::Mesh2D optimizedMesh;
-    OptimizeMesh( out, optimizedMesh );
-    out = optimizedMesh;
   }
 }
 

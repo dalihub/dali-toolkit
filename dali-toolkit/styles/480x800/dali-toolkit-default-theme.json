@@ -23,8 +23,9 @@ distributing this software or its derivatives.
 
 //******************************************************************************
 //
-// Default style theme for Tizen dark theme, The values should come from
-// UX design document.
+// Default Reference style theme for a 480x800 resolution, The values determined by UX design specification.
+// This file can be copied to a new folder within the styles/ directory and amended with new default values.
+// Can be overriden if StyleManager applies another style sheet.
 //
 //******************************************************************************
 
@@ -33,13 +34,60 @@ distributing this software or its derivatives.
   {
     "textlabel":
     {
-      "font-family":"HelveticaNeue",
-      "font-style":"Regular",
       "point-size":18
     },
-    "textselectionpopuplabel":
+
+    "textlabel-font-size-0":
     {
-      "point-size":18
+      "point-size":8
+    },
+    "textlabel-font-size-1":
+    {
+      "point-size":10
+    },
+    "textlabel-font-size-2":
+    {
+      "point-size":15
+    },
+    "textlabel-font-size-3":
+    {
+      "point-size":19
+    },
+    "textlabel-font-size-4":
+    {
+      "point-size":25
+    },
+
+    "textfield":
+    {
+      "point-size":18,
+      "primary-cursor-color":[0.0,0.72,0.9,1.0],
+      "secondary-cursor-color":[0.0,0.72,0.9,1.0],
+      "selection-highlight-color":[0.75,0.96,1.0,1.0],
+      "grab-handle-image":"{DALI_IMAGE_DIR}cursor_handler_center.png",
+      "selection-handle-image-left":"{DALI_IMAGE_DIR}selection_handle_left.png",
+      "selection-handle-image-right":"{DALI_IMAGE_DIR}selection_handle_right.png"
+    },
+
+    "textfield-font-size-0":
+    {
+      "point-size":10
+    },
+    "textfield-font-size-1":
+    {
+      "point-size":10
+    },
+    "textfield-font-size-2":
+    {
+      "point-size":10
+    },
+    "textfield-font-size-3":
+    {
+      "point-size":10
+    },
+    "textfield-font-size-4":
+    {
+      "point-size":10
     },
     "textselectionpopup":
     {
@@ -50,19 +98,9 @@ distributing this software or its derivatives.
       "popup-pressed-color":[0.24,0.72,0.8,0.11],
       "background-image": {
         "filename": "{DALI_IMAGE_DIR}selection-popup-bg.9.png"
-        }
-    },
-    "textfield":
-    {
-      "font-family":"HelveticaNeue",
-      "font-style":"Regular",
-      "point-size":18,
-      "primary-cursor-color":[0.0,0.71,0.9,1.0],
-      "secondary-cursor-color":[0.0,0.71,0.9,1.0],
-      "selection-highlight-color":[0.75,0.96,1.0,1.0],
-      "grab-handle-image":"{DALI_IMAGE_DIR}cursor_handler_center.png",
-      "selection-handle-image-left":"{DALI_IMAGE_DIR}selection_handle_left.png",
-      "selection-handle-image-right":"{DALI_IMAGE_DIR}selection_handle_right.png"
+        },
+      "popup-fade-in-duration":0.25,
+      "popup-fade-out-duration":0.25
     },
     "scrollview":
     {

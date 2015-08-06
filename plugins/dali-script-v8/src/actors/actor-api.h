@@ -64,6 +64,9 @@ namespace ActorApi
   void ScreenToLocal( const v8::FunctionCallbackInfo< v8::Value >& args );
   void SetKeyboardFocusable( const v8::FunctionCallbackInfo< v8::Value >& args );
   void IsKeyboardFocusable( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void GetNaturalSize( const v8::FunctionCallbackInfo< v8::Value >& args );
+  void GetWidthForHeight( const v8::FunctionCallbackInfo<v8::Value>& args );
+  void GetHeightForWidth( const v8::FunctionCallbackInfo<v8::Value>& args );
   void TranslateBy( const v8::FunctionCallbackInfo< v8::Value >& args );
   void RotateBy( const v8::FunctionCallbackInfo< v8::Value >& args );
   void ScaleBy( const v8::FunctionCallbackInfo< v8::Value >& args );

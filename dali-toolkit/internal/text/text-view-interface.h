@@ -33,6 +33,8 @@ namespace Toolkit
 namespace Text
 {
 
+struct GlyphRun;
+
 /**
  * @brief Abstract interface to provide the information necessary displaying text.
  *
@@ -129,6 +131,23 @@ public:
    */
   virtual float GetUnderlineHeight() const = 0;
 
+  /**
+   * @brief Retrieves the number of underline runs.
+   *
+   * @return The number of underline runs.
+   */
+  virtual Length GetNumberOfUnderlineRuns() const = 0;
+
+  /**
+   * @brief Retrieves the underline runs.
+   *
+   * @param[out] underlineRuns Pointer to a buffer where the underline runs are copied.
+   * @param[in] index Index of the first underline run to be copied.
+   * @param[in] numberOfRuns Number of underline runs to be copied.
+   */
+  virtual void GetUnderlineRuns( GlyphRun* underlineRuns,
+                                 UnderlineRunIndex index,
+                                 Length numberOfRuns ) const = 0;
 };
 
 } // namespace Text

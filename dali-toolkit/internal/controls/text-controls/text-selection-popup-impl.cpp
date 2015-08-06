@@ -25,11 +25,13 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/animation/animation.h>
 #include <dali/public-api/images/nine-patch-image.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/devel-api/object/type-registry-helper.h>
+
 #include <libintl.h>
 #include <cfloat>
 
@@ -79,7 +81,7 @@ const char* const OPTION_CLIPBOARD("option-clipboard");                         
 
 BaseHandle Create()
 {
-  return Toolkit::TextSelectionPopup::New( Toolkit::TextSelectionPopup::NONE, NULL );
+  return Toolkit::TextSelectionPopup::New( NULL );
 }
 
 // Setup properties, signals and actions using the type-registry.
@@ -101,14 +103,15 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-divider-color", 
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-icon-color", VECTOR4, POPUP_ICON_COLOR )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-pressed-color", VECTOR4, POPUP_PRESSED_COLOR )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-pressed-image", STRING, POPUP_PRESSED_IMAGE )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-fade-in-duration", FLOAT, POPUP_FADE_IN_DURATION )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popup-fade-out-duration", FLOAT, POPUP_FADE_OUT_DURATION )
 
 DALI_TYPE_REGISTRATION_END()
 
 } // namespace
 
 
-Dali::Toolkit::TextSelectionPopup TextSelectionPopup::New( Toolkit::TextSelectionPopup::Buttons buttonsToEnable,
-                                                           TextSelectionPopupCallbackInterface* callbackInterface )
+Dali::Toolkit::TextSelectionPopup TextSelectionPopup::New( TextSelectionPopupCallbackInterface* callbackInterface )
 {
    // Create the implementation, temporarily owned by this handle on stack
   IntrusivePtr< TextSelectionPopup > impl = new TextSelectionPopup( callbackInterface );
@@ -116,7 +119,6 @@ Dali::Toolkit::TextSelectionPopup TextSelectionPopup::New( Toolkit::TextSelectio
   // Pass ownership to CustomActor handle
   Dali::Toolkit::TextSelectionPopup handle( *impl );
 
-  impl->mEnabledButtons = buttonsToEnable;
   // Second-phase init of the implementation
   // This can only be done after the CustomActor connection has been made...
   impl->Initialize();
@@ -208,6 +210,16 @@ void TextSelectionPopup::SetProperty( BaseObject* object, Property::Index index,
       case Toolkit::TextSelectionPopup::Property::POPUP_PRESSED_IMAGE:
       {
         impl.SetPressedImage( value.Get< std::string >() );
+        break;
+      }
+      case Toolkit::TextSelectionPopup::Property::POPUP_FADE_IN_DURATION:
+      {
+        impl.mFadeInDuration = value.Get < float >();
+        break;
+      }
+      case Toolkit::TextSelectionPopup::Property::POPUP_FADE_OUT_DURATION:
+      {
+        impl.mFadeOutDuration = value.Get < float >();
         break;
       }
     } // switch
@@ -305,9 +317,25 @@ Property::Value TextSelectionPopup::GetProperty( BaseObject* object, Property::I
         value = impl.GetPressedImage();
         break;
       }
+      case Toolkit::TextSelectionPopup::Property::POPUP_FADE_IN_DURATION:
+      {
+        value = impl.mFadeInDuration;
+        break;
+      }
+      case Toolkit::TextSelectionPopup::Property::POPUP_FADE_OUT_DURATION:
+      {
+        value = impl.mFadeOutDuration;
+        break;
+      }
     } // switch
   }
   return value;
+}
+
+void TextSelectionPopup::EnableButtons( Toolkit::TextSelectionPopup::Buttons buttonsToEnable )
+{
+  mEnabledButtons = buttonsToEnable;
+  mButtonsChanged = true;
 }
 
 void TextSelectionPopup::RaiseAbove( Layer target )
@@ -320,12 +348,36 @@ void TextSelectionPopup::RaiseAbove( Layer target )
 
 void TextSelectionPopup::ShowPopup()
 {
-  AddPopupOptionsToToolbar( mShowIcons, mShowCaptions );
+  if ( !mPopupShowing || mButtonsChanged )
+  {
+    Actor self = Self();
+    AddPopupOptionsToToolbar( mShowIcons, mShowCaptions );
+
+    Animation animation = Animation::New( mFadeInDuration );
+    animation.AnimateTo( Property(self, Actor::Property::COLOR_ALPHA), 1.0f  );
+    animation.Play();
+    mPopupShowing = true;
+  }
+}
+
+void TextSelectionPopup::HidePopup()
+{
+  if ( mPopupShowing )
+  {
+    mPopupShowing = false;
+    Actor self = Self();
+    Animation animation = Animation::New( mFadeOutDuration );
+    animation.AnimateTo( Property(self, Actor::Property::COLOR_ALPHA), 0.0f  );
+    animation.FinishedSignal().Connect( this, &TextSelectionPopup::HideAnimationFinished );
+    animation.Play();
+  }
 }
 
 void TextSelectionPopup::OnInitialize()
 {
-  CreatePopup();
+  Actor self = Self();
+  self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+  self.SetProperty( Actor::Property::COLOR_ALPHA, 0.0f );
 }
 
 void TextSelectionPopup::OnStageConnection( int depth )
@@ -334,6 +386,15 @@ void TextSelectionPopup::OnStageConnection( int depth )
   Control::OnStageConnection( depth );
 
   // TextSelectionToolbar::OnStageConnection() will set the depths of all the popup's components.
+}
+
+void TextSelectionPopup::HideAnimationFinished( Animation& animation )
+{
+  Actor self = Self();
+  if ( !mPopupShowing ) // During the Hide/Fade animation there could be a call to Show the Popup again, mPopupShowing will be true in this case.
+  {
+    UnparentAndReset( self );  // Popup needs to be shown so do not unparent
+  }
 }
 
 bool TextSelectionPopup::OnCutButtonPressed( Toolkit::Button button )
@@ -402,6 +463,7 @@ void TextSelectionPopup::SetDimensionToCustomise( const PopupCustomisations& set
   {
     case POPUP_MAXIMUM_SIZE :
     {
+      mPopupMaxSize = dimension;
       if ( mToolbar )
       {
         mToolbar.SetProperty( Toolkit::TextSelectionToolbar::Property::MAX_SIZE, dimension );
@@ -438,7 +500,14 @@ Size TextSelectionPopup::GetDimensionToCustomise( const PopupCustomisations& set
   {
     case POPUP_MAXIMUM_SIZE :
     {
-      return mToolbar.GetProperty( Toolkit::TextSelectionToolbar::Property::MAX_SIZE ).Get< Vector2 >();
+      if ( mToolbar )
+      {
+        return mToolbar.GetProperty( Toolkit::TextSelectionToolbar::Property::MAX_SIZE ).Get< Vector2 >();
+      }
+      else
+      {
+        return mPopupMaxSize;
+      }
     }
     case OPTION_MAXIMUM_SIZE :
     {
@@ -677,6 +746,26 @@ std::string TextSelectionPopup::GetPressedImage() const
 
  void TextSelectionPopup::AddPopupOptionsToToolbar( bool showIcons, bool showCaptions )
  {
+   CreateOrderedListOfPopupOptions();
+
+   mButtonsChanged = false;
+   UnparentAndReset( mToolbar);
+
+   if( !mToolbar )
+   {
+     Actor self = Self();
+     mToolbar = Toolkit::TextSelectionToolbar::New();
+     if ( mPopupMaxSize != Vector2::ZERO ) // If PopupMaxSize property set then apply to Toolbar. Toolbar currently is not retriving this from json
+     {
+       mToolbar.SetProperty( Toolkit::TextSelectionToolbar::Property::MAX_SIZE, mPopupMaxSize );
+     }
+     mToolbar.SetParentOrigin( ParentOrigin::CENTER );
+#ifdef DECORATOR_DEBUG
+     mToolbar.SetName("TextSelectionToolbar");
+#endif
+     self.Add( mToolbar );
+   }
+
    // Iterate list of buttons and add active ones to Toolbar
    std::size_t numberOfOptionsRequired =  GetNumberOfEnabledOptions();
    std::size_t numberOfOptionsAdded = 0u;
@@ -691,23 +780,12 @@ std::string TextSelectionPopup::GetPressedImage() const
    }
  }
 
- void TextSelectionPopup::CreatePopup()
- {
-   Actor self = Self();
-   CreateOrderedListOfPopupOptions();
-   self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
-
-   if( !mToolbar )
-   {
-     mToolbar = Toolkit::TextSelectionToolbar::New();
-     mToolbar.SetParentOrigin( ParentOrigin::CENTER );
-     self.Add( mToolbar );
-   }
- }
-
 TextSelectionPopup::TextSelectionPopup( TextSelectionPopupCallbackInterface* callbackInterface )
 : Control( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ),
   mToolbar(),
+  mPopupMaxSize(),
+  mOptionMaxSize(),
+  mOptionMinSize(),
   mOptionDividerSize(),
   mEnabledButtons( Toolkit::TextSelectionPopup::NONE ),
   mCallbackInterface( callbackInterface ),
@@ -720,8 +798,12 @@ TextSelectionPopup::TextSelectionPopup( TextSelectionPopupCallbackInterface* cal
   mCopyOptionPriority ( 3 ),
   mPasteOptionPriority ( 5 ),
   mClipboardOptionPriority( 6 ),
+  mFadeInDuration(0.0f),
+  mFadeOutDuration(0.0f),
   mShowIcons( false ),
-  mShowCaptions( true )
+  mShowCaptions( true ),
+  mPopupShowing( false ),
+  mButtonsChanged( false )
 {
 }
 

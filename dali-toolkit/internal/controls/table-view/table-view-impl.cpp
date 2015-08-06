@@ -798,6 +798,14 @@ void TableView::OnLayoutNegotiated( float size, Dimension::Type dimension )
   }
 }
 
+void TableView::OnSizeSet( const Vector3& size )
+{
+  // If this table view is size negotiated by another actor or control, then the
+  // rows and columns must be recalculated or the new size will not take effect.
+  mRowDirty = mColumnDirty = true;
+  RelayoutRequest();
+}
+
 void TableView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   // Go through the layout data

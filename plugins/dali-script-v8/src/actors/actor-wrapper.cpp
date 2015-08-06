@@ -183,6 +183,9 @@ const ActorFunctions ActorFunctionTable[]=
     // ignore. GetCurrentAnchorPoint()  use Actor.anchorPoint
     // ignore. SetSize() use Actor.size
     // ignore. GetCurrentSize() use Actor.size
+    { "GetNaturalSize",   ActorApi::GetNaturalSize,    ACTOR_API },
+    { "GetWidthForHeight",ActorApi::GetWidthForHeight, ACTOR_API },
+    { "GetHeightForWidth",ActorApi::GetHeightForWidth, ACTOR_API },
     // ignore. SetPosition(....) use Actor.position
     // ignore. SetX, SetY, SetZ,  use Actor.position.x, Actor.position.y, Actor.position.z
     { "TranslateBy",         ActorApi::TranslateBy,              ACTOR_API },

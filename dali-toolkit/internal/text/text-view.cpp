@@ -103,7 +103,7 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
       // Otherwise use the given number of glyphs.
       if( lastLine.ellipsis )
       {
-        numberOfLaidOutGlyphs = lastLine.glyphIndex + lastLine.numberOfGlyphs;
+        numberOfLaidOutGlyphs = lastLine.glyphRun.glyphIndex + lastLine.glyphRun.numberOfGlyphs;
       }
       else
       {
@@ -141,7 +141,7 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
       LineRun* line = lineBuffer + lineIndex;
 
       // Index of the last glyph of the line.
-      GlyphIndex lastGlyphIndexOfLine = line->glyphIndex + line->numberOfGlyphs - 1u;
+      GlyphIndex lastGlyphIndexOfLine = line->glyphRun.glyphIndex + line->glyphRun.numberOfGlyphs - 1u;
 
       // Add the alignment offset to the glyph's position.
       for( Length index = 0u; index < numberOfLaidOutGlyphs; ++index )
@@ -156,7 +156,7 @@ Length View::GetGlyphs( GlyphInfo* glyphs,
           if( lineIndex < numberOfLines )
           {
             line = lineBuffer + lineIndex;
-            lastGlyphIndexOfLine = line->glyphIndex + line->numberOfGlyphs - 1u;
+            lastGlyphIndexOfLine = line->glyphRun.glyphIndex + line->glyphRun.numberOfGlyphs - 1u;
           }
         }
       }
@@ -317,6 +317,27 @@ float View::GetUnderlineHeight() const
   return 0.0f;
 }
 
+Length View::GetNumberOfUnderlineRuns() const
+{
+  if( mImpl->mVisualModel )
+  {
+    return mImpl->mVisualModel->mUnderlineRuns.Count();
+  }
+
+  return 0u;
+}
+
+void View::GetUnderlineRuns( GlyphRun* underlineRuns,
+                             UnderlineRunIndex index,
+                             Length numberOfRuns ) const
+{
+  if( mImpl->mVisualModel )
+  {
+    mImpl->mVisualModel->GetUnderlineRuns( underlineRuns,
+                                           index,
+                                           numberOfRuns );
+  }
+}
 
 } // namespace Text
 

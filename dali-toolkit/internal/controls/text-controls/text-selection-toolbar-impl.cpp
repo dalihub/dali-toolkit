@@ -255,7 +255,7 @@ void TextSelectionToolbar::RaiseAbove( Layer target )
 }
 
 TextSelectionToolbar::TextSelectionToolbar()
-: Control( ControlBehaviour( ControlBehaviour( ACTOR_BEHAVIOUR_NONE ) ) ),
+: Control( ControlBehaviour( ControlBehaviour( REQUIRES_STYLE_CHANGE_SIGNALS ) ) ),
   mMaxSize (),
   mIndexInTable( 0 ),
   mDividerIndexes()

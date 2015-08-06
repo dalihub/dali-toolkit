@@ -313,19 +313,6 @@ public:
                    bool optimize = false );
 
   /**
-   * @brief Combine two meshes, outputting the result into a new mesh
-   *
-   * @param[in] first First mesh
-   * @param[in] second Second mesh
-   * @param[in] optimize should we optimize vertex data
-   * @param[out] out resulting mesh
-   */
-  void StitchMesh( const Mesh2D& first,
-                   const Mesh2D& second,
-                   Mesh2D& out,
-                   bool optimize = false );
-
-  /**
    * @brief Get the BufferImage containing an atlas
    *
    * @param[in] atlas AtlasId returned when atlas was created

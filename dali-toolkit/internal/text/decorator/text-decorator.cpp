@@ -322,7 +322,7 @@ struct Decorator::Impl : public ConnectionTracker
         CreateGrabHandle();
 
         grabHandle.actor.SetPosition( position.x,
-                                      grabHandle.lineHeight ); // TODO : Fix for multiline.
+                                      position.y + grabHandle.lineHeight ); // TODO : Fix for multiline.
       }
       grabHandle.actor.SetVisible( isVisible );
     }
@@ -351,13 +351,13 @@ struct Decorator::Impl : public ConnectionTracker
         if( isPrimaryVisible )
         {
           primary.actor.SetPosition( primaryPosition.x,
-                                     primary.lineHeight ); // TODO : Fix for multiline.
+                                     primaryPosition.y + primary.lineHeight ); // TODO : Fix for multiline.
         }
 
         if( isSecondaryVisible )
         {
           secondary.actor.SetPosition( secondaryPosition.x,
-                                       secondary.lineHeight ); // TODO : Fix for multiline.
+                                       secondaryPosition.y + secondary.lineHeight ); // TODO : Fix for multiline.
         }
       }
       primary.actor.SetVisible( isPrimaryVisible );
@@ -384,18 +384,13 @@ struct Decorator::Impl : public ConnectionTracker
 
     if( mActiveCopyPastePopup )
     {
-      if( !mCopyPastePopup.actor.GetParent() )
-      {
-        mActiveLayer.Add( mCopyPastePopup.actor );
-      }
-
-      mCopyPastePopup.actor.RaiseAbove( mActiveLayer );
+      ShowPopup();
     }
     else
     {
       if( mCopyPastePopup.actor )
       {
-        mCopyPastePopup.actor.Unparent();
+        mCopyPastePopup.actor.HidePopup();
       }
     }
   }
@@ -409,6 +404,22 @@ struct Decorator::Impl : public ConnectionTracker
     mHandle[ RIGHT_SELECTION_HANDLE ].position += scrollOffset;
     mHighlightPosition += scrollOffset;
     DeterminePositionPopup();
+  }
+
+  void ShowPopup()
+  {
+    if ( !mCopyPastePopup.actor )
+    {
+      return;
+    }
+
+    if( !mCopyPastePopup.actor.GetParent() )
+    {
+      mActiveLayer.Add( mCopyPastePopup.actor );
+    }
+
+    mCopyPastePopup.actor.RaiseAbove( mActiveLayer );
+    mCopyPastePopup.actor.ShowPopup();
   }
 
   void DeterminePositionPopup()
@@ -445,7 +456,6 @@ struct Decorator::Impl : public ConnectionTracker
   void PopupRelayoutComplete( Actor actor )
   {
     // Size negotiation for CopyPastePopup complete so can get the size and constrain position within bounding box.
-    mCopyPastePopup.actor.OnRelayoutSignal().Disconnect( this, &Decorator::Impl::PopupRelayoutComplete  );
 
     DeterminePositionPopup();
   }
@@ -1498,20 +1508,17 @@ void Decorator::SetEnabledPopupButtons( TextSelectionPopup::Buttons& enabledButt
 {
    mImpl->mEnabledPopupButtons = enabledButtonsBitMask;
 
-   UnparentAndReset( mImpl->mCopyPastePopup.actor );
-   mImpl->mCopyPastePopup.actor = TextSelectionPopup::New( mImpl->mEnabledPopupButtons,
-                                                           &mImpl->mTextSelectionPopupCallbackInterface );
-#ifdef DECORATOR_DEBUG
-   mImpl->mCopyPastePopup.actor.SetName("mCopyPastePopup");
-#endif
-   mImpl->mCopyPastePopup.actor.SetAnchorPoint( AnchorPoint::CENTER );
-   mImpl->mCopyPastePopup.actor.OnRelayoutSignal().Connect( mImpl,  &Decorator::Impl::PopupRelayoutComplete  ); // Position popup after size negotiation
-
-   if( mImpl->mActiveLayer )
+   if ( !mImpl->mCopyPastePopup.actor )
    {
-     mImpl->mActiveLayer.Add( mImpl->mCopyPastePopup.actor );
-     mImpl->mCopyPastePopup.actor.ShowPopup();
+     mImpl->mCopyPastePopup.actor = TextSelectionPopup::New( &mImpl->mTextSelectionPopupCallbackInterface );
+#ifdef DECORATOR_DEBUG
+     mImpl->mCopyPastePopup.actor.SetName("mCopyPastePopup");
+#endif
+     mImpl->mCopyPastePopup.actor.SetAnchorPoint( AnchorPoint::CENTER );
+     mImpl->mCopyPastePopup.actor.OnRelayoutSignal().Connect( mImpl,  &Decorator::Impl::PopupRelayoutComplete  ); // Position popup after size negotiation
    }
+
+   mImpl->mCopyPastePopup.actor.EnableButtons( mImpl->mEnabledPopupButtons );
 }
 
 TextSelectionPopup::Buttons& Decorator::GetEnabledPopupButtons()

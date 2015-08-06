@@ -93,7 +93,7 @@ std::ostream& operator<< (std::ostream& o, const Vector<LineRun>& lineRuns)
   for( unsigned int i=0; i<lineRuns.Count(); ++i )
   {
     // e.g. Print "Line 0 Glyphs: 0->9 Characters: 0->9 (10)" for a ten character run staring from beginning of the model
-    o << "Line " << i << " Glyphs: " << lineRuns[i].glyphIndex << "->" << (lineRuns[i].glyphIndex + lineRuns[i].numberOfGlyphs );
+    o << "Line " << i << " Glyphs: " << lineRuns[i].glyphRun.glyphIndex << "->" << (lineRuns[i].glyphRun.glyphIndex + lineRuns[i].glyphRun.numberOfGlyphs );
     o << " Characters: " << lineRuns[i].characterRun.characterIndex << "->" << (lineRuns[i].characterRun.characterIndex + lineRuns[i].characterRun.numberOfCharacters );
     o << " Width: " << lineRuns[i].width;
     o << " Ascender: " << lineRuns[i].ascender;
