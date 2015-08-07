@@ -273,7 +273,8 @@ void Popup::OnInitialize()
   self.Add( mLayer );
 
   // Add Backing (Dimmed effect).
-  mLayer.Add( CreateBacking() );
+  mBacking = CreateBacking();
+  mLayer.Add( mBacking );
 
   mPopupContainer = Actor::New();
   mPopupContainer.SetName( "popup-container" );
@@ -458,11 +459,13 @@ void Popup::StartTransitionAnimation( bool transitionIn, bool instantaneous /* f
   // This is set up last so that different animation modes can have an effect on the backing animation speed.
   if( mBackingEnabled )
   {
+    // Use the alpha from the user-specified color.
+    float targetAlpha = mBackingColor.a;
     if( duration > Math::MACHINE_EPSILON_0 )
     {
       if( transitionIn )
       {
-        mAnimation.AnimateTo( Property( mBacking, Actor::Property::COLOR_ALPHA ), 1.0f, AlphaFunction::EASE_IN_OUT, TimePeriod( 0.0f, duration * 0.70f ) );
+        mAnimation.AnimateTo( Property( mBacking, Actor::Property::COLOR_ALPHA ), targetAlpha, AlphaFunction::EASE_IN_OUT, TimePeriod( 0.0f, duration * 0.70f ) );
       }
       else
       {
@@ -471,7 +474,7 @@ void Popup::StartTransitionAnimation( bool transitionIn, bool instantaneous /* f
     }
     else
     {
-      mBacking.SetOpacity( transitionIn ? 1.0f : 0.0f );
+      mBacking.SetProperty( Actor::Property::COLOR_ALPHA, transitionIn ? targetAlpha : 0.0f );
     }
   }
 
@@ -834,7 +837,7 @@ void Popup::LayoutTail()
     mTailImage.SetParentOrigin( position );
     mTailImage.SetAnchorPoint( anchorPoint );
 
-    mLayer.Add( mTailImage );
+    mPopupContainer.Add( mTailImage );
   }
 }
 
@@ -849,27 +852,28 @@ Toolkit::Popup::ContextualMode Popup::GetContextualMode() const
   return mContextualMode;
 }
 
-ImageActor Popup::CreateBacking()
+Toolkit::Control Popup::CreateBacking()
 {
-  mBacking = Dali::Toolkit::CreateSolidColorActor( mBackingColor );
-  mBacking.SetName( "popup-backing" );
+  Toolkit::Control backing = Control::New();
+  backing.SetBackgroundColor( Vector4( mBackingColor.r, mBackingColor.g, mBackingColor.b, 1.0f ) );
+  backing.SetName( "popup-backing" );
 
   // Must always be positioned top-left of stage, regardless of parent.
-  mBacking.SetPositionInheritanceMode( DONT_INHERIT_POSITION );
-  mBacking.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  backing.SetPositionInheritanceMode( DONT_INHERIT_POSITION );
+  backing.SetAnchorPoint( AnchorPoint::TOP_LEFT );
 
   // Always the full size of the stage.
-  mBacking.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  mBacking.SetSize( Stage::GetCurrent().GetSize() );
+  backing.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+  backing.SetSize( Stage::GetCurrent().GetSize() );
 
   // Catch events.
-  mBacking.SetSensitive( true );
+  backing.SetSensitive( true );
 
   // Default to being transparent.
-  mBacking.SetOpacity( 0.0f );
-  mBacking.TouchedSignal().Connect( this, &Popup::OnBackingTouched );
-  mBacking.WheelEventSignal().Connect( this, &Popup::OnBackingWheelEvent );
-  return mBacking;
+  backing.SetProperty( Actor::Property::COLOR_ALPHA, 0.0f );
+  backing.TouchedSignal().Connect( this, &Popup::OnBackingTouched );
+  backing.WheelEventSignal().Connect( this, &Popup::OnBackingWheelEvent );
+  return backing;
 }
 
 Toolkit::Popup::TouchedOutsideSignalType& Popup::OutsideTouchedSignal()
@@ -977,6 +981,7 @@ const bool Popup::IsBackingEnabled() const
 void Popup::SetBackingColor( Vector4 color )
 {
   mBackingColor = color;
+  mBacking.SetBackgroundColor( Vector4( color.r, color.g, color.b, 1.0f ) );
   mLayoutDirty = true;
 }
 
