@@ -108,6 +108,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "secondary-cursor-color",       
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enable-cursor-blink",                  BOOLEAN,   ENABLE_CURSOR_BLINK                  )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-blink-interval",                FLOAT,     CURSOR_BLINK_INTERVAL                )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-blink-duration",                FLOAT,     CURSOR_BLINK_DURATION                )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "cursor-width",                         INTEGER,   CURSOR_WIDTH                         )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-image",                    STRING,    GRAB_HANDLE_IMAGE                    )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "grab-handle-pressed-image",            STRING,    GRAB_HANDLE_PRESSED_IMAGE            )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "scroll-threshold",                     FLOAT,     SCROLL_THRESHOLD                     )
@@ -409,6 +410,18 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p CURSOR_BLINK_DURATION %f\n", impl.mController.Get(), duration );
 
           impl.mDecorator->SetCursorBlinkDuration( duration );
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::CURSOR_WIDTH:
+      {
+        if( impl.mDecorator )
+        {
+          const int width = value.Get< int >();
+          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField %p CURSOR_WIDTH %d\n", impl.mController.Get(), width );
+
+          impl.mDecorator->SetCursorWidth( width );
+          impl.mController->GetLayoutEngine().SetCursorWidth( width );
         }
         break;
       }
@@ -735,6 +748,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mDecorator )
         {
           value = impl.mDecorator->GetCursorBlinkDuration();
+        }
+        break;
+      }
+      case Toolkit::TextField::Property::CURSOR_WIDTH:
+      {
+        if( impl.mDecorator )
+        {
+          value = impl.mDecorator->GetCursorWidth();
         }
         break;
       }

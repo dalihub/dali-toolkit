@@ -82,6 +82,7 @@ public:
       ENABLE_CURSOR_BLINK,                      ///< name "enable-cursor-blink",                 Whether the cursor should blink or not,                                   type BOOLEAN
       CURSOR_BLINK_INTERVAL,                    ///< name "cursor-blink-interval",               The time interval in seconds between cursor on/off states,                type FLOAT
       CURSOR_BLINK_DURATION,                    ///< name "cursor-blink-duration",               The cursor will stop blinking after this number of seconds (if non-zero), type FLOAT
+      CURSOR_WIDTH,                             ///< name "cursor-width",                        The cursor width,                                                         type INTEGER
       GRAB_HANDLE_IMAGE,                        ///< name "grab-handle-image",                   The image to display for the grab handle,                                 type STRING
       GRAB_HANDLE_PRESSED_IMAGE,                ///< name "grab-handle-pressed-image",           The image to display when the grab handle is pressed,                     type STRING
       SCROLL_THRESHOLD,                         ///< name "scroll-threshold"                     Scrolling will occur if the cursor is this close to the control border,   type FLOAT

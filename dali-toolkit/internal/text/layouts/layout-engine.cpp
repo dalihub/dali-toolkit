@@ -45,6 +45,7 @@ namespace
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 const bool RTL = true;
+const float CURSOR_WIDTH = 1.f;
 
 } //namespace
 
@@ -101,6 +102,7 @@ struct LayoutEngine::Impl
   : mLayout( LayoutEngine::SINGLE_LINE_BOX ),
     mHorizontalAlignment( LayoutEngine::HORIZONTAL_ALIGN_BEGIN ),
     mVerticalAlignment( LayoutEngine::VERTICAL_ALIGN_TOP ),
+    mCursorWidth( CURSOR_WIDTH ),
     mEllipsisEnabled( false )
   {
     mFontClient = TextAbstraction::FontClient::Get();
@@ -210,7 +212,7 @@ struct LayoutEngine::Impl
 
     float tmpExtraBearing = ( 0.f > glyphInfo.xBearing ) ? -glyphInfo.xBearing : 0.f;
 
-    tmpLineLayout.length += 1.f; // Added one unit to give some space to the cursor.
+    tmpLineLayout.length += mCursorWidth; // Added to give some space to the cursor.
 
     // Calculate the line height if there is no characters.
     FontId lastFontId = glyphInfo.fontId;
@@ -450,7 +452,7 @@ struct LayoutEngine::Impl
 
     const GlyphInfo& glyph = *glyphsBuffer;
     float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing : 0.f;
-    penX += 1.f; // Added one unit to give some space to the cursor.
+    penX += mCursorWidth; // Added to give some space to the cursor.
 
     for( GlyphIndex i = 0u; i < numberOfGlyphs; ++i )
     {
@@ -671,7 +673,7 @@ struct LayoutEngine::Impl
       const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + *( layoutParameters.charactersToGlyphsBuffer + characterVisualIndex ) );
 
       float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing : 0.f;
-      penX += 1.f; // Added one unit to give some space to the cursor.
+      penX += mCursorWidth; // Added to give some space to the cursor.
 
       Vector2* glyphPositionsBuffer = glyphPositions.Begin();
 
@@ -817,6 +819,7 @@ struct LayoutEngine::Impl
   LayoutEngine::Layout mLayout;
   LayoutEngine::HorizontalAlignment mHorizontalAlignment;
   LayoutEngine::VerticalAlignment mVerticalAlignment;
+  float mCursorWidth;
 
   TextAbstraction::FontClient mFontClient;
 
@@ -872,6 +875,16 @@ void LayoutEngine::SetVerticalAlignment( VerticalAlignment alignment )
 LayoutEngine::VerticalAlignment LayoutEngine::GetVerticalAlignment() const
 {
   return mImpl->mVerticalAlignment;
+}
+
+void LayoutEngine::SetCursorWidth( int width )
+{
+  mImpl->mCursorWidth = static_cast<float>( width );
+}
+
+int LayoutEngine::GetCursorWidth() const
+{
+  return static_cast<int>( mImpl->mCursorWidth );
 }
 
 bool LayoutEngine::LayoutText( const LayoutParameters& layoutParameters,
