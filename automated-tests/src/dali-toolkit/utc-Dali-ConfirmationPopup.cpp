@@ -174,6 +174,9 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationP(void)
 
   // Tell the confirmation popup to connect to the signal in our button called "on-stage".
   popup.SetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED, "on-stage" );
+  std::string resultProperty;
+  DALI_TEST_CHECK( popup.GetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_OK_SELECTED ).Get( resultProperty ) );
+  DALI_TEST_EQUALS( resultProperty, "on-stage", TEST_LOCATION );
 
   // Connect to the confirmation popup's OK signal. This signal is dynamically created upon connection.
   gSignalReceivedOK = false;
@@ -195,6 +198,9 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationP(void)
   // Remove the popup from the stage, and connect the cancel signal.
   popup.Unparent();
   popup.SetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED, "on-stage" );
+  DALI_TEST_CHECK( popup.GetProperty( Toolkit::ConfirmationPopup::Property::CONNECT_SIGNAL_CANCEL_SELECTED ).Get( resultProperty ) );
+  DALI_TEST_EQUALS( resultProperty, "on-stage", TEST_LOCATION );
+
   popup.ConnectSignal( testTracker, "control-signal-cancel", ConfirmationPopupCancelTestFunctor() );
 
   // Check the cancel signal has not occurred yet.
@@ -250,6 +256,32 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationN(void)
    DALI_TEST_CHECK( !gSignalReceivedOK );
 
    END_TEST;
+}
+
+int UtcDaliConfirmationPopupTypeRegistryCreation(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliConfirmationPopupTypeRegistryCreation" );
+
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( "ConfirmationPopup" );
+  DALI_TEST_CHECK( typeInfo )
+
+  BaseHandle baseHandle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( baseHandle )
+
+  Toolkit::Popup popup = Toolkit::Popup::DownCast( baseHandle );
+  popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
+
+  Stage::GetCurrent().Add( popup );
+  popup.SetDisplayState( Toolkit::Popup::SHOWN );
+
+  application.SendNotification();
+  application.Render();
+
+  // Check the popup is shown.
+  DALI_TEST_EQUALS( popup.GetDisplayState(), Popup::SHOWN, TEST_LOCATION );
+
+  END_TEST;
 }
 
 
