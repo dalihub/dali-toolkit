@@ -107,6 +107,8 @@ const float SCROLL_THRESHOLD = 10.f;
 const float SCROLL_SPEED = 300.f;
 const float SCROLL_DISTANCE = SCROLL_SPEED * SCROLL_TICK_INTERVAL * TO_SECONDS;
 
+const float CURSOR_WIDTH = 1.f;
+
 /**
  * structure to hold coordinates of each quad, which will make up the mesh.
  */
@@ -249,6 +251,7 @@ struct Decorator::Impl : public ConnectionTracker
     mActiveCursor( ACTIVE_CURSOR_NONE ),
     mCursorBlinkInterval( CURSOR_BLINK_INTERVAL ),
     mCursorBlinkDuration( 0.0f ),
+    mCursorWidth( CURSOR_WIDTH ),
     mHandleScrolling( HANDLE_TYPE_COUNT ),
     mScrollDirection( SCROLL_NONE ),
     mScrollThreshold( SCROLL_THRESHOLD ),
@@ -289,7 +292,7 @@ struct Decorator::Impl : public ConnectionTracker
 
         mPrimaryCursor.SetPosition( position.x,
                                     position.y );
-        mPrimaryCursor.SetSize( Size( 1.0f, cursor.cursorHeight ) );
+        mPrimaryCursor.SetSize( Size( mCursorWidth, cursor.cursorHeight ) );
       }
       mPrimaryCursor.SetVisible( mPrimaryCursorVisible );
     }
@@ -301,7 +304,7 @@ struct Decorator::Impl : public ConnectionTracker
       {
         mSecondaryCursor.SetPosition( cursor.position.x,
                                       cursor.position.y );
-        mSecondaryCursor.SetSize( Size( 1.0f, cursor.cursorHeight ) );
+        mSecondaryCursor.SetSize( Size( mCursorWidth, cursor.cursorHeight ) );
       }
       mSecondaryCursor.SetVisible( mSecondaryCursorVisible );
     }
@@ -1297,6 +1300,7 @@ struct Decorator::Impl : public ConnectionTracker
   unsigned int        mActiveCursor;
   unsigned int        mCursorBlinkInterval;
   float               mCursorBlinkDuration;
+  float               mCursorWidth;             ///< The width of the cursors in pixels.
   HandleType          mHandleScrolling;         ///< The handle which is scrolling.
   ScrollDirection     mScrollDirection;         ///< The direction of the scroll.
   float               mScrollThreshold;         ///< Defines a square area inside the control, close to the edge. A cursor entering this area will trigger scroll events.
@@ -1422,6 +1426,16 @@ void Decorator::SetCursorBlinkDuration( float seconds )
 float Decorator::GetCursorBlinkDuration() const
 {
   return mImpl->mCursorBlinkDuration;
+}
+
+void Decorator::SetCursorWidth( int width )
+{
+  mImpl->mCursorWidth = static_cast<float>( width );
+}
+
+int Decorator::GetCursorWidth() const
+{
+  return static_cast<int>( mImpl->mCursorWidth );
 }
 
 /** Handles **/

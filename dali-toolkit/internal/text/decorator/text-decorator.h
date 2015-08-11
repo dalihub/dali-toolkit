@@ -298,6 +298,20 @@ public:
   float GetCursorBlinkDuration() const;
 
   /**
+   * @brief Sets the width of the cursors.
+   *
+   * @param[in] width The width of the cursor in pixels.
+   */
+  void SetCursorWidth( int width );
+
+  /**
+   * @brief Retrieves the width of the cursors.
+   *
+   * @return The width of the cursors in pixels.
+   */
+  int GetCursorWidth() const;
+
+  /**
    * @brief Sets whether a handle is active.
    *
    * @param[in] handleType One of the handles.
