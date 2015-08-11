@@ -27,8 +27,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
-#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
-#include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
+#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
+#include <dali-toolkit/public-api/controls/page-turn-view/page-factory.h>
 #include <dali-toolkit/devel-api/controls/shadow-view/shadow-view.h>
 
 namespace Dali
@@ -58,49 +58,42 @@ protected:
 public:
 
   /**
-   * @copydoc Toolkit::PageTurnView::SetSpineShadowParameter
+   * Set the page size
+   * @param[in] pageSize The size of pages
+   */
+  void SetPageSize( const Vector2& pageSize );
+
+  /**
+   * Retrieve the page size.
+   * @return The page size.
+   */
+  Vector2 GetPageSize();
+
+  /**
+   * Set the spine shadow parameter to the shader effects.
+   * The two parameters are the major&minor radius (in pixels) to form an ellipse shape.
+   * The top-left quarter of this ellipse is used to calculate spine normal for simulating shadow.
+   * @param [in] spineShadowParameter The major&minor ellipse radius for the simulated spine shadow.
    */
   void SetSpineShadowParameter( const Vector2& spineShadowParameter );
 
   /**
-   * @copydoc Toolkit::PageTurnView::GetSpineShadowParameter
+   * Retrieve the spine shadow parameter of the shader effects.
+   * @return The spine shadow parameter.
    */
   Vector2 GetSpineShadowParameter();
 
-  /**
-   * @copydoc Toolkit::PageTurnView::GoToPage
+  /*
+   * Jump to a given page.
+   * @param[in] pageId The new current page id.
    */
   void GoToPage( unsigned int pageId );
 
   /**
-   * @copydoc Toolkit::PageTurnView::GetCurrentPage
+   * Retrieve the id of the current Page.
+   * @return The current page id.
    */
   unsigned int GetCurrentPage();
-
-  /**
-   * @copydoc Toolkit::PageTurnView::EnterEditMode
-   */
-  Actor EnterEditMode();
-
-  /**
-   * @copydoc Toolkit::PageTurnView::LeaveEditMode
-   */
-  void LeaveEditMode();
-
-  /**
-   * @copydoc Toolkit::PageTurnView::GetHitActor
-   */
-  Actor GetHitActor( Vector2& screenCoordinates, Vector2& actorCoordinates );
-
-  /**
-   * @copydoc Toolkit::PageTurnView::RefreshAll
-   */
-  void RefreshAll();
-
-  /**
-   * @copydoc Toolkit::PageTurnView::RefreshCurrentPage
-   */
-  void RefreshCurrentPage();
 
 protected:
 
@@ -141,11 +134,6 @@ protected:
 
 private:
 
-  /**
-   * Set up the render tasks for rendering the page actor to off-screen image
-   */
-  void SetupRenderTasks();
-
  /**
   * Set up the shadow view control to cast shadow
   */
@@ -177,11 +165,6 @@ private:
    */
   void SliddenBack( Animation& animation );
 
-  /**
-   * Refresh the given page.
-   @param[in] the page index.
-   */
-  void RenderPage( int pageIndex );
 
 private: // from Control
 
@@ -213,12 +196,6 @@ private: // implemented differently by PageTurnLandscapeView and PageTurnPortrai
    * Implemented in subclasses to provide specific behaviour.
    */
   virtual void OnPageTurnViewInitialize() = 0;
-
-  /**
-   * Create the page actor from off screen buffer
-   * @param[in] The index of the page to be added
-   */
-  virtual ImageActor NewPageFromRenderBuffer( int pageIndex ) = 0;
 
   /**
    * This method is called after the a new page is added to the stage.
@@ -262,7 +239,15 @@ private: // implemented differently by PageTurnLandscapeView and PageTurnPortrai
    */
   virtual void OnPossibleOutwardsFlick( const Vector2& panPosition, float gestureSpeed ) { }
 
-public: //signal
+  /**
+   * This method is called when page is turned over
+   * In portrait view, the page on the left side is not rendered
+   * @param[in] actor The page actor
+   * @param[in] isLeftSide Which side the page is turned to
+   */
+  virtual void OnTurnedOver( ImageActor actor, bool isLeftSide ) { }
+
+public: //signal and property
 
   /**
    * @copydoc Toolkit::PageTurnView::PageTurnStartedSignal()
@@ -284,6 +269,35 @@ public: //signal
    */
   Toolkit::PageTurnView::PagePanSignal& PagePanFinishedSignal();
 
+  /**
+    * Connects a callback function with the object's signals.
+    * @param[in] object The object providing the signal.
+    * @param[in] tracker Used to disconnect the signal.
+    * @param[in] signalName The signal to connect to.
+    * @param[in] functor A newly allocated FunctorDelegate.
+    * @return True if the signal was connected.
+    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
+    */
+  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+
+   // Properties
+
+  /**
+   * Called when a property of an object of this type is set.
+   * @param[in] object The object whose property is set.
+   * @param[in] index The property index.
+   * @param[in] value The new property value.
+   */
+  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+
+  /**
+   * Called to retrieve a property of an object of this type.
+   * @param[in] object The object whose property is to be retrieved.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  static Property::Value GetProperty( BaseObject* object, Property::Index index );
+
 private:
 
   //Undefined
@@ -294,26 +308,16 @@ private:
 
 protected:
 
-  Actor                          mRootOnScreen;
-
   Vector2                        mControlSize;             ///< The size of the control, it is decided by the page size, the SetSize from application can not change it
   Layer                          mTurningPageLayer;        ///< The layer for the turning page, to avoid possible depth conflict
   Toolkit::ShadowView            mShadowView;              ///< The shadow view control for shadow casting
   ImageActor                     mShadowPlane;             ///< The plane for the shadow to cast on
   Actor                          mPointLight;              ///< The point light used for shadow casting
-  Layer                          mShadowLayer;             ///< The layer to display the shadow
 
   PageFactory&                   mPageFactory;             ///< The page factory which provides the page actors
   Vector2                        mPageSize;                ///< The page size
   int                            mTotalPageCount;          ///< The total number of pages provided by the page factory
 
-  bool                           mIsEditMode;              ///< The boolean to indicate the current page content is edit-able or not
-
-  bool                           mNeedOffscreenRendering;  ///< The boolean to indicate whether off screen rendering is required for creating page image
-  std::vector<RenderTask>        mOffscreenTask;           ///< The vector of off screen rendering tasks
-  std::vector<Actor>             mPageSourceActor;         ///< The vector of page source actor
-  std::vector<FrameBufferImage>  mRenderedPage;            ///< The vector of off screen buffers
-  CameraActor                    mCameraActor;             ///< The camera actor attached to the off screen tasks
   bool                           mPanning;                 ///< The boolean to indicate whether the pan gesture is continuing
 
   std::vector<ShaderEffect>      mTurnEffect;              ///< The group of PageTurnEffects
@@ -325,8 +329,9 @@ protected:
 
   std::vector<ImageActor>        mPageActors;              ///< The vector of pages on stage
   int                            mCurrentPageIndex;        ///< The index of the current page, between 0 ~ mTotalPageCount-1
+  int                            mTurningPageIndex;        ///< The index of the turning page
   std::map<ImageActor,bool>      mIsTurnBack;              ///< The map to keep track the page actor's turning direction
-  std::map<Animation,ImageActor> mAnimationActorPair;      ///< The map to keep track which page actor is the animation act on
+  std::map<Animation,int>        mAnimationPageIdPair;     ///< The map to keep track which page actor is the animation act on
   std::map<Animation, int>       mAnimationIndexPair;      ///< The map to keep track which PageTurnEffect, PanDisplacementProperty, CurrentCenterProperty is used for the animation
   int                            mIndex;                   ///< The index to keep track which PageTurnEffect, PanDisplacementProperty, CurrentCenterProperty is used for the current panning page
   std::vector<bool>              mIsAnimating;             ///< The boolean vector to keep track which PageTurnEffect, PanDisplacementProperty, CurrentCenterProperty is available for using

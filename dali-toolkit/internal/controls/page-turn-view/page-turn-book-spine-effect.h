@@ -41,8 +41,6 @@ namespace Internal
  * please set the uniforms with the same values as the PageTurnEffect.
  *
  * Animatable/Constrainable uniforms:
- *  "uShadowWidth"          - The width of shadow to be pageSize * shadowWidth. This shadow appears at the edges of the actor
- *                            which is not visible on static pages
  *  "uSpineShadowParameter" - The two parameters are the major&minor radius (in pixels) to form an ellipse shape. The top-left
  *                            quarter of this ellipse is used to calculate spine normal for simulating shadow
  *  "uIsBackImageVisible"   - Set whether the current page is with its backside visible. Need to pass the parameter as true for
@@ -53,58 +51,47 @@ namespace Internal
  **/
 inline ShaderEffect CreatePageTurnBookSpineEffect()
 {
-  std::string vertexSource(
-      "precision mediump float;\n"
-      "uniform float uShadowWidth;\n"
-      "  void main()\n"
-      "  {\n"
-      "    gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);\n"
-      "    vTexCoord.x = (aTexCoord.x-sTextureRect.s) /( 1.0 - uShadowWidth ) + sTextureRect.s;\n"
-      "    vTexCoord.y = ( aTexCoord.y-sTextureRect.t-0.5*uShadowWidth*(sTextureRect.q-sTextureRect.t) )/( 1.0 - uShadowWidth ) + sTextureRect.t;\n"
-      "  }");
+  std::string vertexSource = DALI_COMPOSE_SHADER(
+      precision mediump float;\n
+      void main()\n
+      {\n
+          gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);\n
+          vTexCoord = aTexCoord;\n
+      }\n);
 
   // the simplified version of the fragment shader of page turn effect
-  std::string fragmentSource(
-      "precision mediump float;\n"
-      "uniform float uIsBackImageVisible;\n"
-      "uniform float uPageWidth;\n"
-      "uniform vec2 uSpineShadowParameter;\n"
-      "  void main()\n"
-      "  {\n"
-      // leave the border for display shadow, not visible( out of the screen ) when the page is static
-      "    if( vTexCoord.y > sTextureRect.q || vTexCoord.y < sTextureRect.t || vTexCoord.x > sTextureRect.p  )\n"
-      "    {\n"
-      "      gl_FragColor = vec4( 0.0 );\n"
-      "    }\n"
-      "    else \n"
-      "    { \n"
+  std::string fragmentSource = DALI_COMPOSE_SHADER(
+      precision mediump float;\n
+      uniform float uIsBackImageVisible;\n
+      uniform float uPageWidth;\n
+      uniform vec2 uSpineShadowParameter;\n
+      void main()\n
+      {\n
       // flip the image horizontally by changing the x component of the texture coordinate
-      "      if( uIsBackImageVisible == 1.0 )  gl_FragColor = texture2D( sTexture, vec2( sTextureRect.p+sTextureRect.s-vTexCoord.x, vTexCoord.y ) ) * uColor; \n"
-      "      else gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n"
-      "      \n"
+        if( uIsBackImageVisible == 1.0 )\n
+          gl_FragColor = texture2D( sTexture, vec2( sTextureRect.p+sTextureRect.s-vTexCoord.x, vTexCoord.y ) ) * uColor; \n
+        else\n
+        gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
       // display book spine, a stripe of shadowed texture
-      "      float pixelPos = (vTexCoord.x-sTextureRect.s)*uPageWidth; \n"
-      "      if(pixelPos < uSpineShadowParameter.x) \n"
-      "      {\n"
-      "        float x = pixelPos - uSpineShadowParameter.x;\n"
-      "        float y = sqrt( uSpineShadowParameter.x*uSpineShadowParameter.x - x*x );\n"
-      "        vec2 spineNormal = normalize(vec2(uSpineShadowParameter.y*x/uSpineShadowParameter.x, y));\n"
-      "        gl_FragColor.rgb *= spineNormal.y; \n"
-      "      }"
-      "    }\n"
-      "  }" );
+        float pixelPos = (vTexCoord.x-sTextureRect.s)*uPageWidth; \n
+        if(pixelPos < uSpineShadowParameter.x) \n
+        {\n
+          float x = pixelPos - uSpineShadowParameter.x;\n
+          float y = sqrt( uSpineShadowParameter.x*uSpineShadowParameter.x - x*x );\n
+          vec2 spineNormal = normalize(vec2(uSpineShadowParameter.y*x/uSpineShadowParameter.x, y));\n
+          gl_FragColor.rgb *= spineNormal.y; \n
+        }
+      } );
 
-  const float DEFAULT_SHADOW_WIDTH(0.15f);
   const Vector2 DEFAULT_SPINE_SHADOW_PARAMETER(50.0f, 20.0f);
 
   ShaderEffect shaderEffect = ShaderEffect::New( vertexSource, fragmentSource );
 
   shaderEffect.SetUniform( "uIsBackImageVisible", -1.f );
-  shaderEffect.SetUniform( "uShadowWidth", DEFAULT_SHADOW_WIDTH );
   shaderEffect.SetUniform( "uSpineShadowParameter", DEFAULT_SPINE_SHADOW_PARAMETER );
 
   float defaultPageWidth = Dali::Stage::GetCurrent().GetSize().x;
-  shaderEffect.SetUniform( "uPageWidth", defaultPageWidth/(1.f-DEFAULT_SHADOW_WIDTH) );
+  shaderEffect.SetUniform( "uPageWidth", defaultPageWidth );
 
   return shaderEffect;
 }

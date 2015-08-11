@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
+#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-view-impl.h>
@@ -67,26 +67,6 @@ PageTurnView::PageTurnView( Dali::Internal::CustomActor* internal )
   VerifyCustomActorPointer<Internal::PageTurnView>(internal);
 }
 
-void PageTurnView::SetSpineShadowParameter( const Vector2& spineShadowParameter )
-{
-  Toolkit::GetImplementation( *this ).SetSpineShadowParameter( spineShadowParameter );
-}
-
-Vector2 PageTurnView::GetSpineShadowParameter()
-{
-  return Toolkit::GetImplementation( *this ).GetSpineShadowParameter();
-}
-
-void PageTurnView::GoToPage( unsigned int pageId )
-{
-  Toolkit::GetImplementation( *this ).GoToPage(pageId);
-}
-
-unsigned int PageTurnView::GetCurrentPage()
-{
-  return Toolkit::GetImplementation( *this ).GetCurrentPage();
-}
-
 PageTurnView::PageTurnSignal& PageTurnView::PageTurnStartedSignal()
 {
   return Toolkit::GetImplementation( *this ).PageTurnStartedSignal();
@@ -105,31 +85,6 @@ PageTurnView::PagePanSignal& PageTurnView::PagePanStartedSignal()
 PageTurnView::PagePanSignal& PageTurnView::PagePanFinishedSignal()
 {
   return Toolkit::GetImplementation( *this ).PagePanFinishedSignal();
-}
-
-Actor PageTurnView::EnterEditMode()
-{
-  return Toolkit::GetImplementation( *this ).EnterEditMode();
-}
-
-void PageTurnView::LeaveEditMode()
-{
-  Toolkit::GetImplementation( *this ).LeaveEditMode();
-}
-
-Actor PageTurnView::GetHitActor( Vector2& screenCoordinates, Vector2& actorCoordinates )
-{
-  return Toolkit::GetImplementation( *this ).GetHitActor( screenCoordinates, actorCoordinates );
-}
-
-void PageTurnView::RefreshAll()
-{
-  Toolkit::GetImplementation( *this ).RefreshAll();
-}
-
-void PageTurnView::RefreshCurrentPage()
-{
-  Toolkit::GetImplementation( *this ).RefreshCurrentPage();
 }
 
 } // namespace Toolkit

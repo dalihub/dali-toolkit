@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
+#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
 
 namespace Dali
 {

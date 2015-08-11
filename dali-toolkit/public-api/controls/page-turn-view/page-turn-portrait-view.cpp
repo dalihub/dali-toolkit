@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-portrait-view.h>
+#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-portrait-view.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-portrait-view-impl.h>

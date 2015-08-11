@@ -20,12 +20,11 @@
 #include <string.h>
 #include <sstream>
 #include <dali-toolkit-test-suite-utils.h>
-#include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
-#include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
-#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-landscape-view.h>
-#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-portrait-view.h>
-#include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
+#include <dali-toolkit/public-api/controls/page-turn-view/page-factory.h>
+#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-landscape-view.h>
+#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-portrait-view.h>
+#include <dali-toolkit/public-api/controls/page-turn-view/page-turn-view.h>
 
 
 
@@ -222,8 +221,6 @@ public:
       actor.SetParentOrigin( ParentOrigin::CENTER );
       actor.SetAnchorPoint( AnchorPoint::CENTER );
 
-      SetActorHittability( actor, true );
-
       mSourceActors[pageId] = actor;
     }
 
@@ -333,163 +330,52 @@ int UtcDaliPageTurnLandscapeViewNew(void)
   END_TEST;
 }
 
-int UtcDaliPageTurnViewSetAndGetSpineShadowParameter(void)
+int UtcDaliPageTurnViewSetGetProperty(void)
 {
   ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliPageTurnViewSetAndGetSpineShadowParameter ");
+  tet_infoline(" UtcDaliPageTurnViewSetGetProperty ");
 
   TestPageFactory factory(application);
   PageTurnView landscapeView = PageTurnLandscapeView::New( factory, PAGE_SIZE );
-  DALI_TEST_CHECK( landscapeView.GetSpineShadowParameter() !=  SPINE_SHADOW_PARAMETER);
-  landscapeView.SetSpineShadowParameter(SPINE_SHADOW_PARAMETER);
-  DALI_TEST_CHECK( landscapeView.GetSpineShadowParameter() ==  SPINE_SHADOW_PARAMETER);
-  END_TEST;
-}
+  DALI_TEST_CHECK( landscapeView );
 
-int UtcDaliPageTurnViewGoToPageAndGetCurrentPage(void)
-{
-  ToolkitTestApplication application;
+  Stage::GetCurrent().Add( landscapeView );
 
-  tet_infoline(" UtcDaliPageTurnViewGoToPageAndGetCurrentPage ");
+  // Test "page-size" property
+  DALI_TEST_CHECK( landscapeView.GetPropertyIndex("page-size") == PageTurnView::Property::PAGE_SIZE  );
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::PAGE_SIZE).Get<Vector2>(), PAGE_SIZE, TEST_LOCATION );
 
-  TestPageFactory factory(application);
-  PageTurnView portraitView = PageTurnPortraitView::New( factory, PAGE_SIZE );
-  DALI_TEST_CHECK( portraitView.GetCurrentPage() == 0 );
+  Vector2 newSize( PAGE_SIZE.x*0.75, PAGE_SIZE.y*0.5f );
+  landscapeView.SetProperty( PageTurnView::Property::PAGE_SIZE, newSize );
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::PAGE_SIZE).Get<Vector2>(), newSize, TEST_LOCATION );
+  Wait( application);
+  DALI_TEST_EQUALS( Vector2(landscapeView.GetTargetSize()), Vector2(newSize.x*2.f, newSize.y), TEST_LOCATION);
 
-  portraitView.GoToPage( 10 );
-  DALI_TEST_CHECK( portraitView.GetCurrentPage() == 10 );
+  landscapeView.SetProperty( PageTurnView::Property::PAGE_SIZE,newSize*1.5f);
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::PAGE_SIZE).Get<Vector2>(), newSize*1.5f, TEST_LOCATION );
+  Wait( application);
+  DALI_TEST_EQUALS( Vector2(landscapeView.GetTargetSize()), Vector2(newSize.x*3.f, newSize.y*1.5f), TEST_LOCATION);
 
-  portraitView.GoToPage( 5 );
-  DALI_TEST_CHECK( portraitView.GetCurrentPage() == 5 );
-  END_TEST;
-}
+  // Test "current-page-id" property
+  DALI_TEST_CHECK( landscapeView.GetPropertyIndex("current-page-id") == PageTurnView::Property::CURRENT_PAGE_ID );
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), 0, TEST_LOCATION );
 
-int UtcDaliPageTurnViewEnterLeaveEditMode(void)
-{
-  ToolkitTestApplication application;
+  int pageId = static_cast<int>(TOTAL_PAGE_NUMBER)/3;
+  landscapeView.SetProperty( PageTurnView::Property::CURRENT_PAGE_ID, pageId );
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), pageId, TEST_LOCATION );
 
-  tet_infoline( " UtcDaliPageTurnViewEnterLeaveEditMode " );
+  landscapeView.SetProperty( PageTurnView::Property::CURRENT_PAGE_ID, pageId*2 );
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), pageId*2, TEST_LOCATION );
 
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
+  // Test "spin-shadow" property
+  DALI_TEST_CHECK( landscapeView.GetPropertyIndex( "spine-shadow" ) == PageTurnView::Property::SPINE_SHADOW );
+  landscapeView.SetProperty( PageTurnView::Property::SPINE_SHADOW, SPINE_SHADOW_PARAMETER );
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::SPINE_SHADOW).Get<Vector2>(), SPINE_SHADOW_PARAMETER, TEST_LOCATION );
 
-  TestPageFactory factory(application);
-  factory.EnableOffscreenRendering( );
+  landscapeView.SetProperty( PageTurnView::Property::SPINE_SHADOW,  SPINE_SHADOW_PARAMETER*0.75f );
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::SPINE_SHADOW).Get<Vector2>(), SPINE_SHADOW_PARAMETER*0.75f, TEST_LOCATION );
 
-  PageTurnView pageTurnView = PageTurnLandscapeView::New( factory, PAGE_SIZE );
-  pageTurnView.SetPositionInheritanceMode( USE_PARENT_POSITION );
-  Stage::GetCurrent().Add( pageTurnView );
-
-  Vector2 size = Stage::GetCurrent().GetSize();
-
-  pageTurnView.GoToPage(5);
-
-  // Render and notify
-  application.SendNotification();
-  application.Render(RENDER_FRAME_INTERVAL);
-
-  Actor actor = pageTurnView.EnterEditMode();
-  // Test that when entering edit mode, current page source actor is returned.
-  unsigned int pageId;
-  std::istringstream( actor.GetName() ) >> pageId;
-  DALI_TEST_CHECK( pageId == 5 );
-
-  bool signalVerified;
-  PageTurnView currentView;
-  unsigned int pageIndex;
-  bool isTurningForwards;
-  PageSignalCallback callbackPanStarted( signalVerified, currentView, pageIndex, isTurningForwards );
-  pageTurnView.PagePanStartedSignal().Connect( &callbackPanStarted, &PageSignalCallback::PagePanSignalCallback );
-
-  currentView = pageTurnView;
-  pageIndex = 5;
-  DALI_TEST_CHECK( !callbackPanStarted.mSignalVerified );
-
-  // Test that the control does not receive pan gesture in edit-mode
-  PerformGestureDiagonalSwipe( application, Vector2(size*0.75f), Vector2(size*0.01f), 10, true, true);
-  DALI_TEST_CHECK( !callbackPanStarted.mSignalVerified );
-
-  pageTurnView.LeaveEditMode();
-  // Test that the control receives pan gesture after leaving edit-mode
-  PerformGestureDiagonalSwipe( application, Vector2(size*0.75f), Vector2(size*0.01f), 10, true, true);
-  DALI_TEST_CHECK( callbackPanStarted.mSignalVerified );
-  END_TEST;
-}
-
-int UtcDaliPageTurnViewGetHitActor(void)
-{
-  ToolkitTestApplication application;
-
-  tet_infoline(" UtcDaliPageTurnViewGetHitActor ");
-
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-
-  TestPageFactory factory(application);
-  factory.EnableOffscreenRendering( );
-
-  PageTurnView pageTurnView = PageTurnPortraitView::New( factory, PAGE_SIZE );
-  pageTurnView.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  pageTurnView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  Stage::GetCurrent().Add( pageTurnView );
-
-  // Render and notify
-  application.SendNotification();
-  application.Render(RENDER_FRAME_INTERVAL);
-
-  pageTurnView.GoToPage(3);
-
-  Vector2 localCoordinate = Vector2();
-  Vector2 screenCoordinate = PAGE_SIZE*0.5f+Vector2(7.f,8.f);
-  Actor hitActor = pageTurnView.GetHitActor( screenCoordinate, localCoordinate );
-  DALI_TEST_CHECK( hitActor );
-  unsigned int pageId;
-  std::istringstream( hitActor.GetName() ) >> pageId;
-  DALI_TEST_CHECK( pageId == 3 );
-  DALI_TEST_EQUALS(  localCoordinate, IMAGE_SIZE*0.5f+Vector2(7.f,8.f), 0.1f, TEST_LOCATION  );
-
-  screenCoordinate = PAGE_SIZE*0.5f+IMAGE_SIZE;
-  hitActor = pageTurnView.GetHitActor( screenCoordinate, localCoordinate );
-  DALI_TEST_CHECK( !hitActor );
-  END_TEST;
-}
-
-int UtcDaliPageTurnViewRefresh(void)
-{
-  ToolkitTestApplication application;
-
-  tet_infoline(" UtcDaliPageTurnViewRefresh ");
-
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
-
-  TestPageFactory factory(application);
-  factory.EnableOffscreenRendering( );
-  PageTurnView pageTurnView = PageTurnPortraitView::New( factory, PAGE_SIZE );
-  pageTurnView.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  pageTurnView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  Stage::GetCurrent().Add( pageTurnView );
-
-  // Render and notify
-  application.SendNotification();
-  application.Render(RENDER_FRAME_INTERVAL);
-  application.Render(RENDER_FRAME_INTERVAL);
-  application.SendNotification();
-
-  factory.DeletePage( 0 );
-
-  pageTurnView.RefreshCurrentPage();
-  // simply calls the certain off screen render task to refresh
-  Vector2 localCoordinate = Vector2();
-  Vector2 screenCoordinate = PAGE_SIZE*0.5f;
-  Actor hitActor = pageTurnView.GetHitActor( screenCoordinate, localCoordinate );
-  unsigned int pageId;
-  std::istringstream( hitActor.GetName() ) >> pageId;
-  DALI_TEST_CHECK( pageId == 0 );
-
-  pageTurnView.RefreshAll();
-  // re-parent all the source actors and refresh
-  hitActor = pageTurnView.GetHitActor( screenCoordinate, localCoordinate );
-  std::istringstream( hitActor.GetName() ) >> pageId;
-  DALI_TEST_CHECK( pageId == 1 );
   END_TEST;
 }
 
@@ -544,7 +430,7 @@ int UtcDaliPageTurnViewSignals(void)
   Vector2 start = size * 0.75f;
   Vector2 direction = -size*0.05f; //-size*0.5f/10.f;
 
-  DALI_TEST_CHECK( portraitView.GetCurrentPage() == 0);
+  DALI_TEST_EQUALS( portraitView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), 0, TEST_LOCATION );
   PerformGestureDiagonalSwipe( application, start, direction, 5, true, false);
   DALI_TEST_CHECK( callbackTurnStarted.mSignalVerified );
   DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
@@ -557,14 +443,15 @@ int UtcDaliPageTurnViewSignals(void)
 
   Wait(application, 1000);
   DALI_TEST_CHECK( callbackTurnFinished.mSignalVerified );
-  DALI_TEST_CHECK( portraitView.GetCurrentPage() == pageIndex+1); // the page is turn over
+  // the page is turn over
+  DALI_TEST_EQUALS( portraitView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), pageIndex+1, TEST_LOCATION );
 
   //---Test 2: pan from position( size*0.5f ) to position( size.width, size.height*0.5f ) to position( size * 0.75f ), page 1 will bent then slid back---
   callbackTurnStarted.Reset();
   callbackTurnFinished.Reset();
   callbackPanStarted.Reset();
   callbackPanFinished.Reset();
-  portraitView.GoToPage(5);
+  portraitView.SetProperty( PageTurnView::Property::CURRENT_PAGE_ID, 5 );
   pageIndex = 5;
   isTurningForwards = true;
 
@@ -586,14 +473,14 @@ int UtcDaliPageTurnViewSignals(void)
 
   Wait(application, 1000);
   DALI_TEST_CHECK( callbackTurnFinished.mSignalVerified );
-  DALI_TEST_CHECK( portraitView.GetCurrentPage() == pageIndex); // the page is not turned over
+  DALI_TEST_EQUALS( portraitView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), pageIndex, TEST_LOCATION ); // the page is not turned over
 
   // ----Test 3: pan 10 frames from position( size*0.25f ) to position( size.width*0.75f, size.height*0.25f ), the previous page will be turned backwards---
   callbackTurnStarted.Reset();
   callbackTurnFinished.Reset();
   callbackPanStarted.Reset();
   callbackPanFinished.Reset();
-  portraitView.GoToPage(10);
+  portraitView.SetProperty( PageTurnView::Property::CURRENT_PAGE_ID, 10);
   pageIndex = 9; // will turn the previous page back
   isTurningForwards = false;
   start = size*0.25f;
@@ -612,6 +499,6 @@ int UtcDaliPageTurnViewSignals(void)
   Wait( application, 1000 );
 
   DALI_TEST_CHECK( callbackTurnFinished.mSignalVerified );
-  DALI_TEST_CHECK( portraitView.GetCurrentPage() == 9);
+  DALI_TEST_EQUALS( portraitView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), 9, TEST_LOCATION );
   END_TEST;
 }
