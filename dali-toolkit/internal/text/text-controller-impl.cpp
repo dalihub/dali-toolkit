@@ -1053,6 +1053,9 @@ void Controller::Impl::RepositionSelectionHandles( CharacterIndex selectionStart
 
   mEventData->mDecorator->SetPosition( RIGHT_SELECTION_HANDLE, secondaryPosition.x, secondaryPosition.y, secondaryCursorInfo.lineHeight );
 
+  // Cursor to be positioned at end of selection so if selection interrupted and edit mode restarted the cursor will be at end of selection
+  mEventData->mPrimaryCursorPosition = (indicesSwapped)?mEventData->mLeftSelectionPosition:mEventData->mRightSelectionPosition;
+
   // Set the flag to update the decorator.
   mEventData->mDecoratorUpdated = true;
 }
