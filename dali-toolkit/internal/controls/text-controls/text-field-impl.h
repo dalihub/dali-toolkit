@@ -188,6 +188,14 @@ private: // From Control
 private: // Implementation
 
   /**
+   * @brief Get a Property Map for the image used for the required Handle Image
+   * @param[out] value the returned image property
+   * @param[in] handleType the type of handle
+   * @param[in] handleImageType the type of image for the given handleType
+   */
+  void GetHandleImagePropertyValue(  Property::Value& value, Text::HandleType handleType, Text::HandleImageType handleImageType );
+
+  /**
    * @brief Enable or disable clipping.
    *
    * @param[in] clipping True if clipping should be enabled.

@@ -87,21 +87,24 @@ DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected-state-image",         STR
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabled-state-image",         STRING,  DISABLED_STATE_IMAGE         )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselected-color",             VECTOR4, UNSELECTED_COLOR             )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected-color",               VECTOR4, SELECTED_COLOR               )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "label",                        MAP,     LABEL                        )
+
+// Deprecated properties:
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "label-text",                   STRING,  LABEL_TEXT                   )
 
+// Signals:
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "pressed",                               SIGNAL_PRESSED               )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "released",                              SIGNAL_RELEASED              )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "clicked",                               SIGNAL_CLICKED               )
 DALI_SIGNAL_REGISTRATION(   Toolkit, Button, "state-changed",                         SIGNAL_STATE_CHANGED         )
 
+// Actions:
 DALI_ACTION_REGISTRATION(   Toolkit, Button, "button-click",                          ACTION_BUTTON_CLICK          )
 
 DALI_TYPE_REGISTRATION_END()
 
 const unsigned int INITIAL_AUTOREPEATING_DELAY( 0.15f );
 const unsigned int NEXT_AUTOREPEATING_DELAY( 0.05f );
-
-const char* const STYLE_BUTTON_LABEL = "button.label";
 
 } // unnamed namespace
 
@@ -428,27 +431,9 @@ float Button::GetAnimationTime() const
 
 void Button::SetLabelText( const std::string& label )
 {
-  if( !mLabel || ( label != GetLabelText() ) )
-  {
-    // If we have a label, unparent and update it.
-    if( mLabel )
-    {
-      mLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, label );
-    }
-    else
-    {
-      // If we don't have a label, create one and set it up.
-      mLabel = Toolkit::TextLabel::New( label );
-      mLabel.SetProperty( Toolkit::Control::Property::STYLE_NAME, STYLE_BUTTON_LABEL );
-      mLabel.SetPosition( 0.f, 0.f );
-      // label should be the top of the button
-      Self().Add( mLabel );
-    }
-
-    OnLabelSet( false );
-
-    RelayoutRequest();
-  }
+  Property::Map labelProperty;
+  labelProperty.Insert( "text", label );
+  ModifyLabel( labelProperty );
 }
 
 std::string Button::GetLabelText() const
@@ -459,6 +444,40 @@ std::string Button::GetLabelText() const
     return label.GetProperty<std::string>( Dali::Toolkit::TextLabel::Property::TEXT );
   }
   return std::string();
+}
+
+void Button::ModifyLabel( const Property::Map& properties )
+{
+  // If we don't have a label yet, create one.
+  if( !mLabel )
+  {
+    // If we don't have a label, create one and set it up.
+    // Note: The label text is set from the passed in property map after creation.
+    mLabel = Toolkit::TextLabel::New();
+    mLabel.SetPosition( 0.0f, 0.0f );
+    // label should be the top of the button
+    Self().Add( mLabel );
+  }
+
+  // Set any properties specified for the label by iterating through all property key-value pairs.
+  for( unsigned int i = 0, mapCount = properties.Count(); i < mapCount; ++i )
+  {
+    const StringValuePair& propertyPair( properties.GetPair( i ) );
+
+    // Convert the property string to a property index.
+    Property::Index setPropertyIndex = mLabel.GetPropertyIndex( propertyPair.first );
+    if( setPropertyIndex != Property::INVALID_INDEX )
+    {
+      // If the conversion worked, we have a valid property index,
+      // Set the property to the new value.
+      mLabel.SetProperty( setPropertyIndex, propertyPair.second );
+    }
+  }
+
+  // Notify derived button classes of the change.
+  OnLabelSet( false );
+
+  RelayoutRequest();
 }
 
 Actor& Button::GetLabelActor()
@@ -1468,6 +1487,17 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
         GetImplementation( button ).SetLabelText( value.Get< std::string >() );
         break;
       }
+
+      case Toolkit::Button::Property::LABEL:
+      {
+        // Get a Property::Map from the property if possible.
+        Property::Map setPropertyMap;
+        if( value.Get( setPropertyMap ) )
+        {
+          GetImplementation( button ).ModifyLabel( setPropertyMap );
+        }
+      }
+      break;
     }
   }
 }
@@ -1553,6 +1583,13 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
         value = GetImplementation( button ).GetLabelText();
         break;
       }
+
+      case Toolkit::Button::Property::LABEL:
+      {
+        Property::Map emptyMap;
+        value = emptyMap;
+        break;
+      }
     }
   }
 
@@ -1571,8 +1608,7 @@ void Button::SetLabel( Actor label )
     }
 
     mLabel = label;
-    mLabel.SetProperty( Toolkit::Control::Property::STYLE_NAME, STYLE_BUTTON_LABEL );
-    mLabel.SetPosition( 0.f, 0.f );
+    mLabel.SetPosition( 0.0f, 0.0f );
 
     // label should be the top of the button
     Self().Add( mLabel );

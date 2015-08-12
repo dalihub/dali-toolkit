@@ -81,6 +81,8 @@ enum HandleType
   GRAB_HANDLE,
   LEFT_SELECTION_HANDLE,
   RIGHT_SELECTION_HANDLE,
+  LEFT_SELECTION_HANDLE_MARKER,
+  RIGHT_SELECTION_HANDLE_MARKER,
   HANDLE_TYPE_COUNT
 };
 
@@ -294,6 +296,20 @@ public:
    * @return The cursor blink-duration.
    */
   float GetCursorBlinkDuration() const;
+
+  /**
+   * @brief Sets the width of the cursors.
+   *
+   * @param[in] width The width of the cursor in pixels.
+   */
+  void SetCursorWidth( int width );
+
+  /**
+   * @brief Retrieves the width of the cursors.
+   *
+   * @return The width of the cursors in pixels.
+   */
+  int GetCursorWidth() const;
 
   /**
    * @brief Sets whether a handle is active.

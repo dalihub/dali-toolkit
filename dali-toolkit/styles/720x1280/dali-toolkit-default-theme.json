@@ -60,13 +60,16 @@ distributing this software or its derivatives.
 
     "textfield":
     {
-      "point-size":28,
+      "point-size":18,
       "primary-cursor-color":[0.0,0.72,0.9,1.0],
       "secondary-cursor-color":[0.0,0.72,0.9,1.0],
+      "cursor-width":3,
       "selection-highlight-color":[0.75,0.96,1.0,1.0],
-      "grab-handle-image":"{DALI_IMAGE_DIR}cursor_handler_center.png",
-      "selection-handle-image-left":"{DALI_IMAGE_DIR}selection_handle_left.png",
-      "selection-handle-image-right":"{DALI_IMAGE_DIR}selection_handle_right.png"
+      "grab-handle-image": { "filename":"{DALI_IMAGE_DIR}cursor_handler_center.png" },
+      "selection-handle-image-left" : {"filename":"{DALI_IMAGE_DIR}selection_handle_left.png" },
+      "selection-handle-image-right": {"filename":"{DALI_IMAGE_DIR}selection_handle_right.png" },
+      "selection-handle-marker-image-left":{ "filename":"{DALI_IMAGE_DIR}selection_marker_left.png" },
+      "selection-handle-marker-image-right":{ "filename":"{DALI_IMAGE_DIR}selection_marker_right.png" }
     },
 
     "textfield-font-size-0":
@@ -101,6 +104,13 @@ distributing this software or its derivatives.
         },
       "popup-fade-in-duration":0.25,
       "popup-fade-out-duration":0.25
+    },
+    "textselectionpopupbutton":
+    {
+      "label":
+      {
+        "point-size":8
+      }
     },
     "scrollview":
     {

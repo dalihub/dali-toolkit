@@ -58,72 +58,72 @@ protected:
 public:
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetDisabled( bool disabled )
+   * @copydoc Dali::Toolkit::Button::SetDisabled
    */
   void SetDisabled( bool disabled );
 
   /**
-   * @copydoc Dali::Toolkit::Button::IsDisabled() const
+   * @copydoc Dali::Toolkit::Button::IsDisabled
    */
   bool IsDisabled() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetAutoRepeating( bool autoRepeating )
+   * @copydoc Dali::Toolkit::Button::SetAutoRepeating
    */
   void SetAutoRepeating( bool autoRepeating );
 
   /**
-   * @copydoc Dali::Toolkit::Button::IsAutoRepeating() const
+   * @copydoc Dali::Toolkit::Button::IsAutoRepeating
    */
   bool IsAutoRepeating() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay )
+   * @copydoc Dali::Toolkit::Button::SetInitialAutoRepeatingDelay
    */
   void SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay );
 
   /**
-   * @copydoc Dali::Toolkit::Button::GetInitialAutoRepeatingDelay() const
+   * @copydoc Dali::Toolkit::Button::GetInitialAutoRepeatingDelay
    */
   float GetInitialAutoRepeatingDelay() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay )
+   * @copydoc Dali::Toolkit::Button::SetNextAutoRepeatingDelay
    */
   void SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay );
 
   /**
-   * @copydoc Dali::Toolkit::Button::GetNextAutoRepeatingDelay() const
+   * @copydoc Dali::Toolkit::Button::GetNextAutoRepeatingDelay
    */
   float GetNextAutoRepeatingDelay() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetTogglableButton( bool togglable )
+   * @copydoc Dali::Toolkit::Button::SetTogglableButton
    */
   void SetTogglableButton( bool togglable );
 
   /**
-   * @copydoc Dali::Toolkit::Button::IsTogglableButton() const
+   * @copydoc Dali::Toolkit::Button::IsTogglableButton
    */
   bool IsTogglableButton() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetSelected( bool selected )
+   * @copydoc Dali::Toolkit::Button::SetSelected
    */
   void SetSelected( bool selected );
 
   /**
-   * @copydoc Dali::Toolkit::Button::IsSelected() const
+   * @copydoc Dali::Toolkit::Button::IsSelected
    */
   bool IsSelected() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetAnimationTime()
+   * @copydoc Dali::Toolkit::Button::SetAnimationTime
    */
   void SetAnimationTime( float animationTime );
 
   /**
-   * @copydoc Dali::Toolkit::Button::GetAnimationTime()
+   * @copydoc Dali::Toolkit::Button::GetAnimationTime
    */
   float GetAnimationTime() const;
 
@@ -208,6 +208,14 @@ public:
   std::string GetDisabledBackgroundImageFilename() const;
 
   /**
+   * @brief Sets the specified properties on the button label.
+   * If the label does not exist yet, it is created.
+   * The derived buttons are notified if any properties are changed.
+   * @param[in] properties A Property::Map of key-value pairs of properties to set.
+   */
+  void ModifyLabel( const Property::Map& properties );
+
+  /**
    * Performs actions as requested using the action name.
    * @param[in] object The object on which to perform the action.
    * @param[in] actionName The action to perform.
@@ -266,12 +274,12 @@ public: // Deprecated API
   void SetDisabledBackgroundImage( Actor image );
 
   /**
-   * @copydoc Dali::Toolkit::Button::GetButtonImage()
+   * @copydoc Dali::Toolkit::Button::GetButtonImage
    */
   Actor GetButtonImage() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::GetSelectedImage()
+   * @copydoc Dali::Toolkit::Button::GetSelectedImage
    */
   Actor GetSelectedImage() const;
 

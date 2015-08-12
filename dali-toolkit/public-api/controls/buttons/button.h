@@ -106,8 +106,11 @@ public:
       UNSELECTED_STATE_IMAGE,          ///< name "unselected-state-image",       @see SetUnselectedImage(),           type std::string
       SELECTED_STATE_IMAGE,            ///< name "selected-state-image",         @see SetSelectedImage(),             type std::string
       DISABLED_STATE_IMAGE,            ///< name "disabled-state-image",         @see SetDisabledImage(),             type std::string
-      UNSELECTED_COLOR,                ///< name "unselected-color",             @see SetUnselectedColor(),           type Vector4
-      SELECTED_COLOR,                  ///< name "selected-color",               @see SetSelectedColor(),             type Vector4
+      UNSELECTED_COLOR,                ///< name "unselected-color",                                                  type Vector4
+      SELECTED_COLOR,                  ///< name "selected-color",                                                    type Vector4
+      LABEL,                           ///< name "label",                                                             type Property::Map
+
+      // Deprecated properties:
       LABEL_TEXT,                      ///< name "label-text",                   @see SetLabelText(),                 type std::string
     };
   };

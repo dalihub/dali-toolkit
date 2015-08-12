@@ -23,6 +23,7 @@
 #include "dali-toolkit-test-utils/toolkit-timer.h"
 
 #include <dali.h>
+#include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali-toolkit/dali-toolkit.h>
@@ -64,28 +65,28 @@ const Dali::TouchPoint pointUpOutside( 0, TouchPoint::Up, 10.0f, 10.0f );
  * @param[in] root The root actor to count from.
  * @return The number of descendants including root actor itself.
  */
-int DescendentCount(const Actor& root)
+int DescendentCount( const Actor& root )
 {
   unsigned int numChildren = root.GetChildCount();
 
   int count = 1;
 
-  for(unsigned int i=0; i<numChildren; ++i)
+  for( unsigned int i = 0; i < numChildren; ++i )
   {
-    count += DescendentCount(root.GetChildAt(i));
+    count += DescendentCount( root.GetChildAt( i ) );
   }
 
   return count;
 }
 
-bool HasAncestor(Actor child, Actor ancestor)
+bool HasAncestor( Actor child, Actor ancestor )
 {
-  while(child && child != ancestor)
+  while( child && child != ancestor )
   {
     child = child.GetParent();
   }
 
-  return (child == ancestor);
+  return ( child == ancestor );
 }
 
 static Toolkit::Popup::DisplayState gPopupState = Toolkit::Popup::HIDDEN;
@@ -134,6 +135,43 @@ void WaitAnimation( ToolkitTestApplication& application )
     application.SendNotification();
     application.Render( RENDER_FRAME_INTERVAL );
   }
+}
+
+/**
+ * A connection tracker is required when connecting to a signal with a functor.
+ */
+class TestConnectionTrackerObject : public ConnectionTracker
+{
+};
+
+/**
+ * This functor is used to test the popup's signal connection.
+ */
+struct PopupTestFunctor
+{
+  PopupTestFunctor()
+  {
+  }
+
+  void operator()()
+  {
+  }
+};
+
+// Generate a KeyEvent to send to Core.
+Integration::KeyEvent GenerateKey( const std::string& keyName,
+                                   const std::string& keyString,
+                                   int keyCode,
+                                   int keyModifier,
+                                   unsigned long timeStamp,
+                                   const Integration::KeyEvent::State& keyState )
+{
+  return Integration::KeyEvent( keyName,
+                                keyString,
+                                keyCode,
+                                keyModifier,
+                                timeStamp,
+                                keyState );
 }
 
 } // Anonymous namespace
@@ -602,7 +640,26 @@ int UtcDaliPopupOnTouchedOutsideSignal(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK( gTouchedOutside );
+  // Confirm the signal is ignored if touch_transparent.
+  gTouchedOutside = false;
+  popup.SetProperty( Popup::Property::TOUCH_TRANSPARENT, true );
+
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointDownOutside );
+  application.ProcessEvent( event );
+
+  application.SendNotification();
+  application.Render();
+
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointUpOutside );
+  application.ProcessEvent( event );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( !gTouchedOutside );
+
   END_TEST;
 }
 
@@ -622,7 +679,14 @@ int UtcDaliPopupPropertyAutoHide(void)
   popup.SetFooter( container );
 
   popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
+  float getAnimationDuration = 0.0f;
+  DALI_TEST_CHECK( popup.GetProperty( Popup::Property::ANIMATION_DURATION ).Get( getAnimationDuration ) );
+  DALI_TEST_EQUALS( getAnimationDuration, 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
   popup.SetProperty( Popup::Property::AUTO_HIDE_DELAY, 200 );
+  int getAutoHideDelay = 0;
+  DALI_TEST_CHECK( popup.GetProperty( Popup::Property::AUTO_HIDE_DELAY ).Get( getAutoHideDelay ) );
+  DALI_TEST_EQUALS( getAutoHideDelay, 200, TEST_LOCATION );
 
   Stage::GetCurrent().Add( popup );
 
@@ -687,28 +751,673 @@ int UtcDaliPopupPropertyAnimationMode(void)
 
       DALI_TEST_EQUALS( checkMode, animationModes[i], TEST_LOCATION );
 
-      popup.SetDisplayState( Popup::SHOWN );
+      popup.SetProperty( Toolkit::Popup::Property::DISPLAY_STATE, "SHOWN" );
+      std::string resultState;
 
       // Only wait for animation if it isn't instant.
       if( j == 0 )
       {
         DALI_TEST_EQUALS( gPopupState, Popup::SHOWING, TEST_LOCATION );
+        DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::DISPLAY_STATE ).Get( resultState ) );
+        DALI_TEST_EQUALS( resultState, "SHOWING", TEST_LOCATION );
         WaitAnimation( application );
       }
 
       DALI_TEST_EQUALS( gPopupState, Popup::SHOWN, TEST_LOCATION );
+      DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::DISPLAY_STATE ).Get( resultState ) );
+      DALI_TEST_EQUALS( resultState, "SHOWN", TEST_LOCATION );
       popup.SetDisplayState( Popup::HIDDEN );
 
       if( j == 0 )
       {
         DALI_TEST_EQUALS( gPopupState, Popup::HIDING, TEST_LOCATION );
+        DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::DISPLAY_STATE ).Get( resultState ) );
+        DALI_TEST_EQUALS( resultState, "HIDING", TEST_LOCATION );
         WaitAnimation( application );
       }
 
       DALI_TEST_EQUALS( gPopupState, Popup::HIDDEN, TEST_LOCATION );
+      DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::DISPLAY_STATE ).Get( resultState ) );
+      DALI_TEST_EQUALS( resultState, "HIDDEN", TEST_LOCATION );
     }
   }
 
   END_TEST;
 }
 
+int UtcDaliPopupPropertyTitle(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliPopupPropertyTitle" );
+
+  // Create the Popup actor
+  Popup popup = Popup::New();
+
+  std::string testLabelText = "TitleTest";
+  TextLabel titleLabel = TextLabel::New();
+  titleLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, testLabelText );
+  Actor title = titleLabel;
+  Property::Map map;
+  Scripting::CreatePropertyMap( title, map );
+  popup.SetProperty( Toolkit::Popup::Property::TITLE, map );
+
+  Property::Map resultMap;
+  DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::TITLE ).Get( resultMap ) );
+
+  Property::Value* resultProperty = resultMap.Find( "text" );
+  DALI_TEST_CHECK( resultProperty );
+
+  std::string resultText;
+  DALI_TEST_CHECK( resultProperty->Get( resultText ) );
+
+  DALI_TEST_EQUALS( resultText, testLabelText, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPopupPropertyContent(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliPopupPropertyContent" );
+
+  // Create the Popup actor
+  Popup popup = Popup::New();
+
+  std::string testLabelText = "ContentTest";
+  TextLabel contentLabel = TextLabel::New();
+  contentLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, testLabelText );
+  Actor content = contentLabel;
+  Property::Map map;
+  Scripting::CreatePropertyMap( content, map );
+  popup.SetProperty( Toolkit::Popup::Property::CONTENT, map );
+
+  Property::Map resultMap;
+  DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::CONTENT ).Get( resultMap ) );
+
+  Property::Value* resultProperty = resultMap.Find( "text" );
+  DALI_TEST_CHECK( resultProperty );
+
+  std::string resultText;
+  DALI_TEST_CHECK( resultProperty->Get( resultText ) );
+
+  DALI_TEST_EQUALS( resultText, testLabelText, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPopupPropertyFooter(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliPopupPropertyFooter" );
+
+  // Create the Popup actor
+  Popup popup = Popup::New();
+
+  std::string testLabelText = "FooterTest";
+  TextLabel footerLabel = TextLabel::New();
+  footerLabel.SetProperty( Toolkit::TextLabel::Property::TEXT, testLabelText );
+  Actor footer = footerLabel;
+  Property::Map map;
+  Scripting::CreatePropertyMap( footer, map );
+  popup.SetProperty( Toolkit::Popup::Property::FOOTER, map );
+
+  Property::Map resultMap;
+  DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::FOOTER ).Get( resultMap ) );
+
+  Property::Value* resultProperty = resultMap.Find( "text" );
+  DALI_TEST_CHECK( resultProperty );
+
+  std::string resultText;
+  DALI_TEST_CHECK( resultProperty->Get( resultText ) );
+
+  DALI_TEST_EQUALS( resultText, testLabelText, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPopupPropertyContextualMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliPopupPropertyContextualMode" );
+
+  // Create the Popup actor
+  Popup popup = Popup::New();
+  popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
+  std::string testLabelText = "ContentTest";
+
+  TextLabel contentLabel = TextLabel::New();
+
+  popup.SetContent( contentLabel );
+
+  // Placement actor to parent the popup from so the popup's contextual position can be relative to it.
+  Actor placement = Actor::New();
+  placement.SetParentOrigin( ParentOrigin::CENTER );
+  placement.SetAnchorPoint( AnchorPoint::CENTER );
+  placement.SetSize( 1.0f, 1.0f );
+  placement.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+  Stage::GetCurrent().Add( placement );
+
+  placement.Add( popup );
+
+  // Test all contextual modes.
+  const char* mode[5] = { "NON_CONTEXTUAL", "ABOVE", "RIGHT", "BELOW", "LEFT" };
+  Vector2 offsetValues[5];
+  offsetValues[0] = Vector2( 0.0f, 0.0f );
+  offsetValues[1] = Vector2( 0.0f, -10.0f );
+  offsetValues[2] = Vector2( 10.0f, 0.0f );
+  offsetValues[3] = Vector2( 0.0f, 10.0f );
+  offsetValues[4] = Vector2( -10.0f, 0.0f );
+
+  for( int i = 0; i < 5; ++i )
+  {
+    popup.SetProperty( Toolkit::Popup::Property::CONTEXTUAL_MODE, mode[i] );
+
+    std::string propertyResult;
+    DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::CONTEXTUAL_MODE ).Get( propertyResult ) );
+    DALI_TEST_EQUALS( propertyResult, std::string( mode[i] ), TEST_LOCATION );
+
+    popup.SetDisplayState( Popup::SHOWN );
+    application.SendNotification();
+    application.Render();
+
+    // Check the position of the label within the popup.
+    DALI_TEST_EQUALS( contentLabel.GetCurrentWorldPosition().GetVectorXY(), offsetValues[i], TEST_LOCATION );
+
+    popup.SetDisplayState( Popup::HIDDEN );
+    application.SendNotification();
+    application.Render();
+  }
+
+  END_TEST;
+}
+
+int UtcDaliPopupPropertyBacking(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliPopupPropertyBacking" );
+
+  // Create the Popup actor
+  Popup popup = Popup::New();
+  popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
+  Stage::GetCurrent().Add( popup );
+
+  Actor backing = popup.FindChildByName( "popup-backing" );
+  DALI_TEST_CHECK( backing );
+
+  DALI_TEST_EQUALS( backing.GetCurrentOpacity(), 1.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  // Check enabled property.
+  popup.SetDisplayState( Popup::SHOWN );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( backing.GetCurrentOpacity(), 0.5f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  popup.SetDisplayState( Popup::HIDDEN );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( backing.GetCurrentOpacity(), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  popup.SetProperty( Popup::Property::BACKING_ENABLED, false );
+  bool propertyResult;
+  DALI_TEST_CHECK( popup.GetProperty( Popup::Property::BACKING_ENABLED ).Get( propertyResult ) );
+  DALI_TEST_EQUALS( propertyResult, false, TEST_LOCATION );
+
+  popup.SetDisplayState( Popup::SHOWN );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( backing.GetCurrentOpacity(), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  popup.SetDisplayState( Popup::HIDDEN );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( backing.GetCurrentOpacity(), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  // Check color property.
+  popup.SetProperty( Popup::Property::BACKING_ENABLED, true );
+  popup.SetProperty( Popup::Property::BACKING_COLOR, Vector4( 1.0f, 0.0f, 0.0f, 1.0f ) );
+
+  popup.SetDisplayState( Popup::SHOWN );
+  application.SendNotification();
+  application.Render();
+
+  Vector4 resultColor;
+  popup.GetProperty( Popup::Property::BACKING_COLOR ).Get( resultColor );
+  DALI_TEST_EQUALS( resultColor, Vector4( 1.0f, 0.0f, 0.0f, 1.0f ), Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPopupPropertyBackgroundImage(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliPopupPropertyBackgroundImage" );
+
+  // Create the Popup actor
+  Popup popup = Popup::New();
+  Stage::GetCurrent().Add( popup );
+
+  // Check setting an invalid image.
+  popup.SetProperty( Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE, "invalid-image.png" );
+  std::string resultString;
+  popup.GetProperty( Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE ).Get( resultString );
+  DALI_TEST_EQUALS( resultString, std::string(""), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPopupPropertyCustomAnimation(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliPopupPropertyCustomAnimation" );
+
+  // Create the Popup actor
+  Popup popup = Popup::New();
+  TextLabel content = TextLabel::New( "text" );
+  popup.SetContent( content );
+
+  popup.SetProperty( Popup::Property::ANIMATION_DURATION, 1.0f );
+  popup.SetProperty( Popup::Property::ANIMATION_MODE, "CUSTOM" );
+
+  Actor popupContainer = popup.FindChildByName( "popup-container" );
+  DALI_TEST_CHECK( popupContainer );
+
+  Vector3 entryAnimationDestination( 300.0f, 200.0f, 0.0f );
+  Vector3 exitAnimationDestination( -300.0f, -200.0f, 0.0f );
+
+  Property::Map animationMapEntry;
+  animationMapEntry.Insert( "actor", "custom-animation-popup" );
+  animationMapEntry.Insert( "property", "position" );
+  animationMapEntry.Insert( "value", entryAnimationDestination );
+  animationMapEntry.Insert( "alpha-function", "EASE_OUT" );
+
+  Property::Array timePeriodMapEntry;
+  timePeriodMapEntry.PushBack( 0.0f );
+  timePeriodMapEntry.PushBack( 1.0f );
+
+  animationMapEntry.Insert( "time-period", timePeriodMapEntry );
+
+  Property::Map animationMapExit;
+  animationMapExit.Insert( "actor", "custom-animation-popup" );
+  animationMapExit.Insert( "property", "position" );
+  animationMapExit.Insert( "value", exitAnimationDestination );
+  animationMapExit.Insert( "alpha-function", "EASE_IN" );
+
+  Property::Array timePeriodMapExit;
+  timePeriodMapExit.PushBack( 0.0f );
+  timePeriodMapExit.PushBack( 1.0f );
+
+  animationMapExit.Insert( "time-period", timePeriodMapExit );
+
+  popup.SetProperty( Toolkit::Popup::Property::ENTRY_ANIMATION, animationMapEntry );
+  popup.SetProperty( Toolkit::Popup::Property::EXIT_ANIMATION, animationMapExit );
+
+  Property::Map resultMap;
+  DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::ENTRY_ANIMATION ).Get( resultMap ) );
+  DALI_TEST_EQUALS( resultMap.Count(), 0, TEST_LOCATION );
+  DALI_TEST_CHECK( popup.GetProperty( Toolkit::Popup::Property::EXIT_ANIMATION ).Get( resultMap ) );
+  DALI_TEST_EQUALS( resultMap.Count(), 0, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( popup );
+  popup.SetDisplayState( Popup::SHOWN );
+
+  for( int i = 0; i < RENDER_ANIMATION_TEST_DURATION_FRAMES; i++ )
+  {
+    application.SendNotification();
+    application.Render( RENDER_FRAME_INTERVAL );
+  }
+
+  // Test the popup has animated to it's entry-transition destination.
+  DALI_TEST_EQUALS( popupContainer.GetCurrentWorldPosition(), entryAnimationDestination, 0.1f, TEST_LOCATION );
+
+  popup.SetDisplayState( Popup::HIDDEN );
+
+  for( int j = 0; j < RENDER_ANIMATION_TEST_DURATION_FRAMES; j++ )
+  {
+    application.SendNotification();
+    application.Render( RENDER_FRAME_INTERVAL );
+  }
+
+  DALI_TEST_EQUALS( popupContainer.GetCurrentWorldPosition(), exitAnimationDestination, 0.1f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+static bool gPushButtonClicked;
+static bool PushButtonClicked( Button button )
+{
+  gPushButtonClicked = true;
+  return true;
+}
+
+int UtcDaliPopupPropertyTouchTransparent(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliPopupPropertyTouchTransparent" );
+
+  // Create the Popup actor
+  Popup popup = Popup::New();
+  TextLabel content = TextLabel::New( "text" );
+  popup.SetContent( content );
+  popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
+  popup.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  popup.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  popup.SetSize( 100, 100 );
+  popup.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+
+  // Create a button (to go underneath the popup).
+  PushButton button = Toolkit::PushButton::New();
+  button.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  button.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  button.SetSize( 100, 100 );
+  button.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+
+  button.ClickedSignal().Connect( &PushButtonClicked );
+
+  Stage::GetCurrent().Add( button );
+
+  button.Add( popup );
+
+  popup.SetDisplayState( Popup::SHOWN );
+  application.SendNotification();
+  application.Render();
+
+  gPushButtonClicked = false;
+  Dali::Integration::TouchEvent event;
+  const Dali::TouchPoint pointDown( 0, TouchPoint::Down, 10.0f, 10.0f );
+  const Dali::TouchPoint pointUp( 0, TouchPoint::Up, 10.0f, 10.0f );
+
+  // Perform a click, the popup should block the click from hitting the button.
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointDown );
+  application.ProcessEvent( event );
+  application.SendNotification();
+  application.Render();
+
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointUp );
+  application.ProcessEvent( event );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( !gPushButtonClicked );
+
+  // Enable touch transparency.
+  popup.SetProperty( Popup::Property::TOUCH_TRANSPARENT, true );
+  bool propertyResult;
+  DALI_TEST_CHECK( popup.GetProperty( Popup::Property::TOUCH_TRANSPARENT ).Get( propertyResult ) );
+  DALI_TEST_EQUALS( propertyResult, true, TEST_LOCATION );
+
+  // Perform a click, the popup should allow the click to travel through to the button.
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointDown );
+  application.ProcessEvent( event );
+  application.SendNotification();
+  application.Render();
+
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( pointUp );
+  application.ProcessEvent( event );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( gPushButtonClicked );
+
+  END_TEST;
+}
+
+int UtcDaliPopupPropertyTail(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliPopupPropertyTail" );
+
+  // Create the Popup actor
+  Popup popup = Popup::New();
+  popup.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  popup.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  popup.SetSize( 100, 100 );
+  popup.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+  TextLabel content = TextLabel::New( "text" );
+  popup.SetContent( content );
+
+  std::string imageFilename = "invalid-image.jpg";
+  popup.SetProperty( Popup::Property::TAIL_DOWN_IMAGE, imageFilename );
+  popup.SetProperty( Popup::Property::TAIL_UP_IMAGE, imageFilename );
+  popup.SetProperty( Popup::Property::TAIL_RIGHT_IMAGE, imageFilename );
+  popup.SetProperty( Popup::Property::TAIL_LEFT_IMAGE, imageFilename );
+
+  std::string resultString;
+  popup.GetProperty( Toolkit::Popup::Property::TAIL_DOWN_IMAGE ).Get( resultString );
+  DALI_TEST_EQUALS( resultString, imageFilename, TEST_LOCATION );
+  popup.GetProperty( Toolkit::Popup::Property::TAIL_UP_IMAGE ).Get( resultString );
+  DALI_TEST_EQUALS( resultString, imageFilename, TEST_LOCATION );
+  popup.GetProperty( Toolkit::Popup::Property::TAIL_RIGHT_IMAGE ).Get( resultString );
+  DALI_TEST_EQUALS( resultString, imageFilename, TEST_LOCATION );
+  popup.GetProperty( Toolkit::Popup::Property::TAIL_LEFT_IMAGE ).Get( resultString );
+  DALI_TEST_EQUALS( resultString, imageFilename, TEST_LOCATION );
+
+  popup.SetProperty( Popup::Property::TAIL_VISIBILITY, true );
+  bool boolResult;
+  DALI_TEST_CHECK( popup.GetProperty( Popup::Property::TAIL_VISIBILITY ).Get( boolResult ) );
+  DALI_TEST_EQUALS( boolResult, true, TEST_LOCATION );
+
+  Actor tailActor;
+  Vector3 tailPosition( ParentOrigin::TOP_CENTER );
+
+  popup.SetProperty( Popup::Property::TAIL_POSITION, tailPosition );
+  Vector3 vectorResult;
+  DALI_TEST_CHECK( popup.GetProperty( Popup::Property::TAIL_POSITION ).Get( vectorResult ) );
+  DALI_TEST_EQUALS( vectorResult, tailPosition, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( popup );
+
+  popup.SetDisplayState( Popup::SHOWN );
+  application.SendNotification();
+  application.Render();
+  tailActor = popup.FindChildByName( "tail-image" );
+  DALI_TEST_CHECK( tailActor );
+
+  float baseValX = tailActor.GetCurrentWorldPosition().x;
+
+  DALI_TEST_GREATER( baseValX, tailActor.GetCurrentWorldPosition().y, TEST_LOCATION );
+
+  popup.SetDisplayState( Popup::HIDDEN );
+  application.SendNotification();
+  application.Render();
+
+  tailPosition = ParentOrigin::CENTER_LEFT;
+  popup.SetProperty( Popup::Property::TAIL_POSITION, tailPosition );
+
+  popup.SetDisplayState( Popup::SHOWN );
+  application.SendNotification();
+  application.Render();
+  tailActor = popup.FindChildByName( "tail-image" );
+  DALI_TEST_CHECK( tailActor );
+
+  float baseValY = tailActor.GetCurrentWorldPosition().y;
+  DALI_TEST_GREATER( baseValX, tailActor.GetCurrentWorldPosition().x, TEST_LOCATION );
+
+  popup.SetDisplayState( Popup::HIDDEN );
+  application.SendNotification();
+  application.Render();
+
+  tailPosition = ParentOrigin::BOTTOM_CENTER;
+  popup.SetProperty( Popup::Property::TAIL_POSITION, tailPosition );
+
+  popup.SetDisplayState( Popup::SHOWN );
+  application.SendNotification();
+  application.Render();
+  tailActor = popup.FindChildByName( "tail-image" );
+  DALI_TEST_CHECK( tailActor );
+  DALI_TEST_EQUALS( tailActor.GetCurrentWorldPosition().x, baseValX, TEST_LOCATION );
+  DALI_TEST_GREATER( tailActor.GetCurrentWorldPosition().y, baseValY, TEST_LOCATION );
+
+  popup.SetDisplayState( Popup::HIDDEN );
+  application.SendNotification();
+  application.Render();
+
+  tailPosition = ParentOrigin::CENTER_RIGHT;
+  popup.SetProperty( Popup::Property::TAIL_POSITION, tailPosition );
+
+  popup.SetDisplayState( Popup::SHOWN );
+  application.SendNotification();
+  application.Render();
+  tailActor = popup.FindChildByName( "tail-image" );
+  DALI_TEST_CHECK( tailActor );
+  DALI_TEST_GREATER( tailActor.GetCurrentWorldPosition().x, baseValX, TEST_LOCATION );
+  DALI_TEST_EQUALS( tailActor.GetCurrentWorldPosition().y, baseValY, TEST_LOCATION );
+
+  popup.SetDisplayState( Popup::HIDDEN );
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliPopupTypeToast(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliPopupTypeToast" );
+
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( "popup-toast" );
+  DALI_TEST_CHECK( typeInfo )
+
+  BaseHandle baseHandle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( baseHandle )
+
+  Toolkit::Popup popup = Toolkit::Popup::DownCast( baseHandle );
+  gPopupState = Toolkit::Popup::HIDDEN;
+  ConnectStateSignals( popup );
+  popup.SetProperty( Popup::Property::ANIMATION_DURATION, 1.0f );
+
+  popup.SetTitle( Toolkit::TextLabel::New( "This is a Toast Popup.\nIt will auto-hide itself" ) );
+  Stage::GetCurrent().Add( popup );
+  popup.SetDisplayState( Toolkit::Popup::SHOWN );
+
+  for( int i = 0; i < RENDER_ANIMATION_TEST_DURATION_FRAMES; i++ )
+  {
+    application.SendNotification();
+    application.Render( RENDER_FRAME_INTERVAL );
+  }
+
+  // Check the toast popup is shown.
+  DALI_TEST_EQUALS( gPopupState, Popup::SHOWN, TEST_LOCATION );
+
+  for( int i = 0; i < RENDER_ANIMATION_TEST_DURATION_FRAMES; i++ )
+  {
+    application.SendNotification();
+    application.Render( RENDER_FRAME_INTERVAL );
+  }
+
+  // Check the toast popup hides.
+  Dali::Timer timer = Timer::New( 0 );
+  timer.MockEmitSignal();
+
+  for( int i = 0; i < RENDER_ANIMATION_TEST_DURATION_FRAMES; i++ )
+  {
+    application.SendNotification();
+    application.Render( RENDER_FRAME_INTERVAL );
+  }
+
+  DALI_TEST_EQUALS( gPopupState, Popup::HIDDEN, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPopupTypeRegistryCreation(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliPopupTypeRegistryCreation" );
+
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( "Popup" );
+  DALI_TEST_CHECK( typeInfo )
+
+  BaseHandle baseHandle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( baseHandle )
+
+  Toolkit::Popup popup = Toolkit::Popup::DownCast( baseHandle );
+  gPopupState = Toolkit::Popup::HIDDEN;
+  ConnectStateSignals( popup );
+  popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
+
+  Stage::GetCurrent().Add( popup );
+  popup.SetDisplayState( Toolkit::Popup::SHOWN );
+
+  application.SendNotification();
+  application.Render();
+
+  // Check the popup is shown.
+  DALI_TEST_EQUALS( gPopupState, Popup::SHOWN, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPopupPropertyTypeRegistryConnectSignal(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliPopupPropertyTypeRegistryConnectSignal" );
+
+  // Create the Popup actor
+  Popup popup = Popup::New();
+
+  TestConnectionTrackerObject* testTracker = new TestConnectionTrackerObject();
+  // Note: The emmision of this signals has already been tested in other tests.
+  DALI_TEST_CHECK( popup.ConnectSignal( testTracker, "touched-outside", PopupTestFunctor() ) );
+  DALI_TEST_CHECK( popup.ConnectSignal( testTracker, "showing", PopupTestFunctor() ) );
+  DALI_TEST_CHECK( popup.ConnectSignal( testTracker, "shown", PopupTestFunctor() ) );
+  DALI_TEST_CHECK( popup.ConnectSignal( testTracker, "hiding", PopupTestFunctor() ) );
+  DALI_TEST_CHECK( popup.ConnectSignal( testTracker, "hidden", PopupTestFunctor() ) );
+
+  // Test connecting to an invalid signal does not work.
+  DALI_TEST_CHECK( !popup.ConnectSignal( testTracker, "invalid", PopupTestFunctor() ) );
+
+  END_TEST;
+}
+
+int UtcDaliPopupOnControlChildAdd(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliPopupOnControlChildAdd" );
+
+  // Create the Popup actor
+  Popup popup = Popup::New();
+  popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
+  std::string testLabelText = "ContentTest";
+  TextLabel contentLabel = TextLabel::New( testLabelText );
+
+  popup.Add( contentLabel );
+
+  DALI_TEST_CHECK( HasAncestor( contentLabel, popup ) );
+
+  END_TEST;
+}
+
+int UtcDaliPopupOnKeyEvent(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliPopupOnKeyEvent" );
+
+  // Create the Popup actor
+  Popup popup = Popup::New();
+  popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
+  Stage::GetCurrent().Add( popup );
+
+  popup.SetDisplayState( Popup::SHOWN );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( popup.GetDisplayState(), Popup::SHOWN, TEST_LOCATION );
+
+  popup.SetKeyInputFocus();
+
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down ) );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( popup.GetDisplayState(), Popup::HIDDEN, TEST_LOCATION );
+
+  END_TEST;
+}

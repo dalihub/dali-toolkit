@@ -309,9 +309,9 @@ private:
   /**
    * @brief Create Dimmed Backing (covers all content behind the dialog).
    *
-   * @return The backing actor.
+   * @return The backing control.
    */
-  ImageActor CreateBacking();
+  Toolkit::Control CreateBacking();
 
   /**
    * @brief Creates the lower area within the popup.
@@ -494,7 +494,7 @@ private:
 
   Layer mLayer;                                      ///< Popup Layer (i.e. Dim backing and PopupBg reside in this).
   Toolkit::TableView mPopupLayout;                   ///< Popup Background (i.e. dialog reside in this).
-  ImageActor mBacking;                               ///< Backing actor (dim effect).
+  Toolkit::Control mBacking;                         ///< Backing actor (dim effect).
   Actor mPreviousFocusedActor;                       ///< Store the previous focused actor to restore the focus when popup hide.
   Actor mTailImage;                                  ///< Stores the tail image.
   Actor mPopupContainer;                             ///< This actor is used to house the background image and the main popup layout.

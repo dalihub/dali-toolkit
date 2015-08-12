@@ -1514,6 +1514,12 @@ void Controller::DecorationEvent( HandleType handleType, HandleState state, floa
         mImpl->mEventData->mEventQueue.push_back( event );
         break;
       }
+      case LEFT_SELECTION_HANDLE_MARKER:
+      case RIGHT_SELECTION_HANDLE_MARKER:
+      {
+        // Markers do not move the handles.
+        break;
+      }
       case HANDLE_TYPE_COUNT:
       {
         DALI_ASSERT_DEBUG( !"Controller::HandleEvent. Unexpected handle type" );

@@ -1716,6 +1716,7 @@ void ScrollView::EnableScrollOvershoot(bool enable)
 
 void ScrollView::AddOverlay(Actor actor)
 {
+  actor.SetDrawMode( DrawMode::OVERLAY_2D );
   mInternalActor.Add( actor );
 }
 
