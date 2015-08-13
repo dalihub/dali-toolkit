@@ -923,7 +923,38 @@ void TextField::OnInitialize()
 
 void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
 {
-  GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnStyleChange\n");
+
+   switch ( change )
+   {
+     case StyleChange::DEFAULT_FONT_CHANGE:
+     {
+       DALI_LOG_INFO( gLogFilter, Debug::General, "TextField::OnStyleChange StyleChange::DEFAULT_FONT_CHANGE\n");
+       if ( mController->GetDefaultFontFamily() == "" )
+       {
+         // Property system did not set the font so should update it.
+         // todo instruct text-controller to update model
+       }
+       break;
+     }
+
+     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
+     {
+       DALI_LOG_INFO( gLogFilter, Debug::General, "TextField::OnStyleChange StyleChange::DEFAULT_FONT_SIZE_CHANGE (%f)\n", mController->GetDefaultPointSize() );
+
+       if ( (mController->GetDefaultPointSize() <= 0.0f) ) // If DefaultPointSize not set by Property system it will be 0.0f
+       {
+         // Property system did not set the PointSize so should update it.
+         // todo instruct text-controller to update model
+       }
+       break;
+     }
+     case StyleChange::THEME_CHANGE:
+     {
+       GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+       break;
+     }
+   }
 }
 
 Vector3 TextField::GetNaturalSize()
