@@ -1473,7 +1473,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     cursorInfo.lineHeight = GetDefaultFontLineHeight();
     cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
 
-    cursorInfo.primaryPosition.x = 1.f;
+    cursorInfo.primaryPosition.x = mEventData->mDecorator->GetCursorWidth();
     cursorInfo.primaryPosition.y = 0.f;
 
     // Nothing else to do.
@@ -1742,7 +1742,7 @@ void Controller::Impl::UpdateCursorPosition()
     {
       case LayoutEngine::HORIZONTAL_ALIGN_BEGIN:
       {
-        cursorPosition.x = 1.f;
+        cursorPosition.x = mEventData->mDecorator->GetCursorWidth();
         break;
       }
       case LayoutEngine::HORIZONTAL_ALIGN_CENTER:
