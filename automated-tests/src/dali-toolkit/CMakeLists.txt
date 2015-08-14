@@ -48,6 +48,7 @@ SET(TC_SOURCES
    utc-Dali-StyleManager.cpp
    utc-Dali-SuperBlurView.cpp
    utc-Dali-Toolkit.cpp
+   utc-Dali-Model3dView.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)
