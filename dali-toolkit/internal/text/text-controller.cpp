@@ -1160,6 +1160,13 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // Menu/Home key behaviour does not allow edit mode to resume like Power key
       // Avoids calling the InsertText() method which can delete selected text
     }
+    else if( Dali::DALI_KEY_SHIFT_LEFT == keyCode )
+    {
+      // DALI_KEY_SHIFT_LEFT is the key code for the Left Shift. It's sent (by the imf?) when the predictive text is enabled
+      // and a character is typed after the type of a upper case latin character.
+
+      // Do nothing.
+    }
     else
     {
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p keyString %s\n", this, keyString.c_str() );
